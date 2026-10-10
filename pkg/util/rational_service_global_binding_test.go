@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestRationalServiceSourceGlobalSlotExactPublicationAndStaticEnd(t *testing.T) {
@@ -43,11 +44,11 @@ func TestRationalServiceSourceGlobalSlotExactPublicationAndStaticEnd(t *testing.
 func TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes(t *testing.T) {
 	for ordinal := int64(0); ordinal < 64; ordinal++ {
 		b := arena.NewBudget(1 << 24)
-		r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 		serviceMust(t, e)
 		cfg := serviceConfig(b)
 		cfg.Integers.Memory = r
-		cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 
 		b.FailAfter(ordinal)
 		m, e := NewRationalManager(RationalConfig{Integers: cfg.Integers, Synchronized: true})
@@ -59,8 +60,8 @@ func TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes(t *testing.T) {
 			// Source destruction has consumed some typed members; name each surviving
 			// constructor scalar before comparing actual direct provider objects.
 			refs := []NumericCellRef{failed.Tmp[0], failed.Tmp[1], failed.Arg[0], failed.Arg[1], failed.IntMin.Cell, failed.Two64.Cell}
-			objects := map[ObjectRef]bool{}
-			blocks := map[Block]bool{}
+			objects := map[umemory.ObjectRef]bool{}
+			blocks := map[umemory.Block]bool{}
 			for _, ref := range refs {
 				if ref == 0 || failed.IsFailureRef(ref) {
 					continue
@@ -72,7 +73,7 @@ func TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes(t *testing.T) {
 				if c.Released {
 					continue
 				}
-				if c.Backing.Object == (ObjectRef{}) || objects[c.Backing.Object] {
+				if c.Backing.Object == (umemory.ObjectRef{}) || objects[c.Backing.Object] {
 					t.Fatal("missing/duplicate constructor payload")
 				}
 				objects[c.Backing.Object] = true
@@ -80,7 +81,7 @@ func TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes(t *testing.T) {
 				_, readErr := r.Size(c.Backing.Raw)
 				serviceMust(t, readErr)
 			}
-			if failed.PendingCell.Object != (ObjectRef{}) {
+			if failed.PendingCell.Object != (umemory.ObjectRef{}) {
 				if objects[failed.PendingCell.Object] {
 					t.Fatal("duplicate pending cell")
 				}

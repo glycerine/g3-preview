@@ -3,6 +3,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // ToRational follows the source copy/unpack/scale route. The output belongs to
@@ -14,7 +15,7 @@ func (m *ArbitraryFloatManager) ToRational(x *ArbitraryFloat, qm *RationalManage
 		return e
 	}
 	if qm == nil || qm.self != qm {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := qm.checkSetter(out); e != nil {
 		return e

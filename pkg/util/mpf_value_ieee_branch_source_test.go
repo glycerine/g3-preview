@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Independent IEEE bit checks are distinct from the original ENSURE adapter.
@@ -13,7 +14,7 @@ import (
 // exponent mapping, rather than substituting a general format conversion.
 func TestArbitraryFloatIEEEIndependentBranchBitsAndWarmNoAllocation(t *testing.T) {
 	b := arena.NewBudget(1 << 27)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	cases := []struct {
 		eb, sb uint32
@@ -80,7 +81,7 @@ func TestArbitraryFloatIEEEIndependentBranchBitsAndWarmNoAllocation(t *testing.T
 
 func TestArbitraryFloatIEEERepresentedShiftGuardDomains(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	var x ArbitraryFloat
 	one := NewInt(1)
@@ -113,7 +114,7 @@ func TestArbitraryFloatIEEECompiledWidthAssertionLeavesSignificandUnread(t *test
 		return
 	}
 	b := arena.NewBudget(1 << 26)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	var x ArbitraryFloat
 	var sig Int
@@ -131,7 +132,7 @@ func TestArbitraryFloatIEEECompiledWidthAssertionLeavesSignificandUnread(t *test
 		t.Fatal("width assertion read stale significand", e)
 	}
 	copied := *m
-	if _, e := copied.ToDouble(&stale); e != ErrRuntimeOwner {
+	if _, e := copied.ToDouble(&stale); e != umemory.ErrRuntimeOwner {
 		t.Fatal("copied owner accepted", e)
 	}
 	if b.Used() != used {

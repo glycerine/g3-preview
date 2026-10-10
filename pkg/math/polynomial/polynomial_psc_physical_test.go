@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Ownership follows actual completed local fields and native reference slices.
-func polynomialPSCPhysical(t *testing.T, m *MultivariatePolynomialCore, refs []*PolynomialRef, polys []Polynomial, external []util.Block) {
+func polynomialPSCPhysical(t *testing.T, m *MultivariatePolynomialCore, refs []*PolynomialRef, polys []Polynomial, external []umemory.Block) {
 	polynomialPSCPhysicalVectors(t, m, refs, nil, polys, external)
 }
-func polynomialPSCPhysicalVectors(t *testing.T, m *MultivariatePolynomialCore, refs []*PolynomialRef, vectors []*PolynomialRefVector, polys []Polynomial, external []util.Block) {
+func polynomialPSCPhysicalVectors(t *testing.T, m *MultivariatePolynomialCore, refs []*PolynomialRef, vectors []*PolynomialRefVector, polys []Polynomial, external []umemory.Block) {
 	t.Helper()
 	b := &m.pscBuffer
 	if s := &m.pscLocal; s.active {

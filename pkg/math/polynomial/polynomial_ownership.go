@@ -5,7 +5,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func (m *MultivariatePolynomialCore) monomialRefCount(a Monomial) (uint32, error) {
@@ -123,10 +123,10 @@ func (m *MultivariatePolynomialCore) cleanupPendingCreation() error {
 			}
 		}
 		l.live = false
-	} else if p.raw != (util.ObjectRef{}) {
+	} else if p.raw != (umemory.ObjectRef{}) {
 		status, e := m.monomials.allocator.DeallocateTracked(uint64(p.requested), p.raw)
 		if status.PhysicalReleased || status.PooledLinked {
-			p.raw = util.ObjectRef{}
+			p.raw = umemory.ObjectRef{}
 		}
 		if e != nil {
 			return e

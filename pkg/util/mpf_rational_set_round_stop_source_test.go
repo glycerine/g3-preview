@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Initial straight-line TLS scan did not reach Round; retained as a recipe
@@ -24,9 +25,9 @@ func rationalSetInitialRoundNUMStopDiagnostic(t *testing.T) {
 }
 func rationalSetRoundNUMStopRecipe(t *testing.T, offset int64) bool {
 	b := arena.NewBudget(1 << 28)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	q := NewRational()
 	zero := NewRational()
@@ -50,7 +51,7 @@ func rationalSetRoundNUMStopRecipe(t *testing.T, offset int64) bool {
 	s := &m.RoundScope
 	t.Log("actual reached offset", offset, "child", body, "source", s.sourceCause, "flags", s.stickyConstructed, s.capConstructed, s.sigmaConstructed, "parent", m.rationalSet.sourceCause)
 	matched := s.sourceCause == arena.ErrBounds && s.stickyConstructed && s.capConstructed && s.sigmaConstructed && m.rationalSet.sourceCause == s.sourceCause && m.rationalSet.sqLive && m.rationalSet.tLive && m.rationalSet.pLive && m.rationalSet.expLive && m.rationalSet.sigLive && errors.Is(body, s.sourceCause)
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &q.Num, &q.Den, &out.significand, &s.sticky, &s.cap, &s.sigma, &m.rationalSet.sig.Num, &m.rationalSet.sig.Den, &m.rationalSet.exp, &m.rationalSet.p, &m.rationalSet.p2, &m.rationalSet.prev, &m.rationalSet.t.Num, &m.rationalSet.t.Den, &m.rationalSet.sq.Num, &m.rationalSet.sq.Den, &m.rational.NTmp, &m.rational.AddTmp1, &m.rational.AddTmp2, &m.rational.LtTmp1.Num, &m.rational.LtTmp1.Den, &m.rational.LtTmp2.Num, &m.rational.LtTmp2.Den)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{lane}, &q.Num, &q.Den, &out.significand, &s.sticky, &s.cap, &s.sigma, &m.rationalSet.sig.Num, &m.rationalSet.sig.Den, &m.rationalSet.exp, &m.rationalSet.p, &m.rationalSet.p2, &m.rationalSet.prev, &m.rationalSet.t.Num, &m.rationalSet.t.Den, &m.rationalSet.sq.Num, &m.rationalSet.sq.Den, &m.rational.NTmp, &m.rational.AddTmp1, &m.rational.AddTmp2, &m.rational.LtTmp1.Num, &m.rational.LtTmp1.Den, &m.rational.LtTmp2.Num, &m.rational.LtTmp2.Den)
 	if b.Used() != rt.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("before recovery named cold graph")
 	}
@@ -93,9 +94,9 @@ func rationalSetRoundNUMStopRecipe(t *testing.T, offset int64) bool {
 		}
 	}
 	contextTLSFinish(t, rt, m.Close)
-	for _, p := range []*Block{&lane, &recovery} {
+	for _, p := range []*umemory.Block{&lane, &recovery} {
 		contextTLSFinish(t, rt, func() error {
-			if *p == (Block{}) {
+			if *p == (umemory.Block{}) {
 				return nil
 			}
 			return rt.Deallocate(p)

@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // One actual monomial_ref local, constructed only after the coefficient loops.
@@ -47,7 +48,7 @@ func (m *MultivariatePolynomialCore) finishTranslation(cause error) error {
 	}
 	ownsGenerated := s.generated != (Monomial{}) && m.generatedActive && m.generatedMonomial == s.generated
 	ownsFactory := s.factoryGeneration != 0 && m.generatedCalleeGeneration == s.factoryGeneration
-	ownsCell := m.pending.translationOwned && (m.pending.raw != (util.ObjectRef{}) || m.pending.value != (Polynomial{}))
+	ownsCell := m.pending.translationOwned && (m.pending.raw != (umemory.ObjectRef{}) || m.pending.value != (Polynomial{}))
 	if !ownsGenerated && !ownsFactory && !ownsCell && !s.xk.assigning {
 		// A normal return transfers the completed raw pointer to the caller. A
 		// body error retains a genuinely constructed return object for owning abort.

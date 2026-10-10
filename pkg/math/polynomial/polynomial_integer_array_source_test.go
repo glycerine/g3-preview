@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialIntegerArrayActualObjectAndEarlyOne(t *testing.T) {
@@ -69,11 +70,11 @@ func TestPolynomialIntegerArrayReachedRuntimeCohortAndUnreadZero(t *testing.T) {
 	view.Count = 1
 	g = util.NewInt(19)
 	e = z.GCDManyIndexed(view, &g)
-	if !errors.Is(e, util.ErrRuntimeOwner) || g != util.NewInt(19) {
+	if !errors.Is(e, umemory.ErrRuntimeOwner) || g != util.NewInt(19) {
 		t.Fatal("reached foreign Runtime must reject before publication", e, g)
 	}
 	integerPhysicalAudit(t, z, &g)
-	integerPhysicalAuditWithRaw(t, foreign, []util.Block{raw})
+	integerPhysicalAuditWithRaw(t, foreign, []umemory.Block{raw})
 	own, e := z.RuntimeOwner().Allocate(24)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, z.RuntimeOwner().Deallocate(&own)) })
@@ -84,5 +85,5 @@ func TestPolynomialIntegerArrayReachedRuntimeCohortAndUnreadZero(t *testing.T) {
 	if g != util.NewInt(1) {
 		t.Fatal("same Runtime source early-one must skip physical tail", g)
 	}
-	integerPhysicalAuditWithRaw(t, z, []util.Block{own}, &g)
+	integerPhysicalAuditWithRaw(t, z, []umemory.Block{own}, &g)
 }

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatCopyFromExplicitForeignOwner(t *testing.T) {
@@ -76,7 +77,7 @@ func TestArbitraryFloatForeignSourceLifecycleDuringDestinationTransport(t *testi
 		var refused [10]error
 		active, calls := false, 0
 		sourceUsed := sb.Used()
-		r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 			if active {
 				calls++
 				refused[0] = provider.Close()
@@ -93,7 +94,7 @@ func TestArbitraryFloatForeignSourceLifecycleDuringDestinationTransport(t *testi
 			return f
 		}})
 		serviceMust(t, e)
-		m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+		m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 		serviceMust(t, e)
 		row, e := r.Allocate(32)
 		serviceMust(t, e)
@@ -114,7 +115,7 @@ func TestArbitraryFloatForeignSourceLifecycleDuringDestinationTransport(t *testi
 			body = m.SetComponentsToRuntimeFromOwnerWithReceipt(row, 0, 11, 40000, true, -42, provider.integer, &raw, &receipt)
 		}
 		active = false
-		if !errors.Is(body, Failure{Kind: FailureMemout}) || calls == 0 {
+		if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls == 0 {
 			t.Fatal(body, calls)
 		}
 		for i, e := range refused {
@@ -127,7 +128,7 @@ func TestArbitraryFloatForeignSourceLifecycleDuringDestinationTransport(t *testi
 		}
 		out, e := m.CaptureRuntimeValue(row, 0)
 		serviceMust(t, e)
-		integerPhysicalAuditWithRaw(t, m.integer, []Block{row, padding}, &out.significand)
+		integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{row, padding}, &out.significand)
 		integerPhysicalAudit(t, provider.integer, &raw, &input.significand)
 		serviceMust(t, m.CleanupValueCopy(&receipt, false))
 		serviceMust(t, r.SetMaxSize(0))

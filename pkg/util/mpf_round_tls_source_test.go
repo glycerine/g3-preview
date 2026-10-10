@@ -6,13 +6,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatRoundActualTLSAllocationReceipt(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	for _, n := range []uint32{2004, 2002, 2000, 1999} {
 		_, e = m.roundPower(n, false)
@@ -38,27 +39,27 @@ func TestArbitraryFloatRoundActualTLSAllocationReceipt(t *testing.T) {
 		t.Fatal("actual reached allocation did not stop")
 	}
 	s := &m.RoundScope
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &sig, &x.significand, &s.sigma, &s.cap, &s.sticky)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &sig, &x.significand, &s.sigma, &s.cap, &s.sticky)
 	if b.Used() != rt.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("before lift exact cold graph")
 	}
 	pending, e := m.integer.Allocator.PendingRoots()
 	serviceMust(t, e)
 	retained := false
-	if block := s.Transferred.Block(); block != (Block{}) {
+	if block := s.Transferred.Block(); block != (umemory.Block{}) {
 		retained = true
 		if s.history == nil || s.history.originalPending != block {
 			t.Fatal("transferred allocation lost issued leaf token")
 		}
 	}
-	if s.Numeric.Cell.Object != (ObjectRef{}) {
+	if s.Numeric.Cell.Object != (umemory.ObjectRef{}) {
 		retained = true
 		if s.history == nil || s.history.originalCell != s.Numeric.Cell {
 			t.Fatal("detached cell lost issued backing token")
 		}
 	}
 	for i, p := range pending {
-		if p != (Block{}) {
+		if p != (umemory.Block{}) {
 			retained = true
 			if s.Numeric.Allocator[i] != p {
 				t.Fatal("actual reached raw allocation prefix lacks round child", body, p)
@@ -106,19 +107,19 @@ func TestArbitraryFloatRoundActualTLSAllocationReceipt(t *testing.T) {
 	}
 	serviceMust(t, m.Close())
 	contextTLSFinish(t, rt, func() error {
-		if pad == (Block{}) {
+		if pad == (umemory.Block{}) {
 			return nil
 		}
 		return rt.Deallocate(&pad)
 	})
 	contextTLSFinish(t, rt, func() error {
-		if lane == (Block{}) {
+		if lane == (umemory.Block{}) {
 			return nil
 		}
 		return rt.Deallocate(&lane)
 	})
 	contextTLSFinish(t, rt, func() error {
-		if recovery == (Block{}) {
+		if recovery == (umemory.Block{}) {
 			return nil
 		}
 		return rt.Deallocate(&recovery)

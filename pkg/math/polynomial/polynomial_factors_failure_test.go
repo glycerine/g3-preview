@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialFactorsConstructorColdRefusal(t *testing.T) {
@@ -136,12 +137,12 @@ func TestPolynomialFactorsAbortOwnsReachedCalleesOnly(t *testing.T) {
 			m.core.integer.Budget().FailAfter(fail)
 			e = f.Multiply(r)
 			polynomialFactorsAudit(t, f, []Polynomial{p}, nil, r)
-			actualOwned := m.core.generatedActive || m.core.generatedCalleePending || m.core.pending.raw != (util.ObjectRef{}) || m.core.pending.value != (Polynomial{})
+			actualOwned := m.core.generatedActive || m.core.generatedCalleePending || m.core.pending.raw != (umemory.ObjectRef{}) || m.core.pending.value != (Polynomial{})
 			m.core.integer.Budget().FailAfter(-1)
 			serviceMust(t, f.Cleanup())
 			if e != nil && actualOwned {
 				found = true
-				if m.core.generatedActive || m.core.generatedCalleePending || m.core.pending.raw != (util.ObjectRef{}) || m.core.pending.value != (Polynomial{}) {
+				if m.core.generatedActive || m.core.generatedCalleePending || m.core.pending.raw != (umemory.ObjectRef{}) || m.core.pending.value != (Polynomial{}) {
 					t.Fatal("operation abort left its reached source callee", fail)
 				}
 			}
@@ -197,7 +198,7 @@ func TestPolynomialFactorsDisplayEveryReservation(t *testing.T) {
 
 func TestPolynomialFactorsConstantFactoryOwnsSingleton(t *testing.T) {
 	q, budget := rationalManager(t, false)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: q.Integers().Memory, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: q.Integers().Memory, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	control := &polynomialEvalControl{limit: 100000}
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: control.checkpoint, Cooperation: control.cooperate}})
@@ -227,7 +228,7 @@ func TestPolynomialFactorsConstantFactoryOwnsSingleton(t *testing.T) {
 
 func TestPolynomialFactorsSingletonForeignReplacement(t *testing.T) {
 	q, budget := rationalManager(t, false)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: q.Integers().Memory, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: q.Integers().Memory, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	control := &polynomialEvalControl{limit: 100000}
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: control.checkpoint, Cooperation: control.cooperate}})

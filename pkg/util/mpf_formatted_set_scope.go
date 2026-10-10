@@ -2,6 +2,7 @@
 package util
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"reflect"
 )
 
@@ -30,10 +31,10 @@ type arbitraryFloatFormattedSetHistory struct {
 	Invocation, header               uint64
 	owned                            bool
 	Numeric                          NumericAllocationRoots
-	Transferred                      SmallAllocatorPendingAllocation
+	Transferred                      umemory.SmallAllocatorPendingAllocation
 	cellRetired                      bool
 	originalCell                     SourceCellBacking
-	originalPending                  Block
+	originalPending                  umemory.Block
 	copy                             ArbitraryFloatValueCopyReceipt
 	roundChild                       ArbitraryFloatRoundReceipt
 	roundFrame                       *ArbitraryFloatRoundScope
@@ -60,7 +61,7 @@ func (c integerAllocationInvocationContext) prepareFormattedSetHistory(z *Intege
 	}
 	s := c.formattedSetFrame(z, true)
 	if s == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.history != nil {
 		return nil
@@ -80,24 +81,24 @@ func (c integerAllocationInvocationContext) prepareFormattedSetHistory(z *Intege
 	}
 	return nil
 }
-func (z *IntegerManager) captureFormattedSetAllocation(c integerAllocationInvocationContext, b SourceCellBacking, o *SmallAllocatorAllocationOutcome) error {
+func (z *IntegerManager) captureFormattedSetAllocation(c integerAllocationInvocationContext, b SourceCellBacking, o *umemory.SmallAllocatorAllocationOutcome) error {
 	s := c.formattedSetFrame(z, true)
 	if s == nil {
 		return nil
 	}
-	if b.Object != (ObjectRef{}) {
+	if b.Object != (umemory.ObjectRef{}) {
 		s.history.originalCell = b
 		if z.PendingCell == b {
 			z.PendingCell = SourceCellBacking{}
 		}
 	}
-	if o.Pending != (Block{}) {
+	if o.Pending != (umemory.Block{}) {
 		s.history.originalPending = o.Pending
 		if e := z.Allocator.TransferAllocationPending(o, &s.history.Transferred); e != nil {
 			return e
 		}
 		if s.history.Numeric.Allocator[0] == o.Pending {
-			s.history.Numeric.Allocator[0] = Block{}
+			s.history.Numeric.Allocator[0] = umemory.Block{}
 		}
 	}
 	return nil
@@ -115,17 +116,17 @@ func (s *arbitraryFloatFormattedSetScope) recordHistory() {
 }
 func (m *ArbitraryFloatManager) formattedSetHistory(r *ArbitraryFloatFormattedSetReceipt) (*arbitraryFloatFormattedSetHistory, error) {
 	if m == nil || m.self != m || r == nil || r.Manager != m || r.Frame == nil || r.Invocation == 0 {
-		return nil, ErrRuntimeOwner
+		return nil, umemory.ErrRuntimeOwner
 	}
 	for h := m.FormattedSetHistories; h != nil; h = h.Next {
 		if h == r.Frame {
 			if h.Self != h || h.Manager != m || h.Invocation != r.Invocation || h.Issued != *r {
-				return nil, ErrRuntimeOwner
+				return nil, umemory.ErrRuntimeOwner
 			}
 			return h, nil
 		}
 	}
-	return nil, ErrRuntimeOwner
+	return nil, umemory.ErrRuntimeOwner
 }
 func (m *ArbitraryFloatManager) FormattedSetInvocationCauses(r *ArbitraryFloatFormattedSetReceipt) (body, source, own error) {
 	h, e := m.formattedSetHistory(r)
@@ -139,7 +140,7 @@ func (m *ArbitraryFloatManager) formattedRoundMatches(s *arbitraryFloatFormatted
 }
 func (m *ArbitraryFloatManager) formattedRoundSourceCause(s *arbitraryFloatFormattedSetScope) error {
 	if m == nil || m.self != m || s != &m.formattedSet || s.manager != m || s.invocation == 0 {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.roundChild.frame != nil {
 		_, source, _ := m.RoundInvocationCauses(&s.roundChild)
@@ -152,7 +153,7 @@ func (m *ArbitraryFloatManager) formattedRoundSourceCause(s *arbitraryFloatForma
 }
 func (m *ArbitraryFloatManager) formattedRoundCleanup(s *arbitraryFloatFormattedSetScope, abort bool) error {
 	if m == nil || m.self != m || s != &m.formattedSet || s.manager != m || s.invocation == 0 {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.roundChild.frame != nil {
 		return m.CleanupRoundWithReceipt(&s.roundChild, abort)
@@ -187,7 +188,7 @@ func (m *ArbitraryFloatManager) finishFormattedSetSource() error {
 }
 func (m *ArbitraryFloatManager) CleanupFormattedSet() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	for h := m.FormattedSetHistories; h != nil; h = h.Next {
 		if e := m.CleanupFormattedSetWithReceipt(&h.Issued, false); e != nil {
@@ -201,7 +202,7 @@ func (m *ArbitraryFloatManager) CleanupFormattedSet() error {
 }
 func (m *ArbitraryFloatManager) CleanupFormattedSetWithReceipt(r *ArbitraryFloatFormattedSetReceipt, abort bool) error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.formattedSet
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type integerDividesScopedCallbackFixture struct {
@@ -18,7 +19,7 @@ type integerDividesScopedCallbackFixture struct {
 
 var integerDividesScopedCallbackCurrent *integerDividesScopedCallbackFixture
 
-func integerDividesScopedFailureTransport(f Failure) error {
+func integerDividesScopedFailureTransport(f umemory.Failure) error {
 	s := integerDividesScopedCallbackCurrent
 	if s != nil && !s.called {
 		s.called = true
@@ -32,11 +33,11 @@ func TestIntegerDividesScopedNUMRuntimeCallbackHasNoAmbientAcquisition(t *testin
 	proved := false
 	for prefix := int64(0); prefix < 50 && !proved; prefix++ {
 		budget := arena.NewBudget(1 << 24)
-		rt, e := NewRuntime(RuntimeConfig{Budget: budget, Transport: integerDividesScopedFailureTransport})
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, Transport: integerDividesScopedFailureTransport})
 		serviceMust(t, e)
 		cfg := serviceConfig(budget).Integers
 		cfg.Memory = rt
-		cfg.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		m, e := NewIntegerManager(cfg)
 		serviceMust(t, e)
 		var a, b, x, y, g, foreign Int

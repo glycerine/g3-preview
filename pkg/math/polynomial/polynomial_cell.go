@@ -4,6 +4,7 @@ package polynomial
 import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Polynomial is a checked scalar locator, never an additional owning copy.
@@ -21,7 +22,7 @@ type polynomialLocation struct {
 	callback                                                             *PolynomialDeletionHandler
 	callbackCause                                                        error
 	callbackStarted, callbackInvoked                                     bool
-	raw                                                                  util.ObjectRef
+	raw                                                                  umemory.ObjectRef
 	monomialBase                                                         uint64
 	generation, requested, initializedCoefficients, initializedMonomials uint32
 	deleteIndex                                                          uint32

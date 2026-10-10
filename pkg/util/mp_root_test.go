@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerSourceRoots(t *testing.T) {
@@ -399,7 +400,7 @@ func TestIntegerRootAndSquareFailureCleanup(t *testing.T) {
 							if !alias && integerString(t, m, &a) != inputBefore {
 								t.Fatal("source Root input changed", fault)
 							}
-							callerPending := !scope.active && m.PendingCell.Object != (ObjectRef{})
+							callerPending := !scope.active && m.PendingCell.Object != (umemory.ObjectRef{})
 							serviceMust(t, m.CleanupRoot())
 							if callerPending {
 								serviceMust(t, m.CleanupPendingAllocation())
@@ -436,7 +437,7 @@ func TestIntegerRootAndSquareFailureCleanup(t *testing.T) {
 							// locals. Final SET's unpublished caller block is
 							// an explicitly separate caller cleanup obligation.
 							serviceMust(t, m.CleanupPerfectSquare())
-							if scope.outputStarted && m.PendingCell.Object != (ObjectRef{}) {
+							if scope.outputStarted && m.PendingCell.Object != (umemory.ObjectRef{}) {
 								serviceMust(t, m.CleanupPendingAllocation())
 							}
 							if !alias && integerString(t, m, &a) != inputBefore {

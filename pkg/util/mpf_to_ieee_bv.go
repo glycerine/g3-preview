@@ -1,13 +1,16 @@
 // Source: src/util/mpf.cpp:1228-1253; src/util/mpf.h:218.
 package util
 
-import "math"
+import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	"math"
+	// ToIEEEBVMPZ assembles the stored sign, biased exponent and significand.
+	// The manager's Integer namespace owns out; input is not unpacked.
+)
 
-// ToIEEEBVMPZ assembles the stored sign, biased exponent and significand.
-// The manager's Integer namespace owns out; input is not unpacked.
 func (m *ArbitraryFloatManager) ToIEEEBVMPZ(x *ArbitraryFloat, out *Int) (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.ieeeBV.active {
 		return ErrNumericPending

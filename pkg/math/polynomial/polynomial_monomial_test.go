@@ -9,15 +9,15 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func monomialFixture(t *testing.T) *MonomialManager {
 	t.Helper()
 	budget := arena.NewBudget(1 << 25)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: budget})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget})
 	serviceMust(t, e)
-	m, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64}})
+	m, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		serviceMust(t, m.CloseChecked())
@@ -251,10 +251,10 @@ func TestMonomialActualConstructorFailureUnwind(t *testing.T) {
 	refusals := 0
 	for ordinal := int64(0); ordinal < 100 && !success; ordinal++ {
 		budget := arena.NewBudget(1 << 25)
-		runtime, e := util.NewRuntime(util.RuntimeConfig{Budget: budget})
+		runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget})
 		serviceMust(t, e)
 		budget.FailAfter(ordinal)
-		m, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: runtime, Profile: util.SmallAllocatorProfile{PointerBits: 64}})
+		m, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: runtime, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 		if e == nil {
 			success = true
 			if m.RuntimeOwner() != runtime {
@@ -444,9 +444,9 @@ func TestMonomialOwningCloseRejectsBorrowedUnitReference(t *testing.T) {
 }
 func TestMonomialCompletedSourceDestructorReverseMembers(t *testing.T) {
 	budget := arena.NewBudget(1 << 20)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: budget})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget})
 	serviceMust(t, e)
-	m, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64}})
+	m, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 	serviceMust(t, e)
 	serviceMust(t, m.SourceFinalize())
 	if m.sourceStage != 10 || r.Stats().LiveBlocks != 0 {
@@ -476,9 +476,9 @@ func TestMonomialSourceFinalizeCallerLifetime(t *testing.T) {
 	for _, direct := range []bool{false, true} {
 		t.Run(strconv.FormatBool(direct), func(t *testing.T) {
 			b := arena.NewBudget(1 << 20)
-			r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+			r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 			serviceMust(t, e)
-			profile := util.SmallAllocatorProfile{PointerBits: 64, Debug: direct}
+			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: direct}
 			m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r, Profile: profile})
 			serviceMust(t, e)
 			_, e = m.MkVar()
@@ -510,7 +510,7 @@ func TestMonomialSourceFinalizeCallerLifetime(t *testing.T) {
 					t.Fatal("pooled backing not consumed")
 				}
 				if direct {
-					if e = r.Close(); !errors.Is(e, util.ErrRuntimeLive) {
+					if e = r.Close(); !errors.Is(e, umemory.ErrRuntimeLive) {
 						t.Fatal("live runtime root guard", e)
 					}
 				}
@@ -529,7 +529,7 @@ func TestMonomialSourceInternFailurePrefixesAndRetry(t *testing.T) {
 	refusals, success := 0, false
 	for ordinal := int64(0); ordinal < 100; ordinal++ {
 		b := arena.NewBudget(1 << 22)
-		r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 		serviceMust(t, e)
 		m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r})
 		serviceMust(t, e)
@@ -583,7 +583,7 @@ func TestMonomialSourceInternFailurePrefixesAndRetry(t *testing.T) {
 }
 func TestMonomialDefaultSourceProfileAndWarmPhysicalGraph(t *testing.T) {
 	b := arena.NewBudget(1 << 22)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	serviceMust(t, e)
 	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r})
 	serviceMust(t, e)
@@ -668,9 +668,9 @@ func TestMonomialSourceRawPowerArrayProduct(t *testing.T) {
 
 func TestMonomialBorrowedAllocatorClosedGuardBeforeHeader(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	serviceMust(t, e)
-	a, e := util.NewSmallAllocator(util.SmallAllocatorConfig{Runtime: r, Profile: util.SmallAllocatorProfile{PointerBits: 64}})
+	a, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 	serviceMust(t, e)
 	serviceMust(t, a.Close())
 	before := r.Stats()
@@ -704,7 +704,7 @@ func TestMonomialSourceRepeatedRenameFreshLexicalTable(t *testing.T) {
 
 func TestMonomialScalarQueriesStopAtOwnerLifetime(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	serviceMust(t, e)
 	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r})
 	serviceMust(t, e)
@@ -733,7 +733,7 @@ func TestMonomialScalarQueriesStopAtOwnerLifetime(t *testing.T) {
 
 func TestMonomialOwningCloseAfterUnitIDRefusal(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	serviceMust(t, e)
 	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r})
 	serviceMust(t, e)
@@ -809,7 +809,7 @@ func TestMonomialSourceSingletonValidityDoesNotReadPower(t *testing.T) {
 	l, e := m.location(a)
 	serviceMust(t, e)
 	_, e = m.allocator.ReadUint32(l.raw, 20)
-	if !errors.Is(e, util.ErrRuntimeUninitialized) {
+	if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal(e)
 	}
 }
@@ -830,7 +830,7 @@ func TestMonomialSourceDegreeSumDoesNotReadVariable(t *testing.T) {
 		t.Fatal(n)
 	}
 	_, e = m.allocator.ReadUint32(l.raw, 20)
-	if !errors.Is(e, util.ErrRuntimeUninitialized) {
+	if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal(e)
 	}
 }
@@ -849,7 +849,7 @@ func TestMonomialSourceValidityFieldShortCircuit(t *testing.T) {
 	// Neither uninitialized degrees nor unrelated ID/refcount/hash is reached.
 	serviceMust(t, m.allocator.WriteUint32(l.raw, 28, 3))
 	_, e = m.IsValid(a)
-	if !errors.Is(e, util.ErrRuntimeUninitialized) {
+	if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal(e)
 	}
 	serviceMust(t, m.allocator.WriteUint32(l.raw, 24, 4))

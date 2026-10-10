@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Independent named field census for this selected owner and its ordinary
@@ -15,10 +16,10 @@ func polynomialNewtonPhysicalAudit(t *testing.T, m *MultivariatePolynomialCore, 
 	polynomialNewtonPhysicalWithRaw(t, m, owners, references, refvectors, lazy, polys, handlers, nil, public...)
 }
 
-func polynomialNewtonPhysicalWithRaw(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []util.Block, public ...*util.Int) {
+func polynomialNewtonPhysicalWithRaw(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []umemory.Block, public ...*util.Int) {
 	polynomialNewtonPhysicalWithExtra(t, m, owners, references, refvectors, lazy, polys, handlers, external, 0, public...)
 }
-func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []util.Block, adapterBytes uint64, public ...*util.Int) {
+func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []umemory.Block, adapterBytes uint64, public ...*util.Int) {
 	t.Helper()
 	z := m.integer
 	refs := map[util.NumericCellRef]bool{}
@@ -206,13 +207,13 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 			serviceMust(t, e)
 		}
 	}
-	if z.PendingAllocationObject() != (util.ObjectRef{}) {
+	if z.PendingAllocationObject() != (umemory.ObjectRef{}) {
 		_, e := z.SourceAllocator().ObjectExtent(z.PendingAllocationObject())
 		serviceMust(t, e)
 	}
-	raw := map[util.Block]bool{}
-	put := func(b util.Block) {
-		if b == (util.Block{}) {
+	raw := map[umemory.Block]bool{}
+	put := func(b umemory.Block) {
+		if b == (umemory.Block{}) {
 			return
 		}
 		if raw[b] {

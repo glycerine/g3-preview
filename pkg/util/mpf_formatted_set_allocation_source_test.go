@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatFormattedSetEveryDirectReservationPrefix(t *testing.T) {
@@ -12,7 +13,7 @@ func TestArbitraryFloatFormattedSetEveryDirectReservationPrefix(t *testing.T) {
 	captured := false
 	for ordinal := int64(0); ordinal < 80; ordinal++ {
 		b := arena.NewBudget(1 << 27)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		one := NewInt(1)
 		var x, out ArbitraryFloat
@@ -29,7 +30,7 @@ func TestArbitraryFloatFormattedSetEveryDirectReservationPrefix(t *testing.T) {
 			if receipt != h.Issued || h.bodyCause != m.formattedSet.bodyCause {
 				t.Fatal("actual leaf record publication")
 			}
-			if h.Numeric.Cell.Object != (ObjectRef{}) || h.Transferred.Block() != (Block{}) {
+			if h.Numeric.Cell.Object != (umemory.ObjectRef{}) || h.Transferred.Block() != (umemory.Block{}) {
 				captured = true
 			}
 		}

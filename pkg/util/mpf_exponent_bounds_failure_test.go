@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatPublicExponentBoundsEveryColdReservation(t *testing.T) {
@@ -45,7 +46,7 @@ func TestArbitraryFloatPublicExponentBoundsCacheTransportGuards(t *testing.T) {
 	b := arena.NewBudget(1 << 27)
 	var m *ArbitraryFloatManager
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			used := b.Used()
@@ -69,7 +70,7 @@ func TestArbitraryFloatPublicExponentBoundsCacheTransportGuards(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	pad, e := r.Allocate(uint64(99990 - r.State().LocalSize - 8))
 	serviceMust(t, e)
@@ -77,10 +78,10 @@ func TestArbitraryFloatPublicExponentBoundsCacheTransportGuards(t *testing.T) {
 	armed = true
 	_, body := m.MkTopExp(63)
 	armed = false
-	if !errors.Is(body, Failure{Kind: FailureMemout}) || calls != 1 {
+	if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls != 1 {
 		t.Fatal("actual cache transport missing", body, calls)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad})
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad})
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes {
 		t.Fatal("immediate cache graph", b.Used())
 	}

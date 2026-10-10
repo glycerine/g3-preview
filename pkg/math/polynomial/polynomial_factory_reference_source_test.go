@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialFactoryActualIncomingINCTransfersBeforeOldDECCallback(t *testing.T) {
@@ -16,7 +15,7 @@ func TestPolynomialFactoryActualIncomingINCTransfersBeforeOldDECCallback(t *test
 	var receipt polynomialFactoryInvocationReceipt
 	p, e := c.mkCellWithReceipt(0, nil, nil, nil, nil, &receipt)
 	serviceMust(t, e)
-	var refused util.Block
+	var refused umemory.Block
 	calls := 0
 	h, e := NewPolynomialDeletionHandler(c.integer.Budget(), func(_ *PolynomialDeletionHandler, c *MultivariatePolynomialCore, deleted Polynomial) error {
 		if deleted != old {
@@ -37,7 +36,7 @@ func TestPolynomialFactoryActualIncomingINCTransfersBeforeOldDECCallback(t *test
 	if !numericPhysicalReservationRefusal(e) || calls != 1 || !out.assigning {
 		t.Fatal("actual old DEC callback refusal not reached", e, calls)
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{out.value, out.incoming, c.factoryInvocation.result}, nil, h.header, []util.Block{refused})
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{out.value, out.incoming, c.factoryInvocation.result}, nil, h.header, []umemory.Block{refused})
 	rejected := receipt
 	used, state := c.integer.Budget().Used(), c.memory.State()
 	if reject := out.assignWithFactoryReceipt(c, c.unit, &rejected); reject != ErrPolynomialPending || rejected != receipt || c.integer.Budget().Used() != used || c.memory.State() != state {

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestRationalServiceIntegerConstructorExplicitBorrowedOwner(t *testing.T) {
@@ -44,7 +45,7 @@ func TestRationalServiceIntegerConstructorActualReturningTransportProtectsSource
 	active := false
 	calls := 0
 	var refused error
-	runtime, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, Transport: func(f Failure) error {
+	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			calls++
 			refused = source.CloseChecked()

@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // This uses the literal int/double/float SET calls from both registered driver
 // helpers. The rounding-dependent INT_MAX float assertion stays source-disabled.
 func TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions(t *testing.T) {
 	b := arena.NewBudget(1 << 27)
-	config := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+	config := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 	m, e := NewArbitraryFloatManager(config)
 	serviceMust(t, e)
 	var a ArbitraryFloat

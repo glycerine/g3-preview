@@ -2,9 +2,8 @@
 package ast
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPsortASTNetworkDefinedPairwiseAndErasedBimanderHelpers(t *testing.T) {
@@ -13,7 +12,7 @@ func TestPsortASTNetworkDefinedPairwiseAndErasedBimanderHelpers(t *testing.T) {
 			m := astTestManager(t)
 			c, e := NewPsortASTContext(m)
 			astTestMust(t, e)
-			r, e := util.NewRuntime(util.RuntimeConfig{Budget: m.BudgetField})
+			r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.BudgetField})
 			astTestMust(t, e)
 			s, e := NewPsortASTNetwork(c, r, m.BudgetField, nil)
 			astTestMust(t, e)
@@ -88,7 +87,7 @@ func TestPsortASTNetworkDirectMergeAppendPrefixAndLexicalScopeRetirement(t *test
 	m := astTestManager(t)
 	c, e := NewPsortASTContext(m)
 	astTestMust(t, e)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: m.BudgetField})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.BudgetField})
 	astTestMust(t, e)
 	s, e := NewPsortASTNetwork(c, r, m.BudgetField, nil)
 	astTestMust(t, e)

@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -45,9 +46,9 @@ func TestASTAuxiliaryPluginEveryConstructorPrefix(t *testing.T) {
 		success := false
 		for ordinal := int64(0); ordinal < 128; ordinal++ {
 			b := arena.NewBudget(1 << 28)
-			r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64})
+			r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 			astTestMust(t, e)
-			q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+			q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 			astTestMust(t, e)
 			sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 			astTestMust(t, e)

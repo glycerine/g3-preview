@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // The original driver displays derivative/rename results without an equality
@@ -95,7 +96,7 @@ func polynomialDerivativePhysicalAudit(t *testing.T, m *MultivariatePolynomialMa
 		}
 		l, e := mm.location(a)
 		serviceMust(t, e)
-		if l.raw != (util.ObjectRef{}) {
+		if l.raw != (umemory.ObjectRef{}) {
 			_, e = mm.allocator.ObjectExtent(l.raw)
 			serviceMust(t, e)
 		}
@@ -276,7 +277,7 @@ func TestPolynomialDerivativeEveryReservationNamedPrefix(t *testing.T) {
 					}
 					b.FailAfter(-1)
 					serviceMust(t, m.CleanupDerivative())
-					if m.core.pending.value != (Polynomial{}) || m.core.pending.raw != (util.ObjectRef{}) || m.core.integer.PendingAllocationObject() != (util.ObjectRef{}) {
+					if m.core.pending.value != (Polynomial{}) || m.core.pending.raw != (umemory.ObjectRef{}) || m.core.integer.PendingAllocationObject() != (umemory.ObjectRef{}) {
 						t.Fatal("derivative cleanup left its actual final factory/numeric pending root", m.core.pending, m.core.integer.PendingCell)
 					}
 					if e == nil {
@@ -374,7 +375,7 @@ func TestMonomialUnitConsumedDropSourceStopAndOwningAbort(t *testing.T) {
 
 func TestPolynomialDerivativeNumericPendingIdentity(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("derivative has no checkpoint") }, Cooperation: func() error { panic("derivative has no cooperation") }}})
 	serviceMust(t, e)
@@ -386,7 +387,7 @@ func TestPolynomialDerivativeNumericPendingIdentity(t *testing.T) {
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(p))
 	_, cause := m.Derivative(p, 0)
-	if !errors.Is(cause, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (util.ObjectRef{}) || m.derivative.numeric.Cell != q.Integers().PendingCell {
+	if !errors.Is(cause, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) || m.derivative.numeric.Cell != q.Integers().PendingCell {
 		t.Fatal("actual n setter descriptor-refusal root", cause, m.derivative.numeric.Cell.Object, q.Integers().PendingCell)
 	}
 	polynomialDerivativePhysicalAudit(t, m, []Polynomial{p})
@@ -394,13 +395,13 @@ func TestPolynomialDerivativeNumericPendingIdentity(t *testing.T) {
 	oldBacking := m.derivative.numeric.Cell
 	old := oldBacking.Object
 	serviceMust(t, q.Integers().CleanupPendingAllocation())
-	if q.Integers().PendingCell.Object != (util.ObjectRef{}) || m.derivative.numeric.Cell != oldBacking {
+	if q.Integers().PendingCell.Object != (umemory.ObjectRef{}) || m.derivative.numeric.Cell != oldBacking {
 		t.Fatal("old physical root or stale receipt changed unexpectedly")
 	}
 	// A later caller reuses the allocator but owns a distinct object generation.
 	out := util.NewInt(11)
 	cause = q.Integers().Copy(&out, &q.Integers().Two64)
-	if !errors.Is(cause, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (util.ObjectRef{}) || q.Integers().PendingCell.Object == old {
+	if !errors.Is(cause, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) || q.Integers().PendingCell.Object == old {
 		t.Fatal("later pending identity", cause, q.Integers().PendingCell)
 	}
 	pending := q.Integers().PendingCell
@@ -423,9 +424,9 @@ func TestPolynomialDerivativeNumericPendingIdentity(t *testing.T) {
 // domain. This is postphysical TLS synchronization evidence, not OOM on free.
 func TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("derivative no checkpoint") }, Cooperation: func() error { panic("derivative no cooperation") }}})
 	serviceMust(t, e)
@@ -473,9 +474,9 @@ func TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation(t *testin
 	for _, mode := range []string{"own", "foreign", "postfree"} {
 		t.Run(mode, func(t *testing.T) {
 			b := arena.NewBudget(1 << 26)
-			r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+			r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 			serviceMust(t, e)
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 			serviceMust(t, e)
 			m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("derivative no checkpoint") }, Cooperation: func() error { panic("derivative no cooperation") }}})
 			serviceMust(t, e)
@@ -493,13 +494,13 @@ func TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation(t *testin
 			serviceMust(t, q.Integers().Del(&a))
 			serviceMust(t, r.SetMaxSize(1))
 			_, cause := m.Derivative(p, 0)
-			if !numericPhysicalReservationRefusal(cause) || q.Integers().Allocator.Stats().PendingBlocks != 1 || q.Integers().PendingCell.Object != (util.ObjectRef{}) {
+			if !numericPhysicalReservationRefusal(cause) || q.Integers().Allocator.Stats().PendingBlocks != 1 || q.Integers().PendingCell.Object != (umemory.ObjectRef{}) {
 				t.Fatal("actual postphysical raw allocation retained", cause, q.Integers().Allocator.Stats(), q.Integers().PendingCell)
 			}
 			polynomialDerivativePhysicalAudit(t, m, []Polynomial{p})
 			roots, e := q.Integers().Allocator.PendingRoots()
 			serviceMust(t, e)
-			if roots != m.derivative.numeric.Allocator || roots[0] == (util.Block{}) {
+			if roots != m.derivative.numeric.Allocator || roots[0] == (umemory.Block{}) {
 				t.Fatal("exact executing raw receipt", roots, m.derivative.numeric.Allocator)
 			}
 			rawSize, e := r.Size(roots[0])
@@ -515,7 +516,7 @@ func TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation(t *testin
 				laterCause := q.Integers().SetLimbs(&later, digits)
 				foreign, e := q.Integers().Allocator.PendingRoots()
 				serviceMust(t, e)
-				if !numericPhysicalReservationRefusal(laterCause) || foreign == roots || foreign[0] == (util.Block{}) {
+				if !numericPhysicalReservationRefusal(laterCause) || foreign == roots || foreign[0] == (umemory.Block{}) {
 					t.Fatal("actual foreign raw replacement not reached", laterCause, roots, foreign)
 				}
 				polynomialDerivativePhysicalAudit(t, m, []Polynomial{p})
@@ -534,7 +535,7 @@ func TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation(t *testin
 				if mode == "postfree" {
 					contextTLSNearMinimum(t, r)
 					cleanup := m.CleanupDerivative()
-					if !errors.Is(cleanup, arena.ErrBounds) || m.derivative.numeric.Allocator != ([3]util.Block{}) || m.derivative.bodyCause != cause {
+					if !errors.Is(cleanup, arena.ErrBounds) || m.derivative.numeric.Allocator != ([3]umemory.Block{}) || m.derivative.bodyCause != cause {
 						t.Fatal("actual physical consumption not recorded with original cause", cleanup, m.derivative)
 					}
 					polynomialDerivativePhysicalAudit(t, m, []Polynomial{p})

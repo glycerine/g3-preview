@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -68,7 +69,7 @@ func TestSMTParamsQIUninitializedDisplayPrefixAndCopiedOwnerGuard(t *testing.T) 
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
 	e = s.Display(out)
-	if !errors.Is(e, util.ErrRuntimeUninitialized) {
+	if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("distinct inherited qi_ematching remains uninitialized", e)
 	}
 	text, e := out.String()
@@ -497,7 +498,7 @@ func TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead(t *testing.T) {
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
 	e = s.Display(out)
-	if !errors.Is(e, util.ErrRuntimeUninitialized) {
+	if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("nonthrowing write failure does not erase later source read", e)
 	}
 	st := out.Stats()
@@ -537,9 +538,9 @@ func TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases(t
 	bc := arena.NewBudget(1 << 24)
 	bs := arena.NewBudget(1 << 24)
 	b := arena.NewBudget(1 << 24)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)

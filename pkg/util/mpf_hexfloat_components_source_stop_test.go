@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math/big"
 	"testing"
 )
@@ -28,9 +29,9 @@ func (t *hexfloatStopText) AppendStreamString(s ArbitraryFloatFormatStream) erro
 func TestArbitraryFloatHexfloatComponentsYoungerSourceStop(t *testing.T) {
 	for _, callerFirst := range []bool{false, true} {
 		budget := arena.NewBudget(1 << 28)
-		r, e := NewRuntime(RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 		serviceMust(t, e)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 		serviceMust(t, e)
 		input := new(big.Int).Add(new(big.Int).Lsh(big.NewInt(1), 259), big.NewInt(1))
 		sig := NewInt(0)
@@ -75,7 +76,7 @@ func TestArbitraryFloatHexfloatComponentsYoungerSourceStop(t *testing.T) {
 		if r.State() != state || budget.Used() != used || s.q != beforeQ || s.sig != beforeSig || m.sourceEnded {
 			t.Fatal("stopped source changed older values")
 		}
-		integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &sig, &s.sig, &s.q.significand, &m.rational.NTmp)
+		integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{lane}, &sig, &s.sig, &s.q.significand, &m.rational.NTmp)
 		if budget.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+text.StorageBytes() {
 			t.Fatal("component source stop graph", budget.Used())
 		}
@@ -100,9 +101,9 @@ func TestArbitraryFloatHexfloatComponentsYoungerSourceStop(t *testing.T) {
 		}
 		contextTLSFinish(t, r, func() error { return m.integer.CleanupRawNumeral(&sig) })
 		contextTLSFinish(t, r, m.Close)
-		for _, block := range []*Block{&lane, &recovery} {
+		for _, block := range []*umemory.Block{&lane, &recovery} {
 			contextTLSFinish(t, r, func() error {
-				if *block == (Block{}) {
+				if *block == (umemory.Block{}) {
 					return nil
 				}
 				return r.Deallocate(block)

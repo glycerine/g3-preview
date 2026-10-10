@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -78,9 +79,9 @@ func TestASTLowLevelPrinterNativeDeclarationIdentityMarks(t *testing.T) {
 
 func TestASTLowLevelPrinterNativeLargeNumeralFormatting(t *testing.T) {
 	bn, ba, bs := arena.NewBudget(1<<28), arena.NewBudget(1<<24), arena.NewBudget(1<<20)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: bn, ThreadLocal: true, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, ThreadLocal: true, SizeTBits: 64})
 	paramsMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs})
 	paramsMust(t, e)

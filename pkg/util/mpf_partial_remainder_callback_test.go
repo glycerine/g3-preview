@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards(t *testing.T) {
@@ -13,7 +14,7 @@ func TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards(t *testi
 	var m *ArbitraryFloatManager
 	var x, y ArbitraryFloat
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			s := &m.partialRemainder
@@ -41,7 +42,7 @@ func TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards(t *testi
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	n := NewInt(1)
 	serviceMust(t, m.integer.Mul2kInPlace(&n, 39999))
@@ -61,7 +62,7 @@ func TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards(t *testi
 	for i := range m.partialRemainder.values {
 		nums = append(nums, &m.partialRemainder.values[i])
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, nums...)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, nums...)
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes {
 		t.Fatal("immediate transport physical graph", b.Used(), m.OwnedStorageBytes(), r.Stats())
 	}

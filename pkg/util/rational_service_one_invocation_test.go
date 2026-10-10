@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestRationalServiceBorrowedOneCopyAndSubtraction(t *testing.T) {
@@ -49,11 +50,11 @@ func TestRationalServiceBorrowedOneSubtractionEveryActualReservation(t *testing.
 	complete, failures := false, 0
 	for ordinal := int64(0); ordinal < 256 && !complete; ordinal++ {
 		b := arena.NewBudget(1 << 27)
-		rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error { return f }})
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error { return f }})
 		serviceMust(t, e)
 		cfg := serviceConfig(b)
 		cfg.Integers.Memory = rt
-		cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		s, e := NewRationalService(cfg)
 		serviceMust(t, e)
 		a := serviceValue(t, s, "18446744073709551617/3")

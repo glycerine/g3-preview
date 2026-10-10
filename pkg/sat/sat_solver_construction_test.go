@@ -7,12 +7,13 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/random"
 )
 
 func TestSATSolverVariableColdPreparationHasNoPrematureQueue(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	satOK(t, e)
 	todo, e := newSATSolverUintSet(b)
 	satOK(t, e)
@@ -144,7 +145,7 @@ func TestSATSolverProbingConstructionBorrowDoesNotPermitRun(t *testing.T) {
 
 func TestSATSolverColdVariableOrdinaryGuardBeforeAnyPublication(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	satOK(t, e)
 	todo, e := newSATSolverUintSet(b)
 	satOK(t, e)

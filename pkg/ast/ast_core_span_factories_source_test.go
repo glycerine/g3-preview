@@ -2,9 +2,8 @@
 package ast
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestASTOrSpanSourceZeroSingletonAndInitializedSpare(t *testing.T) {
@@ -24,7 +23,7 @@ func TestASTOrSpanSourceZeroSingletonAndInitializedSpare(t *testing.T) {
 	y, e := m.MkFreshConst("y", sort)
 	astTestMust(t, e)
 	astTestPin(t, m, y)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: m.BudgetField})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.BudgetField})
 	astTestMust(t, e)
 	v, e := NewASTLiteralVector(m.BudgetField)
 	astTestMust(t, e)

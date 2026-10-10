@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialRootUpperBoundActualCallbackOwnerAndTupleRefusal(t *testing.T) {
@@ -17,7 +18,7 @@ func TestUPolynomialRootUpperBoundActualCallbackOwnerAndTupleRefusal(t *testing.
 			var p *UPolynomialManager
 			armed := false
 			calls := 0
-			transport := func(f util.Failure) error {
+			transport := func(f umemory.Failure) error {
 				if !armed {
 					return f
 				}
@@ -95,7 +96,7 @@ func TestUPolynomialRootUpperBoundActualCallbackOwnerAndTupleRefusal(t *testing.
 				}
 				return f
 			}
-			var rt *util.Runtime
+			var rt *umemory.Runtime
 			c, p, rt = algebraicNegTLSFixture(t, transport)
 			z := c.config.Rationals.Integers()
 			poly, e := p.NewPolynomial()
@@ -116,7 +117,7 @@ func TestUPolynomialRootUpperBoundActualCallbackOwnerAndTupleRefusal(t *testing.
 			if body == nil || calls == 0 {
 				t.Fatal("actual returning transport not reached", body, calls)
 			}
-			rootUpperActualGraph(t, c, p, poly, &out, []util.Block{held})
+			rootUpperActualGraph(t, c, p, poly, &out, []umemory.Block{held})
 			serviceMust(t, rt.SetMaxSize(0))
 			serviceMust(t, p.cleanupRootUpperBound(false))
 			serviceMust(t, z.Del(&out))

@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialCompositionEveryReservation(t *testing.T) {
@@ -64,7 +65,7 @@ func TestPolynomialCompositionEveryReservation(t *testing.T) {
 					}
 					m.core.integer.Budget().FailAfter(-1)
 					serviceMust(t, m.CleanupComposition())
-					if m.core.pending.value != (Polynomial{}) || m.core.pending.raw != (util.ObjectRef{}) || m.core.singletonReference || m.core.constantScope.active || m.core.generatedActive || m.core.integer.PendingAllocationObject() != (util.ObjectRef{}) {
+					if m.core.pending.value != (Polynomial{}) || m.core.pending.raw != (umemory.ObjectRef{}) || m.core.singletonReference || m.core.constantScope.active || m.core.generatedActive || m.core.integer.PendingAllocationObject() != (umemory.ObjectRef{}) {
 						t.Fatal("operation abort omitted reached callee", m.core.pending, m.core.singletonReference, m.core.constantScope.active)
 					}
 					if got != (Polynomial{}) {
@@ -117,12 +118,12 @@ func TestPolynomialCompositionBigScalarOverloadEveryReservation(t *testing.T) {
 			} else if !numericPhysicalReservationRefusal(e) {
 				t.Fatal("literal scalar overload refusal", e)
 			}
-			if m.core.integer.PendingAllocationObject() != (util.ObjectRef{}) {
+			if m.core.integer.PendingAllocationObject() != (umemory.ObjectRef{}) {
 				physical = true
 			}
 			m.core.integer.Budget().FailAfter(-1)
 			serviceMust(t, m.CleanupComposition())
-			if m.core.integer.PendingAllocationObject() != (util.ObjectRef{}) || m.core.constantScope.active || m.core.pending.value != (Polynomial{}) || m.core.singletonReference {
+			if m.core.integer.PendingAllocationObject() != (umemory.ObjectRef{}) || m.core.constantScope.active || m.core.pending.value != (Polynomial{}) || m.core.singletonReference {
 				t.Fatal("operation abort lacks actual scalar overload leaf", m.core.integer.PendingAllocationObject(), m.core.constantScope.active)
 			}
 			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, big, r.root.value, r.root.incoming}, []*util.Int{&holder}, r.header)
@@ -297,12 +298,12 @@ func TestPolynomialCompositionSameVariableBigCopyEveryReservation(t *testing.T) 
 			} else if !numericPhysicalReservationRefusal(e) {
 				t.Fatal(e)
 			}
-			if m.core.integer.PendingAllocationObject() != (util.ObjectRef{}) {
+			if m.core.integer.PendingAllocationObject() != (umemory.ObjectRef{}) {
 				physical = true
 			}
 			m.core.integer.Budget().FailAfter(-1)
 			serviceMust(t, m.CleanupComposition())
-			if m.core.integer.PendingAllocationObject() != (util.ObjectRef{}) || m.core.pending.value != (Polynomial{}) {
+			if m.core.integer.PendingAllocationObject() != (umemory.ObjectRef{}) || m.core.pending.value != (Polynomial{}) {
 				t.Fatal("same-variable actual Coeff leaf omitted by operation abort")
 			}
 			if e == nil {
@@ -330,11 +331,11 @@ func TestPolynomialCompositionSameVariableBigCopyEveryReservation(t *testing.T) 
 // this is not ordinary exhaustion or an allocation-limit free refusal.
 func TestPolynomialCompositionStoppedAuxiliaryPreservesDegreeScope(t *testing.T) {
 	budget := arena.NewBudget(1 << 25)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	t.Cleanup(func() {
@@ -458,11 +459,11 @@ func TestPolynomialCompositionScalarForeignReplacement(t *testing.T) {
 
 func TestPolynomialCompositionPostphysicalCellRawReceipt(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	t.Cleanup(func() {
@@ -495,14 +496,14 @@ func TestPolynomialCompositionPostphysicalCellRawReceipt(t *testing.T) {
 	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, nil, 0)
 	roots, e := m.core.monomials.allocator.PendingRoots()
 	serviceMust(t, e)
-	if !numericPhysicalReservationRefusal(cause) || roots == ([3]util.Block{}) || m.core.pending.raw != (util.ObjectRef{}) {
+	if !numericPhysicalReservationRefusal(cause) || roots == ([3]umemory.Block{}) || m.core.pending.raw != (umemory.ObjectRef{}) {
 		t.Fatal("real shared allocator postphysical prefix", cause, roots, m.core.pending)
 	}
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, m.CleanupComposition())
 	after, e := m.core.monomials.allocator.PendingRoots()
 	serviceMust(t, e)
-	if after != ([3]util.Block{}) {
+	if after != ([3]umemory.Block{}) {
 		t.Fatal("operation abort omitted shared physical cell raw", after)
 	}
 	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, nil, 0)
@@ -510,7 +511,7 @@ func TestPolynomialCompositionPostphysicalCellRawReceipt(t *testing.T) {
 
 var polynomialCompositionCallbackState struct {
 	target  Polynomial
-	runtime *util.Runtime
+	runtime *umemory.Runtime
 	inputs  [4000]Monomial
 	invoked bool
 }
@@ -539,11 +540,11 @@ func polynomialCompositionForeignDeletionCall(h *PolynomialDeletionHandler, c *M
 }
 func TestPolynomialCompositionDeletionCallbackOwnsForeignContinuation(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	t.Cleanup(func() {
@@ -585,10 +586,10 @@ func TestPolynomialCompositionDeletionCallbackOwnsForeignContinuation(t *testing
 	cause = m.finishComposition(cause)
 	roots, e := m.core.monomials.allocator.PendingRoots()
 	serviceMust(t, e)
-	if !polynomialCompositionCallbackState.invoked || !numericPhysicalReservationRefusal(cause) || roots == ([3]util.Block{}) {
+	if !polynomialCompositionCallbackState.invoked || !numericPhysicalReservationRefusal(cause) || roots == ([3]umemory.Block{}) {
 		t.Fatal("real callback constructor physical stop", cause, roots)
 	}
-	if m.core.pending.compositionParent != nil || m.composition.monomialRaw != ([3]util.Block{}) {
+	if m.core.pending.compositionParent != nil || m.composition.monomialRaw != ([3]umemory.Block{}) {
 		t.Fatal("callback continuation attributed to composition")
 	}
 	pending := m.core.pending
@@ -605,7 +606,7 @@ func TestPolynomialCompositionDeletionCallbackOwnsForeignContinuation(t *testing
 
 func TestPolynomialCompositionNumericPendingForeignReplacement(t *testing.T) {
 	b := arena.NewBudget(1 << 25)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		serviceMust(t, q.CloseChecked())
@@ -625,13 +626,13 @@ func TestPolynomialCompositionNumericPendingForeignReplacement(t *testing.T) {
 	}()
 	cause := m.ComposeXMinusConstant(p, &q.Integers().Two64, r)
 	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming}, []*util.Int{&out}, r.header)
-	if !errors.Is(cause, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (util.ObjectRef{}) || m.composition.numericPending != q.Integers().PendingCell.Object {
+	if !errors.Is(cause, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) || m.composition.numericPending != q.Integers().PendingCell.Object {
 		t.Fatal("actual raw coefficient Copy pending receipt", cause, q.Integers().PendingCell)
 	}
 	old := q.Integers().PendingCell
 	serviceMust(t, q.Integers().CleanupPendingAllocation())
 	cause = q.Integers().Copy(&out, &q.Integers().Two64)
-	if !errors.Is(cause, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (util.ObjectRef{}) || q.Integers().PendingCell.Object == old.Object {
+	if !errors.Is(cause, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) || q.Integers().PendingCell.Object == old.Object {
 		t.Fatal("real later allocation generation", cause, q.Integers().PendingCell)
 	}
 	later := q.Integers().PendingCell
@@ -753,11 +754,11 @@ func TestPolynomialCompositionStoppedConstantPrecedesOuterLocals(t *testing.T) {
 // Genuine public TLS signed-counter guard; owner primitive, not ordinary OOM.
 func TestPolynomialCompositionStoppedConstantPhysicalReleasePrecedesOuter(t *testing.T) {
 	budget := arena.NewBudget(1 << 25)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	t.Cleanup(func() {
@@ -867,11 +868,11 @@ func TestPolynomialCompositionForeignStoppedConstantDoesNotPoisonOuter(t *testin
 // Actual returned-placement and public TLS leaf stop; helper-domain proof.
 func TestPolynomialCompositionStoppedConstantResultHasSingleOwningCleanup(t *testing.T) {
 	budget := arena.NewBudget(1 << 25)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	t.Cleanup(func() {

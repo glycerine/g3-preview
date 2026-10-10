@@ -6,11 +6,12 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialVariableDegreesActualNumericStreamFlags(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	if e != nil {
 		t.Fatal(e)
 	}

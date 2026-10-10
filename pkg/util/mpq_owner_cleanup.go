@@ -1,6 +1,8 @@
 // Source: src/util/mpq.cpp:28-34; src/util/mpf.cpp:61-67.
 package util
 
+import umemory "github.com/glycerine/g3/pkg/util/memory"
+
 func (m *RationalManager) Error() string { return "mpnum: retained rational manager" }
 func (m *RationalManager) Unwrap() error {
 	if m.originalCause != nil {
@@ -10,7 +12,7 @@ func (m *RationalManager) Unwrap() error {
 }
 func (m *RationalManager) OriginalCause() error { return m.originalCause }
 func (m *RationalManager) CleanupCause() error  { return m.CleanupCauseField }
-func (m *RationalManager) RuntimeOwner() *Runtime {
+func (m *RationalManager) RuntimeOwner() *umemory.Runtime {
 	if m == nil || m.self != m || m.Z == nil {
 		return nil
 	}
@@ -19,7 +21,7 @@ func (m *RationalManager) RuntimeOwner() *Runtime {
 func (m *RationalManager) Cleanup() error { return m.CloseChecked() }
 func (m *RationalManager) CloseChecked() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.Z != nil && (m.Z.numericCallerExecuting() || m.Z.rationalServiceReadCallbackActive() || m.Z.conversionCallerExecuting() || m.Z.CopyAllocation.Executing || m.Z.NormalizationExecuting) || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfLifecycleCallbackActive() || (m.Z != nil && m.Z.mpfBorrowedSourceCallbackActive()) {
 		return ErrNumericPending

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialHenselEveryReachedCancellation(t *testing.T) {
@@ -119,7 +120,7 @@ func TestUPolynomialHenselEveryReachedCancellation(t *testing.T) {
 		}
 		pending, e := q.Integers().Allocator.PendingRoots()
 		serviceMust(t, e)
-		if q.Integers().PendingCell.Object != (util.ObjectRef{}) || pending != ([3]util.Block{}) || q.Integers().AddMulInvocation.Active || q.Integers().DivisionRaw.Active || q.Integers().ExtendedRaw.Active || q.Integers().DividesNumeral.Active {
+		if q.Integers().PendingCell.Object != (umemory.ObjectRef{}) || pending != ([3]umemory.Block{}) || q.Integers().AddMulInvocation.Active || q.Integers().DivisionRaw.Active || q.Integers().ExtendedRaw.Active || q.Integers().DividesNumeral.Active {
 			t.Fatal("actual pair child or numeric leaf remains after own ACK", ordinal, body, q.Integers().PendingCell, pending, q.Integers().AddMulInvocation.Active, q.Integers().DivisionRaw.Active, q.Integers().ExtendedRaw.Active, q.Integers().DividesNumeral.Active)
 		}
 		for _, a := range args {

@@ -7,11 +7,12 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialConstantCoefficientReceiptActualSETLateTLSLeaf(t *testing.T) {
 	b := arena.NewBudget(1 << 27)
-	runtime, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = runtime
@@ -40,7 +41,7 @@ func TestPolynomialConstantCoefficientReceiptActualSETLateTLSLeaf(t *testing.T) 
 	cell := receipt.frame.copy.Frame
 	roots, e := c.integer.SourceAllocator().PendingRoots()
 	serviceMust(t, e)
-	if roots[0] == (util.Block{}) || cell.Roots.Allocator[0] != roots[0] || cell.Roots.Cell.Object != (util.ObjectRef{}) {
+	if roots[0] == (umemory.Block{}) || cell.Roots.Allocator[0] != roots[0] || cell.Roots.Cell.Object != (umemory.ObjectRef{}) {
 		t.Fatal("actual raw leaf before object publication", roots, cell.Roots)
 	}
 	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&large, &out}, 0)

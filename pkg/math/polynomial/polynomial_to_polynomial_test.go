@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialToPolynomialZeroBeforeLocal(t *testing.T) {
@@ -152,7 +153,7 @@ func TestPolynomialToPolynomialModularSourceSets(t *testing.T) {
 
 func TestPolynomialToPolynomialExactNumericForeignReplacement(t *testing.T) {
 	budget := arena.NewBudget(1 << 24)
-	z, e := util.NewIntegerManager(util.IntegerConfig{Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	z, e := util.NewIntegerManager(util.IntegerConfig{Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: z, Checkpoint: func() bool { panic("constructor has no checkpoint") }, Cooperation: func() error { panic("constructor has no cooperation") }}})
 	serviceMust(t, e)
@@ -168,7 +169,7 @@ func TestPolynomialToPolynomialExactNumericForeignReplacement(t *testing.T) {
 		}
 	}()
 	_, cause := m.ToPolynomial(1, []util.Int{z.Two64}, 0)
-	if !errors.Is(cause, arena.ErrSlotLimit) || z.PendingAllocationObject() == (util.ObjectRef{}) {
+	if !errors.Is(cause, arena.ErrSlotLimit) || z.PendingAllocationObject() == (umemory.ObjectRef{}) {
 		t.Fatal("actual copied coefficient descriptor refusal", cause)
 	}
 	original := z.PendingCell
@@ -191,9 +192,9 @@ func TestPolynomialToPolynomialExactNumericForeignReplacement(t *testing.T) {
 // Runtime release frontier before the retained mk_univariate result.
 func TestPolynomialToPolynomialReturnedResultAfterNativeBufferFinalize(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	z, e := util.NewIntegerManager(util.IntegerConfig{Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	z, e := util.NewIntegerManager(util.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: z, Checkpoint: func() bool { panic("constructor no checkpoint") }, Cooperation: func() error { panic("constructor no cooperation") }}})
 	serviceMust(t, e)

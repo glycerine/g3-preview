@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialDividesIndependentFiniteAndZeroReadMask(t *testing.T) {
@@ -39,7 +40,7 @@ func TestPolynomialDividesEveryActualReservationPrefix(t *testing.T) {
 		for ordinal := int64(0); ordinal < 128 && !success; ordinal++ {
 			t.Run(fmt.Sprintf("%v/%d", want, ordinal), func(t *testing.T) {
 				budget := arena.NewBudget(1 << 24)
-				qowner, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+				qowner, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 				serviceMust(t, e)
 				t.Cleanup(func() {
 					qowner.Close()
@@ -93,7 +94,7 @@ func TestPolynomialDividesEveryActualReservationPrefix(t *testing.T) {
 
 func TestPolynomialDividesBigNumericPendingBlocksOwningClose(t *testing.T) {
 	budget := arena.NewBudget(1 << 24)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 10, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 10, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		q.Close()
@@ -114,7 +115,7 @@ func TestPolynomialDividesBigNumericPendingBlocksOwningClose(t *testing.T) {
 	serviceMust(t, e)
 	p = polynomialCaller(t, c, p)
 	_, e = c.Divides(divisor, p)
-	if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (util.ObjectRef{}) || !c.dividesLocal.active {
+	if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) || !c.dividesLocal.active {
 		t.Fatal("actual source quotient numeric Copy descriptor refusal", e, q.Integers().PendingCell, c.dividesLocal)
 	}
 	polynomialImpPhysicalAuditValues(t, full, []Polynomial{p, divisor})
@@ -142,7 +143,7 @@ func TestPolynomialDividesBigNumericPendingBlocksOwningClose(t *testing.T) {
 	if c.dividesInvocationSourceCause(&receipt) != source {
 		t.Fatal("true own erased source history")
 	}
-	if q.Integers().PendingCell.Object != (util.ObjectRef{}) {
+	if q.Integers().PendingCell.Object != (umemory.ObjectRef{}) {
 		t.Fatal("actual matching numerical pending retained after owning cleanup")
 	}
 	polynomialImpPhysicalAuditValues(t, full, []Polynomial{p, divisor})

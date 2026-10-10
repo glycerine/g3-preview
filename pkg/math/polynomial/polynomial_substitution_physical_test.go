@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func polynomialSubstitutionPhysical(t *testing.T, m *MultivariatePolynomialCore, refs []*PolynomialRef, polys []Polynomial, external []util.Block, values ...*util.Int) {
+func polynomialSubstitutionPhysical(t *testing.T, m *MultivariatePolynomialCore, refs []*PolynomialRef, polys []Polynomial, external []umemory.Block, values ...*util.Int) {
 	polynomialSubstitutionPhysicalWithHandlers(t, m, refs, polys, external, nil, values...)
 }
-func polynomialSubstitutionPhysicalWithHandlers(t *testing.T, m *MultivariatePolynomialCore, refs []*PolynomialRef, polys []Polynomial, external []util.Block, handlers []*PolynomialDeletionHandler, values ...*util.Int) {
+func polynomialSubstitutionPhysicalWithHandlers(t *testing.T, m *MultivariatePolynomialCore, refs []*PolynomialRef, polys []Polynomial, external []umemory.Block, handlers []*PolynomialDeletionHandler, values ...*util.Int) {
 	t.Helper()
 	d := &m.substitution
 	s := &d.scope

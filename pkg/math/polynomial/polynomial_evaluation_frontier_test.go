@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames(t *testing.T) {
@@ -52,11 +53,11 @@ func TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames(t *testing.T) 
 // counter recipe selects the guarded signed-host domain, not ordinary OOM.
 func TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary(t *testing.T) {
 	budget := arena.NewBudget(1 << 25)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	t.Cleanup(func() {
@@ -97,7 +98,7 @@ func TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary(t *testing
 	serviceMust(t, m.core.DecRef(warm))
 	contextTLSNearMinimum(t, rt)
 	olderBefore := older.aux
-	var stoppedState util.RuntimeState
+	var stoppedState umemory.RuntimeState
 	cause := func() (cause error) {
 		defer func() {
 			e := m.finishEvaluationRationalFrame(older)

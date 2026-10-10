@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ func TestArbitraryFloatBinaryStringActualCopyTransportGuards(t *testing.T) {
 	x := ArbitraryFloat{format: arbitraryFloatFormat(8, 40000, false), significand: NewInt(1)}
 	var out OwnedString
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			s := &m.binaryString
@@ -34,7 +35,7 @@ func TestArbitraryFloatBinaryStringActualCopyTransportGuards(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	serviceMust(t, m.integer.Mul2kInPlace(&x.significand, 39998))
 	_, e = m.IsNaN(&x)
@@ -49,10 +50,10 @@ func TestArbitraryFloatBinaryStringActualCopyTransportGuards(t *testing.T) {
 	armed = true
 	body := m.ToStringBinary(&x, 0, 0, &out)
 	armed = false
-	if !errors.Is(body, Failure{Kind: FailureMemout}) || calls != 1 || !m.binaryString.active {
+	if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls != 1 || !m.binaryString.active {
 		t.Fatal("actual binary COPY transport missing", body, calls)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &x.significand, &m.binaryString.tmp)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &x.significand, &m.binaryString.tmp)
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes {
 		t.Fatal("binary callback graph", b.Used())
 	}

@@ -3,6 +3,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // sourceNumeralDel checks the actual capacity access. The permanently dead
@@ -61,7 +62,7 @@ func (m *RationalManager) cleanupOuter(source bool) error {
 // ownership metadata. CloseChecked is the separate owning cleanup operation.
 func (m *RationalManager) SourceFinalize() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.Z != nil && (m.Z.numericCallerExecuting() || m.Z.rationalServiceReadCallbackActive() || m.Z.conversionCallerExecuting() || m.Z.CopyAllocation.Executing || m.Z.NormalizationExecuting) || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfLifecycleCallbackActive() || (m.Z != nil && m.Z.mpfBorrowedSourceCallbackActive()) {
 		return ErrNumericPending

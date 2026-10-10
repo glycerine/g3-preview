@@ -1,8 +1,12 @@
 // Source: src/util/mpf.cpp:233-300; src/util/mpq.cpp:312-315.
 package util
 
+import
+
 // These are the actual reached lexical holders. Branch p2 and the nested
 // PrevPowerOfTwo NUM finish before the later p/t/sq declarations.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type arbitraryFloatRationalSetScope struct {
 	plainParent     *arbitraryFloatPlainRationalSetScope
 	plainInvocation uint64
@@ -97,7 +101,7 @@ func (m *ArbitraryFloatManager) CleanupExponentRationalSetWithReceipt(r *Arbitra
 }
 func (m *ArbitraryFloatManager) cleanupExponentRationalSetScope(r *ArbitraryFloatRationalSetReceipt, abort, currentOnly bool) error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.rationalSet
 
@@ -128,7 +132,7 @@ func (m *ArbitraryFloatManager) cleanupExponentRationalSetScope(r *ArbitraryFloa
 		return nil
 	}
 	if s.manager != m || s.invocation == 0 {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.executing || s.finishing || (m.integer != nil && m.integer.Memory.FailureTransportActive()) {
 		return ErrNumericPending

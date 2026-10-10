@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestSetterPublicationPartsCrossedAliasBranch(t *testing.T) {
@@ -84,8 +85,8 @@ func TestSetterPublicationScalarNumeratorBeforeRefusal(t *testing.T) {
 		budget.FailAfter(0)
 		e = m.SetFraction(&a, 1, math.MaxUint64)
 		parserPublicationAudit(t, m, roots...)
-		var failure Failure
-		if !errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != FailureMemout || !m.Z.Memory.State().OutOfMemory) {
+		var failure umemory.Failure
+		if !errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != umemory.FailureMemout || !m.Z.Memory.State().OutOfMemory) {
 			t.Fatal("actual armed growth error", e)
 		}
 		if a.Num != NewInt(1) || a.Den != NewInt(19) {

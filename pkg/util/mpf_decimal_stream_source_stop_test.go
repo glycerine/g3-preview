@@ -4,14 +4,15 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
 func TestArbitraryFloatDecimalStreamChildSourceStopProtectsScopedQ(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	sig := NewInt(1)
 	var x ArbitraryFloat
@@ -42,7 +43,7 @@ func TestArbitraryFloatDecimalStreamChildSourceStopProtectsScopedQ(t *testing.T)
 	if r.State() != before || s.q != q || b.Used() != used || !m.rationalReady || m.sourceEnded {
 		t.Fatal("stopped source touched older owner")
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &x.significand, &s.q.Num, &s.q.Den, &child.values[0], &child.values[1], &child.values[2], &child.values[3], &m.rational.NTmp, &m.rationalConversion.a.significand, &m.rationalConversion.n, &m.rationalConversion.d)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{lane}, &x.significand, &s.q.Num, &s.q.Den, &child.values[0], &child.values[1], &child.values[2], &child.values[3], &m.rational.NTmp, &m.rationalConversion.a.significand, &m.rationalConversion.n, &m.rationalConversion.d)
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+out.Buffer.String.StorageBytes() {
 		t.Fatal("immediate wrapper source-stop graph", b.Used())
 	}
@@ -60,9 +61,9 @@ func TestArbitraryFloatDecimalStreamChildSourceStopProtectsScopedQ(t *testing.T)
 	out.Buffer.OwnAbort()
 	contextTLSFinish(t, r, func() error { return m.CleanupValue(&x) })
 	contextTLSFinish(t, r, m.Close)
-	for _, v := range []*Block{&lane, &recovery} {
+	for _, v := range []*umemory.Block{&lane, &recovery} {
 		contextTLSFinish(t, r, func() error {
-			if *v == (Block{}) {
+			if *v == (umemory.Block{}) {
 				return nil
 			}
 			return r.Deallocate(v)

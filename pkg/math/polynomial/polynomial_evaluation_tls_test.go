@@ -8,17 +8,18 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // This public Runtime realloc recipe deliberately reaches the guarded native
 // signed-host overflow boundary. It is neither valid exhaustion nor free OOM.
 func TestPolynomialEvaluationStoppedPhysicalLeafAndReuse(t *testing.T) {
 	budget := arena.NewBudget(1 << 25)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	t.Cleanup(func() {

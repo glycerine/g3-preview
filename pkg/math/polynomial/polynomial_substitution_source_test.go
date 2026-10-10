@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialSubstitutionIntegerIndependentIdentity(t *testing.T) {
@@ -134,7 +135,7 @@ func TestPolynomialSubstitutionIntegerBoundedGridAndScalarForward(t *testing.T) 
 	serviceMust(t, m.IncRef(a))
 	polynomialQueryExpect(t, m, a, map[[3]uint32]int64{{0, 1, 0}: -24, {0, 0, 2}: 10, {0, 0, 1}: 7, {0, 0, 0}: 11})
 	serviceMust(t, m.DecRef(a))
-	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, []util.Block{*xsRaw})
+	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, []umemory.Block{*xsRaw})
 }
 func TestPolynomialSubstitutionFractionZeroAndAliasProfiles(t *testing.T) {
 	m := polynomialCellFixture(t)
@@ -191,7 +192,7 @@ func TestPolynomialSubstitutionWarmAbsentBranchActualStorage(t *testing.T) {
 			panic("source absent warm branch")
 		}
 	})
-	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, []util.Block{xs.raw}, &(*values[0].BorrowNumerator()), &(*values[0].BorrowDenominator()))
+	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, []umemory.Block{xs.raw}, &(*values[0].BorrowNumerator()), &(*values[0].BorrowDenominator()))
 	after, e := m.memory.AllocationCount()
 	serviceMust(t, e)
 	if allocs != 0 || before != m.memory.Stats() || count != after || state != m.memory.State() || used != m.integer.Budget().Used() {
@@ -206,13 +207,13 @@ func TestPolynomialSubstitutionColdOwnersAndSourceInputLifetime(t *testing.T) {
 	stale := xs
 	serviceMust(t, m.memory.Reallocate(b, 16))
 	_, e := m.SubstituteIntegers(p, 1, stale, []util.Int{util.NewInt(2)})
-	if !errors.Is(e, util.ErrRuntimeOwner) {
+	if !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("captured real source pointer accessed during scoped ctor", e)
 	}
 	if m.substitution.scope.active {
 		t.Fatal("failed scope ctor has no reset or completed numeric locals")
 	}
-	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, []util.Block{*b})
+	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, []umemory.Block{*b})
 	shallow := *m
 	if _, e = shallow.SubstituteIntegers(p, 0, PolynomialVariablesView{}, nil); !errors.Is(e, ErrPolynomialOwner) {
 		t.Fatal(e)
@@ -284,7 +285,7 @@ func TestPolynomialSubstitutionEveryReservationNamedPrefixes(t *testing.T) {
 				e = m.SubstitutePolynomialFraction(p, 0, q, q, out)
 			}
 			polys := []Polynomial{p, q, result}
-			polynomialSubstitutionPhysical(t, m, []*PolynomialRef{out}, polys, []util.Block{*xraw}, &input)
+			polynomialSubstitutionPhysical(t, m, []*PolynomialRef{out}, polys, []umemory.Block{*xraw}, &input)
 			if e != nil {
 				refusals++
 				if !numericPhysicalReservationRefusal(e) {
@@ -309,7 +310,7 @@ func TestPolynomialSubstitutionEveryReservationNamedPrefixes(t *testing.T) {
 				t.Errorf("exact reached SOM scoped child omitted route=%d prefix=%d invocation=%d older-active=%v older-stage=%d raw=%v", route, fault, m.som.gcdInvocation, m.substitution.scope.active, m.substitution.scope.stage, m.integer.GcdRaw.Active)
 				serviceMust(t, m.som.finishNormalizeNumeral(true))
 			}
-			if m.powerLocal.active || m.pending.raw != (util.ObjectRef{}) || m.pending.value != (Polynomial{}) || m.generatedActive || m.generatedCalleePending {
+			if m.powerLocal.active || m.pending.raw != (umemory.ObjectRef{}) || m.pending.value != (Polynomial{}) || m.generatedActive || m.generatedCalleePending {
 				t.Fatal("standalone substitution cleanup did not drain started callees", route, fault, m.powerLocal, m.pending, m.generatedActive, m.generatedCalleePending, m.substitution.generatedReceipt, m.substitution.generatedCalleeReceipt)
 			}
 			if result != (Polynomial{}) {
@@ -373,7 +374,7 @@ func TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind(t *testing.T
 		h.State++
 		m.integer.Budget().FailAfter(0)
 		raw, e := m.memory.Allocate(1)
-		if raw != (util.Block{}) {
+		if raw != (umemory.Block{}) {
 			t.Fatal("callback unexpectedly owns completed allocation", raw)
 		}
 		return e
@@ -430,7 +431,7 @@ func TestPolynomialSubstitutionZeroTermWarmPhysicalCohort(t *testing.T) {
 
 func TestPolynomialSubstitutionNativeCohortPreservesBorrowedRoots(t *testing.T) {
 	// Isolate native cohort reuse from direct-profile cold object allocation.
-	m := polynomialCellFixtureWithProfile(t, util.SmallAllocatorProfile{PointerBits: 64})
+	m := polynomialCellFixtureWithProfile(t, umemory.SmallAllocatorProfile{PointerBits: 64})
 	p := polynomialQueryTerms(t, m, []int32{1, 1}, [][]MonomialPower{{{0, 1}, {1, 1}}, {{0, 2}, {2, 1}}})
 	zero := util.Int{}
 	a, e := m.SubstituteInteger(p, 0, &zero)

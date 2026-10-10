@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialVariableRecognitionLiteralWritePrefixes(t *testing.T) {
@@ -103,8 +104,8 @@ func TestPolynomialVariableRecognitionBIGEveryActualPrefix(t *testing.T) {
 				roots, e := c.integer.SourceAllocator().PendingRoots()
 				serviceMust(t, e)
 				pending := c.integer.PendingCell
-				if pending.Object != (util.ObjectRef{}) || roots != ([3]util.Block{}) {
-					cellOwned, rawOwned := pending.Object == (util.ObjectRef{}), roots == ([3]util.Block{})
+				if pending.Object != (umemory.ObjectRef{}) || roots != ([3]umemory.Block{}) {
+					cellOwned, rawOwned := pending.Object == (umemory.ObjectRef{}), roots == ([3]umemory.Block{})
 					if c.integer.MatchesCopyAllocationInvocation(&s.copy) {
 						cellOwned = cellOwned || s.copy.Frame.Roots.Cell == pending
 						rawOwned = rawOwned || s.copy.Frame.Roots.Allocator == roots

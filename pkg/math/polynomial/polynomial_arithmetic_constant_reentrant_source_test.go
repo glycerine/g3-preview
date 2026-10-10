@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // ErrorTransport is an explicit supported Go callback profile, not a native
@@ -18,7 +19,7 @@ func TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame(t *test
 	active := false
 	callbacks := 0
 	var rejected error
-	runtime, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f util.Failure) error {
+	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			callbacks++
 			c := full.core
@@ -33,7 +34,7 @@ func TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame(t *test
 		return f
 	}})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: runtime, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: runtime, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	full, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
@@ -58,7 +59,7 @@ func TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame(t *test
 	if rejected != ErrPolynomialPending || !c.matchesArithmeticInvocation(&receipt) {
 		t.Fatal("executing constant owning guard absent", rejected, cause)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, nil, []*util.Int{&big}, 0, []util.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, full, nil, []*util.Int{&big}, 0, []umemory.Block{held})
 	serviceMust(t, runtime.SetMaxSize(0))
 	serviceMust(t, c.cleanupArithmeticInvocation(&receipt, false))
 	serviceMust(t, c.cleanupArithmeticInvocation(&receipt, true))
@@ -68,7 +69,7 @@ func TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame(t *test
 	old := receipt
 	budget.FailAfter(0)
 	_, later := c.mulAddWithReceipt(c.zero, Polynomial{}, &big, &receipt)
-	polynomialImpPhysicalAuditNamedExtra(t, full, nil, []*util.Int{&big}, 0, []util.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, full, nil, []*util.Int{&big}, 0, []umemory.Block{held})
 	if !numericPhysicalReservationRefusal(later) || receipt.invocation == old.invocation {
 		t.Fatal("actual later constant acquisition absent", later)
 	}

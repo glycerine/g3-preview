@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestSourceCStringBoundedBytesAndLbuf(t *testing.T) {
@@ -85,7 +86,7 @@ func TestIntegerCharacterUsesActualInitializedSizeHeader(t *testing.T) {
 	}
 	a := Int{Cell: ref, Val: 1}
 	m.PublishCell(ref)
-	if _, e = m.prepareInteger(&a, 0); !errors.Is(e, ErrRuntimeUninitialized) {
+	if _, e = m.prepareInteger(&a, 0); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("actual size access must precede char ctor", e)
 	}
 	if m.Natural.CharFormatting.active || m.Natural.CharFormatting.pending || m.Natural.Formatting.Active {

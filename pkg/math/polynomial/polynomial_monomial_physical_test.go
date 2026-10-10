@@ -2,20 +2,19 @@
 package polynomial
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
-func monomialPhysicalAudit(t *testing.T, m *MonomialManager, externalRaw ...util.Block) {
+func monomialPhysicalAudit(t *testing.T, m *MonomialManager, externalRaw ...umemory.Block) {
 	t.Helper()
 	if m == nil {
 		return
 	}
 	r := m.memory.Stats()
 	var blocks uint32
-	add := func(b util.Block) {
-		if b != (util.Block{}) {
+	add := func(b umemory.Block) {
+		if b != (umemory.Block{}) {
 			blocks++
 		}
 	}

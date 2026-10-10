@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatRationalStringEveryColdReservation(t *testing.T) {
@@ -114,7 +115,7 @@ func TestArbitraryFloatRationalStringRefusedChildKeepsOlderInvocation(t *testing
 	reached := false
 	for ordinal := int64(0); ordinal < 60; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 		serviceMust(t, e)
 		sig := NewInt(1)
 		var x ArbitraryFloat
@@ -125,7 +126,7 @@ func TestArbitraryFloatRationalStringRefusedChildKeepsOlderInvocation(t *testing
 		b.FailAfter(ordinal)
 		body := m.ToRational(&x, m.rational, &q)
 		c := &m.rationalConversion
-		matched := body != nil && c.active && c.numericPhase == 2 && c.numeric.Cell.Object != (ObjectRef{})
+		matched := body != nil && c.active && c.numericPhase == 2 && c.numeric.Cell.Object != (umemory.ObjectRef{})
 		b.FailAfter(-1)
 		if matched {
 			reached = true

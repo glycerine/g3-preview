@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -16,11 +17,11 @@ import (
 // mathematical failure reachability; the vector's actual field owns the NUM.
 func TestUPolynomialHenselActualCallerChildStopProtectsOlderFields(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -83,7 +84,7 @@ func TestUPolynomialHenselActualCallerChildStopProtectsOlderFields(t *testing.T)
 	serviceMust(t, e)
 	contextTLSNearMinimum(t, rt)
 	e = rt.Deallocate(&external)
-	if e == nil || external != (util.Block{}) {
+	if e == nil || external != (umemory.Block{}) {
 		t.Fatal("actual signed release frontier", e)
 	}
 	context := numericIntegerModularManager_henselPairAllocationContext(u.modular, &r)
@@ -118,7 +119,7 @@ func TestUPolynomialHenselActualCallerChildStopProtectsOlderFields(t *testing.T)
 	serviceMust(t, e)
 	defer func() {
 		e := rt.Deallocate(&recovery)
-		if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+		if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 			t.Fatal(e)
 		}
 	}()
@@ -132,7 +133,7 @@ func TestUPolynomialHenselActualCallerChildStopProtectsOlderFields(t *testing.T)
 	if s.henselPairInvocationSourceCause(&r) != firstCause || !errors.Is(stop, arena.ErrBounds) {
 		t.Fatal("owning erased immutable source history")
 	}
-	primeTrialPhysicalAuditExternal(t, q, s, []util.Block{recovery})
+	primeTrialPhysicalAuditExternal(t, q, s, []umemory.Block{recovery})
 	next, e := s.beginHenselPairInvocation()
 	serviceMust(t, e)
 	next.frame.executing = false

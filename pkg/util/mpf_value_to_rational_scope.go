@@ -1,8 +1,12 @@
 // Source: src/util/mpf.cpp:1695-1711.
 package util
 
+import
+
 // Real lexical holders are embedded and charged in the MPF owner header.
 // Source constructor credit is recorded only at the reached declarations.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type arbitraryFloatRationalConversionScope struct {
 	outputDetachedNext                   *arbitraryFloatRationalConversionScope
 	outputDetachedInvocation             uint64
@@ -16,8 +20,8 @@ type arbitraryFloatRationalConversionScope struct {
 	invocation                           uint64
 	copy                                 ArbitraryFloatValueCopyReceipt
 	originalCell                         SourceCellBacking
-	originalPending                      Block
-	transferred                          SmallAllocatorPendingAllocation
+	originalPending                      umemory.Block
+	transferred                          umemory.SmallAllocatorPendingAllocation
 	cellRetired                          bool
 	numeric                              NumericAllocationRoots
 	numericPhase                         uint8
@@ -30,7 +34,7 @@ type arbitraryFloatRationalConversionScope struct {
 
 func (m *ArbitraryFloatManager) finishRationalConversionSource() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.rationalConversion
 	if s.sourceCause != nil {
@@ -69,7 +73,7 @@ func (m *ArbitraryFloatManager) finishRationalConversionSource() error {
 		s.sourceCause = e
 		return e
 	}
-	s.active = m.rationalConversionOutputPending(s) || s.outputAllocation.numeric.Cell.Object != (ObjectRef{}) || s.outputAllocation.transferred.Block() != (Block{}) || s.outputAllocation.numeric.Allocator != ([3]Block{}) || copyPending || s.numeric.Cell.Object != (ObjectRef{}) || s.transferred.Block() != (Block{}) || s.numeric.Allocator != ([3]Block{})
+	s.active = m.rationalConversionOutputPending(s) || s.outputAllocation.numeric.Cell.Object != (umemory.ObjectRef{}) || s.outputAllocation.transferred.Block() != (umemory.Block{}) || s.outputAllocation.numeric.Allocator != ([3]umemory.Block{}) || copyPending || s.numeric.Cell.Object != (umemory.ObjectRef{}) || s.transferred.Block() != (umemory.Block{}) || s.numeric.Allocator != ([3]umemory.Block{})
 	return nil
 }
 
@@ -78,7 +82,7 @@ func (m *ArbitraryFloatManager) finishRationalConversionSource() error {
 // this routine acquires no authority from allocator directories or counts.
 func (m *ArbitraryFloatManager) CleanupRationalConversion() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.rationalConversion
 	if s.manager == nil {
@@ -151,7 +155,7 @@ func (m *ArbitraryFloatManager) CleanupRationalConversion() error {
 // This query follows only the issued child, never a manager-wide inventory.
 func (m *ArbitraryFloatManager) rationalConversionCopyPending(s *arbitraryFloatRationalConversionScope) (bool, error) {
 	if m == nil || m.self != m || s != &m.rationalConversion || s.manager != m || s.invocation == 0 {
-		return false, ErrRuntimeOwner
+		return false, umemory.ErrRuntimeOwner
 	}
 	if s.copy == (ArbitraryFloatValueCopyReceipt{}) {
 		return false, nil
@@ -165,7 +169,7 @@ func (m *ArbitraryFloatManager) rationalConversionCopyPending(s *arbitraryFloatR
 	}
 	child := &q.Issued.Child
 	if child.manager != m.integer || !m.integer.validCopyAllocationScope(child.Frame) || child.invocation == 0 || child.Frame.invocation != child.invocation {
-		return false, ErrRuntimeOwner
+		return false, umemory.ErrRuntimeOwner
 	}
 	return child.Frame.active, nil
 }
@@ -173,14 +177,14 @@ func (m *ArbitraryFloatManager) rationalConversionCopyPending(s *arbitraryFloatR
 type arbitraryFloatRationalOutputAllocation struct {
 	numeric         NumericAllocationRoots
 	originalCell    SourceCellBacking
-	originalPending Block
-	transferred     SmallAllocatorPendingAllocation
+	originalPending umemory.Block
+	transferred     umemory.SmallAllocatorPendingAllocation
 	cellRetired     bool
 }
 
 func (m *ArbitraryFloatManager) rationalConversionOutputSourceCause(s *arbitraryFloatRationalConversionScope) error {
 	if !m.validConversionScope(s) {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	z := s.outputManager.Z
 	if e := z.RawInvocationSourceCause(&s.outputExtended); e != nil {
@@ -200,7 +204,7 @@ func (m *ArbitraryFloatManager) rationalConversionOutputPending(s *arbitraryFloa
 }
 func (m *ArbitraryFloatManager) cleanupRationalConversionOutput(s *arbitraryFloatRationalConversionScope, abort bool) error {
 	if !m.validConversionScope(s) {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	z := s.outputManager.Z
 	if e := z.CleanupRawInvocation(&s.outputExtended, abort); e != nil {

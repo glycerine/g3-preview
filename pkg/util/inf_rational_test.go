@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func infValue(t *testing.T, s *RationalService, n, d int64, eps string) OwnedInfRational {
@@ -594,7 +595,7 @@ func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
 			// Scalar arithmetic and integer floor copies reuse pooled storage; select
 			// the supported direct profile to exercise real source malloc refusals.
 			if op == 9 || op == 10 || op == 12 {
-				config.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+				config.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			}
 			s, e := NewRationalService(config)
 			serviceMust(t, e)

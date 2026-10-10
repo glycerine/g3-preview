@@ -3,6 +3,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type polynomialCoefficientScope struct {
@@ -13,7 +14,7 @@ type polynomialCoefficientScope struct {
 	active, executing, foreignTransferred bool
 	generatedCleanupStarted               bool
 	generated                             Monomial
-	allocator                             [3]util.Block
+	allocator                             [3]umemory.Block
 }
 type polynomialCoefficientInvocationReceipt struct {
 	manager    *MultivariatePolynomialCore
@@ -94,7 +95,7 @@ func (m *MultivariatePolynomialCore) cleanupCoefficientInvocation(r *polynomialC
 	}
 	owned, foreign := false, false
 	for i := range roots {
-		if roots[i] != (util.Block{}) {
+		if roots[i] != (umemory.Block{}) {
 			if roots[i] == s.allocator[i] {
 				owned = true
 			} else {

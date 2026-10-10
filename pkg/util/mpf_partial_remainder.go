@@ -3,6 +3,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math"
 )
 
@@ -10,7 +11,7 @@ import (
 // helper does. It updates x; y remains borrowed through the final publication.
 func (m *ArbitraryFloatManager) PartialRemainder(x, y *ArbitraryFloat, expDiff int64, partial bool) (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.partialRemainder.active {
 		return ErrNumericPending

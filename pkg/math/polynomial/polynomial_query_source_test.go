@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func polynomialQueryTerms(t *testing.T, m *MultivariatePolynomialCore, as []int32, pws [][]MonomialPower) Polynomial {
@@ -196,7 +197,7 @@ func TestPolynomialQueryPowerAssignmentStoppedCallback(t *testing.T) {
 		}
 		m.integer.Budget().FailAfter(0)
 		raw, e := m.memory.Allocate(1)
-		if raw != (util.Block{}) {
+		if raw != (umemory.Block{}) {
 			t.Fatal("unexpected completed callback allocation", raw)
 		}
 		return e
@@ -301,15 +302,15 @@ func TestPolynomialQueryReachedFieldReadProfiles(t *testing.T) {
 		t.Fatal("univariate reads VAR but not DEG or cached total")
 	}
 	_, e = m.IsLinear(p)
-	if !errors.Is(e, util.ErrRuntimeUninitialized) {
+	if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("linear reaches degree", e)
 	}
 	_, e = m.TotalDegree(p)
-	if !errors.Is(e, util.ErrRuntimeUninitialized) {
+	if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("total reaches cached total", e)
 	}
 	_, e = m.Degree(p, 1)
-	if !errors.Is(e, util.ErrRuntimeUninitialized) {
+	if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("maximal variable reaches degree", e)
 	}
 	serviceMust(t, m.writeMonomial(p, 0, original))

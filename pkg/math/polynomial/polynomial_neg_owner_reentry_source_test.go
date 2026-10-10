@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialNegActualCopyTransportRefusesOwnerRetirement(t *testing.T) {
@@ -16,7 +17,7 @@ func TestPolynomialNegActualCopyTransportRefusesOwnerRetirement(t *testing.T) {
 	active := false
 	calls := 0
 	var rejected error
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f util.Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			calls++
 			c := full.core
@@ -31,7 +32,7 @@ func TestPolynomialNegActualCopyTransportRefusesOwnerRetirement(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	full, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
@@ -59,7 +60,7 @@ func TestPolynomialNegActualCopyTransportRefusesOwnerRetirement(t *testing.T) {
 	if calls != 1 || !numericPhysicalReservationRefusal(body) {
 		t.Fatal("actual Copy transport not reached", calls, body)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*util.Int{&big}, 0, []util.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*util.Int{&big}, 0, []umemory.Block{held})
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, c.cleanupNegInvocation(&receipt, false))
 	serviceMust(t, c.cleanupNegInvocation(&receipt, true))

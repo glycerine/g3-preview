@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatToRationalPooledSourceConsumption(t *testing.T) {
@@ -12,7 +13,7 @@ func TestArbitraryFloatToRationalPooledSourceConsumption(t *testing.T) {
 		reached := false
 		for ordinal := int64(0); ordinal < 80; ordinal++ {
 			b := arena.NewBudget(1 << 27)
-			cfg := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64}}
+			cfg := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}}
 			m, e := NewArbitraryFloatManager(cfg)
 			serviceMust(t, e)
 			qm, e := NewRationalManager(RationalConfig{Integers: cfg})
@@ -43,7 +44,7 @@ func TestArbitraryFloatToRationalPooledSourceConsumption(t *testing.T) {
 			if output {
 				cell, roots, retired, z = &s.outputAllocation.originalCell, &s.outputAllocation.numeric, &s.outputAllocation.cellRetired, qm.Z
 			}
-			matched := body != nil && roots.Cell.Object != (ObjectRef{}) && roots.Cell.Offset != 0
+			matched := body != nil && roots.Cell.Object != (umemory.ObjectRef{}) && roots.Cell.Offset != 0
 			sourceNamed := []*Int{&x.significand, &s.a.significand, &s.n, &s.d}
 			outputNamed := []*Int{&out.Num, &out.Den, &qm.NTmp}
 			for i := range sourceHolders {

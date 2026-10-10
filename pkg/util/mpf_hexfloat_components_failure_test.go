@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math/big"
 	"testing"
 )
@@ -116,7 +117,7 @@ func TestArbitraryFloatHexfloatComponentsEntryAuthority(t *testing.T) {
 	text, e := NewArbitraryFloatFormatText(b)
 	serviceMust(t, e)
 	copyOwner := *m
-	if _, e := copyOwner.ToStringHexfloatComponentsInto(false, 0, &sig, 8, 4, 0, text); !errors.Is(e, ErrRuntimeOwner) {
+	if _, e := copyOwner.ToStringHexfloatComponentsInto(false, 0, &sig, 8, 4, 0, text); !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("copied manager", e)
 	}
 	m.hexfloatComponents.invocation = ^uint64(0)
@@ -134,7 +135,7 @@ func TestArbitraryFloatHexfloatComponentsRefusedDivisionKeepsOlderRoots(t *testi
 	reached := false
 	for ordinal := int64(0); ordinal < 80; ordinal++ {
 		budget := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 		serviceMust(t, e)
 		z := m.integer
 		sig := NewInt(-3)

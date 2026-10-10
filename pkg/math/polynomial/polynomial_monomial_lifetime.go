@@ -3,7 +3,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Constructor unwind invokes only destructors of completed members. A failed
@@ -120,11 +120,11 @@ func (m *MonomialManager) CleanupValue(a *Monomial) error {
 		return e
 	}
 	m.table.removeToken(monomialKey{monomialObjectKey, a.slot})
-	if l.raw != (util.ObjectRef{}) && m.sourceStage >= 3 && m.allocatorOwned {
+	if l.raw != (umemory.ObjectRef{}) && m.sourceStage >= 3 && m.allocatorOwned {
 		if l.sourceOffset == 0 {
 			e = m.memory.Deallocate(&l.sourceRaw)
-			if l.sourceRaw == (util.Block{}) {
-				l.raw = util.ObjectRef{}
+			if l.sourceRaw == (umemory.Block{}) {
+				l.raw = umemory.ObjectRef{}
 			}
 			if e != nil {
 				return e
@@ -134,13 +134,13 @@ func (m *MonomialManager) CleanupValue(a *Monomial) error {
 				return ErrMonomialPending
 			}
 		}
-		l.raw = util.ObjectRef{}
+		l.raw = umemory.ObjectRef{}
 	}
-	if l.raw != (util.ObjectRef{}) {
+	if l.raw != (umemory.ObjectRef{}) {
 		p, e := m.allocator.DeallocateTracked(uint64(l.requested), l.raw)
 		if p.PhysicalReleased || p.PooledLinked {
 			l.acknowledgeToPolynomialCreated(*a)
-			l.raw = util.ObjectRef{}
+			l.raw = umemory.ObjectRef{}
 		}
 		if e != nil {
 			return e

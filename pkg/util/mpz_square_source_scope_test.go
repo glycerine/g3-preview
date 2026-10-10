@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerPerfectSquareResetsCallerBeforeRawCopyRefusal(t *testing.T) {
@@ -54,11 +55,11 @@ func TestIntegerPerfectSquareOwnsActualFailedRawFields(t *testing.T) {
 // proof, not valid allocation exhaustion or an end-to-end square-root recipe.
 func TestIntegerPerfectSquareRawEndStopsBeforeLaterDeletion(t *testing.T) {
 	b := arena.NewBudget(1 << 25)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := NewRationalManager(RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m := q.Z
@@ -96,7 +97,7 @@ func TestIntegerPerfectSquareRawEndStopsBeforeLaterDeletion(t *testing.T) {
 
 func TestIntegerPerfectSquarePendingReceiptLeavesForeignReplacement(t *testing.T) {
 	b := arena.NewBudget(1 << 22)
-	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 2, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 2, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	defer func() {
 		serviceMust(t, m.CleanupPerfectSquare())
@@ -108,7 +109,7 @@ func TestIntegerPerfectSquarePendingReceiptLeavesForeignReplacement(t *testing.T
 	}()
 	out := Int{}
 	_, e = m.IsPerfectSquare(&m.Two64, &out)
-	if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (ObjectRef{}) || m.PerfectSquare.pending != m.PendingCell.Object {
+	if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (umemory.ObjectRef{}) || m.PerfectSquare.pending != m.PendingCell.Object {
 		t.Fatal("actual internal raw hi pending receipt", e)
 	}
 	integerPhysicalAudit(t, m, &out)
@@ -116,7 +117,7 @@ func TestIntegerPerfectSquarePendingReceiptLeavesForeignReplacement(t *testing.T
 	serviceMust(t, m.CleanupPendingAllocation())
 	foreign := Int{}
 	e = m.Copy(&foreign, &m.IntMin)
-	if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (ObjectRef{}) || m.PendingCell.Object == old.Object {
+	if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (umemory.ObjectRef{}) || m.PendingCell.Object == old.Object {
 		t.Fatal("actual later caller replacement", e)
 	}
 	later := m.PendingCell

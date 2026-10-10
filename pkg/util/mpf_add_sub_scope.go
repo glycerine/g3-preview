@@ -1,6 +1,8 @@
 // Source: src/util/mpf.cpp:526-585 (a, b, sticky_rem and Round lifetimes).
 package util
 
+import umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type arbitraryFloatAddSubScope struct {
 	manager                        *ArbitraryFloatManager
 	invocation                     uint64
@@ -63,7 +65,7 @@ func (s *arbitraryFloatAddSubScope) unbind() error {
 }
 func (m *ArbitraryFloatManager) finishAddSubSource() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.addSub
 	if s.executing || s.finishing {
@@ -79,7 +81,7 @@ func (m *ArbitraryFloatManager) finishAddSubSource() error {
 	defer func() { s.finishing = false }()
 	if s.roundFrame != nil {
 		if s.roundFrame != &m.RoundScope || s.roundInvocation != m.RoundScope.Invocation {
-			return ErrRuntimeOwner
+			return umemory.ErrRuntimeOwner
 		}
 		if s.roundFrame.sourceCause != nil {
 			s.sourceCause = s.roundFrame.sourceCause
@@ -106,7 +108,7 @@ func (m *ArbitraryFloatManager) finishAddSubSource() error {
 
 func (m *ArbitraryFloatManager) CleanupAddSub() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.addSub
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {
@@ -116,7 +118,7 @@ func (m *ArbitraryFloatManager) CleanupAddSub() (cause error) {
 		return nil
 	}
 	if !s.valid() {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := s.bind(); e != nil {
 		return e
@@ -126,7 +128,7 @@ func (m *ArbitraryFloatManager) CleanupAddSub() (cause error) {
 	z := m.integer
 	if s.roundFrame != nil {
 		if s.roundFrame != &m.RoundScope || s.roundInvocation != m.RoundScope.Invocation {
-			return ErrRuntimeOwner
+			return umemory.ErrRuntimeOwner
 		}
 		if e := m.CleanupRound(); e != nil {
 			return e
@@ -168,7 +170,7 @@ func (m *ArbitraryFloatManager) CleanupAddSub() (cause error) {
 // invocations for which no history receipt is materialized.
 func (s *arbitraryFloatAddSubScope) enterArbitraryFloatRound(m *ArbitraryFloatManager, frame *ArbitraryFloatRoundScope) error {
 	if !s.NumericBound(true) || m != s.manager || frame != &m.RoundScope || !frame.active || !frame.executing {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s.roundFrame = frame
 	s.roundInvocation = frame.Invocation

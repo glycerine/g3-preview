@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -166,12 +167,12 @@ func (s *MemoryFatalContext) Close() error {
 	s.closed = true
 	return nil
 }
-func (s *MemoryFatalContext) HandleMemoryFailure(r *Runtime, f Failure) error {
+func (s *MemoryFatalContext) HandleMemoryFailure(r *umemory.Runtime, f umemory.Failure) error {
 	if e := s.open(); e != nil {
 		return e
 	}
 	switch f.Kind {
-	case FailureMemout:
+	case umemory.FailureMemout:
 		if !s.exitOOM {
 			return OutOfMemoryError{z3exception.MustZ3Error(z3exception.ErrorMemout)}
 		}
@@ -191,7 +192,7 @@ func (s *MemoryFatalContext) HandleMemoryFailure(r *Runtime, f Failure) error {
 			return e
 		}
 		os.Exit(101)
-	case FailureAllocExceeded:
+	case umemory.FailureAllocExceeded:
 		out, e := s.streams.Stdout()
 		if e != nil {
 			return e
@@ -211,5 +212,5 @@ func (s *MemoryFatalContext) HandleMemoryFailure(r *Runtime, f Failure) error {
 		}
 		os.Exit(113)
 	}
-	return ErrFailureTransport
+	return umemory.ErrFailureTransport
 }

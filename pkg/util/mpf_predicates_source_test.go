@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatLiteralClassificationPolicies(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	cases := []struct {
 		exp                                   int64
@@ -85,9 +86,9 @@ func TestArbitraryFloatLiteralClassificationPolicies(t *testing.T) {
 // ebits=1, which is valid here while top/bottom require ebits>=2 in DEBUG.
 func TestArbitraryFloatLiteralMinimumMaximumExponent(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	for _, bits := range []uint32{1, 2, 8, 15} {
 		lo, e := m.minExponent(bits)

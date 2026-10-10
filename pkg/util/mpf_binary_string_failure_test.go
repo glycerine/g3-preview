@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math/big"
 	"testing"
 )
@@ -126,7 +127,7 @@ func TestArbitraryFloatBinaryStringEntryAuthority(t *testing.T) {
 	out.SourceDestroy()
 	copyManager := *m
 	var later OwnedString
-	if e := copyManager.ToStringBinary(&x, 0, 0, &later); !errors.Is(e, ErrRuntimeOwner) {
+	if e := copyManager.ToStringBinary(&x, 0, 0, &later); !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("copied manager", e)
 	}
 	m.binaryString.invocation = ^uint64(0)
@@ -147,7 +148,7 @@ func TestArbitraryFloatBinaryStringRefusedDivisionKeepsOlderRoots(t *testing.T) 
 	reached := false
 	for ordinal := int64(0); ordinal < 80; ordinal++ {
 		budget := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 		serviceMust(t, e)
 		z := m.integer
 		x := ArbitraryFloat{format: arbitraryFloatFormat(8, 3, false), exponent: -160, significand: NewInt(3)}

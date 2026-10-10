@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialFactorToPolynomialTransportCannotRetireExecutingOwner(t *testing.T) {
@@ -17,7 +18,7 @@ func TestPolynomialFactorToPolynomialTransportCannotRetireExecutingOwner(t *test
 			var q *util.RationalManager
 			var callbackOut, callbackInput util.Int
 			active, seen := false, false
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f util.Failure) error {
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 				if active {
 					seen = true
 					before := rtStateForFactors(fs)
@@ -77,7 +78,7 @@ func TestPolynomialFactorToPolynomialTransportCannotRetireExecutingOwner(t *test
 			cfg.Memory = rt
 			q, e = util.NewRationalManager(util.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
-			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 			serviceMust(t, e)
 			full, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 			serviceMust(t, e)
@@ -102,7 +103,7 @@ func TestPolynomialFactorToPolynomialTransportCannotRetireExecutingOwner(t *test
 			if !seen || !numericPhysicalReservationRefusal(cause) {
 				t.Fatal("actual SET returning transport", seen, cause)
 			}
-			polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*util.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []util.Block{held})
+			polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*util.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []umemory.Block{held})
 			serviceMust(t, rt.SetMaxSize(0))
 			serviceMust(t, full.CleanupToPolynomial())
 			serviceMust(t, fs.CloseChecked())

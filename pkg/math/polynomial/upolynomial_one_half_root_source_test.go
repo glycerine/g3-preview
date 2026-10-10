@@ -10,17 +10,18 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialHasOneHalfRootActualBodyAndNumeralDT(t *testing.T) {
 	reached := false
 	for offset := int64(12); offset < 500 && !reached; offset += 4 {
 		t.Run(fmt.Sprint(offset), func(t *testing.T) {
-			var rt *util.Runtime
-			var lane, held util.Block
+			var rt *umemory.Runtime
+			var lane, held umemory.Block
 			armed := false
 			var transportBlocks uint32
-			transport := func(f util.Failure) error {
+			transport := func(f umemory.Failure) error {
 				if !armed {
 					return f
 				}
@@ -52,9 +53,9 @@ func TestUPolynomialHasOneHalfRootActualBodyAndNumeralDT(t *testing.T) {
 				armed = false
 				serviceMust(t, rt.SetMaxSize(0))
 				contextTLSFinish(t, rt, func() error { return p.cleanupOneHalfRoot(false) })
-				for _, b := range []*util.Block{&lane, &held} {
+				for _, b := range []*umemory.Block{&lane, &held} {
 					contextTLSFinish(t, rt, func() error {
-						if *b == (util.Block{}) {
+						if *b == (umemory.Block{}) {
 							return nil
 						}
 						return rt.Deallocate(b)
@@ -74,7 +75,7 @@ func TestUPolynomialHasOneHalfRootActualBodyAndNumeralDT(t *testing.T) {
 			armed = true
 			_, body := p.HasOneHalfRoot(v)
 			armed = false
-			if lane == (util.Block{}) || rt.Stats().LiveBlocks >= transportBlocks {
+			if lane == (umemory.Block{}) || rt.Stats().LiveBlocks >= transportBlocks {
 				return
 			}
 			reached = true
@@ -88,7 +89,7 @@ func TestUPolynomialHasOneHalfRootActualBodyAndNumeralDT(t *testing.T) {
 			if (q.values[1]).Cell == 0 || !z.IsLiveCellToken(uint64((q.values[1]).Cell)) || (!z.Cell((q.values[1]).Cell).Released && !z.Cell((q.values[1]).Cell).CleanupPending) {
 				t.Fatal("ak descriptor does not name consumed physical source release")
 			}
-			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&q.values[0], &q.values[1]}, []util.Block{lane, held})
+			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&q.values[0], &q.values[1]}, []umemory.Block{lane, held})
 			before := *q
 			used, physical := z.Budget().Used(), rt.Stats()
 			if e := p.SourceFinalize(); e != q.sourceCause {
@@ -149,7 +150,7 @@ func TestUPolynomialHasOneHalfRootActualModularOwnerCallback(t *testing.T) {
 	var foreign *util.IntegerModularManager
 	var current UPolynomial
 	armed, reached := false, false
-	transport := func(f util.Failure) error {
+	transport := func(f umemory.Failure) error {
 		if !armed {
 			return f
 		}
@@ -220,7 +221,7 @@ func TestUPolynomialHasOneHalfRootActualModularOwnerCallback(t *testing.T) {
 	if !reached || body == nil {
 		t.Fatal("actual public allocating leaf absent", reached, body)
 	}
-	algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&p.oneHalfRoot.values[0], &p.oneHalfRoot.values[1]}, []util.Block{held})
+	algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&p.oneHalfRoot.values[0], &p.oneHalfRoot.values[1]}, []umemory.Block{held})
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, p.cleanupOneHalfRoot(false))
 	serviceMust(t, p.cleanupOneHalfRoot(true))

@@ -10,8 +10,9 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/idgen"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrMonomialOwner = errors.New("mpnum: invalid monomial owner")
@@ -28,9 +29,9 @@ type MonomialPower struct{ Var, Degree uint32 }
 type MonomialInfo struct{ RefCount, ID, TotalDegree, Size, Hash uint32 }
 type MonomialManagerConfig struct {
 	Budget    *arena.Budget
-	Memory    *util.Runtime
-	Allocator *util.SmallAllocator
-	Profile   util.SmallAllocatorProfile
+	Memory    *umemory.Runtime
+	Allocator *umemory.SmallAllocator
+	Profile   umemory.SmallAllocatorProfile
 }
 type monomialLocation struct {
 	toPolynomialCohort                 *polynomialToPolynomialScope
@@ -51,8 +52,8 @@ type monomialLocation struct {
 	derivativeSlot                     uint32
 	unreferencedCohort                 *polynomialSubstitutionState
 	unreferencedSlot                   uint32
-	raw                                util.ObjectRef
-	sourceRaw                          util.Block
+	raw                                umemory.ObjectRef
+	sourceRaw                          umemory.Block
 	sourceOffset                       uint64
 	generation, requested, id          uint32
 	stage                              uint8
@@ -79,8 +80,8 @@ type MonomialManager struct {
 	borrowedTemp                                                              *monomialTemp // actual borrowed imp temporary pointer; no ownership
 	self                                                                      *MonomialManager
 	config                                                                    MonomialManagerConfig
-	memory                                                                    *util.Runtime
-	allocator                                                                 *util.SmallAllocator
+	memory                                                                    *umemory.Runtime
+	allocator                                                                 *umemory.SmallAllocator
 	ids                                                                       idgen.Generator
 	table                                                                     monomialTable
 	temps                                                                     [4]monomialTemp
@@ -124,14 +125,14 @@ func NewMonomialManager(c MonomialManagerConfig) (*MonomialManager, error) {
 		}
 	} else {
 		var e error
-		r, e = util.NewRuntime(util.RuntimeConfig{Budget: c.Budget, SizeTBits: c.Profile.PointerBits})
+		r, e = umemory.NewRuntime(umemory.RuntimeConfig{Budget: c.Budget, SizeTBits: c.Profile.PointerBits})
 		if e != nil {
 			return nil, e
 		}
 		owned = true
 	}
 	if c.Profile.PointerBits == 0 {
-		c.Profile = util.SmallAllocatorProfile{PointerBits: r.SizeTBits(), Debug: polynomialSourceDebug, Windows: runtime.GOOS == "windows"}
+		c.Profile = umemory.SmallAllocatorProfile{PointerBits: r.SizeTBits(), Debug: polynomialSourceDebug, Windows: runtime.GOOS == "windows"}
 	}
 	if c.Profile.PointerBits != r.SizeTBits() {
 		if owned {
@@ -173,7 +174,7 @@ func NewMonomialManager(c MonomialManagerConfig) (*MonomialManager, error) {
 	m.idsInitialized = true
 	m.allocator = c.Allocator
 	if m.allocator == nil {
-		a, e := util.NewSmallAllocator(util.SmallAllocatorConfig{Runtime: r, Profile: c.Profile})
+		a, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: r, Profile: c.Profile})
 		if e != nil {
 			return fail(e)
 		}
@@ -230,7 +231,7 @@ func (m *MonomialManager) check() error {
 	}
 	return m.memory.CheckOpen()
 }
-func (m *MonomialManager) RuntimeOwner() *util.Runtime {
+func (m *MonomialManager) RuntimeOwner() *umemory.Runtime {
 	if m == nil || m.self != m {
 		return nil
 	}
@@ -461,10 +462,10 @@ func (m *MonomialManager) deleteCore(a Monomial, l *monomialLocation) error {
 		}
 		l.stage = 2
 	}
-	if l.raw != (util.ObjectRef{}) {
+	if l.raw != (umemory.ObjectRef{}) {
 		progress, e := m.allocator.DeallocateTracked(uint64(l.requested), l.raw)
 		if progress.PhysicalReleased || progress.PooledLinked {
-			l.raw = util.ObjectRef{}
+			l.raw = umemory.ObjectRef{}
 		}
 		if e != nil {
 			return e

@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestASTBitVectorNumericCallerReturnedNormAndInverse(t *testing.T) {
@@ -94,8 +95,8 @@ func TestASTBitVectorNumericCallerExactEveryActualReservation(t *testing.T) {
 					}
 				} else {
 					failures++
-					var failure util.Failure
-					if !errors.Is(body, arena.ErrInjectedFailure) && (!errors.As(body, &failure) || failure.Kind != util.FailureMemout) {
+					var failure umemory.Failure
+					if !errors.Is(body, arena.ErrInjectedFailure) && (!errors.As(body, &failure) || failure.Kind != umemory.FailureMemout) {
 						t.Fatal(body)
 					}
 				}

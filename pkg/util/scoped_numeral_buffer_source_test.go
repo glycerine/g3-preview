@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func scopedBufferFixture(t *testing.T) (*IntegerModularManager, *scopedIntegerModularBuffer128) {
@@ -164,7 +165,7 @@ func TestScopedNumeralBufferBorrowedNativeView(t *testing.T) {
 	}
 	view, e := b.view()
 	serviceMust(t, e)
-	if view.Count != 130 || view.Values == nil || view.Raw != (Block{}) {
+	if view.Count != 130 || view.Values == nil || view.Raw != (umemory.Block{}) {
 		t.Fatal("native borrowed view", view)
 	}
 	serviceMust(t, view.store(2, NewInt(56)))

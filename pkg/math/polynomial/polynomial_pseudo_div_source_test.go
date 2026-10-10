@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func polynomialPseudoOutputs(t *testing.T, m *MultivariatePolynomialCore) (*PolynomialRef, *PolynomialRef) {
@@ -273,14 +274,14 @@ func TestPolynomialPseudoDivisionWarmSourceProfileAndCounts(t *testing.T) {
 // destructor guard. This is neither source-valid exhaustion nor pointer repair.
 func TestPolynomialPseudoDivisionReverseDestructionRefusal(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	runtime, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 32})
+	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 32})
 	serviceMust(t, e)
 	config := serviceConfig(b).Integers
 	config.Memory = runtime
-	config.Profile = util.SmallAllocatorProfile{PointerBits: 32}
+	config.Profile = umemory.SmallAllocatorProfile{PointerBits: 32}
 	rational, e := util.NewRationalManager(util.RationalConfig{Integers: config})
 	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: runtime, Profile: util.SmallAllocatorProfile{PointerBits: 32}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: runtime, Profile: umemory.SmallAllocatorProfile{PointerBits: 32}})
 	serviceMust(t, e)
 	serviceMust(t, mm.IncManagerRef())
 	m, e := NewMultivariatePolynomialCore(MultivariatePolynomialConfig{Integer: rational.Integers(), Rationals: rational, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})

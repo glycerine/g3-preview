@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -31,7 +32,7 @@ func TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText(t *testing.T) {
 	}
 	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
-	if e = v.Display(out); !errors.Is(e, util.ErrRuntimeUninitialized) {
+	if e = v.Display(out); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("invented initialized ematching", e)
 	}
 	text, e = out.String()

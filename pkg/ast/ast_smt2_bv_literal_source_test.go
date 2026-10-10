@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
@@ -86,7 +87,7 @@ func astBVPrinterRawGraph(t *testing.T, m *ASTManager, input *util.OwnedRational
 	if input != nil {
 		values = append(values, input)
 	}
-	var blocks []util.Block
+	var blocks []umemory.Block
 	p := m.bitVectorPlugin
 	for f := p.numeralFrames; f != nil; f = f.next {
 		if f.self != f || f.owner != p {

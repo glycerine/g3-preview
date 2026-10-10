@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestRationalServiceGCDCoefficientsInvocation(t *testing.T) {
@@ -46,7 +47,7 @@ func TestRationalServiceGCDCoefficientsInvocationEveryRuntimeReservation(t *test
 		var call RationalServiceInvocation
 		active, transports := false, 0
 		var ready, cleanup, reentry error
-		rt, e := NewRuntime(RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 			if active {
 				transports++
 				ready = call.SourceReady()
@@ -58,7 +59,7 @@ func TestRationalServiceGCDCoefficientsInvocationEveryRuntimeReservation(t *test
 		serviceMust(t, e)
 		cfg := serviceConfig(budget)
 		cfg.Integers.Memory = rt
-		cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		s, e = NewRationalService(cfg)
 		serviceMust(t, e)
 		a := serviceValue(t, s, "1329227995784915872903807060280344577")
@@ -87,8 +88,8 @@ func TestRationalServiceGCDCoefficientsInvocationEveryRuntimeReservation(t *test
 		for i := uint8(0); i < call.scope.Count; i++ {
 			roots = append(roots, &call.scope.Roots[i].Num, &call.scope.Roots[i].Den)
 		}
-		var extra []Block
-		if block := call.transferred.Block(); block != (Block{}) {
+		var extra []umemory.Block
+		if block := call.transferred.Block(); block != (umemory.Block{}) {
 			extra = append(extra, block)
 		}
 		integerPhysicalAuditWithRaw(t, s.Manager.Z, extra, roots...)

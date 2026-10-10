@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // These are explicit Go owner-metadata boundary fixtures. Source reservation
@@ -197,7 +198,7 @@ func scalarExactDivNumericPageOneFixture(t *testing.T) *MultivariatePolynomialMa
 	b := arena.NewBudget(1 << 26)
 	cfg := serviceConfig(b).Integers
 	cfg.Cells.PageSize = 1
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})

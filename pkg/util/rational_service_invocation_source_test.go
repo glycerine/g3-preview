@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestRationalServiceInvocationInlineHistoryAndExactOwner(t *testing.T) {
@@ -110,7 +111,7 @@ func TestRationalServiceInvocationDetachedCellSourceEnd(t *testing.T) {
 		for ordinal := int64(0); ordinal < 100 && !found; ordinal++ {
 			b := arena.NewBudget(1 << 27)
 			cfg := serviceConfig(b)
-			cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: debug}
+			cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: debug}
 			s, e := NewRationalService(cfg)
 			serviceMust(t, e)
 			var call RationalServiceInvocation
@@ -129,7 +130,7 @@ func TestRationalServiceInvocationDetachedCellSourceEnd(t *testing.T) {
 				t.Fatal("immediate detached frontier", debug, ordinal, b.Used(), want)
 			}
 			b.FailAfter(-1)
-			if captured.Object != (ObjectRef{}) {
+			if captured.Object != (umemory.ObjectRef{}) {
 				found = true
 				if body == nil || call.originalCell != captured {
 					t.Fatal("actual failed leaf missing immutable backing", ordinal, body)
@@ -168,7 +169,7 @@ func TestRationalServiceCopyInvocationEveryActualReservation(t *testing.T) {
 	for ordinal := int64(0); ordinal < 30; ordinal++ {
 		b := arena.NewBudget(1 << 27)
 		cfg := serviceConfig(b)
-		cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		s, e := NewRationalService(cfg)
 		serviceMust(t, e)
 		a := serviceValue(t, s, "18446744073709551617")
@@ -177,12 +178,12 @@ func TestRationalServiceCopyInvocationEveryActualReservation(t *testing.T) {
 		var c RationalServiceInvocation
 		b.FailAfter(ordinal)
 		body := s.CopyWithInvocation(&out, &a, &c)
-		extra := []Block{}
-		if block := c.transferred.Block(); block != (Block{}) {
+		extra := []umemory.Block{}
+		if block := c.transferred.Block(); block != (umemory.Block{}) {
 			extra = append(extra, block)
 		}
 		integerPhysicalAuditWithRaw(t, s.Manager.Z, extra, &a.Raw.Num, &a.Raw.Den, &out.Raw.Num, &out.Raw.Den)
-		if backing := c.numeric.Cell; backing.Object != (ObjectRef{}) {
+		if backing := c.numeric.Cell; backing.Object != (umemory.ObjectRef{}) {
 			if _, e := s.Manager.Z.Allocator.ObjectExtent(backing.Object); e != nil {
 				t.Fatal("exact detached copy backing", e)
 			}

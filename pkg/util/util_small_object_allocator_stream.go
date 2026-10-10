@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Read the actual borrowed C string at insertion time. Source strlen precedes
@@ -63,7 +64,7 @@ func smallObjectCStringInto(out *NumericTextStream, region *arena.BytesRegion, t
 	}
 	return nil
 }
-func (b *smallObjectIOBridge) diagnostic(a *SmallAllocator) error {
+func (b *smallObjectIOBridge) diagnostic(a *umemory.SmallAllocator) error {
 	out := b.config.Diagnostics
 	if e := out.AppendCString("Memory leak detected for small object allocator '"); e != nil {
 		return e
@@ -94,7 +95,7 @@ func (b *smallObjectIOBridge) diagnostic(a *SmallAllocator) error {
 	}
 	return out.AppendByte('\n') // explicit byte sink; native stderr flush remains open
 }
-func (b *smallObjectIOBridge) verbose(a *SmallAllocator, end bool) error {
+func (b *smallObjectIOBridge) verbose(a *umemory.SmallAllocator, end bool) error {
 	out := b.config.Verbose
 	if b.config.VerboseContext != nil {
 		var e error
@@ -140,14 +141,14 @@ func (b *smallObjectIOBridge) verbose(a *SmallAllocator, end bool) error {
 	return out.AppendByte('\n')
 }
 
-func (b *smallObjectIOBridge) Emit(a *SmallAllocator, event AllocatorIOEvent) error {
+func (b *smallObjectIOBridge) Emit(a *umemory.SmallAllocator, event umemory.AllocatorIOEvent) error {
 	switch event {
-	case AllocatorIOLeak:
+	case umemory.AllocatorIOLeak:
 		return b.diagnostic(a)
-	case AllocatorIOVerboseStart:
+	case umemory.AllocatorIOVerboseStart:
 		return b.verbose(a, false)
-	case AllocatorIOVerboseEnd:
+	case umemory.AllocatorIOVerboseEnd:
 		return b.verbose(a, true)
 	}
-	return ErrAllocatorIO
+	return umemory.ErrAllocatorIO
 }

@@ -7,19 +7,20 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // This is an explicitly malformed Go physical layout, not a valid source
 // allocation failure. The 32-bit allocator refuses the actual destructor read.
 func TestLexicalInfDestructorRefusal(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 32})
 	if e != nil {
 		t.Fatal(e)
 	}
 	cfg := serviceConfig(b)
 	cfg.Integers.Memory = r
-	cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 32}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 32}
 	s, e := NewRationalService(cfg)
 	if e != nil {
 		t.Fatal(e)
@@ -80,13 +81,13 @@ func TestLexicalReverseMemberProgressAndExplicitRecovery(t *testing.T) {
 	for _, first := range []bool{false, true} {
 		t.Run(map[bool]string{false: "second", true: "first"}[first], func(t *testing.T) {
 			b := arena.NewBudget(1 << 24)
-			r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32})
+			r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 32})
 			if e != nil {
 				t.Fatal(e)
 			}
 			cfg := serviceConfig(b)
 			cfg.Integers.Memory = r
-			cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 32}
+			cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 32}
 			s, e := NewRationalService(cfg)
 			if e != nil {
 				t.Fatal(e)
@@ -172,13 +173,13 @@ func TestLexicalReverseMemberProgressAndExplicitRecovery(t *testing.T) {
 
 func TestLexicalFailedConstructorCompletedMemberOrder(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 32})
 	if e != nil {
 		t.Fatal(e)
 	}
 	cfg := serviceConfig(b)
 	cfg.Integers.Memory = r
-	cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 32}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 32}
 	s, e := NewRationalService(cfg)
 	if e != nil {
 		t.Fatal(e)
@@ -258,13 +259,13 @@ func lexicalEightRootFixture(s *RationalService, corrupt bool) (out OwnedInfRati
 }
 func TestLexicalUnpublishedResultAndEightChargedRoots(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 32})
 	if e != nil {
 		t.Fatal(e)
 	}
 	cfg := serviceConfig(b)
 	cfg.Integers.Memory = r
-	cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 32}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 32}
 	s, e := NewRationalService(cfg)
 	if e != nil {
 		t.Fatal(e)
@@ -312,7 +313,7 @@ func TestLexicalUnpublishedResultAndEightChargedRoots(t *testing.T) {
 func TestLexicalCloneFailedMemberReadUnwind(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
 	cfg := serviceConfig(b)
-	cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	s, e := NewRationalService(cfg)
 	if e != nil {
 		t.Fatal(e)
@@ -400,13 +401,13 @@ func TestLexicalCallerDestructorLateMemberRead(t *testing.T) {
 
 func TestLexicalOriginalFailureAndCleanupCause(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 32})
 	if e != nil {
 		t.Fatal(e)
 	}
 	cfg := serviceConfig(b)
 	cfg.Integers.Memory = r
-	cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 32}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 32}
 	s, e := NewRationalService(cfg)
 	if e != nil {
 		t.Fatal(e)
@@ -456,13 +457,13 @@ func TestLexicalOriginalFailureAndCleanupCause(t *testing.T) {
 
 func TestLexicalRationalManagerOneRootContinuation(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 32})
 	if e != nil {
 		t.Fatal(e)
 	}
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = r
-	cfg.Profile = SmallAllocatorProfile{PointerBits: 32}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 32}
 	m, e := NewRationalManager(RationalConfig{Integers: cfg, Synchronized: true})
 	if e != nil {
 		t.Fatal(e)

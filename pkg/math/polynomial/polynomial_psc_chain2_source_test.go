@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Independent constants use p(-1), the norm of x+1 modulo x²+1,
@@ -59,7 +60,7 @@ func TestPolynomialPSCChain2FirstZeroDivisorGuardsUninitializedN3(t *testing.T) 
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, m.CleanupPSCChain2()); serviceMust(t, out.Close()) })
 	err := m.PSCChain2(p, c.zero, 0, out)
-	if !errors.Is(err, util.ErrRuntimeUninitialized) {
+	if !errors.Is(err, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("literal uninitialized n3 read repaired or replaced", err)
 	}
 	n, e := out.Size()
@@ -78,7 +79,7 @@ func TestPolynomialPSCChain2FirstZeroDivisorGuardsUninitializedN3(t *testing.T) 
 	original := err.Error()
 	q := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{{{0, 1}}, nil})
 	serviceMust(t, m.PSCChain2(p, q, 0, out))
-	if err.Error() != original || !errors.Is(err, util.ErrRuntimeUninitialized) {
+	if err.Error() != original || !errors.Is(err, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("later invocation retargeted original guard")
 	}
 }

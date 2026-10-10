@@ -5,19 +5,19 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // PolynomialVariablesView is a by-value borrowed source var const* pointer.
 // It captures backing identity, not a vector owner, size, or copied values.
 type PolynomialVariablesView struct {
-	runtime *util.Runtime
-	raw     util.Block
+	runtime *umemory.Runtime
+	raw     umemory.Block
 	offset  uint64
 	values  []uint32
 }
 
-func BorrowPolynomialVariables(r *util.Runtime, b util.Block, offset uint64) PolynomialVariablesView {
+func BorrowPolynomialVariables(r *umemory.Runtime, b umemory.Block, offset uint64) PolynomialVariablesView {
 	return PolynomialVariablesView{runtime: r, raw: b, offset: offset}
 }
 func (v PolynomialVariablesView) At(i uint32) (uint32, error) {
@@ -28,7 +28,7 @@ func (v PolynomialVariablesView) At(i uint32) (uint32, error) {
 		return v.values[i], nil
 	}
 	if v.runtime == nil {
-		return 0, util.ErrRuntimeOwner
+		return 0, umemory.ErrRuntimeOwner
 	}
 	o := v.offset + uint64(i)*4
 	if o < v.offset {
@@ -36,8 +36,8 @@ func (v PolynomialVariablesView) At(i uint32) (uint32, error) {
 	}
 	return v.runtime.ReadUint32(v.raw, o)
 }
-func (v PolynomialVariablesView) IsNull() bool { return v.values == nil && v.raw == (util.Block{}) }
-func variableEmbedded(d *PolynomialVariableDegrees, r *util.Runtime, complete bool) {
+func (v PolynomialVariablesView) IsNull() bool { return v.values == nil && v.raw == (umemory.Block{}) }
+func variableEmbedded(d *PolynomialVariableDegrees, r *umemory.Runtime, complete bool) {
 	*d = PolynomialVariableDegrees{runtime: r, constructed: complete}
 	d.self = d
 }
@@ -102,7 +102,7 @@ func variableView(d *PolynomialVariableDegrees) PolynomialVariablesView {
 type PolynomialMaxDegrees struct {
 	self                                                *PolynomialMaxDegrees
 	core                                                *MultivariatePolynomialCore
-	runtime                                             *util.Runtime
+	runtime                                             *umemory.Runtime
 	maxDegree, variables                                PolynomialVariableDegrees
 	header                                              uint64
 	constructed, closing, finalizing, finalized, closed bool
@@ -110,7 +110,7 @@ type PolynomialMaxDegrees struct {
 	bodyCause, sourceCause                              error
 }
 
-func newPolynomialMaxDegrees(m *MultivariatePolynomialCore, r *util.Runtime, complete bool) (*PolynomialMaxDegrees, error) {
+func newPolynomialMaxDegrees(m *MultivariatePolynomialCore, r *umemory.Runtime, complete bool) (*PolynomialMaxDegrees, error) {
 	if e := r.CheckOpen(); e != nil {
 		return nil, e
 	}
@@ -249,14 +249,14 @@ func (d *PolynomialMaxDegrees) Vars() (PolynomialVariablesView, error) {
 
 type PolynomialVariablePositions struct {
 	self                                                *PolynomialVariablePositions
-	runtime                                             *util.Runtime
+	runtime                                             *umemory.Runtime
 	positions                                           PolynomialVariableDegrees
 	header                                              uint64
 	constructed, closing, finalizing, finalized, closed bool
 	bodyCause, sourceCause                              error
 }
 
-func newPolynomialVariablePositions(r *util.Runtime, complete bool) (*PolynomialVariablePositions, error) {
+func newPolynomialVariablePositions(r *umemory.Runtime, complete bool) (*PolynomialVariablePositions, error) {
 	if e := r.CheckOpen(); e != nil {
 		return nil, e
 	}
@@ -269,7 +269,7 @@ func newPolynomialVariablePositions(r *util.Runtime, complete bool) (*Polynomial
 	variableEmbedded(&d.positions, r, complete)
 	return d, nil
 }
-func NewPolynomialVariablePositions(r *util.Runtime) (*PolynomialVariablePositions, error) {
+func NewPolynomialVariablePositions(r *umemory.Runtime) (*PolynomialVariablePositions, error) {
 	return newPolynomialVariablePositions(r, true)
 }
 func (d *PolynomialVariablePositions) identity() error {

@@ -7,21 +7,22 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // This fixture deliberately uses real manager storage and reservation faults.
 // Observe each failing action before Del, String, disabling the fault, or Close.
 func mpzPublicationOwner(t *testing.T) (*IntegerManager, *arena.Budget) {
-	return mpzPublicationOwnerProfile(t, SmallAllocatorProfile{})
+	return mpzPublicationOwnerProfile(t, umemory.SmallAllocatorProfile{})
 }
 
 // The genuine source Debug NonWindows direct branch makes each new physical
 // object a real cold allocation, even when release pool classes are warmed.
 // Used only for action-timing fault fixtures; default pooled tests remain.
 func mpzPublicationDirectOwner(t *testing.T) (*IntegerManager, *arena.Budget) {
-	return mpzPublicationOwnerProfile(t, SmallAllocatorProfile{PointerBits: 64, Debug: true})
+	return mpzPublicationOwnerProfile(t, umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 }
-func mpzPublicationOwnerProfile(t *testing.T, profile SmallAllocatorProfile) (*IntegerManager, *arena.Budget) {
+func mpzPublicationOwnerProfile(t *testing.T, profile umemory.SmallAllocatorProfile) (*IntegerManager, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 20)
 	m, err := NewIntegerManager(IntegerConfig{
@@ -85,8 +86,8 @@ func TestIntegerSourceTmpFreeBeforeReplacementFailure(t *testing.T) {
 	b.FailAfter(0)
 	err := m.EnsureTmp(0, 33)
 	if before.chunks == 0 {
-		failure, ok := err.(Failure)
-		if !ok || failure.Kind != FailureMemout || failure.ErrorCode() != 101 {
+		failure, ok := err.(umemory.Failure)
+		if !ok || failure.Kind != umemory.FailureMemout || failure.ErrorCode() != 101 {
 			t.Fatalf("expected source physical Memout101, got %v", err)
 		}
 	} else if err != arena.ErrInjectedFailure {
@@ -237,7 +238,7 @@ func TestIntegerSourceFailedDescriptorConstructorAndUnwind(t *testing.T) {
 			if owner != nil {
 				t.Fatal("failed constructor published usable owner", fault)
 			}
-			var partial ConstructionFailure
+			var partial umemory.ConstructionFailure
 			if errors.As(e, &partial) {
 				if partial.OriginalCause() == nil || partial.Unwrap() != partial.OriginalCause() || !numericPhysicalReservationRefusal(partial.OriginalCause()) {
 					t.Fatal("retained constructor cause", fault, e)
@@ -367,10 +368,10 @@ func TestIntegerSourceTmpUnsignedCapacityGuardAfterOldFree(t *testing.T) {
 	if m.Cells.IsLive(NumericSlot(old), oldGeneration) {
 		t.Fatal("old descriptor generation survived destructive replacement")
 	}
-	if _, _, err := m.Allocator.RawLocation(oldObject); err != ErrAllocatorOwner {
+	if _, _, err := m.Allocator.RawLocation(oldObject); err != umemory.ErrAllocatorOwner {
 		t.Fatal("old actual object remained accessible", err)
 	}
-	if m.PendingCell.Object != (ObjectRef{}) {
+	if m.PendingCell.Object != (umemory.ObjectRef{}) {
 		// Debug NonWindows uses exact-size direct backing; ILP32 pooling also
 		// rounds four bytes to four. The capacity word is outside this object.
 		pending := m.PendingCell
@@ -381,7 +382,7 @@ func TestIntegerSourceTmpUnsignedCapacityGuardAfterOldFree(t *testing.T) {
 		if m.Tmp[0] != 0 || m.Cells.Stats().Live+1 != before.cells {
 			t.Fatal("undefined capacity access published descriptor/tmp")
 		}
-		if _, err = pending.ReadWord(m.Allocator, 0); !errors.Is(err, ErrRuntimeUninitialized) {
+		if _, err = pending.ReadWord(m.Allocator, 0); !errors.Is(err, umemory.ErrRuntimeUninitialized) {
 			t.Fatal("pending source m_size initialized", err)
 		}
 		if _, err = pending.ReadWord(m.Allocator, 4); err != arena.ErrBounds {
@@ -416,7 +417,7 @@ func TestIntegerSourceTmpUnsignedCapacityGuardAfterOldFree(t *testing.T) {
 		if v, err := c.Backing.ReadWord(m.Allocator, 4); err != nil || v != 0x7fffffff {
 			t.Fatal("physical capacity publication", v, err)
 		}
-		if _, err := c.Backing.ReadWord(m.Allocator, 0); !errors.Is(err, ErrRuntimeUninitialized) {
+		if _, err := c.Backing.ReadWord(m.Allocator, 0); !errors.Is(err, umemory.ErrRuntimeUninitialized) {
 			t.Fatal("replacement source size synthesized", err)
 		}
 		after := mpzPublicationSnapshot(m, b)
@@ -692,7 +693,7 @@ func TestIntegerSourceScratchSpanGuardAfterFiniteWrappedAllocation(t *testing.T)
 	if c.Size != size || c.span != 12 || mpzPublicationSnapshot(m, b) != before {
 		t.Fatal("span borrowed without source size publication", c)
 	}
-	if _, err := c.Backing.ReadWord(m.Allocator, 0); !errors.Is(err, ErrRuntimeUninitialized) {
+	if _, err := c.Backing.ReadWord(m.Allocator, 0); !errors.Is(err, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("scratch borrow invented initialized m_size", err)
 	}
 }

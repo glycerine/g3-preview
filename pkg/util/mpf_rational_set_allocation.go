@@ -2,6 +2,7 @@
 package util
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"reflect"
 )
 
@@ -26,10 +27,10 @@ type arbitraryFloatRationalSetHistory struct {
 	Next                             *arbitraryFloatRationalSetHistory
 	Invocation, header               uint64
 	Numeric                          NumericAllocationRoots
-	Transferred                      SmallAllocatorPendingAllocation
+	Transferred                      umemory.SmallAllocatorPendingAllocation
 	cellRetired, owned               bool
 	originalCell                     SourceCellBacking
-	originalPending                  Block
+	originalPending                  umemory.Block
 	prevSourceCause                  error
 	bodyCause, sourceCause, ownCause error
 }
@@ -53,7 +54,7 @@ func (c integerAllocationInvocationContext) prepareRationalSetHistory(z *Integer
 	}
 	s := c.rationalSetFrame(z, true)
 	if s == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.history != nil {
 		return nil
@@ -66,7 +67,7 @@ func (c integerAllocationInvocationContext) prepareRationalSetHistory(z *Integer
 	if p := s.plainParent; p != nil {
 		if !p.matched(s.manager) || p.invocation != s.plainInvocation || !p.executing {
 			s.manager.budget.Release(bytes)
-			return ErrRuntimeOwner
+			return umemory.ErrRuntimeOwner
 		}
 		h.plainParent, h.plainInvocation = p, p.invocation
 		if p.receipt != nil {
@@ -83,25 +84,25 @@ func (c integerAllocationInvocationContext) prepareRationalSetHistory(z *Integer
 	s.manager.rationalSetHistoryBytes += bytes
 	return nil
 }
-func (z *IntegerManager) captureRationalSetAllocation(c integerAllocationInvocationContext, b SourceCellBacking, o *SmallAllocatorAllocationOutcome) error {
+func (z *IntegerManager) captureRationalSetAllocation(c integerAllocationInvocationContext, b SourceCellBacking, o *umemory.SmallAllocatorAllocationOutcome) error {
 	s := c.rationalSetFrame(z, true)
 	if s == nil || c.raw != nil {
 		return nil
 	}
 	h := s.history
-	if b.Object != (ObjectRef{}) {
+	if b.Object != (umemory.ObjectRef{}) {
 		h.originalCell = b
 		if z.PendingCell == b {
 			z.PendingCell = SourceCellBacking{}
 		}
 	}
-	if o.Pending != (Block{}) {
+	if o.Pending != (umemory.Block{}) {
 		h.originalPending = o.Pending
 		if e := z.Allocator.TransferAllocationPending(o, &h.Transferred); e != nil {
 			return e
 		}
 		if h.Numeric.Allocator[0] == o.Pending {
-			h.Numeric.Allocator[0] = Block{}
+			h.Numeric.Allocator[0] = umemory.Block{}
 		}
 	}
 	return nil
@@ -196,17 +197,17 @@ func (m *ArbitraryFloatManager) rationalSetRoundCleanup(s *arbitraryFloatRationa
 
 func (m *ArbitraryFloatManager) rationalSetHistory(r *ArbitraryFloatRationalSetReceipt) (*arbitraryFloatRationalSetHistory, error) {
 	if m == nil || m.self != m || r == nil || r.manager != m || r.frame == nil || r.invocation == 0 {
-		return nil, ErrRuntimeOwner
+		return nil, umemory.ErrRuntimeOwner
 	}
 	for h := m.RationalSetHistories; h != nil; h = h.Next {
 		if h == r.frame {
 			if h.Self != h || h.Manager != m || h.Invocation != r.invocation || h.issued != *r {
-				return nil, ErrRuntimeOwner
+				return nil, umemory.ErrRuntimeOwner
 			}
 			return h, nil
 		}
 	}
-	return nil, ErrRuntimeOwner
+	return nil, umemory.ErrRuntimeOwner
 }
 func (m *ArbitraryFloatManager) ExponentRationalSetInvocationCauses(r *ArbitraryFloatRationalSetReceipt) (body, source, own error) {
 	h, e := m.rationalSetHistory(r)
@@ -218,7 +219,7 @@ func (m *ArbitraryFloatManager) ExponentRationalSetInvocationCauses(r *Arbitrary
 
 func (m *ArbitraryFloatManager) cleanupRationalSetHistory(h *arbitraryFloatRationalSetHistory, abort bool) error {
 	if h == nil || h.Self != h || h.Manager != m || h.Invocation == 0 {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if h.owned {
 		return nil

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func smt2ScopeFixture(t *testing.T) (*IntegerManager, *arena.Budget, Int) {
@@ -80,11 +81,11 @@ func TestSMT2CompletedTemporaryGuardedLateFree(t *testing.T) {
 		bodyFails, hasInner := scenario == 1, scenario == 2
 		t.Run([]string{"completed-body", "guarded-body-write", "completed-inner-before-outer"}[scenario], func(t *testing.T) {
 			b := arena.NewBudget(1 << 26)
-			r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+			r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 			if e != nil {
 				t.Fatal(e)
 			}
-			m, e := NewIntegerManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{PageSize: 2, Budget: b}}})
+			m, e := NewIntegerManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{PageSize: 2, Budget: b}}})
 			if e != nil {
 				t.Fatal(e)
 			}
@@ -204,7 +205,7 @@ func TestSMT2CompletedTemporaryGuardedLateFree(t *testing.T) {
 			if !state.Pending || state.Guard || state.OriginalCause != original || state.CleanupCause != arena.ErrBounds || m.Smt2Display.Value.Cell != ref {
 				t.Fatal("actual retained release cursor", state)
 			}
-			if _, e = r.Size(raw); e != ErrRuntimeOwner {
+			if _, e = r.Size(raw); e != umemory.ErrRuntimeOwner {
 				t.Fatal("physical free not completed", e)
 			}
 			integerPhysicalAudit(t, m, &a)

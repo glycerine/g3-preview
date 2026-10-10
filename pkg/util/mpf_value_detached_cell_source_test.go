@@ -6,12 +6,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatPooledDescriptorAfterSourceEnd(t *testing.T) {
 	for ordinal := int64(0); ordinal < 16; ordinal++ {
 		b := arena.NewBudget(1 << 26)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 		serviceMust(t, e)
 		var source Int
 		serviceMust(t, m.integer.SetLimbs(&source, []uint32{0xffffffff, 0xffffffff, 0x7fffffff}))
@@ -22,7 +23,7 @@ func TestArbitraryFloatPooledDescriptorAfterSourceEnd(t *testing.T) {
 		if m.ValueCalls != nil {
 			r = m.ValueCalls.Issued
 		}
-		if body != nil && r.frame != nil && r.Child.Frame.Roots.Cell.Object != (ObjectRef{}) && r.Child.Frame.Roots.Cell.Offset != 0 {
+		if body != nil && r.frame != nil && r.Child.Frame.Roots.Cell.Object != (umemory.ObjectRef{}) && r.Child.Frame.Roots.Cell.Offset != 0 {
 			t.Log("actual pooled descriptor refusal", ordinal, body, r.Child.Frame.Roots.Cell)
 			integerPhysicalAuditWithRaw(t, m.integer, nil, &source, &a.significand)
 			var maps uint64
@@ -62,7 +63,7 @@ func TestArbitraryFloatPooledDescriptorAfterSourceEnd(t *testing.T) {
 func TestArbitraryFloatDirectDescriptorAfterSourceEnd(t *testing.T) {
 	for ordinal := int64(0); ordinal < 16; ordinal++ {
 		b := arena.NewBudget(1 << 26)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		var source Int
 		serviceMust(t, m.integer.SetLimbs(&source, []uint32{0xffffffff, 0xffffffff, 0x7fffffff}))
@@ -73,7 +74,7 @@ func TestArbitraryFloatDirectDescriptorAfterSourceEnd(t *testing.T) {
 		if m.ValueCalls != nil {
 			r = m.ValueCalls.Issued
 		}
-		if body != nil && r.frame != nil && r.Child.Frame.Roots.Cell.Object != (ObjectRef{}) && r.Child.Frame.Roots.Cell.Offset == 0 {
+		if body != nil && r.frame != nil && r.Child.Frame.Roots.Cell.Object != (umemory.ObjectRef{}) && r.Child.Frame.Roots.Cell.Offset == 0 {
 			t.Log("actual direct descriptor refusal", ordinal, body, r.Child.Frame.Roots.Cell)
 			integerPhysicalAuditWithRaw(t, m.integer, nil, &source, &a.significand)
 			var maps uint64
@@ -113,9 +114,9 @@ func TestArbitraryFloatDirectDescriptorAfterSourceEnd(t *testing.T) {
 func TestArbitraryFloatPooledDescriptorAfterPartialSourceEnd(t *testing.T) {
 	for ordinal := int64(0); ordinal < 16; ordinal++ {
 		b := arena.NewBudget(1 << 26)
-		rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 		serviceMust(t, e)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 		serviceMust(t, e)
 		var source Int
 		serviceMust(t, m.integer.SetLimbs(&source, []uint32{0xffffffff, 0xffffffff, 0x7fffffff}))
@@ -126,7 +127,7 @@ func TestArbitraryFloatPooledDescriptorAfterPartialSourceEnd(t *testing.T) {
 		if m.ValueCalls != nil {
 			r = m.ValueCalls.Issued
 		}
-		if body != nil && r.frame != nil && r.Child.Frame.Roots.Cell.Object != (ObjectRef{}) && r.Child.Frame.Roots.Cell.Offset != 0 {
+		if body != nil && r.frame != nil && r.Child.Frame.Roots.Cell.Object != (umemory.ObjectRef{}) && r.Child.Frame.Roots.Cell.Offset != 0 {
 			t.Log("actual pooled descriptor refusal", ordinal, body, r.Child.Frame.Roots.Cell)
 			integerPhysicalAuditWithRaw(t, m.integer, nil, &source, &a.significand)
 			var maps uint64
@@ -146,10 +147,10 @@ func TestArbitraryFloatPooledDescriptorAfterPartialSourceEnd(t *testing.T) {
 				t.Fatal(e)
 			}
 			stop := m.SourceFinalize()
-			if !errors.Is(stop, arena.ErrBounds) || m.integer.SourceFinalized || !r.Child.Frame.cellRetired || r.Child.Frame.Roots.Cell.Object != (ObjectRef{}) {
+			if !errors.Is(stop, arena.ErrBounds) || m.integer.SourceFinalized || !r.Child.Frame.cellRetired || r.Child.Frame.Roots.Cell.Object != (umemory.ObjectRef{}) {
 				t.Fatal("actual partial source chunk release", stop, m.integer.SourceFinalizeStage, r.Child.Frame)
 			}
-			integerPhysicalAuditWithRaw(t, m.integer, []Block{lane})
+			integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{lane})
 			recovery, e := rt.Allocate(2000000)
 			serviceMust(t, e)
 			if r.Child.Frame.originalCell != original {
@@ -164,7 +165,7 @@ func TestArbitraryFloatPooledDescriptorAfterPartialSourceEnd(t *testing.T) {
 			}
 			contextTLSFinish(t, rt, m.Close)
 			contextTLSFinish(t, rt, func() error { return rt.Deallocate(&lane) })
-			if e = rt.Deallocate(&recovery); e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (Block{})) {
+			if e = rt.Deallocate(&recovery); e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 				t.Fatal(e)
 			}
 			contextTLSFinish(t, rt, rt.Close)

@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestASTBitVectorOriginalUint64Numeral(t *testing.T) {
@@ -64,8 +64,8 @@ func TestASTBitVectorUint64ConstructorStrictBoundaryBeforeWidthGuard(t *testing.
 				t.Fatal("inline constructor must precede inner width guard", constructor, body)
 			}
 		} else {
-			var failure util.Failure
-			if constructor == nil || !errors.As(body, &failure) || failure.Kind != util.FailureMemout || f.complete[5] {
+			var failure umemory.Failure
+			if constructor == nil || !errors.As(body, &failure) || failure.Kind != umemory.FailureMemout || f.complete[5] {
 				t.Fatal("uint64 INT_MAX constructor bypassed big allocation", constructor, body)
 			}
 		}
@@ -90,8 +90,8 @@ func TestASTBitVectorUint64NumeralEveryNumericalReservation(t *testing.T) {
 				}
 				success = true
 			} else if !errors.Is(body, arena.ErrInjectedFailure) {
-				var f util.Failure
-				if !errors.As(body, &f) || f.Kind != util.FailureMemout {
+				var f umemory.Failure
+				if !errors.As(body, &f) || f.Kind != umemory.FailureMemout {
 					t.Fatal(ordinal, body)
 				}
 			}

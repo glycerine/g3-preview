@@ -35692,9 +35692,9 @@
         "pkg/math/polynomial/polynomial_derivative_allocation_context_test.go",
         "pkg/math/polynomial/polynomial_derivative_direct_source_test.go",
         "pkg/math/polynomial/polynomial_derivative_uint32_leaf_source_test.go",
-        "pkg/util/small_allocator.go",
-        "pkg/util/small_allocator_allocation_outcome.go",
-        "pkg/util/small_allocator_guarded_start_source_test.go",
+        "pkg/util/memory/small_allocator.go",
+        "pkg/util/memory/small_allocator_allocation_outcome.go",
+        "pkg/util/memory/small_allocator_guarded_start_source_test.go",
         "pkg/math/polynomial/polynomial_monomial_allocator_invocation.go",
         "pkg/math/polynomial/polynomial_monomial_allocator_leaf_source_test.go",
         "pkg/math/polynomial/polynomial_lex_raw_pointer.go",
@@ -40968,9 +40968,9 @@
         "pkg/math/polynomial/polynomial_primitive_public_source_test.go",
         "pkg/math/polynomial/polynomial_square_free.go",
         "pkg/math/polynomial/polynomial_square_free_source_test.go",
-        "pkg/util/small_allocator.go",
-        "pkg/util/small_allocator_allocation_outcome.go",
-        "pkg/util/small_allocator_guarded_start_source_test.go",
+        "pkg/util/memory/small_allocator.go",
+        "pkg/util/memory/small_allocator_allocation_outcome.go",
+        "pkg/util/memory/small_allocator_guarded_start_source_test.go",
         "pkg/math/polynomial/polynomial_monomial_allocator_invocation.go",
         "pkg/math/polynomial/polynomial_monomial_allocator_leaf_source_test.go",
         "pkg/math/polynomial/polynomial_scalar_exact_div_actual_source_test.go",
@@ -108117,13 +108117,13 @@
       "go_targets": [
         "pkg/arena/small_bytes.go",
         "pkg/util/util_small_object_allocator.go",
-        "pkg/util/small_allocator_consolidate.go",
+        "pkg/util/memory/small_allocator_consolidate.go",
         "pkg/util/util_small_object_allocator_stream.go",
         "pkg/util/util_small_object_allocator_test.go",
-        "pkg/util/small_allocator.go",
-        "pkg/util/allocator_io.go",
-        "pkg/util/small_allocator_test.go",
-        "pkg/util/shared_runtime_api_test.go",
+        "pkg/util/memory/small_allocator.go",
+        "pkg/util/memory/allocator_io.go",
+        "pkg/util/memory/small_allocator_test.go",
+        "pkg/util/memory/shared_runtime_api_test.go",
         "pkg/util/util_memory_bridge_test.go"
       ],
       "tests": [
@@ -108179,7 +108179,7 @@
         {
           "name": "source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and retained cleanup roots",
           "status": "partial",
-          "go_target": "pkg/util/small_allocator.go",
+          "go_target": "pkg/util/memory/small_allocator.go",
           "tests": [
             "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
             "TestSmallObjectAllocatorProfilesThresholdsAndHeaders",
@@ -112198,7 +112198,7 @@
         "pkg/util/util_debug_context.go",
         "pkg/util/util_debug_context_test.go",
         "pkg/util/heap/heap.go",
-        "pkg/util/small_allocator_assertions.go",
+        "pkg/util/memory/small_allocator_assertions.go",
         "pkg/util/util_small_object_allocator_assertions_test.go",
         "pkg/util/util_small_object_allocator.go",
         "pkg/util/util_debug_notification.go",
@@ -113087,7 +113087,8 @@
         "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See PORT_PROGRESS.md#audit-z3-exception-port-status-md."
       ],
       "deviations": [
-        "Go cold error interfaces replace virtual throw transport; source nonzero/location assertions use classified guard errors. Generic printf constructor/platform domains remain explicitly open."
+        "Go cold error interfaces replace virtual throw transport; source nonzero/location assertions use classified guard errors. Generic printf constructor/platform domains remain explicitly open.",
+        "The concrete raw Runtime, SmallAllocator, source accounting/failure/cleanup progress and borrowed runtime uint32 view now live in independent util/memory. Production and tests import their actual owner directly without root util aliases or forwarding adapters. The extracted package has no dependency on root util or numeral/parameter owners. Existing private memory tests move with their real implementation; higher-level integration checks remain at callers. This changes package ownership only, preserving allocation/counter/publication/destruction/error behavior and existing completion gaps."
       ]
     },
     {
@@ -123152,25 +123153,25 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/util_memory_runtime.go",
-        "pkg/util/accounting.go",
-        "pkg/util/runtime.go",
-        "pkg/util/failure.go",
-        "pkg/util/tokens.go",
-        "pkg/util/accounting_test.go",
-        "pkg/util/runtime_test.go",
-        "pkg/util/shared_runtime_api_test.go",
+        "pkg/util/memory/accounting.go",
+        "pkg/util/memory/runtime.go",
+        "pkg/util/memory/failure.go",
+        "pkg/util/memory/tokens.go",
+        "pkg/util/memory/accounting_test.go",
+        "pkg/util/memory/runtime_test.go",
+        "pkg/util/memory/shared_runtime_api_test.go",
         "pkg/util/util_memory_bridge_test.go",
-        "pkg/util/uint32_codec.go",
-        "pkg/util/uint32_codec_test.go",
-        "pkg/util/release_progress.go",
-        "pkg/util/release_progress_test.go",
-        "pkg/util/runtime_size_t_entry_test.go",
+        "pkg/util/memory/uint32_codec.go",
+        "pkg/util/memory/uint32_codec_test.go",
+        "pkg/util/memory/release_progress.go",
+        "pkg/util/memory/release_progress_test.go",
+        "pkg/util/memory/runtime_size_t_entry_test.go",
         "pkg/util/util_memory_fatal_policy.go",
         "pkg/util/util_memory_fatal_policy_test.go",
         "pkg/util/util_numeric_stream_file.go",
         "pkg/util/util_numeric_stream_file_test.go",
         "pkg/util/util_numeric_stream.go",
-        "pkg/util/runtime_initialization_oom.go"
+        "pkg/util/memory/runtime_initialization_oom.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -123293,7 +123294,7 @@
         {
           "name": "scalar global and lane counter transitions, synchronization and read predicates; allocator/runtime and transport open",
           "status": "partial",
-          "go_target": "pkg/util/accounting.go",
+          "go_target": "pkg/util/memory/accounting.go",
           "tests": [
             "TestMemoryAccountingBoundedIndependentLaneModel",
             "TestMemoryAccountingDeallocationClampAndWatermark",
@@ -123308,7 +123309,7 @@
         {
           "name": "actual owned raw allocation/reallocation/deallocation and size/count/peak/watermark routes, both source counter profiles and size widths; explicit transport/checked-lifetime adapters",
           "status": "ported",
-          "go_target": "pkg/util/runtime.go",
+          "go_target": "pkg/util/memory/runtime.go",
           "tests": [
             "TestMemoryRuntimeActualBlocksHeadersAndReallocate",
             "TestMemoryRuntimeTLSStrictThresholdAndRepeatedCounts",
@@ -123344,7 +123345,7 @@
         {
           "name": "Concrete little-endian initialized uint32 byte-view adapter and guarded real rounded object extent",
           "status": "partial",
-          "go_target": "pkg/util/uint32_codec.go",
+          "go_target": "pkg/util/memory/uint32_codec.go",
           "tests": [
             "TestMemoryUint32CodecActualBackingAndInitializedBytes",
             "TestMemoryAllocatorUint32CodecUsesIntrusivePayload",
@@ -123355,7 +123356,7 @@
         {
           "name": "Actual before/after physical deallocation prefixes and charged retained release authority; explicit checked cleanup continuation",
           "status": "partial",
-          "go_target": "pkg/util/release_progress.go",
+          "go_target": "pkg/util/memory/release_progress.go",
           "tests": [
             "TestMemoryTrackedReleaseLatePhysicalPrefix",
             "TestMemoryTrackedReleaseBeforePhysicalRefusal",
@@ -123370,7 +123371,7 @@
         {
           "name": "Actual size_t32 parameter conversion before allocation/reallocation header addition and source max-size/max-count/watermark setters; LP64 order preserved",
           "status": "partial",
-          "go_target": "pkg/util/runtime.go",
+          "go_target": "pkg/util/memory/runtime.go",
           "tests": [
             "TestMemoryRuntimeActualSizeT32AllocateReallocateEntry",
             "TestMemoryRuntimeActualSizeT32LimitSetters",
@@ -123420,7 +123421,7 @@
         {
           "name": "reached initialization OOM=false scalar assignment cpp102 through actual Runtime, preserving real allocation/counter/limit state; containing first-init/generated children/full-init publication remain open",
           "status": "partial",
-          "go_target": "pkg/util/runtime_initialization_oom.go",
+          "go_target": "pkg/util/memory/runtime_initialization_oom.go",
           "tests": [
             "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
             "TestMemoryRuntimeInitializationClearReachedOwnerGuard"
@@ -123464,7 +123465,8 @@
         "Repeated stopped source destructor invocation is guarded; Close is separate exact owning abort.",
         "Legacy symbol/tag/prime/Params storage lacks actual source-global Runtime backing; no accounting tickets or inferred Budget malloc events.",
         "_TRACE file path/PROFILE_MEMORY/global ostream and full registered test driver remain open.",
-        "Caller-confined assertion binding does not complete process-global macros, debugger notification, TRACE, or native ostream/ABI. Null-imp and closed-context cases are explicitly checked diagnostic domains."
+        "Caller-confined assertion binding does not complete process-global macros, debugger notification, TRACE, or native ostream/ABI. Null-imp and closed-context cases are explicitly checked diagnostic domains.",
+        "The concrete raw Runtime, SmallAllocator, source accounting/failure/cleanup progress and borrowed runtime uint32 view now live in independent util/memory. Production and tests import their actual owner directly without root util aliases or forwarding adapters. The extracted package has no dependency on root util or numeral/parameter owners. Existing private memory tests move with their real implementation; higher-level integration checks remain at callers. This changes package ownership only, preserving allocation/counter/publication/destruction/error behavior and existing completion gaps."
       ]
     },
     {
@@ -123474,21 +123476,21 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/util_memory_runtime.go",
-        "pkg/util/accounting.go",
-        "pkg/util/runtime.go",
-        "pkg/util/failure.go",
-        "pkg/util/tokens.go",
-        "pkg/util/accounting_test.go",
-        "pkg/util/runtime_test.go",
-        "pkg/util/shared_runtime_api_test.go",
+        "pkg/util/memory/accounting.go",
+        "pkg/util/memory/runtime.go",
+        "pkg/util/memory/failure.go",
+        "pkg/util/memory/tokens.go",
+        "pkg/util/memory/accounting_test.go",
+        "pkg/util/memory/runtime_test.go",
+        "pkg/util/memory/shared_runtime_api_test.go",
         "pkg/util/util_memory_bridge_test.go",
-        "pkg/util/runtime_size_t_entry_test.go",
+        "pkg/util/memory/runtime_size_t_entry_test.go",
         "pkg/util/util_memory_fatal_policy.go",
         "pkg/util/util_memory_fatal_policy_test.go",
         "pkg/util/util_numeric_stream_file.go",
         "pkg/util/util_numeric_stream_file_test.go",
         "pkg/util/util_numeric_stream.go",
-        "pkg/util/runtime_initialization_oom.go"
+        "pkg/util/memory/runtime_initialization_oom.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -123603,7 +123605,7 @@
         {
           "name": "scalar global and lane counter transitions, synchronization and read predicates; allocator/runtime and transport open",
           "status": "partial",
-          "go_target": "pkg/util/accounting.go",
+          "go_target": "pkg/util/memory/accounting.go",
           "tests": [
             "TestMemoryAccountingBoundedIndependentLaneModel",
             "TestMemoryAccountingDeallocationClampAndWatermark",
@@ -123618,7 +123620,7 @@
         {
           "name": "actual owned raw allocation/reallocation/deallocation and size/count/peak/watermark routes, both source counter profiles and size widths; explicit transport/checked-lifetime adapters",
           "status": "ported",
-          "go_target": "pkg/util/runtime.go",
+          "go_target": "pkg/util/memory/runtime.go",
           "tests": [
             "TestMemoryRuntimeActualBlocksHeadersAndReallocate",
             "TestMemoryRuntimeTLSStrictThresholdAndRepeatedCounts",
@@ -123654,7 +123656,7 @@
         {
           "name": "Actual size_t32 parameter conversion before allocation/reallocation header addition and source max-size/max-count/watermark setters; LP64 order preserved",
           "status": "partial",
-          "go_target": "pkg/util/runtime.go",
+          "go_target": "pkg/util/memory/runtime.go",
           "tests": [
             "TestMemoryRuntimeActualSizeT32AllocateReallocateEntry",
             "TestMemoryRuntimeActualSizeT32LimitSetters",
@@ -123704,7 +123706,7 @@
         {
           "name": "reached initialization OOM=false scalar assignment cpp102 through actual Runtime, preserving real allocation/counter/limit state; containing first-init/generated children/full-init publication remain open",
           "status": "partial",
-          "go_target": "pkg/util/runtime_initialization_oom.go",
+          "go_target": "pkg/util/memory/runtime_initialization_oom.go",
           "tests": [
             "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
             "TestMemoryRuntimeInitializationClearReachedOwnerGuard"
@@ -123736,7 +123738,8 @@
         "Guarded failed-first single-lane spin domain; no silent retry or flag repair.",
         "Repeated stopped source destructor invocation is guarded; Close is separate exact owning abort.",
         "Legacy symbol/tag/prime/Params storage lacks actual source-global Runtime backing; no accounting tickets or inferred Budget malloc events.",
-        "_TRACE file path/PROFILE_MEMORY/global ostream and full registered test driver remain open."
+        "_TRACE file path/PROFILE_MEMORY/global ostream and full registered test driver remain open.",
+        "The concrete raw Runtime, SmallAllocator, source accounting/failure/cleanup progress and borrowed runtime uint32 view now live in independent util/memory. Production and tests import their actual owner directly without root util aliases or forwarding adapters. The extracted package has no dependency on root util or numeral/parameter owners. Existing private memory tests move with their real implementation; higher-level integration checks remain at callers. This changes package ownership only, preserving allocation/counter/publication/destruction/error behavior and existing completion gaps."
       ]
     },
     {
@@ -129319,7 +129322,7 @@
         "pkg/util/mpq_scientific_boundary_test.go",
         "pkg/util/mp_scalar_projection_test.go",
         "pkg/util/mpq_owner_cleanup.go",
-        "pkg/util/construction_failure.go",
+        "pkg/util/memory/construction_failure.go",
         "pkg/util/mpq_source_finalize.go",
         "pkg/util/transitive_source_finalize_test.go",
         "pkg/util/mp_display_scope.go",
@@ -130208,7 +130211,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/construction_failure.go",
+        "pkg/util/memory/construction_failure.go",
         "pkg/util/inf_scalar_projection_test.go",
         "pkg/util/mp_add_publication_test.go",
         "pkg/util/mp_bitwise_publication_test.go",
@@ -131946,7 +131949,7 @@
         "pkg/util/mpz_gcd_diagnostics_release.go",
         "pkg/util/mpz_source_finalize.go",
         "pkg/util/mpz_source_finalize_test.go",
-        "pkg/util/construction_failure.go",
+        "pkg/util/memory/construction_failure.go",
         "pkg/util/mpz_constructor_unwind.go",
         "pkg/util/mpz_construction_failure_test.go",
         "pkg/util/mpz_allocator_phase_b_test.go",
@@ -134406,7 +134409,7 @@
         "pkg/util/mp_gcd_publication_test.go",
         "pkg/util/mpz_gcd_diagnostics_debug.go",
         "pkg/util/mpz_gcd_diagnostics_release.go",
-        "pkg/util/construction_failure.go",
+        "pkg/util/memory/construction_failure.go",
         "pkg/util/mpz_constructor_unwind.go",
         "pkg/util/mpz_construction_failure_test.go",
         "pkg/util/mpz_allocator_phase_b_test.go",
@@ -139550,7 +139553,7 @@
         "pkg/util/inf_rational.go",
         "pkg/util/inf_int_rational.go",
         "pkg/util/rational_service_cleanup.go",
-        "pkg/util/construction_failure.go",
+        "pkg/util/memory/construction_failure.go",
         "pkg/util/mpz_allocator_phase_b_test.go",
         "pkg/util/rational_service_source_finalize.go",
         "pkg/util/transitive_source_finalize_test.go",
@@ -143645,34 +143648,34 @@
       "go_targets": [
         "pkg/arena/small_bytes.go",
         "pkg/util/util_small_object_allocator.go",
-        "pkg/util/small_allocator_consolidate.go",
+        "pkg/util/memory/small_allocator_consolidate.go",
         "pkg/util/util_small_object_allocator_stream.go",
         "pkg/util/util_small_object_allocator_test.go",
-        "pkg/util/small_allocator.go",
-        "pkg/util/allocator_io.go",
-        "pkg/util/small_allocator_test.go",
-        "pkg/util/shared_runtime_api_test.go",
+        "pkg/util/memory/small_allocator.go",
+        "pkg/util/memory/allocator_io.go",
+        "pkg/util/memory/small_allocator_test.go",
+        "pkg/util/memory/shared_runtime_api_test.go",
         "pkg/util/util_memory_bridge_test.go",
-        "pkg/util/uint32_codec.go",
-        "pkg/util/uint32_codec_test.go",
-        "pkg/util/release_progress.go",
-        "pkg/util/release_progress_test.go",
-        "pkg/util/small_allocator_pending_roots.go",
-        "pkg/util/small_allocator_pending_roots_test.go",
-        "pkg/util/small_allocator_raw.go",
-        "pkg/util/small_allocator_raw_test.go",
-        "pkg/util/small_allocator_size_t_entry_test.go",
-        "pkg/util/small_allocator_query_prefix_test.go",
-        "pkg/util/small_allocator_assertions.go",
+        "pkg/util/memory/uint32_codec.go",
+        "pkg/util/memory/uint32_codec_test.go",
+        "pkg/util/memory/release_progress.go",
+        "pkg/util/memory/release_progress_test.go",
+        "pkg/util/memory/small_allocator_pending_roots.go",
+        "pkg/util/memory/small_allocator_pending_roots_test.go",
+        "pkg/util/memory/small_allocator_raw.go",
+        "pkg/util/memory/small_allocator_raw_test.go",
+        "pkg/util/memory/small_allocator_size_t_entry_test.go",
+        "pkg/util/memory/small_allocator_query_prefix_test.go",
+        "pkg/util/memory/small_allocator_assertions.go",
         "pkg/util/util_small_object_allocator_assertions_test.go",
         "pkg/util/util_verbose_context.go",
         "pkg/util/util_verbose_context_test.go",
         "pkg/util/util_numeric_stream_file.go",
         "pkg/util/util_numeric_stream_file_test.go",
         "pkg/util/util_memory_fatal_policy_test.go",
-        "pkg/util/small_allocator_allocation_outcome.go",
-        "pkg/util/small_allocator_allocation_outcome_test.go",
-        "pkg/util/small_allocator_guarded_start_source_test.go",
+        "pkg/util/memory/small_allocator_allocation_outcome.go",
+        "pkg/util/memory/small_allocator_allocation_outcome_test.go",
+        "pkg/util/memory/small_allocator_guarded_start_source_test.go",
         "pkg/math/polynomial/polynomial_monomial.go",
         "pkg/math/polynomial/polynomial_monomial_factory.go",
         "pkg/math/polynomial/polynomial_monomial_allocator_invocation.go",
@@ -143927,7 +143930,7 @@
         {
           "name": "source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and retained cleanup roots",
           "status": "ported",
-          "go_target": "pkg/util/small_allocator.go",
+          "go_target": "pkg/util/memory/small_allocator.go",
           "tests": [
             "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
             "TestSmallObjectAllocatorProfilesThresholdsAndHeaders",
@@ -143962,7 +143965,7 @@
         {
           "name": "Concrete little-endian initialized uint32 byte-view adapter and guarded real rounded object extent",
           "status": "ported",
-          "go_target": "pkg/util/uint32_codec.go",
+          "go_target": "pkg/util/memory/uint32_codec.go",
           "tests": [
             "TestMemoryUint32CodecActualBackingAndInitializedBytes",
             "TestMemoryAllocatorUint32CodecUsesIntrusivePayload",
@@ -143973,7 +143976,7 @@
         {
           "name": "Actual before/after physical deallocation prefixes and charged retained release authority; explicit checked cleanup continuation",
           "status": "ported",
-          "go_target": "pkg/util/release_progress.go",
+          "go_target": "pkg/util/memory/release_progress.go",
           "tests": [
             "TestMemoryTrackedReleaseLatePhysicalPrefix",
             "TestMemoryTrackedReleaseBeforePhysicalRefusal",
@@ -143988,7 +143991,7 @@
         {
           "name": "Read-only checked Go PendingRoots diagnostic exposes actual pending allocation/two lexical roots during stopped cleanup; no source action/allocation/directory sweep or new source method completion",
           "status": "ported",
-          "go_target": "pkg/util/small_allocator_pending_roots.go",
+          "go_target": "pkg/util/memory/small_allocator_pending_roots.go",
           "tests": [
             "TestSmallAllocatorActualPendingRootsIdentityOnly"
           ]
@@ -143996,7 +143999,7 @@
         {
           "name": "Selected raw deallocate cpp72-96 size_t entry/zero/debug bypass/receiver subtraction/direct free/foreign pooled nextword-head publication and actual owning invocation abort",
           "status": "ported",
-          "go_target": "pkg/util/small_allocator_raw.go",
+          "go_target": "pkg/util/memory/small_allocator_raw.go",
           "tests": [
             "TestSmallAllocatorRawForeignDirectSourceCounters",
             "TestSmallAllocatorRawReceiverAssertionAndReleaseWrap",
@@ -144011,7 +144014,7 @@
         {
           "name": "Source size_t32/64 argument conversion before zero in Allocate/DeallocateTracked; exact normalized CompleteRelease receipt; zero preserves actual stopped raw invocation",
           "status": "ported",
-          "go_target": "pkg/util/release_progress.go",
+          "go_target": "pkg/util/memory/release_progress.go",
           "tests": [
             "TestSmallAllocatorCheckedActualSizeTEntry",
             "TestSmallAllocatorCheckedZeroPreservesStoppedRawInvocation",
@@ -144024,7 +144027,7 @@
         {
           "name": "get_allocation_size and get_wasted_size/get_num_free_objs read published count/free-list prefix during stopped raw sidecar allocation without mutation or cleanup",
           "status": "ported",
-          "go_target": "pkg/util/small_allocator.go",
+          "go_target": "pkg/util/memory/small_allocator.go",
           "tests": [
             "TestSmallAllocatorQueriesReadPublishedPrefixDuringRawStop"
           ]
@@ -144067,7 +144070,7 @@
         {
           "name": "allocate optional concrete actual acquisition outcome preserves same source engine: stamp guarded frame/nonce at body start, actual rememberPending and installed/free-list object leaves; zero/rejected entry unchanged",
           "status": "ported",
-          "go_target": "pkg/util/small_allocator_allocation_outcome.go",
+          "go_target": "pkg/util/memory/small_allocator_allocation_outcome.go",
           "tests": [
             "TestSmallAllocatorOutcomeActualAcquisitionAndUnchangedQuickGuard",
             "TestSmallAllocatorOutcomeActualPendingLeafAndRejectedEntry"
@@ -144076,7 +144079,7 @@
         {
           "name": "AllocateWithOutcomeStarted src/util/small_object_allocator.cpp:97-140: Same allocation engine; existing public entry signatures/routes unchanged. Concrete started result only actual guarded metadata publication.",
           "status": "ported",
-          "go_target": "pkg/util/small_allocator.go",
+          "go_target": "pkg/util/memory/small_allocator.go",
           "tests": [
             "TestSmallAllocatorGuardedStartPreservesRejectedHistory",
             "TestSmallAllocatorGuardedStartActualPendingAndValidRetry"
@@ -144108,7 +144111,8 @@
         "A checked Runtime provider and ObjectRef values replace the source global allocator and native pointer ABI. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit.",
         "File-backed diagnostics use explicit borrowed os.File service; default write failure is nonthrowing badbit. Native stream buffering/locale/exception masks/global stderr initialization remain separate.",
         "Finite-field and discriminant callers retain independent algorithm and cleanup obligations outside this allocator source unit.",
-        "Monomial callers retain independent algorithm obligations outside this allocator source unit."
+        "Monomial callers retain independent algorithm obligations outside this allocator source unit.",
+        "The concrete raw Runtime, SmallAllocator, source accounting/failure/cleanup progress and borrowed runtime uint32 view now live in independent util/memory. Production and tests import their actual owner directly without root util aliases or forwarding adapters. The extracted package has no dependency on root util or numeral/parameter owners. Existing private memory tests move with their real implementation; higher-level integration checks remain at callers. This changes package ownership only, preserving allocation/counter/publication/destruction/error behavior and existing completion gaps."
       ]
     },
     {
@@ -144119,30 +144123,30 @@
       "go_targets": [
         "pkg/arena/small_bytes.go",
         "pkg/util/util_small_object_allocator.go",
-        "pkg/util/small_allocator_consolidate.go",
+        "pkg/util/memory/small_allocator_consolidate.go",
         "pkg/util/util_small_object_allocator_stream.go",
         "pkg/util/util_small_object_allocator_test.go",
-        "pkg/util/small_allocator.go",
-        "pkg/util/allocator_io.go",
-        "pkg/util/small_allocator_test.go",
-        "pkg/util/shared_runtime_api_test.go",
+        "pkg/util/memory/small_allocator.go",
+        "pkg/util/memory/allocator_io.go",
+        "pkg/util/memory/small_allocator_test.go",
+        "pkg/util/memory/shared_runtime_api_test.go",
         "pkg/util/util_memory_bridge_test.go",
-        "pkg/util/small_allocator_pending_roots.go",
-        "pkg/util/small_allocator_pending_roots_test.go",
-        "pkg/util/small_allocator_raw.go",
-        "pkg/util/small_allocator_raw_test.go",
-        "pkg/util/release_progress.go",
-        "pkg/util/small_allocator_size_t_entry_test.go",
-        "pkg/util/small_allocator_query_prefix_test.go",
-        "pkg/util/small_allocator_assertions.go",
+        "pkg/util/memory/small_allocator_pending_roots.go",
+        "pkg/util/memory/small_allocator_pending_roots_test.go",
+        "pkg/util/memory/small_allocator_raw.go",
+        "pkg/util/memory/small_allocator_raw_test.go",
+        "pkg/util/memory/release_progress.go",
+        "pkg/util/memory/small_allocator_size_t_entry_test.go",
+        "pkg/util/memory/small_allocator_query_prefix_test.go",
+        "pkg/util/memory/small_allocator_assertions.go",
         "pkg/util/util_small_object_allocator_assertions_test.go",
         "pkg/util/util_verbose_context.go",
         "pkg/util/util_verbose_context_test.go",
         "pkg/util/util_numeric_stream_file.go",
         "pkg/util/util_numeric_stream_file_test.go",
         "pkg/util/util_memory_fatal_policy_test.go",
-        "pkg/util/small_allocator_allocation_outcome.go",
-        "pkg/util/small_allocator_guarded_start_source_test.go",
+        "pkg/util/memory/small_allocator_allocation_outcome.go",
+        "pkg/util/memory/small_allocator_guarded_start_source_test.go",
         "pkg/math/polynomial/polynomial_monomial.go",
         "pkg/math/polynomial/polynomial_monomial_factory.go",
         "pkg/math/polynomial/polynomial_monomial_allocator_invocation.go",
@@ -144341,7 +144345,7 @@
         {
           "name": "source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and retained cleanup roots",
           "status": "ported",
-          "go_target": "pkg/util/small_allocator.go",
+          "go_target": "pkg/util/memory/small_allocator.go",
           "tests": [
             "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
             "TestSmallObjectAllocatorProfilesThresholdsAndHeaders",
@@ -144376,7 +144380,7 @@
         {
           "name": "Read-only checked Go PendingRoots diagnostic exposes actual pending allocation/two lexical roots during stopped cleanup; no source action/allocation/directory sweep or new source method completion",
           "status": "ported",
-          "go_target": "pkg/util/small_allocator_pending_roots.go",
+          "go_target": "pkg/util/memory/small_allocator_pending_roots.go",
           "tests": [
             "TestSmallAllocatorActualPendingRootsIdentityOnly"
           ]
@@ -144384,7 +144388,7 @@
         {
           "name": "Selected raw deallocate cpp72-96 size_t entry/zero/debug bypass/receiver subtraction/direct free/foreign pooled nextword-head publication and actual owning invocation abort",
           "status": "ported",
-          "go_target": "pkg/util/small_allocator_raw.go",
+          "go_target": "pkg/util/memory/small_allocator_raw.go",
           "tests": [
             "TestSmallAllocatorRawForeignDirectSourceCounters",
             "TestSmallAllocatorRawReceiverAssertionAndReleaseWrap",
@@ -144399,7 +144403,7 @@
         {
           "name": "Source size_t32/64 argument conversion before zero in Allocate/DeallocateTracked; exact normalized CompleteRelease receipt; zero preserves actual stopped raw invocation",
           "status": "ported",
-          "go_target": "pkg/util/release_progress.go",
+          "go_target": "pkg/util/memory/release_progress.go",
           "tests": [
             "TestSmallAllocatorCheckedActualSizeTEntry",
             "TestSmallAllocatorCheckedZeroPreservesStoppedRawInvocation",
@@ -144412,7 +144416,7 @@
         {
           "name": "get_allocation_size and get_wasted_size/get_num_free_objs read published count/free-list prefix during stopped raw sidecar allocation without mutation or cleanup",
           "status": "ported",
-          "go_target": "pkg/util/small_allocator.go",
+          "go_target": "pkg/util/memory/small_allocator.go",
           "tests": [
             "TestSmallAllocatorQueriesReadPublishedPrefixDuringRawStop"
           ]
@@ -144455,7 +144459,7 @@
         {
           "name": "AllocateWithOutcomeStarted src/util/small_object_allocator.cpp:97-140: Same allocation engine; existing public entry signatures/routes unchanged. Concrete started result only actual guarded metadata publication.",
           "status": "ported",
-          "go_target": "pkg/util/small_allocator.go",
+          "go_target": "pkg/util/memory/small_allocator.go",
           "tests": [
             "TestSmallAllocatorGuardedStartPreservesRejectedHistory",
             "TestSmallAllocatorGuardedStartActualPendingAndValidRetry"
@@ -144481,7 +144485,8 @@
         "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; Go runtime and explicit diagnostic-stream bindings replace native global wiring. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions.",
         "A checked Runtime provider and ObjectRef values replace the source global allocator and native pointer ABI. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit.",
         "File-backed diagnostics use explicit borrowed os.File service; default write failure is nonthrowing badbit. Native stream buffering/locale/exception masks/global stderr initialization remain separate.",
-        "Monomial callers retain independent algorithm obligations outside this allocator source unit."
+        "Monomial callers retain independent algorithm obligations outside this allocator source unit.",
+        "The concrete raw Runtime, SmallAllocator, source accounting/failure/cleanup progress and borrowed runtime uint32 view now live in independent util/memory. Production and tests import their actual owner directly without root util aliases or forwarding adapters. The extracted package has no dependency on root util or numeral/parameter owners. Existing private memory tests move with their real implementation; higher-level integration checks remain at callers. This changes package ownership only, preserving allocation/counter/publication/destruction/error behavior and existing completion gaps."
       ]
     },
     {
@@ -147047,8 +147052,8 @@
         "pkg/util/escaped/escaped.go",
         "pkg/util/util_verbose_context.go",
         "pkg/util/util_verbose_context_test.go",
-        "pkg/util/small_allocator.go",
-        "pkg/util/allocator_io.go",
+        "pkg/util/memory/small_allocator.go",
+        "pkg/util/memory/allocator_io.go",
         "pkg/util/util_small_object_allocator.go",
         "pkg/util/util_small_object_allocator_stream.go"
       ],
@@ -147181,8 +147186,8 @@
         "pkg/util/escaped/escaped.go",
         "pkg/util/util_verbose_context.go",
         "pkg/util/util_verbose_context_test.go",
-        "pkg/util/small_allocator.go",
-        "pkg/util/allocator_io.go",
+        "pkg/util/memory/small_allocator.go",
+        "pkg/util/memory/allocator_io.go",
         "pkg/util/util_small_object_allocator.go",
         "pkg/util/util_small_object_allocator_stream.go"
       ],
@@ -147543,7 +147548,7 @@
         "pkg/math/polynomial/polynomial_psc_chain1_prefix_source_test.go",
         "pkg/math/polynomial/polynomial_psc_chain1_source_test.go",
         "pkg/sat/sat_solver_scalar_runtime.go",
-        "pkg/util/runtime_uint32_view.go",
+        "pkg/util/memory/runtime_uint32_view.go",
         "pkg/math/polynomial/polynomial_gcd_power_buffer.go",
         "pkg/math/polynomial/polynomial_gcd_power_buffer_source_test.go",
         "pkg/math/polynomial/polynomial_composition.go",

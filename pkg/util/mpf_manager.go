@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/insdict"
 )
 
@@ -63,7 +64,7 @@ type ArbitraryFloatManager struct {
 	rational                                                *RationalManager
 	integer                                                 *IntegerManager                 // source reference to the exact same mpq base
 	powers                                                  [4]insdict.Dict[uint32, uint32] // p, pn, pm1, pm1n
-	memory                                                  *Runtime
+	memory                                                  *umemory.Runtime
 	budget                                                  *arena.Budget
 	valueExecuting                                          bool
 	valueCopy                                               integerCopyAllocationReceipt
@@ -91,7 +92,7 @@ func NewArbitraryFloatManager(c IntegerConfig) (*ArbitraryFloatManager, error) {
 	q, e := NewRationalManager(RationalConfig{Integers: c, Synchronized: false})
 	if e != nil {
 		m.failedChild = e
-		var child ConstructionFailure
+		var child umemory.ConstructionFailure
 		if errors.As(e, &child) {
 			m.memory = child.RuntimeOwner()
 		}
@@ -113,7 +114,7 @@ func (m *ArbitraryFloatManager) Unwrap() error {
 }
 func (m *ArbitraryFloatManager) OriginalCause() error { return m.bodyCause }
 func (m *ArbitraryFloatManager) CleanupCause() error  { return m.ownCause }
-func (m *ArbitraryFloatManager) RuntimeOwner() *Runtime {
+func (m *ArbitraryFloatManager) RuntimeOwner() *umemory.Runtime {
 	if m == nil || m.self != m {
 		return nil
 	}
@@ -122,7 +123,7 @@ func (m *ArbitraryFloatManager) RuntimeOwner() *Runtime {
 func (m *ArbitraryFloatManager) Cleanup() error { return m.Close() }
 func (m *ArbitraryFloatManager) SourceFinalize() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.integer != nil && m.integer.stringSet.NumericExecuting() || m.signedFraction.executing || m.signedFraction.finishing || m.hexfloatComponents.executing || m.hexfloatComponents.finishing || m.binaryString.executing || m.binaryString.finishing || m.decimalStream.executing || m.decimalStream.finishing || m.integer.decimalStreamExecuting(false) || m.smt2Stream.executing || m.smt2Stream.finishing || m.integer.smt2StreamExecuting(false) || m.rationalString.executing || m.rationalString.finishing || m.integer.rationalStringExecuting(false) || m.rawString.executing || m.rawString.finishing || m.ieeeBV.executing || m.ieeeBV.finishing || m.sbv.executing || m.sbv.finishing || m.toMPZ.executing || m.toMPZ.finishing || m.integer.mpfToMPZExecuting(false) || m.rem.executing || m.rem.finishing || m.partialRemainder.executing || m.partialRemainder.finishing || m.renormalize.executing || m.renormalize.finishing || m.sqrt.executing || m.sqrt.finishing || m.fma.executing || m.fma.finishing || m.div.executing || m.div.finishing || m.mul.executing || m.mul.finishing || m.addSub.executing || m.addSub.finishing || m.integralRound.executing || m.integralRound.finishing || m.integerQuery.executing || m.integerQuery.finishing || m.plainRationalSet.executing || m.plainRationalSet.finishing || m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
 		return ErrNumericPending
@@ -132,7 +133,7 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 	// its unjoined leaves remains with the text caller.
 	for f := m.FormatScopes; f != nil; f = f.Next {
 		if !m.MatchesFormatFrame(f) {
-			return ErrRuntimeOwner
+			return umemory.ErrRuntimeOwner
 		}
 		if e := f.SourceReady(); e != nil && !f.owned {
 			return e
@@ -330,7 +331,7 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 }
 func (m *ArbitraryFloatManager) Close() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.integer != nil && m.integer.stringSet.NumericExecuting() || m.signedFraction.executing || m.signedFraction.finishing || m.hexfloatComponents.executing || m.hexfloatComponents.finishing || m.binaryString.executing || m.binaryString.finishing || m.decimalStream.executing || m.decimalStream.finishing || m.integer.decimalStreamExecuting(false) || m.smt2Stream.executing || m.smt2Stream.finishing || m.integer.smt2StreamExecuting(false) || m.rationalString.executing || m.rationalString.finishing || m.integer.rationalStringExecuting(false) || m.rawString.executing || m.rawString.finishing || m.ieeeBV.executing || m.ieeeBV.finishing || m.sbv.executing || m.sbv.finishing || m.toMPZ.executing || m.toMPZ.finishing || m.integer.mpfToMPZExecuting(false) || m.rem.executing || m.rem.finishing || m.partialRemainder.executing || m.partialRemainder.finishing || m.renormalize.executing || m.renormalize.finishing || m.sqrt.executing || m.sqrt.finishing || m.fma.executing || m.fma.finishing || m.div.executing || m.div.finishing || m.mul.executing || m.mul.finishing || m.addSub.executing || m.addSub.finishing || m.integralRound.executing || m.integralRound.finishing || m.integerQuery.executing || m.integerQuery.finishing || m.plainRationalSet.executing || m.plainRationalSet.finishing || m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
 		return ErrNumericPending
@@ -463,10 +464,10 @@ func (m *ArbitraryFloatManager) Close() error {
 		}
 	}
 	if m.failedChild != nil {
-		var child ConstructionFailure
+		var child umemory.ConstructionFailure
 		if errors.As(m.failedChild, &child) {
 			if child.RuntimeOwner() != m.memory {
-				return stop(ErrRuntimeOwner)
+				return stop(umemory.ErrRuntimeOwner)
 			}
 			if e := child.Cleanup(); e != nil {
 				return stop(e)
@@ -503,7 +504,7 @@ func (m *ArbitraryFloatManager) Close() error {
 // the shared Runtime owner once. This is accounting, not root acquisition.
 func (m *ArbitraryFloatManager) OwnedStorageBytes() uint64 {
 	if m == nil || m.self != m {
-		panic(ErrRuntimeOwner)
+		panic(umemory.ErrRuntimeOwner)
 	}
 	n := m.binaryString.storageBytes() + m.rationalString.storageBytes() + m.rawString.storageBytes() + m.header + m.rationalSetHistoryBytes + m.formattedSetHistoryBytes + m.roundHistoryBytes + m.valueHistoryBytes + m.powerWrapperBytes + m.conversionHistoryBytes + m.inputHistoryBytes
 	var z *IntegerManager
@@ -539,10 +540,10 @@ func (m *ArbitraryFloatManager) formatFrameUnfinished(f *ArbitraryFloatFormatInv
 	if f.owned {
 		return false
 	}
-	if f.sourceCursor != 5 || NumericAllocationPending(&f.Numeric) || f.Transferred.Block() != (Block{}) {
+	if f.sourceCursor != 5 || NumericAllocationPending(&f.Numeric) || f.Transferred.Block() != (umemory.Block{}) {
 		return true
 	}
-	if NumericAllocationPending(&f.Decimal.Numeric) || f.Decimal.Transferred.Block() != (Block{}) {
+	if NumericAllocationPending(&f.Decimal.Numeric) || f.Decimal.Transferred.Block() != (umemory.Block{}) {
 		return true
 	}
 

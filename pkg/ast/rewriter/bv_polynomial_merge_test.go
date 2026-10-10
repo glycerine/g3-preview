@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -209,8 +210,8 @@ func TestBVPolynomialMergeEveryFactoryAndOwnerReservation(t *testing.T) {
 			if body != nil {
 				failures++
 				if !errors.Is(body, arena.ErrInjectedFailure) {
-					var f util.Failure
-					if !errors.As(body, &f) || f.Kind != util.FailureMemout {
+					var f umemory.Failure
+					if !errors.As(body, &f) || f.Kind != umemory.FailureMemout {
 						t.Fatal("unexpected refusal", body)
 					}
 				}
@@ -243,9 +244,9 @@ func TestBVPolynomialMergeEveryActualEmptyProductReservation(t *testing.T) {
 	for ordinal := int64(0); ordinal < 200 && !complete; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			budget := arena.NewBudget(1 << 28)
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, SizeTBits: 64, Transport: func(f util.Failure) error { return f }})
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64, Transport: func(f umemory.Failure) error { return f }})
 			astTestMust(t, e)
-			q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
+			q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
 			astTestMust(t, e)
 			sy, e := usymbol.NewManager(usymbol.Config{Budget: budget})
 			astTestMust(t, e)
@@ -282,8 +283,8 @@ func TestBVPolynomialMergeEveryActualEmptyProductReservation(t *testing.T) {
 			if body != nil {
 				failures++
 				if !errors.Is(body, arena.ErrInjectedFailure) {
-					var f util.Failure
-					if !errors.As(body, &f) || f.Kind != util.FailureMemout {
+					var f umemory.Failure
+					if !errors.As(body, &f) || f.Kind != umemory.FailureMemout {
 						t.Fatal("unexpected actual refusal", body)
 					}
 				}

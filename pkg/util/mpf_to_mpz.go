@@ -5,13 +5,14 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // ToMPZ truncates an unpacked MPF value using the source COPY, sign and shift
 // sequence. The explicitly supplied Integer manager owns the output.
 func (m *ArbitraryFloatManager) ToMPZ(x *ArbitraryFloat, output *IntegerManager, out *Int) (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.toMPZ.active {
 		return ErrNumericPending
@@ -20,7 +21,7 @@ func (m *ArbitraryFloatManager) ToMPZ(x *ArbitraryFloat, output *IntegerManager,
 		return e
 	}
 	if output == nil || output.self != output {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := output.check(out); e != nil {
 		return e

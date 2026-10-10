@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type integerRawOwnerReentryFixture struct {
@@ -18,7 +19,7 @@ type integerRawOwnerReentryFixture struct {
 
 var integerRawOwnerReentryCurrent *integerRawOwnerReentryFixture
 
-func integerRawOwnerReentryTransport(f Failure) error {
+func integerRawOwnerReentryTransport(f umemory.Failure) error {
 	s := integerRawOwnerReentryCurrent
 	if s != nil && !s.called {
 		s.called = true
@@ -38,11 +39,11 @@ func TestIntegerRawExecutingOwnerRefusesFinalizeAndClose(t *testing.T) {
 		for _, finalize := range []bool{true, false} {
 			t.Run(operation+"/"+map[bool]string{true: "SourceFinalize", false: "CloseChecked"}[finalize], func(t *testing.T) {
 				budget := arena.NewBudget(1 << 24)
-				rt, e := NewRuntime(RuntimeConfig{Budget: budget, Transport: integerRawOwnerReentryTransport})
+				rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, Transport: integerRawOwnerReentryTransport})
 				serviceMust(t, e)
 				cfg := serviceConfig(budget).Integers
 				cfg.Memory = rt
-				cfg.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+				cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 				m, e := NewIntegerManager(cfg)
 				serviceMust(t, e)
 				var a, g Int
@@ -98,7 +99,7 @@ func TestIntegerRawExecutingOwnerRefusesFinalizeAndClose(t *testing.T) {
 					}
 					serviceMust(t, m.CleanupAddMulRaw())
 				}
-				if !errors.Is(body, Failure{Kind: FailureMemout}) {
+				if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) {
 					t.Fatal("earlier failure changed", body)
 				}
 				serviceMust(t, m.Del(&a))

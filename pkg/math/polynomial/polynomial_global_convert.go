@@ -2,16 +2,19 @@
 // src/util/scoped_numeral_buffer.h.
 package polynomial
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	// The native monomial slice borrows handles; numeral elements own their values.
+	// orphans retains only newly created zero-reference monomials for owning abort.
+)
 
-// The native monomial slice borrows handles; numeral elements own their values.
-// orphans retains only newly created zero-reference monomials for owning abort.
 type polynomialGlobalConversionScope struct {
 	ms                                   []Monomial
 	as                                   util.ScopedIntegerModularBuffer128
 	orphans                              []Monomial
 	result                               Polynomial
-	monomialRaw                          [3]util.Block
+	monomialRaw                          [3]umemory.Block
 	factoryGeneration, calleeGeneration  uint64
 	active, executing, ownsResult        bool
 	bodyCause, sourceCause, cleanupCause error
@@ -138,7 +141,7 @@ func (m *MultivariatePolynomialManager) conversionMonomial(source *MonomialManag
 		c.monomials.creation.parent = c
 	}
 	after, probe := c.monomials.allocator.PendingRoots()
-	if before == ([3]util.Block{}) {
+	if before == ([3]umemory.Block{}) {
 		s.monomialRaw = after
 	}
 	if e != nil || probe != nil {
@@ -217,7 +220,7 @@ func (m *MultivariatePolynomialManager) CleanupConversion() error {
 			}
 		}
 	}
-	if s.monomialRaw != ([3]util.Block{}) {
+	if s.monomialRaw != ([3]umemory.Block{}) {
 		now, e := c.monomials.allocator.PendingRoots()
 		if e != nil {
 			return fail(e)
@@ -226,15 +229,15 @@ func (m *MultivariatePolynomialManager) CleanupConversion() error {
 			e = c.monomials.allocator.CleanupPending()
 			after, x := c.monomials.allocator.PendingRoots()
 			for i := range s.monomialRaw {
-				if after[i] == (util.Block{}) {
-					s.monomialRaw[i] = util.Block{}
+				if after[i] == (umemory.Block{}) {
+					s.monomialRaw[i] = umemory.Block{}
 				}
 			}
 			if e != nil || x != nil {
 				return fail(polynomialNewtonJoin(e, x))
 			}
 		}
-		s.monomialRaw = [3]util.Block{}
+		s.monomialRaw = [3]umemory.Block{}
 	}
 	s.orphans = nil
 	s.active = false

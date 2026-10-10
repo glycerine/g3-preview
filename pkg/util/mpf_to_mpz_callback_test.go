@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatToMPZForeignTransportAndBothOwners(t *testing.T) {
@@ -19,7 +20,7 @@ func TestArbitraryFloatToMPZForeignTransportAndBothOwners(t *testing.T) {
 	var otherValue ArbitraryFloat
 	b := arena.NewBudget(1 << 28)
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			s := &m.toMPZ
@@ -40,10 +41,10 @@ func TestArbitraryFloatToMPZForeignTransportAndBothOwners(t *testing.T) {
 					t.Fatal("actual two-owner guard", i, err)
 				}
 			}
-			if err := sourceRuntime.Close(); !errors.Is(err, ErrRuntimeLive) {
+			if err := sourceRuntime.Close(); !errors.Is(err, umemory.ErrRuntimeLive) {
 				t.Fatal("actual source Runtime live blocks", err)
 			}
-			if err := other.memory.Close(); !errors.Is(err, ErrRuntimeLive) {
+			if err := other.memory.Close(); !errors.Is(err, umemory.ErrRuntimeLive) {
 				t.Fatal("actual output Runtime live blocks", err)
 			}
 			if x != xBefore || out != outBefore || otherValue != otherBefore || b.Used() != used || sourceBudget.Used() != sourceUsed {
@@ -53,7 +54,7 @@ func TestArbitraryFloatToMPZForeignTransportAndBothOwners(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	other, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	other, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	serviceMust(t, other.MkOne(8, 3, false, &otherValue))
 	pad, e := r.Allocate(uint64(99990 - r.State().LocalSize - 8))
@@ -66,7 +67,7 @@ func TestArbitraryFloatToMPZForeignTransportAndBothOwners(t *testing.T) {
 		t.Fatal("actual foreign COPY refusal", body, calls)
 	}
 	integerPhysicalAudit(t, m.integer, &x.significand)
-	integerPhysicalAuditWithRaw(t, other.integer, []Block{pad}, &out, &otherValue.significand)
+	integerPhysicalAuditWithRaw(t, other.integer, []umemory.Block{pad}, &out, &otherValue.significand)
 	if sourceBudget.Used() != m.OwnedStorageBytes()+sourceRuntime.Stats().TotalBytes || b.Used() != other.OwnedStorageBytes()+r.Stats().TotalBytes {
 		t.Fatal("immediate two-owner physical graph")
 	}

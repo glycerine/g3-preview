@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func variableHelperArray(t *testing.T, r *util.Runtime, values []uint32) (PolynomialVariablesView, *util.Block) {
+func variableHelperArray(t *testing.T, r *umemory.Runtime, values []uint32) (PolynomialVariablesView, *umemory.Block) {
 	t.Helper()
 	raw, e := r.Allocate(uint64(len(values)) * 4)
 	serviceMust(t, e)
@@ -132,7 +132,7 @@ func TestScopedPolynomialVariablePositionsCapturedBackingLifetime(t *testing.T) 
 	t.Cleanup(func() { serviceMust(t, s.CloseChecked()) })
 	serviceMust(t, r.Reallocate(raw, 24))
 	e = s.SourceFinalize()
-	if !errors.Is(e, util.ErrRuntimeOwner) {
+	if !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("captured raw pointer after realloc", e)
 	}
 	for x, w := range map[uint32]uint32{1: 0, 4: 1} {
@@ -142,7 +142,7 @@ func TestScopedPolynomialVariablePositionsCapturedBackingLifetime(t *testing.T) 
 			t.Fatal(x, v, w)
 		}
 	}
-	if e = s.SourceFinalize(); !errors.Is(e, util.ErrRuntimeOwner) {
+	if e = s.SourceFinalize(); !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal(e)
 	}
 }
@@ -370,7 +370,7 @@ func TestPolynomialMaxDegreesCopyConstructorNativeMembers(t *testing.T) {
 }
 func TestPolynomialMaxDegreesCopyConstructorNativeMembersIgnoreTLSLimit(t *testing.T) {
 	b := arena.NewBudget(1 << 25)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true})
 	serviceMust(t, e)
 	a, e := newPolynomialMaxDegrees(nil, r, true)
 	serviceMust(t, e)
@@ -433,7 +433,7 @@ func TestPolynomialVariableHelperWarmAndColdOwnerGuards(t *testing.T) {
 
 func TestPolynomialMaxDegreesSourceFinalizeNativeMembers(t *testing.T) {
 	b := arena.NewBudget(1 << 25)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	d, e := newPolynomialMaxDegrees(nil, r, true)
 	serviceMust(t, e)

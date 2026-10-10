@@ -9,10 +9,11 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type upolyPhysicalExtraOwners struct {
-	CallerBlocks         []util.Block // actual directly returned caller allocations only
+	CallerBlocks         []umemory.Block // actual directly returned caller allocations only
 	ASTManagers          []*ASTManager
 	DebugContexts        []*util.DebugContext
 	ParamsRationalValues []paramsPhysicalRationalOwner

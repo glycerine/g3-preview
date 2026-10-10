@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatRoundSqrtActualTransportOwnerGuards(t *testing.T) {
@@ -14,7 +15,7 @@ func TestArbitraryFloatRoundSqrtActualTransportOwnerGuards(t *testing.T) {
 	armed := false
 	calls := 0
 	var oldContext integerAllocationInvocationContext
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			before := x
@@ -41,7 +42,7 @@ func TestArbitraryFloatRoundSqrtActualTransportOwnerGuards(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	_, e = m.roundPower(23, false)
 	serviceMust(t, e)
@@ -65,27 +66,27 @@ func TestArbitraryFloatRoundSqrtActualTransportOwnerGuards(t *testing.T) {
 		t.Fatal("actual reached allocation did not stop")
 	}
 	s := &m.RoundSqrtScope
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &sig, &x.significand, &s.sigma, &s.cap, &s.sticky)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &sig, &x.significand, &s.sigma, &s.cap, &s.sticky)
 	if b.Used() != rt.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("before lift exact cold graph")
 	}
 	pending, e := m.integer.Allocator.PendingRoots()
 	serviceMust(t, e)
 	retained := false
-	if block := s.Transferred.Block(); block != (Block{}) {
+	if block := s.Transferred.Block(); block != (umemory.Block{}) {
 		retained = true
 		if s.history == nil || s.history.originalPending != block {
 			t.Fatal("transferred allocation lost issued leaf token")
 		}
 	}
-	if s.Numeric.Cell.Object != (ObjectRef{}) {
+	if s.Numeric.Cell.Object != (umemory.ObjectRef{}) {
 		retained = true
 		if s.history == nil || s.history.originalCell != s.Numeric.Cell {
 			t.Fatal("detached cell lost issued backing token")
 		}
 	}
 	for i, p := range pending {
-		if p != (Block{}) {
+		if p != (umemory.Block{}) {
 			retained = true
 			if s.Numeric.Allocator[i] != p {
 				t.Fatal("actual reached raw allocation prefix lacks round child", body, p)
@@ -106,7 +107,7 @@ func TestArbitraryFloatRoundSqrtActualTransportOwnerGuards(t *testing.T) {
 	invalidReceipt := oldReceipt
 	invalidReceipt.frame = &copiedHistory
 	used, state := b.Used(), rt.State()
-	if err := m.CleanupRoundSqrtWithReceipt(&invalidReceipt, true); err != ErrRuntimeOwner {
+	if err := m.CleanupRoundSqrtWithReceipt(&invalidReceipt, true); err != umemory.ErrRuntimeOwner {
 		t.Fatal("copied history guard", err)
 	}
 	if used != b.Used() || state != rt.State() {
@@ -134,7 +135,7 @@ func TestArbitraryFloatRoundSqrtActualTransportOwnerGuards(t *testing.T) {
 	}
 	serviceMust(t, m.Close())
 	contextTLSFinish(t, rt, func() error {
-		if pad == (Block{}) {
+		if pad == (umemory.Block{}) {
 			return nil
 		}
 		return rt.Deallocate(&pad)

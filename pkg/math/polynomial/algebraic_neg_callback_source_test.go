@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -18,7 +19,7 @@ func TestAlgebraicNegActualTransportOwnerAndTupleRefusal(t *testing.T) {
 	var c *AlgebraicRootCore
 	armed := false
 	calls := 0
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, Transport: func(f util.Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, Transport: func(f umemory.Failure) error {
 		if !armed {
 			return f
 		}
@@ -91,7 +92,7 @@ func TestAlgebraicNegActualTransportOwnerAndTupleRefusal(t *testing.T) {
 	serviceMust(t, e)
 	cfg := serviceConfig(budget)
 	cfg.Integers.Memory = rt
-	cfg.Integers.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	s, e := util.NewRationalService(cfg)
 	serviceMust(t, e)
 	p, e := NewUPolynomialManagerFromRationalService(s, UPolynomialConfig{Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -104,13 +105,13 @@ func TestAlgebraicNegActualTransportOwnerAndTupleRefusal(t *testing.T) {
 	serviceMust(t, e)
 	bi, e := util.NewBinaryIntervalManager(b)
 	serviceMust(t, e)
-	allocator, e := util.NewSmallAllocator(util.SmallAllocatorConfig{Runtime: rt, Profile: cfg.Integers.Profile})
+	allocator, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: rt, Profile: cfg.Integers.Profile})
 	serviceMust(t, e)
 	c, e = NewAlgebraicRootCore(AlgebraicRootConfig{Rationals: s.Manager, Polynomials: p, Factors: f, Binary: b, Intervals: bi, Allocator: allocator, Checkpoint: p.config.Checkpoint, Cooperation: p.config.Cooperation})
 	serviceMust(t, e)
 	var a Algebraic
 	n := util.NewRational()
-	var held util.Block
+	var held umemory.Block
 	defer func() {
 		armed = false
 		budget.FailAfter(-1)
@@ -156,5 +157,5 @@ func TestAlgebraicNegActualTransportOwnerAndTupleRefusal(t *testing.T) {
 	if !errors.Is(body, c.negation.bodyCause) {
 		t.Fatal("immutable body cause missing")
 	}
-	algebraicCellSourcePhysical(t, c, nil, nil, []util.Block{held}, &a)
+	algebraicCellSourcePhysical(t, c, nil, nil, []umemory.Block{held}, &a)
 }

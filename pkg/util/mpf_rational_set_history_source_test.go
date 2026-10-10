@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatExponentRationalSetInlineZeroRetainsActualLeaf(t *testing.T) {
 	reached := false
 	for ordinal := int64(0); ordinal < 40; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		q := NewRational()
 		serviceMust(t, m.rational.SetFraction(&q, 3, 2))
@@ -24,7 +25,7 @@ func TestArbitraryFloatExponentRationalSetInlineZeroRetainsActualLeaf(t *testing
 		body := m.SetExponentRationalWithReceipt(&out, 8, 4000, ArbitraryFloatNearestEven, &ex, &q, &r)
 		s := &m.rationalSet
 		h := s.history
-		matched := body != nil && h != nil && (h.Numeric.Cell.Object != (ObjectRef{}) || h.Transferred.Block() != (Block{})) && !s.active
+		matched := body != nil && h != nil && (h.Numeric.Cell.Object != (umemory.ObjectRef{}) || h.Transferred.Block() != (umemory.Block{})) && !s.active
 		if matched {
 			reached = true
 			used := b.Used()
@@ -48,7 +49,7 @@ func TestArbitraryFloatExponentRationalSetInlineZeroRetainsActualLeaf(t *testing
 			copied := *h
 			forged := r
 			forged.frame = &copied
-			if e := m.CleanupExponentRationalSetWithReceipt(&forged, true); e != ErrRuntimeOwner {
+			if e := m.CleanupExponentRationalSetWithReceipt(&forged, true); e != umemory.ErrRuntimeOwner {
 				t.Fatal("copied actual leaf accepted", e)
 			}
 			b.FailAfter(-1)

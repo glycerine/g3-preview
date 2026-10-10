@@ -8,17 +8,18 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // A real signed-host accounting guard isolates the reached AddMul RAW end DEL.
 // The output ADD completes before that source explicit release. This is an owner-primitive profile, not normal mathematical OOM.
 func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
@@ -53,7 +54,7 @@ func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t 
 	// scratch. The direct allocator profile isolates actual RAW tmp release.
 	serviceMust(t, c.integer.Mul(&large, &three, &warmProduct))
 	serviceMust(t, c.integer.Rem(&warmProduct, &(*c.modular.BorrowModulus()), &warm))
-	var external util.Block
+	var external umemory.Block
 	var receipt polynomialPowerInvocationReceipt
 	var output polynomialReference
 	defer func() {
@@ -76,10 +77,10 @@ func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t 
 		contextTLSFinish(t, rt, m.CloseChecked)
 		contextTLSFinish(t, rt, q.CloseChecked)
 		x = rt.Deallocate(&recovery)
-		if x != nil && (!errors.Is(x, arena.ErrBounds) || recovery != (util.Block{})) {
+		if x != nil && (!errors.Is(x, arena.ErrBounds) || recovery != (umemory.Block{})) {
 			t.Fatal(x)
 		}
-		if external != (util.Block{}) {
+		if external != (umemory.Block{}) {
 			contextTLSFinish(t, rt, func() error { return rt.Deallocate(&external) })
 		}
 		contextTLSFinish(t, rt, rt.Close)
@@ -98,7 +99,7 @@ func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t 
 			}
 			contextTLSNearMinimum(t, rt)
 			x := rt.Deallocate(&external)
-			if !errors.Is(x, arena.ErrBounds) || external != (util.Block{}) {
+			if !errors.Is(x, arena.ErrBounds) || external != (umemory.Block{}) {
 				t.Fatal("actual external TLS release", x)
 			}
 		}
@@ -141,7 +142,7 @@ func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t 
 	serviceMust(t, e)
 	defer func() {
 		x := rt.Deallocate(&recovery)
-		if x != nil && (!errors.Is(x, arena.ErrBounds) || recovery != (util.Block{})) {
+		if x != nil && (!errors.Is(x, arena.ErrBounds) || recovery != (umemory.Block{})) {
 			t.Fatal("actual recovery release", x, recovery)
 		}
 	}()
@@ -170,7 +171,7 @@ func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t 
 	if !errors.Is(oldReturnedError, source) || oldReturnedError.Error() != oldErrorText {
 		t.Fatal("new source changed previous exception/history")
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p, output.value, output.incoming, warmPolynomial.value, warmPolynomial.incoming}, []*util.Int{&large, &warm, &warmProduct, &modulus}, 0, []util.Block{recovery})
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p, output.value, output.incoming, warmPolynomial.value, warmPolynomial.incoming}, []*util.Int{&large, &warm, &warmProduct, &modulus}, 0, []umemory.Block{recovery})
 	serviceMust(t, c.cleanupPowerInvocation(&later, true))
 	serviceMust(t, output.closeValue(c, true))
 	serviceMust(t, output.abort(c))

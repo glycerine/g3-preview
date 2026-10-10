@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -102,7 +103,7 @@ func TestUPolynomialFactorFrontendErasedBIGSETOwnsActualPendingLeaf(t *testing.T
 				complete = true
 				return
 			}
-			if z.Integers().PendingCell.Object == (util.ObjectRef{}) {
+			if z.Integers().PendingCell.Object == (umemory.ObjectRef{}) {
 				return
 			}
 			reached = true
@@ -131,7 +132,7 @@ func TestUPolynomialFactorFrontendErasedBIGSETOwnsActualPendingLeaf(t *testing.T
 			if captured.bodyCause != firstBody || captured.sourceCause != firstSource {
 				t.Fatal("SET own cleanup erased original cause")
 			}
-			if z.Integers().PendingCell.Object != (util.ObjectRef{}) {
+			if z.Integers().PendingCell.Object != (umemory.ObjectRef{}) {
 				t.Fatal("service own ACK did not retire its actual failed early SET leaf", ordinal, z.Integers().PendingCell)
 			}
 			if m.values(&input)[0] != originalInput || b != originalB {
@@ -178,7 +179,7 @@ func TestUPolynomialFactorFrontendConstantOldACKPreservesLaterPending(t *testing
 			_, body := s.Factor(m.stateView(&input), fs, DefaultUPolynomialFactorParams())
 			primeTrialPhysicalAuditOwners(t, z, s, []*UPolynomialFactors{fs}, roots...)
 			q := s.frontendConstant.record
-			if body != nil && q != nil && q.numeric.Cell.Object != (util.ObjectRef{}) {
+			if body != nil && q != nil && q.numeric.Cell.Object != (umemory.ObjectRef{}) {
 				return q
 			}
 			z.Budget().FailAfter(-1)
@@ -287,12 +288,12 @@ func TestUPolynomialFactorFrontendConstantDirectLeafAfterIntegerSourceEnd(t *tes
 	for ordinal := int64(0); ordinal < 32 && !reached; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			budget := arena.NewBudget(1 << 26)
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, SizeTBits: 64})
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64})
 			serviceMust(t, e)
 			cfg := serviceConfig(budget).Integers
 			cfg.Cells.PageSize = 1
 			cfg.Memory = rt
-			cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			z, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: z.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -337,7 +338,7 @@ func TestUPolynomialFactorFrontendConstantDirectLeafAfterIntegerSourceEnd(t *tes
 			_, body := s.Factor(m.stateView(&input), fs, DefaultUPolynomialFactorParams())
 			primeTrialPhysicalAuditOwners(t, z, s, []*UPolynomialFactors{fs}, roots...)
 			q := s.frontendConstant.record
-			if body == nil || q == nil || q.numeric.Cell.Object == (util.ObjectRef{}) || q.numeric.Cell.Offset != 0 {
+			if body == nil || q == nil || q.numeric.Cell.Object == (umemory.ObjectRef{}) || q.numeric.Cell.Offset != 0 {
 				return
 			}
 			reached = true

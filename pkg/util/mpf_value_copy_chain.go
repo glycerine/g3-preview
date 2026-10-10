@@ -1,9 +1,13 @@
 // Source: src/util/scoped_numeral_vector.h:25-65; src/util/mpf.cpp:316-333.
 package util
 
+import
+
 // Embedded, charged with the concrete vector owner. Links are acquired only
 // by the existing allocating SET record leaf. They borrow exact issued records;
 // this chain creates no second numeral/storage owner or allocation registry.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type ArbitraryFloatValueCopyChain struct {
 	self             *ArbitraryFloatValueCopyChain
 	manager          *ArbitraryFloatManager
@@ -13,11 +17,11 @@ type ArbitraryFloatValueCopyChain struct {
 
 func (c *ArbitraryFloatValueCopyChain) Bind(m *ArbitraryFloatManager) error {
 	if c == nil || m == nil || m.self != m || m.closed || m.sourceEnded {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if c.self != nil {
 		if c.self != c || c.manager != m || c.ended {
-			return ErrRuntimeOwner
+			return umemory.ErrRuntimeOwner
 		}
 		return nil
 	}
@@ -26,7 +30,7 @@ func (c *ArbitraryFloatValueCopyChain) Bind(m *ArbitraryFloatManager) error {
 }
 func (c *ArbitraryFloatValueCopyChain) guard() error {
 	if c == nil || c.self != c || c.manager == nil || c.manager.self != c.manager || c.ended {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if c.executing || c.manager.valueExecuting || c.manager.memory.FailureTransportActive() {
 		return ErrNumericPending
@@ -54,7 +58,7 @@ func (c *ArbitraryFloatValueCopyChain) Cleanup(abort bool) error {
 	}
 	for q := c.head; q != nil; q = q.callerNext {
 		if q.caller != c || q.self != q || q.manager != c.manager {
-			return ErrRuntimeOwner
+			return umemory.ErrRuntimeOwner
 		}
 		if !q.callerFalseAck {
 			if e := c.manager.CleanupValueCopy(&q.Issued, false); e != nil {

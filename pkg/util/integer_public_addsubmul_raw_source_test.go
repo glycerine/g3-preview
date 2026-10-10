@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerPublicAddSubMulRetainsReachedRAWTemporary(t *testing.T) {
@@ -18,11 +19,11 @@ func TestIntegerPublicAddSubMulRetainsReachedRAWTemporary(t *testing.T) {
 			retained, success := false, false
 			for ordinal := int64(0); ordinal < 64 && !success; ordinal++ {
 				budget := arena.NewBudget(1 << 24)
-				rt, e := NewRuntime(RuntimeConfig{Budget: budget})
+				rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget})
 				serviceMust(t, e)
 				cfg := serviceConfig(budget).Integers
 				cfg.Memory = rt
-				cfg.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+				cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 				m, e := NewIntegerManager(cfg)
 				serviceMust(t, e)
 				a, b, c, d := NewInt(7), NewInt(0), NewInt(3), NewInt(17)
@@ -96,7 +97,7 @@ func TestIntegerPublicAddSubMulEndDELAfterOutput(t *testing.T) {
 		}
 		t.Run(name, func(t *testing.T) {
 			b := arena.NewBudget(1 << 26)
-			rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 			serviceMust(t, e)
 			cfg := serviceConfig(b).Integers
 			cfg.Memory = rt
@@ -127,7 +128,7 @@ func TestIntegerPublicAddSubMulEndDELAfterOutput(t *testing.T) {
 				}
 				contextTLSFinish(t, rt, m.CloseChecked)
 				e = rt.Deallocate(&recovery)
-				if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (Block{})) {
+				if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 					t.Fatal("recovery physical consumption", e)
 				}
 				contextTLSFinish(t, rt, rt.Close)
@@ -139,7 +140,7 @@ func TestIntegerPublicAddSubMulEndDELAfterOutput(t *testing.T) {
 			serviceMust(t, e)
 			contextTLSNearMinimum(t, rt)
 			e = rt.Deallocate(&external)
-			if e == nil || external != (Block{}) {
+			if e == nil || external != (umemory.Block{}) {
 				t.Fatal("actual external signed-domain stop", e)
 			}
 			if subtract {
@@ -200,11 +201,11 @@ func TestIntegerPublicAddSubMulOwnAckDoesNotRepairSourceScratchHole(t *testing.T
 		}
 		t.Run(name, func(t *testing.T) {
 			budget := arena.NewBudget(1 << 24)
-			rt, e := NewRuntime(RuntimeConfig{Budget: budget})
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget})
 			serviceMust(t, e)
 			cfg := serviceConfig(budget).Integers
 			cfg.Memory = rt
-			cfg.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			m, e := NewIntegerManager(cfg)
 			serviceMust(t, e)
 			var c, d Int

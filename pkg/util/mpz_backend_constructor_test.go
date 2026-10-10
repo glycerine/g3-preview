@@ -5,15 +5,16 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerMandatoryCellConstructorTopology(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	if e != nil {
 		t.Fatal(e)
 	}
-	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Memory: rt, Profile: SmallAllocatorProfile{PointerBits: 64}})
+	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -29,7 +30,7 @@ func TestIntegerMandatoryCellConstructorTopology(t *testing.T) {
 		t.Fatalf("constructor physical topology %+v count%d", s, n)
 	}
 	refs := []NumericCellRef{m.Tmp[0], m.Arg[0], m.Tmp[1], m.Arg[1], m.IntMin.Cell, m.Two64.Cell}
-	objects := make([]ObjectRef, len(refs))
+	objects := make([]umemory.ObjectRef, len(refs))
 	for i, ref := range refs {
 		objects[i], e = m.CellObject(ref)
 		if e != nil {
@@ -58,11 +59,11 @@ func TestIntegerMandatoryCellConstructorTopology(t *testing.T) {
 	}
 	// Only actual source writes establish initialized physical fields.
 	rawTmp1, offTmp1, _ := m.Allocator.RawLocation(objects[2])
-	if _, e = rt.ReadUint32(rawTmp1, offTmp1); !errors.Is(e, ErrRuntimeUninitialized) {
+	if _, e = rt.ReadUint32(rawTmp1, offTmp1); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatalf("untouched tmp1 size synthesized: %v", e)
 	}
 	rawArg0, offArg0, _ := m.Allocator.RawLocation(objects[1])
-	if _, e = rt.ReadUint32(rawArg0, offArg0+8); !errors.Is(e, ErrRuntimeUninitialized) {
+	if _, e = rt.ReadUint32(rawArg0, offArg0+8); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatalf("unused arg0 digit synthesized: %v", e)
 	}
 	rawArg1, offArg1, _ := m.Allocator.RawLocation(objects[3])

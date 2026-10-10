@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/messages"
 )
 
@@ -22,7 +23,7 @@ func evaluatorFixture(t *testing.T) (*ast.ASTManager, *model.Model, *model.Model
 	astTestMust(t, g.InitializeSource())
 	p, e := c.NewValue()
 	astTestMust(t, e)
-	memory, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	memory, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	astTestMust(t, e)
 	cooperate, e := cooperate.NewCooperation(b)
 	astTestMust(t, e)

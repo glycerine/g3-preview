@@ -7,9 +7,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func contextTLSNearMinimum(t *testing.T, r *Runtime) {
+func contextTLSNearMinimum(t *testing.T, r *umemory.Runtime) {
 	t.Helper()
 	first, e := r.Allocate(8)
 	serviceMust(t, e)
@@ -36,7 +37,7 @@ func contextTLSNearMinimum(t *testing.T, r *Runtime) {
 	}
 }
 
-func contextTLSFinish(t *testing.T, r *Runtime, close func() error) {
+func contextTLSFinish(t *testing.T, r *umemory.Runtime, close func() error) {
 	t.Helper()
 	for {
 		before := r.Stats().LiveBlocks

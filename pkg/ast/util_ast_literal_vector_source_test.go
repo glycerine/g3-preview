@@ -4,7 +4,8 @@ package ast
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
@@ -59,12 +60,12 @@ func TestASTLiteralVectorNativeBorrowGrowthAndNonowningReset(t *testing.T) {
 		t.Fatal("closed owner left capture usable", e)
 	}
 }
-func astLiteralNamedGraph(t *testing.T, b *arena.Budget, r *util.Runtime, external uint64, owners []*ASTLiteralVector, anchors ...util.Block) {
+func astLiteralNamedGraph(t *testing.T, b *arena.Budget, r *umemory.Runtime, external uint64, owners []*ASTLiteralVector, anchors ...umemory.Block) {
 	t.Helper()
 	cold := external
-	roots := map[util.Block]bool{}
+	roots := map[umemory.Block]bool{}
 	for _, h := range anchors {
-		if h == (util.Block{}) {
+		if h == (umemory.Block{}) {
 			continue
 		}
 		if roots[h] {

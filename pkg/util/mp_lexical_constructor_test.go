@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // A failed rational copy constructor has no rational destructor. Its partial
@@ -76,7 +77,7 @@ func TestConstructorInfPowerUsesPrvalueMove(t *testing.T) {
 	measure := func(manual bool) uint64 {
 		b := arena.NewBudget(1 << 25)
 		cfg := serviceConfig(b)
-		cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		s, e := NewRationalService(cfg)
 		if e != nil {
 			t.Fatal(e)
@@ -159,13 +160,13 @@ func TestConstructorInfPowerUsesPrvalueMove(t *testing.T) {
 // earlier queued partial ctor abort, without replaying either freed member.
 func TestConstructorCompletedUnwindPrecedesOwningAbort(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 32})
 	if e != nil {
 		t.Fatal(e)
 	}
 	cfg := serviceConfig(b)
 	cfg.Integers.Memory = r
-	cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 32}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 32}
 	s, e := NewRationalService(cfg)
 	if e != nil {
 		t.Fatal(e)
@@ -297,7 +298,7 @@ func TestConstructorEightRootsAndWarmBoundary(t *testing.T) {
 func TestConstructorExpressionFailedCopyPhase(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
 	cfg := serviceConfig(b)
-	cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	s, e := NewRationalService(cfg)
 	if e != nil {
 		t.Fatal(e)

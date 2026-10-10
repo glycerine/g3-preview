@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ func TestRationalDecimalStreamDenominatorCopyTransportGuards(t *testing.T) {
 	a := Rational{Num: NewInt(-3), Den: NewInt(1)}
 	var out OwnedStringStream
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			s := &m.rational.decimalStream
@@ -33,7 +34,7 @@ func TestRationalDecimalStreamDenominatorCopyTransportGuards(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	serviceMust(t, out.Construct(b))
 	serviceMust(t, out.AppendCString("prefix:"))
@@ -45,10 +46,10 @@ func TestRationalDecimalStreamDenominatorCopyTransportGuards(t *testing.T) {
 	body := m.rational.DisplayDecimalInto(&out, &a, 10, false)
 	armed = false
 	s := &m.rational.decimalStream
-	if !errors.Is(body, Failure{Kind: FailureMemout}) || calls != 1 || !s.active || s.count != 3 || s.sourceCursor != 0 || s.bodySucceeded {
+	if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls != 1 || !s.active || s.count != 3 || s.sourceCursor != 0 || s.bodySucceeded {
 		t.Fatal("actual second COPY transport missing", body, calls)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &a.Num, &a.Den, &s.values[0], &s.values[1], &s.values[2], &s.values[3])
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &a.Num, &a.Den, &s.values[0], &s.values[1], &s.values[2], &s.values[3])
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+out.Buffer.String.StorageBytes() {
 		t.Fatal("immediate second COPY graph", b.Used())
 	}

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func polynomialFactorsAudit(t *testing.T, f *PolynomialFactors, caller []Polynomial, input []*util.Int, refs ...*PolynomialRef) {
@@ -14,7 +15,7 @@ func polynomialFactorsAudit(t *testing.T, f *PolynomialFactors, caller []Polynom
 func polynomialFactorsAuditExtra(t *testing.T, f *PolynomialFactors, caller []Polynomial, input []*util.Int, extraHeader uint64, refs ...*PolynomialRef) {
 	polynomialFactorsAuditOwnersExtra(t, f, caller, input, extraHeader, nil, nil, refs...)
 }
-func polynomialFactorsAuditOwnersExtra(t *testing.T, f *PolynomialFactors, caller []Polynomial, input []*util.Int, extraHeader uint64, external []util.Block, other []*PolynomialFactors, refs ...*PolynomialRef) {
+func polynomialFactorsAuditOwnersExtra(t *testing.T, f *PolynomialFactors, caller []Polynomial, input []*util.Int, extraHeader uint64, external []umemory.Block, other []*PolynomialFactors, refs ...*PolynomialRef) {
 	t.Helper()
 	m := f.manager.core
 	polys := append([]Polynomial(nil), caller...)
@@ -29,7 +30,7 @@ func polynomialFactorsAuditOwnersExtra(t *testing.T, f *PolynomialFactors, calle
 		}
 	}
 	h := extraHeader
-	raw := append([]util.Block(nil), external...)
+	raw := append([]umemory.Block(nil), external...)
 	owners := append([]*PolynomialFactors{f}, other...)
 	for _, f := range owners {
 		if f == nil || f.closed {

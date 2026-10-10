@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // This embedded cold continuation names only the reached SET invocation. The
@@ -62,9 +63,9 @@ func (m *MultivariatePolynomialManager) iccpConstantSET(i, a *util.Int, parent *
 		s.executing = false
 		s.bodyCause = err
 		err = errors.Join(err, s.sourceCause)
-		pending := s.numeric.PendingObject() != (util.ObjectRef{}) || c.modular.MatchesPNormalizeInvocation(&s.normalize)
+		pending := s.numeric.PendingObject() != (umemory.ObjectRef{}) || c.modular.MatchesPNormalizeInvocation(&s.normalize)
 		for _, raw := range s.numeric.PendingAllocatorBlocks() {
-			pending = pending || raw != (util.Block{})
+			pending = pending || raw != (umemory.Block{})
 		}
 		if !pending {
 			s.active = false

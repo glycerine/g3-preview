@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -20,7 +21,7 @@ func TestUPolynomialRecombinationTrialTransportProtectsActualCaller(t *testing.T
 	var s *UPolynomialFactorizationService
 	armed := false
 	calls := 0
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f util.Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			prior := s.scope
@@ -35,7 +36,7 @@ func TestUPolynomialRecombinationTrialTransportProtectsActualCaller(t *testing.T
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -45,7 +46,7 @@ func TestUPolynomialRecombinationTrialTransportProtectsActualCaller(t *testing.T
 	s, e = NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
 	var leading util.Int
-	var held util.Block
+	var held umemory.Block
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
 	defer func() {
@@ -98,7 +99,7 @@ func TestUPolynomialRecombinationTrialTransportProtectsActualCaller(t *testing.T
 	if used || !numericPhysicalReservationRefusal(body) || calls != 1 {
 		t.Fatal("actual tail Copy refusal", used, body, calls)
 	}
-	primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []util.Block{held}, &leading)
+	primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []umemory.Block{held}, &leading)
 	helper := &parent.trialHelper
 	if !polynomialNegNumericPending(&helper.numeric) {
 		t.Fatal("actual Copy leaf missing captured authority")
@@ -106,7 +107,7 @@ func TestUPolynomialRecombinationTrialTransportProtectsActualCaller(t *testing.T
 	if e := s.finishSquareFreeScopeSource(); e != ErrUPolynomialCleanupPending || parent.constructed != 0 || (parent.p).Cell != 0 || helper.bodyCause != body || helper.sourceCause != nil {
 		t.Fatal("completed helper DT did not precede older enclosing source suffix", e, parent.constructed, parent.p)
 	}
-	primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []util.Block{held}, &leading)
+	primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []umemory.Block{held}, &leading)
 
 }
 
@@ -197,11 +198,11 @@ func TestUPolynomialRecombinationTrialEveryActualBranchPrefix(t *testing.T) {
 func TestUPolynomialRecombinationTrialActualReleaseHistories(t *testing.T) {
 	for _, source := range []bool{true, false} {
 		b := arena.NewBudget(1 << 26)
-		rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 		serviceMust(t, e)
 		cfg := serviceConfig(b).Integers
 		cfg.Memory = rt
-		cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 		serviceMust(t, e)
 		m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -251,11 +252,11 @@ func TestUPolynomialRecombinationTrialActualReleaseHistories(t *testing.T) {
 		if source && !errors.Is(first, h.sourceCause) || !source && h.ownCause != first {
 			t.Fatal("acknowledgment lost history")
 		}
-		primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []util.Block{recovery})
+		primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []umemory.Block{recovery})
 		contextTLSFinish(t, rt, s.CleanupRetained)
 		contextTLSFinish(t, rt, fs.Close)
 		e = rt.Deallocate(&recovery)
-		if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+		if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 			t.Fatal("actual consumed recovery block", e)
 		}
 		contextTLSFinish(t, rt, s.Close)
@@ -415,7 +416,7 @@ func TestUPolynomialRecombinationTrialRelatedOwnerTransport(t *testing.T) {
 			var target *UPolynomialManager
 			armed := false
 			calls := 0
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f util.Failure) error {
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f umemory.Failure) error {
 				if armed {
 					calls++
 					prior := s.scope
@@ -439,7 +440,7 @@ func TestUPolynomialRecombinationTrialRelatedOwnerTransport(t *testing.T) {
 			serviceMust(t, e)
 			cfg := serviceConfig(b).Integers
 			cfg.Memory = rt
-			cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -449,7 +450,7 @@ func TestUPolynomialRecombinationTrialRelatedOwnerTransport(t *testing.T) {
 			s, e = NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 			serviceMust(t, e)
 			var leading util.Int
-			var held util.Block
+			var held umemory.Block
 			target, e = NewRelatedUPolynomialManager(m)
 			serviceMust(t, e)
 			var prime util.Int
@@ -509,7 +510,7 @@ func TestUPolynomialRecombinationTrialRelatedOwnerTransport(t *testing.T) {
 			if used || !numericPhysicalReservationRefusal(body) || calls != 1 {
 				t.Fatal("actual tail Copy refusal", used, body, calls)
 			}
-			primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []util.Block{held}, &leading, &prime)
+			primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []umemory.Block{held}, &leading, &prime)
 			helper := &parent.trialHelper
 			if !polynomialNegNumericPending(&helper.numeric) {
 				t.Fatal("actual Copy leaf missing captured authority")
@@ -517,7 +518,7 @@ func TestUPolynomialRecombinationTrialRelatedOwnerTransport(t *testing.T) {
 			if e := s.finishSquareFreeScopeSource(); e != ErrUPolynomialCleanupPending || parent.constructed != 0 || (parent.p).Cell != 0 || helper.bodyCause != body || helper.sourceCause != nil {
 				t.Fatal("completed helper DT did not precede older enclosing source suffix", e, parent.constructed, parent.p)
 			}
-			primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []util.Block{held}, &leading, &prime)
+			primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []umemory.Block{held}, &leading, &prime)
 
 		})
 	}
@@ -529,11 +530,11 @@ func TestUPolynomialRecombinationTrialRelatedOwnerTransport(t *testing.T) {
 func TestUPolynomialRecombinationTrialActualCompiledChildSourceStopProtectsTmp(t *testing.T) {
 	for _, source := range []bool{true} {
 		b := arena.NewBudget(1 << 26)
-		rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 		serviceMust(t, e)
 		cfg := serviceConfig(b).Integers
 		cfg.Memory = rt
-		cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 		serviceMust(t, e)
 		m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -597,11 +598,11 @@ func TestUPolynomialRecombinationTrialActualCompiledChildSourceStopProtectsTmp(t
 		if source && !errors.Is(first, h.sourceCause) || !source && h.ownCause != first {
 			t.Fatal("acknowledgment lost history")
 		}
-		primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []util.Block{recovery})
+		primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []umemory.Block{recovery})
 		contextTLSFinish(t, rt, s.CleanupRetained)
 		contextTLSFinish(t, rt, fs.Close)
 		e = rt.Deallocate(&recovery)
-		if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+		if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 			t.Fatal("actual consumed recovery block", e)
 		}
 		contextTLSFinish(t, rt, s.Close)

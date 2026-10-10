@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // SourceFinalize runs only the source destructor, preserving caller-owned
@@ -13,7 +14,7 @@ import (
 // it does not claim C++ recovery from an interrupted destructor.
 func (m *IntegerManager) SourceFinalize() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.rawInvocationExecuting() || m.CopyAllocation.Executing || m.NormalizationExecuting || m.numericCallerExecuting() {
 		return ErrNumericPending
@@ -127,7 +128,7 @@ func (m *IntegerManager) markSourceFreedPools() error {
 		}
 		for h := parent.RationalSetHistories; h != nil; h = h.Next {
 			if h.Self != h || h.Manager != parent || h.Invocation == 0 {
-				return ErrRuntimeOwner
+				return umemory.ErrRuntimeOwner
 			}
 			if e := m.markSourceConsumedDetachedCell(&h.Numeric.Cell, &h.cellRetired); e != nil {
 				return e
@@ -135,7 +136,7 @@ func (m *IntegerManager) markSourceFreedPools() error {
 		}
 		for h := parent.FormattedSetHistories; h != nil; h = h.Next {
 			if h.Self != h || h.Manager != parent || h.Issued.Manager != parent || h.Issued.Frame != h || h.Issued.Invocation != h.Invocation || h.Invocation == 0 {
-				return ErrRuntimeOwner
+				return umemory.ErrRuntimeOwner
 			}
 			if e := m.markSourceConsumedDetachedCell(&h.Numeric.Cell, &h.cellRetired); e != nil {
 				return e
@@ -143,7 +144,7 @@ func (m *IntegerManager) markSourceFreedPools() error {
 		}
 		for q := parent.InputCalls; q != nil; q = q.Next {
 			if q.Self != q || q.Manager != parent || q.Issued.Manager != parent || q.Issued.Frame != q || q.Issued.Invocation == 0 {
-				return ErrRuntimeOwner
+				return umemory.ErrRuntimeOwner
 			}
 			if e := m.markSourceConsumedDetachedCell(&q.Numeric.Cell, &q.cellRetired); e != nil {
 				return e
@@ -153,7 +154,7 @@ func (m *IntegerManager) markSourceFreedPools() error {
 
 	for s := m.conversionDetachedOutputs; s != nil; s = s.outputDetachedNext {
 		if s.manager == nil || !s.manager.validConversionScope(s) || s.outputManager.Z != m || s.outputDetachedInvocation == 0 || s.outputDetachedInvocation != s.invocation {
-			return ErrRuntimeOwner
+			return umemory.ErrRuntimeOwner
 		}
 		if e := m.markSourceConsumedDetachedCell(&s.outputAllocation.numeric.Cell, &s.outputAllocation.cellRetired); e != nil {
 			return e
@@ -210,7 +211,7 @@ func (m *IntegerManager) markSourceFreedPools() error {
 			continue
 		}
 		_, e = m.Memory.ReadUint32(c.Backing.Raw, c.Backing.Offset+4)
-		if errors.Is(e, ErrRuntimeOwner) {
+		if errors.Is(e, umemory.ErrRuntimeOwner) {
 			c.Released = true
 			if e := m.Cells.Write(slot, c); e != nil {
 				return e
@@ -237,7 +238,7 @@ func (m *IntegerManager) freeAfterSourceFinalize(ref NumericCellRef) error {
 		}
 		raw := c.Backing.Raw
 		e := m.Memory.Deallocate(&raw)
-		if raw == (Block{}) {
+		if raw == (umemory.Block{}) {
 			c.Released = true
 			m.Store(ref, c)
 		}
@@ -253,11 +254,11 @@ func (m *IntegerManager) freeAfterSourceFinalize(ref NumericCellRef) error {
 // markSourceConsumedDetachedCell checks only a previously acquired exact cell
 // token at the reached allocator destructor frontier. Direct blocks survive.
 func (m *IntegerManager) markSourceConsumedDetachedCell(c *SourceCellBacking, retired *bool) error {
-	if c.Object == (ObjectRef{}) || c.Offset == 0 {
+	if c.Object == (umemory.ObjectRef{}) || c.Offset == 0 {
 		return nil
 	}
 	_, e := m.Memory.ReadUint32(c.Raw, c.Offset+4)
-	if errors.Is(e, ErrRuntimeOwner) {
+	if errors.Is(e, umemory.ErrRuntimeOwner) {
 		*c = SourceCellBacking{}
 		*retired = true
 		return nil

@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -439,8 +440,8 @@ func TestUPolynomialHenselImportedBigModulusPhysicalFailureRoots(t *testing.T) {
 			if err != nil && !errors.Is(err, arena.ErrInjectedFailure) {
 				// Actual raw allocation transports budget refusal through source memout.
 				// Require both the concrete failure kind and source runtime OOM state.
-				var failure util.Failure
-				if !errors.As(err, &failure) || failure.Kind != util.FailureMemout || !m.IntegerManager().RuntimeOwner().State().OutOfMemory {
+				var failure umemory.Failure
+				if !errors.As(err, &failure) || failure.Kind != umemory.FailureMemout || !m.IntegerManager().RuntimeOwner().State().OutOfMemory {
 					t.Fatal(ordinal, err)
 				}
 			}
@@ -573,8 +574,8 @@ func TestUPolynomialHenselDeadLowerGuardedCloseAndCallerSetZ(t *testing.T) {
 	// the independent exact physical frontier probe reaches it at159.
 	b.FailAfter(159)
 	err := service.HenselLiftFactors(f, pf, 16, lf)
-	var failure util.Failure
-	if !errors.As(err, &failure) || failure.Kind != util.FailureMemout || !m.IntegerManager().RuntimeOwner().State().OutOfMemory {
+	var failure umemory.Failure
+	if !errors.As(err, &failure) || failure.Kind != umemory.FailureMemout || !m.IntegerManager().RuntimeOwner().State().OutOfMemory {
 		t.Fatal("frozen debug raw-allocation refusal prefix", err)
 	}
 	upolyHenselAuditPhysical(t, cores, owners)
@@ -610,8 +611,8 @@ func upolyHenselAllocationRefusal(z *util.IntegerManager, err error) bool {
 	if errors.Is(err, arena.ErrInjectedFailure) {
 		return true
 	}
-	var failure util.Failure
-	return errors.As(err, &failure) && failure.Kind == util.FailureMemout && z.RuntimeOwner().State().OutOfMemory
+	var failure umemory.Failure
+	return errors.As(err, &failure) && failure.Kind == umemory.FailureMemout && z.RuntimeOwner().State().OutOfMemory
 }
 
 // Source: src/util/mpz.cpp:730-817.

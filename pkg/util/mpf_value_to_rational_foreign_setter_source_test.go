@@ -6,12 +6,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatToRationalForeignSetterOwnsDescriptorPrefix(t *testing.T) {
 	for ordinal := int64(0); ordinal < 160; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		config := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+		config := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 		m, e := NewArbitraryFloatManager(config)
 		serviceMust(t, e)
 		qm, e := NewRationalManager(RationalConfig{Integers: config})
@@ -33,9 +34,9 @@ func TestArbitraryFloatToRationalForeignSetterOwnsDescriptorPrefix(t *testing.T)
 		if b.Used() != want {
 			t.Fatal("immediate actual conversion/source/output cold graph", ordinal, b.Used(), want)
 		}
-		matched := body != nil && s.numericPhase == 6 && (qm.Z.PendingCell.Object != (ObjectRef{}) || s.outputAllocation.numeric.Cell.Object != (ObjectRef{}))
+		matched := body != nil && s.numericPhase == 6 && (qm.Z.PendingCell.Object != (umemory.ObjectRef{}) || s.outputAllocation.numeric.Cell.Object != (umemory.ObjectRef{}))
 		if matched {
-			if s.outputAllocation.numeric.Cell.Object == (ObjectRef{}) || s.outputAllocation.originalCell != s.outputAllocation.numeric.Cell || qm.Z.PendingCell.Object != (ObjectRef{}) {
+			if s.outputAllocation.numeric.Cell.Object == (umemory.ObjectRef{}) || s.outputAllocation.originalCell != s.outputAllocation.numeric.Cell || qm.Z.PendingCell.Object != (umemory.ObjectRef{}) {
 				t.Fatalf("foreign output descriptor at actual SET lacks exact conversion child authority: prefix=%d body=%v object=%v", ordinal, body, qm.Z.PendingCell.Object)
 			}
 		}

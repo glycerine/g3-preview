@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // The public signed-counter recipe is a guarded host/source undefined-domain
@@ -16,11 +17,11 @@ import (
 // are real; no numeral metadata, pointer or destructor callback is fabricated.
 func TestPolynomialExactDivActualNUMStopPreservesOlderReference(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: cfg.Profile})
@@ -182,17 +183,17 @@ func TestPolynomialExactDivActualNUMStopPreservesOlderReference(t *testing.T) {
 // This real input retains more than one megabyte before the checkpoint. The
 // first public host-domain request therefore uses a four-megabyte negative
 // lane instead of the smaller fixture's one-megabyte assumption.
-func exactDivisionTLSNearMinimum(t *testing.T, r *util.Runtime) {
+func exactDivisionTLSNearMinimum(t *testing.T, r *umemory.Runtime) {
 	t.Helper()
 	first, e := r.Allocate(8)
 	serviceMust(t, e)
 	second, e := r.Allocate(8)
 	serviceMust(t, e)
 	defer func() {
-		if first != (util.Block{}) {
+		if first != (umemory.Block{}) {
 			contextTLSFinish(t, r, func() error { return r.Deallocate(&first) })
 		}
-		if second != (util.Block{}) {
+		if second != (umemory.Block{}) {
 			contextTLSFinish(t, r, func() error { return r.Deallocate(&second) })
 		}
 	}()

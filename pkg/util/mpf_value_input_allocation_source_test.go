@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatInputReachedSETAndShiftAllocationReceipt(t *testing.T) {
@@ -13,13 +14,13 @@ func TestArbitraryFloatInputReachedSETAndShiftAllocationReceipt(t *testing.T) {
 	completed := false
 	for ordinal := int64(0); ordinal < 60; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		var x ArbitraryFloat
 		var r ArbitraryFloatValueInputReceipt
 		b.FailAfter(ordinal)
 		body := m.SetDoubleWithReceipt(&x, 11, 4000, math.Float64frombits(0xbff123456789abcd), &r)
-		if body != nil && m.integer.PendingCell.Object != (ObjectRef{}) {
+		if body != nil && m.integer.PendingCell.Object != (umemory.ObjectRef{}) {
 			t.Fatal("actual supplied input allocation failed without exact child transfer", ordinal, body)
 		}
 		integerPhysicalAudit(t, m.integer, &x.significand)
@@ -32,7 +33,7 @@ func TestArbitraryFloatInputReachedSETAndShiftAllocationReceipt(t *testing.T) {
 			if q.bodyCause != body {
 				t.Fatal("original body cause lost")
 			}
-			if body != nil && (q.Numeric.Cell.Object != (ObjectRef{}) || q.Transferred.Block() != (Block{})) {
+			if body != nil && (q.Numeric.Cell.Object != (umemory.ObjectRef{}) || q.Transferred.Block() != (umemory.Block{})) {
 				captured = true
 			}
 		}

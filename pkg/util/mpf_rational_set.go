@@ -3,6 +3,7 @@ package util
 
 import (
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // SetExponentRational follows the literal normalization of significand*2^exponent.
@@ -17,10 +18,10 @@ func (m *ArbitraryFloatManager) setExponentRationalWithPlainCaller(out *Arbitrar
 		return e
 	}
 	if plain != nil && (!plain.matched(m) || !plain.executing || plain.finishing || !plain.expLive || exponent != &plain.exp) {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if significand == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	// is_neg/is_zero read only the actual numerator. The zero branch never
 	// reads exponent or denominator, and constructs no lexical NUMs.

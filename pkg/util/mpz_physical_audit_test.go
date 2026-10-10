@@ -7,21 +7,22 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func numericPhysicalReservationRefusal(e error) bool {
 	if errors.Is(e, arena.ErrInjectedFailure) {
 		return true
 	}
-	var f Failure
-	return errors.As(e, &f) && f.Kind == FailureMemout && f.ErrorCode() == 101
+	var f umemory.Failure
+	return errors.As(e, &f) && f.Kind == umemory.FailureMemout && f.ErrorCode() == 101
 }
 
 func integerPhysicalAudit(t *testing.T, m *IntegerManager, public ...*Int) {
 	integerPhysicalAuditWithRaw(t, m, nil, public...)
 }
 
-func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Block, public ...*Int) {
+func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []umemory.Block, public ...*Int) {
 	t.Helper()
 	cells := map[NumericCellRef]bool{}
 	add := func(r NumericCellRef) {
@@ -94,7 +95,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 			if !w.Valid() {
 				t.Fatal("invalid actual Power owner")
 			}
-			if w.Initialized && !w.SourceDelDone && w.Block != (Block{}) {
+			if w.Initialized && !w.SourceDelDone && w.Block != (umemory.Block{}) {
 				a, e := w.Capture()
 				if e != nil {
 					t.Fatal("invalid actual Power NUM", e)
@@ -122,7 +123,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 	if uint32(len(cells)) != m.Cells.Stats().Live {
 		t.Fatal("unnamed actual integer descriptor", len(cells), m.Cells.Stats().Live)
 	}
-	objects := map[ObjectRef]bool{}
+	objects := map[umemory.ObjectRef]bool{}
 	for ref := range cells {
 		c := m.Cell(ref)
 		if c.Payload != (arena.VectorRef{}) {
@@ -140,7 +141,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 		}
 		objects[object] = true
 	}
-	if m.PendingCell.Object != (ObjectRef{}) {
+	if m.PendingCell.Object != (umemory.ObjectRef{}) {
 		if objects[m.PendingCell.Object] {
 			t.Fatal("duplicated pending physical object")
 		}
@@ -148,14 +149,14 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 			t.Fatal("invalid pending object", e)
 		}
 	}
-	raw := map[Block]bool{}
+	raw := map[umemory.Block]bool{}
 	if parent := m.MpfParent; parent != nil {
 		for s := parent.FormatScopes; s != nil; s = s.Next {
 			if !parent.MatchesFormatFrame(s) {
 				t.Fatal("invalid actual format frame")
 			}
-			for _, b := range []Block{s.Transferred.Block(), s.Decimal.Transferred.Block()} {
-				if b != (Block{}) {
+			for _, b := range []umemory.Block{s.Transferred.Block(), s.Decimal.Transferred.Block()} {
+				if b != (umemory.Block{}) {
 					if raw[b] {
 						t.Fatal("duplicate format transferred raw")
 					}
@@ -166,7 +167,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 				}
 			}
 			for _, c := range []SourceCellBacking{s.Numeric.Cell, s.Decimal.Numeric.Cell} {
-				if c.Object == (ObjectRef{}) {
+				if c.Object == (umemory.ObjectRef{}) {
 					continue
 				}
 				if objects[c.Object] {
@@ -199,8 +200,8 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 			if !w.Valid() {
 				t.Fatal("invalid actual Power owner")
 			}
-			for _, block := range []Block{w.Block, w.Transferred.Block()} {
-				if block == (Block{}) {
+			for _, block := range []umemory.Block{w.Block, w.Transferred.Block()} {
+				if block == (umemory.Block{}) {
 					continue
 				}
 				if raw[block] {
@@ -211,7 +212,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 				}
 				raw[block] = true
 			}
-			if c := w.Roots.Cell; c.Object != (ObjectRef{}) {
+			if c := w.Roots.Cell; c.Object != (umemory.ObjectRef{}) {
 				if objects[c.Object] {
 					t.Fatal("duplicate actual Power object")
 				}
@@ -226,8 +227,8 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 			if h.Self != h || h.Manager != parent || h.Invocation == 0 {
 				t.Fatal("invalid actual rational SET record")
 			}
-			for _, block := range []Block{h.Transferred.Block(), h.Numeric.Allocator[0], h.Numeric.Allocator[1], h.Numeric.Allocator[2]} {
-				if block == (Block{}) {
+			for _, block := range []umemory.Block{h.Transferred.Block(), h.Numeric.Allocator[0], h.Numeric.Allocator[1], h.Numeric.Allocator[2]} {
+				if block == (umemory.Block{}) {
 					continue
 				}
 				if raw[block] {
@@ -238,7 +239,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 				}
 				raw[block] = true
 			}
-			if c := h.Numeric.Cell; c.Object != (ObjectRef{}) {
+			if c := h.Numeric.Cell; c.Object != (umemory.ObjectRef{}) {
 				if objects[c.Object] {
 					t.Fatal("duplicate rational SET object")
 				}
@@ -252,8 +253,8 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 			if h.Self != h || h.Manager != parent || h.Issued.Frame != h || h.Issued.Manager != parent || h.Issued.Invocation != h.Invocation || h.Invocation == 0 {
 				t.Fatal("invalid actual formatted SET record")
 			}
-			for _, block := range []Block{h.Transferred.Block(), h.Numeric.Allocator[0], h.Numeric.Allocator[1], h.Numeric.Allocator[2]} {
-				if block == (Block{}) {
+			for _, block := range []umemory.Block{h.Transferred.Block(), h.Numeric.Allocator[0], h.Numeric.Allocator[1], h.Numeric.Allocator[2]} {
+				if block == (umemory.Block{}) {
 					continue
 				}
 				if raw[block] {
@@ -264,7 +265,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 				}
 				raw[block] = true
 			}
-			if c := h.Numeric.Cell; c.Object != (ObjectRef{}) {
+			if c := h.Numeric.Cell; c.Object != (umemory.ObjectRef{}) {
 				if objects[c.Object] {
 					t.Fatal("duplicate formatted SET cell")
 				}
@@ -290,7 +291,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 		}
 		for _, s := range []*ArbitraryFloatRoundScope{&parent.RoundScope, &parent.RoundSqrtScope} {
 			if s.Manager == parent && s.Invocation != 0 {
-				if block := s.Transferred.Block(); block != (Block{}) {
+				if block := s.Transferred.Block(); block != (umemory.Block{}) {
 					if raw[block] {
 						t.Fatal("duplicate round transferred raw")
 					}
@@ -299,7 +300,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 					}
 					raw[block] = true
 				}
-				if c := s.Numeric.Cell; c.Object != (ObjectRef{}) {
+				if c := s.Numeric.Cell; c.Object != (umemory.ObjectRef{}) {
 					if objects[c.Object] {
 						t.Fatal("duplicate round cell")
 					}
@@ -328,7 +329,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 			if q.Self != q || q.Manager != parent || q.Issued.Manager != parent || q.Issued.Frame != q || q.Issued.Invocation == 0 {
 				t.Fatal("invalid actual input call owner")
 			}
-			if block := q.Transferred.Block(); block != (Block{}) {
+			if block := q.Transferred.Block(); block != (umemory.Block{}) {
 				if raw[block] {
 					t.Fatal("duplicate input transferred raw")
 				}
@@ -337,7 +338,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 				}
 				raw[block] = true
 			}
-			if c := q.Numeric.Cell; c.Object != (ObjectRef{}) {
+			if c := q.Numeric.Cell; c.Object != (umemory.ObjectRef{}) {
 				if objects[c.Object] {
 					t.Fatal("duplicate input cell")
 				}
@@ -370,7 +371,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 				t.Fatal("invalid retained MPF child")
 			}
 			block := child.Transferred.Block()
-			if block != (Block{}) {
+			if block != (umemory.Block{}) {
 				if raw[block] {
 					t.Fatal("duplicate transferred MPF raw root")
 				}
@@ -379,7 +380,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 				}
 				raw[block] = true
 			}
-			if c := child.Roots.Cell; c.Object != (ObjectRef{}) {
+			if c := child.Roots.Cell; c.Object != (umemory.ObjectRef{}) {
 				if objects[c.Object] {
 					t.Fatal("duplicate retained MPF cell")
 				}
@@ -417,7 +418,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 	}
 
 	for _, block := range external {
-		if block == (Block{}) || raw[block] {
+		if block == (umemory.Block{}) || raw[block] {
 			t.Fatal("duplicate or empty named external block", block)
 		}
 		if _, e := m.Memory.Size(block); e != nil {
@@ -444,8 +445,8 @@ func integerActualOwnedBytes(m *IntegerManager) uint64 {
 // source profile/body allocates lexical locals during the measured operation.
 type numericWarmSnapshot struct {
 	used, owned, size, count uint64
-	runtime                  RuntimeStats
-	allocator                AllocatorStats
+	runtime                  umemory.RuntimeStats
+	allocator                umemory.AllocatorStats
 	cells                    uint32
 }
 

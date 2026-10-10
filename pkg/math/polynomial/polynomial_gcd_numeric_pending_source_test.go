@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup(t *testing.T) {
@@ -16,7 +17,7 @@ func TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup(t *testing.
 }
 func polynomialResultantDescriptorRefusal(t *testing.T, replacement bool) {
 	budget := arena.NewBudget(1 << 25)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 12, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 12, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		q.Close()
@@ -49,7 +50,7 @@ func polynomialResultantDescriptorRefusal(t *testing.T, replacement bool) {
 	cause := full.Resultant(p, b, 1, r)
 
 	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, b, r.root.value}, nil, r.header)
-	if !errors.Is(cause, arena.ErrSlotLimit) || z.PendingCell.Object == (util.ObjectRef{}) {
+	if !errors.Is(cause, arena.ErrSlotLimit) || z.PendingCell.Object == (umemory.ObjectRef{}) {
 		t.Fatal("actual bounded descriptor-after-physical prefix not reached", cause, z.PendingCell)
 	}
 	root := z.PendingCell
@@ -72,7 +73,7 @@ func polynomialResultantDescriptorRefusal(t *testing.T, replacement bool) {
 			fillers[filled] = foreign
 			filled++
 		}
-		if !errors.Is(e, arena.ErrSlotLimit) || z.PendingCell.Object == (util.ObjectRef{}) {
+		if !errors.Is(e, arena.ErrSlotLimit) || z.PendingCell.Object == (umemory.ObjectRef{}) {
 			t.Fatal("actual foreign replacement refusal", e, z.PendingCell)
 		}
 		if z.PendingCell.Object == root.Object {
@@ -92,7 +93,7 @@ func polynomialResultantDescriptorRefusal(t *testing.T, replacement bool) {
 		}
 		serviceMust(t, z.CleanupPendingAllocation())
 		serviceMust(t, z.Del(&foreign))
-	} else if z.PendingCell.Object != (util.ObjectRef{}) {
+	} else if z.PendingCell.Object != (umemory.ObjectRef{}) {
 		t.Fatal("composed cleanup failed to drain exact invocation numeric object", root, z.PendingCell)
 	}
 	for i := 0; i < filled; i++ {

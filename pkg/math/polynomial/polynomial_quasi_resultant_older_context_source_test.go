@@ -8,17 +8,18 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Signed-host TLS/direct allocator profile isolates an actual end-only RAW
 // release after ADD. This is not ordinary mathematical allocation OOM.
 func TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	rationals, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: rationals.Integers(), Rationals: rationals, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
@@ -51,7 +52,7 @@ func TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory(t *t
 		serviceMust(t, c.integer.Mul(&large, &three, &warmProduct))
 		serviceMust(t, c.integer.Rem(&warmProduct, &(*c.modular.BorrowModulus()), &warm))
 	}
-	var external, recovery util.Block
+	var external, recovery umemory.Block
 	defer func() {
 		extra, x := rt.Allocate(400000)
 		serviceMust(t, x)
@@ -76,10 +77,10 @@ func TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory(t *t
 		}
 		contextTLSFinish(t, rt, full.CloseChecked)
 		contextTLSFinish(t, rt, rationals.CloseChecked)
-		for _, b := range []*util.Block{&external, &recovery, &extra} {
-			if *b != (util.Block{}) {
+		for _, b := range []*umemory.Block{&external, &recovery, &extra} {
+			if *b != (umemory.Block{}) {
 				x := rt.Deallocate(b)
-				if x != nil && (!errors.Is(x, arena.ErrBounds) || *b != (util.Block{})) {
+				if x != nil && (!errors.Is(x, arena.ErrBounds) || *b != (umemory.Block{})) {
 					t.Fatal("actual named direct release", x, *b)
 				}
 			}
@@ -101,7 +102,7 @@ func TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory(t *t
 	external, e = rt.Allocate(200000)
 	serviceMust(t, e)
 	contextTLSNearMinimum(t, rt)
-	if x := rt.Deallocate(&external); !errors.Is(x, arena.ErrBounds) || external != (util.Block{}) {
+	if x := rt.Deallocate(&external); !errors.Is(x, arena.ErrBounds) || external != (umemory.Block{}) {
 		t.Fatal("actual arm", x)
 	}
 	guard, stopped := upolynomialSourceNumeralDel(c.integer, &older)

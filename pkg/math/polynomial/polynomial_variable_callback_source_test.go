@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // This is the returning Go ErrorTransport owner boundary, not a native source callback.
@@ -18,7 +19,7 @@ func TestPolynomialVariableActualTransportCannotRetireExecutingOwner(t *testing.
 			var m *MultivariatePolynomialCore
 			var receipt polynomialVariableInvocationReceipt
 			active, seen := false, false
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f util.Failure) error {
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 				if active {
 					seen = true
 					state := m.memory.State()
@@ -45,7 +46,7 @@ func TestPolynomialVariableActualTransportCannotRetireExecutingOwner(t *testing.
 			cfg.Memory = rt
 			q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
-			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 			serviceMust(t, e)
 			full, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 			serviceMust(t, e)
@@ -65,7 +66,7 @@ func TestPolynomialVariableActualTransportCannotRetireExecutingOwner(t *testing.
 			if !seen || !numericPhysicalReservationRefusal(cause) {
 				t.Fatal("actual returning transport absent", seen, cause)
 			}
-			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p}, nil, 0, []util.Block{held})
+			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p}, nil, 0, []umemory.Block{held})
 			serviceMust(t, rt.SetMaxSize(0))
 			serviceMust(t, m.cleanupVariableInvocation(&receipt, true))
 			serviceMust(t, full.CloseChecked())

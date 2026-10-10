@@ -6,9 +6,10 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func astUnsignedGrowthPrime(t *testing.T, r *util.Runtime) util.Block {
+func astUnsignedGrowthPrime(t *testing.T, r *umemory.Runtime) umemory.Block {
 	t.Helper()
 	astTestMust(t, r.SetMaxSize(0))
 	request := int64(99990) - r.State().LocalSize - 8
@@ -22,10 +23,10 @@ func astUnsignedGrowthPrime(t *testing.T, r *util.Runtime) util.Block {
 }
 
 // The diagnostic fixture stays with the AST tests and borrows only public utilities.
-func astDebugActionFixture(t *testing.T, text string) (*arena.Budget, *util.Runtime, *util.DebugContext, *util.NumericCharInput, *os.File) {
+func astDebugActionFixture(t *testing.T, text string) (*arena.Budget, *umemory.Runtime, *util.DebugContext, *util.NumericCharInput, *os.File) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	astTestMust(t, e)
 	region, e := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
 	astTestMust(t, e)

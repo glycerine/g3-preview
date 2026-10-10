@@ -5,7 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
@@ -88,8 +89,8 @@ func TestASTBitVectorMinusOneEveryActualReservation(t *testing.T) {
 						}
 					}
 				} else {
-					var f util.Failure
-					if !errors.Is(body, arena.ErrInjectedFailure) && (!errors.As(body, &f) || f.Kind != util.FailureMemout) {
+					var f umemory.Failure
+					if !errors.Is(body, arena.ErrInjectedFailure) && (!errors.As(body, &f) || f.Kind != umemory.FailureMemout) {
 						t.Fatal(body)
 					}
 					if n != nil {

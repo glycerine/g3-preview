@@ -4,6 +4,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func (s *RationalService) Error() string { return "mpnum: retained rational service" }
@@ -15,7 +16,7 @@ func (s *RationalService) Unwrap() error {
 }
 func (s *RationalService) OriginalCause() error { return s.originalCause }
 func (s *RationalService) CleanupCause() error  { return s.cleanupCause }
-func (s *RationalService) RuntimeOwner() *Runtime {
+func (s *RationalService) RuntimeOwner() *umemory.Runtime {
 	if s == nil || s.self != s {
 		return nil
 	}

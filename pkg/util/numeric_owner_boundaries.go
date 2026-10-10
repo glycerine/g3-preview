@@ -1,9 +1,12 @@
 // Source: src/util/mpz.h, mpq.h, mpbq.h, mpbqi.h, mpzzp.h.
 package util
 
-import "github.com/glycerine/g3/pkg/arena"
+import (
+	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	// ValidOwner verifies the address identity of a borrowed primitive owner.
+)
 
-// ValidOwner verifies the address identity of a borrowed primitive owner.
 func (m *IntegerManager) ValidOwner() bool        { return m != nil && m.self == m }
 func (m *NaturalManager) ValidOwner() bool        { return m != nil && m.self == m }
 func (m *IntegerModularManager) ValidOwner() bool { return m != nil && m.self == m }
@@ -53,7 +56,7 @@ func (m *BinaryRationalManager) Open() error { return m.open() }
 // enters its own algorithms or retains any new numeric fields.
 func (m *IntegerManager) SourceReady() error {
 	if m == nil || !m.ValidOwner() {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.closed || m.SourceFinalizing || m.constructionFailed {
 		return arena.ErrClosed

@@ -2,10 +2,11 @@ package util
 
 import (
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func CleanupNumericAllocationRoots(z *IntegerManager, r *NumericAllocationRoots) error {
-	if r.Cell.Object != (ObjectRef{}) {
+	if r.Cell.Object != (umemory.ObjectRef{}) {
 		old := r.Cell
 		if z.PendingCell == old {
 			e := z.cleanupPendingAllocation()
@@ -25,7 +26,7 @@ func CleanupNumericAllocationRoots(z *IntegerManager, r *NumericAllocationRoots)
 	}
 	owned, foreign := false, false
 	for i, x := range now {
-		if x != (Block{}) {
+		if x != (umemory.Block{}) {
 			if x == r.Allocator[i] {
 				owned = true
 			} else {
@@ -44,7 +45,7 @@ func CleanupNumericAllocationRoots(z *IntegerManager, r *NumericAllocationRoots)
 		}
 		for i, old := range r.Allocator {
 			if now[i] != old {
-				r.Allocator[i] = Block{}
+				r.Allocator[i] = umemory.Block{}
 			}
 		}
 		if e != nil {
@@ -53,7 +54,7 @@ func CleanupNumericAllocationRoots(z *IntegerManager, r *NumericAllocationRoots)
 	} else {
 		for i, old := range r.Allocator {
 			if now[i] != old {
-				r.Allocator[i] = Block{}
+				r.Allocator[i] = umemory.Block{}
 			}
 		}
 	}

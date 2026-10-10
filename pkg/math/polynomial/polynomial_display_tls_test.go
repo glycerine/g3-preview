@@ -9,16 +9,17 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func polynomialDisplayTLSOwner(t *testing.T) (*MultivariatePolynomialManager, *util.RationalManager, *util.Runtime, *arena.Budget) {
+func polynomialDisplayTLSOwner(t *testing.T) (*MultivariatePolynomialManager, *util.RationalManager, *umemory.Runtime, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 27)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = r
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("display has no source checkpoint") }, Cooperation: func() error { panic("display has no source cooperation") }}})
@@ -54,7 +55,7 @@ func TestPolynomialDisplayExactNumericReceiptAndReplacement(t *testing.T) {
 			cause := f.numericCall(0, &a)
 			roots, e := z.Allocator.PendingRoots()
 			serviceMust(t, e)
-			if !numericPhysicalReservationRefusal(cause) || roots[0] == (util.Block{}) || f.numeric.Allocator != roots {
+			if !numericPhysicalReservationRefusal(cause) || roots[0] == (umemory.Block{}) || f.numeric.Allocator != roots {
 				t.Fatal("actual invoked Copy raw receipt", cause, roots, f.numeric.Allocator)
 			}
 			cause = f.finish(cause)
@@ -70,7 +71,7 @@ func TestPolynomialDisplayExactNumericReceiptAndReplacement(t *testing.T) {
 				}
 				roots, e = z.Allocator.PendingRoots()
 				serviceMust(t, e)
-				if roots[0] == (util.Block{}) || roots == old {
+				if roots[0] == (umemory.Block{}) || roots == old {
 					t.Fatal("replacement needs a distinct actual token", roots, old)
 				}
 				polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a, &foreign}, 0)
@@ -83,7 +84,7 @@ func TestPolynomialDisplayExactNumericReceiptAndReplacement(t *testing.T) {
 				if now != roots {
 					t.Fatal("owning display cleanup swept later foreign raw", now, roots)
 				}
-			} else if now != ([3]util.Block{}) {
+			} else if now != ([3]umemory.Block{}) {
 				t.Fatal("owning display cleanup omitted its own exact Copy raw", now)
 			}
 			if f.bodyCause == nil || !errors.Is(f.bodyCause, cause) {
@@ -113,7 +114,7 @@ func TestPolynomialDisplaySinkCreatesForeignPending(t *testing.T) {
 			t.Fatal(b.Used())
 		}
 	}()
-	var owned [3]util.Block
+	var owned [3]umemory.Block
 	sink := &polynomialDisplayTestSink{decimalHook: func(*PolynomialDecimalView) error {
 		digits := make([]uint32, 40000)
 		digits[39999] = 1
@@ -124,7 +125,7 @@ func TestPolynomialDisplaySinkCreatesForeignPending(t *testing.T) {
 		}
 		owned, e = z.Allocator.PendingRoots()
 		serviceMust(t, e)
-		if owned[0] == (util.Block{}) {
+		if owned[0] == (umemory.Block{}) {
 			t.Fatal("no actual caller pending raw")
 		}
 		return cause

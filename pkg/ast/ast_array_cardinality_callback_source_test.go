@@ -15,6 +15,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -26,7 +27,7 @@ func TestASTArrayFiniteRealCallbackOwnerGuard(t *testing.T) {
 		active, calls := false, 0
 		budgetMode := os.Getenv("G3_ARRAY_CALLBACK_BUDGET") != ""
 		countMode := os.Getenv("G3_ARRAY_CALLBACK_COUNT") != "" || budgetMode
-		rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: !countMode, SizeTBits: 64, Transport: func(f util.Failure) error {
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: !countMode, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 			if active {
 				calls++
 				if own := m.Close(); !errors.Is(own, ErrASTPending) {
@@ -39,7 +40,7 @@ func TestASTArrayFiniteRealCallbackOwnerGuard(t *testing.T) {
 			return f
 		}})
 		astTestMust(t, e)
-		q, e = util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+		q, e = util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 		astTestMust(t, e)
 		sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 		astTestMust(t, e)
@@ -66,7 +67,7 @@ func TestASTArrayFiniteRealCallbackOwnerGuard(t *testing.T) {
 		ps = append(ps, rp)
 		anchor, e := polynomial.NewUPolynomialManagerFromRationalService(q, polynomial.UPolynomialConfig{Checkpoint: func() bool { panic("unused Array physical anchor") }, Cooperation: func() error { panic("unused Array physical anchor") }})
 		astTestMust(t, e)
-		var padding util.Block
+		var padding umemory.Block
 		if budgetMode {
 			ordinal, e := strconv.ParseInt(os.Getenv("G3_ARRAY_CALLBACK_BUDGET"), 10, 64)
 			astTestMust(t, e)
@@ -94,8 +95,8 @@ func TestASTArrayFiniteRealCallbackOwnerGuard(t *testing.T) {
 			if call == nil {
 				fmt.Println("ARRAY_BUDGET_SOURCE_COMPLETE")
 			} else if !errors.Is(call, arena.ErrInjectedFailure) {
-				var failure util.Failure
-				if !errors.As(call, &failure) || failure.Kind != util.FailureMemout {
+				var failure umemory.Failure
+				if !errors.As(call, &failure) || failure.Kind != umemory.FailureMemout {
 					t.Fatal("actual constructor/getter/return reservation refusal", call)
 				}
 			}
@@ -103,8 +104,8 @@ func TestASTArrayFiniteRealCallbackOwnerGuard(t *testing.T) {
 			if call == nil {
 				fmt.Println("ARRAY_COUNT_SOURCE_COMPLETE")
 			} else {
-				var f util.Failure
-				if !errors.As(call, &f) || f.Kind != util.FailureAllocExceeded || calls == 0 {
+				var f umemory.Failure
+				if !errors.As(call, &f) || f.Kind != umemory.FailureAllocExceeded || calls == 0 {
 					t.Fatal("literal reached count failure", call, calls)
 				}
 				frame := m.ArrayCardinality
@@ -123,7 +124,7 @@ func TestASTArrayFiniteRealCallbackOwnerGuard(t *testing.T) {
 		}
 		extras := upolyPhysicalExtraOwners{ASTManagers: []*ASTManager{m}, RationalServices: []*util.RationalService{q}}
 		if !countMode {
-			extras.CallerBlocks = []util.Block{padding}
+			extras.CallerBlocks = []umemory.Block{padding}
 		}
 		upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{anchor}, nil, extras)
 		if budgetMode {

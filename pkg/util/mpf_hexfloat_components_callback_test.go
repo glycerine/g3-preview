@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ func TestArbitraryFloatHexfloatComponentsActualCopyTransport(t *testing.T) {
 	sig := NewInt(0)
 	var text *ArbitraryFloatFormatText
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			s := &m.hexfloatComponents
@@ -34,7 +35,7 @@ func TestArbitraryFloatHexfloatComponentsActualCopyTransport(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 	serviceMust(t, e)
 	digits := make([]uint32, 1250)
 	digits[len(digits)-1] = 1
@@ -48,10 +49,10 @@ func TestArbitraryFloatHexfloatComponentsActualCopyTransport(t *testing.T) {
 	_, body := m.ToStringHexfloatComponentsInto(false, 0, &sig, 8, 40000, 0, text)
 	armed = false
 	s := &m.hexfloatComponents
-	if !errors.Is(body, Failure{Kind: FailureMemout}) || calls != 1 || !s.active || s.format != nil {
+	if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls != 1 || !s.active || s.format != nil {
 		t.Fatal("actual component COPY transport missing", body, calls)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &sig, &s.sig, &s.q.significand)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &sig, &s.sig, &s.q.significand)
 	if budget.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+text.StorageBytes() {
 		t.Fatal("component callback graph", budget.Used())
 	}

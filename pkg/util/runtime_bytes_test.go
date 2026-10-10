@@ -7,11 +7,12 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	uhash "github.com/glycerine/g3/pkg/util/hash"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestRuntimeBytesSourceLengthAndSignedTail(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	r, e := NewRuntime(RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -47,7 +48,7 @@ func TestRuntimeBytesSourceLengthAndSignedTail(t *testing.T) {
 }
 func TestRuntimeBytesReachedDescendingTailRead(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	r, e := NewRuntime(RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	if e != nil {
 		t.Fatal(e)
 	}

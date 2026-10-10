@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialExactDivIndependentProductAndScalar(t *testing.T) {
@@ -305,14 +306,14 @@ func TestPolynomialExactDivReverseDestructionRefusal(t *testing.T) {
 }
 func polynomialExactDivRefusal(t *testing.T, returnExpression bool) {
 	b := arena.NewBudget(1 << 24)
-	runtime, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 32})
+	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 32})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = runtime
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 32}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 32}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: runtime, Profile: util.SmallAllocatorProfile{PointerBits: 32}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: runtime, Profile: umemory.SmallAllocatorProfile{PointerBits: 32}})
 	serviceMust(t, e)
 	serviceMust(t, mm.IncManagerRef())
 	m, e := NewMultivariatePolynomialCore(MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})

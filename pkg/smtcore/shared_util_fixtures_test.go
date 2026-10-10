@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -114,7 +115,7 @@ type paramsPhysicalValueOwner struct {
 
 // Cold graph uses the actual named owners and their typed backing capacities.
 // Source allocation counters remain separate from this physical Go charge.
-func paramsDecAuditColdGraph(t *testing.T, q *util.RationalService, m *polynomial.UPolynomialManager, r *util.Runtime, bn *arena.Budget, c *util.ParamsContext, bc *arena.Budget, sy *usymbol.Manager, bs *arena.Budget) {
+func paramsDecAuditColdGraph(t *testing.T, q *util.RationalService, m *polynomial.UPolynomialManager, r *umemory.Runtime, bn *arena.Budget, c *util.ParamsContext, bc *arena.Budget, sy *usymbol.Manager, bs *arena.Budget) {
 	t.Helper()
 	qv := reflect.ValueOf(q).Elem()
 	qm := testFieldBySourceName(qv, "manager").Elem()
@@ -158,7 +159,7 @@ func paramsDecAuditColdGraph(t *testing.T, q *util.RationalService, m *polynomia
 
 // Public reallocs reach the source LP64 signed-overflow guarded domain. They
 // do not simulate OOM, mutate private counters, or inject a deallocation error.
-func paramsDecTLSNearMinimum(t *testing.T, r *util.Runtime) {
+func paramsDecTLSNearMinimum(t *testing.T, r *umemory.Runtime) {
 	t.Helper()
 	a, e := r.Allocate(8)
 	paramsMust(t, e)
@@ -234,4 +235,4 @@ func symbolText(t *testing.T, m *usymbol.Manager, s usymbol.Symbol) string {
 	return v
 }
 
-var _ util.ConstructionFailure = (*util.RationalService)(nil)
+var _ umemory.ConstructionFailure = (*util.RationalService)(nil)

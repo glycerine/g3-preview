@@ -2,6 +2,7 @@
 package util
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"reflect"
 )
 
@@ -13,7 +14,7 @@ type arbitraryFloatRationalConversionHistory struct {
 	next                             *arbitraryFloatRationalConversionHistory
 	invocation, header               uint64
 	sourceCell, outputCell           SourceCellBacking
-	sourcePending, outputPending     Block
+	sourcePending, outputPending     umemory.Block
 	copy                             ArbitraryFloatValueCopyReceipt
 	gcd, division, extended          integerRawInvocationReceipt
 	bodyCause, sourceCause, ownCause error
@@ -25,7 +26,7 @@ func (c integerAllocationInvocationContext) prepareConversionHistory(z *IntegerM
 	}
 	s := c.conversionFrame(z, true)
 	if s == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.history != nil {
 		return nil
@@ -53,16 +54,16 @@ func (s *arbitraryFloatRationalConversionScope) recordHistory() {
 	if h.self != h || h.manager != s.manager || h.invocation != s.invocation {
 		return
 	}
-	if h.sourceCell.Object == (ObjectRef{}) {
+	if h.sourceCell.Object == (umemory.ObjectRef{}) {
 		h.sourceCell = s.originalCell
 	}
-	if h.outputCell.Object == (ObjectRef{}) {
+	if h.outputCell.Object == (umemory.ObjectRef{}) {
 		h.outputCell = s.outputAllocation.originalCell
 	}
-	if h.sourcePending == (Block{}) {
+	if h.sourcePending == (umemory.Block{}) {
 		h.sourcePending = s.originalPending
 	}
-	if h.outputPending == (Block{}) {
+	if h.outputPending == (umemory.Block{}) {
 		h.outputPending = s.outputAllocation.originalPending
 	}
 	h.bodyCause = s.bodyCause

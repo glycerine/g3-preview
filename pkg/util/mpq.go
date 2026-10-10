@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrUninitializedRational = errors.New("mpnum: rational has zero denominator; use NewRational")
@@ -75,7 +76,7 @@ func (m *RationalManager) Integers() *IntegerManager { return m.Z }
 // checkOwnerReady guards the cold owner without reading either numeral field.
 func (m *RationalManager) checkOwnerReady() error {
 	if m == nil || m.self != m || m.Z == nil || m.Z.self != m.Z {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.closed || m.Closing || m.SourceFinalizing || m.SourceFinalized || m.Z.closed || m.Z.SourceFinalizing || m.Z.constructionFailed {
 		return arena.ErrClosed
@@ -314,7 +315,7 @@ func (m *RationalManager) setPartsFromIntegerOwnerWithAllocationContext(a *Ratio
 		return e
 	}
 	if sourceOwner == nil || sourceOwner.self != sourceOwner {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := sourceOwner.check(d); e != nil {
 		return e

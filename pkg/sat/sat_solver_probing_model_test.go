@@ -8,17 +8,18 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func satProbingAudit(t *testing.T, s *satSolverProbing, analysis *satSolverConflictAnalysis, d *satSolverDynamicSubsumption, external ...util.Block) {
+func satProbingAudit(t *testing.T, s *satSolverProbing, analysis *satSolverConflictAnalysis, d *satSolverDynamicSubsumption, external ...umemory.Block) {
 	t.Helper()
 	p := s.propagation()
 	v := p.variables
 	l := s.lifecycle
-	roots := append([]util.Block(nil), external...)
+	roots := append([]umemory.Block(nil), external...)
 	satScalarAuditRoots(t, v, roots...)
 	// Exact named physical graph, once-only Runtime and all genuine cold backing.
 	want := s.ownerBytes
@@ -58,7 +59,7 @@ func satProbingExpectedRefusal(t *testing.T, p *satSolverPropagationState, e err
 	if errors.Is(e, arena.ErrInjectedFailure) {
 		return
 	}
-	var failure util.Failure
+	var failure umemory.Failure
 	if errors.As(e, &failure) && failure.ErrorCode() == 101 && p.memory.State().OutOfMemory {
 		return
 	}

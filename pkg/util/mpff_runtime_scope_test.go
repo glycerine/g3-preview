@@ -6,9 +6,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func fastRuntimeConfig(b *arena.Budget, r *Runtime, p uint32) FastFloatConfig {
+func fastRuntimeConfig(b *arena.Budget, r *umemory.Runtime, p uint32) FastFloatConfig {
 	c := DefaultFastFloatConfig(serviceConfig(b).Integers.Words)
 	c.PrecisionWords, c.InitialCapacity, c.Memory = p, 2, r
 	return c
@@ -16,7 +17,7 @@ func fastRuntimeConfig(b *arena.Budget, r *Runtime, p uint32) FastFloatConfig {
 
 func TestFastFloatBorrowedRuntimeIdentityAndGuards(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	before := b.Used()
 	c := fastRuntimeConfig(b, r, 2)
@@ -29,7 +30,7 @@ func TestFastFloatBorrowedRuntimeIdentityAndGuards(t *testing.T) {
 	copied := *r
 	c = fastRuntimeConfig(b, &copied, 2)
 	b.FailAfter(0)
-	if m, e := NewFastFloatManager(c); m != nil || e != ErrRuntimeOwner || b.Used() != before {
+	if m, e := NewFastFloatManager(c); m != nil || e != umemory.ErrRuntimeOwner || b.Used() != before {
 		t.Fatal("copied runtime before header", m, e, b.Used())
 	}
 	b.FailAfter(-1)
@@ -93,7 +94,7 @@ func TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes(t *testing.T) {
 	success := false
 	for fault := int64(0); fault < 100; fault++ {
 		b := arena.NewBudget(1 << 28)
-		r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32, ThreadLocal: true})
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 32, ThreadLocal: true})
 		serviceMust(t, e)
 		baseline := b.Used()
 		state := r.State()
@@ -127,12 +128,12 @@ func TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes(t *testing.T) {
 
 // Independent whole shared graph, including caller raw blocks and every actual
 // borrowed owner. No budget-to-malloc substitution and no inferred orphan root.
-func fastSharedRuntimeAudit(t *testing.T, r *Runtime, owners []*FastFloatManager, caller ...Block) {
+func fastSharedRuntimeAudit(t *testing.T, r *umemory.Runtime, owners []*FastFloatManager, caller ...umemory.Block) {
 	t.Helper()
-	roots := map[Block]bool{}
+	roots := map[umemory.Block]bool{}
 	var physical, initialization uint64
-	add := func(v Block) {
-		if v == (Block{}) {
+	add := func(v umemory.Block) {
+		if v == (umemory.Block{}) {
 			return
 		}
 		if roots[v] {
@@ -168,7 +169,7 @@ func TestFastFloatSharedRuntimeProfileAndClose(t *testing.T) {
 	for _, bits := range []uint8{32, 64} {
 		for _, tls := range []bool{false, true} {
 			b := arena.NewBudget(1 << 28)
-			r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: bits, ThreadLocal: tls})
+			r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: bits, ThreadLocal: tls})
 			serviceMust(t, e)
 			first, e := NewFastFloatManager(fastRuntimeConfig(b, r, 96))
 			serviceMust(t, e)
@@ -247,7 +248,7 @@ func TestFastFloatSharedRuntimeProfileAndClose(t *testing.T) {
 
 func TestFastFloatBorrowedRuntimeInlineWarmScope(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 32, ThreadLocal: true})
 	serviceMust(t, e)
 	m, e := NewFastFloatManager(fastRuntimeConfig(b, r, 2))
 	serviceMust(t, e)

@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialNormalizeIndependentSignedIntegerContent(t *testing.T) {
@@ -108,7 +109,7 @@ func TestPolynomialNormalizeBigDescriptorRefusalAndReplacement(t *testing.T) {
 	for _, replacement := range []bool{false, true} {
 		t.Run(fmt.Sprint(replacement), func(t *testing.T) {
 			budget := arena.NewBudget(1 << 24)
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 9, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 9, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 			serviceMust(t, e)
 			t.Cleanup(func() {
 				q.Close()
@@ -124,7 +125,7 @@ func TestPolynomialNormalizeBigDescriptorRefusalAndReplacement(t *testing.T) {
 			serviceMust(t, e)
 			p = polynomialCaller(t, c, p)
 			_, e = full.Normalize(p)
-			if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (util.ObjectRef{}) {
+			if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) {
 				t.Fatal("actual GCD Copy physical allocation before descriptor refusal", e, q.Integers().PendingCell)
 			}
 			old := q.Integers().PendingCell
@@ -133,7 +134,7 @@ func TestPolynomialNormalizeBigDescriptorRefusalAndReplacement(t *testing.T) {
 			if replacement {
 				serviceMust(t, q.Integers().CleanupPendingAllocation())
 				e = q.Integers().Copy(&foreign, &q.Integers().Two64)
-				if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (util.ObjectRef{}) {
+				if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) {
 					t.Fatal("actual foreign replacement", e, q.Integers().PendingCell)
 				}
 				if q.Integers().PendingCell.Object == old.Object {
@@ -149,7 +150,7 @@ func TestPolynomialNormalizeBigDescriptorRefusalAndReplacement(t *testing.T) {
 				}
 				serviceMust(t, q.Integers().CleanupPendingAllocation())
 				serviceMust(t, q.Integers().Del(&foreign))
-			} else if q.Integers().PendingCell.Object != (util.ObjectRef{}) {
+			} else if q.Integers().PendingCell.Object != (umemory.ObjectRef{}) {
 				t.Fatal("Normalize did not drain actual invocation-owned pending allocation", q.Integers().PendingCell)
 			}
 			polynomialImpPhysicalAuditValues(t, full, []Polynomial{p})

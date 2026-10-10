@@ -4,17 +4,18 @@ package util
 import (
 	"github.com/glycerine/g3/pkg/arena"
 	uhash "github.com/glycerine/g3/pkg/util/hash"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Concrete call-local readers own no storage. The inline variant addresses the
 // real source cold m_0 word and its checked initialized-byte mask.
 
 type runtimeHashSource struct {
-	runtime         *Runtime
+	runtime         *umemory.Runtime
 	region          *arena.BytesRegion
 	regionRef       arena.BytesRegionRef
 	regionMode      bool
-	block           Block
+	block           umemory.Block
 	offset, extent  uint64
 	bounded, inline bool
 	word            *uint32
@@ -27,10 +28,10 @@ func (s runtimeHashSource) byteAt(i uint64) (byte, error) {
 	}
 	if s.inline {
 		if s.word == nil || s.mask == nil {
-			return 0, ErrRuntimeOwner
+			return 0, umemory.ErrRuntimeOwner
 		}
 		if *s.mask&(1<<i) == 0 {
-			return 0, ErrRuntimeUninitialized
+			return 0, umemory.ErrRuntimeUninitialized
 		}
 		return byte(*s.word >> (8 * i)), nil
 	}
@@ -52,10 +53,10 @@ func (s runtimeHashSource) wordAt(i uint64) (uint32, error) {
 	}
 	if s.inline {
 		if s.word == nil || s.mask == nil {
-			return 0, ErrRuntimeOwner
+			return 0, umemory.ErrRuntimeOwner
 		}
 		if *s.mask != 0xF {
-			return 0, ErrRuntimeUninitialized
+			return 0, umemory.ErrRuntimeUninitialized
 		}
 		return *s.word, nil
 	}
@@ -72,7 +73,7 @@ func (s runtimeHashSource) wordAt(i uint64) (uint32, error) {
 	}
 	return s.runtime.ReadUint32(s.block, s.offset+i)
 }
-func RuntimeBytesBounded(r *Runtime, block Block, offset, extent uint64, n, seed uint32) (uint32, error) {
+func RuntimeBytesBounded(r *umemory.Runtime, block umemory.Block, offset, extent uint64, n, seed uint32) (uint32, error) {
 	return runtimeHashBytes(runtimeHashSource{runtime: r, block: block, offset: offset, extent: extent, bounded: true}, n, seed)
 }
 func InlineWordBytes(word *uint32, initialized *uint8, extent uint64, n, seed uint32) (uint32, error) {

@@ -4,13 +4,14 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
 type decimalStopAtQuestionMark struct {
 	inner   *OwnedStringStream
-	runtime *Runtime
-	lane    *Block
+	runtime *umemory.Runtime
+	lane    *umemory.Block
 	t       *testing.T
 	armed   bool
 }
@@ -35,9 +36,9 @@ func (s *decimalStopAtQuestionMark) AppendCString(v string) error {
 
 func TestRationalDecimalStreamReachedEndLabelSourceStop(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	a := Rational{Num: NewInt(1), Den: NewInt(1)}
 	serviceMust(t, m.integer.Mul2kInPlace(&a.Den, 4000))
@@ -67,7 +68,7 @@ func TestRationalDecimalStreamReachedEndLabelSourceStop(t *testing.T) {
 	if r.State() != before || b.Used() != used || s.values != values || m.rational.SourceFinalized {
 		t.Fatal("source stop changed unread older owner")
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &a.Num, &a.Den, &s.values[0], &s.values[1], &s.values[2], &s.values[3])
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{lane}, &a.Num, &a.Den, &s.values[0], &s.values[1], &s.values[2], &s.values[3])
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+out.Buffer.String.StorageBytes() {
 		t.Fatal("immediate decimal end-label graph", b.Used())
 	}
@@ -86,9 +87,9 @@ func TestRationalDecimalStreamReachedEndLabelSourceStop(t *testing.T) {
 	contextTLSFinish(t, r, func() error { return m.integer.CleanupRawNumeral(&a.Num) })
 	contextTLSFinish(t, r, func() error { return m.integer.CleanupRawNumeral(&a.Den) })
 	contextTLSFinish(t, r, m.Close)
-	for _, v := range []*Block{&lane, &recovery} {
+	for _, v := range []*umemory.Block{&lane, &recovery} {
 		contextTLSFinish(t, r, func() error {
-			if *v == (Block{}) {
+			if *v == (umemory.Block{}) {
 				return nil
 			}
 			return r.Deallocate(v)

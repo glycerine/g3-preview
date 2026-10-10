@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -15,11 +16,11 @@ import (
 // AddMul end DEL. It is a guarded owner-primitive profile, not ordinary OOM.
 func TestUPolynomialMignotteActualAddMulEndStopsOlderNUM(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -39,7 +40,7 @@ func TestUPolynomialMignotteActualAddMulEndStopsOlderNUM(t *testing.T) {
 		contextTLSFinish(t, rt, u.Close)
 		contextTLSFinish(t, rt, q.CloseChecked)
 		e = rt.Deallocate(&recovery)
-		if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+		if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 			t.Fatal(e)
 		}
 		contextTLSFinish(t, rt, rt.Close)
@@ -83,9 +84,9 @@ func TestUPolynomialMignotteActualAddMulEndStopsOlderNUM(t *testing.T) {
 	if s.mignotteInvocationSourceCause(&r) == nil || !errors.Is(stop, body) {
 		t.Fatal("owning erased source cause")
 	}
-	mignotteScopePhysicalAuditExtra(t, q, s, []util.Block{recovery}, &a, &warm)
+	mignotteScopePhysicalAuditExtra(t, q, s, []umemory.Block{recovery}, &a, &warm)
 	e = rt.Deallocate(&recovery)
-	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal(e)
 	}
 }

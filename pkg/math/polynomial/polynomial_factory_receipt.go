@@ -2,7 +2,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // The actual core owns the unjoined placement/result. A receipt names this
@@ -15,9 +15,9 @@ type polynomialFactoryScope struct {
 	executing         bool
 	allocationStarted bool
 	allocationCause   error
-	allocation        util.SmallAllocatorAllocationOutcome
+	allocation        umemory.SmallAllocatorAllocationOutcome
 	result            Polynomial
-	allocator         [3]util.Block
+	allocator         [3]umemory.Block
 }
 type polynomialFactoryInvocationReceipt struct {
 	manager    *MultivariatePolynomialCore
@@ -31,7 +31,7 @@ func (m *MultivariatePolynomialCore) matchesFactoryInvocation(r *polynomialFacto
 
 // The actual constructor passes its embedded outcome directly to the malloc
 // engine. A copied owner/frame or a callback cannot acquire its authority.
-func (m *MultivariatePolynomialCore) factoryAllocationOutcome(r *polynomialFactoryInvocationReceipt) *util.SmallAllocatorAllocationOutcome {
+func (m *MultivariatePolynomialCore) factoryAllocationOutcome(r *polynomialFactoryInvocationReceipt) *umemory.SmallAllocatorAllocationOutcome {
 	if !m.matchesFactoryInvocation(r) || !r.frame.executing || m.callbackDepth != 0 || m.pending.generation != r.invocation || m.monomials == nil || m.monomials.self != m.monomials {
 		return nil
 	}
@@ -82,7 +82,7 @@ func (m *MultivariatePolynomialCore) transferFactoryResult(r *polynomialFactoryI
 			return e
 		}
 	}
-	if s.allocator == ([3]util.Block{}) {
+	if s.allocator == ([3]umemory.Block{}) {
 		s.active = false
 	}
 	return nil
@@ -116,7 +116,7 @@ func (m *MultivariatePolynomialCore) cleanupFactoryInvocation(r *polynomialFacto
 	}
 	owned, foreign := false, false
 	for i := range roots {
-		if roots[i] != (util.Block{}) {
+		if roots[i] != (umemory.Block{}) {
 			if roots[i] == s.allocator[i] {
 				owned = true
 			} else {
@@ -136,18 +136,18 @@ func (m *MultivariatePolynomialCore) cleanupFactoryInvocation(r *polynomialFacto
 		// Observation acknowledges only consumption of the captured token. It
 		// never assigns a later allocator root to this older invocation.
 		for i, token := range s.allocator {
-			if token != (util.Block{}) && now[i] != token {
-				s.allocator[i] = util.Block{}
+			if token != (umemory.Block{}) && now[i] != token {
+				s.allocator[i] = umemory.Block{}
 			}
 		}
-		if s.allocation.Pending != (util.Block{}) && now[0] != s.allocation.Pending {
-			s.allocation.Pending = util.Block{}
+		if s.allocation.Pending != (umemory.Block{}) && now[0] != s.allocation.Pending {
+			s.allocation.Pending = umemory.Block{}
 		}
 		if e != nil {
 			return e
 		}
 	} else {
-		s.allocator = [3]util.Block{}
+		s.allocator = [3]umemory.Block{}
 	}
 	*s = polynomialFactoryScope{invocation: s.invocation, allocation: s.allocation, allocationStarted: s.allocationStarted, allocationCause: s.allocationCause}
 	return nil

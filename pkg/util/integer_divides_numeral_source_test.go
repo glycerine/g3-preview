@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type integerDividesReentryFixture struct {
@@ -19,7 +20,7 @@ type integerDividesReentryFixture struct {
 
 var integerDividesReentryCurrent *integerDividesReentryFixture
 
-func integerDividesReentryTransport(f Failure) error {
+func integerDividesReentryTransport(f umemory.Failure) error {
 	s := integerDividesReentryCurrent
 	if s != nil && !s.called {
 		s.called = true
@@ -38,11 +39,11 @@ func integerDividesReentryTransport(f Failure) error {
 func TestIntegerDividesScopedNUMExecutingOwnerRefusal(t *testing.T) {
 	for _, finalize := range []bool{true, false} {
 		budget := arena.NewBudget(1 << 24)
-		rt, e := NewRuntime(RuntimeConfig{Budget: budget, Transport: integerDividesReentryTransport})
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, Transport: integerDividesReentryTransport})
 		serviceMust(t, e)
 		cfg := serviceConfig(budget).Integers
 		cfg.Memory = rt
-		cfg.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		m, e := NewIntegerManager(cfg)
 		serviceMust(t, e)
 		var a, b Int
@@ -124,7 +125,7 @@ func TestIntegerDividesScopedNUMCopiedAndRetargetedContextsRefuse(t *testing.T) 
 // Actual signed-host TLS guard domain, not ordinary mathematical exhaustion.
 func TestIntegerDividesScopedNUMSourceDTAndImmutableHistory(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
@@ -155,7 +156,7 @@ func TestIntegerDividesScopedNUMSourceDTAndImmutableHistory(t *testing.T) {
 		t.Fatal("literal completed Rem then scoped NUM DT stop", result, returned, s.BodyCause, s.sourceCause, "num", s.Ended, s.Numeral)
 	}
 	captured, source := returned.Error(), s.sourceCause
-	integerPhysicalAuditWithRaw(t, m, []Block{lane}, &a, &d, &s.Numeral)
+	integerPhysicalAuditWithRaw(t, m, []umemory.Block{lane}, &a, &d, &s.Numeral)
 	if b.Used() != integerActualOwnedBytes(m) {
 		t.Fatal("immediate named cold graph", b.Used(), integerActualOwnedBytes(m))
 	}
@@ -183,7 +184,7 @@ func TestIntegerDividesScopedNUMSourceDTAndImmutableHistory(t *testing.T) {
 	serviceMust(t, rt.Deallocate(&lane))
 	serviceMust(t, m.CloseChecked())
 	e = rt.Deallocate(&recovery)
-	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (Block{})) {
+	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal("recovery consumed outcome", e)
 	}
 	contextTLSFinish(t, rt, rt.Close)

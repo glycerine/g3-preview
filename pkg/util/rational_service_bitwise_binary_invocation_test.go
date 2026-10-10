@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math/big"
 	"testing"
 )
@@ -44,11 +45,11 @@ func TestRationalServiceBinaryBitwiseEveryActualReservation(t *testing.T) {
 			complete, sawBody := false, false
 			for ordinal := int64(0); ordinal < 512 && !complete; ordinal++ {
 				budget := arena.NewBudget(1 << 27)
-				rt, e := NewRuntime(RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error { return f }})
+				rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error { return f }})
 				serviceMust(t, e)
 				cfg := serviceConfig(budget)
 				cfg.Integers.Memory = rt
-				cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+				cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 				s, e := NewRationalService(cfg)
 				serviceMust(t, e)
 				a, b := serviceValue(t, s, tc.a), serviceValue(t, s, tc.b)
@@ -176,7 +177,7 @@ func TestRationalServiceBinaryBitwiseExecutingRawGuard(t *testing.T) {
 		var s *RationalService
 		var call RationalServiceInvocation
 		active, calls := false, 0
-		rt, e := NewRuntime(RuntimeConfig{Budget: budget, ThreadLocal: false, SizeTBits: 64, Transport: func(f Failure) error {
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: false, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 			if active {
 				calls++
 				z := s.Manager.Z
@@ -211,7 +212,7 @@ func TestRationalServiceBinaryBitwiseExecutingRawGuard(t *testing.T) {
 		serviceMust(t, e)
 		cfg := serviceConfig(budget)
 		cfg.Integers.Memory = rt
-		cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		s, e = NewRationalService(cfg)
 		serviceMust(t, e)
 		text := new(big.Int).Add(new(big.Int).Lsh(big.NewInt(1), 4096), big.NewInt(7)).String()

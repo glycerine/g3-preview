@@ -1,6 +1,8 @@
 // Source: src/util/rational.h; src/util/mpz.h:allocate.
 package util
 
+import umemory "github.com/glycerine/g3/pkg/util/memory"
+
 func (c *RationalServiceInvocation) allocationContext() integerAllocationInvocationContext {
 	if c == nil {
 		return integerAllocationInvocationContext{}
@@ -14,24 +16,24 @@ func (c integerAllocationInvocationContext) rationalServiceFrame(z *IntegerManag
 	}
 	return s
 }
-func (z *IntegerManager) captureRationalServiceAllocationOutcome(c integerAllocationInvocationContext, backing SourceCellBacking, out *SmallAllocatorAllocationOutcome) error {
+func (z *IntegerManager) captureRationalServiceAllocationOutcome(c integerAllocationInvocationContext, backing SourceCellBacking, out *umemory.SmallAllocatorAllocationOutcome) error {
 	s := c.rationalServiceFrame(z)
 	if s == nil || c.raw != nil {
 		return nil
 	}
-	if backing.Object != (ObjectRef{}) {
+	if backing.Object != (umemory.ObjectRef{}) {
 		s.originalCell = backing
 		if z.PendingCell == backing {
 			z.PendingCell = SourceCellBacking{}
 		}
 	}
-	if out.Pending != (Block{}) {
+	if out.Pending != (umemory.Block{}) {
 		s.originalPending = out.Pending
 		if e := z.Allocator.TransferAllocationPending(out, &s.transferred); e != nil {
 			return e
 		}
 		if s.numeric.Allocator[0] == out.Pending {
-			s.numeric.Allocator[0] = Block{}
+			s.numeric.Allocator[0] = umemory.Block{}
 		}
 	}
 	return nil

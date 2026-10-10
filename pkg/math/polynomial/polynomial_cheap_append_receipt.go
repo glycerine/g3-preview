@@ -3,6 +3,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type polynomialCheapAppendScope struct {
@@ -169,7 +170,7 @@ func (b *polynomialSOM) acknowledgeFactoryAppendTransfer(invocation uint64) erro
 	if !s.active || s.factoryInvocation != invocation {
 		return nil
 	}
-	if !s.completedTransfer || s.foreignMixed || s.stopped || s.transferredCoefficients != s.coefficients || s.transferredMonomials != s.monomials || b.hasPendingReference || s.pending != (Monomial{}) || s.movingCoefficient.NativeCellToken() != 0 || s.numeric.PendingObject() != (util.ObjectRef{}) || s.numeric.PendingAllocatorBlocks() != ([3]util.Block{}) {
+	if !s.completedTransfer || s.foreignMixed || s.stopped || s.transferredCoefficients != s.coefficients || s.transferredMonomials != s.monomials || b.hasPendingReference || s.pending != (Monomial{}) || s.movingCoefficient.NativeCellToken() != 0 || s.numeric.PendingObject() != (umemory.ObjectRef{}) || s.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) {
 		return ErrPolynomialPending
 	}
 	as, e := b.as.size(b.owner)

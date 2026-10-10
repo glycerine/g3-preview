@@ -11,6 +11,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -67,7 +68,7 @@ func TestASTSMT2FloatRealLiteralActualCallbackRetainsParent(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	var m *ASTManager
 	active, calls := false, 0
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f util.Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			calls++
 			if e := m.Close(); !errors.Is(e, ErrASTPending) {
@@ -83,7 +84,7 @@ func TestASTSMT2FloatRealLiteralActualCallbackRetainsParent(t *testing.T) {
 		return f
 	}})
 	astTestMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	astTestMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)
@@ -119,7 +120,7 @@ func TestASTSMT2FloatRealLiteralActualCallbackRetainsParent(t *testing.T) {
 	if f.text != nil {
 		texts = append(texts, f.text)
 	}
-	astFloatingPointRawGraphSourceOwners(t, q, p, []util.Block{padding}, texts, nil)
+	astFloatingPointRawGraphSourceOwners(t, q, p, []umemory.Block{padding}, texts, nil)
 	if f.bodyCause == nil || p.header == 0 || f.self != f || f != &p.literalPrimary {
 		t.Fatal("actual stopped call history", f)
 	}

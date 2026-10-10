@@ -1,8 +1,12 @@
 // Source: src/util/mpz.cpp:283-303; src/util/mpz.h:692.
 package util
 
+import
+
 // Actual RAW ten/tmp fields and reached end DEL in the charged Integer owner.
 // Body failure omits DEL; owning cleanup never advances that source history.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type integerStringSetScope struct {
 	manager                                                   *IntegerManager
 	invocation                                                uint64
@@ -74,7 +78,7 @@ func (m *IntegerManager) stringSetSourceReady() error {
 // roots. It does not delete the borrowed destination or replay a skipped end label.
 func (m *IntegerManager) CleanupStringSet() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.stringSet
 	if s.executing || s.finishing || m.Memory != nil && m.Memory.FailureTransportActive() {

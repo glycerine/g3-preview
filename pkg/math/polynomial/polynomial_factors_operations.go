@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func (f *PolynomialFactors) invoke(body func() error) error {
@@ -244,7 +245,7 @@ func (f *PolynomialFactors) cleanupMultiply() error {
 	if e := f.numeric.cleanup(m.integer); e != nil {
 		return e
 	}
-	if f.monomialRaw != ([3]util.Block{}) {
+	if f.monomialRaw != ([3]umemory.Block{}) {
 		now, e := m.monomials.allocator.PendingRoots()
 		if e != nil {
 			return e
@@ -257,7 +258,7 @@ func (f *PolynomialFactors) cleanupMultiply() error {
 				return errors.Join(e, x)
 			}
 		} else {
-			f.monomialRaw = [3]util.Block{}
+			f.monomialRaw = [3]umemory.Block{}
 		}
 	}
 	f.multiplyActive = false

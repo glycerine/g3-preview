@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/control"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func satLemmaFixture(t *testing.T, n uint32) (*satSolverConflictAnalysis, *satSolverPropagationState, *satSolverVariableState, *arena.Budget) {
@@ -22,7 +23,7 @@ func satLemmaAudit(t *testing.T, s *satSolverConflictAnalysis) {
 	t.Helper()
 	p := s.propagation
 	v := p.variables
-	roots := []util.Block{}
+	roots := []umemory.Block{}
 	satScalarAuditRoots(t, v, roots...)
 	want := s.ownerBytes + uint64(reflect.TypeOf(satSolverPropagationState{}).Size()) + uint64(cap(p.diffLevels.data)) + v.Stats().TotalBytes
 	todo := v.elimTodo

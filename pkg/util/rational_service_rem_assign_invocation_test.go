@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math/big"
 	"testing"
 )
@@ -43,7 +44,7 @@ func TestRationalServiceRemAssignInvocationEveryActualReservation(t *testing.T) 
 	for ordinal := int64(0); ordinal < 256 && !complete; ordinal++ {
 		b := arena.NewBudget(1 << 27)
 		cfg := serviceConfig(b)
-		cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		s, e := NewRationalService(cfg)
 		serviceMust(t, e)
 		a := serviceValue(t, s, aText)

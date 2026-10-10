@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestBVRewriterOriginalRepeatAndZeroExtend(t *testing.T) {
@@ -124,8 +124,8 @@ func TestBVRewriterRepeatAndZeroExtendEveryColdReservation(t *testing.T) {
 				if body != nil {
 					failures++
 					if !errors.Is(body, arena.ErrInjectedFailure) {
-						var f util.Failure
-						if !errors.As(body, &f) || f.Kind != util.FailureMemout {
+						var f umemory.Failure
+						if !errors.As(body, &f) || f.Kind != umemory.FailureMemout {
 							t.Fatal("unexpected refusal", body)
 						}
 					}

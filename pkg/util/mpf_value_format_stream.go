@@ -2,8 +2,12 @@
 // rational display
 package util
 
+import
+
 // ArbitraryFloatFormatStream borrows the reached default-profile stringstream.
 // Each call is one source insertion. Source and owning ends remain distinct.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type ArbitraryFloatFormatStream interface {
 	RationalSourceStream
 	AppendInt64(int64) error
@@ -37,13 +41,13 @@ func BorrowArbitraryFloatFormattedCString(v ArbitraryFloatFormatCString) Arbitra
 }
 func (v ArbitraryFloatFormattedCString) Byte(i uint64) (byte, error) {
 	if v.view == nil {
-		return 0, ErrRuntimeOwner
+		return 0, umemory.ErrRuntimeOwner
 	}
 	return v.view.Byte(i)
 }
 func (v ArbitraryFloatFormattedCString) Length() (uint64, error) {
 	if v.view == nil {
-		return 0, ErrRuntimeOwner
+		return 0, umemory.ErrRuntimeOwner
 	}
 	return v.view.Length()
 }

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialEvalSignIntEveryActualReservationPrefix(t *testing.T) {
@@ -41,7 +42,7 @@ func TestUPolynomialEvalSignIntEveryActualReservationPrefix(t *testing.T) {
 			if want := baseline + integerActualOwnedBytes(z) + p.integerEvaluationHistoryBytes; z.Budget().Used() != want {
 				t.Fatal("before-lift cold graph", z.Budget().Used(), want)
 			}
-			if q.numeric.Cell.Object != (util.ObjectRef{}) || polynomialNegNumericPending(&q.numeric) {
+			if q.numeric.Cell.Object != (umemory.ObjectRef{}) || polynomialNegNumericPending(&q.numeric) {
 				acquired = true
 			}
 			if q.history != nil {

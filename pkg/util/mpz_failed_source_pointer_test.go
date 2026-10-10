@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerSourceFailureTwoChargedSentinels(t *testing.T) {
@@ -105,7 +106,7 @@ func TestIntegerSourceFailureSentinelPreparationPrefixes(t *testing.T) {
 				break
 			}
 			failures++
-			var owner ConstructionFailure
+			var owner umemory.ConstructionFailure
 			if errors.As(e, &owner) {
 				z, ok := owner.(*IntegerManager)
 				if !ok || z.originalCause == nil {
@@ -147,13 +148,13 @@ func TestIntegerSourceFailureSentinelPreparationPrefixes(t *testing.T) {
 // source allocation completes before its ordinary descriptor is refused.
 func TestIntegerSourceSentinelSlotLimitReachedAllocation(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewIntegerManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 2, SlotLimit: 7}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{Budget: b, PageSize: 2}}})
+	m, e := NewIntegerManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 2, SlotLimit: 7}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{Budget: b, PageSize: 2}}})
 	if m != nil || !errors.Is(e, arena.ErrSlotLimit) {
 		t.Fatal("actual reached ordinary descriptor refusal", m, e)
 	}
-	var owner ConstructionFailure
+	var owner umemory.ConstructionFailure
 	if !errors.As(e, &owner) {
 		t.Fatal("physical allocation retained in charged owner", e)
 	}
@@ -164,16 +165,16 @@ func TestIntegerSourceSentinelSlotLimitReachedAllocation(t *testing.T) {
 	cs := z.Cells.Stats()
 	count, cause := r.AllocationCount()
 	serviceMust(t, cause)
-	if cs.Slots != 7 || cs.Retired != 2 || cs.Live != 5 || count != 6 || r.Stats().LiveBlocks != 6 || r.Stats().PhysicalBytes != 240 || z.Two64.Cell != 0 || z.PendingCell.Object == (ObjectRef{}) {
+	if cs.Slots != 7 || cs.Retired != 2 || cs.Live != 5 || count != 6 || r.Stats().LiveBlocks != 6 || r.Stats().PhysicalBytes != 240 || z.Two64.Cell != 0 || z.PendingCell.Object == (umemory.ObjectRef{}) {
 		t.Fatal("two metadata plus five published and sixth physical cell", cs, count, r.Stats(), z.PendingCell)
 	}
-	actual := map[Block]bool{}
+	actual := map[umemory.Block]bool{}
 	for _, ref := range []NumericCellRef{z.Tmp[0], z.Arg[0], z.Tmp[1], z.Arg[1], z.IntMin.Cell} {
 		if !ValidNumericRef(z.Cells, ref) {
 			t.Fatal("actual constructor private field", ref)
 		}
 		c := z.Cell(ref)
-		if c.Backing.Raw == (Block{}) || actual[c.Backing.Raw] {
+		if c.Backing.Raw == (umemory.Block{}) || actual[c.Backing.Raw] {
 			t.Fatal("distinct real raw field", c)
 		}
 		actual[c.Backing.Raw] = true

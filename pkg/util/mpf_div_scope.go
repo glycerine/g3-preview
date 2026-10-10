@@ -1,6 +1,8 @@
 // Source: src/util/mpf.cpp:716-744 (a, b, sticky_rem and Round lifetimes).
 package util
 
+import umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type arbitraryFloatDivScope struct {
 	manager                        *ArbitraryFloatManager
 	invocation                     uint64
@@ -63,7 +65,7 @@ func (s *arbitraryFloatDivScope) unbind() error {
 }
 func (m *ArbitraryFloatManager) finishDivSource() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.div
 	if s.executing || s.finishing {
@@ -79,7 +81,7 @@ func (m *ArbitraryFloatManager) finishDivSource() error {
 	defer func() { s.finishing = false }()
 	if s.roundFrame != nil {
 		if s.roundFrame != &m.RoundScope || s.roundInvocation != m.RoundScope.Invocation {
-			return ErrRuntimeOwner
+			return umemory.ErrRuntimeOwner
 		}
 		if s.roundFrame.sourceCause != nil {
 			s.sourceCause = s.roundFrame.sourceCause
@@ -106,7 +108,7 @@ func (m *ArbitraryFloatManager) finishDivSource() error {
 
 func (m *ArbitraryFloatManager) CleanupDiv() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.div
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {
@@ -116,7 +118,7 @@ func (m *ArbitraryFloatManager) CleanupDiv() (cause error) {
 		return nil
 	}
 	if !s.valid() {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := s.bind(); e != nil {
 		return e
@@ -126,7 +128,7 @@ func (m *ArbitraryFloatManager) CleanupDiv() (cause error) {
 	z := m.integer
 	if s.roundFrame != nil {
 		if s.roundFrame != &m.RoundScope || s.roundInvocation != m.RoundScope.Invocation {
-			return ErrRuntimeOwner
+			return umemory.ErrRuntimeOwner
 		}
 		if e := m.CleanupRound(); e != nil {
 			return e
@@ -168,7 +170,7 @@ func (m *ArbitraryFloatManager) CleanupDiv() (cause error) {
 // invocations for which no history receipt is materialized.
 func (s *arbitraryFloatDivScope) enterArbitraryFloatRound(m *ArbitraryFloatManager, frame *ArbitraryFloatRoundScope) error {
 	if !s.NumericBound(true) || m != s.manager || frame != &m.RoundScope || !frame.active || !frame.executing {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s.roundFrame = frame
 	s.roundInvocation = frame.Invocation

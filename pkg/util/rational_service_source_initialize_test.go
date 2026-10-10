@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestRationalServicePreparedSourcePublicationAndConstants(t *testing.T) {
@@ -54,7 +55,7 @@ func TestRationalServicePreparedEveryActualManagerConstructorRefusal(t *testing.
 	successOrdinal := int64(-1)
 	for ordinal := int64(0); ordinal < 128; ordinal++ {
 		b := arena.NewBudget(1 << 24)
-		r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -72,8 +73,8 @@ func TestRationalServicePreparedEveryActualManagerConstructorRefusal(t *testing.
 				t.Fatal("success unpublished manager")
 			}
 		} else {
-			var mf Failure
-			if !errors.Is(e, arena.ErrInjectedFailure) && !(errors.As(e, &mf) && mf.Kind == FailureMemout && mf.ErrorCode() == 101 && r.State().OutOfMemory) {
+			var mf umemory.Failure
+			if !errors.Is(e, arena.ErrInjectedFailure) && !(errors.As(e, &mf) && mf.Kind == umemory.FailureMemout && mf.ErrorCode() == 101 && r.State().OutOfMemory) {
 				t.Fatal(ordinal, e)
 			}
 			if s.Manager != nil {
@@ -155,7 +156,7 @@ func TestRationalServicePreparedColdAbortAndOwnerGuards(t *testing.T) {
 
 // Every byte below belongs to named concrete owners. Runtime provider storage
 // is added once; failed constructor metadata is not a published source manager.
-func sourcePreparedGraph(t *testing.T, s *RationalService, r *Runtime) {
+func sourcePreparedGraph(t *testing.T, s *RationalService, r *umemory.Runtime) {
 	t.Helper()
 	want := s.HeaderBytes + r.Stats().TotalBytes
 	var z *IntegerManager
@@ -228,11 +229,11 @@ func sourcePreparedEarlyIntegerPhysical(t *testing.T, m *IntegerManager) {
 			t.Fatal("unnamed constructor descriptors", len(cells), m.Cells.Stats().Live)
 		}
 	}
-	objects := map[ObjectRef]bool{}
-	closedRaw := map[Block]bool{}
+	objects := map[umemory.ObjectRef]bool{}
+	closedRaw := map[umemory.Block]bool{}
 	checkRetainedRaw := func(c SourceCellBacking) {
 		n, e := m.Memory.Size(c.Raw)
-		if e != nil || c.Raw == (Block{}) || c.Offset > n || c.extent > n-c.Offset {
+		if e != nil || c.Raw == (umemory.Block{}) || c.Offset > n || c.extent > n-c.Offset {
 			t.Fatal("invalid retained constructor raw", c, e)
 		}
 		if closedRaw[c.Raw] {
@@ -264,7 +265,7 @@ func sourcePreparedEarlyIntegerPhysical(t *testing.T, m *IntegerManager) {
 			t.Fatal("actual constructor object", ref, o, e)
 		}
 	}
-	if m.PendingCell.Object != (ObjectRef{}) {
+	if m.PendingCell.Object != (umemory.ObjectRef{}) {
 		if objects[m.PendingCell.Object] {
 			t.Fatal("duplicate pending constructor object")
 		}

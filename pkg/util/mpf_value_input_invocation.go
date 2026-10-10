@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // The borrowed receipt names an actual allocation-call record. It contains no
@@ -21,9 +22,9 @@ type arbitraryFloatValueInputCall struct {
 	Issued              ArbitraryFloatValueInputReceipt
 	header              uint64
 	Numeric             NumericAllocationRoots
-	Transferred         SmallAllocatorPendingAllocation
+	Transferred         umemory.SmallAllocatorPendingAllocation
 	originalCell        SourceCellBacking
-	originalPending     Block
+	originalPending     umemory.Block
 	cellRetired         bool
 	executing, retired  bool
 	bodyCause, ownCause error
@@ -61,7 +62,7 @@ func (c integerAllocationInvocationContext) prepareInputAllocation(z *IntegerMan
 	}
 	a := c.inputBinding(z)
 	if a == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if a.record != nil {
 		return nil
@@ -93,25 +94,25 @@ func (c integerAllocationInvocationContext) inputRoots(z *IntegerManager) *Numer
 	}
 	return &q.Numeric
 }
-func (z *IntegerManager) captureInputAllocationOutcome(c integerAllocationInvocationContext, backing SourceCellBacking, out *SmallAllocatorAllocationOutcome) error {
+func (z *IntegerManager) captureInputAllocationOutcome(c integerAllocationInvocationContext, backing SourceCellBacking, out *umemory.SmallAllocatorAllocationOutcome) error {
 	a := c.inputBinding(z)
 	if a == nil || a.record == nil {
 		return nil
 	}
 	q := a.record
-	if backing.Object != (ObjectRef{}) {
+	if backing.Object != (umemory.ObjectRef{}) {
 		q.originalCell = backing
 		if z.PendingCell == backing {
 			z.PendingCell = SourceCellBacking{}
 		}
 	}
-	if out.Pending != (Block{}) {
+	if out.Pending != (umemory.Block{}) {
 		q.originalPending = out.Pending
 		if e := z.Allocator.TransferAllocationPending(out, &q.Transferred); e != nil {
 			return e
 		}
 		if q.Numeric.Allocator[0] == out.Pending {
-			q.Numeric.Allocator[0] = Block{}
+			q.Numeric.Allocator[0] = umemory.Block{}
 		}
 	}
 	return nil
@@ -121,30 +122,30 @@ func (m *ArbitraryFloatManager) finishValueInput(cause error) {
 	if q := a.record; q != nil {
 		q.executing = false
 		q.bodyCause = cause
-		q.retired = !NumericAllocationPending(&q.Numeric) && q.Transferred.Block() == (Block{})
+		q.retired = !NumericAllocationPending(&q.Numeric) && q.Transferred.Block() == (umemory.Block{})
 	}
 	a.active = false
 }
 func (m *ArbitraryFloatManager) valueInputCall(r *ArbitraryFloatValueInputReceipt) (*arbitraryFloatValueInputCall, error) {
 	if m == nil || m.self != m || r == nil || r.Manager != m || r.Frame == nil || r.Invocation == 0 {
-		return nil, ErrRuntimeOwner
+		return nil, umemory.ErrRuntimeOwner
 	}
 	for q := m.InputCalls; q != nil; q = q.Next {
 		if q == r.Frame {
 			if q.Self != q || q.Manager != m || q.Issued != *r {
-				return nil, ErrRuntimeOwner
+				return nil, umemory.ErrRuntimeOwner
 			}
 			return q, nil
 		}
 	}
-	return nil, ErrRuntimeOwner
+	return nil, umemory.ErrRuntimeOwner
 }
 
 // false reads only completion metadata; true releases the exact unjoined leaf
 // after the caller owns its older passed MPF NUM. No output numeral is owned here.
 func (m *ArbitraryFloatManager) CleanupValueInput(r *ArbitraryFloatValueInputReceipt, abort bool) error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.closed {
 		return arena.ErrClosed

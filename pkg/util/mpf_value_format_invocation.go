@@ -4,6 +4,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // ArbitraryFloatFormatInvocation is real cold continuation storage embedded in
@@ -11,7 +12,7 @@ import (
 // source declarations are reached; the text owner charges this actual record.
 
 type ArbitraryFloatFormatInvocation struct {
-	originalPending                               Block
+	originalPending                               umemory.Block
 	self                                          *ArbitraryFloatFormatInvocation
 	manager                                       *ArbitraryFloatManager
 	Next                                          *ArbitraryFloatFormatInvocation
@@ -26,7 +27,7 @@ type ArbitraryFloatFormatInvocation struct {
 	Numeric                                       NumericAllocationRoots
 	originalCell                                  SourceCellBacking
 	cellRetired                                   bool
-	Transferred                                   SmallAllocatorPendingAllocation
+	Transferred                                   umemory.SmallAllocatorPendingAllocation
 	gcd, division, extended                       integerRawInvocationReceipt
 
 	Decimal                          rationalDecimalScope
@@ -60,14 +61,14 @@ func (m *ArbitraryFloatManager) formatInvocationExecuting() bool {
 }
 func (m *ArbitraryFloatManager) beginFormatInvocation(s *ArbitraryFloatFormatInvocation, text ArbitraryFloatFormatTarget) error {
 	if m == nil || m.self != m || m.integer == nil || m.integer.self != m.integer {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.closed || m.sourceEnded || !m.constructorComplete {
 		return arena.ErrClosed
 	}
 
 	if s == nil || text == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.formatInvocationExecuting() || m.valueExecuting {
 		return ErrNumericPending
@@ -84,7 +85,7 @@ func (m *ArbitraryFloatManager) beginFormatInvocation(s *ArbitraryFloatFormatInv
 // FormatInvocationCauses is immutable invocation history, not acquisition.
 func (m *ArbitraryFloatManager) FormatInvocationCauses(s *ArbitraryFloatFormatInvocation) (body, source, own error) {
 	if !m.MatchesFormatFrame(s) {
-		return ErrRuntimeOwner, nil, nil
+		return umemory.ErrRuntimeOwner, nil, nil
 	}
 	return s.bodyCause, s.sourceCause, s.ownCause
 }
@@ -95,7 +96,7 @@ func (m *ArbitraryFloatManager) FormatInvocationCauses(s *ArbitraryFloatFormatIn
 // after the older scoped q/denom/num cleanup; source history remains untouched.
 func (m *ArbitraryFloatManager) CleanupFormatInvocation(s *ArbitraryFloatFormatInvocation, abort bool) error {
 	if !m.MatchesFormatFrame(s) {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.executing || s.finishing || m.valueExecuting || m.memory.FailureTransportActive() {
 		return ErrNumericPending
@@ -158,7 +159,7 @@ func (m *ArbitraryFloatManager) CleanupFormatInvocation(s *ArbitraryFloatFormatI
 // owner end, after all exact owning actions. It does not perform source DT.
 func (m *ArbitraryFloatManager) EndFormatContext(s *ArbitraryFloatFormatInvocation) error {
 	if !m.MatchesFormatFrame(s) {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if !s.owned || s.executing || s.finishing {
 		return ErrNumericPending
@@ -172,44 +173,44 @@ func (m *ArbitraryFloatManager) EndFormatContext(s *ArbitraryFloatFormatInvocati
 		}
 		link = &(*link).Next
 	}
-	return ErrRuntimeOwner
+	return umemory.ErrRuntimeOwner
 }
 
 // The text owner uses these methods at its actual source/owning end. An unused
 // context has no reached numerical invocation and therefore no NUM authority.
 func (s *ArbitraryFloatFormatInvocation) SourceCause() error {
 	if s == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.manager == nil && s.self == nil && s.invocation == 0 {
 		return nil
 	}
 	if s.manager == nil || !s.manager.MatchesFormatFrame(s) {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	return s.sourceCause
 }
 func (s *ArbitraryFloatFormatInvocation) Cleanup(abort bool) error {
 	if s == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.manager == nil && s.self == nil && s.invocation == 0 {
 		return nil
 	}
 	if s.manager == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	return s.manager.CleanupFormatInvocation(s, abort)
 }
 func (s *ArbitraryFloatFormatInvocation) EndContext() error {
 	if s == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.manager == nil && s.self == nil && s.invocation == 0 {
 		return nil
 	}
 	if s.manager == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	return s.manager.EndFormatContext(s)
 }
@@ -218,13 +219,13 @@ func (s *ArbitraryFloatFormatInvocation) EndContext() error {
 // destroying res. It is distinct from the readonly source-history query.
 func (s *ArbitraryFloatFormatInvocation) SourceReady() error {
 	if s == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.manager == nil && s.self == nil && s.invocation == 0 {
 		return nil
 	}
 	if s.manager == nil || !s.manager.MatchesFormatFrame(s) {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.executing || s.finishing || s.manager.memory.FailureTransportActive() {
 		return ErrNumericPending

@@ -6,12 +6,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerPendingAllocationExplicitCleanup(t *testing.T) {
 	for _, direct := range []bool{false, true} {
 		b := arena.NewBudget(1 << 24)
-		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: direct}})
+		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: direct}})
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -19,7 +20,7 @@ func TestIntegerPendingAllocationExplicitCleanup(t *testing.T) {
 		out := NewInt(19)
 		before := m.Cells.Stats()
 		e = m.Copy(&out, &m.Two64)
-		if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (ObjectRef{}) {
+		if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (umemory.ObjectRef{}) {
 			t.Fatal("physical allocation before descriptor refusal", e, m.PendingCell)
 		}
 		integerPhysicalAudit(t, m, &old, &out)
@@ -28,7 +29,7 @@ func TestIntegerPendingAllocationExplicitCleanup(t *testing.T) {
 		if e = m.CleanupPendingAllocation(); e != nil {
 			t.Fatal(e)
 		}
-		if m.PendingCell.Object != (ObjectRef{}) || m.Cells.Stats() != before || old != NewInt(17) || out.Cell != m.FailedNullRef {
+		if m.PendingCell.Object != (umemory.ObjectRef{}) || m.Cells.Stats() != before || old != NewInt(17) || out.Cell != m.FailedNullRef {
 			t.Fatal("cleanup changed source numeral publication", old, out, m.Cells.Stats(), before)
 		}
 		if _, e = m.Allocator.ObjectExtent(pending); e == nil {

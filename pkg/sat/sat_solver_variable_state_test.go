@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func satVariableStateFixture(t *testing.T) (*satSolverVariableState, *satSolverUintSet, *arena.Budget) {
@@ -20,7 +20,7 @@ func satVariableStateFixtureWithBudget(t *testing.T, b *arena.Budget) (*satSolve
 	t.Helper()
 	todo, e := newSATSolverUintSet(b)
 	satOK(t, e)
-	mem, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	mem, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	satOK(t, e)
 	s, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, mem)
 	satOK(t, e)
@@ -158,7 +158,7 @@ func TestSATSolverVariableConstructorRefusalAndBorrowedTodo(t *testing.T) {
 		todo, e := newSATSolverUintSet(b)
 		satOK(t, e)
 		satOK(t, todo.Insert(19))
-		mem, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+		mem, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 		satOK(t, e)
 		base := b.Used()
 

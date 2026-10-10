@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Fresh allocated partial records exercise the typed guard at the reached field;
@@ -21,7 +21,7 @@ func monomialReadWrite(t *testing.T, m *MonomialManager, a Monomial, offset uint
 }
 func monomialReadMissing(t *testing.T, e error) {
 	t.Helper()
-	if !errors.Is(e, util.ErrRuntimeUninitialized) {
+	if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("actual reached uninitialized field", e)
 	}
 }

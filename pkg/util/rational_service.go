@@ -10,6 +10,7 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrRationalServiceOwner = errors.New("mpnum: rational service provenance mismatch")
@@ -465,7 +466,7 @@ func (s *RationalService) Stats() (RationalServiceStats, error) {
 			stats.RetainedCellDescriptors++
 		}
 	}
-	if z.PendingCell.Object != (ObjectRef{}) {
+	if z.PendingCell.Object != (umemory.ObjectRef{}) {
 		stats.PendingCellObjects = 1
 	}
 	stats.LivePayloads = stats.LiveNumericObjects + stats.PendingCellObjects + stats.NaturalPayloads

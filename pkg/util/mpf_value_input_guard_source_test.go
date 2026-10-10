@@ -5,11 +5,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatInputCapturedContextExactFrameAndNonce(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	old, e := m.beginValueInput(nil)
 	serviceMust(t, e)
@@ -27,7 +28,7 @@ func TestArbitraryFloatInputCapturedContextExactFrameAndNonce(t *testing.T) {
 	used := b.Used()
 	head := m.InputCalls
 	for _, c := range []integerAllocationInvocationContext{old, invalid} {
-		if c.inputRoots(m.integer) != nil || c.prepareInputAllocation(m.integer) != ErrRuntimeOwner {
+		if c.inputRoots(m.integer) != nil || c.prepareInputAllocation(m.integer) != umemory.ErrRuntimeOwner {
 			t.Fatal("saved/copy context accepted")
 		}
 		if b.Used() != used || m.InputCalls != head {
@@ -44,7 +45,7 @@ func TestArbitraryFloatInputCapturedContextExactFrameAndNonce(t *testing.T) {
 	copiedReceipt := issued
 	copiedReceipt.Frame = &frameCopy
 	used = b.Used()
-	if m.CleanupValueInput(&copiedReceipt, true) != ErrRuntimeOwner || b.Used() != used {
+	if m.CleanupValueInput(&copiedReceipt, true) != umemory.ErrRuntimeOwner || b.Used() != used {
 		t.Fatal("copied owning descriptor mutated actual frame")
 	}
 	serviceMust(t, m.CleanupValueInput(&issued, true))

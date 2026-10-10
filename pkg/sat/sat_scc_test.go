@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func satSCCFixture(t *testing.T, n uint32) (*satSCC, *satSolverClauseLifecycle) {
@@ -391,8 +392,8 @@ func TestSATSCCActualAllocationPrefixSweep(t *testing.T) {
 		satSCCAudit(t, c)
 		if err != nil {
 			if !errors.Is(err, arena.ErrInjectedFailure) {
-				var mf util.Failure
-				if !errors.As(err, &mf) || mf.Kind != util.FailureMemout || !p.memory.State().OutOfMemory {
+				var mf umemory.Failure
+				if !errors.As(err, &mf) || mf.Kind != umemory.FailureMemout || !p.memory.State().OutOfMemory {
 					t.Fatal(ordinal, err)
 				}
 			}

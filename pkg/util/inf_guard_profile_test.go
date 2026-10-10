@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Added branch fixtures for inf_rational.cpp:80-111,169-179; no new source ENSURE credit.
@@ -131,7 +132,7 @@ func TestInfGuardUnreadDivisorAndLowerRoot(t *testing.T) {
 func TestInfGuardAllocationPrecedenceAndWarmRoots(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
 	cfg := serviceConfig(b)
-	cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	s, e := NewRationalService(cfg)
 	serviceMust(t, e)
 	defer func() {

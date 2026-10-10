@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatInputActualAllocationTransportOwnerGuards(t *testing.T) {
@@ -15,7 +16,7 @@ func TestArbitraryFloatInputActualAllocationTransportOwnerGuards(t *testing.T) {
 	var receipt ArbitraryFloatValueInputReceipt
 	armed := false
 	calls := 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			used := b.Used()
@@ -33,7 +34,7 @@ func TestArbitraryFloatInputActualAllocationTransportOwnerGuards(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	pad, e := r.Allocate(uint64(99990 - r.State().LocalSize - 8))
 	serviceMust(t, e)
@@ -49,7 +50,7 @@ func TestArbitraryFloatInputActualAllocationTransportOwnerGuards(t *testing.T) {
 	if q.bodyCause != body {
 		t.Fatal("body cause not retained")
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &x.significand)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &x.significand)
 	if b.Used() != r.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("before lift exact cold graph")
 	}

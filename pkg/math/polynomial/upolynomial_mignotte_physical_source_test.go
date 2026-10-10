@@ -7,9 +7,10 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *util.IntegerManager, external []util.Block, public ...*util.Int) {
+func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *util.IntegerManager, external []umemory.Block, public ...*util.Int) {
 	t.Helper()
 	cells := map[util.NumericCellRef]bool{}
 	add := func(r util.NumericCellRef) {
@@ -59,7 +60,7 @@ func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *util.IntegerManager, ext
 	if uint32(len(cells)) != m.Cells.Stats().Live {
 		t.Fatal("unnamed actual integer descriptor", len(cells), m.Cells.Stats().Live)
 	}
-	objects := map[util.ObjectRef]bool{}
+	objects := map[umemory.ObjectRef]bool{}
 	for ref := range cells {
 		c := m.Cell(ref)
 		if c.Payload != (arena.VectorRef{}) {
@@ -77,7 +78,7 @@ func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *util.IntegerManager, ext
 		}
 		objects[object] = true
 	}
-	if m.PendingAllocationObject() != (util.ObjectRef{}) {
+	if m.PendingAllocationObject() != (umemory.ObjectRef{}) {
 		if objects[m.PendingAllocationObject()] {
 			t.Fatal("duplicated pending physical object")
 		}
@@ -85,7 +86,7 @@ func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *util.IntegerManager, ext
 			t.Fatal("invalid pending object", e)
 		}
 	}
-	raw := map[util.Block]bool{}
+	raw := map[umemory.Block]bool{}
 	if m.SourceFinalized || m.ConstructorUnwound {
 		for ref := range cells {
 			c := m.Cell(ref)
@@ -99,7 +100,7 @@ func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *util.IntegerManager, ext
 	}
 
 	for _, block := range external {
-		if block == (util.Block{}) || raw[block] {
+		if block == (umemory.Block{}) || raw[block] {
 			t.Fatal("duplicate or empty named external block", block)
 		}
 		if _, e := m.RuntimeOwner().Size(block); e != nil {
@@ -116,7 +117,7 @@ func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *util.IntegerManager, ext
 func mignotteScopePhysicalAudit(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, caller ...*util.Int) {
 	mignotteScopePhysicalAuditExtra(t, q, s, nil, caller...)
 }
-func mignotteScopePhysicalAuditExtra(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, external []util.Block, caller ...*util.Int) {
+func mignotteScopePhysicalAuditExtra(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, external []umemory.Block, caller ...*util.Int) {
 	u := s.manager
 	c := s.scope
 	roots := append([]*util.Int{}, caller...)

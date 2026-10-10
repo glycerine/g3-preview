@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -19,9 +20,9 @@ func TestBVRewriterMultiplicationEqualityEveryActualNumericReservation(t *testin
 		for ordinal := int64(0); ordinal < 8192 && !complete; ordinal++ {
 			t.Run(fmt.Sprintf("%s/%d", branch, ordinal), func(t *testing.T) {
 				b := arena.NewBudget(1 << 27)
-				rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f util.Failure) error { return f }})
+				rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error { return f }})
 				astTestMust(t, e)
-				q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+				q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 				astTestMust(t, e)
 				sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 				astTestMust(t, e)

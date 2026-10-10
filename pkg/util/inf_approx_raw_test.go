@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // These raw scalar shapes are actual initialized numeral fields (no storage
@@ -204,7 +205,7 @@ func TestInfApproxSignedValueConstructionAndRawAssignments(t *testing.T) {
 func TestInfApproxFirstCopyFailurePrecedesUnreadEPS(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
 	cfg := serviceConfig(b)
-	cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	s, e := NewRationalService(cfg)
 	serviceMust(t, e)
 	defer func() {
@@ -350,7 +351,7 @@ func TestInfApproxPowerActualMaskAndEarlierRefusal(t *testing.T) {
 	for _, upper := range []bool{false, true} {
 		budget := arena.NewBudget(1 << 24)
 		cfg := serviceConfig(budget)
-		cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		s, e := NewRationalService(cfg)
 		serviceMust(t, e)
 		// The exact branch raises FIRST2; its first actual square allocation must

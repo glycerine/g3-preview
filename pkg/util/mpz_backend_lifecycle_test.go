@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerBackendScratchHeaderAndSpareDigit(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64}})
+	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -26,7 +27,7 @@ func TestIntegerBackendScratchHeaderAndSpareDigit(t *testing.T) {
 	if e = m.prepareTmpSpan(1, 4); e != nil {
 		t.Fatal(e)
 	}
-	if _, e = m.Memory.ReadUint32(raw, off); !errors.Is(e, ErrRuntimeUninitialized) {
+	if _, e = m.Memory.ReadUint32(raw, off); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("scratch capacity borrow invented size", e)
 	}
 	x := NewInt(0)
@@ -53,7 +54,7 @@ func TestIntegerBackendConstructorReservationSweep(t *testing.T) {
 	for stop := int64(0); stop < 80; stop++ {
 		b := arena.NewBudget(1 << 24)
 		b.FailAfter(stop)
-		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64}})
+		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 		if e == nil {
 			m.Close()
 			success = true
@@ -80,7 +81,7 @@ func TestIntegerBackendConstructorReservationSweep(t *testing.T) {
 
 func TestIntegerBackendPooledWarmReuseNoAllocations(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64}})
+	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -123,7 +124,7 @@ func TestIntegerBackendPooledWarmReuseNoAllocations(t *testing.T) {
 
 func TestIntegerBackendPhysicalPrefixBeforeDescriptorLimit(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64}})
+	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -136,13 +137,13 @@ func TestIntegerBackendPhysicalPrefixBeforeDescriptorLimit(t *testing.T) {
 		t.Fatal("source capacity preparation failed before pointer publication", out)
 	}
 	root := m.PendingCell
-	if root.Object == (ObjectRef{}) {
+	if root.Object == (umemory.ObjectRef{}) {
 		t.Fatal("actual unpublished physical object lost")
 	}
 	if v, e := root.ReadWord(m.Allocator, 4); e != nil || v != 6 {
 		t.Fatal("capacity-only source publication", v, e)
 	}
-	if _, e = root.ReadWord(m.Allocator, 0); !errors.Is(e, ErrRuntimeUninitialized) {
+	if _, e = root.ReadWord(m.Allocator, 0); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("unpublished size synthesized", e)
 	}
 	if m.Cells.Stats().Live != 6 || m.Allocator.Stats().Chunks != before.Chunks {

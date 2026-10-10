@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatToRationalOwnACKPreservesLaterForeignDescriptor(t *testing.T) {
 	for ordinal := int64(0); ordinal < 60; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		cfg := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+		cfg := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 		m, e := NewArbitraryFloatManager(cfg)
 		serviceMust(t, e)
 		qm, e := NewRationalManager(RationalConfig{Integers: cfg})
@@ -28,7 +29,7 @@ func TestArbitraryFloatToRationalOwnACKPreservesLaterForeignDescriptor(t *testin
 		b.FailAfter(ordinal)
 		body := m.ToRational(&x, qm, &out)
 		s := &m.rationalConversion
-		matched := body != nil && s.numericPhase == 2 && s.numeric.Cell.Object != (ObjectRef{})
+		matched := body != nil && s.numericPhase == 2 && s.numeric.Cell.Object != (umemory.ObjectRef{})
 		b.FailAfter(-1)
 		var foreign Int
 		foreignPending := false
@@ -40,7 +41,7 @@ func TestArbitraryFloatToRationalOwnACKPreservesLaterForeignDescriptor(t *testin
 			for f := int64(0); f < 12; f++ {
 				b.FailAfter(f)
 				e = m.integer.Copy(&foreign, &foreignSource)
-				if e != nil && m.integer.PendingCell.Object != (ObjectRef{}) {
+				if e != nil && m.integer.PendingCell.Object != (umemory.ObjectRef{}) {
 					foreignPending = true
 					break
 				}

@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ func TestRationalSMT2StreamCopyTransportGuards(t *testing.T) {
 	a := Rational{Num: NewInt(-1), Den: NewInt(3)}
 	var out OwnedStringStream
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			s, p := &m.integer.smt2Stream, &m.rational.smt2Stream
@@ -36,7 +37,7 @@ func TestRationalSMT2StreamCopyTransportGuards(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	serviceMust(t, out.Construct(b))
 	serviceMust(t, m.integer.Mul2kInPlace(&a.Num, 40000))
@@ -46,10 +47,10 @@ func TestRationalSMT2StreamCopyTransportGuards(t *testing.T) {
 	armed = true
 	body := m.rational.DisplaySMT2Into(&out, &a, false)
 	armed = false
-	if !errors.Is(body, Failure{Kind: FailureMemout}) || calls != 1 || !m.rational.smt2Stream.active || !m.integer.smt2Stream.active {
+	if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls != 1 || !m.rational.smt2Stream.active || !m.integer.smt2Stream.active {
 		t.Fatal("actual negative COPY transport missing", body, calls)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &a.Num, &a.Den, &m.integer.smt2Stream.tmp)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &a.Num, &a.Den, &m.integer.smt2Stream.tmp)
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+out.Buffer.String.StorageBytes() {
 		t.Fatal("immediate COPY graph", b.Used())
 	}
@@ -88,7 +89,7 @@ func TestRationalSMT2StreamRefusedChildDoesNotAdoptOlderCopy(t *testing.T) {
 	reached := false
 	for ordinal := int64(0); ordinal < 60; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 		serviceMust(t, e)
 		v := NewInt(-1)
 		serviceMust(t, m.integer.Mul2kInPlace(&v, 4000))
@@ -97,7 +98,7 @@ func TestRationalSMT2StreamRefusedChildDoesNotAdoptOlderCopy(t *testing.T) {
 		b.FailAfter(ordinal)
 		body := m.integer.DisplaySMT2Into(&out, &v, false)
 		s := &m.integer.smt2Stream
-		matched := body != nil && s.active && m.integer.CopyAllocation.Roots.Cell.Object != (ObjectRef{})
+		matched := body != nil && s.active && m.integer.CopyAllocation.Roots.Cell.Object != (umemory.ObjectRef{})
 		b.FailAfter(-1)
 		if matched {
 			reached = true

@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialEvalSignBinaryPublicBodyAndNumeralDT(t *testing.T) {
@@ -17,10 +18,10 @@ func TestUPolynomialEvalSignBinaryPublicBodyAndNumeralDT(t *testing.T) {
 	for offset := int64(12); offset < 400 && !reached; offset += 4 {
 		t.Run(fmt.Sprint(offset), func(t *testing.T) {
 			var z *util.IntegerManager
-			var rt *util.Runtime
-			var lane, held util.Block
+			var rt *umemory.Runtime
+			var lane, held umemory.Block
 			armed := false
-			transport := func(f util.Failure) error {
+			transport := func(f umemory.Failure) error {
 				if !armed || z == nil || z.AddMulInvocation.Tmp.Cell == 0 || z.IsFailureRef(z.AddMulInvocation.Tmp.Cell) {
 					return f
 				}
@@ -52,9 +53,9 @@ func TestUPolynomialEvalSignBinaryPublicBodyAndNumeralDT(t *testing.T) {
 				contextTLSFinish(t, rt, z.CleanupAddMulRaw)
 				contextTLSFinish(t, rt, func() error { return c.config.Binary.Del(&b) })
 				contextTLSFinish(t, rt, func() error { return p.cleanupBinaryEvaluation(true) })
-				for _, block := range []*util.Block{&lane, &held} {
+				for _, block := range []*umemory.Block{&lane, &held} {
 					contextTLSFinish(t, rt, func() error {
-						if *block == (util.Block{}) {
+						if *block == (umemory.Block{}) {
 							return nil
 						}
 						return rt.Deallocate(block)
@@ -85,7 +86,7 @@ func TestUPolynomialEvalSignBinaryPublicBodyAndNumeralDT(t *testing.T) {
 			if q.bodyCause == nil || q.sourceCause == nil || q.sourceRemaining != 1 || q.addMul.Frame == nil || q.addMul.Frame.Tmp.Cell == 0 {
 				t.Fatal("actual source/RAW frontier", q.sourceRemaining)
 			}
-			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&(*b.BorrowNumerator()), &q.values[0], &q.values[1], &q.addMul.Frame.Tmp}, []util.Block{lane, held})
+			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&(*b.BorrowNumerator()), &q.values[0], &q.values[1], &q.addMul.Frame.Tmp}, []umemory.Block{lane, held})
 			if want := baseline + integerActualOwnedBytes(z) + p.binaryEvaluationHistoryBytes; want != z.Budget().Used() {
 				t.Fatal("actual cold graph", want, z.Budget().Used())
 			}

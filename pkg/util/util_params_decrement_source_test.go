@@ -8,12 +8,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // Public reallocs reach the source LP64 signed-overflow guarded domain. They
 // do not simulate OOM, mutate private counters, or inject a deallocation error.
-func paramsDecTLSNearMinimum(t *testing.T, r *Runtime) {
+func paramsDecTLSNearMinimum(t *testing.T, r *umemory.Runtime) {
 	t.Helper()
 	a, e := r.Allocate(8)
 	paramsMust(t, e)
@@ -56,9 +57,9 @@ func TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop(t 
 	bn := arena.NewBudget(1 << 26)
 	bc := arena.NewBudget(1 << 24)
 	bs := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -128,9 +129,9 @@ func TestParamsReferenceCleanupDecrementActualLeafReceipt(t *testing.T) {
 	bn := arena.NewBudget(1 << 26)
 	bc := arena.NewBudget(1 << 24)
 	bs := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -235,9 +236,9 @@ func TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration(t *test
 	bn := arena.NewBudget(1 << 26)
 	bc := arena.NewBudget(1 << 24)
 	bs := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -338,7 +339,7 @@ func TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration(t *test
 
 // Cold graph uses the actual named owners and their typed backing capacities.
 // Source allocation counters remain separate from this physical Go charge.
-func paramsDecAuditColdGraph(t *testing.T, q *RationalService, m *IntegerManager, r *Runtime, bn *arena.Budget, c *ParamsContext, bc *arena.Budget, sy *usymbol.Manager, bs *arena.Budget) {
+func paramsDecAuditColdGraph(t *testing.T, q *RationalService, m *IntegerManager, r *umemory.Runtime, bn *arena.Budget, c *ParamsContext, bc *arena.Budget, sy *usymbol.Manager, bs *arena.Budget) {
 	t.Helper()
 	qv := reflect.ValueOf(q).Elem()
 	qm := testFieldBySourceName(qv, "manager").Elem()

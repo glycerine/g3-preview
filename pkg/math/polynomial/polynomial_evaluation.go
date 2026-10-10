@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // The map is a cold source virtual interface. Values are borrowed live fields;
@@ -34,8 +35,8 @@ type polynomialEvaluationScope struct {
 	active, executing                    bool
 	rational                             *util.RationalManager
 	groups                               [3]uint64 // normalize, addition, power: exact started RAW groups only
-	numericPending                       util.ObjectRef
-	allocatorPending                     [3]util.Block
+	numericPending                       umemory.ObjectRef
+	allocatorPending                     [3]umemory.Block
 	bodyCause, sourceCause, cleanupCause error
 	integerFrames                        []*polynomialEvalIntegerFrame
 	intervalFrames                       []*polynomialEvalIntervalFrame
@@ -133,15 +134,15 @@ func (m *MultivariatePolynomialManager) evaluationRationalCall(op uint8, a, b *u
 				s.groups[i] = gens[i]
 			}
 		}
-		if beforeCell == (util.ObjectRef{}) && q.Integers().PendingAllocationObject() != (util.ObjectRef{}) {
+		if beforeCell == (umemory.ObjectRef{}) && q.Integers().PendingAllocationObject() != (umemory.ObjectRef{}) {
 			s.numericPending = q.Integers().PendingAllocationObject()
 		}
-		if beforeRaw == ([3]util.Block{}) {
+		if beforeRaw == ([3]umemory.Block{}) {
 			roots, x := q.Integers().SourceAllocator().PendingRoots()
 			if x != nil {
 				return errors.Join(e, x)
 			}
-			if roots != ([3]util.Block{}) {
+			if roots != ([3]umemory.Block{}) {
 				s.allocatorPending = roots
 			}
 		}
@@ -461,7 +462,7 @@ func (m *MultivariatePolynomialManager) evaluationPending() bool {
 			return true
 		}
 	}
-	return s.lexGeneration != 0 || s.groups != ([3]uint64{}) || s.numericPending != (util.ObjectRef{}) || s.allocatorPending != ([3]util.Block{})
+	return s.lexGeneration != 0 || s.groups != ([3]uint64{}) || s.numericPending != (umemory.ObjectRef{}) || s.allocatorPending != ([3]umemory.Block{})
 }
 func (m *MultivariatePolynomialManager) CleanupEvaluation() error {
 	if e := m.identity(); e != nil {
@@ -534,16 +535,16 @@ func (m *MultivariatePolynomialManager) CleanupEvaluation() error {
 			return e
 		}
 	}
-	if s.numericPending != (util.ObjectRef{}) {
+	if s.numericPending != (umemory.ObjectRef{}) {
 		if z.PendingAllocationObject() == s.numericPending {
 			if e := z.CleanupPendingAllocation(); e != nil {
 				s.cleanupCause = e
 				return e
 			}
 		}
-		s.numericPending = util.ObjectRef{}
+		s.numericPending = umemory.ObjectRef{}
 	}
-	if s.allocatorPending != ([3]util.Block{}) {
+	if s.allocatorPending != ([3]umemory.Block{}) {
 		current, e := z.SourceAllocator().PendingRoots()
 		if e != nil {
 			return e
@@ -560,7 +561,7 @@ func (m *MultivariatePolynomialManager) CleanupEvaluation() error {
 				return e
 			}
 		}
-		s.allocatorPending = [3]util.Block{}
+		s.allocatorPending = [3]umemory.Block{}
 	}
 	s.active = false
 	s.depth = 0
@@ -1099,21 +1100,21 @@ func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v P
 	return nil
 }
 
-func (m *MultivariatePolynomialManager) evaluationCaptureNumeric(beforeCell util.ObjectRef, beforeRaw [3]util.Block, cause error) error {
+func (m *MultivariatePolynomialManager) evaluationCaptureNumeric(beforeCell umemory.ObjectRef, beforeRaw [3]umemory.Block, cause error) error {
 	s := &m.evaluation
 	if !s.executing {
 		return cause
 	}
 	z := m.core.integer
-	if beforeCell == (util.ObjectRef{}) && z.PendingAllocationObject() != (util.ObjectRef{}) {
+	if beforeCell == (umemory.ObjectRef{}) && z.PendingAllocationObject() != (umemory.ObjectRef{}) {
 		s.numericPending = z.PendingAllocationObject()
 	}
-	if beforeRaw == ([3]util.Block{}) {
+	if beforeRaw == ([3]umemory.Block{}) {
 		roots, e := z.SourceAllocator().PendingRoots()
 		if e != nil {
 			return errors.Join(cause, e)
 		}
-		if roots != ([3]util.Block{}) {
+		if roots != ([3]umemory.Block{}) {
 			s.allocatorPending = roots
 		}
 	}
@@ -1345,18 +1346,18 @@ func (m *MultivariatePolynomialManager) evaluationLexSort(p Polynomial) error {
 // Source early reset/set routes construct no recursive auxiliary or rational
 // RAW group. Preserve any older invocation, while separately recording only a
 // genuinely newly started Integer allocation at this reached VM call.
-func (m *MultivariatePolynomialManager) evaluationEarlyRoots(beforeCell util.ObjectRef, beforeRaw [3]util.Block, cause error) error {
+func (m *MultivariatePolynomialManager) evaluationEarlyRoots(beforeCell umemory.ObjectRef, beforeRaw [3]umemory.Block, cause error) error {
 	z := m.core.integer
 	s := &m.evaluation
-	if beforeCell == (util.ObjectRef{}) && z.PendingAllocationObject() != (util.ObjectRef{}) {
+	if beforeCell == (umemory.ObjectRef{}) && z.PendingAllocationObject() != (umemory.ObjectRef{}) {
 		s.numericPending = z.PendingAllocationObject()
 	}
-	if beforeRaw == ([3]util.Block{}) {
+	if beforeRaw == ([3]umemory.Block{}) {
 		after, e := z.SourceAllocator().PendingRoots()
 		if e != nil {
 			return errors.Join(cause, e)
 		}
-		if after != ([3]util.Block{}) {
+		if after != ([3]umemory.Block{}) {
 			s.allocatorPending = after
 		}
 	}

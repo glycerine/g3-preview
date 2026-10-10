@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type polynomialCompositionScope struct {
@@ -28,8 +29,8 @@ type polynomialCompositionScope struct {
 	calleeGeneration, factoryGeneration     uint64
 	singleton                               Monomial
 	singletonGeneration, constantGeneration uint64
-	numericPending                          util.ObjectRef
-	integerRaw, monomialRaw                 [3]util.Block
+	numericPending                          umemory.ObjectRef
+	integerRaw, monomialRaw                 [3]umemory.Block
 	bodyCause, sourceCause, cleanupCause    error
 }
 
@@ -83,7 +84,7 @@ func (m *MultivariatePolynomialManager) finishComposition(cause error) error {
 		}
 		s.localCompleted = false
 	}
-	if cause == nil && s.freshResult == (Polynomial{}) && s.generated == (Monomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.numericPending == (util.ObjectRef{}) && s.integerRaw == ([3]util.Block{}) && s.monomialRaw == ([3]util.Block{}) && s.rawMask == 0 {
+	if cause == nil && s.freshResult == (Polynomial{}) && s.generated == (Monomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.numericPending == (umemory.ObjectRef{}) && s.integerRaw == ([3]umemory.Block{}) && s.monomialRaw == ([3]umemory.Block{}) && s.rawMask == 0 {
 		s.active = false
 	}
 	return cause
@@ -109,15 +110,15 @@ func (m *MultivariatePolynomialManager) compositionNumeral(op uint8, n *util.Int
 	}
 	s := &m.composition
 	if s.executing {
-		if cell == (util.ObjectRef{}) && z.PendingAllocationObject() != (util.ObjectRef{}) {
+		if cell == (umemory.ObjectRef{}) && z.PendingAllocationObject() != (umemory.ObjectRef{}) {
 			s.numericPending = z.PendingAllocationObject()
 		}
-		if roots == ([3]util.Block{}) {
+		if roots == ([3]umemory.Block{}) {
 			after, x := z.SourceAllocator().PendingRoots()
 			if x != nil {
 				return errors.Join(e, x)
 			}
-			if after != ([3]util.Block{}) {
+			if after != ([3]umemory.Block{}) {
 				s.integerRaw = after
 			}
 		}
@@ -147,12 +148,12 @@ func (m *MultivariatePolynomialManager) compositionVariable(x, d uint32, powers 
 			s.calleeGeneration = outcome.generation
 		}
 	}
-	if before == ([3]util.Block{}) {
+	if before == ([3]umemory.Block{}) {
 		after, x := c.monomials.allocator.PendingRoots()
 		if x != nil {
 			return Monomial{}, errors.Join(e, x)
 		}
-		if after != ([3]util.Block{}) {
+		if after != ([3]umemory.Block{}) {
 			s.monomialRaw = after
 		}
 	}
@@ -764,15 +765,15 @@ func (m *MultivariatePolynomialManager) compositionLinear(x, y uint32, minus boo
 			return Polynomial{}, e
 		}
 		e = m.core.modular.SetInt32(&s.raw[1], -1)
-		if before == (util.ObjectRef{}) && m.core.integer.PendingAllocationObject() != (util.ObjectRef{}) {
+		if before == (umemory.ObjectRef{}) && m.core.integer.PendingAllocationObject() != (umemory.ObjectRef{}) {
 			s.numericPending = m.core.integer.PendingAllocationObject()
 		}
-		if raw == ([3]util.Block{}) {
+		if raw == ([3]umemory.Block{}) {
 			after, x := m.core.integer.SourceAllocator().PendingRoots()
 			if x != nil {
 				return Polynomial{}, errors.Join(e, x)
 			}
-			if after != ([3]util.Block{}) {
+			if after != ([3]umemory.Block{}) {
 				s.integerRaw = after
 			}
 		}
@@ -1089,14 +1090,14 @@ func (m *MultivariatePolynomialManager) CleanupComposition() error {
 		}
 		s.singleton = Monomial{}
 	}
-	if s.numericPending != (util.ObjectRef{}) {
+	if s.numericPending != (umemory.ObjectRef{}) {
 		if c.integer.PendingAllocationObject() == s.numericPending {
 			if e := c.integer.CleanupPendingAllocation(); e != nil {
 				s.cleanupCause = e
 				return e
 			}
 		}
-		s.numericPending = util.ObjectRef{}
+		s.numericPending = umemory.ObjectRef{}
 	}
 	for i := 0; i < 2; i++ {
 		roots := &s.integerRaw
@@ -1105,7 +1106,7 @@ func (m *MultivariatePolynomialManager) CleanupComposition() error {
 			roots = &s.monomialRaw
 			allocator = c.monomials.allocator
 		}
-		if *roots != ([3]util.Block{}) {
+		if *roots != ([3]umemory.Block{}) {
 			current, e := allocator.PendingRoots()
 			if e != nil {
 				return e
@@ -1122,7 +1123,7 @@ func (m *MultivariatePolynomialManager) CleanupComposition() error {
 					return x
 				}
 			}
-			*roots = [3]util.Block{}
+			*roots = [3]umemory.Block{}
 		}
 	}
 	s.active = false
@@ -1146,7 +1147,7 @@ func (m *MultivariatePolynomialManager) finishCompositionResult(p Polynomial, e 
 	if s.freshResult == p {
 		s.freshResult = Polynomial{}
 	}
-	if s.generated == (Monomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.numericPending == (util.ObjectRef{}) && s.integerRaw == ([3]util.Block{}) && s.monomialRaw == ([3]util.Block{}) && s.rawMask == 0 {
+	if s.generated == (Monomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.numericPending == (umemory.ObjectRef{}) && s.integerRaw == ([3]umemory.Block{}) && s.monomialRaw == ([3]umemory.Block{}) && s.rawMask == 0 {
 		s.active = false
 	}
 	return p, nil
@@ -1158,8 +1159,8 @@ type polynomialCompositionNumericSnapshot struct {
 	factors       *PolynomialFactors
 	factorsBefore polynomialNumericRoots
 	scope         *polynomialCompositionScope
-	object        util.ObjectRef
-	raw           [3]util.Block
+	object        umemory.ObjectRef
+	raw           [3]umemory.Block
 }
 
 func (c *MultivariatePolynomialCore) compositionNumericBefore() (polynomialCompositionNumericSnapshot, error) {
@@ -1190,15 +1191,15 @@ func (c *MultivariatePolynomialCore) compositionNumericAfter(before polynomialCo
 	if s == nil || !s.executing {
 		return cause
 	}
-	if before.object == (util.ObjectRef{}) && c.integer.PendingAllocationObject() != (util.ObjectRef{}) {
+	if before.object == (umemory.ObjectRef{}) && c.integer.PendingAllocationObject() != (umemory.ObjectRef{}) {
 		s.numericPending = c.integer.PendingAllocationObject()
 	}
-	if before.raw == ([3]util.Block{}) {
+	if before.raw == ([3]umemory.Block{}) {
 		after, e := c.integer.SourceAllocator().PendingRoots()
 		if e != nil {
 			return errors.Join(cause, e)
 		}
-		if after != ([3]util.Block{}) {
+		if after != ([3]umemory.Block{}) {
 			s.integerRaw = after
 		}
 	}

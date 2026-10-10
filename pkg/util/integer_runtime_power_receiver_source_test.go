@@ -2,6 +2,7 @@
 package util
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
@@ -33,7 +34,7 @@ func TestIntegerPhysicalPowerTwoSoleRuntimeReceiver(t *testing.T) {
 		if p < 31 && (out != NewInt(int32(uint32(1)<<p)) || b.Used() != before) {
 			t.Fatal("inline power allocated or changed value", p, out, b.Used(), before)
 		}
-		integerPhysicalAuditWithRaw(t, m, []Block{row}, &out)
+		integerPhysicalAuditWithRaw(t, m, []umemory.Block{row}, &out)
 		if b.Used() != integerActualOwnedBytes(m) {
 			t.Fatal("immediate physical/cold graph", p, b.Used())
 		}

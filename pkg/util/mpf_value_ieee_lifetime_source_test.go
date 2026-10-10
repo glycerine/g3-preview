@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatIEEEEveryReachedCacheReservationPrefix(t *testing.T) {
@@ -13,9 +14,9 @@ func TestArbitraryFloatIEEEEveryReachedCacheReservationPrefix(t *testing.T) {
 		completed := false
 		for ordinal := int64(0); ordinal < 64; ordinal++ {
 			b := arena.NewBudget(1 << 27)
-			r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+			r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 			serviceMust(t, e)
-			m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+			m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 			serviceMust(t, e)
 			var x ArbitraryFloat
 			one := NewInt(1)
@@ -34,7 +35,7 @@ func TestArbitraryFloatIEEEEveryReachedCacheReservationPrefix(t *testing.T) {
 			} else {
 				_, body = m.ToDouble(&x)
 			}
-			integerPhysicalAuditWithRaw(t, m.integer, []Block{foreign}, &x.significand)
+			integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{foreign}, &x.significand)
 			if b.Used() != r.Stats().TotalBytes+m.OwnedStorageBytes() {
 				t.Fatal("before-lift exact cache/caller cold graph", single, ordinal, b.Used())
 			}
@@ -71,7 +72,7 @@ func TestArbitraryFloatIEEEActualCacheTransportRetainsEarlierCall(t *testing.T) 
 	var x ArbitraryFloat
 	armed := false
 	calls := 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			used := b.Used()
@@ -91,7 +92,7 @@ func TestArbitraryFloatIEEEActualCacheTransportRetainsEarlierCall(t *testing.T) 
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	one := NewInt(1)
 	serviceMust(t, m.SetComponents(&x, 11, 53, false, 0, &one))
@@ -102,7 +103,7 @@ func TestArbitraryFloatIEEEActualCacheTransportRetainsEarlierCall(t *testing.T) 
 	armed = true
 	_, body := m.ToDouble(&x)
 	armed = false
-	if !errors.Is(body, Failure{Kind: FailureMemout}) || calls != 1 {
+	if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls != 1 {
 		t.Fatal("real wrapper allocation callback", body, calls)
 	}
 	old := m.PowerWrappers
@@ -110,7 +111,7 @@ func TestArbitraryFloatIEEEActualCacheTransportRetainsEarlierCall(t *testing.T) 
 		t.Fatal("actual failed cache authority", old)
 	}
 	original := old.original
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &x.significand)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &x.significand)
 	if b.Used() != r.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("before-lift cache physical/cold graph")
 	}
@@ -120,7 +121,7 @@ func TestArbitraryFloatIEEEActualCacheTransportRetainsEarlierCall(t *testing.T) 
 	if x != before || old.bodyCause != body || old.original != original || old == m.PowerWrappers {
 		t.Fatal("later caller erased earlier actual cache history")
 	}
-	if original != (Block{}) {
+	if original != (umemory.Block{}) {
 		if _, e := r.Size(original); e != nil {
 			t.Fatal("later caller consumed earlier cache raw", e)
 		}

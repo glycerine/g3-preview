@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Source -a.exponent is undefined for INT64_MIN. This represented Go input
@@ -13,7 +14,7 @@ import (
 // it does not claim a C++ assertion or mathematical overflow prefix.
 func TestArbitraryFloatToRationalUndefinedSignedNegationGuard(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	cfg := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+	cfg := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 	m, e := NewArbitraryFloatManager(cfg)
 	serviceMust(t, e)
 	var x ArbitraryFloat

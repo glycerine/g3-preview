@@ -1,8 +1,12 @@
 // Source: src/util/mpf.cpp:108-112; src/util/mpf.h:77.
 package util
 
+import
+
 // SetFractionSigned follows the original scoped rational conversion. The
 // signed32 numerator/denominator overload retains its reached checked domain.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 func (m *ArbitraryFloatManager) SetFractionSigned(out *ArbitraryFloat, ebits, sbits uint32, mode ArbitraryFloatRoundingMode, n, d int32) (cause error) {
 	if e := m.valueGuard(out); e != nil {
 		return e
@@ -220,7 +224,7 @@ func (m *ArbitraryFloatManager) finishSignedFractionSource() error {
 // children and scoped fields, preserving any stopped source destruction.
 func (m *ArbitraryFloatManager) CleanupSignedFraction() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.signedFraction
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {

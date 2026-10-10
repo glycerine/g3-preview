@@ -11,6 +11,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrAlgebraicOwner = errors.New("mpnum: invalid algebraic owner or value")
@@ -30,7 +31,7 @@ type AlgebraicRootConfig struct {
 	Factors     *UPolynomialFactorizationService
 	Binary      *util.BinaryRationalManager
 	Intervals   *util.BinaryIntervalManager
-	Allocator   *util.SmallAllocator
+	Allocator   *umemory.SmallAllocator
 	Checkpoint  func() bool
 	Cooperation func() error
 }
@@ -38,7 +39,7 @@ type AlgebraicRootConfig struct {
 // Only checked locations live here. Numeral fields are encoded in real object
 // bytes; coefficient arrays are actual owned UPolynomial typed backings.
 type algebraicLocation struct {
-	raw                                       util.ObjectRef
+	raw                                       umemory.ObjectRef
 	coefficientInitialized, coefficientCursor uint32
 	sourceGuard                               bool
 	generation                                uint32
@@ -254,7 +255,7 @@ func (m *AlgebraicRootCore) store(l *algebraicLocation, r *algebraicRecord) erro
 func (m *AlgebraicRootCore) load(l *algebraicLocation) (algebraicRecord, error) {
 	r := algebraicRecord{value: util.NewRational()}
 	if !l.initialized {
-		return r, util.ErrRuntimeUninitialized
+		return r, umemory.ErrRuntimeUninitialized
 	}
 	var w [14]uint32
 	n := 6
@@ -355,7 +356,7 @@ func (m *AlgebraicRootCore) destroyCell(a *Algebraic, l *algebraicLocation, owni
 	if l.raw.LogicalAddress() != 0 {
 		progress, e := m.config.Allocator.DeallocateTracked(n, l.raw)
 		if progress.PhysicalReleased || progress.PooledLinked {
-			l.raw = util.ObjectRef{}
+			l.raw = umemory.ObjectRef{}
 			l.initialized = false
 		}
 		if e != nil {

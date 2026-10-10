@@ -8,13 +8,14 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestMonomialFactoryAllocatorActualPhysicalPrefix(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	_, e = m.MkVar()
 	serviceMust(t, e)
@@ -40,13 +41,13 @@ func TestMonomialFactoryAllocatorActualPhysicalPrefix(t *testing.T) {
 	}()
 	serviceMust(t, rt.SetMaxSize(1))
 	_, cause := m.mkMonomialCreated([]MonomialPower{{0, 2}}, &outcome)
-	if !numericPhysicalReservationRefusal(cause) || !outcome.started || outcome.allocator[0] == (util.Block{}) {
+	if !numericPhysicalReservationRefusal(cause) || !outcome.started || outcome.allocator[0] == (umemory.Block{}) {
 		t.Fatal("actual object malloc physical failure not reached", cause, outcome, m.creation)
 	}
 	monomialPhysicalAudit(t, m, held)
 	current, e := m.allocator.PendingRoots()
 	serviceMust(t, e)
-	if current != outcome.allocator || m.creation.stage != 2 || m.locations[m.creation.slot-1].raw != (util.ObjectRef{}) {
+	if current != outcome.allocator || m.creation.stage != 2 || m.locations[m.creation.slot-1].raw != (umemory.ObjectRef{}) {
 		t.Fatal("exact unpublished allocation prefix", current, outcome, m.creation)
 	}
 	// A source/ordinary retry cannot silently consume the original unjoined root.
@@ -85,9 +86,9 @@ func TestMonomialFactoryAllocatorActualPhysicalPrefix(t *testing.T) {
 
 func TestMonomialFactoryAllocatorRejectedNewCreationPreservesEarlierLeaf(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	_, e = m.MkVar()
 	serviceMust(t, e)
@@ -113,13 +114,13 @@ func TestMonomialFactoryAllocatorRejectedNewCreationPreservesEarlierLeaf(t *test
 	}()
 	serviceMust(t, rt.SetMaxSize(1))
 	_, cause := m.mkMonomialCreated([]MonomialPower{{0, 2}}, &outcome)
-	if !numericPhysicalReservationRefusal(cause) || !outcome.started || outcome.allocator[0] == (util.Block{}) {
+	if !numericPhysicalReservationRefusal(cause) || !outcome.started || outcome.allocator[0] == (umemory.Block{}) {
 		t.Fatal("actual object malloc physical failure not reached", cause, outcome, m.creation)
 	}
 	monomialPhysicalAudit(t, m, held)
 	current, e := m.allocator.PendingRoots()
 	serviceMust(t, e)
-	if current != outcome.allocator || m.creation.stage != 2 || m.locations[m.creation.slot-1].raw != (util.ObjectRef{}) {
+	if current != outcome.allocator || m.creation.stage != 2 || m.locations[m.creation.slot-1].raw != (umemory.ObjectRef{}) {
 		t.Fatal("exact unpublished allocation prefix", current, outcome, m.creation)
 	}
 
@@ -129,7 +130,7 @@ func TestMonomialFactoryAllocatorRejectedNewCreationPreservesEarlierLeaf(t *test
 	before := rt.Stats()
 	var rejected monomialFactoryOutcome
 	_, e = m.mkMonomialCreated([]MonomialPower{{0, 3}}, &rejected)
-	if e != util.ErrAllocatorPending || !rejected.started || rejected.allocatorInvocation.invocation != 0 || rejected.allocator != ([3]util.Block{}) || m.allocatorInvocation != frameBefore || rt.Stats() != before {
+	if e != umemory.ErrAllocatorPending || !rejected.started || rejected.allocatorInvocation.invocation != 0 || rejected.allocator != ([3]umemory.Block{}) || m.allocatorInvocation != frameBefore || rt.Stats() != before {
 		t.Fatal("new source creation acquired older rejected leaf", e, rejected)
 	}
 	monomialPhysicalAudit(t, m, held)
@@ -157,11 +158,11 @@ func TestMonomialFactoryAllocatorRejectedNewCreationPreservesEarlierLeaf(t *test
 
 func TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
@@ -196,10 +197,10 @@ func TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf(t *testing.T) {
 	_, cause := m.derivativeWithReceipt(p, 0, &receipt)
 	roots, e := mm.allocator.PendingRoots()
 	serviceMust(t, e)
-	if !numericPhysicalReservationRefusal(cause) || roots[0] == (util.Block{}) || mm.creation.stage != 2 {
+	if !numericPhysicalReservationRefusal(cause) || roots[0] == (umemory.Block{}) || mm.creation.stage != 2 {
 		t.Fatal("actual monomial malloc leaf not reached", cause, roots, mm.creation)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p}, nil, 0, []util.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p}, nil, 0, []umemory.Block{held})
 	serviceMust(t, m.cleanupDerivativeInvocation(&receipt, false))
 	if after, e := mm.allocator.PendingRoots(); e != nil || after != roots {
 		t.Fatal("completed source NUM phase consumed unjoined allocation", after, e)
@@ -208,16 +209,16 @@ func TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf(t *testing.T) {
 	if mm.allocator.Stats().PendingBlocks != 0 {
 		t.Fatal("matched derivative abort abandoned actual monomial allocation leaf")
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p}, nil, 0, []util.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p}, nil, 0, []umemory.Block{held})
 }
 
 func TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
@@ -234,7 +235,7 @@ func TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved(t *tes
 	}
 	held, e := rt.Allocate(uint64(pad))
 	serviceMust(t, e)
-	var foreignHeld util.Block
+	var foreignHeld umemory.Block
 	defer func() {
 		serviceMust(t, rt.SetMaxSize(0))
 		serviceMust(t, mm.CleanupCreation())
@@ -254,10 +255,10 @@ func TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved(t *tes
 	_, cause := m.derivativeWithReceipt(p, 0, &receipt)
 	roots, e := mm.allocator.PendingRoots()
 	serviceMust(t, e)
-	if !numericPhysicalReservationRefusal(cause) || roots[0] == (util.Block{}) || mm.creation.stage != 2 {
+	if !numericPhysicalReservationRefusal(cause) || roots[0] == (umemory.Block{}) || mm.creation.stage != 2 {
 		t.Fatal("actual monomial malloc leaf not reached", cause, roots, mm.creation)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p}, nil, 0, []util.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p}, nil, 0, []umemory.Block{held})
 	serviceMust(t, m.cleanupDerivativeInvocation(&receipt, false))
 	if after, e := mm.allocator.PendingRoots(); e != nil || after != roots {
 		t.Fatal("completed source NUM phase consumed unjoined allocation", after, e)
@@ -279,29 +280,29 @@ func TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved(t *tes
 	}
 	foreignRoots, e := mm.allocator.PendingRoots()
 	serviceMust(t, e)
-	if foreignRoots == roots || foreignRoots[0] == (util.Block{}) {
+	if foreignRoots == roots || foreignRoots[0] == (umemory.Block{}) {
 		t.Fatal("new actual pending identity", foreignRoots)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p}, nil, 0, []util.Block{held, foreignHeld})
+	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p}, nil, 0, []umemory.Block{held, foreignHeld})
 	serviceMust(t, m.cleanupDerivativeInvocation(&receipt, true))
 	after, e := mm.allocator.PendingRoots()
 	serviceMust(t, e)
 	if after != foreignRoots || !mm.matchesMonomialAllocatorInvocation(&foreign.allocatorInvocation) || mm.creation.generation != foreign.generation || m.derivative.bodyCause != cause {
 		t.Fatal("old parent abort swept foreign acquisition/history", after, mm.creation)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p}, nil, 0, []util.Block{held, foreignHeld})
+	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p}, nil, 0, []umemory.Block{held, foreignHeld})
 	serviceMust(t, mm.CleanupCreation())
 	serviceMust(t, mm.cleanupMonomialAllocatorInvocation(&foreign.allocatorInvocation, true))
-	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p}, nil, 0, []util.Block{held, foreignHeld})
+	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p}, nil, 0, []umemory.Block{held, foreignHeld})
 }
 
 // This public Runtime signed-accounting profile proves the owning leaf's
 // postphysical acknowledgement. It is not an ordinary mathematical OOM path.
 func TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	powers := make([]MonomialPower, 15000)
 	for i := range powers {
@@ -317,7 +318,7 @@ func TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease(t *testing.T) {
 	serviceMust(t, rt.SetMaxSize(1))
 	var outcome monomialFactoryOutcome
 	_, cause := m.internTempCreated(0, &outcome)
-	if !numericPhysicalReservationRefusal(cause) || outcome.allocator[0] == (util.Block{}) {
+	if !numericPhysicalReservationRefusal(cause) || outcome.allocator[0] == (umemory.Block{}) {
 		t.Fatal("actual large object pending", cause, outcome)
 	}
 	monomialPhysicalAudit(t, m, held)
@@ -325,7 +326,7 @@ func TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease(t *testing.T) {
 	contextTLSNearMinimum(t, rt)
 	before := rt.Stats().LiveBlocks
 	e = m.cleanupMonomialAllocatorInvocation(&outcome.allocatorInvocation, true)
-	if !errors.Is(e, arena.ErrBounds) || rt.Stats().LiveBlocks+1 != before || m.allocatorInvocation.outcome.Pending != (util.Block{}) || m.allocatorInvocation.sourceCause != cause {
+	if !errors.Is(e, arena.ErrBounds) || rt.Stats().LiveBlocks+1 != before || m.allocatorInvocation.outcome.Pending != (umemory.Block{}) || m.allocatorInvocation.sourceCause != cause {
 		t.Fatal("actual physical consume followed by signed guard", e, rt.State())
 	}
 	monomialPhysicalAudit(t, m, held)
@@ -337,7 +338,7 @@ func TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease(t *testing.T) {
 	serviceMust(t, m.CleanupCreation())
 	contextTLSFinish(t, rt, m.CloseChecked)
 	contextTLSFinish(t, rt, func() error {
-		if held == (util.Block{}) {
+		if held == (umemory.Block{}) {
 			return nil
 		}
 		return rt.Deallocate(&held)

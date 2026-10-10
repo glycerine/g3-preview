@@ -7,11 +7,12 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	runtime, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = runtime
@@ -69,10 +70,10 @@ func TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf(t *testing.T
 	}
 	roots, e := c.integer.SourceAllocator().PendingRoots()
 	serviceMust(t, e)
-	if roots[0] == (util.Block{}) || c.integer.PendingAllocationObject() != (util.ObjectRef{}) {
+	if roots[0] == (umemory.Block{}) || c.integer.PendingAllocationObject() != (umemory.ObjectRef{}) {
 		t.Fatal("actual new raw scratch before cell publication", roots)
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, []*util.Int{&large, &out}, 0, []util.Block{external})
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, []*util.Int{&large, &out}, 0, []umemory.Block{external})
 	if !c.matchesConstantCoefficientInvocation(&receipt) {
 		t.Fatal("ConstantCoefficient receipt lost reached PNormalize scratch acquisition")
 	}
@@ -86,17 +87,17 @@ func TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf(t *testing.T
 	serviceMust(t, c.cleanupConstantCoefficientInvocation(&receipt, true))
 	remaining, e := c.integer.SourceAllocator().PendingRoots()
 	serviceMust(t, e)
-	if remaining[0] != (util.Block{}) || c.matchesConstantCoefficientInvocation(&receipt) {
+	if remaining[0] != (umemory.Block{}) || c.matchesConstantCoefficientInvocation(&receipt) {
 		t.Fatal("exact reached Normalize leaf remains owned")
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, []*util.Int{&large, &out}, 0, []util.Block{external})
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, []*util.Int{&large, &out}, 0, []umemory.Block{external})
 }
 
 func TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix(t *testing.T) {
 	firstSuccess := -1
 	for n := 0; n < 128; n++ {
 		b := arena.NewBudget(1 << 26)
-		rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 		serviceMust(t, e)
 		cfg := serviceConfig(b).Integers
 		cfg.Memory = rt

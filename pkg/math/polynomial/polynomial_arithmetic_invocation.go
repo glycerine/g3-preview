@@ -4,6 +4,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // A concrete owning continuation records acquisition by this actual source
@@ -307,12 +308,12 @@ func (b *polynomialSOM) acknowledgeArithmeticSourceReset(r *polynomialArithmetic
 		return
 	}
 	s := r.frame
-	if s.sourceCause != nil || s.transportBound || s.singleton != (Monomial{}) || s.generated != (Monomial{}) || s.calleeGeneration != 0 || (m.monomials.matchesMonomialAllocatorInvocation(&s.monomialAllocator) && s.monomialAllocator.outcome.Pending != (util.Block{})) || s.numeric.PendingObject().OwnerID() != 0 || s.numeric.PendingAllocatorBlocks() != ([3]util.Block{}) || m.matchesFactoryInvocation(&s.factory) || m.modular.MatchesPNormalizeInvocation(&s.normalize) || m.integer.MatchesAddMulInvocation(&s.addMul) {
+	if s.sourceCause != nil || s.transportBound || s.singleton != (Monomial{}) || s.generated != (Monomial{}) || s.calleeGeneration != 0 || (m.monomials.matchesMonomialAllocatorInvocation(&s.monomialAllocator) && s.monomialAllocator.outcome.Pending != (umemory.Block{})) || s.numeric.PendingObject().OwnerID() != 0 || s.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) || m.matchesFactoryInvocation(&s.factory) || m.modular.MatchesPNormalizeInvocation(&s.normalize) || m.integer.MatchesAddMulInvocation(&s.addMul) {
 		return
 	}
 	a := &b.appendScope
 	if a.active {
-		if !b.matchesAppendInvocation(&s.append) || a.pending != (Monomial{}) || a.movingCoefficient != (util.Int{}) || a.numeric.PendingObject().OwnerID() != 0 || a.numeric.PendingAllocatorBlocks() != ([3]util.Block{}) || a.coefficientClaims != 0 || a.monomialClaims != 0 || a.retirePhase != 0 {
+		if !b.matchesAppendInvocation(&s.append) || a.pending != (Monomial{}) || a.movingCoefficient != (util.Int{}) || a.numeric.PendingObject().OwnerID() != 0 || a.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) || a.coefficientClaims != 0 || a.monomialClaims != 0 || a.retirePhase != 0 {
 			return
 		}
 		// Claim counters here refuse unsafe acknowledgement; the authority is the

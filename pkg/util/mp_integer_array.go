@@ -5,17 +5,18 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // A call-local concrete borrowed view, never a duplicated owning numeral array.
 // The slice route retains the existing API's aliasing; the codec route loads
 // only the source-reached numeral field from an actual Runtime backing.
 type IntegerArrayView struct {
-	Allocator      *SmallAllocator
-	Object         ObjectRef
+	Allocator      *umemory.SmallAllocator
+	Object         umemory.ObjectRef
 	Values         []Int
-	Runtime        *Runtime
-	Raw            Block
+	Runtime        *umemory.Runtime
+	Raw            umemory.Block
 	Count          uint32
 	Offset, Stride uint64
 }
@@ -140,16 +141,16 @@ func (m *IntegerModularManager) GCDManyIndexed(as IntegerArrayView, g *Int) erro
 }
 
 // checkedAt validates the borrowed cohort only when this numeral is reached.
-func (v IntegerArrayView) checkedAt(owner *Runtime, i uint32) (Int, error) {
+func (v IntegerArrayView) checkedAt(owner *umemory.Runtime, i uint32) (Int, error) {
 	if v.Allocator != nil && v.Allocator.RuntimeOwner() != owner {
-		return Int{}, ErrRuntimeOwner
+		return Int{}, umemory.ErrRuntimeOwner
 	}
 	if v.Runtime != nil && v.Runtime != owner {
-		return Int{}, ErrRuntimeOwner
+		return Int{}, umemory.ErrRuntimeOwner
 	}
 	return v.At(i)
 }
-func (v IntegerArrayView) sameRuntimeElement(owner *Runtime, raw Block, offset uint64, i uint32) bool {
+func (v IntegerArrayView) sameRuntimeElement(owner *umemory.Runtime, raw umemory.Block, offset uint64, i uint32) bool {
 	return v.Allocator == nil && v.Runtime == owner && v.Raw == raw && v.Offset+uint64(i)*v.Stride == offset && (v.Stride == 0 || uint64(i) <= (math.MaxUint64-v.Offset)/v.Stride)
 }
 func (v IntegerArrayView) store(i uint32, a Int) error {
@@ -186,12 +187,12 @@ func (v IntegerArrayView) store(i uint32, a Int) error {
 }
 
 // Only a source-reached coefficient requires the borrowed object allocator.
-func (v IntegerArrayView) referenceWithAllocatorOwner(owner *Runtime, i uint32, local *Int) (*Int, error) {
+func (v IntegerArrayView) referenceWithAllocatorOwner(owner *umemory.Runtime, i uint32, local *Int) (*Int, error) {
 	if v.Runtime != nil && v.Runtime != owner {
-		return nil, ErrRuntimeOwner
+		return nil, umemory.ErrRuntimeOwner
 	}
 	if v.Allocator != nil && v.Allocator.RuntimeOwner() != owner {
-		return nil, ErrRuntimeOwner
+		return nil, umemory.ErrRuntimeOwner
 	}
 	return v.Reference(i, local)
 }
@@ -199,9 +200,9 @@ func (v IntegerArrayView) referenceWithAllocatorOwner(owner *Runtime, i uint32, 
 // Store writes the borrowed source representation without acquiring a second
 // numeral owner. The enclosing source aggregate controls ownership and release.
 func (v IntegerArrayView) Store(i uint32, a Int) error { return v.store(i, a) }
-func (v IntegerArrayView) CheckedAt(owner *Runtime, i uint32) (Int, error) {
+func (v IntegerArrayView) CheckedAt(owner *umemory.Runtime, i uint32) (Int, error) {
 	return v.checkedAt(owner, i)
 }
-func (v IntegerArrayView) SameRuntimeElement(owner *Runtime, raw Block, offset uint64, i uint32) bool {
+func (v IntegerArrayView) SameRuntimeElement(owner *umemory.Runtime, raw umemory.Block, offset uint64, i uint32) bool {
 	return v.sameRuntimeElement(owner, raw, offset, i)
 }

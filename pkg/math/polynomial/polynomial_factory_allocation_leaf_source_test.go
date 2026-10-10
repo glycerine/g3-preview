@@ -8,15 +8,16 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialFactoryAllocationActualLeaf(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
@@ -47,9 +48,9 @@ func TestPolynomialFactoryAllocationActualLeaf(t *testing.T) {
 	}
 	roots, e := mm.allocator.PendingRoots()
 	serviceMust(t, e)
-	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []util.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []umemory.Block{held})
 	s := receipt.frame
-	if roots[0] == (util.Block{}) || !s.allocationStarted || s.allocation.Pending != roots[0] || s.allocator != roots || mm.allocator.AllocationOutcomeInvocation(&s.allocation) == 0 || s.executing {
+	if roots[0] == (umemory.Block{}) || !s.allocationStarted || s.allocation.Pending != roots[0] || s.allocator != roots || mm.allocator.AllocationOutcomeInvocation(&s.allocation) == 0 || s.executing {
 		t.Fatal("actual returned allocation outcome not retained", roots, s)
 	}
 	if s.allocationCause != cause {
@@ -58,7 +59,7 @@ func TestPolynomialFactoryAllocationActualLeaf(t *testing.T) {
 	// Rejected lower allocation retains the prior embedded outcome verbatim.
 	oldOutcome := s.allocation
 	_, started, rejected := mm.allocator.AllocateWithOutcomeStarted(12, &s.allocation)
-	if started || rejected != util.ErrAllocatorPending || s.allocation != oldOutcome {
+	if started || rejected != umemory.ErrAllocatorPending || s.allocation != oldOutcome {
 		t.Fatal("rejected lower entry changed outcome", started, rejected)
 	}
 	before := rt.Stats()
@@ -76,8 +77,8 @@ func TestPolynomialFactoryAllocationActualLeaf(t *testing.T) {
 		t.Fatal("false/copied/stale cleanup altered pending leaf")
 	}
 	serviceMust(t, c.cleanupFactoryInvocation(&receipt, true))
-	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []util.Block{held})
-	if s.allocationCause != cause || s.allocation.Pending != (util.Block{}) {
+	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []umemory.Block{held})
+	if s.allocationCause != cause || s.allocation.Pending != (umemory.Block{}) {
 		t.Fatal("own acknowledgment lost first cause or consumed-root frontier", s)
 	}
 	if mm.allocator.Stats().PendingBlocks != 0 {
@@ -93,10 +94,10 @@ func TestPolynomialFactoryAllocationActualLeaf(t *testing.T) {
 	_, foreignCause := c.mkCell(0, nil, nil, nil, nil)
 	foreignRoots, e := mm.allocator.PendingRoots()
 	serviceMust(t, e)
-	if !numericPhysicalReservationRefusal(foreignCause) || foreignRoots[0] == (util.Block{}) {
+	if !numericPhysicalReservationRefusal(foreignCause) || foreignRoots[0] == (umemory.Block{}) {
 		t.Fatal("later foreign real leaf not reached", foreignCause, foreignRoots)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []util.Block{held, held2})
+	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []umemory.Block{held, held2})
 	serviceMust(t, c.cleanupFactoryInvocation(&receipt, true))
 	after, e := mm.allocator.PendingRoots()
 	serviceMust(t, e)
@@ -105,7 +106,7 @@ func TestPolynomialFactoryAllocationActualLeaf(t *testing.T) {
 	}
 	serviceMust(t, c.CleanupConstruction())
 	serviceMust(t, mm.allocator.CleanupPending())
-	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []util.Block{held, held2})
+	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []umemory.Block{held, held2})
 }
 
 func TestPolynomialFactoryAllocationRealCallbackForeignStart(t *testing.T) {
@@ -162,7 +163,7 @@ func TestPolynomialFactoryAllocationConcreteFrameGuards(t *testing.T) {
 	p, e := c.mkCellWithReceipt(0, nil, nil, nil, nil, &receipt)
 	serviceMust(t, e)
 	s := receipt.frame
-	if !s.allocationStarted || s.allocation.Object == (util.ObjectRef{}) || s.allocation.Pending != (util.Block{}) || s.executing {
+	if !s.allocationStarted || s.allocation.Object == (umemory.ObjectRef{}) || s.allocation.Pending != (umemory.Block{}) || s.executing {
 		t.Fatal("real completed malloc outcome", s)
 	}
 	if c.factoryAllocationOutcome(&receipt) != nil {
@@ -194,11 +195,11 @@ func TestPolynomialFactoryAllocationConcreteFrameGuards(t *testing.T) {
 func TestPolynomialFactoryAllocationPostphysicalOwnRetry(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
 	transports := 0
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f util.Failure) error { transports++; return f }})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error { transports++; return f }})
 	serviceMust(t, e)
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
@@ -209,19 +210,19 @@ func TestPolynomialFactoryAllocationPostphysicalOwnRetry(t *testing.T) {
 	serviceMust(t, rt.SetMaxSize(1))
 	var receipt polynomialFactoryInvocationReceipt
 	_, cause := c.mkCellWithReceipt(15000, nil, nil, nil, nil, &receipt)
-	if !numericPhysicalReservationRefusal(cause) || receipt.frame.allocation.Pending == (util.Block{}) {
+	if !numericPhysicalReservationRefusal(cause) || receipt.frame.allocation.Pending == (umemory.Block{}) {
 		t.Fatal("actual large malloc pending absent", cause)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []util.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []umemory.Block{held})
 	serviceMust(t, rt.SetMaxSize(0))
 	contextTLSNearMinimum(t, rt)
 	before := rt.Stats().LiveBlocks
 	beforeTransport := transports
 	e = c.cleanupFactoryInvocation(&receipt, true)
-	if !errors.Is(e, arena.ErrBounds) || rt.Stats().LiveBlocks+1 != before || receipt.frame.allocator != ([3]util.Block{}) || receipt.frame.allocation.Pending != (util.Block{}) || receipt.frame.allocationCause != cause || transports != beforeTransport {
+	if !errors.Is(e, arena.ErrBounds) || rt.Stats().LiveBlocks+1 != before || receipt.frame.allocator != ([3]umemory.Block{}) || receipt.frame.allocation.Pending != (umemory.Block{}) || receipt.frame.allocationCause != cause || transports != beforeTransport {
 		t.Fatal("actual postphysical ack/history/transport", e, rt.State(), receipt.frame)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []util.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []umemory.Block{held})
 	state := rt.State()
 	serviceMust(t, c.cleanupFactoryInvocation(&receipt, true))
 	if rt.State() != state || receipt.frame.allocationCause != cause {
@@ -231,7 +232,7 @@ func TestPolynomialFactoryAllocationPostphysicalOwnRetry(t *testing.T) {
 	contextTLSFinish(t, rt, q.CloseChecked)
 	contextTLSFinish(t, rt, mm.CloseChecked)
 	contextTLSFinish(t, rt, func() error {
-		if held == (util.Block{}) {
+		if held == (umemory.Block{}) {
 			return nil
 		}
 		return rt.Deallocate(&held)

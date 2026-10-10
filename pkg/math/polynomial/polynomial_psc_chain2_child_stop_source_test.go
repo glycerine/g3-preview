@@ -8,17 +8,18 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // A real signed-host accounting guard stops the reached Power AddMul RAW DEL.
 // This is an owner-primitive boundary, not an ordinary mathematical OOM.
 func TestPolynomialPSCChain2YoungerPowerSourceStopPreservesNineLocals(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	rational, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: rational.Integers(), Rationals: rational, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
@@ -61,7 +62,7 @@ func TestPolynomialPSCChain2YoungerPowerSourceStopPreservesNineLocals(t *testing
 	}
 	out, e := NewPolynomialRefVector(c)
 	serviceMust(t, e)
-	var external util.Block
+	var external umemory.Block
 	defer func() {
 		recovery, x := rt.Allocate(400000)
 		serviceMust(t, x)
@@ -84,10 +85,10 @@ func TestPolynomialPSCChain2YoungerPowerSourceStopPreservesNineLocals(t *testing
 		contextTLSFinish(t, rt, m.CloseChecked)
 		contextTLSFinish(t, rt, rational.CloseChecked)
 		x = rt.Deallocate(&recovery)
-		if x != nil && (!errors.Is(x, arena.ErrBounds) || recovery != (util.Block{})) {
+		if x != nil && (!errors.Is(x, arena.ErrBounds) || recovery != (umemory.Block{})) {
 			t.Fatal(x)
 		}
-		if external != (util.Block{}) {
+		if external != (umemory.Block{}) {
 			contextTLSFinish(t, rt, func() error { return rt.Deallocate(&external) })
 		}
 		contextTLSFinish(t, rt, rt.Close)
@@ -104,7 +105,7 @@ func TestPolynomialPSCChain2YoungerPowerSourceStopPreservesNineLocals(t *testing
 			if visits == 2 {
 				contextTLSNearMinimum(t, rt)
 				x := rt.Deallocate(&external)
-				if !errors.Is(x, arena.ErrBounds) || external != (util.Block{}) {
+				if !errors.Is(x, arena.ErrBounds) || external != (umemory.Block{}) {
 					t.Fatal("actual external release", x)
 				}
 			}
@@ -137,7 +138,7 @@ func TestPolynomialPSCChain2YoungerPowerSourceStopPreservesNineLocals(t *testing
 		t.Fatal("own ACK erased immutable child/parent history")
 	}
 	x := rt.Deallocate(&recovery)
-	if x != nil && (!errors.Is(x, arena.ErrBounds) || recovery != (util.Block{})) {
+	if x != nil && (!errors.Is(x, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal("actual recovery release", x)
 	}
 	if !errors.Is(returned, source) {

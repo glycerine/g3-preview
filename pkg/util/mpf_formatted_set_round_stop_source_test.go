@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatFormattedSetRoundNUMStopProtectsOlderClass(t *testing.T) {
@@ -22,9 +23,9 @@ func TestArbitraryFloatFormattedSetRoundNUMStopProtectsOlderClass(t *testing.T) 
 }
 func formattedSetRoundNUMStopRecipe(t *testing.T, offset int64) bool {
 	b := arena.NewBudget(1 << 28)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	digits := make([]uint32, 63)
 	digits[0] = 1
@@ -53,7 +54,7 @@ func formattedSetRoundNUMStopRecipe(t *testing.T, offset int64) bool {
 	s := &m.RoundScope
 	t.Log("actual reached offset", offset, "child", body, "source", s.sourceCause, "flags", s.stickyConstructed, s.capConstructed, s.sigmaConstructed, "parent", m.formattedSet.sourceCause)
 	matched := s.sourceCause == arena.ErrBounds && s.stickyConstructed && s.capConstructed && s.sigmaConstructed && m.formattedSet.sourceCause == s.sourceCause && errors.Is(body, s.sourceCause)
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &sig, &x.significand, &out.significand, &s.sticky, &s.cap, &s.sigma)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{lane}, &sig, &x.significand, &out.significand, &s.sticky, &s.cap, &s.sigma)
 	if b.Used() != rt.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("before recovery named cold graph")
 	}
@@ -92,9 +93,9 @@ func formattedSetRoundNUMStopRecipe(t *testing.T, offset int64) bool {
 	serviceMust(t, m.Del(&x))
 	serviceMust(t, m.integer.Del(&sig))
 	serviceMust(t, m.Close())
-	for _, p := range []*Block{&lane, &recovery} {
+	for _, p := range []*umemory.Block{&lane, &recovery} {
 		contextTLSFinish(t, rt, func() error {
-			if *p == (Block{}) {
+			if *p == (umemory.Block{}) {
 				return nil
 			}
 			return rt.Deallocate(p)

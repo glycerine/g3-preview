@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatFormattedSetLiteralPrecisionRoutes(t *testing.T) {
@@ -15,7 +16,7 @@ func TestArbitraryFloatFormattedSetLiteralPrecisionRoutes(t *testing.T) {
 		exp      int64
 	}{{24, 30, 0, 0, 0}, {30, 24, 0, 0, 0}, {24, 21, 0, 1 << 23, 0}, {24, 24, 17, 17, 0}} {
 		b := arena.NewBudget(1 << 27)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		var x, y ArbitraryFloat
 		sig := NewInt(tc.frac)

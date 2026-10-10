@@ -34534,3 +34534,40 @@ Native hash/symbol/root util focused hash/runtime/MPQInf checks passed
 (18.806s/31.652s). Module-wide compilation, hash/symbol/AST/polynomial vet,
 manifest and diff checks passed. Import audit verifies util/hash only imports
 encoding/binary. No full native module rerun within the hourly interval.
+
+## Extract independent util/memory ownership package
+
+Moved18 production files for raw Runtime, SmallAllocator, accounting, failures,
+tracked release/pending ownership, uint32 codecs, runtime uint32 borrows and
+construction-failure contracts into util/memory. Compiler-resolved native and
+g3debug audits verified no production back-edge to root util. All actual
+numeral, parameter, AST, SAT, polynomial and other callers import the concrete
+memory owner directly; public root compatibility aliases were not added.
+
+Moved16 implementation test files with the same tests and private assertions.
+Higher-level exception/diagnostic/stream integration stays with its actual root
+consumer. Only its simple test error-check helper is retained locally. Removed
+obsolete private runtime/config/block/state/stats aliases, three unused error
+aliases and empty accounting/runtime test placeholders. Root source exception
+transport selection and diagnostic wrapper behavior remain; their concrete
+configuration and storage now name memory owners directly.
+
+Package imports are stdlib plus arena only: no root util, numeral, parameter,
+string or other util dependency. Allocations, profile counters, physical bytes,
+source failure/publication/destruction prefixes and owner identity are unchanged.
+Manifest source/test paths follow the real implementation and existing gaps;
+counts remain2102 units/677 APIs:62 ported,281 partial,1731 unported,two
+dead/deleted. Root util now has266 production files; its numeral/text/parameter
+boundaries and the complete requested root subpackage split remain unfinished.
+
+Validation: full native memory passed (0.092s); native AST/rewriter/polynomial/
+model/tactic/SAT/SAT tactic/SMT core/API passed
+(18.292s/9.869s/31.726s/0.056s/0.030s/0.498s/0.122s/0.234s/0.013s).
+Full root util passed (91.498s), log /mnt/oldrog/tmp/g3-extract-memory-util-tests.log.
+Full g3debug memory/AST/tactic passed (0.096s/20.357s/0.023s). Final native and
+g3debug memory/root policy/diagnostic/stream checks passed
+(0.077s/0.031s and0.075s/0.027s). Module-wide native compilation passed; combined
+g3debug+g3checked compilation exposed one tag-combination-only test import,
+which is corrected. Final combined compilation and its MPF numeric-stop test
+passed (0.031s). Memory/root util/AST/polynomial/SAT vet, manifest and diff checks
+passed. No full native module rerun within the hourly interval.

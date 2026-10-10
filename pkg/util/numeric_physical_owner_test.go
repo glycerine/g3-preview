@@ -2,6 +2,7 @@
 package util
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"reflect"
 	"testing"
 )
@@ -17,7 +18,7 @@ type paramsPhysicalRationalOwner struct {
 }
 
 type numericPhysicalExtraOwners struct {
-	CallerBlocks         []Block // actual directly returned caller allocations only
+	CallerBlocks         []umemory.Block // actual directly returned caller allocations only
 	DebugContexts        []*DebugContext
 	ParamsRationalValues []paramsPhysicalRationalOwner
 	ParamsValues         []paramsPhysicalValueOwner

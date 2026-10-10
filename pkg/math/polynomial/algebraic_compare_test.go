@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -21,16 +22,16 @@ func algebraicCompareFixture(t *testing.T) (*AlgebraicRootCore, *UPolynomialMana
 func algebraicCompareFixtureProfile(t *testing.T, guardProfile bool) (*AlgebraicRootCore, *UPolynomialManager, *algebraicCompareControl) {
 	t.Helper()
 	var s *util.RationalService
-	profile := util.SmallAllocatorProfile{PointerBits: 64}
+	profile := umemory.SmallAllocatorProfile{PointerBits: 64}
 	if !guardProfile {
 		s, _ = serviceNew(t)
 	} else {
 		budget := arena.NewBudget(1 << 25)
-		runtime, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, SizeTBits: 32})
+		runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 32})
 		serviceMust(t, e)
 		cfg := serviceConfig(budget)
 		cfg.Integers.Memory = runtime
-		profile = util.SmallAllocatorProfile{PointerBits: 32, Debug: true}
+		profile = umemory.SmallAllocatorProfile{PointerBits: 32, Debug: true}
 		cfg.Integers.Profile = profile
 		s, e = util.NewRationalService(cfg)
 		serviceMust(t, e)
@@ -53,7 +54,7 @@ func algebraicCompareFixtureProfile(t *testing.T, guardProfile bool) (*Algebraic
 	serviceMust(t, e)
 	bi, e := util.NewBinaryIntervalManager(b)
 	serviceMust(t, e)
-	a, e := util.NewSmallAllocator(util.SmallAllocatorConfig{Runtime: s.Manager.Z.Memory, Profile: profile})
+	a, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: s.Manager.Z.Memory, Profile: profile})
 	serviceMust(t, e)
 	c, e := NewAlgebraicRootCore(AlgebraicRootConfig{Rationals: s.Manager, Polynomials: p, Factors: f, Binary: b, Intervals: bi, Allocator: a, Checkpoint: p.config.Checkpoint, Cooperation: p.config.Cooperation})
 	serviceMust(t, e)

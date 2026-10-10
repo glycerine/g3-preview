@@ -1,14 +1,17 @@
 // Source: src/util/mpf.cpp:1255-1270.
 package util
 
-import "github.com/glycerine/g3/pkg/arena"
+import (
+	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	// Renormalize shifts a nonnegative significand into the given precision and
+	// adjusts its exponent. Like the source helper, it ignores ebits and truncates
+	// discarded bits without rounding. The caller owns both output fields.
+)
 
-// Renormalize shifts a nonnegative significand into the given precision and
-// adjusts its exponent. Like the source helper, it ignores ebits and truncates
-// discarded bits without rounding. The caller owns both output fields.
 func (m *ArbitraryFloatManager) Renormalize(ebits, sbits uint32, exponent *int64, sig *Int) (cause error) {
 	if m == nil || m.self != m || m.integer == nil || m.integer.self != m.integer {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.renormalize.active {
 		return ErrNumericPending
@@ -17,7 +20,7 @@ func (m *ArbitraryFloatManager) Renormalize(ebits, sbits uint32, exponent *int64
 		return e
 	}
 	if exponent == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := m.integer.check(sig); e != nil {
 		return e

@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestSATSolverNativeActivityAndTrailAccounting(t *testing.T) {
@@ -142,7 +142,7 @@ func TestSATSolverNativeTrailDoesNotReachRuntimeTLSCheckpoint(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	todo, e := newSATSolverUintSet(b)
 	satOK(t, e)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true})
 	satOK(t, e)
 	v, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, r)
 	satOK(t, e)

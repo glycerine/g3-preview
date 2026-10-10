@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatFormattedSetInlineZeroAfterRetainedUnpackLeaf(t *testing.T) {
 	found := false
 	for ordinal := int64(0); ordinal < 20; ordinal++ {
 		b := arena.NewBudget(1 << 27)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		var x, out, z, after ArbitraryFloat
 		one := NewInt(1)
@@ -22,7 +23,7 @@ func TestArbitraryFloatFormattedSetInlineZeroAfterRetainedUnpackLeaf(t *testing.
 		b.FailAfter(ordinal)
 		body := m.SetFormat(&out, 8, 24, ArbitraryFloatNearestEven, &x)
 		old := m.formattedSet.history
-		selected := body != nil && old != nil && old.Numeric.Cell.Object != (ObjectRef{})
+		selected := body != nil && old != nil && old.Numeric.Cell.Object != (umemory.ObjectRef{})
 		if selected {
 			integerPhysicalAudit(t, m.integer, &x.significand, &out.significand, &z.significand)
 			if b.Used() != m.memory.Stats().TotalBytes+m.OwnedStorageBytes() {
@@ -30,7 +31,7 @@ func TestArbitraryFloatFormattedSetInlineZeroAfterRetainedUnpackLeaf(t *testing.
 			}
 			oldContext := m.formattedSet.allocationContext()
 			copiedScope := m.formattedSet
-			if (integerAllocationInvocationContext{mpfFormattedSet: &copiedScope, mpfFormattedSetInvocation: copiedScope.invocation}).formattedSetFrame(m.integer, false) != nil || m.formattedRoundSourceCause(&copiedScope) != ErrRuntimeOwner || m.formattedRoundCleanup(&copiedScope, true) != ErrRuntimeOwner {
+			if (integerAllocationInvocationContext{mpfFormattedSet: &copiedScope, mpfFormattedSetInvocation: copiedScope.invocation}).formattedSetFrame(m.integer, false) != nil || m.formattedRoundSourceCause(&copiedScope) != umemory.ErrRuntimeOwner || m.formattedRoundCleanup(&copiedScope, true) != umemory.ErrRuntimeOwner {
 				t.Fatal("copied actual scope authority")
 			}
 			copiedHistory := *old
@@ -38,7 +39,7 @@ func TestArbitraryFloatFormattedSetInlineZeroAfterRetainedUnpackLeaf(t *testing.
 			forged.Frame = &copiedHistory
 			beforeCell := old.Numeric.Cell
 			beforeUsed := b.Used()
-			if e = m.CleanupFormattedSetWithReceipt(&forged, true); e != ErrRuntimeOwner || old.Numeric.Cell != beforeCell || b.Used() != beforeUsed {
+			if e = m.CleanupFormattedSetWithReceipt(&forged, true); e != umemory.ErrRuntimeOwner || old.Numeric.Cell != beforeCell || b.Used() != beforeUsed {
 				t.Fatal("copied history authority", e)
 			}
 			bodyBefore, sourceBefore, ownBefore := m.FormattedSetInvocationCauses(&old.Issued)
@@ -47,7 +48,7 @@ func TestArbitraryFloatFormattedSetInlineZeroAfterRetainedUnpackLeaf(t *testing.
 				t.Fatal("literal inline zero erased by retained unrelated allocation", ordinal, e)
 			}
 			b.FailAfter(-1)
-			if oldContext.formattedSetFrame(m.integer, false) != nil || oldContext.roots(m.integer) != nil || oldContext.prepareFormattedSetHistory(m.integer) != ErrRuntimeOwner {
+			if oldContext.formattedSetFrame(m.integer, false) != nil || oldContext.roots(m.integer) != nil || oldContext.prepareFormattedSetHistory(m.integer) != umemory.ErrRuntimeOwner {
 				t.Fatal("saved mutable binding retargeted to next invocation")
 			}
 			if after.SBits() != 24 || after.EBits() != 8 || !after.Sign() {

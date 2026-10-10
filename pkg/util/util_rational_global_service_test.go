@@ -8,14 +8,15 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func rationalGlobalFixture(t *testing.T) (*RationalGlobalService, *arena.Budget, *Runtime) {
+func rationalGlobalFixture(t *testing.T) (*RationalGlobalService, *arena.Budget, *umemory.Runtime) {
 	t.Helper()
 	b := arena.NewBudget(1 << 26)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	cfg := RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}}
+	cfg := RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}}
 	g, e := NewRationalGlobalService(cfg)
 	paramsMust(t, e)
 	t.Cleanup(func() {
@@ -169,7 +170,7 @@ func rationalGlobalFinish(t *testing.T, g *RationalGlobalService) {
 
 // Only actual service fields and acquired constructor nodes introduce owners.
 // Runtime is counted once; its allocation directory is never an owning source.
-func rationalGlobalColdGraph(t *testing.T, g *RationalGlobalService, r *Runtime) {
+func rationalGlobalColdGraph(t *testing.T, g *RationalGlobalService, r *umemory.Runtime) {
 	t.Helper()
 	n := r.Stats().TotalBytes + g.header
 	sv := reflect.ValueOf(g.service).Elem()
@@ -265,8 +266,8 @@ func TestRationalGlobalEveryActualConstructorReservationAndRetry(t *testing.T) {
 			return
 		}
 		if !errors.Is(e, arena.ErrInjectedFailure) {
-			var failure Failure
-			if !errors.As(e, &failure) || failure.Kind != FailureMemout || failure.ErrorCode() != 101 || !r.State().OutOfMemory {
+			var failure umemory.Failure
+			if !errors.As(e, &failure) || failure.Kind != umemory.FailureMemout || failure.ErrorCode() != 101 || !r.State().OutOfMemory {
 				t.Fatal("unexpected actual constructor refusal", ordinal, e)
 			}
 		}
@@ -312,8 +313,8 @@ func TestRationalGlobalEveryReinitReservationPublishesBeforeEndedZero(t *testing
 			t.Fatal("failed reinit constructor published pointer")
 		}
 		if !errors.Is(e, arena.ErrInjectedFailure) {
-			var f Failure
-			if !errors.As(e, &f) || f.Kind != FailureMemout || f.ErrorCode() != 101 || !r.State().OutOfMemory {
+			var f umemory.Failure
+			if !errors.As(e, &f) || f.Kind != umemory.FailureMemout || f.ErrorCode() != 101 || !r.State().OutOfMemory {
 				t.Fatal("unexpected reinit refusal", e)
 			}
 		}

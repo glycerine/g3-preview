@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestSourceStringAssertions(t *testing.T) {
@@ -156,13 +157,13 @@ func TestParserExceptionCategoriesAndFailurePublication(t *testing.T) {
 			var power *PowerDomainError
 			var parsed *ParseError
 			if text == "1e2147483647" {
-				var failure Failure
-				if !errors.Is(e, arena.ErrBudget) && !errors.Is(e, arena.ErrBounds) && (!errors.As(e, &failure) || failure.Kind != FailureMemout || !m.Z.Memory.State().OutOfMemory) {
+				var failure umemory.Failure
+				if !errors.Is(e, arena.ErrBudget) && !errors.Is(e, arena.ErrBounds) && (!errors.As(e, &failure) || failure.Kind != umemory.FailureMemout || !m.Z.Memory.State().OutOfMemory) {
 					t.Fatal(text, e)
 				}
 			} else {
-				var failure Failure
-				if (!errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != FailureMemout || !m.Z.Memory.State().OutOfMemory)) || errors.As(e, &power) || errors.As(e, &parsed) {
+				var failure umemory.Failure
+				if (!errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != umemory.FailureMemout || !m.Z.Memory.State().OutOfMemory)) || errors.As(e, &power) || errors.As(e, &parsed) {
 					t.Fatal(text, e)
 				}
 			}
@@ -252,18 +253,18 @@ func TestParserBudgetFailureCleanup(t *testing.T) {
 					qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den, &out})
 					if e != nil && integer == 0 {
 						parserPublicationAudit(t, m, &a.Num, &a.Den, &out)
-						var failure Failure
+						var failure umemory.Failure
 						var parsed *ParseError
 						var power *PowerDomainError
-						if (!errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != FailureMemout || !m.Z.Memory.State().OutOfMemory)) || errors.As(e, &parsed) || errors.As(e, &power) || !parserPublicationSweepMatches(t, m, &a, text) || roundPublicationDecode(t, m.Z, &out).Cmp(big.NewInt(17)) != 0 {
+						if (!errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != umemory.FailureMemout || !m.Z.Memory.State().OutOfMemory)) || errors.As(e, &parsed) || errors.As(e, &power) || !parserPublicationSweepMatches(t, m, &a, text) || roundPublicationDecode(t, m.Z, &out).Cmp(big.NewInt(17)) != 0 {
 							t.Fatal("source parser failure pair", synch, text, after, e, a)
 						}
 					}
 					budget.FailAfter(-1)
 					if e != nil {
 						failures++
-						var failure Failure
-						if integer == 1 && ((!errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != FailureMemout || !m.Z.Memory.State().OutOfMemory)) || rationalString(t, m, &a) != "17/13" || !integerParserSourcePrefixMatches(t, m.Z, &out, text)) {
+						var failure umemory.Failure
+						if integer == 1 && ((!errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != umemory.FailureMemout || !m.Z.Memory.State().OutOfMemory)) || rationalString(t, m, &a) != "17/13" || !integerParserSourcePrefixMatches(t, m.Z, &out, text)) {
 							t.Fatal("integer parser source prefix differs", synch, text, integer, after, e)
 						}
 					} else {

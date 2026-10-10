@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerCopyAllocationReceiptUnchangedWithoutAllocation(t *testing.T) {
@@ -40,12 +41,12 @@ func TestIntegerCopyAllocationReceiptExactBackingAndForeignReplacement(t *testin
 	for _, direct := range []bool{false, true} {
 		t.Run(map[bool]string{false: "pooled", true: "direct"}[direct], func(t *testing.T) {
 			b := arena.NewBudget(1 << 24)
-			m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: direct}})
+			m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: direct}})
 			serviceMust(t, e)
 			out := NewInt(19)
 			var receipt integerCopyAllocationReceipt
 			e = m.CopyFromOwnerWithReceipt(&out, m, &m.Two64, &receipt)
-			if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (ObjectRef{}) || !m.MatchesCopyAllocationInvocation(&receipt) || receipt.Frame.Roots.Cell != m.PendingCell {
+			if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (umemory.ObjectRef{}) || !m.MatchesCopyAllocationInvocation(&receipt) || receipt.Frame.Roots.Cell != m.PendingCell {
 				t.Fatal("actual backing before descriptor refusal", e, m.PendingCell)
 			}
 			integerPhysicalAudit(t, m, &out)
@@ -54,7 +55,7 @@ func TestIntegerCopyAllocationReceiptExactBackingAndForeignReplacement(t *testin
 			serviceMust(t, m.Del(&out))
 			out = NewInt(23)
 			e = m.Copy(&out, &m.Two64)
-			if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (ObjectRef{}) || m.PendingCell.Object == old.Object {
+			if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (umemory.ObjectRef{}) || m.PendingCell.Object == old.Object {
 				t.Fatal("real same-cardinality replacement", e)
 			}
 			foreign := m.PendingCell

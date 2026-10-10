@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Returning Go transport is an adapter profile, not a native callback claim.
@@ -31,7 +32,7 @@ func TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner(t *tes
 	var call RationalServiceInvocation
 	var out OwnedRational
 	active, calls := false, 0
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			calls++
 			if call.division.Frame != &s.Manager.Z.DivisionRaw || call.division.Invocation != s.Manager.Z.DivisionRaw.Invocation || !s.Manager.Z.DivisionRaw.executing {
@@ -65,7 +66,7 @@ func TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner(t *tes
 	serviceMust(t, e)
 	cfg := serviceConfig(b)
 	cfg.Integers.Memory = rt
-	cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	s, e = NewRationalService(cfg)
 	serviceMust(t, e)
 	a, e := s.NewValue()
@@ -101,8 +102,8 @@ func TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner(t *tes
 	for i := uint8(0); i < call.scope.Count; i++ {
 		roots = append(roots, &call.scope.Roots[i].Num, &call.scope.Roots[i].Den)
 	}
-	extra := []Block{held}
-	if block := call.transferred.Block(); block != (Block{}) {
+	extra := []umemory.Block{held}
+	if block := call.transferred.Block(); block != (umemory.Block{}) {
 		extra = append(extra, block)
 	}
 	integerPhysicalAuditWithRaw(t, s.Manager.Z, extra, roots...)

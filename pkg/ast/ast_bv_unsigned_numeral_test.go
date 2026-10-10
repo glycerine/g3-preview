@@ -5,7 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math"
 	"testing"
 )
@@ -72,8 +73,8 @@ func TestASTBitVectorUnsignedNumeralEveryNumericalReservation(t *testing.T) {
 			} else {
 				failures++
 				if !errors.Is(body, arena.ErrInjectedFailure) {
-					var f util.Failure
-					if !errors.As(body, &f) || f.Kind != util.FailureMemout {
+					var f umemory.Failure
+					if !errors.As(body, &f) || f.Kind != umemory.FailureMemout {
 						t.Fatal("unexpected numerical refusal", body)
 					}
 				}

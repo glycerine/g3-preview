@@ -1,6 +1,8 @@
 // Source: src/util/mpf.cpp:1228-1253 (finite-branch biased_exp scoped lifetime).
 package util
 
+import umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type arbitraryFloatIEEEBVScope struct {
 	manager                        *ArbitraryFloatManager
 	invocation                     uint64
@@ -51,7 +53,7 @@ func (s *arbitraryFloatIEEEBVScope) unbind() error {
 }
 func (m *ArbitraryFloatManager) finishIEEEBVSource() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.ieeeBV
 	if s.executing || s.finishing {
@@ -85,7 +87,7 @@ func (m *ArbitraryFloatManager) finishIEEEBVSource() error {
 
 func (m *ArbitraryFloatManager) CleanupToIEEEBVMPZ() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.ieeeBV
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {
@@ -95,7 +97,7 @@ func (m *ArbitraryFloatManager) CleanupToIEEEBVMPZ() (cause error) {
 		return nil
 	}
 	if !s.valid() {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := s.bind(); e != nil {
 		return e

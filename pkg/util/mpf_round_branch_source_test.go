@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Independent represented IEEE checks validate literal overflow, denormal and
@@ -15,7 +16,7 @@ func TestArbitraryFloatRoundLiteralOverflowDenormalCarry(t *testing.T) {
 	for _, sign := range []bool{false, true} {
 		for _, mode := range []ArbitraryFloatRoundingMode{ArbitraryFloatNearestEven, ArbitraryFloatNearestAway, ArbitraryFloatTowardPositive, ArbitraryFloatTowardNegative, ArbitraryFloatTowardZero} {
 			b := arena.NewBudget(1 << 27)
-			m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+			m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 			serviceMust(t, e)
 			for _, tc := range []struct {
 				sig  int32
@@ -76,7 +77,7 @@ func TestArbitraryFloatRoundReachedSignedExpressionGuard(t *testing.T) {
 		exp int64
 	}{{1, math.MinInt64}, {1 << 27, math.MaxInt64}} {
 		b := arena.NewBudget(1 << 27)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		sig := NewInt(tc.sig)
 		var x ArbitraryFloat

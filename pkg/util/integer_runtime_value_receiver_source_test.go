@@ -6,17 +6,18 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Returning Go transport is a concrete adapter profile. It observes the real
 // vector row at the reached lower allocation; it is not a native C++ callback.
 func TestIntegerPhysicalCopyPublishesSignBeforeActualAllocationCallback(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	var r *Runtime
-	var row Block
+	var r *umemory.Runtime
+	var row umemory.Block
 	active, calls := false, 0
 	var seen uint32
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			calls++
 			var read error
@@ -28,7 +29,7 @@ func TestIntegerPhysicalCopyPublishesSignBeforeActualAllocationCallback(t *testi
 		return f
 	}})
 	serviceMust(t, e)
-	m, e := NewIntegerManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e := NewIntegerManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	row, e = r.Allocate(16)
 	serviceMust(t, e)
@@ -59,10 +60,10 @@ func TestIntegerPhysicalCopyPublishesSignBeforeActualAllocationCallback(t *testi
 	if int32(val) != out.Val || NumericCellRef(uint64(low)|uint64(high)<<32) != out.Cell {
 		t.Fatal("exact failed receiver prefix", out, val, low, high)
 	}
-	if !errors.Is(call, Failure{Kind: FailureMemout}) {
+	if !errors.Is(call, umemory.Failure{Kind: umemory.FailureMemout}) {
 		t.Fatal("original source failure", call)
 	}
-	integerPhysicalAuditWithRaw(t, m, []Block{row, padding}, &out, &source)
+	integerPhysicalAuditWithRaw(t, m, []umemory.Block{row, padding}, &out, &source)
 	if b.Used() != integerActualOwnedBytes(m) {
 		t.Fatal("immediate physical/cold graph", b.Used())
 	}
@@ -98,7 +99,7 @@ func TestIntegerPhysicalCopyReceiverIdentityAndExtentGuards(t *testing.T) {
 	}
 	good := integerRuntimeValueReceiver{runtime: m.Memory, block: row}
 	mismatched := NewInt(13)
-	if e = m.copyFromOwnerWithPhysicalReceipt(&mismatched, m, &source, &receipt, &good); !errors.Is(e, ErrRuntimeOwner) {
+	if e = m.copyFromOwnerWithPhysicalReceipt(&mismatched, m, &source, &receipt, &good); !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("actual captured row mismatch", e)
 	}
 	serviceMust(t, m.copyFromOwnerWithPhysicalReceipt(&out, m, &source, &receipt, &good))
@@ -124,6 +125,6 @@ func TestIntegerPhysicalCopyReceiverIdentityAndExtentGuards(t *testing.T) {
 	if word != 19 || out != NewInt(11) || receipt.invocation != 0 {
 		t.Fatal("stale borrowed row mutated replacement")
 	}
-	integerPhysicalAuditWithRaw(t, m, []Block{replacement}, &out, &source)
+	integerPhysicalAuditWithRaw(t, m, []umemory.Block{replacement}, &out, &source)
 	serviceMust(t, m.Memory.Deallocate(&replacement))
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Returning Go ErrorTransport profile: allocation refusal invokes a supported
@@ -15,7 +16,7 @@ func TestPolynomialNormalizeActualTransportOwnerSourceRefusal(t *testing.T) {
 	budget := arena.NewBudget(1 << 28)
 	var full *MultivariatePolynomialManager
 	active, seen := false, false
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f util.Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			active = false
 			seen = true
@@ -68,6 +69,6 @@ func TestPolynomialNormalizeActualTransportOwnerSourceRefusal(t *testing.T) {
 		t.Error("named owners retained", budget.Used())
 	}
 }
-func rtStateForNormalize(m *MultivariatePolynomialManager) util.RuntimeState {
+func rtStateForNormalize(m *MultivariatePolynomialManager) umemory.RuntimeState {
 	return m.core.memory.State()
 }

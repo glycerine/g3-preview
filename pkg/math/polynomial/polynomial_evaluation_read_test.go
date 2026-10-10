@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // An actual newly allocated partially initialized monomial exercises reached
@@ -41,7 +42,7 @@ func TestPolynomialEvaluationReachedDegreeAfterVariableBreak(t *testing.T) {
 		// explicit owning abort of this actual placed field, without filling
 		// either the header or the deliberately unread second degree.
 		e := m.core.CleanupValue(&partial)
-		if !errors.Is(e, util.ErrRuntimeUninitialized) {
+		if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 			t.Fatal("partial source deletion header", e)
 		}
 		l, e := m.core.polynomialLocation(partial)
@@ -76,7 +77,7 @@ func TestPolynomialEvaluationReachedDegreeAfterVariableBreak(t *testing.T) {
 	m.evaluation.executing = true
 	e = m.evaluationRationalCore(partial, &values, 0, 1, 1, &out)
 	m.evaluation.executing = false
-	if !errors.Is(e, util.ErrRuntimeUninitialized) {
+	if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("actually reached second degree", e)
 	}
 	want := int32(6)

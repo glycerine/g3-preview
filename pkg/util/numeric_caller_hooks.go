@@ -3,6 +3,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // NumericInvocationHooks transports caller-owned lifetime policy. The hooks
@@ -84,7 +85,7 @@ func (m *NaturalManager) numericCallerExecuting() bool {
 // The owner must clear its guard before destroying the borrowed manager.
 func (m *IntegerManager) SetCallerExecutionGuard(guard func() bool) error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.closed {
 		return arena.ErrClosed
@@ -97,7 +98,7 @@ func (m *IntegerManager) SetCallerExecutionGuard(guard func() bool) error {
 }
 func (m *NaturalManager) SetCallerExecutionGuard(guard func() bool) error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.ClosedField {
 		return arena.ErrClosed

@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -16,20 +17,20 @@ func TestPolynomialFactorCoreActualYoungerBackendDTProtectsReferencesAndNumeral(
 		t.Skip("literal conditional checker erased")
 	}
 	b := arena.NewBudget(1 << 28)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	primes, e := primegen.NewGenerator(b)
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}, Factorization: UPolynomialFactorizationConfig{Primes: primes, FactorizationDebugTag: true}})
 	serviceMust(t, e)
-	var external util.Block
+	var external umemory.Block
 	armed := false
 	full.upm.config.Checkpoint = func() bool {
 		if full.factorService != nil && full.factorService.scope != nil {
@@ -38,7 +39,7 @@ func TestPolynomialFactorCoreActualYoungerBackendDTProtectsReferencesAndNumeral(
 				armed = true
 				contextTLSNearMinimum(t, rt)
 				cause := rt.Deallocate(&external)
-				if !errors.Is(cause, arena.ErrBounds) || external != (util.Block{}) {
+				if !errors.Is(cause, arena.ErrBounds) || external != (umemory.Block{}) {
 					t.Fatal("actual signed owner release", cause)
 				}
 				return false
@@ -109,7 +110,7 @@ func TestPolynomialFactorCoreActualYoungerBackendDTProtectsReferencesAndNumeral(
 	if full.factorRoot != newReceipt || beforeUsed != b.Used() || beforeOutput != rtStateForFactors(later) || parent.sourceCause != original || parent.cleanupCause != own || !errors.Is(parent.bodyCause, ErrUPolynomialCanceled) || !errors.Is(body, original) {
 		t.Fatal("later actual call or stale ACK erased old diagnostics/adopted new output")
 	}
-	polynomialFactorsAuditOwnersExtra(t, later, []Polynomial{p}, nil, primes.Stats().TotalBytes, []util.Block{recovery}, []*PolynomialFactors{out})
+	polynomialFactorsAuditOwnersExtra(t, later, []Polynomial{p}, nil, primes.Stats().TotalBytes, []umemory.Block{recovery}, []*PolynomialFactors{out})
 	contextTLSFinish(t, rt, later.CloseChecked)
 	contextTLSFinish(t, rt, out.CloseChecked)
 	contextTLSFinish(t, rt, func() error { return full.core.DecRef(p) })

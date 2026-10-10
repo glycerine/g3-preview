@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatRoundSqrtDetachedDescriptorAcrossOlderScratchStop(t *testing.T) {
@@ -12,7 +13,7 @@ func TestArbitraryFloatRoundSqrtDetachedDescriptorAcrossOlderScratchStop(t *test
 		found := false
 		for ordinal := int64(0); ordinal < 20; ordinal++ {
 			b := arena.NewBudget(1 << 27)
-			m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: direct}})
+			m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: direct}})
 			serviceMust(t, e)
 			_, e = m.roundPower(32, false)
 			serviceMust(t, e)
@@ -36,7 +37,7 @@ func TestArbitraryFloatRoundSqrtDetachedDescriptorAcrossOlderScratchStop(t *test
 			if b.Used() != m.memory.Stats().TotalBytes+m.OwnedStorageBytes() {
 				t.Fatal("before lift exact graph", ordinal)
 			}
-			selected := returned != nil && s.history != nil && s.Numeric.Cell.Object != (ObjectRef{}) && (s.Numeric.Cell.Offset == 0) == direct
+			selected := returned != nil && s.history != nil && s.Numeric.Cell.Object != (umemory.ObjectRef{}) && (s.Numeric.Cell.Offset == 0) == direct
 			b.FailAfter(-1)
 			serviceMust(t, m.CleanupRoundSqrtWithReceipt(&receipt, false))
 			serviceMust(t, m.Del(&x))

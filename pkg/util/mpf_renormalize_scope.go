@@ -1,8 +1,12 @@
 // Source: src/util/mpf.cpp:1255-1270 (no lexical NUM or RAW declarations).
 package util
 
+import
+
 // Cached powers retain their existing persistent member owners. This scope
 // owns only allocating prefixes reached by the caller's in-place shift.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type arbitraryFloatRenormalizeScope struct {
 	manager                        *ArbitraryFloatManager
 	invocation                     uint64
@@ -49,7 +53,7 @@ func (s *arbitraryFloatRenormalizeScope) unbind() error {
 }
 func (m *ArbitraryFloatManager) CleanupRenormalize() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.renormalize
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {
@@ -59,7 +63,7 @@ func (m *ArbitraryFloatManager) CleanupRenormalize() (cause error) {
 		return nil
 	}
 	if !s.valid() {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := s.bind(); e != nil {
 		return e

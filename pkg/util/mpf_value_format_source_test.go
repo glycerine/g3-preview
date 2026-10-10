@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatToStringLiteralSpecialBranches(t *testing.T) {
@@ -144,7 +145,7 @@ func (s *formatTestStream) Close() error          { return nil }
 func TestArbitraryFloatToStringEveryNumericalReservationPrefix(t *testing.T) {
 	for ordinal := int64(0); ordinal < 400; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 		serviceMust(t, e)
 		var a ArbitraryFloat
 		sig := NewInt(1)
@@ -207,12 +208,12 @@ func TestArbitraryFloatToStringEveryNumericalReservationPrefix(t *testing.T) {
 func TestArbitraryFloatToStringActualAllocationCallbackGuards(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	var m *ArbitraryFloatManager
-	var rt *Runtime
+	var rt *umemory.Runtime
 	var text formatTestText
 	var a ArbitraryFloat
 	active := false
 	calls := 0
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			calls++
 			used := b.Used()
@@ -254,7 +255,7 @@ func TestArbitraryFloatToStringActualAllocationCallbackGuards(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	sig := NewInt(1)
 	serviceMust(t, m.SetComponents(&a, 8, 40000, false, 0, &sig))
@@ -268,10 +269,10 @@ func TestArbitraryFloatToStringActualAllocationCallbackGuards(t *testing.T) {
 	active = true
 	_, body := m.ToStringInto(&a, &text)
 	active = false
-	if !errors.Is(body, Failure{Kind: FailureMemout}) || calls == 0 {
+	if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls == 0 {
 		t.Fatal("actual callback leaf not reached", body, calls)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &a.significand, &m.rational.NTmp)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &a.significand, &m.rational.NTmp)
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, m.CleanupFormatInvocation(&text.scope, false))
 	serviceMust(t, m.CleanupFormatInvocation(&text.scope, true))
@@ -297,9 +298,9 @@ func TestArbitraryFloatToStringScopedRationalSourceDTStop(t *testing.T) {
 		return
 	}
 	b := arena.NewBudget(1 << 28)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	var a ArbitraryFloat
 	sig := NewInt(1)
@@ -329,7 +330,7 @@ func TestArbitraryFloatToStringScopedRationalSourceDTStop(t *testing.T) {
 	}
 	_, body := m.ToStringInto(&a, text)
 	integerPhysicalAuditWithRaw(t, m.integer, nil, &a.significand, &m.rational.NTmp)
-	if !errors.Is(release, arena.ErrBounds) || external != (Block{}) {
+	if !errors.Is(release, arena.ErrBounds) || external != (umemory.Block{}) {
 		t.Fatal("actual accounting frontier", release)
 	}
 	if !errors.Is(body, arena.ErrBounds) || text.scope.sourceCause == nil || text.scope.sourceCursor != 1 || older != ([4]Int{text.scope.Q.Num, text.scope.Q.Den, text.scope.Denom, text.scope.Num}) {
@@ -364,7 +365,7 @@ func TestArbitraryFloatToStringScopedRationalSourceDTStop(t *testing.T) {
 	serviceMust(t, text.scope.EndContext())
 	contextTLSFinish(t, rt, func() error { return m.Del(&a) })
 	contextTLSFinish(t, rt, m.Close)
-	if e := rt.Deallocate(&recovery); e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (Block{})) {
+	if e := rt.Deallocate(&recovery); e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal(e)
 	}
 	contextTLSFinish(t, rt, rt.Close)
@@ -375,7 +376,7 @@ func TestArbitraryFloatToStringScopedRationalSourceDTStop(t *testing.T) {
 
 func TestArbitraryFloatToStringCopiedScopeAndRetainedHistory(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	var a ArbitraryFloat
 	sig := NewInt(1)
@@ -397,10 +398,10 @@ func TestArbitraryFloatToStringCopiedScopeAndRetainedHistory(t *testing.T) {
 	copied := first.scope
 	used := b.Used()
 	state := m.memory.State()
-	if e := m.CleanupFormatInvocation(&copied, true); e != ErrRuntimeOwner {
+	if e := m.CleanupFormatInvocation(&copied, true); e != umemory.ErrRuntimeOwner {
 		t.Fatal("copied actual frame accepted", e)
 	}
-	if e := copied.SourceReady(); e != ErrRuntimeOwner {
+	if e := copied.SourceReady(); e != umemory.ErrRuntimeOwner {
 		t.Fatal("copied history accepted", e)
 	}
 	if used != b.Used() || state != m.memory.State() {
@@ -450,7 +451,7 @@ func TestArbitraryFloatToStringCopiedScopeAndRetainedHistory(t *testing.T) {
 func TestArbitraryFloatToStringOldScopePreservesLaterAllocatingCall(t *testing.T) {
 	for ordinal := int64(0); ordinal < 30; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		var a ArbitraryFloat
 		sig := NewInt(1)

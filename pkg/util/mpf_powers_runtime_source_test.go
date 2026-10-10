@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatPowersRuntimeWrapperCacheAndSourceDestruction(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	for _, n := range []uint32{0, 30, 31, 100} {
 		w, err := m.powerTwoWrapper(n, false)
@@ -50,15 +51,15 @@ func TestArbitraryFloatPowerWrapperEveryActualReservationPrefix(t *testing.T) {
 	failed, completed := false, false
 	for ordinal := int64(0); ordinal < 64; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 		serviceMust(t, e)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 		serviceMust(t, e)
 		foreign, e := r.Allocate(23)
 		serviceMust(t, e)
 		b.FailAfter(ordinal)
 		_, call := m.powerTwoWrapper(100, false)
-		var raw []Block
+		var raw []umemory.Block
 		var nums []*Int
 		values := make([]Int, 0, 8)
 		raw = append(raw, foreign)
@@ -104,9 +105,9 @@ func TestArbitraryFloatPowerWrapperEveryActualReservationPrefix(t *testing.T) {
 
 func TestArbitraryFloatPowerMinusOneAndNegatedCaches(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	for _, n := range []uint32{0, 1, 30, 31, 32, 62} {
 		for _, neg := range []bool{false, true} {
@@ -135,12 +136,12 @@ func TestArbitraryFloatPowerMinusOneAndNegatedCaches(t *testing.T) {
 
 func TestArbitraryFloatPowerActualAllocationCallbackPrefixAndOwnerExclusion(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	var r *Runtime
+	var r *umemory.Runtime
 	var m *ArbitraryFloatManager
 	active, calls := false, 0
 	var seen uint32
 	var lifecycle []error
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f umemory.Failure) error {
 		if active {
 			calls++
 			w := m.PowerWrappers
@@ -152,7 +153,7 @@ func TestArbitraryFloatPowerActualAllocationCallbackPrefixAndOwnerExclusion(t *t
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	if r.State().LocalSize >= 99900 {
 		t.Fatal("fixture TLS constructor extent", r.State())
@@ -177,7 +178,7 @@ func TestArbitraryFloatPowerActualAllocationCallbackPrefixAndOwnerExclusion(t *t
 	}
 	a, e := w.Capture()
 	serviceMust(t, e)
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{padding}, &a)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{padding}, &a)
 	if b.Used() != r.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("before-lift exact physical/cold graph", b.Used())
 	}
@@ -194,9 +195,9 @@ func TestArbitraryFloatPowerActualAllocationCallbackPrefixAndOwnerExclusion(t *t
 
 func TestArbitraryFloatPowerContextRejectsIdleCopiedAndStaleReceipts(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	w, e := m.powerTwoWrapper(8, false)
 	serviceMust(t, e)
@@ -229,12 +230,12 @@ func TestArbitraryFloatPowerContextRejectsIdleCopiedAndStaleReceipts(t *testing.
 
 func TestArbitraryFloatMinusOneScratchFailureReadsPublishedPowerPrefix(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	var r *Runtime
+	var r *umemory.Runtime
 	var m *ArbitraryFloatManager
 	active, calls := false, 0
 	var oldPower Int
 	var sawScratchHole bool
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f umemory.Failure) error {
 		if active {
 			calls++
 			var read error
@@ -245,7 +246,7 @@ func TestArbitraryFloatMinusOneScratchFailureReadsPublishedPowerPrefix(t *testin
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	// Power's 62520-byte source cell fits below the synchronization threshold;
 	// the following literal subtraction scratch growth crosses it.
@@ -271,7 +272,7 @@ func TestArbitraryFloatMinusOneScratchFailureReadsPublishedPowerPrefix(t *testin
 	if after != oldPower || w.bodyCause == nil || w.Roots == (NumericAllocationRoots{}) {
 		t.Fatal("failed decrement changed sole wrapper or lost actual outcome", after, oldPower, w)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{padding}, &after)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{padding}, &after)
 	if b.Used() != r.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("before-lift exact scratch acquisition graph", b.Used())
 	}
@@ -288,9 +289,9 @@ func TestArbitraryFloatMinusOneScratchFailureReadsPublishedPowerPrefix(t *testin
 
 func TestArbitraryFloatThreeFailedCacheMissesThenSuccessfulMissAndWarmHit(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	foreign, e := r.Allocate(23)
 	serviceMust(t, e)
@@ -299,16 +300,16 @@ func TestArbitraryFloatThreeFailedCacheMissesThenSuccessfulMissAndWarmHit(t *tes
 	for _, n := range []uint32{1000000, 1000010, 1000020} {
 		_, call := m.powerTwoWrapper(n, false)
 		w := m.PowerWrappers
-		if call == nil || w == nil || !w.published || w.Transferred.Block() == (Block{}) {
+		if call == nil || w == nil || !w.published || w.Transferred.Block() == (umemory.Block{}) {
 			t.Fatal("actual failed cache acquisition", n, call, w)
 		}
 		stopped = append(stopped, w)
-		integerPhysicalAuditWithRaw(t, m.integer, []Block{foreign})
+		integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{foreign})
 		if b.Used() != r.Stats().TotalBytes+m.OwnedStorageBytes() {
 			t.Fatal("before-lift independent failed cache graph", n, b.Used())
 		}
 	}
-	original := []Block{stopped[0].Transferred.Block(), stopped[1].Transferred.Block(), stopped[2].Transferred.Block()}
+	original := []umemory.Block{stopped[0].Transferred.Block(), stopped[1].Transferred.Block(), stopped[2].Transferred.Block()}
 	serviceMust(t, r.SetMaxSize(0))
 	current, e := m.powerTwoWrapper(100, false)
 	serviceMust(t, e)
@@ -324,7 +325,7 @@ func TestArbitraryFloatThreeFailedCacheMissesThenSuccessfulMissAndWarmHit(t *tes
 			t.Fatal("later source call overwrote exact older acquisition", i, w)
 		}
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{foreign})
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{foreign})
 	if b.Used() != r.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("warm before-lift graph", b.Used())
 	}
@@ -337,7 +338,7 @@ func TestArbitraryFloatThreeFailedCacheMissesThenSuccessfulMissAndWarmHit(t *tes
 	}
 	serviceMust(t, m.Close())
 	for i, w := range stopped {
-		if w.Transferred.Block() != (Block{}) || w.bodyCause == nil || w.original == (Block{}) {
+		if w.Transferred.Block() != (umemory.Block{}) || w.bodyCause == nil || w.original == (umemory.Block{}) {
 			t.Fatal("own ACK lost original source history", i, w)
 		}
 	}
@@ -361,17 +362,17 @@ func testArbitraryFloatDescriptorFailureSourceEndThenOwnHistory(t *testing.T, po
 	found := false
 	for ordinal := int64(0); ordinal < 64; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 		serviceMust(t, e)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: !pooled}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: !pooled}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 		serviceMust(t, e)
 		foreign, e := r.Allocate(23)
 		serviceMust(t, e)
 		b.FailAfter(ordinal)
 		_, call := m.powerTwoWrapper(100, false)
 		w := m.PowerWrappers
-		selected := call != nil && w != nil && w.Roots.Cell.Object != (ObjectRef{}) && (w.Roots.Cell.Offset != 0) == pooled
-		integerPhysicalAuditWithRaw(t, m.integer, []Block{foreign})
+		selected := call != nil && w != nil && w.Roots.Cell.Object != (umemory.ObjectRef{}) && (w.Roots.Cell.Offset != 0) == pooled
+		integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{foreign})
 		if b.Used() != r.Stats().TotalBytes+m.OwnedStorageBytes() {
 			t.Fatal("before-lift exact descriptor-prefix graph", ordinal, b.Used())
 		}
@@ -385,10 +386,10 @@ func testArbitraryFloatDescriptorFailureSourceEndThenOwnHistory(t *testing.T, po
 				t.Fatal("actual completed source suffix/history", ordinal, w)
 			}
 			if pooled {
-				if _, read := r.ReadUint32(original.Raw, original.Offset+4); read != ErrRuntimeOwner {
+				if _, read := r.ReadUint32(original.Raw, original.Offset+4); read != umemory.ErrRuntimeOwner {
 					t.Fatal("actual pooled source release", ordinal, read)
 				}
-				if !w.cellRetired || w.Roots.Cell.Object != (ObjectRef{}) {
+				if !w.cellRetired || w.Roots.Cell.Object != (umemory.ObjectRef{}) {
 					t.Fatal("actual physical retirement stamp", ordinal, w)
 				}
 			} else {

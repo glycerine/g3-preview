@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialFactorConstantActualHelperReceipt(t *testing.T) {
@@ -64,7 +65,7 @@ func TestPolynomialFactorConstantTransportCannotRetireExecutingOwner(t *testing.
 			var q *util.RationalManager
 			var callbackOut, callbackInput util.Int
 			active, seen := false, false
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f util.Failure) error {
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 				if active {
 					seen = true
 					before := rtStateForFactors(fs)
@@ -123,7 +124,7 @@ func TestPolynomialFactorConstantTransportCannotRetireExecutingOwner(t *testing.
 			cfg.Memory = rt
 			q, e = util.NewRationalManager(util.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
-			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 			serviceMust(t, e)
 			full, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 			serviceMust(t, e)
@@ -148,7 +149,7 @@ func TestPolynomialFactorConstantTransportCannotRetireExecutingOwner(t *testing.
 			if !seen || !numericPhysicalReservationRefusal(cause) {
 				t.Fatal("actual SET returning transport", seen, cause)
 			}
-			polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*util.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []util.Block{held})
+			polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*util.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []umemory.Block{held})
 			serviceMust(t, rt.SetMaxSize(0))
 			serviceMust(t, fs.CloseChecked())
 			serviceMust(t, q.Integers().Del(&a))
@@ -232,7 +233,7 @@ func TestPolynomialFactorConstantEveryActualReservationPrefix(t *testing.T) {
 					} else if !numericPhysicalReservationRefusal(e) {
 						t.Fatal("actual leaf refusal", e)
 					}
-					if receipt.invocation != 0 && z.PendingAllocationObject() != (util.ObjectRef{}) && fs.constantInvocation.numeric.Cell != z.PendingCell {
+					if receipt.invocation != 0 && z.PendingAllocationObject() != (umemory.ObjectRef{}) && fs.constantInvocation.numeric.Cell != z.PendingCell {
 						t.Fatal("actual pending cell not captured by concrete helper")
 					}
 					z.Budget().FailAfter(-1)

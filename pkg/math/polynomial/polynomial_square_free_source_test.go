@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialSquareFreeLiteralMultiplicityAndAliases(t *testing.T) {
@@ -122,7 +123,7 @@ func TestPolynomialSquareFreeLiteralGF2AndAbsentVariable(t *testing.T) {
 }
 
 func TestPolynomialSquareFreeEarlyRoutesPreserveOlderDerivative(t *testing.T) {
-	m := polynomialPrimitiveFixtureWithProfile(t, util.SmallAllocatorProfile{PointerBits: 64, Debug: true})
+	m := polynomialPrimitiveFixtureWithProfile(t, umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 	c := m.core
 	p := polynomialQueryTerms(t, c, []int32{1}, [][]MonomialPower{{{0, 2}}})
 	constant := polynomialQueryTerms(t, c, []int32{7}, [][]MonomialPower{nil})
@@ -327,7 +328,7 @@ func TestPolynomialSquareFreeCallerPublicationPreservesForeignCallbackRoot(t *te
 	serviceMust(t, e)
 	serviceMust(t, out.Assign(old))
 	var foreign Monomial
-	var refused util.Block
+	var refused umemory.Block
 	calls := 0
 	h, e := NewPolynomialDeletionHandler(c.integer.Budget(), func(_ *PolynomialDeletionHandler, c *MultivariatePolynomialCore, value Polynomial) error {
 		if value != old {
@@ -368,7 +369,7 @@ func TestPolynomialSquareFreeCallerPublicationPreservesForeignCallbackRoot(t *te
 	if _, e = c.monomials.Info(foreign); e != nil {
 		t.Fatal("named callback monomial before fault lift", e)
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p, out.root.value, incoming}, nil, out.header+h.header, []util.Block{refused})
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p, out.root.value, incoming}, nil, out.header+h.header, []umemory.Block{refused})
 	c.integer.Budget().FailAfter(-1)
 	serviceMust(t, m.CleanupGCD())
 	if out.root.incoming != incoming {
@@ -378,7 +379,7 @@ func TestPolynomialSquareFreeCallerPublicationPreservesForeignCallbackRoot(t *te
 	if _, e = c.monomials.Info(foreign); e != nil {
 		t.Fatal("parent cleanup swept callback-owned monomial", e)
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p, out.root.value, incoming}, nil, out.header+h.header, []util.Block{refused})
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p, out.root.value, incoming}, nil, out.header+h.header, []umemory.Block{refused})
 	serviceMust(t, out.Close())
 	if calls != 1 {
 		t.Fatal("caller owning abort replayed source callback")

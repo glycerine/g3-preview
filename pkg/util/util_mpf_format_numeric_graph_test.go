@@ -7,9 +7,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func mpfFormatNumericRawGraph(t *testing.T, q *RationalService, m *ArbitraryFloatManager, blocksOwned []Block, texts []*ArbitraryFloatFormatText, inputs ...*ArbitraryFloat) {
+func mpfFormatNumericRawGraph(t *testing.T, q *RationalService, m *ArbitraryFloatManager, blocksOwned []umemory.Block, texts []*ArbitraryFloatFormatText, inputs ...*ArbitraryFloat) {
 	t.Helper()
 	r := reflect.ValueOf(q.RuntimeOwner()).Elem()
 	roots := map[[3]uint64]bool{}
@@ -228,12 +229,12 @@ func mpfFormatNumericRawGraph(t *testing.T, q *RationalService, m *ArbitraryFloa
 	}
 }
 
-func mpfFormatNumericOwner(t *testing.T) (*arena.Budget, *Runtime, *RationalService, *ArbitraryFloatManager) {
+func mpfFormatNumericOwner(t *testing.T) (*arena.Budget, *umemory.Runtime, *RationalService, *ArbitraryFloatManager) {
 	t.Helper()
 	b := arena.NewBudget(1 << 28)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	serviceMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	m, e := q.NewArbitraryFloatManager()
 	serviceMust(t, e)

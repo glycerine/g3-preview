@@ -7,6 +7,7 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Embedded in the actual charged caller header. The roots below are transferred
@@ -28,9 +29,9 @@ type RationalServiceInvocation struct {
 	bitwiseOr, bitwiseAnd, bitwiseXor   integerRawInvocationReceipt
 	addGeneration, normGeneration       uint64
 	compareGeneration, powerGeneration  uint64
-	transferred                         SmallAllocatorPendingAllocation
+	transferred                         umemory.SmallAllocatorPendingAllocation
 	originalCell                        SourceCellBacking
-	originalPending                     Block
+	originalPending                     umemory.Block
 	cellRetired                         bool
 
 	invocation                            uint64
@@ -449,7 +450,7 @@ func (s *RationalService) SetIntegerFromOwnerWithInvocation(out *OwnedRational, 
 		return e
 	}
 	if source == nil || source.self != source {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e = source.check(n); e != nil {
 		return e

@@ -1,8 +1,12 @@
 // Source: src/util/mpf.cpp:1635-1693; src/util/mpf.h:295.
 package util
 
+import
+
 // ToStringBinary follows the source text construction and repeated integer
 // division, constructing the returned string in fresh caller storage.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 func (m *ArbitraryFloatManager) ToStringBinary(x *ArbitraryFloat, upperExtra, lowerExtra uint32, out *OwnedString) (cause error) {
 	if e := m.valueGuard(x); e != nil {
 		return e
@@ -404,7 +408,7 @@ func (m *ArbitraryFloatManager) finishBinaryStringSource() error {
 // children. It does not replay a stopped source destructor or numerical body.
 func (m *ArbitraryFloatManager) CleanupBinaryString() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.binaryString
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {

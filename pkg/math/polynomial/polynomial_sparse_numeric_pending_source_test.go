@@ -8,13 +8,14 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialSparseBigInputDescriptorRefusalRetainsActualRoot(t *testing.T) {
 	for _, replacement := range []bool{false, true} {
 		t.Run(fmt.Sprint(replacement), func(t *testing.T) {
 			budget := arena.NewBudget(1 << 24)
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 			serviceMust(t, e)
 			t.Cleanup(func() {
 				q.Close()
@@ -37,7 +38,7 @@ func TestPolynomialSparseBigInputDescriptorRefusalRetainsActualRoot(t *testing.T
 			serviceMust(t, e)
 			t.Cleanup(func() { serviceMust(t, s.CloseChecked()) })
 			_, e = s.Add(&q.Integers().Two64, m.unit)
-			if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (util.ObjectRef{}) {
+			if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) {
 				t.Fatal("actual numeric physical allocation before descriptor refusal", e, q.Integers().PendingCell)
 			}
 			root := q.Integers().PendingCell
@@ -46,7 +47,7 @@ func TestPolynomialSparseBigInputDescriptorRefusalRetainsActualRoot(t *testing.T
 				serviceMust(t, q.Integers().CleanupPendingAllocation())
 				foreign := util.NewInt(19)
 				e = q.Integers().Copy(&foreign, &q.Integers().Two64)
-				if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (util.ObjectRef{}) {
+				if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) {
 					t.Fatal("actual later foreign pending", e)
 				}
 				newer := q.Integers().PendingCell
@@ -62,7 +63,7 @@ func TestPolynomialSparseBigInputDescriptorRefusalRetainsActualRoot(t *testing.T
 				serviceMust(t, q.Integers().Del(&foreign))
 			} else {
 				serviceMust(t, s.CloseChecked())
-				if q.Integers().PendingCell.Object != (util.ObjectRef{}) {
+				if q.Integers().PendingCell.Object != (umemory.ObjectRef{}) {
 					t.Fatal("owning sparse cleanup must drain only its actual numeric pending allocation", root, q.Integers().PendingCell)
 				}
 			}
@@ -107,7 +108,7 @@ func TestPolynomialSparseBigInputEveryActualCopyReservationPrefix(t *testing.T) 
 				t.Log("BIG input copy reservation endpoint", ordinal)
 			}
 			serviceMust(t, s.CloseChecked())
-			if m.integer.PendingAllocationObject() != (util.ObjectRef{}) {
+			if m.integer.PendingAllocationObject() != (umemory.ObjectRef{}) {
 				t.Fatal("owned pending numeric root remains", m.integer.PendingCell)
 			}
 			polynomialSparsePhysical(t, s, nil, []Polynomial{p})
@@ -158,7 +159,7 @@ func TestPolynomialSparseBigFieldInterpolationEveryNumericPrefix(t *testing.T) {
 			z.Budget().FailAfter(-1)
 			serviceMust(t, s.CleanupInterpolation())
 			polynomialSparsePhysical(t, s, out, []Polynomial{p, q})
-			if z.PendingAllocationObject() != (util.ObjectRef{}) {
+			if z.PendingAllocationObject() != (umemory.ObjectRef{}) {
 				t.Fatal("actual interpolation numeric pending", z.PendingCell)
 			}
 			if e == nil {

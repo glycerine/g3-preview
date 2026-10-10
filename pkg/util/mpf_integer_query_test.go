@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatIsIntIndependentDyadicOracle(t *testing.T) {
@@ -178,7 +179,7 @@ func TestArbitraryFloatIsIntActualTransportGuardsAndAbandonedScope(t *testing.T)
 	var m *ArbitraryFloatManager
 	var x ArbitraryFloat
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			xBefore, scopeBefore, used := x, m.integerQuery, b.Used()
@@ -195,7 +196,7 @@ func TestArbitraryFloatIsIntActualTransportGuardsAndAbandonedScope(t *testing.T)
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	n := NewInt(1)
 	serviceMust(t, m.integer.Mul2k(&n, 39998, &n))
@@ -213,7 +214,7 @@ func TestArbitraryFloatIsIntActualTransportGuardsAndAbandonedScope(t *testing.T)
 	if body == nil || calls != 1 || !m.integerQuery.active {
 		t.Fatal("actual scoped SET transport was not reached", body, calls, m.integerQuery)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &x.significand, &m.integerQuery.t)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &x.significand, &m.integerQuery.t)
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes {
 		t.Fatal("stopped actual Runtime graph", b.Used(), m.OwnedStorageBytes(), r.Stats())
 	}

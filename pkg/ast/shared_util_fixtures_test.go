@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"os"
 )
@@ -70,8 +71,8 @@ func numericStorageReservationRefusal(err error) bool {
 	if errors.Is(err, arena.ErrInjectedFailure) {
 		return true
 	}
-	var physical util.Failure
-	return errors.As(err, &physical) && physical.Kind == util.FailureMemout && physical.ErrorCode() == 101
+	var physical umemory.Failure
+	return errors.As(err, &physical) && physical.Kind == umemory.FailureMemout && physical.ErrorCode() == 101
 }
 func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.RationalService) {
 	t.Helper()
@@ -111,7 +112,7 @@ func gparamsTestConfig(b *arena.Budget) util.GlobalParamsConfig {
 	return util.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}
 }
 
-func debugActionFixture(t *testing.T, text string) (*util.Runtime, *util.DebugContext, *util.DebugActionContext, *util.NumericCharInput, *util.MemoryStandardStreams) {
+func debugActionFixture(t *testing.T, text string) (*umemory.Runtime, *util.DebugContext, *util.DebugActionContext, *util.NumericCharInput, *util.MemoryStandardStreams) {
 	t.Helper()
 	d, r, b := debugDiagnosticFixture(t)
 	inputFile, e := os.CreateTemp(".", "debug-action-input-*")
@@ -147,12 +148,12 @@ func gparamsVectorGraph(s arena.VectorStats) uint64 {
 	return s.OwnerBytes + s.PayloadBytes + s.BlockMetadataBytes + s.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 }
 
-var _ util.ConstructionFailure = (*util.RationalService)(nil)
+var _ umemory.ConstructionFailure = (*util.RationalService)(nil)
 
-func debugDiagnosticFixture(t *testing.T) (*util.DebugContext, *util.Runtime, *arena.Budget) {
+func debugDiagnosticFixture(t *testing.T) (*util.DebugContext, *umemory.Runtime, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	paramsMust(t, e)
 	region, e := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
 	paramsMust(t, e)

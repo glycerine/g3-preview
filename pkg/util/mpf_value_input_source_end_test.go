@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatInputDescriptorSourceEndHistory(t *testing.T) {
@@ -13,7 +14,7 @@ func TestArbitraryFloatInputDescriptorSourceEndHistory(t *testing.T) {
 		found := false
 		for ordinal := int64(0); ordinal < 30; ordinal++ {
 			b := arena.NewBudget(1 << 27)
-			m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: direct}})
+			m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: direct}})
 			serviceMust(t, e)
 			var x ArbitraryFloat
 			var r ArbitraryFloatValueInputReceipt
@@ -28,7 +29,7 @@ func TestArbitraryFloatInputDescriptorSourceEndHistory(t *testing.T) {
 				q, e = m.valueInputCall(&r)
 				serviceMust(t, e)
 			}
-			selected := body != nil && q != nil && q.Numeric.Cell.Object != (ObjectRef{}) && (q.Numeric.Cell.Offset == 0) == direct
+			selected := body != nil && q != nil && q.Numeric.Cell.Object != (umemory.ObjectRef{}) && (q.Numeric.Cell.Offset == 0) == direct
 			b.FailAfter(-1)
 			serviceMust(t, m.CleanupValueInput(&r, false))
 			serviceMust(t, m.Del(&x))

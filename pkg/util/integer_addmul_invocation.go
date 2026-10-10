@@ -1,8 +1,12 @@
 // Source: src/util/mpz.h:393-426 (plain RAW tmp; end-only explicit DEL).
 package util
 
+import
+
 // This is actual source invocation state in the charged Integer owner. Body
 // failure does not reach DEL; its published temporary is explicitly unjoined.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type integerAddMulScope struct {
 	Receipt                         integerAddMulInvocationReceipt
 	parentContext                   integerAllocationInvocationContext
@@ -85,7 +89,7 @@ func (m *IntegerManager) CleanupAddMulInvocation(r *integerAddMulInvocationRecei
 // Source body failure does not imply that its end DEL was reached.
 func (m *IntegerManager) CleanupAddMulRaw() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.AddMulInvocation
 	r := integerAddMulInvocationReceipt{m, s, s.invocation}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Returning error transport is a supported Go callback. The polynomial borrow
@@ -18,7 +19,7 @@ func TestPolynomialScalarExactDivActualTransportGuardsWholeOwner(t *testing.T) {
 	active := false
 	calls := 0
 	var rejected error
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f util.Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			calls++
 			closing, stage, used := full.closing, full.cleanupStage, b.Used()
@@ -62,7 +63,7 @@ func TestPolynomialScalarExactDivActualTransportGuardsWholeOwner(t *testing.T) {
 	if rejected != ErrPolynomialPending {
 		t.Error("executing scalar whole owner accepted destruction", rejected)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, nil, []*util.Int{&modulus}, 0, []util.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, full, nil, []*util.Int{&modulus}, 0, []umemory.Block{held})
 	old := c.exactDivision.scalarReceipt
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, c.CleanupExactDivision())

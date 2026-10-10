@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Cold Go metadata reservations retain their arena category. An actual source
@@ -15,8 +16,8 @@ func numericStorageReservationRefusal(err error) bool {
 	if errors.Is(err, arena.ErrInjectedFailure) {
 		return true
 	}
-	var physical Failure
-	return errors.As(err, &physical) && physical.Kind == FailureMemout && physical.ErrorCode() == 101
+	var physical umemory.Failure
+	return errors.As(err, &physical) && physical.Kind == umemory.FailureMemout && physical.ErrorCode() == 101
 }
 
 // Enumerate named persistent scratch roots, so source free-before-allocation

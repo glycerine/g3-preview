@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatRoundColdCachedPowerAndNumericPrefixes(t *testing.T) {
@@ -12,7 +13,7 @@ func TestArbitraryFloatRoundColdCachedPowerAndNumericPrefixes(t *testing.T) {
 	refusal := false
 	for ordinal := int64(0); ordinal < 100; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		digits := make([]uint32, 63)
 		digits[0] = 1
@@ -30,7 +31,7 @@ func TestArbitraryFloatRoundColdCachedPowerAndNumericPrefixes(t *testing.T) {
 		if b.Used() != m.integer.Memory.Stats().TotalBytes+m.OwnedStorageBytes() {
 			t.Fatal("before lift actual round cold graph", ordinal)
 		}
-		if body != nil && m.integer.PendingCell.Object != (ObjectRef{}) {
+		if body != nil && m.integer.PendingCell.Object != (umemory.ObjectRef{}) {
 			captured := s.Numeric.Cell == m.integer.PendingCell
 			for w := m.PowerWrappers; w != nil; w = w.Next {
 				if w.Roots.Cell == m.integer.PendingCell {
@@ -45,7 +46,7 @@ func TestArbitraryFloatRoundColdCachedPowerAndNumericPrefixes(t *testing.T) {
 		pending, e := m.integer.Allocator.PendingRoots()
 		serviceMust(t, e)
 		for i, p := range pending {
-			if body != nil && p != (Block{}) {
+			if body != nil && p != (umemory.Block{}) {
 				captured := s.Numeric.Allocator[i] == p
 				for w := m.PowerWrappers; w != nil; w = w.Next {
 					if w.Roots.Allocator[i] == p {

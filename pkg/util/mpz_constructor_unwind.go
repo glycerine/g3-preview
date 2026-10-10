@@ -2,6 +2,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Failed construction destroys completed members in reverse declaration order.
@@ -40,7 +41,7 @@ func (m *IntegerManager) hasConstructorPhysicalRoots() bool {
 		}
 		// A saved pooled token is not physical storage after member chunk free.
 		_, e := m.Memory.ReadUint32(m.PendingCell.Raw, m.PendingCell.Offset+4)
-		if e != ErrRuntimeOwner {
+		if e != umemory.ErrRuntimeOwner {
 			return true
 		}
 	}

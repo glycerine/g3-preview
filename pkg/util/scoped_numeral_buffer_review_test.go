@@ -6,13 +6,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestScopedBufferReviewDestructiveCopyBeforeSourceDestructor(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
-	r, e := NewRuntime(RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	z, e := NewIntegerManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	z, e := NewIntegerManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 	serviceMust(t, e)
 	m, e := NewIntegerModularManager(z)
 	serviceMust(t, e)
@@ -55,9 +56,9 @@ func TestScopedBufferReviewDestructiveCopyBeforeSourceDestructor(t *testing.T) {
 
 func TestScopedBufferReviewStoppedSourceBlocksMutation(t *testing.T) {
 	budget := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	z, e := NewIntegerManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	z, e := NewIntegerManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 	serviceMust(t, e)
 	m, e := NewIntegerModularManager(z)
 	serviceMust(t, e)

@@ -12,13 +12,14 @@ import (
 	"time"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-func debugActionFixture(t *testing.T, text string) (*Runtime, *DebugContext, *DebugActionContext, *NumericCharInput, *MemoryStandardStreams) {
+func debugActionFixture(t *testing.T, text string) (*umemory.Runtime, *DebugContext, *DebugActionContext, *NumericCharInput, *MemoryStandardStreams) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	paramsMust(t, e)
 	region, e := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
 	paramsMust(t, e)
@@ -274,7 +275,7 @@ func TestDebugMacroCassertLiteralTagShortCircuitAndUninitializedCondition(t *tes
 	}
 	if on {
 		_, e = r.Read(word, 0)
-		if !errors.Is(e, ErrRuntimeUninitialized) {
+		if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 			t.Fatal("actual reached condition word guard", e)
 		}
 	}
@@ -286,7 +287,7 @@ func TestDebugMacroVerifyConditionIsNotErasedByAssertionSwitch(t *testing.T) {
 	word, e := r.Allocate(1)
 	paramsMust(t, e)
 	t.Cleanup(func() {
-		if word != (Block{}) {
+		if word != (umemory.Block{}) {
 			paramsMust(t, r.Deallocate(&word))
 		}
 	})

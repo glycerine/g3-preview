@@ -7,12 +7,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func transitiveSourceOwner(t *testing.T, service bool, profile SmallAllocatorProfile) (*RationalManager, *RationalService, *Runtime, *arena.Budget) {
+func transitiveSourceOwner(t *testing.T, service bool, profile umemory.SmallAllocatorProfile) (*RationalManager, *RationalService, *umemory.Runtime, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -38,7 +39,7 @@ func transitiveSourceRun(m *RationalManager, s *RationalService) error {
 	}
 	return m.SourceFinalize()
 }
-func transitiveSourceClose(t *testing.T, m *RationalManager, s *RationalService, rt *Runtime, b *arena.Budget) {
+func transitiveSourceClose(t *testing.T, m *RationalManager, s *RationalService, rt *umemory.Runtime, b *arena.Budget) {
 	t.Helper()
 	var e error
 	if s != nil {
@@ -64,7 +65,7 @@ func transitiveSourceDigits(n int) []uint32 { d := make([]uint32, n); d[0], d[n-
 func TestTransitiveSourceFinalizeCallerPhysicalLifetimes(t *testing.T) {
 	for _, service := range []bool{false, true} {
 		for _, direct := range []bool{false, true} {
-			m, s, rt, b := transitiveSourceOwner(t, service, SmallAllocatorProfile{PointerBits: 64})
+			m, s, rt, b := transitiveSourceOwner(t, service, umemory.SmallAllocatorProfile{PointerBits: 64})
 			caller := NewRational()
 			n := 6
 			if direct {
@@ -99,7 +100,7 @@ func TestTransitiveSourceFinalizeCallerPhysicalLifetimes(t *testing.T) {
 				if rt.Stats().LiveBlocks != 0 {
 					t.Fatal("pool source lifetime", rt.Stats())
 				}
-				if _, e := rt.ReadUint32(raw, offset+8); !errors.Is(e, ErrRuntimeOwner) {
+				if _, e := rt.ReadUint32(raw, offset+8); !errors.Is(e, umemory.ErrRuntimeOwner) {
 					t.Fatal("destroyed pooled bytes", e)
 				}
 			}
@@ -116,12 +117,12 @@ func TestTransitiveSourceFinalizeCallerPhysicalLifetimes(t *testing.T) {
 func TestTransitiveSourceFinalizeActualDiagnosticPrefix(t *testing.T) {
 	for _, service := range []bool{false, true} {
 		for _, retry := range []bool{false, true} {
-			m, s, rt, b := transitiveSourceOwner(t, service, SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: true})
+			m, s, rt, b := transitiveSourceOwner(t, service, umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: true})
 			caller := NewRational()
 			if e := m.Z.SetLimbs(&caller.Num, transitiveSourceDigits(60)); e != nil {
 				t.Fatal(e)
 			}
-			if e := transitiveSourceRun(m, s); !errors.Is(e, ErrAllocatorIO) {
+			if e := transitiveSourceRun(m, s); !errors.Is(e, umemory.ErrAllocatorIO) {
 				t.Fatal("real post-pool-free diagnostic refusal", e)
 			}
 			if m.cleanupStage != 9 || m.SourceFinalized || m.Z.SourceFinalizeStage != 7 || rt.Stats().LiveBlocks != 1 || (m.Z.Natural == nil || !m.Z.Natural.sourceFinalized || m.Z.Natural.SourceStage != 4 || m.Z.Natural.HeaderBytes == 0) || m.HeaderBytes == 0 {
@@ -144,11 +145,11 @@ func TestTransitiveSourceFinalizeActualDiagnosticPrefix(t *testing.T) {
 
 func TestRationalSourceFinalizeActualPrivateGuardOrder(t *testing.T) {
 	for stop := 0; stop < 9; stop++ {
-		m, s, rt, b := transitiveSourceOwner(t, false, SmallAllocatorProfile{PointerBits: 64, Debug: true})
+		m, s, rt, b := transitiveSourceOwner(t, false, umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 		roots := [9]*Int{&m.NTmp, &m.AddTmp1, &m.AddTmp2, &m.LtTmp1.Num, &m.LtTmp1.Den, &m.LtTmp2.Num, &m.LtTmp2.Den, &m.AddMulTmp.Num, &m.AddMulTmp.Den}
 		// Reverse physical allocation order prevents descriptor scanning from
 		// accidentally satisfying source destructor-order assertions.
-		var raws [9]Block
+		var raws [9]umemory.Block
 		for i := 8; i >= 0; i-- {
 			if e := m.Z.SetLimbs(roots[i], transitiveSourceDigits(60)); e != nil {
 				t.Fatal(e)
@@ -174,7 +175,7 @@ func TestRationalSourceFinalizeActualPrivateGuardOrder(t *testing.T) {
 		for i := range raws {
 			_, e = rt.ReadUint32(raws[i], 8)
 			if i <= stop {
-				if !errors.Is(e, ErrRuntimeOwner) {
+				if !errors.Is(e, umemory.ErrRuntimeOwner) {
 					t.Fatal("prior source release missing", stop, i, e)
 				}
 			} else if e != nil {
@@ -198,12 +199,12 @@ func TestRationalSourceFinalizeActualPrivateGuardOrder(t *testing.T) {
 }
 
 func TestServiceSourceFinalizeActualCacheDenominatorGuard(t *testing.T) {
-	m, s, rt, b := transitiveSourceOwner(t, true, SmallAllocatorProfile{PointerBits: 64, Debug: true})
+	m, s, rt, b := transitiveSourceOwner(t, true, umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 	if _, e := s.PowerOfTwo(1); e != nil {
 		t.Fatal(e)
 	}
 	prior := [3]*Int{&s.Cache[0].Num, &s.Cache[0].Den, &s.Cache[1].Num}
-	var raws [3]Block
+	var raws [3]umemory.Block
 	for i, p := range prior {
 		if e := m.Z.SetLimbs(p, transitiveSourceDigits(60)); e != nil {
 			t.Fatal(e)
@@ -231,7 +232,7 @@ func TestServiceSourceFinalizeActualCacheDenominatorGuard(t *testing.T) {
 		t.Fatal("cache NUM/DEN source prefix")
 	}
 	for _, raw := range raws {
-		if _, e = rt.ReadUint32(raw, 8); !errors.Is(e, ErrRuntimeOwner) {
+		if _, e = rt.ReadUint32(raw, 8); !errors.Is(e, umemory.ErrRuntimeOwner) {
 			t.Fatal("prior cache source release", e)
 		}
 	}
@@ -249,7 +250,7 @@ func TestServiceSourceFinalizeActualCacheDenominatorGuard(t *testing.T) {
 }
 
 func TestServiceSourceFinalizeFreshCacheDenominatorNull(t *testing.T) {
-	m, s, rt, b := transitiveSourceOwner(t, true, SmallAllocatorProfile{PointerBits: 64, Debug: true})
+	m, s, rt, b := transitiveSourceOwner(t, true, umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 	if _, e := s.PowerOfTwo(1); e != nil {
 		t.Fatal(e)
 	}
@@ -275,7 +276,7 @@ func TestServiceSourceFinalizeFreshCacheDenominatorNull(t *testing.T) {
 
 func TestTransitiveSourceFinalizeActualChildScratchHole(t *testing.T) {
 	for _, service := range []bool{false, true} {
-		m, s, rt, b := transitiveSourceOwner(t, service, SmallAllocatorProfile{PointerBits: 64, Debug: true})
+		m, s, rt, b := transitiveSourceOwner(t, service, umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 		old := m.Z.Tmp[0]
 		b.FailAfter(0)
 		e := m.Z.EnsureTmp(0, 33)
@@ -350,12 +351,12 @@ func transitiveSourceAudit(t *testing.T, m *RationalManager, s *RationalService,
 	if uint32(len(refs)) != cs.Live {
 		t.Fatal("unnamed source lifetime descriptor", len(refs), cs.Live)
 	}
-	direct := map[Block]bool{}
+	direct := map[umemory.Block]bool{}
 	for ref := range refs {
 		c := z.Cell(ref)
 		v, e := z.Memory.ReadUint32(c.Backing.Raw, c.Backing.Offset+4)
 		if c.Released {
-			if !errors.Is(e, ErrRuntimeOwner) {
+			if !errors.Is(e, umemory.ErrRuntimeOwner) {
 				t.Fatal("released pooled raw remains accessible", e)
 			}
 			continue
@@ -370,13 +371,13 @@ func transitiveSourceAudit(t *testing.T, m *RationalManager, s *RationalService,
 			direct[c.Backing.Raw] = true
 		}
 	}
-	if z.PendingCell.Object != (ObjectRef{}) {
+	if z.PendingCell.Object != (umemory.ObjectRef{}) {
 		if z.PendingCell.Offset == 0 {
 			direct[z.PendingCell.Raw] = true
 		}
 	}
 	a := z.Allocator.Stats()
-	rawBuffers := map[Block]bool{}
+	rawBuffers := map[umemory.Block]bool{}
 	owned := m.HeaderBytes + z.HeaderBytes + z.Memory.Stats().TotalBytes + a.TotalBytes + cs.OwnerBytes + cs.RecordBytes + cs.MetadataBytes + cs.DirectoryBytes
 
 	if z.Natural != nil {
@@ -398,17 +399,17 @@ func transitiveSourceAudit(t *testing.T, m *RationalManager, s *RationalService,
 func TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards(t *testing.T) {
 	var zeroM RationalManager
 	var zeroS RationalService
-	if e := zeroM.SourceFinalize(); !errors.Is(e, ErrRuntimeOwner) {
+	if e := zeroM.SourceFinalize(); !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal(e)
 	}
 	if e := zeroS.SourceFinalize(); !errors.Is(e, ErrRationalServiceCopy) {
 		t.Fatal(e)
 	}
-	m, s, rt, b := transitiveSourceOwner(t, true, SmallAllocatorProfile{PointerBits: 64})
+	m, s, rt, b := transitiveSourceOwner(t, true, umemory.SmallAllocatorProfile{PointerBits: 64})
 	copiedM := *m
 	copiedS := RationalService{self: s, Manager: m, ownerID: s.ownerID}
 	state, used := rt.State(), b.Used()
-	if e := copiedM.SourceFinalize(); !errors.Is(e, ErrRuntimeOwner) {
+	if e := copiedM.SourceFinalize(); !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal(e)
 	}
 	if e := copiedS.SourceFinalize(); !errors.Is(e, ErrRationalServiceCopy) {
@@ -454,7 +455,7 @@ func TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards(t *testing.T) {
 // source setter failure at every hook/member boundary before child destruction.
 func TestServiceSourceFinalizeActualHookAndConstantOrder(t *testing.T) {
 	for stop := 0; stop < 24; stop++ {
-		m, s, rt, b := transitiveSourceOwner(t, true, SmallAllocatorProfile{PointerBits: 64, Debug: true})
+		m, s, rt, b := transitiveSourceOwner(t, true, umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 		if _, e := s.PowerOfTwo(1); e != nil {
 			t.Fatal(e)
 		}
@@ -464,7 +465,7 @@ func TestServiceSourceFinalizeActualHookAndConstantOrder(t *testing.T) {
 			&s.InfMinusOneField.Second.Num, &s.InfMinusOneField.Second.Den, &s.InfMinusOneField.First.Num, &s.InfMinusOneField.First.Den,
 			&s.InfIntZeroField.First.Num, &s.InfIntZeroField.First.Den, &s.InfIntOneField.First.Num, &s.InfIntOneField.First.Den, &s.InfIntMinusOneField.First.Num, &s.InfIntMinusOneField.First.Den,
 			&s.ZeroField.Num, &s.ZeroField.Den, &s.OneField.Num, &s.OneField.Den, &s.MinusOneField.Num, &s.MinusOneField.Den}
-		var raws [24]Block
+		var raws [24]umemory.Block
 		for i := 23; i >= 0; i-- {
 			if e := m.Z.SetLimbs(roots[i], transitiveSourceDigits(60)); e != nil {
 				t.Fatal(e)
@@ -494,7 +495,7 @@ func TestServiceSourceFinalizeActualHookAndConstantOrder(t *testing.T) {
 		for i, raw := range raws {
 			_, e = rt.ReadUint32(raw, 8)
 			if i <= stop {
-				if !errors.Is(e, ErrRuntimeOwner) {
+				if !errors.Is(e, umemory.ErrRuntimeOwner) {
 					t.Fatal("prior hook/member release missing", stop, i, e)
 				}
 			} else if e != nil {

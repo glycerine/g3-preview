@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -17,7 +18,7 @@ func TestUPolynomialFactorFrontendActualOuterVectorSourceStop(t *testing.T) {
 		return
 	}
 	budget := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
@@ -49,7 +50,7 @@ func TestUPolynomialFactorFrontendActualOuterVectorSourceStop(t *testing.T) {
 	serviceMust(t, fs.Reset())
 	external, e := rt.Allocate(200000)
 	serviceMust(t, e)
-	var bodyRecovery util.Block
+	var bodyRecovery umemory.Block
 	t.Cleanup(func() {
 		recovery, x := rt.Allocate(4000000)
 		serviceMust(t, x)
@@ -67,14 +68,14 @@ func TestUPolynomialFactorFrontendActualOuterVectorSourceStop(t *testing.T) {
 		t.Log("after UPM", rt.Stats())
 		contextTLSFinish(t, rt, z.CloseChecked)
 		t.Log("after Rational", rt.Stats())
-		if bodyRecovery != (util.Block{}) {
+		if bodyRecovery != (umemory.Block{}) {
 			contextTLSFinish(t, rt, func() error { return rt.Deallocate(&bodyRecovery) })
 		}
-		if external != (util.Block{}) {
+		if external != (umemory.Block{}) {
 			contextTLSFinish(t, rt, func() error { return rt.Deallocate(&external) })
 		}
 		x = rt.Deallocate(&recovery)
-		if x != nil && (!errors.Is(x, arena.ErrBounds) || recovery != (util.Block{})) {
+		if x != nil && (!errors.Is(x, arena.ErrBounds) || recovery != (umemory.Block{})) {
 			t.Fatal(x)
 		}
 		t.Log("before Runtime", rt.Stats())
@@ -98,7 +99,7 @@ func TestUPolynomialFactorFrontendActualOuterVectorSourceStop(t *testing.T) {
 	}
 	_, body := s.Factor(m.stateView(&input), fs, DefaultUPolynomialFactorParams())
 	primeTrialPhysicalAuditAll(t, z, s, []*UPolynomialFactors{fs}, nil, roots...)
-	if !armed || !errors.Is(release, arena.ErrBounds) || external != (util.Block{}) {
+	if !armed || !errors.Is(release, arena.ErrBounds) || external != (umemory.Block{}) {
 		t.Fatal("actual checkpoint setup release", armed, release)
 	}
 	oldTmp := z.Integers().Tmp[0]
@@ -135,7 +136,7 @@ func TestUPolynomialFactorFrontendActualOuterVectorSourceStop(t *testing.T) {
 	if q.sourceCause != cause || !errors.Is(original, cause) {
 		t.Fatal("own acknowledgment changed source history")
 	}
-	primeTrialPhysicalAuditAll(t, z, s, []*UPolynomialFactors{fs}, []util.Block{bodyRecovery}, roots...)
+	primeTrialPhysicalAuditAll(t, z, s, []*UPolynomialFactors{fs}, []umemory.Block{bodyRecovery}, roots...)
 	oldHistory := *receipt.history
 	serviceMust(t, fs.Reset())
 	// The failed scratch lifetime is a guarded hole, never an implicit repair.
@@ -157,11 +158,11 @@ func TestUPolynomialFactorFrontendActualOuterVectorSourceStop(t *testing.T) {
 	if before != rt.State() || current.invocation != s.frontend.invocation || current.receipt != s.frontend.receipt {
 		t.Fatal("old completed ACK touched later invocation")
 	}
-	primeTrialPhysicalAuditAll(t, z, s, []*UPolynomialFactors{fs}, []util.Block{bodyRecovery}, roots...)
+	primeTrialPhysicalAuditAll(t, z, s, []*UPolynomialFactors{fs}, []umemory.Block{bodyRecovery}, roots...)
 	t.Log("body before recovery free", bodyRecovery, rt.Stats())
 	e = rt.Deallocate(&bodyRecovery)
 	t.Log("body after recovery free", bodyRecovery, e, rt.Stats())
-	if e != nil && (!errors.Is(e, arena.ErrBounds) || bodyRecovery != (util.Block{})) {
+	if e != nil && (!errors.Is(e, arena.ErrBounds) || bodyRecovery != (umemory.Block{})) {
 		t.Fatal(e)
 	}
 }

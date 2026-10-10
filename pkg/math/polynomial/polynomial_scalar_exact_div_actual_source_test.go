@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // The scalar overload's tmp is a real RAW declaration. Its direct division
@@ -41,22 +42,22 @@ func scalarExactDivActualNUMPrefixes(t *testing.T, negative bool) {
 		pending := z.PendingCell
 		raw, e := z.SourceAllocator().PendingRoots()
 		serviceMust(t, e)
-		acquired := pending.Object != (util.ObjectRef{}) || raw != ([3]util.Block{})
+		acquired := pending.Object != (umemory.ObjectRef{}) || raw != ([3]umemory.Block{})
 		owned := !acquired || c.exactDivision.active && c.exactDivision.kind == 2 &&
-			(pending.Object == (util.ObjectRef{}) || c.exactDivision.numeric.Cell == pending) &&
-			(raw == ([3]util.Block{}) || c.exactDivision.numeric.Allocator == raw)
+			(pending.Object == (umemory.ObjectRef{}) || c.exactDivision.numeric.Cell == pending) &&
+			(raw == ([3]umemory.Block{}) || c.exactDivision.numeric.Allocator == raw)
 		// Child RAW is allowed to own its own actual declarations, but the
 		// parent's saved child tuple must identify that exact returned call.
 		if acquired && z.MatchesRawInvocation(&c.exactDivision.divisionRaw) {
-			owned = (pending.Object == (util.ObjectRef{}) || c.exactDivision.divisionRaw.Frame.Numeric.Cell == pending) &&
-				(raw == ([3]util.Block{}) || c.exactDivision.divisionRaw.Frame.Numeric.Allocator == raw)
+			owned = (pending.Object == (umemory.ObjectRef{}) || c.exactDivision.divisionRaw.Frame.Numeric.Cell == pending) &&
+				(raw == ([3]umemory.Block{}) || c.exactDivision.divisionRaw.Frame.Numeric.Allocator == raw)
 		}
 		// R.add is an actual child after direct NUM division. Its matched
 		// arithmetic receipt owns its own copy/publication acquisitions.
 		r := &c.exactDivision.scalarReceipt.prelude
 		if acquired && c.matchesArithmeticInvocation(r) {
-			owned = owned || (pending.Object == (util.ObjectRef{}) || r.frame.numeric.Cell == pending) &&
-				(raw == ([3]util.Block{}) || r.frame.numeric.Allocator == raw)
+			owned = owned || (pending.Object == (umemory.ObjectRef{}) || r.frame.numeric.Cell == pending) &&
+				(raw == ([3]umemory.Block{}) || r.frame.numeric.Allocator == raw)
 		}
 		saw = saw || acquired
 		if body == nil {

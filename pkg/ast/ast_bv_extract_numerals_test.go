@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestASTBitVectorExtractNumeralsEveryActualReservation(t *testing.T) {
@@ -75,8 +75,8 @@ func TestASTBitVectorExtractNumeralsEveryActualReservation(t *testing.T) {
 					astTestMust(t, m.numerals.Del(&v))
 				} else {
 					failures++
-					var f util.Failure
-					if !errors.Is(body, arena.ErrInjectedFailure) && (!errors.As(body, &f) || f.Kind != util.FailureMemout) {
+					var f umemory.Failure
+					if !errors.Is(body, arena.ErrInjectedFailure) && (!errors.As(body, &f) || f.Kind != umemory.FailureMemout) {
 						t.Fatal(body)
 					}
 					if n != nil {

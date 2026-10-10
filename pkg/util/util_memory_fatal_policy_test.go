@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -50,14 +51,14 @@ func TestMemoryFatalNonExitExceptionCatch(t *testing.T) {
 	smallObjectMust(t, e)
 	c, e := NewMemoryFatalContext(MemoryFatalContextConfig{Budget: b, Streams: streams})
 	smallObjectMust(t, e)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, FatalPolicy: c})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, FatalPolicy: c})
 	smallObjectMust(t, e)
 	used := b.Used()
 	b.FailAfter(0)
 	h, e := r.Allocate(1)
 	var derived OutOfMemoryError
 	var base z3exception.Z3Error
-	if !errors.As(e, &derived) || !errors.As(e, &base) || base.ErrorCode() != z3exception.ErrorMemout || !r.State().OutOfMemory || h != (Block{}) || b.Used() != used {
+	if !errors.As(e, &derived) || !errors.As(e, &base) || base.ErrorCode() != z3exception.ErrorMemout || !r.State().OutOfMemory || h != (umemory.Block{}) || b.Used() != used {
 		t.Fatal(h, e, r.State(), b.Used(), used)
 	}
 	b.FailAfter(-1)
@@ -78,7 +79,7 @@ func TestMemoryFatalSubprocessChild(t *testing.T) {
 	smallObjectMust(t, e)
 	c, e := NewMemoryFatalContext(MemoryFatalContextConfig{Budget: b, Streams: streams})
 	smallObjectMust(t, e)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, FatalPolicy: c})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, FatalPolicy: c})
 	smallObjectMust(t, e)
 	defer os.Stdout.WriteString("UNWOUND")
 	var region *arena.BytesRegion
@@ -217,13 +218,13 @@ func TestMemoryFatalReachedMaxCountReadAfterOutput(t *testing.T) {
 	c, e := NewMemoryFatalContext(MemoryFatalContextConfig{Budget: b, Streams: streams})
 	smallObjectMust(t, e)
 	defer c.Close()
-	r, e := NewRuntime(RuntimeConfig{Budget: b, FatalPolicy: c})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, FatalPolicy: c})
 	smallObjectMust(t, e)
 	smallObjectMust(t, r.Close())
 	// Checked invalid-owner continuation: source count getter is reached only
 	// AFTER the first insertion. This is not a valid allocation-limit execution.
 	before := b.Used()
-	e = c.HandleMemoryFailure(r, Failure{Kind: FailureAllocExceeded})
+	e = c.HandleMemoryFailure(r, umemory.Failure{Kind: umemory.FailureAllocExceeded})
 	if !errors.Is(e, arena.ErrClosed) || b.Used() != before {
 		t.Fatal(e, b.Used(), before)
 	}
@@ -255,11 +256,11 @@ func TestMemoryFatalContextActualColdRefusalAndCohort(t *testing.T) {
 		t.Fatal(b.Used(), want)
 	}
 	foreign := arena.NewBudget(1 << 20)
-	r, e := NewRuntime(RuntimeConfig{Budget: foreign, FatalPolicy: c})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: foreign, FatalPolicy: c})
 	if !errors.Is(e, arena.ErrConfig) || r != nil || foreign.Used() != 0 {
 		t.Fatal(r, e, foreign.Used())
 	}
-	r, e = NewRuntime(RuntimeConfig{Budget: b, FatalPolicy: c, Transport: func(f Failure) error { return f }})
+	r, e = umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, FatalPolicy: c, Transport: func(f umemory.Failure) error { return f }})
 	if !errors.Is(e, arena.ErrConfig) || r != nil || b.Used() != want {
 		t.Fatal("two failure transports", r, e, b.Used(), want)
 	}
@@ -272,7 +273,7 @@ func TestMemoryFatalMainRuntimeBinding(t *testing.T) {
 	c, e := NewMemoryFatalContext(MemoryFatalContextConfig{Budget: b, Streams: s})
 	smallObjectMust(t, e)
 	defer c.Close()
-	r, e := newUtilMemoryRuntime(utilMemoryRuntimeConfig{Budget: b, FatalPolicy: c})
+	r, e := newUtilMemoryRuntime(umemory.RuntimeConfig{Budget: b, FatalPolicy: c})
 	smallObjectMust(t, e)
 	defer r.Close()
 	before := b.Used()

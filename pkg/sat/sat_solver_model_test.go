@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestSATSolverNativeModelConverterMatchesSlice(t *testing.T) {
@@ -17,7 +17,7 @@ func TestSATSolverNativeModelConverterMatchesSlice(t *testing.T) {
 	e, e1 = mc.Mk(satModelBlockLit, 1)
 	satOK(t, e1)
 	satOK(t, mc.InsertBinary(e, 3, 4))
-	r, err := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, err := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	satOK(t, err)
 	var col satUintColumn
 	col.Bind(r)
@@ -49,7 +49,7 @@ func TestSATSolverNativeModelConverterMatchesSlice(t *testing.T) {
 }
 func TestSATSolverNativeModelResizeInitializesDefaultEnums(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	satOK(t, e)
 	var col satUintColumn
 	col.Bind(r)

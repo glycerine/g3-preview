@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestRationalServiceStatsCountsActualNumericPayloads(t *testing.T) {
@@ -22,7 +23,7 @@ func TestRationalServiceStatsCountsActualNumericPayloads(t *testing.T) {
 		t.Fatal("actual numeric object copies must appear in payload statistics", before, after)
 	}
 	z := s.Manager.Z
-	seen := make(map[ObjectRef]bool)
+	seen := make(map[umemory.ObjectRef]bool)
 	var objects uint32
 	for n := uint32(1); n <= z.Cells.Stats().Slots; n++ {
 		c, err := z.Cells.Read(arena.Slot(n))
@@ -54,7 +55,7 @@ func TestRationalServiceStatsIncludesUnpublishedPhysicalCell(t *testing.T) {
 	config := serviceConfig(b)
 	config.Integers.Cells.PageSize = 8
 	config.Integers.Cells.SlotLimit = 8 // six source cells plus two charged dead descriptors
-	config.Integers.Profile = SmallAllocatorProfile{PointerBits: 64}
+	config.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64}
 	s, e := NewRationalService(config)
 	serviceMust(t, e)
 	v, e := s.NewValue()
@@ -68,7 +69,7 @@ func TestRationalServiceStatsIncludesUnpublishedPhysicalCell(t *testing.T) {
 	after, err := s.Stats()
 	serviceMust(t, err)
 	z := s.Manager.Z
-	if z.PendingCell.Object == (ObjectRef{}) {
+	if z.PendingCell.Object == (umemory.ObjectRef{}) {
 		t.Fatal("missing completed physical allocation")
 	}
 	if _, _, err := z.Allocator.RawLocation(z.PendingCell.Object); err != nil {

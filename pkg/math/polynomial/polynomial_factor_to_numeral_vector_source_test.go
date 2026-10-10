@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialFactorToNumeralVectorReadsOriginalAfterNormalize(t *testing.T) {
@@ -57,7 +58,7 @@ func TestPolynomialFactorToNumeralVectorEveryActualBigPrefix(t *testing.T) {
 			if cause != nil && !numericPhysicalReservationRefusal(cause) {
 				t.Fatal(cause)
 			}
-			if full.factorNumeralVector.phase == 1 && z.PendingAllocationObject() != (util.ObjectRef{}) && full.factorNumeralVector.numeric.Cell.Object != z.PendingAllocationObject() {
+			if full.factorNumeralVector.phase == 1 && z.PendingAllocationObject() != (umemory.ObjectRef{}) && full.factorNumeralVector.numeric.Cell.Object != z.PendingAllocationObject() {
 				t.Fatal("reached original coefficient SET cell missing concrete vector child")
 			}
 			z.Budget().FailAfter(-1)

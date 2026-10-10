@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"strings"
 	"testing"
 )
@@ -180,7 +181,7 @@ func TestRationalDecimalStreamInlineCallKeepsOlderCopyAllocation(t *testing.T) {
 	reached := false
 	for ordinal := int64(0); ordinal < 60; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 		serviceMust(t, e)
 		source := NewInt(1)
 		serviceMust(t, m.integer.Mul2kInPlace(&source, 4000))
@@ -188,7 +189,7 @@ func TestRationalDecimalStreamInlineCallKeepsOlderCopyAllocation(t *testing.T) {
 		var receipt integerCopyAllocationReceipt
 		b.FailAfter(ordinal)
 		body := m.integer.CopyFromOwnerWithReceipt(&target, m.integer, &source, &receipt)
-		matched := body != nil && m.integer.MatchesCopyAllocationInvocation(&receipt) && m.integer.CopyAllocation.Roots.Cell.Object != (ObjectRef{})
+		matched := body != nil && m.integer.MatchesCopyAllocationInvocation(&receipt) && m.integer.CopyAllocation.Roots.Cell.Object != (umemory.ObjectRef{})
 		b.FailAfter(-1)
 		if matched {
 			reached = true

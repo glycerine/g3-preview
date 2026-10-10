@@ -4,11 +4,12 @@ package sat
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
-func satLiteralRowsTestInput(t *testing.T, r *util.Runtime) *satUintColumn {
+func satLiteralRowsTestInput(t *testing.T, r *umemory.Runtime) *satUintColumn {
 	t.Helper()
 	c := &satUintColumn{}
 	c.Bind(r)
@@ -138,7 +139,7 @@ func TestSATSolverLiteralRowsOwnerAndInputGuards(t *testing.T) {
 	if e := out.appendColumn(nil); !errors.Is(e, ErrSATOwner) {
 		t.Fatal(e)
 	}
-	other, e := util.NewRuntime(util.RuntimeConfig{Budget: s.budget})
+	other, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: s.budget})
 	satOK(t, e)
 	if e := out.checkRuntime(other); !errors.Is(e, ErrSATOwner) {
 		t.Fatal(e)

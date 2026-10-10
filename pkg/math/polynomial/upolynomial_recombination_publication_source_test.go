@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -24,7 +25,7 @@ func recombinationPublicationTransportProtectsActualCaller(t *testing.T, mode st
 	var s *UPolynomialFactorizationService
 	armed := false
 	calls := 0
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f util.Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			prior := s.scope
@@ -53,7 +54,7 @@ func recombinationPublicationTransportProtectsActualCaller(t *testing.T, mode st
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -62,7 +63,7 @@ func recombinationPublicationTransportProtectsActualCaller(t *testing.T, mode st
 	serviceMust(t, e)
 	s, e = NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
-	var held util.Block
+	var held umemory.Block
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
 	var value, prime util.Int
@@ -131,7 +132,7 @@ func recombinationPublicationTransportProtectsActualCaller(t *testing.T, mode st
 	if !numericPhysicalReservationRefusal(body) || calls != 1 {
 		t.Fatal("actual source scalar MUL refusal", body, calls)
 	}
-	primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []util.Block{held}, &value, &prime)
+	primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []umemory.Block{held}, &value, &prime)
 }
 
 func recombinationPublicationFixture(t *testing.T) (*util.RationalManager, *UPolynomialFactorizationService, *UPolynomialFactors) {
@@ -404,11 +405,11 @@ func TestUPolynomialRecombinationPublicationExactCapturedContext(t *testing.T) {
 func TestUPolynomialRecombinationPublicationActualChildStopAndOwningHistory(t *testing.T) {
 	for _, source := range []bool{true, false} {
 		b := arena.NewBudget(1 << 26)
-		rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 		serviceMust(t, e)
 		cfg := serviceConfig(b).Integers
 		cfg.Memory = rt
-		cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 		serviceMust(t, e)
 		m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -476,13 +477,13 @@ func TestUPolynomialRecombinationPublicationActualChildStopAndOwningHistory(t *t
 		if source && !errors.Is(first, h.sourceCause) || !source && h.ownCause != first {
 			t.Fatal("acknowledgment lost history")
 		}
-		primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []util.Block{recovery})
+		primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []umemory.Block{recovery})
 		parent.zpe = nil
 		contextTLSFinish(t, rt, related.Close)
 		contextTLSFinish(t, rt, s.CleanupRetained)
 		contextTLSFinish(t, rt, fs.Close)
 		e = rt.Deallocate(&recovery)
-		if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+		if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 			t.Fatal("actual consumed recovery block", e)
 		}
 		contextTLSFinish(t, rt, s.Close)
@@ -532,7 +533,7 @@ func TestUPolynomialRecombinationPublicationExactOldLeafPreservesForeignReplacem
 			h.executing = false
 			primeTrialPhysicalAuditOwners(t, q, s, []*UPolynomialFactors{fs}, &prime, &foreign, &large, &value)
 			old := h.numeric.Cell
-			if old.Object != (util.ObjectRef{}) {
+			if old.Object != (umemory.ObjectRef{}) {
 				if q.Integers().PendingCell != old || !numericPhysicalReservationRefusal(body) {
 					t.Fatal("actual direct pending leaf absent", ordinal, body, old, q.Integers().PendingCell)
 				}
@@ -552,9 +553,9 @@ func TestUPolynomialRecombinationPublicationExactOldLeafPreservesForeignReplacem
 					primeTrialPhysicalAuditOwners(t, q, s, []*UPolynomialFactors{fs}, &prime, &foreign, &large, &value)
 					laterRaw, x := q.Integers().Allocator.PendingRoots()
 					serviceMust(t, x)
-					if q.Integers().PendingCell.Object != (util.ObjectRef{}) || laterRaw != ([3]util.Block{}) {
+					if q.Integers().PendingCell.Object != (umemory.ObjectRef{}) || laterRaw != ([3]umemory.Block{}) {
 						replacement := q.Integers().PendingCell
-						if (replacement.Object != (util.ObjectRef{}) && replacement == old) || !numericPhysicalReservationRefusal(failure) {
+						if (replacement.Object != (umemory.ObjectRef{}) && replacement == old) || !numericPhysicalReservationRefusal(failure) {
 							t.Fatal("not a genuine later generation", next, failure, replacement, old)
 						}
 						q.Budget().FailAfter(-1)
@@ -625,7 +626,7 @@ func TestUPolynomialRecombinationPublicationNumericAbortBeforeFaultLift(t *testi
 		h.executing = false
 		_ = h.finish(&r, body)
 		primeTrialPhysicalAuditOwners(t, q, s, []*UPolynomialFactors{fs}, &value, &input)
-		if h.numeric.Cell.Object != (util.ObjectRef{}) {
+		if h.numeric.Cell.Object != (umemory.ObjectRef{}) {
 			if !numericPhysicalReservationRefusal(body) {
 				t.Fatal("actual descriptor refusal", body)
 			}

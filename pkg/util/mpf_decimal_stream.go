@@ -1,8 +1,12 @@
 // Source: src/util/mpf.cpp:1578-1582; src/util/mpf.h:142.
 package util
 
+import
+
 // DisplayDecimalInto converts through the original scoped rational and borrows
 // the caller stream. CleanupDecimalStream joins actual failed children and locals.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 func (m *ArbitraryFloatManager) DisplayDecimalInto(out RationalSourceStream, x *ArbitraryFloat, precision uint32) (cause error) {
 	if e := m.valueGuard(x); e != nil {
 		return e
@@ -135,7 +139,7 @@ func (m *ArbitraryFloatManager) finishDecimalStreamSource() error {
 
 func (m *ArbitraryFloatManager) CleanupDecimalStream() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.decimalStream
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // These are independent bounded constructor/arithmetic oracles for the actual
@@ -12,17 +13,17 @@ import (
 // construction and subresultant dependencies are not established by these tests.
 func polynomialCellFixture(t *testing.T) *MultivariatePolynomialCore {
 	t.Helper()
-	return polynomialCellFixtureWithProfile(t, util.SmallAllocatorProfile{})
+	return polynomialCellFixtureWithProfile(t, umemory.SmallAllocatorProfile{})
 }
 
 // Explicit direct object allocation keeps real factory-failure coverage after
 // native locator growth ceases to reserve artificial container storage.
 func polynomialCellDirectObjectFixture(t *testing.T) *MultivariatePolynomialCore {
 	t.Helper()
-	return polynomialCellFixtureWithProfile(t, util.SmallAllocatorProfile{PointerBits: 64, Debug: true})
+	return polynomialCellFixtureWithProfile(t, umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 }
 
-func polynomialCellFixtureWithProfile(t *testing.T, profile util.SmallAllocatorProfile) *MultivariatePolynomialCore {
+func polynomialCellFixtureWithProfile(t *testing.T, profile umemory.SmallAllocatorProfile) *MultivariatePolynomialCore {
 	t.Helper()
 	q, b := rationalManager(t, false)
 	z := q.Integers()

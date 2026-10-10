@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // FastFloat owns a fixed significand block in its implicit manager. No owning
@@ -33,7 +34,7 @@ type FastFloatConfig struct {
 	// Memory borrows the actual allocation runtime. Nil constructs an owned
 	// runtime. Caller confinement and the Budget ownership contract still apply;
 	// process-global source binding remains a separate integration.
-	Memory *Runtime
+	Memory *umemory.Runtime
 }
 
 func DefaultFastFloatConfig(c arena.VectorConfig) FastFloatConfig {
@@ -109,7 +110,7 @@ func NewFastFloatManager(c FastFloatConfig) (*FastFloatManager, error) {
 }
 
 // RuntimeOwner returns the actual runtime identity without transferring ownership.
-func (m *FastFloatManager) RuntimeOwner() *Runtime {
+func (m *FastFloatManager) RuntimeOwner() *umemory.Runtime {
 	if m == nil || m.self != m || m.natural == nil {
 		return nil
 	}

@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // An opaque borrowed handle to one actual SET call. It carries no numeral or
@@ -45,7 +46,7 @@ type arbitraryFloatCopyBinding struct {
 
 func (m *ArbitraryFloatManager) beginValueCopyBinding(receipt *ArbitraryFloatValueCopyReceipt, sourceInteger *IntegerManager) error {
 	if sourceInteger == nil || sourceInteger.self != sourceInteger {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if sourceInteger.mpfValueRead != nil {
 		return ErrNumericPending
@@ -67,7 +68,7 @@ func (z *IntegerManager) validateFloatCopyBinding(c *arbitraryFloatCopyBinding) 
 	}
 	m := c.manager
 	if m == nil || m.self != m || m.integer != z || c != &m.valueBinding || !c.active || !m.valueExecuting || c.invocation == 0 || c.invocation != m.valueInvocation || m.closed || m.sourceEnded {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	return nil
 }
@@ -97,7 +98,7 @@ func (z *IntegerManager) prepareFloatCopyRecord(c *arbitraryFloatCopyBinding) er
 	if chain := c.chain; chain != nil {
 		if chain.self != chain || chain.manager != m || !chain.executing || chain.ended {
 			m.budget.Release(bytes)
-			return ErrRuntimeOwner
+			return umemory.ErrRuntimeOwner
 		}
 		q.caller = chain
 		q.callerNext = chain.head
@@ -139,21 +140,21 @@ func (m *ArbitraryFloatManager) finishValueCopyBinding(cause error) {
 
 func (m *ArbitraryFloatManager) valueCopyCall(r *ArbitraryFloatValueCopyReceipt) (*arbitraryFloatValueCopyCall, error) {
 	if m == nil || m.self != m || r == nil || r.manager != m || r.frame == nil || m.integer == nil || m.integer.self != m.integer {
-		return nil, ErrRuntimeOwner
+		return nil, umemory.ErrRuntimeOwner
 	}
 	if m.closed {
 		return nil, arena.ErrClosed
 	}
 	q := r.frame
 	if q.self != q || q.manager != m || q.header == 0 || r.invocation == 0 || *r != q.Issued {
-		return nil, ErrRuntimeOwner
+		return nil, umemory.ErrRuntimeOwner
 	}
 	for old := m.ValueCalls; old != nil; old = old.Next {
 		if old == q {
 			return q, nil
 		}
 	}
-	return nil, ErrRuntimeOwner
+	return nil, umemory.ErrRuntimeOwner
 }
 
 // false acknowledges only completed children. true disposes the exact unjoined
@@ -161,7 +162,7 @@ func (m *ArbitraryFloatManager) valueCopyCall(r *ArbitraryFloatValueCopyReceipt)
 // never re-enters an allocator, even after that allocator frame is reused.
 func (m *ArbitraryFloatManager) CleanupValueCopy(r *ArbitraryFloatValueCopyReceipt, abortUnjoined bool) error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.closed {
 		return arena.ErrClosed
@@ -184,7 +185,7 @@ func (m *ArbitraryFloatManager) CleanupValueCopy(r *ArbitraryFloatValueCopyRecei
 	}
 	child := &q.Issued.Child
 	if child.manager != m.integer || !m.integer.validCopyAllocationScope(child.Frame) || child.invocation == 0 || child.Frame.invocation != child.invocation {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if child.Frame.Executing {
 		return ErrNumericPending
@@ -236,7 +237,7 @@ func (m *ArbitraryFloatManager) releaseValueCopyHistory() {
 // Charged caller metadata only. These bytes contain no owning NUM payload.
 func (m *ArbitraryFloatManager) ValueCopyHistoryBytes() uint64 {
 	if m == nil || m.self != m {
-		panic(ErrRuntimeOwner)
+		panic(umemory.ErrRuntimeOwner)
 	}
 	return m.valueHistoryBytes
 }

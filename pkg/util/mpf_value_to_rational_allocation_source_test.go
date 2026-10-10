@@ -6,12 +6,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatToRationalReachedUnpackOwnsDescriptorPrefix(t *testing.T) {
 	for ordinal := int64(0); ordinal < 32; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		config := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+		config := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 		m, e := NewArbitraryFloatManager(config)
 		serviceMust(t, e)
 		qm, e := NewRationalManager(RationalConfig{Integers: config})
@@ -33,9 +34,9 @@ func TestArbitraryFloatToRationalReachedUnpackOwnsDescriptorPrefix(t *testing.T)
 		if b.Used() != want {
 			t.Fatal("immediate actual conversion/source/output cold graph", ordinal, b.Used(), want)
 		}
-		matched := body != nil && s.numericPhase == 2 && (m.integer.PendingCell.Object != (ObjectRef{}) || s.numeric.Cell.Object != (ObjectRef{}))
+		matched := body != nil && s.numericPhase == 2 && (m.integer.PendingCell.Object != (umemory.ObjectRef{}) || s.numeric.Cell.Object != (umemory.ObjectRef{}))
 		if matched {
-			if s.numeric.Cell.Object == (ObjectRef{}) || s.originalCell != s.numeric.Cell || m.integer.PendingCell.Object != (ObjectRef{}) {
+			if s.numeric.Cell.Object == (umemory.ObjectRef{}) || s.originalCell != s.numeric.Cell || m.integer.PendingCell.Object != (umemory.ObjectRef{}) {
 				t.Fatalf("actual unpack descriptor prefix=%d missing exact conversion authority: body=%v", ordinal, body)
 			}
 		}

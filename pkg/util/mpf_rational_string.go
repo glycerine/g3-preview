@@ -1,8 +1,12 @@
 // Source: src/util/mpf.cpp:1572-1576; src/util/mpf.h:141.
 package util
 
+import
+
 // ToRationalString converts through the original scoped rational and constructs
 // a caller-owned result in fresh storage. CleanupRationalString joins failures.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 func (m *ArbitraryFloatManager) ToRationalString(x *ArbitraryFloat, out *OwnedString) (cause error) {
 	if e := m.valueGuard(x); e != nil {
 		return e
@@ -139,7 +143,7 @@ func (m *ArbitraryFloatManager) finishRationalStringSource() error {
 
 func (m *ArbitraryFloatManager) CleanupRationalString() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.rationalString
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {

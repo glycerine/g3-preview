@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatFormattedSetUnpackCallbackOwnerRefusal(t *testing.T) {
@@ -13,7 +14,7 @@ func TestArbitraryFloatFormattedSetUnpackCallbackOwnerRefusal(t *testing.T) {
 	var x, out ArbitraryFloat
 	armed := false
 	calls := 0
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			t.Logf("actual callback flags value=%v copy=%v raw=%v", m.valueExecuting, m.integer.CopyAllocation.Executing, m.integer.rawInvocationExecuting())
@@ -34,7 +35,7 @@ func TestArbitraryFloatFormattedSetUnpackCallbackOwnerRefusal(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	one := NewInt(1)
 	serviceMust(t, m.SetComponents(&x, 8, 4000, false, 0, &one))
@@ -57,7 +58,7 @@ func TestArbitraryFloatFormattedSetUnpackCallbackOwnerRefusal(t *testing.T) {
 	if body == nil || calls != 1 {
 		t.Fatal("reached real unpack allocation", body, calls)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &x.significand, &out.significand)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &x.significand, &out.significand)
 	if b.Used() != rt.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("before-lift exact cold graph")
 	}

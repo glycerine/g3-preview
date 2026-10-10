@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Independently named source owners. The full-manager children remain fresh
@@ -14,7 +15,7 @@ func polynomialSparsePhysical(t *testing.T, s *PolynomialSparseInterpolator, out
 	full := s.owner
 	m := full.core
 	sk := s.skeleton
-	raw := []util.Block{}
+	raw := []umemory.Block{}
 	public := []*util.Int{&s.interpolation.aux}
 	public = append(public, extraNum...)
 	extra := full.header + full.upm.header + full.upm.modular.Header + full.upm.store.header + s.header

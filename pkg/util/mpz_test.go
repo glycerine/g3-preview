@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func integerManager(t *testing.T) (*IntegerManager, *arena.Budget) {
@@ -83,7 +84,7 @@ func TestIntegerConstructorOwnership(t *testing.T) {
 	if m.Cells.Stats().Live != 6 {
 		t.Fatal("six actual source objects; four actual inline Natural buffers have no allocated payload")
 	}
-	var objects [6]ObjectRef
+	var objects [6]umemory.ObjectRef
 	for i, ref := range []NumericCellRef{m.Tmp[0], m.Tmp[1], m.Arg[0], m.Arg[1], m.IntMin.Cell, m.Two64.Cell} {
 		c := m.Cell(ref)
 		if c.Capacity != 6 || c.Payload != (arena.VectorRef{}) {

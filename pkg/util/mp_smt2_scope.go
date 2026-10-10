@@ -3,6 +3,7 @@ package util
 
 import (
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrSMT2DisplayPending = errors.New("mpnum: scoped SMT2 display cleanup is pending")
@@ -22,7 +23,7 @@ type SMT2DisplayState struct {
 
 func (m *IntegerManager) SMT2DisplayState() SMT2DisplayState {
 	if m == nil || m.self != m {
-		return SMT2DisplayState{CleanupCause: ErrRuntimeOwner}
+		return SMT2DisplayState{CleanupCause: umemory.ErrRuntimeOwner}
 	}
 	s := &m.Smt2Display
 	return SMT2DisplayState{s.active, s.guard, s.original, s.cleanup}
@@ -85,7 +86,7 @@ func (m *IntegerManager) finishSMT2Display(length *uint32, result *error) {
 // no source destructor event, counter rollback or pointer repair is invented.
 func (m *IntegerManager) CleanupSMT2Display() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.Smt2Display
 	if !s.active {

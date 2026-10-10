@@ -8,17 +8,18 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Signed-host TLS/direct allocator profile isolates an actual end-only RAW
 // release after ADD. This is not ordinary mathematical allocation OOM.
 func TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	rationals, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: rationals.Integers(), Rationals: rationals, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
@@ -51,7 +52,7 @@ func TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs(t *te
 		serviceMust(t, c.integer.Mul(&large, &three, &warmProduct))
 		serviceMust(t, c.integer.Rem(&warmProduct, &(*c.modular.BorrowModulus()), &warm))
 	}
-	var external, recovery util.Block
+	var external, recovery umemory.Block
 	var receipt polynomialPseudoDivisionInvocationReceipt
 	defer func() {
 		extra, x := rt.Allocate(400000)
@@ -77,10 +78,10 @@ func TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs(t *te
 		}
 		contextTLSFinish(t, rt, full.CloseChecked)
 		contextTLSFinish(t, rt, rationals.CloseChecked)
-		for _, b := range []*util.Block{&external, &recovery, &extra} {
-			if *b != (util.Block{}) {
+		for _, b := range []*umemory.Block{&external, &recovery, &extra} {
+			if *b != (umemory.Block{}) {
 				x := rt.Deallocate(b)
-				if x != nil && (!errors.Is(x, arena.ErrBounds) || *b != (util.Block{})) {
+				if x != nil && (!errors.Is(x, arena.ErrBounds) || *b != (umemory.Block{})) {
 					t.Fatal("actual named direct release", x, *b)
 				}
 			}
@@ -98,7 +99,7 @@ func TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs(t *te
 		if visits == 1 {
 			contextTLSNearMinimum(t, rt)
 			x := rt.Deallocate(&external)
-			if !errors.Is(x, arena.ErrBounds) || external != (util.Block{}) {
+			if !errors.Is(x, arena.ErrBounds) || external != (umemory.Block{}) {
 				t.Fatal("actual arm release", x)
 			}
 		}

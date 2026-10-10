@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerRootSourceCopyPublishesCallerBeforeBisection(t *testing.T) {
@@ -96,11 +97,11 @@ func TestIntegerRootReceiptPreservesLaterRealInvocation(t *testing.T) {
 // call is claimed to create this source-end deallocation boundary.
 func TestIntegerRootEndActualPhysicalStopAndOlderRAW(t *testing.T) {
 	b := arena.NewBudget(1 << 25)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := NewRationalManager(RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m := q.Z
@@ -137,7 +138,7 @@ func TestIntegerRootEndActualPhysicalStopAndOlderRAW(t *testing.T) {
 
 func TestIntegerRootPendingBackingExactAndForeignReplacement(t *testing.T) {
 	b := arena.NewBudget(1 << 22)
-	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 2, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 2, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	defer func() {
 		serviceMust(t, m.CleanupRoot())
@@ -148,7 +149,7 @@ func TestIntegerRootPendingBackingExactAndForeignReplacement(t *testing.T) {
 	}()
 	var receipt integerRootInvocationReceipt
 	_, e = m.rootInPlaceWithReceipt(&m.Two64, 2, &receipt)
-	if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (ObjectRef{}) || m.RootRaw.pending != m.PendingCell || m.PendingCell.Requested == 0 {
+	if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (umemory.ObjectRef{}) || m.RootRaw.pending != m.PendingCell || m.PendingCell.Requested == 0 {
 		t.Fatal("real raw-before-cell publication full backing receipt", e, m.PendingCell, m.RootRaw.pending)
 	}
 	integerPhysicalAudit(t, m)
@@ -161,7 +162,7 @@ func TestIntegerRootPendingBackingExactAndForeignReplacement(t *testing.T) {
 	serviceMust(t, m.CleanupPendingAllocation())
 	foreign := Int{}
 	e = m.Copy(&foreign, &m.Two64)
-	if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (ObjectRef{}) || m.PendingCell == old {
+	if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (umemory.ObjectRef{}) || m.PendingCell == old {
 		t.Fatal("genuine later caller pending backing", e, m.PendingCell)
 	}
 	integerPhysicalAudit(t, m, &foreign)

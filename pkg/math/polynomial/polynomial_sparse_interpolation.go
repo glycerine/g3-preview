@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Concrete numeral locals own native slices and are constructed at their
@@ -184,9 +185,9 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 			err = errors.Join(err, e)
 			return
 		}
-		pending := (f.topOwner && m.pscPending()) || s.numeric.PendingObject() != (util.ObjectRef{})
+		pending := (f.topOwner && m.pscPending()) || s.numeric.PendingObject() != (umemory.ObjectRef{})
 		for _, root := range s.numeric.PendingAllocatorBlocks() {
-			pending = pending || root != (util.Block{})
+			pending = pending || root != (umemory.Block{})
 		}
 		if !pending {
 			if e := s.CleanupInterpolation(); e != nil {

@@ -6,19 +6,20 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatValueCopyTypedOwningOrder(t *testing.T) {
 	for _, copyValue := range []bool{false, true} {
 		b := arena.NewBudget(1 << 28)
-		var r *Runtime
+		var r *umemory.Runtime
 		var m *ArbitraryFloatManager
-		var row Block
+		var row umemory.Block
 		active, calls := false, 0
 		var seen [6]uint32
 		var closeRefusal, sourceRefusal, falseRefusal, trueRefusal error
 		var receipt ArbitraryFloatValueCopyReceipt
-		r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 			if active {
 				calls++
 				for i := range seen {
@@ -36,7 +37,7 @@ func TestArbitraryFloatValueCopyTypedOwningOrder(t *testing.T) {
 			return f
 		}})
 		serviceMust(t, e)
-		m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+		m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 		serviceMust(t, e)
 		row, e = r.Allocate(64)
 		serviceMust(t, e)
@@ -65,7 +66,7 @@ func TestArbitraryFloatValueCopyTypedOwningOrder(t *testing.T) {
 			body = m.SetComponentsToRuntimeWithReceipt(row, 0, 11, 40000, true, -42, &source, &receipt)
 		}
 		active = false
-		if !errors.Is(body, Failure{Kind: FailureMemout}) || calls == 0 {
+		if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls == 0 {
 			t.Fatal(copyValue, body, calls)
 		}
 		wantExponent := int64(99)
@@ -84,7 +85,7 @@ func TestArbitraryFloatValueCopyTypedOwningOrder(t *testing.T) {
 		if out.Exponent() != wantExponent || !m.integer.MatchesCopyAllocationInvocation(&m.valueCopy) {
 			t.Fatal("actual failed row/child tuple", copyValue, out, m.valueCopy)
 		}
-		integerPhysicalAuditWithRaw(t, m.integer, []Block{row, padding}, &source, &input.significand, &out.significand)
+		integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{row, padding}, &source, &input.significand, &out.significand)
 		var maps uint64
 		if want := m.header + m.ValueCopyHistoryBytes() + m.rational.HeaderBytes + integerActualOwnedBytes(m.integer) + maps; b.Used() != want {
 			t.Fatal("immediate cold/physical graph", b.Used(), want)
@@ -108,33 +109,33 @@ func TestArbitraryFloatValueCopyTypedOwningOrder(t *testing.T) {
 		active = true
 		body2 := m.CopyToRuntimeWithReceipt(row, 32, &input, &newer)
 		active = false
-		if !errors.Is(body2, Failure{Kind: FailureMemout}) || newer.Child.invocation <= receipt.Child.invocation || !m.integer.MatchesCopyAllocationInvocation(&newer.Child) {
+		if !errors.Is(body2, umemory.Failure{Kind: umemory.FailureMemout}) || newer.Child.invocation <= receipt.Child.invocation || !m.integer.MatchesCopyAllocationInvocation(&newer.Child) {
 			t.Fatal("second actual failed acquisition did not issue a fresh frame", body2, newer, receipt)
 		}
 		fresh, read := m.CaptureRuntimeValue(row, 32)
 		serviceMust(t, read)
-		integerPhysicalAuditWithRaw(t, m.integer, []Block{row, padding, retryPadding}, &source, &input.significand, &fresh.significand)
+		integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{row, padding, retryPadding}, &source, &input.significand, &fresh.significand)
 		used = b.Used()
 		serviceMust(t, m.CleanupValueCopy(&receipt, false))
 		serviceMust(t, m.CleanupValueCopy(&receipt, true))
 		spliced := receipt
 		spliced.Child = newer.Child
-		if e := m.CleanupValueCopy(&spliced, true); e != ErrRuntimeOwner {
+		if e := m.CleanupValueCopy(&spliced, true); e != umemory.ErrRuntimeOwner {
 			t.Fatal("spliced issued tuple accepted", e)
 		}
 		stale := newer
 		stale.invocation--
-		if e := m.CleanupValueCopy(&stale, true); e != ErrRuntimeOwner {
+		if e := m.CleanupValueCopy(&stale, true); e != umemory.ErrRuntimeOwner {
 			t.Fatal("stale caller nonce accepted", e)
 		}
 		copied := *m
-		if e := copied.CleanupValueCopy(&newer, true); e != ErrRuntimeOwner {
+		if e := copied.CleanupValueCopy(&newer, true); e != umemory.ErrRuntimeOwner {
 			t.Fatal("copied owner accepted", e)
 		}
 		foreignBudget := arena.NewBudget(1 << 26)
 		foreign, e := NewArbitraryFloatManager(serviceConfig(foreignBudget).Integers)
 		serviceMust(t, e)
-		if e := foreign.CleanupValueCopy(&newer, true); e != ErrRuntimeOwner {
+		if e := foreign.CleanupValueCopy(&newer, true); e != umemory.ErrRuntimeOwner {
 			t.Fatal("foreign owner accepted", e)
 		}
 		serviceMust(t, foreign.Close())

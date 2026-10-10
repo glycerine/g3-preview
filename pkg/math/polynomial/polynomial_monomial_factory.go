@@ -3,7 +3,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func (m *MonomialManager) keyWord(k monomialKey, word uint32) (uint32, error) {
@@ -60,7 +60,7 @@ func validMonomialPowers(p []MonomialPower) bool {
 type monomialFactoryOutcome struct {
 	created, started    bool
 	generation          uint64
-	allocator           [3]util.Block
+	allocator           [3]umemory.Block
 	allocatorInvocation monomialAllocatorInvocationReceipt
 }
 
@@ -186,7 +186,7 @@ func (m *MonomialManager) internSourceTempCreated(t *monomialTemp, key monomialK
 			outcome.allocator[0] = frame.outcome.Pending
 		}
 	}
-	if object != (util.ObjectRef{}) {
+	if object != (umemory.ObjectRef{}) {
 		l.raw = object
 		l.live = true
 		l.sourceRaw, l.sourceOffset, e = m.allocator.RawLocation(object)
@@ -361,10 +361,10 @@ func (m *MonomialManager) CleanupCreation() error {
 	}
 	if c.slot != 0 {
 		l := &m.locations[c.slot-1]
-		if l.raw != (util.ObjectRef{}) {
+		if l.raw != (umemory.ObjectRef{}) {
 			progress, e := m.allocator.DeallocateTracked(uint64(l.requested), l.raw)
 			if progress.PhysicalReleased || progress.PooledLinked {
-				l.raw = util.ObjectRef{}
+				l.raw = umemory.ObjectRef{}
 			}
 			if e != nil {
 				return e

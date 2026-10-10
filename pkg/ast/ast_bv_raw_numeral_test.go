@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"os"
 	"os/exec"
@@ -137,8 +138,8 @@ func TestASTBitVectorRawNumeralEveryActualNumericalReservation(t *testing.T) {
 				success = true
 				astTestPin(t, m, d)
 			} else if !errors.Is(body, arena.ErrInjectedFailure) {
-				var source util.Failure
-				if !errors.As(body, &source) || source.Kind != util.FailureMemout {
+				var source umemory.Failure
+				if !errors.As(body, &source) || source.Kind != umemory.FailureMemout {
 					t.Fatal(ordinal, body)
 				}
 			}
@@ -209,7 +210,7 @@ func TestASTBitVectorRawNumeralTransportOwnerGuard(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	var m *ASTManager
 	active, calls := false, 0
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, Transport: func(f util.Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			calls++
 			if e := m.Close(); !errors.Is(e, ErrASTPending) {
@@ -222,7 +223,7 @@ func TestASTBitVectorRawNumeralTransportOwnerGuard(t *testing.T) {
 		return f
 	}})
 	astTestMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	astTestMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)

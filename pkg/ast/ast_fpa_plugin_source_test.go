@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -68,7 +69,7 @@ func TestASTFloatingPointActualConstructorRegistrationAndSorts(t *testing.T) {
 func astFloatingPointConstructorRawGraph(t *testing.T, q *util.RationalService, p *astFloatingPointPluginOwner, foreign ...*util.OwnedRational) {
 	astFloatingPointRawGraphWithBlocks(t, q, p, nil, foreign...)
 }
-func astFloatingPointRawGraphWithBlocks(t *testing.T, q *util.RationalService, p *astFloatingPointPluginOwner, blocksOwned []util.Block, foreign ...*util.OwnedRational) {
+func astFloatingPointRawGraphWithBlocks(t *testing.T, q *util.RationalService, p *astFloatingPointPluginOwner, blocksOwned []umemory.Block, foreign ...*util.OwnedRational) {
 	astFloatingPointRawGraphSourceOwners(t, q, p, blocksOwned, nil, nil, foreign...)
 }
 func astFloatingPointFormatRawGraph(t *testing.T, q *util.RationalService, p *astFloatingPointPluginOwner, texts ...*util.ArbitraryFloatFormatText) {
@@ -81,7 +82,7 @@ type astFloatBorrowedInteger struct {
 	value *util.Int
 }
 
-func astFloatingPointRawGraphSourceOwners(t *testing.T, q *util.RationalService, p *astFloatingPointPluginOwner, blocksOwned []util.Block, texts []*util.ArbitraryFloatFormatText, integers []astFloatBorrowedInteger, foreign ...*util.OwnedRational) {
+func astFloatingPointRawGraphSourceOwners(t *testing.T, q *util.RationalService, p *astFloatingPointPluginOwner, blocksOwned []umemory.Block, texts []*util.ArbitraryFloatFormatText, integers []astFloatBorrowedInteger, foreign ...*util.OwnedRational) {
 	t.Helper()
 	r := reflect.ValueOf(q.RuntimeOwner()).Elem()
 	roots := map[[3]uint64]bool{}
@@ -369,9 +370,9 @@ func TestASTFloatingPointEveryActualConstructorAndPublicationPrefix(t *testing.T
 	failed := 0
 	for ordinal := int64(0); ordinal < 256; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64})
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 		astTestMust(t, e)
-		q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+		q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 		astTestMust(t, e)
 		sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 		astTestMust(t, e)
@@ -431,9 +432,9 @@ func TestASTFloatingPointEveryActualConstructorAndPublicationPrefix(t *testing.T
 
 func TestASTFloatingPointSourceFinalizeAndOwnContextEndPreserveBorrowedNumerals(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	astTestMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	astTestMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)

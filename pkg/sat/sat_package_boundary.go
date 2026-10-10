@@ -3,12 +3,13 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/lbool"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func (s *Solver) Budget() *arena.Budget                         { return s.budget }
-func (s *Solver) RuntimeOwner() *util.Runtime                   { return s.runtime.memory }
+func (s *Solver) RuntimeOwner() *umemory.Runtime                { return s.runtime.memory }
 func (s *Solver) CheckOwner() error                             { return s.open() }
 func (s *Solver) SourceInconsistent() (bool, error)             { return s.sourceInconsistent() }
 func (s *Solver) SourceNumVars() (uint32, error)                { return s.sourceNumVars() }

@@ -6,14 +6,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPsortASTNetworkUninitializedModeReachedAfterActualComparatorPrefix(t *testing.T) {
 	m := astTestManager(t)
 	c, e := NewPsortASTContext(m)
 	astTestMust(t, e)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: m.BudgetField})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.BudgetField})
 	astTestMust(t, e)
 	s, e := NewPsortASTNetwork(c, r, m.BudgetField, nil)
 	astTestMust(t, e)
@@ -69,7 +69,7 @@ func TestPsortASTNetworkNativeRangeFailureUnwindsFrames(t *testing.T) {
 	m := astTestManager(t)
 	c, e := NewPsortASTContext(m)
 	astTestMust(t, e)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: m.BudgetField})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.BudgetField})
 	astTestMust(t, e)
 	s, e := NewPsortASTNetwork(c, r, m.BudgetField, nil)
 	astTestMust(t, e)

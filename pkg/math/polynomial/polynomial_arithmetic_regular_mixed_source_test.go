@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialRegularMatchedRowsPreserveLaterForeignPositions(t *testing.T) {
@@ -121,7 +122,7 @@ func TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags(t *testin
 			foreign := c.integer.PendingCell
 			raw, e := c.integer.SourceAllocator().PendingRoots()
 			serviceMust(t, e)
-			if foreign.Raw != (util.Block{}) || raw != ([3]util.Block{}) {
+			if foreign.Raw != (umemory.Block{}) || raw != ([3]umemory.Block{}) {
 				saw = true
 			}
 			c.integer.Budget().FailAfter(-1)
@@ -154,7 +155,7 @@ func TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags(t *testin
 			replacementRaw, x := c.integer.SourceAllocator().PendingRoots()
 			serviceMust(t, x)
 			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, public, 0)
-			if replacementBody != nil && (replacement.Raw != (util.Block{}) || replacementRaw != ([3]util.Block{})) {
+			if replacementBody != nil && (replacement.Raw != (umemory.Block{}) || replacementRaw != ([3]umemory.Block{})) {
 				replacementSaw = true
 				serviceMust(t, c.cleanupArithmeticInvocation(&old, false))
 				serviceMust(t, c.cleanupArithmeticInvocation(&old, true))

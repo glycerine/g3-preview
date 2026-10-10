@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Cold API method-set contracts: the charged owner itself retains failure.
 // No separately allocated wrapper is accepted by this proposed surface.
-var _ ConstructionFailure = (*IntegerManager)(nil)
-var _ ConstructionFailure = (*RationalManager)(nil)
-var _ ConstructionFailure = (*RationalService)(nil)
+var _ umemory.ConstructionFailure = (*IntegerManager)(nil)
+var _ umemory.ConstructionFailure = (*RationalManager)(nil)
+var _ umemory.ConstructionFailure = (*RationalService)(nil)
 
 func phaseBCheckAcyclicFailure(t *testing.T, e error) {
 	t.Helper()
@@ -33,11 +34,11 @@ func phaseBCheckAcyclicFailure(t *testing.T, e error) {
 
 func TestIntegerDefaultActualAllocatorConstructorTopology(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	if e != nil {
 		t.Fatal(e)
 	}
-	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Memory: rt, Profile: SmallAllocatorProfile{PointerBits: 64}})
+	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -53,7 +54,7 @@ func TestIntegerDefaultActualAllocatorConstructorTopology(t *testing.T) {
 		t.Fatalf("constructor physical topology %+v count%d", s, n)
 	}
 	refs := []NumericCellRef{m.Tmp[0], m.Arg[0], m.Tmp[1], m.Arg[1], m.IntMin.Cell, m.Two64.Cell}
-	objects := make([]ObjectRef, len(refs))
+	objects := make([]umemory.ObjectRef, len(refs))
 	for i, ref := range refs {
 		objects[i], e = m.CellObject(ref)
 		if e != nil {
@@ -82,11 +83,11 @@ func TestIntegerDefaultActualAllocatorConstructorTopology(t *testing.T) {
 	}
 	// Only actual source writes establish initialized physical fields.
 	rawTmp1, offTmp1, _ := m.Allocator.RawLocation(objects[2])
-	if _, e = rt.ReadUint32(rawTmp1, offTmp1); !errors.Is(e, ErrRuntimeUninitialized) {
+	if _, e = rt.ReadUint32(rawTmp1, offTmp1); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatalf("untouched tmp1 size synthesized: %v", e)
 	}
 	rawArg0, offArg0, _ := m.Allocator.RawLocation(objects[1])
-	if _, e = rt.ReadUint32(rawArg0, offArg0+8); !errors.Is(e, ErrRuntimeUninitialized) {
+	if _, e = rt.ReadUint32(rawArg0, offArg0+8); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatalf("unused arg0 digit synthesized: %v", e)
 	}
 	rawArg1, offArg1, _ := m.Allocator.RawLocation(objects[3])
@@ -148,7 +149,7 @@ func TestIntegerDefaultRuntimeIsActuallyOwnedBackend(t *testing.T) {
 
 func TestIntegerSourceFinalizeRetainsActualDirectCallerRoot(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -214,7 +215,7 @@ func TestIntegerConstructorRefusalRetainsTransitiveOwnership(t *testing.T) {
 		success := false
 		for stop := int64(0); stop < 64; stop++ {
 			b := arena.NewBudget(1 << 24)
-			r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+			r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 			if e != nil {
 				t.Fatal(e)
 			}
@@ -253,7 +254,7 @@ func TestIntegerConstructorRefusalRetainsTransitiveOwnership(t *testing.T) {
 				if !numericPhysicalReservationRefusal(construction) {
 					t.Fatalf("kind%d stop%d error %v", kind, stop, construction)
 				}
-				var partial ConstructionFailure
+				var partial umemory.ConstructionFailure
 				if errors.As(construction, &partial) {
 					original := partial.OriginalCause()
 					if original == nil || partial.Unwrap() != original {
@@ -299,7 +300,7 @@ func TestIntegerConstructorRefusalRetainsTransitiveOwnership(t *testing.T) {
 // Source ensure_tmp/borrow prepares capacity, not a physical m_size write.
 func TestIntegerScratchSpanDoesNotPublishPhysicalSize(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -318,7 +319,7 @@ func TestIntegerScratchSpanDoesNotPublishPhysicalSize(t *testing.T) {
 	if e = m.prepareTmpSpan(1, 4); e != nil {
 		t.Fatal(e)
 	}
-	if _, e = rt.ReadUint32(raw, off); !errors.Is(e, ErrRuntimeUninitialized) {
+	if _, e = rt.ReadUint32(raw, off); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatalf("scratch span invented physical size: %v", e)
 	}
 	// A typed64 setter writes low+high first, and publishes size last.

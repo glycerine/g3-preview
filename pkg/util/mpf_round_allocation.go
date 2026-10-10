@@ -3,6 +3,7 @@
 package util
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"reflect"
 )
 
@@ -21,7 +22,7 @@ type arbitraryFloatRoundHistory struct {
 	next                             *arbitraryFloatRoundHistory
 	invocation, header               uint64
 	originalCell                     SourceCellBacking
-	originalPending                  Block
+	originalPending                  umemory.Block
 	bodyCause, sourceCause, ownCause error
 }
 
@@ -56,7 +57,7 @@ func (c integerAllocationInvocationContext) prepareRoundHistory(z *IntegerManage
 	}
 	s := c.roundFrame(z, true)
 	if s == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := s.parentFormattedSet.prepareRationalSetHistory(z); e != nil {
 		return e
@@ -82,24 +83,24 @@ func (c integerAllocationInvocationContext) prepareRoundHistory(z *IntegerManage
 	s.Manager.roundHistoryBytes += bytes
 	return nil
 }
-func (z *IntegerManager) captureRoundAllocationOutcome(c integerAllocationInvocationContext, backing SourceCellBacking, out *SmallAllocatorAllocationOutcome) error {
+func (z *IntegerManager) captureRoundAllocationOutcome(c integerAllocationInvocationContext, backing SourceCellBacking, out *umemory.SmallAllocatorAllocationOutcome) error {
 	s := c.roundFrame(z, true)
 	if s == nil {
 		return nil
 	}
-	if backing.Object != (ObjectRef{}) {
+	if backing.Object != (umemory.ObjectRef{}) {
 		s.history.originalCell = backing
 		if z.PendingCell == backing {
 			z.PendingCell = SourceCellBacking{}
 		}
 	}
-	if out.Pending != (Block{}) {
+	if out.Pending != (umemory.Block{}) {
 		s.history.originalPending = out.Pending
 		if e := z.Allocator.TransferAllocationPending(out, &s.Transferred); e != nil {
 			return e
 		}
 		if s.Numeric.Allocator[0] == out.Pending {
-			s.Numeric.Allocator[0] = Block{}
+			s.Numeric.Allocator[0] = umemory.Block{}
 		}
 	}
 	return nil
@@ -126,17 +127,17 @@ func (m *ArbitraryFloatManager) releaseRoundHistory() {
 
 func (m *ArbitraryFloatManager) roundHistory(r *ArbitraryFloatRoundReceipt) (*arbitraryFloatRoundHistory, error) {
 	if m == nil || m.self != m || r == nil || r.manager != m || r.frame == nil || r.invocation == 0 {
-		return nil, ErrRuntimeOwner
+		return nil, umemory.ErrRuntimeOwner
 	}
 	for h := m.roundHistories; h != nil; h = h.next {
 		if h == r.frame {
 			if h.self != h || h.manager != m || h.issued != *r {
-				return nil, ErrRuntimeOwner
+				return nil, umemory.ErrRuntimeOwner
 			}
 			return h, nil
 		}
 	}
-	return nil, ErrRuntimeOwner
+	return nil, umemory.ErrRuntimeOwner
 }
 func (m *ArbitraryFloatManager) RoundInvocationCauses(r *ArbitraryFloatRoundReceipt) (body, source, own error) {
 	h, e := m.roundHistory(r)

@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment(t *testing.T) {
@@ -15,7 +14,7 @@ func TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment(t *tes
 	old := polynomialICCPUnownedTerms(t, c, []int32{1, 5}, [][]MonomialPower{{{0, 1}}, nil})
 	var out polynomialReference
 	serviceMust(t, out.assign(c, old))
-	var refused util.Block
+	var refused umemory.Block
 	calls := 0
 	h, e := NewPolynomialDeletionHandler(c.integer.Budget(), func(_ *PolynomialDeletionHandler, c *MultivariatePolynomialCore, p Polynomial) error {
 		if p != old {
@@ -40,7 +39,7 @@ func TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment(t *tes
 	if !numericPhysicalReservationRefusal(e) || calls != 1 || !out.assigning {
 		t.Fatal("actual returned assignment stop", e, calls, out)
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{input, out.value, out.incoming}, nil, h.header, []util.Block{refused})
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{input, out.value, out.incoming}, nil, h.header, []umemory.Block{refused})
 	c.integer.Budget().FailAfter(-1)
 	serviceMust(t, m.CleanupGCD())
 	serviceMust(t, out.close(c))

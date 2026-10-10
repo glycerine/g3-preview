@@ -3,6 +3,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math/big"
 	"math/rand/v2"
 	"strings"
@@ -62,7 +63,7 @@ func TestIntegerStringSetSourceEveryColdReservation(t *testing.T) {
 		complete := false
 		for ordinal := int64(0); ordinal < 400; ordinal++ {
 			b := arena.NewBudget(1 << 28)
-			m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+			m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 			serviceMust(t, e)
 			z := m.integer
 			a := NewInt(7)
@@ -189,7 +190,7 @@ func TestIntegerStringSetSourceWarmAndEntryAuthority(t *testing.T) {
 	}
 	z.stringSet.invocation = 0
 	copied := *z
-	if e := copied.SetString(&a, "1"); e != ErrRuntimeOwner {
+	if e := copied.SetString(&a, "1"); e != umemory.ErrRuntimeOwner {
 		t.Fatal("copied manager", e)
 	}
 	if e := z.SetString(nil, "1"); e != arena.ErrInvalidSlot {

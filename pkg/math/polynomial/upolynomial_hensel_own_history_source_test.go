@@ -7,17 +7,18 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 // Actual signed-accounting release guard is a helper domain, not ordinary OOM.
 func TestUPolynomialHenselActualOwningRefusalRetainsFirstHistory(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -72,20 +73,20 @@ func TestUPolynomialHenselActualOwningRefusalRetainsFirstHistory(t *testing.T) {
 	if h.ownCause != first || s.henselPairInvocationOwnCause(&r) != first {
 		t.Fatal("retry erased original own cleanup cause")
 	}
-	primeTrialPhysicalAuditExternal(t, q, s, []util.Block{recovery})
+	primeTrialPhysicalAuditExternal(t, q, s, []umemory.Block{recovery})
 	e = rt.Deallocate(&recovery)
-	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal(e)
 	}
 }
 
 func TestUPolynomialHenselActualCallerOwningRefusalRetainsFirstHistory(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -132,9 +133,9 @@ func TestUPolynomialHenselActualCallerOwningRefusalRetainsFirstHistory(t *testin
 	if c.ownCause != first || c.sourceCause != nil || c.bodyCause != nil {
 		t.Fatal("caller retirement erased or replaced first own history")
 	}
-	primeTrialPhysicalAuditExternal(t, q, s, []util.Block{recovery})
+	primeTrialPhysicalAuditExternal(t, q, s, []umemory.Block{recovery})
 	e = rt.Deallocate(&recovery)
-	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal(e)
 	}
 }

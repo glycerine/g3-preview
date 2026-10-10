@@ -13,6 +13,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/polynomial"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"path/filepath"
 )
 
@@ -60,7 +61,7 @@ func astTestSymbolGraph(s *usymbol.Manager) uint64 {
 }
 
 type upolyPhysicalExtraOwners struct {
-	CallerBlocks         []util.Block // actual directly returned caller allocations only
+	CallerBlocks         []umemory.Block // actual directly returned caller allocations only
 	ASTManagers          []*ast.ASTManager
 	DebugContexts        []*util.DebugContext
 	ParamsRationalValues []paramsPhysicalRationalOwner

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatMkMaxValueCopyTransportPublication(t *testing.T) {
@@ -14,7 +15,7 @@ func TestArbitraryFloatMkMaxValueCopyTransportPublication(t *testing.T) {
 	x := ArbitraryFloat{format: arbitraryFloatFormat(8, 24, false), exponent: 7, significand: NewInt(9)}
 	var receipt ArbitraryFloatValueCopyReceipt
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			if x.EBits() != 17 || x.SBits() != 40000 || !x.Sign() || x.exponent != 65535 || !m.valueExecuting || receipt.frame == nil {
@@ -33,7 +34,7 @@ func TestArbitraryFloatMkMaxValueCopyTransportPublication(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	_, e = m.topExponent(17)
 	serviceMust(t, e)
@@ -45,10 +46,10 @@ func TestArbitraryFloatMkMaxValueCopyTransportPublication(t *testing.T) {
 	armed = true
 	body := m.MkMaxValue(17, 40000, true, &x, &receipt)
 	armed = false
-	if !errors.Is(body, Failure{Kind: FailureMemout}) || calls != 1 || receipt.frame == nil {
+	if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls != 1 || receipt.frame == nil {
 		t.Fatal("actual COPY transport missing", body, calls, receipt)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &x.significand)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &x.significand)
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes {
 		t.Fatal("immediate constructor graph", b.Used())
 	}

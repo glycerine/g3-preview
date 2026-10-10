@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func TestIntegerStringSetSourceActualAllocationTransport(t *testing.T) {
 	var m *ArbitraryFloatManager
 	a := NewInt(7)
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			z := m.integer
@@ -33,7 +34,7 @@ func TestIntegerStringSetSourceActualAllocationTransport(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	pad, e := r.Allocate(uint64(99990 - r.State().LocalSize - 8))
 	serviceMust(t, e)
@@ -41,10 +42,10 @@ func TestIntegerStringSetSourceActualAllocationTransport(t *testing.T) {
 	armed = true
 	body := m.integer.SetString(&a, "-12345678901234567890")
 	armed = false
-	if !errors.Is(body, Failure{Kind: FailureMemout}) || calls != 1 {
+	if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls != 1 {
 		t.Fatal("actual parse transport", body, calls)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &a)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &a)
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes {
 		t.Fatal("callback exact graph")
 	}
@@ -61,9 +62,9 @@ func TestIntegerStringSetSourceActualAllocationTransport(t *testing.T) {
 
 func TestIntegerStringSetSourceResetReleaseBeforeDeclarations(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	z := m.integer
 	var a Int
@@ -90,7 +91,7 @@ func TestIntegerStringSetSourceResetReleaseBeforeDeclarations(t *testing.T) {
 	if e = m.SourceFinalize(); !errors.Is(e, arena.ErrBounds) || m.sourceCause != s.sourceCause || z.SourceFinalizing || b.Used() != used {
 		t.Fatal("RESET stop crossed older class", e)
 	}
-	integerPhysicalAuditWithRaw(t, z, []Block{lane}, &a)
+	integerPhysicalAuditWithRaw(t, z, []umemory.Block{lane}, &a)
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes {
 		t.Fatal("RESET stopped graph")
 	}
@@ -102,9 +103,9 @@ func TestIntegerStringSetSourceResetReleaseBeforeDeclarations(t *testing.T) {
 	}
 	serviceMust(t, z.CleanupRawNumeral(&a))
 	contextTLSFinish(t, r, m.Close)
-	for _, block := range []*Block{&lane, &recovery} {
+	for _, block := range []*umemory.Block{&lane, &recovery} {
 		contextTLSFinish(t, r, func() error {
-			if *block == (Block{}) {
+			if *block == (umemory.Block{}) {
 				return nil
 			}
 			return r.Deallocate(block)

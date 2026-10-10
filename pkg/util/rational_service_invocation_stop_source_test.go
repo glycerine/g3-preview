@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // The signed-host accounting stop is an explicit guarded Go profile. The
@@ -17,10 +18,10 @@ func TestRationalServiceInvocationCompletedSourceStopAndOwnHistory(t *testing.T)
 	}
 	b := arena.NewBudget(1 << 28)
 	active, calls := false, 0
-	var rt *Runtime
-	var external Block
+	var rt *umemory.Runtime
+	var external umemory.Block
 	var release error
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			active = false
 			calls++
@@ -32,7 +33,7 @@ func TestRationalServiceInvocationCompletedSourceStopAndOwnHistory(t *testing.T)
 	serviceMust(t, e)
 	cfg := serviceConfig(b)
 	cfg.Integers.Memory = rt
-	cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	s, e := NewRationalService(cfg)
 	serviceMust(t, e)
 	a, e := s.NewValue()
@@ -59,7 +60,7 @@ func TestRationalServiceInvocationCompletedSourceStopAndOwnHistory(t *testing.T)
 	var call RationalServiceInvocation
 	out, body := s.AddWithInvocation(&a, &zero, &call)
 	active = false
-	if calls != 1 || !errors.Is(release, arena.ErrBounds) || external != (Block{}) {
+	if calls != 1 || !errors.Is(release, arena.ErrBounds) || external != (umemory.Block{}) {
 		t.Fatal("actual callback frontier", calls, release)
 	}
 	if call.sourceCause == nil || !errors.Is(call.sourceCause, arena.ErrBounds) || !errors.Is(body, arena.ErrBounds) {
@@ -69,8 +70,8 @@ func TestRationalServiceInvocationCompletedSourceStopAndOwnHistory(t *testing.T)
 	for i := uint8(0); i < call.scope.Count; i++ {
 		roots = append(roots, &call.scope.Roots[i].Num, &call.scope.Roots[i].Den)
 	}
-	extra := []Block{held}
-	if block := call.transferred.Block(); block != (Block{}) {
+	extra := []umemory.Block{held}
+	if block := call.transferred.Block(); block != (umemory.Block{}) {
 		extra = append(extra, block)
 	}
 	integerPhysicalAuditWithRaw(t, s.Manager.Z, extra, roots...)
@@ -86,8 +87,8 @@ func TestRationalServiceInvocationCompletedSourceStopAndOwnHistory(t *testing.T)
 	if !errors.Is(own, arena.ErrBounds) || call.ownCause != own {
 		t.Fatal("real incomplete-child owning stop", own, call.ownCause, call.numeric, call.originalPending, call.originalCell, call.transferred.Block())
 	}
-	extra = []Block{held}
-	if block := call.transferred.Block(); block != (Block{}) {
+	extra = []umemory.Block{held}
+	if block := call.transferred.Block(); block != (umemory.Block{}) {
 		extra = append(extra, block)
 	}
 	integerPhysicalAuditWithRaw(t, s.Manager.Z, extra, roots...)
@@ -125,8 +126,8 @@ func TestRationalServiceInvocationCompletedSourceStopAndOwnHistory(t *testing.T)
 	contextTLSFinish(t, rt, func() error { return s.CleanupValue(&a) })
 	contextTLSFinish(t, rt, func() error { return s.CleanupValue(&zero) })
 	contextTLSFinish(t, rt, s.CloseChecked)
-	for _, p := range []*Block{&recovery, &held} {
-		if e := rt.Deallocate(p); e != nil && (!errors.Is(e, arena.ErrBounds) || *p != (Block{})) {
+	for _, p := range []*umemory.Block{&recovery, &held} {
+		if e := rt.Deallocate(p); e != nil && (!errors.Is(e, arena.ErrBounds) || *p != (umemory.Block{})) {
 			t.Fatal(e)
 		}
 	}

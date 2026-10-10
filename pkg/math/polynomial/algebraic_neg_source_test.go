@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestAlgebraicNegLiteralNullBasicAndRoot(t *testing.T) {
@@ -85,7 +86,7 @@ func TestAlgebraicNegMinimumEveryActualReservationPrefix(t *testing.T) {
 			if body != nil && !numericPhysicalReservationRefusal(body) {
 				t.Fatal(body)
 			}
-			if z.PendingCell.Object != (util.ObjectRef{}) {
+			if z.PendingCell.Object != (umemory.ObjectRef{}) {
 				pending = true
 				if frame.numeric.Cell != z.PendingCell {
 					t.Fatal("actual MIN leaf not stamped into its executing caller")
@@ -154,7 +155,7 @@ func TestAlgebraicNegRootHornerEveryActualReservationPrefix(t *testing.T) {
 			if q.eval.constructed == 2 {
 				child = true
 			}
-			if z.PendingCell.Object != (util.ObjectRef{}) {
+			if z.PendingCell.Object != (umemory.ObjectRef{}) {
 				if q.numeric.Cell != z.PendingCell && q.eval.numeric.Cell != z.PendingCell && (!z.MatchesAddMulInvocation(&q.eval.addMul) || q.eval.addMul.Frame.Numeric.Cell != z.PendingCell) {
 					t.Fatal("actual root/Horner numeric leaf has no concrete caller")
 				}

@@ -6,15 +6,16 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // This exercises the real signed-host TLS owner-primitive domain. It is not an
 // ordinary mathematical allocation failure or an injected destructor callback.
 func TestArbitraryFloatToRationalGCDSourceStopsOlderLocals(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	cfg := IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+	cfg := IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 	m, e := NewArbitraryFloatManager(cfg)
 	serviceMust(t, e)
 	var x ArbitraryFloat
@@ -35,7 +36,7 @@ func TestArbitraryFloatToRationalGCDSourceStopsOlderLocals(t *testing.T) {
 	}
 	returned := m.ToRational(&x, m.rational, &out)
 	s := &m.rationalConversion
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &x.significand, &out.Num, &out.Den, &m.rational.NTmp, &s.a.significand, &s.n, &s.d)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{lane}, &x.significand, &out.Num, &out.Den, &m.rational.NTmp, &s.a.significand, &s.n, &s.d)
 	var maps uint64
 	want := m.header + m.ValueCopyHistoryBytes() + m.RationalConversionHistoryBytes() + m.powerWrapperBytes + m.rational.HeaderBytes + maps + integerActualOwnedBytes(m.integer)
 	if b.Used() != want {
@@ -54,7 +55,7 @@ func TestArbitraryFloatToRationalGCDSourceStopsOlderLocals(t *testing.T) {
 		t.Fatal("sticky unread older suffix", e)
 	}
 	type powerSourceSnapshot struct {
-		block             Block
+		block             umemory.Block
 		delDone, freeDone bool
 	}
 	var powersBefore []powerSourceSnapshot
@@ -86,7 +87,7 @@ func TestArbitraryFloatToRationalGCDSourceStopsOlderLocals(t *testing.T) {
 		t.Fatal("class owning stop lost original phase", m.rationalReady, m.closed, m.ownCause)
 	}
 	firstOwn := s.ownCause
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &x.significand, &out.Num, &out.Den, &m.rational.NTmp, &s.a.significand, &s.n, &s.d)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{lane}, &x.significand, &out.Num, &out.Den, &m.rational.NTmp, &s.a.significand, &s.n, &s.d)
 	recovery, e := rt.Allocate(2000000)
 	serviceMust(t, e)
 	contextTLSFinish(t, rt, m.CleanupRationalConversion)

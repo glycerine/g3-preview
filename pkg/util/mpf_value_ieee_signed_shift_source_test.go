@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // C++11 CWG1457's corrected signed-left-shift rule allows these nonnegative
@@ -14,7 +15,7 @@ import (
 // intentionally distinct from canonical mathematical floating-point values.
 func TestArbitraryFloatToDoubleDefinedUnsignedRepresentableSignedShifts(t *testing.T) {
 	b := arena.NewBudget(1 << 27)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	cases := []struct {
 		sb   uint32

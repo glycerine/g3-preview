@@ -6,12 +6,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func rawDisplayFixture(t *testing.T) (*RationalManager, *arena.Budget, Rational) {
-	return rawDisplayFixtureProfile(t, SmallAllocatorProfile{})
+	return rawDisplayFixtureProfile(t, umemory.SmallAllocatorProfile{})
 }
-func rawDisplayFixtureProfile(t *testing.T, profile SmallAllocatorProfile) (*RationalManager, *arena.Budget, Rational) {
+func rawDisplayFixtureProfile(t *testing.T, profile umemory.SmallAllocatorProfile) (*RationalManager, *arena.Budget, Rational) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	cfg := IntegerConfig{Profile: profile, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{PageSize: 2, Budget: b}}}
@@ -33,7 +34,7 @@ func TestRawDecimalFailedDenominatorRetainsCopiedNumerator(t *testing.T) {
 	// Independently locate the real allocation prefix between the two source
 	// Copy calls, rather than relying on an allocator ordinal constant.
 	for fault := int64(0); fault < 40; fault++ {
-		control, cb, ca := rawDisplayFixtureProfile(t, SmallAllocatorProfile{PointerBits: 64, Debug: true})
+		control, cb, ca := rawDisplayFixtureProfile(t, umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 		var num, den Int
 		cb.FailAfter(fault)
 		e1 := control.Z.Copy(&num, &ca.Num)
@@ -50,7 +51,7 @@ func TestRawDecimalFailedDenominatorRetainsCopiedNumerator(t *testing.T) {
 		if !selected {
 			continue
 		}
-		m, b, a := rawDisplayFixtureProfile(t, SmallAllocatorProfile{PointerBits: 64, Debug: true})
+		m, b, a := rawDisplayFixtureProfile(t, umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 		before := m.Z.Cells.Stats().Live
 		b.FailAfter(fault)
 		_, e := m.prepareDecimal(&a, 0, false)

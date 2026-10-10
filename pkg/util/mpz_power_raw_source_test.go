@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerPowerGeneralRetainsRAWBeforeCallerSET(t *testing.T) {
@@ -42,7 +43,7 @@ func TestIntegerPowerGeneralMinusOneUsesActualRAW(t *testing.T) {
 
 func TestIntegerPowerPendingBackingExactAndForeignReplacement(t *testing.T) {
 	b := arena.NewBudget(1 << 22)
-	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 2, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 2, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	defer func() {
 		serviceMust(t, m.CleanupPower())
@@ -54,7 +55,7 @@ func TestIntegerPowerPendingBackingExactAndForeignReplacement(t *testing.T) {
 	out := NewInt(7)
 	var receipt integerPowerInvocationReceipt
 	e = m.powerWithReceipt(&m.Two64, 2, &out, &receipt)
-	if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (ObjectRef{}) || m.PowerRaw.pending != m.PendingCell || m.PendingCell.Requested == 0 || out != NewInt(7) {
+	if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (umemory.ObjectRef{}) || m.PowerRaw.pending != m.PendingCell || m.PendingCell.Requested == 0 || out != NewInt(7) {
 		t.Fatal("RAW COPY full actual backing before caller SET", e, m.PendingCell, m.PowerRaw.pending, out)
 	}
 	integerPhysicalAudit(t, m, &out)
@@ -67,7 +68,7 @@ func TestIntegerPowerPendingBackingExactAndForeignReplacement(t *testing.T) {
 	serviceMust(t, m.CleanupPendingAllocation())
 	foreign := Int{}
 	e = m.Copy(&foreign, &m.Two64)
-	if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (ObjectRef{}) || m.PendingCell == old {
+	if !errors.Is(e, arena.ErrSlotLimit) || m.PendingCell.Object == (umemory.ObjectRef{}) || m.PendingCell == old {
 		t.Fatal("genuine replacement caller continuation", e)
 	}
 	integerPhysicalAudit(t, m, &out, &foreign)
@@ -83,7 +84,7 @@ func TestIntegerPowerPendingBackingExactAndForeignReplacement(t *testing.T) {
 
 func TestIntegerPowerCallerOutputPendingExcludedFromRAWOwner(t *testing.T) {
 	b := arena.NewBudget(1 << 22)
-	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 2, SlotLimit: 9, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 2, SlotLimit: 9, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	out := NewInt(7)
 	defer func() {
@@ -97,7 +98,7 @@ func TestIntegerPowerCallerOutputPendingExcludedFromRAWOwner(t *testing.T) {
 	}()
 	var r integerPowerInvocationReceipt
 	e = m.powerWithReceipt(&m.Two64, 2, &out, &r)
-	if !errors.Is(e, arena.ErrSlotLimit) || !m.matchesPowerInvocation(&r) || m.PowerRaw.endEntered || m.PendingCell.Object == (ObjectRef{}) || m.PowerRaw.pending.Object != (ObjectRef{}) {
+	if !errors.Is(e, arena.ErrSlotLimit) || !m.matchesPowerInvocation(&r) || m.PowerRaw.endEntered || m.PendingCell.Object == (umemory.ObjectRef{}) || m.PowerRaw.pending.Object != (umemory.ObjectRef{}) {
 		t.Fatal("actual caller MUL pending must remain outside RAW receipt", e, m.PendingCell, m.PowerRaw)
 	}
 	integerPhysicalAudit(t, m, &out)

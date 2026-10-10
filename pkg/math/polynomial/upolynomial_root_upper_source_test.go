@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialRootUpperBoundActualBodyAndNumeralDT(t *testing.T) {
@@ -16,11 +17,11 @@ func TestUPolynomialRootUpperBoundActualBodyAndNumeralDT(t *testing.T) {
 	for offset := int64(12); offset < 500 && !reached; offset += 4 {
 		t.Run(fmt.Sprint(offset), func(t *testing.T) {
 			var z *util.IntegerManager
-			var rt *util.Runtime
-			var lane, held util.Block
+			var rt *umemory.Runtime
+			var lane, held umemory.Block
 			armed := false
 			var transportBlocks uint32
-			transport := func(f util.Failure) error {
+			transport := func(f umemory.Failure) error {
 				if !armed {
 					return f
 				}
@@ -55,9 +56,9 @@ func TestUPolynomialRootUpperBoundActualBodyAndNumeralDT(t *testing.T) {
 				contextTLSFinish(t, rt, func() error { return p.cleanupRootUpperBound(false) })
 				contextTLSFinish(t, rt, func() error { return z.Del(&out) })
 				contextTLSFinish(t, rt, func() error { return p.cleanupRootUpperBound(true) })
-				for _, b := range []*util.Block{&lane, &held} {
+				for _, b := range []*umemory.Block{&lane, &held} {
 					contextTLSFinish(t, rt, func() error {
-						if *b == (util.Block{}) {
+						if *b == (umemory.Block{}) {
 							return nil
 						}
 						return rt.Deallocate(b)
@@ -76,7 +77,7 @@ func TestUPolynomialRootUpperBoundActualBodyAndNumeralDT(t *testing.T) {
 			baseline := z.Budget().Used() - integerActualOwnedBytes(z) - p.rootUpperBoundHistoryBytes
 			body := p.RootUpperBound(v, &out)
 			armed = false
-			if lane == (util.Block{}) {
+			if lane == (umemory.Block{}) {
 				return
 			}
 			if body == nil {
@@ -105,7 +106,7 @@ func TestUPolynomialRootUpperBoundActualBodyAndNumeralDT(t *testing.T) {
 					}
 				}
 			}
-			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, extra, []util.Block{lane, held})
+			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, extra, []umemory.Block{lane, held})
 			if want := baseline + integerActualOwnedBytes(z) + p.rootUpperBoundHistoryBytes; want != z.Budget().Used() {
 				t.Fatal("before-lift exact cold", want, z.Budget().Used())
 			}

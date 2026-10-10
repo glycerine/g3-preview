@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // These concrete call-local pointers borrow actual polynomial payload fields.
@@ -16,13 +17,13 @@ import (
 type polynomialCoefficientPointer struct {
 	core  *MultivariatePolynomialCore
 	value Polynomial
-	raw   util.ObjectRef
+	raw   umemory.ObjectRef
 	start uint32
 }
 type polynomialMonomialPointer struct {
 	core  *MultivariatePolynomialCore
 	value Polynomial
-	raw   util.ObjectRef
+	raw   umemory.ObjectRef
 	start uint32
 	base  uint64
 }
@@ -41,7 +42,7 @@ func (c *MultivariatePolynomialCore) captureMonomialPointer(p Polynomial, start 
 	}
 	return polynomialMonomialPointer{core: c, value: p, raw: l.raw, start: start, base: l.monomialBase}, nil
 }
-func polynomialCapturedLocation(c *MultivariatePolynomialCore, p Polynomial, raw util.ObjectRef) (*polynomialLocation, error) {
+func polynomialCapturedLocation(c *MultivariatePolynomialCore, p Polynomial, raw umemory.ObjectRef) (*polynomialLocation, error) {
 	if c == nil {
 		return nil, ErrPolynomialOwner
 	}

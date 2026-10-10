@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialScopedZPActualModeAndPrimeRestoration(t *testing.T) {
@@ -75,7 +76,7 @@ func TestPolynomialScopedZPFailedBodyDoesNotRestoreMode(t *testing.T) {
 
 func TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending(t *testing.T) {
 	budget := arena.NewBudget(1 << 24)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 11, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 11, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		q.Close()
@@ -92,7 +93,7 @@ func TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending(t *testing.T) 
 	var scope polynomialScopedSetZP
 	next := util.NewInt(7)
 	e = scope.construct(full, &next)
-	if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (util.ObjectRef{}) || scope.completed {
+	if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) || scope.completed {
 		t.Fatal("actual old-prime member Copy descriptor refusal", e, q.Integers().PendingCell, scope.completed)
 	}
 	if (*c.modular.BorrowModulus()) != old {
@@ -100,7 +101,7 @@ func TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending(t *testing.T) 
 	}
 	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&scope.p}, 0)
 	serviceMust(t, scope.cleanup())
-	if q.Integers().PendingCell.Object != (util.ObjectRef{}) {
+	if q.Integers().PendingCell.Object != (umemory.ObjectRef{}) {
 		t.Fatal("scoped class failed member root not drained by explicit owning abort")
 	}
 	if (*c.modular.BorrowModulus()) != old {

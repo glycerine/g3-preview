@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialPSCOptimizedCapturedChildrenEveryReservationPrefix(t *testing.T) {
@@ -39,7 +38,7 @@ func TestPolynomialPSCOptimizedCapturedChildrenEveryReservationPrefix(t *testing
 			}
 			laz := &m.lazardLocal
 			ps = append(ps, laz.x.value, laz.x.incoming, laz.c.value, laz.c.incoming)
-			var raw []util.Block
+			var raw []umemory.Block
 			h := &m.pscBuffer
 			if h.constructed {
 				if !h.finalized {

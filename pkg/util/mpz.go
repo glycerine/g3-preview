@@ -9,6 +9,7 @@ import (
 	"runtime"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrConversion = errors.New("mpnum: integer conversion out of range")
@@ -35,8 +36,8 @@ type NumericCell struct {
 type IntegerConfig struct {
 	Cells   arena.Config
 	Words   arena.VectorConfig
-	Memory  *Runtime
-	Profile SmallAllocatorProfile
+	Memory  *umemory.Runtime
+	Profile umemory.SmallAllocatorProfile
 }
 
 // IntegerManager owns all persistent source cells, two reusable result
@@ -66,8 +67,8 @@ type IntegerManager struct {
 	self                                   *IntegerManager
 	mpfValueRead                           *arbitraryFloatCopyBinding
 	MpfParent                              *ArbitraryFloatManager
-	Memory                                 *Runtime
-	Allocator                              *SmallAllocator
+	Memory                                 *umemory.Runtime
+	Allocator                              *umemory.SmallAllocator
 	ownsMemory                             bool
 	PendingCell                            SourceCellBacking
 	originalCause, CleanupCauseField       error
@@ -131,7 +132,7 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	}
 	var e error
 	if m.Memory == nil {
-		m.Memory, e = NewRuntime(RuntimeConfig{Budget: m.BudgetField, SizeTBits: uint8(32 << (^uint(0) >> 63))})
+		m.Memory, e = umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.BudgetField, SizeTBits: uint8(32 << (^uint(0) >> 63))})
 		if e != nil {
 			return fail(e)
 		}
@@ -139,9 +140,9 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	}
 	profile := config.Profile
 	if profile.PointerBits == 0 {
-		profile = SmallAllocatorProfile{PointerBits: m.Memory.SizeTBits(), Debug: modularSourceDebug, Windows: runtime.GOOS == "windows"}
+		profile = umemory.SmallAllocatorProfile{PointerBits: m.Memory.SizeTBits(), Debug: modularSourceDebug, Windows: runtime.GOOS == "windows"}
 	}
-	m.Allocator, e = NewSmallAllocator(SmallAllocatorConfig{Runtime: m.Memory, Profile: profile})
+	m.Allocator, e = umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: m.Memory, Profile: profile})
 	if e != nil {
 		return fail(e)
 	}
@@ -194,22 +195,22 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	return m, nil
 }
 
-func (m *IntegerManager) RuntimeOwner() *Runtime {
+func (m *IntegerManager) RuntimeOwner() *umemory.Runtime {
 	if m == nil || m.self != m {
 		return nil
 	}
 	return m.Memory
 }
-func (m *IntegerManager) CellObject(ref NumericCellRef) (ObjectRef, error) {
+func (m *IntegerManager) CellObject(ref NumericCellRef) (umemory.ObjectRef, error) {
 	if m == nil || m.self != m {
-		return ObjectRef{}, ErrRuntimeOwner
+		return umemory.ObjectRef{}, umemory.ErrRuntimeOwner
 	}
 	if !ValidNumericRef(m.Cells, ref) {
-		return ObjectRef{}, arena.ErrInvalidSlot
+		return umemory.ObjectRef{}, arena.ErrInvalidSlot
 	}
 	c := m.Cell(ref)
 	if c.Released {
-		return ObjectRef{}, arena.ErrInvalidSlot
+		return umemory.ObjectRef{}, arena.ErrInvalidSlot
 	}
 	return c.Backing.Object, nil
 }
@@ -239,7 +240,7 @@ func (m *IntegerManager) checkCleanup(a *Int) error {
 		return ErrNumericPending
 	}
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.rationalServiceReadCallbackActive() || (m.mpfValueRead != nil && m.mpfBorrowedSourceCallbackActive()) {
 		return ErrNumericPending
@@ -262,7 +263,7 @@ func (m *IntegerManager) checkCleanup(a *Int) error {
 }
 func (m *IntegerManager) check(a *Int) error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.stringSetTransportActive() || m.decimalStreamExecuting(true) || m.smt2StreamExecuting(true) || m.rationalStringExecuting(true) || m.mpfToMPZExecuting(true) || m.mpfArithmeticTransportActive() || m.myMPZSqrtTransportActive() {
 		return ErrNumericPending
@@ -352,8 +353,8 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	if modularSourceDebug && capacity < 6 {
 		return 0, ErrIntegerAssertion
 	}
-	if m.PendingCell.Object != (ObjectRef{}) {
-		return 0, ErrAllocatorPending
+	if m.PendingCell.Object != (umemory.ObjectRef{}) {
+		return 0, umemory.ErrAllocatorPending
 	}
 	if e := context.prepareCaller(m, "constant-history"); e != nil {
 		return 0, e
@@ -370,8 +371,8 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	if e := context.prepareInputAllocation(m); e != nil {
 		return 0, e
 	}
-	var outcome SmallAllocatorAllocationOutcome
-	var out *SmallAllocatorAllocationOutcome
+	var outcome umemory.SmallAllocatorAllocationOutcome
+	var out *umemory.SmallAllocatorAllocationOutcome
 	var roots *NumericAllocationRoots
 	if s != nil && m.executingCopyAllocationScope(s) {
 		roots = &s.Roots
@@ -395,13 +396,13 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	// Capture the physical prefix before charged descriptor preparation.
 	m.PendingCell = backing
 	if out != nil {
-		if backing.Object != (ObjectRef{}) {
+		if backing.Object != (umemory.ObjectRef{}) {
 			roots.Cell = backing
 			if s != nil && roots == &s.Roots {
 				s.originalCell = backing
 			}
 		}
-		if outcome.Pending != (Block{}) {
+		if outcome.Pending != (umemory.Block{}) {
 			roots.Allocator[0] = outcome.Pending
 		}
 	}
@@ -433,12 +434,12 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 			}
 		}
 		if s != nil && s.mpfCaller != nil && roots == &s.Roots {
-			if outcome.Pending != (Block{}) {
+			if outcome.Pending != (umemory.Block{}) {
 				if transfer := m.Allocator.TransferAllocationPending(&outcome, &s.Transferred); transfer != nil {
 					return 0, JoinNumericErrors(e, transfer)
 				}
 			}
-			if backing.Object != (ObjectRef{}) {
+			if backing.Object != (umemory.ObjectRef{}) {
 				m.PendingCell = SourceCellBacking{}
 			}
 		}
@@ -515,7 +516,7 @@ func (m *IntegerManager) Close() {
 }
 func (m *IntegerManager) CloseChecked() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.rawInvocationExecuting() || m.CopyAllocation.Executing || m.NormalizationExecuting || m.numericCallerExecuting() {
 		return ErrNumericPending

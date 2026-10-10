@@ -8,14 +8,15 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func mpfNumeralHelpersFixture(t *testing.T) (*ArbitraryFloatManager, *Runtime, *arena.Budget) {
+func mpfNumeralHelpersFixture(t *testing.T) (*ArbitraryFloatManager, *umemory.Runtime, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 27)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		b.FailAfter(-1)

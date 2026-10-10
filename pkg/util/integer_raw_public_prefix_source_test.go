@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerPublicRawEveryActualPrefixAndExactReceipt(t *testing.T) {
@@ -262,7 +263,7 @@ func TestIntegerPublicRawUnpublishedCellOwnAfterSourceFinalize(t *testing.T) {
 		}
 		integerPhysicalAudit(t, m, named...)
 		budget.FailAfter(-1)
-		if e != nil && s.Numeric.Cell.Object != (ObjectRef{}) && m.Tmp[0] != 0 && m.Tmp[1] != 0 {
+		if e != nil && s.Numeric.Cell.Object != (umemory.ObjectRef{}) && m.Tmp[0] != 0 && m.Tmp[1] != 0 {
 			serviceMust(t, m.SourceFinalize())
 			serviceMust(t, m.CleanupRawInvocation(&r, true))
 			integerPhysicalAudit(t, m, &a, &b, &x, &y, &g)
@@ -292,7 +293,7 @@ type integerRawPublicCallbackFixture struct {
 
 var integerRawPublicCallbackCurrent *integerRawPublicCallbackFixture
 
-func integerRawPublicFailureTransport(f Failure) error {
+func integerRawPublicFailureTransport(f umemory.Failure) error {
 	s := integerRawPublicCallbackCurrent
 	if s != nil && !s.called {
 		s.called = true
@@ -308,11 +309,11 @@ func TestIntegerPublicRawRuntimeCallbackHasNoAmbientAcquisition(t *testing.T) {
 	proved := false
 	for prefix := int64(0); prefix < 50 && !proved; prefix++ {
 		budget := arena.NewBudget(1 << 24)
-		rt, e := NewRuntime(RuntimeConfig{Budget: budget, Transport: integerRawPublicFailureTransport})
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, Transport: integerRawPublicFailureTransport})
 		serviceMust(t, e)
 		cfg := serviceConfig(budget).Integers
 		cfg.Memory = rt
-		cfg.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		m, e := NewIntegerManager(cfg)
 		serviceMust(t, e)
 		var a, b, x, y, g, foreign Int

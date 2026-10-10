@@ -1,11 +1,15 @@
 // Source: src/util/mpf.cpp:951-1003.
 package util
 
+import
+
 // MyMPZSqrt preserves the original helper's normalized-radicand bounds and
 // bisection. An inexact result chooses the upper endpoint as a sticky bit.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 func MyMPZSqrt(m *IntegerManager, sbits uint32, oddExp bool, input, out *Int) (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.mySqrt
 	if s.active || s.invocation == ^uint64(0) {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Active numerals use native storage. Discarded BIG values remain actual
@@ -121,7 +122,7 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipt(n uint32, as []util.Int, 
 	return m.mkCellWithReceipts(n, as, ms, buffer, single, receipt, nil)
 }
 func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []util.Int, ms []Monomial, buffer *polynomialSOM, single *util.Int, receipt *polynomialFactoryInvocationReceipt, appendReceipt *polynomialCheapAppendInvocationReceipt) (Polynomial, error) {
-	if m.pending.raw != (util.ObjectRef{}) || m.pending.value != (Polynomial{}) {
+	if m.pending.raw != (umemory.ObjectRef{}) || m.pending.value != (Polynomial{}) {
 		return Polynomial{}, ErrPolynomialPending
 	}
 	if receipt != nil && m.factoryInvocation.active {
@@ -186,7 +187,7 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []util.Int,
 	requested := polynomialCodecBytes(n)
 	observer := m.pending.compositionParent
 	squareObserver := m.pending.squareRootParent
-	var before [3]util.Block
+	var before [3]umemory.Block
 	if observer != nil || squareObserver != nil || m.pending.conversionParent != nil || m.pending.factorsParent != nil {
 		var e error
 		before, e = m.monomials.allocator.PendingRoots()
@@ -194,7 +195,7 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []util.Int,
 			return Polynomial{}, e
 		}
 	}
-	var raw util.ObjectRef
+	var raw umemory.ObjectRef
 	var e error
 	if outcome := m.factoryAllocationOutcome(receipt); outcome != nil {
 		var started bool
@@ -210,13 +211,13 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []util.Int,
 	} else {
 		raw, e = m.monomials.allocator.Allocate(uint64(requested))
 	}
-	if raw != (util.ObjectRef{}) {
+	if raw != (umemory.ObjectRef{}) {
 		m.pending.raw = raw
 		m.pending.requested = requested
 	}
-	if (observer != nil || squareObserver != nil) && before == ([3]util.Block{}) {
+	if (observer != nil || squareObserver != nil) && before == ([3]umemory.Block{}) {
 		after, probe := m.monomials.allocator.PendingRoots()
-		if after != ([3]util.Block{}) {
+		if after != ([3]umemory.Block{}) {
 			if observer != nil {
 				observer.monomialRaw = after
 			}
@@ -228,18 +229,18 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []util.Int,
 			return Polynomial{}, errors.Join(e, probe)
 		}
 	}
-	if owner := m.pending.conversionParent; owner != nil && before == ([3]util.Block{}) {
+	if owner := m.pending.conversionParent; owner != nil && before == ([3]umemory.Block{}) {
 		after, probe := m.monomials.allocator.PendingRoots()
-		if after != ([3]util.Block{}) {
+		if after != ([3]umemory.Block{}) {
 			owner.monomialRaw = after
 		}
 		if probe != nil {
 			return Polynomial{}, errors.Join(e, probe)
 		}
 	}
-	if f := m.pending.factorsParent; f != nil && before == ([3]util.Block{}) {
+	if f := m.pending.factorsParent; f != nil && before == ([3]umemory.Block{}) {
 		after, x := m.monomials.allocator.PendingRoots()
-		if after != ([3]util.Block{}) {
+		if after != ([3]umemory.Block{}) {
 			f.monomialRaw = after
 		}
 		if x != nil {
@@ -263,7 +264,7 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []util.Int,
 	*l = polynomialLocation{raw: raw, requested: requested, generation: g, live: true, monomialBase: 12 + uint64(n)*12}
 	p := Polynomial{owner: m.origin, slot: slot, generation: g}
 	m.pending.value = p
-	m.pending.raw = util.ObjectRef{}
+	m.pending.raw = umemory.ObjectRef{}
 	m.pending.buffer = buffer
 	if e = m.writeWord(p, 0, 0); e != nil {
 		return Polynomial{}, e

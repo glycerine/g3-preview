@@ -1,13 +1,17 @@
 // Source: src/util/mpq.cpp:156-185.
 package util
 
+import
+
 // These are the four literal RAW declarations. Failure omits the end label's
 // DEL statements; explicit owning cleanup has its own cursor after older NUMs.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type rationalDecimalScope struct {
-	originalPending Block
+	originalPending umemory.Block
 	originalCell    SourceCellBacking
 	cellRetired     bool
-	Transferred     SmallAllocatorPendingAllocation
+	Transferred     umemory.SmallAllocatorPendingAllocation
 
 	Parent                                 *ArbitraryFloatFormatInvocation
 	Values                                 [4]Int // ten,n1,d1,v1: source end-label DEL order

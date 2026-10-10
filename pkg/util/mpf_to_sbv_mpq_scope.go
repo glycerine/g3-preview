@@ -1,6 +1,8 @@
 // Source: src/util/mpf.cpp:1186-1223 (t and z scoped lifetimes).
 package util
 
+import umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type arbitraryFloatSBVScope struct {
 	manager                        *ArbitraryFloatManager
 	invocation                     uint64
@@ -54,7 +56,7 @@ func (s *arbitraryFloatSBVScope) unbind() error {
 }
 func (m *ArbitraryFloatManager) finishSBVSource() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.sbv
 	if s.executing || s.finishing {
@@ -88,7 +90,7 @@ func (m *ArbitraryFloatManager) finishSBVSource() error {
 
 func (m *ArbitraryFloatManager) CleanupToSBVMPQ() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.sbv
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {
@@ -98,7 +100,7 @@ func (m *ArbitraryFloatManager) CleanupToSBVMPQ() (cause error) {
 		return nil
 	}
 	if !s.valid() {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := s.bind(); e != nil {
 		return e

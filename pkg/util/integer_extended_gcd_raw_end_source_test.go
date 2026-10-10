@@ -7,11 +7,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerPublicExtendedGCDRawBodyAndEndLifetimes(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
-	rt, e := NewRuntime(RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
@@ -54,7 +55,7 @@ func TestIntegerPublicExtendedGCDRawBodyAndEndLifetimes(t *testing.T) {
 	for i := uint8(0); i < s.Count; i++ {
 		named = append(named, &s.Values[i])
 	}
-	integerPhysicalAuditWithRaw(t, m, []Block{lane}, named...)
+	integerPhysicalAuditWithRaw(t, m, []umemory.Block{lane}, named...)
 	if budget.Used() != integerActualOwnedBytes(m) {
 		t.Fatal("immediate cold RAW graph", budget.Used(), integerActualOwnedBytes(m))
 	}
@@ -66,14 +67,14 @@ func TestIntegerPublicExtendedGCDRawBodyAndEndLifetimes(t *testing.T) {
 	if m.RawInvocationSourceCause(&r) != source || SourceExtendedGCDDebug && s.Values != before {
 		t.Fatal("false owning phase changed unexecuted RAW end DEL/history")
 	}
-	integerPhysicalAuditWithRaw(t, m, []Block{lane}, named...)
+	integerPhysicalAuditWithRaw(t, m, []umemory.Block{lane}, named...)
 	recovery, e := rt.Allocate(2000000)
 	serviceMust(t, e)
 	serviceMust(t, m.CleanupRawInvocation(&r, true))
 	if m.RawInvocationSourceCause(&r) != source || returned.Error() != captured {
 		t.Fatal("owning acknowledgement changed source cause")
 	}
-	integerPhysicalAuditWithRaw(t, m, []Block{lane, recovery}, &a, &b, &x, &y, &g)
+	integerPhysicalAuditWithRaw(t, m, []umemory.Block{lane, recovery}, &a, &b, &x, &y, &g)
 	two, zero := NewInt(2), NewInt(0)
 	serviceMust(t, m.ExtendedGCD(&two, &zero, &x, &y, &g))
 	if s.Invocation == r.Invocation || s.sourceCause != nil || returned.Error() != captured || !errors.Is(returned, arena.ErrBounds) {
@@ -85,7 +86,7 @@ func TestIntegerPublicExtendedGCDRawBodyAndEndLifetimes(t *testing.T) {
 	serviceMust(t, rt.Deallocate(&lane))
 	serviceMust(t, m.CloseChecked())
 	e = rt.Deallocate(&recovery)
-	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (Block{})) {
+	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal("actual recovery consumption", e)
 	}
 	contextTLSFinish(t, rt, rt.Close)

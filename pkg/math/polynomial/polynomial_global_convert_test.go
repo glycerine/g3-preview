@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialGlobalConvertSelfBorrow(t *testing.T) {
@@ -168,7 +169,7 @@ func TestPolynomialGlobalConvertExactNumericForeignReplacement(t *testing.T) {
 	serviceMust(t, sm.core.IncRef(p))
 	defer func() { serviceMust(t, sm.core.DecRef(p)) }()
 	budget := arena.NewBudget(1 << 24)
-	z, e := util.NewIntegerManager(util.IntegerConfig{Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	z, e := util.NewIntegerManager(util.IntegerConfig{Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 	serviceMust(t, e)
 	tm, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: z, Checkpoint: func() bool { panic("source convert has no checkpoint") }, Cooperation: func() error { panic("source convert has no cooperation") }}})
 	serviceMust(t, e)
@@ -184,7 +185,7 @@ func TestPolynomialGlobalConvertExactNumericForeignReplacement(t *testing.T) {
 		}
 	}()
 	_, cause := ConvertPolynomial(sm, p, tm, ^uint32(0), 0)
-	if !errors.Is(cause, arena.ErrSlotLimit) || z.PendingAllocationObject() == (util.ObjectRef{}) {
+	if !errors.Is(cause, arena.ErrSlotLimit) || z.PendingAllocationObject() == (umemory.ObjectRef{}) {
 		t.Fatal("actual coefficient payload before slot refusal", cause)
 	}
 	original := z.PendingCell

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerAddMulSourceShortcutsLeaveReceiptUnchanged(t *testing.T) {
@@ -79,7 +80,7 @@ func TestIntegerAddMulSourceRAWBodyFailureRetainsPublishedTemporary(t *testing.T
 // consumption. This is a source release-stop proof, not ordinary exhaustion.
 func TestIntegerAddMulSourceEndDELStopsAfterCallerOutput(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
@@ -108,7 +109,7 @@ func TestIntegerAddMulSourceEndDELStopsAfterCallerOutput(t *testing.T) {
 		}
 		contextTLSFinish(t, rt, m.CloseChecked)
 		e = rt.Deallocate(&recovery)
-		if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (Block{})) {
+		if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 			t.Fatal("recovery physical consumption", e)
 		}
 		contextTLSFinish(t, rt, rt.Close)
@@ -120,7 +121,7 @@ func TestIntegerAddMulSourceEndDELStopsAfterCallerOutput(t *testing.T) {
 	serviceMust(t, e)
 	contextTLSNearMinimum(t, rt)
 	e = rt.Deallocate(&external)
-	if e == nil || external != (Block{}) {
+	if e == nil || external != (umemory.Block{}) {
 		t.Fatal("actual external signed-domain stop", e)
 	}
 	e = m.addMulWithAllocationContext(&a, &bval, &c, &d, &receipt, integerAllocationInvocationContext{})

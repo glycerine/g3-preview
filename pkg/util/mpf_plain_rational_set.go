@@ -3,6 +3,7 @@ package util
 
 import (
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type ArbitraryFloatPlainRationalSetReceipt struct {
@@ -119,7 +120,7 @@ func (m *ArbitraryFloatManager) CleanupPlainRationalSet() error {
 }
 func (m *ArbitraryFloatManager) CleanupPlainRationalSetWithReceipt(r *ArbitraryFloatPlainRationalSetReceipt, abort bool) error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.plainRationalSet
 	if s.executing || s.finishing || m.memory.FailureTransportActive() {
@@ -130,14 +131,14 @@ func (m *ArbitraryFloatManager) CleanupPlainRationalSetWithReceipt(r *ArbitraryF
 			return nil
 		}
 		if r.manager != m || r.frame != s || r.invocation == 0 {
-			return ErrRuntimeOwner
+			return umemory.ErrRuntimeOwner
 		}
 		h, e := m.rationalSetHistory(&r.child)
 		if e != nil {
 			return e
 		}
 		if h == nil || h.plainParent != s || h.plainInvocation != r.invocation {
-			return ErrRuntimeOwner
+			return umemory.ErrRuntimeOwner
 		}
 		if s.invocation != r.invocation {
 			if !h.plainExpFinished {

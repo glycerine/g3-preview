@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestNaturalFormattingLexicalSourceLocals(t *testing.T) {
@@ -100,12 +101,12 @@ func TestNaturalFormattingEmptyGuardAfterLocalActions(t *testing.T) {
 
 func TestNaturalSourceFinalizeColdLifecycleGuards(t *testing.T) {
 	var absent *NaturalManager
-	if e := absent.SourceFinalize(); !errors.Is(e, ErrRuntimeOwner) {
+	if e := absent.SourceFinalize(); !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("nil owner", e)
 	}
 	m := naturalManager(t)
 	copied := *m
-	if e := copied.SourceFinalize(); !errors.Is(e, ErrRuntimeOwner) {
+	if e := copied.SourceFinalize(); !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("copied owner", e)
 	}
 	// These scalar state fixtures test exact lifecycle entry guards. They do

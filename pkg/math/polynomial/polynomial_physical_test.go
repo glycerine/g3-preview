@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Independent named field census for this selected owner and its ordinary
@@ -126,7 +127,7 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 			serviceMust(t, e)
 		}
 	}
-	if z.PendingAllocationObject() != (util.ObjectRef{}) {
+	if z.PendingAllocationObject() != (umemory.ObjectRef{}) {
 		_, e := z.SourceAllocator().ObjectExtent(z.PendingAllocationObject())
 		serviceMust(t, e)
 	}

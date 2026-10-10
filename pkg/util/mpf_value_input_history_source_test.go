@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatInputMultiplePendingAndInlineHistory(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	var values [2]ArbitraryFloat
 	var receipts [2]ArbitraryFloatValueInputReceipt
@@ -28,7 +29,7 @@ func TestArbitraryFloatInputMultiplePendingAndInlineHistory(t *testing.T) {
 			if r != (ArbitraryFloatValueInputReceipt{}) {
 				q, e := m.valueInputCall(&r)
 				serviceMust(t, e)
-				if body != nil && (q.Numeric.Cell.Object != (ObjectRef{}) || q.Transferred.Block() != (Block{})) {
+				if body != nil && (q.Numeric.Cell.Object != (umemory.ObjectRef{}) || q.Transferred.Block() != (umemory.Block{})) {
 					receipts[i], causes[i], found = r, body, true
 					b.FailAfter(-1)
 					break

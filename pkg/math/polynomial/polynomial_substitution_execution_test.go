@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower(t *testing.T) {
@@ -35,7 +36,7 @@ func TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower(t *testing.T) 
 		h.State++
 		m.integer.Budget().FailAfter(0)
 		b, e := m.memory.Allocate(1)
-		if b != (util.Block{}) {
+		if b != (umemory.Block{}) {
 			t.Fatal("unexpected raw publication", b)
 		}
 		return e
@@ -50,7 +51,7 @@ func TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower(t *testing.T) 
 	m.integer.Budget().FailAfter(-1)
 	m.integer.Budget().FailAfter(0)
 	e = m.Power(foreign, 2, foreignOut)
-	if !numericPhysicalReservationRefusal(e) || (m.monomials.creation.stage == 0 && m.pending.raw == (util.ObjectRef{}) && m.pending.value == (Polynomial{})) {
+	if !numericPhysicalReservationRefusal(e) || (m.monomials.creation.stage == 0 && m.pending.raw == (umemory.ObjectRef{}) && m.pending.value == (Polynomial{})) {
 		t.Fatal("actual later caller construction", e, m.monomials.creation, m.pending)
 	}
 	before := m.monomials.creation

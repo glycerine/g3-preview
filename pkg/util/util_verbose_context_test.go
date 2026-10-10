@@ -4,6 +4,7 @@ package util
 
 import (
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"reflect"
 	"testing"
 
@@ -97,7 +98,7 @@ func TestVerboseContextColdRefusalAndExactCharge(t *testing.T) {
 	}
 }
 
-func verboseContextPhysical(t *testing.T, rt *utilMemoryRuntime, b *arena.Budget, region *arena.BytesRegion, out *NumericTextStream, c *VerboseContext, a *utilSmallObjectAllocator) {
+func verboseContextPhysical(t *testing.T, rt *umemory.Runtime, b *arena.Budget, region *arena.BytesRegion, out *NumericTextStream, c *VerboseContext, a *utilSmallObjectAllocator) {
 	t.Helper()
 	rs := region.Stats()
 	ds := rs.Descriptors

@@ -6,20 +6,21 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-var ErrSmallObjectOwner = ErrAllocatorOwner
-var ErrSmallObjectAssertion = ErrAllocatorAssertion
-var ErrSmallObjectUnreachable = ErrAllocatorUnreachable
-var ErrSmallObjectPending = ErrAllocatorPending
-var ErrSmallObjectNonterminating = ErrAllocatorNonterminating
+var ErrSmallObjectOwner = umemory.ErrAllocatorOwner
+var ErrSmallObjectAssertion = umemory.ErrAllocatorAssertion
+var ErrSmallObjectUnreachable = umemory.ErrAllocatorUnreachable
+var ErrSmallObjectPending = umemory.ErrAllocatorPending
+var ErrSmallObjectNonterminating = umemory.ErrAllocatorNonterminating
 
-type utilSmallObjectProfile = SmallAllocatorProfile
-type utilSmallObjectRef = ObjectRef
-type smallObjectStats = AllocatorStats
+type utilSmallObjectProfile = umemory.SmallAllocatorProfile
+type utilSmallObjectRef = umemory.ObjectRef
+type smallObjectStats = umemory.AllocatorStats
 type utilSmallObjectConfig struct {
 	Debug                *DebugContext
-	Runtime              *utilMemoryRuntime
+	Runtime              *umemory.Runtime
 	Profile              utilSmallObjectProfile
 	ID                   string
 	IDPresent, IDNull    bool
@@ -32,7 +33,7 @@ type utilSmallObjectConfig struct {
 type smallObjectIOBridge struct{ config utilSmallObjectConfig }
 type utilSmallObjectAllocator struct {
 	self                 *utilSmallObjectAllocator
-	core                 *SmallAllocator
+	core                 *umemory.SmallAllocator
 	io                   *smallObjectIOBridge
 	budget               *arena.Budget
 	headerBytes, ioBytes uint64
@@ -65,14 +66,14 @@ func newUtilSmallObjectAllocator(c utilSmallObjectConfig) (*utilSmallObjectAlloc
 		c.ID = "unknown"
 	}
 	io := &smallObjectIOBridge{config: c}
-	mc := SmallAllocatorConfig{Runtime: c.Runtime, Profile: c.Profile, IO: io, Verbosity: c.Verbosity}
+	mc := umemory.SmallAllocatorConfig{Runtime: c.Runtime, Profile: c.Profile, IO: io, Verbosity: c.Verbosity}
 	if c.Debug != nil {
 		mc.Assertions = c.Debug
 	}
 	if c.VerboseContext != nil {
 		mc.VerboseControl = c.VerboseContext
 	}
-	core, e := NewSmallAllocator(mc)
+	core, e := umemory.NewSmallAllocator(mc)
 	if e != nil {
 		b.Release(i + h)
 		return nil, e
@@ -111,9 +112,9 @@ func (a *utilSmallObjectAllocator) Write(r utilSmallObjectRef, n uint64, v byte)
 	}
 	return a.core.Write(r, n, v)
 }
-func (a *utilSmallObjectAllocator) RawLocation(r utilSmallObjectRef) (utilMemoryBlock, uint64, error) {
+func (a *utilSmallObjectAllocator) RawLocation(r utilSmallObjectRef) (umemory.Block, uint64, error) {
 	if e := a.valid(); e != nil {
-		return utilMemoryBlock{}, 0, e
+		return umemory.Block{}, 0, e
 	}
 	return a.core.RawLocation(r)
 }

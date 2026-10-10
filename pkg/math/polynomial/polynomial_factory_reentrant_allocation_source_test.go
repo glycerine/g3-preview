@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // ErrorTransport is a supported Go callback profile. This test does not claim
@@ -25,7 +26,7 @@ func polynomialFactoryTransportCleanupMode(t *testing.T, mode string) {
 	active := false
 	callbacks := 0
 	var callbackCleanup error
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f util.Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			callbacks++
 			before := c.pending
@@ -52,7 +53,7 @@ func polynomialFactoryTransportCleanupMode(t *testing.T, mode string) {
 	serviceMust(t, e)
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	m, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
@@ -72,7 +73,7 @@ func polynomialFactoryTransportCleanupMode(t *testing.T, mode string) {
 	}
 	roots, e := mm.allocator.PendingRoots()
 	serviceMust(t, e)
-	if !c.matchesFactoryInvocation(&receipt) || receipt.frame.allocator != roots || roots[0] == (util.Block{}) || receipt.frame.allocation.Pending != roots[0] {
+	if !c.matchesFactoryInvocation(&receipt) || receipt.frame.allocator != roots || roots[0] == (umemory.Block{}) || receipt.frame.allocation.Pending != roots[0] {
 		t.Fatalf("callback retired executing receipt: active=%v roots=%v scope=%+v callback=%v body=%v", c.matchesFactoryInvocation(&receipt), roots, receipt.frame, callbackCleanup, cause)
 	}
 	if callbackCleanup != ErrPolynomialPending {
@@ -81,16 +82,16 @@ func polynomialFactoryTransportCleanupMode(t *testing.T, mode string) {
 	if receipt.frame.allocationCause != cause || receipt.frame.executing {
 		t.Fatal("actual stopped outcome history changed", receipt.frame)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []util.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []umemory.Block{held})
 	serviceMust(t, c.cleanupFactoryInvocation(&receipt, false))
 	if receipt.frame.allocation.Pending != roots[0] {
 		t.Fatal("source-only cleanup consumed unjoined malloc")
 	}
 	serviceMust(t, c.cleanupFactoryInvocation(&receipt, true))
-	if receipt.frame.allocationCause != cause || receipt.frame.allocation.Pending != (util.Block{}) {
+	if receipt.frame.allocationCause != cause || receipt.frame.allocation.Pending != (umemory.Block{}) {
 		t.Fatal("owning acknowledgment lost cause", receipt.frame)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []util.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []umemory.Block{held})
 	serviceMust(t, rt.SetMaxSize(0))
 	old := receipt
 	p, e := c.mkCellWithReceipt(0, nil, nil, nil, nil, &receipt)

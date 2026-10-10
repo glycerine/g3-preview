@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerSourceCopyFromOwnerEveryDestructivePrefix(t *testing.T) {
@@ -79,7 +80,7 @@ func TestIntegerSourceCopyFromOwnerEveryDestructivePrefix(t *testing.T) {
 func TestIntegerSourceCopyFromOwnerPendingReplacement(t *testing.T) {
 	source, _ := mpzPublicationDirectOwner(t)
 	budget := arena.NewBudget(1 << 24)
-	target, e := NewIntegerManager(IntegerConfig{Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	target, e := NewIntegerManager(IntegerConfig{Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 	serviceMust(t, e)
 	var input, out, foreign Int
 	serviceMust(t, source.Copy(&input, &source.Two64))
@@ -95,7 +96,7 @@ func TestIntegerSourceCopyFromOwnerPendingReplacement(t *testing.T) {
 		}
 	}()
 	e = target.CopyFromOwner(&out, source, &input)
-	if !errors.Is(e, arena.ErrSlotLimit) || out.Cell != target.FailedNullRef || target.PendingCell.Object == (ObjectRef{}) {
+	if !errors.Is(e, arena.ErrSlotLimit) || out.Cell != target.FailedNullRef || target.PendingCell.Object == (umemory.ObjectRef{}) {
 		t.Fatal("actual fresh NULL/allocated payload before descriptor refusal", e, out)
 	}
 	original := target.PendingCell

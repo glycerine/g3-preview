@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // An actual numerical/object refusal leaves a reached derivative invocation.
@@ -69,10 +70,10 @@ func TestPolynomialExactDivInvocationQuickAndCompleted(t *testing.T) {
 
 func polynomialPrimitiveFixture(t *testing.T) *MultivariatePolynomialManager {
 	t.Helper()
-	return polynomialPrimitiveFixtureWithProfile(t, util.SmallAllocatorProfile{})
+	return polynomialPrimitiveFixtureWithProfile(t, umemory.SmallAllocatorProfile{})
 }
 
-func polynomialPrimitiveFixtureWithProfile(t *testing.T, profile util.SmallAllocatorProfile) *MultivariatePolynomialManager {
+func polynomialPrimitiveFixtureWithProfile(t *testing.T, profile umemory.SmallAllocatorProfile) *MultivariatePolynomialManager {
 	t.Helper()
 	q, b := rationalManager(t, false)
 	var mm *MonomialManager
@@ -100,7 +101,7 @@ func polynomialPrimitiveFixtureWithProfile(t *testing.T, profile util.SmallAlloc
 func TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort(t *testing.T) {
 	// Select pooled object storage so a warm raw zero result needs no new
 	// object allocation in either build profile.
-	m := polynomialPrimitiveFixtureWithProfile(t, util.SmallAllocatorProfile{PointerBits: 64})
+	m := polynomialPrimitiveFixtureWithProfile(t, umemory.SmallAllocatorProfile{PointerBits: 64})
 	c := m.core
 	p := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{{{0, 2}}, {{1, 2}}})
 	prime := util.NewInt(2)

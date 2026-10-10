@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Factors own one polynomial reference per successfully acquired entry and an
@@ -45,7 +46,7 @@ type PolynomialFactors struct {
 	generated                                                          Monomial
 	calleeGeneration                                                   uint64
 	somOwned, cheapOwned                                               bool
-	monomialRaw                                                        [3]util.Block
+	monomialRaw                                                        [3]umemory.Block
 	stopped                                                            bool
 	freshResult                                                        Polynomial
 }
@@ -101,7 +102,7 @@ func (f *PolynomialFactors) open() error {
 	if e := f.ready(); e != nil {
 		return e
 	}
-	if f.memberSet.active || f.constantInvocation.active || f.sourceCause != nil || f.resetting || f.multiplyActive || f.localActive || f.numeric.PendingObject() != (util.ObjectRef{}) || f.numeric.PendingAllocatorBlocks() != ([3]util.Block{}) {
+	if f.memberSet.active || f.constantInvocation.active || f.sourceCause != nil || f.resetting || f.multiplyActive || f.localActive || f.numeric.PendingObject() != (umemory.ObjectRef{}) || f.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) {
 		return ErrPolynomialPending
 	}
 	if frame := f.displayReceipt; frame != nil && frame.generation == f.displayGeneration && frame.active && frame.sink == nil {

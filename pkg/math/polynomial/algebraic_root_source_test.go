@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -49,7 +50,7 @@ func algebraicSourceFixture(t *testing.T) *algebraicSourceCohort {
 	f.binary = binary
 	intervals, e := util.NewBinaryIntervalManager(binary)
 	algebraicSourceMust(t, e)
-	allocator, e := util.NewSmallAllocator(util.SmallAllocatorConfig{Runtime: s.RuntimeOwner(), Profile: util.SmallAllocatorProfile{PointerBits: s.RuntimeOwner().SizeTBits(), Debug: polynomialSourceDebug}})
+	allocator, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: s.RuntimeOwner(), Profile: umemory.SmallAllocatorProfile{PointerBits: s.RuntimeOwner().SizeTBits(), Debug: polynomialSourceDebug}})
 	algebraicSourceMust(t, e)
 	core, e := numericRationalService_NewAlgebraicRootCore(s, AlgebraicRootConfig{Polynomials: p, Factors: factors, Binary: binary, Intervals: intervals, Allocator: allocator, Checkpoint: func() bool { f.algebraicTicks++; return limit.Inc() }, Cooperation: func() error { return cooperation.Cooperate("algebraic") }})
 	algebraicSourceMust(t, e)

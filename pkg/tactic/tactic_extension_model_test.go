@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func extensionFixture(t *testing.T) (*ast.ASTManager, *model.Model, *ModelRef, model.ModelEvaluatorConfig) {
@@ -20,7 +21,7 @@ func extensionFixture(t *testing.T) (*ast.ASTManager, *model.Model, *ModelRef, m
 	globals, e := util.NewGlobalParamsService(sy, ctx, util.GlobalParamsConfig{Budget: budget, Catalog: catalog, DescriptorPageSize: 2, DescriptorWordsPageSize: 16})
 	satOK(t, e)
 	satOK(t, globals.InitializeSource())
-	memory, e := util.NewRuntime(util.RuntimeConfig{Budget: budget})
+	memory, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget})
 	satOK(t, e)
 	cooperate, e := cooperate.NewCooperation(budget)
 	satOK(t, e)

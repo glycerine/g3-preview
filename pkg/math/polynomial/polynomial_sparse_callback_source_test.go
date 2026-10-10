@@ -9,11 +9,12 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialSparseOutputCallbackNumericPendingRemainsForeign(t *testing.T) {
 	budget := arena.NewBudget(1 << 24)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		q.Close()
@@ -69,7 +70,7 @@ func TestPolynomialSparseOutputCallbackNumericPendingRemainsForeign(t *testing.T
 	t.Cleanup(func() { serviceMust(t, m.RemoveDeletionHandler(handler)); serviceMust(t, handler.CloseChecked()) })
 	ok, e = s.Interpolate(out)
 	serviceMust(t, e)
-	if !ok || calls != 1 || reached.Object == (util.ObjectRef{}) {
+	if !ok || calls != 1 || reached.Object == (umemory.ObjectRef{}) {
 		t.Fatal("actual completed callback publication", ok, calls, reached)
 	}
 	polynomialSparsePhysical(t, s, out, []Polynomial{p, polyTwo}, &foreign)
@@ -158,7 +159,7 @@ func TestPolynomialSparseOutputCallbackCreationRemainsForeign(t *testing.T) {
 // even in the release assertion profile; no allocator field is forged.
 func polynomialSparseDirectFactoryFixture(t *testing.T) *MultivariatePolynomialManager {
 	q, b := rationalManager(t, false)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().Memory, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().Memory, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	serviceMust(t, mm.IncManagerRef())
 	t.Cleanup(func() { serviceMust(t, mm.DecManagerRef()) })

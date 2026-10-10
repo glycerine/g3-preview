@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrMixedNotation = errors.New("mpnum: mixing rational/scientific notation")
@@ -41,7 +42,7 @@ func (e *ParseError) Error() string { return e.Unwrap().Error() }
 // a dot keeps the actual old denominator until its later source arithmetic.
 func (m *RationalManager) SetString(out *Rational, text string) error {
 	if m == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.closed {
 		return arena.ErrClosed

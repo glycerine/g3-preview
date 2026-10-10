@@ -1,8 +1,12 @@
 // Source: src/util/mpf.cpp:1590-1606; src/util/mpf.h:292.
 package util
 
+import
+
 // ToStringRaw constructs the returned source string in fresh caller storage.
 // On failure CleanupRawString joins its actual temporaries and return slot.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 func (m *ArbitraryFloatManager) ToStringRaw(x *ArbitraryFloat, out *OwnedString) (cause error) {
 	if e := m.valueGuard(x); e != nil {
 		return e
@@ -157,7 +161,7 @@ func (m *ArbitraryFloatManager) finishRawStringSource() error {
 
 func (m *ArbitraryFloatManager) CleanupRawString() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.rawString
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {
@@ -167,7 +171,7 @@ func (m *ArbitraryFloatManager) CleanupRawString() (cause error) {
 		return nil
 	}
 	if !s.valid() {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := m.integer.BindCaller(&s.integerBinding, s, 27); e != nil {
 		return e

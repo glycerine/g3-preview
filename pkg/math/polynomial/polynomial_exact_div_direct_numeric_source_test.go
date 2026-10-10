@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame(t *testing.T) {
@@ -34,8 +35,8 @@ func TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame(t *testing.T) {
 		roots, e := c.integer.SourceAllocator().PendingRoots()
 		serviceMust(t, e)
 		pending := c.integer.PendingCell
-		if body != nil && receipt.invocation != 0 && (pending.Object != (util.SourceCellBacking{}).Object || roots != ([3]util.Block{})) {
-			ownedCell, ownedRaw := pending.Object == (util.SourceCellBacking{}).Object, roots == ([3]util.Block{})
+		if body != nil && receipt.invocation != 0 && (pending.Object != (util.SourceCellBacking{}).Object || roots != ([3]umemory.Block{})) {
+			ownedCell, ownedRaw := pending.Object == (util.SourceCellBacking{}).Object, roots == ([3]umemory.Block{})
 			if c.matchesExactDivInvocation(&receipt) {
 				for _, actual := range []*polynomialNumericRoots{&receipt.frame.numeric} {
 					ownedCell = ownedCell || actual.Cell == pending
@@ -55,7 +56,7 @@ func TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame(t *testing.T) {
 			if !ownedCell || !ownedRaw {
 				t.Fatal("actual ExactDiv acquisition has no exact direct local/buffer frame", ordinal, body, pending, roots, receipt.frame.numericPhase)
 			}
-			if receipt.frame.numericPhase == 1 && ((pending.Object != (util.SourceCellBacking{}).Object && receipt.frame.numeric.Cell == pending) || (roots != ([3]util.Block{}) && receipt.frame.numeric.Allocator == roots)) {
+			if receipt.frame.numericPhase == 1 && ((pending.Object != (util.SourceCellBacking{}).Object && receipt.frame.numeric.Cell == pending) || (roots != ([3]umemory.Block{}) && receipt.frame.numeric.Allocator == roots)) {
 				saw = true
 				// At this actual NUM leaf, pending destruction needs no new
 				// source allocation. Prove false/true ownership while the real
@@ -101,7 +102,7 @@ func TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame(t *testing.T) {
 // reaches descriptor preparation after its direct payload allocation.
 func polynomialExactDivDirectPageOneFixture(t *testing.T) *MultivariatePolynomialManager {
 	budget := arena.NewBudget(1 << 24)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1, Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1, Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)

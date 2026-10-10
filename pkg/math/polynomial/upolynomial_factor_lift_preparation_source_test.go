@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -22,7 +23,7 @@ func liftPreparationSavedModulusTransport(t *testing.T, mode string) {
 	var s *UPolynomialFactorizationService
 	armed := false
 	calls := 0
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f util.Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			prior := s.scope
@@ -55,7 +56,7 @@ func liftPreparationSavedModulusTransport(t *testing.T, mode string) {
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -64,7 +65,7 @@ func liftPreparationSavedModulusTransport(t *testing.T, mode string) {
 	serviceMust(t, e)
 	s, e = NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
-	var held util.Block
+	var held umemory.Block
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
 	var value util.Int
@@ -107,7 +108,7 @@ func liftPreparationSavedModulusTransport(t *testing.T, mode string) {
 	if !numericPhysicalReservationRefusal(body) || calls != 1 {
 		t.Fatal("actual saved-modulus source SET refusal", body, calls)
 	}
-	primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []util.Block{held}, &value)
+	primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []umemory.Block{held}, &value)
 }
 
 // The actual post-loop caller uses the literal saved-prime/Mignotte/related

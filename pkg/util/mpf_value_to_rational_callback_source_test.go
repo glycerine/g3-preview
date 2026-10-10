@@ -6,18 +6,19 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatToRationalAllocationCallbackGuards(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	var m *ArbitraryFloatManager
-	var rt *Runtime
+	var rt *umemory.Runtime
 	var qm *RationalManager
 	out := NewRational()
 	var a ArbitraryFloat
 	active := false
 	calls := 0
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			calls++
 			used := b.Used()
@@ -58,7 +59,7 @@ func TestArbitraryFloatToRationalAllocationCallbackGuards(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	qm, e = NewRationalManager(RationalConfig{Integers: serviceConfig(b).Integers})
 	serviceMust(t, e)
@@ -76,10 +77,10 @@ func TestArbitraryFloatToRationalAllocationCallbackGuards(t *testing.T) {
 	active = true
 	body := m.ToRational(&a, qm, &out)
 	active = false
-	if !errors.Is(body, Failure{Kind: FailureMemout}) || calls == 0 {
+	if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls == 0 {
 		t.Fatal("actual callback leaf not reached", body, calls)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad, m.rationalConversion.transferred.Block()}, &a.significand, &m.rational.NTmp)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad, m.rationalConversion.transferred.Block()}, &a.significand, &m.rational.NTmp)
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, m.CleanupRationalConversion())
 	serviceMust(t, m.CleanupRationalConversion())

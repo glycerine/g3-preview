@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialContentBeforeAIActualGCDPrelude(t *testing.T) {
@@ -204,11 +205,11 @@ func TestPolynomialContentPreludeActualFrameAndSavedContextGuards(t *testing.T) 
 // end DEL, and that reached child source stop precedes Content's ai constructor.
 func TestPolynomialContentBeforeAIReachedGCDSourceStop(t *testing.T) {
 	budget := arena.NewBudget(1 << 28)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
 	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
@@ -252,7 +253,7 @@ func TestPolynomialContentBeforeAIReachedGCDSourceStop(t *testing.T) {
 	if cause == nil || cause != z.RawInvocationSourceCause(&s.gcd) {
 		t.Fatal("actual child source stop missing parent", cause)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*util.Int{&a, &b, &i, &g}, 0, []util.Block{lane})
+	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*util.Int{&a, &b, &i, &g}, 0, []umemory.Block{lane})
 	serviceMust(t, c.cleanupContentInvocation(&receipt, false))
 	if c.contentInvocationSourceCause(&receipt) != cause || s.aiConstructed || s.aiEnded {
 		t.Fatal("false own phase invented ai/source completion")
@@ -263,7 +264,7 @@ func TestPolynomialContentBeforeAIReachedGCDSourceStop(t *testing.T) {
 	if c.contentInvocationSourceCause(&receipt) != cause || z.RawInvocationSourceCause(&receipt.frame.gcd) != cause || returned.Error() != captured {
 		t.Fatal("own acknowledgement changed source history")
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*util.Int{&a, &b, &i, &g}, 0, []util.Block{lane, recovery})
+	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*util.Int{&a, &b, &i, &g}, 0, []umemory.Block{lane, recovery})
 	var later polynomialContentInvocationReceipt
 	serviceMust(t, c.integerContentWithReceipt(p, &i, &primitive, &later))
 	if later.invocation == receipt.invocation || returned.Error() != captured || !errors.Is(returned, arena.ErrBounds) {
@@ -278,7 +279,7 @@ func TestPolynomialContentBeforeAIReachedGCDSourceStop(t *testing.T) {
 	serviceMust(t, full.CloseChecked())
 	serviceMust(t, q.CloseChecked())
 	e = rt.Deallocate(&recovery)
-	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal("actual recovery consumption", e)
 	}
 	contextTLSFinish(t, rt, rt.Close)

@@ -5,10 +5,11 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Independent named physical census; borrowed views are not owning roots.
-func polynomialVariablePhysical(t *testing.T, m *MultivariatePolynomialCore, maxOwners []*PolynomialMaxDegrees, posOwners []*PolynomialVariablePositions, maxScopes []*ScopedPolynomialMaxDegrees, posScopes []*ScopedPolynomialVariablePositions, external []util.Block, polys []Polynomial) {
+func polynomialVariablePhysical(t *testing.T, m *MultivariatePolynomialCore, maxOwners []*PolynomialMaxDegrees, posOwners []*PolynomialVariablePositions, maxScopes []*ScopedPolynomialMaxDegrees, posScopes []*ScopedPolynomialVariablePositions, external []umemory.Block, polys []Polynomial) {
 	t.Helper()
 	var fields []*PolynomialVariableDegrees
 	var headers uint64
@@ -37,7 +38,7 @@ func polynomialVariablePhysical(t *testing.T, m *MultivariatePolynomialCore, max
 	polynomialVariablePhysicalCore(t, m, nil, nil, nil, nil, polys, nil, external, fields, headers)
 	polynomialOperationMonomialAudit(t, m, polys, nil)
 }
-func polynomialVariablePhysicalCore(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []util.Block, degrees []*PolynomialVariableDegrees, extraColdHeaders uint64, public ...*util.Int) {
+func polynomialVariablePhysicalCore(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []umemory.Block, degrees []*PolynomialVariableDegrees, extraColdHeaders uint64, public ...*util.Int) {
 	t.Helper()
 	// The current shared census retains exact cell validation, paired failure
 	// states and all actual pseudo/Power/ExactDiv scope roots. This wrapper adds

@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrPsortUninitializedComparison = errors.New("g3: reached uninitialized psort comparison mode")
@@ -24,7 +25,7 @@ type PsortASTStats struct{ CompiledVariables, CompiledClauses, ClauseVariables u
 type PsortASTNetwork struct {
 	self            *PsortASTNetwork
 	context         *PsortASTContext
-	runtime         *util.Runtime
+	runtime         *umemory.Runtime
 	budget          *arena.Budget
 	debug           *util.DebugContext
 	header          uint64
@@ -74,7 +75,7 @@ func psortVectorPointer(v *ASTLiteralVector) (psortASTPointer, error) {
 	p, e := v.Span()
 	return psortASTPointer{span: p}, e
 }
-func NewPsortASTNetwork(c *PsortASTContext, r *util.Runtime, b *arena.Budget, d *util.DebugContext) (*PsortASTNetwork, error) {
+func NewPsortASTNetwork(c *PsortASTContext, r *umemory.Runtime, b *arena.Budget, d *util.DebugContext) (*PsortASTNetwork, error) {
 	if c == nil || c.self != c || r == nil || b == nil || c.budget != b || r.Budget() != b || d != nil && (!d.ValidOwner() || d.Budget() != b) {
 		return nil, arena.ErrConfig
 	}

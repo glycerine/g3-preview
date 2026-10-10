@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/messages"
 )
 
@@ -23,7 +24,7 @@ type ModelEvaluatorConfig struct {
 	Context     *util.ParamsContext
 	Globals     *util.GlobalParamsService
 	Params      *util.ParamsRef
-	Memory      *util.Runtime
+	Memory      *umemory.Runtime
 	Cooperation *cooperate.Cooperation
 }
 

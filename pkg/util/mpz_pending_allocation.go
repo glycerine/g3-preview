@@ -3,6 +3,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // CleanupPendingAllocation explicitly releases physical storage whose source
@@ -12,7 +13,7 @@ import (
 
 func (m *IntegerManager) CleanupPendingAllocation() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.closed {
 		return arena.ErrClosed
@@ -27,11 +28,11 @@ func (m *IntegerManager) CleanupPendingAllocation() error {
 }
 
 func (m *IntegerManager) cleanupPendingAllocation() error {
-	if m.PendingCell.Object != (ObjectRef{}) {
+	if m.PendingCell.Object != (umemory.ObjectRef{}) {
 		if m.ConstructorUnwound || m.SourceFinalized {
 			if m.PendingCell.Offset != 0 {
 				_, e := m.Memory.ReadUint32(m.PendingCell.Raw, m.PendingCell.Offset+4)
-				if e != ErrRuntimeOwner {
+				if e != umemory.ErrRuntimeOwner {
 					if e != nil {
 						return e
 					}
@@ -42,7 +43,7 @@ func (m *IntegerManager) cleanupPendingAllocation() error {
 			}
 			raw := m.PendingCell.Raw
 			e := m.Memory.Deallocate(&raw)
-			if raw == (Block{}) {
+			if raw == (umemory.Block{}) {
 				m.PendingCell = SourceCellBacking{}
 			}
 			return e

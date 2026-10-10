@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Each invocation borrows reusable, concrete Go scratch slices. Numeral cells
@@ -74,7 +75,7 @@ func (m *NaturalManager) finishFormattingScope(s *naturalFormattingScope) error 
 // CleanupFormatting drops cached scratch after ending the active invocation.
 func (m *NaturalManager) CleanupFormatting() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.ClosedField || m.runtime == nil {
 		return arena.ErrClosed

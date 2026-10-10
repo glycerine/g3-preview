@@ -6,18 +6,19 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatFreshAllocatingRowWhileOlderCopyRetainsRoots(t *testing.T) {
 	for _, copyValue := range []bool{false, true} {
 		b := arena.NewBudget(1 << 28)
-		var r *Runtime
+		var r *umemory.Runtime
 		var m *ArbitraryFloatManager
-		var row Block
+		var row umemory.Block
 		active, calls := false, 0
 		var seen [6]uint32
 		var closeRefusal, sourceRefusal error
-		r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 			if active {
 				calls++
 				for i := range seen {
@@ -33,7 +34,7 @@ func TestArbitraryFloatFreshAllocatingRowWhileOlderCopyRetainsRoots(t *testing.T
 			return f
 		}})
 		serviceMust(t, e)
-		m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+		m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 		serviceMust(t, e)
 		row, e = r.Allocate(64)
 		serviceMust(t, e)
@@ -57,7 +58,7 @@ func TestArbitraryFloatFreshAllocatingRowWhileOlderCopyRetainsRoots(t *testing.T
 			body = m.SetComponentsToRuntime(row, 0, 11, 113, true, -42, &source)
 		}
 		active = false
-		if !errors.Is(body, Failure{Kind: FailureMemout}) || calls == 0 {
+		if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls == 0 {
 			t.Fatal(copyValue, body, calls)
 		}
 		wantExponent := int64(99)
@@ -76,7 +77,7 @@ func TestArbitraryFloatFreshAllocatingRowWhileOlderCopyRetainsRoots(t *testing.T
 		if out.Exponent() != wantExponent || !m.integer.MatchesCopyAllocationInvocation(&m.valueCopy) {
 			t.Fatal("actual failed row/child tuple", copyValue, out, m.valueCopy)
 		}
-		integerPhysicalAuditWithRaw(t, m.integer, []Block{row, padding}, &source, &input.significand, &out.significand)
+		integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{row, padding}, &source, &input.significand, &out.significand)
 		var maps uint64
 		if want := m.header + m.ValueCopyHistoryBytes() + m.rational.HeaderBytes + integerActualOwnedBytes(m.integer) + maps; b.Used() != want {
 			t.Fatal("immediate cold/physical graph", b.Used(), want)
@@ -124,13 +125,13 @@ func TestArbitraryFloatFreshAllocatingRowWhileOlderCopyRetainsRoots(t *testing.T
 func TestArbitraryFloatTwoFailedAllocatingRowsRetainIndependentRoots(t *testing.T) {
 	for _, copyValue := range []bool{false, true} {
 		b := arena.NewBudget(1 << 28)
-		var r *Runtime
+		var r *umemory.Runtime
 		var m *ArbitraryFloatManager
-		var row Block
+		var row umemory.Block
 		active, calls := false, 0
 		var seen [6]uint32
 		var closeRefusal, sourceRefusal error
-		r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 			if active {
 				calls++
 				for i := range seen {
@@ -146,7 +147,7 @@ func TestArbitraryFloatTwoFailedAllocatingRowsRetainIndependentRoots(t *testing.
 			return f
 		}})
 		serviceMust(t, e)
-		m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+		m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 		serviceMust(t, e)
 		row, e = r.Allocate(64)
 		serviceMust(t, e)
@@ -175,7 +176,7 @@ func TestArbitraryFloatTwoFailedAllocatingRowsRetainIndependentRoots(t *testing.
 			body = m.SetComponentsToRuntime(row, 0, 11, 113, true, -42, &source)
 		}
 		active = false
-		if !errors.Is(body, Failure{Kind: FailureMemout}) || calls == 0 {
+		if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls == 0 {
 			t.Fatal(copyValue, body, calls)
 		}
 		wantExponent := int64(99)
@@ -194,7 +195,7 @@ func TestArbitraryFloatTwoFailedAllocatingRowsRetainIndependentRoots(t *testing.
 		if out.Exponent() != wantExponent || !m.integer.MatchesCopyAllocationInvocation(&m.valueCopy) {
 			t.Fatal("actual failed row/child tuple", copyValue, out, m.valueCopy)
 		}
-		integerPhysicalAuditWithRaw(t, m.integer, []Block{row, padding}, &source, &input.significand, &out.significand)
+		integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{row, padding}, &source, &input.significand, &out.significand)
 		var maps uint64
 		if want := m.header + m.ValueCopyHistoryBytes() + m.rational.HeaderBytes + integerActualOwnedBytes(m.integer) + maps; b.Used() != want {
 			t.Fatal("immediate cold/physical graph", b.Used(), want)
@@ -216,12 +217,12 @@ func TestArbitraryFloatTwoFailedAllocatingRowsRetainIndependentRoots(t *testing.
 			next = m.SetComponentsToRuntimeWithReceipt(row, 32, 11, 113, true, -42, &source, &newer)
 		}
 		active = false
-		if !errors.Is(next, Failure{Kind: FailureMemout}) || newer.frame == olderCall || newer.Child.Frame == retained.Frame || !m.integer.MatchesCopyAllocationInvocation(&newer.Child) {
+		if !errors.Is(next, umemory.Failure{Kind: umemory.FailureMemout}) || newer.frame == olderCall || newer.Child.Frame == retained.Frame || !m.integer.MatchesCopyAllocationInvocation(&newer.Child) {
 			t.Fatal("second actual failed allocation", next, newer)
 		}
 		fresh, read := m.CaptureRuntimeValue(row, 32)
 		serviceMust(t, read)
-		integerPhysicalAuditWithRaw(t, m.integer, []Block{row, padding, retryPadding}, &source, &input.significand, &older.significand, &fresh.significand)
+		integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{row, padding, retryPadding}, &source, &input.significand, &older.significand, &fresh.significand)
 		serviceMust(t, r.SetMaxSize(0))
 		unchanged, read := m.CaptureRuntimeValue(row, 0)
 		serviceMust(t, read)

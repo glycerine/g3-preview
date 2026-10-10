@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // PolynomialVariableDegrees stores the source var2degree values in ordinary
@@ -14,13 +14,13 @@ import (
 type PolynomialVariableDegrees struct {
 	collecting                                 bool
 	self                                       *PolynomialVariableDegrees
-	runtime                                    *util.Runtime
+	runtime                                    *umemory.Runtime
 	values                                     []uint32
 	header                                     uint64
 	constructed, finalizing, finalized, closed bool
 }
 
-func NewPolynomialVariableDegrees(r *util.Runtime) (*PolynomialVariableDegrees, error) {
+func NewPolynomialVariableDegrees(r *umemory.Runtime) (*PolynomialVariableDegrees, error) {
 	if e := r.CheckOpen(); e != nil {
 		return nil, e
 	}

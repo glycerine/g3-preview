@@ -4,13 +4,14 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func (m *ArbitraryFloatManager) captureRuntimeValue(block Block, offset uint64, own bool) (ArbitraryFloat, error) {
+func (m *ArbitraryFloatManager) captureRuntimeValue(block umemory.Block, offset uint64, own bool) (ArbitraryFloat, error) {
 	var zero ArbitraryFloat
 	if own {
 		if m == nil || m.self != m || m.integer == nil || m.integer.self != m.integer {
-			return zero, ErrRuntimeOwner
+			return zero, umemory.ErrRuntimeOwner
 		}
 		if !m.constructorComplete || m.closed {
 			return zero, arena.ErrClosed
@@ -40,11 +41,11 @@ func (m *ArbitraryFloatManager) captureRuntimeValue(block Block, offset uint64, 
 
 // CaptureRuntimeValue is a borrowed scalar read of sole Runtime row bytes; it
 // does not dereference the encoded cell or create another owning numeral.
-func (m *ArbitraryFloatManager) CaptureRuntimeValue(block Block, offset uint64) (ArbitraryFloat, error) {
+func (m *ArbitraryFloatManager) CaptureRuntimeValue(block umemory.Block, offset uint64) (ArbitraryFloat, error) {
 	return m.captureRuntimeValue(block, offset, false)
 }
 
-func (m *ArbitraryFloatManager) writeRuntimeExponent(block Block, offset uint64, exponent int64) error {
+func (m *ArbitraryFloatManager) writeRuntimeExponent(block umemory.Block, offset uint64, exponent int64) error {
 	if e := m.memory.WriteUint32(block, offset+4, uint32(exponent)); e != nil {
 		return e
 	}
@@ -64,22 +65,22 @@ func (m *ArbitraryFloatManager) physicalCopySignificandFromOwner(out *Int, sourc
 // CopyToRuntime publishes format/exponent before SET. The optional concrete
 // receiver publishes sign, poison/null and returned cell at the existing
 // Integer leaf sites, before real allocation callbacks can observe the row.
-func (m *ArbitraryFloatManager) CopyToRuntime(block Block, offset uint64, source *ArbitraryFloat) error {
+func (m *ArbitraryFloatManager) CopyToRuntime(block umemory.Block, offset uint64, source *ArbitraryFloat) error {
 	return m.CopyToRuntimeWithReceipt(block, offset, source, nil)
 }
-func (m *ArbitraryFloatManager) CopyToRuntimeWithReceipt(block Block, offset uint64, source *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt) error {
+func (m *ArbitraryFloatManager) CopyToRuntimeWithReceipt(block umemory.Block, offset uint64, source *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt) error {
 	return m.CopyToRuntimeFromOwnerWithReceipt(block, offset, m, source, receipt)
 }
 
 // The source MPF is borrowed from an explicitly named owner. Its compressed
 // significand is read by that owner's Integer leaf, never inferred from IDs.
-func (m *ArbitraryFloatManager) CopyToRuntimeFromOwnerWithReceipt(block Block, offset uint64, sourceManager *ArbitraryFloatManager, source *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt) (cause error) {
+func (m *ArbitraryFloatManager) CopyToRuntimeFromOwnerWithReceipt(block umemory.Block, offset uint64, sourceManager *ArbitraryFloatManager, source *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt) (cause error) {
 	out, e := m.captureRuntimeValue(block, offset, false)
 	if e != nil {
 		return e
 	}
 	if sourceManager == nil || source == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := sourceManager.valueGuard(source); e != nil {
 		return e
@@ -105,22 +106,22 @@ func (m *ArbitraryFloatManager) CopyToRuntimeFromOwnerWithReceipt(block Block, o
 
 // SetComponentsToRuntime uses the source mpz overload's opposite exponent
 // ordering: write format, SET the actual row's significand, then exponent.
-func (m *ArbitraryFloatManager) SetComponentsToRuntime(block Block, offset uint64, ebits, sbits uint32, sign bool, exponent int64, significand *Int) error {
+func (m *ArbitraryFloatManager) SetComponentsToRuntime(block umemory.Block, offset uint64, ebits, sbits uint32, sign bool, exponent int64, significand *Int) error {
 	return m.SetComponentsToRuntimeWithReceipt(block, offset, ebits, sbits, sign, exponent, significand, nil)
 }
-func (m *ArbitraryFloatManager) SetComponentsToRuntimeWithReceipt(block Block, offset uint64, ebits, sbits uint32, sign bool, exponent int64, significand *Int, receipt *ArbitraryFloatValueCopyReceipt) error {
+func (m *ArbitraryFloatManager) SetComponentsToRuntimeWithReceipt(block umemory.Block, offset uint64, ebits, sbits uint32, sign bool, exponent int64, significand *Int, receipt *ArbitraryFloatValueCopyReceipt) error {
 	if m == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	return m.SetComponentsToRuntimeFromOwnerWithReceipt(block, offset, ebits, sbits, sign, exponent, m.integer, significand, receipt)
 }
-func (m *ArbitraryFloatManager) SetComponentsToRuntimeFromOwnerWithReceipt(block Block, offset uint64, ebits, sbits uint32, sign bool, exponent int64, sourceManager *IntegerManager, significand *Int, receipt *ArbitraryFloatValueCopyReceipt) (cause error) {
+func (m *ArbitraryFloatManager) SetComponentsToRuntimeFromOwnerWithReceipt(block umemory.Block, offset uint64, ebits, sbits uint32, sign bool, exponent int64, sourceManager *IntegerManager, significand *Int, receipt *ArbitraryFloatValueCopyReceipt) (cause error) {
 	out, e := m.captureRuntimeValue(block, offset, false)
 	if e != nil {
 		return e
 	}
 	if sourceManager == nil || significand == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := sourceManager.check(significand); e != nil {
 		return e
@@ -143,7 +144,7 @@ func (m *ArbitraryFloatManager) SetComponentsToRuntimeFromOwnerWithReceipt(block
 
 // Deletion has no allocating publication gap. Always write its actual returned
 // NUM prefix, including a consumed release that also returns an owning error.
-func (m *ArbitraryFloatManager) delRuntimeValue(block Block, offset uint64, own bool) error {
+func (m *ArbitraryFloatManager) delRuntimeValue(block umemory.Block, offset uint64, own bool) error {
 	out, e := m.captureRuntimeValue(block, offset, own)
 	if e != nil {
 		return e
@@ -169,9 +170,9 @@ func (m *ArbitraryFloatManager) delRuntimeValue(block Block, offset uint64, own 
 	return e
 }
 
-func (m *ArbitraryFloatManager) DelRuntimeValue(block Block, offset uint64) error {
+func (m *ArbitraryFloatManager) DelRuntimeValue(block umemory.Block, offset uint64) error {
 	return m.delRuntimeValue(block, offset, false)
 }
-func (m *ArbitraryFloatManager) CleanupRuntimeValue(block Block, offset uint64) error {
+func (m *ArbitraryFloatManager) CleanupRuntimeValue(block umemory.Block, offset uint64) error {
 	return m.delRuntimeValue(block, offset, true)
 }

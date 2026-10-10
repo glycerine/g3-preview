@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/idgen"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var (
@@ -41,7 +42,7 @@ type satClauseHotHeader struct{ ID, Size, Capacity, Approx, Flags uint32 }
 type satClauseAllocatorConfig struct {
 	Storage        arena.SmallBytesConfig
 	OutOfMemory    func() bool
-	OOMRuntime     *util.Runtime
+	OOMRuntime     *umemory.Runtime
 	PooledOverride bool
 }
 type ClauseAllocator struct {
@@ -49,7 +50,7 @@ type ClauseAllocator struct {
 	origin                                 uint64
 	storage                                *arena.SmallBytes
 	ids                                    idgen.Generator
-	oomRuntime                             *util.Runtime
+	oomRuntime                             *umemory.Runtime
 	budget                                 *arena.Budget
 	large                                  []satLargeClauseEntry
 	largeFree                              uint32

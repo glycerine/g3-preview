@@ -4,6 +4,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // ExponentBias borrows the actual cached m_powers2.m1 numeral and reaches the
@@ -31,7 +32,7 @@ func (m *ArbitraryFloatManager) CopySignificand(out *Int, a *ArbitraryFloat, rec
 		return e
 	}
 	if out == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	m.valueExecuting = true
 	defer func() { m.valueExecuting = false }()
@@ -59,7 +60,7 @@ func (m *ArbitraryFloatManager) DeleteScopedInteger(a *Int) error {
 		return e
 	}
 	if a == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	m.valueExecuting = true
 	defer func() { m.valueExecuting = false }()
@@ -70,7 +71,7 @@ func (m *ArbitraryFloatManager) DeleteScopedInteger(a *Int) error {
 // or source-ended numeral. It does not acknowledge an unjoined copy child.
 func (m *ArbitraryFloatManager) CleanupScopedInteger(a *Int) error {
 	if m == nil || m.self != m || m.integer == nil || m.integer.self != m.integer || a == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if !m.constructorComplete || m.closed {
 		return arena.ErrClosed

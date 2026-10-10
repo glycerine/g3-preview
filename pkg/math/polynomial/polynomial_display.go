@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // PolynomialTextSink is a cold stream binding. Decimal bytes are borrowed only
@@ -206,7 +207,7 @@ func (f *polynomialDisplayFrame) finish(body error) error {
 	if e := f.finishNumeral(); e != nil {
 		return polynomialNewtonJoin(body, e)
 	}
-	if f.characterPending || f.limbs.Pending() || f.numeric.PendingObject() != (util.ObjectRef{}) || f.numeric.PendingAllocatorBlocks() != ([3]util.Block{}) {
+	if f.characterPending || f.limbs.Pending() || f.numeric.PendingObject() != (umemory.ObjectRef{}) || f.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) {
 		return body
 	}
 	f.active = false
@@ -721,8 +722,8 @@ func (v *PolynomialRefVector) DisplayInto(sink PolynomialTextSink) error {
 	return nil
 }
 
-func displayDeallocatePublished(r *util.Runtime, b *util.Block) error {
-	if *b == (util.Block{}) {
+func displayDeallocatePublished(r *umemory.Runtime, b *umemory.Block) error {
+	if *b == (umemory.Block{}) {
 		return nil
 	}
 	return r.Deallocate(b)

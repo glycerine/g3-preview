@@ -2,6 +2,7 @@
 package util
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -19,10 +20,10 @@ func sourceSmallObjectAlloc(t *testing.T, a *utilSmallObjectAllocator, n uint64)
 	sourceSmallObjectMust(t, e)
 	return r
 }
-func smallObjectDiagnosticFixture(t *testing.T) (*utilMemoryRuntime, *arena.Budget, *arena.BytesRegion, *NumericTextStream) {
+func smallObjectDiagnosticFixture(t *testing.T) (*umemory.Runtime, *arena.Budget, *arena.BytesRegion, *NumericTextStream) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
-	rt, e := newUtilMemoryRuntime(utilMemoryRuntimeConfig{Budget: b, SizeTBits: 64})
+	rt, e := newUtilMemoryRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	sourceSmallObjectMust(t, e)
 	region, e := arena.NewBytesRegion(arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 4, Budget: b}})
 	sourceSmallObjectMust(t, e)

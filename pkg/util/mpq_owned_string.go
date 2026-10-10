@@ -1,9 +1,13 @@
 // Source: src/util/mpq.cpp:123-127; src/util/mpq.h:255; src/util/mpz.cpp:1432-1435.
 package util
 
+import
+
 // ToOwnedString follows the selected left-to-right numerator/slash/denominator
 // string sequence. Success transfers the fresh return slot to the caller.
 // Failure retains actual temporaries for CleanupOwnedString or CloseChecked.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 func (m *RationalManager) ToOwnedString(a *Rational, out *OwnedString) (cause error) {
 	if e := m.checkScalarValue(a); e != nil {
 		return e
@@ -160,7 +164,7 @@ func (m *RationalManager) finishOwnedStringSource() error {
 
 func (m *RationalManager) CleanupOwnedString() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.stringScope
 	if s.executing || s.finishing || m.Z.Memory != nil && m.Z.Memory.FailureTransportActive() {

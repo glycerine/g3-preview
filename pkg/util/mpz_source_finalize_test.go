@@ -7,16 +7,17 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerSourceFinalizeCallerPhysicalLifetimes(t *testing.T) {
 	for _, direct := range []bool{false, true} {
 		budget := arena.NewBudget(1 << 24)
-		rt, e := NewRuntime(RuntimeConfig{Budget: budget, SizeTBits: 64})
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64})
 		if e != nil {
 			t.Fatal(e)
 		}
-		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Memory: rt, Profile: SmallAllocatorProfile{PointerBits: 64}})
+		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -90,11 +91,11 @@ func TestIntegerSourceFinalizeCallerPhysicalLifetimes(t *testing.T) {
 
 func TestIntegerSourceFinalizeReverseNaturalUnderAllocationLimit(t *testing.T) {
 	budget := arena.NewBudget(1 << 24)
-	rt, e := NewRuntime(RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
 	if e != nil {
 		t.Fatal(e)
 	}
-	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Memory: rt, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -149,11 +150,11 @@ func TestIntegerSourceFinalizeReverseNaturalUnderAllocationLimit(t *testing.T) {
 func TestIntegerSourceFinalizeDiagnosticFailureRetainsCaller(t *testing.T) {
 	for _, retryFinalize := range []bool{false, true} {
 		budget := arena.NewBudget(1 << 24)
-		rt, e := NewRuntime(RuntimeConfig{Budget: budget, SizeTBits: 64})
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64})
 		if e != nil {
 			t.Fatal(e)
 		}
-		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Memory: rt, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: true}})
+		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: true}})
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -164,7 +165,7 @@ func TestIntegerSourceFinalizeDiagnosticFailureRetainsCaller(t *testing.T) {
 			t.Fatal(e)
 		}
 		raw := m.Cell(caller.Cell).Backing.Raw
-		if e = m.SourceFinalize(); !errors.Is(e, ErrAllocatorIO) {
+		if e = m.SourceFinalize(); !errors.Is(e, umemory.ErrAllocatorIO) {
 			t.Fatal("actual source diagnostic refusal", e)
 		}
 		if m.CleanupCauseField != e || m.HeaderBytes == 0 || m.Cells.Stats().Live != 1 || (m.Natural == nil || !m.Natural.sourceFinalized || m.Natural.SourceStage != 4 || m.Natural.HeaderBytes == 0) || m.Tmp != [2]NumericCellRef{} || m.Arg != [2]NumericCellRef{} || m.Two64.Cell != 0 || m.IntMin.Cell != 0 {

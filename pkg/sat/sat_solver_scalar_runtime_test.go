@@ -2,9 +2,8 @@
 package sat
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverNativeVariableColumnsAvoidRuntimeAllocation(t *testing.T) {
@@ -31,13 +30,13 @@ func satScalarTestUintSize(t *testing.T, c *satUintColumn) uint32 {
 	return v
 }
 
-func satScalarAuditRoots(t *testing.T, v *satSolverVariableState, external ...util.Block) {
+func satScalarAuditRoots(t *testing.T, v *satSolverVariableState, external ...umemory.Block) {
 	t.Helper()
-	roots := append([]util.Block{}, external...)
+	roots := append([]umemory.Block{}, external...)
 	satRuntimeAuditBlocks(t, v.memory, roots...)
 }
 
-func satScalarAuditOwner(t *testing.T, v *satSolverVariableState, external ...util.Block) {
+func satScalarAuditOwner(t *testing.T, v *satSolverVariableState, external ...umemory.Block) {
 	t.Helper()
 	satScalarAuditRoots(t, v, external...)
 	todo := v.elimTodo.Stats()

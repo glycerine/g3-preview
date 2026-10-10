@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialCheapMatchedRootRowRetirementPreservesForeign(t *testing.T) {
@@ -268,11 +269,11 @@ func TestPolynomialCheapKnownPartialCopyPreservesEarlierForeignRow(t *testing.T)
 // pending-raw release after row compaction; ordinary math/OOM is not claimed.
 func TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease(t *testing.T) {
 	b := arena.NewBudget(1 << 27)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
@@ -301,7 +302,7 @@ func TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease(t *testing
 	serviceMust(t, c.cheap.prepareAppendTags(2))
 	serviceMust(t, rt.SetMaxSize(1))
 	cause := c.cheap.addWithAppendReceipt(&large, c.monomials.unit, false, &r)
-	if !numericPhysicalReservationRefusal(cause) || c.cheap.appendScope.numeric.Allocator == ([3]util.Block{}) {
+	if !numericPhysicalReservationRefusal(cause) || c.cheap.appendScope.numeric.Allocator == ([3]umemory.Block{}) {
 		t.Fatal("actual pending COPY raw", cause, c.cheap.appendScope.numeric)
 	}
 	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&large}, 0)

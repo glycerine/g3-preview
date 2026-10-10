@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/idgen"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrPolynomialOwner = util.ErrNumericOwner
@@ -38,7 +39,7 @@ type polynomialCreation struct {
 	generation        uint64
 	squareRootParent  *polynomialSquareRootScope
 	derivativeParent  *polynomialDerivativeScope
-	raw               util.ObjectRef
+	raw               umemory.ObjectRef
 	value             Polynomial
 	requested, id     uint32
 	idConsumed        bool
@@ -113,7 +114,7 @@ type MultivariatePolynomialCore struct {
 	integer                                                      *util.IntegerManager
 	modular                                                      *util.IntegerModularManager
 	monomials                                                    *MonomialManager
-	memory                                                       *util.Runtime
+	memory                                                       *umemory.Runtime
 	ids                                                          idgen.Generator
 	polynomials                                                  []Polynomial
 	locations                                                    []polynomialLocation

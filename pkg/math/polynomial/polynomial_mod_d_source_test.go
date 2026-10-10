@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func polynomialDegreeMap(t *testing.T, m *MultivariatePolynomialCore) *PolynomialVariableDegrees {
@@ -139,7 +140,7 @@ func TestPolynomialSOMModDSourceLogicalAssertionAndZeroReadMask(t *testing.T) {
 
 func TestPolynomialVariableDegreesNativeGrowthIgnoresArenaFailure(t *testing.T) {
 	b := arena.NewBudget(1 << 22)
-	runtime, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	serviceMust(t, e)
 	d, e := NewPolynomialVariableDegrees(runtime)
 	serviceMust(t, e)

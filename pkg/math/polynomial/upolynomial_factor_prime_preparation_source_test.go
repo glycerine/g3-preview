@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -404,12 +405,12 @@ func TestUPolynomialFactorPrimePreparationOldLeafPreservesForeignReplacement(t *
 				t.Logf("actual GCD prefix=%d body=%v rawActive=%v rawCount=%d captured=%v numeric=%+v pending=%+v", ordinal/16, body, q.Integers().GcdRaw.Active, q.Integers().GcdRaw.Count, h.gcdRaw.Frame == &q.Integers().GcdRaw, *owned, q.Integers().PendingCell)
 			}
 			if util.NumericAllocationPending(owned) {
-				if (old.Object != (util.ObjectRef{}) && q.Integers().PendingCell != old) || !numericPhysicalReservationRefusal(body) {
+				if (old.Object != (umemory.ObjectRef{}) && q.Integers().PendingCell != old) || !numericPhysicalReservationRefusal(body) {
 					t.Fatal("actual direct pending leaf absent", ordinal, body, old, q.Integers().PendingCell)
 				}
 				_ = h.finish(&r, body)
 				serviceMust(t, h.own(&r, false))
-				if *owned != oldRoots || (old.Object != (util.ObjectRef{}) && q.Integers().PendingCell != old) {
+				if *owned != oldRoots || (old.Object != (umemory.ObjectRef{}) && q.Integers().PendingCell != old) {
 					t.Fatal("false phase retired unjoined raw leaf")
 				}
 				_ = s.finishSquareFreeScopeError(body)
@@ -432,9 +433,9 @@ func TestUPolynomialFactorPrimePreparationOldLeafPreservesForeignReplacement(t *
 					t.Logf("foreignCopy prefix=%d error=%v pending=%+v", next, failure, q.Integers().PendingCell)
 					laterRaw, x := q.Integers().Allocator.PendingRoots()
 					serviceMust(t, x)
-					if q.Integers().PendingCell.Object != (util.ObjectRef{}) || laterRaw != ([3]util.Block{}) {
+					if q.Integers().PendingCell.Object != (umemory.ObjectRef{}) || laterRaw != ([3]umemory.Block{}) {
 						replacement := q.Integers().PendingCell
-						if (replacement.Object != (util.ObjectRef{}) && replacement == old) || !numericPhysicalReservationRefusal(failure) {
+						if (replacement.Object != (umemory.ObjectRef{}) && replacement == old) || !numericPhysicalReservationRefusal(failure) {
 							t.Fatal("not a genuine later generation", next, failure, replacement, old)
 						}
 						q.Budget().FailAfter(-1)
@@ -487,11 +488,11 @@ func TestUPolynomialFactorPrimePreparationActualNumeralDestructorHistory(t *test
 	for _, source := range []bool{true} {
 		t.Run(fmt.Sprint(source), func(t *testing.T) {
 			b := arena.NewBudget(1 << 26)
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 			serviceMust(t, e)
 			cfg := serviceConfig(b).Integers
 			cfg.Memory = rt
-			cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			zq, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: zq.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -549,7 +550,7 @@ func TestUPolynomialFactorPrimePreparationActualNumeralDestructorHistory(t *test
 			if source && !errors.Is(first, h.sourceCause) || !source && h.ownCause != first {
 				t.Fatal("matched owning acknowledgment lost immutable history")
 			}
-			primeTrialPhysicalAuditAll(t, zq, s, []*UPolynomialFactors{fs}, []util.Block{recovery})
+			primeTrialPhysicalAuditAll(t, zq, s, []*UPolynomialFactors{fs}, []umemory.Block{recovery})
 			var nextInput upolyVectorState
 			serviceMust(t, m.set(&nextInput, []util.Int{util.NewInt(1), util.NewInt(0), util.NewInt(2)}))
 			lateParams := DefaultUPolynomialFactorParams()
@@ -563,10 +564,10 @@ func TestUPolynomialFactorPrimePreparationActualNumeralDestructorHistory(t *test
 			}
 			serviceMust(t, h.own(&r, false))
 			serviceMust(t, h.own(&r, true))
-			primeTrialPhysicalAuditAll(t, zq, s, []*UPolynomialFactors{fs}, []util.Block{recovery})
+			primeTrialPhysicalAuditAll(t, zq, s, []*UPolynomialFactors{fs}, []umemory.Block{recovery})
 			contextTLSFinish(t, rt, fs.Close)
 			e = rt.Deallocate(&recovery)
-			if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+			if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 				t.Fatal("recovery release", e)
 			}
 			contextTLSFinish(t, rt, s.Close)
@@ -589,11 +590,11 @@ func TestUPolynomialFactorPrimePreparationActualRelatedDestructorHistory(t *test
 	for _, source := range []bool{true, false} {
 		t.Run(fmt.Sprint(source), func(t *testing.T) {
 			b := arena.NewBudget(1 << 26)
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 			serviceMust(t, e)
 			cfg := serviceConfig(b).Integers
 			cfg.Memory = rt
-			cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			zq, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: zq.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -651,7 +652,7 @@ func TestUPolynomialFactorPrimePreparationActualRelatedDestructorHistory(t *test
 			if source && !errors.Is(first, h.sourceCause) || !source && h.ownCause != first {
 				t.Fatal("matched owning acknowledgment lost immutable history")
 			}
-			primeTrialPhysicalAuditAll(t, zq, s, []*UPolynomialFactors{fs}, []util.Block{recovery})
+			primeTrialPhysicalAuditAll(t, zq, s, []*UPolynomialFactors{fs}, []umemory.Block{recovery})
 			var nextInput upolyVectorState
 			serviceMust(t, m.set(&nextInput, []util.Int{util.NewInt(1), util.NewInt(0), util.NewInt(2)}))
 			lateParams := DefaultUPolynomialFactorParams()
@@ -665,10 +666,10 @@ func TestUPolynomialFactorPrimePreparationActualRelatedDestructorHistory(t *test
 			}
 			serviceMust(t, h.own(&r, false))
 			serviceMust(t, h.own(&r, true))
-			primeTrialPhysicalAuditAll(t, zq, s, []*UPolynomialFactors{fs}, []util.Block{recovery})
+			primeTrialPhysicalAuditAll(t, zq, s, []*UPolynomialFactors{fs}, []umemory.Block{recovery})
 			contextTLSFinish(t, rt, fs.Close)
 			e = rt.Deallocate(&recovery)
-			if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+			if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 				t.Fatal("recovery release", e)
 			}
 			contextTLSFinish(t, rt, s.Close)

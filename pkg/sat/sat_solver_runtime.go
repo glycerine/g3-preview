@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrSATRuntimeLive = errors.New("sat: borrowed runtime still has live solver owners")
@@ -23,7 +24,7 @@ type Runtime struct {
 	self            *Runtime
 	budget          *arena.Budget
 	context         *util.ParamsContext
-	memory          *util.Runtime
+	memory          *umemory.Runtime
 	globals         *util.GlobalParams
 	ownerBytes      uint64
 	liveSolvers     uint32
@@ -52,7 +53,7 @@ func NewRuntime(c RuntimeConfig) (r *Runtime, err error) {
 			}
 		}
 	}()
-	if r.memory, err = util.NewRuntime(util.RuntimeConfig{Budget: c.Budget}); err != nil {
+	if r.memory, err = umemory.NewRuntime(umemory.RuntimeConfig{Budget: c.Budget}); err != nil {
 		return r, err
 	}
 	// GetModule does not execute descriptor registration. Optional descriptor

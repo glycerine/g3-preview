@@ -1,8 +1,12 @@
 // Source: src/util/mpz.cpp:1412-1429; src/util/mpq.cpp:142-153.
 package util
 
+import
+
 // DisplaySMT2Into borrows out for the original sequence of insertions. Any
 // emitted prefix belongs to the caller; CleanupSMT2Stream joins failed locals.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 func (m *IntegerManager) DisplaySMT2Into(out RationalSourceStream, a *Int, decimal bool) (cause error) {
 	if e := m.check(a); e != nil {
 		return e
@@ -132,7 +136,7 @@ func (m *IntegerManager) finishSMT2StreamSource() error {
 }
 func (m *IntegerManager) CleanupSMT2Stream() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.smt2Stream
 	if s.executing || s.finishing || m.Memory != nil && m.Memory.FailureTransportActive() {
@@ -290,7 +294,7 @@ func (m *RationalManager) finishSMT2StreamSource() error {
 }
 func (m *RationalManager) CleanupSMT2Stream() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.smt2Stream
 	if s.executing || s.finishing || m.Z.Memory != nil && m.Z.Memory.FailureTransportActive() {

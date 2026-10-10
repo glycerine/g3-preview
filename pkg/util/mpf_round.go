@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type ArbitraryFloatRoundingMode uint8
@@ -89,7 +90,7 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 		return e
 	}
 	if parent.mpfFormattedSet != nil && parent.formattedSetFrame(m.integer, true) == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.RoundScope
 	if s.active {

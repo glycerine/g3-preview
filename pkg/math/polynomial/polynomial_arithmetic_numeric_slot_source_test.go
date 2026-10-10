@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialRegularSetActualDefaultSlotNumericAcquisition(t *testing.T) {
@@ -46,7 +47,7 @@ func TestPolynomialRegularSetActualDefaultSlotNumericAcquisition(t *testing.T) {
 			}
 			saw = true
 		}
-		if r.frame.numeric.Allocator != ([3]util.Block{}) {
+		if r.frame.numeric.Allocator != ([3]umemory.Block{}) {
 			saw = true
 		}
 		// No lexical NUM is constructed in this source buffer method. Exact unjoined
@@ -90,11 +91,11 @@ func polynomialArithmeticDirectObjectFixture(t *testing.T) *MultivariatePolynomi
 func polynomialArithmeticAllocatorFixture(t *testing.T, directObjects bool) *MultivariatePolynomialManager {
 	t.Helper()
 	budget := arena.NewBudget(1 << 24)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	var mm *MonomialManager
 	if directObjects {
-		mm, e = NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: q.Integers().RuntimeOwner(), Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		mm, e = NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: q.Integers().RuntimeOwner(), Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 	}
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})

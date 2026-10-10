@@ -6,13 +6,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatPlainRationalSetFirstOwnRawStopHistory(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	q := NewRational()
 	zero := NewRational()
@@ -26,7 +27,7 @@ func TestArbitraryFloatPlainRationalSetFirstOwnRawStopHistory(t *testing.T) {
 	body := m.SetRationalWithReceipt(&out, 8, 4000, ArbitraryFloatNearestEven, &q, &r)
 	h, e := m.rationalSetHistory(&r.child)
 	serviceMust(t, e)
-	if body == nil || h.Transferred.Block() == (Block{}) || h.bodyCause == nil || !errors.Is(body, h.bodyCause) {
+	if body == nil || h.Transferred.Block() == (umemory.Block{}) || h.bodyCause == nil || !errors.Is(body, h.bodyCause) {
 		t.Fatal("actual raw transfer failure", body, h)
 	}
 	// The actual issued child record cannot authorize a copied parent frame.
@@ -35,13 +36,13 @@ func TestArbitraryFloatPlainRationalSetFirstOwnRawStopHistory(t *testing.T) {
 	forged.frame = &copied
 	beforeParent, beforeHistory := m.plainRationalSet, *h
 	beforeUsed, beforeState := b.Used(), rt.State()
-	if e = m.CleanupPlainRationalSetWithReceipt(&forged, true); e != ErrRuntimeOwner {
+	if e = m.CleanupPlainRationalSetWithReceipt(&forged, true); e != umemory.ErrRuntimeOwner {
 		t.Fatal("copied parent accepted", e)
 	}
 	if m.plainRationalSet != beforeParent || *h != beforeHistory || b.Used() != beforeUsed || rt.State() != beforeState {
 		t.Fatal("rejected parent touched child or history")
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &q.Num, &q.Den, &out.significand, &after.significand, &m.rationalSet.sig.Num, &m.rationalSet.sig.Den, &m.rationalSet.exp, &m.rationalSet.p, &m.rationalSet.t.Num, &m.rationalSet.t.Den, &m.rationalSet.sq.Num, &m.rationalSet.sq.Den, &m.rational.LtTmp1.Num, &m.rational.LtTmp1.Den, &m.rational.LtTmp2.Num, &m.rational.LtTmp2.Den)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &q.Num, &q.Den, &out.significand, &after.significand, &m.rationalSet.sig.Num, &m.rationalSet.sig.Den, &m.rationalSet.exp, &m.rationalSet.p, &m.rationalSet.t.Num, &m.rationalSet.t.Den, &m.rationalSet.sq.Num, &m.rationalSet.sq.Den, &m.rational.LtTmp1.Num, &m.rational.LtTmp1.Den, &m.rational.LtTmp2.Num, &m.rational.LtTmp2.Den)
 	if b.Used() != rt.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("before lift cold graph")
 	}
@@ -89,9 +90,9 @@ func TestArbitraryFloatPlainRationalSetFirstOwnRawStopHistory(t *testing.T) {
 		t.Fatal(e)
 	}
 	serviceMust(t, m.Close())
-	for _, p := range []*Block{&pad, &lane, &recovery} {
+	for _, p := range []*umemory.Block{&pad, &lane, &recovery} {
 		contextTLSFinish(t, rt, func() error {
-			if *p == (Block{}) {
+			if *p == (umemory.Block{}) {
 				return nil
 			}
 			return rt.Deallocate(p)

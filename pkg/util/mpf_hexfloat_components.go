@@ -1,9 +1,13 @@
 // Source: src/util/mpf.cpp:1608-1619; src/util/mpf.h:294.
 package util
 
+import
+
 // ToStringHexfloatComponentsInto restores scale and strips the hidden bit,
 // then borrows the caller's ordinary MPF text context for the source return.
 // Despite its source name this overload delegates to to_string, not hex output.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 func (m *ArbitraryFloatManager) ToStringHexfloatComponentsInto(sign bool, exponent int64, sig *Int, ebits, sbits, rbits uint32, text ArbitraryFloatFormatTarget) (view ArbitraryFloatFormattedCString, cause error) {
 	if e := m.valueOwnerGuard(); e != nil {
 		return view, e
@@ -212,7 +216,7 @@ func (m *ArbitraryFloatManager) finishHexfloatComponentsSource() error {
 // scoped values. It leaves borrowed input and caller text storage untouched.
 func (m *ArbitraryFloatManager) CleanupHexfloatComponents() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.hexfloatComponents
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {

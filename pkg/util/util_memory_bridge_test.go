@@ -7,13 +7,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestMemoryBridgeColdHeadersAndConstructorUnwind(t *testing.T) {
 	for stop := int64(0); stop < 3; stop++ {
 		b := arena.NewBudget(1 << 20)
-		r, e := newUtilMemoryRuntime(utilMemoryRuntimeConfig{Budget: b, SizeTBits: 64})
+		r, e := newUtilMemoryRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 		smallObjectMust(t, e)
 		baseline := b.Used()
 		b.FailAfter(stop)
@@ -32,7 +33,7 @@ func TestMemoryBridgeColdHeadersAndConstructorUnwind(t *testing.T) {
 		}
 	}
 	b := arena.NewBudget(1 << 20)
-	r, e := newUtilMemoryRuntime(utilMemoryRuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := newUtilMemoryRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	smallObjectMust(t, e)
 	before := b.Used()
 	a, e := newUtilSmallObjectAllocator(utilSmallObjectConfig{Runtime: r, Profile: utilSmallObjectProfile{PointerBits: 64}})
@@ -50,7 +51,7 @@ func TestMemoryBridgeColdHeadersAndConstructorUnwind(t *testing.T) {
 func TestMemoryBridgeNominalOOMAndCountErrors(t *testing.T) {
 	for _, code := range []z3exception.ErrorCode{z3exception.ErrorMemout, z3exception.ErrorAllocExceeded} {
 		b := arena.NewBudget(1 << 20)
-		r, e := newUtilMemoryRuntime(utilMemoryRuntimeConfig{Budget: b, SizeTBits: 64})
+		r, e := newUtilMemoryRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 		smallObjectMust(t, e)
 		if code == z3exception.ErrorMemout {
 			smallObjectMust(t, r.SetMaxSize(1))
@@ -62,7 +63,7 @@ func TestMemoryBridgeNominalOOMAndCountErrors(t *testing.T) {
 		}
 		h, e := r.Allocate(1)
 		var z z3exception.Z3Error
-		if !errors.As(e, &z) || z.ErrorCode() != code || h != (utilMemoryBlock{}) {
+		if !errors.As(e, &z) || z.ErrorCode() != code || h != (umemory.Block{}) {
 			t.Fatal("main nominal source error bridge", code, h, e)
 		}
 		smallObjectMust(t, r.Close())
@@ -73,13 +74,13 @@ func TestMemoryBridgeNominalOOMAndCountErrors(t *testing.T) {
 }
 
 func TestMemoryBridgeDefaultExceptionAndCopiedOwner(t *testing.T) {
-	e := memoryErrorTransport(Failure{Kind: FailureVectorOverflow})
+	e := memoryErrorTransport(umemory.Failure{Kind: umemory.FailureVectorOverflow})
 	var d z3exception.DefaultException
 	if !errors.As(e, &d) || d.HasErrorCode() || d.ErrorCode() != z3exception.ErrorOK || d.Message() != "Overflow encountered when expanding vector" {
 		t.Fatal("nominal main no-code class", e)
 	}
 	b := arena.NewBudget(1 << 20)
-	r, e := newUtilMemoryRuntime(utilMemoryRuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := newUtilMemoryRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	smallObjectMust(t, e)
 	before := b.Used()
 	b.FailAfter(0)
@@ -108,7 +109,7 @@ func TestMemoryBridgeDefaultExceptionAndCopiedOwner(t *testing.T) {
 
 func TestMemoryBridgePendingFinalizationRetainsAllHeaders(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	r, e := newUtilMemoryRuntime(utilMemoryRuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := newUtilMemoryRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	smallObjectMust(t, e)
 	a, e := newUtilSmallObjectAllocator(utilSmallObjectConfig{Runtime: r, Profile: utilSmallObjectProfile{PointerBits: 64}})
 	smallObjectMust(t, e)

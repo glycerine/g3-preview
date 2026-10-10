@@ -5,13 +5,14 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // limbView is ephemeral: external buffers are borrowed; numeric blocks stay indexed.
 // No view is persisted in a manager or exposes an arena backing slice.
 type limbView struct {
 	external  []uint32
-	allocator *SmallAllocator
+	allocator *umemory.SmallAllocator
 	backing   SourceCellBacking
 	size      uint32
 }

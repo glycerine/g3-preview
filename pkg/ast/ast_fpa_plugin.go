@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -315,7 +316,7 @@ func (m *ASTManager) destroyFloatingPointMembers(own bool) error {
 			}
 		}
 		if own && p.failedNumeric != nil {
-			var failed util.ConstructionFailure
+			var failed umemory.ConstructionFailure
 			if errors.As(p.failedNumeric, &failed) {
 				if e := failed.Cleanup(); e != nil {
 					return stop(e)

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialDiscriminantYoungerCoefficientRefStopBeforeLeadingAndPrime(t *testing.T) {
@@ -35,7 +36,7 @@ func TestPolynomialDiscriminantYoungerCoefficientRefStopBeforeLeadingAndPrime(t 
 		}
 		core.integer.Budget().FailAfter(0)
 		raw, err := core.memory.Allocate(8)
-		if raw != (util.Block{}) || err == nil {
+		if raw != (umemory.Block{}) || err == nil {
 			t.Fatal("real source callback allocation refusal missing", raw, err)
 		}
 		refused = err

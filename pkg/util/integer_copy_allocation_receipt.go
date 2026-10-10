@@ -3,6 +3,7 @@ package util
 
 import (
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type integerCopyAllocationScope struct {
@@ -10,7 +11,7 @@ type integerCopyAllocationScope struct {
 	active, Executing bool
 	Roots             NumericAllocationRoots
 	mpfCaller         *arbitraryFloatValueCopyCall
-	Transferred       SmallAllocatorPendingAllocation
+	Transferred       umemory.SmallAllocatorPendingAllocation
 	originalCell      SourceCellBacking
 	cellRetired       bool
 }
@@ -67,16 +68,16 @@ func (m *IntegerManager) CleanupCopyAllocationInvocation(r *integerCopyAllocatio
 		return ErrNumericPending
 	}
 	if s.mpfCaller != nil {
-		if s.Roots.Cell.Object != (ObjectRef{}) {
+		if s.Roots.Cell.Object != (umemory.ObjectRef{}) {
 			e := m.cleanupDetachedCopyCell(&s.Roots.Cell)
-			if s.Roots.Cell.Object == (ObjectRef{}) {
+			if s.Roots.Cell.Object == (umemory.ObjectRef{}) {
 				s.cellRetired = true
 			}
 			if e != nil {
 				return e
 			}
 		}
-		if s.Transferred.Block() != (Block{}) {
+		if s.Transferred.Block() != (umemory.Block{}) {
 			e := m.Allocator.CleanupTransferredAllocation(&s.Transferred)
 			s.Roots.Allocator[0] = s.Transferred.Block()
 			if e != nil {
@@ -86,7 +87,7 @@ func (m *IntegerManager) CleanupCopyAllocationInvocation(r *integerCopyAllocatio
 	} else if e := s.Roots.Cleanup(m); e != nil {
 		return e
 	}
-	*s = integerCopyAllocationScope{invocation: s.invocation, mpfCaller: s.mpfCaller, originalCell: s.originalCell, cellRetired: s.cellRetired || s.originalCell.Object != (ObjectRef{})}
+	*s = integerCopyAllocationScope{invocation: s.invocation, mpfCaller: s.mpfCaller, originalCell: s.originalCell, cellRetired: s.cellRetired || s.originalCell.Object != (umemory.ObjectRef{})}
 	return nil
 }
 
@@ -95,7 +96,7 @@ func (m *IntegerManager) CleanupCopyAllocationInvocation(r *integerCopyAllocatio
 // stops. Direct backing survives allocator destruction and belongs to caller.
 func (m *IntegerManager) cleanupDetachedCopyCell(c *SourceCellBacking) error {
 	if c.Offset != 0 {
-		if _, e := m.Memory.Size(c.Raw); errors.Is(e, ErrRuntimeOwner) {
+		if _, e := m.Memory.Size(c.Raw); errors.Is(e, umemory.ErrRuntimeOwner) {
 			*c = SourceCellBacking{}
 			return nil
 		} else if e != nil {
@@ -109,7 +110,7 @@ func (m *IntegerManager) cleanupDetachedCopyCell(c *SourceCellBacking) error {
 	if ended && c.Offset == 0 {
 		raw := c.Raw
 		e = m.Memory.Deallocate(&raw)
-		if raw == (Block{}) {
+		if raw == (umemory.Block{}) {
 			*c = SourceCellBacking{}
 		}
 		return e
@@ -118,7 +119,7 @@ func (m *IntegerManager) cleanupDetachedCopyCell(c *SourceCellBacking) error {
 		raw := c.Raw
 		handled, e := m.Allocator.CleanupSourceRetainedDirect(c.Object, &raw)
 		if handled {
-			if raw == (Block{}) {
+			if raw == (umemory.Block{}) {
 				*c = SourceCellBacking{}
 			}
 			return e

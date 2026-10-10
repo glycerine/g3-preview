@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialRecombinationTrialExactOldLeafPreservesForeignReplacement(t *testing.T) {
@@ -38,7 +39,7 @@ func TestUPolynomialRecombinationTrialExactOldLeafPreservesForeignReplacement(t 
 			h.executing = false
 			primeTrialPhysicalAuditOwners(t, q, s, []*UPolynomialFactors{fs}, &prime, &foreign, &large)
 			old := h.numeric.Cell
-			if old.Object != (util.ObjectRef{}) {
+			if old.Object != (umemory.ObjectRef{}) {
 				if q.Integers().PendingCell != old || !numericPhysicalReservationRefusal(body) {
 					t.Fatal("actual direct pending leaf absent", ordinal, body, old, q.Integers().PendingCell)
 				}
@@ -58,9 +59,9 @@ func TestUPolynomialRecombinationTrialExactOldLeafPreservesForeignReplacement(t 
 					primeTrialPhysicalAuditOwners(t, q, s, []*UPolynomialFactors{fs}, &prime, &foreign, &large)
 					laterRaw, x := q.Integers().Allocator.PendingRoots()
 					serviceMust(t, x)
-					if q.Integers().PendingCell.Object != (util.ObjectRef{}) || laterRaw != ([3]util.Block{}) {
+					if q.Integers().PendingCell.Object != (umemory.ObjectRef{}) || laterRaw != ([3]umemory.Block{}) {
 						replacement := q.Integers().PendingCell
-						if (replacement.Object != (util.ObjectRef{}) && replacement == old) || !numericPhysicalReservationRefusal(failure) {
+						if (replacement.Object != (umemory.ObjectRef{}) && replacement == old) || !numericPhysicalReservationRefusal(failure) {
 							t.Fatal("not a genuine later generation", next, failure, replacement, old)
 						}
 						q.Budget().FailAfter(-1)

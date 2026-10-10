@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -128,9 +129,9 @@ func TestASTFloatingPointScopedValueInlineErasesCopyAcquisition(t *testing.T) {
 // Source: src/util/scoped_numeral_vector.h:25-65; src/util/mpf.cpp:316-333.
 func TestASTFloatingPointScopedValueTwoRetainedAllocationChildren(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	astTestMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	astTestMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)
@@ -144,7 +145,7 @@ func TestASTFloatingPointScopedValueTwoRetainedAllocationChildren(t *testing.T) 
 	astTestMust(t, e)
 	p := m.floatingPointPlugin
 	v := &p.values
-	z, e := util.NewIntegerManager(util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: m.BudgetField}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: m.BudgetField}}})
+	z, e := util.NewIntegerManager(util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: m.BudgetField}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: m.BudgetField}}})
 	astTestMust(t, e)
 	sig, two := util.NewInt(0), util.NewInt(2)
 	astTestMust(t, z.Power(&two, 100, &sig))

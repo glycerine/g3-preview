@@ -3,6 +3,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func (m *MultivariatePolynomialCore) IsZero(p Polynomial) (bool, error) {
@@ -127,7 +128,7 @@ func (m *MultivariatePolynomialCore) generatedRemoveVariableWithCoefficient(term
 	a, e := m.monomials.removeVariableCreated(term, x, &outcome)
 	if scope != nil && scope == &m.coefficientInvocation && scope.active && scope.executing {
 		for i, root := range outcome.allocator {
-			if root != (util.Block{}) {
+			if root != (umemory.Block{}) {
 				scope.allocator[i] = root
 			}
 		}
@@ -196,7 +197,7 @@ func (m *MultivariatePolynomialCore) coeffCoreWithReceipts(p Polynomial, x, k ui
 		defer func() {
 			scope.executing = false
 			_ = m.coefficientInvocationSourceCause(receipt)
-			if cause == nil && scope.generated == (Monomial{}) && scope.calleeGeneration == 0 && scope.allocator == ([3]util.Block{}) {
+			if cause == nil && scope.generated == (Monomial{}) && scope.calleeGeneration == 0 && scope.allocator == ([3]umemory.Block{}) {
 				scope.active = false
 			}
 		}()

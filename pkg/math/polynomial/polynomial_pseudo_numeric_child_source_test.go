@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialPseudoActualMinusANumericAcquisition(t *testing.T) {
@@ -35,12 +36,12 @@ func TestPolynomialPseudoActualMinusANumericAcquisition(t *testing.T) {
 		serviceMust(t, e)
 		cell := c.integer.PendingCell
 		s := &c.pseudoDivision
-		if body != nil && s.numericPhase == 1 && (cell.Object != (util.SourceCellBacking{}).Object || raw != ([3]util.Block{})) {
+		if body != nil && s.numericPhase == 1 && (cell.Object != (util.SourceCellBacking{}).Object || raw != ([3]umemory.Block{})) {
 			saw = true
 			if cell.Object != (util.SourceCellBacking{}).Object && s.numeric.Cell != cell {
 				t.Fatal("actual minus_a Copy cell has no direct Pseudo authority", prefix, body, cell, s.numeric)
 			}
-			if raw != ([3]util.Block{}) && s.numeric.Allocator != raw {
+			if raw != ([3]umemory.Block{}) && s.numeric.Allocator != raw {
 				t.Fatal("actual minus_a Copy raw has no direct Pseudo authority", prefix, body, raw, s.numeric)
 			}
 			saved := body

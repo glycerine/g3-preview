@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialEvalSignBinaryActualCallbackOwnerAndTupleRefusal(t *testing.T) {
@@ -15,7 +16,7 @@ func TestUPolynomialEvalSignBinaryActualCallbackOwnerAndTupleRefusal(t *testing.
 	var p *UPolynomialManager
 	armed := false
 	calls := 0
-	transport := func(f util.Failure) error {
+	transport := func(f umemory.Failure) error {
 		if !armed {
 			return f
 		}
@@ -77,7 +78,7 @@ func TestUPolynomialEvalSignBinaryActualCallbackOwnerAndTupleRefusal(t *testing.
 		}
 		return f
 	}
-	var rt *util.Runtime
+	var rt *umemory.Runtime
 	c, p, rt = algebraicNegTLSFixture(t, transport)
 	poly := algebraicPolynomial(t, p, 1, math.MaxInt32, 1)
 	v, e := p.wholeView(poly)
@@ -98,7 +99,7 @@ func TestUPolynomialEvalSignBinaryActualCallbackOwnerAndTupleRefusal(t *testing.
 	if q.addMul.Frame != nil {
 		extra = append(extra, &q.addMul.Frame.Tmp)
 	}
-	algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, extra, []util.Block{held})
+	algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, extra, []umemory.Block{held})
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, p.cleanupBinaryEvaluation(false))
 	serviceMust(t, c.config.Binary.Del(&b))

@@ -3,6 +3,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // SourceFinalize performs only the actual completed manager's source member
@@ -13,7 +14,7 @@ func (m *NaturalManager) SourceFinalize() error {
 		return arena.ErrInvalidSlot
 	}
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.ClosedField || m.Closing || m.runtime == nil || m.originalCause != nil {
 		return arena.ErrClosed

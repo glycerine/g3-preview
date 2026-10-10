@@ -2,9 +2,8 @@
 package sat
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func satFullSolverRuntimeAudit(t *testing.T, s *Solver, outputs ...*satSolverLiteralRows) {
@@ -13,7 +12,7 @@ func satFullSolverRuntimeAudit(t *testing.T, s *Solver, outputs ...*satSolverLit
 }
 
 // Native SAT containers own no Runtime payload blocks.
-func satFullSolverRuntimeRoots(_ *Solver, _ ...*satSolverLiteralRows) []util.Block { return nil }
+func satFullSolverRuntimeRoots(_ *Solver, _ ...*satSolverLiteralRows) []umemory.Block { return nil }
 func satFullSolverUserClauseAudit(t *testing.T, s *Solver) {
 	t.Helper()
 	refs := []StoredClauseRef{}

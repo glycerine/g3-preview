@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -21,11 +22,11 @@ func algebraicCellSourceFixtureProfile(t *testing.T, directTLS bool) (*Algebraic
 	t.Helper()
 	budget := arena.NewBudget(1 << 24)
 	config := serviceConfig(budget)
-	var runtime *util.Runtime
+	var runtime *umemory.Runtime
 	var e error
-	profile := util.SmallAllocatorProfile{PointerBits: 64}
+	profile := umemory.SmallAllocatorProfile{PointerBits: 64}
 	if directTLS {
-		runtime, e = util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true})
+		runtime, e = umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true})
 		serviceMust(t, e)
 		config.Integers.Memory = runtime
 		profile.Debug = true // actual non-Windows debug allocator direct profile
@@ -55,7 +56,7 @@ func algebraicCellSourceFixtureProfile(t *testing.T, directTLS bool) (*Algebraic
 	serviceMust(t, e)
 	bi, e := util.NewBinaryIntervalManager(b)
 	serviceMust(t, e)
-	a, e := util.NewSmallAllocator(util.SmallAllocatorConfig{Runtime: s.Manager.Z.Memory, Profile: profile})
+	a, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: s.Manager.Z.Memory, Profile: profile})
 	serviceMust(t, e)
 	c, e := NewAlgebraicRootCore(AlgebraicRootConfig{Rationals: s.Manager, Polynomials: p, Factors: f, Binary: b, Intervals: bi, Allocator: a,
 		Checkpoint:  func() bool { t.Fatal("cell core visited source checkpoint"); return false },
@@ -92,7 +93,7 @@ func algebraicCellSourceRecord(t *testing.T, c *AlgebraicRootCore, a *Algebraic)
 // Ownership is discovered from named caller/core fields, never from the live
 // descriptor registry. Registries are inspected only afterward to reject an
 // unmatched actual live object. Allocator free-pool chunks remain real roots.
-func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPolynomial, integers []*util.Int, raw []util.Block, values ...*Algebraic) {
+func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPolynomial, integers []*util.Int, raw []umemory.Block, values ...*Algebraic) {
 	t.Helper()
 	z, p := c.config.Rationals.Integers(), c.config.Polynomials
 	refs := map[util.NumericCellRef]bool{}
@@ -193,7 +194,7 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 			addState(&c.factors.factors[i])
 		}
 	}
-	objects := map[util.ObjectRef]bool{}
+	objects := map[umemory.ObjectRef]bool{}
 	cellHandles := map[Algebraic]bool{}
 	values = append(append([]*Algebraic(nil), values...), &c.pending)
 	if c.rootSelection != nil {
@@ -211,7 +212,7 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 		cellHandles[*a] = true
 		l, e := c.locationCleanup(a)
 		serviceMust(t, e)
-		if l.raw != (util.ObjectRef{}) {
+		if l.raw != (umemory.ObjectRef{}) {
 			if _, e = c.config.Allocator.ObjectExtent(l.raw); e != nil {
 				t.Fatal(e)
 			}
@@ -271,15 +272,15 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 			t.Fatal("named integer lost physical object", e)
 		}
 	}
-	if z.PendingCell.Object != (util.ObjectRef{}) {
+	if z.PendingCell.Object != (umemory.ObjectRef{}) {
 		_, e := z.Allocator.ObjectExtent(z.PendingCell.Object)
 		serviceMust(t, e)
 	}
-	rawRoots := map[util.Block]bool{}
-	addRaw := func(block util.Block) {
-		if block != (util.Block{}) {
+	rawRoots := map[umemory.Block]bool{}
+	addRaw := func(block umemory.Block) {
+		if block != (umemory.Block{}) {
 			rawRoots[block] = true
-			if _, e := z.RuntimeOwner().Read(block, 0); e != nil && !errors.Is(e, util.ErrRuntimeUninitialized) {
+			if _, e := z.RuntimeOwner().Read(block, 0); e != nil && !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 				t.Fatal("invalid named raw block", e)
 			}
 		}
@@ -597,7 +598,7 @@ func TestAlgebraicCellSourceRootCopyDeletionOrder(t *testing.T) {
 // Prime the actual TLS lane to its strict 100000-byte boundary with one real
 // caller-owned allocation. The next allocation publishes the source counter
 // and then refuses; no synthetic event, restored counter, or mutable quota.
-func algebraicCellSourceTLSBoundary(t *testing.T, c *AlgebraicRootCore) util.Block {
+func algebraicCellSourceTLSBoundary(t *testing.T, c *AlgebraicRootCore) umemory.Block {
 	t.Helper()
 	runtime := c.config.Rationals.Integers().RuntimeOwner()
 	s := runtime.State()
@@ -624,7 +625,7 @@ func TestAlgebraicCellSourceConstCopyPrecedesCellAllocation(t *testing.T) {
 	block := algebraicCellSourceTLSBoundary(t, c)
 	runtime := c.config.Rationals.Integers().RuntimeOwner()
 	e := c.SetRational(&a, &q)
-	var failure util.Failure
+	var failure umemory.Failure
 	if !errors.As(e, &failure) || failure.ErrorCode() != 101 || !runtime.State().OutOfMemory {
 		t.Fatal("expected real TLS refusal during const numerical copy", e)
 	}
@@ -640,7 +641,7 @@ func TestAlgebraicCellSourceConstCopyPrecedesCellAllocation(t *testing.T) {
 	if c.config.Rationals.Integers().Allocator.Stats().PendingBlocks == 0 {
 		t.Fatal("refused actual numerical allocation lost physical pending ownership")
 	}
-	algebraicCellSourcePhysical(t, c, nil, []*util.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, []util.Block{block}, &a)
+	algebraicCellSourcePhysical(t, c, nil, []*util.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, []umemory.Block{block}, &a)
 	// Separate explicit caller teardown actions after immediate prefix checks.
 	serviceMust(t, runtime.SetMaxSize(0))
 	serviceMust(t, runtime.Deallocate(&block))
@@ -657,7 +658,7 @@ func TestAlgebraicCellSourceMutableRefusalDoesNotConsumeInput(t *testing.T) {
 	block := algebraicCellSourceTLSBoundary(t, c)
 	runtime := c.config.Rationals.Integers().RuntimeOwner()
 	e := c.SetTake(&a, &q)
-	var failure util.Failure
+	var failure umemory.Failure
 	if !errors.As(e, &failure) || failure.ErrorCode() != 101 || !runtime.State().OutOfMemory {
 		t.Fatal("expected actual cell allocation TLS refusal", e)
 	}
@@ -667,7 +668,7 @@ func TestAlgebraicCellSourceMutableRefusalDoesNotConsumeInput(t *testing.T) {
 	if c.config.Allocator.Stats().PendingBlocks != 1 {
 		t.Fatal("refused cell raw block lacks actual allocator pending owner", c.config.Allocator.Stats())
 	}
-	algebraicCellSourcePhysical(t, c, nil, []*util.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, []util.Block{block}, &a)
+	algebraicCellSourcePhysical(t, c, nil, []*util.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, []umemory.Block{block}, &a)
 	serviceMust(t, runtime.SetMaxSize(0))
 	serviceMust(t, runtime.Deallocate(&block))
 	serviceMust(t, c.config.Allocator.CleanupPending())

@@ -5,9 +5,8 @@ package polynomial
 import (
 	"errors"
 	"fmt"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialGCDCheckpointPreservesActualForeignPrimitiveCreation(t *testing.T) {
@@ -50,7 +49,7 @@ func TestPolynomialGCDCheckpointPreservesActualForeignPrimitiveCreation(t *testi
 				t.Fatal("actual callback source allocation", callbackError)
 			}
 			before := c.pending
-			if before.raw == (util.ObjectRef{}) && before.value == (Polynomial{}) && returned == (Polynomial{}) {
+			if before.raw == (umemory.ObjectRef{}) && before.value == (Polynomial{}) && returned == (Polynomial{}) {
 				return
 			}
 			seen = true
@@ -115,7 +114,7 @@ func TestPolynomialGCDCooperationPreservesActualForeignPrimitiveCreation(t *test
 				t.Fatal("actual callback source allocation", callbackError)
 			}
 			before := c.pending
-			if before.raw == (util.ObjectRef{}) && before.value == (Polynomial{}) && returned == (Polynomial{}) {
+			if before.raw == (umemory.ObjectRef{}) && before.value == (Polynomial{}) && returned == (Polynomial{}) {
 				return
 			}
 			seen = true

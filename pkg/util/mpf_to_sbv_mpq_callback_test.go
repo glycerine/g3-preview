@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatToSBVMPQUnpackTransportAndOwnerGuards(t *testing.T) {
@@ -14,7 +15,7 @@ func TestArbitraryFloatToSBVMPQUnpackTransportAndOwnerGuards(t *testing.T) {
 	var x ArbitraryFloat
 	out := NewRational()
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			s := &m.sbv
@@ -37,7 +38,7 @@ func TestArbitraryFloatToSBVMPQUnpackTransportAndOwnerGuards(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	n := NewInt(0)
 	serviceMust(t, m.SetComponents(&x, 17, 40000, false, 1, &n))
@@ -57,7 +58,7 @@ func TestArbitraryFloatToSBVMPQUnpackTransportAndOwnerGuards(t *testing.T) {
 		t.Fatal("actual unpack allocation transport missing", body, calls)
 	}
 	s := &m.sbv
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &x.significand, &out.Num, &out.Den, &s.a.significand, &m.RoundScope.sigma, &m.RoundScope.cap, &m.RoundScope.sticky)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &x.significand, &out.Num, &out.Den, &s.a.significand, &m.RoundScope.sigma, &m.RoundScope.cap, &m.RoundScope.sticky)
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes {
 		t.Fatal("immediate unpack physical graph", b.Used(), m.OwnedStorageBytes(), r.Stats())
 	}

@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // This is the actual signed-host TLS owner-primitive guard profile. The
@@ -15,7 +16,7 @@ import (
 // not claimed. The source checkpoint arms it after the real R/NUM/ref prefix.
 func TestPolynomialDividesYoungerScopedNUMStopsOlderSourceSuffix(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
@@ -72,7 +73,7 @@ func TestPolynomialDividesYoungerScopedNUMStopsOlderSourceSuffix(t *testing.T) {
 		t.Fatal("actual younger source DT must stop before older NUM/ref", answer, returned, s)
 	}
 	captured, source := returned.Error(), s.sourceCause
-	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p, divisor}, []*util.Int{&a, &d}, 0, []util.Block{lane})
+	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p, divisor}, []*util.Int{&a, &d}, 0, []umemory.Block{lane})
 	own := c.cleanupDividesInvocation(&receipt, false)
 	if own != nil && !errors.Is(own, arena.ErrBounds) {
 		t.Fatal("completed younger then older own suffix", own)
@@ -86,7 +87,7 @@ func TestPolynomialDividesYoungerScopedNUMStopsOlderSourceSuffix(t *testing.T) {
 	if s.active || c.dividesInvocationSourceCause(&receipt) != source || returned.Error() != captured {
 		t.Fatal("true own phase altered source history")
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p, divisor}, []*util.Int{&a, &d}, 0, []util.Block{lane, recovery})
+	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p, divisor}, []*util.Int{&a, &d}, 0, []umemory.Block{lane, recovery})
 	c.config.Checkpoint = func() bool { return true }
 	answer, e = c.Divides(c.zero, c.zero)
 	serviceMust(t, e)
@@ -111,7 +112,7 @@ func TestPolynomialDividesYoungerScopedNUMStopsOlderSourceSuffix(t *testing.T) {
 	serviceMust(t, full.CloseChecked())
 	serviceMust(t, rationals.CloseChecked())
 	e = rt.Deallocate(&recovery)
-	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal("recovery consumed outcome", e)
 	}
 	contextTLSFinish(t, rt, rt.Close)

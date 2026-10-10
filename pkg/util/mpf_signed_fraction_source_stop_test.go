@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
@@ -17,10 +18,10 @@ func signedFractionYoungerSourceStop(t *testing.T, childFirst bool) {
 	for ordinal := int64(0); ordinal < 120; ordinal++ {
 		b := arena.NewBudget(1 << 28)
 		var m *ArbitraryFloatManager
-		var r *Runtime
-		var lane Block
+		var r *umemory.Runtime
+		var lane umemory.Block
 		armed, target := false, false
-		rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 			if armed && m.rationalSet.executing && m.rationalSet.pLive && m.rationalSet.p.Cell != 0 && !m.integer.IsFailureRef(m.rationalSet.p.Cell) && m.integer.Cell(m.rationalSet.p.Cell).Size >= 125 && m.rationalSet.tLive {
 				armed = false
 				target = true
@@ -38,7 +39,7 @@ func signedFractionYoungerSourceStop(t *testing.T, childFirst bool) {
 		}})
 		serviceMust(t, e)
 		r = rt
-		m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		var out ArbitraryFloat
 		armed = true
@@ -52,7 +53,7 @@ func signedFractionYoungerSourceStop(t *testing.T, childFirst bool) {
 			if !errors.Is(body, arena.ErrBounds) || s.sourceCause == nil || !errors.Is(s.sourceCause, arena.ErrBounds) || !s.qLive || s.qCursor != 0 || s.q.Num != NewInt(3) || s.q.Den != NewInt(2) || c.sourceCause == nil || m.plainRationalSet.sourceCause == nil || !m.plainRationalSet.expLive {
 				t.Fatal("younger source stop crossed rational", ordinal, body, s.sourceCause, c.sourceCause, s.qCursor)
 			}
-			signedFractionPhysicalAudit(t, m, &out, []Block{lane})
+			signedFractionPhysicalAudit(t, m, &out, []umemory.Block{lane})
 			before, child, plain, used := *s, *c, m.plainRationalSet, b.Used()
 			if e = m.SourceFinalize(); !errors.Is(e, arena.ErrBounds) || s.q != before.q || s.qLive != before.qLive || s.qCursor != before.qCursor || s.sourceCause != before.sourceCause || s.child != before.child || *c != child || m.plainRationalSet != plain || b.Used() != used || m.sourceEnded {
 				t.Fatal("source stop crossed older class", e)
@@ -84,9 +85,9 @@ func signedFractionYoungerSourceStop(t *testing.T, childFirst bool) {
 			}
 			serviceMust(t, m.CleanupValue(&out))
 			contextTLSFinish(t, r, m.Close)
-			for _, block := range []*Block{&lane, &recovery} {
+			for _, block := range []*umemory.Block{&lane, &recovery} {
 				contextTLSFinish(t, r, func() error {
-					if *block == (Block{}) {
+					if *block == (umemory.Block{}) {
 						return nil
 					}
 					return r.Deallocate(block)

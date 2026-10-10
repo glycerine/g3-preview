@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type variableRecognitionOwnerCallback struct {
@@ -26,7 +27,7 @@ type variableRecognitionOwnerCallback struct {
 
 var variableRecognitionOwnerCallbackCurrent *variableRecognitionOwnerCallback
 
-func variableRecognitionOwnerTransport(f util.Failure) error {
+func variableRecognitionOwnerTransport(f umemory.Failure) error {
 	s := variableRecognitionOwnerCallbackCurrent
 	if s != nil && !s.called {
 		s.called = true
@@ -75,9 +76,9 @@ func TestPolynomialVariableRecognitionExecutingIntegerOwnerRefusesFinalize(t *te
 }
 func variableRecognitionExecutingOwner(t *testing.T, mode string, field, standalone bool) {
 	budget := arena.NewBudget(1 << 24)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, Transport: variableRecognitionOwnerTransport})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, Transport: variableRecognitionOwnerTransport})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1, Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1, Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)

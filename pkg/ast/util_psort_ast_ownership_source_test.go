@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func psortNamedGraph(t *testing.T, s *PsortASTNetwork, c *PsortASTContext, in, out *ASTLiteralVector, other uint64) {
@@ -40,7 +40,7 @@ func TestPsortASTNetworkEveryActualBoundReservationNamedBeforeFaultLift(t *testi
 				m := astTestManager(t)
 				c, e := NewPsortASTContext(m)
 				astTestMust(t, e)
-				r, e := util.NewRuntime(util.RuntimeConfig{Budget: m.BudgetField, SizeTBits: bits})
+				r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.BudgetField, SizeTBits: bits})
 				astTestMust(t, e)
 				s, e := NewPsortASTNetwork(c, r, m.BudgetField, nil)
 				astTestMust(t, e)
@@ -75,8 +75,8 @@ func TestPsortASTNetworkEveryActualBoundReservationNamedBeforeFaultLift(t *testi
 					t.Fatal("borrowed input logical size modified", ordinal, sz)
 				}
 				if cause != nil && !errors.Is(cause, arena.ErrInjectedFailure) {
-					var failure util.Failure
-					if !errors.As(cause, &failure) || failure.Kind != util.FailureMemout {
+					var failure umemory.Failure
+					if !errors.As(cause, &failure) || failure.Kind != umemory.FailureMemout {
 						t.Fatal("actual reservation cause", bits, mode, ordinal, cause)
 					}
 				}

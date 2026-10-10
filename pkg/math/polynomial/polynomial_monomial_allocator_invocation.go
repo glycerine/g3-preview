@@ -3,19 +3,19 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type monomialAllocatorScope struct {
 	owner                          *MonomialManager
-	outcome                        util.SmallAllocatorAllocationOutcome
+	outcome                        umemory.SmallAllocatorAllocationOutcome
 	invocation, creationGeneration uint64
 	sourceCause                    error
 }
 type monomialAllocatorInvocationReceipt struct {
 	manager    *MonomialManager
 	frame      *monomialAllocatorScope
-	outcome    *util.SmallAllocatorAllocationOutcome
+	outcome    *umemory.SmallAllocatorAllocationOutcome
 	invocation uint64
 }
 
@@ -23,7 +23,7 @@ func (m *MonomialManager) matchesMonomialAllocatorInvocation(r *monomialAllocato
 	return m != nil && m.self == m && r != nil && r.manager == m && r.frame == &m.allocatorInvocation && r.frame.owner == m && r.outcome == &r.frame.outcome && r.invocation != 0 && r.invocation == r.frame.invocation && m.allocator.AllocationOutcomeInvocation(r.outcome) == r.invocation
 }
 func (m *MonomialManager) cleanupMonomialAllocatorInvocation(r *monomialAllocatorInvocationReceipt, abort bool) error {
-	if !m.matchesMonomialAllocatorInvocation(r) || !abort || r.outcome.Pending == (util.Block{}) {
+	if !m.matchesMonomialAllocatorInvocation(r) || !abort || r.outcome.Pending == (umemory.Block{}) {
 		return nil
 	}
 	current, e := m.allocator.PendingRoots()
@@ -31,13 +31,13 @@ func (m *MonomialManager) cleanupMonomialAllocatorInvocation(r *monomialAllocato
 		return e
 	}
 	// The actual Allocate leaf can acquire only pending[0]. Scratch is foreign.
-	if current != ([3]util.Block{r.outcome.Pending, {}, {}}) {
+	if current != ([3]umemory.Block{r.outcome.Pending, {}, {}}) {
 		return ErrMonomialPending
 	}
 	e = m.allocator.CleanupPending()
 	after, x := m.allocator.PendingRoots()
-	if after[0] == (util.Block{}) {
-		r.outcome.Pending = util.Block{}
+	if after[0] == (umemory.Block{}) {
+		r.outcome.Pending = umemory.Block{}
 	}
 	return polynomialNewtonJoin(e, x)
 }

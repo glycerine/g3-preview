@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerGCDRawEveryActualPrefix(t *testing.T) {
@@ -80,7 +81,7 @@ func integerGCDRawPrefixes(t *testing.T, shift uint32) {
 // Actual signed-host TLS guard domain; source output precedes end-only DEL.
 func TestIntegerGCDRawReachedEndLifetime(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
-	rt, e := NewRuntime(RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
@@ -122,7 +123,7 @@ func TestIntegerGCDRawReachedEndLifetime(t *testing.T) {
 	for i := uint8(0); i < s.Count; i++ {
 		named = append(named, &s.Values[i])
 	}
-	integerPhysicalAuditWithRaw(t, m, []Block{lane}, named...)
+	integerPhysicalAuditWithRaw(t, m, []umemory.Block{lane}, named...)
 	if budget.Used() != integerActualOwnedBytes(m) {
 		t.Fatal("immediate cold RAW graph", budget.Used(), integerActualOwnedBytes(m))
 	}
@@ -133,14 +134,14 @@ func TestIntegerGCDRawReachedEndLifetime(t *testing.T) {
 	if m.RawInvocationSourceCause(&r) != source {
 		t.Fatal("false owning phase changed unexecuted RAW end DEL/history")
 	}
-	integerPhysicalAuditWithRaw(t, m, []Block{lane}, named...)
+	integerPhysicalAuditWithRaw(t, m, []umemory.Block{lane}, named...)
 	recovery, e := rt.Allocate(2000000)
 	serviceMust(t, e)
 	serviceMust(t, m.CleanupRawInvocation(&r, true))
 	if m.RawInvocationSourceCause(&r) != source || returned.Error() != captured {
 		t.Fatal("owning acknowledgement changed source cause")
 	}
-	integerPhysicalAuditWithRaw(t, m, []Block{lane, recovery}, &a, &b, &x, &y, &g)
+	integerPhysicalAuditWithRaw(t, m, []umemory.Block{lane, recovery}, &a, &b, &x, &y, &g)
 	serviceMust(t, m.GCD(&a, &a, &g))
 	if s.Invocation == r.Invocation || s.sourceCause != nil || returned.Error() != captured || !errors.Is(returned, arena.ErrBounds) {
 		t.Fatal("new actual invocation mutated old returned error")
@@ -151,7 +152,7 @@ func TestIntegerGCDRawReachedEndLifetime(t *testing.T) {
 	serviceMust(t, rt.Deallocate(&lane))
 	serviceMust(t, m.CloseChecked())
 	e = rt.Deallocate(&recovery)
-	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (Block{})) {
+	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal("actual recovery consumption", e)
 	}
 	contextTLSFinish(t, rt, rt.Close)
@@ -348,7 +349,7 @@ type integerGCDRawCallbackFixture struct {
 
 var integerGCDRawCallbackCurrent *integerGCDRawCallbackFixture
 
-func integerGCDRawFailureTransport(f Failure) error {
+func integerGCDRawFailureTransport(f umemory.Failure) error {
 	s := integerGCDRawCallbackCurrent
 	if s != nil && !s.called {
 		s.called = true
@@ -363,11 +364,11 @@ func TestIntegerGCDRawRuntimeCallbackHasNoAmbientAcquisition(t *testing.T) {
 	proved := false
 	for prefix := int64(0); prefix < 50 && !proved; prefix++ {
 		budget := arena.NewBudget(1 << 24)
-		rt, e := NewRuntime(RuntimeConfig{Budget: budget, Transport: integerGCDRawFailureTransport})
+		rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, Transport: integerGCDRawFailureTransport})
 		serviceMust(t, e)
 		cfg := serviceConfig(budget).Integers
 		cfg.Memory = rt
-		cfg.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 		m, e := NewIntegerManager(cfg)
 		serviceMust(t, e)
 		var a, b, x, y, g, foreign Int

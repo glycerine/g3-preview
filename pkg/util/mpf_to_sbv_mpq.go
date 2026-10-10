@@ -5,13 +5,14 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // ToSBVMPQ rounds to an integer rational using the manager's own numeral
 // namespace. The output remains caller-owned through the MPF manager lifetime.
 func (m *ArbitraryFloatManager) ToSBVMPQ(mode ArbitraryFloatRoundingMode, x *ArbitraryFloat, out *Rational) (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.sbv.active {
 		return ErrNumericPending

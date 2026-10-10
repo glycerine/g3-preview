@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -14,15 +15,15 @@ import (
 // tuple. It tests parent transport, not an ordinary allocation between moves.
 func TestUPolynomialFactorLiftPreparationCapturedCheckerSourceStop(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	armed := false
-	var external util.Block
+	var external umemory.Block
 	var c *upolyHenselCallerScope
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Cooperation: func() error { return nil }, Checkpoint: func() bool {
 		if c != nil && c.checkSource == 2 && !armed {
@@ -32,7 +33,7 @@ func TestUPolynomialFactorLiftPreparationCapturedCheckerSourceStop(t *testing.T)
 			armed = true
 			contextTLSNearMinimum(t, rt)
 			x := rt.Deallocate(&external)
-			if !errors.Is(x, arena.ErrBounds) || external != (util.Block{}) {
+			if !errors.Is(x, arena.ErrBounds) || external != (umemory.Block{}) {
 				t.Fatal("actual signed release guard", x)
 			}
 			return false
@@ -140,7 +141,7 @@ func TestUPolynomialFactorLiftPreparationCapturedCheckerSourceStop(t *testing.T)
 	contextTLSFinish(t, rt, func() error { return q.Integers().Del(&prime) })
 	contextTLSFinish(t, rt, func() error { return q.Integers().Del(&pe) })
 	x := rt.Deallocate(&recovery)
-	if x != nil && (!errors.Is(x, arena.ErrBounds) || recovery != (util.Block{})) {
+	if x != nil && (!errors.Is(x, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal(x)
 	}
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func dynAckSourceFixture(t *testing.T) (*util.ParamsContext, *util.GlobalParamsService, *util.ParamsRef, *arena.Budget) {
@@ -31,7 +32,7 @@ func dynAckSourceFixture(t *testing.T) (*util.ParamsContext, *util.GlobalParamsS
 	return c, g, &local, b
 }
 
-var _ util.ConstructionFailure = (*util.RationalService)(nil)
+var _ umemory.ConstructionFailure = (*util.RationalService)(nil)
 
 func catalogTestConfig(b *arena.Budget) util.GlobalParamsCatalogConfig {
 	return util.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}}

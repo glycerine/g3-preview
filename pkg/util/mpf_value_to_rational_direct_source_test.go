@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatToRationalDirectOutputAfterSourceEnd(t *testing.T) {
 	for ordinal := int64(0); ordinal < 80; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		cfg := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+		cfg := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 		m, e := NewArbitraryFloatManager(cfg)
 		serviceMust(t, e)
 		qm, e := NewRationalManager(RationalConfig{Integers: cfg})
@@ -35,7 +36,7 @@ func TestArbitraryFloatToRationalDirectOutputAfterSourceEnd(t *testing.T) {
 		if b.Used() != want {
 			t.Fatal("immediate direct conversion graph", ordinal, b.Used(), want)
 		}
-		matched := body != nil && s.outputAllocation.numeric.Cell.Object != (ObjectRef{}) && s.outputAllocation.numeric.Cell.Offset == 0
+		matched := body != nil && s.outputAllocation.numeric.Cell.Object != (umemory.ObjectRef{}) && s.outputAllocation.numeric.Cell.Offset == 0
 		b.FailAfter(-1)
 		if matched {
 			original := s.outputAllocation.originalCell

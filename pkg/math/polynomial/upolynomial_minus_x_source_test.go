@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialPMinusXActualMinimumCallbackProtectsCaller(t *testing.T) {
@@ -17,7 +18,7 @@ func TestUPolynomialPMinusXActualMinimumCallbackProtectsCaller(t *testing.T) {
 	var oldContext integerAllocationInvocationContext
 	var foreignView UPolynomialView
 	var current *UPolynomial
-	transport := func(f util.Failure) error {
+	transport := func(f umemory.Failure) error {
 		if !armed {
 			return f
 		}
@@ -95,7 +96,7 @@ func TestUPolynomialPMinusXActualMinimumCallbackProtectsCaller(t *testing.T) {
 	if !reached || body == nil {
 		t.Fatal("actual MIN allocation callback missing", reached, body)
 	}
-	algebraicCellSourcePhysical(t, c, []UPolynomial{poly, foreign}, nil, []util.Block{held})
+	algebraicCellSourcePhysical(t, c, []UPolynomial{poly, foreign}, nil, []umemory.Block{held})
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, p.cleanupKnuth(false))
 	serviceMust(t, p.cleanupKnuth(true))
@@ -114,7 +115,7 @@ func TestUPolynomialPMinusXActualMinimumCallbackProtectsCaller(t *testing.T) {
 	if body == nil {
 		t.Fatal("later actual transport failure missing")
 	}
-	algebraicCellSourcePhysical(t, c, []UPolynomial{poly, later, foreign}, nil, []util.Block{held})
+	algebraicCellSourcePhysical(t, c, []UPolynomial{poly, later, foreign}, nil, []umemory.Block{held})
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, p.cleanupKnuth(false))
 	serviceMust(t, p.cleanupKnuth(true))

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func binaryDisplayTestOwner(t *testing.T, z *IntegerManager) (*BinaryRationalManager, error) {
@@ -212,11 +213,11 @@ func TestBinarySourceEndLabelsAndInlineWarm(t *testing.T) {
 // It is not normal exhaustion or an allocation-limit deallocation refusal.
 func TestBinarySourceEndLabelGuardedPhysicalFreeContinuation(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = r
-	cfg.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	z, e := NewIntegerManager(cfg)
 	serviceMust(t, e)
 	m, e := binaryDisplayTestOwner(t, z)
@@ -283,7 +284,7 @@ func TestBinarySourceEndLabelGuardedPhysicalFreeContinuation(t *testing.T) {
 	if stopped.GlobalSize != near.GlobalSize || stopped.LocalSize != -int64(size+8) || stopped.GlobalCount != near.GlobalCount {
 		t.Fatal("actual physical free before sync guard", near, stopped)
 	}
-	if _, e = r.Size(raw); e != ErrRuntimeOwner {
+	if _, e = r.Size(raw); e != umemory.ErrRuntimeOwner {
 		t.Fatal("source physical release", e)
 	}
 	if !z.Cell(refs[0]).Released || !z.Cell(refs[0]).CleanupPending {
@@ -315,7 +316,7 @@ func TestBinarySourceEndLabelGuardedPhysicalFreeContinuation(t *testing.T) {
 		if after.GlobalSize != before.GlobalSize || after.LocalSize != before.LocalSize-int64(extent+8) || after.GlobalCount != before.GlobalCount || after.LocalCount != before.LocalCount {
 			t.Fatal("single actual physical free prefix", stage, before, after)
 		}
-		if _, e = r.Size(raw); e != ErrRuntimeOwner {
+		if _, e = r.Size(raw); e != umemory.ErrRuntimeOwner {
 			t.Fatal("real freed token", stage, e)
 		}
 		for i := uint8(0); i < stage; i++ {

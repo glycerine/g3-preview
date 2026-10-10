@@ -1,6 +1,8 @@
 // Source: src/util/mpf.cpp:1100-1170 (scoped_mpf and scoped_mpz lifetimes).
 package util
 
+import umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type arbitraryFloatIntegralRoundScope struct {
 	manager                        *ArbitraryFloatManager
 	invocation                     uint64
@@ -71,7 +73,7 @@ func (s *arbitraryFloatIntegralRoundScope) unbind() error {
 }
 func (m *ArbitraryFloatManager) finishIntegralRoundSource() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.integralRound
 	if s.executing || s.finishing {
@@ -105,7 +107,7 @@ func (m *ArbitraryFloatManager) finishIntegralRoundSource() error {
 
 func (m *ArbitraryFloatManager) CleanupRoundToIntegral() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.integralRound
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {
@@ -115,7 +117,7 @@ func (m *ArbitraryFloatManager) CleanupRoundToIntegral() (cause error) {
 		return nil
 	}
 	if !s.valid() {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := s.bind(); e != nil {
 		return e

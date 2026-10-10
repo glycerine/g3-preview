@@ -7,12 +7,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	satOK(t, e)
 	var c satUintColumn
 	c.Bind(r)
@@ -57,7 +57,7 @@ func TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice(t *testing.T) {
 }
 func TestSATSolverMutableCapturedSpanRejectsClosedColumn(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	satOK(t, e)
 	var c satUintColumn
 	c.Bind(r)

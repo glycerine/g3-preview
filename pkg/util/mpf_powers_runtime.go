@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Cold acquisition metadata. The sole numeral payload is the 16-byte Runtime
@@ -14,9 +15,9 @@ type arbitraryFloatPowerWrapper struct {
 	self                                                             *arbitraryFloatPowerWrapper
 	manager                                                          *ArbitraryFloatManager
 	Next                                                             *arbitraryFloatPowerWrapper
-	Block, original                                                  Block
+	Block, original                                                  umemory.Block
 	Roots                                                            NumericAllocationRoots
-	Transferred                                                      SmallAllocatorPendingAllocation
+	Transferred                                                      umemory.SmallAllocatorPendingAllocation
 	originalCell                                                     SourceCellBacking
 	cellRetired                                                      bool
 	id                                                               uint32
@@ -29,8 +30,8 @@ func (w *arbitraryFloatPowerWrapper) Valid() bool {
 	return w != nil && w.self == w && w.manager != nil && w.manager.self == w.manager && !w.manager.closed && w.id != 0
 }
 func (w *arbitraryFloatPowerWrapper) Capture() (Int, error) {
-	if !w.Valid() || w.Block == (Block{}) {
-		return Int{}, ErrRuntimeOwner
+	if !w.Valid() || w.Block == (umemory.Block{}) {
+		return Int{}, umemory.ErrRuntimeOwner
 	}
 	r := w.manager.memory
 	val, e := r.ReadUint32(w.Block, 0)
@@ -66,7 +67,7 @@ func (m *ArbitraryFloatManager) powerTwoMinusOneWrapper(n uint32, negated bool) 
 }
 func (m *ArbitraryFloatManager) powerWrapper(n uint32, minusOne, negated bool) (*arbitraryFloatPowerWrapper, error) {
 	if m == nil || m.self != m || m.integer == nil || m.integer.self != m.integer {
-		return nil, ErrRuntimeOwner
+		return nil, umemory.ErrRuntimeOwner
 	}
 	if !m.constructorComplete || m.closed || m.sourceEnded {
 		return nil, arena.ErrClosed
@@ -84,7 +85,7 @@ func (m *ArbitraryFloatManager) powerWrapper(n uint32, minusOne, negated bool) (
 	if id, found := m.powers[index].Get2(n); found {
 		w := m.powerWrapperByID(id)
 		if w == nil {
-			return nil, ErrRuntimeOwner
+			return nil, umemory.ErrRuntimeOwner
 		}
 		return w, nil
 	}
@@ -176,7 +177,7 @@ func (c integerAllocationInvocationContext) mpfPowerRoots(m *IntegerManager) *Nu
 }
 func (w *arbitraryFloatPowerWrapper) destroy(own bool) error {
 	if !w.Valid() {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if !own && w.sourceCause != nil {
 		return w.sourceCause
@@ -191,7 +192,7 @@ func (w *arbitraryFloatPowerWrapper) destroy(own bool) error {
 		}
 		return e
 	}
-	if !w.SourceDelDone && w.Initialized && w.Block != (Block{}) {
+	if !w.SourceDelDone && w.Initialized && w.Block != (umemory.Block{}) {
 		a, e := w.Capture()
 		if e != nil {
 			return stop(e)
@@ -210,16 +211,16 @@ func (w *arbitraryFloatPowerWrapper) destroy(own bool) error {
 		w.SourceDelDone = true
 	}
 	if own {
-		if w.Roots.Cell.Object != (ObjectRef{}) {
+		if w.Roots.Cell.Object != (umemory.ObjectRef{}) {
 			e := w.manager.integer.cleanupDetachedCopyCell(&w.Roots.Cell)
-			if w.Roots.Cell.Object == (ObjectRef{}) {
+			if w.Roots.Cell.Object == (umemory.ObjectRef{}) {
 				w.cellRetired = true
 			}
 			if e != nil {
 				return stop(e)
 			}
 		}
-		if w.Transferred.Block() != (Block{}) {
+		if w.Transferred.Block() != (umemory.Block{}) {
 			if e := w.manager.integer.Allocator.CleanupTransferredAllocation(&w.Transferred); e != nil {
 				return stop(e)
 			}
@@ -227,12 +228,12 @@ func (w *arbitraryFloatPowerWrapper) destroy(own bool) error {
 	}
 	// Source memory_manager.h:112 skips nullptr. A failed wrapper new has
 	// no Runtime payload to release; its cold metadata remains until owner end.
-	if !w.sourceFreeDone && w.Block == (Block{}) {
+	if !w.sourceFreeDone && w.Block == (umemory.Block{}) {
 		w.sourceFreeDone = true
 	}
 	if !w.sourceFreeDone {
 		e := w.manager.memory.Deallocate(&w.Block)
-		if w.Block == (Block{}) {
+		if w.Block == (umemory.Block{}) {
 			w.sourceFreeDone = true
 		}
 		if e != nil {
@@ -254,7 +255,7 @@ func (m *ArbitraryFloatManager) destroyPowerWrappers(own bool) error {
 		for _, id := range m.powers[i].All() {
 			w := m.powerWrapperByID(id)
 			if w == nil {
-				return ErrRuntimeOwner
+				return umemory.ErrRuntimeOwner
 			}
 			if e := w.destroy(false); e != nil {
 				return e
@@ -273,17 +274,17 @@ func (m *ArbitraryFloatManager) releasePowerWrapperHistory() {
 
 // Called only at the actual allocating leaf return. It transfers the exact
 // returned outcome; no before/after allocator census participates in authority.
-func (m *IntegerManager) capturePowerAllocationOutcome(c integerAllocationInvocationContext, backing SourceCellBacking, outcome *SmallAllocatorAllocationOutcome) error {
+func (m *IntegerManager) capturePowerAllocationOutcome(c integerAllocationInvocationContext, backing SourceCellBacking, outcome *umemory.SmallAllocatorAllocationOutcome) error {
 	w := c.mpfPower
 	if c.mpfPowerRoots(m) == nil {
 		return ErrNumericCallerOwner
 	}
-	if outcome != nil && outcome.Pending != (Block{}) {
+	if outcome != nil && outcome.Pending != (umemory.Block{}) {
 		if e := m.Allocator.TransferAllocationPending(outcome, &w.Transferred); e != nil {
 			return e
 		}
 	}
-	if backing.Object != (ObjectRef{}) {
+	if backing.Object != (umemory.ObjectRef{}) {
 		w.originalCell = backing
 		m.PendingCell = SourceCellBacking{}
 	}

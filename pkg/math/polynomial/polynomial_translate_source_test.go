@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialTranslateIndependentMultivariableIdentity(t *testing.T) {
@@ -160,7 +161,7 @@ func TestPolynomialTranslateManyEveryReservationPrefix(t *testing.T) {
 			values := []util.Int{util.NewInt(2), util.NewInt(-3)}
 			m.integer.Budget().FailAfter(fault)
 			e = m.TranslateMany(p, 2, xs, values, out)
-			polynomialSOMPhysicalWithOwners(t, m, nil, nil, []util.Block{*raw}, []Polynomial{p}, []*PolynomialRef{out}, &values[0], &values[1])
+			polynomialSOMPhysicalWithOwners(t, m, nil, nil, []umemory.Block{*raw}, []Polynomial{p}, []*PolynomialRef{out}, &values[0], &values[1])
 			m.integer.Budget().FailAfter(-1)
 			if e == nil {
 				succeeded = true
@@ -171,7 +172,7 @@ func TestPolynomialTranslateManyEveryReservationPrefix(t *testing.T) {
 				}
 				serviceMust(t, m.CleanupTranslation())
 			}
-			polynomialSOMPhysicalWithOwners(t, m, nil, nil, []util.Block{*raw}, []Polynomial{p}, []*PolynomialRef{out}, &values[0], &values[1])
+			polynomialSOMPhysicalWithOwners(t, m, nil, nil, []umemory.Block{*raw}, []Polynomial{p}, []*PolynomialRef{out}, &values[0], &values[1])
 			serviceMust(t, out.Close())
 		})
 	}
@@ -192,7 +193,7 @@ func TestPolynomialTranslateCapturedVariablesAndWrapperProfiles(t *testing.T) {
 	xs := BorrowPolynomialVariables(m.memory, raw, 0)
 	serviceMust(t, m.memory.Deallocate(&raw))
 	e = m.TranslateMany(p, 1, xs, []util.Int{util.NewInt(2)}, out)
-	if !errors.Is(e, util.ErrRuntimeOwner) {
+	if !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("captured backing read", e)
 	}
 	if out.root.value != p {
@@ -388,7 +389,7 @@ func TestPolynomialTranslateIndependentFiniteGrid(t *testing.T) {
 					}
 				}
 			}
-			polynomialSOMPhysicalWithOwners(t, m, nil, nil, []util.Block{*raw}, []Polynomial{p}, []*PolynomialRef{out}, &values[0], &values[1])
+			polynomialSOMPhysicalWithOwners(t, m, nil, nil, []umemory.Block{*raw}, []Polynomial{p}, []*PolynomialRef{out}, &values[0], &values[1])
 		}
 	}
 }

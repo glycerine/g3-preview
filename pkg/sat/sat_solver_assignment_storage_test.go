@@ -7,20 +7,21 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/lbool"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func satRuntimeActualRefusal(r *util.Runtime, e error) bool {
+func satRuntimeActualRefusal(r *umemory.Runtime, e error) bool {
 	if errors.Is(e, arena.ErrInjectedFailure) {
 		return true
 	}
-	var f util.Failure
+	var f umemory.Failure
 	return errors.As(e, &f) && f.ErrorCode() == 101 && r.State().OutOfMemory
 }
 
 // Enumerate only declared owning roots; never infer ownership from live entries.
-func satRuntimeAuditBlocks(t *testing.T, r *util.Runtime, external ...util.Block) {
+func satRuntimeAuditBlocks(t *testing.T, r *umemory.Runtime, external ...umemory.Block) {
 	t.Helper()
 	roots := external
 	type identity struct{ slot, generation uint32 }
@@ -114,7 +115,7 @@ func TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards(t *testing.T) {
 }
 func TestSATSolverAssignmentRequiresSameActualCheckpointRuntime(t *testing.T) {
 	s, v, b := satPropagationFixture(t, 1)
-	foreign, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	foreign, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	satOK(t, e)
 	before := b.Used()
 	got, e := newSATSolverPropagationState(v, s.clauses, s.converter, s.limit, foreign, s.config, b)

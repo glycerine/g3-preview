@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Core supplies the actual shared numeral and control owners. Allocator selects
@@ -15,7 +15,7 @@ import (
 // Integer Runtime when neither explicit source pointer is supplied.
 type MultivariatePolynomialManagerConfig struct {
 	Core          MultivariatePolynomialConfig
-	Allocator     *util.SmallAllocator
+	Allocator     *umemory.SmallAllocator
 	Factorization UPolynomialFactorizationConfig
 }
 

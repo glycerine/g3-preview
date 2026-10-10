@@ -3,6 +3,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // A call-local borrowed Int address in sole Runtime storage. It carries no
@@ -10,8 +11,8 @@ import (
 // are signed inline value, compressed cell low, compressed cell high.
 
 type integerRuntimeValueReceiver struct {
-	runtime *Runtime
-	block   Block
+	runtime *umemory.Runtime
+	block   umemory.Block
 	offset  uint64
 }
 
@@ -20,7 +21,7 @@ func (r *integerRuntimeValueReceiver) validate(m *IntegerManager, a *Int) error 
 		return nil
 	}
 	if r.runtime == nil || r.runtime != m.Memory || a == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	extent, e := r.runtime.Size(r.block)
 	if e != nil {
@@ -42,7 +43,7 @@ func (r *integerRuntimeValueReceiver) validate(m *IntegerManager, a *Int) error 
 		return e
 	}
 	if int32(val) != a.Val || NumericCellRef(uint64(low)|uint64(high)<<32) != a.Cell {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	return nil
 }

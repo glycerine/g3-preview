@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard(t *testing.T) {
@@ -60,11 +61,11 @@ func TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards
 		succeeded := false
 		for ordinal := int64(0); ordinal < 8; ordinal++ {
 			b := arena.NewBudget(1 << 24)
-			rt, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: bits})
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: bits})
 			serviceMust(t, e)
 			cfg := serviceConfig(b)
 			cfg.Integers.Memory = rt
-			cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: bits, Debug: true}
+			cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: bits, Debug: true}
 			q, e := NewRationalService(cfg)
 			serviceMust(t, e)
 			foreignConfig := serviceConfig(b)
@@ -98,8 +99,8 @@ func TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards
 				t.Fatal("rejected tuple changed actual acquisitions")
 			}
 			if body != nil {
-				var failure Failure
-				if !errors.As(body, &failure) || failure.Kind != FailureMemout {
+				var failure umemory.Failure
+				if !errors.As(body, &failure) || failure.Kind != umemory.FailureMemout {
 					t.Fatal("actual Runtime reservation", bits, ordinal, body)
 				}
 			}

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialActualModularCallerCloseBeforeReturn(t *testing.T) {
@@ -16,7 +17,7 @@ func TestUPolynomialActualModularCallerCloseBeforeReturn(t *testing.T) {
 			var p *UPolynomialManager
 			var foreign *util.IntegerModularManager
 			armed, reached := false, false
-			transport := func(f util.Failure) error {
+			transport := func(f umemory.Failure) error {
 				if !armed {
 					return f
 				}
@@ -140,7 +141,7 @@ func TestUPolynomialActualModularCallerCloseBeforeReturn(t *testing.T) {
 				}
 				extra = append(extra, &p.display.numeral)
 			}
-			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, extra, []util.Block{held}, &algebraic)
+			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, extra, []umemory.Block{held}, &algebraic)
 			serviceMust(t, rt.SetMaxSize(0))
 			switch mode {
 			case "knuth":
@@ -190,7 +191,7 @@ func TestAlgebraicBasicNegDoesNotBorrowUPModularOwner(t *testing.T) {
 	var c *AlgebraicRootCore
 	var p *UPolynomialManager
 	armed, reached := false, false
-	transport := func(f util.Failure) error {
+	transport := func(f umemory.Failure) error {
 		if !armed {
 			return f
 		}
@@ -205,7 +206,7 @@ func TestAlgebraicBasicNegDoesNotBorrowUPModularOwner(t *testing.T) {
 		}
 		return f
 	}
-	var rt *util.Runtime
+	var rt *umemory.Runtime
 	c, p, rt = algebraicNegTLSFixture(t, transport)
 	var r util.Rational
 	serviceMust(t, c.config.Rationals.SetInt32(&r, math.MinInt32))
@@ -221,7 +222,7 @@ func TestAlgebraicBasicNegDoesNotBorrowUPModularOwner(t *testing.T) {
 	if !reached || body == nil {
 		t.Fatal("actual basic MIN allocation callback absent", reached, body)
 	}
-	algebraicCellSourcePhysical(t, c, nil, nil, []util.Block{held}, &a)
+	algebraicCellSourcePhysical(t, c, nil, nil, []umemory.Block{held}, &a)
 	serviceMust(t, rt.SetMaxSize(0))
 	receipt := algebraicNegInvocationReceipt{c, &c.negation, c.negation.invocation}
 	serviceMust(t, c.cleanupNegation(&receipt, false))

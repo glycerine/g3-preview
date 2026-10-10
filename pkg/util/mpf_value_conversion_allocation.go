@@ -1,6 +1,8 @@
 // Source: src/util/mpf.cpp:1695-1711,1922-1945; src/util/mpz.h:133-164.
 package util
 
+import umemory "github.com/glycerine/g3/pkg/util/memory"
+
 func (c integerAllocationInvocationContext) conversionFrame(z *IntegerManager, executing bool) *arbitraryFloatRationalConversionScope {
 	s := c.mpfConversion
 	if z == nil || z.self != z || s == nil || s.manager == nil || s.manager.self != s.manager || s != &s.manager.rationalConversion || c.mpfConversionInvocation == 0 || c.mpfConversionInvocation != s.invocation {
@@ -29,7 +31,7 @@ func (s *arbitraryFloatRationalConversionScope) outputAllocationContext() intege
 	return integerAllocationInvocationContext{mpfConversion: s, mpfConversionInvocation: s.invocation, mpfConversionOutput: true}
 }
 
-func (z *IntegerManager) captureConversionAllocationOutcome(c integerAllocationInvocationContext, backing SourceCellBacking, out *SmallAllocatorAllocationOutcome) error {
+func (z *IntegerManager) captureConversionAllocationOutcome(c integerAllocationInvocationContext, backing SourceCellBacking, out *umemory.SmallAllocatorAllocationOutcome) error {
 	s := c.conversionFrame(z, true)
 	if s == nil || c.raw != nil {
 		return nil
@@ -39,7 +41,7 @@ func (z *IntegerManager) captureConversionAllocationOutcome(c integerAllocationI
 		o := &s.outputAllocation
 		original, pending, transferred, roots = &o.originalCell, &o.originalPending, &o.transferred, &o.numeric
 	}
-	if backing.Object != (ObjectRef{}) {
+	if backing.Object != (umemory.ObjectRef{}) {
 		*original = backing
 		if c.mpfConversionOutput {
 			s.bindDetachedOutput(z)
@@ -48,13 +50,13 @@ func (z *IntegerManager) captureConversionAllocationOutcome(c integerAllocationI
 			z.PendingCell = SourceCellBacking{}
 		}
 	}
-	if out.Pending != (Block{}) {
+	if out.Pending != (umemory.Block{}) {
 		*pending = out.Pending
 		if e := z.Allocator.TransferAllocationPending(out, transferred); e != nil {
 			return e
 		}
 		if roots.Allocator[0] == out.Pending {
-			roots.Allocator[0] = Block{}
+			roots.Allocator[0] = umemory.Block{}
 		}
 	}
 	return nil

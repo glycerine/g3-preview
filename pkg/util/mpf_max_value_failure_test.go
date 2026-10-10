@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatMkMaxValueEveryActualReservationPrefix(t *testing.T) {
@@ -18,9 +19,9 @@ func testArbitraryFloatMkMaxValuePrefix(t *testing.T, sb uint32, bigOutput bool)
 	completed := false
 	for ordinal := int64(0); ordinal < 128; ordinal++ {
 		b := arena.NewBudget(1 << 27)
-		r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 		serviceMust(t, e)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 		serviceMust(t, e)
 		value := ArbitraryFloat{format: 1 << 31, significand: NewInt(9), exponent: 7}
 		if bigOutput {

@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialFactorToPolynomialActualChildReceipt(t *testing.T) {
@@ -53,7 +54,7 @@ func TestPolynomialFactorToPolynomialEveryBigReservationPrefix(t *testing.T) {
 			if cause != nil && !numericPhysicalReservationRefusal(cause) {
 				t.Fatal(cause)
 			}
-			if z.PendingAllocationObject() != (util.ObjectRef{}) && full.toPolynomial.numeric.Cell.Object != z.PendingAllocationObject() {
+			if z.PendingAllocationObject() != (umemory.ObjectRef{}) && full.toPolynomial.numeric.Cell.Object != z.PendingAllocationObject() {
 				t.Fatal("actual copy descriptor not held by exact conversion frame")
 			}
 			z.Budget().FailAfter(-1)

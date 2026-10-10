@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func upolyContextOwner(t *testing.T) (*util.RationalService, *UPolynomialManager, UPolynomial) {
@@ -78,7 +79,7 @@ func TestUPolynomialContextVectorStopAPI(t *testing.T) {
 // Public realloc operations publish the actual LP64 TLS lane before the host
 // extent guard. This fixture deliberately reaches source signed-overflow UB;
 // it is not ordinary exhaustion and never writes private Runtime counters.
-func contextTLSNearMinimum(t *testing.T, r *util.Runtime) {
+func contextTLSNearMinimum(t *testing.T, r *umemory.Runtime) {
 	t.Helper()
 	first, e := r.Allocate(8)
 	serviceMust(t, e)
@@ -105,14 +106,14 @@ func contextTLSNearMinimum(t *testing.T, r *util.Runtime) {
 	}
 }
 
-func contextTLSOwner(t *testing.T) (*util.RationalService, *UPolynomialManager, UPolynomial, *util.Runtime, *arena.Budget) {
+func contextTLSOwner(t *testing.T) (*util.RationalService, *UPolynomialManager, UPolynomial, *umemory.Runtime, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 25)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b)
 	cfg.Integers.Memory = r
-	cfg.Integers.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	s, e := util.NewRationalService(cfg)
 	serviceMust(t, e)
 	m, e := NewUPolynomialManagerFromRationalService(s, UPolynomialConfig{Checkpoint: func() bool { panic("constant route checkpoint") }, Cooperation: func() error { panic("constant route cooperation") }})
@@ -252,7 +253,7 @@ func TestUPolynomialContextPartialCopyWaitsForStoppedVector(t *testing.T) {
 
 // Each ErrBounds is the actual postphysical TLS synchronization refusal. Retry
 // acknowledges that exact release; no source counter or pointer is repaired.
-func contextTLSDelete(t *testing.T, s *util.RationalService, a *util.OwnedRational, r *util.Runtime) {
+func contextTLSDelete(t *testing.T, s *util.RationalService, a *util.OwnedRational, r *umemory.Runtime) {
 	t.Helper()
 	before := r.Stats().LiveBlocks
 	e := s.Del(a)
@@ -264,7 +265,7 @@ func contextTLSDelete(t *testing.T, s *util.RationalService, a *util.OwnedRation
 		serviceMust(t, s.Del(a))
 	}
 }
-func contextTLSFinish(t *testing.T, r *util.Runtime, close func() error) {
+func contextTLSFinish(t *testing.T, r *umemory.Runtime, close func() error) {
 	t.Helper()
 	for {
 		before := r.Stats().LiveBlocks

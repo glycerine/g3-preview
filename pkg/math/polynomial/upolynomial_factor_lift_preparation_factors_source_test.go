@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -17,11 +18,11 @@ func TestUPolynomialFactorLiftPreparationFactorsSourceCursorAndOwnHistory(t *tes
 	for _, site := range []string{"row", "reset", "own"} {
 		t.Run(site, func(t *testing.T) {
 			b := arena.NewBudget(1 << 26)
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 			serviceMust(t, e)
 			cfg := serviceConfig(b).Integers
 			cfg.Memory = rt
-			cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			z, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: z.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -93,9 +94,9 @@ func TestUPolynomialFactorLiftPreparationFactorsSourceCursorAndOwnHistory(t *tes
 			if site == "own" && prep.ownCause != first || site != "own" && prep.sourceCause != first {
 				t.Fatal("own acknowledgment erased first class history")
 			}
-			primeTrialPhysicalAuditAll(t, z, s, []*UPolynomialFactors{out}, []util.Block{recovery})
+			primeTrialPhysicalAuditAll(t, z, s, []*UPolynomialFactors{out}, []umemory.Block{recovery})
 			e = rt.Deallocate(&recovery)
-			if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+			if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 				t.Fatal(e)
 			}
 		})

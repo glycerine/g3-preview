@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialCheapDuplicateAssertionBeforeZero(t *testing.T) {
@@ -50,9 +51,9 @@ func TestPolynomialCheapResetReleasesBIG(t *testing.T) {
 // is not valid allocation exhaustion and uses no private counter mutation.
 func TestPolynomialSOMResetStoppedAfterPhysicalFreeOwningCursor(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	profile := util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Profile: profile, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r, Profile: profile})
@@ -108,7 +109,7 @@ func TestPolynomialSOMResetStoppedAfterPhysicalFreeOwningCursor(t *testing.T) {
 	}
 	l, e := mm.location(large)
 	serviceMust(t, e)
-	if l.raw != (util.ObjectRef{}) || l.stage == 0 {
+	if l.raw != (umemory.ObjectRef{}) || l.stage == 0 {
 		t.Fatal("completed second physical action", l)
 	}
 	polynomialPhysicalAudit(t, m)
@@ -133,9 +134,9 @@ func TestPolynomialSOMResetStoppedAfterPhysicalFreeOwningCursor(t *testing.T) {
 
 func TestPolynomialStoppedMonomialUnitOwningGuardDependency(t *testing.T) {
 	b := arena.NewBudget(1 << 22)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	serviceMust(t, mm.IncManagerRef())
 	_, e = mm.Unit()
@@ -147,7 +148,7 @@ func TestPolynomialStoppedMonomialUnitOwningGuardDependency(t *testing.T) {
 	caller, e := r.Allocate(200000)
 	serviceMust(t, e)
 	contextTLSNearMinimum(t, r)
-	if e = r.Deallocate(&caller); !errors.Is(e, arena.ErrBounds) || caller != (util.Block{}) {
+	if e = r.Deallocate(&caller); !errors.Is(e, arena.ErrBounds) || caller != (umemory.Block{}) {
 		t.Fatal("actual caller physical free before TLS guard", e, caller)
 	}
 	before := r.Stats().LiveBlocks
@@ -157,7 +158,7 @@ func TestPolynomialStoppedMonomialUnitOwningGuardDependency(t *testing.T) {
 	}
 	l, e := mm.location(mm.unit)
 	serviceMust(t, e)
-	if l.raw != (util.ObjectRef{}) || l.stage == 0 {
+	if l.raw != (umemory.ObjectRef{}) || l.stage == 0 {
 		t.Fatal("real consumed unit raw with charged deletion state", l)
 	}
 	monomialPhysicalAudit(t, mm)

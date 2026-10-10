@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func satConflictAudit(t *testing.T, c *satSolverConflictResolution) {
@@ -19,7 +19,7 @@ func satConflictAudit(t *testing.T, c *satSolverConflictResolution) {
 	p := analysis.propagation
 	v := p.variables
 	l := s.lifecycle
-	roots := []util.Block{}
+	roots := []umemory.Block{}
 	satScalarAuditRoots(t, v, roots...)
 	want := c.ownerBytes + s.ownerBytes + analysis.ownerBytes + d.ownerBytes
 	want += l.ownerBytes + uint64(cap(l.Original)+cap(l.learned))*uint64(reflect.TypeOf(StoredClauseRef{}).Size()) + uint64(cap(l.reinit))*uint64(reflect.TypeOf(satClauseWrapper{}).Size()) + uint64(cap(l.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())

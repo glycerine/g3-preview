@@ -6,6 +6,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"reflect"
 	"testing"
 )
@@ -44,9 +45,9 @@ func (t *mpfFormatStopText) AppendStreamString(s ArbitraryFloatFormatStream) err
 
 func TestMPFFormatTextYoungerNumeralStopProtectsNonemptyResult(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	config := IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+	config := IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 	q, e := NewRationalService(RationalServiceConfig{Integers: config})
 	serviceMust(t, e)
 	m, e := q.NewArbitraryFloatManager()
@@ -70,7 +71,7 @@ func TestMPFFormatTextYoungerNumeralStopProtectsNonemptyResult(t *testing.T) {
 		release = rt.Deallocate(&external)
 	}}
 	_, body := m.ToStringInto(&a, proxy)
-	if !errors.Is(release, arena.ErrBounds) || external != (Block{}) {
+	if !errors.Is(release, arena.ErrBounds) || external != (umemory.Block{}) {
 		t.Fatal("actual accounting frontier", release)
 	}
 	cause := text.Numeric.SourceCause()
@@ -161,7 +162,7 @@ func TestMPFFormatTextYoungerNumeralStopProtectsNonemptyResult(t *testing.T) {
 	finish(func() error { return m.Del(&a) })
 	finish(m.Close)
 	finish(q.Close)
-	if e = rt.Deallocate(&recovery); e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (Block{})) {
+	if e = rt.Deallocate(&recovery); e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal(e)
 	}
 	finish(rt.Close)

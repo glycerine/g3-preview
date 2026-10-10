@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math"
 	"math/big"
 	"testing"
@@ -54,7 +55,7 @@ func TestArbitraryFloatSignedFractionReachedUndefinedNegation(t *testing.T) {
 	serviceMust(t, m.Del(&out))
 }
 
-func signedFractionPhysicalAudit(t *testing.T, m *ArbitraryFloatManager, out *ArbitraryFloat, blocks []Block, extra ...*Int) {
+func signedFractionPhysicalAudit(t *testing.T, m *ArbitraryFloatManager, out *ArbitraryFloat, blocks []umemory.Block, extra ...*Int) {
 	t.Helper()
 	s, c, r := &m.signedFraction, &m.rationalSet, &m.RoundScope
 	nums := []*Int{&out.significand, &s.q.Num, &s.q.Den, &m.plainRationalSet.exp, &c.sig.Num, &c.sig.Den, &c.t.Num, &c.t.Den, &c.sq.Num, &c.sq.Den, &c.exp, &c.p, &c.p2, &c.prev, &r.sigma, &r.cap, &r.sticky, &m.rational.NTmp, &m.rational.AddTmp1, &m.rational.AddTmp2, &m.rational.LtTmp1.Num, &m.rational.LtTmp1.Den, &m.rational.LtTmp2.Num, &m.rational.LtTmp2.Den}
@@ -73,7 +74,7 @@ func TestArbitraryFloatSignedFractionEveryColdReservation(t *testing.T) {
 		success := false
 		for ordinal := int64(0); ordinal < 500; ordinal++ {
 			b := arena.NewBudget(1 << 28)
-			m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+			m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 			serviceMust(t, e)
 			var out ArbitraryFloat
 			b.FailAfter(ordinal)
@@ -159,11 +160,11 @@ func TestArbitraryFloatSignedFractionEntryAuthority(t *testing.T) {
 	m, _, b := mpfNumeralHelpersFixture(t)
 	var out ArbitraryFloat
 	old, used := out, b.Used()
-	if e := m.SetFractionSigned(nil, 8, 24, ArbitraryFloatNearestEven, 1, 2); !errors.Is(e, ErrRuntimeOwner) {
+	if e := m.SetFractionSigned(nil, 8, 24, ArbitraryFloatNearestEven, 1, 2); !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("nil output", e)
 	}
 	copied := *m
-	if e := copied.SetFractionSigned(&out, 8, 24, ArbitraryFloatNearestEven, 1, 2); !errors.Is(e, ErrRuntimeOwner) {
+	if e := copied.SetFractionSigned(&out, 8, 24, ArbitraryFloatNearestEven, 1, 2); !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("copied manager", e)
 	}
 	m.signedFraction.invocation = ^uint64(0)

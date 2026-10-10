@@ -1,6 +1,8 @@
 // Source: src/util/mpf.cpp:1519-1569; src/util/mpq.cpp:156-185.
 package util
 
+import umemory "github.com/glycerine/g3/pkg/util/memory"
+
 func (c integerAllocationInvocationContext) formatFrame(z *IntegerManager, executing bool) *ArbitraryFloatFormatInvocation {
 	s := c.mpfFormat
 	if z == nil || z.self != z || s == nil || z.MpfParent == nil || !z.MpfParent.MatchesFormatFrame(s) || s.manager.integer != z || c.mpfFormatInvocation == 0 || c.mpfFormatInvocation != s.invocation {
@@ -68,7 +70,7 @@ func (m *ArbitraryFloatManager) cleanupFormatChildren(s *ArbitraryFloatFormatInv
 	return nil
 }
 
-func (z *IntegerManager) captureFormatAllocationOutcome(c integerAllocationInvocationContext, backing SourceCellBacking, out *SmallAllocatorAllocationOutcome) error {
+func (z *IntegerManager) captureFormatAllocationOutcome(c integerAllocationInvocationContext, backing SourceCellBacking, out *umemory.SmallAllocatorAllocationOutcome) error {
 	s := c.formatFrame(z, true)
 	if s == nil || c.raw != nil {
 		return nil
@@ -83,36 +85,36 @@ func (z *IntegerManager) captureFormatAllocationOutcome(c integerAllocationInvoc
 		transferred = &c.formatDecimal.Transferred
 		roots = &c.formatDecimal.Numeric
 	}
-	if backing.Object != (ObjectRef{}) {
+	if backing.Object != (umemory.ObjectRef{}) {
 		*original = backing
 		if z.PendingCell == backing {
 			z.PendingCell = SourceCellBacking{}
 		}
 	}
-	if out.Pending != (Block{}) {
+	if out.Pending != (umemory.Block{}) {
 		*originalPending = out.Pending
 		if e := z.Allocator.TransferAllocationPending(out, transferred); e != nil {
 			return e
 		}
 		if roots.Allocator[0] == out.Pending {
-			roots.Allocator[0] = Block{}
+			roots.Allocator[0] = umemory.Block{}
 		}
 	}
 	return nil
 }
-func (z *IntegerManager) cleanupFormatAllocation(roots *NumericAllocationRoots, transferred *SmallAllocatorPendingAllocation, retired *bool) error {
-	if roots.Cell.Object != (ObjectRef{}) {
+func (z *IntegerManager) cleanupFormatAllocation(roots *NumericAllocationRoots, transferred *umemory.SmallAllocatorPendingAllocation, retired *bool) error {
+	if roots.Cell.Object != (umemory.ObjectRef{}) {
 		if e := z.cleanupDetachedCopyCell(&roots.Cell); e != nil {
 			return e
 		}
 		*retired = true
 	}
-	if transferred.Block() != (Block{}) {
+	if transferred.Block() != (umemory.Block{}) {
 		if e := z.Allocator.CleanupTransferredAllocation(transferred); e != nil {
 			return e
 		}
 	}
-	if roots.Allocator == ([3]Block{}) {
+	if roots.Allocator == ([3]umemory.Block{}) {
 		return nil
 	}
 	return roots.Cleanup(z)

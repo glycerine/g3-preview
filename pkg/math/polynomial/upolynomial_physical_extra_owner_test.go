@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Every entry is supplied by its actual caller owner; storage directories do
@@ -22,7 +23,7 @@ type paramsPhysicalRationalOwner struct {
 }
 
 type upolyPhysicalExtraOwners struct {
-	CallerBlocks         []util.Block // actual directly returned caller allocations only
+	CallerBlocks         []umemory.Block // actual directly returned caller allocations only
 	ASTManagers          []*ast.ASTManager
 	DebugContexts        []*util.DebugContext
 	ParamsRationalValues []paramsPhysicalRationalOwner

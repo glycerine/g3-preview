@@ -6,15 +6,15 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func orderFixture(t *testing.T) *MonomialManager {
 	t.Helper()
 	b := arena.NewBudget(1 << 25)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	serviceMust(t, e)
-	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64}})
+	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		serviceMust(t, m.CloseChecked())
@@ -356,7 +356,7 @@ func TestMonomialOrderSourceDegreeShortCircuit(t *testing.T) {
 			t.Fatal(got)
 		}
 		_, e = m.orderField(a, 24)
-		if !errors.Is(e, util.ErrRuntimeUninitialized) {
+		if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 			t.Fatal("degree must remain unread/uninitialized", e)
 		}
 	})
@@ -376,7 +376,7 @@ func TestMonomialOrderSourceDegreeShortCircuit(t *testing.T) {
 			t.Fatal(got)
 		}
 		_, e = m.LexWithMinimum(a, b, 2)
-		if !errors.Is(e, util.ErrRuntimeUninitialized) {
+		if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 			t.Fatal("reached minimum degree", e)
 		}
 	})
@@ -385,11 +385,11 @@ func TestMonomialOrderSourceDegreeShortCircuit(t *testing.T) {
 		a := orderPartialValue(t, m, 1, nil)
 		b := orderPartialValue(t, m, 1, nil)
 		_, e := m.Lex(a, b)
-		if !errors.Is(e, util.ErrRuntimeUninitialized) {
+		if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 			t.Fatal(e)
 		}
 		_, e = m.ReverseLex(a, b)
-		if !errors.Is(e, util.ErrRuntimeUninitialized) {
+		if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 			t.Fatal(e)
 		}
 	})

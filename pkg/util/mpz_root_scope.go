@@ -3,6 +3,7 @@ package util
 
 import (
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrRootPending = errors.New("mpnum: retained integer root RAW invocation")
@@ -13,7 +14,7 @@ type integerRootScope struct {
 	powerInvocation                      integerPowerInvocationReceipt
 	Values                               [4]Int
 	pending                              SourceCellBacking
-	raw                                  [3]Block
+	raw                                  [3]umemory.Block
 	generation                           uint64
 	active, EndEntered, stopped          bool
 	SourceIndex, cleanupIndex            uint8
@@ -44,7 +45,7 @@ func (m *IntegerManager) finishRoot() error {
 // execution. It resumes only these actual four raw fields in ascending order.
 func (m *IntegerManager) CleanupRoot() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.RootRaw
 	if e := m.CleanupPowerInvocation(&s.powerInvocation, false); e != nil {
@@ -72,7 +73,7 @@ func (m *IntegerManager) CleanupRoot() error {
 		}
 		s.cleanupIndex++
 	}
-	if s.pending.Object != (ObjectRef{}) {
+	if s.pending.Object != (umemory.ObjectRef{}) {
 		if m.PendingCell == s.pending {
 			if e := m.cleanupPendingAllocation(); e != nil {
 				s.pending = m.PendingCell
@@ -82,7 +83,7 @@ func (m *IntegerManager) CleanupRoot() error {
 		}
 		s.pending = SourceCellBacking{}
 	}
-	if s.raw != ([3]Block{}) {
+	if s.raw != ([3]umemory.Block{}) {
 		now, e := m.Allocator.PendingRoots()
 		if e != nil {
 			return e
@@ -99,7 +100,7 @@ func (m *IntegerManager) CleanupRoot() error {
 				return x
 			}
 		}
-		s.raw = [3]Block{}
+		s.raw = [3]umemory.Block{}
 	}
 	if e := m.CleanupPowerInvocation(&s.powerInvocation, true); e != nil {
 		return e
@@ -128,13 +129,13 @@ func (m *IntegerManager) rootRawCall(op uint8, a, b, out *Int) (cause error) {
 		cause = m.Div(a, b, out)
 	}
 	s := &m.RootRaw
-	if before == (ObjectRef{}) && m.PendingCell.Object != (ObjectRef{}) {
+	if before == (umemory.ObjectRef{}) && m.PendingCell.Object != (umemory.ObjectRef{}) {
 		if !m.matchesPowerInvocation(&s.powerInvocation) || m.PowerRaw.pending != m.PendingCell {
 			s.pending = m.PendingCell
 		}
 	}
 	after, e := m.Allocator.PendingRoots()
-	if raw == ([3]Block{}) && after != ([3]Block{}) {
+	if raw == ([3]umemory.Block{}) && after != ([3]umemory.Block{}) {
 		if !m.matchesPowerInvocation(&s.powerInvocation) || m.PowerRaw.raw != after {
 			s.raw = after
 		}

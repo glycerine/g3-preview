@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -81,8 +82,8 @@ func numericPhysicalReservationRefusal(e error) bool {
 	if errors.Is(e, arena.ErrInjectedFailure) {
 		return true
 	}
-	var f util.Failure
-	return errors.As(e, &f) && f.Kind == util.FailureMemout && f.ErrorCode() == 101
+	var f umemory.Failure
+	return errors.As(e, &f) && f.Kind == umemory.FailureMemout && f.ErrorCode() == 101
 }
 func integerManager(t *testing.T) (*util.IntegerManager, *arena.Budget) {
 	t.Helper()
@@ -133,8 +134,8 @@ func numericStorageReservationRefusal(err error) bool {
 	if errors.Is(err, arena.ErrInjectedFailure) {
 		return true
 	}
-	var physical util.Failure
-	return errors.As(err, &physical) && physical.Kind == util.FailureMemout && physical.ErrorCode() == 101
+	var physical umemory.Failure
+	return errors.As(err, &physical) && physical.Kind == umemory.FailureMemout && physical.ErrorCode() == 101
 }
 func serviceConfig(b *arena.Budget) util.RationalServiceConfig {
 	return util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}}
@@ -225,9 +226,9 @@ func roundPublicationDecode(t *testing.T, m *util.IntegerManager, n *util.Int) *
 }
 
 func mpzPublicationDirectOwner(t *testing.T) (*util.IntegerManager, *arena.Budget) {
-	return mpzPublicationOwnerProfile(t, util.SmallAllocatorProfile{PointerBits: 64, Debug: true})
+	return mpzPublicationOwnerProfile(t, umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 }
-func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external []util.Block, public ...*util.Int) {
+func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external []umemory.Block, public ...*util.Int) {
 	t.Helper()
 	cells := map[util.NumericCellRef]bool{}
 	add := func(r util.NumericCellRef) {
@@ -297,7 +298,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 			if !w.Valid() {
 				t.Fatal("invalid actual Power owner")
 			}
-			if w.Initialized && !w.SourceDelDone && w.Block != (util.Block{}) {
+			if w.Initialized && !w.SourceDelDone && w.Block != (umemory.Block{}) {
 				a, e := w.Capture()
 				if e != nil {
 					t.Fatal("invalid actual Power NUM", e)
@@ -324,7 +325,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 	if uint32(len(cells)) != m.Cells.Stats().Live {
 		t.Fatal("unnamed actual integer descriptor", len(cells), m.Cells.Stats().Live)
 	}
-	objects := map[util.ObjectRef]bool{}
+	objects := map[umemory.ObjectRef]bool{}
 	for ref := range cells {
 		c := m.Cell(ref)
 		if c.Payload != (arena.VectorRef{}) {
@@ -342,7 +343,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 		}
 		objects[object] = true
 	}
-	if m.PendingCell.Object != (util.ObjectRef{}) {
+	if m.PendingCell.Object != (umemory.ObjectRef{}) {
 		if objects[m.PendingCell.Object] {
 			t.Fatal("duplicated pending physical object")
 		}
@@ -350,14 +351,14 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 			t.Fatal("invalid pending object", e)
 		}
 	}
-	raw := map[util.Block]bool{}
+	raw := map[umemory.Block]bool{}
 	if parent := m.MpfParent; parent != nil {
 		for s := parent.FormatScopes; s != nil; s = s.Next {
 			if !parent.MatchesFormatFrame(s) {
 				t.Fatal("invalid actual format frame")
 			}
-			for _, b := range []util.Block{s.Transferred.Block(), s.Decimal.Transferred.Block()} {
-				if b != (util.Block{}) {
+			for _, b := range []umemory.Block{s.Transferred.Block(), s.Decimal.Transferred.Block()} {
+				if b != (umemory.Block{}) {
 					if raw[b] {
 						t.Fatal("duplicate format transferred raw")
 					}
@@ -368,7 +369,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 				}
 			}
 			for _, c := range []util.SourceCellBacking{s.Numeric.Cell, s.Decimal.Numeric.Cell} {
-				if c.Object == (util.ObjectRef{}) {
+				if c.Object == (umemory.ObjectRef{}) {
 					continue
 				}
 				if objects[c.Object] {
@@ -401,8 +402,8 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 			if !w.Valid() {
 				t.Fatal("invalid actual Power owner")
 			}
-			for _, block := range []util.Block{w.Block, w.Transferred.Block()} {
-				if block == (util.Block{}) {
+			for _, block := range []umemory.Block{w.Block, w.Transferred.Block()} {
+				if block == (umemory.Block{}) {
 					continue
 				}
 				if raw[block] {
@@ -413,7 +414,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 				}
 				raw[block] = true
 			}
-			if c := w.Roots.Cell; c.Object != (util.ObjectRef{}) {
+			if c := w.Roots.Cell; c.Object != (umemory.ObjectRef{}) {
 				if objects[c.Object] {
 					t.Fatal("duplicate actual Power object")
 				}
@@ -428,8 +429,8 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 			if h.Self != h || h.Manager != parent || h.Invocation == 0 {
 				t.Fatal("invalid actual rational SET record")
 			}
-			for _, block := range []util.Block{h.Transferred.Block(), h.Numeric.Allocator[0], h.Numeric.Allocator[1], h.Numeric.Allocator[2]} {
-				if block == (util.Block{}) {
+			for _, block := range []umemory.Block{h.Transferred.Block(), h.Numeric.Allocator[0], h.Numeric.Allocator[1], h.Numeric.Allocator[2]} {
+				if block == (umemory.Block{}) {
 					continue
 				}
 				if raw[block] {
@@ -440,7 +441,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 				}
 				raw[block] = true
 			}
-			if c := h.Numeric.Cell; c.Object != (util.ObjectRef{}) {
+			if c := h.Numeric.Cell; c.Object != (umemory.ObjectRef{}) {
 				if objects[c.Object] {
 					t.Fatal("duplicate rational SET object")
 				}
@@ -454,8 +455,8 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 			if h.Self != h || h.Manager != parent || h.Issued.Frame != h || h.Issued.Manager != parent || h.Issued.Invocation != h.Invocation || h.Invocation == 0 {
 				t.Fatal("invalid actual formatted SET record")
 			}
-			for _, block := range []util.Block{h.Transferred.Block(), h.Numeric.Allocator[0], h.Numeric.Allocator[1], h.Numeric.Allocator[2]} {
-				if block == (util.Block{}) {
+			for _, block := range []umemory.Block{h.Transferred.Block(), h.Numeric.Allocator[0], h.Numeric.Allocator[1], h.Numeric.Allocator[2]} {
+				if block == (umemory.Block{}) {
 					continue
 				}
 				if raw[block] {
@@ -466,7 +467,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 				}
 				raw[block] = true
 			}
-			if c := h.Numeric.Cell; c.Object != (util.ObjectRef{}) {
+			if c := h.Numeric.Cell; c.Object != (umemory.ObjectRef{}) {
 				if objects[c.Object] {
 					t.Fatal("duplicate formatted SET cell")
 				}
@@ -492,7 +493,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 		}
 		for _, s := range []*util.ArbitraryFloatRoundScope{&parent.RoundScope, &parent.RoundSqrtScope} {
 			if s.Manager == parent && s.Invocation != 0 {
-				if block := s.Transferred.Block(); block != (util.Block{}) {
+				if block := s.Transferred.Block(); block != (umemory.Block{}) {
 					if raw[block] {
 						t.Fatal("duplicate round transferred raw")
 					}
@@ -501,7 +502,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 					}
 					raw[block] = true
 				}
-				if c := s.Numeric.Cell; c.Object != (util.ObjectRef{}) {
+				if c := s.Numeric.Cell; c.Object != (umemory.ObjectRef{}) {
 					if objects[c.Object] {
 						t.Fatal("duplicate round cell")
 					}
@@ -530,7 +531,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 			if q.Self != q || q.Manager != parent || q.Issued.Manager != parent || q.Issued.Frame != q || q.Issued.Invocation == 0 {
 				t.Fatal("invalid actual input call owner")
 			}
-			if block := q.Transferred.Block(); block != (util.Block{}) {
+			if block := q.Transferred.Block(); block != (umemory.Block{}) {
 				if raw[block] {
 					t.Fatal("duplicate input transferred raw")
 				}
@@ -539,7 +540,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 				}
 				raw[block] = true
 			}
-			if c := q.Numeric.Cell; c.Object != (util.ObjectRef{}) {
+			if c := q.Numeric.Cell; c.Object != (umemory.ObjectRef{}) {
 				if objects[c.Object] {
 					t.Fatal("duplicate input cell")
 				}
@@ -572,7 +573,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 				t.Fatal("invalid retained MPF child")
 			}
 			block := child.Transferred.Block()
-			if block != (util.Block{}) {
+			if block != (umemory.Block{}) {
 				if raw[block] {
 					t.Fatal("duplicate transferred MPF raw root")
 				}
@@ -581,7 +582,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 				}
 				raw[block] = true
 			}
-			if c := child.Roots.Cell; c.Object != (util.ObjectRef{}) {
+			if c := child.Roots.Cell; c.Object != (umemory.ObjectRef{}) {
 				if objects[c.Object] {
 					t.Fatal("duplicate retained MPF cell")
 				}
@@ -619,7 +620,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 	}
 
 	for _, block := range external {
-		if block == (util.Block{}) || raw[block] {
+		if block == (umemory.Block{}) || raw[block] {
 			t.Fatal("duplicate or empty named external block", block)
 		}
 		if _, e := m.Memory.Size(block); e != nil {
@@ -657,7 +658,7 @@ func integerPhysicalAudit(t *testing.T, m *util.IntegerManager, public ...*util.
 func rationalPublicationDirectOwner(t *testing.T, synch bool) (*util.RationalManager, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
-	m, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: false}}, Synchronized: synch})
+	m, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: false}}, Synchronized: synch})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -762,8 +763,8 @@ func qopsAuditLiveOwnership(t *testing.T, m *util.RationalManager, public []*uti
 
 type numericWarmSnapshot struct {
 	used, owned, size, count uint64
-	runtime                  util.RuntimeStats
-	allocator                util.AllocatorStats
+	runtime                  umemory.RuntimeStats
+	allocator                umemory.AllocatorStats
 	cells                    uint32
 }
 
@@ -774,7 +775,7 @@ func qopsMust(t *testing.T, e error) {
 	}
 }
 
-func mpzPublicationOwnerProfile(t *testing.T, profile util.SmallAllocatorProfile) (*util.IntegerManager, *arena.Budget) {
+func mpzPublicationOwnerProfile(t *testing.T, profile umemory.SmallAllocatorProfile) (*util.IntegerManager, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 20)
 	m, err := util.NewIntegerManager(util.IntegerConfig{

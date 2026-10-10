@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialICCPConstantSETActualPendingAcquisition(t *testing.T) {
@@ -70,7 +71,7 @@ func TestPolynomialICCPConstantSETActualPendingAcquisition(t *testing.T) {
 				if !testNumericScopeEqual(*actual.frame, before) {
 					t.Fatal("copied constant cleanup mutated actual scope")
 				}
-				if c.integer.PendingAllocationObject() != (util.ObjectRef{}) && actual.frame.numeric.Cell != c.integer.PendingCell {
+				if c.integer.PendingAllocationObject() != (umemory.ObjectRef{}) && actual.frame.numeric.Cell != c.integer.PendingCell {
 					t.Fatal("copied cleanup consumed exact actual pending cell")
 				}
 			}
@@ -161,7 +162,7 @@ func TestPolynomialICCPConstantOldReceiptPreservesLaterForeignPendingCell(t *tes
 	c.integer.Budget().FailAfter(1)
 	body := full.iccpPartsWithReceipt(p, 0, &i, &content, &primitive, &receipt)
 	old := c.integer.PendingCell
-	if body == nil || old.Object == (util.ObjectRef{}) || receipt.shortcutConstant.frame.numeric.Cell != old {
+	if body == nil || old.Object == (umemory.ObjectRef{}) || receipt.shortcutConstant.frame.numeric.Cell != old {
 		t.Fatal("actual source SET pending descriptor horizon", body, old)
 	}
 	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, primitive.value}, []*util.Int{&big, &held, &i, &foreign}, 0)
@@ -175,7 +176,7 @@ func TestPolynomialICCPConstantOldReceiptPreservesLaterForeignPendingCell(t *tes
 		c.integer.Budget().FailAfter(prefix)
 		e = c.integer.SetLimbs(&foreign, large)
 		now := c.integer.PendingCell
-		if now.Object != (util.ObjectRef{}) && now != old {
+		if now.Object != (umemory.ObjectRef{}) && now != old {
 			found = true
 			if e == nil {
 				t.Fatal("later pending cell without actual refusal")

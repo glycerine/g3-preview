@@ -3,6 +3,7 @@ package util
 
 import (
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrPerfectSquarePending = errors.New("mpnum: retained perfect-square raw invocation")
@@ -22,8 +23,8 @@ type integerPerfectSquareScope struct {
 	parentContext                            integerAllocationInvocationContext
 	Executing, sourceExecuting, ownExecuting bool
 	Values                                   [6]Int
-	pending                                  ObjectRef
-	Raw                                      [3]Block
+	pending                                  umemory.ObjectRef
+	Raw                                      [3]umemory.Block
 	outputStarted                            bool
 	outputChoice                             uint8
 	Generation                               uint64
@@ -63,7 +64,7 @@ func (m *IntegerManager) finishPerfectSquare() error {
 // execution. It resumes only these actual six raw fields in ascending order.
 func (m *IntegerManager) CleanupPerfectSquare() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.PerfectSquare
 	if s.directReceipt.Invocation != 0 {
@@ -94,16 +95,16 @@ func (m *IntegerManager) CleanupPerfectSquare() error {
 		}
 		s.cleanupIndex++
 	}
-	if s.pending != (ObjectRef{}) {
+	if s.pending != (umemory.ObjectRef{}) {
 		if m.PendingCell.Object == s.pending {
 			if e := m.cleanupPendingAllocation(); e != nil {
 				s.cleanupCause = e
 				return e
 			}
 		}
-		s.pending = ObjectRef{}
+		s.pending = umemory.ObjectRef{}
 	}
-	if s.Raw != ([3]Block{}) {
+	if s.Raw != ([3]umemory.Block{}) {
 		now, e := m.Allocator.PendingRoots()
 		if e != nil {
 			return e
@@ -120,7 +121,7 @@ func (m *IntegerManager) CleanupPerfectSquare() error {
 				return x
 			}
 		}
-		s.Raw = [3]Block{}
+		s.Raw = [3]umemory.Block{}
 	}
 	s.Active = false
 	s.cleanupCause = nil
@@ -147,11 +148,11 @@ func (m *IntegerManager) perfectSquareCall(op uint8, a, b, out *Int) (cause erro
 		cause = m.Div(a, b, out)
 	}
 	s := &m.PerfectSquare
-	if before == (ObjectRef{}) && m.PendingCell.Object != (ObjectRef{}) {
+	if before == (umemory.ObjectRef{}) && m.PendingCell.Object != (umemory.ObjectRef{}) {
 		s.pending = m.PendingCell.Object
 	}
 	after, e := m.Allocator.PendingRoots()
-	if raw == ([3]Block{}) && after != ([3]Block{}) {
+	if raw == ([3]umemory.Block{}) && after != ([3]umemory.Block{}) {
 		s.Raw = after
 	}
 	if e != nil {

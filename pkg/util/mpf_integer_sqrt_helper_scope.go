@@ -1,6 +1,8 @@
 // Source: src/util/mpf.cpp:951-1003 (lower, upper, mid, product, diff lifetimes).
 package util
 
+import umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type integerMPFSqrtHelperScope struct {
 	manager                        *IntegerManager
 	invocation                     uint64
@@ -52,7 +54,7 @@ func (s *integerMPFSqrtHelperScope) unbind() error {
 }
 func (m *IntegerManager) finishMyMPZSqrtSource() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.mySqrt
 	if s.executing || s.finishing {
@@ -87,7 +89,7 @@ func (m *IntegerManager) finishMyMPZSqrtSource() error {
 
 func (m *IntegerManager) CleanupMyMPZSqrt() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.mySqrt
 	if s.executing || s.finishing || m.Memory != nil && m.Memory.FailureTransportActive() {
@@ -97,7 +99,7 @@ func (m *IntegerManager) CleanupMyMPZSqrt() (cause error) {
 		return nil
 	}
 	if !s.valid() {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := s.bind(); e != nil {
 		return e

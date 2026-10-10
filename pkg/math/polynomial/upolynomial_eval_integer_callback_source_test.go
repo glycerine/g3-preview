@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialEvalSignIntActualCallbackOwnerAndTupleRefusal(t *testing.T) {
@@ -15,7 +16,7 @@ func TestUPolynomialEvalSignIntActualCallbackOwnerAndTupleRefusal(t *testing.T) 
 	var p *UPolynomialManager
 	armed := false
 	calls := 0
-	transport := func(f util.Failure) error {
+	transport := func(f umemory.Failure) error {
 		if !armed {
 			return f
 		}
@@ -77,7 +78,7 @@ func TestUPolynomialEvalSignIntActualCallbackOwnerAndTupleRefusal(t *testing.T) 
 		}
 		return f
 	}
-	var rt *util.Runtime
+	var rt *umemory.Runtime
 	c, p, rt = algebraicNegTLSFixture(t, transport)
 	z := c.config.Rationals.Integers()
 	poly := algebraicPolynomial(t, p, 1, math.MaxInt32, 1)
@@ -99,7 +100,7 @@ func TestUPolynomialEvalSignIntActualCallbackOwnerAndTupleRefusal(t *testing.T) 
 	if q.addMul.Frame != nil {
 		extra = append(extra, &q.addMul.Frame.Tmp)
 	}
-	algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, extra, []util.Block{held})
+	algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, extra, []umemory.Block{held})
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, p.cleanupIntegerEvaluation(false))
 	serviceMust(t, z.Del(&b))

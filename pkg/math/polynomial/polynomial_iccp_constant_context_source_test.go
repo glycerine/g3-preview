@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type iccpConstantContextProbe struct {
@@ -18,7 +19,7 @@ type iccpConstantContextProbe struct {
 
 var iccpConstantContextCurrent *iccpConstantContextProbe
 
-func iccpConstantContextTransport(f util.Failure) error {
+func iccpConstantContextTransport(f umemory.Failure) error {
 	probe := iccpConstantContextCurrent
 	if probe == nil {
 		return f
@@ -55,9 +56,9 @@ func iccpConstantContextTransport(f util.Failure) error {
 }
 func TestPolynomialICCPConstantActualExecutingContextForeignAndReusedNonce(t *testing.T) {
 	budget := arena.NewBudget(1 << 25)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, Transport: iccpConstantContextTransport})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, Transport: iccpConstantContextTransport})
 	serviceMust(t, e)
-	cfg := util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1, Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+	cfg := util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1, Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})

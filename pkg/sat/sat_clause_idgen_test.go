@@ -6,12 +6,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestSATClauseNativeIDFreeListAndLIFO(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
-	r, err := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, err := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	satOK(t, err)
 	a, err := NewSATClauseAllocator(satClauseAllocatorConfig{Storage: arena.SmallBytesConfig{Descriptors: arena.Config{Budget: b}}, OOMRuntime: r})
 	satOK(t, err)
@@ -40,7 +40,7 @@ func TestSATClauseNativeIDFreeListAndLIFO(t *testing.T) {
 
 func TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
-	r, err := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, err := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	satOK(t, err)
 	a, err := NewSATClauseAllocator(satClauseAllocatorConfig{Storage: arena.SmallBytesConfig{Descriptors: arena.Config{Budget: b}}, OOMRuntime: r})
 	satOK(t, err)
@@ -48,8 +48,8 @@ func TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips(t *testing.T) {
 	satOK(t, err)
 	b.FailAfter(0)
 	err = a.Delete(c)
-	var failure util.Failure
-	if !errors.As(err, &failure) || failure.Kind != util.FailureMemout || !r.State().OutOfMemory || !a.IsLive(c) || a.ids.FreeLen() != 0 {
+	var failure umemory.Failure
+	if !errors.As(err, &failure) || failure.Kind != umemory.FailureMemout || !r.State().OutOfMemory || !a.IsLive(c) || a.ids.FreeLen() != 0 {
 		t.Fatal("recycle-before-release prefix", err, r.State(), a.ids.FreeLen())
 	}
 	// Sticky source OOM skips free-list publication on retry, then permits the
@@ -68,7 +68,7 @@ func TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips(t *testing.T) {
 
 func TestSATClauseIDBorrowedOOMProviderLifetime(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
-	r, err := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, err := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	satOK(t, err)
 	a, err := NewSATClauseAllocator(satClauseAllocatorConfig{Storage: arena.SmallBytesConfig{Descriptors: arena.Config{Budget: b}}, OOMRuntime: r})
 	satOK(t, err)

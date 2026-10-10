@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialFactorToNumeralVectorTransportCannotRetireExecutingOwner(t *testing.T) {
@@ -23,7 +24,7 @@ func polynomialToNumeralVectorTransportCannotRetireExecutingOwner(t *testing.T, 
 			var output upolyVectorState
 			var captured polynomialFactorNumeralVectorReceipt
 			active, seen := false, false
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f util.Failure) error {
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 				if active {
 					seen = true
 					captured = full.factorNumeralVector.direct
@@ -84,7 +85,7 @@ func polynomialToNumeralVectorTransportCannotRetireExecutingOwner(t *testing.T, 
 			cfg.Memory = rt
 			q, e = util.NewRationalManager(util.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
-			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 			serviceMust(t, e)
 			full, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 			serviceMust(t, e)
@@ -118,7 +119,7 @@ func polynomialToNumeralVectorTransportCannotRetireExecutingOwner(t *testing.T, 
 			if !seen || !numericPhysicalReservationRefusal(cause) {
 				t.Fatal("actual SET returning transport", seen, cause)
 			}
-			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p}, []*util.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []util.Block{held})
+			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p}, []*util.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []umemory.Block{held})
 			serviceMust(t, rt.SetMaxSize(0))
 			serviceMust(t, full.cleanupFactorNumeralVector(&full.factorNumeralVector.direct, false))
 			serviceMust(t, full.upm.reset(&output))

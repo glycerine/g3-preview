@@ -6,13 +6,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatRoundYoungerStickyNUMStopsOlderClass(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	digits := make([]uint32, 63)
 	digits[0] = 1
@@ -39,7 +40,7 @@ func TestArbitraryFloatRoundYoungerStickyNUMStopsOlderClass(t *testing.T) {
 	if !errors.Is(returned, arena.ErrBounds) || s.sourceCause == nil || !s.capConstructed || !s.sigmaConstructed {
 		t.Fatal("recipe missed younger source NUM stop", returned, s.sourceCause, s.stickyConstructed, s.capConstructed, s.sigmaConstructed, rt.State())
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &sig, &x.significand, &s.sticky, &s.cap, &s.sigma)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{lane}, &sig, &x.significand, &s.sticky, &s.cap, &s.sigma)
 	if b.Used() != rt.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("before lift exact physical/cold graph")
 	}
@@ -79,13 +80,13 @@ func TestArbitraryFloatRoundYoungerStickyNUMStopsOlderClass(t *testing.T) {
 	contextTLSFinish(t, rt, func() error { return m.integer.Del(&sig) })
 	contextTLSFinish(t, rt, m.Close)
 	contextTLSFinish(t, rt, func() error {
-		if recovery == (Block{}) {
+		if recovery == (umemory.Block{}) {
 			return nil
 		}
 		return rt.Deallocate(&recovery)
 	})
 	contextTLSFinish(t, rt, func() error {
-		if lane == (Block{}) {
+		if lane == (umemory.Block{}) {
 			return nil
 		}
 		return rt.Deallocate(&lane)

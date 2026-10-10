@@ -7,12 +7,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestNumeralConstructionFailureOwnerMethodSets(t *testing.T) {
-	var _ ConstructionFailure = (*IntegerManager)(nil)
-	var _ ConstructionFailure = (*RationalManager)(nil)
-	var _ ConstructionFailure = (*RationalService)(nil)
+	var _ umemory.ConstructionFailure = (*IntegerManager)(nil)
+	var _ umemory.ConstructionFailure = (*RationalManager)(nil)
+	var _ umemory.ConstructionFailure = (*RationalService)(nil)
 }
 
 func TestIntegerFailedConstructorActualMemberUnwind(t *testing.T) {
@@ -20,13 +21,13 @@ func TestIntegerFailedConstructorActualMemberUnwind(t *testing.T) {
 		observed := false
 		for stop := int64(0); stop < 64; stop++ {
 			b := arena.NewBudget(1 << 24)
-			rt, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 			if e != nil {
 				t.Fatal(e)
 			}
 			baseline := b.Used()
 			b.FailAfter(stop)
-			profile := SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: !direct}
+			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: !direct}
 			m, e := NewIntegerManager(IntegerConfig{Memory: rt, Profile: profile, Cells: arena.Config{Budget: b, PageSize: 2}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b, PageSize: 2}}})
 			b.FailAfter(-1)
 			if e == nil {
@@ -37,15 +38,15 @@ func TestIntegerFailedConstructorActualMemberUnwind(t *testing.T) {
 				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal("original source allocation refusal", e)
 				}
-				var failed ConstructionFailure
+				var failed umemory.ConstructionFailure
 				if errors.As(e, &failed) {
 					partial, ok := failed.(*IntegerManager)
 					if !ok || partial.RuntimeOwner() != rt || partial.OriginalCause() == nil || partial.Unwrap() != partial.OriginalCause() || partial.SourceFinalizing || partial.SourceFinalized {
 						t.Fatal("failed constructor falsely invoked completed destructor", e)
 					}
 					original := partial.OriginalCause()
-					hasPrivateRoot := partial.Tmp != [2]NumericCellRef{} || partial.Arg != [2]NumericCellRef{} || partial.PendingCell.Object != (ObjectRef{})
-					candidate := hasPrivateRoot && ((direct && partial.CleanupCause() == nil && rt.Stats().LiveBlocks > 0) || (!direct && errors.Is(partial.CleanupCause(), ErrAllocatorIO)))
+					hasPrivateRoot := partial.Tmp != [2]NumericCellRef{} || partial.Arg != [2]NumericCellRef{} || partial.PendingCell.Object != (umemory.ObjectRef{})
+					candidate := hasPrivateRoot && ((direct && partial.CleanupCause() == nil && rt.Stats().LiveBlocks > 0) || (!direct && errors.Is(partial.CleanupCause(), umemory.ErrAllocatorIO)))
 					if candidate {
 						if partial.Natural != nil || partial.HeaderBytes == 0 || b.Used() <= baseline {
 							t.Fatal("member-unwind root/charged owner prefix")
@@ -55,12 +56,12 @@ func TestIntegerFailedConstructorActualMemberUnwind(t *testing.T) {
 								t.Fatal("successful member unwind lost direct roots or invented cleanup refusal")
 							}
 						} else {
-							if rt.Stats().LiveBlocks != 0 || !errors.Is(partial.CleanupCause(), ErrAllocatorIO) {
+							if rt.Stats().LiveBlocks != 0 || !errors.Is(partial.CleanupCause(), umemory.ErrAllocatorIO) {
 								t.Fatal("pool-free then source diagnostic prefix", partial.CleanupCause(), rt.Stats())
 							}
 						}
 						// Actual private scalar roots have not run the destructor del body.
-						if partial.Tmp == [2]NumericCellRef{} && partial.Arg == [2]NumericCellRef{} && partial.PendingCell.Object == (ObjectRef{}) {
+						if partial.Tmp == [2]NumericCellRef{} && partial.Arg == [2]NumericCellRef{} && partial.PendingCell.Object == (umemory.ObjectRef{}) {
 							t.Fatal("no real partial constructor allocation observed")
 						}
 					}
@@ -94,7 +95,7 @@ func TestIntegerFailedConstructorActualMemberUnwind(t *testing.T) {
 // unpublished Rational/Service header cannot hide in the total.
 func constructionFailureOwningCleanup(t *testing.T, e error, b *arena.Budget) {
 	t.Helper()
-	var failure ConstructionFailure
+	var failure umemory.ConstructionFailure
 	if !errors.As(e, &failure) {
 		return
 	}
@@ -119,7 +120,7 @@ func constructionFailureOwningCleanup(t *testing.T, e error, b *arena.Budget) {
 			}
 			v, err := m.Memory.ReadUint32(c.Backing.Raw, c.Backing.Offset+4)
 			if c.Released {
-				if !errors.Is(err, ErrRuntimeOwner) {
+				if !errors.Is(err, umemory.ErrRuntimeOwner) {
 					t.Fatal("released source pooled root still physically live", i, err)
 				}
 			} else if err != nil || v != c.Capacity {

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // The returning allocation transport lifts that allocation fault and arms the
@@ -16,10 +17,10 @@ func TestArbitraryFloatExponentRationalSetReachedRoundNUMStop(t *testing.T) {
 	for ordinal := int64(0); ordinal < 90; ordinal++ {
 		b := arena.NewBudget(1 << 28)
 		var m *ArbitraryFloatManager
-		var rt *Runtime
-		var lane Block
+		var rt *umemory.Runtime
+		var lane umemory.Block
 		armed, target := false, false
-		rt0, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+		rt0, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 			if armed && m.RoundScope.executing && m.RoundScope.stickyConstructed && m.RoundScope.sticky.Cell != 0 {
 				armed = false
 				target = true
@@ -37,7 +38,7 @@ func TestArbitraryFloatExponentRationalSetReachedRoundNUMStop(t *testing.T) {
 		}})
 		serviceMust(t, e)
 		rt = rt0
-		m, e = NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e = NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		q := NewRational()
 		ex := NewInt(-5000)
@@ -57,7 +58,7 @@ func TestArbitraryFloatExponentRationalSetReachedRoundNUMStop(t *testing.T) {
 			if r.sourceCause != arena.ErrBounds || !r.stickyConstructed || !r.capConstructed || !r.sigmaConstructed || s.sourceCause != r.sourceCause || !s.sqLive || !s.tLive || !s.pLive || !s.expLive || !s.sigLive || !errors.Is(body, r.sourceCause) {
 				t.Fatalf("target reached but suffix differs ordinal%d body%v child%v flags%v/%v/%v parent%v", ordinal, body, r.sourceCause, r.stickyConstructed, r.capConstructed, r.sigmaConstructed, s.sourceCause)
 			}
-			integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &q.Num, &q.Den, &out.significand, &r.sigma, &r.cap, &r.sticky, &s.sig.Num, &s.sig.Den, &s.exp, &s.p, &s.p2, &s.prev, &s.t.Num, &s.t.Den, &s.sq.Num, &s.sq.Den, &m.rational.NTmp, &m.rational.AddTmp1, &m.rational.AddTmp2, &m.rational.LtTmp1.Num, &m.rational.LtTmp1.Den, &m.rational.LtTmp2.Num, &m.rational.LtTmp2.Den)
+			integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{lane}, &q.Num, &q.Den, &out.significand, &r.sigma, &r.cap, &r.sticky, &s.sig.Num, &s.sig.Den, &s.exp, &s.p, &s.p2, &s.prev, &s.t.Num, &s.t.Den, &s.sq.Num, &s.sq.Den, &m.rational.NTmp, &m.rational.AddTmp1, &m.rational.AddTmp2, &m.rational.LtTmp1.Num, &m.rational.LtTmp1.Den, &m.rational.LtTmp2.Num, &m.rational.LtTmp2.Den)
 			if b.Used() != rt.Stats().TotalBytes+m.OwnedStorageBytes() {
 				t.Fatal("before TLS recovery named physical/cold graph")
 			}
@@ -74,13 +75,13 @@ func TestArbitraryFloatExponentRationalSetReachedRoundNUMStop(t *testing.T) {
 			serviceMust(t, m.rational.Del(&q))
 			serviceMust(t, m.Close())
 			contextTLSFinish(t, rt, func() error {
-				if lane == (Block{}) {
+				if lane == (umemory.Block{}) {
 					return nil
 				}
 				return rt.Deallocate(&lane)
 			})
 			contextTLSFinish(t, rt, func() error {
-				if recovery == (Block{}) {
+				if recovery == (umemory.Block{}) {
 					return nil
 				}
 				return rt.Deallocate(&recovery)

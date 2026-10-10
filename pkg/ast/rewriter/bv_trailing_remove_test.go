@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -96,8 +97,8 @@ func TestBVTrailingRemovalEveryOwnerAndFactoryReservation(t *testing.T) {
 				if body != nil {
 					failures++
 					if !errors.Is(body, arena.ErrInjectedFailure) {
-						var f util.Failure
-						if !errors.As(body, &f) || f.Kind != util.FailureMemout {
+						var f umemory.Failure
+						if !errors.As(body, &f) || f.Kind != umemory.FailureMemout {
 							t.Fatal("unexpected refusal", body)
 						}
 					}
@@ -495,9 +496,9 @@ func TestBVTrailingRemovalActualRuntimeNumeralChild(t *testing.T) {
 	for ordinal := int64(0); ordinal < 256; ordinal++ {
 		t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
 			b := arena.NewBudget(1 << 28)
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, Transport: func(f util.Failure) error { return f }})
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, Transport: func(f umemory.Failure) error { return f }})
 			satOK(t, e)
-			q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+			q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 			satOK(t, e)
 			sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 			satOK(t, e)
@@ -559,8 +560,8 @@ func TestBVTrailingRemovalActualRuntimeNumeralChild(t *testing.T) {
 			if body != nil {
 				failures++
 				if !errors.Is(body, arena.ErrInjectedFailure) {
-					var f util.Failure
-					if !errors.As(body, &f) || f.Kind != util.FailureMemout {
+					var f umemory.Failure
+					if !errors.As(body, &f) || f.Kind != umemory.FailureMemout {
 						t.Fatal("unexpected actual refusal", body)
 					}
 				}

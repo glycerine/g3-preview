@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math"
 	"math/big"
 	"testing"
@@ -167,9 +168,9 @@ func TestRationalSignedFractionSourceWarmReinitialization(t *testing.T) {
 
 func TestRationalSignedFractionSourceNumeratorReleaseStopsPublication(t *testing.T) {
 	budget := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 	serviceMust(t, e)
 	a := NewRational()
 	digits := make([]uint32, 125)
@@ -192,7 +193,7 @@ func TestRationalSignedFractionSourceNumeratorReleaseStopsPublication(t *testing
 	if e := m.rational.SetFractionSignedSource(&a, -3, 7); !errors.Is(e, arena.ErrInvalidSlot) || r.State() != state || budget.Used() != used || a != old {
 		t.Fatal("released source replay", e)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &a.Num, &a.Den, &m.rational.NTmp)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{lane}, &a.Num, &a.Den, &m.rational.NTmp)
 	if budget.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes {
 		t.Fatal("signed setter source stop graph", budget.Used())
 	}
@@ -201,9 +202,9 @@ func TestRationalSignedFractionSourceNumeratorReleaseStopsPublication(t *testing
 	contextTLSFinish(t, r, func() error { return m.integer.CleanupRawNumeral(&a.Num) })
 	contextTLSFinish(t, r, func() error { return m.integer.CleanupRawNumeral(&a.Den) })
 	contextTLSFinish(t, r, m.Close)
-	for _, block := range []*Block{&lane, &recovery} {
+	for _, block := range []*umemory.Block{&lane, &recovery} {
 		contextTLSFinish(t, r, func() error {
-			if *block == (Block{}) {
+			if *block == (umemory.Block{}) {
 				return nil
 			}
 			return r.Deallocate(block)

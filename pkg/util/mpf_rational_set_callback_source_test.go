@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatExponentRationalSetCallbackOwnerRefusal(t *testing.T) {
@@ -15,7 +16,7 @@ func TestArbitraryFloatExponentRationalSetCallbackOwnerRefusal(t *testing.T) {
 	ex := NewInt(0)
 	armed := false
 	calls := 0
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			t.Logf("actual callback flags value=%v copy=%v raw=%v", m.valueExecuting, m.integer.CopyAllocation.Executing, m.integer.rawInvocationExecuting())
@@ -36,7 +37,7 @@ func TestArbitraryFloatExponentRationalSetCallbackOwnerRefusal(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	serviceMust(t, m.rational.SetFraction(&q, 3, 2))
 	pad, e := rt.Allocate(uint64(99990 - rt.State().LocalSize - 8))
@@ -48,7 +49,7 @@ func TestArbitraryFloatExponentRationalSetCallbackOwnerRefusal(t *testing.T) {
 	if body == nil || calls != 1 {
 		t.Fatal("reached real SET Power allocation", body, calls)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &q.Num, &q.Den, &out.significand, &m.rationalSet.sig.Num, &m.rationalSet.sig.Den, &m.rationalSet.exp, &m.rationalSet.p, &m.rationalSet.t.Num, &m.rationalSet.t.Den, &m.rationalSet.sq.Num, &m.rationalSet.sq.Den, &m.rational.LtTmp1.Num, &m.rational.LtTmp1.Den, &m.rational.LtTmp2.Num, &m.rational.LtTmp2.Den)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &q.Num, &q.Den, &out.significand, &m.rationalSet.sig.Num, &m.rationalSet.sig.Den, &m.rationalSet.exp, &m.rationalSet.p, &m.rationalSet.t.Num, &m.rationalSet.t.Den, &m.rationalSet.sq.Num, &m.rationalSet.sq.Den, &m.rational.LtTmp1.Num, &m.rational.LtTmp1.Den, &m.rational.LtTmp2.Num, &m.rational.LtTmp2.Den)
 	if b.Used() != rt.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("before-lift exact cold graph")
 	}

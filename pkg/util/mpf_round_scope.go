@@ -2,14 +2,18 @@
 // Source: src/util/mpf.cpp:1963-2098.
 package util
 
+import
+
 // Actual lexical NUM storage is reflected in the MPF owner header. Declaration
 // flags change only at literal reached constructors; sticky is branch-scoped.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type ArbitraryFloatRoundScope struct {
 	parentFormattedSet integerAllocationInvocationContext
 	receipt            *ArbitraryFloatRoundReceipt
 	Numeric            NumericAllocationRoots
 	history            *arbitraryFloatRoundHistory
-	Transferred        SmallAllocatorPendingAllocation
+	Transferred        umemory.SmallAllocatorPendingAllocation
 	cellRetired        bool
 
 	Manager                                             *ArbitraryFloatManager
@@ -28,7 +32,7 @@ func (m *ArbitraryFloatManager) finishRoundSqrtSource() error {
 }
 func (m *ArbitraryFloatManager) finishRoundScopeSource(s *ArbitraryFloatRoundScope) error {
 	if m == nil || m.self != m || (s != &m.RoundScope && s != &m.RoundSqrtScope) {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.sourceCause != nil {
 		return s.sourceCause
@@ -54,7 +58,7 @@ func (m *ArbitraryFloatManager) finishRoundScopeSource(s *ArbitraryFloatRoundSco
 			*a.constructed = false
 		}
 	}
-	s.active = NumericAllocationPending(&s.Numeric) || s.Transferred.Block() != (Block{})
+	s.active = NumericAllocationPending(&s.Numeric) || s.Transferred.Block() != (umemory.Block{})
 
 	if !s.active && s.history != nil {
 		s.history.owned = true
@@ -69,7 +73,7 @@ func (m *ArbitraryFloatManager) CleanupRound() error {
 }
 func (m *ArbitraryFloatManager) CleanupRoundWithReceipt(r *ArbitraryFloatRoundReceipt, abort bool) error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	return m.cleanupRoundScope(&m.RoundScope, r, abort)
 }
@@ -81,16 +85,16 @@ func (m *ArbitraryFloatManager) CleanupRoundSqrt() error {
 }
 func (m *ArbitraryFloatManager) CleanupRoundSqrtWithReceipt(r *ArbitraryFloatRoundReceipt, abort bool) error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	return m.cleanupRoundScope(&m.RoundSqrtScope, r, abort)
 }
 func (m *ArbitraryFloatManager) cleanupRoundScope(s *ArbitraryFloatRoundScope, r *ArbitraryFloatRoundReceipt, abort bool) error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s != &m.RoundScope && s != &m.RoundSqrtScope {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {
 		return ErrNumericPending
@@ -108,7 +112,7 @@ func (m *ArbitraryFloatManager) cleanupRoundScope(s *ArbitraryFloatRoundScope, r
 			return nil
 		}
 		if s.history != h || s.Invocation != h.invocation {
-			return ErrRuntimeOwner
+			return umemory.ErrRuntimeOwner
 		}
 	}
 	if s.Manager == nil {

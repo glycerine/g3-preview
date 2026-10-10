@@ -5,13 +5,14 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Actual source-invisible allocation prefixes of an invoked numeric leaf.
 // Identity comes from the returned physical tokens, never manager activity.
 type NumericAllocationRoots struct {
 	Cell      SourceCellBacking
-	Allocator [3]Block
+	Allocator [3]umemory.Block
 }
 
 func CaptureNumericAllocationRoots(z *IntegerManager) (NumericAllocationRoots, error) {
@@ -20,7 +21,7 @@ func CaptureNumericAllocationRoots(z *IntegerManager) (NumericAllocationRoots, e
 }
 
 func (r *NumericAllocationRoots) After(z *IntegerManager, before NumericAllocationRoots) error {
-	if z.PendingCell.Object != (ObjectRef{}) && z.PendingCell != before.Cell {
+	if z.PendingCell.Object != (umemory.ObjectRef{}) && z.PendingCell != before.Cell {
 		r.Cell = z.PendingCell
 	}
 	roots, e := z.Allocator.PendingRoots()
@@ -28,7 +29,7 @@ func (r *NumericAllocationRoots) After(z *IntegerManager, before NumericAllocati
 		return e
 	}
 	for i := range roots {
-		if roots[i] != (Block{}) && roots[i] != before.Allocator[i] {
+		if roots[i] != (umemory.Block{}) && roots[i] != before.Allocator[i] {
 			r.Allocator[i] = roots[i]
 		}
 	}
@@ -36,7 +37,7 @@ func (r *NumericAllocationRoots) After(z *IntegerManager, before NumericAllocati
 }
 
 func (r *NumericAllocationRoots) Cleanup(z *IntegerManager) error {
-	if r.Cell.Object != (ObjectRef{}) {
+	if r.Cell.Object != (umemory.ObjectRef{}) {
 		if z.PendingCell == r.Cell {
 			e := z.cleanupPendingAllocation()
 			// Tracked deallocation can physically complete before reporting failure.
@@ -55,7 +56,7 @@ func (r *NumericAllocationRoots) Cleanup(z *IntegerManager) error {
 	owned := false
 	foreign := false
 	for i := range roots {
-		if roots[i] != (Block{}) {
+		if roots[i] != (umemory.Block{}) {
 			if roots[i] == r.Allocator[i] {
 				owned = true
 			} else {
@@ -80,7 +81,7 @@ func (r *NumericAllocationRoots) Cleanup(z *IntegerManager) error {
 	// A replacement or externally consumed token does not grant cleanup authority.
 	for i := range roots {
 		if roots[i] != r.Allocator[i] {
-			r.Allocator[i] = Block{}
+			r.Allocator[i] = umemory.Block{}
 		}
 	}
 	return nil
@@ -122,9 +123,9 @@ func SourceNumeralDel(z *IntegerManager, a *Int) (bool, error) {
 
 // PendingObject and PendingAllocatorBlocks expose the exact retained tokens
 // for caller diagnostics. They acquire no authority over replacement roots.
-func (r *NumericAllocationRoots) PendingObject() ObjectRef         { return r.Cell.Object }
-func (r *NumericAllocationRoots) PendingAllocatorBlocks() [3]Block { return r.Allocator }
-func (m *IntegerManager) PendingAllocationObject() ObjectRef       { return m.PendingCell.Object }
+func (r *NumericAllocationRoots) PendingObject() umemory.ObjectRef         { return r.Cell.Object }
+func (r *NumericAllocationRoots) PendingAllocatorBlocks() [3]umemory.Block { return r.Allocator }
+func (m *IntegerManager) PendingAllocationObject() umemory.ObjectRef       { return m.PendingCell.Object }
 
 // SourceAllocator borrows the numeric manager's actual utility allocator.
-func (m *IntegerManager) SourceAllocator() *SmallAllocator { return m.Allocator }
+func (m *IntegerManager) SourceAllocator() *umemory.SmallAllocator { return m.Allocator }

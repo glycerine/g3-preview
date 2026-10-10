@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialScalarExactDivCompiledAssertionCapturesActualBoolNUM(t *testing.T) {
@@ -66,11 +67,11 @@ func TestPolynomialScalarExactDivCompiledAssertionBIGRefusalPrefixes(t *testing.
 		pending := z.PendingCell
 		raw, e := z.SourceAllocator().PendingRoots()
 		serviceMust(t, e)
-		acquired := pending.Object != (util.ObjectRef{}) || raw != ([3]util.Block{})
+		acquired := pending.Object != (umemory.ObjectRef{}) || raw != ([3]umemory.Block{})
 
 		if acquired || child.Pending(z) {
 			saw = true
-			if !s.active || !z.MatchesDividesNumeralInvocation(&s.boolNumeral) || pending.Object != (util.ObjectRef{}) && child.Numeric.Cell != pending || raw != ([3]util.Block{}) && child.Numeric.Allocator != raw {
+			if !s.active || !z.MatchesDividesNumeralInvocation(&s.boolNumeral) || pending.Object != (umemory.ObjectRef{}) && child.Numeric.Cell != pending || raw != ([3]umemory.Block{}) && child.Numeric.Allocator != raw {
 				t.Fatal("actual bool refused acquisition lacks active scalar child", prefix)
 			}
 		}

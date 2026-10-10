@@ -3,6 +3,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Divides returns a boolean after its NUM/ref suffix. Its R rows remain in
@@ -22,12 +23,12 @@ func (b *polynomialSOM) transferArithmeticRowsToMember(r *polynomialArithmeticIn
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
-	if s.transportBound || s.singleton != (Monomial{}) || s.generated != (Monomial{}) || s.calleeGeneration != 0 || (m.monomials.matchesMonomialAllocatorInvocation(&s.monomialAllocator) && s.monomialAllocator.outcome.Pending != (util.Block{})) || s.numeric.PendingObject().OwnerID() != 0 || s.numeric.PendingAllocatorBlocks() != ([3]util.Block{}) || m.matchesFactoryInvocation(&s.factory) || m.modular.MatchesPNormalizeInvocation(&s.normalize) || m.integer.MatchesAddMulInvocation(&s.addMul) {
+	if s.transportBound || s.singleton != (Monomial{}) || s.generated != (Monomial{}) || s.calleeGeneration != 0 || (m.monomials.matchesMonomialAllocatorInvocation(&s.monomialAllocator) && s.monomialAllocator.outcome.Pending != (umemory.Block{})) || s.numeric.PendingObject().OwnerID() != 0 || s.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) || m.matchesFactoryInvocation(&s.factory) || m.modular.MatchesPNormalizeInvocation(&s.normalize) || m.integer.MatchesAddMulInvocation(&s.addMul) {
 		return ErrPolynomialPending
 	}
 	a := &b.appendScope
 	if a.active {
-		if !b.matchesAppendInvocation(&s.append) || a.pending != (Monomial{}) || a.movingCoefficient != (util.Int{}) || a.numeric.PendingObject().OwnerID() != 0 || a.numeric.PendingAllocatorBlocks() != ([3]util.Block{}) || a.retirePhase != 0 || a.stopped {
+		if !b.matchesAppendInvocation(&s.append) || a.pending != (Monomial{}) || a.movingCoefficient != (util.Int{}) || a.numeric.PendingObject().OwnerID() != 0 || a.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) || a.retirePhase != 0 || a.stopped {
 			return ErrPolynomialPending
 		}
 		// The per-slot acquisition tags are the authority. Claim counters are

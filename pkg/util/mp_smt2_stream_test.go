@@ -3,6 +3,7 @@ package util
 
 import (
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math/big"
 	"math/rand/v2"
 	"testing"
@@ -101,7 +102,7 @@ func TestRationalSMT2StreamAuthorityAndPreconditions(t *testing.T) {
 		t.Fatal("nil stream began child", e)
 	}
 	copied := *m.rational
-	if e := copied.DisplaySMT2Into(&out, &a, false); !errors.Is(e, ErrRuntimeOwner) {
+	if e := copied.DisplaySMT2Into(&out, &a, false); !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("copied rational owner", e)
 	}
 	serviceMust(t, m.rational.DisplaySMT2Into(&out, &a, false))

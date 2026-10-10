@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Returning Go transport is an adapter profile, not a native callback claim.
@@ -28,7 +29,7 @@ func TestRationalServiceModActualTransportRefusesHeldOwner(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	var s *RationalService
 	active, calls := false, 0
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			calls++
 			used, stage := b.Used(), s.cleanupStage
@@ -47,7 +48,7 @@ func TestRationalServiceModActualTransportRefusesHeldOwner(t *testing.T) {
 	serviceMust(t, e)
 	cfg := serviceConfig(b)
 	cfg.Integers.Memory = rt
-	cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	s, e = NewRationalService(cfg)
 	serviceMust(t, e)
 	a, e := s.NewValue()
@@ -80,7 +81,7 @@ func TestRationalServiceModActualTransportRefusesHeldOwner(t *testing.T) {
 	for i := uint8(0); i < s.Lexical.Count; i++ {
 		roots = append(roots, &s.Lexical.Roots[i].Num, &s.Lexical.Roots[i].Den)
 	}
-	integerPhysicalAuditWithRaw(t, s.Manager.Z, []Block{held}, roots...)
+	integerPhysicalAuditWithRaw(t, s.Manager.Z, []umemory.Block{held}, roots...)
 	if want := s.HeaderBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); b.Used() != want {
 		t.Fatal("actual cold graph before limit lift", b.Used(), want)
 	}

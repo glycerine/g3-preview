@@ -6,16 +6,17 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Explicit malformed physical requested-size guard, not source-valid malloc
 // exhaustion: actual ILP32 deallocation refuses before physical release.
-func rawArithmeticGuardOwner(t *testing.T) (*RationalManager, *arena.Budget, *Runtime) {
+func rawArithmeticGuardOwner(t *testing.T) (*RationalManager, *arena.Budget, *umemory.Runtime) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 32})
 	serviceMust(t, e)
-	m, e := NewRationalManager(RationalConfig{Synchronized: true, Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 32, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
+	m, e := NewRationalManager(RationalConfig{Synchronized: true, Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 32, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		serviceMust(t, m.CloseChecked())

@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Actual returned-factory incoming INC precedes the old result DEC callback.
@@ -15,7 +16,7 @@ import (
 // release-stop proof, not defined C++ exhaustion or a mathematical defect.
 func TestPolynomialDiscriminantStrictLeadingNUMStopKeepsOlderPrimeAndCause(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
@@ -42,8 +43,8 @@ func TestPolynomialDiscriminantStrictLeadingNUMStopKeepsOlderPrimeAndCause(t *te
 	serviceMust(t, pr.Assign(p))
 	out, e := NewPolynomialRef(c)
 	serviceMust(t, e)
-	var lane, recovery util.Block
-	var lcObject util.ObjectRef
+	var lane, recovery umemory.Block
+	var lcObject umemory.ObjectRef
 	var lcBefore util.Int
 	var primeBefore Polynomial
 	calls := 0
@@ -88,8 +89,8 @@ func TestPolynomialDiscriminantStrictLeadingNUMStopKeepsOlderPrimeAndCause(t *te
 		return []Polynomial{pr.root.value, out.root.value, out.root.incoming, s.refs[0].value, s.refs[1].value}
 	}
 	audit := func() {
-		raws := []util.Block{lane}
-		if recovery != (util.Block{}) {
+		raws := []umemory.Block{lane}
+		if recovery != (umemory.Block{}) {
 			raws = append(raws, recovery)
 		}
 		polynomialImpPhysicalAuditNamedRaw(t, m, values(), []*util.Int{&leading, &s.lc}, pr.header+out.header+h.header, raws)
@@ -138,7 +139,7 @@ func TestPolynomialDiscriminantStrictLeadingNUMStopKeepsOlderPrimeAndCause(t *te
 	serviceMust(t, m.CloseChecked())
 	serviceMust(t, q.CloseChecked())
 	e = rt.Deallocate(&recovery)
-	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal("real recovery block physical consumption", e)
 	}
 	contextTLSFinish(t, rt, rt.Close)

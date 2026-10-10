@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatRoundReachedNumericLeafAuthority(t *testing.T) {
@@ -12,7 +13,7 @@ func TestArbitraryFloatRoundReachedNumericLeafAuthority(t *testing.T) {
 	refusal := false
 	for ordinal := int64(0); ordinal < 100; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		// Warm only the literal member caches used by the tiny-denormal branch.
 		for _, n := range []uint32{2004, 2002, 2000, 1999} {
@@ -39,14 +40,14 @@ func TestArbitraryFloatRoundReachedNumericLeafAuthority(t *testing.T) {
 		if b.Used() != m.integer.Memory.Stats().TotalBytes+m.OwnedStorageBytes() {
 			t.Fatal("before lift actual round cold graph", ordinal)
 		}
-		if body != nil && m.integer.PendingCell.Object != (ObjectRef{}) && s.Numeric.Cell != m.integer.PendingCell {
+		if body != nil && m.integer.PendingCell.Object != (umemory.ObjectRef{}) && s.Numeric.Cell != m.integer.PendingCell {
 			t.Fatal("actual reached rounding NUM leaf lost direct frame authority", ordinal, body, m.integer.PendingCell)
 		}
 
 		pending, e := m.integer.Allocator.PendingRoots()
 		serviceMust(t, e)
 		for i, p := range pending {
-			if body != nil && p != (Block{}) && s.Numeric.Allocator[i] != p {
+			if body != nil && p != (umemory.Block{}) && s.Numeric.Allocator[i] != p {
 				t.Fatal("actual allocator returned failure prefix uncaptured", ordinal, body, i, p)
 			}
 		}

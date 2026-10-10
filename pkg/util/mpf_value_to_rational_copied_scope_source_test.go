@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Invalid copied Go owner metadata is distinct from a numerical source prefix.
 func TestArbitraryFloatToRationalCopiedParentCannotAbortChild(t *testing.T) {
 	for ordinal := int64(0); ordinal < 64; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		cfg := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+		cfg := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 		m, e := NewArbitraryFloatManager(cfg)
 		serviceMust(t, e)
 		qm, e := NewRationalManager(RationalConfig{Integers: cfg})
@@ -31,7 +32,7 @@ func TestArbitraryFloatToRationalCopiedParentCannotAbortChild(t *testing.T) {
 			child := *s.outputGCD.Frame
 			used := b.Used()
 			state := qm.Z.Memory.State()
-			if e := m.cleanupRationalConversionOutput(&copied, true); e != ErrRuntimeOwner {
+			if e := m.cleanupRationalConversionOutput(&copied, true); e != umemory.ErrRuntimeOwner {
 				t.Fatal("copied parent adopted exact child", ordinal, e)
 			}
 			if s.outputGCD.Frame.Values != child.Values || s.outputGCD.Frame.cursor != child.cursor || s.outputGCD.Frame.Active != child.Active || b.Used() != used || qm.Z.Memory.State() != state {

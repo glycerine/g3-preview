@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
@@ -11,8 +12,8 @@ import (
 // after all negative-branch insertions, before the older rational continuation.
 type smt2StopBeforeTemporaryDT struct {
 	inner   *OwnedStringStream
-	runtime *Runtime
-	lane    *Block
+	runtime *umemory.Runtime
+	lane    *umemory.Block
 	t       *testing.T
 	armed   bool
 }
@@ -37,9 +38,9 @@ func (s *smt2StopBeforeTemporaryDT) AppendCString(v string) error {
 
 func TestRationalSMT2StreamNegativeSourceStopProtectsContinuation(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	a := Rational{Num: NewInt(-1), Den: NewInt(3)}
 	serviceMust(t, m.integer.Mul2kInPlace(&a.Num, 4000))
@@ -69,7 +70,7 @@ func TestRationalSMT2StreamNegativeSourceStopProtectsContinuation(t *testing.T) 
 	if r.State() != state || b.Used() != used || a != old || p.child != child || m.rational.SourceFinalized {
 		t.Fatal("stopped source changed older owner")
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &a.Num, &a.Den, &s.tmp)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{lane}, &a.Num, &a.Den, &s.tmp)
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+out.Buffer.String.StorageBytes() {
 		t.Fatal("immediate source-stop graph", b.Used())
 	}
@@ -88,9 +89,9 @@ func TestRationalSMT2StreamNegativeSourceStopProtectsContinuation(t *testing.T) 
 	contextTLSFinish(t, r, func() error { return m.integer.CleanupRawNumeral(&a.Num) })
 	contextTLSFinish(t, r, func() error { return m.integer.CleanupRawNumeral(&a.Den) })
 	contextTLSFinish(t, r, m.Close)
-	for _, v := range []*Block{&lane, &recovery} {
+	for _, v := range []*umemory.Block{&lane, &recovery} {
 		contextTLSFinish(t, r, func() error {
-			if *v == (Block{}) {
+			if *v == (umemory.Block{}) {
 				return nil
 			}
 			return r.Deallocate(v)

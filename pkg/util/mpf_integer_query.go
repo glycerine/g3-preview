@@ -1,9 +1,13 @@
 // Source: src/util/mpf.cpp:1795-1819; src/util/mpf.h:183.
 package util
 
+import
+
 // The reached scoped_mpz is actual storage in its parent owner. Its captured
 // SET receipt identifies the precise younger allocation; diagnostic metadata
 // and cached powers are not used as substitute temporary owners.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type arbitraryFloatIntegerQueryScope struct {
 	t                                         Int
 	copy                                      integerCopyAllocationReceipt
@@ -62,7 +66,7 @@ func (m *ArbitraryFloatManager) IsInt(x *ArbitraryFloat) (result bool, cause err
 
 func (m *ArbitraryFloatManager) finishIntegerQuerySource() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.integerQuery
 	if s.executing || s.finishing {
@@ -91,7 +95,7 @@ func (m *ArbitraryFloatManager) finishIntegerQuerySource() error {
 // numeral. It never replays the query or changes the const input.
 func (m *ArbitraryFloatManager) CleanupIntegerQuery() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.integerQuery
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {

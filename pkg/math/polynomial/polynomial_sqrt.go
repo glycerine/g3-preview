@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Four actual scoped numerals, one RAW numeral, and the actual monomial_ref.
@@ -25,8 +26,8 @@ type polynomialSquareRootScope struct {
 	drain                                uint32
 	perfectSquare                        util.IntegerPerfectSquareInvocationReceipt
 	factoryGeneration, calleeGeneration  uint64
-	numericPending                       util.ObjectRef
-	integerRaw, monomialRaw              [3]util.Block
+	numericPending                       umemory.ObjectRef
+	integerRaw, monomialRaw              [3]umemory.Block
 	freshResult                          Polynomial
 	bodyCause, sourceCause, cleanupCause error
 }
@@ -151,9 +152,9 @@ func (m *MultivariatePolynomialManager) squareRootMonomial(op uint8, a, b Monomi
 		l.squareRootCohort = s
 		l.squareRootSlot = idx
 	}
-	if before == ([3]util.Block{}) {
+	if before == ([3]umemory.Block{}) {
 		after, x := c.monomials.allocator.PendingRoots()
-		if after != ([3]util.Block{}) {
+		if after != ([3]umemory.Block{}) {
 			s.monomialRaw = after
 		}
 		if x != nil {
@@ -186,12 +187,12 @@ func (m *MultivariatePolynomialManager) squareRootNumeral(op uint8, a, b, out *u
 	case 4:
 		e = c.modular.Div(a, b, out)
 	}
-	if pending == (util.ObjectRef{}) && z.PendingAllocationObject() != (util.ObjectRef{}) {
+	if pending == (umemory.ObjectRef{}) && z.PendingAllocationObject() != (umemory.ObjectRef{}) {
 		s.numericPending = z.PendingAllocationObject()
 	}
-	if raw == ([3]util.Block{}) {
+	if raw == ([3]umemory.Block{}) {
 		after, x := z.SourceAllocator().PendingRoots()
-		if after != ([3]util.Block{}) {
+		if after != ([3]umemory.Block{}) {
 			s.integerRaw = after
 		}
 		if x != nil {
@@ -212,12 +213,12 @@ func (m *MultivariatePolynomialManager) squareRootAdd(b *polynomialSOM, a *util.
 		return e
 	}
 	e = b.add(a, t, false)
-	if pending == (util.ObjectRef{}) && z.PendingAllocationObject() != (util.ObjectRef{}) {
+	if pending == (umemory.ObjectRef{}) && z.PendingAllocationObject() != (umemory.ObjectRef{}) {
 		s.numericPending = z.PendingAllocationObject()
 	}
-	if raw == ([3]util.Block{}) {
+	if raw == ([3]umemory.Block{}) {
 		after, x := z.SourceAllocator().PendingRoots()
-		if after != ([3]util.Block{}) {
+		if after != ([3]umemory.Block{}) {
 			s.integerRaw = after
 		}
 		if x != nil {
@@ -277,7 +278,7 @@ func (m *MultivariatePolynomialManager) finishSquareRoot(cause error) error {
 		}
 		s.stage++
 	}
-	if cause == nil && s.freshResult == (Polynomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.numericPending == (util.ObjectRef{}) && s.integerRaw == ([3]util.Block{}) && s.monomialRaw == ([3]util.Block{}) {
+	if cause == nil && s.freshResult == (Polynomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.numericPending == (umemory.ObjectRef{}) && s.integerRaw == ([3]umemory.Block{}) && s.monomialRaw == ([3]umemory.Block{}) {
 		s.active = false
 	}
 	return cause
@@ -609,21 +610,21 @@ func (m *MultivariatePolynomialManager) cleanupSqrtModeOwned(abort bool, invocat
 	if e := m.cleanupSqrtOrphanInvocation(invocation, cursor); e != nil {
 		return e
 	}
-	if s.numericPending != (util.ObjectRef{}) {
+	if s.numericPending != (umemory.ObjectRef{}) {
 		if c.integer.PendingAllocationObject() == s.numericPending {
 			if e := c.integer.CleanupPendingAllocation(); e != nil {
 				s.cleanupCause = e
 				return e
 			}
 		}
-		s.numericPending = util.ObjectRef{}
+		s.numericPending = umemory.ObjectRef{}
 	}
-	for i, allocator := range [2]*util.SmallAllocator{c.integer.SourceAllocator(), c.monomials.allocator} {
+	for i, allocator := range [2]*umemory.SmallAllocator{c.integer.SourceAllocator(), c.monomials.allocator} {
 		receipt := &s.integerRaw
 		if i == 1 {
 			receipt = &s.monomialRaw
 		}
-		if *receipt == ([3]util.Block{}) {
+		if *receipt == ([3]umemory.Block{}) {
 			continue
 		}
 		now, e := allocator.PendingRoots()
@@ -634,8 +635,8 @@ func (m *MultivariatePolynomialManager) cleanupSqrtModeOwned(abort bool, invocat
 			e = allocator.CleanupPending()
 			after, x := allocator.PendingRoots()
 			for j := range receipt {
-				if after[j] == (util.Block{}) {
-					receipt[j] = util.Block{}
+				if after[j] == (umemory.Block{}) {
+					receipt[j] = umemory.Block{}
 				}
 			}
 			if e != nil {
@@ -646,7 +647,7 @@ func (m *MultivariatePolynomialManager) cleanupSqrtModeOwned(abort bool, invocat
 				return x
 			}
 		}
-		*receipt = [3]util.Block{}
+		*receipt = [3]umemory.Block{}
 	}
 	s.active = false
 	s.cleanupCause = nil

@@ -5,11 +5,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatToRationalAllocatedHistorySurvivesInlineCall(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	cfg := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+	cfg := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 	m, e := NewArbitraryFloatManager(cfg)
 	serviceMust(t, e)
 	qm, e := NewRationalManager(RationalConfig{Integers: cfg})

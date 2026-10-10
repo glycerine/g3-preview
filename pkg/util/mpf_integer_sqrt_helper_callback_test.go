@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestMyMPZSqrtReturningTransportAndOwnerGuards(t *testing.T) {
@@ -13,7 +14,7 @@ func TestMyMPZSqrtReturningTransportAndOwnerGuards(t *testing.T) {
 	var z *IntegerManager
 	input, out := NewInt(1), NewInt(7)
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			s := &z.mySqrt
@@ -39,7 +40,7 @@ func TestMyMPZSqrtReturningTransportAndOwnerGuards(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	z, e = NewIntegerManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	z, e = NewIntegerManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	pad, e := r.Allocate(uint64(99990 - r.State().LocalSize - 8))
 	serviceMust(t, e)
@@ -51,7 +52,7 @@ func TestMyMPZSqrtReturningTransportAndOwnerGuards(t *testing.T) {
 		t.Fatal("actual helper allocation transport missing", body, calls)
 	}
 	s := &z.mySqrt
-	integerPhysicalAuditWithRaw(t, z, []Block{pad}, &input, &out, &s.values[0], &s.values[1], &s.values[2], &s.values[3], &s.values[4])
+	integerPhysicalAuditWithRaw(t, z, []umemory.Block{pad}, &input, &out, &s.values[0], &s.values[1], &s.values[2], &s.values[3], &s.values[4])
 	if b.Used() != integerActualOwnedBytes(z) {
 		t.Fatal("immediate helper physical graph", b.Used(), integerActualOwnedBytes(z), r.Stats())
 	}

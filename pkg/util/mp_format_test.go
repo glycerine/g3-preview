@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestNaturalOwnedConstructorAndClose(t *testing.T) {
@@ -247,7 +248,7 @@ func TestIntegerSmallAndRawRationalFormatting(t *testing.T) {
 func TestNaturalNestedOwnerAccounting(t *testing.T) {
 	b := arena.NewBudget(1 << 23)
 	c := arena.VectorConfig{PageSize: 32, Descriptors: arena.Config{PageSize: 2, Budget: b}}
-	parent, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	parent, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	serviceMust(t, e)
 	caller, e := parent.Allocate(4)
 	serviceMust(t, e)

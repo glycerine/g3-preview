@@ -7,21 +7,22 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func polynomialImpPhysicalAudit(t *testing.T, full *MultivariatePolynomialManager, supplied ...*util.SmallAllocator) {
+func polynomialImpPhysicalAudit(t *testing.T, full *MultivariatePolynomialManager, supplied ...*umemory.SmallAllocator) {
 	t.Helper()
 	polynomialImpPhysicalAuditValues(t, full, nil, supplied...)
 }
 
-func polynomialImpPhysicalAuditValues(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, supplied ...*util.SmallAllocator) {
+func polynomialImpPhysicalAuditValues(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, supplied ...*umemory.SmallAllocator) {
 	t.Helper()
 	polynomialImpPhysicalAuditNamed(t, full, polys, nil, 0, supplied...)
 }
-func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*util.Int, externalHeaders uint64, supplied ...*util.SmallAllocator) {
+func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*util.Int, externalHeaders uint64, supplied ...*umemory.SmallAllocator) {
 	polynomialImpPhysicalAuditNamedExtra(t, full, polys, input, externalHeaders, nil, supplied...)
 }
-func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*util.Int, externalHeaders uint64, extraRaw []util.Block, supplied ...*util.SmallAllocator) {
+func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*util.Int, externalHeaders uint64, extraRaw []umemory.Block, supplied ...*umemory.SmallAllocator) {
 	t.Helper()
 	m := full.core
 	owners := []*PolynomialNewtonInterpolator{}
@@ -29,7 +30,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	refvectors := []*PolynomialRefVector{}
 	lazy := []*PolynomialNewtonVector{&full.newton}
 	handlers := []*PolynomialDeletionHandler{}
-	external := append([]util.Block(nil), extraRaw...)
+	external := append([]umemory.Block(nil), extraRaw...)
 	adapterBytes := full.header
 	public := []*util.Int{&full.derivative.n, &full.derivative.a, &full.composition.a}
 	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
@@ -418,13 +419,13 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 			serviceMust(t, e)
 		}
 	}
-	if z.PendingAllocationObject() != (util.ObjectRef{}) {
+	if z.PendingAllocationObject() != (umemory.ObjectRef{}) {
 		_, e := z.SourceAllocator().ObjectExtent(z.PendingAllocationObject())
 		serviceMust(t, e)
 	}
-	raw := map[util.Block]bool{}
-	put := func(b util.Block) {
-		if b == (util.Block{}) {
+	raw := map[umemory.Block]bool{}
+	put := func(b umemory.Block) {
+		if b == (umemory.Block{}) {
 			return
 		}
 		if raw[b] {
@@ -438,7 +439,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	mm := m.monomials
 
 	za := z.SourceAllocator().Stats()
-	ma := util.AllocatorStats{}
+	ma := umemory.AllocatorStats{}
 	mmBytes := uint64(0)
 	if mm != nil {
 		ma = mm.allocator.Stats()
@@ -479,6 +480,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 }
 
-func polynomialImpPhysicalAuditNamedRaw(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*util.Int, externalHeaders uint64, extraRaw []util.Block, supplied ...*util.SmallAllocator) {
+func polynomialImpPhysicalAuditNamedRaw(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*util.Int, externalHeaders uint64, extraRaw []umemory.Block, supplied ...*umemory.SmallAllocator) {
 	polynomialImpPhysicalAuditNamedExtra(t, full, polys, input, externalHeaders, extraRaw, supplied...)
 }

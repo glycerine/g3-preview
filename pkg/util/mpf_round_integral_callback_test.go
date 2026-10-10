@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatRoundToIntegralUnpackTransportAndOwnerGuards(t *testing.T) {
@@ -13,7 +14,7 @@ func TestArbitraryFloatRoundToIntegralUnpackTransportAndOwnerGuards(t *testing.T
 	var m *ArbitraryFloatManager
 	var x, out ArbitraryFloat
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			s := &m.integralRound
@@ -36,7 +37,7 @@ func TestArbitraryFloatRoundToIntegralUnpackTransportAndOwnerGuards(t *testing.T
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	n := NewInt(0)
 	serviceMust(t, m.SetComponents(&x, 17, 40000, false, 1, &n))
@@ -56,7 +57,7 @@ func TestArbitraryFloatRoundToIntegralUnpackTransportAndOwnerGuards(t *testing.T
 		t.Fatal("actual unpack allocation transport missing", body, calls)
 	}
 	s := &m.integralRound
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &x.significand, &out.significand, &s.a.significand, &s.div, &s.rem)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &x.significand, &out.significand, &s.a.significand, &s.div, &s.rem)
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes {
 		t.Fatal("immediate unpack physical graph", b.Used(), m.OwnedStorageBytes(), r.Stats())
 	}

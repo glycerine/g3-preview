@@ -3,18 +3,17 @@
 package polynomial
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialKnuthMinimumActualOwnerCallback(t *testing.T) {
 	var p *UPolynomialManager
 	armed, reached := false, false
 	var oldContext integerAllocationInvocationContext
-	transport := func(f util.Failure) error {
+	transport := func(f umemory.Failure) error {
 		if !armed {
 			return f
 		}
@@ -81,7 +80,7 @@ func TestUPolynomialKnuthMinimumActualOwnerCallback(t *testing.T) {
 	if !reached || body == nil {
 		t.Fatal("actual MIN allocation callback missing", reached, body)
 	}
-	algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, nil, []util.Block{held})
+	algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, nil, []umemory.Block{held})
 	serviceMust(t, p.cleanupKnuth(false))
 	serviceMust(t, p.cleanupKnuth(true))
 	serviceMust(t, rt.Deallocate(&held))
@@ -99,7 +98,7 @@ func TestUPolynomialKnuthMinimumActualOwnerCallback(t *testing.T) {
 	if body == nil {
 		t.Fatal("later actual transport failure missing")
 	}
-	algebraicCellSourcePhysical(t, c, []UPolynomial{poly, later}, nil, []util.Block{held})
+	algebraicCellSourcePhysical(t, c, []UPolynomial{poly, later}, nil, []umemory.Block{held})
 	serviceMust(t, p.cleanupKnuth(false))
 	serviceMust(t, p.cleanupKnuth(true))
 	serviceMust(t, rt.Deallocate(&held))

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestRationalServiceNegAssignInvocationPhysicalNumerator(t *testing.T) {
@@ -47,11 +48,11 @@ func TestRationalServiceNegAssignInvocationEveryIntMinReservation(t *testing.T) 
 	for ordinal := int64(0); ordinal < 64 && !success; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			b := arena.NewBudget(1 << 26)
-			rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error { return f }})
+			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error { return f }})
 			serviceMust(t, e)
 			cfg := serviceConfig(b)
 			cfg.Integers.Memory = rt
-			cfg.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			s, e := NewRationalService(cfg)
 			serviceMust(t, e)
 			a := serviceValue(t, s, "-2147483648/3")
@@ -67,8 +68,8 @@ func TestRationalServiceNegAssignInvocationEveryIntMinReservation(t *testing.T) 
 			body := s.NegAssignWithInvocation(&a, &c)
 			b.FailAfter(-1)
 			roots := []*Int{&a.Raw.Num, &a.Raw.Den}
-			var extra []Block
-			if block := c.transferred.Block(); block != (Block{}) {
+			var extra []umemory.Block
+			if block := c.transferred.Block(); block != (umemory.Block{}) {
 				extra = append(extra, block)
 			}
 			integerPhysicalAuditWithRaw(t, s.Manager.Z, extra, roots...)

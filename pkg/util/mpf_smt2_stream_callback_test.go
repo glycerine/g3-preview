@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ func TestArbitraryFloatSMT2StreamConversionTransportGuards(t *testing.T) {
 	var x ArbitraryFloat
 	var out OwnedStringStream
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			s, c := &m.smt2Stream, &m.rationalConversion
@@ -35,7 +36,7 @@ func TestArbitraryFloatSMT2StreamConversionTransportGuards(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	serviceMust(t, e)
 	serviceMust(t, out.Construct(b))
 	sig := NewInt(1)
@@ -53,11 +54,11 @@ func TestArbitraryFloatSMT2StreamConversionTransportGuards(t *testing.T) {
 	body := m.DisplaySMT2Into(&out, &x, true)
 	armed = false
 	s, c := &m.smt2Stream, &m.rationalConversion
-	if !errors.Is(body, Failure{Kind: FailureMemout}) || calls != 1 || !s.active || s.conversion != c.invocation || s.format != 0 {
+	if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls != 1 || !s.active || s.conversion != c.invocation || s.format != 0 {
 		t.Fatal("actual conversion transport missing", body, calls)
 	}
-	raw := []Block{pad}
-	if c.transferred.Block() != (Block{}) {
+	raw := []umemory.Block{pad}
+	if c.transferred.Block() != (umemory.Block{}) {
 		raw = append(raw, c.transferred.Block())
 	}
 	integerPhysicalAuditWithRaw(t, m.integer, raw, &x.significand, &s.q.Num, &s.q.Den, &c.a.significand, &c.n, &c.d, &m.rational.NTmp)

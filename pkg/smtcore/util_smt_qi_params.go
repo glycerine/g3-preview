@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // DefaultsInitialized records the actual scalar initializer frontier after
@@ -261,7 +262,7 @@ func (s *SMTQIParams) Display(out *util.NumericTextStream) error {
 		return e
 	}
 	if !s.state.EmatchingInitialized {
-		return util.ErrRuntimeUninitialized
+		return umemory.ErrRuntimeUninitialized
 	}
 	bEmatching := int64(0)
 	if s.state.Ematching {

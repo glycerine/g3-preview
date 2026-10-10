@@ -3,6 +3,7 @@ package util
 
 import (
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrRawDisplayPending = errors.New("mpnum: raw display local cleanup is pending")
@@ -56,7 +57,7 @@ func (m *IntegerManager) finishRawDisplay(err *error, length *uint32) {
 // rather than a claim that the failed C++ function executed its end label.
 func (m *IntegerManager) CleanupRawDisplay() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.RawDisplay
 	if !s.active {

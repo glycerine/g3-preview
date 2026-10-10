@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialNewtonSourceInterpolation(t *testing.T) {
@@ -385,9 +386,9 @@ func newtonRefGet(t *testing.T, n *PolynomialRef) Polynomial {
 // private counters, callback errors, or allocation failures are fabricated.
 func TestPolynomialNewtonStoppedReferenceBeforeOwningAbort(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	runtime, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	profile := util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: runtime, Profile: profile, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: runtime, Profile: profile})

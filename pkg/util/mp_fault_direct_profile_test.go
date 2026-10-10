@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Explicit supported source allocator profile for action-timing refusal tests.
@@ -11,7 +12,7 @@ import (
 func rationalPublicationDirectOwner(t *testing.T, synch bool) (*RationalManager, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
-	m, e := NewRationalManager(RationalConfig{Integers: IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: false}}, Synchronized: synch})
+	m, e := NewRationalManager(RationalConfig{Integers: IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: false}}, Synchronized: synch})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -27,7 +28,7 @@ func servicePublicationDirectOwner(t *testing.T) (*RationalService, *arena.Budge
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	c := serviceConfig(b)
-	c.Integers.Profile = SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: false}
+	c.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: false}
 	s, e := NewRationalService(c)
 	if e != nil {
 		t.Fatal(e)

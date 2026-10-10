@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -42,7 +43,7 @@ func algebraicControlledFixture(t *testing.T) (*AlgebraicRootCore, *UPolynomialM
 	serviceMust(t, e)
 	bi, e := util.NewBinaryIntervalManager(b)
 	serviceMust(t, e)
-	a, e := util.NewSmallAllocator(util.SmallAllocatorConfig{Runtime: s.Manager.Z.Memory, Profile: util.SmallAllocatorProfile{PointerBits: 64}})
+	a, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: s.Manager.Z.Memory, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 	serviceMust(t, e)
 	c, e := NewAlgebraicRootCore(AlgebraicRootConfig{Rationals: s.Manager, Polynomials: p, Factors: f, Binary: b, Intervals: bi, Allocator: a, Checkpoint: p.config.Checkpoint, Cooperation: p.config.Cooperation})
 	serviceMust(t, e)

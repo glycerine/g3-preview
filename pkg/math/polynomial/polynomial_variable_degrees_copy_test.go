@@ -8,13 +8,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func degreeCopyRuntime(t *testing.T) (*util.Runtime, *arena.Budget) {
+func degreeCopyRuntime(t *testing.T) (*umemory.Runtime, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		serviceMust(t, r.Close())
@@ -24,7 +24,7 @@ func degreeCopyRuntime(t *testing.T) (*util.Runtime, *arena.Budget) {
 	})
 	return r, b
 }
-func degreeCopyOwner(t *testing.T, r *util.Runtime) *PolynomialVariableDegrees {
+func degreeCopyOwner(t *testing.T, r *umemory.Runtime) *PolynomialVariableDegrees {
 	t.Helper()
 	d, e := NewPolynomialVariableDegrees(r)
 	serviceMust(t, e)

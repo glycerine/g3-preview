@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots(t *testing.T) {
@@ -70,13 +71,13 @@ func TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots(t *testing.T)
 			}
 			raw, inspect := q.Integers().Allocator.PendingRoots()
 			serviceMust(t, inspect)
-			if q.Integers().PendingCell.Object != (util.ObjectRef{}) {
+			if q.Integers().PendingCell.Object != (umemory.ObjectRef{}) {
 				found = true
 				if m.evaluation.numericPending != q.Integers().PendingCell.Object {
 					t.Fatal("actual new numeric object receipt")
 				}
 			}
-			if raw != ([3]util.Block{}) {
+			if raw != ([3]umemory.Block{}) {
 				found = true
 				if m.evaluation.allocatorPending != raw {
 					t.Fatal("actual new allocator roots receipt")
@@ -84,12 +85,12 @@ func TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots(t *testing.T)
 			}
 			q.Budget().FailAfter(-1)
 			serviceMust(t, m.CleanupEvaluation())
-			if q.Integers().PendingCell.Object != (util.ObjectRef{}) {
+			if q.Integers().PendingCell.Object != (umemory.ObjectRef{}) {
 				t.Fatal("operation cleanup omitted early Copy object")
 			}
 			raw, inspect = q.Integers().Allocator.PendingRoots()
 			serviceMust(t, inspect)
-			if raw != ([3]util.Block{}) {
+			if raw != ([3]umemory.Block{}) {
 				t.Fatal("operation cleanup omitted early Copy raw")
 			}
 			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, constant}, inputs, 0)

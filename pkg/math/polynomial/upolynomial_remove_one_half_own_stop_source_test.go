@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialRemoveOneHalfRootActualUnjoinedOwnStop(t *testing.T) {
@@ -60,10 +61,10 @@ func TestUPolynomialRemoveOneHalfRootActualUnjoinedOwnStop(t *testing.T) {
 				if !errors.Is(first, arena.ErrBounds) || q.ownCause != first || q.sourceCause != oldSource || q.bodyCause != oldBody || q.addMul != child {
 					t.Fatal("actual first-own stop/history", first, q.ownCause)
 				}
-				algebraicCellSourcePhysical(t, c, nil, []*util.Int{&q.addMul.Frame.Tmp}, []util.Block{lane})
+				algebraicCellSourcePhysical(t, c, nil, []*util.Int{&q.addMul.Frame.Tmp}, []umemory.Block{lane})
 				contextTLSFinish(t, rt, func() error { return p.cleanupRemoveOneHalfRootWithReceipt(&r, true) })
 				contextTLSFinish(t, rt, func() error {
-					if lane == (util.Block{}) {
+					if lane == (umemory.Block{}) {
 						return nil
 					}
 					return rt.Deallocate(&lane)

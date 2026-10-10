@@ -2,7 +2,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type polynomialPSCChain2Scope struct {
@@ -195,7 +195,7 @@ func (m *MultivariatePolynomialManager) PSCChain2(p, q Polynomial, x uint32, out
 		// Literal n3 has no initializer. Refuse only at its actual undefined read;
 		// do not replace it with a mathematical zero or execute a fabricated child.
 		if !s.n3Initialized {
-			return util.ErrRuntimeUninitialized
+			return umemory.ErrRuntimeUninitialized
 		}
 		s.n2 = s.n3
 		s.d0 = s.d1

@@ -1,8 +1,12 @@
 // Source: src/util/mpf.cpp:1170-1181 (no lexical NUM or RAW declarations).
 package util
 
+import
+
 // The source numeral and output remain borrowed. This actual reflected scope
 // owns only reached output COPY/shift prefixes, never a mirrored public value.
+umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type arbitraryFloatToMPZScope struct {
 	manager                                    *ArbitraryFloatManager
 	output                                     *IntegerManager
@@ -75,7 +79,7 @@ func (z *IntegerManager) mpfToMPZExecuting(transport bool) bool {
 }
 func (m *ArbitraryFloatManager) CleanupToMPZ() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.toMPZ
 	if s.executing || s.finishing || m.valueExecuting || s.transportActive() {
@@ -85,7 +89,7 @@ func (m *ArbitraryFloatManager) CleanupToMPZ() (cause error) {
 		return nil
 	}
 	if !s.valid() {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := s.bind(); e != nil {
 		return e

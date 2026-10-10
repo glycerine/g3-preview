@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestASTArithmeticOriginalNumeralFactory(t *testing.T) {
@@ -249,8 +249,8 @@ func TestASTArithmeticNumeralEveryCachePublicationReservation(t *testing.T) {
 				succeeded = true
 				return
 			}
-			var failure util.Failure
-			if !errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != util.FailureMemout) {
+			var failure umemory.Failure
+			if !errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != umemory.FailureMemout) {
 				t.Fatal("cache refusal cause", ordinal, e)
 			}
 		})
@@ -277,8 +277,8 @@ func TestASTArithmeticBigNumeralEveryCopyReservation(t *testing.T) {
 			h, e := m.ArithmeticNumeral(&n, false)
 			m.Budget().FailAfter(-1)
 			if e != nil {
-				var failure util.Failure
-				if !errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != util.FailureMemout) {
+				var failure umemory.Failure
+				if !errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != umemory.FailureMemout) {
 					t.Fatal("numeric copy refusal", ordinal, e)
 				}
 				return

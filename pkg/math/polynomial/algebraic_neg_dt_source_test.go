@@ -10,17 +10,18 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
-func algebraicNegTLSFixture(t *testing.T, transport util.ErrorTransport) (*AlgebraicRootCore, *UPolynomialManager, *util.Runtime) {
+func algebraicNegTLSFixture(t *testing.T, transport umemory.ErrorTransport) (*AlgebraicRootCore, *UPolynomialManager, *umemory.Runtime) {
 	t.Helper()
 	budget := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, Transport: transport})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, Transport: transport})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget)
 	cfg.Integers.Memory = rt
-	cfg.Integers.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	s, e := util.NewRationalService(cfg)
 	serviceMust(t, e)
 	p, e := NewUPolynomialManagerFromRationalService(s, UPolynomialConfig{Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -33,7 +34,7 @@ func algebraicNegTLSFixture(t *testing.T, transport util.ErrorTransport) (*Algeb
 	serviceMust(t, e)
 	bi, e := util.NewBinaryIntervalManager(b)
 	serviceMust(t, e)
-	allocator, e := util.NewSmallAllocator(util.SmallAllocatorConfig{Runtime: rt, Profile: cfg.Integers.Profile})
+	allocator, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: rt, Profile: cfg.Integers.Profile})
 	serviceMust(t, e)
 	c, e := NewAlgebraicRootCore(AlgebraicRootConfig{Rationals: s.Manager, Polynomials: p, Factors: f, Binary: b, Intervals: bi, Allocator: allocator, Checkpoint: p.config.Checkpoint, Cooperation: p.config.Cooperation})
 	serviceMust(t, e)
@@ -66,10 +67,10 @@ func algebraicNegDTCase(t *testing.T, closeCore bool) {
 	for offset := int64(12); offset < 400 && !reached; offset += 4 {
 		t.Run(fmt.Sprint(offset), func(t *testing.T) {
 			var c *AlgebraicRootCore
-			var rt *util.Runtime
-			var lane, held util.Block
+			var rt *umemory.Runtime
+			var lane, held umemory.Block
 			armed := false
-			transport := func(f util.Failure) error {
+			transport := func(f umemory.Failure) error {
 				if !armed || c.negation.phase != 4 || c.negation.eval.addMul.Frame == nil || c.negation.eval.addMul.Frame.Tmp.Cell == 0 || c.config.Rationals.Integers().IsFailureRef(c.negation.eval.addMul.Frame.Tmp.Cell) {
 					return f
 				}
@@ -113,16 +114,16 @@ func algebraicNegDTCase(t *testing.T, closeCore bool) {
 					contextTLSFinish(t, rt, func() error { return c.Del(&a) })
 					contextTLSFinish(t, rt, func() error { return c.cleanupNegation(&r, true) })
 				}
-				if lane != (util.Block{}) {
+				if lane != (umemory.Block{}) {
 					contextTLSFinish(t, rt, func() error {
-						if lane == (util.Block{}) {
+						if lane == (umemory.Block{}) {
 							return nil
 						}
 						return rt.Deallocate(&lane)
 					})
 				}
 				contextTLSFinish(t, rt, func() error {
-					if held == (util.Block{}) {
+					if held == (umemory.Block{}) {
 						return nil
 					}
 					return rt.Deallocate(&held)
@@ -153,7 +154,7 @@ func algebraicNegDTCase(t *testing.T, closeCore bool) {
 				t.Fatal("failed-body RAW TMP was incorrectly source-destructed")
 			}
 			extra := []*util.Int{&q.eval.values[0], &q.eval.values[1], &q.eval.addMul.Frame.Tmp}
-			algebraicCellSourcePhysical(t, c, []UPolynomial{original}, extra, []util.Block{lane, held}, &a)
+			algebraicCellSourcePhysical(t, c, []UPolynomial{original}, extra, []umemory.Block{lane, held}, &a)
 			t.Logf("captured lane=%+v root=%+v eval=%+v tmp=%+v", lane, q.numeric, q.eval.numeric, q.eval.addMul.Frame.Numeric)
 			before := q.diagnostic()
 			physical := rt.Stats()
@@ -194,12 +195,12 @@ func algebraicNegDTCase(t *testing.T, closeCore bool) {
 				if !errors.Is(stop, arena.ErrBounds) || c.closed || c.closing || c.header != oldHeader || len(c.negationHistory) != oldHistory || q.sourceCause != oldSource {
 					t.Fatal("younger own stop failed to protect older owner storage", stop)
 				}
-				algebraicCellSourcePhysical(t, c, []UPolynomial{original}, extra, []util.Block{lane, held})
+				algebraicCellSourcePhysical(t, c, []UPolynomial{original}, extra, []umemory.Block{lane, held})
 				contextTLSFinish(t, rt, c.Close)
 				if q.active || !c.closed || q.bodyCause != before.bodyCause || q.sourceCause != before.sourceCause || q.eval.sourceRemaining != before.sourceRemaining {
 					t.Fatal("core owning continuation erased source history")
 				}
-				algebraicCellSourcePhysical(t, c, []UPolynomial{original}, nil, []util.Block{lane, held})
+				algebraicCellSourcePhysical(t, c, []UPolynomial{original}, nil, []umemory.Block{lane, held})
 				return
 			}
 

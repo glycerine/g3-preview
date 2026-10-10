@@ -6,12 +6,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatToRationalEveryReachedReservationPrefix(t *testing.T) {
 	for ordinal := int64(0); ordinal < 512; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		config := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+		config := IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 		m, e := NewArbitraryFloatManager(config)
 		serviceMust(t, e)
 		qm, e := NewRationalManager(RationalConfig{Integers: config})
@@ -26,11 +27,11 @@ func TestArbitraryFloatToRationalEveryReachedReservationPrefix(t *testing.T) {
 		b.FailAfter(ordinal)
 		body := m.ToRational(&a, qm, &out)
 		s := &m.rationalConversion
-		var sourceRaw, outputRaw []Block
-		if block := s.transferred.Block(); block != (Block{}) {
+		var sourceRaw, outputRaw []umemory.Block
+		if block := s.transferred.Block(); block != (umemory.Block{}) {
 			sourceRaw = append(sourceRaw, block)
 		}
-		if block := s.outputAllocation.transferred.Block(); block != (Block{}) {
+		if block := s.outputAllocation.transferred.Block(); block != (umemory.Block{}) {
 			outputRaw = append(outputRaw, block)
 		}
 		integerPhysicalAuditWithRaw(t, m.integer, sourceRaw, &a.significand, &s.a.significand, &s.n, &s.d, &m.rational.NTmp)

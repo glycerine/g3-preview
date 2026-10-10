@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialVariableConstructionFailurePrefixes(t *testing.T) {
@@ -14,7 +15,7 @@ func TestPolynomialVariableConstructionFailurePrefixes(t *testing.T) {
 	for fault := int64(0); fault < 100 && !success; fault++ {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			b := arena.NewBudget(1 << 24)
-			profile := util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
@@ -60,7 +61,7 @@ func TestPolynomialMultiplicationFailurePrefixes(t *testing.T) {
 	for fault := int64(0); fault < 100 && !success; fault++ {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			b := arena.NewBudget(1 << 24)
-			profile := util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
@@ -114,7 +115,7 @@ func TestPolynomialLinearMixedGeneratedFailurePrefixes(t *testing.T) {
 	for fault := int64(0); fault < 100 && !success; fault++ {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			b := arena.NewBudget(1 << 24)
-			profile := util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
@@ -267,7 +268,7 @@ func TestPolynomialUnivariateGeneratedFailurePrefixes(t *testing.T) {
 	for fault := int64(0); fault < 100 && !success; fault++ {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			b := arena.NewBudget(1 << 24)
-			profile := util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
@@ -314,7 +315,7 @@ func TestPolynomialSoleRetainCalleeConstructionCleanup(t *testing.T) {
 	for fault := int64(0); fault < 100 && !success; fault++ {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			b := arena.NewBudget(1 << 24)
-			profile := util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})

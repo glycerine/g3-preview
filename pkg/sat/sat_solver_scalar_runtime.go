@@ -3,17 +3,17 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type satUintColumn struct {
 	self    *satUintColumn
-	runtime *util.Runtime
+	runtime *umemory.Runtime
 	values  []uint32
 	closed  bool
 }
 
-func (c *satUintColumn) Bind(r *util.Runtime) { *c = satUintColumn{runtime: r}; c.self = c }
+func (c *satUintColumn) Bind(r *umemory.Runtime) { *c = satUintColumn{runtime: r}; c.self = c }
 func (c *satUintColumn) open() error {
 	if c == nil || c.self != c || c.runtime == nil {
 		return ErrSATOwner

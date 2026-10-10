@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialSqrtInvocationGuardAndActualAcquisition(t *testing.T) {
@@ -107,11 +108,11 @@ func TestPolynomialSqrtReceiptPreservesOlderActualFalseQuotientCohort(t *testing
 // domain. It does not claim ordinary mathematical free-failure reachability.
 func TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("destructor helper checkpoint unreachable") }, Cooperation: func() error { panic("destructor helper cooperation unreachable") }}})
@@ -201,11 +202,11 @@ func TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort(t *testing.T) {
 // six RAW locals have no source destructor until the end label is entered.
 func TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare(t *testing.T) {
 	b := arena.NewBudget(1 << 27)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("hi Copy refuses before checkpoint") }, Cooperation: func() error { panic("hi Copy refuses before cooperation") }}})
@@ -241,7 +242,7 @@ func TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare(t
 	serviceMust(t, rt.SetMaxSize(1))
 	_, cause := m.sqrtWithReceipt(p, out, &receipt)
 	child := q.Integers().PerfectSquare
-	if !numericPhysicalReservationRefusal(cause) || !child.Active || child.EndEntered || child.Raw[0] == (util.Block{}) || m.squareRoot.perfectSquare.Invocation != child.Generation {
+	if !numericPhysicalReservationRefusal(cause) || !child.Active || child.EndEntered || child.Raw[0] == (umemory.Block{}) || m.squareRoot.perfectSquare.Invocation != child.Generation {
 		t.Fatal("actual unentered raw child", cause, child)
 	}
 	polynomialSqrtPhysicalAudit(t, m, []Polynomial{p, out.root.value, out.root.incoming}, nil, out.header)
@@ -260,11 +261,11 @@ func TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare(t
 
 func TestPolynomialSqrtInvocationPreservesLaterForeignPerfectSquare(t *testing.T) {
 	b := arena.NewBudget(1 << 27)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("hi Copy refuses before checkpoint") }, Cooperation: func() error { panic("hi Copy refuses before cooperation") }}})
@@ -300,7 +301,7 @@ func TestPolynomialSqrtInvocationPreservesLaterForeignPerfectSquare(t *testing.T
 	serviceMust(t, rt.SetMaxSize(1))
 	_, cause := m.sqrtWithReceipt(p, out, &receipt)
 	child := q.Integers().PerfectSquare
-	if !numericPhysicalReservationRefusal(cause) || !child.Active || child.EndEntered || child.Raw[0] == (util.Block{}) || m.squareRoot.perfectSquare.Invocation != child.Generation {
+	if !numericPhysicalReservationRefusal(cause) || !child.Active || child.EndEntered || child.Raw[0] == (umemory.Block{}) || m.squareRoot.perfectSquare.Invocation != child.Generation {
 		t.Fatal("actual unentered raw child", cause, child)
 	}
 	polynomialSqrtPhysicalAudit(t, m, []Polynomial{p, out.root.value, out.root.incoming}, nil, out.header)
@@ -322,7 +323,7 @@ func TestPolynomialSqrtInvocationPreservesLaterForeignPerfectSquare(t *testing.T
 	serviceMust(t, rt.SetMaxSize(1))
 	_, foreignCause := q.Integers().IsPerfectSquare(&foreignInput, &foreignOutput)
 	foreign := q.Integers().PerfectSquare
-	if !numericPhysicalReservationRefusal(foreignCause) || !foreign.Active || foreign.Generation == child.Generation || foreign.Raw[0] == (util.Block{}) {
+	if !numericPhysicalReservationRefusal(foreignCause) || !foreign.Active || foreign.Generation == child.Generation || foreign.Raw[0] == (umemory.Block{}) {
 		t.Fatal("actual replacement invocation", foreignCause, foreign)
 	}
 	polynomialSqrtPhysicalAudit(t, m, []Polynomial{p, out.root.value, out.root.incoming}, []*util.Int{&foreignInput, &foreignOutput}, out.header)
@@ -430,7 +431,7 @@ func TestPolynomialSqrtInvocationBigNumeralEveryReservation(t *testing.T) {
 			c.integer.Budget().FailAfter(-1)
 			serviceMust(t, m.cleanupSqrtInvocation(&receipt, false))
 			serviceMust(t, m.cleanupSqrtInvocation(&receipt, true))
-			if c.integer.PendingAllocationObject() != (util.ObjectRef{}) || c.pending.raw != (util.ObjectRef{}) || c.pending.value != (Polynomial{}) {
+			if c.integer.PendingAllocationObject() != (umemory.ObjectRef{}) || c.pending.raw != (umemory.ObjectRef{}) || c.pending.value != (Polynomial{}) {
 				t.Fatal("actual operation-owned pending roots not consumed")
 			}
 			if cause == nil {

@@ -7,11 +7,12 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	uhash "github.com/glycerine/g3/pkg/util/hash"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestRuntimeBytesBoundedActualReachedLoads(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	r, e := NewRuntime(RuntimeConfig{Budget: b})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -19,7 +20,7 @@ func TestRuntimeBytesBoundedActualReachedLoads(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if _, e = RuntimeBytesBounded(r, h, 0, 6, 12, 0); !errors.Is(e, ErrRuntimeUninitialized) {
+	if _, e = RuntimeBytesBounded(r, h, 0, 6, 12, 0); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("first word before later bound", e)
 	}
 	if e = r.WriteUint32(h, 0, 1); e != nil {
@@ -31,7 +32,7 @@ func TestRuntimeBytesBoundedActualReachedLoads(t *testing.T) {
 	if _, e = RuntimeBytesBounded(r, h, 0, 1, 11, 0); !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("descending byte10 before initialized byte0", e)
 	}
-	got, e := RuntimeBytesBounded(nil, Block{}, ^uint64(0), 0, 0, 9)
+	got, e := RuntimeBytesBounded(nil, umemory.Block{}, ^uint64(0), 0, 0, 9)
 	if e != nil || got != uhash.String("", 9) {
 		t.Fatal("zero no provider access", got, e)
 	}
@@ -48,7 +49,7 @@ func TestRuntimeBytesBoundedActualReachedLoads(t *testing.T) {
 func TestInlineWordBytesActualColdAndReadOrder(t *testing.T) {
 	var word uint32
 	initialized := uint8(0)
-	if _, e := InlineWordBytes(&word, &initialized, 4, 12, 0); !errors.Is(e, ErrRuntimeUninitialized) {
+	if _, e := InlineWordBytes(&word, &initialized, 4, 12, 0); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal(e)
 	}
 	if _, e := InlineWordBytes(&word, &initialized, 4, 11, 0); !errors.Is(e, arena.ErrBounds) {

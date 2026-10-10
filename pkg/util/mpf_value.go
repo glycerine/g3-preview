@@ -5,6 +5,7 @@ package util
 import (
 	"github.com/glycerine/g3/pkg/arena"
 	uhash "github.com/glycerine/g3/pkg/util/hash"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // ArbitraryFloat is the actual pointer-free MPF numeral. An initialized BIG
@@ -33,14 +34,14 @@ func arbitraryFloatFormat(ebits, sbits uint32, sign bool) uint32 {
 
 func (m *ArbitraryFloatManager) valueGuard(a *ArbitraryFloat) error {
 	if a == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	return m.valueOwnerGuard()
 }
 
 func (m *ArbitraryFloatManager) valueOwnerGuard() error {
 	if m == nil || m.self != m || m.integer == nil || m.integer.self != m.integer {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if !m.constructorComplete || m.closed || m.sourceEnded {
 		return arena.ErrClosed
@@ -77,7 +78,7 @@ func (m *ArbitraryFloatManager) EqCore(a, b *ArbitraryFloat) (bool, error) {
 		return false, e
 	}
 	if b == nil {
-		return false, ErrRuntimeOwner
+		return false, umemory.ErrRuntimeOwner
 	}
 	if a.EBits() != b.EBits() || a.SBits() != b.SBits() || a.Sign() != b.Sign() {
 		return false, nil
@@ -117,7 +118,7 @@ func (m *ArbitraryFloatManager) SetComponents(out *ArbitraryFloat, ebits, sbits 
 		return e
 	}
 	if significand == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	m.valueExecuting = true
 	defer func() { m.valueExecuting = false }()
@@ -155,7 +156,7 @@ func (m *ArbitraryFloatManager) copyWithValueReceiptAndChain(out, source *Arbitr
 		return e
 	}
 	if source == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	m.valueExecuting = true
 	defer func() { m.valueExecuting = false }()
@@ -185,7 +186,7 @@ func (m *ArbitraryFloatManager) Del(a *ArbitraryFloat) error {
 // acknowledges its exact retained copy child at actual context destruction.
 func (m *ArbitraryFloatManager) CleanupValue(a *ArbitraryFloat) error {
 	if m == nil || m.self != m || m.integer == nil || m.integer.self != m.integer || a == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if !m.constructorComplete || m.closed {
 		return arena.ErrClosed

@@ -8,15 +8,16 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // This actual deletion callback selects the guarded signed-host TLS domain.
 // It does not model a defined C++ allocation failure or a mathematical defect.
 func TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
-	runtime, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
+	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	profile := util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: runtime, Profile: profile, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: runtime, Profile: profile})
@@ -46,7 +47,7 @@ func TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals(t *testing.T) {
 	serviceMust(t, cc.close(c))
 	serviceMust(t, prim.close(c))
 	serviceMust(t, c.integer.Del(&integerContent))
-	var lane util.Block
+	var lane umemory.Block
 	calls := 0
 	h, e := NewPolynomialDeletionHandler(budget, func(_ *PolynomialDeletionHandler, c *MultivariatePolynomialCore, p Polynomial) error {
 		if len(m.iccpFrames) == 0 {
@@ -80,7 +81,7 @@ func TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals(t *testing.T) {
 	if oldA != p || oldB != b || parent.depth == 0 {
 		t.Fatal("older source result locals not retained", oldA, oldB, parent.depth)
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{pr.root.value, br.root.value, out.root.value}, nil, pr.header+br.header+out.header+h.header, []util.Block{lane})
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{pr.root.value, br.root.value, out.root.value}, nil, pr.header+br.header+out.header+h.header, []umemory.Block{lane})
 	receipt := parent.iccpInvocation
 	if !m.matchesICCPInvocation(&receipt) || receipt.frame != oldICCP.frame || receipt.invocation == oldICCP.invocation {
 		t.Fatal("exact retained ICCP invocation", receipt, oldICCP)
@@ -119,11 +120,11 @@ func TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals(t *testing.T) {
 	serviceMust(t, h.CloseChecked())
 	for _, ref := range []*PolynomialRef{pr, br, out} {
 		polynomialTLSCloseReference(t, m, ref, func() {
-			polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{pr.root.value, br.root.value, out.root.value}, nil, pr.header+br.header+out.header, []util.Block{lane})
+			polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{pr.root.value, br.root.value, out.root.value}, nil, pr.header+br.header+out.header, []umemory.Block{lane})
 		})
 	}
 	contextTLSFinish(t, runtime, func() error {
-		if lane == (util.Block{}) {
+		if lane == (umemory.Block{}) {
 			return nil
 		}
 		return runtime.Deallocate(&lane)
@@ -181,7 +182,7 @@ func polynomialTLSCloseReference(t *testing.T, m *MultivariatePolynomialManager,
 		if attempts > 64 {
 			t.Fatal("bounded caller continuation")
 		}
-		var raws []util.ObjectRef
+		var raws []umemory.ObjectRef
 		for _, l := range children {
 			raws = append(raws, l.raw)
 		}
@@ -202,7 +203,7 @@ func polynomialTLSCloseReference(t *testing.T, m *MultivariatePolynomialManager,
 			consumed = true
 		}
 		for j, l := range children {
-			if raws[j] != (util.ObjectRef{}) && l.raw == (util.ObjectRef{}) {
+			if raws[j] != (umemory.ObjectRef{}) && l.raw == (umemory.ObjectRef{}) {
 				if _, e := c.monomials.allocator.ReadUint32(raws[j], 0); e == nil {
 					t.Fatal("consumed child allocation readable")
 				}

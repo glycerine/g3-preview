@@ -4,7 +4,8 @@ package ast
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
@@ -258,8 +259,8 @@ func TestASTBitVectorInt2BVRejectedRationalStillReachesNumericAllocation(t *test
 	m.Budget().FailAfter(0)
 	_, body := m.MkFamilyFuncDecl(fid, 57, []ASTParameter{rational}, []ASTHandle{ints}, ASTHandle{})
 	m.Budget().FailAfter(-1)
-	var source util.Failure
-	if !errors.Is(body, arena.ErrInjectedFailure) && (!errors.As(body, &source) || source.Kind != util.FailureMemout) {
+	var source umemory.Failure
+	if !errors.Is(body, arena.ErrInjectedFailure) && (!errors.As(body, &source) || source.Kind != umemory.FailureMemout) {
 		t.Fatal("source parameter copy must precede kind rejection", body)
 	}
 	astTestMust(t, m.DelParameter(&rational))

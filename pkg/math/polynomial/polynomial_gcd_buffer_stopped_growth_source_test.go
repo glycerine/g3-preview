@@ -7,18 +7,18 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Exact captured allocation progress permits signed-host teardown continuation.
-func polynomialTLSCloseFull(t *testing.T, m *MultivariatePolynomialManager, r *util.Runtime, mm *MonomialManager) {
+func polynomialTLSCloseFull(t *testing.T, m *MultivariatePolynomialManager, r *umemory.Runtime, mm *MonomialManager) {
 	t.Helper()
 	for attempts := 0; ; attempts++ {
 		if attempts > 64 {
 			t.Fatal("bounded actual owning continuation")
 		}
 		var oldCells [2]*polynomialLocation
-		var oldObjects [2]util.ObjectRef
+		var oldObjects [2]umemory.ObjectRef
 		for i, p := range [2]Polynomial{m.core.zero, m.core.unit} {
 			if p != (Polynomial{}) {
 				l, e := m.core.polynomialLocation(p)

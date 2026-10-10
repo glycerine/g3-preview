@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // This source-member grouping is not a complete solver constructor. It supplies
@@ -17,7 +17,7 @@ type satSolverVariableState struct {
 	budget                                          *arena.Budget
 	watches                                         *satSolverWatchLists
 	assignment                                      []lbool.LBool
-	memory                                          *util.Runtime
+	memory                                          *umemory.Runtime
 	phase, previousPhase                            []int8
 	decision, eliminated, external, assignedSinceGC []bool
 	mark, literalMark                               []bool
@@ -40,7 +40,7 @@ type satSolverVariableStats struct {
 // Cold preparation provides actual source member borrows while later members
 // are still unconstructed. Full solver ordinary operations remain guarded by
 // its constructor completion; the standalone adapter below retains its order.
-func newSATColdVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.VectorConfig, raw *util.Runtime) (*satSolverVariableState, error) {
+func newSATColdVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.VectorConfig, raw *umemory.Runtime) (*satSolverVariableState, error) {
 	if e := todo.open(); e != nil {
 		return nil, e
 	}
@@ -64,7 +64,7 @@ func newSATColdVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.Ve
 	return s, nil
 }
 
-func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.VectorConfig, raw *util.Runtime) (*satSolverVariableState, error) {
+func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.VectorConfig, raw *umemory.Runtime) (*satSolverVariableState, error) {
 	s, e := newSATColdVariableState(todo, b, c, raw)
 	if e != nil {
 		return nil, e

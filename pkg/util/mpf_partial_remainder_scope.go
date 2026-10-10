@@ -1,6 +1,8 @@
 // Source: src/util/mpf.cpp:1272-1436 (actual reached scoped integer lifetimes).
 package util
 
+import umemory "github.com/glycerine/g3/pkg/util/memory"
+
 type arbitraryFloatPartialRemainderScope struct {
 	manager                        *ArbitraryFloatManager
 	invocation                     uint64
@@ -52,7 +54,7 @@ func (s *arbitraryFloatPartialRemainderScope) unbind() error {
 }
 func (m *ArbitraryFloatManager) finishPartialRemainderSource() error {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.partialRemainder
 	if s.executing || s.finishing {
@@ -87,7 +89,7 @@ func (m *ArbitraryFloatManager) finishPartialRemainderSource() error {
 
 func (m *ArbitraryFloatManager) CleanupPartialRemainder() (cause error) {
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.partialRemainder
 	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {
@@ -97,7 +99,7 @@ func (m *ArbitraryFloatManager) CleanupPartialRemainder() (cause error) {
 		return nil
 	}
 	if !s.valid() {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if e := s.bind(); e != nil {
 		return e

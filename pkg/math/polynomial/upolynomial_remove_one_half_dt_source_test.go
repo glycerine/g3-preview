@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialRemoveOneHalfRootActualAmSourceStop(t *testing.T) {
@@ -29,12 +30,12 @@ func TestUPolynomialRemoveOneHalfRootActualAmSourceStop(t *testing.T) {
 	v, e := p.wholeView(input)
 	serviceMust(t, e)
 	oldCheckpoint := p.config.Checkpoint
-	var lane util.Block
+	var lane umemory.Block
 	defer func() {
 		p.config.Checkpoint = oldCheckpoint
 		contextTLSFinish(t, rt, func() error { return p.cleanupRemoveOneHalfRoot(false) })
 		contextTLSFinish(t, rt, func() error {
-			if lane == (util.Block{}) {
+			if lane == (umemory.Block{}) {
 				return nil
 			}
 			return rt.Deallocate(&lane)
@@ -85,7 +86,7 @@ func TestUPolynomialRemoveOneHalfRootActualAmSourceStop(t *testing.T) {
 	if (q.values[0]).Cell == 0 || (!z.Cell((q.values[0]).Cell).Released && !z.Cell((q.values[0]).Cell).CleanupPending) {
 		t.Fatal("lost actual consumed am descriptor")
 	}
-	algebraicCellSourcePhysical(t, c, []UPolynomial{input, out}, []*util.Int{&q.values[0]}, []util.Block{lane})
+	algebraicCellSourcePhysical(t, c, []UPolynomial{input, out}, []*util.Int{&q.values[0]}, []umemory.Block{lane})
 	before := q.sourceRemaining
 	physical := rt.Stats()
 	used := z.Budget().Used()

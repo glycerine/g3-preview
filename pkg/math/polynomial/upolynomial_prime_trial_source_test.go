@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestUPolynomialPrimeTrialLiteralRoutes(t *testing.T) {
@@ -105,10 +106,10 @@ func primeTrialPhysicalAuditExtra(t *testing.T, q *util.RationalManager, s *UPol
 func primeTrialPhysicalAuditOwners(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, externalFactors []*UPolynomialFactors, extra ...*util.Int) {
 	primeTrialPhysicalAuditAll(t, q, s, externalFactors, nil, extra...)
 }
-func primeTrialPhysicalAuditExternal(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, external []util.Block, extra ...*util.Int) {
+func primeTrialPhysicalAuditExternal(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, external []umemory.Block, extra ...*util.Int) {
 	primeTrialPhysicalAuditAll(t, q, s, nil, external, extra...)
 }
-func primeTrialPhysicalAuditAll(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, externalFactors []*UPolynomialFactors, external []util.Block, extra ...*util.Int) {
+func primeTrialPhysicalAuditAll(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, externalFactors []*UPolynomialFactors, external []umemory.Block, extra ...*util.Int) {
 	roots := append(extra, []*util.Int{&q.NTmp, &q.AddTmp1, &q.AddTmp2, &q.AddMulTmp.Num, &q.AddMulTmp.Den, &q.LtTmp1.Num, &q.LtTmp1.Den, &q.LtTmp2.Num, &q.LtTmp2.Den}...)
 	n := q.HeaderBytes + integerActualOwnedBytes(q.Integers()) + s.header + s.config.Primes.Stats().TotalBytes
 	for q := s.frontendConstantCalls; q != nil; q = q.next {

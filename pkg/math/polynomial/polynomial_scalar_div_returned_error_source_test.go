@@ -9,11 +9,12 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
@@ -64,17 +65,17 @@ func TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation(t *testi
 	capturedText := returned.Error()
 	source := s.sourceCause
 	auditIndex := 0
-	audit := func(recovery util.Block) {
+	audit := func(recovery umemory.Block) {
 		auditIndex++
 		row, rowErr := c.cheap.as.coefficient(c, 0)
 		t.Log("audit source frontier", auditIndex, "NUM", s.a, "row", row, rowErr, "tmp", c.integer.Tmp, "numeric", s.numeric, "returned", s.returned, "transport", s.transportBound, s.transport, s.transportSlot)
-		raw := []util.Block{lane}
-		if recovery != (util.Block{}) {
+		raw := []umemory.Block{lane}
+		if recovery != (umemory.Block{}) {
 			raw = append(raw, recovery)
 		}
 		polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{pr.root.value, result, s.returned, c.factoryInvocation.result}, []*util.Int{&coefficient, &s.a}, pr.header, raw)
 	}
-	audit(util.Block{})
+	audit(umemory.Block{})
 	// Preserve the exact stopped source cause even if owning acknowledgement
 	// consumes its already released physical allocation before recovery.
 	own := c.cleanupScalarDivInvocation(&receipt, false)
@@ -84,7 +85,7 @@ func TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation(t *testi
 	if c.scalarDivInvocationSourceCause(&receipt) != source {
 		t.Fatal("false owning acknowledgement erased source cause")
 	}
-	audit(util.Block{})
+	audit(umemory.Block{})
 	recovery, e := rt.Allocate(2000000)
 	serviceMust(t, e)
 	serviceMust(t, c.cleanupScalarDivInvocation(&receipt, false))
@@ -112,7 +113,7 @@ func TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation(t *testi
 	serviceMust(t, m.CloseChecked())
 	serviceMust(t, q.CloseChecked())
 	e = rt.Deallocate(&recovery)
-	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+	if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal("actual recovery consumption", e)
 	}
 	contextTLSFinish(t, rt, rt.Close)

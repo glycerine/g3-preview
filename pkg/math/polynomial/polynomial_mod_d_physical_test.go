@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // This independent named census additionally accounts the map's cold owner.
@@ -27,7 +28,7 @@ func polynomialModDPhysical(t *testing.T, m *MultivariatePolynomialCore, q, r *P
 	if q != nil {
 		refs = append(refs, q)
 	}
-	raw := []util.Block{}
+	raw := []umemory.Block{}
 	polynomialModDNewtonPhysicalWithRaw(t, m, nil, refs, nil, nil, polys, nil, raw, []*PolynomialVariableDegrees{d}, append(public, &s.numeral)...)
 	monos := []Monomial{s.monomial.value, s.monomial.incoming}
 	// Ref outputs are real named polynomial roots, not inferred directory entries.
@@ -36,7 +37,7 @@ func polynomialModDPhysical(t *testing.T, m *MultivariatePolynomialCore, q, r *P
 	}
 	polynomialOperationMonomialAudit(t, m, polys, monos)
 }
-func polynomialModDNewtonPhysicalWithRaw(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []util.Block, degrees []*PolynomialVariableDegrees, public ...*util.Int) {
+func polynomialModDNewtonPhysicalWithRaw(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []umemory.Block, degrees []*PolynomialVariableDegrees, public ...*util.Int) {
 	t.Helper()
 	var headers uint64
 	for _, d := range degrees {

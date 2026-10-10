@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
@@ -327,9 +328,9 @@ func TestContextParamsMergeEveryContextCOWReservationPreservesInputAndExactRetur
 
 func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testing.T) {
 	bn, bc, bs, b := arena.NewBudget(1<<26), arena.NewBudget(1<<24), arena.NewBudget(1<<24), arena.NewBudget(1<<24)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -384,7 +385,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	proof, model, core := true, false, true
 	paramsMust(t, r.SetMaxSize(1))
 	e = s.GetSolverParams(ast, &p, &proof, &model, &core)
-	var failure util.Failure
+	var failure umemory.Failure
 	if !errors.As(e, &failure) || failure.ErrorCode() != 101 || proof || !model || core || s.frames == nil {
 		t.Fatalf("actual postphysical COW copy refusal: %T %v; failure=%v, frames=%+v, flags=%v/%v/%v", e, e, failure, s.frames, proof, model, core)
 	}
@@ -607,9 +608,9 @@ func TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation(t *test
 
 func TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTuples(t *testing.T) {
 	bn, bc, bs, b := arena.NewBudget(1<<26), arena.NewBudget(1<<24), arena.NewBudget(1<<24), arena.NewBudget(1<<24)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)

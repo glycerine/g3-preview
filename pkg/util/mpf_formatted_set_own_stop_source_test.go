@@ -6,13 +6,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatFormattedSetFirstOwnRawStopHistory(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e := NewArbitraryFloatManager(IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	one := NewInt(1)
 	var x, out, z, after ArbitraryFloat
@@ -33,10 +34,10 @@ func TestArbitraryFloatFormattedSetFirstOwnRawStopHistory(t *testing.T) {
 	body := m.SetFormatWithReceipt(&out, 8, 24, ArbitraryFloatNearestEven, &x, &r)
 	h, e := m.formattedSetHistory(&r)
 	serviceMust(t, e)
-	if body == nil || h.Transferred.Block() == (Block{}) || h.bodyCause == nil || !errors.Is(body, h.bodyCause) {
+	if body == nil || h.Transferred.Block() == (umemory.Block{}) || h.bodyCause == nil || !errors.Is(body, h.bodyCause) {
 		t.Fatal("actual raw transfer failure", body, h)
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &x.significand, &out.significand, &z.significand)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{pad}, &x.significand, &out.significand, &z.significand)
 	if b.Used() != rt.Stats().TotalBytes+m.OwnedStorageBytes() {
 		t.Fatal("before lift cold graph")
 	}
@@ -75,9 +76,9 @@ func TestArbitraryFloatFormattedSetFirstOwnRawStopHistory(t *testing.T) {
 		t.Fatal(e)
 	}
 	serviceMust(t, m.Close())
-	for _, p := range []*Block{&pad, &lane, &recovery} {
+	for _, p := range []*umemory.Block{&pad, &lane, &recovery} {
 		contextTLSFinish(t, rt, func() error {
-			if *p == (Block{}) {
+			if *p == (umemory.Block{}) {
 				return nil
 			}
 			return rt.Deallocate(p)

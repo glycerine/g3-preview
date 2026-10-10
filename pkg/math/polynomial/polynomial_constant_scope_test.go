@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialConstImplicitRationalUsesActualBorrowedOwner(t *testing.T) {
@@ -43,9 +44,9 @@ func TestPolynomialConstImplicitRationalUsesActualBorrowedOwner(t *testing.T) {
 // incomplete: only an explicit owning abort may drain its retained fields.
 func TestPolynomialConstFailedConstructorRetainedUntilOwningClose(t *testing.T) {
 	b := arena.NewBudget(1 << 22)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	serviceMust(t, mm.IncManagerRef())
 	m, e := NewMultivariatePolynomialCore(MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { t.Fatal("constant checkpoint"); return false }, Cooperation: func() error { t.Fatal("constant cooperation"); return nil }})
@@ -83,7 +84,7 @@ func TestPolynomialConstTwoCopyFailurePrefixes(t *testing.T) {
 	for fault := int64(0); fault < 60 && !success; fault++ {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			b := arena.NewBudget(1 << 22)
-			profile := util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
@@ -115,7 +116,7 @@ func TestPolynomialConstTwoCopyFailurePrefixes(t *testing.T) {
 					t.Fatal("caller published before completed return", p)
 				}
 				first = first || m.constantScope.failedConstructor
-				second = second || (!m.constantScope.failedConstructor && events-count == 2 && m.pending.value == (Polynomial{}) && m.pending.raw == (util.ObjectRef{}))
+				second = second || (!m.constantScope.failedConstructor && events-count == 2 && m.pending.value == (Polynomial{}) && m.pending.raw == (umemory.ObjectRef{}))
 			}
 			polynomialPhysicalAudit(t, m, &a, &coef)
 			got, e := q.Integers().Int64(&a)

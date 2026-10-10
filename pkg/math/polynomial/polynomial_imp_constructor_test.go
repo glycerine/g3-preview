@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // Independent physical/default-state assertions for the real complete imp
@@ -51,7 +52,7 @@ func TestPolynomialImpBorrowedMonomialConstructorHierarchy(t *testing.T) {
 // its own destruction must leave that supplied allocator and Runtime usable.
 func TestPolynomialImpBorrowedAllocatorConstructorHierarchy(t *testing.T) {
 	q, budget := rationalManager(t, false)
-	allocator, e := util.NewSmallAllocator(util.SmallAllocatorConfig{Runtime: q.Integers().Memory, Profile: util.SmallAllocatorProfile{PointerBits: 64}})
+	allocator, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: q.Integers().Memory, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{
 		Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q,
@@ -178,10 +179,10 @@ func TestPolynomialImpAllocatorAndDefaultConstructorEveryReservation(t *testing.
 			for ordinal := int64(0); ordinal < 100; ordinal++ {
 				t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 					q, b := rationalManager(t, false)
-					var a *util.SmallAllocator
+					var a *umemory.SmallAllocator
 					var e error
 					if borrowed {
-						a, e = util.NewSmallAllocator(util.SmallAllocatorConfig{Runtime: q.Integers().Memory, Profile: util.SmallAllocatorProfile{PointerBits: 64}})
+						a, e = umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: q.Integers().Memory, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 						serviceMust(t, e)
 					}
 					baseline := b.Used()
@@ -263,9 +264,9 @@ func TestPolynomialImpOwningCloseRejectsActualCallerBeforeDestruction(t *testing
 
 func TestPolynomialImpUPStoppedLeafPreservesParentSuffix(t *testing.T) {
 	b := arena.NewBudget(1 << 25)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
+	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r})
 	serviceMust(t, e)

@@ -8,9 +8,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func rootUpperActualGraph(t *testing.T, c *AlgebraicRootCore, p *UPolynomialManager, poly UPolynomial, out *util.Int, raw []util.Block) {
+func rootUpperActualGraph(t *testing.T, c *AlgebraicRootCore, p *UPolynomialManager, poly UPolynomial, out *util.Int, raw []umemory.Block) {
 	t.Helper()
 	q := &p.rootUpperBound
 	extra := []*util.Int{out}

@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func TestArbitraryFloatSignedFractionActualConversionTransport(t *testing.T) {
 	var m *ArbitraryFloatManager
 	var out ArbitraryFloat
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			s := &m.signedFraction
@@ -32,7 +33,7 @@ func TestArbitraryFloatSignedFractionActualConversionTransport(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	pad, e := r.Allocate(uint64(99990 - r.State().LocalSize - 8))
 	serviceMust(t, e)
@@ -40,10 +41,10 @@ func TestArbitraryFloatSignedFractionActualConversionTransport(t *testing.T) {
 	armed = true
 	body := m.SetFractionSigned(&out, 8, 4000, ArbitraryFloatNearestEven, 3, 2)
 	armed = false
-	if !errors.Is(body, Failure{Kind: FailureMemout}) || calls != 1 {
+	if !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || calls != 1 {
 		t.Fatal("conversion transport missing", body, calls)
 	}
-	signedFractionPhysicalAudit(t, m, &out, []Block{pad})
+	signedFractionPhysicalAudit(t, m, &out, []umemory.Block{pad})
 	serviceMust(t, r.SetMaxSize(0))
 	serviceMust(t, m.CleanupSignedFraction())
 	serviceMust(t, m.CleanupValue(&out))
@@ -59,7 +60,7 @@ func TestArbitraryFloatSignedFractionRefusedOlderChild(t *testing.T) {
 	reached := false
 	for ordinal := int64(0); ordinal < 150; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		q := NewRational()
 		var older, out ArbitraryFloat
@@ -115,7 +116,7 @@ func TestArbitraryFloatSignedFractionRefusedNormalizationKeepsOlderGCD(t *testin
 	reached := false
 	for ordinal := int64(0); ordinal < 100; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		z := m.integer
 		a, d, g := NewInt(1), NewInt(1), NewInt(0)
@@ -169,7 +170,7 @@ func TestArbitraryFloatSignedFractionInlineChildKeepsOlderHistory(t *testing.T) 
 	reached := false
 	for ordinal := int64(0); ordinal < 80; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		q := NewRational()
 		var older, out ArbitraryFloat
@@ -181,7 +182,7 @@ func TestArbitraryFloatSignedFractionInlineChildKeepsOlderHistory(t *testing.T) 
 		body := m.SetExponentRationalWithReceipt(&older, 8, 4000, ArbitraryFloatNearestEven, &ex, &q, &receipt)
 		b.FailAfter(-1)
 		h := m.rationalSet.history
-		if body != nil && h != nil && !m.rationalSet.active && (h.Numeric.Cell.Object != (ObjectRef{}) || h.Transferred.Block() != (Block{})) {
+		if body != nil && h != nil && !m.rationalSet.active && (h.Numeric.Cell.Object != (umemory.ObjectRef{}) || h.Transferred.Block() != (umemory.Block{})) {
 			reached = true
 			before := *h
 			serviceMust(t, m.SetFractionSigned(&out, 8, 4, ArbitraryFloatNearestEven, 3, 2))

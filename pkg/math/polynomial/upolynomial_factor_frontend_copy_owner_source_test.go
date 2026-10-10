@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -23,7 +24,7 @@ func frontendCopyIntegerOwnerTransport(t *testing.T, mode string, erased ...bool
 	var fs *UPolynomialFactors
 	armed := false
 	calls := 0
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f util.Failure) error {
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f umemory.Failure) error {
 		if armed {
 			calls++
 			before := b.Used()
@@ -63,7 +64,7 @@ func frontendCopyIntegerOwnerTransport(t *testing.T, mode string, erased ...bool
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Cells.PageSize = 1
-	cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e = util.NewRationalManager(util.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	z = q.Integers()
@@ -85,7 +86,7 @@ func frontendCopyIntegerOwnerTransport(t *testing.T, mode string, erased ...bool
 		inputValues = []util.Int{large}
 	}
 	serviceMust(t, m.set(&input, inputValues))
-	var held util.Block
+	var held umemory.Block
 	defer func() {
 		armed = false
 		b.FailAfter(-1)
@@ -122,5 +123,5 @@ func frontendCopyIntegerOwnerTransport(t *testing.T, mode string, erased ...bool
 	for i := range m.values(&input) {
 		caller = append(caller, &m.values(&input)[i])
 	}
-	primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []util.Block{held}, caller...)
+	primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []umemory.Block{held}, caller...)
 }

@@ -5,15 +5,16 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestIntegerSourceCellBackingInitializesCapacityOnly(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	if e != nil {
 		t.Fatal(e)
 	}
-	a, e := NewSmallAllocator(SmallAllocatorConfig{Runtime: r})
+	a, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: r})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -21,14 +22,14 @@ func TestIntegerSourceCellBackingInitializesCapacityOnly(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if c.Requested != 32 || c.extent != 32 || c.Object == (ObjectRef{}) || r.Stats().PhysicalBytes != 8200 {
+	if c.Requested != 32 || c.extent != 32 || c.Object == (umemory.ObjectRef{}) || r.Stats().PhysicalBytes != 8200 {
 		t.Fatal("actual source cell backing topology")
 	}
 	if v, e := c.ReadWord(a, 4); e != nil || v != 6 {
 		t.Fatal("actual capacity store", v, e)
 	}
 	for _, off := range []uint64{0, 8, 12, 28} {
-		if _, e := c.ReadWord(a, off); !errors.Is(e, ErrRuntimeUninitialized) {
+		if _, e := c.ReadWord(a, off); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 			t.Fatalf("invented cell initialization at%d: %v", off, e)
 		}
 	}
@@ -61,11 +62,11 @@ func TestIntegerSourceCellBackingInitializesCapacityOnly(t *testing.T) {
 func TestIntegerSourceCellWrappedHeaderGuardUsesActualRoundedExtent(t *testing.T) {
 	for _, bits := range []uint8{32, 64} {
 		b := arena.NewBudget(1 << 24)
-		r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: bits})
+		r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: bits})
 		if e != nil {
 			t.Fatal(e)
 		}
-		a, e := NewSmallAllocator(SmallAllocatorConfig{Runtime: r})
+		a, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: r})
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -84,7 +85,7 @@ func TestIntegerSourceCellWrappedHeaderGuardUsesActualRoundedExtent(t *testing.T
 				t.Fatal("LP64 rounded header write", v, e)
 			}
 		}
-		if c.Object == (ObjectRef{}) || c.Requested != 4 || c.extent != uint64(bits/8) || r.Stats().LiveBlocks != 1 {
+		if c.Object == (umemory.ObjectRef{}) || c.Requested != 4 || c.extent != uint64(bits/8) || r.Stats().LiveBlocks != 1 {
 			t.Fatal("wrapped header guard lost allocated object")
 		}
 		if e = c.writeWord(a, 8, 1); !errors.Is(e, arena.ErrBounds) {

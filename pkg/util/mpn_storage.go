@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // NaturalManager owns source division scratch, an embedded lexical formatting
@@ -17,7 +18,7 @@ type NaturalManager struct {
 	callerBindings  *NumericCallerBinding
 
 	self                              *NaturalManager
-	runtime                           *Runtime
+	runtime                           *umemory.Runtime
 	ownsRuntime                       bool
 	Division                          [4][]uint32
 	verificationScratch               []uint32
@@ -39,7 +40,7 @@ type NaturalManager struct {
 func NewNaturalManager(c arena.VectorConfig) (*NaturalManager, error) {
 	return newNaturalManagerWithMemory(c, nil)
 }
-func newNaturalManagerWithMemory(c arena.VectorConfig, runtime *Runtime) (*NaturalManager, error) {
+func newNaturalManagerWithMemory(c arena.VectorConfig, runtime *umemory.Runtime) (*NaturalManager, error) {
 	header := uint64(reflect.TypeOf(NaturalManager{}).Size())
 	if e := c.Descriptors.Budget.Reserve(header); e != nil {
 		return nil, e
@@ -49,7 +50,7 @@ func newNaturalManagerWithMemory(c arena.VectorConfig, runtime *Runtime) (*Natur
 	if runtime == nil {
 		m.ownsRuntime = true
 		var e error
-		m.runtime, e = NewRuntime(RuntimeConfig{Budget: m.budget, SizeTBits: uint8(32 << (^uint(0) >> 63))})
+		m.runtime, e = umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.budget, SizeTBits: uint8(32 << (^uint(0) >> 63))})
 		if e != nil {
 			m.originalCause = e
 			if cleanup := m.CloseChecked(); cleanup != nil {
@@ -60,7 +61,7 @@ func newNaturalManagerWithMemory(c arena.VectorConfig, runtime *Runtime) (*Natur
 	}
 	return m, nil
 }
-func (m *NaturalManager) RuntimeOwner() *Runtime {
+func (m *NaturalManager) RuntimeOwner() *umemory.Runtime {
 	if m == nil || m.self != m {
 		return nil
 	}
@@ -93,7 +94,7 @@ func (m *NaturalManager) check() error {
 		return arena.ErrClosed
 	}
 	if m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.ClosedField || m.Closing || m.runtime == nil || m.SourceFinalizing || m.originalCause != nil {
 		return arena.ErrClosed
@@ -113,7 +114,7 @@ func (m *NaturalManager) CloseChecked() error {
 		return arena.ErrInvalidSlot
 	}
 	if m == nil || m.self != m {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	if m.ClosedField {
 		return nil

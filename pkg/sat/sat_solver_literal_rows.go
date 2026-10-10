@@ -3,7 +3,8 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"reflect"
 )
 
@@ -11,14 +12,14 @@ import (
 // Native Go slices own both levels of storage, outside Runtime accounting.
 type satSolverLiteralRows struct {
 	self              *satSolverLiteralRows
-	runtime           *util.Runtime
+	runtime           *umemory.Runtime
 	budget            *arena.Budget
 	rows              [][]Literal
 	ownerBytes, epoch uint64
 	closed            bool
 }
 
-func newSATSolverLiteralRows(r *util.Runtime, b *arena.Budget) (*satSolverLiteralRows, error) {
+func newSATSolverLiteralRows(r *umemory.Runtime, b *arena.Budget) (*satSolverLiteralRows, error) {
 	if r == nil || r.Budget() != b {
 		return nil, ErrSATOwner
 	}
@@ -42,7 +43,7 @@ func (o *satSolverLiteralRows) open() error {
 	}
 	return o.runtime.CheckOpen()
 }
-func (o *satSolverLiteralRows) checkRuntime(r *util.Runtime) error {
+func (o *satSolverLiteralRows) checkRuntime(r *umemory.Runtime) error {
 	if e := o.open(); e != nil {
 		return e
 	}

@@ -4,15 +4,16 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 )
 
 func TestArbitraryFloatBinaryStringTemporarySourceStop(t *testing.T) {
 	budget := arena.NewBudget(1 << 28)
 	var m *ArbitraryFloatManager
-	var lane Block
+	var lane umemory.Block
 	armed, calls := false, 0
-	r, e := NewRuntime(RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
 			armed = false
 			calls++
@@ -32,7 +33,7 @@ func TestArbitraryFloatBinaryStringTemporarySourceStop(t *testing.T) {
 		return f
 	}})
 	serviceMust(t, e)
-	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	m, e = NewArbitraryFloatManager(IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: budget, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 	serviceMust(t, e)
 	x := ArbitraryFloat{format: arbitraryFloatFormat(8, 40000, false)}
 	digits := make([]uint32, 1250)
@@ -54,7 +55,7 @@ func TestArbitraryFloatBinaryStringTemporarySourceStop(t *testing.T) {
 	body := m.ToStringBinary(&x, 0, 0, &out)
 	armed = false
 	s := &m.binaryString
-	if calls != 1 || !errors.Is(body, Failure{Kind: FailureMemout}) || !errors.Is(body, arena.ErrBounds) || s.sourceCause == nil || !s.tmpLive || s.bitsLive || !s.outLive || !out.Matches("#b0 #b01111111 ") {
+	if calls != 1 || !errors.Is(body, umemory.Failure{Kind: umemory.FailureMemout}) || !errors.Is(body, arena.ErrBounds) || s.sourceCause == nil || !s.tmpLive || s.bitsLive || !s.outLive || !out.Matches("#b0 #b01111111 ") {
 		t.Fatal("actual source tmp stop missing", calls, body, s.sourceCause, s.tmpLive, s.bitsLive, s.outLive)
 	}
 	before, used, value, cause := r.State(), budget.Used(), x, s.sourceCause
@@ -67,7 +68,7 @@ func TestArbitraryFloatBinaryStringTemporarySourceStop(t *testing.T) {
 	if r.State() != before || budget.Used() != used || x != value || m.sourceEnded || !m.rationalReady || !out.Matches("#b0 #b01111111 ") {
 		t.Fatal("source stop touched older owners")
 	}
-	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane, pad}, &x.significand, &s.tmp)
+	integerPhysicalAuditWithRaw(t, m.integer, []umemory.Block{lane, pad}, &x.significand, &s.tmp)
 	if budget.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes {
 		t.Fatal("source stop graph", budget.Used())
 	}
@@ -79,9 +80,9 @@ func TestArbitraryFloatBinaryStringTemporarySourceStop(t *testing.T) {
 	}
 	contextTLSFinish(t, r, func() error { return m.CleanupValue(&x) })
 	contextTLSFinish(t, r, m.Close)
-	for _, block := range []*Block{&lane, &pad, &recovery} {
+	for _, block := range []*umemory.Block{&lane, &pad, &recovery} {
 		contextTLSFinish(t, r, func() error {
-			if *block == (Block{}) {
+			if *block == (umemory.Block{}) {
 				return nil
 			}
 			return r.Deallocate(block)

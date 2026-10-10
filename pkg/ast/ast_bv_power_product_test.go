@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func bvPowerProductRawApp(t *testing.T, m *ASTManager, fid FamilyID, s ASTHandle, k int32, name string, args []ASTHandle) ASTHandle {
@@ -192,8 +192,8 @@ func TestASTBitVectorPolynomialPowerProductEveryActualReadReservation(t *testing
 			if body != nil {
 				failures++
 				if !errors.Is(body, arena.ErrInjectedFailure) {
-					var f util.Failure
-					if !errors.As(body, &f) || f.Kind != util.FailureMemout {
+					var f umemory.Failure
+					if !errors.As(body, &f) || f.Kind != umemory.FailureMemout {
 						t.Fatal("unexpected copy refusal", body)
 					}
 				}

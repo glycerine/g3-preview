@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestSmallObjectAllocatorActualAssertionSwitchForeignDirect(t *testing.T) {
@@ -23,7 +24,7 @@ func TestSmallObjectAllocatorActualAssertionSwitchForeignDirect(t *testing.T) {
 	v := sourceSmallObjectAlloc(t, d, 300)
 	h, o, e := d.core.RawLocation(v)
 	sourceSmallObjectMust(t, e)
-	p := RawObjectPointer{Runtime: rt, Block: h, Offset: o}
+	p := umemory.RawObjectPointer{Runtime: rt, Block: h, Offset: o}
 	smallObjectAssertionPhysical(t, rt, b, region, out, debug, a, d)
 	before := rt.State()
 	used := b.Used()
@@ -119,7 +120,7 @@ func TestSmallObjectAllocatorClosedAssertionOwnerDirectFreePrefix(t *testing.T) 
 	if !errors.Is(e, arena.ErrClosed) || q.RequestedAdjusted || q.PhysicalReleased {
 		t.Fatal("checked free reached closed assertion owner before subtraction", q, e)
 	}
-	q, e = a.core.DeallocateRawTracked(300, RawObjectPointer{Runtime: rt, Block: h, Offset: o})
+	q, e = a.core.DeallocateRawTracked(300, umemory.RawObjectPointer{Runtime: rt, Block: h, Offset: o})
 	if !errors.Is(e, arena.ErrClosed) || q.RequestedAdjusted || q.PhysicalReleased {
 		t.Fatal("raw free reached closed assertion owner before subtraction", q, e)
 	}
@@ -131,7 +132,7 @@ func TestSmallObjectAllocatorClosedAssertionOwnerDirectFreePrefix(t *testing.T) 
 	sourceSmallObjectMust(t, a.Close())
 }
 
-func smallObjectAssertionPhysical(t *testing.T, rt *utilMemoryRuntime, b *arena.Budget, region *arena.BytesRegion, out *NumericTextStream, debug *DebugContext, owners ...*utilSmallObjectAllocator) {
+func smallObjectAssertionPhysical(t *testing.T, rt *umemory.Runtime, b *arena.Budget, region *arena.BytesRegion, out *NumericTextStream, debug *DebugContext, owners ...*utilSmallObjectAllocator) {
 	t.Helper()
 	rs := region.Stats()
 	ds := rs.Descriptors
@@ -167,7 +168,7 @@ func TestSmallObjectAllocatorAssertionControlColdEveryRefusal(t *testing.T) {
 			}
 		} else {
 			success++
-			if a.core.Stats().OwnerBytes != uint64(reflect.TypeOf(SmallAllocator{}).Size()) || a.ioBytes != uint64(reflect.TypeOf(smallObjectIOBridge{}).Size()) {
+			if a.core.Stats().OwnerBytes != uint64(reflect.TypeOf(umemory.SmallAllocator{}).Size()) || a.ioBytes != uint64(reflect.TypeOf(smallObjectIOBridge{}).Size()) {
 				t.Fatal("actual reflected cold interface/header charge")
 			}
 		}

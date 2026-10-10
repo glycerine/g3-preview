@@ -3,6 +3,7 @@ package util
 
 import (
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func (m *ArbitraryFloatManager) SetFormat(out *ArbitraryFloat, ebits, sbits uint32, mode ArbitraryFloatRoundingMode, x *ArbitraryFloat) error {
@@ -13,7 +14,7 @@ func (m *ArbitraryFloatManager) SetFormatWithReceipt(out *ArbitraryFloat, ebits,
 		return e
 	}
 	if x == nil {
-		return ErrRuntimeOwner
+		return umemory.ErrRuntimeOwner
 	}
 	s := &m.formattedSet
 	if s.active || s.executing || s.finishing || s.invocation == ^uint64(0) {

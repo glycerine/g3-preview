@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"math"
 	"reflect"
@@ -47,9 +48,9 @@ func (t *mpfFormatStopText) AppendStreamString(s util.ArbitraryFloatFormatStream
 
 func TestASTCheckpointMPFFormatTextYoungerNumeralStopProtectsNonemptyResult(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
+	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	astTestMust(t, e)
-	config := util.IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+	config := util.IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: config})
 	astTestMust(t, e)
 	symbols, e := usymbol.NewManager(usymbol.Config{Budget: b})
@@ -83,7 +84,7 @@ func TestASTCheckpointMPFFormatTextYoungerNumeralStopProtectsNonemptyResult(t *t
 		release = rt.Deallocate(&external)
 	}}
 	_, body := m.ToStringInto(&a, proxy)
-	if !errors.Is(release, arena.ErrBounds) || external != (util.Block{}) {
+	if !errors.Is(release, arena.ErrBounds) || external != (umemory.Block{}) {
 		t.Fatal("actual accounting frontier", release)
 	}
 	cause := text.Numeric.SourceCause()
@@ -158,7 +159,7 @@ func TestASTCheckpointMPFFormatTextYoungerNumeralStopProtectsNonemptyResult(t *t
 	finish(parent.Close)
 	finish(q.Close)
 	finish(symbols.Close)
-	if e = rt.Deallocate(&recovery); e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
+	if e = rt.Deallocate(&recovery); e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (umemory.Block{})) {
 		t.Fatal(e)
 	}
 	finish(rt.Close)
@@ -167,7 +168,7 @@ func TestASTCheckpointMPFFormatTextYoungerNumeralStopProtectsNonemptyResult(t *t
 	}
 }
 
-func astMpfFormatTLSNearMinimum(t *testing.T, r *util.Runtime) {
+func astMpfFormatTLSNearMinimum(t *testing.T, r *umemory.Runtime) {
 	t.Helper()
 	first, e := r.Allocate(8)
 	astTestMust(t, e)
