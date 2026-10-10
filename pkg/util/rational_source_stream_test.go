@@ -19,12 +19,17 @@ func TestNumeralCStringViewExactCompletedCharacterInvocation(t *testing.T) {
 	size, e := c.Backing.ReadWord(z.Allocator, 0)
 	serviceMust(t, e)
 	n := z.Natural
-	construct := func() NumeralCStringView {
+	construct := func() numeralCStringView {
 		serviceMust(t, n.beginIntegerCharacters(uint32(11*size)))
 		serviceMust(t, n.sourceToCString(limbView{allocator: z.Allocator, backing: c.Backing, size: size}, sourceDecimalDestination{character: n.CharFormatting.Buffer}, uint64(len(n.CharFormatting.Buffer))))
-		return NumeralCStringView{owner: n, invocation: n.CharFormatting.invocation}
+		return numeralCStringView{owner: n, invocation: n.CharFormatting.invocation}
 	}
 	old := construct()
+	snapshot, e := old.String()
+	serviceMust(t, e)
+	if snapshot != "1099511627776" {
+		t.Fatal("native snapshot", snapshot)
+	}
 	for i, want := range []byte("1099511627776\x00") {
 		got, e := old.Byte(uint64(i))
 		serviceMust(t, e)
@@ -39,14 +44,21 @@ func TestNumeralCStringViewExactCompletedCharacterInvocation(t *testing.T) {
 	if _, e = old.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
 		t.Fatal("ended source char object", e)
 	}
+	if _, e = old.String(); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("expired snapshot producer", e)
+	}
 	next := construct()
+	n.CharFormatting.Buffer[0] = '2'
+	if snapshot != "1099511627776" {
+		t.Fatal("native snapshot aliases reused storage", snapshot)
+	}
 	if old.invocation == next.invocation {
 		t.Fatal("actual lexical invocation reused")
 	}
 	if _, e = old.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
 		t.Fatal("expired view read replacement char object", e)
 	}
-	if ch, e := next.Byte(0); e != nil || ch != '1' {
+	if ch, e := next.Byte(0); e != nil || ch != '2' {
 		t.Fatal("current exact view", ch, e)
 	}
 	serviceMust(t, n.destroyIntegerCharacters())

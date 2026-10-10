@@ -1,45 +1,6 @@
-// Source: src/util/mpz.cpp:1385-1410; src/util/mpq.cpp:130-141.
+// Native numeral output boundary for retained numeric stream consumers.
 package util
 
-func (out *NumericTextStream) AppendNumeralCString(v NumeralCStringView) error {
-	if e := out.lock(); e != nil {
-		return e
-	}
-	defer out.mu.Unlock()
-	var n uint64
-	for {
-		ch, e := v.Byte(n)
-		if e != nil {
-			return e
-		}
-		if ch == 0 {
-			break
-		}
-		n++
-	}
-	if out.FileBad || out.fileFail {
-		return nil
-	}
-	pad, e := out.fieldPadding(n)
-	if e != nil {
-		return e
-	}
-	if out.state.Alignment != NumericLeft {
-		if e = out.padding(pad); e != nil {
-			return e
-		}
-	}
-	for i := uint64(0); i < n; i++ {
-		ch, e := v.Byte(i)
-		if e != nil {
-			return e
-		}
-		if e = out.emitByte(ch); e != nil {
-			return e
-		}
-	}
-	if out.state.Alignment == NumericLeft {
-		return out.padding(pad)
-	}
-	return nil
+func (out *NumericTextStream) AppendNumeralText(text string) error {
+	return out.AppendCString(text)
 }

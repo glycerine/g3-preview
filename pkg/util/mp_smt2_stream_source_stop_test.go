@@ -18,8 +18,8 @@ type smt2StopBeforeTemporaryDT struct {
 }
 
 func (s *smt2StopBeforeTemporaryDT) AppendInt32(v int32) error { return s.inner.AppendInt32(v) }
-func (s *smt2StopBeforeTemporaryDT) AppendNumeralCString(v NumeralCStringView) error {
-	return s.inner.AppendNumeralCString(v)
+func (s *smt2StopBeforeTemporaryDT) AppendNumeralText(v string) error {
+	return s.inner.AppendNumeralText(v)
 }
 func (s *smt2StopBeforeTemporaryDT) AppendCString(v string) error {
 	if e := s.inner.AppendCString(v); e != nil {

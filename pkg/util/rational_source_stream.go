@@ -2,6 +2,7 @@
 package util
 
 import (
+	"bytes"
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -21,12 +22,12 @@ func (e *NumeralSourceFailure) Unwrap() []error { return []error{e.BodyCause, e.
 type RationalSourceStream interface {
 	AppendInt32(int32) error
 	AppendCString(string) error
-	AppendNumeralCString(NumeralCStringView) error
+	AppendNumeralText(string) error
 }
 
-// NumeralCStringView borrows the exact completed lexical char buffer invocation.
-// It performs reached byte reads without building a host string or assembly.
-type NumeralCStringView struct {
+// numeralCStringView borrows the exact completed lexical char buffer invocation.
+// It stays inside the producer; stream callbacks receive an independent string.
+type numeralCStringView struct {
 	caller            *RationalServiceInvocation
 	owner             *NaturalManager
 	invocation        uint64
@@ -34,7 +35,7 @@ type NumeralCStringView struct {
 	displayInvocation uint64
 }
 
-func (v NumeralCStringView) Byte(i uint64) (byte, error) {
+func (v numeralCStringView) Byte(i uint64) (byte, error) {
 	if v.owner == nil || v.owner.self != v.owner || v.owner.ClosedField {
 		return 0, arena.ErrInvalidSlot
 	}
@@ -52,6 +53,23 @@ func (v NumeralCStringView) Byte(i uint64) (byte, error) {
 		return 0, arena.ErrInvalidSlot
 	}
 	return characterByte(s.Buffer, i)
+}
+
+// String validates the exact completed character invocation and snapshots its
+// first-NUL text before crossing the output callback boundary.
+func (v numeralCStringView) String() (string, error) {
+	if _, e := v.Byte(0); e != nil {
+		return "", e
+	}
+	scope := &v.owner.CharFormatting
+	if v.Character != nil {
+		scope = v.Character
+	}
+	n := bytes.IndexByte(scope.Buffer, 0)
+	if n < 0 {
+		return "", arena.ErrBounds
+	}
+	return string(scope.Buffer[:n]), nil
 }
 
 func (s *RationalService) InsertInto(out RationalSourceStream, v *OwnedRational) error {
@@ -185,7 +203,12 @@ func (m *IntegerManager) insertSourceIntegerTrackedWithContexts(out RationalSour
 	}()
 	e = n.sourceToCStringScopedTracked(limbView{allocator: m.Allocator, backing: c.Backing, size: size}, sourceDecimalDestination{character: characters.Buffer}, uint64(len(characters.Buffer)), characters.formatting, receipt)
 	if e == nil {
-		e = out.AppendNumeralCString(NumeralCStringView{owner: n, invocation: characters.invocation, Character: characters, displayInvocation: characters.displayInvocation, caller: caller})
+		view := numeralCStringView{owner: n, invocation: characters.invocation, Character: characters, displayInvocation: characters.displayInvocation, caller: caller}
+		var text string
+		text, e = view.String()
+		if e == nil {
+			e = out.AppendNumeralText(text)
+		}
 	}
 	if e != nil && characters.originalCause == nil {
 		characters.originalCause = e

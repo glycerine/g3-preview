@@ -16,8 +16,8 @@ type decimalStopAtQuestionMark struct {
 }
 
 func (s *decimalStopAtQuestionMark) AppendInt32(v int32) error { return s.inner.AppendInt32(v) }
-func (s *decimalStopAtQuestionMark) AppendNumeralCString(v NumeralCStringView) error {
-	return s.inner.AppendNumeralCString(v)
+func (s *decimalStopAtQuestionMark) AppendNumeralText(v string) error {
+	return s.inner.AppendNumeralText(v)
 }
 func (s *decimalStopAtQuestionMark) AppendCString(v string) error {
 	if e := s.inner.AppendCString(v); e != nil {

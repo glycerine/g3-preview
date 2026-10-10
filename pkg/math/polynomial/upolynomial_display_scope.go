@@ -278,10 +278,10 @@ func (s upolyDisplayStream) AppendCString(v string) error {
 	defer func() { s.scope.owner.callbackDepth-- }()
 	return s.out.AppendCString(v)
 }
-func (s upolyDisplayStream) AppendNumeralCString(v util.NumeralCStringView) error {
+func (s upolyDisplayStream) AppendNumeralText(v string) error {
 	s.scope.owner.callbackDepth++
 	defer func() { s.scope.owner.callbackDepth-- }()
-	return s.out.AppendNumeralCString(v)
+	return s.out.AppendNumeralText(v)
 }
 
 func numericIntegerModularManager_copyWithDisplayContext(m *util.IntegerModularManager, out, value *util.Int, c integerAllocationInvocationContext) error {

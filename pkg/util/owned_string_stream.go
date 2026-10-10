@@ -3,7 +3,6 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"math"
 	"strconv"
 	"strings"
 )
@@ -28,21 +27,6 @@ func (b *OwnedStringBuffer) Construct(budget *arena.Budget) error {
 		return e
 	}
 	b.String.goBuilder = &b.builder
-	return nil
-}
-
-func (b *OwnedStringBuffer) put(ch byte) error {
-	if b == nil || b.Self != b || !b.String.Ready || b.String.Closed {
-		return ErrOwnedStringOwner
-	}
-	if b.Position >= uint64(^uint(0)>>1) {
-		return arena.ErrBounds
-	}
-	if e := b.builder.WriteByte(ch); e != nil {
-		return e
-	}
-	b.Position++
-	b.String.Length = b.Position
 	return nil
 }
 
@@ -81,7 +65,7 @@ func (b *OwnedStringBuffer) OwnAbort() {
 }
 
 // OwnedStringStream uses Go decimal formatting and strings.Builder for the
-// project’s numeric text output. Checked numeral errors remain sticky.
+// project’s numeric text output. Output errors remain sticky.
 type OwnedStringStream struct {
 	Self   *OwnedStringStream
 	Buffer OwnedStringBuffer
@@ -101,18 +85,10 @@ func (s *OwnedStringStream) check() error {
 	}
 	return s.Cause
 }
-func (s *OwnedStringStream) emit(ch byte) error {
-	e := s.Buffer.put(ch)
-	if e != nil {
-		s.Cause = e
-	}
-	return e
-}
 func (s *OwnedStringStream) AppendInt32(n int32) error {
 	return s.AppendInt64(int64(n))
 }
 
-// AppendInt64 supplies the signed exponent insertion used by mpf.cpp:1598.
 func (s *OwnedStringStream) appendText(text string) error {
 	if e := s.check(); e != nil {
 		return e
@@ -124,6 +100,7 @@ func (s *OwnedStringStream) appendText(text string) error {
 	return nil
 }
 
+// AppendInt64 supplies the signed exponent insertion used by mpf.cpp:1598.
 func (s *OwnedStringStream) AppendInt64(n int64) error {
 	if e := s.check(); e != nil {
 		return e
@@ -140,28 +117,7 @@ func (s *OwnedStringStream) AppendCString(text string) error {
 	}
 	return s.appendText(text)
 }
-func (s *OwnedStringStream) AppendNumeralCString(v NumeralCStringView) error {
-	if e := s.check(); e != nil {
-		return e
-	}
-	for i := uint64(0); ; i++ {
-		ch, e := v.Byte(i)
-		if e != nil {
-			s.Cause = e
-			return e
-		}
-		if ch == 0 {
-			return nil
-		}
-		if e = s.emit(ch); e != nil {
-			return e
-		}
-		if i == math.MaxUint64 {
-			s.Cause = arena.ErrBounds
-			return s.Cause
-		}
-	}
-}
+func (s *OwnedStringStream) AppendNumeralText(text string) error { return s.AppendCString(text) }
 func (s *OwnedStringStream) Str(dst *OwnedString) error {
 	if e := s.check(); e != nil {
 		return e

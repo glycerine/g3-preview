@@ -27,7 +27,7 @@ func TestIntegerCharacterNativeScratchGrowthAndLifetime(t *testing.T) {
 			}
 		}
 		s.Buffer[0] = '7'
-		view := NumeralCStringView{owner: m, invocation: s.invocation}
+		view := numeralCStringView{owner: m, invocation: s.invocation}
 		if b, e := view.Byte(0); e != nil || b != '7' {
 			t.Fatal(b, e)
 		}

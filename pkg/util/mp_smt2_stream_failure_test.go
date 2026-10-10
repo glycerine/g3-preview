@@ -137,11 +137,11 @@ func (s *smt2FailingStream) AppendInt32(v int32) error {
 	}
 	return s.inner.AppendInt32(v)
 }
-func (s *smt2FailingStream) AppendNumeralCString(v NumeralCStringView) error {
+func (s *smt2FailingStream) AppendNumeralText(v string) error {
 	if e := s.next(); e != nil {
 		return e
 	}
-	return s.inner.AppendNumeralCString(v)
+	return s.inner.AppendNumeralText(v)
 }
 
 func TestRationalSMT2StreamEveryInsertionException(t *testing.T) {

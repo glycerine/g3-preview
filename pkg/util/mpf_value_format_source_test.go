@@ -134,17 +134,9 @@ func (s *formatTestStream) AppendInt64(v int64) error {
 	return nil
 }
 func (s *formatTestStream) AppendCString(v string) error { s.bytes = append(s.bytes, v...); return nil }
-func (s *formatTestStream) AppendNumeralCString(v NumeralCStringView) error {
-	for i := uint64(0); ; i++ {
-		b, e := v.Byte(i)
-		if e != nil {
-			return e
-		}
-		if b == 0 {
-			return nil
-		}
-		s.bytes = append(s.bytes, b)
-	}
+func (s *formatTestStream) AppendNumeralText(v string) error {
+	s.bytes = append(s.bytes, v...)
+	return nil
 }
 func (s *formatTestStream) SourceFinalize() error { return nil }
 func (s *formatTestStream) Close() error          { return nil }

@@ -10,9 +10,9 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// The old c_str belongs to an exited lexical buffer, even when the next
-// actual display reuses the embedded call metadata and prints identical bytes.
-func TestUPolynomialDisplayBorrowRefusesLaterLiveEmbeddedCall(t *testing.T) {
+// Native output text survives lexical cleanup and reuse of the embedded call.
+// The actual insertion receipt still cannot end an executing lexical child.
+func TestUPolynomialDisplayNativeTextSurvivesLaterEmbeddedCall(t *testing.T) {
 	r, s := preparationPhysicalFixture(t)
 	m := s.manager
 	var a util.Int
@@ -25,8 +25,8 @@ func TestUPolynomialDisplayBorrowRefusesLaterLiveEmbeddedCall(t *testing.T) {
 		serviceMust(t, m.reset(&p))
 		m.freeBacking(&p)
 	}()
-	var old util.NumeralCStringView
-	first := &upolyDisplaySink{numeralHook: func(v util.NumeralCStringView) error {
+	var old string
+	first := &upolyDisplaySink{numeralHook: func(v string) error {
 		old = v
 		// Neither cleanup mode may end the still-executing lexical child.
 		for _, owning := range []bool{false, true} {
@@ -39,28 +39,26 @@ func TestUPolynomialDisplayBorrowRefusesLaterLiveEmbeddedCall(t *testing.T) {
 				t.Fatal("executing cleanup refusal changed the real receipt or charged state")
 			}
 		}
-		_, e := v.Byte(0)
-		return e
+		return nil
 	}}
 	serviceMust(t, m.DisplayInto(m.stateView(&p), first, "x", false))
-	if _, e := old.Byte(0); e != arena.ErrInvalidSlot {
-		t.Fatalf("exited lexical borrow: %v", e)
+	if old != "79228162514264337593543950343" {
+		t.Fatal("completed native text", old)
 	}
 	called := false
-	second := &upolyDisplaySink{numeralHook: func(v util.NumeralCStringView) error {
+	second := &upolyDisplaySink{numeralHook: func(v string) error {
 		called = true
-		if old.Character != v.Character {
-			t.Fatal("fixture did not reuse actual embedded character metadata")
+		if old != v {
+			t.Fatal("later native value changed", old, v)
 		}
 		before := r.Integers().Budget().Used()
-		if b, e := old.Byte(0); e != arena.ErrInvalidSlot {
-			t.Errorf("old lexical borrow retargeted to later live call: byte %d, error %v", b, e)
+		if old != "79228162514264337593543950343" {
+			t.Fatal("old native text changed", old)
 		}
 		if before != r.Integers().Budget().Used() {
-			t.Fatal("stale view read changed charged state")
+			t.Fatal("native text read changed charged state")
 		}
-		_, e := v.Byte(0)
-		return e
+		return nil
 	}}
 	serviceMust(t, m.DisplayInto(m.stateView(&p), second, "x", false))
 	if !called || first.text.String() != second.text.String() {
@@ -87,7 +85,7 @@ func TestUPolynomialDisplayInsertionReceiptRefusesLaterEmbeddedCall(t *testing.T
 				m.freeBacking(&p)
 			}()
 			marker := errors.New("actual borrowed output failure")
-			out := &upolyDisplaySink{numeralHook: func(util.NumeralCStringView) error { return marker }}
+			out := &upolyDisplaySink{numeralHook: func(string) error { return marker }}
 			if e := m.DisplayInto(m.stateView(&p), out, "x", false); e != marker {
 				t.Fatal("first output failure", e)
 			}

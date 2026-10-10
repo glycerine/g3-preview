@@ -55,9 +55,8 @@ func TestOwnedStringStreamDecimalAndCountedReturn(t *testing.T) {
 		serviceMust(t, out.AppendCString("|\x00ignored"))
 		fmt.Fprintf(&expected, "%d|", n)
 	}
-	// A put byte, unlike a C-string insertion, preserves embedded NUL at str().
-	serviceMust(t, out.emit(0))
-	serviceMust(t, out.emit('z'))
+	// Counted native text preserves embedded NUL at str().
+	serviceMust(t, out.appendText("\x00z"))
 	var result OwnedString
 	serviceMust(t, out.Str(&result))
 	got, e := result.View().String()
@@ -90,7 +89,7 @@ func TestOwnedStringStreamGoBuilderIgnoresArenaFailures(t *testing.T) {
 	}
 }
 
-func TestOwnedStringStreamOwnerAndBorrowGuards(t *testing.T) {
+func TestOwnedStringStreamOwnerAndNativeTextGuards(t *testing.T) {
 	var out OwnedStringStream
 	serviceMust(t, out.Construct(nil))
 	copied := out
@@ -100,14 +99,9 @@ func TestOwnedStringStreamOwnerAndBorrowGuards(t *testing.T) {
 	if !errors.Is(out.Construct(nil), ErrOwnedStringOwner) {
 		t.Fatal("double construct")
 	}
-	if e := out.AppendNumeralCString(NumeralCStringView{}); !errors.Is(e, arena.ErrInvalidSlot) {
-		t.Fatal("stale numeral", e)
-	}
-	if out.Buffer.Position != 0 {
-		t.Fatal("stale numeral output")
-	}
-	if !errors.Is(out.AppendCString("x"), arena.ErrInvalidSlot) {
-		t.Fatal("replayed invalid numeral")
+	serviceMust(t, out.AppendNumeralText("17"))
+	if out.Buffer.Position != 2 {
+		t.Fatal("native numeral text", out.Buffer.Position)
 	}
 	out.OwnAbort()
 	if !errors.Is(out.AppendInt32(1), ErrOwnedStringOwner) {

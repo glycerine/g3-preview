@@ -33529,3 +33529,28 @@ is not enough to split the stream group: its numeral CString-view method remains
 a numerical bridge. Actual owning AST/model containers and other external
 native storage migration also remain open. Goal stays active; the complete
 util subpackage split is unfinished.
+
+## Recovered native numeral output boundary
+
+Resumed the interrupted change after the power loss. RationalSourceStream now
+accepts native string text for the retained numeral insertion event. The producer
+validates its exact completed character invocation and copies first-NUL text
+before calling output. The checked view stays private to util. NumericTextStream
+and OwnedStringStream no longer depend on numerical storage through their input
+methods. Removed the unused single-byte string builder adapter. Actual source
+character lifetime, reentry guards, insertion receipts and destructor cleanup
+remain; this does not add STL or generic template implementation credit.
+
+Validation: focused native util/polynomial passed (0.514s/0.048s), and matching
+g3debug checks passed (0.544s/0.059s). Tests check native text surviving nested
+output and source-buffer reuse, private stale producer rejection, failure
+ordinals and actual cleanup/receipt guards. Module-wide compilation, util and
+polynomial vet, manifest and diff checks passed. No full native suite rerun.
+Counts remain 2102 units/677 APIs: 62 ported, 283 partial, 1729 unported,
+two dead/deleted.
+
+The receiver-aware placement audit now reports 286 root production files and
+43 components, with a largest coupled group of 183 files (previously 190).
+The external caller migration is incomplete: model array tuple tables and
+array expansion/equality still use ASTRefVector storage. The complete util
+subpackage split remains unfinished; this audit is not proof of readiness.

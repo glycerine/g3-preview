@@ -16,7 +16,7 @@ import (
 type upolyDisplaySink struct {
 	text        strings.Builder
 	literalHook func(string) error
-	numeralHook func(util.NumeralCStringView) error
+	numeralHook func(string) error
 }
 
 func (s *upolyDisplaySink) AppendInt32(v int32) error {
@@ -32,22 +32,14 @@ func (s *upolyDisplaySink) AppendCString(v string) error {
 	s.text.WriteString(v)
 	return nil
 }
-func (s *upolyDisplaySink) AppendNumeralCString(v util.NumeralCStringView) error {
+func (s *upolyDisplaySink) AppendNumeralText(v string) error {
 	if s.numeralHook != nil {
 		if e := s.numeralHook(v); e != nil {
 			return e
 		}
 	}
-	for i := uint64(0); ; i++ {
-		b, e := v.Byte(i)
-		if e != nil {
-			return e
-		}
-		if b == 0 {
-			return nil
-		}
-		s.text.WriteByte(b)
-	}
+	s.text.WriteString(v)
+	return nil
 }
 func TestUPolynomialDisplayActualTst1DriverOutput(t *testing.T) {
 	z, s := preparationPhysicalFixture(t)
@@ -186,8 +178,8 @@ func TestUPolynomialDisplayBIGStreamFailureLiteralLifetime(t *testing.T) {
 			serviceMust(t, r.Integers().Del(&a))
 			defer func() { serviceMust(t, m.CleanupDisplay()); serviceMust(t, m.reset(&p)); m.freeBacking(&p) }()
 			marker := errors.New("actual ostream refused decimal borrow")
-			var borrowed util.NumeralCStringView
-			out := &upolyDisplaySink{numeralHook: func(v util.NumeralCStringView) error { borrowed = v; return marker }}
+			var borrowed string
+			out := &upolyDisplaySink{numeralHook: func(v string) error { borrowed = v; return marker }}
 			var e error
 			if smt {
 				e = m.DisplaySMT2Into(m.stateView(&p), out, "x")
@@ -200,8 +192,8 @@ func TestUPolynomialDisplayBIGStreamFailureLiteralLifetime(t *testing.T) {
 			if m.display.constructed != smt {
 				t.Fatal("source scoped NUM vs RAW declaration lifetime", smt, m.display.constructed)
 			}
-			if _, e = borrowed.Byte(0); e == nil {
-				t.Fatal("decimal buffer borrow survived lexical insertion")
+			if borrowed != "79228162514264337593543950343" {
+				t.Fatal("native numeral snapshot", borrowed)
 			}
 			roots := []*util.Int{&m.display.numeral}
 			for i := uint32(0); i < p.size; i++ {
@@ -410,7 +402,7 @@ func TestUPolynomialDisplayNestedInlineErasedAllocation(t *testing.T) {
 	}
 }
 
-func TestUPolynomialDisplayNestedBIGPreservesActualOuterBorrow(t *testing.T) {
+func TestUPolynomialDisplayNestedBIGPreservesNativeText(t *testing.T) {
 	r, s := preparationPhysicalFixture(t)
 	m := s.manager
 	var a util.Int
@@ -420,22 +412,20 @@ func TestUPolynomialDisplayNestedBIGPreservesActualOuterBorrow(t *testing.T) {
 	serviceMust(t, r.Integers().Del(&a))
 	defer func() { serviceMust(t, m.CleanupDisplay()); serviceMust(t, m.reset(&p)); m.freeBacking(&p) }()
 	called := false
-	var old util.NumeralCStringView
-	out := &upolyDisplaySink{numeralHook: func(v util.NumeralCStringView) error {
+	var old string
+	out := &upolyDisplaySink{numeralHook: func(v string) error {
 		if called {
 			return nil
 		}
 		called = true
 		old = v
-		first, e := v.Byte(0)
-		serviceMust(t, e)
+		first := v
 		inner := &upolyDisplaySink{}
 		serviceMust(t, m.DisplaySMT2Into(m.stateView(&p), inner, "y"))
 		if inner.text.String() != "79228162514264337593543950343" {
 			t.Fatal(inner.text.String())
 		}
-		after, e := v.Byte(0)
-		serviceMust(t, e)
+		after := v
 		if first != after {
 			t.Fatal("nested lexical char buffer overwrote outer borrow")
 		}
@@ -446,12 +436,12 @@ func TestUPolynomialDisplayNestedBIGPreservesActualOuterBorrow(t *testing.T) {
 	if !called || out.text.String() != "79228162514264337593543950343" {
 		t.Fatal(out.text.String())
 	}
-	if _, e := old.Byte(0); e == nil {
-		t.Fatal("outer char borrow survived actual lexical DT")
+	if old != "79228162514264337593543950343" {
+		t.Fatal("native outer snapshot changed after lexical cleanup", old)
 	}
 }
 
-func TestUPolynomialDisplayNestedInlinePreservesActualOuterBorrow(t *testing.T) {
+func TestUPolynomialDisplayNestedInlinePreservesNativeText(t *testing.T) {
 	r, s := preparationPhysicalFixture(t)
 	m := s.manager
 	var a util.Int
@@ -467,16 +457,14 @@ func TestUPolynomialDisplayNestedInlinePreservesActualOuterBorrow(t *testing.T) 
 		serviceMust(t, m.reset(&n))
 		m.freeBacking(&n)
 	}()
-	out := &upolyDisplaySink{numeralHook: func(v util.NumeralCStringView) error {
-		first, e := v.Byte(0)
-		serviceMust(t, e)
+	out := &upolyDisplaySink{numeralHook: func(v string) error {
+		first := v
 		inner := &upolyDisplaySink{}
 		serviceMust(t, m.DisplaySMT2Into(m.stateView(&n), inner, "y"))
 		if inner.text.String() != "(- 2)" {
 			t.Fatal(inner.text.String())
 		}
-		after, e := v.Byte(0)
-		serviceMust(t, e)
+		after := v
 		if first != after {
 			t.Fatal("inline nested call invalidated real outer CString")
 		}
@@ -550,12 +538,12 @@ func TestUPolynomialDisplayActualNaturalBorrowOwnerReentry(t *testing.T) {
 			serviceMust(t, r.Integers().Del(&a))
 			defer func() { serviceMust(t, m.CleanupDisplay()); serviceMust(t, m.reset(&p)); m.freeBacking(&p) }()
 			called := false
-			out := &upolyDisplaySink{numeralHook: func(v util.NumeralCStringView) error {
+			out := &upolyDisplaySink{numeralHook: func(v string) error {
 				called = true
 				n := r.Integers().Naturals()
 				before := r.Integers().Budget().Used()
-				first, e := v.Byte(0)
-				serviceMust(t, e)
+				first := v
+				var e error
 				if mode == "source" {
 					e = n.SourceFinalize()
 				} else {
@@ -564,8 +552,8 @@ func TestUPolynomialDisplayActualNaturalBorrowOwnerReentry(t *testing.T) {
 				if e == nil || n.ClosedField || n.Closing || n.SourceFinalizing || before != r.Integers().Budget().Used() {
 					t.Errorf("live lexical borrowed character scope retired: %v", e)
 				}
-				after, e := v.Byte(0)
-				if e != nil || first != after {
+				after := v
+				if first != after {
 					t.Errorf("actual live borrow changed %v", e)
 				}
 				return nil
@@ -596,7 +584,7 @@ func TestUPolynomialDisplayErasedRoutePreservesEarlierUnjoinedRAW(t *testing.T) 
 		m.freeBacking(&p)
 	}()
 	marker := errors.New("actual earlier failed ostream body")
-	e := m.DisplaySMT2Into(m.stateView(&p), &upolyDisplaySink{numeralHook: func(util.NumeralCStringView) error { return marker }}, "x")
+	e := m.DisplaySMT2Into(m.stateView(&p), &upolyDisplaySink{numeralHook: func(string) error { return marker }}, "x")
 	if !errors.Is(e, marker) || !m.display.active || !m.display.constructed || (m.display.numeral).Cell == 0 {
 		t.Fatal("actual source failed RAW prefix", e)
 	}

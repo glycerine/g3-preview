@@ -49,19 +49,9 @@ func TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard(t *testing
 
 type numeralReceiptDiscardStream struct{}
 
-func (numeralReceiptDiscardStream) AppendInt32(int32) error    { return nil }
-func (numeralReceiptDiscardStream) AppendCString(string) error { return nil }
-func (numeralReceiptDiscardStream) AppendNumeralCString(v NumeralCStringView) error {
-	for i := uint64(0); ; i++ {
-		c, e := v.Byte(i)
-		if e != nil {
-			return e
-		}
-		if c == 0 {
-			return nil
-		}
-	}
-}
+func (numeralReceiptDiscardStream) AppendInt32(int32) error        { return nil }
+func (numeralReceiptDiscardStream) AppendCString(string) error     { return nil }
+func (numeralReceiptDiscardStream) AppendNumeralText(string) error { return nil }
 
 // Exact guarded primitive receipts share the actual InsertInto child engine.
 // Wrong copies are passed directly; the parent's acquired tuple is untouched.
