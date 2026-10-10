@@ -120307,7 +120307,9 @@
       "go_targets": [
         "pkg/util/lp/lar_bounds.go",
         "pkg/util/lp/lar_bounds_test.go",
-        "pkg/util/lp/stacked_lar_witness.go"
+        "pkg/util/lp/stacked_lar_witness.go",
+        "pkg/util/lp/bound_propagator.go",
+        "pkg/util/lp/bound_propagator_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -120316,7 +120318,12 @@
         "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
         "TestLARBoundsExistingScopedOwnersAndAlias",
         "TestLARBoundsDebugInvariantProfiles",
-        "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+        "TestLARBoundsMultipleColumnsAndExistingInfeasibility",
+        "TestLARBoundPropagatorIndependentStrongestOracle",
+        "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
+        "TestLARBoundPropagatorPhysicalFailurePrefixes",
+        "TestLARBoundPropagatorMappingAndOwnerGuards",
+        "TestLARBoundPropagatorLeavesHookInvocationOwned"
       ],
       "conditionals": [
         {
@@ -120713,6 +120720,18 @@
           "name": "remaining full LAR constructor/lifecycle, constraint scopes, term/matrix/basis integration, solve, propagation and explanations",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "adjust_column_index_to_term_index and get_term live directory mapping consumed by exact bound propagation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/bound_propagator.go",
+          "tests": [
+            "TestLARBoundPropagatorIndependentStrongestOracle",
+            "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
+            "TestLARBoundPropagatorPhysicalFailurePrefixes",
+            "TestLARBoundPropagatorMappingAndOwnerGuards",
+            "TestLARBoundPropagatorLeavesHookInvocationOwned"
+          ]
         }
       ],
       "ownership": [
@@ -120819,27 +120838,181 @@
       "path": "src/util/lp/lp_bound_propagator.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/bound_propagator.go",
+        "pkg/util/lp/bound_propagator_test.go"
+      ],
+      "tests": [
+        "TestLARBoundPropagatorIndependentStrongestOracle",
+        "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
+        "TestLARBoundPropagatorPhysicalFailurePrefixes",
+        "TestLARBoundPropagatorMappingAndOwnerGuards",
+        "TestLARBoundPropagatorLeavesHookInvocationOwned"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete borrowed bound-model constructor and current column-type/lower/upper accessors",
+          "status": "ported",
+          "go_target": "pkg/util/lp/bound_propagator.go",
+          "tests": [
+            "TestLARBoundPropagatorIndependentStrongestOracle",
+            "TestLARBoundPropagatorHooksBorrowedModelAndStreams"
+          ]
+        },
+        {
+          "name": "try_add_bound exact copy, term-index adjustment and constant restoration before virtual interest filter",
+          "status": "ported",
+          "go_target": "pkg/util/lp/bound_propagator.go",
+          "tests": [
+            "TestLARBoundPropagatorIndependentStrongestOracle",
+            "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
+            "TestLARBoundPropagatorPhysicalFailurePrefixes",
+            "TestLARBoundPropagatorMappingAndOwnerGuards",
+            "TestLARBoundPropagatorLeavesHookInvocationOwned"
+          ]
+        },
+        {
+          "name": "strongest lower/upper maps, first-discovery order, strict tie upgrade and source temporary/stored copy/assignment publication",
+          "status": "ported",
+          "go_target": "pkg/util/lp/bound_propagator.go",
+          "tests": [
+            "TestLARBoundPropagatorIndependentStrongestOracle",
+            "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
+            "TestLARBoundPropagatorPhysicalFailurePrefixes"
+          ]
+        },
+        {
+          "name": "base always-interesting behavior and typed source virtual interest override with independent stopped-call ownership",
+          "status": "ported",
+          "go_target": "pkg/util/lp/bound_propagator.go",
+          "tests": [
+            "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
+            "TestLARBoundPropagatorLeavesHookInvocationOwned"
+          ]
+        },
+        {
+          "name": "number_of_found_bounds and base doh stream/typed virtual evidence consumer",
+          "status": "ported",
+          "go_target": "pkg/util/lp/bound_propagator.go",
+          "tests": [
+            "TestLARBoundPropagatorIndependentStrongestOracle",
+            "TestLARBoundPropagatorHooksBorrowedModelAndStreams"
+          ]
+        },
+        {
+          "name": "owning partial/complete implied-bound and local cleanup without destroying borrowed model/hooks",
+          "status": "ported",
+          "go_target": "pkg/util/lp/bound_propagator.go",
+          "tests": [
+            "TestLARBoundPropagatorIndependentStrongestOracle",
+            "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
+            "TestLARBoundPropagatorPhysicalFailurePrefixes",
+            "TestLARBoundPropagatorMappingAndOwnerGuards",
+            "TestLARBoundPropagatorLeavesHookInvocationOwned"
+          ]
+        }
+      ],
+      "ownership": [
+        "The propagator borrows concrete LARBounds plus pointers to live native column-to-external and term directories; the manager, terms, hooks and streams outlive their use and are never closed here. It owns native strongest-bound maps, independently copied implied bounds, copied/shifted working value, source temporary and unpublished stored copy, plus actual numeric invocation/allocation receipts. New map indices publish before fallible implied-bound construction/storage. A failed call retains real partial state until explicit Close.",
+        "Numeric tracking ends before entering the separately owned interest hook and resumes only after success, so a stopped virtual-provider division and its physical roots are not claimed by the propagator. Close destroys unpublished stored/temporary values, copied working value and stored bounds in reverse order, with identity-checked cleanup."
+      ],
+      "deviations": [
+        "LP propagator operations and source virtual boundaries are implemented; complete row analyzer, full LAR constructor/model registration, explanation consumer and SMT integration remain open. Constructor binds the existing concrete bound owner and live model directories directly, without claiming a complete LARSolver constructor.",
+        "Native Go maps/slices replace source container layout and growth; deterministic first-discovery output order and map-before-copy failure prefixes are preserved. Term threshold remains the source 1000000. Default consume uses native io.Writer with os.Stdout binding and returns actual writer errors; C++ ostream internals are not emulated."
+      ]
     },
     {
       "path": "src/util/lp/lp_bound_propagator.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/bound_propagator.go",
+        "pkg/util/lp/bound_propagator_test.go"
+      ],
+      "tests": [
+        "TestLARBoundPropagatorIndependentStrongestOracle",
+        "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
+        "TestLARBoundPropagatorPhysicalFailurePrefixes",
+        "TestLARBoundPropagatorMappingAndOwnerGuards",
+        "TestLARBoundPropagatorLeavesHookInvocationOwned"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete borrowed bound-model constructor and current column-type/lower/upper accessors",
+          "status": "ported",
+          "go_target": "pkg/util/lp/bound_propagator.go",
+          "tests": [
+            "TestLARBoundPropagatorIndependentStrongestOracle",
+            "TestLARBoundPropagatorHooksBorrowedModelAndStreams"
+          ]
+        },
+        {
+          "name": "try_add_bound exact copy, term-index adjustment and constant restoration before virtual interest filter",
+          "status": "ported",
+          "go_target": "pkg/util/lp/bound_propagator.go",
+          "tests": [
+            "TestLARBoundPropagatorIndependentStrongestOracle",
+            "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
+            "TestLARBoundPropagatorPhysicalFailurePrefixes",
+            "TestLARBoundPropagatorMappingAndOwnerGuards",
+            "TestLARBoundPropagatorLeavesHookInvocationOwned"
+          ]
+        },
+        {
+          "name": "strongest lower/upper maps, first-discovery order, strict tie upgrade and source temporary/stored copy/assignment publication",
+          "status": "ported",
+          "go_target": "pkg/util/lp/bound_propagator.go",
+          "tests": [
+            "TestLARBoundPropagatorIndependentStrongestOracle",
+            "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
+            "TestLARBoundPropagatorPhysicalFailurePrefixes"
+          ]
+        },
+        {
+          "name": "base always-interesting behavior and typed source virtual interest override with independent stopped-call ownership",
+          "status": "ported",
+          "go_target": "pkg/util/lp/bound_propagator.go",
+          "tests": [
+            "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
+            "TestLARBoundPropagatorLeavesHookInvocationOwned"
+          ]
+        },
+        {
+          "name": "number_of_found_bounds and base doh stream/typed virtual evidence consumer",
+          "status": "ported",
+          "go_target": "pkg/util/lp/bound_propagator.go",
+          "tests": [
+            "TestLARBoundPropagatorIndependentStrongestOracle",
+            "TestLARBoundPropagatorHooksBorrowedModelAndStreams"
+          ]
+        },
+        {
+          "name": "owning partial/complete implied-bound and local cleanup without destroying borrowed model/hooks",
+          "status": "ported",
+          "go_target": "pkg/util/lp/bound_propagator.go",
+          "tests": [
+            "TestLARBoundPropagatorIndependentStrongestOracle",
+            "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
+            "TestLARBoundPropagatorPhysicalFailurePrefixes",
+            "TestLARBoundPropagatorMappingAndOwnerGuards",
+            "TestLARBoundPropagatorLeavesHookInvocationOwned"
+          ]
+        }
+      ],
+      "ownership": [
+        "The propagator borrows concrete LARBounds plus pointers to live native column-to-external and term directories; the manager, terms, hooks and streams outlive their use and are never closed here. It owns native strongest-bound maps, independently copied implied bounds, copied/shifted working value, source temporary and unpublished stored copy, plus actual numeric invocation/allocation receipts. New map indices publish before fallible implied-bound construction/storage. A failed call retains real partial state until explicit Close.",
+        "Numeric tracking ends before entering the separately owned interest hook and resumes only after success, so a stopped virtual-provider division and its physical roots are not claimed by the propagator. Close destroys unpublished stored/temporary values, copied working value and stored bounds in reverse order, with identity-checked cleanup."
+      ],
+      "deviations": [
+        "LP propagator operations and source virtual boundaries are implemented; complete row analyzer, full LAR constructor/model registration, explanation consumer and SMT integration remain open. Constructor binds the existing concrete bound owner and live model directories directly, without claiming a complete LARSolver constructor.",
+        "Native Go maps/slices replace source container layout and growth; deterministic first-discovery output order and map-before-copy failure prefixes are preserved. Term threshold remains the source 1000000. Default consume uses native io.Writer with os.Stdout binding and returns actual writer errors; C++ ostream internals are not emulated."
+      ]
     },
     {
       "path": "src/util/lp/lp_core_solver_base.h",

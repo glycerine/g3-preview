@@ -37966,3 +37966,54 @@ LP78 partial/32 unported; global2103 units/677 APIs,62 ported/359 partial/
 1654 unported/two dead-deleted. Full native module checkpoint remains22:14 UTC,
 89.8% (12347/13752), predating current LAR additions; hourly repeat is not due.
 The complete implementation/test/coverage goal remains unfinished.
+
+### Exact LAR strongest-bound propagation and virtual providers — 2026-10-10
+
+Ported lp_bound_propagator's concrete constructor binding, actual bound getters,
+TryAddBound and strongest lower/upper lookup maps, found-bound count and base/
+virtual consume behavior. The propagator borrows existing LARBounds and pointers
+to live native column-to-external/term directories. Mapping preserves the source
+1000000 threshold and internal-column identity for ordinary external variables;
+term columns acquire the current borrowed term constant before interest filtering.
+Native maps hold indices into insertion-ordered independently owned implied
+bounds. Numeric comparison precedes structural equality/strict tie upgrade.
+Replacing a bound constructs the source temporary then performs owning assignment;
+new entries publish the map index before temporary/stored copies and vector append.
+Complete/partial publication and actual numerical call roots survive errors until
+explicit Close. No full LARSolver constructor or model registration is claimed.
+
+Typed exact interest/evidence interfaces represent the actual virtual overrides
+in theory_lra.cpp. The default interest route accepts every candidate; consume
+uses native io.Writer/os.Stdout for doh newline and actual writer error prefixes.
+Numeric tracking ends before invoking the separately owned interest provider and
+resumes after success. A real provider-owned aliased division refusal proves the
+propagator acquires no provider receipts; closing it leaves the exact active
+provider division generation/state untouched for that owner's cleanup. Borrowed
+model numerals, hooks, directories and streams survive propagator destruction.
+
+1200 independent big.Rat candidate decisions validate strongest values in both
+directions, strict ties, aliases to the same term, coefficient-sign/row evidence,
+first-discovery order and input mutation isolation. Live appended directories/
+terms, current bound getters, shifted filter inputs/kinds, rejection/error before
+map publication, evidence overrides and stream failures are covered.14 pooled/
+direct physical failure campaigns enumerate new lower/upper, stronger lower/
+upper replacement, strict ties and term arithmetic through success. They verify
+actual map-before-copy prefixes, stopped guards, independent ownership, exact
+values/evidence and named live-root census after cleanup. Missing/foreign/stopped
+term and mapping guards are covered using real borrowed source fields.
+
+Focused propagator/implied-bound/LAR-term native checks pass14.635s; combined
+ g3debug/g3checked15.999s. New file119/133 (89.5%) in both profiles. Fourteen gaps
+mostly qualify invariant-protected lookup/child cleanup errors and prior pending
+checks. Profiles: /mnt/oldrog/tmp/g3-bound-propagator-{native,debug}.cover.
+Both LP vets, source/evidence/no-generics verification and native module-wide
+test compilation pass. Graph adds one production filename and no import edges.
+
+lp_bound_propagator.h/.cpp now have explicit partial implementation/test evidence;
+LP80 partial/30 unported, global2103 units/677 APIs,62 ported/361 partial/
+1652 unported/two dead-deleted. Full native checkpoint remains22:14 UTC,
+89.8% (12347/13752), predating current LAR additions; hourly repeat not due.
+Next is the actual row analyzer using already ported exact iterators/propagator;
+retained lar_solver row callers pass zero numeric-pair RHS. Full row analysis,
+LAR model/matrix/basis/scopes/optimization, explanations and original drivers
+remain open. The complete LP implementation/test goal is unfinished.

@@ -1171,6 +1171,7 @@
       ],
       "production_files": [
         "assert_release.go",
+        "bound_propagator.go",
         "column_info_float.go",
         "core_base_float.go",
         "core_dual_float.go",
