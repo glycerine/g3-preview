@@ -5,7 +5,7 @@ package lp
 import "math"
 
 // FloatPrimalCoreSolver is the retained stage-one double/double core. This
-// layer supplies initialization and pricing; it does not yet expose Solve.
+// layer supplies initialization, pricing and Harris steps; it does not yet expose Solve.
 type FloatPrimalCoreSolver struct {
 	*FloatCoreSolverBase
 	Beta                                         *IndexedFloatVector

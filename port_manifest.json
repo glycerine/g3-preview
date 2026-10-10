@@ -121360,7 +121360,8 @@
         "pkg/util/lp/primal_price_float.go",
         "pkg/util/lp/primal_core_float_test.go",
         "pkg/util/lp/primal_price_float_test.go",
-        "pkg/util/lp/primal_prepare_float_test.go"
+        "pkg/util/lp/primal_prepare_float_test.go",
+        "pkg/util/lp/primal_harris_float.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -121373,7 +121374,11 @@
         "TestLPFloatPrimalPricingIndependentOrderAndRotation",
         "TestLPFloatPrimalPricingBudgetAndIEEE",
         "TestLPFloatPrimalPricingPublicationAndAssertions",
-        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+        "TestLPFloatPrimalPreparedBasisIndependentOracle",
+        "TestLPFloatPrimalHarrisIndependentBounds",
+        "TestLPFloatPrimalHarrisInfeasibleCrossings",
+        "TestLPFloatPrimalHarrisIEEEAndPrefixes",
+        "TestLPFloatPrimalHarrisReachedGuards"
       ],
       "conditionals": [
         {
@@ -121546,6 +121551,19 @@
             "TestLPFloatPrimalPricingPublicationAndAssertions",
             "TestLPFloatPrimalPreparedBasisIndependentOracle"
           ]
+        },
+        {
+          "name": "Retained double/double Harris tolerance, feasible/infeasible column step limits, sparse Harris theta, randomized maximum-pivot leaving selection and entering bound flip",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_harris_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalHarrisIndependentBounds",
+            "TestLPFloatPrimalHarrisInfeasibleCrossings",
+            "TestLPFloatPrimalHarrisIEEEAndPrefixes",
+            "TestLPFloatPrimalHarrisReachedGuards"
+          ]
         }
       ],
       "ownership": [
@@ -121553,7 +121571,8 @@
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
-        "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced."
+        "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced.",
+        "Harris output pointers require nonnil Go storage. Undefined source indices and empty leaving modulo-zero return ErrBounds after reached mutations; empty leaving selection consumes the source RNG and leaves converted epsilon zero. Exact/tableau variants, breakpoint selection and full find_leaving_and_t integration remain open. Definition-only checked feasible-positive helper is not copied."
       ]
     },
     {
@@ -121566,7 +121585,8 @@
         "pkg/util/lp/primal_price_float.go",
         "pkg/util/lp/primal_core_float_test.go",
         "pkg/util/lp/primal_price_float_test.go",
-        "pkg/util/lp/primal_prepare_float_test.go"
+        "pkg/util/lp/primal_prepare_float_test.go",
+        "pkg/util/lp/primal_harris_float.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -121579,7 +121599,11 @@
         "TestLPFloatPrimalPricingIndependentOrderAndRotation",
         "TestLPFloatPrimalPricingBudgetAndIEEE",
         "TestLPFloatPrimalPricingPublicationAndAssertions",
-        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+        "TestLPFloatPrimalPreparedBasisIndependentOracle",
+        "TestLPFloatPrimalHarrisIndependentBounds",
+        "TestLPFloatPrimalHarrisInfeasibleCrossings",
+        "TestLPFloatPrimalHarrisIEEEAndPrefixes",
+        "TestLPFloatPrimalHarrisReachedGuards"
       ],
       "conditionals": [
         {
@@ -121880,6 +121904,19 @@
             "TestLPFloatPrimalPricingPublicationAndAssertions",
             "TestLPFloatPrimalPreparedBasisIndependentOracle"
           ]
+        },
+        {
+          "name": "Retained double/double Harris tolerance, feasible/infeasible column step limits, sparse Harris theta, randomized maximum-pivot leaving selection and entering bound flip",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_harris_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalHarrisIndependentBounds",
+            "TestLPFloatPrimalHarrisInfeasibleCrossings",
+            "TestLPFloatPrimalHarrisIEEEAndPrefixes",
+            "TestLPFloatPrimalHarrisReachedGuards"
+          ]
         }
       ],
       "ownership": [
@@ -121887,7 +121924,8 @@
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
-        "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced."
+        "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced.",
+        "Harris output pointers require nonnil Go storage. Undefined source indices and empty leaving modulo-zero return ErrBounds after reached mutations; empty leaving selection consumes the source RNG and leaves converted epsilon zero. Exact/tableau variants, breakpoint selection and full find_leaving_and_t integration remain open. Definition-only checked feasible-positive helper is not copied."
       ]
     },
     {

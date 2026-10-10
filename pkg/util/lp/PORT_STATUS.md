@@ -168,3 +168,31 @@ profiles: `/mnt/oldrog/tmp/g3-primal-prepare-{native,debug}.{log,cover}`. The
 current full native snapshot includes primal preparation and all core additions.
 Preparation methods initialize matrix/vectors; current integration tests construct
 the actual primal core and execute its initialization. Optimization remains open.
+
+
+### Floating Harris step limits and leaving selection — 2026-10-10
+
+Ported retained double/double Harris epsilon control, feasible/infeasible
+one-sided and boxed step limits, indexed Harris theta, randomized maximum-pivot
+leaving selection, and entering-column bound flips. Preserved global cached
+feasibility, strict pivot tolerances, first-operand std::min IEEE behavior,
+random circular tie order, boxed lower crossing's upper-bound epsilon scale,
+flip output even on rejection, and error publication prefixes. Empty leaving
+selection consumes RNG and leaves epsilon zero before the typed undefined-domain
+guard; successful selection restores settings epsilon. Definition-only checked
+feasible-positive helper is excluded. Exact/tableau variants, breakpoints and
+full find_leaving_and_t / optimization integration remain open.
+
+500 independent bound-intersection worlds verify theta and randomized strongest
+admissible pivot/step. Independent infeasible boundary cases cover all column
+types and directions; targeted tests cover IEEE/ties, skipped pivots, zero-step
+short circuit, missing bound/index guards, entering flips and native/debug
+assertion differences. Focused core/primal/presolve/solver/column/scaler/static/LU
+checks pass native1.029s and debug/checked0.837s. Harris statements134/136 (98.5%)
+native and136/136 (100%) debug; native gaps are erased assertions. Profiles:
+/mnt/oldrog/tmp/g3-harris-{native,debug}.cover. Whole LP remains65 partial/45
+unported. The20:03 full native90.0% aggregate predates this Harris addition.
+
+Native and combined debug/checked LP vet, source inventory/evidence/no-generics
+verification and diff checks pass. Regenerated graph stays64 packages with
+unchanged edges and the new Harris production file recorded.
