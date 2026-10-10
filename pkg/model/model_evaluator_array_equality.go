@@ -11,7 +11,7 @@ import (
 type arrayEquality struct {
 	active             bool
 	left, right        arrayExpansion
-	conj, args1, args2 ast.ASTRefVector
+	conj, args1, args2 []ast.ASTHandle
 	select1, select2   ast.ASTRef
 	table1, table2     arrayTupleTable
 }
@@ -20,8 +20,8 @@ func (f *arrayEquality) close(m *ast.ASTManager) error {
 	if !f.active {
 		return nil
 	}
-	f.table2.close(m)
-	f.table1.close(m)
+	f.table2.close()
+	f.table1.close()
 	if e := f.right.closeLexical(m); e != nil {
 		return e
 	}
@@ -35,12 +35,11 @@ func (f *arrayEquality) close(m *ast.ASTManager) error {
 			}
 		}
 	}
-	for _, v := range []*ast.ASTRefVector{&f.args2, &f.args1, &f.conj} {
-		if *v != (ast.ASTRefVector{}) {
-			if e := m.DelRefVector(v); e != nil {
-				return e
-			}
+	for _, roots := range []*[]ast.ASTHandle{&f.args2, &f.args1, &f.conj} {
+		if e := releaseArrayRoots(m, roots); e != nil {
+			return e
 		}
+		*roots = nil
 	}
 	if e := f.right.closeElse(m); e != nil {
 		return e
@@ -78,14 +77,11 @@ func (c *evaluatorConfiguration) arrayConjPush(f *arrayEquality, a, b ast.ASTHan
 	if e != nil {
 		return e
 	}
-	return f.left.push(m, f.conj, eq)
+	return appendArrayRoot(m, &f.conj, eq)
 }
 func (c *evaluatorConfiguration) arrayConjunction(f *arrayEquality, out ast.ASTRef, shortcut bool) (rewriter.RewriteStatus, error) {
 	m := c.owner.model.manager
-	args, e := m.RewriterVectorArguments(f.conj)
-	if e != nil {
-		return rewriter.RewriteFailed, e
-	}
+	args := ast.SliceArguments(f.conj)
 	if shortcut {
 		if args.Count() == 0 {
 			yes, e := m.MkTrue()
@@ -149,18 +145,6 @@ func (c *evaluatorConfiguration) arrayEq(a, b ast.ASTHandle, out ast.ASTRef) (st
 	if e != nil || !rightOK {
 		return rewriter.RewriteFailed, e
 	}
-	f.conj, e = m.NewRefVector()
-	if e != nil {
-		return rewriter.RewriteFailed, e
-	}
-	f.args1, e = m.NewRefVector()
-	if e != nil {
-		return rewriter.RewriteFailed, e
-	}
-	f.args2, e = m.NewRefVector()
-	if e != nil {
-		return rewriter.RewriteFailed, e
-	}
 	else1, e := m.RefGet(f.left.elseCase)
 	if e != nil {
 		return rewriter.RewriteFailed, e
@@ -198,10 +182,10 @@ func (c *evaluatorConfiguration) arrayEq(a, b ast.ASTHandle, out ast.ASTRef) (st
 	if leftUnique && rightUnique && len(f.left.stores) != 0 {
 		return c.arrayEqCore(f, else1, else2, out)
 	}
-	if e = f.left.push(m, f.args1, a); e != nil {
+	if e = appendArrayRoot(m, &f.args1, a); e != nil {
 		return rewriter.RewriteFailed, e
 	}
-	if e = f.left.push(m, f.args2, b); e != nil {
+	if e = appendArrayRoot(m, &f.args2, b); e != nil {
 		return rewriter.RewriteFailed, e
 	}
 	for _, row := range f.right.stores {
@@ -210,30 +194,20 @@ func (c *evaluatorConfiguration) arrayEq(a, b ast.ASTHandle, out ast.ASTRef) (st
 		}
 	}
 	for _, row := range f.left.stores {
-		view, e := m.RewriterVectorArguments(row)
-		if e != nil {
+		indices := ast.SliceArguments(row[:len(row)-1])
+		if e = releaseArrayTail(m, &f.args1); e != nil {
 			return rewriter.RewriteFailed, e
 		}
-		indices, e := view.Range(0, view.Count()-1)
-		if e != nil {
+		if e = appendArrayArguments(m, &f.args1, indices); e != nil {
 			return rewriter.RewriteFailed, e
 		}
-		if e = m.RefVectorResize(f.args1, 1); e != nil {
+		if e = releaseArrayTail(m, &f.args2); e != nil {
 			return rewriter.RewriteFailed, e
 		}
-		if e = f.left.append(m, f.args1, indices); e != nil {
+		if e = appendArrayArguments(m, &f.args2, indices); e != nil {
 			return rewriter.RewriteFailed, e
 		}
-		if e = m.RefVectorResize(f.args2, 1); e != nil {
-			return rewriter.RewriteFailed, e
-		}
-		if e = f.left.append(m, f.args2, indices); e != nil {
-			return rewriter.RewriteFailed, e
-		}
-		args, e := m.RewriterVectorArguments(f.args1)
-		if e != nil {
-			return rewriter.RewriteFailed, e
-		}
+		args := ast.SliceArguments(f.args1)
 		s1, e := m.MkArrayAppArguments(c.arrayFamily, ast.ASTArrayOpSelect, args)
 		if e != nil {
 			return rewriter.RewriteFailed, e
@@ -242,10 +216,7 @@ func (c *evaluatorConfiguration) arrayEq(a, b ast.ASTHandle, out ast.ASTRef) (st
 		if e != nil {
 			return rewriter.RewriteFailed, e
 		}
-		args, e = m.RewriterVectorArguments(f.args2)
-		if e != nil {
-			return rewriter.RewriteFailed, e
-		}
+		args = ast.SliceArguments(f.args2)
 		s2, e := m.MkArrayAppArguments(c.arrayFamily, ast.ASTArrayOpSelect, args)
 		if e != nil {
 			return rewriter.RewriteFailed, e
@@ -268,57 +239,40 @@ func (c *evaluatorConfiguration) arrayEq(a, b ast.ASTHandle, out ast.ASTRef) (st
 }
 func (c *evaluatorConfiguration) arrayEqCore(f *arrayEquality, else1, else2 ast.ASTHandle, out ast.ASTRef) (rewriter.RewriteStatus, error) {
 	m := c.owner.model.manager
-	size, e := m.RefVectorSize(f.left.stores[0])
-	if e != nil {
-		return rewriter.RewriteFailed, e
-	}
-	arity := size - 1
+	arity := len(f.left.stores[0]) - 1
 	f.table1.arity = arity
 	f.table2.arity = arity
-	if e = f.table1.resize(m, 8); e != nil {
-		return rewriter.RewriteFailed, e
-	}
-	if e = f.table2.resize(m, 8); e != nil {
-		return rewriter.RewriteFailed, e
-	}
 	for i := len(f.left.stores); i > 0; {
 		i--
-		if e = f.table1.insert(m, f.left.stores[i]); e != nil {
+		if e := f.table1.insert(f.left.stores[i]); e != nil {
 			return rewriter.RewriteFailed, e
 		}
 	}
 	for _, row := range f.right.stores {
-		duplicate, e := f.table2.find(m, row)
+		_, duplicate, e := f.table2.find(row)
 		if e != nil {
 			return rewriter.RewriteFailed, e
 		}
-		if duplicate >= 0 {
+		if duplicate {
 			continue
 		}
-		if e = f.table2.insert(m, row); e != nil {
+		if e = f.table2.insert(row); e != nil {
 			return rewriter.RewriteFailed, e
 		}
-		index, e := f.table1.find(m, row)
+		other, found, e := f.table1.find(row)
 		if e != nil {
 			return rewriter.RewriteFailed, e
 		}
-		val, e := m.RefVectorGet(row, arity)
-		if e != nil {
-			return rewriter.RewriteFailed, e
-		}
-		if index >= 0 {
-			other := f.table1.cells[index].row
-			leftVal, e := m.RefVectorGet(other, arity)
-			if e != nil {
-				return rewriter.RewriteFailed, e
-			}
+		val := row[arity]
+		if found {
+			leftVal := other[arity]
 			r, e := c.arrayCompare(leftVal, val)
 			if e != nil {
 				return rewriter.RewriteFailed, e
 			}
 			switch r {
 			case 1:
-				if e = f.table1.remove(m, other); e != nil {
+				if e = f.table1.remove(other); e != nil {
 					return rewriter.RewriteFailed, e
 				}
 			case -1:
@@ -351,14 +305,8 @@ func (c *evaluatorConfiguration) arrayEqCore(f *arrayEquality, else1, else2 ast.
 			}
 		}
 	}
-	for _, cell := range f.table1.cells {
-		if cell.state != modelMapUsed {
-			continue
-		}
-		value, e := m.RefVectorGet(cell.row, arity)
-		if e != nil {
-			return rewriter.RewriteFailed, e
-		}
+	for _, row := range f.table1.rows.All() {
+		value := row[arity]
 		r, e := c.arrayCompare(value, else2)
 		if e != nil {
 			return rewriter.RewriteFailed, e

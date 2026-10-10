@@ -1,5 +1,4 @@
-// Source: src/model/model_evaluator.cpp:337-358;
-// src/util/hash.h:72-122; src/util/hashtable.h:351-403,546-577.
+// Native collection checks for src/model/model_evaluator.cpp:337-416.
 package model
 
 import (
@@ -34,144 +33,136 @@ func arrayTableManager(t *testing.T) *ast.ASTManager {
 	t.Cleanup(func() { arrayTableMust(t, m.Close()) })
 	return m
 }
-func arrayTableRow(t *testing.T, m *ast.ASTManager, n, key uint32, value bool) ast.ASTRefVector {
+func arrayTableRow(t *testing.T, m *ast.ASTManager, n, key uint32, value bool) []ast.ASTHandle {
 	t.Helper()
-	v, e := m.NewRefVector()
-	arrayTableMust(t, e)
-	t.Cleanup(func() { arrayTableMust(t, m.DelRefVector(&v)) })
+	var row []ast.ASTHandle
+	t.Cleanup(func() { arrayTableMust(t, releaseArrayRoots(m, &row)) })
 	for i := uint32(0); i < n; i++ {
 		h, e := m.MkBoolVal(key&(1<<i) != 0)
 		arrayTableMust(t, e)
-		arrayTableMust(t, m.RefVectorPush(v, h))
+		arrayTableMust(t, appendArrayRoot(m, &row, h))
 	}
 	h, e := m.MkBoolVal(value)
 	arrayTableMust(t, e)
-	arrayTableMust(t, m.RefVectorPush(v, h))
-	return v
+	arrayTableMust(t, appendArrayRoot(m, &row, h))
+	return row
 }
-func TestArrayTupleOriginalCompositeHashGoldenAndReadOrder(t *testing.T) {
-	golden := []uint32{0x2b17922b, 0xf08c62d3, 0xdc08ad60, 0x0b669b25, 0xae9299db, 0x148468d9, 0x010876a5, 0xeea55b85, 0xc2a07325}
-	for i, want := range golden {
-		n := uint32(i + 1)
-		var order []uint32
-		got, e := arrayCompositeHash(n, func(j uint32) (uint32, error) { order = append(order, j); return j + 1, nil })
-		arrayTableMust(t, e)
-		if got != want {
-			t.Fatal("source composite hash", n, got, want)
-		}
-		for j, index := range order {
-			expected := uint32(j)
-			if n > 3 {
-				expected = n - 1 - uint32(j)
-			}
-			if index != expected {
-				t.Fatal("source child order", n, order)
-			}
-		}
-	}
-}
-func TestArrayTupleOriginalReplacementGrowthAndLastTombstone(t *testing.T) {
+
+func TestArrayTupleNativeReplacementOrderAndRemoval(t *testing.T) {
 	m := arrayTableManager(t)
-	var table arrayTupleTable
-	table.arity = 8
-	arrayTableMust(t, table.resize(m, 8))
-	rows := make([]ast.ASTRefVector, 256)
+	table := arrayTupleTable{arity: 8}
+	defer table.close()
+	rows := make([][]ast.ASTHandle, 256)
 	for i := range rows {
 		rows[i] = arrayTableRow(t, m, 8, uint32(i), true)
-	}
-	defer table.close(m)
-	for i := 0; i < 7; i++ {
-		arrayTableMust(t, table.insert(m, rows[i]))
-	}
-	if len(table.cells) != 8 {
-		t.Fatal("early expansion")
 	}
 	replacement := arrayTableRow(t, m, 8, 0, false)
-	arrayTableMust(t, table.insert(m, replacement))
-	index, e := table.find(m, rows[0])
+	before := m.Budget().Used()
+	m.Budget().FailAfter(0)
+	defer m.Budget().FailAfter(-1)
+	for _, row := range rows {
+		arrayTableMust(t, table.insert(row))
+	}
+	arrayTableMust(t, table.insert(replacement))
+	found, ok, e := table.find(rows[0])
 	arrayTableMust(t, e)
-	if len(table.cells) != 16 || table.size != 7 || table.cells[index].row != replacement {
-		t.Fatal("expand-before-replace source order")
+	if !ok || found[8] != replacement[8] || table.rows.Len() != 256 {
+		t.Fatal("equal index tuple must replace its value", ok, len(found), table.rows.Len())
 	}
-	for i := 7; i < 48; i++ {
-		arrayTableMust(t, table.insert(m, rows[i]))
-	}
-	if len(table.cells) != 64 {
-		t.Fatal("source growth", len(table.cells))
-	}
-	first := -1
-	mask := len(table.cells) - 1
-	for i := range table.cells {
-		if table.cells[i].state == modelMapUsed && table.cells[(i+1)&mask].state == modelMapUsed && table.cells[(i+2)&mask].state == modelMapUsed {
-			first = i
-			break
+	index := 0
+	for _, row := range table.rows.All() {
+		want := rows[index]
+		if index == 0 {
+			want = replacement
 		}
-	}
-	if first < 0 {
-		t.Fatal("fixture has no occupied triple")
-	}
-	a, b := table.cells[first].row, table.cells[(first+1)&mask].row
-	arrayTableMust(t, table.remove(m, a))
-	arrayTableMust(t, table.remove(m, b))
-	candidate := -1
-	for i := 48; i < len(rows); i++ {
-		h, e := table.hash(m, rows[i])
-		arrayTableMust(t, e)
-		if int(h)&mask == first {
-			candidate = i
-			break
+		for j, h := range want {
+			if h != row[j] {
+				t.Fatal("insertion order", index, j)
+			}
 		}
+		index++
 	}
-	if candidate < 0 {
-		t.Fatal("fixture has no colliding new tuple")
+	if index != 256 {
+		t.Fatal("iteration count", index)
 	}
-	arrayTableMust(t, table.insert(m, rows[candidate]))
-	if table.cells[first].state != modelMapDeleted || table.cells[(first+1)&mask].row != rows[candidate] || table.deleted != 1 {
-		t.Fatal("source last tombstone not reused")
+	arrayTableMust(t, table.remove(rows[0]))
+	if _, ok, e := table.find(replacement); e != nil || ok {
+		t.Fatal("removed tuple", ok, e)
+	}
+	arrayTableMust(t, table.insert(rows[0]))
+	index = 1
+	for _, row := range table.rows.All() {
+		want := rows[index%256]
+		for j, h := range want {
+			if h != row[j] {
+				t.Fatal("reinserted key order", index, j)
+			}
+		}
+		index++
+	}
+	if m.Budget().Used() != before {
+		t.Fatal("native table charged arena backing")
 	}
 }
-func TestArrayTupleOriginalDeletedCleanupAndResizeRefusal(t *testing.T) {
+
+func TestArrayTupleNativeCompleteIndexIdentityAndBorrowing(t *testing.T) {
 	m := arrayTableManager(t)
-	rows := make([]ast.ASTRefVector, 190)
-	for i := range rows {
-		rows[i] = arrayTableRow(t, m, 8, uint32(i), true)
-	}
-	var table arrayTupleTable
-	table.arity = 8
-	arrayTableMust(t, table.resize(m, 256))
-	defer table.close(m)
-	for _, row := range rows {
-		arrayTableMust(t, table.insert(m, row))
-	}
-	before := &table.cells[0]
-	order := make([]ast.ASTRefVector, 0, len(rows))
-	for _, cell := range table.cells {
-		if cell.state == modelMapUsed {
-			order = append(order, cell.row)
-		}
-	}
-	cleaned := false
-	for _, row := range order {
-		arrayTableMust(t, table.remove(m, row))
-		if before != &table.cells[0] {
-			cleaned = true
-		}
-	}
-	if !cleaned || table.size != 0 {
-		t.Fatal("source deleted-entry threshold not reached")
-	}
-	arrayTableMust(t, table.insert(m, rows[0]))
-	baseline := m.Budget().Used()
-	before = &table.cells[0]
-	m.Budget().FailAfter(0)
-	e := table.resize(m, 512)
-	m.Budget().FailAfter(-1)
-	if e != arena.ErrInjectedFailure || before != &table.cells[0] || m.Budget().Used() != baseline {
-		t.Fatal("failed resize published or leaked", e)
-	}
-	index, e := table.find(m, rows[0])
+	a := arrayTableRow(t, m, 2, 1, true)
+	b := arrayTableRow(t, m, 2, 2, true)
+	table := arrayTupleTable{arity: 2}
+	before, e := m.GetRefCount(a[0])
 	arrayTableMust(t, e)
-	if index < 0 {
-		t.Fatal("resize refusal lost tuple")
+	arrayTableMust(t, table.insert(a))
+	arrayTableMust(t, table.insert(b))
+	if table.rows.Len() != 2 {
+		t.Fatal("ordered tuple elements collapsed")
+	}
+	for _, row := range [][]ast.ASTHandle{a, b} {
+		got, ok, e := table.find(row)
+		arrayTableMust(t, e)
+		if !ok || got[0] != row[0] || got[1] != row[1] {
+			t.Fatal("tuple lookup", got, ok)
+		}
+	}
+	if e := table.insert(a[:2]); e != ast.ErrASTDomain {
+		t.Fatal("missing tuple result", e)
+	}
+	table.close()
+	after, e := m.GetRefCount(a[0])
+	arrayTableMust(t, e)
+	if before != after {
+		t.Fatal("borrowed table changed AST ownership", before, after)
+	}
+}
+
+func TestModelArrayNativeRootsPartialAppendAndGrowth(t *testing.T) {
+	m := arrayTableManager(t)
+	yes, e := m.MkTrue()
+	arrayTableMust(t, e)
+	before, e := m.GetRefCount(yes)
+	arrayTableMust(t, e)
+	var roots []ast.ASTHandle
+	foreign := arrayTableManager(t)
+	no, e := foreign.MkFalse()
+	arrayTableMust(t, e)
+	e = appendArrayArguments(m, &roots, ast.SliceArguments([]ast.ASTHandle{yes, no}))
+	if e != ast.ErrASTHandle || len(roots) != 1 {
+		t.Fatal("partial owning append", len(roots), e)
+	}
+	m.Budget().FailAfter(0)
+	for i := 0; i < 4096; i++ {
+		arrayTableMust(t, appendArrayRoot(m, &roots, yes))
+	}
+	count, e := m.GetRefCount(yes)
+	arrayTableMust(t, e)
+	if count != before+4097 {
+		t.Fatal("one reference per native root", count, before)
+	}
+	arrayTableMust(t, releaseArrayRoots(m, &roots))
+	m.Budget().FailAfter(-1)
+	count, e = m.GetRefCount(yes)
+	arrayTableMust(t, e)
+	if len(roots) != 0 || count != before {
+		t.Fatal("native root release", len(roots), count, before)
 	}
 }

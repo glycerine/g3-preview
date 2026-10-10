@@ -159,7 +159,3 @@ func Composite(kind, n uint32, child func(uint32) uint32) uint32 {
 func WordReader(n, init uint32, word func(uint32) uint32) uint32 {
 	return hashBytes(n, init, func(i uint32) uint32 { return word(i / 4) }, func(i uint32) uint32 { return uint32(int32(int8(byte(word(i/4) >> (8 * (i % 4)))))) })
 }
-
-// Source: src/util/hash.h:25-35. MixState retains all three words for successive
-// rounds of the original composite hash, rather than discarding a and b.
-func MixState(a, b, c uint32) (uint32, uint32, uint32) { return mix(a, b, c) }

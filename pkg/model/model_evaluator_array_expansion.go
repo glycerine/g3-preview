@@ -1,5 +1,4 @@
-// Source: src/model/model_evaluator.cpp:207-221,422-499,565-569;
-// src/util/vector.h:59-98,350-356; src/util/ref_vector.h:96-100.
+// Source: src/model/model_evaluator.cpp:207-221,422-499,565-569.
 package model
 
 import (
@@ -9,115 +8,96 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// Actual lexical vector<expr_ref_vector>, expr_ref and current row/argument
-// owners. Embedded continuation fields keep interrupted cleanup visible.
+// Native rows own one AST reference per element. Embedded lexical fields retain
+// unfinished numerical/AST cleanup; collection backing belongs to Go.
 type arrayExpansion struct {
 	active             bool
-	stores             []ast.ASTRefVector
+	stores             [][]ast.ASTHandle
 	drain              int
-	row, copyRow, args ast.ASTRefVector
+	row, copyRow, args []ast.ASTHandle
 	elseCase           ast.ASTRef
 	parameter          ast.ASTParameter
 	parameterLive      bool
-	receipt            ast.ASTRefVectorPushReceipt
-	pendingVector      ast.ASTRefVector
-	pendingHandle      ast.ASTHandle
-	pendingPush        bool
 }
 
-func (f *arrayExpansion) push(m *ast.ASTManager, v ast.ASTRefVector, h ast.ASTHandle) error {
-	if f.pendingPush {
-		return util.ErrParamsPrecondition
+func appendArrayRoot(m *ast.ASTManager, roots *[]ast.ASTHandle, h ast.ASTHandle) error {
+	if e := m.IncRef(h); e != nil {
+		return e
 	}
-	f.receipt = ast.ASTRefVectorPushReceipt{}
-	e := m.RefVectorPushTracked(v, h, &f.receipt)
-	if e != nil {
-		held, stateError := f.receipt.Unpublished()
-		if held {
-			f.pendingVector = v
-			f.pendingHandle = h
-			f.pendingPush = true
-		}
-		return errors.Join(e, stateError)
-	}
-	f.receipt = ast.ASTRefVectorPushReceipt{}
+	*roots = append(*roots, h)
 	return nil
 }
-func (f *arrayExpansion) append(m *ast.ASTManager, v ast.ASTRefVector, args ast.AppArguments) error {
+
+// A consumed DEC can report a later destructor error. Retire that root before
+// returning, retaining only unconsumed references for the cleanup retry.
+func releaseArrayRoots(m *ast.ASTManager, roots *[]ast.ASTHandle) error {
+	values := *roots
+	for i, h := range values {
+		consumed, e := m.DecRefConsumed(h)
+		next := i
+		if consumed {
+			values[i] = ast.ASTHandle{}
+			next++
+		}
+		if e != nil {
+			*roots = values[next:]
+			return e
+		}
+		if !consumed {
+			*roots = values[next:]
+			return ast.ErrASTPending
+		}
+	}
+	*roots = values[:0]
+	return nil
+}
+func appendArrayArguments(m *ast.ASTManager, roots *[]ast.ASTHandle, args ast.AppArguments) error {
 	for i := uint32(0); i < args.Count(); i++ {
 		h, e := args.At(i)
 		if e != nil {
 			return e
 		}
-		if e = f.push(m, v, h); e != nil {
+		if e = appendArrayRoot(m, roots, h); e != nil {
 			return e
 		}
 	}
 	return nil
 }
-func (f *arrayExpansion) publishRow(m *ast.ASTManager) error {
-	if e := f.appendRowCopy(m, f.row); e != nil {
-		return e
-	}
-	return m.DelRefVector(&f.row)
+func (f *arrayExpansion) publishRow() {
+	// Transfer this row's references to the stores without a redundant copy.
+	f.stores = append(f.stores, f.row)
+	f.row = nil
 }
-func (f *arrayExpansion) appendRowCopy(m *ast.ASTManager, input ast.ASTRefVector) error {
-	var e error
-	f.copyRow, e = m.NewRefVector()
-	if e != nil {
-		return e
-	}
-	args, e := m.RewriterVectorArguments(input)
-	if e != nil {
-		return e
-	}
-	if e = f.append(m, f.copyRow, args); e != nil {
+func (f *arrayExpansion) appendRowCopy(m *ast.ASTManager, input []ast.ASTHandle) error {
+	if e := appendArrayArguments(m, &f.copyRow, ast.SliceArguments(input)); e != nil {
 		return e
 	}
 	f.stores = append(f.stores, f.copyRow)
-	f.copyRow = ast.ASTRefVector{}
+	f.copyRow = nil
 	return nil
 }
 func (f *arrayExpansion) removeRow(m *ast.ASTManager, index int) error {
-	for j := index + 1; j < len(f.stores); j++ {
-		if e := m.RefVectorReset(f.stores[j-1]); e != nil {
-			return e
-		}
-		args, e := m.RewriterVectorArguments(f.stores[j])
-		if e != nil {
-			return e
-		}
-		if e = f.append(m, f.stores[j-1], args); e != nil {
-			return e
-		}
-	}
-	last := len(f.stores) - 1
-	if e := m.DelRefVector(&f.stores[last]); e != nil {
+	if e := releaseArrayRoots(m, &f.stores[index]); e != nil {
 		return e
 	}
+	copy(f.stores[index:], f.stores[index+1:])
+	last := len(f.stores) - 1
+	f.stores[last] = nil
 	f.stores = f.stores[:last]
 	return nil
 }
 func (f *arrayExpansion) closeLexical(m *ast.ASTManager) error {
-	if f.pendingPush {
-		if e := m.CompleteRefVectorPush(f.pendingVector, f.pendingHandle, &f.receipt); e != nil {
-			return e
-		}
-		f.pendingPush = false
-		f.receipt = ast.ASTRefVectorPushReceipt{}
-	}
 	if f.parameterLive {
 		if e := m.DelParameter(&f.parameter); e != nil {
 			return e
 		}
 		f.parameterLive = false
 	}
-	for _, v := range []*ast.ASTRefVector{&f.args, &f.copyRow, &f.row} {
-		if *v != (ast.ASTRefVector{}) {
-			if e := m.DelRefVector(v); e != nil {
-				return e
-			}
+	for _, roots := range []*[]ast.ASTHandle{&f.args, &f.copyRow, &f.row} {
+		if e := releaseArrayRoots(m, roots); e != nil {
+			return e
 		}
+		*roots = nil
 	}
 	return nil
 }
@@ -129,7 +109,7 @@ func (f *arrayExpansion) closeElse(m *ast.ASTManager) error {
 }
 func (f *arrayExpansion) closeStores(m *ast.ASTManager) error {
 	for f.drain < len(f.stores) {
-		if e := m.DelRefVector(&f.stores[f.drain]); e != nil {
+		if e := releaseArrayRoots(m, &f.stores[f.drain]); e != nil {
 			return e
 		}
 		f.drain++
@@ -162,23 +142,16 @@ func (c *evaluatorConfiguration) arrayOp(h ast.ASTHandle, op int32) (bool, error
 	kind, e := m.GetDeclKind(h)
 	return kind == op, e
 }
-func (c *evaluatorConfiguration) arrayArgsAreValues(v ast.ASTRefVector, unique *bool) (bool, error) {
+func (c *evaluatorConfiguration) arrayArgsAreValues(v []ast.ASTHandle, unique *bool) (bool, error) {
 	m := c.owner.model.manager
-	size, e := m.RefVectorSize(v)
-	if e != nil {
-		return false, e
-	}
 	values := true
-	for j := uint32(0); values && j+1 < size; j++ {
-		h, e := m.RefVectorGet(v, j)
+	for j := 0; values && j+1 < len(v); j++ {
+		var e error
+		values, e = m.IsValue(v[j])
 		if e != nil {
 			return false, e
 		}
-		values, e = m.IsValue(h)
-		if e != nil {
-			return false, e
-		}
-		one, e := m.IsUniqueValue(h)
+		one, e := m.IsUniqueValue(v[j])
 		if e != nil {
 			return false, e
 		}
@@ -197,10 +170,6 @@ func (c *evaluatorConfiguration) extractArray(a ast.ASTHandle, f *arrayExpansion
 		if !stored {
 			break
 		}
-		f.row, e = m.NewRefVector()
-		if e != nil {
-			return false, unique, e
-		}
 		args, e := m.AppArgumentView(a)
 		if e != nil {
 			return false, unique, e
@@ -209,7 +178,7 @@ func (c *evaluatorConfiguration) extractArray(a ast.ASTHandle, f *arrayExpansion
 		if e != nil {
 			return false, unique, e
 		}
-		if e = f.append(m, f.row, tail); e != nil {
+		if e = appendArrayArguments(m, &f.row, tail); e != nil {
 			return false, unique, e
 		}
 		current, e := c.arrayArgsAreValues(f.row, &unique)
@@ -217,9 +186,7 @@ func (c *evaluatorConfiguration) extractArray(a ast.ASTHandle, f *arrayExpansion
 			return false, unique, e
 		}
 		values = values && current
-		if e = f.publishRow(m); e != nil {
-			return false, unique, e
-		}
+		f.publishRow()
 		a, e = args.At(0)
 		if e != nil {
 			return false, unique, e
@@ -253,37 +220,23 @@ func (c *evaluatorConfiguration) extractArray(a ast.ASTHandle, f *arrayExpansion
 	}
 	base := len(f.stores)
 	for _, entry := range g.entries {
-		f.row, e = m.NewRefVector()
-		if e != nil {
-			return false, unique, e
-		}
-		if e = f.append(m, f.row, ast.SliceArguments(entry.args)); e != nil {
+		if e = appendArrayArguments(m, &f.row, ast.SliceArguments(entry.args)); e != nil {
 			return false, unique, e
 		}
 		value, e := entry.Result()
 		if e != nil {
 			return false, unique, e
 		}
-		if e = f.push(m, f.row, value); e != nil {
+		if e = appendArrayRoot(m, &f.row, value); e != nil {
 			return false, unique, e
 		}
-		size, e := m.RefVectorSize(f.row)
-		if e != nil {
-			return false, unique, e
-		}
-		for j := uint32(0); j < size; j++ {
-			h, e := m.RefVectorGet(f.row, j)
-			if e != nil {
-				return false, unique, e
-			}
+		for _, h := range f.row {
 			ground, e := m.IsGround(h)
 			if e != nil || !ground {
 				return false, unique, e
 			}
 		}
-		if e = f.publishRow(m); e != nil {
-			return false, unique, e
-		}
+		f.publishRow()
 	}
 	fallback, e := g.Else()
 	if e != nil {
@@ -301,14 +254,8 @@ func (c *evaluatorConfiguration) extractArray(a ast.ASTHandle, f *arrayExpansion
 	}
 	for i := len(f.stores); values && i > base; {
 		i--
-		size, e := m.RefVectorSize(f.stores[i])
-		if e != nil {
-			return false, unique, e
-		}
-		last, e := m.RefVectorGet(f.stores[i], size-1)
-		if e != nil {
-			return false, unique, e
-		}
+		row := f.stores[i]
+		last := row[len(row)-1]
 		same, e := m.AreEqual(fallback, last)
 		if e != nil {
 			return false, unique, e
@@ -376,28 +323,17 @@ func (c *evaluatorConfiguration) expandValue(out ast.ASTRef) (err error) {
 	}
 	for i := len(f.stores); i > 0; {
 		i--
-		f.args, e = m.NewRefVector()
-		if e != nil {
-			return e
-		}
 		current, e := m.RefGet(out)
 		if e != nil {
 			return e
 		}
-		if e = f.push(m, f.args, current); e != nil {
+		if e = appendArrayRoot(m, &f.args, current); e != nil {
 			return e
 		}
-		row, e := m.RewriterVectorArguments(f.stores[i])
-		if e != nil {
+		if e = appendArrayArguments(m, &f.args, ast.SliceArguments(f.stores[i])); e != nil {
 			return e
 		}
-		if e = f.append(m, f.args, row); e != nil {
-			return e
-		}
-		args, e := m.RewriterVectorArguments(f.args)
-		if e != nil {
-			return e
-		}
+		args := ast.SliceArguments(f.args)
 		stored, e := m.MkArrayAppArguments(c.arrayFamily, ast.ASTArrayOpStore, args)
 		if e != nil {
 			return e
@@ -405,9 +341,18 @@ func (c *evaluatorConfiguration) expandValue(out ast.ASTRef) (err error) {
 		if e = m.SetRef(out, stored); e != nil {
 			return e
 		}
-		if e = m.DelRefVector(&f.args); e != nil {
+		if e = releaseArrayRoots(m, &f.args); e != nil {
 			return e
 		}
 	}
 	return nil
+}
+
+// Preserve the base array while releasing temporary select indices. On an
+// interrupted DEC, keep all unconsumed roots reachable for lexical cleanup.
+func releaseArrayTail(m *ast.ASTManager, roots *[]ast.ASTHandle) error {
+	tail := (*roots)[1:]
+	e := releaseArrayRoots(m, &tail)
+	*roots = append((*roots)[:1], tail...)
+	return e
 }

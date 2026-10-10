@@ -50740,15 +50740,15 @@
         "TestModelEvaluatorOriginalArrayEqualityMatchedUnknownValueConstraints",
         "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals",
         "TestModelEvaluatorOriginalArrayEqualityFiniteAndInfiniteElseCases",
-        "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder",
-        "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
-        "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal",
         "TestModelEvaluatorOriginalArrayMapTraversalAndSelection",
         "TestModelEvaluatorOriginalSetOperationsAndMembership",
         "TestModelEvaluatorBVUnspecifiedFunctionCompletion",
         "TestModelEvaluatorArithmeticUnspecifiedRegisteredInterpretations",
         "TestModelEvaluatorBVUnspecifiedConstantLookupAndCompletion",
-        "TestModelEvaluatorBVUnspecifiedCompletionEveryReservation"
+        "TestModelEvaluatorBVUnspecifiedCompletionEveryReservation",
+        "TestArrayTupleNativeReplacementOrderAndRemoval",
+        "TestArrayTupleNativeCompleteIndexIdentityAndBorrowing",
+        "TestModelArrayNativeRootsPartialAppendAndGrowth"
       ],
       "assertions": [
         {
@@ -50817,11 +50817,12 @@
           "tests": [
             "TestModelEvaluatorOriginalFunctionArrayValueExpansionAndPrecedence",
             "TestModelEvaluatorOriginalArrayExpansionPruningAndGroundness",
-            "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals"
+            "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals",
+            "TestModelArrayNativeRootsPartialAppendAndGrowth"
           ]
         },
         {
-          "name": "original mk_array_eq and mk_array_eq_core, args_hash/args_eq with borrowed-row concrete source table; value/unknown-index equality paths and exact source constraints (src/model/model_evaluator.cpp:292-420)",
+          "name": "original mk_array_eq and mk_array_eq_core array precedence/constraints with native slice roots and insertion-ordered tuple lookup (src/model/model_evaluator.cpp:292-420)",
           "status": "partial",
           "go_target": "pkg/model/model_evaluator_array_equality.go",
           "tests": [
@@ -50830,9 +50831,8 @@
             "TestModelEvaluatorOriginalArrayEqualityMatchedUnknownValueConstraints",
             "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals",
             "TestModelEvaluatorOriginalArrayEqualityFiniteAndInfiniteElseCases",
-            "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder",
-            "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
-            "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal"
+            "TestArrayTupleNativeReplacementOrderAndRemoval",
+            "TestArrayTupleNativeCompleteIndexIdentityAndBorrowing"
           ]
         },
         {
@@ -50850,16 +50850,16 @@
       "ownership": [
         "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array.",
         "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array.",
-        "Extraction owns the original vector of owning expression vectors, copied store rows and else expression. Actual row-copy/growth order, tail reset/append/pop pruning and reverse reconstruction are retained. An embedded evaluator continuation names current row/copy/argument vectors, else reference, parameter and actual unjoined vector INC receipt; interrupted cleanup blocks reuse until Close completes. Expansion preserves source const/store output publication prefixes on later failure rather than fabricating rollback.",
-        "Embedded equality continuation owns both extracted row vectors/else references, conjunction and fallback argument vectors, lexical select references and two borrowed-row tables. Actual INC-before-growth receipts retain unpublished acquisitions until cleanup; tables release before borrowed rows. Source raw select/equality intermediates created before failed ITE publication remain with the AST manager until Close; evaluator reset must not fabricate ownership of them.",
-        "Unspecified BV/arithmetic declarations reuse existing constant registration and partial-theory substitution/function-interpretation owners. Macro completion publishes the exact new interpretation after its else value; pending owners remain available to evaluator close on failed allocation. New plugin predicates borrow declaration metadata and do not construct an application or acquire numerical references."
+        "Unspecified BV/arithmetic declarations reuse existing constant registration and partial-theory substitution/function-interpretation owners. Macro completion publishes the exact new interpretation after its else value; pending owners remain available to evaluator close on failed allocation. New plugin predicates borrow declaration metadata and do not construct an application or acquire numerical references.",
+        "Native slice roots retain one actual AST reference per element, including partial appends. Cleanup retires consumed references before reporting errors and retains unread roots for retry. Borrowed tuple tables clear before their owning rows; original else, parameter and select owners retain existing lexical cleanup."
       ],
       "deviations": [
         "Boolean/uninterpreted and selected original array store/select and value extraction/expansion and nonidentity equality paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
         "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit.",
         "Original equality constraints deliberately retain two source limitations: finite-domain default equality is required even when explicit entries cover every index, and unknown matched rows remain in table1 for a later comparison with else2. Independent truth-table tests expose these source false negatives. No source algorithm correction or whole-unit native allocation/assertion credit is claimed.",
         "Original set declarations/reducers now reach evaluator traversal. Independent concrete Boolean membership/subset tests cover reducible aligned-store/constant cases and exact unresolved select/map/equality residuals for mismatched-index or mixed constant/store inputs. This preserves the source evaluator limitation rather than claiming full concrete set decision coverage.",
-        "The five BV zero-divisor symbols and three arithmetic unspecified symbols now follow original plugin-uninterpreted interpretation/completion paths. Arithmetic/BV NUM declarations preserve original BR_FAILED then macro fallback rather than rejecting values returned by interpretations. Other theory reducers remain unported and retain explicit unsupported errors; this is not whole BV/arithmetic evaluation credit. Registered plugin family tags replace native plugin-pointer dispatch, with checked false for absent bindings; native ABI/assertion/exception/TRACE and whole-unit ownership audits remain separate."
+        "The five BV zero-divisor symbols and three arithmetic unspecified symbols now follow original plugin-uninterpreted interpretation/completion paths. Arithmetic/BV NUM declarations preserve original BR_FAILED then macro fallback rather than rejecting values returned by interpretations. Other theory reducers remain unported and retain explicit unsupported errors; this is not whole BV/arithmetic evaluation credit. Registered plugin family tags replace native plugin-pointer dispatch, with checked false for absent bindings; native ABI/assertion/exception/TRACE and whole-unit ownership audits remain separate.",
+        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added."
       ]
     },
     {
@@ -50893,11 +50893,11 @@
         "TestModelEvaluatorOriginalArrayEqualityMatchedUnknownValueConstraints",
         "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals",
         "TestModelEvaluatorOriginalArrayEqualityFiniteAndInfiniteElseCases",
-        "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder",
-        "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
-        "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal",
         "TestModelEvaluatorOriginalArrayMapTraversalAndSelection",
-        "TestModelEvaluatorOriginalSetOperationsAndMembership"
+        "TestModelEvaluatorOriginalSetOperationsAndMembership",
+        "TestArrayTupleNativeReplacementOrderAndRemoval",
+        "TestArrayTupleNativeCompleteIndexIdentityAndBorrowing",
+        "TestModelArrayNativeRootsPartialAppendAndGrowth"
       ],
       "conditionals": [
         {
@@ -50946,11 +50946,12 @@
           "tests": [
             "TestModelEvaluatorOriginalFunctionArrayValueExpansionAndPrecedence",
             "TestModelEvaluatorOriginalArrayExpansionPruningAndGroundness",
-            "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals"
+            "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals",
+            "TestModelArrayNativeRootsPartialAppendAndGrowth"
           ]
         },
         {
-          "name": "original mk_array_eq and mk_array_eq_core, args_hash/args_eq with borrowed-row concrete source table; value/unknown-index equality paths and exact source constraints (src/model/model_evaluator.cpp:292-420)",
+          "name": "original mk_array_eq and mk_array_eq_core array precedence/constraints with native slice roots and insertion-ordered tuple lookup (src/model/model_evaluator.cpp:292-420)",
           "status": "partial",
           "go_target": "pkg/model/model_evaluator_array_equality.go",
           "tests": [
@@ -50959,23 +50960,22 @@
             "TestModelEvaluatorOriginalArrayEqualityMatchedUnknownValueConstraints",
             "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals",
             "TestModelEvaluatorOriginalArrayEqualityFiniteAndInfiniteElseCases",
-            "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder",
-            "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
-            "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal"
+            "TestArrayTupleNativeReplacementOrderAndRemoval",
+            "TestArrayTupleNativeCompleteIndexIdentityAndBorrowing"
           ]
         }
       ],
       "ownership": [
         "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array.",
         "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array.",
-        "Extraction owns the original vector of owning expression vectors, copied store rows and else expression. Actual row-copy/growth order, tail reset/append/pop pruning and reverse reconstruction are retained. An embedded evaluator continuation names current row/copy/argument vectors, else reference, parameter and actual unjoined vector INC receipt; interrupted cleanup blocks reuse until Close completes. Expansion preserves source const/store output publication prefixes on later failure rather than fabricating rollback.",
-        "Embedded equality continuation owns both extracted row vectors/else references, conjunction and fallback argument vectors, lexical select references and two borrowed-row tables. Actual INC-before-growth receipts retain unpublished acquisitions until cleanup; tables release before borrowed rows. Source raw select/equality intermediates created before failed ITE publication remain with the AST manager until Close; evaluator reset must not fabricate ownership of them."
+        "Native slice roots retain one actual AST reference per element, including partial appends. Cleanup retires consumed references before reporting errors and retains unread roots for retry. Borrowed tuple tables clear before their owning rows; original else, parameter and select owners retain existing lexical cleanup."
       ],
       "deviations": [
         "Boolean/uninterpreted and selected original array store/select and value extraction/expansion and nonidentity equality paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
         "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit.",
         "Original equality constraints deliberately retain two source limitations: finite-domain default equality is required even when explicit entries cover every index, and unknown matched rows remain in table1 for a later comparison with else2. Independent truth-table tests expose these source false negatives. No source algorithm correction or whole-unit native allocation/assertion credit is claimed.",
-        "Original set declarations/reducers now reach evaluator traversal. Independent concrete Boolean membership/subset tests cover reducible aligned-store/constant cases and exact unresolved select/map/equality residuals for mismatched-index or mixed constant/store inputs. This preserves the source evaluator limitation rather than claiming full concrete set decision coverage."
+        "Original set declarations/reducers now reach evaluator traversal. Independent concrete Boolean membership/subset tests cover reducible aligned-store/constant cases and exact unresolved select/map/equality residuals for mismatched-index or mixed constant/store inputs. This preserves the source evaluator limitation rather than claiming full concrete set decision coverage.",
+        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added."
       ]
     },
     {
@@ -114525,13 +114525,11 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/hash.go",
-        "pkg/sat/sat_solver_mutex_pair_set_test.go",
-        "pkg/model/model_array_tuple_table.go"
+        "pkg/sat/sat_solver_mutex_pair_set_test.go"
       ],
       "tests": [
         "TestSourceHashVectors",
         "TestCompositeVisitOrder",
-        "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder",
         "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"
       ],
       "conditionals": [
@@ -114615,21 +114613,15 @@
             "TestSourceHashVectors",
             "TestCompositeVisitOrder"
           ]
-        },
-        {
-          "name": "selected original get_composite_hash tuple consumer and full MIX state through MixState (src/util/hash.h:72-122)",
-          "status": "partial",
-          "go_target": "pkg/model/model_array_tuple_table.go",
-          "tests": [
-            "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder"
-          ]
         }
       ],
       "ownership": [
         "No retained caller data; baseline little-endian/signed-char policy explicit. Generic hash-table/container functors not yet audited; see PORT_PROGRESS.md#audit-utilhash-port-status-md.",
         "Mutex detection uses a native map[[2]uint32]struct{} for literal-pair membership. It never iterates the map; source clause collection and clique traversal order remain. Removed Runtime-backed bucket geometry, cached hashes, FREE/default member construction, rehash/copy and allocation/destructor refusal simulation. Only the actual lexical frame header remains budgeted. A 32-variable complete graph exercises 496 pairs through both collection passes, repeats append-only queries with just one permitted header reservation, checks independent clique membership and exact frame cleanup. No C++ hash/table implementation credit is added."
       ],
-      "deviations": []
+      "deviations": [
+        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added."
+      ]
     },
     {
       "path": "src/util/hashtable.h",
@@ -114649,7 +114641,6 @@
         "pkg/sat/sat_solver_index_iterator_source_test.go",
         "pkg/sat/sat_solver_mutex_pair_set_test.go",
         "pkg/util/runtime_bytes_bounded.go",
-        "pkg/model/model_array_tuple_table.go",
         "pkg/ast/rewriter/bv_trailing_table.go"
       ],
       "tests": [
@@ -114717,8 +114708,6 @@
         "TestSATSolverConsequenceNativeMapGrowthAndReplacement",
         "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
         "TestSATConsequenceNativeIndexIteratorBorrowLifetime",
-        "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
-        "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal",
         "TestBVTrailingConstructorBorrowsExtractionOwner",
         "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
@@ -114998,15 +114987,6 @@
           ]
         },
         {
-          "name": "selected args_table borrowed AST-row specialization: growth before replacement, last tombstone, physical bucket order, deletion cleanup and reservation refusal (src/util/hashtable.h:183-256,351-403,494-509,546-577)",
-          "status": "partial",
-          "go_target": "pkg/model/model_array_tuple_table.go",
-          "tests": [
-            "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
-            "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal"
-          ]
-        },
-        {
           "name": "concrete append-only obj_map<expr,pair<unsigned,unsigned>> source hash/key comparison, linear probing, capacity-eight strict three-quarter pre-insert growth, source-order rehash and table iteration (src/util/obj_hashtable.h:58-105,144-159; src/util/hashtable.h:155-214,219-227,244-256,377-396,494-510)",
           "status": "partial",
           "go_target": "pkg/ast/rewriter/bv_trailing_table.go",
@@ -115061,7 +115041,8 @@
         "These are Go owner/config guard-domain proofs, not native C++ algorithm failure or source copy-constructor credit. Four real accidental-Go-copy public actions previously returned success, with Close/source DT releasing original owner bytes; they now reject without affecting original backing/state/cause/charges. No new storage or source allocator events.",
         "Selected Runtime32/64 and legacy char-pointer/int32 engines implement literal source action/publication order and real shared assertion transport; representation geometry is not native ABI. Source source-pointer/runtime provider/borrowed spelling lifetime qualifications remain explicit. Malformed uninitialized value and dangling DT, closed assertion provider, and host ErrorTransport reentry are Go guard-domain proofs rather than ordinary native math REDs. Registered src/test/map.cpp:23-44 exact14 ENSURE credit remains unchanged, independent tests add none. Core dump key_data ostream instantiation lacks a source-defined operator<<; no fabricated value formatting is supplied. Other entry/key/value/native/global/compiler profiles remain partial.",
         "BV trailing count-cache specialization uses concrete Go entry storage and checked AST identity handles without generics, at its rewriter consumer to avoid import cycles. It preserves selected append-only probing/growth/iteration algorithms and key reference ownership; generic map APIs, native object-pointer/sentinel/entry layout and Runtime allocator/exception/fatal ABI remain uncredited.",
-        "SAT antecedents now use map[uint32]*satSolverIndexSet and concrete insdict.Dict[uint32,struct{}] sets. Map values are deep copies; duplicate replacement preserves the mapped row identity and replaces its contents. Native insertion order replaces physical bucket order. Removed source hashtable capacity, probing, tombstones, Runtime backing/pointer headers, eager inactive nested values, temporary copies and container allocation/destructor refusal states. Only actual map/frame headers remain charged. Borrowed ordered iterator views are invalidated by key changes, assignment, reset or close; duplicates preserve the view. Reset/close drops mapped sets and rejects stale borrowed rows. Cold header refusal, 257-value growth/replacement, independent 4096-operation union/assignment oracle, borrowed lifetime and retained consequence algorithms are covered. No generic C++ hashtable/map implementation credit is added."
+        "SAT antecedents now use map[uint32]*satSolverIndexSet and concrete insdict.Dict[uint32,struct{}] sets. Map values are deep copies; duplicate replacement preserves the mapped row identity and replaces its contents. Native insertion order replaces physical bucket order. Removed source hashtable capacity, probing, tombstones, Runtime backing/pointer headers, eager inactive nested values, temporary copies and container allocation/destructor refusal states. Only actual map/frame headers remain charged. Borrowed ordered iterator views are invalidated by key changes, assignment, reset or close; duplicates preserve the view. Reset/close drops mapped sets and rejects stale borrowed rows. Cold header refusal, 257-value growth/replacement, independent 4096-operation union/assignment oracle, borrowed lifetime and retained consequence algorithms are covered. No generic C++ hashtable/map implementation credit is added.",
+        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added."
       ]
     },
     {
@@ -142230,7 +142211,8 @@
         "Polynomial reference vectors, including Newton values and caller PSC outputs, use native []Polynomial storage. Actual INC-before-publication, SET incoming INC before old DEC, ascending reset and stopped reference destruction remain. Container growth/free has no Runtime faultpoints or charged backing; removed push-allocation receipts and obsolete incoming-growth failure fixtures. A 4097-entry independent association/count regression covers null entries, SET, reset, zero resize and reuse with Runtime reservations disabled. Cached display counts now stop at current native logical bounds after callback reset instead of reading retained backing tail. Actual reference/numeral constructors and destructor failure checks remain; no whole-unit completion credit is added."
       ],
       "deviations": [
-        "No generic RefVectorCore, RefVector, or SRefVector exists in Go. Current AST, polynomial, and s-expression targets use concrete typed owners; remaining specializations should stay beside their consumers."
+        "No generic RefVectorCore, RefVector, or SRefVector exists in Go. Current AST, polynomial, and s-expression targets use concrete typed owners; remaining specializations should stay beside their consumers.",
+        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added."
       ]
     },
     {
@@ -149150,7 +149132,8 @@
         "Monomial interning and lexical rename tables now use concrete insertion-ordered insdict.Dict v0.10.1 entries and native map[uint32][]uint32 project-hash buckets. Stable entry IDs retain temporary factory publication and replacement by completed objects. Removed C++ primary/cellar/free-list geometry, physical codecs, rehash/growth/collision counters and table allocation/free failures. Native []bool validates debug rename permutations; Go sort.Slice replaces the remaining monomial heap sort. Rename iterates deterministic insertion order and swaps only after all mutations/inserts complete. Cached project hash/equality still read actual reached object powers; real object allocations, refcounts and stopped source destructor continuations remain. Owning token cleanup uses the stored bucket after partial key mutation; constructor/source table destruction records removal of any pending factory edge. Independent cold growth and duplicate/delete/order coverage spans 4097 actual monomials under disabled Runtime reservations, two renames preserve every canonical identity, forced collisions preserve distinct powers, and source/owning pending cleanup is verified. The obsolete polynomial rename table-allocation sweep is replaced by allocation-disabled exact-value checks; warm ModD/PSC tests now audit real Runtime/numeric storage independently of native Go allocations. No whole-unit completion credit is added.",
         "Persistent found-variable flags shared by substitution and Vars now use native []bool. Removed cap/size byte codecs, source 3/2 growth, Runtime binding/pending/interrupted state, container allocation/free failures and raw-root census adapters. Growth preserves old flags and initializes new flags false; reserve does not shrink. The original reached term/query reset loops remain, including visited flags surviving a source body failure. Native bounds retain debug assertions and release arena.ErrBounds; scalar member cleanup releases the slice. Native cold growth through 4097 flags and cold Vars output publication run under disabled Runtime reservations with unchanged accounting. An actual reached malformed-variable bounds fixture checks the published visited prefix and retained flags without inventing a source failure/reentry from deleted container allocation. Three obsolete container-only tests are retired. Real substitution numeric/factory/destructor and owner guards remain. No whole-unit completion credit is added.",
         "Binary-rational fields and DRS/Sturm stacks now use native slice append, removing C++ vector capacity/header arithmetic, initialized masks and container-only reservations/refunds. Binary logical size remains distinct from native constructed field extent; relocation transfers actual numeral fields once and clears old owning records. Root-isolation frame packing/traversal, endpoint arithmetic, ascending numeric destruction, actual cold owners and real numeric allocation failures remain. Native buffer BackingBytes is zero.",
-        "This checkpoint supersedes prior Runtime scalar-column/cache growth, raw-header, allocation-refusal and stale-on-reallocation claims for these SAT unsigned members. Retired tests of emulated storage events; retained independent solver, minimization, consequence, MUS, model and probing results in native/debug profiles. Empty invalid lemma operations now stop at native checked bounds. Clause sorting uses Go standard sort instead of a translated STL heap algorithm. Native replacements add no generic C++ vector/STL implementation credit."
+        "This checkpoint supersedes prior Runtime scalar-column/cache growth, raw-header, allocation-refusal and stale-on-reallocation claims for these SAT unsigned members. Retired tests of emulated storage events; retained independent solver, minimization, consequence, MUS, model and probing results in native/debug profiles. Empty invalid lemma operations now stop at native checked bounds. Clause sorting uses Go standard sort instead of a translated STL heap algorithm. Native replacements add no generic C++ vector/STL implementation credit.",
+        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added."
       ]
     },
     {

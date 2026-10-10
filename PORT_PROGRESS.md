@@ -33554,3 +33554,40 @@ The receiver-aware placement audit now reports 286 root production files and
 The external caller migration is incomplete: model array tuple tables and
 array expansion/equality still use ASTRefVector storage. The complete util
 subpackage split remains unfinished; this audit is not proof of readiness.
+
+## Native model array roots and ordered tuple lookup
+
+Model evaluator array extraction, equality and reconstruction now own native
+[]ASTHandle rows/arguments/conjunctions with explicit INC before append and
+consumed-DEC-aware cleanup. Partial appends keep their acquired references;
+interrupted cleanup retains unconsumed/unread roots for retry. Row publication
+transfers slice ownership instead of constructing a redundant reference-vector
+copy; pruning releases one row and shifts slice headers. Else, parameter and
+select owners retain their actual lexical cleanup. No ASTRefVector storage or
+unpublished push-growth receipt remains in model production or its fixtures.
+
+Tuple lookup now uses insdict.Dict v0.10.1 keyed by copied, ordered complete AST
+handle identities, borrowing the owning row slices. Equal tuples replace their
+result without moving the key. Source array precedence, duplicate handling,
+value/groundness guards, reconstruction and actual AST/numeral failure behavior
+remain. Final unmatched constraints iterate in dictionary insertion order rather
+than physical source bucket order. Removed the source table growth/tombstone/
+rehash/budget emulation, its geometry/refusal tests and the now-unused exported
+MixState helper. Retired the corresponding two generic hash/table evidence
+groups; these replacements add no C++ container/STL implementation credit.
+
+Validation: full native model passed (0.064s), full g3debug model passed (0.080s).
+Existing integration tests cover function-backed arrays, precedence, pruning,
+symbolic-index truth tables, unknown matched-value constraints, differing finite/
+infinite defaults and real allocation refusals/reference restoration. Native
+fixtures cover ordered tuple replacement/removal/reinsertion, complete index
+identity, borrowed ownership, partial append rejection and 4097 owning references
+with arena reservations disabled. Full API/SAT tactic/tactic passed
+(0.011s/0.101s/0.023s); module-wide compilation, model vet, manifest and diff checks
+passed. No full native module rerun inside the hourly interval. Counts remain
+2102 units/677 APIs: 62 ported, 283 partial, 1729 unported, two dead/deleted.
+
+The receiver-aware util audit remains 286 files/43 components/largest183. This
+removes model's owning-vector consumers but does not complete the external native
+collection audit or the requested root util split. AST-internal collections and
+remaining util boundaries still need migration/reorganization. Goal stays active.
