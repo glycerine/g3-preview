@@ -1208,6 +1208,7 @@
         "permutation.go",
         "permutation_exact.go",
         "permutation_float.go",
+        "primal_prepare_float.go",
         "priority_heap.go",
         "priority_queue_exact.go",
         "priority_queue_native.go",

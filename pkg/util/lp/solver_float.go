@@ -30,6 +30,10 @@ var ErrLPSolverMissingRow = errors.New("lp: cannot find row")
 type FloatLPSolver struct {
 	A                                                             *FloatStaticMatrix
 	B, ColumnScale, Costs                                         []float64
+	X, UpperBounds                                                []float64
+	Basis, NBasis                                                 []uint32
+	Heading                                                       []int32
+	ColumnTypes                                                   []ColumnType
 	AValues                                                       *insdict.Dict[uint32, *insdict.Dict[uint32, float64]]
 	Constraints                                                   map[uint32]FloatConstraint
 	Columns                                                       map[uint32]*FloatColumnInfo

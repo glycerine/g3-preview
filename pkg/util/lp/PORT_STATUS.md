@@ -5,12 +5,13 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently 55 partial source units and55 unported units. No complete
+There are currently 58 partial source units and52 unported units. No complete
 LP solver is available yet. A green Go coverage report does not measure the C++
 code that has not been ported.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Floating primal initial residual basis and bound/cost preparation | 120 independent [A,D]X=B worlds; real sparse/forced-dense LU solves in both orientations, structural costs/bounds, negative initial values, unsigned wrap, resize/IEEE/empty-program and publication/output-error cases | 96.2% (101/105) native and debug. Gaps propagate real host-clock/invariant-protected child errors or guard enormous negative converted extents. Actual core construction/optimization and exact preparation remain open |
 | Floating solver presolve, pinning and fixed/zero elimination | 100 independent exact box-corner worlds and1500 relation/RHS decisions; strict directional tolerance/IEEE/unknown/zero bounds, pin and RHS publication prefixes, deferred erasure, actual cleanup pass-count semantics, writer failures and cleanup-to-scale integration | Native97.8% (133/136), debug98.5% (134/136). Native gaps are debug-only assertion/error propagation; debug gaps guard null pointers after successful source metadata lookup. Exact presolve and complete drivers remain open |
 | Floating common solver preparation and retained column metadata | 120 independent original-system worlds across shifted/flipped/boxed/free columns; external/core maps, scaled solutions/objectives, reconstruction, counters, stale name aliases, bound tolerance/IEEE and source error/publication prefixes | Solver96.6% native (196/203),98.0% debug (199/203); retained column metadata89.6% (43/48),100% (48/48). Gaps include other-profile assertions, real host-clock failure and invariant-protected reconstruction/false-balance propagation. Primal/dual optimization and exact preparation remain open |
 | Floating ratio/geometric and power-of-two scaler | 160 independent known-solution matrix worlds; diagonal-factor oracles, strict thresholds, both ordering branches, original-ratio and reps+1 fixtures, borrowed inputs, RHS/scale publication failures, zero/NaN/infinity and source log stop | Native86.9% (226/260), debug88.1% (229/260). Gaps propagate invariant-protected child errors, belong to the other assertion profile or lie beyond the source unimplemented balance stop. Precise explicit scale/full solver integration remain open |
@@ -69,7 +70,8 @@ code that has not been ported.
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
 The complete native module suite passed at19:01 UTC on2026-10-10, including
-all current LU, floating scaler, common solver and presolve additions. LP passed
+all LU, floating scaler, common solver and presolve additions through that run.
+This full snapshot predates floating primal preparation. LP passed
 in330.403s with **89.8%** statement coverage (**9259/10316 existing Go statements**).
 Other results: numeral93.895s, AST20.506s and polynomial33.270s. Authoritative
 log/profile: `/mnt/oldrog/tmp/g3-presolve-module-native.log` and
@@ -155,3 +157,9 @@ Common preparation does not supply primal/dual optimization or exact owners.
 Floating presolve plus solver/column/scaler/static regressions pass0.216s in
 both native and combined debug/checked profiles. Authoritative focused logs
 and coverage: `/mnt/oldrog/tmp/g3-presolve-{native,debug}.{log,cover}`.
+
+Floating primal preparation plus floating presolve/solver/column/scaler/static
+and LU regressions pass0.769s native/0.766s combined debug/checked. Logs and
+profiles: `/mnt/oldrog/tmp/g3-primal-prepare-{native,debug}.{log,cover}`. No
+within-hour full native repeat is needed; the19:01 snapshot predates this addition.
+Preparation constructs no core solver and executes no optimization loop.

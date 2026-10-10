@@ -36931,3 +36931,49 @@ The full native exact solve file is74/74 (100%) after prepared extraction;
 floating solve31/37 (83.8%). Other added components match their current focused
 native snapshots. This is Go statement coverage, not a completion claim for
 unported C++ code. Full debug suite is not repeated solely for aggregate coverage.
+
+
+### Floating primal initial basis and bounds/cost preparation — 2026-10-10
+
+Ported retained lp_primal_simplex.hpp:51-56,63-68,146-165,189-250 floating
+preparation. Find_maximal_solution reaches bounds then solve_with_total_inf.
+Shared floating X/basis/nonbasis/heading/types/upper bounds now have native
+slices, with primal low bounds. Active source initialization adds one signed
+residual column per row: equality fixed with X=b, GE low-bound with X=-b and
+coefficient-1, LE low-bound with X=b and coefficient+1. Negative values/initial
+bound violations are intentional source data for the later core algorithm.
+Residual costs stay zero, then structural costs copy scaled original values.
+
+Whole-source caller audit finds the separate artificial-variable initializer
+only in declaration/definition plus its own row-helper call. init_buffer and
+set_zero_bound have no retained caller. Those unused template bodies are not
+ported. Artificial counters still contribute to the real bounds-vector size;
+that is retained even when it leaves unused trailing slots. Source unsigned
+extent wraps are preserved; the subsequent signed Linux int conversion has a
+qualified negative-extent Go guard. Preparation preserves resized X/basis
+prefixes, clears low bounds/costs, appends a column before later array guards,
+and stores low before upper in the chained bound assignment. Empty programs
+return source OPTIMAL before clearing vectors; nonempty prep does not solve.
+
+120 independent signed-diagonal problems verify [A,D]X=B, unchanged structural
+coefficients, basis numbering, costs/types/scales/bounds and extra metadata
+lengths. Actual sparse/forced-dense LU basis construction solves both orientations
+against independent diagonal products. Tests check signed zero/NaN/infinity,
+all source publication prefixes, unknown relation assertion profiles, unsigned
+counter wrap, resize retained values, empty/nonempty zero-row programs and
+message writer errors. No fake core solver, allocation callback or optimization
+result is introduced.
+
+Focused primal/presolve/solver/column/scaler/static/LU regressions pass0.769s
+native/0.766s combined g3debug/g3checked. New file101/105 (96.2%) in both. Gaps
+are actual host-clock failure, invariant-protected adjusted-bound/matrix child
+errors and the enormous negative converted extent guard; no fabricated state
+is used for coverage. Full native module last passed19:01 UTC at89.8% LP Go
+coverage; that snapshot predates this addition and no within-hour repeat is
+needed. Three source units become partial; LP58 partial/52 unported. Actual
+core construction/optimization, precise preparation, dual/LAR, random updates,
+bounds/evidence, MPS and complete original drivers remain required.
+
+Both LP vets, source inventory/evidence/no-generics and diff checks pass.
+Regenerated graph remains64 packages with unchanged edges and the added
+primal preparation file. The optimization loop remains explicitly unported.
