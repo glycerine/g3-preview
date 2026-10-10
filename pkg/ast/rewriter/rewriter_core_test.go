@@ -144,7 +144,7 @@ func TestRewriterCoreSharedFramesQuantifierChildrenAndPackedFields(t *testing.T)
 	if shared {
 		t.Fatal("constant cached")
 	}
-	satOK(t, m.RefVectorPush(c.results, q))
+	satOK(t, appendRewriterRoot(m, &c.results, q))
 	satOK(t, c.pushFrameCore(app, true, 6, 7))
 	fr := &c.frames[0]
 	if fr.state() != 2 || fr.maxDepth() != 3 || fr.index() != 0 || fr.spos != 1 || !fr.cacheResult() || fr.newChild() {
@@ -242,37 +242,32 @@ func TestRewriterCoreProofCompactionResetAndCleanupSourceAsymmetry(t *testing.T)
 	satOK(t, e)
 	defer func() { satOK(t, c.Close()) }()
 	for _, pr := range []ast.ASTHandle{{}, a, {}, b, {}} {
-		satOK(t, m.RefVectorPush(c.proofResults, pr))
+		satOK(t, appendRewriterRoot(m, &c.proofResults, pr))
 	}
 	satOK(t, c.elimReflexProofs(1))
-	n, e := m.RefVectorSize(c.proofResults)
-	satOK(t, e)
+	n := uint32(len(c.proofResults))
 	if n != 3 {
 		t.Fatal("source stable proof compaction", n)
 	}
 	for i, want := range []ast.ASTHandle{{}, a, b} {
-		got, e := m.RefVectorGet(c.proofResults, uint32(i))
-		satOK(t, e)
+		got := c.proofResults[i]
 		if got != want {
 			t.Fatal("compaction preserves prefix and order", i, got, want)
 		}
 	}
-	satOK(t, m.RefVectorPush(c.results, p))
+	satOK(t, appendRewriterRoot(m, &c.results, p))
 	// Original free_memory finalizes results but leaves proofResults untouched.
 	satOK(t, c.Cleanup())
-	n, e = m.RefVectorSize(c.proofResults)
-	satOK(t, e)
+	n = uint32(len(c.proofResults))
 	if n != 3 {
 		t.Fatal("source cleanup proof-stack asymmetry", n)
 	}
-	n, e = m.RefVectorSize(c.results)
-	satOK(t, e)
+	n = uint32(len(c.results))
 	if n != 0 {
 		t.Fatal("cleanup result stack not finalized")
 	}
 	satOK(t, c.Reset())
-	n, e = m.RefVectorSize(c.proofResults)
-	satOK(t, e)
+	n = uint32(len(c.proofResults))
 	if n != 0 {
 		t.Fatal("proof-enabled reset clears proof stack")
 	}
@@ -304,7 +299,7 @@ func TestRewriterCoreNativeAndDebugAssertionBoundaries(t *testing.T) {
 	defer func() { satOK(t, c.Close()) }()
 	p, q, r := goalTestAtom(t, m, "assert-core-p"), goalTestAtom(t, m, "assert-core-q"), goalTestAtom(t, m, "assert-core-r")
 	app := goalTestApp(t, m, ast.ASTOpOr, p, q)
-	satOK(t, m.RefVectorPush(c.proofResults, ast.ASTHandle{}))
+	satOK(t, appendRewriterRoot(m, &c.proofResults, ast.ASTHandle{}))
 	e = c.elimReflexProofs(0)
 	if ast.ASTSourceDebug {
 		if e != ast.ErrASTDomain {
@@ -314,8 +309,7 @@ func TestRewriterCoreNativeAndDebugAssertionBoundaries(t *testing.T) {
 		satOK(t, e)
 	}
 	satOK(t, c.Reset())
-	n, e := m.RefVectorSize(c.proofResults)
-	satOK(t, e)
+	n := uint32(len(c.proofResults))
 	want := uint32(0)
 	if ast.ASTSourceDebug {
 		want = 1

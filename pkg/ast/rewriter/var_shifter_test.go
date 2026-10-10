@@ -212,8 +212,7 @@ func TestVariableShifterSharedCacheGroundShortcutAndDeepTraversal(t *testing.T) 
 	if index != 4 {
 		t.Fatal("deep source variable index", index)
 	}
-	n, e := m.RefVectorSize(s.core.results)
-	satOK(t, e)
+	n := uint32(len(s.core.results))
 	if n != 0 || len(s.core.frames) != 0 {
 		t.Fatal("source main loop left results or frames")
 	}

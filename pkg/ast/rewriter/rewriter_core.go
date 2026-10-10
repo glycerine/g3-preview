@@ -84,10 +84,10 @@ type rewriterCore struct {
 	cacheStack                     rewriterCacheStack
 	cache                          *ast.ActivityCache
 	frames                         []rewriterFrame
-	results                        ast.ASTRefVector
+	results                        []ast.ASTHandle
 	proofCacheStack                rewriterCacheStack
 	proofCache                     *ast.ActivityCache
-	proofResults                   ast.ASTRefVector
+	proofResults                   []ast.ASTHandle
 	root                           ast.ASTHandle
 	numQVars                       uint32
 	scopes                         []rewriterScope
@@ -118,17 +118,7 @@ func newRewriterCore(m *ast.ASTManager, proofGen bool) (*rewriterCore, error) {
 func (c *rewriterCore) init(m *ast.ASTManager, proofGen bool) error {
 	c.manager, c.proofGen, c.cancelCheck = m, proofGen, true
 	c.self = c
-	var e error
-	// Both owning result-vector members are constructed, even without proofs.
-	c.results, e = m.NewRefVector()
-	if e != nil {
-		return e
-	}
-	c.proofResults, e = m.NewRefVector()
-	if e != nil {
-		return e
-	}
-	if e = c.initCacheStack(); e != nil {
+	if e := c.initCacheStack(); e != nil {
 		return e
 	}
 	c.ready = true
@@ -386,18 +376,9 @@ func (c *rewriterCore) pushFrameCore(t ast.ASTHandle, cache bool, state, depth u
 	if e := c.open(); e != nil {
 		return e
 	}
-	n, e := c.manager.RefVectorSize(c.results)
-	if e != nil {
-		return e
-	}
-	if ast.ASTSourceDebug && c.proofGen {
-		p, e := c.manager.RefVectorSize(c.proofResults)
-		if e != nil {
-			return e
-		}
-		if n != p {
-			return ast.ErrASTDomain
-		}
+	n := uint32(len(c.results))
+	if ast.ASTSourceDebug && c.proofGen && len(c.results) != len(c.proofResults) {
+		return ast.ErrASTDomain
 	}
 	if len(c.frames) == cap(c.frames) {
 		size := uint64(2)
@@ -530,29 +511,24 @@ func (c *rewriterCore) elimReflexProofs(spos uint32) error {
 	if ast.ASTSourceDebug && !c.proofGen {
 		return ast.ErrASTDomain
 	}
-	size, e := c.manager.RefVectorSize(c.proofResults)
-	if e != nil {
-		return e
-	}
-	if spos > size {
+	if uint64(spos) > uint64(len(c.proofResults)) {
 		return ast.ErrASTDomain
 	}
-	j := spos
-	for i := spos; i < size; i++ {
-		pr, e := c.manager.RefVectorGet(c.proofResults, i)
-		if e != nil {
-			return e
-		}
+	j := int(spos)
+	for i := int(spos); i < len(c.proofResults); i++ {
+		pr := c.proofResults[i]
 		if !pr.IsNull() {
+			// Transfer each nonnull reference once; discarded entries are only nulls.
+			c.proofResults[j] = pr
 			if i != j {
-				if e = c.manager.RefVectorSet(c.proofResults, j, pr); e != nil {
-					return e
-				}
+				c.proofResults[i] = ast.ASTHandle{}
 			}
 			j++
 		}
 	}
-	return c.manager.RefVectorShrink(c.proofResults, j)
+	clear(c.proofResults[j:])
+	c.proofResults = c.proofResults[:j]
+	return nil
 }
 func (c *rewriterCore) SetCancelCheck(f bool) error {
 	if e := c.open(); e != nil {
@@ -574,11 +550,11 @@ func (c *rewriterCore) Reset() (err error) {
 		return e
 	}
 	c.frames = c.frames[:0]
-	if e := c.manager.RefVectorReset(c.results); e != nil {
+	if e := shrinkRewriterRoots(c.manager, &c.results, 0); e != nil {
 		return e
 	}
 	if c.proofGen {
-		if e := c.manager.RefVectorReset(c.proofResults); e != nil {
+		if e := shrinkRewriterRoots(c.manager, &c.proofResults, 0); e != nil {
 			return e
 		}
 	}
@@ -594,12 +570,13 @@ func (c *rewriterCore) freeMemory() error {
 	c.manager.BudgetField.Release(c.frameBytes)
 	c.frames = nil
 	c.frameBytes = 0
-	if e := c.manager.RefVectorFinalize(c.results); e != nil {
+	if e := shrinkRewriterRoots(c.manager, &c.results, 0); e != nil {
 		return e
 	}
 	c.manager.BudgetField.Release(c.scopeBytes)
 	c.scopes = nil
 	c.scopeBytes = 0
+	c.results = nil
 	// Source deliberately does not finalize the proof result-stack here.
 	return nil
 }
@@ -636,16 +613,14 @@ func (c *rewriterCore) Close() error {
 	c.manager.BudgetField.Release(c.scopeBytes)
 	c.scopes = nil
 	c.scopeBytes = 0
-	if c.proofResults != (ast.ASTRefVector{}) {
-		if e := c.manager.DelRefVector(&c.proofResults); e != nil {
-			return e
-		}
+	if e := shrinkRewriterRoots(c.manager, &c.proofResults, 0); e != nil {
+		return e
 	}
-	if c.results != (ast.ASTRefVector{}) {
-		if e := c.manager.DelRefVector(&c.results); e != nil {
-			return e
-		}
+	c.proofResults = nil
+	if e := shrinkRewriterRoots(c.manager, &c.results, 0); e != nil {
+		return e
 	}
+	c.results = nil
 	c.manager.BudgetField.Release(c.frameBytes)
 	c.frames = nil
 	c.frameBytes = 0

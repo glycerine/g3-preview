@@ -27119,7 +27119,9 @@
         "pkg/ast/rewriter/rewriter_core.go",
         "pkg/ast/rewriter/var_shifter.go",
         "pkg/ast/rewriter/rewriter_engine.go",
-        "pkg/ast/rewriter/rewriter_configuration.go"
+        "pkg/ast/rewriter/rewriter_configuration.go",
+        "pkg/ast/rewriter/rewriter_roots.go",
+        "pkg/ast/rewriter/rewriter_roots_test.go"
       ],
       "tests": [
         "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
@@ -27138,7 +27140,9 @@
         "TestRewriterEngineOriginalMaxStepsResumeAndCleanup",
         "TestRewriterEngineOriginalMacroExpansionUnderBinder",
         "TestBetaReducerOriginalPatternAndNoPatternReplacement",
-        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
+        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel",
+        "TestRewriterNativeResultAndProofRootsGrowth",
+        "TestRewriterNativeRootOnlyReferenceAliasReplacement"
       ],
       "conditionals": [
         {
@@ -27267,7 +27271,9 @@
             "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
             "TestRewriterCoreSharedFramesQuantifierChildrenAndPackedFields",
             "TestRewriterCoreProofCompactionResetAndCleanupSourceAsymmetry",
-            "TestRewriterCoreNativeAndDebugAssertionBoundaries"
+            "TestRewriterCoreNativeAndDebugAssertionBoundaries",
+            "TestRewriterNativeResultAndProofRootsGrowth",
+            "TestRewriterNativeRootOnlyReferenceAliasReplacement"
           ]
         },
         {
@@ -27287,7 +27293,8 @@
         "Concrete iterative frames/scopes and borrowed scalar binding/shift vectors retain original growth and state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
       ],
       "deviations": [
-        "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited."
+        "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited.",
+        "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added."
       ]
     },
     {
@@ -27300,7 +27307,9 @@
         "pkg/ast/rewriter/var_shifter.go",
         "pkg/ast/rewriter/rewriter_engine.go",
         "pkg/ast/rewriter/rewriter_configuration.go",
-        "pkg/ast/rewriter/traversal.go"
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/ast/rewriter/rewriter_roots.go",
+        "pkg/ast/rewriter/rewriter_roots_test.go"
       ],
       "tests": [
         "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
@@ -27324,7 +27333,9 @@
         "TestTraversalAtomicRootDoesNotCheckResourceCallback",
         "TestTraversalBindingsAndDisabledCancellation",
         "TestTraversalColdConstructionCleanup",
-        "TestTraversalExternalDefaultConfiguration"
+        "TestTraversalExternalDefaultConfiguration",
+        "TestRewriterNativeResultAndProofRootsGrowth",
+        "TestRewriterNativeRootOnlyReferenceAliasReplacement"
       ],
       "conditionals": [
         {
@@ -27373,7 +27384,9 @@
             "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
             "TestRewriterCoreSharedFramesQuantifierChildrenAndPackedFields",
             "TestRewriterCoreProofCompactionResetAndCleanupSourceAsymmetry",
-            "TestRewriterCoreNativeAndDebugAssertionBoundaries"
+            "TestRewriterCoreNativeAndDebugAssertionBoundaries",
+            "TestRewriterNativeResultAndProofRootsGrowth",
+            "TestRewriterNativeRootOnlyReferenceAliasReplacement"
           ]
         },
         {
@@ -27383,7 +27396,9 @@
           "tests": [
             "TestRewriterCoreSharedFramesQuantifierChildrenAndPackedFields",
             "TestRewriterCoreNativeAndDebugAssertionBoundaries",
-            "TestRewriterCoreOriginalScopedCachesAndRootRestoration"
+            "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
+            "TestRewriterNativeResultAndProofRootsGrowth",
+            "TestRewriterNativeRootOnlyReferenceAliasReplacement"
           ]
         },
         {
@@ -27419,7 +27434,8 @@
       ],
       "deviations": [
         "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited.",
-        "The public concrete Traversal exposes the same no-proof engine to other Go packages through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point. This boundary does not implement model evaluator theory reduction, completion or proof generation."
+        "The public concrete Traversal exposes the same no-proof engine to other Go packages through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point. This boundary does not implement model evaluator theory reduction, completion or proof generation.",
+        "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added."
       ]
     },
     {
@@ -27443,7 +27459,9 @@
       "go_targets": [
         "pkg/ast/rewriter/rewriter_engine.go",
         "pkg/ast/rewriter/rewriter_configuration.go",
-        "pkg/ast/rewriter/traversal.go"
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/ast/rewriter/rewriter_roots.go",
+        "pkg/ast/rewriter/rewriter_roots_test.go"
       ],
       "tests": [
         "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
@@ -27458,7 +27476,9 @@
         "TestTraversalAtomicRootDoesNotCheckResourceCallback",
         "TestTraversalBindingsAndDisabledCancellation",
         "TestTraversalColdConstructionCleanup",
-        "TestTraversalExternalDefaultConfiguration"
+        "TestTraversalExternalDefaultConfiguration",
+        "TestRewriterNativeResultAndProofRootsGrowth",
+        "TestRewriterNativeRootOnlyReferenceAliasReplacement"
       ],
       "conditionals": [
         {
@@ -27663,7 +27683,9 @@
             "TestRewriterEngineOriginalMaxStepsResumeAndCleanup",
             "TestRewriterEngineOriginalMacroExpansionUnderBinder",
             "TestBetaReducerOriginalPatternAndNoPatternReplacement",
-            "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
+            "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel",
+            "TestRewriterNativeResultAndProofRootsGrowth",
+            "TestRewriterNativeRootOnlyReferenceAliasReplacement"
           ]
         }
       ],
@@ -27672,7 +27694,8 @@
       ],
       "deviations": [
         "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited.",
-        "The public concrete Traversal exposes the same no-proof engine to other Go packages through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point. This boundary does not implement model evaluator theory reduction, completion or proof generation."
+        "The public concrete Traversal exposes the same no-proof engine to other Go packages through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point. This boundary does not implement model evaluator theory reduction, completion or proof generation.",
+        "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added."
       ]
     },
     {
@@ -142212,7 +142235,8 @@
       ],
       "deviations": [
         "No generic RefVectorCore, RefVector, or SRefVector exists in Go. Current AST, polynomial, and s-expression targets use concrete typed owners; remaining specializations should stay beside their consumers.",
-        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added."
+        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added.",
+        "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added."
       ]
     },
     {

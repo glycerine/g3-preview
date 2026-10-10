@@ -113,7 +113,7 @@ func (s *variableShifter) processVar(v ast.ASTHandle) error {
 		return e
 	}
 	if index < c.numQVars {
-		return m.RefVectorPush(c.results, v)
+		return appendRewriterRoot(m, &c.results, v)
 	}
 	if s.inverse {
 		if ast.ASTSourceDebug && index < c.numQVars+s.shift {
@@ -136,7 +136,7 @@ func (s *variableShifter) processVar(v ast.ASTHandle) error {
 	if e != nil {
 		return e
 	}
-	if e = m.RefVectorPush(c.results, newVar); e != nil {
+	if e = appendRewriterRoot(m, &c.results, newVar); e != nil {
 		return e
 	}
 	return c.setNewChild(v)
@@ -149,7 +149,7 @@ func (s *variableShifter) visit(t ast.ASTHandle) (bool, error) {
 		return false, e
 	}
 	if ground {
-		return true, m.RefVectorPush(c.results, t)
+		return true, appendRewriterRoot(m, &c.results, t)
 	}
 	cache, e := c.mustCache(t)
 	if e != nil {
@@ -161,7 +161,7 @@ func (s *variableShifter) visit(t ast.ASTHandle) (bool, error) {
 			return false, e
 		}
 		if !r.IsNull() {
-			if e = m.RefVectorPush(c.results, r); e != nil {
+			if e = appendRewriterRoot(m, &c.results, r); e != nil {
 				return false, e
 			}
 			return true, c.setNewChildIfDifferent(t, r)
@@ -187,7 +187,10 @@ func (s *variableShifter) visit(t ast.ASTHandle) (bool, error) {
 	}
 }
 func (c *rewriterCore) resultArguments(offset, count uint32) (ast.AppArguments, error) {
-	return c.manager.RefVectorArgumentsRange(c.results, offset, count)
+	if uint64(offset) > uint64(len(c.results)) || uint64(count) > uint64(len(c.results))-uint64(offset) {
+		return ast.AppArguments{}, ast.ErrASTDomain
+	}
+	return ast.SliceArguments(c.results[offset : offset+count]), nil
 }
 
 func (s *variableShifter) rebuildApp(t ast.ASTHandle, fr rewriterFrame, n uint32) (ast.ASTHandle, error) {
@@ -229,10 +232,7 @@ func (s *variableShifter) processApp() error {
 		}
 	}
 	fr := c.frames[frameIndex]
-	size, e := m.RefVectorSize(c.results)
-	if e != nil {
-		return e
-	}
+	size := uint32(len(c.results))
 	if size != fr.spos+n {
 		return ast.ErrASTDomain
 	}
@@ -243,10 +243,10 @@ func (s *variableShifter) processApp() error {
 			return e
 		}
 	}
-	if e = m.RefVectorShrink(c.results, fr.spos); e != nil {
+	if e = shrinkRewriterRoots(m, &c.results, fr.spos); e != nil {
 		return e
 	}
-	if e = m.RefVectorPush(c.results, newTerm); e != nil {
+	if e = appendRewriterRoot(m, &c.results, newTerm); e != nil {
 		return e
 	}
 	c.frames = c.frames[:frameIndex]
@@ -271,7 +271,7 @@ func (s *variableShifter) quantifierChild(q ast.ASTHandle, i, patterns uint32) (
 func (s *variableShifter) rebuildQuantifier(q ast.ASTHandle, fr rewriterFrame, patterns, noPatterns uint32) (ast.ASTHandle, error) {
 	c := &s.core
 	m := c.manager
-	body, e := m.RefVectorGet(c.results, fr.spos)
+	body, e := c.resultAt(fr.spos)
 	if e != nil {
 		return ast.ASTHandle{}, e
 	}
@@ -330,10 +330,7 @@ func (s *variableShifter) processQuantifier() error {
 		}
 	}
 	fr := c.frames[frameIndex]
-	size, e := m.RefVectorSize(c.results)
-	if e != nil {
-		return e
-	}
+	size := uint32(len(c.results))
 	if size != fr.spos+n {
 		return ast.ErrASTDomain
 	}
@@ -344,10 +341,10 @@ func (s *variableShifter) processQuantifier() error {
 			return e
 		}
 	}
-	if e = m.RefVectorShrink(c.results, fr.spos); e != nil {
+	if e = shrinkRewriterRoots(m, &c.results, fr.spos); e != nil {
 		return e
 	}
-	if e = m.RefVectorPush(c.results, newTerm); e != nil {
+	if e = appendRewriterRoot(m, &c.results, newTerm); e != nil {
 		return e
 	}
 	c.frames = c.frames[:frameIndex]
@@ -365,29 +362,23 @@ func (s *variableShifter) processQuantifier() error {
 func (s *variableShifter) publishResult(out ast.ASTRef) error {
 	c := &s.core
 	m := c.manager
-	n, e := m.RefVectorSize(c.results)
-	if e != nil {
-		return e
-	}
+	n := uint32(len(c.results))
 	if n != 1 {
 		return ast.ErrASTDomain
 	}
-	h, e := m.RefVectorGet(c.results, n-1)
+	h, e := c.resultAt(n - 1)
 	if e != nil {
 		return e
 	}
 	if e = m.SetRef(out, h); e != nil {
 		return e
 	}
-	return m.RefVectorPop(c.results)
+	return c.popResult()
 }
 func (s *variableShifter) mainLoop(t ast.ASTHandle, out ast.ASTRef) error {
 	c := &s.core
 	m := c.manager
-	n, e := m.RefVectorSize(c.results)
-	if e != nil {
-		return e
-	}
+	n := uint32(len(c.results))
 	if len(c.cacheStack.values) == 0 || c.cache != c.cacheStack.values[0] || len(c.frames) != 0 || n != 0 {
 		return ast.ErrASTDomain
 	}
@@ -408,7 +399,7 @@ func (s *variableShifter) mainLoop(t ast.ASTHandle, out ast.ASTRef) error {
 				return e
 			}
 			if !r.IsNull() {
-				if e = m.RefVectorPush(c.results, r); e != nil {
+				if e = appendRewriterRoot(m, &c.results, r); e != nil {
 					return e
 				}
 				c.frames = c.frames[:len(c.frames)-1]

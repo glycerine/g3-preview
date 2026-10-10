@@ -33591,3 +33591,36 @@ The receiver-aware util audit remains 286 files/43 components/largest183. This
 removes model's owning-vector consumers but does not complete the external native
 collection audit or the requested root util split. AST-internal collections and
 remaining util boundaries still need migration/reorganization. Goal stays active.
+
+## Native rewriter result, proof and annotation roots
+
+RewriterCore result/proof stacks, variable-shifter results and engine lexical
+pattern/no-pattern lists now use native []ASTHandle ownership. Append INCs once;
+shrink/pop release ascending roots, retire consumed DEC references before an
+error and retain unread/unconsumed ownership for retry. Replacement retains the
+incoming alias before releasing the old reference. Stable proof compaction moves
+nonnull references without extra INC/DEC traffic. Pattern roots live in engine
+fields so interrupted lexical cleanup remains reachable through Reset/Cleanup/
+Close. Native borrowed result ranges feed the existing AST argument view. Removed
+cold vector records, byte codecs, capacity emulation and result backing growth/
+free faultpoints. Actual traversal, cache/scopes, AST construction and numerical
+failure behavior remain; no C++ container/STL implementation credit is added.
+
+Validation: focused core/shifter/substitution/public Boolean passed (0.036s).
+Full native rewriter passed (12.806s); new native root tests passed (0.007s).
+The remaining g3debug rewriter suite passed (17.676s), excluding three baseline
+warm factory-allocation failures: NAND/AND native buffer tests and
+TestArrayRewriterOriginalSortingConstantAndIteRules. The latter reproduced on an
+unchanged archive of preceding commit 0bfe885, with the same injected failure at
+array_rewriter_test.go:181; it is not a result-stack regression. This is not a
+claim that the complete g3debug suite passes. New fixtures verify 4097 result/
+proof references with arena reservations disabled, count-preserving compaction,
+preserved shrink prefixes, alias replacement of the only owning reference and
+no double DEC on repeated reset. Full native model/API/tactic/SAT tactic passed
+(0.054s/0.011s/0.025s/0.121s). Module-wide compilation, rewriter vet, manifest,
+gofmt and diff checks passed. No full native module rerun. Counts remain
+2102 units/677 APIs: 62 ported, 283 partial, 1729 unported, two dead/deleted.
+
+Rewriter frame/scope/binding/cache-stack storage still simulates source growth.
+Other Boolean/BV/proof/sequence AST collection consumers also remain. The util
+root split and the full external native collection audit are unfinished.

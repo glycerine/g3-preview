@@ -24,6 +24,7 @@ type rewriterEngine struct {
 	cfg                              rewriterConfiguration
 	numSteps                         uint32
 	bindings                         []ast.ASTHandle
+	patterns, noPatterns             []ast.ASTHandle
 	shifter, invShifter              variableShifter
 	r, pr, pr2                       ast.ASTRef
 	shifts                           []uint32
@@ -167,6 +168,9 @@ func (r *rewriterEngine) Reset() error {
 	if e := r.open(); e != nil {
 		return e
 	}
+	if e := r.releasePatterns(); e != nil {
+		return e
+	}
 	r.cfg.reset()
 	if e := r.core.Reset(); e != nil {
 		return e
@@ -180,6 +184,9 @@ func (r *rewriterEngine) Reset() error {
 }
 func (r *rewriterEngine) Cleanup() error {
 	if e := r.open(); e != nil {
+		return e
+	}
+	if e := r.releasePatterns(); e != nil {
 		return e
 	}
 	r.cfg.cleanup()
@@ -206,6 +213,9 @@ func (r *rewriterEngine) Close() error {
 		return nil
 	}
 	m := r.core.manager
+	if e := r.releasePatterns(); e != nil {
+		return e
+	}
 	m.BudgetField.Release(r.shiftBytes)
 	r.shifts = nil
 	r.shiftBytes = 0
@@ -308,13 +318,13 @@ func (r *rewriterEngine) visit(t ast.ASTHandle, depth uint32) (bool, error) {
 		if e = r.sameSort(t, sub); e != nil {
 			return false, e
 		}
-		if e = m.RefVectorPush(c.results, sub); e != nil {
+		if e = appendRewriterRoot(m, &c.results, sub); e != nil {
 			return false, e
 		}
 		return true, r.setNewChildIfDifferent(t, sub)
 	}
 	if depth == 0 {
-		return true, m.RefVectorPush(c.results, t)
+		return true, appendRewriterRoot(m, &c.results, t)
 	}
 	cache, e := r.mustCache(t)
 	if e != nil {
@@ -329,7 +339,7 @@ func (r *rewriterEngine) visit(t ast.ASTHandle, depth uint32) (bool, error) {
 			if e = r.sameSort(t, h); e != nil {
 				return false, e
 			}
-			if e = m.RefVectorPush(c.results, h); e != nil {
+			if e = appendRewriterRoot(m, &c.results, h); e != nil {
 				return false, e
 			}
 			return true, r.setNewChildIfDifferent(t, h)
@@ -340,7 +350,7 @@ func (r *rewriterEngine) visit(t ast.ASTHandle, depth uint32) (bool, error) {
 		return false, e
 	}
 	if !allowed {
-		return true, m.RefVectorPush(c.results, t)
+		return true, appendRewriterRoot(m, &c.results, t)
 	}
 	kind, e := m.GetKind(t)
 	if e != nil {
@@ -378,7 +388,7 @@ func (r *rewriterEngine) processVar(t ast.ASTHandle) (err error) {
 		if e != nil {
 			return e
 		}
-		if e = m.RefVectorPush(c.results, h); e != nil {
+		if e = appendRewriterRoot(m, &c.results, h); e != nil {
 			return e
 		}
 		if e = r.sameSort(t, h); e != nil {
@@ -418,20 +428,20 @@ func (r *rewriterEngine) processVar(t ast.ASTHandle) (err error) {
 					if e != nil {
 						return e
 					}
-					return m.RefVectorPush(c.results, value)
+					return appendRewriterRoot(m, &c.results, value)
 				}()
 				if e != nil {
 					return e
 				}
 				return r.setNewChild(t)
 			}
-			if e = m.RefVectorPush(c.results, h); e != nil {
+			if e = appendRewriterRoot(m, &c.results, h); e != nil {
 				return e
 			}
 			return r.setNewChild(t)
 		}
 	}
-	return m.RefVectorPush(c.results, t)
+	return appendRewriterRoot(m, &c.results, t)
 }
 func (r *rewriterEngine) processConst(t ast.ASTHandle) error {
 	c := &r.core
@@ -452,7 +462,7 @@ func (r *rewriterEngine) processConst(t ast.ASTHandle) error {
 		if e = r.sameSort(t, h); e != nil {
 			return e
 		}
-		if e = m.RefVectorPush(c.results, h); e != nil {
+		if e = appendRewriterRoot(m, &c.results, h); e != nil {
 			return e
 		}
 		if e = m.ResetRef(r.r); e != nil {
@@ -463,7 +473,7 @@ func (r *rewriterEngine) processConst(t ast.ASTHandle) error {
 	if ast.ASTSourceDebug && st != brFailed {
 		return ast.ErrASTDomain
 	}
-	return m.RefVectorPush(c.results, t)
+	return appendRewriterRoot(m, &c.results, t)
 }
 
 // Complete one frame while preserving the source's explicit temporary-ref
@@ -475,10 +485,10 @@ func (r *rewriterEngine) finish(fr rewriterFrame, unconditional, clear bool) err
 	if e != nil {
 		return e
 	}
-	if e = m.RefVectorShrink(c.results, fr.spos); e != nil {
+	if e = shrinkRewriterRoots(m, &c.results, fr.spos); e != nil {
 		return e
 	}
-	if e = m.RefVectorPush(c.results, h); e != nil {
+	if e = appendRewriterRoot(m, &c.results, h); e != nil {
 		return e
 	}
 	if e = r.cache(fr, h); e != nil {
@@ -500,20 +510,20 @@ func (r *rewriterEngine) finish(fr rewriterFrame, unconditional, clear bool) err
 }
 func (r *rewriterEngine) rewritten(fr rewriterFrame, clear bool) error {
 	c, m := &r.core, r.core.manager
-	h, e := m.RefVectorBack(c.results)
+	h, e := c.resultBack()
 	if e != nil {
 		return e
 	}
 	if e = m.SetRef(r.r, h); e != nil {
 		return e
 	}
-	if e = m.RefVectorPop(c.results); e != nil {
+	if e = c.popResult(); e != nil {
 		return e
 	}
-	if e = m.RefVectorPop(c.results); e != nil {
+	if e = c.popResult(); e != nil {
 		return e
 	}
-	if e = m.RefVectorPush(c.results, h); e != nil {
+	if e = appendRewriterRoot(m, &c.results, h); e != nil {
 		return e
 	}
 	if e = r.cache(fr, h); e != nil {
@@ -540,7 +550,7 @@ func (r *rewriterEngine) constantFold(frameIndex int) (bool, error) {
 	if e != nil || !ite {
 		return false, e
 	}
-	cond, e := m.RefVectorGet(c.results, fr.spos)
+	cond, e := c.resultAt(fr.spos)
 	if e != nil {
 		return false, e
 	}
@@ -563,10 +573,10 @@ func (r *rewriterEngine) constantFold(frameIndex int) (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	if e = m.RefVectorShrink(c.results, fr.spos); e != nil {
+	if e = shrinkRewriterRoots(m, &c.results, fr.spos); e != nil {
 		return false, e
 	}
-	if e = m.RefVectorPush(c.results, arg); e != nil {
+	if e = appendRewriterRoot(m, &c.results, arg); e != nil {
 		return false, e
 	}
 	c.frames[frameIndex].setState(1)
@@ -652,10 +662,7 @@ func (r *rewriterEngine) processApp() (err error) {
 				}
 			}
 		}
-		size, e := m.RefVectorSize(c.results)
-		if e != nil {
-			return e
-		}
+		size := uint32(len(c.results))
 		args, e := c.resultArguments(fr.spos, size-fr.spos)
 		if e != nil {
 			return e
@@ -672,10 +679,10 @@ func (r *rewriterEngine) processApp() (err error) {
 			if e = r.sameSort(t, h); e != nil {
 				return e
 			}
-			if e = m.RefVectorShrink(c.results, fr.spos); e != nil {
+			if e = shrinkRewriterRoots(m, &c.results, fr.spos); e != nil {
 				return e
 			}
-			if e = m.RefVectorPush(c.results, h); e != nil {
+			if e = appendRewriterRoot(m, &c.results, h); e != nil {
 				return e
 			}
 			if st == brDone {
@@ -730,7 +737,7 @@ func (r *rewriterEngine) processApp() (err error) {
 						return e
 					}
 				}
-				if e = m.RefVectorPush(c.results, def); e != nil {
+				if e = appendRewriterRoot(m, &c.results, def); e != nil {
 					return e
 				}
 				if e = r.beginScope(); e != nil {
@@ -770,7 +777,7 @@ func (r *rewriterEngine) processApp() (err error) {
 		if e = c.endScope(); e != nil {
 			return e
 		}
-		h, e := m.RefVectorBack(c.results)
+		h, e := c.resultBack()
 		if e != nil {
 			return e
 		}
@@ -861,22 +868,16 @@ func (r *rewriterEngine) processQuantifier() (err error) {
 		}
 	}
 	fr = c.frames[fi]
-	pats, e := m.NewRefVector()
-	if e != nil {
-		return e
+	if len(r.patterns) != 0 || len(r.noPatterns) != 0 {
+		return ast.ErrASTPending
 	}
-	defer func() { err = errors.Join(err, m.DelRefVector(&pats)) }()
-	nopats, e := m.NewRefVector()
-	if e != nil {
-		return e
-	}
-	defer func() { err = errors.Join(err, m.DelRefVector(&nopats)) }()
+	defer func() { err = errors.Join(err, r.releasePatterns()) }()
 	for i := uint32(0); i < np; i++ {
 		h, e := m.GetPattern(q, i)
 		if e != nil {
 			return e
 		}
-		if e = m.RefVectorPush(pats, h); e != nil {
+		if e = appendRewriterRoot(m, &r.patterns, h); e != nil {
 			return e
 		}
 	}
@@ -885,13 +886,13 @@ func (r *rewriterEngine) processQuantifier() (err error) {
 		if e != nil {
 			return e
 		}
-		if e = m.RefVectorPush(nopats, h); e != nil {
+		if e = appendRewriterRoot(m, &r.noPatterns, h); e != nil {
 			return e
 		}
 	}
 	if r.cfg.rewritePatterns() {
 		for i := uint32(0); i < np+nn; i++ {
-			h, e := m.RefVectorGet(c.results, fr.spos+1+i)
+			h, e := c.resultAt(fr.spos + 1 + i)
 			if e != nil {
 				return e
 			}
@@ -900,28 +901,22 @@ func (r *rewriterEngine) processQuantifier() (err error) {
 				return e
 			}
 			if pattern {
-				v, j := pats, i
+				v, j := &r.patterns, i
 				if i >= np {
-					v, j = nopats, i-np
+					v, j = &r.noPatterns, i-np
 				}
-				if e = m.RefVectorSet(v, j, h); e != nil {
+				if e = replaceRewriterRoot(m, v, j, h); e != nil {
 					return e
 				}
 			}
 		}
 	}
-	newBody, e := m.RefVectorGet(c.results, fr.spos)
+	newBody, e := c.resultAt(fr.spos)
 	if e != nil {
 		return e
 	}
-	pa, e := m.RewriterVectorArguments(pats)
-	if e != nil {
-		return e
-	}
-	na, e := m.RewriterVectorArguments(nopats)
-	if e != nil {
-		return e
-	}
+	pa := ast.SliceArguments(r.patterns)
+	na := ast.SliceArguments(r.noPatterns)
 	done, e := r.cfg.reduceQuantifier(q, newBody, pa, na, r.r, r.pr)
 	if e != nil {
 		return e
@@ -942,10 +937,10 @@ func (r *rewriterEngine) processQuantifier() (err error) {
 	if e != nil {
 		return e
 	}
-	if e = m.RefVectorShrink(c.results, fr.spos); e != nil {
+	if e = shrinkRewriterRoots(m, &c.results, fr.spos); e != nil {
 		return e
 	}
-	if e = m.RefVectorPush(c.results, h); e != nil {
+	if e = appendRewriterRoot(m, &c.results, h); e != nil {
 		return e
 	}
 	if nd > uint32(len(r.bindings)) || nd > uint32(len(r.shifts)) {
@@ -1035,7 +1030,7 @@ func (r *rewriterEngine) Resume(out ast.ASTRef) error {
 				return e
 			}
 			if !h.IsNull() {
-				if e = m.RefVectorPush(c.results, h); e != nil {
+				if e = appendRewriterRoot(m, &c.results, h); e != nil {
 					return e
 				}
 				c.frames = c.frames[:len(c.frames)-1]
@@ -1068,14 +1063,14 @@ func (r *rewriterEngine) Resume(out ast.ASTRef) error {
 }
 func (r *rewriterEngine) publish(out ast.ASTRef) error {
 	m := r.core.manager
-	h, e := m.RefVectorBack(r.core.results)
+	h, e := r.core.resultBack()
 	if e != nil {
 		return e
 	}
 	if e = m.SetRef(out, h); e != nil {
 		return e
 	}
-	return m.RefVectorPop(r.core.results)
+	return r.core.popResult()
 }
 
 // rewriter_tpl overrides the base child assertion: builtin/macro frames may
@@ -1096,4 +1091,17 @@ func (r *rewriterEngine) setNewChildIfDifferent(old, new ast.ASTHandle) error {
 		return r.core.open()
 	}
 	return r.setNewChild(old)
+}
+
+func (r *rewriterEngine) releasePatterns() error {
+	m := r.core.manager
+	if e := shrinkRewriterRoots(m, &r.noPatterns, 0); e != nil {
+		return e
+	}
+	r.noPatterns = nil
+	if e := shrinkRewriterRoots(m, &r.patterns, 0); e != nil {
+		return e
+	}
+	r.patterns = nil
+	return nil
 }
