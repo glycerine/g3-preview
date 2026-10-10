@@ -120492,14 +120492,21 @@
       "go_targets": [
         "pkg/util/lp/core_base_float.go",
         "pkg/util/lp/core_base_float_test.go",
-        "pkg/util/lp/primal_prepare_float_test.go"
+        "pkg/util/lp/primal_prepare_float_test.go",
+        "pkg/util/lp/core_iteration_float.go",
+        "pkg/util/lp/core_iteration_float_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
         "TestLPFloatCoreFeasibilityExactDyadicOracle",
         "TestLPFloatCoreSourcePublicationAndGuards",
         "TestLPFloatCoreHeadingInvalidDomainProfiles",
-        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+        "TestLPFloatPrimalPreparedBasisIndependentOracle",
+        "TestLPFloatCoreBasisChangeIndependentStateMachine",
+        "TestLPFloatCoreReducedCostsAndEnteringColumnIndependentOracle",
+        "TestLPFloatCoreIterationPublicationPrefixes",
+        "TestLPFloatCoreBasisChangeSourceGuardsAndDetachedColumn",
+        "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation"
       ],
       "assertions": [
         {
@@ -120573,13 +120580,27 @@
             "TestLPFloatCoreHeadingInvalidDomainProfiles",
             "TestLPFloatPrimalPreparedBasisIndependentOracle"
           ]
+        },
+        {
+          "name": "Retained floating basis exchange/restoration and cancellable trace, cB and refined yB solve, row-ordered reduced costs, one-iteration initialization, explicit LU refactor and entering-column solve",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_iteration_float.go",
+          "tests": [
+            "TestLPFloatCoreBasisChangeIndependentStateMachine",
+            "TestLPFloatCoreReducedCostsAndEnteringColumnIndependentOracle",
+            "TestLPFloatCoreIterationPublicationPrefixes",
+            "TestLPFloatCoreBasisChangeSourceGuardsAndDetachedColumn",
+            "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation"
+          ]
         }
       ],
       "ownership": [
-        "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally."
+        "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally.",
+        "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair."
       ],
       "deviations": [
-        "Floating initialization/feasibility layer only. Exact instantiations, pivots/basis changes, reduced costs, solve/update/optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set."
+        "Floating initialization/feasibility layer only. Exact instantiations, numerical pivot/basis updates, primal-value reconstruction, solve/update/optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
+        "Floating basis bookkeeping and reduced-cost/entering-column layer only. Actual numerical pivot/update and optimization remain open. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added."
       ]
     },
     {
@@ -120590,14 +120611,21 @@
       "go_targets": [
         "pkg/util/lp/core_base_float.go",
         "pkg/util/lp/core_base_float_test.go",
-        "pkg/util/lp/primal_prepare_float_test.go"
+        "pkg/util/lp/primal_prepare_float_test.go",
+        "pkg/util/lp/core_iteration_float.go",
+        "pkg/util/lp/core_iteration_float_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
         "TestLPFloatCoreFeasibilityExactDyadicOracle",
         "TestLPFloatCoreSourcePublicationAndGuards",
         "TestLPFloatCoreHeadingInvalidDomainProfiles",
-        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+        "TestLPFloatPrimalPreparedBasisIndependentOracle",
+        "TestLPFloatCoreBasisChangeIndependentStateMachine",
+        "TestLPFloatCoreReducedCostsAndEnteringColumnIndependentOracle",
+        "TestLPFloatCoreIterationPublicationPrefixes",
+        "TestLPFloatCoreBasisChangeSourceGuardsAndDetachedColumn",
+        "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation"
       ],
       "conditionals": [
         {
@@ -120777,13 +120805,27 @@
             "TestLPFloatCoreHeadingInvalidDomainProfiles",
             "TestLPFloatPrimalPreparedBasisIndependentOracle"
           ]
+        },
+        {
+          "name": "Retained floating basis exchange/restoration and cancellable trace, cB and refined yB solve, row-ordered reduced costs, one-iteration initialization, explicit LU refactor and entering-column solve",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_iteration_float.go",
+          "tests": [
+            "TestLPFloatCoreBasisChangeIndependentStateMachine",
+            "TestLPFloatCoreReducedCostsAndEnteringColumnIndependentOracle",
+            "TestLPFloatCoreIterationPublicationPrefixes",
+            "TestLPFloatCoreBasisChangeSourceGuardsAndDetachedColumn",
+            "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation"
+          ]
         }
       ],
       "ownership": [
-        "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally."
+        "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally.",
+        "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair."
       ],
       "deviations": [
-        "Floating initialization/feasibility layer only. Exact instantiations, pivots/basis changes, reduced costs, solve/update/optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set."
+        "Floating initialization/feasibility layer only. Exact instantiations, numerical pivot/basis updates, primal-value reconstruction, solve/update/optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
+        "Floating basis bookkeeping and reduced-cost/entering-column layer only. Actual numerical pivot/update and optimization remain open. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added."
       ]
     },
     {
@@ -120794,14 +120836,21 @@
       "go_targets": [
         "pkg/util/lp/core_base_float.go",
         "pkg/util/lp/core_base_float_test.go",
-        "pkg/util/lp/primal_prepare_float_test.go"
+        "pkg/util/lp/primal_prepare_float_test.go",
+        "pkg/util/lp/core_iteration_float.go",
+        "pkg/util/lp/core_iteration_float_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
         "TestLPFloatCoreFeasibilityExactDyadicOracle",
         "TestLPFloatCoreSourcePublicationAndGuards",
         "TestLPFloatCoreHeadingInvalidDomainProfiles",
-        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+        "TestLPFloatPrimalPreparedBasisIndependentOracle",
+        "TestLPFloatCoreBasisChangeIndependentStateMachine",
+        "TestLPFloatCoreReducedCostsAndEnteringColumnIndependentOracle",
+        "TestLPFloatCoreIterationPublicationPrefixes",
+        "TestLPFloatCoreBasisChangeSourceGuardsAndDetachedColumn",
+        "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -120817,13 +120866,27 @@
             "TestLPFloatCoreHeadingInvalidDomainProfiles",
             "TestLPFloatPrimalPreparedBasisIndependentOracle"
           ]
+        },
+        {
+          "name": "Retained floating basis exchange/restoration and cancellable trace, cB and refined yB solve, row-ordered reduced costs, one-iteration initialization, explicit LU refactor and entering-column solve",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_iteration_float.go",
+          "tests": [
+            "TestLPFloatCoreBasisChangeIndependentStateMachine",
+            "TestLPFloatCoreReducedCostsAndEnteringColumnIndependentOracle",
+            "TestLPFloatCoreIterationPublicationPrefixes",
+            "TestLPFloatCoreBasisChangeSourceGuardsAndDetachedColumn",
+            "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation"
+          ]
         }
       ],
       "ownership": [
-        "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally."
+        "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally.",
+        "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair."
       ],
       "deviations": [
-        "Floating initialization/feasibility layer only. Exact instantiations, pivots/basis changes, reduced costs, solve/update/optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set."
+        "Floating initialization/feasibility layer only. Exact instantiations, numerical pivot/basis updates, primal-value reconstruction, solve/update/optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
+        "Floating basis bookkeeping and reduced-cost/entering-column layer only. Actual numerical pivot/update and optimization remain open. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added."
       ]
     },
     {

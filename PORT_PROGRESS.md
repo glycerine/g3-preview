@@ -37020,3 +37020,51 @@ and is not repeated within the hour. Graph remains64 packages with unchanged
 edges. Four previously unported source units become partial; LP62 partial/48
 unported. Exact core, pivot/basis updates, reduced costs, actual optimization,
 dual/LAR, bounds/evidence, MPS and complete upstream drivers remain required.
+
+
+### Floating core basis changes and reduced-cost iteration preparation — 2026-10-10
+
+Ported retained floating change_basis/change_basis_unconditionally/restoration,
+start/stop/cancel-on-immediate-reverse basis trace, fill_cb vector projection,
+refined yB solve, row-ordered reduced costs, one-iteration initialization, explicit
+LU refactor and entering-column Bd solve using actual owned indexed Ed/W.
+Whole-source callers include primal tableau/LU and LAR/dual basis bookkeeping.
+The definition-only pointer fill_cb overload and floating faster-column overload
+without a retained concrete implementation gain no invented adapters.
+
+Native slices/maps retain source semantics. Unconditional exchange appends a
+missing nonbasic before looking up the leaving variable. Regular exchange has
+no append fallback. Entering heading, basic slot, leaving heading and nonbasic
+slot publish in order; explicit Go guards preserve each completed prefix.
+Signed INT_MIN unary-minus overflow in regular source exchange has a qualified
+Go guard. Trace records only completed exchanges. Logical basis changes leave
+LU untouched; InitLU explicitly replaces the real numerical owner.
+
+Reduced costs initialize descending columns, reading costs only for nonbasics,
+then process descending rows and each literal insertion-order sparse term.
+Zero Y skips the row, including signed zero; duplicate coefficients are not
+coalesced. FillCB publishes increasing basis costs before calling the actual
+refined LU row solve, including when the owner is nil/closed/stopped. Floating
+Bd omits the source precise-only column-nonzero update. Source indexed_vector
+is_OK is itself a true stub, so no false condition is fabricated for coverage.
+
+80 independent state machines perform200 exchanges each (16,000 total), with
+restores, enabled/disabled/restarted tracing and independent inverse headings.
+64 independently assembled diagonally-dominant matrix worlds each perform six
+rounds of known-dual cost projection, reduced costs, known entering-column
+solutions, basis exchange and real sparse/forced-dense refactor. Focused fixtures
+verify detached nonbasics, source writes before invalid accesses, child lifecycle
+errors, NaN/signed zero and cancellation-sensitive descending/duplicate arithmetic.
+
+Focused core/primal/presolve/solver/column/scaler/static/LU tests pass0.858s native
+and0.816s combined debug/checked. New file92/97 (94.8%) native,93/97 (95.9%) debug.
+Remaining gaps guard row bounds established by completed initialization or false
+source is_OK stubs; native also excludes the debug entering assertion. Both LP
+vets pass. Profiles: /mnt/oldrog/tmp/g3-core-iteration-{native,debug}.cover.
+The full native module19:01 UTC89.8% LP snapshot predates current core additions;
+no within-hour full-suite repeat is needed. LP stays62 partial/48 unported source
+units. Primal value reconstruction, actual numerical basis/X updates, exact core,
+optimization, dual/LAR, bounds/evidence, MPS and complete upstream drivers stay open.
+
+Source inventory/evidence/no-generics and diff checks pass. Regenerated graph
+remains64 packages with unchanged edges and the new iteration production file.
