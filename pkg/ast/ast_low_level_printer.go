@@ -1,5 +1,5 @@
 // Source: src/ast/ast_ll_pp.cpp:21-320; src/ast/for_each_ast.h:27-125;
-// src/ast/for_each_ast.cpp:37-48; src/util/vector.h:43-125,303-355.
+// src/ast/for_each_ast.cpp:37-48. Native Go traversal collections.
 package ast
 
 import (
@@ -11,13 +11,11 @@ import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-// Actual lexical headers live inline in the charged manager. The pointer stack
-// has only scalar slot/generation words in the existing global vector provider;
-// it neither INCs nodes nor owns a second shadow slice of the traversal.
+// The lexical frame lives inline in the charged manager. Its native stack and
+// identity marks borrow AST nodes; only the acquired numeral owns a value.
 type astLowLevelFrame struct {
-	stack, pending                       arena.SmallBytesRef
-	capacity, pendingCapacity            uint32
-	marks                                astMarkState
+	stack                                []astNodeRef
+	marks                                map[astNodeRef]struct{}
 	invocation                           uint64
 	Active, sourceDone                   bool
 	bodyCause, destructorCause, ownCause error
@@ -34,104 +32,6 @@ type astLowLevelPrinter struct {
 	frame              *astLowLevelFrame
 }
 
-func (m *ASTManager) llStackSize(f *astLowLevelFrame) (uint32, error) {
-	if f.stack == (arena.SmallBytesRef{}) {
-		return 0, nil
-	}
-	return m.vectorWord(f.stack, 4)
-}
-func (m *ASTManager) llStackCapacity(f *astLowLevelFrame) (uint32, error) {
-	if f.stack == (arena.SmallBytesRef{}) {
-		return 0, nil
-	}
-	return m.vectorWord(f.stack, 0)
-}
-func (m *ASTManager) llStackPush(f *astLowLevelFrame, r astNodeRef) error {
-	size, e := m.llStackSize(f)
-	if e != nil {
-		return e
-	}
-	capacity, e := m.llStackCapacity(f)
-	if e != nil {
-		return e
-	}
-	if size == capacity {
-		n := uint32(2)
-		if f.stack != (arena.SmallBytesRef{}) {
-			n = (3*capacity + 1) >> 1
-			if n <= capacity {
-				return arena.ErrBounds
-			}
-		}
-		bytes := uint64(n)*8 + 8
-		if bytes > math.MaxUint32 {
-			return arena.ErrBounds
-		}
-		block, e := m.vectorAllocator.Allocate(uint32(bytes))
-		if e != nil {
-			return e
-		}
-		f.pending = block
-		f.pendingCapacity = n
-		if e = m.vectorPutWord(block, 0, n); e == nil {
-			e = m.vectorPutWord(block, 4, size)
-		}
-		for i := uint32(0); e == nil && i < size; i++ {
-			var x astNodeRef
-			x, e = m.llStackAt(f, i)
-			if e == nil {
-				e = m.vectorPutWord(block, 8+8*i, x.slot)
-			}
-			if e == nil {
-				e = m.vectorPutWord(block, 12+8*i, x.generation)
-			}
-		}
-		if e != nil {
-			return e
-		}
-		if f.stack != (arena.SmallBytesRef{}) {
-			if e = m.vectorAllocator.Deallocate(f.capacity*8+8, f.stack); e != nil {
-				return e
-			}
-		}
-		f.stack = block
-		f.capacity = n
-		f.pending = arena.SmallBytesRef{}
-		f.pendingCapacity = 0
-	}
-	if e = m.vectorPutWord(f.stack, 8+8*size, r.slot); e != nil {
-		return e
-	}
-	if e = m.vectorPutWord(f.stack, 12+8*size, r.generation); e != nil {
-		return e
-	}
-	return m.vectorPutWord(f.stack, 4, size+1)
-}
-func (m *ASTManager) llStackAt(f *astLowLevelFrame, i uint32) (astNodeRef, error) {
-	size, e := m.llStackSize(f)
-	if e != nil {
-		return astNodeRef{}, e
-	}
-	if i >= size {
-		return astNodeRef{}, arena.ErrBounds
-	}
-	slot, e := m.vectorWord(f.stack, 8+8*i)
-	if e != nil {
-		return astNodeRef{}, e
-	}
-	generation, e := m.vectorWord(f.stack, 12+8*i)
-	return astNodeRef{slot, generation}, e
-}
-func (m *ASTManager) llStackPop(f *astLowLevelFrame) error {
-	size, e := m.llStackSize(f)
-	if e != nil {
-		return e
-	}
-	if size == 0 {
-		return ErrASTDomain
-	}
-	return m.vectorPutWord(f.stack, 4, size-1)
-}
 func (m *ASTManager) llFrameDestroy(owning bool) error {
 	f := &m.LowLevel
 	if !f.Active {
@@ -163,31 +63,15 @@ func (m *ASTManager) llFrameDestroy(owning bool) error {
 		}
 		f.NumeralAcquired = false
 	}
-	if f.capacity != 0 {
-		if e := m.vectorAllocator.Deallocate(f.capacity*8+8, f.stack); e != nil {
-			return stop(e)
-		}
-		f.stack = arena.SmallBytesRef{}
-		f.capacity = 0
-	}
-	if owning && f.pendingCapacity != 0 {
-		if e := m.vectorAllocator.Deallocate(f.pendingCapacity*8+8, f.pending); e != nil {
-			return stop(e)
-		}
-		f.pending = arena.SmallBytesRef{}
-		f.pendingCapacity = 0
-	}
-	// A retained unpublished allocation is own-only and protects this frame's
-	// metadata; source destruction never claims it by scanning provider roots.
-	f.marks.decls.close(m)
-	f.marks.exprs.close(m)
+	f.stack = nil
+	f.marks = nil
 	f.sourceDone = true
 	if owning && f.numeralInsertion.Active() {
 		if e := m.numerals.CompleteNumeralInsertion(&f.numeralInsertion, true); e != nil {
 			return stop(e)
 		}
 	}
-	if f.pendingCapacity == 0 && !f.numeralInsertion.Active() {
+	if !f.numeralInsertion.Active() {
 		f.Active = false
 	}
 	return nil
@@ -213,6 +97,7 @@ func (m *ASTManager) lowLevelPrint(out *util.NumericTextStream, r astNodeRef, on
 		f.Active = false
 		return e
 	}
+	f.marks = make(map[astNodeRef]struct{})
 	p := astLowLevelPrinter{manager: m, out: out, root: r, onlyExprs: onlyExprs, compact: compact, arithFamily: fid, frame: f}
 	defer func() {
 		if result != nil && f.bodyCause == nil {
@@ -226,32 +111,15 @@ func (m *ASTManager) lowLevelPrint(out *util.NumericTextStream, r astNodeRef, on
 	if m.nodeAt(r.slot).kind == ASTSort {
 		return p.sort(r)
 	}
-	if e := m.llStackPush(f, r); e != nil {
-		return e
-	}
-	for {
-		size, e := m.llStackSize(f)
-		if e != nil {
-			return e
-		}
-		if size == 0 {
-			break
-		}
-		curr, e := m.llStackAt(f, size-1)
-		if e != nil {
-			return e
-		}
+	f.stack = append(f.stack, r)
+	for len(f.stack) != 0 {
+		curr := f.stack[len(f.stack)-1]
 		if e = m.validNode(curr); e != nil {
 			return e
 		}
-		marked, e := f.marks.marked(m, m.external(curr))
-		if e != nil {
-			return e
-		}
-		if marked {
-			if e = m.llStackPop(f); e != nil {
-				return e
-			}
+		if _, marked := f.marks[curr]; marked {
+			f.stack[len(f.stack)-1] = astNodeRef{}
+			f.stack = f.stack[:len(f.stack)-1]
 			continue
 		}
 		complete := true
@@ -279,27 +147,15 @@ func (m *ASTManager) lowLevelPrint(out *util.NumericTextStream, r astNodeRef, on
 				if !complete {
 					continue
 				}
-				yes, e := f.marks.marked(m, m.external(d.rangeSort))
-				if e != nil {
-					return e
-				}
-				if !yes {
-					if e = m.llStackPush(f, d.rangeSort); e != nil {
-						return e
-					}
+				if _, yes := f.marks[d.rangeSort]; !yes {
+					f.stack = append(f.stack, d.rangeSort)
 					continue
 				}
 			}
 		case ASTApp:
 			a := m.appAt(curr.slot)
-			yes, e := f.marks.marked(m, m.external(a.decl))
-			if e != nil {
-				return e
-			}
-			if !yes {
-				if e = m.llStackPush(f, a.decl); e != nil {
-					return e
-				}
+			if _, yes := f.marks[a.decl]; !yes {
+				f.stack = append(f.stack, a.decl)
 				continue
 			}
 			complete, e = p.arguments(a.args, a.count)
@@ -325,14 +181,8 @@ func (m *ASTManager) lowLevelPrint(out *util.NumericTextStream, r astNodeRef, on
 			if !complete {
 				continue
 			}
-			yes, e := f.marks.marked(m, m.external(q.body))
-			if e != nil {
-				return e
-			}
-			if !yes {
-				if e = m.llStackPush(f, q.body); e != nil {
-					return e
-				}
+			if _, yes := f.marks[q.body]; !yes {
+				f.stack = append(f.stack, q.body)
 				continue
 			}
 		case ASTVar:
@@ -342,12 +192,9 @@ func (m *ASTManager) lowLevelPrint(out *util.NumericTextStream, r astNodeRef, on
 		if e = p.process(curr); e != nil {
 			return e
 		}
-		if e = f.marks.mark(m, m.external(curr), true); e != nil {
-			return e
-		}
-		if e = m.llStackPop(f); e != nil {
-			return e
-		}
+		f.marks[curr] = struct{}{}
+		f.stack[len(f.stack)-1] = astNodeRef{}
+		f.stack = f.stack[:len(f.stack)-1]
 	}
 	return nil
 }
@@ -361,14 +208,8 @@ func (p *astLowLevelPrinter) arguments(raw arena.SmallBytesRef, n uint32) (bool,
 		if e = p.manager.validNode(r); e != nil {
 			return false, e
 		}
-		yes, e := p.frame.marks.marked(p.manager, p.manager.external(r))
-		if e != nil {
-			return false, e
-		}
-		if !yes {
-			if e = p.manager.llStackPush(p.frame, r); e != nil {
-				return false, e
-			}
+		if _, yes := p.frame.marks[r]; !yes {
+			p.frame.stack = append(p.frame.stack, r)
 			all = false
 		}
 	}
@@ -408,14 +249,8 @@ func (p *astLowLevelPrinter) parameters(info *astInfoRecord) (bool, error) {
 			if e = p.manager.validNode(r); e != nil {
 				return false, e
 			}
-			yes, e := p.frame.marks.marked(p.manager, p.manager.external(r))
-			if e != nil {
-				return false, e
-			}
-			if !yes {
-				if e = p.manager.llStackPush(p.frame, r); e != nil {
-					return false, e
-				}
+			if _, yes := p.frame.marks[r]; !yes {
+				p.frame.stack = append(p.frame.stack, r)
 				all = false
 			}
 		}

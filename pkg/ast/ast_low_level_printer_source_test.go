@@ -3,6 +3,7 @@
 package ast
 
 import (
+	"errors"
 	bigint "math/big"
 	"strconv"
 	"strings"
@@ -41,12 +42,12 @@ func TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags(t *testing.T) {
 	if got != want {
 		t.Fatal("literal postorder, unsigned field formatting", got, want)
 	}
-	if m.LowLevel.Active || m.LowLevel.capacity != 0 || m.LowLevel.marks.exprs.bytes != 0 || m.LowLevel.marks.decls.bytes != 0 {
+	if m.LowLevel.Active || m.LowLevel.stack != nil || m.LowLevel.marks != nil {
 		t.Fatal("source lexical stack/mark DT lost roots")
 	}
 }
 
-func TestASTLowLevelPrinterDeclarationMarksUseActualDeclarationIndex(t *testing.T) {
+func TestASTLowLevelPrinterNativeDeclarationIdentityMarks(t *testing.T) {
 	sy, q, _ := astTestOwners(t)
 	b := arena.NewBudget(1 << 20)
 	m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
@@ -68,10 +69,10 @@ func TestASTLowLevelPrinterDeclarationMarksUseActualDeclarationIndex(t *testing.
 	got, e := out.String()
 	astTestMust(t, e)
 	if got != "bounded-decl\n" {
-		t.Fatal("source declaration bitmap uses get_decl_id, not tagged global id", got)
+		t.Fatal("native declaration identity produces exact compact output", got)
 	}
 	if b.Used() != m.Stats().AllocatedBytes {
-		t.Fatal("source lexical bitmap graph", b.Used(), m.Stats())
+		t.Fatal("native lexical teardown budget", b.Used(), m.Stats())
 	}
 }
 
@@ -136,5 +137,112 @@ func TestASTLowLevelPrinterNativeLargeNumeralFormatting(t *testing.T) {
 	paramsMust(t, sy.Close())
 	if bn.Used() != 0 || ba.Used() != 0 || bs.Used() != 0 {
 		t.Fatal("owner refunds", bn.Used(), ba.Used(), bs.Used())
+	}
+}
+
+func TestASTLowLevelPrinterNativeWideAndDeepPostorder(t *testing.T) {
+	m := astTestManager(t)
+	bs, e := m.MkBoolSort()
+	astTestMust(t, e)
+	arith, e := m.Symbols.Intern("arith")
+	astTestMust(t, e)
+	_, e = m.families.MkID(arith)
+	astTestMust(t, e)
+	keys := markTestNodes(t, m, 257)
+	var args, domains []ASTHandle
+	for _, key := range keys {
+		args = append(args, key, key)
+		domains = append(domains, bs, bs)
+	}
+	decl, e := m.MkFuncDecl(astTestSymbol(t, m, "wide"), domains, bs, ASTFuncDeclInfo{})
+	astTestMust(t, e)
+	root, e := m.MkApp(decl, args)
+	astTestMust(t, e)
+	astTestPin(t, m, root)
+	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: arena.NewBudget(1 << 24)})
+	astTestMust(t, e)
+	defer out.Close()
+	ref := func(h ASTHandle) string {
+		id, e := m.GetASTID(h)
+		astTestMust(t, e)
+		return "#" + strconv.FormatUint(uint64(id), 10)
+	}
+	var want strings.Builder
+	for i := len(keys) - 1; i >= 0; i-- {
+		want.WriteString(ref(keys[i]) + " := (:var " + strconv.Itoa(i+30000) + " Bool)\n")
+	}
+	want.WriteString("(wide")
+	for _, key := range args {
+		want.WriteString(" " + ref(key))
+	}
+	want.WriteString(")\n")
+	before := m.BudgetField.Used()
+	m.BudgetField.FailAfter(0)
+	e = m.DisplayLowLevel(out, root, true, true)
+	m.BudgetField.FailAfter(-1)
+	astTestMust(t, e)
+	got, e := out.String()
+	astTestMust(t, e)
+	if got != want.String() {
+		t.Fatal("wide shared postorder differs", got)
+	}
+	for _, key := range keys {
+		rc, e := m.GetRefCount(key)
+		astTestMust(t, e)
+		if rc != 2 {
+			t.Fatal("borrowed traversal changed root references", rc)
+		}
+	}
+	if m.BudgetField.Used() != before || m.LowLevel.Active || m.LowLevel.stack != nil || m.LowLevel.marks != nil {
+		t.Fatal("native wide lexical storage retained or charged")
+	}
+	// A separately shaped chain exercises stack depth and quantifier traversal.
+	leaf, e := m.MkVar(0, bs)
+	astTestMust(t, e)
+	chain := []ASTHandle{leaf}
+	name := astTestSymbol(t, m, "x")
+	for i := 0; i < 257; i++ {
+		q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{bs}, Names: []usymbol.Symbol{name}, Body: chain[len(chain)-1]})
+		astTestMust(t, e)
+		chain = append(chain, q)
+	}
+	astTestPin(t, m, chain[len(chain)-1])
+	want.Reset()
+	want.WriteString(ref(leaf) + " := (:var 0 Bool)\n")
+	for i := 1; i < len(chain); i++ {
+		if i+1 < len(chain) {
+			want.WriteString(ref(chain[i]) + " := ")
+		}
+		want.WriteString("(forall (vars (x Bool)) " + ref(chain[i-1]) + ")\n")
+	}
+	for attempt := 0; attempt < 2; attempt++ {
+		astTestMust(t, out.ResetText())
+		before = m.BudgetField.Used()
+		m.BudgetField.FailAfter(0)
+		e = m.DisplayLowLevel(out, chain[len(chain)-1], true, true)
+		m.BudgetField.FailAfter(-1)
+		astTestMust(t, e)
+		got, e = out.String()
+		astTestMust(t, e)
+		if got != want.String() {
+			t.Fatal("deep quantifier postorder differs", got)
+		}
+		if m.BudgetField.Used() != before || m.LowLevel.Active || m.LowLevel.stack != nil || m.LowLevel.marks != nil {
+			t.Fatal("native deep lexical storage retained or charged")
+		}
+	}
+	astTestMust(t, out.Close())
+	e = m.DisplayLowLevel(out, chain[len(chain)-1], true, true)
+	if !errors.Is(e, arena.ErrClosed) || m.LowLevel.Active || m.LowLevel.stack != nil || m.LowLevel.marks != nil {
+		t.Fatal("output failure retained native lexical traversal", e)
+	}
+	fresh, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: arena.NewBudget(1 << 24)})
+	astTestMust(t, e)
+	defer fresh.Close()
+	astTestMust(t, m.DisplayLowLevel(fresh, chain[len(chain)-1], true, true))
+	got, e = fresh.String()
+	astTestMust(t, e)
+	if got != want.String() {
+		t.Fatal("failed traversal poisoned subsequent invocation", got)
 	}
 }

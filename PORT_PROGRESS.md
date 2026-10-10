@@ -32833,3 +32833,49 @@ no generic C++ vector implementation credit is added. The util knot and complete
 subpackage split remain active. Other retained AST vector/printer consumers,
 SAT collections, NumericTextStream consumers and internal util numeric/text/
 parameter dependency cycles remain to be converted or separated.
+
+## Native low-level printer traversal collections
+
+Low-level AST printing now uses a borrowed []astNodeRef LIFO stack and native
+map[astNodeRef]struct{} visitation marks. Removed encoded vector headers,
+capacity arithmetic, pending expansion allocations, stack-word codecs and
+private dense declaration/expression mark stores. Native backing has no custom
+arena reservation/refund or simulated storage-failure event. The frame remains
+inline in the actual charged manager; only its acquired numeral and tracked
+numeral insertion own numerical values. Actual numeral cleanup/ACK order and
+borrowed output transport remain unchanged. The traversal retains source
+parameter/domain/range/pattern/body ordering, mark-after-process and postorder
+printing, with stable checked node identities replacing mark bit indices.
+
+Literal output checks cover 257 distinct shared variables with duplicate
+arguments (514 children) and a 257-level quantifier chain, including repeated
+invocation. They run with manager reservations disabled and verify exact output,
+unchanged AST reference counts, unchanged charged storage and cleared lexical
+collections. A closed output stream interrupts a deep traversal, verifies its
+lexical collections are dropped and verifies a fresh stream prints the same
+complete output on the next invocation. Existing borrowed formatting flags,
+compact declaration output and independently known 2049-bit numeral formatting
+and clean source/own teardown checks remain.
+
+Three trace fixtures depended on removed private stack/bitmap allocation
+refusals. Two now trigger the actual post-registration catch through a closed
+output-stream guard, retaining literal table/INC acquisition, source dangling
+membership stop, owning recovery and later slot-generation protection checks.
+The borrowed format-child sweep now covers actual factory reservation prefixes
+and successful native trace completion, verifying child close preserves the
+owner's writable file/stream. The failed borrowed-format constructor guard
+continues to cover actual caught history and unfinished owning abort. Closed
+stream guards are Go lifetime checks, not claims about native ostream badbit
+or the removed lexical backing refusals. Manifest evidence names/ownership
+were updated without changing source/API completion statuses.
+
+Validation: full native AST passed (27.080s), full native rewriter passed
+(13.386s). Module-wide compilation, AST/rewriter vet and manifest evidence
+passed. Initial native/debug focused printer/trace groups passed (0.018s /
+0.017s); final focused native/debug results, including the deep output-failure/reuse
+addition, passed (0.017s / 0.018s). Gofmt and diff checks passed. The full native module was
+not repeated inside the hourly interval. The util knot and complete subpackage
+split remain active: other retained AST reference/printer storage, SAT
+collections, NumericTextStream consumers and internal util dependency cycles
+remain. Counts stay 2102 units/677 APIs: 63 ported, 284 partial, 1727 unported
+and two dead/deleted, with no C++ generic container implementation credit.

@@ -9821,10 +9821,10 @@
         "TestASTSourceFinalizeRetainsDebugInfoParametersForExactOwningClose",
         "TestASTTraceFactoriesOnlyActualNewNodesAndLiteralArgumentChains",
         "TestASTSourceConstructorCopyAndBorrowedNamespaceGuardsPreserveActualOwners",
-        "TestASTTraceAppPostRegistrationAllocationCatchFreesLiteralNodeWithoutTableRepair",
-        "TestASTTraceCatchCapturesEachSuccessfulINCAndNeverFreesLaterSlotGeneration",
+        "TestASTTraceAppClosedStreamCatchFreesLiteralNodeWithoutTableRepair",
+        "TestASTTraceClosedStreamCatchCapturesINCAndPreservesLaterSlotGeneration",
         "TestASTLowLevelPrinterNativeLargeNumeralFormatting",
-        "TestASTBorrowedFormatTraceCatchUsesReachedStreamWithoutFileOwnership",
+        "TestASTBorrowedFormatNativeTraceAndStreamLifetime",
         "TestASTIncompleteBorrowedFormatConstructorRetainsCaughtHistoryUntilOwnAbort",
         "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
         "TestASTAuxiliaryPluginEveryConstructorPrefix",
@@ -10824,8 +10824,8 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_trace_acquisition.go",
           "tests": [
-            "TestASTTraceAppPostRegistrationAllocationCatchFreesLiteralNodeWithoutTableRepair",
-            "TestASTTraceCatchCapturesEachSuccessfulINCAndNeverFreesLaterSlotGeneration"
+            "TestASTTraceAppClosedStreamCatchFreesLiteralNodeWithoutTableRepair",
+            "TestASTTraceClosedStreamCatchCapturesINCAndPreservesLaterSlotGeneration"
           ]
         },
         {
@@ -10833,7 +10833,7 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_core_source_constructor.go",
           "tests": [
-            "TestASTBorrowedFormatTraceCatchUsesReachedStreamWithoutFileOwnership",
+            "TestASTBorrowedFormatNativeTraceAndStreamLifetime",
             "TestASTIncompleteBorrowedFormatConstructorRetainsCaughtHistoryUntilOwnAbort"
           ]
         },
@@ -10955,7 +10955,8 @@
         "The selected original Int/Real coercion pass is now implemented for associative and ordinary arithmetic domains, including other-family declarations such as array select/store. Cast direction follows the expected sort kind, calls the actual arithmetic OP_TO_REAL/OP_TO_INT declaration dispatch and leaves nonarithmetic mismatches for check_args rejection. The explicit Go returning-error continuation names unpublished INCs and qualifies cleanup refusal; native allocation/exception/TRACE and complete owner/representation audits remain open.",
         "DecRefConsumed exposes the existing Go deletion transport consumption result so extraction cache owners retire acquired references on later deletion failure. The original DecRef API retains its behavior. This is a checked Go ownership adapter, not an added native algorithm or whole-unit pointer/destructor/ABI audit credit.",
         "The concrete AppArguments suffix reader avoids an extra pointer-buffer copy when extraction propagation removes a complete leading concat segment. Existing family fallback domain construction is shared without changing its numerical sort/declaration/application order or existing failure-cleanup qualifications. Borrowed suffix tests check mixed-width output, hash-cons identity, domain growth and source-application expiry; propagation every-reservation campaigns cover both suffix and shortened-head paths.",
-        "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised."
+        "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised.",
+        "Low-level trace traversal now uses native slices and identity maps; private stack/bitmap allocation faults no longer exist. Two post-registration catch fixtures now use an actual closed output-stream guard while retaining literal table/INC ownership, source stop and later slot-generation checks. The borrowed format-child reservation sweep now requires completed native trace and verifies borrowed stream/file lifetime. The existing failed borrowed-format constructor closed-stream guard remains. These do not claim the removed lexical backing allocation refusals still occur."
       ]
     },
     {
@@ -12114,8 +12115,9 @@
       ],
       "tests": [
         "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
-        "TestASTLowLevelPrinterDeclarationMarksUseActualDeclarationIndex",
-        "TestASTLowLevelPrinterNativeLargeNumeralFormatting"
+        "TestASTLowLevelPrinterNativeDeclarationIdentityMarks",
+        "TestASTLowLevelPrinterNativeLargeNumeralFormatting",
+        "TestASTLowLevelPrinterNativeWideAndDeepPostorder"
       ],
       "conditionals": [
         {
@@ -12136,7 +12138,8 @@
           "go_target": "pkg/ast/ast_low_level_printer.go",
           "tests": [
             "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
-            "TestASTLowLevelPrinterDeclarationMarksUseActualDeclarationIndex"
+            "TestASTLowLevelPrinterNativeDeclarationIdentityMarks",
+            "TestASTLowLevelPrinterNativeWideAndDeepPostorder"
           ]
         },
         {
@@ -12149,11 +12152,12 @@
         }
       ],
       "ownership": [
-        "Two actual declaration/expression mark stores, exact nonowning raw traversal stack and acquired numeral. Younger reached source DT stop protects older NUM/stack/marks; own continuation consumes only actual retained tokens. Bounded/root overloads and AST_LL_PP_SHOW_FAMILY_NAME remain separate."
+        "The inline lexical frame borrows AST nodes in a native []astNodeRef stack and map[astNodeRef]struct{} identity marks. Only its acquired numeral and tracked numeral insertion own numerical values. Actual numeral cleanup/ACK precedes dropping stack and marks. No container backing reservation, pending expansion block, dense declaration/expression bitmap or simulated storage-failure event remains. Actual output stream remains borrowed. Bounded/root overloads and AST_LL_PP_SHOW_FAMILY_NAME remain separate."
       ],
       "deviations": [
         "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
-        "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised."
+        "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised.",
+        "Native traversal collections preserve the source LIFO order, declaration/domain/range and parameter visitation, mark-after-process behavior and exact compact output. Independent literal output checks cover 257 shared variables with duplicate arguments and 257 nested quantifiers with reservations disabled, plus unchanged reference counts and lexical reuse. Erased container allocation faults add no C++ vector or bitmap implementation credit."
       ]
     },
     {
@@ -14874,7 +14878,8 @@
       ],
       "tests": [
         "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
-        "TestASTLowLevelPrinterDeclarationMarksUseActualDeclarationIndex"
+        "TestASTLowLevelPrinterNativeDeclarationIdentityMarks",
+        "TestASTLowLevelPrinterNativeWideAndDeepPostorder"
       ],
       "conditionals": [
         {
@@ -14895,15 +14900,17 @@
           "go_target": "pkg/ast/ast_low_level_printer.go",
           "tests": [
             "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
-            "TestASTLowLevelPrinterDeclarationMarksUseActualDeclarationIndex"
+            "TestASTLowLevelPrinterNativeDeclarationIdentityMarks",
+            "TestASTLowLevelPrinterNativeWideAndDeepPostorder"
           ]
         }
       ],
       "ownership": [
-        "Concrete raw stack retains no INC/owning AST roots; source tuple/lifetime reads remain reached."
+        "The inline lexical frame borrows AST nodes in a native []astNodeRef stack and map[astNodeRef]struct{} identity marks. Only its acquired numeral and tracked numeral insertion own numerical values. Actual numeral cleanup/ACK precedes dropping stack and marks. No container backing reservation, pending expansion block, dense declaration/expression bitmap or simulated storage-failure event remains. Actual output stream remains borrowed. Bounded/root overloads and AST_LL_PP_SHOW_FAMILY_NAME remain separate."
       ],
       "deviations": [
-        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
+        "Native traversal collections preserve the source LIFO order, declaration/domain/range and parameter visitation, mark-after-process behavior and exact compact output. Independent literal output checks cover 257 shared variables with duplicate arguments and 257 nested quantifiers with reservations disabled, plus unchanged reference counts and lexical reuse. Erased container allocation faults add no C++ vector or bitmap implementation credit."
       ]
     },
     {
