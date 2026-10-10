@@ -9,9 +9,9 @@ import (
 )
 
 type bvOrInvocation struct {
-	flat, args, pieces ast.ASTHandleBuffer
-	positive           *ast.ASTFastMark1
-	negative           *ast.ASTFastMark2
+	flat, args, pieces []ast.ASTHandle
+	positive           map[ast.ASTHandle]bool
+	negative           map[ast.ASTHandle]bool
 	numerals           *ast.BitVectorBitwiseNumerals
 	zeroBit, zero      ast.ASTBitVectorNumeralInvocation
 	header             uint64
@@ -29,27 +29,17 @@ func (v *bvOrInvocation) close(m *ast.ASTManager) error {
 			return e
 		}
 	}
-	v.pieces.Close(m.Budget())
+	v.pieces = nil
 	if v.numerals != nil {
 		if e := v.numerals.Close(); e != nil {
 			return e
 		}
 		v.numerals = nil
 	}
-	if v.negative != nil {
-		if e := v.negative.Close(); e != nil {
-			return e
-		}
-		v.negative = nil
-	}
-	if v.positive != nil {
-		if e := v.positive.Close(); e != nil {
-			return e
-		}
-		v.positive = nil
-	}
-	v.args.Close(m.Budget())
-	v.flat.Close(m.Budget())
+	v.negative = nil
+	v.positive = nil
+	v.args = nil
+	v.flat = nil
 	m.Budget().Release(v.header)
 	v.header = 0
 	return nil
@@ -105,28 +95,20 @@ func (p *BVRewriter) RewriteOR(args ast.AppArguments, out ast.ASTRef) (st Rewrit
 					if e != nil {
 						return st, e
 					}
-					if e = v.flat.Push(m.Budget(), child); e != nil {
-						return st, e
-					}
+					v.flat = append(v.flat, child)
 				}
-			} else if e = v.flat.Push(m.Budget(), arg); e != nil {
-				return st, e
+			} else {
+				v.flat = append(v.flat, arg)
 			}
 		}
-		if uint32(len(v.flat.Slice())) != args.Count() {
+		if uint32(len(v.flat)) != args.Count() {
 			flattened = true
-			args = ast.SliceArguments(v.flat.Slice())
+			args = ast.SliceArguments(v.flat)
 		}
 	}
-	// Original new_args precedes both concrete mark planes, then v1/v2.
-	v.positive, e = ast.NewASTFastMark1(m)
-	if e != nil {
-		return st, e
-	}
-	v.negative, e = ast.NewASTFastMark2(m)
-	if e != nil {
-		return st, e
-	}
+	// Membership is local to this invocation; numerical v1/v2 retain their scopes.
+	v.positive = make(map[ast.ASTHandle]bool)
+	v.negative = make(map[ast.ASTHandle]bool)
 	v.numerals, e = ast.NewBitVectorBitwiseNumerals(m)
 	if e != nil {
 		return st, e
@@ -151,7 +133,7 @@ func (p *BVRewriter) RewriteOR(args ast.AppArguments, out ast.ASTRef) (st Rewrit
 	if e = v.numerals.End(8, 7, 6, 5, 4, 3); e != nil {
 		return st, e
 	}
-	v.pieces.Close(m.Budget())
+	v.pieces = nil
 	if e = v.numerals.SourceEnd(); e != nil {
 		return st, e
 	}
@@ -195,20 +177,12 @@ func (p *BVRewriter) bvOrBody(v *bvOrInvocation, args ast.AppArguments, width ui
 			}
 		}
 		var duplicate, opposite bool
-		// Preserve the original polarity-specific short-circuit check order.
 		if negative {
-			opposite, e = v.positive.IsMarked(atom)
-			if e == nil && !opposite {
-				duplicate, e = v.negative.IsMarked(atom)
-			}
+			opposite = v.positive[atom]
+			duplicate = !opposite && v.negative[atom]
 		} else {
-			duplicate, e = v.positive.IsMarked(atom)
-			if e == nil && !duplicate {
-				opposite, e = v.negative.IsMarked(atom)
-			}
-		}
-		if e != nil {
-			return failed, RewriteFailed, e
+			duplicate = v.positive[atom]
+			opposite = !duplicate && v.negative[atom]
 		}
 		if opposite {
 			if e = n.AllOne(width); e != nil {
@@ -222,16 +196,11 @@ func (p *BVRewriter) bvOrBody(v *bvOrInvocation, args ast.AppArguments, width ui
 			continue
 		}
 		if negative {
-			e = v.negative.Mark(atom, true)
+			v.negative[atom] = true
 		} else {
-			e = v.positive.Mark(atom, true)
+			v.positive[atom] = true
 		}
-		if e == nil {
-			e = v.args.Push(m.Budget(), arg)
-		}
-		if e != nil {
-			return failed, RewriteFailed, e
-		}
+		v.args = append(v.args, arg)
 	}
 	allone, e := n.IsAllOne(width)
 	if e != nil {
@@ -241,8 +210,8 @@ func (p *BVRewriter) bvOrBody(v *bvOrInvocation, args ast.AppArguments, width ui
 		result, e := n.Constant(0, width)
 		return result, RewriteDone, e
 	}
-	if len(v.args.Slice()) == 2 && coefficients == 0 {
-		left, right := v.args.Slice()[0], v.args.Slice()[1]
+	if len(v.args) == 2 && coefficients == 0 {
+		left, right := v.args[0], v.args[1]
 		concat, e := m.IsBitVectorOperation(left, 37)
 		if e == nil && concat {
 			concat, e = m.IsBitVectorOperation(right, 37)
@@ -261,8 +230,8 @@ func (p *BVRewriter) bvOrBody(v *bvOrInvocation, args ast.AppArguments, width ui
 	if e != nil {
 		return failed, RewriteFailed, e
 	}
-	if !zero && len(v.args.Slice()) == 1 {
-		result, e := p.bvOrMask(v, v.args.Slice()[0], width)
+	if !zero && len(v.args) == 1 {
+		result, e := p.bvOrMask(v, v.args[0], width)
 		return result, Rewrite2, e
 	}
 	if !flattened && !merged && (coefficients == 0 || coefficients == 1 && !zero) {
@@ -277,13 +246,13 @@ func (p *BVRewriter) bvOrBody(v *bvOrInvocation, args ast.AppArguments, width ui
 	if !zero {
 		h, e := n.Constant(0, width)
 		if e == nil {
-			e = v.args.Push(m.Budget(), h)
+			v.args = append(v.args, h)
 		}
 		if e != nil {
 			return failed, RewriteFailed, e
 		}
 	}
-	hs := v.args.Slice()
+	hs := v.args
 	switch len(hs) {
 	case 0:
 		result, e := m.BitVectorNumeralUnsignedWithInvocation(0, width, &v.zero)
@@ -292,7 +261,7 @@ func (p *BVRewriter) bvOrBody(v *bvOrInvocation, args ast.AppArguments, width ui
 		return hs[0], RewriteDone, nil
 	default:
 		if p.polynomial.config.bitVector.SortAC {
-			// Reuse the concrete std::sort comparator/output-contract port.
+			// Sort with the shared Go comparator.
 			if e = bvPolynomialSortMonomials(m, p.bvFamily, true, hs); e != nil {
 				return failed, RewriteFailed, e
 			}
@@ -336,7 +305,7 @@ func (p *BVRewriter) bvOrDisjointConcat(v *bvOrInvocation, left, right ast.ASTHa
 		if j != high {
 			h, e := p.extract.Apply(uint32(high), uint32(j+1), right)
 			if e == nil {
-				e = v.pieces.Push(m.Budget(), h)
+				v.pieces = append(v.pieces, h)
 			}
 			if e != nil {
 				return ast.ASTHandle{}, false, e
@@ -356,14 +325,14 @@ func (p *BVRewriter) bvOrDisjointConcat(v *bvOrInvocation, left, right ast.ASTHa
 		if j != high {
 			h, e := p.extract.Apply(uint32(high), uint32(j+1), left)
 			if e == nil {
-				e = v.pieces.Push(m.Budget(), h)
+				v.pieces = append(v.pieces, h)
 			}
 			if e != nil {
 				return ast.ASTHandle{}, false, e
 			}
 		}
 	}
-	result, e := m.MkBitVectorConcat(v.pieces.Slice())
+	result, e := m.MkBitVectorConcat(v.pieces)
 	return result, true, e
 }
 
@@ -397,7 +366,7 @@ func (p *BVRewriter) bvOrMask(v *bvOrInvocation, arg ast.ASTHandle, width uint32
 			}
 			h, e := n.Constant(5, bits)
 			if e == nil {
-				e = v.pieces.Push(p.manager.Budget(), h)
+				v.pieces = append(v.pieces, h)
 			}
 			if e != nil {
 				return ast.ASTHandle{}, e
@@ -423,7 +392,7 @@ func (p *BVRewriter) bvOrMask(v *bvOrInvocation, arg ast.ASTHandle, width uint32
 		if i != low {
 			h, e := p.extract.Apply(i-1, low, arg)
 			if e == nil {
-				e = v.pieces.Push(p.manager.Budget(), h)
+				v.pieces = append(v.pieces, h)
 			}
 			if e != nil {
 				return ast.ASTHandle{}, e
@@ -431,7 +400,7 @@ func (p *BVRewriter) bvOrMask(v *bvOrInvocation, arg ast.ASTHandle, width uint32
 			low = i
 		}
 	}
-	hs := v.pieces.Slice()
+	hs := v.pieces
 	for i, j := 0, len(hs)-1; i < j; i, j = i+1, j-1 {
 		hs[i], hs[j] = hs[j], hs[i]
 	}

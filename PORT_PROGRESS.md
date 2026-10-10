@@ -33926,3 +33926,39 @@ to OR, XOR and concatenation storage. Array/proof/sequence/scoped-mark/sorting
 context and other retained callers remain, as do internal util numeric/text/
 parameter cycles. The complete external native migration and requested util
 root subpackage split are unfinished.
+
+## Native BV OR/XOR membership and owning concat/mask slices
+
+OR and XOR now use native borrowed []ASTHandle flatten/rebuild scratch and
+invocation-local map[ASTHandle]bool positive/negative membership. OR disjoint
+concat and normalized mask scratch are borrowed slices; XOR's unnormalized mask
+pieces are an owning []ASTHandle slice with explicit INC and ascending consumed-
+DEC cleanup. Removed shared mark-plane/trail allocation and buffer publication
+plumbing. Polarity collision/toggle order, first-survivor order, same-count
+flatten discard, sorting/FAILED guards, run reversal and output statuses remain.
+Actual numerical values/children, younger not_t/constant references and source
+cleanup order remain on the real invocation.
+
+Concatenation now owns native []ASTHandle arguments directly. Deleted the
+bvConcatRefBuffer wrapper and its growth-only pending acquisition. Pop still
+removes its raw slot before DEC and keeps an unconsumed popped reference on the
+actual concat invocation. Cleanup records consumed progress and retires the
+numeric owner before argument roots. Numeral fusion still pops before factory;
+extract fusion still constructs before pop. Updated native ownership fixtures
+and retired XOR simulated 16/32/64 growth-refusal expectations. Fault campaigns
+now inspect actual retained mask roots. Manifest claims exclude C++ container,
+shared mark storage and backing-failure credit; unit counts are unchanged.
+
+Validation: focused OR/XOR/concat native passed (2.687s); full native rewriter
+passed (11.709s); remaining g3debug rewriter passed (16.450s) with the same three
+previously verified baseline exclusions. A new regression verifies foreign mark
+planes cannot influence either polarity's OR deduplication or XOR parity, and
+remain marked after rewrite/cleanup. Native model/API/tactic/SAT tactic passed
+(0.052s/0.012s/0.025s/0.112s); rewriter vet and manifest checks passed. Counts
+remain 2102 units/677 APIs:62 ported,283 partial,1729 unported,two dead/deleted.
+No full native module rerun inside the hourly interval.
+
+Production-only searches find no BV rewriter ASTHandleBuffer, ASTRefVector,
+ASTFastMark or bvConcatRefBuffer users. Array/proof/sequence/AST/tactic callers
+and internal util numeric/text/parameter cycles remain. The complete external
+native migration and requested util root split remain unfinished.

@@ -118,7 +118,7 @@ func TestBVRewriterOREveryActualNumericAndMaskReservation(t *testing.T) {
 					if !numericHoistRefusal(body) {
 						t.Fatal(body)
 					}
-					if p.bvor != nil && len(p.bvor.pieces.Slice()) >= 16 {
+					if p.bvor != nil && len(p.bvor.pieces) >= 16 {
 						retainedPieces = true
 					}
 					_, replay := p.RewriteOR(ast.SliceArguments(args), out)

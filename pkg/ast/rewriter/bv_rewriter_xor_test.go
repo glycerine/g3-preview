@@ -181,7 +181,7 @@ func TestBVRewriterXOREveryColdReservationAndPublication(t *testing.T) {
 					if p.bvxor != nil && p.bvxor.constant != (ast.ASTRef{}) {
 						value, e := m.RefGet(p.bvxor.constant)
 						astTestMust(t, e)
-						if value.IsNull() && len(p.bvxor.args.Slice()) == 0 {
+						if value.IsNull() && len(p.bvxor.args) == 0 {
 							unusedConstant = true
 						}
 					}

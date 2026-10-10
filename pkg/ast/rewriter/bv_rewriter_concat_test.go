@@ -171,28 +171,28 @@ func TestBVRewriterConcatEveryColdReservationAndPublication(t *testing.T) {
 	}
 }
 
-func TestBVConcatRefBufferPushPopAndForwardDestruction(t *testing.T) {
+func TestBVConcatNativeRootsPushPopAndForwardDestruction(t *testing.T) {
 	m, _ := bvAddFixture(t)
 	x := bvMergeVars(t, m, 1)[0]
 	before, e := m.GetRefCount(x)
 	astTestMust(t, e)
-	var b bvConcatRefBuffer
+	var b bvConcatInvocation
 	for i := 0; i < 16; i++ {
-		astTestMust(t, b.push(m, x))
+		astTestMust(t, appendRewriterRoot(m, &b.args, x))
 	}
 	m.Budget().FailAfter(0)
-	body := b.push(m, x)
+	body := appendRewriterRoot(m, &b.args, x)
 	m.Budget().FailAfter(-1)
 	rc, e := m.GetRefCount(x)
 	astTestMust(t, e)
-	if body != nil || len(b.values.Slice()) != 17 || !b.pending.IsNull() || rc != before+17 {
+	if body != nil || len(b.args) != 17 || !b.pending.IsNull() || rc != before+17 {
 		t.Fatal("native buffer push", body, rc)
 	}
 	astTestMust(t, b.close(m))
 	rc, e = m.GetRefCount(x)
 	astTestMust(t, e)
 	if rc != before {
-		t.Fatal("pending/spilled ownership", rc)
+		t.Fatal("native root ownership", rc)
 	}
 	// An unpinned 32-child node grows the native deletion worklist.
 	makeOwned := func() ast.ASTHandle {
@@ -208,23 +208,23 @@ func TestBVConcatRefBufferPushPopAndForwardDestruction(t *testing.T) {
 		return h
 	}
 	h := makeOwned()
-	astTestMust(t, b.push(m, h))
+	astTestMust(t, appendRewriterRoot(m, &b.args, h))
 	m.Budget().FailAfter(0)
-	body = b.pop(m)
+	body = b.popArgs(m)
 	m.Budget().FailAfter(-1)
-	if body != nil || len(b.values.Slice()) != 0 || !b.pending.IsNull() {
+	if body != nil || len(b.args) != 0 || !b.pending.IsNull() {
 		t.Fatal("pop before consumed DEC", body)
 	}
 	astTestMust(t, b.close(m))
 	h = makeOwned()
-	astTestMust(t, b.push(m, h))
-	astTestMust(t, b.push(m, x))
+	astTestMust(t, appendRewriterRoot(m, &b.args, h))
+	astTestMust(t, appendRewriterRoot(m, &b.args, x))
 	m.Budget().FailAfter(0)
 	body = b.close(m)
 	m.Budget().FailAfter(-1)
 	rc, e = m.GetRefCount(x)
 	astTestMust(t, e)
-	if body != nil || len(b.values.Slice()) != 0 || rc != before {
+	if body != nil || len(b.args) != 0 || rc != before {
 		t.Fatal("native forward destruction", body, rc)
 	}
 	astTestMust(t, b.close(m))

@@ -2,7 +2,6 @@
 package rewriter
 
 import (
-	"errors"
 	"fmt"
 	"math/big"
 	"testing"
@@ -54,22 +53,18 @@ func TestBVRewriterXOREveryActualNumericAndMaskReservation(t *testing.T) {
 				m.Budget().FailAfter(ordinal)
 				st, body := p.RewriteXOR(ast.SliceArguments(args), out)
 				m.Budget().FailAfter(-1)
-				var incoming ast.ASTHandle
 				if body != nil {
 					failures++
 					if !numericHoistRefusal(body) {
 						t.Fatal(body)
 					}
-					if p.bvxor != nil && !p.bvxor.pieces.pending.IsNull() {
-						incoming = p.bvxor.pieces.pending
-						count := len(p.bvxor.pieces.values.Slice())
-						if count != 16 && count != 32 && count != 64 {
-							t.Fatal("wrong incoming-INC frontier")
-						}
-						refs, e := m.GetRefCount(incoming)
-						astTestMust(t, e)
-						if refs != 1 {
-							t.Fatal("pending actual INC", refs)
+					if p.bvxor != nil {
+						for _, h := range p.bvxor.pieces {
+							refs, e := m.GetRefCount(h)
+							astTestMust(t, e)
+							if refs == 0 {
+								t.Fatal("native mask root lost ownership")
+							}
 						}
 					}
 					_, replay := p.RewriteXOR(ast.SliceArguments(args), out)
@@ -167,11 +162,7 @@ func TestBVRewriterXOREveryActualNumericAndMaskReservation(t *testing.T) {
 				if p.cause != cause {
 					t.Fatal("cleanup changed history")
 				}
-				if !incoming.IsNull() {
-					if _, e = m.GetRefCount(incoming); !errors.Is(e, ast.ErrASTHandle) {
-						t.Fatal("uninserted incoming INC survived owning cleanup", e)
-					}
-				}
+
 			})
 		}
 		if !complete || failures == 0 {

@@ -1,86 +1,43 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:1451-1510;
-// src/util/ref_buffer.h:35-68.
+// Source: src/ast/rewriter/bv_rewriter.cpp:1451-1510.
 package rewriter
 
 import (
-	"github.com/glycerine/g3/pkg/ast"
 	"reflect"
+
+	"github.com/glycerine/g3/pkg/ast"
 )
 
-// A concrete expr_ref_buffer backed by a typed Go slice. The pending reference
-// captures a popped DEC that has not consumed ownership. Consumption is
-// recorded before returning.
-type bvConcatRefBuffer struct {
-	values  ast.ASTHandleBuffer
-	pending ast.ASTHandle
-}
-
-func (b *bvConcatRefBuffer) push(m *ast.ASTManager, h ast.ASTHandle) error {
-	if !b.pending.IsNull() {
-		return ast.ErrASTPending
-	}
-	if e := m.IncRef(h); e != nil {
-		return e
-	}
-	b.pending = h
-	if e := b.values.Push(m.Budget(), h); e != nil {
-		return e
-	}
-	b.pending = ast.ASTHandle{}
-	return nil
-}
-func (b *bvConcatRefBuffer) endPending(m *ast.ASTManager) error {
-	if b.pending.IsNull() {
-		return nil
-	}
-	consumed, e := m.DecRefConsumed(b.pending)
-	if consumed {
-		b.pending = ast.ASTHandle{}
-	}
-	return e
-}
-func (b *bvConcatRefBuffer) pop(m *ast.ASTManager) error {
-	if !b.pending.IsNull() {
-		return ast.ErrASTPending
-	}
-	hs := b.values.Slice()
-	if len(hs) == 0 {
-		return ast.ErrASTDomain
-	}
-	h := hs[len(hs)-1]
-	if e := b.values.PopBack(); e != nil {
-		return e
-	}
-	b.pending = h
-	return b.endPending(m)
-}
-func (b *bvConcatRefBuffer) close(m *ast.ASTManager) error {
-	if e := b.endPending(m); e != nil {
-		return e
-	}
-	// ref_buffer_core::dec_range_ref visits forwards, including duplicates.
-	for i, h := range b.values.Slice() {
-		if h.IsNull() {
-			continue
-		}
-		consumed, e := m.DecRefConsumed(h)
-		if consumed {
-			b.values.Slice()[i] = ast.ASTHandle{}
-		}
-		if e != nil {
-			return e
-		}
-	}
-	b.values.Close(m.Budget())
-	return nil
-}
-
+// pending keeps a popped root reachable if its destructor has not consumed it.
 type bvConcatInvocation struct {
-	args     bvConcatRefBuffer
+	args     []ast.ASTHandle
+	pending  ast.ASTHandle
 	numerals *ast.BitVectorConcatNumerals
 	header   uint64
 }
 
+func (v *bvConcatInvocation) endPending(m *ast.ASTManager) error {
+	if v.pending.IsNull() {
+		return nil
+	}
+	consumed, e := m.DecRefConsumed(v.pending)
+	if consumed {
+		v.pending = ast.ASTHandle{}
+	}
+	return e
+}
+func (v *bvConcatInvocation) popArgs(m *ast.ASTManager) error {
+	if !v.pending.IsNull() {
+		return ast.ErrASTPending
+	}
+	if len(v.args) == 0 {
+		return ast.ErrASTDomain
+	}
+	last := len(v.args) - 1
+	v.pending = v.args[last]
+	v.args[last] = ast.ASTHandle{}
+	v.args = v.args[:last]
+	return v.endPending(m)
+}
 func (v *bvConcatInvocation) close(m *ast.ASTManager) error {
 	if v.numerals != nil {
 		if e := v.numerals.Close(); e != nil {
@@ -88,9 +45,13 @@ func (v *bvConcatInvocation) close(m *ast.ASTManager) error {
 		}
 		v.numerals = nil
 	}
-	if e := v.args.close(m); e != nil {
+	if e := v.endPending(m); e != nil {
 		return e
 	}
+	if e := shrinkRewriterRoots(m, &v.args, 0); e != nil {
+		return e
+	}
+	v.args = nil
 	m.Budget().Release(v.header)
 	v.header = 0
 	return nil
@@ -124,7 +85,7 @@ func (p *BVRewriter) RewriteConcat(args ast.AppArguments, out ast.ASTRef) (st Re
 		}
 		var prev ast.ASTHandle
 		if i > 0 {
-			hs := v.args.values.Slice()
+			hs := v.args
 			if len(hs) == 0 {
 				return st, ast.ErrASTDomain
 			}
@@ -145,14 +106,14 @@ func (p *BVRewriter) RewriteConcat(args ast.AppArguments, out ast.ASTRef) (st Re
 			if e = n.Fuse(sz1); e != nil {
 				return st, e
 			}
-			if e = v.args.pop(m); e != nil {
+			if e = v.popArgs(m); e != nil {
 				return st, e
 			}
 			h, e := n.Constant(1, sz1+sz2)
 			if e != nil {
 				return st, e
 			}
-			if e = v.args.push(m, h); e != nil {
+			if e = appendRewriterRoot(m, &v.args, h); e != nil {
 				return st, e
 			}
 			fusedNumeral = true
@@ -175,7 +136,7 @@ func (p *BVRewriter) RewriteConcat(args ast.AppArguments, out ast.ASTRef) (st Re
 				if e != nil {
 					return st, e
 				}
-				if e = v.args.push(m, h); e != nil {
+				if e = appendRewriterRoot(m, &v.args, h); e != nil {
 					return st, e
 				}
 			}
@@ -230,10 +191,10 @@ func (p *BVRewriter) RewriteConcat(args ast.AppArguments, out ast.ASTRef) (st Re
 						if e != nil {
 							return st, e
 						}
-						if e = v.args.pop(m); e != nil {
+						if e = v.popArgs(m); e != nil {
 							return st, e
 						}
-						if e = v.args.push(m, h); e != nil {
+						if e = appendRewriterRoot(m, &v.args, h); e != nil {
 							return st, e
 						}
 						fusedExtract = true
@@ -242,12 +203,12 @@ func (p *BVRewriter) RewriteConcat(args ast.AppArguments, out ast.ASTRef) (st Re
 				}
 			}
 		}
-		if e = v.args.push(m, arg); e != nil {
+		if e = appendRewriterRoot(m, &v.args, arg); e != nil {
 			return st, e
 		}
 	}
 	if fusedNumeral || expanded || fusedExtract {
-		hs := v.args.values.Slice()
+		hs := v.args
 		if len(hs) == 0 {
 			return st, ast.ErrASTDomain
 		}
@@ -273,7 +234,7 @@ func (p *BVRewriter) RewriteConcat(args ast.AppArguments, out ast.ASTRef) (st Re
 			return
 		}
 	}
-	// The numeric locals end before the older owning argument buffer.
+	// The numeric locals end before the older owning argument slice.
 	if err = n.SourceEnd(); err != nil {
 		return
 	}

@@ -1,5 +1,5 @@
 // Source: src/ast/rewriter/bv_rewriter.cpp:1736-1903;
-// src/ast/rewriter/bv_rewriter.h:93; src/util/ref_buffer.h:35-68.
+// src/ast/rewriter/bv_rewriter.h:93.
 package rewriter
 
 import (
@@ -9,11 +9,11 @@ import (
 )
 
 type bvXorInvocation struct {
-	flat, args        ast.ASTHandleBuffer
-	positive          *ast.ASTFastMark1
-	negative          *ast.ASTFastMark2
+	flat, args        []ast.ASTHandle
+	positive          map[ast.ASTHandle]bool
+	negative          map[ast.ASTHandle]bool
 	numerals          *ast.BitVectorBitwiseNumerals
-	pieces            bvConcatRefBuffer
+	pieces            []ast.ASTHandle
 	notTerm, constant ast.ASTRef
 	allone, zero      ast.ASTBitVectorNumeralInvocation
 	header            uint64
@@ -44,36 +44,23 @@ func (v *bvXorInvocation) close(m *ast.ASTManager) error {
 			return e
 		}
 	}
-	// A failed push retains its actual incoming INC for owning cleanup.
-	if e := v.pieces.endPending(m); e != nil {
-		return e
-	}
 	if e := v.endRefs(m); e != nil {
 		return e
 	}
-	v.args.Close(m.Budget())
-	if e := v.pieces.close(m); e != nil {
+	v.args = nil
+	if e := shrinkRewriterRoots(m, &v.pieces, 0); e != nil {
 		return e
 	}
+	v.pieces = nil
 	if v.numerals != nil {
 		if e := v.numerals.Close(); e != nil {
 			return e
 		}
 		v.numerals = nil
 	}
-	if v.negative != nil {
-		if e := v.negative.Close(); e != nil {
-			return e
-		}
-		v.negative = nil
-	}
-	if v.positive != nil {
-		if e := v.positive.Close(); e != nil {
-			return e
-		}
-		v.positive = nil
-	}
-	v.flat.Close(m.Budget())
+	v.negative = nil
+	v.positive = nil
+	v.flat = nil
 	m.Budget().Release(v.header)
 	v.header = 0
 	return nil
@@ -128,27 +115,19 @@ func (p *BVRewriter) RewriteXOR(args ast.AppArguments, out ast.ASTRef) (st Rewri
 					if e != nil {
 						return st, e
 					}
-					if e = v.flat.Push(m.Budget(), child); e != nil {
-						return st, e
-					}
+					v.flat = append(v.flat, child)
 				}
-			} else if e = v.flat.Push(m.Budget(), arg); e != nil {
-				return st, e
+			} else {
+				v.flat = append(v.flat, arg)
 			}
 		}
-		if uint32(len(v.flat.Slice())) != args.Count() {
+		if uint32(len(v.flat)) != args.Count() {
 			flattened = true
-			args = ast.SliceArguments(v.flat.Slice())
+			args = ast.SliceArguments(v.flat)
 		}
 	}
-	v.positive, e = ast.NewASTFastMark1(m)
-	if e != nil {
-		return st, e
-	}
-	v.negative, e = ast.NewASTFastMark2(m)
-	if e != nil {
-		return st, e
-	}
+	v.positive = make(map[ast.ASTHandle]bool)
+	v.negative = make(map[ast.ASTHandle]bool)
 	v.numerals, e = ast.NewBitVectorBitwiseNumerals(m)
 	if e != nil {
 		return st, e
@@ -177,8 +156,8 @@ func (p *BVRewriter) RewriteXOR(args ast.AppArguments, out ast.ASTRef) (st Rewri
 	if e = v.endRefs(m); e != nil {
 		return st, e
 	}
-	v.args.Close(m.Budget())
-	if e = v.pieces.close(m); e != nil {
+	v.args = nil
+	if e = shrinkRewriterRoots(m, &v.pieces, 0); e != nil {
 		return st, e
 	}
 	if e = v.numerals.SourceEnd(); e != nil {
@@ -223,37 +202,17 @@ func (p *BVRewriter) bvXorBody(v *bvXorInvocation, args ast.AppArguments, width 
 				return failed, RewriteFailed, e
 			}
 		}
-		var duplicate, opposite bool
+		marks, other := v.positive, v.negative
 		if negative {
-			duplicate, e = v.negative.IsMarked(atom)
-			if e == nil && !duplicate {
-				opposite, e = v.positive.IsMarked(atom)
-			}
-		} else {
-			duplicate, e = v.positive.IsMarked(atom)
-			if e == nil && !duplicate {
-				opposite, e = v.negative.IsMarked(atom)
-			}
+			marks, other = other, marks
 		}
-		if e != nil {
-			return failed, RewriteFailed, e
-		}
+		duplicate := marks[atom]
+		opposite := !duplicate && other[atom]
 		if duplicate || opposite {
 			if duplicate {
-				if negative {
-					e = v.negative.Mark(atom, false)
-				} else {
-					e = v.positive.Mark(atom, false)
-				}
+				delete(marks, atom)
 			} else {
-				if negative {
-					e = v.positive.Mark(atom, false)
-				} else {
-					e = v.negative.Mark(atom, false)
-				}
-			}
-			if e != nil {
-				return failed, RewriteFailed, e
+				delete(other, atom)
 			}
 			merged = true
 			if opposite {
@@ -262,14 +221,7 @@ func (p *BVRewriter) bvXorBody(v *bvXorInvocation, args ast.AppArguments, width 
 				}
 			}
 		} else {
-			if negative {
-				e = v.negative.Mark(atom, true)
-			} else {
-				e = v.positive.Mark(atom, true)
-			}
-			if e != nil {
-				return failed, RewriteFailed, e
-			}
+			marks[atom] = true
 		}
 	}
 	zero, e := n.IsZero()
@@ -327,7 +279,7 @@ func (p *BVRewriter) bvXorBody(v *bvXorInvocation, args ast.AppArguments, width 
 			e = m.SetRef(v.constant, h)
 		}
 		if e == nil {
-			e = v.args.Push(m.Budget(), h)
+			v.args = append(v.args, h)
 		}
 		if e != nil {
 			return failed, RewriteFailed, e
@@ -350,33 +302,20 @@ func (p *BVRewriter) bvXorBody(v *bvXorInvocation, args ast.AppArguments, width 
 			return failed, RewriteFailed, e
 		}
 		atom := arg
-		var marked bool
+		marks := v.positive
 		if negative {
 			atom, e = m.GetArg(arg, 0)
-			if e == nil {
-				marked, e = v.negative.IsMarked(atom)
-			}
-		} else {
-			marked, e = v.positive.IsMarked(atom)
-		}
-		if e != nil {
-			return failed, RewriteFailed, e
-		}
-		if marked {
-			if e = v.args.Push(m.Budget(), arg); e != nil {
-				return failed, RewriteFailed, e
-			}
-			if negative {
-				e = v.negative.Mark(atom, false)
-			} else {
-				e = v.positive.Mark(atom, false)
-			}
 			if e != nil {
 				return failed, RewriteFailed, e
 			}
+			marks = v.negative
+		}
+		if marks[atom] {
+			v.args = append(v.args, arg)
+			delete(marks, atom)
 		}
 	}
-	hs := v.args.Slice()
+	hs := v.args
 	switch len(hs) {
 	case 0:
 		result, e := m.BitVectorNumeralUnsignedWithInvocation(0, width, &v.zero)
@@ -438,7 +377,7 @@ func (p *BVRewriter) bvXorMask(v *bvXorInvocation, arg ast.ASTHandle, width uint
 		if i != low {
 			h, e := p.extract.Apply(i-1, low, not)
 			if e == nil {
-				e = v.pieces.push(m, h)
+				e = appendRewriterRoot(m, &v.pieces, h)
 			}
 			if e != nil {
 				return ast.ASTHandle{}, e
@@ -461,7 +400,7 @@ func (p *BVRewriter) bvXorMask(v *bvXorInvocation, arg ast.ASTHandle, width uint
 		if i != low {
 			h, e := p.extract.Apply(i-1, low, arg)
 			if e == nil {
-				e = v.pieces.push(m, h)
+				e = appendRewriterRoot(m, &v.pieces, h)
 			}
 			if e != nil {
 				return ast.ASTHandle{}, e
@@ -469,7 +408,7 @@ func (p *BVRewriter) bvXorMask(v *bvXorInvocation, arg ast.ASTHandle, width uint
 			low = i
 		}
 	}
-	hs := v.pieces.values.Slice()
+	hs := v.pieces
 	for i, j := 0, len(hs)-1; i < j; i, j = i+1, j-1 {
 		hs[i], hs[j] = hs[j], hs[i]
 	}

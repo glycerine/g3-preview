@@ -266,3 +266,60 @@ func TestBVRewriterORSortingFlatConfigurationAndErasedSingleton(t *testing.T) {
 		t.Fatal("borrowed view publication", st, got)
 	}
 }
+
+func TestBVRewriterORXORNativeMembershipPreservesForeignMarkPlanes(t *testing.T) {
+	m, _ := bvAddFixture(t)
+	p := bvNotTestOwner(t, m, false, false)
+	defer func() { astTestMust(t, p.Close()) }()
+	xs := bvMergeVars(t, m, 2)
+	x, y := xs[0], xs[1]
+	not, e := m.MkBitVectorNot(x)
+	astTestMust(t, e)
+	astTestPin(t, m, not)
+	one, e := ast.NewASTFastMark1(m)
+	astTestMust(t, e)
+	defer func() { astTestMust(t, one.Close()) }()
+	two, e := ast.NewASTFastMark2(m)
+	astTestMust(t, e)
+	defer func() { astTestMust(t, two.Close()) }()
+	for _, h := range xs {
+		astTestMust(t, one.Mark(h, true))
+		astTestMust(t, two.Mark(h, true))
+	}
+	out, e := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, e)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	for _, tc := range []struct {
+		args []ast.ASTHandle
+		want ast.ASTHandle
+		xor  bool
+	}{
+		{[]ast.ASTHandle{x, x}, x, false},
+		{[]ast.ASTHandle{not, not}, not, false},
+		{[]ast.ASTHandle{x, x, y}, y, true},
+		{[]ast.ASTHandle{not, not, y}, y, true},
+	} {
+		var st RewriteStatus
+		if tc.xor {
+			st, e = p.RewriteXOR(ast.SliceArguments(tc.args), out)
+		} else {
+			st, e = p.RewriteOR(ast.SliceArguments(tc.args), out)
+		}
+		astTestMust(t, e)
+		got, e := m.RefGet(out)
+		astTestMust(t, e)
+		if st != RewriteDone || got != tc.want {
+			t.Fatal("foreign marks influenced membership", tc.xor, st, got, tc.want)
+		}
+	}
+	astTestMust(t, p.Close())
+	for _, h := range xs {
+		a, e := one.IsMarked(h)
+		astTestMust(t, e)
+		b, e := two.IsMarked(h)
+		astTestMust(t, e)
+		if !a || !b {
+			t.Fatal("rewriter changed another caller's marks")
+		}
+	}
+}
