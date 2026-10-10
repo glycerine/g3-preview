@@ -122005,7 +122005,8 @@
         "pkg/util/lp/lu_column_exact.go",
         "pkg/util/lp/lu_column_test.go",
         "pkg/util/lp/lu_column_failure_test.go",
-        "pkg/util/lp/lu_update_float.go"
+        "pkg/util/lp/lu_update_float.go",
+        "pkg/util/lp/lu_update_exact.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -122041,7 +122042,16 @@
         "TestLPFloatLUUpdateDegenerationAndPublication",
         "TestLPFloatLUUpdateRowSolveLiteral",
         "TestLPFloatLUUpdateReachedBounds",
-        "TestLPFloatLUUpdateSparseColumnSolveIntegration"
+        "TestLPFloatLUUpdateSparseColumnSolveIntegration",
+        "TestLPExactLUUpdateDegenerationAndGuards",
+        "TestLPExactLUUpdateLeavesStoppedCallerOwned",
+        "TestLPExactLUUpdateReachedBounds",
+        "TestLPExactLUUpdateSparseColumnIntegration",
+        "TestLPExactLUUpdateRowSolveLiteral",
+        "TestLPExactLUUpdateIndependentBasisOracle",
+        "TestLPExactLUUpdateAllocationFailureCensus",
+        "TestLPExactLUUpdateLeavesOlderComparisonOwned",
+        "TestLPExactLUUpdateRowFillAllocationCensus"
       ],
       "conditionals": [
         {
@@ -122217,6 +122227,22 @@
             "TestLPFloatLUUpdateReachedBounds",
             "TestLPFloatLUUpdateSparseColumnSolveIntegration"
           ]
+        },
+        {
+          "name": "retained mpq/mpq and mpq/numeric_pair Suhl replace_column with concrete row/diagonal tail publication and exact numerical ownership",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lu_update_exact.go",
+          "tests": [
+            "TestLPExactLUUpdateDegenerationAndGuards",
+            "TestLPExactLUUpdateLeavesStoppedCallerOwned",
+            "TestLPExactLUUpdateReachedBounds",
+            "TestLPExactLUUpdateSparseColumnIntegration",
+            "TestLPExactLUUpdateRowSolveLiteral",
+            "TestLPExactLUUpdateIndependentBasisOracle",
+            "TestLPExactLUUpdateAllocationFailureCensus",
+            "TestLPExactLUUpdateLeavesOlderComparisonOwned",
+            "TestLPExactLUUpdateRowFillAllocationCensus"
+          ]
         }
       ],
       "ownership": [
@@ -122231,7 +122257,8 @@
         "Retained double/double initial sparse/dense factorization and dense column/dense-indexed row solves are implemented. Preserve source density unsigned-square wrap, sparse pivot before dense switch, unit-column ignored shortening result, tail conjugation/publication order and strict small-pivot/drop thresholds. Exact initial LU construction/solves are now implemented; Suhl updates, refinement orchestration and full upstream LU driver remain open. Native Go floating owners use slices; explicit Close and stopped-operation guards expose partial/error lifetimes without numeric ownership adapters.",
         "Retained exact scalar/pair initial LU factorization and dense column/dense-indexed row solves now execute actual source stages. Shared state contains concrete rational coefficient algorithms only; concrete typed pair buffers/tails implement pair X applications. Precise tableaux are rejected at the source debug assertion after member construction; tiny nonzero exact pivots/solutions are never dropped. Suhl updates, refinement/error-check orchestration, dimension extension and full upstream LU driver remain open. No universal algebra adapter or unused template instantiation is added.",
         "Entering-column preparation and solve_Bd now execute retained double/mpq/mpq-pair paths. The precise ratio10 and floating ratio120 use source unsigned multiplication and strict comparison against destination PRE-assignment size. Dense route copies every data slot then clears index and scans dimension descending; sparse route uses indexed assignment and actual graph solve (floating residual correction). Pair-only faster route follows its actual retained core-solver caller. Source unindexed values, sparse self-assignment zeroing, dense self-assignment, configurable drop/precise zero behavior and error-publication prefixes remain literal. Native Go storage replaces vector internals; no STL adapter or unused faster/template route is ported. Suhl updates, row restoration, error-check/refinement orchestration, extension and full upstream driver remain open.",
-        "Floating Suhl replacement now executes lu.hpp:581-587,775-934. Counter increments before transformation; bump permutation changes U before Q/R; row eta conjugates before publication; diagonal tail publishes before row division then conjugates. Wrong nonzero pivot checks and tiny diagonals set Degenerated; early degeneration clears all row work without marking a Go error. Strict tolerance, cancellation, underflow/assertion, NaN std::max first-operand selection and zero/skipped terms preserve source control flow. Native Go collections replace vector/STL storage. 64 independent original-basis worlds with 12 nonsingular replacements each verify dense/indexed row and column solves after every update across sparse/forced-dense initial factors; a 241-row indexed entering-column integration and all four original test_small_lu replacements execute. The source subsequent dimension extension, exact mpq/mpq-pair Suhl updates and full --test_lu remain open; no whole-unit promotion."
+        "Floating Suhl replacement now executes lu.hpp:581-587,775-934. Counter increments before transformation; bump permutation changes U before Q/R; row eta conjugates before publication; diagonal tail publishes before row division then conjugates. Wrong nonzero pivot checks and tiny diagonals set Degenerated; early degeneration clears all row work without marking a Go error. Strict tolerance, cancellation, underflow/assertion, NaN std::max first-operand selection and zero/skipped terms preserve source control flow. Native Go collections replace vector/STL storage. 64 independent original-basis worlds with 12 nonsingular replacements each verify dense/indexed row and column solves after every update across sparse/forced-dense initial factors; a 241-row indexed entering-column integration and all four original test_small_lu replacements execute. The source subsequent dimension extension, exact mpq/mpq-pair Suhl updates and full --test_lu remain open; no whole-unit promotion.",
+        "Exact Suhl updates now execute retained lu.hpp:581-587,775-934 coefficient paths with concrete rational/pair tails. By-value pivot construction precedes counter increment; v, unary minus, product expression, delta, compound-add t, diagonal and last-row parameter retain separate owning cells. Each scalar expression captures only its own newly acquired calls; child vectors/matrices/tails retain their own receipts. Row eta conjugates before publication; diagonal tail publishes before row division then conjugates. Partial children and pending arithmetic release before lexical inputs and ordinary tail/member destruction. Exact tolerance means zero and ignores pivot checking. Empty early-degeneration row eta owners are reclaimed explicitly instead of leaking the source raw pointer. Independent exact basis/solution worlds, sparse-column integration, literal cancellation/tiny/hidden-index cases, actual pooled/direct allocation walks and borrowed caller/older-comparison identity verify retained behavior. Error-check/refinement orchestration, dimension extension, scaling/simplex/LAR/MPS and complete original test drivers remain open; no whole-unit promotion."
       ]
     },
     {
@@ -122259,7 +122286,8 @@
         "pkg/util/lp/lu_column_exact.go",
         "pkg/util/lp/lu_column_test.go",
         "pkg/util/lp/lu_column_failure_test.go",
-        "pkg/util/lp/lu_update_float.go"
+        "pkg/util/lp/lu_update_float.go",
+        "pkg/util/lp/lu_update_exact.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -122295,7 +122323,16 @@
         "TestLPFloatLUUpdateDegenerationAndPublication",
         "TestLPFloatLUUpdateRowSolveLiteral",
         "TestLPFloatLUUpdateReachedBounds",
-        "TestLPFloatLUUpdateSparseColumnSolveIntegration"
+        "TestLPFloatLUUpdateSparseColumnSolveIntegration",
+        "TestLPExactLUUpdateDegenerationAndGuards",
+        "TestLPExactLUUpdateLeavesStoppedCallerOwned",
+        "TestLPExactLUUpdateReachedBounds",
+        "TestLPExactLUUpdateSparseColumnIntegration",
+        "TestLPExactLUUpdateRowSolveLiteral",
+        "TestLPExactLUUpdateIndependentBasisOracle",
+        "TestLPExactLUUpdateAllocationFailureCensus",
+        "TestLPExactLUUpdateLeavesOlderComparisonOwned",
+        "TestLPExactLUUpdateRowFillAllocationCensus"
       ],
       "conditionals": [
         {
@@ -122631,6 +122668,22 @@
             "TestLPFloatLUUpdateReachedBounds",
             "TestLPFloatLUUpdateSparseColumnSolveIntegration"
           ]
+        },
+        {
+          "name": "retained mpq/mpq and mpq/numeric_pair Suhl replace_column with concrete row/diagonal tail publication and exact numerical ownership",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lu_update_exact.go",
+          "tests": [
+            "TestLPExactLUUpdateDegenerationAndGuards",
+            "TestLPExactLUUpdateLeavesStoppedCallerOwned",
+            "TestLPExactLUUpdateReachedBounds",
+            "TestLPExactLUUpdateSparseColumnIntegration",
+            "TestLPExactLUUpdateRowSolveLiteral",
+            "TestLPExactLUUpdateIndependentBasisOracle",
+            "TestLPExactLUUpdateAllocationFailureCensus",
+            "TestLPExactLUUpdateLeavesOlderComparisonOwned",
+            "TestLPExactLUUpdateRowFillAllocationCensus"
+          ]
         }
       ],
       "ownership": [
@@ -122645,7 +122698,8 @@
         "Retained double/double initial sparse/dense factorization and dense column/dense-indexed row solves are implemented. Preserve source density unsigned-square wrap, sparse pivot before dense switch, unit-column ignored shortening result, tail conjugation/publication order and strict small-pivot/drop thresholds. Exact initial LU construction/solves are now implemented; Suhl updates, refinement orchestration and full upstream LU driver remain open. Native Go floating owners use slices; explicit Close and stopped-operation guards expose partial/error lifetimes without numeric ownership adapters.",
         "Retained exact scalar/pair initial LU factorization and dense column/dense-indexed row solves now execute actual source stages. Shared state contains concrete rational coefficient algorithms only; concrete typed pair buffers/tails implement pair X applications. Precise tableaux are rejected at the source debug assertion after member construction; tiny nonzero exact pivots/solutions are never dropped. Suhl updates, refinement/error-check orchestration, dimension extension and full upstream LU driver remain open. No universal algebra adapter or unused template instantiation is added.",
         "Entering-column preparation and solve_Bd now execute retained double/mpq/mpq-pair paths. The precise ratio10 and floating ratio120 use source unsigned multiplication and strict comparison against destination PRE-assignment size. Dense route copies every data slot then clears index and scans dimension descending; sparse route uses indexed assignment and actual graph solve (floating residual correction). Pair-only faster route follows its actual retained core-solver caller. Source unindexed values, sparse self-assignment zeroing, dense self-assignment, configurable drop/precise zero behavior and error-publication prefixes remain literal. Native Go storage replaces vector internals; no STL adapter or unused faster/template route is ported. Suhl updates, row restoration, error-check/refinement orchestration, extension and full upstream driver remain open.",
-        "Floating Suhl replacement now executes lu.hpp:581-587,775-934. Counter increments before transformation; bump permutation changes U before Q/R; row eta conjugates before publication; diagonal tail publishes before row division then conjugates. Wrong nonzero pivot checks and tiny diagonals set Degenerated; early degeneration clears all row work without marking a Go error. Strict tolerance, cancellation, underflow/assertion, NaN std::max first-operand selection and zero/skipped terms preserve source control flow. Native Go collections replace vector/STL storage. 64 independent original-basis worlds with 12 nonsingular replacements each verify dense/indexed row and column solves after every update across sparse/forced-dense initial factors; a 241-row indexed entering-column integration and all four original test_small_lu replacements execute. The source subsequent dimension extension, exact mpq/mpq-pair Suhl updates and full --test_lu remain open; no whole-unit promotion."
+        "Floating Suhl replacement now executes lu.hpp:581-587,775-934. Counter increments before transformation; bump permutation changes U before Q/R; row eta conjugates before publication; diagonal tail publishes before row division then conjugates. Wrong nonzero pivot checks and tiny diagonals set Degenerated; early degeneration clears all row work without marking a Go error. Strict tolerance, cancellation, underflow/assertion, NaN std::max first-operand selection and zero/skipped terms preserve source control flow. Native Go collections replace vector/STL storage. 64 independent original-basis worlds with 12 nonsingular replacements each verify dense/indexed row and column solves after every update across sparse/forced-dense initial factors; a 241-row indexed entering-column integration and all four original test_small_lu replacements execute. The source subsequent dimension extension, exact mpq/mpq-pair Suhl updates and full --test_lu remain open; no whole-unit promotion.",
+        "Exact Suhl updates now execute retained lu.hpp:581-587,775-934 coefficient paths with concrete rational/pair tails. By-value pivot construction precedes counter increment; v, unary minus, product expression, delta, compound-add t, diagonal and last-row parameter retain separate owning cells. Each scalar expression captures only its own newly acquired calls; child vectors/matrices/tails retain their own receipts. Row eta conjugates before publication; diagonal tail publishes before row division then conjugates. Partial children and pending arithmetic release before lexical inputs and ordinary tail/member destruction. Exact tolerance means zero and ignores pivot checking. Empty early-degeneration row eta owners are reclaimed explicitly instead of leaking the source raw pointer. Independent exact basis/solution worlds, sparse-column integration, literal cancellation/tiny/hidden-index cases, actual pooled/direct allocation walks and borrowed caller/older-comparison identity verify retained behavior. Error-check/refinement orchestration, dimension extension, scaling/simplex/LAR/MPS and complete original test drivers remain open; no whole-unit promotion."
       ]
     },
     {
@@ -122667,7 +122721,8 @@
         "pkg/util/lp/lu_column_exact.go",
         "pkg/util/lp/lu_column_test.go",
         "pkg/util/lp/lu_column_failure_test.go",
-        "pkg/util/lp/lu_update_float.go"
+        "pkg/util/lp/lu_update_float.go",
+        "pkg/util/lp/lu_update_exact.go"
       ],
       "tests": [
         "TestLPFloatLUIndependentFactorizationAndSolves",
@@ -122697,7 +122752,16 @@
         "TestLPFloatLUUpdateDegenerationAndPublication",
         "TestLPFloatLUUpdateRowSolveLiteral",
         "TestLPFloatLUUpdateReachedBounds",
-        "TestLPFloatLUUpdateSparseColumnSolveIntegration"
+        "TestLPFloatLUUpdateSparseColumnSolveIntegration",
+        "TestLPExactLUUpdateDegenerationAndGuards",
+        "TestLPExactLUUpdateLeavesStoppedCallerOwned",
+        "TestLPExactLUUpdateReachedBounds",
+        "TestLPExactLUUpdateSparseColumnIntegration",
+        "TestLPExactLUUpdateRowSolveLiteral",
+        "TestLPExactLUUpdateIndependentBasisOracle",
+        "TestLPExactLUUpdateAllocationFailureCensus",
+        "TestLPExactLUUpdateLeavesOlderComparisonOwned",
+        "TestLPExactLUUpdateRowFillAllocationCensus"
       ],
       "conditionals": [
         {
@@ -122778,6 +122842,22 @@
             "TestLPFloatLUUpdateReachedBounds",
             "TestLPFloatLUUpdateSparseColumnSolveIntegration"
           ]
+        },
+        {
+          "name": "retained mpq/mpq and mpq/numeric_pair Suhl replace_column with concrete row/diagonal tail publication and exact numerical ownership",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lu_update_exact.go",
+          "tests": [
+            "TestLPExactLUUpdateDegenerationAndGuards",
+            "TestLPExactLUUpdateLeavesStoppedCallerOwned",
+            "TestLPExactLUUpdateReachedBounds",
+            "TestLPExactLUUpdateSparseColumnIntegration",
+            "TestLPExactLUUpdateRowSolveLiteral",
+            "TestLPExactLUUpdateIndependentBasisOracle",
+            "TestLPExactLUUpdateAllocationFailureCensus",
+            "TestLPExactLUUpdateLeavesOlderComparisonOwned",
+            "TestLPExactLUUpdateRowFillAllocationCensus"
+          ]
         }
       ],
       "ownership": [
@@ -122789,7 +122869,8 @@
         "Retained double/double initial sparse/dense factorization and dense column/dense-indexed row solves are implemented. Preserve source density unsigned-square wrap, sparse pivot before dense switch, unit-column ignored shortening result, tail conjugation/publication order and strict small-pivot/drop thresholds. Exact initial LU construction/solves are now implemented; Suhl updates, refinement orchestration and full upstream LU driver remain open. Native Go floating owners use slices; explicit Close and stopped-operation guards expose partial/error lifetimes without numeric ownership adapters.",
         "Retained exact scalar/pair initial LU factorization and dense column/dense-indexed row solves now execute actual source stages. Shared state contains concrete rational coefficient algorithms only; concrete typed pair buffers/tails implement pair X applications. Precise tableaux are rejected at the source debug assertion after member construction; tiny nonzero exact pivots/solutions are never dropped. Suhl updates, refinement/error-check orchestration, dimension extension and full upstream LU driver remain open. No universal algebra adapter or unused template instantiation is added.",
         "Entering-column preparation and solve_Bd now execute retained double/mpq/mpq-pair paths. The precise ratio10 and floating ratio120 use source unsigned multiplication and strict comparison against destination PRE-assignment size. Dense route copies every data slot then clears index and scans dimension descending; sparse route uses indexed assignment and actual graph solve (floating residual correction). Pair-only faster route follows its actual retained core-solver caller. Source unindexed values, sparse self-assignment zeroing, dense self-assignment, configurable drop/precise zero behavior and error-publication prefixes remain literal. Native Go storage replaces vector internals; no STL adapter or unused faster/template route is ported. Suhl updates, row restoration, error-check/refinement orchestration, extension and full upstream driver remain open.",
-        "Floating Suhl replacement now executes lu.hpp:581-587,775-934. Counter increments before transformation; bump permutation changes U before Q/R; row eta conjugates before publication; diagonal tail publishes before row division then conjugates. Wrong nonzero pivot checks and tiny diagonals set Degenerated; early degeneration clears all row work without marking a Go error. Strict tolerance, cancellation, underflow/assertion, NaN std::max first-operand selection and zero/skipped terms preserve source control flow. Native Go collections replace vector/STL storage. 64 independent original-basis worlds with 12 nonsingular replacements each verify dense/indexed row and column solves after every update across sparse/forced-dense initial factors; a 241-row indexed entering-column integration and all four original test_small_lu replacements execute. The source subsequent dimension extension, exact mpq/mpq-pair Suhl updates and full --test_lu remain open; no whole-unit promotion."
+        "Floating Suhl replacement now executes lu.hpp:581-587,775-934. Counter increments before transformation; bump permutation changes U before Q/R; row eta conjugates before publication; diagonal tail publishes before row division then conjugates. Wrong nonzero pivot checks and tiny diagonals set Degenerated; early degeneration clears all row work without marking a Go error. Strict tolerance, cancellation, underflow/assertion, NaN std::max first-operand selection and zero/skipped terms preserve source control flow. Native Go collections replace vector/STL storage. 64 independent original-basis worlds with 12 nonsingular replacements each verify dense/indexed row and column solves after every update across sparse/forced-dense initial factors; a 241-row indexed entering-column integration and all four original test_small_lu replacements execute. The source subsequent dimension extension, exact mpq/mpq-pair Suhl updates and full --test_lu remain open; no whole-unit promotion.",
+        "Exact Suhl updates now execute retained lu.hpp:581-587,775-934 coefficient paths with concrete rational/pair tails. By-value pivot construction precedes counter increment; v, unary minus, product expression, delta, compound-add t, diagonal and last-row parameter retain separate owning cells. Each scalar expression captures only its own newly acquired calls; child vectors/matrices/tails retain their own receipts. Row eta conjugates before publication; diagonal tail publishes before row division then conjugates. Partial children and pending arithmetic release before lexical inputs and ordinary tail/member destruction. Exact tolerance means zero and ignores pivot checking. Empty early-degeneration row eta owners are reclaimed explicitly instead of leaking the source raw pointer. Independent exact basis/solution worlds, sparse-column integration, literal cancellation/tiny/hidden-index cases, actual pooled/direct allocation walks and borrowed caller/older-comparison identity verify retained behavior. Error-check/refinement orchestration, dimension extension, scaling/simplex/LAR/MPS and complete original test drivers remain open; no whole-unit promotion."
       ]
     },
     {

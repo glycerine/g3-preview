@@ -1192,6 +1192,7 @@
         "lu_float.go",
         "lu_float_solve.go",
         "lu_state.go",
+        "lu_update_exact.go",
         "lu_update_float.go",
         "numeric_pair.go",
         "pair_priority_queue.go",

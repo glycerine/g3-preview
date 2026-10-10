@@ -20,6 +20,9 @@ type exactLUState struct {
 	tails                         []exactLUCoefficientTail // transferred to the typed owner before return
 	pendingEta                    *RationalEtaMatrix
 	denseOwned                    bool
+	updateWork                    *IndexedRationalVector
+	pendingRowEta                 *RationalRowEtaMatrix
+	pendingDiagonal               *RationalDiagonalMatrix
 }
 type exactLUCoefficientTail struct {
 	eta   *RationalEtaMatrix
@@ -211,9 +214,15 @@ func (m *exactLUState) createInitialFactorization() error {
 	return nil
 }
 
-// The typed owner first destroys published tails in forward source order.
-// Unpublished child owners retain failed construction/arithmetic prefixes.
+// The typed owner resolves failed update calls and children before tails.
+// Initial-factorization children retain failed construction/arithmetic prefixes.
 func (m *exactLUState) closeMembers() error {
+	if m.updateWork != nil {
+		if err := m.updateWork.Close(); err != nil {
+			return err
+		}
+		m.updateWork = nil
+	}
 	if m.pendingEta != nil {
 		if err := m.pendingEta.Close(); err != nil {
 			return err

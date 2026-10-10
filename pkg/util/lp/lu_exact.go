@@ -31,6 +31,9 @@ func (m *RationalLU) Close() (err error) {
 		return nil
 	}
 	defer m.finish(&err)
+	if err = m.closeUpdatePending(); err != nil {
+		return err
+	}
 	for len(m.Tail) > 0 {
 		if err = m.Tail[0].Close(); err != nil {
 			return err
@@ -80,6 +83,9 @@ func (m *PairLU) Close() (err error) {
 		return nil
 	}
 	defer m.finish(&err)
+	if err = m.closeUpdatePending(); err != nil {
+		return err
+	}
 	for len(m.Tail) > 0 {
 		if err = m.Tail[0].Close(); err != nil {
 			return err

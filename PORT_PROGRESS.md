@@ -36553,3 +36553,72 @@ partially published row/diagonal tails and matrix-before-caller failure cleanup.
 Error-check/refinement orchestration, dimension extension, scaling/simplex/LAR/
 MPS and complete retained upstream drivers remain required. No source unit is
 promoted wholesale: LP stays48 partial/62 unported units.
+
+
+### Exact scalar/pair Suhl LU column updates — 2026-10-10
+
+Ported retained mpq/mpq and mpq/numeric_pair coefficient orchestration from
+lu.hpp:581-587,775-934 in lu_update_exact.go. Shared exact coefficient algorithms
+publish concrete RationalRowEta/PairRowEta and RationalDiagonal/PairDiagonal
+owners. No any-valued arithmetic or callback template layer is introduced.
+By-value pivot argument copying precedes the refactor counter increment. Actual
+v, unary-minus, product temporary/delta, compound-add result t, diagonal and
+last-row parameter copies each have independent owning numerical cells. Scalar
+expressions capture only their own new arithmetic receipts. Vector, matrix and
+tail child calls retain their own receipts; pending raw calls resolve before
+borrowed lexical inputs or published tails are destroyed. Failed row/diagonal
+construction remains owned, and diagonal publication precedes U division and
+conjugation as in source. Precise tolerance means exact zero, and the source
+skips pivot checking. Early degeneration clears all row work; its unpublished
+empty row eta is explicitly reclaimed rather than leaking a C++ raw pointer.
+
+96 independent exact basis worlds (48 per type) perform eight replacements each,
+768 updates total, across sizes1..6 and sparse/forced-dense initial factors.
+Independent math/big.Rat basis combinations and known solutions verify scalar/
+pair column and dense/indexed row solves after every update, plus triangular
+unit U, counters, workspace consumption and borrowed source preservation.
+The supplied999 pivot intentionally differs from the actual7/11 pivot, proving
+precise checking is skipped. A21-row actual sparse entering-column route verifies
+both types through update and subsequent solves. Literal fixtures cover tiny
+exact pivots under huge float tolerances, cancellation with indexed/hidden
+values, stored zeros, lower-triangle assertion positions, new tiny fill, empty/
+zero-column degeneration, foreign/stopped callers, counter wrap, closed owners,
+and reached permutation/workspace bounds.
+
+Twelve full-update pooled/direct campaigns and two targeted sparse-fill campaigns
+walk physical allocation ordinals through first success:2,506 native and5,014
+combined debug/checked refusals, maximum933/937 respectively. Full-update stage
+assertions verify pivot-argument refusal before counter increment, real scalar
+arithmetic calls, partial row eta and diagonal construction, and failure after
+diagonal tail publication. Sparse-fill campaigns additionally require a real
+failed new workspace SetValue after delta computation. Every failure closes LU
+before caller values, validates the independent borrowed source and accounts for
+all named live cells/direct objects. Separate real failed Add and comparison
+fixtures prove rejected caller and older unrelated receipts remain caller-owned.
+
+Native full-update campaigns pass73.369s; debug/checked155.843s. Additional
+fill/literal checks pass0.040s/0.049s. Exact new-basis native property checks
+pass7.136s; debug property/initial-regression checks10.735s. Guard/bounds/older
+checks and both LP vets pass. The preexisting complete native exact-LU regression
+selection also passed56.951s with current production code. A first overlarge
+five-row fault fixture reached the default600s Go timeout; it was replaced with
+a smaller dense initial basis and genuine32/48-digit fractional update values.
+Large three-row coefficients still exercise row eta allocation; all failure-stage
+assertions remain required. No numerical or ownership requirement was removed.
+
+Coverage combines matching current mode:set blocks from these focused runs,
+without rerunning the completed fault walks. lu_update_exact.go is265/302 (87.7%)
+native and267/302 (88.4%) debug/checked; both public ReplaceColumn methods94.1%.
+Uncovered returns propagate valid-child/zero-predicate/cleanup errors, protect
+invariants, or belong to the opposite assertion profile. Earlier initial-LU
+component coverage numbers are historical before added Suhl cleanup statements.
+The full LP89.2% coverage snapshot is still historical and says nothing about
+unported C++. Full native module last passed16:39 UTC; no within-hour full rerun.
+Source inventory/evidence/no-generics and diff gates pass. Graph remains64
+packages with unchanged edges and lists the new exact update file. LP stays48
+partial/62 unported units; no whole-unit promotion.
+
+Next complete retained LU error-check/refinement orchestration and dimension
+extension, then finish the remaining original LU scenarios. Scaling, simplex,
+LAR, bounds/evidence/constraint scopes, MPS and retained upstream drivers remain
+required by the full active LP goal.
