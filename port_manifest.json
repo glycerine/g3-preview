@@ -9676,7 +9676,8 @@
         "pkg/ast/ast_dec_ref_consumed_test.go",
         "pkg/ast/ast_bv_arguments.go",
         "pkg/ast/ast_bv_concat_arguments_test.go",
-        "pkg/ast/ast_bv_add_arguments_test.go"
+        "pkg/ast/ast_bv_add_arguments_test.go",
+        "pkg/ast/ast_dependency_consumed_test.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -9840,7 +9841,8 @@
         "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix",
         "TestASTProofQuantReaderMalformedParameterKeepsAppendPrefix",
         "TestASTProofHyperNativeWideReaderExactOwnershipAndIndependentOutputs",
-        "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix"
+        "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix",
+        "TestASTDependencyDecConsumedActualRootOwnership"
       ],
       "conditionals": [
         {
@@ -10936,7 +10938,8 @@
         "Quantifier instantiation decoding now accepts *[]ASTHandle and appends borrowed expression handles directly; removed ASTProofBindings and its source-vector backing/header lifecycle. The source fact assignment, debug empty-output assertion, parameter extraction order, partial malformed-parameter outputs and nonowning reference counts remain. Hyper-resolution builder uses a native argument slice; omitted unused fmls/sorts storage while preserving premise fact validation before actual parameter construction. Removed astProofRawArguments. No source container growth/refusal behavior is credited; hyper-resolution inputs and owning outputs are also native slices.",
         "Hyper-resolution builder accepts borrowed [][]ASTHandle substitutions. Reader appends owning handles into *[]ASTHandle premises and native [][]ASTHandle substitution rows; caller owns appended premise DECs, while ASTProofHyperOutput retires its substitutions in ascending outer/inner order. Position/row growth uses Go append directly with no vector headers/backing charge or growth-only unjoined INC. Output Close records consumed slots before errors, retains unconsumed ownership for retry, and blocks new use once cleanup starts. Source parameter/position conversion order, malformed-prefix publication, conclusion ASTRef assignment and actual owner-header checks remain. Native wide decoding verifies exact published reference counts under disabled arena reservations and independent outputs after source proof destruction. No source container allocation-failure geometry is credited.",
         "Removed the unused ASTRefVector general bridge, push receipts, physical element/iterator borrows and argument-view adapters after retained callers migrated to native slices. Production Go had no consumer beyond these bridge adapters; source ref_vector functionality used by retained algorithms is represented by their concrete native owning slices and scalar ASTRef. Removed bridge-only tests and source growth/refusal claims. Live mark/shared-occurrence test fixtures acquire and release native handle slices explicitly; borrowed BV argument range tests use SliceArguments.Range. Actual dependency-buffer raw word codecs stay at their concrete buffer consumer. This adds no generic container implementation credit and does not assert completion of other reference specializations.",
-        "Removed unused Go ASTDependencyRef scalar/vector/buffer adapters and their physical borrows, growth/copy/lifecycle tests and cleanup codecs. Caller audit found these APIs exclusively within their bridge implementations/tests after retained consumers migrated to concrete native ownership. Source expr_dependency_ref uses are not classified as dead: actual Go dependency DAG and goal ownership callbacks remain. The separate ASTManager vectorAllocator had no remaining production payload consumer and is removed from construction/statistics/teardown; its old diagnostic bit position is reserved to avoid renumbering remaining constructor bits. The live substitution dependency pointer conversion remains as a concrete substitution helper. Live substitution tests retain actual allocator/ownership/refcount checks and drop only observations of the unrelated empty adapter allocator. No generic template/container or whole-unit completion credit is added."
+        "Removed unused Go ASTDependencyRef scalar/vector/buffer adapters and their physical borrows, growth/copy/lifecycle tests and cleanup codecs. Caller audit found these APIs exclusively within their bridge implementations/tests after retained consumers migrated to concrete native ownership. Source expr_dependency_ref uses are not classified as dead: actual Go dependency DAG and goal ownership callbacks remain. The separate ASTManager vectorAllocator had no remaining production payload consumer and is removed from construction/statistics/teardown; its old diagnostic bit position is reserved to avoid renumbering remaining constructor bits. The live substitution dependency pointer conversion remains as a concrete substitution helper. Live substitution tests retain actual allocator/ownership/refcount checks and drop only observations of the unrelated empty adapter allocator. No generic template/container or whole-unit completion credit is added.",
+        "The retained goal native-slice owner uses DependencyDecConsumed to observe whether a real root decrement occurred before a subsequent destruction error. DependencyDec delegates to the same existing decrement path; source counter/debug and destruction order remain. No generic container credit is added."
       ]
     },
     {
@@ -11015,7 +11018,8 @@
         "pkg/ast/ast_core_source_constructor.go",
         "pkg/ast/ast_debug_ref_count.go",
         "pkg/ast/ast_some_value_proc_test.go",
-        "pkg/ast/ast_rewriter_access.go"
+        "pkg/ast/ast_rewriter_access.go",
+        "pkg/ast/ast_dependency_consumed_test.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -11177,7 +11181,8 @@
         "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix",
         "TestASTProofQuantReaderMalformedParameterKeepsAppendPrefix",
         "TestASTProofHyperNativeWideReaderExactOwnershipAndIndependentOutputs",
-        "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix"
+        "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix",
+        "TestASTDependencyDecConsumedActualRootOwnership"
       ],
       "conditionals": [
         {
@@ -11957,7 +11962,8 @@
         "Quantifier instantiation decoding now accepts *[]ASTHandle and appends borrowed expression handles directly; removed ASTProofBindings and its source-vector backing/header lifecycle. The source fact assignment, debug empty-output assertion, parameter extraction order, partial malformed-parameter outputs and nonowning reference counts remain. Hyper-resolution builder uses a native argument slice; omitted unused fmls/sorts storage while preserving premise fact validation before actual parameter construction. Removed astProofRawArguments. No source container growth/refusal behavior is credited; hyper-resolution inputs and owning outputs are also native slices.",
         "Hyper-resolution builder accepts borrowed [][]ASTHandle substitutions. Reader appends owning handles into *[]ASTHandle premises and native [][]ASTHandle substitution rows; caller owns appended premise DECs, while ASTProofHyperOutput retires its substitutions in ascending outer/inner order. Position/row growth uses Go append directly with no vector headers/backing charge or growth-only unjoined INC. Output Close records consumed slots before errors, retains unconsumed ownership for retry, and blocks new use once cleanup starts. Source parameter/position conversion order, malformed-prefix publication, conclusion ASTRef assignment and actual owner-header checks remain. Native wide decoding verifies exact published reference counts under disabled arena reservations and independent outputs after source proof destruction. No source container allocation-failure geometry is credited.",
         "Removed the unused ASTRefVector general bridge, push receipts, physical element/iterator borrows and argument-view adapters after retained callers migrated to native slices. Production Go had no consumer beyond these bridge adapters; source ref_vector functionality used by retained algorithms is represented by their concrete native owning slices and scalar ASTRef. Removed bridge-only tests and source growth/refusal claims. Live mark/shared-occurrence test fixtures acquire and release native handle slices explicitly; borrowed BV argument range tests use SliceArguments.Range. Actual dependency-buffer raw word codecs stay at their concrete buffer consumer. This adds no generic container implementation credit and does not assert completion of other reference specializations.",
-        "Removed unused Go ASTDependencyRef scalar/vector/buffer adapters and their physical borrows, growth/copy/lifecycle tests and cleanup codecs. Caller audit found these APIs exclusively within their bridge implementations/tests after retained consumers migrated to concrete native ownership. Source expr_dependency_ref uses are not classified as dead: actual Go dependency DAG and goal ownership callbacks remain. The separate ASTManager vectorAllocator had no remaining production payload consumer and is removed from construction/statistics/teardown; its old diagnostic bit position is reserved to avoid renumbering remaining constructor bits. The live substitution dependency pointer conversion remains as a concrete substitution helper. Live substitution tests retain actual allocator/ownership/refcount checks and drop only observations of the unrelated empty adapter allocator. No generic template/container or whole-unit completion credit is added."
+        "Removed unused Go ASTDependencyRef scalar/vector/buffer adapters and their physical borrows, growth/copy/lifecycle tests and cleanup codecs. Caller audit found these APIs exclusively within their bridge implementations/tests after retained consumers migrated to concrete native ownership. Source expr_dependency_ref uses are not classified as dead: actual Go dependency DAG and goal ownership callbacks remain. The separate ASTManager vectorAllocator had no remaining production payload consumer and is removed from construction/statistics/teardown; its old diagnostic bit position is reserved to avoid renumbering remaining constructor bits. The live substitution dependency pointer conversion remains as a concrete substitution helper. Live substitution tests retain actual allocator/ownership/refcount checks and drop only observations of the unrelated empty adapter allocator. No generic template/container or whole-unit completion credit is added.",
+        "The retained goal native-slice owner uses DependencyDecConsumed to observe whether a real root decrement occurred before a subsequent destruction error. DependencyDec delegates to the same existing decrement path; source counter/debug and destruction order remain. No generic container credit is added."
       ]
     },
     {
@@ -96654,7 +96660,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/tactic/tactic_goal.go"
+        "pkg/tactic/tactic_goal.go",
+        "pkg/tactic/tactic_goal_ownership.go"
       ],
       "tests": [
         "TestTacticGoalAssertionSplittingAndSourceOrder",
@@ -96668,7 +96675,9 @@
         "TestTacticGoalUpdateLiteralFalseHeadSourceBehavior",
         "TestTacticGoalAssertionsToSATAndValidatedModel",
         "TestTacticGoalProofUpdateKeepsDerivedFacts",
-        "TestTacticGoalSourceDepthPrecisionCountsAndReferences"
+        "TestTacticGoalSourceDepthPrecisionCountsAndReferences",
+        "TestTacticGoalNativeSlicesGrowCopyUpdateAndRelease",
+        "TestTacticGoalNativeSlicesKeepActualPublicationPrefix"
       ],
       "assertions": [
         {
@@ -96752,7 +96761,8 @@
         "quick_process temporary negations now use a native []ASTHandle with explicit INC before append and DEC on lexical exit, matching the source expr_ref_vector ownership. This corrects the prior nonowning expression-vector borrow. Goal output acquisition still precedes temporary cleanup."
       ],
       "deviations": [
-        "Display/printing, cross-manager translation, is_well_sorted, is_equal, the default and copying constructor facades remain unported. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred."
+        "Display/printing, cross-manager translation, is_well_sorted, is_equal, the default and copying constructor facades remain unported. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
+        "Goal forms/proofs/dependencies now own native []ASTHandle/[]ASTDependency slices. Copies acquire independent element pins and backing rather than persistent-array reroot graphs; native growth has no emulated allocation geometry. Actual formula/proof/core publication order, saved-first and literal-false update behavior, snapshot isolation, depth/precision and explicit reference ownership remain. Concrete ownership helpers retire consumed references even when destruction reports an error, and retain unconsumed guard failures. Added 129-row native/debug growth/copy/update/shrink/close tests with arena reservations disabled and exact formula/proof/dependency pin checks, plus a real foreign-core guard publication-prefix check. Printing/translation and other declared gaps remain open."
       ]
     },
     {
@@ -96761,7 +96771,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/tactic/tactic_goal.go"
+        "pkg/tactic/tactic_goal.go",
+        "pkg/tactic/tactic_goal_ownership.go"
       ],
       "tests": [
         "TestTacticGoalAssertionSplittingAndSourceOrder",
@@ -96775,7 +96786,9 @@
         "TestTacticGoalUpdateLiteralFalseHeadSourceBehavior",
         "TestTacticGoalAssertionsToSATAndValidatedModel",
         "TestTacticGoalProofUpdateKeepsDerivedFacts",
-        "TestTacticGoalSourceDepthPrecisionCountsAndReferences"
+        "TestTacticGoalSourceDepthPrecisionCountsAndReferences",
+        "TestTacticGoalNativeSlicesGrowCopyUpdateAndRelease",
+        "TestTacticGoalNativeSlicesKeepActualPublicationPrefix"
       ],
       "conditionals": [
         {
@@ -96814,7 +96827,8 @@
         "Goal expression/dependency arrays retain their actual AST-manager owners. Assertions retain f/pr/dependencies through processing; false replacement protects proof/dependency references before reset. Redundancy membership uses local borrowed Go maps; original formula prefix/suffix ownership keeps encountered atoms alive through compaction. NumExprs shares a native identity map across formulas and the existing postorder project visitor with native frames, preserving shared-only deduplication, quantifier children and associative application weight. No shared mark/trail or native-frame backing reservation is credited at these callers."
       ],
       "deviations": [
-        "Display/printing, cross-manager translation, is_well_sorted, is_equal, the default and copying constructor facades remain unported. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred."
+        "Display/printing, cross-manager translation, is_well_sorted, is_equal, the default and copying constructor facades remain unported. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
+        "Goal forms/proofs/dependencies now own native []ASTHandle/[]ASTDependency slices. Copies acquire independent element pins and backing rather than persistent-array reroot graphs; native growth has no emulated allocation geometry. Actual formula/proof/core publication order, saved-first and literal-false update behavior, snapshot isolation, depth/precision and explicit reference ownership remain. Concrete ownership helpers retire consumed references even when destruction reports an error, and retain unconsumed guard failures. Added 129-row native/debug growth/copy/update/shrink/close tests with arena reservations disabled and exact formula/proof/dependency pin checks, plus a real foreign-core guard publication-prefix check. Printing/translation and other declared gaps remain open."
       ]
     },
     {
@@ -112771,7 +112785,8 @@
         "pkg/ast/ast_dependency_array.go",
         "pkg/ast/ast_dependency_array_api.go",
         "pkg/ast/ast_dependency_array_values.go",
-        "pkg/ast/ast_dependency_traversal.go"
+        "pkg/ast/ast_dependency_traversal.go",
+        "pkg/ast/ast_dependency_consumed_test.go"
       ],
       "tests": [
         "TestASTDependencyNativeLIFOCallbacksWithReservationsDisabled",
@@ -112800,7 +112815,8 @@
         "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
         "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation",
         "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
-        "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix"
+        "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix",
+        "TestASTDependencyDecConsumedActualRootOwnership"
       ],
       "conditionals": [
         {
@@ -113074,7 +113090,8 @@
         "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers."
       ],
       "deviations": [
-        "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics."
+        "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",
+        "The retained goal native-slice owner uses DependencyDecConsumed to observe whether a real root decrement occurred before a subsequent destruction error. DependencyDec delegates to the same existing decrement path; source counter/debug and destruction order remain. No generic container credit is added."
       ]
     },
     {

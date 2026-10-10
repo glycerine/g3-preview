@@ -175,24 +175,29 @@ func (d *astDependencyManager) join(a, b arena.SmallBytesRef) (arena.SmallBytesR
 	return r, e
 }
 func (d *astDependencyManager) dec(r arena.SmallBytesRef) error {
+	_, e := d.decConsumed(r)
+	return e
+}
+
+func (d *astDependencyManager) decConsumed(r arena.SmallBytesRef) (bool, error) {
 	if dependencyNull(r) {
-		return nil
+		return true, nil
 	}
 	c, e := d.node(r)
 	if e != nil {
-		return e
+		return false, e
 	}
 	if ASTSourceDebug && c.rc == 0 {
-		return ErrASTDomain
+		return false, ErrASTDomain
 	}
 	c.rc = (c.rc - 1) & astDependencyMaxRC
 	if e = d.store(r, c); e != nil {
-		return e
+		return false, e
 	}
 	if c.rc != 0 {
-		return nil
+		return true, nil
 	}
-	return d.del(r)
+	return true, d.del(r)
 }
 
 // Native scratch preserves left/right enqueue and LIFO destruction order.

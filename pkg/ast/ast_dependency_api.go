@@ -50,15 +50,22 @@ func (m *ASTManager) DependencyInc(h ASTDependency) error {
 	return m.dependencies.inc(r)
 }
 func (m *ASTManager) DependencyDec(h ASTDependency) error {
+	_, e := m.DependencyDecConsumed(h)
+	return e
+}
+
+// DependencyDecConsumed reports whether the root reference was decremented,
+// including when subsequent AST destruction reports an error.
+func (m *ASTManager) DependencyDecConsumed(h ASTDependency) (bool, error) {
 	if e := m.lock(); e != nil {
-		return e
+		return false, e
 	}
 	defer m.mu.Unlock()
 	r, e := m.dependencies.valid(h)
 	if e != nil {
-		return e
+		return false, e
 	}
-	return m.dependencies.dec(r)
+	return m.dependencies.decConsumed(r)
 }
 func (m *ASTManager) DependencyRefCount(h ASTDependency) (uint32, error) {
 	if e := m.lock(); e != nil {

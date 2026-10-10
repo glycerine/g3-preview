@@ -34432,3 +34432,36 @@ Module-wide compilation, AST vet and manifest checks passed. Counts remain
 No full native module rerun after the previous hourly run. Goal forms/proofs
 and dependencies remain the next live native-slice migration; internal util
 boundaries and the complete root util split are still unfinished.
+
+## Native goal formula, proof and dependency slices
+
+Migrated the last production ASTExprArray/ASTDependencyArray consumer, Goal,
+to owning []ASTHandle formulas/proofs and []ASTDependency cores. Concrete goal
+operations acquire real element references before publication, replace with
+consumed-decrement tracking, and release in source member/slot order. Copies
+acquire independent backing and pins, preserving snapshot isolation across
+updates and resets. Native slice growth/copy has no persistent-array reroot or
+emulated capacity reservation. Source saved-first/literal-false update behavior,
+formula/proof/core publication order, and depth/precision algebra remain.
+
+DependencyDec now delegates to the same decrement transport with an explicit
+consumption result. DependencyDecConsumed exposes that result to the live goal
+owner; a later AST destruction error cannot cause repeated decrement on close.
+Counter/debug behavior and dependency destruction order are unchanged. Actual
+root, empty, freed and foreign ownership cases have focused native/debug checks.
+
+New 129-row integration grows all three owning slices, replaces a populated
+snapshot twice, self-copies, updates the original, resets, shrinks and closes
+with arena reservations disabled. Exact formula/proof/dependency pins and
+snapshot identities are checked. A foreign dependency guard verifies that real
+formula/proof publication survives a rejected core and is subsequently released.
+
+Validation: added native slice checks passed (0.012s); final native tactic/SAT
+tactic/API passed (0.026s/cached/cached); final debug goal checks passed (0.018s).
+Full native AST passed (19.700s), full debug AST passed (20.008s). Module-wide
+compilation, AST/tactic vet, manifest and diff checks passed. Counts remain
+2102 units/677 APIs:62 ported,283 partial,1729 unported,two dead/deleted.
+No full native module rerun within the hourly interval. The persistent-array
+adapters now have no production consumer outside their own implementations;
+remove those unused bridges next. Internal util boundaries and complete root
+util subpackage split remain unfinished.
