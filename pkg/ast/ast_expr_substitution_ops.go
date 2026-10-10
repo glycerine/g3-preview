@@ -41,7 +41,7 @@ func (m *ASTManager) substInc(which uint32, r astNodeRef) error {
 }
 func (m *ASTManager) substDec(which uint32, r astNodeRef) (bool, error) {
 	if which == 2 {
-		return m.dependencyArrays.valueDec(substDependencyPointer(r))
+		return m.dependencies.decConsumed(substDependencyPointer(r))
 	}
 	return m.decNode(r)
 }

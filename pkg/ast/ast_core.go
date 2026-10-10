@@ -84,10 +84,8 @@ func constructSourceASTManager(c ASTManagerConfig, format bool, filename TraceFi
 		return fail(e)
 	}
 	m.constructorMembers |= astCtorFamilies
-	m.exprArrays = astExprArrayManager{owner: m, allocator: m.allocator, budget: m.BudgetField, id: m.origin, preserve: true}
 	m.dependencies = astDependencyManager{owner: m, allocator: m.allocator}
-	m.dependencyArrays = astDependencyArrayManager{owner: m, allocator: m.allocator, budget: m.BudgetField, id: m.origin, preserve: true}
-	m.constructorMembers |= astCtorArrays
+	m.constructorMembers |= astCtorDependencies
 	m.initTable()
 	m.constructorMembers |= astCtorTable | astCtorIDGenerators
 	m.DebugFreeIndices = make(map[uint32]struct{})
@@ -440,9 +438,7 @@ func (m *ASTManager) closeCore(source bool) error {
 	m.declIDs.Cleanup(1 << 31)
 	m.ExprIDs.Cleanup(0)
 	m.table = astCanonicalTable{}
-	m.dependencyArrays.closeAfterNodeTeardown()
 	m.dependencies.closeAfterNodeTeardown()
-	m.exprArrays.closeAfterNodeTeardown()
 	if m.families != nil {
 		note(m.families.Close())
 		if source && failure != nil {

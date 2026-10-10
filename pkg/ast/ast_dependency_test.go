@@ -130,21 +130,6 @@ func TestASTDependencySourceReferenceCountZeroAndWrap(t *testing.T) {
 
 func TestASTDependencyCompletePublicMethodContracts(t *testing.T) {
 	var _ func(*ASTManager, []ASTHandle) (ASTDependencyJoinProgress, error) = (*ASTManager).DependencyJoinValues
-	var _ func(*ASTManager, *ASTDependencyArray) error = (*ASTManager).DependencyArrayMk
-	var _ func(*ASTManager, *ASTDependencyArray) error = (*ASTManager).DependencyArrayDel
-	var _ func(*ASTManager, *ASTDependencyArray, *ASTDependencyArray) error = (*ASTManager).DependencyArrayCopy
-	var _ func(*ASTManager, *ASTDependencyArray) (uint32, error) = (*ASTManager).DependencyArraySize
-	var _ func(*ASTManager, *ASTDependencyArray) (bool, error) = (*ASTManager).DependencyArrayEmpty
-	var _ func(*ASTManager, *ASTDependencyArray, uint32) (ASTDependency, error) = (*ASTManager).DependencyArrayGet
-	var _ func(*ASTManager, *ASTDependencyArray, uint32, ASTDependency) error = (*ASTManager).DependencyArraySet
-	var _ func(*ASTManager, *ASTDependencyArray, uint32, ASTDependency, *ASTDependencyArray) error = (*ASTManager).DependencyArraySetFrom
-	var _ func(*ASTManager, *ASTDependencyArray, ASTDependency) error = (*ASTManager).DependencyArrayPush
-	var _ func(*ASTManager, *ASTDependencyArray, ASTDependency, *ASTDependencyArray) error = (*ASTManager).DependencyArrayPushFrom
-	var _ func(*ASTManager, *ASTDependencyArray) error = (*ASTManager).DependencyArrayPop
-	var _ func(*ASTManager, *ASTDependencyArray, *ASTDependencyArray) error = (*ASTManager).DependencyArrayPopFrom
-	var _ func(*ASTManager, *ASTDependencyArray) error = (*ASTManager).DependencyArrayUnshare
-	var _ func(*ASTManager, *ASTDependencyArray) error = (*ASTManager).DependencyArrayUnfold
-	var _ func(*ASTManager, *ASTDependencyArray) error = (*ASTManager).DependencyArrayReroot
 }
 
 func TestASTDependencyIndependentDAGOracleProvenanceAndWarmStorage(t *testing.T) {

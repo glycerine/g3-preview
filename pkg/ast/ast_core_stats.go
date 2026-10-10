@@ -19,7 +19,7 @@ func (m *ASTManager) Stats() ASTManagerStats {
 	if m.Closed {
 		return ASTManagerStats{}
 	}
-	s := ASTManagerStats{LiveNodes: m.liveNodes, LiveParameters: m.liveParameters, LiveInfos: m.liveInfos, LiveReferences: m.liveReferences, ArrayLiveCells: m.exprArrays.liveCells, OwnerBytes: m.ownerBytes, PageBytes: m.pageBytes, DirectoryBytes: m.directoryBytes}
+	s := ASTManagerStats{LiveNodes: m.liveNodes, LiveParameters: m.liveParameters, LiveInfos: m.liveInfos, LiveReferences: m.liveReferences, OwnerBytes: m.ownerBytes, PageBytes: m.pageBytes, DirectoryBytes: m.directoryBytes}
 	s.AllocatedBytes = m.datatypePluginBytes() + m.auxiliaryPluginBytes() + m.floatingPointPluginBytes() + m.sequencePluginBytes() + m.plugins.bytes() + m.arrayCardinalityBytes() + m.arrayPluginBytes() + m.arithmeticPluginBytes() + m.bitVectorPluginBytes() + m.formatPluginBytes() + m.formatFramesBytes() + m.ppFramesBytes() + s.OwnerBytes + s.PageBytes + s.DirectoryBytes + uint64(cap(m.builtin.userNames))*uint64(reflect.TypeOf(usymbol.Symbol{}).Size())
 	for _, state := range m.scopedExprSubstitutions {
 		s.AllocatedBytes += state.header
@@ -46,7 +46,7 @@ func (m *ASTManager) Stats() ASTManagerStats {
 	for _, v := range m.basic.proofCaches {
 		s.AllocatedBytes += uint64(cap(v)) * width
 	}
-	s.AllocatedBytes += uint64(m.ExprIDs.FreeCapacity()+m.declIDs.FreeCapacity())*4 + uint64(cap(m.exprArrays.getTmp)+cap(m.exprArrays.rerootTmp))*8
+	s.AllocatedBytes += uint64(m.ExprIDs.FreeCapacity()+m.declIDs.FreeCapacity()) * 4
 	if m.allocator != nil {
 		a := m.allocator.Stats()
 		s.AllocatedBytes += a.OwnerBytes + a.PayloadBytes + a.MetadataBytes + a.DirectoryBytes

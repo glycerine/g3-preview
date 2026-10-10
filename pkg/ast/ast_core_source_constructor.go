@@ -9,7 +9,7 @@ const (
 	astCtorAllocator uint32 = 1 << iota
 	astCtorFamilies
 	_ // retired unused reference-vector allocator bit
-	astCtorArrays
+	astCtorDependencies
 	astCtorTable
 	astCtorIDGenerators
 	astCtorDebugFree
@@ -71,10 +71,8 @@ func (m *ASTManager) unwindConstructorMembers() error {
 		m.constructorMemberStage = 3
 	}
 	if m.constructorMemberStage == 3 {
-		if m.constructorMembers&astCtorArrays != 0 {
-			m.dependencyArrays.closeAfterNodeTeardown()
+		if m.constructorMembers&astCtorDependencies != 0 {
 			m.dependencies.closeAfterNodeTeardown()
-			m.exprArrays.closeAfterNodeTeardown()
 		}
 		m.constructorMemberStage = 4
 	}

@@ -34465,3 +34465,35 @@ No full native module rerun within the hourly interval. The persistent-array
 adapters now have no production consumer outside their own implementations;
 remove those unused bridges next. Internal util boundaries and complete root
 util subpackage split remain unfinished.
+
+## Remove unused persistent AST array adapters
+
+After native goal migration, the only remaining production dependency-array
+reference was a scalar decrement helper used by substitution. It now invokes
+the actual dependency DAG decConsumed transport directly, with the same root,
+RC/debug and consumed-error semantics. Removed 11 expression/dependency array
+and layout files, 22 bridge-only tests (including the generic million-update
+stress workload), and array portions of the mixed source AST test. Retained
+Boolean interning assertions under TestASTSourceInterningAssertions; native goal
+integration verifies real snapshot identity and formula/proof/core ownership.
+
+Removed embedded array managers, codecs, scratch, construction/teardown and
+array-only statistics. The eagerly bound dependency DAG manager remains; its
+constructor bit position is unchanged and now named astCtorDependencies.
+Constructor and substitution tests retain their real dependency ownership checks.
+Search across all Go files finds no remaining array bridge names or callers.
+
+Manifest explicitly withdraws obsolete generic parray/standalone stress credit:
+src/util/parray.h and src/test/parray.cpp are unported, not dead. Subpaving's
+actual specialization remains unported at its consumer. Removed bridge method,
+target and test claims while retaining native goal and AST interning evidence.
+Counts are now2102 units/677 APIs:62 ported,281 partial,1731 unported,two
+dead/deleted; the two decreased partial counts reflect removed claims.
+
+Validation: focused dependency/substitution/constructor/interning checks passed
+(0.114s). Full native AST/rewriter/model/tactic/SAT tactic/API passed
+(18.398s/10.200s/0.056s/0.030s/0.115s/0.011s); full debug AST passed (17.952s).
+Module-wide compilation, AST/tactic vet, manifest and diff checks passed. No
+full native module rerun within the hourly interval. Root util still has286
+production files and43 dependency components; internal private boundaries and
+the requested complete subpackage split remain unfinished.

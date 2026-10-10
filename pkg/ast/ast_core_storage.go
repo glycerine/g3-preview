@@ -58,8 +58,8 @@ type ASTManagerConfig struct {
 	OutOfMemory func() bool
 }
 type ASTManagerStats struct {
-	LiveNodes, LiveParameters, LiveInfos, LiveReferences, ArrayLiveCells uint32
-	AllocatedBytes, OwnerBytes, PageBytes, DirectoryBytes                uint64
+	LiveNodes, LiveParameters, LiveInfos, LiveReferences  uint32
+	AllocatedBytes, OwnerBytes, PageBytes, DirectoryBytes uint64
 }
 type ASTParameter struct {
 	origin           uint64
@@ -76,11 +76,6 @@ type ASTFuncDeclInfo struct {
 type ASTRef struct {
 	origin           uint64
 	slot, generation uint32
-}
-type ASTExprArray struct {
-	origin  uint64
-	cell    arena.SmallBytesRef
-	updates uint32
 }
 type ASTParameterKind uint32
 
@@ -283,9 +278,6 @@ type ASTManager struct {
 	boolSort, proofSort, trueApp, falseApp, undefProof                                                 astNodeRef
 	deletionHead, deletionCurrent                                                                      astNodeRef
 	pendingDeletionHead, pendingDeletionCurrent                                                        astNodeRef
-	exprArrays                                                                                         astExprArrayManager
-	// Actual AST-valued dependency manager and persistent-array specialization;
-	// borrowed owners are bound eagerly and scratch backing is charged on use.
 	// Source fresh_id and lexical func_decl_info storage; included in owner header.
 	freshID                                        uint32
 	freshInfo                                      astInfoRecord
@@ -311,8 +303,8 @@ type ASTManager struct {
 	formatFrameSerial                              uint64
 	ppFrames                                       *astFormatPPFrame
 	ppFrameSerial                                  uint64
-	dependencies                                   astDependencyManager
-	dependencyArrays                               astDependencyArrayManager
+	// Actual dependency DAG owner is bound eagerly to this manager and allocator.
+	dependencies astDependencyManager
 }
 
 func astNextOrigin() (uint64, error) {
