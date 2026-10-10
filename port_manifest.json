@@ -24410,7 +24410,7 @@
         "TestBVTrailingEmptyCompoundsAndUnreadOperands",
         "TestBVTrailingEveryColdCountReservation",
         "TestBVTrailingConstructorBorrowsExtractionOwner",
-        "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+        "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
         "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
         "TestASTBitVectorNumeralScopeOriginalLifetime",
@@ -24544,7 +24544,7 @@
           "go_target": "pkg/ast/rewriter/bv_trailing.go",
           "tests": [
             "TestBVTrailingConstructorBorrowsExtractionOwner",
-            "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+            "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
             "TestBVTrailingCacheGrowthAndEqualThresholdReset",
             "TestBVTrailingResetConsumedKeyAfterDeletionFailure"
           ]
@@ -24626,7 +24626,7 @@
         "TestBVTrailingEmptyCompoundsAndUnreadOperands",
         "TestBVTrailingEveryColdCountReservation",
         "TestBVTrailingConstructorBorrowsExtractionOwner",
-        "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+        "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
         "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
         "TestBVTrailingOriginalStructuralRemoval",
@@ -24671,7 +24671,7 @@
           "go_target": "pkg/ast/rewriter/bv_trailing.go",
           "tests": [
             "TestBVTrailingConstructorBorrowsExtractionOwner",
-            "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+            "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
             "TestBVTrailingCacheGrowthAndEqualThresholdReset",
             "TestBVTrailingResetConsumedKeyAfterDeletionFailure"
           ]
@@ -115094,7 +115094,7 @@
         "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
         "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal",
         "TestBVTrailingConstructorBorrowsExtractionOwner",
-        "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+        "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
         "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
         "TestBVTrailingEveryColdCountReservation"
@@ -115398,7 +115398,7 @@
           "go_target": "pkg/ast/rewriter/bv_trailing_table.go",
           "tests": [
             "TestBVTrailingConstructorBorrowsExtractionOwner",
-            "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+            "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
             "TestBVTrailingCacheGrowthAndEqualThresholdReset",
             "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
             "TestBVTrailingEveryColdCountReservation"
@@ -137810,7 +137810,7 @@
         "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
         "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths",
         "TestBVTrailingConstructorBorrowsExtractionOwner",
-        "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+        "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
         "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
         "TestBVTrailingEveryColdCountReservation"
@@ -137924,7 +137924,7 @@
           "go_target": "pkg/ast/rewriter/bv_trailing_table.go",
           "tests": [
             "TestBVTrailingConstructorBorrowsExtractionOwner",
-            "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+            "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
             "TestBVTrailingCacheGrowthAndEqualThresholdReset",
             "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
             "TestBVTrailingEveryColdCountReservation"

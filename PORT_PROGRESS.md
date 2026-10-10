@@ -32596,3 +32596,26 @@ list; all counts/statuses remain 2102 units/677 APIs, 63 ported, 284 partial,
 AST collections include owning trailing-bit caches and substitution/shared
 occurrence tables, in addition to SAT containers and text consumers. Internal
 util numeric/text/parameter cycles still precede the complete subpackage split.
+
+## Native owning bit-vector trailing-bit cache
+
+Replaced the trailing-bit cache's open-addressed table, geometric rehashing and
+simulated bucket allocation charges with insdict.Dict[uint64,bvTrailingEntry].
+Keys encode checked AST slot/generation identity within the owning manager.
+Insertion order gives deterministic cleanup; each entry records whether its
+reference was consumed before any deletion error is returned, preserving safe
+retry. Actual cold table headers and key INC/DEC ownership remain. Removed the
+pending-reference guard that existed solely for fallible container insertion.
+
+The native growth test covers 257 pinned keys with reservations disabled after
+the actual cold header is created, exact reference counts, insertion order,
+cache hits and strict/equal reset thresholds. Existing stopped-deletion cleanup
+coverage still passes and verifies retry does not decrement a consumed key twice.
+Manifest evidence uses the renamed native growth test; statuses are unchanged.
+
+Validation: full native rewriter passed (13.964s); focused g3debug trailing-bit
+coverage passed (0.277s). Module-wide compilation, rewriter vet, manifest evidence
+and diff checks passed. This checkpoint was recovered after the power loss.
+The util knot is not resolved: retained AST substitution/shared-occurrence
+collections, SAT vectors and NumericTextStream consumers still need conversion,
+and internal util dependency cycles still precede the complete subpackage split.

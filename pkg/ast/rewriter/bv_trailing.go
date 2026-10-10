@@ -18,8 +18,6 @@ type BVTrailing struct {
 	extract                       *MkExtractProc
 	manager                       *ast.ASTManager
 	tables                        [6]*bvTrailingTable
-	pending                       ast.ASTHandle
-	pendingOwned                  bool
 	header                        uint64
 	running, closed               bool
 	failure                       error
@@ -145,11 +143,9 @@ func (p *BVTrailing) cache(depth uint32, arg ast.ASTHandle, min, max uint32) err
 	if e := p.manager.IncRef(arg); e != nil {
 		return e
 	}
-	p.pending, p.pendingOwned = arg, true
-	if e := p.tables[depth].insert(p.manager, arg, min, max); e != nil {
-		return e
-	}
-	p.pending, p.pendingOwned = ast.ASTHandle{}, false
+	// Native insertion publishes the acquired reference without a fallible
+	// container-growth step between INC and transfer to the entry.
+	p.tables[depth].insert(arg, min, max)
 	return nil
 }
 
@@ -166,7 +162,7 @@ func (p *BVTrailing) resetCache(condition uint32) error {
 	}
 	for depth := uint32(1); depth <= bvTrailingDepth; depth++ {
 		table := p.tables[depth]
-		if table == nil || condition != 0 && table.size < condition {
+		if table == nil || condition != 0 && uint32(table.entries.Len()) < condition {
 			continue
 		}
 		if e := table.close(p.manager); e != nil {
@@ -204,19 +200,9 @@ func (p *BVTrailing) Close() error {
 			return e
 		}
 	}
-	if p.pendingOwned {
-		consumed, e := p.manager.DecRefConsumed(p.pending)
-		if consumed {
-			p.pendingOwned = false
-		}
-		if e != nil {
-			return e
-		}
-	}
 	if e := p.resetCache(0); e != nil {
 		return e
 	}
-	p.pending = ast.ASTHandle{}
 	p.manager.Budget().Release(p.header)
 	p.header = 0
 	p.closed = true

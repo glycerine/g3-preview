@@ -100,60 +100,67 @@ func TestBVTrailingOriginalCountingAlgorithms(t *testing.T) {
 	}
 }
 
-func TestBVTrailingCacheReferencesGrowthAndResetThreshold(t *testing.T) {
+func TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold(t *testing.T) {
 	m, p, _ := bvTrailingFixture(t)
 	sort, e := m.BitVectorSort(8)
 	satOK(t, e)
-	var keys []ast.ASTHandle
-	for i := 0; i < 7; i++ {
-		x, e := m.MkVar(uint32(i), sort)
+	const count = 257
+	keys := make([]ast.ASTHandle, count)
+	for i := range keys {
+		keys[i], e = m.MkVar(uint32(i), sort)
 		satOK(t, e)
-		astTestPin(t, m, x)
-		keys = append(keys, x)
-		before, e := m.GetRefCount(x)
+		astTestPin(t, m, keys[i])
+	}
+	// The first actual lazy table owns a cold header. All following growth
+	// uses the native dictionary and must preserve exact INC ownership.
+	_, _, e = p.Count(keys[0])
+	satOK(t, e)
+	used, storage := m.Budget().Used(), m.Stats()
+	m.Budget().FailAfter(0)
+	for _, key := range keys[1:] {
+		before, e := m.GetRefCount(key)
 		satOK(t, e)
-		min, max, e := p.Count(x)
+		min, max, e := p.Count(key)
 		satOK(t, e)
-		after, e := m.GetRefCount(x)
+		after, e := m.GetRefCount(key)
 		satOK(t, e)
 		if min != 0 || max != 8 || after != before+1 {
-			t.Fatal("cache must own exactly one key reference")
+			t.Fatal("native cache must own exactly one key reference", key, min, max, after)
 		}
 	}
-	if len(p.tables[5].entries) != 8 || p.tables[5].size != 7 {
-		t.Fatal("initial source capacity/load threshold")
+	index := 0
+	for _, entry := range p.tables[5].entries.All() {
+		if entry.key != keys[index] || !entry.owned || entry.min != 0 || entry.max != 8 {
+			t.Fatal("native growth changed ordered owning entry", index, entry)
+		}
+		index++
 	}
-	satOK(t, p.ResetCache(8))
-	if p.tables[5] == nil {
-		t.Fatal("strict reset threshold")
+	if index != count || m.Budget().Used() != used || m.Stats() != storage {
+		t.Fatal("native cache growth changed actual object storage")
 	}
-	x, e := m.MkVar(7, sort)
-	satOK(t, e)
-	astTestPin(t, m, x)
-	before, e := m.GetRefCount(x)
-	satOK(t, e)
-	m.Budget().FailAfter(0)
-	_, _, body := p.Count(x)
+	satOK(t, p.ResetCache(count+1))
+	if p.tables[5] == nil || p.tables[5].entries.Len() != count {
+		t.Fatal("strict reset threshold changed")
+	}
+	for _, key := range keys {
+		min, max, e := p.Count(key)
+		satOK(t, e)
+		rc, e := m.GetRefCount(key)
+		satOK(t, e)
+		if min != 0 || max != 8 || rc != 2 {
+			t.Fatal("cache hit reacquired key", key, rc)
+		}
+	}
 	m.Budget().FailAfter(-1)
-	after, e := m.GetRefCount(x)
-	satOK(t, e)
-	if !errors.Is(body, arena.ErrInjectedFailure) || after != before+1 || !p.pendingOwned || p.pending != x || p.tables[5].size != 7 {
-		t.Fatal("growth failure must follow INC", body, before, after)
+	satOK(t, p.ResetCache(count))
+	if p.tables[5] != nil {
+		t.Fatal("equal threshold did not retire table")
 	}
-	if _, _, e = p.Count(x); !errors.Is(e, ast.ErrASTPending) {
-		t.Fatal("stopped owner retried", e)
-	}
-	satOK(t, p.Close())
-	after, e = m.GetRefCount(x)
-	satOK(t, e)
-	if after != before {
-		t.Fatal("pending INC not retired")
-	}
-	for _, k := range keys {
-		rc, e := m.GetRefCount(k)
+	for _, key := range keys {
+		rc, e := m.GetRefCount(key)
 		satOK(t, e)
 		if rc != 1 {
-			t.Fatal("cache key retained", rc)
+			t.Fatal("native cache cleanup changed caller reference", key, rc)
 		}
 	}
 }
@@ -169,8 +176,8 @@ func TestBVTrailingCacheGrowthAndEqualThresholdReset(t *testing.T) {
 		_, _, e = p.Count(x)
 		satOK(t, e)
 	}
-	if len(p.tables[5].entries) != 16 || p.tables[5].size != 8 {
-		t.Fatal("source grows before eighth insertion")
+	if p.tables[5].entries.Len() != 8 {
+		t.Fatal("native cache lost an entry")
 	}
 	satOK(t, p.ResetCache(8))
 	if p.tables[5] != nil {
@@ -380,7 +387,7 @@ func TestBVTrailingResetConsumedKeyAfterDeletionFailure(t *testing.T) {
 		t.Fatal("failed reset lost exact table")
 	}
 	found := false
-	for _, entry := range table.entries {
+	for _, entry := range table.entries.All() {
 		if entry.key == root {
 			found = true
 			if entry.owned {
