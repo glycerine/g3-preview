@@ -74,8 +74,16 @@ func lpVertexMaximum(a [][]float64, b, c []float64) float64 {
 
 func lpSolveStandardFixture(t *testing.T, a [][]float64, b, c, x []float64, basis []uint32) *FloatPrimalCoreSolver {
 	t.Helper()
+	return lpSolveStandardConstructorFixture(t, a, b, c, x, basis, false, false)
+}
+
+func lpSolveStandardConstructorFixture(t *testing.T, a [][]float64, b, c, x []float64, basis []uint32, zeroLow, defaultStrategy bool) *FloatPrimalCoreSolver {
+	t.Helper()
 	in := lpFloatCoreInput(t, uint32(len(b)), uint32(len(c)))
 	in.Settings.SimplexStrategy = StrategyLU
+	if defaultStrategy {
+		in.Settings.SimplexStrategy = StrategyTableauRows
+	}
 	in.Settings.MaxTotalIterations = 1000
 	*in.B = append([]float64(nil), b...)
 	*in.Costs = append([]float64(nil), c...)
@@ -89,7 +97,16 @@ func lpSolveStandardFixture(t *testing.T, a [][]float64, b, c, x []float64, basi
 	for j := range c {
 		(*in.ColumnTypes)[j] = ColumnLowBound
 	}
-	m, err := NewFloatPrimalCoreSolver(in)
+	var m *FloatPrimalCoreSolver
+	var err error
+	if zeroLow {
+		// Match the source fixture's empty upper vector and omitted low vector.
+		*in.UpperBounds = nil
+		in.LowBounds = nil
+		m, err = NewFloatPrimalCoreSolverWithZeroLowBounds(in)
+	} else {
+		m, err = NewFloatPrimalCoreSolver(in)
+	}
 	lpStaticMust(t, err)
 	t.Cleanup(func() { m.Close() })
 	return m
@@ -105,21 +122,36 @@ func TestLPFloatPrimalSolveOriginalNumericalFixtures(t *testing.T) {
 		{[][]float64{{1, 3, 1, 1, 0, 0, 0}, {-1, 0, 3, 0, 1, 0, 0}, {2, -1, 2, 0, 0, 1, 0}, {2, 3, -1, 0, 0, 0, 1}}, []float64{3, 2, 4, 2}, []float64{5, 5, 3, 0, 0, 0, 0}, []float64{0, 0, 0, 3, 2, 4, 2}, []uint32{3, 4, 5, 6}},
 	}
 	for i, f := range fixtures {
-		m := lpSolveStandardFixture(t, f.a, f.b, f.c, f.x, f.basis)
-		iterations, err := m.Solve()
-		want := lpVertexMaximum(f.a, f.b, f.c)
-		cost := 0.0
-		for j, v := range *m.X {
-			cost += f.c[j] * v
-			if v < -1e-7 {
-				t.Fatal(i, "negative solution", *m.X)
+		for _, zeroLow := range []bool{false, true} {
+			m := lpSolveStandardConstructorFixture(t, f.a, f.b, f.c, f.x, f.basis, zeroLow, false)
+			iterations, err := m.Solve()
+			want := lpVertexMaximum(f.a, f.b, f.c)
+			cost := 0.0
+			for j, v := range *m.X {
+				cost += f.c[j] * v
+				if v < -1e-7 {
+					t.Fatal(i, "negative solution", *m.X)
+				}
+			}
+			if err != nil || m.Status != StatusOptimal || iterations == 0 || math.Abs(cost-want) > 1e-7 {
+				t.Fatal(i, iterations, m.Status, cost, want, err, *m.X)
+			}
+			if bad, err := m.AMultXIsOff(); bad || err != nil {
+				t.Fatal(i, bad, err)
 			}
 		}
-		if err != nil || m.Status != StatusOptimal || iterations == 0 || math.Abs(cost-want) > 1e-7 {
-			t.Fatal(i, iterations, m.Status, cost, want, err, *m.X)
+		original := lpSolveStandardConstructorFixture(t, f.a, f.b, f.c, f.x, f.basis, true, true)
+		if original.Status != StatusFeasible || original.Factorization != nil {
+			t.Fatal("original default constructor", original.Status)
 		}
-		if bad, err := m.AMultXIsOff(); bad || err != nil {
-			t.Fatal(i, bad, err)
+		wantErr := ErrBounds
+		if sourceDebugEnabled {
+			// Source init_reduced_costs asserts !use_tableau before the
+			// release path reaches the missing factorization.
+			wantErr = ErrAssertion
+		}
+		if _, err := original.Solve(); err != wantErr {
+			t.Fatal("original floating default profile", err)
 		}
 	}
 }

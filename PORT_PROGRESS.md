@@ -37452,3 +37452,42 @@ duplicate debug assertion and last stdout error. Profiles:
 verification passes. LP stays66 partial/44 unported. Full native snapshot
 remains20:03 UTC90.0% and predates these additions. Exact/default-tableau,
 dual and complete LAR/parser/upstream driver scope remains unfinished.
+
+
+### Original floating zero-low constructor and initial-X checks — 2026-10-10
+
+Ported lp_primal_core_solver.h:937-999 constructor without lower-bound
+argument and initial_x_is_correct. Core borrows its owner's initially empty
+lower-vector header, beta/Harris initialize before the debug predicate, and
+zeros resize only after success. Base FEASIBLE status is retained, unlike the
+stage-one constructor. Safe Go empty header qualifies the source reference to
+a not-yet-constructed member; boxed debug reads return ErrBounds before this
+undefined source domain. No pre-InitRun pricing-field correctness is claimed;
+source omitted thresholds remain outside that profile, and definition-only
+enter-price epsilon assignment has no retained read and is excluded.
+
+Initial-X checks build actual basis membership, compare zero/upper exactly,
+ignore stored lower bounds, require low nonbasics at zero and boxed nonbasics
+at either endpoint; fixed/free/upper nonbasics have no additional endpoint
+requirement. Source LP_OUT text/order, IEEE comparisons and writer errors are
+preserved.2,000 independent predicate worlds, all strict/Nextafter/IEEE cases,
+real writer refusal, partial base/LU/predicate owners, dummy-header aliasing and
+metadata prefixes pass native and combined debug/checked.
+
+Original test_lp_0 and test_lp_1 fixtures now additionally use this actual
+constructor with omitted low argument and empty upper vector. Explicit LU
+solves both to independently enumerated optima and checks all original equations
+and nonnegativity. Unchanged source default settings are tested separately:
+debug reaches init_reduced_costs !use_tableau assertion, release reaches the
+missing factorization guard. These are source-profile failure qualifications,
+not successful default solver or complete upstream driver credit. Existing
+stage-one fixture regressions remain covered.
+
+Focused native core/primal/presolve/solver/column/scaler/static/LU checks pass
+0.995s, combined debug/checked0.957s. New code49/54 (90.7%) native,54/54
+(100%) debug; native gaps are erased source assertion branches. Profiles:
+/mnt/oldrog/tmp/g3-initial-{native,debug}.cover. Both LP vets and source/evidence/
+no-generics verifier pass. LP remains66 partial/44 unported. Last native full
+module snapshot is20:03 UTC90.0%, predating these additions. Graph regeneration
+adds the production file without changing imports. Exact/tableau, dual, full
+LAR/parser and complete original driver scope remains unfinished.

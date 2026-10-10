@@ -16,6 +16,7 @@ type FloatPrimalCoreSolver struct {
 	ColumnNormUpdateCounter, BlandModeThreshold  uint32
 	SignOfEnteringDelta                          int32
 	NonBasisList                                 []uint32
+	lowBoundsDummy                               []float64
 }
 
 func NewFloatPrimalCoreSolver(in FloatCoreInputs) (*FloatPrimalCoreSolver, error) {

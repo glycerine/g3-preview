@@ -102964,7 +102964,9 @@
         "pkg/util/lp/lu_update_float.go",
         "pkg/util/lp/lu_extend_test.go",
         "pkg/util/lp/lu_upstream_test.go",
-        "pkg/util/lp/primal_solve_float_test.go"
+        "pkg/util/lp/primal_solve_float_test.go",
+        "pkg/util/lp/primal_initial_float.go",
+        "pkg/util/lp/primal_initial_float_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103007,7 +103009,11 @@
         "TestLPFloatPrimalSolveStopsAndStatuses",
         "TestLPFloatPrimalIterationBudgetAndStatistics",
         "TestLPFloatPrimalStatisticsGuardsAndIEEE",
-        "TestLPFloatPrimalSolveAndIterationReachedGuards"
+        "TestLPFloatPrimalSolveAndIterationReachedGuards",
+        "TestLPFloatPrimalInitialIndependentPredicate",
+        "TestLPFloatPrimalInitialIEEEAndOutput",
+        "TestLPFloatPrimalZeroLowConstructorPublication",
+        "TestLPFloatPrimalInitialMetadataPrefixes"
       ],
       "conditionals": [
         {
@@ -103660,6 +103666,18 @@
             "TestLPFloatPrimalStatisticsGuardsAndIEEE",
             "TestLPFloatPrimalSolveAndIterationReachedGuards"
           ]
+        },
+        {
+          "name": "Floating constructor without low-bound argument, owned zero-low dummy header and literal initial-X validator; original test_lp_0/1 through that constructor with explicit LU plus unchanged default-profile guards",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_initial_float.go",
+          "tests": [
+            "TestLPFloatPrimalInitialIndependentPredicate",
+            "TestLPFloatPrimalInitialIEEEAndOutput",
+            "TestLPFloatPrimalZeroLowConstructorPublication",
+            "TestLPFloatPrimalInitialMetadataPrefixes",
+            "TestLPFloatPrimalSolveOriginalNumericalFixtures"
+          ]
         }
       ],
       "ownership": [
@@ -103673,7 +103691,8 @@
         "Floating Suhl replacement now executes lu.hpp:581-587,775-934. Counter increments before transformation; bump permutation changes U before Q/R; row eta conjugates before publication; diagonal tail publishes before row division then conjugates. Wrong nonzero pivot checks and tiny diagonals set Degenerated; early degeneration clears all row work without marking a Go error. Strict tolerance, cancellation, underflow/assertion, NaN std::max first-operand selection and zero/skipped terms preserve source control flow. Native Go collections replace vector/STL storage. 64 independent original-basis worlds with 12 nonsingular replacements each verify dense/indexed row and column solves after every update across sparse/forced-dense initial factors; a 241-row indexed entering-column integration and all four original test_small_lu replacements execute. The source subsequent dimension extension, exact mpq/mpq-pair Suhl updates and full --test_lu remain open; no whole-unit promotion.",
         "Original debug-selected test_small_lu numerical scenario now includes its two-row extension after four replacements, checked against independent original-basis products in native and debug Go profiles. No native upstream debug-driver execution or diagnostic-stream completion is claimed; --test_lu and remaining scenarios stay open.",
         "All four --test_lu mathematical scenarios now execute in Go: small fixture and two-row extension, cyclic-square larger fixture, holes fixture including its replacement and default-random fixture with both replacements. Larger fixtures run source density0.7 plus forced sparse/dense policies and independent basis factorization/known row-column/refined-solve checks. Source global g_rand starts at random_gen default0; independent Go test owner preserves that recurrence and first-row golden draws. Actual command parsing, diagnostic output and whole upstream driver execution remain open; no complete src/test/lp.cpp promotion.",
-        "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded."
+        "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
+        "Zero-low constructor preserves base FEASIBLE status, beta/Harris initialization, debug predicate before dummy resize, and borrowed header identity. The Go header is safely empty before base construction; boxed debug reads guard the C++ not-yet-constructed dummy member domain. Source omitted pricing fields are not credited before InitRun; dead enter-price epsilon assignment is excluded because no retained read exists. Initial checks use exact zero/upper comparisons, not stored lower bounds/tolerance. Original smoke fixtures now use the actual constructor with empty upper bounds: explicit LU verifies independent optima; unchanged source default strategy instead hits !use_tableau assertion in debug and missing factorization ErrBounds guard in release. This does not claim default source solver correctness or completion of the whole upstream driver."
       ]
     },
     {
@@ -121585,7 +121604,9 @@
         "pkg/util/lp/primal_refresh_float.go",
         "pkg/util/lp/primal_advance_float.go",
         "pkg/util/lp/primal_solve_float.go",
-        "pkg/util/lp/primal_feasible_float.go"
+        "pkg/util/lp/primal_feasible_float.go",
+        "pkg/util/lp/primal_initial_float.go",
+        "pkg/util/lp/primal_initial_float_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -121630,7 +121651,11 @@
         "TestLPFloatPrimalSolveAndIterationReachedGuards",
         "TestLPFloatPrimalFindFeasibleIndependentSystems",
         "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
-        "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
+        "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes",
+        "TestLPFloatPrimalInitialIndependentPredicate",
+        "TestLPFloatPrimalInitialIEEEAndOutput",
+        "TestLPFloatPrimalZeroLowConstructorPublication",
+        "TestLPFloatPrimalInitialMetadataPrefixes"
       ],
       "conditionals": [
         {
@@ -121887,6 +121912,18 @@
             "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
             "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
           ]
+        },
+        {
+          "name": "Floating constructor without low-bound argument, owned zero-low dummy header and literal initial-X validator; original test_lp_0/1 through that constructor with explicit LU plus unchanged default-profile guards",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_initial_float.go",
+          "tests": [
+            "TestLPFloatPrimalInitialIndependentPredicate",
+            "TestLPFloatPrimalInitialIEEEAndOutput",
+            "TestLPFloatPrimalZeroLowConstructorPublication",
+            "TestLPFloatPrimalInitialMetadataPrefixes",
+            "TestLPFloatPrimalSolveOriginalNumericalFixtures"
+          ]
         }
       ],
       "ownership": [
@@ -121900,7 +121937,8 @@
         "Floating norm/price updates preserve sparse index iteration including duplicates, absolute-source IEEE comparisons, first-operand std::max NaN behavior, fixed-column dot product before skipping writes, and reached mutation prefixes at native bounds guards. Definition-only calculate_column_norm_exactly debug helper is not copied. Exact/tableau recurrences and complete primal optimization integration remain open.",
         "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open.",
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
-        "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open."
+        "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open.",
+        "Zero-low constructor preserves base FEASIBLE status, beta/Harris initialization, debug predicate before dummy resize, and borrowed header identity. The Go header is safely empty before base construction; boxed debug reads guard the C++ not-yet-constructed dummy member domain. Source omitted pricing fields are not credited before InitRun; dead enter-price epsilon assignment is excluded because no retained read exists. Initial checks use exact zero/upper comparisons, not stored lower bounds/tolerance. Original smoke fixtures now use the actual constructor with empty upper bounds: explicit LU verifies independent optima; unchanged source default strategy instead hits !use_tableau assertion in debug and missing factorization ErrBounds guard in release. This does not claim default source solver correctness or completion of the whole upstream driver."
       ]
     },
     {
