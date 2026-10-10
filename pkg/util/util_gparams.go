@@ -21,12 +21,6 @@ type GlobalParamsConfig struct {
 	CLongBits                                   uint8
 	Register                                    func(GlobalParamsRegistrar) error
 }
-type GlobalParamCString struct {
-	Origin  uint64
-	Ref     arena.BytesRegionRef
-	Offset  uint32
-	Present bool
-}
 type GparamsRefCell struct{ value ParamsRef }
 type GparamsRegionBinding struct {
 	origin uint64

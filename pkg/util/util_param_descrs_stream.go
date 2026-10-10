@@ -4,6 +4,7 @@ import (
 	"bytes"
 
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // DisplayInto emits source param_descrs::display into a borrowed byte buffer.
@@ -55,7 +56,7 @@ func (d *ParamDescrs) DisplayInto(dst *bytes.Buffer, indent uint32, smt2, includ
 			// Null CString sets source ostream failbit at this actual output action.
 			// This byte-destination adapter returns a typed failure with that prefix.
 			if !info.descr.present {
-				return ErrParamsStreamFailure
+				return utext.ErrNullCString
 			}
 			dst.WriteString(info.descr.value)
 		}

@@ -1,5 +1,5 @@
 // Source-owner extraction bridge charges and nominal errors, tests first.
-package util
+package diagnostic
 
 import (
 	"errors"

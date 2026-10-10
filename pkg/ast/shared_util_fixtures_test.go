@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -113,7 +114,7 @@ func gparamsTestConfig(b *arena.Budget) util.GlobalParamsConfig {
 	return util.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}
 }
 
-func debugActionFixture(t *testing.T, text string) (*umemory.Runtime, *util.DebugContext, *util.DebugActionContext, *util.NumericCharInput, *util.MemoryStandardStreams) {
+func debugActionFixture(t *testing.T, text string) (*umemory.Runtime, *udiag.DebugContext, *udiag.DebugActionContext, *udiag.NumericCharInput, *udiag.MemoryStandardStreams) {
 	t.Helper()
 	d, r, b := debugDiagnosticFixture(t)
 	inputFile, e := os.CreateTemp(".", "debug-action-input-*")
@@ -124,11 +125,11 @@ func debugActionFixture(t *testing.T, text string) (*umemory.Runtime, *util.Debu
 	paramsMust(t, e)
 	out, e := os.CreateTemp(".", "debug-action-output-*")
 	paramsMust(t, e)
-	streams, e := util.NewMemoryStandardStreams(util.MemoryStandardStreamsConfig{Budget: b, Stdout: out, Stderr: out})
+	streams, e := udiag.NewMemoryStandardStreams(udiag.MemoryStandardStreamsConfig{Budget: b, Stdout: out, Stderr: out})
 	paramsMust(t, e)
-	input, e := util.NewDebuggerCharInput(streams, inputFile)
+	input, e := udiag.NewDebuggerCharInput(streams, inputFile)
 	paramsMust(t, e)
-	action, e := util.NewDebugActionContext(util.DebugActionConfig{Budget: b, Streams: streams, Input: input})
+	action, e := udiag.NewDebugActionContext(udiag.DebugActionConfig{Budget: b, Streams: streams, Input: input})
 	paramsMust(t, e)
 	paramsMust(t, d.BindAssertionStreams(streams))
 	paramsMust(t, d.BindAssertionActions(action))
@@ -151,14 +152,14 @@ func gparamsVectorGraph(s arena.VectorStats) uint64 {
 
 var _ umemory.ConstructionFailure = (*unumeral.RationalService)(nil)
 
-func debugDiagnosticFixture(t *testing.T) (*util.DebugContext, *umemory.Runtime, *arena.Budget) {
+func debugDiagnosticFixture(t *testing.T) (*udiag.DebugContext, *umemory.Runtime, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	paramsMust(t, e)
 	region, e := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
 	paramsMust(t, e)
-	d, e := util.NewDebugContext(region, b)
+	d, e := udiag.NewDebugContext(region, b)
 	paramsMust(t, e)
 	t.Cleanup(func() {
 		b.FailAfter(-1)

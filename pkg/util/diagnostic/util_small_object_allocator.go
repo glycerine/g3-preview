@@ -1,6 +1,6 @@
 // Source: src/util/small_object_allocator.h; src/util/small_object_allocator.cpp; src/util/debug.h:63.
 // Charged main adapter; all allocation algorithms live solely in memory.
-package util
+package diagnostic
 
 import (
 	"reflect"
@@ -26,7 +26,7 @@ type utilSmallObjectConfig struct {
 	ID                   string
 	IDPresent, IDNull    bool
 	BorrowedID           *arena.BytesRegion
-	IDRef                GlobalParamCString
+	IDRef                utext.RegionCString
 	Diagnostics, Verbose *utext.NumericTextStream
 	Verbosity            uint32
 	VerboseContext       *VerboseContext

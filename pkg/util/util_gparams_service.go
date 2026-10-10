@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -17,7 +18,7 @@ var ErrGlobalParamsUninitialized = errors.New("g3: source global parameter point
 // accounting remain separate bindings. The header and all nodes are charged.
 type GlobalParamsService struct {
 	self                        *GlobalParamsService
-	namespaceAssertions         *DebugContext
+	namespaceAssertions         *udiag.DebugContext
 	Symbols                     *usymbol.Manager
 	Context                     *ParamsContext
 	Config                      GlobalParamsConfig

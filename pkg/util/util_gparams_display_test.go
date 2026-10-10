@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func gparamsDescriptionBytes(t *testing.T, r *arena.BytesRegion, s string) arena.BytesRegionRef {
@@ -65,7 +66,7 @@ func TestGlobalParamsDescriptionNullAndClosedReadPrefixes(t *testing.T) {
 	paramsMust(t, g.ensureRegistered())
 	out := new(bytes.Buffer)
 	paramsMust(t, g.RegisterModuleDescription("sat", nil, arena.BytesRegionRef{}, 0))
-	if e := g.DisplayModulesInto(out); !errors.Is(e, ErrParamsStreamFailure) {
+	if e := g.DisplayModulesInto(out); !errors.Is(e, utext.ErrNullCString) {
 		t.Fatal(e)
 	}
 	got := out.String()

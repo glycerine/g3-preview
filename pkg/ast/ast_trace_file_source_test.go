@@ -113,7 +113,7 @@ func TestASTTraceFileEveryConstructorReservationAndSourcePointerGuard(t *testing
 	}
 	b := arena.NewBudget(1 << 20)
 	f, e := newASTTraceFile(b, util.ParamsStringView{})
-	if !errors.Is(e, util.ErrParamsStreamFailure) || f == nil || b.Used() != f.header {
+	if !errors.Is(e, utext.ErrNullCString) || f == nil || b.Used() != f.header {
 		t.Fatal("reached null-pointer Go guard retains actual acquired wrapper", e)
 	}
 	paramsMust(t, f.Close())

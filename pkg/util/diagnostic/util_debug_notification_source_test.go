@@ -1,5 +1,5 @@
 // Source: src/util/debug.cpp:37-42; src/util/debug.h:58-65.
-package util
+package diagnostic
 
 import (
 	"errors"
@@ -86,7 +86,7 @@ func TestDebugNotificationBorrowedCStringActualLifetimePrefixes(t *testing.T) {
 				condition.Present = false
 			}
 			e := d.NotifyBorrowedAssertionViolation(d.region, filename, 17, d.region, condition)
-			if !errors.Is(e, ErrParamsStreamFailure) {
+			if !errors.Is(e, utext.ErrNullCString) {
 				t.Fatal("null pointer reached guard", e)
 			}
 			want := "ASSERTION VIOLATION\nFile: "
@@ -223,7 +223,7 @@ func TestDebugNotificationUnboundAndOwnerGuards(t *testing.T) {
 	debugNotificationPhysical(t, d, streams, b)
 }
 
-func debugNotificationCString(t *testing.T, r *arena.BytesRegion, text string) GlobalParamCString {
+func debugNotificationCString(t *testing.T, r *arena.BytesRegion, text string) utext.RegionCString {
 	t.Helper()
 	ref, e := r.Allocate(uint32(len(text) + 1))
 	paramsMust(t, e)
@@ -231,7 +231,7 @@ func debugNotificationCString(t *testing.T, r *arena.BytesRegion, text string) G
 		paramsMust(t, r.Write(ref, uint32(i), text[i]))
 	}
 	paramsMust(t, r.Write(ref, uint32(len(text)), 0))
-	return GlobalParamCString{Origin: r.OwnerID(), Ref: ref, Present: true}
+	return utext.RegionCString{Origin: r.OwnerID(), Ref: ref, Present: true}
 }
 
 func TestDebugNotificationForeignCStringProviderRemainsBorrowed(t *testing.T) {

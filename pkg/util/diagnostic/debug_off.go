@@ -1,6 +1,6 @@
 //go:build !g3debug
 
 // Source: src/util/bit_util.cpp Z3DEBUG.
-package util
+package diagnostic
 
 const sourceDebug = false

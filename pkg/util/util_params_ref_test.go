@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func paramsTestOwner(t *testing.T) (*ParamsContext, *usymbol.Manager, *unumeral.RationalService) {
@@ -268,7 +269,7 @@ func TestParamsReferenceNullableStreamAndDisplayName(t *testing.T) {
 		t.Fatal("null stored string is not fallback")
 	}
 	text, e = c.Display(&a)
-	if e != ErrParamsStreamFailure {
+	if e != utext.ErrNullCString {
 		t.Fatal(e)
 	}
 	if text != "(params s " {
@@ -298,7 +299,7 @@ func TestParamsReferenceNullableStreamAndDisplayName(t *testing.T) {
 		t.Fatal("SMT2 buffer")
 	}
 	text, e = c.DisplaySMT2(&a, nil, d)
-	if e != ErrParamsStreamFailure {
+	if e != utext.ErrNullCString {
 		t.Fatal(e)
 	}
 	if text != "(set-option :" {

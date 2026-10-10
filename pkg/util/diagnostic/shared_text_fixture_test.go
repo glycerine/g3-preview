@@ -1,4 +1,4 @@
-package util
+package diagnostic
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

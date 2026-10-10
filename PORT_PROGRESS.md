@@ -34641,3 +34641,31 @@ passed (20.441s/1.441s). Native and combined-tag module compilation, numeral/
 root util/AST/polynomial/SMT core/SAT vet, manifest and diff checks passed.
 The requested complete root split remains open: parameters, diagnostics,
 S-expressions, runtime hashing and unused internal adapters still need review.
+
+## Separate diagnostics from parameter storage
+
+Moved the actually shared borrowed RegionCString descriptor, null-C-string error
+identity and standard-library CStringLength helper to util/text. Parameter and
+diagnostic consumers import that owner directly; original fields, guards and
+error text are preserved. Names now describe the shared text boundary instead
+of presenting diagnostic text as parameter-owned storage.
+
+Parameters now read DebugContext.HasAssertionActions and invoke the existing
+DebugAssertionFailure function, preserving the original unbound parameter error
+and reached notification/debugger sequence. The binding check does not reach
+owner lifetime, stream readiness or the assertion switch. Symbol source debug
+selection uses existing DebugBuild. These remove private accesses and the
+parameter back-edge without a universal callback or forwarding root API.
+
+Moved15 production and13 test/helper files into util/diagnostic: assertion/debug
+actions, their concrete character input/standard streams, fatal memory policy,
+verbosity and allocator diagnostic integration. The package has no root util
+or parameter dependency. Root parameter integration retains only its public
+DebugContext fixture; diagnostic tests use local assertion helpers. Manifest
+paths follow real implementation/test owners and inventory remains unchanged.
+
+Full native diagnostic/text/root util passed (0.188s/0.020s/1.234s), and matching
+full g3debug suites passed (0.202s/0.020s/1.493s). Full g3debug AST passed; combined
+module compilation, diagnostic/text/root util/AST vet, manifest and diff checks
+passed. Numerals were committed separately as512298e9. The remaining root split
+still includes parameters, S-expressions, runtime hashing and unused adapters.

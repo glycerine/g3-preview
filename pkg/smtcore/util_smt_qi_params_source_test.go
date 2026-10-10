@@ -481,7 +481,7 @@ func TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix(t *testing.T) {
 	maxKey := "qi.max_multi_patterns"
 	paramsMust(t, c.SetUIntName(p, &maxKey, 57))
 	cause := v.Update(p)
-	if !errors.Is(cause, util.ErrParamsStreamFailure) || v.state.MaxEagerMultipatterns != 0 || v.Helpers != nil {
+	if !errors.Is(cause, utext.ErrNullCString) || v.state.MaxEagerMultipatterns != 0 || v.Helpers != nil {
 		t.Fatal("source null cost reached after earlier getters, before last getter", cause)
 	}
 	current, e := v.CostText()

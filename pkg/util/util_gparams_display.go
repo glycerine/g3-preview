@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // Region bindings are cold borrowed owners. The source stores char* without
@@ -37,12 +38,12 @@ func (g *GlobalParams) registerModuleDescription(name string, r *arena.BytesRegi
 	if _, e := g.SymbolsField.Hash(key); e != nil {
 		return e
 	}
-	var text GlobalParamCString
+	var text utext.RegionCString
 	if r != nil {
 		if e = g.bindDescriptionRegion(r); e != nil {
 			return e
 		}
-		text = GlobalParamCString{Origin: r.OwnerID(), Ref: ref, Offset: offset, Present: true}
+		text = utext.RegionCString{Origin: r.OwnerID(), Ref: ref, Offset: offset, Present: true}
 	}
 	g.ModuleDescriptions.set(key, text)
 	return nil
@@ -61,9 +62,9 @@ func (g *GlobalParams) RegisterModuleDescription(name string, region *arena.Byte
 	defer g.mu.Unlock()
 	return g.registerModuleDescription(name, region, ref, offset)
 }
-func (g *GlobalParams) descriptionInto(out *bytes.Buffer, text GlobalParamCString) error {
+func (g *GlobalParams) descriptionInto(out *bytes.Buffer, text utext.RegionCString) error {
 	if !text.Present {
-		return ErrParamsStreamFailure
+		return utext.ErrNullCString
 	}
 	var r *arena.BytesRegion
 	for _, x := range g.Bindings {
@@ -222,7 +223,7 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *bytes.Buffer, name st
 	if debugOut == nil {
 		return ErrGlobalParamsOwner
 	}
-	debugOut.WriteString(name[:nulStringLength(name)])
+	debugOut.WriteString(name[:utext.CStringLength(name)])
 	debugOut.WriteByte(' ')
 	{
 		text, e := g.SymbolsField.Display(module)
@@ -319,12 +320,12 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *bytes.Buffer, name st
 	out.WriteString(info.kind.String())
 	out.WriteString("\n  description:    ")
 	if !info.descr.present {
-		return ErrParamsStreamFailure
+		return utext.ErrNullCString
 	}
 	out.WriteString(info.descr.value)
 	out.WriteString("\n  default value:  ")
 	if !info.def.present {
-		return ErrParamsStreamFailure
+		return utext.ErrNullCString
 	}
 	out.WriteString(info.def.value)
 	out.WriteByte('\n')

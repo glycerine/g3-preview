@@ -5,6 +5,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -62,7 +63,7 @@ func (g *GlobalParams) normalizeWorkspace() (usymbol.Symbol, usymbol.Symbol, err
 	return usymbol.Symbol{}, param, e
 }
 func (g *GlobalParams) normalizeName(name string) (usymbol.Symbol, usymbol.Symbol, error) {
-	name = name[:nulStringLength(name)]
+	name = name[:utext.CStringLength(name)]
 	if len(name) > 0 && name[0] == ':' {
 		name = name[1:]
 	}
@@ -305,7 +306,7 @@ func (g *GlobalParams) setNormalized(module, k usymbol.Symbol, value string) err
 		}
 		d = found
 	}
-	value = value[:nulStringLength(value)]
+	value = value[:utext.CStringLength(value)]
 	if e := g.validateType(k, value, d); e != nil {
 		return e
 	}

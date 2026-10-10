@@ -5,7 +5,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -23,14 +24,14 @@ func astUnsignedGrowthPrime(t *testing.T, r *umemory.Runtime) umemory.Block {
 }
 
 // The diagnostic fixture stays with the AST tests and borrows only public utilities.
-func astDebugActionFixture(t *testing.T, text string) (*arena.Budget, *umemory.Runtime, *util.DebugContext, *util.NumericCharInput, *os.File) {
+func astDebugActionFixture(t *testing.T, text string) (*arena.Budget, *umemory.Runtime, *udiag.DebugContext, *udiag.NumericCharInput, *os.File) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	astTestMust(t, e)
 	region, e := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
 	astTestMust(t, e)
-	d, e := util.NewDebugContext(region, b)
+	d, e := udiag.NewDebugContext(region, b)
 	astTestMust(t, e)
 	t.Cleanup(func() {
 		b.FailAfter(-1)
@@ -49,11 +50,11 @@ func astDebugActionFixture(t *testing.T, text string) (*arena.Budget, *umemory.R
 	astTestMust(t, e)
 	out, e := os.CreateTemp(t.TempDir(), "debug-action-output-*")
 	astTestMust(t, e)
-	streams, e := util.NewMemoryStandardStreams(util.MemoryStandardStreamsConfig{Budget: b, Stdout: out, Stderr: out})
+	streams, e := udiag.NewMemoryStandardStreams(udiag.MemoryStandardStreamsConfig{Budget: b, Stdout: out, Stderr: out})
 	astTestMust(t, e)
-	input, e := util.NewDebuggerCharInput(streams, inputFile)
+	input, e := udiag.NewDebuggerCharInput(streams, inputFile)
 	astTestMust(t, e)
-	action, e := util.NewDebugActionContext(util.DebugActionConfig{Budget: b, Streams: streams, Input: input})
+	action, e := udiag.NewDebugActionContext(udiag.DebugActionConfig{Budget: b, Streams: streams, Input: input})
 	astTestMust(t, e)
 	astTestMust(t, d.BindAssertionStreams(streams))
 	astTestMust(t, d.BindAssertionActions(action))

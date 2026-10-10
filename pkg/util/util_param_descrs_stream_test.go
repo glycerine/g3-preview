@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func pdStreamBuffer(t *testing.T, _ *arena.Budget) *bytes.Buffer {
@@ -52,7 +53,7 @@ func TestParamDescrsDisplayIntoNullDescriptionActualAction(t *testing.T) {
 			}
 		} else if descr {
 			want = "p  a_key (unsigned int) "
-			if !errors.Is(e, ErrParamsStreamFailure) {
+			if !errors.Is(e, utext.ErrNullCString) {
 				t.Fatal("source null CString failure", e)
 			}
 		} else {

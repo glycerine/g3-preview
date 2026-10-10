@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"github.com/glycerine/insdict"
 )
 
@@ -196,7 +197,7 @@ func paramDescrString(s *string) paramDescrText {
 	if s == nil {
 		return paramDescrText{}
 	}
-	return paramDescrText{value: (*s)[:nulStringLength(*s)], present: true}
+	return paramDescrText{value: (*s)[:utext.CStringLength(*s)], present: true}
 }
 func (d *ParamDescrs) load(r paramDescrText) (string, bool, error) {
 	return r.value, r.present, nil

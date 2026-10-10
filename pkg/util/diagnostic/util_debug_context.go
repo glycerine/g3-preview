@@ -1,11 +1,12 @@
 // Source: src/util/debug.cpp:28-79; src/util/debug.h:28-29,60-65,98.
-package util
+package diagnostic
 
 import (
 	"errors"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // SourceAssertionsEnabled evaluates the selected source assertion profile and
@@ -70,7 +71,7 @@ func (d *DebugContext) AssertionsEnabled() (bool, error) {
 	return d.assertions, nil
 }
 
-func debugTagName(tag string) string { return tag[:nulStringLength(tag)] }
+func debugTagName(tag string) string { return tag[:utext.CStringLength(tag)] }
 
 func (d *DebugContext) EnableDebug(tag string) error {
 	if e := d.open(); e != nil {

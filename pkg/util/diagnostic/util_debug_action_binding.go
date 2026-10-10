@@ -1,5 +1,5 @@
 // Source: src/util/debug.h:60-65; src/util/debug.cpp:37-42,73-117.
-package util
+package diagnostic
 
 import (
 	"errors"
@@ -38,3 +38,6 @@ func DebugAssertionFailure(d *DebugContext, file string, line int32, condition s
 	}
 	return d.assertionActions.InvokeDebugger()
 }
+
+// HasAssertionActions reads the borrowed binding without reaching its lifetime.
+func (d *DebugContext) HasAssertionActions() bool { return d != nil && d.assertionActions != nil }

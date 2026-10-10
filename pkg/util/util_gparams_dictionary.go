@@ -1,12 +1,15 @@
 // Source: src/util/gparams.cpp; src/util/dictionary.h; src/util/map.h.
 package util
 
-import usymbol "github.com/glycerine/g3/pkg/util/symbol"
+import (
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
+	// Module descriptors are rendered by traversal, so their dictionary preserves
+	// registration order. The other two dictionaries are lookup-only.
+)
 
 import "github.com/glycerine/insdict"
 
-// Module descriptors are rendered by traversal, so their dictionary preserves
-// registration order. The other two dictionaries are lookup-only.
 type gparamsDescriptorDictionary struct {
 	values *insdict.Dict[usymbol.Symbol, uint32]
 }
@@ -16,7 +19,7 @@ type gparamsRefDictionary struct {
 }
 
 type gparamsDescriptionDictionary struct {
-	values map[usymbol.Symbol]GlobalParamCString
+	values map[usymbol.Symbol]utext.RegionCString
 }
 
 func (d *gparamsDescriptorDictionary) init() {
@@ -69,13 +72,13 @@ func (d *gparamsRefDictionary) size() uint32 {
 }
 
 func (d *gparamsDescriptionDictionary) init() {
-	d.values = make(map[usymbol.Symbol]GlobalParamCString)
+	d.values = make(map[usymbol.Symbol]utext.RegionCString)
 }
-func (d *gparamsDescriptionDictionary) get(k usymbol.Symbol) (GlobalParamCString, bool) {
+func (d *gparamsDescriptionDictionary) get(k usymbol.Symbol) (utext.RegionCString, bool) {
 	v, ok := d.values[k]
 	return v, ok
 }
-func (d *gparamsDescriptionDictionary) set(k usymbol.Symbol, text GlobalParamCString) {
+func (d *gparamsDescriptionDictionary) set(k usymbol.Symbol, text utext.RegionCString) {
 	if d.values == nil {
 		d.init()
 	}

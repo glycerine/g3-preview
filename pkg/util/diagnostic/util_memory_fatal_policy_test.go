@@ -1,6 +1,6 @@
 // Source: src/util/memory_manager.cpp:33-72; src/util/memory_manager.h:49-71.
 // Source: src/util/error_codes.h; src/util/z3_exception.h.
-package util
+package diagnostic
 
 import (
 	"bytes"
@@ -97,7 +97,7 @@ func TestMemoryFatalSubprocessChild(t *testing.T) {
 	}
 	switch route {
 	case "count", "count-exit", "count-bad":
-		smallObjectMust(t, c.ExitWhenOutOfMemory(route == "count-exit", nil, GlobalParamCString{}))
+		smallObjectMust(t, c.ExitWhenOutOfMemory(route == "count-exit", nil, utext.RegionCString{}))
 		smallObjectMust(t, r.SetMaxCount(1))
 		_, e = r.Allocate(0)
 		smallObjectMust(t, e)
@@ -108,7 +108,7 @@ func TestMemoryFatalSubprocessChild(t *testing.T) {
 		b.FailAfter(0)
 		_, e = r.Allocate(0)
 	case "oom", "oom-bad", "oom-custom":
-		smallObjectMust(t, c.ExitWhenOutOfMemory(true, nil, GlobalParamCString{}))
+		smallObjectMust(t, c.ExitWhenOutOfMemory(true, nil, utext.RegionCString{}))
 		if route == "oom-custom" {
 			region, e = arena.NewBytesRegion(arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 4, Budget: b}})
 			smallObjectMust(t, e)
@@ -117,8 +117,8 @@ func TestMemoryFatalSubprocessChild(t *testing.T) {
 			smallObjectMust(t, region.Write(msg.Ref, 0, 'n'))
 			smallObjectMust(t, region.Write(msg.Ref, 1, 'e'))
 			smallObjectMust(t, region.Write(msg.Ref, 2, 'w'))
-			smallObjectMust(t, c.ExitWhenOutOfMemory(false, nil, GlobalParamCString{}))
-			smallObjectMust(t, c.ExitWhenOutOfMemory(true, nil, GlobalParamCString{}))
+			smallObjectMust(t, c.ExitWhenOutOfMemory(false, nil, utext.RegionCString{}))
+			smallObjectMust(t, c.ExitWhenOutOfMemory(true, nil, utext.RegionCString{}))
 		}
 		if route == "oom-bad" {
 			smallObjectMust(t, os.Stderr.Close())
@@ -180,11 +180,11 @@ func TestMemoryFatalBorrowedPointerRetentionAndReachedSentry(t *testing.T) {
 	defer c.Close()
 	text := smallObjectID(t, region, "borrowed")
 	smallObjectMust(t, c.ExitWhenOutOfMemory(true, region, text))
-	smallObjectMust(t, c.ExitWhenOutOfMemory(false, nil, GlobalParamCString{}))
+	smallObjectMust(t, c.ExitWhenOutOfMemory(false, nil, utext.RegionCString{}))
 	if c.exitOOM || c.region != region || c.message != text || !c.borrowed {
 		t.Fatal("false changed old pointer")
 	}
-	smallObjectMust(t, c.ExitWhenOutOfMemory(true, nil, GlobalParamCString{}))
+	smallObjectMust(t, c.ExitWhenOutOfMemory(true, nil, utext.RegionCString{}))
 	if !c.exitOOM || c.region != region || c.message != text {
 		t.Fatal("null changed old pointer")
 	}
@@ -203,11 +203,11 @@ func TestMemoryFatalBorrowedPointerRetentionAndReachedSentry(t *testing.T) {
 	// Setter stores a stale pointer without any eager pointee read.
 	smallObjectMust(t, c.ExitWhenOutOfMemory(true, region, text))
 	copy := *c
-	if e = copy.ExitWhenOutOfMemory(false, nil, GlobalParamCString{}); !errors.Is(e, utext.ErrNumericStreamOwner) {
+	if e = copy.ExitWhenOutOfMemory(false, nil, utext.RegionCString{}); !errors.Is(e, utext.ErrNumericStreamOwner) {
 		t.Fatal(e)
 	}
 	smallObjectMust(t, c.Close())
-	if e = c.ExitWhenOutOfMemory(false, nil, GlobalParamCString{}); !errors.Is(e, arena.ErrClosed) {
+	if e = c.ExitWhenOutOfMemory(false, nil, utext.RegionCString{}); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
 	}
 }

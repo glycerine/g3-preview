@@ -7,7 +7,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -27,7 +28,7 @@ type PsortASTNetwork struct {
 	context         *PsortASTContext
 	runtime         *umemory.Runtime
 	budget          *arena.Budget
-	debug           *util.DebugContext
+	debug           *udiag.DebugContext
 	header          uint64
 	mode            uint8
 	modeInitialized bool
@@ -75,7 +76,7 @@ func psortVectorPointer(v *ASTLiteralVector) (psortASTPointer, error) {
 	p, e := v.Span()
 	return psortASTPointer{span: p}, e
 }
-func NewPsortASTNetwork(c *PsortASTContext, r *umemory.Runtime, b *arena.Budget, d *util.DebugContext) (*PsortASTNetwork, error) {
+func NewPsortASTNetwork(c *PsortASTContext, r *umemory.Runtime, b *arena.Budget, d *udiag.DebugContext) (*PsortASTNetwork, error) {
 	if c == nil || c.self != c || r == nil || b == nil || c.budget != b || r.Budget() != b || d != nil && (!d.ValidOwner() || d.Budget() != b) {
 		return nil, arena.ErrConfig
 	}
@@ -106,7 +107,7 @@ func (s *PsortASTNetwork) open() error {
 	return s.context.open()
 }
 func (s *PsortASTNetwork) assertions() (bool, error) {
-	if !util.DebugBuild {
+	if !udiag.DebugBuild {
 		return false, nil
 	}
 	if s.debug == nil {
@@ -115,7 +116,7 @@ func (s *PsortASTNetwork) assertions() (bool, error) {
 	return s.debug.AssertionsEnabled()
 }
 func (s *PsortASTNetwork) assertion(line uint32, text string) error {
-	return util.DebugAssertionFailure(s.debug, "src/util/sorting_network.h", int32(line), text)
+	return udiag.DebugAssertionFailure(s.debug, "src/util/sorting_network.h", int32(line), text)
 }
 func (s *PsortASTNetwork) comparison() (uint8, error) {
 	if !s.modeInitialized {

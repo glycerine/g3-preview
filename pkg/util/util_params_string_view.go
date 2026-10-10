@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // Cold borrowed source pointer. Captured storage/provider/ref comes from the
@@ -28,7 +29,7 @@ func LiteralParamsStringView(s string) ParamsStringView {
 func (v ParamsStringView) Present() bool { return v.PresentField }
 func (v ParamsStringView) Byte(i uint64) (byte, error) {
 	if !v.PresentField {
-		return 0, ErrParamsStreamFailure
+		return 0, utext.ErrNullCString
 	}
 	switch v.Mode {
 	case 1:

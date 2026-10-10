@@ -1,5 +1,5 @@
 // Actual source diagnostic byte streams stay in main; core tests moved to memory.
-package util
+package diagnostic
 
 import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"
@@ -43,7 +43,7 @@ func smallObjectDiagnosticFixture(t *testing.T) (*umemory.Runtime, *arena.Budget
 	})
 	return rt, b, region, stream
 }
-func smallObjectID(t *testing.T, r *arena.BytesRegion, text string) GlobalParamCString {
+func smallObjectID(t *testing.T, r *arena.BytesRegion, text string) utext.RegionCString {
 	t.Helper()
 	ref, e := r.Allocate(uint32(len(text) + 1))
 	sourceSmallObjectMust(t, e)
@@ -51,7 +51,7 @@ func smallObjectID(t *testing.T, r *arena.BytesRegion, text string) GlobalParamC
 		sourceSmallObjectMust(t, r.Write(ref, uint32(i), text[i]))
 	}
 	sourceSmallObjectMust(t, r.Write(ref, uint32(len(text)), 0))
-	return GlobalParamCString{Origin: r.OwnerID(), Ref: ref, Present: true}
+	return utext.RegionCString{Origin: r.OwnerID(), Ref: ref, Present: true}
 }
 func TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth(t *testing.T) {
 	rt, _, region, out := smallObjectDiagnosticFixture(t)
@@ -81,7 +81,7 @@ func TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth(t *testing.T
 func TestSmallObjectAllocatorNullStaleIDErrorPrefixes(t *testing.T) {
 	for _, stale := range []bool{false, true} {
 		rt, _, region, out := smallObjectDiagnosticFixture(t)
-		id := GlobalParamCString{}
+		id := utext.RegionCString{}
 		if stale {
 			id = smallObjectID(t, region, "old")
 			region.Reset()
@@ -94,7 +94,7 @@ func TestSmallObjectAllocatorNullStaleIDErrorPrefixes(t *testing.T) {
 			if e != arena.ErrInvalidSlot {
 				t.Fatal("stale spelling not checked at insertion", e)
 			}
-		} else if e != ErrParamsStreamFailure {
+		} else if e != utext.ErrNullCString {
 			t.Fatal("null ostream insertion adapter", e)
 		}
 		if rt.Stats().PhysicalBytes != 0 {

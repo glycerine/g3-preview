@@ -1,6 +1,6 @@
 // Source: src/util/memory_manager.cpp:33-72; src/util/memory_manager.h:49-71.
 // Source: src/util/error_codes.h; src/util/z3_exception.h.
-package util
+package diagnostic
 
 import (
 	"os"
@@ -108,7 +108,7 @@ type MemoryFatalContext struct {
 	streams                   *MemoryStandardStreams
 	header                    uint64
 	region                    *arena.BytesRegion
-	message                   GlobalParamCString
+	message                   utext.RegionCString
 	exitOOM, borrowed, closed bool
 }
 
@@ -145,7 +145,7 @@ func (s *MemoryFatalContext) MemoryBudget() *arena.Budget {
 
 // Source stores the flag first and retains the previous pointer on false/null.
 // Pointer lifetime is deliberately not inspected until insertion.
-func (s *MemoryFatalContext) ExitWhenOutOfMemory(flag bool, r *arena.BytesRegion, msg GlobalParamCString) error {
+func (s *MemoryFatalContext) ExitWhenOutOfMemory(flag bool, r *arena.BytesRegion, msg utext.RegionCString) error {
 	if e := s.open(); e != nil {
 		return e
 	}

@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var (
@@ -373,7 +374,7 @@ func (m *SexprManager) MkString(s string, line, pos uint32) (SexprHandle, error)
 	return h, nil
 }
 func (m *SexprManager) MkCString(s string, line, pos uint32) (SexprHandle, error) {
-	return m.MkString(s[:nulStringLength(s)], line, pos)
+	return m.MkString(s[:utext.CStringLength(s)], line, pos)
 }
 func (m *SexprManager) mkSymbol(s usymbol.Symbol, line, pos uint32, kind SexprKind) (SexprHandle, error) {
 	if e := m.lock(); e != nil {

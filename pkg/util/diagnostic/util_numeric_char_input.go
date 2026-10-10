@@ -1,5 +1,5 @@
 // Source: src/util/debug.cpp:73-117, especially std::cin formatted extraction79-80.
-package util
+package diagnostic
 
 import (
 	"errors"

@@ -13,11 +13,11 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 var ErrParamsOwner = errors.New("g3: parameters owner or lifetime mismatch")
-var ErrParamsStreamFailure = errors.New("g3: null C-string failed parameter stream")
 var ErrParamsPrecondition = errors.New("g3: parameters source precondition")
 var paramsNextOwner uint64
 
@@ -660,7 +660,7 @@ func (c *ParamsContext) storeText(s *string, source *paramsText) (paramsText, er
 	if s == nil {
 		return paramsText{}, nil
 	}
-	value := (*s)[:nulStringLength(*s)]
+	value := (*s)[:utext.CStringLength(*s)]
 	return paramsText{owned: &paramsOwnedString{value: value, live: true}, present: true}, nil
 }
 func (c *ParamsContext) setCore(slot uint32, k usymbol.Symbol, kind ParamKind, bits uint64, sym usymbol.Symbol, str *string, rat *unumeral.OwnedRational, text *paramsText) error {
@@ -1155,7 +1155,7 @@ func (c *ParamsContext) appendValue(x *paramEntry) error {
 		return c.appendSymbol(x.symbol, false, false)
 	case ParamString:
 		if !x.text.present {
-			return ErrParamsStreamFailure
+			return utext.ErrNullCString
 		}
 		return c.appendEntryText(x)
 	case ParamNumeral:
@@ -1232,7 +1232,7 @@ func (c *ParamsContext) format(v *ParamsRef, key *usymbol.Symbol, module *string
 					return e
 				}
 				if module == nil {
-					return ErrParamsStreamFailure
+					return utext.ErrNullCString
 				}
 				if e = c.appendString(paramsCString(*module)); e != nil {
 					return e
@@ -1273,7 +1273,7 @@ func (c *ParamsContext) Display(v *ParamsRef) (string, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if e := c.format(v, nil, nil, nil); e != nil {
-		if errors.Is(e, ErrParamsStreamFailure) {
+		if errors.Is(e, utext.ErrNullCString) {
 			return string(c.workspace), e
 		}
 		return "", e
@@ -1295,7 +1295,7 @@ func (c *ParamsContext) DisplayKey(v *ParamsRef, k usymbol.Symbol) (string, erro
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if e := c.format(v, &k, nil, nil); e != nil {
-		if errors.Is(e, ErrParamsStreamFailure) {
+		if errors.Is(e, utext.ErrNullCString) {
 			return string(c.workspace), e
 		}
 		return "", e
@@ -1311,7 +1311,7 @@ func (c *ParamsContext) DisplaySMT2(v *ParamsRef, module *string, d *ParamDescrs
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if e := c.format(v, nil, module, d); e != nil {
-		if errors.Is(e, ErrParamsStreamFailure) {
+		if errors.Is(e, utext.ErrNullCString) {
 			return string(c.workspace), e
 		}
 		return "", e
@@ -1542,7 +1542,7 @@ func (c *ParamsContext) DisplayKeyName(v *ParamsRef, name *string) (string, erro
 		return "", e
 	}
 	if e = c.format(v, &k, nil, nil); e != nil {
-		if errors.Is(e, ErrParamsStreamFailure) {
+		if errors.Is(e, utext.ErrNullCString) {
 			return string(c.workspace), e
 		}
 		return "", e
@@ -1617,7 +1617,7 @@ func (c *ParamsContext) DebugString(v *ParamsRef) (string, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if e := c.format(v, nil, nil, nil); e != nil {
-		if errors.Is(e, ErrParamsStreamFailure) {
+		if errors.Is(e, utext.ErrNullCString) {
 			return string(c.workspace), e
 		}
 		return "", e

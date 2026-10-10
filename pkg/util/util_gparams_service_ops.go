@@ -7,6 +7,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -16,7 +17,7 @@ var ErrGlobalParamsAssertion = errors.New("g3: global parameters source assertio
 // borrow. Binding only stores its pointer; its lifetime is checked at reached
 // DEBUG SASSERT sites. Nil retains the source enabled default. Release erases
 // assertion accesses. This does not install a process-wide global binding.
-func (s *GlobalParamsService) BindNamespaceAssertions(d *DebugContext) error {
+func (s *GlobalParamsService) BindNamespaceAssertions(d *udiag.DebugContext) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -34,13 +35,10 @@ func (s *GlobalParamsService) NamespaceAssertionsEnabled() (bool, error) {
 }
 func (s *GlobalParamsService) NamespaceAssertionFailure(file string, line int32, condition string) error {
 	d := s.namespaceAssertions
-	if d == nil || d.assertionActions == nil {
+	if !d.HasAssertionActions() {
 		return ErrGlobalParamsAssertion
 	}
-	if e := d.NotifyAssertionViolation(file, line, condition); e != nil {
-		return e
-	}
-	return d.assertionActions.InvokeDebugger()
+	return udiag.DebugAssertionFailure(d, file, line, condition)
 }
 func (s *GlobalParamsService) namespaceImpAt(line int32) (*GlobalParams, error) {
 	if e := s.open(); e != nil {

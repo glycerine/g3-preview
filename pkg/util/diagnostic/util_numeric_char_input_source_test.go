@@ -1,5 +1,5 @@
 // Source: src/util/debug.cpp:73-117, particularly formatted char extraction79-80.
-package util
+package diagnostic
 
 import (
 	"errors"

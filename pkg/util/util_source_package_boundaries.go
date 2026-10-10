@@ -3,6 +3,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -14,7 +15,7 @@ func SymbolCStringView(m *usymbol.Manager, s usymbol.Symbol) (ParamsStringView, 
 		return ParamsStringView{}, e
 	}
 	if s.IsNumerical() {
-		if sourceDebug {
+		if udiag.DebugBuild {
 			return ParamsStringView{}, usymbol.ErrInvalid
 		}
 		return LiteralParamsStringView(""), nil

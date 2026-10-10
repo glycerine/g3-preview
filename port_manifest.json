@@ -108116,15 +108116,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/arena/small_bytes.go",
-        "pkg/util/util_small_object_allocator.go",
+        "pkg/util/diagnostic/util_small_object_allocator.go",
         "pkg/util/memory/small_allocator_consolidate.go",
-        "pkg/util/util_small_object_allocator_stream.go",
-        "pkg/util/util_small_object_allocator_test.go",
+        "pkg/util/diagnostic/util_small_object_allocator_stream.go",
+        "pkg/util/diagnostic/util_small_object_allocator_test.go",
         "pkg/util/memory/small_allocator.go",
         "pkg/util/memory/allocator_io.go",
         "pkg/util/memory/small_allocator_test.go",
         "pkg/util/memory/shared_runtime_api_test.go",
-        "pkg/util/util_memory_bridge_test.go"
+        "pkg/util/diagnostic/util_memory_bridge_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -108203,7 +108203,7 @@
         {
           "name": "source allocator borrowed CString diagnostics and real NumericTextStream verbosity",
           "status": "partial",
-          "go_target": "pkg/util/util_small_object_allocator_stream.go",
+          "go_target": "pkg/util/diagnostic/util_small_object_allocator_stream.go",
           "tests": [
             "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
             "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
@@ -112011,21 +112011,21 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_debug_context.go",
-        "pkg/util/util_debug_context_test.go",
+        "pkg/util/diagnostic/util_debug_context.go",
+        "pkg/util/diagnostic/util_debug_context_test.go",
         "pkg/util/heap/heap.go",
-        "pkg/util/util_debug_notification.go",
-        "pkg/util/util_debug_notification_source_test.go",
-        "pkg/util/util_numeric_char_input.go",
-        "pkg/util/util_numeric_char_input_source_test.go",
+        "pkg/util/diagnostic/util_debug_notification.go",
+        "pkg/util/diagnostic/util_debug_notification_source_test.go",
+        "pkg/util/diagnostic/util_numeric_char_input.go",
+        "pkg/util/diagnostic/util_numeric_char_input_source_test.go",
         "pkg/util/text/util_numeric_stream_flush.go",
-        "pkg/util/util_debug_actions.go",
-        "pkg/util/util_debug_actions_host_linux.go",
-        "pkg/util/util_debug_actions_host_other.go",
-        "pkg/util/util_debug_actions_source_test.go",
-        "pkg/util/util_debug_action_binding.go",
+        "pkg/util/diagnostic/util_debug_actions.go",
+        "pkg/util/diagnostic/util_debug_actions_host_linux.go",
+        "pkg/util/diagnostic/util_debug_actions_host_other.go",
+        "pkg/util/diagnostic/util_debug_actions_source_test.go",
+        "pkg/util/diagnostic/util_debug_action_binding.go",
         "pkg/util/util_gparams_service_ops.go",
-        "pkg/util/numeric_char_input_tie_boundary_test.go"
+        "pkg/util/diagnostic/numeric_char_input_tie_boundary_test.go"
       ],
       "tests": [
         "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
@@ -112076,13 +112076,13 @@
         {
           "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
           "status": "partial",
-          "go_target": "pkg/util/util_debug_context.go",
+          "go_target": "pkg/util/diagnostic/util_debug_context.go",
           "tests": []
         },
         {
           "name": "notify_assertion_violation source37-42 separate stderr insertion chains with caller format state and borrowed CString reached lifetime",
           "status": "partial",
-          "go_target": "pkg/util/util_debug_notification.go",
+          "go_target": "pkg/util/diagnostic/util_debug_notification.go",
           "tests": [
             "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
             "TestDebugNotificationBorrowedCStringActualLifetimePrefixes",
@@ -112096,7 +112096,7 @@
         {
           "name": "invoke_gdb formatted std::cin char extraction prerequisite at cpp79-80: concrete classic-byte file input, actual tied stdout sentry and default nonthrowing flags",
           "status": "partial",
-          "go_target": "pkg/util/util_numeric_char_input.go",
+          "go_target": "pkg/util/diagnostic/util_numeric_char_input.go",
           "tests": [
             "TestNumericCharInputClassicWhitespaceIndependentEveryByte",
             "TestNumericCharInputEOFFailureErasesClosedTieAndDestination",
@@ -112110,7 +112110,7 @@
         {
           "name": "invoke_gdb cpp73-117 and NO_Z3_DEBUGGER h42-56: literal prompt/extract/switch, real exit/default exception and concrete Linux system/signal action chain",
           "status": "partial",
-          "go_target": "pkg/util/util_debug_actions.go",
+          "go_target": "pkg/util/diagnostic/util_debug_actions.go",
           "tests": [
             "TestDebugActionSubprocessHelper",
             "TestDebugActionLiteralContinueAbortThrowEOFFlow",
@@ -112125,13 +112125,13 @@
         {
           "name": "Concrete enabled-false SASSERT notification/action binding: permutation.cpp:67,70-73 and vector.h:70,113,167,304,309; actual C continuation/T exception/exit action sites",
           "status": "partial",
-          "go_target": "pkg/util/util_debug_action_binding.go",
+          "go_target": "pkg/util/diagnostic/util_debug_action_binding.go",
           "tests": []
         },
         {
           "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
           "status": "partial",
-          "go_target": "pkg/util/util_debug_notification.go",
+          "go_target": "pkg/util/diagnostic/util_debug_notification.go",
           "tests": []
         },
         {
@@ -112198,24 +112198,24 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_debug_context.go",
-        "pkg/util/util_debug_context_test.go",
+        "pkg/util/diagnostic/util_debug_context.go",
+        "pkg/util/diagnostic/util_debug_context_test.go",
         "pkg/util/heap/heap.go",
         "pkg/util/memory/small_allocator_assertions.go",
-        "pkg/util/util_small_object_allocator_assertions_test.go",
-        "pkg/util/util_small_object_allocator.go",
-        "pkg/util/util_debug_notification.go",
-        "pkg/util/util_debug_notification_source_test.go",
-        "pkg/util/util_numeric_char_input.go",
-        "pkg/util/util_numeric_char_input_source_test.go",
+        "pkg/util/diagnostic/util_small_object_allocator_assertions_test.go",
+        "pkg/util/diagnostic/util_small_object_allocator.go",
+        "pkg/util/diagnostic/util_debug_notification.go",
+        "pkg/util/diagnostic/util_debug_notification_source_test.go",
+        "pkg/util/diagnostic/util_numeric_char_input.go",
+        "pkg/util/diagnostic/util_numeric_char_input_source_test.go",
         "pkg/util/text/util_numeric_stream_flush.go",
-        "pkg/util/util_debug_actions.go",
-        "pkg/util/util_debug_actions_host_linux.go",
-        "pkg/util/util_debug_actions_host_other.go",
-        "pkg/util/util_debug_actions_source_test.go",
-        "pkg/util/util_debug_action_binding.go",
-        "pkg/util/util_debug_macros.go",
-        "pkg/util/util_debug_macro_source_test.go",
+        "pkg/util/diagnostic/util_debug_actions.go",
+        "pkg/util/diagnostic/util_debug_actions_host_linux.go",
+        "pkg/util/diagnostic/util_debug_actions_host_other.go",
+        "pkg/util/diagnostic/util_debug_actions_source_test.go",
+        "pkg/util/diagnostic/util_debug_action_binding.go",
+        "pkg/util/diagnostic/util_debug_macros.go",
+        "pkg/util/diagnostic/util_debug_macro_source_test.go",
         "pkg/util/util_gparams_service_ops.go"
       ],
       "tests": [
@@ -112363,13 +112363,13 @@
         {
           "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
           "status": "partial",
-          "go_target": "pkg/util/util_debug_context.go",
+          "go_target": "pkg/util/diagnostic/util_debug_context.go",
           "tests": []
         },
         {
           "name": "Actual source runtime assertions_enabled read at reached allocator SASSERT sites; erased release/nonWindows direct/zero branches; optional cold borrow of actual DebugContext",
           "status": "partial",
-          "go_target": "pkg/util/util_small_object_allocator.go",
+          "go_target": "pkg/util/diagnostic/util_small_object_allocator.go",
           "tests": [
             "TestSmallObjectAllocatorActualAssertionSwitchForeignDirect",
             "TestSmallObjectAllocatorAssertionBindingReachedAndErased",
@@ -112380,7 +112380,7 @@
         {
           "name": "notify_assertion_violation source37-42 separate stderr insertion chains with caller format state and borrowed CString reached lifetime",
           "status": "partial",
-          "go_target": "pkg/util/util_debug_notification.go",
+          "go_target": "pkg/util/diagnostic/util_debug_notification.go",
           "tests": [
             "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
             "TestDebugNotificationBorrowedCStringActualLifetimePrefixes",
@@ -112394,7 +112394,7 @@
         {
           "name": "invoke_gdb formatted std::cin char extraction prerequisite at cpp79-80: concrete classic-byte file input, actual tied stdout sentry and default nonthrowing flags",
           "status": "partial",
-          "go_target": "pkg/util/util_numeric_char_input.go",
+          "go_target": "pkg/util/diagnostic/util_numeric_char_input.go",
           "tests": [
             "TestNumericCharInputClassicWhitespaceIndependentEveryByte",
             "TestNumericCharInputEOFFailureErasesClosedTieAndDestination",
@@ -112408,7 +112408,7 @@
         {
           "name": "invoke_gdb cpp73-117 and NO_Z3_DEBUGGER h42-56: literal prompt/extract/switch, real exit/default exception and concrete Linux system/signal action chain",
           "status": "partial",
-          "go_target": "pkg/util/util_debug_actions.go",
+          "go_target": "pkg/util/diagnostic/util_debug_actions.go",
           "tests": [
             "TestDebugActionSubprocessHelper",
             "TestDebugActionLiteralContinueAbortThrowEOFFlow",
@@ -112423,19 +112423,19 @@
         {
           "name": "Concrete enabled-false SASSERT notification/action binding: permutation.cpp:67,70-73 and vector.h:70,113,167,304,309; actual C continuation/T exception/exit action sites",
           "status": "partial",
-          "go_target": "pkg/util/util_debug_action_binding.go",
+          "go_target": "pkg/util/diagnostic/util_debug_action_binding.go",
           "tests": []
         },
         {
           "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
           "status": "partial",
-          "go_target": "pkg/util/util_debug_notification.go",
+          "go_target": "pkg/util/diagnostic/util_debug_notification.go",
           "tests": []
         },
         {
           "name": "Literal source macro false leaves plus concrete Runtime heap constructor/reset/reserve/bounds/insert/move/erase/min/key-update/swap and nested indexed/back/pop/shrink assertion control; src/util/debug.h:63-65; src/util/debug.h:67-78; src/util/debug.h:81-92; src/util/error_codes.h:29; src/util/heap.h:57,61-66,79-92,230-239; src/util/vector.h:303-310; src/util/heap.h:126,138,145,154,162,165,174,191,196,217,260-265; src/util/heap.h:105,169,175-176,181,197,221,226; src/util/vector.h:334,344,391,402; src/util/heap.h:272-282",
           "status": "partial",
-          "go_target": "pkg/util/util_debug_macros.go",
+          "go_target": "pkg/util/diagnostic/util_debug_macros.go",
           "tests": [
             "TestDebugMacroUnreachableIgnoresAssertionSwitch",
             "TestDebugMacroVerifyFalsePrefixAndContinue",
@@ -113045,8 +113045,8 @@
       "status": "ported",
       "go_targets": [
         "pkg/util/z3exception/z3_exception.go",
-        "pkg/util/util_memory_fatal_policy.go",
-        "pkg/util/util_memory_fatal_policy_test.go"
+        "pkg/util/diagnostic/util_memory_fatal_policy.go",
+        "pkg/util/diagnostic/util_memory_fatal_policy_test.go"
       ],
       "tests": [
         "TestZ3ExceptionSourceCodesAndLabels",
@@ -113079,7 +113079,7 @@
         {
           "name": "ERR_MEMOUT101/ERR_ALLOC_EXCEEDED113 exact constants exercised by real compiled-Go fatal dispatch",
           "status": "ported",
-          "go_target": "pkg/util/util_memory_fatal_policy.go",
+          "go_target": "pkg/util/diagnostic/util_memory_fatal_policy.go",
           "tests": [
             "TestMemoryFatalNonExitExceptionCatch",
             "TestMemoryFatalRealExitWithActiveReservationRefusal"
@@ -114718,8 +114718,8 @@
         "pkg/util/heap/heap_test.go",
         "pkg/util/heap/source_frontier_test.go",
         "pkg/util/heap/owner_test.go",
-        "pkg/util/util_debug_macros.go",
-        "pkg/util/util_debug_macro_source_test.go",
+        "pkg/util/diagnostic/util_debug_macros.go",
+        "pkg/util/diagnostic/util_debug_macro_source_test.go",
         "pkg/util/heap/source_prefix_test.go",
         "pkg/sat/sat_var_queue_native_test.go"
       ],
@@ -123155,7 +123155,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_memory_runtime.go",
+        "pkg/util/diagnostic/util_memory_runtime.go",
         "pkg/util/memory/accounting.go",
         "pkg/util/memory/runtime.go",
         "pkg/util/memory/failure.go",
@@ -123163,14 +123163,14 @@
         "pkg/util/memory/accounting_test.go",
         "pkg/util/memory/runtime_test.go",
         "pkg/util/memory/shared_runtime_api_test.go",
-        "pkg/util/util_memory_bridge_test.go",
+        "pkg/util/diagnostic/util_memory_bridge_test.go",
         "pkg/util/memory/uint32_codec.go",
         "pkg/util/memory/uint32_codec_test.go",
         "pkg/util/memory/release_progress.go",
         "pkg/util/memory/release_progress_test.go",
         "pkg/util/memory/runtime_size_t_entry_test.go",
-        "pkg/util/util_memory_fatal_policy.go",
-        "pkg/util/util_memory_fatal_policy_test.go",
+        "pkg/util/diagnostic/util_memory_fatal_policy.go",
+        "pkg/util/diagnostic/util_memory_fatal_policy_test.go",
         "pkg/util/text/util_numeric_stream_file.go",
         "pkg/util/text/util_numeric_stream_file_test.go",
         "pkg/util/text/util_numeric_stream.go",
@@ -123337,7 +123337,7 @@
         {
           "name": "main nominal Z3/default-exception transport and charged allocator bridge ownership",
           "status": "ported",
-          "go_target": "pkg/util/util_memory_runtime.go",
+          "go_target": "pkg/util/diagnostic/util_memory_runtime.go",
           "tests": [
             "TestMemoryBridgeColdHeadersAndConstructorUnwind",
             "TestMemoryBridgeNominalOOMAndCountErrors",
@@ -123388,7 +123388,7 @@
         {
           "name": "cpp33-72/h44-47,70: explicit same-cohort source OOM policy, derived/base exception catch, conditional borrowed CString setter, count prefix then actual current max-count read, real exits101/113 through standard file providers",
           "status": "partial",
-          "go_target": "pkg/util/util_memory_fatal_policy.go",
+          "go_target": "pkg/util/diagnostic/util_memory_fatal_policy.go",
           "tests": [
             "TestMemoryFatalStandardStreamsColdGraph",
             "TestMemoryFatalNonExitExceptionCatch",
@@ -123411,13 +123411,13 @@
             "TestMemoryFatalRealExitWithActiveReservationRefusal"
           ],
           "go_targets": [
-            "pkg/util/util_memory_fatal_policy.go"
+            "pkg/util/diagnostic/util_memory_fatal_policy.go"
           ]
         },
         {
           "name": "Bound FatalPolicy through real lower Runtime dispatch and main alias wrapper; unbound legacy transport unchanged; source vector-overflow transport remains separate",
           "status": "partial",
-          "go_target": "pkg/util/util_memory_runtime.go",
+          "go_target": "pkg/util/diagnostic/util_memory_runtime.go",
           "tests": [
             "TestMemoryFatalMainRuntimeBinding",
             "TestMemoryFatalNonExitExceptionCatch",
@@ -123482,7 +123482,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_memory_runtime.go",
+        "pkg/util/diagnostic/util_memory_runtime.go",
         "pkg/util/memory/accounting.go",
         "pkg/util/memory/runtime.go",
         "pkg/util/memory/failure.go",
@@ -123490,10 +123490,10 @@
         "pkg/util/memory/accounting_test.go",
         "pkg/util/memory/runtime_test.go",
         "pkg/util/memory/shared_runtime_api_test.go",
-        "pkg/util/util_memory_bridge_test.go",
+        "pkg/util/diagnostic/util_memory_bridge_test.go",
         "pkg/util/memory/runtime_size_t_entry_test.go",
-        "pkg/util/util_memory_fatal_policy.go",
-        "pkg/util/util_memory_fatal_policy_test.go",
+        "pkg/util/diagnostic/util_memory_fatal_policy.go",
+        "pkg/util/diagnostic/util_memory_fatal_policy_test.go",
         "pkg/util/text/util_numeric_stream_file.go",
         "pkg/util/text/util_numeric_stream_file_test.go",
         "pkg/util/text/util_numeric_stream.go",
@@ -123652,7 +123652,7 @@
         {
           "name": "main nominal Z3/default-exception transport and charged allocator bridge ownership",
           "status": "ported",
-          "go_target": "pkg/util/util_memory_runtime.go",
+          "go_target": "pkg/util/diagnostic/util_memory_runtime.go",
           "tests": [
             "TestMemoryBridgeColdHeadersAndConstructorUnwind",
             "TestMemoryBridgeNominalOOMAndCountErrors",
@@ -123677,7 +123677,7 @@
         {
           "name": "cpp33-72/h44-47,70: explicit same-cohort source OOM policy, derived/base exception catch, conditional borrowed CString setter, count prefix then actual current max-count read, real exits101/113 through standard file providers",
           "status": "partial",
-          "go_target": "pkg/util/util_memory_fatal_policy.go",
+          "go_target": "pkg/util/diagnostic/util_memory_fatal_policy.go",
           "tests": [
             "TestMemoryFatalStandardStreamsColdGraph",
             "TestMemoryFatalNonExitExceptionCatch",
@@ -123700,13 +123700,13 @@
             "TestMemoryFatalRealExitWithActiveReservationRefusal"
           ],
           "go_targets": [
-            "pkg/util/util_memory_fatal_policy.go"
+            "pkg/util/diagnostic/util_memory_fatal_policy.go"
           ]
         },
         {
           "name": "Bound FatalPolicy through real lower Runtime dispatch and main alias wrapper; unbound legacy transport unchanged; source vector-overflow transport remains separate",
           "status": "partial",
-          "go_target": "pkg/util/util_memory_runtime.go",
+          "go_target": "pkg/util/diagnostic/util_memory_runtime.go",
           "tests": [
             "TestMemoryFatalMainRuntimeBinding",
             "TestMemoryFatalNonExitExceptionCatch",
@@ -143671,15 +143671,15 @@
       "status": "ported",
       "go_targets": [
         "pkg/arena/small_bytes.go",
-        "pkg/util/util_small_object_allocator.go",
+        "pkg/util/diagnostic/util_small_object_allocator.go",
         "pkg/util/memory/small_allocator_consolidate.go",
-        "pkg/util/util_small_object_allocator_stream.go",
-        "pkg/util/util_small_object_allocator_test.go",
+        "pkg/util/diagnostic/util_small_object_allocator_stream.go",
+        "pkg/util/diagnostic/util_small_object_allocator_test.go",
         "pkg/util/memory/small_allocator.go",
         "pkg/util/memory/allocator_io.go",
         "pkg/util/memory/small_allocator_test.go",
         "pkg/util/memory/shared_runtime_api_test.go",
-        "pkg/util/util_memory_bridge_test.go",
+        "pkg/util/diagnostic/util_memory_bridge_test.go",
         "pkg/util/memory/uint32_codec.go",
         "pkg/util/memory/uint32_codec_test.go",
         "pkg/util/memory/release_progress.go",
@@ -143691,12 +143691,12 @@
         "pkg/util/memory/small_allocator_size_t_entry_test.go",
         "pkg/util/memory/small_allocator_query_prefix_test.go",
         "pkg/util/memory/small_allocator_assertions.go",
-        "pkg/util/util_small_object_allocator_assertions_test.go",
-        "pkg/util/util_verbose_context.go",
-        "pkg/util/util_verbose_context_test.go",
+        "pkg/util/diagnostic/util_small_object_allocator_assertions_test.go",
+        "pkg/util/diagnostic/util_verbose_context.go",
+        "pkg/util/diagnostic/util_verbose_context_test.go",
         "pkg/util/text/util_numeric_stream_file.go",
         "pkg/util/text/util_numeric_stream_file_test.go",
-        "pkg/util/util_memory_fatal_policy_test.go",
+        "pkg/util/diagnostic/util_memory_fatal_policy_test.go",
         "pkg/util/memory/small_allocator_allocation_outcome.go",
         "pkg/util/memory/small_allocator_allocation_outcome_test.go",
         "pkg/util/memory/small_allocator_guarded_start_source_test.go",
@@ -143979,7 +143979,7 @@
         {
           "name": "source allocator borrowed CString diagnostics and real NumericTextStream verbosity",
           "status": "ported",
-          "go_target": "pkg/util/util_small_object_allocator_stream.go",
+          "go_target": "pkg/util/diagnostic/util_small_object_allocator_stream.go",
           "tests": [
             "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
             "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
@@ -144060,7 +144060,7 @@
         {
           "name": "Actual source runtime assertions_enabled read at reached allocator SASSERT sites; erased release/nonWindows direct/zero branches; optional cold borrow of actual DebugContext",
           "status": "ported",
-          "go_target": "pkg/util/util_small_object_allocator.go",
+          "go_target": "pkg/util/diagnostic/util_small_object_allocator.go",
           "tests": [
             "TestSmallObjectAllocatorActualAssertionSwitchForeignDirect",
             "TestSmallObjectAllocatorAssertionBindingReachedAndErased",
@@ -144071,7 +144071,7 @@
         {
           "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
           "status": "ported",
-          "go_target": "pkg/util/util_verbose_context.go",
+          "go_target": "pkg/util/diagnostic/util_verbose_context.go",
           "tests": [
             "TestVerboseContextMutableAllocatorSelection",
             "TestVerboseContextBorrowedPointerAndLifetime",
@@ -144084,7 +144084,7 @@
         {
           "name": "Selected ostream provider prerequisite and external CString strlen-before-badbit sentry; actual file write failure sets nonthrowing badbit without output-buffer allocation",
           "status": "ported",
-          "go_target": "pkg/util/util_small_object_allocator_stream.go",
+          "go_target": "pkg/util/diagnostic/util_small_object_allocator_stream.go",
           "tests": [
             "TestNumericFileStreamExactFormattingAndBorrow",
             "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
@@ -144151,15 +144151,15 @@
       "status": "ported",
       "go_targets": [
         "pkg/arena/small_bytes.go",
-        "pkg/util/util_small_object_allocator.go",
+        "pkg/util/diagnostic/util_small_object_allocator.go",
         "pkg/util/memory/small_allocator_consolidate.go",
-        "pkg/util/util_small_object_allocator_stream.go",
-        "pkg/util/util_small_object_allocator_test.go",
+        "pkg/util/diagnostic/util_small_object_allocator_stream.go",
+        "pkg/util/diagnostic/util_small_object_allocator_test.go",
         "pkg/util/memory/small_allocator.go",
         "pkg/util/memory/allocator_io.go",
         "pkg/util/memory/small_allocator_test.go",
         "pkg/util/memory/shared_runtime_api_test.go",
-        "pkg/util/util_memory_bridge_test.go",
+        "pkg/util/diagnostic/util_memory_bridge_test.go",
         "pkg/util/memory/small_allocator_pending_roots.go",
         "pkg/util/memory/small_allocator_pending_roots_test.go",
         "pkg/util/memory/small_allocator_raw.go",
@@ -144168,12 +144168,12 @@
         "pkg/util/memory/small_allocator_size_t_entry_test.go",
         "pkg/util/memory/small_allocator_query_prefix_test.go",
         "pkg/util/memory/small_allocator_assertions.go",
-        "pkg/util/util_small_object_allocator_assertions_test.go",
-        "pkg/util/util_verbose_context.go",
-        "pkg/util/util_verbose_context_test.go",
+        "pkg/util/diagnostic/util_small_object_allocator_assertions_test.go",
+        "pkg/util/diagnostic/util_verbose_context.go",
+        "pkg/util/diagnostic/util_verbose_context_test.go",
         "pkg/util/text/util_numeric_stream_file.go",
         "pkg/util/text/util_numeric_stream_file_test.go",
-        "pkg/util/util_memory_fatal_policy_test.go",
+        "pkg/util/diagnostic/util_memory_fatal_policy_test.go",
         "pkg/util/memory/small_allocator_allocation_outcome.go",
         "pkg/util/memory/small_allocator_guarded_start_source_test.go",
         "pkg/math/polynomial/polynomial_monomial.go",
@@ -144398,7 +144398,7 @@
         {
           "name": "source allocator borrowed CString diagnostics and real NumericTextStream verbosity",
           "status": "ported",
-          "go_target": "pkg/util/util_small_object_allocator_stream.go",
+          "go_target": "pkg/util/diagnostic/util_small_object_allocator_stream.go",
           "tests": [
             "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
             "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
@@ -144453,7 +144453,7 @@
         {
           "name": "Actual source runtime assertions_enabled read at reached allocator SASSERT sites; erased release/nonWindows direct/zero branches; optional cold borrow of actual DebugContext",
           "status": "ported",
-          "go_target": "pkg/util/util_small_object_allocator.go",
+          "go_target": "pkg/util/diagnostic/util_small_object_allocator.go",
           "tests": [
             "TestSmallObjectAllocatorActualAssertionSwitchForeignDirect",
             "TestSmallObjectAllocatorAssertionBindingReachedAndErased",
@@ -144464,7 +144464,7 @@
         {
           "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
           "status": "ported",
-          "go_target": "pkg/util/util_verbose_context.go",
+          "go_target": "pkg/util/diagnostic/util_verbose_context.go",
           "tests": [
             "TestVerboseContextMutableAllocatorSelection",
             "TestVerboseContextBorrowedPointerAndLifetime",
@@ -144477,7 +144477,7 @@
         {
           "name": "Selected ostream provider prerequisite and external CString strlen-before-badbit sentry; actual file write failure sets nonthrowing badbit without output-buffer allocation",
           "status": "ported",
-          "go_target": "pkg/util/util_small_object_allocator_stream.go",
+          "go_target": "pkg/util/diagnostic/util_small_object_allocator_stream.go",
           "tests": [
             "TestNumericFileStreamExactFormattingAndBorrow",
             "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
@@ -145408,7 +145408,7 @@
       "status": "platform_replacement",
       "go_targets": [
         "pkg/util/symbol/symbol.go",
-        "pkg/util/util_debug_context.go"
+        "pkg/util/diagnostic/util_debug_context.go"
       ],
       "tests": [
         "TestSymbolDuplicateLookupAndInvalidTokens",
@@ -145432,7 +145432,7 @@
           "status": "platform_replacement",
           "go_targets": [
             "pkg/util/symbol/symbol.go",
-            "pkg/util/util_debug_context.go"
+            "pkg/util/diagnostic/util_debug_context.go"
           ],
           "tests": [
             "TestSymbolDuplicateLookupAndInvalidTokens",
@@ -147082,12 +147082,12 @@
         "pkg/util/numeral/mpz_log.go",
         "pkg/util/util_sexpr.go",
         "pkg/util/escaped/escaped.go",
-        "pkg/util/util_verbose_context.go",
-        "pkg/util/util_verbose_context_test.go",
+        "pkg/util/diagnostic/util_verbose_context.go",
+        "pkg/util/diagnostic/util_verbose_context_test.go",
         "pkg/util/memory/small_allocator.go",
         "pkg/util/memory/allocator_io.go",
-        "pkg/util/util_small_object_allocator.go",
-        "pkg/util/util_small_object_allocator_stream.go"
+        "pkg/util/diagnostic/util_small_object_allocator.go",
+        "pkg/util/diagnostic/util_small_object_allocator_stream.go"
       ],
       "tests": [
         "TestSourceRandomVectors",
@@ -147186,7 +147186,7 @@
         {
           "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
           "status": "partial",
-          "go_target": "pkg/util/util_verbose_context.go",
+          "go_target": "pkg/util/diagnostic/util_verbose_context.go",
           "tests": [
             "TestVerboseContextMutableAllocatorSelection",
             "TestVerboseContextBorrowedPointerAndLifetime",
@@ -147216,12 +147216,12 @@
         "pkg/util/numeral/mpz_log.go",
         "pkg/util/util_sexpr.go",
         "pkg/util/escaped/escaped.go",
-        "pkg/util/util_verbose_context.go",
-        "pkg/util/util_verbose_context_test.go",
+        "pkg/util/diagnostic/util_verbose_context.go",
+        "pkg/util/diagnostic/util_verbose_context_test.go",
         "pkg/util/memory/small_allocator.go",
         "pkg/util/memory/allocator_io.go",
-        "pkg/util/util_small_object_allocator.go",
-        "pkg/util/util_small_object_allocator_stream.go"
+        "pkg/util/diagnostic/util_small_object_allocator.go",
+        "pkg/util/diagnostic/util_small_object_allocator_stream.go"
       ],
       "tests": [
         "TestSourceRandomVectors",
@@ -147488,7 +147488,7 @@
         {
           "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
           "status": "partial",
-          "go_target": "pkg/util/util_verbose_context.go",
+          "go_target": "pkg/util/diagnostic/util_verbose_context.go",
           "tests": [
             "TestVerboseContextMutableAllocatorSelection",
             "TestVerboseContextBorrowedPointerAndLifetime",
@@ -147564,9 +147564,9 @@
         "pkg/math/polynomial/polynomial_lex_sort.go",
         "pkg/math/polynomial/polynomial_lex_raw_pointer.go",
         "pkg/math/polynomial/polynomial_lex_raw_source_test.go",
-        "pkg/util/util_debug_notification.go",
-        "pkg/util/util_debug_macros.go",
-        "pkg/util/util_debug_macro_source_test.go",
+        "pkg/util/diagnostic/util_debug_notification.go",
+        "pkg/util/diagnostic/util_debug_macros.go",
+        "pkg/util/diagnostic/util_debug_macro_source_test.go",
         "pkg/ast/util_ast_literal_vector.go",
         "pkg/ast/util_ast_literal_vector_source_test.go",
         "pkg/math/polynomial/polynomial_ref_vector_set.go",
@@ -148167,13 +148167,13 @@
         {
           "name": "Concrete enabled-false SASSERT notification/action binding: permutation.cpp:67,70-73 and vector.h:70,113,167,304,309; actual C continuation/T exception/exit action sites",
           "status": "partial",
-          "go_target": "pkg/util/util_debug_action_binding.go",
+          "go_target": "pkg/util/diagnostic/util_debug_action_binding.go",
           "tests": []
         },
         {
           "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
           "status": "partial",
-          "go_target": "pkg/util/util_debug_notification.go",
+          "go_target": "pkg/util/diagnostic/util_debug_notification.go",
           "tests": []
         },
         {
@@ -148602,8 +148602,8 @@
       "status": "ported",
       "go_targets": [
         "pkg/util/z3exception/z3_exception.go",
-        "pkg/util/util_memory_fatal_policy.go",
-        "pkg/util/util_memory_fatal_policy_test.go"
+        "pkg/util/diagnostic/util_memory_fatal_policy.go",
+        "pkg/util/diagnostic/util_memory_fatal_policy_test.go"
       ],
       "tests": [
         "TestZ3ExceptionSourceCodesAndLabels",
@@ -148653,7 +148653,7 @@
         {
           "name": "ERR_MEMOUT101/ERR_ALLOC_EXCEEDED113 actual fatal dispatch and out_of_memory_error -> z3_error derived/base Go catch adaptation",
           "status": "ported",
-          "go_target": "pkg/util/util_memory_fatal_policy.go",
+          "go_target": "pkg/util/diagnostic/util_memory_fatal_policy.go",
           "tests": [
             "TestMemoryFatalNonExitExceptionCatch",
             "TestMemoryFatalRealExitWithActiveReservationRefusal"

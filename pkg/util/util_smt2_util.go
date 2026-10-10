@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var ErrSMT2NeedsQuoting = errors.New("g3: SMT2 symbol does not satisfy quoting precondition")
@@ -22,7 +23,7 @@ func IsSMT2QuotedCString(text *string) bool {
 		return false
 	}
 	s := *text
-	n := nulStringLength(s)
+	n := utext.CStringLength(s)
 	s = s[:n]
 	if n > 0 && s[0] >= '0' && s[0] <= '9' {
 		return true

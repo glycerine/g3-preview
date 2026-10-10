@@ -9,7 +9,8 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/idgen"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	utext "github.com/glycerine/g3/pkg/util/text"
@@ -17,7 +18,7 @@ import (
 
 var (
 	ErrSATOwner     = errors.New("sat: foreign or copied storage owner")
-	ErrSATAssertion = util.ErrDebugAssertion
+	ErrSATAssertion = udiag.ErrDebugAssertion
 	ErrSATKind      = errors.New("sat: invalid pointer-union kind")
 )
 var satStorageNextOwner atomic.Uint64

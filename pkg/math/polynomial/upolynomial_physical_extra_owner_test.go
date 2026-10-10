@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -26,7 +27,7 @@ type paramsPhysicalRationalOwner struct {
 type upolyPhysicalExtraOwners struct {
 	CallerBlocks         []umemory.Block // actual directly returned caller allocations only
 	ASTManagers          []*ast.ASTManager
-	DebugContexts        []*util.DebugContext
+	DebugContexts        []*udiag.DebugContext
 	ParamsRationalValues []paramsPhysicalRationalOwner
 	ParamsValues         []paramsPhysicalValueOwner
 	RationalServices     []*unumeral.RationalService

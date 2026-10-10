@@ -1,7 +1,7 @@
 //go:build linux
 
 // Source: src/util/debug.cpp:88-107.
-package util
+package diagnostic
 
 import (
 	"os"

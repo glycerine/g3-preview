@@ -2,6 +2,7 @@
 package util
 
 import (
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
@@ -20,7 +21,7 @@ type paramsPhysicalRationalOwner struct {
 
 type numericPhysicalExtraOwners struct {
 	CallerBlocks         []umemory.Block // actual directly returned caller allocations only
-	DebugContexts        []*DebugContext
+	DebugContexts        []*udiag.DebugContext
 	ParamsRationalValues []paramsPhysicalRationalOwner
 	ParamsValues         []paramsPhysicalValueOwner
 	RationalServices     []*unumeral.RationalService

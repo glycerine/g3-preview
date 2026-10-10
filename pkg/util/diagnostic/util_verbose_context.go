@@ -1,5 +1,5 @@
 // Source: src/util/util.cpp:22-40; src/util/util.h:176-186.
-package util
+package diagnostic
 
 import (
 	"errors"

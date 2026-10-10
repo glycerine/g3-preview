@@ -1,6 +1,9 @@
 package util
 
-import usymbol "github.com/glycerine/g3/pkg/util/symbol"
+import (
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
+)
 
 import "testing"
 
@@ -36,7 +39,7 @@ func TestGparamsDictionariesUseRequiredGoOrdering(t *testing.T) {
 
 	var descriptions gparamsDescriptionDictionary
 	descriptions.init()
-	text := GlobalParamCString{Offset: 7, Present: true}
+	text := utext.RegionCString{Offset: 7, Present: true}
 	descriptions.set(usymbol.Numerical(3), text)
 	if got, ok := descriptions.get(usymbol.Numerical(3)); !ok || got != text {
 		t.Fatal(got, ok)

@@ -8,13 +8,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-func psortActionFixture(t *testing.T, text string) (*PsortASTNetwork, *util.DebugContext, *util.NumericCharInput, *os.File) {
+func psortActionFixture(t *testing.T, text string) (*PsortASTNetwork, *udiag.DebugContext, *udiag.NumericCharInput, *os.File) {
 	t.Helper()
 	b, r, d, input, streams := astDebugActionFixture(t, text)
 	symbols, e := usymbol.NewManager(usymbol.Config{Budget: b})
@@ -60,7 +61,7 @@ func TestPsortASTNetworkBoundContinueThenThrowActualSourcePrefix(t *testing.T) {
 	astTestMust(t, e)
 	state, e := input.State()
 	astTestMust(t, e)
-	if util.DebugBuild {
+	if udiag.DebugBuild {
 		var exception z3exception.DefaultException
 		if !errors.As(cause, &exception) || !strings.Contains(string(data), "Line: 983\nm <= n\n") || !strings.Contains(string(data), "Line: 1019\nk + offset <= n\n") || state.Position != 2 {
 			t.Fatal("source bound action chain", cause, string(data), state)
@@ -106,7 +107,7 @@ func TestPsortASTNetworkUnusedClosedAssertionProviderAndDisabledBound(t *testing
 	s.running = true
 	_, e = s.power2(1)
 	s.running = false
-	if util.DebugBuild {
+	if udiag.DebugBuild {
 		if !errors.Is(e, arena.ErrClosed) {
 			t.Fatal("actual reached flag read", e)
 		}

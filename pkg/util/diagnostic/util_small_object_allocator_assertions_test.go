@@ -1,5 +1,5 @@
 // Source: src/util/small_object_allocator.cpp:72-145; src/util/debug.h:63.
-package util
+package diagnostic
 
 import (
 	"errors"

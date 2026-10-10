@@ -1,6 +1,6 @@
 // Source: src/util/small_object_allocator.cpp:172-242; src/util/util.cpp:22-40.
 // Source allocator diagnostics through an explicit borrowed ostream adapter.
-package util
+package diagnostic
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
@@ -11,12 +11,12 @@ import (
 // Read the actual borrowed C string at insertion time. Source strlen precedes
 // field padding; the complete string consumes width once. No copied spelling,
 // intermediate Go string, per-byte public stream calls or nested mutex locks.
-func smallObjectCStringInto(out *utext.NumericTextStream, region *arena.BytesRegion, text GlobalParamCString) error {
+func smallObjectCStringInto(out *utext.NumericTextStream, region *arena.BytesRegion, text utext.RegionCString) error {
 	if e := out.CheckOpen(); e != nil {
 		return e
 	}
 	if !text.Present {
-		return ErrParamsStreamFailure
+		return utext.ErrNullCString
 	}
 	if region == nil || text.Origin != region.OwnerID() {
 		return ErrSmallObjectOwner

@@ -1,5 +1,5 @@
 // Source: src/util/debug.cpp:37-42; src/util/debug.h:58-65.
-package util
+package diagnostic
 
 import (
 	"errors"
@@ -32,7 +32,7 @@ func (d *DebugContext) BindAssertionStreams(s *MemoryStandardStreams) error {
 type debugNotificationText struct {
 	text     string
 	region   *arena.BytesRegion
-	pointer  GlobalParamCString
+	pointer  utext.RegionCString
 	borrowed bool
 }
 
@@ -45,7 +45,7 @@ func (t debugNotificationText) insert(out *utext.NumericTextStream) error {
 func (d *DebugContext) NotifyAssertionViolation(fileName string, line int32, condition string) error {
 	return d.notifyAssertionViolation(debugNotificationText{text: fileName}, line, debugNotificationText{text: condition})
 }
-func (d *DebugContext) NotifyBorrowedAssertionViolation(fileRegion *arena.BytesRegion, fileName GlobalParamCString, line int32, conditionRegion *arena.BytesRegion, condition GlobalParamCString) error {
+func (d *DebugContext) NotifyBorrowedAssertionViolation(fileRegion *arena.BytesRegion, fileName utext.RegionCString, line int32, conditionRegion *arena.BytesRegion, condition utext.RegionCString) error {
 	return d.notifyAssertionViolation(debugNotificationText{region: fileRegion, pointer: fileName, borrowed: true}, line, debugNotificationText{region: conditionRegion, pointer: condition, borrowed: true})
 }
 
