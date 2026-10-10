@@ -36977,3 +36977,46 @@ bounds/evidence, MPS and complete original drivers remain required.
 Both LP vets, source inventory/evidence/no-generics and diff checks pass.
 Regenerated graph remains64 packages with unchanged edges and the added
 primal preparation file. The optimization loop remains explicitly unported.
+
+
+### Floating core initialization, basis headings and bound feasibility — 2026-10-10
+
+Ported retained double/double lp_core_solver_base construction/init, owned optional
+LU lifecycle, native indexed/dense scratch, descending nonbasic heading encoding,
+heading validation, boxed-bound validation, column/basic/all-column feasibility
+and cached infeasibility-set updates. The actual column_namer virtual contract is
+borrowed as a Go interface; formatted iterator diagnostics remain unported.
+Inputs borrow pointers to native slice headers, so caller resizing remains visible.
+The constructor repeats heading initialization after init/LU and leaves the
+infeasibility set empty even when X violates bounds. FEASIBLE initial status is
+source bookkeeping, not a fabricated optimization result.
+
+Source floating bounds use strict relative-plus-absolute primal tolerance, with
+literal zero-bound and IEEE behavior. Box checks and inverse heading assertions
+are evaluated only in debug; release does not read their bound arrays. Qualified
+Go guards cover source null/out-of-bounds domains. A bad basic column preserves
+the published -1 heading and earlier basic writes before error, without clearing
+the old nonbasic list. Partial construction returns the actual owner for cleanup.
+Floating LU Close has only native storage and cannot fail; no fake error injector.
+
+160 independent reordered diagonal bases verify headings, descending nonbasics,
+all default scratch extents/state, real optional LU solves/replacement/destruction
+and borrowed headers. 41,665 exact dyadic rational comparisons independently
+verify tolerance; strict adjacent-float boundaries, all column types, NaN/infinity,
+boxed ordering, basic-only versus all-column feasibility and cached inf-set
+membership are covered. The existing120-world prepared-primal test now constructs
+the real core, including its LU, for sparse and forced-dense basis solves.
+
+Focused core/primal/presolve/solver/column/scaler/static/LU regressions pass0.796s
+native/0.868s combined debug/checked. New core file135/152 (88.8%) native and
+148/152 (97.4%) debug. Native gaps mostly belong to debug-only checks. Remaining
+debug gaps are enormous int-set extent refusal, invariant-protected heading
+checks and the other-profile short-basis guard. No huge artificial allocation
+or unreachable invariant corruption is added solely for coverage.
+Both LP vets, source inventory/evidence/no-generics and diff checks pass.
+Profiles: /mnt/oldrog/tmp/g3-core-{native,debug}.cover. Full native module passed
+19:01 UTC at89.8% LP Go coverage; that snapshot predates primal/core additions
+and is not repeated within the hour. Graph remains64 packages with unchanged
+edges. Four previously unported source units become partial; LP62 partial/48
+unported. Exact core, pivot/basis updates, reduced costs, actual optimization,
+dual/LAR, bounds/evidence, MPS and complete upstream drivers remain required.

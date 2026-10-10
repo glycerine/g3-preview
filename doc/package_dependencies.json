@@ -1172,6 +1172,7 @@
       "production_files": [
         "assert_release.go",
         "column_info_float.go",
+        "core_base_float.go",
         "diagonal_matrix_exact.go",
         "diagonal_matrix_float.go",
         "eta_exact_expression.go",

@@ -5,12 +5,13 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently 58 partial source units and52 unported units. No complete
+There are currently 62 partial source units and48 unported units. No complete
 LP solver is available yet. A green Go coverage report does not measure the C++
 code that has not been ported.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Floating core construction, basis headings and feasibility | 160 independent reordered diagonal bases with actual optional LU and replacement; 41,665 exact dyadic rational tolerance comparisons, all column types/IEEE/strict boundaries, cached infeasibility updates, debug/release publication guards; actual 120-world prepared-primal integration | Native88.8% (135/152), debug97.4% (148/152). Remaining debug gaps guard enormous int-set extents, valid heading invariants and other-profile short-basis domains. Exact core, pivots, reduced costs and optimization remain open |
 | Floating primal initial residual basis and bound/cost preparation | 120 independent [A,D]X=B worlds; real sparse/forced-dense LU solves in both orientations, structural costs/bounds, negative initial values, unsigned wrap, resize/IEEE/empty-program and publication/output-error cases | 96.2% (101/105) native and debug. Gaps propagate real host-clock/invariant-protected child errors or guard enormous negative converted extents. Actual core construction/optimization and exact preparation remain open |
 | Floating solver presolve, pinning and fixed/zero elimination | 100 independent exact box-corner worlds and1500 relation/RHS decisions; strict directional tolerance/IEEE/unknown/zero bounds, pin and RHS publication prefixes, deferred erasure, actual cleanup pass-count semantics, writer failures and cleanup-to-scale integration | Native97.8% (133/136), debug98.5% (134/136). Native gaps are debug-only assertion/error propagation; debug gaps guard null pointers after successful source metadata lookup. Exact presolve and complete drivers remain open |
 | Floating common solver preparation and retained column metadata | 120 independent original-system worlds across shifted/flipped/boxed/free columns; external/core maps, scaled solutions/objectives, reconstruction, counters, stale name aliases, bound tolerance/IEEE and source error/publication prefixes | Solver96.6% native (196/203),98.0% debug (199/203); retained column metadata89.6% (43/48),100% (48/48). Gaps include other-profile assertions, real host-clock failure and invariant-protected reconstruction/false-balance propagation. Primal/dual optimization and exact preparation remain open |

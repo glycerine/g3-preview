@@ -118265,14 +118265,31 @@
       "path": "src/util/lp/column_namer.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/core_base_float.go",
+        "pkg/util/lp/core_base_float_test.go",
+        "pkg/util/lp/primal_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Retained column_namer virtual name contract borrowed by floating core",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_float.go",
+          "tests": [
+            "TestLPFloatPrimalPreparedBasisIndependentOracle"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Only the actual project naming interface is represented; linear iterator and formatted-combination diagnostics remain open. No generic numeric callback adapter is introduced."
+      ]
     },
     {
       "path": "src/util/lp/conversion_helper.h",
@@ -120471,9 +120488,19 @@
       "path": "src/util/lp/lp_core_solver_base.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/core_base_float.go",
+        "pkg/util/lp/core_base_float_test.go",
+        "pkg/util/lp/primal_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatCoreConstructionIndependentBasisOracle",
+        "TestLPFloatCoreFeasibilityExactDyadicOracle",
+        "TestLPFloatCoreSourcePublicationAndGuards",
+        "TestLPFloatCoreHeadingInvalidDomainProfiles",
+        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+      ],
       "assertions": [
         {
           "line": 200,
@@ -120534,17 +120561,44 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained double/double constructor/init, basis heading and nonbasic initialization/validation, bound feasibility and infeasibility-set update",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_float.go",
+          "tests": [
+            "TestLPFloatCoreConstructionIndependentBasisOracle",
+            "TestLPFloatCoreFeasibilityExactDyadicOracle",
+            "TestLPFloatCoreSourcePublicationAndGuards",
+            "TestLPFloatCoreHeadingInvalidDomainProfiles",
+            "TestLPFloatPrimalPreparedBasisIndependentOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally."
+      ],
+      "deviations": [
+        "Floating initialization/feasibility layer only. Exact instantiations, pivots/basis changes, reduced costs, solve/update/optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set."
+      ]
     },
     {
       "path": "src/util/lp/lp_core_solver_base.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/core_base_float.go",
+        "pkg/util/lp/core_base_float_test.go",
+        "pkg/util/lp/primal_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatCoreConstructionIndependentBasisOracle",
+        "TestLPFloatCoreFeasibilityExactDyadicOracle",
+        "TestLPFloatCoreSourcePublicationAndGuards",
+        "TestLPFloatCoreHeadingInvalidDomainProfiles",
+        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+      ],
       "conditionals": [
         {
           "line": 161,
@@ -120711,22 +120765,66 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained double/double constructor/init, basis heading and nonbasic initialization/validation, bound feasibility and infeasibility-set update",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_float.go",
+          "tests": [
+            "TestLPFloatCoreConstructionIndependentBasisOracle",
+            "TestLPFloatCoreFeasibilityExactDyadicOracle",
+            "TestLPFloatCoreSourcePublicationAndGuards",
+            "TestLPFloatCoreHeadingInvalidDomainProfiles",
+            "TestLPFloatPrimalPreparedBasisIndependentOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally."
+      ],
+      "deviations": [
+        "Floating initialization/feasibility layer only. Exact instantiations, pivots/basis changes, reduced costs, solve/update/optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set."
+      ]
     },
     {
       "path": "src/util/lp/lp_core_solver_base_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/core_base_float.go",
+        "pkg/util/lp/core_base_float_test.go",
+        "pkg/util/lp/primal_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatCoreConstructionIndependentBasisOracle",
+        "TestLPFloatCoreFeasibilityExactDyadicOracle",
+        "TestLPFloatCoreSourcePublicationAndGuards",
+        "TestLPFloatCoreHeadingInvalidDomainProfiles",
+        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained double/double constructor/init, basis heading and nonbasic initialization/validation, bound feasibility and infeasibility-set update",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_float.go",
+          "tests": [
+            "TestLPFloatCoreConstructionIndependentBasisOracle",
+            "TestLPFloatCoreFeasibilityExactDyadicOracle",
+            "TestLPFloatCoreSourcePublicationAndGuards",
+            "TestLPFloatCoreHeadingInvalidDomainProfiles",
+            "TestLPFloatPrimalPreparedBasisIndependentOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally."
+      ],
+      "deviations": [
+        "Floating initialization/feasibility layer only. Exact instantiations, pivots/basis changes, reduced costs, solve/update/optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set."
+      ]
     },
     {
       "path": "src/util/lp/lp_dual_core_solver.h",
@@ -123619,7 +123717,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/numeric_pair.go",
-        "pkg/util/lp/static_matrix_float.go"
+        "pkg/util/lp/static_matrix_float.go",
+        "pkg/util/lp/core_base_float.go",
+        "pkg/util/lp/core_base_float_test.go"
       ],
       "tests": [
         "TestLPRationalPairArithmeticOracle",
@@ -123637,7 +123737,8 @@
         "TestLPPairPriorityQueueOlderComparisonIdentity",
         "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
         "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes",
-        "TestLPFloatStaticMatrixQueriesAndColumnCopies"
+        "TestLPFloatStaticMatrixQueriesAndColumnCopies",
+        "TestLPFloatCoreFeasibilityExactDyadicOracle"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -123678,6 +123779,14 @@
           "go_target": "pkg/util/lp/static_matrix_float.go",
           "tests": [
             "TestLPFloatStaticMatrixQueriesAndColumnCopies"
+          ]
+        },
+        {
+          "name": "Retained convert_struct<double,double> below/above bound numerical comparisons",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_float.go",
+          "tests": [
+            "TestLPFloatCoreFeasibilityExactDyadicOracle"
           ]
         }
       ],

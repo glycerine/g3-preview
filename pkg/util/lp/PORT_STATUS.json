@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 89.8,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native module tests passed2026-10-10 at19:01 UTC: LP330.403s,89.8% (9259/10316), including dimension extension, lifecycle, prepared solves, floating scaler, common solver preparation and presolve. This full snapshot predates floating primal preparation. Authoritative log/profile: /mnt/oldrog/tmp/g3-presolve-module-native.{log,cover}. Current focused debug/checked profiles cover each added component: floating primal preparation96.2% native/debug, floating presolve98.5%, solver98.0%, scaler88.1%, prepared exact100%/floating94.6%. Complete debug coverage predates sparse basis storage. Exact solver/presolve, full primal/dual/LAR/MPS integration and complete upstream command drivers remain open.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native module tests passed2026-10-10 at19:01 UTC: LP330.403s,89.8% (9259/10316), including dimension extension, lifecycle, prepared solves, floating scaler, common solver preparation and presolve. This full snapshot predates floating primal preparation and core initialization. Authoritative log/profile: /mnt/oldrog/tmp/g3-presolve-module-native.{log,cover}. Current focused debug/checked profiles cover each added component: floating core initialization88.8% native/97.4% debug, floating primal preparation96.2% native/debug, floating presolve98.5%, solver98.0%, scaler88.1%, prepared exact100%/floating94.6%. Complete debug coverage predates sparse basis storage. Exact solver/presolve, full primal/dual/LAR/MPS integration and complete upstream command drivers remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -218,9 +218,15 @@
     },
     {
       "source": "src/util/lp/column_namer.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/core_base_float.go",
+        "pkg/util/lp/core_base_float_test.go",
+        "pkg/util/lp/primal_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+      ]
     },
     {
       "source": "src/util/lp/conversion_helper.h",
@@ -657,21 +663,51 @@
     },
     {
       "source": "src/util/lp/lp_core_solver_base.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/core_base_float.go",
+        "pkg/util/lp/core_base_float_test.go",
+        "pkg/util/lp/primal_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatCoreConstructionIndependentBasisOracle",
+        "TestLPFloatCoreFeasibilityExactDyadicOracle",
+        "TestLPFloatCoreSourcePublicationAndGuards",
+        "TestLPFloatCoreHeadingInvalidDomainProfiles",
+        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+      ]
     },
     {
       "source": "src/util/lp/lp_core_solver_base.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/core_base_float.go",
+        "pkg/util/lp/core_base_float_test.go",
+        "pkg/util/lp/primal_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatCoreConstructionIndependentBasisOracle",
+        "TestLPFloatCoreFeasibilityExactDyadicOracle",
+        "TestLPFloatCoreSourcePublicationAndGuards",
+        "TestLPFloatCoreHeadingInvalidDomainProfiles",
+        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+      ]
     },
     {
       "source": "src/util/lp/lp_core_solver_base_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/core_base_float.go",
+        "pkg/util/lp/core_base_float_test.go",
+        "pkg/util/lp/primal_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatCoreConstructionIndependentBasisOracle",
+        "TestLPFloatCoreFeasibilityExactDyadicOracle",
+        "TestLPFloatCoreSourcePublicationAndGuards",
+        "TestLPFloatCoreHeadingInvalidDomainProfiles",
+        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+      ]
     },
     {
       "source": "src/util/lp/lp_dual_core_solver.h",
@@ -1259,7 +1295,9 @@
       "source": "src/util/lp/numeric_pair.h",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/numeric_pair.go"
+        "pkg/util/lp/numeric_pair.go",
+        "pkg/util/lp/core_base_float.go",
+        "pkg/util/lp/core_base_float_test.go"
       ],
       "tests": [
         "TestLPRationalPairArithmeticOracle",
@@ -1276,7 +1314,8 @@
         "TestLPPairPriorityQueueAllocationFailureCensus",
         "TestLPPairPriorityQueueOlderComparisonIdentity",
         "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
-        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPFloatCoreFeasibilityExactDyadicOracle"
       ]
     },
     {

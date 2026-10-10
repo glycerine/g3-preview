@@ -134,7 +134,17 @@ func TestLPFloatPrimalPreparedBasisIndependentOracle(t *testing.T) {
 		} else {
 			m.Settings.DensityThreshold = math.Inf(1)
 		}
-		lu, err := NewFloatLU(m.A, m.Basis, m.Settings)
+		m.Settings.SimplexStrategy = StrategyLU
+		core, err := NewFloatCoreSolverBase(FloatCoreInputs{
+			A: m.A, B: &m.B, X: &m.X, Costs: &m.Costs,
+			Basis: &m.Basis, NBasis: &m.NBasis, Heading: &m.Heading,
+			Settings: m.Settings, Names: m.FloatLPSolver,
+			ColumnTypes: &m.ColumnTypes, LowBounds: &m.LowBounds, UpperBounds: &m.UpperBounds,
+		})
+		if err != nil {
+			t.Fatal(world, err)
+		}
+		lu := core.Factorization
 		if err != nil || lu.GetStatus() != LUOK {
 			t.Fatal(world, err)
 		}
@@ -152,7 +162,7 @@ func TestLPFloatPrimalPreparedBasisIndependentOracle(t *testing.T) {
 				lpScalerNear(t, y[i], m.X[nc+i])
 			}
 		}
-		if err := lu.Close(); err != nil {
+		if err := core.Close(); err != nil {
 			t.Fatal(err)
 		}
 	}
