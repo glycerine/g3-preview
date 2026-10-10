@@ -36622,3 +36622,55 @@ Next complete retained LU error-check/refinement orchestration and dimension
 extension, then finish the remaining original LU scenarios. Scaling, simplex,
 LAR, bounds/evidence/constraint scopes, MPS and retained upstream drivers remain
 required by the full active LP goal.
+
+
+### LU dense/indexed row error-check and refinement — 2026-10-10
+
+Ported retained lu.hpp:313-478 into lu_refine_float.go and lu_refine_exact.go,
+including all six public double/mpq/mpq-pair methods used by retained core/dual
+solvers. Floating refinement computes the original-matrix residual and applies
+exactly one correction. Sparse routing uses strict unsigned ratio120 against
+full A columns; an output-fill transition selects dense residual correction.
+Indexed residual uses the passed Settings drop tolerance, literal row/index
+order and RHS-only marker union; final correction uses fixed1e-14 and preserves
+signed zero/IEEE behavior. Dense paths clear yCopy; sparse paths retain it.
+Precise paths skip residual arithmetic and use strict unsigned ratio30. No
+unused template or source #if0 residual is ported. Native slices replace vectors.
+Exact routing introduces no numerical owner; child solves keep their own call
+receipts, and foreign/stopped caller guards precede either routing branch.
+
+64 independent rational basis/known-solution worlds check all three types and
+sparse/forced-dense initial factors. Strict threshold and output-fill fixtures
+execute every floating route. Concrete deliberately approximate factors prove
+one correction, independently computing rhs*(2H-H*H). 1,200 exact residual/union
+worlds,96 post-Suhl replacements, RHS-only residual, tolerance/IEEE/signed-zero
+and reached bounds/publication prefixes supplement the source algorithms.
+Twelve pooled/direct real allocation campaigns walk through first success:
+1,196 native/2,304 debug refusals, maximum193. LU is closed before borrowed caller
+cleanup; named-cell/direct-object census and original source values verify
+ownership. A real stopped caller retains its invocation through LU Close.
+
+Focused allocation checks passed4.735s native/9.284s debug. Final strengthened
+property/guard checks pass1.324s/1.495s; both vets pass. Matching focused coverage
+combines to floating110/121 (90.9%), precise27/27 (100%) in each profile. Remaining
+floating returns propagate child errors behind valid marker/extent invariants;
+no synthetic fault callback is added. Full native module coverage verification
+passed at17:57 UTC: LP327.475s, numeral92.883s, AST20.253s, polynomial33.172s.
+Current full LP coverage is8499/9501 statements (89.5%); this replaces the
+historical89.2% snapshot. Native floating core is105/128 (82.0%); older debug core
+counts predate added refinement members and remain labeled historical.
+Log/profile: /mnt/oldrog/tmp/g3-lu-refine-module-native.{log,cover}.
+Source inventory/evidence/no-generics and diff gates pass; regenerated graph
+remains64 packages with unchanged dependencies and two new production files.
+LP remains48 partial/62 unported source units. Dimension extension, remaining original LU scenarios,
+scaling/simplex/LAR/bounds/MPS and complete retained upstream drivers remain
+required by the active full LP goal.
+
+Next dimension-extension audit: retained lu.h:308-356 is called from
+lar_solver.h:902-925 and original test_small_lu. The LAR caller refactors rather
+than extends when it finds a dense tail or reaches200 updates. Existing sparse
+Resize extends with identity entries; LU must publish Dim, U, Q, R and row work
+in source order, then resize owned extension workspace and replace affected
+basis columns. RWave is reinitialized by the subsequent update, not by the
+dimension helper. Exact failures retain actual child-owned numerical prefixes.
+Use native unordered maps for the affected-column set, with no STL port.
