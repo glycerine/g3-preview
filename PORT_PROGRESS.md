@@ -34995,3 +34995,54 @@ LP inventory is20 partial/90 unported source units; canonical repository ledger
 is62 ported/301 partial/1711 unported/two dead-deleted. Previous checkpoint
 6f9c0856 saved exact permutations. Full LP objective remains active, with exact
 queue comparison ownership, matrices/eta/LU and the solver layers still ahead.
+
+
+## Exact LP priority queues and synchronized comparison ownership
+
+Added the actual binary_heap_priority_queue<mpq> and
+binary_heap_priority_queue<numeric_pair<mpq>> operations reached by primal
+breakpoint consumers: enqueue/change/decrease, both sift directions, dequeue,
+clear and resize. Every priority slot owns initialized project numerals; removing
+or clearing membership retains those values. Source decrease_priority takes T
+by value, so its actual lexical argument is independently deep-copied before
+assignment and remains owned through any stopped call. A failed shrink-domain
+bubble retains that argument even when no numerical allocation root is pending.
+
+Rational greater comparisons reverse scalar operands as rational::operator>
+does. Added numeric_pair strict Less/Greater with scalar comparison first,
+structural X equality second, then Y. Independent unreduced raw-value fixtures
+verify that numerically equal but structurally unequal X does not reach Y; this
+does not claim that LP constructors emit unnormalized rationals. Other exact
+queue helpers with no retained caller were not instantiated just to represent
+unused definitions, including remove/get_priority/peek/debug print/consistency.
+
+The numeral boundary now exposes the real synchronized comparison generation
+and identity-checked cleanup. Concrete queue receipts retain only their newly
+started raw comparison and actual physical roots. Older stopped comparisons
+survive queue failure/Close. A numeral regression uses actual completed and
+subsequent failed comparisons to prove that an obsolete saved generation cannot
+consume the replacement. Each reservation fixture uses a fresh manager because
+source failed scratch holes are not repaired into an invented retry policy.
+
+Two independent5000-operation exact map oracles, copy/retained-priority lifetime
+checks, literal tie order, shrink/wrap/empty prefixes and real1000+digit
+new/decrease/increase/dequeue reservation campaigns pass in native and combined
+debug/checked profiles. Campaigns require actual injected/physical memout errors,
+walk to first success, retain stopped by-value arguments, and count current named
+numeral cells and actual direct objects after Close. No registry ownership
+inference or synthetic native-container OOM is used. All raw comparison and
+normalization/add/power invocations are checked consumed after actual owning
+cleanup; an older unrelated caller remains responsible for its own invocation.
+
+Full LP focused suite passes native51.608s/debug-checked69.886s,89.1%/91.2% overall
+statement coverage. Exact queue implementation86.2%, comparison call receipts
+84.6% in each profile; numeric_pair.go remains100%. New numeral boundary accessor
+covers100%, matching-generation cleanup83.3%; its uncovered return propagates a
+child teardown error. Focused numeral comparison service/boundary checks pass
+native0.315s/debug0.473s, as do module-wide native test compilation, LP/numeral
+vet, portcheck and regenerated graphs. Final strict failure-classification
+campaigns pass native29.786s/debug43.699s. Remaining uncovered statements are
+explicit guard/child error propagation; no fabricated destructor fault is used
+merely for coverage. Inventory remains20 partial/90 unported LP source units;
+complete primal/matrix integration remains open. Checkpoint39c28eb5 saved native
+queues. Full LP objective continues with matrices, eta/LU and solver integration.

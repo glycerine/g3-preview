@@ -1,12 +1,12 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 89.5,
+  "native_statement_coverage_of_current_go_code": 89.1,
   "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms.",
   "remaining_work": [
-    "remaining exact/floating numeric traits and conversions, exact priorities",
+    "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
-    "exact priority queues and LU/eta factorization",
+    "LU/eta factorization and priority-queue solver integration",
     "scaling and random updates",
     "primal/dual simplex and LAR solvers",
     "bounds/evidence, constraint scopes and explanations",
@@ -25,7 +25,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/priority_heap.go",
-        "pkg/util/lp/priority_queue_native.go"
+        "pkg/util/lp/priority_queue_native.go",
+        "pkg/util/lp/priority_queue_exact.go",
+        "pkg/util/lp/exact_priority_calls.go"
       ],
       "tests": [
         "TestLPPriorityQueueSource",
@@ -43,7 +45,18 @@
         "TestLPIntPairPriorityQueueIndependentMapOracle",
         "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
         "TestLPUintPairPriorityQueueIndependentMapOracle",
-        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPRationalPairSourceRelations",
+        "TestLPRationalPriorityQueueIndependentExactOracle",
+        "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPPairPriorityQueueIndependentExactOracle",
+        "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPRationalPriorityQueueAllocationFailureCensus",
+        "TestLPRationalPriorityQueueOlderComparisonIdentity",
+        "TestLPPairPriorityQueueAllocationFailureCensus",
+        "TestLPPairPriorityQueueOlderComparisonIdentity",
+        "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
       ]
     },
     {
@@ -51,7 +64,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/priority_heap.go",
-        "pkg/util/lp/priority_queue_native.go"
+        "pkg/util/lp/priority_queue_native.go",
+        "pkg/util/lp/priority_queue_exact.go",
+        "pkg/util/lp/exact_priority_calls.go"
       ],
       "tests": [
         "TestLPPriorityQueueSource",
@@ -69,7 +84,18 @@
         "TestLPIntPairPriorityQueueIndependentMapOracle",
         "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
         "TestLPUintPairPriorityQueueIndependentMapOracle",
-        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPRationalPairSourceRelations",
+        "TestLPRationalPriorityQueueIndependentExactOracle",
+        "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPPairPriorityQueueIndependentExactOracle",
+        "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPRationalPriorityQueueAllocationFailureCensus",
+        "TestLPRationalPriorityQueueOlderComparisonIdentity",
+        "TestLPPairPriorityQueueAllocationFailureCensus",
+        "TestLPPairPriorityQueueOlderComparisonIdentity",
+        "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
       ]
     },
     {
@@ -77,7 +103,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/priority_heap.go",
-        "pkg/util/lp/priority_queue_native.go"
+        "pkg/util/lp/priority_queue_native.go",
+        "pkg/util/lp/priority_queue_exact.go",
+        "pkg/util/lp/exact_priority_calls.go"
       ],
       "tests": [
         "TestLPPriorityQueueSource",
@@ -95,7 +123,18 @@
         "TestLPIntPairPriorityQueueIndependentMapOracle",
         "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
         "TestLPUintPairPriorityQueueIndependentMapOracle",
-        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPRationalPairSourceRelations",
+        "TestLPRationalPriorityQueueIndependentExactOracle",
+        "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPPairPriorityQueueIndependentExactOracle",
+        "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPRationalPriorityQueueAllocationFailureCensus",
+        "TestLPRationalPriorityQueueOlderComparisonIdentity",
+        "TestLPPairPriorityQueueAllocationFailureCensus",
+        "TestLPPairPriorityQueueOlderComparisonIdentity",
+        "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
       ]
     },
     {
@@ -677,7 +716,18 @@
         "TestLPRationalPairArithmeticOracle",
         "TestLPRationalPairOrderSignsAndFormatting",
         "TestLPRationalPairCoordinateErrorPrefixes",
-        "TestLPRationalPairSourceAccumulation"
+        "TestLPRationalPairSourceAccumulation",
+        "TestLPRationalPairSourceRelations",
+        "TestLPRationalPriorityQueueIndependentExactOracle",
+        "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPPairPriorityQueueIndependentExactOracle",
+        "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPRationalPriorityQueueAllocationFailureCensus",
+        "TestLPRationalPriorityQueueOlderComparisonIdentity",
+        "TestLPPairPriorityQueueAllocationFailureCensus",
+        "TestLPPairPriorityQueueOlderComparisonIdentity",
+        "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
       ]
     },
     {
@@ -975,5 +1025,5 @@
     "unported": 90,
     "partial": 20
   },
-  "combined_debug_checked_statement_coverage_of_current_go_code": 91.9
+  "combined_debug_checked_statement_coverage_of_current_go_code": 91.2
 }

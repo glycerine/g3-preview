@@ -1169,6 +1169,7 @@
       ],
       "production_files": [
         "assert_release.go",
+        "exact_priority_calls.go",
         "exact_vector_calls.go",
         "gparams_catalog_collectors.go",
         "indexed_exact_vector.go",
@@ -1181,6 +1182,7 @@
         "permutation_exact.go",
         "permutation_float.go",
         "priority_heap.go",
+        "priority_queue_exact.go",
         "priority_queue_native.go",
         "stacked_pair_vector.go",
         "stacked_value.go",

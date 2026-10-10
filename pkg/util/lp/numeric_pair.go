@@ -116,3 +116,31 @@ func (p *RationalPair) String(m *numeral.RationalManager) (string, error) {
 	}
 	return "(" + x + ", " + y + ")", nil
 }
+
+// Less and Greater preserve the source scalar-comparison order and structural
+// X equality gate. Numerically equal unreduced raw X values do not advance to Y.
+// Greater's rational comparisons reverse operands, as rational::operator> does.
+func (p *RationalPair) Less(m *numeral.RationalManager, a *RationalPair) (bool, error) {
+	c, err := m.Compare(&p.X, &a.X)
+	if err != nil || c < 0 {
+		return c < 0, err
+	}
+	equal, err := m.Equal(&p.X, &a.X)
+	if err != nil || !equal {
+		return false, err
+	}
+	c, err = m.Compare(&p.Y, &a.Y)
+	return c < 0, err
+}
+func (p *RationalPair) Greater(m *numeral.RationalManager, a *RationalPair) (bool, error) {
+	c, err := m.Compare(&a.X, &p.X)
+	if err != nil || c < 0 {
+		return c < 0, err
+	}
+	equal, err := m.Equal(&p.X, &a.X)
+	if err != nil || !equal {
+		return false, err
+	}
+	c, err = m.Compare(&a.Y, &p.Y)
+	return c < 0, err
+}

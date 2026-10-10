@@ -9,9 +9,9 @@ import (
 var ErrExactVectorPending = errors.New("lp: exact vector has a stopped numeral invocation")
 var ErrExactVectorOwner = errors.New("lp: exact vectors belong to different numeral managers")
 
-// Only the actual numeric calls made by an owning exact indexed vector are
-// recorded here. This is not an arithmetic adapter: concrete methods below
-// call the numeral/pair operations directly.
+// These receipts record actual numeric calls made by concrete exact vector
+// storage and its matrix/queue owners. This is not an arithmetic adapter:
+// each algorithm calls the numeral/pair operations directly.
 type exactVectorCalls struct {
 	roots numeral.NumericAllocationRoots
 	raw   [3]uint64

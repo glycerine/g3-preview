@@ -21,10 +21,11 @@ code that has not been ported.
 | Shared permutation index algorithms and double/double applications | Original `--test_perm`; 2,304 distinct compositions and 288 transpositions against independent dense products; all 120 size-five permutations across six dense/four sparse directions; literal alias and shrunk-domain prefixes | Index algorithms 91.2% native / 93.0% debug; floating applications 87.7% / 92.6% |
 | Exact rational/rational and rational/pair permutation applications | All 24 size-four permutations across six dense/four retained rational sparse directions against independent exact matrix products; ordered indices including zeros; 1000-digit allocation refusals through first success; named-cell/direct-object census; stopped destination ownership and every pending mutation guard | 82.8% native / 91.5% debug; native excludes debug dense copies and exact comparison |
 | Native int/unsigned/double priority queues and int/unsigned pair queues | Original `-tbq` and strengthened pair smoke scenario; 12,000 independent map operations per type (60,000 total); exact tie/LIFO order, source mutation prefixes, extent wrap, NaN/infinity and diagnostic gaps | 85.6% scalar algorithms; 92.2% pair wrappers; index helpers 87.7/89.5% heap, 90.6/88.7% pair |
+| Exact rational/pair priority queues and strict pair relations | 5,000 operations per type against independent exact ordering; retained-priority/copy ownership, ties, exact fractions; actual new/increase/decrease/dequeue reservation campaigns; by-value argument stops, named-cell/direct-object census and older comparison identity | 86.2% queue code, 84.6% call receipts in each profile; pair arithmetic/relations file remains 100% |
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
-Current package statement coverage is **89.5% native and 91.9% combined debug/checked**. Exact scoped
+Current package statement coverage is **89.1% native and 91.2% combined debug/checked**. Exact scoped
 vector allocation and rollback paths are tested; remaining uncovered statements
 include numerical child and cleanup/capture error returns, plus profile-specific
 assertion paths. The explicit
@@ -39,7 +40,7 @@ claimed. Go slices and maps replace STL/container internals. Printing uses Go
 
 The next layers retain the full requested scope:
 
-1. Concrete scoped vectors, actual numeral/numeric-pair types, remaining exact priorities and
+1. Concrete scoped vectors, actual numeral/numeric-pair types, priority-queue integration and
    indexed vectors, with independent state/ordering/arithmetic tests.
 2. Sparse/static/dense matrices, remaining permutation integration, eta transformations and LU,
    checked against independent matrix operations and exact residuals.

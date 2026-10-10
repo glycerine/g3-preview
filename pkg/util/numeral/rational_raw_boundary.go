@@ -23,3 +23,29 @@ func (m *RationalManager) CleanupRawInvocations(saved *[3]uint64) error {
 	}
 	return nil
 }
+
+// RationalComparisonInvocationState identifies the actual synchronized raw
+// cross-product invocation. It is separate from numeral values and does not
+// infer ownership from allocated cells or numeral values.
+type RationalComparisonInvocationState struct {
+	Active     bool
+	Generation uint64
+}
+
+func (m *RationalManager) ComparisonInvocationState() RationalComparisonInvocationState {
+	r := &m.RawArithmetic
+	return RationalComparisonInvocationState{Active: r.CompareActive, Generation: r.compareGeneration}
+}
+
+// CleanupComparisonInvocation releases a matching caller-acquired generation.
+// Older and replaced generations are left to their actual invoking owners.
+func (m *RationalManager) CleanupComparisonInvocation(saved *uint64) error {
+	state := m.ComparisonInvocationState()
+	if *saved != 0 && *saved == state.Generation {
+		if err := m.CleanupRawGroup(rationalRawComparison); err != nil {
+			return err
+		}
+	}
+	*saved = 0
+	return nil
+}

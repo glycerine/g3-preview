@@ -117546,7 +117546,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/priority_heap.go",
-        "pkg/util/lp/priority_queue_native.go"
+        "pkg/util/lp/priority_queue_native.go",
+        "pkg/util/lp/priority_queue_exact.go",
+        "pkg/util/lp/exact_priority_calls.go"
       ],
       "tests": [
         "TestLPPriorityQueueSource",
@@ -117564,7 +117566,18 @@
         "TestLPIntPairPriorityQueueIndependentMapOracle",
         "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
         "TestLPUintPairPriorityQueueIndependentMapOracle",
-        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPRationalPairSourceRelations",
+        "TestLPRationalPriorityQueueIndependentExactOracle",
+        "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPPairPriorityQueueIndependentExactOracle",
+        "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPRationalPriorityQueueAllocationFailureCensus",
+        "TestLPRationalPriorityQueueOlderComparisonIdentity",
+        "TestLPPairPriorityQueueAllocationFailureCensus",
+        "TestLPPairPriorityQueueOlderComparisonIdentity",
+        "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
       ],
       "conditionals": [
         {
@@ -117615,16 +117628,36 @@
             "TestLPUintPairPriorityQueueIndependentMapOracle",
             "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
           ]
+        },
+        {
+          "name": "actual mpq and numeric_pair<mpq> enqueue/change/decrease, sifts, dequeue/clear/resize with owning priorities and actual source by-value decrease argument",
+          "status": "ported",
+          "go_target": "pkg/util/lp/priority_queue_exact.go",
+          "tests": [
+            "TestLPRationalPairSourceRelations",
+            "TestLPRationalPriorityQueueIndependentExactOracle",
+            "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+            "TestLPPairPriorityQueueIndependentExactOracle",
+            "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+            "TestLPRationalPriorityQueueAllocationFailureCensus",
+            "TestLPRationalPriorityQueueOlderComparisonIdentity",
+            "TestLPPairPriorityQueueAllocationFailureCensus",
+            "TestLPPairPriorityQueueOlderComparisonIdentity",
+            "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+            "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
+          ]
         }
       ],
       "ownership": [
-        "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit."
+        "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit.",
+        "Exact priority slots and decrease-by-value arguments own concrete initialized project numerals. Comparison calls retain only newly acquired synchronized raw generations and physical allocation roots; older active comparisons remain with their actual caller. Source lexical argument copies remain owned until Close after a stopped call. Clear/dequeue retain priorities. No provenance is inferred from a manager registry."
       ],
       "deviations": [
-        "Exact mpq/numeric_pair priorities and complete primal/matrix integration remain open; no whole-unit promotion. Default source empty construction is New*PriorityQueue(0); constructor required before use.",
+        "Complete primal/matrix integration remains open; no whole-unit promotion. Default source empty construction is New*PriorityQueue(0); constructor required before use.",
         "Whole-source scan finds dequeue_and_get_priority used only by uncalled debug print; print, peek, duplicate put_to_heap and uncalled float remove are not added merely to instantiate template definitions. The unused dequeue-with-priority inverse-index omission is not silently repaired or exercised as a retained caller.",
         "Typed Go guards retain valid prefixes after invalid source extent operations. Resize does not prune active membership. Auto-growth uses literal unsigned o<<1, including zero/wrap behavior. Strict tie comparisons and IEEE NaN/infinity behavior remain literal; native empty dequeue with existing storage retains unsigned size decrement, debug stops before mutation.",
-        "Source debug inverse assertions use the existing explicit Go error profile, not process-global debugger/TRACE transport. The source consistency check does not verify every active heap object has an inverse member; independent tests check both directions for valid operations."
+        "Source debug inverse assertions use the existing explicit Go error profile, not process-global debugger/TRACE transport. The source consistency check does not verify every active heap object has an inverse member; independent tests check both directions for valid operations.",
+        "Exact get_priority, peek, remove, dequeue-with-priority and debug print/consistency instantiations have no retained exact caller and are not represented by unused adapters. Actual mpq greater reverses scalar comparison operands. Numeric-pair comparisons use scalar < or > followed by structural X equality before Y, preserving unreduced raw-value gate behavior. Full source global service/debug transport remains open."
       ]
     },
     {
@@ -117634,7 +117667,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/priority_heap.go",
-        "pkg/util/lp/priority_queue_native.go"
+        "pkg/util/lp/priority_queue_native.go",
+        "pkg/util/lp/priority_queue_exact.go",
+        "pkg/util/lp/exact_priority_calls.go"
       ],
       "tests": [
         "TestLPPriorityQueueSource",
@@ -117652,7 +117687,18 @@
         "TestLPIntPairPriorityQueueIndependentMapOracle",
         "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
         "TestLPUintPairPriorityQueueIndependentMapOracle",
-        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPRationalPairSourceRelations",
+        "TestLPRationalPriorityQueueIndependentExactOracle",
+        "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPPairPriorityQueueIndependentExactOracle",
+        "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPRationalPriorityQueueAllocationFailureCensus",
+        "TestLPRationalPriorityQueueOlderComparisonIdentity",
+        "TestLPPairPriorityQueueAllocationFailureCensus",
+        "TestLPPairPriorityQueueOlderComparisonIdentity",
+        "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
       ],
       "conditionals": [
         {
@@ -117727,16 +117773,36 @@
             "TestLPUintPairPriorityQueueIndependentMapOracle",
             "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
           ]
+        },
+        {
+          "name": "actual mpq and numeric_pair<mpq> enqueue/change/decrease, sifts, dequeue/clear/resize with owning priorities and actual source by-value decrease argument",
+          "status": "ported",
+          "go_target": "pkg/util/lp/priority_queue_exact.go",
+          "tests": [
+            "TestLPRationalPairSourceRelations",
+            "TestLPRationalPriorityQueueIndependentExactOracle",
+            "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+            "TestLPPairPriorityQueueIndependentExactOracle",
+            "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+            "TestLPRationalPriorityQueueAllocationFailureCensus",
+            "TestLPRationalPriorityQueueOlderComparisonIdentity",
+            "TestLPPairPriorityQueueAllocationFailureCensus",
+            "TestLPPairPriorityQueueOlderComparisonIdentity",
+            "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+            "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
+          ]
         }
       ],
       "ownership": [
-        "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit."
+        "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit.",
+        "Exact priority slots and decrease-by-value arguments own concrete initialized project numerals. Comparison calls retain only newly acquired synchronized raw generations and physical allocation roots; older active comparisons remain with their actual caller. Source lexical argument copies remain owned until Close after a stopped call. Clear/dequeue retain priorities. No provenance is inferred from a manager registry."
       ],
       "deviations": [
-        "Exact mpq/numeric_pair priorities and complete primal/matrix integration remain open; no whole-unit promotion. Default source empty construction is New*PriorityQueue(0); constructor required before use.",
+        "Complete primal/matrix integration remains open; no whole-unit promotion. Default source empty construction is New*PriorityQueue(0); constructor required before use.",
         "Whole-source scan finds dequeue_and_get_priority used only by uncalled debug print; print, peek, duplicate put_to_heap and uncalled float remove are not added merely to instantiate template definitions. The unused dequeue-with-priority inverse-index omission is not silently repaired or exercised as a retained caller.",
         "Typed Go guards retain valid prefixes after invalid source extent operations. Resize does not prune active membership. Auto-growth uses literal unsigned o<<1, including zero/wrap behavior. Strict tie comparisons and IEEE NaN/infinity behavior remain literal; native empty dequeue with existing storage retains unsigned size decrement, debug stops before mutation.",
-        "Source debug inverse assertions use the existing explicit Go error profile, not process-global debugger/TRACE transport. The source consistency check does not verify every active heap object has an inverse member; independent tests check both directions for valid operations."
+        "Source debug inverse assertions use the existing explicit Go error profile, not process-global debugger/TRACE transport. The source consistency check does not verify every active heap object has an inverse member; independent tests check both directions for valid operations.",
+        "Exact get_priority, peek, remove, dequeue-with-priority and debug print/consistency instantiations have no retained exact caller and are not represented by unused adapters. Actual mpq greater reverses scalar comparison operands. Numeric-pair comparisons use scalar < or > followed by structural X equality before Y, preserving unreduced raw-value gate behavior. Full source global service/debug transport remains open."
       ]
     },
     {
@@ -117746,7 +117812,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/priority_heap.go",
-        "pkg/util/lp/priority_queue_native.go"
+        "pkg/util/lp/priority_queue_native.go",
+        "pkg/util/lp/priority_queue_exact.go",
+        "pkg/util/lp/exact_priority_calls.go"
       ],
       "tests": [
         "TestLPPriorityQueueSource",
@@ -117764,7 +117832,18 @@
         "TestLPIntPairPriorityQueueIndependentMapOracle",
         "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
         "TestLPUintPairPriorityQueueIndependentMapOracle",
-        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPRationalPairSourceRelations",
+        "TestLPRationalPriorityQueueIndependentExactOracle",
+        "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPPairPriorityQueueIndependentExactOracle",
+        "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPRationalPriorityQueueAllocationFailureCensus",
+        "TestLPRationalPriorityQueueOlderComparisonIdentity",
+        "TestLPPairPriorityQueueAllocationFailureCensus",
+        "TestLPPairPriorityQueueOlderComparisonIdentity",
+        "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -117791,16 +117870,36 @@
             "TestLPUintPairPriorityQueueIndependentMapOracle",
             "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
           ]
+        },
+        {
+          "name": "actual mpq and numeric_pair<mpq> enqueue/change/decrease, sifts, dequeue/clear/resize with owning priorities and actual source by-value decrease argument",
+          "status": "ported",
+          "go_target": "pkg/util/lp/priority_queue_exact.go",
+          "tests": [
+            "TestLPRationalPairSourceRelations",
+            "TestLPRationalPriorityQueueIndependentExactOracle",
+            "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+            "TestLPPairPriorityQueueIndependentExactOracle",
+            "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+            "TestLPRationalPriorityQueueAllocationFailureCensus",
+            "TestLPRationalPriorityQueueOlderComparisonIdentity",
+            "TestLPPairPriorityQueueAllocationFailureCensus",
+            "TestLPPairPriorityQueueOlderComparisonIdentity",
+            "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+            "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
+          ]
         }
       ],
       "ownership": [
-        "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit."
+        "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit.",
+        "Exact priority slots and decrease-by-value arguments own concrete initialized project numerals. Comparison calls retain only newly acquired synchronized raw generations and physical allocation roots; older active comparisons remain with their actual caller. Source lexical argument copies remain owned until Close after a stopped call. Clear/dequeue retain priorities. No provenance is inferred from a manager registry."
       ],
       "deviations": [
-        "Exact mpq/numeric_pair priorities and complete primal/matrix integration remain open; no whole-unit promotion. Default source empty construction is New*PriorityQueue(0); constructor required before use.",
+        "Complete primal/matrix integration remains open; no whole-unit promotion. Default source empty construction is New*PriorityQueue(0); constructor required before use.",
         "Whole-source scan finds dequeue_and_get_priority used only by uncalled debug print; print, peek, duplicate put_to_heap and uncalled float remove are not added merely to instantiate template definitions. The unused dequeue-with-priority inverse-index omission is not silently repaired or exercised as a retained caller.",
         "Typed Go guards retain valid prefixes after invalid source extent operations. Resize does not prune active membership. Auto-growth uses literal unsigned o<<1, including zero/wrap behavior. Strict tie comparisons and IEEE NaN/infinity behavior remain literal; native empty dequeue with existing storage retains unsigned size decrement, debug stops before mutation.",
-        "Source debug inverse assertions use the existing explicit Go error profile, not process-global debugger/TRACE transport. The source consistency check does not verify every active heap object has an inverse member; independent tests check both directions for valid operations."
+        "Source debug inverse assertions use the existing explicit Go error profile, not process-global debugger/TRACE transport. The source consistency check does not verify every active heap object has an inverse member; independent tests check both directions for valid operations.",
+        "Exact get_priority, peek, remove, dequeue-with-priority and debug print/consistency instantiations have no retained exact caller and are not represented by unused adapters. Actual mpq greater reverses scalar comparison operands. Numeric-pair comparisons use scalar < or > followed by structural X equality before Y, preserving unreduced raw-value gate behavior. Full source global service/debug transport remains open."
       ]
     },
     {
@@ -121747,7 +121846,18 @@
         "TestLPRationalPairArithmeticOracle",
         "TestLPRationalPairOrderSignsAndFormatting",
         "TestLPRationalPairCoordinateErrorPrefixes",
-        "TestLPRationalPairSourceAccumulation"
+        "TestLPRationalPairSourceAccumulation",
+        "TestLPRationalPairSourceRelations",
+        "TestLPRationalPriorityQueueIndependentExactOracle",
+        "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPPairPriorityQueueIndependentExactOracle",
+        "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPRationalPriorityQueueAllocationFailureCensus",
+        "TestLPRationalPriorityQueueOlderComparisonIdentity",
+        "TestLPPairPriorityQueueAllocationFailureCensus",
+        "TestLPPairPriorityQueueOlderComparisonIdentity",
+        "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -121761,6 +121871,25 @@
             "TestLPRationalPairOrderSignsAndFormatting",
             "TestLPRationalPairCoordinateErrorPrefixes",
             "TestLPRationalPairSourceAccumulation"
+          ]
+        },
+        {
+          "name": "actual numeric_pair<mpq> strict Less/Greater with reversed scalar > operands and source structural X equality gate",
+          "status": "ported",
+          "go_target": "pkg/util/lp/numeric_pair.go",
+          "tests": [
+            "TestLPRationalPairSourceRelations",
+            "TestLPRationalPairSourceRelations",
+            "TestLPRationalPriorityQueueIndependentExactOracle",
+            "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+            "TestLPPairPriorityQueueIndependentExactOracle",
+            "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+            "TestLPRationalPriorityQueueAllocationFailureCensus",
+            "TestLPRationalPriorityQueueOlderComparisonIdentity",
+            "TestLPPairPriorityQueueAllocationFailureCensus",
+            "TestLPPairPriorityQueueOlderComparisonIdentity",
+            "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+            "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
           ]
         }
       ],
@@ -130295,7 +130424,10 @@
         "pkg/util/numeral/mpq_decimal_stream_test.go",
         "pkg/util/numeral/mpq_decimal_stream_failure_test.go",
         "pkg/util/numeral/mpq_decimal_stream_callback_test.go",
-        "pkg/util/numeral/mpq_decimal_stream_source_stop_test.go"
+        "pkg/util/numeral/mpq_decimal_stream_source_stop_test.go",
+        "pkg/util/numeral/rational_raw_boundary.go",
+        "pkg/util/numeral/rational_raw_comparison_boundary_test.go",
+        "pkg/util/lp/priority_queue_exact_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -130481,7 +130613,19 @@
         "TestRationalDecimalStreamDenominatorCopyTransportGuards",
         "TestRationalDecimalStreamReachedEndLabelSourceStop",
         "TestRationalDecimalStreamLiteralRawNegativeDenominator",
-        "TestRationalDecimalStreamInlineCallKeepsOlderCopyAllocation"
+        "TestRationalDecimalStreamInlineCallKeepsOlderCopyAllocation",
+        "TestRationalComparisonBoundaryGenerationIdentity",
+        "TestLPRationalPairSourceRelations",
+        "TestLPRationalPriorityQueueIndependentExactOracle",
+        "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPPairPriorityQueueIndependentExactOracle",
+        "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPRationalPriorityQueueAllocationFailureCensus",
+        "TestLPRationalPriorityQueueOlderComparisonIdentity",
+        "TestLPPairPriorityQueueAllocationFailureCensus",
+        "TestLPPairPriorityQueueOlderComparisonIdentity",
+        "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
       ],
       "assertions": [
         {
@@ -131090,6 +131234,14 @@
             "TestRationalDecimalStreamLiteralRawNegativeDenominator",
             "TestRationalDecimalStreamInlineCallKeepsOlderCopyAllocation"
           ]
+        },
+        {
+          "name": "identity-checked caller observation/cleanup of actual synchronized rational comparison RAW invocation used by concrete LP priority queues",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/rational_raw_boundary.go",
+          "tests": [
+            "TestRationalComparisonBoundaryGenerationIdentity"
+          ]
         }
       ],
       "ownership": [
@@ -131216,7 +131368,10 @@
         "pkg/util/numeral/mpq_decimal_stream_callback_test.go",
         "pkg/util/numeral/mpq_decimal_stream_source_stop_test.go",
         "pkg/util/numeral/mpq_signed_fraction_source.go",
-        "pkg/util/numeral/mpq_signed_fraction_source_test.go"
+        "pkg/util/numeral/mpq_signed_fraction_source_test.go",
+        "pkg/util/numeral/rational_raw_boundary.go",
+        "pkg/util/numeral/rational_raw_comparison_boundary_test.go",
+        "pkg/util/lp/priority_queue_exact_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -131493,7 +131648,19 @@
         "TestRationalSignedFractionSourceEveryColdGCDReservation",
         "TestRationalSignedFractionSourceWarmReinitialization",
         "TestRationalSignedFractionSourceNumeratorReleaseStopsPublication",
-        "TestRationalSignedFractionSourceDriverTst0"
+        "TestRationalSignedFractionSourceDriverTst0",
+        "TestRationalComparisonBoundaryGenerationIdentity",
+        "TestLPRationalPairSourceRelations",
+        "TestLPRationalPriorityQueueIndependentExactOracle",
+        "TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPPairPriorityQueueIndependentExactOracle",
+        "TestLPPairPriorityQueueExactLifetimeAndPrefixContracts",
+        "TestLPRationalPriorityQueueAllocationFailureCensus",
+        "TestLPRationalPriorityQueueOlderComparisonIdentity",
+        "TestLPPairPriorityQueueAllocationFailureCensus",
+        "TestLPPairPriorityQueueOlderComparisonIdentity",
+        "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
       ],
       "conditionals": [
         {
@@ -132655,6 +132822,14 @@
             "TestRationalSignedFractionSourceWarmReinitialization",
             "TestRationalSignedFractionSourceNumeratorReleaseStopsPublication",
             "TestRationalSignedFractionSourceDriverTst0"
+          ]
+        },
+        {
+          "name": "identity-checked caller observation/cleanup of actual synchronized rational comparison RAW invocation used by concrete LP priority queues",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/rational_raw_boundary.go",
+          "tests": [
+            "TestRationalComparisonBoundaryGenerationIdentity"
           ]
         }
       ],
