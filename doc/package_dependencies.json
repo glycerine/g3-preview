@@ -1171,6 +1171,8 @@
       ],
       "production_files": [
         "assert_release.go",
+        "diagonal_matrix_exact.go",
+        "diagonal_matrix_float.go",
         "eta_exact_expression.go",
         "eta_matrix_exact.go",
         "eta_matrix_float.go",

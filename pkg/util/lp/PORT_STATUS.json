@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 90.7,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. The 90.7% complete native snapshot (6210/6843 statements) predates indexed refinement and sparse LU extension. Focused extension coverage: float 96.6% native/100% debug; exact 91.3% native/93.5% debug. Complete debug/checked coverage predates sparse basis storage; current component results are recorded in PORT_STATUS.md.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. The 90.7% complete native snapshot (6210/6843 statements) predates indexed refinement, sparse LU extension and diagonal tails. Focused diagonal coverage: floating97.3% native/100% debug; exact86.1%/88.9%; debug view100%. Complete debug/checked coverage predates sparse basis storage; current component results are recorded in PORT_STATUS.md.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -833,15 +833,43 @@
     },
     {
       "source": "src/util/lp/lu.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/diagonal_matrix_float.go",
+        "pkg/util/lp/diagonal_matrix_exact.go",
+        "pkg/util/lp/diagonal_matrix_debug.go",
+        "pkg/util/lp/diagonal_matrix_test.go",
+        "pkg/util/lp/diagonal_matrix_failure_test.go",
+        "pkg/util/lp/diagonal_matrix_debug_test.go"
+      ],
+      "tests": [
+        "TestLPDiagonalTailIndependentMatrixOracle",
+        "TestLPDiagonalTailLiteralToleranceAndIEEE",
+        "TestLPDiagonalTailBoundsAndOwnerGuards",
+        "TestLPDiagonalTailAllocationFailureCensus",
+        "TestLPDiagonalTailBorrowedStoppedInput",
+        "TestLPDiagonalTailDebugDenseView"
+      ]
     },
     {
       "source": "src/util/lp/lu.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/diagonal_matrix_float.go",
+        "pkg/util/lp/diagonal_matrix_exact.go",
+        "pkg/util/lp/diagonal_matrix_debug.go",
+        "pkg/util/lp/diagonal_matrix_test.go",
+        "pkg/util/lp/diagonal_matrix_failure_test.go",
+        "pkg/util/lp/diagonal_matrix_debug_test.go"
+      ],
+      "tests": [
+        "TestLPDiagonalTailIndependentMatrixOracle",
+        "TestLPDiagonalTailLiteralToleranceAndIEEE",
+        "TestLPDiagonalTailBoundsAndOwnerGuards",
+        "TestLPDiagonalTailAllocationFailureCensus",
+        "TestLPDiagonalTailBorrowedStoppedInput",
+        "TestLPDiagonalTailDebugDenseView"
+      ]
     },
     {
       "source": "src/util/lp/lu_instances.cpp",
@@ -1684,8 +1712,8 @@
     }
   ],
   "status_counts": {
-    "unported": 68,
-    "partial": 42
+    "unported": 66,
+    "partial": 44
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7
 }

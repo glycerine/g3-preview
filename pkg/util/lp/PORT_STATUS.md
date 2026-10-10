@@ -5,7 +5,7 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently forty-two partial source units and 68 unported units. No complete
+There are currently forty-four partial source units and 66 unported units. No complete
 LP solver is available yet. A green Go coverage report does not measure the C++
 code that has not been ported.
 
@@ -46,13 +46,14 @@ code that has not been ported.
 | Indexed graph traversal and floating/exact scalar triangular solves | 240 independent nilpotent inverse-polynomial worlds with sparse reachability/index membership; literal postorder/output prefixes, flag lifetimes, zero/tiny/unindexed inputs; four physical failure campaigns and borrowed-owner guards | Graphs 94.4% native / 97.2% debug each; exact solve 89.3%, floating 93.4% in both profiles; remaining statements propagate child/cleanup errors, protect index rebuild bounds or belong to the opposite assertion profile |
 | Floating indexed residual correction/refinement | 240 independent exact inverse-polynomial and dense-residual worlds with shuffled permutations; strict density boundary, sparse/dense tolerance divergence, hidden/trailing data, fixed cleanup/order/IEEE and reached error prefixes | 91.4% native and debug/checked (32/35); remaining returns guard invariant-protected correction errors |
 | Sparse identity extension, stored-entry count and LU permutation composition | 120 worlds with eight repeated dense-oracle permutation/growth rounds; retained workspace/queue/counters and reciprocal links; pooled/direct inline-one growth under disabled numerical reservations; native/debug shrink, real stopped-owner and publication/error prefixes | Floating 96.6% native / 100% debug; exact 91.3% / 93.5%; remaining returns propagate inline-one/capture/cleanup errors or belong to the opposite assertion profile |
+| LU one-coordinate diagonal tails for floating/rational/pair paths | 240 independent matrix/conjugation worlds; exact tiny values, strict tolerance/IEEE/index quirks, constructor ownership, fourteen pooled/direct reservation campaigns, stopped caller receipts and actual pair X-before-Y failure; cached debug view | Floating 97.3% native / 100% debug; exact 86.1% / 88.9%; debug view 100%; gaps propagate child/cleanup/capture errors, test an unreachable exact-zero quotient or belong to the other profile |
 | Settings defaults, stats, float tolerance families, random state and resource limits | All numerical/strategy defaults, source RNG golden vectors, mutable thresholds, strict CPU-time boundary, borrowed limit/error propagation and stats reset | 96.3%; uncovered constructor return propagates a real host-clock start error |
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
 The last complete native LP run reported **90.7%** statement coverage
 (6210/6843 existing Go statements), including sparse indexed graph traversal
-and solves, before floating indexed refinement and sparse identity extension were added. The last
+and solves, before floating indexed refinement, sparse identity extension and diagonal tails were added. The last
 complete combined debug/checked run reported **91.7%** before sparse basis storage
 was added; sparse basis, elimination, pivot, active shortening, eta construction, column
 replacement and dense/indexed solve components now also pass focused debug/checked tests. Exact scoped

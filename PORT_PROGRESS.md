@@ -36051,3 +36051,48 @@ prerequisites.
 Final LP vet, portcheck, regenerated64-package graph and diff checks pass.
 Production graph edges are unchanged; new extension files appear in its inventory.
 Full native regression passed within this hour and was not redundantly rerun.
+
+
+## LU diagonal tail prerequisite
+
+Implemented retained one_elem_on_diag for double/double, mpq/mpq and mpq/pair,
+reached by lu.hpp:926-934 column-update repair. Floating dense applications divide
+the selected coordinate directly; sparse applications skip exact zero first.
+Sparse right uses strict fixed1e-14 and sparse left uses live settings; dropping
+erases only the first duplicate before writing positive zero. Neither repairs
+hidden unindexed input. Exact left returns before settings/drop; exact right
+uses the precise zero predicate. Pair dense division publishes X before Y.
+Conjugation maps only the diagonal index through inverse permutation.
+
+Exact construction retains actual value-parameter/member copies. Debug builds
+construct and own the reciprocal through actual rational expression temporaries;
+debug-only dense views return that cached value and expose dimensions. Failed
+constructors return a closeable partial owner. Tail owns new arithmetic calls
+and lexical work; caller owns partial destination fields. Cleanup retains caller
+values and destroys reciprocal before coefficient. Unused copy constructor is
+not ported; no complete LU or actual source-driver execution credit is claimed.
+
+Tests cover240 independent scalar/pair dense matrix worlds with permutation
+conjugation and four application routes, exact values below floating tolerance,
+strict fixed/settings thresholds, signed zero/NaN/infinity, duplicate erasure,
+hidden input and dense0/0 vs sparse zero skip. Fourteen pooled/direct constructor
+and application campaigns walk real reservation ordinals through first success.
+Warm pooled native constructors need no new backing, so no synthetic failure is
+introduced. Tests require actual newly owned numerical receipts and a real direct
+pair failure with independently expected X complete while Y remains old.
+Owning-cell/direct-object census after tail cleanup and full manager cleanup
+verify partial outputs; actual stopped caller Add receipts survive rejection and
+tail Close. Foreign-manager and reached bounds/stopped guards are checked.
+
+Focused native0.313s and combined debug/checked0.631s pass. Floating36/37 (97.3%)
+native and37/37 (100%) debug; exact93/108 (86.1%) native and96/108 (88.9%) debug;
+debug view21/21 (100%). Gaps propagate capture/child/cleanup errors, preserve a
+source zero-result branch unreachable for valid nonzero exact division, or belong
+to the other build profile. The full native90.7% snapshot predates this addition.
+LU header/body now partial, not complete:44 partial/66 unported source units.
+Full LU factorization/update/solve, dense blocks, scaling/simplex/LAR/MPS and
+retained original driver/test integration remain required.
+
+Final native and debug/checked LP vet, portcheck and diff checks pass.
+Regenerated64-package production graph retains its edges and lists the new
+diagonal tail files. The full native suite passed within this hour; no repeat.

@@ -121863,9 +121863,23 @@
       "path": "src/util/lp/lu.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/diagonal_matrix_float.go",
+        "pkg/util/lp/diagonal_matrix_exact.go",
+        "pkg/util/lp/diagonal_matrix_debug.go",
+        "pkg/util/lp/diagonal_matrix_test.go",
+        "pkg/util/lp/diagonal_matrix_failure_test.go",
+        "pkg/util/lp/diagonal_matrix_debug_test.go"
+      ],
+      "tests": [
+        "TestLPDiagonalTailIndependentMatrixOracle",
+        "TestLPDiagonalTailLiteralToleranceAndIEEE",
+        "TestLPDiagonalTailBoundsAndOwnerGuards",
+        "TestLPDiagonalTailAllocationFailureCensus",
+        "TestLPDiagonalTailBorrowedStoppedInput",
+        "TestLPDiagonalTailDebugDenseView"
+      ],
       "conditionals": [
         {
           "line": 37,
@@ -121956,17 +121970,54 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained one_elem_on_diag double/mpq/mpq-pair constructor, dense/sparse applications, conjugation and debug cached reciprocal/dense view",
+          "status": "ported",
+          "go_target": "pkg/util/lp/diagonal_matrix_float.go",
+          "go_targets": [
+            "pkg/util/lp/diagonal_matrix_exact.go",
+            "pkg/util/lp/diagonal_matrix_debug.go"
+          ],
+          "tests": [
+            "TestLPDiagonalTailIndependentMatrixOracle",
+            "TestLPDiagonalTailLiteralToleranceAndIEEE",
+            "TestLPDiagonalTailBoundsAndOwnerGuards",
+            "TestLPDiagonalTailAllocationFailureCensus",
+            "TestLPDiagonalTailBorrowedStoppedInput",
+            "TestLPDiagonalTailDebugDenseView"
+          ]
+        }
+      ],
+      "ownership": [
+        "Diagonal tail owns coefficient and debug reciprocal in a borrowed manager. Exact construction copies the by-value parameter before its member and destroys the parameter after debug reciprocal construction. Matrix owns only new numerical calls/lexical temporaries; destination owns completed/partial quotient fields. Close releases stopped calls/work, reciprocal then coefficient and roots, preserving caller values. Pair division publishes X before Y. Foreign/stopped indexed destinations reject before tail arithmetic and retain their original receipts."
+      ],
+      "deviations": [
+        "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Full LU constructor/factorization, transformations/updates/solves, dense-block prerequisites and actual upstream-driver integration remain unported.",
+        "240 independent dense-matrix worlds check scalar/pair results and conjugation; literal tests cover tolerance boundaries, negative zero, NaN/infinity, duplicate index erasure, hidden data and dense0/0 vs sparse zero skip. Fourteen pooled/direct campaigns walk real reservation ordinals through first success; warm pooled native constructor copies need no new backing, so no synthetic refusal is claimed. Actual receipts, caller ownership census and pair X-complete/Y-old failure are verified. Selected owner guards adapt Go lifetime/invalid domains; no complete solver or registered upstream-driver credit."
+      ]
     },
     {
       "path": "src/util/lp/lu.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/diagonal_matrix_float.go",
+        "pkg/util/lp/diagonal_matrix_exact.go",
+        "pkg/util/lp/diagonal_matrix_debug.go",
+        "pkg/util/lp/diagonal_matrix_test.go",
+        "pkg/util/lp/diagonal_matrix_failure_test.go",
+        "pkg/util/lp/diagonal_matrix_debug_test.go"
+      ],
+      "tests": [
+        "TestLPDiagonalTailIndependentMatrixOracle",
+        "TestLPDiagonalTailLiteralToleranceAndIEEE",
+        "TestLPDiagonalTailBoundsAndOwnerGuards",
+        "TestLPDiagonalTailAllocationFailureCensus",
+        "TestLPDiagonalTailBorrowedStoppedInput",
+        "TestLPDiagonalTailDebugDenseView"
+      ],
       "conditionals": [
         {
           "line": 28,
@@ -122217,9 +122268,32 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained one_elem_on_diag double/mpq/mpq-pair constructor, dense/sparse applications, conjugation and debug cached reciprocal/dense view",
+          "status": "ported",
+          "go_target": "pkg/util/lp/diagonal_matrix_float.go",
+          "go_targets": [
+            "pkg/util/lp/diagonal_matrix_exact.go",
+            "pkg/util/lp/diagonal_matrix_debug.go"
+          ],
+          "tests": [
+            "TestLPDiagonalTailIndependentMatrixOracle",
+            "TestLPDiagonalTailLiteralToleranceAndIEEE",
+            "TestLPDiagonalTailBoundsAndOwnerGuards",
+            "TestLPDiagonalTailAllocationFailureCensus",
+            "TestLPDiagonalTailBorrowedStoppedInput",
+            "TestLPDiagonalTailDebugDenseView"
+          ]
+        }
+      ],
+      "ownership": [
+        "Diagonal tail owns coefficient and debug reciprocal in a borrowed manager. Exact construction copies the by-value parameter before its member and destroys the parameter after debug reciprocal construction. Matrix owns only new numerical calls/lexical temporaries; destination owns completed/partial quotient fields. Close releases stopped calls/work, reciprocal then coefficient and roots, preserving caller values. Pair division publishes X before Y. Foreign/stopped indexed destinations reject before tail arithmetic and retain their original receipts."
+      ],
+      "deviations": [
+        "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Full LU constructor/factorization, transformations/updates/solves, dense-block prerequisites and actual upstream-driver integration remain unported.",
+        "240 independent dense-matrix worlds check scalar/pair results and conjugation; literal tests cover tolerance boundaries, negative zero, NaN/infinity, duplicate index erasure, hidden data and dense0/0 vs sparse zero skip. Fourteen pooled/direct campaigns walk real reservation ordinals through first success; warm pooled native constructor copies need no new backing, so no synthetic refusal is claimed. Actual receipts, caller ownership census and pair X-complete/Y-old failure are verified. Selected owner guards adapt Go lifetime/invalid domains; no complete solver or registered upstream-driver credit."
+      ]
     },
     {
       "path": "src/util/lp/lu_instances.cpp",
