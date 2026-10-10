@@ -35300,3 +35300,56 @@ linear-combination integration, formatting and complete sparse/LU/solver layers
 remain required. Static units become partial:31 partial/79 unported LP files;
 repository62 ported/312 partial/1700 unported/two dead-deleted. The complete LP
 implementation/test objective remains active.
+
+## Exact static matrix coefficient owners and row elimination
+
+Added RationalStaticMatrix, the shared mpq coefficient storage used by retained
+mpq/mpq and mpq/numeric_pair instances. Rows own initialized rational values in
+a borrowed manager; columns borrow row positions. Constructor, initialization,
+row/column addition, Clear, Set, explicit-zero AddNewElement, first-match copied
+Element, borrowed ColumnValue, term counts, removal and row/column scaling are
+implemented. Native slice relocation transfers owners without synthetic capacity
+reservations. Source row-cell temporary and stored value copies remain actual
+numeric operations. Set publishes its column cell before those copies;
+AddNewElement publishes it afterward. RemoveElement copies column-tail metadata,
+then row-tail scalar fields and owning rational value, repairs the moved link and
+finally deletes the row tail. Tests preserve real stopped publication prefixes.
+
+Exact PivotRowToRow preserves the copied/negated alpha, concrete rational product
+expression lifetimes, exact-zero checks, descending cancellation removal and
+source workspace reset. It shares the source wrong target-row-versus-column-count
+debug assertion. It does not apply floating tolerance to exact coefficients.
+Actual lexical values, newly acquired rational/integer invocation receipts and
+physical roots remain owned until Close; pending owners reject further mutation.
+A successful inline pivot leaves another caller's older stopped addition intact.
+An attempted arbitrary-precision pivot while that manager's scratch was already
+poisoned reached ErrDeadSlot; that unsupported reentry is not counted as a valid
+completed algorithm. The ownership fixture uses real inline operations that can
+complete with the older raw frame still outstanding, without scratch repair.
+
+Independent math/big.Rat tests cover1,800 storage/scaling/removal mutations and240
+normalized exact row-elimination worlds, shuffled row orders, fill, multiple
+cancellations and both reciprocal link directions. Separate fixtures pin tiny
+330-digit denominators, same-row coefficient aliases, live scaling divisors,
+duplicates/explicit zeros, old-width initialization, malformed-link and bounds
+mutation prefixes, zero-pivot/coefficient assertions, native self pivot and tall
+matrix profile differences. Eight fresh-manager reservation campaigns exercise
+Set, AddNewElement, Element, removal, row/column scaling and both fill/existing-term
+pivots through first success, checking independent numerical endpoints, pending
+guards, named live cells/direct objects and consumed raw invocation generations.
+No manager-wide teardown or registry inference substitutes for owning cleanup.
+
+Focused exact checks pass native5.342s; current new-file coverage91.2% native/
+92.6% debug-checked. Remaining statements are child/cleanup errors, redundant
+workspace bounds and profile-only assertions. Exact scopes/transpose, dense and
+sparse column extraction, products/extrema, precise linear-combination fill,
+formatting and complete sparse/LU/solver integration remain required. The three
+static source units remain partial; LP31 partial/79 unported, repository62
+ported/312 partial/1700 unported/two dead-deleted. Full LP objective continues.
+
+Full LP regression passes native76.688s/debug-checked111.410s with90.0%/91.8%
+coverage. Final focused exact tests including older-call identity pass native
+5.342s/debug6.171s. LP vet, portcheck, regenerated64-package graphs and diff
+checks pass. Prior floating static checkpoint7ac921be includes the successful
+hourly full native module suite; no redundant module-wide run was started for
+this isolated exact addition.

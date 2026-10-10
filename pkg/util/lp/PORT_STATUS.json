@@ -1,7 +1,7 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 89.9,
+  "native_statement_coverage_of_current_go_code": 90.0,
   "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
@@ -1115,7 +1115,8 @@
       "source": "src/util/lp/static_matrix.h",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/static_matrix_float.go"
+        "pkg/util/lp/static_matrix_float.go",
+        "pkg/util/lp/static_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -1125,14 +1126,22 @@
         "TestLPFloatStaticMatrixLiteralDuplicatesAndDiagnosticGaps",
         "TestLPFloatStaticMatrixBoundsAndVectorPrefixes",
         "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards",
-        "TestLPFloatStaticMatrixScopeAndCrosslinkStops"
+        "TestLPFloatStaticMatrixScopeAndCrosslinkStops",
+        "TestLPExactStaticMatrixIndependentMutationOracle",
+        "TestLPExactStaticMatrixIndependentPivotOracle",
+        "TestLPExactStaticMatrixLiteralStorageAndAliases",
+        "TestLPExactStaticMatrixAllocationFailureCensus",
+        "TestLPExactStaticMatrixBoundsAndMutationPrefixes",
+        "TestLPExactStaticMatrixTinyPivotAndBorrowedAliases",
+        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned"
       ]
     },
     {
       "source": "src/util/lp/static_matrix.hpp",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/static_matrix_float.go"
+        "pkg/util/lp/static_matrix_float.go",
+        "pkg/util/lp/static_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -1142,14 +1151,22 @@
         "TestLPFloatStaticMatrixLiteralDuplicatesAndDiagnosticGaps",
         "TestLPFloatStaticMatrixBoundsAndVectorPrefixes",
         "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards",
-        "TestLPFloatStaticMatrixScopeAndCrosslinkStops"
+        "TestLPFloatStaticMatrixScopeAndCrosslinkStops",
+        "TestLPExactStaticMatrixIndependentMutationOracle",
+        "TestLPExactStaticMatrixIndependentPivotOracle",
+        "TestLPExactStaticMatrixLiteralStorageAndAliases",
+        "TestLPExactStaticMatrixAllocationFailureCensus",
+        "TestLPExactStaticMatrixBoundsAndMutationPrefixes",
+        "TestLPExactStaticMatrixTinyPivotAndBorrowedAliases",
+        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned"
       ]
     },
     {
       "source": "src/util/lp/static_matrix_instances.cpp",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/static_matrix_float.go"
+        "pkg/util/lp/static_matrix_float.go",
+        "pkg/util/lp/static_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -1159,7 +1176,14 @@
         "TestLPFloatStaticMatrixLiteralDuplicatesAndDiagnosticGaps",
         "TestLPFloatStaticMatrixBoundsAndVectorPrefixes",
         "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards",
-        "TestLPFloatStaticMatrixScopeAndCrosslinkStops"
+        "TestLPFloatStaticMatrixScopeAndCrosslinkStops",
+        "TestLPExactStaticMatrixIndependentMutationOracle",
+        "TestLPExactStaticMatrixIndependentPivotOracle",
+        "TestLPExactStaticMatrixLiteralStorageAndAliases",
+        "TestLPExactStaticMatrixAllocationFailureCensus",
+        "TestLPExactStaticMatrixBoundsAndMutationPrefixes",
+        "TestLPExactStaticMatrixTinyPivotAndBorrowedAliases",
+        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned"
       ]
     },
     {
@@ -1199,5 +1223,5 @@
     "unported": 79,
     "partial": 31
   },
-  "combined_debug_checked_statement_coverage_of_current_go_code": 91.7
+  "combined_debug_checked_statement_coverage_of_current_go_code": 91.8
 }
