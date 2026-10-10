@@ -121279,22 +121279,55 @@
       "path": "src/util/lp/lp_dual_core_solver.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dual_core_float.go",
+        "pkg/util/lp/dual_core_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDualPreparationIndependentModels",
+        "TestLPFloatDualCoreIndependentDualVectors",
+        "TestLPFloatDualCorePartialOwnersAndGuards"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Floating dual core actual LU constructor and borrowed eligibility filter, restore_non_basis, beta/A-wave initialization and real X/dual reduced-cost recomputation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_core_float.go",
+          "tests": [
+            "TestLPFloatDualPreparationIndependentModels",
+            "TestLPFloatDualCoreIndependentDualVectors",
+            "TestLPFloatDualCorePartialOwnersAndGuards"
+          ]
+        },
+        {
+          "name": "Remaining dual pricing, ratio/bound-flip/pivot optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit."
+      ]
     },
     {
       "path": "src/util/lp/lp_dual_core_solver.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dual_core_float.go",
+        "pkg/util/lp/dual_core_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDualPreparationIndependentModels",
+        "TestLPFloatDualCoreIndependentDualVectors",
+        "TestLPFloatDualCorePartialOwnersAndGuards"
+      ],
       "assertions": [
         {
           "line": 41,
@@ -121419,43 +121452,127 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Floating dual core actual LU constructor and borrowed eligibility filter, restore_non_basis, beta/A-wave initialization and real X/dual reduced-cost recomputation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_core_float.go",
+          "tests": [
+            "TestLPFloatDualPreparationIndependentModels",
+            "TestLPFloatDualCoreIndependentDualVectors",
+            "TestLPFloatDualCorePartialOwnersAndGuards"
+          ]
+        },
+        {
+          "name": "Remaining dual pricing, ratio/bound-flip/pivot optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit."
+      ]
     },
     {
       "path": "src/util/lp/lp_dual_core_solver_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dual_core_float.go",
+        "pkg/util/lp/dual_core_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDualPreparationIndependentModels",
+        "TestLPFloatDualCoreIndependentDualVectors",
+        "TestLPFloatDualCorePartialOwnersAndGuards"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Floating dual core actual LU constructor and borrowed eligibility filter, restore_non_basis, beta/A-wave initialization and real X/dual reduced-cost recomputation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_core_float.go",
+          "tests": [
+            "TestLPFloatDualPreparationIndependentModels",
+            "TestLPFloatDualCoreIndependentDualVectors",
+            "TestLPFloatDualCorePartialOwnersAndGuards"
+          ]
+        },
+        {
+          "name": "Remaining dual pricing, ratio/bound-flip/pivot optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit."
+      ]
     },
     {
       "path": "src/util/lp/lp_dual_simplex.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dual_prepare_float.go",
+        "pkg/util/lp/dual_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDualPreparationIndependentModels",
+        "TestLPFloatDualPreparationSourcePrefixes",
+        "TestLPFloatDualPreparationIEEEAndResize",
+        "TestLPFloatDualPreparationMetadataAndStageTwoPrefixes",
+        "TestLPFloatDualCostFlipIEEEAndPublication"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Floating dual stage-one structural/logical costs/bounds/eligibility, signed slack/artificial basis assembly, native allocation/resize and stage-two metadata/RHS restoration",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_prepare_float.go",
+          "tests": [
+            "TestLPFloatDualPreparationIndependentModels",
+            "TestLPFloatDualPreparationSourcePrefixes",
+            "TestLPFloatDualPreparationIEEEAndResize",
+            "TestLPFloatDualPreparationMetadataAndStageTwoPrefixes",
+            "TestLPFloatDualCostFlipIEEEAndPublication"
+          ]
+        },
+        {
+          "name": "Remaining dual pricing, ratio/bound-flip/pivot optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit."
+      ]
     },
     {
       "path": "src/util/lp/lp_dual_simplex.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dual_prepare_float.go",
+        "pkg/util/lp/dual_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDualPreparationIndependentModels",
+        "TestLPFloatDualPreparationSourcePrefixes",
+        "TestLPFloatDualPreparationIEEEAndResize",
+        "TestLPFloatDualPreparationMetadataAndStageTwoPrefixes",
+        "TestLPFloatDualCostFlipIEEEAndPublication"
+      ],
       "assertions": [
         {
           "line": 33,
@@ -121516,9 +121633,30 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Floating dual stage-one structural/logical costs/bounds/eligibility, signed slack/artificial basis assembly, native allocation/resize and stage-two metadata/RHS restoration",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_prepare_float.go",
+          "tests": [
+            "TestLPFloatDualPreparationIndependentModels",
+            "TestLPFloatDualPreparationSourcePrefixes",
+            "TestLPFloatDualPreparationIEEEAndResize",
+            "TestLPFloatDualPreparationMetadataAndStageTwoPrefixes",
+            "TestLPFloatDualCostFlipIEEEAndPublication"
+          ]
+        },
+        {
+          "name": "Remaining dual pricing, ratio/bound-flip/pivot optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit."
+      ]
     },
     {
       "path": "src/util/lp/lp_dual_simplex_instances.cpp",
@@ -123110,7 +123248,9 @@
         "pkg/util/lp/solver_float_test.go",
         "pkg/util/lp/solver_presolve_float.go",
         "pkg/util/lp/solver_presolve_float_test.go",
-        "pkg/util/lp/primal_solver_float.go"
+        "pkg/util/lp/primal_solver_float.go",
+        "pkg/util/lp/dual_prepare_float.go",
+        "pkg/util/lp/dual_prepare_float_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -123128,7 +123268,9 @@
         "TestLPFloatPrimalOuterStatusesAndPublication",
         "TestLPFloatPrimalOuterErrorsKeepSourcePrefixes",
         "TestLPFloatPrimalOuterSourceUpperOnlyInconsistency",
-        "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors"
+        "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors",
+        "TestLPFloatDualCostFlipIEEEAndPublication",
+        "TestLPFloatDualPreparationIndependentModels"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -123180,6 +123322,15 @@
             "TestLPFloatPrimalOuterSourceUpperOnlyInconsistency",
             "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors"
           ]
+        },
+        {
+          "name": "Floating common flip_costs used by dual preparation, including native metadata alias/IEEE and deterministic error prefix",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_prepare_float.go",
+          "tests": [
+            "TestLPFloatDualCostFlipIEEEAndPublication",
+            "TestLPFloatDualPreparationIndependentModels"
+          ]
         }
       ],
       "ownership": [
@@ -123192,7 +123343,8 @@
         "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
         "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested.",
         "Floating presolve now supersedes earlier open-presolve notes. Independent exact box-corner extrema verify 100 randomized boxes and 1500 relation/RHS decisions; strict directional tolerance, missing/zero bounds, IEEE, source error prefixes and cleanup-to-scaling integration are tested. Cleanup preserves source d=(try_to_remove_some_rows()>0): logs count successful passes, not removed rows, and fixed-term substitution alone does not force another pass. Go writer errors return after source mutations; native ostream badbit/global binding is not claimed. Exact presolve and full simplex/LAR drivers remain open; whole source units remain partial.",
-        "Outer LU path uses actual presolve/preparation/scaling/core Solve. Sorted external numeric indices choose deterministic source unordered objective-sum order. Partial Go constructor owner is closed before returning its error without publishing CoreSolver. The source upper-only flip/type inconsistency is preserved and tested: maximize -x with x<=3,z>=0,-x+z<=2 reports optimal x=3,cost=-3 although independent true optimum is x=-2,cost=2. No source algorithm correction is silently applied. Default tableau/precise variants, source diagnostics/solution validators and complete original driver integration remain open."
+        "Outer LU path uses actual presolve/preparation/scaling/core Solve. Sorted external numeric indices choose deterministic source unordered objective-sum order. Partial Go constructor owner is closed before returning its error without publishing CoreSolver. The source upper-only flip/type inconsistency is preserved and tested: maximize -x with x<=3,z>=0,-x+z<=2 reports optimal x=3,cost=-3 although independent true optimum is x=-2,cost=2. No source algorithm correction is silently applied. Default tableau/precise variants, source diagnostics/solution validators and complete original driver integration remain open.",
+        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit."
       ]
     },
     {
@@ -123206,7 +123358,9 @@
         "pkg/util/lp/solver_float_test.go",
         "pkg/util/lp/solver_presolve_float.go",
         "pkg/util/lp/solver_presolve_float_test.go",
-        "pkg/util/lp/primal_solver_float.go"
+        "pkg/util/lp/primal_solver_float.go",
+        "pkg/util/lp/dual_prepare_float.go",
+        "pkg/util/lp/dual_prepare_float_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -123224,7 +123378,9 @@
         "TestLPFloatPrimalOuterStatusesAndPublication",
         "TestLPFloatPrimalOuterErrorsKeepSourcePrefixes",
         "TestLPFloatPrimalOuterSourceUpperOnlyInconsistency",
-        "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors"
+        "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors",
+        "TestLPFloatDualCostFlipIEEEAndPublication",
+        "TestLPFloatDualPreparationIndependentModels"
       ],
       "assertions": [
         {
@@ -123334,6 +123490,15 @@
             "TestLPFloatPrimalOuterSourceUpperOnlyInconsistency",
             "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors"
           ]
+        },
+        {
+          "name": "Floating common flip_costs used by dual preparation, including native metadata alias/IEEE and deterministic error prefix",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_prepare_float.go",
+          "tests": [
+            "TestLPFloatDualCostFlipIEEEAndPublication",
+            "TestLPFloatDualPreparationIndependentModels"
+          ]
         }
       ],
       "ownership": [
@@ -123346,7 +123511,8 @@
         "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
         "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested.",
         "Floating presolve now supersedes earlier open-presolve notes. Independent exact box-corner extrema verify 100 randomized boxes and 1500 relation/RHS decisions; strict directional tolerance, missing/zero bounds, IEEE, source error prefixes and cleanup-to-scaling integration are tested. Cleanup preserves source d=(try_to_remove_some_rows()>0): logs count successful passes, not removed rows, and fixed-term substitution alone does not force another pass. Go writer errors return after source mutations; native ostream badbit/global binding is not claimed. Exact presolve and full simplex/LAR drivers remain open; whole source units remain partial.",
-        "Outer LU path uses actual presolve/preparation/scaling/core Solve. Sorted external numeric indices choose deterministic source unordered objective-sum order. Partial Go constructor owner is closed before returning its error without publishing CoreSolver. The source upper-only flip/type inconsistency is preserved and tested: maximize -x with x<=3,z>=0,-x+z<=2 reports optimal x=3,cost=-3 although independent true optimum is x=-2,cost=2. No source algorithm correction is silently applied. Default tableau/precise variants, source diagnostics/solution validators and complete original driver integration remain open."
+        "Outer LU path uses actual presolve/preparation/scaling/core Solve. Sorted external numeric indices choose deterministic source unordered objective-sum order. Partial Go constructor owner is closed before returning its error without publishing CoreSolver. The source upper-only flip/type inconsistency is preserved and tested: maximize -x with x<=3,z>=0,-x+z<=2 reports optimal x=3,cost=-3 although independent true optimum is x=-2,cost=2. No source algorithm correction is silently applied. Default tableau/precise variants, source diagnostics/solution validators and complete original driver integration remain open.",
+        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit."
       ]
     },
     {
@@ -123359,7 +123525,9 @@
         "pkg/util/lp/solver_float.go",
         "pkg/util/lp/solver_float_test.go",
         "pkg/util/lp/solver_presolve_float.go",
-        "pkg/util/lp/solver_presolve_float_test.go"
+        "pkg/util/lp/solver_presolve_float_test.go",
+        "pkg/util/lp/dual_prepare_float.go",
+        "pkg/util/lp/dual_prepare_float_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -123372,7 +123540,9 @@
         "TestLPFloatPresolveUnknownBoundsAndPinPrefixes",
         "TestLPFloatPresolveCleanupPassesAndDeferredErasure",
         "TestLPFloatPresolveInputAndWriterErrorPrefixes",
-        "TestLPFloatPresolveComposedErrorsAndPreparedProblem"
+        "TestLPFloatPresolveComposedErrorsAndPreparedProblem",
+        "TestLPFloatDualCostFlipIEEEAndPublication",
+        "TestLPFloatDualPreparationIndependentModels"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -123410,6 +123580,15 @@
             "TestLPFloatPresolveInputAndWriterErrorPrefixes",
             "TestLPFloatPresolveComposedErrorsAndPreparedProblem"
           ]
+        },
+        {
+          "name": "Floating common flip_costs used by dual preparation, including native metadata alias/IEEE and deterministic error prefix",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_prepare_float.go",
+          "tests": [
+            "TestLPFloatDualCostFlipIEEEAndPublication",
+            "TestLPFloatDualPreparationIndependentModels"
+          ]
         }
       ],
       "ownership": [
@@ -123421,7 +123600,8 @@
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
         "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
         "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested.",
-        "Floating presolve now supersedes earlier open-presolve notes. Independent exact box-corner extrema verify 100 randomized boxes and 1500 relation/RHS decisions; strict directional tolerance, missing/zero bounds, IEEE, source error prefixes and cleanup-to-scaling integration are tested. Cleanup preserves source d=(try_to_remove_some_rows()>0): logs count successful passes, not removed rows, and fixed-term substitution alone does not force another pass. Go writer errors return after source mutations; native ostream badbit/global binding is not claimed. Exact presolve and full simplex/LAR drivers remain open; whole source units remain partial."
+        "Floating presolve now supersedes earlier open-presolve notes. Independent exact box-corner extrema verify 100 randomized boxes and 1500 relation/RHS decisions; strict directional tolerance, missing/zero bounds, IEEE, source error prefixes and cleanup-to-scaling integration are tested. Cleanup preserves source d=(try_to_remove_some_rows()>0): logs count successful passes, not removed rows, and fixed-term substitution alone does not force another pass. Go writer errors return after source mutations; native ostream badbit/global binding is not claimed. Exact presolve and full simplex/LAR drivers remain open; whole source units remain partial.",
+        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit."
       ]
     },
     {

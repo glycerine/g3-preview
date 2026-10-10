@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 89.6,
-  "coverage_warning": "Latest native module checkpoint passed2026-10-10 at21:11 UTC: LP324.009s,89.6% (11189/12482), log/profile /mnt/oldrog/tmp/g3-mps-module-native.{log,cover}. This snapshot was launched before final MPS diagnostic/metadata strengthening and NAME state publication correction; final focused native/debug checks and vets validate the current code, with MPS353/376 (93.9%) native and356/376 (94.7%) debug. The remaining text records earlier component checkpoints. Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native module suite passed2026-10-10 at20:03 UTC: LP332.181s,90.0% (10056/11174), including all current floating primal preparation, core initialization/iteration/value/pivot/numerical-update layers and primal initialization/pricing. Other unchanged packages reused valid Go test cache entries. Authoritative log/profile: /mnt/oldrog/tmp/g3-primal-core-module-native.{log,cover}. Current focused debug/checked profiles cover each added component: floating primal initialization95.8% native/98.2% debug, entering pricing89.9%/100%, floating value reconstruction95.2% native/96.0% debug, numerical update87.8%/91.1%, pivot-row preparation96.2%/100%, floating core iteration preparation94.8% native/95.9% debug, floating core initialization88.8% native/97.4% debug, floating primal preparation96.2% native/debug, floating presolve98.5%, solver98.0%, scaler88.1%, prepared exact100%/floating94.6%. Complete debug coverage predates sparse basis storage. Exact solver/presolve, full primal/dual/LAR/MPS integration and complete upstream command drivers remain open. Floating Harris step/leaving/entering-flip routines subsequently pass focused native/debug checks with134/136 (98.5%) and136/136 (100%) statements; the full native module aggregate above predates this addition. Floating breakpoint construction/slope/selection and full floating find_leaving_and_t routing subsequently pass focused checks:112/120 (93.3%) native,115/120 (95.8%) debug/checked. LP now66 partial/44 unported; prior full native aggregate predates these additions. Floating reduced-cost refresh/pivot, LU beta and steepest-edge norm updates subsequently pass focused checks with105/111 (94.6%) native and111/111 (100%) debug/checked statements. The preceding full native aggregate predates these additions. Floating pivot comparison/advance orchestration subsequently pass focused checks:137/167 (82.0%) native,151/167 (90.4%) debug/checked. Remaining statements qualify child/index errors or other-profile assertions; whole optimization loop and complete original smoke drivers remain open. Prior full native module aggregate predates these additions. Floating stage-one core Solve and iteration/statistics/time services subsequently pass102 optimum checks (two original numerical fixtures and100 independent bounded LPs). Solve61/84 (72.6%) native,66/84 (78.6%) debug; statistics54/69 (78.3%),65/69 (94.2%). Gaps include rare numerical status rechecks, child-error propagation and opposite-profile assertions. Original upper-only constructor/default smoke-driver profile and outer/exact/dual/LAR solvers remain open; old full-native aggregate predates these additions. Floating primal outer LU solve/reconstruction subsequently passes120 independent bounded low/boxed-coordinate optimum worlds including fixed costs/scaling. New file54/63 (85.7%) in native/debug profiles. Upper-only flipped-bound source inconsistency is preserved in an explicit counterexample regression (reported cost -3 versus true optimum2); this profile is not claimed generally correct. Default tableau/exact variants, diagnostics/validators and complete original drivers remain open. Floating named-solution validators subsequently pass200 independent dense row systems, all tolerance/IEEE/output/metadata prefixes and120 actual outer solved-model validations. New code76/78 (97.4%) native/debug; uncovered statements are opposite-profile assertion/guard branches. Shared formatter extraction leaves current statistics56/71 (78.9%) native,67/71 (94.4%) debug. LP remains66 partial/44 unported; the concrete primal instances were already partial; old module aggregate predates these additions. Floating FindFeasibleSolution and nonbasic diagnostics subsequently pass160 independent two-row systems:58 reach feasible solutions,102 reach independently predicted source reduced-cost drift stops. Explicit source cost refresh ordering is preserved; this is not general feasibility correctness credit. Native85.4% (41/48), combined debug/checked95.8% (46/48); gaps are erased assertions, unreachable duplicate debug assertion and last stdout error. Source default tableau/exact/LAR integration remains open; old full module aggregate predates these additions. Floating original no-low-argument constructor and initial-X checks subsequently pass2000 independently predicted worlds, strict/IEEE/output/metadata prefixes and original test_lp_0/1 via actual constructor with empty upper vectors. Explicit LU verifies independent numerical optima; unchanged default settings produce source !use_tableau debug assertion / release missing-LU guard, not successful default optimization. New code49/54 (90.7%) native,54/54 (100%) debug/checked. LP remains66 partial/44 unported. Earlier whole-module coverage predates these changes. Floating MPS parser and primal construction subsequently pass120 independently solved parse-to-optimum models, stored fixed/bounds/ranges and equality integration fixtures, all bounds/ranges/fixed-field and malformed/I/O publication checks. New code353/376 (93.9%) native,356/376 (94.7%) combined debug/checked. Go ParseFloat numeric grammar replaces libc conversion without emulation. LP now67 partial/43 unported. Exact/dual/LAR reader construction and complete upstream CLI remain open.",
+  "coverage_warning": "Latest native module checkpoint passed2026-10-10 at21:11 UTC: LP324.009s,89.6% (11189/12482), log/profile /mnt/oldrog/tmp/g3-mps-module-native.{log,cover}. This snapshot was launched before final MPS diagnostic/metadata strengthening and NAME state publication correction; final focused native/debug checks and vets validate the current code, with MPS353/376 (93.9%) native and356/376 (94.7%) debug. The remaining text records earlier component checkpoints. Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native module suite passed2026-10-10 at20:03 UTC: LP332.181s,90.0% (10056/11174), including all current floating primal preparation, core initialization/iteration/value/pivot/numerical-update layers and primal initialization/pricing. Other unchanged packages reused valid Go test cache entries. Authoritative log/profile: /mnt/oldrog/tmp/g3-primal-core-module-native.{log,cover}. Current focused debug/checked profiles cover each added component: floating primal initialization95.8% native/98.2% debug, entering pricing89.9%/100%, floating value reconstruction95.2% native/96.0% debug, numerical update87.8%/91.1%, pivot-row preparation96.2%/100%, floating core iteration preparation94.8% native/95.9% debug, floating core initialization88.8% native/97.4% debug, floating primal preparation96.2% native/debug, floating presolve98.5%, solver98.0%, scaler88.1%, prepared exact100%/floating94.6%. Complete debug coverage predates sparse basis storage. Exact solver/presolve, full primal/dual/LAR/MPS integration and complete upstream command drivers remain open. Floating Harris step/leaving/entering-flip routines subsequently pass focused native/debug checks with134/136 (98.5%) and136/136 (100%) statements; the full native module aggregate above predates this addition. Floating breakpoint construction/slope/selection and full floating find_leaving_and_t routing subsequently pass focused checks:112/120 (93.3%) native,115/120 (95.8%) debug/checked. LP now66 partial/44 unported; prior full native aggregate predates these additions. Floating reduced-cost refresh/pivot, LU beta and steepest-edge norm updates subsequently pass focused checks with105/111 (94.6%) native and111/111 (100%) debug/checked statements. The preceding full native aggregate predates these additions. Floating pivot comparison/advance orchestration subsequently pass focused checks:137/167 (82.0%) native,151/167 (90.4%) debug/checked. Remaining statements qualify child/index errors or other-profile assertions; whole optimization loop and complete original smoke drivers remain open. Prior full native module aggregate predates these additions. Floating stage-one core Solve and iteration/statistics/time services subsequently pass102 optimum checks (two original numerical fixtures and100 independent bounded LPs). Solve61/84 (72.6%) native,66/84 (78.6%) debug; statistics54/69 (78.3%),65/69 (94.2%). Gaps include rare numerical status rechecks, child-error propagation and opposite-profile assertions. Original upper-only constructor/default smoke-driver profile and outer/exact/dual/LAR solvers remain open; old full-native aggregate predates these additions. Floating primal outer LU solve/reconstruction subsequently passes120 independent bounded low/boxed-coordinate optimum worlds including fixed costs/scaling. New file54/63 (85.7%) in native/debug profiles. Upper-only flipped-bound source inconsistency is preserved in an explicit counterexample regression (reported cost -3 versus true optimum2); this profile is not claimed generally correct. Default tableau/exact variants, diagnostics/validators and complete original drivers remain open. Floating named-solution validators subsequently pass200 independent dense row systems, all tolerance/IEEE/output/metadata prefixes and120 actual outer solved-model validations. New code76/78 (97.4%) native/debug; uncovered statements are opposite-profile assertion/guard branches. Shared formatter extraction leaves current statistics56/71 (78.9%) native,67/71 (94.4%) debug. LP remains66 partial/44 unported; the concrete primal instances were already partial; old module aggregate predates these additions. Floating FindFeasibleSolution and nonbasic diagnostics subsequently pass160 independent two-row systems:58 reach feasible solutions,102 reach independently predicted source reduced-cost drift stops. Explicit source cost refresh ordering is preserved; this is not general feasibility correctness credit. Native85.4% (41/48), combined debug/checked95.8% (46/48); gaps are erased assertions, unreachable duplicate debug assertion and last stdout error. Source default tableau/exact/LAR integration remains open; old full module aggregate predates these additions. Floating original no-low-argument constructor and initial-X checks subsequently pass2000 independently predicted worlds, strict/IEEE/output/metadata prefixes and original test_lp_0/1 via actual constructor with empty upper vectors. Explicit LU verifies independent numerical optima; unchanged default settings produce source !use_tableau debug assertion / release missing-LU guard, not successful default optimization. New code49/54 (90.7%) native,54/54 (100%) debug/checked. LP remains66 partial/44 unported. Earlier whole-module coverage predates these changes. Floating MPS parser and primal construction subsequently pass120 independently solved parse-to-optimum models, stored fixed/bounds/ranges and equality integration fixtures, all bounds/ranges/fixed-field and malformed/I/O publication checks. New code353/376 (93.9%) native,356/376 (94.7%) combined debug/checked. Go ParseFloat numeric grammar replaces libc conversion without emulation. LP now67 partial/43 unported. Exact/dual/LAR reader construction and complete upstream CLI remain open. Floating dual two-stage model preparation and actual core construction/recomputation subsequently pass160 independent prepared models and100 independent dual-vector worlds through real LU. Preparation256/303 (84.5%) native,259/303 (85.5%) debug; core53/54 (98.1%) in each. Strict/IEEE row signs, counter/resize/backup/metadata/eligibility/publication prefixes and common flip costs are tested. Remaining preparation gaps predominantly qualify malformed metadata child propagation; core gap is a heading guard protected by base construction. Full dual optimization/stage dispatch, exact variants and original drivers remain open. Five dual source units newly partial:LP72 partial/38 unported. Last full native module checkpoint at21:11 predates these changes; current focused checks validate them.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -843,33 +843,72 @@
     },
     {
       "source": "src/util/lp/lp_dual_core_solver.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dual_core_float.go",
+        "pkg/util/lp/dual_core_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDualPreparationIndependentModels",
+        "TestLPFloatDualCoreIndependentDualVectors",
+        "TestLPFloatDualCorePartialOwnersAndGuards"
+      ]
     },
     {
       "source": "src/util/lp/lp_dual_core_solver.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dual_core_float.go",
+        "pkg/util/lp/dual_core_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDualPreparationIndependentModels",
+        "TestLPFloatDualCoreIndependentDualVectors",
+        "TestLPFloatDualCorePartialOwnersAndGuards"
+      ]
     },
     {
       "source": "src/util/lp/lp_dual_core_solver_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dual_core_float.go",
+        "pkg/util/lp/dual_core_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDualPreparationIndependentModels",
+        "TestLPFloatDualCoreIndependentDualVectors",
+        "TestLPFloatDualCorePartialOwnersAndGuards"
+      ]
     },
     {
       "source": "src/util/lp/lp_dual_simplex.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dual_prepare_float.go",
+        "pkg/util/lp/dual_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDualPreparationIndependentModels",
+        "TestLPFloatDualPreparationSourcePrefixes",
+        "TestLPFloatDualPreparationIEEEAndResize",
+        "TestLPFloatDualPreparationMetadataAndStageTwoPrefixes",
+        "TestLPFloatDualCostFlipIEEEAndPublication"
+      ]
     },
     {
       "source": "src/util/lp/lp_dual_simplex.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dual_prepare_float.go",
+        "pkg/util/lp/dual_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDualPreparationIndependentModels",
+        "TestLPFloatDualPreparationSourcePrefixes",
+        "TestLPFloatDualPreparationIEEEAndResize",
+        "TestLPFloatDualPreparationMetadataAndStageTwoPrefixes",
+        "TestLPFloatDualCostFlipIEEEAndPublication"
+      ]
     },
     {
       "source": "src/util/lp/lp_dual_simplex_instances.cpp",
@@ -1204,7 +1243,9 @@
         "pkg/util/lp/solver_float_test.go",
         "pkg/util/lp/solver_presolve_float.go",
         "pkg/util/lp/solver_presolve_float_test.go",
-        "pkg/util/lp/primal_solver_float.go"
+        "pkg/util/lp/primal_solver_float.go",
+        "pkg/util/lp/dual_prepare_float.go",
+        "pkg/util/lp/dual_prepare_float_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -1222,7 +1263,9 @@
         "TestLPFloatPrimalOuterStatusesAndPublication",
         "TestLPFloatPrimalOuterErrorsKeepSourcePrefixes",
         "TestLPFloatPrimalOuterSourceUpperOnlyInconsistency",
-        "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors"
+        "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors",
+        "TestLPFloatDualCostFlipIEEEAndPublication",
+        "TestLPFloatDualPreparationIndependentModels"
       ]
     },
     {
@@ -1234,7 +1277,9 @@
         "pkg/util/lp/solver_float_test.go",
         "pkg/util/lp/solver_presolve_float.go",
         "pkg/util/lp/solver_presolve_float_test.go",
-        "pkg/util/lp/primal_solver_float.go"
+        "pkg/util/lp/primal_solver_float.go",
+        "pkg/util/lp/dual_prepare_float.go",
+        "pkg/util/lp/dual_prepare_float_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -1252,7 +1297,9 @@
         "TestLPFloatPrimalOuterStatusesAndPublication",
         "TestLPFloatPrimalOuterErrorsKeepSourcePrefixes",
         "TestLPFloatPrimalOuterSourceUpperOnlyInconsistency",
-        "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors"
+        "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors",
+        "TestLPFloatDualCostFlipIEEEAndPublication",
+        "TestLPFloatDualPreparationIndependentModels"
       ]
     },
     {
@@ -1263,7 +1310,9 @@
         "pkg/util/lp/solver_float.go",
         "pkg/util/lp/solver_float_test.go",
         "pkg/util/lp/solver_presolve_float.go",
-        "pkg/util/lp/solver_presolve_float_test.go"
+        "pkg/util/lp/solver_presolve_float_test.go",
+        "pkg/util/lp/dual_prepare_float.go",
+        "pkg/util/lp/dual_prepare_float_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -1276,7 +1325,9 @@
         "TestLPFloatPresolveUnknownBoundsAndPinPrefixes",
         "TestLPFloatPresolveCleanupPassesAndDeferredErasure",
         "TestLPFloatPresolveInputAndWriterErrorPrefixes",
-        "TestLPFloatPresolveComposedErrorsAndPreparedProblem"
+        "TestLPFloatPresolveComposedErrorsAndPreparedProblem",
+        "TestLPFloatDualCostFlipIEEEAndPublication",
+        "TestLPFloatDualPreparationIndependentModels"
       ]
     },
     {
@@ -2636,8 +2687,8 @@
     }
   ],
   "status_counts": {
-    "unported": 43,
-    "partial": 67
+    "unported": 38,
+    "partial": 72
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7
 }

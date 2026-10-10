@@ -5,7 +5,7 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently 67 partial source units and 43 unported units. The floating
+There are currently 72 partial source units and 38 unported units. The floating
 stage-one core exposes Solve, and outer LU primal integration is implemented.
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
@@ -29,6 +29,7 @@ after changed infeasibility costs make the stored reduced cost stale. For
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Floating dual two-stage preparation and real core construction/recomputation | 160 independently prepared models and100 independent dual-vector systems through actual LU; source column eligibility, cost/bound transformations, signed slack/artificial basis, restoration, IEEE/resize/backup and error publication checks | Preparation84.5% native (256/303),85.5% debug (259/303); core98.1% in each (53/54). Full dual optimization/stage dispatch and exact variants remain open; these tests do not claim dual optima |
 | Floating MPS parser and primal construction | 120 independent parse-to-optimum models; stored fixed/bounds/ranges fixture; equality/greater-than integration; all bound types, signed/zero/IEEE ranges, fixed-field fallbacks, continuation/duplicate/marker publication, malformed records and real I/O refusals | Native93.9% (353/376), debug/checked94.7% (356/376). Native Go numeric grammar/writers are explicit boundaries. Exact/dual/LAR creation and complete upstream CLI remain open |
 | Floating original zero-low constructor and initial-X validator | 2,000 independent predicate worlds; strict/IEEE/output and constructor publication checks; original test_lp_0/1 via actual constructor with empty upper vectors and independent optima under explicit LU | Native90.7% (49/54), debug/checked100% (54/54). Native gaps are erased assertions. Unchanged default strategy reaches source tableau assertion in debug / missing LU guard in release; complete original driver remains open |
 | Floating feasibility-only entry point and nonbasic diagnostics | 160 independent two-row systems:58 feasible exits,102 independently predicted source drift stops; debug mode/status ordering, erased release check, all column types, real writer/stdout failures | Native85.4% (41/48), debug/checked95.8% (46/48). Exact/LAR integration remains open; source drift stops are fidelity evidence, not successful feasibility credit |

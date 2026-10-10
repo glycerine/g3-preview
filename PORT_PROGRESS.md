@@ -37543,3 +37543,50 @@ was launched before final MPS diagnostic/metadata strengthening and NAME
 state publication correction; final focused profiles and vets cover current
 code. No immediate full-suite repeat is needed. Complete source port and
 upstream CLI, exact/tableau/dual/LAR integration remain unfinished.
+
+
+### Floating dual model stages and actual core construction — 2026-10-10
+
+Ported retained dual simplex structural/logical stage-one costs, bounds and
+eligibility; signed slack/artificial basis assembly; native augmentation
+and field sizing; backup/zero and stage-two RHS/bound/type/cost restoration.
+Stage-one low structurals are boxed [0,1], free structurals [-1e4,1e4],
+original boxed structurals are ineligible with zero costs/bounds. Artificial
+logicals are fixed zero; slack logicals box [0,1] then restore low-bound type.
+Stage-two free columns retain old numeric bound slots. Augment does not touch
+X despite its source method name. BCopy appends without clearing, counters
+accumulate with unsigned wrap, and source chained assignment/error prefixes
+remain ordered. Common FlipCosts uses native metadata and sorted external
+indices for deterministic source unordered-map failure publication.
+
+Actual floating dual core constructor borrows all vector headers and the
+eligibility header, constructs real LU, solves yB before filtering nonbasics,
+and preserves excluded negative headings. Restoring eligibility, beta/A-wave
+initialization and actual X/dual/reduced-cost recomputation are implemented.
+Partial owners expose real base/LU/solve/filter failure prefixes for cleanup.
+No source optimizer callbacks or placeholder Solve implementations are added.
+
+160 independent models verify every structural/logical cost/type/bound,
+slack/artificial sign and index, original structural coefficients, filtered
+nonbasis order and both model stages. Real sparse/forced-dense LU checks
+restored equations and reduced costs.100 independently chosen dual vectors
+verify actual yB and c-yA calculations. Tests strengthen strict/zero/NaN/
+infinite RHS branches, native resize/truncation, source counter wrap,
+backup behavior, missing metadata/operator[] keys, stage publication order,
+borrowed header updates, actual closed-child errors and cost IEEE/aliases.
+
+Focused native core/primal/dual/MPS/presolve/solver/column/scaler/static/LU
+checks pass0.961s; combined debug/checked1.020s. Preparation256/303 (84.5%)
+native,259/303 (85.5%) debug; core53/54 (98.1%) in each. Preparation gaps
+mostly propagate child errors under malformed metadata or are profile-only;
+core heading guard follows successful base heading setup and yB solve and
+has no reached one-goroutine failure. Profiles:
+/mnt/oldrog/tmp/g3-dual-prepare-{native,debug}.cover. Both LP vets and source/
+evidence/no-generics verifier pass. Graph regeneration adds two production
+files without changing import edges. Five dual units become partial:LP72
+partial/38 unported; global62 ported/353 partial/1660 unported/two dead-deleted.
+
+No dual optimum/completion credit: dual pricing, ratio/flip/pivot optimization,
+outer stage execution/status/solution reconstruction, exact variants and full
+upstream driver integration remain open. Last full native module checkpoint
+remains21:11 UTC89.6%, predating these additions; another full run is not due.

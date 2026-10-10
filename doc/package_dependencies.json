@@ -1180,6 +1180,8 @@
         "core_values_float.go",
         "diagonal_matrix_exact.go",
         "diagonal_matrix_float.go",
+        "dual_core_float.go",
+        "dual_prepare_float.go",
         "eta_exact_expression.go",
         "eta_matrix_exact.go",
         "eta_matrix_float.go",
