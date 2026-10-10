@@ -1,8 +1,8 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 90.1,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native90.1% (7043/7818) verified2026-10-10 at15:28 UTC predates exact dense tail applications and indexed normalization receipt fix. Complete debug coverage predates sparse basis storage. Current focused component evidence is recorded in PORT_STATUS.md. Full LU/solver integration remains open.",
+  "native_statement_coverage_of_current_go_code": 89.2,
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native LP89.2% (7474/8375) verified2026-10-10 at16:04 UTC includes exact dense tails, indexed normalization receipts and floating LU initial factorization/solves. Subsequent focused tests strengthen sparse degeneration and tail-error branches. Complete debug coverage predates sparse basis storage; current focused component evidence is recorded in PORT_STATUS.md. Exact LU orchestration, updates and full solver integration remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -843,7 +843,11 @@
         "pkg/util/lp/diagonal_matrix_debug.go",
         "pkg/util/lp/diagonal_matrix_test.go",
         "pkg/util/lp/diagonal_matrix_failure_test.go",
-        "pkg/util/lp/diagonal_matrix_debug_test.go"
+        "pkg/util/lp/diagonal_matrix_debug_test.go",
+        "pkg/util/lp/lu_state.go",
+        "pkg/util/lp/lu_float.go",
+        "pkg/util/lp/lu_float_solve.go",
+        "pkg/util/lp/lu_float_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -851,7 +855,15 @@
         "TestLPDiagonalTailBoundsAndOwnerGuards",
         "TestLPDiagonalTailAllocationFailureCensus",
         "TestLPDiagonalTailBorrowedStoppedInput",
-        "TestLPDiagonalTailDebugDenseView"
+        "TestLPDiagonalTailDebugDenseView",
+        "TestLPFloatLUIndependentFactorizationAndSolves",
+        "TestLPFloatLUSourceSmallInitialBasis",
+        "TestLPFloatLUSourceInitialBasisWithHoles",
+        "TestLPFloatLUDenseSingularPrefix",
+        "TestLPFloatLUDegenerationAndLifetime",
+        "TestLPFloatLUInputFailureAndStoppedSolve",
+        "TestLPFloatLUDensityUnsignedAndDropBoundaries",
+        "TestLPFloatLUTinyPivotAndUnitColumnShortening"
       ]
     },
     {
@@ -863,7 +875,11 @@
         "pkg/util/lp/diagonal_matrix_debug.go",
         "pkg/util/lp/diagonal_matrix_test.go",
         "pkg/util/lp/diagonal_matrix_failure_test.go",
-        "pkg/util/lp/diagonal_matrix_debug_test.go"
+        "pkg/util/lp/diagonal_matrix_debug_test.go",
+        "pkg/util/lp/lu_state.go",
+        "pkg/util/lp/lu_float.go",
+        "pkg/util/lp/lu_float_solve.go",
+        "pkg/util/lp/lu_float_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -871,14 +887,36 @@
         "TestLPDiagonalTailBoundsAndOwnerGuards",
         "TestLPDiagonalTailAllocationFailureCensus",
         "TestLPDiagonalTailBorrowedStoppedInput",
-        "TestLPDiagonalTailDebugDenseView"
+        "TestLPDiagonalTailDebugDenseView",
+        "TestLPFloatLUIndependentFactorizationAndSolves",
+        "TestLPFloatLUSourceSmallInitialBasis",
+        "TestLPFloatLUSourceInitialBasisWithHoles",
+        "TestLPFloatLUDenseSingularPrefix",
+        "TestLPFloatLUDegenerationAndLifetime",
+        "TestLPFloatLUInputFailureAndStoppedSolve",
+        "TestLPFloatLUDensityUnsignedAndDropBoundaries",
+        "TestLPFloatLUTinyPivotAndUnitColumnShortening"
       ]
     },
     {
       "source": "src/util/lp/lu_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/lu_state.go",
+        "pkg/util/lp/lu_float.go",
+        "pkg/util/lp/lu_float_solve.go",
+        "pkg/util/lp/lu_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatLUIndependentFactorizationAndSolves",
+        "TestLPFloatLUSourceSmallInitialBasis",
+        "TestLPFloatLUSourceInitialBasisWithHoles",
+        "TestLPFloatLUDenseSingularPrefix",
+        "TestLPFloatLUDegenerationAndLifetime",
+        "TestLPFloatLUInputFailureAndStoppedSolve",
+        "TestLPFloatLUDensityUnsignedAndDropBoundaries",
+        "TestLPFloatLUTinyPivotAndUnitColumnShortening"
+      ]
     },
     {
       "source": "src/util/lp/matrix.h",

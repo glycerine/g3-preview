@@ -102958,7 +102958,8 @@
         "pkg/util/lp/permutation_test.go",
         "pkg/util/lp/priority_queue_test.go",
         "pkg/util/lp/pair_priority_queue_test.go",
-        "pkg/util/lp/sparse_matrix_float_test.go"
+        "pkg/util/lp/sparse_matrix_float_test.go",
+        "pkg/util/lp/lu_float_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -102984,7 +102985,9 @@
         "TestLPUintPairPriorityQueueSlotAndFailurePrefixes",
         "TestLPFloatSparseOriginalInitU",
         "TestLPFloatSparseBasisIndependentOracle",
-        "TestLPFloatSparseBasisLiteralStops"
+        "TestLPFloatSparseBasisLiteralStops",
+        "TestLPFloatLUSourceSmallInitialBasis",
+        "TestLPFloatLUSourceInitialBasisWithHoles"
       ],
       "conditionals": [
         {
@@ -103576,6 +103579,15 @@
             "TestLPFloatSparseBasisIndependentOracle",
             "TestLPFloatSparseBasisLiteralStops"
           ]
+        },
+        {
+          "name": "test_small_lu and test_larger_lu_with_holes initial basis factorization fixtures; their update sequences and --test_lu driver remain open",
+          "status": "partial",
+          "go_target": "pkg/util/lp/lu_float_test.go",
+          "tests": [
+            "TestLPFloatLUSourceSmallInitialBasis",
+            "TestLPFloatLUSourceInitialBasisWithHoles"
+          ]
         }
       ],
       "ownership": [
@@ -103583,7 +103595,8 @@
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
-        "Original test_rationals is an output/timing million-iteration loop without assertions. New unit test retains ten-term arithmetic and forty complete repetitions with exact expected result; original performance campaign and non-pair benchmark routes remain open."
+        "Original test_rationals is an output/timing million-iteration loop without assertions. New unit test retains ten-term arithmetic and forty complete repetitions with exact expected result; original performance campaign and non-pair benchmark routes remain open.",
+        "Retained double/double initial sparse/dense factorization and dense column/dense-indexed row solves are implemented. Preserve source density unsigned-square wrap, sparse pivot before dense switch, unit-column ignored shortening result, tail conjugation/publication order and strict small-pivot/drop thresholds. Rational and pair LU orchestration, indexed column preparation/solves, Suhl updates, refinement orchestration and full upstream LU driver remain open. Native Go floating owners use slices; explicit Close and stopped-operation guards expose partial/error lifetimes without numeric ownership adapters."
       ]
     },
     {
@@ -121913,7 +121926,11 @@
         "pkg/util/lp/diagonal_matrix_debug.go",
         "pkg/util/lp/diagonal_matrix_test.go",
         "pkg/util/lp/diagonal_matrix_failure_test.go",
-        "pkg/util/lp/diagonal_matrix_debug_test.go"
+        "pkg/util/lp/diagonal_matrix_debug_test.go",
+        "pkg/util/lp/lu_state.go",
+        "pkg/util/lp/lu_float.go",
+        "pkg/util/lp/lu_float_solve.go",
+        "pkg/util/lp/lu_float_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -121921,7 +121938,15 @@
         "TestLPDiagonalTailBoundsAndOwnerGuards",
         "TestLPDiagonalTailAllocationFailureCensus",
         "TestLPDiagonalTailBorrowedStoppedInput",
-        "TestLPDiagonalTailDebugDenseView"
+        "TestLPDiagonalTailDebugDenseView",
+        "TestLPFloatLUIndependentFactorizationAndSolves",
+        "TestLPFloatLUSourceSmallInitialBasis",
+        "TestLPFloatLUSourceInitialBasisWithHoles",
+        "TestLPFloatLUDenseSingularPrefix",
+        "TestLPFloatLUDegenerationAndLifetime",
+        "TestLPFloatLUInputFailureAndStoppedSolve",
+        "TestLPFloatLUDensityUnsignedAndDropBoundaries",
+        "TestLPFloatLUTinyPivotAndUnitColumnShortening"
       ],
       "conditionals": [
         {
@@ -122030,14 +122055,35 @@
             "TestLPDiagonalTailBorrowedStoppedInput",
             "TestLPDiagonalTailDebugDenseView"
           ]
+        },
+        {
+          "name": "retained double/double initial sparse/dense LU constructor, pivots, density switch, status/refactor queries, dense column solve and dense/indexed row solve",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lu_float.go",
+          "go_targets": [
+            "pkg/util/lp/lu_state.go",
+            "pkg/util/lp/lu_float_solve.go"
+          ],
+          "tests": [
+            "TestLPFloatLUIndependentFactorizationAndSolves",
+            "TestLPFloatLUSourceSmallInitialBasis",
+            "TestLPFloatLUSourceInitialBasisWithHoles",
+            "TestLPFloatLUDenseSingularPrefix",
+            "TestLPFloatLUDegenerationAndLifetime",
+            "TestLPFloatLUInputFailureAndStoppedSolve",
+            "TestLPFloatLUDensityUnsignedAndDropBoundaries",
+            "TestLPFloatLUTinyPivotAndUnitColumnShortening"
+          ]
         }
       ],
       "ownership": [
-        "Diagonal tail owns coefficient and debug reciprocal in a borrowed manager. Exact construction copies the by-value parameter before its member and destroys the parameter after debug reciprocal construction. Matrix owns only new numerical calls/lexical temporaries; destination owns completed/partial quotient fields. Close releases stopped calls/work, reciprocal then coefficient and roots, preserving caller values. Pair division publishes X before Y. Foreign/stopped indexed destinations reject before tail arithmetic and retain their original receipts."
+        "Diagonal tail owns coefficient and debug reciprocal in a borrowed manager. Exact construction copies the by-value parameter before its member and destroys the parameter after debug reciprocal construction. Matrix owns only new numerical calls/lexical temporaries; destination owns completed/partial quotient fields. Close releases stopped calls/work, reciprocal then coefficient and roots, preserving caller values. Pair division publishes X before Y. Foreign/stopped indexed destinations reject before tail arithmetic and retain their original receipts.",
+        "FloatLU borrows static source/settings, owns permutations and U, and publishes conjugated eta/dense tails in source order. Failed dense construction/factorization retains the attempted block without publishing it. Close releases floating Go storage; operations after error/Close return explicit stopped/closed errors. Exact numerical LU ownership is not claimed."
       ],
       "deviations": [
-        "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Full LU constructor/factorization, transformations/updates/solves, dense-block prerequisites and actual upstream-driver integration remain unported.",
-        "240 independent dense-matrix worlds check scalar/pair results and conjugation; literal tests cover tolerance boundaries, negative zero, NaN/infinity, duplicate index erasure, hidden data and dense0/0 vs sparse zero skip. Fourteen pooled/direct campaigns walk real reservation ordinals through first success; warm pooled native constructor copies need no new backing, so no synthetic refusal is claimed. Actual receipts, caller ownership census and pair X-complete/Y-old failure are verified. Selected owner guards adapt Go lifetime/invalid domains; no complete solver or registered upstream-driver credit."
+        "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Floating LU initial factorization and dense column/dense-indexed row solves are now implemented; exact LU orchestration, updates, remaining solve/refinement routes and full upstream-driver integration remain open.",
+        "240 independent dense-matrix worlds check scalar/pair results and conjugation; literal tests cover tolerance boundaries, negative zero, NaN/infinity, duplicate index erasure, hidden data and dense0/0 vs sparse zero skip. Fourteen pooled/direct campaigns walk real reservation ordinals through first success; warm pooled native constructor copies need no new backing, so no synthetic refusal is claimed. Actual receipts, caller ownership census and pair X-complete/Y-old failure are verified. Selected owner guards adapt Go lifetime/invalid domains; no complete solver or registered upstream-driver credit.",
+        "Retained double/double initial sparse/dense factorization and dense column/dense-indexed row solves are implemented. Preserve source density unsigned-square wrap, sparse pivot before dense switch, unit-column ignored shortening result, tail conjugation/publication order and strict small-pivot/drop thresholds. Rational and pair LU orchestration, indexed column preparation/solves, Suhl updates, refinement orchestration and full upstream LU driver remain open. Native Go floating owners use slices; explicit Close and stopped-operation guards expose partial/error lifetimes without numeric ownership adapters."
       ]
     },
     {
@@ -122051,7 +122097,11 @@
         "pkg/util/lp/diagonal_matrix_debug.go",
         "pkg/util/lp/diagonal_matrix_test.go",
         "pkg/util/lp/diagonal_matrix_failure_test.go",
-        "pkg/util/lp/diagonal_matrix_debug_test.go"
+        "pkg/util/lp/diagonal_matrix_debug_test.go",
+        "pkg/util/lp/lu_state.go",
+        "pkg/util/lp/lu_float.go",
+        "pkg/util/lp/lu_float_solve.go",
+        "pkg/util/lp/lu_float_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -122059,7 +122109,15 @@
         "TestLPDiagonalTailBoundsAndOwnerGuards",
         "TestLPDiagonalTailAllocationFailureCensus",
         "TestLPDiagonalTailBorrowedStoppedInput",
-        "TestLPDiagonalTailDebugDenseView"
+        "TestLPDiagonalTailDebugDenseView",
+        "TestLPFloatLUIndependentFactorizationAndSolves",
+        "TestLPFloatLUSourceSmallInitialBasis",
+        "TestLPFloatLUSourceInitialBasisWithHoles",
+        "TestLPFloatLUDenseSingularPrefix",
+        "TestLPFloatLUDegenerationAndLifetime",
+        "TestLPFloatLUInputFailureAndStoppedSolve",
+        "TestLPFloatLUDensityUnsignedAndDropBoundaries",
+        "TestLPFloatLUTinyPivotAndUnitColumnShortening"
       ],
       "conditionals": [
         {
@@ -122328,23 +122386,58 @@
             "TestLPDiagonalTailBorrowedStoppedInput",
             "TestLPDiagonalTailDebugDenseView"
           ]
+        },
+        {
+          "name": "retained double/double initial sparse/dense LU constructor, pivots, density switch, status/refactor queries, dense column solve and dense/indexed row solve",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lu_float.go",
+          "go_targets": [
+            "pkg/util/lp/lu_state.go",
+            "pkg/util/lp/lu_float_solve.go"
+          ],
+          "tests": [
+            "TestLPFloatLUIndependentFactorizationAndSolves",
+            "TestLPFloatLUSourceSmallInitialBasis",
+            "TestLPFloatLUSourceInitialBasisWithHoles",
+            "TestLPFloatLUDenseSingularPrefix",
+            "TestLPFloatLUDegenerationAndLifetime",
+            "TestLPFloatLUInputFailureAndStoppedSolve",
+            "TestLPFloatLUDensityUnsignedAndDropBoundaries",
+            "TestLPFloatLUTinyPivotAndUnitColumnShortening"
+          ]
         }
       ],
       "ownership": [
-        "Diagonal tail owns coefficient and debug reciprocal in a borrowed manager. Exact construction copies the by-value parameter before its member and destroys the parameter after debug reciprocal construction. Matrix owns only new numerical calls/lexical temporaries; destination owns completed/partial quotient fields. Close releases stopped calls/work, reciprocal then coefficient and roots, preserving caller values. Pair division publishes X before Y. Foreign/stopped indexed destinations reject before tail arithmetic and retain their original receipts."
+        "Diagonal tail owns coefficient and debug reciprocal in a borrowed manager. Exact construction copies the by-value parameter before its member and destroys the parameter after debug reciprocal construction. Matrix owns only new numerical calls/lexical temporaries; destination owns completed/partial quotient fields. Close releases stopped calls/work, reciprocal then coefficient and roots, preserving caller values. Pair division publishes X before Y. Foreign/stopped indexed destinations reject before tail arithmetic and retain their original receipts.",
+        "FloatLU borrows static source/settings, owns permutations and U, and publishes conjugated eta/dense tails in source order. Failed dense construction/factorization retains the attempted block without publishing it. Close releases floating Go storage; operations after error/Close return explicit stopped/closed errors. Exact numerical LU ownership is not claimed."
       ],
       "deviations": [
-        "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Full LU constructor/factorization, transformations/updates/solves, dense-block prerequisites and actual upstream-driver integration remain unported.",
-        "240 independent dense-matrix worlds check scalar/pair results and conjugation; literal tests cover tolerance boundaries, negative zero, NaN/infinity, duplicate index erasure, hidden data and dense0/0 vs sparse zero skip. Fourteen pooled/direct campaigns walk real reservation ordinals through first success; warm pooled native constructor copies need no new backing, so no synthetic refusal is claimed. Actual receipts, caller ownership census and pair X-complete/Y-old failure are verified. Selected owner guards adapt Go lifetime/invalid domains; no complete solver or registered upstream-driver credit."
+        "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Floating LU initial factorization and dense column/dense-indexed row solves are now implemented; exact LU orchestration, updates, remaining solve/refinement routes and full upstream-driver integration remain open.",
+        "240 independent dense-matrix worlds check scalar/pair results and conjugation; literal tests cover tolerance boundaries, negative zero, NaN/infinity, duplicate index erasure, hidden data and dense0/0 vs sparse zero skip. Fourteen pooled/direct campaigns walk real reservation ordinals through first success; warm pooled native constructor copies need no new backing, so no synthetic refusal is claimed. Actual receipts, caller ownership census and pair X-complete/Y-old failure are verified. Selected owner guards adapt Go lifetime/invalid domains; no complete solver or registered upstream-driver credit.",
+        "Retained double/double initial sparse/dense factorization and dense column/dense-indexed row solves are implemented. Preserve source density unsigned-square wrap, sparse pivot before dense switch, unit-column ignored shortening result, tail conjugation/publication order and strict small-pivot/drop thresholds. Rational and pair LU orchestration, indexed column preparation/solves, Suhl updates, refinement orchestration and full upstream LU driver remain open. Native Go floating owners use slices; explicit Close and stopped-operation guards expose partial/error lifetimes without numeric ownership adapters."
       ]
     },
     {
       "path": "src/util/lp/lu_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/lu_state.go",
+        "pkg/util/lp/lu_float.go",
+        "pkg/util/lp/lu_float_solve.go",
+        "pkg/util/lp/lu_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatLUIndependentFactorizationAndSolves",
+        "TestLPFloatLUSourceSmallInitialBasis",
+        "TestLPFloatLUSourceInitialBasisWithHoles",
+        "TestLPFloatLUDenseSingularPrefix",
+        "TestLPFloatLUDegenerationAndLifetime",
+        "TestLPFloatLUInputFailureAndStoppedSolve",
+        "TestLPFloatLUDensityUnsignedAndDropBoundaries",
+        "TestLPFloatLUTinyPivotAndUnitColumnShortening"
+      ],
       "conditionals": [
         {
           "line": 42,
@@ -122357,9 +122450,33 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained double/double initial sparse/dense LU constructor, pivots, density switch, status/refactor queries, dense column solve and dense/indexed row solve",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lu_float.go",
+          "go_targets": [
+            "pkg/util/lp/lu_state.go",
+            "pkg/util/lp/lu_float_solve.go"
+          ],
+          "tests": [
+            "TestLPFloatLUIndependentFactorizationAndSolves",
+            "TestLPFloatLUSourceSmallInitialBasis",
+            "TestLPFloatLUSourceInitialBasisWithHoles",
+            "TestLPFloatLUDenseSingularPrefix",
+            "TestLPFloatLUDegenerationAndLifetime",
+            "TestLPFloatLUInputFailureAndStoppedSolve",
+            "TestLPFloatLUDensityUnsignedAndDropBoundaries",
+            "TestLPFloatLUTinyPivotAndUnitColumnShortening"
+          ]
+        }
+      ],
+      "ownership": [
+        "FloatLU borrows static source/settings, owns permutations and U, and publishes conjugated eta/dense tails in source order. Failed dense construction/factorization retains the attempted block without publishing it. Close releases floating Go storage; operations after error/Close return explicit stopped/closed errors. Exact numerical LU ownership is not claimed."
+      ],
+      "deviations": [
+        "Retained double/double initial sparse/dense factorization and dense column/dense-indexed row solves are implemented. Preserve source density unsigned-square wrap, sparse pivot before dense switch, unit-column ignored shortening result, tail conjugation/publication order and strict small-pivot/drop thresholds. Rational and pair LU orchestration, indexed column preparation/solves, Suhl updates, refinement orchestration and full upstream LU driver remain open. Native Go floating owners use slices; explicit Close and stopped-operation guards expose partial/error lifetimes without numeric ownership adapters."
+      ]
     },
     {
       "path": "src/util/lp/matrix.h",

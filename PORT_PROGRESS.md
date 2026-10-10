@@ -36291,3 +36291,49 @@ LP units. Unused dense init/default constructor/indexed row product and disabled
 alternate source branches are not ported or credited. Full LU integration,
 factorization/update/solve, scaling/simplex/LAR/MPS algorithms and retained
 upstream-driver/test scenarios remain active. No complete LP solver is claimed.
+
+
+## Floating LU initial factorization and solve orchestration
+
+Resumed the interrupted FloatLU files and completed their verification against
+src/util/lp/lu.h/.hpp. Initial construction copies the selected rectangular
+basis, validates debug basis uniqueness after copy, increments factorization
+stats, selects sparse pivots and switches to a dense block after completing the
+current sparse pivot. Eta/dense tails are conjugated and published in source
+order. Unit-column shortening deliberately ignores its bool result. Fixed
+small-pivot rejection and final solution dropping retain their strict boundaries;
+density uses the source uint32 square before float conversion. Borrowed source,
+basis and settings remain caller-owned; stopped/error and closed floating owners
+have explicit Go guards. Exact LU numerical owners are still open.
+
+Dense B*y and dense/indexed y*B solves now compose actual tails, permutations and
+sparse triangular solves, including floating residual correction for B*y.
+180 independent well-conditioned rectangular-source/basis worlds each run sparse
+and forced-dense. Independent big.Rat products verify known solutions and
+residuals in three directions, and explicit matrix products verify
+L_k*...*L_0*B=Q*U*R. Both permutation directions and100 dense switches execute.
+Original test_small_lu and test_larger_lu_with_holes initial matrices and bases
+execute with their original dimensions; column-update steps and --test_lu driver
+remain open. Singular sparse/dense cases check unsuccessful eta/block publication,
+while empty, duplicate/short/invalid basis, stopped/closed, density wrap/NaN,
+refactor threshold and tiny-pivot/drop edges cover reached behavior.
+
+Full native LP passed164.276s at16:04 UTC with89.2% coverage (7474/8375 current
+Go statements). Broader debug/checked LU/sparse/dense/permutation/eta/indexed
+checks passed114.852s. Final focused floating LU native/debug checks passed
+0.351s/0.337s after strengthening sparse degeneration and first-tail failures;
+core coverage is99/122 (81.1%) native and103/122 (84.4%) debug/checked, solve
+orchestration38/47 (80.9%) both. Shared state helper6/16 native and13/16 debug;
+remaining basis checks are guarded by earlier constructor validation or omitted
+in the other profile. Remaining LU gaps propagate child errors behind valid
+construction invariants, plus debug-only diagnostics. Both vets, source inventory,
+executable evidence and no-generics checks passed. No full native module suite
+was repeated inside its hourly interval.
+
+The graph remains64 packages with unchanged import edges and records three new
+production LU files. The double/double initial implementation makes
+lu_instances.cpp partial; LP inventory is48 partial/62 unported source units.
+Next: rational/rational and rational/pair LU constructors and solves with exact
+ownership/failure campaigns, followed by indexed column preparation/solves,
+Suhl updates and error-check/refinement orchestration. Scaling, simplex/LAR/MPS
+and remaining upstream tests remain required. The full LP goal stays active.
