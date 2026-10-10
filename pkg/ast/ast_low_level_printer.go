@@ -793,11 +793,11 @@ func appendASTSymbol(out *util.NumericTextStream, m *ASTManager, s usymbol.Symbo
 		if s.IsNull() {
 			return out.AppendCString("null")
 		}
-		v, e := util.SymbolCStringView(m.Symbols, s)
+		text, _, e := m.Symbols.BareString(s)
 		if e != nil {
 			return e
 		}
-		return out.AppendCStringView(v)
+		return out.AppendCString(text)
 	}
 	if e := out.AppendCString("k!"); e != nil {
 		return e

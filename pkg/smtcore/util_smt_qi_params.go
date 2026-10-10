@@ -547,7 +547,7 @@ func (s *SMTQIParams) Display(out *util.NumericTextStream) error {
 	if e := out.AppendCString("m_mbqi_id="); e != nil {
 		return e
 	}
-	if e := out.AppendCStringView(s.state.MBQIId); e != nil {
+	if e := (s.state.MBQIId).AppendTo(out); e != nil {
 		return e
 	}
 	if e := out.AppendByte('\n'); e != nil {

@@ -11,6 +11,7 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -291,7 +292,27 @@ func (s *NumericTextStream) AppendCString(v string) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	n := nulStringLength(v)
+	return s.appendCString(v)
+}
+
+// AppendNullableCString accepts a native optional string. A missing input
+// marks the selected file transport bad without emitting or consuming width.
+func (s *NumericTextStream) AppendNullableCString(v *string) error {
+	if e := s.lock(); e != nil {
+		return e
+	}
+	defer s.mu.Unlock()
+	if v == nil {
+		s.FileBad = true
+		return nil
+	}
+	return s.appendCString(*v)
+}
+func (s *NumericTextStream) appendCString(v string) error {
+	n := len(v)
+	if i := strings.IndexByte(v, 0); i >= 0 {
+		n = i
+	}
 	if s.FileBad || s.fileFail {
 		return nil
 	}

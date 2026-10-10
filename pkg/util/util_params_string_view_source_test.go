@@ -138,13 +138,13 @@ func TestParamsStringViewCStringSentryNullAndStaleBeforeBadbit(t *testing.T) {
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
 	paramsMust(t, out.SetWidth(7))
-	paramsMust(t, out.AppendCStringView(view))
+	paramsMust(t, (view).AppendTo(out))
 	got, e := out.String()
 	paramsMust(t, e)
 	if got != "   ABCD" {
 		t.Fatal("one actual field width and live bytes", got)
 	}
-	paramsMust(t, out.AppendCStringView(ParamsStringView{}))
+	paramsMust(t, (ParamsStringView{}).AppendTo(out))
 	paramsMust(t, out.AppendCString("ignored"))
 	after, e := out.String()
 	paramsMust(t, e)
@@ -152,7 +152,7 @@ func TestParamsStringViewCStringSentryNullAndStaleBeforeBadbit(t *testing.T) {
 		t.Fatal("null pointer nonthrowing badbit", after)
 	}
 	paramsMust(t, c.Reset(&v))
-	if e := out.AppendCStringView(view); !errors.Is(e, arena.ErrInvalidSlot) {
+	if e := (view).AppendTo(out); !errors.Is(e, arena.ErrInvalidSlot) {
 		t.Fatal("strlen must reach stale pointer before badbit sentry", e)
 	}
 }

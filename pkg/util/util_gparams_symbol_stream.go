@@ -3,7 +3,7 @@ package util
 
 import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 
-func (out *NumericTextStream) AppendSMTSymbol(g *GlobalParamsService, s usymbol.Symbol) error {
+func (g *GlobalParamsService) AppendSymbolTo(out *NumericTextStream, s usymbol.Symbol) error {
 	enabled, e := g.NamespaceAssertionsEnabled()
 	if e != nil {
 		return e
@@ -17,12 +17,12 @@ func (out *NumericTextStream) AppendSMTSymbol(g *GlobalParamsService, s usymbol.
 		if s.Value == 0 {
 			return out.AppendCString("null")
 		}
-		// This call acquires scalar pointer identity only. Actual strlen/bytes are
-		// reached by the existing C-string engine, including after stream badbit.
+		// Resolve the checked immutable spelling in this parameter-service layer,
+		// including its lifetime read after an earlier output failure.
 		if !g.Symbols.Owns(s) {
 			return usymbol.ErrOwner
 		}
-		return out.AppendCStringView(ParamsStringView{symbols: g.Symbols, symbol: s, Mode: 3, PresentField: true})
+		return (ParamsStringView{symbols: g.Symbols, symbol: s, Mode: 3, PresentField: true}).AppendTo(out)
 	}
 	if e = out.AppendCString("k!"); e != nil {
 		return e

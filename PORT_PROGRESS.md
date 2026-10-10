@@ -33366,3 +33366,29 @@ group of 226 files. NumericTextStream's parameter-CString and global-symbol meth
 are among the remaining cross-domain bridges. The complete caller migration and
 subpackage split remain active; no readiness claim is made from file-use counts.
 Audit scripts/results are saved under /mnt/oldrog/tmp/g3-util-{file,package}-dependencies.*.
+
+## Remove numeric-stream dependencies on parameter services
+
+Moved checked parameter text emission to ParamsStringView.AppendTo and retained
+SMT symbol emission to GlobalParamsService.AppendSymbolTo. NumericTextStream no
+longer has methods accepting ParamsStringView or GlobalParamsService. It receives
+a native optional string for nullable text emission and uses strings.IndexByte
+for its first-NUL boundary instead of the parameter helper. Owner locking,
+missing-input transport state, stale-input checks before failed-output sentries,
+width, source symbol assertions and numerical-symbol formatting remain covered.
+AST low-level symbol printing now reads its own checked immutable symbol spelling
+and passes a native string directly, without constructing a parameter view.
+
+Validation: focused native util/smtcore passed (0.033s/0.076s), corresponding
+focused g3debug checks passed (0.031s/0.077s), AST trace/low-level native and debug
+checks both passed (0.016s each), module-wide compilation, three-package vet,
+manifest evidence, gofmt and diff checks passed. No full native suite rerun inside
+the hourly interval; the preceding full native util/smtcore run remains green.
+Counts stay 2102 units/677 APIs: 62 ported, 283 partial, 1729 unported, two dead/deleted.
+
+The stricter receiver-aware package-placement audit now finds 286 root files and
+40 components, with the largest coupled group reduced from 226 to 190 files and
+a separate 35-file parameter/debug service group. Both counts include method
+placement requirements, not just file-use cycles. The complete external native
+storage migration and root util package split remain active. Retained SAT scalar
+Runtime columns, AST ref-vector storage and other consumers still require work.

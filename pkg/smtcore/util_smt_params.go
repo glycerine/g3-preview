@@ -1310,7 +1310,7 @@ func (s *SMTParams) Display(out *util.NumericTextStream) error {
 	if e := out.AppendCString("m_logic="); e != nil {
 		return e
 	}
-	if e := out.AppendSMTSymbol(s.Globals, s.state.Logic); e != nil {
+	if e := s.Globals.AppendSymbolTo(out, s.state.Logic); e != nil {
 		return e
 	}
 	if e := out.AppendByte('\n'); e != nil {

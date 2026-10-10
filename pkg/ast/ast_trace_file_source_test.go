@@ -128,11 +128,11 @@ func TestASTTraceFileFailbitSentryPreservesWidthButCStringStillReadsLength(t *te
 	defer func() { paramsMust(t, f.Close()) }()
 	paramsMust(t, f.stream.SetWidth(17))
 	before := f.stream.State()
-	paramsMust(t, f.stream.AppendCStringView(util.LiteralParamsStringView("payload")))
+	paramsMust(t, (util.LiteralParamsStringView("payload")).AppendTo(&f.stream))
 	if f.stream.State() != before {
 		t.Fatal("failed-open sentry must erase padding/output and preserve width")
 	}
-	if e = f.stream.AppendCStringView(util.ParamsStringView{Mode: 2, PresentField: true}); !errors.Is(e, util.ErrParamsOwner) {
+	if e = (util.ParamsStringView{Mode: 2, PresentField: true}).AppendTo(&f.stream); !errors.Is(e, util.ErrParamsOwner) {
 		t.Fatal("actual CString length read precedes failed sentry", e)
 	}
 	if b.Used() != f.header || f.stream.Stats().Position != 0 {

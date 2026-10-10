@@ -78116,7 +78116,8 @@
       ],
       "deviations": [
         "Completed selected constructor/update/context/display bodies only; compiler-generated copies, real SMT context/driver, remaining generated parameter tables, global process/ABI profiles and arbitrary ostream locale/boolalpha remain open. QI m_qi_ematching is separately source-uninitialized until a real caller assignment; default parent Display reaches its actual label then typed initialization guard. State after failed construction is diagnostic, with explicit preceding scalar/string-solver/dump frontier flags. Guarded TLS fixture reaches actual younger model destructor and proves older helper protection without a native callback claim.",
-        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement."
+        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement.",
+        "The retained SMT symbol output action now belongs to GlobalParamsService.AppendSymbolTo rather than NumericTextStream. Assertion/provider checks and native symbol spelling resolution stay in the parameter-service layer; AST low-level printing reads its own symbol spelling directly. No stream-to-global-service dependency or new template/STL implementation is introduced."
       ]
     },
     {
@@ -78206,7 +78207,8 @@
       "deviations": [
         "Completed selected constructor/update/context/display bodies only; compiler-generated copies, real SMT context/driver, remaining generated parameter tables, global process/ABI profiles and arbitrary ostream locale/boolalpha remain open. QI m_qi_ematching is separately source-uninitialized until a real caller assignment; default parent Display reaches its actual label then typed initialization guard. State after failed construction is diagnostic, with explicit preceding scalar/string-solver/dump frontier flags. Guarded TLS fixture reaches actual younger model destructor and proves older helper protection without a native callback claim.",
         "Go-managed counted byte slices implement the text members. No C++ string storage, capacity, allocator, or ABI behavior is a porting target. Uninitialized source QI ematching is preserved as diagnostic initialization metadata, never claimed to become a defined default boolean. Go self/closed/stopped ownership and the borrowed context/service namespace guards are explicit representation boundaries.",
-        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement."
+        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement.",
+        "The retained SMT symbol output action now belongs to GlobalParamsService.AppendSymbolTo rather than NumericTextStream. Assertion/provider checks and native symbol spelling resolution stay in the parameter-service layer; AST low-level printing reads its own symbol spelling directly. No stream-to-global-service dependency or new template/STL implementation is introduced."
       ]
     },
     {
@@ -138236,7 +138238,8 @@
         "pkg/util/util_gparams_constructor_source.go",
         "pkg/util/util_params_string_view.go",
         "pkg/util/util_params_string_view_source_test.go",
-        "pkg/smtcore/util_context_params_methods_source_test.go"
+        "pkg/smtcore/util_context_params_methods_source_test.go",
+        "pkg/util/util_params_string_stream.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -138709,7 +138712,8 @@
         "Concrete prepared per-block replacement frame binds actual matched index, old kind, slot/generation, nonwrapping invocation and borrowed current leaf identity at reached del_value. Actual owning NUM stays only in the entry, never copied into a second owning frame. Explicit CompleteSetReplacement acknowledges consumed physical child before kind then field publication; Context.Close instead discards prepared copied text and consumed old leaf before block teardown, with no setter body publication. Reflected ReplacementBytes cold directory remains charged; prepared Go string lifetimes are named but outside arena accounting. No RC/count/registry authority.",
         "Descriptor owner-header refusal occurs before publication; native info, name, and immutable metadata storage introduce no arena refusal after that header. Existing registry cleanup retains actual acquired child owners, with embedded descriptors charged only in their containing frame.",
         "The concrete call-local pointer view captures actual Words/ref/length or Symbol BytesRegion/ref/offset from the returned source entry. No RC, copied payload or formatting-workspace allocation is acquired. Each reached byte retains actual provider/generation/lifetime checks; returned symbol spelling may outlive ParamsContext while its provider remains live.",
-        "The call-local descriptor is embedded in the charged context frame. Descriptor info uses insdict and names use native slices; metadata strings are Go-managed. Completed destruction clears names then info and releases any actual wrapper header; no separate text owner is constructed."
+        "The call-local descriptor is embedded in the charged context frame. Descriptor info uses insdict and names use native slices; metadata strings are Go-managed. Completed destruction clears names then info and releases any actual wrapper header; no separate text owner is constructed.",
+        "Checked parameter text emission belongs to ParamsStringView.AppendTo, which resolves a native optional string for NumericTextStream. The stream retains no ParamsStringView or parameter context dependency; native first-NUL handling uses strings.IndexByte rather than a parameter helper. Existing missing/stale input guards and output prefix behavior remain."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
@@ -138757,7 +138761,8 @@
         "pkg/util/util_params_set_rat_source_test.go",
         "pkg/util/util_params_set_replacement_source.go",
         "pkg/util/util_params_set_replacement_source_test.go",
-        "pkg/util/util_gparams_constructor_source.go"
+        "pkg/util/util_gparams_constructor_source.go",
+        "pkg/util/util_params_string_stream.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -139168,7 +139173,8 @@
         "Defined absent-key lookup on a live parent after stopped numeral destruction returns without action or receipt stamp; source keys are scanned before the stopped mutation guard. Both symbol/name routes preserve original invocation, cursor, refs, size, Runtime and exact physical/cold graph. Source-ended zeroDEC lifetime is guarded before lookup separately. Historical premature whole-block guard candidate is superseded, not accepted.",
         "SET_RAT ADD stamps the actual NewValue result into precharged concrete setFrames.next.rat before Copy and retains it on actual Copy/append refusal. Source POD new_entry has no rational destructor; only true entry publication transfers ownership. Separate exact owning receipt or Context.Close releases this actual local, preserving first body and owning cleanup causes and actual consumed physical child frontier. SourceSetBytes is the independent reflected cold directory charge; audits name actual acquired tokens, not numeric live-count or RC inference.",
         "Concrete prepared per-block replacement frame binds actual matched index, old kind, slot/generation, nonwrapping invocation and borrowed current leaf identity at reached del_value. Actual owning NUM stays only in the entry, never copied into a second owning frame. Explicit CompleteSetReplacement acknowledges consumed physical child before kind then field publication; Context.Close instead discards prepared copied text and consumed old leaf before block teardown, with no setter body publication. Reflected ReplacementBytes cold directory remains charged; prepared Go string lifetimes are named but outside arena accounting. No RC/count/registry authority.",
-        "Descriptor owner-header refusal occurs before publication; native info, name, and immutable metadata storage introduce no arena refusal after that header. Existing registry cleanup retains actual acquired child owners, with embedded descriptors charged only in their containing frame."
+        "Descriptor owner-header refusal occurs before publication; native info, name, and immutable metadata storage introduce no arena refusal after that header. Existing registry cleanup retains actual acquired child owners, with embedded descriptors charged only in their containing frame.",
+        "Checked parameter text emission belongs to ParamsStringView.AppendTo, which resolves a native optional string for NumericTextStream. The stream retains no ParamsStringView or parameter context dependency; native first-NUL handling uses strings.IndexByte rather than a parameter helper. Existing missing/stale input guards and output prefix behavior remain."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
@@ -146521,7 +146527,7 @@
         "pkg/util/symbol/service.go",
         "pkg/util/symbol/service_test.go",
         "pkg/util/util_gparams_service_ops.go",
-        "pkg/util/util_numeric_stream_symbol_source.go",
+        "pkg/util/util_gparams_symbol_stream.go",
         "pkg/smtcore/util_smt_params_source_test.go"
       ],
       "tests": [
@@ -146704,7 +146710,7 @@
         {
           "name": "Reached null/string/numerical symbol ostream insertion (src/util/symbol.h:97-110)",
           "status": "partial",
-          "go_target": "pkg/util/util_numeric_stream_symbol_source.go",
+          "go_target": "pkg/util/util_gparams_symbol_stream.go",
           "tests": [
             "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags"
           ],
@@ -146729,7 +146735,8 @@
         "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
         "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
         "Supported scalar ostream representation only; native pointer encoding and full locale/global stream bindings remain separate obligations.",
-        "Unused string_buffer symbol insertion specialization and its implementation credit are removed. Actual fresh-name and parameter-output callers use checked Display strings and native buffers."
+        "Unused string_buffer symbol insertion specialization and its implementation credit are removed. Actual fresh-name and parameter-output callers use checked Display strings and native buffers.",
+        "The retained SMT symbol output action now belongs to GlobalParamsService.AppendSymbolTo rather than NumericTextStream. Assertion/provider checks and native symbol spelling resolution stay in the parameter-service layer; AST low-level printing reads its own symbol spelling directly. No stream-to-global-service dependency or new template/STL implementation is introduced."
       ]
     },
     {
