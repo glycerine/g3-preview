@@ -11,7 +11,8 @@ code that has not been ported.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
-| Floating primal reduced-cost refresh and steepest-edge updates | 160 independent basis-coordinate worlds with sparse/forced-dense LU, independent transposed beta solves, new-basis norms and reduced costs; drift/profitability/tolerance classification, periodic seeded reset, infeasibility-cost transitions, fixed/duplicate/IEEE and mutation guards | Native94.6% (105/111), debug/checked100% (111/111). Native gaps are erased source assertions. Actual pivot/optimization orchestration and exact/tableau paths remain open |
+| Floating primal pivot comparison and advance orchestration | 180 independent ray/basis worlds through sparse/forced-dense LU; bound flips, feasibility-cost transitions, degenerate pivots, actual stale-LU recovery, singular refusal/rollback, drift and two-observation status transitions; mutation/output guards | Native82.0% (137/167), debug/checked90.4% (151/167). Gaps qualify child/index errors or opposite-profile assertions. Full solve/iteration/resource/statistics loop and exact/tableau advance remain open |
+| Floating primal reduced-cost refresh and steepest-edge updates | 160 independent basis-coordinate worlds with sparse/forced-dense LU, independent transposed beta solves, new-basis norms and reduced costs; drift/profitability/tolerance classification, periodic seeded reset, infeasibility-cost transitions, fixed/duplicate/IEEE and mutation guards | Native94.6% (105/111), debug/checked100% (111/111). Native gaps are erased source assertions. Floating pivot orchestration is implemented; full optimization loop and exact/tableau paths remain open |
 | Floating Harris and breakpoint leaving/step selection | 500 independent Harris bound worlds and600 signed breakpoint crossing worlds; independent hinge slope jumps, source double first-crossing behavior, queue/order/publication guards, bound flips and full floating dispatch | Harris98.5% native/100% debug; breakpoint/dispatch93.3% native (112/120),95.8% debug (115/120). Remaining gaps propagate queue errors behind valid metadata or belong to the other assertion profile. Exact/tableau paths and full optimization remain open |
 | Floating primal stage-one initialization and entering pricing | 150 independent basic/nonbasic bound worlds (3,300 column decisions); real feasibility/objective cost lifecycle and seeded norms, 100 independent rank worlds with45 choices each, budget/rotation/counter rules, IEEE and publication/error prefixes; actual120 prepared-primal run initializations | Initialization95.8% native (158/165),98.2% debug (162/165); pricing89.9% (89/99),100% (99/99). Gaps guard inherited valid boxed bounds/int-set invariants or belong to debug-only bound assertions. Harris and floating breakpoint leaving/step selection are implemented; norm/price updates are implemented; optimization remains open |
 | Floating primal values, pivot rows and numerical basis/X updates | 100 independent known-solution reconstruction worlds; 120 dense independent B*d/nullspace worlds through sparse/forced-dense LU, real pivot rows, Suhl and full refactors; singular feasible-only/rollback, nonzero-step restoration, stale factors, drop-based refusal, output/borrowed-input prefixes, literal correction sign and IEEE residuals | Values95.2% native (118/124),96.0% debug (119/124); numerical updates87.8% (79/90),91.1% (82/90); pivot rows96.2% (25/26),100% (26/26). Gaps are other-profile assertions, invariant-protected child errors and final non-OK refactor after restored feasible X. Full optimization and exact core remain open |
@@ -254,3 +255,34 @@ Profiles: /mnt/oldrog/tmp/g3-refresh-{native,debug}.cover. Both LP vets and sour
 evidence/no-generics verification pass. LP stays66 partial/44 unported. The20:03
 full native90.0% aggregate predates these additions; no full repeat is due.
 Graph regenerated with unchanged edges and the new production file.
+
+
+### Floating primal pivot/advance orchestration — 2026-10-10
+
+Ported floating column/row pivot consistency codes, bound-flip advance,
+entering/leaving pivot orchestration and complete floating entering advance.
+Actual LU beta/pivot/refactor, X/basis updates, cost/norm transitions and pricing
+list mutations execute in source order. Preserved zero-pivot code1, strict
+normalized Harris comparison, signed delta handling, numerical refusal versus
+Go child errors, feasibility-only early returns, restored-basis versus failed
+new-basis ownership, and two-observation tentative-unbounded/unstable escalation.
+Borrowed Go DebugOut emits the source failure diagnostic after rollback/counter
+publication. Whole solve/iteration/resource/statistics orchestration, precise/
+tableau advances and complete original smoke drivers remain open.
+
+180 independent known-basis ray worlds through sparse/forced-dense LU verify
+entering selection, limiting basic variable, new X/basis/cost and equation
+residuals for both movement signs. Separate worlds cover flips, zero steps,
+feasibility-cost repair/restoration and list retention, source drift decisions,
+actual stale-basis recovery/refactor, real singular rollback/refusal, actual
+drop-based restore/diagnostic refusal, IEEE pivot comparison and reached output/
+mutation guards. Distinct ray distances avoid treating roundoff-split exact ties
+as exact ordering; Harris tests separately check source randomized equal pivots.
+Focused native core/primal/presolve/solver/column/scaler/static/LU checks pass
+0.951s and combined debug/checked0.973s. New code137/167 (82.0%) native and151/167
+(90.4%) debug; remaining statements qualify child/index errors under malformed
+metadata or belong to the other assertion profile. Profiles:
+/mnt/oldrog/tmp/g3-advance-{native,debug}.cover. Both LP vets and source/evidence/
+no-generics verification pass. LP stays66 partial/44 unported. Last full native
+module snapshot remains20:03 UTC90.0%, predating these additions; no immediate
+full rerun. Regenerated graph has unchanged edges plus the new production file.

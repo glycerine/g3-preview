@@ -37281,3 +37281,34 @@ Profiles: /mnt/oldrog/tmp/g3-refresh-{native,debug}.cover. Both LP vets and sour
 evidence/no-generics verification pass. LP stays66 partial/44 unported. The20:03
 full native90.0% aggregate predates these additions; no full repeat is due.
 Graph regenerated with unchanged edges and the new production file.
+
+
+### Floating primal pivot/advance orchestration — 2026-10-10
+
+Ported floating column/row pivot consistency codes, bound-flip advance,
+entering/leaving pivot orchestration and complete floating entering advance.
+Actual LU beta/pivot/refactor, X/basis updates, cost/norm transitions and pricing
+list mutations execute in source order. Preserved zero-pivot code1, strict
+normalized Harris comparison, signed delta handling, numerical refusal versus
+Go child errors, feasibility-only early returns, restored-basis versus failed
+new-basis ownership, and two-observation tentative-unbounded/unstable escalation.
+Borrowed Go DebugOut emits the source failure diagnostic after rollback/counter
+publication. Whole solve/iteration/resource/statistics orchestration, precise/
+tableau advances and complete original smoke drivers remain open.
+
+180 independent known-basis ray worlds through sparse/forced-dense LU verify
+entering selection, limiting basic variable, new X/basis/cost and equation
+residuals for both movement signs. Separate worlds cover flips, zero steps,
+feasibility-cost repair/restoration and list retention, source drift decisions,
+actual stale-basis recovery/refactor, real singular rollback/refusal, actual
+drop-based restore/diagnostic refusal, IEEE pivot comparison and reached output/
+mutation guards. Distinct ray distances avoid treating roundoff-split exact ties
+as exact ordering; Harris tests separately check source randomized equal pivots.
+Focused native core/primal/presolve/solver/column/scaler/static/LU checks pass
+0.951s and combined debug/checked0.973s. New code137/167 (82.0%) native and151/167
+(90.4%) debug; remaining statements qualify child/index errors under malformed
+metadata or belong to the other assertion profile. Profiles:
+/mnt/oldrog/tmp/g3-advance-{native,debug}.cover. Both LP vets and source/evidence/
+no-generics verification pass. LP stays66 partial/44 unported. Last full native
+module snapshot remains20:03 UTC90.0%, predating these additions; no immediate
+full rerun. Regenerated graph has unchanged edges plus the new production file.

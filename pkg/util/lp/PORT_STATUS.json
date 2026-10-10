@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 90.0,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native module suite passed2026-10-10 at20:03 UTC: LP332.181s,90.0% (10056/11174), including all current floating primal preparation, core initialization/iteration/value/pivot/numerical-update layers and primal initialization/pricing. Other unchanged packages reused valid Go test cache entries. Authoritative log/profile: /mnt/oldrog/tmp/g3-primal-core-module-native.{log,cover}. Current focused debug/checked profiles cover each added component: floating primal initialization95.8% native/98.2% debug, entering pricing89.9%/100%, floating value reconstruction95.2% native/96.0% debug, numerical update87.8%/91.1%, pivot-row preparation96.2%/100%, floating core iteration preparation94.8% native/95.9% debug, floating core initialization88.8% native/97.4% debug, floating primal preparation96.2% native/debug, floating presolve98.5%, solver98.0%, scaler88.1%, prepared exact100%/floating94.6%. Complete debug coverage predates sparse basis storage. Exact solver/presolve, full primal/dual/LAR/MPS integration and complete upstream command drivers remain open. Floating Harris step/leaving/entering-flip routines subsequently pass focused native/debug checks with134/136 (98.5%) and136/136 (100%) statements; the full native module aggregate above predates this addition. Floating breakpoint construction/slope/selection and full floating find_leaving_and_t routing subsequently pass focused checks:112/120 (93.3%) native,115/120 (95.8%) debug/checked. LP now66 partial/44 unported; prior full native aggregate predates these additions. Floating reduced-cost refresh/pivot, LU beta and steepest-edge norm updates subsequently pass focused checks with105/111 (94.6%) native and111/111 (100%) debug/checked statements. The preceding full native aggregate predates these additions.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native module suite passed2026-10-10 at20:03 UTC: LP332.181s,90.0% (10056/11174), including all current floating primal preparation, core initialization/iteration/value/pivot/numerical-update layers and primal initialization/pricing. Other unchanged packages reused valid Go test cache entries. Authoritative log/profile: /mnt/oldrog/tmp/g3-primal-core-module-native.{log,cover}. Current focused debug/checked profiles cover each added component: floating primal initialization95.8% native/98.2% debug, entering pricing89.9%/100%, floating value reconstruction95.2% native/96.0% debug, numerical update87.8%/91.1%, pivot-row preparation96.2%/100%, floating core iteration preparation94.8% native/95.9% debug, floating core initialization88.8% native/97.4% debug, floating primal preparation96.2% native/debug, floating presolve98.5%, solver98.0%, scaler88.1%, prepared exact100%/floating94.6%. Complete debug coverage predates sparse basis storage. Exact solver/presolve, full primal/dual/LAR/MPS integration and complete upstream command drivers remain open. Floating Harris step/leaving/entering-flip routines subsequently pass focused native/debug checks with134/136 (98.5%) and136/136 (100%) statements; the full native module aggregate above predates this addition. Floating breakpoint construction/slope/selection and full floating find_leaving_and_t routing subsequently pass focused checks:112/120 (93.3%) native,115/120 (95.8%) debug/checked. LP now66 partial/44 unported; prior full native aggregate predates these additions. Floating reduced-cost refresh/pivot, LU beta and steepest-edge norm updates subsequently pass focused checks with105/111 (94.6%) native and111/111 (100%) debug/checked statements. The preceding full native aggregate predates these additions. Floating pivot comparison/advance orchestration subsequently pass focused checks:137/167 (82.0%) native,151/167 (90.4%) debug/checked. Remaining statements qualify child/index errors or other-profile assertions; whole optimization loop and complete original smoke drivers remain open. Prior full native module aggregate predates these additions.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -682,7 +682,8 @@
         "pkg/util/lp/core_update_float.go",
         "pkg/util/lp/core_pivot_float.go",
         "pkg/util/lp/core_values_float_test.go",
-        "pkg/util/lp/core_update_float_test.go"
+        "pkg/util/lp/core_update_float_test.go",
+        "pkg/util/lp/primal_advance_float.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -705,7 +706,16 @@
         "TestLPFloatCoreRestoreRefactorOutputAndFailurePrefixes",
         "TestLPFloatCoreNumericalUpdateAndPivotGuards",
         "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
-        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
+        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep",
+        "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+        "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+        "TestLPFloatPrimalPivotComparisonThresholds",
+        "TestLPFloatPrimalAdvanceRefreshRecovery",
+        "TestLPFloatPrimalAdvanceActualResidualRecovery",
+        "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+        "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+        "TestLPFloatPrimalAdvanceReachedGuards",
+        "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
       ]
     },
     {
@@ -721,7 +731,8 @@
         "pkg/util/lp/core_update_float.go",
         "pkg/util/lp/core_pivot_float.go",
         "pkg/util/lp/core_values_float_test.go",
-        "pkg/util/lp/core_update_float_test.go"
+        "pkg/util/lp/core_update_float_test.go",
+        "pkg/util/lp/primal_advance_float.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -744,7 +755,16 @@
         "TestLPFloatCoreRestoreRefactorOutputAndFailurePrefixes",
         "TestLPFloatCoreNumericalUpdateAndPivotGuards",
         "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
-        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
+        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep",
+        "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+        "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+        "TestLPFloatPrimalPivotComparisonThresholds",
+        "TestLPFloatPrimalAdvanceRefreshRecovery",
+        "TestLPFloatPrimalAdvanceActualResidualRecovery",
+        "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+        "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+        "TestLPFloatPrimalAdvanceReachedGuards",
+        "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
       ]
     },
     {
@@ -760,7 +780,8 @@
         "pkg/util/lp/core_update_float.go",
         "pkg/util/lp/core_pivot_float.go",
         "pkg/util/lp/core_values_float_test.go",
-        "pkg/util/lp/core_update_float_test.go"
+        "pkg/util/lp/core_update_float_test.go",
+        "pkg/util/lp/primal_advance_float.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -783,7 +804,16 @@
         "TestLPFloatCoreRestoreRefactorOutputAndFailurePrefixes",
         "TestLPFloatCoreNumericalUpdateAndPivotGuards",
         "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
-        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
+        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep",
+        "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+        "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+        "TestLPFloatPrimalPivotComparisonThresholds",
+        "TestLPFloatPrimalAdvanceRefreshRecovery",
+        "TestLPFloatPrimalAdvanceActualResidualRecovery",
+        "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+        "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+        "TestLPFloatPrimalAdvanceReachedGuards",
+        "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
       ]
     },
     {
@@ -863,7 +893,8 @@
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/primal_harris_float.go",
         "pkg/util/lp/primal_breakpoint_float.go",
-        "pkg/util/lp/primal_refresh_float.go"
+        "pkg/util/lp/primal_refresh_float.go",
+        "pkg/util/lp/primal_advance_float.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -890,7 +921,16 @@
         "TestLPFloatPrimalRefreshClassificationAndNormLifecycle",
         "TestLPFloatPrimalRefreshIEEEAndCostTransitions",
         "TestLPFloatPrimalRefreshPublicationAndGuards",
-        "TestLPFloatPrimalNormUpdateReachedBounds"
+        "TestLPFloatPrimalNormUpdateReachedBounds",
+        "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+        "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+        "TestLPFloatPrimalPivotComparisonThresholds",
+        "TestLPFloatPrimalAdvanceRefreshRecovery",
+        "TestLPFloatPrimalAdvanceActualResidualRecovery",
+        "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+        "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+        "TestLPFloatPrimalAdvanceReachedGuards",
+        "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
       ]
     },
     {
@@ -904,7 +944,8 @@
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/primal_harris_float.go",
         "pkg/util/lp/primal_breakpoint_float.go",
-        "pkg/util/lp/primal_refresh_float.go"
+        "pkg/util/lp/primal_refresh_float.go",
+        "pkg/util/lp/primal_advance_float.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -931,7 +972,16 @@
         "TestLPFloatPrimalRefreshClassificationAndNormLifecycle",
         "TestLPFloatPrimalRefreshIEEEAndCostTransitions",
         "TestLPFloatPrimalRefreshPublicationAndGuards",
-        "TestLPFloatPrimalNormUpdateReachedBounds"
+        "TestLPFloatPrimalNormUpdateReachedBounds",
+        "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+        "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+        "TestLPFloatPrimalPivotComparisonThresholds",
+        "TestLPFloatPrimalAdvanceRefreshRecovery",
+        "TestLPFloatPrimalAdvanceActualResidualRecovery",
+        "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+        "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+        "TestLPFloatPrimalAdvanceReachedGuards",
+        "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
       ]
     },
     {

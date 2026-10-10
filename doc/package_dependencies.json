@@ -1213,6 +1213,7 @@
         "permutation.go",
         "permutation_exact.go",
         "permutation_float.go",
+        "primal_advance_float.go",
         "primal_breakpoint_float.go",
         "primal_core_float.go",
         "primal_harris_float.go",

@@ -120524,7 +120524,8 @@
         "pkg/util/lp/core_update_float.go",
         "pkg/util/lp/core_pivot_float.go",
         "pkg/util/lp/core_values_float_test.go",
-        "pkg/util/lp/core_update_float_test.go"
+        "pkg/util/lp/core_update_float_test.go",
+        "pkg/util/lp/primal_advance_float.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -120547,7 +120548,16 @@
         "TestLPFloatCoreRestoreRefactorOutputAndFailurePrefixes",
         "TestLPFloatCoreNumericalUpdateAndPivotGuards",
         "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
-        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
+        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep",
+        "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+        "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+        "TestLPFloatPrimalPivotComparisonThresholds",
+        "TestLPFloatPrimalAdvanceRefreshRecovery",
+        "TestLPFloatPrimalAdvanceActualResidualRecovery",
+        "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+        "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+        "TestLPFloatPrimalAdvanceReachedGuards",
+        "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
       ],
       "assertions": [
         {
@@ -120655,6 +120665,24 @@
             "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
             "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
           ]
+        },
+        {
+          "name": "Floating column/row pivot consistency comparison",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_advance_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+            "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+            "TestLPFloatPrimalPivotComparisonThresholds",
+            "TestLPFloatPrimalAdvanceRefreshRecovery",
+            "TestLPFloatPrimalAdvanceActualResidualRecovery",
+            "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+            "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+            "TestLPFloatPrimalAdvanceReachedGuards",
+            "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
+          ]
         }
       ],
       "ownership": [
@@ -120665,7 +120693,8 @@
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
         "Floating basis bookkeeping and reduced-cost/entering-column layer only. Full primal/dual/LAR optimization remains open; floating numerical pivot/update is now implemented. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added.",
-        "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced."
+        "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced.",
+        "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open."
       ]
     },
     {
@@ -120683,7 +120712,8 @@
         "pkg/util/lp/core_update_float.go",
         "pkg/util/lp/core_pivot_float.go",
         "pkg/util/lp/core_values_float_test.go",
-        "pkg/util/lp/core_update_float_test.go"
+        "pkg/util/lp/core_update_float_test.go",
+        "pkg/util/lp/primal_advance_float.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -120706,7 +120736,16 @@
         "TestLPFloatCoreRestoreRefactorOutputAndFailurePrefixes",
         "TestLPFloatCoreNumericalUpdateAndPivotGuards",
         "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
-        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
+        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep",
+        "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+        "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+        "TestLPFloatPrimalPivotComparisonThresholds",
+        "TestLPFloatPrimalAdvanceRefreshRecovery",
+        "TestLPFloatPrimalAdvanceActualResidualRecovery",
+        "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+        "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+        "TestLPFloatPrimalAdvanceReachedGuards",
+        "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
       ],
       "conditionals": [
         {
@@ -120920,6 +120959,24 @@
             "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
             "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
           ]
+        },
+        {
+          "name": "Floating column/row pivot consistency comparison",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_advance_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+            "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+            "TestLPFloatPrimalPivotComparisonThresholds",
+            "TestLPFloatPrimalAdvanceRefreshRecovery",
+            "TestLPFloatPrimalAdvanceActualResidualRecovery",
+            "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+            "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+            "TestLPFloatPrimalAdvanceReachedGuards",
+            "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
+          ]
         }
       ],
       "ownership": [
@@ -120930,7 +120987,8 @@
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
         "Floating basis bookkeeping and reduced-cost/entering-column layer only. Full primal/dual/LAR optimization remains open; floating numerical pivot/update is now implemented. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added.",
-        "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced."
+        "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced.",
+        "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open."
       ]
     },
     {
@@ -120948,7 +121006,8 @@
         "pkg/util/lp/core_update_float.go",
         "pkg/util/lp/core_pivot_float.go",
         "pkg/util/lp/core_values_float_test.go",
-        "pkg/util/lp/core_update_float_test.go"
+        "pkg/util/lp/core_update_float_test.go",
+        "pkg/util/lp/primal_advance_float.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -120971,7 +121030,16 @@
         "TestLPFloatCoreRestoreRefactorOutputAndFailurePrefixes",
         "TestLPFloatCoreNumericalUpdateAndPivotGuards",
         "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
-        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
+        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep",
+        "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+        "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+        "TestLPFloatPrimalPivotComparisonThresholds",
+        "TestLPFloatPrimalAdvanceRefreshRecovery",
+        "TestLPFloatPrimalAdvanceActualResidualRecovery",
+        "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+        "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+        "TestLPFloatPrimalAdvanceReachedGuards",
+        "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -121021,6 +121089,24 @@
             "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
             "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
           ]
+        },
+        {
+          "name": "Floating column/row pivot consistency comparison",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_advance_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+            "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+            "TestLPFloatPrimalPivotComparisonThresholds",
+            "TestLPFloatPrimalAdvanceRefreshRecovery",
+            "TestLPFloatPrimalAdvanceActualResidualRecovery",
+            "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+            "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+            "TestLPFloatPrimalAdvanceReachedGuards",
+            "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
+          ]
         }
       ],
       "ownership": [
@@ -121031,7 +121117,8 @@
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
         "Floating basis bookkeeping and reduced-cost/entering-column layer only. Full primal/dual/LAR optimization remains open; floating numerical pivot/update is now implemented. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added.",
-        "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced."
+        "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced.",
+        "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open."
       ]
     },
     {
@@ -121388,7 +121475,8 @@
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/primal_harris_float.go",
         "pkg/util/lp/primal_breakpoint_float.go",
-        "pkg/util/lp/primal_refresh_float.go"
+        "pkg/util/lp/primal_refresh_float.go",
+        "pkg/util/lp/primal_advance_float.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -121415,7 +121503,16 @@
         "TestLPFloatPrimalRefreshClassificationAndNormLifecycle",
         "TestLPFloatPrimalRefreshIEEEAndCostTransitions",
         "TestLPFloatPrimalRefreshPublicationAndGuards",
-        "TestLPFloatPrimalNormUpdateReachedBounds"
+        "TestLPFloatPrimalNormUpdateReachedBounds",
+        "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+        "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+        "TestLPFloatPrimalPivotComparisonThresholds",
+        "TestLPFloatPrimalAdvanceRefreshRecovery",
+        "TestLPFloatPrimalAdvanceActualResidualRecovery",
+        "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+        "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+        "TestLPFloatPrimalAdvanceReachedGuards",
+        "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
       ],
       "conditionals": [
         {
@@ -121629,6 +121726,24 @@
             "TestLPFloatPrimalRefreshPublicationAndGuards",
             "TestLPFloatPrimalNormUpdateReachedBounds"
           ]
+        },
+        {
+          "name": "Floating bound-flip, entering/leaving pivot and full entering advance orchestration, drift/refactor/residual recovery and source tentative-unbounded/unstable status transitions",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_advance_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+            "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+            "TestLPFloatPrimalPivotComparisonThresholds",
+            "TestLPFloatPrimalAdvanceRefreshRecovery",
+            "TestLPFloatPrimalAdvanceActualResidualRecovery",
+            "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+            "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+            "TestLPFloatPrimalAdvanceReachedGuards",
+            "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
+          ]
         }
       ],
       "ownership": [
@@ -121639,7 +121754,8 @@
         "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced.",
         "Harris output pointers require nonnil Go storage. Undefined source indices and empty leaving modulo-zero return ErrBounds after reached mutations; empty leaving selection consumes the source RNG and leaves converted epsilon zero. Exact/tableau variants, breakpoint selection and full find_leaving_and_t integration remain open. Definition-only checked feasible-positive helper is not copied.",
         "Go native FloatBreakpoint value slice replaces C++ vector records; scalar values have no independent ownership. Source double advance always stops after the first queued crossing even if slope remains beneficial; exact multi-breakpoint continuation is not claimed. Entering boxed breakpoint uses full bound span rather than distance from current X. Invalid source index/empty queue uses reached typed bounds/assertion guards; errors preserve earlier record/queue mutations. Exact records/solver, diagnostic printing and complete optimization loop remain open.",
-        "Floating norm/price updates preserve sparse index iteration including duplicates, absolute-source IEEE comparisons, first-operand std::max NaN behavior, fixed-column dot product before skipping writes, and reached mutation prefixes at native bounds guards. Definition-only calculate_column_norm_exactly debug helper is not copied. Exact/tableau recurrences and complete primal optimization integration remain open."
+        "Floating norm/price updates preserve sparse index iteration including duplicates, absolute-source IEEE comparisons, first-operand std::max NaN behavior, fixed-column dot product before skipping writes, and reached mutation prefixes at native bounds guards. Definition-only calculate_column_norm_exactly debug helper is not copied. Exact/tableau recurrences and complete primal optimization integration remain open.",
+        "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open."
       ]
     },
     {
@@ -121655,7 +121771,8 @@
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/primal_harris_float.go",
         "pkg/util/lp/primal_breakpoint_float.go",
-        "pkg/util/lp/primal_refresh_float.go"
+        "pkg/util/lp/primal_refresh_float.go",
+        "pkg/util/lp/primal_advance_float.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -121682,7 +121799,16 @@
         "TestLPFloatPrimalRefreshClassificationAndNormLifecycle",
         "TestLPFloatPrimalRefreshIEEEAndCostTransitions",
         "TestLPFloatPrimalRefreshPublicationAndGuards",
-        "TestLPFloatPrimalNormUpdateReachedBounds"
+        "TestLPFloatPrimalNormUpdateReachedBounds",
+        "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+        "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+        "TestLPFloatPrimalPivotComparisonThresholds",
+        "TestLPFloatPrimalAdvanceRefreshRecovery",
+        "TestLPFloatPrimalAdvanceActualResidualRecovery",
+        "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+        "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+        "TestLPFloatPrimalAdvanceReachedGuards",
+        "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
       ],
       "conditionals": [
         {
@@ -122024,6 +122150,24 @@
             "TestLPFloatPrimalRefreshPublicationAndGuards",
             "TestLPFloatPrimalNormUpdateReachedBounds"
           ]
+        },
+        {
+          "name": "Floating bound-flip, entering/leaving pivot and full entering advance orchestration, drift/refactor/residual recovery and source tentative-unbounded/unstable status transitions",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_advance_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalAdvanceIndependentRayWorlds",
+            "TestLPFloatPrimalAdvanceBoundFlipAndUnbounded",
+            "TestLPFloatPrimalPivotComparisonThresholds",
+            "TestLPFloatPrimalAdvanceRefreshRecovery",
+            "TestLPFloatPrimalAdvanceActualResidualRecovery",
+            "TestLPFloatPrimalAdvanceInfeasibilityTransitions",
+            "TestLPFloatPrimalAdvanceActualNumericalRefusals",
+            "TestLPFloatPrimalAdvanceReachedGuards",
+            "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
+          ]
         }
       ],
       "ownership": [
@@ -122034,7 +122178,8 @@
         "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced.",
         "Harris output pointers require nonnil Go storage. Undefined source indices and empty leaving modulo-zero return ErrBounds after reached mutations; empty leaving selection consumes the source RNG and leaves converted epsilon zero. Exact/tableau variants, breakpoint selection and full find_leaving_and_t integration remain open. Definition-only checked feasible-positive helper is not copied.",
         "Go native FloatBreakpoint value slice replaces C++ vector records; scalar values have no independent ownership. Source double advance always stops after the first queued crossing even if slope remains beneficial; exact multi-breakpoint continuation is not claimed. Entering boxed breakpoint uses full bound span rather than distance from current X. Invalid source index/empty queue uses reached typed bounds/assertion guards; errors preserve earlier record/queue mutations. Exact records/solver, diagnostic printing and complete optimization loop remain open.",
-        "Floating norm/price updates preserve sparse index iteration including duplicates, absolute-source IEEE comparisons, first-operand std::max NaN behavior, fixed-column dot product before skipping writes, and reached mutation prefixes at native bounds guards. Definition-only calculate_column_norm_exactly debug helper is not copied. Exact/tableau recurrences and complete primal optimization integration remain open."
+        "Floating norm/price updates preserve sparse index iteration including duplicates, absolute-source IEEE comparisons, first-operand std::max NaN behavior, fixed-column dot product before skipping writes, and reached mutation prefixes at native bounds guards. Definition-only calculate_column_norm_exactly debug helper is not copied. Exact/tableau recurrences and complete primal optimization integration remain open.",
+        "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open."
       ]
     },
     {
