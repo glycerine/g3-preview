@@ -1198,6 +1198,7 @@
         "sparse_float_vector.go",
         "sparse_matrix_exact.go",
         "sparse_matrix_float.go",
+        "sparse_matrix_float_elimination.go",
         "sparse_rational_vector.go",
         "stacked_pair_vector.go",
         "stacked_value.go",

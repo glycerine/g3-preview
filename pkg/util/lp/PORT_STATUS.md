@@ -36,11 +36,13 @@ code that has not been ported.
 | Exact static last-row fill with basis elimination | 240 independent rational elimination worlds; literal zero/duplicate/stale workspace behavior; three physical refusal campaigns through success, owner-specific publication prefixes and older comparison identity | 85.0% in each profile; remaining guards include unreachable child Reset/bounds failures for the retained concrete term iterator |
 | Floating sparse basis construction and permutation queries | Standalone source test_init_U fixture; 600 independent sparse worlds, duplicate/zero/IEEE values, reciprocal offsets, 16 permutation rounds per world and malformed-input prefix checks | 100% in each focused profile; factorization, elimination and solves remain open |
 | Exact sparse basis coefficient storage and permutation queries | 120 independent arbitrary-precision sparse worlds; 12 permutation rounds each, duplicate/zero/first-match storage, independent source/row/column owning-cell census; two real allocation-refusal campaigns through success, column-before-row stops and older comparison identity | 94.2% in both focused profiles; remaining statements propagate cleanup errors or guard fresh constructor state |
+| Floating sparse mutation, row elimination, maximum ordering and division | 6,000 independent map mutations and 800 dense pivot worlds; reciprocal links, shuffled permutations, exact cancellation/fill, strict tolerances, live divisor, IEEE values, duplicate publication/removal and reached bounds prefixes | 94.4% native / 95.6% debug/checked focused; remaining gaps propagate bounds errors on malformed permutation metadata or belong to the opposite assertion profile |
 | Settings defaults, stats, float tolerance families, random state and resource limits | All numerical/strategy defaults, source RNG golden vectors, mutable thresholds, strict CPU-time boundary, borrowed limit/error propagation and stats reset | 96.3%; uncovered constructor return propagates a real host-clock start error |
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
-The current complete native LP run reports **90.3%** statement coverage. The last
+The last complete native LP run, before floating sparse elimination, reports
+**90.3%** statement coverage. The last
 complete combined debug/checked run reported **91.7%** before sparse basis storage
 was added; both sparse basis components now also pass focused debug/checked tests. Exact scoped
 vector allocation and rollback paths are tested; remaining uncovered statements

@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 90.3,
-  "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms. Native complete LP coverage includes exact sparse basis storage; the last complete debug/checked percentage predates sparse basis storage, whose focused debug/checked coverage is recorded in PORT_STATUS.md.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms. The last complete native LP percentage predates floating sparse elimination; the last complete debug/checked percentage predates sparse basis storage. Current component focused coverage is recorded in PORT_STATUS.md.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -346,7 +346,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/sparse_matrix_float.go",
-        "pkg/util/lp/sparse_matrix_exact.go"
+        "pkg/util/lp/sparse_matrix_exact.go",
+        "pkg/util/lp/sparse_matrix_float_elimination.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -355,7 +356,11 @@
         "TestLPExactSparseBasisIndependentOracle",
         "TestLPExactSparseBasisAllocationFailureCensus",
         "TestLPExactSparseBasisBoundsAndBorrowedOwner",
-        "TestLPExactSparseBasisLeavesOlderComparisonOwned"
+        "TestLPExactSparseBasisLeavesOlderComparisonOwned",
+        "TestLPFloatSparseIndependentMutationOracle",
+        "TestLPFloatSparseIndependentPivotOracle",
+        "TestLPFloatSparseLiteralEliminationAndDivision",
+        "TestLPFloatSparseMutationBoundsAndPrefixes"
       ]
     },
     {
@@ -1105,7 +1110,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/sparse_matrix_float.go",
-        "pkg/util/lp/sparse_matrix_exact.go"
+        "pkg/util/lp/sparse_matrix_exact.go",
+        "pkg/util/lp/sparse_matrix_float_elimination.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1114,7 +1120,11 @@
         "TestLPExactSparseBasisIndependentOracle",
         "TestLPExactSparseBasisAllocationFailureCensus",
         "TestLPExactSparseBasisBoundsAndBorrowedOwner",
-        "TestLPExactSparseBasisLeavesOlderComparisonOwned"
+        "TestLPExactSparseBasisLeavesOlderComparisonOwned",
+        "TestLPFloatSparseIndependentMutationOracle",
+        "TestLPFloatSparseIndependentPivotOracle",
+        "TestLPFloatSparseLiteralEliminationAndDivision",
+        "TestLPFloatSparseMutationBoundsAndPrefixes"
       ]
     },
     {
@@ -1122,7 +1132,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/sparse_matrix_float.go",
-        "pkg/util/lp/sparse_matrix_exact.go"
+        "pkg/util/lp/sparse_matrix_exact.go",
+        "pkg/util/lp/sparse_matrix_float_elimination.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1131,7 +1142,11 @@
         "TestLPExactSparseBasisIndependentOracle",
         "TestLPExactSparseBasisAllocationFailureCensus",
         "TestLPExactSparseBasisBoundsAndBorrowedOwner",
-        "TestLPExactSparseBasisLeavesOlderComparisonOwned"
+        "TestLPExactSparseBasisLeavesOlderComparisonOwned",
+        "TestLPFloatSparseIndependentMutationOracle",
+        "TestLPFloatSparseIndependentPivotOracle",
+        "TestLPFloatSparseLiteralEliminationAndDivision",
+        "TestLPFloatSparseMutationBoundsAndPrefixes"
       ]
     },
     {
@@ -1139,7 +1154,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/sparse_matrix_float.go",
-        "pkg/util/lp/sparse_matrix_exact.go"
+        "pkg/util/lp/sparse_matrix_exact.go",
+        "pkg/util/lp/sparse_matrix_float_elimination.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1148,7 +1164,11 @@
         "TestLPExactSparseBasisIndependentOracle",
         "TestLPExactSparseBasisAllocationFailureCensus",
         "TestLPExactSparseBasisBoundsAndBorrowedOwner",
-        "TestLPExactSparseBasisLeavesOlderComparisonOwned"
+        "TestLPExactSparseBasisLeavesOlderComparisonOwned",
+        "TestLPFloatSparseIndependentMutationOracle",
+        "TestLPFloatSparseIndependentPivotOracle",
+        "TestLPFloatSparseLiteralEliminationAndDivision",
+        "TestLPFloatSparseMutationBoundsAndPrefixes"
       ]
     },
     {

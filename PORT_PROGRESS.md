@@ -35591,3 +35591,38 @@ The last full debug/checked percentage predates sparse storage and is explicitly
 identified as such; no focused coverage is presented as whole-source coverage.
 LP vet, source ledger,64-package graph regeneration and diff checks pass. No graph
 edges changed, and no redundant full native module suite was run.
+
+## Floating sparse elimination and literal mutation prefixes
+
+Implemented floating physical add/remove, reciprocal link repair, maximum-first
+row ordering, pivot-column removal/workspace scan, row elimination and logical-row
+division. Add publishes row then column; remove copies column tail before row tail,
+repairs each backlink after assignment, then pops column/row and decrements active
+count. Maximum ordering repairs both column offsets before swapping row entries.
+Pivoting removes the target pivot column, updates existing terms through the
+source work vector, appends new terms in pivot-row order, insertion-sorts cancellation
+offsets, clears original workspace entries and removes cancellations descending.
+
+Retained strict float tolerances and IEEE values. Division borrows its live divisor,
+including valid row-value aliases, and writes small results as retained positive-zero
+entries. Maximum uses strict absolute comparison: ties keep the first entry and a
+NaN head stays at the head. Self-pivot asserts before mutation in debug but runs
+the source release continuation. Duplicate new pivot terms remain separate entries;
+duplicate existing cancellation offsets are not deduplicated. An independent fixture
+pins the actual first-removal prefix before the repeated invalid offset reaches a
+Go bounds guard. Malformed backlink tests also preserve completed tail assignment,
+maximum repair and numeric division/update prefixes without repairing metadata.
+
+Added6,000 independent map mutation steps and800 dense elimination worlds with
+row/column permutations, exact dyadic fill/cancellation arithmetic, empty-result
+status and both-direction value/backlink checks. Literal fixtures cover strict
+thresholds, live divisor, zero/infinite division profiles, NaN/infinity ordering,
+zero tolerance, reverse cancellation sorting and duplicate entries. Focused native
+floating suite passes0.102s; combined debug/checked floating and exact sparse suites
+pass5.073s. New file coverage151/160 (94.4%) native and153/160 (95.6%) debug/checked.
+Remaining statements propagate bounds errors from malformed permutation metadata,
+an invariant-protected workspace cleanup index, or the opposite assertion profile.
+LP vet passes. No shared existing implementation was modified; no redundant full
+LP/module suite was run after the preceding successful full native LP checkpoint.
+Source counts remain42 partial/68 unported; exact sparse mutation/elimination,
+pivot selection/shortening, triangular solves, LU and full solver work remain open.
