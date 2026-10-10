@@ -7,7 +7,8 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast/rewriter/bit_blaster"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -34,12 +35,12 @@ type SMTPreprocessorState struct {
 	DefaultsInitialized            bool
 }
 type SMTPreprocessorParams struct {
-	util.ModuleParamsOwner
+	uparams.ModuleParamsOwner
 	self                                 *SMTPreprocessorParams
 	pattern                              SMTPatternInferenceParams
 	bit                                  bit_blaster.SMTBitBlasterParams
 	state                                SMTPreprocessorState
-	empty                                util.ParamsRef
+	empty                                uparams.ParamsRef
 	header                               uint64
 	completedBases                       uint8
 	bitEnded, patternEnded               bool
@@ -47,9 +48,9 @@ type SMTPreprocessorParams struct {
 	constructorCause                     error
 }
 
-func NewSMTPreprocessorParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) (*SMTPreprocessorParams, error) {
+func NewSMTPreprocessorParams(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) (*SMTPreprocessorParams, error) {
 	if c == nil || g == nil || b == nil || g.CheckOwner(c, b) != nil {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if e := c.Check(p); e != nil {
 		return nil, e
@@ -67,11 +68,11 @@ func NewSMTPreprocessorParams(c *util.ParamsContext, p *util.ParamsRef, g *util.
 }
 
 // Same source constructor engine: an actual containing header charges embedded fields once.
-func (s *SMTPreprocessorParams) constructSource(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) error {
+func (s *SMTPreprocessorParams) constructSource(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) error {
 	if s == nil || s.self != nil {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
-	*s = SMTPreprocessorParams{ModuleParamsOwner: util.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header, empty: c.EmptyValue()}
+	*s = SMTPreprocessorParams{ModuleParamsOwner: uparams.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header, empty: c.EmptyValue()}
 	s.self = s
 	s.ModuleParamsOwner.Self = &s.ModuleParamsOwner
 	s.activeCall = true
@@ -111,10 +112,10 @@ func (s *SMTPreprocessorParams) sourceUnwindBases() {
 }
 func (s *SMTPreprocessorParams) open() error {
 	if s == nil || s.self != s || s.closed {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.Running || s.activeCall {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return nil
 }
@@ -136,31 +137,31 @@ func (s *SMTPreprocessorParams) BitBlasterState() (bit_blaster.SMTBitBlasterPara
 	}
 	return s.bit, s.completedBases&2 != 0, nil
 }
-func (s *SMTPreprocessorParams) UpdateLocal(p *util.ParamsRef) error {
+func (s *SMTPreprocessorParams) UpdateLocal(p *uparams.ParamsRef) error {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	// Exact retained lexical owners bar a new mutation; read-only State remains diagnostic.
 	if s.Helpers != nil || s.DestructorCause != nil || s.pattern.Helpers != nil || s.pattern.DestructorCause != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.activeCall = true
 	defer func() { s.activeCall = false }()
 	return s.updateLocal(p)
 }
-func (s *SMTPreprocessorParams) Update(p *util.ParamsRef) error {
+func (s *SMTPreprocessorParams) Update(p *uparams.ParamsRef) error {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	// Exact retained lexical owners bar a new mutation; read-only State remains diagnostic.
 	if s.Helpers != nil || s.DestructorCause != nil || s.pattern.Helpers != nil || s.pattern.DestructorCause != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.activeCall = true
 	defer func() { s.activeCall = false }()
@@ -169,9 +170,9 @@ func (s *SMTPreprocessorParams) Update(p *util.ParamsRef) error {
 	}
 	return s.updateLocal(p)
 }
-func (s *SMTPreprocessorParams) updateLocal(local *util.ParamsRef) (result error) {
+func (s *SMTPreprocessorParams) updateLocal(local *uparams.ParamsRef) (result error) {
 	if !s.activeCall || s.Helpers != nil || s.DestructorCause != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.Running = true
 	defer func() { s.Running = false }()
@@ -211,13 +212,13 @@ func (s *SMTPreprocessorParams) updateLocal(local *util.ParamsRef) (result error
 }
 func (s *SMTPreprocessorParams) Close() error {
 	if s == nil || s.self != s {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.closed {
 		return nil
 	}
 	if s.Running || s.activeCall {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	// Finish only exact retained lexical leaves before any older base lifetime.
 	if e := s.CloseHelpers(); e != nil {
@@ -249,7 +250,7 @@ func (s *SMTPreprocessorParams) Display(out *utext.NumericTextStream) error {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.activeCall = true
 	defer func() { s.activeCall = false }()

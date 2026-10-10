@@ -1,11 +1,41 @@
 # Breaking `util` into focused Go packages
 
-This document analyzes the direct C++ sources in [`src/util`](../../src/util) and
-the corresponding Go port in this directory. It is a guide for later package
-moves; it does not propose moving files mechanically or preserving C++ utility
-code that has no production consumer.
+This document records the original analysis of direct C++ sources in
+[`src/util`](../../src/util) and the corresponding Go port. The package split
+described below was completed on October 10, 2026. The original source graph
+and survey counts remain as historical context.
 
-## Conclusion
+## Completed Go package boundaries
+
+There are no Go files directly in `pkg/util` and no Go consumers import the
+old root package. Its implementation and tests now live in 36 utility packages.
+All utility production imports stay within the Go standard library, external
+libraries, `arena`, and other utility packages; none imports a solver package.
+
+The final extractions are:
+
+| Package | Responsibility |
+| --- | --- |
+| `util/numeral` | Concrete integer, rational, binary and floating-point managers, ownership and invocation state |
+| `util/params` | Parameter values, descriptors, catalog and global service |
+| `util/diagnostic` | Assertions, debugger actions, standard streams, fatal policy and allocator diagnostics |
+| `util/text` | Go-managed text, numeric streams and shared borrowed C-string boundaries |
+| `util/memory` | Runtime accounting, allocation, release and concrete storage borrows |
+| `util/hash` and `util/hash/runtime` | Pure project hashing and concrete runtime-backed reads |
+| `util/sexpr` | S-expression values and their numeral/symbol ownership |
+| `util/smt2` | SMT2 symbol quoting predicates and formatting |
+
+Numerals depend on memory/text/hash; parameters depend on numerals, symbols,
+text and diagnostics. Diagnostics have no parameter dependency. Consumers use
+native slices/maps, `insdict.Dict` v0.10.1 where insertion order is observable,
+and Go text builders/buffers. No root forwarding package was retained.
+
+The full native module suite, checked and combined debug/checked compilation,
+focused debug suites, vet and manifest validation passed after the final move.
+This completes the package reorganization, not the outstanding C++ algorithm
+port. Source coverage and completion credit remain in `port_manifest.json`.
+
+## Original analysis
 
 Splitting `pkg/util` is feasible and worthwhile. The C++ include graph has a
 small, strongly connected infrastructure core and many feature units layered on

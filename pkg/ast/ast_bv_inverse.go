@@ -2,8 +2,8 @@
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/util"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 func (m *ASTManager) BitVectorMultiplicativeInverse(n *unumeral.OwnedRational, bits uint32, out *unumeral.OwnedRational) (bool, error) {
@@ -36,10 +36,10 @@ func (m *ASTManager) BitVectorMultiplicativeInverseWithInvocation(n *unumeral.Ow
 	defer func() { m.formatExecuting = previous }()
 	return m.bitVectorMultiplicativeInverseCaptured(n, bits, out, nil, &c.receipt)
 }
-func (m *ASTManager) bitVectorMultiplicativeInverse(n *unumeral.OwnedRational, bits uint32, out *unumeral.OwnedRational, g *util.GlobalParamsService) (bool, error) {
+func (m *ASTManager) bitVectorMultiplicativeInverse(n *unumeral.OwnedRational, bits uint32, out *unumeral.OwnedRational, g *uparams.GlobalParamsService) (bool, error) {
 	return m.bitVectorMultiplicativeInverseCaptured(n, bits, out, g, nil)
 }
-func (m *ASTManager) bitVectorMultiplicativeInverseCaptured(n *unumeral.OwnedRational, bits uint32, out *unumeral.OwnedRational, g *util.GlobalParamsService, captured *astBVNormalizationReceipt) (yes bool, result error) {
+func (m *ASTManager) bitVectorMultiplicativeInverseCaptured(n *unumeral.OwnedRational, bits uint32, out *unumeral.OwnedRational, g *uparams.GlobalParamsService, captured *astBVNormalizationReceipt) (yes bool, result error) {
 	q := m.numerals
 	one, e := q.IsOne(n)
 	if e != nil {
@@ -156,7 +156,7 @@ func (m *ASTManager) bitVectorMultiplicativeInverseCaptured(n *unumeral.OwnedRat
 			return false, e
 		}
 		if !positive {
-			if e = util.NamespaceAssertionFailureOptional(g, "src/ast/bv_decl_plugin.cpp", 844, "x.is_pos()"); e != nil {
+			if e = uparams.NamespaceAssertionFailureOptional(g, "src/ast/bv_decl_plugin.cpp", 844, "x.is_pos()"); e != nil {
 				return false, e
 			}
 		}
@@ -189,7 +189,7 @@ func (m *ASTManager) bitVectorMultiplicativeInverseCaptured(n *unumeral.OwnedRat
 			}
 		}
 		if !valid {
-			if e = util.NamespaceAssertionFailureOptional(g, "src/ast/bv_decl_plugin.cpp", 845, "mod(x * n, rational::power_of_two(bv_size)).is_one()"); e != nil {
+			if e = uparams.NamespaceAssertionFailureOptional(g, "src/ast/bv_decl_plugin.cpp", 845, "mod(x * n, rational::power_of_two(bv_size)).is_one()"); e != nil {
 				return false, e
 			}
 		}

@@ -9,10 +9,11 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/messages"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 var ErrModelEvaluatorTheory = errors.New("g3: model evaluator theory reducer is not ported")
@@ -21,9 +22,9 @@ var ErrModelEvaluatorTheory = errors.New("g3: model evaluator theory reducer is 
 // is the original raw allocation accounting owner; typed runtime-wide allocator
 // wiring remains a separate port obligation.
 type ModelEvaluatorConfig struct {
-	Context     *util.ParamsContext
-	Globals     *util.GlobalParamsService
-	Params      *util.ParamsRef
+	Context     *uparams.ParamsContext
+	Globals     *uparams.GlobalParamsService
+	Params      *uparams.ParamsRef
 	Memory      *umemory.Runtime
 	Cooperation *cooperate.Cooperation
 }
@@ -48,7 +49,7 @@ type evaluatorConfiguration struct {
 	array                              *rewriter.ArrayRewriter
 	arrayFamily                        ast.FamilyID
 	substitution                       *rewriter.VarSubstitution
-	params                             util.ModuleParamsOwner
+	params                             uparams.ModuleParamsOwner
 	pending                            *FunctionInterpretation
 	maxMemory                          uint64
 	maxSteps                           uint32
@@ -57,13 +58,13 @@ type evaluatorConfiguration struct {
 
 func NewModelEvaluator(md *ModelCore, s ModelEvaluatorConfig) (*ModelEvaluator, error) {
 	if md == nil || s.Context == nil || s.Globals == nil || s.Memory == nil || s.Cooperation == nil {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if e := md.open(); e != nil {
 		return nil, e
 	}
 	if s.Context.SymbolsField != md.manager.Symbols || s.Globals.Context != s.Context {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if _, e := s.Memory.AllocationSize(); e != nil {
 		return nil, e
@@ -80,9 +81,9 @@ func NewModelEvaluator(md *ModelCore, s ModelEvaluatorConfig) (*ModelEvaluator, 
 	ev.services.Params = nil
 	return ev, ev.init(s.Params)
 }
-func (ev *ModelEvaluator) init(p *util.ParamsRef) error {
+func (ev *ModelEvaluator) init(p *uparams.ParamsRef) error {
 	ev.cfg = evaluatorConfiguration{owner: ev}
-	ev.cfg.params = util.ModuleParamsOwner{Budget: ev.services.Globals.Config.Budget}
+	ev.cfg.params = uparams.ModuleParamsOwner{Budget: ev.services.Globals.Config.Budget}
 	ev.cfg.params.Self = &ev.cfg.params
 	if e := ev.cfg.params.Bind(ev.services.Context, ev.services.Globals); e != nil {
 		return e
@@ -130,7 +131,7 @@ func (ev *ModelEvaluator) open() error {
 		return arena.ErrClosed
 	}
 	if !ev.ready || ev.cfg.pending != nil || ev.cfg.substitution != nil || ev.cfg.expansion.active || ev.cfg.equality.active {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return ev.model.open()
 }
@@ -143,13 +144,13 @@ func (ev *ModelEvaluator) Evaluate(t ast.ASTHandle, out ast.ASTRef) error {
 	}
 	return ev.cfg.expandValue(out)
 }
-func (ev *ModelEvaluator) UpdtParams(p *util.ParamsRef) error {
+func (ev *ModelEvaluator) UpdtParams(p *uparams.ParamsRef) error {
 	if e := ev.open(); e != nil {
 		return e
 	}
 	return ev.cfg.updateParams(p)
 }
-func (ev *ModelEvaluator) Reset(p *util.ParamsRef) error {
+func (ev *ModelEvaluator) Reset(p *uparams.ParamsRef) error {
 	if e := ev.open(); e != nil {
 		return e
 	}
@@ -221,7 +222,7 @@ func (ev *ModelEvaluator) closeImp() error {
 	}
 	return nil
 }
-func (ev *ModelEvaluator) Cleanup(p *util.ParamsRef) error {
+func (ev *ModelEvaluator) Cleanup(p *uparams.ParamsRef) error {
 	if e := ev.open(); e != nil {
 		return e
 	}
@@ -245,10 +246,10 @@ func (ev *ModelEvaluator) Close() error {
 	ev.closed = true
 	return nil
 }
-func (c *evaluatorConfiguration) updateParams(local *util.ParamsRef) (err error) {
+func (c *evaluatorConfiguration) updateParams(local *uparams.ParamsRef) (err error) {
 	o := &c.params
 	if o.Running || o.DestructorCause != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if local == nil {
 		empty, e := o.Context.NewValue()

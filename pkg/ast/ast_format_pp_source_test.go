@@ -7,7 +7,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -55,7 +56,7 @@ func TestASTFormatPrettyPrinterLiteralWidthIndentAndSingleLine(t *testing.T) {
 	}
 }
 
-func astFormatPrettyNamedCold(t *testing.T, m *ASTManager, g *util.GlobalParamsService, b *arena.Budget, out *utext.NumericTextStream) {
+func astFormatPrettyNamedCold(t *testing.T, m *ASTManager, g *uparams.GlobalParamsService, b *arena.Budget, out *utext.NumericTextStream) {
 	t.Helper()
 	total := m.Stats().AllocatedBytes + g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {

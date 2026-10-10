@@ -9,9 +9,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 	"github.com/glycerine/g3/pkg/util/z3exception"
@@ -142,11 +143,11 @@ func TestASTSMT2BitVectorLiteralEveryReachedReservation(t *testing.T) {
 			for ordinal := int64(0); ordinal < 128; ordinal++ {
 				c, sy, _ := paramsTestOwner(t)
 				b := c.BudgetField
-				catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+				catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 				paramsMust(t, e)
 				cfg := gparamsTestConfig(b)
 				cfg.Catalog = catalog
-				g, e := util.NewGlobalParamsService(sy, c, cfg)
+				g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 				paramsMust(t, e)
 				paramsMust(t, g.InitializeSource())
 				local, e := c.NewValue()
@@ -270,13 +271,13 @@ func TestASTSMT2BitVectorFalseNumeralActualActionAndErasure(t *testing.T) {
 			paramsMust(t, e)
 			q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 			paramsMust(t, e)
-			c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: b, Text: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+			c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: b, Text: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 			paramsMust(t, e)
-			catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+			catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 			paramsMust(t, e)
 			cfg := gparamsTestConfig(b)
 			cfg.Catalog = catalog
-			g, e := util.NewGlobalParamsService(sy, c, cfg)
+			g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 			paramsMust(t, e)
 			paramsMust(t, g.BindNamespaceAssertions(d))
 			m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})

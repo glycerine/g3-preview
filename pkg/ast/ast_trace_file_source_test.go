@@ -9,7 +9,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -35,7 +36,7 @@ func TestASTTraceFileActualOpenTruncateFormattingAndOwningClose(t *testing.T) {
 	if e := os.WriteFile(name, []byte("old contents"), 0600); e != nil {
 		t.Fatal(e)
 	}
-	f, e := newASTTraceFile(b, util.LiteralParamsStringView(name))
+	f, e := newASTTraceFile(b, uparams.LiteralParamsStringView(name))
 	paramsMust(t, e)
 	if f == nil || f.stream.Buffer != nil || f.stream.File == nil || f.stream.OwnerBytes != 0 || b.Used() != uint64(reflect.TypeOf(f).Elem().Size()) {
 		t.Fatal("one real header, embedded borrowed formatter, actual owned fd")
@@ -62,7 +63,7 @@ func TestASTTraceFileActualOpenTruncateFormattingAndOwningClose(t *testing.T) {
 func TestASTTraceFileFailedOpenIsNonNullBadStreamWithoutHiddenMemoryOutput(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
 	name := astTracePath(t) + "/missing"
-	f, e := newASTTraceFile(b, util.LiteralParamsStringView(name))
+	f, e := newASTTraceFile(b, uparams.LiteralParamsStringView(name))
 	paramsMust(t, e)
 	if f == nil || f.stream.File != nil || f.stream.Buffer != nil {
 		t.Fatal("source fstream remains nonnull after actual failed open")
@@ -94,7 +95,7 @@ func TestASTTraceFileEveryConstructorReservationAndSourcePointerGuard(t *testing
 		b := arena.NewBudget(1 << 20)
 		name := astTracePath(t)
 		b.FailAfter(ordinal)
-		f, e := newASTTraceFile(b, util.LiteralParamsStringView(name))
+		f, e := newASTTraceFile(b, uparams.LiteralParamsStringView(name))
 		if ordinal == 0 {
 			if f != nil || !errors.Is(e, arena.ErrInjectedFailure) || b.Used() != 0 {
 				t.Fatal("actual wrapper new-expression first refusal", f, e)
@@ -112,7 +113,7 @@ func TestASTTraceFileEveryConstructorReservationAndSourcePointerGuard(t *testing
 		}
 	}
 	b := arena.NewBudget(1 << 20)
-	f, e := newASTTraceFile(b, util.ParamsStringView{})
+	f, e := newASTTraceFile(b, uparams.ParamsStringView{})
 	if !errors.Is(e, utext.ErrNullCString) || f == nil || b.Used() != f.header {
 		t.Fatal("reached null-pointer Go guard retains actual acquired wrapper", e)
 	}
@@ -124,16 +125,16 @@ func TestASTTraceFileEveryConstructorReservationAndSourcePointerGuard(t *testing
 
 func TestASTTraceFileFailbitSentryPreservesWidthButCStringStillReadsLength(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	f, e := newASTTraceFile(b, util.LiteralParamsStringView(astTracePath(t)+"/missing"))
+	f, e := newASTTraceFile(b, uparams.LiteralParamsStringView(astTracePath(t)+"/missing"))
 	paramsMust(t, e)
 	defer func() { paramsMust(t, f.Close()) }()
 	paramsMust(t, f.stream.SetWidth(17))
 	before := f.stream.State()
-	paramsMust(t, (util.LiteralParamsStringView("payload")).AppendTo(&f.stream))
+	paramsMust(t, (uparams.LiteralParamsStringView("payload")).AppendTo(&f.stream))
 	if f.stream.State() != before {
 		t.Fatal("failed-open sentry must erase padding/output and preserve width")
 	}
-	if e = (util.ParamsStringView{Mode: 2, PresentField: true}).AppendTo(&f.stream); !errors.Is(e, util.ErrParamsOwner) {
+	if e = (uparams.ParamsStringView{Mode: 2, PresentField: true}).AppendTo(&f.stream); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("actual CString length read precedes failed sentry", e)
 	}
 	if b.Used() != f.header || f.stream.Stats().Position != 0 {
@@ -143,7 +144,7 @@ func TestASTTraceFileFailbitSentryPreservesWidthButCStringStillReadsLength(t *te
 
 func TestASTTraceFileFailedSentryOwnedStringKeepsWidthAndReachedLifetime(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	f, e := newASTTraceFile(b, util.LiteralParamsStringView(astTracePath(t)+"/missing"))
+	f, e := newASTTraceFile(b, uparams.LiteralParamsStringView(astTracePath(t)+"/missing"))
 	paramsMust(t, e)
 	var value utext.OwnedString
 	paramsMust(t, value.Construct(b, "trace"))
@@ -166,7 +167,7 @@ func TestASTSourceTraceConstructorNestedFormatWritesSameActualFileBeforeParent(t
 	sy, q, _ := astTestOwners(t)
 	b := arena.NewBudget(1 << 30)
 	name := astTracePath(t)
-	filename := util.LiteralParamsStringView(name)
+	filename := uparams.LiteralParamsStringView(name)
 	m, e := NewSourceASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b}, &filename)
 	paramsMust(t, e)
 	defer m.Close()

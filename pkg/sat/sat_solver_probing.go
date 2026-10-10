@@ -7,7 +7,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
@@ -49,7 +50,7 @@ func newSATColdProbing(l *satSolverClauseLifecycle, b *arena.Budget) (*satSolver
 	s.cacheWork.Bind(l.propagation.memory)
 	return s, nil
 }
-func (s *satSolverProbing) initializeSource(c *util.ParamsContext, v *util.ParamsRef) error {
+func (s *satSolverProbing) initializeSource(c *uparams.ParamsContext, v *uparams.ParamsRef) error {
 	if e := s.constructionBorrow(); e != nil {
 		return e
 	}
@@ -65,7 +66,7 @@ func (s *satSolverProbing) initializeSource(c *util.ParamsContext, v *util.Param
 	s.constructed = true
 	return nil
 }
-func newSATSolverProbing(l *satSolverClauseLifecycle, c *util.ParamsContext, v *util.ParamsRef, b *arena.Budget) (*satSolverProbing, error) {
+func newSATSolverProbing(l *satSolverClauseLifecycle, c *uparams.ParamsContext, v *uparams.ParamsRef, b *arena.Budget) (*satSolverProbing, error) {
 	s, e := newSATColdProbing(l, b)
 	if e != nil {
 		return nil, e
@@ -97,7 +98,7 @@ func (s *satSolverProbing) open() error {
 	}
 	return nil
 }
-func (s *satSolverProbing) updateParams(c *util.ParamsContext, p *util.ParamsRef) error {
+func (s *satSolverProbing) updateParams(c *uparams.ParamsContext, p *uparams.ParamsRef) error {
 	if e := s.constructionBorrow(); e != nil {
 		return e
 	}
@@ -141,7 +142,7 @@ func (s *satSolverProbing) collectStatistics(st *statistics.Statistics, key stat
 }
 
 // Source collect_param_descrs has an empty TODO body.
-func satProbingCollectParamDescriptions(d *util.ParamDescrs) {}
+func satProbingCollectParamDescriptions(d *uparams.ParamDescrs) {}
 func (s *satSolverProbing) dec(n uint32) error {
 	if e := s.open(); e != nil {
 		return e

@@ -4,7 +4,7 @@ package rewriter
 
 import (
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // BoolRewriter is the original configured Boolean reducer. Traversal invokes its
@@ -13,7 +13,7 @@ type BoolRewriter = boolRewriter
 
 // NewBoolRewriter borrows the AST and parameter services. A nonnil partial owner
 // returned with an error must be closed.
-func NewBoolRewriter(m *ast.ASTManager, c *util.ParamsContext, g *util.GlobalParamsService, p *util.ParamsRef) (*BoolRewriter, error) {
+func NewBoolRewriter(m *ast.ASTManager, c *uparams.ParamsContext, g *uparams.GlobalParamsService, p *uparams.ParamsRef) (*BoolRewriter, error) {
 	return newBoolRewriter(m, c, g, p)
 }
 func (rw *boolRewriter) Flat() (bool, error) {

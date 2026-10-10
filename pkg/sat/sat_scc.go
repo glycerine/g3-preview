@@ -6,7 +6,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
@@ -30,7 +31,7 @@ type satSCC struct {
 	enabled, active, closing, closed, debugInvariant bool
 }
 
-func newSATSCC(l *satSolverClauseLifecycle, p *util.ParamsRef) (*satSCC, error) {
+func newSATSCC(l *satSolverClauseLifecycle, p *uparams.ParamsRef) (*satSCC, error) {
 	if e := l.constructionBorrow(); e != nil {
 		return nil, e
 	}
@@ -66,7 +67,7 @@ func (c *satSCC) open() error {
 	}
 	return c.lifecycle.open()
 }
-func (c *satSCC) Update(local *util.ParamsRef) (err error) {
+func (c *satSCC) Update(local *uparams.ParamsRef) (err error) {
 	if e := c.constructionBorrow(); e != nil {
 		return e
 	}
@@ -402,6 +403,6 @@ func (c *satSCC) component(li uint32) error {
 	return nil
 }
 
-func collectSCCParamDescrs(d *util.ParamDescrs) error {
-	return satConfigInsertDescriptor(d, "scc", util.ParamBool, "eliminate Boolean variables by computing strongly connected components", "true")
+func collectSCCParamDescrs(d *uparams.ParamDescrs) error {
+	return satConfigInsertDescriptor(d, "scc", uparams.ParamBool, "eliminate Boolean variables by computing strongly connected components", "true")
 }

@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
-func smtCopyGraph(t *testing.T, g *util.GlobalParamsService, b *arena.Budget, owners ...*SMTParams) {
+func smtCopyGraph(t *testing.T, g *uparams.GlobalParamsService, b *arena.Budget, owners ...*SMTParams) {
 	t.Helper()
 	n := g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
@@ -31,7 +31,7 @@ func smtCopyGraph(t *testing.T, g *util.GlobalParamsService, b *arena.Budget, ow
 			t.Fatal("exact copy owner")
 		}
 		n += s.header + uint64(s.qi.cost.StorageBytes()+s.qi.newGen.StorageBytes())
-		for _, m := range []*util.ModuleParamsOwner{&s.ModuleParamsOwner, &s.preprocess.ModuleParamsOwner, &s.preprocess.pattern.ModuleParamsOwner, &s.dyn.ModuleParamsOwner, &s.qi.ModuleParamsOwner, &s.arith.ModuleParamsOwner, &s.array.ModuleParamsOwner, &s.bv.ModuleParamsOwner, &s.str.ModuleParamsOwner, &s.pb.ModuleParamsOwner} {
+		for _, m := range []*uparams.ModuleParamsOwner{&s.ModuleParamsOwner, &s.preprocess.ModuleParamsOwner, &s.preprocess.pattern.ModuleParamsOwner, &s.dyn.ModuleParamsOwner, &s.qi.ModuleParamsOwner, &s.arith.ModuleParamsOwner, &s.array.ModuleParamsOwner, &s.bv.ModuleParamsOwner, &s.str.ModuleParamsOwner, &s.pb.ModuleParamsOwner} {
 			for f := m.Helpers; f != nil; f = f.Next {
 				if f.Owner != m || f.Self != f || f.Invocation == 0 {
 					t.Fatal("named exact helper")
@@ -47,7 +47,7 @@ func smtCopyGraph(t *testing.T, g *util.GlobalParamsService, b *arena.Budget, ow
 		t.Fatal("exact live cold graph before faultlift", n, b.Used())
 	}
 }
-func smtCopyLongSource(t *testing.T, c *util.ParamsContext, p *util.ParamsRef, s *SMTParams) {
+func smtCopyLongSource(t *testing.T, c *uparams.ParamsContext, p *uparams.ParamsRef, s *SMTParams) {
 	t.Helper()
 	paramsMust(t, c.SetStringName(p, dynAckName("qi.cost"), dynAckName(strings.Repeat("c", 43))))
 	paramsMust(t, c.SetStringName(p, dynAckName("mbqi.id"), dynAckName("borrowed-id")))
@@ -186,13 +186,13 @@ func TestSMTParamsCopyGuardsAndActualSelfAssignmentLeaveProviderAndAllocationsUn
 	paramsMust(t, s.Assign(s))
 	smtCopyGraph(t, g, b, s)
 	shallow := *s
-	if _, e = shallow.Clone(); !errors.Is(e, util.ErrParamsOwner) {
+	if _, e = shallow.Clone(); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("accidental Go copy cannot acquire or release", e)
 	}
-	if e = shallow.Assign(s); !errors.Is(e, util.ErrParamsOwner) {
+	if e = shallow.Assign(s); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal(e)
 	}
-	if e = s.Assign(&shallow); !errors.Is(e, util.ErrParamsOwner) {
+	if e = s.Assign(&shallow); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal(e)
 	}
 	smtCopyGraph(t, g, b, s)
@@ -201,7 +201,7 @@ func TestSMTParamsCopyGuardsAndActualSelfAssignmentLeaveProviderAndAllocationsUn
 	other, e := NewSMTParams(g2.Context, p2, g2, b2)
 	paramsMust(t, e)
 	before := s.state
-	if e = s.Assign(other); !errors.Is(e, util.ErrParamsOwner) {
+	if e = s.Assign(other); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("foreign global source namespace", e)
 	}
 	if s.state != before {
@@ -211,7 +211,7 @@ func TestSMTParamsCopyGuardsAndActualSelfAssignmentLeaveProviderAndAllocationsUn
 	smtCopyGraph(t, g2, b2, other)
 	paramsMust(t, other.Close())
 	paramsMust(t, s.SourceFinalize())
-	if _, e = s.Clone(); !errors.Is(e, util.ErrParamsOwner) {
+	if _, e = s.Clone(); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("ended source lifetime", e)
 	}
 	paramsMust(t, s.Close())

@@ -5,7 +5,8 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"testing"
 )
 
@@ -165,7 +166,7 @@ func TestArrayRewriterOriginalStoreEqualityBufferRefusals(t *testing.T) {
 
 func TestArrayRewriterOriginalParameterDescriptionWrapper(t *testing.T) {
 	m, _, _, _ := boolRewriterConfigFixture(t)
-	d, e := util.NewParamDescrs(m.Symbols, util.ParamDescrsConfig{Budget: m.Budget()})
+	d, e := uparams.NewParamDescrs(m.Symbols, uparams.ParamDescrsConfig{Budget: m.Budget()})
 	satOK(t, e)
 	defer func() { satOK(t, d.Close()) }()
 	var receiver *ArrayRewriter // Source get_param_descrs is static.
@@ -180,7 +181,7 @@ func TestArrayRewriterOriginalParameterDescriptionWrapper(t *testing.T) {
 		satOK(t, e)
 		kind, e := d.Kind(s)
 		satOK(t, e)
-		if kind != util.ParamBool {
+		if kind != uparams.ParamBool {
 			t.Fatal("array parameter kind", name, kind)
 		}
 		def, present, e := d.Default(s)

@@ -6,7 +6,8 @@ package rewriter
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"reflect"
 )
 
@@ -16,7 +17,7 @@ type ArrayRewriter struct {
 	equality                                                     arrayStoreEquality
 	self                                                         *ArrayRewriter
 	manager                                                      *ast.ASTManager
-	params                                                       util.ModuleParamsOwner
+	params                                                       uparams.ModuleParamsOwner
 	family                                                       ast.FamilyID
 	header                                                       uint64
 	ready, closed                                                bool
@@ -24,9 +25,9 @@ type ArrayRewriter struct {
 }
 
 // A nonnil partial constructor result must be closed after an error.
-func NewArrayRewriter(m *ast.ASTManager, c *util.ParamsContext, g *util.GlobalParamsService, p *util.ParamsRef) (*ArrayRewriter, error) {
+func NewArrayRewriter(m *ast.ASTManager, c *uparams.ParamsContext, g *uparams.GlobalParamsService, p *uparams.ParamsRef) (*ArrayRewriter, error) {
 	if m == nil || c == nil || g == nil || c.SymbolsField != m.Symbols || g.Context != c {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if _, e := m.ProofsEnabled(); e != nil {
 		return nil, e
@@ -42,7 +43,7 @@ func NewArrayRewriter(m *ast.ASTManager, c *util.ParamsContext, g *util.GlobalPa
 		return rw, e
 	}
 	rw.family = fid
-	rw.params = util.ModuleParamsOwner{Budget: g.Config.Budget}
+	rw.params = uparams.ModuleParamsOwner{Budget: g.Config.Budget}
 	rw.params.Self = &rw.params
 	if e = rw.params.Bind(c, g); e != nil {
 		return rw, e
@@ -53,10 +54,10 @@ func NewArrayRewriter(m *ast.ASTManager, c *util.ParamsContext, g *util.GlobalPa
 }
 func (rw *ArrayRewriter) open() error {
 	if rw == nil || rw.self != rw || rw.closed {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if !rw.ready {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if rw.equality.active {
 		return ast.ErrASTPending
@@ -66,7 +67,7 @@ func (rw *ArrayRewriter) open() error {
 }
 func (rw *ArrayRewriter) Close() error {
 	if rw == nil || rw.self != rw {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if rw.closed {
 		return nil
@@ -84,16 +85,16 @@ func (rw *ArrayRewriter) Close() error {
 	rw.closed = true
 	return nil
 }
-func (rw *ArrayRewriter) UpdtParams(p *util.ParamsRef) error {
+func (rw *ArrayRewriter) UpdtParams(p *uparams.ParamsRef) error {
 	if e := rw.open(); e != nil {
 		return e
 	}
 	return rw.updateParams(p)
 }
-func (rw *ArrayRewriter) updateParams(local *util.ParamsRef) (err error) {
+func (rw *ArrayRewriter) updateParams(local *uparams.ParamsRef) (err error) {
 	o := &rw.params
 	if o.Self != o || o.Running || o.DestructorCause != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if local == nil {
 		empty, e := o.Context.NewValue()

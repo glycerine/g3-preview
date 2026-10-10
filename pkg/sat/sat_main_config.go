@@ -7,7 +7,8 @@ import (
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -96,8 +97,8 @@ type satMainConfigState struct {
 // confined by the caller; Budget is also owner-confined. Never copy this header.
 type satMainConfig struct {
 	self       *satMainConfig
-	globals    *util.GlobalParams
-	context    *util.ParamsContext
+	globals    *uparams.GlobalParams
+	context    *uparams.ParamsContext
 	symbols    *usymbol.Manager
 	budget     *arena.Budget
 	state      satMainConfigState
@@ -106,7 +107,7 @@ type satMainConfig struct {
 	closed     bool
 }
 
-func newSATMainConfig(g *util.GlobalParams, p *util.ParamsRef, b *arena.Budget) (*satMainConfig, error) {
+func newSATMainConfig(g *uparams.GlobalParams, p *uparams.ParamsRef, b *arena.Budget) (*satMainConfig, error) {
 	if g == nil {
 		return nil, ErrSATMainConfigOwner
 	}

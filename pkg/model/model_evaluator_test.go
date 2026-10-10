@@ -7,18 +7,19 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/messages"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
-func evaluatorFixture(t *testing.T) (*ast.ASTManager, *model.Model, *model.ModelEvaluator, *util.ParamsContext, *util.ParamsRef, model.ModelEvaluatorConfig) {
+func evaluatorFixture(t *testing.T) (*ast.ASTManager, *model.Model, *model.ModelEvaluator, *uparams.ParamsContext, *uparams.ParamsRef, model.ModelEvaluatorConfig) {
 	c, sy, q := paramsTestOwner(t)
 	b := arena.NewBudget(^uint64(0))
-	catalog, e := util.NewGlobalParamsCatalog(sy, util.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
+	catalog, e := uparams.NewGlobalParamsCatalog(sy, uparams.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
 	astTestMust(t, e)
-	g, e := util.NewGlobalParamsService(sy, c, util.GlobalParamsConfig{Budget: b, Catalog: catalog, DescriptorPageSize: 2, DescriptorWordsPageSize: 16})
+	g, e := uparams.NewGlobalParamsService(sy, c, uparams.GlobalParamsConfig{Budget: b, Catalog: catalog, DescriptorPageSize: 2, DescriptorWordsPageSize: 16})
 	astTestMust(t, e)
 	astTestMust(t, g.InitializeSource())
 	p, e := c.NewValue()

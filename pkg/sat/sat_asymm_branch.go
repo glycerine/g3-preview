@@ -6,7 +6,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
@@ -31,7 +32,7 @@ type satAsymmBranch struct {
 	sortLeft, sortMid, sortRight, sortEnd, sortOut, sortN, sortDrainStage, sortDrainIndex uint32
 }
 
-func newSATAsymmBranch(l *satSolverClauseLifecycle, p *util.ParamsRef) (*satAsymmBranch, error) {
+func newSATAsymmBranch(l *satSolverClauseLifecycle, p *uparams.ParamsRef) (*satAsymmBranch, error) {
 	if e := l.constructionBorrow(); e != nil {
 		return nil, e
 	}
@@ -67,7 +68,7 @@ func (a *satAsymmBranch) open() error {
 	}
 	return a.lifecycle.open()
 }
-func (a *satAsymmBranch) Update(p *util.ParamsRef) (err error) {
+func (a *satAsymmBranch) Update(p *uparams.ParamsRef) (err error) {
 	if e := a.constructionBorrow(); e != nil {
 		return e
 	}
@@ -110,12 +111,12 @@ func (a *satAsymmBranch) collectStatistics(s *statistics.Statistics, k statistic
 	s.UpdateUint(k, a.elimLiterals)
 	return nil
 }
-func collectAsymmBranchParamDescrs(d *util.ParamDescrs) error {
+func collectAsymmBranchParamDescrs(d *uparams.ParamDescrs) error {
 	for _, x := range [3]struct {
 		name             string
-		kind             util.ParamKind
+		kind             uparams.ParamKind
 		description, def string
-	}{{"asymm_branch", util.ParamBool, "asymmetric branching", "true"}, {"asymm_branch.rounds", util.ParamUInt, "maximum number of rounds of asymmetric branching", "32"}, {"asymm_branch.limit", util.ParamUInt, "approx. maximum number of literals visited during asymmetric branching", "100000000"}} {
+	}{{"asymm_branch", uparams.ParamBool, "asymmetric branching", "true"}, {"asymm_branch.rounds", uparams.ParamUInt, "maximum number of rounds of asymmetric branching", "32"}, {"asymm_branch.limit", uparams.ParamUInt, "approx. maximum number of literals visited during asymmetric branching", "100000000"}} {
 		if e := satConfigInsertDescriptor(d, x.name, x.kind, x.description, x.def); e != nil {
 			return e
 		}

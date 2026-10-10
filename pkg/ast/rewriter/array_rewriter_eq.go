@@ -5,7 +5,7 @@ package rewriter
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // Concrete owning continuation for the lexical source buffers/references.
@@ -152,7 +152,7 @@ func (rw *ArrayRewriter) MkEqCore(lhs, rhs ast.ASTHandle, out ast.ASTRef) (statu
 }
 
 // Source static get_param_descrs forwards only the array module collector.
-func (rw *ArrayRewriter) GetParamDescrs(d *util.ParamDescrs) error {
+func (rw *ArrayRewriter) GetParamDescrs(d *uparams.ParamDescrs) error {
 	return catalogCollectArrayRewriterParams(d)
 }
 

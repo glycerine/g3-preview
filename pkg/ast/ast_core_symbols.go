@@ -5,7 +5,8 @@ import (
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -35,7 +36,7 @@ func (m *ASTManager) modelValueName(sortName usymbol.Symbol, index int32) (usymb
 		buffer = append(buffer, v)
 		return nil
 	}
-	view, e := util.SymbolCStringView(m.Symbols, sortName)
+	view, e := uparams.SymbolCStringView(m.Symbols, sortName)
 	if e == nil && (sortName.IsNumerical() || sortName.IsNull()) {
 		e = ErrASTDomain
 	}

@@ -13,7 +13,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // These observe the actual cold factory contract; they do not implement a
@@ -35,14 +35,14 @@ func (r *tacticManagerTestReference) DecRef() error {
 func (r *tacticManagerTestReference) Close() error { r.closed = true; return nil }
 
 type tacticManagerTestFactory struct {
-	params         *util.ParamsContext
+	params         *uparams.ParamsContext
 	events         *[]int
 	id             int
 	called, closed bool
 	mustOutlive    *tactic.Probe
 }
 
-func (f *tacticManagerTestFactory) Make(m *ast.ASTManager, p *util.ParamsRef) (tacticReference, error) {
+func (f *tacticManagerTestFactory) Make(m *ast.ASTManager, p *uparams.ParamsRef) (tacticReference, error) {
 	empty, e := f.params.Empty(p)
 	if e != nil {
 		return nil, e
@@ -65,7 +65,7 @@ func (f *tacticManagerTestFactory) Close() error {
 	return nil
 }
 
-func tacticRegistryFixture(t *testing.T) (*tacticManager, *util.ParamsContext, *ast.ASTManager) {
+func tacticRegistryFixture(t *testing.T) (*tacticManager, *uparams.ParamsContext, *ast.ASTManager) {
 	t.Helper()
 	c, sy, q := paramsTestOwner(t)
 	m, e := ast.NewASTManager(ast.ASTManagerConfig{Symbols: sy, Numerals: q, Budget: c.Budget()})

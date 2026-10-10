@@ -6,18 +6,19 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usexpr "github.com/glycerine/g3/pkg/util/sexpr"
 )
 
 // Every entry is supplied by its actual caller owner; storage directories do
 // not supply missing lexical roots.
 type paramsPhysicalValueOwner struct {
-	Context *util.ParamsContext
-	Value   *util.ParamsRef
+	Context *uparams.ParamsContext
+	Value   *uparams.ParamsRef
 }
 
 type paramsPhysicalRationalOwner struct {
@@ -123,10 +124,10 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 			}
 			addRat(testFieldBySourceName(value, "raw"))
 		}
-		paramsContexts := make(map[*util.ParamsContext]bool)
+		paramsContexts := make(map[*uparams.ParamsContext]bool)
 		for _, owner := range x.ParamsValues {
 			if owner.Context == nil || owner.Value == nil {
-				panic(util.ErrParamsOwner)
+				panic(uparams.ErrParamsOwner)
 			}
 			c, v := owner.Context, owner.Value
 			if !paramsContexts[c] {
@@ -135,8 +136,8 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 					if !frame.Active {
 						continue
 					}
-					if !frame.Acquired || frame.Invocation == 0 || i >= len(c.Blocks) || frame.Generation != c.Blocks[i].Generation || frame.Next.Kind != util.ParamNumeral {
-						panic(util.ErrParamsOwner)
+					if !frame.Acquired || frame.Invocation == 0 || i >= len(c.Blocks) || frame.Generation != c.Blocks[i].Generation || frame.Next.Kind != uparams.ParamNumeral {
+						panic(uparams.ErrParamsOwner)
 					}
 					raw := reflect.ValueOf(&frame.Next.Rat).Elem()
 					if testFieldBySourceName(raw, "ownerID").Uint() != testFieldBySourceName(reflect.ValueOf(c.NumeralsField).Elem(), "ownerID").Uint() {
@@ -149,38 +150,38 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 						continue
 					}
 					if frame.Invocation == 0 || frame.HeldSlot == 0 || int(frame.HeldSlot) > len(c.Blocks) {
-						panic(util.ErrParamsOwner)
+						panic(uparams.ErrParamsOwner)
 					}
 					held := &c.Blocks[frame.HeldSlot-1]
 					if !held.Live || held.Generation != frame.HeldGeneration {
-						panic(util.ErrParamsOwner)
+						panic(uparams.ErrParamsOwner)
 					}
 					for i := uint32(0); i < held.Size; i++ {
 						entry := c.Entry(held, i)
-						if entry.Kind == util.ParamNumeral {
+						if entry.Kind == uparams.ParamNumeral {
 							addRat(testFieldBySourceName(reflect.ValueOf(&entry.Rat).Elem(), "raw"))
 						}
 					}
 				}
 			}
 			if c.Self != c || c.Closed || v.Owner != c.Owner {
-				panic(util.ErrParamsOwner)
+				panic(uparams.ErrParamsOwner)
 			}
 			if v.Slot == 0 {
 				continue
 			}
 			if int(v.Slot) > len(c.Blocks) {
-				panic(util.ErrParamsOwner)
+				panic(uparams.ErrParamsOwner)
 			}
 			b := &c.Blocks[v.Slot-1]
 			if !b.Live || b.Generation != v.Generation {
-				panic(util.ErrParamsOwner)
+				panic(uparams.ErrParamsOwner)
 			}
 			// refs==0 is allowed only as a reached stopped destructor owner. The
 			// explicitly supplied owning value, not the count, names its actual block.
 			for i := uint32(0); i < b.Size; i++ {
 				e := c.Entry(b, i)
-				if e.Kind == util.ParamNumeral {
+				if e.Kind == uparams.ParamNumeral {
 					addRat(testFieldBySourceName(reflect.ValueOf(&e.Rat).Elem(), "raw"))
 				}
 			}

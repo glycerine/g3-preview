@@ -8,11 +8,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func satConfigFixture(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.GlobalParams, *arena.Budget, *util.ParamsRef, *satMainConfig) {
+func satConfigFixture(t *testing.T) (*uparams.ParamsContext, *usymbol.Manager, *uparams.GlobalParams, *arena.Budget, *uparams.ParamsRef, *satMainConfig) {
 	t.Helper()
 	c, sy, g, b := satMainConfigTestRuntime(t)
 	p, e := c.NewValue()
@@ -23,7 +24,7 @@ func satConfigFixture(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *uti
 	t.Cleanup(func() { paramsMust(t, m.Close()) })
 	return c, sy, g, b, &p, m
 }
-func satConfigSymbol(t *testing.T, c *util.ParamsContext, sy *usymbol.Manager, p *util.ParamsRef, key, value string) {
+func satConfigSymbol(t *testing.T, c *uparams.ParamsContext, sy *usymbol.Manager, p *uparams.ParamsRef, key, value string) {
 	t.Helper()
 	s, e := sy.Intern(value)
 	paramsMust(t, e)
@@ -280,7 +281,7 @@ func TestSATMainConfigOwnerAndLifetimeGuards(t *testing.T) {
 	t.Cleanup(func() { paramsMust(t, n.Close()) })
 	before, e := m.State()
 	paramsMust(t, e)
-	if e = m.Update(&p2); !errors.Is(e, util.ErrParamsOwner) {
+	if e = m.Update(&p2); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal(e)
 	}
 	if e = m.Assign(n); !errors.Is(e, ErrSATMainConfigOwner) {
@@ -468,7 +469,7 @@ func TestSATMainConfigCloneFaultAndSameSymbolsAssignment(t *testing.T) {
 	}
 	// A separate registry in the same borrowed symbol domain remains the
 	// receiver's registry after implicit source member assignment.
-	g2, e := util.NewGlobalParams(g.SymbolsField, c, util.GlobalParamsConfig{Budget: b})
+	g2, e := uparams.NewGlobalParams(g.SymbolsField, c, uparams.GlobalParamsConfig{Budget: b})
 	paramsMust(t, e)
 	t.Cleanup(func() { paramsMust(t, g2.Close()) })
 	n, e = newSATMainConfig(g2, p, b)

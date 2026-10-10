@@ -8,20 +8,20 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // BVPolynomialConfiguration owns generated parameter snapshots, not the full
 // polynomial rewriter's persistent expression map or current-sort storage.
 type BVPolynomialConfiguration struct {
 	self            *BVPolynomialConfiguration
-	context         *util.ParamsContext
-	globals         *util.GlobalParams
+	context         *uparams.ParamsContext
+	globals         *uparams.GlobalParams
 	state           BVPolynomialConfigurationState
 	bitVector       BVRewriterConfigurationState
-	snapshots       [4]util.ParamsRef // poly, arith, optional outer default params_ref, BV
+	snapshots       [4]uparams.ParamsRef // poly, arith, optional outer default params_ref, BV
 	placed          [4]bool
-	decrements      [4]util.ParamsDecrementReceipt
+	decrements      [4]uparams.ParamsDecrementReceipt
 	header          uint64
 	passes          uint64
 	stopped, closed bool
@@ -35,11 +35,11 @@ type BVPolynomialConfigurationState struct {
 
 // On a reached failure the returned owner retains the actual placed prefix for
 // Close. A caller-supplied local params_ref is borrowed only during each update.
-func NewBVPolynomialConfiguration(c *util.ParamsContext, g *util.GlobalParams, local *util.ParamsRef) (*BVPolynomialConfiguration, error) {
+func NewBVPolynomialConfiguration(c *uparams.ParamsContext, g *uparams.GlobalParams, local *uparams.ParamsRef) (*BVPolynomialConfiguration, error) {
 	if c == nil || g == nil || g.ContextField != c {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
-	var defaultLocal util.ParamsRef
+	var defaultLocal uparams.ParamsRef
 	if local != nil {
 		if e := c.Check(local); e != nil {
 			return nil, e
@@ -78,7 +78,7 @@ func NewBVPolynomialConfiguration(c *util.ParamsContext, g *util.GlobalParams, l
 }
 func (p *BVPolynomialConfiguration) open() error {
 	if p == nil || p.self != p || p.closed {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if p.stopped {
 		return p.cause
@@ -104,18 +104,18 @@ func (p *BVPolynomialConfiguration) end(i int) error {
 	}
 	if e == nil {
 		p.placed[i] = false
-		p.decrements[i] = util.ParamsDecrementReceipt{}
+		p.decrements[i] = uparams.ParamsDecrementReceipt{}
 	}
 	return e
 }
-func (p *BVPolynomialConfiguration) boolean(local *util.ParamsRef, key string, def bool, dst *bool) error {
+func (p *BVPolynomialConfiguration) boolean(local *uparams.ParamsRef, key string, def bool, dst *bool) error {
 	v, e := p.context.GetBoolFallbackName(local, &key, &p.snapshots[0], def)
 	if e == nil {
 		*dst = v
 	}
 	return e
 }
-func (p *BVPolynomialConfiguration) Update(local *util.ParamsRef) (err error) {
+func (p *BVPolynomialConfiguration) Update(local *uparams.ParamsRef) (err error) {
 	if e := p.open(); e != nil {
 		return e
 	}
@@ -205,12 +205,12 @@ func (p *BVPolynomialConfiguration) MultiplicationOptions() (bool, BVPolynomialM
 	s, e := p.State()
 	return s.Flat, BVPolynomialMultiplicationOptions{ASTOrder: s.ASTOrder, HoistCoefficients: s.HoistCoefficients, SumOfMonomials: s.SumOfMonomials, MonomialLimit: s.MonomialLimit}, e
 }
-func BVPolynomialParameterDescriptions(d *util.ParamDescrs) error {
+func BVPolynomialParameterDescriptions(d *uparams.ParamDescrs) error {
 	return catalogCollectPolyRewriterParams(d)
 }
 func (p *BVPolynomialConfiguration) Close() error {
 	if p == nil || p.self != p {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if p.closed {
 		return nil

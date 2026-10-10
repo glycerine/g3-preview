@@ -2180,7 +2180,7 @@
       "role": "reference_tool",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_module_params_source.go",
+        "pkg/util/params/util_module_params_source.go",
         "pkg/smtcore/util_smt_qi_params_source_test.go"
       ],
       "tests": [
@@ -2221,7 +2221,7 @@
         {
           "name": "Concrete generated borrowed-string accessor through the existing lexical helper (scripts/mk_genfile_common.py:895-939)",
           "status": "partial",
-          "go_target": "pkg/util/util_module_params_source.go",
+          "go_target": "pkg/util/params/util_module_params_source.go",
           "tests": [
             "TestParamsStringViewReturnedPointerNoFormatCopyAndInvalidation",
             "TestParamsStringViewFallbackNullAndProviderLifetime",
@@ -2835,10 +2835,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ackermannization/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -2872,7 +2872,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -2978,10 +2978,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ackermannization/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -3015,7 +3015,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -16365,10 +16365,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/fpa/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -16402,7 +16402,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -17234,10 +17234,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/normal_forms/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -17367,7 +17367,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -17382,10 +17382,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/normal_forms/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -17419,7 +17419,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -17434,10 +17434,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/normal_forms/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -17471,7 +17471,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -17992,10 +17992,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/smtcore/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -18029,7 +18029,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -18229,10 +18229,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -18266,7 +18266,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -18988,10 +18988,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/rewriter/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -19025,7 +19025,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -19415,10 +19415,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/rewriter/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -19452,7 +19452,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -20543,10 +20543,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/rewriter/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go",
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
         "pkg/ast/rewriter/bool_rewriter_config.go"
       ],
       "tests": [
@@ -20589,7 +20589,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         },
         {
@@ -24027,10 +24027,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/rewriter/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -24064,7 +24064,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -24081,7 +24081,7 @@
       "go_targets": [
         "pkg/smtcore/util_smt_bv_params.go",
         "pkg/smtcore/util_smt_bv_params_source_test.go",
-        "pkg/util/util_module_params_source.go"
+        "pkg/util/params/util_module_params_source.go"
       ],
       "tests": [
         "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
@@ -25215,10 +25215,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/rewriter/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -25252,7 +25252,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -26634,10 +26634,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/rewriter/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -26671,7 +26671,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -27430,10 +27430,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/rewriter/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -27467,7 +27467,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -29614,13 +29614,13 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/smtcore/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go",
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
         "pkg/smtcore/util_context_params.go",
         "pkg/smtcore/util_context_params_source_test.go",
-        "pkg/util/util_param_descrs.go",
+        "pkg/util/params/util_param_descrs.go",
         "pkg/smtcore/util_context_params_methods_source.go",
         "pkg/smtcore/util_context_params_methods_source_test.go",
         "pkg/smtcore/util_context_params_ast_source.go"
@@ -29666,7 +29666,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         },
         {
@@ -29734,13 +29734,13 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/smtcore/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go",
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
         "pkg/smtcore/util_context_params.go",
         "pkg/smtcore/util_context_params_source_test.go",
-        "pkg/util/util_param_descrs.go",
+        "pkg/util/params/util_param_descrs.go",
         "pkg/smtcore/util_context_params_methods_source.go",
         "pkg/smtcore/util_context_params_methods_source_test.go"
       ],
@@ -29793,7 +29793,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         },
         {
@@ -32084,10 +32084,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/smtcore/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -32121,7 +32121,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -35241,10 +35241,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/math/polynomial/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -35278,7 +35278,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -47008,10 +47008,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/math/realclosure/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -47045,7 +47045,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -50766,10 +50766,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/model/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go",
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
         "pkg/model/model_evaluator.go"
       ],
       "tests": [
@@ -50811,7 +50811,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         },
         {
@@ -51097,10 +51097,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/model/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -51134,7 +51134,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -52139,10 +52139,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/muz/base/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -52176,7 +52176,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -61984,10 +61984,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/nlsat/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -62021,7 +62021,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -63006,10 +63006,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/opt/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -63043,7 +63043,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -64201,10 +64201,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/parsers/util/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -64238,7 +64238,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -66542,10 +66542,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/sat/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -66579,7 +66579,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -69306,10 +69306,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/sat/sat_main_config_descrs.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -69343,7 +69343,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -69932,10 +69932,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/sat/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -69969,7 +69969,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -70541,10 +70541,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/sat/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -70578,7 +70578,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -77446,7 +77446,7 @@
       "go_targets": [
         "pkg/smtcore/util_smt_dyn_ack_params.go",
         "pkg/smtcore/util_smt_dyn_ack_params_source_test.go",
-        "pkg/util/util_module_params_source.go",
+        "pkg/util/params/util_module_params_source.go",
         "pkg/smtcore/util_smt_array_params_source_test.go",
         "pkg/smtcore/util_smt_bv_params_source_test.go"
       ],
@@ -77486,7 +77486,7 @@
         {
           "name": "Concrete embedded generated module helper engine shared with array without changing dack assignments or source acquisition/destructor order (scripts/mk_genfile_common.py:895-939; src/smt/params/dyn_ack_params.cpp:22-30)",
           "status": "partial",
-          "go_target": "pkg/util/util_module_params_source.go",
+          "go_target": "pkg/util/params/util_module_params_source.go",
           "tests": [
             "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
             "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
@@ -77499,7 +77499,7 @@
         {
           "name": "Concrete simultaneous generated-helper frame engine, older reads and strict younger source stop before older DT (scripts/mk_genfile_common.py:895-939; src/smt/params/theory_bv_params.cpp:24-29)",
           "status": "partial",
-          "go_target": "pkg/util/util_module_params_source.go",
+          "go_target": "pkg/util/params/util_module_params_source.go",
           "tests": [
             "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
             "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
@@ -77528,7 +77528,7 @@
       "go_targets": [
         "pkg/smtcore/util_smt_dyn_ack_params.go",
         "pkg/smtcore/util_smt_dyn_ack_params_source_test.go",
-        "pkg/util/util_module_params_source.go",
+        "pkg/util/params/util_module_params_source.go",
         "pkg/smtcore/util_smt_array_params_source_test.go"
       ],
       "tests": [
@@ -77573,7 +77573,7 @@
         {
           "name": "Concrete embedded generated module helper engine shared with array without changing dack assignments or source acquisition/destructor order (scripts/mk_genfile_common.py:895-939; src/smt/params/dyn_ack_params.cpp:22-30)",
           "status": "partial",
-          "go_target": "pkg/util/util_module_params_source.go",
+          "go_target": "pkg/util/params/util_module_params_source.go",
           "tests": [
             "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
             "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
@@ -78001,10 +78001,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/smtcore/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -78038,7 +78038,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -78056,7 +78056,7 @@
         "pkg/smtcore/util_smt_dyn_ack_params.go",
         "pkg/smtcore/util_smt_dyn_ack_params_source_test.go",
         "pkg/smtcore/util_smt_array_params.go",
-        "pkg/util/util_module_params_source.go",
+        "pkg/util/params/util_module_params_source.go",
         "pkg/smtcore/util_smt_array_params_source_test.go",
         "pkg/smtcore/util_smt_bv_params.go",
         "pkg/smtcore/util_smt_bv_params_source_test.go",
@@ -78410,7 +78410,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/util_smt_array_params.go",
-        "pkg/util/util_module_params_source.go",
+        "pkg/util/params/util_module_params_source.go",
         "pkg/smtcore/util_smt_array_params_source_test.go",
         "pkg/smtcore/util_smt_bv_params_source_test.go"
       ],
@@ -78445,7 +78445,7 @@
         {
           "name": "Concrete simultaneous generated-helper frame engine, older reads and strict younger source stop before older DT (scripts/mk_genfile_common.py:895-939; src/smt/params/theory_bv_params.cpp:24-29)",
           "status": "partial",
-          "go_target": "pkg/util/util_module_params_source.go",
+          "go_target": "pkg/util/params/util_module_params_source.go",
           "tests": [
             "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
             "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
@@ -78472,7 +78472,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/util_smt_array_params.go",
-        "pkg/util/util_module_params_source.go",
+        "pkg/util/params/util_module_params_source.go",
         "pkg/smtcore/util_smt_array_params_source_test.go"
       ],
       "tests": [
@@ -78533,7 +78533,7 @@
       "go_targets": [
         "pkg/smtcore/util_smt_bv_params.go",
         "pkg/smtcore/util_smt_bv_params_source_test.go",
-        "pkg/util/util_module_params_source.go"
+        "pkg/util/params/util_module_params_source.go"
       ],
       "tests": [
         "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
@@ -78583,7 +78583,7 @@
       "go_targets": [
         "pkg/smtcore/util_smt_bv_params.go",
         "pkg/smtcore/util_smt_bv_params_source_test.go",
-        "pkg/util/util_module_params_source.go"
+        "pkg/util/params/util_module_params_source.go"
       ],
       "tests": [
         "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
@@ -90943,10 +90943,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/solver/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -90980,7 +90980,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -97892,10 +97892,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/tactic/sls/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -97929,7 +97929,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -98666,10 +98666,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/tactic/smtlogics/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -98703,7 +98703,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -101868,10 +101868,10 @@
       "role": "test",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
-        "pkg/util/util_gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams_catalog_collectors.go",
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -101886,7 +101886,7 @@
         {
           "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
           "status": "ported",
-          "go_target": "pkg/util/util_gparams_catalog_dispatch.go",
+          "go_target": "pkg/util/params/util_gparams_catalog_dispatch.go",
           "tests": [
             "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
             "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
@@ -111622,7 +111622,7 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_param_descrs.go"
+        "pkg/util/params/util_param_descrs.go"
       ],
       "tests": [
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
@@ -111639,7 +111639,7 @@
         {
           "name": "cmd_arg_kind exact enum values and complete source label switch",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -111662,7 +111662,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_param_descrs.go",
+        "pkg/util/params/util_param_descrs.go",
         "pkg/smtcore/util_cmd_exception.go"
       ],
       "tests": [
@@ -111703,7 +111703,7 @@
         {
           "name": "cmd_arg_kind exact enum values and complete source label switch",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -112024,7 +112024,7 @@
         "pkg/util/diagnostic/util_debug_actions_host_other.go",
         "pkg/util/diagnostic/util_debug_actions_source_test.go",
         "pkg/util/diagnostic/util_debug_action_binding.go",
-        "pkg/util/util_gparams_service_ops.go",
+        "pkg/util/params/util_gparams_service_ops.go",
         "pkg/util/diagnostic/numeric_char_input_tie_boundary_test.go"
       ],
       "tests": [
@@ -112216,7 +112216,7 @@
         "pkg/util/diagnostic/util_debug_action_binding.go",
         "pkg/util/diagnostic/util_debug_macros.go",
         "pkg/util/diagnostic/util_debug_macro_source_test.go",
-        "pkg/util/util_gparams_service_ops.go"
+        "pkg/util/params/util_gparams_service_ops.go"
       ],
       "tests": [
         "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
@@ -112769,8 +112769,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_param_descrs.go",
-        "pkg/util/util_gparams_dictionary.go"
+        "pkg/util/params/util_param_descrs.go",
+        "pkg/util/params/util_gparams_dictionary.go"
       ],
       "tests": [
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
@@ -112814,7 +112814,7 @@
         {
           "name": "complete concrete dictionary<param_descrs::imp::info> specialization",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -112828,7 +112828,7 @@
         {
           "name": "selected three concrete GlobalParams dictionary operations with cached Symbol hash, probing and reset",
           "status": "ported",
-          "go_target": "pkg/util/util_gparams_dictionary.go",
+          "go_target": "pkg/util/params/util_gparams_dictionary.go",
           "tests": [
             "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
             "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
@@ -112956,10 +112956,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
-        "pkg/util/util_gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams_catalog_collectors.go",
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -112974,7 +112974,7 @@
         {
           "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
           "status": "ported",
-          "go_target": "pkg/util/util_gparams_catalog_collectors.go",
+          "go_target": "pkg/util/params/util_gparams_catalog_collectors.go",
           "tests": [
             "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
             "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
@@ -112995,10 +112995,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
-        "pkg/util/util_gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams_catalog_collectors.go",
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -113023,7 +113023,7 @@
         {
           "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
           "status": "ported",
-          "go_target": "pkg/util/util_gparams_catalog_collectors.go",
+          "go_target": "pkg/util/params/util_gparams_catalog_collectors.go",
           "tests": [
             "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
             "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
@@ -113629,24 +113629,24 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_debug.go",
-        "pkg/util/util_gparams_dictionary.go",
-        "pkg/util/util_gparams_display.go",
-        "pkg/util/util_gparams_names.go",
-        "pkg/util/util_gparams_nodebug.go",
-        "pkg/util/util_gparams_parse.go",
-        "pkg/util/util_gparams_values.go",
-        "pkg/util/util_gparams_catalog.go",
-        "pkg/util/util_gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go",
-        "pkg/util/util_gparams_source_finalize.go",
-        "pkg/util/util_gparams_source_finalize_test.go",
-        "pkg/util/util_gparams_child_decrement_source_test.go",
-        "pkg/util/util_gparams_global_reset_source_test.go",
-        "pkg/util/util_gparams_service.go",
-        "pkg/util/util_gparams_constructor_source.go",
-        "pkg/util/util_gparams_service_ops.go"
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_debug.go",
+        "pkg/util/params/util_gparams_dictionary.go",
+        "pkg/util/params/util_gparams_display.go",
+        "pkg/util/params/util_gparams_names.go",
+        "pkg/util/params/util_gparams_nodebug.go",
+        "pkg/util/params/util_gparams_parse.go",
+        "pkg/util/params/util_gparams_values.go",
+        "pkg/util/params/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams_catalog_collectors.go",
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/util/params/util_gparams_source_finalize.go",
+        "pkg/util/params/util_gparams_source_finalize_test.go",
+        "pkg/util/params/util_gparams_child_decrement_source_test.go",
+        "pkg/util/params/util_gparams_global_reset_source_test.go",
+        "pkg/util/params/util_gparams_service.go",
+        "pkg/util/params/util_gparams_constructor_source.go",
+        "pkg/util/params/util_gparams_service_ops.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -113759,7 +113759,7 @@
         {
           "name": "explicit-owner registry registration, normalization, typed set/get, shared module snapshots, reset and byte-stream displays",
           "status": "ported",
-          "go_target": "pkg/util/util_gparams.go",
+          "go_target": "pkg/util/params/util_gparams.go",
           "tests": [
             "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
             "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
@@ -113783,7 +113783,7 @@
         {
           "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
           "status": "ported",
-          "go_target": "pkg/util/util_gparams_catalog_collectors.go",
+          "go_target": "pkg/util/params/util_gparams_catalog_collectors.go",
           "tests": [
             "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
             "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
@@ -113795,7 +113795,7 @@
         {
           "name": "imp destructor body reset/module deletion and reverse member suffix; guarded source stop with separate owning sparse-shrink acknowledgment (cpp106-123); generated g_imp finalization/nulling, ctor unwind and descendant stopped numeral decrements remain open",
           "status": "partial",
-          "go_target": "pkg/util/util_gparams_source_finalize.go",
+          "go_target": "pkg/util/params/util_gparams_source_finalize.go",
           "tests": [
             "TestGlobalParamsSourceFinalizeEmptyMembersAndGuards",
             "TestGlobalParamsSourceFinalizeFiniteNamedModuleOwners",
@@ -113805,7 +113805,7 @@
         {
           "name": "imp destructor module ParamsRef zero-count child stop and matching explicit owning continuation; actual internal get_params plus numeral setter lifecycle route, not public string parser coverage",
           "status": "partial",
-          "go_target": "pkg/util/util_gparams_source_finalize.go",
+          "go_target": "pkg/util/params/util_gparams_source_finalize.go",
           "tests": [
             "TestGlobalParamsSourceModuleDECStoppedChildOwningContinuation"
           ]
@@ -113813,7 +113813,7 @@
         {
           "name": "actual imp destructor stage0 live global-value reset with scalar prefix preservation and separate exact reset-child owning receipt; internal value setter route, not public string parsing coverage",
           "status": "partial",
-          "go_target": "pkg/util/util_gparams_source_finalize.go",
+          "go_target": "pkg/util/params/util_gparams_source_finalize.go",
           "tests": [
             "TestGlobalParamsSourceGlobalResetRetainsInlinePrefixBeforeChildStop"
           ]
@@ -113821,7 +113821,7 @@
         {
           "name": "actual imp declaration-order constructor, completed-member unwind and unconditional source g_imp initialize/finalize pointer boundaries; explicit named owning abort for failed placement headers and overwritten predecessors",
           "status": "partial",
-          "go_target": "pkg/util/util_gparams_service.go",
+          "go_target": "pkg/util/params/util_gparams_service.go",
           "tests": [
             "TestGlobalParamsSourceConstructorAllActualNestedPrefixes",
             "TestGlobalParamsServiceUnconditionalInitAndCurrentPointer",
@@ -113833,7 +113833,7 @@
         {
           "name": "actual namespace current-imp forwarding cpp557-631 with get_module char symbol construction before SASSERT and display_module SASSERT before symbol; numeric bare_str assertion/empty-string ternary uses same imp engine",
           "status": "partial",
-          "go_target": "pkg/util/util_gparams_service_ops.go",
+          "go_target": "pkg/util/params/util_gparams_service_ops.go",
           "tests": [
             "TestGlobalParamsNamespaceNullAndSourceArgumentOrder",
             "TestGlobalParamsNamespaceActualCurrentReinitAndSharedRef",
@@ -113855,7 +113855,7 @@
         {
           "name": "Concrete default standard-stream/action service preparation and exact borrowed generated process Context finalizer; source-site namespace assertion transport with gate-before-condition and bare_str C continuation (src/util/debug.cpp:28-35; src/util/debug.cpp:44-68; src/util/debug.cpp:37-42,73-117; src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:558,564,569,574,579,584,589,594,603,609,614,619,624,629; src/util/symbol.h:96)",
           "status": "partial",
-          "go_target": "pkg/util/util_gparams_service_ops.go",
+          "go_target": "pkg/util/params/util_gparams_service_ops.go",
           "tests": []
         }
       ],
@@ -113891,22 +113891,22 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_debug.go",
-        "pkg/util/util_gparams_dictionary.go",
-        "pkg/util/util_gparams_display.go",
-        "pkg/util/util_gparams_names.go",
-        "pkg/util/util_gparams_nodebug.go",
-        "pkg/util/util_gparams_parse.go",
-        "pkg/util/util_gparams_values.go",
-        "pkg/util/util_gparams_catalog.go",
-        "pkg/util/util_gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go",
-        "pkg/util/util_gparams_source_finalize.go",
-        "pkg/util/util_gparams_source_finalize_test.go",
-        "pkg/util/util_gparams_service.go",
-        "pkg/util/util_gparams_constructor_source.go",
-        "pkg/util/util_gparams_service_ops.go"
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_debug.go",
+        "pkg/util/params/util_gparams_dictionary.go",
+        "pkg/util/params/util_gparams_display.go",
+        "pkg/util/params/util_gparams_names.go",
+        "pkg/util/params/util_gparams_nodebug.go",
+        "pkg/util/params/util_gparams_parse.go",
+        "pkg/util/params/util_gparams_values.go",
+        "pkg/util/params/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams_catalog_collectors.go",
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/util/params/util_gparams_source_finalize.go",
+        "pkg/util/params/util_gparams_source_finalize_test.go",
+        "pkg/util/params/util_gparams_service.go",
+        "pkg/util/params/util_gparams_constructor_source.go",
+        "pkg/util/params/util_gparams_service_ops.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -113965,7 +113965,7 @@
         {
           "name": "explicit-owner registry registration, normalization, typed set/get, shared module snapshots, reset and byte-stream displays",
           "status": "ported",
-          "go_target": "pkg/util/util_gparams.go",
+          "go_target": "pkg/util/params/util_gparams.go",
           "tests": [
             "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
             "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
@@ -113989,7 +113989,7 @@
         {
           "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
           "status": "ported",
-          "go_target": "pkg/util/util_gparams_catalog_collectors.go",
+          "go_target": "pkg/util/params/util_gparams_catalog_collectors.go",
           "tests": [
             "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
             "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
@@ -114001,7 +114001,7 @@
         {
           "name": "imp destructor body reset/module deletion and reverse member suffix; guarded source stop with separate owning sparse-shrink acknowledgment (cpp106-123); generated g_imp finalization/nulling, ctor unwind and descendant stopped numeral decrements remain open",
           "status": "partial",
-          "go_target": "pkg/util/util_gparams_source_finalize.go",
+          "go_target": "pkg/util/params/util_gparams_source_finalize.go",
           "tests": [
             "TestGlobalParamsSourceFinalizeEmptyMembersAndGuards",
             "TestGlobalParamsSourceFinalizeFiniteNamedModuleOwners",
@@ -114011,7 +114011,7 @@
         {
           "name": "actual imp declaration-order constructor, completed-member unwind and unconditional source g_imp initialize/finalize pointer boundaries; explicit named owning abort for failed placement headers and overwritten predecessors",
           "status": "partial",
-          "go_target": "pkg/util/util_gparams_service.go",
+          "go_target": "pkg/util/params/util_gparams_service.go",
           "tests": [
             "TestGlobalParamsSourceConstructorAllActualNestedPrefixes",
             "TestGlobalParamsServiceUnconditionalInitAndCurrentPointer",
@@ -114023,7 +114023,7 @@
         {
           "name": "actual namespace current-imp forwarding cpp557-631 with get_module char symbol construction before SASSERT and display_module SASSERT before symbol; numeric bare_str assertion/empty-string ternary uses same imp engine",
           "status": "partial",
-          "go_target": "pkg/util/util_gparams_service_ops.go",
+          "go_target": "pkg/util/params/util_gparams_service_ops.go",
           "tests": [
             "TestGlobalParamsNamespaceNullAndSourceArgumentOrder",
             "TestGlobalParamsNamespaceActualCurrentReinitAndSharedRef",
@@ -114289,7 +114289,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_param_descrs.go",
+        "pkg/util/params/util_param_descrs.go",
         "pkg/ast/ast_shared_occs_iterator.go",
         "pkg/ast/ast_sparse_mark.go",
         "pkg/ast/ast_expr_substitution_table.go",
@@ -114557,7 +114557,7 @@
         {
           "name": "descriptor dictionary physical probing/growth/removal/tombstone cleanup specialization",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -119713,10 +119713,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_gparams.go",
-        "pkg/util/util_gparams_catalog.go",
+        "pkg/util/params/util_gparams.go",
+        "pkg/util/params/util_gparams_catalog.go",
         "pkg/util/lp/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -119750,7 +119750,7 @@
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ],
           "go_targets": [
-            "pkg/util/util_gparams_catalog_test.go"
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
@@ -122904,8 +122904,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_param_descrs.go",
-        "pkg/util/util_gparams_dictionary.go",
+        "pkg/util/params/util_param_descrs.go",
+        "pkg/util/params/util_gparams_dictionary.go",
         "pkg/sat/sat_solver_index_sets.go",
         "pkg/sat/sat_solver_index_set.go",
         "pkg/sat/sat_solver_index_map.go",
@@ -123035,7 +123035,7 @@
         {
           "name": "cached symbol/info default-map entry specialization",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -123049,7 +123049,7 @@
         {
           "name": "selected three concrete GlobalParams dictionary operations with cached Symbol hash, probing and reset",
           "status": "ported",
-          "go_target": "pkg/util/util_gparams_dictionary.go",
+          "go_target": "pkg/util/params/util_gparams_dictionary.go",
           "tests": [
             "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
             "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
@@ -137785,34 +137785,34 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_param_name.go",
-        "pkg/util/util_param_descrs.go",
-        "pkg/util/util_params_ref.go",
-        "pkg/util/util_params_string_symbol_test.go",
-        "pkg/util/util_param_descrs_stream.go",
-        "pkg/util/util_param_descrs_stream_debug.go",
-        "pkg/util/util_param_descrs_stream_nodebug.go",
-        "pkg/util/util_param_descrs_stream_test.go",
-        "pkg/util/util_params_decrement_source.go",
-        "pkg/util/util_params_decrement_tracked_test.go",
-        "pkg/util/util_params_source_frame.go",
-        "pkg/util/util_params_assignment_source_test.go",
-        "pkg/util/util_params_reset_source.go",
-        "pkg/util/util_params_reset_source_test.go",
-        "pkg/util/util_params_reset_key_source.go",
-        "pkg/util/util_params_reset_key_source_test.go",
+        "pkg/util/params/util_param_name.go",
+        "pkg/util/params/util_param_descrs.go",
+        "pkg/util/params/util_params_ref.go",
+        "pkg/util/params/util_params_string_symbol_test.go",
+        "pkg/util/params/util_param_descrs_stream.go",
+        "pkg/util/params/util_param_descrs_stream_debug.go",
+        "pkg/util/params/util_param_descrs_stream_nodebug.go",
+        "pkg/util/params/util_param_descrs_stream_test.go",
+        "pkg/util/params/util_params_decrement_source.go",
+        "pkg/util/params/util_params_decrement_tracked_test.go",
+        "pkg/util/params/util_params_source_frame.go",
+        "pkg/util/params/util_params_assignment_source_test.go",
+        "pkg/util/params/util_params_reset_source.go",
+        "pkg/util/params/util_params_reset_source_test.go",
+        "pkg/util/params/util_params_reset_key_source.go",
+        "pkg/util/params/util_params_reset_key_source_test.go",
         "pkg/math/polynomial/upolynomial_physical_extra_owner_test.go",
-        "pkg/util/util_params_ref_test.go",
-        "pkg/util/util_params_decrement_source_test.go",
-        "pkg/util/util_params_set_rat_source.go",
-        "pkg/util/util_params_set_rat_source_test.go",
-        "pkg/util/util_params_set_replacement_source.go",
-        "pkg/util/util_params_set_replacement_source_test.go",
-        "pkg/util/util_gparams_constructor_source.go",
-        "pkg/util/util_params_string_view.go",
-        "pkg/util/util_params_string_view_source_test.go",
+        "pkg/util/params/util_params_ref_test.go",
+        "pkg/util/params/util_params_decrement_source_test.go",
+        "pkg/util/params/util_params_set_rat_source.go",
+        "pkg/util/params/util_params_set_rat_source_test.go",
+        "pkg/util/params/util_params_set_replacement_source.go",
+        "pkg/util/params/util_params_set_replacement_source_test.go",
+        "pkg/util/params/util_gparams_constructor_source.go",
+        "pkg/util/params/util_params_string_view.go",
+        "pkg/util/params/util_params_string_view_source_test.go",
         "pkg/smtcore/util_context_params_methods_source_test.go",
-        "pkg/util/util_params_string_stream.go"
+        "pkg/util/params/util_params_string_stream.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -137937,7 +137937,7 @@
         {
           "name": "norm_param_name complete nullable C-string and symbol overloads",
           "status": "ported",
-          "go_target": "pkg/util/util_param_name.go",
+          "go_target": "pkg/util/params/util_param_name.go",
           "tests": [
             "TestParamNameNormalizationSourceBranches",
             "TestParamNameNormalizationByteDomain",
@@ -137948,7 +137948,7 @@
         {
           "name": "param_descrs construction/destruction and exact nullable owned metadata",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -137962,7 +137962,7 @@
         {
           "name": "param_descrs insertion/erasure/duplicate kind and persistent name history",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -137976,7 +137976,7 @@
         {
           "name": "param_descrs kind/default/description/module queries and namespace rewrite",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -137990,7 +137990,7 @@
         {
           "name": "param_descrs sorted display and physical dictionary bucket-order copy",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -138004,7 +138004,7 @@
         {
           "name": "five parameter descriptor insertion helpers with exact descriptions",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -138018,7 +138018,7 @@
         {
           "name": "params_ref default/get_empty, owning copy/destructor/assignment and sharing Copy/Append",
           "status": "partial",
-          "go_target": "pkg/util/util_params_ref.go",
+          "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
@@ -138043,7 +138043,7 @@
         {
           "name": "params_ref init/copy_core and private params ordered entries/refcounts/value destruction",
           "status": "partial",
-          "go_target": "pkg/util/util_params_ref.go",
+          "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
@@ -138068,7 +138068,7 @@
         {
           "name": "all six getter/setter Symbol and nullable name routes plus five fallback families",
           "status": "ported",
-          "go_target": "pkg/util/util_params_ref.go",
+          "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
@@ -138093,7 +138093,7 @@
         {
           "name": "shared reset/contains and validation module mutation, duplicate/key-kind scan and exact exception text",
           "status": "partial",
-          "go_target": "pkg/util/util_params_ref.go",
+          "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
@@ -138118,7 +138118,7 @@
         {
           "name": "ostream display/full/key/SMT2 filtering and Z3DEBUG pp diagnostic boundary",
           "status": "ported",
-          "go_target": "pkg/util/util_params_ref.go",
+          "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
@@ -138143,7 +138143,7 @@
         {
           "name": "borrowed interned set_str spelling, copy, deletion and display through canonical scalar Symbol",
           "status": "ported",
-          "go_target": "pkg/util/util_params_ref.go",
+          "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsBorrowedStringSymbolCopyAndOwnership",
             "TestParamsBorrowedStringSymbolReplacementAndWarmSet",
@@ -138154,7 +138154,7 @@
         {
           "name": "param_descrs display into charged borrowed stream with actual name/description output and assertion prefixes",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs_stream.go",
+          "go_target": "pkg/util/params/util_param_descrs_stream.go",
           "tests": [
             "TestParamDescrsDisplayIntoSourceBranchesAndSort",
             "TestParamDescrsDisplayIntoNullDescriptionActualAction",
@@ -138164,7 +138164,7 @@
         {
           "name": "selected default DEBUG dec_ref predecrement assertion and zero-reference ascending destruction with explicit per-block owning continuation",
           "status": "ported",
-          "go_target": "pkg/util/util_params_decrement_source.go",
+          "go_target": "pkg/util/params/util_params_decrement_source.go",
           "tests": [
             "TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop",
             "TestParamsReferenceCleanupDecrementActualLeafReceipt",
@@ -138174,7 +138174,7 @@
         {
           "name": "explicit Go child DEL receipt stamped only at actual zero-reference destructor entry; exact owner/slot/generation/nonwrapping invocation match before owning continuation, no repeated DEC",
           "status": "ported",
-          "go_target": "pkg/util/util_params_decrement_source.go",
+          "go_target": "pkg/util/params/util_params_decrement_source.go",
           "tests": [
             "TestParamsReferenceTrackedDecrementGuardedEntryReceipt"
           ]
@@ -138182,7 +138182,7 @@
         {
           "name": "selected params_ref assignment srcINC then oldDEC then pointer publication, and init published-pointer copy before oldDEC with charged exact failed-source frame owning abort",
           "status": "ported",
-          "go_target": "pkg/util/util_params_source_frame.go",
+          "go_target": "pkg/util/params/util_params_source_frame.go",
           "tests": [
             "TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC",
             "TestParamsReferenceInitFailedCopySkipsOldDEC",
@@ -138197,7 +138197,7 @@
         {
           "name": "selected live params::reset ascending numeral traversal retains scalar entries until vector finalize, and explicit invocation/kind-matched owning continuation",
           "status": "ported",
-          "go_target": "pkg/util/util_params_reset_source.go",
+          "go_target": "pkg/util/params/util_params_reset_source.go",
           "tests": [
             "TestParamsReferenceResetRetainsCompletedInlinePrefixAtActualLeafStop",
             "TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation",
@@ -138207,7 +138207,7 @@
         {
           "name": "selected matched-key del_value then ascending suffix assignment/pop with exact index/kind/invocation explicit owning continuation",
           "status": "ported",
-          "go_target": "pkg/util/util_params_reset_key_source.go",
+          "go_target": "pkg/util/params/util_params_reset_key_source.go",
           "tests": [
             "TestParamsReferenceResetKeyRejectsOrdinaryReplayAfterActualLeafStop",
             "TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop",
@@ -138217,7 +138217,7 @@
         {
           "name": "selected SET_RAT ADD literal acquired local Copy before append; actual interrupted local retained and explicit exact owning abort",
           "status": "partial",
-          "go_target": "pkg/util/util_params_set_rat_source.go",
+          "go_target": "pkg/util/params/util_params_set_rat_source.go",
           "tests": [
             "TestParamsReferenceSetRatAppendRefusalRetainsActualLocal",
             "TestParamsReferenceSetRatOwningAbortActualConsumedLeaf",
@@ -138228,7 +138228,7 @@
         {
           "name": "selected matched SET_SIMPLE/SET_SYM NUM leaf before kind/field publication and exact explicit owning continuation",
           "status": "partial",
-          "go_target": "pkg/util/util_params_set_replacement_source.go",
+          "go_target": "pkg/util/params/util_params_set_replacement_source.go",
           "tests": [
             "TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay",
             "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops",
@@ -138240,7 +138240,7 @@
         {
           "name": "selected param_descrs source placement construction with actual default-invalid info table before null names vector; unfinished child header/text context retained separately from completed members",
           "status": "partial",
-          "go_target": "pkg/util/util_gparams_constructor_source.go",
+          "go_target": "pkg/util/params/util_gparams_constructor_source.go",
           "tests": [
             "TestGlobalParamsSourceConstructorAllActualNestedPrefixes",
             "TestGlobalParamsServiceUnconditionalInitAndCurrentPointer",
@@ -138250,7 +138250,7 @@
         {
           "name": "Borrowed get_str fallback pointer at the returned entry, without formatting copy (src/util/params.cpp:639-648,902-930)",
           "status": "partial",
-          "go_target": "pkg/util/util_params_string_view.go",
+          "go_target": "pkg/util/params/util_params_string_view.go",
           "tests": [
             "TestParamsStringViewReturnedPointerNoFormatCopyAndInvalidation",
             "TestParamsStringViewFallbackNullAndProviderLifetime",
@@ -138260,7 +138260,7 @@
         {
           "name": "Same descriptor constructor engine for actual lexical context unknown-key descriptor; reverse completed members distinct from incomplete owning abort (src/util/params.cpp:49-75,210-216)",
           "status": "partial",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestContextParamsEveryUnknownDescriptorAndErrorBufferReservation"
           ],
@@ -138312,31 +138312,31 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_param_name.go",
-        "pkg/util/util_param_descrs.go",
-        "pkg/util/util_params_ref.go",
-        "pkg/util/util_params_string_symbol_test.go",
-        "pkg/util/util_param_descrs_stream.go",
-        "pkg/util/util_param_descrs_stream_debug.go",
-        "pkg/util/util_param_descrs_stream_nodebug.go",
-        "pkg/util/util_param_descrs_stream_test.go",
-        "pkg/util/util_params_decrement_source.go",
-        "pkg/util/util_params_decrement_tracked_test.go",
-        "pkg/util/util_params_source_frame.go",
-        "pkg/util/util_params_assignment_source_test.go",
-        "pkg/util/util_params_reset_source.go",
-        "pkg/util/util_params_reset_source_test.go",
-        "pkg/util/util_params_reset_key_source.go",
-        "pkg/util/util_params_reset_key_source_test.go",
+        "pkg/util/params/util_param_name.go",
+        "pkg/util/params/util_param_descrs.go",
+        "pkg/util/params/util_params_ref.go",
+        "pkg/util/params/util_params_string_symbol_test.go",
+        "pkg/util/params/util_param_descrs_stream.go",
+        "pkg/util/params/util_param_descrs_stream_debug.go",
+        "pkg/util/params/util_param_descrs_stream_nodebug.go",
+        "pkg/util/params/util_param_descrs_stream_test.go",
+        "pkg/util/params/util_params_decrement_source.go",
+        "pkg/util/params/util_params_decrement_tracked_test.go",
+        "pkg/util/params/util_params_source_frame.go",
+        "pkg/util/params/util_params_assignment_source_test.go",
+        "pkg/util/params/util_params_reset_source.go",
+        "pkg/util/params/util_params_reset_source_test.go",
+        "pkg/util/params/util_params_reset_key_source.go",
+        "pkg/util/params/util_params_reset_key_source_test.go",
         "pkg/math/polynomial/upolynomial_physical_extra_owner_test.go",
-        "pkg/util/util_params_ref_test.go",
-        "pkg/util/util_params_decrement_source_test.go",
-        "pkg/util/util_params_set_rat_source.go",
-        "pkg/util/util_params_set_rat_source_test.go",
-        "pkg/util/util_params_set_replacement_source.go",
-        "pkg/util/util_params_set_replacement_source_test.go",
-        "pkg/util/util_gparams_constructor_source.go",
-        "pkg/util/util_params_string_stream.go"
+        "pkg/util/params/util_params_ref_test.go",
+        "pkg/util/params/util_params_decrement_source_test.go",
+        "pkg/util/params/util_params_set_rat_source.go",
+        "pkg/util/params/util_params_set_rat_source_test.go",
+        "pkg/util/params/util_params_set_replacement_source.go",
+        "pkg/util/params/util_params_set_replacement_source_test.go",
+        "pkg/util/params/util_gparams_constructor_source.go",
+        "pkg/util/params/util_params_string_stream.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -138422,7 +138422,7 @@
         {
           "name": "norm_param_name complete nullable C-string and symbol overloads",
           "status": "ported",
-          "go_target": "pkg/util/util_param_name.go",
+          "go_target": "pkg/util/params/util_param_name.go",
           "tests": [
             "TestParamNameNormalizationSourceBranches",
             "TestParamNameNormalizationByteDomain",
@@ -138433,7 +138433,7 @@
         {
           "name": "param_descrs construction/destruction and exact nullable owned metadata",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -138447,7 +138447,7 @@
         {
           "name": "param_descrs insertion/erasure/duplicate kind and persistent name history",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -138461,7 +138461,7 @@
         {
           "name": "param_descrs kind/default/description/module queries and namespace rewrite",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -138475,7 +138475,7 @@
         {
           "name": "param_descrs sorted display and physical dictionary bucket-order copy",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -138489,7 +138489,7 @@
         {
           "name": "five parameter descriptor insertion helpers with exact descriptions",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
@@ -138503,7 +138503,7 @@
         {
           "name": "params_ref default/get_empty, owning copy/destructor/assignment and sharing Copy/Append",
           "status": "partial",
-          "go_target": "pkg/util/util_params_ref.go",
+          "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
@@ -138528,7 +138528,7 @@
         {
           "name": "params_ref init/copy_core and private params ordered entries/refcounts/value destruction",
           "status": "partial",
-          "go_target": "pkg/util/util_params_ref.go",
+          "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
@@ -138553,7 +138553,7 @@
         {
           "name": "all six getter/setter Symbol and nullable name routes plus five fallback families",
           "status": "ported",
-          "go_target": "pkg/util/util_params_ref.go",
+          "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
@@ -138578,7 +138578,7 @@
         {
           "name": "shared reset/contains and validation module mutation, duplicate/key-kind scan and exact exception text",
           "status": "partial",
-          "go_target": "pkg/util/util_params_ref.go",
+          "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
@@ -138603,7 +138603,7 @@
         {
           "name": "ostream display/full/key/SMT2 filtering and Z3DEBUG pp diagnostic boundary",
           "status": "ported",
-          "go_target": "pkg/util/util_params_ref.go",
+          "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
@@ -138628,7 +138628,7 @@
         {
           "name": "borrowed interned set_str spelling, copy, deletion and display through canonical scalar Symbol",
           "status": "ported",
-          "go_target": "pkg/util/util_params_ref.go",
+          "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsBorrowedStringSymbolCopyAndOwnership",
             "TestParamsBorrowedStringSymbolReplacementAndWarmSet",
@@ -138639,7 +138639,7 @@
         {
           "name": "param_descrs display into charged borrowed stream with actual name/description output and assertion prefixes",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs_stream.go",
+          "go_target": "pkg/util/params/util_param_descrs_stream.go",
           "tests": [
             "TestParamDescrsDisplayIntoSourceBranchesAndSort",
             "TestParamDescrsDisplayIntoNullDescriptionActualAction",
@@ -138649,7 +138649,7 @@
         {
           "name": "selected default DEBUG dec_ref predecrement assertion and zero-reference ascending destruction with explicit per-block owning continuation",
           "status": "ported",
-          "go_target": "pkg/util/util_params_decrement_source.go",
+          "go_target": "pkg/util/params/util_params_decrement_source.go",
           "tests": [
             "TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop",
             "TestParamsReferenceCleanupDecrementActualLeafReceipt",
@@ -138659,7 +138659,7 @@
         {
           "name": "explicit Go child DEL receipt stamped only at actual zero-reference destructor entry; exact owner/slot/generation/nonwrapping invocation match before owning continuation, no repeated DEC",
           "status": "ported",
-          "go_target": "pkg/util/util_params_decrement_source.go",
+          "go_target": "pkg/util/params/util_params_decrement_source.go",
           "tests": [
             "TestParamsReferenceTrackedDecrementGuardedEntryReceipt"
           ]
@@ -138667,7 +138667,7 @@
         {
           "name": "selected params_ref assignment srcINC then oldDEC then pointer publication, and init published-pointer copy before oldDEC with charged exact failed-source frame owning abort",
           "status": "ported",
-          "go_target": "pkg/util/util_params_source_frame.go",
+          "go_target": "pkg/util/params/util_params_source_frame.go",
           "tests": [
             "TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC",
             "TestParamsReferenceInitFailedCopySkipsOldDEC",
@@ -138682,7 +138682,7 @@
         {
           "name": "selected live params::reset ascending numeral traversal retains scalar entries until vector finalize, and explicit invocation/kind-matched owning continuation",
           "status": "ported",
-          "go_target": "pkg/util/util_params_reset_source.go",
+          "go_target": "pkg/util/params/util_params_reset_source.go",
           "tests": [
             "TestParamsReferenceResetRetainsCompletedInlinePrefixAtActualLeafStop",
             "TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation",
@@ -138692,7 +138692,7 @@
         {
           "name": "selected matched-key del_value then ascending suffix assignment/pop with exact index/kind/invocation explicit owning continuation",
           "status": "ported",
-          "go_target": "pkg/util/util_params_reset_key_source.go",
+          "go_target": "pkg/util/params/util_params_reset_key_source.go",
           "tests": [
             "TestParamsReferenceResetKeyRejectsOrdinaryReplayAfterActualLeafStop",
             "TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop",
@@ -138702,7 +138702,7 @@
         {
           "name": "selected SET_RAT ADD literal acquired local Copy before append; actual interrupted local retained and explicit exact owning abort",
           "status": "partial",
-          "go_target": "pkg/util/util_params_set_rat_source.go",
+          "go_target": "pkg/util/params/util_params_set_rat_source.go",
           "tests": [
             "TestParamsReferenceSetRatAppendRefusalRetainsActualLocal",
             "TestParamsReferenceSetRatOwningAbortActualConsumedLeaf",
@@ -138713,7 +138713,7 @@
         {
           "name": "selected matched SET_SIMPLE/SET_SYM NUM leaf before kind/field publication and exact explicit owning continuation",
           "status": "partial",
-          "go_target": "pkg/util/util_params_set_replacement_source.go",
+          "go_target": "pkg/util/params/util_params_set_replacement_source.go",
           "tests": [
             "TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay",
             "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops",
@@ -138725,7 +138725,7 @@
         {
           "name": "selected param_descrs source placement construction with actual default-invalid info table before null names vector; unfinished child header/text context retained separately from completed members",
           "status": "partial",
-          "go_target": "pkg/util/util_gparams_constructor_source.go",
+          "go_target": "pkg/util/params/util_gparams_constructor_source.go",
           "tests": [
             "TestGlobalParamsSourceConstructorAllActualNestedPrefixes",
             "TestGlobalParamsServiceUnconditionalInitAndCurrentPointer",
@@ -145727,8 +145727,8 @@
         "pkg/util/symbol/symbol.go",
         "pkg/util/symbol/service.go",
         "pkg/util/symbol/service_test.go",
-        "pkg/util/util_gparams_service_ops.go",
-        "pkg/util/util_gparams_symbol_stream.go",
+        "pkg/util/params/util_gparams_service_ops.go",
+        "pkg/util/params/util_gparams_symbol_stream.go",
         "pkg/smtcore/util_smt_params_source_test.go"
       ],
       "tests": [
@@ -145905,13 +145905,13 @@
         {
           "name": "Concrete default standard-stream/action service preparation and exact borrowed generated process Context finalizer; source-site namespace assertion transport with gate-before-condition and bare_str C continuation (src/util/debug.cpp:28-35; src/util/debug.cpp:44-68; src/util/debug.cpp:37-42,73-117; src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:558,564,569,574,579,584,589,594,603,609,614,619,624,629; src/util/symbol.h:96)",
           "status": "partial",
-          "go_target": "pkg/util/util_gparams_service_ops.go",
+          "go_target": "pkg/util/params/util_gparams_service_ops.go",
           "tests": []
         },
         {
           "name": "Reached null/string/numerical symbol ostream insertion (src/util/symbol.h:97-110)",
           "status": "partial",
-          "go_target": "pkg/util/util_gparams_symbol_stream.go",
+          "go_target": "pkg/util/params/util_gparams_symbol_stream.go",
           "tests": [
             "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags"
           ],
@@ -147520,7 +147520,7 @@
         "pkg/sat/sat_solver_uint_set.go",
         "pkg/sat/sat_solver_watch_store.go",
         "pkg/sat/sat_storage_vector.go",
-        "pkg/util/util_param_descrs.go",
+        "pkg/util/params/util_param_descrs.go",
         "pkg/ast/ast_shared_occs.go",
         "pkg/math/polynomial/upolynomial_binary_vector.go",
         "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
@@ -147897,7 +147897,7 @@
         {
           "name": "descriptor names/sort/prefix concrete vectors with exact source push-growth capacities",
           "status": "ported",
-          "go_target": "pkg/util/util_param_descrs.go",
+          "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",

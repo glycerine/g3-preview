@@ -4,8 +4,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -16,7 +17,7 @@ func paramsMust(t *testing.T, e error) {
 		t.Fatal(e)
 	}
 }
-func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *unumeral.RationalService) {
+func paramsTestOwner(t *testing.T) (*uparams.ParamsContext, *usymbol.Manager, *unumeral.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
@@ -27,7 +28,7 @@ func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *unum
 	if e != nil {
 		t.Fatal(e)
 	}
-	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
+	c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -52,9 +53,9 @@ func statFixture(t *testing.T) *statistics.Statistics {
 	return statistics.New()
 }
 func statKey(v string) statistics.Key { return statistics.Key(v) }
-func pdnew(t *testing.T, m *usymbol.Manager, b *arena.Budget) *util.ParamDescrs {
+func pdnew(t *testing.T, m *usymbol.Manager, b *arena.Budget) *uparams.ParamDescrs {
 	t.Helper()
-	d, e := util.NewParamDescrs(m, util.ParamDescrsConfig{Budget: b, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2}}})
+	d, e := uparams.NewParamDescrs(m, uparams.ParamDescrsConfig{Budget: b, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2}}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -74,7 +75,7 @@ func symbolManagerTest(t *testing.T, b *arena.Budget, direct bool) *usymbol.Mana
 	})
 	return m
 }
-func pdinsert(t *testing.T, d *util.ParamDescrs, n string, k util.ParamKind, descr, def, mod *string) {
+func pdinsert(t *testing.T, d *uparams.ParamDescrs, n string, k uparams.ParamKind, descr, def, mod *string) {
 	t.Helper()
 	if e := d.InsertName(n, k, descr, def, mod); e != nil {
 		t.Fatal(e)
@@ -82,9 +83,9 @@ func pdinsert(t *testing.T, d *util.ParamDescrs, n string, k util.ParamKind, des
 }
 func pdstr(s string) *string { return &s }
 
-func pdtotal(s util.ParamDescrsStats) uint64 {
+func pdtotal(s uparams.ParamDescrsStats) uint64 {
 	return s.OwnerBytes + s.TableBytes + s.NamesBytes
 }
-func paramsBorrowedPhysicalBytes(s util.ParamsStats) uint64 {
+func paramsBorrowedPhysicalBytes(s uparams.ParamsStats) uint64 {
 	return s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.SourceSetBytes + s.ReplacementBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes
 }

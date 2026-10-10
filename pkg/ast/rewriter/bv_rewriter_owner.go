@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // BVRewriter owns the derived BV object's persistent members. The polynomial
@@ -17,7 +17,7 @@ import (
 type BVRewriter struct {
 	self                  *BVRewriter
 	manager               *ast.ASTManager
-	context               *util.ParamsContext
+	context               *uparams.ParamsContext
 	bvFamily, arithFamily ast.FamilyID
 	polynomial            *BVPolynomialRewriter
 	extract               MkExtractProc
@@ -57,20 +57,20 @@ type BVRewriter struct {
 	concat                *bvConcatInvocation
 	mulBound              *ast.BitVectorMultiplyBoundNumerals
 	eqRefs                [2]ast.ASTRef
-	defaultParams         util.ParamsRef
-	defaultDecrement      util.ParamsDecrementReceipt
+	defaultParams         uparams.ParamsRef
+	defaultDecrement      uparams.ParamsDecrementReceipt
 	defaultPlaced         bool
 	header                uint64
 	running, closed       bool
 	cause                 error
 }
 
-func NewBVRewriter(m *ast.ASTManager, c *util.ParamsContext, g *util.GlobalParams, local *util.ParamsRef) (*BVRewriter, error) {
+func NewBVRewriter(m *ast.ASTManager, c *uparams.ParamsContext, g *uparams.GlobalParams, local *uparams.ParamsRef) (*BVRewriter, error) {
 	if _, e := m.ProofsEnabled(); e != nil {
 		return nil, e
 	}
 	if c == nil || g == nil || g.ContextField != c {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if local != nil {
 		if e := c.Check(local); e != nil {
@@ -139,7 +139,7 @@ func (p *BVRewriter) fail(e error) error {
 	}
 	return e
 }
-func (p *BVRewriter) endDefault(c *util.ParamsContext) error {
+func (p *BVRewriter) endDefault(c *uparams.ParamsContext) error {
 	if !p.defaultPlaced {
 		return nil
 	}
@@ -151,7 +151,7 @@ func (p *BVRewriter) endDefault(c *util.ParamsContext) error {
 	}
 	if e == nil {
 		p.defaultPlaced = false
-		p.defaultDecrement = util.ParamsDecrementReceipt{}
+		p.defaultDecrement = uparams.ParamsDecrementReceipt{}
 	}
 	return e
 }
@@ -161,7 +161,7 @@ func (p *BVRewriter) State() (BVRewriterConfigurationState, error) {
 	}
 	return p.polynomial.config.BitVectorState()
 }
-func (p *BVRewriter) Update(local *util.ParamsRef) error {
+func (p *BVRewriter) Update(local *uparams.ParamsRef) error {
 	if e := p.open(); e != nil {
 		return e
 	}

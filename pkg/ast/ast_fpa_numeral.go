@@ -4,8 +4,8 @@ package ast
 import (
 	"math"
 
-	"github.com/glycerine/g3/pkg/util"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -33,16 +33,16 @@ func (p *astFloatingPointPluginOwner) numeralAssertionsEnabled() (bool, error) {
 }
 func (p *astFloatingPointPluginOwner) numeralAssertionFailure(line int32, condition string) error {
 	if p.assertions == nil {
-		return util.ErrGlobalParamsAssertion
+		return uparams.ErrGlobalParamsAssertion
 	}
 	return p.assertions.NamespaceAssertionFailure("src/ast/fpa_decl_plugin.cpp", line, condition)
 }
-func (p *astFloatingPointPluginOwner) mkNumeralDecl(value *unumeral.ArbitraryFloat, g *util.GlobalParamsService) (astNodeRef, error) {
+func (p *astFloatingPointPluginOwner) mkNumeralDecl(value *unumeral.ArbitraryFloat, g *uparams.GlobalParamsService) (astNodeRef, error) {
 	if p == nil || p.self != p || p.owner == nil || p.owner.floatingPointPlugin != p || !p.published || p.sourceEnded || value == nil {
 		return astNodeRef{}, ErrASTHandle
 	}
 	if g != nil && (g.CheckBudget(p.owner.BudgetField) != nil) {
-		return astNodeRef{}, util.ErrGlobalParamsOwner
+		return astNodeRef{}, uparams.ErrGlobalParamsOwner
 	}
 	if p.assertions != nil && p.assertions != g {
 		return astNodeRef{}, ErrASTHandle
@@ -178,7 +178,7 @@ func (p *astFloatingPointPluginOwner) recycledValueID(id uint32) error {
 
 // Source: src/ast/fpa_decl_plugin.cpp:94-95. This reaches the same actual
 // declaration registration and application constructor, without another clone.
-func (p *astFloatingPointPluginOwner) mkNumeral(value *unumeral.ArbitraryFloat, g *util.GlobalParamsService) (astNodeRef, error) {
+func (p *astFloatingPointPluginOwner) mkNumeral(value *unumeral.ArbitraryFloat, g *uparams.GlobalParamsService) (astNodeRef, error) {
 	decl, e := p.mkNumeralDecl(value, g)
 	if e != nil {
 		return astNodeRef{}, e

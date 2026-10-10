@@ -7,10 +7,11 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 func satSCCFixture(t *testing.T, n uint32) (*satSCC, *satSolverClauseLifecycle) {
@@ -267,8 +268,8 @@ func TestSATSCCParametersAndNativeLocalStorage(t *testing.T) {
 	local, err := ctx.NewValue()
 	satOK(t, err)
 	t.Cleanup(func() { satOK(t, ctx.Del(&local)) })
-	p.config.globals.Register = func(r util.GlobalParamsRegistrar) error {
-		d, err := util.NewParamDescrs(p.config.symbols, util.ParamDescrsConfig{Budget: p.config.globals.Budget})
+	p.config.globals.Register = func(r uparams.GlobalParamsRegistrar) error {
+		d, err := uparams.NewParamDescrs(p.config.symbols, uparams.ParamDescrsConfig{Budget: p.config.globals.Budget})
 		if err != nil {
 			return err
 		}

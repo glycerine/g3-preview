@@ -9,8 +9,9 @@ import (
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 type astBVLiteralFrame struct {
@@ -233,10 +234,10 @@ func (f *astBVLiteralFrame) endDigits() error {
 	}
 	return nil
 }
-func astBVPPFalse(g *util.GlobalParamsService, line int32, condition string) error {
-	return util.NamespaceAssertionFailureOptional(g, "src/ast/ast_smt2_pp.cpp", line, condition)
+func astBVPPFalse(g *uparams.GlobalParamsService, line int32, condition string) error {
+	return uparams.NamespaceAssertionFailureOptional(g, "src/ast/ast_smt2_pp.cpp", line, condition)
 }
-func (m *ASTManager) ppBitVectorLiteral(h ASTHandle, signed, radix bool, g *util.GlobalParamsService) (out ASTHandle, result error) {
+func (m *ASTManager) ppBitVectorLiteral(h ASTHandle, signed, radix bool, g *uparams.GlobalParamsService) (out ASTHandle, result error) {
 	if e := m.lock(); e != nil {
 		return out, e
 	}
@@ -245,9 +246,9 @@ func (m *ASTManager) ppBitVectorLiteral(h ASTHandle, signed, radix bool, g *util
 	defer func() { m.formatExecuting = false }()
 	return m.ppBitVectorLiteralCore(h, signed, radix, g, nil)
 }
-func (m *ASTManager) ppBitVectorLiteralCore(h ASTHandle, signed, radix bool, g *util.GlobalParamsService, captured **astBVLiteralFrame) (out ASTHandle, result error) {
+func (m *ASTManager) ppBitVectorLiteralCore(h ASTHandle, signed, radix bool, g *uparams.GlobalParamsService, captured **astBVLiteralFrame) (out ASTHandle, result error) {
 	if g != nil && (g.CheckBudget(m.BudgetField) != nil) {
-		return out, util.ErrGlobalParamsOwner
+		return out, uparams.ErrGlobalParamsOwner
 	}
 	fm := m.Format
 	if fm == nil {

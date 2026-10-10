@@ -4,13 +4,13 @@ package ast
 import (
 	"errors"
 
-	"github.com/glycerine/g3/pkg/util"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // The gate is reached before evaluating the condition. Release erases provider
 // access; nil selects the existing enabled-default assertion adapter.
-func astBVAssertionEnabled(g *util.GlobalParamsService) (bool, error) {
+func astBVAssertionEnabled(g *uparams.GlobalParamsService) (bool, error) {
 	if !ASTSourceDebug {
 		return false, nil
 	}
@@ -49,10 +49,10 @@ func (m *ASTManager) normalizeBitVectorValueWithInvocation(value *unumeral.Owned
 	return m.normalizeBitVectorWithFrame(value, bits, signed, nil, &c.receipt)
 }
 
-func (m *ASTManager) normalizeBitVector(value *unumeral.OwnedRational, bits uint32, signed bool, g *util.GlobalParamsService) (out unumeral.OwnedRational, result error) {
+func (m *ASTManager) normalizeBitVector(value *unumeral.OwnedRational, bits uint32, signed bool, g *uparams.GlobalParamsService) (out unumeral.OwnedRational, result error) {
 	return m.normalizeBitVectorWithFrame(value, bits, signed, g, nil)
 }
-func (m *ASTManager) normalizeBitVectorWithFrame(value *unumeral.OwnedRational, bits uint32, signed bool, g *util.GlobalParamsService, captured *astBVNormalizationReceipt) (out unumeral.OwnedRational, result error) {
+func (m *ASTManager) normalizeBitVectorWithFrame(value *unumeral.OwnedRational, bits uint32, signed bool, g *uparams.GlobalParamsService, captured *astBVNormalizationReceipt) (out unumeral.OwnedRational, result error) {
 	f, e := m.beginBVNumeralFrame()
 	if e != nil {
 		return out, e
@@ -121,7 +121,7 @@ func (m *ASTManager) normalizeBitVectorWithFrame(value *unumeral.OwnedRational, 
 			return out, e
 		}
 		if negative {
-			if e = util.NamespaceAssertionFailureOptional(g, "src/ast/bv_decl_plugin.cpp", 755, "!r.is_neg()"); e != nil {
+			if e = uparams.NamespaceAssertionFailureOptional(g, "src/ast/bv_decl_plugin.cpp", 755, "!r.is_neg()"); e != nil {
 				return out, e
 			}
 		}

@@ -1,9 +1,11 @@
 // Parameter collectors remain with the C++ definitions they translate.
 package fpa
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	uparams "github.com/glycerine/g3/pkg/util/params"
+)
 
-func catalogInsert(d *util.ParamDescrs, key string, kind util.ParamKind, descr, def, module string) error {
+func catalogInsert(d *uparams.ParamDescrs, key string, kind uparams.ParamKind, descr, def, module string) error {
 	if module == "" {
 		return d.InsertName(key, kind, &descr, &def, nil)
 	}
@@ -11,13 +13,13 @@ func catalogInsert(d *util.ParamDescrs, key string, kind util.ParamKind, descr, 
 }
 
 // Source: src/ast/fpa/fpa2bv_rewriter_params.pyg
-func catalogCollectFpa2bvRewriterParams(d *util.ParamDescrs) error {
-	if e := catalogInsert(d, "hi_fp_unspecified", util.ParamBool, "use the 'hardware interpretation' for unspecified values in fp.min, fp.max, fp.to_ubv, fp.to_sbv, and fp.to_real", "false", "rewriter"); e != nil {
+func catalogCollectFpa2bvRewriterParams(d *uparams.ParamDescrs) error {
+	if e := catalogInsert(d, "hi_fp_unspecified", uparams.ParamBool, "use the 'hardware interpretation' for unspecified values in fp.min, fp.max, fp.to_ubv, fp.to_sbv, and fp.to_real", "false", "rewriter"); e != nil {
 		return e
 	}
 	return nil
 }
 
 func init() {
-	util.RegisterGlobalParamsCollector("catalogCollectFpa2bvRewriterParams", catalogCollectFpa2bvRewriterParams)
+	uparams.RegisterGlobalParamsCollector("catalogCollectFpa2bvRewriterParams", catalogCollectFpa2bvRewriterParams)
 }

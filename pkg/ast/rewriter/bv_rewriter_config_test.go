@@ -4,9 +4,8 @@ package rewriter
 
 import (
 	"errors"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestBVRewriterConfigurationDefaultsAndLocalOnlyOption(t *testing.T) {
@@ -121,7 +120,7 @@ func TestBVRewriterConfigurationAllocationFreeSnapshotAndStoppedOwner(t *testing
 		t.Fatal(old)
 	}
 	copied := *p
-	if e = copied.Close(); !errors.Is(e, util.ErrParamsOwner) {
+	if e = copied.Close(); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("copied owner", e)
 	}
 	// An actual unavailable borrowed global owner stops the reached suffix.
@@ -174,7 +173,7 @@ func TestBVRewriterConfigurationDescriptionsAndIndependentSetter(t *testing.T) {
 		t.Fatal("local update must overwrite source setter")
 	}
 	for _, external := range []bool{false, true} {
-		d, e := util.NewParamDescrs(g.SymbolsField, util.ParamDescrsConfig{Budget: b})
+		d, e := uparams.NewParamDescrs(g.SymbolsField, uparams.ParamDescrsConfig{Budget: b})
 		astTestMust(t, e)
 		astTestMust(t, BVRewriterParameterDescriptions(d, external))
 		for _, key := range []string{"flat", "som", "hoist_mul", "som_blowup", "hi_div0", "bit2bool", "mul2concat", "bv_sort_ac", "bv_urem_simpl"} {

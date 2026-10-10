@@ -3,9 +3,8 @@ package ast
 
 import (
 	"errors"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestASTBitVectorOriginalSizeSortAndExpression(t *testing.T) {
@@ -69,7 +68,7 @@ func TestASTBitVectorSizeSourceDebugGuardAndReleaseRead(t *testing.T) {
 		width, body := m.BitVectorSize(s)
 		m.Budget().FailAfter(-1)
 		if ASTSourceDebug {
-			if !errors.Is(body, util.ErrGlobalParamsAssertion) {
+			if !errors.Is(body, uparams.ErrGlobalParamsAssertion) {
 				t.Fatal("source sort assertion", body)
 			}
 		} else if body != nil || width != ^uint32(0)-2 {

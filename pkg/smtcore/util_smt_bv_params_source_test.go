@@ -11,9 +11,10 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -58,7 +59,7 @@ func TestSMTBVSevenDefaultsThenActualUpdate(t *testing.T) {
 	}
 }
 
-func bvNamedColdGraph(t *testing.T, v *SMTBVParams, g *util.GlobalParamsService, b *arena.Budget) {
+func bvNamedColdGraph(t *testing.T, v *SMTBVParams, g *uparams.GlobalParamsService, b *arena.Budget) {
 	t.Helper()
 	n := g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
@@ -162,7 +163,7 @@ func TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix(t *testi
 				if got.HiDiv0 || v.constructorReady || v.constructorCause != cause {
 					t.Fatal("failed constructor initialized prefix", ordinal, got)
 				}
-				if e = v.Update(p); !errors.Is(e, util.ErrParamsPrecondition) {
+				if e = v.Update(p); !errors.Is(e, uparams.ErrParamsPrecondition) {
 					t.Fatal("incomplete constructor guard", e)
 				}
 			} else if !got.HiDiv0 || !v.constructorReady {
@@ -191,13 +192,13 @@ func TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes(t *testing.T) {
 		sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 		paramsMust(t, e)
 		bc := arena.NewBudget(^uint64(0))
-		c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+		c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 		paramsMust(t, e)
-		catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+		catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 		paramsMust(t, e)
 		cfg := gparamsTestConfig(b)
 		cfg.Catalog = catalog
-		g, e := util.NewGlobalParamsService(sy, c, cfg)
+		g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 		paramsMust(t, e)
 		paramsMust(t, g.InitializeSource())
 		local, e := c.NewValue()
@@ -314,15 +315,15 @@ func TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper(t *testing.T) 
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
-	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+	c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
 	m, e := polynomial.NewUPolynomialManagerFromRationalService(q, polynomial.UPolynomialConfig{Checkpoint: func() bool { panic("unreached polynomial checkpoint") }, Cooperation: func() error { panic("unreached polynomial cooperation") }})
 	paramsMust(t, e)
-	catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+	catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 	paramsMust(t, e)
 	cfg := gparamsTestConfig(b)
 	cfg.Catalog = catalog
-	g, e := util.NewGlobalParamsService(sy, c, cfg)
+	g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 	paramsMust(t, e)
 	paramsMust(t, g.InitializeSource())
 	local, e := c.NewValue()
@@ -405,7 +406,7 @@ func TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper(t *testing.T) 
 	v.Running = false
 	// Callback/foreign owning requests cannot replace or adopt the exact frame.
 	copyOwner := *v
-	if e := copyOwner.Close(); !errors.Is(e, util.ErrParamsOwner) {
+	if e := copyOwner.Close(); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("foreign copied outer owner", e)
 	}
 	paramsDecFinish(t, v.Close)
@@ -434,7 +435,7 @@ func TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion(t *
 	bvNamedColdGraph(t, v, g, b)
 	before := sb.Used()
 	sb.FailAfter(0)
-	if e := v.Display(out); !errors.Is(e, util.ErrParamsPrecondition) {
+	if e := v.Display(out); !errors.Is(e, uparams.ErrParamsPrecondition) {
 		t.Fatal("incomplete source object entered display", e)
 	}
 	got, e := out.String()
@@ -475,11 +476,11 @@ func TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter(t *testing.T) {
 	if v == nil {
 		t.Fatal("actual initialized scalar wrapper before source helper", cause)
 	}
-	if util.GlobalParamsSourceDebug {
-		if !errors.Is(cause, util.ErrGlobalParamsAssertion) {
+	if uparams.GlobalParamsSourceDebug {
+		if !errors.Is(cause, uparams.ErrGlobalParamsAssertion) {
 			t.Fatal("actual source namespace assertion", cause)
 		}
-	} else if !errors.Is(cause, util.ErrGlobalParamsUninitialized) {
+	} else if !errors.Is(cause, uparams.ErrGlobalParamsUninitialized) {
 		t.Fatal("null-global Go guard", cause)
 	}
 	want := SMTBVState{Mode: 1, Reflect: true, BlastMaxSize: 2147483647, EnableInt2BV: true}
@@ -500,7 +501,7 @@ func TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter(t *testing.T) {
 	defer func() { paramsMust(t, foreignC.Del(&foreign)) }()
 	before, _ := v.State()
 	serial := v.Serial
-	if e = v.Update(&foreign); !errors.Is(e, util.ErrParamsOwner) {
+	if e = v.Update(&foreign); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("reached local ParamsRef owner guard", e)
 	}
 	after, _ := v.State()

@@ -7,7 +7,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -18,7 +19,7 @@ type SMTBVState struct {
 	EnableInt2BV                bool
 }
 type SMTBVParams struct {
-	util.ModuleParamsOwner
+	uparams.ModuleParamsOwner
 	self                     *SMTBVParams
 	state                    SMTBVState
 	header                   uint64
@@ -26,9 +27,9 @@ type SMTBVParams struct {
 	constructorCause         error
 }
 
-func NewSMTBVParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) (*SMTBVParams, error) {
+func NewSMTBVParams(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) (*SMTBVParams, error) {
 	if c == nil || g == nil || b == nil || g.CheckOwner(c, b) != nil {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if e := c.Check(p); e != nil {
 		return nil, e
@@ -46,11 +47,11 @@ func NewSMTBVParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalPara
 }
 
 // Same source constructor engine: an actual containing header charges embedded fields once.
-func (s *SMTBVParams) constructSource(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) error {
+func (s *SMTBVParams) constructSource(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) error {
 	if s == nil || s.self != nil {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
-	*s = SMTBVParams{ModuleParamsOwner: util.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header, state: SMTBVState{1, false, true, false, false, 2147483647, true}}
+	*s = SMTBVParams{ModuleParamsOwner: uparams.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header, state: SMTBVState{1, false, true, false, false, 2147483647, true}}
 	s.self = s
 	s.ModuleParamsOwner.Self = &s.ModuleParamsOwner
 	e := s.update(p)
@@ -63,10 +64,10 @@ func (s *SMTBVParams) constructSource(c *util.ParamsContext, p *util.ParamsRef, 
 }
 func (s *SMTBVParams) open() error {
 	if s == nil || s.self != s || s.closed {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return nil
 }
@@ -76,21 +77,21 @@ func (s *SMTBVParams) State() (SMTBVState, error) {
 	}
 	return s.state, nil
 }
-func (s *SMTBVParams) Update(p *util.ParamsRef) error {
+func (s *SMTBVParams) Update(p *uparams.ParamsRef) error {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return s.update(p)
 }
-func (s *SMTBVParams) update(local *util.ParamsRef) (result error) {
+func (s *SMTBVParams) update(local *uparams.ParamsRef) (result error) {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if s.Helpers != nil || s.DestructorCause != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.Running = true
 	defer func() { s.Running = false }()
@@ -127,13 +128,13 @@ func (s *SMTBVParams) update(local *util.ParamsRef) (result error) {
 }
 func (s *SMTBVParams) Close() error {
 	if s == nil || s.self != s {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.closed {
 		return nil
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := s.CloseHelpers(); e != nil {
 		return e
@@ -148,7 +149,7 @@ func (s *SMTBVParams) Display(out *utext.NumericTextStream) error {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := out.AppendCString("m_bv_mode="); e != nil {
 		return e

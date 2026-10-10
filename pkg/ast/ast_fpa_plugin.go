@@ -7,9 +7,9 @@ import (
 	"math"
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -21,7 +21,7 @@ type astFloatingPointPluginOwner struct {
 	literalPrimary                                              astFloatLiteralFrame
 	literalFrames                                               *astFloatLiteralFrame
 	literalSerial                                               uint64
-	assertions                                                  *util.GlobalParamsService
+	assertions                                                  *uparams.GlobalParamsService
 	next                                                        *astFloatingPointPluginOwner
 	self                                                        *astFloatingPointPluginOwner
 	owner                                                       *ASTManager

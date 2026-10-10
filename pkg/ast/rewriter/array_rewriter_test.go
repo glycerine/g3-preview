@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"testing"
 )
 
@@ -191,11 +192,11 @@ func TestArrayRewriterOriginalSortingConstantAndIteRules(t *testing.T) {
 		t.Fatal("parameter update did not reset source flags")
 	}
 	copyOwner := *rw
-	if e = copyOwner.SetExpandSelectIte(true); e != util.ErrParamsOwner {
+	if e = copyOwner.SetExpandSelectIte(true); e != uparams.ErrParamsOwner {
 		t.Fatal("copied owner accepted", e)
 	}
 	satOK(t, rw.Close())
-	if _, e = rw.MkAppCore(ast.ASTHandle{}, ast.SliceArguments(nil), out); e != util.ErrParamsOwner {
+	if _, e = rw.MkAppCore(ast.ASTHandle{}, ast.SliceArguments(nil), out); e != uparams.ErrParamsOwner {
 		t.Fatal("closed owner accepted", e)
 	}
 }

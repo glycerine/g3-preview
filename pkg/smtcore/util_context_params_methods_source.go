@@ -10,7 +10,8 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -20,12 +21,12 @@ type contextParamsFrame struct {
 	next                                                                     *contextParamsFrame
 	invocation, header                                                       uint64
 	key                                                                      OwnedString
-	descriptor                                                               util.ParamDescrs
+	descriptor                                                               uparams.ParamDescrs
 	buffer                                                                   bytes.Buffer
-	value                                                                    util.ParamsRef
-	sourceReceipt                                                            util.ParamsSourceReceipt
-	setReceipt                                                               util.ParamsSetReceipt
-	decrement                                                                util.ParamsDecrementReceipt
+	value                                                                    uparams.ParamsRef
+	sourceReceipt                                                            uparams.ParamsSourceReceipt
+	setReceipt                                                               uparams.ParamsSetReceipt
+	decrement                                                                uparams.ParamsDecrementReceipt
 	bodyCause, destructorCause, ownCause                                     error
 	setAcknowledged, sourceAcknowledged                                      bool
 	keyComplete, descriptorAttempted, bufferComplete, valueOwned, sourceDone bool
@@ -33,7 +34,7 @@ type contextParamsFrame struct {
 
 func (s *ContextParams) beginSourceFrame() (*contextParamsFrame, error) {
 	if s.destructorCause != nil {
-		return nil, util.ErrParamsPrecondition
+		return nil, uparams.ErrParamsPrecondition
 	}
 	if s.nextFrame == math.MaxUint64 {
 		return nil, arena.ErrBounds
@@ -103,7 +104,7 @@ func (s *ContextParams) closeSourceFrames() error {
 	for s.frames != nil {
 		f := s.frames
 		if f.self != f || f.owner != s || f.invocation == 0 {
-			return util.ErrParamsOwner
+			return uparams.ErrParamsOwner
 		}
 		if f.setReceipt.Invocation() != 0 && !f.setAcknowledged {
 			if e := s.context.CleanupSet(f.setReceipt); e != nil {
@@ -128,7 +129,7 @@ func (s *ContextParams) closeSourceFrames() error {
 			if f.decrement.Invocation() != 0 {
 				e = s.context.CompleteDecrement(&f.value, f.decrement)
 				if e == nil {
-					f.value = util.ParamsRef{}
+					f.value = uparams.ParamsRef{}
 				}
 			} else {
 				e = s.context.DelTracked(&f.value, &f.decrement)
@@ -165,21 +166,21 @@ func (s *ContextParams) sourceCallReady() error {
 		return e
 	}
 	if !s.ready {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return nil
 }
 func (s *ContextParams) Set(param, value *string) error {
-	var p, v util.ParamsStringView
+	var p, v uparams.ParamsStringView
 	if param != nil {
-		p = util.LiteralParamsStringView(*param)
+		p = uparams.LiteralParamsStringView(*param)
 	}
 	if value != nil {
-		v = util.LiteralParamsStringView(*value)
+		v = uparams.LiteralParamsStringView(*value)
 	}
 	return s.SetViews(p, v)
 }
-func (s *ContextParams) SetViews(param, value util.ParamsStringView) (result error) {
+func (s *ContextParams) SetViews(param, value uparams.ParamsStringView) (result error) {
 	if e := s.sourceCallReady(); e != nil {
 		return e
 	}
@@ -249,7 +250,7 @@ func (s *ContextParams) SetViews(param, value util.ParamsStringView) (result err
 		return s.setSourceBool(f, &s.state.SMTLib2Compliant, param, value)
 	}
 	f.descriptorAttempted = true
-	if e = f.descriptor.InitEmbeddedSource(s.context.Symbols(), util.ParamDescrsConfig{Budget: s.budget}); e != nil {
+	if e = f.descriptor.InitEmbeddedSource(s.context.Symbols(), uparams.ParamDescrsConfig{Budget: s.budget}); e != nil {
 		return e
 	}
 	if e = catalogCollectContextParams(&f.descriptor); e != nil {
@@ -272,7 +273,7 @@ func (s *ContextParams) SetViews(param, value util.ParamsStringView) (result err
 	return z3exception.NewDefaultException(f.buffer.String())
 }
 
-func contextStringEqual(v util.ParamsStringView, text string) (bool, error) {
+func contextStringEqual(v uparams.ParamsStringView, text string) (bool, error) {
 	for i := 0; i <= len(text); i++ {
 		b, e := v.Byte(uint64(i))
 		if e != nil {
@@ -288,7 +289,7 @@ func contextStringEqual(v util.ParamsStringView, text string) (bool, error) {
 	}
 	return true, nil
 }
-func (s *ContextParams) setSourceBool(f *contextParamsFrame, opt *bool, param, value util.ParamsStringView) error {
+func (s *ContextParams) setSourceBool(f *contextParamsFrame, opt *bool, param, value uparams.ParamsStringView) error {
 	equal, e := contextStringEqual(value, "true")
 	if e != nil {
 		return e
@@ -307,7 +308,7 @@ func (s *ContextParams) setSourceBool(f *contextParamsFrame, opt *bool, param, v
 	}
 	return s.sourceInvalidValue(f, "Boolean", param, value)
 }
-func (s *ContextParams) setSourceUInt(f *contextParamsFrame, opt *uint32, param, value util.ParamsStringView) error {
+func (s *ContextParams) setSourceUInt(f *contextParamsFrame, opt *uint32, param, value uparams.ParamsStringView) error {
 	n, e := value.Length()
 	if e != nil {
 		return e
@@ -346,7 +347,7 @@ func (s *ContextParams) setSourceUInt(f *contextParamsFrame, opt *uint32, param,
 	*opt = uint32(number)
 	return nil
 }
-func appendContextView(out *bytes.Buffer, v util.ParamsStringView) error {
+func appendContextView(out *bytes.Buffer, v uparams.ParamsStringView) error {
 	// The selected char-pointer insertion obtains strlen before stream emission.
 	n, e := v.Length()
 	if e != nil {
@@ -361,7 +362,7 @@ func appendContextView(out *bytes.Buffer, v util.ParamsStringView) error {
 	}
 	return nil
 }
-func (s *ContextParams) sourceInvalidValue(f *contextParamsFrame, kind string, param, value util.ParamsStringView) error {
+func (s *ContextParams) sourceInvalidValue(f *contextParamsFrame, kind string, param, value uparams.ParamsStringView) error {
 	f.bufferComplete = true
 	f.buffer.WriteString("invalid value '")
 	if e := appendContextView(&f.buffer, value); e != nil {
@@ -380,25 +381,25 @@ func (s *ContextParams) sourceInvalidValue(f *contextParamsFrame, kind string, p
 // The returned value is one actually acquired reference; callers own its Del.
 // A source failure retains the concrete lexical owner and exact child receipt
 // until source destruction/explicit owning abort, never a reference-count guess.
-func (s *ContextParams) MergeDefaultParams(p *util.ParamsRef) (value util.ParamsRef, result error) {
+func (s *ContextParams) MergeDefaultParams(p *uparams.ParamsRef) (value uparams.ParamsRef, result error) {
 	if e := s.sourceCallReady(); e != nil {
-		return util.ParamsRef{}, e
+		return uparams.ParamsRef{}, e
 	}
 	s.executing = true
 	defer func() { s.executing = false }()
 	f, e := s.beginSourceFrame()
 	if e != nil {
-		return util.ParamsRef{}, e
+		return uparams.ParamsRef{}, e
 	}
 	defer func() { result = s.endSourceFrame(f, result) }()
 	if e = s.mergeSourceFrame(f, p); e != nil {
-		return util.ParamsRef{}, e
+		return uparams.ParamsRef{}, e
 	}
 	value = f.value
 	f.valueOwned = false // Actual successful return/NRVO transfer.
 	return value, nil
 }
-func (s *ContextParams) mergeSourceFrame(f *contextParamsFrame, p *util.ParamsRef) error {
+func (s *ContextParams) mergeSourceFrame(f *contextParamsFrame, p *uparams.ParamsRef) error {
 	change := false
 	if !s.state.AutoConfig {
 		found, e := s.context.ContainsName(p, dynSourceName("auto_config"))
@@ -421,7 +422,7 @@ func (s *ContextParams) mergeSourceFrame(f *contextParamsFrame, p *util.ParamsRe
 		set, guard := s.context.StoppedSet(&f.value)
 		if guard == nil {
 			f.setReceipt = set
-		} else if !errors.Is(guard, util.ErrParamsPrecondition) {
+		} else if !errors.Is(guard, uparams.ErrParamsPrecondition) {
 			return errors.Join(e, guard)
 		}
 		// This actual mutation began with a fresh copied reference, so an active
@@ -429,7 +430,7 @@ func (s *ContextParams) mergeSourceFrame(f *contextParamsFrame, p *util.ParamsRe
 		r, guard := s.context.StoppedSource(&f.value)
 		if guard == nil {
 			f.sourceReceipt = r
-		} else if !errors.Is(guard, util.ErrParamsPrecondition) {
+		} else if !errors.Is(guard, uparams.ErrParamsPrecondition) {
 			return errors.Join(e, guard)
 		}
 		return e
@@ -437,7 +438,7 @@ func (s *ContextParams) mergeSourceFrame(f *contextParamsFrame, p *util.ParamsRe
 	return nil
 }
 func dynSourceName(s string) *string { return &s }
-func (s *ContextParams) GetSolverParams(m *ast.ASTManager, p *util.ParamsRef, proofs, models, unsatCore *bool) (result error) {
+func (s *ContextParams) GetSolverParams(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, unsatCore *bool) (result error) {
 	if e := s.sourceCallReady(); e != nil {
 		return e
 	}
@@ -460,7 +461,7 @@ func (s *ContextParams) GetSolverParams(m *ast.ASTManager, p *util.ParamsRef, pr
 		}
 	}
 	if proofs == nil {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	*proofs = proof
 	model, e := s.context.GetBoolName(p, dynSourceName("model"), s.state.Model)
@@ -468,7 +469,7 @@ func (s *ContextParams) GetSolverParams(m *ast.ASTManager, p *util.ParamsRef, pr
 		return e
 	}
 	if models == nil {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	*models = model
 	core, e := s.context.GetBoolName(p, dynSourceName("unsat_core"), s.state.UnsatCore)
@@ -476,7 +477,7 @@ func (s *ContextParams) GetSolverParams(m *ast.ASTManager, p *util.ParamsRef, pr
 		return e
 	}
 	if unsatCore == nil {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	*unsatCore = core
 	if e = s.mergeSourceFrame(f, p); e != nil {
@@ -489,7 +490,7 @@ func (s *ContextParams) GetSolverParams(m *ast.ASTManager, p *util.ParamsRef, pr
 		r, guard := s.context.StoppedSource(p)
 		if guard == nil {
 			f.sourceReceipt = r
-		} else if !errors.Is(guard, util.ErrParamsPrecondition) {
+		} else if !errors.Is(guard, uparams.ErrParamsPrecondition) {
 			return errors.Join(e, guard)
 		}
 		return e

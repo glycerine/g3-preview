@@ -6,14 +6,15 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/control"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 type SolverConfig struct {
-	ParamsContext *util.ParamsContext
-	Params        util.ParamsRef
+	ParamsContext *uparams.ParamsContext
+	Params        uparams.ParamsRef
 	RLimit        *control.Reslimit
 	Budget        *arena.Budget
 	Runtime       *Runtime
@@ -27,7 +28,7 @@ type Solver struct {
 	blockedCorrectionSets        uint32                   // actual m_stats field; source has only reset/read sites.
 	self                         *Solver
 	runtime                      *Runtime
-	context                      *util.ParamsContext
+	context                      *uparams.ParamsContext
 	Limit                        *control.Reslimit
 	budget                       *arena.Budget
 	config                       *satMainConfig
@@ -48,7 +49,7 @@ type Solver struct {
 	gc                           *satSolverGC
 	model                        satUintColumn
 	mus                          satSolverMUSMembers
-	params                       util.ParamsRef
+	params                       uparams.ParamsRef
 	elimTodo                     *satSolverUintSet
 	antecedents                  *satSolverIndexMap
 	auxLiterals, todoAntecedents satUintColumn
@@ -250,7 +251,7 @@ func (s *Solver) open() error {
 	}
 	return s.Lifecycle.open()
 }
-func (s *Solver) updateParams(p *util.ParamsRef) error {
+func (s *Solver) updateParams(p *uparams.ParamsRef) error {
 	// This helper is also the actual constructor body; no fabricated completed
 	// solver gate precedes its reached parameter actions.
 	if e := s.identity(); e != nil {
@@ -284,7 +285,7 @@ func (s *Solver) updateParams(p *util.ParamsRef) error {
 	s.decision.rng.SetSeed(cfg.RandomSeed)
 	return nil
 }
-func (s *Solver) UpdateParams(p *util.ParamsRef) error {
+func (s *Solver) UpdateParams(p *uparams.ParamsRef) error {
 	if e := s.open(); e != nil {
 		return e
 	}

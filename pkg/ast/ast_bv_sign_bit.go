@@ -2,8 +2,8 @@
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/util"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 func (m *ASTManager) BitVectorHasSignBit(n *unumeral.OwnedRational, bits uint32) (bool, error) {
@@ -36,16 +36,16 @@ func (m *ASTManager) BitVectorHasSignBitWithInvocation(n *unumeral.OwnedRational
 	return m.bitVectorHasSignBitCaptured(n, bits, nil, &c.receipt)
 }
 
-func (m *ASTManager) bitVectorHasSignBit(n *unumeral.OwnedRational, bits uint32, g *util.GlobalParamsService) (bool, error) {
+func (m *ASTManager) bitVectorHasSignBit(n *unumeral.OwnedRational, bits uint32, g *uparams.GlobalParamsService) (bool, error) {
 	return m.bitVectorHasSignBitCaptured(n, bits, g, nil)
 }
-func (m *ASTManager) bitVectorHasSignBitCaptured(n *unumeral.OwnedRational, bits uint32, g *util.GlobalParamsService, captured *astBVNormalizationReceipt) (sign bool, result error) {
+func (m *ASTManager) bitVectorHasSignBitCaptured(n *unumeral.OwnedRational, bits uint32, g *uparams.GlobalParamsService, captured *astBVNormalizationReceipt) (sign bool, result error) {
 	enabled, e := astBVAssertionEnabled(g)
 	if e != nil {
 		return false, e
 	}
 	if enabled && bits == 0 {
-		if e = util.NamespaceAssertionFailureOptional(g, "src/ast/bv_decl_plugin.cpp", 768, "bv_size > 0"); e != nil {
+		if e = uparams.NamespaceAssertionFailureOptional(g, "src/ast/bv_decl_plugin.cpp", 768, "bv_size > 0"); e != nil {
 			return false, e
 		}
 	}

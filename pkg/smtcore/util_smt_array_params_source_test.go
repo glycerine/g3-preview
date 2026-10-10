@@ -10,7 +10,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -65,7 +66,7 @@ func TestSMTArrayDisplayExactlyNineFieldsAndSignedBooleanShowPos(t *testing.T) {
 	}
 }
 
-func arrayNamedColdGraph(t *testing.T, a *SMTArrayParams, g *util.GlobalParamsService, b *arena.Budget, extra ...*SMTArrayParams) {
+func arrayNamedColdGraph(t *testing.T, a *SMTArrayParams, g *uparams.GlobalParamsService, b *arena.Budget, extra ...*SMTArrayParams) {
 	t.Helper()
 	total := g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
@@ -157,9 +158,9 @@ func TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry(t *testi
 	before, e := a.State()
 	paramsMust(t, e)
 	cause := a.Update(c, p, g)
-	want := util.ErrGlobalParamsUninitialized
-	if util.GlobalParamsSourceDebug {
-		want = util.ErrGlobalParamsAssertion
+	want := uparams.ErrGlobalParamsUninitialized
+	if uparams.GlobalParamsSourceDebug {
+		want = uparams.ErrGlobalParamsAssertion
 	}
 	if !errors.Is(cause, want) || a.Helpers != nil {
 		t.Fatal("actual helper constructor source assertion", cause)
@@ -183,7 +184,7 @@ func TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry(t *testi
 		t.Fatal("updt_params modified a field absent from source body", before, a.state)
 	}
 	copy := *a
-	if e = copy.Close(); !errors.Is(e, util.ErrParamsOwner) {
+	if e = copy.Close(); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("copied owning wrapper", e)
 	}
 	arrayNamedColdGraph(t, a, g, b)
@@ -219,16 +220,16 @@ func TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards(t *testing.
 	if !got {
 		t.Fatal("local was cloned instead of borrowed")
 	}
-	if _, e = other.FrameBool(f, "array.weak", false); !errors.Is(e, util.ErrParamsPrecondition) {
+	if _, e = other.FrameBool(f, "array.weak", false); !errors.Is(e, uparams.ErrParamsPrecondition) {
 		t.Fatal("foreign frame admitted", e)
 	}
-	if e = a.Close(); !errors.Is(e, util.ErrParamsPrecondition) {
+	if e = a.Close(); !errors.Is(e, uparams.ErrParamsPrecondition) {
 		t.Fatal("destructive callback admitted during helper execution", e)
 	}
 	arrayNamedColdGraph(t, a, g, b, other)
 	paramsMust(t, a.FinishHelper(f, nil))
 	a.Running = false
-	if _, e = a.FrameBool(f, "array.weak", false); !errors.Is(e, util.ErrParamsPrecondition) {
+	if _, e = a.FrameBool(f, "array.weak", false); !errors.Is(e, uparams.ErrParamsPrecondition) {
 		t.Fatal("ended lexical frame reused", e)
 	}
 	paramsMust(t, other.FinishHelper(foreign, nil))

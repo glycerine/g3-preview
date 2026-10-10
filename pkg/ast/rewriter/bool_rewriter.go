@@ -4,14 +4,14 @@ package rewriter
 
 import (
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // Original Boolean rewriter's AND/OR core fragment. This inline helper borrows
 // its AST manager; boolRewriterStar supplies the original traversal.
 type boolRewriter struct {
 	self                                *boolRewriter
-	params                              util.ModuleParamsOwner
+	params                              uparams.ModuleParamsOwner
 	header                              uint64
 	ready, closed                       bool
 	elimAnd                             bool

@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/random"
 )
 
@@ -213,10 +214,10 @@ func TestSATSolverInterveningChildFailureBeforeQueueConstruction(t *testing.T) {
 	// Both source child parameter reads happen before the later case split
 	// queue member. An actual dead ParamsRef must fail there, not at a fake
 	// ordinary solver readiness gate or premature heap reserve128.
-	if child, e := newSATSCC(l, &invalid); child != nil || !errors.Is(e, util.ErrParamsOwner) {
+	if child, e := newSATSCC(l, &invalid); child != nil || !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("SCC source parameter site", child, e)
 	}
-	if child, e := newSATAsymmBranch(l, &invalid); child != nil || !errors.Is(e, util.ErrParamsOwner) {
+	if child, e := newSATAsymmBranch(l, &invalid); child != nil || !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("asymm source parameter site", child, e)
 	}
 	if v.queue != nil || v.watches != nil || v.activity != nil || v.trail != nil || b.Used() != before || old.memory.Stats().LiveBlocks != rawBefore {

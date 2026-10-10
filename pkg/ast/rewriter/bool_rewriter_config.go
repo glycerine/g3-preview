@@ -9,16 +9,16 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // The standalone cold constructor charges its complete header once. A failed
 // reached parameter constructor returns its owner for explicit Close, following
 // the existing generated-helper lifetime engine. AST/parameter services borrow.
 
-func newBoolRewriter(m *ast.ASTManager, c *util.ParamsContext, g *util.GlobalParamsService, p *util.ParamsRef) (*boolRewriter, error) {
+func newBoolRewriter(m *ast.ASTManager, c *uparams.ParamsContext, g *uparams.GlobalParamsService, p *uparams.ParamsRef) (*boolRewriter, error) {
 	if m == nil || c == nil || g == nil || c.SymbolsField != m.Symbols || g.Context != c {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if _, e := m.ProofsEnabled(); e != nil {
 		return nil, e
@@ -30,10 +30,10 @@ func newBoolRewriter(m *ast.ASTManager, c *util.ParamsContext, g *util.GlobalPar
 	rw := &boolRewriter{header: n}
 	return rw, rw.init(m, c, g, p)
 }
-func (rw *boolRewriter) init(m *ast.ASTManager, c *util.ParamsContext, g *util.GlobalParamsService, p *util.ParamsRef) error {
+func (rw *boolRewriter) init(m *ast.ASTManager, c *uparams.ParamsContext, g *uparams.GlobalParamsService, p *uparams.ParamsRef) error {
 	rw.manager = m
 	rw.self = rw
-	rw.params = util.ModuleParamsOwner{Budget: g.Config.Budget}
+	rw.params = uparams.ModuleParamsOwner{Budget: g.Config.Budget}
 	rw.params.Self = &rw.params
 	if e := rw.params.Bind(c, g); e != nil {
 		return e
@@ -46,24 +46,24 @@ func (rw *boolRewriter) init(m *ast.ASTManager, c *util.ParamsContext, g *util.G
 }
 func (rw *boolRewriter) configuredOpen() error {
 	if rw == nil || rw.self != rw || rw.closed {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if !rw.ready {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	_, e := rw.manager.ProofsEnabled()
 	return e
 }
-func (rw *boolRewriter) UpdtParams(p *util.ParamsRef) error {
+func (rw *boolRewriter) UpdtParams(p *uparams.ParamsRef) error {
 	if e := rw.configuredOpen(); e != nil {
 		return e
 	}
 	return rw.updateParams(p)
 }
-func (rw *boolRewriter) updateParams(local *util.ParamsRef) (err error) {
+func (rw *boolRewriter) updateParams(local *uparams.ParamsRef) (err error) {
 	o := &rw.params
 	if o.Self != o || o.Running || o.DestructorCause != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if local == nil {
 		empty, e := o.Context.NewValue()
@@ -125,7 +125,7 @@ func (rw *boolRewriter) updateParams(local *util.ParamsRef) (err error) {
 func (rw *boolRewriter) ResetLocalContextCost() { rw.localContextCost = 0 }
 func (rw *boolRewriter) Close() error {
 	if rw == nil || rw.self != rw {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if rw.closed {
 		return nil
@@ -229,7 +229,7 @@ func (rw *boolRewriter) mkApp(decl ast.ASTHandle, args []ast.ASTHandle, out ast.
 	}
 	return rw.manager.SetRef(out, h)
 }
-func (rw *boolRewriter) GetParamDescrs(d *util.ParamDescrs) error {
+func (rw *boolRewriter) GetParamDescrs(d *uparams.ParamDescrs) error {
 	return catalogCollectBoolRewriterParams(d)
 }
 

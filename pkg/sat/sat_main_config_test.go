@@ -4,15 +4,16 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func satMainConfigTestRuntime(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.GlobalParams, *arena.Budget) {
+func satMainConfigTestRuntime(t *testing.T) (*uparams.ParamsContext, *usymbol.Manager, *uparams.GlobalParams, *arena.Budget) {
 	t.Helper()
 	c, s, _ := paramsTestOwner(t)
 	b := arena.NewBudget(^uint64(0))
-	g, e := util.NewGlobalParams(s, c, util.GlobalParamsConfig{Budget: b, Register: func(util.GlobalParamsRegistrar) error {
+	g, e := uparams.NewGlobalParams(s, c, uparams.GlobalParamsConfig{Budget: b, Register: func(uparams.GlobalParamsRegistrar) error {
 		t.Fatal("configuration GetModule must not lazily register descriptors")
 		return nil
 	}})

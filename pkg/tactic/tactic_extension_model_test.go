@@ -8,17 +8,18 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 func extensionFixture(t *testing.T) (*ast.ASTManager, *model.Model, *ModelRef, model.ModelEvaluatorConfig) {
 	ctx, sy, q := paramsTestOwner(t)
 	budget := arena.NewBudget(^uint64(0))
-	catalog, e := util.NewGlobalParamsCatalog(sy, util.GlobalParamsCatalogConfig{Budget: budget, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: budget}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: budget}}})
+	catalog, e := uparams.NewGlobalParamsCatalog(sy, uparams.GlobalParamsCatalogConfig{Budget: budget, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: budget}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: budget}}})
 	satOK(t, e)
-	globals, e := util.NewGlobalParamsService(sy, ctx, util.GlobalParamsConfig{Budget: budget, Catalog: catalog, DescriptorPageSize: 2, DescriptorWordsPageSize: 16})
+	globals, e := uparams.NewGlobalParamsService(sy, ctx, uparams.GlobalParamsConfig{Budget: budget, Catalog: catalog, DescriptorPageSize: 2, DescriptorWordsPageSize: 16})
 	satOK(t, e)
 	satOK(t, globals.InitializeSource())
 	memory, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget})

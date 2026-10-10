@@ -9,20 +9,21 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func dynAckSourceFixture(t *testing.T) (*util.ParamsContext, *util.GlobalParamsService, *util.ParamsRef, *arena.Budget) {
+func dynAckSourceFixture(t *testing.T) (*uparams.ParamsContext, *uparams.GlobalParamsService, *uparams.ParamsRef, *arena.Budget) {
 	t.Helper()
 	c, sy, _ := paramsTestOwner(t)
 	b := arena.NewBudget(^uint64(0))
-	catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+	catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 	paramsMust(t, e)
 	cfg := gparamsTestConfig(b)
 	cfg.Catalog = catalog
-	g, e := util.NewGlobalParamsService(sy, c, cfg)
+	g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 	paramsMust(t, e)
 	paramsMust(t, g.InitializeSource())
 	local, e := c.NewValue()
@@ -80,7 +81,7 @@ func TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder(t *testing.T) {
 
 func dynAckName(s string) *string { return &s }
 
-func dynAckNamedColdGraph(t *testing.T, d *SMTDynAckParams, g *util.GlobalParamsService, b *arena.Budget) {
+func dynAckNamedColdGraph(t *testing.T, d *SMTDynAckParams, g *uparams.GlobalParamsService, b *arena.Budget) {
 	t.Helper()
 	total := g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
@@ -155,7 +156,7 @@ func TestSMTDynAckFailedGetterDoesNotPublishFallbackAndModuleReferenceEnds(t *te
 	invalid, e := c.NewValue()
 	paramsMust(t, e)
 	paramsMust(t, c.Del(&invalid))
-	if e = d.Update(&invalid); !errors.Is(e, util.ErrParamsOwner) {
+	if e = d.Update(&invalid); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("reached local guard", e)
 	}
 	after, e := d.State()
@@ -165,10 +166,10 @@ func TestSMTDynAckFailedGetterDoesNotPublishFallbackAndModuleReferenceEnds(t *te
 	}
 	dynAckNamedColdGraph(t, d, g, b)
 	copy := *d
-	if _, e = copy.State(); !errors.Is(e, util.ErrParamsOwner) {
+	if _, e = copy.State(); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("copied owner state", e)
 	}
-	if e = copy.Close(); !errors.Is(e, util.ErrParamsOwner) {
+	if e = copy.Close(); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("copied owner cleanup", e)
 	}
 	dynAckNamedColdGraph(t, d, g, b)
@@ -248,13 +249,13 @@ func TestSMTDynAckEveryActualUnwarmedSymbolAndHelperConstructorPrefix(t *testing
 		sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 		paramsMust(t, e)
 		bc := arena.NewBudget(^uint64(0))
-		c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+		c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 		paramsMust(t, e)
-		catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+		catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 		paramsMust(t, e)
 		cfg := gparamsTestConfig(b)
 		cfg.Catalog = catalog
-		g, e := util.NewGlobalParamsService(sy, c, cfg)
+		g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 		paramsMust(t, e)
 		paramsMust(t, g.InitializeSource())
 		local, e := c.NewValue()
@@ -307,9 +308,9 @@ func TestSMTDynAckReachedNamespaceAssertionConstructorPrefix(t *testing.T) {
 	c, g, p, b := dynAckSourceFixture(t)
 	paramsMust(t, g.FinalizeSource())
 	d, cause := NewSMTDynAckParams(c, p, g, b)
-	want := util.ErrGlobalParamsUninitialized
-	if util.GlobalParamsSourceDebug {
-		want = util.ErrGlobalParamsAssertion
+	want := uparams.ErrGlobalParamsUninitialized
+	if uparams.GlobalParamsSourceDebug {
+		want = uparams.ErrGlobalParamsAssertion
 	}
 	if !errors.Is(cause, want) || d == nil || d.constructorReady || d.constructorCause != cause || d.Helpers != nil {
 		t.Fatal("source symbol then namespace assertion ctor stop", cause, d)
@@ -323,7 +324,7 @@ func TestSMTDynAckReachedNamespaceAssertionConstructorPrefix(t *testing.T) {
 	}
 	dynAckNamedColdGraph(t, d, g, b)
 	paramsMust(t, g.InitializeSource())
-	if e = d.Update(p); !errors.Is(e, util.ErrParamsPrecondition) {
+	if e = d.Update(p); !errors.Is(e, uparams.ErrParamsPrecondition) {
 		t.Fatal("uncompleted constructor reused as source object", e)
 	}
 	paramsMust(t, d.Close())

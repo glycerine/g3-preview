@@ -1,7 +1,7 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
@@ -10,14 +10,14 @@ import (
 // params_ref typed local->module->literal fallback. Symbol default construction
 // is evaluated even when the local value is present, as in generated C++.
 
-func (m *satMainConfig) symbol(p, g *util.ParamsRef, key, def string) (usymbol.Symbol, error) {
+func (m *satMainConfig) symbol(p, g *uparams.ParamsRef, key, def string) (usymbol.Symbol, error) {
 	d, e := m.symbols.Intern(def)
 	if e != nil {
 		return usymbol.Symbol{}, e
 	}
 	return m.context.GetSymbolFallbackName(p, &key, g, d)
 }
-func (m *satMainConfig) uint(p, g *util.ParamsRef, key string, d uint32, dst *uint32, mask uint32) error {
+func (m *satMainConfig) uint(p, g *uparams.ParamsRef, key string, d uint32, dst *uint32, mask uint32) error {
 	var v uint32
 	var e error
 	if g == nil {
@@ -32,7 +32,7 @@ func (m *satMainConfig) uint(p, g *util.ParamsRef, key string, d uint32, dst *ui
 	m.state.Initialized |= mask
 	return nil
 }
-func (m *satMainConfig) double(p, g *util.ParamsRef, key string, d float64, dst *float64, mask uint32) error {
+func (m *satMainConfig) double(p, g *uparams.ParamsRef, key string, d float64, dst *float64, mask uint32) error {
 	var v float64
 	var e error
 	if g == nil {
@@ -47,7 +47,7 @@ func (m *satMainConfig) double(p, g *util.ParamsRef, key string, d float64, dst 
 	m.state.Initialized |= mask
 	return nil
 }
-func (m *satMainConfig) boolean(p, g *util.ParamsRef, key string, d bool, dst *bool, mask uint32) error {
+func (m *satMainConfig) boolean(p, g *uparams.ParamsRef, key string, d bool, dst *bool, mask uint32) error {
 	v, e := m.context.GetBoolFallbackName(p, &key, g, d)
 	if e != nil {
 		return e
@@ -57,7 +57,7 @@ func (m *satMainConfig) boolean(p, g *util.ParamsRef, key string, d bool, dst *b
 	return nil
 }
 
-func (m *satMainConfig) Update(p *util.ParamsRef) (err error) {
+func (m *satMainConfig) Update(p *uparams.ParamsRef) (err error) {
 	if e := m.open(); e != nil {
 		return e
 	}

@@ -6,8 +6,9 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -26,10 +27,10 @@ type SMTQIState struct {
 	MaxCexs, MaxCexsIncrement, MaxIterations           uint32
 	Trace                                              bool
 	ForceTemplate                                      uint32
-	MBQIId                                             util.ParamsStringView
+	MBQIId                                             uparams.ParamsStringView
 }
 type SMTQIParams struct {
-	util.ModuleParamsOwner
+	uparams.ModuleParamsOwner
 	self                     *SMTQIParams
 	state                    SMTQIState
 	cost, newGen             OwnedString
@@ -39,9 +40,9 @@ type SMTQIParams struct {
 	constructorCause         error
 }
 
-func NewSMTQIParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) (*SMTQIParams, error) {
+func NewSMTQIParams(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) (*SMTQIParams, error) {
 	if c == nil || g == nil || b == nil || g.CheckOwner(c, b) != nil {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if e := c.Check(p); e != nil {
 		return nil, e
@@ -59,11 +60,11 @@ func NewSMTQIParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalPara
 }
 
 // Same source constructor engine: an actual containing header charges embedded fields once.
-func (s *SMTQIParams) constructSource(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) error {
+func (s *SMTQIParams) constructSource(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) error {
 	if s == nil || s.self != nil {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
-	*s = SMTQIParams{ModuleParamsOwner: util.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header}
+	*s = SMTQIParams{ModuleParamsOwner: uparams.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header}
 	s.self = s
 	s.ModuleParamsOwner.Self = &s.ModuleParamsOwner
 	if e := s.cost.Construct(b, "(+ weight generation)"); e != nil {
@@ -95,10 +96,10 @@ func (s *SMTQIParams) constructSource(c *util.ParamsContext, p *util.ParamsRef, 
 }
 func (s *SMTQIParams) open() error {
 	if s == nil || s.self != s || s.closed {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return nil
 }
@@ -113,7 +114,7 @@ func (s *SMTQIParams) CostText() (QITextView, error) {
 		return QITextView{}, e
 	}
 	if !s.constructorReady {
-		return QITextView{}, util.ErrParamsPrecondition
+		return QITextView{}, uparams.ErrParamsPrecondition
 	}
 	return s.cost.View(), nil
 }
@@ -122,27 +123,27 @@ func (s *SMTQIParams) SetEmatching(v bool) error {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.state.Ematching = v
 	s.state.EmatchingInitialized = true
 	return nil
 }
-func (s *SMTQIParams) Update(p *util.ParamsRef) error {
+func (s *SMTQIParams) Update(p *uparams.ParamsRef) error {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return s.update(p)
 }
-func (s *SMTQIParams) update(local *util.ParamsRef) (result error) {
+func (s *SMTQIParams) update(local *uparams.ParamsRef) (result error) {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if s.Helpers != nil || s.DestructorCause != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.Running = true
 	defer func() { s.Running = false }()
@@ -233,13 +234,13 @@ func (s *SMTQIParams) update(local *util.ParamsRef) (result error) {
 }
 func (s *SMTQIParams) Close() error {
 	if s == nil || s.self != s {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.closed {
 		return nil
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := s.CloseHelpers(); e != nil {
 		return e
@@ -257,7 +258,7 @@ func (s *SMTQIParams) Display(out *utext.NumericTextStream) error {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := out.AppendCString("m_qi_ematching="); e != nil {
 		return e

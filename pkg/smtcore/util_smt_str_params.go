@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 type SMTStrState struct {
@@ -29,7 +29,7 @@ type SMTStrState struct {
 	RegexAutomataLengthAttemptThreshold          uint32
 }
 type SMTStrParams struct {
-	util.ModuleParamsOwner
+	uparams.ModuleParamsOwner
 	self                     *SMTStrParams
 	state                    SMTStrState
 	header                   uint64
@@ -37,9 +37,9 @@ type SMTStrParams struct {
 	constructorCause         error
 }
 
-func NewSMTStrParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) (*SMTStrParams, error) {
+func NewSMTStrParams(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) (*SMTStrParams, error) {
 	if c == nil || g == nil || b == nil || g.CheckOwner(c, b) != nil {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if e := c.Check(p); e != nil {
 		return nil, e
@@ -57,11 +57,11 @@ func NewSMTStrParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalPar
 }
 
 // Same source constructor engine: an actual containing header charges embedded fields once.
-func (s *SMTStrParams) constructSource(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) error {
+func (s *SMTStrParams) constructSource(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) error {
 	if s == nil || s.self != nil {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
-	*s = SMTStrParams{ModuleParamsOwner: util.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header, state: SMTStrState{true, false, false, true, false, true, true, false, false, 64, -0.1, true, 1000, 1000, 10, 10, 10}}
+	*s = SMTStrParams{ModuleParamsOwner: uparams.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header, state: SMTStrState{true, false, false, true, false, true, true, false, false, 64, -0.1, true, 1000, 1000, 10, 10, 10}}
 	s.self = s
 	s.ModuleParamsOwner.Self = &s.ModuleParamsOwner
 	e := s.update(p)
@@ -74,10 +74,10 @@ func (s *SMTStrParams) constructSource(c *util.ParamsContext, p *util.ParamsRef,
 }
 func (s *SMTStrParams) open() error {
 	if s == nil || s.self != s || s.closed {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return nil
 }
@@ -87,21 +87,21 @@ func (s *SMTStrParams) State() (SMTStrState, error) {
 	}
 	return s.state, nil
 }
-func (s *SMTStrParams) Update(p *util.ParamsRef) error {
+func (s *SMTStrParams) Update(p *uparams.ParamsRef) error {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return s.update(p)
 }
-func (s *SMTStrParams) update(local *util.ParamsRef) (result error) {
+func (s *SMTStrParams) update(local *uparams.ParamsRef) (result error) {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if s.Helpers != nil || s.DestructorCause != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.Running = true
 	defer func() { s.Running = false }()
@@ -201,13 +201,13 @@ func (s *SMTStrParams) update(local *util.ParamsRef) (result error) {
 }
 func (s *SMTStrParams) Close() error {
 	if s == nil || s.self != s {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.closed {
 		return nil
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := s.CloseHelpers(); e != nil {
 		return e

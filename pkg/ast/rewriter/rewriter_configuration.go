@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // Configurations are cold owners; frames, bindings and results use concrete
@@ -121,9 +121,9 @@ type boolRewriterStar struct {
 	cfg    boolRewriterStarConfig
 }
 
-func newBoolRewriterStar(m *ast.ASTManager, c *util.ParamsContext, g *util.GlobalParamsService, p *util.ParamsRef) (*boolRewriterStar, error) {
+func newBoolRewriterStar(m *ast.ASTManager, c *uparams.ParamsContext, g *uparams.GlobalParamsService, p *uparams.ParamsRef) (*boolRewriterStar, error) {
 	if m == nil || c == nil || g == nil || c.SymbolsField != m.Symbols || g.Context != c {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if _, e := m.ProofsEnabled(); e != nil {
 		return nil, e

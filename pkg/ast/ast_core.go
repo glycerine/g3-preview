@@ -7,8 +7,9 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/idgen"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -29,7 +30,7 @@ func newASTManager(c ASTManagerConfig, format bool) (*ASTManager, error) {
 // NewSourceASTManager retains the real failed placement-new context. A failed
 // constructor invokes only reverse completed member DT, never ast_manager's
 // destructor body. Body-acquired file/format pointers remain named for Abort.
-func NewSourceASTManager(c ASTManagerConfig, filename *util.ParamsStringView) (*ASTManager, error) {
+func NewSourceASTManager(c ASTManagerConfig, filename *uparams.ParamsStringView) (*ASTManager, error) {
 	var borrowed TraceFilename
 	if filename != nil {
 		borrowed = *filename

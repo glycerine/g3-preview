@@ -8,9 +8,10 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/tactic"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/control"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -34,7 +35,7 @@ func goalTestApp(t *testing.T, m *ast.ASTManager, op int32, args ...ast.ASTHandl
 	astTestPin(t, m, h)
 	return h
 }
-func satSolverCheckFixture(t *testing.T) (*sat.Solver, *util.ParamsContext, util.ParamsRef) {
+func satSolverCheckFixture(t *testing.T) (*sat.Solver, *uparams.ParamsContext, uparams.ParamsRef) {
 	t.Helper()
 	ctx, _, _ := paramsTestOwner(t)
 	p, e := ctx.NewValue()
@@ -132,7 +133,7 @@ func proofTestBool(t *testing.T, m *ast.ASTManager, name string) ast.ASTHandle {
 	astTestMust(t, e)
 	return h
 }
-func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *unumeral.RationalService) {
+func paramsTestOwner(t *testing.T) (*uparams.ParamsContext, *usymbol.Manager, *unumeral.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
@@ -143,7 +144,7 @@ func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *unum
 	if e != nil {
 		t.Fatal(e)
 	}
-	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
+	c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
 	if e != nil {
 		t.Fatal(e)
 	}

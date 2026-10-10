@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/control"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/random"
 )
 
-func satSolverCheckFixture(t *testing.T) (*Solver, *util.ParamsContext, util.ParamsRef) {
+func satSolverCheckFixture(t *testing.T) (*Solver, *uparams.ParamsContext, uparams.ParamsRef) {
 	t.Helper()
 	ctx, _, _ := paramsTestOwner(t)
 	p, e := ctx.NewValue()

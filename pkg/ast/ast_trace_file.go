@@ -7,7 +7,8 @@ import (
 	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -24,7 +25,7 @@ type astTraceFile struct {
 	Closed           bool
 }
 
-func newASTTraceFile(b *arena.Budget, name util.ParamsStringView) (*astTraceFile, error) {
+func newASTTraceFile(b *arena.Budget, name uparams.ParamsStringView) (*astTraceFile, error) {
 	return newASTTraceFileBorrowed(b, name)
 }
 func newASTTraceFileBorrowed(b *arena.Budget, name TraceFilename) (*astTraceFile, error) {

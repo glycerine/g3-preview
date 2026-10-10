@@ -9,7 +9,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -35,7 +36,7 @@ func TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults(t *testing.T) {
 	}
 }
 
-func pbNamedColdGraph(t *testing.T, v *SMTPBParams, g *util.GlobalParamsService, b *arena.Budget) {
+func pbNamedColdGraph(t *testing.T, v *SMTPBParams, g *uparams.GlobalParamsService, b *arena.Budget) {
 	t.Helper()
 	n := g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
@@ -241,13 +242,13 @@ func TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation(t *testing.T) {
 		sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 		paramsMust(t, e)
 		bc := arena.NewBudget(^uint64(0))
-		c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+		c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 		paramsMust(t, e)
-		catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+		catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 		paramsMust(t, e)
 		cfg := gparamsTestConfig(b)
 		cfg.Catalog = catalog
-		g, e := util.NewGlobalParamsService(sy, c, cfg)
+		g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 		paramsMust(t, e)
 		paramsMust(t, g.InitializeSource())
 		local, e := c.NewValue()
@@ -301,11 +302,11 @@ func TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards(t *testing.T) {
 	paramsMust(t, g.FinalizeSource())
 	before := v.state
 	cause := v.Update(c, p, g)
-	if util.GlobalParamsSourceDebug {
-		if !errors.Is(cause, util.ErrGlobalParamsAssertion) {
+	if uparams.GlobalParamsSourceDebug {
+		if !errors.Is(cause, uparams.ErrGlobalParamsAssertion) {
 			t.Fatal("source namespace assertion", cause)
 		}
-	} else if !errors.Is(cause, util.ErrGlobalParamsUninitialized) {
+	} else if !errors.Is(cause, uparams.ErrGlobalParamsUninitialized) {
 		t.Fatal("guarded null imp", cause)
 	}
 	if v.state != before || v.Helpers != nil || v.Serial != 1 {
@@ -322,7 +323,7 @@ func TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards(t *testing.T) {
 	}
 	paramsMust(t, out.Close())
 	copyOwner := *v
-	if e = copyOwner.Close(); !errors.Is(e, util.ErrParamsOwner) {
+	if e = copyOwner.Close(); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("accidental owner copy before mutation", e)
 	}
 	paramsMust(t, g.InitializeSource())
@@ -332,7 +333,7 @@ func TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards(t *testing.T) {
 	}
 	pbNamedColdGraph(t, v, g, b)
 	paramsMust(t, v.Close())
-	if e = v.Update(c, p, g); !errors.Is(e, util.ErrParamsOwner) {
+	if e = v.Update(c, p, g); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("ended lifetime", e)
 	}
 	pbNamedColdGraph(t, nil, g, b)

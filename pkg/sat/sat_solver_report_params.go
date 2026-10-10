@@ -2,11 +2,11 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func collectSolverParamDescrs(d *util.ParamDescrs) error {
+func collectSolverParamDescrs(d *uparams.ParamDescrs) error {
 	if e := collectSATConfigParamDescrs(d); e != nil {
 		return e
 	}

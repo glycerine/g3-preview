@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
-func contextParamsCold(t *testing.T, v *ContextParams, g *util.GlobalParamsService, b *arena.Budget) {
+func contextParamsCold(t *testing.T, v *ContextParams, g *uparams.GlobalParamsService, b *arena.Budget) {
 	t.Helper()
 	n := g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
@@ -115,10 +115,10 @@ func TestContextParamsEveryConstructorReservationAndReverseStringUnwind(t *testi
 			}
 			if v != nil {
 				before := b.Used()
-				if x := v.Update(p); !errors.Is(x, util.ErrParamsPrecondition) {
+				if x := v.Update(p); !errors.Is(x, uparams.ErrParamsPrecondition) {
 					t.Fatal("failed ctor ordinary Update", x)
 				}
-				if x := v.UpdateGlobal(); !errors.Is(x, util.ErrParamsPrecondition) {
+				if x := v.UpdateGlobal(); !errors.Is(x, uparams.ErrParamsPrecondition) {
 					t.Fatal("failed ctor global read", x)
 				}
 				if b.Used() != before {
@@ -167,7 +167,7 @@ func TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards(t *testi
 	contextParamsCold(t, v, g, b)
 	b.FailAfter(-1)
 	copied := *v
-	if !errors.Is(copied.Close(), util.ErrParamsOwner) {
+	if !errors.Is(copied.Close(), uparams.ErrParamsOwner) {
 		t.Fatal("copied owner")
 	}
 }

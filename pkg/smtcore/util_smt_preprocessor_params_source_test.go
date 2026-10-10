@@ -10,9 +10,10 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -46,7 +47,7 @@ func TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument(t *t
 	}
 }
 
-func preprocessorNamedColdGraph(t *testing.T, v *SMTPreprocessorParams, g *util.GlobalParamsService, b *arena.Budget) {
+func preprocessorNamedColdGraph(t *testing.T, v *SMTPreprocessorParams, g *uparams.GlobalParamsService, b *arena.Budget) {
 	t.Helper()
 	n := g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
@@ -158,7 +159,7 @@ func TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind(t *testing.
 				}
 			}
 			copyOwner := *v
-			if e := copyOwner.Close(); !errors.Is(e, util.ErrParamsOwner) {
+			if e := copyOwner.Close(); !errors.Is(e, uparams.ErrParamsOwner) {
 				t.Fatal("copied parent guard", e)
 			}
 		}
@@ -274,13 +275,13 @@ func TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation(t *testi
 		sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 		paramsMust(t, e)
 		bc := arena.NewBudget(^uint64(0))
-		c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+		c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 		paramsMust(t, e)
-		catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+		catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 		paramsMust(t, e)
 		cfg := gparamsTestConfig(b)
 		cfg.Catalog = catalog
-		g, e := util.NewGlobalParamsService(sy, c, cfg)
+		g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 		paramsMust(t, e)
 		paramsMust(t, g.InitializeSource())
 		local, e := c.NewValue()
@@ -340,10 +341,10 @@ func TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread(t *tes
 	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
 	used := b.Used()
-	if e = v.Display(out); !errors.Is(e, util.ErrParamsPrecondition) {
+	if e = v.Display(out); !errors.Is(e, uparams.ErrParamsPrecondition) {
 		t.Fatal("incomplete Display", e)
 	}
-	if e = v.Update(p); !errors.Is(e, util.ErrParamsPrecondition) {
+	if e = v.Update(p); !errors.Is(e, uparams.ErrParamsPrecondition) {
 		t.Fatal("incomplete Update", e)
 	}
 	got, e := out.String()
@@ -358,7 +359,7 @@ func TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread(t *tes
 	paramsMust(t, e)
 	copyLive := *live
 	used = b.Used()
-	if e = copyLive.Close(); !errors.Is(e, util.ErrParamsOwner) || b.Used() != used || live.bitEnded || live.patternEnded {
+	if e = copyLive.Close(); !errors.Is(e, uparams.ErrParamsOwner) || b.Used() != used || live.bitEnded || live.patternEnded {
 		t.Fatal("copied outer owner before base/header mutation", e)
 	}
 	paramsMust(t, live.Close())
@@ -375,15 +376,15 @@ func TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation(t *testi
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
-	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+	c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
 	m, e := polynomial.NewUPolynomialManagerFromRationalService(q, polynomial.UPolynomialConfig{Checkpoint: func() bool { panic("unreached polynomial checkpoint") }, Cooperation: func() error { panic("unreached polynomial cooperation") }})
 	paramsMust(t, e)
-	catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+	catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 	paramsMust(t, e)
 	cfg := gparamsTestConfig(b)
 	cfg.Catalog = catalog
-	g, e := util.NewGlobalParamsService(sy, c, cfg)
+	g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 	paramsMust(t, e)
 	paramsMust(t, g.InitializeSource())
 	local, e := c.NewValue()
@@ -450,10 +451,10 @@ func TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation(t *testi
 	}
 	v.Running = false
 	v.activeCall = false
-	if e := v.Update(&local); !errors.Is(e, util.ErrParamsPrecondition) || v.pattern.Serial != patternSerial {
+	if e := v.Update(&local); !errors.Is(e, uparams.ErrParamsPrecondition) || v.pattern.Serial != patternSerial {
 		t.Fatal("new Update entered older base through stopped younger owner", e)
 	}
-	if e := v.UpdateLocal(&local); !errors.Is(e, util.ErrParamsPrecondition) {
+	if e := v.UpdateLocal(&local); !errors.Is(e, uparams.ErrParamsPrecondition) {
 		t.Fatal("new local mutation through retained owner", e)
 	}
 	after := upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, extras)
@@ -466,7 +467,7 @@ func TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation(t *testi
 	v.activeCall = false
 	// Callback/foreign owning requests cannot replace or adopt the exact frame.
 	copyOwner := *v
-	if e := copyOwner.Close(); !errors.Is(e, util.ErrParamsOwner) {
+	if e := copyOwner.Close(); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("foreign copied outer owner", e)
 	}
 	paramsDecFinish(t, v.Close)

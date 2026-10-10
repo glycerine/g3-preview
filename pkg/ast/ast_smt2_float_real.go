@@ -9,8 +9,9 @@ import (
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // Concrete source stack values live in this charged cold invocation header.
@@ -142,13 +143,13 @@ func (p *astFloatingPointPluginOwner) releaseLiteralFrames() {
 
 // The use_float_real_lits profile of the actual source method. The BV-literal
 // suffix is a separate reached dependency, not substituted here.
-func (m *ASTManager) ppFloatRealLiteral(h ASTHandle, g *util.GlobalParamsService) (ASTHandle, error) {
+func (m *ASTManager) ppFloatRealLiteral(h ASTHandle, g *uparams.GlobalParamsService) (ASTHandle, error) {
 	return m.ppFloatLiteral(h, false, true, g)
 }
-func (m *ASTManager) ppFloatBitVectorLiteral(h ASTHandle, radix bool, g *util.GlobalParamsService) (ASTHandle, error) {
+func (m *ASTManager) ppFloatBitVectorLiteral(h ASTHandle, radix bool, g *uparams.GlobalParamsService) (ASTHandle, error) {
 	return m.ppFloatLiteral(h, radix, false, g)
 }
-func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.GlobalParamsService) (out ASTHandle, result error) {
+func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *uparams.GlobalParamsService) (out ASTHandle, result error) {
 	if e := m.lock(); e != nil {
 		return out, e
 	}
@@ -164,7 +165,7 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.Globa
 		return out, e
 	}
 	if g != nil && (g.CheckBudget(m.BudgetField) != nil) {
-		return out, util.ErrGlobalParamsOwner
+		return out, uparams.ErrGlobalParamsOwner
 	}
 	if p.literalSerial == math.MaxUint64 {
 		return out, arena.ErrBounds
@@ -209,7 +210,7 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.Globa
 	}
 	if !found {
 		if g == nil {
-			return out, util.ErrGlobalParamsAssertion
+			return out, uparams.ErrGlobalParamsAssertion
 		}
 		if e = g.NamespaceVerifyFailure("src/ast/ast_smt2_pp.cpp", 241, "get_futil().is_numeral(t, v)"); e != nil {
 			return out, e

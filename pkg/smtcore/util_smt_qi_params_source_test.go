@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -44,7 +45,7 @@ func TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText(t *testing.T) {
 	paramsMust(t, out.Close())
 }
 
-func qiNamedColdGraph(t *testing.T, v *SMTQIParams, g *util.GlobalParamsService, b *arena.Budget) {
+func qiNamedColdGraph(t *testing.T, v *SMTQIParams, g *uparams.GlobalParamsService, b *arena.Budget) {
 	t.Helper()
 	n := g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
@@ -92,7 +93,7 @@ func TestSMTQIEveryConstructorReservationAndOwnedMemberUnwind(t *testing.T) {
 				t.Fatal("completed member reverse source unwind", ordinal, v.completed)
 			}
 			copyOwner := *v
-			if e = copyOwner.Close(); !errors.Is(e, util.ErrParamsOwner) {
+			if e = copyOwner.Close(); !errors.Is(e, uparams.ErrParamsOwner) {
 				t.Fatal("shallow copied owning wrapper", e)
 			}
 		}
@@ -351,13 +352,13 @@ func TestSMTQIEveryUnwarmedSharedModuleAcquisitionReservation(t *testing.T) {
 		sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 		paramsMust(t, e)
 		bc := arena.NewBudget(^uint64(0))
-		c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+		c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 		paramsMust(t, e)
-		catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+		catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 		paramsMust(t, e)
 		cfg := gparamsTestConfig(b)
 		cfg.Catalog = catalog
-		g, e := util.NewGlobalParamsService(sy, c, cfg)
+		g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 		paramsMust(t, e)
 		paramsMust(t, g.InitializeSource())
 		local, e := c.NewValue()

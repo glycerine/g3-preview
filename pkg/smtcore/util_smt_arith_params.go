@@ -7,7 +7,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -60,7 +61,7 @@ type SMTArithState struct {
 	EuclideanSolver              bool
 }
 type SMTArithParams struct {
-	util.ModuleParamsOwner
+	uparams.ModuleParamsOwner
 	self                     *SMTArithParams
 	state                    SMTArithState
 	header                   uint64
@@ -68,9 +69,9 @@ type SMTArithParams struct {
 	constructorCause         error
 }
 
-func NewSMTArithParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) (*SMTArithParams, error) {
+func NewSMTArithParams(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) (*SMTArithParams, error) {
 	if c == nil || g == nil || b == nil || g.CheckOwner(c, b) != nil {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if e := c.Check(p); e != nil {
 		return nil, e
@@ -88,11 +89,11 @@ func NewSMTArithParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalP
 }
 
 // Same source constructor engine: an actual containing header charges embedded fields once.
-func (s *SMTArithParams) constructSource(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) error {
+func (s *SMTArithParams) constructSource(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) error {
 	if s == nil || s.self != nil {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
-	*s = SMTArithParams{ModuleParamsOwner: util.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header, state: SMTArithState{Eq2Ineq: false, ProcessAllEqs: false, Mode: 2, AutoConfigSimplex: false, BlandsRuleThreshold: 1000, PropagateEqs: true, BoundProp: 2, StrongerLemmas: true, SkipRowsWithBigCoeffs: true, MaxLemmaSize: 128, SmallLemmaSize: 16, Reflect: true, IgnoreInt: false, LazyPivotingLevel: 0, RandomSeed: 0, RandomInitialValue: false, RandomLower: -1000, RandomUpper: 1000, Adaptive: false, AdaptiveAssertionThreshold: 0.2, AdaptivePropagationThreshold: 0.4, DumpLemmas: false, EagerEqAxioms: true, BranchCutRatio: 2, IntEqBranching: false, EnumConstMod: false, GCDTest: true, EagerGCD: false, AdaptiveGCD: false, PropagationThreshold: 4294967295, PivotStrategy: 0, AddBinaryBounds: false, PropagationStrategy: 1, EqBounds: false, LazyAdapter: false, Fixnum: false, IntOnly: false, NLArith: true, NLArithGB: true, NLArithGBThreshold: 512, NLArithGBEqs: false, NLArithGBPerturbate: true, NLArithMaxDegree: 6, NLArithBranching: true, NLArithRounds: 1024, EuclideanSolver: false}}
+	*s = SMTArithParams{ModuleParamsOwner: uparams.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header, state: SMTArithState{Eq2Ineq: false, ProcessAllEqs: false, Mode: 2, AutoConfigSimplex: false, BlandsRuleThreshold: 1000, PropagateEqs: true, BoundProp: 2, StrongerLemmas: true, SkipRowsWithBigCoeffs: true, MaxLemmaSize: 128, SmallLemmaSize: 16, Reflect: true, IgnoreInt: false, LazyPivotingLevel: 0, RandomSeed: 0, RandomInitialValue: false, RandomLower: -1000, RandomUpper: 1000, Adaptive: false, AdaptiveAssertionThreshold: 0.2, AdaptivePropagationThreshold: 0.4, DumpLemmas: false, EagerEqAxioms: true, BranchCutRatio: 2, IntEqBranching: false, EnumConstMod: false, GCDTest: true, EagerGCD: false, AdaptiveGCD: false, PropagationThreshold: 4294967295, PivotStrategy: 0, AddBinaryBounds: false, PropagationStrategy: 1, EqBounds: false, LazyAdapter: false, Fixnum: false, IntOnly: false, NLArith: true, NLArithGB: true, NLArithGBThreshold: 512, NLArithGBEqs: false, NLArithGBPerturbate: true, NLArithMaxDegree: 6, NLArithBranching: true, NLArithRounds: 1024, EuclideanSolver: false}}
 	s.self = s
 	s.ModuleParamsOwner.Self = &s.ModuleParamsOwner
 	e := s.update(p)
@@ -105,10 +106,10 @@ func (s *SMTArithParams) constructSource(c *util.ParamsContext, p *util.ParamsRe
 }
 func (s *SMTArithParams) open() error {
 	if s == nil || s.self != s || s.closed {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return nil
 }
@@ -118,21 +119,21 @@ func (s *SMTArithParams) State() (SMTArithState, error) {
 	}
 	return s.state, nil
 }
-func (s *SMTArithParams) Update(local *util.ParamsRef) error {
+func (s *SMTArithParams) Update(local *uparams.ParamsRef) error {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return s.update(local)
 }
-func (s *SMTArithParams) update(local *util.ParamsRef) (result error) {
+func (s *SMTArithParams) update(local *uparams.ParamsRef) (result error) {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if s.Helpers != nil || s.DestructorCause != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.Running = true
 	defer func() { s.Running = false }()
@@ -234,13 +235,13 @@ func (s *SMTArithParams) update(local *util.ParamsRef) (result error) {
 }
 func (s *SMTArithParams) Close() error {
 	if s == nil || s.self != s {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.closed {
 		return nil
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := s.CloseHelpers(); e != nil {
 		return e
@@ -255,7 +256,7 @@ func (s *SMTArithParams) Display(out *utext.NumericTextStream) error {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := out.AppendCString("m_arith_eq2ineq="); e != nil {
 		return e

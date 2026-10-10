@@ -8,14 +8,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 func TestASTTraceAppClosedStreamCatchFreesLiteralNodeWithoutTableRepair(t *testing.T) {
 	sy, q, _ := astTestOwners(t)
 	b := arena.NewBudget(1 << 28)
 	name := astTracePath(t)
-	filename := util.LiteralParamsStringView(name)
+	filename := uparams.LiteralParamsStringView(name)
 	m, e := NewSourceASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b}, &filename)
 	paramsMust(t, e)
 	bs, e := m.MkBoolSort()
@@ -74,7 +74,7 @@ func TestASTTraceAppClosedStreamCatchFreesLiteralNodeWithoutTableRepair(t *testi
 func TestASTTraceClosedStreamCatchCapturesINCAndPreservesLaterSlotGeneration(t *testing.T) {
 	sy, q, _ := astTestOwners(t)
 	b := arena.NewBudget(1 << 28)
-	filename := util.LiteralParamsStringView(astTracePath(t))
+	filename := uparams.LiteralParamsStringView(astTracePath(t))
 	m, e := NewSourceASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b}, &filename)
 	paramsMust(t, e)
 	sort, e := m.MkBoolSort()
@@ -140,7 +140,7 @@ func TestASTBorrowedFormatNativeTraceAndStreamLifetime(t *testing.T) {
 	for ordinal := int64(0); ordinal < 32; ordinal++ {
 		b := arena.NewBudget(1 << 28)
 		name := astTracePath(t)
-		filename := util.LiteralParamsStringView(name)
+		filename := uparams.LiteralParamsStringView(name)
 		owner, e := NewSourceASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b}, &filename)
 		paramsMust(t, e)
 		m := owner.Format
@@ -206,7 +206,7 @@ func TestASTIncompleteBorrowedFormatConstructorRetainsCaughtHistoryUntilOwnAbort
 	sy, q, _ := astTestOwners(t)
 	b := arena.NewBudget(1 << 28)
 	name := astTracePath(t)
-	filename := util.LiteralParamsStringView(name)
+	filename := uparams.LiteralParamsStringView(name)
 	owner, e := NewSourceASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b}, &filename)
 	paramsMust(t, e)
 	borrowed := owner.TraceStream

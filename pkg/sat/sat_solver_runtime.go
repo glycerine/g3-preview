@@ -6,8 +6,9 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 var ErrSATRuntimeLive = errors.New("sat: borrowed runtime still has live solver owners")
@@ -18,14 +19,14 @@ var ErrSATRuntimeLive = errors.New("sat: borrowed runtime still has live solver 
 // borrowed and must outlive this owner and all its solver borrowers.
 type RuntimeConfig struct {
 	Budget        *arena.Budget
-	ParamsContext *util.ParamsContext
+	ParamsContext *uparams.ParamsContext
 }
 type Runtime struct {
 	self            *Runtime
 	budget          *arena.Budget
-	context         *util.ParamsContext
+	context         *uparams.ParamsContext
 	memory          *umemory.Runtime
-	globals         *util.GlobalParams
+	globals         *uparams.GlobalParams
 	ownerBytes      uint64
 	liveSolvers     uint32
 	closing, closed bool
@@ -59,7 +60,7 @@ func NewRuntime(c RuntimeConfig) (r *Runtime, err error) {
 	// GetModule does not execute descriptor registration. Optional descriptor
 	// catalog production remains its actual separate binding, never a fake
 	// successful callback installed by the solver constructor.
-	r.globals, err = util.NewGlobalParams(c.ParamsContext.Symbols(), c.ParamsContext, util.GlobalParamsConfig{Budget: c.Budget})
+	r.globals, err = uparams.NewGlobalParams(c.ParamsContext.Symbols(), c.ParamsContext, uparams.GlobalParamsConfig{Budget: c.Budget})
 	return r, err
 }
 func (r *Runtime) open() error {

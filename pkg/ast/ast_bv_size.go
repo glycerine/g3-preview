@@ -1,7 +1,9 @@
 // Source: src/ast/bv_decl_plugin.h:302,390-394.
 package ast
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	uparams "github.com/glycerine/g3/pkg/util/params"
+)
 
 func (m *ASTManager) IsBitVector(h ASTHandle) (bool, error) {
 	if e := m.lock(); e != nil {
@@ -43,7 +45,7 @@ func (m *ASTManager) BitVectorSize(h ASTHandle) (uint32, error) {
 	return m.bitVectorSortSize(r, nil)
 }
 
-func (m *ASTManager) bitVectorSortSize(s astNodeRef, g *util.GlobalParamsService) (uint32, error) {
+func (m *ASTManager) bitVectorSortSize(s astNodeRef, g *uparams.GlobalParamsService) (uint32, error) {
 	enabled, e := astBVAssertionEnabled(g)
 	if e != nil {
 		return 0, e
@@ -54,7 +56,7 @@ func (m *ASTManager) bitVectorSortSize(s astNodeRef, g *util.GlobalParamsService
 			return 0, e
 		}
 		if !isBV {
-			if e = util.NamespaceAssertionFailureOptional(g, "src/ast/bv_decl_plugin.h", 391, "is_bv_sort(s)"); e != nil {
+			if e = uparams.NamespaceAssertionFailureOptional(g, "src/ast/bv_decl_plugin.h", 391, "is_bv_sort(s)"); e != nil {
 				return 0, e
 			}
 		}

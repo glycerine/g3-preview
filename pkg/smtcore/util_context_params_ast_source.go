@@ -5,14 +5,14 @@ package smtcore
 import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // Concrete call-local filename reader: borrowed c_str address identity remains
 // distinct from owned string/Params storage. No copied path is retained here.
 
 type astTraceFilename struct {
-	params    util.ParamsStringView
+	params    uparams.ParamsStringView
 	owned     QITextView
 	ownedMode bool
 }
@@ -53,7 +53,7 @@ func (s *ContextParams) MkASTManager(c ast.ASTManagerConfig) (*ast.ASTManager, e
 		return nil, e
 	}
 	if c.Symbols != s.context.Symbols() || c.Numerals != s.context.Numerals() {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	c.ProofMode = ast.ASTProofDisabled
 	if s.state.Proof {

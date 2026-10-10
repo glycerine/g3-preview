@@ -6,7 +6,8 @@ import (
 	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
@@ -52,7 +53,7 @@ func NewCmdExceptionSymbolAt(m *usymbol.Manager, message string, s usymbol.Symbo
 	var digits [12]byte
 	var numeric []byte
 	length := uint64(4)
-	var view util.ParamsStringView
+	var view uparams.ParamsStringView
 	if s.IsNumerical() {
 		number, e := s.Number()
 		if e != nil {
@@ -62,7 +63,7 @@ func NewCmdExceptionSymbolAt(m *usymbol.Manager, message string, s usymbol.Symbo
 		length = uint64(2 + len(numeric))
 	} else if !s.IsNull() {
 		var e error
-		view, e = util.SymbolCStringView(m, s)
+		view, e = uparams.SymbolCStringView(m, s)
 		if e != nil {
 			return CmdException{}, e
 		}

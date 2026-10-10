@@ -9,7 +9,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -17,7 +18,7 @@ func TestASTTraceFactoriesOnlyActualNewNodesAndLiteralArgumentChains(t *testing.
 	sy, q, _ := astTestOwners(t)
 	b := arena.NewBudget(1 << 28)
 	name := astTracePath(t)
-	filename := util.LiteralParamsStringView(name)
+	filename := uparams.LiteralParamsStringView(name)
 	m, e := NewSourceASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b}, &filename)
 	paramsMust(t, e)
 	defer m.Close()

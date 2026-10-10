@@ -6,7 +6,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -21,7 +22,7 @@ type SMTDynAckState struct {
 	GCInverseDecay float64
 }
 type SMTDynAckParams struct {
-	util.ModuleParamsOwner
+	uparams.ModuleParamsOwner
 	self             *SMTDynAckParams
 	state            SMTDynAckState
 	header           uint64
@@ -30,9 +31,9 @@ type SMTDynAckParams struct {
 	constructorReady bool
 }
 
-func NewSMTDynAckParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) (*SMTDynAckParams, error) {
+func NewSMTDynAckParams(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) (*SMTDynAckParams, error) {
 	if c == nil || g == nil || g.CheckOwner(c, b) != nil || b == nil {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if e := c.Check(p); e != nil {
 		return nil, e
@@ -50,11 +51,11 @@ func NewSMTDynAckParams(c *util.ParamsContext, p *util.ParamsRef, g *util.Global
 }
 
 // Same source constructor engine: an actual containing header charges embedded fields once.
-func (s *SMTDynAckParams) constructSource(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) error {
+func (s *SMTDynAckParams) constructSource(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) error {
 	if s == nil || s.self != nil {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
-	*s = SMTDynAckParams{ModuleParamsOwner: util.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header, state: SMTDynAckState{1, false, 0.1, 10, 2000, 0.8}}
+	*s = SMTDynAckParams{ModuleParamsOwner: uparams.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header, state: SMTDynAckState{1, false, 0.1, 10, 2000, 0.8}}
 	s.self = s
 	s.ModuleParamsOwner.Self = &s.ModuleParamsOwner
 	e := s.update(p)
@@ -69,10 +70,10 @@ func (s *SMTDynAckParams) constructSource(c *util.ParamsContext, p *util.ParamsR
 }
 func (s *SMTDynAckParams) open() error {
 	if s == nil || s.self != s || s.closed {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return nil
 }
@@ -82,23 +83,23 @@ func (s *SMTDynAckParams) State() (SMTDynAckState, error) {
 	}
 	return s.state, nil
 }
-func (s *SMTDynAckParams) Update(p *util.ParamsRef) error {
+func (s *SMTDynAckParams) Update(p *uparams.ParamsRef) error {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return s.update(p)
 }
-func (s *SMTDynAckParams) update(p *util.ParamsRef) (result error) {
+func (s *SMTDynAckParams) update(p *uparams.ParamsRef) (result error) {
 	if e := s.open(); e != nil {
 		return e
 	}
 	// Retained stopped helper frames cannot be replaced by an unrelated call.
 	// This Go owning protocol guard has no source successful update credit.
 	if s.Helpers != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.Running = true
 	defer func() { s.Running = false }()
@@ -149,13 +150,13 @@ func (s *SMTDynAckParams) update(p *util.ParamsRef) (result error) {
 }
 func (s *SMTDynAckParams) Close() error {
 	if s == nil || s.self != s {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.closed {
 		return nil
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := s.CloseHelpers(); e != nil {
 		return e
@@ -174,7 +175,7 @@ func (s *SMTDynAckParams) Display(out *utext.NumericTextStream) error {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := out.AppendCString("m_dack="); e != nil {
 		return e

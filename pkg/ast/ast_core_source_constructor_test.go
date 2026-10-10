@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 func TestASTSourceConstructorEveryPrefixRetainsBodyFilesAndUnwindsOnlyCompletedMembers(t *testing.T) {
@@ -24,7 +24,7 @@ func TestASTSourceConstructorEveryPrefixRetainsBodyFilesAndUnwindsOnlyCompletedM
 	for ordinal := int64(0); ordinal < 256; ordinal++ {
 		b := arena.NewBudget(1 << 30)
 		b.FailAfter(ordinal)
-		filename := util.LiteralParamsStringView(name)
+		filename := uparams.LiteralParamsStringView(name)
 		m, e := NewSourceASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b}, &filename)
 		if m == nil {
 			if e == nil || b.Used() != 0 {
@@ -82,7 +82,7 @@ func TestASTSourceConstructorEveryPrefixRetainsBodyFilesAndUnwindsOnlyCompletedM
 func TestASTSourceConstructorCopyAndBorrowedNamespaceGuardsPreserveActualOwners(t *testing.T) {
 	sy, q, _ := astTestOwners(t)
 	b := arena.NewBudget(1 << 28)
-	filename := util.LiteralParamsStringView(astTracePath(t))
+	filename := uparams.LiteralParamsStringView(astTracePath(t))
 	m, e := NewSourceASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b}, &filename)
 	paramsMust(t, e)
 	defer m.Close()

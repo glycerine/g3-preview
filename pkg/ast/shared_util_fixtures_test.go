@@ -5,10 +5,11 @@ import (
 
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"os"
 )
@@ -19,7 +20,7 @@ func paramsMust(t *testing.T, e error) {
 		t.Fatal(e)
 	}
 }
-func catalogGraph(c *util.GlobalParamsCatalog) uint64 {
+func catalogGraph(c *uparams.GlobalParamsCatalog) uint64 {
 	n := c.OwnerBytes
 	if c.Region != nil {
 		s := c.Region.Stats()
@@ -32,9 +33,9 @@ func catalogGraph(c *util.GlobalParamsCatalog) uint64 {
 	}
 	return n
 }
-func gparamsGraph(g *util.GlobalParams) uint64 {
+func gparamsGraph(g *uparams.GlobalParams) uint64 {
 	n := g.OwnerBytes
-	count := func(d *util.ParamDescrs) uint64 {
+	count := func(d *uparams.ParamDescrs) uint64 {
 		if d == nil || d.Budget != g.Budget {
 			return 0
 		}
@@ -76,7 +77,7 @@ func numericStorageReservationRefusal(err error) bool {
 	var physical umemory.Failure
 	return errors.As(err, &physical) && physical.Kind == umemory.FailureMemout && physical.ErrorCode() == 101
 }
-func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *unumeral.RationalService) {
+func paramsTestOwner(t *testing.T) (*uparams.ParamsContext, *usymbol.Manager, *unumeral.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
@@ -87,7 +88,7 @@ func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *unum
 	if e != nil {
 		t.Fatal(e)
 	}
-	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
+	c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -107,11 +108,11 @@ func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *unum
 	})
 	return c, sy, q
 }
-func catalogTestConfig(b *arena.Budget) util.GlobalParamsCatalogConfig {
-	return util.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}}
+func catalogTestConfig(b *arena.Budget) uparams.GlobalParamsCatalogConfig {
+	return uparams.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}}
 }
-func gparamsTestConfig(b *arena.Budget) util.GlobalParamsConfig {
-	return util.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}
+func gparamsTestConfig(b *arena.Budget) uparams.GlobalParamsConfig {
+	return uparams.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}
 }
 
 func debugActionFixture(t *testing.T, text string) (*umemory.Runtime, *udiag.DebugContext, *udiag.DebugActionContext, *udiag.NumericCharInput, *udiag.MemoryStandardStreams) {

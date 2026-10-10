@@ -2,7 +2,7 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
@@ -19,29 +19,29 @@ func (s *satSimplifier) collectStatistics(st *statistics.Statistics, keys [5]sta
 	}
 	return nil
 }
-func collectSimplifierParamDescrs(d *util.ParamDescrs) error {
+func collectSimplifierParamDescrs(d *uparams.ParamDescrs) error {
 	for _, x := range [17]struct {
 		name             string
-		kind             util.ParamKind
+		kind             uparams.ParamKind
 		description, def string
 	}{
-		{"elim_blocked_clauses", util.ParamBool, "eliminate blocked clauses", "false"},
-		{"elim_blocked_clauses_at", util.ParamUInt, "eliminate blocked clauses only once at the given simplification round", "2"},
-		{"blocked_clause_limit", util.ParamUInt, "maximum number of literals visited during blocked clause elimination", "100000000"},
-		{"resolution", util.ParamBool, "eliminate boolean variables using resolution", "true"},
-		{"resolution.limit", util.ParamUInt, "approx. maximum number of literals visited during variable elimination", "500000000"},
-		{"resolution.occ_cutoff", util.ParamUInt, "first cutoff (on number of positive/negative occurrences) for Boolean variable elimination", "10"},
-		{"resolution.occ_cutoff_range1", util.ParamUInt, "second cutoff (number of positive/negative occurrences) for Boolean variable elimination, for problems containing less than res_cls_cutoff1 clauses", "8"},
-		{"resolution.occ_cutoff_range2", util.ParamUInt, "second cutoff (number of positive/negative occurrences) for Boolean variable elimination, for problems containing more than res_cls_cutoff1 and less than res_cls_cutoff2", "5"},
-		{"resolution.occ_cutoff_range3", util.ParamUInt, "second cutoff (number of positive/negative occurrences) for Boolean variable elimination, for problems containing more than res_cls_cutoff2", "3"},
-		{"resolution.lit_cutoff_range1", util.ParamUInt, "second cutoff (total number of literals) for Boolean variable elimination, for problems containing less than res_cls_cutoff1 clauses", "700"},
-		{"resolution.lit_cutoff_range2", util.ParamUInt, "second cutoff (total number of literals) for Boolean variable elimination, for problems containing more than res_cls_cutoff1 and less than res_cls_cutoff2", "400"},
-		{"resolution.lit_cutoff_range3", util.ParamUInt, "second cutoff (total number of literals) for Boolean variable elimination, for problems containing more than res_cls_cutoff2", "300"},
-		{"resolution.cls_cutoff1", util.ParamUInt, "limit1 - total number of problems clauses for the second cutoff of Boolean variable elimination", "100000000"},
-		{"resolution.cls_cutoff2", util.ParamUInt, "limit2 - total number of problems clauses for the second cutoff of Boolean variable elimination", "700000000"},
-		{"elim_vars", util.ParamBool, "enable variable elimination during simplification", "true"},
-		{"subsumption", util.ParamBool, "eliminate subsumed clauses", "true"},
-		{"subsumption.limit", util.ParamUInt, "approx. maximum number of literals visited during subsumption (and subsumption resolution)", "100000000"},
+		{"elim_blocked_clauses", uparams.ParamBool, "eliminate blocked clauses", "false"},
+		{"elim_blocked_clauses_at", uparams.ParamUInt, "eliminate blocked clauses only once at the given simplification round", "2"},
+		{"blocked_clause_limit", uparams.ParamUInt, "maximum number of literals visited during blocked clause elimination", "100000000"},
+		{"resolution", uparams.ParamBool, "eliminate boolean variables using resolution", "true"},
+		{"resolution.limit", uparams.ParamUInt, "approx. maximum number of literals visited during variable elimination", "500000000"},
+		{"resolution.occ_cutoff", uparams.ParamUInt, "first cutoff (on number of positive/negative occurrences) for Boolean variable elimination", "10"},
+		{"resolution.occ_cutoff_range1", uparams.ParamUInt, "second cutoff (number of positive/negative occurrences) for Boolean variable elimination, for problems containing less than res_cls_cutoff1 clauses", "8"},
+		{"resolution.occ_cutoff_range2", uparams.ParamUInt, "second cutoff (number of positive/negative occurrences) for Boolean variable elimination, for problems containing more than res_cls_cutoff1 and less than res_cls_cutoff2", "5"},
+		{"resolution.occ_cutoff_range3", uparams.ParamUInt, "second cutoff (number of positive/negative occurrences) for Boolean variable elimination, for problems containing more than res_cls_cutoff2", "3"},
+		{"resolution.lit_cutoff_range1", uparams.ParamUInt, "second cutoff (total number of literals) for Boolean variable elimination, for problems containing less than res_cls_cutoff1 clauses", "700"},
+		{"resolution.lit_cutoff_range2", uparams.ParamUInt, "second cutoff (total number of literals) for Boolean variable elimination, for problems containing more than res_cls_cutoff1 and less than res_cls_cutoff2", "400"},
+		{"resolution.lit_cutoff_range3", uparams.ParamUInt, "second cutoff (total number of literals) for Boolean variable elimination, for problems containing more than res_cls_cutoff2", "300"},
+		{"resolution.cls_cutoff1", uparams.ParamUInt, "limit1 - total number of problems clauses for the second cutoff of Boolean variable elimination", "100000000"},
+		{"resolution.cls_cutoff2", uparams.ParamUInt, "limit2 - total number of problems clauses for the second cutoff of Boolean variable elimination", "700000000"},
+		{"elim_vars", uparams.ParamBool, "enable variable elimination during simplification", "true"},
+		{"subsumption", uparams.ParamBool, "eliminate subsumed clauses", "true"},
+		{"subsumption.limit", uparams.ParamUInt, "approx. maximum number of literals visited during subsumption (and subsumption resolution)", "100000000"},
 	} {
 		if e := satConfigInsertDescriptor(d, x.name, x.kind, x.description, x.def); e != nil {
 			return e

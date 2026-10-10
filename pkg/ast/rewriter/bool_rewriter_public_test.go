@@ -4,7 +4,8 @@ package rewriter
 
 import (
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"testing"
 )
 
@@ -66,11 +67,11 @@ func TestBoolRewriterPublicCoreThroughOriginalTraversal(t *testing.T) {
 		t.Fatal("core miss changed output", status, got)
 	}
 	copyOwner := *rw
-	if _, e = copyOwner.Flat(); e != util.ErrParamsOwner {
+	if _, e = copyOwner.Flat(); e != uparams.ErrParamsOwner {
 		t.Fatal("copied reducer", e)
 	}
 	satOK(t, rw.Close())
-	if _, e = rw.MkAppCore(ast.ASTHandle{}, ast.SliceArguments(nil), out); e != util.ErrParamsOwner {
+	if _, e = rw.MkAppCore(ast.ASTHandle{}, ast.SliceArguments(nil), out); e != uparams.ErrParamsOwner {
 		t.Fatal("closed reducer", e)
 	}
 }

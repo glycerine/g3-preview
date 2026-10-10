@@ -11,10 +11,10 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
-func boolRewriterConfigFixture(t *testing.T) (*ast.ASTManager, *util.ParamsContext, *util.GlobalParamsService, *util.ParamsRef) {
+func boolRewriterConfigFixture(t *testing.T) (*ast.ASTManager, *uparams.ParamsContext, *uparams.GlobalParamsService, *uparams.ParamsRef) {
 	t.Helper()
 	c, g, p, b := dynAckSourceFixture(t)
 	m, e := ast.NewASTManager(ast.ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: b})
@@ -57,11 +57,11 @@ func TestBoolRewriterConstructorDefaultsFallbackAndCostRetention(t *testing.T) {
 		t.Fatal("source explicit cost reset")
 	}
 	copyOwner := *rw
-	if e = copyOwner.UpdtParams(p); e != util.ErrParamsOwner {
+	if e = copyOwner.UpdtParams(p); e != uparams.ErrParamsOwner {
 		t.Fatal("copied configured owner accepted", e)
 	}
 	satOK(t, rw.Close())
-	if e = rw.UpdtParams(p); e != util.ErrParamsOwner {
+	if e = rw.UpdtParams(p); e != uparams.ErrParamsOwner {
 		t.Fatal("retired configured owner accepted", e)
 	}
 }

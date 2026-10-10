@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // Native rows own one AST reference per element. Embedded lexical fields retain
@@ -289,7 +289,7 @@ func (c *evaluatorConfiguration) expandValue(out ast.ASTRef) (err error) {
 	}
 	f := &c.expansion
 	if f.active {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	f.active = true
 	defer func() { err = errors.Join(err, f.close(m)) }()

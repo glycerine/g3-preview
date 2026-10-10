@@ -6,7 +6,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -15,7 +16,7 @@ type SMTPBState struct {
 	LearnComplements, EnableCompilation, EnableSimplex bool
 }
 type SMTPBParams struct {
-	util.ModuleParamsOwner
+	uparams.ModuleParamsOwner
 	self   *SMTPBParams
 	state  SMTPBState
 	header uint64
@@ -38,9 +39,9 @@ func NewSMTPBParams(b *arena.Budget) (*SMTPBParams, error) {
 // Same source constructor engine: an actual containing header charges embedded fields once.
 func (s *SMTPBParams) constructSource(b *arena.Budget) error {
 	if s == nil || s.self != nil {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
-	*s = SMTPBParams{ModuleParamsOwner: util.ModuleParamsOwner{Budget: b}, state: SMTPBState{1000, true, true, false}, header: s.header}
+	*s = SMTPBParams{ModuleParamsOwner: uparams.ModuleParamsOwner{Budget: b}, state: SMTPBState{1000, true, true, false}, header: s.header}
 	s.self = s
 	s.ModuleParamsOwner.Self = &s.ModuleParamsOwner
 	// Source accepts an unused params_ref: it does not call updt_params.
@@ -48,10 +49,10 @@ func (s *SMTPBParams) constructSource(b *arena.Budget) error {
 }
 func (s *SMTPBParams) open() error {
 	if s == nil || s.self != s || s.closed {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return nil
 }
@@ -61,7 +62,7 @@ func (s *SMTPBParams) State() (SMTPBState, error) {
 	}
 	return s.state, nil
 }
-func (s *SMTPBParams) Update(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService) (result error) {
+func (s *SMTPBParams) Update(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService) (result error) {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -101,13 +102,13 @@ func (s *SMTPBParams) Update(c *util.ParamsContext, p *util.ParamsRef, g *util.G
 }
 func (s *SMTPBParams) Close() error {
 	if s == nil || s.self != s {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.closed {
 		return nil
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := s.CloseHelpers(); e != nil {
 		return e

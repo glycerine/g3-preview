@@ -8,7 +8,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -30,7 +31,7 @@ func TestSMTStrSeventeenLiteralDefaultsAndMandatoryConstructorUpdate(t *testing.
 	}
 }
 
-func strNamedColdGraph(t *testing.T, v *SMTStrParams, g *util.GlobalParamsService, b *arena.Budget) {
+func strNamedColdGraph(t *testing.T, v *SMTStrParams, g *uparams.GlobalParamsService, b *arena.Budget) {
 	t.Helper()
 	n := g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
@@ -138,7 +139,7 @@ func TestSMTStrEveryConstructorReservationAndOwnedMemberUnwind(t *testing.T) {
 				t.Fatal("completed member reverse source unwind", ordinal, v.Serial)
 			}
 			copyOwner := *v
-			if e = copyOwner.Close(); !errors.Is(e, util.ErrParamsOwner) {
+			if e = copyOwner.Close(); !errors.Is(e, uparams.ErrParamsOwner) {
 				t.Fatal("shallow copied owning wrapper", e)
 			}
 		}
@@ -164,13 +165,13 @@ func TestSMTStrEveryUnwarmedSharedModuleAcquisitionReservation(t *testing.T) {
 		sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 		paramsMust(t, e)
 		bc := arena.NewBudget(^uint64(0))
-		c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+		c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 		paramsMust(t, e)
-		catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+		catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 		paramsMust(t, e)
 		cfg := gparamsTestConfig(b)
 		cfg.Catalog = catalog
-		g, e := util.NewGlobalParamsService(sy, c, cfg)
+		g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 		paramsMust(t, e)
 		paramsMust(t, g.InitializeSource())
 		local, e := c.NewValue()
@@ -221,18 +222,18 @@ func TestSMTStrNullGlobalIncompleteConstructorAndOwnerEligibility(t *testing.T) 
 	if v == nil || v.constructorReady || v.Serial != 1 || v.Helpers != nil {
 		t.Fatal("actual first lexical declaration before publication", v, cause)
 	}
-	if util.GlobalParamsSourceDebug {
-		if !errors.Is(cause, util.ErrGlobalParamsAssertion) {
+	if uparams.GlobalParamsSourceDebug {
+		if !errors.Is(cause, uparams.ErrGlobalParamsAssertion) {
 			t.Fatal(cause)
 		}
-	} else if !errors.Is(cause, util.ErrGlobalParamsUninitialized) {
+	} else if !errors.Is(cause, uparams.ErrGlobalParamsUninitialized) {
 		t.Fatal(cause)
 	}
-	if e := v.Update(p); !errors.Is(e, util.ErrParamsPrecondition) {
+	if e := v.Update(p); !errors.Is(e, uparams.ErrParamsPrecondition) {
 		t.Fatal("uncompleted source constructor not callable", e)
 	}
 	copyOwner := *v
-	if e := copyOwner.Close(); !errors.Is(e, util.ErrParamsOwner) {
+	if e := copyOwner.Close(); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("actual outer identity", e)
 	}
 	strNamedColdGraph(t, v, g, b)

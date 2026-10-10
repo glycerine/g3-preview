@@ -11,9 +11,10 @@ import (
 	"time"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -53,7 +54,7 @@ func TestASTBitVectorSignBitZeroWidthAssertionBeforeInput(t *testing.T) {
 	}
 	m := astTestManager(t)
 	yes, e := m.BitVectorHasSignBit(nil, 0)
-	if yes || !errors.Is(e, util.ErrGlobalParamsAssertion) {
+	if yes || !errors.Is(e, uparams.ErrGlobalParamsAssertion) {
 		t.Fatal("zero-width assertion must precede input/plugin reads", yes, e)
 	}
 }

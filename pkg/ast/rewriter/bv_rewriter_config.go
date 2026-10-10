@@ -3,11 +3,13 @@
 // scripts/mk_genfile_common.py:895-939.
 package rewriter
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	uparams "github.com/glycerine/g3/pkg/util/params"
+	// BVRewriterConfigurationState holds the derived rewriter's original flags.
+	// The enclosing configuration charges these fields and its actual generated
+	// helper snapshot once, and retains any stopped lookup/destruction prefix.
+)
 
-// BVRewriterConfigurationState holds the derived rewriter's original flags.
-// The enclosing configuration charges these fields and its actual generated
-// helper snapshot once, and retains any stopped lookup/destruction prefix.
 type BVRewriterConfigurationState struct {
 	HiDiv0, EliminateSignExtension, MultiplyToConcat, BitToBool                bool
 	Trailing, RemainderSimplification, BlastEqualityValue, SplitConcatEquality bool
@@ -25,14 +27,14 @@ func (p *BVPolynomialConfiguration) BitVectorState() (BVRewriterConfigurationSta
 // UpdateBitVector is the original derived updt_params: base first, then local.
 // The base constructor remains independent; its two updates precede the local
 // suffix in the eventual complete BV rewriter constructor.
-func (p *BVPolynomialConfiguration) UpdateBitVector(local *util.ParamsRef) error {
+func (p *BVPolynomialConfiguration) UpdateBitVector(local *uparams.ParamsRef) error {
 	if e := p.Update(local); e != nil {
 		return e
 	}
 	return p.UpdateBitVectorLocal(local)
 }
 
-func (p *BVPolynomialConfiguration) bvBoolean(local *util.ParamsRef, key string, def bool, dst *bool) error {
+func (p *BVPolynomialConfiguration) bvBoolean(local *uparams.ParamsRef, key string, def bool, dst *bool) error {
 	v, e := p.context.GetBoolFallbackName(local, &key, &p.snapshots[3], def)
 	if e == nil {
 		*dst = v
@@ -40,7 +42,7 @@ func (p *BVPolynomialConfiguration) bvBoolean(local *util.ParamsRef, key string,
 	return e
 }
 
-func (p *BVPolynomialConfiguration) UpdateBitVectorLocal(local *util.ParamsRef) (err error) {
+func (p *BVPolynomialConfiguration) UpdateBitVectorLocal(local *uparams.ParamsRef) (err error) {
 	if e := p.open(); e != nil {
 		return e
 	}
@@ -131,7 +133,7 @@ func (p *BVPolynomialConfiguration) SetMkBVToNumeral(v bool) error {
 
 // Source: src/ast/rewriter/bv_rewriter.cpp:53-60.
 // externalRelease represents the original _EXTERNAL_RELEASE build selection.
-func BVRewriterParameterDescriptions(d *util.ParamDescrs, externalRelease bool) error {
+func BVRewriterParameterDescriptions(d *uparams.ParamDescrs, externalRelease bool) error {
 	if e := BVPolynomialParameterDescriptions(d); e != nil {
 		return e
 	}
@@ -140,7 +142,7 @@ func BVRewriterParameterDescriptions(d *util.ParamDescrs, externalRelease bool) 
 	}
 	if !externalRelease {
 		description := "(default: false) convert (mkbv [true/false]*) into a numeral"
-		return d.InsertName("mkbv2num", util.ParamBool, &description, nil, nil)
+		return d.InsertName("mkbv2num", uparams.ParamBool, &description, nil, nil)
 	}
 	return nil
 }

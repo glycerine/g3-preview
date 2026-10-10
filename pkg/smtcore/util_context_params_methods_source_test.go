@@ -10,9 +10,10 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/polynomial"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
@@ -128,9 +129,9 @@ func TestContextParamsGetSolverProofShortCircuitAndPublicationBeforeMergedParams
 	m := astTestManager(t)
 	paramsMust(t, m.ToggleProofMode(ast.ASTProofDisabled))
 	proofs, models, core := true, true, true
-	var invalid util.ParamsRef
+	var invalid uparams.ParamsRef
 	e = s.GetSolverParams(m, &invalid, &proofs, &models, &core)
-	if !errors.Is(e, util.ErrParamsOwner) || proofs || !models || !core {
+	if !errors.Is(e, uparams.ErrParamsOwner) || proofs || !models || !core {
 		t.Fatal("disabled proof skips p getter, later model reaches invalid p", e, proofs, models, core)
 	}
 	paramsMust(t, c.SetBoolName(p, dynAckName("proof"), true))
@@ -148,7 +149,7 @@ func TestContextParamsGetSolverProofShortCircuitAndPublicationBeforeMergedParams
 	contextParamsCold(t, s, g, b)
 }
 
-func contextMethodsCold(t *testing.T, s *ContextParams, g *util.GlobalParamsService, b *arena.Budget) {
+func contextMethodsCold(t *testing.T, s *ContextParams, g *uparams.GlobalParamsService, b *arena.Budget) {
 	t.Helper()
 	n := g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
@@ -259,13 +260,13 @@ func TestContextParamsMergeEveryContextCOWReservationPreservesInputAndExactRetur
 		bc, bs, b := arena.NewBudget(1<<24), arena.NewBudget(1<<24), arena.NewBudget(1<<24)
 		sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 		paramsMust(t, e)
-		c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+		c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 		paramsMust(t, e)
-		catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+		catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 		paramsMust(t, e)
 		cfg := gparamsTestConfig(b)
 		cfg.Catalog = catalog
-		g, e := util.NewGlobalParamsService(sy, c, cfg)
+		g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 		paramsMust(t, e)
 		paramsMust(t, g.InitializeSource())
 		pv, e := c.NewValue()
@@ -335,15 +336,15 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
-	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+	c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
 	m, e := polynomial.NewUPolynomialManagerFromRationalService(q, polynomial.UPolynomialConfig{Checkpoint: func() bool { panic("unreached polynomial checkpoint") }, Cooperation: func() error { panic("unreached polynomial cooperation") }})
 	paramsMust(t, e)
-	catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+	catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 	paramsMust(t, e)
 	cfg := gparamsTestConfig(b)
 	cfg.Catalog = catalog
-	g, e := util.NewGlobalParamsService(sy, c, cfg)
+	g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 	paramsMust(t, e)
 	paramsMust(t, g.InitializeSource())
 	s, e := NewContextParams(c, g, b)
@@ -415,7 +416,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	originalDT := f.destructorCause
 	wrong := actual
 	wrong.InvocationField++
-	if e = c.CleanupSet(wrong); !errors.Is(e, util.ErrParamsPrecondition) || !leaf.Active || !leaf.Acquired {
+	if e = c.CleanupSet(wrong); !errors.Is(e, uparams.ErrParamsPrecondition) || !leaf.Active || !leaf.Acquired {
 		t.Fatal("foreign primitive invocation cannot release copied numeral", e)
 	}
 	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, extras)
@@ -450,7 +451,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	paramsMust(t, x)
 	foreignSource, x := c.StoppedSource(&foreign)
 	paramsMust(t, x)
-	if _, x = s2.MergeDefaultParams(&foreign); !errors.Is(x, util.ErrParamsPrecondition) {
+	if _, x = s2.MergeDefaultParams(&foreign); !errors.Is(x, uparams.ErrParamsPrecondition) {
 		t.Fatal("stopped caller mutation guard", x)
 	}
 	paramsMust(t, r.SetMaxSize(0))
@@ -549,16 +550,16 @@ func TestContextParamsAllSetBooleanFieldsAndReachedBorrowedStringLifetime(t *tes
 	paramsMust(t, e)
 	paramsMust(t, c.Reset(p))
 	old := s.state
-	e = s.SetViews(util.LiteralParamsStringView("model"), view)
+	e = s.SetViews(uparams.LiteralParamsStringView("model"), view)
 	if e == nil || s.state != old {
 		t.Fatal("reached stale value must fail before bool publication", e)
 	}
-	e = s.SetViews(util.LiteralParamsStringView("unknown"), view)
+	e = s.SetViews(uparams.LiteralParamsStringView("unknown"), view)
 	var ex z3exception.DefaultException
 	if !errors.As(e, &ex) {
 		t.Fatal("unknown branch must leave stale unused value unread", e)
 	}
-	e = s.SetViews(view, util.ParamsStringView{})
+	e = s.SetViews(view, uparams.ParamsStringView{})
 	if e == nil || s.state != old {
 		t.Fatal("key constructor reaches stale borrow before value", e)
 	}
@@ -615,15 +616,15 @@ func TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTupl
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
-	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+	c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
 	m, e := polynomial.NewUPolynomialManagerFromRationalService(q, polynomial.UPolynomialConfig{Checkpoint: func() bool { panic("unreached polynomial checkpoint") }, Cooperation: func() error { panic("unreached polynomial cooperation") }})
 	paramsMust(t, e)
-	catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+	catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 	paramsMust(t, e)
 	cfg := gparamsTestConfig(b)
 	cfg.Catalog = catalog
-	g, e := util.NewGlobalParamsService(sy, c, cfg)
+	g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 	paramsMust(t, e)
 	paramsMust(t, g.InitializeSource())
 	s, e := NewContextParams(c, g, b)

@@ -8,7 +8,8 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -24,7 +25,7 @@ type tacticReference interface {
 	Close() error
 }
 type tacticFactory interface {
-	Make(*ast.ASTManager, *util.ParamsRef) (tacticReference, error)
+	Make(*ast.ASTManager, *uparams.ParamsRef) (tacticReference, error)
 	Close() error
 }
 
@@ -32,7 +33,7 @@ type tacticFactory interface {
 // ParamsContext provides the source temporary empty params_ref at Make.
 type tacticCmd struct {
 	self               *tacticCmd
-	params             *util.ParamsContext
+	params             *uparams.ParamsContext
 	name               usymbol.Symbol
 	description        string
 	descriptionPresent bool
@@ -42,7 +43,7 @@ type tacticCmd struct {
 	closed             bool
 }
 
-func newTacticCmd(c *util.ParamsContext, name usymbol.Symbol, description *string, factory tacticFactory) (*tacticCmd, error) {
+func newTacticCmd(c *uparams.ParamsContext, name usymbol.Symbol, description *string, factory tacticFactory) (*tacticCmd, error) {
 	if c == nil || factory == nil {
 		return nil, errTacticRegistryOwner
 	}

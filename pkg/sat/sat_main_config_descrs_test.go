@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // Frozen descriptor bytes from sat_params.pyg and mk_genfile_common.py
@@ -57,7 +57,7 @@ func TestSATMainConfigGeneratedDescriptorBytesAndOrder(t *testing.T) {
 		}
 		kind, e := d.KindName(f[0])
 		paramsMust(t, e)
-		wantKind := map[string]util.ParamKind{"0": util.ParamUInt, "1": util.ParamBool, "2": util.ParamDouble, "4": util.ParamSymbol}[f[1]]
+		wantKind := map[string]uparams.ParamKind{"0": uparams.ParamUInt, "1": uparams.ParamBool, "2": uparams.ParamDouble, "4": uparams.ParamSymbol}[f[1]]
 		if kind != wantKind {
 			t.Fatal(i, kind, wantKind)
 		}
@@ -88,7 +88,7 @@ func TestSATMainConfigGeneratedDescriptorBytesAndOrder(t *testing.T) {
 func TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert(t *testing.T) {
 	sy := symbolManagerTest(t, nil, false)
 	d := pdnew(t, sy, nil)
-	pdinsert(t, d, "phase", util.ParamSymbol, pdstr("old"), pdstr("false"), pdstr("borrowed-original"))
+	pdinsert(t, d, "phase", uparams.ParamSymbol, pdstr("old"), pdstr("false"), pdstr("borrowed-original"))
 	paramsMust(t, collectSATConfigParamDescrs(d))
 	paramsMust(t, collectSATConfigParamDescrs(d))
 	n, e := d.Size()
@@ -98,7 +98,7 @@ func TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert(t *testing.T) {
 	}
 	kind, e := d.KindName("phase")
 	paramsMust(t, e)
-	if kind != util.ParamSymbol {
+	if kind != uparams.ParamSymbol {
 		t.Fatal("source insert overwrote", kind)
 	}
 	description, yes, e := d.DescriptionName("phase")
@@ -131,7 +131,7 @@ func TestSATMainConfigGeneratedDescriptorNativeStorage(t *testing.T) {
 	}
 }
 func TestSATMainConfigGeneratedDescriptorLifetime(t *testing.T) {
-	if e := collectSATConfigParamDescrs(nil); !errors.Is(e, util.ErrParamDescrsPrecondition) {
+	if e := collectSATConfigParamDescrs(nil); !errors.Is(e, uparams.ErrParamDescrsPrecondition) {
 		t.Fatal(e)
 	}
 	sy := symbolManagerTest(t, nil, false)

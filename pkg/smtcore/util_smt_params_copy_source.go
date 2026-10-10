@@ -3,9 +3,8 @@
 package smtcore
 
 import (
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Compiler-generated copies copy source members, never Go owner/receipt history.
@@ -17,12 +16,12 @@ func (s *SMTParams) copySourceReady() error {
 		return e
 	}
 	if !s.constructorReady || s.Helpers != nil || s.sourceStop() != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return nil
 }
-func (s *SMTParams) initCopyOwner(o *util.ModuleParamsOwner) {
-	*o = util.ModuleParamsOwner{Context: s.Context, Globals: s.Globals, Budget: s.Budget}
+func (s *SMTParams) initCopyOwner(o *uparams.ModuleParamsOwner) {
+	*o = uparams.ModuleParamsOwner{Context: s.Context, Globals: s.Globals, Budget: s.Budget}
 	o.Self = o
 }
 func (s *SMTParams) Clone() (*SMTParams, error) {
@@ -35,7 +34,7 @@ func (s *SMTParams) Clone() (*SMTParams, error) {
 	}
 	d := &SMTParams{header: n, empty: s.Context.EmptyValue()}
 	d.self = d
-	d.ModuleParamsOwner = util.ModuleParamsOwner{Context: s.Context, Globals: s.Globals, Budget: s.Budget}
+	d.ModuleParamsOwner = uparams.ModuleParamsOwner{Context: s.Context, Globals: s.Globals, Budget: s.Budget}
 	d.ModuleParamsOwner.Self = &d.ModuleParamsOwner
 	// Declaration-order bases. The first two contain only source scalar members.
 	d.initCopyOwner(&d.preprocess.ModuleParamsOwner)
@@ -112,13 +111,13 @@ func (s *SMTParams) Assign(src *SMTParams) error {
 		return e
 	}
 	if src == nil {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if e := src.copySourceReady(); e != nil {
 		return e
 	}
 	if s.Context != src.Context || s.Globals != src.Globals || s.Budget != src.Budget {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s == src {
 		return nil

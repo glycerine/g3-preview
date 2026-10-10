@@ -4,7 +4,8 @@ package ast
 import (
 	"errors"
 	"fmt"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"testing"
 )
 
@@ -66,7 +67,7 @@ func TestASTBitVectorSignBitInvocationAssertionBeforeInput(t *testing.T) {
 	m := astTestManager(t)
 	var call ASTBitVectorNumeralInvocation
 	yes, e := m.BitVectorHasSignBitWithInvocation(nil, 0, &call)
-	if yes || !errors.Is(e, util.ErrGlobalParamsAssertion) || call.receipt.frame != nil {
+	if yes || !errors.Is(e, uparams.ErrGlobalParamsAssertion) || call.receipt.frame != nil {
 		t.Fatal("assertion before input/frame", yes, e)
 	}
 	astTestMust(t, m.CleanupBitVectorNumeralInvocation(&call))

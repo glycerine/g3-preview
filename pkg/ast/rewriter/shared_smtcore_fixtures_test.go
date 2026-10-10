@@ -4,20 +4,21 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
-func dynAckSourceFixture(t *testing.T) (*util.ParamsContext, *util.GlobalParamsService, *util.ParamsRef, *arena.Budget) {
+func dynAckSourceFixture(t *testing.T) (*uparams.ParamsContext, *uparams.GlobalParamsService, *uparams.ParamsRef, *arena.Budget) {
 	t.Helper()
 	c, sy, _ := paramsTestOwner(t)
 	b := arena.NewBudget(^uint64(0))
-	catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+	catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 	paramsMust(t, e)
 	cfg := gparamsTestConfig(b)
 	cfg.Catalog = catalog
-	g, e := util.NewGlobalParamsService(sy, c, cfg)
+	g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 	paramsMust(t, e)
 	paramsMust(t, g.InitializeSource())
 	local, e := c.NewValue()
@@ -35,8 +36,8 @@ func dynAckSourceFixture(t *testing.T) (*util.ParamsContext, *util.GlobalParamsS
 
 var _ umemory.ConstructionFailure = (*unumeral.RationalService)(nil)
 
-func catalogTestConfig(b *arena.Budget) util.GlobalParamsCatalogConfig {
-	return util.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}}
+func catalogTestConfig(b *arena.Budget) uparams.GlobalParamsCatalogConfig {
+	return uparams.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}}
 }
 func paramsMust(t *testing.T, e error) {
 	t.Helper()
@@ -45,6 +46,6 @@ func paramsMust(t *testing.T, e error) {
 	}
 }
 
-func gparamsTestConfig(b *arena.Budget) util.GlobalParamsConfig {
-	return util.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}
+func gparamsTestConfig(b *arena.Budget) uparams.GlobalParamsConfig {
+	return uparams.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}
 }

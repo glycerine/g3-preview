@@ -2,7 +2,7 @@
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"strconv"
 )
 
@@ -134,7 +134,7 @@ func (f *astFloatLiteralFrame) abortBVParts() error {
 	}
 	return f.owner.numeric.CleanupValueCopy(&f.sigCopy, true)
 }
-func (m *ASTManager) floatBitVectorSuffix(f *astFloatLiteralFrame, radix bool, g *util.GlobalParamsService) (ASTHandle, error) {
+func (m *ASTManager) floatBitVectorSuffix(f *astFloatLiteralFrame, radix bool, g *uparams.GlobalParamsService) (ASTHandle, error) {
 	fm := m.Format
 	if fm == nil {
 		return ASTHandle{}, ErrASTDomain

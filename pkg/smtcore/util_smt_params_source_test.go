@@ -9,9 +9,10 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -81,12 +82,12 @@ func TestSMTParamsQIUninitializedDisplayPrefixAndCopiedOwnerGuard(t *testing.T) 
 	}
 	copyOwner := *s
 	before := b.Used()
-	if e := copyOwner.Close(); !errors.Is(e, util.ErrParamsOwner) || b.Used() != before {
+	if e := copyOwner.Close(); !errors.Is(e, uparams.ErrParamsOwner) || b.Used() != before {
 		t.Fatal("copied owning wrapper", e)
 	}
 }
 
-func smtParamsNamedCold(t *testing.T, s *SMTParams, g *util.GlobalParamsService, b *arena.Budget) {
+func smtParamsNamedCold(t *testing.T, s *SMTParams, g *uparams.GlobalParamsService, b *arena.Budget) {
 	t.Helper()
 	n := g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
@@ -109,7 +110,7 @@ func smtParamsNamedCold(t *testing.T, s *SMTParams, g *util.GlobalParamsService,
 				t.Fatal("source inline base got second owning header", h)
 			}
 		}
-		owners := []*util.ModuleParamsOwner{&s.ModuleParamsOwner, &s.preprocess.ModuleParamsOwner, &s.preprocess.pattern.ModuleParamsOwner, &s.dyn.ModuleParamsOwner, &s.qi.ModuleParamsOwner, &s.arith.ModuleParamsOwner, &s.array.ModuleParamsOwner, &s.bv.ModuleParamsOwner, &s.str.ModuleParamsOwner, &s.pb.ModuleParamsOwner}
+		owners := []*uparams.ModuleParamsOwner{&s.ModuleParamsOwner, &s.preprocess.ModuleParamsOwner, &s.preprocess.pattern.ModuleParamsOwner, &s.dyn.ModuleParamsOwner, &s.qi.ModuleParamsOwner, &s.arith.ModuleParamsOwner, &s.array.ModuleParamsOwner, &s.bv.ModuleParamsOwner, &s.str.ModuleParamsOwner, &s.pb.ModuleParamsOwner}
 		for _, m := range owners {
 			for f := m.Helpers; f != nil; f = f.Next {
 				if f.Self != f || f.Owner != m || f.Invocation == 0 {
@@ -127,7 +128,7 @@ func smtParamsNamedCold(t *testing.T, s *SMTParams, g *util.GlobalParamsService,
 		t.Fatal("before-lift once-only graph", n, b.Used())
 	}
 }
-func smtWarmAllModules(t *testing.T, g *util.GlobalParamsService) {
+func smtWarmAllModules(t *testing.T, g *uparams.GlobalParamsService) {
 	t.Helper()
 	for _, name := range []string{"pi", "smt", "rewriter", "model"} {
 		s, e := g.Symbols.Intern(name)
@@ -162,7 +163,7 @@ func TestSMTParamsWarmConstructorArenaFailuresAndCompletedBaseUnwind(t *testing.
 					t.Fatal("reverse completed-base source unwind", ordinal, s.completedBases, s.endedBases)
 				}
 				before := b.Used()
-				if x := s.Update(p); !errors.Is(x, util.ErrParamsPrecondition) {
+				if x := s.Update(p); !errors.Is(x, uparams.ErrParamsPrecondition) {
 					t.Fatal("incomplete ctor call", x)
 				}
 				if before != b.Used() {
@@ -546,15 +547,15 @@ func TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases(t
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
-	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+	c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
 	m, e := polynomial.NewUPolynomialManagerFromRationalService(q, polynomial.UPolynomialConfig{Checkpoint: func() bool { panic("unreached polynomial checkpoint") }, Cooperation: func() error { panic("unreached polynomial cooperation") }})
 	paramsMust(t, e)
-	catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+	catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 	paramsMust(t, e)
 	cfg := gparamsTestConfig(b)
 	cfg.Catalog = catalog
-	g, e := util.NewGlobalParamsService(sy, c, cfg)
+	g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 	paramsMust(t, e)
 	paramsMust(t, g.InitializeSource())
 	local, e := c.NewValue()
@@ -626,10 +627,10 @@ func TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases(t
 	}
 	v.Running = false
 	v.activeCall = false
-	if e := v.Update(&local); !errors.Is(e, util.ErrParamsPrecondition) || older.DestructorStarted || smtParamsRefCount(t, c, &older.Value) != olderCount {
+	if e := v.Update(&local); !errors.Is(e, uparams.ErrParamsPrecondition) || older.DestructorStarted || smtParamsRefCount(t, c, &older.Value) != olderCount {
 		t.Fatal("new Update entered older base through stopped younger owner", e)
 	}
-	if e := v.UpdateLocal(&local); !errors.Is(e, util.ErrParamsPrecondition) {
+	if e := v.UpdateLocal(&local); !errors.Is(e, uparams.ErrParamsPrecondition) {
 		t.Fatal("new local mutation through retained owner", e)
 	}
 	after := upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, extras)
@@ -645,7 +646,7 @@ func TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases(t
 	v.activeCall = false
 	// Callback/foreign owning requests cannot replace or adopt the exact frame.
 	copyOwner := *v
-	if e := copyOwner.Close(); !errors.Is(e, util.ErrParamsOwner) {
+	if e := copyOwner.Close(); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("foreign copied outer owner", e)
 	}
 	paramsDecFinish(t, v.Close)
@@ -655,7 +656,7 @@ func TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases(t
 	smtParamsNamedCold(t, v, g, b)
 }
 
-func smtParamsRefCount(t *testing.T, c *util.ParamsContext, v *util.ParamsRef) uint32 {
+func smtParamsRefCount(t *testing.T, c *uparams.ParamsContext, v *uparams.ParamsRef) uint32 {
 	t.Helper()
 	paramsMust(t, c.Check(v))
 	if v.Slot == 0 {
@@ -670,14 +671,14 @@ func TestSMTParamsNativeStringSolverMemberIgnoresSymbolArenaRefusal(t *testing.T
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2, DirectOnly: true})
 	paramsMust(t, e)
 	bc := arena.NewBudget(^uint64(0))
-	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+	c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
 	b := arena.NewBudget(^uint64(0))
-	catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+	catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 	paramsMust(t, e)
 	cfg := gparamsTestConfig(b)
 	cfg.Catalog = catalog
-	g, e := util.NewGlobalParamsService(sy, c, cfg)
+	g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 	paramsMust(t, e)
 	paramsMust(t, g.InitializeSource())
 	local, e := c.NewValue()
@@ -726,13 +727,13 @@ func TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation(t *testing.
 		sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 		paramsMust(t, e)
 		bc := arena.NewBudget(^uint64(0))
-		c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+		c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 		paramsMust(t, e)
-		catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+		catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 		paramsMust(t, e)
 		cfg := gparamsTestConfig(b)
 		cfg.Catalog = catalog
-		g, e := util.NewGlobalParamsService(sy, c, cfg)
+		g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 		paramsMust(t, e)
 		paramsMust(t, g.InitializeSource())
 		p, e := c.NewValue()
@@ -791,7 +792,7 @@ func TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund(t *te
 		t.Fatal("source destruction acquired storage")
 	}
 	smtParamsNamedCold(t, s, g, b)
-	if _, e = s.State(); !errors.Is(e, util.ErrParamsOwner) {
+	if _, e = s.State(); !errors.Is(e, uparams.ErrParamsOwner) {
 		t.Fatal("ended ordinary source object", e)
 	}
 	paramsMust(t, g.CheckOpen())

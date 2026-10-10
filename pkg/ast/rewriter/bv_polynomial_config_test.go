@@ -8,21 +8,22 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func bvPolynomialParamsFixture(t *testing.T) (*util.ParamsContext, *util.GlobalParams, *arena.Budget) {
+func bvPolynomialParamsFixture(t *testing.T) (*uparams.ParamsContext, *uparams.GlobalParams, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	astTestMust(t, e)
 	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 2}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{Budget: b, PageSize: 2}}}})
 	astTestMust(t, e)
-	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{Budget: b, PageSize: 2}}})
+	c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{Budget: b, PageSize: 2}}})
 	astTestMust(t, e)
-	g, e := util.NewGlobalParams(sy, c, util.GlobalParamsConfig{Budget: b, Register: func(util.GlobalParamsRegistrar) error { return nil }})
+	g, e := uparams.NewGlobalParams(sy, c, uparams.GlobalParamsConfig{Budget: b, Register: func(uparams.GlobalParamsRegistrar) error { return nil }})
 	astTestMust(t, e)
 	t.Cleanup(func() {
 		astTestMust(t, g.Close())
@@ -159,7 +160,7 @@ func TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix(t *testin
 			}
 			if p != nil {
 				copy := *p
-				if e := copy.Close(); !errors.Is(e, util.ErrParamsOwner) {
+				if e := copy.Close(); !errors.Is(e, uparams.ErrParamsOwner) {
 					t.Fatal("copied owner", e)
 				}
 				cause := p.cause
@@ -251,7 +252,7 @@ func TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences(t *testing.T
 
 func TestBVPolynomialConfigurationDescriptionsAndAdditionCaller(t *testing.T) {
 	c, g, b := bvPolynomialParamsFixture(t)
-	d, e := util.NewParamDescrs(g.SymbolsField, util.ParamDescrsConfig{Budget: b})
+	d, e := uparams.NewParamDescrs(g.SymbolsField, uparams.ParamDescrsConfig{Budget: b})
 	astTestMust(t, e)
 	defer func() { astTestMust(t, d.Close()) }()
 	astTestMust(t, BVPolynomialParameterDescriptions(d))

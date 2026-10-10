@@ -9,7 +9,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -33,7 +34,7 @@ func TestSMTPatternTenMembersLiteralConstructorAndPIModule(t *testing.T) {
 	}
 }
 
-func patternNamedColdGraph(t *testing.T, v *SMTPatternInferenceParams, g *util.GlobalParamsService, b *arena.Budget) {
+func patternNamedColdGraph(t *testing.T, v *SMTPatternInferenceParams, g *uparams.GlobalParamsService, b *arena.Budget) {
 	t.Helper()
 	n := g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
@@ -140,7 +141,7 @@ func TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix(t *testing
 				t.Fatal("only literal two initializers before failed helper", ordinal, v.state)
 			}
 			copyOwner := *v
-			if e = copyOwner.Close(); !errors.Is(e, util.ErrParamsOwner) {
+			if e = copyOwner.Close(); !errors.Is(e, uparams.ErrParamsOwner) {
 				t.Fatal("copy guard", e)
 			}
 		}
@@ -229,20 +230,20 @@ func TestSMTPatternFailedConstructorDisplayAndUpdateUnread(t *testing.T) {
 	c, g, p, b := dynAckSourceFixture(t)
 	paramsMust(t, g.FinalizeSource())
 	v, cause := NewSMTPatternInferenceParams(c, p, g, b)
-	if util.GlobalParamsSourceDebug {
-		if !errors.Is(cause, util.ErrGlobalParamsAssertion) {
+	if uparams.GlobalParamsSourceDebug {
+		if !errors.Is(cause, uparams.ErrGlobalParamsAssertion) {
 			t.Fatal(cause)
 		}
-	} else if !errors.Is(cause, util.ErrGlobalParamsUninitialized) {
+	} else if !errors.Is(cause, uparams.ErrGlobalParamsUninitialized) {
 		t.Fatal(cause)
 	}
 	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
 	stats := b.Used()
-	if e = v.Display(out); !errors.Is(e, util.ErrParamsPrecondition) {
+	if e = v.Display(out); !errors.Is(e, uparams.ErrParamsPrecondition) {
 		t.Fatal("incomplete display", e)
 	}
-	if e = v.Update(p); !errors.Is(e, util.ErrParamsPrecondition) {
+	if e = v.Update(p); !errors.Is(e, uparams.ErrParamsPrecondition) {
 		t.Fatal("incomplete update", e)
 	}
 	got, e := out.String()
@@ -263,13 +264,13 @@ func TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation(t *t
 		sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 		paramsMust(t, e)
 		bc := arena.NewBudget(^uint64(0))
-		c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+		c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 		paramsMust(t, e)
-		catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+		catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 		paramsMust(t, e)
 		cfg := gparamsTestConfig(b)
 		cfg.Catalog = catalog
-		g, e := util.NewGlobalParamsService(sy, c, cfg)
+		g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 		paramsMust(t, e)
 		paramsMust(t, g.InitializeSource())
 		local, e := c.NewValue()

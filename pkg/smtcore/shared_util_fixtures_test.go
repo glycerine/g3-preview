@@ -9,14 +9,15 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *unumeral.RationalService) {
+func paramsTestOwner(t *testing.T) (*uparams.ParamsContext, *usymbol.Manager, *unumeral.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
@@ -27,7 +28,7 @@ func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *unum
 	if e != nil {
 		t.Fatal(e)
 	}
-	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
+	c, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -53,7 +54,7 @@ func paramsMust(t *testing.T, e error) {
 		t.Fatal(e)
 	}
 }
-func catalogGraph(c *util.GlobalParamsCatalog) uint64 {
+func catalogGraph(c *uparams.GlobalParamsCatalog) uint64 {
 	n := c.OwnerBytes
 	if c.Region != nil {
 		s := c.Region.Stats()
@@ -66,9 +67,9 @@ func catalogGraph(c *util.GlobalParamsCatalog) uint64 {
 	}
 	return n
 }
-func gparamsGraph(g *util.GlobalParams) uint64 {
+func gparamsGraph(g *uparams.GlobalParams) uint64 {
 	n := g.OwnerBytes
-	count := func(d *util.ParamDescrs) uint64 {
+	count := func(d *uparams.ParamDescrs) uint64 {
 		if d == nil || d.Budget != g.Budget {
 			return 0
 		}
@@ -85,11 +86,11 @@ func gparamsVectorGraph(s arena.VectorStats) uint64 {
 	d := s.Descriptors
 	return s.OwnerBytes + s.PayloadBytes + s.BlockMetadataBytes + s.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 }
-func catalogTestConfig(b *arena.Budget) util.GlobalParamsCatalogConfig {
-	return util.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}}
+func catalogTestConfig(b *arena.Budget) uparams.GlobalParamsCatalogConfig {
+	return uparams.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}}
 }
-func gparamsTestConfig(b *arena.Budget) util.GlobalParamsConfig {
-	return util.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}
+func gparamsTestConfig(b *arena.Budget) uparams.GlobalParamsConfig {
+	return uparams.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}
 }
 
 func paramsDecFinish(t *testing.T, fn func() error) {
@@ -111,13 +112,13 @@ type paramsPhysicalRationalOwner struct {
 	Value   *unumeral.OwnedRational
 }
 type paramsPhysicalValueOwner struct {
-	Context *util.ParamsContext
-	Value   *util.ParamsRef
+	Context *uparams.ParamsContext
+	Value   *uparams.ParamsRef
 }
 
 // Cold graph uses the actual named owners and their typed backing capacities.
 // Source allocation counters remain separate from this physical Go charge.
-func paramsDecAuditColdGraph(t *testing.T, q *unumeral.RationalService, m *polynomial.UPolynomialManager, r *umemory.Runtime, bn *arena.Budget, c *util.ParamsContext, bc *arena.Budget, sy *usymbol.Manager, bs *arena.Budget) {
+func paramsDecAuditColdGraph(t *testing.T, q *unumeral.RationalService, m *polynomial.UPolynomialManager, r *umemory.Runtime, bn *arena.Budget, c *uparams.ParamsContext, bc *arena.Budget, sy *usymbol.Manager, bs *arena.Budget) {
 	t.Helper()
 	qv := reflect.ValueOf(q).Elem()
 	qm := testFieldBySourceName(qv, "manager").Elem()

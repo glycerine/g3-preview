@@ -6,7 +6,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -91,7 +92,7 @@ type SMTParamsState struct {
 	DefaultsInitialized, StringSolverInitialized, DumpInitialized bool
 }
 type SMTParams struct {
-	util.ModuleParamsOwner
+	uparams.ModuleParamsOwner
 	self                                 *SMTParams
 	preprocess                           SMTPreprocessorParams
 	dyn                                  SMTDynAckParams
@@ -103,16 +104,16 @@ type SMTParams struct {
 	pb                                   SMTPBParams
 	datatype                             SMTDatatypeParams
 	state                                SMTParamsState
-	empty                                util.ParamsRef
+	empty                                uparams.ParamsRef
 	header                               uint64
 	completedBases, endedBases           uint16
 	closed, constructorReady, activeCall bool
 	constructorCause, copyCause          error
 }
 
-func NewSMTParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) (*SMTParams, error) {
+func NewSMTParams(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) (*SMTParams, error) {
 	if c == nil || g == nil || b == nil || g.CheckOwner(c, b) != nil {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if e := c.Check(p); e != nil {
 		return nil, e
@@ -124,7 +125,7 @@ func NewSMTParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParams
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	s := &SMTParams{ModuleParamsOwner: util.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: n, empty: c.EmptyValue()}
+	s := &SMTParams{ModuleParamsOwner: uparams.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: n, empty: c.EmptyValue()}
 	s.self = s
 	s.ModuleParamsOwner.Self = &s.ModuleParamsOwner
 	s.activeCall = true
@@ -140,7 +141,7 @@ func NewSMTParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParams
 	}
 	return s, e
 }
-func (s *SMTParams) construct(p *util.ParamsRef) error {
+func (s *SMTParams) construct(p *uparams.ParamsRef) error {
 	if e := s.preprocess.constructSource(s.Context, &s.empty, s.Globals, s.Budget); e != nil {
 		return e
 	}
@@ -256,10 +257,10 @@ func (s *SMTParams) construct(p *util.ParamsRef) error {
 }
 func (s *SMTParams) open() error {
 	if s == nil || s.self != s || s.closed {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.activeCall || s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return nil
 }
@@ -350,11 +351,11 @@ func (s *SMTParams) admitMutation() error {
 		return e
 	}
 	if !s.constructorReady || s.sourceStop() != nil || s.Helpers != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return nil
 }
-func (s *SMTParams) UpdateLocal(p *util.ParamsRef) error {
+func (s *SMTParams) UpdateLocal(p *uparams.ParamsRef) error {
 	if e := s.admitMutation(); e != nil {
 		return e
 	}
@@ -362,7 +363,7 @@ func (s *SMTParams) UpdateLocal(p *util.ParamsRef) error {
 	defer func() { s.activeCall = false }()
 	return s.updateLocal(p)
 }
-func (s *SMTParams) Update(p *util.ParamsRef) error {
+func (s *SMTParams) Update(p *uparams.ParamsRef) error {
 	if e := s.admitMutation(); e != nil {
 		return e
 	}
@@ -396,15 +397,15 @@ func (s *SMTParams) UpdateContext(p *ContextParams) error {
 		return e
 	}
 	if !p.ready {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.state.AutoConfig = p.state.AutoConfig
 	s.state.Model = p.state.Model
 	return nil
 }
-func (s *SMTParams) updateLocal(local *util.ParamsRef) (result error) {
+func (s *SMTParams) updateLocal(local *uparams.ParamsRef) (result error) {
 	if !s.activeCall || s.Helpers != nil || s.DestructorCause != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.Running = true
 	defer func() { s.Running = false }()
@@ -566,7 +567,7 @@ func (s *SMTParams) SourceFinalize() error {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := s.sourceStop(); e != nil {
 		return e
@@ -577,13 +578,13 @@ func (s *SMTParams) SourceFinalize() error {
 }
 func (s *SMTParams) Close() error {
 	if s == nil || s.self != s {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.header == 0 {
 		return nil
 	}
 	if s.activeCall || s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	// First drain actual youngest lexical owners. Source causes remain sticky.
 	if s.array.self != nil {
@@ -644,7 +645,7 @@ func (s *SMTParams) Display(out *utext.NumericTextStream) error {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.activeCall = true
 	defer func() { s.activeCall = false }()

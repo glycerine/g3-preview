@@ -11,9 +11,10 @@ import (
 	"time"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -90,7 +91,7 @@ func TestASTBitVectorInverseZeroWidthSourceAssertion(t *testing.T) {
 	text, e := m.numerals.String(&out)
 	astTestMust(t, e)
 	if ASTSourceDebug {
-		if yes || !errors.Is(body, util.ErrGlobalParamsAssertion) || text != "99" {
+		if yes || !errors.Is(body, uparams.ErrGlobalParamsAssertion) || text != "99" {
 			t.Fatal("source positivity assertion", yes, body, text)
 		}
 	} else if !yes || body != nil || text != "0" {

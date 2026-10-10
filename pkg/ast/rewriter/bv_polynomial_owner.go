@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // BVPolynomialRewriter owns the persistent BV specialization. Argument views
@@ -39,12 +39,12 @@ type BVPolynomialRewriter struct {
 
 // A reached constructor failure returns the owner for explicit Close. The
 // expression map is constructed before the two original parameter updates.
-func NewBVPolynomialRewriter(m *ast.ASTManager, c *util.ParamsContext, g *util.GlobalParams, local *util.ParamsRef) (*BVPolynomialRewriter, error) {
+func NewBVPolynomialRewriter(m *ast.ASTManager, c *uparams.ParamsContext, g *uparams.GlobalParams, local *uparams.ParamsRef) (*BVPolynomialRewriter, error) {
 	if _, e := m.ProofsEnabled(); e != nil {
 		return nil, e
 	}
 	if c == nil || g == nil || g.ContextField != c {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if local != nil {
 		if e := c.Check(local); e != nil {
@@ -87,7 +87,7 @@ func (p *BVPolynomialRewriter) fail(e error) error {
 	}
 	return e
 }
-func (p *BVPolynomialRewriter) Update(local *util.ParamsRef) error {
+func (p *BVPolynomialRewriter) Update(local *uparams.ParamsRef) error {
 	if e := p.open(); e != nil {
 		return e
 	}

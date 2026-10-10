@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 type arrayEquality struct {
@@ -122,7 +122,7 @@ func (c *evaluatorConfiguration) arrayEq(a, b ast.ASTHandle, out ast.ASTRef) (st
 	}
 	f := &c.equality
 	if f.active {
-		return rewriter.RewriteFailed, util.ErrParamsPrecondition
+		return rewriter.RewriteFailed, uparams.ErrParamsPrecondition
 	}
 	f.active = true
 	f.left.active = true

@@ -6,7 +6,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
@@ -52,7 +53,7 @@ type satSimplifier struct {
 	cleanupLearned, cleanupInterrupted                                           bool
 }
 
-func newSATSimplifier(l *satSolverClauseLifecycle, c *satCleaner, d *satSolverDecision, p *util.ParamsRef) (s *satSimplifier, err error) {
+func newSATSimplifier(l *satSolverClauseLifecycle, c *satCleaner, d *satSolverDecision, p *uparams.ParamsRef) (s *satSimplifier, err error) {
 	if e := l.constructionBorrow(); e != nil {
 		return nil, e
 	}
@@ -157,7 +158,7 @@ func (s *satSimplifier) invariant() error {
 	}
 	return nil
 }
-func (s *satSimplifier) Update(p *util.ParamsRef) (err error) {
+func (s *satSimplifier) Update(p *uparams.ParamsRef) (err error) {
 	if e := s.constructionBorrow(); e != nil {
 		return e
 	}

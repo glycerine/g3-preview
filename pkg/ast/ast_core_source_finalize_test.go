@@ -5,13 +5,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 func TestASTSourceFinalizeStoppedEOFProtectsAutomaticMembersAndOwnsFileUntilACK(t *testing.T) {
 	sy, q, _ := astTestOwners(t)
 	b := arena.NewBudget(1 << 30)
-	name := util.LiteralParamsStringView(astTracePath(t))
+	name := uparams.LiteralParamsStringView(astTracePath(t))
 	m, e := NewSourceASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b}, &name)
 	astTestMust(t, e)
 	f := m.TraceFile

@@ -34691,3 +34691,37 @@ Native hash/runtime hash/S-expression/SMT2/root util passed
 passed (0.004s/0.004s/0.211s/0.005s/1.216s). Four-profile compiler preflight,
 changed package/root vet, manifest and diff checks passed. Manifest counts are
 unchanged. Only the parameter group and its integration tests remain at root.
+
+## Complete root util package extraction
+
+Moved the final33 production and35 test/helper files into util/params, including
+parameter values/descriptors, global catalog/services, source action receipts
+and actual parameter/debug/numeral integration tests. All126 affected caller
+files now import util/params directly. Compiler-resolved preflight covers native,
+g3debug, g3checked and combined profiles. No public root aliases or forwarding
+package were retained. Native parameter storage uses Go slices/maps and
+insdict.Dict v0.10.1 for the actual insertion-ordered dictionary.
+
+Final audit finds ZERO root-level Go files, ZERO imports of
+"github.com/glycerine/g3/pkg/util", and36 utility packages. Every utility's
+production project dependencies are arena or other utility packages, with no
+solver-domain imports. Numerals import memory/text/hash; parameters import
+numerals/symbols/text/diagnostics; diagnostics have no parameter back-edge.
+The eleven-unit C++ include cycle remains historical source context, not a Go
+package cycle or a reason to preserve unused Go container adapters.
+
+Updated util/BREAKDOWN.md with completed boundaries, current counts and the
+actual import direction; its original C++ graph is retained as historical
+analysis. The requested native-consumer migration and complete root utility
+subpackage reorganization are now complete. This does not complete outstanding
+source algorithm ports or raise source coverage credit. Manifest inventory
+remains2102 units/677 APIs:62 ported,281 partial,1731 unported,two dead/deleted.
+
+FULL native module suite passed at about06:07 UTC Oct10, log
+/mnt/oldrog/tmp/g3-final-util-split-native-full.log. Notable results: numeral
+88.401s, params1.186s, AST18.218s, rewriter10.226s, polynomial31.916s,
+SMT core0.237s, SAT0.545s, tactic0.033s. Full g3debug parameter/diagnostic/
+AST/tactic checks passed (1.258s/cached/20.855s/0.025s). Module-wide g3checked
+and combined g3debug+g3checked compilation, all util plus AST/polynomial/
+SMT core/SAT vet, manifest and diff checks passed. Final pure/nested package
+import audit passed for all36 utility packages.

@@ -6,7 +6,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -26,7 +27,7 @@ type SMTPatternInferenceState struct {
 	Initialized               uint16
 }
 type SMTPatternInferenceParams struct {
-	util.ModuleParamsOwner
+	uparams.ModuleParamsOwner
 	self                     *SMTPatternInferenceParams
 	state                    SMTPatternInferenceState
 	header                   uint64
@@ -34,9 +35,9 @@ type SMTPatternInferenceParams struct {
 	constructorCause         error
 }
 
-func NewSMTPatternInferenceParams(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) (*SMTPatternInferenceParams, error) {
+func NewSMTPatternInferenceParams(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) (*SMTPatternInferenceParams, error) {
 	if c == nil || g == nil || b == nil || g.CheckOwner(c, b) != nil {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if e := c.Check(p); e != nil {
 		return nil, e
@@ -55,11 +56,11 @@ func NewSMTPatternInferenceParams(c *util.ParamsContext, p *util.ParamsRef, g *u
 
 // Same actual constructor engine for standalone and embedded source bases. The
 // containing object charges the embedded fields once; no extra wrapper/header.
-func (s *SMTPatternInferenceParams) constructSource(c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService, b *arena.Budget) error {
+func (s *SMTPatternInferenceParams) constructSource(c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService, b *arena.Budget) error {
 	if s == nil || s.self != nil {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
-	s.ModuleParamsOwner = util.ModuleParamsOwner{Context: c, Globals: g, Budget: b}
+	s.ModuleParamsOwner = uparams.ModuleParamsOwner{Context: c, Globals: g, Budget: b}
 	s.state = SMTPatternInferenceState{NoPatternWeight: -1, AvoidSkolems: true, Initialized: 0x180}
 	s.self = s
 	s.ModuleParamsOwner.Self = &s.ModuleParamsOwner
@@ -74,10 +75,10 @@ func (s *SMTPatternInferenceParams) constructSource(c *util.ParamsContext, p *ut
 
 func (s *SMTPatternInferenceParams) open() error {
 	if s == nil || s.self != s || s.closed {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return nil
 }
@@ -87,21 +88,21 @@ func (s *SMTPatternInferenceParams) State() (SMTPatternInferenceState, error) {
 	}
 	return s.state, nil
 }
-func (s *SMTPatternInferenceParams) Update(p *util.ParamsRef) error {
+func (s *SMTPatternInferenceParams) Update(p *uparams.ParamsRef) error {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return s.update(p)
 }
-func (s *SMTPatternInferenceParams) update(local *util.ParamsRef) (result error) {
+func (s *SMTPatternInferenceParams) update(local *uparams.ParamsRef) (result error) {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if s.Helpers != nil || s.DestructorCause != nil {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.Running = true
 	defer func() { s.Running = false }()
@@ -164,13 +165,13 @@ func (s *SMTPatternInferenceParams) update(local *util.ParamsRef) (result error)
 }
 func (s *SMTPatternInferenceParams) Close() error {
 	if s == nil || s.self != s {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.closed {
 		return nil
 	}
 	if s.Running {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := s.CloseHelpers(); e != nil {
 		return e
@@ -185,7 +186,7 @@ func (s *SMTPatternInferenceParams) Display(out *utext.NumericTextStream) error 
 		return e
 	}
 	if !s.constructorReady {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := out.AppendCString("m_pi_max_multi_patterns="); e != nil {
 		return e

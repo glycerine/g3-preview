@@ -7,7 +7,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -19,8 +20,8 @@ type astFormatPPPair struct {
 type astFormatPPFrame struct {
 	next                                                      *astFormatPPFrame
 	owner                                                     *ASTManager
-	parameters                                                util.ModuleParamsOwner
-	helper                                                    *util.ModuleParamsFrame
+	parameters                                                uparams.ModuleParamsOwner
+	helper                                                    *uparams.ModuleParamsFrame
 	todo                                                      []astFormatPPPair
 	size                                                      uint32
 	space                                                     astNodeRef
@@ -69,7 +70,7 @@ func (m *ASTManager) ppFramesBytes() uint64 {
 	}
 	return n
 }
-func (m *ASTManager) ppAssertFormat(r astNodeRef, g *util.GlobalParamsService, line int32) error {
+func (m *ASTManager) ppAssertFormat(r astNodeRef, g *uparams.GlobalParamsService, line int32) error {
 	// SASSERT switch is reached before either actual expression operand.
 	if !ASTSourceDebug {
 		return nil
@@ -132,10 +133,10 @@ func (m *ASTManager) formatParameter(r astNodeRef) (*astParameterRecord, error) 
 	}
 	return m.parameter(token)
 }
-func (m *ASTManager) formatSymbolView(s usymbol.Symbol) (util.ParamsStringView, error) {
-	return util.SymbolCStringView(m.Symbols, s)
+func (m *ASTManager) formatSymbolView(s usymbol.Symbol) (uparams.ParamsStringView, error) {
+	return uparams.SymbolCStringView(m.Symbols, s)
 }
-func (m *ASTManager) formatSpaceToBreak(r astNodeRef, g *util.GlobalParamsService) (uint32, bool, error) {
+func (m *ASTManager) formatSpaceToBreak(r astNodeRef, g *uparams.GlobalParamsService) (uint32, bool, error) {
 	if e := m.ppAssertFormat(r, g, 25); e != nil {
 		return 0, false, e
 	}
@@ -253,14 +254,14 @@ func (m *ASTManager) releasePPFrames() error {
 	return nil
 }
 
-func (m *ASTManager) PrintFormat(out *utext.NumericTextStream, h ASTHandle, c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService) (result error) {
+func (m *ASTManager) PrintFormat(out *utext.NumericTextStream, h ASTHandle, c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService) (result error) {
 	f, e := m.lockFormat()
 	if e != nil {
 		return e
 	}
 	defer f.unlockFormat()
 	if out == nil || c == nil || c.CheckServices(f.Symbols, nil) != nil || g == nil || g.CheckOwner(c, f.BudgetField) != nil {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	r, e := f.requireExpr(h)
 	if e != nil {
@@ -276,7 +277,7 @@ func (m *ASTManager) PrintFormat(out *utext.NumericTextStream, h ASTHandle, c *u
 	f.ppFrameSerial++
 	frame := &astFormatPPFrame{owner: f, header: n, invocation: f.ppFrameSerial, next: f.ppFrames}
 	f.ppFrames = frame
-	frame.parameters = util.ModuleParamsOwner{Context: c, Globals: g, Budget: f.BudgetField}
+	frame.parameters = uparams.ModuleParamsOwner{Context: c, Globals: g, Budget: f.BudgetField}
 	frame.parameters.Self = &frame.parameters
 	defer func() {
 		result = frame.sourceDestroy(result)

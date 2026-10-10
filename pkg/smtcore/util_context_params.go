@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // InterpolantsInitialized remains false: the source never initializes m_interpolants.
@@ -18,8 +18,8 @@ type ContextParamsState struct {
 }
 type ContextParams struct {
 	self                       *ContextParams
-	context                    *util.ParamsContext
-	globals                    *util.GlobalParamsService
+	context                    *uparams.ParamsContext
+	globals                    *uparams.GlobalParamsService
 	budget                     *arena.Budget
 	dotProof, traceFile        OwnedString
 	state                      ContextParamsState
@@ -31,9 +31,9 @@ type ContextParams struct {
 	nextFrame                  uint64
 }
 
-func NewContextParams(c *util.ParamsContext, g *util.GlobalParamsService, b *arena.Budget) (*ContextParams, error) {
+func NewContextParams(c *uparams.ParamsContext, g *uparams.GlobalParamsService, b *arena.Budget) (*ContextParams, error) {
 	if c == nil || g == nil || b == nil || g.CheckOwner(c, b) != nil {
-		return nil, util.ErrParamsOwner
+		return nil, uparams.ErrParamsOwner
 	}
 	if e := g.CheckOpen(); e != nil {
 		return nil, e
@@ -84,10 +84,10 @@ func NewContextParams(c *util.ParamsContext, g *util.GlobalParamsService, b *are
 }
 func (s *ContextParams) open() error {
 	if s == nil || s.self != s || s.closed {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.executing {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	return nil
 }
@@ -109,12 +109,12 @@ func (s *ContextParams) DotProofFile() QITextView {
 	}
 	return s.dotProof.View()
 }
-func (s *ContextParams) Update(p *util.ParamsRef) error {
+func (s *ContextParams) Update(p *uparams.ParamsRef) error {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if !s.ready {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.executing = true
 	defer func() { s.executing = false }()
@@ -125,7 +125,7 @@ func (s *ContextParams) UpdateGlobal() error {
 		return e
 	}
 	if !s.ready {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.executing = true
 	defer func() { s.executing = false }()
@@ -140,12 +140,12 @@ func (s *ContextParams) SetRLimit(n uint32) error {
 		return e
 	}
 	if !s.ready {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	s.state.RLimit = n
 	return nil
 }
-func (s *ContextParams) update(p *util.ParamsRef) error {
+func (s *ContextParams) update(p *uparams.ParamsRef) error {
 	kTimeout := "timeout"
 	vTimeout, e := s.context.GetUIntName(p, &kTimeout, s.state.Timeout)
 	if e != nil {
@@ -253,13 +253,13 @@ func (s *ContextParams) update(p *util.ParamsRef) error {
 }
 func (s *ContextParams) Close() error {
 	if s == nil || s.self != s {
-		return util.ErrParamsOwner
+		return uparams.ErrParamsOwner
 	}
 	if s.closed {
 		return nil
 	}
 	if s.executing {
-		return util.ErrParamsPrecondition
+		return uparams.ErrParamsPrecondition
 	}
 	if e := s.closeSourceFrames(); e != nil {
 		return e

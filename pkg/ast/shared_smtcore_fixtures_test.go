@@ -4,18 +4,18 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
-func dynAckSourceFixture(t *testing.T) (*util.ParamsContext, *util.GlobalParamsService, *util.ParamsRef, *arena.Budget) {
+func dynAckSourceFixture(t *testing.T) (*uparams.ParamsContext, *uparams.GlobalParamsService, *uparams.ParamsRef, *arena.Budget) {
 	t.Helper()
 	c, sy, _ := paramsTestOwner(t)
 	b := arena.NewBudget(^uint64(0))
-	catalog, e := util.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+	catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 	paramsMust(t, e)
 	cfg := gparamsTestConfig(b)
 	cfg.Catalog = catalog
-	g, e := util.NewGlobalParamsService(sy, c, cfg)
+	g, e := uparams.NewGlobalParamsService(sy, c, cfg)
 	paramsMust(t, e)
 	paramsMust(t, g.InitializeSource())
 	local, e := c.NewValue()
@@ -33,7 +33,7 @@ func dynAckSourceFixture(t *testing.T) (*util.ParamsContext, *util.GlobalParamsS
 
 func dynAckName(s string) *string { return &s }
 
-func astParamsNamedColdGraph(t *testing.T, g *util.GlobalParamsService, b *arena.Budget) {
+func astParamsNamedColdGraph(t *testing.T, g *uparams.GlobalParamsService, b *arena.Budget) {
 	t.Helper()
 	total := g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
