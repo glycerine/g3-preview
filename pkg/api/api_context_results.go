@@ -22,7 +22,7 @@ var errAPIObjectOwner = errors.New("api: invalid, copied or retired context resu
 type apiContextResults struct {
 	self                          *apiContextResults
 	manager                       *ast.ASTManager
-	lastResult, astTrail          ast.ASTRefVector
+	lastResult, astTrail          []ast.ASTHandle
 	lastObject, pendingDestroy    *apiObject
 	allocated                     insdict.Dict[uint32, uint32]
 	objects                       []*apiObject
@@ -56,16 +56,6 @@ func newAPIContextResults(m *ast.ASTManager, rc bool) (c *apiContextResults, err
 	}
 	c = &apiContextResults{manager: m, userRefCount: rc, ownerBytes: n}
 	c.self = c
-	// The source declares both vectors before its object table.
-	if c.lastResult, err = m.NewRefVector(); err != nil {
-		m.Budget().Release(n)
-		return nil, err
-	}
-	if c.astTrail, err = m.NewRefVector(); err != nil {
-		cleanup := m.DelRefVector(&c.lastResult)
-		m.Budget().Release(n)
-		return nil, errors.Join(err, cleanup)
-	}
 	return c, nil
 }
 
@@ -82,24 +72,55 @@ func (c *apiContextResults) open() error {
 	return nil
 }
 
-func (c *apiContextResults) saveASTTrail(h ast.ASTHandle) error {
+// Native result slices own one AST reference per entry, including duplicates.
+func (c *apiContextResults) appendASTRoot(roots *[]ast.ASTHandle, h ast.ASTHandle) error {
+	if e := c.manager.IncRef(h); e != nil {
+		return e
+	}
+	*roots = append(*roots, h)
+	return nil
+}
+
+// Keep only unconsumed roots after an interrupted callback. A consumed DEC may
+// still report a later destructor error; retry must not release that root twice.
+func (c *apiContextResults) resetASTRoots(roots *[]ast.ASTHandle) error {
+	values := *roots
+	for i, h := range values {
+		consumed, e := c.manager.DecRefConsumed(h)
+		next := i
+		if consumed {
+			values[i] = ast.ASTHandle{}
+			next++
+		}
+		if e != nil {
+			*roots = values[next:]
+			return e
+		}
+		if !consumed {
+			*roots = values[next:]
+			return errAPIObjectOwner
+		}
+	}
+	*roots = values[:0]
+	return nil
+}
+
+func (c *apiContextResults) saveASTTrail(h ast.ASTHandle) (err error) {
 	if e := c.open(); e != nil {
 		return e
 	}
 	if !c.userRefCount {
-		return c.manager.RefVectorPush(c.astTrail, h)
+		return c.appendASTRoot(&c.astTrail, h)
 	}
 	// Keep an alias alive across reset, exactly as context.cpp:220-225.
 	if e := c.manager.IncRef(h); e != nil {
 		return e
 	}
-	if e := c.manager.RefVectorReset(c.lastResult); e != nil {
+	defer func() { err = errors.Join(err, c.manager.DecRef(h)) }()
+	if e := c.resetASTRoots(&c.lastResult); e != nil {
 		return e
 	}
-	if e := c.manager.RefVectorPush(c.lastResult, h); e != nil {
-		return e
-	}
-	return c.manager.DecRef(h)
+	return c.appendASTRoot(&c.lastResult, h)
 }
 
 func (c *apiContextResults) saveMultipleASTTrail(h ast.ASTHandle) error {
@@ -107,9 +128,9 @@ func (c *apiContextResults) saveMultipleASTTrail(h ast.ASTHandle) error {
 		return e
 	}
 	if c.userRefCount {
-		return c.manager.RefVectorPush(c.lastResult, h)
+		return c.appendASTRoot(&c.lastResult, h)
 	}
-	return c.manager.RefVectorPush(c.astTrail, h)
+	return c.appendASTRoot(&c.astTrail, h)
 }
 
 func (c *apiContextResults) resetLastResult() error {
@@ -117,7 +138,7 @@ func (c *apiContextResults) resetLastResult() error {
 		return e
 	}
 	if c.userRefCount {
-		if e := c.manager.RefVectorReset(c.lastResult); e != nil {
+		if e := c.resetASTRoots(&c.lastResult); e != nil {
 			return e
 		}
 	}
@@ -293,16 +314,14 @@ func (c *apiContextResults) Close() error {
 	c.freeIDs = nil
 	c.allocated.Clear()
 	c.objects = nil
-	if c.astTrail != (ast.ASTRefVector{}) {
-		if e := c.manager.DelRefVector(&c.astTrail); e != nil {
-			return e
-		}
+	if e := c.resetASTRoots(&c.astTrail); e != nil {
+		return e
 	}
-	if c.lastResult != (ast.ASTRefVector{}) {
-		if e := c.manager.DelRefVector(&c.lastResult); e != nil {
-			return e
-		}
+	c.astTrail = nil
+	if e := c.resetASTRoots(&c.lastResult); e != nil {
+		return e
 	}
+	c.lastResult = nil
 	c.manager.Budget().Release(c.ownerBytes)
 	c.ownerBytes = 0
 	c.closed = true

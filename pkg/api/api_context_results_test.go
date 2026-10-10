@@ -45,21 +45,20 @@ func TestAPIContextResultsExplicitReferencesAndAlias(t *testing.T) {
 	}
 	q := apiResultsAtom(t, m, "api-rc-q")
 	astTestMust(t, c.saveMultipleASTTrail(q))
-	n, e := m.RefVectorSize(c.lastResult)
-	astTestMust(t, e)
+	n := len(c.lastResult)
 	if n != 2 {
 		t.Fatal("multiple results did not append", n)
 	}
 	astTestMust(t, m.IncRef(p)) // user's explicit retain survives next API call.
 	astTestMust(t, c.resetLastResult())
-	if _, e = m.GetKind(q); !errors.Is(e, ast.ErrASTHandle) {
+	if _, e := m.GetKind(q); !errors.Is(e, ast.ErrASTHandle) {
 		t.Fatal("unpinned old result survived reset", e)
 	}
 	if rc, e := m.GetRefCount(p); e != nil || rc != 1 {
 		t.Fatal("user reference was lost", rc, e)
 	}
 	astTestMust(t, m.DecRef(p))
-	if _, e = m.GetKind(p); !errors.Is(e, ast.ErrASTHandle) {
+	if _, e := m.GetKind(p); !errors.Is(e, ast.ErrASTHandle) {
 		t.Fatal("last external release did not retire AST", e)
 	}
 }
@@ -78,8 +77,7 @@ func TestAPIContextResultsAutomaticReferencesAllASTKinds(t *testing.T) {
 	}
 	astTestMust(t, c.saveMultipleASTTrail(p))
 	astTestMust(t, c.resetLastResult())
-	n, e := m.RefVectorSize(c.astTrail)
-	astTestMust(t, e)
+	n := len(c.astTrail)
 	if n != 4 {
 		t.Fatal("automatic reset changed the accumulated AST trail", n)
 	}
@@ -270,5 +268,39 @@ func TestAPIContextObjectCloseUsesNativeFreeIDStorage(t *testing.T) {
 	astTestMust(t, c.Close())
 	if !o.object.closed {
 		t.Fatal("owning close did not drain the refused source prefix")
+	}
+}
+
+func TestAPIContextNativeResultGrowthAndReferenceRelease(t *testing.T) {
+	for _, rc := range []bool{false, true} {
+		m, c := apiResultsFixture(t, rc)
+		p := apiResultsAtom(t, m, "native-result-growth")
+		before := m.Budget().Used()
+		m.Budget().FailAfter(0)
+		for i := 0; i < 4097; i++ {
+			astTestMust(t, c.saveMultipleASTTrail(p))
+		}
+		if got, e := m.GetRefCount(p); e != nil || got != 4097 || m.Budget().Used() != before {
+			t.Fatal("native root growth and one reference per entry", got, e, m.Budget().Used(), before)
+		}
+		astTestMust(t, c.resetLastResult())
+		if rc {
+			if len(c.lastResult) != 0 {
+				t.Fatal("explicit results not reset")
+			}
+			if _, e := m.GetKind(p); !errors.Is(e, ast.ErrASTHandle) {
+				t.Fatal("reset retained explicit results", e)
+			}
+		} else if got, e := m.GetRefCount(p); e != nil || got != 4097 {
+			t.Fatal("automatic trail must survive result reset", got, e)
+		}
+		astTestMust(t, c.Close())
+		m.Budget().FailAfter(-1)
+		if c.astTrail != nil || c.lastResult != nil {
+			t.Fatal("close retained native backing")
+		}
+		if _, e := m.GetKind(p); !errors.Is(e, ast.ErrASTHandle) {
+			t.Fatal("close retained root", e)
+		}
 	}
 }

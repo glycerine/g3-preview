@@ -33477,3 +33477,27 @@ native migration. Root util production files did not change: the last stricter
 receiver-aware placement audit still has 286 files, 40 components and a largest
 190-file coupled group. The complete caller migration and util subpackage split
 remain active and unfinished.
+
+## Native API context result roots
+
+API last-result and automatic AST trails now use native []ASTHandle storage.
+Every append acquires one actual AST reference. Single-result replacement retains
+the incoming handle across reset to protect the only-reference alias case.
+Reset/Close use the actual DecRefConsumed result: consumed roots are retired even
+if a later destructor fails, while unconsumed/unread roots stay available for
+retry. No source vector header, payload codec, cold vector construction, capacity
+geometry or simulated backing-growth reservation remains in API context callers.
+The existing context cold-header and object destructor accounting remain.
+
+Validation: full native API passed (0.014s), full g3debug API passed (0.011s).
+Retained tests cover all AST kinds, alias replacement, explicit user ownership,
+automatic trails, actual goal/SAT/model roots and deterministic object teardown.
+A 4097-entry native-growth fixture exercises both result modes under FailAfter0,
+checks one reference per duplicate entry, release/reset policy and final backing
+removal. API vet, manifest, gofmt and diff checks passed. Counts remain 2102 units,
+677 APIs: 62 ported, 283 partial, 1729 unported, two dead/deleted. The preceding
+full native module suite remains within the hourly interval; no rerun here.
+
+This removes the API package's retained ASTRefVector consumer. Model evaluation
+and AST-internal owning collections still require migration. The root util
+subpackage split remains active and unfinished.
