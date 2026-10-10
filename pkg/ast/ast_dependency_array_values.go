@@ -60,7 +60,6 @@ func (m *astDependencyArrayManager) closeAfterNodeTeardown() {
 	// Source ast_manager destroys its nodes before allocator/member teardown.
 	// Escaped array tokens therefore cannot invoke their AST callbacks again.
 	// The enclosing allocator reclaims all remaining encoded records and values.
-	m.budget.Release(uint64(cap(m.getTmp)+cap(m.rerootTmp)) * 8)
 	m.getTmp = nil
 	m.rerootTmp = nil
 	m.liveCells = 0
@@ -70,7 +69,7 @@ func (m *astDependencyArrayManager) closeAfterNodeTeardown() {
 }
 
 // A valid cell's reference is consumed before any AST domain destructor can
-// report an emergency-worklist error. Callers must publish/clear their token
+// report a destruction callback error. Callers must publish/clear their token
 // after that error rather than retaining a dangling source union pointer.
 func (m *astDependencyArrayManager) decConsumed(r arena.SmallBytesRef) (bool, error) {
 	if astPArrayNull(r) {

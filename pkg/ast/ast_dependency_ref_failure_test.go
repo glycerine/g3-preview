@@ -259,7 +259,7 @@ func TestASTDependencyRefVectorDebugCounterRefusalKeepsOwnedBacking(t *testing.T
 	astTestMust(t, m.dependencies.store(d.record, c))
 	astTestMust(t, m.DelDependencyRefVector(&v))
 }
-func TestASTDependencyRefVectorConsumedCallbackErrorReclaimsLexicalOwner(t *testing.T) {
+func TestASTDependencyRefVectorNativeDeletionReclaimsLexicalOwner(t *testing.T) {
 	m := astTestManager(t)
 	sort, e := m.MkBoolSort()
 	astTestMust(t, e)
@@ -279,9 +279,7 @@ func TestASTDependencyRefVectorConsumedCallbackErrorReclaimsLexicalOwner(t *test
 	m.BudgetField.FailAfter(0)
 	e = m.DelDependencyRefVector(&v)
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
+	astTestMust(t, e)
 	if v != (ASTDependencyRefVector{}) || m.dependencies.live != 0 || m.liveNodes != baseNodes {
 		t.Fatal("consumed callback lost lexical owner", v, m.dependencies.live, m.liveNodes, baseNodes)
 	}
@@ -829,7 +827,7 @@ func TestASTDependencyRefPendingForceManagerCloseReclaimsPhysicalGraph(t *testin
 	}
 }
 
-func TestASTDependencyRefResumedConsumedErrorStillFinishesRequestedDestruction(t *testing.T) {
+func TestASTDependencyRefNativeDeletionFinishesResumedDestruction(t *testing.T) {
 	if !ASTSourceDebug {
 		return
 	}
@@ -879,9 +877,7 @@ func TestASTDependencyRefResumedConsumedErrorStillFinishesRequestedDestruction(t
 			e = m.DelDependencyRefVector(&v)
 		}
 		m.BudgetField.FailAfter(-1)
-		if !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal("actual dependency deletion worklist refusal", e)
-		}
+		astTestMust(t, e)
 		if m.dependencies.live != 0 || v != (ASTDependencyRefVector{}) || b != (ASTDependencyRefBuffer{}) {
 			t.Fatal("completed resumed phase must not abandon still-owned prefix", buffer, e, m.dependencies.live, v, b)
 		}

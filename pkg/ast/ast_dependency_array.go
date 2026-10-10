@@ -342,30 +342,6 @@ func (m *astDependencyArrayManager) rootPush(c *astDependencyArrayCell, v arena.
 	c.idx++
 	return nil
 }
-func (m *astDependencyArrayManager) growScratch(a *[]arena.SmallBytesRef) error {
-	if len(*a) < cap(*a) {
-		return nil
-	}
-	n, e := astDependencyScratchCapacity(uint64(cap(*a)), uint64(^uint(0)>>1))
-	if e != nil {
-		return e
-	}
-	if e := m.budget.Reserve(n * 8); e != nil {
-		return e
-	}
-	next := make([]arena.SmallBytesRef, len(*a), int(n))
-	copy(next[:cap(next)], (*a)[:cap(*a)])
-	m.budget.Release(uint64(cap(*a)) * 8)
-	*a = next
-	return nil
-}
-func (m *astDependencyArrayManager) scratchPush(a *[]arena.SmallBytesRef, r arena.SmallBytesRef) error {
-	if e := m.growScratch(a); e != nil {
-		return e
-	}
-	*a = append(*a, r)
-	return nil
-}
 func (m *astDependencyArrayManager) sizeCell(r arena.SmallBytesRef) (uint32, error) {
 	for !astPArrayNull(r) {
 		c, e := m.cell(r)
@@ -772,9 +748,7 @@ func (m *astDependencyArrayManager) getValues(r arena.SmallBytesRef) (block aren
 			}
 			break
 		}
-		if e = m.scratchPush(&m.getTmp, r); e != nil {
-			return block, 0, e
-		}
+		m.getTmp = append(m.getTmp, r)
 		r = c.link
 	}
 	// The temporary block remains lexical ownership until complete publication.
@@ -927,9 +901,7 @@ func (m *astDependencyArrayManager) Reroot(ref *ASTDependencyArray) error {
 		if c.kind == astPArrayRoot {
 			break
 		}
-		if e = m.scratchPush(&m.rerootTmp, r); e != nil {
-			return e
-		}
+		m.rerootTmp = append(m.rerootTmp, r)
 		r = c.link
 	}
 	c, e = m.cell(r)

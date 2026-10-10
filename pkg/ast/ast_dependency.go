@@ -2,8 +2,6 @@
 package ast
 
 import (
-	"math"
-
 	"github.com/glycerine/g3/pkg/arena"
 )
 
@@ -18,13 +16,12 @@ type ASTDependencyJoinProgress struct{ Completed, PendingLeaf ASTDependency }
 
 const astDependencyMaxRC uint32 = (1 << 30) - 1
 
-// Encoded source word, padding, value/children, pending link.
-// The charged continuation link replaces unsafe exception abandonment.
+// Encoded project reference/mark word, padding and value/children.
 type astDependencyNode struct {
-	rc                uint32
-	marked, leaf      bool
-	value             astNodeRef
-	left, right, next arena.SmallBytesRef
+	rc           uint32
+	marked, leaf bool
+	value        astNodeRef
+	left, right  arena.SmallBytesRef
 }
 type astDependencyManager struct {
 	owner     *ASTManager
@@ -57,7 +54,7 @@ func (d *astDependencyManager) node(r arena.SmallBytesRef) (astDependencyNode, e
 		return astDependencyNode{}, ErrASTHandle
 	}
 	n, e := d.allocator.Size(r)
-	if e != nil || (n != 24 && n != 32) {
+	if e != nil || (n != 16 && n != 24) {
 		return astDependencyNode{}, ErrASTHandle
 	}
 	w, e := d.owner.readWord(r, 0)
@@ -74,12 +71,12 @@ func (d *astDependencyManager) node(r arena.SmallBytesRef) (astDependencyNode, e
 	}
 	c := astDependencyNode{rc: w & astDependencyMaxRC, marked: w&(1<<30) != 0, leaf: w&(1<<31) != 0}
 	if c.leaf {
-		if n != 24 {
+		if n != 16 {
 			return c, ErrASTHandle
 		}
 		c.value = astNodeRef{a, b}
 	} else {
-		if n != 32 {
+		if n != 24 {
 			return c, ErrASTHandle
 		}
 		c.left = arena.SmallBytesRef{Slot: arena.Slot(a), Generation: arena.Generation(b)}
@@ -93,14 +90,9 @@ func (d *astDependencyManager) node(r arena.SmallBytesRef) (astDependencyNode, e
 		}
 		c.right = arena.SmallBytesRef{Slot: arena.Slot(a), Generation: arena.Generation(b)}
 	}
-	a, e = d.owner.readWord(r, n-8)
-	if e != nil {
-		return c, e
-	}
-	b, e = d.owner.readWord(r, n-4)
-	c.next = arena.SmallBytesRef{Slot: arena.Slot(a), Generation: arena.Generation(b)}
-	return c, e
+	return c, nil
 }
+
 func (d *astDependencyManager) store(r arena.SmallBytesRef, c astDependencyNode) error {
 	w := c.rc & astDependencyMaxRC
 	if c.marked {
@@ -112,14 +104,14 @@ func (d *astDependencyManager) store(r arena.SmallBytesRef, c astDependencyNode)
 	if e := d.owner.writeWord(r, 0, w); e != nil {
 		return e
 	}
-	var words [6]uint32
+	var words [4]uint32
 	var count uint32
 	if c.leaf {
-		words = [6]uint32{c.value.slot, c.value.generation, uint32(c.next.Slot), uint32(c.next.Generation)}
-		count = 4
+		words = [4]uint32{c.value.slot, c.value.generation}
+		count = 2
 	} else {
-		words = [6]uint32{uint32(c.left.Slot), uint32(c.left.Generation), uint32(c.right.Slot), uint32(c.right.Generation), uint32(c.next.Slot), uint32(c.next.Generation)}
-		count = 6
+		words = [4]uint32{uint32(c.left.Slot), uint32(c.left.Generation), uint32(c.right.Slot), uint32(c.right.Generation)}
+		count = 4
 	}
 	for i := uint32(0); i < count; i++ {
 		if e := d.owner.writeWord(r, 8+i*4, words[i]); e != nil {
@@ -143,12 +135,12 @@ func (d *astDependencyManager) leaf(v astNodeRef) (arena.SmallBytesRef, error) {
 	if v.slot == 0 {
 		return arena.SmallBytesRef{}, nil
 	}
-	r, e := d.allocator.Allocate(24)
+	r, e := d.allocator.Allocate(16)
 	if e != nil {
 		return r, e
 	}
 	if e = d.owner.incNode(v); e != nil {
-		d.allocator.Deallocate(24, r)
+		d.allocator.Deallocate(16, r)
 		return arena.SmallBytesRef{}, e
 	}
 	e = d.store(r, astDependencyNode{leaf: true, value: v})
@@ -164,16 +156,16 @@ func (d *astDependencyManager) join(a, b arena.SmallBytesRef) (arena.SmallBytesR
 	if dependencyNull(b) || a == b {
 		return a, nil
 	}
-	r, e := d.allocator.Allocate(32)
+	r, e := d.allocator.Allocate(24)
 	if e != nil {
 		return r, e
 	}
 	if e = d.inc(a); e != nil {
-		d.allocator.Deallocate(32, r)
+		d.allocator.Deallocate(24, r)
 		return arena.SmallBytesRef{}, e
 	}
 	if e = d.inc(b); e != nil {
-		d.allocator.Deallocate(32, r)
+		d.allocator.Deallocate(24, r)
 		return arena.SmallBytesRef{}, e
 	}
 	e = d.store(r, astDependencyNode{left: a, right: b})
@@ -181,25 +173,6 @@ func (d *astDependencyManager) join(a, b arena.SmallBytesRef) (arena.SmallBytesR
 		d.live++
 	}
 	return r, e
-}
-func (d *astDependencyManager) push(r arena.SmallBytesRef) error {
-	if len(d.todo) == cap(d.todo) {
-		n, e := astDependencyScratchCapacity(uint64(cap(d.todo)), uint64(math.MaxInt))
-		if e != nil {
-			return e
-		}
-		if e := d.owner.BudgetField.Reserve(n * 8); e != nil {
-			return e
-		}
-		a := make([]arena.SmallBytesRef, len(d.todo), int(n))
-		copy(a[:cap(a)], d.todo[:cap(d.todo)])
-		if d.owner != nil {
-			d.owner.BudgetField.Release(uint64(cap(d.todo)) * 8)
-		}
-		d.todo = a
-	}
-	d.todo = append(d.todo, r)
-	return nil
 }
 func (d *astDependencyManager) dec(r arena.SmallBytesRef) error {
 	if dependencyNull(r) {
@@ -222,65 +195,20 @@ func (d *astDependencyManager) dec(r arena.SmallBytesRef) error {
 	return d.del(r)
 }
 
-// First refusal switches the same LIFO work to links already charged in nodes.
-// No allocation/replay occurs during this finite consumed-error continuation.
+// Native scratch preserves left/right enqueue and LIFO destruction order.
 func (d *astDependencyManager) del(r arena.SmallBytesRef) error {
 	var first error
-	var pending arena.SmallBytesRef
-	intrusive := false
-	link := func(x arena.SmallBytesRef) error {
+	d.todo = append(d.todo, r)
+	for len(d.todo) != 0 {
+		x := d.todo[len(d.todo)-1]
+		d.todo = d.todo[:len(d.todo)-1]
 		c, e := d.node(x)
 		if e != nil {
 			return e
 		}
-		c.next = pending
-		if e = d.store(x, c); e == nil {
-			pending = x
-		}
-		return e
-	}
-	enqueue := func(x arena.SmallBytesRef) error {
-		if intrusive {
-			return link(x)
-		}
-		if e := d.push(x); e != nil {
-			if first == nil {
-				first = e
-			}
-			intrusive = true
-			for _, q := range d.todo {
-				if e = link(q); e != nil {
-					return e
-				}
-			}
-			d.todo = d.todo[:0]
-			return link(x)
-		}
-		return nil
-	}
-	if e := enqueue(r); e != nil {
-		return e
-	}
-	for len(d.todo) != 0 || !dependencyNull(pending) {
-		var x arena.SmallBytesRef
-		if intrusive {
-			x = pending
-			c, e := d.node(x)
-			if e != nil {
-				return e
-			}
-			pending = c.next
-		} else {
-			x = d.todo[len(d.todo)-1]
-			d.todo = d.todo[:len(d.todo)-1]
-		}
-		c, e := d.node(x)
-		if e != nil {
-			return e
-		}
-		bytes := uint32(32)
+		bytes := uint32(24)
 		if c.leaf {
-			bytes = 24
+			bytes = 16
 			_, e = d.owner.decNode(c.value)
 			if e != nil && first == nil {
 				first = e
@@ -299,9 +227,7 @@ func (d *astDependencyManager) del(r arena.SmallBytesRef) error {
 					return e
 				}
 				if v.rc == 0 {
-					if e = enqueue(child); e != nil {
-						return e
-					}
+					d.todo = append(d.todo, child)
 				}
 			}
 		}
@@ -313,25 +239,6 @@ func (d *astDependencyManager) del(r arena.SmallBytesRef) error {
 	return first
 }
 func (d *astDependencyManager) closeAfterNodeTeardown() {
-	if d.owner != nil {
-		d.owner.BudgetField.Release(uint64(cap(d.todo)) * 8)
-	}
 	d.todo = nil
 	d.live = 0
-}
-
-// Source unsigned32 vector byte guard and actual Go host allocation guard are
-// separate; Go backing has no fictitious source heap header reservation.
-func astDependencyScratchCapacity(old, hostMax uint64) (uint64, error) {
-	n := uint64(2)
-	if old != 0 {
-		if old > (math.MaxUint64-1)/3 {
-			return 0, arena.ErrBounds
-		}
-		n = (3*old + 1) / 2
-	}
-	if n <= old || n > uint64(math.MaxUint32-8)/8 || n > hostMax/8 {
-		return 0, arena.ErrBounds
-	}
-	return n, nil
 }

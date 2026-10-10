@@ -8,7 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestASTExprSubstitutionConsumedEraseFinishesSameEntry(t *testing.T) {
+func TestASTExprSubstitutionNativeDependencyEraseFinishesSameEntry(t *testing.T) {
 	m := astTestManager(t)
 	key := astDependencyExpr(t, m, 10200)
 	value := astDependencyExpr(t, m, 10201)
@@ -20,13 +20,11 @@ func TestASTExprSubstitutionConsumedEraseFinishesSameEntry(t *testing.T) {
 	m.BudgetField.FailAfter(0)
 	e = m.ExprSubstitutionErase(s, key)
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
+	astTestMust(t, e)
 	found, e := m.ExprSubstitutionContains(s, key)
 	astTestMust(t, e)
 	if found {
-		t.Fatal("consumed deletion error must finish same entry")
+		t.Fatal("native erase must remove the same entry")
 	}
 	if m.dependencies.live != 0 {
 		t.Fatal("dependency roots before Close", m.dependencies.live)
@@ -270,7 +268,7 @@ func TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding(t *test
 	astTestMust(t, m.DelExprSubstitution(&s))
 	astTestMust(t, m.DecRef(key))
 }
-func TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix(t *testing.T) {
+func TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix(t *testing.T) {
 	m := astTestManager(t)
 	key := astDependencyExpr(t, m, 12300)
 	value := astDependencyExpr(t, m, 12301)
@@ -285,19 +283,11 @@ func TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix(t *testing.T) {
 	m.BudgetField.FailAfter(0)
 	e = m.ScopedExprSubstitutionPop(scope, 1)
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
+	astTestMust(t, e)
 	a, e := m.scopedSubstState(scope)
 	astTestMust(t, e)
-	if a.operation>>30 != 1 || a.index != 1 || a.size != 1 {
-		t.Fatal("completed erase cursor before trail resize", a)
-	}
-	astTestMust(t, m.ScopedExprSubstitutionPop(scope, 1))
-	a, e = m.scopedSubstState(scope)
-	astTestMust(t, e)
 	if a.operation != 0 || a.size != 0 {
-		t.Fatal(a)
+		t.Fatal("native pop retained pending scope state", a)
 	}
 	if m.dependencies.live != 0 {
 		t.Fatal(m.dependencies.live)
@@ -407,7 +397,7 @@ func TestASTExprSubstitutionCollisionsWrapAndLastTombstone(t *testing.T) {
 	}
 	astTestMust(t, m.DelExprSubstitution(&s))
 }
-func TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries(t *testing.T) {
+func TestASTExprSubstitutionNativeDependencyResetFinishesAllEntries(t *testing.T) {
 	m := astTestManager(t)
 	s, e := m.NewExprSubstitutionCores(true)
 	astTestMust(t, e)
@@ -422,11 +412,9 @@ func TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries(t *testing.T
 	m.BudgetField.FailAfter(0)
 	e = m.ExprSubstitutionReset(s)
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	if m.dependencies.live != 1 {
-		t.Fatal("only completed entry cleanup before source error", m.dependencies.live)
+	astTestMust(t, e)
+	if m.dependencies.live != 0 {
+		t.Fatal("native reset must clean all dependencies", m.dependencies.live)
 	}
 	astTestMust(t, m.ExprSubstitutionReset(s))
 	astTestMust(t, m.DelExprSubstitution(&s))

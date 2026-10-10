@@ -7,7 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestASTDependencyDeletionRefusalCompletesPhysicalGraphImmediately(t *testing.T) {
+func TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately(t *testing.T) {
 	m := astTestManager(t)
 	h := astDependencyExpr(t, m, 1900)
 	baseline := m.allocator.Stats().Live
@@ -21,11 +21,9 @@ func TestASTDependencyDeletionRefusalCompletesPhysicalGraphImmediately(t *testin
 	astTestMust(t, m.DependencyInc(root))
 	m.BudgetField.FailAfter(0)
 	e := m.DependencyDec(root)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal("first actual todo reserve", e)
-	}
+	astTestMust(t, e)
 	if m.dependencies.live != 0 || m.allocator.Stats().Live != baseline {
-		t.Fatal("lost intrusive deletion roots before Close", m.dependencies.live, m.allocator.Stats().Live, baseline)
+		t.Fatal("native deletion retained dependency nodes", m.dependencies.live, m.allocator.Stats().Live, baseline)
 	}
 	if rc, e := m.GetRefCount(h); e != nil || rc != 1 {
 		t.Fatal(rc, e)
@@ -62,7 +60,7 @@ func TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix(t *testing.T
 	astTestMust(t, m.DependencyDec(leaf))
 }
 
-func TestASTDependencyArrayDeletionASTFailureConsumesAllRoots(t *testing.T) {
+func TestASTDependencyArrayNativeDeletionConsumesAllRoots(t *testing.T) {
 	m := astTestManager(t)
 	b, e := m.MkBoolSort()
 	astTestMust(t, e)
@@ -80,9 +78,7 @@ func TestASTDependencyArrayDeletionASTFailureConsumesAllRoots(t *testing.T) {
 	astTestMust(t, m.DependencyArrayPush(&a, leaf))
 	m.BudgetField.FailAfter(0)
 	e = m.DependencyArrayDel(&a)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal("actual dependency worklist refusal", e)
-	}
+	astTestMust(t, e)
 	if a != (ASTDependencyArray{}) || m.dependencies.live != 0 || m.dependencyArrays.liveCells != 0 || m.dependencyArrays.liveBlocks != 0 || m.liveNodes != baseline {
 		t.Fatal("immediate owned callback graph", a, m.dependencies.live, m.dependencyArrays.liveCells, m.dependencyArrays.liveBlocks, m.liveNodes, baseline)
 	}

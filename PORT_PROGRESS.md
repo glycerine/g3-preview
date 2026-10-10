@@ -32704,3 +32704,47 @@ Module-wide compilation, AST/rewriter vet, manifest evidence, gofmt and diff
 checks passed. The util knot and complete subpackage split remain active:
 AST dependency/substitution collections, SAT vectors, NumericTextStream consumers
 and internal util numeric/text/parameter dependency cycles still remain.
+
+## Native dependency traversal, destruction and persistent-array scratch
+
+AST dependency FIFO traversal and LIFO deletion now use a native slice of
+checked dependency references. Removed source vector capacity arithmetic,
+simulated scratch reservations/refunds and the emergency intrusive fallback.
+Dependency records no longer carry the fallback's unused link: actual encoded
+leaf/join objects are 16/24 bytes, with their project RC30/marked/leaf word,
+AST value or left/right children unchanged. Actual SmallBytes object allocation,
+AST reference INC/DEC, reference wrapping, callback order and consumed-error
+propagation remain. Persistent dependency arrays now append to native get/reroot
+scratch slices too; their actual persistent root/patch/value algorithm and
+owning object allocations remain.
+
+The new cold worklist test builds 257 distinct leaf values, checks an absent
+Contains traversal and exact FIFO linearization order with reservations disabled,
+checks every leaf mark is cleared, destroys the entire dependency graph and
+checks each caller retain remains. Existing warmed traversal/destruction
+allocation checks, shared-DAG oracle, actual LIFO AST callback/ID-recycling
+checks, real output-vector refusal cleanup and persistent array fault sweeps
+remain. Wide reference-vector/array destruction and resumed debug-domain
+cleanup now verify native success rather than requiring removed worklist
+reservation failures. Updated manifest evidence names and ownership descriptions
+without changing source/API completion statuses.
+
+Focused native dependency groups passed (0.065s); focused g3debug dependency
+groups passed (0.069s). AST/rewriter vet and manifest evidence passed. The
+roughly hourly full native module checkpoint is running; its result is recorded
+below when terminal. The util knot/split remains active, with substitution and
+other retained collections, SAT vectors, NumericTextStream consumers and internal
+util dependency cycles still remaining.
+
+The full native module checkpoint completed at about 00:47 UTC Oct10. Its only
+failures were four AST substitution fixtures explicitly requiring the removed
+dependency-worklist allocation error. Updated those fixtures to require native
+completion of same-entry erase, every reset entry, scope pop and subsequent
+scope destruction, retaining exact key reference and dependency-live checks.
+A fresh full AST run passed (27.041s); expanded focused g3debug dependency and
+substitution groups passed (0.062s). Every other package passed in the full
+checkpoint, including util (99.048s), polynomial (31.706s), rewriter (12.810s),
+SAT and SMT core. The initial full command exits nonzero for those old AST test
+expectations; the corrected full AST rerun supplies their terminal passing
+result without redundantly repeating the long unchanged native suites.
+Manifest evidence, gofmt and diff checks passed after all fixture updates.

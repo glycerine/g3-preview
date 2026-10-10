@@ -3,8 +3,6 @@ package ast
 import (
 	"errors"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/arena"
 )
 
 func astDependencyExpr(t *testing.T, m *ASTManager, index uint32) ASTHandle {
@@ -224,7 +222,7 @@ func TestASTDependencyIndependentDAGOracleProvenanceAndWarmStorage(t *testing.T)
 	}
 }
 
-func TestASTDependencyActualLIFOCallbacksNormalAndIntrusiveFailure(t *testing.T) {
+func TestASTDependencyNativeLIFOCallbacksWithReservationsDisabled(t *testing.T) {
 	for _, fail := range [2]bool{false, true} {
 		m := astTestManager(t)
 		s, e := m.MkBoolSort()
@@ -250,13 +248,7 @@ func TestASTDependencyActualLIFOCallbacksNormalAndIntrusiveFailure(t *testing.T)
 		}
 		e = m.DependencyDec(root)
 		m.BudgetField.FailAfter(-1)
-		if fail {
-			if !errors.Is(e, arena.ErrInjectedFailure) {
-				t.Fatal(e)
-			}
-		} else {
-			astTestMust(t, e)
-		}
+		astTestMust(t, e)
 		ids := m.ExprIDs.FreeIDs()[start:]
 		if len(ids) != 2 || ids[0] != ib || ids[1] != ia {
 			t.Fatal("source left-then-right push => right-then-left actual AST DEC", fail, ids, ia, ib)
@@ -267,24 +259,72 @@ func TestASTDependencyActualLIFOCallbacksNormalAndIntrusiveFailure(t *testing.T)
 	}
 }
 
-func TestASTDependencyScratchActualAndSourceByteBounds(t *testing.T) {
-	sourceWords := (uint64(^uint32(0)) - 8) / 8
-	old := sourceWords * 2 / 3
-	n, e := astDependencyScratchCapacity(old, ^uint64(0)>>1)
-	if e != nil || n != sourceWords {
-		t.Fatal(n, e, sourceWords)
+func TestASTDependencyNativeColdFIFOAndCompleteUnmarking(t *testing.T) {
+	m := astTestManager(t)
+	absent := astDependencyExpr(t, m, 19000)
+	var root ASTDependency
+	var nodes []ASTHandle
+	var leaves []ASTDependency
+	for i := 0; i < 257; i++ {
+		h := astDependencyExpr(t, m, uint32(20000+i))
+		nodes = append(nodes, h)
+		leaf, e := m.DependencyLeaf(h)
+		astTestMust(t, e)
+		leaves = append(leaves, leaf)
+		root, e = m.DependencyJoin(root, leaf)
+		astTestMust(t, e)
 	}
-	if _, e = astDependencyScratchCapacity(old+1, ^uint64(0)>>1); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("source unsigned32 allocation bytes", e)
+	astTestMust(t, m.DependencyInc(root))
+	out, e := m.NewExprVector()
+	astTestMust(t, e)
+	for _, h := range nodes {
+		astTestMust(t, m.ExprVectorPush(out, h))
 	}
-	host32 := uint64(1<<31) - 1
-	hostWords := host32 / 8
-	old = hostWords * 2 / 3
-	if _, e = astDependencyScratchCapacity(old, host32); e != nil {
-		t.Fatal(e)
+	astTestMust(t, m.ExprVectorReset(out))
+	before := m.BudgetField.Used()
+	m.BudgetField.FailAfter(0)
+	yes, e := m.DependencyContains(root, absent)
+	astTestMust(t, e)
+	if yes {
+		t.Fatal("absent value found")
 	}
-	if _, e = astDependencyScratchCapacity(old+2, host32); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("actual Go host backing bytes", e)
+	astTestMust(t, m.DependencyLinearizeRaw(root, out))
+	if n, e := m.ExprVectorSize(out); e != nil || n != 257 {
+		t.Fatal("native FIFO cardinality", n, e)
+	}
+	for i := 0; i < 257; i++ {
+		want := 256 - i
+		if i == 255 {
+			want = 0
+		}
+		if i == 256 {
+			want = 1
+		}
+		got, e := m.ExprVectorGet(out, uint32(i))
+		astTestMust(t, e)
+		if got != nodes[want] {
+			t.Fatal("left/right FIFO traversal order", i, got, nodes[want])
+		}
+	}
+	for _, leaf := range leaves {
+		c, e := m.dependencies.node(leaf.record)
+		astTestMust(t, e)
+		if c.marked {
+			t.Fatal("traversal retained a dependency mark")
+		}
+	}
+	if len(m.dependencies.todo) != 0 || m.BudgetField.Used() != before {
+		t.Fatal("native scratch changed object storage")
+	}
+	astTestMust(t, m.DependencyDec(root))
+	m.BudgetField.FailAfter(-1)
+	astTestMust(t, m.DelExprVector(&out))
+	for _, h := range nodes {
+		rc, e := m.GetRefCount(h)
+		astTestMust(t, e)
+		if rc != 1 {
+			t.Fatal("dependency deletion lost caller ownership", rc)
+		}
 	}
 }
 

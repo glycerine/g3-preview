@@ -32,12 +32,8 @@ func (d *astDependencyManager) traverse(root arena.SmallBytesRef, target astNode
 	if e = d.store(root, c); e != nil {
 		return false, e
 	}
-	if e = d.push(root); e != nil {
-		c.marked = false
-		d.store(root, c)
-		return false, e
-	}
-	// Unsafe allocation-exception adapter clears completed dependency marks.
+	d.todo = append(d.todo, root)
+	// Clear every visited dependency mark even if actual output publication fails.
 	defer d.unmarkTodo()
 	for q := 0; q < len(d.todo); q++ {
 		c, e := d.node(d.todo[q])
@@ -59,9 +55,7 @@ func (d *astDependencyManager) traverse(root arena.SmallBytesRef, target astNode
 					return false, e
 				}
 				if !v.marked {
-					if e = d.push(child); e != nil {
-						return false, e
-					}
+					d.todo = append(d.todo, child)
 					v.marked = true
 					if e = d.store(child, v); e != nil {
 						return false, e

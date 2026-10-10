@@ -199,7 +199,7 @@ func TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths(t *testing.T)
 	astTestMust(t, m.DelScopedExprSubstitution(&scope))
 	astTestMust(t, m.DelExprSubstitution(&s))
 }
-func TestASTScopedExprSubstitutionDestructorAfterConsumedPopError(t *testing.T) {
+func TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop(t *testing.T) {
 	m := astTestManager(t)
 	s, e := m.NewExprSubstitutionCores(true)
 	astTestMust(t, e)
@@ -214,9 +214,7 @@ func TestASTScopedExprSubstitutionDestructorAfterConsumedPopError(t *testing.T) 
 	m.BudgetField.FailAfter(0)
 	e = m.ScopedExprSubstitutionPop(scope, 1)
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
+	astTestMust(t, e)
 	astTestMust(t, m.DelScopedExprSubstitution(&scope))
 	if scope != (ASTScopedExprSubstitution{}) {
 		t.Fatal(scope)
@@ -224,7 +222,7 @@ func TestASTScopedExprSubstitutionDestructorAfterConsumedPopError(t *testing.T) 
 	rc, e := m.GetRefCount(key)
 	astTestMust(t, e)
 	if rc != 1 {
-		t.Fatal("release retained trail after caught error", rc)
+		t.Fatal("release trail after native dependency cleanup", rc)
 	}
 	astTestMust(t, m.DelExprSubstitution(&s))
 }
