@@ -5,7 +5,7 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently six partial source units and 104 unported units. No complete
+There are currently seven partial source units and 103 unported units. No complete
 LP solver is available yet. A green Go coverage report does not measure the C++
 code that has not been ported.
 
@@ -13,6 +13,7 @@ code that has not been ported.
 | --- | --- | --- |
 | `int_set.h` | Original `test_int_set`; dense swap order, resizing, reached invalid-domain clear prefix, 10,000-step independent map oracle, output/error cases | 100% |
 | Four live `stacked_value.h` scalar types | Original `test_stacked_unsigned`; signed, status and strategy restoration, nested/excess/zero pops, unsigned wrap | 100% |
+| Three concrete `stacked_vector.h` element types | Original `test_stacked_vector` with strengthened assertions; 12,000 operations against independent snapshots, repeated replacements, popped tails, baseline journals and checked scope/index guards | 100% |
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 

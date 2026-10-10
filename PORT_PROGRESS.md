@@ -34766,3 +34766,29 @@ running in /mnt/oldrog/tmp/g3-lp-foundation-module-full.log. Pre-existing untrac
 dependency-graph artifacts from the preceding task remain separate from this LP
 implementation commit. Next: concrete scoped vectors, numeric pairs and indexed
 matrix primitives, followed by the complete requested solver and driver scope.
+
+
+## Resume LP scoped vectors and restore package graphs
+
+Saved reproducible native Go import graphs in doc/package_dependencies.svg and
+util_dependencies.svg, with DOT and JSON data and scripts/package_dependencies.py.
+Regenerated with the existing home module cache:64 packages, no unresolved external
+dependencies. Arrows mean consumer -> dependency. Utility reorganization remains
+complete; recursive source port coverage remains partial. Arena-only utility leaves
+are bitset/cooperate/heap/idgen/memory/prime/stack/text; this graph describes current
+Go code, not the remaining C++ dependencies of unported algorithms.
+
+Completed actual uint32/int32/ColumnType scoped-vector implementations, retaining
+source change journals even before first push, reverse replacement order and
+ignored changes to popped tails. Original --smap test_stacked_vector now checks
+independent intermediate/final values, and three full-copy snapshot oracles cover
+12,000 nested operations, repeated/same-value replacements, baseline journal
+prefixes, zero initialization, views and invalid-domain guards. The numeric-pair
+instantiation remains open. Native/combined debug+checked LP focused tests passed
+(0.074s/0.068s), both100% statement coverage of current Go code. LP vet passed.
+Seven LP units are partial and103 unported; full LP goal remains incomplete.
+
+Collected successful exit0 from the earlier full native module run, log
+/mnt/oldrog/tmp/g3-lp-foundation-module-full.log. No additional full run was needed
+for the isolated scoped-vector addition. Dependency-graph artifacts are saved in
+separate additive commit5a17b8b3. No source hashing or generic helpers were added.

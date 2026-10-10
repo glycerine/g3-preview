@@ -677,9 +677,16 @@
     },
     {
       "source": "src/util/lp/stacked_vector.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/stacked_vector.go"
+      ],
+      "tests": [
+        "TestLPStackedVectorSource",
+        "TestLPStackedUintVectorSnapshots",
+        "TestLPStackedIntVectorSnapshots",
+        "TestLPStackedColumnVectorSnapshots"
+      ]
     },
     {
       "source": "src/util/lp/static_matrix.h",
@@ -719,7 +726,7 @@
     }
   ],
   "status_counts": {
-    "unported": 104,
-    "partial": 6
+    "unported": 103,
+    "partial": 7
   }
 }

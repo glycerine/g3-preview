@@ -102939,11 +102939,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/int_set_test.go",
-        "pkg/util/lp/stacked_value_test.go"
+        "pkg/util/lp/stacked_value_test.go",
+        "pkg/util/lp/stacked_vector_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
-        "TestLPStackedUnsignedSource"
+        "TestLPStackedUnsignedSource",
+        "TestLPStackedVectorSource"
       ],
       "conditionals": [
         {
@@ -103491,6 +103493,14 @@
           "tests": [
             "TestLPIntSetSource",
             "TestLPStackedUnsignedSource"
+          ]
+        },
+        {
+          "name": "--smap test_stacked_vector with independent intermediate and final assertions",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_vector_test.go",
+          "tests": [
+            "TestLPStackedVectorSource"
           ]
         }
       ],
@@ -122600,9 +122610,16 @@
       "path": "src/util/lp/stacked_vector.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/stacked_vector.go"
+      ],
+      "tests": [
+        "TestLPStackedVectorSource",
+        "TestLPStackedUintVectorSnapshots",
+        "TestLPStackedIntVectorSnapshots",
+        "TestLPStackedColumnVectorSnapshots"
+      ],
       "assertions": [
         {
           "line": 38,
@@ -122631,9 +122648,25 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete unsigned/int/column_type indexing, literal replacement history, push_back/increase_size_by_one, scope push/peek_size and reverse journal pop",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_vector.go",
+          "tests": [
+            "TestLPStackedVectorSource",
+            "TestLPStackedUintVectorSnapshots",
+            "TestLPStackedIntVectorSnapshots",
+            "TestLPStackedColumnVectorSnapshots"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed slices own values and change journals. Values borrows read-only backing; callers must use Set to preserve rollback. No numeral ownership or STL internals are claimed."
+      ],
+      "deviations": [
+        "The actual numeric_pair<mpq> instantiation in lar_core_solver.h remains unported. Checked ErrBounds/ErrScope guard source-undefined access and zero/excess vector pops; scalar stacked_value retains its distinct saturating-pop behavior."
+      ]
     },
     {
       "path": "src/util/lp/static_matrix.h",
