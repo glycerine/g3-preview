@@ -32487,3 +32487,38 @@ activity and other retained AST tables, SAT storage/runtime columns and text
 consumers. Internal util numeric/text/parameter cycles still prevent the full
 remaining subpackage split. No full-module runtime suite was repeated here;
 the 23:46–23:48 UTC checkpoint remains current.
+
+## Native AST activity cache entries and queue
+
+ActivityCache now stores actual owning entry records in
+insdict.Dict[ASTHandle, *astActivityEntry] v0.10.1, with native []ASTHandle queue
+storage. Its custom handle hasher includes origin, slot and generation; equality
+still uses the complete checked handle. Removed chained bucket/cellar geometry,
+rehashing/free-cell machinery, simulated table/queue capacity charges and unused
+Capacity API. No retained production consumer used that container introspection.
+The cache's real cold owner header remains charged.
+
+Actual key/value INC and DEC order, replacement's incoming-value owner, pending
+retirement, consumed-reference flags and stopped-cleanup retry remain. Queue order,
+unused bounds, oldest-unused eviction, used-key skipping and compression retain
+the project algorithm. The source accessed-replacement counter quirk remains in
+both builds. Native entry retirement iterates insertion order deterministically;
+source hash-table bucket order is no longer represented. Eviction uses Dict's
+native deletion/compaction, with stable pointed-to ownership records.
+
+Replaced the obsolete chain-displacement/capacity test with
+TestASTActivityCacheNativeGrowthOrderAndOwnership. It grows 257 real entries and
+queue keys with reservations disabled, verifies insertion order and ownership
+flags, duplicate behavior, used-key skipping, oldest-unused eviction, exact
+reference counts, unchanged actual object storage and complete matched reset
+preserving caller references. Existing cache tests retain replacement, null proof
+values, cold-owner lifetime and 1924-entry eviction/compression coverage.
+
+Validation: focused native cache passed (0.026s), g3debug (0.025s), full AST
+(27.326s) and full rewriter (13.555s). AST/rewriter vet, manifest evidence, gofmt
+and diff checks passed. Manifest renames the obsolete chain test in every source
+and method evidence list; all source/API counts and statuses remain unchanged.
+The util knot/split remains active. Other retained AST hash/storage collections,
+SAT collections, text consumers and internal util numeric/text/parameter cycles
+still remain. The last full native module checkpoint remains 23:46–23:48 UTC;
+no repeat runtime module suite was needed in this chunk.

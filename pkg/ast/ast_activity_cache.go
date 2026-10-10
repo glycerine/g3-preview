@@ -1,196 +1,39 @@
-// Source: src/ast/act_cache.cpp:56-225; src/ast/act_cache.h:23-53;
-// src/util/chashtable.h:58-266,312-348,406-419,443-479,484-522;
-// src/ast/ast.h:1598; src/util/vector.h:35-143.
+// Source: src/ast/act_cache.cpp:56-225; src/ast/act_cache.h:23-53.
 package ast
 
 import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/insdict"
 )
 
-// Concrete cmap<expr*, tagged expr*> specialization. Encoded link indices and
-// an explicit activity bit replace source pointers/tags. Cached AST hashes are
-// immutable. Table iteration remains ascending buckets, then head-first chains.
-type astActivityCell struct {
+// Native entries own the key/value references recorded by their acquisition
+// flags. Insertion order makes stopped reference cleanup deterministic.
+type astActivityEntry struct {
 	key, value                          ASTHandle
-	hash, next                          uint32
 	accessed, dummy, keyHeld, valueHeld bool
 }
-type astActivityTable struct {
-	cells                                     []astActivityCell
-	slots, next, free, size, used, collisions uint32
-}
 
-func activityTableBytes(n uint32) uint64 {
-	return uint64(n) * uint64(reflect.TypeOf(astActivityCell{}).Size())
-}
-func activityCells(m *ASTManager, slots, cellar uint32) ([]astActivityCell, error) {
-	n := uint64(slots) + uint64(cellar)
-	if slots == 0 || slots&(slots-1) != 0 || cellar == 0 || n >= uint64(astChainEnd) || n > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(astActivityCell{}).Size()) {
-		return nil, arena.ErrBounds
-	}
-	if e := m.BudgetField.Reserve(activityTableBytes(uint32(n))); e != nil {
-		return nil, e
-	}
-	cells := make([]astActivityCell, int(n))
-	for i := range cells {
-		cells[i].next = astChainFree
-	}
-	return cells, nil
-}
-func (t *astActivityTable) init(m *ASTManager) error {
-	cells, e := activityCells(m, 8, 2)
-	if e != nil {
-		return e
-	}
-	*t = astActivityTable{cells: cells, slots: 8, next: 8, free: astChainEnd, collisions: t.collisions}
-	return nil
-}
-func (t *astActivityTable) find(k ASTHandle, hash uint32) (uint32, bool) {
-	if t.slots == 0 {
-		return astChainEnd, false
-	}
-	i := hash & (t.slots - 1)
-	if t.cells[i].next == astChainFree {
-		return astChainEnd, false
-	}
-	for ; i != astChainEnd; i = t.cells[i].next {
-		if t.cells[i].key == k {
-			return i, true
-		}
-		t.collisions++
-	}
-	return astChainEnd, false
-}
-func (t *astActivityTable) expand(m *ASTManager) error {
-	slots, cellar := uint64(t.slots)*2, uint64(len(t.cells)-int(t.slots))*2
-	for {
-		if slots >= uint64(astChainEnd) || cellar >= uint64(astChainEnd) {
-			return arena.ErrBounds
-		}
-		cells, e := activityCells(m, uint32(slots), uint32(cellar))
-		if e != nil {
-			return e
-		}
-		next := uint32(slots)
-		t.used = 0
-		fits := true
-		for b := uint32(0); b < t.slots && fits; b++ {
-			if t.cells[b].next == astChainFree {
-				continue
-			}
-			for i := b; i != astChainEnd; i = t.cells[i].next {
-				idx := t.cells[i].hash & (uint32(slots) - 1)
-				if cells[idx].next == astChainFree {
-					cells[idx] = t.cells[i]
-					cells[idx].next = astChainEnd
-					t.used++
-				} else {
-					if next == uint32(len(cells)) {
-						fits = false
-						break
-					}
-					cells[next] = cells[idx]
-					cells[idx] = t.cells[i]
-					cells[idx].next = next
-					next++
-				}
-			}
-		}
-		if fits {
-			m.BudgetField.Release(activityTableBytes(uint32(len(t.cells))))
-			t.cells = cells
-			t.slots = uint32(slots)
-			t.next = next
-			t.free = astChainEnd
-			return nil
-		}
-		m.BudgetField.Release(activityTableBytes(uint32(len(cells))))
-		cellar *= 2
-	}
-}
-func (t *astActivityTable) insertDummy(m *ASTManager, k ASTHandle, hash uint32) (uint32, error) {
-	// Source grows before checking whether this key is already present.
-	if t.free == astChainEnd && t.next == uint32(len(t.cells)) {
-		if e := t.expand(m); e != nil {
-			return astChainEnd, e
-		}
-	}
-	if i, found := t.find(k, hash); found {
-		return i, nil
-	}
-	idx := hash & (t.slots - 1)
-	entry := astActivityCell{key: k, hash: hash, next: astChainEnd, dummy: true}
-	if t.cells[idx].next == astChainFree {
-		t.used++
-	} else {
-		j := t.free
-		if j != astChainEnd {
-			t.free = t.cells[j].next
-		} else {
-			j = t.next
-			t.next++
-		}
-		t.cells[j] = t.cells[idx]
-		entry.next = j
-	}
-	t.cells[idx] = entry
-	t.size++
-	return idx, nil
-}
-func (t *astActivityTable) erase(k ASTHandle, hash uint32) {
-	i := hash & (t.slots - 1)
-	if t.cells[i].next == astChainFree {
-		return
-	}
-	prev := uint32(astChainEnd)
-	for i != astChainEnd {
-		c := t.cells[i]
-		if c.key == k {
-			t.size--
-			if prev == astChainEnd {
-				if c.next == astChainEnd {
-					t.used--
-					t.cells[i].next = astChainFree
-				} else {
-					t.cells[i] = t.cells[c.next]
-					t.cells[c.next].next = t.free
-					t.free = c.next
-				}
-			} else {
-				t.cells[prev].next = c.next
-				t.cells[i].next = t.free
-				t.free = i
-			}
-			return
-		}
-		t.collisions++
-		prev = i
-		i = c.next
-	}
-}
-func (t *astActivityTable) release(m *ASTManager) {
-	m.BudgetField.Release(activityTableBytes(uint32(len(t.cells))))
-	*t = astActivityTable{free: astChainEnd, collisions: t.collisions}
-}
-
-// The cache is an owning cold object borrowing its AST manager. The queue is
-// the source ptr_vector (initial capacity2, growth ceil(3*capacity/2)), not an
-// inline buffer. Its handles borrow the references owned by live map entries.
+// ActivityCache's queue borrows keys owned by live entries. Entries remain
+// stable while numerical/AST deletion may stop and be acknowledged later.
 type ActivityCache struct {
 	self                     *ActivityCache
 	manager                  *ASTManager
-	table                    astActivityTable
+	entries                  insdict.Dict[ASTHandle, *astActivityEntry]
 	queue                    []ASTHandle
 	qhead, unused, maxUnused uint32
-	header, queueBytes       uint64
-	retiring                 astActivityCell
+	header                   uint64
+	retiring                 astActivityEntry
 	incoming                 ASTHandle
 	incomingHeld             bool
 	pending                  bool
 	cause                    error
 	closed                   bool
+}
+
+func activityHandleHash(h ASTHandle) uint64 {
+	return h.origin ^ uint64(h.slot)*0x9e3779b97f4a7c15 ^ uint64(h.generation)*0xbf58476d1ce4e5b9
 }
 
 func NewActivityCache(m *ASTManager, maxUnused *uint32) (*ActivityCache, error) {
@@ -213,11 +56,8 @@ func NewActivityCache(m *ASTManager, maxUnused *uint32) (*ActivityCache, error) 
 		return nil, e
 	}
 	c := &ActivityCache{manager: m, maxUnused: n, header: bytes}
+	c.entries = *insdict.NewDictFunc[ASTHandle, *astActivityEntry](activityHandleHash)
 	c.self = c
-	if e := c.table.init(m); e != nil {
-		m.BudgetField.Release(bytes)
-		return nil, e
-	}
 	return c, nil
 }
 func (c *ActivityCache) open() error {
@@ -229,29 +69,6 @@ func (c *ActivityCache) open() error {
 	}
 	_, e := c.manager.ProofsEnabled()
 	return e
-}
-func (c *ActivityCache) pushQueue(k ASTHandle) error {
-	if len(c.queue) == cap(c.queue) {
-		n := uint64(2)
-		if cap(c.queue) != 0 {
-			n = (3*uint64(cap(c.queue)) + 1) >> 1
-		}
-		width := uint64(reflect.TypeOf(ASTHandle{}).Size())
-		if n > uint64(^uint32(0)) || n > uint64(^uint(0)>>1)/width {
-			return arena.ErrBounds
-		}
-		bytes := n * width
-		if e := c.manager.BudgetField.Reserve(bytes); e != nil {
-			return e
-		}
-		q := make([]ASTHandle, len(c.queue), int(n))
-		copy(q, c.queue)
-		c.manager.BudgetField.Release(c.queueBytes)
-		c.queue = q
-		c.queueBytes = bytes
-	}
-	c.queue = append(c.queue, k)
-	return nil
 }
 func (c *ActivityCache) dec(h ASTHandle) (bool, error) {
 	m := c.manager
@@ -268,7 +85,7 @@ func (c *ActivityCache) dec(h ASTHandle) (bool, error) {
 	}
 	return m.decNode(r)
 }
-func (c *ActivityCache) retire(entry *astActivityCell) error {
+func (c *ActivityCache) retire(entry *astActivityEntry) error {
 	if entry.keyHeld {
 		consumed, e := c.dec(entry.key)
 		if consumed {
@@ -297,7 +114,7 @@ func (c *ActivityCache) finishPending() error {
 		return e
 	}
 	c.pending = false
-	c.retiring = astActivityCell{}
+	c.retiring = astActivityEntry{}
 	return nil
 }
 func (c *ActivityCache) deleteUnused() error {
@@ -305,20 +122,16 @@ func (c *ActivityCache) deleteUnused() error {
 	for c.qhead < size {
 		k := c.queue[c.qhead]
 		c.qhead++
-		hash, e := c.manager.GetHash(k)
-		if e != nil {
-			return e
-		}
-		i, found := c.table.find(k, hash)
+		entry, found := c.entries.Get2(k)
 		if !found {
 			return ErrASTDomain
 		}
-		if !c.table.cells[i].accessed {
+		if !entry.accessed {
 			c.unused--
-			c.retiring = c.table.cells[i]
+			c.retiring = *entry
 			c.pending = true
-			c.table.erase(k, hash)
-			if e = c.finishPending(); e != nil {
+			c.entries.DelPackMaybe(k)
+			if e := c.finishPending(); e != nil {
 				return e
 			}
 			break
@@ -362,32 +175,29 @@ func (c *ActivityCache) Insert(k, v ASTHandle) (err error) {
 			return e
 		}
 	}
-	hash, e := m.GetHash(k)
-	if e != nil {
-		return e
+	entry, found := c.entries.Get2(k)
+	if !found {
+		entry = &astActivityEntry{key: k, dummy: true}
+		c.entries.Put(k, entry)
 	}
-	i, e := c.table.insertDummy(m, k, hash)
-	if e != nil {
-		return e
-	}
-	entry := &c.table.cells[i]
 	if entry.dummy {
-		if e = m.IncRef(k); e != nil {
+		if e := m.IncRef(k); e != nil {
 			return e
 		}
 		entry.keyHeld = true
-		if e = m.IncRef(v); e != nil {
+		if e := m.IncRef(v); e != nil {
 			return e
 		}
 		entry.valueHeld = !v.IsNull()
 		entry.value = v
 		entry.dummy = false
-		if e = c.pushQueue(k); e != nil {
-			return e
+		if uint64(len(c.queue)) >= uint64(^uint32(0)) {
+			return arena.ErrBounds
 		}
+		c.queue = append(c.queue, k)
 		c.unused++
 	} else if entry.value != v {
-		if e = m.IncRef(v); e != nil {
+		if e := m.IncRef(v); e != nil {
 			return e
 		}
 		// Publish after the old-value DEC, preserving source statement order.
@@ -414,15 +224,13 @@ func (c *ActivityCache) Find(k ASTHandle) (ASTHandle, error) {
 	if k.IsNull() {
 		return ASTHandle{}, ErrASTDomain
 	}
-	hash, e := c.manager.GetHash(k)
-	if e != nil {
+	if _, e := c.manager.GetHash(k); e != nil {
 		return ASTHandle{}, e
 	}
-	i, found := c.table.find(k, hash)
+	entry, found := c.entries.Get2(k)
 	if !found {
 		return ASTHandle{}, nil
 	}
-	entry := &c.table.cells[i]
 	if !entry.accessed {
 		entry.accessed = true
 		if ASTSourceDebug && c.unused == 0 {
@@ -446,14 +254,9 @@ func (c *ActivityCache) decRefs() error {
 	if e := c.finishPending(); e != nil {
 		return e
 	}
-	for b := uint32(0); b < c.table.slots; b++ {
-		if c.table.cells[b].next == astChainFree {
-			continue
-		}
-		for i := b; i != astChainEnd; i = c.table.cells[i].next {
-			if e := c.retire(&c.table.cells[i]); e != nil {
-				return e
-			}
+	for _, entry := range c.entries.All() {
+		if e := c.retire(entry); e != nil {
+			return e
 		}
 	}
 	return nil
@@ -470,18 +273,10 @@ func (c *ActivityCache) clear(cleanup bool) (err error) {
 	if e := c.decRefs(); e != nil {
 		return e
 	}
-	if cleanup || c.table.size != 0 || c.table.slots == 0 {
-		// Source finalize deletes the old array before reinitializing at8+2.
-		c.table.release(c.manager)
-		if e := c.table.init(c.manager); e != nil {
-			return e
-		}
-	}
+	c.entries.Clear()
 	c.queue = c.queue[:0]
 	if cleanup {
-		c.manager.BudgetField.Release(c.queueBytes)
 		c.queue = nil
-		c.queueBytes = 0
 	}
 	c.unused = 0
 	c.qhead = 0
@@ -495,13 +290,7 @@ func (c *ActivityCache) Size() (uint32, error) {
 	if e := c.open(); e != nil {
 		return 0, e
 	}
-	return c.table.size, nil
-}
-func (c *ActivityCache) Capacity() (uint32, error) {
-	if e := c.open(); e != nil {
-		return 0, e
-	}
-	return uint32(len(c.table.cells)), nil
+	return uint32(c.entries.Len()), nil
 }
 func (c *ActivityCache) Empty() (bool, error) {
 	n, e := c.Size()
@@ -517,10 +306,9 @@ func (c *ActivityCache) Close() error {
 	if e := c.decRefs(); e != nil {
 		return e
 	}
-	c.table.release(c.manager)
-	c.manager.BudgetField.Release(c.queueBytes + c.header)
+	c.entries = insdict.Dict[ASTHandle, *astActivityEntry]{}
+	c.manager.BudgetField.Release(c.header)
 	c.queue = nil
-	c.queueBytes = 0
 	c.header = 0
 	c.closed = true
 	return nil

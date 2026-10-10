@@ -8753,7 +8753,7 @@
         "TestASTActivityCacheSourceOwnershipReplacementAndReset",
         "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
         "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
-        "TestASTActivityCacheOriginalChainDisplacementRehashAndErase"
+        "TestASTActivityCacheNativeGrowthOrderAndOwnership"
       ],
       "conditionals": [
         {
@@ -8834,7 +8834,7 @@
             "TestASTActivityCacheSourceOwnershipReplacementAndReset",
             "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
             "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
-            "TestASTActivityCacheOriginalChainDisplacementRehashAndErase"
+            "TestASTActivityCacheNativeGrowthOrderAndOwnership"
           ]
         }
       ],
@@ -8857,7 +8857,7 @@
         "TestASTActivityCacheSourceOwnershipReplacementAndReset",
         "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
         "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
-        "TestASTActivityCacheOriginalChainDisplacementRehashAndErase"
+        "TestASTActivityCacheNativeGrowthOrderAndOwnership"
       ],
       "conditionals": [
         {
@@ -8880,7 +8880,7 @@
             "TestASTActivityCacheSourceOwnershipReplacementAndReset",
             "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
             "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
-            "TestASTActivityCacheOriginalChainDisplacementRehashAndErase"
+            "TestASTActivityCacheNativeGrowthOrderAndOwnership"
           ]
         }
       ],
@@ -111825,7 +111825,7 @@
         "TestASTActivityCacheSourceOwnershipReplacementAndReset",
         "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
         "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
-        "TestASTActivityCacheOriginalChainDisplacementRehashAndErase",
+        "TestASTActivityCacheNativeGrowthOrderAndOwnership",
         "TestMonomialNativeScratchGrowthResetAndBounds",
         "TestMonomialNativeVariableCountingAndInterning",
         "TestMonomialNativeTableGrowthRenameAndOrder",
@@ -112155,7 +112155,7 @@
             "TestASTActivityCacheSourceOwnershipReplacementAndReset",
             "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
             "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
-            "TestASTActivityCacheOriginalChainDisplacementRehashAndErase"
+            "TestASTActivityCacheNativeGrowthOrderAndOwnership"
           ]
         }
       ],

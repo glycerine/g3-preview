@@ -1,5 +1,4 @@
-// Source: src/ast/act_cache.cpp:56-225; src/ast/act_cache.h:23-53;
-// src/util/chashtable.h:106-174,312-348,443-479.
+// Source: src/ast/act_cache.cpp:56-225; src/ast/act_cache.h:23-53.
 package ast
 
 import (
@@ -13,23 +12,21 @@ func TestASTActivityCacheSourceOwnershipReplacementAndReset(t *testing.T) {
 	c, e := NewActivityCache(m, &limit)
 	astTestMust(t, e)
 	t.Cleanup(func() { astTestMust(t, c.Close()) })
-	if c.maxUnused != 1024 || c.table.slots != 8 || len(c.table.cells) != 10 || len(c.queue) != 0 {
-		t.Fatal("source cache constructor", c.maxUnused, c.table.slots, len(c.table.cells))
+	if c.maxUnused != 1024 || c.entries.Len() != 0 || len(c.queue) != 0 {
+		t.Fatal("source cache constructor", c.maxUnused, c.entries.Len())
 	}
 	size, e := c.Size()
 	astTestMust(t, e)
-	capacity, e := c.Capacity()
-	astTestMust(t, e)
 	empty, e := c.Empty()
 	astTestMust(t, e)
-	if size != 0 || capacity != 10 || !empty {
-		t.Fatal("source cache queries", size, capacity, empty)
+	if size != 0 || !empty {
+		t.Fatal("source cache queries", size, empty)
 	}
 	p, q, r := activityCacheTestAtom(t, m, "cache-p"), activityCacheTestAtom(t, m, "cache-q"), activityCacheTestAtom(t, m, "cache-r")
 	refs := func(h ASTHandle) uint32 { n, e := m.GetRefCount(h); astTestMust(t, e); return n }
 	bp, bq, br := refs(p), refs(q), refs(r)
 	astTestMust(t, c.Insert(p, q))
-	if c.table.size != 1 || c.unused != 1 || refs(p) != bp+1 || refs(q) != bq+1 {
+	if c.entries.Len() != 1 || c.unused != 1 || refs(p) != bp+1 || refs(q) != bq+1 {
 		t.Fatal("source new entry ownership")
 	}
 	astTestMust(t, c.Insert(p, q))
@@ -51,18 +48,18 @@ func TestASTActivityCacheSourceOwnershipReplacementAndReset(t *testing.T) {
 		t.Fatal("repeat find")
 	}
 	astTestMust(t, c.Reset())
-	if c.table.size != 0 || c.unused != 0 || c.qhead != 0 || len(c.queue) != 0 || refs(p) != bp || refs(q) != bq || refs(r) != br {
+	if c.entries.Len() != 0 || c.unused != 0 || c.qhead != 0 || len(c.queue) != 0 || refs(p) != bp || refs(q) != bq || refs(r) != br {
 		t.Fatal("source reset ownership/state")
 	}
 	// Null values are used by the original proof cache, but still have an entry.
 	astTestMust(t, c.Insert(p, ASTHandle{}))
 	found, e = c.Find(p)
 	astTestMust(t, e)
-	if !found.IsNull() || c.table.size != 1 || c.unused != 0 {
-		t.Fatal("null tagged value", found, c.table.size, c.unused)
+	if !found.IsNull() || c.entries.Len() != 1 || c.unused != 0 {
+		t.Fatal("null tagged value", found, c.entries.Len(), c.unused)
 	}
 	astTestMust(t, c.Cleanup())
-	if c.table.size != 0 || len(c.table.cells) != 10 || c.queue != nil {
+	if c.entries.Len() != 0 || c.queue != nil {
 		t.Fatal("cleanup reinitializes map and finalizes queue")
 	}
 	copyOwner := *c
@@ -88,7 +85,7 @@ func TestASTActivityCacheOldestUnusedEvictionAndQueueCompression(t *testing.T) {
 		keys = append(keys, k)
 		astTestMust(t, c.Insert(k, value))
 	}
-	if c.unused != 1024 || c.table.size != 1024 {
+	if c.unused != 1024 || c.entries.Len() != 1024 {
 		t.Fatal("source unused bound")
 	}
 	// The default overload captures the current canonical AST-table size.
@@ -113,8 +110,8 @@ func TestASTActivityCacheOldestUnusedEvictionAndQueueCompression(t *testing.T) {
 	}
 	fresh := activityCacheTestAtom(t, m, "cache-trigger")
 	astTestMust(t, c.Insert(fresh, value))
-	if c.unused != 1024 || c.table.size != 1924 || c.qhead != 901 {
-		t.Fatal("skip used keys then evict oldest unused", c.unused, c.table.size, c.qhead)
+	if c.unused != 1024 || c.entries.Len() != 1924 || c.qhead != 901 {
+		t.Fatal("skip used keys then evict oldest unused", c.unused, c.entries.Len(), c.qhead)
 	}
 	missing, e := c.Find(keys[900])
 	astTestMust(t, e)
@@ -167,41 +164,63 @@ func TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk(t *testing.T
 	}
 }
 
-func TestASTActivityCacheOriginalChainDisplacementRehashAndErase(t *testing.T) {
+func TestASTActivityCacheNativeGrowthOrderAndOwnership(t *testing.T) {
 	m := astTestManager(t)
 	c, e := NewActivityCache(m, nil)
 	astTestMust(t, e)
 	defer func() { astTestMust(t, c.Close()) }()
-	value := activityCacheTestAtom(t, m, "chain-value")
-	var keys []ASTHandle
-	for i := 0; len(keys) < 3; i++ {
-		k := activityCacheTestAtom(t, m, fmt.Sprintf("chain-key-%d", i))
-		hash, e := m.GetHash(k)
-		astTestMust(t, e)
-		if hash&15 == 0 {
-			keys = append(keys, k)
+	const count = 257
+	value := activityCacheTestAtom(t, m, "native-cache-value")
+	keys := make([]ASTHandle, count)
+	for i := range keys {
+		keys[i] = activityCacheTestAtom(t, m, fmt.Sprintf("native-cache-key-%d", i))
+	}
+	valueRefs, e := m.GetRefCount(value)
+	astTestMust(t, e)
+	used, storage := m.BudgetField.Used(), m.Stats()
+	m.BudgetField.FailAfter(0)
+	for _, key := range keys {
+		astTestMust(t, c.Insert(key, value))
+	}
+	index := 0
+	for key, entry := range c.entries.All() {
+		if key != keys[index] || entry.key != key || entry.value != value || !entry.keyHeld || !entry.valueHeld {
+			t.Fatal("native growth changed ordered owning entry", index, key, entry)
 		}
+		index++
 	}
-	for _, k := range keys {
-		astTestMust(t, c.Insert(k, value))
-	}
-	if c.table.cells[0].key != keys[2] || c.table.cells[8].key != keys[0] || c.table.cells[9].key != keys[1] || c.table.next != 10 || c.table.used != 1 {
-		t.Fatal("source head displacement / sequential cellar")
-	}
-	// Even a duplicate expands a full cellar before finding its existing entry.
 	astTestMust(t, c.Insert(keys[1], value))
-	if c.table.slots != 16 || len(c.table.cells) != 20 || c.table.cells[0].key != keys[0] || c.table.cells[16].key != keys[2] || c.table.cells[17].key != keys[1] || c.table.size != 3 || c.unused != 3 {
-		t.Fatal("source copy order and grow-before-duplicate")
+	if index != count || len(c.queue) != count || c.unused != count {
+		t.Fatal("duplicate changed queue or acquisitions", index, len(c.queue), c.unused)
+	}
+	got, e := c.Find(keys[0])
+	astTestMust(t, e)
+	if got != value {
+		t.Fatal("native lookup", got)
 	}
 	astTestMust(t, c.deleteUnused())
-	if c.table.cells[0].key != keys[1] || c.table.free != 17 || c.table.size != 2 || c.qhead != 1 || c.unused != 2 {
-		t.Fatal("source erase replaces head with next cellar cell")
+	if c.entries.Get(keys[0]) == nil || c.entries.Get(keys[1]) != nil || c.qhead != 2 || c.unused != count-2 {
+		t.Fatal("oldest unused eviction changed", c.qhead, c.unused)
 	}
-	collisions := c.table.collisions
+	refs, e := m.GetRefCount(value)
+	astTestMust(t, e)
+	if refs != valueRefs+count-1 || m.BudgetField.Used() != used || m.Stats() != storage {
+		t.Fatal("native containers changed actual object storage or references", refs, valueRefs)
+	}
 	astTestMust(t, c.Reset())
-	if c.table.collisions != collisions || c.table.slots != 8 {
-		t.Fatal("source reset preserves lifetime collision count")
+	refs, e = m.GetRefCount(value)
+	astTestMust(t, e)
+	if refs != valueRefs || c.entries.Len() != 0 || len(c.queue) != 0 || m.BudgetField.Used() != used {
+		t.Fatal("matched reset retained references", refs, valueRefs)
 	}
+	for _, key := range keys {
+		refs, e := m.GetRefCount(key)
+		astTestMust(t, e)
+		if refs != 1 {
+			t.Fatal("reset changed caller-owned key", key, refs)
+		}
+	}
+	m.BudgetField.FailAfter(-1)
 }
 
 func activityCacheTestAtom(t *testing.T, m *ASTManager, name string) ASTHandle {
