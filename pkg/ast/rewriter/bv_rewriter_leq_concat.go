@@ -10,7 +10,7 @@ import (
 type bvLEConcatInvocation struct {
 	numerals *ast.BitVectorConcatComparisonNumerals
 	refs     [2]ast.ASTRef
-	args     ast.ASTHandleBuffer
+	args     []ast.ASTHandle
 	header   uint64
 }
 
@@ -30,7 +30,8 @@ func (v *bvLEConcatInvocation) close(m *ast.ASTManager) error {
 			return e
 		}
 	}
-	v.args.Close(m.Budget())
+	clear(v.args)
+	v.args = nil
 	if e := v.endRefs(m); e != nil {
 		return e
 	}
@@ -178,19 +179,17 @@ func (p *BVRewriter) leConcatBody(v *bvLEConcatInvocation, signed bool, a, b ast
 					if e != nil {
 						return failed, RewriteFailed, e
 					}
-					if e = v.args.Push(m.Budget(), head); e != nil {
-						return failed, RewriteFailed, e
-					}
+					v.args = append(v.args, head)
 					for j := uint32(1); j < old.Count(); j++ {
 						h, e := old.At(j)
 						if e == nil {
-							e = v.args.Push(m.Budget(), h)
+							v.args = append(v.args, h)
 						}
 						if e != nil {
 							return failed, RewriteFailed, e
 						}
 					}
-					node, e = p.shortConcat(ast.SliceArguments(v.args.Slice()))
+					node, e = p.shortConcat(ast.SliceArguments(v.args))
 				} else {
 					var suffix ast.AppArguments
 					suffix, e = old.Range(1, old.Count()-1)
@@ -204,7 +203,8 @@ func (p *BVRewriter) leConcatBody(v *bvLEConcatInvocation, signed bool, a, b ast
 				if e = m.SetRef(v.refs[i], node); e != nil {
 					return failed, RewriteFailed, e
 				}
-				v.args.Close(m.Budget())
+				clear(v.args)
+				v.args = nil
 			}
 			left, e := m.RefGet(v.refs[0])
 			if e != nil {

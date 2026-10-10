@@ -33886,3 +33886,43 @@ these internal numeric/text/parameter cycles. Other BV/array scratch, sequence/
 proof/scoped-mark/sorting-context references and further retained consumers need
 auditing/migration. The external native caller migration and complete requested
 util root subpackage split are unfinished.
+
+## Native BV repeat, bitwise, extension, extraction and equality scratch
+
+Fourteen BV production files now use native borrowed []ASTHandle scratch:
+standalone AND/NAND, sign extension and repeat; persistent derived bitwise/
+repeat storage; derived sign-extension; extraction and propagation args/concat
+args; concat comparison; concat/bit-blast equality; bit-to-Boolean conversion;
+and NOT distribution. Removed ASTHandleBuffer method/error plumbing from these
+call chains and pass slices directly to factories. Successful source and owning
+cleanup clear retained parent/invocation slices at the existing boundaries.
+No borrowed scratch INC is introduced; actual numerical invocations, temporary
+AST references and output ownership remain unchanged.
+
+Retained source operand/bit/segment order, De Morgan nesting and rewrite depths,
+identity-before-numerics paths, extension width wrap, extraction propagation
+configuration and unused ep_res construction, concat shortened-head ref lifetime,
+alignment cursor updates, low-to-high equality terms and output publication.
+Tests read native fields directly and describe long argument arrays rather than
+inline/spill storage. Manifest storage claims now distinguish native scratch from
+actual numerical/reference owners and no generic container/backing-fault fidelity
+credit is added. No new implementation-mirroring tests were introduced for these
+reversible storage/plumbing replacements.
+
+Validation: BV caller/polynomial focused native passed (11.793s). Full native
+rewriter passed (12.249s); remaining g3debug rewriter passed (17.304s), excluding
+the same three previously verified baseline failures. Existing cold/actual-numeric
+campaigns continue checking stopped source prefixes, retained long arguments,
+independent shapes/order, cursor progress, published outputs and consumed old-root
+cleanup. Native model/API/tactic/SAT tactic passed
+(0.050s/0.011s/0.024s/0.106s). Module-wide compilation, rewriter vet, manifest,
+gofmt and diff checks passed. No full native module rerun within the hourly
+interval; the immediately preceding full module checkpoint remains green.
+Counts remain2102 units/677 APIs:62 ported,283 partial,1729 unported,
+two dead/deleted.
+
+A production-only search now limits BV rewriter ASTHandleBuffer/FastMark users
+to OR, XOR and concatenation storage. Array/proof/sequence/scoped-mark/sorting
+context and other retained callers remain, as do internal util numeric/text/
+parameter cycles. The complete external native migration and requested util
+root subpackage split are unfinished.

@@ -29,14 +29,11 @@ func RewriteBitVectorRepeat(m *ast.ASTManager, n uint32, arg ast.ASTHandle, out 
 	if n == 1 {
 		return RewriteDone, m.SetRef(out, arg)
 	}
-	var args ast.ASTHandleBuffer
-	defer args.Close(m.Budget())
+	var args []ast.ASTHandle
 	for i := uint32(0); i < n; i++ {
-		if e := args.Push(m.Budget(), arg); e != nil {
-			return RewriteFailed, e
-		}
+		args = append(args, arg)
 	}
-	h, e := m.MkBitVectorConcat(args.Slice())
+	h, e := m.MkBitVectorConcat(args)
 	if e != nil {
 		return RewriteFailed, e
 	}

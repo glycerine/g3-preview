@@ -36,14 +36,12 @@ func (p *BVRewriter) rewriteNegatedBitwise(args ast.AppArguments, out ast.ASTRef
 			if e != nil {
 				return st, e
 			}
-			if e = p.bitwiseArgs.Push(m.Budget(), child); e != nil {
-				return st, e
-			}
+			p.bitwiseArgs = append(p.bitwiseArgs, child)
 		}
-		if ast.ASTSourceDebug && negateResult && args.Count() != uint32(len(p.bitwiseArgs.Slice())) {
+		if ast.ASTSourceDebug && negateResult && args.Count() != uint32(len(p.bitwiseArgs)) {
 			return st, ast.ErrASTDomain
 		}
-		args = ast.SliceArguments(p.bitwiseArgs.Slice())
+		args = ast.SliceArguments(p.bitwiseArgs)
 	}
 	var result ast.ASTHandle
 	if xor {
@@ -68,7 +66,8 @@ func (p *BVRewriter) rewriteNegatedBitwise(args ast.AppArguments, out ast.ASTRef
 		return
 	}
 	if negateChildren {
-		p.bitwiseArgs.Close(m.Budget())
+		clear(p.bitwiseArgs)
+		p.bitwiseArgs = nil
 	}
 	return
 }

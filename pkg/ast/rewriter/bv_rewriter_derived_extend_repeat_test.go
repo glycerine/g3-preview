@@ -153,7 +153,7 @@ func TestBVRewriterDerivedExtendRepeatEveryColdReservation(t *testing.T) {
 					if st != want {
 						t.Fatal("status", st, want)
 					}
-					if len(p.repeatArgs.Slice()) != 0 {
+					if len(p.repeatArgs) != 0 {
 						t.Fatal("source buffer survived return")
 					}
 				} else {

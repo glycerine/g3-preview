@@ -164,7 +164,7 @@ func TestBVRewriterConcatEqualitySingletonSidesAndTargetGuards(t *testing.T) {
 
 func TestBVRewriterConcatEqualityEveryColdReservation(t *testing.T) {
 	complete := false
-	sawSpill := false
+	sawLongArguments := false
 	sawAssignment := false
 	for ordinal := int64(0); ordinal < 2048 && !complete; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
@@ -215,14 +215,14 @@ func TestBVRewriterConcatEqualityEveryColdReservation(t *testing.T) {
 				if !numericHoistRefusal(body) {
 					t.Fatal(body)
 				}
-				if b := p.concatEquality; b != nil && len(b.equalities.Slice()) > 0 {
-					count := uint32(len(b.equalities.Slice()))
+				if b := p.concatEquality; b != nil && len(b.equalities) > 0 {
+					count := uint32(len(b.equalities))
 					if b.i1 != 40-count || b.i2 != 40-count || b.low1 != 0 || b.low2 != 0 {
 						t.Fatal("cursor advanced across refused push", count, b.i1, b.i2, b.low1, b.low2)
 					}
 				}
-				if p.concatEquality != nil && len(p.concatEquality.equalities.Slice()) > 16 {
-					sawSpill = true
+				if p.concatEquality != nil && len(p.concatEquality.equalities) > 16 {
+					sawLongArguments = true
 				}
 				got, e := m.RefGet(out)
 				astTestMust(t, e)
@@ -244,8 +244,8 @@ func TestBVRewriterConcatEqualityEveryColdReservation(t *testing.T) {
 			astTestMust(t, p.Close())
 		})
 	}
-	if !complete || !sawSpill || !sawAssignment {
-		t.Fatal(complete, sawSpill, sawAssignment)
+	if !complete || !sawLongArguments || !sawAssignment {
+		t.Fatal(complete, sawLongArguments, sawAssignment)
 	}
 }
 

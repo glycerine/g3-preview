@@ -10,7 +10,7 @@ import (
 
 type bvExtractInvocation struct {
 	numerals   *ast.BitVectorExtractNumerals
-	args       ast.ASTHandleBuffer
+	args       []ast.ASTHandle
 	propagated ast.ASTRef
 	ite        [3]ast.ASTHandle
 	header     uint64
@@ -31,7 +31,8 @@ func (v *bvExtractInvocation) close(m *ast.ASTManager) error {
 	if e := v.endRef(m); e != nil {
 		return e
 	}
-	v.args.Close(m.Budget())
+	clear(v.args)
+	v.args = nil
 	if v.numerals != nil {
 		if e := v.numerals.Close(); e != nil {
 			return e
@@ -87,7 +88,8 @@ func (p *BVRewriter) RewriteExtract(high, low uint32, arg ast.ASTHandle, out ast
 	if e = v.endRef(m); e != nil {
 		return st, e
 	}
-	v.args.Close(m.Budget())
+	clear(v.args)
+	v.args = nil
 	if e = v.numerals.SourceEnd(); e != nil {
 		return st, e
 	}
@@ -162,7 +164,7 @@ func (p *BVRewriter) bvExtractBody(v *bvExtractInvocation, high, low uint32, arg
 				child, e = p.extract.Apply(high, low, child)
 			}
 			if e == nil {
-				e = v.args.Push(m.Budget(), child)
+				v.args = append(v.args, child)
 			}
 			if e != nil {
 				return failed, RewriteFailed, e
@@ -172,7 +174,7 @@ func (p *BVRewriter) bvExtractBody(v *bvExtractInvocation, high, low uint32, arg
 		if e != nil {
 			return failed, RewriteFailed, e
 		}
-		node, e := m.MkFamilyApp(p.bvFamily, kind, nil, v.args.Slice())
+		node, e := m.MkFamilyApp(p.bvFamily, kind, nil, v.args)
 		return node, Rewrite2, e
 	}
 	if p.polynomial.config.bitVector.ExtractPropagation && high >= low {
@@ -266,7 +268,7 @@ func (p *BVRewriter) bvExtractConcat(v *bvExtractInvocation, high, low uint32, a
 			current, e = p.extract.Apply(high-index, 0, current)
 		}
 		if e == nil {
-			e = v.args.Push(m.Budget(), current)
+			v.args = append(v.args, current)
 		}
 		if e != nil {
 			return failed, RewriteFailed, e
@@ -282,9 +284,7 @@ func (p *BVRewriter) bvExtractConcat(v *bvExtractInvocation, high, low uint32, a
 			}
 			index -= bits
 			if index > low {
-				if e = v.args.Push(m.Budget(), current); e != nil {
-					return failed, RewriteFailed, e
-				}
+				v.args = append(v.args, current)
 				continue
 			}
 			st := Rewrite2
@@ -296,12 +296,12 @@ func (p *BVRewriter) bvExtractConcat(v *bvExtractInvocation, high, low uint32, a
 				current, e = p.extract.Apply(bits-1, low-index, current)
 			}
 			if e == nil {
-				e = v.args.Push(m.Budget(), current)
+				v.args = append(v.args, current)
 			}
 			if e != nil {
 				return failed, RewriteFailed, e
 			}
-			node, e := m.MkBitVectorConcat(v.args.Slice())
+			node, e := m.MkBitVectorConcat(v.args)
 			return node, st, e
 		}
 		return failed, RewriteFailed, ast.ErrASTDomain

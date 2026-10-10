@@ -11,12 +11,13 @@ type bvBitBoolInvocation struct {
 	manager  *ast.ASTManager
 	numerals *ast.BitVectorBit2BoolNumerals
 	bit1     ast.ASTRef
-	args     ast.ASTHandleBuffer
+	args     []ast.ASTHandle
 	header   uint64
 }
 
 func (b *bvBitBoolInvocation) close() error {
-	b.args.Close(b.manager.Budget())
+	clear(b.args)
+	b.args = nil
 	if b.bit1 != (ast.ASTRef{}) {
 		if e := b.manager.DelRef(&b.bit1); e != nil {
 			return e
@@ -33,7 +34,8 @@ func (b *bvBitBoolInvocation) close() error {
 	return nil
 }
 func (b *bvBitBoolInvocation) sourceEnd() error {
-	b.args.Close(b.manager.Budget())
+	clear(b.args)
+	b.args = nil
 	if b.bit1 != (ast.ASTRef{}) {
 		if e := b.manager.DelRef(&b.bit1); e != nil {
 			return e
@@ -244,15 +246,13 @@ func (p *BVPolynomialRewriter) RewriteBit2Bool(lhs, rhs ast.ASTHandle, out ast.A
 		if e != nil {
 			return st, e
 		}
-		if e = b.args.Push(m.Budget(), eq); e != nil {
-			return st, e
-		}
+		b.args = append(b.args, eq)
 	}
 	var result ast.ASTHandle
 	if bor {
-		result, e = m.MkOrArgs(b.args.Slice())
+		result, e = m.MkOrArgs(b.args)
 	} else {
-		result, e = m.MkXorArgs(b.args.Slice())
+		result, e = m.MkXorArgs(b.args)
 	}
 	if e != nil {
 		return st, e

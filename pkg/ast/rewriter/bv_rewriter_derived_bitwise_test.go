@@ -90,7 +90,7 @@ func TestBVRewriterDerivedBitwiseOriginalShape(t *testing.T) {
 						t.Fatal("operand order", i)
 					}
 				}
-				if len(p.bitwiseArgs.Slice()) != 0 {
+				if len(p.bitwiseArgs) != 0 {
 					t.Fatal("buffer survived source return")
 				}
 			})
@@ -145,14 +145,14 @@ func TestBVRewriterDerivedBitwiseEveryColdReservation(t *testing.T) {
 					if st != want {
 						t.Fatal("depth", st, want)
 					}
-					if len(p.bitwiseArgs.Slice()) != 0 {
+					if len(p.bitwiseArgs) != 0 {
 						t.Fatal("source buffer leaked")
 					}
 				} else {
 					if !numericHoistRefusal(body) {
 						t.Fatal(body)
 					}
-					if len(p.bitwiseArgs.Slice()) > 0 {
+					if len(p.bitwiseArgs) > 0 {
 						retained = true
 					}
 					if got != old {
@@ -169,7 +169,7 @@ func TestBVRewriterDerivedBitwiseEveryColdReservation(t *testing.T) {
 				cause := p.cause
 				astTestMust(t, p.Close())
 				astTestMust(t, p.Close())
-				if p.cause != cause || len(p.bitwiseArgs.Slice()) != 0 {
+				if p.cause != cause || len(p.bitwiseArgs) != 0 {
 					t.Fatal("own cleanup/history")
 				}
 			})
@@ -221,7 +221,7 @@ func TestBVRewriterDerivedBitwiseBorrowsAppArguments(t *testing.T) {
 		} else {
 			astTestMust(t, e)
 		}
-		if len(warmOwner.bitwiseArgs.Slice()) != 0 {
+		if len(warmOwner.bitwiseArgs) != 0 {
 			t.Fatal("NOR/XNOR created a borrowed buffer")
 		}
 		if m.Budget().Used() != before {

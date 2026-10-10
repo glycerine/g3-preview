@@ -9,18 +9,15 @@ func RewriteBitVectorNAND(m *ast.ASTManager, args []ast.ASTHandle, out ast.ASTRe
 	if m == nil {
 		return RewriteFailed, ast.ErrASTHandle
 	}
-	var newArgs ast.ASTHandleBuffer
-	defer newArgs.Close(m.Budget())
+	var newArgs []ast.ASTHandle
 	for _, arg := range args {
 		neg, e := m.MkBitVectorNot(arg)
 		if e != nil {
 			return RewriteFailed, e
 		}
-		if e = newArgs.Push(m.Budget(), neg); e != nil {
-			return RewriteFailed, e
-		}
+		newArgs = append(newArgs, neg)
 	}
-	h, e := m.MkBitVectorOr(newArgs.Slice())
+	h, e := m.MkBitVectorOr(newArgs)
 	if e != nil {
 		return RewriteFailed, e
 	}
@@ -62,18 +59,15 @@ func RewriteBitVectorAND(m *ast.ASTManager, args []ast.ASTHandle, out ast.ASTRef
 	if m == nil {
 		return RewriteFailed, ast.ErrASTHandle
 	}
-	var newArgs ast.ASTHandleBuffer
-	defer newArgs.Close(m.Budget())
+	var newArgs []ast.ASTHandle
 	for _, arg := range args {
 		neg, e := m.MkBitVectorNot(arg)
 		if e != nil {
 			return RewriteFailed, e
 		}
-		if e = newArgs.Push(m.Budget(), neg); e != nil {
-			return RewriteFailed, e
-		}
+		newArgs = append(newArgs, neg)
 	}
-	inner, e := m.MkBitVectorOr(newArgs.Slice())
+	inner, e := m.MkBitVectorOr(newArgs)
 	if e != nil {
 		return RewriteFailed, e
 	}

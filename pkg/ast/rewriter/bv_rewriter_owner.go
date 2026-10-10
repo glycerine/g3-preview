@@ -39,8 +39,8 @@ type BVRewriter struct {
 	unsignedRemainder     *ast.BitVectorUnsignedRemainderNumerals
 	uremArgs              [2]ast.ASTHandle
 	scalarNumeral         ast.ASTBitVectorNumeralInvocation
-	repeatArgs            ast.ASTHandleBuffer
-	bitwiseArgs           ast.ASTHandleBuffer
+	repeatArgs            []ast.ASTHandle
+	bitwiseArgs           []ast.ASTHandle
 	bvor                  *bvOrInvocation
 	bvxor                 *bvXorInvocation
 	extensionPair         [2]ast.ASTHandle
@@ -212,8 +212,10 @@ func (p *BVRewriter) Close() error {
 	if e := p.manager.CleanupBitVectorNumeralInvocation(&p.scalarNumeral); e != nil {
 		return e
 	}
-	p.repeatArgs.Close(p.manager.Budget())
-	p.bitwiseArgs.Close(p.manager.Budget())
+	clear(p.repeatArgs)
+	p.repeatArgs = nil
+	clear(p.bitwiseArgs)
+	p.bitwiseArgs = nil
 	if p.leOverflow != nil {
 		if e := p.leOverflow.close(p.manager); e != nil {
 			return e

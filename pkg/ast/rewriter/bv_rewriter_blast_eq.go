@@ -10,12 +10,13 @@ import (
 type bvBlastEqInvocation struct {
 	manager  *ast.ASTManager
 	numerals *ast.BitVectorBlastEqualityNumerals
-	args     ast.ASTHandleBuffer
+	args     []ast.ASTHandle
 	header   uint64
 }
 
 func (b *bvBlastEqInvocation) close() error {
-	b.args.Close(b.manager.Budget())
+	clear(b.args)
+	b.args = nil
 	if b.numerals != nil {
 		if e := b.numerals.Close(); e != nil {
 			return e
@@ -27,7 +28,8 @@ func (b *bvBlastEqInvocation) close() error {
 	return nil
 }
 func (b *bvBlastEqInvocation) sourceEnd() error {
-	b.args.Close(b.manager.Budget())
+	clear(b.args)
+	b.args = nil
 	return b.numerals.SourceEnd()
 }
 
@@ -132,14 +134,12 @@ func (p *BVPolynomialRewriter) RewriteBlastEqualityValue(lhs, rhs ast.ASTHandle,
 		if e != nil {
 			return st, e
 		}
-		if e = b.args.Push(m.Budget(), eq); e != nil {
-			return st, e
-		}
+		b.args = append(b.args, eq)
 		if e = n.Divide(); e != nil {
 			return st, e
 		}
 	}
-	result, e := m.MkAndArgs(b.args.Slice())
+	result, e := m.MkAndArgs(b.args)
 	if e != nil {
 		return st, e
 	}

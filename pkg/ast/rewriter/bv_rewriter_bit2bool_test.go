@@ -160,7 +160,7 @@ func TestBVRewriterBit2BoolGuardsNumeralsNOTAndITE(t *testing.T) {
 
 func TestBVRewriterBit2BoolEveryColdReservation(t *testing.T) {
 	complete := false
-	sawSpill := false
+	sawLongArguments := false
 	sawIntermediate := false
 	for ordinal := int64(0); ordinal < 1024 && !complete; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
@@ -207,8 +207,8 @@ func TestBVRewriterBit2BoolEveryColdReservation(t *testing.T) {
 				if !numericHoistRefusal(body) {
 					t.Fatal(body)
 				}
-				if p.bitBool != nil && len(p.bitBool.args.Slice()) > 16 {
-					sawSpill = true
+				if p.bitBool != nil && len(p.bitBool.args) > 16 {
+					sawLongArguments = true
 				}
 				got, e := m.RefGet(out)
 				astTestMust(t, e)
@@ -230,8 +230,8 @@ func TestBVRewriterBit2BoolEveryColdReservation(t *testing.T) {
 			astTestMust(t, p.Close())
 		})
 	}
-	if !complete || !sawSpill || !sawIntermediate {
-		t.Fatal(complete, sawSpill, sawIntermediate)
+	if !complete || !sawLongArguments || !sawIntermediate {
+		t.Fatal(complete, sawLongArguments, sawIntermediate)
 	}
 }
 

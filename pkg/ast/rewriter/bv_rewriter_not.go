@@ -9,7 +9,7 @@ import (
 type bvNotInvocation struct {
 	numerals    *ast.BitVectorNotNumerals
 	allone, one ast.ASTBitVectorNumeralInvocation
-	args        ast.ASTHandleBuffer
+	args        []ast.ASTHandle
 	ns, nt      ast.ASTRef
 	triple      [3]ast.ASTHandle
 	header      uint64
@@ -43,7 +43,8 @@ func (v *bvNotInvocation) close(m *ast.ASTManager) error {
 	if e := v.endRefs(m); e != nil {
 		return e
 	}
-	v.args.Close(m.Budget())
+	clear(v.args)
+	v.args = nil
 	if v.numerals != nil {
 		if e := v.numerals.Close(); e != nil {
 			return e
@@ -120,11 +121,9 @@ func (p *BVRewriter) RewriteNot(arg ast.ASTHandle, out ast.ASTRef) (st RewriteSt
 				if e != nil {
 					return st, e
 				}
-				if e = v.args.Push(m.Budget(), child); e != nil {
-					return st, e
-				}
+				v.args = append(v.args, child)
 			}
-			result, e = m.MkBitVectorConcat(v.args.Slice())
+			result, e = m.MkBitVectorConcat(v.args)
 			if e != nil {
 				return st, e
 			}
@@ -168,7 +167,8 @@ func (p *BVRewriter) RewriteNot(arg ast.ASTHandle, out ast.ASTRef) (st RewriteSt
 	if err = n.End(4, 3, 2, 1); err != nil {
 		return
 	}
-	v.args.Close(m.Budget())
+	clear(v.args)
+	v.args = nil
 	if err = v.endRefs(m); err != nil {
 		return
 	}

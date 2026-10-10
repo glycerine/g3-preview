@@ -79,7 +79,7 @@ func TestBVRewriterBlastEqualityEveryActualNumericalReservation(t *testing.T) {
 				if p.blastEquality != nil && p.blastEquality.numerals != nil {
 					sawNumericOwner = true
 				}
-				if p.blastEquality != nil && len(p.blastEquality.args.Slice()) > 0 {
+				if p.blastEquality != nil && len(p.blastEquality.args) > 0 {
 					sawLoopPrefix = true
 				}
 				cause := p.cause

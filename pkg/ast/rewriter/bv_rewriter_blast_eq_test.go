@@ -127,7 +127,7 @@ func TestBVRewriterBlastEqualityGuardsSwapAndRHSWidth(t *testing.T) {
 
 func TestBVRewriterBlastEqualityEveryColdReservation(t *testing.T) {
 	complete := false
-	sawSpill := false
+	sawLongArguments := false
 	sawAssignment := false
 	for ordinal := int64(0); ordinal < 2048 && !complete; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
@@ -174,8 +174,8 @@ func TestBVRewriterBlastEqualityEveryColdReservation(t *testing.T) {
 				if !numericHoistRefusal(body) {
 					t.Fatal(body)
 				}
-				if p.blastEquality != nil && len(p.blastEquality.args.Slice()) > 16 {
-					sawSpill = true
+				if p.blastEquality != nil && len(p.blastEquality.args) > 16 {
+					sawLongArguments = true
 				}
 				got, e := m.RefGet(out)
 				astTestMust(t, e)
@@ -197,7 +197,7 @@ func TestBVRewriterBlastEqualityEveryColdReservation(t *testing.T) {
 			astTestMust(t, p.Close())
 		})
 	}
-	if !complete || !sawSpill || !sawAssignment {
-		t.Fatal(complete, sawSpill, sawAssignment)
+	if !complete || !sawLongArguments || !sawAssignment {
+		t.Fatal(complete, sawLongArguments, sawAssignment)
 	}
 }

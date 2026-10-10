@@ -30,17 +30,12 @@ func RewriteBitVectorSignExtend(extract *MkExtractProc, n uint32, arg ast.ASTHan
 	if e != nil {
 		return RewriteFailed, e
 	}
-	var args ast.ASTHandleBuffer
-	defer args.Close(m.Budget())
+	var args []ast.ASTHandle
 	for i := uint32(0); i < n; i++ {
-		if e = args.Push(m.Budget(), sign); e != nil {
-			return RewriteFailed, e
-		}
+		args = append(args, sign)
 	}
-	if e = args.Push(m.Budget(), arg); e != nil {
-		return RewriteFailed, e
-	}
-	h, e := m.MkBitVectorConcat(args.Slice())
+	args = append(args, arg)
+	h, e := m.MkBitVectorConcat(args)
 	if e != nil {
 		return RewriteFailed, e
 	}

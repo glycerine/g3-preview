@@ -9,7 +9,7 @@ import (
 
 type bvSignExtensionInvocation struct {
 	numerals *ast.BitVectorSignExtensionNumerals
-	args     ast.ASTHandleBuffer
+	args     []ast.ASTHandle
 	header   uint64
 }
 
@@ -19,7 +19,8 @@ func (v *bvSignExtensionInvocation) close(m *ast.ASTManager) error {
 			return e
 		}
 	}
-	v.args.Close(m.Budget())
+	clear(v.args)
+	v.args = nil
 	if v.numerals != nil {
 		if e := v.numerals.Close(); e != nil {
 			return e
@@ -71,14 +72,10 @@ func (p *BVRewriter) RewriteSignExtend(amount uint32, arg ast.ASTHandle, out ast
 			return st, e
 		}
 		for i := uint32(0); i < amount; i++ {
-			if e = v.args.Push(m.Budget(), sign); e != nil {
-				return st, e
-			}
+			v.args = append(v.args, sign)
 		}
-		if e = v.args.Push(m.Budget(), arg); e != nil {
-			return st, e
-		}
-		node, e = m.MkBitVectorConcat(v.args.Slice())
+		v.args = append(v.args, arg)
+		node, e = m.MkBitVectorConcat(v.args)
 		st = Rewrite2
 	}
 	if e != nil {
@@ -89,7 +86,8 @@ func (p *BVRewriter) RewriteSignExtend(amount uint32, arg ast.ASTHandle, out ast
 			return st, e
 		}
 	}
-	v.args.Close(m.Budget())
+	clear(v.args)
+	v.args = nil
 	if e = v.numerals.SourceEnd(); e != nil {
 		return st, e
 	}

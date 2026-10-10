@@ -10,7 +10,7 @@ import (
 
 type bvExtractPropagation struct {
 	numerals         *ast.BitVectorExtractNumerals
-	args, concatArgs ast.ASTHandleBuffer
+	args, concatArgs []ast.ASTHandle
 	header           uint64
 }
 
@@ -20,8 +20,10 @@ func (v *bvExtractPropagation) close(m *ast.ASTManager) error {
 			return e
 		}
 	}
-	v.concatArgs.Close(m.Budget())
-	v.args.Close(m.Budget())
+	clear(v.concatArgs)
+	v.concatArgs = nil
+	clear(v.args)
+	v.args = nil
 	if v.numerals != nil {
 		if e := v.numerals.Close(); e != nil {
 			return e
@@ -83,8 +85,10 @@ func (p *BVRewriter) propagateExtract(high uint32, arg ast.ASTHandle, out ast.AS
 			return removed, e
 		}
 	}
-	v.concatArgs.Close(m.Budget())
-	v.args.Close(m.Budget())
+	clear(v.concatArgs)
+	v.concatArgs = nil
+	clear(v.args)
+	v.args = nil
 	if e = v.numerals.SourceEnd(); e != nil {
 		return removed, e
 	}
@@ -185,20 +189,19 @@ func (p *BVRewriter) bvPropagateExtractBody(v *bvExtractPropagation, args ast.Ap
 		newArg := newFirst
 		if concat {
 			if !newFirst.IsNull() {
-				v.concatArgs.Reset()
-				if e = v.concatArgs.Push(m.Budget(), newFirst); e != nil {
-					return failed, 0, e
-				}
+				clear(v.concatArgs)
+				v.concatArgs = v.concatArgs[:0]
+				v.concatArgs = append(v.concatArgs, newFirst)
 				for j := uint32(1); j < children.Count(); j++ {
 					h, e := children.At(j)
 					if e == nil {
-						e = v.concatArgs.Push(m.Budget(), h)
+						v.concatArgs = append(v.concatArgs, h)
 					}
 					if e != nil {
 						return failed, 0, e
 					}
 				}
-				newArg, e = m.MkBitVectorConcat(v.concatArgs.Slice())
+				newArg, e = m.MkBitVectorConcat(v.concatArgs)
 			} else {
 				switch children.Count() {
 				case 1:
@@ -218,16 +221,14 @@ func (p *BVRewriter) bvPropagateExtractBody(v *bvExtractPropagation, args ast.Ap
 			}
 		}
 		if !newArg.IsNull() {
-			if e = v.args.Push(m.Budget(), newArg); e != nil {
-				return failed, 0, e
-			}
+			v.args = append(v.args, newArg)
 		}
 	}
 	kind, e := m.GetDeclKind(arg)
 	if e != nil {
 		return failed, 0, e
 	}
-	node, e := m.MkFamilyApp(p.bvFamily, kind, nil, v.args.Slice())
+	node, e := m.MkFamilyApp(p.bvFamily, kind, nil, v.args)
 	if e == nil && ast.ASTSourceDebug {
 		sort, er := m.GetSort(node)
 		if er != nil {

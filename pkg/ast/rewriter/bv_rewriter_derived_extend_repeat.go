@@ -42,11 +42,11 @@ func (p *BVRewriter) RewriteRepeat(n uint32, arg ast.ASTHandle, out ast.ASTRef) 
 		return RewriteDone, p.manager.SetRef(out, arg)
 	}
 	for i := uint32(0); i < n; i++ {
-		if err = p.repeatArgs.Push(p.manager.Budget(), arg); err != nil {
+		if p.repeatArgs = append(p.repeatArgs, arg); err != nil {
 			return
 		}
 	}
-	node, e := p.manager.MkBitVectorConcat(p.repeatArgs.Slice())
+	node, e := p.manager.MkBitVectorConcat(p.repeatArgs)
 	if e != nil {
 		return st, e
 	}
@@ -54,6 +54,7 @@ func (p *BVRewriter) RewriteRepeat(n uint32, arg ast.ASTHandle, out ast.ASTRef) 
 	if err = p.manager.SetRef(out, node); err != nil {
 		return
 	}
-	p.repeatArgs.Close(p.manager.Budget())
+	clear(p.repeatArgs)
+	p.repeatArgs = nil
 	return
 }

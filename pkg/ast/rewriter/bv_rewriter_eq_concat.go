@@ -11,13 +11,14 @@ type bvConcatEqualityInvocation struct {
 	manager            *ast.ASTManager
 	singleton          [2]ast.ASTHandle
 	operands           [2]ast.AppArguments
-	equalities         ast.ASTHandleBuffer
+	equalities         []ast.ASTHandle
 	low1, low2, i1, i2 uint32
 	header             uint64
 }
 
 func (b *bvConcatEqualityInvocation) close() {
-	b.equalities.Close(b.manager.Budget())
+	clear(b.equalities)
+	b.equalities = nil
 	b.manager.Budget().Release(b.header)
 	b.header = 0
 }
@@ -128,9 +129,7 @@ func (p *BVPolynomialRewriter) RewriteConcatenationEquality(lhs, rhs ast.ASTHand
 		if e != nil {
 			return st, e
 		}
-		if e = b.equalities.Push(m.Budget(), eq); e != nil {
-			return st, e
-		}
+		b.equalities = append(b.equalities, eq)
 		// Publish each original cursor update only after the equality push succeeds.
 		if rem1 == rem2 {
 			b.low1 = 0
@@ -147,10 +146,10 @@ func (p *BVPolynomialRewriter) RewriteConcatenationEquality(lhs, rhs ast.ASTHand
 			b.i2--
 		}
 	}
-	if ast.ASTSourceDebug && (b.i1 != 0 || b.i2 != 0 || len(b.equalities.Slice()) < 1) {
+	if ast.ASTSourceDebug && (b.i1 != 0 || b.i2 != 0 || len(b.equalities) < 1) {
 		return st, ast.ErrASTDomain
 	}
-	result, e := m.MkAndArgs(b.equalities.Slice())
+	result, e := m.MkAndArgs(b.equalities)
 	if e != nil {
 		return st, e
 	}
