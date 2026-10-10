@@ -507,9 +507,25 @@
     },
     {
       "source": "src/util/lp/iterator_on_term_with_basis_var.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/lar_term.go",
+        "pkg/util/lp/term_iterator.go"
+      ],
+      "tests": [
+        "TestLARTermIndependentArithmeticAndOrderOracle",
+        "TestLARTermLiteralZeroAndLivePivotPrefixes",
+        "TestLARTermAllocationFailureCensus",
+        "TestLARTermIteratorLiteralCursorAndCopyFailure",
+        "TestLARTermBorrowedVectorFailureOwnership",
+        "TestLARTermIteratorLiveValuesAndPendingGuards",
+        "TestLARTermIteratorRetainsPhysicalCopyReceipt",
+        "TestLPExactStaticFillIndependentEliminationOracle",
+        "TestLPExactStaticFillLiteralWorkspaceAndPublication",
+        "TestLPExactStaticFillAllocationFailureCensus",
+        "TestLPExactStaticFillBoundsAndLiteralStops",
+        "TestLPExactStaticFillAndTermLeaveOlderComparisonOwned"
+      ]
     },
     {
       "source": "src/util/lp/lar_constraints.h",
@@ -549,9 +565,25 @@
     },
     {
       "source": "src/util/lp/lar_term.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/lar_term.go",
+        "pkg/util/lp/term_iterator.go"
+      ],
+      "tests": [
+        "TestLARTermIndependentArithmeticAndOrderOracle",
+        "TestLARTermLiteralZeroAndLivePivotPrefixes",
+        "TestLARTermAllocationFailureCensus",
+        "TestLARTermIteratorLiteralCursorAndCopyFailure",
+        "TestLARTermBorrowedVectorFailureOwnership",
+        "TestLARTermIteratorLiveValuesAndPendingGuards",
+        "TestLARTermIteratorRetainsPhysicalCopyReceipt",
+        "TestLPExactStaticFillIndependentEliminationOracle",
+        "TestLPExactStaticFillLiteralWorkspaceAndPublication",
+        "TestLPExactStaticFillAllocationFailureCensus",
+        "TestLPExactStaticFillBoundsAndLiteralStops",
+        "TestLPExactStaticFillAndTermLeaveOlderComparisonOwned"
+      ]
     },
     {
       "source": "src/util/lp/linear_combination_iterator.h",
@@ -1164,7 +1196,9 @@
         "pkg/util/lp/static_matrix_exact.go",
         "pkg/util/lp/static_matrix_exact_products.go",
         "pkg/util/lp/exact_eta_calls.go",
-        "pkg/util/lp/static_matrix_exact_scopes.go"
+        "pkg/util/lp/static_matrix_exact_scopes.go",
+        "pkg/util/lp/static_matrix_exact_fill.go",
+        "pkg/util/lp/term_iterator.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -1195,7 +1229,12 @@
         "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
         "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
         "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
-        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix",
+        "TestLPExactStaticFillIndependentEliminationOracle",
+        "TestLPExactStaticFillLiteralWorkspaceAndPublication",
+        "TestLPExactStaticFillAllocationFailureCensus",
+        "TestLPExactStaticFillBoundsAndLiteralStops",
+        "TestLPExactStaticFillAndTermLeaveOlderComparisonOwned"
       ]
     },
     {
@@ -1206,7 +1245,9 @@
         "pkg/util/lp/static_matrix_exact.go",
         "pkg/util/lp/static_matrix_exact_products.go",
         "pkg/util/lp/exact_eta_calls.go",
-        "pkg/util/lp/static_matrix_exact_scopes.go"
+        "pkg/util/lp/static_matrix_exact_scopes.go",
+        "pkg/util/lp/static_matrix_exact_fill.go",
+        "pkg/util/lp/term_iterator.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -1237,7 +1278,12 @@
         "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
         "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
         "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
-        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix",
+        "TestLPExactStaticFillIndependentEliminationOracle",
+        "TestLPExactStaticFillLiteralWorkspaceAndPublication",
+        "TestLPExactStaticFillAllocationFailureCensus",
+        "TestLPExactStaticFillBoundsAndLiteralStops",
+        "TestLPExactStaticFillAndTermLeaveOlderComparisonOwned"
       ]
     },
     {
@@ -1248,7 +1294,9 @@
         "pkg/util/lp/static_matrix_exact.go",
         "pkg/util/lp/static_matrix_exact_products.go",
         "pkg/util/lp/exact_eta_calls.go",
-        "pkg/util/lp/static_matrix_exact_scopes.go"
+        "pkg/util/lp/static_matrix_exact_scopes.go",
+        "pkg/util/lp/static_matrix_exact_fill.go",
+        "pkg/util/lp/term_iterator.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -1279,7 +1327,12 @@
         "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
         "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
         "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
-        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix",
+        "TestLPExactStaticFillIndependentEliminationOracle",
+        "TestLPExactStaticFillLiteralWorkspaceAndPublication",
+        "TestLPExactStaticFillAllocationFailureCensus",
+        "TestLPExactStaticFillBoundsAndLiteralStops",
+        "TestLPExactStaticFillAndTermLeaveOlderComparisonOwned"
       ]
     },
     {
@@ -1316,8 +1369,8 @@
     }
   ],
   "status_counts": {
-    "unported": 74,
-    "partial": 36
+    "unported": 72,
+    "partial": 38
   },
-  "combined_debug_checked_statement_coverage_of_current_go_code": 91.9
+  "combined_debug_checked_statement_coverage_of_current_go_code": 91.7
 }

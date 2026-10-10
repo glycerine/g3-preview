@@ -35485,3 +35485,42 @@ transpose cleanup and measures91.0%/92.4%; remaining new
 returns propagate actual cleanup errors. LP vet, portcheck, regenerated64-package
 graph and diff checks pass. The prior hourly full native module suite remains
 current; no redundant module-wide run was started within that hour.
+
+## Exact LAR terms and last-row basis elimination
+
+Implemented the retained lar_term coefficient/constant owner, accumulation,
+cancellation, owning coefficient export and live-pivot substitution, plus its
+term-with-basis iterator and exact static last-row fill. Source lar_solver.h:256
+retains contains; the term iterator retains size. Definition-only equality and
+unused clones remain excluded. Approved insdict insertion order replaces
+unspecified unordered-map order while preserving stable two-pass traversal.
+No STL nodes, capacity simulation or universal template adapters were added.
+
+Iterator copies own their actual numerical receipts separately from the term
+and destination matrix. Basis flag publishes before its copy; coefficient key
+publishes before copy and cursor advances only after success. Substitution
+rereads its live pivot and guards an erased pivot after the actual source prefix.
+Static fill retains persistent indexed workspace across resize/clear, including
+explicit zeros, duplicate indices and unindexed stale dense values. Last-row
+publication preserves column linkage before the fallible coefficient copy.
+Failures before numerical acquisition need not have pending receipts: tests
+identify the actual cursor, lexical value and publication prefix instead of
+fabricating ownership. Close releases only the actual owning calls and values.
+
+Tests include 1,600 independent term map/order operations, 240 exact matrix
+elimination worlds, eight term and three fill physical refusal campaigns through
+first success, actual iterator copy failures, named-cell/direct-object census,
+and preservation of an older caller-owned comparison generation. Focused tests
+pass native12.967s/debug-checked14.782s. New-file coverage is90.0% term,
+96.3% term iterator and85.0% fill in both profiles. Remaining fill statements
+mostly propagate child cleanup/errors or check Reset/bounds errors unreachable
+for the actual retained stable term iterator; no unused iterator was invented
+for coverage.
+
+Full native module regression passes (LP107.183s,90.1%); full LP combined
+debug/checked passes142.757s,91.7%. Exact static storage after workspace cleanup
+integration measures90.8% native/92.2% debug. Vet, source-ledger validation and
+diff checks pass. Graph has64 packages and unchanged dependency edges. LP now
+has38 partial/72 unported source units; repository62 ported/319 partial/1693
+unported/two dead-deleted. Complete sparse/LU/scaling/primal/dual/LAR solver,
+MPS and remaining upstream driver implementation/tests remain open.

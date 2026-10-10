@@ -16,6 +16,7 @@ type RationalStaticMatrix struct {
 	Rows         [][]RationalRowCell
 	Columns      [][]ColumnCell
 	RowOffsets   []int32
+	WorkVector   *IndexedRationalVector
 	manager      *numeral.RationalManager
 	calls        exactEtaCalls
 	work         *IndexedRationalVector
@@ -25,14 +26,14 @@ type RationalStaticMatrix struct {
 }
 
 func NewRationalStaticMatrix(manager *numeral.RationalManager, rows, columns uint32) *RationalStaticMatrix {
-	m := &RationalStaticMatrix{manager: manager, Rows: make([][]RationalRowCell, rows), Columns: make([][]ColumnCell, columns)}
+	m := &RationalStaticMatrix{manager: manager, Rows: make([][]RationalRowCell, rows), Columns: make([][]ColumnCell, columns), WorkVector: NewIndexedRationalVector(manager, 0)}
 	m.initRowOffsets()
 	return m
 }
 func (m *RationalStaticMatrix) RowCount() uint32    { return uint32(len(m.Rows)) }
 func (m *RationalStaticMatrix) ColumnCount() uint32 { return uint32(len(m.Columns)) }
 func (m *RationalStaticMatrix) ready() error {
-	if m.work != nil || m.calls.pending() {
+	if m.work != nil || m.calls.pending() || (m.WorkVector != nil && m.WorkVector.calls.pending()) {
 		return ErrExactVectorPending
 	}
 	return nil
@@ -141,6 +142,9 @@ func (m *RationalStaticMatrix) Set(row, column uint32, value *numeral.Rational) 
 		return err
 	}
 	defer m.finishWork(b, &err)
+	return m.set(row, column, value, 0, 1)
+}
+func (m *RationalStaticMatrix) set(row, column uint32, value *numeral.Rational, temporary, stored int) error {
 	zero, err := m.manager.IsZero(value)
 	if err != nil || zero {
 		return err
@@ -154,7 +158,7 @@ func (m *RationalStaticMatrix) Set(row, column uint32, value *numeral.Rational) 
 	co, ro := uint32(len(m.Columns[column])), uint32(len(m.Rows[row]))
 	// Source publishes this link before either exact row-cell copy.
 	m.Columns[column] = append(m.Columns[column], ColumnCell{row, ro})
-	return m.appendRowValue(row, column, co, value, 0, 1)
+	return m.appendRowValue(row, column, co, value, temporary, stored)
 }
 func (m *RationalStaticMatrix) addNewElement(row, column uint32, value *numeral.Rational, temporary, stored int) error {
 	if uint64(row) >= uint64(len(m.Rows)) || uint64(column) >= uint64(len(m.Columns)) {
@@ -468,6 +472,11 @@ func (m *RationalStaticMatrix) Close() error {
 			return err
 		}
 		m.work = nil
+	}
+	if m.WorkVector != nil {
+		if err := m.WorkVector.Close(); err != nil {
+			return err
+		}
 	}
 	if err := m.clearOwnedRow(&m.transposeRow); err != nil {
 		return err

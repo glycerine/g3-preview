@@ -1181,6 +1181,7 @@
         "indexed_exact_vector.go",
         "indexed_vector.go",
         "int_set.go",
+        "lar_term.go",
         "numeric_pair.go",
         "pair_priority_queue.go",
         "pair_queue_index.go",
@@ -1200,11 +1201,13 @@
         "stacked_value.go",
         "stacked_vector.go",
         "static_matrix_exact.go",
+        "static_matrix_exact_fill.go",
         "static_matrix_exact_products.go",
         "static_matrix_exact_scopes.go",
         "static_matrix_float.go",
         "tail_matrix_exact.go",
         "tail_matrix_float.go",
+        "term_iterator.go",
         "types.go"
       ]
     },
