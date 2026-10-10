@@ -33624,3 +33624,32 @@ gofmt and diff checks passed. No full native module rerun. Counts remain
 Rewriter frame/scope/binding/cache-stack storage still simulates source growth.
 Other Boolean/BV/proof/sequence AST collection consumers also remain. The util
 root split and the full external native collection audit are unfinished.
+
+## Native rewriter frame, scope, cache directory and binding storage
+
+Rewriter frames/scopes, owning ActivityCache pointer directories and borrowed
+binding/shift arrays now use plain Go slice append. Removed manual 3/2 growth,
+backing reservations/refunds, byte counters, rewriterVectorCapacity and the
+cache-pointer append failure owner. Actual ActivityCache construction is still
+budgeted and its stopped reference cleanup remains reachable in the owning slice.
+Cache close clears each completed owner before returning on a later failure.
+Packed frame bits, scope root/variable restoration, cache reuse, binding order,
+resource/cancellation checks and actual AST/numeral owners remain unchanged.
+These native replacements add no C++ container/STL implementation credit.
+
+Validation: focused native core/root/shifter/substitution/public Boolean passed
+(0.042s), and native growth fixtures passed (0.014s). Full native rewriter passed
+(12.372s); remaining g3debug rewriter passed (17.358s) with the same three verified
+baseline warm-allocation exclusions recorded above. A public substitution fixture
+installs 4097 cold bindings in both orders with arena reservations disabled;
+4097 cold frame appends and 65 cold scope appends independently preserve packed
+states, borrowed reference counts, scope restoration and unchanged arena charge.
+Actual cache owners are constructed before disabling reservations in the scope
+fixture. Full model/API/tactic/SAT tactic passed (0.056s/0.013s/0.025s/0.110s).
+Module-wide compilation, rewriter vet, manifest, gofmt and diff checks passed.
+No full native module rerun inside the hourly interval. Counts remain
+2102 units/677 APIs: 62 ported, 283 partial, 1729 unported, two dead/deleted.
+
+The primary traversal engine and variable shifters now use native collection
+backing throughout. Other Boolean/BV/proof/sequence AST collections remain, and
+the complete external native caller audit and root util split are unfinished.

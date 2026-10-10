@@ -27142,7 +27142,9 @@
         "TestBetaReducerOriginalPatternAndNoPatternReplacement",
         "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel",
         "TestRewriterNativeResultAndProofRootsGrowth",
-        "TestRewriterNativeRootOnlyReferenceAliasReplacement"
+        "TestRewriterNativeRootOnlyReferenceAliasReplacement",
+        "TestRewriterNativeFrameAndScopeGrowth",
+        "TestVarSubstitutionNativeColdBindingGrowth"
       ],
       "conditionals": [
         {
@@ -27273,7 +27275,9 @@
             "TestRewriterCoreProofCompactionResetAndCleanupSourceAsymmetry",
             "TestRewriterCoreNativeAndDebugAssertionBoundaries",
             "TestRewriterNativeResultAndProofRootsGrowth",
-            "TestRewriterNativeRootOnlyReferenceAliasReplacement"
+            "TestRewriterNativeRootOnlyReferenceAliasReplacement",
+            "TestRewriterNativeFrameAndScopeGrowth",
+            "TestVarSubstitutionNativeColdBindingGrowth"
           ]
         },
         {
@@ -27290,11 +27294,12 @@
         }
       ],
       "ownership": [
-        "Concrete iterative frames/scopes and borrowed scalar binding/shift vectors retain original growth and state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
+        "Concrete iterative frames/scopes and borrowed scalar binding/shift arrays use native slices and retain algorithm state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
       ],
       "deviations": [
         "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited.",
-        "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added."
+        "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added.",
+        "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit."
       ]
     },
     {
@@ -27335,7 +27340,9 @@
         "TestTraversalColdConstructionCleanup",
         "TestTraversalExternalDefaultConfiguration",
         "TestRewriterNativeResultAndProofRootsGrowth",
-        "TestRewriterNativeRootOnlyReferenceAliasReplacement"
+        "TestRewriterNativeRootOnlyReferenceAliasReplacement",
+        "TestRewriterNativeFrameAndScopeGrowth",
+        "TestVarSubstitutionNativeColdBindingGrowth"
       ],
       "conditionals": [
         {
@@ -27386,7 +27393,9 @@
             "TestRewriterCoreProofCompactionResetAndCleanupSourceAsymmetry",
             "TestRewriterCoreNativeAndDebugAssertionBoundaries",
             "TestRewriterNativeResultAndProofRootsGrowth",
-            "TestRewriterNativeRootOnlyReferenceAliasReplacement"
+            "TestRewriterNativeRootOnlyReferenceAliasReplacement",
+            "TestRewriterNativeFrameAndScopeGrowth",
+            "TestVarSubstitutionNativeColdBindingGrowth"
           ]
         },
         {
@@ -27398,7 +27407,9 @@
             "TestRewriterCoreNativeAndDebugAssertionBoundaries",
             "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
             "TestRewriterNativeResultAndProofRootsGrowth",
-            "TestRewriterNativeRootOnlyReferenceAliasReplacement"
+            "TestRewriterNativeRootOnlyReferenceAliasReplacement",
+            "TestRewriterNativeFrameAndScopeGrowth",
+            "TestVarSubstitutionNativeColdBindingGrowth"
           ]
         },
         {
@@ -27430,12 +27441,13 @@
         }
       ],
       "ownership": [
-        "Concrete iterative frames/scopes and borrowed scalar binding/shift vectors retain original growth and state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
+        "Concrete iterative frames/scopes and borrowed scalar binding/shift arrays use native slices and retain algorithm state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
       ],
       "deviations": [
         "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited.",
         "The public concrete Traversal exposes the same no-proof engine to other Go packages through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point. This boundary does not implement model evaluator theory reduction, completion or proof generation.",
-        "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added."
+        "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added.",
+        "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit."
       ]
     },
     {
@@ -27478,7 +27490,9 @@
         "TestTraversalColdConstructionCleanup",
         "TestTraversalExternalDefaultConfiguration",
         "TestRewriterNativeResultAndProofRootsGrowth",
-        "TestRewriterNativeRootOnlyReferenceAliasReplacement"
+        "TestRewriterNativeRootOnlyReferenceAliasReplacement",
+        "TestRewriterNativeFrameAndScopeGrowth",
+        "TestVarSubstitutionNativeColdBindingGrowth"
       ],
       "conditionals": [
         {
@@ -27685,17 +27699,20 @@
             "TestBetaReducerOriginalPatternAndNoPatternReplacement",
             "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel",
             "TestRewriterNativeResultAndProofRootsGrowth",
-            "TestRewriterNativeRootOnlyReferenceAliasReplacement"
+            "TestRewriterNativeRootOnlyReferenceAliasReplacement",
+            "TestRewriterNativeFrameAndScopeGrowth",
+            "TestVarSubstitutionNativeColdBindingGrowth"
           ]
         }
       ],
       "ownership": [
-        "Concrete iterative frames/scopes and borrowed scalar binding/shift vectors retain original growth and state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
+        "Concrete iterative frames/scopes and borrowed scalar binding/shift arrays use native slices and retain algorithm state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
       ],
       "deviations": [
         "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited.",
         "The public concrete Traversal exposes the same no-proof engine to other Go packages through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point. This boundary does not implement model evaluator theory reduction, completion or proof generation.",
-        "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added."
+        "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added.",
+        "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit."
       ]
     },
     {
@@ -149157,7 +149174,8 @@
         "Persistent found-variable flags shared by substitution and Vars now use native []bool. Removed cap/size byte codecs, source 3/2 growth, Runtime binding/pending/interrupted state, container allocation/free failures and raw-root census adapters. Growth preserves old flags and initializes new flags false; reserve does not shrink. The original reached term/query reset loops remain, including visited flags surviving a source body failure. Native bounds retain debug assertions and release arena.ErrBounds; scalar member cleanup releases the slice. Native cold growth through 4097 flags and cold Vars output publication run under disabled Runtime reservations with unchanged accounting. An actual reached malformed-variable bounds fixture checks the published visited prefix and retained flags without inventing a source failure/reentry from deleted container allocation. Three obsolete container-only tests are retired. Real substitution numeric/factory/destructor and owner guards remain. No whole-unit completion credit is added.",
         "Binary-rational fields and DRS/Sturm stacks now use native slice append, removing C++ vector capacity/header arithmetic, initialized masks and container-only reservations/refunds. Binary logical size remains distinct from native constructed field extent; relocation transfers actual numeral fields once and clears old owning records. Root-isolation frame packing/traversal, endpoint arithmetic, ascending numeric destruction, actual cold owners and real numeric allocation failures remain. Native buffer BackingBytes is zero.",
         "This checkpoint supersedes prior Runtime scalar-column/cache growth, raw-header, allocation-refusal and stale-on-reallocation claims for these SAT unsigned members. Retired tests of emulated storage events; retained independent solver, minimization, consequence, MUS, model and probing results in native/debug profiles. Empty invalid lemma operations now stop at native checked bounds. Clause sorting uses Go standard sort instead of a translated STL heap algorithm. Native replacements add no generic C++ vector/STL implementation credit.",
-        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added."
+        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added.",
+        "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit."
       ]
     },
     {

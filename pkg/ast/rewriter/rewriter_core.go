@@ -1,12 +1,10 @@
 // Source: src/ast/rewriter/rewriter.cpp:23-204;
-// src/ast/rewriter/rewriter.h:31-119; src/ast/ast.h:845-853;
-// src/util/vector.h:59-99; src/util/ref_vector.h:45-72,140-172.
+// src/ast/rewriter/rewriter.h:31-119; src/ast/ast.h:845-853.
 package rewriter
 
 import (
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 )
 
@@ -32,69 +30,38 @@ type rewriterScope struct {
 	oldNumQVars uint32
 }
 
-// Cold owner pointer vectors use the original ptr_vector growth. Each new
-// cache is retained in pendingCache until its pointer append succeeds.
-type rewriterCacheStack struct {
-	values []*ast.ActivityCache
-	bytes  uint64
-}
-
-func (s *rewriterCacheStack) push(m *ast.ASTManager, c *ast.ActivityCache) error {
-	if len(s.values) == cap(s.values) {
-		n := uint64(2)
-		if cap(s.values) != 0 {
-			n = (3*uint64(cap(s.values)) + 1) >> 1
-		}
-		width := uint64(reflect.TypeOf((*ast.ActivityCache)(nil)).Size())
-		if n > uint64(^uint32(0)) || n > uint64(^uint(0)>>1)/width {
-			return arena.ErrBounds
-		}
-		bytes := n * width
-		if e := m.BudgetField.Reserve(bytes); e != nil {
-			return e
-		}
-		v := make([]*ast.ActivityCache, len(s.values), int(n))
-		copy(v, s.values)
-		m.BudgetField.Release(s.bytes)
-		s.values = v
-		s.bytes = bytes
-	}
-	s.values = append(s.values, c)
-	return nil
-}
-func (s *rewriterCacheStack) close(m *ast.ASTManager) error {
-	for i, c := range s.values {
+// Cache objects retain their own AST ownership and destructor continuation.
+// The directory that owns them is a native Go slice.
+func closeRewriterCaches(caches *[]*ast.ActivityCache) error {
+	for i, c := range *caches {
 		if c != nil {
 			if e := c.Close(); e != nil {
 				return e
 			}
-			s.values[i] = nil
+			(*caches)[i] = nil
 		}
 	}
-	m.BudgetField.Release(s.bytes)
-	s.values = nil
-	s.bytes = 0
+	*caches = nil
 	return nil
 }
 
 type rewriterCore struct {
-	self                           *rewriterCore
-	manager                        *ast.ASTManager
-	proofGen, cancelCheck          bool
-	cacheStack                     rewriterCacheStack
-	cache                          *ast.ActivityCache
-	frames                         []rewriterFrame
-	results                        []ast.ASTHandle
-	proofCacheStack                rewriterCacheStack
-	proofCache                     *ast.ActivityCache
-	proofResults                   []ast.ASTHandle
-	root                           ast.ASTHandle
-	numQVars                       uint32
-	scopes                         []rewriterScope
-	pendingCache                   *ast.ActivityCache
-	header, frameBytes, scopeBytes uint64
-	ready, closed                  bool
-	cause                          error
+	self                  *rewriterCore
+	manager               *ast.ASTManager
+	proofGen, cancelCheck bool
+	cacheStack            []*ast.ActivityCache
+	cache                 *ast.ActivityCache
+	frames                []rewriterFrame
+	results               []ast.ASTHandle
+	proofCacheStack       []*ast.ActivityCache
+	proofCache            *ast.ActivityCache
+	proofResults          []ast.ASTHandle
+	root                  ast.ASTHandle
+	numQVars              uint32
+	scopes                []rewriterScope
+	header                uint64
+	ready, closed         bool
+	cause                 error
 }
 
 func newRewriterCore(m *ast.ASTManager, proofGen bool) (*rewriterCore, error) {
@@ -137,20 +104,16 @@ func (c *rewriterCore) open() error {
 	_, e := c.manager.ProofsEnabled()
 	return e
 }
-func (c *rewriterCore) pushCache(stack *rewriterCacheStack) (*ast.ActivityCache, error) {
+func (c *rewriterCore) pushCache(stack *[]*ast.ActivityCache) (*ast.ActivityCache, error) {
 	v, e := ast.NewActivityCache(c.manager, nil)
 	if e != nil {
 		return nil, e
 	}
-	c.pendingCache = v
-	if e = stack.push(c.manager, v); e != nil {
-		return nil, e
-	}
-	c.pendingCache = nil
+	*stack = append(*stack, v)
 	return v, nil
 }
 func (c *rewriterCore) initCacheStack() error {
-	if len(c.cacheStack.values) != 0 {
+	if len(c.cacheStack) != 0 {
 		return ast.ErrASTDomain
 	}
 	v, e := c.pushCache(&c.cacheStack)
@@ -168,18 +131,12 @@ func (c *rewriterCore) initCacheStack() error {
 	return nil
 }
 func (c *rewriterCore) delCacheStack() error {
-	if c.pendingCache != nil {
-		if e := c.pendingCache.Close(); e != nil {
-			return e
-		}
-		c.pendingCache = nil
-	}
-	if e := c.cacheStack.close(c.manager); e != nil {
+	if e := closeRewriterCaches(&c.cacheStack); e != nil {
 		return e
 	}
 	c.cache = nil
 	if c.proofGen {
-		if e := c.proofCacheStack.close(c.manager); e != nil {
+		if e := closeRewriterCaches(&c.proofCacheStack); e != nil {
 			return e
 		}
 		c.proofCache = nil
@@ -242,45 +199,22 @@ func (c *rewriterCore) getCacheSize() (uint32, error) {
 	return c.cache.Size()
 }
 func (c *rewriterCore) resetCache() error {
-	if len(c.cacheStack.values) == 0 {
+	if len(c.cacheStack) == 0 {
 		return ast.ErrASTDomain
 	}
-	c.cache = c.cacheStack.values[0]
+	c.cache = c.cacheStack[0]
 	if e := c.cache.Reset(); e != nil {
 		return e
 	}
 	if c.proofGen {
-		if len(c.proofCacheStack.values) == 0 {
+		if len(c.proofCacheStack) == 0 {
 			return ast.ErrASTDomain
 		}
-		c.proofCache = c.proofCacheStack.values[0]
+		c.proofCache = c.proofCacheStack[0]
 		if e := c.proofCache.Reset(); e != nil {
 			return e
 		}
 	}
-	return nil
-}
-func (c *rewriterCore) pushScope() error {
-	if len(c.scopes) == cap(c.scopes) {
-		n := uint64(2)
-		if cap(c.scopes) != 0 {
-			n = (3*uint64(cap(c.scopes)) + 1) >> 1
-		}
-		width := uint64(reflect.TypeOf(rewriterScope{}).Size())
-		if n > uint64(^uint32(0)) || n > uint64(^uint(0)>>1)/width {
-			return arena.ErrBounds
-		}
-		bytes := n * width
-		if e := c.manager.BudgetField.Reserve(bytes); e != nil {
-			return e
-		}
-		v := make([]rewriterScope, len(c.scopes), int(n))
-		copy(v, c.scopes)
-		c.manager.BudgetField.Release(c.scopeBytes)
-		c.scopes = v
-		c.scopeBytes = bytes
-	}
-	c.scopes = append(c.scopes, rewriterScope{c.root, c.numQVars})
 	return nil
 }
 func (c *rewriterCore) beginScope() (err error) {
@@ -292,14 +226,12 @@ func (c *rewriterCore) beginScope() (err error) {
 			c.cause = err
 		}
 	}()
-	if e := c.pushScope(); e != nil {
-		return e
-	}
+	c.scopes = append(c.scopes, rewriterScope{c.root, c.numQVars})
 	level := len(c.scopes)
-	if level > len(c.cacheStack.values) || c.proofGen && len(c.proofCacheStack.values) != len(c.cacheStack.values) {
+	if level > len(c.cacheStack) || c.proofGen && len(c.proofCacheStack) != len(c.cacheStack) {
 		return ast.ErrASTDomain
 	}
-	if level == len(c.cacheStack.values) {
+	if level == len(c.cacheStack) {
 		if _, e := c.pushCache(&c.cacheStack); e != nil {
 			return e
 		}
@@ -309,12 +241,12 @@ func (c *rewriterCore) beginScope() (err error) {
 			}
 		}
 	}
-	c.cache = c.cacheStack.values[level]
+	c.cache = c.cacheStack[level]
 	if e := c.cache.Reset(); e != nil {
 		return e
 	}
 	if c.proofGen {
-		c.proofCache = c.proofCacheStack.values[level]
+		c.proofCache = c.proofCacheStack[level]
 		if e := c.proofCache.Reset(); e != nil {
 			return e
 		}
@@ -345,9 +277,9 @@ func (c *rewriterCore) endScope() (err error) {
 	c.root = s.oldRoot
 	c.numQVars = s.oldNumQVars
 	c.scopes = c.scopes[:len(c.scopes)-1]
-	c.cache = c.cacheStack.values[len(c.scopes)]
+	c.cache = c.cacheStack[len(c.scopes)]
 	if c.proofGen {
-		c.proofCache = c.proofCacheStack.values[len(c.scopes)]
+		c.proofCache = c.proofCacheStack[len(c.scopes)]
 	}
 	return nil
 }
@@ -379,25 +311,6 @@ func (c *rewriterCore) pushFrameCore(t ast.ASTHandle, cache bool, state, depth u
 	n := uint32(len(c.results))
 	if ast.ASTSourceDebug && c.proofGen && len(c.results) != len(c.proofResults) {
 		return ast.ErrASTDomain
-	}
-	if len(c.frames) == cap(c.frames) {
-		size := uint64(2)
-		if cap(c.frames) != 0 {
-			size = (3*uint64(cap(c.frames)) + 1) >> 1
-		}
-		width := uint64(reflect.TypeOf(rewriterFrame{}).Size())
-		if size > uint64(^uint32(0)) || size > uint64(^uint(0)>>1)/width {
-			return arena.ErrBounds
-		}
-		bytes := size * width
-		if e := c.manager.BudgetField.Reserve(bytes); e != nil {
-			return e
-		}
-		v := make([]rewriterFrame, len(c.frames), int(size))
-		copy(v, c.frames)
-		c.manager.BudgetField.Release(c.frameBytes)
-		c.frames = v
-		c.frameBytes = bytes
 	}
 	fr := rewriterFrame{curr: t, spos: n}
 	fr.setState(state)
@@ -567,15 +480,11 @@ func (c *rewriterCore) freeMemory() error {
 	if e := c.delCacheStack(); e != nil {
 		return e
 	}
-	c.manager.BudgetField.Release(c.frameBytes)
 	c.frames = nil
-	c.frameBytes = 0
 	if e := shrinkRewriterRoots(c.manager, &c.results, 0); e != nil {
 		return e
 	}
-	c.manager.BudgetField.Release(c.scopeBytes)
 	c.scopes = nil
-	c.scopeBytes = 0
 	c.results = nil
 	// Source deliberately does not finalize the proof result-stack here.
 	return nil
@@ -610,9 +519,7 @@ func (c *rewriterCore) Close() error {
 		return e
 	}
 	// Destructor body precedes member destruction in reverse declaration order.
-	c.manager.BudgetField.Release(c.scopeBytes)
 	c.scopes = nil
-	c.scopeBytes = 0
 	if e := shrinkRewriterRoots(c.manager, &c.proofResults, 0); e != nil {
 		return e
 	}
@@ -621,9 +528,7 @@ func (c *rewriterCore) Close() error {
 		return e
 	}
 	c.results = nil
-	c.manager.BudgetField.Release(c.frameBytes)
 	c.frames = nil
-	c.frameBytes = 0
 	c.manager.BudgetField.Release(c.header)
 	c.header = 0
 	c.closed = true

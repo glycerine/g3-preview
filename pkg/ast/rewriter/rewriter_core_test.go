@@ -22,7 +22,7 @@ func TestRewriterCoreOriginalScopedCachesAndRootRestoration(t *testing.T) {
 			c, e := newRewriterCore(m, proof)
 			satOK(t, e)
 			defer func() { satOK(t, c.Close()) }()
-			if !c.cancelCheck || c.numQVars != 0 || len(c.cacheStack.values) != 1 || len(c.proofCacheStack.values) != map[bool]int{false: 0, true: 1}[proof] {
+			if !c.cancelCheck || c.numQVars != 0 || len(c.cacheStack) != 1 || len(c.proofCacheStack) != map[bool]int{false: 0, true: 1}[proof] {
 				t.Fatal("source core constructor")
 			}
 			satOK(t, c.SetCancelCheck(false))
@@ -53,7 +53,7 @@ func TestRewriterCoreOriginalScopedCachesAndRootRestoration(t *testing.T) {
 			cache(q, p)
 			satOK(t, c.beginScope())
 			cache(r, q)
-			if len(c.cacheStack.values) != 4 {
+			if len(c.cacheStack) != 4 {
 				t.Fatal("source scope cache stack growth")
 			}
 			satOK(t, c.endScope())
@@ -223,7 +223,7 @@ func TestRewriterCoreSharedFramesQuantifierChildrenAndPackedFields(t *testing.T)
 		t.Fatal("reset retains frame storage")
 	}
 	satOK(t, c.Cleanup())
-	if c.frames != nil || c.scopes != nil || len(c.cacheStack.values) != 1 {
+	if c.frames != nil || c.scopes != nil || len(c.cacheStack) != 1 {
 		t.Fatal("cleanup frees frame/scope storage and recreates base cache")
 	}
 }

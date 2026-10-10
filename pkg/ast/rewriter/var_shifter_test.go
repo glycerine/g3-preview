@@ -139,7 +139,7 @@ func TestVariableShifterNestedBindersPatternsAndAnnotations(t *testing.T) {
 			if weight != 17 || forall || a != qid || z != skid || name != usymbol.Numerical(0) {
 				t.Fatal("original quantifier annotations changed")
 			}
-			if len(s.core.scopes) != 0 || s.core.numQVars != 0 || s.core.cache != s.core.cacheStack.values[0] {
+			if len(s.core.scopes) != 0 || s.core.numQVars != 0 || s.core.cache != s.core.cacheStack[0] {
 				t.Fatal("source quantifier scope not retired")
 			}
 			satOK(t, s.ShiftBy(original, 3, out))

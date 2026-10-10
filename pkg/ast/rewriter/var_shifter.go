@@ -379,7 +379,7 @@ func (s *variableShifter) mainLoop(t ast.ASTHandle, out ast.ASTRef) error {
 	c := &s.core
 	m := c.manager
 	n := uint32(len(c.results))
-	if len(c.cacheStack.values) == 0 || c.cache != c.cacheStack.values[0] || len(c.frames) != 0 || n != 0 {
+	if len(c.cacheStack) == 0 || c.cache != c.cacheStack[0] || len(c.frames) != 0 || n != 0 {
 		return ast.ErrASTDomain
 	}
 	c.root = t

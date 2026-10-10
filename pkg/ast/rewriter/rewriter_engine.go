@@ -1,12 +1,11 @@
 // Source: src/ast/rewriter/rewriter_def.h:23-750;
-// src/ast/rewriter/rewriter.h:194-363; src/util/vector.h:59-99.
+// src/ast/rewriter/rewriter.h:194-363.
 package rewriter
 
 import (
 	"errors"
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/messages"
 )
@@ -19,17 +18,17 @@ func (e rewriterException) Error() string { return e.message }
 // scopes, bounded revisit depths and borrowed binding vectors. Proof-generating
 // traversal remains a separate port obligation.
 type rewriterEngine struct {
-	self                             *rewriterEngine
-	core                             rewriterCore
-	cfg                              rewriterConfiguration
-	numSteps                         uint32
-	bindings                         []ast.ASTHandle
-	patterns, noPatterns             []ast.ASTHandle
-	shifter, invShifter              variableShifter
-	r, pr, pr2                       ast.ASTRef
-	shifts                           []uint32
-	header, bindingBytes, shiftBytes uint64
-	ready, closed                    bool
+	self                 *rewriterEngine
+	core                 rewriterCore
+	cfg                  rewriterConfiguration
+	numSteps             uint32
+	bindings             []ast.ASTHandle
+	patterns, noPatterns []ast.ASTHandle
+	shifter, invShifter  variableShifter
+	r, pr, pr2           ast.ASTRef
+	shifts               []uint32
+	header               uint64
+	ready, closed        bool
 }
 
 func newRewriterEngine(m *ast.ASTManager, cfg rewriterConfiguration) (*rewriterEngine, error) {
@@ -80,49 +79,9 @@ func (r *rewriterEngine) open() error {
 	}
 	return r.core.open()
 }
-func rewriterVectorCapacity(capacity int, width uint64) (uint64, uint64, error) {
-	n := uint64(2)
-	if capacity != 0 {
-		n = (3*uint64(capacity) + 1) >> 1
-	}
-	if n > uint64(^uint32(0)) || n > uint64(^uint(0)>>1)/width {
-		return 0, 0, arena.ErrBounds
-	}
-	return n, n * width, nil
-}
-func (r *rewriterEngine) pushBinding(h ast.ASTHandle, shift uint32) error {
-	m := r.core.manager
-	if len(r.bindings) == cap(r.bindings) {
-		n, bytes, e := rewriterVectorCapacity(cap(r.bindings), uint64(reflect.TypeOf(ast.ASTHandle{}).Size()))
-		if e != nil {
-			return e
-		}
-		if e = m.BudgetField.Reserve(bytes); e != nil {
-			return e
-		}
-		v := make([]ast.ASTHandle, len(r.bindings), int(n))
-		copy(v, r.bindings)
-		m.BudgetField.Release(r.bindingBytes)
-		r.bindings = v
-		r.bindingBytes = bytes
-	}
+func (r *rewriterEngine) pushBinding(h ast.ASTHandle, shift uint32) {
 	r.bindings = append(r.bindings, h)
-	if len(r.shifts) == cap(r.shifts) {
-		n, bytes, e := rewriterVectorCapacity(cap(r.shifts), 4)
-		if e != nil {
-			return e
-		}
-		if e = m.BudgetField.Reserve(bytes); e != nil {
-			return e
-		}
-		v := make([]uint32, len(r.shifts), int(n))
-		copy(v, r.shifts)
-		m.BudgetField.Release(r.shiftBytes)
-		r.shifts = v
-		r.shiftBytes = bytes
-	}
 	r.shifts = append(r.shifts, shift)
-	return nil
 }
 func (r *rewriterEngine) SetBindings(values []ast.ASTHandle) error {
 	return r.setBindings(values, false)
@@ -158,9 +117,7 @@ func (r *rewriterEngine) setBindingArguments(values ast.AppArguments, inverse bo
 		if e != nil {
 			return e
 		}
-		if e = r.pushBinding(h, n); e != nil {
-			return e
-		}
+		r.pushBinding(h, n)
 	}
 	return nil
 }
@@ -193,15 +150,10 @@ func (r *rewriterEngine) Cleanup() error {
 	if e := r.core.Cleanup(); e != nil {
 		return e
 	}
-	m := r.core.manager
-	m.BudgetField.Release(r.bindingBytes)
-	r.bindingBytes = 0
 	r.bindings = nil
 	if e := r.shifter.core.Cleanup(); e != nil {
 		return e
 	}
-	m.BudgetField.Release(r.shiftBytes)
-	r.shiftBytes = 0
 	r.shifts = nil
 	return r.invShifter.core.Cleanup()
 }
@@ -216,9 +168,7 @@ func (r *rewriterEngine) Close() error {
 	if e := r.releasePatterns(); e != nil {
 		return e
 	}
-	m.BudgetField.Release(r.shiftBytes)
 	r.shifts = nil
-	r.shiftBytes = 0
 	for _, ref := range []*ast.ASTRef{&r.pr2, &r.pr, &r.r} {
 		if *ref != (ast.ASTRef{}) {
 			if e := m.DelRef(ref); e != nil {
@@ -236,9 +186,7 @@ func (r *rewriterEngine) Close() error {
 			return e
 		}
 	}
-	m.BudgetField.Release(r.bindingBytes)
 	r.bindings = nil
-	r.bindingBytes = 0
 	if e := r.core.Close(); e != nil {
 		return e
 	}
@@ -733,9 +681,7 @@ func (r *rewriterEngine) processApp() (err error) {
 					if e != nil {
 						return e
 					}
-					if e = r.pushBinding(h, sz); e != nil {
-						return e
-					}
+					r.pushBinding(h, sz)
 				}
 				if e = appendRewriterRoot(m, &c.results, def); e != nil {
 					return e
@@ -835,9 +781,7 @@ func (r *rewriterEngine) processQuantifier() (err error) {
 		c.root = body
 		sz := uint32(len(r.bindings))
 		for i := uint32(0); i < nd; i++ {
-			if e = r.pushBinding(ast.ASTHandle{}, sz); e != nil {
-				return e
-			}
+			r.pushBinding(ast.ASTHandle{}, sz)
 		}
 		c.numQVars += nd
 	}
@@ -986,7 +930,7 @@ func (r *rewriterEngine) Rewrite(t ast.ASTHandle, out ast.ASTRef) error {
 		return e
 	}
 	c := &r.core
-	if len(c.frames) != 0 || c.cache != c.cacheStack.values[0] {
+	if len(c.frames) != 0 || c.cache != c.cacheStack[0] {
 		return ast.ErrASTDomain
 	}
 	c.root = t
