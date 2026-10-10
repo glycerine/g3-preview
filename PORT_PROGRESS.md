@@ -35524,3 +35524,28 @@ diff checks pass. Graph has64 packages and unchanged dependency edges. LP now
 has38 partial/72 unported source units; repository62 ported/319 partial/1693
 unported/two dead-deleted. Complete sparse/LU/scaling/primal/dual/LAR solver,
 MPS and remaining upstream driver implementation/tests remain open.
+
+## Floating sparse basis construction for LU
+
+Added the retained double/double square basis workspace from sparse_matrix.h/.hpp:
+descending basis-column copying, independently owned row/column floating indexed
+values, reciprocal offsets, active count, identity permutations, empty pivot queue,
+processed flags and -1 pivot workspace. Logical row queries map forward; columns
+map in reverse. Lowest-row lookup maps stored rows back through the permutation
+and returns literal zero for an empty column. Swaps affect permutations only.
+Copy retains explicit zero, duplicate and IEEE values, and malformed source input
+returns a typed bounds error after the actual descending copy prefix.
+
+Strengthened standalone source test_init_U with its exact expected matrix. Its
+upstream call is after the driver's unconditional return, so this is independent
+Go fixture execution, not registered upstream execution credit. Added600 independent
+random sparse worlds with duplicate basis selections, independently calculated
+row/column orders and reciprocal offsets,16 permutation rounds each, first-match
+duplicate queries, empty columns, partial constructor stops and ownership checks.
+Focused tests pass native0.055s/debug-checked0.059s with100% new-file statement
+coverage in both profiles. LP vet passes. No full module rerun: the hourly native
+suite completed successfully before this additive component. Exact rational basis
+storage, sparse elimination, Markovitz selection, LU and solver integration remain
+required. Four newly reached source units are partial: LP42 partial/68 unported;
+repository62 ported/323 partial/1689 unported/two dead-deleted. This checkpoint
+also records the preceding term/fill source-ledger changes omitted from5e48841d.

@@ -1196,6 +1196,7 @@
         "row_eta_matrix_float.go",
         "settings.go",
         "sparse_float_vector.go",
+        "sparse_matrix_float.go",
         "sparse_rational_vector.go",
         "stacked_pair_vector.go",
         "stacked_value.go",

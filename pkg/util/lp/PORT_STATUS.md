@@ -5,7 +5,7 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently thirty-eight partial source units and 72 unported units. No complete
+There are currently forty-two partial source units and 68 unported units. No complete
 LP solver is available yet. A green Go coverage report does not measure the C++
 code that has not been ported.
 
@@ -34,11 +34,12 @@ code that has not been ported.
 | Exact LAR term ownership, arithmetic and substitution | 1,600 independent map/order operations; explicit zero/cancellation/reinsertion and live pivot prefixes; eight physical refusal campaigns, partial construction/export and borrowed-owner census | 90.0% in each profile; remaining statements propagate child/cleanup errors |
 | Exact term-with-basis iterator | Basis-first and coefficient copy publication; live values, cursor failure, stopped-owner guards and actual copy receipt census | 96.3% in each profile |
 | Exact static last-row fill with basis elimination | 240 independent rational elimination worlds; literal zero/duplicate/stale workspace behavior; three physical refusal campaigns through success, owner-specific publication prefixes and older comparison identity | 85.0% in each profile; remaining guards include unreachable child Reset/bounds failures for the retained concrete term iterator |
+| Floating sparse basis construction and permutation queries | Standalone source test_init_U fixture; 600 independent sparse worlds, duplicate/zero/IEEE values, reciprocal offsets, 16 permutation rounds per world and malformed-input prefix checks | 100% in each focused profile; factorization, elimination and solves remain open |
 | Settings defaults, stats, float tolerance families, random state and resource limits | All numerical/strategy defaults, source RNG golden vectors, mutable thresholds, strict CPU-time boundary, borrowed limit/error propagation and stats reset | 96.3%; uncovered constructor return propagates a real host-clock start error |
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
-Current complete-package coverage runs report **90.1% native and 91.7% combined debug/checked**. Exact scoped
+The last complete-package coverage runs, before floating sparse basis storage was added, report **90.1% native and 91.7% combined debug/checked**. Exact scoped
 vector allocation and rollback paths are tested; remaining uncovered statements
 include numerical child and cleanup/capture error returns, plus profile-specific
 assertion paths. The explicit

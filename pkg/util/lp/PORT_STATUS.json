@@ -343,9 +343,15 @@
     },
     {
       "source": "src/util/lp/indexed_value.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/sparse_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatSparseOriginalInitU",
+        "TestLPFloatSparseBasisIndependentOracle",
+        "TestLPFloatSparseBasisLiteralStops"
+      ]
     },
     {
       "source": "src/util/lp/indexed_vector.h",
@@ -1091,21 +1097,39 @@
     },
     {
       "source": "src/util/lp/sparse_matrix.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/sparse_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatSparseOriginalInitU",
+        "TestLPFloatSparseBasisIndependentOracle",
+        "TestLPFloatSparseBasisLiteralStops"
+      ]
     },
     {
       "source": "src/util/lp/sparse_matrix.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/sparse_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatSparseOriginalInitU",
+        "TestLPFloatSparseBasisIndependentOracle",
+        "TestLPFloatSparseBasisLiteralStops"
+      ]
     },
     {
       "source": "src/util/lp/sparse_matrix_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/sparse_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatSparseOriginalInitU",
+        "TestLPFloatSparseBasisIndependentOracle",
+        "TestLPFloatSparseBasisLiteralStops"
+      ]
     },
     {
       "source": "src/util/lp/sparse_vector.h",
@@ -1369,8 +1393,8 @@
     }
   ],
   "status_counts": {
-    "unported": 72,
-    "partial": 38
+    "unported": 68,
+    "partial": 42
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7
 }
