@@ -36473,3 +36473,39 @@ and row-maximum refresh. Suhl updates consume it to restore the upper-triangular
 basis after the bump. Then complete retained column updates, error-check/
 refinement orchestration and dimension extension. Scaling/simplex/LAR/MPS and
 remaining upstream scenarios stay required by the active full LP goal.
+
+
+### Sparse physical-row restoration for retained LU updates — 2026-10-10
+
+Ported sparse_matrix.hpp:337-400 to floating and shared exact coefficient
+implementations in sparse_matrix_float_restore.go and sparse_matrix_exact_restore.go.
+The row argument is physical; workspace columns are logical. Existing entries
+are visited backward, with exact owning local copies and row-before-column
+publication. New entries consume index order, skip zero/previously consumed
+coordinates, clear the index before refreshing the maximum, and return false
+for an empty row. Reciprocal links and active counts use the existing concrete
+mutation helpers. Precise tolerance remains exact zero; floating strict/NaN/zero
+tolerance and debug assertion-after-removal behavior preserve source order.
+
+800 independent coordinate-map worlds shuffle both permutations and compare all
+coefficients/backlinks and maxima. Literal tests cover duplicate old/new indices,
+hidden common/missing workspace values, empty rows, tiny exact coefficients,
+IEEE/tolerance edges and reached bounds publication prefixes. Six pooled/direct
+physical allocation campaigns walk through first success, verify actual
+row-before-column refusal and index-clear-before-maximum refusal, close matrix
+before caller and account for every remaining named cell/direct object. A real
+failed caller Add verifies matrix rejection and Close leave its raw receipt
+untouched. No manufactured allocation or pending frame is credited.
+
+Focused native checks passed0.257s and combined debug/checked0.282s. Exact file
+56/62 statements (90.3%) in each; floating40/43 (93.0%) native and42/43 (97.7%)
+debug/checked. Remaining statements propagate child/cleanup failures, guard a
+redundant beginWork check, or belong to the other assertion profile. Both LP vets
+pass. Full module last passed16:39 UTC and is not repeated within the hour;
+full LP coverage remains the historical89.2% snapshot, not a C++ completion
+percentage. Source units remain48 partial/62 unported.
+
+Next connect retained Suhl ReplaceColumn orchestration to this primitive,
+including bump permutations, row eta solving/publication, degeneration cleanup
+and diagonal tails. Error-check/refinement, dimension extension, scaling/simplex/
+LAR/MPS and original upstream scenarios remain required by the active full goal.

@@ -123948,7 +123948,9 @@
         "pkg/util/lp/sparse_matrix_refine_test.go",
         "pkg/util/lp/sparse_matrix_float_extend.go",
         "pkg/util/lp/sparse_matrix_exact_extend.go",
-        "pkg/util/lp/sparse_matrix_extend_test.go"
+        "pkg/util/lp/sparse_matrix_extend_test.go",
+        "pkg/util/lp/sparse_matrix_float_restore.go",
+        "pkg/util/lp/sparse_matrix_exact_restore.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -124015,7 +124017,14 @@
         "TestLPSparseExtensionIndependentBlockOracle",
         "TestLPSparseExtensionNativeInlineOnes",
         "TestLPSparseExtensionBoundsShrinkAndStoppedOwner",
-        "TestLPSparseExtensionPublicationErrors"
+        "TestLPSparseExtensionPublicationErrors",
+        "TestLPSparseRowRestoreIndependentOracle",
+        "TestLPSparseRowRestoreLiteralWorkspace",
+        "TestLPFloatSparseRowRestoreToleranceAndIEEE",
+        "TestLPExactSparseRowRestoreAllocationCensus",
+        "TestLPSparseRowRestoreBoundsAndPrefixes",
+        "TestLPExactSparseRowRestoreLeavesStoppedCallerOwned",
+        "TestLPExactSparseRowRestoreTinyAndForeign"
       ],
       "conditionals": [
         {
@@ -124252,6 +124261,23 @@
             "TestLPSparseExtensionBoundsShrinkAndStoppedOwner",
             "TestLPSparseExtensionPublicationErrors"
           ]
+        },
+        {
+          "name": "retained floating/mpq physical-row restoration from logical indexed workspace, reverse existing updates/removal, new entries and maximum refresh",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_float_restore.go",
+          "go_targets": [
+            "pkg/util/lp/sparse_matrix_exact_restore.go"
+          ],
+          "tests": [
+            "TestLPSparseRowRestoreIndependentOracle",
+            "TestLPSparseRowRestoreLiteralWorkspace",
+            "TestLPFloatSparseRowRestoreToleranceAndIEEE",
+            "TestLPExactSparseRowRestoreAllocationCensus",
+            "TestLPSparseRowRestoreBoundsAndPrefixes",
+            "TestLPExactSparseRowRestoreLeavesStoppedCallerOwned",
+            "TestLPExactSparseRowRestoreTinyAndForeign"
+          ]
         }
       ],
       "ownership": [
@@ -124281,7 +124307,8 @@
         "Native slices replace graph/vector container internals without numeric copies or universal template adapters. Stored zero terms remain structural graph edges; supplied output prefixes and repeated entries remain literal, not deduplicated. Floating drop is applied only after the full sparse solve and assigns positive zero to dropped fields; exact drop tests zero without rewriting it. Input indices select traversal reachability; absent unindexed fields stay untouched unless reached by that traversal. Left indexed products copy the y operand first, unlike dense left solves. Column recursion requires the retained upper-triangular acyclic domain; no invented cycle repair. Numeric-pair indexed/refinement explicit instantiations lack a live caller in the precise LU branch and are not credited. Floating indexed refinement, remaining sparse diagnostics, complete LU and solvers remain open.",
         "Floating indexed refinement uses source unsigned products and strict sparse/dense density comparison, residual Add without rounding, source traversal-order sparse correction and fixed 1e-14 cleanup. Dense correction updates dimension slots descending and rebuilds the index across all dense slots, including trailing data. The copy constructor retains unindexed data; assignment would not. Precise refinement remains unreachable in retained LU and is not ported. Remaining sparse diagnostics, full LU, solvers and upstream integration remain open.",
         "Retained sparse resize preserves existing workspace flags/values, shortening counters and pivot queue. New int/bool entries are zero, not constructor WorkPivot=-1. Queue Resize changes only its priority/index extent, not the pair directory, including an initially empty directory. Native shrink follows source assertion erasure: headers remain while permutation/work extents shrink; debug rejects before mutation. Counts include stored zeros/duplicates and ignore active counters. Independent120-world/eight-round dense oracle and pooled/direct zero-reservation inline-one tests cover retained behavior.",
-        "Remaining-source caller audit: sparse get_non_zero_column_in_row, full-row/triangular/max/backlink/debug queue/score/print checkers have no retained consumers; triangular checker LU references are comments, and explicit instantiations alone are not callers. Sparse add_columns_at_the_end/delete_column and unadjusted remove_zero_elements helper are definition-only; fill_reachable_indices and adjusted set_row_from_work declarations lack live bodies. Sparse multiply_from_left occurs only in sparse_matrix_with_permutaions_test, whose sole dispatch is after unconditional return finalize(0) in src/test/lp.cpp:3240. These unused methods are not ported or credited as executed upstream tests. Retained right/reverse-left compositions are reached at lu.hpp:480-481,790-791; resize at lu.h:311 and count at lu.h:257. Full LU and retained original driver integration remain open; no whole-unit promotion."
+        "Remaining-source caller audit: sparse get_non_zero_column_in_row, full-row/triangular/max/backlink/debug queue/score/print checkers have no retained consumers; triangular checker LU references are comments, and explicit instantiations alone are not callers. Sparse add_columns_at_the_end/delete_column and unadjusted remove_zero_elements helper are definition-only; fill_reachable_indices and adjusted set_row_from_work declarations lack live bodies. Sparse multiply_from_left occurs only in sparse_matrix_with_permutaions_test, whose sole dispatch is after unconditional return finalize(0) in src/test/lp.cpp:3240. These unused methods are not ported or credited as executed upstream tests. Retained right/reverse-left compositions are reached at lu.hpp:480-481,790-791; resize at lu.h:311 and count at lu.h:257. Full LU and retained original driver integration remain open; no whole-unit promotion.",
+        "Retained Suhl prerequisite sparse_matrix.hpp:337-400 consumes a physical row and logical column workspace. Existing entries run backward; precise by-value local, row assignment, column setter and workspace clearing retain literal owning copy order. New entries run in index order; index clears before maximum refresh. Exact drop tolerance is zero regardless of floating settings. Native tiny nonzero removal can be reinserted by the later indexed append; debug asserts after removal. 800 independent coordinate-map/permutation worlds, duplicate/hidden workspace and strict tolerance/IEEE cases, reached bounds prefixes and six pooled/direct physical refusal campaigns verify matrix-before-caller cleanup and named ownership census. Suhl orchestration and full upstream LU scenarios remain open; no whole-unit promotion."
       ]
     },
     {
@@ -124317,7 +124344,9 @@
         "pkg/util/lp/sparse_matrix_refine_test.go",
         "pkg/util/lp/sparse_matrix_float_extend.go",
         "pkg/util/lp/sparse_matrix_exact_extend.go",
-        "pkg/util/lp/sparse_matrix_extend_test.go"
+        "pkg/util/lp/sparse_matrix_extend_test.go",
+        "pkg/util/lp/sparse_matrix_float_restore.go",
+        "pkg/util/lp/sparse_matrix_exact_restore.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -124384,7 +124413,14 @@
         "TestLPSparseExtensionIndependentBlockOracle",
         "TestLPSparseExtensionNativeInlineOnes",
         "TestLPSparseExtensionBoundsShrinkAndStoppedOwner",
-        "TestLPSparseExtensionPublicationErrors"
+        "TestLPSparseExtensionPublicationErrors",
+        "TestLPSparseRowRestoreIndependentOracle",
+        "TestLPSparseRowRestoreLiteralWorkspace",
+        "TestLPFloatSparseRowRestoreToleranceAndIEEE",
+        "TestLPExactSparseRowRestoreAllocationCensus",
+        "TestLPSparseRowRestoreBoundsAndPrefixes",
+        "TestLPExactSparseRowRestoreLeavesStoppedCallerOwned",
+        "TestLPExactSparseRowRestoreTinyAndForeign"
       ],
       "conditionals": [
         {
@@ -124805,6 +124841,23 @@
             "TestLPSparseExtensionBoundsShrinkAndStoppedOwner",
             "TestLPSparseExtensionPublicationErrors"
           ]
+        },
+        {
+          "name": "retained floating/mpq physical-row restoration from logical indexed workspace, reverse existing updates/removal, new entries and maximum refresh",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_float_restore.go",
+          "go_targets": [
+            "pkg/util/lp/sparse_matrix_exact_restore.go"
+          ],
+          "tests": [
+            "TestLPSparseRowRestoreIndependentOracle",
+            "TestLPSparseRowRestoreLiteralWorkspace",
+            "TestLPFloatSparseRowRestoreToleranceAndIEEE",
+            "TestLPExactSparseRowRestoreAllocationCensus",
+            "TestLPSparseRowRestoreBoundsAndPrefixes",
+            "TestLPExactSparseRowRestoreLeavesStoppedCallerOwned",
+            "TestLPExactSparseRowRestoreTinyAndForeign"
+          ]
         }
       ],
       "ownership": [
@@ -124834,7 +124887,8 @@
         "Native slices replace graph/vector container internals without numeric copies or universal template adapters. Stored zero terms remain structural graph edges; supplied output prefixes and repeated entries remain literal, not deduplicated. Floating drop is applied only after the full sparse solve and assigns positive zero to dropped fields; exact drop tests zero without rewriting it. Input indices select traversal reachability; absent unindexed fields stay untouched unless reached by that traversal. Left indexed products copy the y operand first, unlike dense left solves. Column recursion requires the retained upper-triangular acyclic domain; no invented cycle repair. Numeric-pair indexed/refinement explicit instantiations lack a live caller in the precise LU branch and are not credited. Floating indexed refinement, remaining sparse diagnostics, complete LU and solvers remain open.",
         "Floating indexed refinement uses source unsigned products and strict sparse/dense density comparison, residual Add without rounding, source traversal-order sparse correction and fixed 1e-14 cleanup. Dense correction updates dimension slots descending and rebuilds the index across all dense slots, including trailing data. The copy constructor retains unindexed data; assignment would not. Precise refinement remains unreachable in retained LU and is not ported. Remaining sparse diagnostics, full LU, solvers and upstream integration remain open.",
         "Retained sparse resize preserves existing workspace flags/values, shortening counters and pivot queue. New int/bool entries are zero, not constructor WorkPivot=-1. Queue Resize changes only its priority/index extent, not the pair directory, including an initially empty directory. Native shrink follows source assertion erasure: headers remain while permutation/work extents shrink; debug rejects before mutation. Counts include stored zeros/duplicates and ignore active counters. Independent120-world/eight-round dense oracle and pooled/direct zero-reservation inline-one tests cover retained behavior.",
-        "Remaining-source caller audit: sparse get_non_zero_column_in_row, full-row/triangular/max/backlink/debug queue/score/print checkers have no retained consumers; triangular checker LU references are comments, and explicit instantiations alone are not callers. Sparse add_columns_at_the_end/delete_column and unadjusted remove_zero_elements helper are definition-only; fill_reachable_indices and adjusted set_row_from_work declarations lack live bodies. Sparse multiply_from_left occurs only in sparse_matrix_with_permutaions_test, whose sole dispatch is after unconditional return finalize(0) in src/test/lp.cpp:3240. These unused methods are not ported or credited as executed upstream tests. Retained right/reverse-left compositions are reached at lu.hpp:480-481,790-791; resize at lu.h:311 and count at lu.h:257. Full LU and retained original driver integration remain open; no whole-unit promotion."
+        "Remaining-source caller audit: sparse get_non_zero_column_in_row, full-row/triangular/max/backlink/debug queue/score/print checkers have no retained consumers; triangular checker LU references are comments, and explicit instantiations alone are not callers. Sparse add_columns_at_the_end/delete_column and unadjusted remove_zero_elements helper are definition-only; fill_reachable_indices and adjusted set_row_from_work declarations lack live bodies. Sparse multiply_from_left occurs only in sparse_matrix_with_permutaions_test, whose sole dispatch is after unconditional return finalize(0) in src/test/lp.cpp:3240. These unused methods are not ported or credited as executed upstream tests. Retained right/reverse-left compositions are reached at lu.hpp:480-481,790-791; resize at lu.h:311 and count at lu.h:257. Full LU and retained original driver integration remain open; no whole-unit promotion.",
+        "Retained Suhl prerequisite sparse_matrix.hpp:337-400 consumes a physical row and logical column workspace. Existing entries run backward; precise by-value local, row assignment, column setter and workspace clearing retain literal owning copy order. New entries run in index order; index clears before maximum refresh. Exact drop tolerance is zero regardless of floating settings. Native tiny nonzero removal can be reinserted by the later indexed append; debug asserts after removal. 800 independent coordinate-map/permutation worlds, duplicate/hidden workspace and strict tolerance/IEEE cases, reached bounds prefixes and six pooled/direct physical refusal campaigns verify matrix-before-caller cleanup and named ownership census. Suhl orchestration and full upstream LU scenarios remain open; no whole-unit promotion."
       ]
     },
     {
