@@ -37176,3 +37176,24 @@ Source inventory/evidence/no-generics and diff checks pass. Regenerated graph
 remains64 packages with unchanged edges and the two new primal production files.
 The last completed full native module snapshot remains19:01 UTC89.8% LP coverage,
 predating all core additions; the next hourly native verification will refresh it.
+
+
+### Hourly native module verification after primal core initialization — 2026-10-10
+
+The complete native module suite passed20:03 UTC. LP ran332.181s with10056/11174
+statements covered (90.0%), including all current floating primal preparation,
+core initialization/iteration/value/pivot/numerical-update layers and primal
+initialization/pricing. Other unchanged packages reused valid Go test cache
+entries. Authoritative log/profile:
+/mnt/oldrog/tmp/g3-primal-core-module-native.{log,cover}.
+This replaces the historical19:01 native89.8% snapshot. Native per-file coverage
+matches focused profiles: primal initialization158/165 (95.8%), pricing89/99
+(89.9%), values118/124 (95.2%), numerical updates79/90 (87.8%), pivot25/26 (96.2%),
+core initialization135/152 (88.8%), iteration92/97 (94.8%). Debug/checked components
+passed focused tests/vet; no full debug repeat is performed for an aggregate.
+
+The original test_lp_0/test_lp_1 smoke drivers invoke solve without asserting an
+answer. Their complete ports still require the remaining constructor/optimization
+paths and strengthened independent optimum assertions. No original-driver or
+whole-source-unit completion credit is added. LP remains65 partial/45 unported;
+Go statement coverage does not measure those unported algorithms.

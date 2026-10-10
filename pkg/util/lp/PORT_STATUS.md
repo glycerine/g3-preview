@@ -73,14 +73,14 @@ code that has not been ported.
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
-The complete native module suite passed at19:01 UTC on2026-10-10, including
-all LU, floating scaler, common solver and presolve additions through that run.
-This full snapshot predates floating primal preparation. LP passed
-in330.403s with **89.8%** statement coverage (**9259/10316 existing Go statements**).
-Other results: numeral93.895s, AST20.506s and polynomial33.270s. Authoritative
-log/profile: `/mnt/oldrog/tmp/g3-presolve-module-native.log` and
-`/mnt/oldrog/tmp/g3-presolve-module-native.cover`. This replaces the historical
-17:57 native snapshot; it does not measure unported C++ algorithms.
+The complete native module suite passed at20:03 UTC on2026-10-10, including
+all current floating primal preparation, core initialization/iteration/value/pivot/
+numerical updates and primal initialization/pricing. LP passed in332.181s with
+**90.0%** statement coverage (**10056/11174 existing Go statements**). Other
+unchanged packages reused valid Go test cache entries. Authoritative log/profile:
+`/mnt/oldrog/tmp/g3-primal-core-module-native.log` and
+`/mnt/oldrog/tmp/g3-primal-core-module-native.cover`. This replaces the historical
+19:01 snapshot; it does not measure unported C++ algorithms.
 
 Current lifecycle/upstream numerical checks pass0.812s native/1.294s debug.
 Same-manager re-entry after a source Add/SubMul allocation refusal preserves
@@ -164,6 +164,7 @@ and coverage: `/mnt/oldrog/tmp/g3-presolve-{native,debug}.{log,cover}`.
 
 Floating primal preparation plus floating presolve/solver/column/scaler/static
 and LU regressions pass0.769s native/0.766s combined debug/checked. Logs and
-profiles: `/mnt/oldrog/tmp/g3-primal-prepare-{native,debug}.{log,cover}`. No
-within-hour full native repeat is needed; the19:01 snapshot predates this addition.
-Preparation constructs no core solver and executes no optimization loop.
+profiles: `/mnt/oldrog/tmp/g3-primal-prepare-{native,debug}.{log,cover}`. The
+current full native snapshot includes primal preparation and all core additions.
+Preparation methods initialize matrix/vectors; current integration tests construct
+the actual primal core and execute its initialization. Optimization remains open.
