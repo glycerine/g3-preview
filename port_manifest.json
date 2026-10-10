@@ -8933,7 +8933,8 @@
         "pkg/ast/ast_arith_numeral_read.go",
         "pkg/ast/ast_arith_numeral_read_test.go",
         "pkg/ast/ast_arith_numeral_invocation.go",
-        "pkg/ast/ast_arith_numeral_invocation_test.go"
+        "pkg/ast/ast_arith_numeral_invocation_test.go",
+        "pkg/ast/ast_plugin_ref_cache.go"
       ],
       "tests": [
         "TestASTArithmeticSourceRegistrationAndDeclarations",
@@ -9160,7 +9161,8 @@
         "pkg/ast/rewriter/bv_rewriter_bv2int.go",
         "pkg/ast/rewriter/bv_rewriter_bv2int_test.go",
         "pkg/ast/ast_bv_bv2int_numerals.go",
-        "pkg/ast/ast_bv_bv2int_numerals_test.go"
+        "pkg/ast/ast_bv_bv2int_numerals_test.go",
+        "pkg/ast/ast_plugin_ref_cache.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
@@ -13010,7 +13012,8 @@
         "pkg/ast/ast_numeric_util_families.go",
         "pkg/ast/ast_numeric_util_families_test.go",
         "pkg/ast/ast_bv_sign_bit_invocation_test.go",
-        "pkg/ast/ast_bv_signed_normalization_invocation_test.go"
+        "pkg/ast/ast_bv_signed_normalization_invocation_test.go",
+        "pkg/ast/ast_plugin_ref_cache.go"
       ],
       "tests": [
         "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
@@ -13508,7 +13511,8 @@
         "pkg/ast/ast_bv_arguments_test.go",
         "pkg/ast/ast_core_plugin_dispatch.go",
         "pkg/ast/ast_bv_concat_arguments_test.go",
-        "pkg/ast/ast_bv_add_arguments_test.go"
+        "pkg/ast/ast_bv_add_arguments_test.go",
+        "pkg/ast/ast_plugin_ref_cache.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
@@ -14974,7 +14978,8 @@
         "pkg/ast/ast_format.go",
         "pkg/ast/ast_format_source_test.go",
         "pkg/ast/ast_format_buffer.go",
-        "pkg/ast/ast_format_buffer_source_test.go"
+        "pkg/ast/ast_format_buffer_source_test.go",
+        "pkg/ast/ast_format_flat.go"
       ],
       "tests": [
         "TestASTFormatSourcePluginAndLiteralPrimitives",
@@ -14983,7 +14988,8 @@
         "TestASTFormatSourceFlatLiteralChoiceAndSharedChildren",
         "TestASTFormatSourceEveryFlatAllocationAndImmediateGraph",
         "TestASTFormatFlatHistorySurvivesNativeSourceFinalize",
-        "TestASTFormatNativeBufferOwnsInternedSpelling"
+        "TestASTFormatNativeBufferOwnsInternedSpelling",
+        "TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation"
       ],
       "conditionals": [
         {
@@ -15038,7 +15044,8 @@
             "TestASTFormatSourceLexicalParameterAndCopiedInfo",
             "TestASTFormatSourceFlatLiteralChoiceAndSharedChildren",
             "TestASTFormatSourceEveryFlatAllocationAndImmediateGraph",
-            "TestASTFormatFlatHistorySurvivesNativeSourceFinalize"
+            "TestASTFormatFlatHistorySurvivesNativeSourceFinalize",
+            "TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation"
           ]
         },
         {
@@ -15055,7 +15062,8 @@
         "FormatBuffer accepts a standard bytes.Buffer. The existing symbol interner owns its immutable spelling before caller buffer mutation or reuse; no custom buffer owner, backing allocation or destructor is simulated."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
+        "Retained format flat recursion now borrows native []astNodeRef todo, []ASTHandle transformed arguments and a lookup-only map[astNodeRef]astNodeRef cache. Stack and child iteration preserve source order; the cache never iterates. Removed cache capacity/probing/rehash/pending-growth and vector backing/refusal emulation, plus unused IgnorePatterns=true results2 storage and obsolete AppArguments format-vector representation. Actual recursion header, AST construction, source UNREACHABLE guards and failed-frame history through enclosing teardown remain. A deep shared graph with 129 distinct leaves grows native storage with only the actual frame reservation in release; exact leaf reference counts and original CHOICE arg0 behavior remain. Original allocation campaign now covers actual frame/factory reservations, and history test stops at real line-break-to-string construction. Shared arithmetic/BV cache storage remains separately pending; no generic container, STL or whole-unit completion credit is added."
       ]
     },
     {
@@ -15063,8 +15071,13 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/ast_format_flat.go",
+        "pkg/ast/ast_format_source_test.go"
+      ],
+      "tests": [
+        "TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -15085,7 +15098,9 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Retained format flat recursion now borrows native []astNodeRef todo, []ASTHandle transformed arguments and a lookup-only map[astNodeRef]astNodeRef cache. Stack and child iteration preserve source order; the cache never iterates. Removed cache capacity/probing/rehash/pending-growth and vector backing/refusal emulation, plus unused IgnorePatterns=true results2 storage and obsolete AppArguments format-vector representation. Actual recursion header, AST construction, source UNREACHABLE guards and failed-frame history through enclosing teardown remain. A deep shared graph with 129 distinct leaves grows native storage with only the actual frame reservation in release; exact leaf reference counts and original CHOICE arg0 behavior remain. Original allocation campaign now covers actual frame/factory reservations, and history test stops at real line-break-to-string construction. Shared arithmetic/BV cache storage remains separately pending; no generic container, STL or whole-unit completion credit is added."
+      ]
     },
     {
       "path": "src/ast/fpa/CMakeLists.txt",
@@ -18849,8 +18864,13 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/ast_format_flat.go",
+        "pkg/ast/ast_format_source_test.go"
+      ],
+      "tests": [
+        "TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -18865,15 +18885,22 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Retained format flat recursion now borrows native []astNodeRef todo, []ASTHandle transformed arguments and a lookup-only map[astNodeRef]astNodeRef cache. Stack and child iteration preserve source order; the cache never iterates. Removed cache capacity/probing/rehash/pending-growth and vector backing/refusal emulation, plus unused IgnorePatterns=true results2 storage and obsolete AppArguments format-vector representation. Actual recursion header, AST construction, source UNREACHABLE guards and failed-frame history through enclosing teardown remain. A deep shared graph with 129 distinct leaves grows native storage with only the actual frame reservation in release; exact leaf reference counts and original CHOICE arg0 behavior remain. Original allocation campaign now covers actual frame/factory reservations, and history test stops at real line-break-to-string construction. Shared arithmetic/BV cache storage remains separately pending; no generic container, STL or whole-unit completion credit is added."
+      ]
     },
     {
       "path": "src/ast/recurse_expr_def.h",
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/ast_format_flat.go",
+        "pkg/ast/ast_format_source_test.go"
+      ],
+      "tests": [
+        "TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -18888,7 +18915,9 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Retained format flat recursion now borrows native []astNodeRef todo, []ASTHandle transformed arguments and a lookup-only map[astNodeRef]astNodeRef cache. Stack and child iteration preserve source order; the cache never iterates. Removed cache capacity/probing/rehash/pending-growth and vector backing/refusal emulation, plus unused IgnorePatterns=true results2 storage and obsolete AppArguments format-vector representation. Actual recursion header, AST construction, source UNREACHABLE guards and failed-frame history through enclosing teardown remain. A deep shared graph with 129 distinct leaves grows native storage with only the actual frame reservation in release; exact leaf reference counts and original CHOICE arg0 behavior remain. Original allocation campaign now covers actual frame/factory reservations, and history test stops at real line-break-to-string construction. Shared arithmetic/BV cache storage remains separately pending; no generic container, STL or whole-unit completion credit is added."
+      ]
     },
     {
       "path": "src/ast/reg_decl_plugins.cpp",

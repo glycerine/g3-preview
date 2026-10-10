@@ -8,8 +8,6 @@ type AppArguments struct {
 	app            ASTHandle
 	appOwner       *ASTManager
 	slice          []ASTHandle
-	format         *astFormatRefVector
-	formatOwner    *ASTManager
 	span           ASTLiteralVectorSpan
 	count          uint32
 	raw            bool
@@ -32,13 +30,6 @@ func (a AppArguments) at(i uint32) (ASTHandle, error) {
 		}
 		child, e := m.readInternal(app.args, i)
 		return m.external(child), e
-	}
-	if a.format != nil {
-		r, e := a.format.at(i)
-		if e != nil {
-			return ASTHandle{}, e
-		}
-		return a.formatOwner.external(r), nil
 	}
 	if a.raw {
 		return a.span.At(i)

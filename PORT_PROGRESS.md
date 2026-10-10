@@ -34319,3 +34319,47 @@ Formatting flat traversal still uses source-shaped vectors and probing cache;
 arithmetic/BV plugin caches share that vector type. Those retained consumers
 need native slices/maps, followed by the remaining reference-specialization
 audits, internal util cycle cleanup and complete root util subpackage split.
+
+## Native formatting flat traversal slices and lookup cache
+
+The retained flat_visitor/recurse_expr specialization now uses []astNodeRef for
+its borrowed traversal stack, []ASTHandle for transformed child arguments and
+a lookup-only map[astNodeRef]astNodeRef. Source child/postorder schedules and
+CHOICE returning original arg0 remain. The map never iterates, so no insertion
+order is required. Removed probing/capacity/rehash/pending-growth storage and
+vector backing/refusal emulation from the traversal, plus unused results2 for
+the actual IgnorePatterns=true instantiation. Removed the obsolete format-vector
+AppArguments representation; retained factories borrow SliceArguments directly.
+
+Actual recursion header, AST constructors, invalid-node/UNREACHABLE guards and
+failed-frame history survive. Native members clear on source destruction; the
+real failed frame's header/history remains until enclosing owner teardown. The
+history test now refuses actual line-break-to-string construction rather than
+an obsolete cache reservation. Existing wide allocation campaign still checks
+every reached actual frame/factory reservation and immediate complete graphs;
+it no longer requires a fabricated number of collection growth reservations.
+
+New integration builds a deep shared graph with 129 distinct leaves and 257
+CHOICE levels. Two traversals grow native storage with only the actual frame
+reservation available in native builds, return original arg0, preserve exact
+leaf reference counts and leave no successful frame/history or budget change.
+Debug retains actual factory well-sorted checks. Existing shared-child order,
+format group and pretty-printer integration checks remain. Remaining arithmetic/
+BV users of the source-shaped cache vector are isolated in ast_plugin_ref_cache.go
+for their next migration; this change does not credit their pending work.
+
+Validation: focused native formatting tests passed (0.016s); final full debug
+AST passed (21.036s). The hourly full native module suite passed at approximately
+05:02 UTC Oct10; log /mnt/oldrog/tmp/g3-native-format-traversal-module-full.log.
+AST/rewriter/polynomial/root util times:19.835s/11.162s/31.400s/91.331s. AST vet,
+manifest, gofmt and diff checks passed. Counts unchanged:2102 units/677 APIs:
+62 ported,283 partial,1729 unported,two dead/deleted. No generic container/STL
+internals, collection-refusal geometry or whole-unit completion credit added.
+
+A receiver-aware type audit also identified169 distinct private symbol/file
+crossings between the43 root util dependency components, recorded in
+/mnt/oldrog/tmp/g3-util-private-boundaries.json. These boundaries require concrete
+package grouping or explicit API changes; moving individual SCCs alone is not a
+verified package split. Build profiles/tests and cycles after grouping still
+require audit. Arithmetic/BV caches, remaining reference specializations,
+internal util boundaries and the complete requested root split remain unfinished.

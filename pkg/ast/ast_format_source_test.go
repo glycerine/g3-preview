@@ -219,7 +219,7 @@ func TestASTFormatSourceEveryFlatAllocationAndImmediateGraph(t *testing.T) {
 		b.FailAfter(ordinal)
 		flat, e := m.FormatFlat(root)
 		if b.Used() != m.Stats().AllocatedBytes {
-			t.Fatal("actual cache/vector/failed-frame graph before lift", ordinal, b.Used(), m.Stats())
+			t.Fatal("actual AST and failed-frame graph before lift", ordinal, b.Used(), m.Stats())
 		}
 		if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
 			t.Fatal(ordinal, e)
@@ -247,8 +247,8 @@ func TestASTFormatSourceEveryFlatAllocationAndImmediateGraph(t *testing.T) {
 			break
 		}
 	}
-	if first < 8 {
-		t.Fatal("cache grow and all source vector allocations reached", first)
+	if first < 1 {
+		t.Fatal("actual frame/factory reservations were not exercised", first)
 	}
 	t.Log("first success", first)
 }
@@ -258,14 +258,14 @@ func TestASTFormatFlatHistorySurvivesNativeSourceFinalize(t *testing.T) {
 	b := arena.NewBudget(1 << 30)
 	m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
 	astTestMust(t, e)
-	root, e := m.FormatString("flat retained history")
+	root, e := m.FormatLineBreak()
 	astTestMust(t, e)
 	f, e := m.GetFormatManager()
 	astTestMust(t, e)
 	b.FailAfter(1)
 	_, body := m.FormatFlat(root)
 	if !errors.Is(body, arena.ErrInjectedFailure) {
-		t.Fatal("real cache allocation refusal", body)
+		t.Fatal("actual AST factory allocation refusal", body)
 	}
 	frame := f.formatFrames
 	if frame == nil || frame.bodyCause != body || frame.header == 0 {
@@ -288,5 +288,58 @@ func TestASTFormatFlatHistorySurvivesNativeSourceFinalize(t *testing.T) {
 	astTestMust(t, m.Close())
 	if frame.header != 0 || b.Used() != 0 {
 		t.Fatal("history retires only at owner end", frame.header, b.Used())
+	}
+}
+
+func TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation(t *testing.T) {
+	m := astTestManager(t)
+	f, e := m.GetFormatManager()
+	astTestMust(t, e)
+	var leaves []ASTHandle
+	for i := uint32(0); i < 129; i++ {
+		h, e := m.FormatUnsigned(i)
+		astTestMust(t, e)
+		leaves = append(leaves, h)
+	}
+	root := leaves[0]
+	var expected ASTHandle
+	branches := append(append([]ASTHandle(nil), leaves[1:]...), leaves...)
+	for _, leaf := range branches {
+		expected = root
+		root, e = m.FormatChoice(root, leaf)
+		astTestMust(t, e)
+	}
+	refs := make([]uint32, len(leaves))
+	for i, h := range leaves {
+		refs[i], e = f.GetRefCount(h)
+		astTestMust(t, e)
+	}
+	before := m.Stats()
+	used := m.BudgetField.Used()
+	for attempt := 0; attempt < 2; attempt++ {
+		// The actual recursion frame remains fallible. Native map/slice growth and
+		// cached native-profile factories need no subsequent arena reservation.
+		if !ASTSourceDebug {
+			m.BudgetField.FailAfter(1)
+		}
+		flat, e := m.FormatFlat(root)
+		m.BudgetField.FailAfter(-1)
+		astTestMust(t, e)
+		if flat != expected {
+			t.Fatal("source CHOICE returns original first alternative", flat, expected)
+		}
+		if f.formatFrames != nil {
+			t.Fatal("successful traversal retained frame history")
+		}
+		for i, h := range leaves {
+			got, e := f.GetRefCount(h)
+			astTestMust(t, e)
+			if got != refs[i] {
+				t.Fatal("borrowed traversal changed reference counts", i, got, refs[i])
+			}
+		}
+		if !ASTSourceDebug && (m.BudgetField.Used() != used || m.Stats() != before) {
+			t.Fatal("native traversal charged container backing")
+		}
 	}
 }
