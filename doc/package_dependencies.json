@@ -1189,6 +1189,8 @@
         "lu_exact.go",
         "lu_exact_factorization.go",
         "lu_exact_solve.go",
+        "lu_extend_exact.go",
+        "lu_extend_float.go",
         "lu_float.go",
         "lu_float_solve.go",
         "lu_refine_exact.go",

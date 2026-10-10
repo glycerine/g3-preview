@@ -36674,3 +36674,44 @@ in source order, then resize owned extension workspace and replace affected
 basis columns. RWave is reinitialized by the subsequent update, not by the
 dimension helper. Exact failures retain actual child-owned numerical prefixes.
 Use native unordered maps for the affected-column set, with no STL port.
+
+
+### Retained LU dimension extension — 2026-10-10
+
+Ported lu.h:308-366 for actual floating and mpq/numeric_pair consumers.
+Reachability audit finds lar_core_solver.h:74-76 and lar_solver.h:853-855,902-925;
+scalar mpq/mpq has no retained extension caller, so that unused specialization
+is excluded. Native unordered maps represent affected columns, without STL
+iteration/layout emulation. Publish Dim, U resize, typed Q/R resize and row work
+in source order; resize owned extension workspace before replacements. RWave
+is reinitialized by the update, not dimension adjustment. Source status stops
+the set traversal at degeneration. Dense-tail query uses real concrete tails;
+caller refactor-at200/dense-tail orchestration remains required in the LAR port.
+
+24 independent rational basis worlds each grow twice,48 growth rounds per type.
+Independent original-matrix products verify known floating and exact-pair column
+solutions plus dense/indexed rows, factorization identity, affected-column sets,
+all dimensions and consumed work. Nonbasic entries exercise heading skips. The
+original test_small_lu now executes all four replacements and its exact two-row
+setup, with independent mathematical assertions. Its diagnostic output/full
+registered --test_lu driver is not credited. Actual six-row dense factorizations
+verify the caller refactor query; empty/negative/short headings, shrinking,
+row/extension work errors, closed/stopped owners and degeneration verify prefixes.
+
+Two pooled/direct extension campaigns walk actual physical refusals through
+success (22 native/40 debug in the final run; unordered set order may vary counts).
+Three direct campaigns stop actual U or Q/R buffer work before extension and
+verify Dim-before-U-before-Q-before-R prefixes, delegated pending calls and
+source/named-cell/direct-object census after Close. No fake allocator/callback
+or LU-wide numerical receipt capture is introduced.
+
+Final extension and floating/exact initial-LU regression checks pass2.419s
+native/2.911s debug. Floating extension53/58 (91.4%)/55/58 (94.8%); exact pair
+57/61 (93.4%)/60/61 (98.4%). Remaining statements are opposite-profile assertions,
+invariant-protected bounds or floating child-error propagation. Floating core
+now107/130 (82.3%) native/111/130 (85.4%) debug. Both vets, source inventory,
+evidence/no-generics and diff gates pass. Full native module last passed17:57
+UTC; no within-hour repeat. The full LP89.5% coverage snapshot predates extension.
+LP stays48 partial/62 unported units. Next finish remaining retained LU scenarios
+and lifecycle integration, followed by scaling, simplex, LAR/bounds/evidence,
+MPS and complete upstream test drivers required by the full active goal.

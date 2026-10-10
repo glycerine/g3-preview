@@ -2,11 +2,11 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 89.5,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native module tests passed2026-10-10 at17:57 UTC, including LP327.475s with89.5% coverage (8499/9501 statements), exact/floating LU updates, columns and row refinement. Row refinement is90.9% floating and100% precise routing in both focused native/debug profiles. Complete debug coverage predates sparse basis storage; current component coverage is recorded in PORT_STATUS.md. Dimension extension, complete upstream drivers and full solver integration remain open.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Last complete native module tests passed2026-10-10 at17:57 UTC, LP327.475s with89.5% (8499/9501); this full snapshot predates dimension extension. Current floating/exact-pair extension passes native/debug focused checks (91.4%/94.8% floating,93.4%/98.4% exact); initial LU/floating regression checks also pass. Component coverage is recorded in PORT_STATUS.md. Complete debug coverage predates sparse basis storage. Remaining complete upstream drivers and full solver/scaling/LAR integration stay open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
-    "remaining LU dimension extension, complete retained upstream drivers and priority-queue solver integration",
+    "remaining LU upstream scenarios, factorization lifecycle and full solver/priority-queue integration",
     "scaling and random updates",
     "primal/dual simplex and LAR solvers",
     "bounds/evidence, constraint scopes and explanations",
@@ -873,7 +873,9 @@
         "pkg/util/lp/lu_update_float.go",
         "pkg/util/lp/lu_update_exact.go",
         "pkg/util/lp/lu_refine_float.go",
-        "pkg/util/lp/lu_refine_exact.go"
+        "pkg/util/lp/lu_refine_exact.go",
+        "pkg/util/lp/lu_extend_float.go",
+        "pkg/util/lp/lu_extend_exact.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -930,7 +932,13 @@
         "TestLPExactLURowRefinementAllocationCensus",
         "TestLPLURowRefinementOwnerGuards",
         "TestLPFloatLURowRefinementBoundsAndPrefixes",
-        "TestLPExactLURowRefinementLeavesStoppedCallerOwned"
+        "TestLPExactLURowRefinementLeavesStoppedCallerOwned",
+        "TestLPLUExtensionIndependentBasisOracle",
+        "TestLPFloatLUExtensionUpstreamSmallLU",
+        "TestLPLUExtensionDenseRefactorQuery",
+        "TestLPExactLUExtensionAllocationCensus",
+        "TestLPLUExtensionLiteralGuardsAndPrefixes",
+        "TestLPExactLUExtensionRetainsStoppedChildren"
       ]
     },
     {

@@ -10,6 +10,7 @@ type FloatLU struct {
 	Dense           *FloatSquareDenseSubmatrix // borrowed after publication into Tail
 	Tail            []FloatTailMatrix
 	rowEtaWork      *IndexedFloatVector
+	wExtension      *IndexedFloatVector
 	yCopy           *IndexedFloatVector
 	ii              *IndexedUintVector
 	Settings        *Settings // borrowed
@@ -28,6 +29,7 @@ func NewFloatLU(a *FloatStaticMatrix, basis []uint32, s *Settings) (m *FloatLU, 
 		return m, err
 	}
 	m.rowEtaWork = NewIndexedFloatVector(n)
+	m.wExtension = NewIndexedFloatVector(0)
 	m.yCopy = NewIndexedFloatVector(0)
 	m.ii = NewIndexedUintVector(0)
 	if err = luDebugBasis(n, a.ColumnCount(), basis); err != nil {
@@ -206,6 +208,7 @@ func (m *FloatLU) Close() error {
 	m.R = nil
 	m.RWave = nil
 	m.rowEtaWork = nil
+	m.wExtension = nil
 	m.yCopy = nil
 	m.ii = nil
 	m.closed = true
