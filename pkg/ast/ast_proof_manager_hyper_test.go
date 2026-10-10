@@ -108,15 +108,16 @@ func TestASTProofHyperActualParametersAppendAndDisabled(t *testing.T) {
 	}
 }
 
-func TestASTProofHyperUnusedFactsVectorFailsBeforeConclusionDiagnostic(t *testing.T) {
+func TestASTProofHyperPremiseValidationBeforeParameterAllocation(t *testing.T) {
 	m := astTestManager(t)
-	ps, _, substs := hyperTestInputs(t, m)
+	ps, f, substs := hyperTestInputs(t, m)
+	ps[1] = ASTHandle{}
 	before := m.BudgetField.Used()
 	m.BudgetField.FailAfter(0)
-	_, e := m.MkProofHyperResolve(ps, ASTHandle{}, []ASTProofPosition{{}}, substs)
+	_, e := m.MkProofHyperResolve(ps, f, []ASTProofPosition{{}}, substs)
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || m.BudgetField.Used() != before {
-		t.Fatal("unused fmls is first allocation, before Bool assertion", e, m.BudgetField.Used(), before)
+	if !errors.Is(e, ErrASTHandle) || m.BudgetField.Used() != before {
+		t.Fatal("premise validation must precede actual parameter allocation", e, m.BudgetField.Used(), before)
 	}
 }
 
@@ -153,25 +154,7 @@ func TestASTProofHyperReaderPremiseIncrementBeforeGrowthFailure(t *testing.T) {
 	astTestMust(t, m.DecRef(ps[0]))
 }
 
-func TestASTProofHyperLexicalRawVectorsAndCache(t *testing.T) {
-	for after := int64(0); after < 5; after++ {
-		m := astTestManager(t)
-		ps, f, _ := hyperTestInputs(t, m)
-		empty, e := m.NewRefVector()
-		astTestMust(t, e)
-		before := m.BudgetField.Used()
-		nodes, parameters, infos := m.liveNodes, m.liveParameters, m.liveInfos
-		// With two premises and an empty substitution, the first five
-		// reserves are: fmls(2), sorts(2), args(2), sorts(3), args(3).
-		// No declaration/parameter action occurs before these finish.
-		m.BudgetField.FailAfter(after)
-		_, e = m.MkProofHyperResolve(ps, f, nil, []ASTRefVector{empty})
-		m.BudgetField.FailAfter(-1)
-		if !errors.Is(e, arena.ErrInjectedFailure) || m.BudgetField.Used() != before || m.liveNodes != nodes || m.liveParameters != parameters || m.liveInfos != infos {
-			t.Fatal("lexical raw vectors leak or omit source growth", after, e, m.BudgetField.Used(), before)
-		}
-		astTestMust(t, m.DelRefVector(&empty))
-	}
+func TestASTProofHyperNativeArgumentsAndCache(t *testing.T) {
 	m := astTestManager(t)
 	ps, f, _ := hyperTestInputs(t, m)
 	empty, e := m.NewRefVector()
@@ -179,9 +162,16 @@ func TestASTProofHyperLexicalRawVectorsAndCache(t *testing.T) {
 	defer m.DelRefVector(&empty)
 	p, e := m.MkProofHyperResolve(ps[:1], f, nil, []ASTRefVector{empty})
 	astTestMust(t, e)
+	before := m.BudgetField.Used()
+	// Debug builds still execute the actual factory's well-sorted validation,
+	// which has its own allocations independently of proof scratch storage.
+	if !ASTSourceDebug {
+		m.BudgetField.FailAfter(0)
+	}
 	q, e := m.MkProofHyperResolve(ps[:1], f, nil, []ASTRefVector{empty})
+	m.BudgetField.FailAfter(-1)
 	astTestMust(t, e)
-	if p != q {
+	if p != q || !ASTSourceDebug && m.BudgetField.Used() != before {
 		t.Fatal("actual structural interning")
 	}
 	// Zero-parameter hyper declarations use the source fixed cache, whose
@@ -424,7 +414,8 @@ func TestASTProofHyperBuilderAllFailurePrefixesImmediateOwnership(t *testing.T) 
 		// Inspect immediately, before Del/Close/String: completed declaration
 		// publication may legitimately survive a subsequent app failure.
 		// Every surviving parameter must belong to a published node's info;
-		// lexical fmls/sorts/args/params arrays must already be refunded.
+		// lexical parameter ownership must already be retired; argument slices
+		// create no numeric-arena reservations.
 		ownedInfos, ownedParameters := uint32(0), uint32(0)
 		for slot := uint32(1); slot < m.nextNode; slot++ {
 			r := m.nodeAt(slot)
@@ -622,7 +613,7 @@ func TestASTProofHyperZeroPremisesAndDebugGuardOrder(t *testing.T) {
 		_, e = m.MkProofHyperResolve(ps, f, nil, nil)
 		m.BudgetField.FailAfter(-1)
 		if !errors.Is(e, ErrASTDomain) || m.BudgetField.Used() != before {
-			t.Fatal("position count assertion precedes fmls allocation", e)
+			t.Fatal("position count assertion precedes parameter construction", e)
 		}
 	}
 }

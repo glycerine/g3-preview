@@ -8,8 +8,8 @@ import (
 
 type ASTProofPosition struct{ First, Second uint32 }
 
-// MkProofHyperResolve preserves all four lexical source vectors, including
-// fmls and sorts, whose values are otherwise unused. Inputs are borrowed.
+// MkProofHyperResolve validates premise facts and assembles native argument/
+// parameter slices. Inputs are borrowed; unused source scratch is omitted.
 func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHandle, positions []ASTProofPosition, substitutions []ASTRefVector) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
@@ -18,17 +18,12 @@ func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHan
 	if uint64(len(premises)) > math.MaxUint32 || uint64(len(positions)) > math.MaxUint32 || uint64(len(substitutions)) > math.MaxUint32 {
 		return ASTHandle{}, arena.ErrBounds
 	}
-	var fmls astProofRawArguments
-	defer fmls.close(m)
 	if ASTSourceDebug && uint64(len(positions))+1 != uint64(len(substitutions)) {
 		return ASTHandle{}, ErrASTDomain
 	}
 	for _, p := range premises {
-		f, e := m.proofFact(p)
+		_, e := m.proofFact(p)
 		if e != nil {
-			return ASTHandle{}, e
-		}
-		if e = fmls.push(m, f); e != nil {
 			return ASTHandle{}, e
 		}
 	}
@@ -69,25 +64,9 @@ func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHan
 			params = append(params, p)
 		}
 	}
-	var sorts astProofRawArguments
-	defer sorts.close(m)
-	var args astProofRawArguments
-	defer args.close(m)
-	for _, p := range premises {
-		if e := sorts.push(m, m.external(m.proofSort)); e != nil {
-			return ASTHandle{}, e
-		}
-		if e := args.push(m, p); e != nil {
-			return ASTHandle{}, e
-		}
-	}
-	if e := sorts.push(m, m.external(m.boolSort)); e != nil {
-		return ASTHandle{}, e
-	}
-	if e := args.push(m, conclusion); e != nil {
-		return ASTHandle{}, e
-	}
-	r, e := m.mkFamilyApp(0, ASTPrHyperResolve, params, args.values)
+	args := append([]ASTHandle(nil), premises...)
+	args = append(args, conclusion)
+	r, e := m.mkFamilyApp(0, ASTPrHyperResolve, params, args)
 	if e != nil {
 		return ASTHandle{}, e
 	}

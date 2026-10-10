@@ -34190,3 +34190,36 @@ retained ast_ext2/psort_nw instantiations, so their actual collection consumers
 still need migration. Proof hyper-resolution and binding storage also remain.
 The complete external-consumer migration, internal util cycles and requested
 root util subpackage split are not complete.
+
+## Direct proof binding slices and native hyper-resolution arguments
+
+MatchProofQuantInstantiation now takes *[]ASTHandle and appends borrowed
+expression handles directly. Removed ASTProofBindings, its owner/header lifecycle
+and source pointer-vector storage. Source fact assignment still precedes the
+empty-binding debug assertion; parameter validation remains ordered and preserves
+completed append prefixes. Updated the real decoder consumer to native slices.
+Forty-binding decoding grows with arena reservations disabled, preserves order,
+retains no additional AST references and keeps release append/debug-empty behavior.
+A malformed integer parameter after a valid AST parameter verifies earlier output
+publication and nil-output guard order.
+
+Hyper-resolution builder now uses []ASTHandle arguments and []ASTParameter owners.
+Removed unused fmls/sorts storage, retaining actual premise fact validation before
+conclusion/parameter processing. Deleted astProofRawArguments and its probing-free
+but still source-capacity growth/refusal emulation. Replaced obsolete raw-vector
+failure tests with invalid-premise ordering and real structural cache coverage.
+The cached native-profile build succeeds with arena reservations disabled; debug
+builds still execute the actual factory's separately allocating well-sorted checks.
+Actual parameter/factory ownership campaigns remain and pass.
+
+Validation: focused native proof reader/hyper checks passed (0.062s), final debug
+focused checks passed (0.055s). Full native AST/rewriter/tactic/model/SAT tactic/API
+passed (20.500s/11.651s/0.024s/0.054s/0.113s/0.011s); full debug AST passed
+(21.994s). Module-wide compilation, AST vet, manifest, gofmt and diff checks
+passed. No full native module rerun inside the hourly interval. Counts unchanged:
+2102 units/677 APIs:62 ported,283 partial,1729 unported,two dead/deleted.
+
+Remaining proof work includes hyper-resolution input/output reference vectors
+and their owned premise/substitution lifetimes. Retained sorting-network AST
+contexts and other collection consumers still need migration. Internal util cycles
+and the complete requested root subpackage split remain unfinished.
