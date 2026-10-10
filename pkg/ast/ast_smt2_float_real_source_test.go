@@ -167,7 +167,7 @@ func TestASTSMT2FloatRealLiteralEveryActualReservationPrefix(t *testing.T) {
 		if captured = p.literalFrames; captured != nil {
 			copyTuple, bodyTuple, sourceTuple = captured.copy, captured.bodyCause, captured.sourceCause
 			if captured.text != nil && !captured.text.SourceEndedField && captured.sourceCause != nil {
-				if captured.buffer.Closed() || captured.valueConsumed {
+				if captured.buffer.Len() == 0 || captured.valueConsumed {
 					t.Fatal("younger formatting source stop consumed older lexical members", ordinal, captured)
 				}
 			}

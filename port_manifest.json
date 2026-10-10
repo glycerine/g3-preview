@@ -12407,7 +12407,8 @@
         "pkg/ast/ast_smt2_float_real.go",
         "pkg/ast/ast_smt2_float_real_source_test.go",
         "pkg/ast/ast_smt2_float_bv_literal.go",
-        "pkg/ast/ast_smt2_float_bv_literal_source_test.go"
+        "pkg/ast/ast_smt2_float_bv_literal_source_test.go",
+        "pkg/ast/ast_smt2_bv_literal_native_test.go"
       ],
       "tests": [
         "TestASTSMT2BitVectorLiteralRadixAndSignedOracle",
@@ -12420,7 +12421,8 @@
         "TestASTSMT2FloatRealLiteralWarmSmallNaNErasesFrameAllocation",
         "TestASTSMT2FloatDefaultBitVectorFields",
         "TestASTSMT2FloatDefaultEveryActualReservation",
-        "TestASTSMT2FloatDefaultWarmUsesNativeInfoStorage"
+        "TestASTSMT2FloatDefaultWarmUsesNativeInfoStorage",
+        "TestASTSMT2BitVectorNativeBufferLongRadixOracle"
       ],
       "conditionals": [
         {
@@ -12577,7 +12579,8 @@
             "TestASTSMT2BitVectorLiteralRadixAndSignedOracle",
             "TestASTSMT2BitVectorLiteralEveryReachedReservation",
             "TestASTSMT2BitVectorLiteralWarmInlinePrimaryDoesNotArchive",
-            "TestASTSMT2BitVectorFalseNumeralActualActionAndErasure"
+            "TestASTSMT2BitVectorFalseNumeralActualActionAndErasure",
+            "TestASTSMT2BitVectorNativeBufferLongRadixOracle"
           ]
         },
         {
@@ -12603,10 +12606,12 @@
         }
       ],
       "ownership": [
-        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
+        "Bit-vector digit and decimal buffers and floating-point literal string buffers now use bytes.Buffer. Removed inline/spill geometry, Runtime payload growth, initialization masks and byte-buffer destruction failures. Actual numeral/reference acquisition, checked numeric-text borrow lifetime and lexical numerical cleanup order remain. Radix digit generation is unchanged; native bytes are reversed directly and interned through the actual format manager."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
+        "Standard bytes.Buffer and strconv replace C++ character/string container behavior without STL implementation credit. Long radix checks cover widths through 4097; actual numeral and formatter failure campaigns remain. NumericTextStream and fresh-name buffer consumers still require separate work before the full util split."
       ]
     },
     {
@@ -15050,7 +15055,7 @@
         "TestASTFormatSourceFlatLiteralChoiceAndSharedChildren",
         "TestASTFormatSourceEveryFlatAllocationAndImmediateGraph",
         "TestASTFormatFlatHistorySurvivesNativeSourceFinalize",
-        "TestASTFormatBorrowedBufferUsesActualStringEngine"
+        "TestASTFormatNativeBufferOwnsInternedSpelling"
       ],
       "conditionals": [
         {
@@ -15109,16 +15114,17 @@
           ]
         },
         {
-          "name": "ast_format_buffer concrete reached source counterpart (format.cpp:66-101)",
+          "name": "format string construction from native caller bytes (format.cpp:147-152)",
           "status": "partial",
           "go_target": "pkg/ast/ast_format_buffer.go",
           "tests": [
-            "TestASTFormatBorrowedBufferUsesActualStringEngine"
+            "TestASTFormatNativeBufferOwnsInternedSpelling"
           ]
         }
       ],
       "ownership": [
-        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
+        "FormatBuffer accepts a standard bytes.Buffer. The existing symbol interner owns its immutable spelling before caller buffer mutation or reuse; no custom buffer owner, backing allocation or destructor is simulated."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."

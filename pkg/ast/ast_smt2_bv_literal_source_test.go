@@ -107,10 +107,7 @@ func astBVPrinterRawGraph(t *testing.T, m *ASTManager, input *util.OwnedRational
 				values = append(values, &f.values[i])
 			}
 		}
-		if !f.characters.rawConsumed {
-			blocks = append(blocks, f.characters.raw)
-		}
-		blocks = append(blocks, f.characters.pending)
+
 	}
 	if fp := m.floatingPointPlugin; fp != nil {
 		for f := fp.literalFrames; f != nil; f = f.next {
@@ -172,7 +169,7 @@ func TestASTSMT2BitVectorLiteralEveryReachedReservation(t *testing.T) {
 				astBVPrinterRawGraph(t, m, &input)
 				if want := before + m.Stats().AllocatedBytes + astTestSymbolGraph(c.SymbolsField) + runtime.Stats().TotalBytes; b.Used() != want {
 					for f := m.bitVectorPlugin.literalFrames; f != nil; f = f.next {
-						t.Log("literal diagnostic", f.header, f.buffer.Position(), f.text.storageBytes(), f.text.streamEnded, f.text.returned, f.sourceDone, f.ownDone)
+						t.Log("literal diagnostic", f.header, f.buffer.Len(), f.text.storageBytes(), f.text.streamEnded, f.text.returned, f.sourceDone, f.ownDone)
 					}
 					t.Log("components", before, m.Stats().AllocatedBytes, astTestSymbolGraph(c.SymbolsField), runtime.Stats().TotalBytes)
 					t.Fatal("before-lift actual literal cold graph", signed, radix, ordinal, body, b.Used(), want)
@@ -245,7 +242,7 @@ func TestASTSMT2BitVectorLiteralWarmInlinePrimaryDoesNotArchive(t *testing.T) {
 	after := m.BudgetField.Used()
 	if e != nil {
 		for f := m.bitVectorPlugin.literalFrames; f != nil; f = f.next {
-			t.Log("reached lexical buffers", f.header, f.characters.pos, f.characters.sourceDone, f.sourceDone, f.normalization.sourceDone)
+			t.Log("reached lexical buffers", f.header, f.characters.Len(), f.sourceDone, f.normalization.sourceDone)
 			for i := range f.children {
 				a, b, c := f.children[i].Causes()
 				t.Log("actual child", i, a, b, c)

@@ -1,28 +1,25 @@
-// Source: src/ast/format.cpp:147-152; src/util/string_buffer.h:62-65.
+// Source: src/ast/format.cpp:147-152; native caller buffers.
 package ast
 
 import (
+	"bytes"
+
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
-	usymbol "github.com/glycerine/g3/pkg/util/symbol"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-// FormatBuffer64 evaluates the source c_str argument before reaching mk_string.
-// Its bytes remain borrowed from the actual buffer throughout symbol creation.
-func (m *ASTManager) FormatBuffer64(b *utext.Buffer) (ASTHandle, error) {
+// FormatBuffer interns the caller's current native bytes before constructing
+// the format node. Symbol interning owns its immutable copy.
+func (m *ASTManager) FormatBuffer(b *bytes.Buffer) (ASTHandle, error) {
 	if b == nil {
-		return ASTHandle{}, utext.ErrOwner
-	}
-	text, e := b.CStr()
-	if e != nil {
-		return ASTHandle{}, e
+		return ASTHandle{}, ErrASTHandle
 	}
 	f, e := m.lockFormat()
 	if e != nil {
 		return ASTHandle{}, e
 	}
 	defer f.unlockFormat()
-	name, e := f.Symbols.InternBytes([]byte(text))
+	name, e := f.Symbols.InternBytes(b.Bytes())
 	if e != nil {
 		return ASTHandle{}, e
 	}
@@ -31,27 +28,22 @@ func (m *ASTManager) FormatBuffer64(b *utext.Buffer) (ASTHandle, error) {
 	return f.external(r), e
 }
 
-// Source: src/ast/ast_smt2_pp.cpp:226-229; src/ast/format.cpp:147-152.
-// Capture the actual sbuffer<char> pointer argument without an assembly copy.
-func (m *ASTManager) formatBVCharacters(b *astBVCharBuffer16) (ASTHandle, error) {
-	if b == nil || b.sourceDone || b.rawConsumed {
-		return ASTHandle{}, ErrASTHandle
-	}
-	f, e := m.lockFormat()
+// A retained numerical formatting result is borrowed until its source
+// temporary ends. Copy its checked bytes directly into native output storage.
+func appendASTFormattedCString(b *bytes.Buffer, text util.ArbitraryFloatFormattedCString) error {
+	n, e := text.Length()
 	if e != nil {
-		return ASTHandle{}, e
+		return e
 	}
-	defer f.unlockFormat()
-	var name usymbol.Symbol
-	if b.cap == 0 {
-		name, e = util.InternSymbolInitializedBytes(f.Symbols, b.inline[:], b.initialized)
-	} else {
-		name, e = util.InternSymbolRuntimeCString(f.Symbols, m.numerals.RuntimeOwner(), b.raw, 0, uint64(b.capacity()))
+	if n > uint64(^uint(0)>>1) {
+		return arena.ErrBounds
 	}
-	if e != nil {
-		return ASTHandle{}, e
+	for i := uint64(0); i < n; i++ {
+		c, e := text.Byte(i)
+		if e != nil {
+			return e
+		}
+		b.WriteByte(c)
 	}
-	p := astParameterRecord{Kind: ASTParameterSymbol, symbol: name}
-	r, e := f.formatApp(ASTFormatString, &p, nil)
-	return f.external(r), e
+	return nil
 }

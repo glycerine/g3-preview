@@ -1,30 +1,49 @@
-// Source: src/ast/format.cpp:147-152; src/util/string_buffer.h:62-65.
+// Source: src/ast/format.cpp:147-152; native caller buffers.
 package ast
 
 import (
+	"bytes"
+	"strings"
 	"testing"
-
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func TestASTFormatBorrowedBufferUsesActualStringEngine(t *testing.T) {
+func TestASTFormatNativeBufferOwnsInternedSpelling(t *testing.T) {
 	m := astTestManager(t)
-	defer func() { astTestMust(t, m.Close()) }()
-	b, e := utext.NewBuffer(utext.Config{})
+	text := "((_ to_fp 8 24) RTZ -1.25)"
+	b := bytes.NewBufferString(text)
+	h, e := m.FormatBuffer(b)
 	astTestMust(t, e)
-	defer func() { astTestMust(t, b.Close()) }()
-	astTestMust(t, b.AppendCString("((_ to_fp 8 24) RTZ "))
-	astTestMust(t, b.AppendCString("-1.25)"))
-	h, e := m.FormatBuffer64(b)
-	astTestMust(t, e)
-	want, e := m.FormatString("((_ to_fp 8 24) RTZ -1.25)")
+	astTestPin(t, m.Format, h)
+	// The interner owns its spelling after the caller mutates and reuses the
+	// bytes. Native buffers have no simulated closed-owner state.
+	b.Bytes()[0] = 'x'
+	want, e := m.FormatString(text)
 	astTestMust(t, e)
 	if h != want {
-		t.Fatal("same actual intern/register engine", h, want)
+		t.Fatal("independent native input lifetime", h, want)
 	}
-	astTestMust(t, b.Close())
+	b.Reset()
+	b.WriteString("#b" + strings.Repeat("01", 2049))
+	b.WriteByte(0)
+	b.WriteString("ignored after the source C-string terminator")
+	got, e := m.FormatBuffer(b)
+	astTestMust(t, e)
+	astTestPin(t, m.Format, got)
+	want, e = m.FormatString("#b" + strings.Repeat("01", 2049))
+	astTestMust(t, e)
+	if got != want {
+		t.Fatal("large native bytes and symbol terminator", got, want)
+	}
+	b.Reset()
+	empty, e := m.FormatBuffer(b)
+	astTestMust(t, e)
+	want, e = m.FormatString("")
+	astTestMust(t, e)
+	if empty != want {
+		t.Fatal("reset buffer formats its current empty value", empty, want)
+	}
 	before := m.Stats()
-	if _, e = m.FormatBuffer64(b); e == nil || m.Stats() != before {
-		t.Fatal("ended borrowed buffer must refuse before formatter mutation", e)
+	if _, e = m.FormatBuffer(nil); e == nil || m.Stats() != before {
+		t.Fatal("nil native input guard before formatter mutation", e)
 	}
 }

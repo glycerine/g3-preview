@@ -2,13 +2,14 @@
 package ast
 
 import (
+	"bytes"
 	"errors"
 	"math"
 	"reflect"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 type astBVLiteralFrame struct {
@@ -20,8 +21,8 @@ type astBVLiteralFrame struct {
 	placed, complete, consumed                 [4]bool
 	children                                   [5]util.RationalServiceInvocation
 	normalization                              astBVNormalizationReceipt
-	buffer                                     utext.Buffer
-	characters                                 astBVCharBuffer16
+	buffer                                     bytes.Buffer
+	characters                                 bytes.Buffer
 	text                                       astBVIntegerText
 	stringBuffer, characterBuffer, textReached bool
 	sourceDone, ownDone, retired               bool
@@ -124,20 +125,12 @@ func (f *astBVLiteralFrame) destroyPhase(own, abort bool) (e error) {
 		}
 	}
 	if f.characterBuffer {
-		if own {
-			e = f.characters.cleanup(f.owner.owner.numerals.RuntimeOwner())
-		} else {
-			e = f.characters.sourceDestroy(f.owner.owner.numerals.RuntimeOwner())
-		}
-		if e != nil {
-			return e
-		}
+		f.characters = bytes.Buffer{}
 	}
-	if f.stringBuffer && !f.buffer.Closed() {
-		if e = f.buffer.Close(); e != nil {
-			return e
-		}
+	if f.stringBuffer {
+		f.buffer = bytes.Buffer{}
 	}
+
 	for _, i := range [...]int{3, 2, 1, 0} {
 		if e = f.destroyValue(i, own); e != nil {
 			return e
@@ -366,10 +359,7 @@ func (m *ASTManager) ppBitVectorLiteralCore(h ASTHandle, signed, radix bool, g *
 	}
 	if !radix {
 		f.stringBuffer = true
-		if e = f.buffer.Init(utext.Config{}); e != nil {
-			return out, e
-		}
-		if e = f.buffer.AppendCString("(_ bv"); e != nil {
+		if _, e = f.buffer.WriteString("(_ bv"); e != nil {
 			return out, e
 		}
 		f.textReached = true
@@ -380,36 +370,35 @@ func (m *ASTManager) ppBitVectorLiteralCore(h ASTHandle, signed, radix bool, g *
 		if e != nil {
 			return out, e
 		}
-		if e = view.AppendTo(&f.buffer); e != nil {
+		if e = appendASTFormattedCString(&f.buffer, view); e != nil {
 			return out, e
 		}
-		if e = f.buffer.AppendCString(" "); e != nil {
+		if _, e = f.buffer.WriteString(" "); e != nil {
 			return out, e
 		}
-		if e = f.buffer.AppendUInt32(width); e != nil {
+		if _, e = f.buffer.WriteString(strconv.FormatInt(int64(int32(width)), 10)); e != nil {
 			return out, e
 		}
-		if e = f.buffer.AppendCString(")"); e != nil {
+		if _, e = f.buffer.WriteString(")"); e != nil {
 			return out, e
 		}
 		if e = f.text.sourceDestroy(); e != nil {
 			return out, e
 		}
-		out, e = fm.FormatBuffer64(&f.buffer)
+		out, e = fm.FormatBuffer(&f.buffer)
 		if e != nil {
 			return out, e
 		}
 	} else {
 		f.characterBuffer = true
-		runtime := q.RuntimeOwner()
-		if e = f.characters.push(runtime, '#'); e != nil {
+		if e = f.characters.WriteByte('#'); e != nil {
 			return out, e
 		}
 		base, step, prefix := uint32(2), uint32(1), byte('b')
 		if width%4 == 0 {
 			base, step, prefix = 16, 4, 'x'
 		}
-		if e = f.characters.push(runtime, prefix); e != nil {
+		if e = f.characters.WriteByte(prefix); e != nil {
 			return out, e
 		}
 		sz := uint32(0)
@@ -510,7 +499,7 @@ func (m *ASTManager) ppBitVectorLiteralCore(h ASTHandle, signed, radix bool, g *
 					glyph = '1'
 				}
 			}
-			if e = f.characters.push(runtime, glyph); e != nil {
+			if e = f.characters.WriteByte(glyph); e != nil {
 				return out, e
 			}
 			sz += step
@@ -522,7 +511,7 @@ func (m *ASTManager) ppBitVectorLiteralCore(h ASTHandle, signed, radix bool, g *
 			}
 		}
 		for sz < width {
-			if e = f.characters.push(runtime, '0'); e != nil {
+			if e = f.characters.WriteByte('0'); e != nil {
 				return out, e
 			}
 			sz += step
@@ -536,31 +525,14 @@ func (m *ASTManager) ppBitVectorLiteralCore(h ASTHandle, signed, radix bool, g *
 				return out, e
 			}
 		}
-		for left, right := uint32(2), f.characters.pos; left < right; {
-			right--
-			if left >= right {
-				break
-			}
-			a, e := f.characters.read(runtime, left)
-			if e != nil {
-				return out, e
-			}
-			z, e := f.characters.read(runtime, right)
-			if e != nil {
-				return out, e
-			}
-			if e = f.characters.write(runtime, left, z); e != nil {
-				return out, e
-			}
-			if e = f.characters.write(runtime, right, a); e != nil {
-				return out, e
-			}
-			left++
+		data := f.characters.Bytes()
+		for left, right := 2, len(data)-1; left < right; left, right = left+1, right-1 {
+			data[left], data[right] = data[right], data[left]
 		}
-		if e = f.characters.push(runtime, 0); e != nil {
+		if e = f.characters.WriteByte(0); e != nil {
 			return out, e
 		}
-		out, e = fm.formatBVCharacters(&f.characters)
+		out, e = fm.FormatBuffer(&f.characters)
 		if e != nil {
 			return out, e
 		}

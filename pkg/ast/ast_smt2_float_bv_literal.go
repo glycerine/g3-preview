@@ -3,6 +3,7 @@ package ast
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	"strconv"
 )
 
 // Exact borrowed child frame tuples; completed returns never consult a reused
@@ -143,22 +144,22 @@ func (m *ASTManager) floatBitVectorSuffix(f *astFloatLiteralFrame, radix bool, g
 	if radix {
 		prefix = "(fp #b"
 	}
-	if e := b.AppendCString(prefix); e != nil {
+	if _, e := b.WriteString(prefix); e != nil {
 		return ASTHandle{}, e
 	}
 	sign := uint32(0)
 	if f.value.Sign() {
 		sign = 1
 	}
-	if e := b.AppendUInt32(sign); e != nil {
+	if _, e := b.WriteString(strconv.FormatInt(int64(int32(sign)), 10)); e != nil {
 		return ASTHandle{}, e
 	}
 	if !radix {
-		if e := b.AppendCString(" 1)"); e != nil {
+		if _, e := b.WriteString(" 1)"); e != nil {
 			return ASTHandle{}, e
 		}
 	}
-	body, e := fm.FormatBuffer64(b)
+	body, e := fm.FormatBuffer(b)
 	if e != nil {
 		return ASTHandle{}, e
 	}

@@ -2,13 +2,14 @@
 package ast
 
 import (
+	"bytes"
 	"errors"
 	"math"
 	"reflect"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // Concrete source stack values live in this charged cold invocation header.
@@ -28,7 +29,7 @@ type astFloatLiteralFrame struct {
 	bvRefAcquired, bvRefConsumed                       [2]bool
 	bvChildren                                         [4]astFloatBVChild
 	copy                                               util.ArbitraryFloatValueCopyReceipt
-	buffer                                             utext.Buffer
+	buffer                                             bytes.Buffer
 	text                                               *util.ArbitraryFloatFormatText
 	header, invocation                                 uint64
 	valueConstructed, valueConsumed, bufferConstructed bool
@@ -88,11 +89,10 @@ func (f *astFloatLiteralFrame) destroy(own bool) error {
 			return stop(e)
 		}
 	}
-	if f.bufferConstructed && !f.buffer.Closed() {
-		if e := f.buffer.Close(); e != nil {
-			return stop(e)
-		}
+	if f.bufferConstructed {
+		f.buffer = bytes.Buffer{}
 	}
+
 	if f.valueConstructed && !f.valueConsumed {
 		var e error
 		if own {
@@ -185,9 +185,6 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.Globa
 	f.self = f
 	p.literalFrames = f
 	// source scoped_mpf precedes get_manager and the default string_buffer.
-	if e = f.buffer.Init(utext.Config{}); e != nil {
-		return out, e
-	}
 	f.bufferConstructed = true
 	defer func() {
 		f.bodyCause = result
@@ -244,29 +241,29 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.Globa
 	}
 	b := &f.buffer
 	if name != "" {
-		if e = b.AppendCString("(_ "); e != nil {
+		if _, e = b.WriteString("(_ "); e != nil {
 			return out, e
 		}
-		if e = b.AppendCString(name); e != nil {
+		if _, e = b.WriteString(name); e != nil {
 			return out, e
 		}
-		if e = b.AppendCString(" "); e != nil {
+		if _, e = b.WriteString(" "); e != nil {
 			return out, e
 		}
-	} else if e = b.AppendCString("((_ to_fp "); e != nil {
+	} else if _, e = b.WriteString("((_ to_fp "); e != nil {
 		return out, e
 	}
-	if e = b.AppendUInt32(f.value.EBits()); e != nil {
+	if _, e = b.WriteString(strconv.FormatInt(int64(int32(f.value.EBits())), 10)); e != nil {
 		return out, e
 	}
-	if e = b.AppendCString(" "); e != nil {
+	if _, e = b.WriteString(" "); e != nil {
 		return out, e
 	}
-	if e = b.AppendUInt32(f.value.SBits()); e != nil {
+	if _, e = b.WriteString(strconv.FormatInt(int64(int32(f.value.SBits())), 10)); e != nil {
 		return out, e
 	}
 	if name == "" {
-		if e = b.AppendCString(") RTZ "); e != nil {
+		if _, e = b.WriteString(") RTZ "); e != nil {
 			return out, e
 		}
 		f.text, e = util.NewArbitraryFloatFormatText(m.BudgetField)
@@ -277,11 +274,11 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.Globa
 		if e != nil {
 			return out, e
 		}
-		if e = view.AppendTo(b); e != nil {
+		if e = appendASTFormattedCString(b, view); e != nil {
 			return out, e
 		}
 	}
-	if e = b.AppendCString(")"); e != nil {
+	if _, e = b.WriteString(")"); e != nil {
 		return out, e
 	}
 	// Full-statement temporary DT precedes mk_string's argument/registration.
@@ -290,10 +287,7 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.Globa
 			return out, e
 		}
 	}
-	text, e := b.CStr()
-	if e != nil {
-		return out, e
-	}
+	text := b.Bytes()
 	fm := m.Format
 	if fm == nil {
 		fm = m
@@ -305,7 +299,7 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.Globa
 		fm.formatExecuting = true
 		defer func() { fm.formatExecuting = false }()
 	}
-	symbol, e := fm.Symbols.InternBytes([]byte(text))
+	symbol, e := fm.Symbols.InternBytes(text)
 	if e != nil {
 		return out, e
 	}

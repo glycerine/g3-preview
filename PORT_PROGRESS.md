@@ -33246,3 +33246,30 @@ checks passed. Counts remain 2102 units/677 APIs: 63 ported, 284 partial,
 hourly interval. The knot and full util split remain active: other scalar/cache
 Runtime columns, AST reference storage, NumericTextStream consumers and internal
 util numeric/text/parameter cycles still remain.
+
+## Recovered native AST literal buffers
+
+Recovered the interrupted bit-vector and floating-point literal buffer change.
+Their character and string output now uses bytes.Buffer, and FormatBuffer accepts
+native caller bytes. Removed the AST inline16/spill character implementation,
+Runtime growth/free branches, initialization masks and four representation-only
+tests. Actual numeral algorithms, numeric-text borrow checks, reference ownership
+and numerical cleanup order remain. Standard strconv retains the reached signed
+32-bit width presentation. Symbol interning owns the spelling before caller
+buffer reuse. New checks cover mutable/reused input, empty buffers, embedded NUL,
+nil input and independently padded binary/hexadecimal literals through 4097 bits.
+The recovered native input test now pins nodes through their actual format
+manager, fixing its owner mismatch.
+
+Validation: focused native AST passed (0.556s), full native AST passed (27.409s),
+focused g3debug AST passed (0.951s), module-wide compilation, AST vet, manifest
+evidence, gofmt and diff checks passed. Counts remain 2102 units/677 APIs:
+63 ported, 284 partial, 1727 unported and two dead/deleted. No full native module
+rerun inside the hourly interval.
+
+The util knot is NOT resolved and the complete package split is not ready.
+A fresh type-aware audit still finds 287 root production files, 104 dependency
+components and a largest strongly connected component of 164 files. External
+AST fresh-name buffers, AST reference storage and numerical text consumers remain;
+internal numeric/text/parameter cycles also require work. Native caller migration
+alone does not eliminate those internal cycles. The remaining split stays active.
