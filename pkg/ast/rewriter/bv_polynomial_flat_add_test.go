@@ -134,7 +134,7 @@ func TestBVPolynomialAdditionApplicationFlatSelection(t *testing.T) {
 	}
 }
 
-func TestBVPolynomialFlatAdditionEverySpillAndFallbackReservation(t *testing.T) {
+func TestBVPolynomialFlatAdditionEveryCoreAndFallbackReservation(t *testing.T) {
 	complete, failures, fallbackFailures := false, 0, 0
 	for ordinal := int64(0); ordinal < 200 && !complete; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
@@ -197,7 +197,7 @@ func TestBVPolynomialFlatAdditionEverySpillAndFallbackReservation(t *testing.T) 
 		})
 	}
 	if !complete || failures == 0 || fallbackFailures == 0 {
-		t.Fatal("spill/fallback horizon", complete, failures, fallbackFailures)
+		t.Fatal("core/fallback horizon", complete, failures, fallbackFailures)
 	}
 }
 

@@ -27,9 +27,7 @@ func (p *BVPolynomialAdditionCore) flatBody(sort ast.ASTHandle, args ast.AppArgu
 		if e != nil {
 			return RewriteFailed, e
 		}
-		if e = p.flatArgs.Push(m.Budget(), arg); e != nil {
-			return RewriteFailed, e
-		}
+		p.flatArgs = append(p.flatArgs, arg)
 	}
 	for ; i < args.Count(); i++ {
 		arg, e := args.At(i)
@@ -50,15 +48,13 @@ func (p *BVPolynomialAdditionCore) flatBody(sort ast.ASTHandle, args ast.AppArgu
 				if e != nil {
 					return RewriteFailed, e
 				}
-				if e = p.flatArgs.Push(m.Budget(), h); e != nil {
-					return RewriteFailed, e
-				}
+				p.flatArgs = append(p.flatArgs, h)
 			}
-		} else if e = p.flatArgs.Push(m.Budget(), arg); e != nil {
-			return RewriteFailed, e
+		} else {
+			p.flatArgs = append(p.flatArgs, arg)
 		}
 	}
-	flat := ast.SliceArguments(p.flatArgs.Slice())
+	flat := ast.SliceArguments(p.flatArgs)
 	st, e := p.body(sort, flat, out, o)
 	if e != nil {
 		return st, e

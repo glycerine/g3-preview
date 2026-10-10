@@ -1,15 +1,16 @@
 // Source: src/ast/rewriter/poly_rewriter_def.h:453-487;
-// src/ast/rewriter/bv_rewriter.h:35-43; src/util/buffer.h:25-59,90-96,146-151.
+// src/ast/rewriter/bv_rewriter.h:35-43.
 package ast
 
 import (
 	"reflect"
+	"sort"
 
 	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorCoefficientHoist holds one source invocation's real locals and
-// exact children. It borrows the manager and caller's argument vector. Go
+// exact children. It borrows the manager and caller's owning argument slice. Go
 // wrapper storage is charged; native stack/layout/allocation ABI is not claimed.
 type BitVectorCoefficientHoist struct {
 	self                                 *BitVectorCoefficientHoist
@@ -18,9 +19,8 @@ type BitVectorCoefficientHoist struct {
 	reads                                [2]util.RationalServiceInvocation
 	values                               [2]util.OwnedRational
 	placed                               [2]bool
-	pps                                  ASTHandleBuffer
+	pps                                  []ASTHandle
 	mulArgs                              [2]ASTHandle
-	ppsPlaced                            bool
 	header                               uint64
 	started, running, sourceDone, closed bool
 	bodyCause, sourceCause, ownCause     error
@@ -39,61 +39,60 @@ func NewBitVectorCoefficientHoist(m *ASTManager) (*BitVectorCoefficientHoist, er
 	return p, nil
 }
 
-func (p *BitVectorCoefficientHoist) less(v ASTRefVector, a, b uint32) (bool, error) {
-	left, e := p.manager.RefVectorGet(v, a)
-	if e != nil {
-		return false, e
-	}
-	right, e := p.manager.RefVectorGet(v, b)
-	if e != nil {
-		return false, e
-	}
-	return p.manager.BitVectorPolynomialHoistLessWithInvocation(left, right, &p.compare)
+// Sorting follows the source coefficient comparator through Go's library.
+func (p *BitVectorCoefficientHoist) sort(v []ASTHandle) error {
+	var cause error
+	sort.Slice(v, func(i, j int) bool {
+		if cause != nil {
+			return false
+		}
+		var less bool
+		less, cause = p.manager.BitVectorPolynomialHoistLessWithInvocation(v[i], v[j], &p.compare)
+		return less
+	})
+	return cause
 }
 
-func (p *BitVectorCoefficientHoist) sift(v ASTRefVector, root, end uint32) error {
-	for root < end/2 {
-		child := root*2 + 1
-		if child+1 < end {
-			less, e := p.less(v, child, child+1)
-			if e != nil {
-				return e
-			}
-			if less {
-				child++
-			}
-		}
-		less, e := p.less(v, root, child)
-		if e != nil {
-			return e
-		}
-		if !less {
-			return nil
-		}
-		if e = p.manager.RefVectorSwapElements(v, root, child); e != nil {
-			return e
-		}
-		root = child
+// The caller owns every slice entry. Acquire the replacement before retiring
+// the old root, keeping both reachable when a stopped DEC consumes neither.
+func (p *BitVectorCoefficientHoist) replace(args *[]ASTHandle, i uint32, h ASTHandle) error {
+	if e := p.manager.IncRef(h); e != nil {
+		return e
+	}
+	consumed, e := p.manager.DecRefConsumed((*args)[i])
+	if consumed {
+		(*args)[i] = h
+	} else {
+		*args = append(*args, h)
+	}
+	if e != nil {
+		return e
+	}
+	if !consumed {
+		return ErrASTPending
 	}
 	return nil
 }
 
-// std::sort is external. This concrete no-scratch heapsort preserves its
-// comparator/output contract, without claiming C++ library comparison order.
-func (p *BitVectorCoefficientHoist) sort(v ASTRefVector, n uint32) error {
-	for i := n / 2; i > 0; i-- {
-		if e := p.sift(v, i-1, n); e != nil {
-			return e
+func (p *BitVectorCoefficientHoist) shrink(args *[]ASTHandle, n uint32) error {
+	values := *args
+	for i := int(n); i < len(values); i++ {
+		consumed, e := p.manager.DecRefConsumed(values[i])
+		next := i
+		if consumed {
+			values[i] = ASTHandle{}
+			next++
+		}
+		if e != nil || !consumed {
+			*args = append(values[:n], values[next:]...)
+			clear(values[len(*args):])
+			if e != nil {
+				return e
+			}
+			return ErrASTPending
 		}
 	}
-	for end := n; end > 1; end-- {
-		if e := p.manager.RefVectorSwapElements(v, 0, end-1); e != nil {
-			return e
-		}
-		if e := p.sift(v, 0, end-1); e != nil {
-			return e
-		}
-	}
+	*args = values[:n]
 	return nil
 }
 
@@ -144,15 +143,16 @@ func (p *BitVectorCoefficientHoist) product(t ASTHandle, i int) (bool, ASTHandle
 	return true, pp, e
 }
 
-func (p *BitVectorCoefficientHoist) body(currentSort ASTHandle, args ASTRefVector) error {
+func (p *BitVectorCoefficientHoist) body(currentSort ASTHandle, args *[]ASTHandle) error {
 	m := p.manager
-	size, e := m.RefVectorSize(args)
-	if e != nil {
+	if args == nil {
+		return ErrASTDomain
+	}
+	size := uint32(len(*args))
+	if e := p.sort(*args); e != nil {
 		return e
 	}
-	if e = p.sort(args, size); e != nil {
-		return e
-	}
+	var e error
 	// These locals are constructed after the entire sort, as in the source.
 	for i := range p.values {
 		p.values[i], e = m.numerals.NewValue()
@@ -161,22 +161,15 @@ func (p *BitVectorCoefficientHoist) body(currentSort ASTHandle, args ASTRefVecto
 		}
 		p.placed[i] = true
 	}
-	p.ppsPlaced = true
 	var i, j uint32
 	for i < size {
-		mon, e := m.RefVectorGet(args, i)
-		if e != nil {
-			return e
-		}
+		mon := (*args)[i]
 		isMul, pp, e := p.product(mon, 0)
 		if e != nil {
 			return e
 		}
 		if isMul && i < size-1 {
-			next, e := m.RefVectorGet(args, i+1)
-			if e != nil {
-				return e
-			}
+			next := (*args)[i+1]
 			isNext, ppNext, e := p.product(next, 1)
 			if e != nil {
 				return e
@@ -189,19 +182,13 @@ func (p *BitVectorCoefficientHoist) body(currentSort ASTHandle, args ASTRefVecto
 				}
 			}
 			if isNext && equal {
-				p.pps.Reset()
-				if e = p.pps.Push(m.Budget(), pp); e != nil {
-					return e
-				}
-				if e = p.pps.Push(m.Budget(), ppNext); e != nil {
-					return e
-				}
+				clear(p.pps)
+				p.pps = p.pps[:0]
+				p.pps = append(p.pps, pp)
+				p.pps = append(p.pps, ppNext)
 				i += 2
 				for i < size {
-					next, e = m.RefVectorGet(args, i)
-					if e != nil {
-						return e
-					}
+					next = (*args)[i]
 					isNext, ppNext, e = p.product(next, 1)
 					if e != nil {
 						return e
@@ -216,9 +203,7 @@ func (p *BitVectorCoefficientHoist) body(currentSort ASTHandle, args ASTRefVecto
 					if !equal {
 						break
 					}
-					if e = p.pps.Push(m.Budget(), ppNext); e != nil {
-						return e
-					}
+					p.pps = append(p.pps, ppNext)
 					i++
 				}
 				if ASTSourceDebug {
@@ -249,7 +234,7 @@ func (p *BitVectorCoefficientHoist) body(currentSort ASTHandle, args ASTRefVecto
 					return e
 				}
 				p.mulArgs[0] = literal
-				sum, e := m.MkBitVectorPolynomialAdd(currentSort, SliceArguments(p.pps.Slice()))
+				sum, e := m.MkBitVectorPolynomialAdd(currentSort, SliceArguments(p.pps))
 				if e != nil {
 					return e
 				}
@@ -258,20 +243,20 @@ func (p *BitVectorCoefficientHoist) body(currentSort ASTHandle, args ASTRefVecto
 				if e != nil {
 					return e
 				}
-				if e = m.RefVectorSet(args, j, mul); e != nil {
+				if e = p.replace(args, j, mul); e != nil {
 					return e
 				}
 				j++
 				continue
 			}
 		}
-		if e = m.RefVectorSet(args, j, mon); e != nil {
+		if e = p.replace(args, j, mon); e != nil {
 			return e
 		}
 		j++
 		i++
 	}
-	return m.RefVectorShrink(args, j)
+	return p.shrink(args, j)
 }
 
 func (p *BitVectorCoefficientHoist) childrenSource() error {
@@ -290,10 +275,8 @@ func (p *BitVectorCoefficientHoist) sourceEnd() error {
 	if e := p.childrenSource(); e != nil {
 		return e
 	}
-	if p.ppsPlaced {
-		p.pps.Close(p.manager.Budget())
-		p.ppsPlaced = false
-	}
+	clear(p.pps)
+	p.pps = nil
 	for i := 1; i >= 0; i-- {
 		if p.placed[i] {
 			if e := p.manager.numerals.Del(&p.values[i]); e != nil {
@@ -306,9 +289,11 @@ func (p *BitVectorCoefficientHoist) sourceEnd() error {
 	return nil
 }
 
-// Hoist sorts and compacts the caller-owned vector in place. This owner names
-// one invocation; failed calls retain their real prefix for Close and never retry.
-func (p *BitVectorCoefficientHoist) Hoist(currentSort ASTHandle, args ASTRefVector) (result error) {
+// Hoist sorts and compacts the caller-owned slice in place. Each entry must
+// hold an acquired AST reference, which remains the caller's responsibility.
+// This owner names one invocation; failed calls retain their real prefix for
+// caller cleanup and never retry.
+func (p *BitVectorCoefficientHoist) Hoist(currentSort ASTHandle, args *[]ASTHandle) (result error) {
 	if p == nil || p.self != p || p.closed {
 		return ErrASTHandle
 	}
@@ -363,10 +348,8 @@ func (p *BitVectorCoefficientHoist) Close() (result error) {
 			return e
 		}
 	}
-	if p.ppsPlaced {
-		p.pps.Close(p.manager.Budget())
-		p.ppsPlaced = false
-	}
+	clear(p.pps)
+	p.pps = nil
 	for i := 1; i >= 0; i-- {
 		if p.placed[i] {
 			if e := p.manager.numerals.CleanupValue(&p.values[i]); e != nil {

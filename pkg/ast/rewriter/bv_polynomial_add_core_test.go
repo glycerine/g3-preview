@@ -233,8 +233,18 @@ func TestBVPolynomialNonflatAdditionEveryColdReservation(t *testing.T) {
 				}
 				astTestMust(t, p.SourceReady())
 			}
+			for _, root := range p.vector {
+				refs, e := m.GetRefCount(root)
+				astTestMust(t, e)
+				if refs == 0 {
+					t.Fatal("native addition root lost its reference")
+				}
+			}
 			history := p.SourceReady()
 			astTestMust(t, p.Close())
+			if p.vector != nil || p.visited != nil || p.multiple != nil || p.flatArgs != nil {
+				t.Fatal("completed cleanup retained native collections")
+			}
 			one, e := ast.NewASTFastMark1(m)
 			astTestMust(t, e)
 			twoMark, e := ast.NewASTFastMark2(m)
@@ -380,4 +390,47 @@ func TestBVPolynomialNonflatAdditionConstructorRefusalAndCopyGuards(t *testing.T
 	}
 	astTestMust(t, p.Close())
 	astTestMust(t, p.Close())
+}
+
+func TestBVPolynomialAdditionNativeMembershipPreservesForeignMarkPlanes(t *testing.T) {
+	m, _ := bvAddFixture(t)
+	xs := bvMergeVars(t, m, 48)
+	currentSort, e := m.GetSort(xs[0])
+	astTestMust(t, e)
+	want := bvMergeMul(t, m, bvAddNum(t, m, 2, 8), bvMulHoistSum(t, m, xs...))
+	one, e := ast.NewASTFastMark1(m)
+	astTestMust(t, e)
+	defer func() { astTestMust(t, one.Close()) }()
+	two, e := ast.NewASTFastMark2(m)
+	astTestMust(t, e)
+	defer func() { astTestMust(t, two.Close()) }()
+	var args []ast.ASTHandle
+	for i := len(xs) - 1; i >= 0; i-- {
+		astTestMust(t, one.Mark(xs[i], true))
+		astTestMust(t, two.Mark(xs[i], true))
+		args = append(args, xs[i], xs[i])
+	}
+	out, e := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, e)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	p, e := NewBVPolynomialAdditionCore(m)
+	astTestMust(t, e)
+	defer func() { astTestMust(t, p.Close()) }()
+	st, e := p.Rewrite(currentSort, ast.SliceArguments(args), out, BVPolynomialAdditionOptions{SortSums: true, HoistCoefficients: true})
+	astTestMust(t, e)
+	got, e := m.RefGet(out)
+	astTestMust(t, e)
+	if st != RewriteDone || got != want {
+		t.Fatal("native duplicate/coefficient grouping", st, got, want)
+	}
+	astTestMust(t, p.Close())
+	for _, x := range xs {
+		marked1, e := one.IsMarked(x)
+		astTestMust(t, e)
+		marked2, e := two.IsMarked(x)
+		astTestMust(t, e)
+		if !marked1 || !marked2 {
+			t.Fatal("addition changed another caller's marks")
+		}
+	}
 }

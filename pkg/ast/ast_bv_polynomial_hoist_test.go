@@ -51,22 +51,19 @@ func TestASTBitVectorCoefficientHoistOriginalGroupsAndLiteralReuse(t *testing.T)
 	c := bvHoistProduct(t, m, three, xs[4], true)
 	d := bvHoistProduct(t, m, large, xs[5], true)
 	e := bvHoistProduct(t, m, large, xs[6], true)
-	v, err := m.NewRefVectorFrom([]ASTHandle{e, c, xs[1], a, z1, d, xs[0], b, z0})
-	astTestMust(t, err)
-	defer func() { astTestMust(t, m.DelRefVector(&v)) }()
+	v := bvHoistRoots(t, m, []ASTHandle{e, c, xs[1], a, z1, d, xs[0], b, z0})
+	defer func() { astTestMust(t, bvReleaseHoistRoots(m, &v)) }()
 	h, err := NewBitVectorCoefficientHoist(m)
 	astTestMust(t, err)
 	defer func() { astTestMust(t, h.Close()) }()
 	// Group factories have multiple operands, so the current sort is unread.
-	astTestMust(t, h.Hoist(ASTHandle{}, v))
-	n, err := m.RefVectorSize(v)
-	astTestMust(t, err)
+	astTestMust(t, h.Hoist(ASTHandle{}, &v))
+	n := len(v)
 	if n != 5 {
 		t.Fatal("group compaction", n)
 	}
 	for i, want := range xs[:2] {
-		got, err := m.RefVectorGet(v, uint32(i))
-		astTestMust(t, err)
+		got := v[uint32(i)]
 		if got != want {
 			t.Fatal("nonproducts must sort first")
 		}
@@ -75,8 +72,7 @@ func TestASTBitVectorCoefficientHoistOriginalGroupsAndLiteralReuse(t *testing.T)
 		num ASTHandle
 		pps []ASTHandle
 	}{{zero, xs[:2]}, {three, xs[2:5]}, {large, xs[5:]}} {
-		group, err := m.RefVectorGet(v, uint32(i+2))
-		astTestMust(t, err)
+		group := v[uint32(i+2)]
 		literal, err := m.GetArg(group, 0)
 		astTestMust(t, err)
 		sum, err := m.GetArg(group, 1)
@@ -97,37 +93,36 @@ func TestASTBitVectorCoefficientHoistOriginalGroupsAndLiteralReuse(t *testing.T)
 		}
 	}
 	astTestMust(t, h.SourceReady())
-	if h.placed[0] || h.placed[1] || h.ppsPlaced {
+	if h.placed[0] || h.placed[1] || h.pps != nil {
 		t.Fatal("source locals did not end")
 	}
 }
 
-func TestASTBitVectorCoefficientHoistSoleVectorOwnershipAndSpill(t *testing.T) {
+func TestASTBitVectorCoefficientHoistSoleSliceOwnershipAndGrowth(t *testing.T) {
 	m := astTestManager(t)
 	fid, s, xs := bvHoistVariables(t, m, 40)
 	n := bvRawOffsetTestNumeral(t, m, fid, s, "-3", 8)
-	v, e := m.NewRefVector()
-	astTestMust(t, e)
-	defer func() { astTestMust(t, m.DelRefVector(&v)) }()
+	var v []ASTHandle
+	defer func() { astTestMust(t, bvReleaseHoistRoots(m, &v)) }()
 	old := make([]ASTHandle, len(xs))
 	refs := make([]uint32, len(xs))
 	for i := len(xs) - 1; i >= 0; i-- {
 		old[i] = bvHoistProduct(t, m, n, xs[i], false)
-		astTestMust(t, m.RefVectorPush(v, old[i]))
-		refs[i], e = m.GetRefCount(xs[i])
+		astTestMust(t, m.IncRef(old[i]))
+		v = append(v, old[i])
+		count, e := m.GetRefCount(xs[i])
 		astTestMust(t, e)
+		refs[i] = count
 	}
 	h, e := NewBitVectorCoefficientHoist(m)
 	astTestMust(t, e)
 	defer func() { astTestMust(t, h.Close()) }()
-	astTestMust(t, h.Hoist(s, v))
-	size, e := m.RefVectorSize(v)
-	astTestMust(t, e)
+	astTestMust(t, h.Hoist(s, &v))
+	size := len(v)
 	if size != 1 {
 		t.Fatal("long group was not combined", size)
 	}
-	group, e := m.RefVectorGet(v, 0)
-	astTestMust(t, e)
+	group := v[0]
 	sum, e := m.GetArg(group, 1)
 	astTestMust(t, e)
 	for i, want := range xs {
@@ -155,15 +150,13 @@ func TestASTBitVectorCoefficientHoistOneKeepsMultiplication(t *testing.T) {
 	one := bvRawOffsetTestNumeral(t, m, fid, s, "1", 8)
 	left := bvHoistProduct(t, m, one, xs[0], true)
 	right := bvHoistProduct(t, m, one, xs[1], true)
-	v, e := m.NewRefVectorFrom([]ASTHandle{right, left})
-	astTestMust(t, e)
-	defer func() { astTestMust(t, m.DelRefVector(&v)) }()
+	v := bvHoistRoots(t, m, []ASTHandle{right, left})
+	defer func() { astTestMust(t, bvReleaseHoistRoots(m, &v)) }()
 	h, e := NewBitVectorCoefficientHoist(m)
 	astTestMust(t, e)
 	defer func() { astTestMust(t, h.Close()) }()
-	astTestMust(t, h.Hoist(s, v))
-	group, e := m.RefVectorGet(v, 0)
-	astTestMust(t, e)
+	astTestMust(t, h.Hoist(s, &v))
+	group := v[0]
 	kind, e := m.GetDeclKind(group)
 	astTestMust(t, e)
 	if kind != 6 {
@@ -181,9 +174,8 @@ func TestASTBitVectorCoefficientHoistSingletonReadAndHeaderRefusal(t *testing.T)
 	fid, s, xs := bvHoistVariables(t, m, 1)
 	n := bvRawOffsetTestNumeral(t, m, fid, s, strings.Repeat("9", 1300), 8)
 	mon := bvHoistProduct(t, m, n, xs[0], true)
-	v, e := m.NewRefVectorFrom([]ASTHandle{mon})
-	astTestMust(t, e)
-	defer func() { astTestMust(t, m.DelRefVector(&v)) }()
+	v := bvHoistRoots(t, m, []ASTHandle{mon})
+	defer func() { astTestMust(t, bvReleaseHoistRoots(m, &v)) }()
 	used := m.Budget().Used()
 	m.Budget().FailAfter(0)
 	h, e := NewBitVectorCoefficientHoist(m)
@@ -199,7 +191,7 @@ func TestASTBitVectorCoefficientHoistSingletonReadAndHeaderRefusal(t *testing.T)
 		t.Fatal("shallow copied owner accepted", e)
 	}
 	m.Budget().FailAfter(0)
-	body := h.Hoist(ASTHandle{}, v)
+	body := h.Hoist(ASTHandle{}, &v)
 	m.Budget().FailAfter(-1)
 	if body == nil || !h.placed[0] || !h.placed[1] {
 		t.Fatal("last-element guard skipped first coefficient read", body)
@@ -208,8 +200,7 @@ func TestASTBitVectorCoefficientHoistSingletonReadAndHeaderRefusal(t *testing.T)
 	if child == nil || errors.Is(child, arena.ErrInvalidSlot) {
 		t.Fatal("missing singleton coefficient call", child)
 	}
-	got, e := m.RefVectorGet(v, 0)
-	astTestMust(t, e)
+	got := v[0]
 	if got != mon {
 		t.Fatal("failed singleton changed caller vector")
 	}
@@ -221,25 +212,23 @@ func TestASTBitVectorCoefficientHoistEmptySingletonAndIndependentGroups(t *testi
 	n := bvRawOffsetTestNumeral(t, m, fid, s, "7", 8)
 	product := bvHoistProduct(t, m, n, xs[0], true)
 	for _, args := range [][]ASTHandle{nil, {xs[0]}, {product}, {product, xs[1]}} {
-		v, e := m.NewRefVectorFrom(args)
-		astTestMust(t, e)
+		v := bvHoistRoots(t, m, args)
 		h, e := NewBitVectorCoefficientHoist(m)
 		astTestMust(t, e)
 		m.Budget().FailAfter(0)
-		body := h.Hoist(ASTHandle{}, v)
+		body := h.Hoist(ASTHandle{}, &v)
 		m.Budget().FailAfter(-1)
 		astTestMust(t, body)
-		size, e := m.RefVectorSize(v)
-		astTestMust(t, e)
+		size := len(v)
 		if int(size) != len(args) {
 			t.Fatal("unmatched group changed size")
 		}
-		if e = h.Hoist(s, v); !errors.Is(e, ErrASTPending) {
+		if e = h.Hoist(s, &v); !errors.Is(e, ErrASTPending) {
 			t.Fatal("source invocation reused", e)
 		}
 		astTestMust(t, h.Close())
 		astTestMust(t, h.Close())
-		astTestMust(t, m.DelRefVector(&v))
+		astTestMust(t, bvReleaseHoistRoots(m, &v))
 	}
 }
 
@@ -250,17 +239,18 @@ func TestASTBitVectorCoefficientHoistEveryActualReservation(t *testing.T) {
 			m := bvOffsetRuntimeTestManager(t)
 			fid, s, xs := bvHoistVariables(t, m, 18)
 			n := bvRawOffsetTestNumeral(t, m, fid, s, strings.Repeat("9", 1300), 8)
-			v, e := m.NewRefVector()
-			astTestMust(t, e)
-			defer func() { astTestMust(t, m.DelRefVector(&v)) }()
+			var v []ASTHandle
+			defer func() { astTestMust(t, bvReleaseHoistRoots(m, &v)) }()
 			for i := len(xs) - 1; i >= 0; i-- {
-				astTestMust(t, m.RefVectorPush(v, bvHoistProduct(t, m, n, xs[i], true)))
+				mon := bvHoistProduct(t, m, n, xs[i], true)
+				astTestMust(t, m.IncRef(mon))
+				v = append(v, mon)
 			}
 			h, e := NewBitVectorCoefficientHoist(m)
 			astTestMust(t, e)
 			defer func() { astTestMust(t, h.Close()) }()
 			m.Budget().FailAfter(ordinal)
-			body := h.Hoist(s, v)
+			body := h.Hoist(s, &v)
 			m.Budget().FailAfter(-1)
 			if body != nil {
 				failures++
@@ -270,13 +260,12 @@ func TestASTBitVectorCoefficientHoistEveryActualReservation(t *testing.T) {
 						t.Fatal("unexpected refusal", body)
 					}
 				}
-				if e = h.Hoist(s, v); !errors.Is(e, ErrASTPending) {
+				if e = h.Hoist(s, &v); !errors.Is(e, ErrASTPending) {
 					t.Fatal("failed call retried", e)
 				}
 			} else {
 				complete = true
-				size, e := m.RefVectorSize(v)
-				astTestMust(t, e)
+				size := len(v)
 				if size != 1 {
 					t.Fatal("hoist horizon result", size)
 				}
@@ -291,4 +280,31 @@ func TestASTBitVectorCoefficientHoistEveryActualReservation(t *testing.T) {
 	if !complete || failures == 0 {
 		t.Fatal("hoist reservation horizon", complete, failures)
 	}
+}
+
+// Test fixtures acquire the same caller-owned roots required by Hoist.
+func bvHoistRoots(t *testing.T, m *ASTManager, args []ASTHandle) []ASTHandle {
+	t.Helper()
+	roots := append([]ASTHandle(nil), args...)
+	for _, h := range roots {
+		astTestMust(t, m.IncRef(h))
+	}
+	return roots
+}
+func bvReleaseHoistRoots(m *ASTManager, roots *[]ASTHandle) error {
+	for len(*roots) != 0 {
+		consumed, e := m.DecRefConsumed((*roots)[0])
+		if consumed {
+			(*roots)[0] = ASTHandle{}
+			*roots = (*roots)[1:]
+		}
+		if e != nil {
+			return e
+		}
+		if !consumed {
+			return ErrASTPending
+		}
+	}
+	*roots = nil
+	return nil
 }

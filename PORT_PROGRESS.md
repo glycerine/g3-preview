@@ -33753,3 +33753,44 @@ gofmt and diff checks passed. No full native module suite rerun. Counts remain
 BV addition/coefficient hoisting and other BV/proof/sequence/AST collection
 consumers still need auditing/migration. The external native caller migration
 and requested util root subpackage split are unfinished.
+
+## Native BV addition membership, argument roots and coefficient hoisting
+
+Nonflat/flat addition now uses native borrowed flattened slices, local Go
+visited/multiple maps, and owning []ASTHandle argument roots. Removed source
+mark-plane/trail owners, bit-before-list pending candidates, reference-vector
+placement/saved identity and unpublished vector append receipts. Sorting uses
+Go sort.Slice with the original monomial comparator and keeps its first error.
+Actual coefficient owners, scan/rebuild order, normalization, constant-leading
+FAILED guards, output publication and DONE/FULL statuses remain.
+
+Coefficient hoisting now consumes the caller's owning *[]ASTHandle directly;
+its sole production caller is native addition. Borrowed power-product scratch
+uses []ASTHandle, and sorting uses Go's library with the source coefficient
+comparator. Replacement acquires the incoming root before consumed-DEC of the
+old root. An unconsumed old root and its acquired replacement remain reachable
+in the caller slice on refusal. Shrinking preserves the unread/unconsumed tail
+for caller cleanup. Actual numerical children/read receipts remain unchanged,
+including construction after sorting, separate debug read/equality, original
+coefficient literal reuse, and c_prime/c source cleanup. Caller roots remain
+separate from the borrowed hoist invocation's numerical cleanup. Tests now own
+native slices explicitly. No source container/STL or simulated storage-failure
+credit is added; manifest descriptions and renamed test evidence were corrected.
+
+Validation: focused final native ast hoist/addition tests passed (7.474s/0.130s),
+and focused final g3debug passed (8.091s/0.235s). Original 40-factor sole-ownership
+compaction checks all retired product handles become invalid and power-product
+reference counts stay unchanged. Actual large-numeral allocation-refusal campaigns
+remain. Addition fault campaigns verify retained roots have live references and
+completed cleanup clears native collections. A new 48-variable doubled/reversed
+addition checks grouping/hoisting output and preserves foreign planes1/2 through
+Close. Full native rewriter passed (11.251s); remaining g3debug rewriter passed
+(15.945s) with the same three previously verified baseline exclusions. Full
+native model/API/tactic/SAT tactic passed (0.055s/0.015s/0.024s/0.113s).
+Module-wide compilation, ast/rewriter vet, manifest, gofmt and diff checks passed.
+No full native module rerun within the hourly interval. Counts remain
+2102 units/677 APIs: 62 ported, 283 partial, 1729 unported, two dead/deleted.
+
+Addition/multiplication core collections are now native. Other BV/array/proof/
+sequence/AST collection callers remain; the complete external native caller
+migration and requested util root subpackage split are unfinished.

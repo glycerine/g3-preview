@@ -4,6 +4,7 @@ package rewriter
 
 import (
 	"reflect"
+	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -11,27 +12,22 @@ import (
 type BVPolynomialAdditionOptions struct{ SortSums, ASTOrder, HoistCoefficients, HoistMultiplication bool }
 
 // BVPolynomialAdditionCore owns the selected nonflat addition invocation.
-// Inputs borrow caller lifetimes through source exit, including mark destruction.
+// Inputs borrow caller lifetimes through source exit.
 type BVPolynomialAdditionCore struct {
-	pendingMarks                         [2]ast.ASTHandle
 	pair                                 [2]ast.ASTHandle
-	flatArgs                             ast.ASTHandleBuffer
+	flatArgs                             []ast.ASTHandle
 	currentSort                          ast.ASTHandle
 	sortBinding                          *ast.ASTHandle
 	ownsPositions                        bool
 	localsEnded                          bool
 	family                               ast.FamilyID
-	savedVector                          ast.ASTRefVector
 	self                                 *BVPolynomialAdditionCore
 	manager                              *ast.ASTManager
 	positions                            *bvPolynomialPositions
 	numeric                              *ast.BitVectorPolynomialAdditionNumerals
-	visited                              *ast.ASTFastMark1
-	multiple                             *ast.ASTFastMark2
-	vector                               ast.ASTRefVector
-	vectorPlaced                         bool
-	push                                 ast.ASTRefVectorPushReceipt
-	pushed                               ast.ASTHandle
+	visited                              map[ast.ASTHandle]bool
+	multiple                             map[ast.ASTHandle]bool
+	vector                               []ast.ASTHandle
 	cmul                                 *ast.BitVectorCoefficientHoist
 	mul                                  *BVPolynomialMultiplicationHoist
 	factory                              ast.ASTBitVectorNumeralInvocation
@@ -72,88 +68,25 @@ func newBVPolynomialAdditionCore(m *ast.ASTManager, table *bvPolynomialPositions
 	return p, nil
 }
 
-// A source mark sets its bit before the buffer append. Keep the reached
-// candidate when append fails so owning cleanup can consume that real prefix.
-func (p *BVPolynomialAdditionCore) mark(plane int, h ast.ASTHandle) error {
-	p.pendingMarks[plane] = h
-	var e error
-	if plane == 0 {
-		e = p.visited.Mark(h, true)
-	} else {
-		e = p.multiple.Mark(h, true)
-	}
-	if e == nil {
-		p.pendingMarks[plane] = ast.ASTHandle{}
-	}
-	return e
-}
 func (p *BVPolynomialAdditionCore) append(h ast.ASTHandle) error {
-	p.pushed = h
-	e := p.manager.RefVectorPushTracked(p.vector, h, &p.push)
-	if e == nil {
-		p.push = ast.ASTRefVectorPushReceipt{}
-	}
-	return e
-}
-func (p *BVPolynomialAdditionCore) less(o BVPolynomialAdditionOptions, a, b uint32) (bool, error) {
-	x, e := p.manager.RefVectorGet(p.vector, a)
-	if e != nil {
-		return false, e
-	}
-	y, e := p.manager.RefVectorGet(p.vector, b)
-	if e != nil {
-		return false, e
-	}
-	return bvMonomialLess(p.manager, p.family, o.ASTOrder, x, y)
-}
-func (p *BVPolynomialAdditionCore) sift(o BVPolynomialAdditionOptions, start, root, end uint32) error {
-	for root < end/2 {
-		child := root*2 + 1
-		if child+1 < end {
-			yes, e := p.less(o, start+child, start+child+1)
-			if e != nil {
-				return e
-			}
-			if yes {
-				child++
-			}
-		}
-		yes, e := p.less(o, start+root, start+child)
-		if e != nil {
-			return e
-		}
-		if !yes {
-			return nil
-		}
-		if e = p.manager.RefVectorSwapElements(p.vector, start+root, start+child); e != nil {
-			return e
-		}
-		root = child
-	}
-	return nil
+	return appendRewriterRoot(p.manager, &p.vector, h)
 }
 
-// std::sort's comparator/output contract; C++ library callback order is uncredited.
 func (p *BVPolynomialAdditionCore) sort(o BVPolynomialAdditionOptions, start uint32) error {
-	n, e := p.manager.RefVectorSize(p.vector)
-	if e != nil {
-		return e
+	if uint64(start) > uint64(len(p.vector)) {
+		return ast.ErrASTDomain
 	}
-	n -= start
-	for i := n / 2; i > 0; i-- {
-		if e = p.sift(o, start, i-1, n); e != nil {
-			return e
+	values := p.vector[start:]
+	var cause error
+	sort.Slice(values, func(i, j int) bool {
+		if cause != nil {
+			return false
 		}
-	}
-	for end := n; end > 1; end-- {
-		if e = p.manager.RefVectorSwapElements(p.vector, start, start+end-1); e != nil {
-			return e
-		}
-		if e = p.sift(o, start, 0, end-1); e != nil {
-			return e
-		}
-	}
-	return nil
+		var less bool
+		less, cause = bvMonomialLess(p.manager, p.family, o.ASTOrder, values[i], values[j])
+		return less
+	})
+	return cause
 }
 func (p *BVPolynomialAdditionCore) body(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialAdditionOptions) (RewriteStatus, error) {
 	m := p.manager
@@ -168,14 +101,8 @@ func (p *BVPolynomialAdditionCore) body(sort ast.ASTHandle, args ast.AppArgument
 	if e = p.numeric.Begin(); e != nil {
 		return RewriteFailed, e
 	}
-	p.visited, e = ast.NewASTFastMark1(m)
-	if e != nil {
-		return RewriteFailed, e
-	}
-	p.multiple, e = ast.NewASTFastMark2(m)
-	if e != nil {
-		return RewriteFailed, e
-	}
+	p.visited = make(map[ast.ASTHandle]bool)
+	p.multiple = make(map[ast.ASTHandle]bool)
 	numCoeffs := uint32(0)
 	hasMultiple, ordered := false, true
 	var prev ast.ASTHandle
@@ -215,19 +142,12 @@ func (p *BVPolynomialAdditionCore) body(sort ast.ASTHandle, args ast.AppArgument
 		if e != nil {
 			return RewriteFailed, e
 		}
-		marked, e := p.visited.IsMarked(pp)
-		if e != nil {
-			return RewriteFailed, e
-		}
+		marked := p.visited[pp]
 		if marked {
-			if e = p.mark(1, pp); e != nil {
-				return RewriteFailed, e
-			}
+			p.multiple[pp] = true
 			hasMultiple = true
 		} else {
-			if e = p.mark(0, pp); e != nil {
-				return RewriteFailed, e
-			}
+			p.visited[pp] = true
 		}
 	}
 	if e = p.numeric.Normalize(sort, false); e != nil {
@@ -256,10 +176,7 @@ func (p *BVPolynomialAdditionCore) body(sort ast.ASTHandle, args ast.AppArgument
 			if e != nil {
 				return RewriteFailed, e
 			}
-			marked, e := p.multiple.IsMarked(pp)
-			if e != nil {
-				return RewriteFailed, e
-			}
+			marked := p.multiple[pp]
 			if !marked {
 				continue
 			}
@@ -308,12 +225,6 @@ func (p *BVPolynomialAdditionCore) body(sort ast.ASTHandle, args ast.AppArgument
 			}
 		}
 	}
-	p.vector, e = m.NewRefVector()
-	if e != nil {
-		return RewriteFailed, e
-	}
-	p.vectorPlaced = true
-	p.savedVector = p.vector
 	zero, e := p.numeric.Zero(false)
 	if e != nil {
 		return RewriteFailed, e
@@ -328,9 +239,7 @@ func (p *BVPolynomialAdditionCore) body(sort ast.ASTHandle, args ast.AppArgument
 		}
 	}
 	if hasMultiple {
-		if e = p.visited.Reset(); e != nil {
-			return RewriteFailed, e
-		}
+		clear(p.visited)
 	}
 	for i := uint32(0); i < args.Count(); i++ {
 		arg, e := args.At(i)
@@ -354,26 +263,18 @@ func (p *BVPolynomialAdditionCore) body(sort ast.ASTHandle, args ast.AppArgument
 		if e != nil {
 			return RewriteFailed, e
 		}
-		marked, e := p.multiple.IsMarked(pp)
-		if e != nil {
-			return RewriteFailed, e
-		}
+		marked := p.multiple[pp]
 		if !marked {
 			if e = p.append(arg); e != nil {
 				return RewriteFailed, e
 			}
 			continue
 		}
-		seen, e := p.visited.IsMarked(pp)
-		if e != nil {
-			return RewriteFailed, e
-		}
+		seen := p.visited[pp]
 		if seen {
 			continue
 		}
-		if e = p.mark(0, pp); e != nil {
-			return RewriteFailed, e
-		}
+		p.visited[pp] = true
 		pos, found, e := p.positions.find(pp)
 		if e != nil {
 			return RewriteFailed, e
@@ -406,7 +307,7 @@ func (p *BVPolynomialAdditionCore) body(sort ast.ASTHandle, args ast.AppArgument
 		if e != nil {
 			return RewriteFailed, e
 		}
-		if e = p.cmul.Hoist(sort, p.vector); e != nil {
+		if e = p.cmul.Hoist(sort, &p.vector); e != nil {
 			return RewriteFailed, e
 		}
 	} else if (hasMultiple && o.SortSums) || (!hasMultiple && !ordered) {
@@ -418,14 +319,7 @@ func (p *BVPolynomialAdditionCore) body(sort ast.ASTHandle, args ast.AppArgument
 			return RewriteFailed, e
 		}
 	}
-	size, e := m.RefVectorSize(p.vector)
-	if e != nil {
-		return RewriteFailed, e
-	}
-	view, e := m.RefVectorArgumentsRange(p.vector, 0, size)
-	if e != nil {
-		return RewriteFailed, e
-	}
+	view := ast.SliceArguments(p.vector)
 	node, e := m.MkBitVectorPolynomialAddWithInvocation(sort, view, &p.factory)
 	if e != nil {
 		return RewriteFailed, e
@@ -474,29 +368,17 @@ func (p *BVPolynomialAdditionCore) sourceEnd() error {
 	if e := p.childrenSource(); e != nil {
 		return e
 	}
-	if p.vectorPlaced {
-		if e := p.manager.DelRefVector(&p.vector); e != nil {
-			return e
-		}
-		p.vectorPlaced = false
+	if e := shrinkRewriterRoots(p.manager, &p.vector, 0); e != nil {
+		return e
 	}
+	p.vector = nil
 	if p.numeric != nil {
 		if e := p.numeric.EndCoefficients(); e != nil {
 			return e
 		}
 	}
-	if p.multiple != nil {
-		if e := p.multiple.Close(); e != nil {
-			return e
-		}
-		p.multiple = nil
-	}
-	if p.visited != nil {
-		if e := p.visited.Close(); e != nil {
-			return e
-		}
-		p.visited = nil
-	}
+	p.multiple = nil
+	p.visited = nil
 	if p.numeric != nil {
 		if e := p.numeric.SourceEnd(); e != nil {
 			return e
@@ -540,7 +422,8 @@ func (p *BVPolynomialAdditionCore) rewrite(sort ast.ASTHandle, args ast.AppArgum
 	}
 	p.sourceCause = p.sourceEnd()
 	if p.sourceCause == nil {
-		p.flatArgs.Close(p.manager.Budget())
+		clear(p.flatArgs)
+		p.flatArgs = nil
 		if fallback && st == RewriteFailed {
 			node, body := p.manager.MkBitVectorPolynomialAddWithInvocation(*p.sortSlot(), args, &p.factory)
 			if body == nil {
@@ -615,49 +498,19 @@ func (p *BVPolynomialAdditionCore) Close() error {
 	if e := p.manager.CleanupBitVectorNumeralInvocation(&p.factory); e != nil {
 		return e
 	}
-	if p.vectorPlaced {
-		if e := p.manager.DelRefVector(&p.vector); e != nil {
-			return e
-		}
-		p.vectorPlaced = false
-	}
-	pending, e := p.push.Unpublished()
-	if e != nil {
+	if e := shrinkRewriterRoots(p.manager, &p.vector, 0); e != nil {
 		return e
 	}
-	if pending {
-		if e = p.manager.CompleteRefVectorPush(p.savedVector, p.pushed, &p.push); e != nil {
-			return e
-		}
-	}
-	if !p.pendingMarks[1].IsNull() && p.multiple != nil {
-		if e = p.multiple.ResetMark(p.pendingMarks[1]); e != nil {
-			return e
-		}
-		p.pendingMarks[1] = ast.ASTHandle{}
-	}
-	if !p.pendingMarks[0].IsNull() && p.visited != nil {
-		if e = p.visited.ResetMark(p.pendingMarks[0]); e != nil {
-			return e
-		}
-		p.pendingMarks[0] = ast.ASTHandle{}
-	}
-	if p.multiple != nil {
-		if e = p.multiple.Close(); e != nil {
-			return e
-		}
-	}
-	if p.visited != nil {
-		if e = p.visited.Close(); e != nil {
-			return e
-		}
-	}
+	p.vector = nil
+	p.multiple = nil
+	p.visited = nil
 	if p.numeric != nil {
-		if e = p.numeric.Close(); e != nil {
+		if e := p.numeric.Close(); e != nil {
 			return e
 		}
 	}
-	p.flatArgs.Close(p.manager.Budget())
+	clear(p.flatArgs)
+	p.flatArgs = nil
 	if p.ownsPositions {
 		p.positions.close()
 	}
