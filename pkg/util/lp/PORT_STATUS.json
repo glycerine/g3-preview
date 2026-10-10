@@ -1,11 +1,11 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 95.4,
+  "native_statement_coverage_of_current_go_code": 93.7,
   "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions, concrete priorities",
-    "indexed/sparse/static/dense matrices and permutations",
+    "exact permutation applications; indexed/sparse/static/dense matrices and transformations",
     "priority queues and LU/eta factorization",
     "scaling and random updates",
     "primal/dual simplex and LAR solvers",
@@ -179,7 +179,9 @@
         "TestLPIndexedPairVectorExactContracts",
         "TestLPIndexedPairVectorExactCopyOwnership",
         "TestLPIndexedPairVectorExactSparseOracle",
-        "TestLPIndexedPairVectorAllocationFailureCensus"
+        "TestLPIndexedPairVectorAllocationFailureCensus",
+        "TestLPIndexedRationalVectorOlderRawInvocationIdentity",
+        "TestLPIndexedPairVectorOlderRawInvocationIdentity"
       ]
     },
     {
@@ -203,7 +205,9 @@
         "TestLPIndexedPairVectorExactContracts",
         "TestLPIndexedPairVectorExactCopyOwnership",
         "TestLPIndexedPairVectorExactSparseOracle",
-        "TestLPIndexedPairVectorAllocationFailureCensus"
+        "TestLPIndexedPairVectorAllocationFailureCensus",
+        "TestLPIndexedRationalVectorOlderRawInvocationIdentity",
+        "TestLPIndexedPairVectorOlderRawInvocationIdentity"
       ]
     },
     {
@@ -227,7 +231,9 @@
         "TestLPIndexedPairVectorExactContracts",
         "TestLPIndexedPairVectorExactCopyOwnership",
         "TestLPIndexedPairVectorExactSparseOracle",
-        "TestLPIndexedPairVectorAllocationFailureCensus"
+        "TestLPIndexedPairVectorAllocationFailureCensus",
+        "TestLPIndexedRationalVectorOlderRawInvocationIdentity",
+        "TestLPIndexedPairVectorOlderRawInvocationIdentity"
       ]
     },
     {
@@ -583,21 +589,51 @@
     },
     {
       "source": "src/util/lp/permutation_matrix.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/permutation.go",
+        "pkg/util/lp/permutation_float.go"
+      ],
+      "tests": [
+        "TestLPPermutationIndependentMatrixProducts",
+        "TestLPPermutationResizeTransposeAndAliasContracts",
+        "TestLPFloatPermutationIndependentDenseAndSparseProducts",
+        "TestLPFloatPermutationSource",
+        "TestLPPermutationGuardPrefixesAndFloatingComparisons",
+        "TestLPPermutationShrunkDomainPreservesReachedPrefixes"
+      ]
     },
     {
       "source": "src/util/lp/permutation_matrix.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/permutation.go",
+        "pkg/util/lp/permutation_float.go"
+      ],
+      "tests": [
+        "TestLPPermutationIndependentMatrixProducts",
+        "TestLPPermutationResizeTransposeAndAliasContracts",
+        "TestLPFloatPermutationIndependentDenseAndSparseProducts",
+        "TestLPFloatPermutationSource",
+        "TestLPPermutationGuardPrefixesAndFloatingComparisons",
+        "TestLPPermutationShrunkDomainPreservesReachedPrefixes"
+      ]
     },
     {
       "source": "src/util/lp/permutation_matrix_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/permutation.go",
+        "pkg/util/lp/permutation_float.go"
+      ],
+      "tests": [
+        "TestLPPermutationIndependentMatrixProducts",
+        "TestLPPermutationResizeTransposeAndAliasContracts",
+        "TestLPFloatPermutationIndependentDenseAndSparseProducts",
+        "TestLPFloatPermutationSource",
+        "TestLPPermutationGuardPrefixesAndFloatingComparisons",
+        "TestLPPermutationShrunkDomainPreservesReachedPrefixes"
+      ]
     },
     {
       "source": "src/util/lp/quick_xplain.cpp",
@@ -792,7 +828,8 @@
     }
   ],
   "status_counts": {
-    "unported": 99,
-    "partial": 11
-  }
+    "unported": 96,
+    "partial": 14
+  },
+  "combined_debug_checked_statement_coverage_of_current_go_code": 94.7
 }

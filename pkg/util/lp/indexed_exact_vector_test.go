@@ -715,3 +715,93 @@ func lpExactVectorNamedCensus(t *testing.T, h *lpPairHarness, extra []*numeral.R
 		t.Fatal("pending physical allocation retained", roots)
 	}
 }
+
+// A stopped arithmetic frame created by another caller retains its own
+// generation and allocation roots across vector failure and Close.
+func TestLPIndexedRationalVectorOlderRawInvocationIdentity(t *testing.T) {
+	h := newLPPairHarness(t)
+	p := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
+	q := h.pair(strings.Repeat("9876543210", 100)+"/13", "0")
+	v := NewIndexedRationalVector(h.m, 1)
+	h.must(v.SetValue(&p.X, 0))
+	local := numeral.NewRational()
+	beforeRoots, err := numeral.CaptureNumericAllocationRoots(h.m.Z)
+	h.must(err)
+	h.budget.FailAfter(0)
+	err = h.m.Add(&p.X, &q.X, &local)
+	h.budget.FailAfter(-1)
+	if err == nil {
+		t.Fatal("older raw call did not fail")
+	}
+	var olderRoots numeral.NumericAllocationRoots
+	h.must(olderRoots.After(h.m.Z, beforeRoots))
+	older := h.m.RawInvocationState()
+	if !older.Active[1] {
+		t.Fatal("missing older addition frame", older)
+	}
+	if err := v.Add(0, &p.X); err != numeral.ErrRationalRawArithmeticPending {
+		t.Fatal(err)
+	}
+	if v.calls.pending() {
+		t.Fatal("vector claimed the older invocation")
+	}
+	h.must(v.Close())
+	if got := h.m.RawInvocationState(); got != older {
+		t.Fatal("vector consumed older arithmetic", got, older)
+	}
+	generations := [3]uint64{}
+	for i, active := range older.Active {
+		if active {
+			generations[i] = older.Generations[i]
+		}
+	}
+	h.must(h.m.CleanupRawInvocations(&generations))
+	h.must(h.m.Del(&local))
+	h.must(numeral.CleanupNumericAllocationRoots(h.m.Z, &olderRoots))
+	lpExactVectorNamedCensus(t, h, nil)
+}
+
+// A stopped arithmetic frame created by another caller retains its own
+// generation and allocation roots across vector failure and Close.
+func TestLPIndexedPairVectorOlderRawInvocationIdentity(t *testing.T) {
+	h := newLPPairHarness(t)
+	p := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
+	q := h.pair(strings.Repeat("9876543210", 100)+"/13", "0")
+	v := NewIndexedPairVector(h.m, 1)
+	h.must(v.SetValue(p, 0))
+	local := numeral.NewRational()
+	beforeRoots, err := numeral.CaptureNumericAllocationRoots(h.m.Z)
+	h.must(err)
+	h.budget.FailAfter(0)
+	err = h.m.Add(&p.X, &q.X, &local)
+	h.budget.FailAfter(-1)
+	if err == nil {
+		t.Fatal("older raw call did not fail")
+	}
+	var olderRoots numeral.NumericAllocationRoots
+	h.must(olderRoots.After(h.m.Z, beforeRoots))
+	older := h.m.RawInvocationState()
+	if !older.Active[1] {
+		t.Fatal("missing older addition frame", older)
+	}
+	if err := v.Add(0, p); err != numeral.ErrRationalRawArithmeticPending {
+		t.Fatal(err)
+	}
+	if v.calls.pending() {
+		t.Fatal("vector claimed the older invocation")
+	}
+	h.must(v.Close())
+	if got := h.m.RawInvocationState(); got != older {
+		t.Fatal("vector consumed older arithmetic", got, older)
+	}
+	generations := [3]uint64{}
+	for i, active := range older.Active {
+		if active {
+			generations[i] = older.Generations[i]
+		}
+	}
+	h.must(h.m.CleanupRawInvocations(&generations))
+	h.must(h.m.Del(&local))
+	h.must(numeral.CleanupNumericAllocationRoots(h.m.Z, &olderRoots))
+	lpExactVectorNamedCensus(t, h, nil)
+}

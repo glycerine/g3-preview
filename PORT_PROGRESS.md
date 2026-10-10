@@ -34885,3 +34885,39 @@ error propagation/teardown profiles remain explicit, not filled with fabricated
 ordinary OOM fixtures. LP vet passed. Full solver goal remains active and the
 source inventory remains eleven partial/99 unported units. Next: permutations,
 concrete priorities and matrix/factorization algorithms.
+
+
+## Permutation matrix index algorithms and concrete floating applications
+
+Added the source forward/reverse/work mapping, literal initialization/set/resize,
+identity/element inspection, transpositions and four composition methods. Shared
+index operations use concrete unsigned slices. Actual double,double applications
+own separate T/X buffers and implement six dense and four sparse directions in
+source traversal/copy/clear/index-publication order. Debug ApplyRightIndexed
+executes the real preliminary dense application and final relative comparison.
+Rational/rational and rational/pair applications remain the next matrix work.
+
+Translated the complete active --test_perm scenario, including both source
+vector_of_permutaions cases; independent dense products replace its debug-only
+assertion dependency. Independent exhaustive checks cover2304 distinct size-four
+composition products,288 transpositions and all120 size-five permutations with
+six dense/four sparse directions. These caught the source's opposite-side
+transposition naming, which is preserved, as are descending-loop alias effects
+for right and reverse-right self products. Shrunk-domain fixtures retain stale
+mapping entries, completed source mutation prefixes and actual native/debug
+sparse failure differences. No atomic repair or unused declaration adapter was
+added. Exact indexed-vector tests additionally verify an older stopped raw
+addition invocation remains owned by its caller across vector failure/Close.
+
+Focused native/debug permutation checks pass(0.014s/0.016s), and both older-raw
+identity tests pass in both profiles. LP vet passed. Updated manifest inventory
+is14 partial/96 unported LP units, not a completed solver. Final all-LP coverage
+is93.7% native/94.7% combined debug-checked. Permutation index algorithms
+cover91.2%/93.0%; floating applications87.7%/92.6%. The prior full-suite
+handle is now absent; its complete64-package log contains only successful or
+no-test package results, with no FAIL/panic. The original process exit code
+was not recovered, so this records log evidence rather than an observed exit.
+Full-suite log is
+/mnt/oldrog/tmp/g3-lp-permutation-module-native.log. Full LP objective remains
+active, with exact permutation buffers, priorities and matrix/LU/solver layers
+still required. Previous checkpointef795199 saved exact indexed vectors.

@@ -3,3 +3,5 @@
 package lp
 
 func sourceAssertionFailure() error { return nil }
+
+const sourceDebugEnabled = false
