@@ -121385,7 +121385,8 @@
         "pkg/util/lp/dual_core_float_test.go",
         "pkg/util/lp/dual_initial_float.go",
         "pkg/util/lp/dual_ratio_float.go",
-        "pkg/util/lp/dual_flip_float.go"
+        "pkg/util/lp/dual_flip_float.go",
+        "pkg/util/lp/dual_advance_float.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -121406,7 +121407,16 @@
         "TestLPFloatDualRatioReachedGuards",
         "TestLPFloatDualFlipFailurePrefixes",
         "TestLPFloatDualRatioActualPivotAndFlips",
-        "TestLPFloatDualFlipReachedStorageErrors"
+        "TestLPFloatDualFlipReachedStorageErrors",
+        "TestLPFloatDualAdvanceIndependentInverseRows",
+        "TestLPFloatDualAdvanceFlipsAndStops",
+        "TestLPFloatDualAdvanceActualDualRecovery",
+        "TestLPFloatDualBetaIEEEAndSourceClamp",
+        "TestLPFloatDualSnapAndRecoverSourceQuirks",
+        "TestLPFloatDualReducedCostDiagnosticThreshold",
+        "TestLPFloatDualAdvanceReachedGuards",
+        "TestLPFloatDualAdvancePublicationAndClosedChildren",
+        "TestLPFloatDualAdvanceActualNumericalRefusals"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -121422,7 +121432,7 @@
           ]
         },
         {
-          "name": "Remaining dual pricing loop, pivot/beta/basis-update optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
+          "name": "Remaining dual pricing/iteration/full optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
           "status": "unported",
           "go_target": "",
           "tests": []
@@ -121459,11 +121469,28 @@
             "TestLPFloatDualRatioActualPivotAndFlips",
             "TestLPFloatDualFlipReachedStorageErrors"
           ]
+        },
+        {
+          "name": "Floating dual pivot preparation, prepared DSE and beta updates, actual shared basis/X pivot and dual recovery/rollback, reduced-cost diagnostic and runaway snap",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_advance_float.go",
+          "tests": [
+            "TestLPFloatDualAdvanceIndependentInverseRows",
+            "TestLPFloatDualAdvanceFlipsAndStops",
+            "TestLPFloatDualAdvanceActualDualRecovery",
+            "TestLPFloatDualBetaIEEEAndSourceClamp",
+            "TestLPFloatDualSnapAndRecoverSourceQuirks",
+            "TestLPFloatDualReducedCostDiagnosticThreshold",
+            "TestLPFloatDualAdvanceReachedGuards",
+            "TestLPFloatDualAdvancePublicationAndClosedChildren",
+            "TestLPFloatDualAdvanceActualNumericalRefusals"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit."
+        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
+        "Floating dual DSE calls the source prepared U/R solve without full scaling/tail transforms. On the explicit scaled triangular B, updated beta1 is0.0517578125 while the true new inverse-row squared norm is0.2666015625. This literal source discrepancy is preserved, not corrected. Boxed runaway snap writes low even when nearer upper; free recovery assigns zero before source debug assertion. Dead restore_d and commented-out xb_minus_delta_p_pivot_column have no retained source caller and are not ported."
       ]
     },
     {
@@ -121476,7 +121503,8 @@
         "pkg/util/lp/dual_core_float_test.go",
         "pkg/util/lp/dual_initial_float.go",
         "pkg/util/lp/dual_ratio_float.go",
-        "pkg/util/lp/dual_flip_float.go"
+        "pkg/util/lp/dual_flip_float.go",
+        "pkg/util/lp/dual_advance_float.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -121497,7 +121525,16 @@
         "TestLPFloatDualRatioReachedGuards",
         "TestLPFloatDualFlipFailurePrefixes",
         "TestLPFloatDualRatioActualPivotAndFlips",
-        "TestLPFloatDualFlipReachedStorageErrors"
+        "TestLPFloatDualFlipReachedStorageErrors",
+        "TestLPFloatDualAdvanceIndependentInverseRows",
+        "TestLPFloatDualAdvanceFlipsAndStops",
+        "TestLPFloatDualAdvanceActualDualRecovery",
+        "TestLPFloatDualBetaIEEEAndSourceClamp",
+        "TestLPFloatDualSnapAndRecoverSourceQuirks",
+        "TestLPFloatDualReducedCostDiagnosticThreshold",
+        "TestLPFloatDualAdvanceReachedGuards",
+        "TestLPFloatDualAdvancePublicationAndClosedChildren",
+        "TestLPFloatDualAdvanceActualNumericalRefusals"
       ],
       "assertions": [
         {
@@ -121635,7 +121672,7 @@
           ]
         },
         {
-          "name": "Remaining dual pricing loop, pivot/beta/basis-update optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
+          "name": "Remaining dual pricing/iteration/full optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
           "status": "unported",
           "go_target": "",
           "tests": []
@@ -121672,11 +121709,28 @@
             "TestLPFloatDualRatioActualPivotAndFlips",
             "TestLPFloatDualFlipReachedStorageErrors"
           ]
+        },
+        {
+          "name": "Floating dual pivot preparation, prepared DSE and beta updates, actual shared basis/X pivot and dual recovery/rollback, reduced-cost diagnostic and runaway snap",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_advance_float.go",
+          "tests": [
+            "TestLPFloatDualAdvanceIndependentInverseRows",
+            "TestLPFloatDualAdvanceFlipsAndStops",
+            "TestLPFloatDualAdvanceActualDualRecovery",
+            "TestLPFloatDualBetaIEEEAndSourceClamp",
+            "TestLPFloatDualSnapAndRecoverSourceQuirks",
+            "TestLPFloatDualReducedCostDiagnosticThreshold",
+            "TestLPFloatDualAdvanceReachedGuards",
+            "TestLPFloatDualAdvancePublicationAndClosedChildren",
+            "TestLPFloatDualAdvanceActualNumericalRefusals"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit."
+        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
+        "Floating dual DSE calls the source prepared U/R solve without full scaling/tail transforms. On the explicit scaled triangular B, updated beta1 is0.0517578125 while the true new inverse-row squared norm is0.2666015625. This literal source discrepancy is preserved, not corrected. Boxed runaway snap writes low even when nearer upper; free recovery assigns zero before source debug assertion. Dead restore_d and commented-out xb_minus_delta_p_pivot_column have no retained source caller and are not ported."
       ]
     },
     {

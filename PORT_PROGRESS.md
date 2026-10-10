@@ -37671,3 +37671,49 @@ checkpoint21:11 UTC predates these changes; a repeat is not due yet.
 Remaining dual pricing loop, beta/basis/pivot optimization and recovery,
 outer stage execution/solutions, exact variants and complete original drivers
 remain open. No dual optimum or source-unit completion credit is claimed.
+
+### Floating dual actual pivots, beta updates and recovery — 2026-10-10
+
+Ported AdvanceOnKnownP through real pivot-row calculation, ratio selection,
+precise leaving beta, entering-column FTRAN, pivot comparison/refactor,
+prepared DSE FTRAN and actual shared numerical basis/X update. Added exact
+floating inverse-row norm initialization, beta recurrence/clamps, reduced-cost
+validation/diagnostics, runaway snapping, entering-boundary recovery, real
+basis rollback/refactor/reconstruction and dual-feasibility recovery. Existing
+shared UpdateBasisAndX supplies actual Suhl replacement/full refactor and
+residual restoration; no source optimizer callback or fake numerical result.
+
+150 independently constructed triangular-basis systems check original X,
+actual pivot step, resulting X and equations, reduced costs, basis/headings,
+prepared operator, beta recurrence and real rollback. Odd worlds force real
+full refactor; even worlds exercise actual replacement. A full bound-flip
+pivot reaches X=(0,1,1,7), basis3 and independently verified reduced costs.
+Real invalid remaining reduced costs trigger dual rollback/recomputation;
+actual singular rollback, strict negative residual tolerance and forced
+pivot-comparison refactor exercise numerical outcomes. IEEE clamps, source
+snap/free-recovery quirks, exact diagnostic threshold, closed LU, short
+metadata and publication-before-error guards are tested.
+
+Independent inverse-row norms exposed a source discrepancy: DSE calls the
+prepared triangular U/R solve, omitting full-solve scaling/tail transforms.
+For B=[[2,1,0],[0,4,2],[0,0,8]] and entering direction(-.5,.5,-.25), source
+updated beta1 is0.0517578125 while the true new inverse-row squared norm is
+0.2666015625. Tests independently solve the normalized U operator and retain
+this literal source result, separately from the true inverse-row norm. No
+claim of general beta-norm accuracy is made. Boxed runaway snapping writes
+low even nearer upper; free-column recovery writes zero before debug assert.
+
+Whole-source no-ignore scan confirms restore_d has no retained caller and
+xb_minus_delta_p_pivot_column is only declared/defined/commented-out; these
+unused helpers were excluded instead of adding dead Go APIs.
+
+Focused native core/primal/dual/MPS/presolve/solver/column/scaler/static/LU
+checks pass1.038s; combined g3debug/g3checked1.013s. New file182/216 (84.3%)
+native,185/216 (85.6%) debug. Remaining gaps include rare numerical snap/
+recovery, invariant-protected child errors and opposite-profile assertions.
+Profiles: /mnt/oldrog/tmp/g3-dual-advance-{native,debug}.cover. Both vets pass;
+source/evidence/no-generics verification and graph regeneration run without
+new import edges. LP remains72 partial/38 unported; full pricing/iteration
+optimization, outer stage/solution dispatch, exact variants and full original
+drivers remain open. Last full module checkpoint21:11 UTC predates this work;
+another hourly run is not due yet. No whole dual optimizer completion credit.

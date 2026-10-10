@@ -27,8 +27,15 @@ after changed infeasibility costs make the stored reduced cost stale. For
 `x=3,s0=13,s1=0`; the retained source loop stops after its first pivot at
 `x=1.375,s0=0,s1=-1.625`. Tests independently predict this drift classification.
 
+Known source limitation: dual DSE invokes only the prepared triangular U/R
+solve, omitting full-solve scaling/tail transforms. For the retained scaled
+triangular fixture, updated beta1 is `0.0517578125`; the independently computed
+new inverse-row squared norm is `0.2666015625`. Tests preserve and distinguish
+these results. This does not establish general beta-norm accuracy.
+
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Floating dual actual pivot, beta update and rollback | 150 independent triangular-basis systems through actual LU replacement/refactor and rollback; full bound-flip pivot, real dual-feasibility/singular/numerical recovery and strict/IEEE/metadata/writer prefixes | Native84.3% (182/216), debug85.6% (185/216). Gaps include rare numerical snap/recovery, child errors and assertion-profile paths. Prepared source DSE beta discrepancy below is preserved; full pricing/iteration optimization remains open |
 | Floating dual Harris ratio selection and bound-flip residual updates | 240 independent breakpoint-group models,120 Harris-window systems,120 flip/equation worlds, real nonunit-basis pivot-row/ratio/flip integration; strict/IEEE/source fallthrough and real child/metadata publication checks | Ratio92.9% native (260/280),95.0% debug (266/280); flips85.9% native (55/64),98.4% debug (63/64). Remaining gaps mostly qualify other-profile assertions or invariant-protected child propagation. Full dual pricing/pivot/beta/basis-update loop remains open |
 | Floating dual feasibility initialization and leaving-row pricing | 160 independently reconstructed systems through actual LU;160 pricing worlds with reordered bases; fixed strict reduced-cost signs, endpoint short circuits, primal tolerance boundaries, IEEE beta division, stopping limits and diagnostic/error publication prefixes | Shared predicates/assignment88.9% native (56/63),95.2% debug (60/63); initialization/pricing88.2% native (45/51),100% debug (51/51). Full pricing/ratio/flip/pivot optimization loop and exact variants remain open |
 | Floating dual two-stage preparation and real core construction/recomputation | 160 independently prepared models and100 independent dual-vector systems through actual LU; source column eligibility, cost/bound transformations, signed slack/artificial basis, restoration, IEEE/resize/backup and error publication checks | Preparation84.5% native (256/303),85.5% debug (259/303); core98.1% in each (53/54). Full dual optimization/stage dispatch and exact variants remain open; these tests do not claim dual optima |
