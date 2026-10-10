@@ -37758,3 +37758,43 @@ new import edges. LP remains72 partial/38 unported. Last full native module
 checkpoint21:11 UTC predates these additions; another hourly run is not due.
 Outer dual two-stage execution/status/cost/solution reconstruction, exact
 variants and complete original drivers remain open; whole LP goal unfinished.
+
+### Floating dual outer stages and original solution reconstruction — 2026-10-10
+
+Connected FindMaximalSolution through cost flipping, actual presolve, sparse
+assembly, RHS shifts/scaling, augmentation and first-stage setup, zero-RHS
+backup, actual core construction and both dual phases. Stage1 skips only on
+strict artificial-cost tolerance; status/counters publish in original order.
+Stage2 restores eligibility, costs/bounds/types and RHS, recomputes actual
+reduced costs/basic values, solves and dispatches source statuses. Added
+matrix extent statistics and actual core Close, original value reconstruction
+and flipped-back objective including fixed costs and column scaling. Sorted
+external indices choose deterministic source unordered summation order.
+
+120 independent bounded vertex models cover shifted lower bounds, boxes,
+fixed columns, scaling and mixed costs through the complete outer LU entry.
+Independent exhaustive Gauss-Jordan minima/maxima and external inequalities/
+bounds validate objective and values; phase iteration sums and actual Close
+are checked. Analytic equality/free-variable fixtures, contradictory rows,
+unbounded objective, both phase time limits, real numerical floating failure,
+constructor/metadata/writer errors and publication prefixes are covered.
+
+Source stage2 switch omits IterationsExhausted: debug asserts before second/
+total iteration publication; native retains outer Feasible status and publishes
+counts, including uint32 sum wrap. Source Stage1 DualUnbounded debug assertion/
+native IterationsExhausted fallthrough and strict artificial-cost NaN/infinity
+boundaries remain explicit. Default tableau still lacks actual LU: constructor
+fails with bounds error, partial owner is cleaned and not published. Successful
+optimization credit applies to explicit LU. Previous dual prepared-DSE and
+forbidden-row source discrepancies remain documented and uncorrected.
+
+Focused native core/primal/dual/MPS/presolve/solver/column/scaler/static/LU
+checks pass0.991s; combined g3debug/g3checked0.958s. New file116/130 (89.2%)
+native,117/130 (90.0%) debug. Remaining statements mostly qualify child errors
+protected by earlier successful stages or opposite assertion profiles.
+Profiles: /mnt/oldrog/tmp/g3-dual-outer-{native,debug}.cover. Both LP vets pass;
+source/evidence/no-generics verifier and graph regeneration run without new
+import edges. LP remains72 partial/38 unported. MPS dual creation, exact
+variants and complete original source drivers remain open; whole LP unfinished.
+Last full module checkpoint21:11 UTC predates these additions; next hourly
+full native run is not due yet.

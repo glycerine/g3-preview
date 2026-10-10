@@ -121441,7 +121441,7 @@
           ]
         },
         {
-          "name": "Remaining exact dual core, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
+          "name": "Remaining exact dual variants and full upstream/MPS dual drivers",
           "status": "unported",
           "go_target": "",
           "tests": []
@@ -121706,7 +121706,7 @@
           ]
         },
         {
-          "name": "Remaining exact dual core, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
+          "name": "Remaining exact dual variants and full upstream/MPS dual drivers",
           "status": "unported",
           "go_target": "",
           "tests": []
@@ -121829,14 +121829,21 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/dual_prepare_float.go",
-        "pkg/util/lp/dual_prepare_float_test.go"
+        "pkg/util/lp/dual_prepare_float_test.go",
+        "pkg/util/lp/dual_solver_float.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
         "TestLPFloatDualPreparationSourcePrefixes",
         "TestLPFloatDualPreparationIEEEAndResize",
         "TestLPFloatDualPreparationMetadataAndStageTwoPrefixes",
-        "TestLPFloatDualCostFlipIEEEAndPublication"
+        "TestLPFloatDualCostFlipIEEEAndPublication",
+        "TestLPFloatDualOuterIndependentVertices",
+        "TestLPFloatDualOuterStageStatusAndTolerance",
+        "TestLPFloatDualOuterEmptyFailuresAndPublication",
+        "TestLPFloatDualOuterRelationsFreeAndStatuses",
+        "TestLPFloatDualOuterActualStopsAndMetadata",
+        "TestLPFloatDualOuterReachedChildFailures"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -121858,11 +121865,25 @@
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "Floating dual outer two-stage execution, source status dispatch and iteration publication, actual core ownership and original column/cost reconstruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_solver_float.go",
+          "tests": [
+            "TestLPFloatDualOuterIndependentVertices",
+            "TestLPFloatDualOuterStageStatusAndTolerance",
+            "TestLPFloatDualOuterEmptyFailuresAndPublication",
+            "TestLPFloatDualOuterRelationsFreeAndStatuses",
+            "TestLPFloatDualOuterActualStopsAndMetadata",
+            "TestLPFloatDualOuterReachedChildFailures"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit."
+        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
+        "Native sorted external indices fix deterministic traversal for source unordered objective summation. Source stage-two status switch omits ITERATIONS_EXHAUSTED: debug asserts before iteration publication; native leaves outer status unchanged and publishes counts, including uint32 addition wrap. Default tableau profile still lacks a core LU and reports explicit constructor bounds error with partial owner cleanup; only explicit LU is credited as successful optimization."
       ]
     },
     {
@@ -121872,14 +121893,21 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/dual_prepare_float.go",
-        "pkg/util/lp/dual_prepare_float_test.go"
+        "pkg/util/lp/dual_prepare_float_test.go",
+        "pkg/util/lp/dual_solver_float.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
         "TestLPFloatDualPreparationSourcePrefixes",
         "TestLPFloatDualPreparationIEEEAndResize",
         "TestLPFloatDualPreparationMetadataAndStageTwoPrefixes",
-        "TestLPFloatDualCostFlipIEEEAndPublication"
+        "TestLPFloatDualCostFlipIEEEAndPublication",
+        "TestLPFloatDualOuterIndependentVertices",
+        "TestLPFloatDualOuterStageStatusAndTolerance",
+        "TestLPFloatDualOuterEmptyFailuresAndPublication",
+        "TestLPFloatDualOuterRelationsFreeAndStatuses",
+        "TestLPFloatDualOuterActualStopsAndMetadata",
+        "TestLPFloatDualOuterReachedChildFailures"
       ],
       "assertions": [
         {
@@ -121959,11 +121987,25 @@
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "Floating dual outer two-stage execution, source status dispatch and iteration publication, actual core ownership and original column/cost reconstruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_solver_float.go",
+          "tests": [
+            "TestLPFloatDualOuterIndependentVertices",
+            "TestLPFloatDualOuterStageStatusAndTolerance",
+            "TestLPFloatDualOuterEmptyFailuresAndPublication",
+            "TestLPFloatDualOuterRelationsFreeAndStatuses",
+            "TestLPFloatDualOuterActualStopsAndMetadata",
+            "TestLPFloatDualOuterReachedChildFailures"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit."
+        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
+        "Native sorted external indices fix deterministic traversal for source unordered objective summation. Source stage-two status switch omits ITERATIONS_EXHAUSTED: debug asserts before iteration publication; native leaves outer status unchanged and publishes counts, including uint32 addition wrap. Default tableau profile still lacks a core LU and reports explicit constructor bounds error with partial owner cleanup; only explicit LU is credited as successful optimization."
       ]
     },
     {
@@ -123558,7 +123600,8 @@
         "pkg/util/lp/solver_presolve_float_test.go",
         "pkg/util/lp/primal_solver_float.go",
         "pkg/util/lp/dual_prepare_float.go",
-        "pkg/util/lp/dual_prepare_float_test.go"
+        "pkg/util/lp/dual_prepare_float_test.go",
+        "pkg/util/lp/dual_solver_float.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -123578,7 +123621,13 @@
         "TestLPFloatPrimalOuterSourceUpperOnlyInconsistency",
         "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors",
         "TestLPFloatDualCostFlipIEEEAndPublication",
-        "TestLPFloatDualPreparationIndependentModels"
+        "TestLPFloatDualPreparationIndependentModels",
+        "TestLPFloatDualOuterIndependentVertices",
+        "TestLPFloatDualOuterStageStatusAndTolerance",
+        "TestLPFloatDualOuterEmptyFailuresAndPublication",
+        "TestLPFloatDualOuterRelationsFreeAndStatuses",
+        "TestLPFloatDualOuterActualStopsAndMetadata",
+        "TestLPFloatDualOuterReachedChildFailures"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -123638,6 +123687,19 @@
           "tests": [
             "TestLPFloatDualCostFlipIEEEAndPublication",
             "TestLPFloatDualPreparationIndependentModels"
+          ]
+        },
+        {
+          "name": "Floating matrix extent statistics output",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_solver_float.go",
+          "tests": [
+            "TestLPFloatDualOuterIndependentVertices",
+            "TestLPFloatDualOuterStageStatusAndTolerance",
+            "TestLPFloatDualOuterEmptyFailuresAndPublication",
+            "TestLPFloatDualOuterRelationsFreeAndStatuses",
+            "TestLPFloatDualOuterActualStopsAndMetadata",
+            "TestLPFloatDualOuterReachedChildFailures"
           ]
         }
       ],

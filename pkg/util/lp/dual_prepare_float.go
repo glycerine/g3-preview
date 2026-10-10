@@ -25,13 +25,14 @@ func (m *FloatLPSolver) FlipCosts() error {
 	return nil
 }
 
-// FloatDualSimplex currently owns the retained two-stage model preparation.
-// Its dual optimization/stage dispatch is not yet implemented.
+// FloatDualSimplex owns the retained floating two-stage dual model and core.
 type FloatDualSimplex struct {
 	*FloatLPSolver
-	BCopy, LowBounds                    []float64
-	CoreColumnTypes, LogicalColumnTypes []ColumnType
-	CanEnterBasis                       []bool
+	BCopy, LowBounds                            []float64
+	CoreColumnTypes, LogicalColumnTypes         []ColumnType
+	CanEnterBasis                               []bool
+	CoreSolver                                  *FloatDualCoreSolver
+	FirstStageIterations, SecondStageIterations uint32
 }
 
 func NewFloatDualSimplex() (*FloatDualSimplex, error) {

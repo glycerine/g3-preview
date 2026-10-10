@@ -6,7 +6,7 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
 There are currently 72 partial source units and 38 unported units. The floating
-stage-one core exposes Solve, and outer LU primal integration is implemented.
+primal and dual cores expose Solve, and outer LU primal/dual integration is implemented.
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
 
@@ -42,6 +42,7 @@ from the120 independently verified bounded optima.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Floating dual outer two-stage solve and solution reconstruction | 120 independent shifted/boxed/fixed/scaled/mixed-cost vertex optima; analytic free/equality models, infeasible/unbounded classification, both phase clock stops, real numerical/metadata/writer and owner publication tests | Native89.2% (116/130), debug90.0% (117/130). Gaps mostly propagate invariant-protected child errors or qualify assertion profiles. Source stage-two iteration-exhaustion dispatch omission is preserved; default tableau remains a missing-LU error. MPS dual/exact integration and original drivers remain open |
 | Floating dual core Solve, iteration and row pricing | 120 bounded covering LPs against independent exhaustive vertex minima;500 independent record-budget pricing worlds; RNG/strict limits/time/output/debug guards and actual numerical failure/forbidden-row transitions | Native77.9% (81/104), debug97.1% (101/104). Native excludes20 assertion-only statements;3 remaining guards are protected by earlier same-thread checks. Source forbidden-row Optimal discrepancy below is preserved. Outer dual stages/exact variants remain open |
 | Floating dual actual pivot, beta update and rollback | 150 independent triangular-basis systems through actual LU replacement/refactor and rollback; full bound-flip pivot, real dual-feasibility/singular/numerical recovery and strict/IEEE/metadata/writer prefixes | Native84.3% (182/216), debug85.6% (185/216). Gaps include rare numerical snap/recovery, child errors and assertion-profile paths. Prepared source DSE beta discrepancy below is preserved; full pricing/iteration optimization remains open |
 | Floating dual Harris ratio selection and bound-flip residual updates | 240 independent breakpoint-group models,120 Harris-window systems,120 flip/equation worlds, real nonunit-basis pivot-row/ratio/flip integration; strict/IEEE/source fallthrough and real child/metadata publication checks | Ratio92.9% native (260/280),95.0% debug (266/280); flips85.9% native (55/64),98.4% debug (63/64). Remaining gaps mostly qualify other-profile assertions or invariant-protected child propagation. Full dual pricing/pivot/beta/basis-update loop remains open |
