@@ -1190,6 +1190,7 @@
         "priority_heap.go",
         "priority_queue_exact.go",
         "priority_queue_native.go",
+        "row_eta_matrix_exact.go",
         "row_eta_matrix_float.go",
         "settings.go",
         "sparse_float_vector.go",

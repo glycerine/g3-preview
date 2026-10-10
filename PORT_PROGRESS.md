@@ -35208,3 +35208,58 @@ against independent rational matrix products or scalar fractions, rather than
 accepting cleanup accounting alone. Final precise tail owning-Close bindings and
 all exact eta tests pass native9.191s/debug12.438s; strengthened endpoint campaigns
 pass native8.873s/debug12.228s. Final LP vet and diff checks pass.
+
+## Exact row eta transformations and mixed owning tails
+
+Ported retained row_eta_matrix<mpq,mpq> and <mpq,numeric_pair<mpq>> instances.
+RationalRowEtaMatrix owns literal rational coefficient terms and actual lexical
+row snapshots/products in a borrowed manager. PairRowEtaMatrix shares the actual
+rational right/sparse algorithms and supplies the concrete pair dense-left path.
+Both bind to precise tail interfaces, including owning Close. The source's unused
+row_start member is not stored, and no uncalled local-to-X/get_diagonal_element
+adapter was introduced. Whole-source search confirms only their definitions.
+
+Dense left retains the live row reference; sparse left copies the row and
+publishes only after accumulation. A new sparse index is appended before the
+result's owning Copy, while cancellation writes zero before source erase(find)
+and its unsupported absent-position error. Right paths keep the live row and
+return early only when its exact value is zero, not when the sparse index is
+empty. Exact drops test zero only, preserving tiny rational terms. Conjugation
+updates the row, snapshots term indices, then publishes descending terms.
+Rational expression helpers preserve copy-left/compound-update/copy-return
+lifetimes; pair products form scalar-left coordinate expressions before copying
+into the pair. Stopped work and numeric invocation roots remain owned until Close.
+
+Independent tests cover240 rational matrix worlds across four rational dense/
+sparse paths plus pair dense-left (1200 applications), including160-bit tiny
+fractions. All24 size-four permutation conjugations and element views are checked
+against independent matrix coordinates. Mixed row/column/permutation chains cover
+both concrete tail families and every retained direction, with owning Close
+through the interfaces. Literal tests pin first-match duplicate lookup, sparse
+cancellation/reappend index order, native self terms' live versus copied pivot,
+zero-row short circuits, empty-index right behavior, zero-before-absent-erase,
+dense versus delayed sparse bounds prefixes and descending conjugation stops.
+
+Fifteen fresh-manager actual reservation campaigns cover append/lookup, dense/
+sparse left/right, pair left, large source numerals, zero pivot/destination and
+exact cancellation. They walk to first success, require injected/physical memout
+errors, verify independent numerical endpoints and count named live cells/direct
+objects after real owning cleanup. A zero-pivot campaign requires reaching the
+actual index-before-result-copy failure prefix. Every pending matrix mutation is
+guarded, and all reached rational/integer raw groups must be consumed after Close.
+An actual stopped indexed-vector Add remains owned by that destination; a second
+matrix can complete an inline operation without adopting the unrelated older raw
+addition. Neither cleanup assertion relies on manager-wide destruction or root
+registry inference.
+
+Focused new row tests pass native10.573s. Complete LP suite passes native75.063s/
+debug-checked106.069s with89.8%/91.5% package statement coverage. Exact row eta
+91.4%/91.8%; uncovered statements are numerical child/cleanup errors and the
+opposite-profile assertion, not missing normal algorithm branches. LP vet,
+portcheck, regenerated64-package graph and diff checks pass. Source units remain
+partial pending formatting and full matrix/LU integration:28 partial/82 unported
+LP units, repository62 ported/309 partial/1703 unported/two dead-deleted. Prior
+checkpoint7c6cdc6a saved exact column eta. Native static/sparse matrices are the
+next solver foundation; dense_matrix/matrix helpers are source debug-only and
+remain required for checked integration. LU, scaling, primal/dual/LAR solvers,
+MPS and remaining upstream tests retain the full objective's unfinished scope.

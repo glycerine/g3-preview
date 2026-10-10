@@ -122715,7 +122715,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/row_eta_matrix_float.go"
+        "pkg/util/lp/row_eta_matrix_float.go",
+        "pkg/util/lp/row_eta_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -122723,7 +122724,14 @@
         "TestLPSparseFloatVectorAndEtaLiteralStorage",
         "TestLPFloatEtaSparseToleranceAndOrderContracts",
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
-        "TestLPFloatEtaIEEEAndAssertionProfiles"
+        "TestLPFloatEtaIEEEAndAssertionProfiles",
+        "TestLPExactRowEtaIndependentMatrixProducts",
+        "TestLPExactRowEtaConjugationAndElements",
+        "TestLPExactRowEtaAllocationFailureCensus",
+        "TestLPExactRowEtaLiteralStorageAndMutationPrefixes",
+        "TestLPExactRowEtaBoundsAndConjugationPrefixes",
+        "TestLPExactRowEtaTailComposition",
+        "TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership"
       ],
       "conditionals": [
         {
@@ -122784,16 +122792,32 @@
             "TestLPFloatEtaBoundsAndConjugationPrefixes",
             "TestLPFloatEtaIEEEAndAssertionProfiles"
           ]
+        },
+        {
+          "name": "retained mpq/mpq and mpq/numeric_pair row eta: exact coefficients, dense/sparse applications, literal element view, descending permutation conjugation and owning cleanup",
+          "status": "ported",
+          "go_target": "pkg/util/lp/row_eta_matrix_exact.go",
+          "tests": [
+            "TestLPExactRowEtaIndependentMatrixProducts",
+            "TestLPExactRowEtaConjugationAndElements",
+            "TestLPExactRowEtaAllocationFailureCensus",
+            "TestLPExactRowEtaLiteralStorageAndMutationPrefixes",
+            "TestLPExactRowEtaBoundsAndConjugationPrefixes",
+            "TestLPExactRowEtaTailComposition",
+            "TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership"
+          ]
         }
       ],
       "ownership": [
-        "Concrete floating values and typed sparse-entry slices replace source vector/STL storage. No generic/any algebra, synthetic native-storage charges or container OOM fixtures. Literal term/index order, duplicate/explicit-zero entries, scalar snapshots versus references and source valid mutation prefixes are preserved. FloatTailMatrix expresses actual retained LU polymorphism."
+        "Concrete floating values and typed sparse-entry slices replace source vector/STL storage. No generic/any algebra, synthetic native-storage charges or container OOM fixtures. Literal term/index order, duplicate/explicit-zero entries, scalar snapshots versus references and source valid mutation prefixes are preserved. FloatTailMatrix expresses actual retained LU polymorphism.",
+        "Borrowed rational manager, owning rational coefficient list and actual copied-row/product/expression/value-parameter lifetimes. Sparse-left index publication precedes result Copy; cancellation writes zero before rejecting an absent source erase position. Dense-right and sparse-right use the live row reference and precise zero tests. Pair dense-left retains scalar-left rational coordinate expressions before copying into the result pair. Concrete matrix call receipts own only acquired RAW generations and allocation roots; stopped destination and unrelated caller frames remain with those owners."
       ],
       "deviations": [
         "Exact mpq coefficient and rational/pair applications, full LU/matrix integration and printing remain open; no whole-unit promotion. Independent matrix products replace uninstantiated upstream debug matrix scaffolding; there is no direct active eta/row-eta unit scenario in src/test/lp.cpp.",
         "Floating column diagonal must be set before use: its source constructor leaves the double uninitialized. Go zero initialization is not claimed as a source default. Sparse right uses fixed1e-14; sparse left uses live settings drop_tolerance. Boundary comparisons are strict and IEEE NaN/zero/infinity behavior is literal.",
         "Row source erase(find(...)) without an end guard is represented by a typed error after its completed zero assignment. Column conjugation publishes ascending terms; row conjugation copies indices then publishes descending. Source debug-only assertions use the existing explicit Go error profile.",
-        "Whole-source scan finds row_eta get_diagonal_element and apply_from_left_local_to_X uncalled; no invalid/uninstantiated definition adapters are invented. The row_start member is never read by retained bodies. Actual column-diagonal getter is represented by the public Diagonal value. Debug row/column resize scaffolding and full stream/global debug binding remain unaudited."
+        "Whole-source scan finds row_eta get_diagonal_element and apply_from_left_local_to_X uncalled; no invalid/uninstantiated definition adapters are invented. The row_start member is never read by retained bodies. Actual column-diagonal getter is represented by the public Diagonal value. Debug row/column resize scaffolding and full stream/global debug binding remain unaudited.",
+        "Unused row_start storage and uncalled indexed local-to-X/get_diagonal_element definitions are not instantiated. Exact sparse tolerance is zero-only. Existing explicit Go bounds/error profiles retain source-valid prefixes. Formatting and complete matrix/LU integration remain open; whole source unit stays partial."
       ]
     },
     {
@@ -122802,7 +122826,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/row_eta_matrix_float.go"
+        "pkg/util/lp/row_eta_matrix_float.go",
+        "pkg/util/lp/row_eta_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -122810,7 +122835,14 @@
         "TestLPSparseFloatVectorAndEtaLiteralStorage",
         "TestLPFloatEtaSparseToleranceAndOrderContracts",
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
-        "TestLPFloatEtaIEEEAndAssertionProfiles"
+        "TestLPFloatEtaIEEEAndAssertionProfiles",
+        "TestLPExactRowEtaIndependentMatrixProducts",
+        "TestLPExactRowEtaConjugationAndElements",
+        "TestLPExactRowEtaAllocationFailureCensus",
+        "TestLPExactRowEtaLiteralStorageAndMutationPrefixes",
+        "TestLPExactRowEtaBoundsAndConjugationPrefixes",
+        "TestLPExactRowEtaTailComposition",
+        "TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership"
       ],
       "conditionals": [
         {
@@ -122891,16 +122923,32 @@
             "TestLPFloatEtaBoundsAndConjugationPrefixes",
             "TestLPFloatEtaIEEEAndAssertionProfiles"
           ]
+        },
+        {
+          "name": "retained mpq/mpq and mpq/numeric_pair row eta: exact coefficients, dense/sparse applications, literal element view, descending permutation conjugation and owning cleanup",
+          "status": "ported",
+          "go_target": "pkg/util/lp/row_eta_matrix_exact.go",
+          "tests": [
+            "TestLPExactRowEtaIndependentMatrixProducts",
+            "TestLPExactRowEtaConjugationAndElements",
+            "TestLPExactRowEtaAllocationFailureCensus",
+            "TestLPExactRowEtaLiteralStorageAndMutationPrefixes",
+            "TestLPExactRowEtaBoundsAndConjugationPrefixes",
+            "TestLPExactRowEtaTailComposition",
+            "TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership"
+          ]
         }
       ],
       "ownership": [
-        "Concrete floating values and typed sparse-entry slices replace source vector/STL storage. No generic/any algebra, synthetic native-storage charges or container OOM fixtures. Literal term/index order, duplicate/explicit-zero entries, scalar snapshots versus references and source valid mutation prefixes are preserved. FloatTailMatrix expresses actual retained LU polymorphism."
+        "Concrete floating values and typed sparse-entry slices replace source vector/STL storage. No generic/any algebra, synthetic native-storage charges or container OOM fixtures. Literal term/index order, duplicate/explicit-zero entries, scalar snapshots versus references and source valid mutation prefixes are preserved. FloatTailMatrix expresses actual retained LU polymorphism.",
+        "Borrowed rational manager, owning rational coefficient list and actual copied-row/product/expression/value-parameter lifetimes. Sparse-left index publication precedes result Copy; cancellation writes zero before rejecting an absent source erase position. Dense-right and sparse-right use the live row reference and precise zero tests. Pair dense-left retains scalar-left rational coordinate expressions before copying into the result pair. Concrete matrix call receipts own only acquired RAW generations and allocation roots; stopped destination and unrelated caller frames remain with those owners."
       ],
       "deviations": [
         "Exact mpq coefficient and rational/pair applications, full LU/matrix integration and printing remain open; no whole-unit promotion. Independent matrix products replace uninstantiated upstream debug matrix scaffolding; there is no direct active eta/row-eta unit scenario in src/test/lp.cpp.",
         "Floating column diagonal must be set before use: its source constructor leaves the double uninitialized. Go zero initialization is not claimed as a source default. Sparse right uses fixed1e-14; sparse left uses live settings drop_tolerance. Boundary comparisons are strict and IEEE NaN/zero/infinity behavior is literal.",
         "Row source erase(find(...)) without an end guard is represented by a typed error after its completed zero assignment. Column conjugation publishes ascending terms; row conjugation copies indices then publishes descending. Source debug-only assertions use the existing explicit Go error profile.",
-        "Whole-source scan finds row_eta get_diagonal_element and apply_from_left_local_to_X uncalled; no invalid/uninstantiated definition adapters are invented. The row_start member is never read by retained bodies. Actual column-diagonal getter is represented by the public Diagonal value. Debug row/column resize scaffolding and full stream/global debug binding remain unaudited."
+        "Whole-source scan finds row_eta get_diagonal_element and apply_from_left_local_to_X uncalled; no invalid/uninstantiated definition adapters are invented. The row_start member is never read by retained bodies. Actual column-diagonal getter is represented by the public Diagonal value. Debug row/column resize scaffolding and full stream/global debug binding remain unaudited.",
+        "Unused row_start storage and uncalled indexed local-to-X/get_diagonal_element definitions are not instantiated. Exact sparse tolerance is zero-only. Existing explicit Go bounds/error profiles retain source-valid prefixes. Formatting and complete matrix/LU integration remain open; whole source unit stays partial."
       ]
     },
     {
@@ -122909,7 +122957,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/row_eta_matrix_float.go"
+        "pkg/util/lp/row_eta_matrix_float.go",
+        "pkg/util/lp/row_eta_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -122917,7 +122966,14 @@
         "TestLPSparseFloatVectorAndEtaLiteralStorage",
         "TestLPFloatEtaSparseToleranceAndOrderContracts",
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
-        "TestLPFloatEtaIEEEAndAssertionProfiles"
+        "TestLPFloatEtaIEEEAndAssertionProfiles",
+        "TestLPExactRowEtaIndependentMatrixProducts",
+        "TestLPExactRowEtaConjugationAndElements",
+        "TestLPExactRowEtaAllocationFailureCensus",
+        "TestLPExactRowEtaLiteralStorageAndMutationPrefixes",
+        "TestLPExactRowEtaBoundsAndConjugationPrefixes",
+        "TestLPExactRowEtaTailComposition",
+        "TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership"
       ],
       "conditionals": [
         {
@@ -122944,16 +123000,32 @@
             "TestLPFloatEtaBoundsAndConjugationPrefixes",
             "TestLPFloatEtaIEEEAndAssertionProfiles"
           ]
+        },
+        {
+          "name": "retained mpq/mpq and mpq/numeric_pair row eta: exact coefficients, dense/sparse applications, literal element view, descending permutation conjugation and owning cleanup",
+          "status": "ported",
+          "go_target": "pkg/util/lp/row_eta_matrix_exact.go",
+          "tests": [
+            "TestLPExactRowEtaIndependentMatrixProducts",
+            "TestLPExactRowEtaConjugationAndElements",
+            "TestLPExactRowEtaAllocationFailureCensus",
+            "TestLPExactRowEtaLiteralStorageAndMutationPrefixes",
+            "TestLPExactRowEtaBoundsAndConjugationPrefixes",
+            "TestLPExactRowEtaTailComposition",
+            "TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership"
+          ]
         }
       ],
       "ownership": [
-        "Concrete floating values and typed sparse-entry slices replace source vector/STL storage. No generic/any algebra, synthetic native-storage charges or container OOM fixtures. Literal term/index order, duplicate/explicit-zero entries, scalar snapshots versus references and source valid mutation prefixes are preserved. FloatTailMatrix expresses actual retained LU polymorphism."
+        "Concrete floating values and typed sparse-entry slices replace source vector/STL storage. No generic/any algebra, synthetic native-storage charges or container OOM fixtures. Literal term/index order, duplicate/explicit-zero entries, scalar snapshots versus references and source valid mutation prefixes are preserved. FloatTailMatrix expresses actual retained LU polymorphism.",
+        "Borrowed rational manager, owning rational coefficient list and actual copied-row/product/expression/value-parameter lifetimes. Sparse-left index publication precedes result Copy; cancellation writes zero before rejecting an absent source erase position. Dense-right and sparse-right use the live row reference and precise zero tests. Pair dense-left retains scalar-left rational coordinate expressions before copying into the result pair. Concrete matrix call receipts own only acquired RAW generations and allocation roots; stopped destination and unrelated caller frames remain with those owners."
       ],
       "deviations": [
         "Exact mpq coefficient and rational/pair applications, full LU/matrix integration and printing remain open; no whole-unit promotion. Independent matrix products replace uninstantiated upstream debug matrix scaffolding; there is no direct active eta/row-eta unit scenario in src/test/lp.cpp.",
         "Floating column diagonal must be set before use: its source constructor leaves the double uninitialized. Go zero initialization is not claimed as a source default. Sparse right uses fixed1e-14; sparse left uses live settings drop_tolerance. Boundary comparisons are strict and IEEE NaN/zero/infinity behavior is literal.",
         "Row source erase(find(...)) without an end guard is represented by a typed error after its completed zero assignment. Column conjugation publishes ascending terms; row conjugation copies indices then publishes descending. Source debug-only assertions use the existing explicit Go error profile.",
-        "Whole-source scan finds row_eta get_diagonal_element and apply_from_left_local_to_X uncalled; no invalid/uninstantiated definition adapters are invented. The row_start member is never read by retained bodies. Actual column-diagonal getter is represented by the public Diagonal value. Debug row/column resize scaffolding and full stream/global debug binding remain unaudited."
+        "Whole-source scan finds row_eta get_diagonal_element and apply_from_left_local_to_X uncalled; no invalid/uninstantiated definition adapters are invented. The row_start member is never read by retained bodies. Actual column-diagonal getter is represented by the public Diagonal value. Debug row/column resize scaffolding and full stream/global debug binding remain unaudited.",
+        "Unused row_start storage and uncalled indexed local-to-X/get_diagonal_element definitions are not instantiated. Exact sparse tolerance is zero-only. Existing explicit Go bounds/error profiles retain source-valid prefixes. Formatting and complete matrix/LU integration remain open; whole source unit stays partial."
       ]
     },
     {
@@ -124106,7 +124178,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/tail_matrix_float.go",
-        "pkg/util/lp/tail_matrix_exact.go"
+        "pkg/util/lp/tail_matrix_exact.go",
+        "pkg/util/lp/row_eta_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -124116,7 +124189,8 @@
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
         "TestLPFloatEtaIEEEAndAssertionProfiles",
         "TestLPExactEtaIndependentMatrixProducts",
-        "TestLPExactEtaTailComposition"
+        "TestLPExactEtaTailComposition",
+        "TestLPExactRowEtaTailComposition"
       ],
       "conditionals": [
         {
@@ -124151,6 +124225,15 @@
           "tests": [
             "TestLPExactEtaIndependentMatrixProducts",
             "TestLPExactEtaTailComposition"
+          ]
+        },
+        {
+          "name": "concrete rational and rational-pair row eta bindings to precise tail polymorphism, including owning Close",
+          "status": "ported",
+          "go_target": "pkg/util/lp/row_eta_matrix_exact.go",
+          "tests": [
+            "TestLPExactRowEtaIndependentMatrixProducts",
+            "TestLPExactRowEtaTailComposition"
           ]
         }
       ],
@@ -141602,7 +141685,9 @@
         "TestBitwisePublicationCallerPrefixes",
         "TestRationalServiceBorrowedZeroAssignmentWithoutTemporary",
         "TestLPExactEtaAllocationFailureCensus",
-        "TestLPExactEtaIndependentMatrixProducts"
+        "TestLPExactEtaIndependentMatrixProducts",
+        "TestLPExactRowEtaIndependentMatrixProducts",
+        "TestLPExactRowEtaAllocationFailureCensus"
       ],
       "conditionals": [
         {
@@ -142333,6 +142418,15 @@
           "tests": [
             "TestLPExactEtaAllocationFailureCensus",
             "TestLPExactEtaIndependentMatrixProducts"
+          ]
+        },
+        {
+          "name": "existing concrete rational product expression ownership reached by row eta instances",
+          "status": "ported",
+          "go_target": "pkg/util/lp/eta_exact_expression.go",
+          "tests": [
+            "TestLPExactRowEtaIndependentMatrixProducts",
+            "TestLPExactRowEtaAllocationFailureCensus"
           ]
         }
       ],

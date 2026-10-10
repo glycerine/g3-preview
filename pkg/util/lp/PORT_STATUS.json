@@ -1,12 +1,12 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 89.7,
+  "native_statement_coverage_of_current_go_code": 89.8,
   "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
-    "exact row eta applications and LU factorization and priority-queue solver integration",
+    "LU factorization and priority-queue solver integration",
     "scaling and random updates",
     "primal/dual simplex and LAR solvers",
     "bounds/evidence, constraint scopes and explanations",
@@ -923,7 +923,8 @@
       "source": "src/util/lp/row_eta_matrix.h",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/row_eta_matrix_float.go"
+        "pkg/util/lp/row_eta_matrix_float.go",
+        "pkg/util/lp/row_eta_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -931,14 +932,22 @@
         "TestLPSparseFloatVectorAndEtaLiteralStorage",
         "TestLPFloatEtaSparseToleranceAndOrderContracts",
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
-        "TestLPFloatEtaIEEEAndAssertionProfiles"
+        "TestLPFloatEtaIEEEAndAssertionProfiles",
+        "TestLPExactRowEtaIndependentMatrixProducts",
+        "TestLPExactRowEtaConjugationAndElements",
+        "TestLPExactRowEtaAllocationFailureCensus",
+        "TestLPExactRowEtaLiteralStorageAndMutationPrefixes",
+        "TestLPExactRowEtaBoundsAndConjugationPrefixes",
+        "TestLPExactRowEtaTailComposition",
+        "TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership"
       ]
     },
     {
       "source": "src/util/lp/row_eta_matrix.hpp",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/row_eta_matrix_float.go"
+        "pkg/util/lp/row_eta_matrix_float.go",
+        "pkg/util/lp/row_eta_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -946,14 +955,22 @@
         "TestLPSparseFloatVectorAndEtaLiteralStorage",
         "TestLPFloatEtaSparseToleranceAndOrderContracts",
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
-        "TestLPFloatEtaIEEEAndAssertionProfiles"
+        "TestLPFloatEtaIEEEAndAssertionProfiles",
+        "TestLPExactRowEtaIndependentMatrixProducts",
+        "TestLPExactRowEtaConjugationAndElements",
+        "TestLPExactRowEtaAllocationFailureCensus",
+        "TestLPExactRowEtaLiteralStorageAndMutationPrefixes",
+        "TestLPExactRowEtaBoundsAndConjugationPrefixes",
+        "TestLPExactRowEtaTailComposition",
+        "TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership"
       ]
     },
     {
       "source": "src/util/lp/row_eta_matrix_instances.cpp",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/row_eta_matrix_float.go"
+        "pkg/util/lp/row_eta_matrix_float.go",
+        "pkg/util/lp/row_eta_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -961,7 +978,14 @@
         "TestLPSparseFloatVectorAndEtaLiteralStorage",
         "TestLPFloatEtaSparseToleranceAndOrderContracts",
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
-        "TestLPFloatEtaIEEEAndAssertionProfiles"
+        "TestLPFloatEtaIEEEAndAssertionProfiles",
+        "TestLPExactRowEtaIndependentMatrixProducts",
+        "TestLPExactRowEtaConjugationAndElements",
+        "TestLPExactRowEtaAllocationFailureCensus",
+        "TestLPExactRowEtaLiteralStorageAndMutationPrefixes",
+        "TestLPExactRowEtaBoundsAndConjugationPrefixes",
+        "TestLPExactRowEtaTailComposition",
+        "TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership"
       ]
     },
     {
@@ -1110,7 +1134,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/tail_matrix_float.go",
-        "pkg/util/lp/tail_matrix_exact.go"
+        "pkg/util/lp/tail_matrix_exact.go",
+        "pkg/util/lp/row_eta_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -1120,7 +1145,8 @@
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
         "TestLPFloatEtaIEEEAndAssertionProfiles",
         "TestLPExactEtaIndependentMatrixProducts",
-        "TestLPExactEtaTailComposition"
+        "TestLPExactEtaTailComposition",
+        "TestLPExactRowEtaTailComposition"
       ]
     },
     {
