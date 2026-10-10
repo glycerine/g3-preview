@@ -1,52 +1,12 @@
 package ast
 
-import (
-	"math"
-	"reflect"
-
-	"github.com/glycerine/g3/pkg/arena"
-)
-
-// Lexical vector<parameter>. Entries own concrete parameter records; AST
-// values are borrowed until declaration registration acquires its references.
-type astProofParameters struct {
-	values  []ASTParameter
-	charged uint64
-}
-
-func (v *astProofParameters) pushOwned(m *ASTManager, p ASTParameter) error {
-	if len(v.values) == cap(v.values) {
-		n := uint64(2)
-		if cap(v.values) != 0 {
-			n = (3*uint64(cap(v.values)) + 1) / 2
-		}
-		width := uint64(reflect.TypeOf(ASTParameter{}).Size())
-		if n <= uint64(cap(v.values)) || n > (math.MaxUint32-8)/16 || n > uint64(^uint(0)>>1)/width {
-			m.dropParameter(p)
-			return arena.ErrBounds
-		}
-		bytes := n * width
-		if e := m.BudgetField.Reserve(bytes); e != nil {
-			m.dropParameter(p)
-			return e
-		}
-		next := make([]ASTParameter, len(v.values), int(n))
-		copy(next, v.values)
-		m.BudgetField.Release(v.charged)
-		v.charged = bytes
-		v.values = next
-	}
-	v.values = append(v.values, p)
-	return nil
-}
-func (v *astProofParameters) close(m *ASTManager) {
-	for _, p := range v.values {
+// Parameter records own their copied payloads; slice storage is Go-managed.
+func (m *ASTManager) dropProofParameters(parameters []ASTParameter) {
+	for _, p := range parameters {
 		m.dropParameter(p)
 	}
-	m.BudgetField.Release(v.charged)
-	v.values = nil
-	v.charged = 0
 }
+
 func (m *ASTManager) MkProofQuantInstantiation(f ASTHandle, bindings []ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
@@ -55,16 +15,14 @@ func (m *ASTManager) MkProofQuantInstantiation(f ASTHandle, bindings []ASTHandle
 	if m.proofMode == ASTProofDisabled {
 		return ASTHandle{}, nil
 	}
-	var parameters astProofParameters
-	defer parameters.close(m)
+	var parameters []ASTParameter
+	defer func() { m.dropProofParameters(parameters) }()
 	for _, h := range bindings {
 		p, e := m.newParameterAST(h)
 		if e != nil {
 			return ASTHandle{}, e
 		}
-		if e = parameters.pushOwned(m, p); e != nil {
-			return ASTHandle{}, e
-		}
+		parameters = append(parameters, p)
 		// The source assertion is after push, and parameter(AST) always has
 		// this tag even when its borrowed AST pointer is null.
 		if ASTSourceDebug && m.parameterAt(p.slot).Kind != ASTParameterAST {
@@ -72,7 +30,7 @@ func (m *ASTManager) MkProofQuantInstantiation(f ASTHandle, bindings []ASTHandle
 		}
 	}
 	args := [1]ASTHandle{f}
-	r, e := m.mkFamilyApp(0, ASTPrQuantInst, parameters.values, args[:])
+	r, e := m.mkFamilyApp(0, ASTPrQuantInst, parameters, args[:])
 	return m.external(r), e
 }
 func (m *ASTManager) MkProofTheoryLemma(tid FamilyID, f ASTHandle, ps []ASTHandle, params []ASTParameter) (ASTHandle, error) {
@@ -83,10 +41,9 @@ func (m *ASTManager) MkProofTheoryLemma(tid FamilyID, f ASTHandle, ps []ASTHandl
 	if m.proofMode == ASTProofDisabled {
 		return ASTHandle{}, nil
 	}
-	var args astProofArguments
-	defer args.close(m)
-	var parameters astProofParameters
-	defer parameters.close(m)
+	var args []ASTHandle
+	var parameters []ASTParameter
+	defer func() { m.dropProofParameters(parameters) }()
 	s, e := m.families.GetName(tid)
 	if e != nil {
 		return ASTHandle{}, e
@@ -95,24 +52,16 @@ func (m *ASTManager) MkProofTheoryLemma(tid FamilyID, f ASTHandle, ps []ASTHandl
 	if e != nil {
 		return ASTHandle{}, e
 	}
-	if e = parameters.pushOwned(m, p); e != nil {
-		return ASTHandle{}, e
-	}
+	parameters = append(parameters, p)
 	for _, param := range params {
 		p, e = m.copyParameter(param)
 		if e != nil {
 			return ASTHandle{}, e
 		}
-		if e = parameters.pushOwned(m, p); e != nil {
-			return ASTHandle{}, e
-		}
+		parameters = append(parameters, p)
 	}
-	if e = args.append(m, ps); e != nil {
-		return ASTHandle{}, e
-	}
-	if e = args.push(m, f); e != nil {
-		return ASTHandle{}, e
-	}
-	r, e := m.mkFamilyApp(0, ASTPrTheoryLemma, parameters.values, args.slice())
+	args = append(args, ps...)
+	args = append(args, f)
+	r, e := m.mkFamilyApp(0, ASTPrTheoryLemma, parameters, args)
 	return m.external(r), e
 }

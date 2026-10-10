@@ -50,19 +50,14 @@ func (m *ASTManager) MkProofTransitivityStar(ps []ASTHandle, a, b ASTHandle) (AS
 			}
 		}
 	}
-	var args astProofArguments
-	defer args.close(m)
-	if e := args.append(m, ps); e != nil {
-		return ASTHandle{}, e
-	}
+	var args []ASTHandle
+	args = append(args, ps...)
 	f, e := m.proofEq(a, b, false)
 	if e != nil {
 		return ASTHandle{}, e
 	}
-	if e = args.push(m, f); e != nil {
-		return ASTHandle{}, e
-	}
-	return m.proofMake(ASTPrTransitivityStar, args.slice()...)
+	args = append(args, f)
+	return m.proofMake(ASTPrTransitivityStar, args...)
 }
 func (m *ASTManager) proofMonotonicity(d astNodeRef, a, b ASTHandle, ps []ASTHandle) (ASTHandle, error) {
 	// Source only inspects f1/f2 here in SASSERT expressions.
@@ -80,20 +75,15 @@ func (m *ASTManager) proofMonotonicity(d astNodeRef, a, b ASTHandle, ps []ASTHan
 			return ASTHandle{}, ErrASTDomain
 		}
 	}
-	var args astProofArguments
-	defer args.close(m)
-	if e := args.append(m, ps); e != nil {
-		return ASTHandle{}, e
-	}
+	var args []ASTHandle
+	args = append(args, ps...)
 	pair := [2]ASTHandle{a, b}
 	f, e := m.mkApp(d, pair[:])
 	if e != nil {
 		return ASTHandle{}, e
 	}
-	if e = args.push(m, m.external(f)); e != nil {
-		return ASTHandle{}, e
-	}
-	return m.proofMake(ASTPrMonotonicity, args.slice()...)
+	args = append(args, m.external(f))
+	return m.proofMake(ASTPrMonotonicity, args...)
 }
 func (m *ASTManager) MkProofMonotonicity(relation, a, b ASTHandle, ps []ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {

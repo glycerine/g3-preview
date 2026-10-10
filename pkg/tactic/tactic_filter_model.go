@@ -15,7 +15,7 @@ import (
 type tacticFilterModelConverter struct {
 	tacticConverterBase
 	manager      *ast.ASTManager
-	declarations ast.ASTHandleVector // func_decl_ref_vector: owning entries
+	declarations []ast.ASTHandle // owning entries
 }
 
 func NewFilterModel(m *ast.ASTManager) (*tacticFilterModelConverter, error) {
@@ -43,13 +43,11 @@ func (c *tacticFilterModelConverter) Insert(d ast.ASTHandle) error {
 	if kind != ast.ASTFuncDecl {
 		return ast.ErrASTDomain
 	}
-	// ref_vector's push_back increments before the pointer vector grows.
+	// Each published declaration owns its acquired AST reference.
 	if e = c.manager.IncRef(d); e != nil {
 		return e
 	}
-	if e = c.declarations.Push(c.manager.Budget(), d); e != nil {
-		return errors.Join(e, c.manager.DecRef(d))
-	}
+	c.declarations = append(c.declarations, d)
 	return nil
 }
 
@@ -65,15 +63,9 @@ func (c *tacticFilterModelConverter) ApplyModel(out *ModelRef, _ uint32) (err er
 		return ast.ErrASTHandle
 	}
 	m := c.manager
-	marks, e := ast.NewASTFastMark1(m)
-	if e != nil {
-		return e
-	}
-	defer func() { err = errors.Join(err, marks.Close()) }()
-	for _, d := range c.declarations.Slice() {
-		if e = marks.Mark(d, true); e != nil {
-			return e
-		}
+	marks := make(map[ast.ASTHandle]bool, len(c.declarations))
+	for _, d := range c.declarations {
+		marks[d] = true
 	}
 	next, e := model.NewModel(m)
 	if e != nil {
@@ -96,11 +88,7 @@ func (c *tacticFilterModelConverter) ApplyModel(out *ModelRef, _ uint32) (err er
 		if e != nil {
 			return e
 		}
-		marked, e := marks.IsMarked(d)
-		if e != nil {
-			return e
-		}
-		if marked {
+		if marks[d] {
 			continue
 		}
 		v, e := old.ConstantInterpretation(d)
@@ -116,11 +104,7 @@ func (c *tacticFilterModelConverter) ApplyModel(out *ModelRef, _ uint32) (err er
 		if e != nil {
 			return e
 		}
-		marked, e := marks.IsMarked(d)
-		if e != nil {
-			return e
-		}
-		if marked {
+		if marks[d] {
 			continue
 		}
 		fi, e := old.FunctionInterpretation(d)
@@ -159,15 +143,21 @@ func (c *tacticFilterModelConverter) Close() error {
 		return nil
 	}
 	// func_decl_ref_vector releases its entries in forward order.
-	for i, d := range c.declarations.Slice() {
+	for i, d := range c.declarations {
 		if !d.IsNull() {
-			if e := c.manager.DecRef(d); e != nil {
+			consumed, e := c.manager.DecRefConsumed(d)
+			if consumed {
+				c.declarations[i] = ast.ASTHandle{}
+			}
+			if e != nil {
 				return e
 			}
-			c.declarations.Slice()[i] = ast.ASTHandle{}
+			if !consumed {
+				return ast.ErrASTPending
+			}
 		}
 	}
-	c.declarations.Close(c.manager.Budget())
+	c.declarations = nil
 	c.release()
 	return nil
 }

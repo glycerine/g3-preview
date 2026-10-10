@@ -6,31 +6,6 @@ import (
 	"testing"
 )
 
-func TestPointerBufferUsesNativeSliceStorage(t *testing.T) {
-	b := arena.NewBudget(1 << 16)
-	var v ASTHandleBuffer
-	for i := uint32(0); i < 16; i++ {
-		astTestMust(t, v.Push(b, ASTHandle{slot: i}))
-	}
-	if b.Used() != 0 {
-		t.Fatal("inline storage charged", b.Used())
-	}
-	b.FailAfter(0)
-	astTestMust(t, v.Push(b, ASTHandle{slot: 16}))
-	if cap(v.Slice()) < len(v.Slice()) || b.Used() != 0 {
-		t.Fatal("native slice storage", cap(v.Slice()), b.Used())
-	}
-	b.FailAfter(-1)
-	for i, n := range v.Slice() {
-		if n != (ASTHandle{slot: uint32(i)}) {
-			t.Fatal("lost value", i, n)
-		}
-	}
-	v.Close(b)
-	if b.Used() != 0 || len(v.Slice()) != 0 {
-		t.Fatal("source destructor retained spill")
-	}
-}
 func TestPointerVectorSourceGrowthAndErase(t *testing.T) {
 	b := arena.NewBudget(1 << 16)
 	var v ASTHandleVector

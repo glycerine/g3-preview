@@ -9,29 +9,6 @@ import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func TestASTProofArgumentGrowthUsesGoSliceStorage(t *testing.T) {
-	m := astTestManager(t)
-	h := m.external(m.trueApp)
-	base := m.BudgetField.Used()
-	var a astProofArguments
-	m.BudgetField.FailAfter(0)
-	for i := 0; i < 65; i++ {
-		if e := a.push(m, h); e != nil {
-			t.Fatal(e)
-		}
-	}
-	if len(a.slice()) != 65 || m.BudgetField.Used() != base {
-		t.Fatal("Go slice charged to AST budget", len(a.slice()), m.BudgetField.Used(), base)
-	}
-	for _, v := range a.slice() {
-		if v != h {
-			t.Fatal("contents")
-		}
-	}
-	a.close(m)
-	m.BudgetField.FailAfter(-1)
-}
-
 func TestASTProofUnitResolutionCountShortCircuit(t *testing.T) {
 	m := astTestManager(t)
 	astTestMust(t, m.ToggleProofMode(ASTProofEnabled))

@@ -35,8 +35,8 @@ func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHan
 	if e := m.proofCheckBool(conclusion); e != nil {
 		return ASTHandle{}, e
 	}
-	var params astProofParameters
-	defer params.close(m)
+	var params []ASTParameter
+	defer func() { m.dropProofParameters(params) }()
 	for i, v := range substitutions {
 		s, e := m.vectorState(v)
 		if e != nil {
@@ -51,9 +51,7 @@ func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHan
 			if e != nil {
 				return ASTHandle{}, e
 			}
-			if e = params.pushOwned(m, p); e != nil {
-				return ASTHandle{}, e
-			}
+			params = append(params, p)
 		}
 		if i+1 < len(substitutions) {
 			if i >= len(positions) {
@@ -63,16 +61,12 @@ func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHan
 			if e != nil {
 				return ASTHandle{}, e
 			}
-			if e = params.pushOwned(m, p); e != nil {
-				return ASTHandle{}, e
-			}
+			params = append(params, p)
 			p, e = m.newParameterInt(int32(positions[i].Second))
 			if e != nil {
 				return ASTHandle{}, e
 			}
-			if e = params.pushOwned(m, p); e != nil {
-				return ASTHandle{}, e
-			}
+			params = append(params, p)
 		}
 	}
 	var sorts astProofRawArguments
@@ -93,7 +87,7 @@ func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHan
 	if e := args.push(m, conclusion); e != nil {
 		return ASTHandle{}, e
 	}
-	r, e := m.mkFamilyApp(0, ASTPrHyperResolve, params.values, args.values)
+	r, e := m.mkFamilyApp(0, ASTPrHyperResolve, params, args.values)
 	if e != nil {
 		return ASTHandle{}, e
 	}

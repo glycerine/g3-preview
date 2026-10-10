@@ -144,8 +144,21 @@ func TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource(t *testing
 		satOK(t, graphs[i].SetElse(yes))
 		satOK(t, old.Core().RegisterFunction(decls[i], graphs[i]))
 	}
+	marks, e := ast.NewASTFastMark1(m)
+	satOK(t, e)
+	defer func() { satOK(t, marks.Close()) }()
+	for _, d := range decls {
+		satOK(t, marks.Mark(d, true))
+	}
 	satOK(t, c.Insert(decls[0]))
 	satOK(t, c.ApplyUnindexed(&out))
+	for _, d := range decls {
+		marked, e := marks.IsMarked(d)
+		satOK(t, e)
+		if !marked {
+			t.Fatal("filter changed another caller's marks")
+		}
+	}
 	next, e := out.Get()
 	satOK(t, e)
 	if next.NumFunctionDeclarations() != 1 {

@@ -34000,3 +34000,41 @@ pkg/ast/rewriter. Proof scratch and other AST reference-vector consumers, model
 constant/function lookup collections, tactic owners and further retained callers
 remain. Internal util cycles and the complete requested root subpackage split
 are still unfinished.
+
+## Native proof rule scratch and tactic model converter collections
+
+Proof argument/literal lists now use borrowed []ASTHandle directly across rule,
+congruence, resolution, theory lemma and expanded-DISTINCT builders. Unit
+resolution debug coverage uses a native []bool indexed by actual premise, with
+all original matching/coverage guards preserved. Quantifier/theory/hyper builders
+own native []ASTParameter lists; real parameter payloads still copy and destroy
+in ascending order at lexical exit. Removed astProofArguments, astProofFound and
+astProofParameters backing-capacity/charge/failure emulation. All retained
+ASTHandleBuffer production consumers are now migrated; deleted that unused
+adapter plus wrapper-only scratch/reset/pop/growth tests and corresponding
+manifest targets. Kept actual proof/parameter/factory/refusal coverage. The large
+rational campaign no longer requires a synthetic minimum count that included
+removed parameter-vector reservations; it still enumerates actual failures
+through success and audits immediate complete parameter/numeral ownership.
+
+Filter and extension model converters now retain native owning []ASTHandle
+trails. Each append follows actual INC; forward destruction clears consumed
+slots before reporting errors, preserving unconsumed roots for cleanup. Extension
+still reconstructs definitions backwards, ends reached function/value/evaluator
+owners and retires definitions before declarations. Filter uses a local Go
+membership map instead of shared AST marks; its real function-copy test now
+marks both input declarations externally, verifies the unfiltered graph survives
+independently and confirms those marks remain set. Duplicate reference counts,
+replacement publication and actual model/universe ownership remain.
+
+Validation: full native AST/rewriter/tactic/model/API/SAT tactic passed
+(20.331s/11.832s/0.024s/0.052s/0.012s/0.115s). Full debug AST/tactic passed
+(22.432s/0.022s). Module-wide compilation, AST/tactic vet, manifest, gofmt and
+diff checks passed. No full native module rerun inside the hourly interval.
+Counts remain2102 units/677 APIs:62 ported,283 partial,1729 unported,
+two dead/deleted. No C++ container/STL or whole-unit implementation credit added.
+
+Remaining migration includes hyper-resolution/binding output storage, sequence/
+scoped reference-vector consumers, model constant/function lookups, goal/SAT
+interface membership and further retained consumers. Internal util cycles and
+complete root subpackage split remain unfinished.

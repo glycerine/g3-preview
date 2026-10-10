@@ -1,23 +1,10 @@
 package ast
 
-type astProofArguments struct{ ASTHandleBuffer }
-
-func (a *astProofArguments) slice() []ASTHandle                    { return a.Slice() }
-func (a *astProofArguments) push(m *ASTManager, h ASTHandle) error { return a.Push(m.BudgetField, h) }
-func (a *astProofArguments) append(m *ASTManager, hs []ASTHandle) error {
-	return a.Append(m.BudgetField, hs)
-}
-func (a *astProofArguments) close(m *ASTManager) { a.Close(m.BudgetField) }
 func (m *ASTManager) proofParentsFact(k int32, ps []ASTHandle, f ASTHandle) (ASTHandle, error) {
-	var args astProofArguments
-	defer args.close(m)
-	if e := args.append(m, ps); e != nil {
-		return ASTHandle{}, e
-	}
-	if e := args.push(m, f); e != nil {
-		return ASTHandle{}, e
-	}
-	return m.proofMake(k, args.slice()...)
+	var args []ASTHandle
+	args = append(args, ps...)
+	args = append(args, f)
+	return m.proofMake(k, args...)
 }
 func (m *ASTManager) MkProofCommutativity(h ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
@@ -264,19 +251,14 @@ func (m *ASTManager) MkProofRewriteStar(a, b ASTHandle, ps []ASTHandle) (ASTHand
 	if m.proofMode == ASTProofDisabled {
 		return ASTHandle{}, nil
 	}
-	var args astProofArguments
-	defer args.close(m)
-	if e := args.append(m, ps); e != nil {
-		return ASTHandle{}, e
-	}
+	var args []ASTHandle
+	args = append(args, ps...)
 	f, e := m.proofEq(a, b, false)
 	if e != nil {
 		return ASTHandle{}, e
 	}
-	if e = args.push(m, f); e != nil {
-		return ASTHandle{}, e
-	}
-	return m.proofMake(ASTPrRewriteStar, args.slice()...)
+	args = append(args, f)
+	return m.proofMake(ASTPrRewriteStar, args...)
 }
 func (m *ASTManager) MkProofApplyDefs(a, b ASTHandle, ps []ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
@@ -286,19 +268,14 @@ func (m *ASTManager) MkProofApplyDefs(a, b ASTHandle, ps []ASTHandle) (ASTHandle
 	if m.proofMode == ASTProofDisabled {
 		return ASTHandle{}, nil
 	}
-	var args astProofArguments
-	defer args.close(m)
-	if e := args.append(m, ps); e != nil {
-		return ASTHandle{}, e
-	}
+	var args []ASTHandle
+	args = append(args, ps...)
 	f, e := m.proofEq(a, b, true)
 	if e != nil {
 		return ASTHandle{}, e
 	}
-	if e = args.push(m, f); e != nil {
-		return ASTHandle{}, e
-	}
-	return m.proofMake(ASTPrApplyDef, args.slice()...)
+	args = append(args, f)
+	return m.proofMake(ASTPrApplyDef, args...)
 }
 func (m *ASTManager) MkProofApplyDef(a, b, p ASTHandle) (ASTHandle, error) {
 	ps := [1]ASTHandle{p}
@@ -341,11 +318,8 @@ func (m *ASTManager) proofNNF(a, b ASTHandle, ps []ASTHandle, negative bool) (AS
 	if _, e := m.proofNNFParents(ps); e != nil {
 		return ASTHandle{}, e
 	}
-	var args astProofArguments
-	defer args.close(m)
-	if e := args.append(m, ps); e != nil {
-		return ASTHandle{}, e
-	}
+	var args []ASTHandle
+	args = append(args, ps...)
 	k := ASTPrNNFPos
 	if negative {
 		var e error
@@ -359,10 +333,8 @@ func (m *ASTManager) proofNNF(a, b ASTHandle, ps []ASTHandle, negative bool) (AS
 	if e != nil {
 		return ASTHandle{}, e
 	}
-	if e = args.push(m, f); e != nil {
-		return ASTHandle{}, e
-	}
-	return m.proofMake(k, args.slice()...)
+	args = append(args, f)
+	return m.proofMake(k, args...)
 }
 func (m *ASTManager) MkProofNNFPos(a, b ASTHandle, ps []ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {

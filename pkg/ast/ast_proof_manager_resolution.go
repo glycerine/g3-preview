@@ -1,53 +1,9 @@
 package ast
 
 import (
-	"math"
-
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// Source debug svector<bool> found.setx retains repeated source growth and
-// diagnoses coverage only after constructing the unmatched-literal buffer.
-type astProofFound struct {
-	values  []bool
-	charged uint64
-}
-
-func (f *astProofFound) set(m *ASTManager, j uint32) error {
-	if j == math.MaxUint32 {
-		return arena.ErrBounds
-	}
-	need := uint64(j) + 1
-	for need > uint64(cap(f.values)) {
-		n := uint64(2)
-		if cap(f.values) != 0 {
-			n = (3*uint64(cap(f.values)) + 1) / 2
-		}
-		if n > math.MaxUint32-8 || n > uint64(^uint(0)>>1) {
-			return arena.ErrBounds
-		}
-		if e := m.BudgetField.Reserve(n); e != nil {
-			return e
-		}
-		next := make([]bool, len(f.values), int(n))
-		copy(next, f.values)
-		m.BudgetField.Release(f.charged)
-		f.charged = n
-		f.values = next
-	}
-	if need > uint64(len(f.values)) {
-		old := len(f.values)
-		f.values = f.values[:int(need)]
-		clear(f.values[old:])
-	}
-	f.values[j] = true
-	return nil
-}
-func (f *astProofFound) close(m *ASTManager) {
-	m.BudgetField.Release(f.charged)
-	f.values = nil
-	f.charged = 0
-}
 func (m *ASTManager) proofComplement(a, b ASTHandle) (bool, error) {
 	if a == m.external(m.trueApp) && b == m.external(m.falseApp) {
 		return true, nil
@@ -93,11 +49,8 @@ func (m *ASTManager) MkProofUnitResolution(ps []ASTHandle) (ASTHandle, error) {
 			}
 		}
 	}
-	var args astProofArguments
-	defer args.close(m)
-	if e := args.append(m, ps); e != nil {
-		return ASTHandle{}, e
-	}
+	var args []ASTHandle
+	args = append(args, ps...)
 	if len(ps) < 2 {
 		return ASTHandle{}, arena.ErrBounds
 	}
@@ -133,10 +86,11 @@ func (m *ASTManager) MkProofUnitResolution(ps []ASTHandle) (ASTHandle, error) {
 		if e != nil {
 			return ASTHandle{}, e
 		}
-		var lits astProofArguments
-		defer lits.close(m)
-		var found astProofFound
-		defer found.close(m)
+		var lits []ASTHandle
+		var found []bool
+		if ASTSourceDebug {
+			found = make([]bool, len(ps))
+		}
 		for i := uint32(0); i < m.appAt(r.slot).count; i++ {
 			lit, e := m.proofArg(f, i)
 			if e != nil {
@@ -155,62 +109,49 @@ func (m *ASTManager) MkProofUnitResolution(ps []ASTHandle) (ASTHandle, error) {
 				if yes {
 					matched = true
 					if ASTSourceDebug {
-						if e = found.set(m, uint32(j)); e != nil {
-							return ASTHandle{}, e
-						}
+						found[j] = true
 						continue
 					}
 					break
 				}
 			}
 			if !matched {
-				if e = lits.push(m, lit); e != nil {
-					return ASTHandle{}, e
-				}
+				lits = append(lits, lit)
 			}
 		}
 		if ASTSourceDebug && m.proofMode != ASTProofDisabled {
 			for j := 1; j < len(ps); j++ {
-				if j >= len(found.values) || !found.values[j] {
+				if j >= len(found) || !found[j] {
 					return ASTHandle{}, ErrASTDomain
 				}
 			}
 		}
-		switch len(lits.slice()) {
+		switch len(lits) {
 		case 0:
 			fact = m.external(m.falseApp)
 		case 1:
-			fact = lits.slice()[0]
+			fact = lits[0]
 		default:
-			fact, e = m.proofMake(ASTOpOr, lits.slice()...)
+			fact, e = m.proofMake(ASTOpOr, lits...)
 			if e != nil {
 				return ASTHandle{}, e
 			}
 		}
-		// The C++ else block ends here: found then new_lits are destroyed
-		// before args growth or final proof candidate allocation. Defers above
-		// remain idempotent early-error cleanup.
-		found.close(m)
-		lits.close(m)
+		// Retire borrowed branch scratch before constructing the final proof.
+		found = nil
+		lits = nil
 	}
-	if e = args.push(m, fact); e != nil {
-		return ASTHandle{}, e
-	}
-	return m.proofMake(ASTPrUnitResolution, args.slice()...)
+	args = append(args, fact)
+	return m.proofMake(ASTPrUnitResolution, args...)
 }
 func (m *ASTManager) MkProofUnitResolutionFact(ps []ASTHandle, fact ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}
 	defer m.mu.Unlock()
-	var args astProofArguments
-	defer args.close(m)
-	if e := args.append(m, ps); e != nil {
-		return ASTHandle{}, e
-	}
-	if e := args.push(m, fact); e != nil {
-		return ASTHandle{}, e
-	}
+	var args []ASTHandle
+	args = append(args, ps...)
+	args = append(args, fact)
 	if ASTSourceDebug {
 		if len(ps) < 2 {
 			return ASTHandle{}, arena.ErrBounds
@@ -283,5 +224,5 @@ func (m *ASTManager) MkProofUnitResolutionFact(ps []ASTHandle, fact ASTHandle) (
 			}
 		}
 	}
-	return m.proofMake(ASTPrUnitResolution, args.slice()...)
+	return m.proofMake(ASTPrUnitResolution, args...)
 }

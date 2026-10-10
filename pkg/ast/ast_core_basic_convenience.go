@@ -95,9 +95,8 @@ func (m *ASTManager) MkDistinctExpanded(args []ASTHandle) (ASTHandle, error) {
 		r, e := m.mkFamilyApp(0, ASTOpNot, nil, unary[:])
 		return m.external(r), e
 	}
-	// Use the concrete borrowed-handle buffer without adding reference increments.
-	var expanded astProofArguments
-	defer expanded.close(m)
+	// Scratch borrows handles; the final applications own their child references.
+	var expanded []ASTHandle
 	for i := 0; i < len(args)-1; i++ {
 		a1 := args[i]
 		for j := i + 1; j < len(args); j++ {
@@ -110,12 +109,10 @@ func (m *ASTManager) MkDistinctExpanded(args []ASTHandle) (ASTHandle, error) {
 			if e != nil {
 				return ASTHandle{}, e
 			}
-			if e = expanded.push(m, m.external(neg)); e != nil {
-				return ASTHandle{}, e
-			}
+			expanded = append(expanded, m.external(neg))
 		}
 	}
-	r, e := m.mkFamilyApp(0, ASTOpAnd, nil, expanded.slice())
+	r, e := m.mkFamilyApp(0, ASTOpAnd, nil, expanded)
 	return m.external(r), e
 }
 func (m *ASTManager) basicBooleanDeclaration(k int32, n uint32) (ASTHandle, error) {

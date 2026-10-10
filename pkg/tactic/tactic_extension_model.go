@@ -16,7 +16,7 @@ type tacticExtensionModelConverter struct {
 	tacticConverterBase
 	manager    *ast.ASTManager
 	services   model.ModelEvaluatorConfig
-	vars, defs ast.ASTHandleVector
+	vars, defs []ast.ASTHandle
 	evaluator  *model.ModelEvaluator
 	value      ast.ASTRef
 	function   *model.FunctionInterpretation
@@ -62,15 +62,11 @@ func (c *tacticExtensionModelConverter) Insert(d, def ast.ASTHandle) error {
 	if e = m.IncRef(d); e != nil {
 		return e
 	}
-	if e = c.vars.Push(m.Budget(), d); e != nil {
-		return errors.Join(e, m.DecRef(d))
-	}
+	c.vars = append(c.vars, d)
 	if e = m.IncRef(def); e != nil {
 		return e
 	}
-	if e = c.defs.Push(m.Budget(), def); e != nil {
-		return errors.Join(e, m.DecRef(def))
-	}
+	c.defs = append(c.defs, def)
 	return nil
 }
 func (c *tacticExtensionModelConverter) drainInvocation() error {
@@ -103,7 +99,7 @@ func (c *tacticExtensionModelConverter) ApplyModel(out *ModelRef, goal uint32) (
 	if c.evaluator != nil || c.function != nil || c.value != (ast.ASTRef{}) {
 		return ErrModelConverterOwner
 	}
-	if len(c.vars.Slice()) != len(c.defs.Slice()) {
+	if len(c.vars) != len(c.defs) {
 		return ast.ErrASTDomain
 	}
 	md, e := out.Get()
@@ -128,16 +124,16 @@ func (c *tacticExtensionModelConverter) ApplyModel(out *ModelRef, goal uint32) (
 	if e != nil {
 		return e
 	}
-	for i := len(c.vars.Slice()); i > 0; {
+	for i := len(c.vars); i > 0; {
 		i--
-		if e = c.evaluator.Evaluate(c.defs.Slice()[i], c.value); e != nil {
+		if e = c.evaluator.Evaluate(c.defs[i], c.value); e != nil {
 			return e
 		}
 		value, e := c.manager.RefGet(c.value)
 		if e != nil {
 			return e
 		}
-		d := c.vars.Slice()[i]
+		d := c.vars[i]
 		arity, e := c.manager.GetArity(d)
 		if e != nil {
 			return e
@@ -179,16 +175,22 @@ func (c *tacticExtensionModelConverter) Close() error {
 	}
 	// Reverse member order: expression references before declaration references;
 	// each original ref_vector releases entries in forward order.
-	for _, vector := range []*ast.ASTHandleVector{&c.defs, &c.vars} {
-		for i, h := range vector.Slice() {
+	for _, vector := range []*[]ast.ASTHandle{&c.defs, &c.vars} {
+		for i, h := range *vector {
 			if !h.IsNull() {
-				if e := c.manager.DecRef(h); e != nil {
+				consumed, e := c.manager.DecRefConsumed(h)
+				if consumed {
+					(*vector)[i] = ast.ASTHandle{}
+				}
+				if e != nil {
 					return e
 				}
-				vector.Slice()[i] = ast.ASTHandle{}
+				if !consumed {
+					return ast.ErrASTPending
+				}
 			}
 		}
-		vector.Close(c.manager.Budget())
+		*vector = nil
 	}
 	c.release()
 	return nil
