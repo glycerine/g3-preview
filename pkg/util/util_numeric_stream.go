@@ -5,6 +5,7 @@
 package util
 
 import (
+	"bytes"
 	"errors"
 	"math"
 	"os"
@@ -13,7 +14,6 @@ import (
 	"sync"
 
 	"github.com/glycerine/g3/pkg/arena"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var ErrNumericStreamOwner = errors.New("g3: invalid numeric stream owner")
@@ -66,7 +66,7 @@ type NumericTextStream struct {
 	mu           sync.Mutex
 	self         *NumericTextStream
 	Budget       *arena.Budget
-	Buffer       *utext.Buffer
+	Buffer       *bytes.Buffer
 	File         *os.File
 	fileByte     [1]byte
 	FilePosition uint64
@@ -87,14 +87,9 @@ func NewNumericTextStream(c NumericTextStreamConfig) (*NumericTextStream, error)
 	if e := c.Budget.Reserve(header); e != nil {
 		return nil, e
 	}
-	var b *utext.Buffer
-	var e error
+	var b *bytes.Buffer
 	if c.BorrowedFile == nil {
-		b, e = utext.NewBuffer(utext.Config{})
-	}
-	if e != nil {
-		c.Budget.Release(header)
-		return nil, e
+		b = new(bytes.Buffer)
 	}
 	s := &NumericTextStream{Budget: c.Budget, Buffer: b, File: c.BorrowedFile, OwnerBytes: header, state: NumericStreamState{Precision: 6, IntegerBase: 10, Fill: ' '}}
 	s.self = s
@@ -126,8 +121,7 @@ func (s *NumericTextStream) Stats() NumericStreamStats {
 	if s.fileMode || s.File != nil {
 		return NumericStreamStats{OwnerBytes: s.OwnerBytes, ScratchBytes: uint64(len(s.scratch)), Position: s.FilePosition, State: s.state}
 	}
-	b := s.Buffer.Stats()
-	return NumericStreamStats{s.OwnerBytes, uint64(len(s.scratch)), b.Position, b.Capacity, b.OwnerBytes, b.OverflowBytes, s.state}
+	return NumericStreamStats{OwnerBytes: s.OwnerBytes, ScratchBytes: uint64(len(s.scratch)), Position: uint64(s.Buffer.Len()), OutputCapacity: uint64(s.Buffer.Cap()), State: s.state}
 }
 func (s *NumericTextStream) SetFloatMode(v NumericFloatMode) error {
 	if e := s.lock(); e != nil {
@@ -246,7 +240,7 @@ func (s *NumericTextStream) emitByte(c byte) error {
 		}
 		return nil
 	}
-	return s.Buffer.AppendByte(c)
+	return s.Buffer.WriteByte(c)
 }
 func (s *NumericTextStream) padding(n uint64) error {
 	for i := uint64(0); i < n; i++ {
@@ -541,8 +535,7 @@ func (s *NumericTextStream) String() (string, error) {
 	if s.fileMode || s.File != nil {
 		return "", ErrNumericStreamFile
 	}
-	data, e := s.Buffer.BytesCopy()
-	return string(data), e
+	return s.Buffer.String(), nil
 }
 func (s *NumericTextStream) ResetText() error {
 	if e := s.lock(); e != nil {
@@ -552,7 +545,8 @@ func (s *NumericTextStream) ResetText() error {
 	if s.fileMode || s.File != nil {
 		return ErrNumericStreamFile
 	}
-	return s.Buffer.Reset()
+	s.Buffer.Reset()
+	return nil
 }
 func (s *NumericTextStream) Close() error {
 	if s == nil || s.self != s {
@@ -563,11 +557,7 @@ func (s *NumericTextStream) Close() error {
 	if s.Closed {
 		return nil
 	}
-	if s.Buffer != nil {
-		if e := s.Buffer.Close(); e != nil {
-			return e
-		}
-	}
+	s.Buffer = nil
 	s.Budget.Release(uint64(len(s.scratch)) + s.OwnerBytes)
 	s.scratch = nil
 	s.Closed = true

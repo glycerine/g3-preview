@@ -2,6 +2,7 @@
 package util
 
 import (
+	"bytes"
 	"math"
 	"reflect"
 
@@ -115,10 +116,7 @@ func CaptureNumericStreamOwnedString(q *OwnedString, s *NumericTextStream, b *ar
 	if s.fileMode || s.Buffer == nil {
 		return ErrNumericStreamFile
 	}
-	data, e := s.Buffer.BytesCopy()
-	if e != nil {
-		return e
-	}
+	data := bytes.Clone(s.Buffer.Bytes())
 	return q.initialize(b, data)
 }
 func (t *ArbitraryFloatFormatText) appendTemporary() error {

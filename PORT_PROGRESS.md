@@ -33305,3 +33305,32 @@ AppendTo, plus internal SMT2 quoting. The refreshed dependency audit is unchange
 output/OwnedString files still depend on ParamsStringView and parameter error
 symbols, which connect numeric ownership back to parameter/global registries.
 The complete migration and subpackage split remain active.
+
+## Retire the unused text buffer wrapper
+
+NumericTextStream now holds a standard bytes.Buffer directly; output stats use
+native Len/Cap, String copies once, reset uses the native method, and stream Close
+releases its reference. Actual file output and numeric formatting state/owner
+checks remain. Counted numerical format snapshots use bytes.Clone to retain an
+independent value, including embedded NULs. SMT2 quoting uses strings.Builder
+with the existing source escaping algorithm.
+
+Removed the uncalled ArbitraryFloatFormattedCString.AppendTo adapter and its two
+wrapper-only tests. With no remaining imports, deleted util/text.Buffer and its
+three representation test groups. No util/text package or import remains. Retired
+the string_buffer header/template and standalone container-driver implementation
+credit in the manifest; upstream files are still present, so this is not a dead
+C++ claim. Actual retained caller behavior is covered at its project consumers.
+
+Validation: native focused numeric/SMT2/float-format util checks passed (6.662s),
+same focused g3debug checks passed (6.653s), dependent native SAT/AST/smtcore checks
+passed (0.018s/0.550s/0.086s), module-wide compilation, util vet, manifest evidence,
+gofmt and diff checks passed. Removing obsolete container credit changes counts to
+2102 units/677 APIs: 62 ported, 283 partial, 1729 unported and two dead/deleted.
+No full native module rerun inside the hourly interval.
+
+The audit now finds 286 root production files and 103 components; the largest
+internal cycle remains 164 files. Parameter-view/error dependencies from numeric
+text/OwnedString code still join numerical ownership back to params/global
+registries. Remaining external custom storage and that internal cycle must be
+resolved before the complete util subpackage split. Goal remains active.

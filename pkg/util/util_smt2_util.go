@@ -3,10 +3,10 @@ package util
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var ErrSMT2NeedsQuoting = errors.New("g3: SMT2 symbol does not satisfy quoting precondition")
@@ -77,14 +77,8 @@ func MkSMT2QuotedSymbol(m *usymbol.Manager, s usymbol.Symbol, _ *arena.Budget) (
 	if !needed {
 		return "", ErrSMT2NeedsQuoting
 	}
-	b, e := utext.NewBuffer(utext.Config{})
-	if e != nil {
-		return "", e
-	}
-	defer b.Close()
-	if e = b.AppendByte('|'); e != nil {
-		return "", e
-	}
+	var b strings.Builder
+	b.WriteByte('|')
 	text, _, e := m.BareString(s)
 	if e != nil {
 		return "", e
@@ -92,16 +86,10 @@ func MkSMT2QuotedSymbol(m *usymbol.Manager, s usymbol.Symbol, _ *arena.Budget) (
 	for i := 0; i < len(text); i++ {
 		c := text[i]
 		if c == '|' || c == '\\' {
-			if e = b.AppendByte('\\'); e != nil {
-				return "", e
-			}
+			b.WriteByte('\\')
 		}
-		if e = b.AppendByte(c); e != nil {
-			return "", e
-		}
+		b.WriteByte(c)
 	}
-	if e = b.AppendByte('|'); e != nil {
-		return "", e
-	}
-	return b.CStr()
+	b.WriteByte('|')
+	return b.String(), nil
 }

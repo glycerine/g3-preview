@@ -108672,13 +108672,9 @@
       "path": "src/test/string_buffer.cpp",
       "component": "test",
       "role": "test",
-      "status": "ported",
-      "go_targets": [
-        "pkg/util/text/buffer.go"
-      ],
-      "tests": [
-        "TestStringBuffer64TextNumbersAndReset"
-      ],
+      "status": "unported",
+      "go_targets": [],
+      "tests": [],
       "assertions": [
         {
           "line": 27,
@@ -108693,39 +108689,14 @@
           "text": "ENSURE(strcmp(b.c_str(), \"Hello World\") == 0);"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
-      "methods": [
-        {
-          "name": "tst1 Testing10true ENSURE at line27",
-          "status": "ported",
-          "go_target": "pkg/util/text/buffer.go",
-          "tests": [
-            "TestStringBuffer64TextNumbersAndReset"
-          ]
-        },
-        {
-          "name": "tst2 length10000 ENSURE at line37",
-          "status": "ported",
-          "go_target": "pkg/util/text/buffer.go",
-          "tests": [
-            "TestStringBuffer64TextNumbersAndReset"
-          ]
-        },
-        {
-          "name": "tst3 32<-128 Hello World ENSURE at line45 and registered tst_string_buffer",
-          "status": "ported",
-          "go_target": "pkg/util/text/buffer.go",
-          "tests": [
-            "TestStringBuffer64TextNumbersAndReset"
-          ]
-        }
-      ],
+      "methods_audited": false,
+      "ownership_audited": false,
+      "methods": [],
       "ownership": [
-        "Source local32/64/128 buffer lifetimes use concrete owners and deterministic Close; caller-owned CStr results are checked without reference-source runtime dependency."
+        "All retained Go consumers now use standard bytes.Buffer or strings.Builder directly. Deleted the unused util/text.Buffer wrapper and its tests, along with the uncalled formatted-CString insertion adapter. No C++ container or template implementation is retained."
       ],
       "deviations": [
-        "Finite LCG digits replace nondeterministic rand; the source assertion checks length only. TRACE text is diagnostic and does not add a fourth assertion."
+        "C++ string_buffer implementation and standalone container-driver completion credit are retired. Native caller behavior is checked in actual AST, SMT context, parameter-display, SMT2 quoting and numeric-stream tests. The upstream source files still exist; this is not a source dead-code claim."
       ]
     },
     {
@@ -146287,15 +146258,9 @@
       "path": "src/util/string_buffer.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
-      "go_targets": [
-        "pkg/util/text/buffer.go"
-      ],
-      "tests": [
-        "TestStringBuffer64TextNumbersAndReset",
-        "TestStringBuffer64AppendAndEmbeddedNUL",
-        "TestStringBuffer64LifecycleAndLongProfile"
-      ],
+      "status": "unported",
+      "go_targets": [],
+      "tests": [],
       "conditionals": [
         {
           "line": 19,
@@ -146342,76 +146307,14 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
-      "methods": [
-        {
-          "name": "live INITIAL_SIZE64 fields, constructor, destructor and expand (lines31-58)",
-          "status": "partial",
-          "go_target": "pkg/util/text/buffer.go",
-          "tests": [
-            "TestStringBuffer64AppendAndEmbeddedNUL",
-            "TestStringBuffer64LifecycleAndLongProfile"
-          ]
-        },
-        {
-          "name": "reset, char and CString append (lines60-80)",
-          "status": "ported",
-          "go_target": "pkg/util/text/buffer.go",
-          "tests": [
-            "TestStringBuffer64TextNumbersAndReset",
-            "TestStringBuffer64AppendAndEmbeddedNUL"
-          ]
-        },
-        {
-          "name": "int, unsigned, long and bool append (lines82-119)",
-          "status": "ported",
-          "go_target": "pkg/util/text/buffer.go",
-          "tests": [
-            "TestStringBuffer64TextNumbersAndReset"
-          ]
-        },
-        {
-          "name": "size, empty and mutating c_str (lines121-135)",
-          "status": "ported",
-          "go_target": "pkg/util/text/buffer.go",
-          "tests": [
-            "TestStringBuffer64AppendAndEmbeddedNUL"
-          ]
-        },
-        {
-          "name": "six scalar insertion operators (lines139-173)",
-          "status": "ported",
-          "go_target": "pkg/util/text/buffer.go",
-          "tests": [
-            "TestStringBuffer64TextNumbersAndReset"
-          ]
-        },
-        {
-          "name": "live INITIAL_SIZE64 self-type buffer insertion (lines175-179)",
-          "status": "partial",
-          "go_target": "pkg/util/text/buffer.go",
-          "tests": [
-            "TestStringBuffer64TextNumbersAndReset",
-            "TestStringBuffer64AppendAndEmbeddedNUL"
-          ]
-        },
-        {
-          "name": "other INITIAL_SIZE template instantiations",
-          "status": "unported",
-          "tests": []
-        },
-        {
-          "name": "Windows secure-CRT sprintf_s runtime error/profile semantics",
-          "status": "unported",
-          "tests": []
-        }
-      ],
+      "methods_audited": false,
+      "ownership_audited": false,
+      "methods": [],
       "ownership": [
-        "The retained Go implementation is only the live INITIAL_SIZE64 specialization. INITIAL_SIZE32 and INITIAL_SIZE128 had no production Go consumers and were removed with their representation-only tests. The native util/text.Buffer uses bytes.Buffer storage. Consumers import the leaf directly; borrowed arbitrary-float text is appended through ArbitraryFloatFormattedCString.AppendTo, keeping numeric ownership outside the text leaf."
+        "All retained Go consumers now use standard bytes.Buffer or strings.Builder directly. Deleted the unused util/text.Buffer wrapper and its tests, along with the uncalled formatted-CString insertion adapter. No C++ container or template implementation is retained."
       ],
       "deviations": [
-        "Current Go production consumers use only INITIAL_SIZE64. Other live upstream specializations remain deferred until their consumers are ported and should use native Go text buffers rather than restoring template-width variants."
+        "C++ string_buffer implementation and standalone container-driver completion credit are retired. Native caller behavior is checked in actual AST, SMT context, parameter-display, SMT2 quoting and numeric-stream tests. The upstream source files still exist; this is not a source dead-code claim."
       ]
     },
     {
@@ -146603,7 +146506,6 @@
         "pkg/util/symbol/bytes.go",
         "pkg/util/symbol/hash.go",
         "pkg/util/symbol/symbol.go",
-        "pkg/util/text/buffer.go",
         "pkg/util/symbol/service.go",
         "pkg/util/symbol/service_test.go",
         "pkg/util/util_gparams_service_ops.go",
@@ -146619,8 +146521,6 @@
         "TestSymbolConcurrentInternIdentity",
         "TestSymbolIndependentBytesAndPrefixOrder",
         "TestSymbolDuplicateLookupAndInvalidTokens",
-        "TestStringBuffer64TextNumbersAndReset",
-        "TestStringBuffer64LifecycleAndLongProfile",
         "TestSymbolServiceSourcePublicationAndReinitialize",
         "TestSymbolServiceSourceEveryConstructorReservation",
         "TestSymbolServiceSourceCopiedOwnerAndPrepareFailure",
@@ -146769,15 +146669,6 @@
           ]
         },
         {
-          "name": "string_buffer32/64/128 symbol insertion (lines113-129): plain/null bulk, numerical k! then signed UNBOXINT",
-          "status": "ported",
-          "go_target": "pkg/util/text/buffer.go",
-          "tests": [
-            "TestStringBuffer64TextNumbersAndReset",
-            "TestStringBuffer64LifecycleAndLongProfile"
-          ]
-        },
-        {
           "name": "string_buffer symbol insertion for other INITIAL_SIZE template instantiations",
           "status": "unported",
           "tests": []
@@ -146812,7 +146703,6 @@
       ],
       "ownership": [
         "The util/symbol leaf imports only arena and standard-library packages. Its owner-local Manager uses map[string]uint32 and a concrete entry slice containing immutable Go spellings and cached source hashes. Handles remain pointer-free owner/ID/generation/tag values; IDs are not recycled. Interning and teardown are serialized. Only the service/manager headers remain arena-budgeted; maps, entries and strings are Go-managed. Borrowed views check the manager lifetime when read.",
-        "Selected buffer insertion borrows SymbolManager only during the call, reads checked spelling bytes directly, and charges destination growth without intermediate Symbol.String text. See PORT_PROGRESS.md#audit-string-buffer-port-status-md.",
         "Explicit SymbolService holds a nullable manager pointer, publishes only a completed manager, preserves initialization identity, and clears the pointer after manager close. Reinitialization creates a fresh identity domain. Separate Close retires the service header. Process singleton/global Runtime accounting remain open.",
         "Actual reflected service and acquired helper headers charged once; only returned construction outcomes stored in named fields. Caller region/process descriptors and MemoryProcess borrowed children never adopted. Constructor horizons and process live cold graph audited before lifting real refusal.",
         "Call-local actual symbol tag and provider identity drive separate insertion calls; string pointers use the existing borrowed CString engine and reached length/read guards, including badbit."
@@ -146821,13 +146711,13 @@
         "Native tagged pointers become scalar tags/IDs and owner-bound opaque tokens; foreign owners and forged generations are rejected. Numerical symbols retain the source uint32 domain and signed rendering. Legacy arena geometry fields are ignored for Go-managed spellings.",
         "Interning uses native map lookup and typed slice append, with strings.Clone to avoid retaining an input suffix. Cached source hash values remain observable, but raw size_t prefixes, physical NUL bytes, region descriptors and arena allocation failures for spellings are removed. Returned Go strings remain safe after manager close; explicitly borrowed views retain owner validation.",
         "Source null/marked/numeric-invalid data operations return typed precondition errors instead of invalid dereferences; identical marked/dummy Less still returnsfalse before dereference as source.",
-        "Selected numerical buffer insertion preserves source k! publication before signed integer suffix; other INITIAL_SIZE template insertion specializations remain open.",
         "Existing utilhash.StrHashtable storage is Budget-backed pointer-free Go table, not memory.Runtime; actual global Runtime table/allocator accounting migration remains required next prerequisite",
         "One explicit caller-supplied source global namespace; no package singleton/independent process Runtime adoption or native stdio static constructor claim",
         "Default direct-Go file emission/classic input/flush profiles; native iostream locale/buffering/throwmask/unitbuf ABI and nonLinux OS/debugbreak remain qualified",
         "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
         "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
-        "Supported scalar ostream representation only; native pointer encoding and full locale/global stream bindings remain separate obligations."
+        "Supported scalar ostream representation only; native pointer encoding and full locale/global stream bindings remain separate obligations.",
+        "Unused string_buffer symbol insertion specialization and its implementation credit are removed. Actual fresh-name and parameter-output callers use checked Display strings and native buffers."
       ]
     },
     {
