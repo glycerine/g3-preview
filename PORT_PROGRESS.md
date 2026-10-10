@@ -35626,3 +35626,52 @@ LP vet passes. No shared existing implementation was modified; no redundant full
 LP/module suite was run after the preceding successful full native LP checkpoint.
 Source counts remain42 partial/68 unported; exact sparse mutation/elimination,
 pivot selection/shortening, triangular solves, LU and full solver work remain open.
+
+## Exact sparse mutation, elimination and live division
+
+Implemented retained mpq add/remove, indexed-value assignment and by-value
+set_value, pivot-column scanning/removal, row elimination and live-reference
+row division. Add publishes three actual indexed-value copies in the row before
+three in the column, followed by active count. Removal copies the column tail
+before its metadata and reciprocal repair, then the row tail before its metadata
+and repair, and destroys column/row tails only after those steps. Column value
+synchronization copies the actual by-value argument before its destination.
+Exact pivoting uses concrete rational product temporaries and direct arithmetic,
+exact-zero tolerance regardless of floating settings, literal duplicate offsets
+and source workspace cleanup, and skips floating maximum-first reordering.
+
+Operations retain newly owned numerical calls and lexical values on error and
+reject further mutations/queries until owning Close. Failures before acquisition
+may own no numeric receipt; stopped workspace still records the owner. Division
+rereads its actual borrowed row/column divisor as column synchronization can change
+it. Debug self-pivot asserts before mutation; release follows the source body.
+The reached invalid zero-divisor release case preserves source nonzero/zero =1/0
+state and owning cleanup, without inventing an early error or claiming valid-domain
+arithmetic for it. No invalid numeral handles were manufactured for coverage.
+
+Tests include1,200 independent map mutations and160 rational elimination worlds,
+shuffled row/column permutations, tiny exact coefficients, retained zero entries,
+source duplicate-removal prefixes, row and column divisor aliases, both-direction
+backlinks and independent named owning-cell/direct-object census. Eight normal
+pooled allocation-refusal campaigns and three explicit source-debug/direct allocator
+campaigns walk to first success. Direct division uses a small divisor that keeps
+large results: patterned large/large fixtures can simplify to inline numerals and
+cannot expose the later allocating column copy. Tests now require an independently
+observed completed row value with its old column value after a later copy refusal
+in direct division and pivot accumulation, and actual row-before-column add and
+column-before-row tail-assignment stops. A real older comparison remains owned by
+its caller through big coefficient insertion/removal and Close.
+
+All sparse focused suites pass native12.213s/debug-checked13.999s. Exact elimination
+file coverage188/209 (90.0%) native and190/209 (90.9%) combined debug/checked.
+Remaining statements propagate valid-owner cleanup/scalar child errors, protect
+malformed permutation metadata or invariant-protected workspace indices, or belong
+to the opposite assertion profile. The strengthened completed-row/failed-column
+fault assertion additionally passes native7.102s. No full native module rerun is
+needed within this hour after the last successful hourly suite; existing shared
+production code was not modified. Source counts stay42 partial/68 unported; full
+sparse replacement/maximum selection, triangular solves, LU and solvers remain open.
+
+The strengthened completed-row/failed-column campaigns also pass combined
+debug/checked8.348s. Final LP vet, source ledger, graph regeneration and diff
+checks pass;64-package graph edges are unchanged.

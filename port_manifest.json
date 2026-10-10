@@ -118688,7 +118688,8 @@
       "go_targets": [
         "pkg/util/lp/sparse_matrix_float.go",
         "pkg/util/lp/sparse_matrix_exact.go",
-        "pkg/util/lp/sparse_matrix_float_elimination.go"
+        "pkg/util/lp/sparse_matrix_float_elimination.go",
+        "pkg/util/lp/sparse_matrix_exact_elimination.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -118701,7 +118702,13 @@
         "TestLPFloatSparseIndependentMutationOracle",
         "TestLPFloatSparseIndependentPivotOracle",
         "TestLPFloatSparseLiteralEliminationAndDivision",
-        "TestLPFloatSparseMutationBoundsAndPrefixes"
+        "TestLPFloatSparseMutationBoundsAndPrefixes",
+        "TestLPExactSparseIndependentMutationOracle",
+        "TestLPExactSparseIndependentPivotOracle",
+        "TestLPExactSparseLiteralDivisionAndPivot",
+        "TestLPExactSparseMutationAllocationFailureCensus",
+        "TestLPExactSparseMutationBoundsAndPrefixes",
+        "TestLPExactSparseMutationLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -118747,17 +118754,32 @@
             "TestLPFloatSparseLiteralEliminationAndDivision",
             "TestLPFloatSparseMutationBoundsAndPrefixes"
           ]
+        },
+        {
+          "name": "retained mpq sparse add/remove, value-before-metadata tail assignment, by-value column setter, exact pivot-column removal/workspace scan, row elimination and live-reference division",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact_elimination.go",
+          "tests": [
+            "TestLPExactSparseIndependentMutationOracle",
+            "TestLPExactSparseIndependentPivotOracle",
+            "TestLPExactSparseLiteralDivisionAndPivot",
+            "TestLPExactSparseMutationAllocationFailureCensus",
+            "TestLPExactSparseMutationBoundsAndPrefixes",
+            "TestLPExactSparseMutationLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
         "Native typed row and column slices each own their floating coefficient. Both reciprocal offsets are captured before column-then-row publication; active count increments after both. Construction retains completed descending-column prefix on invalid input and preserves duplicates and explicit zeros. Permutations, pivot queue, processed flags and -1 pivot workspace initialize independently.",
         "Exact sparse basis storage owns separate row and column coefficients. Indexed-value argument/member/stored copies use three initialized lexical slots; argument survives its full expression, member and argument are released after publication. Column publishes before row; active count increments only after both. Numerical Copy roots and stopped lexical values remain with the partial constructor result; Close releases new numerical calls, lexical values, columns then rows in ascending vector destruction order, then remaining owned roots. Borrowed static source and older raw/comparison generations remain caller-owned.",
-        "Floating add publishes physical row then column. Removal copies column tail before row tail, repairs each reciprocal offset after the respective assignment, then pops column and row and decrements active count. Maximum-head reordering repairs both column offsets before the row swap. Pivot scan revisits moved tails, retains the source work vector, cleans only original target indices, insertion-sorts cancellation offsets and removes them descending. Divisor and pivot alpha are borrowed references; division reads the live divisor per coefficient and stores small results as retained positive zero entries."
+        "Floating add publishes physical row then column. Removal copies column tail before row tail, repairs each reciprocal offset after the respective assignment, then pops column and row and decrements active count. Maximum-head reordering repairs both column offsets before the row swap. Pivot scan revisits moved tails, retains the source work vector, cleans only original target indices, insertion-sorts cancellation offsets and removes them descending. Divisor and pivot alpha are borrowed references; division reads the live divisor per coefficient and stores small results as retained positive zero entries.",
+        "Exact AddNewElement owns three reached indexed-value copies in each direction, publishes row before column and increments count after both. Tail assignment copies the owning rational before index/other publication, repairs the matching backlink, then destroys column and row tails. Column synchronization owns the actual set_value by-value argument and destination copy. Pivot owns concrete product temporaries and insertion/copy/arithmetic receipts, retains source work-vector and mutation prefixes on failure, and skips maximum reordering for precise types. Row division borrows a live row or column divisor; Close releases only newly acquired raw/numerical receipts, lexical values and published coefficients."
       ],
       "deviations": [
-        "Floating basis storage, queries and row elimination are implemented. Exact sparse mutation/elimination, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
+        "Floating basis storage, queries and row elimination are implemented. Remaining sparse replacement/maximum ordering, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
         "The same concrete mpq coefficient storage serves retained rational/rational and rational/pair matrix instances; scalar/pair solve algorithms remain open. Native slice movement transfers ownership without emulating C++ vector capacity copies. Source invalid domains preserve completed copy prefixes and return typed errors; stopped owners reject further queries and swaps. No universal numeric callbacks or Go generic matrix were added.",
-        "Floating source strict tolerance, IEEE, NaN-head/tie ordering, duplicate new-term publication and duplicate cancellation offsets are preserved. Self pivot asserts before mutation in debug and follows the source release continuation otherwise. Reached invalid indices/backlinks return typed bounds errors after the actual mutation prefix; no hidden workspace repair or cancellation deduplication. Exact mutation/elimination, eta-driven shortening, pivot selection, triangular solves and LU remain open. Independent oracle tests are not credited as previously unreachable upstream driver execution."
+        "Floating source strict tolerance, IEEE, NaN-head/tie ordering, duplicate new-term publication and duplicate cancellation offsets are preserved. Self pivot asserts before mutation in debug and follows the source release continuation otherwise. Reached invalid indices/backlinks return typed bounds errors after the actual mutation prefix; no hidden workspace repair or cancellation deduplication. Exact maximum ordering, eta-driven shortening, pivot selection, triangular solves and LU remain open. Independent oracle tests are not credited as previously unreachable upstream driver execution.",
+        "Exact drop/zero tolerance is IsZero independent of floating settings. Duplicate cancellation offsets and source release self-pivot behavior remain literal. Debug zero divisor asserts; the reached release nonzero/zero rational case yields source 1/0 state rather than an invented early error and is not credited as valid-domain arithmetic. Failed operations freeze the owner even when no receipt was acquired before refusal. Physical fault campaigns use both default pooled and explicitly selected source debug/direct allocation profiles; no fabricated budget event or receipt. Full sparse replacement/maximum selection, triangular solves, LU and solver integration remain open."
       ]
     },
     {
@@ -123416,7 +123438,8 @@
       "go_targets": [
         "pkg/util/lp/sparse_matrix_float.go",
         "pkg/util/lp/sparse_matrix_exact.go",
-        "pkg/util/lp/sparse_matrix_float_elimination.go"
+        "pkg/util/lp/sparse_matrix_float_elimination.go",
+        "pkg/util/lp/sparse_matrix_exact_elimination.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -123429,7 +123452,13 @@
         "TestLPFloatSparseIndependentMutationOracle",
         "TestLPFloatSparseIndependentPivotOracle",
         "TestLPFloatSparseLiteralEliminationAndDivision",
-        "TestLPFloatSparseMutationBoundsAndPrefixes"
+        "TestLPFloatSparseMutationBoundsAndPrefixes",
+        "TestLPExactSparseIndependentMutationOracle",
+        "TestLPExactSparseIndependentPivotOracle",
+        "TestLPExactSparseLiteralDivisionAndPivot",
+        "TestLPExactSparseMutationAllocationFailureCensus",
+        "TestLPExactSparseMutationBoundsAndPrefixes",
+        "TestLPExactSparseMutationLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -123529,17 +123558,32 @@
             "TestLPFloatSparseLiteralEliminationAndDivision",
             "TestLPFloatSparseMutationBoundsAndPrefixes"
           ]
+        },
+        {
+          "name": "retained mpq sparse add/remove, value-before-metadata tail assignment, by-value column setter, exact pivot-column removal/workspace scan, row elimination and live-reference division",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact_elimination.go",
+          "tests": [
+            "TestLPExactSparseIndependentMutationOracle",
+            "TestLPExactSparseIndependentPivotOracle",
+            "TestLPExactSparseLiteralDivisionAndPivot",
+            "TestLPExactSparseMutationAllocationFailureCensus",
+            "TestLPExactSparseMutationBoundsAndPrefixes",
+            "TestLPExactSparseMutationLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
         "Native typed row and column slices each own their floating coefficient. Both reciprocal offsets are captured before column-then-row publication; active count increments after both. Construction retains completed descending-column prefix on invalid input and preserves duplicates and explicit zeros. Permutations, pivot queue, processed flags and -1 pivot workspace initialize independently.",
         "Exact sparse basis storage owns separate row and column coefficients. Indexed-value argument/member/stored copies use three initialized lexical slots; argument survives its full expression, member and argument are released after publication. Column publishes before row; active count increments only after both. Numerical Copy roots and stopped lexical values remain with the partial constructor result; Close releases new numerical calls, lexical values, columns then rows in ascending vector destruction order, then remaining owned roots. Borrowed static source and older raw/comparison generations remain caller-owned.",
-        "Floating add publishes physical row then column. Removal copies column tail before row tail, repairs each reciprocal offset after the respective assignment, then pops column and row and decrements active count. Maximum-head reordering repairs both column offsets before the row swap. Pivot scan revisits moved tails, retains the source work vector, cleans only original target indices, insertion-sorts cancellation offsets and removes them descending. Divisor and pivot alpha are borrowed references; division reads the live divisor per coefficient and stores small results as retained positive zero entries."
+        "Floating add publishes physical row then column. Removal copies column tail before row tail, repairs each reciprocal offset after the respective assignment, then pops column and row and decrements active count. Maximum-head reordering repairs both column offsets before the row swap. Pivot scan revisits moved tails, retains the source work vector, cleans only original target indices, insertion-sorts cancellation offsets and removes them descending. Divisor and pivot alpha are borrowed references; division reads the live divisor per coefficient and stores small results as retained positive zero entries.",
+        "Exact AddNewElement owns three reached indexed-value copies in each direction, publishes row before column and increments count after both. Tail assignment copies the owning rational before index/other publication, repairs the matching backlink, then destroys column and row tails. Column synchronization owns the actual set_value by-value argument and destination copy. Pivot owns concrete product temporaries and insertion/copy/arithmetic receipts, retains source work-vector and mutation prefixes on failure, and skips maximum reordering for precise types. Row division borrows a live row or column divisor; Close releases only newly acquired raw/numerical receipts, lexical values and published coefficients."
       ],
       "deviations": [
-        "Floating basis storage, queries and row elimination are implemented. Exact sparse mutation/elimination, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
+        "Floating basis storage, queries and row elimination are implemented. Remaining sparse replacement/maximum ordering, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
         "The same concrete mpq coefficient storage serves retained rational/rational and rational/pair matrix instances; scalar/pair solve algorithms remain open. Native slice movement transfers ownership without emulating C++ vector capacity copies. Source invalid domains preserve completed copy prefixes and return typed errors; stopped owners reject further queries and swaps. No universal numeric callbacks or Go generic matrix were added.",
-        "Floating source strict tolerance, IEEE, NaN-head/tie ordering, duplicate new-term publication and duplicate cancellation offsets are preserved. Self pivot asserts before mutation in debug and follows the source release continuation otherwise. Reached invalid indices/backlinks return typed bounds errors after the actual mutation prefix; no hidden workspace repair or cancellation deduplication. Exact mutation/elimination, eta-driven shortening, pivot selection, triangular solves and LU remain open. Independent oracle tests are not credited as previously unreachable upstream driver execution."
+        "Floating source strict tolerance, IEEE, NaN-head/tie ordering, duplicate new-term publication and duplicate cancellation offsets are preserved. Self pivot asserts before mutation in debug and follows the source release continuation otherwise. Reached invalid indices/backlinks return typed bounds errors after the actual mutation prefix; no hidden workspace repair or cancellation deduplication. Exact maximum ordering, eta-driven shortening, pivot selection, triangular solves and LU remain open. Independent oracle tests are not credited as previously unreachable upstream driver execution.",
+        "Exact drop/zero tolerance is IsZero independent of floating settings. Duplicate cancellation offsets and source release self-pivot behavior remain literal. Debug zero divisor asserts; the reached release nonzero/zero rational case yields source 1/0 state rather than an invented early error and is not credited as valid-domain arithmetic. Failed operations freeze the owner even when no receipt was acquired before refusal. Physical fault campaigns use both default pooled and explicitly selected source debug/direct allocation profiles; no fabricated budget event or receipt. Full sparse replacement/maximum selection, triangular solves, LU and solver integration remain open."
       ]
     },
     {
@@ -123550,7 +123594,8 @@
       "go_targets": [
         "pkg/util/lp/sparse_matrix_float.go",
         "pkg/util/lp/sparse_matrix_exact.go",
-        "pkg/util/lp/sparse_matrix_float_elimination.go"
+        "pkg/util/lp/sparse_matrix_float_elimination.go",
+        "pkg/util/lp/sparse_matrix_exact_elimination.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -123563,7 +123608,13 @@
         "TestLPFloatSparseIndependentMutationOracle",
         "TestLPFloatSparseIndependentPivotOracle",
         "TestLPFloatSparseLiteralEliminationAndDivision",
-        "TestLPFloatSparseMutationBoundsAndPrefixes"
+        "TestLPFloatSparseMutationBoundsAndPrefixes",
+        "TestLPExactSparseIndependentMutationOracle",
+        "TestLPExactSparseIndependentPivotOracle",
+        "TestLPExactSparseLiteralDivisionAndPivot",
+        "TestLPExactSparseMutationAllocationFailureCensus",
+        "TestLPExactSparseMutationBoundsAndPrefixes",
+        "TestLPExactSparseMutationLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -123847,17 +123898,32 @@
             "TestLPFloatSparseLiteralEliminationAndDivision",
             "TestLPFloatSparseMutationBoundsAndPrefixes"
           ]
+        },
+        {
+          "name": "retained mpq sparse add/remove, value-before-metadata tail assignment, by-value column setter, exact pivot-column removal/workspace scan, row elimination and live-reference division",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact_elimination.go",
+          "tests": [
+            "TestLPExactSparseIndependentMutationOracle",
+            "TestLPExactSparseIndependentPivotOracle",
+            "TestLPExactSparseLiteralDivisionAndPivot",
+            "TestLPExactSparseMutationAllocationFailureCensus",
+            "TestLPExactSparseMutationBoundsAndPrefixes",
+            "TestLPExactSparseMutationLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
         "Native typed row and column slices each own their floating coefficient. Both reciprocal offsets are captured before column-then-row publication; active count increments after both. Construction retains completed descending-column prefix on invalid input and preserves duplicates and explicit zeros. Permutations, pivot queue, processed flags and -1 pivot workspace initialize independently.",
         "Exact sparse basis storage owns separate row and column coefficients. Indexed-value argument/member/stored copies use three initialized lexical slots; argument survives its full expression, member and argument are released after publication. Column publishes before row; active count increments only after both. Numerical Copy roots and stopped lexical values remain with the partial constructor result; Close releases new numerical calls, lexical values, columns then rows in ascending vector destruction order, then remaining owned roots. Borrowed static source and older raw/comparison generations remain caller-owned.",
-        "Floating add publishes physical row then column. Removal copies column tail before row tail, repairs each reciprocal offset after the respective assignment, then pops column and row and decrements active count. Maximum-head reordering repairs both column offsets before the row swap. Pivot scan revisits moved tails, retains the source work vector, cleans only original target indices, insertion-sorts cancellation offsets and removes them descending. Divisor and pivot alpha are borrowed references; division reads the live divisor per coefficient and stores small results as retained positive zero entries."
+        "Floating add publishes physical row then column. Removal copies column tail before row tail, repairs each reciprocal offset after the respective assignment, then pops column and row and decrements active count. Maximum-head reordering repairs both column offsets before the row swap. Pivot scan revisits moved tails, retains the source work vector, cleans only original target indices, insertion-sorts cancellation offsets and removes them descending. Divisor and pivot alpha are borrowed references; division reads the live divisor per coefficient and stores small results as retained positive zero entries.",
+        "Exact AddNewElement owns three reached indexed-value copies in each direction, publishes row before column and increments count after both. Tail assignment copies the owning rational before index/other publication, repairs the matching backlink, then destroys column and row tails. Column synchronization owns the actual set_value by-value argument and destination copy. Pivot owns concrete product temporaries and insertion/copy/arithmetic receipts, retains source work-vector and mutation prefixes on failure, and skips maximum reordering for precise types. Row division borrows a live row or column divisor; Close releases only newly acquired raw/numerical receipts, lexical values and published coefficients."
       ],
       "deviations": [
-        "Floating basis storage, queries and row elimination are implemented. Exact sparse mutation/elimination, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
+        "Floating basis storage, queries and row elimination are implemented. Remaining sparse replacement/maximum ordering, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
         "The same concrete mpq coefficient storage serves retained rational/rational and rational/pair matrix instances; scalar/pair solve algorithms remain open. Native slice movement transfers ownership without emulating C++ vector capacity copies. Source invalid domains preserve completed copy prefixes and return typed errors; stopped owners reject further queries and swaps. No universal numeric callbacks or Go generic matrix were added.",
-        "Floating source strict tolerance, IEEE, NaN-head/tie ordering, duplicate new-term publication and duplicate cancellation offsets are preserved. Self pivot asserts before mutation in debug and follows the source release continuation otherwise. Reached invalid indices/backlinks return typed bounds errors after the actual mutation prefix; no hidden workspace repair or cancellation deduplication. Exact mutation/elimination, eta-driven shortening, pivot selection, triangular solves and LU remain open. Independent oracle tests are not credited as previously unreachable upstream driver execution."
+        "Floating source strict tolerance, IEEE, NaN-head/tie ordering, duplicate new-term publication and duplicate cancellation offsets are preserved. Self pivot asserts before mutation in debug and follows the source release continuation otherwise. Reached invalid indices/backlinks return typed bounds errors after the actual mutation prefix; no hidden workspace repair or cancellation deduplication. Exact maximum ordering, eta-driven shortening, pivot selection, triangular solves and LU remain open. Independent oracle tests are not credited as previously unreachable upstream driver execution.",
+        "Exact drop/zero tolerance is IsZero independent of floating settings. Duplicate cancellation offsets and source release self-pivot behavior remain literal. Debug zero divisor asserts; the reached release nonzero/zero rational case yields source 1/0 state rather than an invented early error and is not credited as valid-domain arithmetic. Failed operations freeze the owner even when no receipt was acquired before refusal. Physical fault campaigns use both default pooled and explicitly selected source debug/direct allocation profiles; no fabricated budget event or receipt. Full sparse replacement/maximum selection, triangular solves, LU and solver integration remain open."
       ]
     },
     {
@@ -123868,7 +123934,8 @@
       "go_targets": [
         "pkg/util/lp/sparse_matrix_float.go",
         "pkg/util/lp/sparse_matrix_exact.go",
-        "pkg/util/lp/sparse_matrix_float_elimination.go"
+        "pkg/util/lp/sparse_matrix_float_elimination.go",
+        "pkg/util/lp/sparse_matrix_exact_elimination.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -123881,7 +123948,13 @@
         "TestLPFloatSparseIndependentMutationOracle",
         "TestLPFloatSparseIndependentPivotOracle",
         "TestLPFloatSparseLiteralEliminationAndDivision",
-        "TestLPFloatSparseMutationBoundsAndPrefixes"
+        "TestLPFloatSparseMutationBoundsAndPrefixes",
+        "TestLPExactSparseIndependentMutationOracle",
+        "TestLPExactSparseIndependentPivotOracle",
+        "TestLPExactSparseLiteralDivisionAndPivot",
+        "TestLPExactSparseMutationAllocationFailureCensus",
+        "TestLPExactSparseMutationBoundsAndPrefixes",
+        "TestLPExactSparseMutationLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -123927,17 +124000,32 @@
             "TestLPFloatSparseLiteralEliminationAndDivision",
             "TestLPFloatSparseMutationBoundsAndPrefixes"
           ]
+        },
+        {
+          "name": "retained mpq sparse add/remove, value-before-metadata tail assignment, by-value column setter, exact pivot-column removal/workspace scan, row elimination and live-reference division",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact_elimination.go",
+          "tests": [
+            "TestLPExactSparseIndependentMutationOracle",
+            "TestLPExactSparseIndependentPivotOracle",
+            "TestLPExactSparseLiteralDivisionAndPivot",
+            "TestLPExactSparseMutationAllocationFailureCensus",
+            "TestLPExactSparseMutationBoundsAndPrefixes",
+            "TestLPExactSparseMutationLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
         "Native typed row and column slices each own their floating coefficient. Both reciprocal offsets are captured before column-then-row publication; active count increments after both. Construction retains completed descending-column prefix on invalid input and preserves duplicates and explicit zeros. Permutations, pivot queue, processed flags and -1 pivot workspace initialize independently.",
         "Exact sparse basis storage owns separate row and column coefficients. Indexed-value argument/member/stored copies use three initialized lexical slots; argument survives its full expression, member and argument are released after publication. Column publishes before row; active count increments only after both. Numerical Copy roots and stopped lexical values remain with the partial constructor result; Close releases new numerical calls, lexical values, columns then rows in ascending vector destruction order, then remaining owned roots. Borrowed static source and older raw/comparison generations remain caller-owned.",
-        "Floating add publishes physical row then column. Removal copies column tail before row tail, repairs each reciprocal offset after the respective assignment, then pops column and row and decrements active count. Maximum-head reordering repairs both column offsets before the row swap. Pivot scan revisits moved tails, retains the source work vector, cleans only original target indices, insertion-sorts cancellation offsets and removes them descending. Divisor and pivot alpha are borrowed references; division reads the live divisor per coefficient and stores small results as retained positive zero entries."
+        "Floating add publishes physical row then column. Removal copies column tail before row tail, repairs each reciprocal offset after the respective assignment, then pops column and row and decrements active count. Maximum-head reordering repairs both column offsets before the row swap. Pivot scan revisits moved tails, retains the source work vector, cleans only original target indices, insertion-sorts cancellation offsets and removes them descending. Divisor and pivot alpha are borrowed references; division reads the live divisor per coefficient and stores small results as retained positive zero entries.",
+        "Exact AddNewElement owns three reached indexed-value copies in each direction, publishes row before column and increments count after both. Tail assignment copies the owning rational before index/other publication, repairs the matching backlink, then destroys column and row tails. Column synchronization owns the actual set_value by-value argument and destination copy. Pivot owns concrete product temporaries and insertion/copy/arithmetic receipts, retains source work-vector and mutation prefixes on failure, and skips maximum reordering for precise types. Row division borrows a live row or column divisor; Close releases only newly acquired raw/numerical receipts, lexical values and published coefficients."
       ],
       "deviations": [
-        "Floating basis storage, queries and row elimination are implemented. Exact sparse mutation/elimination, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
+        "Floating basis storage, queries and row elimination are implemented. Remaining sparse replacement/maximum ordering, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
         "The same concrete mpq coefficient storage serves retained rational/rational and rational/pair matrix instances; scalar/pair solve algorithms remain open. Native slice movement transfers ownership without emulating C++ vector capacity copies. Source invalid domains preserve completed copy prefixes and return typed errors; stopped owners reject further queries and swaps. No universal numeric callbacks or Go generic matrix were added.",
-        "Floating source strict tolerance, IEEE, NaN-head/tie ordering, duplicate new-term publication and duplicate cancellation offsets are preserved. Self pivot asserts before mutation in debug and follows the source release continuation otherwise. Reached invalid indices/backlinks return typed bounds errors after the actual mutation prefix; no hidden workspace repair or cancellation deduplication. Exact mutation/elimination, eta-driven shortening, pivot selection, triangular solves and LU remain open. Independent oracle tests are not credited as previously unreachable upstream driver execution."
+        "Floating source strict tolerance, IEEE, NaN-head/tie ordering, duplicate new-term publication and duplicate cancellation offsets are preserved. Self pivot asserts before mutation in debug and follows the source release continuation otherwise. Reached invalid indices/backlinks return typed bounds errors after the actual mutation prefix; no hidden workspace repair or cancellation deduplication. Exact maximum ordering, eta-driven shortening, pivot selection, triangular solves and LU remain open. Independent oracle tests are not credited as previously unreachable upstream driver execution.",
+        "Exact drop/zero tolerance is IsZero independent of floating settings. Duplicate cancellation offsets and source release self-pivot behavior remain literal. Debug zero divisor asserts; the reached release nonzero/zero rational case yields source 1/0 state rather than an invented early error and is not credited as valid-domain arithmetic. Failed operations freeze the owner even when no receipt was acquired before refusal. Physical fault campaigns use both default pooled and explicitly selected source debug/direct allocation profiles; no fabricated budget event or receipt. Full sparse replacement/maximum selection, triangular solves, LU and solver integration remain open."
       ]
     },
     {

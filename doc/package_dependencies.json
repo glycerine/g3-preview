@@ -1197,6 +1197,7 @@
         "settings.go",
         "sparse_float_vector.go",
         "sparse_matrix_exact.go",
+        "sparse_matrix_exact_elimination.go",
         "sparse_matrix_float.go",
         "sparse_matrix_float_elimination.go",
         "sparse_rational_vector.go",
