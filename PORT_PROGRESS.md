@@ -37866,3 +37866,51 @@ evidence. LP76 partial/34 unported; repository2103 units/677 APIs,
 62 ported/357 partial/1656 unported/two dead-deleted (other classifications
 unchanged). Full owning constraints, bound propagator, row analysis, exact/LAR
 solver integration and complete original drivers remain open; LP goal unfinished.
+
+### Owning LAR constraints and bound witnesses — 2026-10-10
+
+Ported retained lar_base_constraint, lar_var_constraint, lar_term_constraint and
+lar_constraint operations. Base Kind initialization precedes independent RHS
+copy; derived column/term/coefficient publication follows it. Variable bounds
+export one owning coefficient. Term constraints borrow the actual mutable term
+and query its current size/coefficients/free value, while owning only their RHS
+and actual stopped copy receipts. General constraints copy an ordered native
+coefficient vector, preserving duplicates and explicit zeros. Direct vector copy
+constructs each rational once, rather than imposing sparse append's parameter/
+make_pair temporaries. Exports own independent complete/partial values and
+receipts; failed exports do not poison their source. General vector destruction
+precedes base RHS cleanup. FreeCoefficient writes initialized caller-owned out;
+the caller retains that partial output on error and the constraint owns only
+actual call cleanup receipts. No abstract callbacks or C++ vector emulation.
+
+Added ul_pair as a pointer-free native witness record with uint32 -1 sentinels,
+public field access and native value copy/equality. Added the source enum stream
+overload separately from the assertion/string formatter: unknown emits ??,
+without assertion. Standard io.Writer errors preserve actually accepted prefixes.
+The unused assertion-only base-copy constraint constructor and coefficient-index
+compare helper are not introduced. Full LAR insertion/scopes, bound updates,
+quick_xplain solving and original stale SMT-reader integration remain open.
+
+120 independent exact worlds check all relation kinds, empty/duplicate/zero
+vectors, input mutation/export destruction isolation, current borrowed term
+updates and surviving term after constraint close. Seven physical allocation
+refusal campaigns enumerate through success for all three constructors, full/
+term exports, stored coefficient growth and free-value return. Tests verify
+source member/completed vector prefixes, pending-operation guards, source
+survival and exact named live-root census after cleanup. An actual stopped
+self-pivot substitution verifies borrowed-term guards; foreign managers are
+rejected.500 witness field/copy worlds and all relation stream refusal prefixes
+are tested. Native focused LAR/term/implied checks pass9.084s; combined
+ g3debug/g3checked10.185s. Constraints77/83 (92.8%), witness/stream10/10 (100%)
+in both profiles. Six remaining constraint statements qualify earlier pending
+checks, raw/value/root cleanup errors, an invariant-protected variable-one export
+or child cleanup failure. Profiles:
+/mnt/oldrog/tmp/g3-lar-constraints-{native,debug}.cover.
+
+Both LP vets, source/evidence/no-generics verification and native module-wide
+test compilation pass. Graph regeneration adds production filenames without
+new import edges. LP remains76 partial/34 unported; global2103 units/677 APIs,
+62 ported/357 partial/1656 unported/two dead-deleted. Latest full native module
+checkpoint remains22:14 UTC (89.8%,12347/13752), predating implied-bound and
+constraint additions; another hourly full run is not yet due. The full LP
+implementation/test goal remains unfinished.

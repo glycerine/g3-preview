@@ -12,8 +12,8 @@ remain incomplete. Go coverage does not measure unported C++ code.
 
 Latest hourly native module checkpoint passed at 22:14 UTC: LP 326.657s,
 89.8% (12347/13752). It includes floating dual outer and MPS primal/dual integration
-and predates the implied-bound addition. Focused native/debug checks validate that
-addition. Log/profile: `/mnt/oldrog/tmp/g3-mps-dual-module-native.{log,cover}`.
+and predates the implied-bound and owning-constraint additions. Focused native/debug checks validate that
+additions. Log/profile: `/mnt/oldrog/tmp/g3-mps-dual-module-native.{log,cover}`.
 
 Known source limitation: the outer primal path flips upper-only coordinates but
 retains `ColumnUpperBound` with zero upper value. Its regression reports source
@@ -42,6 +42,7 @@ from the120 independently verified bounded optima.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Owning LAR variable/term/general constraints and bound witnesses | 120 independent exact copy/borrow worlds; all relations, duplicate/zero coefficients and empty vectors; seven physical refusal campaigns through success with partial element/evidence prefixes, source isolation and exact root census; stopped-term/foreign-manager guards; witness value copies and stream refusal prefixes | Native/debug constraints 92.8% (77/83); witnesses/stream 100% (10/10). Full LAR constraint insertion/scopes, bound updates and quick_xplain solving remain open |
 | Exact LAR implied bounds and relation kinds | 160 independent big.Rat/evidence worlds, all six equality fields, copy isolation/self-assignment, strict direction/formatting, actual constructor/assignment allocation refusals and partial-owner cleanup | Native/debug 91.4% (53/58). Remaining guards qualify child cleanup errors or prior pending checks. Bound propagator, row analyzer, explanations and owning constraints remain open |
 | Floating MPS dual creation and primal/dual comparison workflow | 120 mixed-cost parsed models in both minimum and maximum modes against independent vertex optima; stored bounds/ranges/fixed fixture; model/reader isolation, IsOK-independent creation and partial-owner publication guards | Reader93.7% native (357/381),94.5% debug (360/381). Both concrete solvers share actual base-model population. Exact/LAR creation and full original CLI remain open |
 | Floating dual outer two-stage solve and solution reconstruction | 120 independent shifted/boxed/fixed/scaled/mixed-cost vertex optima; analytic free/equality models, infeasible/unbounded classification, both phase clock stops, real numerical/metadata/writer and owner publication tests | Native89.2% (116/130), debug90.0% (117/130). Gaps mostly propagate invariant-protected child errors or qualify assertion profiles. Source stage-two iteration-exhaustion dispatch omission is preserved; default tableau remains a missing-LU error. Exact integration and original drivers remain open |

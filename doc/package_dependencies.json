@@ -1200,6 +1200,8 @@
         "indexed_exact_vector.go",
         "indexed_vector.go",
         "int_set.go",
+        "lar_bound_witness.go",
+        "lar_constraints.go",
         "lar_term.go",
         "lu_column_exact.go",
         "lu_column_float.go",

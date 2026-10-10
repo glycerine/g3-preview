@@ -119810,10 +119810,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/implied_bound.go",
-        "pkg/util/lp/implied_bound_test.go"
+        "pkg/util/lp/implied_bound_test.go",
+        "pkg/util/lp/lar_constraints.go",
+        "pkg/util/lp/lar_constraints_test.go"
       ],
       "tests": [
-        "TestLPImpliedBoundKindsAndStrings"
+        "TestLPImpliedBoundKindsAndStrings",
+        "TestLARConstraintsIndependentExactCopiesAndBorrows",
+        "TestLARConstraintsConstructionAndExportPhysicalRefusals",
+        "TestLARConstraintsForeignManagerAndStoppedTerm"
       ],
       "assertions": [
         {
@@ -119825,8 +119830,8 @@
           "text": "SASSERT(false);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "flip_kind and lconstraint_kind_string",
@@ -119835,11 +119840,53 @@
           "tests": [
             "TestLPImpliedBoundKindsAndStrings"
           ]
+        },
+        {
+          "name": "owning base RHS construction/free coefficient/destruction and source member order",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_constraints.go",
+          "tests": [
+            "TestLARConstraintsIndependentExactCopiesAndBorrows",
+            "TestLARConstraintsConstructionAndExportPhysicalRefusals",
+            "TestLARConstraintsForeignManagerAndStoppedTerm"
+          ]
+        },
+        {
+          "name": "lar_var_constraint construction, size and owning coefficient export",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_constraints.go",
+          "tests": [
+            "TestLARConstraintsIndependentExactCopiesAndBorrows",
+            "TestLARConstraintsConstructionAndExportPhysicalRefusals"
+          ]
+        },
+        {
+          "name": "lar_term_constraint borrowed term, live size/coefficient/free-value queries and owning RHS",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_constraints.go",
+          "tests": [
+            "TestLARConstraintsIndependentExactCopiesAndBorrows",
+            "TestLARConstraintsConstructionAndExportPhysicalRefusals",
+            "TestLARConstraintsForeignManagerAndStoppedTerm"
+          ]
+        },
+        {
+          "name": "lar_constraint deep coefficient vector construction, size, owning export and derived-before-base destruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_constraints.go",
+          "tests": [
+            "TestLARConstraintsIndependentExactCopiesAndBorrows",
+            "TestLARConstraintsConstructionAndExportPhysicalRefusals"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Each base owns an independently copied RHS and stopped copy receipts in a borrowed RationalManager. Variable constraints own no coefficient storage; term constraints borrow the live LARTerm without destroying it; general constraints own an ordered SparseRationalVector, including the unpublished partial element of a stopped copy. Export owners are independent and retain their own call receipts. FreeCoefficient writes caller-owned initialized out, whose partial value stays caller-owned on error. Derived vector cleanup precedes base RHS cleanup."
+      ],
       "deviations": [
-        "Only relation reversal and formatting are implemented here; owning base/variable/term/general constraints and their LAR consumers remain open. Unknown relation returns the source empty string and debug assertion error."
+        "Retained variable, term and general owning constraint operations are implemented with native Go slices and exact numeral owners. Full LAR constraint insertion, scope/bound updates, quick_xplain solving and upstream driver integration remain incomplete.",
+        "The unused lar_constraint(const lar_base_constraint&) assertion-only constructor and its default base construction are not introduced. The retained full coefficient constructor is reached by quick_xplain; existing stale smt_reader constructors are not credited as working Go drivers.",
+        "Term coefficient order follows the existing insertion-ordered Go term dictionary rather than C++ unordered_map buckets; duplicates and explicit zeros in general coefficient vectors are copied unchanged. Native value and output adapters do not emulate C++ vector allocation/layout or ostream internals."
       ]
     },
     {
@@ -129522,10 +129569,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/implied_bound.go",
-        "pkg/util/lp/implied_bound_test.go"
+        "pkg/util/lp/implied_bound_test.go",
+        "pkg/util/lp/lar_bound_witness.go",
+        "pkg/util/lp/lar_bound_witness_test.go"
       ],
       "tests": [
-        "TestLPImpliedBoundKindsAndStrings"
+        "TestLPImpliedBoundKindsAndStrings",
+        "TestLARBoundWitnessSourceValueSemantics",
+        "TestLARBoundWitnessKindStreamAndFailures"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -129537,11 +129588,30 @@
           "tests": [
             "TestLPImpliedBoundKindsAndStrings"
           ]
+        },
+        {
+          "name": "ul_pair default/row constructors, reference accessors, copy and equality/inequality as native value fields and operators",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_bound_witness.go",
+          "tests": [
+            "TestLARBoundWitnessSourceValueSemantics"
+          ]
+        },
+        {
+          "name": "lconstraint_kind stream overload including unknown ?? fallback and actual writer error prefixes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_bound_witness.go",
+          "tests": [
+            "TestLARBoundWitnessKindStreamAndFailures"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Witness records are pointer-free Go values; source copy and equality are native value copy and ==. Fields replace reference accessors. InvalidLARIndex preserves the unsigned -1 sentinel. Relation output borrows the io.Writer."
+      ],
       "deviations": [
-        "Only the relation enum is implemented; ul_pair bound-index bookkeeping remains unported."
+        "Relation encoding/stream output and retained ul_pair witness value semantics are implemented. LAR bound update/explanation integration remains incomplete. The source free coefficient-index compare helper has no retained caller found and is not introduced.",
+        "Unknown enum stream output is ?? without assertion, independently of the lar_constraints string formatter. Go io.Writer errors and accepted prefixes replace ostream transport."
       ]
     },
     {
