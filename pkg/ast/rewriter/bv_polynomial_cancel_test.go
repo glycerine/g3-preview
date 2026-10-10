@@ -103,14 +103,14 @@ func TestBVPolynomialCancellationCheapGuardsConstantPlacementAndAliasedOutputs(t
 		astTestMust(t, m.SetRef(lo, xs[2]))
 		astTestMust(t, m.SetRef(ro, xs[2]))
 		table := p.positions
-		size, capacity := table.size, table.capacity
+		size := len(table.entries)
 		st, e := p.CancelMonomials(row.lhs, row.rhs, row.move, lo, ro)
 		astTestMust(t, e)
 		l, e := m.RefGet(lo)
 		astTestMust(t, e)
 		r, e := m.RefGet(ro)
 		astTestMust(t, e)
-		if st != RewriteFailed || l != xs[2] || r != xs[2] || p.positions != table || size != table.size || capacity != table.capacity {
+		if st != RewriteFailed || l != xs[2] || r != xs[2] || p.positions != table || size != len(table.entries) {
 			t.Fatal("cheap guard mutated outputs or map", st, l, r)
 		}
 	}
@@ -230,7 +230,7 @@ func TestBVPolynomialCancellationEveryColdReservationAndLeftPublication(t *testi
 			m.Budget().FailAfter(-1)
 			if body == nil {
 				complete = true
-				if st != RewriteDone || p.cancellation != nil || p.positions != table || table.size != 48 {
+				if st != RewriteDone || p.cancellation != nil || p.positions != table || len(table.entries) != 48 {
 					t.Fatal("source completion or persistent map", st)
 				}
 				l, e := m.RefGet(lo)
@@ -305,9 +305,9 @@ func TestBVPolynomialCancellationEveryColdReservationAndLeftPublication(t *testi
 	}
 }
 
-func TestBVPolynomialCancellationSparseResetRefusalPreservesActualPrefix(t *testing.T) {
+func TestBVPolynomialCancellationNativeResetActualAllocationPrefixes(t *testing.T) {
 	complete := false
-	sawFreed := false
+	sawRefusal := false
 	for ordinal := int64(0); ordinal < 128 && !complete; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			c, g, _ := bvPolynomialParamsFixture(t)
@@ -335,33 +335,34 @@ func TestBVPolynomialCancellationSparseResetRefusalPreservesActualPrefix(t *test
 			_, e = p.CancelMonomials(lhs, rhs, false, lo, ro)
 			astTestMust(t, e)
 			table := p.positions
-			capacity := table.capacity
-			if table.size != 1 || capacity <= 16 {
-				t.Fatal("not sparse warm map", table.size, capacity)
+			if len(table.entries) != 1 {
+				t.Fatal("not a warm sparse map", len(table.entries))
 			}
+			// A later source reset must discard this older, borrowed position.
+			astTestMust(t, table.insert(xs[47], 1234))
 			m.Budget().FailAfter(ordinal)
 			_, body := p.CancelMonomials(lhs, rhs, false, lo, ro)
 			m.Budget().FailAfter(-1)
 			if body == nil {
 				complete = true
-				if table.capacity != capacity/2 {
-					t.Fatal("source sparse reset did not halve", table.capacity, capacity)
+				l, e := m.RefGet(lo)
+				astTestMust(t, e)
+				r, e := m.RefGet(ro)
+				astTestMust(t, e)
+				_, foreign := table.entries[xs[47]]
+				if l != bvAddNum(t, m, 0, 8) || r != bvAddNum(t, m, 1, 8) || p.positions != table || foreign {
+					t.Fatal("independent warm cancellation or shared binding", l, r)
 				}
 			} else {
 				if !errors.Is(body, arena.ErrInjectedFailure) {
 					t.Fatal(body)
 				}
-				if table.stopped {
-					sawFreed = true
-					if table.entries != nil || table.bytes != 0 || table.capacity != capacity/2 {
-						t.Fatal("old table not freed before refused replacement")
-					}
-				}
+				sawRefusal = true
 			}
 			astTestMust(t, p.Close())
 		})
 	}
-	if !complete || !sawFreed {
-		t.Fatal("missing sparse reset refusal", complete, sawFreed)
+	if !complete || !sawRefusal {
+		t.Fatal("missing success or actual cold allocation refusal", complete, sawRefusal)
 	}
 }

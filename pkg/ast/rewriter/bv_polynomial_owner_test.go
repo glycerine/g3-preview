@@ -29,19 +29,17 @@ func TestBVPolynomialOwnerPersistentMapAndSharedSort(t *testing.T) {
 	for i := 0; i < 2; i++ {
 		st, e := p.RewriteAddition(ast.SliceArguments(args), out)
 		astTestMust(t, e)
-		if st != RewriteDone || p.positions != table || table.closed || table.size != 48 {
+		if st != RewriteDone || p.positions != table || table.closed || len(table.entries) != 48 {
 			t.Fatal("persistent map", st, table)
 		}
 		if p.addition != nil {
 			t.Fatal("successful scope retained")
 		}
 	}
-	backing := &table.entries[0]
-	capacity := table.capacity
 	st, e := p.RewriteAddition(ast.SliceArguments(args), out)
 	astTestMust(t, e)
-	if st != RewriteDone || backing != &table.entries[0] || capacity != table.capacity {
-		t.Fatal("dense reset replaced retained backing")
+	if st != RewriteDone || p.positions != table || len(table.entries) != 48 {
+		t.Fatal("native reset changed shared map binding")
 	}
 	sort, e := m.GetSort(xs[0])
 	astTestMust(t, e)
@@ -229,7 +227,7 @@ func TestBVPolynomialOwnerConstructorEveryReservation(t *testing.T) {
 				charged.FailAfter(-1)
 				if e == nil {
 					succeeded = true
-					if p.config.passes != 2 || p.positions.capacity != 8 {
+					if p.config.passes != 2 || len(p.positions.entries) != 0 {
 						t.Fatal("incomplete constructor")
 					}
 				} else {

@@ -23166,7 +23166,7 @@
         "TestBVPolynomialCancellationCheapGuardsConstantPlacementAndAliasedOutputs",
         "TestBVPolynomialCancellationCrossSideMarksAndMoveOnlySorting",
         "TestBVPolynomialCancellationEveryColdReservationAndLeftPublication",
-        "TestBVPolynomialCancellationSparseResetRefusalPreservesActualPrefix",
+        "TestBVPolynomialCancellationNativeResetActualAllocationPrefixes",
         "TestBVPolynomialCancellationEveryActualNumericReservation",
         "TestASTBitVectorCancellationNumeralsExplicitZeroAndExactSubtraction",
         "TestBVRewriterAdditionCallerConnectsCoreAndDisjointBits",
@@ -23467,7 +23467,7 @@
             "TestBVPolynomialCancellationCheapGuardsConstantPlacementAndAliasedOutputs",
             "TestBVPolynomialCancellationCrossSideMarksAndMoveOnlySorting",
             "TestBVPolynomialCancellationEveryColdReservationAndLeftPublication",
-            "TestBVPolynomialCancellationSparseResetRefusalPreservesActualPrefix",
+            "TestBVPolynomialCancellationNativeResetActualAllocationPrefixes",
             "TestBVPolynomialCancellationEveryActualNumericReservation"
           ]
         },
@@ -26035,9 +26035,9 @@
         "TestASTBitVectorPolynomialPowerProductCoefficientAndFallbackOne",
         "TestASTBitVectorPolynomialPowerProductFallbackTemporaryBeforeReceiverGuard",
         "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation",
-        "TestBVPolynomialPositionsGrowthBeforeDuplicateAndBorrowedKeys",
-        "TestBVPolynomialPositionsCollisionWrapAndStaleKeyReset",
-        "TestBVPolynomialPositionsEveryConstructionAndSparseResetReservation",
+        "TestBVPolynomialPositionsNativeGrowthUpdateAndBorrowedKeys",
+        "TestBVPolynomialPositionsNativeBorrowedKeyLifetimeAndReset",
+        "TestBVPolynomialPositionsColdBindingAndNativeReset",
         "TestASTBitVectorPolynomialHoistOrderOriginalBranches",
         "TestASTBitVectorPolynomialHoistOrderBothReadsBeforeShortcut",
         "TestASTBitVectorPolynomialHoistOrderEveryActualCopyReservation",
@@ -26114,7 +26114,7 @@
         "TestBVPolynomialCancellationCheapGuardsConstantPlacementAndAliasedOutputs",
         "TestBVPolynomialCancellationCrossSideMarksAndMoveOnlySorting",
         "TestBVPolynomialCancellationEveryColdReservationAndLeftPublication",
-        "TestBVPolynomialCancellationSparseResetRefusalPreservesActualPrefix",
+        "TestBVPolynomialCancellationNativeResetActualAllocationPrefixes",
         "TestBVPolynomialCancellationEveryActualNumericReservation",
         "TestASTBitVectorCancellationNumeralsExplicitZeroAndExactSubtraction"
       ],
@@ -26220,9 +26220,9 @@
           "status": "partial",
           "go_target": "pkg/ast/rewriter/bv_polynomial_positions.go",
           "tests": [
-            "TestBVPolynomialPositionsGrowthBeforeDuplicateAndBorrowedKeys",
-            "TestBVPolynomialPositionsCollisionWrapAndStaleKeyReset",
-            "TestBVPolynomialPositionsEveryConstructionAndSparseResetReservation"
+            "TestBVPolynomialPositionsNativeGrowthUpdateAndBorrowedKeys",
+            "TestBVPolynomialPositionsNativeBorrowedKeyLifetimeAndReset",
+            "TestBVPolynomialPositionsColdBindingAndNativeReset"
           ]
         },
         {
@@ -26431,7 +26431,7 @@
             "TestBVPolynomialCancellationCheapGuardsConstantPlacementAndAliasedOutputs",
             "TestBVPolynomialCancellationCrossSideMarksAndMoveOnlySorting",
             "TestBVPolynomialCancellationEveryColdReservationAndLeftPublication",
-            "TestBVPolynomialCancellationSparseResetRefusalPreservesActualPrefix",
+            "TestBVPolynomialCancellationNativeResetActualAllocationPrefixes",
             "TestBVPolynomialCancellationEveryActualNumericReservation"
           ]
         },
@@ -26615,7 +26615,7 @@
         "TestBVPolynomialCancellationCheapGuardsConstantPlacementAndAliasedOutputs",
         "TestBVPolynomialCancellationCrossSideMarksAndMoveOnlySorting",
         "TestBVPolynomialCancellationEveryColdReservationAndLeftPublication",
-        "TestBVPolynomialCancellationSparseResetRefusalPreservesActualPrefix",
+        "TestBVPolynomialCancellationNativeResetActualAllocationPrefixes",
         "TestBVPolynomialCancellationEveryActualNumericReservation",
         "TestASTBitVectorCancellationNumeralsExplicitZeroAndExactSubtraction"
       ],
@@ -26846,7 +26846,7 @@
             "TestBVPolynomialCancellationCheapGuardsConstantPlacementAndAliasedOutputs",
             "TestBVPolynomialCancellationCrossSideMarksAndMoveOnlySorting",
             "TestBVPolynomialCancellationEveryColdReservationAndLeftPublication",
-            "TestBVPolynomialCancellationSparseResetRefusalPreservesActualPrefix",
+            "TestBVPolynomialCancellationNativeResetActualAllocationPrefixes",
             "TestBVPolynomialCancellationEveryActualNumericReservation"
           ]
         },

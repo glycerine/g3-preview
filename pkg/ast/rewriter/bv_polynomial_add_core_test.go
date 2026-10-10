@@ -360,7 +360,8 @@ func TestBVPolynomialNonflatAdditionEveryActualNumericReservation(t *testing.T) 
 }
 
 func TestBVPolynomialNonflatAdditionConstructorRefusalAndCopyGuards(t *testing.T) {
-	for ordinal := int64(0); ordinal < 3; ordinal++ {
+	// Only the actual addition and shared-binding headers are charged.
+	for ordinal := int64(0); ordinal < 2; ordinal++ {
 		m, _ := bvAddFixture(t)
 		before := m.Budget().Used()
 		m.Budget().FailAfter(ordinal)

@@ -32561,3 +32561,38 @@ root-collection refusal fixture. Manifest renames both affected tests in all
 source/method evidence; source/API statuses remain unchanged. The util knot/split
 remains active: other retained AST collection owners, SAT containers, text
 consumers and internal util numeric/text/parameter cycles still need conversion.
+
+## Native shared bit-vector polynomial position map
+
+The concrete position binding shared by BV polynomial addition, cancellation,
+the persistent rewriter and multiplication hoisting now stores positions in a
+native map[ast.ASTHandle]uint32. Removed linear probing, capacity thresholds,
+geometric rehashing, sparse-reset shrinking, simulated capacity charges and the
+stopped-reset state. The actual shared cold binding header, checked manager
+borrow, closed guard and persistent identity remain. Stored keys borrow their
+caller expressions; queried/inserted handles are validated before native lookup.
+Clear/destruction never dereference stale stored keys. All retained consumers
+continue to use the same shared binding and sort publication.
+
+Native tests grow 257 actual checked keys with reservations disabled, check
+updates, independent positions, unchanged actual object storage and unchanged
+AST reference counts. They also check queried stale handles, reset/destruction
+after borrowed expressions die, real cold-header refusal, native sparse reset,
+repeat Close and closed-binding rejection. Persistent owner tests verify shared
+identity and complete map contents through repeated addition and cancellation.
+The warm cancellation campaign now checks exact 0/1 output and removal of an
+older foreign borrowed position across native reset, while still sweeping every
+actual cold allocation prefix. No post-reset reservation is fabricated: warm
+scalar repeat can have no real allocation between reset and position publication.
+The addition constructor fixture now sweeps its two actual cold headers; the
+removed third reservation belonged only to hash bucket storage.
+
+Validation: full native rewriter passed (13.701s); focused g3debug position,
+owner, cancellation and constructor groups passed (0.361s). Rewriter vet,
+manifest evidence, gofmt and diff checks passed. Manifest renames the replaced
+container-only tests and native reset campaign in every source/method evidence
+list; all counts/statuses remain 2102 units/677 APIs, 63 ported, 284 partial,
+1727 unported and two dead/deleted. The util knot/split remains active. Remaining
+AST collections include owning trailing-bit caches and substitution/shared
+occurrence tables, in addition to SAT containers and text consumers. Internal
+util numeric/text/parameter cycles still precede the complete subpackage split.
