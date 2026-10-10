@@ -35820,3 +35820,49 @@ Actual large-coefficient zero-diagonal rejection also verifies destruction of th
 already populated unpublished eta in pooled/direct profiles, with named-cell and
 direct-object census. Final LP vet, source ledger and dependency graph checks pass;
 the64-package graph edges remain unchanged.
+
+
+## Floating/exact sparse column replacement
+
+Implemented replace_column, backward removal/common update and forward new-entry
+insertion/clearing for double and retained mpq coefficient storage. Old entries
+read logical input coordinates through inverse row permutation. Missing values
+remove both owning directions and repair a removed head's maximum. Common updates
+publish column value before the row setter, compare head decreases before updating
+and nonhead increases afterward, then zero the borrowed input slot. New entries
+copy actual w_at_i before checking zero, use tolerance only for new floating terms,
+append row before column, repair maximum order and zero that input. Index clears
+only after the whole loop. Zero entries skip zero assignment, retaining signed
+zeros; unindexed common values are consumed, while absent unindexed values stay.
+Replacement intentionally leaves pivot queue and shortened counters unchanged.
+
+Exact replacement owns both abs temporaries, the reached w_at_i copy, setter and
+append arguments, owning swaps and all newly acquired numeric calls. Existing
+maximum helpers use separate lexical slots, preserving w_at_i through append and
+comparison. The borrowed indexed input retains its published/partial values;
+close a stopped matrix before it. Same-manager and stopped-input guards reject
+before mutation and never adopt the borrowed vector's receipts. Exact drop checks
+zero only, independently of floating settings.
+
+Added1,600 replacements against independent coordinate maps across repeated
+row/column permutations, shuffled input order, zero/cancellation and tiny values,
+with reciprocal links, exact owning-cell census and independent row maxima.
+Literal tests cover old/input duplicates, unindexed data, head decrease/new maximum,
+strict tolerance boundaries, common tiny values, signed zeros, NaN and infinity.
+Ten pooled/direct physical failure campaigns walk to first success and require
+observed direct column-before-row setter, new row-before-column append, completed
+head removal and backlink-before-owning-swap prefixes. Stopped matrix/input guards,
+foreign manager checks and reached malformed-index/reciprocal-link errors preserve
+their actual matrix/input publication prefixes. No invalid numeric handles or
+artificial allocation events are introduced.
+
+Focused native tests pass5.629s and combined debug/checked6.273s. Exact replacement
+coverage106/120 (88.3%); floating60/63 (95.2%) in both profiles. Remaining statements
+propagate scalar copy/absolute/zero/cleanup errors or protect the row-nonempty
+assertion guaranteed by successful insertion. The previous full native module
+snapshot is35 minutes old, so no redundant full suite was run. Source counts remain
+42 partial/68 unported; triangular solves, remaining sparse diagnostics, complete
+LU, simplex/LAR, scaling, MPS input and retained upstream-driver work remain open.
+
+Final LP vet, portcheck, graph regeneration and diff checks pass. The64-package
+production graph retains its edges and includes the new implementation files.

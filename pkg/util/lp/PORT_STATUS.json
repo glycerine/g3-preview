@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 90.4,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Last complete native LP coverage (90.4%) predates active shortening/eta integration and construction; last complete debug/checked coverage predates sparse basis storage. Current focused component coverage is recorded in PORT_STATUS.md.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Last complete native LP coverage (90.4%) predates active shortening, eta construction/integration and column replacement; last complete debug/checked coverage predates sparse basis storage. Current focused component coverage is recorded in PORT_STATUS.md.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -1134,7 +1134,10 @@
         "pkg/util/lp/sparse_matrix_active_test.go",
         "pkg/util/lp/sparse_matrix_float_eta.go",
         "pkg/util/lp/sparse_matrix_exact_eta.go",
-        "pkg/util/lp/sparse_matrix_eta_test.go"
+        "pkg/util/lp/sparse_matrix_eta_test.go",
+        "pkg/util/lp/sparse_matrix_float_replace.go",
+        "pkg/util/lp/sparse_matrix_exact_replace.go",
+        "pkg/util/lp/sparse_matrix_replace_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1176,7 +1179,13 @@
         "TestLPSparseEtaRepeatedPivotIndependentDeterminant",
         "TestLPExactSparseEtaConstructionOlderComparisonOwnership",
         "TestLPExactSparseEtaConstructionUnitWithoutCopies",
-        "TestLPExactSparseEtaConstructionZeroDiagonalDestroysLargePrefix"
+        "TestLPExactSparseEtaConstructionZeroDiagonalDestroysLargePrefix",
+        "TestLPSparseColumnReplacementIndependentOracle",
+        "TestLPSparseColumnReplacementLiteralInput",
+        "TestLPExactSparseColumnReplacementAllocationFailureCensus",
+        "TestLPSparseColumnReplacementIEEEAndTolerance",
+        "TestLPSparseColumnReplacementBoundsAndPrefixes",
+        "TestLPExactSparseColumnReplacementBorrowedOwnerGuards"
       ]
     },
     {
@@ -1194,7 +1203,10 @@
         "pkg/util/lp/sparse_matrix_active_test.go",
         "pkg/util/lp/sparse_matrix_float_eta.go",
         "pkg/util/lp/sparse_matrix_exact_eta.go",
-        "pkg/util/lp/sparse_matrix_eta_test.go"
+        "pkg/util/lp/sparse_matrix_eta_test.go",
+        "pkg/util/lp/sparse_matrix_float_replace.go",
+        "pkg/util/lp/sparse_matrix_exact_replace.go",
+        "pkg/util/lp/sparse_matrix_replace_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1236,7 +1248,13 @@
         "TestLPSparseEtaRepeatedPivotIndependentDeterminant",
         "TestLPExactSparseEtaConstructionOlderComparisonOwnership",
         "TestLPExactSparseEtaConstructionUnitWithoutCopies",
-        "TestLPExactSparseEtaConstructionZeroDiagonalDestroysLargePrefix"
+        "TestLPExactSparseEtaConstructionZeroDiagonalDestroysLargePrefix",
+        "TestLPSparseColumnReplacementIndependentOracle",
+        "TestLPSparseColumnReplacementLiteralInput",
+        "TestLPExactSparseColumnReplacementAllocationFailureCensus",
+        "TestLPSparseColumnReplacementIEEEAndTolerance",
+        "TestLPSparseColumnReplacementBoundsAndPrefixes",
+        "TestLPExactSparseColumnReplacementBorrowedOwnerGuards"
       ]
     },
     {
@@ -1254,7 +1272,10 @@
         "pkg/util/lp/sparse_matrix_active_test.go",
         "pkg/util/lp/sparse_matrix_float_eta.go",
         "pkg/util/lp/sparse_matrix_exact_eta.go",
-        "pkg/util/lp/sparse_matrix_eta_test.go"
+        "pkg/util/lp/sparse_matrix_eta_test.go",
+        "pkg/util/lp/sparse_matrix_float_replace.go",
+        "pkg/util/lp/sparse_matrix_exact_replace.go",
+        "pkg/util/lp/sparse_matrix_replace_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1296,7 +1317,13 @@
         "TestLPSparseEtaRepeatedPivotIndependentDeterminant",
         "TestLPExactSparseEtaConstructionOlderComparisonOwnership",
         "TestLPExactSparseEtaConstructionUnitWithoutCopies",
-        "TestLPExactSparseEtaConstructionZeroDiagonalDestroysLargePrefix"
+        "TestLPExactSparseEtaConstructionZeroDiagonalDestroysLargePrefix",
+        "TestLPSparseColumnReplacementIndependentOracle",
+        "TestLPSparseColumnReplacementLiteralInput",
+        "TestLPExactSparseColumnReplacementAllocationFailureCensus",
+        "TestLPSparseColumnReplacementIEEEAndTolerance",
+        "TestLPSparseColumnReplacementBoundsAndPrefixes",
+        "TestLPExactSparseColumnReplacementBorrowedOwnerGuards"
       ]
     },
     {
