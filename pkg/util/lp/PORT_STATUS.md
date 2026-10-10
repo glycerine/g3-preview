@@ -16,8 +16,15 @@ retains `ColumnUpperBound` with zero upper value. Its regression reports source
 preserved for fidelity; successful low/boxed-bound tests do not establish correctness
 for that upper-only profile.
 
+Known source limitation: feasibility-only search can stop with `FLOATING_POINT_ERROR`
+after changed infeasibility costs make the stored reduced cost stale. For
+`-8*x+s0=-11`, `-x+s1=-3`, with nonnegative variables, a feasible witness is
+`x=3,s0=13,s1=0`; the retained source loop stops after its first pivot at
+`x=1.375,s0=0,s1=-1.625`. Tests independently predict this drift classification.
+
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Floating feasibility-only entry point and nonbasic diagnostics | 160 independent two-row systems:58 feasible exits,102 independently predicted source drift stops; debug mode/status ordering, erased release check, all column types, real writer/stdout failures | Native85.4% (41/48), debug/checked95.8% (46/48). Exact/LAR integration remains open; source drift stops are fidelity evidence, not successful feasibility credit |
 | Floating named solution feasibility validators | 200 independent dense row systems; all equality/inequality and bound tolerance edges, IEEE, name/metadata failures, output/publication prefixes and120 actual solved outer models | Native/debug97.4% (76/78); gaps are opposite-profile assertion/guard branches. Native classic-six-digit writer boundary is explicit; exact validators and complete parser/test-driver consumers remain open |
 | Floating outer primal LU solve and reconstruction | 120 independent low/boxed-coordinate LP optima with fixed costs, shifts, scaling and source-equation checks; infeasibility, constructor/solve/output publication, value/cost/Close ownership and source upper-only counterexample | Native/debug85.7% (54/63). Gaps propagate child errors under invalid metadata. Upper-only source type/flip inconsistency is explicitly preserved, not credited as correct optimization; default tableau/exact variants, diagnostics and validators remain open |
 | Floating stage-one solve and iteration/statistics control | Two original numerical fixtures and100 independent bounded standard-form LPs compared with exhaustive dense vertex enumeration; feasible-only/infeasible/unbounded/cancellation/limit exits, seeded entering budgets, output/clock failures, IEEE and mutation guards | Solve72.6% native (61/84),78.6% debug (66/84); statistics78.9% (56/71),94.4% (67/71). Gaps include rare numerical rechecks, qualified child errors and other-profile assertions. Original upper-only constructor/default profile, exact/dual/LAR solvers and outer diagnostics/validators remain open |

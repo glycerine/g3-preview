@@ -120549,7 +120549,8 @@
         "pkg/util/lp/core_values_float_test.go",
         "pkg/util/lp/core_update_float_test.go",
         "pkg/util/lp/primal_advance_float.go",
-        "pkg/util/lp/core_statistics_float.go"
+        "pkg/util/lp/core_statistics_float.go",
+        "pkg/util/lp/primal_feasible_float.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -120587,7 +120588,10 @@
         "TestLPFloatPrimalSolveStopsAndStatuses",
         "TestLPFloatPrimalIterationBudgetAndStatistics",
         "TestLPFloatPrimalStatisticsGuardsAndIEEE",
-        "TestLPFloatPrimalSolveAndIterationReachedGuards"
+        "TestLPFloatPrimalSolveAndIterationReachedGuards",
+        "TestLPFloatPrimalFindFeasibleIndependentSystems",
+        "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
+        "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
       ],
       "assertions": [
         {
@@ -120728,6 +120732,16 @@
             "TestLPFloatPrimalStatisticsGuardsAndIEEE",
             "TestLPFloatPrimalSolveAndIterationReachedGuards"
           ]
+        },
+        {
+          "name": "Retained floating feasibility-only entry point, debug nonbasic feasibility precheck and source split-stream column diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_feasible_float.go",
+          "tests": [
+            "TestLPFloatPrimalFindFeasibleIndependentSystems",
+            "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
+            "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -120740,7 +120754,8 @@
         "Floating basis bookkeeping and reduced-cost/entering-column layer only. Full primal/dual/LAR optimization remains open; floating numerical pivot/update is now implemented. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added.",
         "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced.",
         "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open.",
-        "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded."
+        "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
+        "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open."
       ]
     },
     {
@@ -121569,7 +121584,8 @@
         "pkg/util/lp/primal_breakpoint_float.go",
         "pkg/util/lp/primal_refresh_float.go",
         "pkg/util/lp/primal_advance_float.go",
-        "pkg/util/lp/primal_solve_float.go"
+        "pkg/util/lp/primal_solve_float.go",
+        "pkg/util/lp/primal_feasible_float.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -121611,7 +121627,10 @@
         "TestLPFloatPrimalSolveStopsAndStatuses",
         "TestLPFloatPrimalIterationBudgetAndStatistics",
         "TestLPFloatPrimalStatisticsGuardsAndIEEE",
-        "TestLPFloatPrimalSolveAndIterationReachedGuards"
+        "TestLPFloatPrimalSolveAndIterationReachedGuards",
+        "TestLPFloatPrimalFindFeasibleIndependentSystems",
+        "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
+        "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
       ],
       "conditionals": [
         {
@@ -121858,6 +121877,16 @@
             "TestLPFloatPrimalStatisticsGuardsAndIEEE",
             "TestLPFloatPrimalSolveAndIterationReachedGuards"
           ]
+        },
+        {
+          "name": "Retained floating feasibility-only entry point, debug nonbasic feasibility precheck and source split-stream column diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_feasible_float.go",
+          "tests": [
+            "TestLPFloatPrimalFindFeasibleIndependentSystems",
+            "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
+            "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -121870,7 +121899,8 @@
         "Go native FloatBreakpoint value slice replaces C++ vector records; scalar values have no independent ownership. Source double advance always stops after the first queued crossing even if slope remains beneficial; exact multi-breakpoint continuation is not claimed. Entering boxed breakpoint uses full bound span rather than distance from current X. Invalid source index/empty queue uses reached typed bounds/assertion guards; errors preserve earlier record/queue mutations. Exact records/solver, diagnostic printing and complete optimization loop remain open.",
         "Floating norm/price updates preserve sparse index iteration including duplicates, absolute-source IEEE comparisons, first-operand std::max NaN behavior, fixed-column dot product before skipping writes, and reached mutation prefixes at native bounds guards. Definition-only calculate_column_norm_exactly debug helper is not copied. Exact/tableau recurrences and complete primal optimization integration remain open.",
         "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open.",
-        "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded."
+        "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
+        "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open."
       ]
     },
     {
@@ -121888,7 +121918,8 @@
         "pkg/util/lp/primal_breakpoint_float.go",
         "pkg/util/lp/primal_refresh_float.go",
         "pkg/util/lp/primal_advance_float.go",
-        "pkg/util/lp/primal_solve_float.go"
+        "pkg/util/lp/primal_solve_float.go",
+        "pkg/util/lp/primal_feasible_float.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -121930,7 +121961,10 @@
         "TestLPFloatPrimalSolveStopsAndStatuses",
         "TestLPFloatPrimalIterationBudgetAndStatistics",
         "TestLPFloatPrimalStatisticsGuardsAndIEEE",
-        "TestLPFloatPrimalSolveAndIterationReachedGuards"
+        "TestLPFloatPrimalSolveAndIterationReachedGuards",
+        "TestLPFloatPrimalFindFeasibleIndependentSystems",
+        "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
+        "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
       ],
       "conditionals": [
         {
@@ -122305,6 +122339,16 @@
             "TestLPFloatPrimalStatisticsGuardsAndIEEE",
             "TestLPFloatPrimalSolveAndIterationReachedGuards"
           ]
+        },
+        {
+          "name": "Retained floating feasibility-only entry point, debug nonbasic feasibility precheck and source split-stream column diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_feasible_float.go",
+          "tests": [
+            "TestLPFloatPrimalFindFeasibleIndependentSystems",
+            "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
+            "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -122317,7 +122361,8 @@
         "Go native FloatBreakpoint value slice replaces C++ vector records; scalar values have no independent ownership. Source double advance always stops after the first queued crossing even if slope remains beneficial; exact multi-breakpoint continuation is not claimed. Entering boxed breakpoint uses full bound span rather than distance from current X. Invalid source index/empty queue uses reached typed bounds/assertion guards; errors preserve earlier record/queue mutations. Exact records/solver, diagnostic printing and complete optimization loop remain open.",
         "Floating norm/price updates preserve sparse index iteration including duplicates, absolute-source IEEE comparisons, first-operand std::max NaN behavior, fixed-column dot product before skipping writes, and reached mutation prefixes at native bounds guards. Definition-only calculate_column_norm_exactly debug helper is not copied. Exact/tableau recurrences and complete primal optimization integration remain open.",
         "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open.",
-        "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded."
+        "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
+        "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open."
       ]
     },
     {
@@ -122330,7 +122375,8 @@
         "pkg/util/lp/primal_price_float.go",
         "pkg/util/lp/primal_core_float_test.go",
         "pkg/util/lp/primal_price_float_test.go",
-        "pkg/util/lp/primal_prepare_float_test.go"
+        "pkg/util/lp/primal_prepare_float_test.go",
+        "pkg/util/lp/primal_feasible_float.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -122343,7 +122389,10 @@
         "TestLPFloatPrimalPricingIndependentOrderAndRotation",
         "TestLPFloatPrimalPricingBudgetAndIEEE",
         "TestLPFloatPrimalPricingPublicationAndAssertions",
-        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+        "TestLPFloatPrimalPreparedBasisIndependentOracle",
+        "TestLPFloatPrimalFindFeasibleIndependentSystems",
+        "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
+        "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -122368,6 +122417,16 @@
             "TestLPFloatPrimalPricingPublicationAndAssertions",
             "TestLPFloatPrimalPreparedBasisIndependentOracle"
           ]
+        },
+        {
+          "name": "Retained floating feasibility-only entry point, debug nonbasic feasibility precheck and source split-stream column diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_feasible_float.go",
+          "tests": [
+            "TestLPFloatPrimalFindFeasibleIndependentSystems",
+            "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
+            "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -122375,7 +122434,8 @@
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
-        "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced."
+        "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced.",
+        "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open."
       ]
     },
     {

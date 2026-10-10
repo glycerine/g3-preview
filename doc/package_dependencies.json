@@ -1217,6 +1217,7 @@
         "primal_advance_float.go",
         "primal_breakpoint_float.go",
         "primal_core_float.go",
+        "primal_feasible_float.go",
         "primal_harris_float.go",
         "primal_prepare_float.go",
         "primal_price_float.go",

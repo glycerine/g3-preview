@@ -37415,3 +37415,40 @@ source/evidence/no-generics verification pass. LP stays66 partial/44 unported:
 concrete primal instances were already partial. Full native90.0% snapshot
 remains20:03 UTC and predates these additions. Exact/default-tableau/dual/LAR
 solvers and complete upstream drivers remain open.
+
+
+### Floating feasibility-only entry point and diagnostics — 2026-10-10
+
+Ported the retained LAR-called FindFeasibleSolution entry point with actual
+Solve, debug nonbasic feasibility traversal and reached column diagnostics.
+The precheck uses ColumnIsFeasible, not equality to a bound; mode changes
+before assertion and previous status survives a failed precheck. Successful
+precheck resets status to UNKNOWN before Solve, including child failure.
+Native builds erase the SASSERT operand. PrintColumnInfo preserves the source
+split between supplied output (column/bounds) and actual standard output
+(heading/X), using native Go streams and classic-six-digit formatting.
+
+160 independent two-row systems have explicit feasible witnesses.58 reach
+feasible solutions checked against all original equations/bounds;102 reproduce
+an independently predicted source reduced-cost drift stop. Source
+lp_primal_core_solver.hpp:574-627,700-795 updates basic infeasibility costs
+then uses the old entering reduced cost in the pivot update. With different
+crossings, next drift exceeds half the old value exactly when the first
+leaving coefficient exceeds the other coefficient. Feasibility-only advance
+reports FLOATING_POINT_ERROR instead of refreshing. Concrete regression
+-8*x+s0=-11,-x+s1=-3 has feasible witness x=3,s0=13,s1=0 but stops after
+first pivot at x=1.375,s0=0,s1=-1.625. Preserve this source limitation,
+not general feasibility correctness credit. No replacement callback or
+source algorithm correction is introduced.
+
+Tests cover infeasible/early-feasible exits, all column diagnostics, interior
+nonbasic feasibility, precheck/status/error publication, erased release
+precheck, real writer/stdout failure and reached malformed metadata prefixes.
+Focused native/combined debug-checked core/primal/presolve/solver/column/scaler/
+static/LU checks and both LP vets pass. New code41/48 (85.4%) native,46/48
+(95.8%) debug; remaining gaps include erased assertion paths, an unreachable
+duplicate debug assertion and last stdout error. Profiles:
+/mnt/oldrog/tmp/g3-feasible-{native,debug}.cover. Source/evidence/no-generics
+verification passes. LP stays66 partial/44 unported. Full native snapshot
+remains20:03 UTC90.0% and predates these additions. Exact/default-tableau,
+dual and complete LAR/parser/upstream driver scope remains unfinished.
