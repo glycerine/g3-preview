@@ -12,6 +12,7 @@ import (
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	usexpr "github.com/glycerine/g3/pkg/util/sexpr"
 )
 
 type upolyPhysicalExtraOwners struct {
@@ -21,7 +22,7 @@ type upolyPhysicalExtraOwners struct {
 	ParamsRationalValues []paramsPhysicalRationalOwner
 	ParamsValues         []paramsPhysicalValueOwner
 	RationalServices     []*unumeral.RationalService
-	SexprManagers        []*util.SexprManager
+	SexprManagers        []*usexpr.SexprManager
 	Services             []*polynomial.UPolynomialFactorizationService
 	Integers             []*unumeral.Int
 	Rationals            []*unumeral.Rational
@@ -724,7 +725,7 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 			for _, page := range s.Pages {
 				for i := range page.Nodes {
 					r := &page.Nodes[i]
-					if r.Live && (r.Kind == util.SexprNumeral || r.Kind == util.SexprBVNumeral) {
+					if r.Live && (r.Kind == usexpr.SexprNumeral || r.Kind == usexpr.SexprBVNumeral) {
 						addRat(testFieldBySourceName(reflect.ValueOf(r.Numeral), "raw"))
 					}
 				}

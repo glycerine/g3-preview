@@ -1,5 +1,5 @@
 // Source: src/util/smt2_util.h; src/util/smt2_util.cpp.
-package util
+package smt2
 
 import (
 	"errors"

@@ -1,5 +1,5 @@
 // Source: src/util/hash.cpp:26-102.
-package util
+package runtimehash
 
 import (
 	"errors"

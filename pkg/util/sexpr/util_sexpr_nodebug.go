@@ -1,6 +1,6 @@
 //go:build !g3debug
 
-package util
+package sexpr
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

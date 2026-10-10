@@ -1,5 +1,5 @@
 // Source: src/util/sexpr.h/.cpp: borrowed nodes in synchronous source traversals.
-package util
+package sexpr
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

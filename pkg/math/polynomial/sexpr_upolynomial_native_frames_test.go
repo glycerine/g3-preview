@@ -3,8 +3,8 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	usexpr "github.com/glycerine/g3/pkg/util/sexpr"
 )
 
 func TestSexprPolynomialNativeFramesNestedBIGOwnership(t *testing.T) {
@@ -44,6 +44,6 @@ func TestSexprPolynomialNativeFramesNestedBIGOwnership(t *testing.T) {
 				t.Fatal("completed lexical frame retained owning vector", i, frame)
 			}
 		}
-		upolyHenselAuditPhysical(t, []*UPolynomialManager{p}, nil, upolyPhysicalExtraOwners{Integers: []*unumeral.Int{&expected}, RationalServices: []*unumeral.RationalService{q}, SexprManagers: []*util.SexprManager{sx}})
+		upolyHenselAuditPhysical(t, []*UPolynomialManager{p}, nil, upolyPhysicalExtraOwners{Integers: []*unumeral.Int{&expected}, RationalServices: []*unumeral.RationalService{q}, SexprManagers: []*usexpr.SexprManager{sx}})
 	}
 }

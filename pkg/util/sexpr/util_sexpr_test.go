@@ -1,6 +1,6 @@
 // sexpr has no direct registered source tests; these freeze defined source
 // branches and explicit undefined-behavior adaptations with independent oracles.
-package util
+package sexpr
 
 import (
 	"errors"

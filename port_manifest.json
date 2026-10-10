@@ -110781,7 +110781,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_stored_model.go",
-        "pkg/util/util_sexpr.go",
+        "pkg/util/sexpr/util_sexpr.go",
         "pkg/ast/ast_shared_occs_mark.go",
         "pkg/util/numeral/mp_integer_output_scope.go",
         "pkg/util/numeral/mp_integer_output_scope_test.go",
@@ -110962,7 +110962,7 @@
         {
           "name": "actual sexpr BV sbuffer<char,false,16> construction/push/doubling/reverse/terminator/destruction",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr.go",
+          "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprBVGoScratchAndNumeralLifetime"
           ]
@@ -114060,10 +114060,10 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/hash/hash.go",
-        "pkg/util/runtime_bytes.go",
-        "pkg/util/runtime_bytes_test.go",
-        "pkg/util/runtime_bytes_bounded.go",
-        "pkg/util/runtime_bytes_bounded_test.go",
+        "pkg/util/hash/runtime/runtime_bytes.go",
+        "pkg/util/hash/runtime/runtime_bytes_test.go",
+        "pkg/util/hash/runtime/runtime_bytes_bounded.go",
+        "pkg/util/hash/runtime/runtime_bytes_bounded_test.go",
         "pkg/util/hash/hash_test.go"
       ],
       "tests": [
@@ -114149,7 +114149,7 @@
         {
           "name": "Concrete borrowed Runtime bytes string_hash: little-endian word loads, signed-char descending tail and zero-length no-read route",
           "status": "partial",
-          "go_target": "pkg/util/runtime_bytes.go",
+          "go_target": "pkg/util/hash/runtime/runtime_bytes.go",
           "tests": [
             "TestRuntimeBytesSourceLengthAndSignedTail",
             "TestRuntimeBytesReachedDescendingTailRead"
@@ -114158,7 +114158,7 @@
         {
           "name": "Shared concrete Runtime bounded/unbounded and actual cold inline-word source string_hash engine; bounds and initialization checked only at reached loads",
           "status": "partial",
-          "go_target": "pkg/util/runtime_bytes_bounded.go",
+          "go_target": "pkg/util/hash/runtime/runtime_bytes_bounded.go",
           "tests": [
             "TestRuntimeBytesBoundedActualReachedLoads",
             "TestInlineWordBytesActualColdAndReadOrder"
@@ -114300,7 +114300,7 @@
         "pkg/sat/sat_solver_index_set_test.go",
         "pkg/sat/sat_solver_index_iterator_source_test.go",
         "pkg/sat/sat_solver_mutex_pair_set_test.go",
-        "pkg/util/runtime_bytes_bounded.go",
+        "pkg/util/hash/runtime/runtime_bytes_bounded.go",
         "pkg/ast/rewriter/bv_trailing_table.go"
       ],
       "tests": [
@@ -137304,7 +137304,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_ref.go",
-        "pkg/util/util_sexpr.go",
+        "pkg/util/sexpr/util_sexpr.go",
         "pkg/math/polynomial/polynomial_ref.go",
         "pkg/math/polynomial/polynomial_newton_test.go",
         "pkg/math/polynomial/polynomial_newton_physical_test.go",
@@ -137385,7 +137385,7 @@
         {
           "name": "actual sexpr concrete specialization constructors/copy/move/assignment, roots, projections and vector element/iterator adaptations",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr.go",
+          "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprKindsFactoriesAndDefinedDisplay",
             "TestSexprBVSourceWidthQuirks",
@@ -141150,7 +141150,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_ref.go",
-        "pkg/util/util_sexpr.go",
+        "pkg/util/sexpr/util_sexpr.go",
         "pkg/math/polynomial/polynomial_ref.go",
         "pkg/math/polynomial/polynomial_newton_test.go",
         "pkg/math/polynomial/polynomial_newton_physical_test.go",
@@ -141291,7 +141291,7 @@
         {
           "name": "actual sexpr concrete specialization constructors/copy/move/assignment, roots, projections and vector element/iterator adaptations",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr.go",
+          "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprKindsFactoriesAndDefinedDisplay",
             "TestSexprBVSourceWidthQuirks",
@@ -143289,11 +143289,11 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_sexpr.go",
-        "pkg/util/util_sexpr_debug.go",
-        "pkg/util/util_sexpr_nodebug.go",
-        "pkg/util/util_sexpr_debug_test.go",
-        "pkg/util/util_sexpr_nodebug_test.go"
+        "pkg/util/sexpr/util_sexpr.go",
+        "pkg/util/sexpr/util_sexpr_debug.go",
+        "pkg/util/sexpr/util_sexpr_nodebug.go",
+        "pkg/util/sexpr/util_sexpr_debug_test.go",
+        "pkg/util/sexpr/util_sexpr_nodebug_test.go"
       ],
       "tests": [
         "TestSexprKindsFactoriesAndDefinedDisplay",
@@ -143373,7 +143373,7 @@
         {
           "name": "all six kinds, constructors/factories and default source metadata",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr.go",
+          "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprKindsFactoriesAndDefinedDisplay",
             "TestSexprBVSourceWidthQuirks",
@@ -143394,7 +143394,7 @@
         {
           "name": "all accessors/predicates and owned projections",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr.go",
+          "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprKindsFactoriesAndDefinedDisplay",
             "TestSexprBVSourceWidthQuirks",
@@ -143415,7 +143415,7 @@
         {
           "name": "logical reference counts, ascending child decrements and LIFO deletion",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr.go",
+          "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprKindsFactoriesAndDefinedDisplay",
             "TestSexprBVSourceWidthQuirks",
@@ -143436,7 +143436,7 @@
         {
           "name": "defined source atom/composite rendering, BV arithmetic and reusable Go digit scratch",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr.go",
+          "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprKindsFactoriesAndDefinedDisplay",
             "TestSexprBVSourceWidthQuirks",
@@ -143457,7 +143457,7 @@
         {
           "name": "concrete sexpr_ref and sexpr_ref_vector source specializations",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr.go",
+          "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprKindsFactoriesAndDefinedDisplay",
             "TestSexprBVSourceWidthQuirks",
@@ -143478,7 +143478,7 @@
         {
           "name": "g3debug BV short-circuit remainder assertions and full-expression temporary lifetimes",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr_debug.go",
+          "go_target": "pkg/util/sexpr/util_sexpr_debug.go",
           "tests": [
             "TestSexprDebugBVInvariantAndShortCircuit",
             "TestSexprDebugBVComparisonFailureRoots"
@@ -143499,9 +143499,9 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_sexpr.go",
-        "pkg/util/util_sexpr_debug.go",
-        "pkg/util/util_sexpr_nodebug.go"
+        "pkg/util/sexpr/util_sexpr.go",
+        "pkg/util/sexpr/util_sexpr_debug.go",
+        "pkg/util/sexpr/util_sexpr_nodebug.go"
       ],
       "tests": [
         "TestSexprKindsFactoriesAndDefinedDisplay",
@@ -143545,7 +143545,7 @@
         {
           "name": "all six kinds, constructors/factories and default source metadata",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr.go",
+          "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprKindsFactoriesAndDefinedDisplay",
             "TestSexprBVSourceWidthQuirks",
@@ -143566,7 +143566,7 @@
         {
           "name": "all accessors/predicates and owned projections",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr.go",
+          "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprKindsFactoriesAndDefinedDisplay",
             "TestSexprBVSourceWidthQuirks",
@@ -143587,7 +143587,7 @@
         {
           "name": "logical reference counts, ascending child decrements and LIFO deletion",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr.go",
+          "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprKindsFactoriesAndDefinedDisplay",
             "TestSexprBVSourceWidthQuirks",
@@ -143608,7 +143608,7 @@
         {
           "name": "defined source atom/composite rendering, BV arithmetic and reusable Go digit scratch",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr.go",
+          "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprKindsFactoriesAndDefinedDisplay",
             "TestSexprBVSourceWidthQuirks",
@@ -143629,7 +143629,7 @@
         {
           "name": "concrete sexpr_ref and sexpr_ref_vector source specializations",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr.go",
+          "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprKindsFactoriesAndDefinedDisplay",
             "TestSexprBVSourceWidthQuirks",
@@ -143650,7 +143650,7 @@
         {
           "name": "g3debug BV short-circuit remainder assertions and full-expression temporary lifetimes",
           "status": "ported",
-          "go_target": "pkg/util/util_sexpr_debug.go",
+          "go_target": "pkg/util/sexpr/util_sexpr_debug.go",
           "tests": [
             "TestSexprDebugBVInvariantAndShortCircuit",
             "TestSexprDebugBVComparisonFailureRoots"
@@ -144527,7 +144527,7 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_smt2_util.go"
+        "pkg/util/smt2/util_smt2_util.go"
       ],
       "tests": [
         "TestSMT2SimpleExhaustiveBytes",
@@ -144548,7 +144548,7 @@
         {
           "name": "is_smt2_simple_symbol_char exact ASCII whitelist (cpp21-29)",
           "status": "ported",
-          "go_target": "pkg/util/util_smt2_util.go",
+          "go_target": "pkg/util/smt2/util_smt2_util.go",
           "tests": [
             "TestSMT2SimpleExhaustiveBytes",
             "TestSMT2QuotedCStringSourceBranches"
@@ -144557,7 +144557,7 @@
         {
           "name": "is_smt2_quoted_symbol nullable CString first-NUL and outer-pipe scanner (cpp31-51)",
           "status": "ported",
-          "go_target": "pkg/util/util_smt2_util.go",
+          "go_target": "pkg/util/smt2/util_smt2_util.go",
           "tests": [
             "TestSMT2QuotedCStringSourceBranches"
           ]
@@ -144565,7 +144565,7 @@
         {
           "name": "is_smt2_quoted_symbol borrowed scalar symbol overload (cpp53-57)",
           "status": "ported",
-          "go_target": "pkg/util/util_smt2_util.go",
+          "go_target": "pkg/util/smt2/util_smt2_util.go",
           "tests": [
             "TestSMT2SymbolSourcePreconditionAndLifetime",
             "TestSMT2QuoteLongGoBufferAndNoBorrowCharges"
@@ -144574,7 +144574,7 @@
         {
           "name": "mk_smt2_quoted_symbol precondition and bytewise escaping (cpp59-72)",
           "status": "ported",
-          "go_target": "pkg/util/util_smt2_util.go",
+          "go_target": "pkg/util/smt2/util_smt2_util.go",
           "tests": [
             "TestSMT2SymbolSourcePreconditionAndLifetime",
             "TestSMT2QuoteGoBufferAndIndependentBytes",
@@ -144595,7 +144595,7 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_smt2_util.go"
+        "pkg/util/smt2/util_smt2_util.go"
       ],
       "tests": [
         "TestSMT2SimpleExhaustiveBytes",
@@ -144620,7 +144620,7 @@
         {
           "name": "is_smt2_simple_symbol_char exact ASCII whitelist (cpp21-29)",
           "status": "ported",
-          "go_target": "pkg/util/util_smt2_util.go",
+          "go_target": "pkg/util/smt2/util_smt2_util.go",
           "tests": [
             "TestSMT2SimpleExhaustiveBytes",
             "TestSMT2QuotedCStringSourceBranches"
@@ -144629,7 +144629,7 @@
         {
           "name": "is_smt2_quoted_symbol nullable CString first-NUL and outer-pipe scanner (cpp31-51)",
           "status": "ported",
-          "go_target": "pkg/util/util_smt2_util.go",
+          "go_target": "pkg/util/smt2/util_smt2_util.go",
           "tests": [
             "TestSMT2QuotedCStringSourceBranches"
           ]
@@ -144637,7 +144637,7 @@
         {
           "name": "is_smt2_quoted_symbol borrowed scalar symbol overload (cpp53-57)",
           "status": "ported",
-          "go_target": "pkg/util/util_smt2_util.go",
+          "go_target": "pkg/util/smt2/util_smt2_util.go",
           "tests": [
             "TestSMT2SymbolSourcePreconditionAndLifetime",
             "TestSMT2QuoteLongGoBufferAndNoBorrowCharges"
@@ -144646,7 +144646,7 @@
         {
           "name": "mk_smt2_quoted_symbol precondition and bytewise escaping (cpp59-72)",
           "status": "ported",
-          "go_target": "pkg/util/util_smt2_util.go",
+          "go_target": "pkg/util/smt2/util_smt2_util.go",
           "tests": [
             "TestSMT2SymbolSourcePreconditionAndLifetime",
             "TestSMT2QuoteGoBufferAndIndependentBytes",
@@ -147080,7 +147080,7 @@
       "go_targets": [
         "pkg/util/random/generator.go",
         "pkg/util/numeral/mpz_log.go",
-        "pkg/util/util_sexpr.go",
+        "pkg/util/sexpr/util_sexpr.go",
         "pkg/util/escaped/escaped.go",
         "pkg/util/diagnostic/util_verbose_context.go",
         "pkg/util/diagnostic/util_verbose_context_test.go",
@@ -147214,7 +147214,7 @@
       "go_targets": [
         "pkg/util/random/generator.go",
         "pkg/util/numeral/mpz_log.go",
-        "pkg/util/util_sexpr.go",
+        "pkg/util/sexpr/util_sexpr.go",
         "pkg/util/escaped/escaped.go",
         "pkg/util/diagnostic/util_verbose_context.go",
         "pkg/util/diagnostic/util_verbose_context_test.go",

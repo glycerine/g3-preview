@@ -6,9 +6,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	usexpr "github.com/glycerine/g3/pkg/util/sexpr"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -671,13 +672,13 @@ func rationalPublicationDirectOwner(t *testing.T, synch bool) (*unumeral.Rationa
 	})
 	return m, b
 }
-func sxOwner(t *testing.T, b *arena.Budget) (*util.SexprManager, *usymbol.Manager, *unumeral.RationalService) {
+func sxOwner(t *testing.T, b *arena.Budget) (*usexpr.SexprManager, *usymbol.Manager, *unumeral.RationalService) {
 	t.Helper()
 	s, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	sxMust(t, e)
 	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 2}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{Budget: b, PageSize: 2}}}})
 	sxMust(t, e)
-	m, e := util.NewSexprManager(util.SexprConfig{Budget: b, PageSize: 2, Symbols: s, Rationals: q})
+	m, e := usexpr.NewSexprManager(usexpr.SexprConfig{Budget: b, PageSize: 2, Symbols: s, Rationals: q})
 	sxMust(t, e)
 	t.Cleanup(func() {
 		sxMust(t, m.Close())

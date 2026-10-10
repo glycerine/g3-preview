@@ -1,5 +1,5 @@
 // Source: src/util/hash.cpp:26-102; src/util/fixed_bit_vector.h:32-69.
-package util
+package runtimehash
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

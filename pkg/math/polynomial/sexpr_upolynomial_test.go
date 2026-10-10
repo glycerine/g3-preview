@@ -6,14 +6,15 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	usexpr "github.com/glycerine/g3/pkg/util/sexpr"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func sxPolyOwner(t *testing.T) (*SexprPolynomialConverter, *util.SexprManager, *usymbol.Manager, *unumeral.RationalService, *UPolynomialManager, UPolynomial) {
+func sxPolyOwner(t *testing.T) (*SexprPolynomialConverter, *usexpr.SexprManager, *usymbol.Manager, *unumeral.RationalService, *UPolynomialManager, UPolynomial) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	sx, sy, q := sxOwner(t, b)
@@ -36,13 +37,13 @@ func sxPolyOwner(t *testing.T) (*SexprPolynomialConverter, *util.SexprManager, *
 	})
 	return c, sx, sy, q, p, out
 }
-func sxPolySym(t *testing.T, sx *util.SexprManager, sy *usymbol.Manager, name string) util.SexprHandle {
+func sxPolySym(t *testing.T, sx *usexpr.SexprManager, sy *usymbol.Manager, name string) usexpr.SexprHandle {
 	t.Helper()
 	h, e := sx.MkSymbol(internSymbol(t, sy, name), 13, 17)
 	sxMust(t, e)
 	return h
 }
-func sxPolyNum(t *testing.T, sx *util.SexprManager, q *unumeral.RationalService, text string) util.SexprHandle {
+func sxPolyNum(t *testing.T, sx *usexpr.SexprManager, q *unumeral.RationalService, text string) usexpr.SexprHandle {
 	t.Helper()
 	v := sxNumber(t, q, text)
 	h, e := sx.MkNumeral(&v, 23, 29)
@@ -50,9 +51,9 @@ func sxPolyNum(t *testing.T, sx *util.SexprManager, q *unumeral.RationalService,
 	sxMust(t, q.Del(&v))
 	return h
 }
-func sxPolyApp(t *testing.T, sx *util.SexprManager, sy *usymbol.Manager, op string, args ...util.SexprHandle) util.SexprHandle {
+func sxPolyApp(t *testing.T, sx *usexpr.SexprManager, sy *usymbol.Manager, op string, args ...usexpr.SexprHandle) usexpr.SexprHandle {
 	t.Helper()
-	children := append([]util.SexprHandle{sxPolySym(t, sx, sy, op)}, args...)
+	children := append([]usexpr.SexprHandle{sxPolySym(t, sx, sy, op)}, args...)
 	h, e := sx.MkComposite(children, 31, 37)
 	sxMust(t, e)
 	return h
@@ -103,7 +104,7 @@ func TestSexprPolynomialErrorsAndCompletedPrefix(t *testing.T) {
 	c, sx, sy, q, p, out := sxPolyOwner(t)
 	x := sxPolySym(t, sx, sy, "x")
 	cases := []struct {
-		h         util.SexprHandle
+		h         usexpr.SexprHandle
 		message   string
 		line, pos int32
 	}{
@@ -161,7 +162,7 @@ func TestSexprPolynomialActualFaultPrefixes(t *testing.T) {
 			e := c.Convert(expr, out)
 			// Explicit source owners name node constants, service scopes/private locals,
 			// caller output and all converter scoped vectors BEFORE fault disabling.
-			upolyHenselAuditPhysical(t, []*UPolynomialManager{p}, nil, upolyPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, SexprManagers: []*util.SexprManager{sx}})
+			upolyHenselAuditPhysical(t, []*UPolynomialManager{p}, nil, upolyPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, SexprManagers: []*usexpr.SexprManager{sx}})
 			if e != nil {
 				if !upolyHenselAllocationRefusal(p.IntegerManager(), e) {
 					t.Fatal(e)
@@ -214,12 +215,12 @@ func TestSexprPolynomialWarmAndRemainingKinds(t *testing.T) {
 	}
 	empty, e := sx.MkComposite(nil, 41, 43)
 	sxMust(t, e)
-	nonhead, e := sx.MkComposite([]util.SexprHandle{two}, 47, 53)
+	nonhead, e := sx.MkComposite([]usexpr.SexprHandle{two}, 47, 53)
 	sxMust(t, e)
 	str, e := sx.MkString("x", 59, 61)
 	sxMust(t, e)
 	for _, a := range []struct {
-		h   util.SexprHandle
+		h   usexpr.SexprHandle
 		msg string
 	}{{empty, "invalid univariate polynomial, symbol expected"}, {nonhead, "invalid univariate polynomial, symbol expected"}, {str, "invalid univariate polynomial, unexpected "}, {sxPolyApp(t, sx, sy, "^", x, str), "invalid univariate polynomial, exponent must be an unsigned integer"}} {
 		err := c.Convert(a.h, out)

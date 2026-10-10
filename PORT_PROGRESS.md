@@ -34669,3 +34669,25 @@ full g3debug suites passed (0.202s/0.020s/1.493s). Full g3debug AST passed; comb
 module compilation, diagnostic/text/root util/AST vet, manifest and diff checks
 passed. Numerals were committed separately as512298e9. The remaining root split
 still includes parameters, S-expressions, runtime hashing and unused adapters.
+
+## Extract remaining independent utility groups
+
+Moved concrete runtime-backed hash reads and their two tests to util/hash/runtime,
+keeping pure util/hash independent of memory. Moved four S-expression production
+files and four existing test files (including debug/release alternatives) to
+util/sexpr, with local public-only symbol/numeral/reflection fixtures. Moved the
+SMT2 quoting predicates/formatter and existing exhaustive tests to util/smt2.
+Seven actual S-expression consumers now import its concrete owner directly.
+
+Removed unused root Go internal-reference domain scaffolding and its storage-
+only representation tests (four files), two uncalled symbol byte/runtime adapter
+functions, and an empty consolidation placeholder. Compiler reference graphs
+showed no retained root consumers. Source files and live manager/reference types
+in their real packages remain; this does not claim the C++ algorithms are dead
+or change their manifest status. Actual consolidation still resides in memory.
+
+Native hash/runtime hash/S-expression/SMT2/root util passed
+(0.005s/0.003s/0.018s/0.004s/1.179s). Matching combined g3debug+g3checked suites
+passed (0.004s/0.004s/0.211s/0.005s/1.216s). Four-profile compiler preflight,
+changed package/root vet, manifest and diff checks passed. Manifest counts are
+unchanged. Only the parameter group and its integration tests remain at root.

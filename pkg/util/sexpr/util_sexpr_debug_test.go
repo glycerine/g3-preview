@@ -1,7 +1,7 @@
 //go:build g3debug
 
 // Source: src/util/sexpr.cpp; src/util/mpq.h (debug ownership audit adaptation).
-package util
+package sexpr
 
 import (
 	"errors"

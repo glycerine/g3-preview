@@ -6,7 +6,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	usexpr "github.com/glycerine/g3/pkg/util/sexpr"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -27,9 +28,9 @@ type sexprPolynomialFrame struct {
 // Native frames retain actual source scoped vectors, including stopped cleanup.
 // The converter header and actual numerical owners are charged separately.
 type SexprPolynomialConverter struct {
-	borrowed   *util.SexprBorrowedNodes
+	borrowed   *usexpr.SexprBorrowedNodes
 	self       *SexprPolynomialConverter
-	sexpr      *util.SexprManager
+	sexpr      *usexpr.SexprManager
 	polynomial *UPolynomialManager
 	frames     []sexprPolynomialFrame
 	depth      uint32
@@ -38,8 +39,8 @@ type SexprPolynomialConverter struct {
 	closed     bool
 }
 
-func NewSexprPolynomialConverter(s *util.SexprManager, m *UPolynomialManager) (out *SexprPolynomialConverter, cause error) {
-	cause = s.WithBorrowedNodes(func(*util.SexprBorrowedNodes) error {
+func NewSexprPolynomialConverter(s *usexpr.SexprManager, m *UPolynomialManager) (out *SexprPolynomialConverter, cause error) {
+	cause = s.WithBorrowedNodes(func(*usexpr.SexprBorrowedNodes) error {
 		if e := numericRationalService_WithUPolynomialRationals(s.Configuration().Rationals, m, func(*UPolynomialRationalContext) error { return nil }); e != nil {
 			return e
 		}
@@ -55,14 +56,14 @@ func NewSexprPolynomialConverter(s *util.SexprManager, m *UPolynomialManager) (o
 }
 func (c *SexprPolynomialConverter) open() error {
 	if c == nil || c.self != c {
-		return util.ErrSexprOwner
+		return usexpr.ErrSexprOwner
 	}
 	if c.closed {
 		return arena.ErrClosed
 	}
 	return nil
 }
-func (c *SexprPolynomialConverter) parseError(h util.SexprHandle, msg string) error {
+func (c *SexprPolynomialConverter) parseError(h usexpr.SexprHandle, msg string) error {
 	r, e := c.borrowed.Record(h)
 	if e != nil {
 		return e
@@ -84,26 +85,26 @@ func (c *SexprPolynomialConverter) frame() (uint32, error) {
 	c.depth++
 	return i, nil
 }
-func (c *SexprPolynomialConverter) Convert(h util.SexprHandle, p UPolynomial) error {
+func (c *SexprPolynomialConverter) Convert(h usexpr.SexprHandle, p UPolynomial) error {
 	return c.convertAtDepth(h, p, 0)
 }
-func (c *SexprPolynomialConverter) convertAtDepth(h util.SexprHandle, p UPolynomial, depth uint32) error {
+func (c *SexprPolynomialConverter) convertAtDepth(h usexpr.SexprHandle, p UPolynomial, depth uint32) error {
 	if e := c.open(); e != nil {
 		return e
 	}
 	if c.cause != nil {
 		return ErrSexprPolynomialPending
 	}
-	return c.sexpr.WithBorrowedNodes(func(nodes *util.SexprBorrowedNodes) error {
+	return c.sexpr.WithBorrowedNodes(func(nodes *usexpr.SexprBorrowedNodes) error {
 		c.borrowed = nodes
 		defer func() { c.borrowed = nil }()
 		return numericRationalService_WithUPolynomialRationals(c.sexpr.Configuration().Rationals, c.polynomial, func(ctx *UPolynomialRationalContext) error { return c.convert(ctx, h, p, depth) })
 	})
 }
-func (c *SexprPolynomialConverter) child(r util.SexprBorrowedNode, i uint32) (util.SexprHandle, error) {
+func (c *SexprPolynomialConverter) child(r usexpr.SexprBorrowedNode, i uint32) (usexpr.SexprHandle, error) {
 	return c.borrowed.Child(r, i)
 }
-func (c *SexprPolynomialConverter) convert(ctx *UPolynomialRationalContext, h util.SexprHandle, p UPolynomial, depth uint32) (result error) {
+func (c *SexprPolynomialConverter) convert(ctx *UPolynomialRationalContext, h usexpr.SexprHandle, p UPolynomial, depth uint32) (result error) {
 	if depth > 1<<16 {
 		return c.parseError(h, "invalid univariate polynomial, too complex")
 	}
@@ -112,7 +113,7 @@ func (c *SexprPolynomialConverter) convert(ctx *UPolynomialRationalContext, h ut
 		return e
 	}
 	switch r.Kind {
-	case util.SexprComposite:
+	case usexpr.SexprComposite:
 		num := r.Length
 		if num == 0 {
 			return c.parseError(h, "invalid univariate polynomial, symbol expected")
@@ -125,7 +126,7 @@ func (c *SexprPolynomialConverter) convert(ctx *UPolynomialRationalContext, h ut
 		if e != nil {
 			return e
 		}
-		if hr.Kind != util.SexprSymbol {
+		if hr.Kind != usexpr.SexprSymbol {
 			return c.parseError(h, "invalid univariate polynomial, symbol expected")
 		}
 		op, e := c.operator(hr.Symbol)
@@ -157,7 +158,7 @@ func (c *SexprPolynomialConverter) convert(ctx *UPolynomialRationalContext, h ut
 			if e != nil {
 				return e
 			}
-			if er.Kind != util.SexprNumeral {
+			if er.Kind != usexpr.SexprNumeral {
 				return c.parseError(exponent, "invalid univariate polynomial, exponent must be an unsigned integer")
 			}
 			n, ok, e := ctx.Exponent(er.Numeral)
@@ -225,10 +226,10 @@ func (c *SexprPolynomialConverter) convert(ctx *UPolynomialRationalContext, h ut
 			}
 		}
 		return nil
-	case util.SexprNumeral:
+	case usexpr.SexprNumeral:
 		return ctx.SetConstant(p, r.Numeral, func() error { return c.parseError(h, "invalid univariate polynomial, integer coefficient expected") })
 
-	case util.SexprSymbol:
+	case usexpr.SexprSymbol:
 		name, e := c.sexpr.Configuration().Symbols.EqualString(r.Symbol, stringPointer("x"))
 		if e != nil {
 			return e

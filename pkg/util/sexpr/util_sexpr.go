@@ -1,6 +1,6 @@
 // Source: src/util/sexpr.h; src/util/sexpr.cpp:28-55.
 // Concrete S-expression records retain source reference counting with Go storage.
-package util
+package sexpr
 
 import (
 	"errors"
