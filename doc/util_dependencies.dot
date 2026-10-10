@@ -35,6 +35,7 @@ digraph packages {
   "util/idgen" -> "arena";
   "util/lbool" [style=filled, fillcolor="#dceafa"];
   "util/lp" [style=filled, fillcolor="#dceafa"];
+  "util/lp" -> "util/numeral";
   "util/lp" -> "util/params";
   "util/luby" [style=filled, fillcolor="#dceafa"];
   "util/memory" [style=filled, fillcolor="#dceafa"];

@@ -122728,13 +122728,18 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/stacked_vector.go"
+        "pkg/util/lp/stacked_vector.go",
+        "pkg/util/lp/stacked_pair_vector.go"
       ],
       "tests": [
         "TestLPStackedVectorSource",
         "TestLPStackedUintVectorSnapshots",
         "TestLPStackedIntVectorSnapshots",
-        "TestLPStackedColumnVectorSnapshots"
+        "TestLPStackedColumnVectorSnapshots",
+        "TestLPStackedPairVectorIndependentSnapshots",
+        "TestLPStackedPairVectorBigOwnership",
+        "TestLPStackedPairVectorAllocationFailureOwnership",
+        "TestLPStackedPairVectorPendingAllocationIdentity"
       ],
       "assertions": [
         {
@@ -122775,13 +122780,25 @@
             "TestLPStackedIntVectorSnapshots",
             "TestLPStackedColumnVectorSnapshots"
           ]
+        },
+        {
+          "name": "actual numeric_pair<mpq> scoped bounds vector: owned deep copies, unchanged-value suppression, push/peek/pop, reverse restoration, tail destruction and explicit failed-copy close",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_pair_vector.go",
+          "tests": [
+            "TestLPStackedPairVectorIndependentSnapshots",
+            "TestLPStackedPairVectorBigOwnership",
+            "TestLPStackedPairVectorAllocationFailureOwnership",
+            "TestLPStackedPairVectorPendingAllocationIdentity"
+          ]
         }
       ],
       "ownership": [
-        "Native typed slices own values and change journals. Values borrows read-only backing; callers must use Set to preserve rollback. No numeral ownership or STL internals are claimed."
+        "Native typed slices own values and change journals. Values borrows read-only backing; callers must use Set to preserve rollback. No numeral ownership or STL internals are claimed.",
+        "Exact scoped vectors own RationalPair values and replacement snapshots. An incomplete lexical copy stays in the actual pending field. CaptureNumericAllocationRoots/After records only newly acquired physical numeric/allocator roots; identity-checked cleanup excludes older/replaced pending allocations. Values and At borrow read-only numerals; Set is required for rollback. Close precedes borrowed manager closure and retains its cursor on errors."
       ],
       "deviations": [
-        "The actual numeric_pair<mpq> instantiation in lar_core_solver.h remains unported. Checked ErrBounds/ErrScope guard source-undefined access and zero/excess vector pops; scalar stacked_value retains its distinct saturating-pop behavior."
+        "All four live element types now have concrete vector implementations; no whole source unit promotion before complete solver integration and source-profile audit. ErrBounds/ErrScope guard source-undefined accesses and zero/excess pops. Native backing has no simulated Runtime reservation failures. Actual numeral allocations can fail and retain explicit owning cleanup receipts; process-global allocation callback/stream bindings and teardown-stop profiles remain open."
       ]
     },
     {

@@ -1164,12 +1164,16 @@
     {
       "package": "util/lp",
       "imports": [
+        "util/numeral",
         "util/params"
       ],
       "production_files": [
         "assert_release.go",
         "gparams_catalog_collectors.go",
+        "indexed_vector.go",
         "int_set.go",
+        "numeric_pair.go",
+        "stacked_pair_vector.go",
         "stacked_value.go",
         "stacked_vector.go",
         "types.go"

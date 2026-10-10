@@ -196,8 +196,10 @@ func TestLPRationalPairCoordinateErrorPrefixes(t *testing.T) {
 	h := newLPPairHarness(t)
 	foreign := newLPPairHarness(t)
 	a, b, out := h.pair("2", "3"), h.pair("1", "1"), h.pair("9", "9")
-	// Foreign owning numerals must fail before their coordinate is consumed.
-	// These are Go provenance guards, not C++ exception/OOM claims.
+	// These big references have no live cell in h.m; operations that dereference
+	// them must fail before that coordinate is consumed. Raw numeral ownership
+	// is a caller contract: this fixture does not claim general provenance checks
+	// when unrelated managers happen to contain matching reference IDs.
 	for _, coordinate := range []int{0, 1} {
 		var bad *RationalPair
 		if coordinate == 0 {

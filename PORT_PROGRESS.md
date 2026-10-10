@@ -34819,3 +34819,36 @@ pair code100%, indexed vectors99.0%(the other profile's assertion/continuation
 path is unreachable). LP vet passes. Eleven LP units partial,99 unported. The
 full LP solver goal remains active; next owning exact vectors, priority queues,
 permutations and matrix/factorization layers, followed by solver integration.
+
+
+## Owning exact LAR scoped bound vectors
+
+Completed the actual stacked_vector<numeric_pair<mpq>> specialization alongside
+the existing scalar element types. Exact values and journals own independent
+project numerals, borrowed views cannot be edited, reverse rollback copies old
+values before destroying journal entries, and tail destruction precedes scope
+pops. Sixteen hundred independent full-copy snapshot operations and big-value
+lifetime checks cover ordinary rollback, unchanged values, nested scopes and
+baseline replacement journals. Live manager cells return to the baseline after
+vector/journal Close, independently of manager closure.
+
+Actual allocation refusal campaigns cover append, old-value snapshot, growing
+replacement and restore. Initial small values reused allocator pools and made
+no new reservations, so the real failure campaign uses1000-digit numerals that
+reach direct physical allocation. It found a true prefix leak: physical cell
+allocation completed before descriptor reservation failed. The vector now uses
+the existing CaptureNumericAllocationRoots/After and identity-checked cleanup
+API, retaining the actual unfinished lexical pair and numeric allocation roots.
+Both live numeral cells and raw Runtime blocks return to their prior counts for
+every reached allocation failure and first success. Separate tests verify that
+older and externally replaced pending allocations remain owned by their actual
+callers; vector Close cannot claim or release them.
+
+Current native LP test1.492s,98.4% overall statement coverage. Exact scoped vector
+92.8%; seven uncovered return statements propagate capture/cleanup errors rather
+than ordinary numerical branches. Source process-global callbacks and teardown
+stop profiles remain open; no fabricated deallocation/OOM fixture was used to
+inflate coverage. All eleven LP source units remain partial,99 unported; complete
+solver/matrix/unit-test integration still ahead. This continues the full active
+LP goal, with no scope reduction. Additive checkpoint994aa663 saved pair and
+indexed-vector algorithms; this checkpoint adds exact scoped ownership.
