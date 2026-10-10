@@ -11,12 +11,10 @@ import (
 // bvPolynomialFlatten is the source TO_BUFFER macro. Expanding an operator
 // replaces the current slot by arg0, appends siblings at the end and revisits
 // that slot. It intentionally does not perform depth-first traversal.
-func bvPolynomialFlatten(m *ast.ASTManager, kind int32, buffer *ast.ASTHandleBuffer, input ast.ASTHandle) error {
-	if e := buffer.Push(m.Budget(), input); e != nil {
-		return e
-	}
-	for i := 0; i < len(buffer.Slice()); {
-		h := buffer.Slice()[i]
+func bvPolynomialFlatten(m *ast.ASTManager, kind int32, buffer *[]ast.ASTHandle, input ast.ASTHandle) error {
+	*buffer = append(*buffer, input)
+	for i := 0; i < len(*buffer); {
+		h := (*buffer)[i]
 		yes, e := m.IsBitVectorOperation(h, kind)
 		if e != nil {
 			return e
@@ -29,7 +27,7 @@ func bvPolynomialFlatten(m *ast.ASTManager, kind int32, buffer *ast.ASTHandleBuf
 		if e != nil {
 			return e
 		}
-		buffer.Slice()[i] = first
+		(*buffer)[i] = first
 		for j := uint32(1); ; j++ {
 			n, e := m.GetNumArgs(h)
 			if e != nil {
@@ -42,9 +40,7 @@ func bvPolynomialFlatten(m *ast.ASTManager, kind int32, buffer *ast.ASTHandleBuf
 			if e != nil {
 				return e
 			}
-			if e = buffer.Push(m.Budget(), arg); e != nil {
-				return e
-			}
+			*buffer = append(*buffer, arg)
 		}
 	}
 	return nil
@@ -57,7 +53,7 @@ type BVPolynomialMerger struct {
 	self                                 *BVPolynomialMerger
 	manager                              *ast.ASTManager
 	currentSort                          *ast.ASTHandle
-	factors                              [2]ast.ASTHandleBuffer
+	factors                              [2][]ast.ASTHandle
 	residuals                            [2]ast.ASTHandle
 	calls                                [2]ast.ASTBitVectorNumeralInvocation
 	header                               uint64
@@ -86,7 +82,7 @@ func (p *BVPolynomialMerger) body(x, y ast.ASTHandle) (ast.ASTHandle, error) {
 	if e := bvPolynomialFlatten(m, 6, &p.factors[1], y); e != nil {
 		return ast.ASTHandle{}, e
 	}
-	one, two := p.factors[0].Slice(), p.factors[1].Slice()
+	one, two := p.factors[0], p.factors[1]
 	k := 0
 	for i := range one {
 		x = one[i]
@@ -114,23 +110,21 @@ func (p *BVPolynomialMerger) body(x, y ast.ASTHandle) (ast.ASTHandle, error) {
 	// Initializer expressions run left-to-right, including any numeral-one
 	// constructor/full-expression DT inside an empty mk_mul_app call.
 	for i := 0; i < 2; i++ {
-		tail := p.factors[i].Slice()[k:]
+		tail := p.factors[i][k:]
 		p.residuals[i], e = m.MkBitVectorPolynomialMulWithInvocation(sort, ast.SliceArguments(tail), &p.calls[i])
 		if e != nil {
 			return ast.ASTHandle{}, e
 		}
 	}
 	if k == len(one) {
-		if e = p.factors[0].Push(m.Budget(), ast.ASTHandle{}); e != nil {
-			return ast.ASTHandle{}, e
-		}
+		p.factors[0] = append(p.factors[0], ast.ASTHandle{})
 	}
 	sum, e := m.MkBitVectorPolynomialAdd(sort, ast.SliceArguments(p.residuals[:]))
 	if e != nil {
 		return ast.ASTHandle{}, e
 	}
-	p.factors[0].Slice()[k] = sum
-	return m.MkBitVectorPolynomialMul(sort, ast.SliceArguments(p.factors[0].Slice()[:k+1]))
+	p.factors[0][k] = sum
+	return m.MkBitVectorPolynomialMul(sort, ast.SliceArguments(p.factors[0][:k+1]))
 }
 
 func (p *BVPolynomialMerger) childrenSource() error {
@@ -161,7 +155,8 @@ func (p *BVPolynomialMerger) Merge(x, y ast.ASTHandle) (ast.ASTHandle, error) {
 		return ast.ASTHandle{}, p.sourceCause
 	}
 	for i := 1; i >= 0; i-- {
-		p.factors[i].Close(p.manager.Budget())
+		clear(p.factors[i])
+		p.factors[i] = nil
 	}
 	p.sourceDone = true
 	return node, nil
@@ -201,7 +196,8 @@ func (p *BVPolynomialMerger) Close() (result error) {
 		}
 	}
 	for i := 1; i >= 0; i-- {
-		p.factors[i].Close(p.manager.Budget())
+		clear(p.factors[i])
+		p.factors[i] = nil
 	}
 	p.manager.Budget().Release(p.header)
 	p.header = 0

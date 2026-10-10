@@ -1,5 +1,4 @@
-// Source: src/ast/rewriter/poly_rewriter_def.h:903-943;
-// src/util/buffer.h:25-75,146-151.
+// Source: src/ast/rewriter/poly_rewriter_def.h:903-943.
 package rewriter
 
 import (
@@ -8,20 +7,6 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
-type bvPolynomialValidity struct{ values []bool }
-
-func (v *bvPolynomialValidity) data() []bool { return v.values }
-func (v *bvPolynomialValidity) fill(_ *ast.ASTManager, n uint32) error {
-	for uint64(len(v.values)) < uint64(n) {
-		v.values = append(v.values, true)
-	}
-	return nil
-}
-func (v *bvPolynomialValidity) close(_ *ast.ASTManager) {
-	clear(v.values)
-	v.values = nil
-}
-
 // BVPolynomialMultiplicationHoist names one source invocation and borrows the
 // manager/result reference. Its map and buffers borrow expression lifetimes.
 type BVPolynomialMultiplicationHoist struct {
@@ -29,8 +14,8 @@ type BVPolynomialMultiplicationHoist struct {
 	manager                              *ast.ASTManager
 	currentSort                          ast.ASTHandle
 	sortBinding                          *ast.ASTHandle
-	adds, muls                           ast.ASTHandleBuffer
-	valid                                bvPolynomialValidity
+	adds, muls                           []ast.ASTHandle
+	valid                                []bool
 	table                                *bvPolynomialPositions
 	merge                                *BVPolynomialMerger
 	zero                                 ast.ASTBitVectorNumeralInvocation
@@ -60,21 +45,23 @@ func (p *BVPolynomialMultiplicationHoist) body(som ast.ASTRef) (bool, error) {
 	if e = bvPolynomialFlatten(m, 4, &p.adds, input); e != nil {
 		return false, e
 	}
-	if e = p.valid.fill(m, uint32(len(p.adds.Slice()))); e != nil {
-		return false, e
+	p.valid = make([]bool, len(p.adds))
+	for i := range p.valid {
+		p.valid[i] = true
 	}
 	p.table, e = newBVPolynomialPositions(m)
 	if e != nil {
 		return false, e
 	}
 	change := false
-	for k := 0; k < len(p.adds.Slice()); k++ {
-		term := p.adds.Slice()[k]
-		p.muls.Reset()
+	for k := 0; k < len(p.adds); k++ {
+		term := p.adds[k]
+		clear(p.muls)
+		p.muls = p.muls[:0]
 		if e = bvPolynomialFlatten(m, 6, &p.muls, term); e != nil {
 			return false, e
 		}
-		for _, factor := range p.muls.Slice() {
+		for _, factor := range p.muls {
 			num, e := m.IsBitVectorOperation(factor, 0)
 			if e != nil {
 				return false, e
@@ -86,8 +73,8 @@ func (p *BVPolynomialMultiplicationHoist) body(som ast.ASTRef) (bool, error) {
 			if e != nil {
 				return false, e
 			}
-			if found && p.valid.data()[j] && j != uint32(k) {
-				*p.sortSlot(), e = m.GetSort(p.adds.Slice()[k])
+			if found && p.valid[j] && j != uint32(k) {
+				*p.sortSlot(), e = m.GetSort(p.adds[k])
 				if e != nil {
 					return false, e
 				}
@@ -95,19 +82,19 @@ func (p *BVPolynomialMultiplicationHoist) body(som ast.ASTRef) (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				merged, e := p.merge.Merge(p.adds.Slice()[j], p.adds.Slice()[k])
+				merged, e := p.merge.Merge(p.adds[j], p.adds[k])
 				if e != nil {
 					return false, e
 				}
-				p.adds.Slice()[j] = merged
+				p.adds[j] = merged
 				if e = p.merge.Close(); e != nil {
 					return false, e
 				}
 				p.merge = nil
-				if e = m.AssignBitVectorPolynomialZeroWithInvocation(*p.sortSlot(), &p.adds.Slice()[k], &p.zero); e != nil {
+				if e = m.AssignBitVectorPolynomialZeroWithInvocation(*p.sortSlot(), &p.adds[k], &p.zero); e != nil {
 					return false, e
 				}
-				p.valid.data()[j], p.valid.data()[k] = false, false
+				p.valid[j], p.valid[k] = false, false
 				change = true
 				break
 			}
@@ -119,7 +106,7 @@ func (p *BVPolynomialMultiplicationHoist) body(som ast.ASTRef) (bool, error) {
 	if !change {
 		return false, nil
 	}
-	result, e := m.MkBitVectorPolynomialAdd(*p.sortSlot(), ast.SliceArguments(p.adds.Slice()))
+	result, e := m.MkBitVectorPolynomialAdd(*p.sortSlot(), ast.SliceArguments(p.adds))
 	if e != nil {
 		return false, e
 	}
@@ -141,9 +128,11 @@ func (p *BVPolynomialMultiplicationHoist) releaseLocals() {
 		p.table.close()
 		p.table = nil
 	}
-	p.valid.close(p.manager)
-	p.muls.Close(p.manager.Budget())
-	p.adds.Close(p.manager.Budget())
+	p.valid = nil
+	clear(p.muls)
+	p.muls = nil
+	clear(p.adds)
+	p.adds = nil
 }
 func (p *BVPolynomialMultiplicationHoist) Hoist(enabled bool, som ast.ASTRef) (bool, error) {
 	if !enabled {

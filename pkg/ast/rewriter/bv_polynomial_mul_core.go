@@ -5,7 +5,6 @@ package rewriter
 import (
 	"errors"
 	"reflect"
-	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -59,16 +58,7 @@ func (p *BVPolynomialMultiplicationCore) assign(out ast.ASTRef, node ast.ASTHand
 
 // The source comparator defines the order; sorting storage uses Go's library.
 func (p *BVPolynomialMultiplicationCore) sort(fid ast.FamilyID, o BVPolynomialMultiplicationOptions) error {
-	var cause error
-	sort.Slice(p.terms, func(i, j int) bool {
-		if cause != nil {
-			return false
-		}
-		var less bool
-		less, cause = bvMonomialLess(p.manager, fid, o.ASTOrder, p.terms[i], p.terms[j])
-		return less
-	})
-	return cause
+	return bvPolynomialSortMonomials(p.manager, fid, o.ASTOrder, p.terms)
 }
 func (p *BVPolynomialMultiplicationCore) body(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialMultiplicationOptions) (RewriteStatus, error) {
 	m := p.manager

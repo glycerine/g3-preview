@@ -88,7 +88,7 @@ func TestBVPolynomialMultiplicationHoistValidityAndZeroPlaceholders(t *testing.T
 	astTestMust(t, p.SourceReady())
 }
 
-func TestBVPolynomialMultiplicationHoistSoleInputOwnershipAndSpill(t *testing.T) {
+func TestBVPolynomialMultiplicationHoistSoleInputOwnershipAndGrowth(t *testing.T) {
 	m, _ := bvAddFixture(t)
 	xs := bvMergeVars(t, m, 40)
 	terms := make([]ast.ASTHandle, 40)

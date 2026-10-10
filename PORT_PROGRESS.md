@@ -33794,3 +33794,46 @@ No full native module rerun within the hourly interval. Counts remain
 Addition/multiplication core collections are now native. Other BV/array/proof/
 sequence/AST collection callers remain; the complete external native caller
 migration and requested util root subpackage split are unfinished.
+
+## Native BV polynomial cancellation, merging and multiplication hoisting
+
+Cancellation visited/multiple membership now uses local Go maps and borrowed
+lhs/rhs output scratch uses plain []ASTHandle. Removed mark owner/trail placement,
+pending bit-before-list candidates and buffer growth wrappers. Actual numerical
+coefficient owners and scalar/numeral factory children remain, including original
+zero-before-normalization behavior, cross-side-only collection, first-encounter
+order, move-only sorting and left assignment before the right factory. Cleanup
+clears native collections while preserving actual numerical refusal/history.
+
+Merge/TO_BUFFER flattened factors and multiplication-hoist term/factor scratch
+now use native borrowed slices. Removed the validity wrapper in favor of []bool.
+The project append-at-end/revisit flattening algorithm, matching swaps and common
+multiplicity, last-left-factor sort publication, residual initializer order,
+actual empty-product numeral-one children, one-merge-per-term validity and zero
+placeholders remain. No new borrowed-root INC is introduced. Successful cleanup
+clears native collections without dereferencing expired borrowed keys.
+
+The shared monomial sorter now uses Go sort.Slice and the original comparator,
+retaining the first domain error. Addition/multiplication cores share it with
+cancellation and BV OR/XOR. No C++ library sorting callback/swap/failure-prefix
+order, container growth fault or generic source implementation credit is added.
+Manifest descriptions and renamed factory/owner/growth evidence were corrected.
+
+Validation: focused cancellation/merge/hoist passed (0.193s). Final polynomial
+and shared-sort OR/XOR focused tests passed native/debug (2.831s/3.851s).
+The existing independent flatten-order fixture now checks a cold native slice
+with arena reservations disabled and unchanged arena charge. A new 48-variable
+cross-side cancellation regression checks exact outputs and preserves foreign
+planes1/2 through Close. Existing source shape/order/aliasing, 40/80-factor sole
+input ownership and actual numerical allocation-refusal campaigns remain.
+Full native rewriter passed (12.278s); remaining g3debug rewriter passed (16.983s)
+with the same three previously verified baseline exclusions. Full native model/
+API/tactic/SAT tactic passed (0.057s/0.012s/0.025s/0.104s). Module-wide compilation,
+rewriter vet, manifest, gofmt and diff checks passed. No full native module rerun
+within the hourly interval. Counts remain 2102 units/677 APIs: 62 ported,
+283 partial, 1729 unported, two dead/deleted.
+
+A production-only search confirms no BV polynomial file still uses
+ASTHandleBuffer, ASTRefVector, ASTFastMark1/2 or the validity wrapper. Other BV,
+array, proof, sequence and AST consumers remain; the complete external native
+caller migration and requested util root split are unfinished.

@@ -366,3 +366,59 @@ func TestBVPolynomialCancellationNativeResetActualAllocationPrefixes(t *testing.
 		t.Fatal("missing success or actual cold allocation refusal", complete, sawRefusal)
 	}
 }
+
+func TestBVPolynomialCancellationNativeMembershipPreservesForeignMarkPlanes(t *testing.T) {
+	c, g, _ := bvPolynomialParamsFixture(t)
+	m, _ := bvAddFixture(t)
+	p, e := NewBVPolynomialRewriter(m, c, g, nil)
+	astTestMust(t, e)
+	defer func() { astTestMust(t, p.Close()) }()
+	xs := bvMergeVars(t, m, 48)
+	var la []ast.ASTHandle
+	for _, x := range xs {
+		la = append(la, x, x)
+	}
+	la = append(la, bvAddNum(t, m, 2, 8))
+	ra := append([]ast.ASTHandle(nil), xs...)
+	ra = append(ra, bvAddNum(t, m, 3, 8))
+	lhs, rhs := bvMulHoistSum(t, m, la...), bvMulHoistSum(t, m, ra...)
+	astTestPin(t, m, lhs)
+	astTestPin(t, m, rhs)
+	wantL, wantR := bvMulHoistSum(t, m, xs...), bvAddNum(t, m, 1, 8)
+	astTestPin(t, m, wantL)
+	one, e := ast.NewASTFastMark1(m)
+	astTestMust(t, e)
+	defer func() { astTestMust(t, one.Close()) }()
+	two, e := ast.NewASTFastMark2(m)
+	astTestMust(t, e)
+	defer func() { astTestMust(t, two.Close()) }()
+	for _, x := range xs {
+		astTestMust(t, one.Mark(x, true))
+		astTestMust(t, two.Mark(x, true))
+	}
+	lo, e := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, e)
+	defer func() { astTestMust(t, m.DelRef(&lo)) }()
+	ro, e := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, e)
+	defer func() { astTestMust(t, m.DelRef(&ro)) }()
+	st, e := p.CancelMonomials(lhs, rhs, false, lo, ro)
+	astTestMust(t, e)
+	gotL, e := m.RefGet(lo)
+	astTestMust(t, e)
+	gotR, e := m.RefGet(ro)
+	astTestMust(t, e)
+	if st != RewriteDone || gotL != wantL || gotR != wantR {
+		t.Fatal("native cross-side cancellation", st, gotL, gotR)
+	}
+	astTestMust(t, p.Close())
+	for _, x := range xs {
+		marked1, e := one.IsMarked(x)
+		astTestMust(t, e)
+		marked2, e := two.IsMarked(x)
+		astTestMust(t, e)
+		if !marked1 || !marked2 {
+			t.Fatal("cancellation changed another caller's marks")
+		}
+	}
+}

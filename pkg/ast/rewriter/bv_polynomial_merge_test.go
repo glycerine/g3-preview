@@ -37,11 +37,17 @@ func TestBVPolynomialMergeOriginalFlattenAndMatchingSwaps(t *testing.T) {
 	xs := bvMergeVars(t, m, 4)
 	left := bvMergeMul(t, m, bvMergeMul(t, m, xs[0], xs[1]), bvMergeMul(t, m, xs[2], xs[3]))
 	right := bvMergeMul(t, m, xs[3], xs[2])
-	var flat ast.ASTHandleBuffer
-	defer flat.Close(m.Budget())
-	astTestMust(t, bvPolynomialFlatten(m, 6, &flat, left))
+	var flat []ast.ASTHandle
+	before := m.Budget().Used()
+	m.Budget().FailAfter(0)
+	flattenErr := bvPolynomialFlatten(m, 6, &flat, left)
+	m.Budget().FailAfter(-1)
+	astTestMust(t, flattenErr)
+	if m.Budget().Used() != before {
+		t.Fatal("native flattening changed arena charge")
+	}
 	for i, want := range []ast.ASTHandle{xs[0], xs[2], xs[1], xs[3]} {
-		if flat.Slice()[i] != want {
+		if flat[i] != want {
 			t.Fatal("source flatten order", i)
 		}
 	}
@@ -185,7 +191,7 @@ func TestBVPolynomialMergeLastFactorSortBeforeResidualFactories(t *testing.T) {
 	}
 }
 
-func TestBVPolynomialMergeEveryFactoryAndSpillReservation(t *testing.T) {
+func TestBVPolynomialMergeEveryFactoryAndOwnerReservation(t *testing.T) {
 	complete, failures := false, 0
 	for ordinal := int64(0); ordinal < 100 && !complete; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {

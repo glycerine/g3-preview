@@ -15,12 +15,11 @@ type bvPolynomialCancellation struct {
 	manager                         *ast.ASTManager
 	positions                       *bvPolynomialPositions
 	numeric                         *ast.BitVectorPolynomialAdditionNumerals
-	visited                         *ast.ASTFastMark1
-	multiple                        *ast.ASTFastMark2
-	pending                         [2]ast.ASTHandle
+	visited                         map[ast.ASTHandle]bool
+	multiple                        map[ast.ASTHandle]bool
 	sides, pair                     [2]ast.ASTHandle
 	monomials                       [2]ast.AppArguments
-	lhs, rhs                        ast.ASTHandleBuffer
+	lhs, rhs                        []ast.ASTHandle
 	factory                         ast.ASTBitVectorNumeralInvocation
 	header                          uint64
 	bodyCause, sourceCause          error
@@ -46,19 +45,6 @@ func (p *bvPolynomialCancellation) getMonomials(i int, h ast.ASTHandle) error {
 		p.monomials[i], e = p.manager.AppArgumentView(h)
 	} else {
 		p.monomials[i] = ast.SliceArguments(p.sides[i : i+1])
-	}
-	return e
-}
-func (p *bvPolynomialCancellation) mark(i int, h ast.ASTHandle) error {
-	p.pending[i] = h
-	var e error
-	if i == 0 {
-		e = p.visited.Mark(h, true)
-	} else {
-		e = p.multiple.Mark(h, true)
-	}
-	if e == nil {
-		p.pending[i] = ast.ASTHandle{}
 	}
 	return e
 }
@@ -88,14 +74,8 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 	if e = p.getMonomials(1, p.sides[1]); e != nil {
 		return RewriteFailed, e
 	}
-	p.visited, e = ast.NewASTFastMark1(m)
-	if e != nil {
-		return RewriteFailed, e
-	}
-	p.multiple, e = ast.NewASTFastMark2(m)
-	if e != nil {
-		return RewriteFailed, e
-	}
+	p.visited = make(map[ast.ASTHandle]bool)
+	p.multiple = make(map[ast.ASTHandle]bool)
 	p.numeric, e = ast.NewBitVectorPolynomialAdditionNumerals(m)
 	if e != nil {
 		return RewriteFailed, e
@@ -125,9 +105,7 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 			if e != nil {
 				return RewriteFailed, e
 			}
-			if e = p.mark(0, pp); e != nil {
-				return RewriteFailed, e
-			}
+			p.visited[pp] = true
 		}
 	}
 	if move && numCoeffs == 0 {
@@ -158,14 +136,9 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 			if e != nil {
 				return RewriteFailed, e
 			}
-			marked, e := p.visited.IsMarked(pp)
-			if e != nil {
-				return RewriteFailed, e
-			}
+			marked := p.visited[pp]
 			if marked {
-				if e = p.mark(1, pp); e != nil {
-					return RewriteFailed, e
-				}
+				p.multiple[pp] = true
 				hasMultiple = true
 			}
 		}
@@ -208,10 +181,7 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 			if e != nil {
 				return RewriteFailed, e
 			}
-			marked, e := p.multiple.IsMarked(pp)
-			if e != nil {
-				return RewriteFailed, e
-			}
+			marked := p.multiple[pp]
 			if !marked {
 				continue
 			}
@@ -247,12 +217,8 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 			}
 		}
 	}
-	if e = p.lhs.Push(m.Budget(), ast.ASTHandle{}); e != nil {
-		return RewriteFailed, e
-	}
-	if e = p.visited.Reset(); e != nil {
-		return RewriteFailed, e
-	}
+	p.lhs = append(p.lhs, ast.ASTHandle{})
+	clear(p.visited)
 	for i := uint32(0); i < p.monomials[0].Count(); i++ {
 		arg, e := p.monomials[0].At(i)
 		if e != nil {
@@ -269,25 +235,15 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 		if e != nil {
 			return RewriteFailed, e
 		}
-		marked, e := p.multiple.IsMarked(pp)
-		if e != nil {
-			return RewriteFailed, e
-		}
+		marked := p.multiple[pp]
 		if !marked {
-			if e = p.lhs.Push(m.Budget(), arg); e != nil {
-				return RewriteFailed, e
-			}
+			p.lhs = append(p.lhs, arg)
 		} else {
-			seen, e := p.visited.IsMarked(pp)
-			if e != nil {
-				return RewriteFailed, e
-			}
+			seen := p.visited[pp]
 			if seen {
 				continue
 			}
-			if e = p.mark(0, pp); e != nil {
-				return RewriteFailed, e
-			}
+			p.visited[pp] = true
 			pos, e := p.position(pp)
 			if e != nil {
 				return RewriteFailed, e
@@ -304,15 +260,11 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 				if e != nil {
 					return RewriteFailed, e
 				}
-				if e = p.lhs.Push(m.Budget(), node); e != nil {
-					return RewriteFailed, e
-				}
+				p.lhs = append(p.lhs, node)
 			}
 		}
 	}
-	if e = p.rhs.Push(m.Budget(), ast.ASTHandle{}); e != nil {
-		return RewriteFailed, e
-	}
+	p.rhs = append(p.rhs, ast.ASTHandle{})
 	for i := uint32(0); i < p.monomials[1].Count(); i++ {
 		arg, e := p.monomials[1].At(i)
 		if e != nil {
@@ -329,17 +281,12 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 		if e != nil {
 			return RewriteFailed, e
 		}
-		marked, e := p.multiple.IsMarked(pp)
-		if e != nil {
-			return RewriteFailed, e
-		}
+		marked := p.multiple[pp]
 		if marked {
 			continue
 		}
 		if !move {
-			if e = p.rhs.Push(m.Budget(), arg); e != nil {
-				return RewriteFailed, e
-			}
+			p.rhs = append(p.rhs, arg)
 			continue
 		}
 		zero, e := n.Zero(true)
@@ -354,9 +301,7 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 			return RewriteFailed, e
 		}
 		if minus {
-			if e = p.lhs.Push(m.Budget(), pp); e != nil {
-				return RewriteFailed, e
-			}
+			p.lhs = append(p.lhs, pp)
 			continue
 		}
 		if e = n.Negate(true); e != nil {
@@ -380,9 +325,7 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 		if e != nil {
 			return RewriteFailed, e
 		}
-		if e = p.lhs.Push(m.Budget(), node); e != nil {
-			return RewriteFailed, e
-		}
+		p.lhs = append(p.lhs, node)
 	}
 	atRHS := false
 	if move {
@@ -391,12 +334,12 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 			if e != nil {
 				return RewriteFailed, e
 			}
-			if e = bvPolynomialSortMonomials(m, fid, o.ASTOrder, p.lhs.Slice()[1:]); e != nil {
+			if e = bvPolynomialSortMonomials(m, fid, o.ASTOrder, p.lhs[1:]); e != nil {
 				return RewriteFailed, e
 			}
 		}
 		atRHS = true
-	} else if len(p.rhs.Slice()) == 1 || len(p.lhs.Slice()) > 1 {
+	} else if len(p.rhs) == 1 || len(p.lhs) > 1 {
 		atRHS = true
 	}
 	if atRHS {
@@ -411,7 +354,7 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 	insertL := false
 	insertR := false
 	if !atRHS {
-		insertL = len(p.lhs.Slice()) == 1
+		insertL = len(p.lhs) == 1
 		if !insertL {
 			zero, e := n.Zero(false)
 			if e != nil {
@@ -420,7 +363,7 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 			insertL = !zero
 		}
 	} else {
-		insertR = len(p.rhs.Slice()) == 1
+		insertR = len(p.rhs) == 1
 		if !insertR {
 			zero, e := n.Zero(false)
 			if e != nil {
@@ -430,23 +373,23 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 		}
 	}
 	loffset, roffset := 1, 1
-	p.rhs.Slice()[0] = ast.ASTHandle{}
+	p.rhs[0] = ast.ASTHandle{}
 	if insertR {
-		p.rhs.Slice()[0], e = n.Constant(sort)
+		p.rhs[0], e = n.Constant(sort)
 		if e != nil {
 			return RewriteFailed, e
 		}
 		roffset = 0
 	}
-	p.lhs.Slice()[0] = ast.ASTHandle{}
+	p.lhs[0] = ast.ASTHandle{}
 	if insertL {
-		p.lhs.Slice()[0], e = n.Constant(sort)
+		p.lhs[0], e = n.Constant(sort)
 		if e != nil {
 			return RewriteFailed, e
 		}
 		loffset = 0
 	}
-	node, e := m.MkBitVectorPolynomialAddWithInvocation(sort, ast.SliceArguments(p.lhs.Slice()[loffset:]), &p.factory)
+	node, e := m.MkBitVectorPolynomialAddWithInvocation(sort, ast.SliceArguments(p.lhs[loffset:]), &p.factory)
 	if e != nil {
 		return RewriteFailed, e
 	}
@@ -454,7 +397,7 @@ func (p *bvPolynomialCancellation) body(sort ast.ASTHandle, move bool, o BVPolyn
 		return RewriteFailed, e
 	}
 	p.lhsAssigned = true
-	node, e = m.MkBitVectorPolynomialAddWithInvocation(sort, ast.SliceArguments(p.rhs.Slice()[roffset:]), &p.factory)
+	node, e = m.MkBitVectorPolynomialAddWithInvocation(sort, ast.SliceArguments(p.rhs[roffset:]), &p.factory)
 	if e != nil {
 		return RewriteFailed, e
 	}
@@ -475,8 +418,10 @@ func (p *bvPolynomialCancellation) sourceEnd() error {
 	if e := p.childrenSource(); e != nil {
 		return e
 	}
-	p.rhs.Close(p.manager.Budget())
-	p.lhs.Close(p.manager.Budget())
+	clear(p.rhs)
+	p.rhs = nil
+	clear(p.lhs)
+	p.lhs = nil
 	if p.numeric != nil {
 		if e := p.numeric.EndCoefficients(); e != nil {
 			return e
@@ -485,18 +430,8 @@ func (p *bvPolynomialCancellation) sourceEnd() error {
 			return e
 		}
 	}
-	if p.multiple != nil {
-		if e := p.multiple.Close(); e != nil {
-			return e
-		}
-		p.multiple = nil
-	}
-	if p.visited != nil {
-		if e := p.visited.Close(); e != nil {
-			return e
-		}
-		p.visited = nil
-	}
+	p.multiple = nil
+	p.visited = nil
 	p.sourceDone = true
 	return nil
 }
@@ -520,35 +455,17 @@ func (p *bvPolynomialCancellation) Close() error {
 	if e := p.manager.CleanupBitVectorNumeralInvocation(&p.factory); e != nil {
 		return e
 	}
-	p.rhs.Close(p.manager.Budget())
-	p.lhs.Close(p.manager.Budget())
+	clear(p.rhs)
+	p.rhs = nil
+	clear(p.lhs)
+	p.lhs = nil
 	if p.numeric != nil {
 		if e := p.numeric.Close(); e != nil {
 			return e
 		}
 	}
-	if !p.pending[1].IsNull() && p.multiple != nil {
-		if e := p.multiple.ResetMark(p.pending[1]); e != nil {
-			return e
-		}
-		p.pending[1] = ast.ASTHandle{}
-	}
-	if !p.pending[0].IsNull() && p.visited != nil {
-		if e := p.visited.ResetMark(p.pending[0]); e != nil {
-			return e
-		}
-		p.pending[0] = ast.ASTHandle{}
-	}
-	if p.multiple != nil {
-		if e := p.multiple.Close(); e != nil {
-			return e
-		}
-	}
-	if p.visited != nil {
-		if e := p.visited.Close(); e != nil {
-			return e
-		}
-	}
+	p.multiple = nil
+	p.visited = nil
 	p.manager.Budget().Release(p.header)
 	p.header = 0
 	p.closed = true

@@ -4,7 +4,6 @@ package rewriter
 
 import (
 	"reflect"
-	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -76,17 +75,7 @@ func (p *BVPolynomialAdditionCore) sort(o BVPolynomialAdditionOptions, start uin
 	if uint64(start) > uint64(len(p.vector)) {
 		return ast.ErrASTDomain
 	}
-	values := p.vector[start:]
-	var cause error
-	sort.Slice(values, func(i, j int) bool {
-		if cause != nil {
-			return false
-		}
-		var less bool
-		less, cause = bvMonomialLess(p.manager, p.family, o.ASTOrder, values[i], values[j])
-		return less
-	})
-	return cause
+	return bvPolynomialSortMonomials(p.manager, p.family, o.ASTOrder, p.vector[start:])
 }
 func (p *BVPolynomialAdditionCore) body(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialAdditionOptions) (RewriteStatus, error) {
 	m := p.manager
