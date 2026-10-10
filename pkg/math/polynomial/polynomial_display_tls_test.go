@@ -8,11 +8,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func polynomialDisplayTLSOwner(t *testing.T) (*MultivariatePolynomialManager, *util.RationalManager, *umemory.Runtime, *arena.Budget) {
+func polynomialDisplayTLSOwner(t *testing.T) (*MultivariatePolynomialManager, *unumeral.RationalManager, *umemory.Runtime, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 27)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
@@ -20,7 +21,7 @@ func polynomialDisplayTLSOwner(t *testing.T) (*MultivariatePolynomialManager, *u
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = r
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("display has no source checkpoint") }, Cooperation: func() error { panic("display has no source cooperation") }}})
 	serviceMust(t, e)
@@ -33,7 +34,7 @@ func TestPolynomialDisplayExactNumericReceiptAndReplacement(t *testing.T) {
 			z := q.Integers()
 			digits := make([]uint32, 40000)
 			digits[39999] = 1
-			a, foreign := util.Int{}, util.Int{}
+			a, foreign := unumeral.Int{}, unumeral.Int{}
 			serviceMust(t, z.SetLimbs(&a, digits))
 			defer func() {
 				serviceMust(t, r.SetMaxSize(0))
@@ -59,7 +60,7 @@ func TestPolynomialDisplayExactNumericReceiptAndReplacement(t *testing.T) {
 				t.Fatal("actual invoked Copy raw receipt", cause, roots, f.numeric.Allocator)
 			}
 			cause = f.finish(cause)
-			polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&a}, 0)
 			old := roots
 			if replace {
 				serviceMust(t, r.SetMaxSize(0))
@@ -74,7 +75,7 @@ func TestPolynomialDisplayExactNumericReceiptAndReplacement(t *testing.T) {
 				if roots[0] == (umemory.Block{}) || roots == old {
 					t.Fatal("replacement needs a distinct actual token", roots, old)
 				}
-				polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a, &foreign}, 0)
+				polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&a, &foreign}, 0)
 			}
 			serviceMust(t, r.SetMaxSize(0))
 			serviceMust(t, m.CleanupDisplay())
@@ -90,14 +91,14 @@ func TestPolynomialDisplayExactNumericReceiptAndReplacement(t *testing.T) {
 			if f.bodyCause == nil || !errors.Is(f.bodyCause, cause) {
 				t.Fatal("original body cause lost during owning continuation")
 			}
-			polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a, &foreign}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&a, &foreign}, 0)
 		})
 	}
 }
 func TestPolynomialDisplaySinkCreatesForeignPending(t *testing.T) {
 	m, q, r, b := polynomialDisplayTLSOwner(t)
 	z := q.Integers()
-	a, foreign := util.Int{}, util.Int{}
+	a, foreign := unumeral.Int{}, unumeral.Int{}
 	serviceMust(t, z.Copy(&a, &z.Two64))
 	p, e := m.core.MkConstantTake(&a)
 	serviceMust(t, e)
@@ -134,7 +135,7 @@ func TestPolynomialDisplaySinkCreatesForeignPending(t *testing.T) {
 	if !numericPhysicalReservationRefusal(cause) {
 		t.Fatal(cause)
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&foreign}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&foreign}, 0)
 	serviceMust(t, r.SetMaxSize(0))
 	serviceMust(t, m.CleanupDisplay())
 	now, e := z.Allocator.PendingRoots()
@@ -142,5 +143,5 @@ func TestPolynomialDisplaySinkCreatesForeignPending(t *testing.T) {
 	if now != owned {
 		t.Fatal("stream callback roots were attributed to parent display", now, owned)
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&foreign}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&foreign}, 0)
 }

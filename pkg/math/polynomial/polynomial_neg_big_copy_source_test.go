@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialNegDirectBIGCopyActualAllocationPrefixes(t *testing.T) {
@@ -13,18 +12,18 @@ func TestPolynomialNegDirectBIGCopyActualAllocationPrefixes(t *testing.T) {
 	for prefix := int64(0); prefix < 192 && !success; prefix++ {
 		full := polynomialPSCFullFixture(t)
 		c := full.core
-		a := util.NewInt(1)
+		a := unumeral.NewInt(1)
 		serviceMust(t, c.integer.Mul2kInPlace(&a, 15000))
 		term, e := c.monomials.MkMonomial([]MonomialPower{{0, 1}})
 		serviceMust(t, e)
-		p, e := c.MkTerms([]util.Int{a}, []Monomial{term})
+		p, e := c.MkTerms([]unumeral.Int{a}, []Monomial{term})
 		serviceMust(t, e)
 		p = polynomialCaller(t, c, p)
 		serviceMust(t, c.integer.Neg(&a))
 		var receipt polynomialNegInvocationReceipt
 		c.integer.Budget().FailAfter(prefix)
 		result, body := c.negWithReceipt(p, &receipt)
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result}, []*util.Int{&a}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result}, []*unumeral.Int{&a}, 0)
 		if body != nil && polynomialNegNumericPending(&c.numeric) {
 			pending = true
 			if receipt.manager != c || receipt.frame != &c.polynomialNegScope || receipt.invocation != c.invocation || !c.negativeActive {
@@ -51,7 +50,7 @@ func TestPolynomialNegDirectBIGCopyActualAllocationPrefixes(t *testing.T) {
 				t.Fatal("BIG minus_a lost exact magnitude", prefix)
 			}
 		}
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result}, []*util.Int{&a}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result}, []*unumeral.Int{&a}, 0)
 		serviceMust(t, c.integer.Del(&a))
 	}
 	if !success || !pending {

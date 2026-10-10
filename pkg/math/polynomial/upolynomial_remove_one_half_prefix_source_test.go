@@ -4,10 +4,9 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialRemoveOneHalfRootEveryActualPrefix(t *testing.T) {
@@ -16,15 +15,15 @@ func TestUPolynomialRemoveOneHalfRootEveryActualPrefix(t *testing.T) {
 		t.Run(fmt.Sprint(prefix), func(t *testing.T) {
 			c, p := algebraicFixture(t)
 			z := p.config.Integer
-			var big, twice, neg util.Int
+			var big, twice, neg unumeral.Int
 			serviceMust(t, z.SetLimbs(&big, []uint32{1, 2, 3, 4}))
-			two := util.NewInt(2)
+			two := unumeral.NewInt(2)
 			serviceMust(t, z.Mul(&big, &two, &twice))
 			serviceMust(t, z.Copy(&neg, &big))
 			serviceMust(t, z.Neg(&neg))
 			input, e := p.NewPolynomial()
 			serviceMust(t, e)
-			serviceMust(t, p.SetInts(input, []util.Int{neg, twice}))
+			serviceMust(t, p.SetInts(input, []unumeral.Int{neg, twice}))
 			out, e := p.NewPolynomial()
 			serviceMust(t, e)
 			serviceMust(t, z.Del(&big))
@@ -41,11 +40,11 @@ func TestUPolynomialRemoveOneHalfRootEveryActualPrefix(t *testing.T) {
 			if body != nil && !numericPhysicalReservationRefusal(body) {
 				t.Fatal(body)
 			}
-			extra := []*util.Int{&q.values[0], &p.oneHalfRoot.values[0], &p.oneHalfRoot.values[1]}
+			extra := []*unumeral.Int{&q.values[0], &p.oneHalfRoot.values[0], &p.oneHalfRoot.values[1]}
 			if z.MatchesAddMulInvocation(&q.addMul) {
 				extra = append(extra, &q.addMul.Frame.Tmp)
 			}
-			for _, child := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
+			for _, child := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
 				if z.MatchesRawInvocation(child) {
 					for i := uint8(0); i < child.Frame.Count; i++ {
 						extra = append(extra, &child.Frame.Values[i])
@@ -120,7 +119,7 @@ func TestUPolynomialRemoveOneHalfRootIndependentLiteralCases(t *testing.T) {
 			for i, n := range cse.want {
 				a, e := p.read(ov, uint32(i))
 				serviceMust(t, e)
-				if *a != util.NewInt(n) {
+				if *a != unumeral.NewInt(n) {
 					t.Fatal("pseudo-division coefficient", i, *a, n)
 				}
 			}

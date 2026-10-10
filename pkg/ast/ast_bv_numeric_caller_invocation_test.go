@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestASTBitVectorNumericCallerReturnedNormAndInverse(t *testing.T) {
@@ -77,7 +78,7 @@ func TestASTBitVectorNumericCallerExactEveryActualReservation(t *testing.T) {
 				astTestMust(t, q.SetString(&value, text))
 				output, e := q.NewValue()
 				astTestMust(t, e)
-				var returned util.OwnedRational
+				var returned unumeral.OwnedRational
 				var call ASTBitVectorNumeralInvocation
 				m.Budget().FailAfter(ordinal)
 				var body error
@@ -139,7 +140,7 @@ func TestASTBitVectorNumericCallerExactEveryActualReservation(t *testing.T) {
 				if original != text {
 					t.Fatal("input modified", original, text)
 				}
-				if returned != (util.OwnedRational{}) {
+				if returned != (unumeral.OwnedRational{}) {
 					astTestMust(t, q.CleanupValue(&returned))
 				}
 				astTestMust(t, q.CleanupValue(&output))

@@ -9,21 +9,22 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/idgen"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-var ErrPolynomialOwner = util.ErrNumericOwner
-var ErrPolynomialAssertion = util.ErrNumericAssertion
+var ErrPolynomialOwner = unumeral.ErrNumericOwner
+var ErrPolynomialAssertion = unumeral.ErrNumericAssertion
 var ErrPolynomialPartial = errors.New("mpnum: unconstructed polynomial field")
-var ErrPolynomialPending = util.ErrNumericPending
+var ErrPolynomialPending = unumeral.ErrNumericPending
 var ErrPolynomialLive = errors.New("mpnum: live caller polynomials")
 var polynomialOrigins atomic.Uint64
 
 type MultivariatePolynomialConfig struct {
-	Integer     *util.IntegerManager
-	Rationals   *util.RationalManager
+	Integer     *unumeral.IntegerManager
+	Rationals   *unumeral.RationalManager
 	Monomials   *MonomialManager
 	Checkpoint  func() bool
 	Cooperation func() error
@@ -102,7 +103,7 @@ type MultivariatePolynomialCore struct {
 	deletionHead                                                 *PolynomialDeletionHandler
 	callbackDepth                                                uint32
 	callbackValue                                                Polynomial
-	linearConstant                                               util.Int
+	linearConstant                                               unumeral.Int
 	linearConstantActive                                         bool
 	overloadResult                                               Polynomial
 	constantScope                                                polynomialConstantScope
@@ -111,8 +112,8 @@ type MultivariatePolynomialCore struct {
 	singletonGeneration, constantGeneration                      uint64
 	self                                                         *MultivariatePolynomialCore
 	config                                                       MultivariatePolynomialConfig
-	integer                                                      *util.IntegerManager
-	modular                                                      *util.IntegerModularManager
+	integer                                                      *unumeral.IntegerManager
+	modular                                                      *unumeral.IntegerModularManager
 	monomials                                                    *MonomialManager
 	memory                                                       *umemory.Runtime
 	ids                                                          idgen.Generator
@@ -125,8 +126,8 @@ type MultivariatePolynomialCore struct {
 	pending                                                      polynomialCreation
 	som, som2, cheap, cheap2                                     polynomialSOM
 	zero, unit                                                   Polynomial
-	zeroNumeral                                                  util.Int
-	minusOne, constantCopy                                       util.Int
+	zeroNumeral                                                  unumeral.Int
+	minusOne, constantCopy                                       unumeral.Int
 	rationalTerms, linearTerms                                   polynomialNumerals
 	linearMonomials                                              []Monomial
 	origin, header                                               uint64
@@ -200,7 +201,7 @@ func preparePolynomialCore(c MultivariatePolynomialConfig, requireMonomials bool
 		}
 	}
 	var e error
-	m.modular, e = util.NewIntegerModularManager(c.Integer)
+	m.modular, e = unumeral.NewIntegerModularManager(c.Integer)
 	if e != nil {
 		m.originalCause = e
 		m.cleanupCause = m.unwindConstructorMembers()
@@ -235,7 +236,7 @@ func (m *MultivariatePolynomialCore) initializePolynomialCoreBody() error {
 	if e = m.incRefCore(m.zero); e != nil {
 		return e
 	}
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	m.unit, e = m.mkConstCore(&one)
 	if e != nil {
 		return e
@@ -278,7 +279,7 @@ func (m *MultivariatePolynomialCore) incRefCore(p Polynomial) error {
 	}
 	return m.writeWord(p, 0, r+1)
 }
-func (m *MultivariatePolynomialCore) MkCoreTake(as []util.Int, ms []Monomial) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) MkCoreTake(as []unumeral.Int, ms []Monomial) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -287,10 +288,10 @@ func (m *MultivariatePolynomialCore) MkCoreTake(as []util.Int, ms []Monomial) (P
 	}
 	return m.mkCell(uint32(len(as)), as, ms, nil, nil)
 }
-func (m *MultivariatePolynomialCore) mkConstCore(a *util.Int) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) mkConstCore(a *unumeral.Int) (Polynomial, error) {
 	return m.mkConstCoreWithArithmeticReceipt(a, nil)
 }
-func (m *MultivariatePolynomialCore) mkConstCoreWithArithmeticReceipt(a *util.Int, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) mkConstCoreWithArithmeticReceipt(a *unumeral.Int, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	if m.singletonReference {
 		return Polynomial{}, ErrPolynomialPending
 	}
@@ -324,10 +325,10 @@ func (m *MultivariatePolynomialCore) mkConstCoreWithArithmeticReceipt(a *util.In
 	}
 	return m.mkCell(1, nil, []Monomial{u}, nil, a)
 }
-func (m *MultivariatePolynomialCore) MkConstantTake(a *util.Int) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) MkConstantTake(a *unumeral.Int) (Polynomial, error) {
 	return m.mkConstantTakeWithArithmeticReceipt(a, nil)
 }
-func (m *MultivariatePolynomialCore) mkConstantTakeWithArithmeticReceipt(a *util.Int, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) mkConstantTakeWithArithmeticReceipt(a *unumeral.Int, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -363,7 +364,7 @@ func (m *MultivariatePolynomialCore) mkVariableWithReceipt(v, k uint32, receipt 
 	if m.singletonReference {
 		return Polynomial{}, ErrPolynomialPending
 	}
-	as := [1]util.Int{util.NewInt(1)}
+	as := [1]unumeral.Int{unumeral.NewInt(1)}
 	var scope *polynomialVariableScope
 	if receipt != nil {
 		scope = &m.variableLocal
@@ -426,7 +427,7 @@ func (m *MultivariatePolynomialCore) mkVariableWithReceipt(v, k uint32, receipt 
 	scope.active = false
 	return result, nil
 }
-func (m *MultivariatePolynomialCore) MkTerms(as []util.Int, ms []Monomial) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) MkTerms(as []unumeral.Int, ms []Monomial) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -653,7 +654,7 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 		return e
 	}
 	if m.modular != nil && !m.modular.Closed() {
-		for _, a := range [3]*util.Int{&m.minusOne, &m.negativeCoefficient, &m.constantCopy} {
+		for _, a := range [3]*unumeral.Int{&m.minusOne, &m.negativeCoefficient, &m.constantCopy} {
 			if e := m.deleteNumeral(a); e != nil {
 				return e
 			}
@@ -696,7 +697,7 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 	return nil
 }
 
-func polynomialIntegerReady(m *util.IntegerManager) error { return m.SourceReady() }
+func polynomialIntegerReady(m *unumeral.IntegerManager) error { return m.SourceReady() }
 
 func (m *MultivariatePolynomialCore) SetZPUint64(p uint64) error {
 	if e := m.check(); e != nil {

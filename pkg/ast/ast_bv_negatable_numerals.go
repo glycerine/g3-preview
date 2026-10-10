@@ -2,18 +2,17 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorNegatableNumerals retains default r and its distinct bitwise-complement return.
 type BitVectorNegatableNumerals struct {
 	self                   *BitVectorNegatableNumerals
 	manager                *ASTManager
-	values                 [2]util.OwnedRational
+	values                 [2]unumeral.OwnedRational
 	placed                 [2]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	header                 uint64
 	sourceCause            error
@@ -90,7 +89,7 @@ func (n *BitVectorNegatableNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorNegatableNumerals) Read(arg ASTHandle, width *uint32) (bool, error) {
@@ -113,7 +112,7 @@ func (n *BitVectorNegatableNumerals) Complement(width uint32) error {
 	q := n.manager.numerals
 	v, e := q.BitwiseNotWithInvocation(width, &n.values[0], &n.scalar)
 	n.values[1] = v
-	n.placed[1] = v != (util.OwnedRational{})
+	n.placed[1] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}

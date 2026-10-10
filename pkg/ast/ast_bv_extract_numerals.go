@@ -3,9 +3,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorExtractNumerals owns default v/val and each reached power return
@@ -14,9 +13,9 @@ import (
 type BitVectorExtractNumerals struct {
 	self                   *BitVectorExtractNumerals
 	manager                *ASTManager
-	values                 [3]util.OwnedRational
+	values                 [3]unumeral.OwnedRational
 	placed                 [3]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	header                 uint64
 	sourceCause            error
@@ -69,7 +68,7 @@ func (n *BitVectorExtractNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorExtractNumerals) Read(arg ASTHandle, width *uint32) (bool, error) {
@@ -89,7 +88,7 @@ func (n *BitVectorExtractNumerals) power(width uint32, modulo bool) error {
 	}
 	q := n.manager.numerals
 	v, e := q.PowerOfTwoWithInvocation(width, &n.scalar)
-	n.values[1], n.placed[1] = v, v != (util.OwnedRational{})
+	n.values[1], n.placed[1] = v, v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}

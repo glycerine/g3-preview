@@ -2,18 +2,17 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorMultiplyBoundNumerals retains original operand/limit/product locals.
 type BitVectorMultiplyBoundNumerals struct {
 	self                   *BitVectorMultiplyBoundNumerals
 	manager                *ASTManager
-	values                 [6]util.OwnedRational
+	values                 [6]unumeral.OwnedRational
 	placed                 [6]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	header                 uint64
 	sourceCause            error
 	stopped, ended, closed bool
@@ -88,7 +87,7 @@ func (n *BitVectorMultiplyBoundNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorMultiplyBoundNumerals) Read(i int, arg ASTHandle, width *uint32) (bool, error) {
@@ -122,7 +121,7 @@ func (n *BitVectorMultiplyBoundNumerals) Power(i int, width uint32) error {
 	}
 	v, e := n.manager.numerals.PowerOfTwoWithInvocation(width, &n.scalar)
 	n.values[i] = v
-	n.placed[i] = v != (util.OwnedRational{})
+	n.placed[i] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -137,7 +136,7 @@ func (n *BitVectorMultiplyBoundNumerals) Product(i int) error {
 	}
 	v, e := n.manager.numerals.MulWithInvocation(&n.values[0], &n.values[1], &n.scalar)
 	n.values[i] = v
-	n.placed[i] = v != (util.OwnedRational{})
+	n.placed[i] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -169,7 +168,7 @@ func (n *BitVectorMultiplyBoundNumerals) NegativeLimit() error {
 	}
 	v, e := n.manager.numerals.NegWithInvocation(&n.values[3], &n.scalar)
 	n.values[5] = v
-	n.placed[5] = v != (util.OwnedRational{})
+	n.placed[5] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}

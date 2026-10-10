@@ -7,13 +7,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The concrete native mapping is borrowed by the two column permutations.
 func TestPolynomialLexNativeMappingCyclesPreserveTermPairs(t *testing.T) {
 	m, p, _ := polynomialLexFixture(t)
-	oldA := make([]util.Int, 5)
+	oldA := make([]unumeral.Int, 5)
 	oldM := make([]Monomial, 5)
 	for i := uint32(0); i < 5; i++ {
 		var e error
@@ -73,7 +73,7 @@ func TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject(t *test
 	}
 	// Exact borrowed object token is authority; a second real object cannot be
 	// substituted while keeping the first polynomial locator.
-	other, e := m.core.MkTerms([]util.Int{util.NewInt(2)}, []Monomial{oldM})
+	other, e := m.core.MkTerms([]unumeral.Int{unumeral.NewInt(2)}, []Monomial{oldM})
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(other))
 	l, e := m.core.polynomialLocation(other)
@@ -134,7 +134,7 @@ func TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard(t *test
 
 func TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot(t *testing.T) {
 	m, p, ms := polynomialLexFixture(t)
-	old, e := m.core.MkTerms([]util.Int{util.NewInt(31)}, []Monomial{ms[0]})
+	old, e := m.core.MkTerms([]unumeral.Int{unumeral.NewInt(31)}, []Monomial{ms[0]})
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(old))
 	a, e := m.core.captureCoefficientPointer(old, 0)
@@ -142,7 +142,7 @@ func TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot(t *testing.T) 
 	mono, e := m.core.captureMonomialPointer(old, 0)
 	serviceMust(t, e)
 	serviceMust(t, m.core.DecRef(old))
-	fresh, e := m.core.MkTerms([]util.Int{util.NewInt(47)}, []Monomial{ms[1]})
+	fresh, e := m.core.MkTerms([]unumeral.Int{unumeral.NewInt(47)}, []Monomial{ms[1]})
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(fresh))
 	if fresh.slot != old.slot || fresh.generation == old.generation {
@@ -156,7 +156,7 @@ func TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot(t *testing.T) 
 	}
 	got, e := m.core.coefficientCore(fresh, 0)
 	serviceMust(t, e)
-	if got != util.NewInt(47) {
+	if got != unumeral.NewInt(47) {
 		t.Fatal("replacement untouched", got)
 	}
 	polynomialImpPhysicalAuditValues(t, m, []Polynomial{p, fresh})

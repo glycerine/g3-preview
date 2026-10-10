@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // The early SET has no source NUM/vector declaration. Its embedded binding
@@ -18,7 +17,7 @@ type upolyFactorConstantBinding struct {
 	executing  bool
 	result     *UPolynomialFactors
 	record     *upolyFactorConstantCall
-	normalize  util.IntegerNormalizeInvocationReceipt
+	normalize  unumeral.IntegerNormalizeInvocationReceipt
 	numeric    polynomialNumericRoots // remains empty until an allocating record exists
 }
 type upolyFactorConstantCall struct {
@@ -28,12 +27,12 @@ type upolyFactorConstantCall struct {
 	next                             *upolyFactorConstantCall
 	header, invocation               uint64
 	numeric                          polynomialNumericRoots
-	normalize                        util.IntegerNormalizeInvocationReceipt
+	normalize                        unumeral.IntegerNormalizeInvocationReceipt
 	bodyCause, sourceCause, ownCause error
 	ownExecuting, retired            bool
 }
 
-func (c integerAllocationInvocationContext) factorFrontendConstantFrame(z *util.IntegerManager) *upolyFactorConstantBinding {
+func (c integerAllocationInvocationContext) factorFrontendConstantFrame(z *unumeral.IntegerManager) *upolyFactorConstantBinding {
 	b := c.factorFrontendConstant
 	if z == nil || !z.ValidOwner() || b == nil || b.service == nil {
 		return nil
@@ -55,7 +54,7 @@ func (s *UPolynomialFactorizationService) ownsFrontendConstantCall(q *upolyFacto
 	}
 	return false
 }
-func (c integerAllocationInvocationContext) prepareFactorFrontendConstantHistory(z *util.IntegerManager) error {
+func (c integerAllocationInvocationContext) prepareFactorFrontendConstantHistory(z *unumeral.IntegerManager) error {
 	b := c.factorFrontendConstantFrame(z)
 	if b == nil || b.record != nil {
 		return nil
@@ -70,7 +69,7 @@ func (c integerAllocationInvocationContext) prepareFactorFrontendConstantHistory
 	b.service.frontendConstantCalls = q
 	return nil
 }
-func (s *UPolynomialFactorizationService) setFrontendConstant(fs *UPolynomialFactors, a *util.Int) (cause error) {
+func (s *UPolynomialFactorizationService) setFrontendConstant(fs *UPolynomialFactors, a *unumeral.Int) (cause error) {
 	b := &s.frontendConstant
 	if b.executing || b.invocation == ^uint64(0) {
 		return ErrUPolynomialCleanupPending

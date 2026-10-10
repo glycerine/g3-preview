@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The registered driver dispatches optimized PSC, not this dormant chain1
@@ -91,7 +91,7 @@ func TestPolynomialSubresultantChainDefectiveGapAndSwappedInputs(t *testing.T) {
 		}
 		v, e := c.Coefficient(got, 0)
 		serviceMust(t, e)
-		if v != util.NewInt(2) {
+		if v != unumeral.NewInt(2) {
 			t.Fatal("independent p(-1) result", v)
 		}
 	}

@@ -3,6 +3,7 @@ package util
 
 import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
 )
@@ -13,8 +14,8 @@ type paramsPhysicalValueOwner struct {
 }
 
 type paramsPhysicalRationalOwner struct {
-	Service *RationalService
-	Value   *OwnedRational
+	Service *unumeral.RationalService
+	Value   *unumeral.OwnedRational
 }
 
 type numericPhysicalExtraOwners struct {
@@ -22,12 +23,12 @@ type numericPhysicalExtraOwners struct {
 	DebugContexts        []*DebugContext
 	ParamsRationalValues []paramsPhysicalRationalOwner
 	ParamsValues         []paramsPhysicalValueOwner
-	RationalServices     []*RationalService
-	Integers             []*Int
-	Rationals            []*Rational
-	RationalManagers     []*RationalManager
-	BinaryValues         []*BinaryRational
-	BinaryManagers       []*BinaryRationalManager
+	RationalServices     []*unumeral.RationalService
+	Integers             []*unumeral.Int
+	Rationals            []*unumeral.Rational
+	RationalManagers     []*unumeral.RationalManager
+	BinaryValues         []*unumeral.BinaryRational
+	BinaryManagers       []*unumeral.BinaryRationalManager
 }
 
 func numericPhysicalExtraNumerals(extras []numericPhysicalExtraOwners, addInt func(reflect.Value)) {
@@ -73,12 +74,12 @@ func numericPhysicalExtraNumerals(extras []numericPhysicalExtraOwners, addInt fu
 
 		for _, owner := range x.ParamsRationalValues {
 			if owner.Service == nil || owner.Value == nil {
-				panic(ErrRationalServiceOwner)
+				panic(unumeral.ErrRationalServiceOwner)
 			}
 			service := reflect.ValueOf(owner.Service).Elem()
 			value := reflect.ValueOf(owner.Value).Elem()
 			if testFieldBySourceName(service, "self").Pointer() != reflect.ValueOf(owner.Service).Pointer() || testFieldBySourceName(value, "ownerID").Uint() == 0 || testFieldBySourceName(value, "ownerID").Uint() != testFieldBySourceName(service, "ownerID").Uint() {
-				panic(ErrRationalServiceOwner)
+				panic(unumeral.ErrRationalServiceOwner)
 			}
 			addRat(testFieldBySourceName(value, "raw"))
 		}
@@ -99,7 +100,7 @@ func numericPhysicalExtraNumerals(extras []numericPhysicalExtraOwners, addInt fu
 					}
 					raw := reflect.ValueOf(&frame.Next.Rat).Elem()
 					if testFieldBySourceName(raw, "ownerID").Uint() != testFieldBySourceName(reflect.ValueOf(c.NumeralsField).Elem(), "ownerID").Uint() {
-						panic(ErrRationalServiceOwner)
+						panic(unumeral.ErrRationalServiceOwner)
 					}
 					addRat(testFieldBySourceName(raw, "raw"))
 				}
@@ -191,7 +192,7 @@ type numericPhysicalGraph struct{ Named, Unpublished, Cleanup, Pending, Objects 
 
 // Read-only independent physical ownership audit. Reflection reads scalar
 // metadata; it neither borrows mutable payloads nor repairs failed numerals.
-func numericAuditPhysical(t *testing.T, manager *IntegerManager, extras ...numericPhysicalExtraOwners) numericPhysicalGraph {
+func numericAuditPhysical(t *testing.T, manager *unumeral.IntegerManager, extras ...numericPhysicalExtraOwners) numericPhysicalGraph {
 	t.Helper()
 	var graph numericPhysicalGraph
 	z := reflect.ValueOf(manager).Elem()

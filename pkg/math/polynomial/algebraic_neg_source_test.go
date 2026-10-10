@@ -7,8 +7,8 @@ import (
 	"math"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestAlgebraicNegLiteralNullBasicAndRoot(t *testing.T) {
@@ -17,7 +17,7 @@ func TestAlgebraicNegLiteralNullBasicAndRoot(t *testing.T) {
 	c.config.Rationals.Budget().FailAfter(0)
 	serviceMust(t, c.Neg(&zero))
 	c.config.Rationals.Budget().FailAfter(-1)
-	q := util.NewRational()
+	q := unumeral.NewRational()
 	serviceMust(t, c.config.Rationals.SetFraction(&q, 3, 2))
 	var a Algebraic
 	serviceMust(t, c.SetRational(&a, &q))
@@ -33,7 +33,7 @@ func TestAlgebraicNegLiteralNullBasicAndRoot(t *testing.T) {
 	poly := algebraicPolynomial(t, p, -2, 0, 0, 1)
 	v, e := p.wholeView(poly)
 	serviceMust(t, e)
-	var lower, upper util.BinaryRational
+	var lower, upper unumeral.BinaryRational
 	serviceMust(t, c.config.Binary.SetInt32(&lower, 1))
 	serviceMust(t, c.config.Binary.SetInt32(&upper, 2))
 	serviceMust(t, c.SetRoot(&a, v, &lower, &upper, true))
@@ -75,7 +75,7 @@ func TestAlgebraicNegMinimumEveryActualReservationPrefix(t *testing.T) {
 			c, _ := algebraicFixture(t)
 			z := c.config.Rationals.Integers()
 			t.Cleanup(func() { z.Budget().FailAfter(-1) })
-			q := util.NewRational()
+			q := unumeral.NewRational()
 			serviceMust(t, c.config.Rationals.SetInt32(&q, math.MinInt32))
 			var a Algebraic
 			serviceMust(t, c.SetRational(&a, &q))
@@ -135,9 +135,9 @@ func TestAlgebraicNegRootHornerEveryActualReservationPrefix(t *testing.T) {
 			original := algebraicPolynomial(t, p, 1, math.MinInt32, 1)
 			v, e := p.wholeView(original)
 			serviceMust(t, e)
-			var lower, upper util.BinaryRational
+			var lower, upper unumeral.BinaryRational
 			serviceMust(t, c.config.Binary.SetInt32(&lower, math.MaxInt32))
-			var upperInt util.Int
+			var upperInt unumeral.Int
 			serviceMust(t, z.SetInt64(&upperInt, int64(math.MaxInt32)+3))
 			serviceMust(t, c.config.Binary.SetInteger(&upper, &upperInt))
 			var a Algebraic
@@ -160,7 +160,7 @@ func TestAlgebraicNegRootHornerEveryActualReservationPrefix(t *testing.T) {
 					t.Fatal("actual root/Horner numeric leaf has no concrete caller")
 				}
 			}
-			var extra []*util.Int
+			var extra []*unumeral.Int
 			if q.eval.constructed == 2 {
 				extra = append(extra, &q.eval.values[0], &q.eval.values[1])
 			}

@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialSOMNormalizeInvocationReceipt struct {
@@ -16,8 +16,8 @@ type polynomialSOMNormalizeScope struct {
 	active, executing, finishing, ownEnded bool
 	invocation                             uint64
 	receipt                                polynomialSOMNormalizeInvocationReceipt
-	normalize                              util.IntegerNormalizeInvocationReceipt
-	gcdRaw, divisionRaw, extendedRaw       util.IntegerRawInvocationReceipt
+	normalize                              unumeral.IntegerNormalizeInvocationReceipt
+	gcdRaw, divisionRaw, extendedRaw       unumeral.IntegerRawInvocationReceipt
 
 	sourceCause, ownCause error
 }
@@ -46,25 +46,25 @@ func (m *MultivariatePolynomialCore) hasSOMNormalizeInvocationHistory(r *polynom
 	}
 	return b.owner == m && r.frame == &b.normalizeScope && r.frame.invocation == r.invocation
 }
-func numericIntegerManager_somNormalizeAllocationRoots(m *util.IntegerManager, r *polynomialSOMNormalizeInvocationReceipt) *polynomialNumericRoots {
+func numericIntegerManager_somNormalizeAllocationRoots(m *unumeral.IntegerManager, r *polynomialSOMNormalizeInvocationReceipt) *polynomialNumericRoots {
 	if m == nil || !m.ValidOwner() || r == nil || r.manager == nil || !r.manager.hasSOMNormalizeInvocationHistory(r) || r.manager.integer != m || !r.frame.active || !r.frame.executing || r.manager.callbackDepth != 0 {
 		return nil
 	}
 	return &r.buffer.gcdNumeric
 }
-func (c integerAllocationInvocationContext) somNormalizeReceipt(m *util.IntegerManager) *polynomialSOMNormalizeInvocationReceipt {
+func (c integerAllocationInvocationContext) somNormalizeReceipt(m *unumeral.IntegerManager) *polynomialSOMNormalizeInvocationReceipt {
 	if c.somNormalize == nil || c.somNormalizeInvocation == 0 || c.somNormalizeInvocation != c.somNormalize.invocation || numericIntegerManager_somNormalizeAllocationRoots(m, c.somNormalize) == nil {
 		return nil
 	}
 	return c.somNormalize
 }
-func numericIntegerModularManager_somNormalizeAllocationContext(m *util.IntegerModularManager, r *polynomialSOMNormalizeInvocationReceipt) integerAllocationInvocationContext {
+func numericIntegerModularManager_somNormalizeAllocationContext(m *unumeral.IntegerModularManager, r *polynomialSOMNormalizeInvocationReceipt) integerAllocationInvocationContext {
 	if m == nil || m.Integers() == nil || numericIntegerManager_somNormalizeAllocationRoots(m.Integers(), r) == nil || r.manager.modular != m {
 		return integerAllocationInvocationContext{}
 	}
 	return integerAllocationInvocationContext{somNormalize: r, somNormalizeInvocation: r.invocation}
 }
-func numericIntegerModularManager_gcdManyIndexedWithSOMNormalizeReceipt(m *util.IntegerModularManager, as util.IntegerArrayView, out *util.Int, r *polynomialSOMNormalizeInvocationReceipt) error {
+func numericIntegerModularManager_gcdManyIndexedWithSOMNormalizeReceipt(m *unumeral.IntegerModularManager, as unumeral.IntegerArrayView, out *unumeral.Int, r *polynomialSOMNormalizeInvocationReceipt) error {
 	if e := m.Check(); e != nil {
 		return e
 	}
@@ -73,25 +73,25 @@ func numericIntegerModularManager_gcdManyIndexedWithSOMNormalizeReceipt(m *util.
 	}
 	return m.AssertNormalized(out)
 }
-func numericIntegerModularManager_divWithSOMNormalizeReceipt(m *util.IntegerModularManager, a, b, out *util.Int, r *polynomialSOMNormalizeInvocationReceipt) error {
+func numericIntegerModularManager_divWithSOMNormalizeReceipt(m *unumeral.IntegerModularManager, a, b, out *unumeral.Int, r *polynomialSOMNormalizeInvocationReceipt) error {
 	return m.WithAllocationContext((numericIntegerModularManager_somNormalizeAllocationContext(m, r)).utility(m.Integers())).Div(a, b, out)
 }
-func (c integerAllocationInvocationContext) recordSOMNormalizationRaw(m *util.IntegerManager, r *util.IntegerRawInvocationReceipt) {
+func (c integerAllocationInvocationContext) recordSOMNormalizationRaw(m *unumeral.IntegerManager, r *unumeral.IntegerRawInvocationReceipt) {
 	p := c.somNormalizeReceipt(m)
 	if p == nil || !m.MatchesRawInvocation(r) {
 		return
 	}
 
 	switch r.Kind() {
-	case util.IntegerRawGCD:
+	case unumeral.IntegerRawGCD:
 		p.frame.gcdRaw = *r
-	case util.IntegerRawDivision:
+	case unumeral.IntegerRawDivision:
 		p.frame.divisionRaw = *r
-	case util.IntegerRawExtendedGCD:
+	case unumeral.IntegerRawExtendedGCD:
 		p.frame.extendedRaw = *r
 	}
 }
-func numericIntegerManager_somNormalizeNumericSourceCause(m *util.IntegerManager, r *polynomialSOMNormalizeInvocationReceipt) error {
+func numericIntegerManager_somNormalizeNumericSourceCause(m *unumeral.IntegerManager, r *polynomialSOMNormalizeInvocationReceipt) error {
 	if r == nil || r.manager == nil || !r.manager.hasSOMNormalizeInvocationHistory(r) || r.manager.integer != m {
 		return nil
 	}
@@ -108,7 +108,7 @@ func numericIntegerManager_somNormalizeNumericSourceCause(m *util.IntegerManager
 	}
 	return nil
 }
-func numericIntegerManager_cleanupSOMNormalizationNumeric(m *util.IntegerManager, r *polynomialSOMNormalizeInvocationReceipt, abort bool) error {
+func numericIntegerManager_cleanupSOMNormalizationNumeric(m *unumeral.IntegerManager, r *polynomialSOMNormalizeInvocationReceipt, abort bool) error {
 	if r == nil || r.manager == nil || !r.manager.hasSOMNormalizeInvocationHistory(r) || r.manager.integer != m {
 		return nil
 	}

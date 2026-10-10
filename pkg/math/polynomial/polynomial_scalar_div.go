@@ -2,21 +2,21 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialScalarDivScope struct {
-	a                        util.Int
+	a                        unumeral.Int
 	returned                 Polynomial
 	active, ended, executing bool
-	normalize                util.IntegerNormalizeInvocationReceipt
+	normalize                unumeral.IntegerNormalizeInvocationReceipt
 
-	transport              util.Int
+	transport              unumeral.Int
 	transportBuffer        *polynomialSOM
 	transportSlot          uint32
 	transportBound         bool
-	division               util.IntegerScalarRawScope
-	extended               util.IntegerScalarRawScope
+	division               unumeral.IntegerScalarRawScope
+	extended               unumeral.IntegerScalarRawScope
 	bodyCause, sourceCause error
 	invocation             uint64
 	numeric                polynomialNumericRoots
@@ -127,13 +127,13 @@ func (m *MultivariatePolynomialCore) cleanupScalarDivPhase(abort bool) error {
 	}
 	return nil
 }
-func (m *MultivariatePolynomialCore) scalarDiv(p Polynomial, d *util.Int) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) scalarDiv(p Polynomial, d *unumeral.Int) (Polynomial, error) {
 	return m.scalarDivWithReceipt(p, d, nil)
 }
-func (m *MultivariatePolynomialCore) scalarDivWithReceipt(p Polynomial, d *util.Int, receipt *polynomialScalarDivInvocationReceipt) (result Polynomial, cause error) {
+func (m *MultivariatePolynomialCore) scalarDivWithReceipt(p Polynomial, d *unumeral.Int, receipt *polynomialScalarDivInvocationReceipt) (result Polynomial, cause error) {
 	return m.scalarDivWithParentReceipts(p, d, receipt, nil, nil)
 }
-func (m *MultivariatePolynomialCore) scalarDivWithParentReceipts(p Polynomial, d *util.Int, receipt *polynomialScalarDivInvocationReceipt, appendReceipt *polynomialCheapAppendInvocationReceipt, factoryReceipt *polynomialFactoryInvocationReceipt) (result Polynomial, cause error) {
+func (m *MultivariatePolynomialCore) scalarDivWithParentReceipts(p Polynomial, d *unumeral.Int, receipt *polynomialScalarDivInvocationReceipt, appendReceipt *polynomialCheapAppendInvocationReceipt, factoryReceipt *polynomialFactoryInvocationReceipt) (result Polynomial, cause error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}

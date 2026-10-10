@@ -2,7 +2,8 @@ package polynomial
 
 import (
 	"errors"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
 )
 
@@ -21,7 +22,7 @@ func TestAlgebraicNativeLocatorAndVectorOwnership(t *testing.T) {
 	})
 	var bigToken uint64
 	for i := range handles {
-		value := util.NewRational()
+		value := unumeral.NewRational()
 		if i == 0 {
 			serviceMust(t, z.SetUint64(value.BorrowNumerator(), 1<<40|1))
 			bigToken = value.BorrowNumerator().NativeCellToken()
@@ -73,7 +74,7 @@ func TestAlgebraicNativeLocatorAndVectorOwnership(t *testing.T) {
 		t.Fatal("native vector reset retained cell ownership")
 	}
 	budget.FailAfter(-1)
-	value := util.NewRational()
+	value := unumeral.NewRational()
 	serviceMust(t, q.SetFraction(&value, 7, 3))
 	var fresh Algebraic
 	serviceMust(t, c.SetTake(&fresh, &value))

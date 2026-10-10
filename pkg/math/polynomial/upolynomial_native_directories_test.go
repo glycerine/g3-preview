@@ -2,9 +2,8 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialNativeDescriptorAndBackingDirectories(t *testing.T) {
@@ -53,14 +52,14 @@ func TestUPolynomialNativeDescriptorAndBackingDirectories(t *testing.T) {
 			t.Fatal("native backing growth reserved bytes", i, e)
 		}
 		b.FailAfter(-1)
-		value := util.NewInt(int32(17*i + 3))
+		value := unumeral.NewInt(int32(17*i + 3))
 		if e := m.SetCoefficient(owned[i], 0, &value); e != nil {
 			t.Fatal(e)
 		}
 	}
 	for i := 0; i < 257; i++ {
-		var value util.Int
-		if e := m.ReadCoefficient(owned[i], 0, &value); e != nil || value != util.NewInt(int32(17*i+3)) {
+		var value unumeral.Int
+		if e := m.ReadCoefficient(owned[i], 0, &value); e != nil || value != unumeral.NewInt(int32(17*i+3)) {
 			t.Fatal("independent backing row", i, value, e)
 		}
 	}

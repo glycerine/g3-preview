@@ -3,8 +3,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *AlgebraicRootCore) comparisonCleanup() error {
@@ -18,7 +17,7 @@ func (m *AlgebraicRootCore) comparisonCleanup() error {
 	return nil
 }
 
-func (m *AlgebraicRootCore) compareBasic(a, b *util.Rational) (int, error) {
+func (m *AlgebraicRootCore) compareBasic(a, b *unumeral.Rational) (int, error) {
 	same, e := m.config.Rationals.Equal(a, b)
 	if e != nil {
 		return 0, e
@@ -35,7 +34,7 @@ func (m *AlgebraicRootCore) compareBasic(a, b *util.Rational) (int, error) {
 	}
 	return 1, nil
 }
-func (m *AlgebraicRootCore) compareRootRational(r *algebraicRecord, b *util.Rational) (int, error) {
+func (m *AlgebraicRootCore) compareRootRational(r *algebraicRecord, b *unumeral.Rational) (int, error) {
 	bm, qm, p := m.config.Binary, m.config.Rationals, m.config.Polynomials
 	below, e := bm.LessEqualRational(&(*r.interval.BorrowUpper()), qm, b)
 	if e != nil {
@@ -74,13 +73,13 @@ func (m *AlgebraicRootCore) compareRootRational(r *algebraicRecord, b *util.Rati
 
 // CompareRational uses source basic equality before less-than, or the actual
 // isolating-interval tests followed by the polynomial's sign at the rational.
-func (m *AlgebraicRootCore) CompareRational(a *Algebraic, b *util.Rational) (int, error) {
+func (m *AlgebraicRootCore) CompareRational(a *Algebraic, b *unumeral.Rational) (int, error) {
 	l, e := m.location(a)
 	if e != nil {
 		return 0, e
 	}
 	if l == nil {
-		zero := util.NewRational()
+		zero := unumeral.NewRational()
 		return m.compareBasic(&zero, b)
 	}
 	r, e := m.load(l)
@@ -102,7 +101,7 @@ func (m *AlgebraicRootCore) Compare(a, b *Algebraic) (int, error) {
 	if e != nil {
 		return 0, e
 	}
-	ar, br := algebraicRecord{value: util.NewRational()}, algebraicRecord{value: util.NewRational()}
+	ar, br := algebraicRecord{value: unumeral.NewRational()}, algebraicRecord{value: unumeral.NewRational()}
 	if al != nil {
 		ar, e = m.load(al)
 		if e != nil {

@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialHenselActualTmpStopProtectsOlderPairFields(t *testing.T) {
@@ -18,17 +18,17 @@ func TestUPolynomialHenselActualTmpStopProtectsOlderPairFields(t *testing.T) {
 	h.rm, e = NewRelatedUPolynomialManager(s.manager)
 	serviceMust(t, e)
 	h.constructed = 1
-	five := util.NewInt(5)
+	five := unumeral.NewInt(5)
 	serviceMust(t, h.rm.SetZP(&five))
 	for i := uint8(2); i <= 7; i++ {
 		m, v := h.vector(i)
 		h.constructed = i
-		serviceMust(t, m.set(v, []util.Int{util.NewInt(1)}))
+		serviceMust(t, m.set(v, []unumeral.Int{unumeral.NewInt(1)}))
 		a, e := m.read(m.stateView(v), 0)
 		serviceMust(t, e)
 		serviceMust(t, q.Integers().Copy(a, &q.Integers().Two64))
 	}
-	var large util.Int
+	var large unumeral.Int
 	words := make([]uint32, 80)
 	words[79] = 1
 	serviceMust(t, q.Integers().SetLimbs(&large, words))

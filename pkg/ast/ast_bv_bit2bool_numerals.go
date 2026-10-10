@@ -3,9 +3,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorBit2BoolNumerals retains v and reached literal/subtraction return
@@ -13,9 +12,9 @@ import (
 type BitVectorBit2BoolNumerals struct {
 	self                   *BitVectorBit2BoolNumerals
 	manager                *ASTManager
-	values                 [3]util.OwnedRational // v, literal one, subtraction return
+	values                 [3]unumeral.OwnedRational // v, literal one, subtraction return
 	placed                 [3]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	header                 uint64
 	sourceCause            error
@@ -63,7 +62,7 @@ func (n *BitVectorBit2BoolNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorBit2BoolNumerals) Read(arg ASTHandle) (yes bool, result error) {
@@ -122,7 +121,7 @@ func (n *BitVectorBit2BoolNumerals) LiteralOne(subtract bool) (node ASTHandle, r
 	index := 1
 	if subtract {
 		n.values[2], e = q.SubWithInvocation(&n.values[1], &n.values[0], &n.scalar)
-		n.placed[2] = n.values[2] != (util.OwnedRational{})
+		n.placed[2] = n.values[2] != (unumeral.OwnedRational{})
 		if e != nil {
 			return node, e
 		}

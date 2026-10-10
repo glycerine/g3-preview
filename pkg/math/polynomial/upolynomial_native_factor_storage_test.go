@@ -1,7 +1,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
 )
 
@@ -50,9 +50,9 @@ func TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews(t *testing.T) {
 	serviceMust(t, e)
 	defer func() { b.FailAfter(-1); serviceMust(t, fs.Close()) }()
 	big := upolySourceNew(t, m, nil)
-	var coefficient util.Int
+	var coefficient unumeral.Int
 	serviceMust(t, q.Integers().SetUint64(&coefficient, 1<<40))
-	serviceMust(t, m.SetInts(big, []util.Int{coefficient, util.NewInt(1)}))
+	serviceMust(t, m.SetInts(big, []unumeral.Int{coefficient, unumeral.NewInt(1)}))
 	serviceMust(t, q.Integers().Del(&coefficient))
 	serviceMust(t, fs.PushCopy(mustUPolyView(t, m, big), 1))
 	view, e := fs.FactorView(0)
@@ -81,7 +81,7 @@ func TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews(t *testing.T) {
 		serviceMust(t, e)
 		row, e := m.read(v, 0)
 		serviceMust(t, e)
-		if *row != util.NewInt(2) {
+		if *row != unumeral.NewInt(2) {
 			t.Fatal(i, *row)
 		}
 	}

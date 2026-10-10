@@ -7,6 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"os"
 )
@@ -47,8 +48,8 @@ func gparamsGraph(g *util.GlobalParams) uint64 {
 }
 
 type paramsPhysicalRationalOwner struct {
-	Service *util.RationalService
-	Value   *util.OwnedRational
+	Service *unumeral.RationalService
+	Value   *unumeral.OwnedRational
 }
 
 func paramsDecFinish(t *testing.T, fn func() error) {
@@ -74,14 +75,14 @@ func numericStorageReservationRefusal(err error) bool {
 	var physical umemory.Failure
 	return errors.As(err, &physical) && physical.Kind == umemory.FailureMemout && physical.ErrorCode() == 101
 }
-func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.RationalService) {
+func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *unumeral.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	if e != nil {
 		t.Fatal(e)
 	}
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -148,7 +149,7 @@ func gparamsVectorGraph(s arena.VectorStats) uint64 {
 	return s.OwnerBytes + s.PayloadBytes + s.BlockMetadataBytes + s.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 }
 
-var _ umemory.ConstructionFailure = (*util.RationalService)(nil)
+var _ umemory.ConstructionFailure = (*unumeral.RationalService)(nil)
 
 func debugDiagnosticFixture(t *testing.T) (*util.DebugContext, *umemory.Runtime, *arena.Budget) {
 	t.Helper()

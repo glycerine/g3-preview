@@ -3,7 +3,7 @@
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 )
 
@@ -12,9 +12,9 @@ import (
 type BitVectorPolynomialMultiplicationNumerals struct {
 	self                   *BitVectorPolynomialMultiplicationNumerals
 	manager                *ASTManager
-	values                 [4]util.OwnedRational
+	values                 [4]unumeral.OwnedRational
 	placed                 [4]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	header                 uint64
 	stopped, ended, closed bool
@@ -71,7 +71,7 @@ func (n *BitVectorPolynomialMultiplicationNumerals) retire() error {
 	if e := c.EndContext(); e != nil {
 		return e
 	}
-	*c = util.RationalServiceInvocation{}
+	*c = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorPolynomialMultiplicationNumerals) Read(arg ASTHandle, i int) (bool, error) {

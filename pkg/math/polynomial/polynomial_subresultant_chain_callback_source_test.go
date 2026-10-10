@@ -4,9 +4,8 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialSubresultantChainResetCallbackBeforeLocalConstructorsRefusesOwnerClose(t *testing.T) {
@@ -19,7 +18,7 @@ func TestPolynomialSubresultantChainResetCallbackBeforeLocalConstructorsRefusesO
 	t.Cleanup(func() { serviceMust(t, m.CleanupSubresultantChain()); serviceMust(t, out.Close()) })
 	term, e := c.monomials.MkVariable(0, 3)
 	serviceMust(t, e)
-	old, e := c.MkTerms([]util.Int{util.NewInt(5), util.NewInt(1)}, []Monomial{term, c.monomials.unit})
+	old, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(5), unumeral.NewInt(1)}, []Monomial{term, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, out.Push(old))
 	calls := 0
@@ -70,7 +69,7 @@ func TestPolynomialSubresultantChainResetFailureHasNoLocalDestruction(t *testing
 	t.Cleanup(func() { serviceMust(t, m.CleanupSubresultantChain()); serviceMust(t, out.Close()) })
 	term, e := c.monomials.MkVariable(0, 3)
 	serviceMust(t, e)
-	old, e := c.MkTerms([]util.Int{util.NewInt(5), util.NewInt(1)}, []Monomial{term, c.monomials.unit})
+	old, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(5), unumeral.NewInt(1)}, []Monomial{term, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, out.Push(old))
 	cause := errors.New("actual subresultant source reset callback")
@@ -114,7 +113,7 @@ func TestPolynomialSubresultantVectorSetIncomingBeforeOldDropAndExactReceipt(t *
 	t.Cleanup(func() { serviceMust(t, out.Close()) })
 	term, e := c.monomials.MkVariable(0, 3)
 	serviceMust(t, e)
-	old, e := c.MkTerms([]util.Int{util.NewInt(5), util.NewInt(1)}, []Monomial{term, c.monomials.unit})
+	old, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(5), unumeral.NewInt(1)}, []Monomial{term, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, out.Push(old))
 	serviceMust(t, out.Push(foreign))

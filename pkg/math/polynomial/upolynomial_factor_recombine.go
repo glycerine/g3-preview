@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (s *UPolynomialFactorizationService) FactorSquareFree(f UPolynomialView, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams) (bool, error) {
@@ -18,10 +18,10 @@ func (s *UPolynomialFactorizationService) FactorSquareFree(f UPolynomialView, fs
 func (s *UPolynomialFactorizationService) FactorSquareFreeDefault(f UPolynomialView, fs *UPolynomialFactors, params UPolynomialFactorParams) (bool, error) {
 	return s.FactorSquareFree(f, fs, 1, params)
 }
-func (s *UPolynomialFactorizationService) mignotteBound(f UPolynomialView, p *util.Int) (uint32, error) {
+func (s *UPolynomialFactorizationService) mignotteBound(f UPolynomialView, p *unumeral.Int) (uint32, error) {
 	return s.mignotteBoundWithReceipt(f, p, nil)
 }
-func (s *UPolynomialFactorizationService) mignotteBoundWithReceipt(f UPolynomialView, p *util.Int, child *upolyMignotteInvocationReceipt) (answer uint32, cause error) {
+func (s *UPolynomialFactorizationService) mignotteBoundWithReceipt(f UPolynomialView, p *unumeral.Int, child *upolyMignotteInvocationReceipt) (answer uint32, cause error) {
 	m := s.manager
 	nm := m.modular
 	if polynomialSourceDebug && upolyViewDegree(f) < 2 {
@@ -102,7 +102,7 @@ func (s *UPolynomialFactorizationService) mignotteBoundWithReceipt(f UPolynomial
 
 // Trial result: 0 continue (bad prime), 1 completed ordinary candidate,
 // 2 source early return true (irreducible/trivial degree set).
-func (s *UPolynomialFactorizationService) factorPrimeTrial(zp *UPolynomialManager, fpp *upolyVectorState, fs, best *UPolynomialFactors, k uint32, p, bestP *util.Int, ds *upolyFactorDegreeState, trials *uint32) (route uint8, failure error) {
+func (s *UPolynomialFactorizationService) factorPrimeTrial(zp *UPolynomialManager, fpp *upolyVectorState, fs, best *UPolynomialFactors, k uint32, p, bestP *unumeral.Int, ds *upolyFactorDegreeState, trials *uint32) (route uint8, failure error) {
 	m := s.manager
 	r, e := s.beginPrimeTrialInvocation(zp)
 	if e != nil {
@@ -297,7 +297,7 @@ func (s *UPolynomialFactorizationService) factorSquareFreeWithReceipt(f UPolynom
 }
 func (s *UPolynomialFactorizationService) primitiveDiagnostic(f UPolynomialView) error {
 	m := s.manager
-	var content util.Int
+	var content unumeral.Int
 	defer m.modular.Del(&content)
 	if e := m.gcdSpan(f, &content); e != nil {
 		return e
@@ -314,7 +314,7 @@ func (s *UPolynomialFactorizationService) primitiveDiagnostic(f UPolynomialView)
 	}
 	return nil
 }
-func (s *UPolynomialFactorizationService) selectFactorTrial(it *upolyFactorCombinationState, leading *util.Int, fpp, trial *upolyVectorState, left bool) (used bool, failure error) {
+func (s *UPolynomialFactorizationService) selectFactorTrial(it *upolyFactorCombinationState, leading *unumeral.Int, fpp, trial *upolyVectorState, left bool) (used bool, failure error) {
 	q, e := s.beginRecombinationTrial(it.factors)
 	if e != nil {
 		return false, e

@@ -2,14 +2,13 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialEvaluationRawGroupIdentity(t *testing.T) {
 	q, _ := rationalManager(t, false)
-	a, out := util.NewRational(), util.NewRational()
+	a, out := unumeral.NewRational(), unumeral.NewRational()
 	serviceMust(t, q.SetFraction(&a, 3, 2))
 	serviceMust(t, q.Power(&a, 2, &out))
 	first := q.RawArithmetic.PowerGeneration
@@ -21,7 +20,7 @@ func TestPolynomialEvaluationRawGroupIdentity(t *testing.T) {
 	if q.RawArithmetic.PowerGeneration <= first {
 		t.Fatal("cleanup reused a continuation identity")
 	}
-	serviceMust(t, q.CleanupRawGroup(util.RationalRawPower))
+	serviceMust(t, q.CleanupRawGroup(unumeral.RationalRawPower))
 	serviceMust(t, q.Del(&a))
 	serviceMust(t, q.Del(&out))
 }

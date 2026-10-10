@@ -10,11 +10,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func sxFractionalBVSourceProfile(t *testing.T, m *SexprManager, h SexprHandle) {
 	// Source Rem asserts integrality before computing the first digit.
-	sxRender(t, m, h, "#x", ErrRationalNotInteger)
+	sxRender(t, m, h, "#x", unumeral.ErrRationalNotInteger)
 }
 
 func TestSexprDebugBVInvariantAndShortCircuit(t *testing.T) {
@@ -58,7 +59,7 @@ func TestSexprDebugBVComparisonFailureRoots(t *testing.T) {
 		text := "1" + strings.Repeat("0", 400)
 		den := "3" + strings.Repeat("0", 399) + "1"
 		c := sxNumber(t, q, text+"/"+den)
-		var filler [16]OwnedRational
+		var filler [16]unumeral.OwnedRational
 		for i := range filler {
 			filler[i], _ = q.NewValue()
 			sxMust(t, q.Copy(&filler[i], &c))
@@ -96,7 +97,7 @@ func TestSexprDebugBVComparisonFailureRoots(t *testing.T) {
 
 // Enumerate known source roots, not live allocations. Reflection reads only
 // scalar test diagnostics; production does not expose or box numeric records.
-func sexprAuditNumericRoots(t *testing.T, q *RationalService, value *OwnedRational, filler []OwnedRational) {
+func sexprAuditNumericRoots(t *testing.T, q *unumeral.RationalService, value *unumeral.OwnedRational, filler []unumeral.OwnedRational) {
 	t.Helper()
 	service := reflect.ValueOf(q).Elem()
 	manager := testFieldBySourceName(service, "manager").Elem()
@@ -150,7 +151,7 @@ func sexprAuditNumericRoots(t *testing.T, q *RationalService, value *OwnedRation
 	for i := 0; i < cache.Len(); i++ {
 		numeral(cache.Index(i))
 	}
-	public := func(v *OwnedRational) {
+	public := func(v *unumeral.OwnedRational) {
 		if _, e := q.IsNeg(v); e != nil {
 			t.Fatal("invalid public comparison root", e)
 		}

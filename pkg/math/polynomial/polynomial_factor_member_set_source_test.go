@@ -2,10 +2,9 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"strconv"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialFactorResetSETOneActualInvocation(t *testing.T) {
@@ -18,7 +17,7 @@ func TestPolynomialFactorResetSETOneActualInvocation(t *testing.T) {
 	if fs.memberSet.invocation <= prior || fs.memberSet.executing || fs.memberSet.active || fs.memberSet.numeric.Cell.Object != (full.core.integer.PendingAllocationObject()) {
 		t.Fatal("reached class member SET needs its own concrete completed invocation")
 	}
-	if fs.constant != util.NewInt(1) {
+	if fs.constant != unumeral.NewInt(1) {
 		t.Fatal("literal reset SET one")
 	}
 	polynomialFactorsAudit(t, fs, nil, nil)
@@ -32,21 +31,21 @@ func TestPolynomialFactorResetSETOneEveryFieldReservationPrefix(t *testing.T) {
 			z := full.core.integer
 			fs, e := NewPolynomialFactors(full)
 			serviceMust(t, e)
-			var modulus util.Int
-			one := util.NewInt(1)
+			var modulus unumeral.Int
+			one := unumeral.NewInt(1)
 			serviceMust(t, z.Mul2k(&one, 521, &modulus))
 			serviceMust(t, z.Sub(&modulus, &one, &modulus))
 			serviceMust(t, full.core.modular.SetZP(&modulus))
 			oldInvocation := fs.memberSet.invocation
 			z.Budget().FailAfter(prefix)
 			cause := fs.Reset()
-			polynomialFactorsAudit(t, fs, nil, []*util.Int{&modulus})
+			polynomialFactorsAudit(t, fs, nil, []*unumeral.Int{&modulus})
 			if cause != nil && !numericPhysicalReservationRefusal(cause) {
 				t.Fatal("actual field SET1 reservation", cause)
 			}
 			if cause == nil {
 				success = true
-				if fs.constant != util.NewInt(1) {
+				if fs.constant != unumeral.NewInt(1) {
 					t.Fatal("literal reset value")
 				}
 			}

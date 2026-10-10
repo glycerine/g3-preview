@@ -3,10 +3,10 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (c integerAllocationInvocationContext) factorFrontendFrame(z *util.IntegerManager) *upolyFactorFrontendScope {
+func (c integerAllocationInvocationContext) factorFrontendFrame(z *unumeral.IntegerManager) *upolyFactorFrontendScope {
 	q := c.factorFrontend
 	if z == nil || !z.ValidOwner() || q == nil || q.self != q || q.service == nil || q.service.self != q.service || q != &q.service.frontend || !q.active || (!q.executing && !q.sourceExecuting && !q.ownExecuting) || q.constructed < 2 || c.factorFrontendInvocation == 0 || c.factorFrontendInvocation != q.invocation {
 		return nil
@@ -17,7 +17,7 @@ func (c integerAllocationInvocationContext) factorFrontendFrame(z *util.IntegerM
 	}
 	return q
 }
-func numericIntegerModularManager_factorFrontendAllocationContext(m *util.IntegerModularManager, q *upolyFactorFrontendScope) integerAllocationInvocationContext {
+func numericIntegerModularManager_factorFrontendAllocationContext(m *unumeral.IntegerModularManager, q *upolyFactorFrontendScope) integerAllocationInvocationContext {
 	if m == nil || !m.ValidOwner() || m.Integers() == nil || q == nil || q.service == nil || q.service.manager == nil || q.service.manager.modular != m {
 		return integerAllocationInvocationContext{}
 	}
@@ -27,24 +27,24 @@ func numericIntegerModularManager_factorFrontendAllocationContext(m *util.Intege
 	}
 	return c
 }
-func (c integerAllocationInvocationContext) recordFactorFrontendRaw(z *util.IntegerManager, r *util.IntegerRawInvocationReceipt) {
+func (c integerAllocationInvocationContext) recordFactorFrontendRaw(z *unumeral.IntegerManager, r *unumeral.IntegerRawInvocationReceipt) {
 	q := c.factorFrontendFrame(z)
 	if q == nil || !z.MatchesRawInvocation(r) {
 		return
 	}
 	switch r.Kind() {
-	case util.IntegerRawGCD:
+	case unumeral.IntegerRawGCD:
 		q.gcdRaw = *r
-	case util.IntegerRawDivision:
+	case unumeral.IntegerRawDivision:
 		q.divisionRaw = *r
-	case util.IntegerRawExtendedGCD:
+	case unumeral.IntegerRawExtendedGCD:
 		q.extendedRaw = *r
 	}
 }
 
 // History validates exact current transport identity independently of whether
 // an older caller NUM has already been consumed by explicit owning cleanup.
-func (c integerAllocationInvocationContext) factorFrontendHistoryFrame(z *util.IntegerManager) *upolyFactorFrontendScope {
+func (c integerAllocationInvocationContext) factorFrontendHistoryFrame(z *unumeral.IntegerManager) *upolyFactorFrontendScope {
 	q := c.factorFrontend
 	if z == nil || !z.ValidOwner() || q == nil || !q.actual() || !q.active || q.service.manager.config.Integer != z || c.factorFrontendInvocation == 0 || c.factorFrontendInvocation != q.invocation || !q.service.matchesFactorFrontendHistory(&q.receipt) {
 		return nil

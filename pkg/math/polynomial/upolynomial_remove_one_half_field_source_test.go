@@ -4,9 +4,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialRemoveOneHalfRootFieldEveryActualPrefix(t *testing.T) {
@@ -20,18 +19,18 @@ func TestUPolynomialRemoveOneHalfRootFieldEveryActualPrefix(t *testing.T) {
 				digits[i] = ^uint32(0)
 			}
 			digits[16] = 511
-			var prime, b, twice, neg util.Int
+			var prime, b, twice, neg unumeral.Int
 			serviceMust(t, z.SetLimbs(&prime, digits))
 			serviceMust(t, p.SetZP(&prime))
 			digits[16] = 255
 			serviceMust(t, z.SetLimbs(&b, digits))
-			two := util.NewInt(2)
+			two := unumeral.NewInt(2)
 			serviceMust(t, z.Mul(&b, &two, &twice))
 			serviceMust(t, z.Copy(&neg, &b))
 			serviceMust(t, z.Neg(&neg))
 			input, e := p.NewPolynomial()
 			serviceMust(t, e)
-			serviceMust(t, p.SetInts(input, []util.Int{neg, twice}))
+			serviceMust(t, p.SetInts(input, []unumeral.Int{neg, twice}))
 			out, e := p.NewPolynomial()
 			serviceMust(t, e)
 			serviceMust(t, z.Del(&twice))
@@ -46,11 +45,11 @@ func TestUPolynomialRemoveOneHalfRootFieldEveryActualPrefix(t *testing.T) {
 			if body != nil && !numericPhysicalReservationRefusal(body) {
 				t.Fatal(body)
 			}
-			extra := []*util.Int{&prime, &b, &q.values[0], &p.oneHalfRoot.values[0], &p.oneHalfRoot.values[1]}
+			extra := []*unumeral.Int{&prime, &b, &q.values[0], &p.oneHalfRoot.values[0], &p.oneHalfRoot.values[1]}
 			if z.MatchesAddMulInvocation(&q.addMul) {
 				extra = append(extra, &q.addMul.Frame.Tmp)
 			}
-			for _, raw := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
+			for _, raw := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
 				if z.MatchesRawInvocation(raw) {
 					for i := uint8(0); i < raw.Frame.Count; i++ {
 						extra = append(extra, &raw.Frame.Values[i])

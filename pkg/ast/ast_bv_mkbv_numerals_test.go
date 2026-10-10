@@ -3,7 +3,8 @@ package ast
 
 import (
 	"fmt"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
 )
 
@@ -76,7 +77,7 @@ func TestASTBitVectorMkBVPostfixDistinctReturn(t *testing.T) {
 	defer func() { astTestMust(t, n.Close()) }()
 	q := m.numerals
 	astTestMust(t, q.SetString(&n.values[0], "4294967296"))
-	var call util.RationalServiceInvocation
+	var call unumeral.RationalServiceInvocation
 	old, e := q.PostIncWithInvocation(&n.values[0], &call)
 	astTestMust(t, e)
 	astTestMust(t, call.SourceReady())

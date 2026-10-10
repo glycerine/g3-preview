@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialPrimeTrialLiteralRoutes(t *testing.T) {
@@ -22,7 +23,7 @@ func TestUPolynomialPrimeTrialLiteralRoutes(t *testing.T) {
 		c, e := s.newSquareFreeScope()
 		serviceMust(t, e)
 		c.constructed = 1
-		serviceMust(t, m.set(&c.fpp, []util.Int{util.NewInt(-2), util.NewInt(0), util.NewInt(1)}))
+		serviceMust(t, m.set(&c.fpp, []unumeral.Int{unumeral.NewInt(-2), unumeral.NewInt(0), unumeral.NewInt(1)}))
 		c.constructed = 2
 		serviceMust(t, m.modular.SetInt32(&c.p, tc.prime))
 		c.zp, e = NewRelatedUPolynomialManager(m)
@@ -48,7 +49,7 @@ func TestUPolynomialPrimeTrialLiteralRoutes(t *testing.T) {
 			if out.count != 1 || out.factors[0].size != 3 {
 				t.Fatal("irreducible source push", out.Stats())
 			}
-			for i, want := range []util.Int{util.NewInt(-2), util.NewInt(0), util.NewInt(1)} {
+			for i, want := range []unumeral.Int{unumeral.NewInt(-2), unumeral.NewInt(0), unumeral.NewInt(1)} {
 				got, e := m.read(m.stateView(&out.factors[0]), uint32(i))
 				serviceMust(t, e)
 				if *got != want {
@@ -67,13 +68,13 @@ func TestUPolynomialPrimeTrialLiteralRoutes(t *testing.T) {
 				serviceMust(t, x)
 				b, x := c.zp.read(c.zp.stateView(v), 1)
 				serviceMust(t, x)
-				if *b != util.NewInt(1) {
+				if *b != unumeral.NewInt(1) {
 					t.Fatal("independent monic linear factor", *b)
 				}
 				switch *a {
-				case util.NewInt(3):
+				case unumeral.NewInt(3):
 					seenPlus = true
-				case util.NewInt(-3):
+				case unumeral.NewInt(-3):
 					seenMinus = true
 				default:
 					t.Fatal("independent roots +/-3", *a)
@@ -83,7 +84,7 @@ func TestUPolynomialPrimeTrialLiteralRoutes(t *testing.T) {
 				t.Fatal("missing independent GF7 factor pair")
 			}
 		}
-		if tc.route == 1 && (trials != 1 || c.bestP != util.NewInt(7)) {
+		if tc.route == 1 && (trials != 1 || c.bestP != unumeral.NewInt(7)) {
 			t.Fatal("actual trial/swap saved prime", trials, c.bestP)
 		}
 		if tc.route == 0 && trials != 0 {
@@ -97,20 +98,20 @@ func TestUPolynomialPrimeTrialLiteralRoutes(t *testing.T) {
 
 // Every owner is supplied by an actual constructor/root in this test. The
 // store directory is counted once even when the actual related core borrows it.
-func primeTrialPhysicalAudit(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService) {
+func primeTrialPhysicalAudit(t *testing.T, q *unumeral.RationalManager, s *UPolynomialFactorizationService) {
 	primeTrialPhysicalAuditExtra(t, q, s)
 }
-func primeTrialPhysicalAuditExtra(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, extra ...*util.Int) {
+func primeTrialPhysicalAuditExtra(t *testing.T, q *unumeral.RationalManager, s *UPolynomialFactorizationService, extra ...*unumeral.Int) {
 	primeTrialPhysicalAuditOwners(t, q, s, nil, extra...)
 }
-func primeTrialPhysicalAuditOwners(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, externalFactors []*UPolynomialFactors, extra ...*util.Int) {
+func primeTrialPhysicalAuditOwners(t *testing.T, q *unumeral.RationalManager, s *UPolynomialFactorizationService, externalFactors []*UPolynomialFactors, extra ...*unumeral.Int) {
 	primeTrialPhysicalAuditAll(t, q, s, externalFactors, nil, extra...)
 }
-func primeTrialPhysicalAuditExternal(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, external []umemory.Block, extra ...*util.Int) {
+func primeTrialPhysicalAuditExternal(t *testing.T, q *unumeral.RationalManager, s *UPolynomialFactorizationService, external []umemory.Block, extra ...*unumeral.Int) {
 	primeTrialPhysicalAuditAll(t, q, s, nil, external, extra...)
 }
-func primeTrialPhysicalAuditAll(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, externalFactors []*UPolynomialFactors, external []umemory.Block, extra ...*util.Int) {
-	roots := append(extra, []*util.Int{&q.NTmp, &q.AddTmp1, &q.AddTmp2, &q.AddMulTmp.Num, &q.AddMulTmp.Den, &q.LtTmp1.Num, &q.LtTmp1.Den, &q.LtTmp2.Num, &q.LtTmp2.Den}...)
+func primeTrialPhysicalAuditAll(t *testing.T, q *unumeral.RationalManager, s *UPolynomialFactorizationService, externalFactors []*UPolynomialFactors, external []umemory.Block, extra ...*unumeral.Int) {
+	roots := append(extra, []*unumeral.Int{&q.NTmp, &q.AddTmp1, &q.AddTmp2, &q.AddMulTmp.Num, &q.AddMulTmp.Den, &q.LtTmp1.Num, &q.LtTmp1.Den, &q.LtTmp2.Num, &q.LtTmp2.Den}...)
 	n := q.HeaderBytes + integerActualOwnedBytes(q.Integers()) + s.header + s.config.Primes.Stats().TotalBytes
 	for q := s.frontendConstantCalls; q != nil; q = q.next {
 		n += q.header
@@ -283,7 +284,7 @@ func TestUPolynomialPrimeTrialToZPRawEveryPrefix(t *testing.T) {
 		c, e := s.newSquareFreeScope()
 		serviceMust(t, e)
 		c.constructed = 1
-		serviceMust(t, m.set(&c.fpp, []util.Int{util.NewInt(1), q.Integers().Two64, util.NewInt(1)}))
+		serviceMust(t, m.set(&c.fpp, []unumeral.Int{unumeral.NewInt(1), q.Integers().Two64, unumeral.NewInt(1)}))
 		c.constructed = 2
 		serviceMust(t, m.modular.SetInt32(&c.p, 7))
 		c.zp, e = NewRelatedUPolynomialManager(m)
@@ -300,7 +301,7 @@ func TestUPolynomialPrimeTrialToZPRawEveryPrefix(t *testing.T) {
 		if e != nil && r.frame.transportBound && r.frame.fzp.size > 0 {
 			first, x := c.zp.read(c.zp.stateView(&r.frame.fzp), 0)
 			serviceMust(t, x)
-			if *first != util.NewInt(1) {
+			if *first != unumeral.NewInt(1) {
 				t.Fatal("completed prefix lost before owning", *first)
 			}
 		}
@@ -334,7 +335,7 @@ func TestUPolynomialPrimeTrialCurrentDestructorStopsOlderVector(t *testing.T) {
 	c, e := s.newSquareFreeScope()
 	serviceMust(t, e)
 	c.constructed = 1
-	serviceMust(t, m.set(&c.fpp, []util.Int{util.NewInt(1), util.NewInt(1)}))
+	serviceMust(t, m.set(&c.fpp, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}))
 	c.constructed = 2
 	serviceMust(t, m.modular.SetInt32(&c.p, 7))
 	c.zp, e = NewRelatedUPolynomialManager(m)
@@ -350,7 +351,7 @@ func TestUPolynomialPrimeTrialCurrentDestructorStopsOlderVector(t *testing.T) {
 	serviceMust(t, e)
 	f.constructed = 2
 	serviceMust(t, q.Integers().Copy(&f.current.constant, &q.Integers().Two64))
-	var large util.Int
+	var large unumeral.Int
 	words := make([]uint32, 80)
 	words[79] = 1
 	serviceMust(t, q.Integers().SetLimbs(&large, words))
@@ -400,7 +401,7 @@ func TestUPolynomialPrimeTrialEveryActualReservation(t *testing.T) {
 		c, e := s.newSquareFreeScope()
 		serviceMust(t, e)
 		c.constructed = 1
-		serviceMust(t, m.set(&c.fpp, []util.Int{util.NewInt(-2), util.NewInt(0), util.NewInt(1)}))
+		serviceMust(t, m.set(&c.fpp, []unumeral.Int{unumeral.NewInt(-2), unumeral.NewInt(0), unumeral.NewInt(1)}))
 		c.constructed = 2
 		serviceMust(t, m.modular.SetInt32(&c.p, 7))
 		c.zp, e = NewRelatedUPolynomialManager(m)
@@ -496,7 +497,7 @@ func TestUPolynomialPrimeToZPNativePushAndPublishedRaw(t *testing.T) {
 		c, e := s.newSquareFreeScope()
 		serviceMust(t, e)
 		c.constructed = 1
-		serviceMust(t, m.set(&c.fpp, []util.Int{util.NewInt(1), util.NewInt(0), q.Integers().Two64}))
+		serviceMust(t, m.set(&c.fpp, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(0), q.Integers().Two64}))
 		c.constructed = 2
 		serviceMust(t, q.Integers().SetLimbs(&c.p, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 		c.zp, e = NewRelatedUPolynomialManager(m)
@@ -511,7 +512,7 @@ func TestUPolynomialPrimeToZPNativePushAndPublishedRaw(t *testing.T) {
 		r.frame.executing = false
 		primeTrialPhysicalAudit(t, q, s)
 		if body == nil {
-			if r.frame.fzp.size != 3 || r.frame.transportBound || r.frame.transport != (util.Int{}) {
+			if r.frame.fzp.size != 3 || r.frame.transportBound || r.frame.transport != (unumeral.Int{}) {
 				t.Fatal("native push must move RAW into coefficient ownership", r.frame.fzp, r.frame.transport)
 			}
 			actual, x := c.zp.read(c.zp.stateView(&r.frame.fzp), 2)
@@ -549,7 +550,7 @@ func TestUPolynomialPrimeTrialEnclosingOwnContinuationEveryHelperPrefix(t *testi
 		c, e := s.newSquareFreeScope()
 		serviceMust(t, e)
 		c.constructed = 1
-		serviceMust(t, m.set(&c.fpp, []util.Int{util.NewInt(1), q.Integers().Two64, util.NewInt(1)}))
+		serviceMust(t, m.set(&c.fpp, []unumeral.Int{unumeral.NewInt(1), q.Integers().Two64, unumeral.NewInt(1)}))
 		c.constructed = 2
 		serviceMust(t, m.modular.SetInt32(&c.p, 7))
 		c.zp, e = NewRelatedUPolynomialManager(m)

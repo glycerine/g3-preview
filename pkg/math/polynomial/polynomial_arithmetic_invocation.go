@@ -3,8 +3,8 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // A concrete owning continuation records acquisition by this actual source
@@ -18,14 +18,14 @@ type polynomialArithmeticScope struct {
 	invocation                                        uint64
 	active, executing, claimed, foreignMixed, stopped bool
 	numeric                                           polynomialNumericRoots
-	normalize                                         util.IntegerNormalizeInvocationReceipt
-	addMul                                            util.IntegerAddMulInvocationReceipt
+	normalize                                         unumeral.IntegerNormalizeInvocationReceipt
+	addMul                                            unumeral.IntegerAddMulInvocationReceipt
 	factory                                           polynomialFactoryInvocationReceipt
 	append                                            polynomialCheapAppendInvocationReceipt
 	constantGeneration                                uint64
 	singleton                                         Monomial
 	singletonGeneration                               uint64
-	transport                                         util.Int
+	transport                                         unumeral.Int
 	transportSlot                                     uint32
 	transportBound                                    bool
 	calleeGeneration                                  uint64
@@ -55,7 +55,7 @@ func (m *MultivariatePolynomialCore) ownsArithmeticFrame(s *polynomialArithmetic
 
 // Direct numeric engines validate the concrete passed invocation. An executing
 // high-level operation alone cannot acquire roots produced by an external hook.
-func numericIntegerManager_arithmeticAllocationRoots(m *util.IntegerManager, r *polynomialArithmeticInvocationReceipt) *polynomialNumericRoots {
+func numericIntegerManager_arithmeticAllocationRoots(m *unumeral.IntegerManager, r *polynomialArithmeticInvocationReceipt) *polynomialNumericRoots {
 	if r == nil || r.manager == nil || r.manager.integer != m || !r.manager.matchesArithmeticInvocation(r) || !r.frame.executing || r.manager.callbackDepth != 0 {
 		return nil
 	}
@@ -109,7 +109,7 @@ func (b *polynomialSOM) acquireArithmeticInvocationWithCoefficient(r *polynomial
 
 // The caller passes this real buffer invocation at each reached numeric call.
 // Allocation authority is recorded by the existing Integer acquisition leaves.
-func (b *polynomialSOM) arithmeticNumericCall(op uint8, a, c, d, out *util.Int, r *polynomialArithmeticInvocationReceipt) error {
+func (b *polynomialSOM) arithmeticNumericCall(op uint8, a, c, d, out *unumeral.Int, r *polynomialArithmeticInvocationReceipt) error {
 	if r == nil {
 		return b.owner.compositionNumericCall(op, a, c, d, out)
 	}
@@ -313,7 +313,7 @@ func (b *polynomialSOM) acknowledgeArithmeticSourceReset(r *polynomialArithmetic
 	}
 	a := &b.appendScope
 	if a.active {
-		if !b.matchesAppendInvocation(&s.append) || a.pending != (Monomial{}) || a.movingCoefficient != (util.Int{}) || a.numeric.PendingObject().OwnerID() != 0 || a.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) || a.coefficientClaims != 0 || a.monomialClaims != 0 || a.retirePhase != 0 {
+		if !b.matchesAppendInvocation(&s.append) || a.pending != (Monomial{}) || a.movingCoefficient != (unumeral.Int{}) || a.numeric.PendingObject().OwnerID() != 0 || a.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) || a.coefficientClaims != 0 || a.monomialClaims != 0 || a.retirePhase != 0 {
 			return
 		}
 		// Claim counters here refuse unsafe acknowledgement; the authority is the

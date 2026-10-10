@@ -3,18 +3,18 @@ package ast
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Native slice storage owns concrete numerals. Copy and ordered destruction
 // operate on the elements; only their numerical allocations use Runtime.
 type astScopedFloatVector struct {
-	copyChain                              util.ArbitraryFloatValueCopyChain
-	copyReceipt                            util.ArbitraryFloatValueCopyReceipt
+	copyChain                              unumeral.ArbitraryFloatValueCopyChain
+	copyReceipt                            unumeral.ArbitraryFloatValueCopyReceipt
 	copyFalseVisited, copyTrueAcknowledged bool
 	copyRow                                uint32
-	values                                 []util.ArbitraryFloat
-	manager                                *util.ArbitraryFloatManager
+	values                                 []unumeral.ArbitraryFloat
+	manager                                *unumeral.ArbitraryFloatManager
 	owner                                  *astFloatingPointPluginOwner
 	destructorIndex                        uint32
 	sourceDone                             bool
@@ -40,12 +40,12 @@ func (v *astScopedFloatVector) size() (uint32, error) {
 	}
 	return uint32(len(v.values)), nil
 }
-func (v *astScopedFloatVector) at(i uint32) (util.ArbitraryFloat, error) {
+func (v *astScopedFloatVector) at(i uint32) (unumeral.ArbitraryFloat, error) {
 	if e := v.guard(); e != nil {
-		return util.ArbitraryFloat{}, e
+		return unumeral.ArbitraryFloat{}, e
 	}
 	if uint64(i) >= uint64(len(v.values)) {
-		return util.ArbitraryFloat{}, arena.ErrBounds
+		return unumeral.ArbitraryFloat{}, arena.ErrBounds
 	}
 	return v.values[i], nil
 }
@@ -61,13 +61,13 @@ func (v *astScopedFloatVector) reserve(n uint32) error {
 		return arena.ErrBounds
 	}
 	if int(n) > len(v.values) {
-		v.values = append(v.values, make([]util.ArbitraryFloat, int(n)-len(v.values))...)
+		v.values = append(v.values, make([]unumeral.ArbitraryFloat, int(n)-len(v.values))...)
 	}
 	return nil
 }
 
 // Publish a default element before SET so numerical failure retains that row.
-func (v *astScopedFloatVector) push(source *util.ArbitraryFloat) error {
+func (v *astScopedFloatVector) push(source *unumeral.ArbitraryFloat) error {
 	n, e := v.size()
 	if e != nil {
 		return e
@@ -80,7 +80,7 @@ func (v *astScopedFloatVector) push(source *util.ArbitraryFloat) error {
 	}
 	return v.set(n, source)
 }
-func (v *astScopedFloatVector) set(i uint32, source *util.ArbitraryFloat) error {
+func (v *astScopedFloatVector) set(i uint32, source *unumeral.ArbitraryFloat) error {
 	if e := v.guard(); e != nil {
 		return e
 	}
@@ -93,14 +93,14 @@ func (v *astScopedFloatVector) set(i uint32, source *util.ArbitraryFloat) error 
 	if uint64(i) >= uint64(len(v.values)) {
 		return arena.ErrBounds
 	}
-	var returned util.ArbitraryFloatValueCopyReceipt
+	var returned unumeral.ArbitraryFloatValueCopyReceipt
 	if e := v.copyChain.Bind(v.manager); e != nil {
 		return e
 	}
 	e := v.copyChain.CopyWithReceipt(&v.values[i], source, &returned)
 	// Keep the latest allocating call for diagnostics; the chain retains all
 	// older exact allocation receipts, including stopped calls.
-	if returned != (util.ArbitraryFloatValueCopyReceipt{}) {
+	if returned != (unumeral.ArbitraryFloatValueCopyReceipt{}) {
 		v.copyReceipt = returned
 		v.copyRow = i
 		v.copyFalseVisited = false

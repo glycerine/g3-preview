@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // A real signed-host accounting guard stops the reached Power AddMul RAW DEL.
@@ -20,7 +21,7 @@ func TestPolynomialSubresultantChainYoungerPowerSourceStopPreservesThreeLocals(t
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	rational, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	rational, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: rational.Integers(), Rationals: rational, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
@@ -29,7 +30,7 @@ func TestPolynomialSubresultantChainYoungerPowerSourceStopPreservesThreeLocals(t
 	serviceMust(t, e)
 	_, e = c.monomials.MkVar()
 	serviceMust(t, e)
-	var large, modulus, warm, warmProduct util.Int
+	var large, modulus, warm, warmProduct unumeral.Int
 	serviceMust(t, c.integer.SetLimbs(&large, []uint32{17, 1 << 30}))
 	digits := make([]uint32, 6)
 	digits[0] = 251
@@ -41,21 +42,21 @@ func TestPolynomialSubresultantChainYoungerPowerSourceStopPreservesThreeLocals(t
 	serviceMust(t, e)
 	xy, e := c.monomials.MkMonomial([]MonomialPower{{0, 1}, {1, 3}})
 	serviceMust(t, e)
-	base, e := c.MkTerms([]util.Int{large, util.NewInt(3)}, []Monomial{y, c.monomials.unit})
+	base, e := c.MkTerms([]unumeral.Int{large, unumeral.NewInt(3)}, []Monomial{y, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(base))
-	q, e := c.MkTerms([]util.Int{large, util.NewInt(3), util.NewInt(1)}, []Monomial{xy, linear, c.monomials.unit})
+	q, e := c.MkTerms([]unumeral.Int{large, unumeral.NewInt(3), unumeral.NewInt(1)}, []Monomial{xy, linear, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(q))
 	fourth, e := c.monomials.MkVariable(0, 4)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{util.NewInt(1), util.NewInt(1)}, []Monomial{fourth, c.monomials.unit})
+	p, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}, []Monomial{fourth, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
 	serviceMust(t, c.modular.SetZP(&modulus))
 	var warmed polynomialReference
 	serviceMust(t, c.powerInto(base, 2, &warmed))
-	three := util.NewInt(3)
+	three := unumeral.NewInt(3)
 	for i := 0; i < 2; i++ {
 		serviceMust(t, c.integer.Mul(&large, &three, &warmProduct))
 		serviceMust(t, c.integer.Rem(&warmProduct, &(*c.modular.BorrowModulus()), &warm))
@@ -79,7 +80,7 @@ func TestPolynomialSubresultantChainYoungerPowerSourceStopPreservesThreeLocals(t
 				contextTLSFinish(t, rt, func() error { return c.CleanupValue(token) })
 			}
 		}
-		for _, a := range []*util.Int{&large, &modulus, &warm, &warmProduct} {
+		for _, a := range []*unumeral.Int{&large, &modulus, &warm, &warmProduct} {
 			contextTLSFinish(t, rt, func() error { return c.integer.Del(a) })
 		}
 		contextTLSFinish(t, rt, m.CloseChecked)
@@ -122,7 +123,7 @@ func TestPolynomialSubresultantChainYoungerPowerSourceStopPreservesThreeLocals(t
 	if c.powerInvocationSourceCause(&power) != source {
 		t.Fatal("exact younger cause", source, c.powerInvocationSourceCause(&power))
 	}
-	subresultantNamedAudit(t, m, out, []Polynomial{p, q, base, warmed.value, warmed.incoming}, []*util.Int{&large, &modulus, &warm, &warmProduct})
+	subresultantNamedAudit(t, m, out, []Polynomial{p, q, base, warmed.value, warmed.incoming}, []*unumeral.Int{&large, &modulus, &warm, &warmProduct})
 	state := rt.State()
 	if m.finishSubresultantChainSource() != source || rt.State() != state || s.constructed != 3 {
 		t.Fatal("sticky source retry changed older suffix")

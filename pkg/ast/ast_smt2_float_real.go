@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Concrete source stack values live in this charged cold invocation header.
@@ -18,19 +19,19 @@ type astFloatLiteralFrame struct {
 	next                                               *astFloatLiteralFrame
 	self                                               *astFloatLiteralFrame
 	owner                                              *astFloatingPointPluginOwner
-	value                                              util.ArbitraryFloat
-	sig                                                util.Int
-	sigCopy                                            util.ArbitraryFloatValueCopyReceipt
+	value                                              unumeral.ArbitraryFloat
+	sig                                                unumeral.Int
+	sigCopy                                            unumeral.ArbitraryFloatValueCopyReceipt
 	sigConstructed, sigConsumed                        bool
-	bvValues                                           [2]util.OwnedRational
+	bvValues                                           [2]unumeral.OwnedRational
 	bvPlaced, bvComplete, bvConsumed                   [2]bool
-	bvInvocations                                      [2]util.RationalServiceInvocation
+	bvInvocations                                      [2]unumeral.RationalServiceInvocation
 	bvRefs                                             [2]astNodeRef
 	bvRefAcquired, bvRefConsumed                       [2]bool
 	bvChildren                                         [4]astFloatBVChild
-	copy                                               util.ArbitraryFloatValueCopyReceipt
+	copy                                               unumeral.ArbitraryFloatValueCopyReceipt
 	buffer                                             bytes.Buffer
-	text                                               *util.ArbitraryFloatFormatText
+	text                                               *unumeral.ArbitraryFloatFormatText
 	header, invocation                                 uint64
 	valueConstructed, valueConsumed, bufferConstructed bool
 	sourceDone, ownDone                                bool
@@ -266,7 +267,7 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.Globa
 		if _, e = b.WriteString(") RTZ "); e != nil {
 			return out, e
 		}
-		f.text, e = util.NewArbitraryFloatFormatText(m.BudgetField)
+		f.text, e = unumeral.NewArbitraryFloatFormatText(m.BudgetField)
 		if e != nil {
 			return out, e
 		}

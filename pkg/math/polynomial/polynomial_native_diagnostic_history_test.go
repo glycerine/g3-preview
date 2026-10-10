@@ -1,9 +1,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialNativeVariableNumeralHistoryPreservesReceipts(t *testing.T) {
@@ -12,7 +11,7 @@ func TestPolynomialNativeVariableNumeralHistoryPreservesReceipts(t *testing.T) {
 	p := polynomialQueryTerms(t, c, []int32{1, 5}, [][]MonomialPower{{{2, 1}}, nil})
 	const count = 4097
 	receipts := make([]polynomialVariableNumeralInvocationReceipt, count)
-	n := util.NewInt(17)
+	n := unumeral.NewInt(17)
 	t.Cleanup(func() {
 		c.integer.Budget().FailAfter(-1)
 		serviceMust(t, c.integer.Del(&n))
@@ -23,13 +22,13 @@ func TestPolynomialNativeVariableNumeralHistoryPreservesReceipts(t *testing.T) {
 		x := uint32(77)
 		yes, e := c.isVariableNumeralWithReceipt(p, &x, &n, &receipts[i])
 		serviceMust(t, e)
-		if !yes || x != 2 || n != util.NewInt(5) || receipts[i].invocation != uint64(i+1) {
+		if !yes || x != 2 || n != unumeral.NewInt(5) || receipts[i].invocation != uint64(i+1) {
 			t.Fatal("independent variable-plus-constant recognition", i, yes, x, n)
 		}
 		if i != 0 {
 			current := c.variableNumeral.invocation
 			serviceMust(t, c.cleanupVariableNumeralInvocation(&receipts[i-1], true))
-			if c.variableNumeral.invocation != current || n != util.NewInt(5) {
+			if c.variableNumeral.invocation != current || n != unumeral.NewInt(5) {
 				t.Fatal("old diagnostic receipt changed later invocation")
 			}
 		}
@@ -44,5 +43,5 @@ func TestPolynomialNativeVariableNumeralHistoryPreservesReceipts(t *testing.T) {
 		}
 	}
 	c.integer.Budget().FailAfter(-1)
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&n}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*unumeral.Int{&n}, 0)
 }

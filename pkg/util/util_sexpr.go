@@ -10,6 +10,7 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -44,12 +45,12 @@ type SexprConfig struct {
 	Budget              *arena.Budget
 	PageSize, SlotLimit uint32
 	Symbols             *usymbol.Manager
-	Rationals           *RationalService
+	Rationals           *unumeral.RationalService
 }
 type sexprRecord struct {
 	Kind                   SexprKind
 	refs, line, pos, width uint32
-	Numeral                OwnedRational
+	Numeral                unumeral.OwnedRational
 	symbol                 usymbol.Symbol
 	children               []SexprHandle
 	text                   string
@@ -324,7 +325,7 @@ func (m *SexprManager) MkComposite(children []SexprHandle, line, pos uint32) (Se
 	}
 	return h, nil
 }
-func (m *SexprManager) mkNumeral(v *OwnedRational, width, line, pos uint32, kind SexprKind) (SexprHandle, error) {
+func (m *SexprManager) mkNumeral(v *unumeral.OwnedRational, width, line, pos uint32, kind SexprKind) (SexprHandle, error) {
 	if e := m.lock(); e != nil {
 		return SexprHandle{}, e
 	}
@@ -348,10 +349,10 @@ func (m *SexprManager) mkNumeral(v *OwnedRational, width, line, pos uint32, kind
 	r.width = width
 	return h, nil
 }
-func (m *SexprManager) MkNumeral(v *OwnedRational, line, pos uint32) (SexprHandle, error) {
+func (m *SexprManager) MkNumeral(v *unumeral.OwnedRational, line, pos uint32) (SexprHandle, error) {
 	return m.mkNumeral(v, 0, line, pos, SexprNumeral)
 }
-func (m *SexprManager) MkBVNumeral(v *OwnedRational, width, line, pos uint32) (SexprHandle, error) {
+func (m *SexprManager) MkBVNumeral(v *unumeral.OwnedRational, width, line, pos uint32) (SexprHandle, error) {
 	return m.mkNumeral(v, width, line, pos, SexprBVNumeral)
 }
 func (m *SexprManager) MkString(s string, line, pos uint32) (SexprHandle, error) {
@@ -450,17 +451,17 @@ func (m *SexprManager) IsBVNumeral(h SexprHandle) (bool, error) { return m.is(h,
 func (m *SexprManager) IsString(h SexprHandle) (bool, error)    { return m.is(h, SexprString) }
 func (m *SexprManager) IsKeyword(h SexprHandle) (bool, error)   { return m.is(h, SexprKeyword) }
 func (m *SexprManager) IsSymbol(h SexprHandle) (bool, error)    { return m.is(h, SexprSymbol) }
-func (m *SexprManager) Numeral(h SexprHandle) (OwnedRational, error) {
+func (m *SexprManager) Numeral(h SexprHandle) (unumeral.OwnedRational, error) {
 	if e := m.lock(); e != nil {
-		return OwnedRational{}, e
+		return unumeral.OwnedRational{}, e
 	}
 	defer m.mu.Unlock()
 	r, e := m.record(h)
 	if e != nil {
-		return OwnedRational{}, e
+		return unumeral.OwnedRational{}, e
 	}
 	if r.Kind != SexprNumeral && r.Kind != SexprBVNumeral {
-		return OwnedRational{}, ErrSexprKind
+		return unumeral.OwnedRational{}, ErrSexprKind
 	}
 	v, e := m.Config.Rationals.NewValue()
 	if e != nil {
@@ -468,7 +469,7 @@ func (m *SexprManager) Numeral(h SexprHandle) (OwnedRational, error) {
 	}
 	if e = m.Config.Rationals.Copy(&v, &r.Numeral); e != nil {
 		m.Config.Rationals.Del(&v)
-		return OwnedRational{}, e
+		return unumeral.OwnedRational{}, e
 	}
 	return v, nil
 }
@@ -592,10 +593,10 @@ func (m *SexprManager) literal(n *uint32, s string) error {
 	}
 	return nil
 }
-func (m *SexprManager) formatNumeral(v *OwnedRational, n *uint32) error {
+func (m *SexprManager) formatNumeral(v *unumeral.OwnedRational, n *uint32) error {
 	q := m.Config.Rationals
 	length, e := q.FormatInto(v, m.stage)
-	if errors.Is(e, ErrShortBuffer) {
+	if errors.Is(e, unumeral.ErrShortBuffer) {
 		if uint64(length) > math.MaxUint32 {
 			return arena.ErrBounds
 		}
@@ -660,7 +661,7 @@ func (m *SexprManager) formatSymbol(s usymbol.Symbol, n *uint32) error {
 	}
 	return nil
 }
-func (m *SexprManager) scalar(n int64) (OwnedRational, error) {
+func (m *SexprManager) scalar(n int64) (unumeral.OwnedRational, error) {
 	q := m.Config.Rationals
 	v, e := q.NewValue()
 	if e != nil {
@@ -668,11 +669,11 @@ func (m *SexprManager) scalar(n int64) (OwnedRational, error) {
 	}
 	if e = q.SetInt64(&v, n); e != nil {
 		q.Del(&v)
-		return OwnedRational{}, e
+		return unumeral.OwnedRational{}, e
 	}
 	return v, nil
 }
-func (m *SexprManager) bvDigit(val *OwnedRational, hex bool) (byte, OwnedRational, error) {
+func (m *SexprManager) bvDigit(val *unumeral.OwnedRational, hex bool) (byte, unumeral.OwnedRational, error) {
 	q := m.Config.Rationals
 	base := int64(2)
 	if hex {
@@ -680,12 +681,12 @@ func (m *SexprManager) bvDigit(val *OwnedRational, hex bool) (byte, OwnedRationa
 	}
 	divisor, e := m.scalar(base)
 	if e != nil {
-		return 0, OwnedRational{}, e
+		return 0, unumeral.OwnedRational{}, e
 	}
 	c, e := q.Rem(val, &divisor)
 	q.Del(&divisor)
 	if e != nil {
-		return 0, OwnedRational{}, e
+		return 0, unumeral.OwnedRational{}, e
 	}
 	keep := false
 	defer func() {
@@ -695,7 +696,7 @@ func (m *SexprManager) bvDigit(val *OwnedRational, hex bool) (byte, OwnedRationa
 	}()
 	divisor, e = m.scalar(base)
 	if e != nil {
-		return 0, OwnedRational{}, e
+		return 0, unumeral.OwnedRational{}, e
 	}
 	next, e := q.IDiv(val, &divisor)
 	if e == nil {
@@ -704,16 +705,16 @@ func (m *SexprManager) bvDigit(val *OwnedRational, hex bool) (byte, OwnedRationa
 	}
 	q.Del(&divisor)
 	if e != nil {
-		return 0, OwnedRational{}, e
+		return 0, unumeral.OwnedRational{}, e
 	}
 	if e = m.sexprBVDiagnostic(&c, base); e != nil {
-		return 0, OwnedRational{}, e
+		return 0, unumeral.OwnedRational{}, e
 	}
 
 	if !hex {
 		zero, e := q.IsZero(&c)
 		if e != nil {
-			return 0, OwnedRational{}, e
+			return 0, unumeral.OwnedRational{}, e
 		}
 		if zero {
 			keep = true
@@ -724,16 +725,16 @@ func (m *SexprManager) bvDigit(val *OwnedRational, hex bool) (byte, OwnedRationa
 	}
 	nine, e := m.scalar(9)
 	if e != nil {
-		return 0, OwnedRational{}, e
+		return 0, unumeral.OwnedRational{}, e
 	}
 	small, e := q.LessEqual(&c, &nine)
 	q.Del(&nine)
 	if e != nil {
-		return 0, OwnedRational{}, e
+		return 0, unumeral.OwnedRational{}, e
 	}
 	digit, e := q.Unsigned(&c)
 	if e != nil {
-		return 0, OwnedRational{}, e
+		return 0, unumeral.OwnedRational{}, e
 	}
 	if small {
 		keep = true

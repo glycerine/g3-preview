@@ -2,18 +2,17 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialRationalArraySourceResetAssertionAndRetainedTail(t *testing.T) {
 	m := polynomialCellFixture(t)
 	u, e := m.monomials.Unit()
 	serviceMust(t, e)
-	a := util.NewRational()
+	a := unumeral.NewRational()
 	serviceMust(t, m.config.Rationals.SetInt64(&a, 4))
-	p, e := m.MkRationalTerms([]util.Rational{a}, []Monomial{u})
+	p, e := m.MkRationalTerms([]unumeral.Rational{a}, []Monomial{u})
 	if polynomialSourceDebug {
 		if e != ErrPolynomialAssertion || p != (Polynomial{}) || m.overloadResult == (Polynomial{}) {
 			t.Fatal("source nonzero rational-array tail assertion before return", p, e)
@@ -34,7 +33,7 @@ func TestPolynomialRationalArraySourceResetAssertionAndRetainedTail(t *testing.T
 	if polynomialSourceDebug {
 		v, e := m.rationalTerms.coefficient(m, 0)
 		serviceMust(t, e)
-		if v != util.NewInt(4) {
+		if v != unumeral.NewInt(4) {
 			t.Fatal("active conversion value", v)
 		}
 	} else if len(m.rationalTerms.values) != 0 || len(m.rationalTerms.retired) != 0 {
@@ -44,7 +43,7 @@ func TestPolynomialRationalArraySourceResetAssertionAndRetainedTail(t *testing.T
 }
 func TestPolynomialRationalUnivariateConsumesActualConversionFields(t *testing.T) {
 	m := polynomialCellFixture(t)
-	as := [3]util.Rational{util.NewRational(), util.NewRational(), util.NewRational()}
+	as := [3]unumeral.Rational{unumeral.NewRational(), unumeral.NewRational(), unumeral.NewRational()}
 	for i, v := range []int64{3, 0, -2} {
 		serviceMust(t, m.config.Rationals.SetInt64(&as[i], v))
 	}
@@ -67,7 +66,7 @@ func TestPolynomialRationalUnivariateConsumesActualConversionFields(t *testing.T
 	}
 	a, e := m.Coefficient(p, 0)
 	serviceMust(t, e)
-	if a != util.NewInt(-2) {
+	if a != unumeral.NewInt(-2) {
 		t.Fatal(a)
 	}
 	mono, e := m.TermMonomial(p, 0)
@@ -80,14 +79,14 @@ func TestPolynomialRationalUnivariateConsumesActualConversionFields(t *testing.T
 }
 func TestPolynomialLinearSourceSwapCopiesAndRetainedBigTail(t *testing.T) {
 	m := polynomialCellFixture(t)
-	as := [3]util.Int{}
+	as := [3]unumeral.Int{}
 	serviceMust(t, m.integer.SetInt64(&as[0], 1<<40))
-	as[2] = util.NewInt(-4)
-	c := util.NewInt(5)
+	as[2] = unumeral.NewInt(-4)
+	c := unumeral.NewInt(5)
 	p, e := m.MkLinearTake(as[:], []uint32{2, 1, 0}, &c)
 	serviceMust(t, e)
 	polynomialCaller(t, m, p)
-	if as != ([3]util.Int{}) || c != (util.Int{}) {
+	if as != ([3]unumeral.Int{}) || c != (unumeral.Int{}) {
 		t.Fatal("actual source input swaps", as, c)
 	}
 	size, e := m.linearTerms.size(m)
@@ -110,8 +109,8 @@ func TestPolynomialLinearSourceSwapCopiesAndRetainedBigTail(t *testing.T) {
 }
 func TestPolynomialRationalLinearSourceConsumesCopiedFieldsOnly(t *testing.T) {
 	m := polynomialCellFixture(t)
-	as := [2]util.Rational{util.NewRational(), util.NewRational()}
-	c := util.NewRational()
+	as := [2]unumeral.Rational{unumeral.NewRational(), unumeral.NewRational()}
+	c := unumeral.NewRational()
 	serviceMust(t, m.config.Rationals.SetInt64(&as[0], 1<<40))
 	serviceMust(t, m.config.Rationals.SetInt64(&as[1], 0))
 	serviceMust(t, m.config.Rationals.SetInt64(&c, -3))
@@ -124,8 +123,8 @@ func TestPolynomialRationalLinearSourceConsumesCopiedFieldsOnly(t *testing.T) {
 	p, e := m.MkRationalLinear(as[:], []uint32{1, 2}, &c)
 	serviceMust(t, e)
 	polynomialCaller(t, m, p)
-	for _, a := range []*util.Rational{&as[0], &as[1], &c} {
-		if !util.IsIntegerRational(a) {
+	for _, a := range []*unumeral.Rational{&as[0], &as[1], &c} {
+		if !unumeral.IsIntegerRational(a) {
 			t.Fatal("const input changed", a)
 		}
 	}
@@ -133,7 +132,7 @@ func TestPolynomialRationalLinearSourceConsumesCopiedFieldsOnly(t *testing.T) {
 		t.Fatal("conversion fields did not transfer")
 	}
 
-	if m.linearConstant != (util.Int{}) || m.linearConstantActive {
+	if m.linearConstant != (unumeral.Int{}) || m.linearConstantActive {
 		t.Fatal("source tmp_c zero at lexical end", m.linearConstant, m.linearConstantActive)
 	}
 	coef, e := m.Coefficient(p, 0)

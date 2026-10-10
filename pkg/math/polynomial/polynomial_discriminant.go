@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This charged cold member records only reached source declarations and actual
@@ -11,11 +11,11 @@ import (
 
 type polynomialDiscriminantScope struct {
 	constant                             polynomialConstantCoefficientInvocationReceipt
-	leadingNeg                           util.IntegerNormalizeInvocationReceipt
+	leadingNeg                           unumeral.IntegerNormalizeInvocationReceipt
 	invocation                           uint64
 	active, executing                    bool
 	refs                                 [2]polynomialReference
-	lc                                   util.Int
+	lc                                   unumeral.Int
 	stack                                [3]uint8
 	depth                                uint8
 	bodyCause, sourceCause, cleanupCause error

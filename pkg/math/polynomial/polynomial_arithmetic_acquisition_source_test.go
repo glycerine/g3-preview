@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialArithmeticGuardedEmptySourceBufferAcquisition(t *testing.T) {
@@ -36,7 +35,7 @@ func TestPolynomialRegularZeroAddMulPreservesUnreadInvocation(t *testing.T) {
 	serviceMust(t, c.som.acquireArithmeticInvocation(&older))
 	saved := *older.frame
 	var erased polynomialArithmeticInvocationReceipt
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	before := c.integer.Budget().Used()
 	c.integer.Budget().FailAfter(0)
 	e := (c.som).addMulWithArithmeticReceipt(&zero, Monomial{}, Polynomial{}, &erased)

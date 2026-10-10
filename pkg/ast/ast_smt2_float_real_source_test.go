@@ -10,8 +10,9 @@ import (
 	"time"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -35,8 +36,8 @@ func TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat(t *testing.T) {
 		{1, 128, false, "(_ NaN 8 4)"},
 		{4, 3, false, "((_ to_fp 8 4) RTZ 1.5 3)"},
 	} {
-		sig := util.NewInt(tc.sig)
-		var v util.ArbitraryFloat
+		sig := unumeral.NewInt(tc.sig)
+		var v unumeral.ArbitraryFloat
 		astTestMust(t, p.numeric.SetComponents(&v, 8, 4, tc.sign, tc.exp, &sig))
 		node, e := p.mkNumeral(&v, nil)
 		astTestMust(t, e)
@@ -84,7 +85,7 @@ func TestASTSMT2FloatRealLiteralActualCallbackRetainsParent(t *testing.T) {
 		return f
 	}})
 	astTestMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	astTestMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)
@@ -97,8 +98,8 @@ func TestASTSMT2FloatRealLiteralActualCallbackRetainsParent(t *testing.T) {
 	_, e = m.RegisterFloatingPointPlugin()
 	astTestMust(t, e)
 	p := m.floatingPointPlugin
-	sig := util.NewInt(0)
-	var v util.ArbitraryFloat
+	sig := unumeral.NewInt(0)
+	var v unumeral.ArbitraryFloat
 	astTestMust(t, p.numeric.SetComponents(&v, 8, 120, false, 3, &sig))
 	node, e := p.mkNumeral(&v, nil)
 	astTestMust(t, e)
@@ -116,7 +117,7 @@ func TestASTSMT2FloatRealLiteralActualCallbackRetainsParent(t *testing.T) {
 		t.Fatal("numerical transport not reached", call, calls)
 	}
 	f := p.literalFrames
-	var texts []*util.ArbitraryFloatFormatText
+	var texts []*unumeral.ArbitraryFloatFormatText
 	if f.text != nil {
 		texts = append(texts, f.text)
 	}
@@ -147,15 +148,15 @@ func TestASTSMT2FloatRealLiteralEveryActualReservationPrefix(t *testing.T) {
 		_, e = m.RegisterFloatingPointPlugin()
 		astTestMust(t, e)
 		p := m.floatingPointPlugin
-		sig := util.NewInt(4)
-		var v util.ArbitraryFloat
+		sig := unumeral.NewInt(4)
+		var v unumeral.ArbitraryFloat
 		astTestMust(t, p.numeric.SetComponents(&v, 8, 4, true, 3, &sig))
 		node, e := p.mkNumeral(&v, nil)
 		astTestMust(t, e)
 		base := m.BudgetField.Used() - m.Stats().AllocatedBytes - m.numerals.RuntimeOwner().Stats().TotalBytes
 		m.BudgetField.FailAfter(ordinal)
 		out, call := m.ppFloatRealLiteral(m.external(node), nil)
-		var texts []*util.ArbitraryFloatFormatText
+		var texts []*unumeral.ArbitraryFloatFormatText
 		for f := p.literalFrames; f != nil; f = f.next {
 			if f.text != nil {
 				texts = append(texts, f.text)
@@ -163,7 +164,7 @@ func TestASTSMT2FloatRealLiteralEveryActualReservationPrefix(t *testing.T) {
 		}
 		astFloatingPointFormatRawGraph(t, m.numerals, p, texts...)
 		var captured *astFloatLiteralFrame
-		var copyTuple util.ArbitraryFloatValueCopyReceipt
+		var copyTuple unumeral.ArbitraryFloatValueCopyReceipt
 		var bodyTuple, sourceTuple error
 		if captured = p.literalFrames; captured != nil {
 			copyTuple, bodyTuple, sourceTuple = captured.copy, captured.bodyCause, captured.sourceCause
@@ -207,8 +208,8 @@ func TestASTSMT2FloatRealLiteralWarmSmallNaNErasesFrameAllocation(t *testing.T) 
 	_, e = m.RegisterFloatingPointPlugin()
 	astTestMust(t, e)
 	p := m.floatingPointPlugin
-	var value util.ArbitraryFloat
-	var receipt util.ArbitraryFloatValueCopyReceipt
+	var value unumeral.ArbitraryFloat
+	var receipt unumeral.ArbitraryFloatValueCopyReceipt
 	astTestMust(t, p.numeric.MkNaN(8, 4, &value, &receipt))
 	node, e := p.mkNumeral(&value, nil)
 	astTestMust(t, e)

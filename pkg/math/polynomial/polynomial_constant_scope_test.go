@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialConstImplicitRationalUsesActualBorrowedOwner(t *testing.T) {
@@ -18,7 +19,7 @@ func TestPolynomialConstImplicitRationalUsesActualBorrowedOwner(t *testing.T) {
 	m, e := NewMultivariatePolynomialCore(MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { t.Fatal("constant route checkpoint"); return false }, Cooperation: func() error { t.Fatal("constant route cooperate"); return nil }})
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, m.CloseChecked()); serviceMust(t, mm.DecManagerRef()) })
-	var a util.Int
+	var a unumeral.Int
 	serviceMust(t, q.Integers().SetInt64(&a, 1<<40))
 	t.Cleanup(func() { serviceMust(t, q.Integers().Del(&a)) })
 	before := q.Integers().Cells.Live
@@ -35,7 +36,7 @@ func TestPolynomialConstImplicitRationalUsesActualBorrowedOwner(t *testing.T) {
 	if v != 1<<40 {
 		t.Fatal(v)
 	}
-	if m.constantScope.active || m.constantScope.rational != (util.Rational{}) || m.constantScope.numeral != (util.Int{}) {
+	if m.constantScope.active || m.constantScope.rational != (unumeral.Rational{}) || m.constantScope.numeral != (unumeral.Int{}) {
 		t.Fatal("completed source local scope retained")
 	}
 }
@@ -44,14 +45,14 @@ func TestPolynomialConstImplicitRationalUsesActualBorrowedOwner(t *testing.T) {
 // incomplete: only an explicit owning abort may drain its retained fields.
 func TestPolynomialConstFailedConstructorRetainedUntilOwningClose(t *testing.T) {
 	b := arena.NewBudget(1 << 22)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
 	serviceMust(t, mm.IncManagerRef())
 	m, e := NewMultivariatePolynomialCore(MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { t.Fatal("constant checkpoint"); return false }, Cooperation: func() error { t.Fatal("constant cooperation"); return nil }})
 	serviceMust(t, e)
-	var a util.Int
+	var a unumeral.Int
 	serviceMust(t, q.Integers().SetInt64(&a, 1<<40))
 	b.FailAfter(0)
 	p, e := m.MulAdd(m.zero, Polynomial{}, &a)
@@ -85,14 +86,14 @@ func TestPolynomialConstTwoCopyFailurePrefixes(t *testing.T) {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			b := arena.NewBudget(1 << 22)
 			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
 			serviceMust(t, e)
 			serviceMust(t, mm.IncManagerRef())
 			m, e := NewMultivariatePolynomialCore(MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { t.Fatal("constant checkpoint"); return false }, Cooperation: func() error { t.Fatal("constant cooperate"); return nil }})
 			serviceMust(t, e)
-			var a util.Int
+			var a unumeral.Int
 			serviceMust(t, q.Integers().SetInt64(&a, 1<<40))
 			count, e := m.memory.AllocationCount()
 			serviceMust(t, e)
@@ -102,7 +103,7 @@ func TestPolynomialConstTwoCopyFailurePrefixes(t *testing.T) {
 			p, e := m.MulAdd(m.zero, Polynomial{}, &a)
 			events, ce := m.memory.AllocationCount()
 			serviceMust(t, ce)
-			var coef util.Int
+			var coef unumeral.Int
 			if e == nil {
 				success = true
 				coef, e = m.Coefficient(p, 0)

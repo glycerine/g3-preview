@@ -4,9 +4,8 @@ package polynomial
 import (
 	"errors"
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialResultantActualConstantPowerChildPrefixes(t *testing.T) {
@@ -233,7 +232,7 @@ func TestPolynomialResultantLaterFailurePreservesSuccessfulDividesMemberRows(t *
 		t.Fatal("literal R.add(p) row construction", as, ms)
 	}
 	var terms [2]Monomial
-	var values [2]util.Int
+	var values [2]unumeral.Int
 	var rc [2]uint32
 	for j := uint32(0); j < 2; j++ {
 		terms[j], e = c.som.ms.monomial(c, j)
@@ -246,7 +245,7 @@ func TestPolynomialResultantLaterFailurePreservesSuccessfulDividesMemberRows(t *
 			t.Fatal("actual successful member transfer retained slot authority")
 		}
 	}
-	rawAs, rawMs := append([]util.Int(nil), c.som.as.values...), append([]Monomial(nil), c.som.ms...)
+	rawAs, rawMs := append([]unumeral.Int(nil), c.som.as.values...), append([]Monomial(nil), c.som.ms...)
 	c.integer.Budget().FailAfter(0)
 	body := full.Resultant(p, q, 0, out)
 	if !numericPhysicalReservationRefusal(body) {

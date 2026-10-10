@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func pscChain2NamedAudit(t *testing.T, m *MultivariatePolynomialManager, out *PolynomialRefVector, p, q Polynomial) {
@@ -66,7 +65,7 @@ func TestPolynomialPSCChain2ActualEveryReservationPrefix(t *testing.T) {
 			serviceMust(t, e)
 			value, e := c.Coefficient(v, 0)
 			serviceMust(t, e)
-			if !constant || value != util.NewInt(want) {
+			if !constant || value != unumeral.NewInt(want) {
 				t.Fatal("retry mathematics", prefix, i, value)
 			}
 		}

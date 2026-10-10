@@ -3,10 +3,9 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialFactorSquareFreeExactInvocationPrefixes(t *testing.T) {
@@ -17,7 +16,7 @@ func TestUPolynomialFactorSquareFreeExactInvocationPrefixes(t *testing.T) {
 			z, s := preparationPhysicalFixture(t)
 			m := s.manager
 			var f upolyVectorState
-			serviceMust(t, m.set(&f, []util.Int{util.NewInt(-6), util.NewInt(1), util.NewInt(1)}))
+			serviceMust(t, m.set(&f, []unumeral.Int{unumeral.NewInt(-6), unumeral.NewInt(1), unumeral.NewInt(1)}))
 			out, e := m.NewFactors()
 			serviceMust(t, e)
 			var r upolyFactorSquareFreeInvocationReceipt
@@ -84,7 +83,7 @@ func TestUPolynomialFactorSquareFreeCallerCheckpointGuardsAndHistory(t *testing.
 	})
 	service = s
 	var f upolyVectorState
-	serviceMust(t, s.manager.set(&f, []util.Int{util.NewInt(-6), util.NewInt(1), util.NewInt(1)}))
+	serviceMust(t, s.manager.set(&f, []unumeral.Int{unumeral.NewInt(-6), unumeral.NewInt(1), unumeral.NewInt(1)}))
 	out, e := s.manager.NewFactors()
 	serviceMust(t, e)
 	defer func() {
@@ -135,7 +134,7 @@ func TestUPolynomialFactorSquareFreeIssuedHistoryAndArchiveRefusal(t *testing.T)
 	z, s := preparationPhysicalFixture(t)
 	m := s.manager
 	var input upolyVectorState
-	serviceMust(t, m.set(&input, []util.Int{util.NewInt(-6), util.NewInt(1), util.NewInt(1)}))
+	serviceMust(t, m.set(&input, []unumeral.Int{unumeral.NewInt(-6), unumeral.NewInt(1), unumeral.NewInt(1)}))
 	out, e := m.NewFactors()
 	serviceMust(t, e)
 	defer func() {

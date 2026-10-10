@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func upolyAdoptionOther(t *testing.T, q *util.RationalManager, limit *control.Reslimit, coop *cooperate.Cooperation) *UPolynomialManager {
+func upolyAdoptionOther(t *testing.T, q *unumeral.RationalManager, limit *control.Reslimit, coop *cooperate.Cooperation) *UPolynomialManager {
 	t.Helper()
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: limit.Inc, Cooperation: func() error { return coop.Cooperate("upolynomial") }})
 	if e != nil {
@@ -34,11 +35,11 @@ func TestUPolynomialStoreIndependentAdoptionTransferAndOldPhysicalViews(t *testi
 	if e != nil {
 		t.Fatal(e)
 	}
-	var n util.Int
+	var n unumeral.Int
 	if e = q.Integers().SetString(&n, "123456789012345678901234567890"); e != nil {
 		t.Fatal(e)
 	}
-	if e = other.SetInts(source, []util.Int{n}); e != nil {
+	if e = other.SetInts(source, []unumeral.Int{n}); e != nil {
 		t.Fatal(e)
 	}
 	if e = q.Integers().Del(&n); e != nil {
@@ -198,7 +199,7 @@ func TestUPolynomialStoreRelatedInheritsImportedBindingsAndUnwinds(t *testing.T)
 		b.FailAfter(-1)
 		if err == nil {
 			finished++
-			var n util.Int
+			var n unumeral.Int
 			if e = child.ReadView(v, 1, &n); e != nil {
 				t.Fatal(e)
 			}

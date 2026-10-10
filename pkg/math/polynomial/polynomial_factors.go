@@ -7,8 +7,9 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Factors own one polynomial reference per successfully acquired entry and an
@@ -25,7 +26,7 @@ type PolynomialFactors struct {
 	manager                                                            *MultivariatePolynomialManager
 	factors                                                            []Polynomial
 	degrees                                                            []uint32
-	constant                                                           util.Int
+	constant                                                           unumeral.Int
 	total                                                              uint32
 	phases                                                             []uint8
 	header                                                             uint64
@@ -35,7 +36,7 @@ type PolynomialFactors struct {
 	sourceCause, bodyCause, cleanupCause                               error
 	current                                                            polynomialReference
 	currentActive                                                      bool
-	local                                                              util.Int
+	local                                                              unumeral.Int
 	localActive                                                        bool
 	numeric                                                            polynomialNumericRoots
 	multiplyActive, executing                                          bool
@@ -130,7 +131,7 @@ func (f *PolynomialFactors) Total() (uint32, error) {
 }
 
 // Constant is a source const-reference borrow; callers must not mutate it.
-func (f *PolynomialFactors) Constant() (*util.Int, error) {
+func (f *PolynomialFactors) Constant() (*unumeral.Int, error) {
 	if e := f.ready(); e != nil {
 		return nil, e
 	}
@@ -222,7 +223,9 @@ func (f *PolynomialFactors) numericCall(body func() error) error {
 	x := f.numeric.after(f.manager.core.integer, before)
 	return errors.Join(e, x)
 }
-func (f *PolynomialFactors) SetConstant(c *util.Int) error { return f.setConstantWithReceipt(c, nil) }
+func (f *PolynomialFactors) SetConstant(c *unumeral.Int) error {
+	return f.setConstantWithReceipt(c, nil)
+}
 func (f *PolynomialFactors) At(i uint32) (*PolynomialRef, error) {
 	if e := f.ready(); e != nil {
 		return nil, e

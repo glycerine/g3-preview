@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 type upolyFactorFrontendInvocationReceipt struct {
@@ -15,7 +14,7 @@ type upolyFactorFrontendInvocationReceipt struct {
 	history    *upolyFactorFrontendHistory
 }
 type upolyFactorFrontendHistory struct {
-	perfectSquare                                                                     util.IntegerPerfectSquareInvocationReceipt
+	perfectSquare                                                                     unumeral.IntegerPerfectSquareInvocationReceipt
 	perfectSquareBodyCause, perfectSquareSourceCause, perfectSquareOwnCause           error
 	vectorNormalizeInvocation                                                         uint64
 	vectorNormalizeBodyCause, vectorNormalizeSourceCause, vectorNormalizeOwnCause     error
@@ -33,15 +32,15 @@ type upolyFactorFrontendHistory struct {
 	divisibilityBodyCause, divisibilitySourceCause, divisibilityOwnCause              error
 	derivativeBodyCause, derivativeOwnCause                                           error
 	derivativePhase                                                                   uint8
-	divisibilityAddMul                                                                util.IntegerAddMulInvocationReceipt
-	boolNumeral                                                                       util.IntegerDividesNumeralInvocationReceipt
-	addMul                                                                            util.IntegerAddMulInvocationReceipt
+	divisibilityAddMul                                                                unumeral.IntegerAddMulInvocationReceipt
+	boolNumeral                                                                       unumeral.IntegerDividesNumeralInvocationReceipt
+	addMul                                                                            unumeral.IntegerAddMulInvocationReceipt
 
 	remainderInvocation, monicInvocation, craInvocation            uint64
 	remainderBodyCause, remainderSourceCause, remainderOwnCause    error
 	monicBodyCause, monicSourceCause, monicOwnCause                error
 	craBodyCause, craSourceCause, craOwnCause                      error
-	remainderAddMul                                                util.IntegerAddMulInvocationReceipt
+	remainderAddMul                                                unumeral.IntegerAddMulInvocationReceipt
 	monicEndEntered                                                bool
 	monicSourceIndex                                               uint8
 	imageFrame                                                     *upolyFactorImageScope
@@ -53,8 +52,8 @@ type upolyFactorFrontendHistory struct {
 	modularGCDBodyCause, modularGCDSourceCause, modularGCDOwnCause error
 	issued                                                         upolyFactorFrontendInvocationReceipt
 	complete                                                       bool
-	gcdRaw, divisionRaw, extendedRaw                               util.IntegerRawInvocationReceipt
-	normalize                                                      util.IntegerNormalizeInvocationReceipt
+	gcdRaw, divisionRaw, extendedRaw                               unumeral.IntegerRawInvocationReceipt
+	normalize                                                      unumeral.IntegerNormalizeInvocationReceipt
 	squareFree                                                     upolyFactorSquareFreeInvocationReceipt
 	self                                                           *upolyFactorFrontendHistory
 	service                                                        *UPolynomialFactorizationService
@@ -68,7 +67,7 @@ type upolyFactorModularGCDScope struct {
 	executing, sourceExecuting, ownExecuting bool
 	owner                                    *upolyFactorFrontendScope
 	invocation                               uint64
-	values                                   [6]util.Int
+	values                                   [6]unumeral.Int
 	constructed                              uint8
 	bodyCause, sourceCause, ownCause         error
 }
@@ -76,17 +75,17 @@ type upolyFactorImageScope struct {
 	executing, sourceExecuting, ownExecuting         bool
 	owner                                            *upolyFactorFrontendScope
 	invocation                                       uint64
-	old, c                                           util.Int
+	old, c                                           unumeral.Int
 	oldMode                                          bool
 	savedConstructed, classConstructed, cConstructed bool
 	sourceStoppedStage                               uint8
 	bodyCause, sourceCause, ownCause                 error
 }
 type upolyFactorRemainderScope struct {
-	addMul                                   util.IntegerAddMulInvocationReceipt
+	addMul                                   unumeral.IntegerAddMulInvocationReceipt
 	owner                                    *upolyFactorFrontendScope
 	invocation                               uint64
-	am                                       util.Int
+	am                                       unumeral.Int
 	constructed                              bool
 	executing, sourceExecuting, ownExecuting bool
 	bodyCause, sourceCause, ownCause         error
@@ -95,7 +94,7 @@ type upolyFactorRemainderScope struct {
 type upolyFactorMonicScope struct {
 	owner                                                        *upolyFactorFrontendScope
 	invocation                                                   uint64
-	lc, inv                                                      util.Int
+	lc, inv                                                      unumeral.Int
 	active, executing, sourceExecuting, ownExecuting, endEntered bool
 	sourceIndex, ownIndex                                        uint8
 	bodyCause, sourceCause, ownCause                             error
@@ -104,7 +103,7 @@ type upolyFactorMonicScope struct {
 type upolyFactorCRAScope struct {
 	owner                                    *upolyFactorFrontendScope
 	invocation                               uint64
-	values                                   [12]util.Int
+	values                                   [12]unumeral.Int
 	constructed, peak                        uint8
 	executing, sourceExecuting, ownExecuting bool
 	bodyCause, sourceCause, ownCause         error
@@ -115,14 +114,14 @@ type upolyFactorDerivativeRaw struct {
 	owner              *upolyFactorDerivativeScope
 	next               *upolyFactorDerivativeRaw
 	invocation, header uint64
-	value              util.Int
+	value              unumeral.Int
 }
 type upolyFactorDerivativeScope struct {
 	retired                              *upolyFactorDerivativeRaw
 	ownCause                             error
 	owner                                *upolyFactorFrontendScope
 	invocation                           uint64
-	d                                    util.Int
+	d                                    unumeral.Int
 	executing, constructed, bodyReturned bool
 	phase                                uint8
 	bodyCause                            error
@@ -131,8 +130,8 @@ type upolyFactorDerivativeScope struct {
 type upolyFactorDivisibilityScope struct {
 	owner                                                 *upolyFactorFrontendScope
 	invocation                                            uint64
-	ratio                                                 util.Int
-	addMul                                                util.IntegerAddMulInvocationReceipt
+	ratio                                                 unumeral.Int
+	addMul                                                unumeral.IntegerAddMulInvocationReceipt
 	executing, sourceExecuting, ownExecuting, constructed bool
 	bodyCause, sourceCause, ownCause                      error
 }
@@ -140,7 +139,7 @@ type upolyFactorDivisibilityScope struct {
 type upolyFactorPrimitiveScope struct {
 	owner                                                 *upolyFactorFrontendScope
 	invocation                                            uint64
-	cont                                                  util.Int
+	cont                                                  unumeral.Int
 	executing, sourceExecuting, ownExecuting, constructed bool
 	bodyCause, sourceCause, ownCause                      error
 }
@@ -148,7 +147,7 @@ type upolyFactorPrimitiveScope struct {
 type upolyFactorVectorNormalizeScope struct {
 	owner                                                          *upolyFactorFrontendScope
 	invocation                                                     uint64
-	g, old, tmp                                                    util.Int
+	g, old, tmp                                                    unumeral.Int
 	constructed, peak                                              uint8
 	executing, sourceExecuting, ownExecuting, coefficientExecuting bool
 	bodyCause, sourceCause, ownCause                               error
@@ -157,7 +156,7 @@ type upolyFactorVectorNormalizeScope struct {
 type upolyFactorModularPowerScope struct {
 	owner                                                        *upolyFactorFrontendScope
 	invocation                                                   uint64
-	power                                                        util.Int
+	power                                                        unumeral.Int
 	active, executing, sourceExecuting, ownExecuting, endEntered bool
 	bodyCause, sourceCause, ownCause                             error
 }
@@ -165,7 +164,7 @@ type upolyFactorModularPowerScope struct {
 type upolyFactorQuadraticScope struct {
 	owner                                    *upolyFactorFrontendScope
 	invocation                               uint64
-	values                                   [4]util.Int
+	values                                   [4]unumeral.Int
 	f1, f2, product                          upolyVectorState
 	constructed, peak                        uint8
 	sourceIndex                              uint32
@@ -176,13 +175,13 @@ type upolyFactorQuadraticScope struct {
 type upolyFactorFlipScope struct {
 	owner                                                 *upolyFactorFrontendScope
 	invocation                                            uint64
-	c                                                     util.Int
+	c                                                     unumeral.Int
 	constructed, executing, sourceExecuting, ownExecuting bool
 	bodyCause, sourceCause, ownCause                      error
 }
 
 type upolyFactorFrontendScope struct {
-	perfectSquare   util.IntegerPerfectSquareInvocationReceipt
+	perfectSquare   unumeral.IntegerPerfectSquareInvocationReceipt
 	vectorNormalize upolyFactorVectorNormalizeScope
 	modularPower    upolyFactorModularPowerScope
 	quadratic       upolyFactorQuadraticScope
@@ -191,7 +190,7 @@ type upolyFactorFrontendScope struct {
 
 	primitive                                        upolyFactorPrimitiveScope
 	divisibility                                     upolyFactorDivisibilityScope
-	boolNumeral                                      util.IntegerDividesNumeralInvocationReceipt
+	boolNumeral                                      unumeral.IntegerDividesNumeralInvocationReceipt
 	derivative                                       upolyFactorDerivativeScope
 	cra                                              upolyFactorCRAScope
 	monic                                            upolyFactorMonicScope
@@ -206,11 +205,11 @@ type upolyFactorFrontendScope struct {
 	previousInteger                                  *upolyFactorFrontendScope
 	invocation                                       uint64
 	active, executing, sourceExecuting, ownExecuting bool
-	content                                          util.Int
+	content                                          unumeral.Int
 	numeric                                          polynomialNumericRoots
-	normalize                                        util.IntegerNormalizeInvocationReceipt
-	gcdRaw, divisionRaw, extendedRaw                 util.IntegerRawInvocationReceipt
-	addMul                                           util.IntegerAddMulInvocationReceipt
+	normalize                                        unumeral.IntegerNormalizeInvocationReceipt
+	gcdRaw, divisionRaw, extendedRaw                 unumeral.IntegerRawInvocationReceipt
+	addMul                                           unumeral.IntegerAddMulInvocationReceipt
 	pp, prime, A, B, D                               upolyVectorState
 	constructed                                      uint8
 	sourceIndex                                      uint32
@@ -356,7 +355,7 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 	if e := q.service.manager.modular.CleanupPNormalizeInvocation(&q.normalize, false); e != nil {
 		return e
 	}
-	for _, r := range []*util.IntegerRawInvocationReceipt{&q.extendedRaw, &q.divisionRaw, &q.gcdRaw} {
+	for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.extendedRaw, &q.divisionRaw, &q.gcdRaw} {
 		if e := z.CleanupRawInvocation(r, false); e != nil {
 			return e
 		}
@@ -445,7 +444,7 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 		if e := q.remainder.own(true); e != nil {
 			return e
 		}
-		for _, r := range []*util.IntegerRawInvocationReceipt{&q.extendedRaw, &q.divisionRaw, &q.gcdRaw} {
+		for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.extendedRaw, &q.divisionRaw, &q.gcdRaw} {
 			if e := z.CleanupRawInvocation(r, true); e != nil {
 				return e
 			}
@@ -493,7 +492,7 @@ func (q *upolyFactorFrontendScope) hasUnjoined() bool {
 	if polynomialNegNumericPending(&q.numeric) {
 		return true
 	}
-	for _, r := range []*util.IntegerRawInvocationReceipt{&q.gcdRaw, &q.divisionRaw, &q.extendedRaw} {
+	for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.gcdRaw, &q.divisionRaw, &q.extendedRaw} {
 		if z.MatchesRawInvocation(r) {
 			return true
 		}
@@ -842,7 +841,7 @@ func (q *upolyFactorFrontendScope) leaveCall() {
 	setFactorFrontendCaller(m.config.Integer, q.previousInteger)
 	q.previousInteger = nil
 }
-func numericIntegerManager_factorFrontendCallerExecuting(m *util.IntegerManager) bool {
+func numericIntegerManager_factorFrontendCallerExecuting(m *unumeral.IntegerManager) bool {
 	if m == nil || !m.ValidOwner() {
 		return false
 	}
@@ -1095,7 +1094,7 @@ func (q *upolyFactorDerivativeScope) retireMultiplier() error {
 	r := &upolyFactorDerivativeRaw{owner: q, invocation: q.invocation, header: n, value: q.d, next: q.retired}
 	r.self = r
 	q.retired = r
-	q.d = util.Int{}
+	q.d = unumeral.Int{}
 	return nil
 }
 func (q *upolyFactorDerivativeScope) own() (cause error) {
@@ -1527,7 +1526,7 @@ func (q *upolyFactorModularPowerScope) own(abort bool) (cause error) {
 func (q *upolyFactorVectorNormalizeScope) valid() bool {
 	return q.owner != nil && q.owner.actual() && q == &q.owner.vectorNormalize
 }
-func (q *upolyFactorVectorNormalizeScope) value(n uint8) *util.Int {
+func (q *upolyFactorVectorNormalizeScope) value(n uint8) *unumeral.Int {
 	switch n {
 	case 1:
 		return &q.g

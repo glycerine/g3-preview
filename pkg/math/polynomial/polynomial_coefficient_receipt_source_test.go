@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialCoefficientReceiptActualSETBeforeINC(t *testing.T) {
@@ -14,14 +13,14 @@ func TestPolynomialCoefficientReceiptActualSETBeforeINC(t *testing.T) {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m := polynomialPSCFullFixture(t)
 			c := m.core
-			var a util.Int
+			var a unumeral.Int
 			words := make([]uint32, 8192)
 			words[0], words[len(words)-1] = 1, 1
 			serviceMust(t, c.integer.SetLimbs(&a, words))
 			t.Cleanup(func() { serviceMust(t, c.integer.Del(&a)) })
 			term, e := c.monomials.MkMonomial([]MonomialPower{{0, 3}, {1, 7}})
 			serviceMust(t, e)
-			p, e := c.MkTerms([]util.Int{a}, []Monomial{term})
+			p, e := c.MkTerms([]unumeral.Int{a}, []Monomial{term})
 			serviceMust(t, e)
 			p = polynomialCaller(t, c, p)
 			var coefficient polynomialCoefficientInvocationReceipt
@@ -35,14 +34,14 @@ func TestPolynomialCoefficientReceiptActualSETBeforeINC(t *testing.T) {
 			if e != nil && c.coefficientInvocation.generated != (Monomial{}) && c.cheap.appendScope.coefficients == 1 && c.cheap.appendScope.monomials == 0 && c.cheap.appendScope.pending == (Monomial{}) {
 				stoppedSet = true
 			}
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, c.factoryInvocation.result}, []*util.Int{&a}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, c.factoryInvocation.result}, []*unumeral.Int{&a}, 0)
 			c.integer.Budget().FailAfter(-1)
 			serviceMust(t, c.cleanupCoefficientInvocation(&coefficient, false))
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, c.factoryInvocation.result}, []*util.Int{&a}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, c.factoryInvocation.result}, []*unumeral.Int{&a}, 0)
 			serviceMust(t, c.cleanupCoefficientInvocation(&coefficient, true))
 			serviceMust(t, c.cleanupFactoryInvocation(&factory, true))
 			serviceMust(t, c.cheap.cleanupAppendInvocation(&appendReceipt, true))
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&a}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&a}, 0)
 			if e == nil {
 				success = true
 				t.Log("first actual coefficient success", ordinal)

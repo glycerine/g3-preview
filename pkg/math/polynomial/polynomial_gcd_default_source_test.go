@@ -3,10 +3,9 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math/big"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialGCDDefaultIntegerIndependentCommonFactors(t *testing.T) {
@@ -114,7 +113,7 @@ func TestPolynomialGCDDefaultIntegerCRAReconstruction(t *testing.T) {
 	z := c.integer
 	// The common factor's constant exceeds every uint32 source prime. A single
 	// balanced modular image cannot be its integer factor; actual CRA is reached.
-	as := []util.Int{util.NewInt(1), {}}
+	as := []unumeral.Int{unumeral.NewInt(1), {}}
 	limbs := make([]uint32, 4)
 	limbs[0], limbs[3] = 17, 16
 	serviceMust(t, z.SetLimbs(&as[1], limbs))
@@ -143,7 +142,7 @@ func TestPolynomialGCDDefaultIntegerCRAReconstruction(t *testing.T) {
 	if !same {
 		t.Fatal("independent large integer common factor")
 	}
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{common, a, b, p, q, r.root.value}, []*util.Int{&as[1]}, r.header)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{common, a, b, p, q, r.root.value}, []*unumeral.Int{&as[1]}, r.header)
 }
 
 func TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS(t *testing.T) {
@@ -156,7 +155,7 @@ func TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS(t *testing.T) {
 	for _, p := range upolyBigPrimes {
 		product.Mul(product, new(big.Int).SetUint64(uint64(p)))
 	}
-	as := []util.Int{{}, util.NewInt(1)}
+	as := []unumeral.Int{{}, unumeral.NewInt(1)}
 	serviceMust(t, z.SetString(&as[0], product.String()))
 	t.Cleanup(func() { serviceMust(t, z.Del(&as[0])) })
 	x, e := c.monomials.MkMonomial([]MonomialPower{{0, 1}})
@@ -183,5 +182,5 @@ func TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS(t *testing.T) {
 	if !same {
 		t.Fatal("actual all-prime rejection/source PRS result")
 	}
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{common, a, b, p, q, r.root.value}, []*util.Int{&as[0]}, r.header)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{common, a, b, p, q, r.root.value}, []*unumeral.Int{&as[0]}, r.header)
 }

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -95,9 +95,9 @@ func TestPolynomialFactorUnivariateLiteralSignParity(t *testing.T) {
 			serviceMust(t, e)
 			var receipt polynomialFactorUnivariateInvocationReceipt
 			serviceMust(t, full.factorSquareFreePrimitiveUnivariateWithReceipt(p, fs, k, DefaultUPolynomialFactorParams(), &receipt))
-			want := util.NewInt(1)
+			want := unumeral.NewInt(1)
 			if k%2 == 1 {
-				want = util.NewInt(-1)
+				want = unumeral.NewInt(-1)
 			}
 			if fs.constant != want {
 				t.Fatal("literal odd-k flip", fs.constant, want)

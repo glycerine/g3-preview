@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestBVPolynomialCoefficientProductSourceGuardsAndBorrowedPublication(t *testing.T) {
@@ -55,7 +55,7 @@ func TestBVPolynomialCoefficientProductSourceGuardsAndBorrowedPublication(t *tes
 	before, e := m.GetRefCount(x)
 	astTestMust(t, e)
 	product := y
-	var call util.RationalServiceInvocation
+	var call unumeral.RationalServiceInvocation
 	yes, e := bvCoefficientProduct(m, binary, &coefficient, &product, &call)
 	astTestMust(t, e)
 	got, e := q.String(&coefficient)
@@ -107,7 +107,7 @@ func TestBVPolynomialCoefficientProductWidthFailureLeavesProductUnchanged(t *tes
 	coefficient, e := q.NewValue()
 	astTestMust(t, e)
 	product := raw
-	var call util.RationalServiceInvocation
+	var call unumeral.RationalServiceInvocation
 	yes, body := bvCoefficientProduct(m, mul, &coefficient, &product, &call)
 	if yes || body == nil || product != raw {
 		t.Fatal("failed read published power product", yes, body, product)

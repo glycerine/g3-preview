@@ -1,13 +1,16 @@
 // Source: src/util/sexpr.h/.cpp: borrowed nodes in synchronous source traversals.
 package util
 
-import usymbol "github.com/glycerine/g3/pkg/util/symbol"
+import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	// SexprBorrowedNodes retains the manager lock during a caller's traversal.
+	// Records carry the borrow generation, so a node from an earlier traversal
+	// cannot acquire authority in a later callback.
+)
 
 import "github.com/glycerine/g3/pkg/arena"
 
-// SexprBorrowedNodes retains the manager lock during a caller's traversal.
-// Records carry the borrow generation, so a node from an earlier traversal
-// cannot acquire authority in a later callback.
 type SexprBorrowedNodes struct {
 	self       *SexprBorrowedNodes
 	manager    *SexprManager
@@ -18,7 +21,7 @@ type SexprBorrowedNode struct {
 	Kind              SexprKind
 	Line, Pos, Length uint32
 	Symbol            usymbol.Symbol
-	Numeral           *OwnedRational
+	Numeral           *unumeral.OwnedRational
 	borrow            *SexprBorrowedNodes
 	generation        uint64
 	handle            SexprHandle

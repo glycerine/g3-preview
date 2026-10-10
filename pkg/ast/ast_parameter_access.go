@@ -1,7 +1,7 @@
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -74,7 +74,7 @@ func (m *ASTManager) ParameterExternal(p ASTParameter) (uint32, error) {
 // ParameterRationalCopy is the source is_rational(rational&) overload:
 // a kind mismatch leaves the caller's owner-confined numeral untouched.
 // The C++ const-reference getter is not exposed as a second owning Go token.
-func (m *ASTManager) ParameterRationalCopy(p ASTParameter, out *util.OwnedRational) (bool, error) {
+func (m *ASTManager) ParameterRationalCopy(p ASTParameter, out *unumeral.OwnedRational) (bool, error) {
 	if e := m.lock(); e != nil {
 		return false, e
 	}

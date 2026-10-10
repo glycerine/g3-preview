@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialGCDCRAIndependentBalancedCoefficientTable(t *testing.T) {
@@ -34,9 +34,9 @@ func TestPolynomialGCDCRAIndependentBalancedCoefficientTable(t *testing.T) {
 		r, e := NewPolynomialRef(c)
 		serviceMust(t, e)
 		t.Cleanup(func() { serviceMust(t, r.Close()) })
-		first, second := util.NewInt(3), util.NewInt(5)
+		first, second := unumeral.NewInt(3), unumeral.NewInt(5)
 		serviceMust(t, full.gcdCRA(a, &first, b, &second, r))
-		if second != util.NewInt(15) || first != util.NewInt(3) {
+		if second != unumeral.NewInt(15) || first != unumeral.NewInt(3) {
 			t.Fatal("source final bound publication", first, second)
 		}
 		polynomialQueryExpect(t, c, r.root.value, want)
@@ -55,8 +55,8 @@ func TestPolynomialGCDCRAEveryActualBigNumeralPrefix(t *testing.T) {
 			r, e := NewPolynomialRef(c)
 			serviceMust(t, e)
 			t.Cleanup(func() { serviceMust(t, r.Close()) })
-			var first util.Int
-			second := util.NewInt(3)
+			var first unumeral.Int
+			second := unumeral.NewInt(3)
 			serviceMust(t, z.Copy(&first, &z.Two64))
 			serviceMust(t, z.Inc(&first))
 			t.Cleanup(func() { serviceMust(t, z.Del(&first)); serviceMust(t, z.Del(&second)) })
@@ -66,10 +66,10 @@ func TestPolynomialGCDCRAEveryActualBigNumeralPrefix(t *testing.T) {
 			if e != nil && !numericPhysicalReservationRefusal(e) {
 				t.Fatal("actual CRA prefix category", ordinal, e)
 			}
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{a, b, r.root.value, r.root.incoming}, []*util.Int{&first, &second}, r.header)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{a, b, r.root.value, r.root.incoming}, []*unumeral.Int{&first, &second}, r.header)
 			z.Budget().FailAfter(-1)
 			serviceMust(t, full.CleanupCRA())
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{a, b, r.root.value, r.root.incoming}, []*util.Int{&first, &second}, r.header)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{a, b, r.root.value, r.root.incoming}, []*unumeral.Int{&first, &second}, r.header)
 			if e == nil {
 				polynomialQueryExpect(t, c, r.root.value, map[[3]uint32]int64{{1, 0, 0}: 2, {}: 1})
 				success = true
@@ -92,7 +92,7 @@ func TestPolynomialGCDCRACompletedNumeralGuardRetainsOlderRoots(t *testing.T) {
 	serviceMust(t, c.pscEnter())
 	s := &full.cra
 	*s = polynomialCRAScope{active: true, topOwner: true, generation: c.pscExecutingOwner(), constructed: 3}
-	var large util.Int
+	var large unumeral.Int
 	limbs := make([]uint32, 8192)
 	limbs[0], limbs[len(limbs)-1] = 17, 1
 	serviceMust(t, z.SetLimbs(&large, limbs))
@@ -111,7 +111,7 @@ func TestPolynomialGCDCRACompletedNumeralGuardRetainsOlderRoots(t *testing.T) {
 		t.Fatal("stopped source reverse order", source, s.constructed)
 	}
 	c.pscLeave()
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 	if again := full.craSourceEnd(); again != source {
 		t.Fatal("source destructor replay", source, again)
 	}
@@ -120,5 +120,5 @@ func TestPolynomialGCDCRACompletedNumeralGuardRetainsOlderRoots(t *testing.T) {
 	}
 	z.Budget().FailAfter(-1)
 	serviceMust(t, full.CleanupCRA())
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 }

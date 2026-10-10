@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialDerivativeActualAppendFactoryEveryPrefix(t *testing.T) {
@@ -92,7 +91,7 @@ func TestPolynomialDerivativeAbortPreservesLaterForeignSourceRow(t *testing.T) {
 			second, e := c.monomials.MkVariable(0, 1)
 			serviceMust(t, e)
 			// Stop on a real later BIG copy, after completing the scalar row.
-			p, e := c.MkTerms([]util.Int{util.NewInt(7), c.integer.Two64}, []Monomial{first, second})
+			p, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(7), c.integer.Two64}, []Monomial{first, second})
 			serviceMust(t, e)
 			serviceMust(t, c.IncRef(p))
 			defer func() { serviceMust(t, c.DecRef(p)) }()
@@ -111,7 +110,7 @@ func TestPolynomialDerivativeAbortPreservesLaterForeignSourceRow(t *testing.T) {
 			eligible := cause != nil && as == ms && ms != 0 && !c.cheap.hasPendingReference && m.derivative.factory.invocation == 0 && m.derivative.calleeGeneration == 0 && c.monomials.creation.stage == 0
 			c.integer.Budget().FailAfter(-1)
 			if eligible {
-				value := util.NewInt(13)
+				value := unumeral.NewInt(13)
 				serviceMust(t, c.cheap.add(&value, foreign, false))
 				before, e := c.monomialRefCount(foreign)
 				serviceMust(t, e)
@@ -221,7 +220,7 @@ func TestPolynomialDerivativeReturnedCallerAndForeignCallbackSurviveAbort(t *tes
 		t.Fatal("completed raw return was not handed off")
 	}
 	var foreign Monomial
-	var foreignNUM util.Int
+	var foreignNUM unumeral.Int
 	calls := 0
 	h, e := NewPolynomialDeletionHandler(c.integer.Budget(), func(_ *PolynomialDeletionHandler, c *MultivariatePolynomialCore, deleted Polynomial) error {
 		if deleted != old {
@@ -253,7 +252,7 @@ func TestPolynomialDerivativeReturnedCallerAndForeignCallbackSurviveAbort(t *tes
 		serviceMust(t, c.monomials.CleanupValue(&foreign))
 	}()
 	cause := out.assign(c, result)
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, out.value, out.incoming}, []*util.Int{&foreignNUM}, h.header)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, out.value, out.incoming}, []*unumeral.Int{&foreignNUM}, h.header)
 	if !numericPhysicalReservationRefusal(cause) || calls != 1 || out.incoming != result || !out.assigning {
 		t.Fatal("actual caller incoming INC then foreign callback refusal", cause, calls, out)
 	}
@@ -270,5 +269,5 @@ func TestPolynomialDerivativeReturnedCallerAndForeignCallbackSurviveAbort(t *tes
 		t.Fatal("callback-created monomial disappeared")
 	}
 	polynomialQueryExpect(t, c, out.incoming, map[[3]uint32]int64{{1, 0, 0}: 14, {}: 11})
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, out.value, out.incoming}, []*util.Int{&foreignNUM}, h.header)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, out.value, out.incoming}, []*unumeral.Int{&foreignNUM}, h.header)
 }

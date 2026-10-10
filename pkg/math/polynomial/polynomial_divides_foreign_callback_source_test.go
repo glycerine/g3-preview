@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialDividesCheckpointForeignRootsSurviveMatchedAbort(t *testing.T) {
@@ -13,7 +12,7 @@ func TestPolynomialDividesCheckpointForeignRootsSurviveMatchedAbort(t *testing.T
 	c := full.core
 	_, e := c.monomials.MkVar()
 	serviceMust(t, e)
-	var foreign util.Int
+	var foreign unumeral.Int
 	var foreignPolynomial Polynomial
 	calls := 0
 	c.config.Checkpoint = func() bool {
@@ -36,7 +35,7 @@ func TestPolynomialDividesCheckpointForeignRootsSurviveMatchedAbort(t *testing.T
 		t.Fatal("actual source checkpoint cancellation", calls, returned)
 	}
 	cell := (foreign).Cell
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{foreignPolynomial}, []*util.Int{&foreign}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{foreignPolynomial}, []*unumeral.Int{&foreign}, 0)
 	serviceMust(t, c.cleanupDividesInvocation(&receipt, false))
 	serviceMust(t, c.cleanupDividesInvocation(&receipt, true))
 	if (foreign).Cell != cell {
@@ -49,7 +48,7 @@ func TestPolynomialDividesCheckpointForeignRootsSurviveMatchedAbort(t *testing.T
 	if !equal || info.RefCount != 1 {
 		t.Fatal("foreign callback value/RC changed", equal, info)
 	}
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{foreignPolynomial}, []*util.Int{&foreign}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{foreignPolynomial}, []*unumeral.Int{&foreign}, 0)
 	c.config.Checkpoint = func() bool { return true }
 	answer, e := c.Divides(c.unit, c.unit)
 	serviceMust(t, e)

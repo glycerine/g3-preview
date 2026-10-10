@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialDiscriminantYoungerCoefficientRefStopBeforeLeadingAndPrime(t *testing.T) {
@@ -22,7 +22,7 @@ func TestPolynomialDiscriminantYoungerCoefficientRefStopBeforeLeadingAndPrime(t 
 	serviceMust(t, e)
 	calls := 0
 	var prime, coefficient Polynomial
-	var leading util.Int
+	var leading unumeral.Int
 	var refused error
 	h, e := NewPolynomialDeletionHandler(c.integer.Budget(), func(_ *PolynomialDeletionHandler, core *MultivariatePolynomialCore, value Polynomial) error {
 		s := &m.discriminant
@@ -50,7 +50,7 @@ func TestPolynomialDiscriminantYoungerCoefficientRefStopBeforeLeadingAndPrime(t 
 		t.Fatal("younger c stop did not retain older declarations/first cause", calls, returned, s.depth)
 	}
 	audit := func() {
-		polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, out.root.value, out.root.incoming, s.refs[0].value, s.refs[1].value}, []*util.Int{&s.lc}, out.header+h.header)
+		polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, out.root.value, out.root.incoming, s.refs[0].value, s.refs[1].value}, []*unumeral.Int{&s.lc}, out.header+h.header)
 	}
 	audit()
 	used, state := c.integer.Budget().Used(), c.memory.State()

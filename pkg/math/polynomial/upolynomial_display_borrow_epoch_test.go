@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Native output text survives lexical cleanup and reuse of the embedded call.
@@ -15,10 +15,10 @@ import (
 func TestUPolynomialDisplayNativeTextSurvivesLaterEmbeddedCall(t *testing.T) {
 	r, s := preparationPhysicalFixture(t)
 	m := s.manager
-	var a util.Int
+	var a unumeral.Int
 	serviceMust(t, r.Integers().SetLimbs(&a, []uint32{7, 0, 0, 1}))
 	var p upolyVectorState
-	serviceMust(t, m.set(&p, []util.Int{a}))
+	serviceMust(t, m.set(&p, []unumeral.Int{a}))
 	serviceMust(t, r.Integers().Del(&a))
 	defer func() {
 		serviceMust(t, m.CleanupDisplay())
@@ -32,7 +32,7 @@ func TestUPolynomialDisplayNativeTextSurvivesLaterEmbeddedCall(t *testing.T) {
 		for _, owning := range []bool{false, true} {
 			before := m.display.insertion
 			used := r.Integers().Budget().Used()
-			if e := util.CompleteNumeralInsertion(&m.display.insertion, r.Integers().Naturals(), nil, owning); e != arena.ErrInvalidSlot {
+			if e := unumeral.CompleteNumeralInsertion(&m.display.insertion, r.Integers().Naturals(), nil, owning); e != arena.ErrInvalidSlot {
 				t.Fatalf("executing borrowed insertion cleanup: %v", e)
 			}
 			if before != m.display.insertion || used != r.Integers().Budget().Used() {
@@ -74,10 +74,10 @@ func TestUPolynomialDisplayInsertionReceiptRefusesLaterEmbeddedCall(t *testing.T
 		t.Run(strconv.FormatBool(owning), func(t *testing.T) {
 			r, s := preparationPhysicalFixture(t)
 			m := s.manager
-			var a util.Int
+			var a unumeral.Int
 			serviceMust(t, r.Integers().SetLimbs(&a, []uint32{7, 0, 0, 1}))
 			var p upolyVectorState
-			serviceMust(t, m.set(&p, []util.Int{a}))
+			serviceMust(t, m.set(&p, []unumeral.Int{a}))
 			serviceMust(t, r.Integers().Del(&a))
 			defer func() {
 				serviceMust(t, m.CleanupDisplay())
@@ -101,7 +101,7 @@ func TestUPolynomialDisplayInsertionReceiptRefusesLaterEmbeddedCall(t *testing.T
 				t.Fatal("fixture did not reuse actual pending embedded insertion")
 			}
 			used := r.Integers().Budget().Used()
-			if e := util.CompleteNumeralInsertion(&old, r.Integers().Naturals(), nil, owning); e != arena.ErrInvalidSlot {
+			if e := unumeral.CompleteNumeralInsertion(&old, r.Integers().Naturals(), nil, owning); e != arena.ErrInvalidSlot {
 				t.Errorf("old insertion receipt acquired later recovery authority: %v", e)
 			}
 			if used != r.Integers().Budget().Used() || !m.display.insertion.Active() {

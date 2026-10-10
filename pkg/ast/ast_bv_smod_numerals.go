@@ -2,18 +2,17 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorSignedModuloNumerals retains r1/r2, abs operands, u, r and reached full-expression returns.
 type BitVectorSignedModuloNumerals struct {
 	self                   *BitVectorSignedModuloNumerals
 	manager                *ASTManager
-	values                 [9]util.OwnedRational
+	values                 [9]unumeral.OwnedRational
 	placed                 [9]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	norm                   ASTBitVectorNumeralInvocation
 	header                 uint64
@@ -91,7 +90,7 @@ func (n *BitVectorSignedModuloNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorSignedModuloNumerals) Read(i int, arg ASTHandle, width *uint32) (bool, error) {
@@ -114,7 +113,7 @@ func (n *BitVectorSignedModuloNumerals) Normalize(i int, width uint32) error {
 	}
 	v, e := n.manager.NormalizeSignedBitVectorValueWithInvocation(&n.values[i], width, &n.norm)
 	n.values[2] = v
-	n.placed[2] = v != (util.OwnedRational{})
+	n.placed[2] = v != (unumeral.OwnedRational{})
 	if e != nil {
 		return n.fail(e)
 	}
@@ -258,9 +257,9 @@ func (n *BitVectorSignedModuloNumerals) Close() error {
 	return nil
 }
 
-func (n *BitVectorSignedModuloNumerals) store(i int, v util.OwnedRational, e error) error {
+func (n *BitVectorSignedModuloNumerals) store(i int, v unumeral.OwnedRational, e error) error {
 	n.values[i] = v
-	n.placed[i] = v != (util.OwnedRational{})
+	n.placed[i] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -275,7 +274,7 @@ func (n *BitVectorSignedModuloNumerals) unsignedNorm(input, out int, width uint3
 	}
 	v, e := n.manager.NormalizeBitVectorValueWithInvocation(&n.values[input], width, &n.norm)
 	n.values[out] = v
-	n.placed[out] = v != (util.OwnedRational{})
+	n.placed[out] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.manager.BitVectorNumeralInvocationSourceReady(&n.norm)
 	}

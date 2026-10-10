@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -19,7 +20,7 @@ func TestUPolynomialMignotteTransportCannotRetireExecutingOwner(t *testing.T) {
 			b := arena.NewBudget(1 << 26)
 			var s *UPolynomialFactorizationService
 			var u *UPolynomialManager
-			var foreign util.Int
+			var foreign unumeral.Int
 			armed := false
 			calls := 0
 			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true, Transport: func(f umemory.Failure) error {
@@ -47,7 +48,7 @@ func TestUPolynomialMignotteTransportCannotRetireExecutingOwner(t *testing.T) {
 			cfg := serviceConfig(b).Integers
 			cfg.Memory = rt
 			cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			u, e = NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 			serviceMust(t, e)
@@ -70,7 +71,7 @@ func TestUPolynomialMignotteTransportCannotRetireExecutingOwner(t *testing.T) {
 					t.Error("named refund", b.Used())
 				}
 			}()
-			var big util.Int
+			var big unumeral.Int
 			serviceMust(t, q.Integers().SetLimbs(&big, []uint32{1, 0, 1}))
 			words := make([]uint32, 80)
 			words[79] = 1

@@ -2,18 +2,17 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorConcatNumerals retains v1, v2 and the returned power-of-two temporary.
 type BitVectorConcatNumerals struct {
 	self                   *BitVectorConcatNumerals
 	manager                *ASTManager
-	values                 [3]util.OwnedRational
+	values                 [3]unumeral.OwnedRational
 	placed                 [3]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	header                 uint64
 	sourceCause            error
@@ -90,7 +89,7 @@ func (n *BitVectorConcatNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorConcatNumerals) Read(i int, arg ASTHandle, width *uint32) (bool, error) {
@@ -115,7 +114,7 @@ func (n *BitVectorConcatNumerals) Fuse(width uint32) error {
 	}
 	v, e := n.manager.numerals.PowerOfTwoWithInvocation(width, &n.scalar)
 	n.values[2] = v
-	n.placed[2] = v != (util.OwnedRational{})
+	n.placed[2] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}

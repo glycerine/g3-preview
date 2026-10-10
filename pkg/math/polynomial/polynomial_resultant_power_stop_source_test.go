@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // A real signed-host accounting guard isolates the reached AddMul RAW end DEL.
@@ -20,24 +21,24 @@ func TestPolynomialResultantYoungerPowerSourceStopPreservesOlderAB(t *testing.T)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	c := m.core
 	_, e = c.monomials.MkVar()
 	serviceMust(t, e)
-	var large, warm util.Int
+	var large, warm unumeral.Int
 	digits := make([]uint32, 2)
 	digits[0] = 17
 	digits[1] = 1 << 30
 	serviceMust(t, c.integer.SetLimbs(&large, digits))
 	term, e := c.monomials.MkVariable(0, 3)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{large, util.NewInt(3)}, []Monomial{term, c.monomials.unit})
+	p, e := c.MkTerms([]unumeral.Int{large, unumeral.NewInt(3)}, []Monomial{term, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
-	var modulus util.Int
+	var modulus unumeral.Int
 	modulusDigits := make([]uint32, 6)
 	modulusDigits[0] = 251
 	modulusDigits[5] = 1 << 31
@@ -50,18 +51,18 @@ func TestPolynomialResultantYoungerPowerSourceStopPreservesOlderAB(t *testing.T)
 	serviceMust(t, e)
 	xy, e := c.monomials.MkMonomial([]MonomialPower{{0, 3}, {1, 1}})
 	serviceMust(t, e)
-	a, e := c.MkTerms([]util.Int{large, large, util.NewInt(3), util.NewInt(3)}, []Monomial{xy, term, y, c.monomials.unit})
+	a, e := c.MkTerms([]unumeral.Int{large, large, unumeral.NewInt(3), unumeral.NewInt(3)}, []Monomial{xy, term, y, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(a))
 	y2, e := c.monomials.MkVariable(1, 2)
 	serviceMust(t, e)
-	b, e := c.MkTerms([]util.Int{util.NewInt(1), util.NewInt(1)}, []Monomial{y2, c.monomials.unit})
+	b, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}, []Monomial{y2, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(b))
 	var warmPolynomial polynomialReference
 	serviceMust(t, m.resultant(a, b, 1, &warmPolynomial))
-	three := util.NewInt(3)
-	var warmProduct util.Int
+	three := unumeral.NewInt(3)
+	var warmProduct unumeral.Int
 	serviceMust(t, c.integer.Mul(&large, &three, &warmProduct))
 	serviceMust(t, c.integer.Rem(&warmProduct, &(*c.modular.BorrowModulus()), &warm))
 	// Ordinary warm cycles retain the actual shared multiplication/remainder
@@ -89,7 +90,7 @@ func TestPolynomialResultantYoungerPowerSourceStopPreservesOlderAB(t *testing.T)
 		for _, v := range []*Polynomial{&a, &b} {
 			contextTLSFinish(t, rt, func() error { return c.CleanupValue(v) })
 		}
-		for _, a := range []*util.Int{&large, &warm, &warmProduct, &modulus} {
+		for _, a := range []*unumeral.Int{&large, &warm, &warmProduct, &modulus} {
 			contextTLSFinish(t, rt, func() error { return c.integer.Del(a) })
 		}
 		contextTLSFinish(t, rt, m.CloseChecked)
@@ -133,7 +134,7 @@ func TestPolynomialResultantYoungerPowerSourceStopPreservesOlderAB(t *testing.T)
 	if frame.resultantPower.manager != c || frame.resultantPower.frame != &c.powerLocal || frame.resultantPower.invocation != c.powerLocal.generation {
 		t.Fatal("missing exact actual Resultant Power invocation", frame.resultantPower)
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, a, b, output.value, output.incoming, warmPolynomial.value, warmPolynomial.incoming}, []*util.Int{&large, &warm, &warmProduct, &modulus}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, a, b, output.value, output.incoming, warmPolynomial.value, warmPolynomial.incoming}, []*unumeral.Int{&large, &warm, &warmProduct, &modulus}, 0)
 	if c.integer.AddMulInvocationSourceCause(&c.powerLocal.arithmetic.frame.addMul) != child || c.powerLocal.arithmetic.frame.addMul.Frame.Stage != 3 {
 		t.Fatal("actual end DEL source phase", e)
 	}

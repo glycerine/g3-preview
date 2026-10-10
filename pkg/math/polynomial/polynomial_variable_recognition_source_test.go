@@ -9,8 +9,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialVariableRecognitionLiteralWritePrefixes(t *testing.T) {
@@ -45,17 +46,17 @@ func TestPolynomialVariableRecognitionLiteralWritePrefixes(t *testing.T) {
 	}
 	p = polynomialQueryTerms(t, c, []int32{2, 5}, [][]MonomialPower{{{2, 1}}, nil})
 	x = 77
-	number := util.NewInt(9)
+	number := unumeral.NewInt(9)
 	ok, e = full.IsVariableNumeral(p, &x, &number)
 	serviceMust(t, e)
-	if ok || x != 77 || number != util.NewInt(9) {
+	if ok || x != 77 || number != unumeral.NewInt(9) {
 		t.Fatal("numeral predicate coefficient rejection skips var and NUM", ok, x, number)
 	}
 	p = polynomialQueryTerms(t, c, []int32{1, 5}, [][]MonomialPower{{{2, 1}}, nil})
 	x = 77
 	ok, e = full.IsVariableNumeral(p, &x, &number)
 	serviceMust(t, e)
-	if !ok || x != 2 || number != util.NewInt(5) {
+	if !ok || x != 2 || number != unumeral.NewInt(5) {
 		t.Fatal("literal variable plus numeral", ok, x, number)
 	}
 	c.integer.Budget().FailAfter(0)
@@ -65,7 +66,7 @@ func TestPolynomialVariableRecognitionLiteralWritePrefixes(t *testing.T) {
 		t.Fatal("size zero source short circuit")
 	}
 	c.integer.Budget().FailAfter(-1)
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&number}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*unumeral.Int{&number}, 0)
 	serviceMust(t, c.integer.Del(&number))
 }
 
@@ -84,18 +85,18 @@ func TestPolynomialVariableRecognitionBIGEveryActualPrefix(t *testing.T) {
 				digits := make([]uint32, 500)
 				digits[0] = 17
 				digits[499] = 1 << 16
-				var big util.Int
+				var big unumeral.Int
 				serviceMust(t, c.integer.SetLimbs(&big, digits))
 				variable, e := c.monomials.MkVariable(2, 1)
 				serviceMust(t, e)
-				raw, e := c.MkTerms([]util.Int{util.NewInt(1), big}, []Monomial{variable, c.monomials.unit})
+				raw, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(1), big}, []Monomial{variable, c.monomials.unit})
 				serviceMust(t, e)
 				p := polynomialCaller(t, c, raw)
 
 				if field {
 					serviceMust(t, c.modular.SetZPUint64(5))
 				}
-				out := util.NewInt(9)
+				out := unumeral.NewInt(9)
 				v := uint32(77)
 				var receipt polynomialVariableNumeralInvocationReceipt
 				c.integer.Budget().FailAfter(prefix)
@@ -118,7 +119,7 @@ func TestPolynomialVariableRecognitionBIGEveryActualPrefix(t *testing.T) {
 						t.Fatal("actual pending SET/PN leaf lacks exact acquired child", prefix, pending, roots)
 					}
 				}
-				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&out, &big}, 0)
+				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*unumeral.Int{&out, &big}, 0)
 				if v != 2 || receipt.invocation == 0 {
 					t.Fatal("actual variable publication and reached SET guard", v, receipt)
 				}
@@ -142,13 +143,13 @@ func TestPolynomialVariableRecognitionBIGEveryActualPrefix(t *testing.T) {
 					success = true
 					t.Log("actual firstsuccess", field, prefix)
 					stop = true
-					if field && out != util.NewInt(-2) {
+					if field && out != unumeral.NewInt(-2) {
 						t.Fatal("literal source SET mode normalization", out)
 					}
 				} else if !numericPhysicalReservationRefusal(returned) && !errors.Is(returned, arena.ErrInjectedFailure) {
 					t.Fatal(returned)
 				}
-				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&out, &big}, 0)
+				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*unumeral.Int{&out, &big}, 0)
 				serviceMust(t, c.integer.Del(&out))
 				serviceMust(t, c.integer.Del(&big))
 			})

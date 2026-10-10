@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame(t *testing.T) {
@@ -16,14 +17,14 @@ func TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame(t *testing.T) {
 	for ordinal := int64(0); ordinal < 140; ordinal++ {
 		full := polynomialExactDivDirectPageOneFixture(t)
 		c := full.core
-		var big util.Int
+		var big unumeral.Int
 		words := make([]uint32, 80)
 		words[0], words[79] = 2, 1
 		serviceMust(t, c.integer.SetLimbs(&big, words))
 		p, e := c.MkConstantTakeCopy(&big)
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(p))
-		two := util.NewInt(2)
+		two := unumeral.NewInt(2)
 		q, e := c.MkConstantTake(&two)
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(q))
@@ -31,12 +32,12 @@ func TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame(t *testing.T) {
 		c.integer.Budget().FailAfter(ordinal)
 		result, body := c.exactDivWithReceipt(p, q, &receipt)
 		t.Log("reached actual prefix", ordinal, body, "NUM", c.exactDivision.numeral, "phase", c.exactDivision.numericPhase, "output", c.som2.arithmeticScope.transport, "R", c.som.arithmeticScope.transport)
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, result}, []*util.Int{&big}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, result}, []*unumeral.Int{&big}, 0)
 		roots, e := c.integer.SourceAllocator().PendingRoots()
 		serviceMust(t, e)
 		pending := c.integer.PendingCell
-		if body != nil && receipt.invocation != 0 && (pending.Object != (util.SourceCellBacking{}).Object || roots != ([3]umemory.Block{})) {
-			ownedCell, ownedRaw := pending.Object == (util.SourceCellBacking{}).Object, roots == ([3]umemory.Block{})
+		if body != nil && receipt.invocation != 0 && (pending.Object != (unumeral.SourceCellBacking{}).Object || roots != ([3]umemory.Block{})) {
+			ownedCell, ownedRaw := pending.Object == (unumeral.SourceCellBacking{}).Object, roots == ([3]umemory.Block{})
 			if c.matchesExactDivInvocation(&receipt) {
 				for _, actual := range []*polynomialNumericRoots{&receipt.frame.numeric} {
 					ownedCell = ownedCell || actual.Cell == pending
@@ -56,14 +57,14 @@ func TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame(t *testing.T) {
 			if !ownedCell || !ownedRaw {
 				t.Fatal("actual ExactDiv acquisition has no exact direct local/buffer frame", ordinal, body, pending, roots, receipt.frame.numericPhase)
 			}
-			if receipt.frame.numericPhase == 1 && ((pending.Object != (util.SourceCellBacking{}).Object && receipt.frame.numeric.Cell == pending) || (roots != ([3]umemory.Block{}) && receipt.frame.numeric.Allocator == roots)) {
+			if receipt.frame.numericPhase == 1 && ((pending.Object != (unumeral.SourceCellBacking{}).Object && receipt.frame.numeric.Cell == pending) || (roots != ([3]umemory.Block{}) && receipt.frame.numeric.Allocator == roots)) {
 				saw = true
 				// At this actual NUM leaf, pending destruction needs no new
 				// source allocation. Prove false/true ownership while the real
 				// fault epoch is still exhausted, before lifting its budget.
 				serviceMust(t, c.cleanupExactDivInvocation(&receipt, false))
 				serviceMust(t, c.cleanupExactDivInvocation(&receipt, true))
-				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, result}, []*util.Int{&big}, 0)
+				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, result}, []*unumeral.Int{&big}, 0)
 			}
 		}
 		c.integer.Budget().FailAfter(-1)
@@ -71,7 +72,7 @@ func TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame(t *testing.T) {
 		serviceMust(t, c.cleanupExactDivInvocation(&receipt, true))
 		if body == nil {
 			// Independent bit pattern: (2^(79*32)+2)/2.
-			half := util.Int{}
+			half := unumeral.Int{}
 			expectedWords := make([]uint32, 79)
 			expectedWords[0], expectedWords[78] = 1, uint32(1)<<31
 			serviceMust(t, c.integer.SetLimbs(&half, expectedWords))
@@ -102,7 +103,7 @@ func TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame(t *testing.T) {
 // reaches descriptor preparation after its direct payload allocation.
 func polynomialExactDivDirectPageOneFixture(t *testing.T) *MultivariatePolynomialManager {
 	budget := arena.NewBudget(1 << 24)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1, Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1, Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
@@ -122,20 +123,20 @@ func TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry(t *testi
 	for ordinal := int64(0); ordinal < 140; ordinal++ {
 		full := polynomialExactDivDirectPageOneFixture(t)
 		c := full.core
-		var big util.Int
+		var big unumeral.Int
 		words := make([]uint32, 80)
 		words[0], words[79] = 2, 1
 		serviceMust(t, c.integer.SetLimbs(&big, words))
 		p, e := c.MkConstantTakeCopy(&big)
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(p))
-		two := util.NewInt(2)
+		two := unumeral.NewInt(2)
 		q, e := c.MkConstantTake(&two)
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(q))
 		c.integer.Budget().FailAfter(ordinal)
 		result, body := c.ExactDiv(p, q)
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, result}, []*util.Int{&big}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, result}, []*unumeral.Int{&big}, 0)
 		c.integer.Budget().FailAfter(-1)
 		serviceMust(t, c.CleanupExactDivision())
 		t.Log("ack", ordinal, "NUMactive", c.exactDivision.active, "R", c.som.arithmeticScope.active, "C", c.som2.arithmeticScope.active, "generated", c.generatedActive, "prelude", c.exactDivision.directReceipt.prelude.invocation, "scratch", c.integer.Tmp)
@@ -148,10 +149,10 @@ func TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry(t *testi
 				if (c.integer.Tmp[0] != 0 && c.integer.Tmp[1] != 0) || !errors.Is(e, arena.ErrInvalidSlot) {
 					t.Fatal("initialized same-owner retry after exact acknowledgment", ordinal, body, e)
 				}
-				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, retry}, []*util.Int{&big}, 0)
+				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, retry}, []*unumeral.Int{&big}, 0)
 				serviceMust(t, c.CleanupExactDivision())
 			}
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, retry}, []*util.Int{&big}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, retry}, []*unumeral.Int{&big}, 0)
 			serviceMust(t, c.CleanupValue(&retry))
 		} else {
 			serviceMust(t, c.CleanupValue(&result))

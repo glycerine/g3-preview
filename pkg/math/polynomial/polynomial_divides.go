@@ -4,8 +4,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialDividesScope struct {
@@ -15,13 +14,13 @@ type polynomialDividesScope struct {
 	invocation               uint64
 	executing                bool
 	constructed              uint8
-	boolNumeral              util.IntegerDividesNumeralInvocationReceipt
-	normalize                util.IntegerNormalizeInvocationReceipt
-	divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
+	boolNumeral              unumeral.IntegerDividesNumeralInvocationReceipt
+	normalize                unumeral.IntegerNormalizeInvocationReceipt
+	divisionRaw, extendedRaw unumeral.IntegerRawInvocationReceipt
 
 	directReceipt           polynomialDividesInvocationReceipt
 	monomial                polynomialDivisionReference
-	numeral                 util.Int
+	numeral                 unumeral.Int
 	numeric                 polynomialNumericRoots
 	active                  bool
 	stage, ownStage         uint8
@@ -210,7 +209,7 @@ func (m *MultivariatePolynomialCore) dividesWithReceipt(q, p Polynomial, receipt
 			return false, ErrPolynomialAssertion
 		}
 	}
-	aq := util.IntegerArrayView{Allocator: m.monomials.allocator, Object: ql.raw, Count: 1, Offset: 12 + uint64(maxQ)*12, Stride: 12}
+	aq := unumeral.IntegerArrayView{Allocator: m.monomials.allocator, Object: ql.raw, Count: 1, Offset: 12 + uint64(maxQ)*12, Stride: 12}
 	// Exact source declaration order: monomial_ref, then scoped numeral.
 	s.constructed = 1
 	s.constructed = 2

@@ -8,17 +8,18 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Real source services; cooperation is a coordinator-owned prerequisite.
 // No successful default callback substitutes for reslimit/cooperation.
-func upolySourceOwnerServices(t *testing.T) (*UPolynomialManager, *util.RationalManager, *arena.Budget, *control.Reslimit, *cooperate.Cooperation) {
+func upolySourceOwnerServices(t *testing.T) (*UPolynomialManager, *unumeral.RationalManager, *arena.Budget, *control.Reslimit, *cooperate.Cooperation) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -49,7 +50,7 @@ func upolySourceOwnerServices(t *testing.T) (*UPolynomialManager, *util.Rational
 	})
 	return m, q, b, limit, cooperation
 }
-func upolySourceOwner(t *testing.T) (*UPolynomialManager, *util.RationalManager, *arena.Budget) {
+func upolySourceOwner(t *testing.T) (*UPolynomialManager, *unumeral.RationalManager, *arena.Budget) {
 	m, q, b, _, _ := upolySourceOwnerServices(t)
 	return m, q, b
 }
@@ -65,9 +66,9 @@ func upolySourceNew(t *testing.T, m *UPolynomialManager, values []int32) UPolyno
 		}
 	})
 	// Input literals are externally borrowed for the call; actual manager copies.
-	nums := make([]util.Int, len(values))
+	nums := make([]unumeral.Int, len(values))
 	for i, v := range values {
-		nums[i] = util.NewInt(v)
+		nums[i] = unumeral.NewInt(v)
 	}
 	if e = m.SetInts(p, nums); e != nil {
 		t.Fatal(e)
@@ -82,7 +83,7 @@ func TestUPolynomialSourceNinePretranslationENSURE(t *testing.T) {
 	// polynomial_ref then converts. Actual dense factor construction is the
 	// explicit input adapter; no multivariate conversion coverage is claimed.
 	for i := int32(1); i <= 4; i++ {
-		if e := m.SetInts(factor, []util.Int{util.NewInt(-i), util.NewInt(1)}); e != nil {
+		if e := m.SetInts(factor, []unumeral.Int{unumeral.NewInt(-i), unumeral.NewInt(1)}); e != nil {
 			t.Fatal(e)
 		}
 		if e := m.Mul(p, factor, p); e != nil {
@@ -97,7 +98,7 @@ func TestUPolynomialSourceNinePretranslationENSURE(t *testing.T) {
 		n    int64
 		zero bool
 	}{{1, true}, {2, true}, {3, true}, {4, true}, {-1, false}, {5, false}, {-2, false}} {
-		point := util.NewRational()
+		point := unumeral.NewRational()
 		if e = q.SetInt64(&point, fixture.n); e != nil {
 			t.Fatal(e)
 		}
@@ -110,7 +111,7 @@ func TestUPolynomialSourceNinePretranslationENSURE(t *testing.T) {
 		}
 	}
 	// Source scoped_mpq c=1/3, r1=1-c, r2=3-c; actual output actions.
-	c, r1, r2 := util.NewRational(), util.NewRational(), util.NewRational()
+	c, r1, r2 := unumeral.NewRational(), unumeral.NewRational(), unumeral.NewRational()
 	if e = q.SetFraction(&c, 1, 3); e != nil {
 		t.Fatal(e)
 	}
@@ -126,7 +127,7 @@ func TestUPolynomialSourceNinePretranslationENSURE(t *testing.T) {
 	if e = q.Sub(&r2, &c, &r2); e != nil {
 		t.Fatal(e)
 	}
-	for _, r := range []*util.Rational{&r1, &r2} {
+	for _, r := range []*unumeral.Rational{&r1, &r2} {
 		sign, e := m.EvalSignRational(view, r)
 		if e != nil || sign == 0 {
 			t.Fatal(sign, e)
@@ -147,7 +148,7 @@ func TestUPolynomialSourceBasicCoefficientRoutes(t *testing.T) {
 	p := upolySourceNew(t, m, []int32{1})
 	factor := upolySourceNew(t, m, nil)
 	for _, n := range []int32{-1, 1, 2, 3, -3} {
-		if e := m.SetInts(factor, []util.Int{util.NewInt(n), util.NewInt(1)}); e != nil {
+		if e := m.SetInts(factor, []unumeral.Int{unumeral.NewInt(n), unumeral.NewInt(1)}); e != nil {
 			t.Fatal(e)
 		}
 		if e := m.Mul(p, factor, p); e != nil {
@@ -156,7 +157,7 @@ func TestUPolynomialSourceBasicCoefficientRoutes(t *testing.T) {
 	}
 	// Frozen independent expansion of source tst1's five factors.
 	for i, want := range []int32{18, 9, -20, -10, 2, 1} {
-		var n util.Int
+		var n unumeral.Int
 		if e := m.ReadCoefficient(p, uint32(i), &n); e != nil {
 			t.Fatal(e)
 		}
@@ -199,7 +200,7 @@ func TestUPolynomialStorageOwnershipAndPhysicalViews(t *testing.T) {
 	if e = m.Swap(p, q); e != nil {
 		t.Fatal(e)
 	}
-	var n util.Int
+	var n unumeral.Int
 	if e = m.ReadView(v, 0, &n); e != nil {
 		t.Fatal(e)
 	}
@@ -211,7 +212,7 @@ func TestUPolynomialStorageOwnershipAndPhysicalViews(t *testing.T) {
 	}
 	before := b.Used()
 	b.FailAfter(0)
-	if e = m.SetInts(q, []util.Int{util.NewInt(1), util.NewInt(2), util.NewInt(3)}); e != nil {
+	if e = m.SetInts(q, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(2), unumeral.NewInt(3)}); e != nil {
 		t.Fatal("native coefficient growth", e)
 	}
 	b.FailAfter(-1)
@@ -257,7 +258,7 @@ func TestUPolynomialFiniteArithmeticAndDirectDerivative(t *testing.T) {
 			t.Fatal(i, size, e)
 		}
 		for j, want := range c.want {
-			var n util.Int
+			var n unumeral.Int
 			if e = m.ReadCoefficient(p, uint32(j), &n); e != nil {
 				t.Fatal(e)
 			}
@@ -318,13 +319,13 @@ func TestUPolynomialViewOverloadsAndModularShape(t *testing.T) {
 	if e != nil || !field {
 		t.Fatal(field, e)
 	}
-	if e = m.SetInts(out, []util.Int{util.NewInt(4), util.NewInt(5)}); e != nil {
+	if e = m.SetInts(out, []unumeral.Int{unumeral.NewInt(4), unumeral.NewInt(5)}); e != nil {
 		t.Fatal(e)
 	}
 	if size, e := m.Size(out); e != nil || size != 1 {
 		t.Fatal(size, e)
 	}
-	var n util.Int
+	var n unumeral.Int
 	if e = m.ReadCoefficient(out, 0, &n); e != nil {
 		t.Fatal(e)
 	}
@@ -355,7 +356,7 @@ func TestUPolynomialRawViewActualReadTiming(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if e = m.SetInts(p, []util.Int{util.NewInt(1), util.NewInt(2), util.NewInt(3)}); e != nil {
+	if e = m.SetInts(p, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(2), unumeral.NewInt(3)}); e != nil {
 		t.Fatal(e)
 	}
 	if sign, e := m.EvalSignInt(empty, nil); e != nil || sign != 0 {
@@ -391,7 +392,7 @@ func TestUPolynomialRawViewActualReadTiming(t *testing.T) {
 	if e = m.MulViews(captured, av, other); e == nil {
 		t.Fatal("captured scratch relocation must not keep old Go allocation readable")
 	}
-	var n util.Int
+	var n unumeral.Int
 	if e = m.ReadCoefficient(other, 0, &n); e != nil {
 		t.Fatal(e)
 	}
@@ -407,7 +408,7 @@ func TestUPolynomialRawViewActualReadTiming(t *testing.T) {
 func TestUPolynomialPredicatesTrimSourceStorage(t *testing.T) {
 	m, _, _ := upolySourceOwner(t)
 	p := upolySourceNew(t, m, []int32{5, 2})
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	if e := m.SetCoefficient(p, 1, &zero); e != nil {
 		t.Fatal(e)
 	}
@@ -442,7 +443,7 @@ func TestUPolynomialIndependentScaledEvaluation(t *testing.T) {
 		}
 		for n := int64(-4); n <= 4; n++ {
 			for d := int64(1); d <= 4; d++ {
-				point := util.NewRational()
+				point := unumeral.NewRational()
 				if e = q.SetFraction(&point, n, uint64(d)); e != nil {
 					t.Fatal(e)
 				}
@@ -463,7 +464,7 @@ func TestUPolynomialIndependentScaledEvaluation(t *testing.T) {
 					t.Fatal(e)
 				}
 				if d == 1 {
-					integer := util.NewInt(int32(n))
+					integer := unumeral.NewInt(int32(n))
 					sign, e = m.EvalSignInt(view, &integer)
 					if e != nil || sign != sum.Sign() {
 						t.Fatal(coeff, n, sign, e)
@@ -473,7 +474,7 @@ func TestUPolynomialIndependentScaledEvaluation(t *testing.T) {
 		}
 		for k := uint32(0); k <= 4; k++ {
 			for n := int32(-4); n <= 4; n++ {
-				point := util.NewBinaryIntPower(n, k)
+				point := unumeral.NewBinaryIntPower(n, k)
 				rat := new(big.Rat).SetFrac(big.NewInt(int64(n)), new(big.Int).Lsh(big.NewInt(1), uint(k)))
 				sum := new(big.Rat)
 				power := new(big.Rat).SetInt64(1)
@@ -533,17 +534,17 @@ func TestUPolynomialImmediateNumericFailureAccounting(t *testing.T) {
 	for fail := int64(0); fail < 24; fail++ {
 		m, q, b := upolySourceOwner(t)
 		p := upolySourceNew(t, m, nil)
-		var z util.Int
+		var z unumeral.Int
 		if e := q.Integers().SetString(&z, "1234567890123456789012345678901234567890"); e != nil {
 			t.Fatal(e)
 		}
-		if e := m.SetInts(p, []util.Int{z, util.NewInt(0), util.NewInt(7)}); e != nil {
+		if e := m.SetInts(p, []unumeral.Int{z, unumeral.NewInt(0), unumeral.NewInt(7)}); e != nil {
 			t.Fatal(e)
 		}
 		if e := q.Integers().Del(&z); e != nil {
 			t.Fatal(e)
 		}
-		point := util.NewRational()
+		point := unumeral.NewRational()
 		if e := q.SetFraction(&point, 9876543210123456, 12345678901234567); e != nil {
 			t.Fatal(e)
 		}
@@ -561,7 +562,7 @@ func TestUPolynomialImmediateNumericFailureAccounting(t *testing.T) {
 		if now.IntegerLiveCells != external+now.OwnedNumeralCells+now.IntegerCachedCells+upolyIntegerRawOwnedCells(t, m.IntegerManager()) {
 			t.Fatal("untracked numeric temporary", fail, base, now)
 		}
-		upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Rationals: []*util.Rational{&point}, RationalManagers: []*util.RationalManager{q}})
+		upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Rationals: []*unumeral.Rational{&point}, RationalManagers: []*unumeral.RationalManager{q}})
 		b.FailAfter(-1)
 		if e = q.Del(&point); e != nil {
 			t.Fatal(e)
@@ -624,13 +625,13 @@ func TestUPolynomialColdFailureAndWarmZeroAllocation(t *testing.T) {
 func TestUPolynomialSourceCopyAndRationalPrefixes(t *testing.T) {
 	m, q, b := upolySourceOwner(t)
 	p := upolySourceNew(t, m, []int32{1, 2, 3})
-	var large util.Int
+	var large unumeral.Int
 	if e := q.Integers().SetString(&large, strings.Repeat("9", 1000)); e != nil {
 		t.Fatal(e)
 	}
 	// Saturate the actual eight-cell pages; parsing may have left cached
 	// blocks, so budget refusal must not assume a fresh limb allocation.
-	var fillers [16]util.Int
+	var fillers [16]unumeral.Int
 	filled := 0
 	for st := m.Stats(); st.IntegerLiveCells+st.IntegerRetiredCells < st.IntegerCellSlots || (st.IntegerLiveCells+st.IntegerRetiredCells)%8 != 0; st = m.Stats() {
 		if filled == len(fillers) {
@@ -643,7 +644,7 @@ func TestUPolynomialSourceCopyAndRationalPrefixes(t *testing.T) {
 	}
 	base := m.Stats()
 	b.FailAfter(0)
-	if e := m.SetInts(p, []util.Int{util.NewInt(7), large, util.NewInt(9)}); e == nil {
+	if e := m.SetInts(p, []unumeral.Int{unumeral.NewInt(7), large, unumeral.NewInt(9)}); e == nil {
 		t.Fatal("big coefficient must refuse fresh backing")
 	}
 	now := m.Stats()
@@ -651,7 +652,7 @@ func TestUPolynomialSourceCopyAndRationalPrefixes(t *testing.T) {
 		t.Fatal("copy failure retained unnamed numerical root", base, now)
 	}
 	b.FailAfter(-1)
-	var n util.Int
+	var n unumeral.Int
 	if e := m.ReadCoefficient(p, 0, &n); e != nil {
 		t.Fatal(e)
 	}
@@ -680,7 +681,7 @@ func TestUPolynomialSourceCopyAndRationalPrefixes(t *testing.T) {
 	if e := q.Integers().Del(&large); e != nil {
 		t.Fatal(e)
 	}
-	one, fraction := util.NewRational(), util.NewRational()
+	one, fraction := unumeral.NewRational(), unumeral.NewRational()
 	if e := q.SetInt64(&one, 1); e != nil {
 		t.Fatal(e)
 	}
@@ -688,7 +689,7 @@ func TestUPolynomialSourceCopyAndRationalPrefixes(t *testing.T) {
 		t.Fatal(e)
 	}
 	target := upolySourceNew(t, m, nil)
-	e := m.SetRationals(target, []util.Rational{one, fraction})
+	e := m.SetRationals(target, []unumeral.Rational{one, fraction})
 	if polynomialSourceDebug {
 		if !errors.Is(e, ErrUPolynomialAssertion) {
 			t.Fatal(e)
@@ -733,7 +734,7 @@ func TestUPolynomialConcreteScopedVectorActions(t *testing.T) {
 		t.Fatal(e)
 	}
 	// Raw captured initialized slot remains source-readable after shrink.
-	var n util.Int
+	var n unumeral.Int
 	if e = m.ReadView(captured, 1, &n); e != nil {
 		t.Fatal(e)
 	}
@@ -757,7 +758,7 @@ func TestUPolynomialConcreteScopedVectorActions(t *testing.T) {
 	if e = m.IntegerManager().Del(&n); e != nil {
 		t.Fatal(e)
 	}
-	value := util.NewInt(8)
+	value := unumeral.NewInt(8)
 	b.FailAfter(0)
 	e = m.PushCoefficient(p, &value)
 	b.FailAfter(-1)
@@ -787,18 +788,18 @@ func TestUPolynomialSourceLifecycleAndNumericDestructionOrder(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	var n util.Int
+	var n unumeral.Int
 	if e = q.Integers().SetString(&n, "123456789012345678901234567890"); e != nil {
 		t.Fatal(e)
 	}
-	if e = m.SetInts(p, []util.Int{n, util.NewInt(1)}); e != nil {
+	if e = m.SetInts(p, []unumeral.Int{n, unumeral.NewInt(1)}); e != nil {
 		t.Fatal(e)
 	}
 	out, e := m.NewPolynomial()
 	if e != nil {
 		t.Fatal(e)
 	}
-	if e = m.SetInts(out, []util.Int{n}); e != nil {
+	if e = m.SetInts(out, []unumeral.Int{n}); e != nil {
 		t.Fatal(e)
 	}
 	if e = m.Power(p, 3, out); e != nil {
@@ -866,14 +867,14 @@ func TestUPolynomialAllSelectedOutputFailurePrefixes(t *testing.T) {
 			p := upolySourceNew(t, m, nil)
 			other := upolySourceNew(t, m, nil)
 			out := upolySourceNew(t, m, []int32{11, 12})
-			var n util.Int
+			var n unumeral.Int
 			if e := q.Integers().SetString(&n, "12345678901234567890123456789012345678901234567890"); e != nil {
 				t.Fatal(e)
 			}
-			if e := m.SetInts(p, []util.Int{n, util.NewInt(3), util.NewInt(1)}); e != nil {
+			if e := m.SetInts(p, []unumeral.Int{n, unumeral.NewInt(3), unumeral.NewInt(1)}); e != nil {
 				t.Fatal(e)
 			}
-			if e := m.SetInts(other, []util.Int{n, util.NewInt(-2)}); e != nil {
+			if e := m.SetInts(other, []unumeral.Int{n, unumeral.NewInt(-2)}); e != nil {
 				t.Fatal(e)
 			}
 			if e := q.Integers().Del(&n); e != nil {
@@ -936,13 +937,13 @@ func TestUPolynomialIndependentConvolutionAllAliases(t *testing.T) {
 		for _, aa := range [][]int32{{}, {2}, {-2, 1}, {1, 0, -2, 1}} {
 			for _, bb := range [][]int32{{}, {-1}, {2, -1, 1}} {
 				for alias := 0; alias < 3; alias++ {
-					numsA := make([]util.Int, len(aa))
-					numsB := make([]util.Int, len(bb))
+					numsA := make([]unumeral.Int, len(aa))
+					numsB := make([]unumeral.Int, len(bb))
 					for i, v := range aa {
-						numsA[i] = util.NewInt(v)
+						numsA[i] = unumeral.NewInt(v)
 					}
 					for i, v := range bb {
-						numsB[i] = util.NewInt(v)
+						numsB[i] = unumeral.NewInt(v)
 					}
 					if e := m.SetInts(a, numsA); e != nil {
 						t.Fatal(e)
@@ -988,7 +989,7 @@ func TestUPolynomialIndependentConvolutionAllAliases(t *testing.T) {
 						t.Fatal(modulus, aa, bb, alias, size, e, want)
 					}
 					for i, w := range want {
-						var n util.Int
+						var n unumeral.Int
 						if e = m.ReadCoefficient(dst, uint32(i), &n); e != nil {
 							t.Fatal(e)
 						}
@@ -1009,9 +1010,9 @@ func TestUPolynomialIndependentConvolutionAllAliases(t *testing.T) {
 func TestUPolynomialScalarModeAndDirectCheckpoint(t *testing.T) {
 	m, _, _, limit, _ := upolySourceOwnerServices(t)
 	p := upolySourceNew(t, m, []int32{2, 1})
-	zero := util.NewInt(0)
-	one := util.NewInt(1)
-	minusTwo := util.NewInt(-2)
+	zero := unumeral.NewInt(0)
+	one := unumeral.NewInt(1)
+	minusTwo := unumeral.NewInt(-2)
 	if e := m.MulScalar(p, &one); e != nil {
 		t.Fatal(e)
 	}
@@ -1034,7 +1035,7 @@ func TestUPolynomialScalarModeAndDirectCheckpoint(t *testing.T) {
 	if e := m.SetZPUint64(7); e != nil {
 		t.Fatal(e)
 	}
-	var modulus util.Int
+	var modulus unumeral.Int
 	if e := m.Modulus(&modulus); e != nil {
 		t.Fatal(e)
 	}
@@ -1053,7 +1054,7 @@ func TestUPolynomialRawMutableScalarOverloads(t *testing.T) {
 	if e := m.NegViewInPlace(v); e != nil {
 		t.Fatal(e)
 	}
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	e := m.MulScalarView(v, &zero)
 	if polynomialSourceDebug {
 		if !errors.Is(e, ErrUPolynomialAssertion) {

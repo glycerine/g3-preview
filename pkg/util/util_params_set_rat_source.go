@@ -4,6 +4,7 @@ package util
 import (
 	"reflect"
 
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -22,7 +23,7 @@ type ParamsSetReceipt struct {
 }
 
 func paramsSetFrameBytes(n int) uint64 { return paramsBytes(n, reflect.TypeOf(paramsSetFrame{})) }
-func (c *ParamsContext) setNewNumeral(slot uint32, key usymbol.Symbol, value *OwnedRational) error {
+func (c *ParamsContext) setNewNumeral(slot uint32, key usymbol.Symbol, value *unumeral.OwnedRational) error {
 	frame := &c.SetFrames[slot-1]
 	if frame.Active {
 		return ErrParamsPrecondition

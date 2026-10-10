@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -57,7 +58,7 @@ func liftPreparationSavedModulusTransport(t *testing.T, mode string) {
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -68,7 +69,7 @@ func liftPreparationSavedModulusTransport(t *testing.T, mode string) {
 	var held umemory.Block
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
-	var value util.Int
+	var value unumeral.Int
 	defer func() {
 		armed = false
 		b.FailAfter(-1)
@@ -89,7 +90,7 @@ func liftPreparationSavedModulusTransport(t *testing.T, mode string) {
 	parent, e := s.newSquareFreeScope()
 	serviceMust(t, e)
 	parent.constructed = 1
-	serviceMust(t, m.set(&parent.fpp, []util.Int{util.NewInt(1), util.NewInt(0), util.NewInt(1)}))
+	serviceMust(t, m.set(&parent.fpp, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(0), unumeral.NewInt(1)}))
 	serviceMust(t, s.preparePrimeSearch(fs))
 	// Valid uint32 prime; compiled post-loop operand profile avoids an
 	// impractical iterator search. Extra capacity does not change its value.
@@ -127,7 +128,7 @@ func TestUPolynomialFactorLiftPreparationEveryActualPrefix(t *testing.T) {
 			c, e := s.newSquareFreeScope()
 			serviceMust(t, e)
 			c.constructed = 1
-			serviceMust(t, m.set(&c.fpp, []util.Int{util.NewInt(-6), util.NewInt(1), util.NewInt(1)}))
+			serviceMust(t, m.set(&c.fpp, []unumeral.Int{unumeral.NewInt(-6), unumeral.NewInt(1), unumeral.NewInt(1)}))
 			serviceMust(t, s.preparePrimeSearch(out))
 			// Compiled eligible post-loop prime profile, using the real trial engine.
 			serviceMust(t, m.modular.SetInt32(&c.p, 7))
@@ -135,7 +136,7 @@ func TestUPolynomialFactorLiftPreparationEveryActualPrefix(t *testing.T) {
 			trials := uint32(0)
 			route, e := s.factorPrimeTrial(c.zp, &c.fpp, out, c.best, 1, &c.p, &c.bestP, &c.ds, &trials)
 			serviceMust(t, e)
-			if route != 1 || c.best.count != 2 || c.bestP != util.NewInt(7) {
+			if route != 1 || c.best.count != 2 || c.bestP != unumeral.NewInt(7) {
 				t.Fatal("actual saved-factor setup", route, c.best.count, c.bestP)
 			}
 			z.Budget().FailAfter(ordinal)
@@ -164,7 +165,7 @@ func TestUPolynomialFactorLiftPreparationEveryActualPrefix(t *testing.T) {
 					serviceMust(t, e)
 					leading, e := c.zpe.read(c.zpe.stateView(&c.lifted.factors[i]), 1)
 					serviceMust(t, e)
-					if *leading != util.NewInt(1) {
+					if *leading != unumeral.NewInt(1) {
 						t.Fatal("independent monic factor", *leading)
 					}
 				}

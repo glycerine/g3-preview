@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialSparseSourceMissingEntryKeepsInputThenReset(t *testing.T) {
@@ -17,7 +16,7 @@ func TestPolynomialSparseSourceMissingEntryKeepsInputThenReset(t *testing.T) {
 	s, e := NewPolynomialSparseInterpolator(full, sk)
 	serviceMust(t, e)
 	q := polynomialQueryTerms(t, m, []int32{1}, [][]MonomialPower{{{1, 1}}})
-	in := util.NewInt(7)
+	in := unumeral.NewInt(7)
 	ok, e := s.Add(&in, q)
 	serviceMust(t, e)
 	if ok {

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialHenselExactOldLeafPreservesForeignReplacement(t *testing.T) {
@@ -16,7 +16,7 @@ func TestUPolynomialHenselExactOldLeafPreservesForeignReplacement(t *testing.T) 
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			q, s := mignotteDirectFixture(t)
 			m := s.manager
-			var prime, foreign, large util.Int
+			var prime, foreign, large unumeral.Int
 			serviceMust(t, q.Integers().SetLimbs(&prime, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 			words := make([]uint32, 25000)
 			words[24999] = 1

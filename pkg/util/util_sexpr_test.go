@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -20,11 +21,11 @@ func sxMust(t *testing.T, e error) {
 		t.Fatal(e)
 	}
 }
-func sxOwner(t *testing.T, b *arena.Budget) (*SexprManager, *usymbol.Manager, *RationalService) {
+func sxOwner(t *testing.T, b *arena.Budget) (*SexprManager, *usymbol.Manager, *unumeral.RationalService) {
 	t.Helper()
 	s, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	sxMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 2}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{Budget: b, PageSize: 2}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 2}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{Budget: b, PageSize: 2}}}})
 	sxMust(t, e)
 	m, e := NewSexprManager(SexprConfig{Budget: b, PageSize: 2, Symbols: s, Rationals: q})
 	sxMust(t, e)
@@ -38,7 +39,7 @@ func sxOwner(t *testing.T, b *arena.Budget) (*SexprManager, *usymbol.Manager, *R
 	})
 	return m, s, q
 }
-func sxNumber(t *testing.T, q *RationalService, text string) OwnedRational {
+func sxNumber(t *testing.T, q *unumeral.RationalService, text string) unumeral.OwnedRational {
 	v, e := q.NewValue()
 	sxMust(t, e)
 	sxMust(t, q.SetString(&v, text))
@@ -336,7 +337,7 @@ func TestSexprFailurePrefixesImmediateOwnership(t *testing.T) {
 			b := arena.NewBudget(1 << 25)
 			m, _, q := sxOwner(t, b)
 			v := sxNumber(t, q, "1684996666696914987166688442938726917102321526408785780068975640579/47890485652059026823698344598447161988085597568237573")
-			if _, e := q.FormatInto(&v, nil); !errors.Is(e, ErrShortBuffer) {
+			if _, e := q.FormatInto(&v, nil); !errors.Is(e, unumeral.ErrShortBuffer) {
 				t.Fatal(e)
 			} // Prime only legitimate numeric formatting scratch.
 			a, e := m.MkNumeral(&v, 0, 0)

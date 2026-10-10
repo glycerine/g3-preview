@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -23,7 +24,7 @@ func TestUPolynomialFactorLiftPreparationFactorsSourceCursorAndOwnHistory(t *tes
 			cfg := serviceConfig(b).Integers
 			cfg.Memory = rt
 			cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-			z, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+			z, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: z.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 			serviceMust(t, e)
@@ -49,7 +50,7 @@ func TestUPolynomialFactorLiftPreparationFactorsSourceCursorAndOwnHistory(t *tes
 			c, e := s.newSquareFreeScope()
 			serviceMust(t, e)
 			c.constructed = 1
-			serviceMust(t, m.set(&c.fpp, []util.Int{util.NewInt(-6), util.NewInt(1), util.NewInt(1)}))
+			serviceMust(t, m.set(&c.fpp, []unumeral.Int{unumeral.NewInt(-6), unumeral.NewInt(1), unumeral.NewInt(1)}))
 			serviceMust(t, s.preparePrimeSearch(out))
 			serviceMust(t, m.modular.SetInt32(&c.p, 7))
 			serviceMust(t, c.zp.SetZP(&c.p))

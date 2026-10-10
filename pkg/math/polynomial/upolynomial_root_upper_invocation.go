@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyRootUpperBoundScope struct {
@@ -16,10 +16,10 @@ type upolyRootUpperBoundScope struct {
 	falseAcknowledged        bool
 	owner                    *UPolynomialManager
 	invocation               uint64
-	values                   [5]util.Int
+	values                   [5]unumeral.Int
 	numeric                  polynomialNumericRoots
-	normalize                util.IntegerNormalizeInvocationReceipt
-	divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
+	normalize                unumeral.IntegerNormalizeInvocationReceipt
+	divisionRaw, extendedRaw unumeral.IntegerRawInvocationReceipt
 
 	sourceRemaining, ownRemaining            uint8
 	active, executing, finishing, ownStarted bool
@@ -34,8 +34,8 @@ type upolyRootUpperBoundHistory struct {
 	frame                    *upolyRootUpperBoundScope
 	next                     *upolyRootUpperBoundHistory
 	invocation               uint64
-	normalize                util.IntegerNormalizeInvocationReceipt
-	divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
+	normalize                unumeral.IntegerNormalizeInvocationReceipt
+	divisionRaw, extendedRaw unumeral.IntegerRawInvocationReceipt
 
 	bodyCause, sourceCause, ownCause error
 	sourceRemaining                  uint8
@@ -44,10 +44,10 @@ type upolyRootUpperBoundHistory struct {
 func (m *UPolynomialManager) rootUpperBoundExecuting() bool {
 	return m != nil && m.self == m && m.rootUpperBound.owner == m && m.rootUpperBound.active && (m.rootUpperBound.executing || m.rootUpperBound.finishing)
 }
-func numericIntegerManager_rootUpperBoundCallerExecuting(z *util.IntegerManager) bool {
+func numericIntegerManager_rootUpperBoundCallerExecuting(z *unumeral.IntegerManager) bool {
 	return z != nil && z.ValidOwner() && rootUpperBoundCaller(z) != nil && rootUpperBoundCaller(z).config.Integer == z && rootUpperBoundCaller(z).rootUpperBoundExecuting()
 }
-func (c integerAllocationInvocationContext) rootUpperBoundFrame(z *util.IntegerManager) *upolyRootUpperBoundScope {
+func (c integerAllocationInvocationContext) rootUpperBoundFrame(z *unumeral.IntegerManager) *upolyRootUpperBoundScope {
 	q := c.rootUpperBound
 	if z == nil || !z.ValidOwner() || q == nil || q.owner == nil || q.owner.self != q.owner || q != &q.owner.rootUpperBound || q.owner.config.Integer != z || rootUpperBoundCaller(z) != q.owner || q.owner.callbackDepth != 0 || !q.active || !q.executing || q.constructed < 4 || c.rootUpperBoundInvocation == 0 || c.rootUpperBoundInvocation != q.invocation {
 		return nil
@@ -232,7 +232,7 @@ func (q *upolyRootUpperBoundScope) matches() bool {
 }
 func (q *upolyRootUpperBoundScope) numericChildCause() error {
 	z := q.owner.config.Integer
-	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
+	for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
 		if e := z.RawInvocationSourceCause(r); e != nil {
 			return e
 		}
@@ -241,7 +241,7 @@ func (q *upolyRootUpperBoundScope) numericChildCause() error {
 }
 func (q *upolyRootUpperBoundScope) cleanupNumericChildren(abort bool) error {
 	z := q.owner.config.Integer
-	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
+	for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
 		if e := z.CleanupRawInvocation(r, abort); e != nil {
 			return e
 		}
@@ -249,20 +249,20 @@ func (q *upolyRootUpperBoundScope) cleanupNumericChildren(abort bool) error {
 
 	return nil
 }
-func (c integerAllocationInvocationContext) recordRootUpperRaw(z *util.IntegerManager, r *util.IntegerRawInvocationReceipt) {
+func (c integerAllocationInvocationContext) recordRootUpperRaw(z *unumeral.IntegerManager, r *unumeral.IntegerRawInvocationReceipt) {
 	q := c.rootUpperBoundFrame(z)
 	if q == nil || !z.MatchesRawInvocation(r) {
 		return
 	}
 
 	switch r.Kind() {
-	case util.IntegerRawDivision:
+	case unumeral.IntegerRawDivision:
 		q.divisionRaw = *r
-	case util.IntegerRawExtendedGCD:
+	case unumeral.IntegerRawExtendedGCD:
 		q.extendedRaw = *r
 	}
 }
 
-func numericNaturalManager_rootUpperBoundCallerExecuting(n *util.NaturalManager) bool {
+func numericNaturalManager_rootUpperBoundCallerExecuting(n *unumeral.NaturalManager) bool {
 	return n != nil && n.ValidOwner() && rootUpperBoundCaller(n) != nil && rootUpperBoundCaller(n).self == rootUpperBoundCaller(n) && rootUpperBoundCaller(n).config.Integer != nil && rootUpperBoundCaller(n).config.Integer.Naturals() == n && rootUpperBoundCaller(n).rootUpperBoundExecuting()
 }

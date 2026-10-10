@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -21,7 +22,7 @@ func TestUPolynomialMignotteActualAddMulEndStopsOlderNUM(t *testing.T) {
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -29,7 +30,7 @@ func TestUPolynomialMignotteActualAddMulEndStopsOlderNUM(t *testing.T) {
 	serviceMust(t, e)
 	s, e := NewUPolynomialFactorizationService(u, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
-	var a, warm util.Int
+	var a, warm unumeral.Int
 	defer func() {
 		recovery, e := rt.Allocate(400000)
 		serviceMust(t, e)
@@ -62,15 +63,15 @@ func TestUPolynomialMignotteActualAddMulEndStopsOlderNUM(t *testing.T) {
 	product[63] = 2
 	serviceMust(t, q.Integers().SetLimbs(&r.frame.norm, product))
 	serviceMust(t, q.Integers().Neg(&r.frame.norm))
-	prime := util.NewInt(251)
+	prime := unumeral.NewInt(251)
 	serviceMust(t, q.Integers().Rem(&a, &prime, &warm))
 	serviceMust(t, q.Integers().EnsureTmp(0, 40000))
 	contextTLSNearMinimum(t, rt)
-	two := util.NewInt(2)
+	two := unumeral.NewInt(2)
 	body := s.mignotteNumericCall(&r, 0, &two, &a, &r.frame.norm, 0)
 	r.frame.executing = false
 	mignotteScopePhysicalAudit(t, q, s, &a, &warm)
-	if !errors.Is(body, arena.ErrBounds) || r.frame.addMul.Frame == nil || r.frame.addMul.Frame.Stage != 3 || r.frame.norm != util.NewInt(0) {
+	if !errors.Is(body, arena.ErrBounds) || r.frame.addMul.Frame == nil || r.frame.addMul.Frame.Stage != 3 || r.frame.norm != unumeral.NewInt(0) {
 		t.Fatal("actual AddMul output before explicit DEL", body, r.frame.norm)
 	}
 	stop := s.finishMignotteSource(&r, body)

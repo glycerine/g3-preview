@@ -4,10 +4,9 @@ package polynomial
 import (
 	"errors"
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialKnuthMinimumEveryActualPrefixAndDestructiveSuffix(t *testing.T) {
@@ -25,9 +24,9 @@ func TestUPolynomialKnuthMinimumEveryActualPrefixAndDestructiveSuffix(t *testing
 					}
 					poly, e := p.NewPolynomial()
 					serviceMust(t, e)
-					nums := make([]util.Int, len(values))
+					nums := make([]unumeral.Int, len(values))
 					for i, v := range values {
-						nums[i] = util.NewInt(v)
+						nums[i] = unumeral.NewInt(v)
 					}
 					serviceMust(t, p.SetInts(poly, nums))
 					v, e := p.wholeView(poly)
@@ -64,7 +63,7 @@ func TestUPolynomialKnuthMinimumEveryActualPrefixAndDestructiveSuffix(t *testing
 						} else {
 							coefficient, e = p.read(v, 4)
 							serviceMust(t, e)
-							if *coefficient != util.NewInt(1) {
+							if *coefficient != unumeral.NewInt(1) {
 								t.Fatal("source reversed suffix was restored on throw", *coefficient)
 							}
 							reversed = true

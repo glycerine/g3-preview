@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialToPolynomialZeroBeforeLocal(t *testing.T) {
@@ -28,14 +29,14 @@ func TestPolynomialToPolynomialZeroBeforeLocal(t *testing.T) {
 func TestPolynomialToPolynomialIndependentAscendingCoefficients(t *testing.T) {
 	m, _, _ := polynomialEvalFixture(t, nil)
 	z := m.core.integer
-	coefficients := []util.Int{util.NewInt(3), util.NewInt(0), util.NewInt(-2), util.NewInt(0), util.NewInt(1)}
-	before := append([]util.Int(nil), coefficients...)
+	coefficients := []unumeral.Int{unumeral.NewInt(3), unumeral.NewInt(0), unumeral.NewInt(-2), unumeral.NewInt(0), unumeral.NewInt(1)}
+	before := append([]unumeral.Int(nil), coefficients...)
 	p, e := m.ToPolynomial(5, coefficients, 0)
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(p))
 	defer func() { serviceMust(t, m.core.DecRef(p)) }()
 	for x := int32(-3); x <= 3; x++ {
-		in, out := util.NewInt(x), util.Int{}
+		in, out := unumeral.NewInt(x), unumeral.Int{}
 		serviceMust(t, m.UnivariateEvaluate(p, 0, &in, &out))
 		got, e := z.Int64(&out)
 		serviceMust(t, e)
@@ -60,17 +61,17 @@ func TestPolynomialToPolynomialEveryActualPrefix(t *testing.T) {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m, _, _ := polynomialEvalFixture(t, nil)
 			z := m.core.integer
-			coefficients := make([]util.Int, 130)
+			coefficients := make([]unumeral.Int, 130)
 			serviceMust(t, z.Copy(&coefficients[0], &z.Two64))
 			serviceMust(t, z.Copy(&coefficients[129], &z.Two64))
 			defer func() { serviceMust(t, z.Del(&coefficients[0])); serviceMust(t, z.Del(&coefficients[129])) }()
-			before := [2]util.Int{coefficients[0], coefficients[129]}
+			before := [2]unumeral.Int{coefficients[0], coefficients[129]}
 			z.Budget().FailAfter(ordinal)
 			p, e := m.ToPolynomial(130, coefficients, 0)
 			if e != nil && !numericPhysicalReservationRefusal(e) {
 				t.Fatal("actual source reservation", ordinal, e)
 			}
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&coefficients[0], &coefficients[129]}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&coefficients[0], &coefficients[129]}, 0)
 			if coefficients[0] != before[0] || coefficients[129] != before[1] {
 				t.Fatal("const input changed")
 			}
@@ -79,7 +80,7 @@ func TestPolynomialToPolynomialEveryActualPrefix(t *testing.T) {
 			if e == nil {
 				success = true
 				serviceMust(t, m.core.IncRef(p))
-				one, out := util.NewInt(1), util.Int{}
+				one, out := unumeral.NewInt(1), unumeral.Int{}
 				serviceMust(t, m.UnivariateEvaluate(p, 0, &one, &out))
 				text, e := z.String(&out)
 				serviceMust(t, e)
@@ -104,7 +105,7 @@ func TestPolynomialToPolynomialZeroKeepsOlderStoppedLocal(t *testing.T) {
 	m, _, _ := polynomialEvalFixture(t, nil)
 	z := m.core.integer
 	z.Budget().FailAfter(0)
-	_, cause := m.ToPolynomial(1, []util.Int{z.Two64}, 0)
+	_, cause := m.ToPolynomial(1, []unumeral.Int{z.Two64}, 0)
 	if !numericPhysicalReservationRefusal(cause) {
 		t.Fatal("actual first copied coefficient refusal", cause)
 	}
@@ -125,13 +126,13 @@ func TestPolynomialToPolynomialModularSourceSets(t *testing.T) {
 	c := m.core
 	z := c.integer
 	serviceMust(t, c.modular.SetZPUint64(7))
-	coefficients := []util.Int{util.NewInt(-11), util.NewInt(14), util.NewInt(3)}
+	coefficients := []unumeral.Int{unumeral.NewInt(-11), unumeral.NewInt(14), unumeral.NewInt(3)}
 	p, e := m.ToPolynomial(3, coefficients, 0)
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
 	defer func() { serviceMust(t, c.DecRef(p)) }()
 	for x := int32(0); x < 7; x++ {
-		in, out := util.NewInt(x), util.Int{}
+		in, out := unumeral.NewInt(x), unumeral.Int{}
 		serviceMust(t, c.modular.PNormalize(&in))
 		serviceMust(t, m.UnivariateEvaluate(p, 0, &in, &out))
 		got, e := z.Int64(&out)
@@ -146,18 +147,18 @@ func TestPolynomialToPolynomialModularSourceSets(t *testing.T) {
 		}
 		serviceMust(t, z.Del(&out))
 	}
-	if coefficients[0] != util.NewInt(-11) || coefficients[1] != util.NewInt(14) {
+	if coefficients[0] != unumeral.NewInt(-11) || coefficients[1] != unumeral.NewInt(14) {
 		t.Fatal("const input normalized in place")
 	}
 }
 
 func TestPolynomialToPolynomialExactNumericForeignReplacement(t *testing.T) {
 	budget := arena.NewBudget(1 << 24)
-	z, e := util.NewIntegerManager(util.IntegerConfig{Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	z, e := unumeral.NewIntegerManager(unumeral.IntegerConfig{Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: z, Checkpoint: func() bool { panic("constructor has no checkpoint") }, Cooperation: func() error { panic("constructor has no cooperation") }}})
 	serviceMust(t, e)
-	foreign := util.NewInt(19)
+	foreign := unumeral.NewInt(19)
 	defer func() {
 		serviceMust(t, m.CleanupToPolynomial())
 		serviceMust(t, z.CleanupPendingAllocation())
@@ -168,24 +169,24 @@ func TestPolynomialToPolynomialExactNumericForeignReplacement(t *testing.T) {
 			t.Fatal("full actual owner graph", budget.Used())
 		}
 	}()
-	_, cause := m.ToPolynomial(1, []util.Int{z.Two64}, 0)
+	_, cause := m.ToPolynomial(1, []unumeral.Int{z.Two64}, 0)
 	if !errors.Is(cause, arena.ErrSlotLimit) || z.PendingAllocationObject() == (umemory.ObjectRef{}) {
 		t.Fatal("actual copied coefficient descriptor refusal", cause)
 	}
 	original := z.PendingCell
-	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&foreign}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&foreign}, 0)
 	serviceMust(t, z.CleanupPendingAllocation())
 	e = z.Copy(&foreign, &z.Two64)
 	if !errors.Is(e, arena.ErrSlotLimit) || z.PendingAllocationObject() == original.Object {
 		t.Fatal("actual later caller continuation", e)
 	}
 	replacement := z.PendingCell
-	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&foreign}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&foreign}, 0)
 	serviceMust(t, m.CleanupToPolynomial())
 	if z.PendingCell != replacement {
 		t.Fatal("operation abort consumed foreign pending backing")
 	}
-	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&foreign}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&foreign}, 0)
 }
 
 // A completed native coefficient buffer finalizes without introducing a
@@ -194,7 +195,7 @@ func TestPolynomialToPolynomialReturnedResultAfterNativeBufferFinalize(t *testin
 	budget := arena.NewBudget(1 << 26)
 	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	z, e := util.NewIntegerManager(util.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	z, e := unumeral.NewIntegerManager(unumeral.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: z, Checkpoint: func() bool { panic("constructor no checkpoint") }, Cooperation: func() error { panic("constructor no cooperation") }}})
 	serviceMust(t, e)
@@ -211,7 +212,7 @@ func TestPolynomialToPolynomialReturnedResultAfterNativeBufferFinalize(t *testin
 	// before the guarded profile; no counter or source allocation repair.
 	var warm [5]Polynomial
 	for i := range warm {
-		a := util.NewInt(int32(7 + i))
+		a := unumeral.NewInt(int32(7 + i))
 		warm[i], e = m.core.MkConstantTake(&a)
 		serviceMust(t, e)
 		serviceMust(t, m.core.IncRef(warm[i]))
@@ -228,7 +229,7 @@ func TestPolynomialToPolynomialReturnedResultAfterNativeBufferFinalize(t *testin
 	serviceMust(t, m.beginToPolynomial())
 	s := &m.toPolynomial
 	serviceMust(t, s.buffer.Resize(16384))
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	serviceMust(t, numericScopedIntegerModularBuffer128_setToPolynomial(&s.buffer, 0, &one, &s.direct))
 	view, e := s.buffer.View()
 	serviceMust(t, e)

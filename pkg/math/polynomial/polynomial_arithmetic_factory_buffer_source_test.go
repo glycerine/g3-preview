@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialRegularFactoryReceiptBindsActualSourceBuffer(t *testing.T) {
@@ -13,7 +12,7 @@ func TestPolynomialRegularFactoryReceiptBindsActualSourceBuffer(t *testing.T) {
 	p := polynomialICCPUnownedTerms(t, c, []int32{7}, [][]MonomialPower{nil})
 	serviceMust(t, c.IncRef(p))
 	defer func() { serviceMust(t, c.DecRef(p)) }()
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	serviceMust(t, c.som.addMul(&one, c.monomials.unit, p))
 	var factory polynomialFactoryInvocationReceipt
 	out, e := c.som.mkWithFactoryReceipt(false, &factory)

@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This is the returning Go ErrorTransport owner boundary, not a native source callback.
@@ -44,7 +45,7 @@ func TestPolynomialVariableActualTransportCannotRetireExecutingOwner(t *testing.
 			serviceMust(t, e)
 			cfg := serviceConfig(b).Integers
 			cfg.Memory = rt
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 			serviceMust(t, e)

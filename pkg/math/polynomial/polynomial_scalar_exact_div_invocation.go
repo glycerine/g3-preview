@@ -2,7 +2,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The scalar overload constructs one RAW numeral after resetting R. This
@@ -82,7 +82,7 @@ func (m *MultivariatePolynomialCore) cleanupScalarExactDivInvocation(r *polynomi
 	return nil
 }
 
-func (m *MultivariatePolynomialCore) ExactDivScalar(p Polynomial, c *util.Int) (result Polynomial, err error) {
+func (m *MultivariatePolynomialCore) ExactDivScalar(p Polynomial, c *unumeral.Int) (result Polynomial, err error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}

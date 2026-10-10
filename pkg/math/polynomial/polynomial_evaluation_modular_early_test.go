@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots(t *testing.T) {
@@ -19,22 +20,22 @@ func TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots(t *testing.T)
 			q := m.core.config.Rationals
 			digits := make([]uint32, 80)
 			digits[0], digits[79] = 3, 1
-			coefficient := util.Int{}
+			coefficient := unumeral.Int{}
 			serviceMust(t, q.Integers().SetLimbs(&coefficient, digits))
 			constant, e := m.core.MkConstantTake(&coefficient)
 			serviceMust(t, e)
 			serviceMust(t, m.core.IncRef(constant))
 			v := polynomialEvalRationalMap{manager: q}
 			for i := range v.values {
-				v.values[i] = util.NewRational()
+				v.values[i] = unumeral.NewRational()
 				serviceMust(t, q.SetInt32(&v.values[i], 2))
 			}
-			oldOutput := util.NewRational()
-			out, value := util.Int{}, util.NewInt(2)
+			oldOutput := unumeral.NewRational()
+			out, value := unumeral.Int{}, unumeral.NewInt(2)
 			// This real caller coefficient occupies the remaining descriptor on
 			// the two-slot cold page, so a later Copy reaches page reservation
 			// after its physical numeric object has actually been allocated.
-			holder := util.Int{}
+			holder := unumeral.Int{}
 			serviceMust(t, q.Integers().SetLimbs(&holder, digits))
 			defer func() {
 				q.Budget().FailAfter(-1)
@@ -47,7 +48,7 @@ func TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots(t *testing.T)
 				}
 				serviceMust(t, m.core.CleanupValue(&constant))
 			}()
-			inputs := []*util.Int{&holder, &(*oldOutput.BorrowNumerator()), &(*oldOutput.BorrowDenominator()), &out}
+			inputs := []*unumeral.Int{&holder, &(*oldOutput.BorrowNumerator()), &(*oldOutput.BorrowDenominator()), &out}
 			for i := range v.values {
 				inputs = append(inputs, &(*v.values[i].BorrowNumerator()), &(*v.values[i].BorrowDenominator()))
 			}

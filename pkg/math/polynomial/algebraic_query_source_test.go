@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // These are independent API assertions. Existing registered algebraic root
@@ -40,7 +39,7 @@ func TestAlgebraicSignAndDegreeLiteralBranches(t *testing.T) {
 	}
 	var zero, a Algebraic
 	check(&zero, false, false, 0)
-	q := util.NewRational()
+	q := unumeral.NewRational()
 	for _, n := range []int32{-3, 3} {
 		serviceMust(t, c.config.Rationals.SetFraction(&q, int64(n), 2))
 		serviceMust(t, c.SetRational(&a, &q))
@@ -61,7 +60,7 @@ func TestAlgebraicSignAndDegreeLiteralBranches(t *testing.T) {
 // Invalid Go ownership guards are distinct from native numerical assertions.
 func TestAlgebraicQueriesRejectCopiedForeignAndStaleOwners(t *testing.T) {
 	c, _ := algebraicFixture(t)
-	q := util.NewRational()
+	q := unumeral.NewRational()
 	serviceMust(t, c.config.Rationals.SetFraction(&q, 3, 2))
 	var a Algebraic
 	serviceMust(t, c.SetRational(&a, &q))
@@ -109,7 +108,7 @@ func TestAlgebraicDegreeUsesActualNonminimalPolynomial(t *testing.T) {
 	poly := algebraicPolynomial(t, p, -4, 0, 0, 0, 1)
 	v, e := p.wholeView(poly)
 	serviceMust(t, e)
-	var lower, upper util.BinaryRational
+	var lower, upper unumeral.BinaryRational
 	serviceMust(t, c.config.Binary.SetInt32(&lower, 1))
 	serviceMust(t, c.config.Binary.SetInt32(&upper, 2))
 	var a Algebraic

@@ -5,22 +5,23 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Independent named field census for this selected owner and its ordinary
 // unsynchronized borrowed rational cohort. This does not infer caller roots
 // from the locator directory, nor cover unrelated rational arithmetic scopes.
-func polynomialPhysicalAudit(t *testing.T, m *MultivariatePolynomialCore, public ...*util.Int) {
+func polynomialPhysicalAudit(t *testing.T, m *MultivariatePolynomialCore, public ...*unumeral.Int) {
 	t.Helper()
 	polynomialPhysicalAuditWithHandlers(t, m, nil, public...)
 }
-func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomialCore, handlers []*PolynomialDeletionHandler, public ...*util.Int) {
+func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomialCore, handlers []*PolynomialDeletionHandler, public ...*unumeral.Int) {
 	t.Helper()
 	z := m.integer
-	refs := map[util.NumericCellRef]bool{}
-	add := func(a util.Int) {
+	refs := map[unumeral.NumericCellRef]bool{}
+	add := func(a unumeral.Int) {
 		if (a).Cell == 0 || z.IsFailureRef((a).Cell) {
 			return
 		}
@@ -30,10 +31,10 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 		refs[(a).Cell] = true
 	}
 	for _, r := range z.Tmp {
-		add(util.IntFromNativeWords([3]uint32{uint32(0), uint32(r), uint32(uint64(r) >> 32)}))
+		add(unumeral.IntFromNativeWords([3]uint32{uint32(0), uint32(r), uint32(uint64(r) >> 32)}))
 	}
 	for _, r := range z.Arg {
-		add(util.IntFromNativeWords([3]uint32{uint32(0), uint32(r), uint32(uint64(r) >> 32)}))
+		add(unumeral.IntFromNativeWords([3]uint32{uint32(0), uint32(r), uint32(uint64(r) >> 32)}))
 	}
 	add(z.IntMin)
 	add(z.Two64)
@@ -48,11 +49,11 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 	}
 	q := m.config.Rationals
 	if q != nil {
-		for _, a := range []util.Int{q.NTmp, q.AddTmp1, q.AddTmp2, q.AddMulTmp.Num, q.AddMulTmp.Den, q.LtTmp1.Num, q.LtTmp1.Den, q.LtTmp2.Num, q.LtTmp2.Den} {
+		for _, a := range []unumeral.Int{q.NTmp, q.AddTmp1, q.AddTmp2, q.AddMulTmp.Num, q.AddMulTmp.Den, q.LtTmp1.Num, q.LtTmp1.Den, q.LtTmp2.Num, q.LtTmp2.Den} {
 			add(a)
 		}
 	}
-	for _, a := range []util.Int{(*m.modular.BorrowModulus()), m.modular.Lower, m.modular.Upper, m.modular.InvTmp1, m.modular.InvTmp2, m.modular.InvTmp3, m.modular.DivTmp, m.zeroNumeral, m.minusOne, m.negativeCoefficient, m.constantCopy, m.linearConstant, m.constantScope.numeral, (*m.constantScope.rational.BorrowNumerator()), (*m.constantScope.rational.BorrowDenominator()), m.exactDivision.numeral, m.pseudoDivision.numeral} {
+	for _, a := range []unumeral.Int{(*m.modular.BorrowModulus()), m.modular.Lower, m.modular.Upper, m.modular.InvTmp1, m.modular.InvTmp2, m.modular.InvTmp3, m.modular.DivTmp, m.zeroNumeral, m.minusOne, m.negativeCoefficient, m.constantCopy, m.linearConstant, m.constantScope.numeral, (*m.constantScope.rational.BorrowNumerator()), (*m.constantScope.rational.BorrowDenominator()), m.exactDivision.numeral, m.pseudoDivision.numeral} {
 		add(a)
 	}
 	cell := func(p Polynomial, n uint32) {
@@ -109,7 +110,7 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 	for slot := uint64(1); slot <= uint64(z.Cells.Stats().Slots); slot++ {
 		c, e := z.Cells.Read(arena.Slot(slot))
 		if e == nil && (c.Unpublished || c.CleanupPending) {
-			add(util.IntFromNativeWords([3]uint32{uint32(0), uint32(util.MakeNumericRef(arena.Slot(slot), z.Cells.State(arena.Slot(slot)).Generation)), uint32(uint64(util.MakeNumericRef(arena.Slot(slot), z.Cells.State(arena.Slot(slot)).Generation)) >> 32)}))
+			add(unumeral.IntFromNativeWords([3]uint32{uint32(0), uint32(unumeral.MakeNumericRef(arena.Slot(slot), z.Cells.State(arena.Slot(slot)).Generation)), uint32(uint64(unumeral.MakeNumericRef(arena.Slot(slot), z.Cells.State(arena.Slot(slot)).Generation)) >> 32)}))
 		}
 	}
 	if uint32(len(refs)) != z.Cells.Stats().Live {

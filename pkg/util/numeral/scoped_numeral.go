@@ -1,0 +1,737 @@
+// Concrete translations of util/scoped_numeral.h and scoped_numeral_vector.h.
+package numeral
+
+import (
+	"errors"
+	"reflect"
+
+	"github.com/glycerine/g3/pkg/arena"
+)
+
+var ErrScopedCopy = errors.New("mpnum: shallow scoped owner copy")
+var ErrScopedOwner = errors.New("mpnum: invalid scoped numeral owner")
+
+// ScopedInt owns one numeral and borrows its manager. Get returns the source's
+// mutable numeral reference; it is valid only until Close and must not be copied
+// as an owning Int. Clone is the explicit deep copy operation. All objects are
+// owner-confined; close them before their manager. A self pointer rejects Go
+// struct copies without unsafe or per-record interfaces.
+type ScopedInt struct {
+	manager *IntegerManager
+	num     Int
+	self    *ScopedInt
+	closed  bool
+}
+type ScopedRational struct {
+	manager *RationalManager
+	num     Rational
+	self    *ScopedRational
+	closed  bool
+}
+
+func NewScopedInt(m *IntegerManager) (*ScopedInt, error) {
+	if m == nil || m.Cells == nil {
+		return nil, ErrScopedOwner
+	}
+	if m.closed {
+		return nil, arena.ErrClosed
+	}
+	if e := m.BudgetField.Reserve(uint64(reflect.TypeOf(ScopedInt{}).Size())); e != nil {
+		return nil, e
+	}
+	s := &ScopedInt{manager: m}
+	s.self = s
+	return s, nil
+}
+func NewScopedRational(m *RationalManager) (*ScopedRational, error) {
+	if m == nil || m.Z == nil {
+		return nil, ErrScopedOwner
+	}
+	if m.closed {
+		return nil, arena.ErrClosed
+	}
+	if e := m.BudgetField.Reserve(uint64(reflect.TypeOf(ScopedRational{}).Size())); e != nil {
+		return nil, e
+	}
+	s := &ScopedRational{manager: m, num: NewRational()}
+	s.self = s
+	return s, nil
+}
+func (s *ScopedInt) Get() (*Int, error) {
+	if s == nil || s.self != s {
+		return nil, ErrScopedCopy
+	}
+	if s.closed {
+		return nil, arena.ErrClosed
+	}
+	if e := s.manager.check(&s.num); e != nil {
+		return nil, e
+	}
+	return &s.num, nil
+}
+func (s *ScopedRational) Get() (*Rational, error) {
+	if s == nil || s.self != s {
+		return nil, ErrScopedCopy
+	}
+	if s.closed {
+		return nil, arena.ErrClosed
+	}
+	if e := s.manager.check(&s.num); e != nil {
+		return nil, e
+	}
+	return &s.num, nil
+}
+func (s *ScopedInt) Manager() (*IntegerManager, error) {
+	if _, e := s.Get(); e != nil {
+		return nil, e
+	}
+	return s.manager, nil
+}
+func (s *ScopedRational) Manager() (*RationalManager, error) {
+	if _, e := s.Get(); e != nil {
+		return nil, e
+	}
+	return s.manager, nil
+}
+func (s *ScopedInt) Set(v *Int) error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	return s.manager.Copy(&s.num, v)
+}
+func (s *ScopedRational) Set(v *Rational) error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	return s.manager.Copy(&s.num, v)
+}
+func (s *ScopedInt) SetInt64(v int64) error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	return s.manager.SetInt64(&s.num, v)
+}
+func (s *ScopedRational) SetInt64(v int64) error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	return s.manager.SetInt64(&s.num, v)
+}
+func (s *ScopedInt) Assign(other *ScopedInt) error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	v, e := other.Get()
+	if e != nil {
+		return e
+	}
+	if s.manager != other.manager {
+		return ErrScopedOwner
+	}
+	return s.manager.Copy(&s.num, v)
+}
+func (s *ScopedRational) Assign(other *ScopedRational) error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	v, e := other.Get()
+	if e != nil {
+		return e
+	}
+	if s.manager != other.manager {
+		return ErrScopedOwner
+	}
+	return s.manager.Copy(&s.num, v)
+}
+func (s *ScopedInt) Clone() (*ScopedInt, error) {
+	if _, e := s.Get(); e != nil {
+		return nil, e
+	}
+	c, e := NewScopedInt(s.manager)
+	if e != nil {
+		return nil, e
+	}
+	if e = c.Set(&s.num); e != nil {
+		c.Close()
+		return nil, e
+	}
+	return c, nil
+}
+func (s *ScopedRational) Clone() (*ScopedRational, error) {
+	if _, e := s.Get(); e != nil {
+		return nil, e
+	}
+	c, e := NewScopedRational(s.manager)
+	if e != nil {
+		return nil, e
+	}
+	if e = c.Set(&s.num); e != nil {
+		c.Close()
+		return nil, e
+	}
+	return c, nil
+}
+func (s *ScopedInt) Reset() error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	return s.manager.Reset(&s.num)
+}
+func (s *ScopedRational) Reset() error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	return s.manager.Reset(&s.num)
+}
+func (s *ScopedInt) SwapValue(v *Int) error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	return s.manager.Swap(&s.num, v)
+}
+func (s *ScopedRational) SwapValue(v *Rational) error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	return s.manager.Swap(&s.num, v)
+}
+func (s *ScopedInt) Swap(other *ScopedInt) error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	v, e := other.Get()
+	if e != nil {
+		return e
+	}
+	if s.manager != other.manager {
+		return ErrScopedOwner
+	}
+	return s.SwapValue(v)
+}
+func (s *ScopedRational) Swap(other *ScopedRational) error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	v, e := other.Get()
+	if e != nil {
+		return e
+	}
+	if s.manager != other.manager {
+		return ErrScopedOwner
+	}
+	return s.SwapValue(v)
+}
+func (s *ScopedInt) Neg() error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	return s.manager.Neg(&s.num)
+}
+func (s *ScopedRational) Neg() error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	return s.manager.Neg(&s.num)
+}
+func (s *ScopedInt) AbsCopy() (*ScopedInt, error) {
+	c, e := s.Clone()
+	if e != nil {
+		return nil, e
+	}
+	if e = c.manager.Abs(&c.num); e != nil {
+		c.Close()
+		return nil, e
+	}
+	return c, nil
+}
+func (s *ScopedRational) AbsCopy() (*ScopedRational, error) {
+	c, e := s.Clone()
+	if e != nil {
+		return nil, e
+	}
+	if e = c.manager.Abs(&c.num); e != nil {
+		c.Close()
+		return nil, e
+	}
+	return c, nil
+}
+func (s *ScopedInt) apply(v *Int, op uint8) error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	switch op {
+	case 0:
+		return s.manager.Add(&s.num, v, &s.num)
+	case 1:
+		return s.manager.Sub(&s.num, v, &s.num)
+	case 2:
+		return s.manager.Mul(&s.num, v, &s.num)
+	case 3:
+		return s.manager.Div(&s.num, v, &s.num)
+	default:
+		return s.manager.Rem(&s.num, v, &s.num)
+	}
+}
+func (s *ScopedRational) apply(v *Rational, op uint8) error {
+	if _, e := s.Get(); e != nil {
+		return e
+	}
+	switch op {
+	case 0:
+		return s.manager.Add(&s.num, v, &s.num)
+	case 1:
+		return s.manager.Sub(&s.num, v, &s.num)
+	case 2:
+		return s.manager.Mul(&s.num, v, &s.num)
+	case 3:
+		return s.manager.Div(&s.num, v, &s.num)
+	default:
+		return s.manager.Rem(&s.num, v, &s.num)
+	}
+}
+func (s *ScopedInt) AddAssign(v *Int) error           { return s.apply(v, 0) }
+func (s *ScopedInt) SubAssign(v *Int) error           { return s.apply(v, 1) }
+func (s *ScopedInt) MulAssign(v *Int) error           { return s.apply(v, 2) }
+func (s *ScopedInt) DivAssign(v *Int) error           { return s.apply(v, 3) }
+func (s *ScopedInt) RemAssign(v *Int) error           { return s.apply(v, 4) }
+func (s *ScopedRational) AddAssign(v *Rational) error { return s.apply(v, 0) }
+func (s *ScopedRational) SubAssign(v *Rational) error { return s.apply(v, 1) }
+func (s *ScopedRational) MulAssign(v *Rational) error { return s.apply(v, 2) }
+func (s *ScopedRational) DivAssign(v *Rational) error { return s.apply(v, 3) }
+func (s *ScopedRational) RemAssign(v *Rational) error { return s.apply(v, 4) }
+func (s *ScopedInt) result(v *Int, op uint8) (*ScopedInt, error) {
+	c, e := s.Clone()
+	if e != nil {
+		return nil, e
+	}
+	if e = c.apply(v, op); e != nil {
+		c.Close()
+		return nil, e
+	}
+	return c, nil
+}
+func (s *ScopedRational) result(v *Rational, op uint8) (*ScopedRational, error) {
+	c, e := s.Clone()
+	if e != nil {
+		return nil, e
+	}
+	if e = c.apply(v, op); e != nil {
+		c.Close()
+		return nil, e
+	}
+	return c, nil
+}
+func (s *ScopedInt) Add(v *Int) (*ScopedInt, error)                { return s.result(v, 0) }
+func (s *ScopedInt) Sub(v *Int) (*ScopedInt, error)                { return s.result(v, 1) }
+func (s *ScopedInt) Mul(v *Int) (*ScopedInt, error)                { return s.result(v, 2) }
+func (s *ScopedInt) Div(v *Int) (*ScopedInt, error)                { return s.result(v, 3) }
+func (s *ScopedRational) Add(v *Rational) (*ScopedRational, error) { return s.result(v, 0) }
+func (s *ScopedRational) Sub(v *Rational) (*ScopedRational, error) { return s.result(v, 1) }
+func (s *ScopedRational) Mul(v *Rational) (*ScopedRational, error) { return s.result(v, 2) }
+func (s *ScopedRational) Div(v *Rational) (*ScopedRational, error) { return s.result(v, 3) }
+func (s *ScopedInt) Compare(v *Int) (int, error) {
+	if _, e := s.Get(); e != nil {
+		return 0, e
+	}
+	return s.manager.Compare(&s.num, v)
+}
+func (s *ScopedRational) Compare(v *Rational) (int, error) {
+	if _, e := s.Get(); e != nil {
+		return 0, e
+	}
+	return s.manager.Compare(&s.num, v)
+}
+func (s *ScopedInt) Equal(v *Int) (bool, error) { c, e := s.Compare(v); return c == 0, e }
+func (s *ScopedRational) Equal(v *Rational) (bool, error) {
+	if _, e := s.Get(); e != nil {
+		return false, e
+	}
+	return s.manager.Equal(&s.num, v)
+}
+func (s *ScopedInt) NotEqual(v *Int) (bool, error)            { v1, e := s.Equal(v); return !v1, e }
+func (s *ScopedRational) NotEqual(v *Rational) (bool, error)  { v1, e := s.Equal(v); return !v1, e }
+func (s *ScopedInt) Less(v *Int) (bool, error)                { c, e := s.Compare(v); return c < 0, e }
+func (s *ScopedInt) Greater(v *Int) (bool, error)             { c, e := s.Compare(v); return c > 0, e }
+func (s *ScopedInt) LessEqual(v *Int) (bool, error)           { c, e := s.Compare(v); return c <= 0, e }
+func (s *ScopedInt) GreaterEqual(v *Int) (bool, error)        { c, e := s.Compare(v); return c >= 0, e }
+func (s *ScopedRational) Less(v *Rational) (bool, error)      { c, e := s.Compare(v); return c < 0, e }
+func (s *ScopedRational) Greater(v *Rational) (bool, error)   { c, e := s.Compare(v); return c > 0, e }
+func (s *ScopedRational) LessEqual(v *Rational) (bool, error) { c, e := s.Compare(v); return c <= 0, e }
+func (s *ScopedRational) GreaterEqual(v *Rational) (bool, error) {
+	c, e := s.Compare(v)
+	return c >= 0, e
+}
+func (s *ScopedInt) sign() (int32, error) {
+	if _, e := s.Get(); e != nil {
+		return 0, e
+	}
+	return s.num.Val, nil
+}
+func (s *ScopedRational) sign() (int32, error) {
+	if _, e := s.Get(); e != nil {
+		return 0, e
+	}
+	return s.num.Num.Val, nil
+}
+func (s *ScopedInt) IsZero() (bool, error)        { v, e := s.sign(); return v == 0, e }
+func (s *ScopedInt) IsPos() (bool, error)         { v, e := s.sign(); return v > 0, e }
+func (s *ScopedInt) IsNeg() (bool, error)         { v, e := s.sign(); return v < 0, e }
+func (s *ScopedInt) IsNonpos() (bool, error)      { v, e := s.sign(); return v <= 0, e }
+func (s *ScopedInt) IsNonneg() (bool, error)      { v, e := s.sign(); return v >= 0, e }
+func (s *ScopedRational) IsZero() (bool, error)   { v, e := s.sign(); return v == 0, e }
+func (s *ScopedRational) IsPos() (bool, error)    { v, e := s.sign(); return v > 0, e }
+func (s *ScopedRational) IsNeg() (bool, error)    { v, e := s.sign(); return v < 0, e }
+func (s *ScopedRational) IsNonpos() (bool, error) { v, e := s.sign(); return v <= 0, e }
+func (s *ScopedRational) IsNonneg() (bool, error) { v, e := s.sign(); return v >= 0, e }
+func (s *ScopedInt) Display() (string, error) {
+	if _, e := s.Get(); e != nil {
+		return "", e
+	}
+	return s.manager.String(&s.num)
+}
+func (s *ScopedRational) Display() (string, error) {
+	if _, e := s.Get(); e != nil {
+		return "", e
+	}
+	return s.manager.String(&s.num)
+}
+func (s *ScopedInt) Close() error {
+	if s == nil || s.self != s {
+		return ErrScopedCopy
+	}
+	if s.closed {
+		return nil
+	}
+	var e error
+	if s.manager.closed {
+		e = arena.ErrClosed
+	} else {
+		e = s.manager.Del(&s.num)
+	}
+	if e != nil && !s.manager.closed {
+		return e
+	}
+	s.manager.BudgetField.Release(uint64(reflect.TypeOf(ScopedInt{}).Size()))
+	s.num = Int{}
+	s.closed = true
+	return e
+}
+func (s *ScopedRational) Close() error {
+	if s == nil || s.self != s {
+		return ErrScopedCopy
+	}
+	if s.closed {
+		return nil
+	}
+	var e error
+	if s.manager.closed {
+		e = arena.ErrClosed
+	} else {
+		e = s.manager.Del(&s.num)
+	}
+	if e != nil && !s.manager.closed {
+		return e
+	}
+	s.manager.BudgetField.Release(uint64(reflect.TypeOf(ScopedRational{}).Size()))
+	s.num = NewRational()
+	s.closed = true
+	return e
+}
+
+// Vectors remain source-noncopyable. No hot backing slice or element pointer
+// escapes: Read makes a deep caller-owned numeral; Set performs manager copy.
+type ScopedIntVector struct {
+	manager *IntegerManager
+	data    []Int
+	self    *ScopedIntVector
+	closed  bool
+}
+type ScopedRationalVector struct {
+	manager *RationalManager
+	data    []Rational
+	self    *ScopedRationalVector
+	closed  bool
+}
+
+func NewScopedIntVector(m *IntegerManager) (*ScopedIntVector, error) {
+	if m == nil || m.Cells == nil {
+		return nil, ErrScopedOwner
+	}
+	if m.closed {
+		return nil, arena.ErrClosed
+	}
+	v := &ScopedIntVector{manager: m}
+	v.self = v
+	return v, nil
+}
+func NewScopedRationalVector(m *RationalManager) (*ScopedRationalVector, error) {
+	if m == nil || m.Z == nil {
+		return nil, ErrScopedOwner
+	}
+	if m.closed {
+		return nil, arena.ErrClosed
+	}
+	v := &ScopedRationalVector{manager: m}
+	v.self = v
+	return v, nil
+}
+func (v *ScopedIntVector) open() error {
+	if v == nil || v.self != v {
+		return ErrScopedCopy
+	}
+	if v.closed || v.manager.closed {
+		return arena.ErrClosed
+	}
+	return nil
+}
+func (v *ScopedRationalVector) open() error {
+	if v == nil || v.self != v {
+		return ErrScopedCopy
+	}
+	if v.closed || v.manager.closed {
+		return arena.ErrClosed
+	}
+	return nil
+}
+func (v *ScopedIntVector) Size() uint32 {
+	if v == nil || v.self != v || v.closed {
+		return 0
+	}
+	return uint32(len(v.data))
+}
+func (v *ScopedRationalVector) Size() uint32 {
+	if v == nil || v.self != v || v.closed {
+		return 0
+	}
+	return uint32(len(v.data))
+}
+func (v *ScopedIntVector) Capacity() uint32 {
+	if v == nil || v.self != v || v.closed {
+		return 0
+	}
+	return uint32(cap(v.data))
+}
+func (v *ScopedRationalVector) Capacity() uint32 {
+	if v == nil || v.self != v || v.closed {
+		return 0
+	}
+	return uint32(cap(v.data))
+}
+func (v *ScopedIntVector) Manager() (*IntegerManager, error) {
+	if e := v.open(); e != nil {
+		return nil, e
+	}
+	return v.manager, nil
+}
+func (v *ScopedRationalVector) Manager() (*RationalManager, error) {
+	if e := v.open(); e != nil {
+		return nil, e
+	}
+	return v.manager, nil
+}
+func (v *ScopedIntVector) Read(i uint32, out *Int) error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if uint64(i) >= uint64(len(v.data)) {
+		return arena.ErrBounds
+	}
+	return v.manager.Copy(out, &v.data[i])
+}
+func (v *ScopedRationalVector) Read(i uint32, out *Rational) error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if uint64(i) >= uint64(len(v.data)) {
+		return arena.ErrBounds
+	}
+	return v.manager.Copy(out, &v.data[i])
+}
+func (v *ScopedIntVector) Set(i uint32, num *Int) error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if uint64(i) >= uint64(len(v.data)) {
+		return arena.ErrBounds
+	}
+	return v.manager.Copy(&v.data[i], num)
+}
+func (v *ScopedRationalVector) Set(i uint32, num *Rational) error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if uint64(i) >= uint64(len(v.data)) {
+		return arena.ErrBounds
+	}
+	return v.manager.Copy(&v.data[i], num)
+}
+
+// Publish a default element before the deep copy. A failed copy retains that
+// element, matching the observable source prefix. Invalid operands are rejected
+// before either action, unlike raw source undefined references.
+func (v *ScopedIntVector) Push(num *Int) error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if e := v.manager.check(num); e != nil {
+		return e
+	}
+	if uint64(len(v.data)) >= uint64(^uint32(0)) {
+		return arena.ErrBounds
+	}
+	input := *num
+	v.data = append(v.data, Int{})
+	return v.manager.Copy(&v.data[len(v.data)-1], &input)
+}
+func (v *ScopedRationalVector) Push(num *Rational) error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if e := v.manager.check(num); e != nil {
+		return e
+	}
+	if uint64(len(v.data)) >= uint64(^uint32(0)) {
+		return arena.ErrBounds
+	}
+	input := *num
+	v.data = append(v.data, NewRational())
+	return v.manager.Copy(&v.data[len(v.data)-1], &input)
+}
+func (v *ScopedIntVector) Shrink(n uint32) error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if uint64(n) > uint64(len(v.data)) {
+		return arena.ErrBounds
+	}
+	for i := int(n); i < len(v.data); i++ {
+		if e := v.manager.Del(&v.data[i]); e != nil {
+			return e
+		}
+	}
+	v.data = v.data[:n]
+	return nil
+}
+func (v *ScopedRationalVector) Shrink(n uint32) error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if uint64(n) > uint64(len(v.data)) {
+		return arena.ErrBounds
+	}
+	for i := int(n); i < len(v.data); i++ {
+		if e := v.manager.Del(&v.data[i]); e != nil {
+			return e
+		}
+	}
+	v.data = v.data[:n]
+	return nil
+}
+func (v *ScopedIntVector) Pop() error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if len(v.data) == 0 {
+		return arena.ErrBounds
+	}
+	return v.Shrink(uint32(len(v.data) - 1))
+}
+func (v *ScopedRationalVector) Pop() error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if len(v.data) == 0 {
+		return arena.ErrBounds
+	}
+	return v.Shrink(uint32(len(v.data) - 1))
+}
+func (v *ScopedIntVector) Resize(n uint32) error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if uint64(n) <= uint64(len(v.data)) {
+		return v.Shrink(n)
+	}
+	if uint64(n) > uint64(int(^uint(0)>>1)) {
+		return arena.ErrBounds
+	}
+	oldLen := len(v.data)
+	newLen := int(n)
+	if newLen > cap(v.data) {
+		next := make([]Int, newLen)
+		copy(next, v.data)
+		v.data = next
+	} else {
+		v.data = v.data[:newLen]
+	}
+	for i := oldLen; i < newLen; i++ {
+		v.data[i] = Int{}
+	}
+	return nil
+}
+func (v *ScopedRationalVector) Resize(n uint32) error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if uint64(n) <= uint64(len(v.data)) {
+		return v.Shrink(n)
+	}
+	if uint64(n) > uint64(int(^uint(0)>>1)) {
+		return arena.ErrBounds
+	}
+	oldLen := len(v.data)
+	newLen := int(n)
+	if newLen > cap(v.data) {
+		next := make([]Rational, newLen)
+		copy(next, v.data)
+		v.data = next
+	} else {
+		v.data = v.data[:newLen]
+	}
+	for i := oldLen; i < newLen; i++ {
+		v.data[i] = NewRational()
+	}
+	return nil
+}
+func (v *ScopedIntVector) Reset() error      { return v.Shrink(0) }
+func (v *ScopedRationalVector) Reset() error { return v.Shrink(0) }
+func (v *ScopedIntVector) Close() error {
+	if v == nil || v.self != v {
+		return ErrScopedCopy
+	}
+	if v.closed {
+		return nil
+	}
+	var e error
+	if v.manager.closed {
+		e = arena.ErrClosed
+	} else {
+		e = v.Reset()
+	}
+	if e != nil && !v.manager.closed {
+		return e
+	}
+	v.data = nil
+	v.closed = true
+	return e
+}
+func (v *ScopedRationalVector) Close() error {
+	if v == nil || v.self != v {
+		return ErrScopedCopy
+	}
+	if v.closed {
+		return nil
+	}
+	var e error
+	if v.manager.closed {
+		e = arena.ErrClosed
+	} else {
+		e = v.Reset()
+	}
+	if e != nil && !v.manager.closed {
+		return e
+	}
+	v.data = nil
+	v.closed = true
+	return e
+}

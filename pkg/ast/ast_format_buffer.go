@@ -5,7 +5,7 @@ import (
 	"bytes"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // FormatBuffer interns the caller's current native bytes before constructing
@@ -30,7 +30,7 @@ func (m *ASTManager) FormatBuffer(b *bytes.Buffer) (ASTHandle, error) {
 
 // A retained numerical formatting result is borrowed until its source
 // temporary ends. Copy its checked bytes directly into native output storage.
-func appendASTFormattedCString(b *bytes.Buffer, text util.ArbitraryFloatFormattedCString) error {
+func appendASTFormattedCString(b *bytes.Buffer, text unumeral.ArbitraryFloatFormattedCString) error {
 	n, e := text.Length()
 	if e != nil {
 		return e

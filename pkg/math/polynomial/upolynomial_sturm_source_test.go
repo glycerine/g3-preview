@@ -2,10 +2,9 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math/big"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func upolySturmSequence(t *testing.T, m *UPolynomialManager) *UPolynomialSequence {
@@ -33,7 +32,7 @@ func upolySturmRow(t *testing.T, m *UPolynomialManager, s *UPolynomialSequence, 
 	}
 	out := make([]int64, n)
 	for j := uint32(0); j < n; j++ {
-		var a util.Int
+		var a unumeral.Int
 		if e = m.ReadView(v, j, &a); e != nil {
 			t.Fatal(e)
 		}
@@ -64,7 +63,7 @@ func TestUPolynomialSourceSixteenTransformENSURE(t *testing.T) {
 	m, q, _ := upolySourceOwner(t)
 	p := upolySourceNew(t, m, []int32{24, -50, 35, -10, 1}) // independent factor expansion
 	out := upolySourceNew(t, m, nil)
-	c, r1, r2 := util.NewRational(), util.NewRational(), util.NewRational()
+	c, r1, r2 := unumeral.NewRational(), unumeral.NewRational(), unumeral.NewRational()
 	if e := q.SetFraction(&c, 1, 3); e != nil {
 		t.Fatal(e)
 	}
@@ -81,7 +80,7 @@ func TestUPolynomialSourceSixteenTransformENSURE(t *testing.T) {
 		t.Fatal(e)
 	}
 	defer func() {
-		for _, r := range []*util.Rational{&r2, &r1, &c} {
+		for _, r := range []*unumeral.Rational{&r2, &r1, &c} {
 			if e := q.Del(r); e != nil {
 				t.Error(e)
 			}
@@ -92,7 +91,7 @@ func TestUPolynomialSourceSixteenTransformENSURE(t *testing.T) {
 	}
 	assertions := 0
 	for _, n := range []int64{1, 2, 3, 4, -1, 5, -2} {
-		point := util.NewRational()
+		point := unumeral.NewRational()
 		if e := q.SetInt64(&point, n); e != nil {
 			t.Fatal(e)
 		}
@@ -105,7 +104,7 @@ func TestUPolynomialSourceSixteenTransformENSURE(t *testing.T) {
 			t.Fatal(e)
 		}
 	}
-	for _, point := range []*util.Rational{&r1, &r2} {
+	for _, point := range []*unumeral.Rational{&r1, &r2} {
 		sign, e := m.EvalSignRational(mustUPolyView(t, m, out), point)
 		if e != nil || sign != 0 {
 			t.Fatal(sign, e)
@@ -120,7 +119,7 @@ func TestUPolynomialSourceSixteenTransformENSURE(t *testing.T) {
 		d    uint64
 		zero bool
 	}{{1, 1, true}, {1, 2, true}, {1, 3, true}, {1, 4, true}, {2, 1, false}, {3, 1, false}, {4, 1, false}} {
-		point := util.NewRational()
+		point := unumeral.NewRational()
 		if e := q.SetFraction(&point, f.n, f.d); e != nil {
 			t.Fatal(e)
 		}
@@ -160,7 +159,7 @@ func TestUPolynomialSourceFiveHalfRootENSURE(t *testing.T) {
 	}
 	// Same source factors, expanded by actual dense arithmetic as explicit
 	// multivariate conversion input adapter, not a fake is_univariate assertion.
-	if e = m.SetInts(p, []util.Int{util.NewInt(1)}); e != nil {
+	if e = m.SetInts(p, []unumeral.Int{unumeral.NewInt(1)}); e != nil {
 		t.Fatal(e)
 	}
 	f := upolySourceNew(t, m, nil)
@@ -168,9 +167,9 @@ func TestUPolynomialSourceFiveHalfRootENSURE(t *testing.T) {
 		coeff []int32
 		power int
 	}{{[]int32{-1000000000, 0, 0, 0, 0, 1}, 3}, {[]int32{-10000000, 3}, 2}, {[]int32{-632, 10}, 2}} {
-		nums := make([]util.Int, len(factor.coeff))
+		nums := make([]unumeral.Int, len(factor.coeff))
 		for i, v := range factor.coeff {
-			nums[i] = util.NewInt(v)
+			nums[i] = unumeral.NewInt(v)
 		}
 		if e = m.SetInts(f, nums); e != nil {
 			t.Fatal(e)
@@ -185,11 +184,11 @@ func TestUPolynomialSourceFiveHalfRootENSURE(t *testing.T) {
 	if e != nil || yes {
 		t.Fatal(yes, e)
 	}
-	if e = m.SetInts(p, []util.Int{util.NewInt(1)}); e != nil {
+	if e = m.SetInts(p, []unumeral.Int{unumeral.NewInt(1)}); e != nil {
 		t.Fatal(e)
 	}
 	for _, factor := range [][2]int32{{-2, 1}, {-4, 1}, {-8, 1}, {-16, 1}, {-32, 1}, {-64, 1}, {-1, 2}, {-1, 4}, {-1, 8}, {-1, 16}, {-1, 32}} {
-		if e = m.SetInts(f, []util.Int{util.NewInt(factor[0]), util.NewInt(factor[1])}); e != nil {
+		if e = m.SetInts(f, []unumeral.Int{unumeral.NewInt(factor[0]), unumeral.NewInt(factor[1])}); e != nil {
 			t.Fatal(e)
 		}
 		if e = m.Mul(p, f, p); e != nil {
@@ -232,7 +231,7 @@ func TestUPolynomialSturmFourierAndRootIDIndependent(t *testing.T) {
 		point         int32
 		variation, id uint32
 	}{{-2, 2, 0}, {-1, 1, 1}, {0, 1, 1}, {1, 0, 2}, {2, 0, 2}} {
-		b := util.NewBinaryInt(f.point)
+		b := unumeral.NewBinaryInt(f.point)
 		got, e := m.SignVariationsBinary(s, &b)
 		if e != nil || got != f.variation {
 			t.Fatal(f, got, e)
@@ -394,7 +393,7 @@ func TestUPolynomialSturmRationalEuclideanOracle(t *testing.T) {
 			t.Fatal(coefficients, plus, e)
 		}
 		for point := int64(-4); point <= 4; point++ {
-			b := util.NewBinaryInt(int32(point))
+			b := unumeral.NewBinaryInt(int32(point))
 			want := upolyRatVariations(rows, point, 0)
 			got, e := m.SignVariationsBinary(seq, &b)
 			if e != nil || got != want {

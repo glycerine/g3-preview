@@ -2,10 +2,9 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialFactorLiftPreparationActualRelatedCheckpointGuards(t *testing.T) {
@@ -42,7 +41,7 @@ func TestUPolynomialFactorLiftPreparationActualRelatedCheckpointGuards(t *testin
 	c, e := s.newSquareFreeScope()
 	serviceMust(t, e)
 	c.constructed = 1
-	serviceMust(t, m.set(&c.fpp, []util.Int{util.NewInt(-6), util.NewInt(1), util.NewInt(1)}))
+	serviceMust(t, m.set(&c.fpp, []unumeral.Int{unumeral.NewInt(-6), unumeral.NewInt(1), unumeral.NewInt(1)}))
 	serviceMust(t, s.preparePrimeSearch(out))
 	serviceMust(t, m.modular.SetInt32(&c.p, 7))
 	serviceMust(t, c.zp.SetZP(&c.p))
@@ -70,7 +69,7 @@ func TestUPolynomialFactorLiftPreparationCopiedStaleFactorContexts(t *testing.T)
 	c, e := s.newSquareFreeScope()
 	serviceMust(t, e)
 	c.constructed = 1
-	serviceMust(t, m.set(&c.fpp, []util.Int{util.NewInt(-6), util.NewInt(1), util.NewInt(1)}))
+	serviceMust(t, m.set(&c.fpp, []unumeral.Int{unumeral.NewInt(-6), unumeral.NewInt(1), unumeral.NewInt(1)}))
 	serviceMust(t, s.preparePrimeSearch(out))
 	serviceMust(t, m.modular.SetInt32(&c.p, 7))
 	serviceMust(t, c.zp.SetZP(&c.p))

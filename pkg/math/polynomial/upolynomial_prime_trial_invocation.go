@@ -7,7 +7,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyPrimeTrialInvocationReceipt struct {
@@ -37,10 +37,10 @@ type upolyPrimeTrialScope struct {
 	fzp                      upolyVectorState
 	current                  *UPolynomialFactors
 	degrees                  upolyFactorDegreeState
-	transport                util.Int
+	transport                unumeral.Int
 	transportBound           bool
 	numeric                  polynomialNumericRoots
-	normalize                util.IntegerNormalizeInvocationReceipt
+	normalize                unumeral.IntegerNormalizeInvocationReceipt
 	sourceIndex              uint32
 	sourceCause, bodyCause   error
 }
@@ -150,9 +150,9 @@ func (s *UPolynomialFactorizationService) cleanupPrimeTrialInvocation(r *upolyPr
 	return nil
 }
 
-func (q *upolyPrimeTrialScope) cleanupNumeric(z *util.IntegerManager) error {
-	e := util.CleanupNumericAllocationRoots(z, &q.numeric.NumericAllocationRoots)
-	if errors.Is(e, util.ErrNumericPending) {
+func (q *upolyPrimeTrialScope) cleanupNumeric(z *unumeral.IntegerManager) error {
+	e := unumeral.CleanupNumericAllocationRoots(z, &q.numeric.NumericAllocationRoots)
+	if errors.Is(e, unumeral.ErrNumericPending) {
 		return errors.Join(ErrUPolynomialCleanupPending, e)
 	}
 	return e

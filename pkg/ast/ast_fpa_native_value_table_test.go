@@ -1,9 +1,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestASTFloatingPointNativeValueBucketsGrowthCollisionAndReuse(t *testing.T) {
@@ -16,13 +15,13 @@ func TestASTFloatingPointNativeValueBucketsGrowthCollisionAndReuse(t *testing.T)
 	astTestMust(t, e)
 	p := m.floatingPointPlugin
 	const count = 257
-	var value util.ArbitraryFloat
+	var value unumeral.ArbitraryFloat
 	before, storage := m.BudgetField.Used(), p.numeric.RuntimeOwner().Stats()
 	m.BudgetField.FailAfter(0)
 	for i := 0; i < count; i++ {
 		// Hash ignores sign and format; all four values share a bucket but
 		// denote different MPFs. Repeating each must return its canonical ID.
-		sig := util.NewInt(int32(i + 1))
+		sig := unumeral.NewInt(int32(i + 1))
 		for variant := 0; variant < 4; variant++ {
 			astTestMust(t, p.numeric.SetComponents(&value, uint32(8+variant/2), uint32(24+variant/2), variant%2 != 0, 3, &sig))
 			id, e := p.mkValueID(&value)
@@ -53,7 +52,7 @@ func TestASTFloatingPointNativeValueBucketsGrowthCollisionAndReuse(t *testing.T)
 			}
 		}
 	}
-	sig := util.NewInt(99999)
+	sig := unumeral.NewInt(99999)
 	astTestMust(t, p.numeric.SetComponents(&value, 8, 24, false, 3, &sig))
 	id, e := p.mkValueID(&value)
 	astTestMust(t, e)

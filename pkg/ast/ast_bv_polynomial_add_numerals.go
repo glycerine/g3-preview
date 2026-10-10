@@ -4,9 +4,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorPolynomialAdditionNumerals owns the addition/cancellation caller's c and a,
@@ -14,11 +13,11 @@ import (
 type BitVectorPolynomialAdditionNumerals struct {
 	self                            *BitVectorPolynomialAdditionNumerals
 	manager                         *ASTManager
-	values                          [2]util.OwnedRational
+	values                          [2]unumeral.OwnedRational
 	placed                          [2]bool
-	scalar                          util.RationalServiceInvocation
+	scalar                          unumeral.RationalServiceInvocation
 	call                            ASTBitVectorNumeralInvocation
-	coeffs                          *util.RationalBuffer16
+	coeffs                          *unumeral.RationalBuffer16
 	header                          uint64
 	started, stopped, ended, closed bool
 	coefficientsEnded               bool
@@ -87,7 +86,7 @@ func (n *BitVectorPolynomialAdditionNumerals) retire() error {
 	if e := c.EndContext(); e != nil {
 		return e
 	}
-	*c = util.RationalServiceInvocation{}
+	*c = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorPolynomialAdditionNumerals) Read(arg ASTHandle) (bool, error) {
@@ -160,7 +159,7 @@ func (n *BitVectorPolynomialAdditionNumerals) BeginCoefficients() error {
 		return ErrASTPending
 	}
 	var e error
-	n.coeffs, e = util.NewRationalBuffer16(n.manager.numerals)
+	n.coeffs, e = unumeral.NewRationalBuffer16(n.manager.numerals)
 	if e != nil {
 		n.stopped = true
 	}

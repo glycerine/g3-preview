@@ -2,10 +2,10 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func numericIntegerModularManager_upolynomialCallerExecuting(m *util.IntegerModularManager) bool {
+func numericIntegerModularManager_upolynomialCallerExecuting(m *unumeral.IntegerModularManager) bool {
 	if m == nil || !m.ValidOwner() || m.Integers() == nil || !m.Integers().ValidOwner() {
 		return false
 	}

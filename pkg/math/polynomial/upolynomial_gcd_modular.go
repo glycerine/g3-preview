@@ -2,7 +2,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // modularImage implements the lexical scoped_set_zp body. The old modulus
@@ -10,15 +10,15 @@ import (
 // GCD the entering mode is always Z. Cleanup on Go failure is explicit safe
 // ownership adaptation; a restoration failure stays visible.
 
-func (m *UPolynomialManager) modularImage(u, v, q *upolyVectorState, p, lc *util.Int, du, dv uint32) (bool, error) {
+func (m *UPolynomialManager) modularImage(u, v, q *upolyVectorState, p, lc *unumeral.Int, du, dv uint32) (bool, error) {
 	return m.modularImageWithSourceContext(u, v, q, p, lc, du, dv, integerAllocationInvocationContext{})
 }
-func (m *UPolynomialManager) modularImageWithSourceContext(u, v, q *upolyVectorState, p, lc *util.Int, du, dv uint32, context integerAllocationInvocationContext) (bad bool, err error) {
+func (m *UPolynomialManager) modularImageWithSourceContext(u, v, q *upolyVectorState, p, lc *unumeral.Int, du, dv uint32, context integerAllocationInvocationContext) (bad bool, err error) {
 	oldMode, e := m.modular.Modular()
 	if e != nil {
 		return false, e
 	}
-	var localOld, localC util.Int
+	var localOld, localC unumeral.Int
 	old, c := &localOld, &localC
 	var frame *upolyFactorImageScope
 	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
@@ -91,10 +91,10 @@ func (m *UPolynomialManager) modularImageWithSourceContext(u, v, q *upolyVectorS
 	}
 	return false, m.mulScalarViewWithSourceContext(m.stateView(q), c, context)
 }
-func (m *UPolynomialManager) combineImages(c1 *upolyVectorState, b1 *util.Int, c2 *upolyVectorState, b2 *util.Int) error {
+func (m *UPolynomialManager) combineImages(c1 *upolyVectorState, b1 *unumeral.Int, c2 *upolyVectorState, b2 *unumeral.Int) error {
 	return m.combineImagesWithSourceContext(c1, b1, c2, b2, integerAllocationInvocationContext{})
 }
-func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState, b1 *util.Int, c2 *upolyVectorState, b2 *util.Int, context integerAllocationInvocationContext) (cause error) {
+func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState, b1 *unumeral.Int, c2 *upolyVectorState, b2 *unumeral.Int, context integerAllocationInvocationContext) (cause error) {
 	if polynomialSourceDebug {
 		even, e := m.config.Integer.IsEven(b1)
 		if e != nil {
@@ -115,7 +115,7 @@ func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState
 	if e := m.reset(R); e != nil {
 		return e
 	}
-	var local [12]util.Int
+	var local [12]unumeral.Int
 	values := &local
 	var frame *upolyFactorCRAScope
 	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
@@ -172,7 +172,7 @@ func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState
 		return e
 	}
 	construct(12)
-	two := util.NewInt(2)
+	two := unumeral.NewInt(2)
 	if e := m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Div(bound, &two, upper); e != nil {
 		return e
 	}
@@ -182,13 +182,13 @@ func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState
 	if e := m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Neg(lower); e != nil {
 		return e
 	}
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	n1, n2 := c1.size, c2.size
 	n := n1
 	if n2 < n {
 		n = n2
 	}
-	add := func(x, y *util.Int) error {
+	add := func(x, y *unumeral.Int) error {
 		if e := m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Mul(x, a1, tmp1); e != nil {
 			return e
 		}
@@ -254,7 +254,7 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 			return ErrUPolynomialAssertion
 		}
 	}
-	var local [6]util.Int
+	var local [6]unumeral.Int
 	values := &local
 	var frame *upolyFactorModularGCDScope
 	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {

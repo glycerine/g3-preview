@@ -5,9 +5,8 @@ package polynomial
 import (
 	"errors"
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Exercise actual imp members together: translation retains its source vector
@@ -29,10 +28,10 @@ func TestPolynomialTranslateImpEveryReservationAndLexSort(t *testing.T) {
 				terms[i], e = m.monomials.MkMonomial(powers)
 				serviceMust(t, e)
 			}
-			p, e := m.MkTerms([]util.Int{util.NewInt(1), util.NewInt(3), util.NewInt(5)}, terms)
+			p, e := m.MkTerms([]unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(3), unumeral.NewInt(5)}, terms)
 			serviceMust(t, e)
 			serviceMust(t, m.IncRef(p))
-			shift := util.NewInt(2)
+			shift := unumeral.NewInt(2)
 			m.integer.Budget().FailAfter(ordinal)
 			out, e := full.Translate(p, 0, &shift)
 			named := []Polynomial{p}
@@ -86,7 +85,7 @@ func TestPolynomialTranslateImpArrayAndVectorFacade(t *testing.T) {
 	out, e := NewPolynomialRef(m)
 	serviceMust(t, e)
 	defer func() { serviceMust(t, out.Close()) }()
-	shift := []util.Int{util.NewInt(2)}
+	shift := []unumeral.Int{unumeral.NewInt(2)}
 	serviceMust(t, full.TranslateMany(p, 1, variableView(xs), shift, out))
 	want := map[[3]uint32]int64{{1, 2, 0}: 11, {0, 2, 0}: 22, {2, 0, 0}: 13, {1, 0, 0}: 52, {0, 0, 0}: 75, {0, 3, 0}: 17, {1, 1, 0}: 19, {0, 1, 0}: 38}
 	polynomialQueryExpect(t, m, out.root.value, want)

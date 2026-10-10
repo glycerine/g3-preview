@@ -7,13 +7,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestDefaultPrimeBorrowFullPolynomialFactorEndToEnd(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	polynomialBindingMust(t, e)
 	s, e := primegen.NewDefaultService(b)
 	polynomialBindingMust(t, e)
@@ -31,7 +32,7 @@ func TestDefaultPrimeBorrowFullPolynomialFactorEndToEnd(t *testing.T) {
 	if _, e = copied.ArithmeticCore(); e != ErrPolynomialOwner {
 		t.Fatal("copied borrowed owner", e)
 	}
-	p, e := c.MkUnivariateTake(x, 2, []util.Int{util.NewInt(-1), util.NewInt(0), util.NewInt(1)})
+	p, e := c.MkUnivariateTake(x, 2, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(0), unumeral.NewInt(1)})
 	polynomialBindingMust(t, e)
 	input, e := NewPolynomialRef(c)
 	polynomialBindingMust(t, e)

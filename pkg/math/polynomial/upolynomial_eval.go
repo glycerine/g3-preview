@@ -2,10 +2,10 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (m *UPolynomialManager) sign(a *util.Int) (int, error) {
+func (m *UPolynomialManager) sign(a *unumeral.Int) (int, error) {
 	zero, e := m.modular.IsZero(a)
 	if e != nil {
 		return 0, e
@@ -29,7 +29,7 @@ func (m *UPolynomialManager) signAt(v UPolynomialView, i uint32) (int, error) {
 	}
 	return m.sign(a)
 }
-func (m *UPolynomialManager) EvalSignInt(v UPolynomialView, b *util.Int) (sign int, cause error) {
+func (m *UPolynomialManager) EvalSignInt(v UPolynomialView, b *unumeral.Int) (sign int, cause error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
@@ -81,7 +81,7 @@ func (m *UPolynomialManager) EvalSignInt(v UPolynomialView, b *util.Int) (sign i
 	}
 	return m.sign(r)
 }
-func (m *UPolynomialManager) EvalSignRational(v UPolynomialView, b *util.Rational) (sign int, cause error) {
+func (m *UPolynomialManager) EvalSignRational(v UPolynomialView, b *unumeral.Rational) (sign int, cause error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
@@ -145,10 +145,10 @@ func (m *UPolynomialManager) EvalSignRational(v UPolynomialView, b *util.Rationa
 	}
 	return m.sign(r)
 }
-func (m *UPolynomialManager) EvalSignBinary(v UPolynomialView, b *util.BinaryRational) (int, error) {
+func (m *UPolynomialManager) EvalSignBinary(v UPolynomialView, b *unumeral.BinaryRational) (int, error) {
 	return m.evalSignBinaryWithNegScope(v, b, nil)
 }
-func (m *UPolynomialManager) evalSignBinaryWithNegScope(v UPolynomialView, b *util.BinaryRational, parent *algebraicNegScope) (value int, cause error) {
+func (m *UPolynomialManager) evalSignBinaryWithNegScope(v UPolynomialView, b *unumeral.BinaryRational, parent *algebraicNegScope) (value int, cause error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
@@ -163,9 +163,9 @@ func (m *UPolynomialManager) evalSignBinaryWithNegScope(v UPolynomialView, b *ut
 	}
 	k := b.K()
 	ki := k
-	var values *[2]util.Int
+	var values *[2]unumeral.Int
 	context := integerAllocationInvocationContext{}
-	var child *util.IntegerAddMulInvocationReceipt
+	var child *unumeral.IntegerAddMulInvocationReceipt
 	if parent == nil {
 		q, e := m.beginBinaryEvaluation()
 		if e != nil {

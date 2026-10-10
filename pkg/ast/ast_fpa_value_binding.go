@@ -2,12 +2,12 @@
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Source: src/ast/fpa_decl_plugin.cpp:52-62. No rollback is performed if
 // reserve, SET, insertion, recycling, or NUM destruction throws.
-func (p *astFloatingPointPluginOwner) mkValueID(value *util.ArbitraryFloat) (idResult uint32, err error) {
+func (p *astFloatingPointPluginOwner) mkValueID(value *unumeral.ArbitraryFloat) (idResult uint32, err error) {
 	defer func() {
 		if err != nil && p != nil && p.self == p && p.bodyCause == nil {
 			p.bodyCause = err

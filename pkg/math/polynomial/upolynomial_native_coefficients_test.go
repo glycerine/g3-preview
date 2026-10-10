@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialNativeCoefficientScratchGrowthAndReset(t *testing.T) {
@@ -24,14 +24,14 @@ func TestUPolynomialNativeCoefficientScratchGrowthAndReset(t *testing.T) {
 			}
 			a := m.values(s)
 			for i := uint32(0); i < n; i++ {
-				if a[i] != (util.Int{}) {
+				if a[i] != (unumeral.Int{}) {
 					t.Fatal("new/default field", n, i, a[i])
 				}
-				a[i] = util.NewInt(int32(37*i) - 128)
+				a[i] = unumeral.NewInt(int32(37*i) - 128)
 			}
 			for i := uint32(0); i < n; i++ {
 				row, e := m.read(m.stateView(s), i)
-				if e != nil || *row != util.NewInt(int32(37*i)-128) {
+				if e != nil || *row != unumeral.NewInt(int32(37*i)-128) {
 					t.Fatal("independent row", n, i, row, e)
 				}
 			}
@@ -44,7 +44,7 @@ func TestUPolynomialNativeCoefficientScratchGrowthAndReset(t *testing.T) {
 				t.Fatal(e)
 			}
 			for i := n / 2; i < n; i++ {
-				if a[i] != util.NewInt(int32(37*i)-128) {
+				if a[i] != unumeral.NewInt(int32(37*i)-128) {
 					t.Fatal("inline Del must preserve its scalar field", n, i, a[i])
 				}
 			}
@@ -80,11 +80,11 @@ func TestUPolynomialNativeCoefficientGrowthMovesActualBIGAndView(t *testing.T) {
 			}
 		}
 	})
-	var original util.Int
+	var original unumeral.Int
 	if e := q.Integers().SetInt64(&original, 1<<40); e != nil {
 		t.Fatal(e)
 	}
-	if e := m.SetInts(p, []util.Int{original}); e != nil {
+	if e := m.SetInts(p, []unumeral.Int{original}); e != nil {
 		t.Fatal(e)
 	}
 	if e := q.Integers().Del(&original); e != nil {
@@ -125,7 +125,7 @@ func TestUPolynomialNativeCoefficientGrowthMovesActualBIGAndView(t *testing.T) {
 	}
 	for i := uint32(1); i < v.count; i++ {
 		row, e := m.read(v, i)
-		if e != nil || *row != (util.Int{}) {
+		if e != nil || *row != (unumeral.Int{}) {
 			t.Fatal("zero extension", i, row, e)
 		}
 	}

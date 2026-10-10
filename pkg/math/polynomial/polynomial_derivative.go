@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // These are the actual two lexical numeral fields and known creation receipts.
@@ -12,7 +12,7 @@ import (
 // arithmetic storage or a source destructor which repairs native leaks.
 type polynomialDerivativeScope struct {
 	invocation                           uint64
-	n, a                                 util.Int
+	n, a                                 unumeral.Int
 	constructed                          uint8
 	stage                                uint8
 	numericPhase                         uint8
@@ -24,7 +24,7 @@ type polynomialDerivativeScope struct {
 	numeric                              polynomialNumericRoots
 	append                               polynomialCheapAppendInvocationReceipt
 	factory                              polynomialFactoryInvocationReceipt
-	normalize                            util.IntegerNormalizeInvocationReceipt
+	normalize                            unumeral.IntegerNormalizeInvocationReceipt
 	orphans                              []Monomial
 	orphanInvocations                    []uint64
 	drain                                uint32
@@ -140,7 +140,7 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 	s.invocation++
 	// This is a new guarded source invocation, not a retry of the older child.
 	// Its historical standalone receipt remains valid on the modular owner.
-	s.normalize = util.IntegerNormalizeInvocationReceipt{}
+	s.normalize = unumeral.IntegerNormalizeInvocationReceipt{}
 	s.append = polynomialCheapAppendInvocationReceipt{}
 	s.factory = polynomialFactoryInvocationReceipt{}
 	s.monomialAllocator = monomialAllocatorInvocationReceipt{}
@@ -186,8 +186,8 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 			continue
 		}
 		// Source constructs n, sets its degree, then constructs a.
-		s.n = util.Int{}
-		s.a = util.Int{}
+		s.n = unumeral.Int{}
+		s.a = unumeral.Int{}
 		s.constructed = 1
 		s.stage = 0
 		s.numericPhase = 1
@@ -276,7 +276,7 @@ func (m *MultivariatePolynomialManager) cleanupDerivativeModeOwned(abort bool, i
 		s.cleanupCause = e
 		return e
 	}
-	for _, a := range [2]*util.Int{&s.a, &s.n} {
+	for _, a := range [2]*unumeral.Int{&s.a, &s.n} {
 		if e := m.core.integer.Del(a); e != nil {
 			s.cleanupCause = e
 			return e

@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The source has no scoped NUMs here. Only actual borrowed coefficient storage,
@@ -20,7 +20,7 @@ type upolyKnuthScope struct {
 	cursor                                          uint32
 	active, executing, finishing, falseAcknowledged bool
 	numeric                                         polynomialNumericRoots
-	normalize                                       util.IntegerNormalizeInvocationReceipt
+	normalize                                       unumeral.IntegerNormalizeInvocationReceipt
 	bodyCause, sourceCause, ownCause                error
 	history                                         *upolyKnuthHistory
 }
@@ -32,7 +32,7 @@ type upolyKnuthHistory struct {
 	invocation                       uint64
 	kind, stage                      uint8
 	cursor                           uint32
-	normalize                        util.IntegerNormalizeInvocationReceipt
+	normalize                        unumeral.IntegerNormalizeInvocationReceipt
 	bodyCause, sourceCause, ownCause error
 }
 type upolyKnuthInvocationReceipt struct {
@@ -45,13 +45,13 @@ type upolyKnuthInvocationReceipt struct {
 func (m *UPolynomialManager) knuthExecuting() bool {
 	return m != nil && m.self == m && m.knuth.owner == m && m.knuth.active && (m.knuth.executing || m.knuth.finishing)
 }
-func numericIntegerManager_knuthCallerExecuting(z *util.IntegerManager) bool {
+func numericIntegerManager_knuthCallerExecuting(z *unumeral.IntegerManager) bool {
 	return z != nil && z.ValidOwner() && knuthCaller(z) != nil && knuthCaller(z).config.Integer == z && knuthCaller(z).knuthExecuting()
 }
-func numericNaturalManager_knuthCallerExecuting(n *util.NaturalManager) bool {
+func numericNaturalManager_knuthCallerExecuting(n *unumeral.NaturalManager) bool {
 	return n != nil && n.ValidOwner() && knuthCaller(n) != nil && knuthCaller(n).config.Integer != nil && knuthCaller(n).config.Integer.Naturals() == n && knuthCaller(n).knuthExecuting()
 }
-func (c integerAllocationInvocationContext) knuthFrame(z *util.IntegerManager) *upolyKnuthScope {
+func (c integerAllocationInvocationContext) knuthFrame(z *unumeral.IntegerManager) *upolyKnuthScope {
 	q := c.knuth
 	if z == nil || !z.ValidOwner() || q == nil || q.owner == nil || q.owner.self != q.owner || q != &q.owner.knuth || q.owner.config.Integer != z || knuthCaller(z) != q.owner || q.owner.callbackDepth != 0 || !q.active || !q.executing || c.knuthInvocation == 0 || c.knuthInvocation != q.invocation {
 		return nil

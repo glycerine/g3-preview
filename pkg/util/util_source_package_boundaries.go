@@ -3,6 +3,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -23,15 +24,15 @@ func SymbolCStringView(m *usymbol.Manager, s usymbol.Symbol) (ParamsStringView, 
 	}
 	return ParamsStringView{symbols: m, symbol: s, Mode: 3, PresentField: true}, nil
 }
-func (c *ParamsContext) CheckServices(s *usymbol.Manager, q *RationalService) error {
+func (c *ParamsContext) CheckServices(s *usymbol.Manager, q *unumeral.RationalService) error {
 	if c == nil || c.Self != c || c.SymbolsField != s || q != nil && c.NumeralsField != q {
 		return ErrParamsOwner
 	}
 	return nil
 }
-func (c *ParamsContext) Symbols() *usymbol.Manager  { return c.SymbolsField }
-func (c *ParamsContext) Numerals() *RationalService { return c.NumeralsField }
-func (c *ParamsContext) Budget() *arena.Budget      { return c.BudgetField }
+func (c *ParamsContext) Symbols() *usymbol.Manager           { return c.SymbolsField }
+func (c *ParamsContext) Numerals() *unumeral.RationalService { return c.NumeralsField }
+func (c *ParamsContext) Budget() *arena.Budget               { return c.BudgetField }
 func (g *GlobalParamsService) CheckOwner(c *ParamsContext, b *arena.Budget) error {
 	if g == nil || g.self != g || g.Context != c || g.Config.Budget != b {
 		return ErrParamsOwner

@@ -5,12 +5,12 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialSOM struct {
 	normalizeScope                              polynomialSOMNormalizeScope
-	cohortMovingCoefficient                     util.Int
+	cohortMovingCoefficient                     unumeral.Int
 	cohortMovingMonomial                        Monomial
 	coefficientOwners, monomialOwners           []uint64
 	coefficientTransferred, monomialTransferred []uint64
@@ -29,7 +29,7 @@ type polynomialSOM struct {
 	positions                                   MonomialPositions
 	as                                          polynomialNumerals
 	ms                                          polynomialMonomials
-	gcd                                         util.Int
+	gcd                                         unumeral.Int
 	gcdActive                                   bool
 	gcdEnded                                    bool
 	gcdGeneration                               uint64
@@ -54,31 +54,31 @@ func (b *polynomialSOM) init(m *MultivariatePolynomialCore, cheap bool) {
 	b.positions.manager = m.monomials
 	b.positions.self = &b.positions
 }
-func (b *polynomialSOM) add(a *util.Int, term Monomial, take bool) error {
+func (b *polynomialSOM) add(a *unumeral.Int, term Monomial, take bool) error {
 	return b.addConsumed(a, term, take, nil)
 }
-func (b *polynomialSOM) addConsumed(a *util.Int, term Monomial, take bool, consumed *bool) error {
+func (b *polynomialSOM) addConsumed(a *unumeral.Int, term Monomial, take bool, consumed *bool) error {
 	return b.addConsumedNumeric(a, term, take, consumed, nil)
 }
-func (b *polynomialSOM) addConsumedNumeric(a *util.Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots) error {
+func (b *polynomialSOM) addConsumedNumeric(a *unumeral.Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots) error {
 	return b.addConsumedReceipts(a, term, take, consumed, receipt, nil)
 }
-func (b *polynomialSOM) addConsumedReceipts(a *util.Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt) (cause error) {
+func (b *polynomialSOM) addConsumedReceipts(a *unumeral.Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt) (cause error) {
 	return b.addConsumedCoefficientReceipts(a, term, take, consumed, receipt, appendReceipt, nil)
 }
-func (b *polynomialSOM) addConsumedCoefficientReceipts(a *util.Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt) (cause error) {
+func (b *polynomialSOM) addConsumedCoefficientReceipts(a *unumeral.Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt) (cause error) {
 	return b.addConsumedScalarDivEngine(a, term, take, consumed, receipt, appendReceipt, coefficientReceipt, nil, nil)
 }
-func (b *polynomialSOM) addConsumedScalarDivReceipts(a *util.Int, term Monomial, take bool, consumed *bool, appendReceipt *polynomialCheapAppendInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt) error {
+func (b *polynomialSOM) addConsumedScalarDivReceipts(a *unumeral.Int, term Monomial, take bool, consumed *bool, appendReceipt *polynomialCheapAppendInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt) error {
 	return b.addConsumedScalarDivEngine(a, term, take, consumed, nil, appendReceipt, nil, scalarReceipt, nil)
 }
-func (b *polynomialSOM) addConsumedNegReceipts(a *util.Int, term Monomial, take bool, consumed *bool, appendReceipt *polynomialCheapAppendInvocationReceipt, negReceipt *polynomialNegInvocationReceipt) error {
+func (b *polynomialSOM) addConsumedNegReceipts(a *unumeral.Int, term Monomial, take bool, consumed *bool, appendReceipt *polynomialCheapAppendInvocationReceipt, negReceipt *polynomialNegInvocationReceipt) error {
 	return b.addConsumedScalarNegEngine(a, term, take, consumed, nil, appendReceipt, nil, nil, nil, negReceipt)
 }
-func (b *polynomialSOM) addConsumedScalarDivEngine(a *util.Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt, arithmeticReceipt *polynomialArithmeticInvocationReceipt) error {
+func (b *polynomialSOM) addConsumedScalarDivEngine(a *unumeral.Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt, arithmeticReceipt *polynomialArithmeticInvocationReceipt) error {
 	return b.addConsumedScalarNegEngine(a, term, take, consumed, receipt, appendReceipt, coefficientReceipt, scalarReceipt, arithmeticReceipt, nil)
 }
-func (b *polynomialSOM) addConsumedScalarNegEngine(a *util.Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt, arithmeticReceipt *polynomialArithmeticInvocationReceipt, negReceipt *polynomialNegInvocationReceipt) (cause error) {
+func (b *polynomialSOM) addConsumedScalarNegEngine(a *unumeral.Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt, arithmeticReceipt *polynomialArithmeticInvocationReceipt, negReceipt *polynomialNegInvocationReceipt) (cause error) {
 	if consumed != nil {
 		*consumed = false
 	}
@@ -177,14 +177,14 @@ func (b *polynomialSOM) addConsumedScalarNegEngine(a *util.Int, term Monomial, t
 		if observer == nil && b.appendScope.active {
 			observer = &b.appendScope
 		}
-		if e = b.as.appendCoefficientWithAppendScope(m, util.Int{}, observer, appendScope != nil); e != nil {
+		if e = b.as.appendCoefficientWithAppendScope(m, unumeral.Int{}, observer, appendScope != nil); e != nil {
 			return e
 		}
 		value, e := b.as.coefficient(m, n)
 		if e != nil {
 			return e
 		}
-		var transport *util.Int
+		var transport *unumeral.Int
 		if scalarReceipt != nil {
 			if numericIntegerManager_scalarDivAllocationRoots(m.integer, scalarReceipt) == nil || b != &m.cheap || !m.matchesScalarDivInvocation(scalarReceipt) || scalarReceipt.frame.transportBound {
 				return ErrPolynomialPending
@@ -222,11 +222,11 @@ func (b *polynomialSOM) addConsumedScalarNegEngine(a *util.Int, term Monomial, t
 		}
 		if scalarReceipt != nil {
 			s := scalarReceipt.frame
-			s.transport, s.transportBuffer, s.transportSlot, s.transportBound = util.Int{}, nil, 0, false
+			s.transport, s.transportBuffer, s.transportSlot, s.transportBound = unumeral.Int{}, nil, 0, false
 		}
 		if negReceipt != nil {
 			s := negReceipt.frame
-			s.transport, s.transportBuffer, s.transportSlot, s.transportBound = util.Int{}, nil, 0, false
+			s.transport, s.transportBuffer, s.transportSlot, s.transportBound = unumeral.Int{}, nil, 0, false
 		}
 		if e != nil {
 			return e
@@ -265,14 +265,14 @@ func (b *polynomialSOM) addConsumedScalarNegEngine(a *util.Int, term Monomial, t
 	b.hasPendingReference = false
 	b.pendingMonomial = Monomial{}
 	if !b.cheap {
-		if e = b.as.appendCoefficientWithAppendScope(m, util.Int{}, observer, appendScope != nil); e != nil {
+		if e = b.as.appendCoefficientWithAppendScope(m, unumeral.Int{}, observer, appendScope != nil); e != nil {
 			return e
 		}
 		value, e := b.as.coefficient(m, n)
 		if e != nil {
 			return e
 		}
-		var target *util.Int = &value
+		var target *unumeral.Int = &value
 		if arithmeticReceipt != nil {
 			s := arithmeticReceipt.frame
 			s.transport = value
@@ -293,7 +293,7 @@ func (b *polynomialSOM) addConsumedScalarNegEngine(a *util.Int, term Monomial, t
 			return w
 		}
 		if arithmeticReceipt != nil {
-			arithmeticReceipt.frame.transport = util.Int{}
+			arithmeticReceipt.frame.transport = unumeral.Int{}
 			arithmeticReceipt.frame.transportBound = false
 		}
 		return e
@@ -334,31 +334,31 @@ func (p polynomialSOMInput) monomial(m *MultivariatePolynomialCore, i uint32) (M
 	}
 	return p.buffer.buffer.ms.monomial(m, i)
 }
-func (p polynomialSOMInput) coefficient(m *MultivariatePolynomialCore, i uint32) (util.Int, error) {
+func (p polynomialSOMInput) coefficient(m *MultivariatePolynomialCore, i uint32) (unumeral.Int, error) {
 	if !p.fromBuffer {
 		return m.coefficientCore(p.polynomial, i)
 	}
 	if polynomialSourceDebug {
 		n, e := p.buffer.buffer.as.size(m)
 		if e != nil {
-			return util.Int{}, e
+			return unumeral.Int{}, e
 		}
 		if i >= n {
-			return util.Int{}, ErrPolynomialAssertion
+			return unumeral.Int{}, ErrPolynomialAssertion
 		}
 	}
 	return p.buffer.buffer.as.coefficient(m, i)
 }
-func (b *polynomialSOM) addMul(a *util.Int, term Monomial, p Polynomial) error {
+func (b *polynomialSOM) addMul(a *unumeral.Int, term Monomial, p Polynomial) error {
 	return b.addSourceInput(a, term, polynomialSOMInput{polynomial: p}, true)
 }
-func (b *polynomialSOM) addMulWithArithmeticReceipt(a *util.Int, term Monomial, p Polynomial, receipt *polynomialArithmeticInvocationReceipt) error {
+func (b *polynomialSOM) addMulWithArithmeticReceipt(a *unumeral.Int, term Monomial, p Polynomial, receipt *polynomialArithmeticInvocationReceipt) error {
 	return b.addSourceInputWithArithmeticReceipt(a, term, polynomialSOMInput{polynomial: p}, true, receipt)
 }
-func (b *polynomialSOM) addSourceInput(a *util.Int, term Monomial, p polynomialSOMInput, multiply bool) error {
+func (b *polynomialSOM) addSourceInput(a *unumeral.Int, term Monomial, p polynomialSOMInput, multiply bool) error {
 	return b.addSourceInputWithArithmeticReceipt(a, term, p, multiply, nil)
 }
-func (b *polynomialSOM) addSourceInputWithArithmeticReceipt(a *util.Int, term Monomial, p polynomialSOMInput, multiply bool, receipt *polynomialArithmeticInvocationReceipt) (cause error) {
+func (b *polynomialSOM) addSourceInputWithArithmeticReceipt(a *unumeral.Int, term Monomial, p polynomialSOMInput, multiply bool, receipt *polynomialArithmeticInvocationReceipt) (cause error) {
 	m := b.owner
 	if multiply {
 		z, e := m.modular.IsZero(a)
@@ -525,7 +525,7 @@ func (b *polynomialSOM) addSourceInputWithArithmeticReceipt(a *util.Int, term Mo
 			if observer == nil && b.appendScope.active {
 				observer = &b.appendScope
 			}
-			if e = b.as.appendCoefficientWithAppendScope(m, util.Int{}, observer, appendScope != nil); e != nil {
+			if e = b.as.appendCoefficientWithAppendScope(m, unumeral.Int{}, observer, appendScope != nil); e != nil {
 				return e
 			}
 			out, e := b.as.coefficient(m, n)
@@ -850,7 +850,7 @@ func (b *polynomialSOM) normalizeWithOwner(parent *polynomialNormalizeScope) (re
 			result = errors.Join(result, cleanup)
 		}
 	}()
-	e = numericIntegerModularManager_gcdManyIndexedWithSOMNormalizeReceipt(m.modular, util.IntegerArrayView{Values: b.as.values, Count: n}, &b.gcd, &b.normalizeScope.receipt)
+	e = numericIntegerModularManager_gcdManyIndexedWithSOMNormalizeReceipt(m.modular, unumeral.IntegerArrayView{Values: b.as.values, Count: n}, &b.gcd, &b.normalizeScope.receipt)
 	if e != nil {
 		return e
 	}
@@ -1044,7 +1044,7 @@ func (b *polynomialSOM) close() error {
 	return nil
 }
 
-func (b *polynomialSOM) addNumericLeaf(receipt *polynomialNumericRoots, op uint8, a, c, d, out *util.Int) error {
+func (b *polynomialSOM) addNumericLeaf(receipt *polynomialNumericRoots, op uint8, a, c, d, out *unumeral.Int) error {
 	if receipt == nil {
 		return b.owner.compositionNumericCall(op, a, c, d, out)
 	}
@@ -1056,6 +1056,6 @@ func (b *polynomialSOM) addNumericLeaf(receipt *polynomialNumericRoots, op uint8
 	return errors.Join(e, receipt.after(b.owner.integer, before))
 }
 
-func (b *polynomialSOM) addWithArithmeticReceipt(a *util.Int, term Monomial, receipt *polynomialArithmeticInvocationReceipt) error {
+func (b *polynomialSOM) addWithArithmeticReceipt(a *unumeral.Int, term Monomial, receipt *polynomialArithmeticInvocationReceipt) error {
 	return b.addConsumedScalarDivEngine(a, term, false, nil, nil, nil, nil, nil, receipt)
 }

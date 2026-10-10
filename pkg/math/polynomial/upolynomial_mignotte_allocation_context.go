@@ -3,17 +3,17 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (c integerAllocationInvocationContext) mignotteReceipt(m *util.IntegerManager) *upolyMignotteInvocationReceipt {
+func (c integerAllocationInvocationContext) mignotteReceipt(m *unumeral.IntegerManager) *upolyMignotteInvocationReceipt {
 	r := c.mignotte
 	if m == nil || !m.ValidOwner() || r == nil || r.service == nil || !r.service.matchesMignotteInvocation(r) || r.service.manager.config.Integer != m || !r.frame.executing || r.frame.constructed == 0 || r.service.manager.callbackDepth != 0 || c.mignotteInvocation == 0 || c.mignotteInvocation != r.invocation {
 		return nil
 	}
 	return r
 }
-func numericIntegerModularManager_mignotteAllocationContext(m *util.IntegerModularManager, r *upolyMignotteInvocationReceipt) integerAllocationInvocationContext {
+func numericIntegerModularManager_mignotteAllocationContext(m *unumeral.IntegerModularManager, r *upolyMignotteInvocationReceipt) integerAllocationInvocationContext {
 	if m == nil || m.Integers() == nil || r == nil || r.service == nil || r.service.manager == nil || r.service.manager.modular != m {
 		return integerAllocationInvocationContext{}
 	}
@@ -27,7 +27,7 @@ func numericIntegerModularManager_mignotteAllocationContext(m *util.IntegerModul
 // One source call dispatches into the original scalar engines. The explicit
 // context reaches only actual allocation leaves; successful NUM publication
 // remains in the declared norm/bound/tmp, never a mirrored numeral array.
-func (s *UPolynomialFactorizationService) mignotteNumericCall(r *upolyMignotteInvocationReceipt, op uint8, a, b, out *util.Int, k uint32) error {
+func (s *UPolynomialFactorizationService) mignotteNumericCall(r *upolyMignotteInvocationReceipt, op uint8, a, b, out *unumeral.Int, k uint32) error {
 	if s == nil || s.self != s || r == nil || r.service != s {
 		return ErrUPolynomialOwner
 	}

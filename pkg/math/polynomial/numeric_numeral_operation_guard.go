@@ -2,16 +2,16 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialNumeralOperationGuard struct {
-	binding   util.NumericCallerBinding
+	binding   unumeral.NumericCallerBinding
 	executing bool
 }
 
 func (g *polynomialNumeralOperationGuard) NumericExecuting() bool { return g != nil && g.executing }
-func (g *polynomialNumeralOperationGuard) enter(z *util.IntegerManager) error {
+func (g *polynomialNumeralOperationGuard) enter(z *unumeral.IntegerManager) error {
 	if g.executing {
 		return ErrPolynomialPending
 	}
@@ -28,7 +28,7 @@ func (g *polynomialNumeralOperationGuard) leave() {
 	}
 	g.executing = false
 }
-func factorNumeralCallExecuting(z *util.IntegerManager) bool {
+func factorNumeralCallExecuting(z *unumeral.IntegerManager) bool {
 	for b := z.CallerBindings(); b != nil; b = b.Previous() {
 		if b.Kind() == 16 && b.Guard().NumericExecuting() {
 			return true

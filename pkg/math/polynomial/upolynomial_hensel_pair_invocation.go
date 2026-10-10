@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyHenselPairInvocationReceipt struct {
@@ -21,7 +21,7 @@ type upolyHenselPairInvocationReceipt struct {
 type upolyHenselPairScope struct {
 	inputs                          [5]upolyHenselInputBorrow
 	check                           upolyHenselCheckScope
-	am                              util.Int
+	am                              unumeral.Int
 	amConstructed, amEnded, amOwned bool
 	amBodyCause, amSourceCause      error
 	ownManagerStage                 uint8
@@ -44,10 +44,10 @@ type upolyHenselPairScope struct {
 	sourceIndex, ownIndex                      uint32
 	bodyCause, sourceCause, ownCause           error
 	numeric                                    polynomialNumericRoots
-	normalize                                  [4]util.IntegerNormalizeInvocationReceipt
-	addMul                                     util.IntegerAddMulInvocationReceipt
-	divisionRaw, extendedRaw                   util.IntegerRawInvocationReceipt
-	boolNumeral                                util.IntegerDividesNumeralInvocationReceipt
+	normalize                                  [4]unumeral.IntegerNormalizeInvocationReceipt
+	addMul                                     unumeral.IntegerAddMulInvocationReceipt
+	divisionRaw, extendedRaw                   unumeral.IntegerRawInvocationReceipt
+	boolNumeral                                unumeral.IntegerDividesNumeralInvocationReceipt
 }
 
 func (s *UPolynomialFactorizationService) ownsHenselFrame(h *upolyHenselPairScope) bool {

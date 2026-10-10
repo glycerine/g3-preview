@@ -2,21 +2,20 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 type polynomialEvalIntervalMap struct {
-	manager *util.BinaryIntervalManager
-	value   util.BinaryInterval
+	manager *unumeral.BinaryIntervalManager
+	value   unumeral.BinaryInterval
 }
 
-func (v *polynomialEvalIntervalMap) Manager() (*util.BinaryIntervalManager, error) {
+func (v *polynomialEvalIntervalMap) Manager() (*unumeral.BinaryIntervalManager, error) {
 	return v.manager, nil
 }
 func (v *polynomialEvalIntervalMap) Contains(x uint32) (bool, error) { return x == 0, nil }
-func (v *polynomialEvalIntervalMap) Interval(x uint32) (*util.BinaryInterval, error) {
+func (v *polynomialEvalIntervalMap) Interval(x uint32) (*unumeral.BinaryInterval, error) {
 	if x != 0 {
 		return nil, ErrPolynomialAssertion
 	}
@@ -25,7 +24,7 @@ func (v *polynomialEvalIntervalMap) Interval(x uint32) (*util.BinaryInterval, er
 func TestPolynomialEvaluationModularDomain(t *testing.T) {
 	m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{3, 0, 0}}, {2, [3]uint32{1, 0, 0}}, {1, [3]uint32{}}})
 	serviceMust(t, m.core.modular.SetZPUint64(5))
-	x, out := util.NewInt(-2), util.Int{}
+	x, out := unumeral.NewInt(-2), unumeral.Int{}
 	serviceMust(t, m.UnivariateEvaluate(p, 0, &x, &out))
 	v, e := m.core.integer.Int64(&out)
 	serviceMust(t, e)
@@ -37,7 +36,7 @@ func TestPolynomialEvaluationModularDomain(t *testing.T) {
 }
 func TestPolynomialEvaluationIntervalDomain(t *testing.T) {
 	b, _ := binaryManager(t)
-	v, e := util.NewBinaryIntervalManager(b)
+	v, e := unumeral.NewBinaryIntervalManager(b)
 	serviceMust(t, e)
 	t.Cleanup(v.Close)
 	ctl := &polynomialEvalControl{limit: 10000}
@@ -45,7 +44,7 @@ func TestPolynomialEvaluationIntervalDomain(t *testing.T) {
 	serviceMust(t, e)
 	_, e = m.core.monomials.MkVar()
 	serviceMust(t, e)
-	as := []util.Int{util.NewInt(1), util.NewInt(-1), util.NewInt(1)}
+	as := []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(-1), unumeral.NewInt(1)}
 	ms := make([]Monomial, 3)
 	ms[0], e = m.core.monomials.MkVariable(0, 2)
 	serviceMust(t, e)
@@ -59,7 +58,7 @@ func TestPolynomialEvaluationIntervalDomain(t *testing.T) {
 	t.Cleanup(func() { serviceMust(t, m.core.DecRef(p)); serviceMust(t, m.CloseChecked()) })
 	values := polynomialEvalIntervalMap{manager: v}
 	intervalSet(t, v, &values.value, -1, 2)
-	out := util.NewBinaryInterval()
+	out := unumeral.NewBinaryInterval()
 	serviceMust(t, m.EvaluateInterval(p, &values, &out))
 	intervalText(t, v, &out, "(-3, 3)")
 	serviceMust(t, v.Del(&values.value))

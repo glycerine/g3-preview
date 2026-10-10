@@ -7,7 +7,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // UPolynomial is an explicit scalar owner. Never copy it as another owning
@@ -37,12 +37,12 @@ type upolyDescriptor struct {
 }
 type upolyDescriptorPage struct{ rows [32]upolyDescriptor }
 type upolyBacking struct {
-	values     []util.Int
+	values     []unumeral.Int
 	generation uint32
 	live       bool
 }
 
-func (m *UPolynomialManager) values(s *upolyVectorState) []util.Int {
+func (m *UPolynomialManager) values(s *upolyVectorState) []unumeral.Int {
 	if s.backing == 0 {
 		return nil
 	}
@@ -79,7 +79,7 @@ func (m *UPolynomialManager) reserve(s *upolyVectorState, n uint32) error {
 		if e != nil {
 			return e
 		}
-		a = append(a, make([]util.Int, int(n)-len(a))...)
+		a = append(a, make([]unumeral.Int, int(n)-len(a))...)
 		if oldSlot != 0 {
 			old := &oldStore.backings[oldSlot-1]
 			old.values = nil
@@ -92,7 +92,7 @@ func (m *UPolynomialManager) reserve(s *upolyVectorState, n uint32) error {
 		b.values, b.live = a, true
 		s.origin, s.backing, s.generation = m.store.origin, slot, b.generation
 	} else if int(n) > len(a) {
-		a = append(a, make([]util.Int, int(n)-len(a))...)
+		a = append(a, make([]unumeral.Int, int(n)-len(a))...)
 		m.stateStore(s).backings[s.backing-1].values = a
 	}
 	clear(a[s.size:n])
@@ -244,14 +244,14 @@ func (m *UPolynomialManager) View(p UPolynomial, start, count uint32) (UPolynomi
 	}
 	return UPolynomialView{m.stateOrigin(s), s.backing, s.generation, start, count}, nil
 }
-func (m *UPolynomialManager) ReadView(v UPolynomialView, index uint32, out *util.Int) error {
+func (m *UPolynomialManager) ReadView(v UPolynomialView, index uint32, out *unumeral.Int) error {
 	a, e := m.read(v, index)
 	if e != nil {
 		return e
 	}
 	return m.modular.Copy(out, a)
 }
-func (m *UPolynomialManager) ReadCoefficient(p UPolynomial, index uint32, out *util.Int) error {
+func (m *UPolynomialManager) ReadCoefficient(p UPolynomial, index uint32, out *unumeral.Int) error {
 	d, e := m.descriptor(p)
 	if e != nil {
 		return e
@@ -261,7 +261,7 @@ func (m *UPolynomialManager) ReadCoefficient(p UPolynomial, index uint32, out *u
 	}
 	return m.modular.Copy(out, &m.values(&d.state)[index])
 }
-func (m *UPolynomialManager) SetCoefficient(p UPolynomial, index uint32, n *util.Int) error {
+func (m *UPolynomialManager) SetCoefficient(p UPolynomial, index uint32, n *unumeral.Int) error {
 	d, e := m.descriptor(p)
 	if e != nil {
 		return e
@@ -271,7 +271,7 @@ func (m *UPolynomialManager) SetCoefficient(p UPolynomial, index uint32, n *util
 	}
 	return m.modular.Copy(&m.values(&d.state)[index], n)
 }
-func (m *UPolynomialManager) set(s *upolyVectorState, a []util.Int) error {
+func (m *UPolynomialManager) set(s *upolyVectorState, a []unumeral.Int) error {
 	if uint64(len(a)) > math.MaxUint32 {
 		return arena.ErrBounds
 	}
@@ -287,7 +287,7 @@ func (m *UPolynomialManager) set(s *upolyVectorState, a []util.Int) error {
 	}
 	return m.setSize(s, n)
 }
-func (m *UPolynomialManager) SetInts(p UPolynomial, a []util.Int) error {
+func (m *UPolynomialManager) SetInts(p UPolynomial, a []unumeral.Int) error {
 	d, e := m.descriptor(p)
 	if e != nil {
 		return e
@@ -309,7 +309,7 @@ func (m *UPolynomialManager) alias(v UPolynomialView, s *upolyVectorState) bool 
 func (m *UPolynomialManager) stateView(s *upolyVectorState) UPolynomialView {
 	return UPolynomialView{m.stateOrigin(s), s.backing, s.generation, 0, s.size}
 }
-func (m *UPolynomialManager) read(v UPolynomialView, index uint32) (*util.Int, error) {
+func (m *UPolynomialManager) read(v UPolynomialView, index uint32) (*unumeral.Int, error) {
 	if e := m.check(); e != nil {
 		return nil, e
 	}

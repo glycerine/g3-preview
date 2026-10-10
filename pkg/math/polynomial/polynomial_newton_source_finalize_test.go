@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialNewtonVectorSourceFinalizeNativeStorage(t *testing.T) {
@@ -17,8 +17,8 @@ func TestPolynomialNewtonVectorSourceFinalizeNativeStorage(t *testing.T) {
 	serviceMust(t, v.SetOwner(m))
 	n, e := v.At(0)
 	serviceMust(t, e)
-	x := util.NewInt(3)
-	y := util.NewInt(17)
+	x := unumeral.NewInt(3)
+	y := unumeral.NewInt(17)
 	p, e := m.MkConstantTake(&y)
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(p))

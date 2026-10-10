@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialHenselPairNumericContextActualFrameAndCapturedNonce(t *testing.T) {
@@ -27,7 +26,7 @@ func TestUPolynomialHenselPairNumericContextActualFrameAndCapturedNonce(t *testi
 	if numericIntegerModularManager_henselPairAllocationContext(s.manager.modular, &badOwner).henselPairReceipt(q.Integers()) != nil {
 		t.Fatal("copied actual service acquired authority")
 	}
-	foreign, e := util.NewIntegerModularManager(q.Integers())
+	foreign, e := unumeral.NewIntegerModularManager(q.Integers())
 	serviceMust(t, e)
 	if numericIntegerModularManager_henselPairAllocationContext(foreign, &r).henselPairReceipt(q.Integers()) != nil {
 		t.Fatal("foreign modular receiver acquired pair roots")

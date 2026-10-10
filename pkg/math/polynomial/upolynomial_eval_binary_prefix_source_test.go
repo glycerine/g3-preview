@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialEvalSignBinaryEveryActualReservationPrefix(t *testing.T) {
@@ -23,7 +23,7 @@ func TestUPolynomialEvalSignBinaryEveryActualReservationPrefix(t *testing.T) {
 			serviceMust(t, e)
 			cv, e := p.wholeView(constant)
 			serviceMust(t, e)
-			var b util.BinaryRational
+			var b unumeral.BinaryRational
 			serviceMust(t, c.config.Binary.SetInt32(&b, math.MaxInt32))
 			baseline := z.Budget().Used() - integerActualOwnedBytes(z) - p.binaryEvaluationHistoryBytes
 			z.Budget().FailAfter(prefix)
@@ -34,7 +34,7 @@ func TestUPolynomialEvalSignBinaryEveryActualReservationPrefix(t *testing.T) {
 			if body != nil && !numericPhysicalReservationRefusal(body) {
 				t.Fatal(body)
 			}
-			extra := []*util.Int{&(*b.BorrowNumerator()), &q.values[0], &q.values[1]}
+			extra := []*unumeral.Int{&(*b.BorrowNumerator()), &q.values[0], &q.values[1]}
 			if q.addMul.Frame != nil {
 				extra = append(extra, &q.addMul.Frame.Tmp)
 			}
@@ -119,7 +119,7 @@ func TestUPolynomialEvalSignBinaryLiteralDyadicHornerBranches(t *testing.T) {
 		k    uint32
 		sign int
 	}{{3, 1, 1}, {1, 0, -1}, {-1, 1, -1}} {
-		var b util.BinaryRational
+		var b unumeral.BinaryRational
 		serviceMust(t, c.config.Binary.SetInt32Power(&b, test.num, test.k))
 		c.config.Rationals.Integers().Budget().FailAfter(0)
 		sign, e := p.EvalSignBinary(v, &b)

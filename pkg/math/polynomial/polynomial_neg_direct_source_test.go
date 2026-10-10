@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialNegDirectReceiptsValidateActualExecutingFrame(t *testing.T) {
@@ -15,11 +14,11 @@ func TestPolynomialNegDirectReceiptsValidateActualExecutingFrame(t *testing.T) {
 	p, e := c.negWithReceipt(c.unit, &receipt)
 	serviceMust(t, e)
 	p = polynomialCaller(t, c, p)
-	var out util.Int
-	value := util.NewInt(7)
+	var out unumeral.Int
+	value := unumeral.NewInt(7)
 	serviceMust(t, numericIntegerModularManager_copyWithNegReceipt(c.modular, &out, &value, &receipt))
 	serviceMust(t, numericIntegerModularManager_negWithNegReceipt(c.modular, &out, &receipt))
-	if out != util.NewInt(-7) {
+	if out != unumeral.NewInt(-7) {
 		t.Fatal("same modular SET/NEG engine")
 	}
 	if (numericIntegerManager_negAllocationRoots(c.integer, &receipt)) != nil {

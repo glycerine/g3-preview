@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestASTCheckpointMPFFormatTextActualNumericalInvocationResult(t *testing.T) {
@@ -28,10 +28,10 @@ func TestASTCheckpointMPFFormatTextActualNumericalInvocationResult(t *testing.T)
 		{0, 0, false, "1.0 0"}, {1, 0, true, "-1.00000011920928955078125 0"},
 		{1, -127, false, "0.00000011920928955078125 -126"},
 	} {
-		n := util.NewInt(c.sig)
-		var a util.ArbitraryFloat
+		n := unumeral.NewInt(c.sig)
+		var a unumeral.ArbitraryFloat
 		astTestMust(t, p.numeric.SetComponents(&a, 8, 24, c.sign, c.exp, &n))
-		text, e := util.NewArbitraryFloatFormatText(m.BudgetField)
+		text, e := unumeral.NewArbitraryFloatFormatText(m.BudgetField)
 		astTestMust(t, e)
 		result, e := p.numeric.ToStringInto(&a, text)
 		astTestMust(t, e)
@@ -69,11 +69,11 @@ func TestASTCheckpointMPFFormatTextActualNumericalEveryReservationPrefix(t *test
 		_, e = m.RegisterFloatingPointPlugin()
 		astTestMust(t, e)
 		p := m.floatingPointPlugin
-		n := util.NewInt(1)
-		var a util.ArbitraryFloat
+		n := unumeral.NewInt(1)
+		var a unumeral.ArbitraryFloat
 		astTestMust(t, p.numeric.SetComponents(&a, 8, 260, false, 0, &n))
 		baseline := m.BudgetField.Used() - m.Stats().AllocatedBytes - m.numerals.RuntimeOwner().Stats().TotalBytes
-		text, e := util.NewArbitraryFloatFormatText(m.BudgetField)
+		text, e := unumeral.NewArbitraryFloatFormatText(m.BudgetField)
 		astTestMust(t, e)
 		m.BudgetField.FailAfter(ordinal)
 		_, call := p.numeric.ToStringInto(&a, text)

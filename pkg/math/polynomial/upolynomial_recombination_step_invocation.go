@@ -5,8 +5,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyRecombinationStepInvocationReceipt struct {
@@ -26,10 +25,10 @@ type upolyRecombinationStepScope struct {
 	active, executing, sourceExecuting, ownExecuting bool
 	sourceEnded, ownEnded                            bool
 	numeric                                          polynomialNumericRoots
-	normalize                                        [2]util.IntegerNormalizeInvocationReceipt
-	boolNumeral                                      util.IntegerDividesNumeralInvocationReceipt
-	addMul                                           util.IntegerAddMulInvocationReceipt
-	divisionRaw, extendedRaw, gcdRaw                 util.IntegerRawInvocationReceipt
+	normalize                                        [2]unumeral.IntegerNormalizeInvocationReceipt
+	boolNumeral                                      unumeral.IntegerDividesNumeralInvocationReceipt
+	addMul                                           unumeral.IntegerAddMulInvocationReceipt
+	divisionRaw, extendedRaw, gcdRaw                 unumeral.IntegerRawInvocationReceipt
 
 	bodyCause, sourceCause, ownCause error
 }
@@ -64,7 +63,7 @@ func (q *upolyRecombinationStepScope) childCause() error {
 	if e := z.AddMulInvocationSourceCause(&q.addMul); e != nil {
 		return e
 	}
-	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
+	for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
 		if e := z.RawInvocationSourceCause(r); e != nil {
 			return e
 		}
@@ -113,7 +112,7 @@ func (q *upolyRecombinationStepScope) pending() bool {
 		return true
 	}
 
-	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
+	for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
 		if z.MatchesRawInvocation(r) {
 			return true
 		}
@@ -160,7 +159,7 @@ func (q *upolyRecombinationStepScope) own(r *upolyRecombinationStepInvocationRec
 	if e := z.CleanupAddMulInvocation(&q.addMul, false); e != nil {
 		return e
 	}
-	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
+	for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
 		if e := z.CleanupRawInvocation(r, false); e != nil {
 			return e
 		}
@@ -168,7 +167,7 @@ func (q *upolyRecombinationStepScope) own(r *upolyRecombinationStepInvocationRec
 
 	q.ownEnded = true
 	if abort {
-		for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
+		for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
 			if e := z.CleanupRawInvocation(r, true); e != nil {
 				return e
 			}

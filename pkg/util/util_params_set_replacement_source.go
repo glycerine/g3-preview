@@ -2,6 +2,7 @@
 package util
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 )
 
@@ -15,7 +16,7 @@ type paramsReplacementFrame struct {
 	oldKind             ParamKind
 	phase               uint8
 	active              bool
-	leaf                OwnedRational
+	leaf                unumeral.OwnedRational
 	next                paramEntry
 }
 type ParamsSetReplacementReceipt struct {

@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyOneHalfRootScope struct {
@@ -18,9 +18,9 @@ type upolyOneHalfRootScope struct {
 	falseAcknowledged                        bool
 	owner                                    *UPolynomialManager
 	invocation                               uint64
-	values                                   [2]util.Int
+	values                                   [2]unumeral.Int
 	numeric                                  polynomialNumericRoots
-	normalize                                util.IntegerNormalizeInvocationReceipt
+	normalize                                unumeral.IntegerNormalizeInvocationReceipt
 	sourceRemaining, ownRemaining            uint8
 	active, executing, finishing, ownStarted bool
 	bodyCause, sourceCause, ownCause         error
@@ -35,7 +35,7 @@ type upolyOneHalfRootHistory struct {
 	frame                            *upolyOneHalfRootScope
 	next                             *upolyOneHalfRootHistory
 	invocation                       uint64
-	normalize                        util.IntegerNormalizeInvocationReceipt
+	normalize                        unumeral.IntegerNormalizeInvocationReceipt
 	bodyCause, sourceCause, ownCause error
 	sourceRemaining                  uint8
 }
@@ -43,13 +43,13 @@ type upolyOneHalfRootHistory struct {
 func (m *UPolynomialManager) oneHalfRootExecuting() bool {
 	return m != nil && m.self == m && m.oneHalfRoot.owner == m && m.oneHalfRoot.active && (m.oneHalfRoot.executing || m.oneHalfRoot.finishing)
 }
-func numericIntegerManager_oneHalfRootCallerExecuting(z *util.IntegerManager) bool {
+func numericIntegerManager_oneHalfRootCallerExecuting(z *unumeral.IntegerManager) bool {
 	return z != nil && z.ValidOwner() && oneHalfRootCaller(z) != nil && oneHalfRootCaller(z).config.Integer == z && oneHalfRootCaller(z).oneHalfRootExecuting()
 }
-func numericNaturalManager_oneHalfRootCallerExecuting(n *util.NaturalManager) bool {
+func numericNaturalManager_oneHalfRootCallerExecuting(n *unumeral.NaturalManager) bool {
 	return n != nil && n.ValidOwner() && oneHalfRootCaller(n) != nil && oneHalfRootCaller(n).config.Integer != nil && oneHalfRootCaller(n).config.Integer.Naturals() == n && oneHalfRootCaller(n).oneHalfRootExecuting()
 }
-func (c integerAllocationInvocationContext) oneHalfRootFrame(z *util.IntegerManager) *upolyOneHalfRootScope {
+func (c integerAllocationInvocationContext) oneHalfRootFrame(z *unumeral.IntegerManager) *upolyOneHalfRootScope {
 	q := c.oneHalfRoot
 	if z == nil || !z.ValidOwner() || q == nil || q.owner == nil || q.owner.self != q.owner || q != &q.owner.oneHalfRoot || q.owner.config.Integer != z || oneHalfRootCaller(z) != q.owner || q.owner.callbackDepth != 0 || !q.active || !q.executing || q.constructed != 2 || c.oneHalfRootInvocation == 0 || c.oneHalfRootInvocation != q.invocation {
 		return nil
@@ -227,22 +227,22 @@ func (m *UPolynomialManager) beginOneHalfRoot() (*upolyOneHalfRootScope, error) 
 
 // The private typed seam rejects a copied/stale frame or a different real
 // modular receiver before the literal numeric source action.
-func numericIntegerModularManager_oneHalfRootContextValid(m *util.IntegerModularManager, c integerAllocationInvocationContext) bool {
+func numericIntegerModularManager_oneHalfRootContextValid(m *unumeral.IntegerModularManager, c integerAllocationInvocationContext) bool {
 	return m != nil && m.ValidOwner() && m.Integers() != nil && c.oneHalfRootFrame(m.Integers()) != nil && c.oneHalfRoot.owner.modular == m
 }
-func numericIntegerModularManager_copyWithOneHalfRootContext(m *util.IntegerModularManager, out, value *util.Int, c integerAllocationInvocationContext) error {
+func numericIntegerModularManager_copyWithOneHalfRootContext(m *unumeral.IntegerModularManager, out, value *unumeral.Int, c integerAllocationInvocationContext) error {
 	if !numericIntegerModularManager_oneHalfRootContextValid(m, c) {
 		return ErrUPolynomialOwner
 	}
 	return m.WithAllocationContext((c).utility(m.Integers())).Copy(out, value)
 }
-func numericIntegerModularManager_mul2kWithOneHalfRootContext(m *util.IntegerModularManager, value *util.Int, k uint32, out *util.Int, c integerAllocationInvocationContext) error {
+func numericIntegerModularManager_mul2kWithOneHalfRootContext(m *unumeral.IntegerModularManager, value *unumeral.Int, k uint32, out *unumeral.Int, c integerAllocationInvocationContext) error {
 	if !numericIntegerModularManager_oneHalfRootContextValid(m, c) {
 		return ErrUPolynomialOwner
 	}
 	return m.WithAllocationContext((c).utility(m.Integers())).Mul2k(value, k, out)
 }
-func numericIntegerModularManager_addWithOneHalfRootContext(m *util.IntegerModularManager, a, b, out *util.Int, c integerAllocationInvocationContext) error {
+func numericIntegerModularManager_addWithOneHalfRootContext(m *unumeral.IntegerModularManager, a, b, out *unumeral.Int, c integerAllocationInvocationContext) error {
 	if !numericIntegerModularManager_oneHalfRootContextValid(m, c) {
 		return ErrUPolynomialOwner
 	}

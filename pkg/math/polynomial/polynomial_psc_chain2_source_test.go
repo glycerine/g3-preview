@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Independent constants use p(-1), the norm of x+1 modulo x²+1,
@@ -46,7 +46,7 @@ func TestPolynomialPSCChain2LiteralRegularAndDefectiveReverse(t *testing.T) {
 			serviceMust(t, e)
 			a, e := c.Coefficient(v, 0)
 			serviceMust(t, e)
-			if !constant || a != util.NewInt(want) {
+			if !constant || a != unumeral.NewInt(want) {
 				t.Fatal("source reverse/independent bounded scalar", i, a, want)
 			}
 		}

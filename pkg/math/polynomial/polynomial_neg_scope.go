@@ -3,19 +3,19 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Embedded in the actual core: these are the existing Neg NUM and result,
 // together with exact owning continuation metadata for that lexical scope.
 
 type polynomialNegScope struct {
-	negativeCoefficient                     util.Int
+	negativeCoefficient                     unumeral.Int
 	negativeResult                          Polynomial
 	negativeActive, negativeEnded           bool
 	negativeExecuting                       bool
-	normalize                               util.IntegerNormalizeInvocationReceipt
-	transport                               util.Int
+	normalize                               unumeral.IntegerNormalizeInvocationReceipt
+	transport                               unumeral.Int
 	transportBuffer                         *polynomialSOM
 	transportSlot                           uint32
 	transportBound                          bool

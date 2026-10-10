@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialFactorFrontendActualCRAConstructorFrontiers(t *testing.T) {
@@ -14,10 +13,10 @@ func TestUPolynomialFactorFrontendActualCRAConstructorFrontiers(t *testing.T) {
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
 	var input upolyVectorState
-	var square, linear util.Int
+	var square, linear unumeral.Int
 	serviceMust(t, z.Integers().SetUint64(&square, 9000000006000000001))
 	serviceMust(t, z.Integers().SetUint64(&linear, 6000000002))
-	serviceMust(t, m.set(&input, []util.Int{square, linear, util.NewInt(1)}))
+	serviceMust(t, m.set(&input, []unumeral.Int{square, linear, unumeral.NewInt(1)}))
 	defer func() {
 		z.Budget().FailAfter(-1)
 		serviceMust(t, s.CleanupRetained())
@@ -40,7 +39,7 @@ func TestUPolynomialFactorFrontendActualCRAConstructorFrontiers(t *testing.T) {
 	if q.invocation == 0 || q.peak != 12 || q.constructed != 0 {
 		t.Fatal("actual modular reconstruction did not bind literal reached CRA NUM frontiers", q.invocation, q.peak, q.constructed)
 	}
-	var caller []*util.Int
+	var caller []*unumeral.Int
 	caller = append(caller, &square, &linear)
 	for i := range m.values(&input) {
 		caller = append(caller, &m.values(&input)[i])
@@ -57,10 +56,10 @@ func TestUPolynomialFactorFrontendActualCRAEveryBIGPrefix(t *testing.T) {
 			fs, e := m.NewFactors()
 			serviceMust(t, e)
 			var input upolyVectorState
-			var square, linear util.Int
+			var square, linear unumeral.Int
 			serviceMust(t, z.Integers().SetUint64(&square, 9000000006000000001))
 			serviceMust(t, z.Integers().SetUint64(&linear, 6000000002))
-			serviceMust(t, m.set(&input, []util.Int{square, linear, util.NewInt(1)}))
+			serviceMust(t, m.set(&input, []unumeral.Int{square, linear, unumeral.NewInt(1)}))
 			defer func() {
 				z.Budget().FailAfter(-1)
 				serviceMust(t, s.CleanupRetained())
@@ -70,7 +69,7 @@ func TestUPolynomialFactorFrontendActualCRAEveryBIGPrefix(t *testing.T) {
 				serviceMust(t, z.Integers().Del(&linear))
 				serviceMust(t, z.Integers().Del(&square))
 			}()
-			var caller []*util.Int
+			var caller []*unumeral.Int
 			caller = append(caller, &square, &linear)
 			for i := range m.values(&input) {
 				caller = append(caller, &m.values(&input)[i])

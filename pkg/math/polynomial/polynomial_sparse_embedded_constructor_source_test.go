@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialSparseEmbeddedNilConstructorHasNoReservation(t *testing.T) {
@@ -45,7 +44,7 @@ func TestPolynomialSparseEmbeddedNativeOutputConstruction(t *testing.T) {
 		t.Fatal("actual embedded output construction", local.header, local.constructed, len(local.outputs))
 	}
 	for _, a := range local.outputs {
-		if a != (util.Int{}) {
+		if a != (unumeral.Int{}) {
 			t.Fatal("nonzero default output", a)
 		}
 	}

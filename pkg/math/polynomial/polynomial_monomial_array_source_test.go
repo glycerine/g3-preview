@@ -6,14 +6,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialTermsIndexedNativeSliceAndResetBeforeRead(t *testing.T) {
 	m := polynomialCellFixture(t)
 	var as polynomialNumerals
 
-	serviceMust(t, as.appendCoefficient(m, util.NewInt(3)))
+	serviceMust(t, as.appendCoefficient(m, unumeral.NewInt(3)))
 	unit, e := m.monomials.Unit()
 	serviceMust(t, e)
 	values := []Monomial{unit}
@@ -22,10 +22,10 @@ func TestPolynomialTermsIndexedNativeSliceAndResetBeforeRead(t *testing.T) {
 	p = polynomialCaller(t, m, p)
 	a, e := m.coefficientCore(p, 0)
 	serviceMust(t, e)
-	if a != util.NewInt(3) {
+	if a != unumeral.NewInt(3) {
 		t.Fatal("actual scalar coefficient", a)
 	}
-	x := util.NewInt(1)
+	x := unumeral.NewInt(1)
 	serviceMust(t, m.som.add(&x, unit, false))
 	_, e = m.mkTermsIndexed(&as, monomialArrayView{count: 0})
 	if !errors.Is(e, arena.ErrBounds) {
@@ -43,7 +43,7 @@ func TestPolynomialTermsIndexedNativeSliceAndUnreachedTail(t *testing.T) {
 	m := polynomialCellFixture(t)
 	var as polynomialNumerals
 
-	serviceMust(t, as.appendCoefficient(m, util.NewInt(5)))
+	serviceMust(t, as.appendCoefficient(m, unumeral.NewInt(5)))
 	unit, e := m.monomials.Unit()
 	serviceMust(t, e)
 	view := monomialArrayView{values: []Monomial{unit}, count: 19}
@@ -52,14 +52,14 @@ func TestPolynomialTermsIndexedNativeSliceAndUnreachedTail(t *testing.T) {
 	p = polynomialCaller(t, m, p)
 	a, e := m.coefficientCore(p, 0)
 	serviceMust(t, e)
-	if a != util.NewInt(5) {
+	if a != unumeral.NewInt(5) {
 		t.Fatal("actual borrowed monomial slice", a)
 	}
 	serviceMust(t, as.reset(m))
 	empty, e := m.mkTermsIndexed(&as, monomialArrayView{count: 19})
 	serviceMust(t, e)
 	_ = polynomialCaller(t, m, empty)
-	serviceMust(t, as.appendCoefficient(m, util.NewInt(1)))
+	serviceMust(t, as.appendCoefficient(m, unumeral.NewInt(1)))
 	view.values = nil
 	_, e = m.mkTermsIndexed(&as, view)
 	if !errors.Is(e, arena.ErrBounds) {

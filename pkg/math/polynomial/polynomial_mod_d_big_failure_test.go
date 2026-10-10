@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialModDBigCoefficientEveryActualRefusal(t *testing.T) {
@@ -16,11 +15,11 @@ func TestPolynomialModDBigCoefficientEveryActualRefusal(t *testing.T) {
 			d, e := NewPolynomialVariableDegrees(m.memory)
 			serviceMust(t, e)
 			serviceMust(t, d.SetDegree(0, 2))
-			big := util.Int{}
+			big := unumeral.Int{}
 			serviceMust(t, m.integer.SetLimbs(&big, []uint32{17, 0, 0, 1}))
 			x, e := m.monomials.MkVariable(0, 1)
 			serviceMust(t, e)
-			p, e := m.MkTerms([]util.Int{big}, []Monomial{x})
+			p, e := m.MkTerms([]unumeral.Int{big}, []Monomial{x})
 			serviceMust(t, e)
 			serviceMust(t, m.IncRef(p))
 			result := Polynomial{}

@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialIntegerContentIndependentSignedBranches(t *testing.T) {
@@ -27,13 +26,13 @@ func TestPolynomialIntegerContentIndependentSignedBranches(t *testing.T) {
 			want = p
 			expected = 1
 		}
-		i := util.NewInt(99)
+		i := unumeral.NewInt(99)
 		c, e := NewPolynomialRef(m)
 		serviceMust(t, e)
 		serviceMust(t, c.Assign(m.unit))
 		m.config.Checkpoint = func() bool { t.Fatal("integer content has no source checkpoint"); return false }
 		serviceMust(t, m.IntegerContent(p, &i, c))
-		if i != util.NewInt(expected) {
+		if i != unumeral.NewInt(expected) {
 			t.Fatal("independent integer content", which, i, expected)
 		}
 		eq, e := m.Equal(c.root.value, want)
@@ -64,19 +63,19 @@ func TestPolynomialIntegerContentEveryActualReservationPrefix(t *testing.T) {
 			t.Cleanup(func() { serviceMust(t, out.Close()) })
 			serviceMust(t, out.Assign(m.unit))
 			t.Cleanup(func() { m.integer.Budget().FailAfter(-1); serviceMust(t, m.CleanupIntegerContent()) })
-			i := util.NewInt(99)
+			i := unumeral.NewInt(99)
 			t.Cleanup(func() { serviceMust(t, m.integer.Del(&i)) })
 			m.integer.Budget().FailAfter(ordinal)
 			e = m.IntegerContent(p, &i, out)
 			if e != nil && !numericPhysicalReservationRefusal(e) {
 				t.Fatal("actual content reservation category", e)
 			}
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, want, out.root.value}, []*util.Int{&i}, out.header)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, want, out.root.value}, []*unumeral.Int{&i}, out.header)
 			m.integer.Budget().FailAfter(-1)
 			serviceMust(t, m.CleanupIntegerContent())
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, want, out.root.value}, []*util.Int{&i}, out.header)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, want, out.root.value}, []*unumeral.Int{&i}, out.header)
 			if e == nil {
-				if i != util.NewInt(2) {
+				if i != unumeral.NewInt(2) {
 					t.Fatal("independent positive gcd", i)
 				}
 				equal, x := m.Equal(out.root.value, want)

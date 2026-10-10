@@ -5,9 +5,8 @@ package polynomial
 import (
 	"errors"
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialGlexMonicActualFieldAndIndependentCoefficients(t *testing.T) {
@@ -76,7 +75,7 @@ func TestPolynomialGlexMonicBigFieldEveryNumericPrefix(t *testing.T) {
 			full := polynomialPSCFullFixture(t)
 			m := full.core
 			z := m.integer
-			var prime util.Int
+			var prime unumeral.Int
 			serviceMust(t, z.SetLimbs(&prime, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 			serviceMust(t, m.modular.SetZP(&prime))
 			serviceMust(t, z.Del(&prime))
@@ -84,7 +83,7 @@ func TestPolynomialGlexMonicBigFieldEveryNumericPrefix(t *testing.T) {
 			serviceMust(t, e)
 			unit, e := m.monomials.Unit()
 			serviceMust(t, e)
-			p, e := m.MkTerms([]util.Int{z.Two64, z.Two64}, []Monomial{x, unit})
+			p, e := m.MkTerms([]unumeral.Int{z.Two64, z.Two64}, []Monomial{x, unit})
 			serviceMust(t, e)
 			p = polynomialCaller(t, m, p)
 			t.Cleanup(func() { z.Budget().FailAfter(-1); serviceMust(t, full.CleanupGlexMonic()) })

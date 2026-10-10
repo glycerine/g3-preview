@@ -3,7 +3,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Ordinary lexical destruction never acknowledges a stopped source pointer.
@@ -118,7 +118,7 @@ func (b *polynomialSOM) beginNormalizeNumeral(parent *polynomialNormalizeScope) 
 		m.substitution.scope.somInvocation = b.gcdInvocation
 		m.substitution.scope.som = b.normalizeScope.receipt
 	}
-	b.gcd = util.Int{}
+	b.gcd = unumeral.Int{}
 	b.gcdActive = true
 	b.gcdBodyCause = nil
 	b.gcdCleanupCause = nil

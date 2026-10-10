@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func pscClassicNamedAudit(t *testing.T, full *MultivariatePolynomialManager, out *PolynomialRefVector, p, q Polynomial) {
@@ -100,7 +99,7 @@ func TestPolynomialPSCClassicActualEveryReservationPrefix(t *testing.T) {
 				serviceMust(t, e)
 				a, e := c.Coefficient(v, 0)
 				serviceMust(t, e)
-				if !constant || a != util.NewInt(w) {
+				if !constant || a != unumeral.NewInt(w) {
 					t.Fatal("independent retry math", prefix, i, a, w)
 				}
 			}

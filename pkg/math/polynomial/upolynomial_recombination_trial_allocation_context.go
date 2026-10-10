@@ -4,10 +4,10 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (c integerAllocationInvocationContext) trialFrame(z *util.IntegerManager) *upolyRecombinationTrialScope {
+func (c integerAllocationInvocationContext) trialFrame(z *unumeral.IntegerManager) *upolyRecombinationTrialScope {
 	q := c.trial
 	if z == nil || !z.ValidOwner() || q == nil || !q.matches() || !q.active || !q.executing || !q.constructed || c.trialInvocation == 0 || c.trialInvocation != q.invocation || q.owner.service.scope != q.owner || q.owner.manager.config.Integer != z {
 		return nil
@@ -23,7 +23,7 @@ func (c integerAllocationInvocationContext) trialFrame(z *util.IntegerManager) *
 	}
 	return q
 }
-func numericIntegerModularManager_trialAllocationContext(m *util.IntegerModularManager, q *upolyRecombinationTrialScope) integerAllocationInvocationContext {
+func numericIntegerModularManager_trialAllocationContext(m *unumeral.IntegerModularManager, q *upolyRecombinationTrialScope) integerAllocationInvocationContext {
 	if m == nil || !m.ValidOwner() || m.Integers() == nil || q == nil || !q.matches() {
 		return integerAllocationInvocationContext{}
 	}
@@ -37,7 +37,7 @@ func numericIntegerModularManager_trialAllocationContext(m *util.IntegerModularM
 	}
 	return integerAllocationInvocationContext{}
 }
-func (q *upolyRecombinationTrialScope) normalizeReceipt(m *util.IntegerModularManager) *util.IntegerNormalizeInvocationReceipt {
+func (q *upolyRecombinationTrialScope) normalizeReceipt(m *unumeral.IntegerModularManager) *unumeral.IntegerNormalizeInvocationReceipt {
 	for i, owner := range q.managers() {
 		if owner.modular == m {
 			return &q.normalize[i]

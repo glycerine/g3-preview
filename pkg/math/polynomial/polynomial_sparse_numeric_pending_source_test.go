@@ -7,15 +7,16 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialSparseBigInputDescriptorRefusalRetainsActualRoot(t *testing.T) {
 	for _, replacement := range []bool{false, true} {
 		t.Run(fmt.Sprint(replacement), func(t *testing.T) {
 			budget := arena.NewBudget(1 << 24)
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 			serviceMust(t, e)
 			t.Cleanup(func() {
 				q.Close()
@@ -45,7 +46,7 @@ func TestPolynomialSparseBigInputDescriptorRefusalRetainsActualRoot(t *testing.T
 			polynomialSparsePhysical(t, s, nil, []Polynomial{p})
 			if replacement {
 				serviceMust(t, q.Integers().CleanupPendingAllocation())
-				foreign := util.NewInt(19)
+				foreign := unumeral.NewInt(19)
 				e = q.Integers().Copy(&foreign, &q.Integers().Two64)
 				if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) {
 					t.Fatal("actual later foreign pending", e)
@@ -98,7 +99,7 @@ func TestPolynomialSparseBigInputEveryActualCopyReservationPrefix(t *testing.T) 
 					t.Fatal("matching constant skeleton entry")
 				}
 				got := s.inputs[0]
-				expected := util.NewInt(-36) // independent balanced residue: 2^64 mod 97 = 61 = -36
+				expected := unumeral.NewInt(-36) // independent balanced residue: 2^64 mod 97 = 61 = -36
 				equal, x := m.integer.Equal(&got, &expected)
 				serviceMust(t, x)
 				if !equal {
@@ -126,14 +127,14 @@ func TestPolynomialSparseBigFieldInterpolationEveryNumericPrefix(t *testing.T) {
 			full := polynomialPSCFullFixture(t)
 			m := full.core
 			z := m.integer
-			var modulus util.Int
+			var modulus unumeral.Int
 			serviceMust(t, z.SetLimbs(&modulus, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 			serviceMust(t, m.modular.SetZP(&modulus))
 			serviceMust(t, z.Del(&modulus))
 			p := polynomialQueryTerms(t, m, []int32{1}, [][]MonomialPower{{{0, 1}}})
 			unit, e := m.monomials.Unit()
 			serviceMust(t, e)
-			q, e := m.MkTerms([]util.Int{z.Two64}, []Monomial{unit})
+			q, e := m.MkTerms([]unumeral.Int{z.Two64}, []Monomial{unit})
 			serviceMust(t, e)
 			q = polynomialCaller(t, m, q)
 			sk, e := NewPolynomialSkeleton(m, p, 0)

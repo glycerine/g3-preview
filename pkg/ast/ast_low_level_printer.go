@@ -7,7 +7,8 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -20,9 +21,9 @@ type astLowLevelFrame struct {
 	invocation                           uint64
 	Active, sourceDone                   bool
 	bodyCause, destructorCause, ownCause error
-	Numeral                              util.OwnedRational
+	Numeral                              unumeral.OwnedRational
 	NumeralAcquired                      bool
-	numeralInsertion                     util.NumeralInsertionReceipt
+	numeralInsertion                     unumeral.NumeralInsertionReceipt
 }
 type astLowLevelPrinter struct {
 	manager            *ASTManager
@@ -383,7 +384,7 @@ func (p *astLowLevelPrinter) numeral(r astNodeRef) (yes bool, result error) {
 	f.Numeral = v
 	f.NumeralAcquired = true
 	defer func() {
-		var younger *util.NumeralSourceFailure
+		var younger *unumeral.NumeralSourceFailure
 		if errors.As(result, &younger) {
 			if f.destructorCause == nil {
 				f.destructorCause = younger

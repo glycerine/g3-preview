@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -18,7 +19,7 @@ func TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC(t *testing.T)
 	bs := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -43,7 +44,7 @@ func TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC(t *testing.T)
 	paramsMust(t, e)
 	// Separate efficient fixture: public source digit setter and scoped copy.
 	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -62,7 +63,7 @@ func TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC(t *testing.T)
 	if block.Refs != 1 || block.Size != 2 {
 		t.Fatal("actual source reference", block.Refs, block.Size)
 	}
-	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
 	before := numericAuditPhysical(t, m, extras)
 	other, e := c.NewValue()
 	paramsMust(t, e)
@@ -165,7 +166,7 @@ func TestParamsReferenceInitFrameOwnAbortActualLeafReceipt(t *testing.T) {
 	bs := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -190,7 +191,7 @@ func TestParamsReferenceInitFrameOwnAbortActualLeafReceipt(t *testing.T) {
 	paramsMust(t, e)
 	// Separate efficient fixture: public source digit setter and scoped copy.
 	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -209,7 +210,7 @@ func TestParamsReferenceInitFrameOwnAbortActualLeafReceipt(t *testing.T) {
 	if block.Refs != 1 || block.Size != 2 {
 		t.Fatal("actual source reference", block.Refs, block.Size)
 	}
-	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
 	before := numericAuditPhysical(t, m, extras)
 	shared, e := c.NewValue()
 	paramsMust(t, e)
@@ -230,7 +231,7 @@ func TestParamsReferenceInitFrameOwnAbortActualLeafReceipt(t *testing.T) {
 	if c.Blocks[oldSlot-1].Refs != 1 {
 		t.Fatal("sole actual frame-held reference")
 	}
-	extras = numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+	extras = numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
 	before = numericAuditPhysical(t, m, extras)
 	paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
 	paramsDecTLSNearMinimum(t, r)
@@ -356,7 +357,7 @@ func TestParamsReferenceNullAssignmentOldDECStop(t *testing.T) {
 	bs := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -381,7 +382,7 @@ func TestParamsReferenceNullAssignmentOldDECStop(t *testing.T) {
 	paramsMust(t, e)
 	// Separate efficient fixture: public source digit setter and scoped copy.
 	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -400,7 +401,7 @@ func TestParamsReferenceNullAssignmentOldDECStop(t *testing.T) {
 	if block.Refs != 1 || block.Size != 2 {
 		t.Fatal("actual source reference", block.Refs, block.Size)
 	}
-	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
 	before := numericAuditPhysical(t, m, extras)
 	other, e := c.NewValue()
 	paramsMust(t, e)
@@ -456,7 +457,7 @@ func TestParamsReferenceContextCloseConsumesExactStoppedFrame(t *testing.T) {
 	bs := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -481,7 +482,7 @@ func TestParamsReferenceContextCloseConsumesExactStoppedFrame(t *testing.T) {
 	paramsMust(t, e)
 	// Separate efficient fixture: public source digit setter and scoped copy.
 	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -500,7 +501,7 @@ func TestParamsReferenceContextCloseConsumesExactStoppedFrame(t *testing.T) {
 	if block.Refs != 1 || block.Size != 2 {
 		t.Fatal("actual source reference", block.Refs, block.Size)
 	}
-	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
 	before := numericAuditPhysical(t, m, extras)
 	shared, e := c.NewValue()
 	paramsMust(t, e)
@@ -521,7 +522,7 @@ func TestParamsReferenceContextCloseConsumesExactStoppedFrame(t *testing.T) {
 	if c.Blocks[oldSlot-1].Refs != 1 {
 		t.Fatal("sole actual frame-held reference")
 	}
-	extras = numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+	extras = numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
 	before = numericAuditPhysical(t, m, extras)
 	paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
 	paramsDecTLSNearMinimum(t, r)
@@ -545,7 +546,7 @@ func TestParamsReferenceContextCloseConsumesExactStoppedFrame(t *testing.T) {
 	if !c.Closed || bc.Used() != 0 {
 		t.Fatal("actual owning context final refund", c.Closed, bc.Used())
 	}
-	numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*RationalService{q}})
+	numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}})
 	paramsMust(t, c.Close())
 }
 

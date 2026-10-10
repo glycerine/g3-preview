@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Guarded helper-domain fixture: the real Copy replacement failure yields a
@@ -18,7 +18,7 @@ func TestPolynomialSOMNormalizeCompletedNumeralSourceGuard(t *testing.T) {
 	c := full.core
 	z := c.integer
 	b := &c.cheap
-	var large util.Int
+	var large unumeral.Int
 	limbs := make([]uint32, 8192)
 	limbs[0], limbs[len(limbs)-1] = 17, 1
 	serviceMust(t, z.SetLimbs(&large, limbs))
@@ -36,7 +36,7 @@ func TestPolynomialSOMNormalizeCompletedNumeralSourceGuard(t *testing.T) {
 	}
 	b.gcdBodyCause = body
 	before := b.gcd
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 	e := b.finishNormalizeNumeral(false)
 	if !errors.Is(e, arena.ErrInvalidSlot) || b.gcd != before || !b.gcdActive {
 		t.Fatal("source destructor acknowledged actual dangling field", e, before, b.gcd)
@@ -46,14 +46,14 @@ func TestPolynomialSOMNormalizeCompletedNumeralSourceGuard(t *testing.T) {
 	}
 	z.Budget().FailAfter(-1)
 	serviceMust(t, b.finishNormalizeNumeral(true))
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 }
 
 func TestPolynomialNormalizeYoungerSourceGuardRetainsOlderNumeral(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
 	z := c.integer
-	var large util.Int
+	var large unumeral.Int
 	limbs := make([]uint32, 8192)
 	limbs[0], limbs[len(limbs)-1] = 17, 1
 	serviceMust(t, z.SetLimbs(&large, limbs))
@@ -74,7 +74,7 @@ func TestPolynomialNormalizeYoungerSourceGuardRetainsOlderNumeral(t *testing.T) 
 		t.Fatal("actual helper dangling state", body, b.gcd)
 	}
 	b.gcdBodyCause = body
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 	guard := b.finishNormalizeNumeral(false)
 	if !errors.Is(guard, arena.ErrInvalidSlot) {
 		t.Fatal("actual younger source guard", guard)
@@ -97,7 +97,7 @@ func TestPolynomialNormalizeYoungerSourceGuardRetainsOlderNumeral(t *testing.T) 
 	if s.active || b.gcdActive {
 		t.Fatal("explicit exact child-first owning cleanup left roots")
 	}
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 }
 
 // Actual completed constructor scopes plus the real Copy-produced guarded
@@ -106,7 +106,7 @@ func TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals(t *testing.T)
 	full := polynomialPSCFullFixture(t)
 	c := full.core
 	z := c.integer
-	var large util.Int
+	var large unumeral.Int
 	limbs := make([]uint32, 8192)
 	limbs[0], limbs[len(limbs)-1] = 17, 1
 	serviceMust(t, z.SetLimbs(&large, limbs))
@@ -135,7 +135,7 @@ func TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals(t *testing.T)
 	if !errors.Is(guard, arena.ErrInvalidSlot) {
 		t.Fatal("actual stopped inner destructor", guard)
 	}
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 	e := c.finishSubstitution(body)
 	if !errors.Is(e, guard) || s.newA != olderA || s.tmp != olderTmp || s.stage != 0 {
 		t.Fatal("younger SOM source stop consumed older completed locals", e, s.newA, s.tmp, s.stage)
@@ -148,14 +148,14 @@ func TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals(t *testing.T)
 	if b.gcdActive || s.active {
 		t.Fatal("standalone owning cleanup did not drain exact child before older locals")
 	}
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 }
 
 func TestPolynomialSubstitutionExpiredSOMReceiptPreservesReplacement(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
 	z := c.integer
-	var large util.Int
+	var large unumeral.Int
 	limbs := make([]uint32, 8192)
 	limbs[0], limbs[len(limbs)-1] = 17, 1
 	serviceMust(t, z.SetLimbs(&large, limbs))
@@ -186,7 +186,7 @@ func TestPolynomialSubstitutionExpiredSOMReceiptPreservesReplacement(t *testing.
 	if e := c.finishSubstitution(body); !errors.Is(e, guard) {
 		t.Fatal(e)
 	}
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 	z.Budget().FailAfter(-1)
 	// Explicit owning acknowledgement of this reached callee, followed by a
 	// genuinely new independent constructor. The old outer receipt survives.
@@ -197,13 +197,13 @@ func TestPolynomialSubstitutionExpiredSOMReceiptPreservesReplacement(t *testing.
 	if b.gcdInvocation == oldInvocation || b.gcdSubstitution != nil {
 		t.Fatal("replacement inherited stopped caller", b.gcdInvocation)
 	}
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 	serviceMust(t, c.CleanupSubstitution())
 	if !b.gcdActive || b.gcd != foreign {
 		t.Fatal("expired receipt swept replacement", foreign, b.gcd)
 	}
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 	// Only the actual independent local's own source destruction consumes it.
 	serviceMust(t, b.finishNormalizeNumeral(false))
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 }

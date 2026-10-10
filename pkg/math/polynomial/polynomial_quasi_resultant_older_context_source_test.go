@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Signed-host TLS/direct allocator profile isolates an actual end-only RAW
@@ -20,21 +21,21 @@ func TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory(t *t
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	rationals, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	rationals, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: rationals.Integers(), Rationals: rationals, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	c := full.core
 	_, e = c.monomials.MkVar()
 	serviceMust(t, e)
-	var large, modulus, warm, warmProduct, older util.Int
+	var large, modulus, warm, warmProduct, older unumeral.Int
 	serviceMust(t, c.integer.SetLimbs(&large, []uint32{17, 1 << 30}))
 	term, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{large, util.NewInt(5)}, []Monomial{term, c.monomials.unit})
+	p, e := c.MkTerms([]unumeral.Int{large, unumeral.NewInt(5)}, []Monomial{term, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
-	b, e := c.MkTerms([]util.Int{large, util.NewInt(3)}, []Monomial{term, c.monomials.unit})
+	b, e := c.MkTerms([]unumeral.Int{large, unumeral.NewInt(3)}, []Monomial{term, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(b))
 	digits := make([]uint32, 6)
@@ -47,7 +48,7 @@ func TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory(t *t
 	serviceMust(t, e)
 	var d uint32
 	serviceMust(t, c.PseudoDivide(p, b, 0, &d, Q, R))
-	three := util.NewInt(3)
+	three := unumeral.NewInt(3)
 	for i := 0; i < 2; i++ {
 		serviceMust(t, c.integer.Mul(&large, &three, &warmProduct))
 		serviceMust(t, c.integer.Rem(&warmProduct, &(*c.modular.BorrowModulus()), &warm))
@@ -66,7 +67,7 @@ func TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory(t *t
 			}
 			contextTLSFinish(t, rt, func() error { return c.CleanupValue(&p) })
 		}
-		for _, v := range []*util.Int{&large, &modulus, &warm, &warmProduct, &older} {
+		for _, v := range []*unumeral.Int{&large, &modulus, &warm, &warmProduct, &older} {
 			contextTLSFinish(t, rt, func() error { return c.integer.Del(v) })
 		}
 		if x = c.DecRef(b); x != nil {
@@ -113,7 +114,7 @@ func TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory(t *t
 	if !ok || current != diagnostic {
 		t.Fatal("older source stop changed completed child diagnostics")
 	}
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, b, Q.root.value, Q.root.incoming, R.root.value, R.root.incoming}, []*util.Int{&large, &modulus, &warm, &warmProduct, &older}, Q.header+R.header)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, b, Q.root.value, Q.root.incoming, R.root.value, R.root.incoming}, []*unumeral.Int{&large, &modulus, &warm, &warmProduct, &older}, Q.header+R.header)
 	recovery, e = rt.Allocate(400000)
 	serviceMust(t, e)
 	contextTLSFinish(t, rt, func() error { return c.integer.Del(&older) })

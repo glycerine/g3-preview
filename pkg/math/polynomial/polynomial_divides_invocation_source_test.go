@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialDividesActualMatchedInvocationEveryPrefix(t *testing.T) {
@@ -63,7 +62,7 @@ func TestPolynomialDividesFalseReturnKeepsPersistentRAndNormalReuse(t *testing.T
 	c := full.core
 	_, e := c.monomials.MkVar()
 	serviceMust(t, e)
-	seven := util.NewInt(7)
+	seven := unumeral.NewInt(7)
 	p, e := c.MkConstantTakeCopy(&seven)
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
@@ -92,7 +91,7 @@ func TestPolynomialDividesFalseReturnKeepsPersistentRAndNormalReuse(t *testing.T
 	if !equal {
 		t.Fatal("source false return changed R coefficient")
 	}
-	used, rawAs, rawMs := c.integer.Budget().Used(), append([]util.Int(nil), c.som.as.values...), append([]Monomial(nil), c.som.ms...)
+	used, rawAs, rawMs := c.integer.Budget().Used(), append([]unumeral.Int(nil), c.som.as.values...), append([]Monomial(nil), c.som.ms...)
 	unitRC, e := c.monomialRefCount(c.monomials.unit)
 	serviceMust(t, e)
 	polynomialImpPhysicalAuditValues(t, full, []Polynomial{p, q})

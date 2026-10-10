@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -77,7 +78,7 @@ func upolyHenselPhysicalFixture(t *testing.T) (*UPolynomialManager, *UPolynomial
 		if e != nil {
 			t.Fatal(e)
 		}
-		values := []util.Int{util.NewInt(cs[0]), util.NewInt(cs[1])}
+		values := []unumeral.Int{unumeral.NewInt(cs[0]), unumeral.NewInt(cs[1])}
 		if e = donor.SetInts(p, values); e != nil {
 			t.Fatal(e)
 		}
@@ -456,14 +457,14 @@ func TestUPolynomialHenselImportedBigModulusPhysicalFailureRoots(t *testing.T) {
 			}
 			successes++
 			succeeded = true
-			var modulus util.Int
+			var modulus unumeral.Int
 			if e := lift.Modulus(&modulus); e != nil {
 				t.Fatal(e)
 			}
 			if modulus.IsSmall() {
 				t.Fatal("5^16 must have physical numeric payload")
 			}
-			var expected util.Int
+			var expected unumeral.Int
 			if e := m.IntegerManager().SetString(&expected, "152587890625"); e != nil {
 				t.Fatal(e)
 			}
@@ -607,7 +608,7 @@ func TestUPolynomialHenselDeadLowerGuardedCloseAndCallerSetZ(t *testing.T) {
 
 // Raw source allocation uses its actual memout transport, while typed Go
 // bookkeeping preserves arena refusal. No other error category is accepted.
-func upolyHenselAllocationRefusal(z *util.IntegerManager, err error) bool {
+func upolyHenselAllocationRefusal(z *unumeral.IntegerManager, err error) bool {
 	if errors.Is(err, arena.ErrInjectedFailure) {
 		return true
 	}
@@ -618,7 +619,7 @@ func upolyHenselAllocationRefusal(z *util.IntegerManager, err error) bool {
 // Source: src/util/mpz.cpp:730-817.
 // Retained Lehmer declarations belong to the external shared Integer owner,
 // not UPolynomial cached/owned stats. Name only actual source frame fields.
-func upolyIntegerGCDRawOwnedCells(t *testing.T, zowner *util.IntegerManager) uint32 {
+func upolyIntegerGCDRawOwnedCells(t *testing.T, zowner *unumeral.IntegerManager) uint32 {
 	t.Helper()
 	z := reflect.ValueOf(zowner).Elem()
 	if testFieldBySourceName(z, "self").Pointer() != z.Addr().Pointer() {
@@ -673,7 +674,7 @@ func upolyIntegerGCDRawOwnedCells(t *testing.T, zowner *util.IntegerManager) uin
 
 // Source: src/util/mpz.h:393-426. Public AddMul/SubMul retain the actual
 // reached RAW temporary separately from UPolynomial members and cached cells.
-func upolyIntegerRawOwnedCells(t *testing.T, owner *util.IntegerManager) uint32 {
+func upolyIntegerRawOwnedCells(t *testing.T, owner *unumeral.IntegerManager) uint32 {
 	t.Helper()
 	count := upolyIntegerGCDRawOwnedCells(t, owner)
 	z := reflect.ValueOf(owner).Elem()

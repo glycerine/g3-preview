@@ -3,10 +3,10 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (c integerAllocationInvocationContext) preparationFrame(z *util.IntegerManager) *upolyFactorPreparationScope {
+func (c integerAllocationInvocationContext) preparationFrame(z *unumeral.IntegerManager) *upolyFactorPreparationScope {
 	q := c.preparation
 	if z == nil || !z.ValidOwner() || q == nil || !q.matches(&q.receipt) || !q.active || !q.executing || c.preparationInvocation == 0 || c.preparationInvocation != q.invocation {
 		return nil
@@ -20,7 +20,7 @@ func (c integerAllocationInvocationContext) preparationFrame(z *util.IntegerMana
 	}
 	return q
 }
-func numericIntegerModularManager_preparationAllocationContext(m *util.IntegerModularManager, q *upolyFactorPreparationScope) integerAllocationInvocationContext {
+func numericIntegerModularManager_preparationAllocationContext(m *unumeral.IntegerModularManager, q *upolyFactorPreparationScope) integerAllocationInvocationContext {
 	if m == nil || !m.ValidOwner() || m.Integers() == nil || q == nil || !q.matches(&q.receipt) || q.service.manager.modular != m {
 		return integerAllocationInvocationContext{}
 	}
@@ -30,9 +30,9 @@ func numericIntegerModularManager_preparationAllocationContext(m *util.IntegerMo
 	}
 	return c
 }
-func (c integerAllocationInvocationContext) recordPreparationRaw(z *util.IntegerManager, r *util.IntegerRawInvocationReceipt) {
+func (c integerAllocationInvocationContext) recordPreparationRaw(z *unumeral.IntegerManager, r *unumeral.IntegerRawInvocationReceipt) {
 	q := c.preparationFrame(z)
-	if q != nil && z.MatchesRawInvocation(r) && r.Kind() == util.IntegerRawGCD {
+	if q != nil && z.MatchesRawInvocation(r) && r.Kind() == unumeral.IntegerRawGCD {
 		q.gcdRaw = *r
 	}
 }

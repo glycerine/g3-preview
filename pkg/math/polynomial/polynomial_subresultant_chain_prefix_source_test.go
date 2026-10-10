@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func subresultantNamedAudit(t *testing.T, m *MultivariatePolynomialManager, out *PolynomialRefVector, polys []Polynomial, numerals []*util.Int) {
+func subresultantNamedAudit(t *testing.T, m *MultivariatePolynomialManager, out *PolynomialRefVector, polys []Polynomial, numerals []*unumeral.Int) {
 	t.Helper()
 	s := &m.subresultant
 	for i := range s.refs {
@@ -31,13 +31,13 @@ func TestPolynomialSubresultantChainDefectiveActualEveryReservationPrefix(t *tes
 	for prefix := int64(0); prefix < 1024; prefix++ {
 		m := polynomialPSCFullFixture(t)
 		c := m.core
-		var big util.Int
+		var big unumeral.Int
 		serviceMust(t, c.integer.SetLimbs(&big, []uint32{7, 11, 1 << 20}))
 		term, e := c.monomials.MkVariable(0, 4)
 		serviceMust(t, e)
 		linear, e := c.monomials.MkVariable(0, 1)
 		serviceMust(t, e)
-		p, e := c.MkTerms([]util.Int{util.NewInt(1), big, util.NewInt(1)}, []Monomial{term, linear, c.monomials.unit})
+		p, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(1), big, unumeral.NewInt(1)}, []Monomial{term, linear, c.monomials.unit})
 		serviceMust(t, e)
 		p = polynomialCaller(t, c, p)
 		q := polynomialQueryTerms(t, c, []int32{2, 1}, [][]MonomialPower{{{0, 2}}, nil})
@@ -47,7 +47,7 @@ func TestPolynomialSubresultantChainDefectiveActualEveryReservationPrefix(t *tes
 		b := m.originalBudget
 		b.FailAfter(prefix)
 		e = m.SubresultantChain(p, q, 0, out)
-		subresultantNamedAudit(t, m, out, []Polynomial{p, q}, []*util.Int{&big})
+		subresultantNamedAudit(t, m, out, []Polynomial{p, q}, []*unumeral.Int{&big})
 		if e != nil && m.subresultant.constructed > 0 {
 			body = true
 		}
@@ -61,7 +61,7 @@ func TestPolynomialSubresultantChainDefectiveActualEveryReservationPrefix(t *tes
 			}
 		}
 		own := m.CleanupSubresultantChain()
-		subresultantNamedAudit(t, m, out, []Polynomial{p, q}, []*util.Int{&big})
+		subresultantNamedAudit(t, m, out, []Polynomial{p, q}, []*unumeral.Int{&big})
 		if m.subresultant.bodyCause != bodyCause {
 			t.Fatal("owning continuation erased actual body cause", prefix)
 		}
@@ -73,7 +73,7 @@ func TestPolynomialSubresultantChainDefectiveActualEveryReservationPrefix(t *tes
 		if own != nil && m.subresultant.cleanupCause != own {
 			t.Fatal("owning continuation erased first cleanup cause", prefix)
 		}
-		subresultantNamedAudit(t, m, out, []Polynomial{p, q}, []*util.Int{&big})
+		subresultantNamedAudit(t, m, out, []Polynomial{p, q}, []*unumeral.Int{&big})
 		guardedHole := false
 		if e != nil {
 			message := e.Error()
@@ -88,7 +88,7 @@ func TestPolynomialSubresultantChainDefectiveActualEveryReservationPrefix(t *tes
 				if !errors.Is(retry, arena.ErrInvalidSlot) {
 					t.Fatal("exact TMP hole retry guard", prefix, retry)
 				}
-				subresultantNamedAudit(t, m, out, []Polynomial{p, q}, []*util.Int{&big})
+				subresultantNamedAudit(t, m, out, []Polynomial{p, q}, []*unumeral.Int{&big})
 				serviceMust(t, m.CleanupSubresultantChain())
 			} else {
 				serviceMust(t, retry)
@@ -104,11 +104,11 @@ func TestPolynomialSubresultantChainDefectiveActualEveryReservationPrefix(t *tes
 		}
 
 		// Independent resultant of 2*x^2+1 and x^4+B*x+1 is 25+8*B^2.
-		var expected util.Int
+		var expected unumeral.Int
 		serviceMust(t, c.integer.Mul(&big, &big, &expected))
-		eight := util.NewInt(8)
+		eight := unumeral.NewInt(8)
 		serviceMust(t, c.integer.Mul(&expected, &eight, &expected))
-		twentyFive := util.NewInt(25)
+		twentyFive := unumeral.NewInt(25)
 		serviceMust(t, c.integer.Add(&expected, &twentyFive, &expected))
 		constant, e2 := out.Get(0)
 		serviceMust(t, e2)

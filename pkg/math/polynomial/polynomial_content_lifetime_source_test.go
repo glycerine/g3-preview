@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This guarded-domain helper test uses the real setter's dangling-pointer
@@ -16,7 +16,7 @@ func TestPolynomialIntegerContentCompletedLocalActualDanglingGuard(t *testing.T)
 	full := polynomialPSCFullFixture(t)
 	m := full.core
 	z := m.integer
-	var large util.Int
+	var large unumeral.Int
 	limbs := make([]uint32, 8192)
 	limbs[0] = 17
 	limbs[len(limbs)-1] = 1
@@ -32,7 +32,7 @@ func TestPolynomialIntegerContentCompletedLocalActualDanglingGuard(t *testing.T)
 	}
 	original := m.contentLocal.ai
 	m.contentLocal.bodyCause = body
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 	e := m.finishIntegerContent(false)
 	if !errors.Is(e, arena.ErrInvalidSlot) || m.contentLocal.ai != original || !m.contentLocal.active {
 		t.Fatal("source destructor must retain actual dangling guard", e, original, m.contentLocal)
@@ -73,9 +73,9 @@ func TestPolynomialIntegerContentCompletedLocalActualDanglingGuard(t *testing.T)
 	if m.contentInvocationSourceCause(&receipt) != e {
 		t.Fatal("true owning phase erased source cause")
 	}
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 	p := polynomialQueryTerms(t, m, []int32{2, 4}, [][]MonomialPower{{{0, 1}}, {{1, 1}}})
-	var i util.Int
+	var i unumeral.Int
 	var primitive polynomialReference
 	var current polynomialContentInvocationReceipt
 	serviceMust(t, m.integerContentWithReceipt(p, &i, &primitive, &current))
@@ -84,7 +84,7 @@ func TestPolynomialIntegerContentCompletedLocalActualDanglingGuard(t *testing.T)
 	}
 	serviceMust(t, m.cleanupContentInvocation(&receipt, false))
 	serviceMust(t, m.cleanupContentInvocation(&receipt, true))
-	if i != util.NewInt(2) {
+	if i != unumeral.NewInt(2) {
 		t.Fatal("later mathematical content", i)
 	}
 	polynomialQueryExpect(t, m, primitive.value, map[[3]uint32]int64{{1, 0, 0}: 1, {0, 1, 0}: 2})

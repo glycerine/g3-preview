@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Signed-host TLS/direct allocator profile isolates an actual end-only RAW
@@ -20,21 +21,21 @@ func TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs(t *te
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	rationals, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	rationals, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: rationals.Integers(), Rationals: rationals, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	c := full.core
 	_, e = c.monomials.MkVar()
 	serviceMust(t, e)
-	var large, modulus, warm, warmProduct util.Int
+	var large, modulus, warm, warmProduct unumeral.Int
 	serviceMust(t, c.integer.SetLimbs(&large, []uint32{17, 1 << 30}))
 	term, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{large, util.NewInt(5)}, []Monomial{term, c.monomials.unit})
+	p, e := c.MkTerms([]unumeral.Int{large, unumeral.NewInt(5)}, []Monomial{term, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
-	b, e := c.MkTerms([]util.Int{large, util.NewInt(3)}, []Monomial{term, c.monomials.unit})
+	b, e := c.MkTerms([]unumeral.Int{large, unumeral.NewInt(3)}, []Monomial{term, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(b))
 	digits := make([]uint32, 6)
@@ -47,7 +48,7 @@ func TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs(t *te
 	serviceMust(t, e)
 	var d uint32
 	serviceMust(t, c.PseudoDivide(p, b, 0, &d, Q, R))
-	three := util.NewInt(3)
+	three := unumeral.NewInt(3)
 	for i := 0; i < 2; i++ {
 		serviceMust(t, c.integer.Mul(&large, &three, &warmProduct))
 		serviceMust(t, c.integer.Rem(&warmProduct, &(*c.modular.BorrowModulus()), &warm))
@@ -67,7 +68,7 @@ func TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs(t *te
 			}
 			contextTLSFinish(t, rt, func() error { return c.CleanupValue(&p) })
 		}
-		for _, v := range []*util.Int{&large, &modulus, &warm, &warmProduct} {
+		for _, v := range []*unumeral.Int{&large, &modulus, &warm, &warmProduct} {
 			contextTLSFinish(t, rt, func() error { return c.integer.Del(v) })
 		}
 		if x = c.DecRef(b); x != nil {
@@ -120,7 +121,7 @@ func TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs(t *te
 	if raw.Frame == nil || raw.Frame.Stage != 3 || raw.Frame.BodyCause != nil || c.integer.AddMulInvocationSourceCause(&raw) != receipt.frame.sourceCause {
 		t.Fatal("actual end-only RAW DEL not reached", body, visits, raw.Frame)
 	}
-	if receipt.frame.depth == 0 || receipt.frame.constructed&(uint16(1)<<pseudoNumeral) == 0 || receipt.frame.numeral == (util.Int{}) || parent.refs[2].root.value != p {
+	if receipt.frame.depth == 0 || receipt.frame.constructed&(uint16(1)<<pseudoNumeral) == 0 || receipt.frame.numeral == (unumeral.Int{}) || parent.refs[2].root.value != p {
 		t.Fatal("younger source stop destroyed older NUM/output", receipt.frame.depth, receipt.frame.numeral, R.root.value)
 	}
 	source := receipt.frame.sourceCause
@@ -129,7 +130,7 @@ func TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs(t *te
 		t.Fatal("actual stopped source cleanup history absent")
 	}
 	returnedText := body.Error()
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, b, Q.root.value, Q.root.incoming, R.root.value, R.root.incoming, parent.refs[0].root.value, parent.refs[0].root.incoming, parent.refs[1].root.value, parent.refs[1].root.incoming, parent.refs[2].root.value, parent.refs[2].root.incoming}, []*util.Int{&large, &modulus, &warm, &warmProduct}, Q.header+R.header)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, b, Q.root.value, Q.root.incoming, R.root.value, R.root.incoming, parent.refs[0].root.value, parent.refs[0].root.incoming, parent.refs[1].root.value, parent.refs[1].root.incoming, parent.refs[2].root.value, parent.refs[2].root.incoming}, []*unumeral.Int{&large, &modulus, &warm, &warmProduct}, Q.header+R.header)
 	state := rt.State()
 	depth := receipt.frame.depth
 	if c.pseudoCleanupPhase(false, false) != source || rt.State() != state || receipt.frame.depth != depth {

@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialFactorConstantActualHelperReceipt(t *testing.T) {
@@ -16,14 +17,14 @@ func TestPolynomialFactorConstantActualHelperReceipt(t *testing.T) {
 	fs, e := NewPolynomialFactors(full)
 	serviceMust(t, e)
 	defer func() { serviceMust(t, fs.CloseChecked()) }()
-	five := util.NewInt(5)
+	five := unumeral.NewInt(5)
 	var receipt polynomialFactorConstantInvocationReceipt
 	serviceMust(t, full.accumulateFactorConstantWithReceipt(fs, &five, &receipt))
-	if fs.constant != util.NewInt(5) || receipt.invocation == 0 {
+	if fs.constant != unumeral.NewInt(5) || receipt.invocation == 0 {
 		t.Fatal("literal MUL/SET and actual invocation")
 	}
 	serviceMust(t, full.flipFactorSignWithReceipt(fs, &receipt))
-	if fs.constant != util.NewInt(-5) || fs.localActive {
+	if fs.constant != unumeral.NewInt(-5) || fs.localActive {
 		t.Fatal("literal SET/NEG/SET and scoped DT")
 	}
 }
@@ -62,8 +63,8 @@ func TestPolynomialFactorConstantTransportCannotRetireExecutingOwner(t *testing.
 			b := arena.NewBudget(1 << 27)
 			var full *MultivariatePolynomialManager
 			var fs *PolynomialFactors
-			var q *util.RationalManager
-			var callbackOut, callbackInput util.Int
+			var q *unumeral.RationalManager
+			var callbackOut, callbackInput unumeral.Int
 			active, seen := false, false
 			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 				if active {
@@ -122,7 +123,7 @@ func TestPolynomialFactorConstantTransportCannotRetireExecutingOwner(t *testing.
 			serviceMust(t, e)
 			cfg := serviceConfig(b).Integers
 			cfg.Memory = rt
-			q, e = util.NewRationalManager(util.RationalConfig{Integers: cfg})
+			q, e = unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 			serviceMust(t, e)
@@ -130,7 +131,7 @@ func TestPolynomialFactorConstantTransportCannotRetireExecutingOwner(t *testing.
 			serviceMust(t, e)
 			fs, e = NewPolynomialFactors(full)
 			serviceMust(t, e)
-			var a util.Int
+			var a unumeral.Int
 			digits := make([]uint32, 80)
 			digits[79] = 1
 			serviceMust(t, q.Integers().SetLimbs(&a, digits))
@@ -149,7 +150,7 @@ func TestPolynomialFactorConstantTransportCannotRetireExecutingOwner(t *testing.
 			if !seen || !numericPhysicalReservationRefusal(cause) {
 				t.Fatal("actual SET returning transport", seen, cause)
 			}
-			polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*util.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []umemory.Block{held})
+			polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*unumeral.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []umemory.Block{held})
 			serviceMust(t, rt.SetMaxSize(0))
 			serviceMust(t, fs.CloseChecked())
 			serviceMust(t, q.Integers().Del(&a))
@@ -170,7 +171,7 @@ func TestPolynomialFactorConstantTransportCannotRetireExecutingOwner(t *testing.
 type factorCallbackState struct {
 	closing, sourceStarted    bool
 	sourceStage               uint8
-	constant                  util.Int
+	constant                  unumeral.Int
 	invocation                uint64
 	sourceCause, cleanupCause error
 }
@@ -192,7 +193,7 @@ func TestPolynomialFactorConstantEveryActualReservationPrefix(t *testing.T) {
 					fs, e := NewPolynomialFactors(full)
 					serviceMust(t, e)
 					z := full.core.integer
-					var a util.Int
+					var a unumeral.Int
 					digits := make([]uint32, 80)
 					digits[79] = 1
 					serviceMust(t, z.SetLimbs(&a, digits))
@@ -209,11 +210,11 @@ func TestPolynomialFactorConstantEveryActualReservationPrefix(t *testing.T) {
 					case "flip":
 						e = full.flipFactorSignWithReceipt(fs, &receipt)
 					}
-					polynomialFactorsAudit(t, fs, nil, []*util.Int{&a})
+					polynomialFactorsAudit(t, fs, nil, []*unumeral.Int{&a})
 					if e == nil {
 						success = true
 						if op == "flip" {
-							var expect util.Int
+							var expect unumeral.Int
 							z.Budget().FailAfter(-1)
 							serviceMust(t, z.Copy(&expect, &a))
 							serviceMust(t, z.Neg(&expect))

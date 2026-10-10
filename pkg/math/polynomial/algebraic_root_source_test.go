@@ -5,18 +5,19 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 type algebraicSourceCohort struct {
-	service                         *util.RationalService
+	service                         *unumeral.RationalService
 	polynomial                      *UPolynomialManager
 	core                            *AlgebraicRootCore
-	binary                          *util.BinaryRationalManager
+	binary                          *unumeral.BinaryRationalManager
 	budget                          *arena.Budget
 	limit                           *control.Reslimit
 	algebraicTicks, polynomialTicks uint64
@@ -31,7 +32,7 @@ func algebraicSourceMust(t *testing.T, e error) {
 func algebraicSourceFixture(t *testing.T) *algebraicSourceCohort {
 	t.Helper()
 	b := arena.NewBudget(1 << 27)
-	s, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}}})
+	s, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}}})
 	algebraicSourceMust(t, e)
 	limit, e := control.NewReslimit(b)
 	algebraicSourceMust(t, e)
@@ -45,10 +46,10 @@ func algebraicSourceFixture(t *testing.T) *algebraicSourceCohort {
 	algebraicSourceMust(t, e)
 	factors, e := NewUPolynomialFactorizationService(p, UPolynomialFactorizationConfig{Primes: primes})
 	algebraicSourceMust(t, e)
-	binary, e := util.NewBinaryRationalManager(p.IntegerManager(), util.BinaryRationalConfig{Diagnostics: s})
+	binary, e := unumeral.NewBinaryRationalManager(p.IntegerManager(), unumeral.BinaryRationalConfig{Diagnostics: s})
 	algebraicSourceMust(t, e)
 	f.binary = binary
-	intervals, e := util.NewBinaryIntervalManager(binary)
+	intervals, e := unumeral.NewBinaryIntervalManager(binary)
 	algebraicSourceMust(t, e)
 	allocator, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: s.RuntimeOwner(), Profile: umemory.SmallAllocatorProfile{PointerBits: s.RuntimeOwner().SizeTBits(), Debug: polynomialSourceDebug}})
 	algebraicSourceMust(t, e)
@@ -113,7 +114,7 @@ func TestAlgebraicRegisteredWilkinsonTwentyIntegerRoots(t *testing.T) {
 	p := upolySourceNew(t, f.polynomial, []int32{-1, 1})
 	factor := upolySourceNew(t, f.polynomial, []int32{0, 1})
 	for i := int32(2); i <= 20; i++ {
-		z := util.NewInt(-i)
+		z := unumeral.NewInt(-i)
 		algebraicSourceMust(t, f.polynomial.SetCoefficient(factor, 0, &z))
 		algebraicSourceMust(t, f.polynomial.Mul(p, factor, p))
 	}
@@ -139,7 +140,7 @@ func TestAlgebraicRealResourceCancellationBeforeMinimalRefine(t *testing.T) {
 	f := algebraicSourceFixture(t)
 	p := upolySourceNew(t, f.polynomial, []int32{-2, 0, 1})
 	q := upolySourceNew(t, f.polynomial, []int32{-3, 0, 1})
-	lo, hi := util.NewBinaryInt(1), util.NewBinaryInt(2)
+	lo, hi := unumeral.NewBinaryInt(1), unumeral.NewBinaryInt(2)
 	var a, b Algebraic
 	algebraicSourceMust(t, f.core.SetRoot(&a, algebraicSourceView(t, f.polynomial, p), &lo, &hi, true))
 	algebraicSourceMust(t, f.core.SetRoot(&b, algebraicSourceView(t, f.polynomial, q), &lo, &hi, true))

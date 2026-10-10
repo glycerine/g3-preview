@@ -4,29 +4,29 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func polynomialSOMPhysicalAudit(t *testing.T, m *MultivariatePolynomialCore, v *PolynomialSOMVector, callerMonos []Monomial, public ...*util.Int) {
+func polynomialSOMPhysicalAudit(t *testing.T, m *MultivariatePolynomialCore, v *PolynomialSOMVector, callerMonos []Monomial, public ...*unumeral.Int) {
 	t.Helper()
 	polynomialSOMPhysicalWithExternal(t, m, v, callerMonos, nil, public...)
 }
-func polynomialSOMPhysicalWithExternal(t *testing.T, m *MultivariatePolynomialCore, v *PolynomialSOMVector, callerMonos []Monomial, external []umemory.Block, public ...*util.Int) {
+func polynomialSOMPhysicalWithExternal(t *testing.T, m *MultivariatePolynomialCore, v *PolynomialSOMVector, callerMonos []Monomial, external []umemory.Block, public ...*unumeral.Int) {
 	t.Helper()
 	polynomialSOMPhysicalWithVectors(t, m, []*PolynomialSOMVector{v}, callerMonos, external, public...)
 }
-func polynomialSOMPhysicalWithVectors(t *testing.T, m *MultivariatePolynomialCore, vectors []*PolynomialSOMVector, callerMonos []Monomial, external []umemory.Block, public ...*util.Int) {
+func polynomialSOMPhysicalWithVectors(t *testing.T, m *MultivariatePolynomialCore, vectors []*PolynomialSOMVector, callerMonos []Monomial, external []umemory.Block, public ...*unumeral.Int) {
 	polynomialSOMPhysicalWithPolynomials(t, m, vectors, callerMonos, external, nil, public...)
 }
-func polynomialSOMPhysicalWithPolynomials(t *testing.T, m *MultivariatePolynomialCore, vectors []*PolynomialSOMVector, callerMonos []Monomial, external []umemory.Block, polys []Polynomial, public ...*util.Int) {
+func polynomialSOMPhysicalWithPolynomials(t *testing.T, m *MultivariatePolynomialCore, vectors []*PolynomialSOMVector, callerMonos []Monomial, external []umemory.Block, polys []Polynomial, public ...*unumeral.Int) {
 	polynomialSOMPhysicalWithOwners(t, m, vectors, callerMonos, external, polys, nil, public...)
 }
-func polynomialSOMPhysicalWithOwners(t *testing.T, m *MultivariatePolynomialCore, vectors []*PolynomialSOMVector, callerMonos []Monomial, external []umemory.Block, polys []Polynomial, references []*PolynomialRef, public ...*util.Int) {
+func polynomialSOMPhysicalWithOwners(t *testing.T, m *MultivariatePolynomialCore, vectors []*PolynomialSOMVector, callerMonos []Monomial, external []umemory.Block, polys []Polynomial, references []*PolynomialRef, public ...*unumeral.Int) {
 	t.Helper()
 	raw, mono, values, extra := polynomialSOMNamedRoots(t, m, vectors)
 	raw = append(raw, external...)
-	roots := append([]*util.Int{}, public...)
+	roots := append([]*unumeral.Int{}, public...)
 	for i := range values {
 		roots = append(roots, &values[i])
 	}
@@ -44,7 +44,7 @@ func polynomialSOMPhysicalWithOwners(t *testing.T, m *MultivariatePolynomialCore
 }
 
 // Collect only the actual named vector owners and their retained children.
-func polynomialSOMNamedRoots(t *testing.T, m *MultivariatePolynomialCore, vectors []*PolynomialSOMVector) (raw []umemory.Block, mono []Monomial, values []util.Int, extra uint64) {
+func polynomialSOMNamedRoots(t *testing.T, m *MultivariatePolynomialCore, vectors []*PolynomialSOMVector) (raw []umemory.Block, mono []Monomial, values []unumeral.Int, extra uint64) {
 	t.Helper()
 	vectors = append(vectors, &m.translateBuffers)
 	seenVectors := map[*PolynomialSOMVector]bool{}

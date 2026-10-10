@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialRegularSourceZeroRemovalTransfersActualTags(t *testing.T) {
@@ -18,10 +17,10 @@ func TestPolynomialRegularSourceZeroRemovalTransfersActualTags(t *testing.T) {
 	serviceMust(t, e)
 	y, e := c.monomials.MkVariable(1, 1)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{util.NewInt(2), util.NewInt(1)}, []Monomial{x, y})
+	p, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(1)}, []Monomial{x, y})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
-	two := util.NewInt(2)
+	two := unumeral.NewInt(2)
 	serviceMust(t, c.modular.SetZP(&two))
 	var r polynomialArithmeticInvocationReceipt
 	serviceMust(t, c.som.acquireArithmeticInvocation(&r))
@@ -34,7 +33,7 @@ func TestPolynomialRegularSourceZeroRemovalTransfersActualTags(t *testing.T) {
 	serviceMust(t, e)
 	a, e := c.som.as.coefficient(c, 0)
 	serviceMust(t, e)
-	if n != 1 || term != y || a != util.NewInt(1) {
+	if n != 1 || term != y || a != unumeral.NewInt(1) {
 		t.Fatal("literal source zero-filter result", n, term, a)
 	}
 	serviceMust(t, c.cleanupArithmeticInvocation(&r, false))

@@ -2,7 +2,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *MultivariatePolynomialCore) checkpoint() error {
@@ -25,10 +25,10 @@ func (m *MultivariatePolynomialCore) checkpoint() error {
 	}
 	return m.config.Cooperation()
 }
-func (m *MultivariatePolynomialCore) AddMul(a1 *util.Int, t1 Monomial, p1 Polynomial, a2 *util.Int, t2 Monomial, p2 Polynomial) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) AddMul(a1 *unumeral.Int, t1 Monomial, p1 Polynomial, a2 *unumeral.Int, t2 Monomial, p2 Polynomial) (Polynomial, error) {
 	return m.addMulWithReceipt(a1, t1, p1, a2, t2, p2, nil)
 }
-func (m *MultivariatePolynomialCore) addMulWithReceipt(a1 *util.Int, t1 Monomial, p1 Polynomial, a2 *util.Int, t2 Monomial, p2 Polynomial, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) addMulWithReceipt(a1 *unumeral.Int, t1 Monomial, p1 Polynomial, a2 *unumeral.Int, t2 Monomial, p2 Polynomial, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -55,7 +55,7 @@ func (m *MultivariatePolynomialCore) addWithReceipt(p, q Polynomial, receipt *po
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	u, e := m.monomials.Unit()
 	if e != nil {
 		return Polynomial{}, e
@@ -69,7 +69,7 @@ func (m *MultivariatePolynomialCore) subWithReceipt(p, q Polynomial, receipt *po
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	if e := m.modular.SetInt64(&m.minusOne, -1); e != nil {
 		return Polynomial{}, e
 	}
@@ -79,10 +79,10 @@ func (m *MultivariatePolynomialCore) subWithReceipt(p, q Polynomial, receipt *po
 	}
 	return m.addMulWithReceipt(&one, u, p, &m.minusOne, u, q, receipt)
 }
-func (m *MultivariatePolynomialCore) MulAdd(p, q Polynomial, a *util.Int) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) MulAdd(p, q Polynomial, a *unumeral.Int) (Polynomial, error) {
 	return m.mulAddWithReceipt(p, q, a, nil)
 }
-func (m *MultivariatePolynomialCore) mulAddWithReceipt(p, q Polynomial, a *util.Int, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) mulAddWithReceipt(p, q Polynomial, a *unumeral.Int, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -137,13 +137,13 @@ func (m *MultivariatePolynomialCore) Mul(p, q Polynomial) (Polynomial, error) {
 	return m.mulWithReceipt(p, q, nil)
 }
 func (m *MultivariatePolynomialCore) mulWithReceipt(p, q Polynomial, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	return m.mulAddWithReceipt(p, q, &zero, receipt)
 }
-func (m *MultivariatePolynomialCore) Scale(a *util.Int, t Monomial, p Polynomial) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) Scale(a *unumeral.Int, t Monomial, p Polynomial) (Polynomial, error) {
 	return m.scaleWithReceipt(a, t, p, nil)
 }
-func (m *MultivariatePolynomialCore) scaleWithReceipt(a *util.Int, t Monomial, p Polynomial, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) scaleWithReceipt(a *unumeral.Int, t Monomial, p Polynomial, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -259,7 +259,7 @@ func (m *MultivariatePolynomialCore) negWithParentReceipts(p Polynomial, receipt
 	result, e = m.cheap.mkWithAppendReceipt(false, appendReceipt, factoryReceipt)
 	return result, e
 }
-func (m *MultivariatePolynomialCore) MkUnivariateTake(v, n uint32, as []util.Int) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) MkUnivariateTake(v, n uint32, as []unumeral.Int) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}

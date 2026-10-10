@@ -5,15 +5,15 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialSubstitutionIntegerIndependentIdentity(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{3, 5, 7, 11}, [][]MonomialPower{{{0, 2}, {1, 1}}, {{1, 2}}, {{2, 1}}, nil})
 	xs, _ := variableHelperArray(t, m.memory, []uint32{0, 2})
-	values := []util.Int{{Val: 2}, {Val: -3}}
+	values := []unumeral.Int{{Val: 2}, {Val: -3}}
 	result, e := m.SubstituteIntegers(p, 2, xs, values)
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(result))
@@ -24,7 +24,7 @@ func TestPolynomialSubstitutionRationalDenominatorClearing(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{1, 1, 1}, [][]MonomialPower{{{0, 2}, {2, 1}}, {{1, 1}}, {{0, 1}, {2, 1}}})
 	xs, _ := variableHelperArray(t, m.memory, []uint32{0, 1})
-	values := []util.Rational{{Num: util.IntFromNativeWords([3]uint32{uint32(3), uint32(0), uint32(uint64(0) >> 32)}), Den: util.IntFromNativeWords([3]uint32{uint32(2), uint32(0), uint32(uint64(0) >> 32)})}, {Num: util.IntFromNativeWords([3]uint32{uint32(3), uint32(0), uint32(uint64(0) >> 32)}), Den: util.IntFromNativeWords([3]uint32{uint32(1), uint32(0), uint32(uint64(0) >> 32)})}}
+	values := []unumeral.Rational{{Num: unumeral.IntFromNativeWords([3]uint32{uint32(3), uint32(0), uint32(uint64(0) >> 32)}), Den: unumeral.IntFromNativeWords([3]uint32{uint32(2), uint32(0), uint32(uint64(0) >> 32)})}, {Num: unumeral.IntFromNativeWords([3]uint32{uint32(3), uint32(0), uint32(uint64(0) >> 32)}), Den: unumeral.IntFromNativeWords([3]uint32{uint32(1), uint32(0), uint32(uint64(0) >> 32)})}}
 	result, e := m.SubstituteRationals(p, 2, xs, values)
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(result))
@@ -50,7 +50,7 @@ func TestPolynomialSubstitutionPolynomialFractionIndependentIdentity(t *testing.
 
 type substitutionReadControl struct {
 	containsCalls, valueCalls uint32
-	value                     util.Rational
+	value                     unumeral.Rational
 	match                     bool
 }
 
@@ -58,7 +58,7 @@ func (c *substitutionReadControl) Contains(x uint32) (bool, error) {
 	c.containsCalls++
 	return c.match && x == 0, nil
 }
-func (c *substitutionReadControl) Rational(x uint32) (*util.Rational, error) {
+func (c *substitutionReadControl) Rational(x uint32) (*unumeral.Rational, error) {
 	c.valueCalls++
 	if !c.match || x != 0 {
 		panic("unreached source rational value")
@@ -70,7 +70,7 @@ func TestPolynomialSubstitutionAbsentAndReachedRawFields(t *testing.T) {
 	p := polynomialQueryTerms(t, m, []int32{1, 1}, [][]MonomialPower{{{0, 1}}, {{1, 1}}})
 	control := substitutionReadControl{}
 	stats, count := m.memory.Stats(), m.memory.State()
-	oldAS, oldMS := append([]util.Int(nil), m.som.as.values...), append([]Monomial(nil), m.som.ms...)
+	oldAS, oldMS := append([]unumeral.Int(nil), m.som.as.values...), append([]Monomial(nil), m.som.ms...)
 	a, e := m.SubstituteRationalMap(p, &control)
 	serviceMust(t, e)
 	if a != p || control.containsCalls != 2 || control.valueCalls != 0 || !polynomialEqualNumerals(m.som.as.values, oldAS) || !polynomialEqualMonomials(m.som.ms, oldMS) || m.substitution.found.values != nil {
@@ -84,7 +84,7 @@ func TestPolynomialSubstitutionAbsentAndReachedRawFields(t *testing.T) {
 	if cap(m.substitution.max.maxDegree.values) == 0 || cap(m.substitution.max.variables.values) == 0 || len(m.substitution.max.variables.values) != 0 {
 		t.Fatal("native maximum-degree workspace was not retained and reset")
 	}
-	control = substitutionReadControl{match: true, value: util.RationalFromBorrowedNumerals(util.NewInt(1), util.NewInt(-2))}
+	control = substitutionReadControl{match: true, value: unumeral.RationalFromBorrowedNumerals(unumeral.NewInt(1), unumeral.NewInt(-2))}
 	a, e = m.SubstituteRationalMap(p, &control)
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(a))
@@ -92,13 +92,13 @@ func TestPolynomialSubstitutionAbsentAndReachedRawFields(t *testing.T) {
 	serviceMust(t, m.DecRef(a))
 	// DEN0 is source-defined denominator clearing: 1+0*y, not an ordinary
 	// Rational reader. The actual zero coefficient is removed by source SOM.
-	control.value = util.RationalFromBorrowedNumerals(util.NewInt(1), util.Int{})
+	control.value = unumeral.RationalFromBorrowedNumerals(unumeral.NewInt(1), unumeral.Int{})
 	a, e = m.SubstituteRationalMap(p, &control)
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(a))
 	polynomialQueryExpect(t, m, a, map[[3]uint32]int64{{0, 0, 0}: 1})
 	serviceMust(t, m.DecRef(a))
-	control.value = util.Rational{}
+	control.value = unumeral.Rational{}
 	a, e = m.SubstituteRationalMap(p, &control)
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(a))
@@ -112,7 +112,7 @@ func TestPolynomialSubstitutionIntegerBoundedGridAndScalarForward(t *testing.T) 
 	xs, xsRaw := variableHelperArray(t, m.memory, []uint32{0, 2})
 	for x := int32(-3); x <= 3; x++ {
 		for z := int32(-2); z <= 2; z++ {
-			v := []util.Int{util.NewInt(x), util.NewInt(z)}
+			v := []unumeral.Int{unumeral.NewInt(x), unumeral.NewInt(z)}
 			a, e := m.SubstituteIntegers(p, 2, xs, v)
 			serviceMust(t, e)
 			serviceMust(t, m.IncRef(a))
@@ -129,7 +129,7 @@ func TestPolynomialSubstitutionIntegerBoundedGridAndScalarForward(t *testing.T) 
 			serviceMust(t, m.DecRef(a))
 		}
 	}
-	v := util.NewInt(-2)
+	v := unumeral.NewInt(-2)
 	a, e := m.SubstituteInteger(p, 0, &v)
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(a))
@@ -176,7 +176,7 @@ func TestPolynomialSubstitutionWarmAbsentBranchActualStorage(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{3, 5}, [][]MonomialPower{{{0, 2}}, {{1, 3}}})
 	xs, _ := variableHelperArray(t, m.memory, []uint32{2})
-	values := []util.Rational{{Num: util.NewInt(2), Den: util.NewInt(3)}}
+	values := []unumeral.Rational{{Num: unumeral.NewInt(2), Den: unumeral.NewInt(3)}}
 	a, e := m.SubstituteRationals(p, 1, xs, values)
 	serviceMust(t, e)
 	if a != p {
@@ -206,7 +206,7 @@ func TestPolynomialSubstitutionColdOwnersAndSourceInputLifetime(t *testing.T) {
 	xs, b := variableHelperArray(t, m.memory, []uint32{0})
 	stale := xs
 	serviceMust(t, m.memory.Reallocate(b, 16))
-	_, e := m.SubstituteIntegers(p, 1, stale, []util.Int{util.NewInt(2)})
+	_, e := m.SubstituteIntegers(p, 1, stale, []unumeral.Int{unumeral.NewInt(2)})
 	if !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("captured real source pointer accessed during scoped ctor", e)
 	}
@@ -223,7 +223,7 @@ func TestPolynomialSubstitutionColdOwnersAndSourceInputLifetime(t *testing.T) {
 func TestPolynomialSubstitutionZeroTermsRepeatAndLaterSourceINC(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{1, 1}, [][]MonomialPower{{{0, 1}, {1, 1}}, {{0, 2}, {2, 1}}})
-	zero := util.Int{}
+	zero := unumeral.Int{}
 	for i := 0; i < 3; i++ {
 		a, e := m.SubstituteInteger(p, 0, &zero)
 		serviceMust(t, e)
@@ -267,19 +267,19 @@ func TestPolynomialSubstitutionEveryReservationNamedPrefixes(t *testing.T) {
 			m := polynomialCellFixture(t)
 			p := polynomialQueryTerms(t, m, []int32{3, 5, 7}, [][]MonomialPower{{{0, 3}, {1, 1}}, {{0, 2}}, nil})
 			xs, xraw := variableHelperArray(t, m.memory, []uint32{0})
-			var input util.Int
+			var input unumeral.Int
 			serviceMust(t, m.integer.SetLimbs(&input, []uint32{17, 0, 1}))
-			value := util.RationalFromBorrowedNumerals(input, util.NewInt(2))
+			value := unumeral.RationalFromBorrowedNumerals(input, unumeral.NewInt(2))
 			q := polynomialQueryTerms(t, m, []int32{1, 1}, [][]MonomialPower{{{1, 1}}, nil})
 			out, e := NewPolynomialRef(m)
 			serviceMust(t, e)
 			m.integer.Budget().FailAfter(fault)
 			result := Polynomial{}
 			if route == 0 {
-				result, e = m.SubstituteIntegers(p, 1, xs, []util.Int{input})
+				result, e = m.SubstituteIntegers(p, 1, xs, []unumeral.Int{input})
 			}
 			if route == 1 {
-				result, e = m.SubstituteRationals(p, 1, xs, []util.Rational{value})
+				result, e = m.SubstituteRationals(p, 1, xs, []unumeral.Rational{value})
 			}
 			if route == 2 {
 				e = m.SubstitutePolynomialFraction(p, 0, q, q, out)
@@ -343,7 +343,7 @@ func TestPolynomialSubstitutionCleanupLeavesForeignFactoryContinuation(t *testin
 	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, nil)
 	m.integer.Budget().FailAfter(-1)
 	oldCreation := m.monomials.creation
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	_, e = m.SubstituteInteger(p, 0, &one)
 	if !errors.Is(e, ErrMonomialPending) {
 		t.Fatal(e)
@@ -409,7 +409,7 @@ func TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind(t *testing.T
 func TestPolynomialSubstitutionZeroTermWarmPhysicalCohort(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{1, 1}, [][]MonomialPower{{{0, 1}, {1, 1}}, {{0, 2}, {2, 1}}})
-	zero := util.Int{}
+	zero := unumeral.Int{}
 	run := func() {
 		a, e := m.SubstituteInteger(p, 0, &zero)
 		serviceMust(t, e)
@@ -433,7 +433,7 @@ func TestPolynomialSubstitutionNativeCohortPreservesBorrowedRoots(t *testing.T) 
 	// Isolate native cohort reuse from direct-profile cold object allocation.
 	m := polynomialCellFixtureWithProfile(t, umemory.SmallAllocatorProfile{PointerBits: 64})
 	p := polynomialQueryTerms(t, m, []int32{1, 1}, [][]MonomialPower{{{0, 1}, {1, 1}}, {{0, 2}, {2, 1}}})
-	zero := util.Int{}
+	zero := unumeral.Int{}
 	a, e := m.SubstituteInteger(p, 0, &zero)
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(a))
@@ -503,7 +503,7 @@ func TestPolynomialSubstitutionBorrowedReceiptRejectsReplacement(t *testing.T) {
 	for fault := int64(0); fault < 64 && !reached; fault++ {
 		m := polynomialCellDirectObjectFixture(t)
 		p := polynomialQueryTerms(t, m, []int32{1}, [][]MonomialPower{{{0, 1}, {1, 19}, {2, 23}}})
-		one := util.NewInt(1)
+		one := unumeral.NewInt(1)
 		m.integer.Budget().FailAfter(fault)
 		out, e := m.SubstituteInteger(p, 0, &one)
 		polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p, out}, nil)

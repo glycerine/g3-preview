@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Actual returned-factory incoming INC precedes the old result DEC callback.
@@ -20,14 +21,14 @@ func TestPolynomialDiscriminantStrictLeadingNUMStopKeepsOlderPrimeAndCause(t *te
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	c := m.core
 	_, e = c.monomials.MkVar()
 	serviceMust(t, e)
-	var leading util.Int
+	var leading unumeral.Int
 	digits := make([]uint32, 64)
 	digits[0] = 7
 	digits[63] = 1
@@ -36,7 +37,7 @@ func TestPolynomialDiscriminantStrictLeadingNUMStopKeepsOlderPrimeAndCause(t *te
 	serviceMust(t, e)
 	unit, e := c.monomials.MkMonomial(nil)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{leading, util.NewInt(1)}, []Monomial{x2, unit})
+	p, e := c.MkTerms([]unumeral.Int{leading, unumeral.NewInt(1)}, []Monomial{x2, unit})
 	serviceMust(t, e)
 	pr, e := NewPolynomialRef(c)
 	serviceMust(t, e)
@@ -45,7 +46,7 @@ func TestPolynomialDiscriminantStrictLeadingNUMStopKeepsOlderPrimeAndCause(t *te
 	serviceMust(t, e)
 	var lane, recovery umemory.Block
 	var lcObject umemory.ObjectRef
-	var lcBefore util.Int
+	var lcBefore unumeral.Int
 	var primeBefore Polynomial
 	calls := 0
 	h, e := NewPolynomialDeletionHandler(budget, func(_ *PolynomialDeletionHandler, core *MultivariatePolynomialCore, old Polynomial) error {
@@ -93,7 +94,7 @@ func TestPolynomialDiscriminantStrictLeadingNUMStopKeepsOlderPrimeAndCause(t *te
 		if recovery != (umemory.Block{}) {
 			raws = append(raws, recovery)
 		}
-		polynomialImpPhysicalAuditNamedRaw(t, m, values(), []*util.Int{&leading, &s.lc}, pr.header+out.header+h.header, raws)
+		polynomialImpPhysicalAuditNamedRaw(t, m, values(), []*unumeral.Int{&leading, &s.lc}, pr.header+out.header+h.header, raws)
 	}
 	audit()
 	cause := s.sourceCause

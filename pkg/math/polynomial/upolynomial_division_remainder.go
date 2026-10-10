@@ -3,7 +3,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *UPolynomialManager) remState(a, b UPolynomialView, d *uint32, r *upolyVectorState) error {
@@ -42,7 +42,7 @@ func (m *UPolynomialManager) remStateWithSourceContext(a, b UPolynomialView, d *
 			return ErrUPolynomialAssertion
 		}
 	}
-	var local util.Int
+	var local unumeral.Int
 	am := &local
 	var frame *upolyFactorRemainderScope
 	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
@@ -98,7 +98,7 @@ func (m *UPolynomialManager) remStateWithSourceContext(a, b UPolynomialView, d *
 				return e
 			}
 			dst := &m.values(r)[i+delta]
-			var child *util.IntegerAddMulInvocationReceipt
+			var child *unumeral.IntegerAddMulInvocationReceipt
 			if frame != nil {
 				child = &frame.addMul
 			}

@@ -2,16 +2,15 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialRegularActualINCBindsRowBeforeNumericFailure(t *testing.T) {
 	for prefix := int64(0); prefix < 32; prefix++ {
 		full := polynomialArithmeticDirectNumericFixture(t)
 		c := full.core
-		var seven util.Int
+		var seven unumeral.Int
 		words := make([]uint32, 2048)
 		words[len(words)-1] = 1
 		serviceMust(t, c.integer.SetLimbs(&seven, words))
@@ -22,10 +21,10 @@ func TestPolynomialRegularActualINCBindsRowBeforeNumericFailure(t *testing.T) {
 		serviceMust(t, c.som.acquireArithmeticInvocation(&r))
 		before, e := c.monomialRefCount(c.monomials.unit)
 		serviceMust(t, e)
-		one := util.NewInt(1)
+		one := unumeral.NewInt(1)
 		c.integer.Budget().FailAfter(prefix)
 		e = c.som.addSourceInputWithArithmeticReceipt(&one, c.monomials.unit, polynomialSOMInput{polynomial: p}, false, &r)
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&seven}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*unumeral.Int{&seven}, 0)
 		ms, x := c.som.ms.size(c)
 		serviceMust(t, x)
 		as, x := c.som.as.size(c)
@@ -46,7 +45,7 @@ func TestPolynomialRegularActualINCBindsRowBeforeNumericFailure(t *testing.T) {
 			if afterOwn != before || position != ^uint32(0) {
 				t.Fatal("matched regular row abort retained source position/INC", afterOwn, position)
 			}
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&seven}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*unumeral.Int{&seven}, 0)
 			serviceMust(t, c.som.addMul(&one, c.monomials.unit, p))
 			serviceMust(t, c.som.close())
 			serviceMust(t, c.DecRef(p))

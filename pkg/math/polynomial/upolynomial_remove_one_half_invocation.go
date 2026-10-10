@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyRemoveOneHalfRootScope struct {
@@ -17,16 +17,16 @@ type upolyRemoveOneHalfRootScope struct {
 	falseAcknowledged                                     bool
 	owner                                                 *UPolynomialManager
 	invocation                                            uint64
-	values                                                [1]util.Int
+	values                                                [1]unumeral.Int
 	numeric                                               polynomialNumericRoots
 	failedRowStore                                        *UPolynomialCoefficientStore
 	failedRowBacking, failedRowGeneration, failedRowIndex uint32
 	failedRowCell                                         uint64
 	failedRowAcknowledged                                 bool
-	normalize                                             util.IntegerNormalizeInvocationReceipt
+	normalize                                             unumeral.IntegerNormalizeInvocationReceipt
 	assertion                                             upolyOneHalfRootInvocationReceipt
-	addMul                                                util.IntegerAddMulInvocationReceipt
-	divisionRaw, extendedRaw                              util.IntegerRawInvocationReceipt
+	addMul                                                unumeral.IntegerAddMulInvocationReceipt
+	divisionRaw, extendedRaw                              unumeral.IntegerRawInvocationReceipt
 
 	sourceRemaining, ownRemaining            uint8
 	active, executing, finishing, ownStarted bool
@@ -45,10 +45,10 @@ type upolyRemoveOneHalfRootHistory struct {
 	frame                                                 *upolyRemoveOneHalfRootScope
 	next                                                  *upolyRemoveOneHalfRootHistory
 	invocation                                            uint64
-	normalize                                             util.IntegerNormalizeInvocationReceipt
+	normalize                                             unumeral.IntegerNormalizeInvocationReceipt
 	assertion                                             upolyOneHalfRootInvocationReceipt
-	addMul                                                util.IntegerAddMulInvocationReceipt
-	divisionRaw, extendedRaw                              util.IntegerRawInvocationReceipt
+	addMul                                                unumeral.IntegerAddMulInvocationReceipt
+	divisionRaw, extendedRaw                              unumeral.IntegerRawInvocationReceipt
 
 	bodyCause, sourceCause, ownCause error
 	sourceRemaining                  uint8
@@ -57,10 +57,10 @@ type upolyRemoveOneHalfRootHistory struct {
 func (m *UPolynomialManager) removeOneHalfRootExecuting() bool {
 	return m != nil && m.self == m && m.removeOneHalfRoot.owner == m && m.removeOneHalfRoot.active && (m.removeOneHalfRoot.executing || m.removeOneHalfRoot.finishing)
 }
-func numericIntegerManager_removeOneHalfRootCallerExecuting(z *util.IntegerManager) bool {
+func numericIntegerManager_removeOneHalfRootCallerExecuting(z *unumeral.IntegerManager) bool {
 	return z != nil && z.ValidOwner() && removeOneHalfRootCaller(z) != nil && removeOneHalfRootCaller(z).config.Integer == z && removeOneHalfRootCaller(z).removeOneHalfRootExecuting()
 }
-func (c integerAllocationInvocationContext) removeOneHalfRootFrame(z *util.IntegerManager) *upolyRemoveOneHalfRootScope {
+func (c integerAllocationInvocationContext) removeOneHalfRootFrame(z *unumeral.IntegerManager) *upolyRemoveOneHalfRootScope {
 	q := c.removeOneHalfRoot
 	if z == nil || !z.ValidOwner() || q == nil || q.owner == nil || q.owner.self != q.owner || q != &q.owner.removeOneHalfRoot || q.owner.config.Integer != z || removeOneHalfRootCaller(z) != q.owner || q.owner.callbackDepth != 0 || !q.active || !q.executing || c.removeOneHalfRootInvocation == 0 || c.removeOneHalfRootInvocation != q.invocation {
 		return nil
@@ -281,7 +281,7 @@ func (q *upolyRemoveOneHalfRootScope) numericChildCause() error {
 	if e := z.AddMulInvocationSourceCause(&q.addMul); e != nil {
 		return e
 	}
-	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
+	for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
 		if e := z.RawInvocationSourceCause(r); e != nil {
 			return e
 		}
@@ -293,7 +293,7 @@ func (q *upolyRemoveOneHalfRootScope) cleanupNumericChildren(abort bool) error {
 	if e := z.CleanupAddMulInvocation(&q.addMul, abort); e != nil {
 		return e
 	}
-	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
+	for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
 		if e := z.CleanupRawInvocation(r, abort); e != nil {
 			return e
 		}
@@ -301,21 +301,21 @@ func (q *upolyRemoveOneHalfRootScope) cleanupNumericChildren(abort bool) error {
 
 	return nil
 }
-func (c integerAllocationInvocationContext) recordRemoveOneHalfRaw(z *util.IntegerManager, r *util.IntegerRawInvocationReceipt) {
+func (c integerAllocationInvocationContext) recordRemoveOneHalfRaw(z *unumeral.IntegerManager, r *unumeral.IntegerRawInvocationReceipt) {
 	q := c.removeOneHalfRootFrame(z)
 	if q == nil || !z.MatchesRawInvocation(r) {
 		return
 	}
 
 	switch r.Kind() {
-	case util.IntegerRawDivision:
+	case unumeral.IntegerRawDivision:
 		q.divisionRaw = *r
-	case util.IntegerRawExtendedGCD:
+	case unumeral.IntegerRawExtendedGCD:
 		q.extendedRaw = *r
 	}
 }
 
-func numericNaturalManager_removeOneHalfRootCallerExecuting(n *util.NaturalManager) bool {
+func numericNaturalManager_removeOneHalfRootCallerExecuting(n *unumeral.NaturalManager) bool {
 	return n != nil && n.ValidOwner() && removeOneHalfRootCaller(n) != nil && removeOneHalfRootCaller(n).self == removeOneHalfRootCaller(n) && removeOneHalfRootCaller(n).config.Integer != nil && removeOneHalfRootCaller(n).config.Integer.Naturals() == n && removeOneHalfRootCaller(n).removeOneHalfRootExecuting()
 }
 
@@ -339,7 +339,7 @@ func (q *upolyRemoveOneHalfRootScope) finishAmSource(body error) error {
 	}
 	return errors.Join(body, q.sourceCause)
 }
-func removeOrHenselAddMulChild(context integerAllocationInvocationContext, r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope) *util.IntegerAddMulInvocationReceipt {
+func removeOrHenselAddMulChild(context integerAllocationInvocationContext, r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope) *unumeral.IntegerAddMulInvocationReceipt {
 	if q := context.removeOneHalfRoot; q != nil && q.owner != nil && context.removeOneHalfRootFrame(q.owner.config.Integer) != nil {
 		return &q.addMul
 	}

@@ -8,15 +8,16 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialRootUpperBoundActualBodyAndNumeralDT(t *testing.T) {
 	reached := false
 	for offset := int64(12); offset < 500 && !reached; offset += 4 {
 		t.Run(fmt.Sprint(offset), func(t *testing.T) {
-			var z *util.IntegerManager
+			var z *unumeral.IntegerManager
 			var rt *umemory.Runtime
 			var lane, held umemory.Block
 			armed := false
@@ -43,13 +44,13 @@ func TestUPolynomialRootUpperBoundActualBodyAndNumeralDT(t *testing.T) {
 			z = c.config.Rationals.Integers()
 			poly, e := p.NewPolynomial()
 			serviceMust(t, e)
-			var big util.Int
+			var big unumeral.Int
 			serviceMust(t, z.SetLimbs(&big, []uint32{1, 2, 3, 4}))
-			serviceMust(t, p.SetInts(poly, []util.Int{big, util.NewInt(1)}))
+			serviceMust(t, p.SetInts(poly, []unumeral.Int{big, unumeral.NewInt(1)}))
 			serviceMust(t, z.Del(&big))
 			v, e := p.wholeView(poly)
 			serviceMust(t, e)
-			var out util.Int
+			var out unumeral.Int
 			defer func() {
 				armed = false
 				serviceMust(t, rt.SetMaxSize(0))
@@ -95,11 +96,11 @@ func TestUPolynomialRootUpperBoundActualBodyAndNumeralDT(t *testing.T) {
 			if q.sourceCause == nil || q.bodyCause == nil || q.constructed != 5 || q.sourceRemaining != 5 {
 				t.Fatal("actual c DT source frontier", q.constructed, q.sourceRemaining, q.sourceCause)
 			}
-			extra := []*util.Int{&out}
+			extra := []*unumeral.Int{&out}
 			for i := range q.values {
 				extra = append(extra, &q.values[i])
 			}
-			for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
+			for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
 				if r.Frame != nil {
 					for i := uint8(0); i < r.Frame.Count; i++ {
 						extra = append(extra, &r.Frame.Values[i])

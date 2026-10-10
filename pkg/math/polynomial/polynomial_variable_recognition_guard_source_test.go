@@ -4,21 +4,20 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialVariableRecognitionExactGuardAndNativeArchive(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
 	p := polynomialQueryTerms(t, c, []int32{1, 5}, [][]MonomialPower{{{0, 1}}, nil})
-	n := util.NewInt(9)
+	n := unumeral.NewInt(9)
 	v := uint32(77)
 	var old polynomialVariableNumeralInvocationReceipt
 	yes, e := c.isVariableNumeralWithReceipt(p, &v, &n, &old)
 	serviceMust(t, e)
-	if !yes || n != util.NewInt(5) {
+	if !yes || n != unumeral.NewInt(5) {
 		t.Fatal("reached SET")
 	}
 	before := c.variableNumeral
@@ -42,16 +41,16 @@ func TestPolynomialVariableRecognitionExactGuardAndNativeArchive(t *testing.T) {
 	// Native diagnostics cannot refuse a scalar SET with no real allocations.
 	c.integer.Budget().FailAfter(0)
 	unchanged := old
-	n = util.NewInt(9)
+	n = unumeral.NewInt(9)
 	v = 77
 	yes, e = c.isVariableNumeralWithReceipt(p, &v, &n, &unchanged)
-	if !yes || e != nil || unchanged.invocation != old.invocation+1 || n != util.NewInt(5) || v != 0 {
+	if !yes || e != nil || unchanged.invocation != old.invocation+1 || n != unumeral.NewInt(5) || v != 0 {
 		t.Fatal("native archive interrupted scalar SET", yes, e, v, n)
 	}
 	first := before
 	before = c.variableNumeral
 	receiptBeforeFalse := unchanged
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&n}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*unumeral.Int{&n}, 0)
 	c.integer.Budget().FailAfter(-1)
 	// False shape paths read no caller NUM and do not acquire a frame.
 	nonunit := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{{{0, 1}}, {{1, 1}}})
@@ -101,17 +100,17 @@ func TestPolynomialVariableRecognitionOldACKPreservesLaterForeignCopyAndPN(t *te
 			_, e := c.monomials.MkVar()
 			serviceMust(t, e)
 			p := polynomialQueryTerms(t, c, []int32{1, 5}, [][]MonomialPower{{{0, 1}}, nil})
-			n := util.NewInt(9)
+			n := unumeral.NewInt(9)
 			v := uint32(77)
 			var old polynomialVariableNumeralInvocationReceipt
 			_, e = c.isVariableNumeralWithReceipt(p, &v, &n, &old)
 			serviceMust(t, e)
 			words := make([]uint32, 500)
 			words[0], words[499] = 17, 1
-			var big, out util.Int
+			var big, out unumeral.Int
 			serviceMust(t, c.integer.SetLimbs(&big, words))
-			var copyReceipt util.IntegerCopyAllocationReceipt
-			var pnReceipt util.IntegerNormalizeInvocationReceipt
+			var copyReceipt unumeral.IntegerCopyAllocationReceipt
+			var pnReceipt unumeral.IntegerNormalizeInvocationReceipt
 			if field {
 				serviceMust(t, c.integer.Copy(&out, &big))
 				modulusWords := make([]uint32, 17)
@@ -119,7 +118,7 @@ func TestPolynomialVariableRecognitionOldACKPreservesLaterForeignCopyAndPN(t *te
 					modulusWords[i] = ^uint32(0)
 				}
 				modulusWords[16] = 511
-				var modulus util.Int
+				var modulus unumeral.Int
 				serviceMust(t, c.integer.SetLimbs(&modulus, modulusWords))
 				serviceMust(t, c.modular.SetZP(&modulus))
 				serviceMust(t, c.integer.Del(&modulus))
@@ -143,7 +142,7 @@ func TestPolynomialVariableRecognitionOldACKPreservesLaterForeignCopyAndPN(t *te
 					t.Fatal("old helper ACK swept later foreign actual child")
 				}
 			}
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&n, &big, &out}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*unumeral.Int{&n, &big, &out}, 0)
 			c.integer.Budget().FailAfter(-1)
 			if found && field && body == nil {
 				// Native one-shot reservations publish shared storage atomically; none of
@@ -151,7 +150,7 @@ func TestPolynomialVariableRecognitionOldACKPreservesLaterForeignCopyAndPN(t *te
 				// successful shared members and caller NUM instead of inventing a root.
 				expectedWords := make([]uint32, 11)
 				expectedWords[0], expectedWords[10] = 17, 1<<18
-				var expected util.Int
+				var expected unumeral.Int
 				serviceMust(t, c.integer.SetLimbs(&expected, expectedWords))
 				cmp, e := c.integer.Compare(&out, &expected)
 				serviceMust(t, e)

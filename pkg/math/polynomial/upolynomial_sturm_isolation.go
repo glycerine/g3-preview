@@ -4,18 +4,18 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolySSFrame struct {
-	lower, upper     util.BinaryRational
+	lower, upper     unumeral.BinaryRational
 	lowerSV, upperSV uint32
 }
 type upolySSStack struct {
 	values []upolySSFrame
 }
 
-func numericBinaryRationalManager_pushSS(b *util.BinaryRationalManager, s *upolySSStack) (*upolySSFrame, error) {
+func numericBinaryRationalManager_pushSS(b *unumeral.BinaryRationalManager, s *upolySSStack) (*upolySSFrame, error) {
 	if uint64(len(s.values)) >= math.MaxUint32 || len(s.values) == int(^uint(0)>>1) {
 		return nil, arena.ErrBounds
 	}
@@ -26,7 +26,7 @@ func numericBinaryRationalManager_pushSS(b *util.BinaryRationalManager, s *upoly
 	}
 	return &s.values[len(s.values)-1], nil
 }
-func numericBinaryRationalManager_popSS(b *util.BinaryRationalManager, s *upolySSStack) error {
+func numericBinaryRationalManager_popSS(b *unumeral.BinaryRationalManager, s *upolySSStack) error {
 	if uint32(len(s.values)) == 0 {
 		return arena.ErrBounds
 	}
@@ -40,14 +40,14 @@ func numericBinaryRationalManager_popSS(b *util.BinaryRationalManager, s *upolyS
 	s.values = s.values[:len(s.values)-1]
 	return nil
 }
-func numericBinaryRationalManager_dropSS(b *util.BinaryRationalManager, s *upolySSStack) {
+func numericBinaryRationalManager_dropSS(b *unumeral.BinaryRationalManager, s *upolySSStack) {
 	for i := uint32(0); i < uint32(len(s.values)); i++ {
 		b.Del(&s.values[i].lower)
 		b.Del(&s.values[i].upper)
 	}
 	*s = upolySSStack{}
 }
-func numericBinaryRationalManager_addSSInterval(b *util.BinaryRationalManager, lower, upper *util.BinaryRational, l, u *BinaryRationalVector) error {
+func numericBinaryRationalManager_addSSInterval(b *unumeral.BinaryRationalManager, lower, upper *unumeral.BinaryRational, l, u *BinaryRationalVector) error {
 	if _, e := numericBinaryRationalManager_binaryPushDefault(b, &l.state); e != nil {
 		return e
 	}
@@ -59,7 +59,7 @@ func numericBinaryRationalManager_addSSInterval(b *util.BinaryRationalManager, l
 	}
 	return b.Copy(&u.state.values[u.state.size-1], upper)
 }
-func (m *UPolynomialManager) pushSSFrame(v UPolynomialView, b *util.BinaryRationalManager, s *upolySSStack, r, l, u *BinaryRationalVector, lowerSV, upperSV uint32, lower, upper *util.BinaryRational) error {
+func (m *UPolynomialManager) pushSSFrame(v UPolynomialView, b *unumeral.BinaryRationalManager, s *upolySSStack, r, l, u *BinaryRationalVector, lowerSV, upperSV uint32, lower, upper *unumeral.BinaryRational) error {
 	if polynomialSourceDebug {
 		same, e := b.Equal(lower, upper)
 		if e != nil {
@@ -99,7 +99,7 @@ func (m *UPolynomialManager) pushSSFrame(v UPolynomialView, b *util.BinaryRation
 	f.upperSV = upperSV
 	return nil
 }
-func (m *UPolynomialManager) SturmIsolateRootsWithBounds(v UPolynomialView, neg, pos uint32, b *util.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
+func (m *UPolynomialManager) SturmIsolateRootsWithBounds(v UPolynomialView, neg, pos uint32, b *unumeral.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
 	if e := m.isolationOwners(b, r, l, u); e != nil {
 		return e
 	}
@@ -114,7 +114,7 @@ func (m *UPolynomialManager) SturmIsolateRootsWithBounds(v UPolynomialView, neg,
 	}
 	var seq upolySequenceState
 	defer m.sequenceDestroy(&seq)
-	var mid, lower, upper util.BinaryRational
+	var mid, lower, upper unumeral.BinaryRational
 	defer b.Del(&mid)
 	defer b.Del(&lower)
 	defer b.Del(&upper)
@@ -138,7 +138,7 @@ func (m *UPolynomialManager) SturmIsolateRootsWithBounds(v UPolynomialView, neg,
 	if plus >= minus {
 		return nil
 	}
-	two := util.NewBinaryInt(2)
+	two := unumeral.NewBinaryInt(2)
 	if e = b.Power(&two, neg, &lower); e != nil {
 		return e
 	}
@@ -148,7 +148,7 @@ func (m *UPolynomialManager) SturmIsolateRootsWithBounds(v UPolynomialView, neg,
 	if e = b.Power(&two, pos, &upper); e != nil {
 		return e
 	}
-	zero := util.NewBinaryInt(0)
+	zero := unumeral.NewBinaryInt(0)
 	if e = m.pushSSFrame(v, b, &s, r, l, u, minus, zeroSV, &lower, &zero); e != nil {
 		return e
 	}
@@ -192,7 +192,7 @@ func (m *UPolynomialManager) SturmIsolateRootsWithBounds(v UPolynomialView, neg,
 	}
 	return nil
 }
-func (m *UPolynomialManager) SturmIsolateRoots(v UPolynomialView, b *util.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
+func (m *UPolynomialManager) SturmIsolateRoots(v UPolynomialView, b *unumeral.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
 	if e := m.isolationOwners(b, r, l, u); e != nil {
 		return e
 	}

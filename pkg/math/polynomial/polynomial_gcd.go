@@ -4,8 +4,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *MultivariatePolynomialManager) GCD(u, v Polynomial, r *PolynomialRef) error {
@@ -246,7 +245,7 @@ func (*polynomialSparseMGCDException) Error() string { return "polynomial sparse
 // The scalar IC overload contains only actual numeric leaves and coefficient
 // reads; unlike polynomial-reference assignment, it invokes no external
 // deletion callback. Its newly returned numeric roots belong to this call.
-func (m *MultivariatePolynomialManager) gcdScalarContent(s *polynomialGCDFunctionScope, p Polynomial, out *util.Int) error {
+func (m *MultivariatePolynomialManager) gcdScalarContent(s *polynomialGCDFunctionScope, p Polynomial, out *unumeral.Int) error {
 	before, e := polynomialNumericBefore(m.core.integer)
 	if e != nil {
 		return e

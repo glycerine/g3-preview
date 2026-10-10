@@ -8,13 +8,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialSparseOutputCallbackNumericPendingRemainsForeign(t *testing.T) {
 	budget := arena.NewBudget(1 << 24)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		q.Close()
@@ -36,7 +37,7 @@ func TestPolynomialSparseOutputCallbackNumericPendingRemainsForeign(t *testing.T
 	s, e := NewPolynomialSparseInterpolator(full, sk)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, s.CloseChecked()) })
-	two := util.NewInt(2)
+	two := unumeral.NewInt(2)
 	polyTwo := polynomialQueryTerms(t, m, []int32{2}, [][]MonomialPower{nil})
 	ok, e := s.Add(&two, polyTwo)
 	serviceMust(t, e)
@@ -45,14 +46,14 @@ func TestPolynomialSparseOutputCallbackNumericPendingRemainsForeign(t *testing.T
 	}
 	unit, e := m.monomials.Unit()
 	serviceMust(t, e)
-	old, e := m.MkTerms([]util.Int{util.NewInt(5)}, []Monomial{unit})
+	old, e := m.MkTerms([]unumeral.Int{unumeral.NewInt(5)}, []Monomial{unit})
 	serviceMust(t, e)
 	out, e := NewPolynomialRef(m)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, out.Close()) })
 	serviceMust(t, out.root.assign(m, old))
-	foreign := util.NewInt(19)
-	var reached util.SourceCellBacking
+	foreign := unumeral.NewInt(19)
+	var reached unumeral.SourceCellBacking
 	calls := 0
 	handler, e := NewPolynomialDeletionHandler(budget, func(_ *PolynomialDeletionHandler, c *MultivariatePolynomialCore, a Polynomial) error {
 		if a == old {
@@ -98,7 +99,7 @@ func TestPolynomialSparseOutputCallbackCreationRemainsForeign(t *testing.T) {
 			s, e := NewPolynomialSparseInterpolator(full, sk)
 			serviceMust(t, e)
 			t.Cleanup(func() { z.Budget().FailAfter(-1); serviceMust(t, s.CloseChecked()) })
-			in := util.NewInt(2)
+			in := unumeral.NewInt(2)
 			q := polynomialQueryTerms(t, m, []int32{2}, [][]MonomialPower{nil})
 			ok, e := s.Add(&in, q)
 			serviceMust(t, e)
@@ -107,7 +108,7 @@ func TestPolynomialSparseOutputCallbackCreationRemainsForeign(t *testing.T) {
 			}
 			unit, e := m.monomials.Unit()
 			serviceMust(t, e)
-			old, e := m.MkTerms([]util.Int{util.NewInt(5)}, []Monomial{unit})
+			old, e := m.MkTerms([]unumeral.Int{unumeral.NewInt(5)}, []Monomial{unit})
 			serviceMust(t, e)
 			out, e := NewPolynomialRef(m)
 			serviceMust(t, e)

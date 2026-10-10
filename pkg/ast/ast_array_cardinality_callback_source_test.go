@@ -14,8 +14,9 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -23,7 +24,7 @@ func TestASTArrayFiniteRealCallbackOwnerGuard(t *testing.T) {
 	if os.Getenv("G3_ARRAY_FINITE_CALLBACK_CHILD") == "1" {
 		b := arena.NewBudget(1 << 28)
 		var m *ASTManager
-		var q *util.RationalService
+		var q *unumeral.RationalService
 		active, calls := false, 0
 		budgetMode := os.Getenv("G3_ARRAY_CALLBACK_BUDGET") != ""
 		countMode := os.Getenv("G3_ARRAY_CALLBACK_COUNT") != "" || budgetMode
@@ -40,7 +41,7 @@ func TestASTArrayFiniteRealCallbackOwnerGuard(t *testing.T) {
 			return f
 		}})
 		astTestMust(t, e)
-		q, e = util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+		q, e = unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 		astTestMust(t, e)
 		sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 		astTestMust(t, e)
@@ -112,7 +113,7 @@ func TestASTArrayFiniteRealCallbackOwnerGuard(t *testing.T) {
 				if frame == nil || frame.bodyCause == nil || !frame.sourceDone || frame.sourceCause != nil {
 					t.Fatal("actual caller source prefix", frame, call)
 				}
-				if os.Getenv("G3_ARRAY_CALLBACK_COUNT") == "3" && frame.tokens[3] == (util.OwnedRational{}) {
+				if os.Getenv("G3_ARRAY_CALLBACK_COUNT") == "3" && frame.tokens[3] == (unumeral.OwnedRational{}) {
 					t.Fatal("actual returned power constructor tuple lost before later Copy refusal")
 				}
 				for _, owned := range frame.Acquired {
@@ -122,7 +123,7 @@ func TestASTArrayFiniteRealCallbackOwnerGuard(t *testing.T) {
 				}
 			}
 		}
-		extras := upolyPhysicalExtraOwners{ASTManagers: []*ASTManager{m}, RationalServices: []*util.RationalService{q}}
+		extras := upolyPhysicalExtraOwners{ASTManagers: []*ASTManager{m}, RationalServices: []*unumeral.RationalService{q}}
 		if !countMode {
 			extras.CallerBlocks = []umemory.Block{padding}
 		}
@@ -138,7 +139,7 @@ func TestASTArrayFiniteRealCallbackOwnerGuard(t *testing.T) {
 		astTestMust(t, q.SetUint64(&foreign, 29))
 		frame := m.ArrayCardinality
 		var body, source error
-		var tuples [4]util.OwnedRational
+		var tuples [4]unumeral.OwnedRational
 		if frame != nil {
 			body, source, tuples = frame.bodyCause, frame.sourceCause, frame.tokens
 		}

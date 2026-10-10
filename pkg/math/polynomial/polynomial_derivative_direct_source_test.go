@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialDerivativeDirectEveryBigCoefficientPrefix(t *testing.T) {
@@ -16,7 +15,7 @@ func TestPolynomialDerivativeDirectEveryBigCoefficientPrefix(t *testing.T) {
 		func() {
 			m := polynomialPrimitiveFixture(t)
 			c := m.core
-			var a util.Int
+			var a unumeral.Int
 			digits := make([]uint32, 80)
 			digits[0] = 9
 			digits[79] = 1
@@ -24,7 +23,7 @@ func TestPolynomialDerivativeDirectEveryBigCoefficientPrefix(t *testing.T) {
 			term, e := c.monomials.MkVariable(0, 2)
 			serviceMust(t, e)
 			serviceMust(t, c.monomials.IncRef(term))
-			as := []util.Int{a}
+			as := []unumeral.Int{a}
 			ms := []Monomial{term}
 			p, e := c.MkCoreTake(as, ms)
 			serviceMust(t, e)
@@ -58,8 +57,8 @@ func TestPolynomialDerivativeDirectEveryBigCoefficientPrefix(t *testing.T) {
 				serviceMust(t, x)
 				original, x := c.coefficientCore(p, 0)
 				serviceMust(t, x)
-				var want util.Int
-				two := util.NewInt(2)
+				var want unumeral.Int
+				two := unumeral.NewInt(2)
 				serviceMust(t, c.integer.Mul(&original, &two, &want))
 				same, x := c.integer.Equal(&got, &want)
 				serviceMust(t, x)

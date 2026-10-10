@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialCoefficientReductActualTwoBIGBufferPrefixes(t *testing.T) {
@@ -16,7 +15,7 @@ func TestPolynomialCoefficientReductActualTwoBIGBufferPrefixes(t *testing.T) {
 			_, e := c.monomials.MkVar()
 			serviceMust(t, e)
 		}
-		var leading, remaining util.Int
+		var leading, remaining unumeral.Int
 		words := make([]uint32, 80)
 		words[0] = 7
 		words[79] = 1
@@ -29,7 +28,7 @@ func TestPolynomialCoefficientReductActualTwoBIGBufferPrefixes(t *testing.T) {
 		serviceMust(t, e)
 		unit, e := c.monomials.Unit()
 		serviceMust(t, e)
-		p, e := c.MkTerms([]util.Int{leading, remaining}, []Monomial{term, unit})
+		p, e := c.MkTerms([]unumeral.Int{leading, remaining}, []Monomial{term, unit})
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(p))
 		var reduct polynomialReference
@@ -38,7 +37,7 @@ func TestPolynomialCoefficientReductActualTwoBIGBufferPrefixes(t *testing.T) {
 		var factory polynomialFactoryInvocationReceipt
 		c.integer.Budget().FailAfter(prefix)
 		result, body := c.coeffCoreWithReceipts(p, 0, 1, &reduct, &receipt, &appendReceipt, &factory)
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result, reduct.value, reduct.incoming}, []*util.Int{&leading, &remaining}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result, reduct.value, reduct.incoming}, []*unumeral.Int{&leading, &remaining}, 0)
 		if body != nil && !numericPhysicalReservationRefusal(body) {
 			t.Fatal("actual two BIG Copy/factory prefix", prefix, body)
 		}
@@ -54,7 +53,7 @@ func TestPolynomialCoefficientReductActualTwoBIGBufferPrefixes(t *testing.T) {
 			}
 		}
 		serviceMust(t, c.cleanupCoefficientInvocation(&receipt, false))
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result, reduct.value, reduct.incoming}, []*util.Int{&leading, &remaining}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result, reduct.value, reduct.incoming}, []*unumeral.Int{&leading, &remaining}, 0)
 		c.integer.Budget().FailAfter(-1)
 		if body == nil {
 			a, e := c.coefficientCore(result, 0)
@@ -81,7 +80,7 @@ func TestPolynomialCoefficientReductActualTwoBIGBufferPrefixes(t *testing.T) {
 		serviceMust(t, c.cleanupCoefficientInvocation(&receipt, true))
 		serviceMust(t, c.cleanupFactoryInvocation(&factory, true))
 		serviceMust(t, c.cheap.cleanupAppendInvocation(&appendReceipt, true))
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result}, []*util.Int{&leading, &remaining}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result}, []*unumeral.Int{&leading, &remaining}, 0)
 		if body == nil {
 			serviceMust(t, c.DecRef(result))
 		}

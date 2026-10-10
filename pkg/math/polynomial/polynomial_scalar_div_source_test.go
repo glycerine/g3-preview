@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialScalarDivLiteralIntegerAndFieldValues(t *testing.T) {
@@ -18,12 +17,12 @@ func TestPolynomialScalarDivLiteralIntegerAndFieldValues(t *testing.T) {
 			serviceMust(t, c.modular.SetZPUint64(23))
 		}
 		p := polynomialQueryTerms(t, c, []int32{6, 10}, [][]MonomialPower{{{0, 1}}, nil})
-		d := util.NewInt(2)
+		d := unumeral.NewInt(2)
 		r, e := c.scalarDiv(p, &d)
 		serviceMust(t, e)
 		r = polynomialCaller(t, c, r)
 		polynomialQueryExpect(t, c, r, map[[3]uint32]int64{{1, 0, 0}: 3, {}: 5})
-		if d != util.NewInt(2) {
+		if d != unumeral.NewInt(2) {
 			t.Fatal("source borrowed divisor changed")
 		}
 	}
@@ -34,7 +33,7 @@ func TestPolynomialScalarDivLiteralIntegerAndFieldValues(t *testing.T) {
 func TestPolynomialScalarDivEmptyDoesNotReadDivisor(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	c := m.core
-	for _, d := range []*util.Int{nil, new(util.Int)} {
+	for _, d := range []*unumeral.Int{nil, new(unumeral.Int)} {
 		r, e := c.scalarDiv(c.zero, d)
 		serviceMust(t, e)
 		r = polynomialCaller(t, c, r)
@@ -59,8 +58,8 @@ func TestPolynomialScalarDivEveryActualReservationPrefix(t *testing.T) {
 					serviceMust(t, c.modular.SetZPUint64(23))
 				}
 				p := polynomialQueryTerms(t, c, []int32{6, 10}, [][]MonomialPower{{{0, 1}}, nil})
-				d := util.NewInt(2)
-				var divisor *util.Int = &d
+				d := unumeral.NewInt(2)
+				var divisor *unumeral.Int = &d
 				if route == 2 {
 					p = c.zero
 					divisor = nil
@@ -71,12 +70,12 @@ func TestPolynomialScalarDivEveryActualReservationPrefix(t *testing.T) {
 				if e != nil && !numericPhysicalReservationRefusal(e) {
 					t.Fatal("actual scalarDiv refusal", e)
 				}
-				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, c.scalarDivision.returned}, []*util.Int{&d, &c.scalarDivision.a}, 0)
+				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, c.scalarDivision.returned}, []*unumeral.Int{&d, &c.scalarDivision.a}, 0)
 				c.integer.Budget().FailAfter(-1)
 				serviceMust(t, c.cleanupScalarDivInvocation(&receipt, false))
-				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, c.scalarDivision.returned}, []*util.Int{&d, &c.scalarDivision.a}, 0)
+				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, c.scalarDivision.returned}, []*unumeral.Int{&d, &c.scalarDivision.a}, 0)
 				serviceMust(t, c.cleanupScalarDivInvocation(&receipt, true))
-				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result}, []*util.Int{&d, &c.scalarDivision.a}, 0)
+				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result}, []*unumeral.Int{&d, &c.scalarDivision.a}, 0)
 				if result != (Polynomial{}) {
 					result = polynomialCaller(t, c, result)
 				}

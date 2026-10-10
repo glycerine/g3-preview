@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialConstructorColdHeaderRefusalOwnership(t *testing.T) {
@@ -66,7 +67,7 @@ func TestPolynomialConstructorBodyFailureNamedRoots(t *testing.T) {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			b := arena.NewBudget(1 << 24)
 			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
 			serviceMust(t, e)
@@ -106,7 +107,7 @@ func TestPolynomialConstructorCompletedMembersUnwindBeforeReturn(t *testing.T) {
 	for fault := int64(2); fault < 80 && !found; fault++ {
 		b := arena.NewBudget(1 << 24)
 		profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-		q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
+		q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 		serviceMust(t, e)
 		mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
 		serviceMust(t, e)

@@ -9,8 +9,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -55,7 +56,7 @@ func recombinationPublicationTransportProtectsActualCaller(t *testing.T, mode st
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -66,7 +67,7 @@ func recombinationPublicationTransportProtectsActualCaller(t *testing.T, mode st
 	var held umemory.Block
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
-	var value, prime util.Int
+	var value, prime unumeral.Int
 	defer func() {
 		armed = false
 		b.FailAfter(-1)
@@ -100,7 +101,7 @@ func recombinationPublicationTransportProtectsActualCaller(t *testing.T, mode st
 	serviceMust(t, e)
 	var liftedSource upolyVectorState
 	for _, constant := range []int32{1, 2} {
-		serviceMust(t, parent.zpe.set(&liftedSource, []util.Int{util.NewInt(constant), util.NewInt(1)}))
+		serviceMust(t, parent.zpe.set(&liftedSource, []unumeral.Int{unumeral.NewInt(constant), unumeral.NewInt(1)}))
 		serviceMust(t, parent.lifted.PushCopy(parent.zpe.stateView(&liftedSource), 1))
 	}
 	serviceMust(t, parent.zpe.reset(&liftedSource))
@@ -114,11 +115,11 @@ func recombinationPublicationTransportProtectsActualCaller(t *testing.T, mode st
 	serviceMust(t, q.Integers().SetLimbs(&prime, pw))
 	serviceMust(t, parent.zpe.SetZP(&prime))
 	parent.constructed = 12
-	parent.leading = util.NewInt(2)
+	parent.leading = unumeral.NewInt(2)
 	words := make([]uint32, 80)
 	words[79] = 1
 	serviceMust(t, q.Integers().SetLimbs(&value, words))
-	serviceMust(t, m.set(&parent.trial, []util.Int{value, util.NewInt(1)}))
+	serviceMust(t, m.set(&parent.trial, []unumeral.Int{value, unumeral.NewInt(1)}))
 	pad := int64(99996) - rt.State().LocalSize - 12
 	if pad <= 0 {
 		t.Fatal("actual source threshold", rt.State())
@@ -135,7 +136,7 @@ func recombinationPublicationTransportProtectsActualCaller(t *testing.T, mode st
 	primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, []umemory.Block{held}, &value, &prime)
 }
 
-func recombinationPublicationFixture(t *testing.T) (*util.RationalManager, *UPolynomialFactorizationService, *UPolynomialFactors) {
+func recombinationPublicationFixture(t *testing.T) (*unumeral.RationalManager, *UPolynomialFactorizationService, *UPolynomialFactors) {
 	t.Helper()
 	q, s := mignotteDirectFixture(t)
 	m := s.manager
@@ -148,22 +149,22 @@ func recombinationPublicationFixture(t *testing.T) (*util.RationalManager, *UPol
 	serviceMust(t, c.ds.init(c.best))
 	c.zpe, e = NewRelatedUPolynomialManager(m)
 	serviceMust(t, e)
-	p := util.NewInt(7)
+	p := unumeral.NewInt(7)
 	serviceMust(t, c.zpe.SetZP(&p))
 	c.lifted, e = c.zpe.NewFactors()
 	serviceMust(t, e)
 	var liftedSource upolyVectorState
 	for _, constant := range []int32{1, 2} {
-		serviceMust(t, c.zpe.set(&liftedSource, []util.Int{util.NewInt(constant), util.NewInt(1)}))
+		serviceMust(t, c.zpe.set(&liftedSource, []unumeral.Int{unumeral.NewInt(constant), unumeral.NewInt(1)}))
 		serviceMust(t, c.lifted.PushCopy(c.zpe.stateView(&liftedSource), 1))
 	}
 	serviceMust(t, c.zpe.reset(&liftedSource))
 	c.zpe.freeBacking(&liftedSource)
 	serviceMust(t, c.it.init(c.lifted, &c.ds))
 	c.constructed = 14
-	c.leading = util.NewInt(2)
-	serviceMust(t, m.set(&c.trial, []util.Int{util.NewInt(1), util.NewInt(1)}))
-	serviceMust(t, m.set(&c.fpp, []util.Int{util.NewInt(8), util.NewInt(12), util.NewInt(4)}))
+	c.leading = unumeral.NewInt(2)
+	serviceMust(t, m.set(&c.trial, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}))
+	serviceMust(t, m.set(&c.fpp, []unumeral.Int{unumeral.NewInt(8), unumeral.NewInt(12), unumeral.NewInt(4)}))
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
 	return q, s, fs
@@ -190,20 +191,20 @@ func TestUPolynomialRecombinationPublicationEveryActualPrefix(t *testing.T) {
 						t.Fatal("independent exact-division result", left, exact, remove)
 					}
 					if exact {
-						if fs.count != 1 || fs.totalFactors != 3 || c.fpp.size != 2 || c.leading != util.NewInt(1) {
+						if fs.count != 1 || fs.totalFactors != 3 || c.fpp.size != 2 || c.leading != unumeral.NewInt(1) {
 							t.Fatal("literal partial factor/remaining publication", fs.count, fs.totalFactors, c.fpp.size, c.leading)
 						}
-						first := util.NewInt(1)
-						remaining := util.NewInt(2)
+						first := unumeral.NewInt(1)
+						remaining := unumeral.NewInt(2)
 						if !left {
 							first, remaining = remaining, first
 						}
 						f, e := fs.factor(0)
 						serviceMust(t, e)
-						if f.size != 2 || m.values(f)[0] != first || m.values(f)[1] != util.NewInt(1) || m.values(&c.fpp)[0] != remaining || m.values(&c.fpp)[1] != util.NewInt(1) {
+						if f.size != 2 || m.values(f)[0] != first || m.values(f)[1] != unumeral.NewInt(1) || m.values(&c.fpp)[0] != remaining || m.values(&c.fpp)[1] != unumeral.NewInt(1) {
 							t.Fatal("independent primitive/complement factor coefficients")
 						}
-					} else if fs.count != 0 || c.fpp.size != 3 || m.values(&c.fpp)[0] != util.NewInt(9) {
+					} else if fs.count != 0 || c.fpp.size != 3 || m.values(&c.fpp)[0] != unumeral.NewInt(9) {
 						t.Fatal("rejected source trial changed original/factors")
 					}
 				}
@@ -237,14 +238,14 @@ func TestUPolynomialRecombinationRemainingPublicationEveryActualPrefix(t *testin
 		q, s, fs := recombinationPublicationFixture(t)
 		m := s.manager
 		c := s.scope
-		serviceMust(t, m.set(&c.fpp, []util.Int{util.NewInt(4), util.NewInt(2)}))
+		serviceMust(t, m.set(&c.fpp, []unumeral.Int{unumeral.NewInt(4), unumeral.NewInt(2)}))
 		q.Budget().FailAfter(ordinal)
 		body := s.publishRecombinationRemainder(fs, 5)
 		primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, nil)
 		if body == nil {
 			f, e := fs.factor(0)
 			serviceMust(t, e)
-			if fs.count != 1 || fs.totalFactors != 5 || f.size != 2 || m.values(f)[0] != util.NewInt(2) || m.values(f)[1] != util.NewInt(1) {
+			if fs.count != 1 || fs.totalFactors != 5 || f.size != 2 || m.values(f)[0] != unumeral.NewInt(2) || m.values(f)[1] != unumeral.NewInt(1) {
 				t.Fatal("independent remaining primitive factor publication")
 			}
 		}
@@ -273,26 +274,26 @@ func TestUPolynomialRecombinationPublicationBIGGCDDivEveryActualPrefix(t *testin
 		q, s, fs := recombinationPublicationFixture(t)
 		m := s.manager
 		c := s.scope
-		var prime, leading, square, middle, constant util.Int
+		var prime, leading, square, middle, constant unumeral.Int
 		serviceMust(t, q.Integers().SetLimbs(&prime, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 		serviceMust(t, c.zpe.SetZP(&prime))
 		serviceMust(t, q.Integers().SetLimbs(&leading, []uint32{0, 0, 2})) // L=2^65
 		serviceMust(t, q.Integers().Mul(&leading, &leading, &square))
-		two := util.NewInt(2)
+		two := unumeral.NewInt(2)
 		serviceMust(t, q.Integers().Mul(&square, &two, &middle))
 		serviceMust(t, q.Integers().Add(&middle, &leading, &middle))
 		serviceMust(t, q.Integers().Mul(&leading, &two, &constant))
 		serviceMust(t, q.Integers().Copy(&c.leading, &leading))
 		// Primitive square-free f=(L*x+1)*(x+2), source f_pp already scaled by L.
-		serviceMust(t, m.set(&c.fpp, []util.Int{constant, middle, square}))
-		serviceMust(t, m.set(&c.trial, []util.Int{util.NewInt(2), util.NewInt(1)}))
+		serviceMust(t, m.set(&c.fpp, []unumeral.Int{constant, middle, square}))
+		serviceMust(t, m.set(&c.trial, []unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(1)}))
 		q.Budget().FailAfter(ordinal)
 		remove, body := s.publishRecombinationTrial(fs, 2, true)
 		primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, nil, &prime, &leading, &square, &middle, &constant)
 		if body == nil {
 			f, e := fs.factor(0)
 			serviceMust(t, e)
-			if !remove || fs.count != 1 || fs.totalFactors != 2 || f.size != 2 || m.values(f)[0] != util.NewInt(2) || m.values(f)[1] != util.NewInt(1) || c.fpp.size != 2 {
+			if !remove || fs.count != 1 || fs.totalFactors != 2 || f.size != 2 || m.values(f)[0] != unumeral.NewInt(2) || m.values(f)[1] != unumeral.NewInt(1) || c.fpp.size != 2 {
 				t.Fatal("independent BIG primitive/exact source result", remove, fs.count, c.fpp.size)
 			}
 			same, e := q.Integers().Equal(&m.values(&c.fpp)[0], &leading)
@@ -317,7 +318,7 @@ func TestUPolynomialRecombinationPublicationBIGGCDDivEveryActualPrefix(t *testin
 		serviceMust(t, s.CleanupRetained())
 		primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, nil, &prime, &leading, &square, &middle, &constant)
 		serviceMust(t, fs.Close())
-		for _, v := range []*util.Int{&prime, &leading, &square, &middle, &constant} {
+		for _, v := range []*unumeral.Int{&prime, &leading, &square, &middle, &constant} {
 			serviceMust(t, q.Integers().Del(v))
 		}
 		if body == nil {
@@ -410,7 +411,7 @@ func TestUPolynomialRecombinationPublicationActualChildStopAndOwningHistory(t *t
 		cfg := serviceConfig(b).Integers
 		cfg.Memory = rt
 		cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-		q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+		q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 		serviceMust(t, e)
 		m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 		serviceMust(t, e)
@@ -434,7 +435,7 @@ func TestUPolynomialRecombinationPublicationActualChildStopAndOwningHistory(t *t
 		child, e := q.Integers().BeginDividesNumeralInvocation(context.utility(q.Integers()))
 		serviceMust(t, e)
 		savedChild := *child
-		childContext := util.NumericAllocationContext{BoolDivides: child, BoolDividesInvocation: child.Invocation}
+		childContext := unumeral.NumericAllocationContext{BoolDivides: child, BoolDividesInvocation: child.Invocation}
 		serviceMust(t, q.Integers().WithAllocationContext(childContext).CopyFromOwnerTracked(&child.Frame.Numeral, q.Integers(), &q.Integers().Two64, nil))
 		serviceMust(t, q.Integers().EnsureOwnedCapacity(&child.Frame.Numeral, 40000))
 		child.Frame.Executing = false
@@ -505,7 +506,7 @@ func TestUPolynomialRecombinationPublicationExactOldLeafPreservesForeignReplacem
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			q, s := mignotteDirectFixture(t)
 			m := s.manager
-			var prime, foreign, large, value util.Int
+			var prime, foreign, large, value unumeral.Int
 			serviceMust(t, q.Integers().SetLimbs(&prime, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 			words := make([]uint32, 25000)
 			words[24999] = 1
@@ -616,7 +617,7 @@ func TestUPolynomialRecombinationPublicationNumericAbortBeforeFaultLift(t *testi
 		serviceMust(t, q.Integers().Copy(&parent.p, &q.Integers().Two64))
 		fs, e := m.NewFactors()
 		serviceMust(t, e)
-		var value, input util.Int
+		var value, input unumeral.Int
 		serviceMust(t, q.Integers().SetLimbs(&input, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 		h, e := s.beginRecombinationStep(fs)
 		serviceMust(t, e)

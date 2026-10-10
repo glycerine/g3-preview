@@ -2,23 +2,22 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix(t *testing.T) {
 	for prefix := int64(0); prefix < 80; prefix++ {
 		full := polynomialArithmeticDirectNumericFixture(t)
 		c := full.core
-		seven, five := util.NewInt(7), util.NewInt(5)
+		seven, five := unumeral.NewInt(7), unumeral.NewInt(5)
 		p, e := c.MkConstantTakeCopy(&seven)
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(p))
 		q, e := c.MkConstantTakeCopy(&five)
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(q))
-		one := util.NewInt(1)
+		one := unumeral.NewInt(1)
 		var r polynomialArithmeticInvocationReceipt
 		c.integer.Budget().FailAfter(prefix)
 		out, e := c.addMulWithReceipt(&one, c.monomials.unit, p, &one, c.monomials.unit, q, &r)
@@ -39,7 +38,7 @@ func TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix(t *testing.T) {
 			serviceMust(t, x)
 			a, x := c.coefficientCore(out, 0)
 			serviceMust(t, x)
-			if n != 1 || a != util.NewInt(12) {
+			if n != 1 || a != unumeral.NewInt(12) {
 				t.Fatal("independent 7+5", n, a)
 			}
 			serviceMust(t, c.IncRef(out))
@@ -58,14 +57,14 @@ func TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix(t *testing.T) {
 func TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame(t *testing.T) {
 	full := polynomialArithmeticDirectNumericFixture(t)
 	c := full.core
-	seven := util.NewInt(7)
+	seven := unumeral.NewInt(7)
 	p, e := c.MkConstantTakeCopy(&seven)
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
 	var old polynomialArithmeticInvocationReceipt
 	serviceMust(t, c.som.acquireArithmeticInvocation(&old))
 	serviceMust(t, c.som.addPolynomialWithArithmeticReceipt(p, &old))
-	zero, one := util.NewInt(0), util.NewInt(1)
+	zero, one := unumeral.NewInt(0), unumeral.NewInt(1)
 	var r polynomialArithmeticInvocationReceipt
 	out, e := c.scaleWithReceipt(&zero, Monomial{}, Polynomial{}, &r)
 	serviceMust(t, e)
@@ -88,7 +87,7 @@ func TestPolynomialArithmeticSourceWrappersEveryActualPrefix(t *testing.T) {
 		for prefix := int64(0); prefix < 200; prefix++ {
 			full := polynomialArithmeticDirectNumericFixture(t)
 			c := full.core
-			seven, five := util.NewInt(7), util.NewInt(5)
+			seven, five := unumeral.NewInt(7), unumeral.NewInt(5)
 			p, e := c.MkConstantTakeCopy(&seven)
 			serviceMust(t, e)
 			serviceMust(t, c.IncRef(p))
@@ -110,11 +109,11 @@ func TestPolynomialArithmeticSourceWrappersEveryActualPrefix(t *testing.T) {
 				out, e = c.mulWithReceipt(p, q, &r)
 				want = 35
 			case 3:
-				three := util.NewInt(3)
+				three := unumeral.NewInt(3)
 				out, e = c.scaleWithReceipt(&three, c.monomials.unit, p, &r)
 				want = 21
 			case 4:
-				two := util.NewInt(2)
+				two := unumeral.NewInt(2)
 				out, e = c.mulAddWithReceipt(p, q, &two, &r)
 				want = 37
 			}
@@ -132,7 +131,7 @@ func TestPolynomialArithmeticSourceWrappersEveryActualPrefix(t *testing.T) {
 			if e == nil {
 				coefficient, x := c.coefficientCore(out, 0)
 				serviceMust(t, x)
-				if coefficient != util.NewInt(want) {
+				if coefficient != unumeral.NewInt(want) {
 					t.Fatal("independent scalar coefficient", op, prefix, coefficient, want)
 				}
 				if c.matchesArithmeticInvocation(&r) {

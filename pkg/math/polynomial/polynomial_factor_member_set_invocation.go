@@ -5,8 +5,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialFactorMemberSetReceipt struct {
@@ -21,19 +20,19 @@ type polynomialFactorMemberSetScope struct {
 	active, executing, finishing         bool
 	direct                               polynomialFactorMemberSetReceipt
 	numeric                              polynomialNumericRoots
-	normalize                            util.IntegerNormalizeInvocationReceipt
+	normalize                            unumeral.IntegerNormalizeInvocationReceipt
 	bodyCause, sourceCause, cleanupCause error
 }
 type polynomialFactorMemberSetHistory struct {
 	invocation                           uint64
-	normalize                            util.IntegerNormalizeInvocationReceipt
+	normalize                            unumeral.IntegerNormalizeInvocationReceipt
 	bodyCause, sourceCause, cleanupCause error
 }
 
 func (f *PolynomialFactors) matchesFactorMemberSet(r *polynomialFactorMemberSetReceipt) bool {
 	return f != nil && f.self == f && f.manager != nil && f.manager.self == f.manager && f.manager.core != nil && f.manager.core.self == f.manager.core && r != nil && r.owner == f && r.frame == &f.memberSet && r.invocation != 0 && r.invocation == f.memberSet.invocation
 }
-func numericIntegerManager_factorMemberSetRoots(m *util.IntegerManager, c integerAllocationInvocationContext) *polynomialNumericRoots {
+func numericIntegerManager_factorMemberSetRoots(m *unumeral.IntegerManager, c integerAllocationInvocationContext) *polynomialNumericRoots {
 	r := c.factorMemberSet
 	if m == nil || !m.ValidOwner() || r == nil || r.owner == nil || !r.owner.matchesFactorMemberSet(r) || c.factorMemberSetInvocation == 0 || c.factorMemberSetInvocation != r.invocation || r.owner.manager.core.integer != m || !r.frame.active || !r.frame.executing || r.owner.manager.core.callbackDepth != 0 {
 		return nil

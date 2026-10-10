@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This is a closing-state protocol fixture, not an injected numeric Del refusal.
@@ -15,7 +15,7 @@ func TestUPolynomialFactorsClosingStateProtocol(t *testing.T) {
 	for _, cleared := range []bool{false, true} {
 		t.Run(map[bool]string{false: "partial-clear", true: "member-destruction"}[cleared], func(t *testing.T) {
 			b := arena.NewBudget(1 << 20)
-			z, e := util.NewIntegerManager(util.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}})
+			z, e := unumeral.NewIntegerManager(unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}})
 			if e != nil {
 				t.Fatal(e)
 			}
@@ -31,7 +31,7 @@ func TestUPolynomialFactorsClosingStateProtocol(t *testing.T) {
 			if e != nil {
 				t.Fatal(e)
 			}
-			if e = m.SetInts(p, []util.Int{util.NewInt(1), util.NewInt(1)}); e != nil {
+			if e = m.SetInts(p, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}); e != nil {
 				t.Fatal(e)
 			}
 			v, e := m.View(p, 0, 2)
@@ -50,7 +50,7 @@ func TestUPolynomialFactorsClosingStateProtocol(t *testing.T) {
 			fs.closing = true
 			before := fs.Stats()
 			used := b.Used()
-			one := util.NewInt(7)
+			one := unumeral.NewInt(7)
 			for name, e := range map[string]error{"set": fs.SetConstant(&one), "push": fs.PushCopy(v, 2), "clear": fs.Clear()} {
 				if !errors.Is(e, arena.ErrClosed) {
 					t.Errorf("%s permits mutation while closing: %v", name, e)

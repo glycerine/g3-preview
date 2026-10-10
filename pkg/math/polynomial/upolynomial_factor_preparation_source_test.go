@@ -9,8 +9,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -50,7 +51,7 @@ func preparationActualCopyTransport(t *testing.T, mode string) {
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -61,7 +62,7 @@ func preparationActualCopyTransport(t *testing.T, mode string) {
 	var held umemory.Block
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
-	var value util.Int
+	var value unumeral.Int
 	defer func() {
 		armed = false
 		b.FailAfter(-1)
@@ -86,7 +87,7 @@ func preparationActualCopyTransport(t *testing.T, mode string) {
 	words[79] = 1
 	serviceMust(t, q.Integers().SetLimbs(&value, words))
 	var original upolyVectorState
-	serviceMust(t, m.set(&original, []util.Int{value, util.NewInt(1)}))
+	serviceMust(t, m.set(&original, []unumeral.Int{value, unumeral.NewInt(1)}))
 	serviceMust(t, fs.PushCopy(m.stateView(&original), 1))
 	serviceMust(t, m.reset(&original))
 	m.freeBacking(&original)
@@ -148,7 +149,7 @@ func preparationDiagnosticBeforeParentTransport(t *testing.T, mode string) {
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -159,7 +160,7 @@ func preparationDiagnosticBeforeParentTransport(t *testing.T, mode string) {
 	var held umemory.Block
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
-	var value util.Int
+	var value unumeral.Int
 	defer func() {
 		armed = false
 		b.FailAfter(-1)
@@ -183,7 +184,7 @@ func preparationDiagnosticBeforeParentTransport(t *testing.T, mode string) {
 	words[79] = 1
 	serviceMust(t, q.Integers().SetLimbs(&value, words))
 	var original upolyVectorState
-	serviceMust(t, m.set(&original, []util.Int{value, util.NewInt(1)}))
+	serviceMust(t, m.set(&original, []unumeral.Int{value, unumeral.NewInt(1)}))
 	serviceMust(t, fs.PushCopy(m.stateView(&original), 1))
 	serviceMust(t, m.reset(&original))
 	m.freeBacking(&original)
@@ -222,7 +223,7 @@ func TestUPolynomialFactorPreparationConditionalEveryActualPrefix(t *testing.T) 
 					m := s.manager
 					fs, e := m.NewFactors()
 					serviceMust(t, e)
-					var large, constant, want util.Int
+					var large, constant, want unumeral.Int
 					serviceMust(t, q.Integers().SetLimbs(&large, []uint32{0, 0, 2}))
 					serviceMust(t, q.Integers().SetLimbs(&want, []uint32{0, 0, 2}))
 					serviceMust(t, q.Integers().Copy(&constant, &q.Integers().Two64))
@@ -230,12 +231,12 @@ func TestUPolynomialFactorPreparationConditionalEveryActualPrefix(t *testing.T) 
 					if negative {
 						serviceMust(t, q.Integers().Neg(&large))
 					}
-					small := util.NewInt(1)
+					small := unumeral.NewInt(1)
 					if negative {
-						small = util.NewInt(-1)
+						small = unumeral.NewInt(-1)
 					}
 					var original upolyVectorState
-					serviceMust(t, m.set(&original, []util.Int{small, util.NewInt(0), util.NewInt(0), large}))
+					serviceMust(t, m.set(&original, []unumeral.Int{small, unumeral.NewInt(0), unumeral.NewInt(0), large}))
 					serviceMust(t, fs.PushCopy(m.stateView(&original), 1))
 					serviceMust(t, m.reset(&original))
 					m.freeBacking(&original)
@@ -252,7 +253,7 @@ func TestUPolynomialFactorPreparationConditionalEveryActualPrefix(t *testing.T) 
 					r := h.receipt
 					source, own := h.sourceCause, h.ownCause
 					if body == nil {
-						expected := util.NewInt(1)
+						expected := unumeral.NewInt(1)
 						actual, e := m.read(m.stateView(&parent.fpp), 0)
 						serviceMust(t, e)
 						same, e := q.Integers().Equal(actual, &expected)
@@ -280,7 +281,7 @@ func TestUPolynomialFactorPreparationConditionalEveryActualPrefix(t *testing.T) 
 					} else if !numericPhysicalReservationRefusal(body) {
 						t.Fatal("actual source reservation", body)
 					}
-					if (!negative || k%2 == 0) && h.numeral != (util.Int{}) {
+					if (!negative || k%2 == 0) && h.numeral != (unumeral.Int{}) {
 						t.Fatal("erased c branch acquired numeral")
 					}
 					q.Budget().FailAfter(-1)
@@ -320,7 +321,7 @@ func TestUPolynomialFactorPreparationActualConditionalDestructorHistory(t *testi
 			cfg := serviceConfig(b).Integers
 			cfg.Memory = rt
 			cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-			zq, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+			zq, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: zq.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 			serviceMust(t, e)
@@ -333,7 +334,7 @@ func TestUPolynomialFactorPreparationActualConditionalDestructorHistory(t *testi
 			parent, e := s.newSquareFreeScope()
 			serviceMust(t, e)
 			parent.constructed = 1
-			serviceMust(t, m.set(&parent.fpp, []util.Int{util.NewInt(1), util.NewInt(1)}))
+			serviceMust(t, m.set(&parent.fpp, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}))
 			h, e := s.beginFactorPreparation(false)
 			serviceMust(t, e)
 			r := h.receipt
@@ -461,7 +462,7 @@ func TestUPolynomialFactorPreparationDiagnosticOldLeafPreservesForeignReplacemen
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			q, s := preparationPhysicalFixture(t)
 			m := s.manager
-			var prime, foreign, large, value util.Int
+			var prime, foreign, large, value unumeral.Int
 			serviceMust(t, q.Integers().SetLimbs(&prime, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 			words := make([]uint32, 25000)
 			words[24999] = 1
@@ -476,7 +477,7 @@ func TestUPolynomialFactorPreparationDiagnosticOldLeafPreservesForeignReplacemen
 			serviceMust(t, e)
 			defer func() { serviceMust(t, fs.Close()) }()
 			var original upolyVectorState
-			serviceMust(t, m.set(&original, []util.Int{util.NewInt(0), prime, util.NewInt(0), util.NewInt(1)}))
+			serviceMust(t, m.set(&original, []unumeral.Int{unumeral.NewInt(0), prime, unumeral.NewInt(0), unumeral.NewInt(1)}))
 			serviceMust(t, fs.PushCopy(m.stateView(&original), 1))
 			serviceMust(t, m.reset(&original))
 			m.freeBacking(&original)
@@ -492,12 +493,12 @@ func TestUPolynomialFactorPreparationDiagnosticOldLeafPreservesForeignReplacemen
 
 			primeTrialPhysicalAuditOwners(t, q, s, []*UPolynomialFactors{fs}, &prime, &foreign, &large, &value)
 			owned := &h.numeric.NumericAllocationRoots
-			if !util.NumericAllocationPending(owned) && q.Integers().MatchesRawInvocation(&h.gcdRaw) {
+			if !unumeral.NumericAllocationPending(owned) && q.Integers().MatchesRawInvocation(&h.gcdRaw) {
 				owned = &h.gcdRaw.Frame.Numeric
 			}
 			old := owned.Cell
 			oldRoots := *owned
-			if util.NumericAllocationPending(owned) {
+			if unumeral.NumericAllocationPending(owned) {
 				if (old.Object != (umemory.ObjectRef{}) && q.Integers().PendingCell != old) || !numericPhysicalReservationRefusal(body) {
 					t.Fatal("actual direct pending leaf absent", ordinal, body, old, q.Integers().PendingCell)
 				}
@@ -564,7 +565,7 @@ func TestUPolynomialFactorPreparationDiagnosticOldLeafPreservesForeignReplacemen
 	t.Fatal("no actual direct old descriptor prefix")
 }
 
-func preparationPhysicalFixture(t *testing.T) (*util.RationalManager, *UPolynomialFactorizationService) {
+func preparationPhysicalFixture(t *testing.T) (*unumeral.RationalManager, *UPolynomialFactorizationService) {
 	t.Helper()
 	b := arena.NewBudget(1 << 26)
 	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
@@ -573,7 +574,7 @@ func preparationPhysicalFixture(t *testing.T) (*util.RationalManager, *UPolynomi
 	cfg.Cells.PageSize = 1
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -604,7 +605,7 @@ func TestUPolynomialFactorPreparationDiagnosticEveryActualPrefix(t *testing.T) {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			q, s := preparationPhysicalFixture(t)
 			m := s.manager
-			var prime, held util.Int
+			var prime, held unumeral.Int
 			serviceMust(t, q.Integers().SetLimbs(&prime, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 			defer func() {
 				serviceMust(t, q.Integers().CleanupRawNumeral(&held))
@@ -614,7 +615,7 @@ func TestUPolynomialFactorPreparationDiagnosticEveryActualPrefix(t *testing.T) {
 			serviceMust(t, e)
 			defer func() { serviceMust(t, fs.Close()) }()
 			var original upolyVectorState
-			serviceMust(t, m.set(&original, []util.Int{util.NewInt(0), prime, util.NewInt(0), util.NewInt(1)}))
+			serviceMust(t, m.set(&original, []unumeral.Int{unumeral.NewInt(0), prime, unumeral.NewInt(0), unumeral.NewInt(1)}))
 			serviceMust(t, fs.PushCopy(m.stateView(&original), 1))
 			serviceMust(t, m.reset(&original))
 			m.freeBacking(&original)

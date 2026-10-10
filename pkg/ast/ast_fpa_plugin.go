@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -24,7 +25,7 @@ type astFloatingPointPluginOwner struct {
 	next                                                        *astFloatingPointPluginOwner
 	self                                                        *astFloatingPointPluginOwner
 	owner                                                       *ASTManager
-	numeric                                                     *util.ArbitraryFloatManager
+	numeric                                                     *unumeral.ArbitraryFloatManager
 	failedNumeric                                               error
 	nextID                                                      uint32
 	freeIDs                                                     []uint32
@@ -45,7 +46,7 @@ func (m *ASTManager) floatingPointPluginBytes() uint64 {
 		if p.numeric != nil {
 			n += p.numeric.OwnedStorageBytes()
 		} else {
-			var failed *util.ArbitraryFloatManager
+			var failed *unumeral.ArbitraryFloatManager
 			if errors.As(p.failedNumeric, &failed) {
 				n += failed.OwnedStorageBytes()
 			}

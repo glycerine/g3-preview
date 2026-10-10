@@ -5,8 +5,8 @@ package polynomial
 import (
 	"errors"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Four actual scoped numerals, one RAW numeral, and the actual monomial_ref.
@@ -15,8 +15,8 @@ import (
 type polynomialSquareRootScope struct {
 	invocation                           uint64
 	orphanInvocations                    []uint64
-	values                               [4]util.Int
-	two                                  util.Int
+	values                               [4]unumeral.Int
+	two                                  unumeral.Int
 	mask                                 uint8
 	reference                            polynomialSquareRootReference
 	referenceCompleted                   bool
@@ -24,7 +24,7 @@ type polynomialSquareRootScope struct {
 	stage                                uint8
 	orphans                              []Monomial
 	drain                                uint32
-	perfectSquare                        util.IntegerPerfectSquareInvocationReceipt
+	perfectSquare                        unumeral.IntegerPerfectSquareInvocationReceipt
 	factoryGeneration, calleeGeneration  uint64
 	numericPending                       umemory.ObjectRef
 	integerRaw, monomialRaw              [3]umemory.Block
@@ -33,7 +33,7 @@ type polynomialSquareRootScope struct {
 }
 
 func (s *polynomialSquareRootScope) constructNumeral(i uint8) {
-	s.values[i] = util.Int{}
+	s.values[i] = unumeral.Int{}
 	s.mask |= 1 << i
 }
 
@@ -165,7 +165,7 @@ func (m *MultivariatePolynomialManager) squareRootMonomial(op uint8, a, b Monomi
 }
 
 // Receipt capture surrounds only the actual VM call, not retained global state.
-func (m *MultivariatePolynomialManager) squareRootNumeral(op uint8, a, b, out *util.Int) (bool, error) {
+func (m *MultivariatePolynomialManager) squareRootNumeral(op uint8, a, b, out *unumeral.Int) (bool, error) {
 	c := m.core
 	z := c.integer
 	s := &m.squareRoot
@@ -204,7 +204,7 @@ func (m *MultivariatePolynomialManager) squareRootNumeral(op uint8, a, b, out *u
 
 // The actual persistent buffer keeps its own coefficient fields. Only a newly
 // started subordinate physical allocation is an invocation's abort receipt.
-func (m *MultivariatePolynomialManager) squareRootAdd(b *polynomialSOM, a *util.Int, t Monomial) error {
+func (m *MultivariatePolynomialManager) squareRootAdd(b *polynomialSOM, a *unumeral.Int, t Monomial) error {
 	z := m.core.integer
 	s := &m.squareRoot
 	pending := z.PendingAllocationObject()
@@ -552,7 +552,7 @@ func (m *MultivariatePolynomialManager) cleanupSqrtModeOwned(abort bool, invocat
 	}
 	active, _, _ = s.perfectSquare.State(c.integer)
 	if abort || !active {
-		s.perfectSquare = util.IntegerPerfectSquareInvocationReceipt{}
+		s.perfectSquare = unumeral.IntegerPerfectSquareInvocationReceipt{}
 	}
 	if e := s.reference.drop(c, &s.reference.value, &s.reference.consumed, true); e != nil {
 		s.cleanupCause = e

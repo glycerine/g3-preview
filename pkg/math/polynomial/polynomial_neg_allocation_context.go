@@ -3,22 +3,22 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func numericIntegerManager_negAllocationRoots(m *util.IntegerManager, r *polynomialNegInvocationReceipt) *polynomialNumericRoots {
+func numericIntegerManager_negAllocationRoots(m *unumeral.IntegerManager, r *polynomialNegInvocationReceipt) *polynomialNumericRoots {
 	if r == nil || r.manager == nil || r.manager.self != r.manager || r.manager.integer != m || !r.manager.matchesNegInvocation(r) || !r.frame.negativeExecuting || r.manager.callbackDepth != 0 {
 		return nil
 	}
 	return &r.frame.numeric
 }
-func numericIntegerModularManager_negAllocationContext(m *util.IntegerModularManager, r *polynomialNegInvocationReceipt) integerAllocationInvocationContext {
+func numericIntegerModularManager_negAllocationContext(m *unumeral.IntegerModularManager, r *polynomialNegInvocationReceipt) integerAllocationInvocationContext {
 	if m == nil || m.Integers() == nil || numericIntegerManager_negAllocationRoots(m.Integers(), r) == nil || r.manager.modular != m {
 		return integerAllocationInvocationContext{}
 	}
 	return integerAllocationInvocationContext{neg: r, negInvocation: r.invocation}
 }
-func numericIntegerModularManager_copyWithNegReceipt(m *util.IntegerModularManager, out, value *util.Int, r *polynomialNegInvocationReceipt) error {
+func numericIntegerModularManager_copyWithNegReceipt(m *unumeral.IntegerModularManager, out, value *unumeral.Int, r *polynomialNegInvocationReceipt) error {
 	if e := m.Check(); e != nil {
 		return e
 	}
@@ -28,7 +28,7 @@ func numericIntegerModularManager_copyWithNegReceipt(m *util.IntegerModularManag
 	}
 	return numericIntegerModularManager_normalizeWithSourceContext(m, out, context)
 }
-func numericIntegerModularManager_negWithNegReceipt(m *util.IntegerModularManager, out *util.Int, r *polynomialNegInvocationReceipt) error {
+func numericIntegerModularManager_negWithNegReceipt(m *unumeral.IntegerModularManager, out *unumeral.Int, r *polynomialNegInvocationReceipt) error {
 	if e := m.Check(); e != nil {
 		return e
 	}

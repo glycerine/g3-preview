@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Actual destroyed-old Copy is a guarded owner-primitive source-DT profile,
@@ -17,14 +17,14 @@ func TestUPolynomialMignotteSourceFinalizerPreservesOlderParent(t *testing.T) {
 	c, e := s.newSquareFreeScope()
 	serviceMust(t, e)
 	c.constructed = 1
-	serviceMust(t, s.manager.set(&c.fpp, []util.Int{util.NewInt(4), util.NewInt(0), util.NewInt(3)}))
+	serviceMust(t, s.manager.set(&c.fpp, []unumeral.Int{unumeral.NewInt(4), unumeral.NewInt(0), unumeral.NewInt(3)}))
 	c.constructed = 2
 	serviceMust(t, q.Integers().Copy(&c.p, &q.Integers().Two64))
 	r, e := s.beginMignotteInvocation()
 	serviceMust(t, e)
 	r.frame.constructed = 1
 	serviceMust(t, q.Integers().Copy(&r.frame.norm, &q.Integers().Two64))
-	var large util.Int
+	var large unumeral.Int
 	words := make([]uint32, 80)
 	words[79] = 1
 	serviceMust(t, q.Integers().SetLimbs(&large, words))

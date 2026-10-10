@@ -6,27 +6,28 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Active numerals use native storage. Discarded BIG values remain actual
 // owning resources until explicit cleanup; Go backing capacity is never charged.
 type polynomialNumerals struct {
-	values  []util.Int
-	retired []util.Int
+	values  []unumeral.Int
+	retired []unumeral.Int
 }
 
 func (v *polynomialNumerals) size(m *MultivariatePolynomialCore) (uint32, error) {
 	return uint32(len(v.values)), nil
 }
-func (v *polynomialNumerals) coefficient(m *MultivariatePolynomialCore, i uint32) (util.Int, error) {
+func (v *polynomialNumerals) coefficient(m *MultivariatePolynomialCore, i uint32) (unumeral.Int, error) {
 	if uint64(i) >= uint64(len(v.values)) {
-		return util.Int{}, arena.ErrBounds
+		return unumeral.Int{}, arena.ErrBounds
 	}
 	return v.values[i], nil
 }
-func (v *polynomialNumerals) putCoefficient(m *MultivariatePolynomialCore, i uint32, a util.Int) error {
+func (v *polynomialNumerals) putCoefficient(m *MultivariatePolynomialCore, i uint32, a unumeral.Int) error {
 	if uint64(i) >= uint64(len(v.values)) {
 		return arena.ErrBounds
 	}
@@ -47,10 +48,10 @@ func (v *polynomialNumerals) publishSize(m *MultivariatePolynomialCore, n uint32
 	return nil
 }
 func (v *polynomialNumerals) reset(m *MultivariatePolynomialCore) error { return v.publishSize(m, 0) }
-func (v *polynomialNumerals) appendCoefficient(m *MultivariatePolynomialCore, a util.Int) error {
+func (v *polynomialNumerals) appendCoefficient(m *MultivariatePolynomialCore, a unumeral.Int) error {
 	return v.appendCoefficientWithAppendScope(m, a, nil, false)
 }
-func (v *polynomialNumerals) appendCoefficientWithAppendScope(m *MultivariatePolynomialCore, a util.Int, scope *polynomialCheapAppendScope, owned bool) error {
+func (v *polynomialNumerals) appendCoefficientWithAppendScope(m *MultivariatePolynomialCore, a unumeral.Int, scope *polynomialCheapAppendScope, owned bool) error {
 	i := uint32(len(v.values))
 	v.values = append(v.values, a)
 	// The actual zero NUM slot exists before vector-size publication and the
@@ -115,13 +116,13 @@ func (m *MultivariatePolynomialCore) publishDirectory(p Polynomial, id uint32) e
 	m.polynomials[id] = p
 	return nil
 }
-func (m *MultivariatePolynomialCore) mkCell(n uint32, as []util.Int, ms []Monomial, buffer *polynomialSOM, single *util.Int) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) mkCell(n uint32, as []unumeral.Int, ms []Monomial, buffer *polynomialSOM, single *unumeral.Int) (Polynomial, error) {
 	return m.mkCellWithReceipt(n, as, ms, buffer, single, nil)
 }
-func (m *MultivariatePolynomialCore) mkCellWithReceipt(n uint32, as []util.Int, ms []Monomial, buffer *polynomialSOM, single *util.Int, receipt *polynomialFactoryInvocationReceipt) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) mkCellWithReceipt(n uint32, as []unumeral.Int, ms []Monomial, buffer *polynomialSOM, single *unumeral.Int, receipt *polynomialFactoryInvocationReceipt) (Polynomial, error) {
 	return m.mkCellWithReceipts(n, as, ms, buffer, single, receipt, nil)
 }
-func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []util.Int, ms []Monomial, buffer *polynomialSOM, single *util.Int, receipt *polynomialFactoryInvocationReceipt, appendReceipt *polynomialCheapAppendInvocationReceipt) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []unumeral.Int, ms []Monomial, buffer *polynomialSOM, single *unumeral.Int, receipt *polynomialFactoryInvocationReceipt, appendReceipt *polynomialCheapAppendInvocationReceipt) (Polynomial, error) {
 	if m.pending.raw != (umemory.ObjectRef{}) || m.pending.value != (Polynomial{}) {
 		return Polynomial{}, ErrPolynomialPending
 	}
@@ -277,18 +278,18 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []util.Int,
 	}
 	max := uint32(0)
 	for i := uint32(0); i < n; i++ {
-		if e = m.writeCoefficient(p, i, util.Int{}); e != nil {
+		if e = m.writeCoefficient(p, i, unumeral.Int{}); e != nil {
 			return Polynomial{}, e
 		}
 		l.initializedCoefficients = i + 1
-		var a util.Int
+		var a unumeral.Int
 		movingAppend := false
 		if buffer != nil {
 			a, e = buffer.as.coefficient(m, i)
 			if e != nil {
 				return Polynomial{}, e
 			}
-			if e = buffer.as.putCoefficient(m, i, util.Int{}); e != nil {
+			if e = buffer.as.putCoefficient(m, i, unumeral.Int{}); e != nil {
 				return Polynomial{}, e
 			}
 			if buffer.appendScope.active && uint64(i) < uint64(len(buffer.coefficientOwners)) && buffer.coefficientOwners[i] == buffer.appendScope.invocation {
@@ -300,19 +301,19 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []util.Int,
 			}
 		} else if single != nil {
 			a = *single
-			*single = util.Int{}
+			*single = unumeral.Int{}
 		} else {
 			if uint64(i) >= uint64(len(as)) {
 				return Polynomial{}, arena.ErrBounds
 			}
 			a = as[i]
-			as[i] = util.Int{}
+			as[i] = unumeral.Int{}
 		}
 		if e = m.writeCoefficient(p, i, a); e != nil {
 			return Polynomial{}, e
 		}
 		if movingAppend {
-			buffer.appendScope.movingCoefficient = util.Int{}
+			buffer.appendScope.movingCoefficient = unumeral.Int{}
 		}
 		if appendScope != nil {
 			appendScope.transferredCoefficients = i + 1

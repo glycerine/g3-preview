@@ -2,18 +2,17 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialHasOneHalfRootOldAcknowledgmentPreservesLaterActualRoots(t *testing.T) {
 	c, p := algebraicFixture(t)
 	z := c.config.Rationals.Integers()
-	var foreign util.Int
-	foreign = util.NewInt(17)
+	var foreign unumeral.Int
+	foreign = unumeral.NewInt(17)
 	savedForeign := foreign
 	defer func() { serviceMust(t, z.Del(&foreign)) }()
 	var old upolyOneHalfRootInvocationReceipt
@@ -24,14 +23,14 @@ func TestUPolynomialHasOneHalfRootOldAcknowledgmentPreservesLaterActualRoots(t *
 		if foundOld {
 			// A later MIN call can reuse the now-warm checked scratch without an
 			// allocation. A larger actual leading SET reaches a fresh source leaf.
-			var leading util.Int
+			var leading unumeral.Int
 			limbs := make([]uint32, 40)
 			limbs[0], limbs[len(limbs)-1] = 17, 1
 			serviceMust(t, z.SetLimbs(&leading, limbs))
-			serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(1), util.NewInt(3), leading}))
+			serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(3), leading}))
 			serviceMust(t, z.Del(&leading))
 		} else {
-			serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(1), util.NewInt(math.MinInt32), util.NewInt(1)}))
+			serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(math.MinInt32), unumeral.NewInt(1)}))
 		}
 		v, e := p.wholeView(poly)
 		serviceMust(t, e)
@@ -45,7 +44,7 @@ func TestUPolynomialHasOneHalfRootOldAcknowledgmentPreservesLaterActualRoots(t *
 		_, body := p.HasOneHalfRoot(v)
 		q := &p.oneHalfRoot
 		r := p.oneHalfRootReceipt()
-		algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&foreign}, nil)
+		algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*unumeral.Int{&foreign}, nil)
 		if foreign != savedForeign {
 			t.Fatal("unrelated actual BIG numeral changed")
 		}
@@ -60,7 +59,7 @@ func TestUPolynomialHasOneHalfRootOldAcknowledgmentPreservesLaterActualRoots(t *
 			if !reflect.DeepEqual(before, *q) || used != z.Budget().Used() || physical != z.RuntimeOwner().Stats() || *old.history != history || foreign != savedForeign {
 				t.Fatal("old ACK consumed later/foreign actual roots or history")
 			}
-			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&foreign}, nil)
+			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*unumeral.Int{&foreign}, nil)
 			foundNew = true
 		}
 		z.Budget().FailAfter(-1)

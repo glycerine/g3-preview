@@ -10,8 +10,9 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 var ErrAlgebraicOwner = errors.New("mpnum: invalid algebraic owner or value")
@@ -26,11 +27,11 @@ type Algebraic struct {
 	slot, generation uint32
 }
 type AlgebraicRootConfig struct {
-	Rationals   *util.RationalManager
+	Rationals   *unumeral.RationalManager
 	Polynomials *UPolynomialManager
 	Factors     *UPolynomialFactorizationService
-	Binary      *util.BinaryRationalManager
-	Intervals   *util.BinaryIntervalManager
+	Binary      *unumeral.BinaryRationalManager
+	Intervals   *unumeral.BinaryIntervalManager
 	Allocator   *umemory.SmallAllocator
 	Checkpoint  func() bool
 	Cooperation func() error
@@ -50,7 +51,7 @@ type AlgebraicRootCore struct {
 	negation                                               algebraicNegScope
 	negationHistory                                        []algebraicNegHistory
 	predicate                                              algebraicPredicateScope
-	isRationalTmp                                          util.Int
+	isRationalTmp                                          unumeral.Int
 	rootSelection                                          *AlgebraicVector
 	self                                                   *AlgebraicRootCore
 	config                                                 AlgebraicRootConfig
@@ -67,7 +68,7 @@ type AlgebraicRootCore struct {
 	compareCheap, comparePoly, compareRefine, compareSturm uint32
 	compareSequence                                        *UPolynomialSequence
 	callers, vectors                                       uint32
-	localQ                                                 util.Rational
+	localQ                                                 unumeral.Rational
 	localActive                                            bool
 	localOriginal, localCleanup                            error
 	constructionStage                                      uint8
@@ -76,9 +77,9 @@ type AlgebraicRootCore struct {
 // Scalar codec is actual Go-adapter extent: basic 24, root 56 bytes. It is not
 // C++ sizeof. No duplicate owning numerals exist in the locator directory.
 type algebraicRecord struct {
-	value       util.Rational
+	value       unumeral.Rational
 	poly        UPolynomial
-	interval    util.BinaryInterval
+	interval    unumeral.BinaryInterval
 	flags, size uint32
 }
 
@@ -211,18 +212,18 @@ func (m *AlgebraicRootCore) allocate(kind uint8) (Algebraic, error) {
 		}
 		return a, e
 	}
-	r := algebraicRecord{value: util.NewRational()}
+	r := algebraicRecord{value: unumeral.NewRational()}
 	if e = m.store(l, &r); e != nil {
 		return a, e
 	}
 	l.initialized = true
 	return a, nil
 }
-func algebraicIntWords(a util.Int) [3]uint32 {
+func algebraicIntWords(a unumeral.Int) [3]uint32 {
 	return a.NativeWords()
 }
-func algebraicWordsInt(w []uint32) util.Int {
-	return util.IntFromNativeWords([3]uint32{uint32(int32(w[0])), uint32(uint64(w[1]) | uint64(w[2])<<32), uint32(uint64(uint64(w[1])|uint64(w[2])<<32) >> 32)})
+func algebraicWordsInt(w []uint32) unumeral.Int {
+	return unumeral.IntFromNativeWords([3]uint32{uint32(int32(w[0])), uint32(uint64(w[1]) | uint64(w[2])<<32), uint32(uint64(uint64(w[1])|uint64(w[2])<<32) >> 32)})
 }
 func (m *AlgebraicRootCore) store(l *algebraicLocation, r *algebraicRecord) error {
 	var w [14]uint32
@@ -253,7 +254,7 @@ func (m *AlgebraicRootCore) store(l *algebraicLocation, r *algebraicRecord) erro
 	return nil
 }
 func (m *AlgebraicRootCore) load(l *algebraicLocation) (algebraicRecord, error) {
-	r := algebraicRecord{value: util.NewRational()}
+	r := algebraicRecord{value: unumeral.NewRational()}
 	if !l.initialized {
 		return r, umemory.ErrRuntimeUninitialized
 	}
@@ -270,12 +271,12 @@ func (m *AlgebraicRootCore) load(l *algebraicLocation) (algebraicRecord, error) 
 		w[i] = v
 	}
 	if l.kind == 0 {
-		r.value = util.RationalFromBorrowedNumerals(algebraicWordsInt(w[:3]), algebraicWordsInt(w[3:6]))
+		r.value = unumeral.RationalFromBorrowedNumerals(algebraicWordsInt(w[:3]), algebraicWordsInt(w[3:6]))
 	} else {
 		r.poly = UPolynomial{uint64(w[0]) | uint64(w[1])<<32, w[2], w[3]}
 		r.flags = w[4]
 		r.size = w[5]
-		r.interval = util.BinaryIntervalFromBorrowedBounds(util.BinaryRationalFromBorrowedNumeral(algebraicWordsInt(w[6:9]), w[9]), util.BinaryRationalFromBorrowedNumeral(algebraicWordsInt(w[10:13]), w[13]))
+		r.interval = unumeral.BinaryIntervalFromBorrowedBounds(unumeral.BinaryRationalFromBorrowedNumeral(algebraicWordsInt(w[6:9]), w[9]), unumeral.BinaryRationalFromBorrowedNumeral(algebraicWordsInt(w[10:13]), w[13]))
 	}
 	return r, nil
 }
@@ -432,7 +433,7 @@ func (m *AlgebraicRootCore) beginQ() error {
 	if m.localActive {
 		return ErrAlgebraicPending
 	}
-	m.localQ = util.NewRational()
+	m.localQ = unumeral.NewRational()
 	m.localActive = true
 	m.localOriginal = nil
 	m.localCleanup = nil
@@ -477,7 +478,7 @@ func (m *AlgebraicRootCore) save(l *algebraicLocation, r *algebraicRecord, cause
 }
 
 // Const source overload makes the scoped copy BEFORE mutable setter actions.
-func (m *AlgebraicRootCore) SetRational(a *Algebraic, q *util.Rational) (err error) {
+func (m *AlgebraicRootCore) SetRational(a *Algebraic, q *unumeral.Rational) (err error) {
 	if _, err = m.location(a); err != nil {
 		return err
 	}
@@ -490,7 +491,7 @@ func (m *AlgebraicRootCore) SetRational(a *Algebraic, q *util.Rational) (err err
 	}
 	return m.SetTake(a, &m.localQ)
 }
-func (m *AlgebraicRootCore) SetTake(a *Algebraic, q *util.Rational) error {
+func (m *AlgebraicRootCore) SetTake(a *Algebraic, q *unumeral.Rational) error {
 	l, e := m.location(a)
 	if e != nil {
 		return e
@@ -632,7 +633,7 @@ func (m *AlgebraicRootCore) normalizeCoefficients(l *algebraicLocation, r *algeb
 	}
 	return m.store(l, r)
 }
-func (m *AlgebraicRootCore) SetRoot(a *Algebraic, p UPolynomialView, lower, upper *util.BinaryRational, minimal bool) (err error) {
+func (m *AlgebraicRootCore) SetRoot(a *Algebraic, p UPolynomialView, lower, upper *unumeral.BinaryRational, minimal bool) (err error) {
 	l, err := m.location(a)
 	if err != nil {
 		return err
@@ -912,8 +913,8 @@ func (m *AlgebraicRootCore) Close() error {
 	return nil
 }
 
-func numericRationalService_NewAlgebraicRootCore(s *util.RationalService, c AlgebraicRootConfig) (out *AlgebraicRootCore, cause error) {
-	cause = s.WithNumericBorrow(func(b *util.RationalNumericBorrow) error {
+func numericRationalService_NewAlgebraicRootCore(s *unumeral.RationalService, c AlgebraicRootConfig) (out *AlgebraicRootCore, cause error) {
+	cause = s.WithNumericBorrow(func(b *unumeral.RationalNumericBorrow) error {
 		if e := b.Ready(); e != nil {
 			return e
 		}

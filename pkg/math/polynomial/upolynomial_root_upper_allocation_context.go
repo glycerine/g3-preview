@@ -3,31 +3,31 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func numericIntegerModularManager_rootUpperContextValid(m *util.IntegerModularManager, c integerAllocationInvocationContext) bool {
+func numericIntegerModularManager_rootUpperContextValid(m *unumeral.IntegerModularManager, c integerAllocationInvocationContext) bool {
 	return m != nil && m.ValidOwner() && m.Integers() != nil && c.rootUpperBoundFrame(m.Integers()) != nil && c.rootUpperBound.owner.modular == m
 }
-func numericIntegerModularManager_copyWithRootUpperContext(m *util.IntegerModularManager, out, value *util.Int, c integerAllocationInvocationContext) error {
+func numericIntegerModularManager_copyWithRootUpperContext(m *unumeral.IntegerModularManager, out, value *unumeral.Int, c integerAllocationInvocationContext) error {
 	if !numericIntegerModularManager_rootUpperContextValid(m, c) {
 		return ErrUPolynomialOwner
 	}
 	return m.WithAllocationContext((c).utility(m.Integers())).Copy(out, value)
 }
-func numericIntegerModularManager_absWithRootUpperContext(m *util.IntegerModularManager, out *util.Int, c integerAllocationInvocationContext) error {
+func numericIntegerModularManager_absWithRootUpperContext(m *unumeral.IntegerModularManager, out *unumeral.Int, c integerAllocationInvocationContext) error {
 	if !numericIntegerModularManager_rootUpperContextValid(m, c) {
 		return ErrUPolynomialOwner
 	}
 	return m.WithAllocationContext((c).utility(m.Integers())).Abs(out)
 }
-func numericIntegerModularManager_addWithRootUpperContext(m *util.IntegerModularManager, a, b, out *util.Int, c integerAllocationInvocationContext) error {
+func numericIntegerModularManager_addWithRootUpperContext(m *unumeral.IntegerModularManager, a, b, out *unumeral.Int, c integerAllocationInvocationContext) error {
 	if !numericIntegerModularManager_rootUpperContextValid(m, c) {
 		return ErrUPolynomialOwner
 	}
 	return m.WithAllocationContext((c).utility(m.Integers())).Add(a, b, out)
 }
-func numericIntegerModularManager_divWithRootUpperContext(m *util.IntegerModularManager, a, b, out *util.Int, c integerAllocationInvocationContext) error {
+func numericIntegerModularManager_divWithRootUpperContext(m *unumeral.IntegerModularManager, a, b, out *unumeral.Int, c integerAllocationInvocationContext) error {
 	if !numericIntegerModularManager_rootUpperContextValid(m, c) {
 		return ErrUPolynomialOwner
 	}

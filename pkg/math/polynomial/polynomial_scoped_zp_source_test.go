@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialScopedZPActualModeAndPrimeRestoration(t *testing.T) {
@@ -19,7 +20,7 @@ func TestPolynomialScopedZPActualModeAndPrimeRestoration(t *testing.T) {
 			serviceMust(t, c.modular.SetZPUint64(7))
 		}
 		var scope polynomialScopedSetZP
-		next := util.NewInt(11)
+		next := unumeral.NewInt(11)
 		serviceMust(t, scope.construct(full, &next))
 		field, e := c.modular.Modular()
 		serviceMust(t, e)
@@ -32,12 +33,12 @@ func TestPolynomialScopedZPActualModeAndPrimeRestoration(t *testing.T) {
 		if field != oldField {
 			t.Fatal("source completed body restores old mode", field, oldField)
 		}
-		if oldField && (*c.modular.BorrowModulus()) != util.NewInt(7) {
+		if oldField && (*c.modular.BorrowModulus()) != unumeral.NewInt(7) {
 			t.Fatal("source completed body restores old prime", (*c.modular.BorrowModulus()))
 		}
 		// The next loop iteration constructs a fresh source local in this
 		// reusable embedded carrier, without an owning-abort action.
-		next = util.NewInt(13)
+		next = unumeral.NewInt(13)
 		serviceMust(t, scope.construct(full, &next))
 		serviceMust(t, scope.sourceEnd())
 		serviceMust(t, scope.cleanup())
@@ -61,7 +62,7 @@ func TestPolynomialScopedZPFailedBodyDoesNotRestoreMode(t *testing.T) {
 	if !field {
 		t.Fatal("failed class constructor silently restored source mode")
 	}
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&scope.p}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&scope.p}, 0)
 	c.integer.Budget().FailAfter(-1)
 	serviceMust(t, scope.cleanup())
 	field, x = c.modular.Modular()
@@ -76,7 +77,7 @@ func TestPolynomialScopedZPFailedBodyDoesNotRestoreMode(t *testing.T) {
 
 func TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending(t *testing.T) {
 	budget := arena.NewBudget(1 << 24)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 11, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 11, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		q.Close()
@@ -91,7 +92,7 @@ func TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending(t *testing.T) 
 	serviceMust(t, c.modular.SetZP(&q.Integers().Two64))
 	old := (*c.modular.BorrowModulus())
 	var scope polynomialScopedSetZP
-	next := util.NewInt(7)
+	next := unumeral.NewInt(7)
 	e = scope.construct(full, &next)
 	if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) || scope.completed {
 		t.Fatal("actual old-prime member Copy descriptor refusal", e, q.Integers().PendingCell, scope.completed)
@@ -99,7 +100,7 @@ func TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending(t *testing.T) 
 	if (*c.modular.BorrowModulus()) != old {
 		t.Fatal("unreached new prime SET")
 	}
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&scope.p}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&scope.p}, 0)
 	serviceMust(t, scope.cleanup())
 	if q.Integers().PendingCell.Object != (umemory.ObjectRef{}) {
 		t.Fatal("scoped class failed member root not drained by explicit owning abort")
@@ -116,9 +117,9 @@ func TestPolynomialScopedZPCompletedMemberGuardIsSticky(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	z := full.core.integer
 	var scope polynomialScopedSetZP
-	next := util.NewInt(7)
+	next := unumeral.NewInt(7)
 	serviceMust(t, scope.construct(full, &next))
-	var large util.Int
+	var large unumeral.Int
 	limbs := make([]uint32, 8192)
 	limbs[0], limbs[len(limbs)-1] = 17, 1
 	serviceMust(t, z.SetLimbs(&large, limbs))
@@ -130,7 +131,7 @@ func TestPolynomialScopedZPCompletedMemberGuardIsSticky(t *testing.T) {
 		t.Fatal("actual dangling replacement", body, scope.p)
 	}
 	saved := scope.p
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large, &scope.p}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large, &scope.p}, 0)
 	first := scope.sourceEnd()
 	if !errors.Is(first, arena.ErrInvalidSlot) || scope.p != saved || scope.stage != 1 || scope.memberEnded {
 		t.Fatal("reached source member destruction", first, scope)
@@ -145,5 +146,5 @@ func TestPolynomialScopedZPCompletedMemberGuardIsSticky(t *testing.T) {
 	}
 	z.Budget().FailAfter(-1)
 	serviceMust(t, scope.cleanup())
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 }

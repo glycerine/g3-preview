@@ -6,14 +6,15 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *util.IntegerManager, external []umemory.Block, public ...*util.Int) {
+func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *unumeral.IntegerManager, external []umemory.Block, public ...*unumeral.Int) {
 	t.Helper()
-	cells := map[util.NumericCellRef]bool{}
-	add := func(r util.NumericCellRef) {
+	cells := map[unumeral.NumericCellRef]bool{}
+	add := func(r unumeral.NumericCellRef) {
 		if r == 0 || m.IsFailureRef(r) {
 			return
 		}
@@ -34,7 +35,7 @@ func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *util.IntegerManager, ext
 	if m.MatchesDividesNumeralInvocation(&m.DividesNumeral.Receipt) {
 		add(m.DividesNumeral.Numeral.Cell)
 	}
-	for _, s := range []*util.IntegerRawScope{&m.DivisionRaw, &m.ExtendedRaw, &m.GcdRaw} {
+	for _, s := range []*unumeral.IntegerRawScope{&m.DivisionRaw, &m.ExtendedRaw, &m.GcdRaw} {
 		for i := uint8(0); i < s.Count; i++ {
 			add(s.Values[i].Cell)
 		}
@@ -114,13 +115,13 @@ func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *util.IntegerManager, ext
 	}
 }
 
-func mignotteScopePhysicalAudit(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, caller ...*util.Int) {
+func mignotteScopePhysicalAudit(t *testing.T, q *unumeral.RationalManager, s *UPolynomialFactorizationService, caller ...*unumeral.Int) {
 	mignotteScopePhysicalAuditExtra(t, q, s, nil, caller...)
 }
-func mignotteScopePhysicalAuditExtra(t *testing.T, q *util.RationalManager, s *UPolynomialFactorizationService, external []umemory.Block, caller ...*util.Int) {
+func mignotteScopePhysicalAuditExtra(t *testing.T, q *unumeral.RationalManager, s *UPolynomialFactorizationService, external []umemory.Block, caller ...*unumeral.Int) {
 	u := s.manager
 	c := s.scope
-	roots := append([]*util.Int{}, caller...)
+	roots := append([]*unumeral.Int{}, caller...)
 	roots = append(roots, &q.NTmp, &q.AddTmp1, &q.AddTmp2, &q.AddMulTmp.Num, &q.AddMulTmp.Den, &q.LtTmp1.Num, &q.LtTmp1.Den, &q.LtTmp2.Num, &q.LtTmp2.Den, &(*u.modular.BorrowModulus()), &u.modular.Lower, &u.modular.Upper, &u.modular.InvTmp1, &u.modular.InvTmp2, &u.modular.InvTmp3, &u.modular.DivTmp)
 	states := []*upolyVectorState{&u.db, &u.dbab1, &u.dbab2, &u.tr, &u.push, &u.basic, &u.div1, &u.div2, &u.exactDiv, &u.gcd1, &u.gcd2, &u.cra, &u.mgcd[0], &u.mgcd[1], &u.mgcd[2], &u.mgcd[3], &u.mgcd[4], &u.mgcd[5], &u.sqf1, &u.sqf2, &u.pw}
 	if c != nil {

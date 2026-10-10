@@ -3,14 +3,13 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (m *MultivariatePolynomialManager) iccpZPX(p Polynomial, x uint32, ci *util.Int, content, pp *polynomialReference) error {
+func (m *MultivariatePolynomialManager) iccpZPX(p Polynomial, x uint32, ci *unumeral.Int, content, pp *polynomialReference) error {
 	return m.iccpZPXWithContentReceipt(p, x, ci, content, pp, nil)
 }
-func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, x uint32, ci *util.Int, content, pp *polynomialReference, contentReceipt *polynomialContentInvocationReceipt) (err error) {
+func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, x uint32, ci *unumeral.Int, content, pp *polynomialReference, contentReceipt *polynomialContentInvocationReceipt) (err error) {
 	c := m.core
 	if polynomialSourceDebug {
 		field, e := c.modular.Modular()

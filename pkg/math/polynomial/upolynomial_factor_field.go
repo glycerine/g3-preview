@@ -6,7 +6,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // ErrUPolynomialNontermination guards a source uint32 loop at its wrap boundary.
@@ -46,7 +46,7 @@ func (m *UPolynomialManager) checkFactors(fs *UPolynomialFactors) error {
 	}
 	return nil
 }
-func (m *UPolynomialManager) scopedPush(s *upolyVectorState, value *util.Int) error {
+func (m *UPolynomialManager) scopedPush(s *upolyVectorState, value *unumeral.Int) error {
 	out, e := m.pushDefault(s)
 	if e != nil {
 		return e
@@ -72,7 +72,7 @@ func (q *upolyBerlekampMatrix) close() {
 	q.column = nil
 	m.freeBacking(&q.values)
 }
-func (q *upolyBerlekampMatrix) get(i, j uint32) (*util.Int, error) {
+func (q *upolyBerlekampMatrix) get(i, j uint32) (*unumeral.Int, error) {
 	if polynomialSourceDebug && (i >= q.size || j >= q.size) {
 		return nil, ErrUPolynomialAssertion
 	}
@@ -103,13 +103,13 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 	if e != nil {
 		return e
 	}
-	*v = util.NewInt(1)
+	*v = unumeral.NewInt(1)
 	for j := uint32(0); j < n; j++ {
 		if _, e = m.pushDefault(&q.values); e != nil {
 			return e
 		}
 	}
-	var tmp util.Int
+	var tmp unumeral.Int
 	defer m.modular.Del(&tmp)
 	row, previous := uint32(0), uint32(0)
 	for k := uint32(1); ; k++ {
@@ -183,7 +183,7 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 }
 func (q *upolyBerlekampMatrix) diagonalize() (uint32, error) {
 	m := q.m
-	var multiplier util.Int
+	var multiplier unumeral.Int
 	defer m.modular.Del(&multiplier)
 	nullRank := uint32(0)
 	for i := uint32(0); i < q.size; i++ {
@@ -432,7 +432,7 @@ func (m *UPolynomialManager) squareFreeFactorZP(f UPolynomialView, fs *UPolynomi
 	if e = m.setView(&t0, f); e != nil {
 		return e
 	}
-	var constant util.Int
+	var constant unumeral.Int
 	defer m.modular.Del(&constant)
 	// mk_monic(lc) has its own scoped inverse destroyed before output constant.
 	if e = m.factorMonic(m.stateView(&t0), &constant); e != nil {
@@ -487,7 +487,7 @@ func (m *UPolynomialManager) squareFreeFactorZP(f UPolynomialView, fs *UPolynomi
 			return e
 		}
 		for deg := uint32(0); deg < t.size; {
-			zero := util.NewInt(0)
+			zero := unumeral.NewInt(0)
 			if e = m.scopedPush(&t0, &zero); e != nil {
 				return e
 			}
@@ -510,8 +510,8 @@ func (m *UPolynomialManager) squareFreeFactorZP(f UPolynomialView, fs *UPolynomi
 	}
 	return nil
 }
-func (m *UPolynomialManager) factorMonic(v UPolynomialView, leading *util.Int) error {
-	var inverse util.Int
+func (m *UPolynomialManager) factorMonic(v UPolynomialView, leading *unumeral.Int) error {
+	var inverse unumeral.Int
 	defer m.modular.Del(&inverse)
 	return m.monic(v, leading, &inverse)
 }

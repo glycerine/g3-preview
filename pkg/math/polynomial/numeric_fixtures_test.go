@@ -8,17 +8,18 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func binaryManager(t *testing.T) (*util.BinaryRationalManager, *arena.Budget) {
+func binaryManager(t *testing.T) (*unumeral.BinaryRationalManager, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 26)
-	s, e := util.NewRationalService(serviceConfig(b))
+	s, e := unumeral.NewRationalService(serviceConfig(b))
 	serviceMust(t, e)
-	z, e := util.NewIntegerManager(serviceConfig(b).Integers)
+	z, e := unumeral.NewIntegerManager(serviceConfig(b).Integers)
 	serviceMust(t, e)
-	m, e := util.NewBinaryRationalManager(z, util.BinaryRationalConfig{Diagnostics: s})
+	m, e := unumeral.NewBinaryRationalManager(z, unumeral.BinaryRationalConfig{Diagnostics: s})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		m.Close()
@@ -30,7 +31,7 @@ func binaryManager(t *testing.T) (*util.BinaryRationalManager, *arena.Budget) {
 	})
 	return m, b
 }
-func binaryText(t *testing.T, m *util.BinaryRationalManager, a *util.BinaryRational, want string) {
+func binaryText(t *testing.T, m *unumeral.BinaryRationalManager, a *unumeral.BinaryRational, want string) {
 	t.Helper()
 	got, e := m.String(a)
 	if e != nil || got != want {
@@ -38,27 +39,27 @@ func binaryText(t *testing.T, m *util.BinaryRationalManager, a *util.BinaryRatio
 	}
 }
 
-func intervalSet(t *testing.T, m *util.BinaryIntervalManager, a *util.BinaryInterval, l, u int32) {
+func intervalSet(t *testing.T, m *unumeral.BinaryIntervalManager, a *unumeral.BinaryInterval, l, u int32) {
 	t.Helper()
-	lo, hi := util.NewBinaryInt(l), util.NewBinaryInt(u)
+	lo, hi := unumeral.NewBinaryInt(l), unumeral.NewBinaryInt(u)
 	serviceMust(t, m.SetBounds(a, &lo, &hi))
 }
-func intervalText(t *testing.T, m *util.BinaryIntervalManager, a *util.BinaryInterval, w string) {
+func intervalText(t *testing.T, m *unumeral.BinaryIntervalManager, a *unumeral.BinaryInterval, w string) {
 	t.Helper()
 	s, e := m.String(a)
 	if e != nil || s != w {
 		t.Fatalf("got %q %v want %q", s, e, w)
 	}
 }
-func rationalManager(t *testing.T, synch bool) (*util.RationalManager, *arena.Budget) {
+func rationalManager(t *testing.T, synch bool) (*unumeral.RationalManager, *arena.Budget) {
 	t.Helper()
 	return rationalManagerWithLimit(t, synch, 1<<20)
 }
 
-func rationalManagerWithLimit(t *testing.T, synch bool, limit uint64) (*util.RationalManager, *arena.Budget) {
+func rationalManagerWithLimit(t *testing.T, synch bool, limit uint64) (*unumeral.RationalManager, *arena.Budget) {
 	t.Helper()
 	budget := arena.NewBudget(limit)
-	m, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: budget}}}, Synchronized: synch})
+	m, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: budget}}}, Synchronized: synch})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -70,7 +71,7 @@ func rationalManagerWithLimit(t *testing.T, synch bool, limit uint64) (*util.Rat
 	})
 	return m, budget
 }
-func rationalString(t *testing.T, m *util.RationalManager, a *util.Rational) string {
+func rationalString(t *testing.T, m *unumeral.RationalManager, a *unumeral.Rational) string {
 	t.Helper()
 	s, e := m.String(a)
 	if e != nil {
@@ -85,10 +86,10 @@ func numericPhysicalReservationRefusal(e error) bool {
 	var f umemory.Failure
 	return errors.As(e, &f) && f.Kind == umemory.FailureMemout && f.ErrorCode() == 101
 }
-func integerManager(t *testing.T) (*util.IntegerManager, *arena.Budget) {
+func integerManager(t *testing.T) (*unumeral.IntegerManager, *arena.Budget) {
 	t.Helper()
 	budget := arena.NewBudget(1 << 20)
-	m, err := util.NewIntegerManager(util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: budget}}})
+	m, err := unumeral.NewIntegerManager(unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: budget}}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +101,7 @@ func integerManager(t *testing.T) (*util.IntegerManager, *arena.Budget) {
 	})
 	return m, budget
 }
-func integerString(t *testing.T, m *util.IntegerManager, n *util.Int) string {
+func integerString(t *testing.T, m *unumeral.IntegerManager, n *unumeral.Int) string {
 	t.Helper()
 	s, e := m.String(n)
 	if e != nil {
@@ -108,10 +109,10 @@ func integerString(t *testing.T, m *util.IntegerManager, n *util.Int) string {
 	}
 	return s
 }
-func modularManager(t *testing.T, p uint64) (*util.IntegerModularManager, *util.IntegerManager, *arena.Budget) {
+func modularManager(t *testing.T, p uint64) (*unumeral.IntegerModularManager, *unumeral.IntegerManager, *arena.Budget) {
 	t.Helper()
 	z, b := integerManager(t)
-	m, e := util.NewIntegerModularManager(z)
+	m, e := unumeral.NewIntegerModularManager(z)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -137,13 +138,13 @@ func numericStorageReservationRefusal(err error) bool {
 	var physical umemory.Failure
 	return errors.As(err, &physical) && physical.Kind == umemory.FailureMemout && physical.ErrorCode() == 101
 }
-func serviceConfig(b *arena.Budget) util.RationalServiceConfig {
-	return util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}}
+func serviceConfig(b *arena.Budget) unumeral.RationalServiceConfig {
+	return unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}}
 }
-func serviceNew(t *testing.T) (*util.RationalService, *arena.Budget) {
+func serviceNew(t *testing.T) (*unumeral.RationalService, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
-	s, e := util.NewRationalService(serviceConfig(b))
+	s, e := unumeral.NewRationalService(serviceConfig(b))
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -170,7 +171,7 @@ func sxMust(t *testing.T, e error) {
 	}
 }
 
-func numericWarmProfileSnapshot(t *testing.T, m *util.IntegerManager, b *arena.Budget) numericWarmSnapshot {
+func numericWarmProfileSnapshot(t *testing.T, m *unumeral.IntegerManager, b *arena.Budget) numericWarmSnapshot {
 	t.Helper()
 	size, e := m.Memory.AllocationSize()
 	if e != nil {
@@ -182,7 +183,7 @@ func numericWarmProfileSnapshot(t *testing.T, m *util.IntegerManager, b *arena.B
 	}
 	return numericWarmSnapshot{b.Used(), integerActualOwnedBytes(m), size, count, m.Memory.Stats(), m.Allocator.Stats(), m.Cells.Stats().Live}
 }
-func numericWarmProfileAudit(t *testing.T, m *util.IntegerManager, b *arena.Budget, before numericWarmSnapshot, goAllocs float64, sourceEvents bool) {
+func numericWarmProfileAudit(t *testing.T, m *unumeral.IntegerManager, b *arena.Budget, before numericWarmSnapshot, goAllocs float64, sourceEvents bool) {
 	t.Helper()
 	numericWarmRuntimeAudit(t, m, b, before, sourceEvents)
 	if !sourceEvents && goAllocs != 0 {
@@ -192,7 +193,7 @@ func numericWarmProfileAudit(t *testing.T, m *util.IntegerManager, b *arena.Budg
 
 // Native polynomial containers may allocate Go storage while the real numeric
 // and Runtime allocator graph remains warm. Audit that graph independently.
-func numericWarmRuntimeAudit(t *testing.T, m *util.IntegerManager, b *arena.Budget, before numericWarmSnapshot, sourceEvents bool) {
+func numericWarmRuntimeAudit(t *testing.T, m *unumeral.IntegerManager, b *arena.Budget, before numericWarmSnapshot, sourceEvents bool) {
 	t.Helper()
 	after := numericWarmProfileSnapshot(t, m, b)
 	if after.used != before.used || after.owned != before.owned || after.size != before.size || after.runtime != before.runtime || after.allocator != before.allocator || after.cells != before.cells {
@@ -207,7 +208,7 @@ func numericWarmRuntimeAudit(t *testing.T, m *util.IntegerManager, b *arena.Budg
 	}
 }
 
-func roundPublicationDecode(t *testing.T, m *util.IntegerManager, n *util.Int) *big.Int {
+func roundPublicationDecode(t *testing.T, m *unumeral.IntegerManager, n *unumeral.Int) *big.Int {
 	t.Helper()
 	qopsMust(t, m.Check(n))
 	if n.IsSmall() {
@@ -225,17 +226,17 @@ func roundPublicationDecode(t *testing.T, m *util.IntegerManager, n *util.Int) *
 	return value
 }
 
-func mpzPublicationDirectOwner(t *testing.T) (*util.IntegerManager, *arena.Budget) {
+func mpzPublicationDirectOwner(t *testing.T) (*unumeral.IntegerManager, *arena.Budget) {
 	return mpzPublicationOwnerProfile(t, umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 }
-func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external []umemory.Block, public ...*util.Int) {
+func integerPhysicalAuditWithRaw(t *testing.T, m *unumeral.IntegerManager, external []umemory.Block, public ...*unumeral.Int) {
 	t.Helper()
-	cells := map[util.NumericCellRef]bool{}
-	add := func(r util.NumericCellRef) {
+	cells := map[unumeral.NumericCellRef]bool{}
+	add := func(r unumeral.NumericCellRef) {
 		if r == 0 || m.IsFailureRef(r) {
 			return
 		}
-		if !util.ValidNumericRef(m.Cells, r) {
+		if !unumeral.ValidNumericRef(m.Cells, r) {
 			t.Fatal("invalid ordinary integer root", r)
 		}
 		cells[r] = true
@@ -252,7 +253,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 	if m.MatchesDividesNumeralInvocation(&m.DividesNumeral.Receipt) {
 		add(m.DividesNumeral.Numeral.Cell)
 	}
-	for _, s := range []*util.IntegerRawScope{&m.DivisionRaw, &m.ExtendedRaw, &m.GcdRaw} {
+	for _, s := range []*unumeral.IntegerRawScope{&m.DivisionRaw, &m.ExtendedRaw, &m.GcdRaw} {
 		for i := uint8(0); i < s.Count; i++ {
 			add(s.Values[i].Cell)
 		}
@@ -319,7 +320,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 			continue
 		}
 		if c.Unpublished || c.CleanupPending {
-			add(util.MakeNumericRef(arena.Slot(slot), m.Cells.State(arena.Slot(slot)).Generation))
+			add(unumeral.MakeNumericRef(arena.Slot(slot), m.Cells.State(arena.Slot(slot)).Generation))
 		}
 	}
 	if uint32(len(cells)) != m.Cells.Stats().Live {
@@ -368,7 +369,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 					raw[b] = true
 				}
 			}
-			for _, c := range []util.SourceCellBacking{s.Numeric.Cell, s.Decimal.Numeric.Cell} {
+			for _, c := range []unumeral.SourceCellBacking{s.Numeric.Cell, s.Decimal.Numeric.Cell} {
 				if c.Object == (umemory.ObjectRef{}) {
 					continue
 				}
@@ -491,7 +492,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 				}
 			}
 		}
-		for _, s := range []*util.ArbitraryFloatRoundScope{&parent.RoundScope, &parent.RoundSqrtScope} {
+		for _, s := range []*unumeral.ArbitraryFloatRoundScope{&parent.RoundScope, &parent.RoundSqrtScope} {
 			if s.Manager == parent && s.Invocation != 0 {
 				if block := s.Transferred.Block(); block != (umemory.Block{}) {
 					if raw[block] {
@@ -633,7 +634,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 		t.Fatal("unnamed physical runtime allocation", m.Memory.Stats(), allocator, len(raw))
 	}
 }
-func binaryRat(t *testing.T, m *util.BinaryRationalManager, a *util.BinaryRational) *big.Rat {
+func binaryRat(t *testing.T, m *unumeral.BinaryRationalManager, a *unumeral.BinaryRational) *big.Rat {
 	t.Helper()
 	n, e := m.Z.String(&a.Num)
 	serviceMust(t, e)
@@ -644,21 +645,21 @@ func binaryRat(t *testing.T, m *util.BinaryRationalManager, a *util.BinaryRation
 	return new(big.Rat).SetFrac(v, new(big.Int).Lsh(big.NewInt(1), uint(a.KField)))
 }
 
-func integerActualOwnedBytes(m *util.IntegerManager) uint64 {
+func integerActualOwnedBytes(m *unumeral.IntegerManager) uint64 {
 	cs := m.Cells.Stats()
 	n := m.HeaderBytes + m.Natural.HeaderBytes + m.Memory.Stats().TotalBytes + m.Allocator.Stats().TotalBytes
 	n += cs.OwnerBytes + cs.RecordBytes + cs.MetadataBytes + cs.DirectoryBytes
 
 	return n
 }
-func integerPhysicalAudit(t *testing.T, m *util.IntegerManager, public ...*util.Int) {
+func integerPhysicalAudit(t *testing.T, m *unumeral.IntegerManager, public ...*unumeral.Int) {
 	integerPhysicalAuditWithRaw(t, m, nil, public...)
 }
 
-func rationalPublicationDirectOwner(t *testing.T, synch bool) (*util.RationalManager, *arena.Budget) {
+func rationalPublicationDirectOwner(t *testing.T, synch bool) (*unumeral.RationalManager, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
-	m, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: false}}, Synchronized: synch})
+	m, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: false}}, Synchronized: synch})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -670,11 +671,11 @@ func rationalPublicationDirectOwner(t *testing.T, synch bool) (*util.RationalMan
 	})
 	return m, b
 }
-func sxOwner(t *testing.T, b *arena.Budget) (*util.SexprManager, *usymbol.Manager, *util.RationalService) {
+func sxOwner(t *testing.T, b *arena.Budget) (*util.SexprManager, *usymbol.Manager, *unumeral.RationalService) {
 	t.Helper()
 	s, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	sxMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 2}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{Budget: b, PageSize: 2}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 2}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{Budget: b, PageSize: 2}}}})
 	sxMust(t, e)
 	m, e := util.NewSexprManager(util.SexprConfig{Budget: b, PageSize: 2, Symbols: s, Rationals: q})
 	sxMust(t, e)
@@ -697,18 +698,18 @@ func internSymbol(t *testing.T, m *usymbol.Manager, text string) usymbol.Symbol 
 	return s
 }
 
-func sxNumber(t *testing.T, q *util.RationalService, text string) util.OwnedRational {
+func sxNumber(t *testing.T, q *unumeral.RationalService, text string) unumeral.OwnedRational {
 	v, e := q.NewValue()
 	sxMust(t, e)
 	sxMust(t, q.SetString(&v, text))
 	return v
 }
 
-func serviceAuditRationalRoots(t *testing.T, s *util.RationalService, values ...*util.Rational) {
+func serviceAuditRationalRoots(t *testing.T, s *unumeral.RationalService, values ...*unumeral.Rational) {
 	t.Helper()
-	roots := []*util.Int{}
-	add := func(q *util.Rational) { roots = append(roots, &q.Num, &q.Den) }
-	for _, q := range []*util.Rational{&s.ZeroField, &s.OneField, &s.MinusOneField, &s.InfZeroField.First, &s.InfZeroField.Second, &s.InfOneField.First, &s.InfOneField.Second, &s.InfMinusOneField.First, &s.InfMinusOneField.Second, &s.InfIntZeroField.First, &s.InfIntOneField.First, &s.InfIntMinusOneField.First} {
+	roots := []*unumeral.Int{}
+	add := func(q *unumeral.Rational) { roots = append(roots, &q.Num, &q.Den) }
+	for _, q := range []*unumeral.Rational{&s.ZeroField, &s.OneField, &s.MinusOneField, &s.InfZeroField.First, &s.InfZeroField.Second, &s.InfOneField.First, &s.InfOneField.Second, &s.InfMinusOneField.First, &s.InfMinusOneField.Second, &s.InfIntZeroField.First, &s.InfIntOneField.First, &s.InfIntMinusOneField.First} {
 		add(q)
 	}
 	for i := range s.Cache {
@@ -721,7 +722,7 @@ func serviceAuditRationalRoots(t *testing.T, s *util.RationalService, values ...
 	}
 	qopsAuditLiveOwnership(t, s.Manager, roots)
 }
-func serviceValue(t *testing.T, s *util.RationalService, text string) util.OwnedRational {
+func serviceValue(t *testing.T, s *unumeral.RationalService, text string) unumeral.OwnedRational {
 	t.Helper()
 	v, e := s.NewValue()
 	serviceMust(t, e)
@@ -729,10 +730,10 @@ func serviceValue(t *testing.T, s *util.RationalService, text string) util.Owned
 	return v
 }
 
-func qopsAuditLiveOwnership(t *testing.T, m *util.RationalManager, public []*util.Int) {
+func qopsAuditLiveOwnership(t *testing.T, m *unumeral.RationalManager, public []*unumeral.Int) {
 	t.Helper()
-	roots := append([]*util.Int(nil), public...)
-	scratch := []*util.Int{&m.NTmp, &m.AddTmp1, &m.AddTmp2, &m.AddMulTmp.Num, &m.AddMulTmp.Den, &m.LtTmp1.Num, &m.LtTmp1.Den, &m.LtTmp2.Num, &m.LtTmp2.Den}
+	roots := append([]*unumeral.Int(nil), public...)
+	scratch := []*unumeral.Int{&m.NTmp, &m.AddTmp1, &m.AddTmp2, &m.AddMulTmp.Num, &m.AddMulTmp.Den, &m.LtTmp1.Num, &m.LtTmp1.Den, &m.LtTmp2.Num, &m.LtTmp2.Den}
 	for _, n := range scratch {
 		if m.Synchronized && n.Cell != 0 && n.Cell != m.Z.FailedRef {
 			t.Fatal("local mode retained rational scratch")
@@ -775,10 +776,10 @@ func qopsMust(t *testing.T, e error) {
 	}
 }
 
-func mpzPublicationOwnerProfile(t *testing.T, profile umemory.SmallAllocatorProfile) (*util.IntegerManager, *arena.Budget) {
+func mpzPublicationOwnerProfile(t *testing.T, profile umemory.SmallAllocatorProfile) (*unumeral.IntegerManager, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 20)
-	m, err := util.NewIntegerManager(util.IntegerConfig{
+	m, err := unumeral.NewIntegerManager(unumeral.IntegerConfig{
 		Cells:   arena.Config{PageSize: 2, Budget: b},
 		Profile: profile,
 		Words:   arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}},

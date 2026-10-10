@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialSourceDestructorPrefixStopsAtRealMissingMember(t *testing.T) {
@@ -13,7 +13,7 @@ func TestPolynomialSourceDestructorPrefixStopsAtRealMissingMember(t *testing.T) 
 	term, e := m.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
 	for _, b := range [4]*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
-		a := util.NewInt(7)
+		a := unumeral.NewInt(7)
 		serviceMust(t, b.add(&a, term, false))
 	}
 	if e = m.SourceFinalizePrefix(); e != ErrPolynomialSourceMember {

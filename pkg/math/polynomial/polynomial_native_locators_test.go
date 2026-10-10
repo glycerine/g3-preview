@@ -1,9 +1,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Locator directories contain nonowning object references. Growing those Go
@@ -53,7 +52,7 @@ func TestPolynomialNativeLocatorGrowthAndGeneration(t *testing.T) {
 			budget.FailAfter(-1)
 			polynomialGrowth++
 		}
-		polys[i], e = m.MkTerms([]util.Int{util.NewInt(int32(i + 3))}, []Monomial{terms[i]})
+		polys[i], e = m.MkTerms([]unumeral.Int{unumeral.NewInt(int32(i + 3))}, []Monomial{terms[i]})
 		serviceMust(t, e)
 		serviceMust(t, m.IncRef(polys[i]))
 	}
@@ -69,7 +68,7 @@ func TestPolynomialNativeLocatorGrowthAndGeneration(t *testing.T) {
 		serviceMust(t, e)
 		power, e := mm.ReadPower(term, 0)
 		serviceMust(t, e)
-		if info.Size != 1 || info.RefCount != 1 || a != util.NewInt(int32(i+3)) || term != terms[i] || power != (MonomialPower{0, uint32(i + 1)}) {
+		if info.Size != 1 || info.RefCount != 1 || a != unumeral.NewInt(int32(i+3)) || term != terms[i] || power != (MonomialPower{0, uint32(i + 1)}) {
 			t.Fatal("native growth changed retained object", i, info, a, term, power)
 		}
 	}
@@ -77,7 +76,7 @@ func TestPolynomialNativeLocatorGrowthAndGeneration(t *testing.T) {
 	serviceMust(t, m.CleanupValue(&polys[0]))
 	term, e := mm.MkVariable(0, count+1)
 	serviceMust(t, e)
-	polys[0], e = m.MkTerms([]util.Int{util.NewInt(17)}, []Monomial{term})
+	polys[0], e = m.MkTerms([]unumeral.Int{unumeral.NewInt(17)}, []Monomial{term})
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(polys[0]))
 	if polys[0].slot != stalePoly.slot || polys[0].generation == stalePoly.generation || term.slot != staleTerm.slot || term.generation == staleTerm.generation {

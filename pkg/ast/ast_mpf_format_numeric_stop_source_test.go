@@ -6,8 +6,9 @@ package ast
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"math"
 	"reflect"
@@ -18,11 +19,11 @@ import (
 // the reached integer-part insertion. Every text operation still uses the
 // actual owned res/ss.str provider; no extra source NUM or allocation is added.
 type mpfFormatStopText struct {
-	*util.ArbitraryFloatFormatText
+	*unumeral.ArbitraryFloatFormatText
 	hook func()
 }
 type mpfFormatStopStream struct {
-	util.ArbitraryFloatFormatStream
+	unumeral.ArbitraryFloatFormatStream
 	hook func()
 }
 
@@ -35,14 +36,14 @@ func (s *mpfFormatStopStream) AppendInt32(n int32) error {
 	}
 	return e
 }
-func (t *mpfFormatStopText) NewArbitraryFloatFormatStream() (util.ArbitraryFloatFormatStream, error) {
+func (t *mpfFormatStopText) NewArbitraryFloatFormatStream() (unumeral.ArbitraryFloatFormatStream, error) {
 	s, e := t.ArbitraryFloatFormatText.NewArbitraryFloatFormatStream()
 	if e != nil {
 		return nil, e
 	}
 	return &mpfFormatStopStream{s, t.hook}, nil
 }
-func (t *mpfFormatStopText) AppendStreamString(s util.ArbitraryFloatFormatStream) error {
+func (t *mpfFormatStopText) AppendStreamString(s unumeral.ArbitraryFloatFormatStream) error {
 	return t.ArbitraryFloatFormatText.AppendStreamString(s.(*mpfFormatStopStream).ArbitraryFloatFormatStream)
 }
 
@@ -50,8 +51,8 @@ func TestASTCheckpointMPFFormatTextYoungerNumeralStopProtectsNonemptyResult(t *t
 	b := arena.NewBudget(1 << 28)
 	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	astTestMust(t, e)
-	config := util.IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: config})
+	config := unumeral.IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: config})
 	astTestMust(t, e)
 	symbols, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)
@@ -65,10 +66,10 @@ func TestASTCheckpointMPFFormatTextYoungerNumeralStopProtectsNonemptyResult(t *t
 	astTestMust(t, e)
 	p := parent.floatingPointPlugin
 	m := p.numeric
-	var a util.ArbitraryFloat
-	n := util.NewInt(1)
+	var a unumeral.ArbitraryFloat
+	n := unumeral.NewInt(1)
 	astTestMust(t, m.SetComponents(&a, 8, 260, true, 0, &n))
-	warm, e := util.NewArbitraryFloatFormatText(b)
+	warm, e := unumeral.NewArbitraryFloatFormatText(b)
 	astTestMust(t, e)
 	_, e = m.ToStringInto(&a, warm)
 	astTestMust(t, e)
@@ -76,7 +77,7 @@ func TestASTCheckpointMPFFormatTextYoungerNumeralStopProtectsNonemptyResult(t *t
 	external, e := rt.Allocate(200000)
 	astTestMust(t, e)
 	baseline := b.Used() - parent.Stats().AllocatedBytes - rt.Stats().TotalBytes
-	text, e := util.NewArbitraryFloatFormatText(b)
+	text, e := unumeral.NewArbitraryFloatFormatText(b)
 	astTestMust(t, e)
 	var release error
 	proxy := &mpfFormatStopText{ArbitraryFloatFormatText: text, hook: func() {

@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -24,7 +25,7 @@ func TestUPolynomialFactorSquareFreeActualCheckerSourceStop(t *testing.T) {
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	armed := false
 	var external umemory.Block
@@ -69,7 +70,7 @@ func TestUPolynomialFactorSquareFreeActualCheckerSourceStop(t *testing.T) {
 	}()
 	out, e := u.NewFactors()
 	serviceMust(t, e)
-	inputs := []util.Int{util.NewInt(0), util.NewInt(0), util.NewInt(1)}
+	inputs := []unumeral.Int{unumeral.NewInt(0), unumeral.NewInt(0), unumeral.NewInt(1)}
 	serviceMust(t, q.Integers().SetString(&inputs[0], "-387381625547900583942"))
 	serviceMust(t, q.Integers().SetString(&inputs[1], "-129127208515966861311"))
 	serviceMust(t, u.set(&inputState, inputs))
@@ -100,8 +101,8 @@ func TestUPolynomialFactorSquareFreeActualCheckerSourceStop(t *testing.T) {
 	if !errors.Is(body, cause) || !errors.Is(body, ErrUPolynomialCanceled) {
 		t.Fatal("body+source returned cause graph", body)
 	}
-	values := make([]util.Int, inputState.size)
-	roots := make([]*util.Int, len(values))
+	values := make([]unumeral.Int, inputState.size)
+	roots := make([]*unumeral.Int, len(values))
 	for i := range values {
 		v, x := u.read(u.stateView(&inputState), uint32(i))
 		serviceMust(t, x)

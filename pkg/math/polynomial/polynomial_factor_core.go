@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialFactorCoreInvocationReceipt struct {
@@ -15,7 +15,7 @@ type polynomialFactorCoreInvocationReceipt struct {
 	invocation uint64
 }
 type polynomialFactorCoreFrame struct {
-	callerBinding                                                util.NumericCallerBinding
+	callerBinding                                                unumeral.NumericCallerBinding
 	self                                                         *polynomialFactorCoreFrame
 	manager                                                      *MultivariatePolynomialManager
 	previous                                                     *polynomialFactorCoreFrame
@@ -28,7 +28,7 @@ type polynomialFactorCoreFrame struct {
 	references                                                   uint8
 	sourceRef, ownRef                                            uint8
 	sourceStarted, ownStarted, sourceNumeralDone, ownNumeralDone bool
-	numeral                                                      util.Int
+	numeral                                                      unumeral.Int
 	refs                                                         [7]polynomialReference // c,pp,C,C_prime,B,A,D
 	minimum                                                      *ScopedPolynomialMaxDegrees
 	child                                                        polynomialFactorCoreInvocationReceipt
@@ -426,7 +426,7 @@ func (m *MultivariatePolynomialManager) Factor(p Polynomial, r *PolynomialFactor
 		return e
 	}
 	if zero {
-		value := util.NewInt(0)
+		value := unumeral.NewInt(0)
 		return r.setConstantWithReceipt(&value, &m.factorInline)
 	}
 	constant, e := m.core.IsConstant(p)
@@ -636,7 +636,7 @@ func (m *MultivariatePolynomialManager) CleanupFactor() error {
 	}
 	return nil
 }
-func numericIntegerManager_factorCoreCallerExecuting(m *util.IntegerManager) bool {
+func numericIntegerManager_factorCoreCallerExecuting(m *unumeral.IntegerManager) bool {
 	if m == nil || !m.ValidOwner() {
 		return false
 	}

@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestMonomialFactoryAllocatorActualPhysicalPrefix(t *testing.T) {
@@ -160,7 +161,7 @@ func TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
 	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
@@ -170,7 +171,7 @@ func TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf(t *testing.T) {
 	serviceMust(t, e)
 	term, e := mm.MkVariable(0, 2)
 	serviceMust(t, e)
-	p, e := m.core.MkTerms([]util.Int{util.NewInt(3)}, []Monomial{term})
+	p, e := m.core.MkTerms([]unumeral.Int{unumeral.NewInt(3)}, []Monomial{term})
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(p))
 	pad := int64(99980) - rt.State().LocalSize - 8
@@ -216,7 +217,7 @@ func TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved(t *tes
 	b := arena.NewBudget(1 << 24)
 	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
@@ -226,7 +227,7 @@ func TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved(t *tes
 	serviceMust(t, e)
 	term, e := mm.MkVariable(0, 2)
 	serviceMust(t, e)
-	p, e := m.core.MkTerms([]util.Int{util.NewInt(3)}, []Monomial{term})
+	p, e := m.core.MkTerms([]unumeral.Int{unumeral.NewInt(3)}, []Monomial{term})
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(p))
 	pad := int64(99980) - rt.State().LocalSize - 8

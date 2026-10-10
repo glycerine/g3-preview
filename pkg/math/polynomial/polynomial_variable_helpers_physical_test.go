@@ -4,8 +4,8 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Independent named physical census; borrowed views are not owning roots.
@@ -38,7 +38,7 @@ func polynomialVariablePhysical(t *testing.T, m *MultivariatePolynomialCore, max
 	polynomialVariablePhysicalCore(t, m, nil, nil, nil, nil, polys, nil, external, fields, headers)
 	polynomialOperationMonomialAudit(t, m, polys, nil)
 }
-func polynomialVariablePhysicalCore(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []umemory.Block, degrees []*PolynomialVariableDegrees, extraColdHeaders uint64, public ...*util.Int) {
+func polynomialVariablePhysicalCore(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []umemory.Block, degrees []*PolynomialVariableDegrees, extraColdHeaders uint64, public ...*unumeral.Int) {
 	t.Helper()
 	// The current shared census retains exact cell validation, paired failure
 	// states and all actual pseudo/Power/ExactDiv scope roots. This wrapper adds

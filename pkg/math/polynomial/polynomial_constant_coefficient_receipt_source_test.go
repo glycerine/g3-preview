@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialConstantCoefficientReceiptActualSETLateTLSLeaf(t *testing.T) {
@@ -16,14 +17,14 @@ func TestPolynomialConstantCoefficientReceiptActualSETLateTLSLeaf(t *testing.T) 
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = runtime
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	c := m.core
 	_, e = c.monomials.MkVar()
 	serviceMust(t, e)
-	large := util.Int{}
+	large := unumeral.Int{}
 	limbs := make([]uint32, 32768)
 	limbs[0] = 17
 	limbs[len(limbs)-1] = 1
@@ -31,7 +32,7 @@ func TestPolynomialConstantCoefficientReceiptActualSETLateTLSLeaf(t *testing.T) 
 	p, e := c.MkConstantTakeCopy(&large)
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
-	out := util.NewInt(19)
+	out := unumeral.NewInt(19)
 	var receipt polynomialConstantCoefficientInvocationReceipt
 	serviceMust(t, runtime.SetMaxSize(1))
 	_, e = c.constantCoefficientWithReceipt(p, 0, 0, &out, &receipt)
@@ -44,7 +45,7 @@ func TestPolynomialConstantCoefficientReceiptActualSETLateTLSLeaf(t *testing.T) 
 	if roots[0] == (umemory.Block{}) || cell.Roots.Allocator[0] != roots[0] || cell.Roots.Cell.Object != (umemory.ObjectRef{}) {
 		t.Fatal("actual raw leaf before object publication", roots, cell.Roots)
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&large, &out}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&large, &out}, 0)
 	before, copyBefore, used, state, stats := *receipt.frame, *cell, b.Used(), runtime.State(), runtime.Stats()
 	rejected := receipt
 	_, e = c.constantCoefficientWithReceipt(p, 0, 0, &out, &rejected)
@@ -61,7 +62,7 @@ func TestPolynomialConstantCoefficientReceiptActualSETLateTLSLeaf(t *testing.T) 
 	serviceMust(t, runtime.SetMaxSize(0))
 	serviceMust(t, c.integer.Del(&out))
 	serviceMust(t, c.cleanupConstantCoefficientInvocation(&receipt, true))
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&large, &out}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&large, &out}, 0)
 	serviceMust(t, c.DecRef(p))
 	serviceMust(t, c.integer.Del(&large))
 	serviceMust(t, m.CloseChecked())

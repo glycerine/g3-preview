@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -21,10 +22,10 @@ func TestUPolynomialFactorFrontendRepeatedErasedSETWithRetainedRAW(t *testing.T)
 			fs, e := m.NewFactors()
 			serviceMust(t, e)
 			var input, singleton upolyVectorState
-			var b util.Int
+			var b unumeral.Int
 			serviceMust(t, z.Integers().SetLimbs(&b, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
-			serviceMust(t, m.set(&input, []util.Int{util.NewInt(1), b, util.NewInt(1)}))
-			serviceMust(t, m.set(&singleton, []util.Int{util.NewInt(0)}))
+			serviceMust(t, m.set(&input, []unumeral.Int{unumeral.NewInt(1), b, unumeral.NewInt(1)}))
+			serviceMust(t, m.set(&singleton, []unumeral.Int{unumeral.NewInt(0)}))
 			defer func() {
 				z.Budget().FailAfter(-1)
 				serviceMust(t, s.CleanupRetained())
@@ -35,7 +36,7 @@ func TestUPolynomialFactorFrontendRepeatedErasedSETWithRetainedRAW(t *testing.T)
 				m.freeBacking(&singleton)
 				serviceMust(t, z.Integers().Del(&b))
 			}()
-			roots := []*util.Int{&b}
+			roots := []*unumeral.Int{&b}
 			for i := range m.values(&input) {
 				roots = append(roots, &m.values(&input)[i])
 			}
@@ -84,9 +85,9 @@ func TestUPolynomialFactorFrontendErasedBIGSETOwnsActualPendingLeaf(t *testing.T
 			fs, e := m.NewFactors()
 			serviceMust(t, e)
 			var input upolyVectorState
-			var b util.Int
+			var b unumeral.Int
 			serviceMust(t, z.Integers().SetLimbs(&b, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
-			serviceMust(t, m.set(&input, []util.Int{b}))
+			serviceMust(t, m.set(&input, []unumeral.Int{b}))
 			defer func() {
 				z.Budget().FailAfter(-1)
 				serviceMust(t, s.CleanupRetained())
@@ -95,7 +96,7 @@ func TestUPolynomialFactorFrontendErasedBIGSETOwnsActualPendingLeaf(t *testing.T
 				m.freeBacking(&input)
 				serviceMust(t, z.Integers().Del(&b))
 			}()
-			roots := []*util.Int{&b, &m.values(&input)[0]}
+			roots := []*unumeral.Int{&b, &m.values(&input)[0]}
 			z.Budget().FailAfter(ordinal)
 			_, body := s.Factor(m.stateView(&input), fs, DefaultUPolynomialFactorParams())
 			primeTrialPhysicalAuditOwners(t, z, s, []*UPolynomialFactors{fs}, roots...)
@@ -161,9 +162,9 @@ func TestUPolynomialFactorFrontendConstantOldACKPreservesLaterPending(t *testing
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
 	var input upolyVectorState
-	var b util.Int
+	var b unumeral.Int
 	serviceMust(t, z.Integers().SetLimbs(&b, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
-	serviceMust(t, m.set(&input, []util.Int{b}))
+	serviceMust(t, m.set(&input, []unumeral.Int{b}))
 	defer func() {
 		z.Budget().FailAfter(-1)
 		serviceMust(t, s.CleanupRetained())
@@ -172,7 +173,7 @@ func TestUPolynomialFactorFrontendConstantOldACKPreservesLaterPending(t *testing
 		m.freeBacking(&input)
 		serviceMust(t, z.Integers().Del(&b))
 	}()
-	roots := []*util.Int{&b, &m.values(&input)[0]}
+	roots := []*unumeral.Int{&b, &m.values(&input)[0]}
 	acquire := func() *upolyFactorConstantCall {
 		for ordinal := int64(0); ordinal < 64; ordinal++ {
 			z.Budget().FailAfter(ordinal)
@@ -226,7 +227,7 @@ func TestUPolynomialFactorFrontendErasedFieldSETActualPNPrefixes(t *testing.T) {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			z, s := preparationPhysicalFixture(t)
 			m := s.manager
-			var modulus, value util.Int
+			var modulus, value unumeral.Int
 			words := make([]uint32, 17)
 			for i := 0; i < 16; i++ {
 				words[i] = 0xffffffff
@@ -239,7 +240,7 @@ func TestUPolynomialFactorFrontendErasedFieldSETActualPNPrefixes(t *testing.T) {
 			fs, e := m.NewFactors()
 			serviceMust(t, e)
 			var input upolyVectorState
-			serviceMust(t, m.set(&input, []util.Int{value}))
+			serviceMust(t, m.set(&input, []unumeral.Int{value}))
 			defer func() {
 				z.Budget().FailAfter(-1)
 				serviceMust(t, s.CleanupRetained())
@@ -250,7 +251,7 @@ func TestUPolynomialFactorFrontendErasedFieldSETActualPNPrefixes(t *testing.T) {
 				serviceMust(t, z.Integers().Del(&value))
 				serviceMust(t, z.Integers().Del(&modulus))
 			}()
-			roots := []*util.Int{&value, &modulus, &m.values(&input)[0]}
+			roots := []*unumeral.Int{&value, &modulus, &m.values(&input)[0]}
 			z.Budget().FailAfter(ordinal)
 			_, body := s.Factor(m.stateView(&input), fs, DefaultUPolynomialFactorParams())
 			primeTrialPhysicalAuditOwners(t, z, s, []*UPolynomialFactors{fs}, roots...)
@@ -294,7 +295,7 @@ func TestUPolynomialFactorFrontendConstantDirectLeafAfterIntegerSourceEnd(t *tes
 			cfg.Cells.PageSize = 1
 			cfg.Memory = rt
 			cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-			z, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+			z, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: z.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 			serviceMust(t, e)
@@ -304,12 +305,12 @@ func TestUPolynomialFactorFrontendConstantDirectLeafAfterIntegerSourceEnd(t *tes
 			serviceMust(t, e)
 			fs, e := m.NewFactors()
 			serviceMust(t, e)
-			var value util.Int
+			var value unumeral.Int
 			words := make([]uint32, 80)
 			words[79] = 1
 			serviceMust(t, z.Integers().SetLimbs(&value, words))
 			var input upolyVectorState
-			serviceMust(t, m.set(&input, []util.Int{value}))
+			serviceMust(t, m.set(&input, []unumeral.Int{value}))
 
 			defer func() {
 				budget.FailAfter(-1)
@@ -333,7 +334,7 @@ func TestUPolynomialFactorFrontendConstantDirectLeafAfterIntegerSourceEnd(t *tes
 					t.Error("source-end exact owner refunds", budget.Used())
 				}
 			}()
-			roots := []*util.Int{&value, &m.values(&input)[0]}
+			roots := []*unumeral.Int{&value, &m.values(&input)[0]}
 			z.Budget().FailAfter(ordinal)
 			_, body := s.Factor(m.stateView(&input), fs, DefaultUPolynomialFactorParams())
 			primeTrialPhysicalAuditOwners(t, z, s, []*UPolynomialFactors{fs}, roots...)
@@ -360,7 +361,7 @@ func TestUPolynomialFactorFrontendConstantDirectLeafAfterIntegerSourceEnd(t *tes
 			if e != nil {
 				t.Fatal("exact failed direct SET leaf not disposable after actual Integer source end", ordinal, e, savedCell)
 			}
-			if q.numeric.Cell != (util.SourceCellBacking{}) || q.bodyCause != savedBody || q.sourceCause != savedSource {
+			if q.numeric.Cell != (unumeral.SourceCellBacking{}) || q.bodyCause != savedBody || q.sourceCause != savedSource {
 				t.Fatal("source-end own ACK lost exact cause or retained physical leaf")
 			}
 			primeTrialPhysicalAuditOwners(t, z, s, nil)

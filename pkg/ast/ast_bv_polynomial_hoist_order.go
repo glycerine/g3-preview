@@ -2,7 +2,9 @@
 // src/ast/rewriter/bv_rewriter.h:36; src/util/rational.h:238-240,421-423.
 package ast
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+)
 
 func (m *ASTManager) BitVectorPolynomialHoistLess(left, right ASTHandle) (bool, error) {
 	return m.bitVectorPolynomialHoistLess(left, right, nil)
@@ -17,7 +19,7 @@ func (m *ASTManager) BitVectorPolynomialHoistLessWithInvocation(left, right ASTH
 	return m.bitVectorPolynomialHoistLess(left, right, c)
 }
 
-func (m *ASTManager) bitVectorPolynomialCoefficientProduct(t astNodeRef, coefficient *util.OwnedRational, c *util.RationalServiceInvocation) (bool, astNodeRef, error) {
+func (m *ASTManager) bitVectorPolynomialCoefficientProduct(t astNodeRef, coefficient *unumeral.OwnedRational, c *unumeral.RationalServiceInvocation) (bool, astNodeRef, error) {
 	mul, e := m.bitVectorAppKind(t, 6)
 	if e != nil || !mul {
 		return false, astNodeRef{}, e

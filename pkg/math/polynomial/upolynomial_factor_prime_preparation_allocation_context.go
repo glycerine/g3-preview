@@ -4,10 +4,10 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (c integerAllocationInvocationContext) primePreparationFrame(z *util.IntegerManager) *upolyFactorPrimePreparationScope {
+func (c integerAllocationInvocationContext) primePreparationFrame(z *unumeral.IntegerManager) *upolyFactorPrimePreparationScope {
 	q := c.primePreparation
 	if z == nil || !z.ValidOwner() || q == nil || !q.matches() || !q.active || (!q.executing && !q.sourceExecuting) || q.owner.constructed < 2 || c.primePreparationInvocation == 0 || c.primePreparationInvocation != q.invocation || q.owner.service.scope != q.owner || q.owner.manager.config.Integer != z {
 		return nil
@@ -26,7 +26,7 @@ func (c integerAllocationInvocationContext) primePreparationFrame(z *util.Intege
 	}
 	return q
 }
-func numericIntegerModularManager_primePreparationAllocationContext(m *util.IntegerModularManager, q *upolyFactorPrimePreparationScope) integerAllocationInvocationContext {
+func numericIntegerModularManager_primePreparationAllocationContext(m *unumeral.IntegerModularManager, q *upolyFactorPrimePreparationScope) integerAllocationInvocationContext {
 	if m == nil || !m.ValidOwner() || m.Integers() == nil || q == nil || !q.matches() {
 		return integerAllocationInvocationContext{}
 	}
@@ -40,7 +40,7 @@ func numericIntegerModularManager_primePreparationAllocationContext(m *util.Inte
 	}
 	return integerAllocationInvocationContext{}
 }
-func (q *upolyFactorPrimePreparationScope) normalizeReceipt(m *util.IntegerModularManager) *util.IntegerNormalizeInvocationReceipt {
+func (q *upolyFactorPrimePreparationScope) normalizeReceipt(m *unumeral.IntegerModularManager) *unumeral.IntegerNormalizeInvocationReceipt {
 	for i, owner := range q.managers() {
 		if owner != nil && owner.modular == m {
 			return &q.normalize[i]
@@ -49,17 +49,17 @@ func (q *upolyFactorPrimePreparationScope) normalizeReceipt(m *util.IntegerModul
 	return nil
 }
 
-func (c integerAllocationInvocationContext) recordPrimePreparationRaw(z *util.IntegerManager, r *util.IntegerRawInvocationReceipt) {
+func (c integerAllocationInvocationContext) recordPrimePreparationRaw(z *unumeral.IntegerManager, r *unumeral.IntegerRawInvocationReceipt) {
 	q := c.primePreparationFrame(z)
 	if q == nil || !z.MatchesRawInvocation(r) {
 		return
 	}
 	switch r.Kind() {
-	case util.IntegerRawDivision:
+	case unumeral.IntegerRawDivision:
 		q.divisionRaw = *r
-	case util.IntegerRawExtendedGCD:
+	case unumeral.IntegerRawExtendedGCD:
 		q.extendedRaw = *r
-	case util.IntegerRawGCD:
+	case unumeral.IntegerRawGCD:
 		q.gcdRaw = *r
 	}
 }

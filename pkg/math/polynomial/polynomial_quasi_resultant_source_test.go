@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialQuasiResultantLiteralBoundedChains(t *testing.T) {
@@ -269,11 +269,11 @@ func TestPolynomialQuasiResultantBIGEveryReservationAndOwnedRetry(t *testing.T) 
 		t.Run(fmt.Sprint(prefix), func(t *testing.T) {
 			m := polynomialPSCFullFixture(t)
 			c := m.core
-			var big util.Int
+			var big unumeral.Int
 			serviceMust(t, c.integer.SetLimbs(&big, []uint32{17, 1 << 30, 1 << 16}))
 			term, e := c.monomials.MkMonomial([]MonomialPower{{0, 3}})
 			serviceMust(t, e)
-			raw, e := c.MkTerms([]util.Int{big, util.NewInt(1)}, []Monomial{term, c.monomials.unit})
+			raw, e := c.MkTerms([]unumeral.Int{big, unumeral.NewInt(1)}, []Monomial{term, c.monomials.unit})
 			serviceMust(t, e)
 			p := polynomialCaller(t, c, raw)
 			serviceMust(t, c.integer.Del(&big))

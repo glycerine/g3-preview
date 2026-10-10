@@ -4,8 +4,8 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower(t *testing.T) {
@@ -17,14 +17,14 @@ func TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower(t *testing.T) 
 	serviceMust(t, e)
 	foreignOut, e := NewPolynomialRef(m)
 	serviceMust(t, e)
-	var big util.Int
+	var big unumeral.Int
 	limbs := make([]uint32, 33)
 	limbs[0] = 17
 	limbs[32] = 1
 	serviceMust(t, m.integer.SetLimbs(&big, limbs))
 	term, e := m.monomials.MkVariable(2, 17)
 	serviceMust(t, e)
-	foreign, e := m.MkTerms([]util.Int{big, util.NewInt(1)}, []Monomial{term, m.monomials.unit})
+	foreign, e := m.MkTerms([]unumeral.Int{big, unumeral.NewInt(1)}, []Monomial{term, m.monomials.unit})
 	serviceMust(t, e)
 	polynomialCaller(t, m, foreign)
 

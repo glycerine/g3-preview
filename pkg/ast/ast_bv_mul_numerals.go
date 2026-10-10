@@ -3,9 +3,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorMultiplicationNumerals owns the reached default v and exact
@@ -13,8 +12,8 @@ import (
 type BitVectorMultiplicationNumerals struct {
 	self                           *BitVectorMultiplicationNumerals
 	manager                        *ASTManager
-	value                          util.OwnedRational
-	scalar                         util.RationalServiceInvocation
+	value                          unumeral.OwnedRational
+	scalar                         unumeral.RationalServiceInvocation
 	zero                           ASTBitVectorNumeralInvocation
 	header                         uint64
 	sourceCause                    error
@@ -74,7 +73,7 @@ func (n *BitVectorMultiplicationNumerals) ReadPower(arg ASTHandle) (yes bool, wi
 	if result = n.scalar.EndContext(); result != nil {
 		return
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	if yes {
 		yes, shift, result = n.manager.numerals.IsPowerOfTwo(&n.value)
 	}

@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func polynomialPseudoOutputs(t *testing.T, m *MultivariatePolynomialCore) (*PolynomialRef, *PolynomialRef) {
@@ -136,7 +137,7 @@ func TestPolynomialPseudoRemainderSourceDebugIdentityAndOutputAlias(t *testing.T
 	}
 }
 
-func polynomialPseudoPhysical(t *testing.T, m *MultivariatePolynomialCore, q, r *PolynomialRef, polys []Polynomial, public ...*util.Int) {
+func polynomialPseudoPhysical(t *testing.T, m *MultivariatePolynomialCore, q, r *PolynomialRef, polys []Polynomial, public ...*unumeral.Int) {
 	t.Helper()
 	refs := []*PolynomialRef{r}
 	if q != nil {
@@ -279,7 +280,7 @@ func TestPolynomialPseudoDivisionReverseDestructionRefusal(t *testing.T) {
 	config := serviceConfig(b).Integers
 	config.Memory = runtime
 	config.Profile = umemory.SmallAllocatorProfile{PointerBits: 32}
-	rational, e := util.NewRationalManager(util.RationalConfig{Integers: config})
+	rational, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: config})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: runtime, Profile: umemory.SmallAllocatorProfile{PointerBits: 32}})
 	serviceMust(t, e)
@@ -288,7 +289,7 @@ func TestPolynomialPseudoDivisionReverseDestructionRefusal(t *testing.T) {
 	serviceMust(t, e)
 	_, e = mm.MkVar()
 	serviceMust(t, e)
-	big := util.Int{}
+	big := unumeral.Int{}
 	serviceMust(t, m.integer.SetLimbs(&big, []uint32{17, 0, 0, 1}))
 	x2, e := mm.MkVariable(0, 2)
 	serviceMust(t, e)
@@ -296,18 +297,18 @@ func TestPolynomialPseudoDivisionReverseDestructionRefusal(t *testing.T) {
 	serviceMust(t, e)
 	unit, e := mm.Unit()
 	serviceMust(t, e)
-	p, e := m.MkTerms([]util.Int{big, util.NewInt(1)}, []Monomial{x2, unit})
+	p, e := m.MkTerms([]unumeral.Int{big, unumeral.NewInt(1)}, []Monomial{x2, unit})
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(p))
-	divisor, e := m.MkTerms([]util.Int{util.NewInt(2), big}, []Monomial{x, unit})
+	divisor, e := m.MkTerms([]unumeral.Int{unumeral.NewInt(2), big}, []Monomial{x, unit})
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(divisor))
 	q, e := NewPolynomialRef(m)
 	serviceMust(t, e)
 	r, e := NewPolynomialRef(m)
 	serviceMust(t, e)
-	var token util.NumericCellRef
-	var original util.NumericCell
+	var token unumeral.NumericCellRef
+	var original unumeral.NumericCell
 	defer func() {
 		if token != 0 && m.integer.IsLiveCellToken(uint64(token)) {
 			cell := m.integer.Cell(token)
@@ -331,7 +332,7 @@ func TestPolynomialPseudoDivisionReverseDestructionRefusal(t *testing.T) {
 	visits := uint32(0)
 	var leading Polynomial
 	var before uint32
-	var numeral util.Int
+	var numeral unumeral.Int
 	m.config.Checkpoint = func() bool {
 		visits++
 		if visits != 2 {

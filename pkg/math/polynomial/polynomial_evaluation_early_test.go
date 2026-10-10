@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialEvaluationEarlyRoutesLeaveRetainedInvocationUntouched(t *testing.T) {
@@ -15,22 +16,22 @@ func TestPolynomialEvaluationEarlyRoutesLeaveRetainedInvocationUntouched(t *test
 	q := s.Manager
 	m, _, _ := polynomialEvalFixtureWithRationals(t, q, []polynomialEvalTerm{{1, [3]uint32{}}})
 	p := polynomialLexWrappedPolynomial(t, m)
-	bounds, e := util.NewBinaryRationalManager(q.Z, util.BinaryRationalConfig{Diagnostics: s})
+	bounds, e := unumeral.NewBinaryRationalManager(q.Z, unumeral.BinaryRationalConfig{Diagnostics: s})
 	serviceMust(t, e)
 	t.Cleanup(bounds.Close)
-	vm, e := util.NewBinaryIntervalManager(bounds)
+	vm, e := unumeral.NewBinaryIntervalManager(bounds)
 	serviceMust(t, e)
 	t.Cleanup(vm.Close)
 	v := polynomialEvalRationalMap{manager: q}
 	for i := range v.values {
-		v.values[i] = util.NewRational()
+		v.values[i] = unumeral.NewRational()
 		serviceMust(t, q.SetInt32(&v.values[i], 2))
 	}
-	output := util.NewRational()
+	output := unumeral.NewRational()
 	e = m.EvaluateRational(p, &v, &output)
 	// Audit the retained bounds stop before exercising early result branches.
 	iv := polynomialEvalIntervalMap{manager: vm}
-	io := util.NewBinaryInterval()
+	io := unumeral.NewBinaryInterval()
 	defer func() {
 		q.BudgetField.FailAfter(-1)
 		serviceMust(t, m.CleanupEvaluation())
@@ -52,23 +53,23 @@ func TestPolynomialEvaluationEarlyRoutesLeaveRetainedInvocationUntouched(t *test
 
 	lex, groups, cell, raw := m.evaluation.lexGeneration, m.evaluation.groups, m.evaluation.numericPending, m.evaluation.allocatorPending
 	oldCause := m.evaluation.bodyCause
-	early := util.NewRational()
+	early := unumeral.NewRational()
 	serviceMust(t, q.SetInt32(&early, 19))
 	serviceMust(t, m.EvaluateRational(m.core.zero, &v, &early))
-	if early != util.NewRational() {
+	if early != unumeral.NewRational() {
 		t.Fatal("source zero reset", early)
 	}
 	serviceMust(t, m.EvaluateRational(m.core.unit, &v, &early))
-	if (*early.BorrowNumerator()) != util.NewInt(1) || (*early.BorrowDenominator()) != util.NewInt(1) {
+	if (*early.BorrowNumerator()) != unumeral.NewInt(1) || (*early.BorrowDenominator()) != unumeral.NewInt(1) {
 		t.Fatal("source constant set", early)
 	}
 	serviceMust(t, vm.SetInteger(&io, &(*early.BorrowNumerator())))
 	serviceMust(t, m.EvaluateInterval(m.core.zero, &iv, &io))
-	if (*(*io.BorrowLower()).BorrowNumerator()) != util.NewInt(0) || (*(*io.BorrowUpper()).BorrowNumerator()) != util.NewInt(0) {
+	if (*(*io.BorrowLower()).BorrowNumerator()) != unumeral.NewInt(0) || (*(*io.BorrowUpper()).BorrowNumerator()) != unumeral.NewInt(0) {
 		t.Fatal("source interval zero reset")
 	}
 	serviceMust(t, m.EvaluateInterval(m.core.unit, &iv, &io))
-	if (*(*io.BorrowLower()).BorrowNumerator()) != util.NewInt(1) || (*(*io.BorrowUpper()).BorrowNumerator()) != util.NewInt(1) {
+	if (*(*io.BorrowLower()).BorrowNumerator()) != unumeral.NewInt(1) || (*(*io.BorrowUpper()).BorrowNumerator()) != unumeral.NewInt(1) {
 		t.Fatal("source interval constant set")
 	}
 	if !m.evaluation.active || m.evaluation.lexGeneration != lex || m.evaluation.groups != groups || m.evaluation.numericPending != cell || m.evaluation.allocatorPending != raw || m.evaluation.bodyCause != oldCause {
@@ -93,21 +94,21 @@ func TestPolynomialEvaluationEarlyCopyCapturesOnlyNewPhysicalRoots(t *testing.T)
 			q := m.core.config.Rationals
 			digits := make([]uint32, 80)
 			digits[0], digits[79] = 3, 1
-			coefficient := util.Int{}
+			coefficient := unumeral.Int{}
 			serviceMust(t, q.Integers().SetLimbs(&coefficient, digits))
 			constant, e := m.core.MkConstantTake(&coefficient)
 			serviceMust(t, e)
 			serviceMust(t, m.core.IncRef(constant))
 			v := polynomialEvalRationalMap{manager: q}
 			for i := range v.values {
-				v.values[i] = util.NewRational()
+				v.values[i] = unumeral.NewRational()
 				serviceMust(t, q.SetInt32(&v.values[i], 2))
 			}
-			oldOutput, out := util.NewRational(), util.NewRational()
+			oldOutput, out := unumeral.NewRational(), unumeral.NewRational()
 			// This real caller coefficient occupies the remaining descriptor on
 			// the two-slot cold page, so a later Copy reaches page reservation
 			// after its physical numeric object has actually been allocated.
-			holder := util.Int{}
+			holder := unumeral.Int{}
 			serviceMust(t, q.Integers().SetLimbs(&holder, digits))
 			defer func() {
 				q.Budget().FailAfter(-1)
@@ -120,7 +121,7 @@ func TestPolynomialEvaluationEarlyCopyCapturesOnlyNewPhysicalRoots(t *testing.T)
 				}
 				serviceMust(t, m.core.CleanupValue(&constant))
 			}()
-			inputs := []*util.Int{&holder, &(*oldOutput.BorrowNumerator()), &(*oldOutput.BorrowDenominator()), &(*out.BorrowNumerator()), &(*out.BorrowDenominator())}
+			inputs := []*unumeral.Int{&holder, &(*oldOutput.BorrowNumerator()), &(*oldOutput.BorrowDenominator()), &(*out.BorrowNumerator()), &(*out.BorrowDenominator())}
 			for i := range v.values {
 				inputs = append(inputs, &(*v.values[i].BorrowNumerator()), &(*v.values[i].BorrowDenominator()))
 			}

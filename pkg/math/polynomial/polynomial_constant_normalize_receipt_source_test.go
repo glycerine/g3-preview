@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf(t *testing.T) {
@@ -16,14 +17,14 @@ func TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf(t *testing.T
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = runtime
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	c := m.core
 	_, e = c.monomials.MkVar()
 	serviceMust(t, e)
-	large := util.Int{}
+	large := unumeral.Int{}
 	limbs := make([]uint32, 128)
 	limbs[0] = 17
 	limbs[len(limbs)-1] = 1
@@ -43,7 +44,7 @@ func TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf(t *testing.T
 	}
 	external, e := runtime.Allocate(uint64(pad))
 	serviceMust(t, e)
-	out := util.NewInt(19)
+	out := unumeral.NewInt(19)
 	var receipt polynomialConstantCoefficientInvocationReceipt
 	defer func() {
 		serviceMust(t, runtime.SetMaxSize(0))
@@ -73,7 +74,7 @@ func TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf(t *testing.T
 	if roots[0] == (umemory.Block{}) || c.integer.PendingAllocationObject() != (umemory.ObjectRef{}) {
 		t.Fatal("actual new raw scratch before cell publication", roots)
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, []*util.Int{&large, &out}, 0, []umemory.Block{external})
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, []*unumeral.Int{&large, &out}, 0, []umemory.Block{external})
 	if !c.matchesConstantCoefficientInvocation(&receipt) {
 		t.Fatal("ConstantCoefficient receipt lost reached PNormalize scratch acquisition")
 	}
@@ -90,7 +91,7 @@ func TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf(t *testing.T
 	if remaining[0] != (umemory.Block{}) || c.matchesConstantCoefficientInvocation(&receipt) {
 		t.Fatal("exact reached Normalize leaf remains owned")
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, []*util.Int{&large, &out}, 0, []umemory.Block{external})
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, []*unumeral.Int{&large, &out}, 0, []umemory.Block{external})
 }
 
 func TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix(t *testing.T) {
@@ -101,14 +102,14 @@ func TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix(t *t
 		serviceMust(t, e)
 		cfg := serviceConfig(b).Integers
 		cfg.Memory = rt
-		q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+		q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 		serviceMust(t, e)
 		m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 		serviceMust(t, e)
 		c := m.core
 		_, e = c.monomials.MkVar()
 		serviceMust(t, e)
-		var large util.Int
+		var large unumeral.Int
 		digits := make([]uint32, 128)
 		digits[0] = 17
 		digits[127] = 1
@@ -117,13 +118,13 @@ func TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix(t *t
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(p))
 		serviceMust(t, c.modular.SetZPUint64(251))
-		out := util.NewInt(19)
+		out := unumeral.NewInt(19)
 		var receipt polynomialConstantCoefficientInvocationReceipt
 		b.FailAfter(int64(n))
 		constant, callError := c.constantCoefficientWithReceipt(p, 0, 0, &out, &receipt)
 		// Every refusal's literal published prefix is audited while injection remains
 		// active, including shared scratch and any unfinished lexical constructor.
-		polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, []*util.Int{&large, &out}, 0, nil)
+		polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, []*unumeral.Int{&large, &out}, 0, nil)
 		if callError == nil {
 			var value uint64
 			for i := len(digits) - 1; i >= 0; i-- {
@@ -141,7 +142,7 @@ func TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix(t *t
 		serviceMust(t, c.cleanupConstantCoefficientInvocation(&receipt, false))
 		serviceMust(t, c.deleteNumeral(&out))
 		serviceMust(t, c.cleanupConstantCoefficientInvocation(&receipt, true))
-		polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, []*util.Int{&large, &out}, 0, nil)
+		polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, []*unumeral.Int{&large, &out}, 0, nil)
 		b.FailAfter(-1)
 		serviceMust(t, c.DecRef(p))
 		serviceMust(t, c.integer.Del(&large))

@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialSOMStoppedCalleeReplacementIdentity(t *testing.T) {
@@ -16,10 +15,10 @@ func TestPolynomialSOMStoppedCalleeReplacementIdentity(t *testing.T) {
 	serviceMust(t, e)
 	x, e := m.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
-	p, e := m.MkTerms([]util.Int{util.NewInt(3)}, []Monomial{x})
+	p, e := m.MkTerms([]unumeral.Int{unumeral.NewInt(3)}, []Monomial{x})
 	serviceMust(t, e)
 	polynomialCaller(t, m, p)
-	a := util.NewInt(2)
+	a := unumeral.NewInt(2)
 	m.integer.Budget().FailAfter(0)
 	e = b.AddMul(&a, x, p)
 	if !numericPhysicalReservationRefusal(e) || !b.calleeCall {

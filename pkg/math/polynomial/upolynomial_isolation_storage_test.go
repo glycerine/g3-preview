@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialIsolationPackedFrameFields(t *testing.T) {
@@ -26,9 +26,9 @@ func TestUPolynomialBinaryVectorActualAscendingDestruction(t *testing.T) {
 	b, budget := binaryManager(t)
 	v, e := numericBinaryRationalManager_NewVector(b)
 	serviceMust(t, e)
-	var input util.Int
+	var input unumeral.Int
 	serviceMust(t, b.Integers().SetLimbs(&input, []uint32{37, 11, 1}))
-	a := util.NewBinaryRational()
+	a := unumeral.NewBinaryRational()
 	serviceMust(t, b.SetIntegerPower(&a, &input, 9))
 	serviceMust(t, b.Integers().Del(&input))
 	for i := 0; i < 3; i++ {
@@ -37,14 +37,14 @@ func TestUPolynomialBinaryVectorActualAscendingDestruction(t *testing.T) {
 	serviceMust(t, b.Del(&a))
 	slots := [3]arena.Slot{}
 	for i := range slots {
-		slots[i] = util.NumericSlot((*v.state.values[i].BorrowNumerator()).Cell)
+		slots[i] = unumeral.NumericSlot((*v.state.values[i].BorrowNumerator()).Cell)
 	}
 	serviceMust(t, v.Reset())
-	var probes [3]util.Int
+	var probes [3]unumeral.Int
 	for i := range probes {
 		serviceMust(t, b.Integers().SetLimbs(&probes[i], []uint32{37, 11, 1}))
-		if util.NumericSlot((probes[i]).Cell) != slots[2-i] {
-			t.Fatal("actual ascending reset", slots, util.NumericSlot((probes[i]).Cell))
+		if unumeral.NumericSlot((probes[i]).Cell) != slots[2-i] {
+			t.Fatal("actual ascending reset", slots, unumeral.NumericSlot((probes[i]).Cell))
 		}
 	}
 	for i := range probes {
@@ -68,9 +68,9 @@ func TestUPolynomialBinaryVectorActualAscendingDestruction(t *testing.T) {
 func TestUPolynomialIsolationSSPopAndDestructorActualOrder(t *testing.T) {
 	b, _ := binaryManager(t)
 	var s upolySSStack
-	var input util.Int
+	var input unumeral.Int
 	serviceMust(t, b.Integers().SetLimbs(&input, []uint32{17, 7, 1}))
-	a := util.NewBinaryRational()
+	a := unumeral.NewBinaryRational()
 	serviceMust(t, b.SetInteger(&a, &input))
 	serviceMust(t, b.Integers().Del(&input))
 	var slots [6]arena.Slot
@@ -79,24 +79,24 @@ func TestUPolynomialIsolationSSPopAndDestructorActualOrder(t *testing.T) {
 		serviceMust(t, e)
 		serviceMust(t, b.Copy(&f.lower, &a))
 		serviceMust(t, b.Copy(&f.upper, &a))
-		slots[2*i] = util.NumericSlot((*f.lower.BorrowNumerator()).Cell)
-		slots[2*i+1] = util.NumericSlot((*f.upper.BorrowNumerator()).Cell)
+		slots[2*i] = unumeral.NumericSlot((*f.lower.BorrowNumerator()).Cell)
+		slots[2*i+1] = unumeral.NumericSlot((*f.upper.BorrowNumerator()).Cell)
 	}
 	serviceMust(t, b.Del(&a))
 	serviceMust(t, numericBinaryRationalManager_popSS(b, &s))
-	var popped [2]util.Int
+	var popped [2]unumeral.Int
 	for i := range popped {
 		serviceMust(t, b.Integers().SetLimbs(&popped[i], []uint32{17, 7, 1}))
-		if util.NumericSlot((popped[i]).Cell) != slots[5-i] {
-			t.Fatal("source pop lower then upper", i, slots, util.NumericSlot((popped[i]).Cell))
+		if unumeral.NumericSlot((popped[i]).Cell) != slots[5-i] {
+			t.Fatal("source pop lower then upper", i, slots, unumeral.NumericSlot((popped[i]).Cell))
 		}
 	}
 	numericBinaryRationalManager_dropSS(b, &s)
-	var remainder [4]util.Int
+	var remainder [4]unumeral.Int
 	for i := range remainder {
 		serviceMust(t, b.Integers().SetLimbs(&remainder[i], []uint32{17, 7, 1}))
-		if util.NumericSlot((remainder[i]).Cell) != slots[3-i] {
-			t.Fatal("ascending frame destructor lower then upper", i, slots, util.NumericSlot((remainder[i]).Cell))
+		if unumeral.NumericSlot((remainder[i]).Cell) != slots[3-i] {
+			t.Fatal("ascending frame destructor lower then upper", i, slots, unumeral.NumericSlot((remainder[i]).Cell))
 		}
 	}
 	for i := range popped {

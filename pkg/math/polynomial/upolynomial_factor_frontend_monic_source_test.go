@@ -3,10 +3,9 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialFactorFrontendActualMonicEndOnly(t *testing.T) {
@@ -15,7 +14,7 @@ func TestUPolynomialFactorFrontendActualMonicEndOnly(t *testing.T) {
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
 	var input upolyVectorState
-	serviceMust(t, m.set(&input, []util.Int{util.NewInt(1), util.NewInt(1), util.NewInt(0), util.NewInt(1)}))
+	serviceMust(t, m.set(&input, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1), unumeral.NewInt(0), unumeral.NewInt(1)}))
 	defer func() {
 		z.Budget().FailAfter(-1)
 		serviceMust(t, s.CleanupRetained())
@@ -29,7 +28,7 @@ func TestUPolynomialFactorFrontendActualMonicEndOnly(t *testing.T) {
 	if q.invocation == 0 || !q.endEntered || q.sourceIndex != 2 || q.active {
 		t.Fatal("actual field Euclid did not capture plain RAW monic successful ascending end DEL", q.invocation, q.endEntered, q.sourceIndex, q.active)
 	}
-	var caller []*util.Int
+	var caller []*unumeral.Int
 	for i := range m.values(&input) {
 		caller = append(caller, &m.values(&input)[i])
 	}
@@ -42,7 +41,7 @@ func TestUPolynomialFactorFrontendCopiedSubscopeOwnerRefused(t *testing.T) {
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
 	var input upolyVectorState
-	serviceMust(t, m.set(&input, []util.Int{util.NewInt(1), util.NewInt(1), util.NewInt(0), util.NewInt(1)}))
+	serviceMust(t, m.set(&input, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1), unumeral.NewInt(0), unumeral.NewInt(1)}))
 	defer func() {
 		z.Budget().FailAfter(-1)
 		serviceMust(t, s.CleanupRetained())

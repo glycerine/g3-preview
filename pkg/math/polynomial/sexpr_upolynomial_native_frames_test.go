@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestSexprPolynomialNativeFramesNestedBIGOwnership(t *testing.T) {
@@ -15,7 +16,7 @@ func TestSexprPolynomialNativeFramesNestedBIGOwnership(t *testing.T) {
 		expr = sxPolyApp(t, sx, sy, "+", x, expr)
 	}
 	z := p.IntegerManager()
-	var expected util.Int
+	var expected unumeral.Int
 	sxMust(t, z.SetLimbs(&expected, []uint32{1, 0, 1 << 16}))
 	defer func() { sxMust(t, z.Del(&expected)) }()
 	for run := 0; run < 2; run++ {
@@ -23,7 +24,7 @@ func TestSexprPolynomialNativeFramesNestedBIGOwnership(t *testing.T) {
 		if n, e := p.Size(out); e != nil || n != 2 {
 			t.Fatal("independent nested sum degree", n, e)
 		}
-		var constant, coefficient util.Int
+		var constant, coefficient unumeral.Int
 		sxMust(t, p.ReadCoefficient(out, 0, &constant))
 		sxMust(t, p.ReadCoefficient(out, 1, &coefficient))
 		same, e := z.Compare(&constant, &expected)
@@ -43,6 +44,6 @@ func TestSexprPolynomialNativeFramesNestedBIGOwnership(t *testing.T) {
 				t.Fatal("completed lexical frame retained owning vector", i, frame)
 			}
 		}
-		upolyHenselAuditPhysical(t, []*UPolynomialManager{p}, nil, upolyPhysicalExtraOwners{Integers: []*util.Int{&expected}, RationalServices: []*util.RationalService{q}, SexprManagers: []*util.SexprManager{sx}})
+		upolyHenselAuditPhysical(t, []*UPolynomialManager{p}, nil, upolyPhysicalExtraOwners{Integers: []*unumeral.Int{&expected}, RationalServices: []*unumeral.RationalService{q}, SexprManagers: []*util.SexprManager{sx}})
 	}
 }

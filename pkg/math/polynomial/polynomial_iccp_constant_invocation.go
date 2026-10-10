@@ -6,8 +6,9 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This embedded cold continuation names only the reached SET invocation. The
@@ -16,7 +17,7 @@ type polynomialICCPConstantScope struct {
 	invocation                           uint64
 	active, executing                    bool
 	numeric                              polynomialNumericRoots
-	normalize                            util.IntegerNormalizeInvocationReceipt
+	normalize                            unumeral.IntegerNormalizeInvocationReceipt
 	directReceipt                        polynomialICCPConstantInvocationReceipt
 	bodyCause, sourceCause, cleanupCause error
 }
@@ -29,14 +30,14 @@ type polynomialICCPConstantInvocationReceipt struct {
 func (m *MultivariatePolynomialManager) hasICCPConstantHistory(r *polynomialICCPConstantInvocationReceipt) bool {
 	return m != nil && m.self == m && r != nil && r.manager == m && r.frame == &m.iccpConstant && r.invocation != 0 && r.frame.invocation == r.invocation
 }
-func numericIntegerManager_iccpConstantContextRoots(m *util.IntegerManager, context integerAllocationInvocationContext) *polynomialNumericRoots {
+func numericIntegerManager_iccpConstantContextRoots(m *unumeral.IntegerManager, context integerAllocationInvocationContext) *polynomialNumericRoots {
 	r := context.iccpConstant
 	if m == nil || !m.ValidOwner() || r == nil || r.manager == nil || r.manager.core == nil || r.manager.core.self != r.manager.core || r.manager.core.integer != m || !r.manager.hasICCPConstantHistory(r) || context.iccpConstantInvocation == 0 || context.iccpConstantInvocation != r.invocation || !r.frame.active || !r.frame.executing || r.manager.core.callbackDepth != 0 {
 		return nil
 	}
 	return &r.frame.numeric
 }
-func (m *MultivariatePolynomialManager) iccpConstantSET(i, a *util.Int, parent *polynomialICCPInvocationReceipt) (err error) {
+func (m *MultivariatePolynomialManager) iccpConstantSET(i, a *unumeral.Int, parent *polynomialICCPInvocationReceipt) (err error) {
 	c := m.core
 	if e := c.modular.Check(); e != nil {
 		return e
@@ -97,7 +98,7 @@ func (m *MultivariatePolynomialManager) cleanupICCPConstantInvocation(r *polynom
 	return nil
 }
 
-func numericIntegerModularManager_iccpConstantAllocationContext(m *util.IntegerModularManager, r *polynomialICCPConstantInvocationReceipt) integerAllocationInvocationContext {
+func numericIntegerModularManager_iccpConstantAllocationContext(m *unumeral.IntegerModularManager, r *polynomialICCPConstantInvocationReceipt) integerAllocationInvocationContext {
 	context := integerAllocationInvocationContext{}
 	if m == nil || m.Integers() == nil || r == nil || r.manager == nil || r.manager.core == nil || r.manager.core.modular != m {
 		return context
@@ -108,6 +109,6 @@ func numericIntegerModularManager_iccpConstantAllocationContext(m *util.IntegerM
 	}
 	return context
 }
-func numericIntegerModularManager_copyWithICCPConstantReceipt(m *util.IntegerModularManager, out, a *util.Int, r *polynomialICCPConstantInvocationReceipt) error {
+func numericIntegerModularManager_copyWithICCPConstantReceipt(m *unumeral.IntegerModularManager, out, a *unumeral.Int, r *polynomialICCPConstantInvocationReceipt) error {
 	return m.WithAllocationContext((numericIntegerModularManager_iccpConstantAllocationContext(m, r)).utility(m.Integers())).Copy(out, a)
 }

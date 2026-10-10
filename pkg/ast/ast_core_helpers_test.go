@@ -4,7 +4,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -14,12 +15,12 @@ func astTestMust(t *testing.T, e error) {
 		t.Fatal(e)
 	}
 }
-func astTestOwners(t *testing.T) (*usymbol.Manager, *util.RationalService, *arena.Budget) {
+func astTestOwners(t *testing.T) (*usymbol.Manager, *unumeral.RationalService, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)
 	s, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	astTestMust(t, e)
 	t.Cleanup(func() {
 		astTestMust(t, q.Close())

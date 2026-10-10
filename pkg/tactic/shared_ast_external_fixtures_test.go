@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func astTestManager(t *testing.T) *ast.ASTManager {
@@ -37,12 +37,12 @@ func astTestPin(t *testing.T, m *ast.ASTManager, h ast.ASTHandle) ast.ASTRef {
 	t.Cleanup(func() { astTestMust(t, m.DelRef(&r)) })
 	return r
 }
-func astTestOwners(t *testing.T) (*usymbol.Manager, *util.RationalService, *arena.Budget) {
+func astTestOwners(t *testing.T) (*usymbol.Manager, *unumeral.RationalService, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)
 	s, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	astTestMust(t, e)
 	t.Cleanup(func() {
 		astTestMust(t, q.Close())

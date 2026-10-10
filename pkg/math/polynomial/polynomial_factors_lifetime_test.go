@@ -8,17 +8,18 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialFactorsCallbackState struct {
 	target          Polynomial
-	source, foreign util.Int
+	source, foreign unumeral.Int
 	calls           uint32
 	power           bool
 	foreignFactory  bool
-	foreignScalar   util.Int
+	foreignScalar   unumeral.Int
 }
 
 var polynomialFactorsCallback *polynomialFactorsCallbackState
@@ -42,7 +43,7 @@ func polynomialFactorsDeletionCopy(h *PolynomialDeletionHandler, m *Multivariate
 }
 func TestPolynomialFactorsResetActualConsumedDrop(t *testing.T) {
 	m, p, _ := polynomialEvalFixture(t, nil)
-	a := util.NewInt(17)
+	a := unumeral.NewInt(17)
 	q, e := m.core.MkConstantTake(&a)
 	serviceMust(t, e)
 	f, e := NewPolynomialFactors(m)
@@ -66,7 +67,7 @@ func TestPolynomialFactorsResetActualConsumedDrop(t *testing.T) {
 	if !numericPhysicalReservationRefusal(constantCause) || (f.constant).Cell != m.core.integer.FailedNullRef {
 		t.Fatal("actual fresh constant failure", constantCause, f.constant)
 	}
-	polynomialFactorsAuditExtra(t, f, []Polynomial{p, q}, []*util.Int{&state.source, &state.foreign}, h.header)
+	polynomialFactorsAuditExtra(t, f, []Polynomial{p, q}, []*unumeral.Int{&state.source, &state.foreign}, h.header)
 	m.core.integer.Budget().FailAfter(-1)
 	serviceMust(t, f.numeric.cleanup(m.core.integer))
 	constantBefore := f.constant
@@ -76,7 +77,7 @@ func TestPolynomialFactorsResetActualConsumedDrop(t *testing.T) {
 		t.Fatal("reached real Copy refusal after source last DEC", e, state.calls, f.phases, state.foreign)
 	}
 	// Caller-created handler roots are explicitly named; factors never owns them.
-	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p, q}, []*util.Int{&f.constant, &f.local, &state.source, &state.foreign}, f.header+h.header, nil)
+	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p, q}, []*unumeral.Int{&f.constant, &f.local, &state.source, &state.foreign}, f.header+h.header, nil)
 	cause := f.sourceCause
 	before := m.core.memory.State()
 	used := m.core.integer.Budget().Used()
@@ -104,14 +105,14 @@ func TestPolynomialFactorsResetActualTLSConsumedConstant(t *testing.T) {
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, p, _ := polynomialEvalFixtureWithRationals(t, q, nil)
 	// Ordinary source create/INC/DEC establishes real freelist capacity before
 	// the guarded signed-host-domain recipe; no free-OOM is manufactured.
 	var warm [6]Polynomial
 	for i := range warm {
-		a := util.NewInt(int32(7 + i))
+		a := unumeral.NewInt(int32(7 + i))
 		warm[i], e = m.core.MkConstantTake(&a)
 		serviceMust(t, e)
 		serviceMust(t, m.core.IncRef(warm[i]))
@@ -165,7 +166,7 @@ func TestPolynomialFactorsFreshNullVersusDestroyedConstant(t *testing.T) {
 			if oldBig {
 				serviceMust(t, f.SetConstant(&m.core.integer.Two64))
 			}
-			a := util.Int{}
+			a := unumeral.Int{}
 			digits := make([]uint32, 80)
 			digits[79] = 1
 			serviceMust(t, m.core.integer.SetLimbs(&a, digits))
@@ -184,7 +185,7 @@ func TestPolynomialFactorsFreshNullVersusDestroyedConstant(t *testing.T) {
 			if (f.constant).Cell != expected {
 				t.Fatal("actual setter-recorded pointer state", f.constant)
 			}
-			polynomialFactorsAudit(t, f, []Polynomial{p}, []*util.Int{&a})
+			polynomialFactorsAudit(t, f, []Polynomial{p}, []*unumeral.Int{&a})
 			m.core.integer.Budget().FailAfter(-1)
 			e = f.SourceFinalize()
 			if oldBig {
@@ -223,7 +224,7 @@ func TestPolynomialFactorsYoungerPowerStop(t *testing.T) {
 	if !numericPhysicalReservationRefusal(cause) || state.calls != 1 || !f.currentActive || !m.core.powerLocal.active || f.sourceCause == nil {
 		t.Fatal("younger actual source stop", cause, state.calls, f.currentActive, m.core.powerLocal.active)
 	}
-	polynomialFactorsAuditExtra(t, f, []Polynomial{p, state.target}, []*util.Int{&state.source, &state.foreign}, h.header, r)
+	polynomialFactorsAuditExtra(t, f, []Polynomial{p, state.target}, []*unumeral.Int{&state.source, &state.foreign}, h.header, r)
 	sourceCause := f.sourceCause
 	current := f.current.value
 	if e = f.finishCurrent(nil); e == nil || f.current.value != current || state.calls != 1 {
@@ -234,7 +235,7 @@ func TestPolynomialFactorsYoungerPowerStop(t *testing.T) {
 	if state.calls != 1 || f.sourceCause != sourceCause || (state.foreign).Cell != m.core.integer.FailedRef {
 		t.Fatal("cleanup replay/foreign/history")
 	}
-	polynomialFactorsAuditExtra(t, f, []Polynomial{p}, []*util.Int{&state.source, &state.foreign}, h.header, r)
+	polynomialFactorsAuditExtra(t, f, []Polynomial{p}, []*unumeral.Int{&state.source, &state.foreign}, h.header, r)
 	serviceMust(t, r.Close())
 	serviceMust(t, f.CloseChecked())
 	serviceMust(t, m.core.integer.Del(&state.source))
@@ -255,7 +256,7 @@ func TestPolynomialFactorsCallbackForeignFactoryAndIncoming(t *testing.T) {
 	p, e := m.core.MkVariable(0, 1)
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(p))
-	a := util.NewInt(17)
+	a := unumeral.NewInt(17)
 	old, e := m.core.MkConstantTake(&a)
 	serviceMust(t, e)
 	f, e := NewPolynomialFactors(m)
@@ -264,7 +265,7 @@ func TestPolynomialFactorsCallbackForeignFactoryAndIncoming(t *testing.T) {
 	r, e := NewPolynomialRef(m.core)
 	serviceMust(t, e)
 	serviceMust(t, r.Assign(old))
-	state := &polynomialFactorsCallbackState{target: old, foreignFactory: true, foreignScalar: util.NewInt(23)}
+	state := &polynomialFactorsCallbackState{target: old, foreignFactory: true, foreignScalar: unumeral.NewInt(23)}
 	polynomialFactorsCallback = state
 	defer func() { polynomialFactorsCallback = nil }()
 	h, e := NewPolynomialDeletionHandler(budget, polynomialFactorsDeletionCopy)
@@ -276,13 +277,13 @@ func TestPolynomialFactorsCallbackForeignFactoryAndIncoming(t *testing.T) {
 	}
 	pending := m.core.pending.generation
 	singleton := m.core.singletonGeneration
-	polynomialFactorsAuditExtra(t, f, []Polynomial{p, old}, []*util.Int{&state.foreignScalar}, h.header, r)
+	polynomialFactorsAuditExtra(t, f, []Polynomial{p, old}, []*unumeral.Int{&state.foreignScalar}, h.header, r)
 	budget.FailAfter(-1)
 	serviceMust(t, f.Cleanup())
 	if r.root.incoming != p || m.core.pending.generation != pending || !m.core.singletonReference || m.core.singletonGeneration != singleton || state.calls != 1 {
 		t.Fatal("parent cleanup consumed foreign factory or caller incoming")
 	}
-	polynomialFactorsAuditExtra(t, f, []Polynomial{p, old}, []*util.Int{&state.foreignScalar}, h.header, r)
+	polynomialFactorsAuditExtra(t, f, []Polynomial{p, old}, []*unumeral.Int{&state.foreignScalar}, h.header, r)
 	// Only the caller of the callback-created factory aborts its continuation.
 	serviceMust(t, m.core.CleanupConstruction())
 	serviceMust(t, r.Close())

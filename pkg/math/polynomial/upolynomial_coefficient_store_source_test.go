@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialRelatedCoreActualCrossCoreReadAndMode(t *testing.T) {
@@ -46,7 +46,7 @@ func TestUPolynomialRelatedCoreActualCrossCoreReadAndMode(t *testing.T) {
 			t.Error(e)
 		}
 	}()
-	if e = child.SetInts(expected, []util.Int{util.NewInt(-1), util.NewInt(2), util.NewInt(1)}); e != nil {
+	if e = child.SetInts(expected, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(2), unumeral.NewInt(1)}); e != nil {
 		t.Fatal(e)
 	}
 	same, e := child.Equal(out, expected)
@@ -80,7 +80,7 @@ func TestUPolynomialRelatedCoreStoreLifetimeAndScalarBorrow(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if e = child.SetInts(p, []util.Int{util.NewInt(1), util.NewInt(2)}); e != nil {
+	if e = child.SetInts(p, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(2)}); e != nil {
 		t.Fatal(e)
 	}
 	v, e := child.View(p, 0, 2)

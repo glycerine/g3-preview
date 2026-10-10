@@ -3,8 +3,7 @@ package ast
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 var ErrSortSizeNotFinite = errors.New("g3: sort size is not finite")
@@ -27,9 +26,9 @@ func InfiniteSortSize() SortSize          { return SortSize{} }
 // Fractions/negative/too-large values become very-big, not a domain error.
 // The service and its token are borrowed for these calls only. The caller must
 // not concurrently mutate/delete the borrowed operand between the two actions.
-func SortSizeFromRational(m *util.RationalService, r *util.OwnedRational) (SortSize, error) {
+func SortSizeFromRational(m *unumeral.RationalService, r *unumeral.OwnedRational) (SortSize, error) {
 	if m == nil {
-		return SortSize{}, util.ErrRationalServiceOwner
+		return SortSize{}, unumeral.ErrRationalServiceOwner
 	}
 	valid, e := m.IsUint64(r)
 	if e != nil {

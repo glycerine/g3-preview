@@ -4,9 +4,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 type polynomialEvalTerm struct {
@@ -22,17 +21,17 @@ func (c *polynomialEvalControl) checkpoint() bool { c.checkpoints++; return c.ch
 func (c *polynomialEvalControl) cooperate() error { c.cooperation++; return nil }
 
 type polynomialEvalRationalMap struct {
-	manager                   *util.RationalManager
-	values                    [3]util.Rational
+	manager                   *unumeral.RationalManager
+	values                    [3]unumeral.Rational
 	managers, contains, reads uint32
 }
 
-func (v *polynomialEvalRationalMap) Manager() (*util.RationalManager, error) {
+func (v *polynomialEvalRationalMap) Manager() (*unumeral.RationalManager, error) {
 	v.managers++
 	return v.manager, nil
 }
 func (v *polynomialEvalRationalMap) Contains(x uint32) (bool, error) { v.contains++; return x < 3, nil }
-func (v *polynomialEvalRationalMap) Rational(x uint32) (*util.Rational, error) {
+func (v *polynomialEvalRationalMap) Rational(x uint32) (*unumeral.Rational, error) {
 	v.reads++
 	if x >= 3 {
 		return nil, ErrPolynomialAssertion
@@ -44,7 +43,7 @@ func polynomialEvalFixture(t *testing.T, terms []polynomialEvalTerm) (*Multivari
 	q, _ := rationalManager(t, false)
 	return polynomialEvalFixtureWithRationals(t, q, terms)
 }
-func polynomialEvalFixtureWithRationals(t *testing.T, q *util.RationalManager, terms []polynomialEvalTerm) (*MultivariatePolynomialManager, Polynomial, *polynomialEvalControl) {
+func polynomialEvalFixtureWithRationals(t *testing.T, q *unumeral.RationalManager, terms []polynomialEvalTerm) (*MultivariatePolynomialManager, Polynomial, *polynomialEvalControl) {
 	t.Helper()
 	control := &polynomialEvalControl{limit: 100000}
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: control.checkpoint, Cooperation: control.cooperate}})
@@ -53,10 +52,10 @@ func polynomialEvalFixtureWithRationals(t *testing.T, q *util.RationalManager, t
 		_, e = m.core.monomials.MkVar()
 		serviceMust(t, e)
 	}
-	as := make([]util.Int, len(terms))
+	as := make([]unumeral.Int, len(terms))
 	ms := make([]Monomial, len(terms))
 	for i, term := range terms {
-		as[i] = util.NewInt(term.coefficient)
+		as[i] = unumeral.NewInt(term.coefficient)
 		powers := []MonomialPower{}
 		for x, d := range term.degrees {
 			if d != 0 {
@@ -118,10 +117,10 @@ func TestPolynomialEvaluationDormantTwentySourceRationals(t *testing.T) {
 			q := m.core.config.Rationals
 			values := &polynomialEvalRationalMap{manager: q}
 			for j, f := range tc.values {
-				values.values[j] = util.NewRational()
+				values.values[j] = unumeral.NewRational()
 				serviceMust(t, q.SetFraction(&values.values[j], f[0], uint64(f[1])))
 			}
-			result, expected := util.NewRational(), util.NewRational()
+			result, expected := unumeral.NewRational(), unumeral.NewRational()
 			serviceMust(t, m.EvaluateRational(p, values, &result))
 			serviceMust(t, q.SetFraction(&expected, tc.expected[0], uint64(tc.expected[1])))
 			equal, e := q.Equal(&result, &expected)

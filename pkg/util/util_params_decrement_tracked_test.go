@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -16,7 +17,7 @@ func TestParamsReferenceTrackedDecrementGuardedEntryReceipt(t *testing.T) {
 	bs := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -41,7 +42,7 @@ func TestParamsReferenceTrackedDecrementGuardedEntryReceipt(t *testing.T) {
 	paramsMust(t, e)
 	// Separate efficient fixture: public source digit setter and scoped copy.
 	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -60,7 +61,7 @@ func TestParamsReferenceTrackedDecrementGuardedEntryReceipt(t *testing.T) {
 	if block.Refs != 1 || block.Size != 2 {
 		t.Fatal("actual source reference", block.Refs, block.Size)
 	}
-	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
 	before := numericAuditPhysical(t, m, extras)
 	other, e := c.NewValue()
 	paramsMust(t, e)
@@ -116,7 +117,7 @@ func TestParamsReferenceTrackedDecrementGuardedEntryReceipt(t *testing.T) {
 	if block.Live || v != (ParamsRef{}) || block.Refs != 0 {
 		t.Fatal("exact callee owning acknowledgment")
 	}
-	numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*RationalService{q}})
+	numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}})
 	paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
 	if e := c.CompleteDecrement(&v, receipt); !errors.Is(e, ErrParamsOwner) {
 		t.Fatal("double acknowledgment", e)

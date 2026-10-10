@@ -5,10 +5,9 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestScalarDivDirectBigActualAllocationPrefixes(t *testing.T) { scalarDivDirectPrefixes(t, false) }
@@ -24,7 +23,7 @@ func scalarDivDirectPrefixes(t *testing.T, copiedProbe bool) {
 			c := m.core
 			_, e := c.monomials.MkVar()
 			serviceMust(t, e)
-			var coefficient, divisor, modulus util.Int
+			var coefficient, divisor, modulus unumeral.Int
 			digits := make([]uint32, 64)
 			digits[0] = 3
 			digits[63] = 1
@@ -54,11 +53,11 @@ func scalarDivDirectPrefixes(t *testing.T, copiedProbe bool) {
 			serviceMust(t, c.integer.SetLimbs(&divisor, dd))
 			term, e := c.monomials.MkVariable(0, 1)
 			serviceMust(t, e)
-			p, e := c.MkTerms([]util.Int{coefficient}, []Monomial{term})
+			p, e := c.MkTerms([]unumeral.Int{coefficient}, []Monomial{term})
 			serviceMust(t, e)
 			p = polynomialCaller(t, c, p)
 			// A real old polynomial deletion warms its source owner ID recycle vector.
-			seventeen := util.NewInt(17)
+			seventeen := unumeral.NewInt(17)
 			warm, e := c.MkConstantTakeCopy(&seventeen)
 			serviceMust(t, e)
 			serviceMust(t, c.IncRef(warm))
@@ -73,7 +72,7 @@ func scalarDivDirectPrefixes(t *testing.T, copiedProbe bool) {
 				serviceMust(t, c.transferFactoryResult(&factory, result))
 			}
 			s := &c.scalarDivision
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, s.returned}, []*util.Int{&coefficient, &divisor, &modulus, &s.a}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, s.returned}, []*unumeral.Int{&coefficient, &divisor, &modulus, &s.a}, 0)
 			if callErr != nil && !numericPhysicalReservationRefusal(callErr) {
 				t.Fatal("literal refusal", route, prefix, callErr)
 			}
@@ -104,16 +103,16 @@ func scalarDivDirectPrefixes(t *testing.T, copiedProbe bool) {
 				if !reflect.DeepEqual(before, *raw) || !reflect.DeepEqual(before, copied) {
 					copiedGuardFailure = "copied child guard mutated actual or copied scope"
 				}
-				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, s.returned}, []*util.Int{&coefficient, &divisor, &modulus, &s.a}, 0)
+				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, s.returned}, []*unumeral.Int{&coefficient, &divisor, &modulus, &s.a}, 0)
 			}
 			// Child RAW end-only DEL does not run on body refusal; older caller NUM
 			// completes before true owning abort may drain those unjoined values.
 			serviceMust(t, c.cleanupScalarDivInvocation(&receipt, false))
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, s.returned}, []*util.Int{&coefficient, &divisor, &modulus, &s.a}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result, s.returned}, []*unumeral.Int{&coefficient, &divisor, &modulus, &s.a}, 0)
 			serviceMust(t, c.cleanupScalarDivInvocation(&receipt, true))
 			serviceMust(t, c.cleanupFactoryInvocation(&factory, true))
 			serviceMust(t, c.cheap.cleanupAppendInvocation(&appendReceipt, true))
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result}, []*util.Int{&coefficient, &divisor, &modulus}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result}, []*unumeral.Int{&coefficient, &divisor, &modulus}, 0)
 			c.integer.Budget().FailAfter(-1)
 
 			if callErr == nil {
@@ -124,7 +123,7 @@ func scalarDivDirectPrefixes(t *testing.T, copiedProbe bool) {
 					if route == 1 {
 						expected[0] = 1
 					}
-					var want util.Int
+					var want unumeral.Int
 					serviceMust(t, c.integer.SetLimbs(&want, expected))
 					if route == 1 {
 						serviceMust(t, c.integer.Neg(&want))
@@ -143,7 +142,7 @@ func scalarDivDirectPrefixes(t *testing.T, copiedProbe bool) {
 			if result != (Polynomial{}) {
 				serviceMust(t, c.DecRef(result))
 			}
-			for _, v := range []*util.Int{&coefficient, &divisor, &modulus} {
+			for _, v := range []*unumeral.Int{&coefficient, &divisor, &modulus} {
 				serviceMust(t, c.integer.Del(v))
 			}
 		}

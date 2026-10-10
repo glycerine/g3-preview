@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialIsolationAllDispatchRoutesIndependent(t *testing.T) {
@@ -49,7 +49,7 @@ func TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau(t *testing.T) {
 	m, q, budget := upolySourceOwner(t)
 	b := upolyIsolationBinaryOwner(t, q, budget)
 	v := upolyIsolationVector(t, b)
-	a := util.NewBinaryInt(7)
+	a := unumeral.NewBinaryInt(7)
 	if e := v.PushCopy(&a); e != nil {
 		t.Fatal(e)
 	}
@@ -81,7 +81,7 @@ func TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau(t *testing.T) {
 		t.Fatal(e)
 	}
 	value := upolyIsolationRead(t, b, v, 0)
-	numerator := util.NewInt(7)
+	numerator := unumeral.NewInt(7)
 	same, e := b.EqualInteger(&value, &numerator)
 	if e != nil || !same {
 		t.Fatal(e)
@@ -121,7 +121,7 @@ func TestUPolynomialBinaryVectorOwnerRefusalAndNativePush(t *testing.T) {
 	}
 	budget.FailAfter(-1)
 	v = upolyIsolationVector(t, b)
-	a := util.NewBinaryInt(1)
+	a := unumeral.NewBinaryInt(1)
 	budget.FailAfter(0)
 	e = v.PushCopy(&a)
 	if e != nil || upolyIsolationSize(t, v) != 1 {
@@ -145,14 +145,14 @@ func TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots(t *testing.T) {
 		m, q, budget := upolySourceOwner(t)
 		b := upolyIsolationBinaryOwner(t, q, budget)
 		v := upolyIsolationVector(t, b)
-		var bigValue util.Int
+		var bigValue unumeral.Int
 		limbs := make([]uint32, 90)
 		limbs[0] = 37
 		limbs[89] = 1
 		if e := m.IntegerManager().SetLimbs(&bigValue, limbs); e != nil {
 			t.Fatal(e)
 		}
-		a := util.NewBinaryRational()
+		a := unumeral.NewBinaryRational()
 		if e := b.SetInteger(&a, &bigValue); e != nil {
 			t.Fatal(e)
 		}
@@ -167,7 +167,7 @@ func TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots(t *testing.T) {
 			t.Fatal("immediate binary output graph", fault, e, e2, graph, vec, binary)
 		}
 
-		upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{BinaryValues: []*util.BinaryRational{&a}, BinaryManagers: []*util.BinaryRationalManager{b}, BinaryVectors: []*BinaryRationalVector{v}})
+		upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{BinaryValues: []*unumeral.BinaryRational{&a}, BinaryManagers: []*unumeral.BinaryRationalManager{b}, BinaryVectors: []*BinaryRationalVector{v}})
 		budget.FailAfter(-1)
 		if e != nil {
 			failures++
@@ -205,7 +205,7 @@ func TestUPolynomialIsolationRemoveZeroExistingPublicRegression(t *testing.T) {
 		t.Fatal(e)
 	}
 	upolyGCDExpect(t, m, out, []int64{6, -3})
-	if e := m.SetInts(out, []util.Int{util.NewInt(1), util.NewInt(1), util.NewInt(1)}); e != nil {
+	if e := m.SetInts(out, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1), unumeral.NewInt(1)}); e != nil {
 		t.Fatal(e)
 	}
 	e := m.RemoveZeroRoots(mustUPolyView(t, m, p).WithCount(5), out)
@@ -247,7 +247,7 @@ func TestUPolynomialIsolationDefinedOutputAliases(t *testing.T) {
 			}
 			for i, n := range x.want {
 				a := upolyIsolationRead(t, b, x.v, uint32(i))
-				want := util.NewInt(int32(n))
+				want := unumeral.NewInt(int32(n))
 				same, e := b.EqualInteger(&a, &want)
 				if e != nil || !same {
 					t.Fatal(f.sturm, i, n, e)
@@ -285,7 +285,7 @@ func TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph(t *testing.T) {
 					t.Fatal("immediate isolation graph", route, fault, e, e2, graph, scratch, roots)
 				}
 
-				upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{BinaryManagers: []*util.BinaryRationalManager{b}, BinaryVectors: []*BinaryRationalVector{r, l, u}})
+				upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{BinaryManagers: []*unumeral.BinaryRationalManager{b}, BinaryVectors: []*BinaryRationalVector{r, l, u}})
 				budget.FailAfter(-1)
 				if e != nil {
 					failures++
@@ -324,7 +324,7 @@ func TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph(t *testing.T) {
 	m, q, budget, limit, _ := upolySourceOwnerServices(t)
 	bqm := upolyIsolationBinaryOwner(t, q, budget)
 	p := upolySourceNew(t, m, []int32{-2, 0, 1})
-	a, b := util.NewBinaryInt(1), util.NewBinaryInt(2)
+	a, b := unumeral.NewBinaryInt(1), unumeral.NewBinaryInt(2)
 	limit.IncCancel()
 	steps := limit.Steps
 	_, e := m.RefineToPrecision(mustUPolyView(t, m, p), bqm, &a, &b, 40)
@@ -333,7 +333,7 @@ func TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph(t *testing.T) {
 	if !errors.Is(e, ErrUPolynomialCanceled) || e2 != nil || limit.Steps != steps+1 || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+scratch.LiveScratchNumerators {
 		t.Fatal("source pre-width cancel", e, e2, steps, limit.Steps, graph)
 	}
-	one, two := util.NewInt(1), util.NewInt(2)
+	one, two := unumeral.NewInt(1), unumeral.NewInt(2)
 	left, e := bqm.EqualInteger(&a, &one)
 	if e != nil {
 		t.Fatal(e)
@@ -354,7 +354,7 @@ func TestUPolynomialIsolationNativeCoefficientResetAndZeroPublication(t *testing
 	m, q, budget := upolySourceOwner(t)
 	b := upolyIsolationBinaryOwner(t, q, budget)
 	r, l, u := upolyIsolationVector(t, b), upolyIsolationVector(t, b), upolyIsolationVector(t, b)
-	one := util.NewBinaryInt(1)
+	one := unumeral.NewBinaryInt(1)
 	for _, v := range []*BinaryRationalVector{r, l, u} {
 		if e := v.PushCopy(&one); e != nil {
 			t.Fatal(e)

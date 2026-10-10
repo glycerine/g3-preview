@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
@@ -330,7 +331,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	bn, bc, bs, b := arena.NewBudget(1<<26), arena.NewBudget(1<<24), arena.NewBudget(1<<24), arena.NewBudget(1<<24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -365,7 +366,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 			t.Fatal("actual caller/provider refunds")
 		}
 	})
-	scoped, e := util.NewScopedInt(m.IntegerManager())
+	scoped, e := unumeral.NewScopedInt(m.IntegerManager())
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -398,7 +399,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	if !leaf.Active || !leaf.Acquired || leaf.Cause == nil {
 		t.Fatal("actual copied POD numeral retained before append")
 	}
-	extras := upolyPhysicalExtraOwners{RationalServices: []*util.RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &leaf.Next.Rat}}, ParamsValues: []paramsPhysicalValueOwner{{c, &p}}}
+	extras := upolyPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &leaf.Next.Rat}}, ParamsValues: []paramsPhysicalValueOwner{{c, &p}}}
 	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, extras)
 	paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
 	contextMethodsCold(t, s, g, b)
@@ -428,7 +429,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	if leaf.Active || leaf.Acquired {
 		t.Fatal("parent owning close omitted exact failed copied numeral")
 	}
-	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{RationalServices: []*util.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &p}}})
+	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &p}}})
 	paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
 	bn.FailAfter(-1)
 	bc.FailAfter(-1)
@@ -484,7 +485,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	if !errors.Is(x, otherBody) || !errors.Is(x, arena.ErrBounds) || older.key.Closed || older.key.Length != 81 {
 		t.Fatal("younger stop protects older lexical storage", x)
 	}
-	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{RationalServices: []*util.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &younger.value}}})
+	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &younger.value}}})
 	paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
 	contextMethodsCold(t, s3, g, b)
 	bn.FailAfter(0)
@@ -494,7 +495,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	if younger.bodyCause != body || !errors.Is(younger.destructorCause, arena.ErrBounds) || older.bodyCause != otherBody || !errors.Is(s3.destructorCause, arena.ErrBounds) {
 		t.Fatal("own ACK preserves each immutable body/source cause")
 	}
-	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{RationalServices: []*util.RationalService{q}})
+	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}})
 	paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
 	contextMethodsCold(t, nil, g, b)
 	bn.FailAfter(-1)
@@ -610,7 +611,7 @@ func TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTupl
 	bn, bc, bs, b := arena.NewBudget(1<<26), arena.NewBudget(1<<24), arena.NewBudget(1<<24), arena.NewBudget(1<<24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -645,7 +646,7 @@ func TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTupl
 			t.Fatal("actual caller/provider refunds")
 		}
 	})
-	scoped, e := util.NewScopedInt(m.IntegerManager())
+	scoped, e := unumeral.NewScopedInt(m.IntegerManager())
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -667,7 +668,7 @@ func TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTupl
 	// Its source POD has no automatic NUM DT; the exact acquisition remains live.
 	s4 := s
 	var x error
-	beforeCopy := upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{RationalServices: []*util.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &p}}})
+	beforeCopy := upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &p}}})
 	bc.FailAfter(1)
 	_, x = s4.MergeDefaultParams(&p)
 	if !errors.Is(x, arena.ErrInjectedFailure) || s4.frames == nil {
@@ -678,7 +679,7 @@ func TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTupl
 		t.Fatal("exact failed-copy tuples before lexical DT completion")
 	}
 	hLeaf := &c.SetFrames[h.setReceipt.Slot-1]
-	hExtras := upolyPhysicalExtraOwners{RationalServices: []*util.RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &hLeaf.Next.Rat}}, ParamsValues: []paramsPhysicalValueOwner{{c, &p}}}
+	hExtras := upolyPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &hLeaf.Next.Rat}}, ParamsValues: []paramsPhysicalValueOwner{{c, &p}}}
 	backedCopy := upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, hExtras)
 	if backedCopy.Objects != beforeCopy.Objects+1 {
 		t.Fatal("actual new copied NUM backing before TLS stop", beforeCopy, backedCopy)
@@ -713,7 +714,7 @@ func TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTupl
 		t.Fatal("matched owning retry preserves exact original tuples and body/source/own history")
 	}
 	paramsMust(t, s4.Close())
-	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{RationalServices: []*util.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &p}}})
+	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &p}}})
 	paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
 	contextMethodsCold(t, nil, g, b)
 	bn.FailAfter(-1)

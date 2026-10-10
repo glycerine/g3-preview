@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"sort"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // std::sort contributes its descending graded-lex order, not library internals.
@@ -76,7 +75,7 @@ func (b *PolynomialSOMBuffer) SortGradedLex() (result error) {
 		if e != nil {
 			return e
 		}
-		if e = b.sortNumerals.appendCoefficient(b.storage, util.Int{}); e != nil {
+		if e = b.sortNumerals.appendCoefficient(b.storage, unumeral.Int{}); e != nil {
 			return e
 		}
 		old, e := b.buffer.as.coefficient(b.storage, pos)

@@ -3,28 +3,28 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func numericIntegerManager_exactDivAllocationRoots(m *util.IntegerManager, r *polynomialExactDivInvocationReceipt) *polynomialNumericRoots {
+func numericIntegerManager_exactDivAllocationRoots(m *unumeral.IntegerManager, r *polynomialExactDivInvocationReceipt) *polynomialNumericRoots {
 	if m == nil || !m.ValidOwner() || r == nil || r.core == nil || r.core.self != r.core || r.core.integer != m || !r.core.matchesExactDivInvocation(r) || !r.frame.executing || r.core.callbackDepth != 0 {
 		return nil
 	}
 	return &r.frame.numeric
 }
-func numericIntegerManager_exactDivContextRoots(m *util.IntegerManager, c integerAllocationInvocationContext) *polynomialNumericRoots {
+func numericIntegerManager_exactDivContextRoots(m *unumeral.IntegerManager, c integerAllocationInvocationContext) *polynomialNumericRoots {
 	if c.exactDiv == nil || c.exactDivInvocation == 0 || c.exactDivInvocation != c.exactDiv.invocation {
 		return nil
 	}
 	return numericIntegerManager_exactDivAllocationRoots(m, c.exactDiv)
 }
-func numericIntegerModularManager_exactDivAllocationContext(m *util.IntegerModularManager, r *polynomialExactDivInvocationReceipt) integerAllocationInvocationContext {
+func numericIntegerModularManager_exactDivAllocationContext(m *unumeral.IntegerModularManager, r *polynomialExactDivInvocationReceipt) integerAllocationInvocationContext {
 	if m == nil || m.Integers() == nil || numericIntegerManager_exactDivAllocationRoots(m.Integers(), r) == nil || r.core.modular != m {
 		return integerAllocationInvocationContext{}
 	}
 	return integerAllocationInvocationContext{exactDiv: r, exactDivInvocation: r.invocation}
 }
-func numericIntegerModularManager_divWithExactDivReceipt(m *util.IntegerModularManager, a, b, out *util.Int, r *polynomialExactDivInvocationReceipt) error {
+func numericIntegerModularManager_divWithExactDivReceipt(m *unumeral.IntegerModularManager, a, b, out *unumeral.Int, r *polynomialExactDivInvocationReceipt) error {
 	context := numericIntegerModularManager_exactDivAllocationContext(m, r)
 	e := m.WithAllocationContext((context).utility(m.Integers())).Div(a, b, out)
 	if m != nil && m.Integers() != nil && numericIntegerManager_exactDivContextRoots(m.Integers(), context) != nil && r.frame.sourceCause == nil {
@@ -32,7 +32,7 @@ func numericIntegerModularManager_divWithExactDivReceipt(m *util.IntegerModularM
 	}
 	return e
 }
-func numericIntegerModularManager_negWithExactDivReceipt(m *util.IntegerModularManager, out *util.Int, r *polynomialExactDivInvocationReceipt) error {
+func numericIntegerModularManager_negWithExactDivReceipt(m *unumeral.IntegerModularManager, out *unumeral.Int, r *polynomialExactDivInvocationReceipt) error {
 	if e := m.Check(); e != nil {
 		return e
 	}
@@ -44,7 +44,7 @@ func numericIntegerModularManager_negWithExactDivReceipt(m *util.IntegerModularM
 }
 
 // Bind only the child returned by the actual guarded RAW declaration action.
-func numericIntegerManager_bindExactDivRaw(m *util.IntegerManager, c integerAllocationInvocationContext, child *util.IntegerRawInvocationReceipt, division bool) {
+func numericIntegerManager_bindExactDivRaw(m *unumeral.IntegerManager, c integerAllocationInvocationContext, child *unumeral.IntegerRawInvocationReceipt, division bool) {
 	if numericIntegerManager_exactDivContextRoots(m, c) == nil || !m.MatchesRawInvocation(child) {
 		return
 	}
@@ -57,7 +57,7 @@ func numericIntegerManager_bindExactDivRaw(m *util.IntegerManager, c integerAllo
 }
 
 // History is read independently of the allocation/executing predicate.
-func numericIntegerManager_exactDivNumericSourceCause(m *util.IntegerManager, r *polynomialExactDivInvocationReceipt) error {
+func numericIntegerManager_exactDivNumericSourceCause(m *unumeral.IntegerManager, r *polynomialExactDivInvocationReceipt) error {
 	if r == nil || r.core == nil || r.core.self != r.core || r.core.integer != m || !r.core.matchesExactDivInvocation(r) {
 		return nil
 	}
@@ -74,7 +74,7 @@ func numericIntegerManager_exactDivNumericSourceCause(m *util.IntegerManager, r 
 
 // False completes reached younger source children. True drains unjoined
 // acquisitions only when the caller has completed its older lexical suffix.
-func numericIntegerManager_cleanupExactDivNumeric(m *util.IntegerManager, r *polynomialExactDivInvocationReceipt, abort bool) error {
+func numericIntegerManager_cleanupExactDivNumeric(m *unumeral.IntegerManager, r *polynomialExactDivInvocationReceipt, abort bool) error {
 	if r == nil || r.core == nil || r.core.self != r.core || r.core.integer != m || !r.core.matchesExactDivInvocation(r) {
 		return nil
 	}

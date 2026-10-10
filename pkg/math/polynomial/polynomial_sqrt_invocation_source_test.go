@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialSqrtInvocationGuardAndActualAcquisition(t *testing.T) {
@@ -113,7 +114,7 @@ func TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort(t *testing.T) {
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("destructor helper checkpoint unreachable") }, Cooperation: func() error { panic("destructor helper cooperation unreachable") }}})
 	serviceMust(t, e)
@@ -132,7 +133,7 @@ func TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort(t *testing.T) {
 	// bounded overflow recipe, isolating the intended NUM destructor frontier.
 	var warm [4]Polynomial
 	for i := range warm {
-		v := util.NewInt(int32(7 + i))
+		v := unumeral.NewInt(int32(7 + i))
 		warm[i], e = m.core.MkConstantTake(&v)
 		serviceMust(t, e)
 		serviceMust(t, m.core.IncRef(warm[i]))
@@ -167,10 +168,10 @@ func TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort(t *testing.T) {
 	serviceMust(t, q.Integers().Copy(&s.values[2], &q.Integers().Two64))
 	serviceMust(t, q.Integers().Copy(&s.values[3], &q.Integers().Two64))
 	serviceMust(t, q.Integers().EnsureOwnedCapacity(&s.values[3], 40000))
-	older := [3]util.Int{s.values[0], s.values[1], s.values[2]}
+	older := [3]unumeral.Int{s.values[0], s.values[1], s.values[2]}
 	contextTLSNearMinimum(t, rt)
 	first := m.finishSquareRoot(nil)
-	if !errors.Is(first, arena.ErrBounds) || !s.stopped || s.stage != 0 || s.sourceCause == nil || [3]util.Int{s.values[0], s.values[1], s.values[2]} != older {
+	if !errors.Is(first, arena.ErrBounds) || !s.stopped || s.stage != 0 || s.sourceCause == nil || [3]unumeral.Int{s.values[0], s.values[1], s.values[2]} != older {
 		t.Fatal("actual source younger NUM stop preserves older fields", first, s.stage)
 	}
 	polynomialSqrtPhysicalAudit(t, m, nil, nil, 0, term)
@@ -207,7 +208,7 @@ func TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare(t
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("hi Copy refuses before checkpoint") }, Cooperation: func() error { panic("hi Copy refuses before cooperation") }}})
 	serviceMust(t, e)
@@ -218,9 +219,9 @@ func TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare(t
 	serviceMust(t, e)
 	digits := make([]uint32, 40000)
 	digits[39999] = 1
-	a := util.Int{}
+	a := unumeral.Int{}
 	serviceMust(t, q.Integers().SetLimbs(&a, digits))
-	p, e := c.MkTerms([]util.Int{a}, []Monomial{term})
+	p, e := c.MkTerms([]unumeral.Int{a}, []Monomial{term})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
 	serviceMust(t, q.Integers().Del(&a))
@@ -266,7 +267,7 @@ func TestPolynomialSqrtInvocationPreservesLaterForeignPerfectSquare(t *testing.T
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("hi Copy refuses before checkpoint") }, Cooperation: func() error { panic("hi Copy refuses before cooperation") }}})
 	serviceMust(t, e)
@@ -277,9 +278,9 @@ func TestPolynomialSqrtInvocationPreservesLaterForeignPerfectSquare(t *testing.T
 	serviceMust(t, e)
 	digits := make([]uint32, 40000)
 	digits[39999] = 1
-	a := util.Int{}
+	a := unumeral.Int{}
 	serviceMust(t, q.Integers().SetLimbs(&a, digits))
-	p, e := c.MkTerms([]util.Int{a}, []Monomial{term})
+	p, e := c.MkTerms([]unumeral.Int{a}, []Monomial{term})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
 	serviceMust(t, q.Integers().Del(&a))
@@ -314,7 +315,7 @@ func TestPolynomialSqrtInvocationPreservesLaterForeignPerfectSquare(t *testing.T
 	// Caller explicitly aborts the old Integer invocation, then starts its own
 	// actual replacement at the same embedded scope address.
 	serviceMust(t, q.Integers().CleanupPerfectSquare())
-	foreignInput, foreignOutput := util.Int{}, util.Int{}
+	foreignInput, foreignOutput := unumeral.Int{}, unumeral.Int{}
 	serviceMust(t, q.Integers().SetLimbs(&foreignInput, digits))
 	defer func() {
 		contextTLSFinish(t, rt, func() error { return q.Integers().Del(&foreignInput) })
@@ -326,13 +327,13 @@ func TestPolynomialSqrtInvocationPreservesLaterForeignPerfectSquare(t *testing.T
 	if !numericPhysicalReservationRefusal(foreignCause) || !foreign.Active || foreign.Generation == child.Generation || foreign.Raw[0] == (umemory.Block{}) {
 		t.Fatal("actual replacement invocation", foreignCause, foreign)
 	}
-	polynomialSqrtPhysicalAudit(t, m, []Polynomial{p, out.root.value, out.root.incoming}, []*util.Int{&foreignInput, &foreignOutput}, out.header)
+	polynomialSqrtPhysicalAudit(t, m, []Polynomial{p, out.root.value, out.root.incoming}, []*unumeral.Int{&foreignInput, &foreignOutput}, out.header)
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, m.cleanupSqrtInvocation(&receipt, true))
 	if q.Integers().PerfectSquare != foreign {
 		t.Fatal("old matched Sqrt receipt consumed foreign child")
 	}
-	polynomialSqrtPhysicalAudit(t, m, []Polynomial{p, out.root.value, out.root.incoming}, []*util.Int{&foreignInput, &foreignOutput}, out.header)
+	polynomialSqrtPhysicalAudit(t, m, []Polynomial{p, out.root.value, out.root.incoming}, []*unumeral.Int{&foreignInput, &foreignOutput}, out.header)
 	serviceMust(t, q.Integers().CleanupPerfectSquare())
 }
 
@@ -393,13 +394,13 @@ func TestPolynomialSqrtInvocationBigNumeralEveryReservation(t *testing.T) {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{1, 0, 0}}})
 			c := m.core
-			a := util.Int{}
+			a := unumeral.Int{}
 			serviceMust(t, c.integer.SetLimbs(&a, []uint32{3, 256}))
 			unit, e := c.monomials.Unit()
 			serviceMust(t, e)
 			term, e := c.monomialCore(p, 0)
 			serviceMust(t, e)
-			base, e := c.MkTerms([]util.Int{a, util.NewInt(3)}, []Monomial{term, unit})
+			base, e := c.MkTerms([]unumeral.Int{a, unumeral.NewInt(3)}, []Monomial{term, unit})
 			serviceMust(t, e)
 			serviceMust(t, c.integer.Del(&a))
 			serviceMust(t, c.IncRef(base))

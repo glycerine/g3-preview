@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type iccpConstantContextProbe struct {
@@ -58,13 +59,13 @@ func TestPolynomialICCPConstantActualExecutingContextForeignAndReusedNonce(t *te
 	budget := arena.NewBudget(1 << 25)
 	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, Transport: iccpConstantContextTransport})
 	serviceMust(t, e)
-	cfg := util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1, Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	cfg := unumeral.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1, Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	c := full.core
-	var big, i util.Int
+	var big, i unumeral.Int
 	words := make([]uint32, 8192)
 	words[0], words[len(words)-1] = 7, 1
 	serviceMust(t, c.integer.SetLimbs(&big, words))
@@ -101,7 +102,7 @@ func TestPolynomialICCPConstantActualExecutingContextForeignAndReusedNonce(t *te
 			if probe.failed != "" {
 				t.Fatal(probe.failed)
 			}
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, primitive.value}, []*util.Int{&big, &i}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, primitive.value}, []*unumeral.Int{&big, &i}, 0)
 			if probe.calls > before {
 				reached = true
 				if body == nil {

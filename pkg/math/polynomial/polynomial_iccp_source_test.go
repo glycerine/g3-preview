@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialICCPIndependentContentAndPrimitiveBranches(t *testing.T) {
@@ -33,7 +32,7 @@ func TestPolynomialICCPIndependentContentAndPrimitiveBranches(t *testing.T) {
 			ppwant = polynomialQueryTerms(t, m, []int32{1, 2}, [][]MonomialPower{{{0, 1}}, {{1, 1}}})
 			iwant = 6
 		}
-		i := util.NewInt(99)
+		i := unumeral.NewInt(99)
 		c, e := NewPolynomialRef(m)
 		serviceMust(t, e)
 		pp, e := NewPolynomialRef(m)
@@ -41,7 +40,7 @@ func TestPolynomialICCPIndependentContentAndPrimitiveBranches(t *testing.T) {
 		serviceMust(t, c.Assign(m.zero))
 		serviceMust(t, pp.Assign(m.unit))
 		serviceMust(t, full.IntegerContentPrimitiveParts(p, 0, &i, c, pp))
-		if i != util.NewInt(iwant) {
+		if i != unumeral.NewInt(iwant) {
 			t.Fatal("independent integer component", route, i, iwant)
 		}
 		equal, e := m.Equal(c.root.value, cwant)
@@ -91,11 +90,11 @@ func TestPolynomialICCPNativeHighDegreeFilters(t *testing.T) {
 		p := polynomialQueryTerms(t, c, []int32{2, 4}, [][]MonomialPower{{{0, degree}, {1, 1}}, {{0, 3}, {1, 1}}})
 		wantContent := polynomialQueryTerms(t, c, []int32{1}, [][]MonomialPower{{{1, 1}}})
 		wantPrimitive := polynomialQueryTerms(t, c, []int32{1, 2}, [][]MonomialPower{{{0, degree}}, {{0, 3}}})
-		var integer util.Int
+		var integer unumeral.Int
 		var content, primitive polynomialReference
 		for repeat := 0; repeat < 2; repeat++ {
 			serviceMust(t, full.iccpParts(p, 0, &integer, &content, &primitive))
-			if integer != util.NewInt(2) {
+			if integer != unumeral.NewInt(2) {
 				t.Fatal("integer content", degree, integer)
 			}
 			same, e := c.Equal(content.value, wantContent)
@@ -113,7 +112,7 @@ func TestPolynomialICCPNativeHighDegreeFilters(t *testing.T) {
 					t.Fatal("completed ICCP scratch retained", degree, s.active, len(s.filter), len(s.powers))
 				}
 			}
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, wantContent, wantPrimitive, content.value, primitive.value}, []*util.Int{&integer}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, wantContent, wantPrimitive, content.value, primitive.value}, []*unumeral.Int{&integer}, 0)
 			serviceMust(t, content.close(c))
 			serviceMust(t, primitive.close(c))
 			serviceMust(t, c.integer.Del(&integer))

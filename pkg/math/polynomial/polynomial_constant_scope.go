@@ -6,7 +6,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The source global rational binding is supplied as an actual borrowed owner.
@@ -14,8 +14,8 @@ import (
 // not an imp-owned rational manager or an escaping per-call scope allocation.
 type polynomialConstantScope struct {
 	arithmeticScope                                                polynomialArithmeticScope
-	rational                                                       util.Rational
-	numeral                                                        util.Int
+	rational                                                       unumeral.Rational
+	numeral                                                        unumeral.Int
 	result                                                         Polynomial
 	active, rationalCompleted, numeralCompleted, failedConstructor bool
 	cause, sourceCause                                             error
@@ -37,7 +37,7 @@ func (m *MultivariatePolynomialCore) beginConstantScope() error {
 	if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 {
 		f.constantGeneration = m.constantGeneration
 	}
-	m.constantScope = polynomialConstantScope{active: true, rational: util.NewRational()}
+	m.constantScope = polynomialConstantScope{active: true, rational: unumeral.NewRational()}
 	if s := m.compositionOwner; s != nil && s.executing {
 		s.constantGeneration = m.constantGeneration
 	}
@@ -66,7 +66,7 @@ func (m *MultivariatePolynomialCore) finishConstantScope(body error) error {
 		s.numeralCompleted = false
 	}
 	if s.rationalCompleted {
-		roots := [2]*util.Int{&(*s.rational.BorrowNumerator()), &(*s.rational.BorrowDenominator())}
+		roots := [2]*unumeral.Int{&(*s.rational.BorrowNumerator()), &(*s.rational.BorrowDenominator())}
 		for s.rationalStage < 2 {
 			if _, e := upolynomialSourceNumeralDel(m.integer, roots[s.rationalStage]); e != nil {
 				s.stopped = true
@@ -90,10 +90,10 @@ func (m *MultivariatePolynomialCore) finishConstantScope(body error) error {
 	}
 	return body
 }
-func (m *MultivariatePolynomialCore) MkConstantTakeCopy(a *util.Int) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) MkConstantTakeCopy(a *unumeral.Int) (Polynomial, error) {
 	return m.mkConstantTakeCopyWithArithmeticReceipt(a, nil)
 }
-func (m *MultivariatePolynomialCore) mkConstantTakeCopyWithArithmeticReceipt(a *util.Int, receipt *polynomialArithmeticInvocationReceipt) (result Polynomial, cause error) {
+func (m *MultivariatePolynomialCore) mkConstantTakeCopyWithArithmeticReceipt(a *unumeral.Int, receipt *polynomialArithmeticInvocationReceipt) (result Polynomial, cause error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -148,10 +148,10 @@ func (m *MultivariatePolynomialCore) constantFromRationalScope() (Polynomial, er
 }
 func (m *MultivariatePolynomialCore) constantFromRationalScopeWithArithmeticReceipt(receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	s := &m.constantScope
-	if polynomialSourceDebug && !util.IsIntegerRational(&s.rational) {
+	if polynomialSourceDebug && !unumeral.IsIntegerRational(&s.rational) {
 		return Polynomial{}, m.finishConstantScope(ErrPolynomialAssertion)
 	}
-	s.numeral = util.Int{}
+	s.numeral = unumeral.Int{}
 	s.numeralCompleted = true
 	var copyCause error
 	if receipt == nil {

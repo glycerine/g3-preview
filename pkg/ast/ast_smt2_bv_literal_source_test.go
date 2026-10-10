@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 	"github.com/glycerine/g3/pkg/util/z3exception"
@@ -82,9 +83,9 @@ func TestASTSMT2BitVectorLiteralRadixAndSignedOracle(t *testing.T) {
 	}
 }
 
-func astBVPrinterRawGraph(t *testing.T, m *ASTManager, input *util.OwnedRational) {
+func astBVPrinterRawGraph(t *testing.T, m *ASTManager, input *unumeral.OwnedRational) {
 	t.Helper()
-	var values []*util.OwnedRational
+	var values []*unumeral.OwnedRational
 	if input != nil {
 		values = append(values, input)
 	}
@@ -267,7 +268,7 @@ func TestASTSMT2BitVectorFalseNumeralActualActionAndErasure(t *testing.T) {
 			b := d.BudgetField
 			sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 			paramsMust(t, e)
-			q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+			q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 			paramsMust(t, e)
 			c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: b, Text: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 			paramsMust(t, e)

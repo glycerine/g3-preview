@@ -2,18 +2,17 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorLogicalShiftNumerals retains r1/r2, threshold, rn and wide returned values.
 type BitVectorLogicalShiftNumerals struct {
 	self                   *BitVectorLogicalShiftNumerals
 	manager                *ASTManager
-	values                 [6]util.OwnedRational
+	values                 [6]unumeral.OwnedRational
 	placed                 [6]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	norm                   ASTBitVectorNumeralInvocation
 	header                 uint64
@@ -91,7 +90,7 @@ func (n *BitVectorLogicalShiftNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorLogicalShiftNumerals) Read(i int, arg ASTHandle, width *uint32) (bool, error) {
@@ -175,7 +174,7 @@ func (n *BitVectorLogicalShiftNumerals) normalizeCopy(dst, src int, width uint32
 	q := n.manager.numerals
 	v, e := n.manager.NormalizeBitVectorValueWithInvocation(&n.values[src], width, &n.norm)
 	n.values[5] = v
-	n.placed[5] = v != (util.OwnedRational{})
+	n.placed[5] = v != (unumeral.OwnedRational{})
 	if e != nil {
 		return n.fail(e)
 	}
@@ -248,7 +247,7 @@ func (n *BitVectorLogicalShiftNumerals) Wide(width uint32, left bool) error {
 	q := n.manager.numerals
 	v, e := q.PowerOfTwoWithInvocation(shift, &n.scalar)
 	n.values[3] = v
-	n.placed[3] = v != (util.OwnedRational{})
+	n.placed[3] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -258,7 +257,7 @@ func (n *BitVectorLogicalShiftNumerals) Wide(width uint32, left bool) error {
 	if left {
 		v, e = q.MulWithInvocation(&n.values[0], &n.values[3], &n.scalar)
 		n.values[4] = v
-		n.placed[4] = v != (util.OwnedRational{})
+		n.placed[4] = v != (unumeral.OwnedRational{})
 		if e == nil {
 			e = n.retire()
 		}

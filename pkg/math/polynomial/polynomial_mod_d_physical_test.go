@@ -4,13 +4,13 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This independent named census additionally accounts the map's cold owner.
 // Its Go-managed degree slice is outside the Runtime block graph.
-func polynomialModDPhysical(t *testing.T, m *MultivariatePolynomialCore, q, r *PolynomialRef, d *PolynomialVariableDegrees, polys []Polynomial, public ...*util.Int) {
+func polynomialModDPhysical(t *testing.T, m *MultivariatePolynomialCore, q, r *PolynomialRef, d *PolynomialVariableDegrees, polys []Polynomial, public ...*unumeral.Int) {
 	t.Helper()
 	s := &m.pseudoDivision
 	for i := range s.refs {
@@ -37,7 +37,7 @@ func polynomialModDPhysical(t *testing.T, m *MultivariatePolynomialCore, q, r *P
 	}
 	polynomialOperationMonomialAudit(t, m, polys, monos)
 }
-func polynomialModDNewtonPhysicalWithRaw(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []umemory.Block, degrees []*PolynomialVariableDegrees, public ...*util.Int) {
+func polynomialModDNewtonPhysicalWithRaw(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []umemory.Block, degrees []*PolynomialVariableDegrees, public ...*unumeral.Int) {
 	t.Helper()
 	var headers uint64
 	for _, d := range degrees {

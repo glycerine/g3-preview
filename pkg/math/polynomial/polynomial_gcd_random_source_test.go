@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/clibrand"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialFreshValueUsesSharedLibcStreamAndRejectsUsedInputs(t *testing.T) {
@@ -16,17 +16,17 @@ func TestPolynomialFreshValueUsesSharedLibcStreamAndRejectsUsedInputs(t *testing
 	serviceMust(t, full.newton.SetOwner(c))
 	n, e := full.newton.At(0)
 	serviceMust(t, e)
-	one, four := util.NewInt(1), util.NewInt(4)
+	one, four := unumeral.NewInt(1), unumeral.NewInt(4)
 	serviceMust(t, c.modular.SetInt32(&four, 4))
 	serviceMust(t, n.Add(&one, c.unit))
 	serviceMust(t, n.Add(&four, c.unit))
 	clibrand.Srand(1)
 	t.Cleanup(func() { clibrand.Srand(1) })
-	out := util.NewInt(99)
+	out := unumeral.NewInt(99)
 	serviceMust(t, full.peekFresh(n.Inputs(), 7, &out))
 	// Captured glibc seed-1 draws: 1804289383%7=1,
 	// 846930886%7=4, 1681692777%7=2. The first two are already used.
-	if out != util.NewInt(2) {
+	if out != unumeral.NewInt(2) {
 		t.Fatal("source rejection/candidate", out)
 	}
 	if next := clibrand.Rand(); next != 1714636915 {
@@ -46,15 +46,15 @@ func TestPolynomialFreshValueZeroModulusSourceProfile(t *testing.T) {
 	serviceMust(t, e)
 	clibrand.Srand(1)
 	t.Cleanup(func() { clibrand.Srand(1) })
-	out := util.NewInt(99)
+	out := unumeral.NewInt(99)
 	e = full.peekFresh(n.Inputs(), 0, &out)
-	want := util.ErrDivideByZero
+	want := unumeral.ErrDivideByZero
 	next := uint32(846930886)
 	if polynomialSourceDebug {
 		want = ErrPolynomialAssertion
 		next = 1804289383
 	}
-	if !errors.Is(e, want) || out != util.NewInt(99) {
+	if !errors.Is(e, want) || out != unumeral.NewInt(99) {
 		t.Fatal("reached zero-modulus guard before SET", e, out)
 	}
 	if draw := clibrand.Rand(); draw != next {

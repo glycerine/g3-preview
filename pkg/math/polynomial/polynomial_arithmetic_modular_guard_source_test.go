@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Invalid passed-owner metadata is a Go boundary guard fixture, not a source
@@ -13,16 +12,16 @@ import (
 func TestPolynomialArithmeticReceiptRejectsForeignModularReceiver(t *testing.T) {
 	full := polynomialArithmeticDirectNumericFixture(t)
 	c := full.core
-	foreign, e := util.NewIntegerModularManagerWithUint64(c.integer, 5, true)
+	foreign, e := unumeral.NewIntegerModularManagerWithUint64(c.integer, 5, true)
 	serviceMust(t, e)
 	defer func() { serviceMust(t, foreign.Close()) }()
 	var r polynomialArithmeticInvocationReceipt
 	serviceMust(t, c.som.acquireArithmeticInvocation(&r))
 	r.frame.executing = true
-	var out util.Int
+	var out unumeral.Int
 	serviceMust(t, numericIntegerModularManager_setInt64WithArithmeticReceipt(foreign, &out, 7, &r))
 	r.frame.executing = false
-	if out != util.NewInt(2) || r.frame.normalize != (util.IntegerNormalizeInvocationReceipt{}) || (r.frame.numeric).NumericAllocationRoots != (polynomialNumericRoots{}).NumericAllocationRoots {
+	if out != unumeral.NewInt(2) || r.frame.normalize != (unumeral.IntegerNormalizeInvocationReceipt{}) || (r.frame.numeric).NumericAllocationRoots != (polynomialNumericRoots{}).NumericAllocationRoots {
 		t.Fatal("foreign modular manager adopted passed arithmetic authority", out, r.frame.normalize, r.frame.numeric)
 	}
 	serviceMust(t, c.cleanupArithmeticInvocation(&r, true))
@@ -34,7 +33,7 @@ func TestPolynomialArithmeticReceiptRejectsForeignModularReceiver(t *testing.T) 
 func TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse(t *testing.T) {
 	full := polynomialArithmeticDirectNumericFixture(t)
 	c := full.core
-	five := util.NewInt(5)
+	five := unumeral.NewInt(5)
 	serviceMust(t, c.modular.SetZP(&five))
 	var r polynomialArithmeticInvocationReceipt
 	serviceMust(t, c.som.acquireArithmeticInvocation(&r))
@@ -50,9 +49,9 @@ func TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse(t 
 	if (old.roots(c.integer)) != nil {
 		t.Fatal("old allocation context adopted later invocation through reused receipt pointer")
 	}
-	out := util.NewInt(7)
+	out := unumeral.NewInt(7)
 	serviceMust(t, numericIntegerModularManager_normalizeWithSourceContext(c.modular, &out, old))
-	if out != util.NewInt(2) || r.frame.normalize != (util.IntegerNormalizeInvocationReceipt{}) {
+	if out != unumeral.NewInt(2) || r.frame.normalize != (unumeral.IntegerNormalizeInvocationReceipt{}) {
 		t.Fatal("stale context acquired younger PN authority", out, r.frame.normalize)
 	}
 	current := numericIntegerModularManager_arithmeticAllocationContext(c.modular, &r)

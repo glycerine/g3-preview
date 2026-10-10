@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes(t *testing.T) {
@@ -15,7 +14,7 @@ func TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes(t *test
 		c := m.core
 		_, e := c.monomials.MkVar()
 		serviceMust(t, e)
-		var modulus, upper, carrier util.Int
+		var modulus, upper, carrier unumeral.Int
 		digits := make([]uint32, 64)
 		digits[63] = 1
 		serviceMust(t, c.integer.SetLimbs(&modulus, digits))
@@ -27,11 +26,11 @@ func TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes(t *test
 		serviceMust(t, e)
 		unit, e := c.monomials.MkMonomial(nil)
 		serviceMust(t, e)
-		p, e := c.MkTerms([]util.Int{upper, util.NewInt(1)}, []Monomial{x2, unit})
+		p, e := c.MkTerms([]unumeral.Int{upper, unumeral.NewInt(1)}, []Monomial{x2, unit})
 		serviceMust(t, e)
 		p = polynomialCaller(t, c, p)
 		// Real deletion warms only the owning ID recycle vectors.
-		eleven := util.NewInt(11)
+		eleven := unumeral.NewInt(11)
 		doomed, e := c.MkConstantTakeCopy(&eleven)
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(doomed))
@@ -40,7 +39,7 @@ func TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes(t *test
 		serviceMust(t, e)
 		serviceMust(t, c.monomials.IncRef(doomedMonomial))
 		serviceMust(t, c.monomials.DecRef(doomedMonomial))
-		thirteen := util.NewInt(13)
+		thirteen := unumeral.NewInt(13)
 		old, e := c.MkConstantTakeCopy(&thirteen)
 		serviceMust(t, e)
 		r, e := NewPolynomialRef(c)
@@ -53,7 +52,7 @@ func TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes(t *test
 				return nil
 			}
 			calls++
-			two := util.NewInt(2)
+			two := unumeral.NewInt(2)
 			if e := core.integer.Mul(&upper, &two, &carrier); e != nil {
 				return e
 			}
@@ -67,10 +66,10 @@ func TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes(t *test
 		serviceMust(t, c.AddDeletionHandler(h))
 		e = m.Discriminant(p, 0, r)
 		s := &m.discriminant
-		polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming, s.refs[0].value, s.refs[1].value}, []*util.Int{&modulus, &upper, &carrier, &s.lc}, r.header+h.header)
+		polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming, s.refs[0].value, s.refs[1].value}, []*unumeral.Int{&modulus, &upper, &carrier, &s.lc}, r.header+h.header)
 		if e != nil && s.leadingNeg.Invocation != 0 && s.leadingNeg.Frame.Stage == 2 && s.scalar.invocation == 0 {
 			selected = true
-			zero := util.NewInt(0)
+			zero := unumeral.NewInt(0)
 			negative, signErr := c.integer.Less(&s.lc, &zero)
 			serviceMust(t, signErr)
 			if !negative || s.scalar.invocation != 0 || r.root.value != c.zero || !numericPhysicalReservationRefusal(e) {
@@ -78,7 +77,7 @@ func TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes(t *test
 			}
 		}
 		serviceMust(t, m.CleanupDiscriminant())
-		polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming}, []*util.Int{&modulus, &upper, &carrier}, r.header+h.header)
+		polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming}, []*unumeral.Int{&modulus, &upper, &carrier}, r.header+h.header)
 		c.integer.Budget().FailAfter(-1)
 		serviceMust(t, c.RemoveDeletionHandler(h))
 		serviceMust(t, h.CloseChecked())
@@ -91,7 +90,7 @@ func TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes(t *test
 			}
 		}
 		serviceMust(t, r.Close())
-		for _, n := range []*util.Int{&modulus, &upper, &carrier} {
+		for _, n := range []*unumeral.Int{&modulus, &upper, &carrier} {
 			serviceMust(t, c.integer.Del(n))
 		}
 		if success {

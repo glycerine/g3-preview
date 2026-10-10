@@ -7,13 +7,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialFactorToPolynomialActualChildReceipt(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
-	values := []util.Int{util.NewInt(7), util.NewInt(3)}
+	values := []unumeral.Int{unumeral.NewInt(7), unumeral.NewInt(3)}
 	var r polynomialToPolynomialInvocationReceipt
 	p, e := full.toPolynomialWithReceipt(2, values, 0, &r)
 	serviceMust(t, e)
@@ -39,10 +40,10 @@ func TestPolynomialFactorToPolynomialEveryBigReservationPrefix(t *testing.T) {
 		t.Run(strconv.FormatInt(prefix, 10), func(t *testing.T) {
 			full := polynomialPSCFullFixture(t)
 			z := full.core.integer
-			var a util.Int
-			one := util.NewInt(1)
+			var a unumeral.Int
+			one := unumeral.NewInt(1)
 			serviceMust(t, z.Mul2k(&one, 521, &a))
-			values := []util.Int{a, util.NewInt(3)}
+			values := []unumeral.Int{a, unumeral.NewInt(3)}
 			var r polynomialToPolynomialInvocationReceipt
 			z.Budget().FailAfter(prefix)
 			p, cause := full.toPolynomialWithReceipt(2, values, 0, &r)
@@ -50,7 +51,7 @@ func TestPolynomialFactorToPolynomialEveryBigReservationPrefix(t *testing.T) {
 			if p != (Polynomial{}) {
 				returned = []Polynomial{p}
 			}
-			polynomialImpPhysicalAuditNamed(t, full, returned, []*util.Int{&a}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, returned, []*unumeral.Int{&a}, 0)
 			if cause != nil && !numericPhysicalReservationRefusal(cause) {
 				t.Fatal(cause)
 			}
@@ -76,7 +77,7 @@ func TestPolynomialFactorToPolynomialEveryBigReservationPrefix(t *testing.T) {
 func TestPolynomialFactorToPolynomialActualFailureHistoryAndStaleContext(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	var old polynomialToPolynomialInvocationReceipt
-	_, cause := full.toPolynomialWithReceipt(2, []util.Int{util.NewInt(7)}, 0, &old)
+	_, cause := full.toPolynomialWithReceipt(2, []unumeral.Int{unumeral.NewInt(7)}, 0, &old)
 	if !errors.Is(cause, arena.ErrBounds) {
 		t.Fatal("reached missing coefficient", cause)
 	}

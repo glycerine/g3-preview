@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames(t *testing.T) {
@@ -16,10 +17,10 @@ func TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames(t *testing.T) 
 	q := m.core.config.Rationals
 	v := polynomialEvalRationalMap{manager: q}
 	for i := range v.values {
-		v.values[i] = util.NewRational()
+		v.values[i] = unumeral.NewRational()
 		serviceMust(t, q.SetInt32(&v.values[i], 2))
 	}
-	out := util.NewRational()
+	out := unumeral.NewRational()
 	defer func() {
 		serviceMust(t, m.CleanupEvaluation())
 		for i := range v.values {
@@ -58,7 +59,7 @@ func TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary(t *testing
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		contextTLSFinish(t, rt, q.CloseChecked)
@@ -70,9 +71,9 @@ func TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary(t *testing
 	m, p, _ := polynomialEvalFixtureWithRationals(t, q, []polynomialEvalTerm{{1, [3]uint32{1, 1, 0}}})
 	v := polynomialEvalRationalMap{manager: q}
 	for i := range v.values {
-		v.values[i] = util.NewRational()
+		v.values[i] = unumeral.NewRational()
 	}
-	out := util.NewRational()
+	out := unumeral.NewRational()
 	defer func() {
 		if !m.closed {
 			contextTLSFinish(t, rt, m.CleanupEvaluation)
@@ -92,7 +93,7 @@ func TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary(t *testing
 	polynomialEvaluationAudit(t, m, p, &v, &out)
 	term, e := m.core.monomials.MkVariable(2, 1)
 	serviceMust(t, e)
-	warm, e := m.core.MkTerms([]util.Int{util.NewInt(3)}, []Monomial{term})
+	warm, e := m.core.MkTerms([]unumeral.Int{unumeral.NewInt(3)}, []Monomial{term})
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(warm))
 	serviceMust(t, m.core.DecRef(warm))

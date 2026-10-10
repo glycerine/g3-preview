@@ -9,17 +9,18 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func paramsTestOwner(t *testing.T) (*ParamsContext, *usymbol.Manager, *RationalService) {
+func paramsTestOwner(t *testing.T) (*ParamsContext, *usymbol.Manager, *unumeral.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	if e != nil {
 		t.Fatal(e)
 	}
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -455,7 +456,7 @@ func TestParamsReferenceSourceGrowthAndFailurePrefixes(t *testing.T) {
 // Audit live roots BEFORE rendering or teardown, so Close cannot hide leaked
 // unpublished numerals. In these sweeps every big rational is one big integer
 // numerator with an inline denominator, hence owns exactly one numeric cell.
-func paramsAuditRoots(t *testing.T, c *ParamsContext, q *RationalService, base, basePayloads uint32, roots []ParamsRef) {
+func paramsAuditRoots(t *testing.T, c *ParamsContext, q *unumeral.RationalService, base, basePayloads uint32, roots []ParamsRef) {
 	t.Helper()
 	var bigs uint32
 	for i, frame := range c.replacementFrames {
@@ -470,7 +471,7 @@ func paramsAuditRoots(t *testing.T, c *ParamsContext, q *RationalService, base, 
 			}
 		}
 	}
-	auditNumeral := func(value *OwnedRational) {
+	auditNumeral := func(value *unumeral.OwnedRational) {
 		big, e := q.IsBig(value)
 		if e != nil {
 			// Read-only test reflection checks the actual service-owned dead
@@ -560,7 +561,7 @@ func paramsAuditRoots(t *testing.T, c *ParamsContext, q *RationalService, base, 
 // The actual unassigned physical root is separate from numeric descriptors.
 // This census reads its exact allocator location and Runtime backing, never
 // reconstructs a token or treats cold locator entries as owning numerals.
-func paramsPendingNumericObject(t *testing.T, q *RationalService) uint32 {
+func paramsPendingNumericObject(t *testing.T, q *unumeral.RationalService) uint32 {
 	t.Helper()
 	z := testFieldBySourceName(testFieldBySourceName(reflect.ValueOf(q).Elem(), "manager").Elem(), "z").Elem()
 	pending := testFieldBySourceName(z, "pendingCell")
@@ -646,7 +647,7 @@ func TestParamsReferenceReservationFailureSweeps(t *testing.T) {
 				digits = 800
 			}
 			paramsMust(t, q.SetString(&wide, "1"+strings.Repeat("0", digits)))
-			var numberBank [16]OwnedRational
+			var numberBank [16]unumeral.OwnedRational
 			for i := range numberBank {
 				numberBank[i], e = q.NewValue()
 				paramsMust(t, e)
@@ -771,7 +772,7 @@ func TestParamsReferenceConstructorFaultAndRecordShape(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	paramsMust(t, e)
 	baseline := b.Used()
 	completed := false
@@ -847,7 +848,7 @@ func TestParamsReferenceSelfCopySourceRatIdentity(t *testing.T) {
 	wide, e := q.NewValue()
 	paramsMust(t, e)
 	paramsMust(t, q.SetString(&wide, "1"+strings.Repeat("0", 100)))
-	var bank [16]OwnedRational
+	var bank [16]unumeral.OwnedRational
 	for i := range bank {
 		bank[i], e = q.NewValue()
 		paramsMust(t, e)

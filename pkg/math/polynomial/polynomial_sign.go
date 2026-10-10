@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // PolynomialSign is the source three-valued sign. Unknown also represents
@@ -17,7 +17,7 @@ const (
 	PolynomialSignPositive PolynomialSign = 1
 )
 
-func (m *MultivariatePolynomialCore) termSign(term Monomial, coefficient *util.Int, signs []PolynomialSign) (PolynomialSign, error) {
+func (m *MultivariatePolynomialCore) termSign(term Monomial, coefficient *unumeral.Int, signs []PolynomialSign) (PolynomialSign, error) {
 	n, e := m.monomials.sizeCore(term)
 	if e != nil {
 		return PolynomialSignUnknown, e

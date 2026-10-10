@@ -3,8 +3,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *MultivariatePolynomialManager) gcdPrimitivePart(p Polynomial, x uint32, out *polynomialReference) error {
@@ -254,7 +253,7 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 // This is the actual scalar-times-two-polynomials overload reached by PRS;
 // multiplying the polynomials first and then scaling would change source
 // checkpoints, coefficient publication and lifetime.
-func (m *MultivariatePolynomialManager) gcdScalarProduct(a *util.Int, p, q Polynomial) (result Polynomial, err error) {
+func (m *MultivariatePolynomialManager) gcdScalarProduct(a *unumeral.Int, p, q Polynomial) (result Polynomial, err error) {
 	c := m.core
 	zero, e := c.modular.IsZero(a)
 	if e != nil {

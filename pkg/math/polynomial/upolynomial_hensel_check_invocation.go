@@ -4,8 +4,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This is the actual conditional child scope, embedded in the charged pair frame.
@@ -13,7 +12,7 @@ import (
 // consumes it. The numeral br is scoped and precedes the first related manager.
 
 type upolyHenselCheckScope struct {
-	br, transport                              util.Int
+	br, transport                              unumeral.Int
 	transportBound                             bool
 	brCore, bCore                              *UPolynomialManager
 	brPrevious, bPrevious                      *upolyHenselPairScope

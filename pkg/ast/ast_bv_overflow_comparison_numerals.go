@@ -2,9 +2,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorOverflowComparisonNumerals owns a0/b0, reached difference or
@@ -12,9 +11,9 @@ import (
 type BitVectorOverflowComparisonNumerals struct {
 	self                   *BitVectorOverflowComparisonNumerals
 	manager                *ASTManager
-	values                 [6]util.OwnedRational
+	values                 [6]unumeral.OwnedRational
 	placed                 [6]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	header                 uint64
 	sourceCause            error
@@ -69,7 +68,7 @@ func (n *BitVectorOverflowComparisonNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorOverflowComparisonNumerals) Read(i int, arg ASTHandle, width *uint32) (bool, error) {
@@ -160,7 +159,7 @@ func (n *BitVectorOverflowComparisonNumerals) subtract(dst, a, b int) error {
 		return ErrASTPending
 	}
 	v, e := n.manager.numerals.SubWithInvocation(&n.values[a], &n.values[b], &n.scalar)
-	n.values[dst], n.placed[dst] = v, v != (util.OwnedRational{})
+	n.values[dst], n.placed[dst] = v, v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -174,7 +173,7 @@ func (n *BitVectorOverflowComparisonNumerals) power(width uint32) error {
 		return ErrASTPending
 	}
 	v, e := n.manager.numerals.PowerOfTwoWithInvocation(width, &n.scalar)
-	n.values[4], n.placed[4] = v, v != (util.OwnedRational{})
+	n.values[4], n.placed[4] = v, v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -198,7 +197,7 @@ func (n *BitVectorOverflowComparisonNumerals) Bounds(width uint32) error {
 		return e
 	}
 	v, e := n.manager.numerals.SubOneWithInvocation(&n.values[5], &n.scalar)
-	n.values[3], n.placed[3] = v, v != (util.OwnedRational{})
+	n.values[3], n.placed[3] = v, v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}

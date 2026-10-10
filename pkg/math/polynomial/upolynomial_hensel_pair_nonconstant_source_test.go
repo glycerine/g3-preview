@@ -4,8 +4,8 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialHenselPairNonconstantDivisionEveryReachedPrefix(t *testing.T) {
@@ -23,9 +23,9 @@ func TestUPolynomialHenselPairNonconstantDivisionEveryReachedPrefix(t *testing.T
 		})
 		service = s
 		m := s.manager
-		var prime, n, negativeN, constant, want, negativeWant, leading, quarter, temporary util.Int
+		var prime, n, negativeN, constant, want, negativeWant, leading, quarter, temporary unumeral.Int
 		serviceMust(t, q.Integers().SetLimbs(&prime, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
-		one, two := util.NewInt(1), util.NewInt(2)
+		one, two := unumeral.NewInt(1), unumeral.NewInt(2)
 		serviceMust(t, q.Integers().Sub(&prime, &one, &n))
 		serviceMust(t, q.Integers().Div(&n, &two, &n))
 		serviceMust(t, q.Integers().Copy(&negativeN, &n))
@@ -41,16 +41,16 @@ func TestUPolynomialHenselPairNonconstantDivisionEveryReachedPrefix(t *testing.T
 		serviceMust(t, q.Integers().Add(&quarter, &one, &temporary))
 		serviceMust(t, q.Integers().Mul(&prime, &temporary, &negativeWant))
 		serviceMust(t, q.Integers().Sub(&n, &negativeWant, &negativeWant))
-		args := []*util.Int{&prime, &n, &negativeN, &constant, &want, &negativeWant, &leading, &quarter, &temporary}
+		args := []*unumeral.Int{&prime, &n, &negativeN, &constant, &want, &negativeWant, &leading, &quarter, &temporary}
 		inputs := [5]upolyVectorState{}
-		vals := [5][]util.Int{{util.NewInt(1)}, {negativeN, util.NewInt(1)}, {util.NewInt(-1)}, {n, util.NewInt(1)}, {constant, util.NewInt(0), leading}}
+		vals := [5][]unumeral.Int{{unumeral.NewInt(1)}, {negativeN, unumeral.NewInt(1)}, {unumeral.NewInt(-1)}, {n, unumeral.NewInt(1)}, {constant, unumeral.NewInt(0), leading}}
 		for i := range inputs {
 			serviceMust(t, m.set(&inputs[i], vals[i]))
 		}
 		outputs := [2]upolyVectorState{}
 		q.Budget().FailAfter(ordinal)
 		body := s.henselPair(&prime, &prime, &prime, m.stateView(&inputs[0]), m.stateView(&inputs[1]), m.stateView(&inputs[2]), m.stateView(&inputs[3]), m.stateView(&inputs[4]), &outputs[0], &outputs[1])
-		roots := append([]*util.Int{}, args...)
+		roots := append([]*unumeral.Int{}, args...)
 		for _, v := range []*upolyVectorState{&inputs[0], &inputs[1], &inputs[2], &inputs[3], &inputs[4], &outputs[0], &outputs[1]} {
 			if v.backing != 0 {
 				a := m.values(v)

@@ -7,15 +7,15 @@ import (
 	"math"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialActualModularCallerCloseBeforeReturn(t *testing.T) {
 	for _, mode := range []string{"knuth", "upper", "integer", "binary", "rational", "negation", "display"} {
 		t.Run(mode, func(t *testing.T) {
 			var p *UPolynomialManager
-			var foreign *util.IntegerModularManager
+			var foreign *unumeral.IntegerModularManager
 			armed, reached := false, false
 			transport := func(f umemory.Failure) error {
 				if !armed {
@@ -38,26 +38,26 @@ func TestUPolynomialActualModularCallerCloseBeforeReturn(t *testing.T) {
 			c, actual, rt := algebraicNegTLSFixture(t, transport)
 			p = actual
 			z := c.config.Rationals.Integers()
-			foreign, e := util.NewIntegerModularManager(z)
+			foreign, e := unumeral.NewIntegerModularManager(z)
 			serviceMust(t, e)
 			poly, e := p.NewPolynomial()
 			serviceMust(t, e)
-			values := []util.Int{util.NewInt(1), util.NewInt(math.MaxInt32), util.NewInt(1)}
+			values := []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(math.MaxInt32), unumeral.NewInt(1)}
 			if mode == "knuth" {
-				values = []util.Int{util.NewInt(1), util.NewInt(math.MinInt32), util.NewInt(1)}
+				values = []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(math.MinInt32), unumeral.NewInt(1)}
 			}
-			var big util.Int
+			var big unumeral.Int
 			if mode == "upper" || mode == "display" {
 				serviceMust(t, z.SetLimbs(&big, []uint32{1, 2, 3, 4}))
-				values = []util.Int{big, util.NewInt(1)}
+				values = []unumeral.Int{big, unumeral.NewInt(1)}
 			}
 			serviceMust(t, p.SetInts(poly, values))
 			serviceMust(t, z.Del(&big))
 			v, e := p.wholeView(poly)
 			serviceMust(t, e)
-			var integer, out util.Int
-			var binary util.BinaryRational
-			var rational util.Rational
+			var integer, out unumeral.Int
+			var binary unumeral.BinaryRational
+			var rational unumeral.Rational
 			var algebraic Algebraic
 			if mode == "integer" {
 				serviceMust(t, z.SetInt32(&integer, math.MaxInt32))
@@ -69,11 +69,11 @@ func TestUPolynomialActualModularCallerCloseBeforeReturn(t *testing.T) {
 				serviceMust(t, c.config.Rationals.SetInt32(&rational, math.MaxInt32))
 			}
 			if mode == "negation" {
-				serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(1), util.NewInt(math.MinInt32), util.NewInt(1)}))
+				serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(math.MinInt32), unumeral.NewInt(1)}))
 				v, e = p.wholeView(poly)
 				serviceMust(t, e)
-				var lower, upper util.BinaryRational
-				var upperInt util.Int
+				var lower, upper unumeral.BinaryRational
+				var upperInt unumeral.Int
 				serviceMust(t, c.config.Binary.SetInt32(&lower, math.MaxInt32))
 				serviceMust(t, z.SetUint32(&upperInt, uint32(math.MaxInt32)+3))
 				serviceMust(t, c.config.Binary.SetInteger(&upper, &upperInt))
@@ -107,7 +107,7 @@ func TestUPolynomialActualModularCallerCloseBeforeReturn(t *testing.T) {
 			if !reached || body == nil {
 				t.Fatal("actual allocating callback absent", mode, reached, body)
 			}
-			extra := []*util.Int{&integer, &out, &(*binary.BorrowNumerator()), &(*rational.BorrowNumerator()), &(*rational.BorrowDenominator())}
+			extra := []*unumeral.Int{&integer, &out, &(*binary.BorrowNumerator()), &(*rational.BorrowNumerator()), &(*rational.BorrowDenominator())}
 			if mode == "upper" {
 				for i := range p.rootUpperBound.values {
 					extra = append(extra, &p.rootUpperBound.values[i])
@@ -208,7 +208,7 @@ func TestAlgebraicBasicNegDoesNotBorrowUPModularOwner(t *testing.T) {
 	}
 	var rt *umemory.Runtime
 	c, p, rt = algebraicNegTLSFixture(t, transport)
-	var r util.Rational
+	var r unumeral.Rational
 	serviceMust(t, c.config.Rationals.SetInt32(&r, math.MinInt32))
 	var a Algebraic
 	serviceMust(t, c.SetRational(&a, &r))

@@ -3,8 +3,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 var ErrPolynomialUnreachable = errors.New("mpnum: polynomial source compiler unreachable")
@@ -69,12 +68,12 @@ type polynomialExactDivisionScope struct {
 	invocation               uint64
 	pscOwner                 uint64
 	monomial                 polynomialDivisionReference
-	numeral                  util.Int
+	numeral                  unumeral.Int
 	numeric                  polynomialNumericRoots
-	normalize                util.IntegerNormalizeInvocationReceipt
-	divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
+	normalize                unumeral.IntegerNormalizeInvocationReceipt
+	divisionRaw, extendedRaw unumeral.IntegerRawInvocationReceipt
 
-	boolNumeral                          util.IntegerDividesNumeralInvocationReceipt
+	boolNumeral                          unumeral.IntegerDividesNumeralInvocationReceipt
 	scalarReceipt                        polynomialScalarExactDivInvocationReceipt
 	directReceipt                        polynomialExactDivInvocationReceipt
 	output                               polynomialArithmeticInvocationReceipt

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -110,7 +110,7 @@ func TestPolynomialFactorZeroPreservesExistingOutputRows(t *testing.T) {
 	serviceMust(t, full.Factor(full.core.zero, out, DefaultUPolynomialFactorParams()))
 	after, e := out.Distinct()
 	serviceMust(t, e)
-	if out.constant != util.NewInt(0) || before != after || !reflect.DeepEqual(factors, out.factors) || !reflect.DeepEqual(degrees, out.degrees) {
+	if out.constant != unumeral.NewInt(0) || before != after || !reflect.DeepEqual(factors, out.factors) || !reflect.DeepEqual(degrees, out.degrees) {
 		t.Fatal("zero wrapper must preserve rows", before, after)
 	}
 	serviceMust(t, out.CloseChecked())

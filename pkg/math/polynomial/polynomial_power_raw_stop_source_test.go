@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // A real signed-host accounting guard isolates the reached AddMul RAW end DEL.
@@ -20,24 +21,24 @@ func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t 
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	c := m.core
 	_, e = c.monomials.MkVar()
 	serviceMust(t, e)
-	var large, warm util.Int
+	var large, warm unumeral.Int
 	digits := make([]uint32, 2)
 	digits[0] = 17
 	digits[1] = 1 << 30
 	serviceMust(t, c.integer.SetLimbs(&large, digits))
 	term, e := c.monomials.MkVariable(0, 3)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{large, util.NewInt(3)}, []Monomial{term, c.monomials.unit})
+	p, e := c.MkTerms([]unumeral.Int{large, unumeral.NewInt(3)}, []Monomial{term, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
-	var modulus util.Int
+	var modulus unumeral.Int
 	modulusDigits := make([]uint32, 6)
 	modulusDigits[0] = 251
 	modulusDigits[5] = 1 << 31
@@ -46,8 +47,8 @@ func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t 
 
 	var warmPolynomial polynomialReference
 	serviceMust(t, c.powerInto(p, 2, &warmPolynomial))
-	three := util.NewInt(3)
-	var warmProduct util.Int
+	three := unumeral.NewInt(3)
+	var warmProduct unumeral.Int
 	serviceMust(t, c.integer.Mul(&large, &three, &warmProduct))
 	serviceMust(t, c.integer.Rem(&warmProduct, &(*c.modular.BorrowModulus()), &warm))
 	// Ordinary warm cycles retain the actual shared multiplication/remainder
@@ -71,7 +72,7 @@ func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t 
 			}
 			contextTLSFinish(t, rt, func() error { return c.CleanupValue(&p) })
 		}
-		for _, a := range []*util.Int{&large, &warm, &warmProduct, &modulus} {
+		for _, a := range []*unumeral.Int{&large, &warm, &warmProduct, &modulus} {
 			contextTLSFinish(t, rt, func() error { return c.integer.Del(a) })
 		}
 		contextTLSFinish(t, rt, m.CloseChecked)
@@ -129,7 +130,7 @@ func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t 
 	serviceMust(t, x)
 	termRow, x := c.som.ms.monomial(c, 0)
 	serviceMust(t, x)
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, output.value, output.incoming, warmPolynomial.value, warmPolynomial.incoming}, []*util.Int{&large, &warm, &warmProduct, &modulus}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, output.value, output.incoming, warmPolynomial.value, warmPolynomial.incoming}, []*unumeral.Int{&large, &warm, &warmProduct, &modulus}, 0)
 	state := rt.State()
 	if c.finishPolynomialPowerSource() != source || rt.State() != state || receipt.frame.result.value != p {
 		t.Fatal("source retry changed stopped older result")
@@ -157,7 +158,7 @@ func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t 
 	if receipt.frame.sourceCause != source || c.powerInvocationSourceCause(&receipt) != source || c.integer.AddMulInvocationSourceCause(&oldRAW) != source {
 		t.Fatal("own ack erased source history")
 	}
-	if row == (util.Int{}) || termRow == (Monomial{}) {
+	if row == (unumeral.Int{}) || termRow == (Monomial{}) {
 		t.Fatal("stopped source lacked actual persistent row", row, termRow)
 	}
 	serviceMust(t, c.modular.SetZ())
@@ -171,7 +172,7 @@ func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t 
 	if !errors.Is(oldReturnedError, source) || oldReturnedError.Error() != oldErrorText {
 		t.Fatal("new source changed previous exception/history")
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p, output.value, output.incoming, warmPolynomial.value, warmPolynomial.incoming}, []*util.Int{&large, &warm, &warmProduct, &modulus}, 0, []umemory.Block{recovery})
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p, output.value, output.incoming, warmPolynomial.value, warmPolynomial.incoming}, []*unumeral.Int{&large, &warm, &warmProduct, &modulus}, 0, []umemory.Block{recovery})
 	serviceMust(t, c.cleanupPowerInvocation(&later, true))
 	serviceMust(t, output.closeValue(c, true))
 	serviceMust(t, output.abort(c))

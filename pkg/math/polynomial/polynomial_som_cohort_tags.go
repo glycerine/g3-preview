@@ -3,7 +3,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Native scalar tags identify actual slot acquisitions. Payload authority stays
@@ -175,7 +175,7 @@ func (b *polynomialSOM) cleanupTaggedAppendInvocation(r *polynomialCheapAppendIn
 				if e != nil {
 					return e
 				}
-				if e = b.as.putCoefficient(m, i, util.Int{}); e != nil {
+				if e = b.as.putCoefficient(m, i, unumeral.Int{}); e != nil {
 					return e
 				}
 				b.cohortMovingCoefficient = a
@@ -185,7 +185,7 @@ func (b *polynomialSOM) cleanupTaggedAppendInvocation(r *polynomialCheapAppendIn
 				if e = b.as.putCoefficient(m, target, b.cohortMovingCoefficient); e != nil {
 					return e
 				}
-				b.cohortMovingCoefficient = util.Int{}
+				b.cohortMovingCoefficient = unumeral.Int{}
 				s.compactionStage = 2
 			}
 			if s.compactionStage == 2 {
@@ -269,7 +269,7 @@ type polynomialAccumulatorRowTransfer struct {
 	owner                             *MultivariatePolynomialCore
 	frame                             *polynomialCheapAppendScope
 	invocation, coefficient, monomial uint64
-	coefficientValue                  util.Int
+	coefficientValue                  unumeral.Int
 	monomialValue                     Monomial
 }
 

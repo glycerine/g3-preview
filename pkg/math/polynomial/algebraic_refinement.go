@@ -2,20 +2,20 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type algebraicPredicateScope struct {
-	saved                                                                                      util.BinaryInterval
+	saved                                                                                      unumeral.BinaryInterval
 	owner                                                                                      Algebraic
-	lower, upper                                                                               util.BinaryRational
-	candidate                                                                                  util.Int
+	lower, upper                                                                               unumeral.BinaryRational
+	candidate                                                                                  unumeral.Int
 	active, savedActive, savedConstructed, restored, candidateActive, lowerActive, upperActive bool
 	stage                                                                                      uint8
 	cause, cleanup                                                                             error
 }
 
-func (m *AlgebraicRootCore) magnitude(l, u *util.BinaryRational) (int32, error) {
+func (m *AlgebraicRootCore) magnitude(l, u *unumeral.BinaryRational) (int32, error) {
 	b := m.config.Binary
 	z := m.config.Rationals.Integers()
 	if polynomialSourceDebug {

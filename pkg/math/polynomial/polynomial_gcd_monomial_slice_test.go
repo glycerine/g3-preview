@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
 )
 
@@ -125,7 +125,7 @@ func TestPolynomialGCDICCPZPXNativeMonomialGrowthIndependentModel(t *testing.T) 
 	serviceMust(t, e)
 	pr, e := NewPolynomialRef(c)
 	serviceMust(t, e)
-	var ci util.Int
+	var ci unumeral.Int
 	t.Cleanup(func() { serviceMust(t, cr.Close()); serviceMust(t, pr.Close()); serviceMust(t, c.integer.Del(&ci)) })
 	serviceMust(t, full.iccpZPX(p, 0, &ci, &cr.root, &pr.root))
 	polynomialQueryExpect(t, c, cr.root.value, map[[3]uint32]int64{{1, 0, 0}: 1, {}: 1})

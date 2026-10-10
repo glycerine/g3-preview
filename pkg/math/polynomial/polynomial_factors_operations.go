@@ -5,8 +5,8 @@ package polynomial
 import (
 	"errors"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (f *PolynomialFactors) invoke(body func() error) error {
@@ -319,7 +319,7 @@ func (f *PolynomialFactors) DisplayInto(sink PolynomialTextSink) (cause error) {
 	}
 	return nil
 }
-func (m *MultivariatePolynomialManager) AccumulateFactorConstant(f *PolynomialFactors, c *util.Int) error {
+func (m *MultivariatePolynomialManager) AccumulateFactorConstant(f *PolynomialFactors, c *unumeral.Int) error {
 	return m.accumulateFactorConstantWithReceipt(f, c, nil)
 }
 func (m *MultivariatePolynomialManager) FlipFactorSign(f *PolynomialFactors) error {

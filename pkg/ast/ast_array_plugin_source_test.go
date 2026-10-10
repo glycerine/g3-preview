@@ -7,7 +7,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -279,7 +280,7 @@ func TestASTArrayFiniteEveryReturnExpressionReservation(t *testing.T) {
 						t.Fatal("completed lexical value not destroyed", ordinal, f)
 					}
 				}
-				if f.tokens[3] == (util.OwnedRational{}) {
+				if f.tokens[3] == (unumeral.OwnedRational{}) {
 					t.Fatal("return expression reached before real Power acquisition", ordinal)
 				}
 			}

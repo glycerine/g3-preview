@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialDividesIndependentFiniteAndZeroReadMask(t *testing.T) {
@@ -40,7 +41,7 @@ func TestPolynomialDividesEveryActualReservationPrefix(t *testing.T) {
 		for ordinal := int64(0); ordinal < 128 && !success; ordinal++ {
 			t.Run(fmt.Sprintf("%v/%d", want, ordinal), func(t *testing.T) {
 				budget := arena.NewBudget(1 << 24)
-				qowner, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+				qowner, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 				serviceMust(t, e)
 				t.Cleanup(func() {
 					qowner.Close()
@@ -94,7 +95,7 @@ func TestPolynomialDividesEveryActualReservationPrefix(t *testing.T) {
 
 func TestPolynomialDividesBigNumericPendingBlocksOwningClose(t *testing.T) {
 	budget := arena.NewBudget(1 << 24)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 10, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 10, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		q.Close()
@@ -111,7 +112,7 @@ func TestPolynomialDividesBigNumericPendingBlocksOwningClose(t *testing.T) {
 	divisor := polynomialQueryTerms(t, c, []int32{1}, [][]MonomialPower{{{0, 2}}})
 	term, e := c.monomials.MkVariable(0, 5)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{q.Integers().Two64}, []Monomial{term})
+	p, e := c.MkTerms([]unumeral.Int{q.Integers().Two64}, []Monomial{term})
 	serviceMust(t, e)
 	p = polynomialCaller(t, c, p)
 	_, e = c.Divides(divisor, p)

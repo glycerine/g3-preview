@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialLazardActualInvocationZeroShortcutAndForeignRefusal(t *testing.T) {
@@ -37,14 +36,14 @@ func TestPolynomialLazardActualBigChildrenEveryReservationPrefix(t *testing.T) {
 	for prefix := int64(0); prefix < 512; prefix++ {
 		full := polynomialPSCFullFixture(t)
 		m := full.core
-		var big util.Int
+		var big unumeral.Int
 		serviceMust(t, m.integer.SetLimbs(&big, []uint32{0, 0, 1 << 16}))
 		linear, e := m.monomials.MkVariable(0, 1)
 		serviceMust(t, e)
-		p, e := m.MkTerms([]util.Int{big, util.NewInt(1)}, []Monomial{linear, m.monomials.unit})
+		p, e := m.MkTerms([]unumeral.Int{big, unumeral.NewInt(1)}, []Monomial{linear, m.monomials.unit})
 		serviceMust(t, e)
 		p = polynomialCaller(t, m, p)
-		y, e := m.MkTerms([]util.Int{big}, []Monomial{m.monomials.unit})
+		y, e := m.MkTerms([]unumeral.Int{big}, []Monomial{m.monomials.unit})
 		serviceMust(t, e)
 		y = polynomialCaller(t, m, y)
 		out, e := NewPolynomialRef(m)
@@ -59,7 +58,7 @@ func TestPolynomialLazardActualBigChildrenEveryReservationPrefix(t *testing.T) {
 		returned := m.seLazardWithReceipt(4, y, p, 0, &out.root, &receipt)
 		s := &m.lazardLocal
 		audit := func() {
-			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p, y, out.root.value, out.root.incoming, s.x.value, s.x.incoming, s.c.value, s.c.incoming}, []*util.Int{&big}, out.header, nil)
+			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p, y, out.root.value, out.root.incoming, s.x.value, s.x.incoming, s.c.value, s.c.incoming}, []*unumeral.Int{&big}, out.header, nil)
 		}
 		audit()
 		if returned != nil && s.phase == 2 {

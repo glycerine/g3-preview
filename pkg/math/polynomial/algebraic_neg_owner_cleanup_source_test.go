@@ -5,10 +5,9 @@ package polynomial
 import (
 	"errors"
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestAlgebraicNegCoreCloseOwnsActualRetainedHornerChild(t *testing.T) {
@@ -21,8 +20,8 @@ func TestAlgebraicNegCoreCloseOwnsActualRetainedHornerChild(t *testing.T) {
 			original := algebraicPolynomial(t, p, 1, math.MinInt32, 1)
 			v, e := p.wholeView(original)
 			serviceMust(t, e)
-			var lower, upper util.BinaryRational
-			var upperInt util.Int
+			var lower, upper unumeral.BinaryRational
+			var upperInt unumeral.Int
 			serviceMust(t, c.config.Binary.SetInt32(&lower, math.MaxInt32))
 			serviceMust(t, z.SetUint32(&upperInt, uint32(math.MaxInt32)+3))
 			serviceMust(t, c.config.Binary.SetInteger(&upper, &upperInt))
@@ -37,7 +36,7 @@ func TestAlgebraicNegCoreCloseOwnsActualRetainedHornerChild(t *testing.T) {
 			if body != nil && !numericPhysicalReservationRefusal(body) {
 				t.Fatal(body)
 			}
-			var extra []*util.Int
+			var extra []*unumeral.Int
 			if q.eval.constructed == 2 {
 				extra = append(extra, &q.eval.values[0], &q.eval.values[1])
 			}
@@ -48,7 +47,7 @@ func TestAlgebraicNegCoreCloseOwnsActualRetainedHornerChild(t *testing.T) {
 			// A new scoped setter cannot silently abort this prior call.
 			retained := body != nil && q.active && q.eval.addMul.Frame != nil && q.eval.addMul.Frame.Tmp.Cell != 0 && !z.IsFailureRef(q.eval.addMul.Frame.Tmp.Cell)
 			if retained {
-				value := util.NewRational()
+				value := unumeral.NewRational()
 				before := q.diagnostic()
 				tmp := q.eval.addMul.Frame.Tmp
 				used := z.Budget().Used()

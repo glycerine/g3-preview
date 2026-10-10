@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialFactorLiftPreparationCompletedChildPrecedesOlderSource(t *testing.T) {
@@ -21,7 +20,7 @@ func TestUPolynomialFactorLiftPreparationCompletedChildPrecedesOlderSource(t *te
 			c, e := s.newSquareFreeScope()
 			serviceMust(t, e)
 			c.constructed = 1
-			serviceMust(t, m.set(&c.fpp, []util.Int{util.NewInt(-6), util.NewInt(1), util.NewInt(1)}))
+			serviceMust(t, m.set(&c.fpp, []unumeral.Int{unumeral.NewInt(-6), unumeral.NewInt(1), unumeral.NewInt(1)}))
 			serviceMust(t, s.preparePrimeSearch(out))
 			// Compiled eligible post-loop prime profile, using the real trial engine.
 			serviceMust(t, m.modular.SetInt32(&c.p, 7))
@@ -29,7 +28,7 @@ func TestUPolynomialFactorLiftPreparationCompletedChildPrecedesOlderSource(t *te
 			trials := uint32(0)
 			route, e := s.factorPrimeTrial(c.zp, &c.fpp, out, c.best, 1, &c.p, &c.bestP, &c.ds, &trials)
 			serviceMust(t, e)
-			if route != 1 || c.best.count != 2 || c.bestP != util.NewInt(7) {
+			if route != 1 || c.best.count != 2 || c.bestP != unumeral.NewInt(7) {
 				t.Fatal("actual saved-factor setup", route, c.best.count, c.bestP)
 			}
 			z.Budget().FailAfter(ordinal)

@@ -1,35 +1,35 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Caller algorithms keep their own scopes; primitive ownership helpers live in util.
 type polynomialNumericRoots struct {
 	operation                      polynomialNumeralOperationGuard
-	integerBinding, naturalBinding util.NumericCallerBinding
-	util.NumericAllocationRoots
-	hooks   util.NumericInvocationHooks
+	integerBinding, naturalBinding unumeral.NumericCallerBinding
+	unumeral.NumericAllocationRoots
+	hooks   unumeral.NumericInvocationHooks
 	caller  integerAllocationInvocationContext
-	integer *util.IntegerManager
+	integer *unumeral.IntegerManager
 }
 
-func polynomialNumericBefore(z *util.IntegerManager) (polynomialNumericRoots, error) {
-	r, e := util.CaptureNumericAllocationRoots(z)
+func polynomialNumericBefore(z *unumeral.IntegerManager) (polynomialNumericRoots, error) {
+	r, e := unumeral.CaptureNumericAllocationRoots(z)
 	return polynomialNumericRoots{NumericAllocationRoots: r}, e
 }
 func polynomialNegNumericPending(r *polynomialNumericRoots) bool {
-	return util.NumericAllocationPending(&r.NumericAllocationRoots)
+	return unumeral.NumericAllocationPending(&r.NumericAllocationRoots)
 }
-func polynomialNewtonJoin(a, b error) error { return util.JoinNumericErrors(a, b) }
-func upolynomialSourceNumeralDel(z *util.IntegerManager, a *util.Int) (bool, error) {
-	return util.SourceNumeralDel(z, a)
+func polynomialNewtonJoin(a, b error) error { return unumeral.JoinNumericErrors(a, b) }
+func upolynomialSourceNumeralDel(z *unumeral.IntegerManager, a *unumeral.Int) (bool, error) {
+	return unumeral.SourceNumeralDel(z, a)
 }
 
-func (r *polynomialNumericRoots) After(z *util.IntegerManager, before polynomialNumericRoots) error {
+func (r *polynomialNumericRoots) After(z *unumeral.IntegerManager, before polynomialNumericRoots) error {
 	return r.NumericAllocationRoots.After(z, before.NumericAllocationRoots)
 }
-func (r *polynomialNumericRoots) NumericRoots(z *util.IntegerManager, local *util.NumericAllocationRoots) *util.NumericAllocationRoots {
+func (r *polynomialNumericRoots) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
 	if r == nil || r.integer != z {
 		return nil
 	}
@@ -48,26 +48,26 @@ func (r *polynomialNumericRoots) NumericRoots(z *util.IntegerManager, local *uti
 	}
 	return &current.NumericAllocationRoots
 }
-func (c integerAllocationInvocationContext) utility(z *util.IntegerManager) util.NumericAllocationContext {
+func (c integerAllocationInvocationContext) utility(z *unumeral.IntegerManager) unumeral.NumericAllocationContext {
 	if c == (integerAllocationInvocationContext{}) {
-		return util.NumericAllocationContext{}
+		return unumeral.NumericAllocationContext{}
 	}
 	r := c.roots(z)
 	if r == nil {
-		return util.NumericAllocationContext{}.WithCaller(&invalidPolynomialNumericHooks)
+		return unumeral.NumericAllocationContext{}.WithCaller(&invalidPolynomialNumericHooks)
 	}
 	r.caller = c
 	r.integer = z
 	r.hooks.Policy = r
-	return util.NumericAllocationContext{}.WithCaller(&r.hooks)
+	return unumeral.NumericAllocationContext{}.WithCaller(&r.hooks)
 }
 
-var invalidPolynomialNumericHooks util.NumericInvocationHooks
+var invalidPolynomialNumericHooks unumeral.NumericInvocationHooks
 
 // The higher source frame retains the primitive allocation receipt.
-func (r *polynomialNumericRoots) after(z *util.IntegerManager, before polynomialNumericRoots) error {
+func (r *polynomialNumericRoots) after(z *unumeral.IntegerManager, before polynomialNumericRoots) error {
 	return r.After(z, before)
 }
-func (r *polynomialNumericRoots) cleanup(z *util.IntegerManager) error {
+func (r *polynomialNumericRoots) cleanup(z *unumeral.IntegerManager) error {
 	return r.NumericAllocationRoots.Cleanup(z)
 }

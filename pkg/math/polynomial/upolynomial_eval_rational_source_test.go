@@ -9,15 +9,16 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialEvalSignRationalPublicBodyAndNumeralDT(t *testing.T) {
 	reached := false
 	for offset := int64(12); offset < 400 && !reached; offset += 4 {
 		t.Run(fmt.Sprint(offset), func(t *testing.T) {
-			var z *util.IntegerManager
+			var z *unumeral.IntegerManager
 			var rt *umemory.Runtime
 			var lane, held umemory.Block
 			armed := false
@@ -44,7 +45,7 @@ func TestUPolynomialEvalSignRationalPublicBodyAndNumeralDT(t *testing.T) {
 			poly := algebraicPolynomial(t, p, 1, math.MaxInt32, 1)
 			v, e := p.wholeView(poly)
 			serviceMust(t, e)
-			var b util.Rational
+			var b unumeral.Rational
 			serviceMust(t, c.config.Rationals.SetInt32(&b, math.MaxInt32))
 			defer func() {
 				armed = false
@@ -86,7 +87,7 @@ func TestUPolynomialEvalSignRationalPublicBodyAndNumeralDT(t *testing.T) {
 			if q.bodyCause == nil || q.sourceCause == nil || q.sourceRemaining != 2 || q.addMul.Frame == nil || q.addMul.Frame.Tmp.Cell == 0 {
 				t.Fatal("actual source/RAW frontier", q.sourceRemaining)
 			}
-			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&(*b.BorrowNumerator()), &(*b.BorrowDenominator()), &q.values[0], &q.values[1], &q.values[2], &q.addMul.Frame.Tmp}, []umemory.Block{lane, held})
+			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*unumeral.Int{&(*b.BorrowNumerator()), &(*b.BorrowDenominator()), &q.values[0], &q.values[1], &q.values[2], &q.addMul.Frame.Tmp}, []umemory.Block{lane, held})
 			if want := baseline + integerActualOwnedBytes(z) + p.rationalEvaluationHistoryBytes; want != z.Budget().Used() {
 				t.Fatal("actual cold graph", want, z.Budget().Used())
 			}

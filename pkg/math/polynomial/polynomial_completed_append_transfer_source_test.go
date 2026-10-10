@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialCoefficientSequentialActualCompletedTransfer(t *testing.T) {
@@ -122,7 +121,7 @@ func TestPolynomialCompletedAppendForeignMixedRefusalKeepsActualCallerINC(t *tes
 	// Its actual leaf marks the previous completed cohort as foreign-mixed.
 	unit, e := c.monomials.Unit()
 	serviceMust(t, e)
-	two := util.NewInt(2)
+	two := unumeral.NewInt(2)
 	serviceMust(t, c.cheap.add(&two, unit, false))
 	if !c.cheap.appendScope.foreignMixed {
 		t.Fatal("actual foreign append mark")
@@ -165,7 +164,7 @@ func TestPolynomialCompletedAppendForeignMixedRefusalKeepsActualCallerINC(t *tes
 func TestPolynomialActualStoppedAppendGuardPreservesFailurePrefix(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	c := m.core
-	value := util.Int{}
+	value := unumeral.Int{}
 	serviceMust(t, c.integer.SetLimbs(&value, []uint32{0, 0, 1}))
 	defer func() { serviceMust(t, c.integer.Del(&value)) }()
 	unit, e := c.monomials.Unit()
@@ -173,7 +172,7 @@ func TestPolynomialActualStoppedAppendGuardPreservesFailurePrefix(t *testing.T) 
 	var receipt polynomialCheapAppendInvocationReceipt
 	c.integer.Budget().FailAfter(0)
 	cause := c.cheap.addWithAppendReceipt(&value, unit, false, &receipt)
-	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&value}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&value}, 0)
 	if !numericPhysicalReservationRefusal(cause) || !c.cheap.appendScope.stopped {
 		t.Fatal("actual source append refusal", cause)
 	}
@@ -189,5 +188,5 @@ func TestPolynomialActualStoppedAppendGuardPreservesFailurePrefix(t *testing.T) 
 	}
 	c.integer.Budget().FailAfter(-1)
 	serviceMust(t, c.cheap.cleanupAppendInvocation(&receipt, true))
-	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&value}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&value}, 0)
 }

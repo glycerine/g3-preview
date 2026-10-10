@@ -11,8 +11,9 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -82,13 +83,13 @@ func TestASTLowLevelPrinterNativeLargeNumeralFormatting(t *testing.T) {
 	bn, ba, bs := arena.NewBudget(1<<28), arena.NewBudget(1<<24), arena.NewBudget(1<<20)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, ThreadLocal: true, SizeTBits: 64})
 	paramsMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs})
 	paramsMust(t, e)
 	anchor, e := polynomial.NewUPolynomialManagerFromRationalService(q, polynomial.UPolynomialConfig{Checkpoint: func() bool { panic("unused") }, Cooperation: func() error { panic("unused") }})
 	paramsMust(t, e)
-	scoped, e := util.NewScopedInt(anchor.IntegerManager())
+	scoped, e := unumeral.NewScopedInt(anchor.IntegerManager())
 	paramsMust(t, e)
 	value, e := scoped.Get()
 	paramsMust(t, e)
@@ -128,7 +129,7 @@ func TestASTLowLevelPrinterNativeLargeNumeralFormatting(t *testing.T) {
 	if !strings.Contains(text, want) || m.LowLevel.Active || m.LowLevel.numeralInsertion.Active() {
 		t.Fatal("native big numeral output/lifetime", text)
 	}
-	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{anchor}, nil, upolyPhysicalExtraOwners{ASTManagers: []*ASTManager{m}, RationalServices: []*util.RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &big}}})
+	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{anchor}, nil, upolyPhysicalExtraOwners{ASTManagers: []*ASTManager{m}, RationalServices: []*unumeral.RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &big}}})
 	paramsMust(t, m.SourceFinalize())
 	paramsMust(t, m.Close())
 	paramsMust(t, out.Close())

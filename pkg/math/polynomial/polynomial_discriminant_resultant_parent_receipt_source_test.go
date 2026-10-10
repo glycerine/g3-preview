@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialDiscriminantResultantReceiptRejectsCopiedActualFrame(t *testing.T) {
@@ -15,7 +14,7 @@ func TestPolynomialDiscriminantResultantReceiptRejectsCopiedActualFrame(t *testi
 		c := m.core
 		_, e := c.monomials.MkVar()
 		serviceMust(t, e)
-		var leading util.Int
+		var leading unumeral.Int
 		words := make([]uint32, 64)
 		words[0], words[63] = 7, 1
 		serviceMust(t, c.integer.SetLimbs(&leading, words))
@@ -23,7 +22,7 @@ func TestPolynomialDiscriminantResultantReceiptRejectsCopiedActualFrame(t *testi
 		serviceMust(t, e)
 		unit, e := c.monomials.MkMonomial(nil)
 		serviceMust(t, e)
-		p, e := c.MkTerms([]util.Int{leading, util.NewInt(1)}, []Monomial{x2, unit})
+		p, e := c.MkTerms([]unumeral.Int{leading, unumeral.NewInt(1)}, []Monomial{x2, unit})
 		serviceMust(t, e)
 		p = polynomialCaller(t, c, p)
 		r, e := NewPolynomialRef(c)
@@ -57,7 +56,7 @@ func TestPolynomialDiscriminantResultantReceiptRejectsCopiedActualFrame(t *testi
 			if actual.frame.nums != nums || actual.frame.depth != depth || used != m.originalBudget.Used() || !actual.frame.active {
 				t.Fatal("copied cleanup mutated actual stopped frame")
 			}
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming, m.discriminant.refs[0].value}, []*util.Int{&leading, &m.discriminant.lc}, r.header)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming, m.discriminant.refs[0].value}, []*unumeral.Int{&leading, &m.discriminant.lc}, r.header)
 		}
 		m.originalBudget.FailAfter(-1)
 		serviceMust(t, m.CleanupDiscriminant())

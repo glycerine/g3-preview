@@ -4,21 +4,20 @@ package polynomial
 import (
 	"errors"
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialCheapAppendReceiptActualActionsAndZeroGuard(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	c := m.core
 	var r polynomialCheapAppendInvocationReceipt
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	serviceMust(t, c.cheap.addWithAppendReceipt(&zero, c.monomials.unit, false, &r))
 	if r != (polynomialCheapAppendInvocationReceipt{}) {
 		t.Fatal("source zero guard created an append receipt")
 	}
-	a := util.NewInt(7)
+	a := unumeral.NewInt(7)
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, c.monomials.unit, false, &r))
 	if !c.cheap.matchesAppendInvocation(&r) || c.cheap.appendScope.coefficients != 1 || c.cheap.appendScope.monomials != 1 {
 		t.Fatal("actual coefficient construction and INC publication were not recorded")
@@ -53,7 +52,7 @@ func TestPolynomialCheapAppendReceiptEveryActualConstructionPrefix(t *testing.T)
 				m := polynomialPSCFullFixture(t)
 				c := m.core
 				var r polynomialCheapAppendInvocationReceipt
-				a := util.NewInt(7)
+				a := unumeral.NewInt(7)
 				if large {
 					limbs := make([]uint32, 8192)
 					limbs[0], limbs[len(limbs)-1] = 1, 1
@@ -68,12 +67,12 @@ func TestPolynomialCheapAppendReceiptEveryActualConstructionPrefix(t *testing.T)
 				if e != nil && c.cheap.appendScope.coefficients == 1 && c.cheap.appendScope.monomials == 0 && c.cheap.appendScope.pending == (Monomial{}) {
 					constructedBeforeStop = true
 				}
-				polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a}, 0)
+				polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&a}, 0)
 				c.integer.Budget().FailAfter(-1)
 				serviceMust(t, c.cheap.cleanupAppendInvocation(&r, false))
-				polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a}, 0)
+				polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&a}, 0)
 				serviceMust(t, c.cheap.cleanupAppendInvocation(&r, true))
-				polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a}, 0)
+				polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&a}, 0)
 				if e == nil {
 					success = true
 					t.Log("actual source append first success", ordinal)
@@ -97,7 +96,7 @@ func TestPolynomialCheapAppendReceiptMixedForeignRefusal(t *testing.T) {
 	variable, e := c.monomials.MkMonomial([]MonomialPower{{0, 1}})
 	serviceMust(t, e)
 	var r polynomialCheapAppendInvocationReceipt
-	a, b := util.NewInt(7), util.NewInt(11)
+	a, b := unumeral.NewInt(7), unumeral.NewInt(11)
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, c.monomials.unit, false, &r))
 	// An actual nil-receipt append is foreign to the first explicit cohort.
 	serviceMust(t, c.cheap.add(&b, variable, false))
@@ -144,7 +143,7 @@ func TestPolynomialCheapAppendReceiptMixedForeignRefusal(t *testing.T) {
 func TestPolynomialCheapAppendReceiptUniqueReplacement(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	c := m.core
-	a := util.NewInt(7)
+	a := unumeral.NewInt(7)
 	var old, current polynomialCheapAppendInvocationReceipt
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, c.monomials.unit, false, &old))
 	serviceMust(t, c.cheap.cleanupAppendInvocation(&old, true))
@@ -169,7 +168,7 @@ func TestPolynomialCheapAppendReceiptUniqueReplacement(t *testing.T) {
 func TestPolynomialCheapAppendReceiptForeignSameCardinality(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	c := m.core
-	a, foreign := util.NewInt(7), util.NewInt(11)
+	a, foreign := unumeral.NewInt(7), unumeral.NewInt(11)
 	var old polynomialCheapAppendInvocationReceipt
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, c.monomials.unit, false, &old))
 	p, e := c.cheap.mk(false)
@@ -211,7 +210,7 @@ func TestPolynomialCheapAppendReceiptActualFactoryTransferPrefixes(t *testing.T)
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m := polynomialPSCFullFixture(t)
 			c := m.core
-			a := util.NewInt(7)
+			a := unumeral.NewInt(7)
 			var appendReceipt polynomialCheapAppendInvocationReceipt
 			serviceMust(t, c.cheap.addWithAppendReceipt(&a, c.monomials.unit, false, &appendReceipt))
 			var factory polynomialFactoryInvocationReceipt
@@ -221,11 +220,11 @@ func TestPolynomialCheapAppendReceiptActualFactoryTransferPrefixes(t *testing.T)
 				t.Fatal(e)
 			}
 			s := &c.cheap.appendScope
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, c.factoryInvocation.result}, []*util.Int{&s.movingCoefficient}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, c.factoryInvocation.result}, []*unumeral.Int{&s.movingCoefficient}, 0)
 			c.integer.Budget().FailAfter(-1)
 			serviceMust(t, c.cleanupFactoryInvocation(&factory, false))
 			serviceMust(t, c.cheap.cleanupAppendInvocation(&appendReceipt, false))
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, c.factoryInvocation.result}, []*util.Int{&s.movingCoefficient}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, c.factoryInvocation.result}, []*unumeral.Int{&s.movingCoefficient}, 0)
 			if e == nil {
 				if s.transferredCoefficients != 1 || s.transferredMonomials != 1 || !s.completedTransfer || s.factoryInvocation != factory.invocation {
 					t.Fatal("actual constructor transfer actions were not uniquely recorded")

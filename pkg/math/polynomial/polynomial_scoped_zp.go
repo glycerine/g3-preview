@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This is an embedded lexical local, not a persistent modular manager.
@@ -11,14 +11,14 @@ import (
 
 type polynomialScopedSetZP struct {
 	owner                                      *MultivariatePolynomialManager
-	p                                          util.Int
+	p                                          unumeral.Int
 	numeric                                    polynomialNumericRoots
 	active, completed, memberEnded, oldModular bool
 	stage                                      uint8
 	bodyCause, sourceCause                     error
 }
 
-func (s *polynomialScopedSetZP) construct(m *MultivariatePolynomialManager, p *util.Int) (err error) {
+func (s *polynomialScopedSetZP) construct(m *MultivariatePolynomialManager, p *unumeral.Int) (err error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -63,7 +63,7 @@ func (s *polynomialScopedSetZP) endMember() error {
 	if s.memberEnded {
 		return nil
 	}
-	_, e := util.SourceNumeralDel(s.owner.core.integer, &s.p)
+	_, e := unumeral.SourceNumeralDel(s.owner.core.integer, &s.p)
 	if e != nil {
 		s.sourceCause = e
 		return e

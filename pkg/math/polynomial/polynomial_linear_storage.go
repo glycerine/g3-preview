@@ -1,11 +1,13 @@
 // Source: src/math/polynomial/linear_eq_solver.h.
 package polynomial
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	// Shared lifecycle state; each concrete solver owns native typed matrix/RHS slices.
+)
 
-// Shared lifecycle state; each concrete solver owns native typed matrix/RHS slices.
 type linearStorage struct {
-	integer                          *util.IntegerManager
+	integer                          *unumeral.IntegerManager
 	n                                uint32
 	header                           uint64
 	sourceCause                      error

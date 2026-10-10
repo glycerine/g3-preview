@@ -7,7 +7,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -32,7 +33,7 @@ func TestUPolynomialMignotteActualYoungerNUMStopsOlderFields(t *testing.T) {
 	serviceMust(t, z.Copy(&q.norm, &z.Two64))
 	serviceMust(t, z.Copy(&q.bound, &z.Two64))
 	serviceMust(t, z.Copy(&q.tmp, &z.Two64))
-	var large util.Int
+	var large unumeral.Int
 	words := make([]uint32, 80)
 	words[79] = 1
 	serviceMust(t, z.SetLimbs(&large, words))
@@ -43,7 +44,7 @@ func TestUPolynomialMignotteActualYoungerNUMStopsOlderFields(t *testing.T) {
 	if !numericPhysicalReservationRefusal(body) || (q.tmp).Cell != z.FailedRef {
 		t.Fatal("actual destroyed-old/refused replacement", body, q.tmp)
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&large, &q.norm, &q.bound, &q.tmp}, s.header+c.header+primes.Stats().TotalBytes)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&large, &q.norm, &q.bound, &q.tmp}, s.header+c.header+primes.Stats().TotalBytes)
 	q.executing = false
 	stop := s.finishMignotteSource(&r, body)
 	if !errors.Is(stop, body) || !errors.Is(stop, arena.ErrInvalidSlot) || q.sourceRemaining != 3 || q.norm != norm || q.bound != bound {
@@ -55,6 +56,6 @@ func TestUPolynomialMignotteActualYoungerNUMStopsOlderFields(t *testing.T) {
 	if s.mignotteInvocationSourceCause(&r) == nil || !errors.Is(stop, body) {
 		t.Fatal("owning acknowledgment erased original source history")
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&large}, s.header+c.header+primes.Stats().TotalBytes)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&large}, s.header+c.header+primes.Stats().TotalBytes)
 	serviceMust(t, s.CleanupRetained())
 }

@@ -1,11 +1,13 @@
 // Source: src/ast/arith_decl_plugin.cpp:400-449.
 package ast
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	// ASTArithmeticNumeralInvocation captures only the factory's reached lexical
+	// parameter. Cache hits and rejected inputs never acquire this child. Cache
+	// publication pins remain owned by the arithmetic plugin.
+)
 
-// ASTArithmeticNumeralInvocation captures only the factory's reached lexical
-// parameter. Cache hits and rejected inputs never acquire this child. Cache
-// publication pins remain owned by the arithmetic plugin.
 type ASTArithmeticNumeralInvocation struct {
 	self                                 *ASTArithmeticNumeralInvocation
 	manager                              *ASTManager
@@ -35,7 +37,7 @@ func (c *ASTArithmeticNumeralInvocation) valid(m *ASTManager) error {
 	return nil
 }
 
-func (m *ASTManager) ArithmeticNumeralWithInvocation(value *util.OwnedRational, integer bool, c *ASTArithmeticNumeralInvocation) (h ASTHandle, err error) {
+func (m *ASTManager) ArithmeticNumeralWithInvocation(value *unumeral.OwnedRational, integer bool, c *ASTArithmeticNumeralInvocation) (h ASTHandle, err error) {
 	if e := m.lock(); e != nil {
 		return h, e
 	}

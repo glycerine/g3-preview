@@ -1,10 +1,9 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Only actual lexical frame headers are charged. Growing the native pointer
@@ -138,7 +137,7 @@ func TestPolynomialEvaluationNativeIntegerDirectory(t *testing.T) {
 // directory preserves cached frame addresses and their owning numeral tokens.
 func TestPolynomialEvaluationNativeIntervalDirectory(t *testing.T) {
 	b, _ := binaryManager(t)
-	v, e := util.NewBinaryIntervalManager(b)
+	v, e := unumeral.NewBinaryIntervalManager(b)
 	serviceMust(t, e)
 	t.Cleanup(v.Close)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{

@@ -5,8 +5,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialFactorToPolynomialTransportCannotRetireExecutingOwner(t *testing.T) {
@@ -15,8 +16,8 @@ func TestPolynomialFactorToPolynomialTransportCannotRetireExecutingOwner(t *test
 			b := arena.NewBudget(1 << 27)
 			var full *MultivariatePolynomialManager
 			var fs *PolynomialFactors
-			var q *util.RationalManager
-			var callbackOut, callbackInput util.Int
+			var q *unumeral.RationalManager
+			var callbackOut, callbackInput unumeral.Int
 			active, seen := false, false
 			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 				if active {
@@ -62,7 +63,7 @@ func TestPolynomialFactorToPolynomialTransportCannotRetireExecutingOwner(t *test
 					case "typedOwn":
 						err = full.cleanupToPolynomialInvocation(&full.toPolynomial.direct, true)
 					case "publicSet":
-						_, err = full.ToPolynomial(1, []util.Int{callbackInput}, 0)
+						_, err = full.ToPolynomial(1, []unumeral.Int{callbackInput}, 0)
 
 					}
 					newValue, inspectError := z.Compare(&callbackOut, &z.Two64)
@@ -76,7 +77,7 @@ func TestPolynomialFactorToPolynomialTransportCannotRetireExecutingOwner(t *test
 			serviceMust(t, e)
 			cfg := serviceConfig(b).Integers
 			cfg.Memory = rt
-			q, e = util.NewRationalManager(util.RationalConfig{Integers: cfg})
+			q, e = unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 			serviceMust(t, e)
@@ -84,7 +85,7 @@ func TestPolynomialFactorToPolynomialTransportCannotRetireExecutingOwner(t *test
 			serviceMust(t, e)
 			fs, e = NewPolynomialFactors(full)
 			serviceMust(t, e)
-			var a util.Int
+			var a unumeral.Int
 			digits := make([]uint32, 80)
 			digits[79] = 1
 			serviceMust(t, q.Integers().SetLimbs(&a, digits))
@@ -98,12 +99,12 @@ func TestPolynomialFactorToPolynomialTransportCannotRetireExecutingOwner(t *test
 			serviceMust(t, e)
 			serviceMust(t, rt.SetMaxSize(1))
 			active = true
-			_, cause := full.ToPolynomial(1, []util.Int{a}, 0)
+			_, cause := full.ToPolynomial(1, []unumeral.Int{a}, 0)
 			active = false
 			if !seen || !numericPhysicalReservationRefusal(cause) {
 				t.Fatal("actual SET returning transport", seen, cause)
 			}
-			polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*util.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []umemory.Block{held})
+			polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*unumeral.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []umemory.Block{held})
 			serviceMust(t, rt.SetMaxSize(0))
 			serviceMust(t, full.CleanupToPolynomial())
 			serviceMust(t, fs.CloseChecked())

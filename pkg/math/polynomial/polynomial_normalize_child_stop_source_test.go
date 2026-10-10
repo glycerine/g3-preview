@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The signed-host TLS guard is an owner-primitive test profile, not mathematical OOM.
@@ -15,7 +16,7 @@ func TestPolynomialNormalizeReachedGCDSourceStop(t *testing.T) {
 	budget := arena.NewBudget(1 << 28)
 	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
@@ -26,7 +27,7 @@ func TestPolynomialNormalizeReachedGCDSourceStop(t *testing.T) {
 		_, e = mm.MkVar()
 		serviceMust(t, e)
 	}
-	var a, b, i, g util.Int
+	var a, b, i, g unumeral.Int
 	words := make([]uint32, 15000)
 	words[0] = 7
 	words[len(words)-1] = 1
@@ -39,7 +40,7 @@ func TestPolynomialNormalizeReachedGCDSourceStop(t *testing.T) {
 	serviceMust(t, e)
 	y, e := mm.MkVariable(1, 1)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{a, b}, []Monomial{x, y})
+	p, e := c.MkTerms([]unumeral.Int{a, b}, []Monomial{x, y})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
 	var receipt polynomialNormalizeInvocationReceipt
@@ -52,7 +53,7 @@ func TestPolynomialNormalizeReachedGCDSourceStop(t *testing.T) {
 	}
 	_, returned := full.normalizeWithReceipt(p, &receipt)
 	s := &full.normalization
-	if !errors.Is(returned, arena.ErrBounds) || !z.GcdRaw.BodySucceeded || !s.gConstructed || s.aConstructed || s.cursor != 0 || s.g != util.NewInt(1) || s.gcdRaw.Frame != &z.GcdRaw {
+	if !errors.Is(returned, arena.ErrBounds) || !z.GcdRaw.BodySucceeded || !s.gConstructed || s.aConstructed || s.cursor != 0 || s.g != unumeral.NewInt(1) || s.gcdRaw.Frame != &z.GcdRaw {
 		t.Fatal("actual child end DEL protects older g", returned, z.GcdRaw.BodySucceeded, s.gConstructed, s.aConstructed, s.g)
 	}
 	captured := returned.Error()
@@ -60,7 +61,7 @@ func TestPolynomialNormalizeReachedGCDSourceStop(t *testing.T) {
 	if cause == nil || cause != z.RawInvocationSourceCause(&s.gcdRaw) {
 		t.Fatal("actual child source stop missing parent", cause)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*util.Int{&a, &b, &i, &g}, 0, []umemory.Block{lane})
+	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*unumeral.Int{&a, &b, &i, &g}, 0, []umemory.Block{lane})
 	own := full.cleanupNormalizeInvocation(&receipt, false)
 	if own != nil && !errors.Is(own, arena.ErrBounds) {
 		t.Fatal("actual false owning stop", own)
@@ -81,7 +82,7 @@ func TestPolynomialNormalizeReachedGCDSourceStop(t *testing.T) {
 	if full.normalizeInvocationSourceCause(&receipt) != cause || z.RawInvocationSourceCause(&receipt.frame.gcdRaw) != cause || returned.Error() != captured {
 		t.Fatal("own acknowledgement changed source history")
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*util.Int{&a, &b, &i, &g}, 0, []umemory.Block{lane, recovery})
+	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*unumeral.Int{&a, &b, &i, &g}, 0, []umemory.Block{lane, recovery})
 	var later polynomialNormalizeInvocationReceipt
 	laterResult, e := full.normalizeWithReceipt(p, &later)
 	serviceMust(t, e)
@@ -92,7 +93,7 @@ func TestPolynomialNormalizeReachedGCDSourceStop(t *testing.T) {
 		t.Fatal("later source invocation changed old error")
 	}
 	serviceMust(t, c.DecRef(p))
-	for _, v := range []*util.Int{&a, &b, &i, &g} {
+	for _, v := range []*unumeral.Int{&a, &b, &i, &g} {
 		serviceMust(t, z.Del(v))
 	}
 	serviceMust(t, rt.Deallocate(&lane))
@@ -112,7 +113,7 @@ func TestPolynomialSOMNormalizeFirstOwnCauseHistory(t *testing.T) {
 	budget := arena.NewBudget(1 << 28)
 	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
@@ -123,7 +124,7 @@ func TestPolynomialSOMNormalizeFirstOwnCauseHistory(t *testing.T) {
 		_, e = mm.MkVar()
 		serviceMust(t, e)
 	}
-	var a, b util.Int
+	var a, b unumeral.Int
 	words := make([]uint32, 15000)
 	words[0] = 7
 	words[len(words)-1] = 1
@@ -148,7 +149,7 @@ func TestPolynomialSOMNormalizeFirstOwnCauseHistory(t *testing.T) {
 	if buf.normalizeScope.ownCause != returned {
 		t.Error("actual first owning cause was not retained", returned, buf.normalizeScope.ownCause)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, nil, []*util.Int{&a, &b}, 0, []umemory.Block{lane})
+	polynomialImpPhysicalAuditNamedExtra(t, full, nil, []*unumeral.Int{&a, &b}, 0, []umemory.Block{lane})
 	recovery, e := rt.Allocate(2000000)
 	serviceMust(t, e)
 	serviceMust(t, buf.finishNormalizeNumeralPhase(true, true))

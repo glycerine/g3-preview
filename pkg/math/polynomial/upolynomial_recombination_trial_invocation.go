@@ -4,8 +4,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyRecombinationTrialInvocationReceipt struct {
@@ -23,11 +22,11 @@ type upolyRecombinationTrialScope struct {
 	invocation                                       uint64
 	active, executing, sourceExecuting, ownExecuting bool
 	constructed, sourceEnded, ownEnded               bool
-	tmp                                              util.Int
+	tmp                                              unumeral.Int
 	numeric                                          polynomialNumericRoots
-	normalize                                        [2]util.IntegerNormalizeInvocationReceipt
-	boolNumeral                                      util.IntegerDividesNumeralInvocationReceipt
-	addMul                                           util.IntegerAddMulInvocationReceipt
+	normalize                                        [2]unumeral.IntegerNormalizeInvocationReceipt
+	boolNumeral                                      unumeral.IntegerDividesNumeralInvocationReceipt
+	addMul                                           unumeral.IntegerAddMulInvocationReceipt
 	bodyCause, sourceCause, ownCause                 error
 }
 

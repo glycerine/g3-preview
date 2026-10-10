@@ -2,7 +2,9 @@
 // src/ast/rewriter/bv_rewriter.h:35-43; src/util/rational.h:43,46,131-134.
 package ast
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+)
 
 func (m *ASTManager) MkBitVectorPolynomialAdd(sort ASTHandle, args AppArguments) (ASTHandle, error) {
 	return m.bitVectorPolynomialApp(sort, args, 4, 0, nil)
@@ -142,17 +144,17 @@ func (m *ASTManager) AssignBitVectorPolynomialZeroWithInvocation(sort ASTHandle,
 	return result
 }
 
-func (m *ASTManager) MkBitVectorPolynomialCoefficient(value *util.OwnedRational, sort, arg ASTHandle) (ASTHandle, error) {
+func (m *ASTManager) MkBitVectorPolynomialCoefficient(value *unumeral.OwnedRational, sort, arg ASTHandle) (ASTHandle, error) {
 	return m.bitVectorPolynomialCoefficient(value, sort, arg, nil)
 }
-func (m *ASTManager) MkBitVectorPolynomialCoefficientWithInvocation(value *util.OwnedRational, sort, arg ASTHandle, c *ASTBitVectorNumeralInvocation) (ASTHandle, error) {
+func (m *ASTManager) MkBitVectorPolynomialCoefficientWithInvocation(value *unumeral.OwnedRational, sort, arg ASTHandle, c *ASTBitVectorNumeralInvocation) (ASTHandle, error) {
 	if c == nil {
 		return ASTHandle{}, ErrASTHandle
 	}
 	return m.bitVectorPolynomialCoefficient(value, sort, arg, c)
 }
 
-func (m *ASTManager) bitVectorPolynomialCoefficient(value *util.OwnedRational, sort, arg ASTHandle, c *ASTBitVectorNumeralInvocation) (node ASTHandle, result error) {
+func (m *ASTManager) bitVectorPolynomialCoefficient(value *unumeral.OwnedRational, sort, arg ASTHandle, c *ASTBitVectorNumeralInvocation) (node ASTHandle, result error) {
 	if e := m.lock(); e != nil {
 		return node, e
 	}

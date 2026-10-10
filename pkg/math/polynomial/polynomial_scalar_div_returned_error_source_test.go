@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation(t *testing.T) {
@@ -18,21 +19,21 @@ func TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation(t *testi
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	c := m.core
 	_, e = c.monomials.MkVar()
 	serviceMust(t, e)
-	var coefficient util.Int
+	var coefficient unumeral.Int
 	digits := make([]uint32, 64)
 	digits[0] = 7
 	digits[63] = 1
 	serviceMust(t, c.integer.SetLimbs(&coefficient, digits))
 	term, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{coefficient}, []Monomial{term})
+	p, e := c.MkTerms([]unumeral.Int{coefficient}, []Monomial{term})
 	serviceMust(t, e)
 	pr, e := NewPolynomialRef(c)
 	serviceMust(t, e)
@@ -49,7 +50,7 @@ func TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation(t *testi
 	if e = rt.Reallocate(&lane, uint64(16)+uint64(delta)-8); !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("actual guarded realloc", e)
 	}
-	d := util.NewInt(2)
+	d := unumeral.NewInt(2)
 	var receipt polynomialScalarDivInvocationReceipt
 	var appendReceipt polynomialCheapAppendInvocationReceipt
 	var factory polynomialFactoryInvocationReceipt
@@ -73,7 +74,7 @@ func TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation(t *testi
 		if recovery != (umemory.Block{}) {
 			raw = append(raw, recovery)
 		}
-		polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{pr.root.value, result, s.returned, c.factoryInvocation.result}, []*util.Int{&coefficient, &s.a}, pr.header, raw)
+		polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{pr.root.value, result, s.returned, c.factoryInvocation.result}, []*unumeral.Int{&coefficient, &s.a}, pr.header, raw)
 	}
 	audit(umemory.Block{})
 	// Preserve the exact stopped source cause even if owning acknowledgement

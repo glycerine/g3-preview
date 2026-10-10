@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyIsolationCounts struct{ calls, roots, intervals, ensure, verify uint32 }
@@ -14,9 +14,9 @@ type upolyIsolationRational struct {
 	d uint64
 }
 
-func upolyIsolationBinaryOwner(t *testing.T, q *util.RationalManager, budget *arena.Budget) *util.BinaryRationalManager {
+func upolyIsolationBinaryOwner(t *testing.T, q *unumeral.RationalManager, budget *arena.Budget) *unumeral.BinaryRationalManager {
 	t.Helper()
-	d, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: budget}}}})
+	d, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: budget}}}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -25,14 +25,14 @@ func upolyIsolationBinaryOwner(t *testing.T, q *util.RationalManager, budget *ar
 			t.Error(e)
 		}
 	})
-	b, e := util.NewBinaryRationalManager(q.Integers(), util.BinaryRationalConfig{Diagnostics: d})
+	b, e := unumeral.NewBinaryRationalManager(q.Integers(), unumeral.BinaryRationalConfig{Diagnostics: d})
 	if e != nil {
 		t.Fatal(e)
 	}
 	t.Cleanup(b.Close)
 	return b
 }
-func upolyIsolationVector(t *testing.T, b *util.BinaryRationalManager) *BinaryRationalVector {
+func upolyIsolationVector(t *testing.T, b *unumeral.BinaryRationalManager) *BinaryRationalVector {
 	t.Helper()
 	v, e := numericBinaryRationalManager_NewVector(b)
 	if e != nil {
@@ -53,9 +53,9 @@ func upolyIsolationSize(t *testing.T, v *BinaryRationalVector) uint32 {
 	}
 	return n
 }
-func upolyIsolationRead(t *testing.T, b *util.BinaryRationalManager, v *BinaryRationalVector, i uint32) util.BinaryRational {
+func upolyIsolationRead(t *testing.T, b *unumeral.BinaryRationalManager, v *BinaryRationalVector, i uint32) unumeral.BinaryRational {
 	t.Helper()
-	a := util.NewBinaryRational()
+	a := unumeral.NewBinaryRational()
 	if e := v.Read(i, &a); e != nil {
 		t.Fatal(e)
 	}
@@ -72,7 +72,7 @@ func upolyIsolationAssert(t *testing.T, c *upolyIsolationCounts, verify, conditi
 		t.Fatal("actual source assertion", *c)
 	}
 }
-func upolyIsolationSign(t *testing.T, m *UPolynomialManager, p UPolynomialView, b *util.BinaryRational) int {
+func upolyIsolationSign(t *testing.T, m *UPolynomialManager, p UPolynomialView, b *unumeral.BinaryRational) int {
 	t.Helper()
 	s, e := m.EvalSignBinary(p, b)
 	if e != nil {
@@ -80,7 +80,7 @@ func upolyIsolationSign(t *testing.T, m *UPolynomialManager, p UPolynomialView, 
 	}
 	return s
 }
-func upolyIsolationVariation(t *testing.T, m *UPolynomialManager, s *UPolynomialSequence, b *util.BinaryRational) uint32 {
+func upolyIsolationVariation(t *testing.T, m *UPolynomialManager, s *UPolynomialSequence, b *unumeral.BinaryRational) uint32 {
 	t.Helper()
 	n, e := m.SignVariationsBinary(s, b)
 	if e != nil {
@@ -88,7 +88,7 @@ func upolyIsolationVariation(t *testing.T, m *UPolynomialManager, s *UPolynomial
 	}
 	return n
 }
-func upolyIsolationCheck(t *testing.T, m *UPolynomialManager, b *util.BinaryRationalManager, p UPolynomial, roots, lowers, uppers *BinaryRationalVector, c *upolyIsolationCounts) {
+func upolyIsolationCheck(t *testing.T, m *UPolynomialManager, b *unumeral.BinaryRationalManager, p UPolynomial, roots, lowers, uppers *BinaryRationalVector, c *upolyIsolationCounts) {
 	t.Helper()
 	view := mustUPolyView(t, m, p)
 	if e := m.IsolateRoots(view, b, roots, lowers, uppers); e != nil {
@@ -145,20 +145,20 @@ func upolyIsolationCheck(t *testing.T, m *UPolynomialManager, b *util.BinaryRati
 		}
 	}
 }
-func upolyIsolationMatch(t *testing.T, q *util.RationalManager, b *util.BinaryRationalManager, roots, lowers, uppers *BinaryRationalVector, expected []upolyIsolationRational, c *upolyIsolationCounts) {
+func upolyIsolationMatch(t *testing.T, q *unumeral.RationalManager, b *unumeral.BinaryRationalManager, roots, lowers, uppers *BinaryRationalVector, expected []upolyIsolationRational, c *upolyIsolationCounts) {
 	t.Helper()
 	r, i := upolyIsolationSize(t, roots), upolyIsolationSize(t, lowers)
 	upolyIsolationAssert(t, c, false, uint32(len(expected)) == r+i)
 	visited := make([]bool, len(expected))
 	for _, want := range expected {
-		ex := util.NewRational()
+		ex := unumeral.NewRational()
 		if e := q.SetFraction(&ex, want.n, want.d); e != nil {
 			t.Fatal(e)
 		}
 		found := false
 		for j := uint32(0); j < r; j++ {
 			value := upolyIsolationRead(t, b, roots, j)
-			rat := util.NewRational()
+			rat := unumeral.NewRational()
 			if e := b.ToRational(q, &value, &rat); e != nil {
 				t.Fatal(e)
 			}
@@ -181,7 +181,7 @@ func upolyIsolationMatch(t *testing.T, q *util.RationalManager, b *util.BinaryRa
 		}
 		for j := uint32(0); j < i; j++ {
 			lower, upper := upolyIsolationRead(t, b, lowers, j), upolyIsolationRead(t, b, uppers, j)
-			a, z := util.NewRational(), util.NewRational()
+			a, z := unumeral.NewRational(), unumeral.NewRational()
 			if e := b.ToRational(q, &lower, &a); e != nil {
 				t.Fatal(e)
 			}
@@ -205,7 +205,7 @@ func upolyIsolationMatch(t *testing.T, q *util.RationalManager, b *util.BinaryRa
 				found = true
 				visited[j+r] = true
 			}
-			for _, v := range []*util.Rational{&a, &z} {
+			for _, v := range []*unumeral.Rational{&a, &z} {
 				if e = q.Del(v); e != nil {
 					t.Fatal(e)
 				}

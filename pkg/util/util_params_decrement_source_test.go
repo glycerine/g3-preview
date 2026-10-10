@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -59,7 +60,7 @@ func TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop(t 
 	bs := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -82,7 +83,7 @@ func TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop(t 
 	paramsMust(t, e)
 	// Separate efficient fixture: public source digit setter and scoped copy.
 	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -98,7 +99,7 @@ func TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop(t 
 	if block.Refs != 1 || block.Size != 1 {
 		t.Fatal("actual source reference", block.Refs, block.Size)
 	}
-	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
 	before := numericAuditPhysical(t, m, extras)
 	paramsDecTLSNearMinimum(t, r)
 	e = c.Del(&v)
@@ -131,7 +132,7 @@ func TestParamsReferenceCleanupDecrementActualLeafReceipt(t *testing.T) {
 	bs := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -156,7 +157,7 @@ func TestParamsReferenceCleanupDecrementActualLeafReceipt(t *testing.T) {
 	paramsMust(t, e)
 	// Separate efficient fixture: public source digit setter and scoped copy.
 	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -175,7 +176,7 @@ func TestParamsReferenceCleanupDecrementActualLeafReceipt(t *testing.T) {
 	if block.Refs != 1 || block.Size != 2 {
 		t.Fatal("actual source reference", block.Refs, block.Size)
 	}
-	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
 	before := numericAuditPhysical(t, m, extras)
 	other, e := c.NewValue()
 	paramsMust(t, e)
@@ -228,7 +229,7 @@ func TestParamsReferenceCleanupDecrementActualLeafReceipt(t *testing.T) {
 	if v != (ParamsRef{}) || block.Live || block.Refs != 0 || block.Size != 0 {
 		t.Fatal("exact owning continuation tombstone", v, *block)
 	}
-	numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*RationalService{q}})
+	numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}})
 	paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
 }
 
@@ -238,7 +239,7 @@ func TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration(t *test
 	bs := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -263,7 +264,7 @@ func TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration(t *test
 	paramsMust(t, e)
 	// Separate efficient fixture: public source digit setter and scoped copy.
 	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -282,7 +283,7 @@ func TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration(t *test
 	if block.Refs != 1 || block.Size != 1 {
 		t.Fatal("actual source reference", block.Refs, block.Size)
 	}
-	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &v2}}}
+	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &v2}}}
 	before := numericAuditPhysical(t, m, extras)
 	other, e := c.NewValue()
 	paramsMust(t, e)
@@ -320,7 +321,7 @@ func TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration(t *test
 	paramsMust(t, c.Del(&other))
 	oldSlot, oldGeneration := v.Slot, v.Generation
 	paramsMust(t, c.CleanupDecrement(&v))
-	remaining := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v2}}}
+	remaining := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v2}}}
 	numericAuditPhysical(t, m, remaining)
 	if !b2.resetActive || b2.Refs != 0 {
 		t.Fatal("unrelated stopped receipt consumed")
@@ -333,13 +334,13 @@ func TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration(t *test
 	}
 	paramsMust(t, c.Del(&replacement))
 	paramsMust(t, c.CleanupDecrement(&v2))
-	numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*RationalService{q}})
+	numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}})
 	paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
 }
 
 // Cold graph uses the actual named owners and their typed backing capacities.
 // Source allocation counters remain separate from this physical Go charge.
-func paramsDecAuditColdGraph(t *testing.T, q *RationalService, m *IntegerManager, r *umemory.Runtime, bn *arena.Budget, c *ParamsContext, bc *arena.Budget, sy *usymbol.Manager, bs *arena.Budget) {
+func paramsDecAuditColdGraph(t *testing.T, q *unumeral.RationalService, m *unumeral.IntegerManager, r *umemory.Runtime, bn *arena.Budget, c *ParamsContext, bc *arena.Budget, sy *usymbol.Manager, bs *arena.Budget) {
 	t.Helper()
 	qv := reflect.ValueOf(q).Elem()
 	qm := testFieldBySourceName(qv, "manager").Elem()

@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *UPolynomialManager) wholeView(p UPolynomial) (UPolynomialView, error) {
@@ -14,7 +14,7 @@ func (m *UPolynomialManager) wholeView(p UPolynomial) (UPolynomialView, error) {
 	}
 	return m.stateView(&d.state), nil
 }
-func (m *UPolynomialManager) SetRationals(p UPolynomial, a []util.Rational) error {
+func (m *UPolynomialManager) SetRationals(p UPolynomial, a []unumeral.Rational) error {
 	d, e := m.descriptor(p)
 	if e != nil {
 		return e
@@ -224,7 +224,7 @@ func (m *UPolynomialManager) mulWithHensel(a, b UPolynomialView, out *upolyVecto
 	}
 	return m.mulWithSourceContext(a, b, out, henselAddMulChild(receipt), context)
 }
-func (m *UPolynomialManager) mulWithSourceContext(a, b UPolynomialView, out *upolyVectorState, child *util.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
+func (m *UPolynomialManager) mulWithSourceContext(a, b UPolynomialView, out *upolyVectorState, child *unumeral.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
 
 	s := &m.basic
 	if polynomialSourceDebug && (m.alias(a, s) || m.alias(b, s)) {
@@ -355,13 +355,13 @@ func (m *UPolynomialManager) derivativeStateWithSourceContext(v UPolynomialView,
 		}()
 	}
 	for i := uint32(1); i < v.count; i++ {
-		var local util.Int
+		var local unumeral.Int
 		multiplier := &local
 		if frame != nil {
 			if e = frame.retireMultiplier(); e != nil {
 				return e
 			}
-			frame.d = util.Int{}
+			frame.d = unumeral.Int{}
 			frame.constructed = true
 			frame.phase = 1
 			multiplier = &frame.d
@@ -474,7 +474,7 @@ func (m *UPolynomialManager) powerState(v UPolynomialView, k uint32, out *upolyV
 	*out, m.pw = m.pw, *out
 	return nil
 }
-func (m *UPolynomialManager) MulScalar(p UPolynomial, b *util.Int) error {
+func (m *UPolynomialManager) MulScalar(p UPolynomial, b *unumeral.Int) error {
 	d, e := m.descriptor(p)
 	if e != nil {
 		return e
@@ -488,17 +488,17 @@ func (m *UPolynomialManager) MulScalar(p UPolynomial, b *util.Int) error {
 	}
 	return m.MulScalarView(m.stateView(&d.state), b)
 }
-func (m *UPolynomialManager) MulScalarView(v UPolynomialView, b *util.Int) error {
+func (m *UPolynomialManager) MulScalarView(v UPolynomialView, b *unumeral.Int) error {
 	return m.MulScalarViewWithHensel(v, b, nil)
 }
-func (m *UPolynomialManager) MulScalarViewWithHensel(v UPolynomialView, b *util.Int, receipt *upolyHenselPairInvocationReceipt) error {
+func (m *UPolynomialManager) MulScalarViewWithHensel(v UPolynomialView, b *unumeral.Int, receipt *upolyHenselPairInvocationReceipt) error {
 	context := numericIntegerModularManager_henselPairAllocationContext(m.modular, receipt)
 	if receipt != nil && context.henselPairReceipt(m.config.Integer) == nil {
 		return ErrUPolynomialOwner
 	}
 	return m.mulScalarViewWithSourceContext(v, b, context)
 }
-func (m *UPolynomialManager) mulScalarViewWithSourceContext(v UPolynomialView, b *util.Int, context integerAllocationInvocationContext) error {
+func (m *UPolynomialManager) mulScalarViewWithSourceContext(v UPolynomialView, b *unumeral.Int, context integerAllocationInvocationContext) error {
 
 	if e := m.check(); e != nil {
 		return e

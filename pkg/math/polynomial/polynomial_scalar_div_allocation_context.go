@@ -3,22 +3,22 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func numericIntegerManager_scalarDivAllocationRoots(m *util.IntegerManager, r *polynomialScalarDivInvocationReceipt) *polynomialNumericRoots {
+func numericIntegerManager_scalarDivAllocationRoots(m *unumeral.IntegerManager, r *polynomialScalarDivInvocationReceipt) *polynomialNumericRoots {
 	if r == nil || r.manager == nil || r.manager.self != r.manager || r.manager.integer != m || !r.manager.matchesScalarDivInvocation(r) || !r.frame.executing || r.manager.callbackDepth != 0 {
 		return nil
 	}
 	return &r.frame.numeric
 }
-func numericIntegerModularManager_scalarDivAllocationContext(m *util.IntegerModularManager, r *polynomialScalarDivInvocationReceipt) integerAllocationInvocationContext {
+func numericIntegerModularManager_scalarDivAllocationContext(m *unumeral.IntegerModularManager, r *polynomialScalarDivInvocationReceipt) integerAllocationInvocationContext {
 	if m == nil || m.Integers() == nil || numericIntegerManager_scalarDivAllocationRoots(m.Integers(), r) == nil || r.manager.modular != m {
 		return integerAllocationInvocationContext{}
 	}
 	return integerAllocationInvocationContext{scalarDiv: r}
 }
-func numericIntegerModularManager_copyWithScalarDivReceipt(m *util.IntegerModularManager, out, value *util.Int, r *polynomialScalarDivInvocationReceipt) error {
+func numericIntegerModularManager_copyWithScalarDivReceipt(m *unumeral.IntegerModularManager, out, value *unumeral.Int, r *polynomialScalarDivInvocationReceipt) error {
 	if e := m.Check(); e != nil {
 		return e
 	}
@@ -29,6 +29,6 @@ func numericIntegerModularManager_copyWithScalarDivReceipt(m *util.IntegerModula
 	return numericIntegerModularManager_normalizeWithSourceContext(m, out, context)
 }
 
-func numericIntegerModularManager_divWithScalarDivReceipt(m *util.IntegerModularManager, a, b, out *util.Int, r *polynomialScalarDivInvocationReceipt) error {
+func numericIntegerModularManager_divWithScalarDivReceipt(m *unumeral.IntegerModularManager, a, b, out *unumeral.Int, r *polynomialScalarDivInvocationReceipt) error {
 	return m.WithAllocationContext((numericIntegerModularManager_scalarDivAllocationContext(m, r)).utility(m.Integers())).Div(a, b, out)
 }

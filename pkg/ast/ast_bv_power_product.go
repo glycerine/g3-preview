@@ -2,23 +2,25 @@
 // src/ast/rewriter/bv_rewriter.h:36; src/util/rational.h:46,131-134.
 package ast
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+)
 
-func (m *ASTManager) ReadBitVectorPolynomialPowerProduct(arg ASTHandle, coefficient *util.OwnedRational) (ASTHandle, error) {
+func (m *ASTManager) ReadBitVectorPolynomialPowerProduct(arg ASTHandle, coefficient *unumeral.OwnedRational) (ASTHandle, error) {
 	return m.readBitVectorPolynomialPowerProduct(arg, coefficient, nil)
 }
 
 // ReadBitVectorPolynomialPowerProductWithInvocation names the original
 // stored-coefficient copy or fallback numeral-one full expression. The result
 // is borrowed; the existing caller coefficient is the physical receiver.
-func (m *ASTManager) ReadBitVectorPolynomialPowerProductWithInvocation(arg ASTHandle, coefficient *util.OwnedRational, c *ASTBitVectorNumeralInvocation) (ASTHandle, error) {
+func (m *ASTManager) ReadBitVectorPolynomialPowerProductWithInvocation(arg ASTHandle, coefficient *unumeral.OwnedRational, c *ASTBitVectorNumeralInvocation) (ASTHandle, error) {
 	if c == nil {
 		return ASTHandle{}, ErrASTHandle
 	}
 	return m.readBitVectorPolynomialPowerProduct(arg, coefficient, c)
 }
 
-func (m *ASTManager) readBitVectorPolynomialPowerProduct(arg ASTHandle, coefficient *util.OwnedRational, c *ASTBitVectorNumeralInvocation) (node ASTHandle, result error) {
+func (m *ASTManager) readBitVectorPolynomialPowerProduct(arg ASTHandle, coefficient *unumeral.OwnedRational, c *ASTBitVectorNumeralInvocation) (node ASTHandle, result error) {
 	if e := m.lock(); e != nil {
 		return node, e
 	}

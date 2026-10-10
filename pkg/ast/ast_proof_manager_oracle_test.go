@@ -5,7 +5,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -42,7 +43,7 @@ func TestASTProofUnitResolutionLexicalScratchPeak(t *testing.T) {
 		b := arena.NewBudget(limit)
 		s, e := usymbol.NewManager(usymbol.Config{Budget: b})
 		astTestMust(t, e)
-		q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+		q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 		astTestMust(t, e)
 		m, e := NewASTManager(ASTManagerConfig{Symbols: s, Numerals: q, Budget: b, ProofMode: ASTProofEnabled})
 		astTestMust(t, e)

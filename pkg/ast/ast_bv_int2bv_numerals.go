@@ -2,18 +2,17 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorInt2BVNumerals retains the default val and its distinct unsigned norm return.
 type BitVectorInt2BVNumerals struct {
 	self                   *BitVectorInt2BVNumerals
 	manager                *ASTManager
-	values                 [2]util.OwnedRational
+	values                 [2]unumeral.OwnedRational
 	placed                 [2]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	norm                   ASTBitVectorNumeralInvocation
 	header                 uint64
@@ -91,7 +90,7 @@ func (n *BitVectorInt2BVNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorInt2BVNumerals) Read(family FamilyID, arg ASTHandle, integer *bool) (bool, error) {
@@ -114,7 +113,7 @@ func (n *BitVectorInt2BVNumerals) Normalize(width uint32) error {
 	}
 	v, e := n.manager.NormalizeBitVectorValueWithInvocation(&n.values[0], width, &n.norm)
 	n.values[1] = v
-	n.placed[1] = v != (util.OwnedRational{})
+	n.placed[1] = v != (unumeral.OwnedRational{})
 	if e != nil {
 		return n.fail(e)
 	}

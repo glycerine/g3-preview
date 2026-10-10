@@ -5,8 +5,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyFactorPrimePreparationInvocationReceipt struct {
@@ -31,8 +30,8 @@ type upolyFactorPrimePreparationScope struct {
 	active, executing, sourceExecuting, ownExecuting bool
 	sourceEnded, ownEnded                            bool
 	numeric                                          polynomialNumericRoots
-	normalize                                        [3]util.IntegerNormalizeInvocationReceipt
-	divisionRaw, extendedRaw, gcdRaw                 util.IntegerRawInvocationReceipt
+	normalize                                        [3]unumeral.IntegerNormalizeInvocationReceipt
+	divisionRaw, extendedRaw, gcdRaw                 unumeral.IntegerRawInvocationReceipt
 
 	bodyCause, sourceCause, ownCause error
 }
@@ -67,7 +66,7 @@ func (q *upolyFactorPrimePreparationScope) childCause() error {
 	if q.matchesHensel() && q.hensel.sourceCause != nil {
 		return q.hensel.sourceCause
 	}
-	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
+	for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
 		if e := z.RawInvocationSourceCause(r); e != nil {
 			return e
 		}
@@ -119,7 +118,7 @@ func (q *upolyFactorPrimePreparationScope) pending() bool {
 		return true
 	}
 
-	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
+	for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
 		if z.MatchesRawInvocation(r) {
 			return true
 		}
@@ -174,7 +173,7 @@ func (q *upolyFactorPrimePreparationScope) own(r *upolyFactorPrimePreparationInv
 			return e
 		}
 	}
-	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
+	for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
 		if e := z.CleanupRawInvocation(r, false); e != nil {
 			return e
 		}
@@ -190,7 +189,7 @@ func (q *upolyFactorPrimePreparationScope) own(r *upolyFactorPrimePreparationInv
 				return e
 			}
 		}
-		for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
+		for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
 			if e := z.CleanupRawInvocation(r, true); e != nil {
 				return e
 			}
@@ -276,7 +275,7 @@ func (q *upolyFactorPrimePreparationScope) bindRelated(m *UPolynomialManager) er
 
 // Selected lexical NUM DT retains its first source stop. Real parent NUMs
 // are never adopted into the adapter or given a second source destructor.
-func (c *upolyFactorSquareFreeScope) sourcePrimeNumeral(n *util.Int) error {
+func (c *upolyFactorSquareFreeScope) sourcePrimeNumeral(n *unumeral.Int) error {
 	q := &c.primePreparation
 	if q.matches() {
 		q.enterCall()

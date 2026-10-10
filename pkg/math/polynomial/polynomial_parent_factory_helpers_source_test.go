@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialParentFactoryHelpersEveryActualPrefix(t *testing.T) {
@@ -20,7 +19,7 @@ func TestPolynomialParentFactoryHelpersEveryActualPrefix(t *testing.T) {
 				var factoryReceipt polynomialFactoryInvocationReceipt
 				var negReceipt polynomialNegInvocationReceipt
 				var divReceipt polynomialScalarDivInvocationReceipt
-				d := util.NewInt(2)
+				d := unumeral.NewInt(2)
 				c.integer.Budget().FailAfter(ordinal)
 				var result Polynomial
 				var e error

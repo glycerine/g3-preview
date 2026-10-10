@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func polynomialImpPhysicalAudit(t *testing.T, full *MultivariatePolynomialManager, supplied ...*umemory.SmallAllocator) {
@@ -19,10 +20,10 @@ func polynomialImpPhysicalAuditValues(t *testing.T, full *MultivariatePolynomial
 	t.Helper()
 	polynomialImpPhysicalAuditNamed(t, full, polys, nil, 0, supplied...)
 }
-func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*util.Int, externalHeaders uint64, supplied ...*umemory.SmallAllocator) {
+func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*unumeral.Int, externalHeaders uint64, supplied ...*umemory.SmallAllocator) {
 	polynomialImpPhysicalAuditNamedExtra(t, full, polys, input, externalHeaders, nil, supplied...)
 }
-func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*util.Int, externalHeaders uint64, extraRaw []umemory.Block, supplied ...*umemory.SmallAllocator) {
+func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*unumeral.Int, externalHeaders uint64, extraRaw []umemory.Block, supplied ...*umemory.SmallAllocator) {
 	t.Helper()
 	m := full.core
 	owners := []*PolynomialNewtonInterpolator{}
@@ -32,7 +33,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	handlers := []*PolynomialDeletionHandler{}
 	external := append([]umemory.Block(nil), extraRaw...)
 	adapterBytes := full.header
-	public := []*util.Int{&full.derivative.n, &full.derivative.a, &full.composition.a}
+	public := []*unumeral.Int{&full.derivative.n, &full.derivative.a, &full.composition.a}
 	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
 		public = append(public, &b.cohortMovingCoefficient, &b.appendScope.movingCoefficient, &b.arithmeticScope.transport)
 	}
@@ -42,7 +43,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	if m.scalarDivision.transportBound {
 		public = append(public, &m.scalarDivision.transport)
 	}
-	for _, raw := range []*util.IntegerScalarRawScope{&m.scalarDivision.division, &m.scalarDivision.extended} {
+	for _, raw := range []*unumeral.IntegerScalarRawScope{&m.scalarDivision.division, &m.scalarDivision.extended} {
 		for i := uint8(0); i < raw.Count; i++ {
 			public = append(public, &raw.Values[i])
 		}
@@ -166,8 +167,8 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 
 	z := m.integer
-	refs := map[util.NumericCellRef]bool{}
-	add := func(a util.Int) {
+	refs := map[unumeral.NumericCellRef]bool{}
+	add := func(a unumeral.Int) {
 		if (a).Cell == 0 || z.IsFailureRef((a).Cell) {
 			return
 		}
@@ -177,10 +178,10 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		refs[(a).Cell] = true
 	}
 	for _, r := range z.Tmp {
-		add(util.IntFromNativeWords([3]uint32{uint32(0), uint32(r), uint32(uint64(r) >> 32)}))
+		add(unumeral.IntFromNativeWords([3]uint32{uint32(0), uint32(r), uint32(uint64(r) >> 32)}))
 	}
 	for _, r := range z.Arg {
-		add(util.IntFromNativeWords([3]uint32{uint32(0), uint32(r), uint32(uint64(r) >> 32)}))
+		add(unumeral.IntFromNativeWords([3]uint32{uint32(0), uint32(r), uint32(uint64(r) >> 32)}))
 	}
 	for i := range z.RootRaw.Values {
 		add(z.RootRaw.Values[i])
@@ -188,7 +189,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	if z.MatchesDividesNumeralInvocation(&z.DividesNumeral.Receipt) {
 		add(z.DividesNumeral.Numeral)
 	}
-	for _, s := range []*util.IntegerRawScope{&z.DivisionRaw, &z.ExtendedRaw, &z.GcdRaw} {
+	for _, s := range []*unumeral.IntegerRawScope{&z.DivisionRaw, &z.ExtendedRaw, &z.GcdRaw} {
 		for i := uint8(0); i < s.Count; i++ {
 			add(s.Values[i])
 		}
@@ -213,7 +214,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 	if full.upm != nil && full.upm.modular != nil {
 		u := full.upm.modular
-		for _, a := range []util.Int{(*u.BorrowModulus()), u.Lower, u.Upper, u.InvTmp1, u.InvTmp2, u.InvTmp3, u.DivTmp} {
+		for _, a := range []unumeral.Int{(*u.BorrowModulus()), u.Lower, u.Upper, u.InvTmp1, u.InvTmp2, u.InvTmp3, u.DivTmp} {
 			add(a)
 		}
 	}
@@ -226,12 +227,12 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 				add(*a)
 			}
 		}
-		for _, a := range []util.Int{q.NTmp, q.AddTmp1, q.AddTmp2, q.AddMulTmp.Num, q.AddMulTmp.Den, q.LtTmp1.Num, q.LtTmp1.Den, q.LtTmp2.Num, q.LtTmp2.Den} {
+		for _, a := range []unumeral.Int{q.NTmp, q.AddTmp1, q.AddTmp2, q.AddMulTmp.Num, q.AddMulTmp.Den, q.LtTmp1.Num, q.LtTmp1.Den, q.LtTmp2.Num, q.LtTmp2.Den} {
 			add(a)
 		}
 	}
 	if m.modular != nil {
-		for _, a := range []util.Int{(*m.modular.BorrowModulus()), m.modular.Lower, m.modular.Upper, m.modular.InvTmp1, m.modular.InvTmp2, m.modular.InvTmp3, m.modular.DivTmp, m.zeroNumeral, m.minusOne, m.negativeCoefficient, m.constantCopy, m.linearConstant, m.constantScope.numeral, (*m.constantScope.rational.BorrowNumerator()), (*m.constantScope.rational.BorrowDenominator()), m.exactDivision.numeral, m.pseudoDivision.numeral, m.dividesLocal.numeral} {
+		for _, a := range []unumeral.Int{(*m.modular.BorrowModulus()), m.modular.Lower, m.modular.Upper, m.modular.InvTmp1, m.modular.InvTmp2, m.modular.InvTmp3, m.modular.DivTmp, m.zeroNumeral, m.minusOne, m.negativeCoefficient, m.constantCopy, m.linearConstant, m.constantScope.numeral, (*m.constantScope.rational.BorrowNumerator()), (*m.constantScope.rational.BorrowDenominator()), m.exactDivision.numeral, m.pseudoDivision.numeral, m.dividesLocal.numeral} {
 			add(a)
 		}
 	}
@@ -279,7 +280,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		}
 		addSkeleton(f.newSkeleton)
 		if f.sparse.self != nil && !f.sparse.closed {
-			for _, values := range [][]util.Int{f.sparse.inputs, f.sparse.outputs} {
+			for _, values := range [][]unumeral.Int{f.sparse.inputs, f.sparse.outputs} {
 				for _, a := range values {
 					add(a)
 				}
@@ -370,12 +371,12 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		}
 		seenNewton[n] = true
 		extraBytes += n.header
-		for _, values := range [][]util.Int{n.inputs, n.invs} {
+		for _, values := range [][]unumeral.Int{n.inputs, n.invs} {
 			for _, a := range values {
 				add(a)
 			}
 		}
-		for _, a := range []util.Int{n.scope.product, n.scope.aux, n.scope.c} {
+		for _, a := range []unumeral.Int{n.scope.product, n.scope.aux, n.scope.c} {
 			add(a)
 		}
 		for _, r := range []*polynomialReference{&n.scope.temp, &n.scope.auxPoly, &n.scope.u} {
@@ -480,6 +481,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 }
 
-func polynomialImpPhysicalAuditNamedRaw(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*util.Int, externalHeaders uint64, extraRaw []umemory.Block, supplied ...*umemory.SmallAllocator) {
+func polynomialImpPhysicalAuditNamedRaw(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*unumeral.Int, externalHeaders uint64, extraRaw []umemory.Block, supplied ...*umemory.SmallAllocator) {
 	polynomialImpPhysicalAuditNamedExtra(t, full, polys, input, externalHeaders, extraRaw, supplied...)
 }

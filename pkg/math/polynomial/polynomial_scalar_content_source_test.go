@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialScalarIntegerContentSignedFirstAndEarlyOne(t *testing.T) {
@@ -27,10 +26,10 @@ func TestPolynomialScalarIntegerContentSignedFirstAndEarlyOne(t *testing.T) {
 			p = polynomialQueryTerms(t, m, []int32{1, 12, 18}, [][]MonomialPower{{{0, 2}}, {{0, 1}}, nil})
 			want = 1
 		}
-		out := util.NewInt(99)
+		out := unumeral.NewInt(99)
 		m.config.Checkpoint = func() bool { t.Fatal("scalar content has no source checkpoint"); return false }
 		serviceMust(t, full.IntegerScalarContent(p, &out))
-		if out != util.NewInt(want) {
+		if out != unumeral.NewInt(want) {
 			t.Fatal("source initial SET preserves lone signed coefficient", route, out, want)
 		}
 		serviceMust(t, m.modular.Del(&out))

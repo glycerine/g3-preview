@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Reallocation can leave the actual setter-recorded dead pointer. Literal
@@ -20,7 +20,7 @@ func TestPolynomialNegFailedSetterSourceDestructorGuard(t *testing.T) {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m := polynomialPSCFullFixture(t)
 			c := m.core
-			var first, large util.Int
+			var first, large unumeral.Int
 			limbs := make([]uint32, 8192)
 			limbs[0] = 1
 			limbs[len(limbs)-1] = 1
@@ -32,7 +32,7 @@ func TestPolynomialNegFailedSetterSourceDestructorGuard(t *testing.T) {
 			t.Cleanup(func() { serviceMust(t, c.integer.Del(&large)); serviceMust(t, c.integer.Del(&first)) })
 			x, e := c.monomials.MkVariable(0, 1)
 			serviceMust(t, e)
-			p, e := c.MkTerms([]util.Int{first, large}, []Monomial{x, c.monomials.unit})
+			p, e := c.MkTerms([]unumeral.Int{first, large}, []Monomial{x, c.monomials.unit})
 			serviceMust(t, e)
 			p = polynomialCaller(t, c, p)
 			var old, current polynomialNegInvocationReceipt
@@ -47,7 +47,7 @@ func TestPolynomialNegFailedSetterSourceDestructorGuard(t *testing.T) {
 			if e != nil && !numericPhysicalReservationRefusal(e) {
 				t.Fatal("actual Neg body refusal", e)
 			}
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, warm, result, c.negativeResult}, []*util.Int{&first, &large}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, warm, result, c.negativeResult}, []*unumeral.Int{&first, &large}, 0)
 			if errors.Is(c.negativeCleanupCause, arena.ErrInvalidSlot) {
 				if !c.negativeActive || !errors.Is(e, arena.ErrInvalidSlot) {
 					t.Fatal("source capacity stop lost actual NUM scope", e, c.negativeActive)
@@ -78,12 +78,12 @@ func TestPolynomialNegFailedSetterSourceDestructorGuard(t *testing.T) {
 			if c.negInvocationSourceCause(&current) != firstCause {
 				t.Fatal("owning NUM acknowledgment erased source first cause")
 			}
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, warm, result, c.negativeResult}, []*util.Int{&first, &large}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, warm, result, c.negativeResult}, []*unumeral.Int{&first, &large}, 0)
 			serviceMust(t, c.cleanupNegInvocation(&current, true))
 			if c.negInvocationSourceCause(&current) != firstCause {
 				t.Fatal("owning abort erased source first cause")
 			}
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, warm, result}, []*util.Int{&first, &large}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, warm, result}, []*unumeral.Int{&first, &large}, 0)
 			if firstCause != nil {
 				stoppedReturn := e
 				var later polynomialNegInvocationReceipt

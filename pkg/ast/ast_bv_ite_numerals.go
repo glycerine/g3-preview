@@ -2,9 +2,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorIteNumerals retains the three reached rhs/else/then numeral copies
@@ -12,9 +11,9 @@ import (
 type BitVectorIteNumerals struct {
 	self                   *BitVectorIteNumerals
 	manager                *ASTManager
-	values                 [3]util.OwnedRational
+	values                 [3]unumeral.OwnedRational
 	placed                 [3]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	header                 uint64
 	sourceCause            error
 	stopped, ended, closed bool
@@ -89,7 +88,7 @@ func (n *BitVectorIteNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorIteNumerals) Read(i int, arg ASTHandle, width *uint32) (bool, error) {

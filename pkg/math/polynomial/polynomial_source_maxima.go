@@ -2,7 +2,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *MultivariatePolynomialCore) gradedLexMaxPosition(p Polynomial) (uint32, error) {
@@ -144,7 +144,7 @@ func (b *polynomialSOM) addPolynomialWithArithmeticReceipt(p Polynomial, receipt
 			if observer == nil && b.appendScope.active {
 				observer = &b.appendScope
 			}
-			if e = b.as.appendCoefficientWithAppendScope(m, util.Int{}, observer, appendScope != nil); e != nil {
+			if e = b.as.appendCoefficientWithAppendScope(m, unumeral.Int{}, observer, appendScope != nil); e != nil {
 				return e
 			}
 			a, e := b.as.coefficient(m, sz)

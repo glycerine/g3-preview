@@ -3,9 +3,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorPolynomialSubtractionLiteral owns the -1 full expression while
@@ -14,9 +13,9 @@ type BitVectorPolynomialSubtractionLiteral struct {
 	sourceCause                     error
 	self                            *BitVectorPolynomialSubtractionLiteral
 	manager                         *ASTManager
-	value                           util.OwnedRational
+	value                           unumeral.OwnedRational
 	placed                          bool
-	scalar                          util.RationalServiceInvocation
+	scalar                          unumeral.RationalServiceInvocation
 	call                            ASTBitVectorNumeralInvocation
 	header                          uint64
 	started, ended, stopped, closed bool
@@ -98,7 +97,7 @@ func (n *BitVectorPolynomialSubtractionLiteral) ConstructReference(sort ASTHandl
 	if e = n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	node, e := n.constant(sort)
 	if e != nil {
 		return e

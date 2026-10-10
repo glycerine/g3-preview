@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialSparseWarmNativeSolverAndFactoryGraph(t *testing.T) {
@@ -19,7 +18,7 @@ func TestPolynomialSparseWarmNativeSolverAndFactoryGraph(t *testing.T) {
 	s, e := NewPolynomialSparseInterpolator(full, sk)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, s.CloseChecked()) })
-	input := util.NewInt(2)
+	input := unumeral.NewInt(2)
 	q := polynomialQueryTerms(t, m, []int32{2}, [][]MonomialPower{nil})
 	ok, e := s.Add(&input, q)
 	serviceMust(t, e)

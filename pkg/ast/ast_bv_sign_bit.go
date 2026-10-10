@@ -1,9 +1,12 @@
 // Source: src/ast/bv_decl_plugin.cpp:767-773.
 package ast
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+)
 
-func (m *ASTManager) BitVectorHasSignBit(n *util.OwnedRational, bits uint32) (bool, error) {
+func (m *ASTManager) BitVectorHasSignBit(n *unumeral.OwnedRational, bits uint32) (bool, error) {
 	if e := m.lock(); e != nil {
 		return false, e
 	}
@@ -15,7 +18,7 @@ func (m *ASTManager) BitVectorHasSignBit(n *util.OwnedRational, bits uint32) (bo
 }
 
 // BitVectorHasSignBitWithInvocation captures the actual sign-test frame at entry.
-func (m *ASTManager) BitVectorHasSignBitWithInvocation(n *util.OwnedRational, bits uint32, c *ASTBitVectorNumeralInvocation) (sign bool, result error) {
+func (m *ASTManager) BitVectorHasSignBitWithInvocation(n *unumeral.OwnedRational, bits uint32, c *ASTBitVectorNumeralInvocation) (sign bool, result error) {
 	if c == nil {
 		return false, ErrASTHandle
 	}
@@ -33,10 +36,10 @@ func (m *ASTManager) BitVectorHasSignBitWithInvocation(n *util.OwnedRational, bi
 	return m.bitVectorHasSignBitCaptured(n, bits, nil, &c.receipt)
 }
 
-func (m *ASTManager) bitVectorHasSignBit(n *util.OwnedRational, bits uint32, g *util.GlobalParamsService) (bool, error) {
+func (m *ASTManager) bitVectorHasSignBit(n *unumeral.OwnedRational, bits uint32, g *util.GlobalParamsService) (bool, error) {
 	return m.bitVectorHasSignBitCaptured(n, bits, g, nil)
 }
-func (m *ASTManager) bitVectorHasSignBitCaptured(n *util.OwnedRational, bits uint32, g *util.GlobalParamsService, captured *astBVNormalizationReceipt) (sign bool, result error) {
+func (m *ASTManager) bitVectorHasSignBitCaptured(n *unumeral.OwnedRational, bits uint32, g *util.GlobalParamsService, captured *astBVNormalizationReceipt) (sign bool, result error) {
 	enabled, e := astBVAssertionEnabled(g)
 	if e != nil {
 		return false, e

@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialHenselActualExtendedGCDCallerIndependentIdentity(t *testing.T) {
@@ -15,15 +14,15 @@ func TestUPolynomialHenselActualExtendedGCDCallerIndependentIdentity(t *testing.
 	c := &parent.hensel
 	c.related, e = NewRelatedUPolynomialManager(s.manager)
 	serviceMust(t, e)
-	five := util.NewInt(5)
+	five := unumeral.NewInt(5)
 	serviceMust(t, c.related.SetZP(&five))
 	var inputs [2]upolyVectorState
-	serviceMust(t, s.manager.set(&inputs[0], []util.Int{util.NewInt(-1), util.NewInt(1)}))
-	serviceMust(t, s.manager.set(&inputs[1], []util.Int{util.NewInt(1), util.NewInt(1)}))
+	serviceMust(t, s.manager.set(&inputs[0], []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(1)}))
+	serviceMust(t, s.manager.set(&inputs[1], []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}))
 	c.quadraticConstructed = 3
 	e = c.related.extendedGCDWithCaller(s.manager.stateView(&inputs[0]), s.manager.stateView(&inputs[1]), &c.quadratic[0], &c.quadratic[1], &c.quadratic[2], c)
 	serviceMust(t, e)
-	for i, want := range []util.Int{util.NewInt(2), util.NewInt(-2), util.NewInt(1)} {
+	for i, want := range []unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(-2), unumeral.NewInt(1)} {
 		if c.quadratic[i].size != 1 || s.manager.values(&c.quadratic[i])[0] != want {
 			t.Fatal("independent Bezout U*A+V*B=1", i, c.quadratic[i])
 		}
@@ -52,27 +51,27 @@ func TestUPolynomialHenselActualExtendedGCDEveryBIGReservation(t *testing.T) {
 		c := &parent.hensel
 		c.related, e = NewRelatedUPolynomialManager(s.manager)
 		serviceMust(t, e)
-		var p, n, minus util.Int
+		var p, n, minus unumeral.Int
 		serviceMust(t, q.Integers().SetLimbs(&p, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 		serviceMust(t, q.Integers().SetLimbs(&n, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x3fffffff}))
 		serviceMust(t, q.Integers().Copy(&minus, &n))
 		serviceMust(t, q.Integers().Neg(&minus))
 		serviceMust(t, c.related.SetZP(&p))
 		var inputs [2]upolyVectorState
-		serviceMust(t, s.manager.set(&inputs[0], []util.Int{minus, util.NewInt(1)}))
-		serviceMust(t, s.manager.set(&inputs[1], []util.Int{n, util.NewInt(1)}))
+		serviceMust(t, s.manager.set(&inputs[0], []unumeral.Int{minus, unumeral.NewInt(1)}))
+		serviceMust(t, s.manager.set(&inputs[1], []unumeral.Int{n, unumeral.NewInt(1)}))
 		c.quadraticConstructed = 3
 		q.Budget().FailAfter(ordinal)
 		body := c.related.extendedGCDWithCaller(s.manager.stateView(&inputs[0]), s.manager.stateView(&inputs[1]), &c.quadratic[0], &c.quadratic[1], &c.quadratic[2], c)
 		if body == nil {
 			// -2*N == 1 (mod p), hence U=1,V=-1 is the independent identity.
-			for i, want := range []util.Int{util.NewInt(1), util.NewInt(-1), util.NewInt(1)} {
+			for i, want := range []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(-1), unumeral.NewInt(1)} {
 				if c.quadratic[i].size != 1 || s.manager.values(&c.quadratic[i])[0] != want {
 					t.Fatal("BIG independent Bezout identity", ordinal, i, c.quadratic[i])
 				}
 			}
 		}
-		roots := []*util.Int{&p, &n, &minus}
+		roots := []*unumeral.Int{&p, &n, &minus}
 		for i := range inputs {
 			for j := range s.manager.values(&inputs[i]) {
 				roots = append(roots, &s.manager.values(&inputs[i])[j])
@@ -100,7 +99,7 @@ func TestUPolynomialHenselActualExtendedGCDEveryBIGReservation(t *testing.T) {
 			serviceMust(t, s.manager.reset(&inputs[i]))
 			s.manager.freeBacking(&inputs[i])
 		}
-		for _, a := range []*util.Int{&p, &n, &minus} {
+		for _, a := range []*unumeral.Int{&p, &n, &minus} {
 			serviceMust(t, q.Integers().Del(a))
 		}
 		primeTrialPhysicalAuditExtra(t, q, s)
@@ -126,23 +125,23 @@ func TestUPolynomialHenselActualQuadraticEveryReservation(t *testing.T) {
 		lift, e := NewRelatedUPolynomialManager(m)
 		serviceMust(t, e)
 		c.lift = lift
-		five := util.NewInt(5)
+		five := unumeral.NewInt(5)
 		serviceMust(t, lift.SetZP(&five))
 		var inputs [3]upolyVectorState
-		for i, v := range [][]util.Int{{util.NewInt(-1), util.NewInt(1)}, {util.NewInt(1), util.NewInt(1)}, {util.NewInt(-6), util.NewInt(0), util.NewInt(1)}} {
+		for i, v := range [][]unumeral.Int{{unumeral.NewInt(-1), unumeral.NewInt(1)}, {unumeral.NewInt(1), unumeral.NewInt(1)}, {unumeral.NewInt(-6), unumeral.NewInt(0), unumeral.NewInt(1)}} {
 			serviceMust(t, m.set(&inputs[i], v))
 		}
 		q.Budget().FailAfter(ordinal)
 		body := s.henselQuadraticWithCaller(m.stateView(&inputs[2]), lift, &inputs[0], &inputs[1], 2, c)
 		c.executing = false
 		if body == nil {
-			for i, want := range []util.Int{util.NewInt(9), util.NewInt(-9)} {
-				if inputs[i].size != 2 || m.values(&inputs[i])[0] != want || m.values(&inputs[i])[1] != util.NewInt(1) {
+			for i, want := range []unumeral.Int{unumeral.NewInt(9), unumeral.NewInt(-9)} {
+				if inputs[i].size != 2 || m.values(&inputs[i])[0] != want || m.values(&inputs[i])[1] != unumeral.NewInt(1) {
 					t.Fatal("independent quadratic p² lift", ordinal, i, inputs[i])
 				}
 			}
 		}
-		var roots []*util.Int
+		var roots []*unumeral.Int
 		for i := range inputs {
 			for j := range m.values(&inputs[i]) {
 				roots = append(roots, &m.values(&inputs[i])[j])
@@ -188,10 +187,10 @@ func TestUPolynomialHenselRepeatedActualQuadraticDeclarations(t *testing.T) {
 		}
 		serviceMust(t, lift.Close())
 	}()
-	five := util.NewInt(5)
+	five := unumeral.NewInt(5)
 	for invocation := 0; invocation < 2; invocation++ {
 		serviceMust(t, lift.SetZP(&five))
-		for i, v := range [][]util.Int{{util.NewInt(-1), util.NewInt(1)}, {util.NewInt(1), util.NewInt(1)}, {util.NewInt(-6), util.NewInt(0), util.NewInt(1)}} {
+		for i, v := range [][]unumeral.Int{{unumeral.NewInt(-1), unumeral.NewInt(1)}, {unumeral.NewInt(1), unumeral.NewInt(1)}, {unumeral.NewInt(-6), unumeral.NewInt(0), unumeral.NewInt(1)}} {
 			serviceMust(t, m.set(&inputs[i], v))
 		}
 		serviceMust(t, s.henselQuadraticWithCaller(m.stateView(&inputs[2]), lift, &inputs[0], &inputs[1], 2, c))
@@ -203,7 +202,7 @@ func TestUPolynomialHenselRepeatedActualQuadraticDeclarations(t *testing.T) {
 		if c.related != nil || s.matchesHenselPairInvocation(&c.pair) {
 			t.Fatal("completed callee storage still active", invocation)
 		}
-		for i, want := range []util.Int{util.NewInt(9), util.NewInt(-9)} {
+		for i, want := range []unumeral.Int{unumeral.NewInt(9), unumeral.NewInt(-9)} {
 			if m.values(&inputs[i])[0] != want {
 				t.Fatal("repeated independent lift", invocation, i)
 			}
@@ -223,23 +222,23 @@ func TestUPolynomialHenselActualTaggedQuadraticEveryReservation(t *testing.T) {
 		lift, e := NewRelatedUPolynomialManager(m)
 		serviceMust(t, e)
 		c.lift = lift
-		five := util.NewInt(5)
+		five := unumeral.NewInt(5)
 		serviceMust(t, lift.SetZP(&five))
 		var inputs [3]upolyVectorState
-		for i, v := range [][]util.Int{{util.NewInt(-1), util.NewInt(1)}, {util.NewInt(1), util.NewInt(1)}, {util.NewInt(-6), util.NewInt(0), util.NewInt(1)}} {
+		for i, v := range [][]unumeral.Int{{unumeral.NewInt(-1), unumeral.NewInt(1)}, {unumeral.NewInt(1), unumeral.NewInt(1)}, {unumeral.NewInt(-6), unumeral.NewInt(0), unumeral.NewInt(1)}} {
 			serviceMust(t, m.set(&inputs[i], v))
 		}
 		q.Budget().FailAfter(ordinal)
 		body := s.henselQuadraticWithCaller(m.stateView(&inputs[2]), lift, &inputs[0], &inputs[1], 2, c)
 		c.executing = false
 		if body == nil {
-			for i, want := range []util.Int{util.NewInt(9), util.NewInt(-9)} {
-				if inputs[i].size != 2 || m.values(&inputs[i])[0] != want || m.values(&inputs[i])[1] != util.NewInt(1) {
+			for i, want := range []unumeral.Int{unumeral.NewInt(9), unumeral.NewInt(-9)} {
+				if inputs[i].size != 2 || m.values(&inputs[i])[0] != want || m.values(&inputs[i])[1] != unumeral.NewInt(1) {
 					t.Fatal("independent quadratic p² lift", ordinal, i, inputs[i])
 				}
 			}
 		}
-		var roots []*util.Int
+		var roots []*unumeral.Int
 		for i := range inputs {
 			for j := range m.values(&inputs[i]) {
 				roots = append(roots, &m.values(&inputs[i])[j])

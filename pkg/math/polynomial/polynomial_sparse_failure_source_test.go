@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialSparseInterpolationEveryActualReservationPrefix(t *testing.T) {
@@ -27,7 +26,7 @@ func TestPolynomialSparseInterpolationEveryActualReservationPrefix(t *testing.T)
 			})
 			polys := []Polynomial{p}
 			for _, x := range []int32{0, 1, 2} {
-				in := util.NewInt(x)
+				in := unumeral.NewInt(x)
 				q := polynomialQueryTerms(t, m, []int32{x*x + 3*x + 2}, [][]MonomialPower{nil})
 				polys = append(polys, q)
 				ok, e := s.Add(&in, q)

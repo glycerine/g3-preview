@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyBinaryEvaluationScope struct {
@@ -15,10 +15,10 @@ type upolyBinaryEvaluationScope struct {
 	falseAcknowledged                        bool
 	owner                                    *UPolynomialManager
 	invocation                               uint64
-	values                                   [2]util.Int
+	values                                   [2]unumeral.Int
 	numeric                                  polynomialNumericRoots
-	normalize                                util.IntegerNormalizeInvocationReceipt
-	addMul                                   util.IntegerAddMulInvocationReceipt
+	normalize                                unumeral.IntegerNormalizeInvocationReceipt
+	addMul                                   unumeral.IntegerAddMulInvocationReceipt
 	sourceRemaining, ownRemaining            uint8
 	active, executing, finishing, ownStarted bool
 	bodyCause, sourceCause, ownCause         error
@@ -31,8 +31,8 @@ type upolyBinaryEvaluationHistory struct {
 	frame                            *upolyBinaryEvaluationScope
 	next                             *upolyBinaryEvaluationHistory
 	invocation                       uint64
-	normalize                        util.IntegerNormalizeInvocationReceipt
-	addMul                           util.IntegerAddMulInvocationReceipt
+	normalize                        unumeral.IntegerNormalizeInvocationReceipt
+	addMul                           unumeral.IntegerAddMulInvocationReceipt
 	bodyCause, sourceCause, ownCause error
 	sourceRemaining                  uint8
 }
@@ -40,10 +40,10 @@ type upolyBinaryEvaluationHistory struct {
 func (m *UPolynomialManager) binaryEvaluationExecuting() bool {
 	return m != nil && m.self == m && m.binaryEvaluation.owner == m && m.binaryEvaluation.active && (m.binaryEvaluation.executing || m.binaryEvaluation.finishing)
 }
-func numericIntegerManager_binaryEvaluationCallerExecuting(z *util.IntegerManager) bool {
+func numericIntegerManager_binaryEvaluationCallerExecuting(z *unumeral.IntegerManager) bool {
 	return z != nil && z.ValidOwner() && binaryEvaluationCaller(z) != nil && binaryEvaluationCaller(z).config.Integer == z && binaryEvaluationCaller(z).binaryEvaluationExecuting()
 }
-func (c integerAllocationInvocationContext) binaryEvaluationFrame(z *util.IntegerManager) *upolyBinaryEvaluationScope {
+func (c integerAllocationInvocationContext) binaryEvaluationFrame(z *unumeral.IntegerManager) *upolyBinaryEvaluationScope {
 	q := c.binaryEvaluation
 	if z == nil || !z.ValidOwner() || q == nil || q.owner == nil || q.owner.self != q.owner || q != &q.owner.binaryEvaluation || q.owner.config.Integer != z || binaryEvaluationCaller(z) != q.owner || q.owner.callbackDepth != 0 || !q.active || !q.executing || c.binaryEvaluationInvocation == 0 || c.binaryEvaluationInvocation != q.invocation {
 		return nil

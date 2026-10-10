@@ -6,7 +6,8 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -66,7 +67,7 @@ func (m *ASTManager) dropParameter(p ASTParameter) error {
 	if e != nil {
 		return e
 	}
-	if r.Kind == ASTParameterRational && r.Rational != (util.OwnedRational{}) {
+	if r.Kind == ASTParameterRational && r.Rational != (unumeral.OwnedRational{}) {
 		if e = m.numerals.Del(&r.Rational); e != nil {
 			return e
 		}
@@ -148,7 +149,7 @@ func (m *ASTManager) NewParameterString(value string) (ASTParameter, error) {
 	}
 	return m.newParameterSymbol(s)
 }
-func (m *ASTManager) newParameterRational(value *util.OwnedRational) (ASTParameter, error) {
+func (m *ASTManager) newParameterRational(value *unumeral.OwnedRational) (ASTParameter, error) {
 	p, e := m.allocParameter()
 	if e != nil {
 		return p, e
@@ -165,7 +166,7 @@ func (m *ASTManager) newParameterRational(value *util.OwnedRational) (ASTParamet
 	}
 	return p, nil
 }
-func (m *ASTManager) NewParameterRational(value *util.OwnedRational) (ASTParameter, error) {
+func (m *ASTManager) NewParameterRational(value *unumeral.OwnedRational) (ASTParameter, error) {
 	if e := m.lock(); e != nil {
 		return ASTParameter{}, e
 	}
@@ -210,7 +211,7 @@ func (m *ASTManager) assignParameter(dst, src ASTParameter) error {
 	if dst == src {
 		return nil
 	}
-	if a.Kind == ASTParameterRational && a.Rational != (util.OwnedRational{}) {
+	if a.Kind == ASTParameterRational && a.Rational != (unumeral.OwnedRational{}) {
 		if e = m.numerals.Del(&a.Rational); e != nil {
 			return e
 		}
@@ -288,7 +289,7 @@ func (m *ASTManager) MoveParameter(src ASTParameter) (ASTParameter, error) {
 	dst.generation = gen
 	dst.nextFree = 0
 	if saved.Kind == ASTParameterRational {
-		m.parameterAt(src.slot).Rational = util.OwnedRational{}
+		m.parameterAt(src.slot).Rational = unumeral.OwnedRational{}
 	}
 	return p, nil
 }

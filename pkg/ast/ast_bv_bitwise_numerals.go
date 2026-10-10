@@ -2,9 +2,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorBitwiseNumerals retains v1/v2 and the reached full expressions of
@@ -14,9 +13,9 @@ import (
 type BitVectorBitwiseNumerals struct {
 	self                   *BitVectorBitwiseNumerals
 	manager                *ASTManager
-	values                 [9]util.OwnedRational
+	values                 [9]unumeral.OwnedRational
 	placed                 [9]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	norm, call             ASTBitVectorNumeralInvocation
 	header                 uint64
 	sourceCause            error
@@ -92,11 +91,11 @@ func (n *BitVectorBitwiseNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
-func (n *BitVectorBitwiseNumerals) store(i int, v util.OwnedRational, e error) error {
-	n.values[i], n.placed[i] = v, v != (util.OwnedRational{})
+func (n *BitVectorBitwiseNumerals) store(i int, v unumeral.OwnedRational, e error) error {
+	n.values[i], n.placed[i] = v, v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -133,7 +132,7 @@ func (n *BitVectorBitwiseNumerals) combine(input int, xor bool) error {
 		return ErrASTPending
 	}
 	q := n.manager.numerals
-	var v util.OwnedRational
+	var v unumeral.OwnedRational
 	var e error
 	if xor {
 		v, e = q.BitwiseXorWithInvocation(&n.values[0], &n.values[input], &n.scalar)
@@ -216,7 +215,7 @@ func (n *BitVectorBitwiseNumerals) Normalize(width uint32) error {
 		return ErrASTPending
 	}
 	v, e := n.manager.NormalizeBitVectorValueWithInvocation(&n.values[0], width, &n.norm)
-	n.values[7], n.placed[7] = v, v != (util.OwnedRational{})
+	n.values[7], n.placed[7] = v, v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.manager.BitVectorNumeralInvocationSourceReady(&n.norm)
 	}

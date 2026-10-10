@@ -3,13 +3,13 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/clibrand"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The source uses the one process C rand stream. Never reseed it here or bind
 // an independent manager-local generator. vals remains a live borrowed vector;
 // only its size is captured before the source rejection loop.
-func (m *MultivariatePolynomialManager) peekFresh(vals PolynomialNewtonInputs, p uint32, out *util.Int) error {
+func (m *MultivariatePolynomialManager) peekFresh(vals PolynomialNewtonInputs, p uint32, out *unumeral.Int) error {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -31,7 +31,7 @@ func (m *MultivariatePolynomialManager) peekFresh(vals PolynomialNewtonInputs, p
 		// The source uint32 modulo by zero is undefined. The checked Go
 		// boundary is reached after the actual draw, before any numeral SET.
 		if p == 0 {
-			return util.ErrDivideByZero
+			return unumeral.ErrDivideByZero
 		}
 		if e = m.core.modular.SetUint32(out, draw%p); e != nil {
 			return e

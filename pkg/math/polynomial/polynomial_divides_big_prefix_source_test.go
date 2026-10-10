@@ -4,9 +4,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialDividesBIGActualEveryReservationPrefix(t *testing.T) {
@@ -17,17 +16,17 @@ func TestPolynomialDividesBIGActualEveryReservationPrefix(t *testing.T) {
 			c := full.core
 			_, e := c.monomials.MkVar()
 			serviceMust(t, e)
-			var big util.Int
+			var big unumeral.Int
 			serviceMust(t, c.integer.SetLimbs(&big, []uint32{0, 0, 0, 0, 1}))
 			t.Cleanup(func() { serviceMust(t, c.integer.Del(&big)) })
 			term, e := c.monomials.MkVariable(0, 5)
 			serviceMust(t, e)
-			p, e := c.MkTerms([]util.Int{big}, []Monomial{term})
+			p, e := c.MkTerms([]unumeral.Int{big}, []Monomial{term})
 			serviceMust(t, e)
 			p = polynomialCaller(t, c, p)
 			q := polynomialQueryTerms(t, c, []int32{1}, [][]MonomialPower{{{0, 2}}})
-			var spare [16]util.Int
-			named := []*util.Int{&big}
+			var spare [16]unumeral.Int
+			named := []*unumeral.Int{&big}
 			used := 0
 			for c.integer.Cells.Stats().Slots > c.integer.Cells.Stats().Live+c.integer.Cells.Stats().Retired || c.integer.Cells.Stats().Slots < c.integer.Cells.Stats().Pages*2 {
 				if used == len(spare) {

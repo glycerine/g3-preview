@@ -3,8 +3,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialFactorUnivariateInvocationReceipt struct {
@@ -13,7 +12,7 @@ type polynomialFactorUnivariateInvocationReceipt struct {
 	invocation uint64
 }
 type polynomialFactorUnivariateScope struct {
-	callerBinding                           util.NumericCallerBinding
+	callerBinding                           unumeral.NumericCallerBinding
 	owner                                   *MultivariatePolynomialManager
 	invocation                              uint64
 	target                                  *PolynomialFactors
@@ -391,7 +390,7 @@ func (m *MultivariatePolynomialManager) archiveFactorUnivariate() error {
 func (m *MultivariatePolynomialManager) closeFactorUnivariateHistory() {
 	m.factorUnivariateHistory = nil
 }
-func numericIntegerManager_factorUnivariateCallerExecuting(m *util.IntegerManager) bool {
+func numericIntegerManager_factorUnivariateCallerExecuting(m *unumeral.IntegerManager) bool {
 	if m == nil || !m.ValidOwner() {
 		return false
 	}

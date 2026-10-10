@@ -3,31 +3,31 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *MultivariatePolynomialManager) hasNormalizeInvocationHistory(r *polynomialNormalizeInvocationReceipt) bool {
 	return m != nil && m.self == m && m.core != nil && m.core.self == m.core && r != nil && r.manager == m && r.frame == &m.normalization && r.invocation != 0 && r.invocation == r.frame.invocation
 }
-func numericIntegerManager_normalizationAllocationRoots(m *util.IntegerManager, r *polynomialNormalizeInvocationReceipt) *polynomialNumericRoots {
+func numericIntegerManager_normalizationAllocationRoots(m *unumeral.IntegerManager, r *polynomialNormalizeInvocationReceipt) *polynomialNumericRoots {
 	if m == nil || !m.ValidOwner() || r == nil || r.manager == nil || !r.manager.hasNormalizeInvocationHistory(r) || r.manager.core.integer != m || !r.frame.active || !r.frame.executing || r.manager.core.callbackDepth != 0 {
 		return nil
 	}
 	return &r.frame.numeric
 }
-func (c integerAllocationInvocationContext) normalizationReceipt(m *util.IntegerManager) *polynomialNormalizeInvocationReceipt {
+func (c integerAllocationInvocationContext) normalizationReceipt(m *unumeral.IntegerManager) *polynomialNormalizeInvocationReceipt {
 	if c.normalization == nil || c.normalizationInvocation == 0 || c.normalizationInvocation != c.normalization.invocation || numericIntegerManager_normalizationAllocationRoots(m, c.normalization) == nil {
 		return nil
 	}
 	return c.normalization
 }
-func numericIntegerModularManager_normalizationAllocationContext(m *util.IntegerModularManager, r *polynomialNormalizeInvocationReceipt) integerAllocationInvocationContext {
+func numericIntegerModularManager_normalizationAllocationContext(m *unumeral.IntegerModularManager, r *polynomialNormalizeInvocationReceipt) integerAllocationInvocationContext {
 	if m == nil || m.Integers() == nil || numericIntegerManager_normalizationAllocationRoots(m.Integers(), r) == nil || r.manager.core.modular != m {
 		return integerAllocationInvocationContext{}
 	}
 	return integerAllocationInvocationContext{normalization: r, normalizationInvocation: r.invocation}
 }
-func numericIntegerModularManager_copyWithNormalizeReceipt(m *util.IntegerModularManager, out, value *util.Int, r *polynomialNormalizeInvocationReceipt) error {
+func numericIntegerModularManager_copyWithNormalizeReceipt(m *unumeral.IntegerModularManager, out, value *unumeral.Int, r *polynomialNormalizeInvocationReceipt) error {
 	if e := m.Check(); e != nil {
 		return e
 	}
@@ -37,7 +37,7 @@ func numericIntegerModularManager_copyWithNormalizeReceipt(m *util.IntegerModula
 	}
 	return numericIntegerModularManager_normalizeWithSourceContext(m, out, context)
 }
-func numericIntegerModularManager_gcdManyIndexedWithNormalizeReceipt(m *util.IntegerModularManager, as util.IntegerArrayView, out *util.Int, r *polynomialNormalizeInvocationReceipt) error {
+func numericIntegerModularManager_gcdManyIndexedWithNormalizeReceipt(m *unumeral.IntegerModularManager, as unumeral.IntegerArrayView, out *unumeral.Int, r *polynomialNormalizeInvocationReceipt) error {
 	if e := m.Check(); e != nil {
 		return e
 	}
@@ -46,25 +46,25 @@ func numericIntegerModularManager_gcdManyIndexedWithNormalizeReceipt(m *util.Int
 	}
 	return m.AssertNormalized(out)
 }
-func numericIntegerModularManager_divWithNormalizeReceipt(m *util.IntegerModularManager, a, b, out *util.Int, r *polynomialNormalizeInvocationReceipt) error {
+func numericIntegerModularManager_divWithNormalizeReceipt(m *unumeral.IntegerModularManager, a, b, out *unumeral.Int, r *polynomialNormalizeInvocationReceipt) error {
 	return m.WithAllocationContext((numericIntegerModularManager_normalizationAllocationContext(m, r)).utility(m.Integers())).Div(a, b, out)
 }
-func (c integerAllocationInvocationContext) recordNormalizationRaw(m *util.IntegerManager, r *util.IntegerRawInvocationReceipt) {
+func (c integerAllocationInvocationContext) recordNormalizationRaw(m *unumeral.IntegerManager, r *unumeral.IntegerRawInvocationReceipt) {
 	p := c.normalizationReceipt(m)
 	if p == nil || !m.MatchesRawInvocation(r) {
 		return
 	}
 
 	switch r.Kind() {
-	case util.IntegerRawGCD:
+	case unumeral.IntegerRawGCD:
 		p.frame.gcdRaw = *r
-	case util.IntegerRawDivision:
+	case unumeral.IntegerRawDivision:
 		p.frame.divisionRaw = *r
-	case util.IntegerRawExtendedGCD:
+	case unumeral.IntegerRawExtendedGCD:
 		p.frame.extendedRaw = *r
 	}
 }
-func numericIntegerManager_normalizationNumericSourceCause(m *util.IntegerManager, r *polynomialNormalizeInvocationReceipt) error {
+func numericIntegerManager_normalizationNumericSourceCause(m *unumeral.IntegerManager, r *polynomialNormalizeInvocationReceipt) error {
 	if r == nil || r.manager == nil || !r.manager.hasNormalizeInvocationHistory(r) || r.manager.core.integer != m {
 		return nil
 	}
@@ -81,7 +81,7 @@ func numericIntegerManager_normalizationNumericSourceCause(m *util.IntegerManage
 	}
 	return nil
 }
-func numericIntegerManager_cleanupNormalizationNumeric(m *util.IntegerManager, r *polynomialNormalizeInvocationReceipt, abort bool) error {
+func numericIntegerManager_cleanupNormalizationNumeric(m *unumeral.IntegerManager, r *polynomialNormalizeInvocationReceipt, abort bool) error {
 	if r == nil || r.manager == nil || !r.manager.hasNormalizeInvocationHistory(r) || r.manager.core.integer != m {
 		return nil
 	}

@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolySequenceState struct {
@@ -14,7 +14,7 @@ type upolySequenceState struct {
 	begins, sizes []uint32
 }
 type UPolynomialSequence struct {
-	callerBinding util.NumericCallerBinding
+	callerBinding unumeral.NumericCallerBinding
 	self          *UPolynomialSequence
 	manager       *UPolynomialManager
 	state         upolySequenceState

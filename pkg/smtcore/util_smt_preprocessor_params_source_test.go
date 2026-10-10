@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -370,7 +371,7 @@ func TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation(t *testi
 	b := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -394,7 +395,7 @@ func TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation(t *testi
 	paramsMust(t, e)
 	sg, e := g.Current.GetParams(smt)
 	paramsMust(t, e)
-	scoped, e := util.NewScopedInt(m.IntegerManager())
+	scoped, e := unumeral.NewScopedInt(m.IntegerManager())
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -434,7 +435,7 @@ func TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation(t *testi
 	paramsMust(t, e)
 	paramsMust(t, g.SourceReset())
 	patternSerial := v.pattern.Serial
-	extras := upolyPhysicalExtraOwners{RationalServices: []*util.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &younger.Value}}}
+	extras := upolyPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &younger.Value}}}
 	before := upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, extras)
 	paramsDecTLSNearMinimum(t, r)
 	bn.FailAfter(0)

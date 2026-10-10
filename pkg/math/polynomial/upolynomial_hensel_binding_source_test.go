@@ -6,7 +6,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -74,7 +75,7 @@ func upolyHenselImportedFixture(t *testing.T) (*UPolynomialManager, *UPolynomial
 		if e != nil {
 			t.Fatal(e)
 		}
-		values := []util.Int{util.NewInt(cs[0]), util.NewInt(cs[1])}
+		values := []unumeral.Int{unumeral.NewInt(cs[0]), unumeral.NewInt(cs[1])}
 		if e = donor.SetInts(p, values); e != nil {
 			t.Fatal(e)
 		}

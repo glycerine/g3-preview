@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop(t *testing.T) {
@@ -18,14 +18,14 @@ func TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop(t *testing.T
 	parent.constructNumeral(0)
 	serviceMust(t, z.Copy(&parent.nums[0], &z.Two64))
 	older := parent.nums[0]
-	prime := util.NewInt(7)
+	prime := unumeral.NewInt(7)
 	serviceMust(t, parent.zp.construct(full, &prime))
 	parent.stack[parent.depth] = gcdZPId
 	parent.depth++
 	child, e := full.beginGCDFunction()
 	serviceMust(t, e)
 	child.constructNumeral(0)
-	var large util.Int
+	var large unumeral.Int
 	limbs := make([]uint32, 8192)
 	limbs[0], limbs[len(limbs)-1] = 17, 1
 	serviceMust(t, z.SetLimbs(&large, limbs))
@@ -50,10 +50,10 @@ func TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop(t *testing.T
 	if first != source || !field || parent.zp.stage != 0 || parent.depth != 2 || parent.nums[0] != older {
 		t.Fatal("older mode restoration crossed child stop", first, source, field, parent.depth)
 	}
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 	z.Budget().FailAfter(-1)
 	serviceMust(t, full.CleanupGCD())
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 }
 
 // Guarded helper domain: source restore sees an actual Copy-produced dangling
@@ -63,7 +63,7 @@ func TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop(t *testing.T) 
 	full := polynomialPSCFullFixture(t)
 	c := full.core
 	z := c.integer
-	prime := util.NewInt(7)
+	prime := unumeral.NewInt(7)
 	serviceMust(t, c.modular.SetZP(&prime))
 	s, e := full.beginGCDFunction()
 	serviceMust(t, e)
@@ -80,7 +80,7 @@ func TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop(t *testing.T) 
 	for i := 0; i < 17; i++ {
 		serviceMust(t, s.monomialBuffer.push(c, unit))
 	}
-	var large util.Int
+	var large unumeral.Int
 	limbs := make([]uint32, 8192)
 	limbs[0], limbs[len(limbs)-1] = 17, 1
 	serviceMust(t, z.SetLimbs(&large, limbs))
@@ -93,7 +93,7 @@ func TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop(t *testing.T) 
 	if !numericPhysicalReservationRefusal(cause) || (s.zp.p).Cell != z.FailedRef {
 		t.Fatal("actual dangling Copy fixture", cause)
 	}
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 	z.Budget().FailAfter(-1)
 	stop := full.CleanupGCD()
 	if !errors.Is(stop, arena.ErrInvalidSlot) {
@@ -104,5 +104,5 @@ func TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop(t *testing.T) 
 	if s.depth != 1 || s.monomialBuffer.values != nil || after != before {
 		t.Fatal("younger monomial references retained across older stop", s.depth, after, before)
 	}
-	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, nil, []*unumeral.Int{&large}, 0)
 }

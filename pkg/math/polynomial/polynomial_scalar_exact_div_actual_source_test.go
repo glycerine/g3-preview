@@ -5,8 +5,8 @@ import (
 	mathbig "math/big"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The scalar overload's tmp is a real RAW declaration. Its direct division
@@ -22,7 +22,7 @@ func scalarExactDivActualNUMPrefixes(t *testing.T, negative bool) {
 	for ordinal := int64(0); ordinal < 140; ordinal++ {
 		full := polynomialExactDivDirectPageOneFixture(t)
 		c, z := full.core, full.core.integer
-		var big util.Int
+		var big unumeral.Int
 		words := make([]uint32, 80)
 		words[0], words[79] = 2, 1
 		serviceMust(t, z.SetLimbs(&big, words))
@@ -32,10 +32,10 @@ func scalarExactDivActualNUMPrefixes(t *testing.T, negative bool) {
 		p, e := c.MkConstantTakeCopy(&big)
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(p))
-		two := util.NewInt(2)
+		two := unumeral.NewInt(2)
 		z.Budget().FailAfter(ordinal)
 		result, body := c.ExactDivScalar(p, &two)
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result}, []*util.Int{&big}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result}, []*unumeral.Int{&big}, 0)
 		if body != nil && c.exactDivision.endEntered {
 			t.Log("actual scalar end frontier", ordinal, "NUM stage", c.exactDivision.stage, "source stop", c.exactDivision.sourceCause)
 		}
@@ -97,7 +97,7 @@ func TestPolynomialScalarExactDivFieldActualCalleePrefixes(t *testing.T) {
 	for ordinal := int64(0); ordinal < 256; ordinal++ {
 		full := polynomialExactDivDirectPageOneFixture(t)
 		c, z := full.core, full.core.integer
-		var modulus util.Int
+		var modulus unumeral.Int
 		words := make([]uint32, 17)
 		for i := range words {
 			words[i] = ^uint32(0)
@@ -105,10 +105,10 @@ func TestPolynomialScalarExactDivFieldActualCalleePrefixes(t *testing.T) {
 		words[16] = 511
 		serviceMust(t, z.SetLimbs(&modulus, words))
 		serviceMust(t, c.modular.SetZP(&modulus))
-		two := util.NewInt(2)
+		two := unumeral.NewInt(2)
 		z.Budget().FailAfter(ordinal)
 		result, body := c.ExactDivScalar(c.unit, &two)
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{result}, []*util.Int{&modulus}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{result}, []*unumeral.Int{&modulus}, 0)
 		if body == nil {
 			a, e := c.coefficientCore(result, 0)
 			serviceMust(t, e)

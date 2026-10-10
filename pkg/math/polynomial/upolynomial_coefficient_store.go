@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // UPolynomialCoefficientStore owns the actual coefficient backing directory.
@@ -15,7 +15,7 @@ import (
 type UPolynomialCoefficientStore struct {
 	self     *UPolynomialCoefficientStore
 	origin   uint64
-	integer  *util.IntegerManager
+	integer  *unumeral.IntegerManager
 	backings []upolyBacking
 	owners   uint32
 	header   uint64
@@ -26,7 +26,7 @@ type UPolynomialCoefficientStoreStats struct {
 	OwnerBytes, DirectoryBytes, BackingBytes, TotalBytes uint64
 }
 
-func newUPolynomialCoefficientStore(z *util.IntegerManager, origin uint64) (*UPolynomialCoefficientStore, error) {
+func newUPolynomialCoefficientStore(z *unumeral.IntegerManager, origin uint64) (*UPolynomialCoefficientStore, error) {
 	n := uint64(reflect.TypeOf(UPolynomialCoefficientStore{}).Size())
 	if e := z.Budget().Reserve(n); e != nil {
 		return nil, e

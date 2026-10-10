@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (q *upolyHenselCallerScope) numericOwners() [4]*UPolynomialManager {
@@ -20,7 +20,7 @@ func (q *upolyHenselCallerScope) ownsNumericManager(m *UPolynomialManager) bool 
 	}
 	return false
 }
-func (c integerAllocationInvocationContext) henselCallerFrame(z *util.IntegerManager) *upolyHenselCallerScope {
+func (c integerAllocationInvocationContext) henselCallerFrame(z *unumeral.IntegerManager) *upolyHenselCallerScope {
 	q := c.henselCaller
 	if z == nil || !z.ValidOwner() || q == nil || !q.matches() || q.invocation == 0 || c.henselCallerInvocation != q.invocation || !q.executing || q.owner.manager.config.Integer != z {
 		return nil
@@ -36,7 +36,7 @@ func (c integerAllocationInvocationContext) henselCallerFrame(z *util.IntegerMan
 	}
 	return q
 }
-func numericIntegerModularManager_henselCallerAllocationContext(m *util.IntegerModularManager, q *upolyHenselCallerScope) integerAllocationInvocationContext {
+func numericIntegerModularManager_henselCallerAllocationContext(m *unumeral.IntegerModularManager, q *upolyHenselCallerScope) integerAllocationInvocationContext {
 	if m == nil || !m.ValidOwner() || m.Integers() == nil || q == nil || q.owner == nil {
 		return integerAllocationInvocationContext{}
 	}
@@ -50,7 +50,7 @@ func numericIntegerModularManager_henselCallerAllocationContext(m *util.IntegerM
 	}
 	return integerAllocationInvocationContext{}
 }
-func (q *upolyHenselCallerScope) normalizeReceipt(m *util.IntegerModularManager) *util.IntegerNormalizeInvocationReceipt {
+func (q *upolyHenselCallerScope) normalizeReceipt(m *unumeral.IntegerModularManager) *unumeral.IntegerNormalizeInvocationReceipt {
 	for i, o := range q.numericOwners() {
 		if o != nil && o.modular == m {
 			return &q.normalize[i]
@@ -58,7 +58,7 @@ func (q *upolyHenselCallerScope) normalizeReceipt(m *util.IntegerModularManager)
 	}
 	return nil
 }
-func numericIntegerManager_bindHenselCallerRaw(z *util.IntegerManager, c integerAllocationInvocationContext, r *util.IntegerRawInvocationReceipt, division bool) {
+func numericIntegerManager_bindHenselCallerRaw(z *unumeral.IntegerManager, c integerAllocationInvocationContext, r *unumeral.IntegerRawInvocationReceipt, division bool) {
 	if q := c.henselCallerFrame(z); q != nil {
 		if division {
 			q.divisionRaw = *r
@@ -69,8 +69,8 @@ func numericIntegerManager_bindHenselCallerRaw(z *util.IntegerManager, c integer
 	}
 }
 
-func (q *upolyHenselCallerScope) numericManagers() [4]*util.IntegerModularManager {
-	var out [4]*util.IntegerModularManager
+func (q *upolyHenselCallerScope) numericManagers() [4]*unumeral.IntegerModularManager {
+	var out [4]*unumeral.IntegerModularManager
 	for i, m := range q.numericOwners() {
 		if m != nil {
 			out[i] = m.modular

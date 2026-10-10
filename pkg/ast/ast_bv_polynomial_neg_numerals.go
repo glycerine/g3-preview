@@ -3,9 +3,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorPolynomialNegationNumerals owns the default a and reached -1 full
@@ -13,9 +12,9 @@ import (
 type BitVectorPolynomialNegationNumerals struct {
 	self                   *BitVectorPolynomialNegationNumerals
 	manager                *ASTManager
-	values                 [2]util.OwnedRational
+	values                 [2]unumeral.OwnedRational
 	placed                 [2]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	header                 uint64
 	sourceCause            error
@@ -73,7 +72,7 @@ func (n *BitVectorPolynomialNegationNumerals) retire() error {
 	if e := c.EndContext(); e != nil {
 		return e
 	}
-	*c = util.RationalServiceInvocation{}
+	*c = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorPolynomialNegationNumerals) Read(arg ASTHandle) (bool, error) {

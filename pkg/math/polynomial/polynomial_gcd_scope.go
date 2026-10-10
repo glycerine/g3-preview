@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // A reusable charged cold record describes one concrete source invocation.
@@ -42,7 +42,7 @@ type polynomialGCDFunctionScope struct {
 	parent, child           *polynomialGCDFunctionScope
 	refs                    [14]PolynomialRef
 	monomials               [2]polynomialDivisionReference
-	nums                    [10]util.Int
+	nums                    [10]unumeral.Int
 	powers                  [2]polynomialGCDPowers
 	stack                   [20]uint8
 	depth                   uint8
@@ -70,7 +70,7 @@ const (
 )
 
 func (s *polynomialGCDFunctionScope) constructNumeral(i uint8) {
-	s.nums[i] = util.Int{}
+	s.nums[i] = unumeral.Int{}
 	s.stack[s.depth] = gcdNumeralBase + i
 	s.depth++
 }
@@ -235,7 +235,7 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 		case id < gcdNumeralBase:
 			s.powers[id] = nil
 		case id < gcdReferenceBase:
-			_, e = util.SourceNumeralDel(m.core.integer, &s.nums[id-gcdNumeralBase])
+			_, e = unumeral.SourceNumeralDel(m.core.integer, &s.nums[id-gcdNumeralBase])
 		default:
 			e = s.refs[id-gcdReferenceBase].root.closeValue(m.core, false)
 		}

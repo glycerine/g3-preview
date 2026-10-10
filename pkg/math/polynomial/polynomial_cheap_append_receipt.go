@@ -2,8 +2,8 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialCheapAppendScope struct {
@@ -25,7 +25,7 @@ type polynomialCheapAppendScope struct {
 	factoryInvocation                             uint64
 	transferredCoefficients, transferredMonomials uint32
 	completedTransfer                             bool
-	movingCoefficient                             util.Int
+	movingCoefficient                             unumeral.Int
 }
 type polynomialCheapAppendInvocationReceipt struct {
 	manager    *MultivariatePolynomialCore
@@ -60,7 +60,7 @@ func (b *polynomialSOM) acquireAppendInvocation(r *polynomialCheapAppendInvocati
 	*r = polynomialCheapAppendInvocationReceipt{manager: b.owner, frame: s, invocation: s.invocation}
 	return nil
 }
-func (b *polynomialSOM) addWithAppendReceipt(a *util.Int, term Monomial, take bool, r *polynomialCheapAppendInvocationReceipt) error {
+func (b *polynomialSOM) addWithAppendReceipt(a *unumeral.Int, term Monomial, take bool, r *polynomialCheapAppendInvocationReceipt) error {
 	return b.addConsumedReceipts(a, term, take, nil, nil, r)
 }
 

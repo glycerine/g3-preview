@@ -7,19 +7,20 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The map is a cold source virtual interface. Values are borrowed live fields;
 // neither recursive frames nor the accessor copy their owning numeral tokens.
 type PolynomialRationalEvaluation interface {
-	Manager() (*util.RationalManager, error)
+	Manager() (*unumeral.RationalManager, error)
 	Contains(uint32) (bool, error)
-	Rational(uint32) (*util.Rational, error)
+	Rational(uint32) (*unumeral.Rational, error)
 }
 type polynomialEvalRationalFrame struct {
-	aux                  util.Rational
+	aux                  unumeral.Rational
 	constructed, stopped bool
 	stage                uint8
 	sourceCause          error
@@ -33,15 +34,15 @@ type polynomialEvaluationScope struct {
 	depth                                uint32
 	lexGeneration                        uint64
 	active, executing                    bool
-	rational                             *util.RationalManager
+	rational                             *unumeral.RationalManager
 	groups                               [3]uint64 // normalize, addition, power: exact started RAW groups only
 	numericPending                       umemory.ObjectRef
 	allocatorPending                     [3]umemory.Block
 	bodyCause, sourceCause, cleanupCause error
 	integerFrames                        []*polynomialEvalIntegerFrame
 	intervalFrames                       []*polynomialEvalIntervalFrame
-	modular                              *util.IntegerModularManager
-	interval                             *util.BinaryIntervalManager
+	modular                              *unumeral.IntegerModularManager
+	interval                             *unumeral.BinaryIntervalManager
 }
 
 func (m *MultivariatePolynomialManager) evaluationRationalFrame() (*polynomialEvalRationalFrame, error) {
@@ -57,7 +58,7 @@ func (m *MultivariatePolynomialManager) evaluationRationalFrame() (*polynomialEv
 	if f.constructed {
 		return nil, ErrPolynomialPending
 	}
-	*f = polynomialEvalRationalFrame{aux: util.NewRational(), constructed: true}
+	*f = polynomialEvalRationalFrame{aux: unumeral.NewRational(), constructed: true}
 	s.depth++
 	return f, nil
 }
@@ -100,7 +101,7 @@ const (
 	polynomialEvalMultiply
 )
 
-func (m *MultivariatePolynomialManager) evaluationRationalCall(op uint8, a, b *util.Rational, n *util.Int, k uint32, out *util.Rational) error {
+func (m *MultivariatePolynomialManager) evaluationRationalCall(op uint8, a, b *unumeral.Rational, n *unumeral.Int, k uint32, out *unumeral.Rational) error {
 	s := &m.evaluation
 	q := s.rational
 	before := q.RawInvocationState().Active
@@ -173,7 +174,7 @@ func (m *MultivariatePolynomialManager) evaluationDegree(p Polynomial, i, x uint
 	}
 	return m.core.monomials.DegreeOf(a, x)
 }
-func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v PolynomialRationalEvaluation, start, end, x uint32, out *util.Rational) (cause error) {
+func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v PolynomialRationalEvaluation, start, end, x uint32, out *unumeral.Rational) (cause error) {
 	if polynomialSourceDebug {
 		if start >= end {
 			return ErrPolynomialAssertion
@@ -369,7 +370,7 @@ func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v P
 	}
 	return nil
 }
-func (m *MultivariatePolynomialManager) EvaluateRational(p Polynomial, v PolynomialRationalEvaluation, out *util.Rational) (cause error) {
+func (m *MultivariatePolynomialManager) EvaluateRational(p Polynomial, v PolynomialRationalEvaluation, out *unumeral.Rational) (cause error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -583,18 +584,18 @@ func (m *MultivariatePolynomialManager) closeEvaluationFrames() error {
 }
 
 type PolynomialIntervalEvaluation interface {
-	Manager() (*util.BinaryIntervalManager, error)
+	Manager() (*unumeral.BinaryIntervalManager, error)
 	Contains(uint32) (bool, error)
-	Interval(uint32) (*util.BinaryInterval, error)
+	Interval(uint32) (*unumeral.BinaryInterval, error)
 }
 type polynomialEvalIntegerMap struct {
-	manager *util.IntegerModularManager
+	manager *unumeral.IntegerModularManager
 	x       uint32
-	value   *util.Int
+	value   *unumeral.Int
 }
 
 func (v *polynomialEvalIntegerMap) Contains(x uint32) (bool, error) { return x == v.x, nil }
-func (v *polynomialEvalIntegerMap) integerValue(x uint32) (*util.Int, error) {
+func (v *polynomialEvalIntegerMap) integerValue(x uint32) (*unumeral.Int, error) {
 	if polynomialSourceDebug && x != v.x {
 		return nil, ErrPolynomialAssertion
 	}
@@ -602,7 +603,7 @@ func (v *polynomialEvalIntegerMap) integerValue(x uint32) (*util.Int, error) {
 }
 
 type polynomialEvalIntegerFrame struct {
-	aux                  util.Int
+	aux                  unumeral.Int
 	constructed, stopped bool
 	stage                uint8
 	sourceCause          error
@@ -621,7 +622,7 @@ func (m *MultivariatePolynomialManager) evaluationIntegerFrame() (*polynomialEva
 	if f.constructed {
 		return nil, ErrPolynomialPending
 	}
-	*f = polynomialEvalIntegerFrame{aux: util.Int{}, constructed: true}
+	*f = polynomialEvalIntegerFrame{aux: unumeral.Int{}, constructed: true}
 	s.depth++
 	return f, nil
 }
@@ -652,7 +653,7 @@ func (m *MultivariatePolynomialManager) finishEvaluationIntegerFrame(f *polynomi
 	return nil
 }
 
-func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *polynomialEvalIntegerMap, start, end, x uint32, out *util.Int) (cause error) {
+func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *polynomialEvalIntegerMap, start, end, x uint32, out *unumeral.Int) (cause error) {
 	if polynomialSourceDebug {
 		if start >= end {
 			return ErrPolynomialAssertion
@@ -850,7 +851,7 @@ func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *p
 }
 
 type polynomialEvalIntervalFrame struct {
-	aux                  util.BinaryInterval
+	aux                  unumeral.BinaryInterval
 	constructed, stopped bool
 	stage                uint8
 	sourceCause          error
@@ -869,7 +870,7 @@ func (m *MultivariatePolynomialManager) evaluationIntervalFrame() (*polynomialEv
 	if f.constructed {
 		return nil, ErrPolynomialPending
 	}
-	*f = polynomialEvalIntervalFrame{aux: util.NewBinaryInterval(), constructed: true}
+	*f = polynomialEvalIntervalFrame{aux: unumeral.NewBinaryInterval(), constructed: true}
 	s.depth++
 	return f, nil
 }
@@ -903,7 +904,7 @@ func (m *MultivariatePolynomialManager) finishEvaluationIntervalFrame(f *polynom
 	return nil
 }
 
-func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v PolynomialIntervalEvaluation, start, end, x uint32, out *util.BinaryInterval) (cause error) {
+func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v PolynomialIntervalEvaluation, start, end, x uint32, out *unumeral.BinaryInterval) (cause error) {
 	if polynomialSourceDebug {
 		if start >= end {
 			return ErrPolynomialAssertion
@@ -1120,7 +1121,7 @@ func (m *MultivariatePolynomialManager) evaluationCaptureNumeric(beforeCell umem
 	}
 	return cause
 }
-func (m *MultivariatePolynomialManager) evaluationIntegerCall(op uint8, a, b *util.Int, n *util.Int, k uint32, out *util.Int) error {
+func (m *MultivariatePolynomialManager) evaluationIntegerCall(op uint8, a, b *unumeral.Int, n *unumeral.Int, k uint32, out *unumeral.Int) error {
 	z := m.core.integer
 	beforeCell := z.PendingAllocationObject()
 	beforeRaw, e := z.SourceAllocator().PendingRoots()
@@ -1146,7 +1147,7 @@ func (m *MultivariatePolynomialManager) evaluationIntegerCall(op uint8, a, b *ut
 	}
 	return m.evaluationCaptureNumeric(beforeCell, beforeRaw, e)
 }
-func (m *MultivariatePolynomialManager) evaluationIntervalCall(op uint8, a, b *util.BinaryInterval, n *util.Int, k uint32, out *util.BinaryInterval) error {
+func (m *MultivariatePolynomialManager) evaluationIntervalCall(op uint8, a, b *unumeral.BinaryInterval, n *unumeral.Int, k uint32, out *unumeral.BinaryInterval) error {
 	z := m.core.integer
 	beforeCell := z.PendingAllocationObject()
 	beforeRaw, e := z.SourceAllocator().PendingRoots()
@@ -1172,7 +1173,7 @@ func (m *MultivariatePolynomialManager) evaluationIntervalCall(op uint8, a, b *u
 	}
 	return m.evaluationCaptureNumeric(beforeCell, beforeRaw, e)
 }
-func (m *MultivariatePolynomialManager) UnivariateEvaluate(p Polynomial, x uint32, value, out *util.Int) (cause error) {
+func (m *MultivariatePolynomialManager) UnivariateEvaluate(p Polynomial, x uint32, value, out *unumeral.Int) (cause error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -1255,7 +1256,7 @@ func (m *MultivariatePolynomialManager) UnivariateEvaluate(p Polynomial, x uint3
 	}
 	return m.evaluationIntegerCore(p, &values, 0, n, max, out)
 }
-func (m *MultivariatePolynomialManager) EvaluateInterval(p Polynomial, v PolynomialIntervalEvaluation, out *util.BinaryInterval) (cause error) {
+func (m *MultivariatePolynomialManager) EvaluateInterval(p Polynomial, v PolynomialIntervalEvaluation, out *unumeral.BinaryInterval) (cause error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -1369,7 +1370,7 @@ func (m *MultivariatePolynomialManager) evaluationEarlyRoots(beforeCell umemory.
 	}
 	return cause
 }
-func (m *MultivariatePolynomialManager) evaluationEarlyRational(q *util.RationalManager, n *util.Int, out *util.Rational) error {
+func (m *MultivariatePolynomialManager) evaluationEarlyRational(q *unumeral.RationalManager, n *unumeral.Int, out *unumeral.Rational) error {
 	z := m.core.integer
 	beforeCell := z.PendingAllocationObject()
 	beforeRaw, e := z.SourceAllocator().PendingRoots()
@@ -1383,7 +1384,7 @@ func (m *MultivariatePolynomialManager) evaluationEarlyRational(q *util.Rational
 	}
 	return m.evaluationEarlyRoots(beforeCell, beforeRaw, e)
 }
-func (m *MultivariatePolynomialManager) evaluationEarlyInterval(vm *util.BinaryIntervalManager, n *util.Int, out *util.BinaryInterval) error {
+func (m *MultivariatePolynomialManager) evaluationEarlyInterval(vm *unumeral.BinaryIntervalManager, n *unumeral.Int, out *unumeral.BinaryInterval) error {
 	z := m.core.integer
 	beforeCell := z.PendingAllocationObject()
 	beforeRaw, e := z.SourceAllocator().PendingRoots()
@@ -1398,7 +1399,7 @@ func (m *MultivariatePolynomialManager) evaluationEarlyInterval(vm *util.BinaryI
 	return m.evaluationEarlyRoots(beforeCell, beforeRaw, e)
 }
 
-func (m *MultivariatePolynomialManager) evaluationEarlyInteger(n *util.Int, out *util.Int) error {
+func (m *MultivariatePolynomialManager) evaluationEarlyInteger(n *unumeral.Int, out *unumeral.Int) error {
 	z := m.core.integer
 	beforeCell := z.PendingAllocationObject()
 	beforeRaw, e := z.SourceAllocator().PendingRoots()

@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyIntegerEvaluationScope struct {
@@ -16,10 +16,10 @@ type upolyIntegerEvaluationScope struct {
 	falseAcknowledged                        bool
 	owner                                    *UPolynomialManager
 	invocation                               uint64
-	values                                   [1]util.Int
+	values                                   [1]unumeral.Int
 	numeric                                  polynomialNumericRoots
-	normalize                                util.IntegerNormalizeInvocationReceipt
-	addMul                                   util.IntegerAddMulInvocationReceipt
+	normalize                                unumeral.IntegerNormalizeInvocationReceipt
+	addMul                                   unumeral.IntegerAddMulInvocationReceipt
 	sourceRemaining, ownRemaining            uint8
 	active, executing, finishing, ownStarted bool
 	bodyCause, sourceCause, ownCause         error
@@ -33,8 +33,8 @@ type upolyIntegerEvaluationHistory struct {
 	frame                            *upolyIntegerEvaluationScope
 	next                             *upolyIntegerEvaluationHistory
 	invocation                       uint64
-	normalize                        util.IntegerNormalizeInvocationReceipt
-	addMul                           util.IntegerAddMulInvocationReceipt
+	normalize                        unumeral.IntegerNormalizeInvocationReceipt
+	addMul                           unumeral.IntegerAddMulInvocationReceipt
 	bodyCause, sourceCause, ownCause error
 	sourceRemaining                  uint8
 }
@@ -42,10 +42,10 @@ type upolyIntegerEvaluationHistory struct {
 func (m *UPolynomialManager) integerEvaluationExecuting() bool {
 	return m != nil && m.self == m && m.integerEvaluation.owner == m && m.integerEvaluation.active && (m.integerEvaluation.executing || m.integerEvaluation.finishing)
 }
-func numericIntegerManager_integerEvaluationCallerExecuting(z *util.IntegerManager) bool {
+func numericIntegerManager_integerEvaluationCallerExecuting(z *unumeral.IntegerManager) bool {
 	return z != nil && z.ValidOwner() && integerEvaluationCaller(z) != nil && integerEvaluationCaller(z).config.Integer == z && integerEvaluationCaller(z).integerEvaluationExecuting()
 }
-func (c integerAllocationInvocationContext) integerEvaluationFrame(z *util.IntegerManager) *upolyIntegerEvaluationScope {
+func (c integerAllocationInvocationContext) integerEvaluationFrame(z *unumeral.IntegerManager) *upolyIntegerEvaluationScope {
 	q := c.integerEvaluation
 	if z == nil || !z.ValidOwner() || q == nil || q.owner == nil || q.owner.self != q.owner || q != &q.owner.integerEvaluation || q.owner.config.Integer != z || integerEvaluationCaller(z) != q.owner || q.owner.callbackDepth != 0 || !q.active || !q.executing || c.integerEvaluationInvocation == 0 || c.integerEvaluationInvocation != q.invocation {
 		return nil

@@ -7,8 +7,9 @@ import (
 	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // PolynomialTextSink is a cold stream binding. Decimal bytes are borrowed only
@@ -72,11 +73,11 @@ type polynomialDisplayFrame struct {
 	monomialSink                         MonomialTextSink
 	generation                           uint64
 	active, stopped                      bool
-	numeral                              util.Int
+	numeral                              unumeral.Int
 	constructed                          bool
 	characters                           []byte
 	characterCompleted, characterPending bool
-	limbs                                util.NaturalFormattingScope
+	limbs                                unumeral.NaturalFormattingScope
 	numeric                              polynomialNumericRoots
 	small                                [12]byte
 	smallSize                            uint32
@@ -152,7 +153,7 @@ func (m *MultivariatePolynomialCore) displayLiteral(sink PolynomialTextSink, s s
 	defer func() { m.callbackDepth-- }()
 	return sink.WriteLiteral(s)
 }
-func (f *polynomialDisplayFrame) numericCall(op uint8, a *util.Int) error {
+func (f *polynomialDisplayFrame) numericCall(op uint8, a *unumeral.Int) error {
 	z := f.owner.integer
 	before, e := polynomialNumericBefore(z)
 	if e != nil {
@@ -244,7 +245,7 @@ func (f *polynomialDisplayFrame) smallDecimal(v int32) {
 	f.smallSize = i
 	f.big = false
 }
-func (f *polynomialDisplayFrame) displayInteger(a *util.Int) error {
+func (f *polynomialDisplayFrame) displayInteger(a *unumeral.Int) error {
 	z := f.owner.integer
 	if e := z.Check(a); e != nil {
 		return e
@@ -729,7 +730,7 @@ func displayDeallocatePublished(r *umemory.Runtime, b *umemory.Block) error {
 	return r.Deallocate(b)
 }
 
-func (f *polynomialDisplayFrame) stringInteger(a *util.Int) (string, error) {
+func (f *polynomialDisplayFrame) stringInteger(a *unumeral.Int) (string, error) {
 	if e := f.owner.modular.AssertNormalized(a); e != nil {
 		return "", e
 	}
@@ -768,21 +769,21 @@ func (m *MultivariatePolynomialCore) displayBindCoefficient(p Polynomial, i uint
 	_, e := m.polynomialLocation(p)
 	return e
 }
-func (m *MultivariatePolynomialCore) displayCoefficient(p Polynomial, i uint32) (util.Int, error) {
+func (m *MultivariatePolynomialCore) displayCoefficient(p Polynomial, i uint32) (unumeral.Int, error) {
 	l, e := m.polynomialLocation(p)
 	if e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	if i >= l.initializedCoefficients {
-		return util.Int{}, ErrPolynomialPartial
+		return unumeral.Int{}, ErrPolynomialPartial
 	}
 	o := uint64(12) + 12*uint64(i)
 	v, e := m.readWord(p, o)
 	if e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	r, e := m.read64(p, o+4)
-	return util.IntFromNativeWords([3]uint32{uint32(v), uint32(r), uint32(uint64(r) >> 32)}), e
+	return unumeral.IntFromNativeWords([3]uint32{uint32(v), uint32(r), uint32(uint64(r) >> 32)}), e
 }
 
 func (m *MultivariatePolynomialCore) DisplayMonomialInto(a Monomial, sink MonomialTextSink, star bool) error {

@@ -4,9 +4,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialFactorFrontendActualPrimitiveGCDCapture(t *testing.T) {
@@ -15,12 +14,12 @@ func TestUPolynomialFactorFrontendActualPrimitiveGCDCapture(t *testing.T) {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			z, s := preparationPhysicalFixture(t)
 			m := s.manager
-			var large util.Int
+			var large unumeral.Int
 			serviceMust(t, z.Integers().SetLimbs(&large, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 			fs, e := m.NewFactors()
 			serviceMust(t, e)
 			var input upolyVectorState
-			serviceMust(t, m.set(&input, []util.Int{large, large}))
+			serviceMust(t, m.set(&input, []unumeral.Int{large, large}))
 			defer func() {
 				z.Budget().FailAfter(-1)
 
@@ -32,7 +31,7 @@ func TestUPolynomialFactorFrontendActualPrimitiveGCDCapture(t *testing.T) {
 			}()
 			z.Budget().FailAfter(ordinal)
 			_, body := s.Factor(m.stateView(&input), fs, DefaultUPolynomialFactorParams())
-			caller := []*util.Int{&large}
+			caller := []*unumeral.Int{&large}
 			for i := range m.values(&input) {
 				caller = append(caller, &m.values(&input)[i])
 			}

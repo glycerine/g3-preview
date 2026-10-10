@@ -4,7 +4,8 @@ package model
 import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"testing"
 )
@@ -19,7 +20,7 @@ func arrayTableManager(t *testing.T) *ast.ASTManager {
 	b := arena.NewBudget(1 << 30)
 	s, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	arrayTableMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	arrayTableMust(t, e)
 	t.Cleanup(func() {
 		arrayTableMust(t, q.Close())

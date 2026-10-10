@@ -6,15 +6,15 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialScalarExactDivCompiledAssertionCapturesActualBoolNUM(t *testing.T) {
 	full := polynomialExactDivDirectPageOneFixture(t)
 	c := full.core
 	before := c.integer.DividesNumeral.Invocation
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	result, e := c.ExactDivScalar(c.unit, &one)
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(result))
@@ -45,7 +45,7 @@ func TestPolynomialScalarExactDivCompiledAssertionBIGRefusalPrefixes(t *testing.
 	for prefix := int64(0); prefix < 100; prefix++ {
 		full := polynomialExactDivDirectPageOneFixture(t)
 		c, z := full.core, full.core.integer
-		var a, d util.Int
+		var a, d unumeral.Int
 		words := make([]uint32, 2048)
 		words[0], words[len(words)-1] = 1, 1
 		serviceMust(t, z.SetLimbs(&a, words))
@@ -56,7 +56,7 @@ func TestPolynomialScalarExactDivCompiledAssertionBIGRefusalPrefixes(t *testing.
 		serviceMust(t, c.IncRef(p))
 		z.Budget().FailAfter(prefix)
 		result, body := c.ExactDivScalar(p, &d)
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result}, []*util.Int{&a, &d}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result}, []*unumeral.Int{&a, &d}, 0)
 		if body == nil {
 			t.Fatal("nondivisible source assertion accepted", prefix)
 		}

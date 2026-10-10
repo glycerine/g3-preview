@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // No corresponding assertions occur in the original polynomial driver. These
@@ -14,21 +13,21 @@ func TestPolynomialSignSourceTable(t *testing.T) {
 	m, _, ms := polynomialLexFixture(t)
 	c := m.core
 	cases := []struct {
-		a                        []util.Int
+		a                        []unumeral.Int
 		terms                    []Monomial
 		vars                     []PolynomialSign
 		sign                     PolynomialSign
 		pos, neg, nonpos, nonneg bool
 	}{
 		{nil, nil, nil, PolynomialSignUnknown, false, false, true, true},
-		{[]util.Int{util.NewInt(3)}, []Monomial{ms[4]}, nil, PolynomialSignPositive, true, false, false, true},
-		{[]util.Int{util.NewInt(-3)}, []Monomial{ms[4]}, nil, PolynomialSignNegative, false, true, true, false},
-		{[]util.Int{util.NewInt(3)}, []Monomial{ms[1]}, []PolynomialSign{PolynomialSignNegative}, PolynomialSignPositive, false, false, false, true},
-		{[]util.Int{util.NewInt(-3)}, []Monomial{ms[1]}, []PolynomialSign{PolynomialSignNegative}, PolynomialSignNegative, false, false, true, false},
-		{[]util.Int{util.NewInt(3)}, []Monomial{ms[1]}, nil, PolynomialSignUnknown, false, false, false, true},
-		{[]util.Int{util.NewInt(3)}, []Monomial{ms[2]}, []PolynomialSign{PolynomialSignPositive, PolynomialSignNegative}, PolynomialSignNegative, false, false, false, false},
-		{[]util.Int{util.NewInt(3), util.NewInt(5)}, []Monomial{ms[1], ms[4]}, []PolynomialSign{PolynomialSignPositive}, PolynomialSignPositive, true, false, false, true},
-		{[]util.Int{util.NewInt(-3), util.NewInt(5)}, []Monomial{ms[1], ms[4]}, []PolynomialSign{PolynomialSignPositive}, PolynomialSignUnknown, false, false, false, false},
+		{[]unumeral.Int{unumeral.NewInt(3)}, []Monomial{ms[4]}, nil, PolynomialSignPositive, true, false, false, true},
+		{[]unumeral.Int{unumeral.NewInt(-3)}, []Monomial{ms[4]}, nil, PolynomialSignNegative, false, true, true, false},
+		{[]unumeral.Int{unumeral.NewInt(3)}, []Monomial{ms[1]}, []PolynomialSign{PolynomialSignNegative}, PolynomialSignPositive, false, false, false, true},
+		{[]unumeral.Int{unumeral.NewInt(-3)}, []Monomial{ms[1]}, []PolynomialSign{PolynomialSignNegative}, PolynomialSignNegative, false, false, true, false},
+		{[]unumeral.Int{unumeral.NewInt(3)}, []Monomial{ms[1]}, nil, PolynomialSignUnknown, false, false, false, true},
+		{[]unumeral.Int{unumeral.NewInt(3)}, []Monomial{ms[2]}, []PolynomialSign{PolynomialSignPositive, PolynomialSignNegative}, PolynomialSignNegative, false, false, false, false},
+		{[]unumeral.Int{unumeral.NewInt(3), unumeral.NewInt(5)}, []Monomial{ms[1], ms[4]}, []PolynomialSign{PolynomialSignPositive}, PolynomialSignPositive, true, false, false, true},
+		{[]unumeral.Int{unumeral.NewInt(-3), unumeral.NewInt(5)}, []Monomial{ms[1], ms[4]}, []PolynomialSign{PolynomialSignPositive}, PolynomialSignUnknown, false, false, false, false},
 	}
 	for i, tc := range cases {
 		p, e := c.MkTerms(tc.a, tc.terms)
@@ -108,7 +107,7 @@ func TestPolynomialSignSourceUnreadSuffixAndNoReservation(t *testing.T) {
 func TestPolynomialSignSourceZeroCoefficientAndOwnerGuards(t *testing.T) {
 	m, _, ms := polynomialLexFixture(t)
 	c := m.core
-	p, e := c.MkTerms([]util.Int{util.NewInt(7)}, []Monomial{ms[4]})
+	p, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(7)}, []Monomial{ms[4]})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
 	// Invalid-Go stored coefficient domain isolates the literal is_pos ternary:
@@ -144,22 +143,22 @@ func TestPolynomialSignSourceZeroCoefficientAndOwnerGuards(t *testing.T) {
 func TestPolynomialSignSourceModularCoefficientBoundary(t *testing.T) {
 	m, _, ms := polynomialLexFixture(t)
 	c := m.core
-	p, e := c.MkTerms([]util.Int{util.NewInt(7)}, []Monomial{ms[4]})
+	p, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(7)}, []Monomial{ms[4]})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
 	defer func() { serviceMust(t, c.modular.SetZ()); serviceMust(t, c.DecRef(p)) }()
 	serviceMust(t, c.modular.SetZPUint64(5))
 	_, e = m.Sign(p, nil)
 	if polynomialSourceDebug {
-		if !errors.Is(e, util.ErrModularAssertion) {
+		if !errors.Is(e, unumeral.ErrModularAssertion) {
 			t.Fatal("literal reached modular is_pos guard", e)
 		}
 	} else {
 		serviceMust(t, e)
 	}
 	// Normalized signed field coefficients use the same source wrapper.
-	a := util.NewInt(-2)
-	q, e := c.MkTerms([]util.Int{a}, []Monomial{ms[4]})
+	a := unumeral.NewInt(-2)
+	q, e := c.MkTerms([]unumeral.Int{a}, []Monomial{ms[4]})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(q))
 	got, e := m.Sign(q, nil)

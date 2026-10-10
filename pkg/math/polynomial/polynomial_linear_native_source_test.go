@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestLinearNativeRHSBeforeReachedInput(t *testing.T) {
@@ -15,8 +15,8 @@ func TestLinearNativeRHSBeforeReachedInput(t *testing.T) {
 	serviceMust(t, e)
 	defer func() { serviceMust(t, s.Close()) }()
 	serviceMust(t, s.Resize(2))
-	rhs := util.NewInt(7)
-	e = s.Add(0, []util.Int{util.NewInt(3)}, &rhs)
+	rhs := unumeral.NewInt(7)
+	e = s.Add(0, []unumeral.Int{unumeral.NewInt(3)}, &rhs)
 	if !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("reached short input", e)
 	}
@@ -29,12 +29,12 @@ func TestLinearNativeRHSBeforeReachedInput(t *testing.T) {
 	serviceMust(t, e)
 	a, e := s.load(r, 0)
 	serviceMust(t, e)
-	if a != util.NewInt(3) {
+	if a != unumeral.NewInt(3) {
 		t.Fatal("first coefficient prefix", a)
 	}
 	a, e = s.load(r, 1)
 	serviceMust(t, e)
-	if a != util.NewInt(0) {
+	if a != unumeral.NewInt(0) {
 		t.Fatal("unreached second coefficient", a)
 	}
 }
@@ -44,11 +44,11 @@ func TestLinearNativeOutputsAndRHSAlias(t *testing.T) {
 		s, e := NewModularLinearSolver(m)
 		serviceMust(t, e)
 		serviceMust(t, s.Resize(2))
-		b := util.NewInt(5)
-		serviceMust(t, s.Add(0, []util.Int{util.NewInt(1), util.NewInt(1)}, &b))
-		b = util.NewInt(3)
-		serviceMust(t, s.Add(1, []util.Int{util.NewInt(0), util.NewInt(1)}, &b))
-		out := make([]util.Int, 2)
+		b := unumeral.NewInt(5)
+		serviceMust(t, s.Add(0, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}, &b))
+		b = unumeral.NewInt(3)
+		serviceMust(t, s.Add(1, []unumeral.Int{unumeral.NewInt(0), unumeral.NewInt(1)}, &b))
+		out := make([]unumeral.Int, 2)
 		if alias {
 			out = s.b
 		}
@@ -58,7 +58,7 @@ func TestLinearNativeOutputsAndRHSAlias(t *testing.T) {
 			t.Fatal("invertible")
 		}
 		for i, want := range []int32{2, 3} {
-			if out[i] != util.NewInt(want) {
+			if out[i] != unumeral.NewInt(want) {
 				t.Fatal("independent solution", alias, i, out[i])
 			}
 		}
@@ -77,10 +77,10 @@ func TestLinearNativeEmptySolve(t *testing.T) {
 	}
 }
 
-func linearNativeNamedAudit(t *testing.T, s *ModularLinearSolver, values ...*util.Int) {
+func linearNativeNamedAudit(t *testing.T, s *ModularLinearSolver, values ...*unumeral.Int) {
 	t.Helper()
 	m := s.manager
-	roots := []*util.Int{m.BorrowModulus(), &m.Lower, &m.Upper, &m.InvTmp1, &m.InvTmp2, &m.InvTmp3, &m.DivTmp}
+	roots := []*unumeral.Int{m.BorrowModulus(), &m.Lower, &m.Upper, &m.InvTmp1, &m.InvTmp2, &m.InvTmp3, &m.DivTmp}
 	roots = append(roots, values...)
 	for i := range s.b {
 		roots = append(roots, &s.b[i])
@@ -96,17 +96,17 @@ func TestLinearNativeOutputCopyEveryRefusalPrefix(t *testing.T) {
 	sawPublished := false
 	for fail := int64(0); fail < 80; fail++ {
 		z, budget := mpzPublicationDirectOwner(t)
-		m, e := util.NewIntegerModularManager(z)
+		m, e := unumeral.NewIntegerModularManager(z)
 		serviceMust(t, e)
 		serviceMust(t, m.SetZPUint64(18446744073709551557))
 		t.Cleanup(func() { serviceMust(t, m.Close()) })
 		s, e := NewModularLinearSolver(m)
 		serviceMust(t, e)
 		serviceMust(t, s.Resize(1))
-		rhs := util.Int{}
+		rhs := unumeral.Int{}
 		serviceMust(t, z.SetUint64(&rhs, 1<<40))
-		serviceMust(t, s.Add(0, []util.Int{util.NewInt(1)}, &rhs))
-		out := make([]util.Int, 1)
+		serviceMust(t, s.Add(0, []unumeral.Int{unumeral.NewInt(1)}, &rhs))
+		out := make([]unumeral.Int, 1)
 		budget.FailAfter(fail)
 		ok, e := s.Solve(out)
 		a := out[0]
@@ -164,31 +164,31 @@ func TestLinearModularNativeGrowthIndependentTriangularSystem(t *testing.T) {
 	const n = 17
 	for pass := 0; pass < 2; pass++ {
 		for i := 0; i < n; i++ {
-			row := make([]util.Int, n)
+			row := make([]unumeral.Int, n)
 			sum := 0
 			for j := i; j < n; j++ {
 				a := (i+j)%5 - 2
 				if i == j {
 					a = 1
 				}
-				row[j] = util.NewInt(int32(a))
+				row[j] = unumeral.NewInt(int32(a))
 				sum += a * (j%7 - 3)
 			}
 			sum = (sum%97 + 97) % 97
 			if sum > 48 {
 				sum -= 97
 			}
-			rhs := util.NewInt(int32(sum))
+			rhs := unumeral.NewInt(int32(sum))
 			serviceMust(t, s.Add(uint32(i), row, &rhs))
 		}
-		out := make([]util.Int, n)
+		out := make([]unumeral.Int, n)
 		ok, e := s.Solve(out)
 		serviceMust(t, e)
 		if !ok {
 			t.Fatal("unit triangular system is invertible")
 		}
 		for i, a := range out {
-			if a != util.NewInt(int32(i%7-3)) {
+			if a != unumeral.NewInt(int32(i%7-3)) {
 				t.Fatal("independent solution", pass, i, a)
 			}
 		}
@@ -204,11 +204,11 @@ func TestLinearNativeBigSelfCopyAliases(t *testing.T) {
 	r, e := NewRationalLinearSolver(q)
 	serviceMust(t, e)
 	serviceMust(t, r.Resize(1))
-	rhs := util.NewRational()
+	rhs := unumeral.NewRational()
 	serviceMust(t, q.SetString(&rhs, "79228162514264337593543950337"))
-	one := util.NewRational()
+	one := unumeral.NewRational()
 	serviceMust(t, q.SetInt64(&one, 1))
-	serviceMust(t, r.Add(0, []util.Rational{one}, &rhs))
+	serviceMust(t, r.Add(0, []unumeral.Rational{one}, &rhs))
 	serviceMust(t, r.Add(0, r.A[0], &r.b[0]))
 	ok, e := r.Solve(r.b)
 	serviceMust(t, e)
@@ -227,9 +227,9 @@ func TestLinearNativeBigSelfCopyAliases(t *testing.T) {
 	s, e := NewModularLinearSolver(m)
 	serviceMust(t, e)
 	serviceMust(t, s.Resize(1))
-	b := util.Int{}
+	b := unumeral.Int{}
 	serviceMust(t, z.SetUint64(&b, 1<<40))
-	serviceMust(t, s.Add(0, []util.Int{util.NewInt(1)}, &b))
+	serviceMust(t, s.Add(0, []unumeral.Int{unumeral.NewInt(1)}, &b))
 	serviceMust(t, s.Add(0, s.A[0], &s.b[0]))
 	ok, e = s.Solve(s.b)
 	serviceMust(t, e)

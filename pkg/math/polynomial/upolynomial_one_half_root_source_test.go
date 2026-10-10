@@ -9,8 +9,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialHasOneHalfRootActualBodyAndNumeralDT(t *testing.T) {
@@ -43,9 +44,9 @@ func TestUPolynomialHasOneHalfRootActualBodyAndNumeralDT(t *testing.T) {
 			z := p.config.Integer
 			poly, e := p.NewPolynomial()
 			serviceMust(t, e)
-			var big util.Int
+			var big unumeral.Int
 			serviceMust(t, z.SetLimbs(&big, []uint32{1, 2, 3, 4}))
-			serviceMust(t, p.SetInts(poly, []util.Int{big, big, util.NewInt(1)}))
+			serviceMust(t, p.SetInts(poly, []unumeral.Int{big, big, unumeral.NewInt(1)}))
 			serviceMust(t, z.Del(&big))
 			v, e := p.wholeView(poly)
 			serviceMust(t, e)
@@ -89,7 +90,7 @@ func TestUPolynomialHasOneHalfRootActualBodyAndNumeralDT(t *testing.T) {
 			if (q.values[1]).Cell == 0 || !z.IsLiveCellToken(uint64((q.values[1]).Cell)) || (!z.Cell((q.values[1]).Cell).Released && !z.Cell((q.values[1]).Cell).CleanupPending) {
 				t.Fatal("ak descriptor does not name consumed physical source release")
 			}
-			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&q.values[0], &q.values[1]}, []umemory.Block{lane, held})
+			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*unumeral.Int{&q.values[0], &q.values[1]}, []umemory.Block{lane, held})
 			before := *q
 			used, physical := z.Budget().Used(), rt.Stats()
 			if e := p.SourceFinalize(); e != q.sourceCause {
@@ -147,7 +148,7 @@ func TestUPolynomialHasOneHalfRootActualBodyAndNumeralDT(t *testing.T) {
 
 func TestUPolynomialHasOneHalfRootActualModularOwnerCallback(t *testing.T) {
 	var p *UPolynomialManager
-	var foreign *util.IntegerModularManager
+	var foreign *unumeral.IntegerModularManager
 	var current UPolynomial
 	armed, reached := false, false
 	transport := func(f umemory.Failure) error {
@@ -205,7 +206,7 @@ func TestUPolynomialHasOneHalfRootActualModularOwnerCallback(t *testing.T) {
 	c, actual, rt := algebraicNegTLSFixture(t, transport)
 	p = actual
 	z := p.config.Integer
-	foreign, e := util.NewIntegerModularManager(z)
+	foreign, e := unumeral.NewIntegerModularManager(z)
 	serviceMust(t, e)
 	defer func() { serviceMust(t, foreign.Close()) }()
 	poly := algebraicPolynomial(t, p, 1, 2147483647, 1)
@@ -221,7 +222,7 @@ func TestUPolynomialHasOneHalfRootActualModularOwnerCallback(t *testing.T) {
 	if !reached || body == nil {
 		t.Fatal("actual public allocating leaf absent", reached, body)
 	}
-	algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&p.oneHalfRoot.values[0], &p.oneHalfRoot.values[1]}, []umemory.Block{held})
+	algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*unumeral.Int{&p.oneHalfRoot.values[0], &p.oneHalfRoot.values[1]}, []umemory.Block{held})
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, p.cleanupOneHalfRoot(false))
 	serviceMust(t, p.cleanupOneHalfRoot(true))

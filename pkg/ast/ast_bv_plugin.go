@@ -5,7 +5,7 @@ import (
 	"math"
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -32,7 +32,7 @@ type astBitVectorPluginOwner struct {
 	sorts                                  []astNodeRef
 	family                                 FamilyID
 	header                                 uint64
-	power                                  util.OwnedRational
+	power                                  unumeral.OwnedRational
 	powerActive, published                 bool
 	bodyCause, destructorCause, powerCause error
 }

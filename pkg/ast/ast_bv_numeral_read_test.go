@@ -8,11 +8,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func bvFinishReadInvocation(t *testing.T, c *util.RationalServiceInvocation) {
+func bvFinishReadInvocation(t *testing.T, c *unumeral.RationalServiceInvocation) {
 	t.Helper()
 	before := c.SourceReady()
 	astTestMust(t, c.Cleanup(false))
@@ -47,7 +48,7 @@ func TestASTBitVectorNumeralReadInvocationStoredValueAndUnmatchedOutputs(t *test
 	defer func() { astTestMust(t, q.Del(&out)) }()
 	for _, literal := range []string{"0", "257", "-1", "340282366920938463463374607431768211457"} {
 		h := bvRawOffsetTestNumeral(t, m, fid, s, literal, 8)
-		var call util.RationalServiceInvocation
+		var call unumeral.RationalServiceInvocation
 		width := uint32(777)
 		matched, e = m.BitVectorNumeralValueWithInvocation(h, &out, &width, &call)
 		astTestMust(t, e)
@@ -86,7 +87,7 @@ func TestASTBitVectorNumeralReadCopiesBeforeReachedWidthError(t *testing.T) {
 	astTestPin(t, m, h)
 	out, e := q.NewValue()
 	astTestMust(t, e)
-	var call util.RationalServiceInvocation
+	var call unumeral.RationalServiceInvocation
 	width := uint32(77)
 	matched, body := m.BitVectorNumeralValueWithInvocation(h, &out, &width, &call)
 	if body == nil || matched || width != 77 {
@@ -137,7 +138,7 @@ func TestASTBitVectorNumeralReadEveryActualCopyReservation(t *testing.T) {
 			astTestPin(t, m, h)
 			out, e := q.NewValue()
 			astTestMust(t, e)
-			var call util.RationalServiceInvocation
+			var call unumeral.RationalServiceInvocation
 			width := uint32(777)
 			before := m.bitVectorPlugin.numeralSerial
 			m.Budget().FailAfter(ordinal)

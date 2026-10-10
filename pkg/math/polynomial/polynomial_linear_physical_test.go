@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func linearDefaultPhysicalCensus(t *testing.T, q *util.RationalManager, s *RationalLinearSolver, baseline uint32) {
+func linearDefaultPhysicalCensus(t *testing.T, q *unumeral.RationalManager, s *RationalLinearSolver, baseline uint32) {
 	t.Helper()
 	if q.Integers().Memory.Stats().LiveBlocks != baseline {
 		t.Fatal("default native matrix allocated Runtime blocks")
@@ -32,11 +32,11 @@ func TestLinearRationalNativeResizeAndReuse(t *testing.T) {
 		// Rational defaults must be 0/1, including all newly grown matrix cells.
 		for i := range s.A {
 			for _, a := range s.A[i] {
-				if *a.BorrowNumerator() != util.NewInt(0) || *a.BorrowDenominator() != util.NewInt(1) {
+				if *a.BorrowNumerator() != unumeral.NewInt(0) || *a.BorrowDenominator() != unumeral.NewInt(1) {
 					t.Fatal("default rational", i, a)
 				}
 			}
-			if *s.b[i].BorrowNumerator() != util.NewInt(0) || *s.b[i].BorrowDenominator() != util.NewInt(1) {
+			if *s.b[i].BorrowNumerator() != unumeral.NewInt(0) || *s.b[i].BorrowDenominator() != unumeral.NewInt(1) {
 				t.Fatal("default RHS", i, s.b[i])
 			}
 		}
@@ -52,9 +52,9 @@ func TestLinearRationalIndependentFiniteTwoByTwo(t *testing.T) {
 	s, e := NewRationalLinearSolver(q)
 	serviceMust(t, e)
 	serviceMust(t, s.Resize(2))
-	rows := [2][2]util.Rational{{util.NewRational(), util.NewRational()}, {util.NewRational(), util.NewRational()}}
-	rhs := [2]util.Rational{util.NewRational(), util.NewRational()}
-	xs := [2]util.Rational{util.NewRational(), util.NewRational()}
+	rows := [2][2]unumeral.Rational{{unumeral.NewRational(), unumeral.NewRational()}, {unumeral.NewRational(), unumeral.NewRational()}}
+	rhs := [2]unumeral.Rational{unumeral.NewRational(), unumeral.NewRational()}
+	xs := [2]unumeral.Rational{unumeral.NewRational(), unumeral.NewRational()}
 	for a := int32(-2); a <= 2; a++ {
 		if a == 0 {
 			continue
@@ -81,7 +81,7 @@ func TestLinearRationalIndependentFiniteTwoByTwo(t *testing.T) {
 						t.Fatal("nonsingular independent determinant")
 					}
 					for i, num := range [2]int32{-3*d - 5*b, 5*a + 3*c} {
-						want := util.NewRational()
+						want := unumeral.NewRational()
 						serviceMust(t, q.SetFractionSigned(&want, num, det))
 						eq, e := q.Equal(&xs[i], &want)
 						serviceMust(t, e)
@@ -109,21 +109,21 @@ func TestLinearRationalSourceBackSubstitutionOutputGuard(t *testing.T) {
 	s, e := NewRationalLinearSolver(q)
 	serviceMust(t, e)
 	serviceMust(t, s.Resize(2))
-	one := util.NewRational()
+	one := unumeral.NewRational()
 	serviceMust(t, q.SetInt64(&one, 1))
-	zero := util.NewRational()
-	b0, b1 := util.NewRational(), util.NewRational()
+	zero := unumeral.NewRational()
+	b0, b1 := unumeral.NewRational(), unumeral.NewRational()
 	serviceMust(t, q.SetInt64(&b0, 5))
 	serviceMust(t, q.SetInt64(&b1, 2))
-	serviceMust(t, s.Add(0, []util.Rational{one, one}, &b0))
-	serviceMust(t, s.Add(1, []util.Rational{zero, one}, &b1))
-	xs := []util.Rational{util.NewRational()}
+	serviceMust(t, s.Add(0, []unumeral.Rational{one, one}, &b0))
+	serviceMust(t, s.Add(1, []unumeral.Rational{zero, one}, &b1))
+	xs := []unumeral.Rational{unumeral.NewRational()}
 	serviceMust(t, q.SetInt64(&xs[0], 77))
 	ok, e := s.Solve(xs)
 	if ok || !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("descending reached result guard", ok, e)
 	}
-	want := util.NewRational()
+	want := unumeral.NewRational()
 	serviceMust(t, q.SetInt64(&want, 77))
 	eq, e := q.Equal(&xs[0], &want)
 	serviceMust(t, e)
@@ -137,7 +137,7 @@ func TestLinearRationalSourceBackSubstitutionOutputGuard(t *testing.T) {
 	if !eq {
 		t.Fatal("back substitution ran before output publication")
 	}
-	for _, a := range []*util.Rational{&one, &zero, &b0, &b1, &xs[0], &want} {
+	for _, a := range []*unumeral.Rational{&one, &zero, &b0, &b1, &xs[0], &want} {
 		serviceMust(t, q.Del(a))
 	}
 	serviceMust(t, s.Close())
@@ -145,7 +145,7 @@ func TestLinearRationalSourceBackSubstitutionOutputGuard(t *testing.T) {
 
 func TestLinearModularIndependentFiniteTwoByTwo(t *testing.T) {
 	q, _ := rationalManager(t, false)
-	m, e := util.NewIntegerModularManager(q.Integers())
+	m, e := unumeral.NewIntegerModularManager(q.Integers())
 	serviceMust(t, e)
 	serviceMust(t, m.SetZPUint64(7))
 	s, e := NewModularLinearSolver(m)
@@ -168,9 +168,9 @@ func TestLinearModularIndependentFiniteTwoByTwo(t *testing.T) {
 							break
 						}
 					}
-					rows := [2][2]util.Int{}
-					rhs := [2]util.Int{}
-					xs := [2]util.Int{}
+					rows := [2][2]unumeral.Int{}
+					rhs := [2]unumeral.Int{}
+					xs := [2]unumeral.Int{}
 					for i, row := range [2][2]int64{{a, b}, {c, d}} {
 						for j, v := range row {
 							serviceMust(t, m.SetInt64(&rows[i][j], v))
@@ -186,7 +186,7 @@ func TestLinearModularIndependentFiniteTwoByTwo(t *testing.T) {
 						t.Fatal("independent invertible matrix", a, b, c, d)
 					}
 					for i, n := range [2]int64{3*d - 5*b, 5*a - 3*c} {
-						want := util.Int{}
+						want := unumeral.Int{}
 						serviceMust(t, m.SetInt64(&want, ((n*inverse)%7+7)%7))
 						eq, e := m.Equal(&xs[i], &want)
 						serviceMust(t, e)
@@ -208,9 +208,9 @@ func TestLinearModularIndependentFiniteTwoByTwo(t *testing.T) {
 	serviceMust(t, m.Close())
 }
 
-func linearArithmeticPhysicalCensus(t *testing.T, q *util.RationalManager, s *RationalLinearSolver, callers ...*util.Rational) {
+func linearArithmeticPhysicalCensus(t *testing.T, q *unumeral.RationalManager, s *RationalLinearSolver, callers ...*unumeral.Rational) {
 	t.Helper()
-	values := []util.Int{q.NTmp, q.AddTmp1, q.AddTmp2, q.AddMulTmp.Num, q.AddMulTmp.Den, q.LtTmp1.Num, q.LtTmp1.Den, q.LtTmp2.Num, q.LtTmp2.Den}
+	values := []unumeral.Int{q.NTmp, q.AddTmp1, q.AddTmp2, q.AddMulTmp.Num, q.AddMulTmp.Den, q.LtTmp1.Num, q.LtTmp1.Den, q.LtTmp2.Num, q.LtTmp2.Den}
 	for _, a := range callers {
 		values = append(values, (*a.BorrowNumerator()), (*a.BorrowDenominator()))
 	}
@@ -222,7 +222,7 @@ func linearArithmeticPhysicalCensus(t *testing.T, q *util.RationalManager, s *Ra
 			values = append(values, *a.BorrowNumerator(), *a.BorrowDenominator())
 		}
 	}
-	refs := make([]*util.Int, len(values))
+	refs := make([]*unumeral.Int, len(values))
 	for i := range values {
 		refs[i] = &values[i]
 	}
@@ -241,11 +241,11 @@ func TestLinearRationalArithmeticEveryReservationPrefix(t *testing.T) {
 			s, e := NewRationalLinearSolver(q)
 			serviceMust(t, e)
 			serviceMust(t, s.Resize(2))
-			input := [6]util.Rational{util.NewRational(), util.NewRational(), util.NewRational(), util.NewRational(), util.NewRational(), util.NewRational()}
+			input := [6]unumeral.Rational{unumeral.NewRational(), unumeral.NewRational(), unumeral.NewRational(), unumeral.NewRational(), unumeral.NewRational(), unumeral.NewRational()}
 			for i, text := range []string{"79228162514264337593543950337", "1", "1", "79228162514264337593543950338", "158456325028528675187087900677", "237684487542793012780631851016"} {
 				serviceMust(t, q.SetString(&input[i], text))
 			}
-			outputs := [2]util.Rational{util.NewRational(), util.NewRational()}
+			outputs := [2]unumeral.Rational{unumeral.NewRational(), unumeral.NewRational()}
 			if solve {
 				serviceMust(t, s.Add(0, input[:2], &input[4]))
 				serviceMust(t, s.Add(1, input[2:4], &input[5]))
@@ -260,7 +260,7 @@ func TestLinearRationalArithmeticEveryReservationPrefix(t *testing.T) {
 			} else {
 				e = s.Add(0, input[:2], &input[4])
 			}
-			roots := []*util.Rational{&input[0], &input[1], &input[2], &input[3], &input[4], &input[5], &outputs[0], &outputs[1]}
+			roots := []*unumeral.Rational{&input[0], &input[1], &input[2], &input[3], &input[4], &input[5], &outputs[0], &outputs[1]}
 			linearArithmeticPhysicalCensus(t, q, s, roots...)
 			if e != nil {
 				if !numericPhysicalReservationRefusal(e) {
@@ -271,7 +271,7 @@ func TestLinearRationalArithmeticEveryReservationPrefix(t *testing.T) {
 				success = true
 				if solve {
 					for i, v := range []int64{2, 3} {
-						want := util.NewRational()
+						want := unumeral.NewRational()
 						serviceMust(t, q.SetInt64(&want, v))
 						equal, e := q.Equal(&outputs[i], &want)
 						serviceMust(t, e)

@@ -3,15 +3,14 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialDiscriminantDegreeZeroConstructsRefBeforeCallbackAndRefusesOwnerClose(t *testing.T) {
 	m := polynomialDiscriminantFixture(t)
 	c := m.core
-	five, seven := util.NewInt(5), util.NewInt(7)
+	five, seven := unumeral.NewInt(5), unumeral.NewInt(7)
 	p, e := c.MkConstantTakeCopy(&five)
 	serviceMust(t, e)
 	p = polynomialCaller(t, c, p)
@@ -48,7 +47,7 @@ func TestPolynomialDiscriminantDegreeZeroConstructsRefBeforeCallbackAndRefusesOw
 func TestPolynomialDiscriminantDegreeZeroCallbackRefusesSourceFinalizeBeforeMutation(t *testing.T) {
 	m := polynomialDiscriminantFixture(t)
 	c := m.core
-	five, seven := util.NewInt(5), util.NewInt(7)
+	five, seven := unumeral.NewInt(5), unumeral.NewInt(7)
 	p, e := c.MkConstantTakeCopy(&five)
 	serviceMust(t, e)
 	p = polynomialCaller(t, c, p)

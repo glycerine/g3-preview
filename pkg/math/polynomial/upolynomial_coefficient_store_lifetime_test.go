@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialStoreRelatedConstructorFailureUnwinds(t *testing.T) {
@@ -81,14 +81,14 @@ func TestUPolynomialStoreCopiedClosedGuardsAndDistinctOrdinary(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if e = m.SetInts(p, []util.Int{util.NewInt(5)}); e != nil {
+	if e = m.SetInts(p, []unumeral.Int{unumeral.NewInt(5)}); e != nil {
 		t.Fatal(e)
 	}
 	v, e := m.View(p, 0, 1)
 	if e != nil {
 		t.Fatal(e)
 	}
-	var out util.Int
+	var out unumeral.Int
 	if e = other.ReadView(v, 0, &out); !errors.Is(e, ErrUPolynomialOwner) {
 		t.Fatal("independent store origin collision", e)
 	}
@@ -123,14 +123,14 @@ func TestUPolynomialStoreGrowthGenerationAndRealCloseGuards(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if e = m.SetInts(p, []util.Int{util.NewInt(1), util.NewInt(2)}); e != nil {
+	if e = m.SetInts(p, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(2)}); e != nil {
 		t.Fatal(e)
 	}
 	v, e := m.View(p, 0, 2)
 	if e != nil {
 		t.Fatal(e)
 	}
-	var out util.Int
+	var out unumeral.Int
 	if e = child.ReadView(v, 1, &out); e != nil {
 		t.Fatal(e)
 	}
@@ -188,7 +188,7 @@ func TestUPolynomialStoreSingleChargeCohortGraph(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if e = child.SetInts(p, []util.Int{util.NewInt(1), util.NewInt(2), util.NewInt(3)}); e != nil {
+	if e = child.SetInts(p, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(2), unumeral.NewInt(3)}); e != nil {
 		t.Fatal(e)
 	}
 	graph, e := store.Stats()
@@ -265,11 +265,11 @@ func TestUPolynomialStoreBigChildRootsSurviveParentClose(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	var a util.Int
+	var a unumeral.Int
 	if e = q.Integers().SetString(&a, "123456789012345678901234567890"); e != nil {
 		t.Fatal(e)
 	}
-	if e = child.SetInts(p, []util.Int{a}); e != nil {
+	if e = child.SetInts(p, []unumeral.Int{a}); e != nil {
 		t.Fatal(e)
 	}
 	if e = q.Integers().Del(&a); e != nil {

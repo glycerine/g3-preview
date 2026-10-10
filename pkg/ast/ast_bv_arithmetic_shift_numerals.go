@@ -2,18 +2,17 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorArithmeticShiftNumerals retains r1/r2, thresholds and reached shift/padding values.
 type BitVectorArithmeticShiftNumerals struct {
 	self                   *BitVectorArithmeticShiftNumerals
 	manager                *ASTManager
-	values                 [6]util.OwnedRational
+	values                 [6]unumeral.OwnedRational
 	placed                 [6]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	sign                   ASTBitVectorNumeralInvocation
 	header                 uint64
@@ -91,7 +90,7 @@ func (n *BitVectorArithmeticShiftNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorArithmeticShiftNumerals) Read(i int, arg ASTHandle, width *uint32) (bool, error) {
@@ -206,7 +205,7 @@ func (n *BitVectorArithmeticShiftNumerals) AllOnes(width uint32) error {
 	q := n.manager.numerals
 	v, e := q.PowerOfTwoWithInvocation(width, &n.scalar)
 	n.values[3] = v
-	n.placed[3] = v != (util.OwnedRational{})
+	n.placed[3] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -218,7 +217,7 @@ func (n *BitVectorArithmeticShiftNumerals) AllOnes(width uint32) error {
 	}
 	v, e = q.SubWithInvocation(&n.values[3], &n.values[4], &n.scalar)
 	n.values[5] = v
-	n.placed[5] = v != (util.OwnedRational{})
+	n.placed[5] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -248,7 +247,7 @@ func (n *BitVectorArithmeticShiftNumerals) Wide(width uint32) error {
 	}
 	v, e := q.PowerOfTwoWithInvocation(amount, &n.scalar)
 	n.values[3] = v
-	n.placed[3] = v != (util.OwnedRational{})
+	n.placed[3] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}

@@ -4,20 +4,20 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (m *UPolynomialManager) divScalar(v UPolynomialView, b *util.Int) error {
+func (m *UPolynomialManager) divScalar(v UPolynomialView, b *unumeral.Int) error {
 	return m.divScalarWithHensel(v, b, nil)
 }
-func (m *UPolynomialManager) divScalarWithHensel(v UPolynomialView, b *util.Int, receipt *upolyHenselPairInvocationReceipt) error {
+func (m *UPolynomialManager) divScalarWithHensel(v UPolynomialView, b *unumeral.Int, receipt *upolyHenselPairInvocationReceipt) error {
 	context := numericIntegerModularManager_henselPairAllocationContext(m.modular, receipt)
 	if receipt != nil && context.henselPairReceipt(m.config.Integer) == nil {
 		return ErrUPolynomialOwner
 	}
 	return m.divScalarWithSourceContext(v, b, context)
 }
-func (m *UPolynomialManager) divScalarWithSourceContext(v UPolynomialView, b *util.Int, context integerAllocationInvocationContext) error {
+func (m *UPolynomialManager) divScalarWithSourceContext(v UPolynomialView, b *unumeral.Int, context integerAllocationInvocationContext) error {
 	if polynomialSourceDebug {
 		zero, e := m.modular.IsZero(b)
 		if e != nil {
@@ -51,14 +51,14 @@ func (m *UPolynomialManager) divScalarWithSourceContext(v UPolynomialView, b *ut
 	}
 	return nil
 }
-func (m *UPolynomialManager) DivScalar(p UPolynomial, b *util.Int) error {
+func (m *UPolynomialManager) DivScalar(p UPolynomial, b *unumeral.Int) error {
 	v, e := m.wholeView(p)
 	if e != nil {
 		return e
 	}
 	return m.divScalar(v, b)
 }
-func (m *UPolynomialManager) DivScalarView(v UPolynomialView, b *util.Int) error {
+func (m *UPolynomialManager) DivScalarView(v UPolynomialView, b *unumeral.Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -71,7 +71,7 @@ func (m *UPolynomialManager) DivScalarView(v UPolynomialView, b *util.Int) error
 type upolyDivisorSpan struct {
 	view      UPolynomialView
 	immediate bool
-	pair      [2]util.Int
+	pair      [2]unumeral.Int
 }
 
 func (b *upolyDivisorSpan) count() uint32 {
@@ -80,7 +80,7 @@ func (b *upolyDivisorSpan) count() uint32 {
 	}
 	return b.view.count
 }
-func (m *UPolynomialManager) readDivisor(b *upolyDivisorSpan, i uint32) (*util.Int, error) {
+func (m *UPolynomialManager) readDivisor(b *upolyDivisorSpan, i uint32) (*unumeral.Int, error) {
 	if b.immediate {
 		if i >= 2 {
 			return nil, arena.ErrBounds
@@ -175,11 +175,11 @@ func (m *UPolynomialManager) divRemCoreSpanWithSourceContext(a UPolynomialView, 
 			return ErrUPolynomialAssertion
 		}
 	}
-	var local util.Int
+	var local unumeral.Int
 	am := &local
 	if receipt != nil {
 		h := receipt.frame
-		h.am = util.Int{}
+		h.am = unumeral.Int{}
 		h.amConstructed = true
 		am = &h.am
 	}
@@ -187,14 +187,14 @@ func (m *UPolynomialManager) divRemCoreSpanWithSourceContext(a UPolynomialView, 
 	// destructor. Legacy nil public Div/DivRem still ignore Del errors and remain
 	// a separate caller-lifetime obligation; scratch/source prefixes stay published.
 	if caller != nil {
-		caller.am = util.Int{}
+		caller.am = unumeral.Int{}
 		caller.amConstructed = true
 		caller.amEnded = false
 		caller.amOwned = false
 		am = &caller.am
 	}
 	if removing := context.removeOneHalfRootFrame(m.config.Integer); removing != nil {
-		removing.values[0] = util.Int{}
+		removing.values[0] = unumeral.Int{}
 		removing.constructed = 1
 		removing.sourceRemaining = 1
 		am = &removing.values[0]
@@ -360,7 +360,7 @@ func (m *UPolynomialManager) dividesViewsWithSourceContext(a, b UPolynomialView,
 	if e != nil || !ok {
 		return false, e
 	}
-	var local util.Int
+	var local unumeral.Int
 	ratio := &local
 	var frame *upolyFactorDivisibilityScope
 	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
@@ -409,7 +409,7 @@ func (m *UPolynomialManager) dividesViewsWithSourceContext(a, b UPolynomialView,
 			}
 			if !zero {
 				dst := &m.values(r)[i+delta]
-				var child *util.IntegerAddMulInvocationReceipt
+				var child *unumeral.IntegerAddMulInvocationReceipt
 				if frame != nil {
 					child = &frame.addMul
 				}
@@ -448,7 +448,7 @@ func (m *UPolynomialManager) Divides(a, b UPolynomial) (bool, error) {
 func (m *UPolynomialManager) exactDivState(a, b UPolynomialView, out *upolyVectorState) (bool, error) {
 	return m.exactDivStateWithSourceContext(a, b, out, nil, integerAllocationInvocationContext{})
 }
-func (m *UPolynomialManager) exactDivStateWithSourceContext(a, b UPolynomialView, out *upolyVectorState, child *util.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) (bool, error) {
+func (m *UPolynomialManager) exactDivStateWithSourceContext(a, b UPolynomialView, out *upolyVectorState, child *unumeral.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) (bool, error) {
 	if b.count == 0 {
 		return false, nil
 	}

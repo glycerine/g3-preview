@@ -2,8 +2,8 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialCoefficientScope struct {
@@ -123,7 +123,7 @@ func (m *MultivariatePolynomialCore) cleanupCoefficientInvocation(r *polynomialC
 
 // A coefficient invocation owns the two actual source buffer children only at
 // reached ADD and mk actions; this contains no mirrored coefficient payload.
-func (m *MultivariatePolynomialCore) coefficientSourceAdd(b *polynomialSOM, a *util.Int, term Monomial, scope *polynomialCoefficientScope, r *polynomialCoefficientInvocationReceipt, appendReceipt *polynomialCheapAppendInvocationReceipt, id int) error {
+func (m *MultivariatePolynomialCore) coefficientSourceAdd(b *polynomialSOM, a *unumeral.Int, term Monomial, scope *polynomialCoefficientScope, r *polynomialCoefficientInvocationReceipt, appendReceipt *polynomialCheapAppendInvocationReceipt, id int) error {
 	if scope == nil {
 		return b.addConsumedCoefficientReceipts(a, term, false, nil, nil, appendReceipt, r)
 	}

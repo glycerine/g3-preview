@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -23,7 +24,7 @@ func TestUPolynomialHenselActualConditionalCheckerDeclarations(t *testing.T) {
 	zpe, e := NewRelatedUPolynomialManager(m)
 	serviceMust(t, e)
 	c.prime, c.lift = zp, zpe
-	five, twentyFive := util.NewInt(5), util.NewInt(25)
+	five, twentyFive := unumeral.NewInt(5), unumeral.NewInt(25)
 	serviceMust(t, zp.SetZP(&five))
 	serviceMust(t, zpe.SetZP(&twentyFive))
 	pf, e := zp.NewFactors()
@@ -31,12 +32,12 @@ func TestUPolynomialHenselActualConditionalCheckerDeclarations(t *testing.T) {
 	lf, e := zpe.NewFactors()
 	serviceMust(t, e)
 	var f, a, al upolyVectorState
-	serviceMust(t, m.set(&f, []util.Int{util.NewInt(-6), util.NewInt(0), util.NewInt(1)}))
-	for _, v := range [][]util.Int{{util.NewInt(-1), util.NewInt(1)}, {util.NewInt(1), util.NewInt(1)}} {
+	serviceMust(t, m.set(&f, []unumeral.Int{unumeral.NewInt(-6), unumeral.NewInt(0), unumeral.NewInt(1)}))
+	for _, v := range [][]unumeral.Int{{unumeral.NewInt(-1), unumeral.NewInt(1)}, {unumeral.NewInt(1), unumeral.NewInt(1)}} {
 		serviceMust(t, m.set(&a, v))
 		serviceMust(t, pf.PushCopy(m.stateView(&a), 1))
 	}
-	for _, v := range [][]util.Int{{util.NewInt(9), util.NewInt(1)}, {util.NewInt(-9), util.NewInt(1)}} {
+	for _, v := range [][]unumeral.Int{{unumeral.NewInt(9), unumeral.NewInt(1)}, {unumeral.NewInt(-9), unumeral.NewInt(1)}} {
 		serviceMust(t, m.set(&al, v))
 		serviceMust(t, lf.PushCopy(m.stateView(&al), 1))
 	}
@@ -79,7 +80,7 @@ func TestUPolynomialHenselActualCheckerEveryBIGReservation(t *testing.T) {
 		zpe, e := NewRelatedUPolynomialManager(m)
 		serviceMust(t, e)
 		c.prime, c.lift = zp, zpe
-		var prime, pe util.Int
+		var prime, pe unumeral.Int
 		serviceMust(t, q.Integers().SetLimbs(&prime, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 		serviceMust(t, q.Integers().Mul(&prime, &prime, &pe))
 		serviceMust(t, zp.SetZP(&prime))
@@ -89,8 +90,8 @@ func TestUPolynomialHenselActualCheckerEveryBIGReservation(t *testing.T) {
 		lf, e := zpe.NewFactors()
 		serviceMust(t, e)
 		var f, a upolyVectorState
-		serviceMust(t, m.set(&f, []util.Int{util.NewInt(-1), util.NewInt(0), util.NewInt(1)}))
-		for _, v := range [][]util.Int{{util.NewInt(-1), util.NewInt(1)}, {util.NewInt(1), util.NewInt(1)}} {
+		serviceMust(t, m.set(&f, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(0), unumeral.NewInt(1)}))
+		for _, v := range [][]unumeral.Int{{unumeral.NewInt(-1), unumeral.NewInt(1)}, {unumeral.NewInt(1), unumeral.NewInt(1)}} {
 			serviceMust(t, m.set(&a, v))
 			serviceMust(t, pf.PushCopy(m.stateView(&a), 1))
 			serviceMust(t, lf.PushCopy(m.stateView(&a), 1))
@@ -150,15 +151,15 @@ func TestUPolynomialHenselActualTaggedEnclosingEveryReservation(t *testing.T) {
 		zpe, e := NewRelatedUPolynomialManager(m)
 		serviceMust(t, e)
 		c.prime, c.lift = zp, zpe
-		five := util.NewInt(5)
+		five := unumeral.NewInt(5)
 		serviceMust(t, zp.SetZP(&five))
 		pf, e := zp.NewFactors()
 		serviceMust(t, e)
 		lf, e := zpe.NewFactors()
 		serviceMust(t, e)
 		var f, a upolyVectorState
-		serviceMust(t, m.set(&f, []util.Int{util.NewInt(-6), util.NewInt(0), util.NewInt(1)}))
-		for _, v := range [][]util.Int{{util.NewInt(-1), util.NewInt(1)}, {util.NewInt(1), util.NewInt(1)}} {
+		serviceMust(t, m.set(&f, []unumeral.Int{unumeral.NewInt(-6), unumeral.NewInt(0), unumeral.NewInt(1)}))
+		for _, v := range [][]unumeral.Int{{unumeral.NewInt(-1), unumeral.NewInt(1)}, {unumeral.NewInt(1), unumeral.NewInt(1)}} {
 			serviceMust(t, m.set(&a, v))
 			serviceMust(t, pf.PushCopy(m.stateView(&a), 1))
 		}
@@ -169,8 +170,8 @@ func TestUPolynomialHenselActualTaggedEnclosingEveryReservation(t *testing.T) {
 			if lf.count != 2 {
 				t.Fatal("literal successful two-factor publication")
 			}
-			for i, want := range []util.Int{util.NewInt(9), util.NewInt(-9)} {
-				if lf.factors[i].size != 2 || m.values(&lf.factors[i])[0] != want || m.values(&lf.factors[i])[1] != util.NewInt(1) {
+			for i, want := range []unumeral.Int{unumeral.NewInt(9), unumeral.NewInt(-9)} {
+				if lf.factors[i].size != 2 || m.values(&lf.factors[i])[0] != want || m.values(&lf.factors[i])[1] != unumeral.NewInt(1) {
 					t.Fatal("independent enclosing lifted factors", ordinal, i)
 				}
 			}
@@ -210,7 +211,7 @@ func TestUPolynomialHenselActualCheckerSourceStopProtectsOlderDeclarations(t *te
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	armed := false
 	var external umemory.Block
@@ -254,7 +255,7 @@ func TestUPolynomialHenselActualCheckerSourceStopProtectsOlderDeclarations(t *te
 	zpe, e := NewRelatedUPolynomialManager(u)
 	serviceMust(t, e)
 	c.prime, c.lift = zp, zpe
-	var prime, pe util.Int
+	var prime, pe unumeral.Int
 	serviceMust(t, q.Integers().SetLimbs(&prime, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 	serviceMust(t, q.Integers().Mul(&prime, &prime, &pe))
 	serviceMust(t, zp.SetZP(&prime))
@@ -264,15 +265,15 @@ func TestUPolynomialHenselActualCheckerSourceStopProtectsOlderDeclarations(t *te
 	lf, e := zpe.NewFactors()
 	serviceMust(t, e)
 	var f, a upolyVectorState
-	serviceMust(t, u.set(&f, []util.Int{util.NewInt(-1), util.NewInt(0), util.NewInt(1)}))
-	for _, v := range [][]util.Int{{util.NewInt(-1), util.NewInt(1)}, {util.NewInt(1), util.NewInt(1)}} {
+	serviceMust(t, u.set(&f, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(0), unumeral.NewInt(1)}))
+	for _, v := range [][]unumeral.Int{{unumeral.NewInt(-1), unumeral.NewInt(1)}, {unumeral.NewInt(1), unumeral.NewInt(1)}} {
 		serviceMust(t, u.set(&a, v))
 		serviceMust(t, pf.PushCopy(u.stateView(&a), 1))
 		serviceMust(t, lf.PushCopy(u.stateView(&a), 1))
 	}
 	c.outerConstructed = 4
 	for i := range c.outer {
-		serviceMust(t, u.set(&c.outer[i], []util.Int{util.NewInt(7)}))
+		serviceMust(t, u.set(&c.outer[i], []unumeral.Int{unumeral.NewInt(7)}))
 	}
 	c.finalLCInvConstructed = true
 	serviceMust(t, q.Integers().Copy(&c.finalLCInv, &q.Integers().Two64))
@@ -327,17 +328,17 @@ func TestUPolynomialHenselCheckerPowerContextRejectsCopiedStaleForeign(t *testin
 	serviceMust(t, s.beginHenselCaller(parent))
 	c := &parent.hensel
 	context := numericIntegerModularManager_henselCallerAllocationContext(m.modular, c)
-	two, out := util.NewInt(2), util.NewInt(7)
+	two, out := unumeral.NewInt(2), unumeral.NewInt(7)
 	copied := *c
 	bad := context
 	bad.henselCaller = &copied
 	used := q.Budget().Used()
-	var receipt util.IntegerPowerInvocationReceipt
-	if e := q.Integers().WithAllocationContext((bad).utility(q.Integers())).PowerTracked(&two, 33, &out, &receipt); e != util.ErrNumericOwner || out != util.NewInt(7) || q.Budget().Used() != used || receipt != (util.IntegerPowerInvocationReceipt{}) {
+	var receipt unumeral.IntegerPowerInvocationReceipt
+	if e := q.Integers().WithAllocationContext((bad).utility(q.Integers())).PowerTracked(&two, 33, &out, &receipt); e != unumeral.ErrNumericOwner || out != unumeral.NewInt(7) || q.Budget().Used() != used || receipt != (unumeral.IntegerPowerInvocationReceipt{}) {
 		t.Fatal("copied caller acquired Power leaf", e)
 	}
 	m.callbackDepth++
-	if e := q.Integers().WithAllocationContext((context).utility(q.Integers())).PowerTracked(&two, 33, &out, &receipt); e != util.ErrNumericOwner || out != util.NewInt(7) || q.Budget().Used() != used {
+	if e := q.Integers().WithAllocationContext((context).utility(q.Integers())).PowerTracked(&two, 33, &out, &receipt); e != unumeral.ErrNumericOwner || out != unumeral.NewInt(7) || q.Budget().Used() != used {
 		t.Fatal("callback acquired old caller Power", e)
 	}
 	m.callbackDepth--
@@ -346,7 +347,7 @@ func TestUPolynomialHenselCheckerPowerContextRejectsCopiedStaleForeign(t *testin
 	serviceMust(t, c.own(true))
 	serviceMust(t, s.beginHenselCaller(parent))
 	newInvocation := c.invocation
-	if e := q.Integers().WithAllocationContext((context).utility(q.Integers())).PowerTracked(&two, 33, &out, &receipt); e != util.ErrNumericOwner || out != util.NewInt(7) || receipt != (util.IntegerPowerInvocationReceipt{}) || c.invocation != newInvocation {
+	if e := q.Integers().WithAllocationContext((context).utility(q.Integers())).PowerTracked(&two, 33, &out, &receipt); e != unumeral.ErrNumericOwner || out != unumeral.NewInt(7) || receipt != (unumeral.IntegerPowerInvocationReceipt{}) || c.invocation != newInvocation {
 		t.Fatal("old actual context retargeted new Power", e)
 	}
 	// Actual nil Power is a foreign caller's quick allocation and is not captured.

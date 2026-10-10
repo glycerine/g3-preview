@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func polynomialQueryTerms(t *testing.T, m *MultivariatePolynomialCore, as []int32, pws [][]MonomialPower) Polynomial {
 	t.Helper()
-	aa := make([]util.Int, len(as))
+	aa := make([]unumeral.Int, len(as))
 	ms := make([]Monomial, len(as))
 	for i, a := range as {
-		aa[i] = util.NewInt(a)
+		aa[i] = unumeral.NewInt(a)
 		var e error
 		ms[i], e = m.monomials.MkMonomial(pws[i])
 		serviceMust(t, e)
@@ -91,7 +91,7 @@ func TestPolynomialQueryCoefficientIndependentMaps(t *testing.T) {
 	if !same {
 		t.Fatal("LC")
 	}
-	out := util.NewInt(91)
+	out := unumeral.NewInt(91)
 	ok, e := m.ConstantCoefficient(p, 1, 0, &out)
 	serviceMust(t, e)
 	v, e := m.integer.Int64(&out)
@@ -264,7 +264,7 @@ func TestPolynomialQueryUnivariateLinearAndScalarCoefficient(t *testing.T) {
 	}
 	c, e = m.UnivariateCoefficient(p, 1)
 	serviceMust(t, e)
-	if c != (util.Int{}) {
+	if c != (unumeral.Int{}) {
 		t.Fatal("actual inline default absent coefficient", c)
 	}
 	p2 := polynomialQueryTerms(t, m, []int32{2, 3, 7}, [][]MonomialPower{{{0, 1}}, {{1, 1}}, nil})

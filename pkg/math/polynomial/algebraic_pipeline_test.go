@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func algebraicBinaryOracle(t *testing.T, z *util.IntegerManager, b *util.BinaryRational) *big.Rat {
+func algebraicBinaryOracle(t *testing.T, z *unumeral.IntegerManager, b *unumeral.BinaryRational) *big.Rat {
 	t.Helper()
 	n := roundPublicationDecode(t, z, &(*b.BorrowNumerator()))
 	d := new(big.Int).Lsh(big.NewInt(1), uint(b.K()))
@@ -21,7 +21,7 @@ func TestAlgebraicIndependentRefinementAndRationalConversion(t *testing.T) {
 	q := algebraicPolynomial(t, p, -2, 0, 1)
 	v, e := p.wholeView(q)
 	serviceMust(t, e)
-	lo, hi := util.NewBinaryInt(1), util.NewBinaryInt(2)
+	lo, hi := unumeral.NewBinaryInt(1), unumeral.NewBinaryInt(2)
 	var a, b Algebraic
 	serviceMust(t, c.SetRoot(&a, v, &lo, &hi, false))
 	serviceMust(t, c.Copy(&b, &a))
@@ -59,8 +59,8 @@ func TestAlgebraicIndependentRefinementAndRationalConversion(t *testing.T) {
 	rp := algebraicPolynomial(t, p, 2, -5, 2)
 	rv, e := p.wholeView(rp)
 	serviceMust(t, e)
-	lo = util.NewBinaryInt(0)
-	hi = util.NewBinaryInt(1)
+	lo = unumeral.NewBinaryInt(0)
+	hi = unumeral.NewBinaryInt(1)
 	var r Algebraic
 	serviceMust(t, c.SetRoot(&r, rv, &lo, &hi, false))
 	isRat, e := c.IsRational(&r)
@@ -73,7 +73,7 @@ func TestAlgebraicIndependentRefinementAndRationalConversion(t *testing.T) {
 	if rl.kind != 0 {
 		t.Fatal("predicate failed to publish basic conversion")
 	}
-	want := util.NewRational()
+	want := unumeral.NewRational()
 	serviceMust(t, c.config.Rationals.SetFraction(&want, 1, 2))
 	d, e := c.CompareRational(&r, &want)
 	serviceMust(t, e)
@@ -90,11 +90,11 @@ func TestAlgebraicNativeCoefficientCopyPublication(t *testing.T) {
 			c, p := algebraicCellSourceFixture(t)
 			poly, e := p.NewPolynomial()
 			serviceMust(t, e)
-			serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(-2), util.NewInt(0), util.NewInt(1)}))
+			serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(-2), unumeral.NewInt(0), unumeral.NewInt(1)}))
 			t.Cleanup(func() { serviceMust(t, p.DelPolynomial(&poly)) })
 			v, e := p.wholeView(poly)
 			serviceMust(t, e)
-			lo, hi := util.NewBinaryInt(1), util.NewBinaryInt(2)
+			lo, hi := unumeral.NewBinaryInt(1), unumeral.NewBinaryInt(2)
 			var src, dst Algebraic
 			serviceMust(t, c.SetRoot(&src, v, &lo, &hi, false))
 			budget := c.config.Rationals.Budget()
@@ -131,9 +131,9 @@ func TestAlgebraicNativeCoefficientCopyPublication(t *testing.T) {
 func TestAlgebraicSourceUnsignedMagnitude(t *testing.T) {
 	c, _ := algebraicFixture(t)
 	for _, tc := range []struct {
-		l, u util.BinaryRational
+		l, u unumeral.BinaryRational
 		want int32
-	}{{util.NewBinaryIntPower(3, 0x80000000), util.NewBinaryIntPower(7, 0x80000001), 2147483647}, {util.NewBinaryIntPower(-7, 0xffffffff), util.NewBinaryIntPower(-3, 0x80000000), -2}} {
+	}{{unumeral.NewBinaryIntPower(3, 0x80000000), unumeral.NewBinaryIntPower(7, 0x80000001), 2147483647}, {unumeral.NewBinaryIntPower(-7, 0xffffffff), unumeral.NewBinaryIntPower(-3, 0x80000000), -2}} {
 		got, e := c.magnitude(&tc.l, &tc.u)
 		serviceMust(t, e)
 		if got != tc.want {
@@ -192,7 +192,7 @@ func TestAlgebraicSavedIntervalAndSquareFreePolicy(t *testing.T) {
 	poly := algebraicPolynomial(t, p, -2, 0, 1)
 	v, e := p.wholeView(poly)
 	serviceMust(t, e)
-	lo, hi := util.NewBinaryInt(1), util.NewBinaryInt(2)
+	lo, hi := unumeral.NewBinaryInt(1), unumeral.NewBinaryInt(2)
 	var a Algebraic
 	serviceMust(t, c.SetRoot(&a, v, &lo, &hi, false))
 	c.minMagnitude = 32
@@ -234,7 +234,7 @@ func TestAlgebraicScalarCodecAndWarmCells(t *testing.T) {
 	c, _ := algebraicCellSourceFixture(t)
 	serviceMust(t, arena.ValidateRecordType(reflect.TypeOf(Algebraic{})))
 	serviceMust(t, arena.ValidateRecordType(reflect.TypeOf(algebraicRecord{})))
-	q := util.NewRational()
+	q := unumeral.NewRational()
 	serviceMust(t, c.config.Rationals.SetFraction(&q, 2, 3))
 	var a Algebraic
 	serviceMust(t, c.SetRational(&a, &q))
@@ -262,7 +262,7 @@ func TestAlgebraicObservableCancellation(t *testing.T) {
 	q := algebraicPolynomial(t, p, -2, 0, 1)
 	view, e := p.wholeView(q)
 	serviceMust(t, e)
-	lo, hi := util.NewBinaryInt(1), util.NewBinaryInt(2)
+	lo, hi := unumeral.NewBinaryInt(1), unumeral.NewBinaryInt(2)
 	var a Algebraic
 	serviceMust(t, c.SetRoot(&a, view, &lo, &hi, false))
 	t.Cleanup(func() { serviceMust(t, c.Del(&a)) })
@@ -284,16 +284,16 @@ func TestAlgebraicPrivateMemberDestructionOrder(t *testing.T) {
 	c, _ := algebraicFixture(t)
 	z := c.config.Rationals.Integers()
 	serviceMust(t, c.ensureIsolation())
-	var n util.Int
+	var n unumeral.Int
 	serviceMust(t, z.SetUint64(&n, 1<<40))
 	t.Cleanup(func() { serviceMust(t, z.Del(&n)) })
-	b := util.NewBinaryInt(0)
+	b := unumeral.NewBinaryInt(0)
 	serviceMust(t, z.Copy(&(*b.BorrowNumerator()), &n))
 	serviceMust(t, c.roots.PushCopy(&b))
 	serviceMust(t, c.lowers.PushCopy(&b))
 	serviceMust(t, c.uppers.PushCopy(&b))
 	serviceMust(t, z.Del(&(*b.BorrowNumerator())))
-	slots := []arena.Slot{util.NumericSlot((*c.roots.state.values[0].BorrowNumerator()).Cell), util.NumericSlot((*c.lowers.state.values[0].BorrowNumerator()).Cell), util.NumericSlot((*c.uppers.state.values[0].BorrowNumerator()).Cell)}
+	slots := []arena.Slot{unumeral.NumericSlot((*c.roots.state.values[0].BorrowNumerator()).Cell), unumeral.NumericSlot((*c.lowers.state.values[0].BorrowNumerator()).Cell), unumeral.NumericSlot((*c.uppers.state.values[0].BorrowNumerator()).Cell)}
 	serviceMust(t, c.Close())
 	// Reverse member destruction uppers, lowers, roots gives LIFO metadata
 	// chain roots -> lowers -> uppers, independent of original slot values.
@@ -312,7 +312,7 @@ func TestAlgebraicPrivateMemberDestructionOrder(t *testing.T) {
 func TestAlgebraicCloseStoppedSelectionBlocksOrdinaryUse(t *testing.T) {
 	c, _, _ := algebraicCompareFixtureProfile(t, true)
 	z := c.config.Rationals.Integers()
-	q := util.NewRational()
+	q := unumeral.NewRational()
 	serviceMust(t, z.SetUint64(&(*q.BorrowNumerator()), 1<<40))
 	var a Algebraic
 	serviceMust(t, c.SetTake(&a, &q))
@@ -338,7 +338,7 @@ func TestAlgebraicCloseStoppedSelectionBlocksOrdinaryUse(t *testing.T) {
 	if e = c.SetTake(&a, &q); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal("ordinary use after owning close", e)
 	}
-	algebraicCellSourcePhysical(t, c, nil, []*util.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, nil)
+	algebraicCellSourcePhysical(t, c, nil, []*unumeral.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, nil)
 	cell = z.Cell(ref)
 	cell.Backing.Requested = requested
 	z.Store(ref, cell)

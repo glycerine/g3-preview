@@ -4,8 +4,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *MultivariatePolynomialManager) quadraticPending(s *polynomialGCDFunctionScope) bool {
@@ -192,7 +191,7 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 	}
 	s.constructReference(c, 5)
 	// m_four and two are source RAW numerals, with no automatic destructor.
-	s.nums[8] = util.Int{}
+	s.nums[8] = unumeral.Int{}
 	if e = c.modular.SetInt32(&s.nums[8], -4); e != nil {
 		return e
 	}
@@ -200,7 +199,7 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 	if e != nil {
 		return e
 	}
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	a, e = c.addMulWithReceipt(&one, u, s.refs[3].root.value, &s.nums[8], u, s.refs[4].root.value, &s.quadraticArithmetic[2])
 	if e != nil {
 		return e
@@ -251,7 +250,7 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 			return e
 		}
 	}
-	s.nums[9] = util.Int{}
+	s.nums[9] = unumeral.Int{}
 	if e = c.modular.SetInt32(&s.nums[9], 2); e != nil {
 		return e
 	}

@@ -6,33 +6,33 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The passed receipt names the actual full manager's embedded derivative
 // frame. Allocation leaves acquire only under its executing source invocation.
 
-func numericIntegerManager_derivativeAllocationRoots(m *util.IntegerManager, r *polynomialDerivativeInvocationReceipt) *polynomialNumericRoots {
+func numericIntegerManager_derivativeAllocationRoots(m *unumeral.IntegerManager, r *polynomialDerivativeInvocationReceipt) *polynomialNumericRoots {
 	if r == nil || r.manager == nil || r.manager.self != r.manager || r.manager.core == nil || r.manager.core.self != r.manager.core || r.manager.core.integer != m || !r.manager.matchesDerivativeInvocation(r) || !r.frame.executing || r.manager.core.callbackDepth != 0 {
 		return nil
 	}
 	return &r.frame.numeric
 }
 
-func numericIntegerModularManager_setUint32WithDerivativeReceipt(m *util.IntegerModularManager, out *util.Int, v uint32, r *polynomialDerivativeInvocationReceipt) error {
+func numericIntegerModularManager_setUint32WithDerivativeReceipt(m *unumeral.IntegerModularManager, out *unumeral.Int, v uint32, r *polynomialDerivativeInvocationReceipt) error {
 	return m.WithAllocationContext((numericIntegerModularManager_derivativeAllocationContext(m, r)).utility(m.Integers())).SetUint32(out, v)
 }
-func numericIntegerModularManager_mulWithDerivativeReceipt(m *util.IntegerModularManager, a, b, out *util.Int, r *polynomialDerivativeInvocationReceipt) error {
+func numericIntegerModularManager_mulWithDerivativeReceipt(m *unumeral.IntegerModularManager, a, b, out *unumeral.Int, r *polynomialDerivativeInvocationReceipt) error {
 	return m.WithAllocationContext((numericIntegerModularManager_derivativeAllocationContext(m, r)).utility(m.Integers())).Mul(a, b, out)
 }
-func numericIntegerModularManager_derivativeAllocationContext(m *util.IntegerModularManager, r *polynomialDerivativeInvocationReceipt) integerAllocationInvocationContext {
+func numericIntegerModularManager_derivativeAllocationContext(m *unumeral.IntegerModularManager, r *polynomialDerivativeInvocationReceipt) integerAllocationInvocationContext {
 	if m == nil || m.Integers() == nil || numericIntegerManager_derivativeAllocationRoots(m.Integers(), r) == nil || r.manager.core.modular != m {
 		return integerAllocationInvocationContext{}
 	}
 	return integerAllocationInvocationContext{derivative: r}
 }
 
-func numericIntegerModularManager_normalizeWithSourceContext(m *util.IntegerModularManager, out *util.Int, context integerAllocationInvocationContext) error {
+func numericIntegerModularManager_normalizeWithSourceContext(m *unumeral.IntegerModularManager, out *unumeral.Int, context integerAllocationInvocationContext) error {
 	if q := context.oneHalfRootFrame(m.Integers()); q != nil && q.owner.modular == m {
 		e := m.WithAllocationContext((context).utility(m.Integers())).PNormalizeWithFactorHistoryTracked(out, &q.normalize)
 		return e

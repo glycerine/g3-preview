@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This is the actual signed-host TLS owner-primitive guard profile. The
@@ -20,14 +21,14 @@ func TestPolynomialDividesYoungerScopedNUMStopsOlderSourceSuffix(t *testing.T) {
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
-	rationals, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	rationals, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: rationals.Integers(), Rationals: rationals, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	c := full.core
 	_, e = c.monomials.MkVar()
 	serviceMust(t, e)
-	var a, d util.Int
+	var a, d unumeral.Int
 	words := make([]uint32, 64)
 	words[63] = 2
 	serviceMust(t, c.integer.SetLimbs(&a, words))
@@ -38,7 +39,7 @@ func TestPolynomialDividesYoungerScopedNUMStopsOlderSourceSuffix(t *testing.T) {
 	serviceMust(t, c.IncRef(divisor))
 	term, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{d}, []Monomial{term})
+	p, e := c.MkTerms([]unumeral.Int{d}, []Monomial{term})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
 	answer, e := c.Divides(divisor, p)
@@ -73,7 +74,7 @@ func TestPolynomialDividesYoungerScopedNUMStopsOlderSourceSuffix(t *testing.T) {
 		t.Fatal("actual younger source DT must stop before older NUM/ref", answer, returned, s)
 	}
 	captured, source := returned.Error(), s.sourceCause
-	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p, divisor}, []*util.Int{&a, &d}, 0, []umemory.Block{lane})
+	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p, divisor}, []*unumeral.Int{&a, &d}, 0, []umemory.Block{lane})
 	own := c.cleanupDividesInvocation(&receipt, false)
 	if own != nil && !errors.Is(own, arena.ErrBounds) {
 		t.Fatal("completed younger then older own suffix", own)
@@ -87,7 +88,7 @@ func TestPolynomialDividesYoungerScopedNUMStopsOlderSourceSuffix(t *testing.T) {
 	if s.active || c.dividesInvocationSourceCause(&receipt) != source || returned.Error() != captured {
 		t.Fatal("true own phase altered source history")
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p, divisor}, []*util.Int{&a, &d}, 0, []umemory.Block{lane, recovery})
+	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p, divisor}, []*unumeral.Int{&a, &d}, 0, []umemory.Block{lane, recovery})
 	c.config.Checkpoint = func() bool { return true }
 	answer, e = c.Divides(c.zero, c.zero)
 	serviceMust(t, e)

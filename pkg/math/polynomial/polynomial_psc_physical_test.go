@@ -4,8 +4,8 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Ownership follows actual completed local fields and native reference slices.
@@ -42,6 +42,6 @@ func polynomialPSCPhysicalVectors(t *testing.T, m *MultivariatePolynomialCore, r
 			polys = append(polys, s.c.value, s.c.incoming)
 		}
 	}
-	var public []*util.Int
+	var public []*unumeral.Int
 	polynomialNewtonPhysicalWithRaw(t, m, nil, refs, vectors, nil, polys, nil, external, public...)
 }

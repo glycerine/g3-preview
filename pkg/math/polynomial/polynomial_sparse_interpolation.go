@@ -6,16 +6,17 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Concrete numeral locals own native slices and are constructed at their
 // declaration sites. The scalar cursor stops before older destruction.
 type polynomialSparseInterpolationScope struct {
-	vectors                                              [3][]util.Int // cs, new_as, as
+	vectors                                              [3][]unumeral.Int // cs, new_as, as
 	mons                                                 []Monomial
-	aux                                                  util.Int
+	aux                                                  unumeral.Int
 	solver                                               ModularLinearSolver
 	active, solverConstructed, sourceFinalized, topOwner bool
 	cursor                                               uint8
@@ -24,11 +25,11 @@ type polynomialSparseInterpolationScope struct {
 	bodyCause, cleanupCause                              error
 }
 
-func (s *PolynomialSparseInterpolator) scopedPush(v *[]util.Int, a *util.Int) error {
-	*v = append(*v, util.Int{})
+func (s *PolynomialSparseInterpolator) scopedPush(v *[]unumeral.Int, a *unumeral.Int) error {
+	*v = append(*v, unumeral.Int{})
 	return s.copyField(*v, uint32(len(*v)-1), a)
 }
-func (s *PolynomialSparseInterpolator) scopedReset(v *[]util.Int) error {
+func (s *PolynomialSparseInterpolator) scopedReset(v *[]unumeral.Int) error {
 	var cursor uint32
 	if e := s.deleteFields(*v, &cursor, false); e != nil {
 		return e
@@ -36,7 +37,7 @@ func (s *PolynomialSparseInterpolator) scopedReset(v *[]util.Int) error {
 	*v = (*v)[:0]
 	return nil
 }
-func (s *PolynomialSparseInterpolator) scopedResize(v *[]util.Int, n uint32) error {
+func (s *PolynomialSparseInterpolator) scopedResize(v *[]unumeral.Int, n uint32) error {
 	old := uint32(len(*v))
 	if n <= old {
 		cursor := n
@@ -50,7 +51,7 @@ func (s *PolynomialSparseInterpolator) scopedResize(v *[]util.Int, n uint32) err
 		*v = (*v)[:n]
 		clear((*v)[old:])
 	} else {
-		values := make([]util.Int, int(n))
+		values := make([]unumeral.Int, int(n))
 		copy(values, *v)
 		*v = values
 	}
@@ -83,7 +84,7 @@ func (s *PolynomialSparseInterpolator) finishInterpolationSource() (err error) {
 		f.cursor = 1
 	}
 	if f.cursor == 1 {
-		if _, e := util.SourceNumeralDel(m.integer, &f.aux); e != nil {
+		if _, e := unumeral.SourceNumeralDel(m.integer, &f.aux); e != nil {
 			return e
 		}
 		f.cursor = 2

@@ -5,11 +5,10 @@ package polynomial
 import (
 	"errors"
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestAlgebraicNegActualHistoryLaterFailureAndErasedZero(t *testing.T) {
@@ -20,7 +19,7 @@ func TestAlgebraicNegActualHistoryLaterFailureAndErasedZero(t *testing.T) {
 			z := c.config.Rationals.Integers()
 			t.Cleanup(func() { z.Budget().FailAfter(-1) })
 			var first, later Algebraic
-			n := util.NewRational()
+			n := unumeral.NewRational()
 			serviceMust(t, c.config.Rationals.SetInt32(&n, math.MinInt32))
 			serviceMust(t, c.SetRational(&first, &n))
 			serviceMust(t, c.SetRational(&later, &n))

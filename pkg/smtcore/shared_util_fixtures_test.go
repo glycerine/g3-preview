@@ -11,18 +11,19 @@ import (
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.RationalService) {
+func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *unumeral.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	if e != nil {
 		t.Fatal(e)
 	}
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -106,8 +107,8 @@ func paramsDecFinish(t *testing.T, fn func() error) {
 }
 
 type paramsPhysicalRationalOwner struct {
-	Service *util.RationalService
-	Value   *util.OwnedRational
+	Service *unumeral.RationalService
+	Value   *unumeral.OwnedRational
 }
 type paramsPhysicalValueOwner struct {
 	Context *util.ParamsContext
@@ -116,7 +117,7 @@ type paramsPhysicalValueOwner struct {
 
 // Cold graph uses the actual named owners and their typed backing capacities.
 // Source allocation counters remain separate from this physical Go charge.
-func paramsDecAuditColdGraph(t *testing.T, q *util.RationalService, m *polynomial.UPolynomialManager, r *umemory.Runtime, bn *arena.Budget, c *util.ParamsContext, bc *arena.Budget, sy *usymbol.Manager, bs *arena.Budget) {
+func paramsDecAuditColdGraph(t *testing.T, q *unumeral.RationalService, m *polynomial.UPolynomialManager, r *umemory.Runtime, bn *arena.Budget, c *util.ParamsContext, bc *arena.Budget, sy *usymbol.Manager, bs *arena.Budget) {
 	t.Helper()
 	qv := reflect.ValueOf(q).Elem()
 	qm := testFieldBySourceName(qv, "manager").Elem()
@@ -236,4 +237,4 @@ func symbolText(t *testing.T, m *usymbol.Manager, s usymbol.Symbol) string {
 	return v
 }
 
-var _ umemory.ConstructionFailure = (*util.RationalService)(nil)
+var _ umemory.ConstructionFailure = (*unumeral.RationalService)(nil)

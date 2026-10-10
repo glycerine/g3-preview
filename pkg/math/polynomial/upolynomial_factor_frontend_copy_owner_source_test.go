@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -19,8 +20,8 @@ func TestUPolynomialFactorFrontendActualCopyIntegerOwnerTransport(t *testing.T) 
 }
 func frontendCopyIntegerOwnerTransport(t *testing.T, mode string, erased ...bool) {
 	b := arena.NewBudget(1 << 26)
-	var z *util.IntegerManager
-	var q *util.RationalManager
+	var z *unumeral.IntegerManager
+	var q *unumeral.RationalManager
 	var fs *UPolynomialFactors
 	armed := false
 	calls := 0
@@ -65,7 +66,7 @@ func frontendCopyIntegerOwnerTransport(t *testing.T, mode string, erased ...bool
 	cfg.Memory = rt
 	cfg.Cells.PageSize = 1
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e = util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e = unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	z = q.Integers()
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: z, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
@@ -76,14 +77,14 @@ func frontendCopyIntegerOwnerTransport(t *testing.T, mode string, erased ...bool
 	serviceMust(t, e)
 	fs, e = m.NewFactors()
 	serviceMust(t, e)
-	var large util.Int
+	var large unumeral.Int
 	words := make([]uint32, 80)
 	words[79] = 1
 	serviceMust(t, z.SetLimbs(&large, words))
 	var input upolyVectorState
-	inputValues := []util.Int{large, util.NewInt(0), util.NewInt(1)}
+	inputValues := []unumeral.Int{large, unumeral.NewInt(0), unumeral.NewInt(1)}
 	if len(erased) != 0 && erased[0] {
-		inputValues = []util.Int{large}
+		inputValues = []unumeral.Int{large}
 	}
 	serviceMust(t, m.set(&input, inputValues))
 	var held umemory.Block
@@ -119,7 +120,7 @@ func frontendCopyIntegerOwnerTransport(t *testing.T, mode string, erased ...bool
 	if body == nil || calls != 1 {
 		t.Fatal("actual primitive BIG+zero Copy transport not reached", body, calls)
 	}
-	caller := []*util.Int{&large}
+	caller := []*unumeral.Int{&large}
 	for i := range m.values(&input) {
 		caller = append(caller, &m.values(&input)[i])
 	}

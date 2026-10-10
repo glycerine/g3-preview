@@ -3,8 +3,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialFactorNumeralVectorReceipt struct {
@@ -27,14 +26,14 @@ type polynomialFactorNumeralVectorScope struct {
 	np                                        polynomialReference
 	normalization                             polynomialNormalizeInvocationReceipt
 	numeric                                   polynomialNumericRoots
-	normalize                                 util.IntegerNormalizeInvocationReceipt
+	normalize                                 unumeral.IntegerNormalizeInvocationReceipt
 	bodyCause, sourceCause, cleanupCause      error
 }
 
 func (m *MultivariatePolynomialManager) matchesFactorNumeralVector(r *polynomialFactorNumeralVectorReceipt) bool {
 	return m != nil && m.self == m && m.core != nil && m.core.self == m.core && r != nil && r.manager == m && r.frame == &m.factorNumeralVector && r.invocation != 0 && r.invocation == r.frame.invocation
 }
-func numericIntegerManager_factorNumeralVectorRoots(m *util.IntegerManager, context integerAllocationInvocationContext) *polynomialNumericRoots {
+func numericIntegerManager_factorNumeralVectorRoots(m *unumeral.IntegerManager, context integerAllocationInvocationContext) *polynomialNumericRoots {
 	r := context.factorNumeralVector
 	if m == nil || !m.ValidOwner() || r == nil || !r.manager.matchesFactorNumeralVector(r) || context.factorNumeralVectorInvocation != r.invocation || r.manager.core.integer != m || !r.frame.active || !r.frame.executing || r.manager.core.callbackDepth != 0 {
 		return nil
@@ -269,7 +268,7 @@ type polynomialFactorNumeralVectorHistory struct {
 	phase                                     uint8
 	referenceConstructed, sourceReferenceDone bool
 	normalization                             polynomialNormalizeInvocationReceipt
-	normalize                                 util.IntegerNormalizeInvocationReceipt
+	normalize                                 unumeral.IntegerNormalizeInvocationReceipt
 	bodyCause, sourceCause, cleanupCause      error
 }
 
@@ -321,7 +320,7 @@ func (m *MultivariatePolynomialManager) closeFactorNumeralVectorHistory() {
 
 // This actual executing caller excludes owner retirement only. Numeric authority
 // remains the explicit converter or its reached Normalize child receipt.
-func numericIntegerManager_factorNumeralVectorCallerExecuting(m *util.IntegerManager) bool {
+func numericIntegerManager_factorNumeralVectorCallerExecuting(m *unumeral.IntegerManager) bool {
 	if m == nil || !m.ValidOwner() {
 		return false
 	}

@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialFactorFrontendActualQuadraticFrontiers(t *testing.T) {
@@ -14,7 +13,7 @@ func TestUPolynomialFactorFrontendActualQuadraticFrontiers(t *testing.T) {
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
 	var input upolyVectorState
-	serviceMust(t, m.set(&input, []util.Int{util.NewInt(-1), util.NewInt(0), util.NewInt(1)}))
+	serviceMust(t, m.set(&input, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(0), unumeral.NewInt(1)}))
 	defer func() {
 		z.Budget().FailAfter(-1)
 		serviceMust(t, s.CleanupRetained())
@@ -44,7 +43,7 @@ func TestUPolynomialFactorFrontendActualQuadraticFrontiers(t *testing.T) {
 	if fs.count != 2 {
 		t.Fatal("actual ordered factor pushes", fs.count)
 	}
-	roots := []*util.Int{}
+	roots := []*unumeral.Int{}
 	for i := range m.values(&input) {
 		roots = append(roots, &m.values(&input)[i])
 	}
@@ -60,9 +59,9 @@ func TestUPolynomialFactorFrontendActualQuadraticPowerFailedBodyRetainsRAW(t *te
 			fs, e := m.NewFactors()
 			serviceMust(t, e)
 			var input upolyVectorState
-			var b util.Int
+			var b unumeral.Int
 			serviceMust(t, z.Integers().SetLimbs(&b, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
-			serviceMust(t, m.set(&input, []util.Int{util.NewInt(1), b, util.NewInt(1)}))
+			serviceMust(t, m.set(&input, []unumeral.Int{unumeral.NewInt(1), b, unumeral.NewInt(1)}))
 			defer func() {
 				z.Budget().FailAfter(-1)
 				serviceMust(t, s.CleanupRetained())
@@ -71,7 +70,7 @@ func TestUPolynomialFactorFrontendActualQuadraticPowerFailedBodyRetainsRAW(t *te
 				m.freeBacking(&input)
 				serviceMust(t, z.Integers().Del(&b))
 			}()
-			roots := []*util.Int{&b}
+			roots := []*unumeral.Int{&b}
 			for i := range m.values(&input) {
 				roots = append(roots, &m.values(&input)[i])
 			}
@@ -122,7 +121,7 @@ func TestUPolynomialFactorFrontendActualQuadraticPerfectSquareBIGPrefixes(t *tes
 			fs, e := m.NewFactors()
 			serviceMust(t, e)
 			var input upolyVectorState
-			serviceMust(t, m.set(&input, []util.Int{util.NewInt(1), util.NewInt(50000), util.NewInt(1)}))
+			serviceMust(t, m.set(&input, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(50000), unumeral.NewInt(1)}))
 			defer func() {
 				z.Budget().FailAfter(-1)
 				serviceMust(t, s.CleanupRetained())
@@ -130,7 +129,7 @@ func TestUPolynomialFactorFrontendActualQuadraticPerfectSquareBIGPrefixes(t *tes
 				serviceMust(t, m.reset(&input))
 				m.freeBacking(&input)
 			}()
-			roots := []*util.Int{}
+			roots := []*unumeral.Int{}
 			for i := range m.values(&input) {
 				roots = append(roots, &m.values(&input)[i])
 			}
@@ -144,7 +143,7 @@ func TestUPolynomialFactorFrontendActualQuadraticPerfectSquareBIGPrefixes(t *tes
 			q := &s.frontend
 			r := q.receipt
 			firstBody, firstSource := q.bodyCause, q.sourceCause
-			if z.Integers().MatchesPerfectSquareInvocation(&q.perfectSquare) && util.NumericAllocationPending(&q.perfectSquare.Frame.Numeric) {
+			if z.Integers().MatchesPerfectSquareInvocation(&q.perfectSquare) && unumeral.NumericAllocationPending(&q.perfectSquare.Frame.Numeric) {
 				owned = true
 				if q.perfectSquare.Frame.Executing || !q.active {
 					t.Fatal("actual acquired RAW leaf lost matched completed-body parent", ordinal)

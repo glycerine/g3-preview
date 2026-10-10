@@ -2,9 +2,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorRemainderEqualityNumerals retains physical divisor/rhs locals and
@@ -12,9 +11,9 @@ import (
 type BitVectorRemainderEqualityNumerals struct {
 	self                   *BitVectorRemainderEqualityNumerals
 	manager                *ASTManager
-	values                 [4]util.OwnedRational
+	values                 [4]unumeral.OwnedRational
 	placed                 [4]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	header                 uint64
 	sourceCause            error
 	stopped, ended, closed bool
@@ -89,7 +88,7 @@ func (n *BitVectorRemainderEqualityNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorRemainderEqualityNumerals) Read(i int, arg ASTHandle, width *uint32) (bool, error) {
@@ -127,7 +126,7 @@ func (n *BitVectorRemainderEqualityNumerals) ReachesModulus(width uint32) (bool,
 	}
 	v, e := n.manager.numerals.AddWithInvocation(&n.values[0], &n.values[1], &n.scalar)
 	n.values[2] = v
-	n.placed[2] = v != (util.OwnedRational{})
+	n.placed[2] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -136,7 +135,7 @@ func (n *BitVectorRemainderEqualityNumerals) ReachesModulus(width uint32) (bool,
 	}
 	v, e = n.manager.numerals.PowerOfTwoWithInvocation(width, &n.scalar)
 	n.values[3] = v
-	n.placed[3] = v != (util.OwnedRational{})
+	n.placed[3] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}

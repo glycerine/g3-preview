@@ -11,9 +11,10 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/idgen"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -53,7 +54,7 @@ const (
 
 type ASTManagerConfig struct {
 	Symbols     *usymbol.Manager
-	Numerals    *util.RationalService
+	Numerals    *unumeral.RationalService
 	Budget      *arena.Budget
 	ProofMode   ASTProofMode
 	OutOfMemory func() bool
@@ -146,7 +147,7 @@ type astParameterRecord struct {
 	integer              int32
 	ast                  astNodeRef
 	symbol               usymbol.Symbol
-	Rational             util.OwnedRational
+	Rational             unumeral.OwnedRational
 	double               float64
 	external             uint32
 }
@@ -235,7 +236,7 @@ type ASTManager struct {
 	BudgetField                                                                                        *arena.Budget
 	Symbols                                                                                            *usymbol.Manager
 	recFun                                                                                             usymbol.Symbol
-	numerals                                                                                           *util.RationalService
+	numerals                                                                                           *unumeral.RationalService
 	families                                                                                           *FamilyManager
 	Limit                                                                                              control.Reslimit // source inline member, charged in the ASTManager header
 	allocator                                                                                          *arena.SmallBytes

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -25,7 +25,7 @@ func TestUPolynomialFactorFullAlgorithmImmediateFailureRoots(t *testing.T) {
 			t.Fatal(e)
 		}
 		p := upolySourceNew(t, m, nil)
-		input := make([]util.Int, 4)
+		input := make([]unumeral.Int, 4)
 		// (x-12345678901234567890)(x+1)(x+2), frozen expansion.
 		for i, text := range []string{"-24691357802469135780", "-37037036703703703668", "-12345678901234567887", "1"} {
 			if e = m.IntegerManager().SetString(&input[i], text); e != nil {

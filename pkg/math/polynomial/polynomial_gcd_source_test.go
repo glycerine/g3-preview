@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialGCDSourceZeroIdentityAndConstantContent(t *testing.T) {
@@ -91,7 +90,7 @@ func TestPolynomialGCDScalarProductSourceIndependentOrder(t *testing.T) {
 	c := full.core
 	p := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{{{0, 1}}, nil})
 	q := polynomialQueryTerms(t, c, []int32{1, -1}, [][]MonomialPower{{{0, 1}}, nil})
-	a := util.NewInt(3)
+	a := unumeral.NewInt(3)
 	got, e := full.gcdScalarProduct(&a, p, q)
 	serviceMust(t, e)
 	got = polynomialCaller(t, c, got)

@@ -6,15 +6,16 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // These are explicit Go owner-metadata boundary fixtures. Source reservation
 // and lexical-prefix campaigns belong to the actual Divides body integration.
 func TestDividesNumericActualFrameAndImmutableContext(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: serviceConfig(b).Integers})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: serviceConfig(b).Integers})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
@@ -46,15 +47,15 @@ func TestDividesNumericActualFrameAndImmutableContext(t *testing.T) {
 	}
 	c.callbackDepth--
 
-	foreignModular, e := util.NewIntegerModularManager(c.integer)
+	foreignModular, e := unumeral.NewIntegerModularManager(c.integer)
 	serviceMust(t, e)
 	if (numericIntegerModularManager_dividesAllocationContext(foreignModular, &r).roots(c.integer)) != nil {
 		t.Fatal("foreign modular receiver acquired")
 	}
 	serviceMust(t, foreignModular.Close())
-	a, d, out := util.NewInt(6), util.NewInt(2), util.NewInt(0)
+	a, d, out := unumeral.NewInt(6), unumeral.NewInt(2), unumeral.NewInt(0)
 
-	var absent *util.IntegerModularManager
+	var absent *unumeral.IntegerModularManager
 	if numericIntegerModularManager_divWithDividesReceipt(absent, &a, &d, &out, &r) == nil || numericIntegerModularManager_negWithDividesReceipt(absent, &out, &r) == nil {
 		t.Fatal("absent receiver accepted")
 	}
@@ -65,7 +66,7 @@ func TestDividesNumericActualFrameAndImmutableContext(t *testing.T) {
 	}
 
 	// A real negative Integer Div constructs and hands off its actual RAW child.
-	a = util.NewInt(-7)
+	a = unumeral.NewInt(-7)
 	serviceMust(t, numericIntegerModularManager_divWithDividesReceipt(c.modular, &a, &d, &out, &r))
 	if s.divisionRaw.Manager != c.integer || s.divisionRaw.Frame != &c.integer.DivisionRaw || s.divisionRaw.Invocation == 0 {
 		t.Fatal("actual RAW child not acquired")
@@ -99,7 +100,7 @@ func TestDividesNumericActualBoolChildAndErasedFieldRoute(t *testing.T) {
 	s := &c.dividesLocal
 	*s = polynomialDividesScope{active: true, executing: true, constructed: 2, invocation: 1}
 	r := polynomialDividesInvocationReceipt{core: c, frame: s, invocation: 1}
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	for i := 0; i < 2; i++ {
 		previous := s.boolNumeral.Invocation
 		result, e := numericIntegerModularManager_dividesWithDividesReceipt(c.modular, &zero, &zero, &r)
@@ -110,7 +111,7 @@ func TestDividesNumericActualBoolChildAndErasedFieldRoute(t *testing.T) {
 	}
 	before := s.boolNumeral
 	serviceMust(t, c.modular.SetZPUint64(5))
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	result, e := numericIntegerModularManager_dividesWithDividesReceipt(c.modular, &one, &zero, &r)
 	serviceMust(t, e)
 	if !result || s.boolNumeral != before {
@@ -136,7 +137,7 @@ func TestDividesNumericLowerActualPrefixes(t *testing.T) {
 			}
 			c := m.core
 			s := &c.dividesLocal
-			var a, divisor, modulus util.Int
+			var a, divisor, modulus unumeral.Int
 			if route == 0 {
 				ds := make([]uint32, 65)
 				ds[64] = 1
@@ -150,11 +151,11 @@ func TestDividesNumericLowerActualPrefixes(t *testing.T) {
 				prime[16] = 511
 				serviceMust(t, c.integer.SetLimbs(&modulus, prime))
 				serviceMust(t, c.modular.SetZP(&modulus))
-				a = util.NewInt(2)
+				a = unumeral.NewInt(2)
 			}
-			divisor = util.NewInt(2)
+			divisor = unumeral.NewInt(2)
 			if route == 2 {
-				divisor = util.NewInt(-2147483648)
+				divisor = unumeral.NewInt(-2147483648)
 			}
 			*s = polynomialDividesScope{invocation: 1, constructed: 2, active: true, executing: true}
 			r := polynomialDividesInvocationReceipt{core: c, frame: s, invocation: 1}
@@ -164,18 +165,18 @@ func TestDividesNumericLowerActualPrefixes(t *testing.T) {
 			if callErr != nil && !numericPhysicalReservationRefusal(callErr) {
 				t.Fatal("actual lower Div refusal", route, prefix, callErr)
 			}
-			polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a, &divisor, &modulus, &s.numeral}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&a, &divisor, &modulus, &s.numeral}, 0)
 			child := s.divisionRaw
 			if route != 0 {
 				child = s.extendedRaw
 			}
 
-			if route == 2 && c.integer.MatchesRawInvocation(&child) && child.Frame.Count == 6 && child.Frame.Values[0].Val == -2147483648 && c.integer.PendingAllocationObject() != (util.SourceCellBacking{}).Object {
+			if route == 2 && c.integer.MatchesRawInvocation(&child) && child.Frame.Count == 6 && child.Frame.Values[0].Val == -2147483648 && c.integer.PendingAllocationObject() != (unumeral.SourceCellBacking{}).Object {
 				if child.Frame.Numeric.Cell != c.integer.PendingCell {
 					t.Fatal("actual ExtendedGCD Abs MIN leaf unowned", prefix, c.integer.PendingCell, child.Frame.Numeric)
 				}
 			}
-			var before [6]util.Int
+			var before [6]unumeral.Int
 			if c.integer.MatchesRawInvocation(&child) {
 				before = child.Frame.Values
 				for i := uint8(0); i < child.Frame.Count; i++ {
@@ -186,23 +187,23 @@ func TestDividesNumericLowerActualPrefixes(t *testing.T) {
 			if c.integer.MatchesRawInvocation(&child) && !child.Frame.BodySucceeded && child.Frame.Values != before {
 				t.Fatal("failed RAW body ran absent source end DEL")
 			}
-			polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a, &divisor, &modulus, &s.numeral}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&a, &divisor, &modulus, &s.numeral}, 0)
 			// Older caller NUM completes before exact unjoined child owning abort.
 			if callErr != nil {
 				serviceMust(t, c.integer.Del(&s.numeral))
 			}
 			serviceMust(t, numericIntegerManager_cleanupDividesNumeric(c.integer, &r, true))
-			polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a, &divisor, &modulus, &s.numeral}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&a, &divisor, &modulus, &s.numeral}, 0)
 			c.integer.Budget().FailAfter(-1)
 			if callErr == nil {
-				var want util.Int
+				var want unumeral.Int
 				if route == 0 {
 					ds := make([]uint32, 64)
 					ds[63] = 0x80000000
 					serviceMust(t, c.integer.SetLimbs(&want, ds))
 					serviceMust(t, c.integer.Neg(&want))
 				} else if route == 1 {
-					want = util.NewInt(1)
+					want = unumeral.NewInt(1)
 				} else {
 					ds := make([]uint32, 16)
 					ds[15] = 2048
@@ -234,7 +235,7 @@ func dividesNumericPageOneFixture(t *testing.T) *MultivariatePolynomialManager {
 	cfg := serviceConfig(b).Integers
 	cfg.Cells.PageSize = 1
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)

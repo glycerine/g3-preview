@@ -3,10 +3,9 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math/big"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialEvaluationIndependentRationalGrid(t *testing.T) {
@@ -15,9 +14,9 @@ func TestPolynomialEvaluationIndependentRationalGrid(t *testing.T) {
 	q := m.core.config.Rationals
 	v := polynomialEvalRationalMap{manager: q}
 	for i := range v.values {
-		v.values[i] = util.NewRational()
+		v.values[i] = unumeral.NewRational()
 	}
-	out := util.NewRational()
+	out := unumeral.NewRational()
 	for x := int64(-2); x <= 2; x++ {
 		for y := int64(-2); y <= 2; y++ {
 			for z := int64(-2); z <= 2; z++ {
@@ -62,9 +61,9 @@ func TestPolynomialEvaluationIndependentModularGrid(t *testing.T) {
 		serviceMust(t, vm.PNormalize(&a))
 		serviceMust(t, m.core.writeCoefficient(p, i, a))
 	}
-	out := util.Int{}
+	out := unumeral.Int{}
 	for x := int32(-3); x <= 3; x++ {
-		value := util.Int{}
+		value := unumeral.Int{}
 		serviceMust(t, vm.SetInt32(&value, x))
 		serviceMust(t, m.UnivariateEvaluate(p, 0, &value, &out))
 		actual, e := m.core.integer.Int64(&out)
@@ -93,11 +92,11 @@ func TestPolynomialEvaluationModularEveryReservation(t *testing.T) {
 			vm := m.core.modular
 			const modulus uint64 = 18446744073709551557
 			serviceMust(t, vm.SetZPUint64(modulus))
-			value, out := util.Int{}, util.Int{}
+			value, out := unumeral.Int{}, unumeral.Int{}
 			serviceMust(t, vm.SetInt64(&value, (1<<60)+17))
 			m.originalBudget.FailAfter(ordinal)
 			e := m.UnivariateEvaluate(p, 0, &value, &out)
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&value, &out}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&value, &out}, 0)
 			if e == nil {
 				success = true
 			} else {
@@ -108,7 +107,7 @@ func TestPolynomialEvaluationModularEveryReservation(t *testing.T) {
 			}
 			m.originalBudget.FailAfter(-1)
 			serviceMust(t, m.CleanupEvaluation())
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&value, &out}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&value, &out}, 0)
 			if e == nil {
 				x := big.NewInt((1 << 60) + 17)
 				prime := new(big.Int).SetUint64(modulus)

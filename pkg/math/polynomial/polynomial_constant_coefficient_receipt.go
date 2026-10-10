@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This partial receipt covers actual SET allocation. The original finite-field
@@ -12,8 +12,8 @@ import (
 type polynomialConstantCoefficientScope struct {
 	invocation        uint64
 	active, executing bool
-	copy              util.IntegerCopyAllocationReceipt
-	normalize         util.IntegerNormalizeInvocationReceipt
+	copy              unumeral.IntegerCopyAllocationReceipt
+	normalize         unumeral.IntegerNormalizeInvocationReceipt
 	sourceCause       error
 }
 type polynomialConstantCoefficientInvocationReceipt struct {

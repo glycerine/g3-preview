@@ -6,7 +6,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -98,7 +99,7 @@ func TestUPolynomialFactorRegisteredThirtySevenNumericFixtures(t *testing.T) {
 					t.Error(e)
 				}
 			})
-			input := make([]util.Int, len(f.coeffs))
+			input := make([]unumeral.Int, len(f.coeffs))
 			for i, s := range f.coeffs {
 				if e := m.IntegerManager().SetString(&input[i], s); e != nil {
 					t.Fatal(e)

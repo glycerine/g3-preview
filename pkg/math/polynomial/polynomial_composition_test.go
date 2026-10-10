@@ -4,9 +4,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // The registered source driver returns after PSC before tst_compose. These two
@@ -39,7 +38,7 @@ func TestPolynomialCompositionDormantOriginal(t *testing.T) {
 
 func polynomialCompositionTerms(t *testing.T, m *MultivariatePolynomialManager, terms []polynomialEvalTerm) Polynomial {
 	t.Helper()
-	as := make([]util.Int, len(terms))
+	as := make([]unumeral.Int, len(terms))
 	ms := make([]Monomial, len(terms))
 	for i, v := range terms {
 		serviceMust(t, m.core.modular.SetInt32(&as[i], v.coefficient))
@@ -129,7 +128,7 @@ func TestPolynomialCompositionIndependentFiniteAndAliases(t *testing.T) {
 				serviceMust(t, e)
 				serviceMust(t, r.Assign(p))
 				var raw Polynomial
-				c := util.Int{}
+				c := unumeral.Int{}
 				serviceMust(t, m.core.modular.SetInt32(&c, 3))
 				switch op {
 				case 0:

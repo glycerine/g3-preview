@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialRemoveOneHalfRootActualUnjoinedOwnStop(t *testing.T) {
@@ -18,15 +19,15 @@ func TestUPolynomialRemoveOneHalfRootActualUnjoinedOwnStop(t *testing.T) {
 		t.Run(fmt.Sprint(prefix), func(t *testing.T) {
 			c, p, rt := algebraicNegTLSFixture(t, nil)
 			z := p.config.Integer
-			var b, fourB, neg util.Int
+			var b, fourB, neg unumeral.Int
 			serviceMust(t, z.SetLimbs(&b, []uint32{1, 2, 3, 4}))
-			four := util.NewInt(4)
+			four := unumeral.NewInt(4)
 			serviceMust(t, z.Mul(&b, &four, &fourB))
 			serviceMust(t, z.Copy(&neg, &b))
 			serviceMust(t, z.Neg(&neg))
 			input, e := p.NewPolynomial()
 			serviceMust(t, e)
-			serviceMust(t, p.SetInts(input, []util.Int{neg, util.NewInt(0), fourB}))
+			serviceMust(t, p.SetInts(input, []unumeral.Int{neg, unumeral.NewInt(0), fourB}))
 			out, e := p.NewPolynomial()
 			serviceMust(t, e)
 			serviceMust(t, z.Del(&b))
@@ -38,7 +39,7 @@ func TestUPolynomialRemoveOneHalfRootActualUnjoinedOwnStop(t *testing.T) {
 			body := p.RemoveOneHalfRoot(v, out)
 			q := &p.removeOneHalfRoot
 			r := p.removeOneHalfRootReceipt()
-			extra := []*util.Int{&q.values[0], &p.oneHalfRoot.values[0], &p.oneHalfRoot.values[1]}
+			extra := []*unumeral.Int{&q.values[0], &p.oneHalfRoot.values[0], &p.oneHalfRoot.values[1]}
 			if z.MatchesAddMulInvocation(&q.addMul) {
 				extra = append(extra, &q.addMul.Frame.Tmp)
 			}
@@ -61,7 +62,7 @@ func TestUPolynomialRemoveOneHalfRootActualUnjoinedOwnStop(t *testing.T) {
 				if !errors.Is(first, arena.ErrBounds) || q.ownCause != first || q.sourceCause != oldSource || q.bodyCause != oldBody || q.addMul != child {
 					t.Fatal("actual first-own stop/history", first, q.ownCause)
 				}
-				algebraicCellSourcePhysical(t, c, nil, []*util.Int{&q.addMul.Frame.Tmp}, []umemory.Block{lane})
+				algebraicCellSourcePhysical(t, c, nil, []*unumeral.Int{&q.addMul.Frame.Tmp}, []umemory.Block{lane})
 				contextTLSFinish(t, rt, func() error { return p.cleanupRemoveOneHalfRootWithReceipt(&r, true) })
 				contextTLSFinish(t, rt, func() error {
 					if lane == (umemory.Block{}) {

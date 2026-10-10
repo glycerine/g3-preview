@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -33,7 +34,7 @@ func TestASTFloatingPointScopedValueNativeGrowthAndDefaults(t *testing.T) {
 	for i := uint32(0); i < n; i++ {
 		a, e := v.at(i)
 		astTestMust(t, e)
-		if a != (util.ArbitraryFloat{}) {
+		if a != (unumeral.ArbitraryFloat{}) {
 			t.Fatal("default numeral", i, a)
 		}
 	}
@@ -59,9 +60,9 @@ func TestASTFloatingPointScopedValueActualInlinePushPublication(t *testing.T) {
 	astTestMust(t, e)
 	p := m.floatingPointPlugin
 	v := &p.values
-	sig := util.NewInt(-19)
+	sig := unumeral.NewInt(-19)
 
-	var source util.ArbitraryFloat
+	var source unumeral.ArbitraryFloat
 	astTestMust(t, p.numeric.SetComponents(&source, 8, 24, true, 7, &sig))
 	astTestMust(t, v.push(&source))
 	got, e := v.at(0)
@@ -104,14 +105,14 @@ func TestASTFloatingPointScopedValueInlineErasesCopyAcquisition(t *testing.T) {
 	v := &p.values
 	astTestMust(t, v.reserve(8))
 	// A prepared row is copied directly, without another vector growth action.
-	var source util.ArbitraryFloat
-	sig := util.NewInt(31)
+	var source unumeral.ArbitraryFloat
+	sig := unumeral.NewInt(31)
 	astTestMust(t, p.numeric.SetComponents(&source, 8, 24, false, 11, &sig))
 	before := m.BudgetField.Used()
 	beforeHistory := p.numeric.ValueCopyHistoryBytes()
 	m.BudgetField.FailAfter(0)
 	astTestMust(t, v.set(3, &source))
-	if v.copyReceipt != (util.ArbitraryFloatValueCopyReceipt{}) || p.numeric.ValueCopyHistoryBytes() != beforeHistory || m.BudgetField.Used() != before {
+	if v.copyReceipt != (unumeral.ArbitraryFloatValueCopyReceipt{}) || p.numeric.ValueCopyHistoryBytes() != beforeHistory || m.BudgetField.Used() != before {
 		t.Fatal("inline actual SET acquired child/history", v.copyReceipt, m.BudgetField.Used(), before)
 	}
 	got, e := v.at(3)
@@ -131,7 +132,7 @@ func TestASTFloatingPointScopedValueTwoRetainedAllocationChildren(t *testing.T) 
 	b := arena.NewBudget(1 << 28)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	astTestMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	astTestMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)
@@ -145,12 +146,12 @@ func TestASTFloatingPointScopedValueTwoRetainedAllocationChildren(t *testing.T) 
 	astTestMust(t, e)
 	p := m.floatingPointPlugin
 	v := &p.values
-	z, e := util.NewIntegerManager(util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: m.BudgetField}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: m.BudgetField}}})
+	z, e := unumeral.NewIntegerManager(unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: m.BudgetField}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: m.BudgetField}}})
 	astTestMust(t, e)
-	sig, two := util.NewInt(0), util.NewInt(2)
+	sig, two := unumeral.NewInt(0), unumeral.NewInt(2)
 	astTestMust(t, z.Power(&two, 100, &sig))
 	astTestMust(t, v.reserve(3))
-	var initial util.ArbitraryFloatValueCopyReceipt
+	var initial unumeral.ArbitraryFloatValueCopyReceipt
 	// The existing foreign-owner input adapter constructs one owned numeral.
 	// Transfer that numeral out of its temporary input row into the native slice.
 	row, e := r.Allocate(32)
@@ -184,7 +185,7 @@ func TestASTFloatingPointScopedValueTwoRetainedAllocationChildren(t *testing.T) 
 	firstTuple := v.copyReceipt
 	second := v.set(2, &source)
 	secondTuple := v.copyReceipt
-	if first == nil || second == nil || firstTuple == (util.ArbitraryFloatValueCopyReceipt{}) || secondTuple == firstTuple {
+	if first == nil || second == nil || firstTuple == (unumeral.ArbitraryFloatValueCopyReceipt{}) || secondTuple == firstTuple {
 		t.Fatal("two actual distinct stopped copy children", first, second, firstTuple, secondTuple)
 	}
 	cause := v.bodyCause

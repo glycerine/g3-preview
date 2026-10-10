@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialFactoryReceiptActualConstructorPrefixes(t *testing.T) {
@@ -81,7 +80,7 @@ func TestPolynomialFactoryReceiptReplacementAndRejectedEntry(t *testing.T) {
 func TestPolynomialFactoryReceiptCheapTransferOwnsActualFactory(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	c := m.core
-	a := util.NewInt(7)
+	a := unumeral.NewInt(7)
 	serviceMust(t, c.cheap.add(&a, c.monomials.unit, false))
 	var receipt polynomialFactoryInvocationReceipt
 	p, e := c.cheap.mkWithFactoryReceipt(false, &receipt)
@@ -98,7 +97,7 @@ func TestPolynomialFactoryReceiptCheapTransferOwnsActualFactory(t *testing.T) {
 	serviceMust(t, c.cleanupFactoryInvocation(&receipt, false))
 	value, e := c.Coefficient(p, 0)
 	serviceMust(t, e)
-	if value != util.NewInt(7) {
+	if value != unumeral.NewInt(7) {
 		t.Fatal("completed phase consumed unjoined placement")
 	}
 	serviceMust(t, c.cleanupFactoryInvocation(&receipt, true))

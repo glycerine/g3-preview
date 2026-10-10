@@ -5,20 +5,20 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // RationalLinearSolver borrows its number-field manager. Matrix/RHS values live only in
 // native Go slices. Returned observation values are nonowning scalar projections.
 type RationalLinearSolver struct {
 	self    *RationalLinearSolver
-	manager *util.RationalManager
+	manager *unumeral.RationalManager
 	linearStorage
-	A [][]util.Rational
-	b []util.Rational
+	A [][]unumeral.Rational
+	b []unumeral.Rational
 }
 
-func NewRationalLinearSolver(m *util.RationalManager) (*RationalLinearSolver, error) {
+func NewRationalLinearSolver(m *unumeral.RationalManager) (*RationalLinearSolver, error) {
 	if e := m.CheckOwnerReady(); e != nil {
 		return nil, e
 	}
@@ -51,7 +51,7 @@ func (s *RationalLinearSolver) open() error {
 	}
 	return nil
 }
-func (s *RationalLinearSolver) row(i uint32) (*[]util.Rational, error) {
+func (s *RationalLinearSolver) row(i uint32) (*[]unumeral.Rational, error) {
 	if uint64(i) >= uint64(len(s.A)) {
 		if polynomialSourceDebug {
 			return nil, ErrPolynomialAssertion
@@ -70,51 +70,51 @@ func (s *RationalLinearSolver) swapRows(i, j uint32) error {
 	s.A[i], s.A[j] = s.A[j], s.A[i]
 	return nil
 }
-func (s *RationalLinearSolver) load(v *[]util.Rational, i uint32) (util.Rational, error) {
+func (s *RationalLinearSolver) load(v *[]unumeral.Rational, i uint32) (unumeral.Rational, error) {
 	if uint64(i) >= uint64(len(*v)) {
 		if polynomialSourceDebug {
-			return util.Rational{}, ErrPolynomialAssertion
+			return unumeral.Rational{}, ErrPolynomialAssertion
 		}
-		return util.Rational{}, arena.ErrBounds
+		return unumeral.Rational{}, arena.ErrBounds
 	}
 	return (*v)[i], nil
 }
-func (s *RationalLinearSolver) copyInto(v *[]util.Rational, i uint32, a *util.Rational) error {
+func (s *RationalLinearSolver) copyInto(v *[]unumeral.Rational, i uint32, a *unumeral.Rational) error {
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
 	return s.manager.Copy(&(*v)[i], a)
 }
-func (s *RationalLinearSolver) setInto(v *[]util.Rational, i uint32, value int64) error {
+func (s *RationalLinearSolver) setInto(v *[]unumeral.Rational, i uint32, value int64) error {
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
 	return s.manager.SetInt64(&(*v)[i], value)
 }
-func (s *RationalLinearSolver) divideInto(v *[]util.Rational, i uint32, divisor *util.Rational) error {
+func (s *RationalLinearSolver) divideInto(v *[]unumeral.Rational, i uint32, divisor *unumeral.Rational) error {
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
 	return s.manager.Div(&(*v)[i], divisor, &(*v)[i])
 }
-func (s *RationalLinearSolver) submulInto(v *[]util.Rational, i uint32, b, c *util.Rational) error {
+func (s *RationalLinearSolver) submulInto(v *[]unumeral.Rational, i uint32, b, c *unumeral.Rational) error {
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
 	return s.manager.SubMul(&(*v)[i], b, c, &(*v)[i])
 }
-func (s *RationalLinearSolver) deleteInto(v *[]util.Rational, i uint32, owning bool) error {
+func (s *RationalLinearSolver) deleteInto(v *[]unumeral.Rational, i uint32, owning bool) error {
 	if uint64(i) >= uint64(len(*v)) {
 		return arena.ErrBounds
 	}
 	if owning {
 		return s.manager.Del(&(*v)[i])
 	}
-	return util.SourceRationalDel(s.manager, &(*v)[i])
+	return unumeral.SourceRationalDel(s.manager, &(*v)[i])
 }
-func (s *RationalLinearSolver) RightHandSide(i uint32) (util.Rational, error) {
+func (s *RationalLinearSolver) RightHandSide(i uint32) (unumeral.Rational, error) {
 	if e := s.open(); e != nil {
-		return util.Rational{}, e
+		return unumeral.Rational{}, e
 	}
 	return s.load(&s.b, i)
 }
@@ -129,14 +129,14 @@ func (s *RationalLinearSolver) Resize(n uint32) error {
 		return e
 	}
 	s.n = n
-	s.A = make([][]util.Rational, n)
-	s.b = make([]util.Rational, n)
+	s.A = make([][]unumeral.Rational, n)
+	s.b = make([]unumeral.Rational, n)
 	for i := range s.A {
-		s.A[i] = make([]util.Rational, n)
+		s.A[i] = make([]unumeral.Rational, n)
 		for j := range s.A[i] {
-			s.A[i][j] = util.NewRational()
+			s.A[i][j] = unumeral.NewRational()
 		}
-		s.b[i] = util.NewRational()
+		s.b[i] = unumeral.NewRational()
 	}
 	return nil
 }
@@ -160,7 +160,7 @@ func (s *RationalLinearSolver) Reset() error {
 	}
 	return nil
 }
-func (s *RationalLinearSolver) Add(i uint32, as []util.Rational, b *util.Rational) error {
+func (s *RationalLinearSolver) Add(i uint32, as []unumeral.Rational, b *unumeral.Rational) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -184,7 +184,7 @@ func (s *RationalLinearSolver) Add(i uint32, as []util.Rational, b *util.Rationa
 	}
 	return nil
 }
-func (s *RationalLinearSolver) Solve(xs []util.Rational) (bool, error) {
+func (s *RationalLinearSolver) Solve(xs []unumeral.Rational) (bool, error) {
 	if e := s.open(); e != nil {
 		return false, e
 	}

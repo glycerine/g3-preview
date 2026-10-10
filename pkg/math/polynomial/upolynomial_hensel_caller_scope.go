@@ -3,8 +3,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // These are the reached caller declarations, embedded in the actual charged
@@ -16,13 +15,13 @@ type upolyHenselCallerScope struct {
 	individualSource, individualOwn                         uint8
 	checkVectors                                            [4]upolyVectorState // mult_zp,f_zp then mult_zpe,f_zpe
 	checkSource, checkOwn                                   uint8
-	checkPower                                              util.Int
+	checkPower                                              unumeral.Int
 	checkPowerConstructed, checkPowerEnded, checkPowerOwned bool
-	checkPowerInvocation                                    util.IntegerPowerInvocationReceipt
+	checkPowerInvocation                                    unumeral.IntegerPowerInvocationReceipt
 
 	quadraticCheck                                                     [3]upolyVectorState // tmp1,tmp2 before MUL; one after both MULs
 	quadraticCheckConstructed, quadraticCheckSource, quadraticCheckOwn uint8
-	initialLC, finalLCInv, transport                                   util.Int
+	initialLC, finalLCInv, transport                                   unumeral.Int
 	initialLCConstructed, initialLCEnded, initialLCOwned               bool
 	finalLCInvConstructed, finalLCInvEnded, finalLCInvOwned            bool
 	transportBound                                                     bool
@@ -32,8 +31,8 @@ type upolyHenselCallerScope struct {
 	callerPreviousInvocation                                           [4]uint64
 	extended                                                           [6]upolyVectorState // V1,V3,Q,R,T,V1Q, actual ext_gcd declarations
 	extendedDebug                                                      [2]upolyVectorState // BV, expectedD at reached DEBUG declaration
-	extendedScoped                                                     [2]util.Int         // lc_inv, lc at final reached lexical block
-	monicRaw                                                           [2]util.Int         // lc, lc_inv in header mk_monic overload; no automatic DT
+	extendedScoped                                                     [2]unumeral.Int     // lc_inv, lc at final reached lexical block
+	monicRaw                                                           [2]unumeral.Int     // lc, lc_inv in header mk_monic overload; no automatic DT
 	extendedConstructed, extendedSource, extendedOwn                   uint8
 	extendedDebugConstructed, extendedDebugSource, extendedDebugOwn    uint8
 	extendedScopedConstructed, extendedScopedSource, extendedScopedOwn uint8
@@ -41,17 +40,17 @@ type upolyHenselCallerScope struct {
 	extendedRawSource, extendedRawOwn                                  uint8
 	extendedActive                                                     bool
 
-	am                              util.Int
+	am                              unumeral.Int
 	amConstructed, amEnded, amOwned bool
 	amBodyCause, amSourceCause      error
 	invocation                      uint64
 	executing                       bool
 	prime, lift                     *UPolynomialManager
 	numeric                         polynomialNumericRoots
-	normalize                       [4]util.IntegerNormalizeInvocationReceipt
-	addMul                          util.IntegerAddMulInvocationReceipt
-	divisionRaw, extendedRaw        util.IntegerRawInvocationReceipt
-	boolNumeral                     util.IntegerDividesNumeralInvocationReceipt
+	normalize                       [4]unumeral.IntegerNormalizeInvocationReceipt
+	addMul                          unumeral.IntegerAddMulInvocationReceipt
+	divisionRaw, extendedRaw        unumeral.IntegerRawInvocationReceipt
+	boolNumeral                     unumeral.IntegerDividesNumeralInvocationReceipt
 
 	owner                                                              *upolyFactorSquareFreeScope
 	active                                                             bool
@@ -239,7 +238,7 @@ func (c *upolyHenselCallerScope) own(abort bool) (cause error) {
 		return e
 	}
 	for _, n := range []struct {
-		value              *util.Int
+		value              *unumeral.Int
 		constructed, ended bool
 		owned              *bool
 	}{{&c.finalLCInv, c.finalLCInvConstructed, c.finalLCInvEnded, &c.finalLCInvOwned}, {&c.initialLC, c.initialLCConstructed, c.initialLCEnded, &c.initialLCOwned}} {
@@ -400,7 +399,7 @@ func (c *upolyHenselCallerScope) finishAmSource(body error) error {
 	c.amEnded = true
 	return c.amBodyCause
 }
-func henselNumericAddMulChild(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope) *util.IntegerAddMulInvocationReceipt {
+func henselNumericAddMulChild(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope) *unumeral.IntegerAddMulInvocationReceipt {
 	if c != nil {
 		return &c.addMul
 	}

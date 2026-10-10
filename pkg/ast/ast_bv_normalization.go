@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The gate is reached before evaluating the condition. Release erases provider
@@ -21,16 +22,16 @@ func astBVAssertionEnabled(g *util.GlobalParamsService) (bool, error) {
 
 // NormalizeBitVectorValueWithInvocation returns the original unsigned norm
 // value. It does not assign into or copy-normalize the input receiver.
-func (m *ASTManager) NormalizeBitVectorValueWithInvocation(value *util.OwnedRational, bits uint32, c *ASTBitVectorNumeralInvocation) (util.OwnedRational, error) {
+func (m *ASTManager) NormalizeBitVectorValueWithInvocation(value *unumeral.OwnedRational, bits uint32, c *ASTBitVectorNumeralInvocation) (unumeral.OwnedRational, error) {
 	return m.normalizeBitVectorValueWithInvocation(value, bits, false, c)
 }
 
 // NormalizeSignedBitVectorValueWithInvocation returns the original signed norm.
 // Its returned owner stays distinct from the input until caller copy assignment.
-func (m *ASTManager) NormalizeSignedBitVectorValueWithInvocation(value *util.OwnedRational, bits uint32, c *ASTBitVectorNumeralInvocation) (util.OwnedRational, error) {
+func (m *ASTManager) NormalizeSignedBitVectorValueWithInvocation(value *unumeral.OwnedRational, bits uint32, c *ASTBitVectorNumeralInvocation) (unumeral.OwnedRational, error) {
 	return m.normalizeBitVectorValueWithInvocation(value, bits, true, c)
 }
-func (m *ASTManager) normalizeBitVectorValueWithInvocation(value *util.OwnedRational, bits uint32, signed bool, c *ASTBitVectorNumeralInvocation) (out util.OwnedRational, result error) {
+func (m *ASTManager) normalizeBitVectorValueWithInvocation(value *unumeral.OwnedRational, bits uint32, signed bool, c *ASTBitVectorNumeralInvocation) (out unumeral.OwnedRational, result error) {
 	if c == nil {
 		return out, ErrASTHandle
 	}
@@ -48,10 +49,10 @@ func (m *ASTManager) normalizeBitVectorValueWithInvocation(value *util.OwnedRati
 	return m.normalizeBitVectorWithFrame(value, bits, signed, nil, &c.receipt)
 }
 
-func (m *ASTManager) normalizeBitVector(value *util.OwnedRational, bits uint32, signed bool, g *util.GlobalParamsService) (out util.OwnedRational, result error) {
+func (m *ASTManager) normalizeBitVector(value *unumeral.OwnedRational, bits uint32, signed bool, g *util.GlobalParamsService) (out unumeral.OwnedRational, result error) {
 	return m.normalizeBitVectorWithFrame(value, bits, signed, g, nil)
 }
-func (m *ASTManager) normalizeBitVectorWithFrame(value *util.OwnedRational, bits uint32, signed bool, g *util.GlobalParamsService, captured *astBVNormalizationReceipt) (out util.OwnedRational, result error) {
+func (m *ASTManager) normalizeBitVectorWithFrame(value *unumeral.OwnedRational, bits uint32, signed bool, g *util.GlobalParamsService, captured *astBVNormalizationReceipt) (out unumeral.OwnedRational, result error) {
 	f, e := m.beginBVNumeralFrame()
 	if e != nil {
 		return out, e

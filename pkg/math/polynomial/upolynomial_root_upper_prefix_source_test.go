@@ -7,18 +7,18 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func rootUpperActualGraph(t *testing.T, c *AlgebraicRootCore, p *UPolynomialManager, poly UPolynomial, out *util.Int, raw []umemory.Block) {
+func rootUpperActualGraph(t *testing.T, c *AlgebraicRootCore, p *UPolynomialManager, poly UPolynomial, out *unumeral.Int, raw []umemory.Block) {
 	t.Helper()
 	q := &p.rootUpperBound
-	extra := []*util.Int{out}
+	extra := []*unumeral.Int{out}
 	for i := range q.values {
 		extra = append(extra, &q.values[i])
 	}
-	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
+	for _, r := range []*unumeral.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw} {
 		if r.Frame != nil {
 			for i := uint8(0); i < r.Frame.Count; i++ {
 				extra = append(extra, &r.Frame.Values[i])
@@ -39,21 +39,21 @@ func TestUPolynomialRootUpperBoundEveryActualReservationPrefix(t *testing.T) {
 					z := c.config.Rationals.Integers()
 					poly, e := p.NewPolynomial()
 					serviceMust(t, e)
-					var max, top util.Int
+					var max, top unumeral.Int
 					serviceMust(t, z.SetLimbs(&max, []uint32{1, 0, 0, 1}))
 
 					if route == "big-div" {
 						serviceMust(t, z.SetLimbs(&top, []uint32{1, 0, 1}))
 					} else {
-						top = util.NewInt(math.MinInt32)
+						top = unumeral.NewInt(math.MinInt32)
 
 					}
-					serviceMust(t, p.SetInts(poly, []util.Int{max, util.NewInt(2), top}))
+					serviceMust(t, p.SetInts(poly, []unumeral.Int{max, unumeral.NewInt(2), top}))
 					serviceMust(t, z.Del(&max))
 					serviceMust(t, z.Del(&top))
 					v, e := p.wholeView(poly)
 					serviceMust(t, e)
-					var out util.Int
+					var out unumeral.Int
 					baseline := z.Budget().Used() - integerActualOwnedBytes(z) - p.rootUpperBoundHistoryBytes
 					z.Budget().FailAfter(prefix)
 					body := p.RootUpperBound(v, &out)
@@ -69,7 +69,7 @@ func TestUPolynomialRootUpperBoundEveryActualReservationPrefix(t *testing.T) {
 					}
 					if body != nil && q.constructed == 4 {
 						beforeC = true
-						if q.values[4] != (util.Int{}) || q.sourceRemaining > 4 {
+						if q.values[4] != (unumeral.Int{}) || q.sourceRemaining > 4 {
 							t.Fatal("c ctor was credited before leading SET/ABS")
 						}
 					}
@@ -90,7 +90,7 @@ func TestUPolynomialRootUpperBoundEveryActualReservationPrefix(t *testing.T) {
 					}
 					z.Budget().FailAfter(-1)
 					if body == nil {
-						var expected util.Int
+						var expected unumeral.Int
 						digits := []uint32{1, 1}
 						if route == "min-abs" {
 							digits = []uint32{2, 0, 2}
@@ -165,9 +165,9 @@ func TestUPolynomialRootUpperBoundIndependentCauchyCases(t *testing.T) {
 		poly := algebraicPolynomial(t, p, sample.coefficients...)
 		v, e := p.wholeView(poly)
 		serviceMust(t, e)
-		var out util.Int
+		var out unumeral.Int
 		serviceMust(t, p.RootUpperBound(v, &out))
-		if out != util.NewInt(sample.bound) {
+		if out != unumeral.NewInt(sample.bound) {
 			t.Fatal(sample.coefficients, out, sample.bound)
 		}
 		serviceMust(t, p.cleanupRootUpperBound(false))

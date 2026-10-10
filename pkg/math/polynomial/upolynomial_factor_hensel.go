@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Both literal to_zp_manager overloads, with reads at each source dereference.
@@ -41,20 +41,20 @@ func (m *UPolynomialManager) toZPCopyWithOwners(p UPolynomialView, out *upolyVec
 		return e
 	}
 	for i := uint32(0); i < p.count; i++ {
-		var local util.Int
+		var local unumeral.Int
 		value := &local
 		if r != nil {
-			r.frame.transport = util.Int{}
+			r.frame.transport = unumeral.Int{}
 			r.frame.transportBound = true
 			value = &r.frame.transport
 		}
 		if h != nil {
-			h.frame.check.transport = util.Int{}
+			h.frame.check.transport = unumeral.Int{}
 			h.frame.check.transportBound = true
 			value = &h.frame.check.transport
 		}
 		if caller != nil {
-			caller.transport = util.Int{}
+			caller.transport = unumeral.Int{}
 			caller.transportBound = true
 			value = &caller.transport
 		}
@@ -96,21 +96,21 @@ func (m *UPolynomialManager) toZPCopyWithOwners(p UPolynomialView, out *upolyVec
 		}
 		*target = *value // literal nontrivial mpz move, no coefficient copy or replay
 		if caller != nil {
-			caller.transport = util.Int{}
+			caller.transport = unumeral.Int{}
 			caller.transportBound = false
 		}
 		if r != nil {
-			r.frame.transport = util.Int{}
+			r.frame.transport = unumeral.Int{}
 			r.frame.transportBound = false
 		}
 		if h != nil {
-			h.frame.check.transport = util.Int{}
+			h.frame.check.transport = unumeral.Int{}
 			h.frame.check.transportBound = false
 		}
 	}
 	return m.trim(out)
 }
-func (s *UPolynomialFactorizationService) HenselLiftPair(a, b, r *util.Int, u, A, v, B, C UPolynomialView, outA, outB UPolynomial) error {
+func (s *UPolynomialFactorizationService) HenselLiftPair(a, b, r *unumeral.Int, u, A, v, B, C UPolynomialView, outA, outB UPolynomial) error {
 	if e := s.check(); e != nil {
 		return e
 	}
@@ -125,10 +125,10 @@ func (s *UPolynomialFactorizationService) HenselLiftPair(a, b, r *util.Int, u, A
 	}
 	return s.henselPair(a, b, r, u, A, v, B, C, &da.state, &db.state)
 }
-func (s *UPolynomialFactorizationService) henselPair(a, b, r *util.Int, u, A, v, B, C UPolynomialView, outA, outB *upolyVectorState) (failure error) {
+func (s *UPolynomialFactorizationService) henselPair(a, b, r *unumeral.Int, u, A, v, B, C UPolynomialView, outA, outB *upolyVectorState) (failure error) {
 	return s.henselPairWithCaller(a, b, r, u, A, v, B, C, outA, outB, nil)
 }
-func (s *UPolynomialFactorizationService) henselPairWithCaller(a, b, r *util.Int, u, A, v, B, C UPolynomialView, outA, outB *upolyVectorState, caller *upolyHenselCallerScope) (failure error) {
+func (s *UPolynomialFactorizationService) henselPairWithCaller(a, b, r *unumeral.Int, u, A, v, B, C UPolynomialView, outA, outB *upolyVectorState, caller *upolyHenselCallerScope) (failure error) {
 	m := s.manager
 	receipt, e := s.beginHenselPairWithCaller(caller)
 	if e != nil {
@@ -305,10 +305,10 @@ func (s *UPolynomialFactorizationService) henselQuadraticWithCaller(C UPolynomia
 	}
 	return nil
 }
-func (s *UPolynomialFactorizationService) henselQuadraticIteration(zpe *UPolynomialManager, pe *util.Int, U, V, A, B, Al, Bl *upolyVectorState) error {
+func (s *UPolynomialFactorizationService) henselQuadraticIteration(zpe *UPolynomialManager, pe *unumeral.Int, U, V, A, B, Al, Bl *upolyVectorState) error {
 	return s.henselQuadraticIterationWithCaller(zpe, pe, U, V, A, B, Al, Bl, nil)
 }
-func (s *UPolynomialFactorizationService) henselQuadraticIterationWithCaller(zpe *UPolynomialManager, pe *util.Int, U, V, A, B, Al, Bl *upolyVectorState, caller *upolyHenselCallerScope) (failure error) {
+func (s *UPolynomialFactorizationService) henselQuadraticIterationWithCaller(zpe *UPolynomialManager, pe *unumeral.Int, U, V, A, B, Al, Bl *upolyVectorState, caller *upolyHenselCallerScope) (failure error) {
 	m := s.manager
 	var locals [6]upolyVectorState
 	tmp1, g, S, T, t, tmp2 := &locals[0], &locals[1], &locals[2], &locals[3], &locals[4], &locals[5]
@@ -323,7 +323,7 @@ func (s *UPolynomialFactorizationService) henselQuadraticIterationWithCaller(zpe
 		defer m.dropLocalVector(tmp1)
 		defer m.dropLocalVector(g)
 	}
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	if e := m.scopedPush(g, &zero); e != nil {
 		return e
 	}
@@ -602,7 +602,7 @@ func (s *UPolynomialFactorizationService) henselFactorsWithCaller(f UPolynomialV
 			return err
 		}
 	}
-	var localLCInv util.Int
+	var localLCInv unumeral.Int
 	lcInv := &localLCInv
 	if caller == nil {
 		defer m.config.Integer.Del(lcInv)
@@ -647,7 +647,7 @@ func (s *UPolynomialFactorizationService) henselInitialCWithCaller(f UPolynomial
 	if e := pf.multiplyWithCaller(C, caller); e != nil {
 		return e
 	}
-	var localLC util.Int
+	var localLC unumeral.Int
 	lc := &localLC
 	if caller == nil {
 		defer m.config.Integer.Del(lc)

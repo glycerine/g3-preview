@@ -6,8 +6,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // An actual newly allocated partially initialized monomial exercises reached
@@ -32,7 +32,7 @@ func TestPolynomialEvaluationReachedDegreeAfterVariableBreak(t *testing.T) {
 		serviceMust(t, mm.allocator.WriteUint32(raw, uint64(store[0]), store[1]))
 	}
 	serviceMust(t, mm.IncRef(term))
-	partial, e := m.core.MkCoreTake([]util.Int{util.NewInt(3)}, []Monomial{term})
+	partial, e := m.core.MkCoreTake([]unumeral.Int{unumeral.NewInt(3)}, []Monomial{term})
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(partial))
 	// The actual placed polynomial field now owns the preexisting source INC.
@@ -55,20 +55,20 @@ func TestPolynomialEvaluationReachedDegreeAfterVariableBreak(t *testing.T) {
 	})
 	values := polynomialEvalRationalMap{manager: q}
 	for i := range values.values {
-		values.values[i] = util.NewRational()
+		values.values[i] = unumeral.NewRational()
 		serviceMust(t, q.SetInt32(&values.values[i], 2))
 	}
-	out := util.NewRational()
+	out := unumeral.NewRational()
 	m.evaluation.rational = q
 	m.evaluation.active = true
 	m.evaluation.executing = true
 	e = m.evaluationRationalCore(partial, &values, 0, 1, 0, &out)
 	m.evaluation.executing = false
 	serviceMust(t, e)
-	if (*out.BorrowNumerator()) != util.NewInt(6) || values.reads != 1 {
+	if (*out.BorrowNumerator()) != unumeral.NewInt(6) || values.reads != 1 {
 		t.Fatal("higher variable breaks before its uninitialized degree", out, values.reads)
 	}
-	inputs := []*util.Int{&(*out.BorrowNumerator()), &(*out.BorrowDenominator())}
+	inputs := []*unumeral.Int{&(*out.BorrowNumerator()), &(*out.BorrowDenominator())}
 	for i := range values.values {
 		inputs = append(inputs, &(*values.values[i].BorrowNumerator()), &(*values.values[i].BorrowDenominator()))
 	}
@@ -84,7 +84,7 @@ func TestPolynomialEvaluationReachedDegreeAfterVariableBreak(t *testing.T) {
 	if polynomialSourceDebug {
 		want = 3
 	}
-	if (*out.BorrowNumerator()) != util.NewInt(want) {
+	if (*out.BorrowNumerator()) != unumeral.NewInt(want) {
 		t.Fatal("source DEBUG degree assertion versus release loop prefix", (*out.BorrowNumerator()), want)
 	}
 	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{base, partial}, inputs, 0)

@@ -3,10 +3,9 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"sort"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorCoefficientHoist holds one source invocation's real locals and
@@ -16,8 +15,8 @@ type BitVectorCoefficientHoist struct {
 	self                                 *BitVectorCoefficientHoist
 	manager                              *ASTManager
 	compare                              ASTBitVectorNumeralInvocation
-	reads                                [2]util.RationalServiceInvocation
-	values                               [2]util.OwnedRational
+	reads                                [2]unumeral.RationalServiceInvocation
+	values                               [2]unumeral.OwnedRational
 	placed                               [2]bool
 	pps                                  []ASTHandle
 	mulArgs                              [2]ASTHandle
@@ -110,7 +109,7 @@ func (p *BitVectorCoefficientHoist) retireRead(i int) error {
 	if e := c.EndContext(); e != nil {
 		return e
 	}
-	*c = util.RationalServiceInvocation{}
+	*c = unumeral.RationalServiceInvocation{}
 	return nil
 }
 

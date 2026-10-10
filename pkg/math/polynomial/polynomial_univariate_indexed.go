@@ -3,19 +3,19 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Concrete borrowed source numeral array routes. None acquires a second
 // owning backing or preflights an unread later coefficient.
 
 type polynomialUnivariateCoefficients struct {
-	values  []util.Int
-	array   util.IntegerArrayView
+	values  []unumeral.Int
+	array   unumeral.IntegerArrayView
 	indexed bool
 }
 
-func (as polynomialUnivariateCoefficients) reference(m *MultivariatePolynomialCore, k uint32, local *util.Int) (*util.Int, error) {
+func (as polynomialUnivariateCoefficients) reference(m *MultivariatePolynomialCore, k uint32, local *unumeral.Int) (*unumeral.Int, error) {
 	if as.indexed {
 		return as.array.Reference(k, local)
 	}
@@ -24,7 +24,7 @@ func (as polynomialUnivariateCoefficients) reference(m *MultivariatePolynomialCo
 	}
 	return &as.values[k], nil
 }
-func (as polynomialUnivariateCoefficients) store(m *MultivariatePolynomialCore, k uint32, a *util.Int) error {
+func (as polynomialUnivariateCoefficients) store(m *MultivariatePolynomialCore, k uint32, a *unumeral.Int) error {
 	if as.indexed {
 		return as.array.Store(k, *a)
 	}
@@ -52,7 +52,7 @@ func (m *MultivariatePolynomialCore) mkUnivariateToPolynomial(v, n uint32, as po
 	k := n + 1
 	for k > 0 {
 		k--
-		var local util.Int
+		var local unumeral.Int
 		a, e := as.reference(m, k, &local)
 		if e != nil {
 			return Polynomial{}, e

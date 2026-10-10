@@ -1,10 +1,12 @@
 // Source: src/ast/rewriter/bv_trailing.cpp:213-234,311-327.
 package ast
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	// beginBitVectorTrailingNumeral guards the allocation-free default rational
+	// on the nonnumeral path; matched calls own its copied stored value and two.
+)
 
-// beginBitVectorTrailingNumeral guards the allocation-free default rational
-// on the nonnumeral path; matched calls own its copied stored value and two.
 func (m *ASTManager) beginBitVectorTrailingNumeral(arg ASTHandle, receipt *astBVNormalizationReceipt) (f *astBVNumeralFrame, r astNodeRef, width uint32, matched bool, result error) {
 	r, result = m.requireExpr(arg)
 	if result != nil {
@@ -80,7 +82,7 @@ func (m *ASTManager) bitVectorTrailingDivide(f *astBVNumeralFrame, limit uint32,
 			return count, e
 		}
 		// Reuse only a fully retired source call site, never a stopped child.
-		f.children[1] = util.RationalServiceInvocation{}
+		f.children[1] = unumeral.RationalServiceInvocation{}
 	}
 	return count, nil
 }

@@ -2,7 +2,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // invocationBound validates the saved higher invocation without requiring it
@@ -103,9 +103,9 @@ func (r *polynomialNumericRoots) NumericBound(executing bool) bool {
 	return valid && (!executing || r.caller.roots(r.integer) == r)
 }
 
-func (r *polynomialNumericRoots) NumericPrepare(z *util.IntegerManager, phase string) error {
+func (r *polynomialNumericRoots) NumericPrepare(z *unumeral.IntegerManager, phase string) error {
 	if r.NumericRoots(z, nil) == nil {
-		return util.ErrNumericOwner
+		return unumeral.ErrNumericOwner
 	}
 	if q := r.caller.upolyDisplayFrame(z); q != nil {
 		if e := q.prepareStorage(); e != nil {
@@ -117,14 +117,14 @@ func (r *polynomialNumericRoots) NumericPrepare(z *util.IntegerManager, phase st
 	}
 	return r.caller.prepareFactorFrontendConstantHistory(z)
 }
-func (r *polynomialNumericRoots) NumericNormalize(m *util.IntegerModularManager, out util.Int) (util.Int, error) {
+func (r *polynomialNumericRoots) NumericNormalize(m *unumeral.IntegerModularManager, out unumeral.Int) (unumeral.Int, error) {
 	if m == nil || r.NumericRoots(m.Integers(), nil) == nil {
-		return out, util.ErrNumericOwner
+		return out, unumeral.ErrNumericOwner
 	}
 	err := numericIntegerModularManager_normalizeWithSourceContext(m, &out, r.caller)
 	return out, err
 }
-func (r *polynomialNumericRoots) NumericRecord(z *util.IntegerManager, event string, receipt util.NumericInvocationReceipt) {
+func (r *polynomialNumericRoots) NumericRecord(z *unumeral.IntegerManager, event string, receipt unumeral.NumericInvocationReceipt) {
 	if r.NumericRoots(z, nil) == nil {
 		return
 	}
@@ -197,9 +197,9 @@ func (r *polynomialNumericRoots) NumericRecord(z *util.IntegerManager, event str
 func (r *polynomialNumericRoots) NumericScalarRawEnabled() bool {
 	return r != nil && r.caller.scalarDiv != nil
 }
-func (r *polynomialNumericRoots) NumericScalarRaw(z *util.IntegerManager, event string) (*util.IntegerScalarRawScope, error) {
+func (r *polynomialNumericRoots) NumericScalarRaw(z *unumeral.IntegerManager, event string) (*unumeral.IntegerScalarRawScope, error) {
 	if r.NumericRoots(z, nil) == nil || r.caller.scalarDiv == nil {
-		return nil, util.ErrNumericOwner
+		return nil, unumeral.ErrNumericOwner
 	}
 	s := r.caller.scalarDiv.frame
 	switch event {
@@ -208,15 +208,15 @@ func (r *polynomialNumericRoots) NumericScalarRaw(z *util.IntegerManager, event 
 	case "extended":
 		return &s.extended, nil
 	}
-	return nil, util.ErrNumericOwner
+	return nil, unumeral.ErrNumericOwner
 }
 
 func (r *polynomialNumericRoots) NumericPowerEnabled() bool {
 	return r != nil && r.caller.factorFrontend != nil
 }
-func (r *polynomialNumericRoots) NumericPower(m *util.IntegerModularManager) (util.NumericPowerInvocation, error) {
+func (r *polynomialNumericRoots) NumericPower(m *unumeral.IntegerModularManager) (unumeral.NumericPowerInvocation, error) {
 	if m == nil || r.NumericRoots(m.Integers(), nil) == nil {
-		return nil, util.ErrNumericOwner
+		return nil, unumeral.ErrNumericOwner
 	}
 	q := r.caller.factorFrontendFrame(m.Integers())
 	if q == nil || q.service.manager.modular != m {
@@ -229,7 +229,7 @@ func (r *polynomialNumericRoots) NumericPower(m *util.IntegerModularManager) (ut
 	*s = upolyFactorModularPowerScope{owner: q, invocation: s.invocation + 1, active: true, executing: true}
 	return s, nil
 }
-func (q *upolyFactorModularPowerScope) NumericPowerValue() *util.Int { return &q.power }
+func (q *upolyFactorModularPowerScope) NumericPowerValue() *unumeral.Int { return &q.power }
 func (q *upolyFactorModularPowerScope) NumericPowerFinish() error {
 	q.endEntered = true
 	return q.finishEnd()
@@ -240,7 +240,7 @@ func (q *upolyFactorModularPowerScope) NumericPowerEnd(e error) {
 	}
 	q.executing = false
 }
-func (r *polynomialNumericRoots) NumericSourceCause(z *util.IntegerManager) error {
+func (r *polynomialNumericRoots) NumericSourceCause(z *unumeral.IntegerManager) error {
 	if r == nil || r.integer != z {
 		return nil
 	}
@@ -267,7 +267,7 @@ func (r *polynomialNumericRoots) NumericSourceCause(z *util.IntegerManager) erro
 }
 
 // Frontend NUM receipts authorize their original modular owner.
-func (r *polynomialNumericRoots) NumericModularOwner(m *util.IntegerModularManager) bool {
+func (r *polynomialNumericRoots) NumericModularOwner(m *unumeral.IntegerModularManager) bool {
 	if q := r.caller.factorFrontend; q != nil {
 		return q.service != nil && q.service.manager != nil && q.service.manager.modular == m
 	}

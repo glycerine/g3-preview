@@ -9,12 +9,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func polynomialEvaluationAudit(t *testing.T, m *MultivariatePolynomialManager, p Polynomial, values *polynomialEvalRationalMap, out *util.Rational) {
+func polynomialEvaluationAudit(t *testing.T, m *MultivariatePolynomialManager, p Polynomial, values *polynomialEvalRationalMap, out *unumeral.Rational) {
 	t.Helper()
-	inputs := []*util.Int{&(*out.BorrowNumerator()), &(*out.BorrowDenominator())}
+	inputs := []*unumeral.Int{&(*out.BorrowNumerator()), &(*out.BorrowDenominator())}
 	for i := range values.values {
 		inputs = append(inputs, &(*values.values[i].BorrowNumerator()), &(*values.values[i].BorrowDenominator()))
 	}
@@ -25,11 +25,11 @@ func TestPolynomialEvaluationLiveAliasSource(t *testing.T) {
 	q := m.core.config.Rationals
 	v := polynomialEvalRationalMap{manager: q}
 	for i := range v.values {
-		v.values[i] = util.NewRational()
+		v.values[i] = unumeral.NewRational()
 	}
 	serviceMust(t, q.SetInt32(&v.values[0], 2))
 	serviceMust(t, m.EvaluateRational(p, &v, &v.values[0]))
-	want := util.NewRational()
+	want := unumeral.NewRational()
 	serviceMust(t, q.SetInt32(&want, 5))
 	equal, e := q.Equal(&v.values[0], &want)
 	serviceMust(t, e)
@@ -47,10 +47,10 @@ func TestPolynomialEvaluationCancellationAndCachedFrames(t *testing.T) {
 	q := m.core.config.Rationals
 	v := polynomialEvalRationalMap{manager: q}
 	for i := range v.values {
-		v.values[i] = util.NewRational()
+		v.values[i] = unumeral.NewRational()
 		serviceMust(t, q.SetInt32(&v.values[i], 2))
 	}
-	out := util.NewRational()
+	out := unumeral.NewRational()
 	serviceMust(t, m.LexSort(p))
 	c.limit = c.checkpoints
 	e := m.EvaluateRational(p, &v, &out)
@@ -96,12 +96,12 @@ func polynomialEvaluationEveryReservation(t *testing.T, synch bool) {
 			budget := q.Budget()
 			values := polynomialEvalRationalMap{manager: q}
 			for i := range values.values {
-				values.values[i] = util.NewRational()
+				values.values[i] = unumeral.NewRational()
 			}
 			serviceMust(t, q.SetString(&values.values[0], "184467440737095516170000000000000000000003"))
 			serviceMust(t, q.SetFraction(&values.values[1], 13, 7))
 			serviceMust(t, q.SetInt32(&values.values[2], 2))
-			out := util.NewRational()
+			out := unumeral.NewRational()
 			budget.FailAfter(ordinal)
 			e := m.EvaluateRational(p, &values, &out)
 			polynomialEvaluationAudit(t, m, p, &values, &out)
@@ -149,7 +149,7 @@ func TestPolynomialEvaluationManagerGuardBeforeFrames(t *testing.T) {
 	m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{1, 0, 0}}})
 	foreign, _ := rationalManager(t, false)
 	v := polynomialEvalRationalMap{manager: foreign}
-	out := util.NewRational()
+	out := unumeral.NewRational()
 	before := m.originalBudget.Used()
 	e := m.EvaluateRational(p, &v, &out)
 	if !errors.Is(e, arena.ErrConfig) || v.managers != 1 || m.originalBudget.Used() != before || len(m.evaluation.rationalFrames) != 0 {
@@ -165,10 +165,10 @@ func TestPolynomialEvaluationRawReceiptForeignReplacement(t *testing.T) {
 			q := m.core.config.Rationals
 			v := polynomialEvalRationalMap{manager: q}
 			for i := range v.values {
-				v.values[i] = util.NewRational()
+				v.values[i] = unumeral.NewRational()
 			}
 			serviceMust(t, q.SetString(&v.values[0], "184467440737095516170000000000000000003"))
-			out := util.NewRational()
+			out := unumeral.NewRational()
 			q.Budget().FailAfter(ordinal)
 			e := m.EvaluateRational(p, &v, &out)
 			polynomialEvaluationAudit(t, m, p, &v, &out)
@@ -176,7 +176,7 @@ func TestPolynomialEvaluationRawReceiptForeignReplacement(t *testing.T) {
 			q.Budget().FailAfter(-1)
 			if e != nil && receipt != 0 && q.RawArithmetic.PowerActive {
 				found = true
-				serviceMust(t, q.CleanupRawGroup(util.RationalRawPower))
+				serviceMust(t, q.CleanupRawGroup(unumeral.RationalRawPower))
 				// A second actual Power call starts the SAME concrete raw group. Its
 				// physical failed-copy prefix is foreign to the stopped evaluation.
 				old := q.RawGeneration
@@ -194,7 +194,7 @@ func TestPolynomialEvaluationRawReceiptForeignReplacement(t *testing.T) {
 					t.Fatal("stale evaluation receipt cleaned foreign replacement")
 				}
 				polynomialEvaluationAudit(t, m, p, &v, &out)
-				serviceMust(t, q.CleanupRawGroup(util.RationalRawPower))
+				serviceMust(t, q.CleanupRawGroup(unumeral.RationalRawPower))
 			} else {
 				serviceMust(t, m.CleanupEvaluation())
 			}
@@ -214,10 +214,10 @@ func TestPolynomialEvaluationWarmInlineSourceLocals(t *testing.T) {
 	q := m.core.config.Rationals
 	v := polynomialEvalRationalMap{manager: q}
 	for i := range v.values {
-		v.values[i] = util.NewRational()
+		v.values[i] = unumeral.NewRational()
 		serviceMust(t, q.SetInt32(&v.values[i], 2))
 	}
-	out := util.NewRational()
+	out := unumeral.NewRational()
 	serviceMust(t, m.EvaluateRational(p, &v, &out))
 	before := q.Budget().Used()
 	source, e := q.Integers().RuntimeOwner().AllocationCount()
@@ -245,10 +245,10 @@ func TestPolynomialEvaluationLexReceiptForeignReplacement(t *testing.T) {
 	q := m.core.config.Rationals
 	values := polynomialEvalRationalMap{manager: q}
 	for i := range values.values {
-		values.values[i] = util.NewRational()
+		values.values[i] = unumeral.NewRational()
 		serviceMust(t, q.SetInt32(&values.values[i], 2))
 	}
-	out := util.NewRational()
+	out := unumeral.NewRational()
 	t.Cleanup(func() {
 		serviceMust(t, m.CleanupEvaluation())
 		serviceMust(t, m.CleanupLexSort())

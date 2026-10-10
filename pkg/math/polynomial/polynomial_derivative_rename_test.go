@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The original driver displays derivative/rename results without an equality
@@ -51,7 +52,7 @@ func TestPolynomialDerivativeIndependentFiniteValue(t *testing.T) {
 
 func TestPolynomialRenameAllDirectoryCellsAndFirstMaximum(t *testing.T) {
 	m, p, ms := polynomialLexFixture(t)
-	other, e := m.core.MkTerms([]util.Int{util.NewInt(29), util.NewInt(31)}, []Monomial{ms[1], ms[2]})
+	other, e := m.core.MkTerms([]unumeral.Int{unumeral.NewInt(29), unumeral.NewInt(31)}, []Monomial{ms[1], ms[2]})
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(other))
 	defer func() { serviceMust(t, m.core.DecRef(other)) }()
@@ -77,7 +78,7 @@ func TestPolynomialRenameAllDirectoryCellsAndFirstMaximum(t *testing.T) {
 		if v == other {
 			want = 29
 		}
-		if a != util.NewInt(want) {
+		if a != unumeral.NewInt(want) {
 			t.Fatal("renamed monomial lost paired coefficient", a, want)
 		}
 	}
@@ -163,7 +164,7 @@ func polynomialDerivativeEvenFixture(t *testing.T, existing bool) (*Multivariate
 		ms[i], e = m.core.monomials.MkVariable(0, uint32(2+2*i))
 		serviceMust(t, e)
 	}
-	p, e := m.core.MkTerms([]util.Int{util.NewInt(1), util.NewInt(1), util.NewInt(1)}, ms)
+	p, e := m.core.MkTerms([]unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1), unumeral.NewInt(1)}, ms)
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(p))
 	borrowed := Monomial{}
@@ -322,11 +323,11 @@ func polynomialRenameFixture(t *testing.T) (*MultivariatePolynomialManager, *Pol
 	}
 	powers := [][]MonomialPower{{{0, 1}, {1, 2}}, {{0, 2}}, {{1, 3}}, {{0, 1}, {1, 1}}, nil}
 	ms := make([]Monomial, len(powers))
-	as := make([]util.Int, len(powers))
+	as := make([]unumeral.Int, len(powers))
 	for i := range powers {
 		ms[i], e = m.core.monomials.MkMonomial(powers[i])
 		serviceMust(t, e)
-		as[i] = util.NewInt(int32(11 + 2*i))
+		as[i] = unumeral.NewInt(int32(11 + 2*i))
 	}
 	p, e := m.core.MkTerms(as, ms)
 	serviceMust(t, e)
@@ -375,7 +376,7 @@ func TestMonomialUnitConsumedDropSourceStopAndOwningAbort(t *testing.T) {
 
 func TestPolynomialDerivativeNumericPendingIdentity(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("derivative has no checkpoint") }, Cooperation: func() error { panic("derivative has no cooperation") }}})
 	serviceMust(t, e)
@@ -383,7 +384,7 @@ func TestPolynomialDerivativeNumericPendingIdentity(t *testing.T) {
 	serviceMust(t, e)
 	mono, e := m.core.monomials.MkVariable(0, ^uint32(0))
 	serviceMust(t, e)
-	p, e := m.core.MkTerms([]util.Int{util.NewInt(1)}, []Monomial{mono})
+	p, e := m.core.MkTerms([]unumeral.Int{unumeral.NewInt(1)}, []Monomial{mono})
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(p))
 	_, cause := m.Derivative(p, 0)
@@ -399,7 +400,7 @@ func TestPolynomialDerivativeNumericPendingIdentity(t *testing.T) {
 		t.Fatal("old physical root or stale receipt changed unexpectedly")
 	}
 	// A later caller reuses the allocator but owns a distinct object generation.
-	out := util.NewInt(11)
+	out := unumeral.NewInt(11)
 	cause = q.Integers().Copy(&out, &q.Integers().Two64)
 	if !errors.Is(cause, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) || q.Integers().PendingCell.Object == old {
 		t.Fatal("later pending identity", cause, q.Integers().PendingCell)
@@ -426,7 +427,7 @@ func TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause(t *testing
 	b := arena.NewBudget(1 << 26)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: r, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("derivative no checkpoint") }, Cooperation: func() error { panic("derivative no cooperation") }}})
 	serviceMust(t, e)
@@ -436,9 +437,9 @@ func TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause(t *testing
 	serviceMust(t, e)
 	words := make([]uint32, 40000)
 	words[39999] = 1
-	a := util.NewInt(0)
+	a := unumeral.NewInt(0)
 	serviceMust(t, q.Integers().SetLimbs(&a, words))
-	p, e := m.core.MkTerms([]util.Int{a}, []Monomial{term})
+	p, e := m.core.MkTerms([]unumeral.Int{a}, []Monomial{term})
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(p))
 	serviceMust(t, q.Integers().Del(&a))
@@ -476,7 +477,7 @@ func TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation(t *testin
 			b := arena.NewBudget(1 << 26)
 			r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 			serviceMust(t, e)
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: r, Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 			serviceMust(t, e)
 			m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("derivative no checkpoint") }, Cooperation: func() error { panic("derivative no cooperation") }}})
 			serviceMust(t, e)
@@ -486,9 +487,9 @@ func TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation(t *testin
 			serviceMust(t, e)
 			digits := make([]uint32, 40000)
 			digits[39999] = 1
-			a := util.NewInt(0)
+			a := unumeral.NewInt(0)
 			serviceMust(t, q.Integers().SetLimbs(&a, digits))
-			p, e := m.core.MkTerms([]util.Int{a}, []Monomial{term})
+			p, e := m.core.MkTerms([]unumeral.Int{a}, []Monomial{term})
 			serviceMust(t, e)
 			serviceMust(t, m.core.IncRef(p))
 			serviceMust(t, q.Integers().Del(&a))
@@ -512,7 +513,7 @@ func TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation(t *testin
 			if mode == "foreign" {
 				// Explicit old callee abort precedes this separate later setter invocation.
 				serviceMust(t, q.Integers().Allocator.CleanupPending())
-				later := util.NewInt(3)
+				later := unumeral.NewInt(3)
 				laterCause := q.Integers().SetLimbs(&later, digits)
 				foreign, e := q.Integers().Allocator.PendingRoots()
 				serviceMust(t, e)

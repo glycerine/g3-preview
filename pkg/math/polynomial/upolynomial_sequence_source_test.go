@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialSequenceCopyMoveAndRetainedRows(t *testing.T) {
@@ -33,7 +33,7 @@ func TestUPolynomialSequenceCopyMoveAndRetainedRows(t *testing.T) {
 			t.Fatal(e)
 		}
 	}
-	var value util.Int
+	var value unumeral.Int
 	if e = m.ReadView(row, 1, &value); e != nil {
 		t.Fatal(e)
 	}
@@ -98,7 +98,7 @@ func TestUPolynomialSequenceNativeMetadataGrowthAndReset(t *testing.T) {
 			t.Fatal(i, row)
 		}
 		for j, want := range []int64{7, -3, 1} {
-			var n util.Int
+			var n unumeral.Int
 			serviceMust(t, m.ReadView(row, uint32(j), &n))
 			got, e := m.IntegerManager().Int64(&n)
 			if e != nil || got != want {
@@ -198,7 +198,7 @@ func TestUPolynomialSequenceBigCopyFailureImmediateGraph(t *testing.T) {
 		m, _, b := upolySourceOwner(t)
 		p := upolySourceNew(t, m, []int32{0, 0, 1})
 		seq := upolySturmSequence(t, m)
-		var bigValue util.Int
+		var bigValue unumeral.Int
 		digits := make([]uint32, 90)
 		digits[89] = 1
 		digits[0] = 37
@@ -237,7 +237,7 @@ func TestUPolynomialSequenceBigCopyFailureImmediateGraph(t *testing.T) {
 				t.Fatal(e)
 			}
 			for i := uint32(0); i < 3; i++ {
-				var value util.Int
+				var value unumeral.Int
 				if e = m.ReadView(row, i, &value); e != nil {
 					t.Fatal(e)
 				}
@@ -271,7 +271,7 @@ func TestUPolynomialSequenceBigCopyFailureImmediateGraph(t *testing.T) {
 func TestUPolynomialTransformCancellationAfterComposition(t *testing.T) {
 	m, q, _, limit, _ := upolySourceOwnerServices(t)
 	p := upolySourceNew(t, m, []int32{1, 2, 3})
-	c := util.NewRational()
+	c := unumeral.NewRational()
 	if e := q.SetFraction(&c, 1, 3); e != nil {
 		t.Fatal(e)
 	}
@@ -384,16 +384,16 @@ func TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset(t *testing.T) {
 	if e = seq.Close(); e != nil {
 		t.Fatal(e)
 	}
-	var value util.Int
+	var value unumeral.Int
 	if e = m.ReadView(captured, 0, &value); !errors.Is(e, ErrUPolynomialOwner) {
 		t.Fatal("closed captured view", e)
 	}
 	seq = upolySturmSequence(t, m)
-	if e = m.SetInts(p, []util.Int{util.NewInt(1), util.NewInt(1), util.NewInt(1)}); e != nil {
+	if e = m.SetInts(p, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1), unumeral.NewInt(1)}); e != nil {
 		t.Fatal(e)
 	}
 	digits := []uint32{31, 17, 1}
-	var bigValue util.Int
+	var bigValue unumeral.Int
 	if e = m.IntegerManager().SetLimbs(&bigValue, digits); e != nil {
 		t.Fatal(e)
 	}
@@ -430,7 +430,7 @@ func TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset(t *testing.T) {
 	if budget.Used() != used-(physicalBefore-physicalAfter) || seq.Stats().TotalBytes != arraysBefore || seq.Stats().OwnedNumeralCells != 0 {
 		t.Fatal("reset retains arrays and frees owned roots", used, budget.Used(), seq.Stats())
 	}
-	var probes [3]util.Int
+	var probes [3]unumeral.Int
 	for i := range probes {
 		if e = m.IntegerManager().SetLimbs(&probes[i], digits); e != nil {
 			t.Fatal(e)

@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialCheapMatchedRootRowRetirementPreservesForeign(t *testing.T) {
@@ -18,7 +19,7 @@ func TestPolynomialCheapMatchedRootRowRetirementPreservesForeign(t *testing.T) {
 	foreign, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
 	var receipt polynomialCheapAppendInvocationReceipt
-	first, second := util.NewInt(7), util.NewInt(11)
+	first, second := unumeral.NewInt(7), unumeral.NewInt(11)
 	serviceMust(t, c.cheap.addWithAppendReceipt(&first, c.monomials.unit, false, &receipt))
 	serviceMust(t, c.cheap.add(&second, foreign, false))
 	beforeForeign, e := c.monomialRefCount(foreign)
@@ -57,7 +58,7 @@ func TestPolynomialCheapActualFactoryMovesRetireMatchedTags(t *testing.T) {
 	foreign, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
 	var receipt polynomialCheapAppendInvocationReceipt
-	a, b := util.NewInt(7), util.NewInt(11)
+	a, b := unumeral.NewInt(7), unumeral.NewInt(11)
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, c.monomials.unit, false, &receipt))
 	serviceMust(t, c.cheap.add(&b, foreign, false))
 	// The actual later unreceipted source factory moves every existing row;
@@ -87,7 +88,7 @@ func TestPolynomialCheapMatchedRowConsumedLastDropResumesExactLeaf(t *testing.T)
 	owned, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
 	var receipt polynomialCheapAppendInvocationReceipt
-	a, b := util.NewInt(7), util.NewInt(11)
+	a, b := unumeral.NewInt(7), unumeral.NewInt(11)
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, owned, false, &receipt))
 	serviceMust(t, c.cheap.add(&b, c.monomials.unit, false))
 	foreignRC, e := c.monomialRefCount(c.monomials.unit)
@@ -129,7 +130,7 @@ func TestPolynomialCheapOwnerCloseResumesConsumedMatchedDrop(t *testing.T) {
 	owned, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
 	var receipt polynomialCheapAppendInvocationReceipt
-	a, b := util.NewInt(7), util.NewInt(11)
+	a, b := unumeral.NewInt(7), unumeral.NewInt(11)
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, owned, false, &receipt))
 	serviceMust(t, c.cheap.add(&b, c.monomials.unit, false))
 	foreignRC, e := c.monomialRefCount(c.monomials.unit)
@@ -165,7 +166,7 @@ func TestPolynomialCheapSourceResetConsumesOldTagsBeforeForeignReuse(t *testing.
 	serviceMust(t, c.monomials.IncRef(foreign))
 	defer func() { serviceMust(t, c.monomials.DecRef(foreign)) }()
 	var r polynomialCheapAppendInvocationReceipt
-	a, b := util.NewInt(7), util.NewInt(11)
+	a, b := unumeral.NewInt(7), unumeral.NewInt(11)
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, c.monomials.unit, false, &r))
 	serviceMust(t, c.cheap.reset())
 	serviceMust(t, c.cheap.add(&b, foreign, false))
@@ -194,7 +195,7 @@ func TestPolynomialCheapMatchedInvocationStartsAfterForeignSourceRow(t *testing.
 	serviceMust(t, e)
 	foreign, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
-	a, b := util.NewInt(11), util.NewInt(7)
+	a, b := unumeral.NewInt(11), unumeral.NewInt(7)
 	serviceMust(t, c.cheap.add(&a, foreign, false))
 	rc, e := c.monomialRefCount(foreign)
 	serviceMust(t, e)
@@ -224,9 +225,9 @@ func TestPolynomialCheapKnownPartialCopyPreservesEarlierForeignRow(t *testing.T)
 		serviceMust(t, e)
 		foreign, e := c.monomials.MkVariable(0, 1)
 		serviceMust(t, e)
-		a := util.NewInt(11)
-		large := util.NewInt(0)
-		two := util.NewInt(2)
+		a := unumeral.NewInt(11)
+		large := unumeral.NewInt(0)
+		two := unumeral.NewInt(2)
 		serviceMust(t, c.integer.Power(&two, 15000, &large))
 		serviceMust(t, c.cheap.add(&a, foreign, false))
 		rc, e := c.monomialRefCount(foreign)
@@ -238,7 +239,7 @@ func TestPolynomialCheapKnownPartialCopyPreservesEarlierForeignRow(t *testing.T)
 		serviceMust(t, e)
 		ms, e := c.cheap.ms.size(c)
 		serviceMust(t, e)
-		polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&large}, 0)
+		polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&large}, 0)
 		partial := cause != nil && as == 2 && ms == 1 && c.cheap.appendScope.coefficientClaims == 1 && c.cheap.appendScope.monomialClaims == 0
 		c.integer.Budget().FailAfter(-1)
 		if partial {
@@ -256,7 +257,7 @@ func TestPolynomialCheapKnownPartialCopyPreservesEarlierForeignRow(t *testing.T)
 		if now != rc || term != foreign || value != a {
 			t.Fatal("partial owned copy consumed earlier foreign row", ordinal, rc, now, term, value)
 		}
-		polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&large}, 0)
+		polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&large}, 0)
 		serviceMust(t, c.cheap.reset())
 		serviceMust(t, c.integer.Del(&large))
 	}
@@ -274,7 +275,7 @@ func TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease(t *testing
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
@@ -293,10 +294,10 @@ func TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease(t *testing
 	serviceMust(t, e)
 	digits := make([]uint32, 40000)
 	digits[39999] = 1
-	large := util.Int{}
+	large := unumeral.Int{}
 	serviceMust(t, q.Integers().SetLimbs(&large, digits))
 	defer func() { contextTLSFinish(t, rt, func() error { return q.Integers().Del(&large) }) }()
-	a := util.NewInt(11)
+	a := unumeral.NewInt(11)
 	serviceMust(t, c.cheap.add(&a, foreign, false))
 	// Warm only cold tag metadata, so the target is the source numeric COPY.
 	serviceMust(t, c.cheap.prepareAppendTags(2))
@@ -305,7 +306,7 @@ func TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease(t *testing
 	if !numericPhysicalReservationRefusal(cause) || c.cheap.appendScope.numeric.Allocator == ([3]umemory.Block{}) {
 		t.Fatal("actual pending COPY raw", cause, c.cheap.appendScope.numeric)
 	}
-	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&large}, 0)
 	serviceMust(t, rt.SetMaxSize(0))
 	contextTLSNearMinimum(t, rt)
 	cause = c.cheap.cleanupAppendInvocation(&r, true)
@@ -316,12 +317,12 @@ func TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease(t *testing
 	if !errors.Is(cause, arena.ErrBounds) || as != 1 || ms != 1 {
 		t.Fatal("postcompaction actual physical release", cause, as, ms, c.cheap.appendScope)
 	}
-	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&large}, 0)
-	later := util.NewInt(13)
+	polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&large}, 0)
+	later := unumeral.NewInt(13)
 	serviceMust(t, c.cheap.add(&later, c.monomials.unit, false))
 	unitRC, e := c.monomialRefCount(c.monomials.unit)
 	serviceMust(t, e)
-	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&large}, 0)
 	contextTLSFinish(t, rt, func() error { return c.cheap.cleanupAppendInvocation(&r, true) })
 	nowUnit, e := c.monomialRefCount(c.monomials.unit)
 	serviceMust(t, e)
@@ -337,7 +338,7 @@ func TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease(t *testing
 	if value != a {
 		t.Fatal("retry changed foreign payload", value)
 	}
-	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&large}, 0)
 }
 
 func TestPolynomialCheapLiveMatchedInvocationContinuesAfterForeignAppend(t *testing.T) {
@@ -353,7 +354,7 @@ func TestPolynomialCheapLiveMatchedInvocationContinuesAfterForeignAppend(t *test
 	serviceMust(t, e)
 	serviceMust(t, c.monomials.IncRef(last))
 	defer func() { serviceMust(t, c.monomials.DecRef(last)) }()
-	a, b, d := util.NewInt(7), util.NewInt(11), util.NewInt(13)
+	a, b, d := unumeral.NewInt(7), unumeral.NewInt(11), unumeral.NewInt(13)
 	var r polynomialCheapAppendInvocationReceipt
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, c.monomials.unit, false, &r))
 	serviceMust(t, c.cheap.add(&b, foreign, false))
@@ -390,7 +391,7 @@ func TestPolynomialCheapStoppedPrecompactionPreservesLaterForeignAppend(t *testi
 	serviceMust(t, e)
 	serviceMust(t, c.monomials.IncRef(later))
 	defer func() { serviceMust(t, c.monomials.DecRef(later)) }()
-	a, b, d := util.NewInt(7), util.NewInt(11), util.NewInt(13)
+	a, b, d := unumeral.NewInt(7), unumeral.NewInt(11), unumeral.NewInt(13)
 	var r polynomialCheapAppendInvocationReceipt
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, owned, false, &r))
 	serviceMust(t, c.cheap.add(&b, c.monomials.unit, false))
@@ -444,8 +445,8 @@ func TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard(t *testin
 	bad, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
 	defer func() { serviceMust(t, c.monomials.CleanupValue(&bad)) }()
-	two := util.NewInt(2)
-	a := util.Int{}
+	two := unumeral.NewInt(2)
+	a := unumeral.Int{}
 	serviceMust(t, c.integer.Power(&two, 70, &a))
 	defer func() { serviceMust(t, c.integer.Del(&a)) }()
 	var r polynomialCheapAppendInvocationReceipt
@@ -464,10 +465,10 @@ func TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard(t *testin
 	serviceMust(t, e)
 	old, e := c.cheap.as.coefficient(c, 0)
 	serviceMust(t, e)
-	if l.initializedCoefficients != 1 || l.initializedMonomials != 0 || old != (util.Int{}) || c.cheap.appendScope.coefficientClaims != 0 || c.cheap.appendScope.monomialClaims != 1 {
+	if l.initializedCoefficients != 1 || l.initializedMonomials != 0 || old != (unumeral.Int{}) || c.cheap.appendScope.coefficientClaims != 0 || c.cheap.appendScope.monomialClaims != 1 {
 		t.Fatal("source asymmetric publication prefix", l, old, c.cheap.appendScope)
 	}
-	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&a}, 0)
 	// Restore this fixture's displaced, already initialized original source
 	// pointer. No unread field or source output is filled/repaired.
 	serviceMust(t, c.cheap.ms.putMonomial(c, 0, saved))
@@ -481,14 +482,14 @@ func TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard(t *testin
 	}
 	serviceMust(t, c.cleanupFactoryInvocation(&f, false))
 	serviceMust(t, c.cleanupFactoryInvocation(&f, true))
-	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&a}, 0)
 }
 
 // Invalid Go owner/frame copies must never acquire physical root authority.
 func TestPolynomialCheapCopiedBufferFrameCannotConsumeActualRows(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	c := m.core
-	a := util.NewInt(7)
+	a := unumeral.NewInt(7)
 	var r polynomialCheapAppendInvocationReceipt
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, c.monomials.unit, false, &r))
 	copied := c.cheap
@@ -523,7 +524,7 @@ func TestPolynomialCheapOwnerClosePreservesAlreadyConsumedEarlierOwnedRow(t *tes
 	serviceMust(t, e)
 	serviceMust(t, c.monomials.IncRef(foreign))
 	defer func() { serviceMust(t, c.monomials.DecRef(foreign)) }()
-	a, b, d := util.NewInt(7), util.NewInt(11), util.NewInt(13)
+	a, b, d := unumeral.NewInt(7), unumeral.NewInt(11), unumeral.NewInt(13)
 	var r polynomialCheapAppendInvocationReceipt
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, c.monomials.unit, false, &r))
 	serviceMust(t, c.cheap.addWithAppendReceipt(&b, owned, false, &r))

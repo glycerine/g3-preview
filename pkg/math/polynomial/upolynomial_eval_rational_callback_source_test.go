@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialEvalSignRationalActualCallbackOwnerAndTupleRefusal(t *testing.T) {
@@ -83,7 +83,7 @@ func TestUPolynomialEvalSignRationalActualCallbackOwnerAndTupleRefusal(t *testin
 	poly := algebraicPolynomial(t, p, 1, math.MaxInt32, 1)
 	v, e := p.wholeView(poly)
 	serviceMust(t, e)
-	var b util.Rational
+	var b unumeral.Rational
 	serviceMust(t, c.config.Rationals.SetInt32(&b, math.MaxInt32))
 	held, e := rt.Allocate(uint64(int64(100000) - rt.State().LocalSize - 12))
 	serviceMust(t, e)
@@ -95,7 +95,7 @@ func TestUPolynomialEvalSignRationalActualCallbackOwnerAndTupleRefusal(t *testin
 		t.Fatal("actual allocating Horner transport not reached", body, calls)
 	}
 	q := &p.rationalEvaluation
-	extra := []*util.Int{&(*b.BorrowNumerator()), &(*b.BorrowDenominator()), &q.values[0], &q.values[1], &q.values[2]}
+	extra := []*unumeral.Int{&(*b.BorrowNumerator()), &(*b.BorrowDenominator()), &q.values[0], &q.values[1], &q.values[2]}
 	if q.addMul.Frame != nil {
 		extra = append(extra, &q.addMul.Frame.Tmp)
 	}

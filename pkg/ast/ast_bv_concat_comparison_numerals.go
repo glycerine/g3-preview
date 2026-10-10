@@ -2,9 +2,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorConcatComparisonNumerals owns af/bf, retained normalized high
@@ -12,9 +11,9 @@ import (
 type BitVectorConcatComparisonNumerals struct {
 	self                   *BitVectorConcatComparisonNumerals
 	manager                *ASTManager
-	values                 [6]util.OwnedRational
+	values                 [6]unumeral.OwnedRational
 	placed                 [6]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	norm                   ASTBitVectorNumeralInvocation
 	header                 uint64
@@ -70,7 +69,7 @@ func (n *BitVectorConcatComparisonNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorConcatComparisonNumerals) Read(i int, arg ASTHandle, width *uint32) (bool, error) {
@@ -98,7 +97,7 @@ func (n *BitVectorConcatComparisonNumerals) High(i int, width, commonWidth uint3
 	input := i
 	if width > commonWidth {
 		v, e := q.PowerOfTwoWithInvocation(width-commonWidth, &n.scalar)
-		n.values[4], n.placed[4] = v, v != (util.OwnedRational{})
+		n.values[4], n.placed[4] = v, v != (unumeral.OwnedRational{})
 		if e == nil {
 			e = n.retire()
 		}
@@ -106,7 +105,7 @@ func (n *BitVectorConcatComparisonNumerals) High(i int, width, commonWidth uint3
 			return n.fail(e)
 		}
 		v, e = q.IDivWithInvocation(&n.values[i], &n.values[4], &n.scalar)
-		n.values[5], n.placed[5] = v, v != (util.OwnedRational{})
+		n.values[5], n.placed[5] = v, v != (unumeral.OwnedRational{})
 		if e == nil {
 			e = n.retire()
 		}
@@ -115,14 +114,14 @@ func (n *BitVectorConcatComparisonNumerals) High(i int, width, commonWidth uint3
 		}
 		input = 5
 	}
-	var v util.OwnedRational
+	var v unumeral.OwnedRational
 	var e error
 	if signed {
 		v, e = n.manager.NormalizeSignedBitVectorValueWithInvocation(&n.values[input], commonWidth, &n.norm)
 	} else {
 		v, e = n.manager.NormalizeBitVectorValueWithInvocation(&n.values[input], commonWidth, &n.norm)
 	}
-	n.values[2+i], n.placed[2+i] = v, v != (util.OwnedRational{})
+	n.values[2+i], n.placed[2+i] = v, v != (unumeral.OwnedRational{})
 	if e != nil {
 		return n.fail(e)
 	}

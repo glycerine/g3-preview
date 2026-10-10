@@ -34613,3 +34613,31 @@ Full native AST/rewriter/polynomial/SMT core/SAT/tactic/API passed
 AST/text passed (20.838s/0.028s). Combined g3debug+g3checked module compilation,
 text/root util/AST/polynomial/SMT core vet, manifest and diff checks passed.
 No full native module rerun within the hourly interval.
+
+## Extract util/numeral after recovery
+
+Recovered clean HEAD8f693a07 after the power interruption. The dependency audit
+confirmed the text extraction removed the numeral-to-parameter back-edge.
+Moved210 production files (including debug/checked alternatives and actual
+numeric caller/error/global-service seams) and341 implementation test files to
+util/numeral. All665 affected caller files now name the numeral owner directly;
+no root compatibility aliases or universal template adapters were added.
+
+Compiler-resolved preflight covers native, g3debug, g3checked and combined tags.
+Shared public-only reflection, file-stream and assertion fixtures stay local to
+the tests that use them. The global numeral physical-owner audit retains its
+same checks with a numeral-only fixture; the parameter/debug integration audit
+keeps its original additional owner domains. The global-service TLS test uses
+the existing equivalent numeral TLS recipe rather than importing parameter
+implementation tests. No source algorithm, failure campaign or implementation
+assertion was removed. Manifest targets follow actual moved files; inventory is
+unchanged at2102 units/677 APIs:62 ported,281 partial,1731 unported,two dead/deleted.
+
+Full native numeral/root util passed (86.305s/1.326s). Combined debug+checked
+extended-GCD/global-service/numeric-format/binary-rational checks passed (0.194s).
+Full native AST/rewriter/polynomial/SMT core/SAT/tactic/API passed
+(18.884s/9.795s/31.442s/0.218s/0.469s/0.028s/0.011s); full g3debug AST/root util
+passed (20.441s/1.441s). Native and combined-tag module compilation, numeral/
+root util/AST/polynomial/SMT core/SAT vet, manifest and diff checks passed.
+The requested complete root split remains open: parameters, diagnostics,
+S-expressions, runtime hashing and unused internal adapters still need review.

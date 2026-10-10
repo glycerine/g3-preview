@@ -4,8 +4,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialFactorConstantInvocationReceipt struct {
@@ -20,14 +19,14 @@ type polynomialFactorConstantScope struct {
 	active, executing, finishing, localConstructed bool
 	kind, phase                                    uint8
 	numeric                                        polynomialNumericRoots
-	normalize                                      [3]util.IntegerNormalizeInvocationReceipt
+	normalize                                      [3]unumeral.IntegerNormalizeInvocationReceipt
 	direct                                         polynomialFactorConstantInvocationReceipt
 	bodyCause, sourceCause, cleanupCause           error
 }
 type polynomialFactorConstantHistory struct {
 	invocation                           uint64
 	kind                                 uint8
-	normalize                            [3]util.IntegerNormalizeInvocationReceipt
+	normalize                            [3]unumeral.IntegerNormalizeInvocationReceipt
 	bodyCause, sourceCause, cleanupCause error
 }
 
@@ -74,7 +73,7 @@ func (f *PolynomialFactors) beginFactorConstant(kind uint8, r *polynomialFactorC
 	}
 	return s, nil
 }
-func numericIntegerManager_factorConstantContextRoots(m *util.IntegerManager, c integerAllocationInvocationContext) *polynomialNumericRoots {
+func numericIntegerManager_factorConstantContextRoots(m *unumeral.IntegerManager, c integerAllocationInvocationContext) *polynomialNumericRoots {
 	r := c.factorConstant
 	if m == nil || !m.ValidOwner() || r == nil || r.manager == nil || !r.manager.matchesFactorConstantInvocation(r) || c.factorConstantInvocation == 0 || c.factorConstantInvocation != r.invocation || r.manager.manager.core.integer != m || !r.frame.active || !r.frame.executing || r.manager.manager.core.callbackDepth != 0 {
 		return nil
@@ -166,7 +165,7 @@ func (f *PolynomialFactors) cleanupFactorConstantInvocation(r *polynomialFactorC
 	}
 	return nil
 }
-func (m *MultivariatePolynomialManager) accumulateFactorConstantWithReceipt(f *PolynomialFactors, a *util.Int, r *polynomialFactorConstantInvocationReceipt) (cause error) {
+func (m *MultivariatePolynomialManager) accumulateFactorConstantWithReceipt(f *PolynomialFactors, a *unumeral.Int, r *polynomialFactorConstantInvocationReceipt) (cause error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -177,7 +176,7 @@ func (m *MultivariatePolynomialManager) accumulateFactorConstantWithReceipt(f *P
 	if e != nil {
 		return e
 	}
-	f.local = util.Int{}
+	f.local = unumeral.Int{}
 	f.localActive = true
 	s.localConstructed = true
 	defer func() {
@@ -204,7 +203,7 @@ func (m *MultivariatePolynomialManager) flipFactorSignWithReceipt(f *PolynomialF
 	if e != nil {
 		return e
 	}
-	f.local = util.Int{}
+	f.local = unumeral.Int{}
 	f.localActive = true
 	s.localConstructed = true
 	defer func() {
@@ -224,7 +223,7 @@ func (m *MultivariatePolynomialManager) flipFactorSignWithReceipt(f *PolynomialF
 		return numericIntegerModularManager_copyWithFactorConstantReceipt(m.core.modular, &f.constant, &f.local, &s.direct)
 	})
 }
-func (f *PolynomialFactors) setConstantWithReceipt(a *util.Int, r *polynomialFactorConstantInvocationReceipt) (cause error) {
+func (f *PolynomialFactors) setConstantWithReceipt(a *unumeral.Int, r *polynomialFactorConstantInvocationReceipt) (cause error) {
 	s, e := f.beginFactorConstant(0, r)
 	if e != nil {
 		return e
@@ -257,13 +256,13 @@ func (m *MultivariatePolynomialCore) factorConstantExecuting() bool {
 	return f != nil && f.self == f && f.manager != nil && f.manager.core == m && ((f.matchesFactorConstantInvocation(&f.constantInvocation.direct) && (f.constantInvocation.executing || f.constantInvocation.finishing)) || (f.matchesFactorMemberSet(&f.memberSet.direct) && (f.memberSet.executing || f.memberSet.finishing)))
 }
 
-func numericIntegerModularManager_factorConstantAllocationContext(m *util.IntegerModularManager, r *polynomialFactorConstantInvocationReceipt) integerAllocationInvocationContext {
+func numericIntegerModularManager_factorConstantAllocationContext(m *unumeral.IntegerModularManager, r *polynomialFactorConstantInvocationReceipt) integerAllocationInvocationContext {
 	if m == nil || !m.ValidOwner() || r == nil || r.manager == nil || !r.manager.matchesFactorConstantInvocation(r) || r.manager.manager.core.modular != m || !r.frame.active || !r.frame.executing || r.manager.manager.core.callbackDepth != 0 {
 		return integerAllocationInvocationContext{}
 	}
 	return r.manager.factorConstantNumericContext()
 }
-func numericIntegerModularManager_copyWithFactorConstantReceipt(m *util.IntegerModularManager, out, a *util.Int, r *polynomialFactorConstantInvocationReceipt) error {
+func numericIntegerModularManager_copyWithFactorConstantReceipt(m *unumeral.IntegerModularManager, out, a *unumeral.Int, r *polynomialFactorConstantInvocationReceipt) error {
 	context := numericIntegerModularManager_factorConstantAllocationContext(m, r)
 	if r != nil {
 		if context.factorConstant == nil {
@@ -281,7 +280,7 @@ func numericIntegerModularManager_copyWithFactorConstantReceipt(m *util.IntegerM
 	}
 	return m.WithAllocationContext((context).utility(m.Integers())).Copy(out, a)
 }
-func numericIntegerModularManager_mulWithFactorConstantReceipt(m *util.IntegerModularManager, a, b, out *util.Int, r *polynomialFactorConstantInvocationReceipt) error {
+func numericIntegerModularManager_mulWithFactorConstantReceipt(m *unumeral.IntegerModularManager, a, b, out *unumeral.Int, r *polynomialFactorConstantInvocationReceipt) error {
 	context := numericIntegerModularManager_factorConstantAllocationContext(m, r)
 	if r != nil {
 		if context.factorConstant == nil {
@@ -299,7 +298,7 @@ func numericIntegerModularManager_mulWithFactorConstantReceipt(m *util.IntegerMo
 	}
 	return m.WithAllocationContext((context).utility(m.Integers())).Mul(a, b, out)
 }
-func numericIntegerModularManager_negWithFactorConstantReceipt(m *util.IntegerModularManager, out *util.Int, r *polynomialFactorConstantInvocationReceipt) error {
+func numericIntegerModularManager_negWithFactorConstantReceipt(m *unumeral.IntegerModularManager, out *unumeral.Int, r *polynomialFactorConstantInvocationReceipt) error {
 	context := numericIntegerModularManager_factorConstantAllocationContext(m, r)
 	if r != nil {
 		if context.factorConstant == nil {

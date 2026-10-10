@@ -3,14 +3,13 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Enumerate actual caller/callee members. Backing directories supply only
 // physical allocated extents; they never discover numerical owner authority.
-func polynomialFactorBackendNamedRoots(t *testing.T, full *MultivariatePolynomialManager) (roots []*util.Int, bytes uint64) {
+func polynomialFactorBackendNamedRoots(t *testing.T, full *MultivariatePolynomialManager) (roots []*unumeral.Int, bytes uint64) {
 	t.Helper()
 	seenManager := map[*UPolynomialManager]bool{}
 	seenStore := map[*UPolynomialCoefficientStore]bool{}

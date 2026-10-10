@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialSquareFreeLiteralMultiplicityAndAliases(t *testing.T) {
@@ -111,7 +111,7 @@ func TestPolynomialSquareFreeLiteralGF2AndAbsentVariable(t *testing.T) {
 	// Source derivative is zero in GF2, so GCD(p,0)=p and the literal
 	// exact-division branch returns one. This is source behavior, rather
 	// than a replacement characteristic-p square-free algorithm.
-	prime := util.NewInt(2)
+	prime := unumeral.NewInt(2)
 	serviceMust(t, c.modular.SetZP(&prime))
 	serviceMust(t, m.SquareFreeVariable(p, 0, out))
 	polynomialQueryExpect(t, c, out.root.value, map[[3]uint32]int64{{}: 1})
@@ -142,14 +142,14 @@ func TestPolynomialSquareFreeEarlyRoutesPreserveOlderDerivative(t *testing.T) {
 	if !numericPhysicalReservationRefusal(e) || !m.matchesDerivativeInvocation(&old) {
 		t.Fatal("actual retained derivative", e)
 	}
-	nums := [2]util.Int{m.derivative.n, m.derivative.a}
+	nums := [2]unumeral.Int{m.derivative.n, m.derivative.a}
 	nonce := m.derivative.invocation
 	for _, v := range []Polynomial{c.zero, constant} {
 		serviceMust(t, m.SquareFreeVariable(v, ^uint32(0), out))
 		if out.root.value != v {
 			t.Fatal("source zero/constant identity", v, out.root.value)
 		}
-		if m.derivative.invocation != nonce || [2]util.Int{m.derivative.n, m.derivative.a} != nums || !m.matchesDerivativeInvocation(&old) {
+		if m.derivative.invocation != nonce || [2]unumeral.Int{m.derivative.n, m.derivative.a} != nums || !m.matchesDerivativeInvocation(&old) {
 			t.Fatal("early route mutated older lexical context")
 		}
 		polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, constant, out.root.value}, nil, out.header)
@@ -390,7 +390,7 @@ func TestPolynomialSquareFreeCalleeAbortPreservesEarlierDerivativeCohort(t *test
 	m := polynomialPrimitiveFixture(t)
 	c := m.core
 	p := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{{{0, 2}}, {{1, 2}}})
-	prime := util.NewInt(2)
+	prime := unumeral.NewInt(2)
 	serviceMust(t, c.modular.SetZP(&prime))
 	earlier, e := m.Derivative(p, 0)
 	serviceMust(t, e)

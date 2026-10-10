@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialDiscriminantActualResultantBeforeLeadingNUMPrefixes(t *testing.T) {
@@ -14,7 +13,7 @@ func TestPolynomialDiscriminantActualResultantBeforeLeadingNUMPrefixes(t *testin
 		c := m.core
 		_, e := c.monomials.MkVar()
 		serviceMust(t, e)
-		var leading util.Int
+		var leading unumeral.Int
 		digits := make([]uint32, 64)
 		digits[0] = 7
 		digits[63] = 1
@@ -23,7 +22,7 @@ func TestPolynomialDiscriminantActualResultantBeforeLeadingNUMPrefixes(t *testin
 		serviceMust(t, e)
 		unit, e := c.monomials.MkMonomial(nil)
 		serviceMust(t, e)
-		p, e := c.MkTerms([]util.Int{leading, util.NewInt(1)}, []Monomial{x2, unit})
+		p, e := c.MkTerms([]unumeral.Int{leading, unumeral.NewInt(1)}, []Monomial{x2, unit})
 		serviceMust(t, e)
 		p = polynomialCaller(t, c, p)
 		r, e := NewPolynomialRef(c)
@@ -34,7 +33,7 @@ func TestPolynomialDiscriminantActualResultantBeforeLeadingNUMPrefixes(t *testin
 		e = m.Discriminant(p, 0, r)
 		s := &m.discriminant
 		values := []Polynomial{p, r.root.value, s.refs[0].value, s.refs[1].value}
-		polynomialImpPhysicalAuditNamed(t, m, values, []*util.Int{&leading, &s.lc}, r.header)
+		polynomialImpPhysicalAuditNamed(t, m, values, []*unumeral.Int{&leading, &s.lc}, r.header)
 		if e != nil && s.constant.invocation != 0 {
 			selected = true
 			if r.root.value == (Polynomial{}) {
@@ -51,7 +50,7 @@ func TestPolynomialDiscriminantActualResultantBeforeLeadingNUMPrefixes(t *testin
 		// The borrowed output stays named across parent cleanup. Its public
 		// reference destructor may need real ID-vector growth outside this function.
 		serviceMust(t, m.CleanupDiscriminant())
-		polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming}, []*util.Int{&leading}, r.header)
+		polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming}, []*unumeral.Int{&leading}, r.header)
 		budget.FailAfter(-1)
 		serviceMust(t, r.Close())
 		serviceMust(t, c.integer.Del(&leading))

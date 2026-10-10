@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *UPolynomialManager) callerSourceContext(c *upolyHenselCallerScope) (integerAllocationInvocationContext, error) {
@@ -37,7 +37,7 @@ func (m *UPolynomialManager) addSubWithCaller(a, b UPolynomialView, out *upolyVe
 	}
 	return m.addSubStateWithSourceContext(a, b, out, sub, context)
 }
-func (m *UPolynomialManager) scalarWithCaller(v *upolyVectorState, a *util.Int, c *upolyHenselCallerScope) error {
+func (m *UPolynomialManager) scalarWithCaller(v *upolyVectorState, a *unumeral.Int, c *upolyHenselCallerScope) error {
 	if c == nil {
 		return m.mulScalarState(v, a)
 	}
@@ -54,7 +54,7 @@ func (m *UPolynomialManager) scalarWithCaller(v *upolyVectorState, a *util.Int, 
 	}
 	return m.mulScalarViewWithSourceContext(m.stateView(v), a, context)
 }
-func (m *UPolynomialManager) divScalarWithCaller(a UPolynomialView, b *util.Int, c *upolyHenselCallerScope) error {
+func (m *UPolynomialManager) divScalarWithCaller(a UPolynomialView, b *unumeral.Int, c *upolyHenselCallerScope) error {
 	context, e := m.callerSourceContext(c)
 	if e != nil {
 		return e

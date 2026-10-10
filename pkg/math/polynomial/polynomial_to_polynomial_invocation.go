@@ -2,13 +2,13 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialToPolynomialHistory struct {
 	invocation                           uint64
 	bodyCause, sourceCause, cleanupCause error
-	normalize                            util.IntegerNormalizeInvocationReceipt
+	normalize                            unumeral.IntegerNormalizeInvocationReceipt
 	append                               polynomialCheapAppendInvocationReceipt
 	factory                              polynomialFactoryInvocationReceipt
 	monomialAllocator                    monomialAllocatorInvocationReceipt
@@ -49,14 +49,14 @@ type polynomialToPolynomialInvocationReceipt struct {
 func (m *MultivariatePolynomialManager) matchesToPolynomialInvocation(r *polynomialToPolynomialInvocationReceipt) bool {
 	return m != nil && m.self == m && m.core != nil && m.core.self == m.core && r != nil && r.manager == m && r.frame == &m.toPolynomial && r.invocation != 0 && r.invocation == r.frame.invocation
 }
-func numericIntegerManager_toPolynomialAllocationRoots(m *util.IntegerManager, c integerAllocationInvocationContext) *polynomialNumericRoots {
+func numericIntegerManager_toPolynomialAllocationRoots(m *unumeral.IntegerManager, c integerAllocationInvocationContext) *polynomialNumericRoots {
 	r := c.toPolynomial
 	if m == nil || !m.ValidOwner() || r == nil || !r.manager.matchesToPolynomialInvocation(r) || c.toPolynomialInvocation != r.invocation || r.manager.core.integer != m || !r.frame.active || !r.frame.executing || r.manager.core.callbackDepth != 0 {
 		return nil
 	}
 	return &r.frame.numeric
 }
-func numericScopedIntegerModularBuffer128_setToPolynomial(b *util.ScopedIntegerModularBuffer128, i uint32, v *util.Int, r *polynomialToPolynomialInvocationReceipt) error {
+func numericScopedIntegerModularBuffer128_setToPolynomial(b *unumeral.ScopedIntegerModularBuffer128, i uint32, v *unumeral.Int, r *polynomialToPolynomialInvocationReceipt) error {
 	if e := b.Check(); e != nil {
 		return e
 	}
@@ -86,7 +86,7 @@ func numericScopedIntegerModularBuffer128_setToPolynomial(b *util.ScopedIntegerM
 	e = numericIntegerModularManager_copyWithToPolynomialReceipt(b.Manager(), &s.transport, v, r)
 	write := b.Store(i, s.transport)
 	if write == nil {
-		s.transport = util.Int{}
+		s.transport = unumeral.Int{}
 		s.transportBound = false
 	}
 	cause := polynomialNewtonJoin(e, write)
@@ -95,7 +95,7 @@ func numericScopedIntegerModularBuffer128_setToPolynomial(b *util.ScopedIntegerM
 	}
 	return cause
 }
-func numericScopedIntegerModularBuffer128_pushToPolynomial(b *util.ScopedIntegerModularBuffer128, v *util.Int, r *polynomialToPolynomialInvocationReceipt) error {
+func numericScopedIntegerModularBuffer128_pushToPolynomial(b *unumeral.ScopedIntegerModularBuffer128, v *unumeral.Int, r *polynomialToPolynomialInvocationReceipt) error {
 	if e := b.Check(); e != nil {
 		return e
 	}
@@ -176,7 +176,7 @@ func (m *MultivariatePolynomialManager) cleanupToPolynomialInvocation(r *polynom
 	return nil
 }
 
-func numericIntegerModularManager_copyWithToPolynomialReceipt(m *util.IntegerModularManager, out, value *util.Int, r *polynomialToPolynomialInvocationReceipt) error {
+func numericIntegerModularManager_copyWithToPolynomialReceipt(m *unumeral.IntegerModularManager, out, value *unumeral.Int, r *polynomialToPolynomialInvocationReceipt) error {
 	if e := m.Check(); e != nil {
 		return e
 	}

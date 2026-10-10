@@ -14,6 +14,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"path/filepath"
 )
 
@@ -66,14 +67,14 @@ type upolyPhysicalExtraOwners struct {
 	DebugContexts        []*util.DebugContext
 	ParamsRationalValues []paramsPhysicalRationalOwner
 	ParamsValues         []paramsPhysicalValueOwner
-	RationalServices     []*util.RationalService
+	RationalServices     []*unumeral.RationalService
 	SexprManagers        []*util.SexprManager
 	Services             []*polynomial.UPolynomialFactorizationService
-	Integers             []*util.Int
-	Rationals            []*util.Rational
-	RationalManagers     []*util.RationalManager
-	BinaryValues         []*util.BinaryRational
-	BinaryManagers       []*util.BinaryRationalManager
+	Integers             []*unumeral.Int
+	Rationals            []*unumeral.Rational
+	RationalManagers     []*unumeral.RationalManager
+	BinaryValues         []*unumeral.BinaryRational
+	BinaryManagers       []*unumeral.BinaryRationalManager
 	BinaryVectors        []*polynomial.BinaryRationalVector
 	Sequences            []*polynomial.UPolynomialSequence
 }
@@ -389,12 +390,12 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*polynomial.UPolynomialManag
 
 	return graph
 }
-func astTestOwners(t *testing.T) (*usymbol.Manager, *util.RationalService, *arena.Budget) {
+func astTestOwners(t *testing.T) (*usymbol.Manager, *unumeral.RationalService, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)
 	s, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	astTestMust(t, e)
 	t.Cleanup(func() {
 		astTestMust(t, q.Close())
@@ -690,12 +691,12 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 		}
 		for _, owner := range x.ParamsRationalValues {
 			if owner.Service == nil || owner.Value == nil {
-				panic(util.ErrRationalServiceOwner)
+				panic(unumeral.ErrRationalServiceOwner)
 			}
 			service := reflect.ValueOf(owner.Service).Elem()
 			value := reflect.ValueOf(owner.Value).Elem()
 			if testFieldBySourceName(service, "self").Pointer() != reflect.ValueOf(owner.Service).Pointer() || testFieldBySourceName(value, "ownerID").Uint() == 0 || testFieldBySourceName(value, "ownerID").Uint() != testFieldBySourceName(service, "ownerID").Uint() {
-				panic(util.ErrRationalServiceOwner)
+				panic(unumeral.ErrRationalServiceOwner)
 			}
 			addRat(testFieldBySourceName(value, "raw"))
 		}
@@ -716,7 +717,7 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 					}
 					raw := reflect.ValueOf(&frame.Next.Rat).Elem()
 					if testFieldBySourceName(raw, "ownerID").Uint() != testFieldBySourceName(reflect.ValueOf(c.NumeralsField).Elem(), "ownerID").Uint() {
-						panic(util.ErrRationalServiceOwner)
+						panic(unumeral.ErrRationalServiceOwner)
 					}
 					addRat(testFieldBySourceName(raw, "raw"))
 				}

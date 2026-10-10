@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialDerivativeActualUnsignedSetLeafPrefixes(t *testing.T) {
@@ -15,7 +14,7 @@ func TestPolynomialDerivativeActualUnsignedSetLeafPrefixes(t *testing.T) {
 		c := m.core
 		term, e := c.monomials.MkVariable(0, ^uint32(0))
 		serviceMust(t, e)
-		p, e := c.MkTerms([]util.Int{util.NewInt(1)}, []Monomial{term})
+		p, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(1)}, []Monomial{term})
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(p))
 		var receipt polynomialDerivativeInvocationReceipt

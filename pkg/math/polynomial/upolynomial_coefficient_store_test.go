@@ -7,12 +7,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialCoefficientStoreCounterAndColdLayout(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	z, e := util.NewIntegerManager(util.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}})
+	z, e := unumeral.NewIntegerManager(unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}})
 	if e != nil {
 		t.Fatal(e)
 	}

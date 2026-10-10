@@ -1,9 +1,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func upolyDivisionValues(t *testing.T, m *UPolynomialManager, p UPolynomial) []int64 {
@@ -14,7 +13,7 @@ func upolyDivisionValues(t *testing.T, m *UPolynomialManager, p UPolynomial) []i
 	}
 	out := make([]int64, n)
 	for i := uint32(0); i < n; i++ {
-		var v util.Int
+		var v unumeral.Int
 		if e = m.ReadCoefficient(p, i, &v); e != nil {
 			t.Fatal(e)
 		}

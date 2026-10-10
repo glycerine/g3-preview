@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -24,7 +25,7 @@ func TestUPolynomialFactorLiftPreparationActualHelperCheckerSourceStop(t *testin
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	armed := false
 	var external umemory.Block
@@ -65,7 +66,7 @@ func TestUPolynomialFactorLiftPreparationActualHelperCheckerSourceStop(t *testin
 	out, e := u.NewFactors()
 	serviceMust(t, e)
 	parent.constructed = 1
-	inputs := []util.Int{util.NewInt(0), util.NewInt(0), util.NewInt(1)}
+	inputs := []unumeral.Int{unumeral.NewInt(0), unumeral.NewInt(0), unumeral.NewInt(1)}
 	serviceMust(t, q.Integers().SetString(&inputs[0], "-387381625547900583942"))
 	serviceMust(t, q.Integers().SetString(&inputs[1], "-129127208515966861311"))
 	serviceMust(t, u.set(&parent.fpp, inputs))
@@ -78,7 +79,7 @@ func TestUPolynomialFactorLiftPreparationActualHelperCheckerSourceStop(t *testin
 	trials := uint32(0)
 	route, e := s.factorPrimeTrial(parent.zp, &parent.fpp, out, parent.best, 1, &parent.p, &parent.bestP, &parent.ds, &trials)
 	serviceMust(t, e)
-	if route != 1 || parent.bestP != util.NewInt(7) || parent.best.count != 2 {
+	if route != 1 || parent.bestP != unumeral.NewInt(7) || parent.best.count != 2 {
 		t.Fatal("actual eligible uint32 candidate", route, parent.bestP)
 	}
 	c = &parent.hensel

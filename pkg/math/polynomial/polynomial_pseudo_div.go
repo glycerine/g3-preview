@@ -3,8 +3,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 const (
@@ -38,7 +37,7 @@ type polynomialPseudoDivisionScope struct {
 	monomialAllocator                     monomialAllocatorInvocationReceipt
 	remainderBuffer                       polynomialArithmeticInvocationReceipt
 	quotientBuffer                        polynomialArithmeticInvocationReceipt
-	normalize                             util.IntegerNormalizeInvocationReceipt
+	normalize                             unumeral.IntegerNormalizeInvocationReceipt
 	directReceipt                         polynomialPseudoDivisionInvocationReceipt
 	numeric                               polynomialNumericRoots
 	numericPhase                          uint8
@@ -51,7 +50,7 @@ type polynomialPseudoDivisionScope struct {
 	coefficientAppend                     polynomialCheapAppendInvocationReceipt
 	coefficientFactory                    polynomialFactoryInvocationReceipt
 	refs                                  [11]polynomialReference
-	numeral                               util.Int
+	numeral                               unumeral.Int
 	monomial                              polynomialDivisionReference
 	stack                                 [13]uint8
 	depth                                 uint8

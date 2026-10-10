@@ -6,11 +6,12 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
-var ErrUPolynomialCleanupPending = util.ErrNumericCleanupPending
+var ErrUPolynomialCleanupPending = unumeral.ErrNumericCleanupPending
 
 // Actual cold ownership for factor_square_free's lexical objects. The source
 // cannot safely continue a destructor through an invalid numeral. Go retains
@@ -36,18 +37,18 @@ type upolyFactorSquareFreeScope struct {
 	primeTrial                                        upolyPrimeTrialScope
 	manager                                           *UPolynomialManager
 	fpp                                               upolyVectorState
-	p                                                 util.Int
+	p                                                 unumeral.Int
 	zp                                                *UPolynomialManager
 	best                                              *UPolynomialFactors
-	bestP                                             util.Int
+	bestP                                             unumeral.Int
 	ds                                                upolyFactorDegreeState
-	gcdTmp                                            util.Int
+	gcdTmp                                            unumeral.Int
 	zpe                                               *UPolynomialManager
 	lifted                                            *UPolynomialFactors
-	leading                                           util.Int
+	leading                                           unumeral.Int
 	it                                                upolyFactorCombinationState
 	trial, quotient                                   upolyVectorState
-	trialContent                                      util.Int
+	trialContent                                      unumeral.Int
 	constructed                                       uint8
 	header                                            uint64
 }

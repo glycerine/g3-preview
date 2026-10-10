@@ -5,7 +5,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Explicit passed invocation identity. It carries no allocation snapshot and
@@ -97,7 +97,7 @@ type integerAllocationInvocationContext struct {
 	factorFrontendInvocation uint64
 }
 
-func (c integerAllocationInvocationContext) roots(m *util.IntegerManager) *polynomialNumericRoots {
+func (c integerAllocationInvocationContext) roots(m *unumeral.IntegerManager) *polynomialNumericRoots {
 	if c.knuth != nil && c.knuthFrame(m) == nil {
 		return nil
 	}
@@ -304,25 +304,25 @@ func (c integerAllocationInvocationContext) roots(m *util.IntegerManager) *polyn
 	return numericIntegerManager_arithmeticAllocationRoots(m, c.arithmeticReceipt(m))
 }
 
-func numericIntegerManager_copyFromOwnerWithArithmeticReceipt(m *util.IntegerManager, out *util.Int, owner *util.IntegerManager, value *util.Int, receipt *polynomialArithmeticInvocationReceipt) error {
+func numericIntegerManager_copyFromOwnerWithArithmeticReceipt(m *unumeral.IntegerManager, out *unumeral.Int, owner *unumeral.IntegerManager, value *unumeral.Int, receipt *polynomialArithmeticInvocationReceipt) error {
 	return m.WithAllocationContext(((integerAllocationInvocationContext{}).withArithmeticInvocation(receipt)).utility(m)).CopyFromOwnerTracked(out, owner, value, nil)
 }
-func numericIntegerModularManager_arithmeticReceiptForReceiver(m *util.IntegerModularManager, r *polynomialArithmeticInvocationReceipt) *polynomialArithmeticInvocationReceipt {
+func numericIntegerModularManager_arithmeticReceiptForReceiver(m *unumeral.IntegerModularManager, r *polynomialArithmeticInvocationReceipt) *polynomialArithmeticInvocationReceipt {
 	if m == nil || m.Integers() == nil || r == nil || r.manager == nil || r.manager.modular != m || numericIntegerManager_arithmeticAllocationRoots(m.Integers(), r) == nil {
 		return nil
 	}
 	return r
 }
-func numericIntegerModularManager_arithmeticAllocationContext(m *util.IntegerModularManager, r *polynomialArithmeticInvocationReceipt) integerAllocationInvocationContext {
+func numericIntegerModularManager_arithmeticAllocationContext(m *unumeral.IntegerModularManager, r *polynomialArithmeticInvocationReceipt) integerAllocationInvocationContext {
 	return (integerAllocationInvocationContext{}).withArithmeticInvocation(numericIntegerModularManager_arithmeticReceiptForReceiver(m, r))
 }
-func numericIntegerModularManager_arithmeticAddMulReceipt(m *util.IntegerModularManager, r *polynomialArithmeticInvocationReceipt) *util.IntegerAddMulInvocationReceipt {
+func numericIntegerModularManager_arithmeticAddMulReceipt(m *unumeral.IntegerModularManager, r *polynomialArithmeticInvocationReceipt) *unumeral.IntegerAddMulInvocationReceipt {
 	if numericIntegerModularManager_arithmeticReceiptForReceiver(m, r) == nil {
 		return nil
 	}
 	return &r.frame.addMul
 }
-func numericIntegerModularManager_normalizeWithArithmeticReceipt(m *util.IntegerModularManager, out *util.Int, r *polynomialArithmeticInvocationReceipt) error {
+func numericIntegerModularManager_normalizeWithArithmeticReceipt(m *unumeral.IntegerModularManager, out *unumeral.Int, r *polynomialArithmeticInvocationReceipt) error {
 	if numericIntegerModularManager_arithmeticReceiptForReceiver(m, r) == nil {
 		return m.PNormalize(out)
 	}
@@ -341,7 +341,7 @@ func (c integerAllocationInvocationContext) withArithmeticInvocation(r *polynomi
 	}
 	return c
 }
-func (c integerAllocationInvocationContext) arithmeticReceipt(m *util.IntegerManager) *polynomialArithmeticInvocationReceipt {
+func (c integerAllocationInvocationContext) arithmeticReceipt(m *unumeral.IntegerManager) *polynomialArithmeticInvocationReceipt {
 	if c.arithmetic != nil && c.arithmeticInvocation != 0 && c.arithmeticInvocation == c.arithmetic.invocation && numericIntegerManager_arithmeticAllocationRoots(m, c.arithmetic) != nil {
 		return c.arithmetic
 	}

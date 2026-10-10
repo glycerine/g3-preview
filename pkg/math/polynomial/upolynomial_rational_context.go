@@ -3,11 +3,11 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func NewUPolynomialManagerFromRationalService(s *util.RationalService, c UPolynomialConfig) (out *UPolynomialManager, cause error) {
-	cause = s.WithNumericBorrow(func(b *util.RationalNumericBorrow) error {
+func NewUPolynomialManagerFromRationalService(s *unumeral.RationalService, c UPolynomialConfig) (out *UPolynomialManager, cause error) {
+	cause = s.WithNumericBorrow(func(b *unumeral.RationalNumericBorrow) error {
 		if e := b.Ready(); e != nil {
 			return e
 		}
@@ -26,13 +26,13 @@ func NewUPolynomialManagerFromRationalService(s *util.RationalService, c UPolyno
 // service access only during the locked callback.
 type UPolynomialRationalContext struct {
 	self       *UPolynomialRationalContext
-	borrow     *util.RationalNumericBorrow
+	borrow     *unumeral.RationalNumericBorrow
 	polynomial *UPolynomialManager
 	active     bool
 }
 
-func numericRationalService_WithUPolynomialRationals(s *util.RationalService, m *UPolynomialManager, body func(*UPolynomialRationalContext) error) error {
-	return s.WithNumericBorrow(func(b *util.RationalNumericBorrow) error {
+func numericRationalService_WithUPolynomialRationals(s *unumeral.RationalService, m *UPolynomialManager, body func(*UPolynomialRationalContext) error) error {
+	return s.WithNumericBorrow(func(b *unumeral.RationalNumericBorrow) error {
 		if m == nil || m.config.Integer != b.Integers() {
 			return ErrUPolynomialOwner
 		}
@@ -62,16 +62,16 @@ func (c *UPolynomialRationalContext) StopVectors(e error) {
 		c.borrow.StopVectors(e)
 	}
 }
-func (c *UPolynomialRationalContext) SetConstant(p UPolynomial, a *util.OwnedRational, nonInteger func() error) error {
+func (c *UPolynomialRationalContext) SetConstant(p UPolynomial, a *unumeral.OwnedRational, nonInteger func() error) error {
 	if !c.valid() {
-		return util.ErrRationalServiceOwner
+		return unumeral.ErrRationalServiceOwner
 	}
 	// WithCopiedScalar preserves source owner validation before the callback
 	// precondition and the reached lexical constructor.
 	if nonInteger == nil {
 		return c.borrow.WithCopiedScalar(a, nil)
 	}
-	return c.borrow.WithCopiedScalar(a, func(value util.Rational) error {
+	return c.borrow.WithCopiedScalar(a, func(value unumeral.Rational) error {
 		integer, e := c.borrow.IsInt(&value)
 		if e != nil {
 			return e
@@ -79,21 +79,21 @@ func (c *UPolynomialRationalContext) SetConstant(p UPolynomial, a *util.OwnedRat
 		if !integer {
 			return nonInteger()
 		}
-		return c.polynomial.SetRationals(p, []util.Rational{value})
+		return c.polynomial.SetRationals(p, []unumeral.Rational{value})
 	})
 }
-func (c *UPolynomialRationalContext) Exponent(a *util.OwnedRational) (uint32, bool, error) {
+func (c *UPolynomialRationalContext) Exponent(a *unumeral.OwnedRational) (uint32, bool, error) {
 	if !c.valid() {
-		return 0, false, util.ErrRationalServiceOwner
+		return 0, false, unumeral.ErrRationalServiceOwner
 	}
 	return c.borrow.Exponent(a)
 }
 func (c *UPolynomialRationalContext) SetIdentity(p UPolynomial) error {
 	if !c.valid() {
-		return util.ErrRationalServiceOwner
+		return unumeral.ErrRationalServiceOwner
 	}
-	return c.polynomial.SetRationals(p, []util.Rational{util.NewRational(), util.RationalFromBorrowedNumerals(util.NewInt(1), util.NewInt(1))})
+	return c.polynomial.SetRationals(p, []unumeral.Rational{unumeral.NewRational(), unumeral.RationalFromBorrowedNumerals(unumeral.NewInt(1), unumeral.NewInt(1))})
 }
-func numericRationalService_CleanupUPolynomialRationals(s *util.RationalService, vectors func() error) error {
-	return s.WithNumericBorrow(func(b *util.RationalNumericBorrow) error { return b.CleanupAfterVectors(vectors) })
+func numericRationalService_CleanupUPolynomialRationals(s *unumeral.RationalService, vectors func() error) error {
+	return s.WithNumericBorrow(func(b *unumeral.RationalNumericBorrow) error { return b.CleanupAfterVectors(vectors) })
 }

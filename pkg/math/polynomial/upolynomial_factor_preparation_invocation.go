@@ -3,8 +3,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyFactorPreparationReceipt struct {
@@ -19,10 +18,10 @@ type upolyFactorPreparationScope struct {
 	receipt                                                                              upolyFactorPreparationReceipt
 	invocation                                                                           uint64
 	active, executing, sourceExecuting, ownExecuting, constructed, sourceEnded, ownEnded bool
-	numeral                                                                              util.Int
+	numeral                                                                              unumeral.Int
 	numeric                                                                              polynomialNumericRoots
-	normalize                                                                            util.IntegerNormalizeInvocationReceipt
-	gcdRaw                                                                               util.IntegerRawInvocationReceipt
+	normalize                                                                            unumeral.IntegerNormalizeInvocationReceipt
+	gcdRaw                                                                               unumeral.IntegerRawInvocationReceipt
 	bodyCause, sourceCause, ownCause                                                     error
 	previous                                                                             *upolyFactorPreparationScope
 	callDepth                                                                            uint32

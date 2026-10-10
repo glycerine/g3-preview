@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *UPolynomialManager) SetZ() error {
@@ -15,7 +15,7 @@ func (m *UPolynomialManager) SetZ() error {
 	}
 	return m.modular.SetZ()
 }
-func (m *UPolynomialManager) SetZP(p *util.Int) error {
+func (m *UPolynomialManager) SetZP(p *unumeral.Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -48,13 +48,13 @@ func (m *UPolynomialManager) Field() (bool, error) {
 
 // NumeralManager borrows the actual embedded source coefficient manager.
 // Closing it independently violates its owning parent's lifetime contract.
-func (m *UPolynomialManager) NumeralManager() (*util.IntegerModularManager, error) {
+func (m *UPolynomialManager) NumeralManager() (*unumeral.IntegerModularManager, error) {
 	if e := m.check(); e != nil {
 		return nil, e
 	}
 	return m.modular, nil
 }
-func (m *UPolynomialManager) borrowedModulus() (*util.Int, error) {
+func (m *UPolynomialManager) borrowedModulus() (*unumeral.Int, error) {
 	if e := m.check(); e != nil {
 		return nil, e
 	}
@@ -133,7 +133,7 @@ func (m *UPolynomialManager) Checkpoint() error {
 
 // Modulus returns an owned copy of source p(); borrowedModulus is the actual
 // private source-reference route for future coefficient/backend integration.
-func (m *UPolynomialManager) Modulus(out *util.Int) error {
+func (m *UPolynomialManager) Modulus(out *unumeral.Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}

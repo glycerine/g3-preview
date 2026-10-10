@@ -2,8 +2,8 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Divides returns a boolean after its NUM/ref suffix. Its R rows remain in
@@ -28,7 +28,7 @@ func (b *polynomialSOM) transferArithmeticRowsToMember(r *polynomialArithmeticIn
 	}
 	a := &b.appendScope
 	if a.active {
-		if !b.matchesAppendInvocation(&s.append) || a.pending != (Monomial{}) || a.movingCoefficient != (util.Int{}) || a.numeric.PendingObject().OwnerID() != 0 || a.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) || a.retirePhase != 0 || a.stopped {
+		if !b.matchesAppendInvocation(&s.append) || a.pending != (Monomial{}) || a.movingCoefficient != (unumeral.Int{}) || a.numeric.PendingObject().OwnerID() != 0 || a.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) || a.retirePhase != 0 || a.stopped {
 			return ErrPolynomialPending
 		}
 		// The per-slot acquisition tags are the authority. Claim counters are

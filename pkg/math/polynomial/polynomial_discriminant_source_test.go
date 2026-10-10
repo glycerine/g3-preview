@@ -5,12 +5,11 @@ package polynomial
 import (
 	"encoding/json"
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"os"
 	"strconv"
 	"strings"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func polynomialDiscriminantFixture(t *testing.T) *MultivariatePolynomialManager {
@@ -69,7 +68,7 @@ func (p *polynomialDiscriminantExpression) primary() Polynomial {
 			p.t.Fatal("source fixture closing parenthesis", p.text)
 		}
 	} else if p.position < len(p.text) && p.text[p.position] >= '0' && p.text[p.position] <= '9' {
-		i := util.NewInt(int32(p.number()))
+		i := unumeral.NewInt(int32(p.number()))
 		v = p.own(p.c.MkConstantTakeCopy(&i))
 	} else {
 		if p.position == len(p.text) {

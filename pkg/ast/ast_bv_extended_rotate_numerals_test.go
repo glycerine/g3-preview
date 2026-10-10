@@ -6,8 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math/big"
 	"testing"
 )
@@ -96,7 +97,7 @@ func TestASTBitVectorExtendedRotationSignedRemainderThenUnsignedRead(t *testing.
 	}
 	shift, body := n.Shift(width)
 	if ASTSourceDebug {
-		if !errors.Is(body, util.ErrIntegerAssertion) || !n.placed[1] || !n.placed[2] {
+		if !errors.Is(body, unumeral.ErrIntegerAssertion) || !n.placed[1] || !n.placed[2] {
 			t.Fatal("original unsigned assertion before expression end", body, n.placed)
 		}
 		text, e := m.numerals.String(&n.values[2])

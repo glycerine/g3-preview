@@ -2,24 +2,26 @@
 // src/util/rational.h:131-134.
 package ast
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	// NormalizeBitVectorCoefficient implements the BV polynomial configuration's
+	// unsigned norm followed by copy assignment into the existing coefficient.
+)
 
-// NormalizeBitVectorCoefficient implements the BV polynomial configuration's
-// unsigned norm followed by copy assignment into the existing coefficient.
-func (m *ASTManager) NormalizeBitVectorCoefficient(value *util.OwnedRational, sort ASTHandle) error {
+func (m *ASTManager) NormalizeBitVectorCoefficient(value *unumeral.OwnedRational, sort ASTHandle) error {
 	return m.normalizeBitVectorCoefficient(value, sort, nil)
 }
 
 // NormalizeBitVectorCoefficientWithInvocation captures this exact operation
 // so older caller locals can join its stopped children before source DT.
-func (m *ASTManager) NormalizeBitVectorCoefficientWithInvocation(value *util.OwnedRational, sort ASTHandle, c *ASTBitVectorNumeralInvocation) error {
+func (m *ASTManager) NormalizeBitVectorCoefficientWithInvocation(value *unumeral.OwnedRational, sort ASTHandle, c *ASTBitVectorNumeralInvocation) error {
 	if c == nil {
 		return ErrASTHandle
 	}
 	return m.normalizeBitVectorCoefficient(value, sort, c)
 }
 
-func (m *ASTManager) normalizeBitVectorCoefficient(value *util.OwnedRational, sort ASTHandle, c *ASTBitVectorNumeralInvocation) (result error) {
+func (m *ASTManager) normalizeBitVectorCoefficient(value *unumeral.OwnedRational, sort ASTHandle, c *ASTBitVectorNumeralInvocation) (result error) {
 	if e := m.lock(); e != nil {
 		return e
 	}

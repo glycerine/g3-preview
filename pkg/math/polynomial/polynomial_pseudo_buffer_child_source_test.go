@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialPseudoActualRAndQBufferChildren(t *testing.T) {
@@ -109,7 +108,7 @@ func TestPolynomialPseudoMatchedAbortPreservesForeignQuotientRow(t *testing.T) {
 		c.integer.Budget().FailAfter(-1)
 		var count uint32
 		if body != nil && as > 0 && as == ms && !c.som2.hasPendingReference && c.matchesArithmeticInvocation(&child) {
-			seven := util.NewInt(7)
+			seven := unumeral.NewInt(7)
 			serviceMust(t, c.som2.add(&seven, term, false))
 			location, e := c.monomials.location(term)
 			serviceMust(t, e)
@@ -133,7 +132,7 @@ func TestPolynomialPseudoMatchedAbortPreservesForeignQuotientRow(t *testing.T) {
 			serviceMust(t, e)
 			after, e := c.monomials.allocator.ReadUint32(location.raw, 0)
 			serviceMust(t, e)
-			if as != 1 || ms != 1 || actual != term || value != util.NewInt(7) || after != count {
+			if as != 1 || ms != 1 || actual != term || value != unumeral.NewInt(7) || after != count {
 				t.Fatal("matched Pseudo cleanup changed actual foreign row", prefix, as, ms, value, actual, after, count)
 			}
 			audit()

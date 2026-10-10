@@ -3,9 +3,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorBlastEqualityNumerals owns physical v, reached two and each reached
@@ -13,9 +12,9 @@ import (
 type BitVectorBlastEqualityNumerals struct {
 	self                   *BitVectorBlastEqualityNumerals
 	manager                *ASTManager
-	values                 [3]util.OwnedRational // v, two, remainder return
+	values                 [3]unumeral.OwnedRational // v, two, remainder return
 	placed                 [3]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	header                 uint64
 	sourceCause            error
@@ -63,7 +62,7 @@ func (n *BitVectorBlastEqualityNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorBlastEqualityNumerals) Read(arg ASTHandle, width *uint32) (yes bool, result error) {
@@ -119,7 +118,7 @@ func (n *BitVectorBlastEqualityNumerals) RemainderIsZero() (zero bool, result er
 	}()
 	q := n.manager.numerals
 	n.values[2], result = q.RemWithInvocation(&n.values[0], &n.values[1], &n.scalar)
-	n.placed[2] = n.values[2] != (util.OwnedRational{})
+	n.placed[2] = n.values[2] != (unumeral.OwnedRational{})
 	if result != nil {
 		return
 	}

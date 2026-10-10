@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestASTBitVectorBorrowedOneEveryActualReservation(t *testing.T) {
@@ -54,7 +55,7 @@ func TestASTBitVectorBorrowedOneEveryActualReservation(t *testing.T) {
 			if m.numerals.OneField != oneBefore {
 				t.Fatal("borrowed constant changed")
 			}
-			if f := call.receipt.frame; f != nil && (f.placed[5] || !reflect.DeepEqual(f.children[9], util.RationalServiceInvocation{})) {
+			if f := call.receipt.frame; f != nil && (f.placed[5] || !reflect.DeepEqual(f.children[9], unumeral.RationalServiceInvocation{})) {
 				t.Fatal("invented outer literal constructor")
 			}
 			copy := call

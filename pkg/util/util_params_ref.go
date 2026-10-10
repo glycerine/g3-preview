@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
@@ -74,7 +75,7 @@ type paramEntry struct {
 	bits   uint64
 	text   paramsText
 	symbol usymbol.Symbol
-	Rat    OwnedRational
+	Rat    unumeral.OwnedRational
 }
 type paramsEntryState struct {
 	generation uint32
@@ -96,7 +97,7 @@ type ParamsContext struct {
 	mu                sync.Mutex
 	Self              *ParamsContext
 	SymbolsField      *usymbol.Manager
-	NumeralsField     *RationalService
+	NumeralsField     *unumeral.RationalService
 	BudgetField       *arena.Budget
 	Owner             uint64
 	Blocks            []paramsBlock
@@ -131,7 +132,7 @@ func paramsPageBytes(p paramsEntryPage) uint64 {
 	return paramsBytes(cap(p.entries), reflect.TypeOf(paramEntry{})) + paramsBytes(cap(p.states), reflect.TypeOf(paramsEntryState{}))
 }
 func paramsDirectoryBytes(n int) uint64 { return paramsBytes(n, reflect.TypeOf(paramsEntryPage{})) }
-func NewParamsContext(s *usymbol.Manager, q *RationalService, c ParamsConfig) (*ParamsContext, error) {
+func NewParamsContext(s *usymbol.Manager, q *unumeral.RationalService, c ParamsConfig) (*ParamsContext, error) {
 	if s == nil || q == nil || c.Text.Descriptors.Budget != nil && c.Text.Descriptors.Budget != c.Budget {
 		return nil, arena.ErrConfig
 	}
@@ -662,7 +663,7 @@ func (c *ParamsContext) storeText(s *string, source *paramsText) (paramsText, er
 	value := (*s)[:nulStringLength(*s)]
 	return paramsText{owned: &paramsOwnedString{value: value, live: true}, present: true}, nil
 }
-func (c *ParamsContext) setCore(slot uint32, k usymbol.Symbol, kind ParamKind, bits uint64, sym usymbol.Symbol, str *string, rat *OwnedRational, text *paramsText) error {
+func (c *ParamsContext) setCore(slot uint32, k usymbol.Symbol, kind ParamKind, bits uint64, sym usymbol.Symbol, str *string, rat *unumeral.OwnedRational, text *paramsText) error {
 	b := &c.Blocks[slot-1]
 	var x *paramEntry
 	var matched uint32
@@ -743,7 +744,7 @@ func (c *ParamsContext) setCore(slot uint32, k usymbol.Symbol, kind ParamKind, b
 	b.Size++
 	return nil
 }
-func (c *ParamsContext) set(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, kind ParamKind, bits uint64, sym usymbol.Symbol, str *string, rat *OwnedRational) error {
+func (c *ParamsContext) set(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, kind ParamKind, bits uint64, sym usymbol.Symbol, str *string, rat *unumeral.OwnedRational) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if e := c.check(v); e != nil {
@@ -846,10 +847,10 @@ func (c *ParamsContext) SetSymbol(v *ParamsRef, k, s usymbol.Symbol) error {
 func (c *ParamsContext) SetSymbolName(v *ParamsRef, k *string, s usymbol.Symbol) error {
 	return c.set(v, usymbol.Symbol{}, k, true, ParamSymbol, 0, s, nil, nil)
 }
-func (c *ParamsContext) SetRat(v *ParamsRef, k usymbol.Symbol, r *OwnedRational) error {
+func (c *ParamsContext) SetRat(v *ParamsRef, k usymbol.Symbol, r *unumeral.OwnedRational) error {
 	return c.set(v, k, nil, false, ParamNumeral, 0, usymbol.Symbol{}, nil, r)
 }
-func (c *ParamsContext) SetRatName(v *ParamsRef, k *string, r *OwnedRational) error {
+func (c *ParamsContext) SetRatName(v *ParamsRef, k *string, r *unumeral.OwnedRational) error {
 	return c.set(v, usymbol.Symbol{}, k, true, ParamNumeral, 0, usymbol.Symbol{}, nil, r)
 }
 func (c *ParamsContext) get(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, kind ParamKind, fallback *ParamsRef) (paramEntry, bool, error) {
@@ -981,15 +982,15 @@ func (c *ParamsContext) GetStringName(v *ParamsRef, k, d *string) (string, bool,
 func (c *ParamsContext) GetStringFallbackName(v *ParamsRef, k *string, f *ParamsRef, d *string) (string, bool, error) {
 	return c.getString(v, usymbol.Symbol{}, k, true, f, d)
 }
-func (c *ParamsContext) getRat(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, d *OwnedRational) (OwnedRational, error) {
+func (c *ParamsContext) getRat(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, d *unumeral.OwnedRational) (unumeral.OwnedRational, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if _, e := c.NumeralsField.IsRational(d); e != nil {
-		return OwnedRational{}, e
+		return unumeral.OwnedRational{}, e
 	}
 	x, ok, e := c.get(v, k, name, byName, ParamNumeral, nil)
 	if e != nil {
-		return OwnedRational{}, e
+		return unumeral.OwnedRational{}, e
 	}
 	r, e := c.NumeralsField.NewValue()
 	if e != nil {
@@ -1006,14 +1007,14 @@ func (c *ParamsContext) getRat(v *ParamsRef, k usymbol.Symbol, name *string, byN
 	}
 	if e != nil {
 		c.NumeralsField.Del(&r)
-		return OwnedRational{}, e
+		return unumeral.OwnedRational{}, e
 	}
 	return r, nil
 }
-func (c *ParamsContext) GetRat(v *ParamsRef, k usymbol.Symbol, d *OwnedRational) (OwnedRational, error) {
+func (c *ParamsContext) GetRat(v *ParamsRef, k usymbol.Symbol, d *unumeral.OwnedRational) (unumeral.OwnedRational, error) {
 	return c.getRat(v, k, nil, false, d)
 }
-func (c *ParamsContext) GetRatName(v *ParamsRef, k *string, d *OwnedRational) (OwnedRational, error) {
+func (c *ParamsContext) GetRatName(v *ParamsRef, k *string, d *unumeral.OwnedRational) (unumeral.OwnedRational, error) {
 	return c.getRat(v, usymbol.Symbol{}, k, true, d)
 }
 func paramsCString(s string) string {
@@ -1165,7 +1166,7 @@ func (c *ParamsContext) appendValue(x *paramEntry) error {
 			old := len(c.workspace)
 			dst := c.workspace[old:cap(c.workspace)]
 			n, e := c.NumeralsField.FormatInto(&x.Rat, dst)
-			if errors.Is(e, ErrShortBuffer) {
+			if errors.Is(e, unumeral.ErrShortBuffer) {
 				if e = c.reserveFormat(cap(c.workspace) - old + 1); e != nil {
 					return e
 				}
@@ -1286,7 +1287,7 @@ func (c *ParamsContext) FormatInto(v *ParamsRef, dst []byte) (int, error) {
 		return 0, e
 	}
 	if len(dst) < len(c.workspace) {
-		return len(c.workspace), ErrShortBuffer
+		return len(c.workspace), unumeral.ErrShortBuffer
 	}
 	return copy(dst, c.workspace), nil
 }
@@ -1555,7 +1556,7 @@ func (c *ParamsContext) FormatKeyInto(v *ParamsRef, k usymbol.Symbol, dst []byte
 		return 0, e
 	}
 	if len(dst) < len(c.workspace) {
-		return len(c.workspace), ErrShortBuffer
+		return len(c.workspace), unumeral.ErrShortBuffer
 	}
 	return copy(dst, c.workspace), nil
 }
@@ -1571,7 +1572,7 @@ func (c *ParamsContext) FormatSMT2Into(v *ParamsRef, module *string, d *ParamDes
 		return 0, e
 	}
 	if len(dst) < len(c.workspace) {
-		return len(c.workspace), ErrShortBuffer
+		return len(c.workspace), unumeral.ErrShortBuffer
 	}
 	return copy(dst, c.workspace), nil
 }

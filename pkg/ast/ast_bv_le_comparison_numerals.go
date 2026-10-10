@@ -2,9 +2,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorLEComparisonNumerals retains r1/r2 and the original unused r3,
@@ -14,9 +13,9 @@ import (
 type BitVectorLEComparisonNumerals struct {
 	self                   *BitVectorLEComparisonNumerals
 	manager                *ASTManager
-	values                 [12]util.OwnedRational
+	values                 [12]unumeral.OwnedRational
 	placed                 [12]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	norm                   ASTBitVectorNumeralInvocation
 	header                 uint64
@@ -74,7 +73,7 @@ func (n *BitVectorLEComparisonNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorLEComparisonNumerals) Read(i int, arg ASTHandle, width *uint32) (bool, error) {
@@ -118,8 +117,8 @@ func (n *BitVectorLEComparisonNumerals) IsPositive(i int) (bool, error) {
 	v, e := n.manager.numerals.IsPos(&n.values[i])
 	return v, n.fail(e)
 }
-func (n *BitVectorLEComparisonNumerals) store(i int, v util.OwnedRational, e error) error {
-	n.values[i], n.placed[i] = v, v != (util.OwnedRational{})
+func (n *BitVectorLEComparisonNumerals) store(i int, v unumeral.OwnedRational, e error) error {
+	n.values[i], n.placed[i] = v, v != (unumeral.OwnedRational{})
 	n.recordTemp(i)
 	if e == nil {
 		e = n.retire()
@@ -175,14 +174,14 @@ func (n *BitVectorLEComparisonNumerals) normValue(i int, width uint32, signed bo
 	if n.placed[9] {
 		return ErrASTPending
 	}
-	var v util.OwnedRational
+	var v unumeral.OwnedRational
 	var e error
 	if signed {
 		v, e = n.manager.NormalizeSignedBitVectorValueWithInvocation(&n.values[i], width, &n.norm)
 	} else {
 		v, e = n.manager.NormalizeBitVectorValueWithInvocation(&n.values[i], width, &n.norm)
 	}
-	n.values[9], n.placed[9] = v, v != (util.OwnedRational{})
+	n.values[9], n.placed[9] = v, v != (unumeral.OwnedRational{})
 	n.recordTemp(9)
 	if e == nil {
 		e = n.manager.BitVectorNumeralInvocationSourceReady(&n.norm)

@@ -6,12 +6,12 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Output is a call-local borrowed stream. It never stores an assembled decimal
 // string; BIG insertion uses the existing exact lexical numeric stream engine.
-func (m *UPolynomialManager) DisplayInto(p UPolynomialView, out util.RationalSourceStream, variable string, star bool) (cause error) {
+func (m *UPolynomialManager) DisplayInto(p UPolynomialView, out unumeral.RationalSourceStream, variable string, star bool) (cause error) {
 	q, e := m.beginDisplay(false)
 	if e != nil {
 		return e
@@ -100,7 +100,7 @@ func (m *UPolynomialManager) DisplayInto(p UPolynomialView, out util.RationalSou
 	}
 	return nil
 }
-func displayUnsigned(out util.RationalSourceStream, n uint32) error {
+func displayUnsigned(out unumeral.RationalSourceStream, n uint32) error {
 	// std::ostream's machine unsigned insertion is transported as fixed decimal
 	// bytes; no source dynamic numeral or buffer is constructed.
 	var bytes [10]byte
@@ -115,7 +115,7 @@ func displayUnsigned(out util.RationalSourceStream, n uint32) error {
 	}
 	return out.AppendCString(string(bytes[i:]))
 }
-func (m *UPolynomialManager) DisplaySMT2Into(p UPolynomialView, out util.RationalSourceStream, variable string) (cause error) {
+func (m *UPolynomialManager) DisplaySMT2Into(p UPolynomialView, out unumeral.RationalSourceStream, variable string) (cause error) {
 	q, e := m.beginDisplay(true)
 	if e != nil {
 		return e
@@ -193,7 +193,7 @@ func (m *UPolynomialManager) DisplaySMT2Into(p UPolynomialView, out util.Rationa
 	}
 	return out.AppendCString(")")
 }
-func (q *upolyDisplayScope) smtNumeral(out util.RationalSourceStream, a *util.Int) error {
+func (q *upolyDisplayScope) smtNumeral(out unumeral.RationalSourceStream, a *unumeral.Int) error {
 	m := q.owner
 	negative, e := m.modular.IsNeg(a)
 	if e != nil {
@@ -206,7 +206,7 @@ func (q *upolyDisplayScope) smtNumeral(out util.RationalSourceStream, a *util.In
 		return e
 	}
 	q.constructed = true
-	q.numeral = util.Int{} // RAW abs_n has no automatic DT.
+	q.numeral = unumeral.Int{} // RAW abs_n has no automatic DT.
 	if e = numericIntegerModularManager_copyWithDisplayContext(m.modular, &q.numeral, a, q.context()); e != nil {
 		return e
 	}
@@ -223,7 +223,7 @@ func (q *upolyDisplayScope) smtNumeral(out util.RationalSourceStream, a *util.In
 	q.constructed = false
 	return out.AppendCString(")")
 }
-func (q *upolyDisplayScope) smtMonomial(out util.RationalSourceStream, a *util.Int, k uint32, variable string) error {
+func (q *upolyDisplayScope) smtMonomial(out unumeral.RationalSourceStream, a *unumeral.Int, k uint32, variable string) error {
 	if k == 0 {
 		return q.smtNumeral(out, a)
 	}
@@ -266,7 +266,7 @@ func (q *upolyDisplayScope) smtMonomial(out util.RationalSourceStream, a *util.I
 	}
 	return out.AppendCString(")")
 }
-func (m *UPolynomialManager) DisplaySequenceInto(seq *UPolynomialSequence, out util.RationalSourceStream, variable string) error {
+func (m *UPolynomialManager) DisplaySequenceInto(seq *UPolynomialSequence, out unumeral.RationalSourceStream, variable string) error {
 	if m == nil || m.self != m || seq == nil || seq.self != seq || seq.manager != m {
 		return ErrUPolynomialOwner
 	}

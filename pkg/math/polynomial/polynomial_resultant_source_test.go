@@ -4,10 +4,9 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math/big"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialResultantIndependentLinearAndQuadraticIdentity(t *testing.T) {
@@ -150,7 +149,7 @@ func TestPolynomialResultantBigNumeralEveryReservationPrefix(t *testing.T) {
 			full := polynomialPSCFullFixture(t)
 			c := full.core
 			z := c.integer
-			as := []util.Int{{}, util.NewInt(1), util.NewInt(1), util.NewInt(2)}
+			as := []unumeral.Int{{}, unumeral.NewInt(1), unumeral.NewInt(1), unumeral.NewInt(2)}
 			limbs := make([]uint32, 11)
 			limbs[0], limbs[10] = 17, 1
 			serviceMust(t, z.SetLimbs(&as[0], limbs))
@@ -171,7 +170,7 @@ func TestPolynomialResultantBigNumeralEveryReservationPrefix(t *testing.T) {
 			t.Cleanup(func() { z.Budget().FailAfter(-1); serviceMust(t, full.CleanupGCD()); serviceMust(t, r.Close()) })
 			z.Budget().FailAfter(ordinal)
 			cause := full.Resultant(p, q, 1, r)
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, r.root.value}, []*util.Int{&as[0]}, r.header)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, r.root.value}, []*unumeral.Int{&as[0]}, r.header)
 			z.Budget().FailAfter(-1)
 			if cause != nil {
 				if !numericPhysicalReservationRefusal(cause) {
@@ -179,7 +178,7 @@ func TestPolynomialResultantBigNumeralEveryReservationPrefix(t *testing.T) {
 				}
 				failures++
 				serviceMust(t, full.CleanupGCD())
-				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, r.root.value}, []*util.Int{&as[0]}, r.header)
+				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, r.root.value}, []*unumeral.Int{&as[0]}, r.header)
 				return
 			}
 			success = true

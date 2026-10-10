@@ -4,12 +4,11 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialMonicScope struct {
-	inv, newA               util.Int
+	inv, newA               unumeral.Int
 	numeric                 polynomialNumericRoots
 	active, topOwner        bool
 	cursor                  uint8
@@ -35,13 +34,13 @@ func (m *MultivariatePolynomialManager) finishGlexMonicSource() (err error) {
 		}
 	}()
 	if s.cursor == 0 {
-		if _, e := util.SourceNumeralDel(m.core.integer, &s.newA); e != nil {
+		if _, e := unumeral.SourceNumeralDel(m.core.integer, &s.newA); e != nil {
 			return e
 		}
 		s.cursor = 1
 	}
 	if s.cursor == 1 {
-		if _, e := util.SourceNumeralDel(m.core.integer, &s.inv); e != nil {
+		if _, e := unumeral.SourceNumeralDel(m.core.integer, &s.inv); e != nil {
 			return e
 		}
 		s.cursor = 2

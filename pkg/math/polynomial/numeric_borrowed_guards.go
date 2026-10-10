@@ -2,17 +2,17 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type borrowedPolynomialGuard interface {
-	util.NumericCallerGuard
+	unumeral.NumericCallerGuard
 	numericCallerOwner() any
-	numericCallerBinding() *util.NumericCallerBinding
+	numericCallerBinding() *unumeral.NumericCallerBinding
 }
 
 func setBorrowedPolynomialCaller(z polynomialGuardOwner, owner any, kind uint32, q borrowedPolynomialGuard) {
-	var current *util.NumericCallerBinding
+	var current *unumeral.NumericCallerBinding
 	for b := z.CallerBindings(); b != nil; b = b.Previous() {
 		if b.Kind() == kind {
 			if g, ok := b.Guard().(borrowedPolynomialGuard); ok {
@@ -45,7 +45,7 @@ func setBorrowedPolynomialCaller(z polynomialGuardOwner, owner any, kind uint32,
 		if current == nil {
 			return
 		}
-		panic(util.ErrNumericOwner)
+		panic(unumeral.ErrNumericOwner)
 	}
 	if e := z.BindCaller(q.numericCallerBinding(), q, kind); e != nil {
 		panic(e)
@@ -76,7 +76,7 @@ func (q *algebraicNegScope) NumericExecuting() bool {
 	return q != nil && q.owner != nil && q.owner.self == q.owner && q == &q.owner.negation && q.owner.negationExecuting()
 }
 func (q *algebraicNegScope) numericCallerOwner() any { return q.owner }
-func (q *algebraicNegScope) numericCallerBinding() *util.NumericCallerBinding {
+func (q *algebraicNegScope) numericCallerBinding() *unumeral.NumericCallerBinding {
 	return &q.numeric.integerBinding
 }
 func factorCoreCaller(z polynomialGuardOwner) *polynomialFactorCoreFrame {
@@ -104,7 +104,7 @@ func (q *polynomialFactorCoreFrame) NumericExecuting() bool {
 	return q != nil && q.manager != nil && q.manager.matchesFactorCore(&polynomialFactorCoreInvocationReceipt{q.manager, q, q.invocation}) && (q.executing || q.finishing)
 }
 func (q *polynomialFactorCoreFrame) numericCallerOwner() any { return q }
-func (q *polynomialFactorCoreFrame) numericCallerBinding() *util.NumericCallerBinding {
+func (q *polynomialFactorCoreFrame) numericCallerBinding() *unumeral.NumericCallerBinding {
 	return &q.callerBinding
 }
 func factorFrontendCaller(z polynomialGuardOwner) *upolyFactorFrontendScope {
@@ -132,7 +132,7 @@ func (q *upolyFactorFrontendScope) NumericExecuting() bool {
 	return q != nil && q.actual() && (q.executing || q.sourceExecuting || q.ownExecuting)
 }
 func (q *upolyFactorFrontendScope) numericCallerOwner() any { return q }
-func (q *upolyFactorFrontendScope) numericCallerBinding() *util.NumericCallerBinding {
+func (q *upolyFactorFrontendScope) numericCallerBinding() *unumeral.NumericCallerBinding {
 	return &q.numeric.integerBinding
 }
 func upolyDisplayCaller(z polynomialGuardOwner) *upolyDisplayScope {
@@ -160,7 +160,7 @@ func (q *upolyDisplayScope) NumericExecuting() bool {
 	return q != nil && q.actual() && (q.executing || q.sourceExecuting || q.ownExecuting)
 }
 func (q *upolyDisplayScope) numericCallerOwner() any { return q }
-func (q *upolyDisplayScope) numericCallerBinding() *util.NumericCallerBinding {
+func (q *upolyDisplayScope) numericCallerBinding() *unumeral.NumericCallerBinding {
 	return &q.numeric.integerBinding
 }
 func upolyDisplaySequenceCaller(z polynomialGuardOwner) *UPolynomialSequence {
@@ -188,7 +188,7 @@ func (q *UPolynomialSequence) NumericExecuting() bool {
 	return q != nil && q.self == q && q.manager != nil && q.manager.self == q.manager && q.manager.displaySequence == q && q.displaying
 }
 func (q *UPolynomialSequence) numericCallerOwner() any { return q }
-func (q *UPolynomialSequence) numericCallerBinding() *util.NumericCallerBinding {
+func (q *UPolynomialSequence) numericCallerBinding() *unumeral.NumericCallerBinding {
 	return &q.callerBinding
 }
 func factorFrontendConstantCaller(z polynomialGuardOwner) *UPolynomialFactorizationService {
@@ -216,7 +216,7 @@ func (q *upolyFactorConstantBinding) NumericExecuting() bool {
 	return q != nil && q.service != nil && q == &q.service.frontendConstant && q.service.constantCallerExecuting()
 }
 func (q *upolyFactorConstantBinding) numericCallerOwner() any { return q.service }
-func (q *upolyFactorConstantBinding) numericCallerBinding() *util.NumericCallerBinding {
+func (q *upolyFactorConstantBinding) numericCallerBinding() *unumeral.NumericCallerBinding {
 	return &q.numeric.integerBinding
 }
 func factorUnivariateCaller(z polynomialGuardOwner) *MultivariatePolynomialManager {
@@ -244,7 +244,7 @@ func (q *polynomialFactorUnivariateScope) NumericExecuting() bool {
 	return q != nil && q.owner != nil && q.owner.self == q.owner && q == &q.owner.factorUnivariate && q.invocation != 0 && (q.executing || q.finishing)
 }
 func (q *polynomialFactorUnivariateScope) numericCallerOwner() any { return q.owner }
-func (q *polynomialFactorUnivariateScope) numericCallerBinding() *util.NumericCallerBinding {
+func (q *polynomialFactorUnivariateScope) numericCallerBinding() *unumeral.NumericCallerBinding {
 	return &q.callerBinding
 }
 func factorNumeralVectorCaller(z polynomialGuardOwner) *MultivariatePolynomialManager {
@@ -272,6 +272,6 @@ func (q *polynomialFactorNumeralVectorScope) NumericExecuting() bool {
 	return q != nil && q.owner != nil && q.owner.self == q.owner && q == &q.owner.factorNumeralVector && q.invocation != 0 && (q.executing || q.finishing)
 }
 func (q *polynomialFactorNumeralVectorScope) numericCallerOwner() any { return q.owner }
-func (q *polynomialFactorNumeralVectorScope) numericCallerBinding() *util.NumericCallerBinding {
+func (q *polynomialFactorNumeralVectorScope) numericCallerBinding() *unumeral.NumericCallerBinding {
 	return &q.numeric.integerBinding
 }

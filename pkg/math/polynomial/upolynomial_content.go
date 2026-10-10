@@ -2,17 +2,17 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // gcdSpan translates raw IntegerManager.GCDMany's source traversal at actual
 // array reads. Only the final result receives mpzzp's normalized assertion;
 // per-pair modular GCD would introduce different checks/actions.
 
-func (m *UPolynomialManager) gcdSpan(v UPolynomialView, out *util.Int) error {
+func (m *UPolynomialManager) gcdSpan(v UPolynomialView, out *unumeral.Int) error {
 	return m.gcdSpanWithSourceContext(v, out, integerAllocationInvocationContext{})
 }
-func (m *UPolynomialManager) gcdSpanWithSourceContext(v UPolynomialView, out *util.Int, context integerAllocationInvocationContext) error {
+func (m *UPolynomialManager) gcdSpanWithSourceContext(v UPolynomialView, out *unumeral.Int, context integerAllocationInvocationContext) error {
 	if e := m.modular.Check(); e != nil {
 		return e
 	}
@@ -49,7 +49,7 @@ func (m *UPolynomialManager) gcdSpanWithSourceContext(v UPolynomialView, out *ut
 			return e
 		}
 		for i := uint32(2); i < v.count; i++ {
-			if util.IsOneInteger(out) {
+			if unumeral.IsOneInteger(out) {
 				break
 			}
 			next, e := m.read(v, i)
@@ -63,10 +63,10 @@ func (m *UPolynomialManager) gcdSpanWithSourceContext(v UPolynomialView, out *ut
 	}
 	return m.modular.AssertNormalized(out)
 }
-func (m *UPolynomialManager) primitiveState(v UPolynomialView, pp *upolyVectorState, cont *util.Int) error {
+func (m *UPolynomialManager) primitiveState(v UPolynomialView, pp *upolyVectorState, cont *unumeral.Int) error {
 	return m.primitiveStateWithSourceContext(v, pp, cont, integerAllocationInvocationContext{})
 }
-func (m *UPolynomialManager) primitiveStateWithSourceContext(v UPolynomialView, pp *upolyVectorState, cont *util.Int, context integerAllocationInvocationContext) error {
+func (m *UPolynomialManager) primitiveStateWithSourceContext(v UPolynomialView, pp *upolyVectorState, cont *unumeral.Int, context integerAllocationInvocationContext) error {
 	if polynomialSourceDebug && v.count == 0 {
 		return ErrUPolynomialAssertion
 	}
@@ -113,14 +113,14 @@ func (m *UPolynomialManager) primitiveStateWithSourceContext(v UPolynomialView, 
 	}
 	return m.setSize(pp, v.count)
 }
-func (m *UPolynomialManager) PrimitiveAndContentViews(v UPolynomialView, pp UPolynomial, cont *util.Int) error {
+func (m *UPolynomialManager) PrimitiveAndContentViews(v UPolynomialView, pp UPolynomial, cont *unumeral.Int) error {
 	out, e := m.descriptor(pp)
 	if e != nil {
 		return e
 	}
 	return m.primitiveState(v, &out.state, cont)
 }
-func (m *UPolynomialManager) PrimitiveAndContent(p, pp UPolynomial, cont *util.Int) error {
+func (m *UPolynomialManager) PrimitiveAndContent(p, pp UPolynomial, cont *unumeral.Int) error {
 	v, e := m.wholeView(p)
 	if e != nil {
 		return e
@@ -135,7 +135,7 @@ func (m *UPolynomialManager) primitive(v UPolynomialView, pp *upolyVectorState) 
 func (m *UPolynomialManager) primitiveWithSourceContext(v UPolynomialView, pp *upolyVectorState, context integerAllocationInvocationContext) (cause error) {
 	owner := context.factorFrontendFrame(m.config.Integer)
 	if owner == nil {
-		var cont util.Int
+		var cont unumeral.Int
 		defer m.modular.Del(&cont)
 		return m.primitiveStateWithSourceContext(v, pp, &cont, context)
 	}
@@ -184,7 +184,7 @@ func (m *UPolynomialManager) normalizeWithSourceContext(v UPolynomialView, conte
 		}
 		return m.modular.WithAllocationContext((context).utility(m.modular.Integers())).SetInt64(x, -1)
 	}
-	var legacy util.Int
+	var legacy unumeral.Int
 	g := &legacy
 	var q *upolyFactorVectorNormalizeScope
 	if context != (integerAllocationInvocationContext{}) {
@@ -216,11 +216,11 @@ func (m *UPolynomialManager) normalizeWithSourceContext(v UPolynomialView, conte
 	}
 	return nil
 }
-func (m *UPolynomialManager) normalizeCoefficient(v UPolynomialView, i uint32, g *util.Int) error {
+func (m *UPolynomialManager) normalizeCoefficient(v UPolynomialView, i uint32, g *unumeral.Int) error {
 	return m.normalizeCoefficientWithSourceContext(v, i, g, nil, integerAllocationInvocationContext{})
 }
-func (m *UPolynomialManager) normalizeCoefficientWithSourceContext(v UPolynomialView, i uint32, g *util.Int, q *upolyFactorVectorNormalizeScope, context integerAllocationInvocationContext) (cause error) {
-	var legacyOld, legacyTmp util.Int
+func (m *UPolynomialManager) normalizeCoefficientWithSourceContext(v UPolynomialView, i uint32, g *unumeral.Int, q *upolyFactorVectorNormalizeScope, context integerAllocationInvocationContext) (cause error) {
+	var legacyOld, legacyTmp unumeral.Int
 	old, tmp := &legacyOld, &legacyTmp
 	// Source Z3DEBUG lexical temporaries are destroyed tmp then old.
 	if polynomialSourceDebug {
@@ -228,7 +228,7 @@ func (m *UPolynomialManager) normalizeCoefficientWithSourceContext(v UPolynomial
 			if !q.valid() || !q.executing || q.constructed != 1 {
 				return ErrUPolynomialOwner
 			}
-			q.old = util.Int{}
+			q.old = unumeral.Int{}
 			q.constructed = 2
 			q.peak = 2
 			q.coefficientExecuting = true
@@ -254,7 +254,7 @@ func (m *UPolynomialManager) normalizeCoefficientWithSourceContext(v UPolynomial
 	}
 	if polynomialSourceDebug {
 		if q != nil {
-			q.tmp = util.Int{}
+			q.tmp = unumeral.Int{}
 			q.constructed = 3
 			q.peak = 3
 		} else {

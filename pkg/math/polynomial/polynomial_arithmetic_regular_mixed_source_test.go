@@ -4,8 +4,8 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialRegularMatchedRowsPreserveLaterForeignPositions(t *testing.T) {
@@ -47,7 +47,7 @@ func TestPolynomialRegularMatchedRowsPreserveLaterForeignPositions(t *testing.T)
 	serviceMust(t, e)
 	value, e := c.som.as.coefficient(c, 0)
 	serviceMust(t, e)
-	if term != qt || value != util.NewInt(1) {
+	if term != qt || value != unumeral.NewInt(1) {
 		t.Fatal("foreign payload", term, value)
 	}
 	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q}, nil, 0)
@@ -59,7 +59,7 @@ func TestPolynomialRegularMatchedRowsPreserveLaterForeignPositions(t *testing.T)
 func TestPolynomialRegularLaterNilAccumulatorWriteTransfersActualRowToMember(t *testing.T) {
 	full := polynomialArithmeticDirectNumericFixture(t)
 	c := full.core
-	seven, five := util.NewInt(7), util.NewInt(5)
+	seven, five := unumeral.NewInt(7), unumeral.NewInt(5)
 	p, e := c.MkConstantTakeCopy(&seven)
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
@@ -71,7 +71,7 @@ func TestPolynomialRegularLaterNilAccumulatorWriteTransfersActualRowToMember(t *
 	serviceMust(t, e)
 	before, e := c.som.as.coefficient(c, 0)
 	serviceMust(t, e)
-	if before != util.NewInt(12) {
+	if before != unumeral.NewInt(12) {
 		t.Fatal("literal later accumulator value", before)
 	}
 	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
@@ -100,11 +100,11 @@ func TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags(t *testin
 	for ordinal := int64(0); ordinal < 32; ordinal++ {
 		full := polynomialExactDivDirectPageOneFixture(t)
 		c := full.core
-		var huge util.Int
+		var huge unumeral.Int
 		words := make([]uint32, 80)
 		words[0], words[79] = 1, 1
 		serviceMust(t, c.integer.SetLimbs(&huge, words))
-		seven := util.NewInt(7)
+		seven := unumeral.NewInt(7)
 		p, e := c.MkConstantTakeCopy(&seven)
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(p))
@@ -114,7 +114,7 @@ func TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags(t *testin
 		tags := [2]uint64{c.som.coefficientOwners[0], c.som.monomialOwners[0]}
 		c.integer.Budget().FailAfter(ordinal)
 		body := c.som.add(&huge, c.monomials.unit, false)
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&huge}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*unumeral.Int{&huge}, 0)
 		if body != nil {
 			if tags != ([2]uint64{c.som.coefficientOwners[0], c.som.monomialOwners[0]}) {
 				t.Fatal("failed setter ceded old actual tokens", ordinal)
@@ -133,12 +133,12 @@ func TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags(t *testin
 			if c.integer.PendingCell != foreign || after != raw {
 				t.Fatal("old abort consumed foreign actual allocation", ordinal)
 			}
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&huge}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*unumeral.Int{&huge}, 0)
 			// The actual nil numeric call belongs to the Integer owner, not old SOM.
 			serviceMust(t, c.integer.CleanupPendingAllocation())
-			var fillers [8]util.Int
+			var fillers [8]unumeral.Int
 			fillerCount := 0
-			public := []*util.Int{&huge}
+			public := []*unumeral.Int{&huge}
 			for c.integer.Cells.Stats().Slots > c.integer.Cells.Stats().Live+c.integer.Cells.Stats().Retired {
 				if fillerCount == len(fillers) {
 					t.Fatal("bounded actual descriptor fill", ordinal)
@@ -147,7 +147,7 @@ func TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags(t *testin
 				public = append(public, &fillers[fillerCount])
 				fillerCount++
 			}
-			var later util.Int
+			var later unumeral.Int
 			public = append(public, &later)
 			c.integer.Budget().FailAfter(1)
 			replacementBody := c.integer.Copy(&later, &huge)

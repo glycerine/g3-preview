@@ -11,17 +11,17 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-var ErrUPolynomialOwner = util.ErrNumericCallerOwner
+var ErrUPolynomialOwner = unumeral.ErrNumericCallerOwner
 var ErrUPolynomialLive = errors.New("mpnum: live polynomial owners")
 var ErrUPolynomialCanceled = errors.New("mpnum: polynomial resource canceled")
-var ErrUPolynomialAssertion = util.ErrNumericCallerAssertion
+var ErrUPolynomialAssertion = unumeral.ErrNumericCallerAssertion
 var upolyOrigins atomic.Uint64
 
 type UPolynomialConfig struct {
-	Integer     *util.IntegerManager
+	Integer     *unumeral.IntegerManager
 	Checkpoint  func() bool
 	Cooperation func() error
 }
@@ -75,7 +75,7 @@ type UPolynomialManager struct {
 	self                         *UPolynomialManager
 	origin                       uint64
 	config                       UPolynomialConfig
-	modular                      *util.IntegerModularManager
+	modular                      *unumeral.IntegerModularManager
 	// Actual source members: 16 core and five derived numeral vectors.
 	basic, div1, div2, exactDiv, gcd1, gcd2, cra   upolyVectorState
 	mgcd                                           [6]upolyVectorState
@@ -109,7 +109,7 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	if e := c.Integer.Budget().Reserve(n); e != nil {
 		return nil, e
 	}
-	z, e := util.NewIntegerModularManager(c.Integer)
+	z, e := unumeral.NewIntegerModularManager(c.Integer)
 	if e != nil {
 		c.Integer.Budget().Release(n)
 		return nil, e
@@ -151,7 +151,7 @@ func (m *UPolynomialManager) check() error {
 	}
 	return nil
 }
-func (m *UPolynomialManager) IntegerManager() *util.IntegerManager {
+func (m *UPolynomialManager) IntegerManager() *unumeral.IntegerManager {
 	if m == nil || m.self != m {
 		return nil
 	}

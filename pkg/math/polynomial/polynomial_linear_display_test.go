@@ -3,11 +3,10 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"io"
 	"strings"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestLinearRationalSourceDisplaySpacingAndOrder(t *testing.T) {
@@ -15,8 +14,8 @@ func TestLinearRationalSourceDisplaySpacingAndOrder(t *testing.T) {
 	s, e := NewRationalLinearSolver(q)
 	serviceMust(t, e)
 	serviceMust(t, s.Resize(2))
-	row := [2]util.Rational{util.NewRational(), util.NewRational()}
-	rhs := util.NewRational()
+	row := [2]unumeral.Rational{unumeral.NewRational(), unumeral.NewRational()}
+	rhs := unumeral.NewRational()
 	serviceMust(t, q.SetFractionSigned(&row[0], -3, 2))
 	serviceMust(t, q.SetInt64(&row[1], 5))
 	serviceMust(t, q.SetInt64(&rhs, 7))
@@ -36,7 +35,7 @@ func TestLinearRationalSourceDisplaySpacingAndOrder(t *testing.T) {
 
 func TestLinearModularSourceDisplayUsesUnderlyingInteger(t *testing.T) {
 	q, _ := rationalManager(t, false)
-	m, e := util.NewIntegerModularManager(q.Integers())
+	m, e := unumeral.NewIntegerModularManager(q.Integers())
 	serviceMust(t, e)
 	serviceMust(t, m.SetZPUint64(7))
 	s, e := NewModularLinearSolver(m)
@@ -46,7 +45,7 @@ func TestLinearModularSourceDisplayUsesUnderlyingInteger(t *testing.T) {
 	// normalization assertion. The actual stored raw value remains unnormalized.
 	r, e := s.row(0)
 	serviceMust(t, e)
-	a := util.Int{}
+	a := unumeral.Int{}
 	serviceMust(t, q.Integers().SetInt64(&a, 9))
 	(*r)[0] = a
 	s.b[0] = a
@@ -77,9 +76,9 @@ func TestLinearSourceDisplayStoppedWriterBeforeRHSRead(t *testing.T) {
 	s, e := NewRationalLinearSolver(q)
 	serviceMust(t, e)
 	serviceMust(t, s.Resize(1))
-	a := util.NewRational()
+	a := unumeral.NewRational()
 	serviceMust(t, q.SetInt64(&a, 5))
-	serviceMust(t, s.Add(0, []util.Rational{a}, &a))
+	serviceMust(t, s.Add(0, []unumeral.Rational{a}, &a))
 	// Make the later RHS read guarded, without changing the reached row.
 	saved := s.b
 	s.b = nil

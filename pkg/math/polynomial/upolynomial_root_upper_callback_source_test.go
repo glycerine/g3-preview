@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialRootUpperBoundActualCallbackOwnerAndTupleRefusal(t *testing.T) {
@@ -101,13 +102,13 @@ func TestUPolynomialRootUpperBoundActualCallbackOwnerAndTupleRefusal(t *testing.
 			z := c.config.Rationals.Integers()
 			poly, e := p.NewPolynomial()
 			serviceMust(t, e)
-			var big util.Int
+			var big unumeral.Int
 			serviceMust(t, z.SetLimbs(&big, []uint32{1, 2, 3, 4}))
-			serviceMust(t, p.SetInts(poly, []util.Int{big, util.NewInt(1)}))
+			serviceMust(t, p.SetInts(poly, []unumeral.Int{big, unumeral.NewInt(1)}))
 			serviceMust(t, z.Del(&big))
 			v, e := p.wholeView(poly)
 			serviceMust(t, e)
-			var out util.Int
+			var out unumeral.Int
 			held, e := rt.Allocate(uint64(int64(100000) - rt.State().LocalSize - 12))
 			serviceMust(t, e)
 			serviceMust(t, rt.SetMaxSize(1))

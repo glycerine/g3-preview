@@ -2,7 +2,7 @@
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
 )
 
@@ -28,7 +28,7 @@ func TestASTArithmeticNumeralReadStoredFlagAndOrderedCopy(t *testing.T) {
 		astTestPin(t, m, h)
 		astTestMust(t, m.DelParameter(&ip))
 		astTestMust(t, m.DelParameter(&rp))
-		var call util.RationalServiceInvocation
+		var call unumeral.RationalServiceInvocation
 		integer := flag == 0
 		yes, e := m.ArithmeticNumeralValueWithInvocation(fid, h, &out, &integer, &call)
 		astTestMust(t, e)
@@ -61,7 +61,7 @@ func TestASTArithmeticNumeralReadStoredFlagAndOrderedCopy(t *testing.T) {
 	astTestPin(t, m, h)
 	astTestMust(t, q.SetInt64(&out, 3))
 	integer := false
-	var call util.RationalServiceInvocation
+	var call unumeral.RationalServiceInvocation
 	yes, e := m.ArithmeticNumeralValueWithInvocation(fid, h, &out, &integer, &call)
 	if yes || e != ErrASTDomain || integer {
 		t.Fatal("bad flag", yes, e, integer)

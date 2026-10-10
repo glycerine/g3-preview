@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func polynomialEqualNumerals(a, b []util.Int) bool {
+func polynomialEqualNumerals(a, b []unumeral.Int) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -30,19 +30,19 @@ func TestPolynomialNativeNumeralGrowthResetAndBounds(t *testing.T) {
 	for _, v := range vectors {
 		for _, n := range []uint32{4097, 0, 129, 1, 33} {
 			for i := uint32(0); i < n; i++ {
-				serviceMust(t, v.appendCoefficient(m, util.NewInt(int32(37*i)-128)))
+				serviceMust(t, v.appendCoefficient(m, unumeral.NewInt(int32(37*i)-128)))
 			}
 			for i := uint32(0); i < n; i++ {
 				got, e := v.coefficient(m, i)
 				serviceMust(t, e)
-				if got != util.NewInt(int32(37*i)-128) {
+				if got != unumeral.NewInt(int32(37*i)-128) {
 					t.Fatal("independent scalar row", i, got)
 				}
 			}
 			if _, e := v.coefficient(m, n); !errors.Is(e, arena.ErrBounds) {
 				t.Fatal("native read bounds", e)
 			}
-			if e := v.putCoefficient(m, n, util.NewInt(1)); !errors.Is(e, arena.ErrBounds) {
+			if e := v.putCoefficient(m, n, unumeral.NewInt(1)); !errors.Is(e, arena.ErrBounds) {
 				t.Fatal("native write bounds", e)
 			}
 			if e := v.publishSize(m, n+1); !errors.Is(e, arena.ErrBounds) {
@@ -67,19 +67,19 @@ func TestPolynomialNativeNumeralGrowthResetAndBounds(t *testing.T) {
 func TestPolynomialNativeNumeralResetRetainsActualBIG(t *testing.T) {
 	m := polynomialCellFixture(t)
 	v := &m.linearTerms
-	var a util.Int
+	var a unumeral.Int
 	serviceMust(t, m.integer.SetInt64(&a, 1<<40))
 	actual := a
 	m.integer.Budget().FailAfter(0)
 	before, used := m.memory.Stats(), m.integer.Budget().Used()
 	serviceMust(t, v.appendCoefficient(m, a))
-	a = util.Int{}
+	a = unumeral.Int{}
 	serviceMust(t, v.reset(m))
 	if len(v.values) != 0 || len(v.retired) != 1 || v.retired[0] != actual {
 		t.Fatal("actual discarded BIG ownership", v)
 	}
 	for i := 0; i < 4097; i++ {
-		serviceMust(t, v.appendCoefficient(m, util.NewInt(int32(i))))
+		serviceMust(t, v.appendCoefficient(m, unumeral.NewInt(int32(i))))
 	}
 	serviceMust(t, v.reset(m))
 	if len(v.retired) != 1 || v.retired[0] != actual {

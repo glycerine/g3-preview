@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -22,7 +23,7 @@ func TestUPolynomialHenselAddMulEndStopProtectsScopedAmAndPair(t *testing.T) {
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -46,17 +47,17 @@ func TestUPolynomialHenselAddMulEndStopProtectsScopedAmAndPair(t *testing.T) {
 	h.rm, e = NewRelatedUPolynomialManager(u)
 	serviceMust(t, e)
 	h.constructed = 1
-	five := util.NewInt(5)
+	five := unumeral.NewInt(5)
 	serviceMust(t, h.rm.SetZP(&five))
 	for i := uint8(2); i <= 7; i++ {
 		m, v := h.vector(i)
 		h.constructed = i
-		serviceMust(t, m.set(v, []util.Int{util.NewInt(1)}))
+		serviceMust(t, m.set(v, []unumeral.Int{unumeral.NewInt(1)}))
 	}
 	h.amConstructed = true
 	serviceMust(t, q.Integers().Copy(&h.am, &q.Integers().Two64))
 	olderAm, olderT := h.am, h.T
-	var a, c, warm util.Int
+	var a, c, warm unumeral.Int
 	digits := make([]uint32, 64)
 	digits[0], digits[63] = 17, 1
 	serviceMust(t, q.Integers().SetLimbs(&c, digits))
@@ -64,9 +65,9 @@ func TestUPolynomialHenselAddMulEndStopProtectsScopedAmAndPair(t *testing.T) {
 	product[0], product[63] = 34, 2
 	serviceMust(t, q.Integers().SetLimbs(&a, product))
 	serviceMust(t, q.Integers().Neg(&a))
-	prime := util.NewInt(251)
+	prime := unumeral.NewInt(251)
 	serviceMust(t, q.Integers().Rem(&c, &prime, &warm))
-	d, two := util.NewInt(9), util.NewInt(2)
+	d, two := unumeral.NewInt(9), unumeral.NewInt(2)
 	external, e := rt.Allocate(200000)
 	serviceMust(t, e)
 	contextTLSNearMinimum(t, rt)
@@ -77,7 +78,7 @@ func TestUPolynomialHenselAddMulEndStopProtectsScopedAmAndPair(t *testing.T) {
 	context := numericIntegerModularManager_henselPairAllocationContext(u.modular, &r)
 	body := q.Integers().WithAllocationContext((context).utility(q.Integers())).AddMulTracked(&a, &two, &c, &d, &h.addMul)
 	firstCause := q.Integers().AddMulInvocationSourceCause(&h.addMul)
-	if firstCause == nil || h.addMul.Frame.Stage != 3 || d != util.NewInt(0) {
+	if firstCause == nil || h.addMul.Frame.Stage != 3 || d != unumeral.NewInt(0) {
 		t.Fatal("actual successful body/end DEL stop", body, firstCause, d)
 	}
 	primeTrialPhysicalAuditExtra(t, q, s, &a, &c, &warm, &d)
@@ -101,7 +102,7 @@ func TestUPolynomialHenselAddMulEndStopProtectsScopedAmAndPair(t *testing.T) {
 	}()
 	contextTLSFinish(t, rt, func() error { return s.cleanupHenselPairInvocation(&r, false) })
 	contextTLSFinish(t, rt, func() error { return s.cleanupHenselPairInvocation(&r, true) })
-	for _, n := range []*util.Int{&a, &c, &warm, &d} {
+	for _, n := range []*unumeral.Int{&a, &c, &warm, &d} {
 		contextTLSFinish(t, rt, func() error { return q.Integers().Del(n) })
 	}
 	if s.henselPairInvocationSourceCause(&r) != firstCause || !errors.Is(stop, arena.ErrBounds) {

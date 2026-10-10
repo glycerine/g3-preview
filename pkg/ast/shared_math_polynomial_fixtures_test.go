@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyPhysicalExtraOwners struct {
@@ -18,14 +19,14 @@ type upolyPhysicalExtraOwners struct {
 	DebugContexts        []*util.DebugContext
 	ParamsRationalValues []paramsPhysicalRationalOwner
 	ParamsValues         []paramsPhysicalValueOwner
-	RationalServices     []*util.RationalService
+	RationalServices     []*unumeral.RationalService
 	SexprManagers        []*util.SexprManager
 	Services             []*polynomial.UPolynomialFactorizationService
-	Integers             []*util.Int
-	Rationals            []*util.Rational
-	RationalManagers     []*util.RationalManager
-	BinaryValues         []*util.BinaryRational
-	BinaryManagers       []*util.BinaryRationalManager
+	Integers             []*unumeral.Int
+	Rationals            []*unumeral.Rational
+	RationalManagers     []*unumeral.RationalManager
+	BinaryValues         []*unumeral.BinaryRational
+	BinaryManagers       []*unumeral.BinaryRationalManager
 	BinaryVectors        []*polynomial.BinaryRationalVector
 	Sequences            []*polynomial.UPolynomialSequence
 }
@@ -633,12 +634,12 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 		}
 		for _, owner := range x.ParamsRationalValues {
 			if owner.Service == nil || owner.Value == nil {
-				panic(util.ErrRationalServiceOwner)
+				panic(unumeral.ErrRationalServiceOwner)
 			}
 			service := reflect.ValueOf(owner.Service).Elem()
 			value := reflect.ValueOf(owner.Value).Elem()
 			if testFieldBySourceName(service, "self").Pointer() != reflect.ValueOf(owner.Service).Pointer() || testFieldBySourceName(value, "ownerID").Uint() == 0 || testFieldBySourceName(value, "ownerID").Uint() != testFieldBySourceName(service, "ownerID").Uint() {
-				panic(util.ErrRationalServiceOwner)
+				panic(unumeral.ErrRationalServiceOwner)
 			}
 			addRat(testFieldBySourceName(value, "raw"))
 		}
@@ -659,7 +660,7 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 					}
 					raw := reflect.ValueOf(&frame.Next.Rat).Elem()
 					if testFieldBySourceName(raw, "ownerID").Uint() != testFieldBySourceName(reflect.ValueOf(c.NumeralsField).Elem(), "ownerID").Uint() {
-						panic(util.ErrRationalServiceOwner)
+						panic(unumeral.ErrRationalServiceOwner)
 					}
 					addRat(testFieldBySourceName(raw, "raw"))
 				}

@@ -6,8 +6,9 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // These concrete call-local pointers borrow actual polynomial payload fields.
@@ -66,24 +67,24 @@ func (v polynomialCoefficientPointer) address(i uint32) (uint64, error) {
 	}
 	return 12 + j*12, nil
 }
-func (v polynomialCoefficientPointer) read(i uint32) (util.Int, error) {
+func (v polynomialCoefficientPointer) read(i uint32) (unumeral.Int, error) {
 	o, e := v.address(i)
 	if e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	a := v.core.monomials.allocator
 	val, e := a.ReadUint32(v.raw, o)
 	if e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	lo, e := a.ReadUint32(v.raw, o+4)
 	if e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	hi, e := a.ReadUint32(v.raw, o+8)
-	return util.IntFromNativeWords([3]uint32{uint32(val), uint32(uint64(lo) | uint64(hi)<<32), uint32(uint64(uint64(lo)|uint64(hi)<<32) >> 32)}), e
+	return unumeral.IntFromNativeWords([3]uint32{uint32(val), uint32(uint64(lo) | uint64(hi)<<32), uint32(uint64(uint64(lo)|uint64(hi)<<32) >> 32)}), e
 }
-func (v polynomialCoefficientPointer) write(i uint32, x util.Int) error {
+func (v polynomialCoefficientPointer) write(i uint32, x unumeral.Int) error {
 	o, e := v.address(i)
 	if e != nil {
 		return e

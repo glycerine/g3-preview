@@ -11,7 +11,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -22,8 +23,8 @@ type astBVNumeralFrame struct {
 	owner                             *astBitVectorPluginOwner
 	next                              *astBVNumeralFrame
 	normalizationChild                astBVNormalizationReceipt
-	children                          [13]util.RationalServiceInvocation
-	values                            [8]util.OwnedRational // utility p[0], power, mod, p0, ps[0]
+	children                          [13]unumeral.RationalServiceInvocation
+	values                            [8]unumeral.OwnedRational // utility p[0], power, mod, p0, ps[0]
 	placed, complete, consumed        [8]bool
 	header, invocation                uint64
 	sourceDone, ownDone, retired      bool
@@ -266,7 +267,7 @@ func (m *ASTManager) beginBVNumeralFrame() (*astBVNumeralFrame, error) {
 	p.numeralFrames = f
 	return f, nil
 }
-func (f *astBVNumeralFrame) copyConstruct(i int, src *util.OwnedRational) error {
+func (f *astBVNumeralFrame) copyConstruct(i int, src *unumeral.OwnedRational) error {
 	q := f.owner.owner.numerals
 	v, e := q.NewValue()
 	if e != nil {
@@ -281,14 +282,14 @@ func (f *astBVNumeralFrame) copyConstruct(i int, src *util.OwnedRational) error 
 	return nil
 }
 
-func (m *ASTManager) mkBitVectorNumeral(value *util.OwnedRational, bits uint32) (astNodeRef, error) {
+func (m *ASTManager) mkBitVectorNumeral(value *unumeral.OwnedRational, bits uint32) (astNodeRef, error) {
 	return m.mkBitVectorNumeralCaptured(value, bits, nil)
 }
-func (m *ASTManager) mkBitVectorNumeralCaptured(value *util.OwnedRational, bits uint32, receipt *astBVNormalizationReceipt) (node astNodeRef, result error) {
+func (m *ASTManager) mkBitVectorNumeralCaptured(value *unumeral.OwnedRational, bits uint32, receipt *astBVNormalizationReceipt) (node astNodeRef, result error) {
 	return m.mkBitVectorNumeralInput(value, bits, receipt, false)
 }
 
-func (m *ASTManager) mkBitVectorNumeralInput(value *util.OwnedRational, bits uint32, receipt *astBVNormalizationReceipt, zero bool) (node astNodeRef, result error) {
+func (m *ASTManager) mkBitVectorNumeralInput(value *unumeral.OwnedRational, bits uint32, receipt *astBVNormalizationReceipt, zero bool) (node astNodeRef, result error) {
 	f, e := m.beginBVNumeralFrame()
 	if e != nil {
 		return node, e
@@ -368,7 +369,7 @@ func (f *astBVNumeralFrame) finishNumeral(result *error, receipt *astBVNormaliza
 	}
 }
 
-func (m *ASTManager) bitVectorNumeralDeclCore(f *astBVNumeralFrame, value *util.OwnedRational, bits uint32) (astNodeRef, error) {
+func (m *ASTManager) bitVectorNumeralDeclCore(f *astBVNumeralFrame, value *unumeral.OwnedRational, bits uint32) (astNodeRef, error) {
 	var e error
 	// The inner plugin checks parameter kinds/count before unsigned width.
 	if bits == 0 {
@@ -419,7 +420,7 @@ func (m *ASTManager) bitVectorNumeralDeclCore(f *astBVNumeralFrame, value *util.
 	return decl, nil
 }
 
-func (m *ASTManager) BitVectorNumeral(value *util.OwnedRational, bits uint32) (ASTHandle, error) {
+func (m *ASTManager) BitVectorNumeral(value *unumeral.OwnedRational, bits uint32) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}
@@ -430,10 +431,10 @@ func (m *ASTManager) BitVectorNumeral(value *util.OwnedRational, bits uint32) (A
 	return m.external(r), e
 }
 
-func (m *ASTManager) readBitVectorNumeral(r astNodeRef, out *util.OwnedRational, width *uint32) (bool, error) {
+func (m *ASTManager) readBitVectorNumeral(r astNodeRef, out *unumeral.OwnedRational, width *uint32) (bool, error) {
 	return m.readBitVectorNumeralWithInvocation(r, out, width, nil)
 }
-func (m *ASTManager) readBitVectorNumeralWithInvocation(r astNodeRef, out *util.OwnedRational, width *uint32, invocation *util.RationalServiceInvocation) (bool, error) {
+func (m *ASTManager) readBitVectorNumeralWithInvocation(r astNodeRef, out *unumeral.OwnedRational, width *uint32, invocation *unumeral.RationalServiceInvocation) (bool, error) {
 	if e := m.validNode(r); e != nil {
 		return false, e
 	}
@@ -486,7 +487,7 @@ func (m *ASTManager) readBitVectorNumeralWithInvocation(r astNodeRef, out *util.
 	*width = uint32(value.integer)
 	return true, nil
 }
-func (m *ASTManager) BitVectorNumeralValue(h ASTHandle, out *util.OwnedRational, width *uint32) (bool, error) {
+func (m *ASTManager) BitVectorNumeralValue(h ASTHandle, out *unumeral.OwnedRational, width *uint32) (bool, error) {
 	if e := m.lock(); e != nil {
 		return false, e
 	}

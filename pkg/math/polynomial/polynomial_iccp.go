@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // One concrete lexical invocation, with native unsigned scratch and the ci
@@ -127,7 +127,7 @@ func (m *MultivariatePolynomialManager) flipLeadingSignWithReceipt(p *polynomial
 	}
 	return p.assign(c, q)
 }
-func (m *MultivariatePolynomialManager) IntegerContentPrimitiveParts(p Polynomial, x uint32, i *util.Int, c, pp *PolynomialRef) error {
+func (m *MultivariatePolynomialManager) IntegerContentPrimitiveParts(p Polynomial, x uint32, i *unumeral.Int, c, pp *PolynomialRef) error {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -142,10 +142,10 @@ func (m *MultivariatePolynomialManager) IntegerContentPrimitiveParts(p Polynomia
 	}
 	return m.iccpParts(p, x, i, &c.root, &pp.root)
 }
-func (m *MultivariatePolynomialManager) iccpParts(p Polynomial, x uint32, i *util.Int, c, pp *polynomialReference) error {
+func (m *MultivariatePolynomialManager) iccpParts(p Polynomial, x uint32, i *unumeral.Int, c, pp *polynomialReference) error {
 	return m.iccpPartsWithReceipt(p, x, i, c, pp, nil)
 }
-func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uint32, i *util.Int, c, pp *polynomialReference, receipt *polynomialICCPInvocationReceipt) (err error) {
+func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uint32, i *unumeral.Int, c, pp *polynomialReference, receipt *polynomialICCPInvocationReceipt) (err error) {
 	core := m.core
 	zero, e := core.IsZero(p)
 	if e != nil {

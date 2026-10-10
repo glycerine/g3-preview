@@ -3,15 +3,15 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	// The native monomial slice borrows handles; numeral elements own their values.
 	// orphans retains only newly created zero-reference monomials for owning abort.
 )
 
 type polynomialGlobalConversionScope struct {
 	ms                                   []Monomial
-	as                                   util.ScopedIntegerModularBuffer128
+	as                                   unumeral.ScopedIntegerModularBuffer128
 	orphans                              []Monomial
 	result                               Polynomial
 	monomialRaw                          [3]umemory.Block
@@ -69,7 +69,7 @@ func ConvertPolynomial(sm *MultivariatePolynomialManager, p Polynomial, tm *Mult
 			}
 		}
 		s.ms = append(s.ms, term)
-		zero := util.Int{}
+		zero := unumeral.Int{}
 		if e = s.as.Push(&zero); e != nil {
 			return Polynomial{}, e
 		}
@@ -110,13 +110,13 @@ func (m *MultivariatePolynomialManager) conversionHasOrphans() bool {
 	}
 	return false
 }
-func (m *MultivariatePolynomialManager) conversionSet(i uint32, source *util.IntegerManager, v *util.Int) (err error) {
+func (m *MultivariatePolynomialManager) conversionSet(i uint32, source *unumeral.IntegerManager, v *unumeral.Int) (err error) {
 	b := &m.conversion.as
 	a, e := b.Physical(i)
 	if e != nil {
 		return e
 	}
-	before, e := util.CaptureNumericAllocationRoots(m.core.integer)
+	before, e := unumeral.CaptureNumericAllocationRoots(m.core.integer)
 	if e != nil {
 		return e
 	}

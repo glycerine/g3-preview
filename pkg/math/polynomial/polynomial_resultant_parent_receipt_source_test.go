@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialResultantReceiptRejectsCopiedActualFrame(t *testing.T) {
@@ -15,7 +14,7 @@ func TestPolynomialResultantReceiptRejectsCopiedActualFrame(t *testing.T) {
 		c := m.core
 		_, e := c.monomials.MkVar()
 		serviceMust(t, e)
-		var leading util.Int
+		var leading unumeral.Int
 		words := make([]uint32, 64)
 		words[0], words[63] = 7, 1
 		serviceMust(t, c.integer.SetLimbs(&leading, words))
@@ -23,7 +22,7 @@ func TestPolynomialResultantReceiptRejectsCopiedActualFrame(t *testing.T) {
 		serviceMust(t, e)
 		unit, e := c.monomials.MkMonomial(nil)
 		serviceMust(t, e)
-		p, e := c.MkTerms([]util.Int{leading, util.NewInt(1)}, []Monomial{x2, unit})
+		p, e := c.MkTerms([]unumeral.Int{leading, unumeral.NewInt(1)}, []Monomial{x2, unit})
 		serviceMust(t, e)
 		p = polynomialCaller(t, c, p)
 		q, e := m.Derivative(p, 0)
@@ -71,7 +70,7 @@ func TestPolynomialResultantReceiptRejectsCopiedActualFrame(t *testing.T) {
 			if pInfo != pAfter || qInfo != qAfter {
 				t.Fatal("copied cleanup changed known caller payload/refcounts")
 			}
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, q, r.root.value, r.root.incoming}, []*util.Int{&leading}, r.header)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, q, r.root.value, r.root.incoming}, []*unumeral.Int{&leading}, r.header)
 		}
 		m.originalBudget.FailAfter(-1)
 		serviceMust(t, m.CleanupGCD())

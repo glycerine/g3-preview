@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type UPolynomialFactors struct {
@@ -17,7 +17,7 @@ type UPolynomialFactors struct {
 	factors                   []upolyVectorState
 	count                     uint32
 	degrees                   []uint32
-	constant                  util.Int
+	constant                  unumeral.Int
 	totalFactors, totalDegree uint32
 	header                    uint64
 	closed                    bool
@@ -117,7 +117,7 @@ func (fs *UPolynomialFactors) Manager() (*UPolynomialManager, error) {
 	}
 	return fs.manager, nil
 }
-func (fs *UPolynomialFactors) NumeralManager() (*util.IntegerModularManager, error) {
+func (fs *UPolynomialFactors) NumeralManager() (*unumeral.IntegerModularManager, error) {
 	if e := fs.check(); e != nil {
 		return nil, e
 	}
@@ -146,16 +146,16 @@ func (fs *UPolynomialFactors) Multiplicity(index uint32) (uint32, error) {
 }
 
 // ConstantCopy is an owned-copy adaptation of the borrowed source accessor.
-func (fs *UPolynomialFactors) ConstantCopy(out *util.Int) error {
+func (fs *UPolynomialFactors) ConstantCopy(out *unumeral.Int) error {
 	if e := fs.check(); e != nil {
 		return e
 	}
 	return fs.manager.modular.Copy(out, &fs.constant)
 }
-func (fs *UPolynomialFactors) SetConstant(value *util.Int) error {
+func (fs *UPolynomialFactors) SetConstant(value *unumeral.Int) error {
 	return fs.setConstantWithSourceContext(value, integerAllocationInvocationContext{})
 }
-func (fs *UPolynomialFactors) setConstantWithSourceContext(value *util.Int, context integerAllocationInvocationContext) error {
+func (fs *UPolynomialFactors) setConstantWithSourceContext(value *unumeral.Int, context integerAllocationInvocationContext) error {
 	if e := fs.check(); e != nil {
 		return e
 	}

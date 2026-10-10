@@ -3,10 +3,10 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (s *UPolynomialFactorizationService) checkHenselPair(C UPolynomialView, a, b, r *util.Int, A, B, Al, Bl UPolynomialView, receipt *upolyHenselPairInvocationReceipt) (ok bool, failure error) {
+func (s *UPolynomialFactorizationService) checkHenselPair(C UPolynomialView, a, b, r *unumeral.Int, A, B, Al, Bl UPolynomialView, receipt *upolyHenselPairInvocationReceipt) (ok bool, failure error) {
 	m := s.manager
 	h := receipt.frame
 	c := &h.check
@@ -161,10 +161,10 @@ func (s *UPolynomialFactorizationService) checkHenselFactorsWithCaller(f UPolyno
 	if err != nil {
 		return false, err
 	}
-	var localPower util.Int
+	var localPower unumeral.Int
 	power := &localPower
 	context := integerAllocationInvocationContext{}
-	var receipt *util.IntegerPowerInvocationReceipt
+	var receipt *unumeral.IntegerPowerInvocationReceipt
 	if caller == nil {
 		defer m.config.Integer.Del(power)
 	} else {

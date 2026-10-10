@@ -5,20 +5,20 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // ModularLinearSolver borrows its number-field manager. Matrix/RHS values live only in
 // native Go slices. Returned observation values are nonowning scalar projections.
 type ModularLinearSolver struct {
 	self    *ModularLinearSolver
-	manager *util.IntegerModularManager
+	manager *unumeral.IntegerModularManager
 	linearStorage
-	A [][]util.Int
-	b []util.Int
+	A [][]unumeral.Int
+	b []unumeral.Int
 }
 
-func modularLinearConstructorGuard(m *util.IntegerModularManager) error {
+func modularLinearConstructorGuard(m *unumeral.IntegerModularManager) error {
 	if e := m.Check(); e != nil {
 		return e
 	}
@@ -33,18 +33,18 @@ func modularLinearConstructorGuard(m *util.IntegerModularManager) error {
 	}
 	return nil
 }
-func (s *ModularLinearSolver) initializeDefault(m *util.IntegerModularManager, header uint64) {
+func (s *ModularLinearSolver) initializeDefault(m *unumeral.IntegerModularManager, header uint64) {
 	*s = ModularLinearSolver{manager: m, linearStorage: linearStorage{integer: m.Integers(), header: header}}
 	s.self = s
 }
-func (s *ModularLinearSolver) constructDefault(m *util.IntegerModularManager) error {
+func (s *ModularLinearSolver) constructDefault(m *unumeral.IntegerModularManager) error {
 	if e := modularLinearConstructorGuard(m); e != nil {
 		return e
 	}
 	s.initializeDefault(m, 0)
 	return nil
 }
-func NewModularLinearSolver(m *util.IntegerModularManager) (*ModularLinearSolver, error) {
+func NewModularLinearSolver(m *unumeral.IntegerModularManager) (*ModularLinearSolver, error) {
 	if e := modularLinearConstructorGuard(m); e != nil {
 		return nil, e
 	}
@@ -74,7 +74,7 @@ func (s *ModularLinearSolver) open() error {
 	}
 	return nil
 }
-func (s *ModularLinearSolver) row(i uint32) (*[]util.Int, error) {
+func (s *ModularLinearSolver) row(i uint32) (*[]unumeral.Int, error) {
 	if uint64(i) >= uint64(len(s.A)) {
 		if polynomialSourceDebug {
 			return nil, ErrPolynomialAssertion
@@ -93,51 +93,51 @@ func (s *ModularLinearSolver) swapRows(i, j uint32) error {
 	s.A[i], s.A[j] = s.A[j], s.A[i]
 	return nil
 }
-func (s *ModularLinearSolver) load(v *[]util.Int, i uint32) (util.Int, error) {
+func (s *ModularLinearSolver) load(v *[]unumeral.Int, i uint32) (unumeral.Int, error) {
 	if uint64(i) >= uint64(len(*v)) {
 		if polynomialSourceDebug {
-			return util.Int{}, ErrPolynomialAssertion
+			return unumeral.Int{}, ErrPolynomialAssertion
 		}
-		return util.Int{}, arena.ErrBounds
+		return unumeral.Int{}, arena.ErrBounds
 	}
 	return (*v)[i], nil
 }
-func (s *ModularLinearSolver) copyInto(v *[]util.Int, i uint32, a *util.Int) error {
+func (s *ModularLinearSolver) copyInto(v *[]unumeral.Int, i uint32, a *unumeral.Int) error {
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
 	return s.manager.Copy(&(*v)[i], a)
 }
-func (s *ModularLinearSolver) setInto(v *[]util.Int, i uint32, value int64) error {
+func (s *ModularLinearSolver) setInto(v *[]unumeral.Int, i uint32, value int64) error {
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
 	return s.manager.SetInt64(&(*v)[i], value)
 }
-func (s *ModularLinearSolver) divideInto(v *[]util.Int, i uint32, divisor *util.Int) error {
+func (s *ModularLinearSolver) divideInto(v *[]unumeral.Int, i uint32, divisor *unumeral.Int) error {
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
 	return s.manager.Div(&(*v)[i], divisor, &(*v)[i])
 }
-func (s *ModularLinearSolver) submulInto(v *[]util.Int, i uint32, b, c *util.Int) error {
+func (s *ModularLinearSolver) submulInto(v *[]unumeral.Int, i uint32, b, c *unumeral.Int) error {
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
 	return s.manager.SubMul(&(*v)[i], b, c, &(*v)[i])
 }
-func (s *ModularLinearSolver) deleteInto(v *[]util.Int, i uint32, owning bool) error {
+func (s *ModularLinearSolver) deleteInto(v *[]unumeral.Int, i uint32, owning bool) error {
 	if uint64(i) >= uint64(len(*v)) {
 		return arena.ErrBounds
 	}
 	if owning {
 		return s.manager.Del(&(*v)[i])
 	}
-	return util.SourceIntegerDel(s.integer, &(*v)[i])
+	return unumeral.SourceIntegerDel(s.integer, &(*v)[i])
 }
-func (s *ModularLinearSolver) RightHandSide(i uint32) (util.Int, error) {
+func (s *ModularLinearSolver) RightHandSide(i uint32) (unumeral.Int, error) {
 	if e := s.open(); e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	return s.load(&s.b, i)
 }
@@ -152,10 +152,10 @@ func (s *ModularLinearSolver) Resize(n uint32) error {
 		return e
 	}
 	s.n = n
-	s.A = make([][]util.Int, n)
-	s.b = make([]util.Int, n)
+	s.A = make([][]unumeral.Int, n)
+	s.b = make([]unumeral.Int, n)
 	for i := range s.A {
-		s.A[i] = make([]util.Int, n)
+		s.A[i] = make([]unumeral.Int, n)
 	}
 	return nil
 }
@@ -179,7 +179,7 @@ func (s *ModularLinearSolver) Reset() error {
 	}
 	return nil
 }
-func (s *ModularLinearSolver) Add(i uint32, as []util.Int, b *util.Int) error {
+func (s *ModularLinearSolver) Add(i uint32, as []unumeral.Int, b *unumeral.Int) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -203,7 +203,7 @@ func (s *ModularLinearSolver) Add(i uint32, as []util.Int, b *util.Int) error {
 	}
 	return nil
 }
-func (s *ModularLinearSolver) Solve(xs []util.Int) (bool, error) {
+func (s *ModularLinearSolver) Solve(xs []unumeral.Int) (bool, error) {
 	if e := s.open(); e != nil {
 		return false, e
 	}

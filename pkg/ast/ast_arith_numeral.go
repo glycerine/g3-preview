@@ -6,7 +6,8 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -16,8 +17,8 @@ type astArithNumeralFrame struct {
 	invocation                           uint64
 	ownDone                              bool
 	bodyCause                            error
-	value                                util.OwnedRational
-	copy                                 util.RationalServiceInvocation
+	value                                unumeral.OwnedRational
+	copy                                 unumeral.RationalServiceInvocation
 	active, placed, complete, sourceDone bool
 	sourceCause                          error
 }
@@ -59,11 +60,11 @@ func (f *astArithNumeralFrame) destroy(m *ASTManager, own bool) error {
 	return nil
 }
 
-func (m *ASTManager) mkArithmeticNumeral(value *util.OwnedRational, integer bool, zero bool) (result astNodeRef, err error) {
+func (m *ASTManager) mkArithmeticNumeral(value *unumeral.OwnedRational, integer bool, zero bool) (result astNodeRef, err error) {
 	return m.mkArithmeticNumeralCaptured(value, integer, zero, nil)
 }
 
-func (m *ASTManager) mkArithmeticNumeralCaptured(value *util.OwnedRational, integer bool, zero bool, call *ASTArithmeticNumeralInvocation) (result astNodeRef, err error) {
+func (m *ASTManager) mkArithmeticNumeralCaptured(value *unumeral.OwnedRational, integer bool, zero bool, call *ASTArithmeticNumeralInvocation) (result astNodeRef, err error) {
 	p := m.arithmeticPlugin
 	if p == nil || !p.published {
 		return result, ErrASTHandle
@@ -172,7 +173,7 @@ func (m *ASTManager) mkArithmeticNumeralCaptured(value *util.OwnedRational, inte
 	return result, nil
 }
 
-func (m *ASTManager) ArithmeticNumeral(value *util.OwnedRational, integer bool) (ASTHandle, error) {
+func (m *ASTManager) ArithmeticNumeral(value *unumeral.OwnedRational, integer bool) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}

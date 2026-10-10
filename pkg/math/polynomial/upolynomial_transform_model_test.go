@@ -4,21 +4,21 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialFullTransformFiniteOracles(t *testing.T) {
 	m, q, _ := upolySourceOwner(t)
 	p := upolySourceNew(t, m, []int32{1, 2, 3})
 	out := upolySourceNew(t, m, nil)
-	b := util.NewBinaryIntPower(1, 1)
-	r := util.NewRational()
+	b := unumeral.NewBinaryIntPower(1, 1)
+	r := unumeral.NewRational()
 	if e := q.SetFraction(&r, 1, 3); e != nil {
 		t.Fatal(e)
 	}
 	defer q.Del(&r)
-	c := util.NewInt(2)
-	three := util.NewInt(3)
+	c := unumeral.NewInt(2)
+	three := unumeral.NewInt(3)
 	for _, f := range []struct {
 		name string
 		call func(UPolynomialView) error
@@ -80,7 +80,7 @@ func TestUPolynomialRootCountBoundsSourceBranches(t *testing.T) {
 	if e != nil || bound != 0 {
 		t.Fatal(bound, e)
 	}
-	var upper util.Int
+	var upper unumeral.Int
 	if e = m.RootUpperBound(mustUPolyView(t, m, p), &upper); e != nil {
 		t.Fatal(e)
 	}
@@ -113,7 +113,7 @@ func TestUPolynomialRootCountBoundsSourceBranches(t *testing.T) {
 		t.Fatal(e)
 	}
 	upolyGCDExpect(t, m, out, []int64{6, -3})
-	diagnostics, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}}})
+	diagnostics, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -122,7 +122,7 @@ func TestUPolynomialRootCountBoundsSourceBranches(t *testing.T) {
 			t.Error(e)
 		}
 	}()
-	bqm, e := util.NewBinaryRationalManager(q.Integers(), util.BinaryRationalConfig{Diagnostics: diagnostics})
+	bqm, e := unumeral.NewBinaryRationalManager(q.Integers(), unumeral.BinaryRationalConfig{Diagnostics: diagnostics})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -131,7 +131,7 @@ func TestUPolynomialRootCountBoundsSourceBranches(t *testing.T) {
 		a, b int32
 		want uint32
 	}{{0, 1, 0}, {1, 2, 1}, {-2, -1, 1}, {-2, 2, 2}, {-1, 1, 0}} {
-		a, binaryB := util.NewBinaryInt(f.a), util.NewBinaryInt(f.b)
+		a, binaryB := unumeral.NewBinaryInt(f.a), unumeral.NewBinaryInt(f.b)
 		count, e := m.DescartesBoundInterval(mustUPolyView(t, m, p), bqm, &a, &binaryB)
 		if e != nil || count != f.want {
 			t.Fatal(f, count, e)

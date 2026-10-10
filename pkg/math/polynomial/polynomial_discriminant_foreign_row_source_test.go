@@ -4,9 +4,8 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialDiscriminantYoungerRefCallbackForeignRowSurvivesExactAbort(t *testing.T) {
@@ -33,7 +32,7 @@ func TestPolynomialDiscriminantYoungerRefCallbackForeignRowSurvivesExactAbort(t 
 		if e != nil {
 			return e
 		}
-		seven := util.NewInt(7)
+		seven := unumeral.NewInt(7)
 		if e = core.cheap.add(&seven, foreign, false); e != nil {
 			return e
 		}
@@ -51,7 +50,7 @@ func TestPolynomialDiscriminantYoungerRefCallbackForeignRowSurvivesExactAbort(t 
 		t.Fatal("actual younger reference stop", calls, returned, stopped)
 	}
 	audit := func() {
-		polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, out.root.value, m.discriminant.refs[0].value, m.discriminant.refs[1].value}, []*util.Int{&m.discriminant.lc}, out.header+h.header)
+		polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, out.root.value, m.discriminant.refs[0].value, m.discriminant.refs[1].value}, []*unumeral.Int{&m.discriminant.lc}, out.header+h.header)
 	}
 	audit()
 	c.integer.Budget().FailAfter(-1)
@@ -68,7 +67,7 @@ func TestPolynomialDiscriminantYoungerRefCallbackForeignRowSurvivesExactAbort(t 
 	serviceMust(t, e)
 	term, e := c.cheap.ms.monomial(c, 0)
 	serviceMust(t, e)
-	if a != util.NewInt(7) || term != foreign {
+	if a != unumeral.NewInt(7) || term != foreign {
 		t.Fatal("foreign row value/identity changed", a, term, foreign)
 	}
 	if m.DiscriminantSourceCause() != stopped || !errors.Is(returned, stopped) {

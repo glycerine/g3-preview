@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -17,7 +18,7 @@ func TestParamsReferenceSetRatAppendRefusalRetainsActualLocal(t *testing.T) {
 	bs := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -42,7 +43,7 @@ func TestParamsReferenceSetRatAppendRefusalRetainsActualLocal(t *testing.T) {
 	paramsMust(t, e)
 	// Separate efficient fixture: public source digit setter and scoped copy.
 	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -65,7 +66,7 @@ func TestParamsReferenceSetRatAppendRefusalRetainsActualLocal(t *testing.T) {
 	paramsMust(t, e)
 	token := v
 	size := c.Blocks[v.Slot-1].Size
-	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &big}}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &big}}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
 	beforeRoots := numericAuditPhysical(t, m, extras)
 	bc.FailAfter(0)
 	e = c.SetRat(&v, k, &big)
@@ -132,7 +133,7 @@ func TestParamsReferenceSetRatOwningAbortActualConsumedLeaf(t *testing.T) {
 	bs := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -157,7 +158,7 @@ func TestParamsReferenceSetRatOwningAbortActualConsumedLeaf(t *testing.T) {
 	paramsMust(t, e)
 	// Separate efficient fixture: public source digit setter and scoped copy.
 	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -180,7 +181,7 @@ func TestParamsReferenceSetRatOwningAbortActualConsumedLeaf(t *testing.T) {
 	paramsMust(t, e)
 	token := v
 	size := c.Blocks[v.Slot-1].Size
-	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &big}}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &big}}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
 	beforeRoots := numericAuditPhysical(t, m, extras)
 	bc.FailAfter(0)
 	if e = c.SetRat(&v, k, &big); !errors.Is(e, arena.ErrInjectedFailure) {
@@ -230,7 +231,7 @@ func TestParamsReferenceSetRatIndependentLocalsAndDeadDestination(t *testing.T) 
 	bs := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -255,7 +256,7 @@ func TestParamsReferenceSetRatIndependentLocalsAndDeadDestination(t *testing.T) 
 	paramsMust(t, e)
 	// Separate efficient fixture: public source digit setter and scoped copy.
 	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -278,7 +279,7 @@ func TestParamsReferenceSetRatIndependentLocalsAndDeadDestination(t *testing.T) 
 	paramsMust(t, e)
 	token := v
 	size := c.Blocks[v.Slot-1].Size
-	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &big}}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &big}}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
 	beforeRoots := numericAuditPhysical(t, m, extras)
 	w, e := c.NewValue()
 	paramsMust(t, e)
@@ -353,7 +354,7 @@ func TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes(t *testing.T) {
 					bs := arena.NewBudget(1 << 24)
 					r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 					paramsMust(t, e)
-					q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+					q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 					paramsMust(t, e)
 					sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 					paramsMust(t, e)
@@ -378,7 +379,7 @@ func TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes(t *testing.T) {
 					paramsMust(t, e)
 					// Separate efficient fixture: public source digit setter and scoped copy.
 					// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-					scoped, e := NewScopedInt(m)
+					scoped, e := unumeral.NewScopedInt(m)
 					paramsMust(t, e)
 					num, e := scoped.Get()
 					paramsMust(t, e)
@@ -401,7 +402,7 @@ func TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes(t *testing.T) {
 					paramsMust(t, e)
 					token := v
 					size := c.Blocks[v.Slot-1].Size
-					extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &big}}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+					extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &big}}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
 					beforeRoots := numericAuditPhysical(t, m, extras)
 					if route == "copy" {
 						bn.FailAfter(int64(fault))

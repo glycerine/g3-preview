@@ -7,10 +7,10 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (c integerAllocationInvocationContext) prepareFactorHistory(z *util.IntegerManager) error {
+func (c integerAllocationInvocationContext) prepareFactorHistory(z *unumeral.IntegerManager) error {
 	if q := c.oneHalfRootFrame(z); q != nil {
 		return q.prepareHistory()
 	}
@@ -70,7 +70,7 @@ func (f *PolynomialFactors) updateFactorMemberSetHistory() {
 	}
 }
 
-func prepareConverterParentHistory(z *util.IntegerManager, r *polynomialFactorNumeralVectorReceipt) error {
+func prepareConverterParentHistory(z *unumeral.IntegerManager, r *polynomialFactorNumeralVectorReceipt) error {
 	if r.manager == nil {
 		return nil
 	}

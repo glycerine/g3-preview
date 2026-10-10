@@ -2,14 +2,13 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialMulAddZeroLeavesRightUnread(t *testing.T) {
 	m := polynomialCellFixture(t)
-	a := util.NewInt(0)
+	a := unumeral.NewInt(0)
 	p, e := m.MulAdd(m.zero, Polynomial{}, &a)
 	serviceMust(t, e)
 	if p != m.zero {
@@ -33,7 +32,7 @@ func TestPolynomialCoefficientGF2SourceMinusOne(t *testing.T) {
 	for i := uint32(0); i < 2; i++ {
 		a, e := m.Coefficient(p, i)
 		serviceMust(t, e)
-		if a != util.NewInt(1) {
+		if a != unumeral.NewInt(1) {
 			t.Fatal("GF2 source Set(-1) normalizes to one", a)
 		}
 	}

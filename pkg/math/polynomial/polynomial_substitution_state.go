@@ -2,7 +2,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This is the actually used cold virtual-map surface. The source manager()
@@ -11,11 +11,11 @@ import (
 
 type PolynomialRationalSubstitution interface {
 	Contains(uint32) (bool, error)
-	Rational(uint32) (*util.Rational, error)
+	Rational(uint32) (*unumeral.Rational, error)
 }
 type polynomialSubstitutionArray struct {
 	positions *PolynomialVariablePositions
-	values    []util.Rational
+	values    []unumeral.Rational
 }
 
 // Distinct actual persistent m_var_max_degree, m_var_pos and m_found_vars.
@@ -42,7 +42,7 @@ type polynomialSubstitutionScope struct {
 	somInvocation                                    uint64
 	active, executing                                bool
 	kind                                             uint8
-	newA, tmp                                        util.Int
+	newA, tmp                                        unumeral.Int
 	newAConstructed, tmpConstructed                  bool
 	maxConstructed, posConstructed                   bool
 	xs                                               PolynomialVariablesView

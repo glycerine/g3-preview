@@ -2,7 +2,7 @@
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 )
 
@@ -13,9 +13,9 @@ type BitVectorBV2IntNumerals struct {
 	manager                *ASTManager
 	call                   ASTArithmeticNumeralInvocation
 	expressionClosed       bool
-	values                 [3]util.OwnedRational
+	values                 [3]unumeral.OwnedRational
 	placed                 [3]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	header                 uint64
 	sourceCause            error
 	stopped, ended, closed bool
@@ -67,7 +67,7 @@ func (n *BitVectorBV2IntNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorBV2IntNumerals) Read(arg ASTHandle, width *uint32) (bool, error) {
@@ -219,7 +219,7 @@ func (n *BitVectorBV2IntNumerals) Coefficient(width uint32) (ASTHandle, error) {
 	}
 	v, e = q.PowerWithInvocation(&n.values[1], width, &n.scalar)
 	n.values[2] = v
-	n.placed[2] = v != (util.OwnedRational{})
+	n.placed[2] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}

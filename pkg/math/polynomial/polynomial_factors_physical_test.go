@@ -5,17 +5,17 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func polynomialFactorsAudit(t *testing.T, f *PolynomialFactors, caller []Polynomial, input []*util.Int, refs ...*PolynomialRef) {
+func polynomialFactorsAudit(t *testing.T, f *PolynomialFactors, caller []Polynomial, input []*unumeral.Int, refs ...*PolynomialRef) {
 	polynomialFactorsAuditExtra(t, f, caller, input, 0, refs...)
 }
-func polynomialFactorsAuditExtra(t *testing.T, f *PolynomialFactors, caller []Polynomial, input []*util.Int, extraHeader uint64, refs ...*PolynomialRef) {
+func polynomialFactorsAuditExtra(t *testing.T, f *PolynomialFactors, caller []Polynomial, input []*unumeral.Int, extraHeader uint64, refs ...*PolynomialRef) {
 	polynomialFactorsAuditOwnersExtra(t, f, caller, input, extraHeader, nil, nil, refs...)
 }
-func polynomialFactorsAuditOwnersExtra(t *testing.T, f *PolynomialFactors, caller []Polynomial, input []*util.Int, extraHeader uint64, external []umemory.Block, other []*PolynomialFactors, refs ...*PolynomialRef) {
+func polynomialFactorsAuditOwnersExtra(t *testing.T, f *PolynomialFactors, caller []Polynomial, input []*unumeral.Int, extraHeader uint64, external []umemory.Block, other []*PolynomialFactors, refs ...*PolynomialRef) {
 	t.Helper()
 	m := f.manager.core
 	polys := append([]Polynomial(nil), caller...)

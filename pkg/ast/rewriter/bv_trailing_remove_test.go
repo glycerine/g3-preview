@@ -8,12 +8,13 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func bvTrailingValueFixture(t *testing.T) (*ast.ASTManager, *BVTrailing, ast.FamilyID, *util.RationalService) {
+func bvTrailingValueFixture(t *testing.T) (*ast.ASTManager, *BVTrailing, ast.FamilyID, *unumeral.RationalService) {
 	t.Helper()
 	sy, q, b := astTestOwners(t)
 	m, e := ast.NewASTManager(ast.ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
@@ -498,7 +499,7 @@ func TestBVTrailingRemovalActualRuntimeNumeralChild(t *testing.T) {
 			b := arena.NewBudget(1 << 28)
 			rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, Transport: func(f umemory.Failure) error { return f }})
 			satOK(t, e)
-			q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+			q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 			satOK(t, e)
 			sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 			satOK(t, e)

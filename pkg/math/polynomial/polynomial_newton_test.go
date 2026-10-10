@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialNewtonSourceInterpolation(t *testing.T) {
@@ -20,12 +21,12 @@ func TestPolynomialNewtonSourceInterpolation(t *testing.T) {
 	cs := [3]int32{-9, -3, 5}
 	ks := [3]int32{-21, 20, -36}
 	for i := 0; i < 3; i++ {
-		as := [1]util.Int{util.NewInt(cs[i])}
-		c := util.NewInt(ks[i])
+		as := [1]unumeral.Int{unumeral.NewInt(cs[i])}
+		c := unumeral.NewInt(ks[i])
 		p, e := m.MkLinearTake(as[:], []uint32{1}, &c)
 		serviceMust(t, e)
 		polynomialCaller(t, m, p)
-		a := util.NewInt(int32(i))
+		a := unumeral.NewInt(int32(i))
 		serviceMust(t, n.Add(&a, p))
 	}
 	if newtonCount(t, n) != 3 {
@@ -111,14 +112,14 @@ func TestPolynomialNewtonWholeMethodAndWarmSingleSample(t *testing.T) {
 	r, e := NewPolynomialRef(m)
 	serviceMust(t, e)
 	defer func() { serviceMust(t, r.Close()) }()
-	serviceMust(t, m.NewtonInterpolation(0, 0, []util.Int{util.NewInt(7)}, []Polynomial{m.unit}, r))
+	serviceMust(t, m.NewtonInterpolation(0, 0, []unumeral.Int{unumeral.NewInt(7)}, []Polynomial{m.unit}, r))
 	if m.newtonLocal != nil || newtonRefGet(t, r) != m.unit {
 		t.Fatal("source local was retained on success")
 	}
 	n, e := NewPolynomialNewtonInterpolator(m)
 	serviceMust(t, e)
 	defer func() { serviceMust(t, n.Close()) }()
-	input := util.NewInt(7)
+	input := unumeral.NewInt(7)
 	serviceMust(t, n.Add(&input, m.unit))
 	serviceMust(t, n.Mk(0, r))
 	serviceMust(t, n.Reset())
@@ -145,9 +146,9 @@ func TestPolynomialNewtonRealAddGrowthRefusalPrefixes(t *testing.T) {
 		serviceMust(t, m.SetZPUint64(1000000007))
 		n, e := NewPolynomialNewtonInterpolator(m)
 		serviceMust(t, e)
-		input := util.NewInt(0)
+		input := unumeral.NewInt(0)
 		serviceMust(t, n.Add(&input, m.unit))
-		input = util.NewInt(2)
+		input = unumeral.NewInt(2)
 		m.integer.Budget().FailAfter(fail)
 		e = n.Add(&input, m.unit)
 		polynomialNewtonPhysicalAudit(t, m, []*PolynomialNewtonInterpolator{n}, nil, nil, nil, nil, nil, &input)
@@ -305,7 +306,7 @@ func TestPolynomialNewtonSourceModularAndDuplicateProfiles(t *testing.T) {
 	m := polynomialCellFixture(t)
 	n, e := NewPolynomialNewtonInterpolator(m)
 	serviceMust(t, e)
-	input := util.NewInt(0)
+	input := unumeral.NewInt(0)
 	e = n.Add(&input, m.unit)
 	if polynomialSourceDebug {
 		if e != ErrPolynomialAssertion {
@@ -389,7 +390,7 @@ func TestPolynomialNewtonStoppedReferenceBeforeOwningAbort(t *testing.T) {
 	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: runtime, Profile: profile, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: runtime, Profile: profile, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: runtime, Profile: profile})
 	serviceMust(t, e)
@@ -410,26 +411,26 @@ func TestPolynomialNewtonStoppedReferenceBeforeOwningAbort(t *testing.T) {
 		contextTLSFinish(t, runtime, q.CloseChecked)
 		contextTLSFinish(t, runtime, runtime.Close)
 	}()
-	inputValue := util.NewInt(7)
+	inputValue := unumeral.NewInt(7)
 	serviceMust(t, n.pushNumeral(&n.inputs, &inputValue))
 	// Distinct raw core fields give the actual old polynomial a >100000-byte
 	// physical extent. Duplicate terms are deliberately unsimplified raw input.
 	const size = 4096
-	as := make([]util.Int, size)
+	as := make([]unumeral.Int, size)
 	ms := make([]Monomial, size)
 	unit, e := mm.Unit()
 	serviceMust(t, e)
 	for i := range as {
-		as[i] = util.NewInt(1)
+		as[i] = unumeral.NewInt(1)
 		ms[i] = unit
 		serviceMust(t, mm.IncRef(unit))
 	}
 	old, e := m.MkCoreTake(as, ms)
 	serviceMust(t, e)
-	small := util.NewInt(2)
+	small := unumeral.NewInt(2)
 	incoming, e := m.MkConstantTake(&small)
 	serviceMust(t, e)
-	other := util.NewInt(3)
+	other := unumeral.NewInt(3)
 	older, e := m.MkConstantTake(&other)
 	serviceMust(t, e)
 	n.scope.kind = 1
@@ -439,7 +440,7 @@ func TestPolynomialNewtonStoppedReferenceBeforeOwningAbort(t *testing.T) {
 	// Prepare source recycle storage before the undefined-accounting boundary.
 	warms := [8]Polynomial{}
 	for i := range warms {
-		a := util.NewInt(int32(4 + i))
+		a := unumeral.NewInt(int32(4 + i))
 		p, e := m.MkConstantTake(&a)
 		serviceMust(t, e)
 		serviceMust(t, m.IncRef(p))
@@ -513,12 +514,12 @@ func TestPolynomialNewtonMkGrowthAndCancellationPrefixes(t *testing.T) {
 		serviceMust(t, e)
 		outputs := [3]Polynomial{}
 		for i := range outputs {
-			a := util.NewInt(int32(i*i + 1))
+			a := unumeral.NewInt(int32(i*i + 1))
 			p, e := m.MkConstantTake(&a)
 			serviceMust(t, e)
 			outputs[i] = p
 			serviceMust(t, m.IncRef(p))
-			input := util.NewInt(int32(i))
+			input := unumeral.NewInt(int32(i))
 			serviceMust(t, n.Add(&input, p))
 		}
 		r, e := NewPolynomialRef(m)
@@ -562,12 +563,12 @@ func TestPolynomialNewtonMkGrowthAndCancellationPrefixes(t *testing.T) {
 	serviceMust(t, e)
 	outputs := [3]Polynomial{}
 	for i := int32(0); i < 3; i++ {
-		a := util.NewInt(i*i + 1)
+		a := unumeral.NewInt(i*i + 1)
 		p, e := m.MkConstantTake(&a)
 		serviceMust(t, e)
 		outputs[i] = p
 		serviceMust(t, m.IncRef(p))
-		input := util.NewInt(i)
+		input := unumeral.NewInt(i)
 		serviceMust(t, n.Add(&input, p))
 	}
 	r, e := NewPolynomialRef(m)
@@ -604,7 +605,7 @@ func TestPolynomialNewtonNativeInputBounds(t *testing.T) {
 			t.Fatal(i, e, want)
 		}
 	}
-	input := util.NewInt(7)
+	input := unumeral.NewInt(7)
 	serviceMust(t, n.Add(&input, m.unit))
 	serviceMust(t, n.Reset())
 	if _, e := n.Input(0); e == nil {
@@ -643,7 +644,7 @@ func TestPolynomialNewtonIndependentBoundedInterpolants(t *testing.T) {
 	for degree := 0; degree < 5; degree++ {
 		m := polynomialCellFixture(t)
 		serviceMust(t, m.SetZPUint64(97))
-		inputs := make([]util.Int, degree+1)
+		inputs := make([]unumeral.Int, degree+1)
 		outputs := make([]Polynomial, degree+1)
 		for i := range inputs {
 			x := int64(i - 2)
@@ -657,8 +658,8 @@ func TestPolynomialNewtonIndependentBoundedInterpolants(t *testing.T) {
 			if v < -48 {
 				v += 97
 			}
-			inputs[i] = util.NewInt(int32(x))
-			a := util.NewInt(int32(v))
+			inputs[i] = unumeral.NewInt(int32(x))
+			a := unumeral.NewInt(int32(v))
 			p, e := m.MkConstantTake(&a)
 			serviceMust(t, e)
 			outputs[i] = p
@@ -733,7 +734,7 @@ func TestPolynomialNewtonNativeNumeralGrowthResetAndReuse(t *testing.T) {
 	m.integer.Budget().FailAfter(0)
 	for pass := 0; pass < 2; pass++ {
 		for i := int32(0); i < 4097; i++ {
-			a := util.NewInt(i)
+			a := unumeral.NewInt(i)
 			serviceMust(t, n.pushNumeral(&n.inputs, &a))
 			serviceMust(t, n.pushNumeral(&n.invs, &a))
 		}

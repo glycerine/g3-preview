@@ -3,16 +3,15 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialFactorUPFactorsLiteralSourceClass(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	fs, e := full.upm.NewFactors()
 	serviceMust(t, e)
-	a := util.NewInt(-7)
+	a := unumeral.NewInt(-7)
 	serviceMust(t, fs.setConstantWithSourceContext(&a, integerAllocationInvocationContext{}))
 	if fs.constant != a {
 		t.Fatal("actual class SET")

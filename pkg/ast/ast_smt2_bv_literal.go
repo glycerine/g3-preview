@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type astBVLiteralFrame struct {
@@ -17,9 +18,9 @@ type astBVLiteralFrame struct {
 	owner                                      *astBitVectorPluginOwner
 	next                                       *astBVLiteralFrame
 	header, invocation                         uint64
-	values                                     [4]util.OwnedRational
+	values                                     [4]unumeral.OwnedRational
 	placed, complete, consumed                 [4]bool
-	children                                   [5]util.RationalServiceInvocation
+	children                                   [5]unumeral.RationalServiceInvocation
 	normalization                              astBVNormalizationReceipt
 	buffer                                     bytes.Buffer
 	characters                                 bytes.Buffer
@@ -228,7 +229,7 @@ func (f *astBVLiteralFrame) endDigits() error {
 		if e := f.children[i].EndContext(); e != nil {
 			return e
 		}
-		f.children[i] = util.RationalServiceInvocation{}
+		f.children[i] = unumeral.RationalServiceInvocation{}
 	}
 	return nil
 }

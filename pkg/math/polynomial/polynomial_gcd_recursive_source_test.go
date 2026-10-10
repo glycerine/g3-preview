@@ -7,7 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/clibrand"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialGCDRecursiveTerminalEuclidIgnoresVariableValue(t *testing.T) {
@@ -238,7 +238,7 @@ func TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop(t *testing.
 	// Explicitly guarded/non-mathematical source-layout fixture. Actual
 	// checkpoint mutates one reached sparse output with a real Copy-produced
 	// dead token; no error callback fabricates a destructor refusal.
-	var large util.Int
+	var large unumeral.Int
 	limbs := make([]uint32, 8192)
 	limbs[0], limbs[len(limbs)-1] = 17, 1
 	serviceMust(t, c.integer.SetLimbs(&large, limbs))
@@ -281,7 +281,7 @@ func TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop(t *testing.
 			}
 			sp.outputs[0] = a
 			injected = true
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{factor, left, right, square, newU, newV, r.root.value}, []*util.Int{&large}, ur.header+vr.header+r.header+sr.header)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{factor, left, right, square, newU, newV, r.root.value}, []*unumeral.Int{&large}, ur.header+vr.header+r.header+sr.header)
 			c.integer.Budget().FailAfter(-1)
 			return true
 		}
@@ -304,7 +304,7 @@ func TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop(t *testing.
 	if stopped := full.finishGCDFunctionSource(outer); !errors.Is(stopped, arena.ErrInvalidSlot) || outer.depth != 2 || &outer.powers[0][0] != olderStorage {
 		t.Fatal("older source buffers crossed stopped sparse destructor", stopped)
 	}
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{factor, left, right, square, newU, newV, r.root.value}, []*util.Int{&large}, ur.header+vr.header+r.header+sr.header)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{factor, left, right, square, newU, newV, r.root.value}, []*unumeral.Int{&large}, ur.header+vr.header+r.header+sr.header)
 	serviceMust(t, full.CleanupGCD())
 	var failed *polynomialSparseMGCDException
 	if !errors.As(body, &failed) {
@@ -372,7 +372,7 @@ func TestPolynomialGCDRecursiveRepeatedSparsePointThrowsAfterActualUnwind(t *tes
 	for i := uint32(0); i < n; i++ {
 		a, e := dense.Inputs().Get(i)
 		serviceMust(t, e)
-		if a == util.NewInt(-3) {
+		if a == unumeral.NewInt(-3) {
 			t.Fatal("selected sparse point was already excluded by dense inputs")
 		}
 	}

@@ -3,8 +3,8 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -39,9 +39,9 @@ func algebraicControlledFixture(t *testing.T) (*AlgebraicRootCore, *UPolynomialM
 	serviceMust(t, e)
 	f, e := NewUPolynomialFactorizationService(p, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
-	b, e := util.NewBinaryRationalManager(s.Manager.Z, util.BinaryRationalConfig{Diagnostics: s})
+	b, e := unumeral.NewBinaryRationalManager(s.Manager.Z, unumeral.BinaryRationalConfig{Diagnostics: s})
 	serviceMust(t, e)
-	bi, e := util.NewBinaryIntervalManager(b)
+	bi, e := unumeral.NewBinaryIntervalManager(b)
 	serviceMust(t, e)
 	a, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: s.Manager.Z.Memory, Profile: umemory.SmallAllocatorProfile{PointerBits: 64}})
 	serviceMust(t, e)
@@ -65,9 +65,9 @@ func algebraicPolynomial(t *testing.T, p *UPolynomialManager, coeff ...int32) UP
 	t.Helper()
 	v, e := p.NewPolynomial()
 	serviceMust(t, e)
-	values := make([]util.Int, len(coeff))
+	values := make([]unumeral.Int, len(coeff))
 	for i, n := range coeff {
-		values[i] = util.NewInt(n)
+		values[i] = unumeral.NewInt(n)
 	}
 	serviceMust(t, p.SetInts(v, values))
 	t.Cleanup(func() { serviceMust(t, p.DelPolynomial(&v)) })
@@ -134,7 +134,7 @@ func TestAlgebraicNullZeroAndRationalCells(t *testing.T) {
 	if !z {
 		t.Fatal("null zero")
 	}
-	r := util.NewRational()
+	r := unumeral.NewRational()
 	serviceMust(t, c.config.Rationals.SetFraction(&r, 2, 3))
 	serviceMust(t, c.SetRational(&a, &r))
 	serviceMust(t, c.Copy(&b, &a))

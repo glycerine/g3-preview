@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -17,7 +18,7 @@ func TestParamsReferenceResetKeyRejectsOrdinaryReplayAfterActualLeafStop(t *test
 	bs := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -42,7 +43,7 @@ func TestParamsReferenceResetKeyRejectsOrdinaryReplayAfterActualLeafStop(t *test
 	paramsMust(t, e)
 	// Separate efficient fixture: public source digit setter and scoped copy.
 	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -70,7 +71,7 @@ func TestParamsReferenceResetKeyRejectsOrdinaryReplayAfterActualLeafStop(t *test
 	paramsMust(t, c.Assign(&alias, &v))
 	block = &c.Blocks[v.Slot-1]
 	beforeSize, beforeRefs := block.Size, block.Refs
-	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &alias}}}
+	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &alias}}}
 	before := numericAuditPhysical(t, m, extras)
 	paramsDecTLSNearMinimum(t, r)
 	bn.FailAfter(0)
@@ -117,7 +118,7 @@ func TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop(t *testing.T) {
 	bs := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -142,7 +143,7 @@ func TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop(t *testing.T) {
 	paramsMust(t, e)
 	// Separate efficient fixture: public source digit setter and scoped copy.
 	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -175,7 +176,7 @@ func TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop(t *testing.T) {
 	paramsMust(t, c.Assign(&alias, &v))
 	block = &c.Blocks[v.Slot-1]
 	beforeSize, beforeRefs := block.Size, block.Refs
-	before := numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &second}}})
+	before := numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &second}}})
 	missingKey, e := sy.Intern("never-found")
 	paramsMust(t, e)
 	paramsDecTLSNearMinimum(t, r)
@@ -186,7 +187,7 @@ func TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop(t *testing.T) {
 	if !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("actual later numeral release stop", e)
 	}
-	after := numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &second}}})
+	after := numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &second}}})
 	if after.Named != before.Named || after.Objects+1 != before.Objects {
 		t.Fatal(before, after)
 	}
@@ -229,7 +230,7 @@ func TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop(t *testing.T) {
 	if out != receipt || r.State() != stateBefore || block.resetCursor != cursorBefore || block.resetStage != stageBefore || block.Size != beforeSize || block.Refs != beforeRefs {
 		t.Fatal("defined absent-key source shortcut changed stopped owner", out, *block)
 	}
-	noopRoots := numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &second}}})
+	noopRoots := numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &second}}})
 	if noopRoots != after {
 		t.Fatal("defined no-op changed physical root census", after, noopRoots)
 	}
@@ -258,7 +259,7 @@ func TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop(t *testing.T) {
 	if e := c.ResetKeyNameTracked(&second, &keyName, &secondReceipt); !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("second named key actual source stop", e)
 	}
-	both := numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &second}}})
+	both := numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &second}}})
 	if both.Named != before.Named || both.Objects+2 != before.Objects {
 		t.Fatal(before, both)
 	}
@@ -291,7 +292,7 @@ func TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop(t *testing.T) {
 	if got != 42 || !c.Blocks[second.Slot-1].resetActive {
 		t.Fatal("other pending key remains source visible", got)
 	}
-	numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &second}}})
+	numericAuditPhysical(t, m, numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &second}}})
 	paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
 	paramsMust(t, c.CompleteResetKey(&second, secondReceipt))
 	if c.Blocks[second.Slot-1].Size != 2 || c.Entry(&c.Blocks[second.Slot-1], 1).key != tail {

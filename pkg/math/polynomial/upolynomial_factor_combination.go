@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyFactorCombinationState struct {
@@ -189,7 +189,7 @@ func (s *upolyFactorCombinationState) next(remove bool) (bool, error) {
 func (s *upolyFactorCombinationState) left(out *upolyVectorState) error {
 	return s.leftWithSourceContext(out, nil, integerAllocationInvocationContext{})
 }
-func (s *upolyFactorCombinationState) leftWithSourceContext(out *upolyVectorState, child *util.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
+func (s *upolyFactorCombinationState) leftWithSourceContext(out *upolyVectorState, child *unumeral.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
 	m := s.factors.manager
 	if polynomialSourceDebug && s.size <= 0 {
 		return ErrUPolynomialAssertion
@@ -215,10 +215,10 @@ func (s *upolyFactorCombinationState) leftWithSourceContext(out *upolyVectorStat
 	}
 	return nil
 }
-func (s *upolyFactorCombinationState) leftTail(value, out *util.Int) error {
+func (s *upolyFactorCombinationState) leftTail(value, out *unumeral.Int) error {
 	return s.leftTailWithSourceContext(value, out, integerAllocationInvocationContext{})
 }
-func (s *upolyFactorCombinationState) leftTailWithSourceContext(value, out *util.Int, context integerAllocationInvocationContext) error {
+func (s *upolyFactorCombinationState) leftTailWithSourceContext(value, out *unumeral.Int, context integerAllocationInvocationContext) error {
 	m := s.factors.manager
 	if e := m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Copy(out, value); e != nil {
 		return e
@@ -238,10 +238,10 @@ func (s *upolyFactorCombinationState) leftTailWithSourceContext(value, out *util
 	}
 	return nil
 }
-func (s *upolyFactorCombinationState) right(value, out *util.Int, polynomial *upolyVectorState) error {
+func (s *upolyFactorCombinationState) right(value, out *unumeral.Int, polynomial *upolyVectorState) error {
 	return s.rightWithSourceContext(value, out, polynomial, nil, integerAllocationInvocationContext{})
 }
-func (s *upolyFactorCombinationState) rightWithSourceContext(value, out *util.Int, polynomial *upolyVectorState, child *util.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
+func (s *upolyFactorCombinationState) rightWithSourceContext(value, out *unumeral.Int, polynomial *upolyVectorState, child *unumeral.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
 	m := s.factors.manager
 	if polynomial != nil {
 		if polynomialSourceDebug && s.size <= 0 {
@@ -386,13 +386,13 @@ func (it *UPolynomialFactorCombination) Right(out UPolynomial) error {
 	}
 	return it.state.right(nil, nil, &d.state)
 }
-func (it *UPolynomialFactorCombination) LeftTail(value, out *util.Int) error {
+func (it *UPolynomialFactorCombination) LeftTail(value, out *unumeral.Int) error {
 	if e := it.check(); e != nil {
 		return e
 	}
 	return it.state.leftTail(value, out)
 }
-func (it *UPolynomialFactorCombination) RightTail(value, out *util.Int) error {
+func (it *UPolynomialFactorCombination) RightTail(value, out *unumeral.Int) error {
 	if e := it.check(); e != nil {
 		return e
 	}

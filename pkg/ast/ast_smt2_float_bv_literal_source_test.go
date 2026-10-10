@@ -4,7 +4,7 @@ package ast
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -22,8 +22,8 @@ func TestASTSMT2FloatDefaultBitVectorFields(t *testing.T) {
 	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
-	sig := util.NewInt(4)
-	var v util.ArbitraryFloat
+	sig := unumeral.NewInt(4)
+	var v unumeral.ArbitraryFloat
 	paramsMust(t, m.floatingPointPlugin.numeric.SetComponents(&v, 8, 4, true, 3, &sig))
 	node, e := m.floatingPointPlugin.mkNumeral(&v, nil)
 	paramsMust(t, e)
@@ -60,16 +60,16 @@ func TestASTSMT2FloatDefaultEveryActualReservation(t *testing.T) {
 				_, e = m.RegisterFloatingPointPlugin()
 				astTestMust(t, e)
 				p := m.floatingPointPlugin
-				sig := util.NewInt(12345)
+				sig := unumeral.NewInt(12345)
 				bits := uint32(24)
 				if big {
-					sig = util.NewInt(0)
+					sig = unumeral.NewInt(0)
 					owner, e := p.numeric.BorrowScopedInteger(&sig)
 					astTestMust(t, e)
 					astTestMust(t, owner.SetLimbs(&sig, []uint32{1, 0x80000000}))
 					bits = 65
 				}
-				var v util.ArbitraryFloat
+				var v unumeral.ArbitraryFloat
 				astTestMust(t, p.numeric.SetComponents(&v, 8, bits, true, 3, &sig))
 				node, e := p.mkNumeral(&v, nil)
 				astTestMust(t, e)
@@ -117,8 +117,8 @@ func TestASTSMT2FloatDefaultWarmUsesNativeInfoStorage(t *testing.T) {
 	_, e = m.RegisterFloatingPointPlugin()
 	astTestMust(t, e)
 	p := m.floatingPointPlugin
-	sig := util.NewInt(4)
-	var v util.ArbitraryFloat
+	sig := unumeral.NewInt(4)
+	var v unumeral.ArbitraryFloat
 	astTestMust(t, p.numeric.SetComponents(&v, 8, 4, false, 3, &sig))
 	node, e := p.mkNumeral(&v, nil)
 	astTestMust(t, e)

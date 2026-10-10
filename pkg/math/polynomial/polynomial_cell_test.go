@@ -4,8 +4,8 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // These are independent bounded constructor/arithmetic oracles for the actual
@@ -66,12 +66,12 @@ func TestPolynomialCellSourceTakeAndFirstMaximum(t *testing.T) {
 		serviceMust(t, e)
 		serviceMust(t, m.monomials.IncRef(ms[i]))
 	}
-	as := [3]util.Int{util.NewInt(11), util.NewInt(-5), util.NewInt(9)}
+	as := [3]unumeral.Int{unumeral.NewInt(11), unumeral.NewInt(-5), unumeral.NewInt(9)}
 	p, e := m.MkCoreTake(as[:], ms[:])
 	serviceMust(t, e)
 	polynomialCaller(t, m, p)
 	for i := range as {
-		if as[i] != (util.Int{}) {
+		if as[i] != (unumeral.Int{}) {
 			t.Fatal("source ascending swap did not consume", i, as[i])
 		}
 	}
@@ -101,7 +101,7 @@ func TestPolynomialCellSourceDuplicateCancellation(t *testing.T) {
 	serviceMust(t, e)
 	u, e := m.monomials.Unit()
 	serviceMust(t, e)
-	as := [4]util.Int{util.NewInt(7), util.NewInt(-7), util.NewInt(3), util.NewInt(0)}
+	as := [4]unumeral.Int{unumeral.NewInt(7), unumeral.NewInt(-7), unumeral.NewInt(3), unumeral.NewInt(0)}
 	p, e := m.MkTerms(as[:], []Monomial{x, x, u, x})
 	serviceMust(t, e)
 	polynomialCaller(t, m, p)
@@ -118,7 +118,7 @@ func TestPolynomialCellSourceDuplicateCancellation(t *testing.T) {
 		t.Fatal(v)
 	}
 	for i, want := range [4]int32{7, -7, 3, 0} {
-		if as[i] != util.NewInt(want) {
+		if as[i] != unumeral.NewInt(want) {
 			t.Fatal("const-term copy route", i, as[i])
 		}
 	}
@@ -129,7 +129,7 @@ func TestPolynomialCellIndependentArithmeticIdentity(t *testing.T) {
 	x, e := m.MkVariable(0, 1)
 	serviceMust(t, e)
 	polynomialCaller(t, m, x)
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	u, e := m.MkConstantTake(&one)
 	serviceMust(t, e)
 	polynomialCaller(t, m, u)

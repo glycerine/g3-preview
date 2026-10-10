@@ -5,7 +5,8 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -14,15 +15,15 @@ import (
 // API and does not assemble or clone the numerical value before insertion.
 type astBVIntegerText struct {
 	self                                                 *astBVIntegerText
-	service                                              *util.RationalService
+	service                                              *unumeral.RationalService
 	stream                                               *utext.NumericTextStream
 	result                                               utext.OwnedString
-	invocation                                           util.RationalServiceInvocation
+	invocation                                           unumeral.RationalServiceInvocation
 	returned, streamEnded, sourceDone, ownFalse, ownTrue bool
 	bodyCause, sourceCause, ownCause                     error
 }
 
-func (x *astBVIntegerText) construct(q *util.RationalService, b *arena.Budget, value *util.OwnedRational) (e error) {
+func (x *astBVIntegerText) construct(q *unumeral.RationalService, b *arena.Budget, value *unumeral.OwnedRational) (e error) {
 	if x == nil || x.self != nil {
 		return ErrASTHandle
 	}
@@ -34,14 +35,14 @@ func (x *astBVIntegerText) construct(q *util.RationalService, b *arena.Budget, v
 		return e
 	}
 	if !integer {
-		return util.ErrRationalNotInteger
+		return unumeral.ErrRationalNotInteger
 	}
 	x.stream, e = utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	if e != nil {
 		return e
 	}
 	e = q.InsertIntoWithInvocation(x.stream, value, &x.invocation)
-	var stop *util.NumeralSourceFailure
+	var stop *unumeral.NumeralSourceFailure
 	if errors.As(e, &stop) {
 		x.sourceCause = stop.DestructorCause
 		return e
@@ -159,11 +160,11 @@ func (v astBVIntegerCString) Length() (uint64, error) {
 		}
 	}
 }
-func (x *astBVIntegerText) cstring() (util.ArbitraryFloatFormattedCString, error) {
+func (x *astBVIntegerText) cstring() (unumeral.ArbitraryFloatFormattedCString, error) {
 	if x == nil || x.self != x || !x.returned || x.result.Closed || !x.result.Ready {
-		return util.ArbitraryFloatFormattedCString{}, ErrASTHandle
+		return unumeral.ArbitraryFloatFormattedCString{}, ErrASTHandle
 	}
-	return util.BorrowArbitraryFloatFormattedCString(astBVIntegerCString{x, x.result.Generation}), nil
+	return unumeral.BorrowArbitraryFloatFormattedCString(astBVIntegerCString{x, x.result.Generation}), nil
 }
 
 func (x *astBVIntegerText) storageBytes() uint64 {

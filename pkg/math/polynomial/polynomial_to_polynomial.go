@@ -4,7 +4,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // One actual per-invocation lexical buffer embedded in the reflected charged
@@ -19,20 +19,20 @@ type polynomialToPolynomialScope struct {
 	invocation                           uint64
 	direct                               polynomialToPolynomialInvocationReceipt
 	numeric                              polynomialNumericRoots
-	normalize                            util.IntegerNormalizeInvocationReceipt
+	normalize                            unumeral.IntegerNormalizeInvocationReceipt
 	finishing                            bool
-	transport                            util.Int
+	transport                            unumeral.Int
 	transportBound                       bool
-	buffer                               util.ScopedIntegerModularBuffer128
+	buffer                               unumeral.ScopedIntegerModularBuffer128
 	generated                            Monomial
 	active, executing                    bool
 	bodyCause, sourceCause, cleanupCause error
 }
 
-func (m *MultivariatePolynomialManager) ToPolynomial(sz uint32, as []util.Int, x uint32) (out Polynomial, cause error) {
+func (m *MultivariatePolynomialManager) ToPolynomial(sz uint32, as []unumeral.Int, x uint32) (out Polynomial, cause error) {
 	return m.toPolynomialWithReceipt(sz, as, x, nil)
 }
-func (m *MultivariatePolynomialManager) toPolynomialWithReceipt(sz uint32, as []util.Int, x uint32, receipt *polynomialToPolynomialInvocationReceipt) (out Polynomial, cause error) {
+func (m *MultivariatePolynomialManager) toPolynomialWithReceipt(sz uint32, as []unumeral.Int, x uint32, receipt *polynomialToPolynomialInvocationReceipt) (out Polynomial, cause error) {
 	if e := m.ready(); e != nil {
 		return Polynomial{}, e
 	}
@@ -71,7 +71,7 @@ func (m *MultivariatePolynomialManager) toPolynomialWithReceipt(sz uint32, as []
 		s.active = false
 	}()
 	for i := uint32(0); i < sz; i++ {
-		zero := util.Int{}
+		zero := unumeral.Int{}
 		if cause = numericScopedIntegerModularBuffer128_pushToPolynomial(&s.buffer, &zero, &s.direct); cause != nil {
 			return Polynomial{}, cause
 		}

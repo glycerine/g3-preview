@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialToNumeralSelectedVariableMatchedOwnHistory(t *testing.T) {
@@ -17,10 +17,10 @@ func TestPolynomialToNumeralSelectedVariableMatchedOwnHistory(t *testing.T) {
 			z := full.core.integer
 			p := polynomialQueryTerms(t, full.core, []int32{1, 3}, [][]MonomialPower{{}, {{0, 1}}})
 			// Construct an actual BIG constant coefficient before the fault stream.
-			var big util.Int
-			one := util.NewInt(1)
+			var big unumeral.Int
+			one := unumeral.NewInt(1)
 			serviceMust(t, z.Mul2k(&one, 521, &big))
-			var coefficient util.Int
+			var coefficient unumeral.Int
 			serviceMust(t, z.Copy(&coefficient, &big))
 			bp, e := full.core.MkConstantTake(&coefficient)
 			serviceMust(t, e)
@@ -33,7 +33,7 @@ func TestPolynomialToNumeralSelectedVariableMatchedOwnHistory(t *testing.T) {
 			var receipt polynomialFactorNumeralVectorReceipt
 			z.Budget().FailAfter(prefix)
 			cause := full.toNumeralVectorVariableWithReceipt(p, 0, &output, &receipt)
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, bp, original}, []*util.Int{&big}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, bp, original}, []*unumeral.Int{&big}, 0)
 			if cause != nil && !numericPhysicalReservationRefusal(cause) {
 				t.Fatal(cause)
 			}
@@ -46,7 +46,7 @@ func TestPolynomialToNumeralSelectedVariableMatchedOwnHistory(t *testing.T) {
 				if !ok || h.cleanupCause != own || !numericPhysicalReservationRefusal(own) {
 					t.Fatal("actual first false-own history", own, h)
 				}
-				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, bp, original}, []*util.Int{&big}, 0)
+				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, bp, original}, []*unumeral.Int{&big}, 0)
 			}
 			z.Budget().FailAfter(-1)
 			serviceMust(t, full.cleanupFactorNumeralVector(&receipt, false))
@@ -59,7 +59,7 @@ func TestPolynomialToNumeralSelectedVariableMatchedOwnHistory(t *testing.T) {
 				if !ok || h.cleanupCause == nil || !numericPhysicalReservationRefusal(own) {
 					t.Fatal("actual first true-own history", own, h)
 				}
-				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, bp, original}, []*util.Int{&big}, 0)
+				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, bp, original}, []*unumeral.Int{&big}, 0)
 			}
 			h, ok := full.factorNumeralVectorDiagnostic(&receipt)
 			if !ok {

@@ -3,10 +3,9 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialFactorFrontendActualHistoryReservation(t *testing.T) {
@@ -16,7 +15,7 @@ func TestUPolynomialFactorFrontendActualHistoryReservation(t *testing.T) {
 	serviceMust(t, e)
 	defer func() { serviceMust(t, fs.Close()) }()
 	var input upolyVectorState
-	serviceMust(t, m.set(&input, []util.Int{util.NewInt(1), util.NewInt(1)}))
+	serviceMust(t, m.set(&input, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}))
 	defer func() { serviceMust(t, m.reset(&input)); m.freeBacking(&input) }()
 	yes, e := s.Factor(m.stateView(&input), fs, DefaultUPolynomialFactorParams())
 	serviceMust(t, e)
@@ -44,10 +43,10 @@ func TestUPolynomialFactorFrontendPriorCapturedChildACKPreservesLater(t *testing
 	m := s.manager
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
-	var large util.Int
+	var large unumeral.Int
 	serviceMust(t, z.Integers().SetLimbs(&large, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 	var input upolyVectorState
-	serviceMust(t, m.set(&input, []util.Int{large, large}))
+	serviceMust(t, m.set(&input, []unumeral.Int{large, large}))
 	defer func() {
 		z.Budget().FailAfter(-1)
 		serviceMust(t, s.CleanupRetained())

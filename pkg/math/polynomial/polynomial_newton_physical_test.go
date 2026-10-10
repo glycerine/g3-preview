@@ -5,25 +5,26 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Independent named field census for this selected owner and its ordinary
 // unsynchronized borrowed rational cohort. This does not infer caller roots
 // from the locator directory, nor cover unrelated rational arithmetic scopes.
-func polynomialNewtonPhysicalAudit(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, public ...*util.Int) {
+func polynomialNewtonPhysicalAudit(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, public ...*unumeral.Int) {
 	polynomialNewtonPhysicalWithRaw(t, m, owners, references, refvectors, lazy, polys, handlers, nil, public...)
 }
 
-func polynomialNewtonPhysicalWithRaw(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []umemory.Block, public ...*util.Int) {
+func polynomialNewtonPhysicalWithRaw(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []umemory.Block, public ...*unumeral.Int) {
 	polynomialNewtonPhysicalWithExtra(t, m, owners, references, refvectors, lazy, polys, handlers, external, 0, public...)
 }
-func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []umemory.Block, adapterBytes uint64, public ...*util.Int) {
+func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []umemory.Block, adapterBytes uint64, public ...*unumeral.Int) {
 	t.Helper()
 	z := m.integer
-	refs := map[util.NumericCellRef]bool{}
-	add := func(a util.Int) {
+	refs := map[unumeral.NumericCellRef]bool{}
+	add := func(a unumeral.Int) {
 		if (a).Cell == 0 || z.IsFailureRef((a).Cell) {
 			return
 		}
@@ -33,15 +34,15 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 		refs[(a).Cell] = true
 	}
 	for _, r := range z.Tmp {
-		add(util.IntFromNativeWords([3]uint32{uint32(0), uint32(r), uint32(uint64(r) >> 32)}))
+		add(unumeral.IntFromNativeWords([3]uint32{uint32(0), uint32(r), uint32(uint64(r) >> 32)}))
 	}
 	for _, r := range z.Arg {
-		add(util.IntFromNativeWords([3]uint32{uint32(0), uint32(r), uint32(uint64(r) >> 32)}))
+		add(unumeral.IntFromNativeWords([3]uint32{uint32(0), uint32(r), uint32(uint64(r) >> 32)}))
 	}
 	if z.MatchesDividesNumeralInvocation(&z.DividesNumeral.Receipt) {
 		add(z.DividesNumeral.Numeral)
 	}
-	for _, s := range []*util.IntegerRawScope{&z.DivisionRaw, &z.ExtendedRaw, &z.GcdRaw} {
+	for _, s := range []*unumeral.IntegerRawScope{&z.DivisionRaw, &z.ExtendedRaw, &z.GcdRaw} {
 		for i := uint8(0); i < s.Count; i++ {
 			add(s.Values[i])
 		}
@@ -65,11 +66,11 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 	}
 	q := m.config.Rationals
 	if q != nil {
-		for _, a := range []util.Int{q.NTmp, q.AddTmp1, q.AddTmp2, q.AddMulTmp.Num, q.AddMulTmp.Den, q.LtTmp1.Num, q.LtTmp1.Den, q.LtTmp2.Num, q.LtTmp2.Den} {
+		for _, a := range []unumeral.Int{q.NTmp, q.AddTmp1, q.AddTmp2, q.AddMulTmp.Num, q.AddMulTmp.Den, q.LtTmp1.Num, q.LtTmp1.Den, q.LtTmp2.Num, q.LtTmp2.Den} {
 			add(a)
 		}
 	}
-	for _, a := range []util.Int{(*m.modular.BorrowModulus()), m.modular.Lower, m.modular.Upper, m.modular.InvTmp1, m.modular.InvTmp2, m.modular.InvTmp3, m.modular.DivTmp, m.zeroNumeral, m.minusOne, m.negativeCoefficient, m.constantCopy, m.linearConstant, m.constantScope.numeral, (*m.constantScope.rational.BorrowNumerator()), (*m.constantScope.rational.BorrowDenominator()), m.exactDivision.numeral, m.pseudoDivision.numeral, m.dividesLocal.numeral} {
+	for _, a := range []unumeral.Int{(*m.modular.BorrowModulus()), m.modular.Lower, m.modular.Upper, m.modular.InvTmp1, m.modular.InvTmp2, m.modular.InvTmp3, m.modular.DivTmp, m.zeroNumeral, m.minusOne, m.negativeCoefficient, m.constantCopy, m.linearConstant, m.constantScope.numeral, (*m.constantScope.rational.BorrowNumerator()), (*m.constantScope.rational.BorrowDenominator()), m.exactDivision.numeral, m.pseudoDivision.numeral, m.dividesLocal.numeral} {
 		add(a)
 	}
 	cell := func(p Polynomial, n uint32) {
@@ -149,12 +150,12 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 		}
 		seenNewton[n] = true
 		extraBytes += n.header
-		for _, values := range [][]util.Int{n.inputs, n.invs} {
+		for _, values := range [][]unumeral.Int{n.inputs, n.invs} {
 			for _, a := range values {
 				add(a)
 			}
 		}
-		for _, a := range []util.Int{n.scope.product, n.scope.aux, n.scope.c} {
+		for _, a := range []unumeral.Int{n.scope.product, n.scope.aux, n.scope.c} {
 			add(a)
 		}
 		for _, r := range []*polynomialReference{&n.scope.temp, &n.scope.auxPoly, &n.scope.u} {
@@ -189,7 +190,7 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 	for slot := uint64(1); slot <= uint64(z.Cells.Stats().Slots); slot++ {
 		c, e := z.Cells.Read(arena.Slot(slot))
 		if e == nil && (c.Unpublished || c.CleanupPending) {
-			add(util.IntFromNativeWords([3]uint32{uint32(0), uint32(util.MakeNumericRef(arena.Slot(slot), z.Cells.State(arena.Slot(slot)).Generation)), uint32(uint64(util.MakeNumericRef(arena.Slot(slot), z.Cells.State(arena.Slot(slot)).Generation)) >> 32)}))
+			add(unumeral.IntFromNativeWords([3]uint32{uint32(0), uint32(unumeral.MakeNumericRef(arena.Slot(slot), z.Cells.State(arena.Slot(slot)).Generation)), uint32(uint64(unumeral.MakeNumericRef(arena.Slot(slot), z.Cells.State(arena.Slot(slot)).Generation)) >> 32)}))
 		}
 	}
 	if uint32(len(refs)) != z.Cells.Stats().Live {

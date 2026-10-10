@@ -2,16 +2,15 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math/big"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
-func upolyIsolationBinaryRat(t *testing.T, m *UPolynomialManager, b *util.BinaryRationalManager, a *util.BinaryRational) *big.Rat {
+func upolyIsolationBinaryRat(t *testing.T, m *UPolynomialManager, b *unumeral.BinaryRationalManager, a *unumeral.BinaryRational) *big.Rat {
 	t.Helper()
-	var n util.Int
+	var n unumeral.Int
 	if e := b.Numerator(a, &n); e != nil {
 		t.Fatal(e)
 	}
@@ -49,7 +48,7 @@ func TestUPolynomialRefinableNineRegisteredCalls(t *testing.T) {
 		}
 		p := upolyIsolationProduct(t, m, factors)
 		v := mustUPolyView(t, m, p)
-		a, b := util.NewBinaryIntPower(f.a, f.ak), util.NewBinaryIntPower(f.b, f.bk)
+		a, b := unumeral.NewBinaryIntPower(f.a, f.ak), unumeral.NewBinaryIntPower(f.b, f.bk)
 		interval, e := m.IsolatingToRefinable(v, bqm, &a, &b)
 		if e != nil {
 			t.Fatal(f, e)
@@ -81,7 +80,7 @@ func TestUPolynomialRefineTwoRegisteredPrecisionInputs(t *testing.T) {
 	}{{[]int32{-1, -1, 0, 0, 0, 1}, 20}, {[]int32{-2, 0, 1}, 200}} {
 		p := upolySourceNew(t, m, f.p)
 		v := mustUPolyView(t, m, p)
-		a, b := util.NewBinaryInt(1), util.NewBinaryInt(2)
+		a, b := unumeral.NewBinaryInt(1), unumeral.NewBinaryInt(2)
 		interval, e := m.RefineToPrecision(v, bqm, &a, &b, f.k)
 		if e != nil {
 			t.Fatal(f.k, e)
@@ -114,14 +113,14 @@ func TestUPolynomialQ2BQNineRegisteredIntervals(t *testing.T) {
 	p := upolyIsolationProduct(t, m, [][]int32{{-1, 1}, {-2, 1}, {-3, 1}, {-4, 1}})
 	v := mustUPolyView(t, m, p)
 	for _, f := range []struct{ a, b upolyIsolationRational }{{upolyIsolationRational{1, 3}, upolyIsolationRational{7, 5}}, {upolyIsolationRational{1, 2}, upolyIsolationRational{7, 5}}, {upolyIsolationRational{3, 7}, upolyIsolationRational{3, 2}}, {upolyIsolationRational{0, 1}, upolyIsolationRational{3, 2}}, {upolyIsolationRational{0, 1}, upolyIsolationRational{23, 21}}, {upolyIsolationRational{7, 2}, upolyIsolationRational{5, 1}}, {upolyIsolationRational{999, 1000}, upolyIsolationRational{1001, 1000}}, {upolyIsolationRational{9999, 10000}, upolyIsolationRational{10001, 10000}}, {upolyIsolationRational{39999, 10000}, upolyIsolationRational{40001, 10000}}} {
-		a, b := util.NewRational(), util.NewRational()
+		a, b := unumeral.NewRational(), unumeral.NewRational()
 		if e := q.SetFraction(&a, f.a.n, f.a.d); e != nil {
 			t.Fatal(e)
 		}
 		if e := q.SetFraction(&b, f.b.n, f.b.d); e != nil {
 			t.Fatal(e)
 		}
-		c, d := util.NewBinaryRational(), util.NewBinaryRational()
+		c, d := unumeral.NewBinaryRational(), unumeral.NewBinaryRational()
 		interval, e := m.ConvertRationalToBinaryInterval(v, q, &a, &b, bqm, &c, &d)
 		if e != nil {
 			t.Fatal(f, e)
@@ -157,7 +156,7 @@ func TestUPolynomialRefineAndNormalizeAllPublicRoutes(t *testing.T) {
 	bqm := upolyIsolationBinaryOwner(t, q, budget)
 	p := upolySourceNew(t, m, []int32{-2, 0, 1})
 	v := mustUPolyView(t, m, p)
-	a, b := util.NewBinaryInt(1), util.NewBinaryInt(2)
+	a, b := unumeral.NewBinaryInt(1), unumeral.NewBinaryInt(2)
 	for route := 0; route < 3; route++ {
 		sign := upolyIsolationSign(t, m, v, &a)
 		var interval bool
@@ -183,7 +182,7 @@ func TestUPolynomialRefineAndNormalizeAllPublicRoutes(t *testing.T) {
 	positive := upolySourceNew(t, m, []int32{-1, 1})
 	pv := mustUPolyView(t, m, positive)
 	for _, known := range []bool{false, true} {
-		a, b = util.NewBinaryInt(-1), util.NewBinaryInt(2)
+		a, b = unumeral.NewBinaryInt(-1), unumeral.NewBinaryInt(2)
 		var yes bool
 		var e error
 		if known {
@@ -203,7 +202,7 @@ func TestUPolynomialRefineAndNormalizeAllPublicRoutes(t *testing.T) {
 		}
 	}
 	zeroPoly := upolySourceNew(t, m, []int32{0, 1})
-	a, b = util.NewBinaryInt(-1), util.NewBinaryInt(1)
+	a, b = unumeral.NewBinaryInt(-1), unumeral.NewBinaryInt(1)
 	yes, e := m.NormalizeInterval(mustUPolyView(t, m, zeroPoly), bqm, &a, &b)
 	if e != nil || yes {
 		t.Fatal(yes, e)
@@ -220,11 +219,11 @@ func TestUPolynomialQ2BQAliasedOutputSourceDebugSite(t *testing.T) {
 	m, q, budget := upolySourceOwner(t)
 	bqm := upolyIsolationBinaryOwner(t, q, budget)
 	p := upolySourceNew(t, m, []int32{-1, 1})
-	a, b := util.NewRational(), util.NewRational()
+	a, b := unumeral.NewRational(), unumeral.NewRational()
 	if e := q.SetInt64(&b, 2); e != nil {
 		t.Fatal(e)
 	}
-	out := util.NewBinaryInt(37)
+	out := unumeral.NewBinaryInt(37)
 	interval, e := m.ConvertRationalToBinaryInterval(mustUPolyView(t, m, p), q, &a, &b, bqm, &out, &out)
 	if polynomialSourceDebug {
 		if e != ErrUPolynomialAssertion {
@@ -233,7 +232,7 @@ func TestUPolynomialQ2BQAliasedOutputSourceDebugSite(t *testing.T) {
 	} else if e != nil || !interval {
 		t.Fatal("defined release alias", interval, e)
 	}
-	two := util.NewInt(2)
+	two := unumeral.NewInt(2)
 	same, e2 := bqm.EqualInteger(&out, &two)
 	if e2 != nil || !same {
 		t.Fatal("source second endpoint publication", e2, same)
@@ -251,7 +250,7 @@ func TestUPolynomialQ2BQAliasedOutputSourceDebugSite(t *testing.T) {
 
 // Only reads actual scalar references; failedRef is retired/nonlive. No copies
 // of owning numerals or numerical formatting disturb the immediate prefix.
-func upolyIsolationCallerNumerators(m *UPolynomialManager, values ...*util.BinaryRational) uint32 {
+func upolyIsolationCallerNumerators(m *UPolynomialManager, values ...*unumeral.BinaryRational) uint32 {
 	failed := testFieldBySourceName(reflect.ValueOf(m.IntegerManager()).Elem(), "failedRef").Uint()
 	var n uint32
 	for _, v := range values {
@@ -275,19 +274,19 @@ func TestUPolynomialRefinementFaultPrefixesImmediateRoots(t *testing.T) {
 					bqm := upolyIsolationBinaryOwner(t, q, budget)
 					p := upolySourceNew(t, m, []int32{-2, 0, 1})
 					v := mustUPolyView(t, m, p)
-					a, b := util.NewBinaryInt(1), util.NewBinaryInt(2)
-					c, d := util.NewBinaryRational(), util.NewBinaryRational()
-					qa, qb := util.NewRational(), util.NewRational()
+					a, b := unumeral.NewBinaryInt(1), unumeral.NewBinaryInt(2)
+					c, d := unumeral.NewBinaryRational(), unumeral.NewBinaryRational()
+					qa, qb := unumeral.NewRational(), unumeral.NewRational()
 					if route == 1 {
-						if e := m.SetInts(p, []util.Int{util.NewInt(-1), util.NewInt(1)}); e != nil {
+						if e := m.SetInts(p, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(1)}); e != nil {
 							t.Fatal(e)
 						}
 						v = mustUPolyView(t, m, p)
-						var num, den util.Int
+						var num, den unumeral.Int
 						if e := m.IntegerManager().SetLimbs(&den, []uint32{0, 0, 0, 16}); e != nil {
 							t.Fatal(e)
 						}
-						one := util.NewInt(1)
+						one := unumeral.NewInt(1)
 						if e := m.IntegerManager().Sub(&den, &one, &num); e != nil {
 							t.Fatal(e)
 						}
@@ -327,7 +326,7 @@ func TestUPolynomialRefinementFaultPrefixesImmediateRoots(t *testing.T) {
 						t.Fatal("immediate refine/conversion graph", route, fault, e, e2, graph, scratch, callers)
 					}
 
-					upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Rationals: []*util.Rational{&qa, &qb}, RationalManagers: []*util.RationalManager{q}, BinaryValues: []*util.BinaryRational{&a, &b, &c, &d}, BinaryManagers: []*util.BinaryRationalManager{bqm}})
+					upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Rationals: []*unumeral.Rational{&qa, &qb}, RationalManagers: []*unumeral.RationalManager{q}, BinaryValues: []*unumeral.BinaryRational{&a, &b, &c, &d}, BinaryManagers: []*unumeral.BinaryRationalManager{bqm}})
 					budget.FailAfter(-1)
 					if e != nil {
 						failures++
@@ -337,7 +336,7 @@ func TestUPolynomialRefinementFaultPrefixesImmediateRoots(t *testing.T) {
 					} else {
 						successes++
 					}
-					for _, value := range []*util.BinaryRational{&a, &b, &c, &d} {
+					for _, value := range []*unumeral.BinaryRational{&a, &b, &c, &d} {
 						if e = bqm.Del(value); e != nil {
 							t.Fatal(route, fault, e)
 						}

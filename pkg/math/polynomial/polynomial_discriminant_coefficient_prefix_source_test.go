@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // p=y*x^2+1 reaches the polynomial leading-coefficient branch: Neg,
@@ -25,10 +24,10 @@ func TestPolynomialDiscriminantPolynomialLeadingCoefficientActualPrefixes(t *tes
 		serviceMust(t, e)
 		y, e := c.monomials.MkMonomial([]MonomialPower{{1, 1}})
 		serviceMust(t, e)
-		p, e := c.MkTerms([]util.Int{util.NewInt(1), util.NewInt(1)}, []Monomial{xy, unit})
+		p, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}, []Monomial{xy, unit})
 		serviceMust(t, e)
 		p = polynomialCaller(t, c, p)
-		expected, e := c.MkTerms([]util.Int{util.NewInt(-4)}, []Monomial{y})
+		expected, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(-4)}, []Monomial{y})
 		serviceMust(t, e)
 		expected = polynomialCaller(t, c, expected)
 		r, e := NewPolynomialRef(c)
@@ -38,7 +37,7 @@ func TestPolynomialDiscriminantPolynomialLeadingCoefficientActualPrefixes(t *tes
 		budget.FailAfter(prefix)
 		e = m.Discriminant(p, 0, r)
 		s := &m.discriminant
-		polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, expected, r.root.value, r.root.incoming, s.refs[0].value, s.refs[1].value}, []*util.Int{&s.lc}, r.header)
+		polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, expected, r.root.value, r.root.incoming, s.refs[0].value, s.refs[1].value}, []*unumeral.Int{&s.lc}, r.header)
 		if s.coefficient.invocation != 0 {
 			selected = true
 			if s.neg.invocation == 0 || s.scalar.invocation != 0 || s.constant.invocation == 0 {
@@ -61,7 +60,7 @@ func TestPolynomialDiscriminantPolynomialLeadingCoefficientActualPrefixes(t *tes
 			}
 		}
 		if own := m.CleanupDiscriminant(); own != nil {
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, expected, r.root.value, r.root.incoming, s.refs[0].value, s.refs[1].value}, []*util.Int{&s.lc}, r.header)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, expected, r.root.value, r.root.incoming, s.refs[0].value, s.refs[1].value}, []*unumeral.Int{&s.lc}, r.header)
 			// The owning suffix can reach a real ID-vector reservation in
 			// either the exact failed polynomial factory or the append row's
 			// actual last monomial DEC. Observe its named slot and stage.

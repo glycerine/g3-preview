@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The public signed-counter recipe is a guarded host/source undefined-domain
@@ -22,7 +23,7 @@ func TestPolynomialExactDivActualNUMStopPreservesOlderReference(t *testing.T) {
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: cfg.Profile})
 	serviceMust(t, e)
@@ -44,7 +45,7 @@ func TestPolynomialExactDivActualNUMStopPreservesOlderReference(t *testing.T) {
 	// ID recycle backing before the guarded-domain destructor-only boundary.
 	var warmed [6]Polynomial
 	for i := range warmed {
-		a := util.NewInt(int32(i + 7))
+		a := unumeral.NewInt(int32(i + 7))
 		warmed[i], e = m.MkConstantTake(&a)
 		serviceMust(t, e)
 		serviceMust(t, m.IncRef(warmed[i]))
@@ -57,7 +58,7 @@ func TestPolynomialExactDivActualNUMStopPreservesOlderReference(t *testing.T) {
 	serviceMust(t, e)
 	serviceMust(t, mm.IncRef(warm))
 	serviceMust(t, mm.DecRef(warm))
-	big, negative := util.Int{}, util.Int{}
+	big, negative := unumeral.Int{}, unumeral.Int{}
 	words := make([]uint32, 30001)
 	words[0] = 1
 	words[len(words)-1] = 1
@@ -70,10 +71,10 @@ func TestPolynomialExactDivActualNUMStopPreservesOlderReference(t *testing.T) {
 	serviceMust(t, e)
 	unit, e := mm.Unit()
 	serviceMust(t, e)
-	p, e := m.MkTerms([]util.Int{big, negative}, []Monomial{x2, unit})
+	p, e := m.MkTerms([]unumeral.Int{big, negative}, []Monomial{x2, unit})
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(p))
-	divisor, e := m.MkTerms([]util.Int{util.NewInt(1), util.NewInt(1)}, []Monomial{x, unit})
+	divisor, e := m.MkTerms([]unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}, []Monomial{x, unit})
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(divisor))
 	defer func() {
@@ -122,7 +123,7 @@ func TestPolynomialExactDivActualNUMStopPreservesOlderReference(t *testing.T) {
 	// whole Close consequently no longer owns their last reference.
 	type foreignRow struct {
 		term        Monomial
-		coefficient util.Int
+		coefficient unumeral.Int
 		refs        uint32
 	}
 	var foreign []foreignRow

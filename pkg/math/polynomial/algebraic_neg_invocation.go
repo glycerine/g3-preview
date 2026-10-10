@@ -7,7 +7,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Neg itself declares no NUM. Its reached binary Horner child declares r then
@@ -19,7 +19,7 @@ type algebraicNegScope struct {
 	active, executing, sourceExecuting, ownExecuting bool
 	falseAcknowledged                                bool
 	numeric                                          polynomialNumericRoots
-	normalize                                        util.IntegerNormalizeInvocationReceipt
+	normalize                                        unumeral.IntegerNormalizeInvocationReceipt
 	eval                                             algebraicNegBinaryScope
 	evalHistory                                      [2]algebraicNegBinaryHistory
 	bodyCause, sourceCause, cleanupCause             error
@@ -29,10 +29,10 @@ type algebraicNegScope struct {
 }
 type algebraicNegBinaryScope struct {
 	invocation                                  uint64
-	values                                      [2]util.Int
+	values                                      [2]unumeral.Int
 	numeric                                     polynomialNumericRoots
-	normalize                                   util.IntegerNormalizeInvocationReceipt
-	addMul                                      util.IntegerAddMulInvocationReceipt
+	normalize                                   unumeral.IntegerNormalizeInvocationReceipt
+	addMul                                      unumeral.IntegerAddMulInvocationReceipt
 	constructed, sourceRemaining, ownRemaining  uint8
 	active, executing, bodyReturned, ownStarted bool
 	bodyCause, sourceCause                      error
@@ -53,7 +53,7 @@ func (m *AlgebraicRootCore) negationExecuting() bool {
 func (m *AlgebraicRootCore) matchesNegation(r *algebraicNegInvocationReceipt) bool {
 	return m != nil && m.self == m && r != nil && r.owner == m && r.frame == &m.negation && r.invocation != 0 && r.frame.owner == m && r.invocation == r.frame.invocation && r.frame.active
 }
-func (c integerAllocationInvocationContext) algebraicNegFrame(z *util.IntegerManager) *algebraicNegScope {
+func (c integerAllocationInvocationContext) algebraicNegFrame(z *unumeral.IntegerManager) *algebraicNegScope {
 	q := c.algebraicNeg
 	if z == nil || !z.ValidOwner() || q == nil || q.owner == nil || q.owner.self != q.owner || q != &q.owner.negation || q.owner.config.Rationals == nil || q.owner.config.Rationals.Integers() != z || algebraicNegCaller(z) != q.owner || !q.active || !q.executing || c.algebraicNegInvocation == 0 || c.algebraicNegInvocation != q.invocation || q.owner.config.Polynomials == nil || q.owner.config.Polynomials.self != q.owner.config.Polynomials || q.owner.config.Polynomials.callbackDepth != 0 || q.owner.config.Polynomials.algebraicNegCaller != q.owner {
 		return nil
@@ -283,8 +283,8 @@ func (q *algebraicNegScope) finishBinarySource(body error) error {
 type algebraicNegBinaryHistory struct {
 	invocation                                 uint64
 	constructed, sourceRemaining, ownRemaining uint8
-	normalize                                  util.IntegerNormalizeInvocationReceipt
-	addMul                                     util.IntegerAddMulInvocationReceipt
+	normalize                                  unumeral.IntegerNormalizeInvocationReceipt
+	addMul                                     unumeral.IntegerAddMulInvocationReceipt
 	bodyCause, sourceCause                     error
 }
 
@@ -300,8 +300,8 @@ type algebraicNegHistory struct {
 	invocation                                        uint64
 	phase, constructed, sourceRemaining, ownRemaining uint8
 	evalInvocation                                    uint64
-	normalize, evalNormalize                          util.IntegerNormalizeInvocationReceipt
-	addMul                                            util.IntegerAddMulInvocationReceipt
+	normalize, evalNormalize                          unumeral.IntegerNormalizeInvocationReceipt
+	addMul                                            unumeral.IntegerAddMulInvocationReceipt
 	bodyCause, sourceCause, cleanupCause              error
 }
 
@@ -343,7 +343,7 @@ func (m *AlgebraicRootCore) negationHistoryFor(r *algebraicNegInvocationReceipt)
 	return algebraicNegHistory{}, false
 }
 
-func numericIntegerManager_algebraicNegCallerExecuting(z *util.IntegerManager) bool {
+func numericIntegerManager_algebraicNegCallerExecuting(z *unumeral.IntegerManager) bool {
 	return z != nil && z.ValidOwner() && algebraicNegCaller(z) != nil && algebraicNegCaller(z).negationExecuting() && algebraicNegCaller(z).config.Rationals.Integers() == z
 }
 

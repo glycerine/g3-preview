@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialDisplayTestSink struct {
@@ -108,7 +108,7 @@ func TestPolynomialDisplayZeroAndRefVectorSuffix(t *testing.T) {
 func TestPolynomialDisplayScalarCStringAliveAndNested(t *testing.T) {
 	m, _, _ := polynomialEvalFixture(t, nil)
 	z := m.core.integer
-	a := util.Int{}
+	a := unumeral.Int{}
 	serviceMust(t, z.Copy(&a, &z.Two64))
 	serviceMust(t, z.Neg(&a))
 	p, e := m.core.MkConstantTake(&a)
@@ -162,7 +162,7 @@ func TestPolynomialDisplayLastCallbackLifetime(t *testing.T) {
 func TestPolynomialDisplayBorrowEndsAfterInsertion(t *testing.T) {
 	m, _, _ := polynomialEvalFixture(t, nil)
 	z := m.core.integer
-	a := util.Int{}
+	a := unumeral.Int{}
 	serviceMust(t, z.Copy(&a, &z.Two64))
 	p, e := m.core.MkConstantTake(&a)
 	serviceMust(t, e)
@@ -195,7 +195,7 @@ func TestPolynomialDisplayEveryReservation(t *testing.T) {
 					z := m.core.integer
 					digits := make([]uint32, 130)
 					digits[129] = 1
-					a := util.Int{}
+					a := unumeral.Int{}
 					serviceMust(t, z.SetLimbs(&a, digits))
 					serviceMust(t, z.Neg(&a))
 					p, e := m.core.MkConstantTake(&a)
@@ -379,7 +379,7 @@ func TestPolynomialDisplayMonomialWrapperAndFiniteField(t *testing.T) {
 	if sink.text.String() != "x0^2*x1" {
 		t.Fatal("source monomial delegation", sink.text.String())
 	}
-	modulus := util.NewInt(5)
+	modulus := unumeral.NewInt(5)
 	serviceMust(t, m.core.modular.SetZP(&modulus))
 	sink = &polynomialDisplayTestSink{}
 	serviceMust(t, m.DisplayInto(p, sink, false))

@@ -3,7 +3,7 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -37,7 +37,7 @@ func TestUPolynomialHenselPairExactSourceActions(t *testing.T) {
 	c := upolySourceNew(t, m, []int32{-6, 0, 1})
 	outA := upolySourceNew(t, m, nil)
 	outB := upolySourceNew(t, m, nil)
-	five := util.NewInt(5)
+	five := unumeral.NewInt(5)
 	if e = service.HenselLiftPair(&five, &five, &five, mustUPolyView(t, m, u), mustUPolyView(t, m, a), mustUPolyView(t, m, v), mustUPolyView(t, m, bb), mustUPolyView(t, m, c), outA, outB); e != nil {
 		t.Fatal(e)
 	}
@@ -127,7 +127,7 @@ func TestUPolynomialHenselMultipleFactorsAndActualModulus(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	var modulus util.Int
+	var modulus unumeral.Int
 	if e = nm.Modulus(&modulus); e != nil {
 		t.Fatal(e)
 	}
@@ -311,7 +311,7 @@ func TestUPolynomialHenselActualTaggedDiagnostics(t *testing.T) {
 	if e = service.HenselLiftFactors(mustUPolyView(t, m, f), pf, 16, lf); e != nil {
 		t.Fatal("actual conditional helper arithmetic", e)
 	}
-	var modulus util.Int
+	var modulus unumeral.Int
 	nm, e := lift.NumeralManager()
 	if e != nil {
 		t.Fatal(e)

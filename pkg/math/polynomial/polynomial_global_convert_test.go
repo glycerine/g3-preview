@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialGlobalConvertSelfBorrow(t *testing.T) {
@@ -33,7 +34,7 @@ func TestPolynomialGlobalConvertDistinctOwnerFilter(t *testing.T) {
 		t.Fatal("source owner modified")
 	}
 	for x := int32(-3); x <= 3; x++ {
-		in, v := util.NewInt(x), util.Int{}
+		in, v := unumeral.NewInt(x), unumeral.Int{}
 		serviceMust(t, tm.UnivariateEvaluate(out, 0, &in, &v))
 		got, e := tm.core.integer.Int64(&v)
 		serviceMust(t, e)
@@ -67,7 +68,7 @@ func TestPolynomialGlobalConvertEveryActualPrefix(t *testing.T) {
 			if e == nil {
 				success = true
 				serviceMust(t, tm.core.IncRef(out))
-				in, value := util.NewInt(2), util.Int{}
+				in, value := unumeral.NewInt(2), unumeral.Int{}
 				serviceMust(t, tm.UnivariateEvaluate(out, 0, &in, &value))
 				got, e := tm.core.integer.Int64(&value)
 				serviceMust(t, e)
@@ -94,9 +95,9 @@ func TestPolynomialGlobalConvertOverflowingBuffersEveryPrefix(t *testing.T) {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			sm, _, _ := polynomialEvalFixture(t, nil)
 			tm, _, _ := polynomialEvalFixture(t, nil)
-			values := make([]util.Int, 130)
+			values := make([]unumeral.Int, 130)
 			for i := range values {
-				values[i] = util.NewInt(1)
+				values[i] = unumeral.NewInt(1)
 			}
 			p, e := sm.ToPolynomial(130, values, 0)
 			serviceMust(t, e)
@@ -114,7 +115,7 @@ func TestPolynomialGlobalConvertOverflowingBuffersEveryPrefix(t *testing.T) {
 			if e == nil {
 				success = true
 				serviceMust(t, tm.core.IncRef(out))
-				in, value := util.NewInt(1), util.Int{}
+				in, value := unumeral.NewInt(1), unumeral.Int{}
 				serviceMust(t, tm.UnivariateEvaluate(out, 0, &in, &value))
 				got, e := tm.core.integer.Int64(&value)
 				serviceMust(t, e)
@@ -138,7 +139,7 @@ func TestPolynomialGlobalConvertOverflowingBuffersEveryPrefix(t *testing.T) {
 func TestPolynomialGlobalConvertBigCoefficientDistinctInteger(t *testing.T) {
 	sm, _, _ := polynomialEvalFixture(t, nil)
 	tm, _, _ := polynomialEvalFixture(t, nil)
-	input := []util.Int{sm.core.integer.Two64, util.NewInt(1)}
+	input := []unumeral.Int{sm.core.integer.Two64, unumeral.NewInt(1)}
 	p, e := sm.ToPolynomial(2, input, 0)
 	serviceMust(t, e)
 	serviceMust(t, sm.core.IncRef(p))
@@ -149,7 +150,7 @@ func TestPolynomialGlobalConvertBigCoefficientDistinctInteger(t *testing.T) {
 	defer func() { serviceMust(t, tm.core.DecRef(out)) }()
 	polynomialImpPhysicalAuditValues(t, sm, []Polynomial{p})
 	polynomialImpPhysicalAuditValues(t, tm, []Polynomial{out})
-	in, value := util.NewInt(1), util.Int{}
+	in, value := unumeral.NewInt(1), unumeral.Int{}
 	serviceMust(t, tm.UnivariateEvaluate(out, 0, &in, &value))
 	text, e := tm.core.integer.String(&value)
 	serviceMust(t, e)
@@ -162,18 +163,18 @@ func TestPolynomialGlobalConvertBigCoefficientDistinctInteger(t *testing.T) {
 
 func TestPolynomialGlobalConvertExactNumericForeignReplacement(t *testing.T) {
 	sm, _, _ := polynomialEvalFixture(t, nil)
-	a := util.Int{}
+	a := unumeral.Int{}
 	serviceMust(t, sm.core.integer.Copy(&a, &sm.core.integer.Two64))
 	p, e := sm.core.MkConstantTake(&a)
 	serviceMust(t, e)
 	serviceMust(t, sm.core.IncRef(p))
 	defer func() { serviceMust(t, sm.core.DecRef(p)) }()
 	budget := arena.NewBudget(1 << 24)
-	z, e := util.NewIntegerManager(util.IntegerConfig{Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	z, e := unumeral.NewIntegerManager(unumeral.IntegerConfig{Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
 	serviceMust(t, e)
 	tm, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: z, Checkpoint: func() bool { panic("source convert has no checkpoint") }, Cooperation: func() error { panic("source convert has no cooperation") }}})
 	serviceMust(t, e)
-	foreign := util.Int{}
+	foreign := unumeral.Int{}
 	defer func() {
 		serviceMust(t, tm.CleanupConversion())
 		serviceMust(t, z.CleanupPendingAllocation())
@@ -189,19 +190,19 @@ func TestPolynomialGlobalConvertExactNumericForeignReplacement(t *testing.T) {
 		t.Fatal("actual coefficient payload before slot refusal", cause)
 	}
 	original := z.PendingCell
-	polynomialImpPhysicalAuditNamed(t, tm, nil, []*util.Int{&foreign}, 0)
+	polynomialImpPhysicalAuditNamed(t, tm, nil, []*unumeral.Int{&foreign}, 0)
 	serviceMust(t, z.CleanupPendingAllocation())
 	e = z.Copy(&foreign, &z.Two64)
 	if !errors.Is(e, arena.ErrSlotLimit) || z.PendingAllocationObject() == original.Object {
 		t.Fatal("actual later generation", e)
 	}
 	replacement := z.PendingCell
-	polynomialImpPhysicalAuditNamed(t, tm, nil, []*util.Int{&foreign}, 0)
+	polynomialImpPhysicalAuditNamed(t, tm, nil, []*unumeral.Int{&foreign}, 0)
 	serviceMust(t, tm.CleanupConversion())
 	if z.PendingCell != replacement {
 		t.Fatal("scope consumed foreign pending backing")
 	}
-	polynomialImpPhysicalAuditNamed(t, tm, nil, []*util.Int{&foreign}, 0)
+	polynomialImpPhysicalAuditNamed(t, tm, nil, []*unumeral.Int{&foreign}, 0)
 }
 
 func TestPolynomialGlobalConvertReturnedResultNativeMonomials(t *testing.T) {
@@ -213,7 +214,7 @@ func TestPolynomialGlobalConvertReturnedResultNativeMonomials(t *testing.T) {
 	serviceMust(t, e)
 	before, used := m.core.memory.Stats(), m.core.integer.Budget().Used()
 	m.core.integer.Budget().FailAfter(0)
-	zero := util.Int{}
+	zero := unumeral.Int{}
 	for i := 0; i < 4097; i++ {
 		s.ms = append(s.ms, unit)
 		serviceMust(t, s.as.Push(&zero))
@@ -222,7 +223,7 @@ func TestPolynomialGlobalConvertReturnedResultNativeMonomials(t *testing.T) {
 		t.Fatal("native lexical storage charged Runtime")
 	}
 	m.core.integer.Budget().FailAfter(-1)
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	serviceMust(t, s.as.Set(0, &one))
 	av, e := s.as.View()
 	serviceMust(t, e)
@@ -299,7 +300,7 @@ func TestPolynomialGlobalConvertSharedMonomialManager(t *testing.T) {
 		t.Fatal("shared monomial path must not invoke conversion factory")
 	}
 	for x := int32(-2); x <= 2; x++ {
-		in, v := util.NewInt(x), util.Int{}
+		in, v := unumeral.NewInt(x), unumeral.Int{}
 		serviceMust(t, tm.UnivariateEvaluate(out, 0, &in, &v))
 		got, e := tm.core.integer.Int64(&v)
 		serviceMust(t, e)
@@ -336,12 +337,12 @@ func TestPolynomialGlobalConvertFactoryForeignReplacement(t *testing.T) {
 			// Explicit caller recovery of the original concrete callee precedes a
 			// separately invoked large placement constructor, not implicit scope repair.
 			serviceMust(t, tm.core.cleanupPendingCreation())
-			coefficients := make([]util.Int, 1024)
+			coefficients := make([]unumeral.Int, 1024)
 			monomials := make([]Monomial, 1024)
 			unit, e := tm.core.monomials.Unit()
 			serviceMust(t, e)
 			for i := range coefficients {
-				coefficients[i] = util.NewInt(1)
+				coefficients[i] = unumeral.NewInt(1)
 				monomials[i] = unit
 			}
 			tm.core.integer.Budget().FailAfter(0)

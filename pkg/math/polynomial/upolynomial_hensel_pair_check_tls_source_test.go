@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -22,7 +23,7 @@ func TestUPolynomialHenselActualConditionalChildStopsOlderPair(t *testing.T) {
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -46,28 +47,28 @@ func TestUPolynomialHenselActualConditionalChildStopsOlderPair(t *testing.T) {
 	h.rm, e = NewRelatedUPolynomialManager(u)
 	serviceMust(t, e)
 	h.constructed = 1
-	five := util.NewInt(5)
+	five := unumeral.NewInt(5)
 	serviceMust(t, h.rm.SetZP(&five))
 	for i := uint8(2); i <= 7; i++ {
 		m, v := h.vector(i)
 		h.constructed = i
-		serviceMust(t, m.set(v, []util.Int{util.NewInt(1)}))
+		serviceMust(t, m.set(v, []unumeral.Int{unumeral.NewInt(1)}))
 	}
 	c := &h.check
-	c.br = util.NewInt(1)
+	c.br = unumeral.NewInt(1)
 	c.constructed = 1
 	c.brCore, e = NewRelatedUPolynomialManager(u)
 	serviceMust(t, e)
 	c.constructed = 2
 	serviceMust(t, c.brCore.SetZP(&five))
-	serviceMust(t, u.set(&c.test1, []util.Int{util.NewInt(1)}))
+	serviceMust(t, u.set(&c.test1, []unumeral.Int{unumeral.NewInt(1)}))
 	c.constructed = 3
 	c.bCore, e = NewRelatedUPolynomialManager(u)
 	serviceMust(t, e)
 	c.constructed = 4
 	serviceMust(t, c.bCore.SetZP(&five))
 	for i := uint8(5); i <= 8; i++ {
-		serviceMust(t, u.set(h.checkVector(i), []util.Int{util.NewInt(1)}))
+		serviceMust(t, u.set(h.checkVector(i), []unumeral.Int{unumeral.NewInt(1)}))
 		c.constructed = i
 	}
 	tmp, e := u.read(u.stateView(&c.test3b), 0)

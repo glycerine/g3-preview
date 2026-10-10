@@ -2,9 +2,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestASTFloatingPointValueTableUsesActualMPFHashAndEquality(t *testing.T) {
@@ -16,12 +15,12 @@ func TestASTFloatingPointValueTableUsesActualMPFHashAndEquality(t *testing.T) {
 	_, e = m.RegisterFloatingPointPlugin()
 	astTestMust(t, e)
 	p := m.floatingPointPlugin
-	var sig util.Int
-	var a, b, c util.ArbitraryFloat
+	var sig unumeral.Int
+	var a, b, c unumeral.ArbitraryFloat
 	astTestMust(t, p.numeric.SetComponents(&a, 8, 24, false, 3, &sig))
 	astTestMust(t, p.numeric.SetComponents(&b, 8, 24, true, 3, &sig))
 	astTestMust(t, p.numeric.SetComponents(&c, 8, 24, false, 3, &sig))
-	for _, n := range []*util.ArbitraryFloat{&a, &b, &c} {
+	for _, n := range []*unumeral.ArbitraryFloat{&a, &b, &c} {
 		astTestMust(t, p.values.push(n))
 	}
 	h0, e := p.numeric.Hash(&a)
@@ -53,8 +52,8 @@ func TestASTFloatingPointValueIDLiteralCanonicalization(t *testing.T) {
 	_, e = m.RegisterFloatingPointPlugin()
 	astTestMust(t, e)
 	p := m.floatingPointPlugin
-	sig := util.NewInt(19)
-	var a util.ArbitraryFloat
+	sig := unumeral.NewInt(19)
+	var a unumeral.ArbitraryFloat
 	astTestMust(t, p.numeric.SetComponents(&a, 8, 24, false, 7, &sig))
 	first, e := p.mkValueID(&a)
 	astTestMust(t, e)
@@ -75,7 +74,7 @@ func TestASTFloatingPointValueIDLiteralCanonicalization(t *testing.T) {
 		t.Fatal("source inline DEL changed nonowning numeral bits", row)
 	}
 	astFloatingPointConstructorRawGraph(t, m.numerals, p)
-	sig = util.NewInt(20)
+	sig = unumeral.NewInt(20)
 	astTestMust(t, p.numeric.SetComponents(&a, 8, 24, false, 7, &sig))
 	distinct, e := p.mkValueID(&a)
 	astTestMust(t, e)
@@ -98,8 +97,8 @@ func TestASTFloatingPointValueIDEveryActualReservationPrefix(t *testing.T) {
 		_, e = m.RegisterFloatingPointPlugin()
 		astTestMust(t, e)
 		p := m.floatingPointPlugin
-		sig := util.NewInt(19)
-		var a util.ArbitraryFloat
+		sig := unumeral.NewInt(19)
+		var a unumeral.ArbitraryFloat
 		astTestMust(t, p.numeric.SetComponents(&a, 8, 24, false, 7, &sig))
 		base := m.BudgetField.Used() - m.Stats().AllocatedBytes - m.numerals.RuntimeOwner().Stats().TotalBytes
 		m.BudgetField.FailAfter(ordinal)

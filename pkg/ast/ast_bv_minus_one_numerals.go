@@ -2,7 +2,7 @@
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 )
 
@@ -11,9 +11,9 @@ import (
 type BitVectorMinusOneNumerals struct {
 	self                   *BitVectorMinusOneNumerals
 	manager                *ASTManager
-	values                 [4]util.OwnedRational
+	values                 [4]unumeral.OwnedRational
 	placed                 [4]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	header                 uint64
 	sourceCause            error
 	stopped, ended, closed bool
@@ -65,7 +65,7 @@ func (n *BitVectorMinusOneNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorMinusOneNumerals) Read(arg ASTHandle, width *uint32) (bool, error) {
@@ -90,7 +90,7 @@ func (n *BitVectorMinusOneNumerals) Compare(width uint32) (bool, error) {
 	q := n.manager.numerals
 	v, e := q.PowerOfTwoWithInvocation(width, &n.scalar)
 	n.values[1] = v
-	n.placed[1] = v != (util.OwnedRational{})
+	n.placed[1] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -112,7 +112,7 @@ func (n *BitVectorMinusOneNumerals) Compare(width uint32) (bool, error) {
 	}
 	v, e = q.SubWithInvocation(&n.values[1], &n.values[2], &n.scalar)
 	n.values[3] = v
-	n.placed[3] = v != (util.OwnedRational{})
+	n.placed[3] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}

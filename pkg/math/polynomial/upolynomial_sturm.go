@@ -1,7 +1,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *UPolynomialManager) sequenceOutput(s *UPolynomialSequence) error {
@@ -136,7 +136,7 @@ func (m *UPolynomialManager) FourierSequence(p UPolynomialView, s *UPolynomialSe
 	}
 	return nil
 }
-func (m *UPolynomialManager) sequenceVariations(s *upolySequenceState, location uint8, b *util.BinaryRational) (uint32, error) {
+func (m *UPolynomialManager) sequenceVariations(s *upolySequenceState, location uint8, b *unumeral.BinaryRational) (uint32, error) {
 	if uint32(len(s.sizes)) <= 1 {
 		return 0, nil
 	}
@@ -200,13 +200,13 @@ func (m *UPolynomialManager) SignVariationsZero(s *UPolynomialSequence) (uint32,
 	}
 	return m.sequenceVariations(&s.state, 2, nil)
 }
-func (m *UPolynomialManager) SignVariationsBinary(s *UPolynomialSequence, b *util.BinaryRational) (uint32, error) {
+func (m *UPolynomialManager) SignVariationsBinary(s *UPolynomialSequence, b *unumeral.BinaryRational) (uint32, error) {
 	if e := m.sequenceOutput(s); e != nil {
 		return 0, e
 	}
 	return m.sequenceVariations(&s.state, 3, b)
 }
-func (m *UPolynomialManager) GetRootID(p UPolynomialView, b *util.BinaryRational) (uint32, error) {
+func (m *UPolynomialManager) GetRootID(p UPolynomialView, b *unumeral.BinaryRational) (uint32, error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}

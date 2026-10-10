@@ -4,10 +4,10 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (c integerAllocationInvocationContext) recombinationFrame(z *util.IntegerManager) *upolyRecombinationStepScope {
+func (c integerAllocationInvocationContext) recombinationFrame(z *unumeral.IntegerManager) *upolyRecombinationStepScope {
 	q := c.recombination
 	if z == nil || !z.ValidOwner() || q == nil || !q.matches() || !q.active || !q.executing || c.recombinationInvocation == 0 || c.recombinationInvocation != q.invocation || q.owner.service.scope != q.owner || q.owner.manager.config.Integer != z {
 		return nil
@@ -23,7 +23,7 @@ func (c integerAllocationInvocationContext) recombinationFrame(z *util.IntegerMa
 	}
 	return q
 }
-func numericIntegerModularManager_recombinationAllocationContext(m *util.IntegerModularManager, q *upolyRecombinationStepScope) integerAllocationInvocationContext {
+func numericIntegerModularManager_recombinationAllocationContext(m *unumeral.IntegerModularManager, q *upolyRecombinationStepScope) integerAllocationInvocationContext {
 	if m == nil || !m.ValidOwner() || m.Integers() == nil || q == nil || !q.matches() {
 		return integerAllocationInvocationContext{}
 	}
@@ -37,7 +37,7 @@ func numericIntegerModularManager_recombinationAllocationContext(m *util.Integer
 	}
 	return integerAllocationInvocationContext{}
 }
-func (q *upolyRecombinationStepScope) normalizeReceipt(m *util.IntegerModularManager) *util.IntegerNormalizeInvocationReceipt {
+func (q *upolyRecombinationStepScope) normalizeReceipt(m *unumeral.IntegerModularManager) *unumeral.IntegerNormalizeInvocationReceipt {
 	for i, owner := range q.managers() {
 		if owner.modular == m {
 			return &q.normalize[i]
@@ -46,22 +46,22 @@ func (q *upolyRecombinationStepScope) normalizeReceipt(m *util.IntegerModularMan
 	return nil
 }
 
-func (c integerAllocationInvocationContext) recordRecombinationRaw(z *util.IntegerManager, r *util.IntegerRawInvocationReceipt) {
+func (c integerAllocationInvocationContext) recordRecombinationRaw(z *unumeral.IntegerManager, r *unumeral.IntegerRawInvocationReceipt) {
 	q := c.recombinationFrame(z)
 	if q == nil || !z.MatchesRawInvocation(r) {
 		return
 	}
 	switch r.Kind() {
-	case util.IntegerRawDivision:
+	case unumeral.IntegerRawDivision:
 		q.divisionRaw = *r
-	case util.IntegerRawExtendedGCD:
+	case unumeral.IntegerRawExtendedGCD:
 		q.extendedRaw = *r
-	case util.IntegerRawGCD:
+	case unumeral.IntegerRawGCD:
 		q.gcdRaw = *r
 	}
 }
 
-func (m *UPolynomialManager) mulScalarStateWithRecombination(s *upolyVectorState, b *util.Int, q *upolyRecombinationStepScope) error {
+func (m *UPolynomialManager) mulScalarStateWithRecombination(s *upolyVectorState, b *unumeral.Int, q *upolyRecombinationStepScope) error {
 	context := numericIntegerModularManager_recombinationAllocationContext(m.modular, q)
 	if context.recombinationFrame(m.config.Integer) == nil {
 		return ErrUPolynomialOwner

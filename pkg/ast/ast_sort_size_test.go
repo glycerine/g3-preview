@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestSortSizeSourceDefaultFactoriesAndGuards(t *testing.T) {
@@ -49,8 +49,8 @@ func TestSortSizeSourceDefaultFactoriesAndGuards(t *testing.T) {
 }
 func TestSortSizeRationalActualUint64Classification(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	config := util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}}
-	m, e := util.NewRationalService(config)
+	config := unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}}
+	m, e := unumeral.NewRationalService(config)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -98,8 +98,8 @@ func TestSortSizeRationalActualUint64Classification(t *testing.T) {
 	}
 }
 func TestSortSizeRationalBorrowedOwnerLifetime(t *testing.T) {
-	m, _ := util.NewRationalService(util.RationalServiceConfig{})
-	other, _ := util.NewRationalService(util.RationalServiceConfig{})
+	m, _ := unumeral.NewRationalService(unumeral.RationalServiceConfig{})
+	other, _ := unumeral.NewRationalService(unumeral.RationalServiceConfig{})
 	defer other.Close()
 	v, _ := m.NewValue()
 	m.SetUint64(&v, math.MaxUint64)
@@ -107,17 +107,17 @@ func TestSortSizeRationalBorrowedOwnerLifetime(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if _, e = SortSizeFromRational(other, &v); !errors.Is(e, util.ErrRationalServiceOwner) {
+	if _, e = SortSizeFromRational(other, &v); !errors.Is(e, unumeral.ErrRationalServiceOwner) {
 		t.Fatal(e)
 	}
-	if _, e = SortSizeFromRational(m, nil); !errors.Is(e, util.ErrRationalServiceOwner) {
+	if _, e = SortSizeFromRational(m, nil); !errors.Is(e, unumeral.ErrRationalServiceOwner) {
 		t.Fatal(e)
 	}
 	if _, e = SortSizeFromRational(nil, &v); e == nil {
 		t.Fatal("nil")
 	}
 	m.Del(&v)
-	if _, e = SortSizeFromRational(m, &v); !errors.Is(e, util.ErrRationalServiceOwner) {
+	if _, e = SortSizeFromRational(m, &v); !errors.Is(e, unumeral.ErrRationalServiceOwner) {
 		t.Fatal(e)
 	}
 	m.Close()

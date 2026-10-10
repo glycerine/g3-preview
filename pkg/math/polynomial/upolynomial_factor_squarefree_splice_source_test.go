@@ -3,10 +3,9 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialFactorSquareFreeRejectsSplicedDiagnosticAcquisition(t *testing.T) {
@@ -22,10 +21,10 @@ func TestUPolynomialFactorSquareFreeRejectsSplicedDiagnosticAcquisition(t *testi
 			out, e := m.NewFactors()
 			serviceMust(t, e)
 			var f, big upolyVectorState
-			var value util.Int
-			serviceMust(t, m.set(&f, []util.Int{util.NewInt(-6), util.NewInt(1), util.NewInt(1)}))
+			var value unumeral.Int
+			serviceMust(t, m.set(&f, []unumeral.Int{unumeral.NewInt(-6), unumeral.NewInt(1), unumeral.NewInt(1)}))
 			serviceMust(t, z.Integers().SetString(&value, "1208925819614629174706176"))
-			serviceMust(t, m.set(&big, []util.Int{value, util.NewInt(1), util.NewInt(1)}))
+			serviceMust(t, m.set(&big, []unumeral.Int{value, unumeral.NewInt(1), unumeral.NewInt(1)}))
 			serviceMust(t, z.Integers().Del(&value))
 			var old, next upolyFactorSquareFreeInvocationReceipt
 			defer func() {

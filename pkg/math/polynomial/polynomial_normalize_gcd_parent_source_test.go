@@ -2,15 +2,14 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialNormalizeGCDParentRetainsActualStoppedChild(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
-	var a, b util.Int
+	var a, b unumeral.Int
 	aw, bw := make([]uint32, 80), make([]uint32, 77)
 	aw[0], aw[79] = 6, 1<<29
 	bw[0], bw[76] = 10, 1<<27
@@ -19,7 +18,7 @@ func TestPolynomialNormalizeGCDParentRetainsActualStoppedChild(t *testing.T) {
 	t.Cleanup(func() { serviceMust(t, c.integer.Del(&a)); serviceMust(t, c.integer.Del(&b)) })
 	x, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{a, b}, []Monomial{x, c.monomials.unit})
+	p, e := c.MkTerms([]unumeral.Int{a, b}, []Monomial{x, c.monomials.unit})
 	serviceMust(t, e)
 	p = polynomialCaller(t, c, p)
 	s, e := full.beginGCDFunction()
@@ -39,7 +38,7 @@ func TestPolynomialNormalizeGCDParentRetainsActualStoppedChild(t *testing.T) {
 	}
 	full.gcdDepth--
 	c.pscLeave()
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&a, &b}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*unumeral.Int{&a, &b}, 0)
 	serviceMust(t, full.CleanupGCD())
 	if full.normalization.active || s.normalizeInvocation != child || !full.hasNormalizeInvocationHistory(&s.normalizeInvocation) {
 		t.Error("own parent omitted exact child or erased child history")

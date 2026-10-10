@@ -2,10 +2,9 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialRemoveOneHalfRootActualDivisionCaller(t *testing.T) {
@@ -49,7 +48,7 @@ func TestUPolynomialRemoveOneHalfRootActualDivisionCaller(t *testing.T) {
 	}
 	value, e := p.read(ov, 0)
 	serviceMust(t, e)
-	if *value != util.NewInt(2) {
+	if *value != unumeral.NewInt(2) {
 		t.Fatal("literal integer pseudo-division quotient", *value)
 	}
 }

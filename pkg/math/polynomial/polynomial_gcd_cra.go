@@ -3,15 +3,14 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The twelve actual scoped_numeral declarations, constructed at their source
 // sites. The outer manager's reflected cold extent owns this concrete carrier.
 
 type polynomialCRAScope struct {
-	nums                    [12]util.Int
+	nums                    [12]unumeral.Int
 	constructed             uint8
 	active, topOwner        bool
 	generation              uint64
@@ -30,7 +29,7 @@ func (m *MultivariatePolynomialManager) craSourceEnd() error {
 	}
 	for s.constructed != 0 {
 		i := s.constructed - 1
-		if _, e := util.SourceNumeralDel(m.core.integer, &s.nums[i]); e != nil {
+		if _, e := unumeral.SourceNumeralDel(m.core.integer, &s.nums[i]); e != nil {
 			s.cleanupCause = e
 			return e
 		}
@@ -87,7 +86,7 @@ func (m *MultivariatePolynomialManager) CleanupCRA() error {
 
 // Concrete operation dispatch shares the real numeric engines; the receipt
 // brackets only the invoked arithmetic leaf, never caller callbacks.
-func (m *MultivariatePolynomialManager) craLeaf(op uint8, a, b, out *util.Int) error {
+func (m *MultivariatePolynomialManager) craLeaf(op uint8, a, b, out *unumeral.Int) error {
 	c := m.core
 	s := &m.cra
 	before, e := polynomialNumericBefore(c.integer)
@@ -116,7 +115,7 @@ func (m *MultivariatePolynomialManager) craAdd(a Polynomial, ai uint32, b Polyno
 	c := m.core
 	s := &m.cra
 	n := &s.nums
-	av := util.NewInt(0)
+	av := unumeral.NewInt(0)
 	if a != (Polynomial{}) {
 		var e error
 		av, e = c.coefficientCore(a, ai)
@@ -127,7 +126,7 @@ func (m *MultivariatePolynomialManager) craAdd(a Polynomial, ai uint32, b Polyno
 	if e := m.craLeaf(0, &av, &n[3], &n[9]); e != nil {
 		return e
 	}
-	bv := util.NewInt(0)
+	bv := unumeral.NewInt(0)
 	if b != (Polynomial{}) {
 		var e error
 		bv, e = c.coefficientCore(b, bi)
@@ -161,7 +160,7 @@ func (m *MultivariatePolynomialManager) craAdd(a Polynomial, ai uint32, b Polyno
 	}
 	return c.cheap.add(&n[8], term, false)
 }
-func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *util.Int, b Polynomial, b2 *util.Int, out *PolynomialRef) (err error) {
+func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b Polynomial, b2 *unumeral.Int, out *PolynomialRef) (err error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -248,7 +247,7 @@ func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *util.Int, b Pol
 		return e
 	}
 	s.constructed = 12
-	two := util.NewInt(2)
+	two := unumeral.NewInt(2)
 	if e = m.craLeaf(4, &n[5], &two, &n[7]); e != nil {
 		return e
 	}

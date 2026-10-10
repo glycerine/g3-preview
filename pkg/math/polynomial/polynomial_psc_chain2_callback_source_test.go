@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialPSCChain2ResetCallbackNineReferencesAndOwnerRefusal(t *testing.T) {
@@ -14,7 +13,7 @@ func TestPolynomialPSCChain2ResetCallbackNineReferencesAndOwnerRefusal(t *testin
 	q := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{{{0, 1}}, nil})
 	third, e := c.monomials.MkVariable(0, 3)
 	serviceMust(t, e)
-	old, e := c.MkTerms([]util.Int{util.NewInt(7), util.NewInt(3)}, []Monomial{third, c.monomials.unit})
+	old, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(7), unumeral.NewInt(3)}, []Monomial{third, c.monomials.unit})
 	serviceMust(t, e)
 	out, e := NewPolynomialRefVector(c)
 	serviceMust(t, e)

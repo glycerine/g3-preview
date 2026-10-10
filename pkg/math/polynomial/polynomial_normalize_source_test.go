@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialNormalizeIndependentSignedIntegerContent(t *testing.T) {
@@ -55,8 +56,8 @@ func TestPolynomialNormalizeEveryActualReservationPrefix(t *testing.T) {
 				c := full.core
 				p := polynomialQueryTerms(t, c, []int32{-6, -10}, [][]MonomialPower{{{0, 1}}, nil})
 				want := polynomialQueryTerms(t, c, []int32{-3, -5}, [][]MonomialPower{{{0, 1}}, nil})
-				var large, unitLarge util.Int
-				inputs := []*util.Int{}
+				var large, unitLarge unumeral.Int
+				inputs := []*unumeral.Int{}
 				if route == 1 {
 					p = polynomialQueryTerms(t, c, []int32{9, -1}, [][]MonomialPower{{{0, 1}}, nil})
 					want = polynomialQueryTerms(t, c, []int32{2, -1}, [][]MonomialPower{{{0, 1}}, nil})
@@ -68,13 +69,13 @@ func TestPolynomialNormalizeEveryActualReservationPrefix(t *testing.T) {
 					t.Cleanup(func() { serviceMust(t, c.integer.Del(&large)); serviceMust(t, c.integer.Del(&unitLarge)) })
 					x, e := c.monomials.MkVariable(0, 1)
 					serviceMust(t, e)
-					p, e = c.MkTerms([]util.Int{large, util.NewInt(7)}, []Monomial{x, c.monomials.unit})
+					p, e = c.MkTerms([]unumeral.Int{large, unumeral.NewInt(7)}, []Monomial{x, c.monomials.unit})
 					serviceMust(t, e)
 					p = polynomialCaller(t, c, p)
-					want, e = c.MkTerms([]util.Int{unitLarge, util.NewInt(1)}, []Monomial{x, c.monomials.unit})
+					want, e = c.MkTerms([]unumeral.Int{unitLarge, unumeral.NewInt(1)}, []Monomial{x, c.monomials.unit})
 					serviceMust(t, e)
 					want = polynomialCaller(t, c, want)
-					inputs = []*util.Int{&large, &unitLarge}
+					inputs = []*unumeral.Int{&large, &unitLarge}
 				}
 				c.integer.Budget().FailAfter(ordinal)
 				result, e := full.Normalize(p)
@@ -109,7 +110,7 @@ func TestPolynomialNormalizeBigDescriptorRefusalAndReplacement(t *testing.T) {
 	for _, replacement := range []bool{false, true} {
 		t.Run(fmt.Sprint(replacement), func(t *testing.T) {
 			budget := arena.NewBudget(1 << 24)
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 9, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 9, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 			serviceMust(t, e)
 			t.Cleanup(func() {
 				q.Close()
@@ -121,7 +122,7 @@ func TestPolynomialNormalizeBigDescriptorRefusalAndReplacement(t *testing.T) {
 			serviceMust(t, e)
 			t.Cleanup(func() { serviceMust(t, full.CleanupNormalization()); serviceMust(t, full.CloseChecked()) })
 			c := full.core
-			p, e := c.MkTerms([]util.Int{q.Integers().Two64}, []Monomial{c.monomials.unit})
+			p, e := c.MkTerms([]unumeral.Int{q.Integers().Two64}, []Monomial{c.monomials.unit})
 			serviceMust(t, e)
 			p = polynomialCaller(t, c, p)
 			_, e = full.Normalize(p)
@@ -130,7 +131,7 @@ func TestPolynomialNormalizeBigDescriptorRefusalAndReplacement(t *testing.T) {
 			}
 			old := q.Integers().PendingCell
 			polynomialImpPhysicalAuditValues(t, full, []Polynomial{p})
-			var foreign util.Int
+			var foreign unumeral.Int
 			if replacement {
 				serviceMust(t, q.Integers().CleanupPendingAllocation())
 				e = q.Integers().Copy(&foreign, &q.Integers().Two64)

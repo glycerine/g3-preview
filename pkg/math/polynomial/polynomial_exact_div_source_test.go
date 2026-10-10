@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialExactDivIndependentProductAndScalar(t *testing.T) {
@@ -21,7 +22,7 @@ func TestPolynomialExactDivIndependentProductAndScalar(t *testing.T) {
 	polynomialCaller(t, m, quotient)
 	polynomialQueryExpect(t, m, quotient, map[[3]uint32]int64{{1, 0, 0}: 1, {}: -1})
 	p2 := polynomialQueryTerms(t, m, []int32{6, -12}, [][]MonomialPower{{{1, 2}}, nil})
-	c := util.NewInt(3)
+	c := unumeral.NewInt(3)
 	scalar, e := m.ExactDivScalar(p2, &c)
 	serviceMust(t, e)
 	polynomialCaller(t, m, scalar)
@@ -33,7 +34,7 @@ func TestPolynomialExactDivIndependentProductAndScalar(t *testing.T) {
 	}
 }
 
-func polynomialExactDivisionPhysical(t *testing.T, m *MultivariatePolynomialCore, polys []Polynomial, public ...*util.Int) {
+func polynomialExactDivisionPhysical(t *testing.T, m *MultivariatePolynomialCore, polys []Polynomial, public ...*unumeral.Int) {
 	t.Helper()
 	// Scope roots must be named by the shared census, without caller annotations.
 	polynomialNewtonPhysicalAudit(t, m, nil, nil, nil, nil, polys, nil, public...)
@@ -131,18 +132,18 @@ func TestPolynomialExactDivScalarRawLocalFailurePrefixes(t *testing.T) {
 		reached := false
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m := polynomialCellFixture(t)
-			big := util.Int{}
+			big := unumeral.Int{}
 			serviceMust(t, m.integer.SetLimbs(&big, []uint32{2, 0, 0, 1}))
 			defer func() { serviceMust(t, m.integer.Del(&big)) }()
 			term, e := m.monomials.MkVariable(1, 2)
 			serviceMust(t, e)
 			unit, e := m.monomials.Unit()
 			serviceMust(t, e)
-			p, e := m.MkTerms([]util.Int{big, util.NewInt(6)}, []Monomial{term, unit})
+			p, e := m.MkTerms([]unumeral.Int{big, unumeral.NewInt(6)}, []Monomial{term, unit})
 			serviceMust(t, e)
 			serviceMust(t, m.IncRef(p))
 			defer func() { serviceMust(t, m.DecRef(p)) }()
-			c := util.NewInt(3)
+			c := unumeral.NewInt(3)
 			b := m.integer.Budget()
 			b.FailAfter(ordinal)
 			result, e := m.ExactDivScalar(p, &c)
@@ -194,7 +195,7 @@ func TestPolynomialExactDivScalarRawLocalFailurePrefixes(t *testing.T) {
 				}
 				a, e = m.Coefficient(result, 1)
 				serviceMust(t, e)
-				if a != util.NewInt(2) {
+				if a != unumeral.NewInt(2) {
 					t.Fatal("constant quotient", a)
 				}
 			}
@@ -220,7 +221,7 @@ func TestPolynomialExactDivScalarRawLocalFailurePrefixes(t *testing.T) {
 func TestPolynomialExactDivScalarDiagnosticsAndTruncation(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{3, 5}, [][]MonomialPower{{{0, 2}}, nil})
-	c := util.NewInt(2)
+	c := unumeral.NewInt(2)
 	quotient, e := m.ExactDivScalar(p, &c)
 	if polynomialSourceDebug {
 		if !errors.Is(e, ErrPolynomialAssertion) {
@@ -231,7 +232,7 @@ func TestPolynomialExactDivScalarDiagnosticsAndTruncation(t *testing.T) {
 		polynomialCaller(t, m, quotient)
 		polynomialQueryExpect(t, m, quotient, map[[3]uint32]int64{{2, 0, 0}: 1, {}: 2})
 	}
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	quotient, e = m.ExactDivScalar(m.zero, &zero)
 	if polynomialSourceDebug {
 		if !errors.Is(e, ErrPolynomialAssertion) {
@@ -311,7 +312,7 @@ func polynomialExactDivRefusal(t *testing.T, returnExpression bool) {
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = runtime
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 32}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: runtime, Profile: umemory.SmallAllocatorProfile{PointerBits: 32}})
 	serviceMust(t, e)
@@ -320,26 +321,26 @@ func polynomialExactDivRefusal(t *testing.T, returnExpression bool) {
 	serviceMust(t, e)
 	_, e = mm.MkVar()
 	serviceMust(t, e)
-	big := util.Int{}
+	big := unumeral.Int{}
 	serviceMust(t, m.integer.SetLimbs(&big, []uint32{2, 0, 0, 1}))
 	term, e := mm.MkVariable(0, 2)
 	serviceMust(t, e)
 	unit, e := mm.Unit()
 	serviceMust(t, e)
-	negative := util.Int{}
+	negative := unumeral.Int{}
 	serviceMust(t, m.integer.Copy(&negative, &big))
 	serviceMust(t, m.integer.Neg(&negative))
-	p, e := m.MkTerms([]util.Int{big, negative}, []Monomial{term, unit})
+	p, e := m.MkTerms([]unumeral.Int{big, negative}, []Monomial{term, unit})
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(p))
 	linear, e := mm.MkVariable(0, 1)
 	serviceMust(t, e)
-	divisor, e := m.MkTerms([]util.Int{util.NewInt(1), util.NewInt(1)}, []Monomial{linear, unit})
+	divisor, e := m.MkTerms([]unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}, []Monomial{linear, unit})
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(divisor))
 	// Cleanup is explicit and restores only malformed fixture metadata.
-	var token util.NumericCellRef
-	var original util.NumericCell
+	var token unumeral.NumericCellRef
+	var original unumeral.NumericCell
 	defer func() {
 		if token != 0 && m.integer.IsLiveCellToken(uint64(token)) {
 			cell := m.integer.Cell(token)

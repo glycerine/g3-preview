@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This owner retains actual numerals in typed Go slices. The skeleton is
@@ -14,7 +14,7 @@ type PolynomialSparseInterpolator struct {
 	self                                                         *PolynomialSparseInterpolator
 	owner                                                        *MultivariatePolynomialManager
 	skeleton                                                     *PolynomialSkeleton
-	inputs, outputs                                              []util.Int
+	inputs, outputs                                              []unumeral.Int
 	header                                                       uint64
 	constructed, closing, closed, sourceStarted, sourceFinalized bool
 	sourceStage                                                  uint8
@@ -82,7 +82,7 @@ func initializePolynomialSparseInterpolator(m *MultivariatePolynomialManager, sk
 				return e
 			}
 			for j := uint32(0); j < entry.NumPowers; j++ {
-				s.outputs = append(s.outputs, util.Int{})
+				s.outputs = append(s.outputs, unumeral.Int{})
 			}
 		}
 	}
@@ -115,7 +115,7 @@ func (s *PolynomialSparseInterpolator) Ready() (bool, error) {
 	max, e := s.skeleton.MaxNumPowers()
 	return n == max, e
 }
-func (s *PolynomialSparseInterpolator) copyField(v []util.Int, i uint32, a *util.Int) error {
+func (s *PolynomialSparseInterpolator) copyField(v []unumeral.Int, i uint32, a *unumeral.Int) error {
 	if uint64(i) >= uint64(len(v)) {
 		if polynomialSourceDebug {
 			return ErrPolynomialAssertion
@@ -129,7 +129,7 @@ func (s *PolynomialSparseInterpolator) copyField(v []util.Int, i uint32, a *util
 	e = s.owner.core.modular.Copy(&v[i], a)
 	return polynomialNewtonJoin(e, s.numericAfter(before))
 }
-func (s *PolynomialSparseInterpolator) Add(in *util.Int, q Polynomial) (bool, error) {
+func (s *PolynomialSparseInterpolator) Add(in *unumeral.Int, q Polynomial) (bool, error) {
 	if e := s.open(); e != nil {
 		return false, e
 	}
@@ -150,7 +150,7 @@ func (s *PolynomialSparseInterpolator) Add(in *util.Int, q Polynomial) (bool, er
 			return false, ErrPolynomialAssertion
 		}
 	}
-	s.inputs = append(s.inputs, util.Int{})
+	s.inputs = append(s.inputs, unumeral.Int{})
 	if e := s.copyField(s.inputs, inputIndex, in); e != nil {
 		return false, e
 	}
@@ -187,14 +187,14 @@ func (s *PolynomialSparseInterpolator) Add(in *util.Int, q Polynomial) (bool, er
 	}
 	return true, nil
 }
-func (s *PolynomialSparseInterpolator) deleteFields(v []util.Int, cursor *uint32, owning bool) error {
+func (s *PolynomialSparseInterpolator) deleteFields(v []unumeral.Int, cursor *uint32, owning bool) error {
 	m := s.owner.core
 	for uint64(*cursor) < uint64(len(v)) {
 		var e error
 		if owning {
 			e = m.deleteNumeral(&v[*cursor])
 		} else {
-			_, e = util.SourceNumeralDel(m.integer, &v[*cursor])
+			_, e = unumeral.SourceNumeralDel(m.integer, &v[*cursor])
 		}
 		if e != nil {
 			return e
@@ -308,7 +308,7 @@ func (s *PolynomialSparseInterpolator) Reset() (err error) {
 	}()
 	m := s.owner.core
 	for uint64(s.resetCursor) < uint64(len(s.inputs)) {
-		if _, e := util.SourceNumeralDel(m.integer, &s.inputs[s.resetCursor]); e != nil {
+		if _, e := unumeral.SourceNumeralDel(m.integer, &s.inputs[s.resetCursor]); e != nil {
 			return e
 		}
 		s.resetCursor++

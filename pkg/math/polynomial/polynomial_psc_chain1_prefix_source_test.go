@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix(t *testing.T) {
@@ -19,7 +19,7 @@ func TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix(t *tes
 			serviceMust(t, e)
 		}
 		c := m.core
-		var big util.Int
+		var big unumeral.Int
 		serviceMust(t, c.integer.SetLimbs(&big, []uint32{11, 7, 1 << 20}))
 		term := func(powers []MonomialPower) Monomial {
 			t.Helper()
@@ -27,13 +27,13 @@ func TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix(t *tes
 			serviceMust(t, e)
 			return v
 		}
-		p, e := c.MkTerms([]util.Int{big, big, util.NewInt(1), util.NewInt(2)}, []Monomial{term([]MonomialPower{{0, 1}, {1, 2}}), term([]MonomialPower{{0, 1}, {1, 1}}), term([]MonomialPower{{1, 1}}), c.monomials.unit})
+		p, e := c.MkTerms([]unumeral.Int{big, big, unumeral.NewInt(1), unumeral.NewInt(2)}, []Monomial{term([]MonomialPower{{0, 1}, {1, 2}}), term([]MonomialPower{{0, 1}, {1, 1}}), term([]MonomialPower{{1, 1}}), c.monomials.unit})
 		serviceMust(t, e)
 		p = polynomialCaller(t, c, p)
-		q, e := c.MkTerms([]util.Int{big, util.NewInt(3)}, []Monomial{term([]MonomialPower{{0, 1}, {1, 1}}), c.monomials.unit})
+		q, e := c.MkTerms([]unumeral.Int{big, unumeral.NewInt(3)}, []Monomial{term([]MonomialPower{{0, 1}, {1, 1}}), c.monomials.unit})
 		serviceMust(t, e)
 		q = polynomialCaller(t, c, q)
-		leading, e := c.MkTerms([]util.Int{big}, []Monomial{term([]MonomialPower{{0, 1}})})
+		leading, e := c.MkTerms([]unumeral.Int{big}, []Monomial{term([]MonomialPower{{0, 1}})})
 		serviceMust(t, e)
 		leading = polynomialCaller(t, c, leading)
 		out, e := NewPolynomialRefVector(c)
@@ -43,13 +43,13 @@ func TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix(t *tes
 		b.FailAfter(prefix)
 		returned := m.PSCChain1(p, q, 1, out)
 		s := &m.pscChain1
-		subresultantNamedAudit(t, m, out, []Polynomial{p, q, leading}, []*util.Int{&big})
+		subresultantNamedAudit(t, m, out, []Polynomial{p, q, leading}, []*unumeral.Int{&big})
 		if returned != nil && s.phase == 2 {
 			coefficientFailure = true
 		}
 		source, body := s.sourceCause, s.bodyCause
 		own := m.CleanupPSCChain1()
-		subresultantNamedAudit(t, m, out, []Polynomial{p, q, leading}, []*util.Int{&big})
+		subresultantNamedAudit(t, m, out, []Polynomial{p, q, leading}, []*unumeral.Int{&big})
 		if s.sourceCause != source || s.bodyCause != body {
 			t.Fatal("own ACK erased actual causes", prefix)
 		}
@@ -69,7 +69,7 @@ func TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix(t *tes
 				if !errors.Is(retry, arena.ErrInvalidSlot) {
 					t.Fatal("exact shared TMP hole", prefix, retry)
 				}
-				subresultantNamedAudit(t, m, out, []Polynomial{p, q, leading}, []*util.Int{&big})
+				subresultantNamedAudit(t, m, out, []Polynomial{p, q, leading}, []*unumeral.Int{&big})
 				serviceMust(t, m.CleanupPSCChain1())
 				serviceMust(t, out.Close())
 				serviceMust(t, c.integer.Del(&big))
@@ -99,7 +99,7 @@ func TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix(t *tes
 		if got != c.unit {
 			t.Fatal("last source unit SET", prefix)
 		}
-		subresultantNamedAudit(t, m, out, []Polynomial{p, q, leading}, []*util.Int{&big})
+		subresultantNamedAudit(t, m, out, []Polynomial{p, q, leading}, []*unumeral.Int{&big})
 		serviceMust(t, out.Close())
 		serviceMust(t, c.integer.Del(&big))
 		if returned == nil {

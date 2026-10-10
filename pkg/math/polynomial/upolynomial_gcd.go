@@ -4,12 +4,12 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Actual raw vector push(default): construct then publish size, with no
 // numeral copy. Source callers perform their following Set separately.
-func (m *UPolynomialManager) pushDefault(s *upolyVectorState) (*util.Int, error) {
+func (m *UPolynomialManager) pushDefault(s *upolyVectorState) (*unumeral.Int, error) {
 	if s.size == math.MaxUint32 {
 		return nil, arena.ErrBounds
 	}
@@ -32,10 +32,10 @@ func (m *UPolynomialManager) flipSign(s *upolyVectorState) error {
 	}
 	return nil
 }
-func (m *UPolynomialManager) mulScalarState(s *upolyVectorState, b *util.Int) error {
+func (m *UPolynomialManager) mulScalarState(s *upolyVectorState, b *unumeral.Int) error {
 	return m.mulScalarStateWithHensel(s, b, nil)
 }
-func (m *UPolynomialManager) mulScalarStateWithHensel(s *upolyVectorState, b *util.Int, receipt *upolyHenselPairInvocationReceipt) error {
+func (m *UPolynomialManager) mulScalarStateWithHensel(s *upolyVectorState, b *unumeral.Int, receipt *upolyHenselPairInvocationReceipt) error {
 	zero, e := m.modular.IsZero(b)
 	if e != nil {
 		return e
@@ -45,10 +45,10 @@ func (m *UPolynomialManager) mulScalarStateWithHensel(s *upolyVectorState, b *ut
 	}
 	return m.MulScalarViewWithHensel(m.stateView(s), b, receipt)
 }
-func (m *UPolynomialManager) monic(v UPolynomialView, lc, inv *util.Int) error {
+func (m *UPolynomialManager) monic(v UPolynomialView, lc, inv *unumeral.Int) error {
 	return m.monicWithSourceContext(v, lc, inv, integerAllocationInvocationContext{})
 }
-func (m *UPolynomialManager) monicWithSourceContext(v UPolynomialView, lc, inv *util.Int, context integerAllocationInvocationContext) error {
+func (m *UPolynomialManager) monicWithSourceContext(v UPolynomialView, lc, inv *unumeral.Int, context integerAllocationInvocationContext) error {
 	if e := m.modular.WithAllocationContext((context).utility(m.modular.Integers())).SetInt64(lc, 1); e != nil {
 		return e
 	}
@@ -92,7 +92,7 @@ func (m *UPolynomialManager) monicLocal(v UPolynomialView) error {
 func (m *UPolynomialManager) monicLocalWithSourceContext(v UPolynomialView, context integerAllocationInvocationContext) (cause error) {
 	owner := context.factorFrontendFrame(m.config.Integer)
 	if owner == nil {
-		var lc, inv util.Int
+		var lc, inv unumeral.Int
 		defer func() { m.modular.Del(&lc); m.modular.Del(&inv) }()
 		return m.monicWithSourceContext(v, &lc, &inv, context)
 	}
@@ -127,28 +127,28 @@ func (m *UPolynomialManager) MakeMonic(p UPolynomial) error {
 	}
 	return m.MakeMonicView(v)
 }
-func (m *UPolynomialManager) MakeMonicWithLeadingView(v UPolynomialView, lc *util.Int) error {
+func (m *UPolynomialManager) MakeMonicWithLeadingView(v UPolynomialView, lc *unumeral.Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	var inv util.Int
+	var inv unumeral.Int
 	defer m.modular.Del(&inv)
 	return m.monic(v, lc, &inv)
 }
-func (m *UPolynomialManager) MakeMonicWithLeading(p UPolynomial, lc *util.Int) error {
+func (m *UPolynomialManager) MakeMonicWithLeading(p UPolynomial, lc *unumeral.Int) error {
 	v, e := m.wholeView(p)
 	if e != nil {
 		return e
 	}
 	return m.MakeMonicWithLeadingView(v, lc)
 }
-func (m *UPolynomialManager) MakeMonicWithLeadingInverseView(v UPolynomialView, lc, inv *util.Int) error {
+func (m *UPolynomialManager) MakeMonicWithLeadingInverseView(v UPolynomialView, lc, inv *unumeral.Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}
 	return m.monic(v, lc, inv)
 }
-func (m *UPolynomialManager) MakeMonicWithLeadingInverse(p UPolynomial, lc, inv *util.Int) error {
+func (m *UPolynomialManager) MakeMonicWithLeadingInverse(p UPolynomial, lc, inv *unumeral.Int) error {
 	v, e := m.wholeView(p)
 	if e != nil {
 		return e
@@ -238,7 +238,7 @@ func (m *UPolynomialManager) subresultantGCD(a, b UPolynomialView, out *upolyVec
 		return e
 	}
 	A, B := &m.gcd1, &m.gcd2
-	var g, h, aux util.Int
+	var g, h, aux unumeral.Int
 	defer func() { m.modular.Del(&aux); m.modular.Del(&h); m.modular.Del(&g) }()
 	if e = m.modular.SetInt32(&g, 1); e != nil {
 		return e

@@ -3,10 +3,10 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (m *MultivariatePolynomialCore) rational2Numeral(as []util.Rational, n uint32) error {
+func (m *MultivariatePolynomialCore) rational2Numeral(as []unumeral.Rational, n uint32) error {
 	size, e := m.rationalTerms.size(m)
 	if e != nil {
 		return e
@@ -18,10 +18,10 @@ func (m *MultivariatePolynomialCore) rational2Numeral(as []util.Rational, n uint
 		if uint64(i) >= uint64(len(as)) {
 			return arena.ErrBounds
 		}
-		if polynomialSourceDebug && !util.IsIntegerRational(&as[i]) {
+		if polynomialSourceDebug && !unumeral.IsIntegerRational(&as[i]) {
 			return ErrPolynomialAssertion
 		}
-		if e = m.rationalTerms.appendCoefficient(m, util.Int{}); e != nil {
+		if e = m.rationalTerms.appendCoefficient(m, unumeral.Int{}); e != nil {
 			return e
 		}
 		pos, e := m.rationalTerms.size(m)
@@ -79,7 +79,7 @@ func (m *MultivariatePolynomialCore) mkTermsSource(n uint32, as polynomialUnivar
 }
 func (m *MultivariatePolynomialCore) mkTermsSourceLinear(n uint32, as polynomialUnivariateCoefficients, ms monomialArrayView, linear bool) (Polynomial, error) {
 	for i := uint32(0); i < n; i++ {
-		var local util.Int
+		var local unumeral.Int
 		a, e := as.reference(m, i, &local)
 		if e != nil {
 			return Polynomial{}, e
@@ -99,7 +99,7 @@ func (m *MultivariatePolynomialCore) mkTermsSourceLinear(n uint32, as polynomial
 	}
 	return m.som.mk(false)
 }
-func (m *MultivariatePolynomialCore) MkRationalTerms(as []util.Rational, ms []Monomial) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) MkRationalTerms(as []unumeral.Rational, ms []Monomial) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -123,7 +123,7 @@ func (m *MultivariatePolynomialCore) MkRationalTerms(as []util.Rational, ms []Mo
 	m.overloadResult = Polynomial{}
 	return p, nil
 }
-func (m *MultivariatePolynomialCore) MkRationalUnivariate(v, n uint32, as []util.Rational) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) MkRationalUnivariate(v, n uint32, as []unumeral.Rational) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -147,7 +147,7 @@ func (m *MultivariatePolynomialCore) MkRationalUnivariate(v, n uint32, as []util
 	m.overloadResult = Polynomial{}
 	return p, nil
 }
-func (m *MultivariatePolynomialCore) MkLinearTake(as []util.Int, xs []uint32, c *util.Int) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) MkLinearTake(as []unumeral.Int, xs []uint32, c *unumeral.Int) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -164,7 +164,7 @@ func (m *MultivariatePolynomialCore) MkLinearTake(as []util.Int, xs []uint32, c 
 	}
 	return m.mkLinearInput(as, uint32(len(as)), xs, c)
 }
-func (m *MultivariatePolynomialCore) mkLinearInput(as []util.Int, count uint32, xs []uint32, c *util.Int) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) mkLinearInput(as []unumeral.Int, count uint32, xs []uint32, c *unumeral.Int) (Polynomial, error) {
 	var e error
 	for i := uint32(0); i < count; i++ {
 		if uint64(i) >= uint64(len(as)) {
@@ -178,7 +178,7 @@ func (m *MultivariatePolynomialCore) mkLinearInput(as []util.Int, count uint32, 
 		if zero {
 			continue
 		}
-		if e = m.linearTerms.appendCoefficient(m, util.Int{}); e != nil {
+		if e = m.linearTerms.appendCoefficient(m, unumeral.Int{}); e != nil {
 			return Polynomial{}, e
 		}
 		n, e := m.linearTerms.size(m)
@@ -213,7 +213,7 @@ func (m *MultivariatePolynomialCore) mkLinearInput(as []util.Int, count uint32, 
 		return Polynomial{}, e
 	}
 	if !zero {
-		if e = m.linearTerms.appendCoefficient(m, util.Int{}); e != nil {
+		if e = m.linearTerms.appendCoefficient(m, unumeral.Int{}); e != nil {
 			return Polynomial{}, e
 		}
 		n, e := m.linearTerms.size(m)
@@ -257,14 +257,14 @@ func (m *MultivariatePolynomialCore) mkLinearInput(as []util.Int, count uint32, 
 	return p, nil
 }
 
-func (m *MultivariatePolynomialCore) MkRationalLinear(as []util.Rational, xs []uint32, c *util.Rational) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) MkRationalLinear(as []unumeral.Rational, xs []uint32, c *unumeral.Rational) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
 	if c == nil {
 		return Polynomial{}, arena.ErrBounds
 	}
-	if polynomialSourceDebug && !util.IsIntegerRational(c) {
+	if polynomialSourceDebug && !unumeral.IsIntegerRational(c) {
 		return Polynomial{}, ErrPolynomialAssertion
 	}
 	if m.overloadResult != (Polynomial{}) || m.linearConstantActive {
@@ -276,7 +276,7 @@ func (m *MultivariatePolynomialCore) MkRationalLinear(as []util.Rational, xs []u
 	if e := m.rational2Numeral(as, uint32(len(as))); e != nil {
 		return Polynomial{}, e
 	}
-	m.linearConstant = util.Int{}
+	m.linearConstant = unumeral.Int{}
 	m.linearConstantActive = true
 	if e := m.modular.Copy(&m.linearConstant, &(*c.BorrowNumerator())); e != nil {
 		return Polynomial{}, e

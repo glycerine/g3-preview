@@ -2,15 +2,15 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialGuardOwner interface {
-	CallerBindings() *util.NumericCallerBinding
-	BindCaller(*util.NumericCallerBinding, util.NumericCallerGuard, uint32) error
+	CallerBindings() *unumeral.NumericCallerBinding
+	BindCaller(*unumeral.NumericCallerBinding, unumeral.NumericCallerGuard, uint32) error
 }
 type upolyNumericGuard interface {
-	util.NumericCallerGuard
+	unumeral.NumericCallerGuard
 	guardOwner() *UPolynomialManager
 	guardRoots() *polynomialNumericRoots
 }
@@ -26,7 +26,7 @@ func upolyCaller(z polynomialGuardOwner, kind uint32) *UPolynomialManager {
 	return nil
 }
 func setUPolyCaller(z polynomialGuardOwner, owner *UPolynomialManager, kind uint32) {
-	var current *util.NumericCallerBinding
+	var current *unumeral.NumericCallerBinding
 	for b := z.CallerBindings(); b != nil; b = b.Previous() {
 		if b.Kind() == kind {
 			if q, ok := b.Guard().(upolyNumericGuard); ok {
@@ -50,7 +50,7 @@ func setUPolyCaller(z polynomialGuardOwner, owner *UPolynomialManager, kind uint
 		if current == nil {
 			return
 		}
-		panic(util.ErrNumericOwner)
+		panic(unumeral.ErrNumericOwner)
 	}
 	var q upolyNumericGuard
 	switch kind {
@@ -69,17 +69,17 @@ func setUPolyCaller(z polynomialGuardOwner, owner *UPolynomialManager, kind uint
 	case 7:
 		q = &owner.binaryEvaluation
 	default:
-		panic(util.ErrNumericOwner)
+		panic(unumeral.ErrNumericOwner)
 	}
 	binding := &q.guardRoots().integerBinding
-	if _, ok := z.(*util.NaturalManager); ok {
+	if _, ok := z.(*unumeral.NaturalManager); ok {
 		binding = &q.guardRoots().naturalBinding
 	}
 	if e := z.BindCaller(binding, q, kind); e != nil {
 		panic(e)
 	}
 }
-func upolyPreviousCaller(b *util.NumericCallerBinding, kind uint32) *UPolynomialManager {
+func upolyPreviousCaller(b *unumeral.NumericCallerBinding, kind uint32) *UPolynomialManager {
 	for ; b != nil; b = b.Previous() {
 		if b.Kind() == kind {
 			if q, ok := b.Guard().(upolyNumericGuard); ok {

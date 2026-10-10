@@ -5,10 +5,9 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialRemoveOneHalfRootFailedRowForeignReplacement(t *testing.T) {
@@ -24,15 +23,15 @@ func TestUPolynomialRemoveOneHalfRootFailedRowForeignReplacement(t *testing.T) {
 			serviceMust(t, e)
 			serviceMust(t, p.RemoveOneHalfRoot(wv, warmOut))
 			serviceMust(t, p.DelPolynomial(&warmOut))
-			var b, twoB, neg util.Int
+			var b, twoB, neg unumeral.Int
 			serviceMust(t, z.SetLimbs(&b, []uint32{1, 2, 3, 4}))
-			two := util.NewInt(2)
+			two := unumeral.NewInt(2)
 			serviceMust(t, z.Mul(&b, &two, &twoB))
 			serviceMust(t, z.Copy(&neg, &b))
 			serviceMust(t, z.Neg(&neg))
 			input, e := p.NewPolynomial()
 			serviceMust(t, e)
-			serviceMust(t, p.SetInts(input, []util.Int{neg, twoB}))
+			serviceMust(t, p.SetInts(input, []unumeral.Int{neg, twoB}))
 			out, e := p.NewPolynomial()
 			serviceMust(t, e)
 			serviceMust(t, z.Del(&b))
@@ -44,7 +43,7 @@ func TestUPolynomialRemoveOneHalfRootFailedRowForeignReplacement(t *testing.T) {
 			body := p.RemoveOneHalfRoot(v, out)
 			q := &p.removeOneHalfRoot
 			r := p.removeOneHalfRootReceipt()
-			extra := []*util.Int{&q.values[0], &p.oneHalfRoot.values[0], &p.oneHalfRoot.values[1]}
+			extra := []*unumeral.Int{&q.values[0], &p.oneHalfRoot.values[0], &p.oneHalfRoot.values[1]}
 			if z.MatchesAddMulInvocation(&q.addMul) {
 				extra = append(extra, &q.addMul.Frame.Tmp)
 			}
@@ -119,7 +118,7 @@ func TestUPolynomialRemoveOneHalfRootErasedAndInvalidContext(t *testing.T) {
 	copyFrame.executing = true
 	copyFrame.owner = p
 	context := integerAllocationInvocationContext{removeOneHalfRoot: &copyFrame, removeOneHalfRootInvocation: copyFrame.invocation}
-	divisor := upolyDivisorSpan{immediate: true, pair: [2]util.Int{util.NewInt(-1), util.NewInt(2)}}
+	divisor := upolyDivisorSpan{immediate: true, pair: [2]unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(2)}}
 	var power uint32
 	if e := p.divRemCoreSpanWithSourceContext(v, &divisor, &power, &p.div2, &p.div1, nil, nil, context); e != ErrUPolynomialOwner {
 		t.Fatal("copied frame reached erased numeric engine", e)
@@ -139,7 +138,7 @@ func TestUPolynomialRemoveOneHalfRootErasedAssertionPreservesOlderChild(t *testi
 			z := p.config.Integer
 			input, e := p.NewPolynomial()
 			serviceMust(t, e)
-			serviceMust(t, p.SetInts(input, []util.Int{util.NewInt(1), util.NewInt(2147483647), util.NewInt(1)}))
+			serviceMust(t, p.SetInts(input, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(2147483647), unumeral.NewInt(1)}))
 			v, e := p.wholeView(input)
 			serviceMust(t, e)
 			empty, e := p.NewPolynomial()
@@ -152,7 +151,7 @@ func TestUPolynomialRemoveOneHalfRootErasedAssertionPreservesOlderChild(t *testi
 			_, body := p.HasOneHalfRoot(v)
 			h := &p.oneHalfRoot
 			old := p.oneHalfRootReceipt()
-			algebraicCellSourcePhysical(t, c, []UPolynomial{input, empty, out}, []*util.Int{&h.values[0], &h.values[1]}, nil)
+			algebraicCellSourcePhysical(t, c, []UPolynomial{input, empty, out}, []*unumeral.Int{&h.values[0], &h.values[1]}, nil)
 			reached = body != nil && h.active && polynomialNegNumericPending(&h.numeric)
 			z.Budget().FailAfter(-1)
 			if reached {

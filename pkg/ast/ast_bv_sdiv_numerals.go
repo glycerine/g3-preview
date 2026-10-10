@@ -2,18 +2,17 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorSignedDivisionNumerals retains r1/r2 and their distinct norm/quotient/allone returns.
 type BitVectorSignedDivisionNumerals struct {
 	self                   *BitVectorSignedDivisionNumerals
 	manager                *ASTManager
-	values                 [7]util.OwnedRational
+	values                 [7]unumeral.OwnedRational
 	placed                 [7]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	norm                   ASTBitVectorNumeralInvocation
 	header                 uint64
@@ -91,7 +90,7 @@ func (n *BitVectorSignedDivisionNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorSignedDivisionNumerals) Read(i int, arg ASTHandle, width *uint32) (bool, error) {
@@ -114,7 +113,7 @@ func (n *BitVectorSignedDivisionNumerals) Normalize(i int, width uint32) error {
 	}
 	v, e := n.manager.NormalizeSignedBitVectorValueWithInvocation(&n.values[i], width, &n.norm)
 	n.values[2] = v
-	n.placed[2] = v != (util.OwnedRational{})
+	n.placed[2] = v != (unumeral.OwnedRational{})
 	if e != nil {
 		return n.fail(e)
 	}
@@ -154,7 +153,7 @@ func (n *BitVectorSignedDivisionNumerals) Quotient() error {
 	// Original machine_div returns a distinct quotient truncated toward zero.
 	v, e := n.manager.numerals.MachineDivWithInvocation(&n.values[0], &n.values[1], &n.scalar)
 	n.values[3] = v
-	n.placed[3] = v != (util.OwnedRational{})
+	n.placed[3] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -167,7 +166,7 @@ func (n *BitVectorSignedDivisionNumerals) AllOnes(width uint32) error {
 	q := n.manager.numerals
 	v, e := q.PowerOfTwoWithInvocation(width, &n.scalar)
 	n.values[4] = v
-	n.placed[4] = v != (util.OwnedRational{})
+	n.placed[4] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -186,7 +185,7 @@ func (n *BitVectorSignedDivisionNumerals) AllOnes(width uint32) error {
 	}
 	v, e = q.SubWithInvocation(&n.values[4], &n.values[5], &n.scalar)
 	n.values[6] = v
-	n.placed[6] = v != (util.OwnedRational{})
+	n.placed[6] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}

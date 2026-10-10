@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration(t *testing.T) {
@@ -14,7 +13,7 @@ func TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration(t *testing.T) {
 		full := polynomialArithmeticDirectNumericFixture(t)
 		c := full.core
 		// The prelude must copy an actual BIG numeral before declaring NUM.
-		one := util.NewInt(1)
+		one := unumeral.NewInt(1)
 		p, e := c.MkConstantTakeCopy(&c.integer.Two64)
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(p))

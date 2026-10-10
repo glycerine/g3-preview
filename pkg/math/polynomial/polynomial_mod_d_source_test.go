@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func polynomialDegreeMap(t *testing.T, m *MultivariatePolynomialCore) *PolynomialVariableDegrees {
@@ -113,7 +114,7 @@ func TestPolynomialPseudoModDLeadingPowerAdjustment(t *testing.T) {
 }
 func TestPolynomialSOMModDSourceLogicalAssertionAndZeroReadMask(t *testing.T) {
 	m := polynomialCellFixture(t)
-	a := util.NewInt(1)
+	a := unumeral.NewInt(1)
 	unit, e := m.monomials.Unit()
 	serviceMust(t, e)
 	serviceMust(t, m.som.add(&a, unit, false))
@@ -126,7 +127,7 @@ func TestPolynomialSOMModDSourceLogicalAssertionAndZeroReadMask(t *testing.T) {
 	} else if !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("native logical bounds", e)
 	}
-	serviceMust(t, m.som.as.appendCoefficient(m, util.Int{}))
+	serviceMust(t, m.som.as.appendCoefficient(m, unumeral.Int{}))
 	// Actual cold map is finalized; NUM0 must avoid both monomial and map reads.
 	d := polynomialDegreeMap(t, m)
 	serviceMust(t, d.SourceFinalize())

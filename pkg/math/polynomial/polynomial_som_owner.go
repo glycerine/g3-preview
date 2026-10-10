@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type somRetainedMonomial struct {
@@ -21,7 +21,7 @@ type PolynomialSOMBuffer struct {
 	storage                                         *MultivariatePolynomialCore
 	buffer                                          polynomialSOM
 	header                                          uint64
-	retiredNumerals                                 []util.Int
+	retiredNumerals                                 []unumeral.Int
 	retiredMonomials                                []somRetainedMonomial
 	retiredNumeralCount, retiredMonomialCount       uint32
 	numeralTransferred, monomialTransferred         uint32
@@ -97,7 +97,7 @@ func (b *PolynomialSOMBuffer) Reset() error {
 	}
 	return b.buffer.reset()
 }
-func (b *PolynomialSOMBuffer) Add(a *util.Int, t Monomial) error {
+func (b *PolynomialSOMBuffer) Add(a *unumeral.Int, t Monomial) error {
 	if e := b.ready(); e != nil {
 		return e
 	}
@@ -106,7 +106,7 @@ func (b *PolynomialSOMBuffer) Add(a *util.Int, t Monomial) error {
 	}
 	return b.buffer.add(a, t, false)
 }
-func (b *PolynomialSOMBuffer) AddTake(a *util.Int, t Monomial) error {
+func (b *PolynomialSOMBuffer) AddTake(a *unumeral.Int, t Monomial) error {
 	if e := b.ready(); e != nil {
 		return e
 	}
@@ -119,13 +119,13 @@ func (b *PolynomialSOMBuffer) AddTake(a *util.Int, t Monomial) error {
 // Only transitions of the borrowed core's concrete named creation fields
 // caused by this invocation become this class's owning-abort obligations.
 // Source member destruction never aborts a returned local or failed callee.
-func (b *PolynomialSOMBuffer) AddMul(a *util.Int, t Monomial, p Polynomial) error {
+func (b *PolynomialSOMBuffer) AddMul(a *unumeral.Int, t Monomial, p Polynomial) error {
 	return b.addInput(a, t, polynomialSOMInput{polynomial: p}, true)
 }
-func (b *PolynomialSOMBuffer) AddMulBuffer(a *util.Int, t Monomial, p *PolynomialSOMBuffer) error {
+func (b *PolynomialSOMBuffer) AddMulBuffer(a *unumeral.Int, t Monomial, p *PolynomialSOMBuffer) error {
 	return b.addInput(a, t, polynomialSOMInput{buffer: p, fromBuffer: true}, true)
 }
-func (b *PolynomialSOMBuffer) AddScaledBuffer(a *util.Int, p *PolynomialSOMBuffer) error {
+func (b *PolynomialSOMBuffer) AddScaledBuffer(a *unumeral.Int, p *PolynomialSOMBuffer) error {
 	if e := b.ready(); e != nil {
 		return e
 	}
@@ -141,7 +141,7 @@ func (b *PolynomialSOMBuffer) AddScaledBuffer(a *util.Int, p *PolynomialSOMBuffe
 func (b *PolynomialSOMBuffer) AddPolynomial(p Polynomial) error {
 	return b.addInput(nil, Monomial{}, polynomialSOMInput{polynomial: p}, false)
 }
-func (b *PolynomialSOMBuffer) addInput(a *util.Int, t Monomial, p polynomialSOMInput, multiply bool) (result error) {
+func (b *PolynomialSOMBuffer) addInput(a *unumeral.Int, t Monomial, p polynomialSOMInput, multiply bool) (result error) {
 	if e := b.ready(); e != nil {
 		return e
 	}
@@ -188,17 +188,17 @@ func (b *PolynomialSOMBuffer) cleanupGeneratedCall() error {
 	}
 	return nil
 }
-func (b *PolynomialSOMBuffer) Coefficient(i uint32) (util.Int, error) {
+func (b *PolynomialSOMBuffer) Coefficient(i uint32) (unumeral.Int, error) {
 	if e := b.ready(); e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	if polynomialSourceDebug {
 		n, e := b.buffer.as.size(b.storage)
 		if e != nil {
-			return util.Int{}, e
+			return unumeral.Int{}, e
 		}
 		if i >= n {
-			return util.Int{}, ErrPolynomialAssertion
+			return unumeral.Int{}, ErrPolynomialAssertion
 		}
 	}
 	return b.buffer.as.coefficient(b.storage, i)
@@ -533,7 +533,7 @@ func (b *PolynomialSOMBuffer) DisplayInto(out MonomialTextSink) error {
 	return monomialSinkLiteral(out, "\n")
 }
 
-func (b *PolynomialSOMBuffer) AddScalar(a *util.Int) error {
+func (b *PolynomialSOMBuffer) AddScalar(a *unumeral.Int) error {
 	if e := b.ready(); e != nil {
 		return e
 	}
@@ -547,7 +547,7 @@ func (b *PolynomialSOMBuffer) AddScalar(a *util.Int) error {
 	return b.buffer.add(a, u, false)
 }
 func (b *PolynomialSOMBuffer) AddMonomialBuffer(t Monomial, p *PolynomialSOMBuffer) error {
-	one := util.NewInt(1) // source completed stack numeral one(1), no heap payload.
+	one := unumeral.NewInt(1) // source completed stack numeral one(1), no heap payload.
 	return b.AddMulBuffer(&one, t, p)
 }
 func (b *PolynomialSOMBuffer) ModD(d *PolynomialVariableDegrees) error {

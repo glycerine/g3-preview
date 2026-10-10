@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func upolyGCDExpect(t *testing.T, m *UPolynomialManager, p UPolynomial, want []int64) {
@@ -26,7 +26,7 @@ func TestUPolynomialContentNormalizationSourceBranches(t *testing.T) {
 	m, _, _ := upolySourceOwner(t)
 	a := upolySourceNew(t, m, []int32{-12, 18, -6})
 	p := upolySourceNew(t, m, nil)
-	var c util.Int
+	var c unumeral.Int
 	if e := m.PrimitiveAndContent(a, p, &c); e != nil {
 		t.Fatal(e)
 	}
@@ -284,7 +284,7 @@ func TestUPolynomialGCDRegisteredFirstDerivativeExample(t *testing.T) {
 		root  int32
 		power int
 	}{{3, 6}, {5, 5}, {11, 7}} {
-		if e := m.SetInts(factor, []util.Int{util.NewInt(-f.root), util.NewInt(1)}); e != nil {
+		if e := m.SetInts(factor, []unumeral.Int{unumeral.NewInt(-f.root), unumeral.NewInt(1)}); e != nil {
 			t.Fatal(e)
 		}
 		for k := 0; k < f.power; k++ {
@@ -326,7 +326,7 @@ func TestUPolynomialGCDRegisteredFirstDerivativeExample(t *testing.T) {
 			if !sub {
 				want.Mul(want, big.NewInt(13))
 			}
-			var got util.Int
+			var got unumeral.Int
 			if e = m.ReadCoefficient(g, uint32(i), &got); e != nil {
 				t.Fatal(e)
 			}
@@ -353,7 +353,7 @@ func TestUPolynomialGCDChainImmediateFailureRoots(t *testing.T) {
 			out := upolySourceNew(t, m, []int32{11, 12})
 			v := upolySourceNew(t, m, nil)
 			dout := upolySourceNew(t, m, nil)
-			var large util.Int
+			var large unumeral.Int
 			if e := q.Integers().SetString(&large, "12345678901234567890123456789012345678901234567890"); e != nil {
 				t.Fatal(e)
 			}
@@ -362,10 +362,10 @@ func TestUPolynomialGCDChainImmediateFailureRoots(t *testing.T) {
 					t.Fatal(e)
 				}
 			}
-			if e := m.SetInts(a, []util.Int{large, util.NewInt(2), util.NewInt(1)}); e != nil {
+			if e := m.SetInts(a, []unumeral.Int{large, unumeral.NewInt(2), unumeral.NewInt(1)}); e != nil {
 				t.Fatal(e)
 			}
-			if e := m.SetInts(other, []util.Int{large, util.NewInt(3), util.NewInt(1)}); e != nil {
+			if e := m.SetInts(other, []unumeral.Int{large, unumeral.NewInt(3), unumeral.NewInt(1)}); e != nil {
 				t.Fatal(e)
 			}
 			if e := q.Integers().Del(&large); e != nil {
@@ -373,8 +373,8 @@ func TestUPolynomialGCDChainImmediateFailureRoots(t *testing.T) {
 			}
 			before := m.Stats()
 			external := before.IntegerLiveCells - before.OwnedNumeralCells - before.IntegerCachedCells
-			var content, lc, inv util.Int
-			two := util.NewInt(2)
+			var content, lc, inv unumeral.Int
+			two := unumeral.NewInt(2)
 			counter := uint32(93)
 			b.FailAfter(fail)
 			var err error
@@ -408,7 +408,7 @@ func TestUPolynomialGCDChainImmediateFailureRoots(t *testing.T) {
 			// The only permitted additions outside the manager graph are the three
 			// actual source output numerals, not an allowance for unnamed temporaries.
 			outputs := uint32(0)
-			for _, x := range []util.Int{content, lc, inv} {
+			for _, x := range []unumeral.Int{content, lc, inv} {
 				if testFieldBySourceName(reflect.ValueOf(x), "cell").Uint() != 0 {
 					outputs++
 				}
@@ -417,9 +417,9 @@ func TestUPolynomialGCDChainImmediateFailureRoots(t *testing.T) {
 			if now.IntegerLiveCells != external+outputs+now.OwnedNumeralCells+now.IntegerCachedCells {
 				t.Fatal("unnamed local root", op, fail, err, before, now, outputs)
 			}
-			upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Integers: []*util.Int{&content, &lc, &inv}, RationalManagers: []*util.RationalManager{q}})
+			upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Integers: []*unumeral.Int{&content, &lc, &inv}, RationalManagers: []*unumeral.RationalManager{q}})
 			b.FailAfter(-1)
-			for _, x := range []*util.Int{&inv, &lc, &content} {
+			for _, x := range []*unumeral.Int{&inv, &lc, &content} {
 				if e := q.Integers().Del(x); e != nil {
 					t.Fatal(e)
 				}
@@ -462,7 +462,7 @@ func TestUPolynomialGCDRawZeroCountsAndSourceAliases(t *testing.T) {
 	}
 	// Real source debug rejects direct remainder input/output alias; release
 	// same-base Set returns before mutation, then computes in that same buffer.
-	if e = m.SetInts(a, []util.Int{util.NewInt(2), util.NewInt(1)}); e != nil {
+	if e = m.SetInts(a, []unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(1)}); e != nil {
 		t.Fatal(e)
 	}
 	var power uint32
@@ -478,7 +478,7 @@ func TestUPolynomialGCDRawZeroCountsAndSourceAliases(t *testing.T) {
 		upolyGCDExpect(t, m, a, []int64{1})
 	}
 	// Public DivRem permits the same q/r owner; source swaps r first then q.
-	if e = m.SetInts(a, []util.Int{util.NewInt(2), util.NewInt(1)}); e != nil {
+	if e = m.SetInts(a, []unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(1)}); e != nil {
 		t.Fatal(e)
 	}
 	if e = m.DivRem(a, b, out, out, &power); e != nil {
@@ -514,14 +514,14 @@ func TestUPolynomialModularGCDCRAAndAllPrimeFallback(t *testing.T) {
 	// Permanent exact product of all 231 active source primes (39103..41549).
 	// With primitive inputs 1+P*x and 2+P*x every modular image loses degree;
 	// only the genuine Euclidean fallback contributes two checkpoints.
-	var p util.Int
+	var p unumeral.Int
 	if e = q.Integers().SetString(&p, "72281563704163390468554344613865981697268096417532898185830731463956991202862156381723822442406430185902272343962106209037022259734054589589771509832616101969073563245939637295520171914563741101372722222388225724053114184535855293430488621916905340634375531252343157962097806024182556922014674849556094504323517239889043714631898242418094530203943384894412218371737626782087162982627243051339990230190141901901314943936056515164760334845853565665191897861856308388331482687299471868936528474006432293908790629327796904367282101244057605259325432547042168783461632004227401144367180753900872998214561525948245758691325277875513151944255585280059492764533971584562086452635471193993199666404816477690902095279935017263322371732225976354939437547459675038205557743700990878333665305741927690617573766495540385679031201157624530285725622749323004927254808222567172354936078488843650973852896345588008946477644700325911826018851139584535871728907061837776621736250767524650331370181989521743149010532598565109856032613723799663632947457509463583151138116994433092877081"); e != nil {
 		t.Fatal(e)
 	}
-	if e = m.SetInts(a, []util.Int{util.NewInt(1), p}); e != nil {
+	if e = m.SetInts(a, []unumeral.Int{unumeral.NewInt(1), p}); e != nil {
 		t.Fatal(e)
 	}
-	if e = m.SetInts(b, []util.Int{util.NewInt(2), p}); e != nil {
+	if e = m.SetInts(b, []unumeral.Int{unumeral.NewInt(2), p}); e != nil {
 		t.Fatal(e)
 	}
 	if e = q.Integers().Del(&p); e != nil {
@@ -612,10 +612,10 @@ func TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks(t *testing.T) {
 		upolyGCDExpect(t, m, v, []int64{2})
 		upolyGCDExpect(t, m, d, []int64{1})
 	}
-	if e = m.SetInts(a, []util.Int{util.NewInt(2), util.NewInt(0), util.NewInt(0), util.NewInt(1)}); e != nil {
+	if e = m.SetInts(a, []unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(0), unumeral.NewInt(0), unumeral.NewInt(1)}); e != nil {
 		t.Fatal(e)
 	}
-	if e = m.SetInts(b, []util.Int{util.NewInt(6), util.NewInt(0), util.NewInt(6)}); e != nil {
+	if e = m.SetInts(b, []unumeral.Int{unumeral.NewInt(6), unumeral.NewInt(0), unumeral.NewInt(6)}); e != nil {
 		t.Fatal(e)
 	}
 	// U and V may denote the same output vector: source has no output/output
@@ -638,7 +638,7 @@ func TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes(t *testing.T) {
 	if e := m.Shrink(p, 1); e != nil {
 		t.Fatal(e)
 	}
-	var content util.Int
+	var content unumeral.Int
 	// gcd sees both original initialized coefficients before reserve. The
 	// subsequent source reserve default-constructs the retained second slot
 	// before the ascending input reads: exact same-base raw prefix is [1].
@@ -653,16 +653,16 @@ func TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes(t *testing.T) {
 		t.Fatal(e)
 	}
 	upolyGCDExpect(t, m, p, []int64{1})
-	if e = m.SetInts(p, []util.Int{util.NewInt(4), util.NewInt(2)}); e != nil {
+	if e = m.SetInts(p, []unumeral.Int{unumeral.NewInt(4), unumeral.NewInt(2)}); e != nil {
 		t.Fatal(e)
 	}
-	var lc, inv util.Int
+	var lc, inv unumeral.Int
 	// In Z inverse is unsupported after source top swap and inverse copy.
 	if e = m.MakeMonicWithLeadingInverse(p, &lc, &inv); e == nil {
 		t.Fatal("unsupported integer inverse")
 	}
 	upolyGCDExpect(t, m, p, []int64{4, 1})
-	for _, x := range []*util.Int{&lc, &inv} {
+	for _, x := range []*unumeral.Int{&lc, &inv} {
 		n, e = m.IntegerManager().Int64(x)
 		if e != nil || n != 2 {
 			t.Fatal(n, e)
@@ -674,7 +674,7 @@ func TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes(t *testing.T) {
 	if e = m.SetZPUint64(7); e != nil {
 		t.Fatal(e)
 	}
-	if e = m.SetInts(p, []util.Int{util.NewInt(4), util.NewInt(2)}); e != nil {
+	if e = m.SetInts(p, []unumeral.Int{unumeral.NewInt(4), unumeral.NewInt(2)}); e != nil {
 		t.Fatal(e)
 	}
 	if e = m.MakeMonicWithLeading(p, &lc); e != nil {
@@ -703,7 +703,7 @@ func TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes(t *testing.T) {
 	q := upolySourceNew(t, m, nil)
 	r := upolySourceNew(t, m, nil)
 	av := mustUPolyView(t, m, a)
-	two := util.NewInt(2)
+	two := unumeral.NewInt(2)
 	if e := m.DivScalarView(av, &two); e != nil {
 		t.Fatal(e)
 	}
@@ -770,7 +770,7 @@ func TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes(t *testing.T) {
 	upolyGCDExpect(t, m, q, nil)
 	upolyGCDExpect(t, m, r, []int64{1})
 	upolyGCDExpect(t, m, d, []int64{1, 1})
-	var lc, inv util.Int
+	var lc, inv unumeral.Int
 	if e = m.MakeMonicWithLeadingInverseView(av, &lc, &inv); e != nil {
 		t.Fatal(e)
 	}
@@ -868,7 +868,7 @@ func TestUPolynomialContentRawEarlyOneAndLateReadPrefix(t *testing.T) {
 	if e := m.NormalizeView(raw); e != nil {
 		t.Fatal("early-one skipped tail", e)
 	}
-	content := util.NewInt(7)
+	content := unumeral.NewInt(7)
 	e := m.PrimitiveAndContentViews(raw, out, &content)
 	if !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("later actual source read", e)

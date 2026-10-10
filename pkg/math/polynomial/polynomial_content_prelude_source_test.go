@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialContentBeforeAIActualGCDPrelude(t *testing.T) {
@@ -22,7 +23,7 @@ func contentBeforeAIActualPrelude(t *testing.T, shortcut bool) {
 	for ordinal := int64(0); ordinal < 256 && !success; ordinal++ {
 		full := polynomialPSCFullFixture(t)
 		c := full.core
-		var a, b, i util.Int
+		var a, b, i unumeral.Int
 		serviceMust(t, c.integer.SetString(&a, "354224848179261915075"))
 		serviceMust(t, c.integer.SetString(&b, "573147844013817084101"))
 		serviceMust(t, c.integer.Mul2kInPlace(&a, 2048))
@@ -31,7 +32,7 @@ func contentBeforeAIActualPrelude(t *testing.T, shortcut bool) {
 		serviceMust(t, e)
 		y, e := c.monomials.MkVariable(1, 1)
 		serviceMust(t, e)
-		p, e := c.MkTerms([]util.Int{a, b}, []Monomial{x, y})
+		p, e := c.MkTerms([]unumeral.Int{a, b}, []Monomial{x, y})
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(p))
 		ref, e := NewPolynomialRef(c)
@@ -59,11 +60,11 @@ func contentBeforeAIActualPrelude(t *testing.T, shortcut bool) {
 			}
 		}
 		s := &c.contentLocal
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, ref.root.value}, []*util.Int{&a, &b, &i, &s.ai}, extra)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, ref.root.value}, []*unumeral.Int{&a, &b, &i, &s.ai}, extra)
 		if callErr != nil && !numericPhysicalReservationRefusal(callErr) {
 			t.Fatal("actual Content refusal", ordinal, callErr)
 		}
-		if c.integer.GcdRaw.Active && !s.aiConstructed && (util.NumericAllocationPending(&c.integer.GcdRaw.Numeric) || c.integer.GcdRaw.Values[0].Cell != 0) {
+		if c.integer.GcdRaw.Active && !s.aiConstructed && (unumeral.NumericAllocationPending(&c.integer.GcdRaw.Numeric) || c.integer.GcdRaw.Values[0].Cell != 0) {
 			if !c.matchesContentInvocation(&receipt) || s.gcd.Manager != c.integer || s.gcd.Frame != &c.integer.GcdRaw || s.gcd.Invocation != c.integer.GcdRaw.Invocation {
 				t.Fatal("actual before-ai GCD child missing", ordinal, callErr)
 			}
@@ -82,7 +83,7 @@ func contentBeforeAIActualPrelude(t *testing.T, shortcut bool) {
 		if !s.aiConstructed && s.ai != before {
 			t.Fatal("unconstructed ai acquired source DT")
 		}
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, ref.root.value}, []*util.Int{&a, &b, &i, &s.ai}, extra)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, ref.root.value}, []*unumeral.Int{&a, &b, &i, &s.ai}, extra)
 		// The older caller i NUM is completed before unjoined RAW owning abort.
 		if callErr != nil {
 			serviceMust(t, c.integer.Del(&i))
@@ -92,7 +93,7 @@ func contentBeforeAIActualPrelude(t *testing.T, shortcut bool) {
 		} else {
 			serviceMust(t, c.cleanupContentInvocation(&receipt, true))
 		}
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, ref.root.value}, []*util.Int{&a, &b, &i}, extra)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, ref.root.value}, []*unumeral.Int{&a, &b, &i}, extra)
 		c.integer.Budget().FailAfter(-1)
 		if retry {
 			captured := callErr.Error()
@@ -118,12 +119,12 @@ func contentBeforeAIActualPrelude(t *testing.T, shortcut bool) {
 					return pp.root.value
 				}
 				return Polynomial{}
-			}()}, []*util.Int{&a, &b, &i}, extra)
+			}()}, []*unumeral.Int{&a, &b, &i}, extra)
 			retried = true
 			t.Log("actual same-owner GCD prelude retry", ordinal)
 		}
 		if callErr == nil || retry {
-			var expected util.Int
+			var expected unumeral.Int
 			serviceMust(t, c.integer.SetInt64(&expected, 1))
 			serviceMust(t, c.integer.Mul2kInPlace(&expected, 2048))
 			cmp, e := c.integer.Compare(&i, &expected)
@@ -207,7 +208,7 @@ func TestPolynomialContentBeforeAIReachedGCDSourceStop(t *testing.T) {
 	budget := arena.NewBudget(1 << 28)
 	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
@@ -218,7 +219,7 @@ func TestPolynomialContentBeforeAIReachedGCDSourceStop(t *testing.T) {
 		_, e = mm.MkVar()
 		serviceMust(t, e)
 	}
-	var a, b, i, g util.Int
+	var a, b, i, g unumeral.Int
 	words := make([]uint32, 15000)
 	words[0] = 7
 	words[len(words)-1] = 1
@@ -231,7 +232,7 @@ func TestPolynomialContentBeforeAIReachedGCDSourceStop(t *testing.T) {
 	serviceMust(t, e)
 	y, e := mm.MkVariable(1, 1)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{a, b}, []Monomial{x, y})
+	p, e := c.MkTerms([]unumeral.Int{a, b}, []Monomial{x, y})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
 	var primitive polynomialReference
@@ -245,7 +246,7 @@ func TestPolynomialContentBeforeAIReachedGCDSourceStop(t *testing.T) {
 	}
 	returned := c.integerContentWithReceipt(p, &i, &primitive, &receipt)
 	s := &c.contentLocal
-	if !errors.Is(returned, arena.ErrBounds) || !z.GcdRaw.BodySucceeded || s.aiConstructed || s.aiEnded || i != util.NewInt(1) || s.gcd.Frame != &z.GcdRaw {
+	if !errors.Is(returned, arena.ErrBounds) || !z.GcdRaw.BodySucceeded || s.aiConstructed || s.aiEnded || i != unumeral.NewInt(1) || s.gcd.Frame != &z.GcdRaw {
 		t.Fatal("actual child end DEL before ai absent", returned, z.GcdRaw.BodySucceeded, s.aiConstructed, s.aiEnded, i)
 	}
 	captured := returned.Error()
@@ -253,7 +254,7 @@ func TestPolynomialContentBeforeAIReachedGCDSourceStop(t *testing.T) {
 	if cause == nil || cause != z.RawInvocationSourceCause(&s.gcd) {
 		t.Fatal("actual child source stop missing parent", cause)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*util.Int{&a, &b, &i, &g}, 0, []umemory.Block{lane})
+	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*unumeral.Int{&a, &b, &i, &g}, 0, []umemory.Block{lane})
 	serviceMust(t, c.cleanupContentInvocation(&receipt, false))
 	if c.contentInvocationSourceCause(&receipt) != cause || s.aiConstructed || s.aiEnded {
 		t.Fatal("false own phase invented ai/source completion")
@@ -264,7 +265,7 @@ func TestPolynomialContentBeforeAIReachedGCDSourceStop(t *testing.T) {
 	if c.contentInvocationSourceCause(&receipt) != cause || z.RawInvocationSourceCause(&receipt.frame.gcd) != cause || returned.Error() != captured {
 		t.Fatal("own acknowledgement changed source history")
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*util.Int{&a, &b, &i, &g}, 0, []umemory.Block{lane, recovery})
+	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*unumeral.Int{&a, &b, &i, &g}, 0, []umemory.Block{lane, recovery})
 	var later polynomialContentInvocationReceipt
 	serviceMust(t, c.integerContentWithReceipt(p, &i, &primitive, &later))
 	if later.invocation == receipt.invocation || returned.Error() != captured || !errors.Is(returned, arena.ErrBounds) {
@@ -272,7 +273,7 @@ func TestPolynomialContentBeforeAIReachedGCDSourceStop(t *testing.T) {
 	}
 	serviceMust(t, primitive.close(c))
 	serviceMust(t, c.DecRef(p))
-	for _, v := range []*util.Int{&a, &b, &i, &g} {
+	for _, v := range []*unumeral.Int{&a, &b, &i, &g} {
 		serviceMust(t, z.Del(v))
 	}
 	serviceMust(t, rt.Deallocate(&lane))
@@ -295,7 +296,7 @@ func TestPolynomialContentConstantActualSETAllocation(t *testing.T) {
 			for prefix := int64(0); prefix < 128 && !success; prefix++ {
 				full := polynomialPSCFullFixture(t)
 				c, z := full.core, full.core.integer
-				var a, i, modulus util.Int
+				var a, i, modulus unumeral.Int
 				serviceMust(t, z.SetInt64(&a, 1))
 				serviceMust(t, z.Mul2kInPlace(&a, 2048))
 				p, e := c.MkConstantTakeCopy(&a)
@@ -304,7 +305,7 @@ func TestPolynomialContentConstantActualSETAllocation(t *testing.T) {
 				if field {
 					serviceMust(t, z.SetInt64(&modulus, 1))
 					serviceMust(t, z.Mul2kInPlace(&modulus, 521))
-					one := util.NewInt(1)
+					one := unumeral.NewInt(1)
 					serviceMust(t, z.Sub(&modulus, &one, &modulus))
 					serviceMust(t, c.modular.SetZP(&modulus))
 				}
@@ -315,7 +316,7 @@ func TestPolynomialContentConstantActualSETAllocation(t *testing.T) {
 				if returned != nil && !numericPhysicalReservationRefusal(returned) {
 					t.Fatal("actual constant SET refusal", prefix, returned)
 				}
-				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result.value, result.incoming}, []*util.Int{&a, &i, &modulus}, 0)
+				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result.value, result.incoming}, []*unumeral.Int{&a, &i, &modulus}, 0)
 				if returned != nil && polynomialNegNumericPending(&c.contentLocal.numeric) {
 					saw = true
 				}
@@ -330,7 +331,7 @@ func TestPolynomialContentConstantActualSETAllocation(t *testing.T) {
 					serviceMust(t, z.Del(&i))
 				}
 				serviceMust(t, c.cleanupContentInvocation(&r, true))
-				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result.value, result.incoming}, []*util.Int{&a, &i, &modulus}, 0)
+				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result.value, result.incoming}, []*unumeral.Int{&a, &i, &modulus}, 0)
 				z.Budget().FailAfter(-1)
 				if returned == nil {
 					success = true
@@ -358,10 +359,10 @@ func TestPolynomialContentFieldActualBIGInverseChildren(t *testing.T) {
 	for prefix := int64(0); prefix < 128 && !success; prefix++ {
 		full := polynomialPSCFullFixture(t)
 		c, z := full.core, full.core.integer
-		var modulus, i util.Int
+		var modulus, i unumeral.Int
 		serviceMust(t, z.SetInt64(&modulus, 1))
 		serviceMust(t, z.Mul2kInPlace(&modulus, 521))
-		one := util.NewInt(1)
+		one := unumeral.NewInt(1)
 		serviceMust(t, z.Sub(&modulus, &one, &modulus))
 		serviceMust(t, c.modular.SetZP(&modulus))
 		p := polynomialQueryTerms(t, c, []int32{2, 4}, [][]MonomialPower{{{0, 1}}, {{1, 1}}})
@@ -372,7 +373,7 @@ func TestPolynomialContentFieldActualBIGInverseChildren(t *testing.T) {
 		if returned != nil && !numericPhysicalReservationRefusal(returned) {
 			t.Fatal("actual BIG inverse Content refusal", prefix, returned)
 		}
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result.value, result.incoming}, []*util.Int{&modulus, &i}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result.value, result.incoming}, []*unumeral.Int{&modulus, &i}, 0)
 		if returned != nil && z.ExtendedRaw.Active {
 			if !r.frame.aiConstructed || r.frame.extended.Manager != z || r.frame.extended.Frame != &z.ExtendedRaw || r.frame.extended.Invocation != z.ExtendedRaw.Invocation {
 				t.Fatal("actual younger six RAW inverse omitted", prefix, r.frame)
@@ -384,10 +385,10 @@ func TestPolynomialContentFieldActualBIGInverseChildren(t *testing.T) {
 			serviceMust(t, z.Del(&i))
 		}
 		serviceMust(t, c.cleanupContentInvocation(&r, true))
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result.value, result.incoming}, []*util.Int{&modulus, &i}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result.value, result.incoming}, []*unumeral.Int{&modulus, &i}, 0)
 		z.Budget().FailAfter(-1)
 		if returned == nil {
-			if i != util.NewInt(2) {
+			if i != unumeral.NewInt(2) {
 				t.Fatal("source raw integer GCD in finite field", i)
 			}
 			polynomialQueryExpect(t, c, result.value, map[[3]uint32]int64{{1, 0, 0}: 1, {0, 1, 0}: 2})

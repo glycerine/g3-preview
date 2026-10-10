@@ -2,15 +2,14 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialDividesPersistentMemberReturnDoesNotConsumeRows(t *testing.T) {
 	full := polynomialArithmeticDirectNumericFixture(t)
 	c := full.core
-	seven := util.NewInt(7)
+	seven := unumeral.NewInt(7)
 	p, e := c.MkConstantTakeCopy(&seven)
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
@@ -35,7 +34,7 @@ func TestPolynomialDividesPersistentMemberReturnDoesNotConsumeRows(t *testing.T)
 	serviceMust(t, e)
 	foreignRC, e := c.monomialRefCount(fm)
 	serviceMust(t, e)
-	rawAs, rawMs, used := append([]util.Int(nil), c.som.as.values...), append([]Monomial(nil), c.som.ms...), c.integer.Budget().Used()
+	rawAs, rawMs, used := append([]unumeral.Int(nil), c.som.as.values...), append([]Monomial(nil), c.som.ms...), c.integer.Budget().Used()
 	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, foreign}, nil, 0)
 	copyReceipt := receipt
 	copyFrame := *receipt.frame

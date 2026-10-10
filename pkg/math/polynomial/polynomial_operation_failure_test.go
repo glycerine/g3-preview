@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialVariableConstructionFailurePrefixes(t *testing.T) {
@@ -16,7 +17,7 @@ func TestPolynomialVariableConstructionFailurePrefixes(t *testing.T) {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			b := arena.NewBudget(1 << 24)
 			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
 			serviceMust(t, e)
@@ -62,7 +63,7 @@ func TestPolynomialMultiplicationFailurePrefixes(t *testing.T) {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			b := arena.NewBudget(1 << 24)
 			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
 			serviceMust(t, e)
@@ -116,7 +117,7 @@ func TestPolynomialLinearMixedGeneratedFailurePrefixes(t *testing.T) {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			b := arena.NewBudget(1 << 24)
 			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
 			serviceMust(t, e)
@@ -128,8 +129,8 @@ func TestPolynomialLinearMixedGeneratedFailurePrefixes(t *testing.T) {
 			m, e := NewMultivariatePolynomialCore(MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { t.Fatal("unexpected constructor checkpoint"); return false }, Cooperation: func() error { t.Fatal("unexpected cooperate"); return nil }})
 			serviceMust(t, e)
 			b.FailAfter(fault)
-			as := []util.Int{util.NewInt(2), util.NewInt(3), util.NewInt(5)}
-			c := util.NewInt(7)
+			as := []unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(3), unumeral.NewInt(5)}
+			c := unumeral.NewInt(7)
 			p, e := m.MkLinearTake(as, []uint32{0, 1, 0}, &c)
 			if e == nil {
 				success = true
@@ -269,7 +270,7 @@ func TestPolynomialUnivariateGeneratedFailurePrefixes(t *testing.T) {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			b := arena.NewBudget(1 << 24)
 			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
 			serviceMust(t, e)
@@ -279,7 +280,7 @@ func TestPolynomialUnivariateGeneratedFailurePrefixes(t *testing.T) {
 			m, e := NewMultivariatePolynomialCore(MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { t.Fatal("unexpected constructor checkpoint"); return false }, Cooperation: func() error { t.Fatal("unexpected cooperate"); return nil }})
 			serviceMust(t, e)
 			b.FailAfter(fault)
-			as := []util.Int{util.NewInt(1), util.NewInt(0), util.NewInt(2)}
+			as := []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(0), unumeral.NewInt(2)}
 			p, e := m.MkUnivariateTake(0, 2, as)
 			if e == nil {
 				success = true
@@ -316,7 +317,7 @@ func TestPolynomialSoleRetainCalleeConstructionCleanup(t *testing.T) {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			b := arena.NewBudget(1 << 24)
 			profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Profile: profile}})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
 			serviceMust(t, e)

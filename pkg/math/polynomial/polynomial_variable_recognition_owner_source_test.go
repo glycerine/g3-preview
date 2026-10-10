@@ -7,17 +7,18 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type variableRecognitionOwnerCallback struct {
 	full       *MultivariatePolynomialManager
-	q          *util.RationalManager
+	q          *unumeral.RationalManager
 	called     bool
 	mode       string
 	p          Polynomial
-	out        *util.Int
+	out        *unumeral.Int
 	v          *uint32
 	result     error
 	changed    bool
@@ -78,7 +79,7 @@ func variableRecognitionExecutingOwner(t *testing.T, mode string, field, standal
 	budget := arena.NewBudget(1 << 24)
 	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, Transport: variableRecognitionOwnerTransport})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1, Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1, Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
@@ -87,14 +88,14 @@ func variableRecognitionExecutingOwner(t *testing.T, mode string, field, standal
 	serviceMust(t, e)
 	words := make([]uint32, 500)
 	words[0], words[499] = 17, 1
-	var big util.Int
+	var big unumeral.Int
 	serviceMust(t, c.integer.SetLimbs(&big, words))
 	mon, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{util.NewInt(1), big}, []Monomial{mon, c.monomials.unit})
+	p, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(1), big}, []Monomial{mon, c.monomials.unit})
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
-	out := util.NewInt(9)
+	out := unumeral.NewInt(9)
 	v := uint32(77)
 	if field {
 		serviceMust(t, c.integer.Copy(&out, &big))
@@ -112,7 +113,7 @@ func variableRecognitionExecutingOwner(t *testing.T, mode string, field, standal
 	variableRecognitionOwnerCallbackCurrent = nil
 	// The callback result is recorded before recovery, without using it as authority.
 	called, result, changed := state.called, state.result, state.changed
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&out, &big}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*unumeral.Int{&out, &big}, 0)
 	if !called || body == nil || !errors.Is(result, ErrPolynomialPending) || changed {
 		t.Fatalf("actual reached SET executing owner: called=%v body=%v result=%v changed=%v", called, body, result, changed)
 	}

@@ -5,8 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math/big"
 	"testing"
 )
@@ -52,7 +53,7 @@ func TestASTBitVectorNotNumeralsEveryActualReservation(t *testing.T) {
 						if !n.placed[0] || n.placed[1] || n.placed[2] || n.placed[3] || mode != "numeric" && !n.placed[4] {
 							t.Fatal("source expression lifetimes", n.placed)
 						}
-						if mode == "borrowed" && n.values[3] != (util.OwnedRational{}) {
+						if mode == "borrowed" && n.values[3] != (unumeral.OwnedRational{}) {
 							t.Fatal("borrowed one constructed literal")
 						}
 						ref, e := m.NewRef(node)

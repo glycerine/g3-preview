@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialPSCChain1AscendingSetAndLastUnitCallbackRefuseOwnerReentry(t *testing.T) {
@@ -17,9 +16,9 @@ func TestPolynomialPSCChain1AscendingSetAndLastUnitCallbackRefuseOwnerReentry(t 
 	serviceMust(t, e)
 	// Actual raw source inputs are borrowed. The source output SET acquires them;
 	// later coefficient and final unit SETs are their literal last owning drops.
-	p, e := c.MkTerms([]util.Int{util.NewInt(1), util.NewInt(1)}, []Monomial{fourth, c.monomials.unit})
+	p, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}, []Monomial{fourth, c.monomials.unit})
 	serviceMust(t, e)
-	q, e := c.MkTerms([]util.Int{util.NewInt(1), util.NewInt(1)}, []Monomial{linear, c.monomials.unit})
+	q, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}, []Monomial{linear, c.monomials.unit})
 	serviceMust(t, e)
 	out, e := NewPolynomialRefVector(c)
 	serviceMust(t, e)

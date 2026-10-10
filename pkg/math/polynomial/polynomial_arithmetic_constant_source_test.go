@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular(t *testing.T) {
@@ -13,28 +12,28 @@ func TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular(
 	for prefix := int64(0); prefix < 80; prefix++ {
 		full := polynomialArithmeticDirectNumericFixture(t)
 		c := full.core
-		seven := util.NewInt(7)
+		seven := unumeral.NewInt(7)
 		p, e := c.MkConstantTakeCopy(&seven)
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(p))
 		var older polynomialArithmeticInvocationReceipt
 		serviceMust(t, c.som.acquireArithmeticInvocation(&older))
 		serviceMust(t, c.som.addPolynomialWithArithmeticReceipt(p, &older))
-		var big util.Int
+		var big unumeral.Int
 		limbs := make([]uint32, 80)
 		limbs[0], limbs[79] = 19, 1
 		serviceMust(t, c.integer.SetLimbs(&big, limbs))
 		var r polynomialArithmeticInvocationReceipt
 		c.integer.Budget().FailAfter(prefix)
 		out, e := c.mulAddWithReceipt(c.zero, Polynomial{}, &big, &r)
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, out}, []*util.Int{&big}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, out}, []*unumeral.Int{&big}, 0)
 		if e != nil && !numericPhysicalReservationRefusal(e) {
 			t.Fatal("actual shortcut failure", prefix, e)
 		}
 		if r.frame != &c.constantScope.arithmeticScope || !c.matchesArithmeticInvocation(&older) {
 			t.Fatal("fake SOM/older frame acquisition", prefix)
 		}
-		if c.integer.PendingAllocationObject() != (util.SourceCellBacking{}).Object && r.frame.numeric.Cell == c.integer.PendingCell {
+		if c.integer.PendingAllocationObject() != (unumeral.SourceCellBacking{}).Object && r.frame.numeric.Cell == c.integer.PendingCell {
 			saw = true
 		}
 		serviceMust(t, c.cleanupArithmeticInvocation(&r, false))
@@ -47,7 +46,7 @@ func TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular(
 		if n != 1 || row != seven || !c.matchesArithmeticInvocation(&older) {
 			t.Fatal("constant abort changed older rows", prefix, n, row)
 		}
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, out}, []*util.Int{&big}, 0)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, out}, []*unumeral.Int{&big}, 0)
 		if e == nil {
 			a, x := c.coefficientCore(out, 0)
 			serviceMust(t, x)

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialICCPConstantSETActualPendingAcquisition(t *testing.T) {
@@ -16,7 +16,7 @@ func TestPolynomialICCPConstantSETActualPendingAcquisition(t *testing.T) {
 		t.Run(fmt.Sprint(prefix), func(t *testing.T) {
 			full := polynomialExactDivDirectPageOneFixture(t)
 			c := full.core
-			var big, i, held util.Int
+			var big, i, held unumeral.Int
 			words := make([]uint32, 80)
 			words[0], words[79] = 7, 1
 			serviceMust(t, c.integer.SetLimbs(&big, words))
@@ -38,7 +38,7 @@ func TestPolynomialICCPConstantSETActualPendingAcquisition(t *testing.T) {
 			})
 			c.integer.Budget().FailAfter(prefix)
 			body := full.iccpPartsWithReceipt(p, 0, &i, &content, &primitive, &receipt)
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*util.Int{&big, &i, &held}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*unumeral.Int{&big, &i, &held}, 0)
 			if body != nil && !numericPhysicalReservationRefusal(body) {
 				t.Fatal("literal constant SET category", body)
 			}
@@ -81,7 +81,7 @@ func TestPolynomialICCPConstantSETActualPendingAcquisition(t *testing.T) {
 			if full.hasICCPConstantHistory(&receipt.shortcutConstant) && !errors.Is(body, receipt.shortcutConstant.frame.bodyCause) {
 				t.Fatal("own ACK changed actual SET body history", body, receipt.shortcutConstant.frame.bodyCause)
 			}
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*util.Int{&big, &i, &held}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*unumeral.Int{&big, &i, &held}, 0)
 			if body == nil {
 				success = true
 				a, e := c.coefficientCore(p, 0)
@@ -102,12 +102,12 @@ func TestPolynomialICCPConstantSETActualPendingAcquisition(t *testing.T) {
 func TestPolynomialICCPConstantModeSwitchSETAndNoLexicalLocals(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
-	seven := util.NewInt(7)
+	seven := unumeral.NewInt(7)
 	p, e := c.MkConstantTakeCopy(&seven)
 	serviceMust(t, e)
 	p = polynomialCaller(t, c, p)
 	serviceMust(t, c.modular.SetZPUint64(5))
-	var i util.Int
+	var i unumeral.Int
 	var content, primitive polynomialReference
 	var receipt polynomialICCPInvocationReceipt
 	t.Cleanup(func() {
@@ -117,13 +117,13 @@ func TestPolynomialICCPConstantModeSwitchSETAndNoLexicalLocals(t *testing.T) {
 		serviceMust(t, c.integer.Del(&i))
 	})
 	serviceMust(t, full.iccpPartsWithReceipt(p, 0, &i, &content, &primitive, &receipt))
-	if i != util.NewInt(2) || content.value != c.unit || primitive.value != c.unit || len(full.iccpFrames) != 0 {
+	if i != unumeral.NewInt(2) || content.value != c.unit || primitive.value != c.unit || len(full.iccpFrames) != 0 {
 		t.Fatal("literal constant SET normalization/constructor order", i)
 	}
 	if !full.hasICCPConstantHistory(&receipt.shortcutConstant) {
 		t.Fatal("actual SET invocation tuple absent")
 	}
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, primitive.value}, []*util.Int{&i}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, primitive.value}, []*unumeral.Int{&i}, 0)
 	serviceMust(t, full.cleanupICCPInvocation(&receipt, false))
 	serviceMust(t, full.cleanupICCPInvocation(&receipt, true))
 	old := receipt
@@ -139,7 +139,7 @@ func TestPolynomialICCPConstantModeSwitchSETAndNoLexicalLocals(t *testing.T) {
 func TestPolynomialICCPConstantOldReceiptPreservesLaterForeignPendingCell(t *testing.T) {
 	full := polynomialExactDivDirectPageOneFixture(t)
 	c := full.core
-	var big, held, i, foreign util.Int
+	var big, held, i, foreign unumeral.Int
 	words := make([]uint32, 80)
 	words[0], words[79] = 7, 1
 	serviceMust(t, c.integer.SetLimbs(&big, words))
@@ -155,7 +155,7 @@ func TestPolynomialICCPConstantOldReceiptPreservesLaterForeignPendingCell(t *tes
 		serviceMust(t, c.integer.CleanupPendingAllocation())
 		serviceMust(t, content.close(c))
 		serviceMust(t, primitive.close(c))
-		for _, n := range []*util.Int{&big, &held, &i, &foreign} {
+		for _, n := range []*unumeral.Int{&big, &held, &i, &foreign} {
 			serviceMust(t, c.integer.Del(n))
 		}
 	})
@@ -165,7 +165,7 @@ func TestPolynomialICCPConstantOldReceiptPreservesLaterForeignPendingCell(t *tes
 	if body == nil || old.Object == (umemory.ObjectRef{}) || receipt.shortcutConstant.frame.numeric.Cell != old {
 		t.Fatal("actual source SET pending descriptor horizon", body, old)
 	}
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, primitive.value}, []*util.Int{&big, &held, &i, &foreign}, 0)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, primitive.value}, []*unumeral.Int{&big, &held, &i, &foreign}, 0)
 	// Explicit owner consumption is separate from the stopped source call.
 	// Keep its old private binding to exercise exact replacement refusal.
 	serviceMust(t, c.integer.CleanupPendingAllocation())
@@ -181,7 +181,7 @@ func TestPolynomialICCPConstantOldReceiptPreservesLaterForeignPendingCell(t *tes
 			if e == nil {
 				t.Fatal("later pending cell without actual refusal")
 			}
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, primitive.value}, []*util.Int{&big, &held, &i, &foreign}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, primitive.value}, []*unumeral.Int{&big, &held, &i, &foreign}, 0)
 			roots, x := c.integer.SourceAllocator().PendingRoots()
 			serviceMust(t, x)
 			serviceMust(t, full.cleanupICCPInvocation(&receipt, false))
@@ -191,7 +191,7 @@ func TestPolynomialICCPConstantOldReceiptPreservesLaterForeignPendingCell(t *tes
 			if c.integer.PendingCell != now || roots != after || receipt.shortcutConstant.frame.bodyCause == nil || !errors.Is(body, receipt.shortcutConstant.frame.bodyCause) {
 				t.Fatal("old SET acknowledgment consumed or retargeted foreign pending roots")
 			}
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, primitive.value}, []*util.Int{&big, &held, &i, &foreign}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, primitive.value}, []*unumeral.Int{&big, &held, &i, &foreign}, 0)
 		}
 		c.integer.Budget().FailAfter(-1)
 		serviceMust(t, c.integer.CleanupPendingAllocation())

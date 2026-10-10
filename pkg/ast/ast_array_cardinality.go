@@ -3,10 +3,9 @@ package ast
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Concrete source lexical values, held in one real charged cold frame only
@@ -17,8 +16,8 @@ type astArrayCardinalityFrame struct {
 	Next                             *astArrayCardinalityFrame
 	Self                             *astArrayCardinalityFrame
 	Owner                            *ASTManager
-	tokens                           [4]util.OwnedRational // immutable latest actual returned construction/acquisition tuples
-	Values                           [4]util.OwnedRational // domain_sz, num_elements, conversion, power result
+	tokens                           [4]unumeral.OwnedRational // immutable latest actual returned construction/acquisition tuples
+	Values                           [4]unumeral.OwnedRational // domain_sz, num_elements, conversion, power result
 	Acquired, completed              [4]bool
 	Invocation, header               uint64
 	sourceDone                       bool

@@ -7,11 +7,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func upolyContextOwner(t *testing.T) (*util.RationalService, *UPolynomialManager, UPolynomial) {
+func upolyContextOwner(t *testing.T) (*unumeral.RationalService, *UPolynomialManager, UPolynomial) {
 	t.Helper()
 	s, _ := serviceNew(t)
 	m, e := NewUPolynomialManagerFromRationalService(s, UPolynomialConfig{Checkpoint: func() bool { panic("constant set must not checkpoint") }, Cooperation: func() error { panic("constant set must not cooperate") }})
@@ -28,7 +29,7 @@ func TestUPolynomialContextRawConstantCopy(t *testing.T) {
 	serviceMust(t, e)
 	// Public source fraction setter publishes finite 1/0; ordinary arithmetic reading
 	// remains invalid, but constant conversion copies before structural IsInt.
-	one, zero := util.NewInt(1), util.NewInt(0)
+	one, zero := unumeral.NewInt(1), unumeral.NewInt(0)
 	serviceMust(t, s.Manager.SetParts(&a.Raw, &one, &zero))
 	want := errors.New("source integer coefficient exception")
 	called := false
@@ -47,13 +48,13 @@ func TestUPolynomialContextBorrowIdentity(t *testing.T) {
 	a := serviceValue(t, s, "3")
 	var copied UPolynomialRationalContext
 	serviceMust(t, numericRationalService_WithUPolynomialRationals(s, m, func(c *UPolynomialRationalContext) error { copied = *c; return nil }))
-	if _, _, e := copied.Exponent(&a); !errors.Is(e, util.ErrRationalServiceOwner) {
+	if _, _, e := copied.Exponent(&a); !errors.Is(e, unumeral.ErrRationalServiceOwner) {
 		t.Fatalf("copied borrowed context escaped lock: %v", e)
 	}
-	if e := copied.SetIdentity(p); !errors.Is(e, util.ErrRationalServiceOwner) {
+	if e := copied.SetIdentity(p); !errors.Is(e, unumeral.ErrRationalServiceOwner) {
 		t.Fatal(e)
 	}
-	if e := copied.SetConstant(p, &a, func() error { t.Fatal("invalid borrow reached callback"); return nil }); !errors.Is(e, util.ErrRationalServiceOwner) {
+	if e := copied.SetConstant(p, &a, func() error { t.Fatal("invalid borrow reached callback"); return nil }); !errors.Is(e, unumeral.ErrRationalServiceOwner) {
 		t.Fatal(e)
 	}
 	copied.StopVectors(arena.ErrBounds)
@@ -106,7 +107,7 @@ func contextTLSNearMinimum(t *testing.T, r *umemory.Runtime) {
 	}
 }
 
-func contextTLSOwner(t *testing.T) (*util.RationalService, *UPolynomialManager, UPolynomial, *umemory.Runtime, *arena.Budget) {
+func contextTLSOwner(t *testing.T) (*unumeral.RationalService, *UPolynomialManager, UPolynomial, *umemory.Runtime, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 25)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
@@ -114,7 +115,7 @@ func contextTLSOwner(t *testing.T) (*util.RationalService, *UPolynomialManager, 
 	cfg := serviceConfig(b)
 	cfg.Integers.Memory = r
 	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	s, e := util.NewRationalService(cfg)
+	s, e := unumeral.NewRationalService(cfg)
 	serviceMust(t, e)
 	m, e := NewUPolynomialManagerFromRationalService(s, UPolynomialConfig{Checkpoint: func() bool { panic("constant route checkpoint") }, Cooperation: func() error { panic("constant route cooperation") }})
 	serviceMust(t, e)
@@ -133,7 +134,7 @@ func contextTLSOwner(t *testing.T) (*util.RationalService, *UPolynomialManager, 
 	return s, m, p, r, b
 }
 
-func contextBigOdd(t *testing.T, s *util.RationalService, den int32) util.OwnedRational {
+func contextBigOdd(t *testing.T, s *unumeral.RationalService, den int32) unumeral.OwnedRational {
 	t.Helper()
 	a, e := s.NewValue()
 	serviceMust(t, e)
@@ -141,21 +142,21 @@ func contextBigOdd(t *testing.T, s *util.RationalService, den int32) util.OwnedR
 	limbs[0] = 17
 	limbs[len(limbs)-1] = 1
 	serviceMust(t, s.Manager.Z.SetLimbs(&a.Raw.Num, limbs))
-	a.Raw.Den = util.NewInt(den)
+	a.Raw.Den = unumeral.NewInt(den)
 	return a
 }
 
-func contextAudit(t *testing.T, s *util.RationalService, a *util.OwnedRational, m *UPolynomialManager, args ...UPolynomial) {
+func contextAudit(t *testing.T, s *unumeral.RationalService, a *unumeral.OwnedRational, m *UPolynomialManager, args ...UPolynomial) {
 	t.Helper()
 	contextAuditAll(t, s, a, m, args)
 }
-func contextAuditAll(t *testing.T, s *util.RationalService, a *util.OwnedRational, m *UPolynomialManager, args []UPolynomial, others ...*util.OwnedRational) {
+func contextAuditAll(t *testing.T, s *unumeral.RationalService, a *unumeral.OwnedRational, m *UPolynomialManager, args []UPolynomial, others ...*unumeral.OwnedRational) {
 	t.Helper()
-	roots := []*util.Int{&a.Raw.Num, &a.Raw.Den}
+	roots := []*unumeral.Int{&a.Raw.Num, &a.Raw.Den}
 	for _, v := range others {
 		roots = append(roots, &v.Raw.Num, &v.Raw.Den)
 	}
-	for _, q := range []*util.Rational{&s.ZeroField, &s.OneField, &s.MinusOneField, &s.InfZeroField.First, &s.InfZeroField.Second, &s.InfOneField.First, &s.InfOneField.Second, &s.InfMinusOneField.First, &s.InfMinusOneField.Second, &s.InfIntZeroField.First, &s.InfIntOneField.First, &s.InfIntMinusOneField.First} {
+	for _, q := range []*unumeral.Rational{&s.ZeroField, &s.OneField, &s.MinusOneField, &s.InfZeroField.First, &s.InfZeroField.Second, &s.InfOneField.First, &s.InfOneField.Second, &s.InfMinusOneField.First, &s.InfMinusOneField.Second, &s.InfIntZeroField.First, &s.InfIntOneField.First, &s.InfIntMinusOneField.First} {
 		roots = append(roots, &(*q.BorrowNumerator()), &(*q.BorrowDenominator()))
 	}
 	for i := range s.Cache {
@@ -208,7 +209,7 @@ func TestUPolynomialContextExceptionBeforeCompletedDestructor(t *testing.T) {
 func TestUPolynomialContextPartialCopyWaitsForStoppedVector(t *testing.T) {
 	s, m, p, r, b := contextTLSOwner(t)
 	a := contextBigOdd(t, s, 1)
-	serviceMust(t, m.SetRationals(p, []util.Rational{a.Raw}))
+	serviceMust(t, m.SetRationals(p, []unumeral.Rational{a.Raw}))
 	contextTLSNearMinimum(t, r)
 	b.FailAfter(0)
 	var original, stopped error
@@ -253,7 +254,7 @@ func TestUPolynomialContextPartialCopyWaitsForStoppedVector(t *testing.T) {
 
 // Each ErrBounds is the actual postphysical TLS synchronization refusal. Retry
 // acknowledges that exact release; no source counter or pointer is repaired.
-func contextTLSDelete(t *testing.T, s *util.RationalService, a *util.OwnedRational, r *umemory.Runtime) {
+func contextTLSDelete(t *testing.T, s *unumeral.RationalService, a *unumeral.OwnedRational, r *umemory.Runtime) {
 	t.Helper()
 	before := r.Stats().LiveBlocks
 	e := s.Del(a)
@@ -282,7 +283,7 @@ func contextTLSFinish(t *testing.T, r *umemory.Runtime, close func() error) {
 func TestUPolynomialContextVectorOnlyStopDoesNotPoisonService(t *testing.T) {
 	s, m, p, r, _ := contextTLSOwner(t)
 	a := contextBigOdd(t, s, 1)
-	serviceMust(t, m.SetRationals(p, []util.Rational{a.Raw}))
+	serviceMust(t, m.SetRationals(p, []unumeral.Rational{a.Raw}))
 	contextTLSNearMinimum(t, r)
 	var stopped error
 	e := numericRationalService_WithUPolynomialRationals(s, m, func(c *UPolynomialRationalContext) error {
@@ -307,7 +308,7 @@ func TestUPolynomialContextVectorOnlyStopDoesNotPoisonService(t *testing.T) {
 	serviceMust(t, e)
 	out, e := s.Add(&a, &zero)
 	serviceMust(t, e)
-	if roundPublicationDecode(t, s.Manager.Z, &a.Raw.Num).Cmp(roundPublicationDecode(t, s.Manager.Z, &out.Raw.Num)) != 0 || out.Raw.Den != util.NewInt(1) {
+	if roundPublicationDecode(t, s.Manager.Z, &a.Raw.Num).Cmp(roundPublicationDecode(t, s.Manager.Z, &out.Raw.Num)) != 0 || out.Raw.Den != unumeral.NewInt(1) {
 		t.Fatal("independent scalar operation changed value")
 	}
 	contextAuditAll(t, s, &a, m, []UPolynomial{p}, &zero, &out)

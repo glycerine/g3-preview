@@ -4,11 +4,10 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"strconv"
 	"strings"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // The driver prints these values without ENSUREs. These exact stream checks
@@ -45,7 +44,7 @@ func TestUPolynomialDisplayActualTst1DriverOutput(t *testing.T) {
 	z, s := preparationPhysicalFixture(t)
 	m := s.manager
 	var p upolyVectorState
-	serviceMust(t, m.set(&p, []util.Int{util.NewInt(18), util.NewInt(9), util.NewInt(-20), util.NewInt(-10), util.NewInt(2), util.NewInt(1)}))
+	serviceMust(t, m.set(&p, []unumeral.Int{unumeral.NewInt(18), unumeral.NewInt(9), unumeral.NewInt(-20), unumeral.NewInt(-10), unumeral.NewInt(2), unumeral.NewInt(1)}))
 	defer func() { serviceMust(t, m.reset(&p)); m.freeBacking(&p) }()
 	out := &upolyDisplaySink{}
 	serviceMust(t, m.DisplayInto(m.stateView(&p), out, "x", false))
@@ -54,7 +53,7 @@ func TestUPolynomialDisplayActualTst1DriverOutput(t *testing.T) {
 	}
 	// Driver's coefficient traversal adds one, then trims the actual vector.
 	for i := uint32(0); i < p.size; i++ {
-		one := util.NewInt(1)
+		one := unumeral.NewInt(1)
 		serviceMust(t, m.modular.Add(&m.values(&p)[i], &one, &m.values(&p)[i]))
 	}
 	serviceMust(t, m.trim(&p))
@@ -69,14 +68,14 @@ func TestUPolynomialDisplaySMT2LiteralSingleMonomialFallthrough(t *testing.T) {
 	_, s := preparationPhysicalFixture(t)
 	m := s.manager
 	cases := []struct {
-		values []util.Int
+		values []unumeral.Int
 		want   string
 	}{
 		{nil, "0"},
-		{[]util.Int{util.NewInt(-3)}, "(- 3)"},
-		{[]util.Int{util.NewInt(0), util.NewInt(1)}, "x(+ x)"},
-		{[]util.Int{util.NewInt(0), util.NewInt(0), util.NewInt(-1)}, "(* (- 1) (^ x 2))(+ (* (- 1) (^ x 2)))"},
-		{[]util.Int{util.NewInt(5), util.NewInt(-1), util.NewInt(2)}, "(+ (* 2 (^ x 2)) (* (- 1) x) 5)"},
+		{[]unumeral.Int{unumeral.NewInt(-3)}, "(- 3)"},
+		{[]unumeral.Int{unumeral.NewInt(0), unumeral.NewInt(1)}, "x(+ x)"},
+		{[]unumeral.Int{unumeral.NewInt(0), unumeral.NewInt(0), unumeral.NewInt(-1)}, "(* (- 1) (^ x 2))(+ (* (- 1) (^ x 2)))"},
+		{[]unumeral.Int{unumeral.NewInt(5), unumeral.NewInt(-1), unumeral.NewInt(2)}, "(+ (* 2 (^ x 2)) (* (- 1) x) 5)"},
 	}
 	for _, tc := range cases {
 		var p upolyVectorState
@@ -95,7 +94,7 @@ func TestUPolynomialDisplayActualStreamOwnerReentry(t *testing.T) {
 	_, s := preparationPhysicalFixture(t)
 	m := s.manager
 	var p upolyVectorState
-	serviceMust(t, m.set(&p, []util.Int{util.NewInt(1), util.NewInt(1)}))
+	serviceMust(t, m.set(&p, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}))
 	defer func() {
 		if !m.closed {
 			serviceMust(t, m.reset(&p))
@@ -127,7 +126,7 @@ func TestUPolynomialDisplayActualLowerOwnerReentry(t *testing.T) {
 			r, s := preparationPhysicalFixture(t)
 			m := s.manager
 			var p upolyVectorState
-			serviceMust(t, m.set(&p, []util.Int{util.NewInt(1), util.NewInt(1)}))
+			serviceMust(t, m.set(&p, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}))
 			defer func() {
 				if !r.Integers().Closed() {
 					serviceMust(t, m.reset(&p))
@@ -170,11 +169,11 @@ func TestUPolynomialDisplayBIGStreamFailureLiteralLifetime(t *testing.T) {
 		t.Run(strconv.FormatBool(smt), func(t *testing.T) {
 			r, s := preparationPhysicalFixture(t)
 			m := s.manager
-			var a util.Int
+			var a unumeral.Int
 			serviceMust(t, r.Integers().SetLimbs(&a, []uint32{7, 0, 0, 1}))
 			serviceMust(t, r.Integers().Neg(&a))
 			var p upolyVectorState
-			serviceMust(t, m.set(&p, []util.Int{a}))
+			serviceMust(t, m.set(&p, []unumeral.Int{a}))
 			serviceMust(t, r.Integers().Del(&a))
 			defer func() { serviceMust(t, m.CleanupDisplay()); serviceMust(t, m.reset(&p)); m.freeBacking(&p) }()
 			marker := errors.New("actual ostream refused decimal borrow")
@@ -195,7 +194,7 @@ func TestUPolynomialDisplayBIGStreamFailureLiteralLifetime(t *testing.T) {
 			if borrowed != "79228162514264337593543950343" {
 				t.Fatal("native numeral snapshot", borrowed)
 			}
-			roots := []*util.Int{&m.display.numeral}
+			roots := []*unumeral.Int{&m.display.numeral}
 			for i := uint32(0); i < p.size; i++ {
 				roots = append(roots, &m.values(&p)[i])
 			}
@@ -222,11 +221,11 @@ func TestUPolynomialDisplayEveryBIGReservationPrefix(t *testing.T) {
 				t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
 					r, s := preparationPhysicalFixture(t)
 					m := s.manager
-					var a util.Int
+					var a unumeral.Int
 					serviceMust(t, r.Integers().SetLimbs(&a, []uint32{7, 0, 0, 1}))
 					serviceMust(t, r.Integers().Neg(&a))
 					var p upolyVectorState
-					serviceMust(t, m.set(&p, []util.Int{a}))
+					serviceMust(t, m.set(&p, []unumeral.Int{a}))
 					serviceMust(t, r.Integers().Del(&a))
 					r.Integers().Budget().FailAfter(ordinal)
 					out := &upolyDisplaySink{}
@@ -236,7 +235,7 @@ func TestUPolynomialDisplayEveryBIGReservationPrefix(t *testing.T) {
 					} else {
 						e = m.DisplayInto(m.stateView(&p), out, "x", false)
 					}
-					roots := []*util.Int{&m.display.numeral}
+					roots := []*unumeral.Int{&m.display.numeral}
 					for i := uint32(0); i < p.size; i++ {
 						roots = append(roots, &m.values(&p)[i])
 					}
@@ -271,7 +270,7 @@ func TestUPolynomialDisplayActualSturmSequenceDriver(t *testing.T) {
 	_, service := preparationPhysicalFixture(t)
 	m := service.manager
 	var p upolyVectorState
-	serviceMust(t, m.set(&p, []util.Int{util.NewInt(8), util.NewInt(2), util.NewInt(8), util.NewInt(10), util.NewInt(10), util.NewInt(0), util.NewInt(1), util.NewInt(0), util.NewInt(1), util.NewInt(3), util.NewInt(7)}))
+	serviceMust(t, m.set(&p, []unumeral.Int{unumeral.NewInt(8), unumeral.NewInt(2), unumeral.NewInt(8), unumeral.NewInt(10), unumeral.NewInt(10), unumeral.NewInt(0), unumeral.NewInt(1), unumeral.NewInt(0), unumeral.NewInt(1), unumeral.NewInt(3), unumeral.NewInt(7)}))
 	defer func() { serviceMust(t, m.reset(&p)); m.freeBacking(&p) }()
 	seq, e := m.NewSequence()
 	serviceMust(t, e)
@@ -302,7 +301,7 @@ func TestUPolynomialDisplayContextCopiedStaleCallbackGuards(t *testing.T) {
 	_, s := preparationPhysicalFixture(t)
 	m := s.manager
 	var p upolyVectorState
-	serviceMust(t, m.set(&p, []util.Int{util.NewInt(0), util.NewInt(1)}))
+	serviceMust(t, m.set(&p, []unumeral.Int{unumeral.NewInt(0), unumeral.NewInt(1)}))
 	defer func() { serviceMust(t, m.reset(&p)); m.freeBacking(&p) }()
 	var old integerAllocationInvocationContext
 	called := false
@@ -312,10 +311,10 @@ func TestUPolynomialDisplayContextCopiedStaleCallbackGuards(t *testing.T) {
 		}
 		called = true
 		old = m.display.context()
-		dst := util.NewInt(9)
-		src := util.NewInt(1)
+		dst := unumeral.NewInt(9)
+		src := unumeral.NewInt(1)
 		before := m.config.Integer.Budget().Used()
-		if e := numericIntegerModularManager_copyWithDisplayContext(m.modular, &dst, &src, old); e != ErrUPolynomialOwner || dst != util.NewInt(9) || before != m.config.Integer.Budget().Used() {
+		if e := numericIntegerModularManager_copyWithDisplayContext(m.modular, &dst, &src, old); e != ErrUPolynomialOwner || dst != unumeral.NewInt(9) || before != m.config.Integer.Budget().Used() {
 			t.Fatal("callback adopted display allocation context", e)
 		}
 		copied := m.display
@@ -345,8 +344,8 @@ func TestUPolynomialDisplayActualNestedBeforeBorrow(t *testing.T) {
 	_, s := preparationPhysicalFixture(t)
 	m := s.manager
 	var p, n upolyVectorState
-	serviceMust(t, m.set(&p, []util.Int{util.NewInt(0), util.NewInt(1)}))
-	serviceMust(t, m.set(&n, []util.Int{util.NewInt(-2)}))
+	serviceMust(t, m.set(&p, []unumeral.Int{unumeral.NewInt(0), unumeral.NewInt(1)}))
+	serviceMust(t, m.set(&n, []unumeral.Int{unumeral.NewInt(-2)}))
 	defer func() { serviceMust(t, m.reset(&p)); m.freeBacking(&p); serviceMust(t, m.reset(&n)); m.freeBacking(&n) }()
 	called := false
 	out := &upolyDisplaySink{literalHook: func(string) error {
@@ -371,8 +370,8 @@ func TestUPolynomialDisplayNestedInlineErasedAllocation(t *testing.T) {
 	_, s := preparationPhysicalFixture(t)
 	m := s.manager
 	var p, n upolyVectorState
-	serviceMust(t, m.set(&p, []util.Int{util.NewInt(0), util.NewInt(1)}))
-	serviceMust(t, m.set(&n, []util.Int{util.NewInt(-2)}))
+	serviceMust(t, m.set(&p, []unumeral.Int{unumeral.NewInt(0), unumeral.NewInt(1)}))
+	serviceMust(t, m.set(&n, []unumeral.Int{unumeral.NewInt(-2)}))
 	defer func() {
 		m.config.Integer.Budget().FailAfter(-1)
 		serviceMust(t, m.reset(&p))
@@ -405,10 +404,10 @@ func TestUPolynomialDisplayNestedInlineErasedAllocation(t *testing.T) {
 func TestUPolynomialDisplayNestedBIGPreservesNativeText(t *testing.T) {
 	r, s := preparationPhysicalFixture(t)
 	m := s.manager
-	var a util.Int
+	var a unumeral.Int
 	serviceMust(t, r.Integers().SetLimbs(&a, []uint32{7, 0, 0, 1}))
 	var p upolyVectorState
-	serviceMust(t, m.set(&p, []util.Int{a}))
+	serviceMust(t, m.set(&p, []unumeral.Int{a}))
 	serviceMust(t, r.Integers().Del(&a))
 	defer func() { serviceMust(t, m.CleanupDisplay()); serviceMust(t, m.reset(&p)); m.freeBacking(&p) }()
 	called := false
@@ -444,12 +443,12 @@ func TestUPolynomialDisplayNestedBIGPreservesNativeText(t *testing.T) {
 func TestUPolynomialDisplayNestedInlinePreservesNativeText(t *testing.T) {
 	r, s := preparationPhysicalFixture(t)
 	m := s.manager
-	var a util.Int
+	var a unumeral.Int
 	serviceMust(t, r.Integers().SetLimbs(&a, []uint32{7, 0, 0, 1}))
 	var p, n upolyVectorState
-	serviceMust(t, m.set(&p, []util.Int{a}))
+	serviceMust(t, m.set(&p, []unumeral.Int{a}))
 	serviceMust(t, r.Integers().Del(&a))
-	serviceMust(t, m.set(&n, []util.Int{util.NewInt(-2)}))
+	serviceMust(t, m.set(&n, []unumeral.Int{unumeral.NewInt(-2)}))
 	defer func() {
 		serviceMust(t, m.CleanupDisplay())
 		serviceMust(t, m.reset(&p))
@@ -479,12 +478,12 @@ func TestUPolynomialDisplayNestedAllocationFailureExactRetirement(t *testing.T) 
 		t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
 			r, s := preparationPhysicalFixture(t)
 			m := s.manager
-			var a util.Int
+			var a unumeral.Int
 			serviceMust(t, r.Integers().SetLimbs(&a, []uint32{7, 0, 0, 1}))
 			serviceMust(t, r.Integers().Neg(&a))
 			var p, n upolyVectorState
-			serviceMust(t, m.set(&p, []util.Int{util.NewInt(0), util.NewInt(1)}))
-			serviceMust(t, m.set(&n, []util.Int{a}))
+			serviceMust(t, m.set(&p, []unumeral.Int{unumeral.NewInt(0), unumeral.NewInt(1)}))
+			serviceMust(t, m.set(&n, []unumeral.Int{a}))
 			serviceMust(t, r.Integers().Del(&a))
 			var nested error
 			called := false
@@ -531,10 +530,10 @@ func TestUPolynomialDisplayActualNaturalBorrowOwnerReentry(t *testing.T) {
 		t.Run(mode, func(t *testing.T) {
 			r, s := preparationPhysicalFixture(t)
 			m := s.manager
-			var a util.Int
+			var a unumeral.Int
 			serviceMust(t, r.Integers().SetLimbs(&a, []uint32{7, 0, 0, 1}))
 			var p upolyVectorState
-			serviceMust(t, m.set(&p, []util.Int{a}))
+			serviceMust(t, m.set(&p, []unumeral.Int{a}))
 			serviceMust(t, r.Integers().Del(&a))
 			defer func() { serviceMust(t, m.CleanupDisplay()); serviceMust(t, m.reset(&p)); m.freeBacking(&p) }()
 			called := false
@@ -571,11 +570,11 @@ func TestUPolynomialDisplayActualNaturalBorrowOwnerReentry(t *testing.T) {
 func TestUPolynomialDisplayErasedRoutePreservesEarlierUnjoinedRAW(t *testing.T) {
 	r, s := preparationPhysicalFixture(t)
 	m := s.manager
-	var a util.Int
+	var a unumeral.Int
 	serviceMust(t, r.Integers().SetLimbs(&a, []uint32{7, 0, 0, 1}))
 	serviceMust(t, r.Integers().Neg(&a))
 	var p upolyVectorState
-	serviceMust(t, m.set(&p, []util.Int{a}))
+	serviceMust(t, m.set(&p, []unumeral.Int{a}))
 	serviceMust(t, r.Integers().Del(&a))
 	defer func() {
 		r.Integers().Budget().FailAfter(-1)

@@ -3,6 +3,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
 )
 
@@ -41,7 +42,7 @@ func TestSexprBorrowedNodesKeepTraversalAndRejectEarlierGeneration(t *testing.T)
 		if child != atom || record.Kind != SexprNumeral || record.Numeral == nil {
 			t.Fatal("source numeral borrow changed")
 		}
-		return q.WithNumericBorrow(func(r *RationalNumericBorrow) error {
+		return q.WithNumericBorrow(func(r *unumeral.RationalNumericBorrow) error {
 			n, ok, e := r.Exponent(record.Numeral)
 			if e != nil {
 				return e

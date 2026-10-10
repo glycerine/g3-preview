@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -19,7 +20,7 @@ func TestUPolynomialHenselActualOwningRefusalRetainsFirstHistory(t *testing.T) {
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -44,12 +45,12 @@ func TestUPolynomialHenselActualOwningRefusalRetainsFirstHistory(t *testing.T) {
 	h.rm, e = NewRelatedUPolynomialManager(u)
 	serviceMust(t, e)
 	h.constructed = 1
-	five := util.NewInt(5)
+	five := unumeral.NewInt(5)
 	serviceMust(t, h.rm.SetZP(&five))
 	for i := uint8(2); i <= 7; i++ {
 		m, v := h.vector(i)
 		h.constructed = i
-		serviceMust(t, m.set(v, []util.Int{util.NewInt(1)}))
+		serviceMust(t, m.set(v, []unumeral.Int{unumeral.NewInt(1)}))
 	}
 	tmp, e := h.rm.read(h.rm.stateView(&h.tmp), 0)
 	serviceMust(t, e)
@@ -87,7 +88,7 @@ func TestUPolynomialHenselActualCallerOwningRefusalRetainsFirstHistory(t *testin
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -112,7 +113,7 @@ func TestUPolynomialHenselActualCallerOwningRefusalRetainsFirstHistory(t *testin
 	c := &parent.hensel
 	c.outerConstructed = 4
 	for i := range c.outer {
-		serviceMust(t, u.set(&c.outer[i], []util.Int{util.NewInt(1)}))
+		serviceMust(t, u.set(&c.outer[i], []unumeral.Int{unumeral.NewInt(1)}))
 	}
 	tmp, e := u.read(u.stateView(&c.outer[3]), 0)
 	serviceMust(t, e)

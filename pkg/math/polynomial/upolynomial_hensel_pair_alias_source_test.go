@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialHenselSourceBorrowedInputOutputAlias(t *testing.T) {
@@ -13,13 +12,13 @@ func TestUPolynomialHenselSourceBorrowedInputOutputAlias(t *testing.T) {
 			q, s := henselDirectFixtureWithConfig(t, func() bool { return true }, debug)
 			m := s.manager
 			inputs := [5]upolyVectorState{}
-			values := [5][]util.Int{{util.NewInt(2)}, {util.NewInt(-1), util.NewInt(1)}, {util.NewInt(-2)}, {util.NewInt(1), util.NewInt(1)}, {util.NewInt(-6), util.NewInt(0), util.NewInt(1)}}
+			values := [5][]unumeral.Int{{unumeral.NewInt(2)}, {unumeral.NewInt(-1), unumeral.NewInt(1)}, {unumeral.NewInt(-2)}, {unumeral.NewInt(1), unumeral.NewInt(1)}, {unumeral.NewInt(-6), unumeral.NewInt(0), unumeral.NewInt(1)}}
 			for i := range inputs {
 				serviceMust(t, m.set(&inputs[i], values[i]))
 			}
-			five := util.NewInt(5)
+			five := unumeral.NewInt(5)
 			body := s.henselPair(&five, &five, &five, m.stateView(&inputs[0]), m.stateView(&inputs[1]), m.stateView(&inputs[2]), m.stateView(&inputs[3]), m.stateView(&inputs[4]), &inputs[1], &inputs[3])
-			var roots []*util.Int
+			var roots []*unumeral.Int
 			for i := range inputs {
 				v := &inputs[i]
 				if v.backing != 0 {
@@ -32,7 +31,7 @@ func TestUPolynomialHenselSourceBorrowedInputOutputAlias(t *testing.T) {
 			primeTrialPhysicalAuditExtra(t, q, s, roots...)
 			if body == nil {
 				for j, index := range []int{1, 3} {
-					for i, want := range [][]util.Int{{util.NewInt(9), util.NewInt(1)}, {util.NewInt(-9), util.NewInt(1)}}[j] {
+					for i, want := range [][]unumeral.Int{{unumeral.NewInt(9), unumeral.NewInt(1)}, {unumeral.NewInt(-9), unumeral.NewInt(1)}}[j] {
 						got, e := m.read(m.stateView(&inputs[index]), uint32(i))
 						serviceMust(t, e)
 						if *got != want {

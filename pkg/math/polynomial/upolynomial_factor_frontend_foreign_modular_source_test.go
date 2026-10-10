@@ -3,10 +3,9 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Invalid typed-owner guard fixture, not source reservation credit. The real
@@ -14,7 +13,7 @@ import (
 func TestUPolynomialFactorFrontendForeignPerfectSquareReceiver(t *testing.T) {
 	z, s := preparationPhysicalFixture(t)
 	m := s.manager
-	foreign, e := util.NewIntegerModularManager(z.Integers())
+	foreign, e := unumeral.NewIntegerModularManager(z.Integers())
 	serviceMust(t, e)
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
@@ -33,14 +32,14 @@ func TestUPolynomialFactorFrontendForeignPerfectSquareReceiver(t *testing.T) {
 		t.Fatal("actual typed context absent")
 	}
 	old := q.perfectSquare
-	destination, a := util.NewInt(77), util.NewInt(4)
+	destination, a := unumeral.NewInt(77), unumeral.NewInt(4)
 	_, refusal := foreign.WithAllocationContext((context).utility(foreign.Integers())).IsPerfectSquare(&a, &destination)
-	if refusal == nil || destination != util.NewInt(77) || !reflect.DeepEqual(old, q.perfectSquare) {
+	if refusal == nil || destination != unumeral.NewInt(77) || !reflect.DeepEqual(old, q.perfectSquare) {
 		t.Fatal("foreign modular receiver acquired actual frontend child", refusal, destination, q.perfectSquare)
 	}
 	yes, e := foreign.IsPerfectSquare(&a, &destination)
 	serviceMust(t, e)
-	if !yes || destination != util.NewInt(2) {
+	if !yes || destination != unumeral.NewInt(2) {
 		t.Fatal("independent nil receiver route", yes, destination)
 	}
 }

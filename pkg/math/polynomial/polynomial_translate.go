@@ -6,8 +6,9 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // One actual monomial_ref local, constructed only after the coefficient loops.
@@ -148,7 +149,7 @@ func (m *MultivariatePolynomialCore) coefficientsCore(p Polynomial, x uint32, cs
 	}
 	return nil
 }
-func (m *MultivariatePolynomialCore) Translate(p Polynomial, x uint32, v *util.Int) (result Polynomial, err error) {
+func (m *MultivariatePolynomialCore) Translate(p Polynomial, x uint32, v *unumeral.Int) (result Polynomial, err error) {
 	if e := m.beginTranslation(); e != nil {
 		return Polynomial{}, e
 	}
@@ -217,7 +218,7 @@ func (m *MultivariatePolynomialCore) Translate(p Polynomial, x uint32, v *util.I
 		if e != nil {
 			return Polynomial{}, e
 		}
-		one := util.NewInt(1)
+		one := unumeral.NewInt(1)
 		if e = m.som.addSourceInput(&one, s.xk.value, polynomialSOMInput{buffer: a, fromBuffer: true}, true); e != nil {
 			return Polynomial{}, e
 		}
@@ -227,7 +228,7 @@ func (m *MultivariatePolynomialCore) Translate(p Polynomial, x uint32, v *util.I
 	}
 	return m.som.mk(false)
 }
-func (m *MultivariatePolynomialCore) TranslateMany(p Polynomial, n uint32, xs PolynomialVariablesView, vs []util.Int, r *PolynomialRef) error {
+func (m *MultivariatePolynomialCore) TranslateMany(p Polynomial, n uint32, xs PolynomialVariablesView, vs []unumeral.Int, r *PolynomialRef) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -268,7 +269,7 @@ func (m *MultivariatePolynomialCore) TranslateMany(p Polynomial, n uint32, xs Po
 
 // The concrete vector overload carries actual borrowed variable bytes and the
 // source sizes. Its DEBUG assertion precedes delegation to the raw array body.
-func (m *MultivariatePolynomialCore) TranslateVariables(p Polynomial, xs *PolynomialVariableDegrees, vs []util.Int, r *PolynomialRef) error {
+func (m *MultivariatePolynomialCore) TranslateVariables(p Polynomial, xs *PolynomialVariableDegrees, vs []unumeral.Int, r *PolynomialRef) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -287,19 +288,19 @@ func (m *MultivariatePolynomialCore) TranslateVariables(p Polynomial, xs *Polyno
 
 // The public source manager forwards to its actual imp, retaining the full
 // owner lifetime guard before exposing the core operations.
-func (m *MultivariatePolynomialManager) Translate(p Polynomial, x uint32, v *util.Int) (Polynomial, error) {
+func (m *MultivariatePolynomialManager) Translate(p Polynomial, x uint32, v *unumeral.Int) (Polynomial, error) {
 	if e := m.ready(); e != nil {
 		return Polynomial{}, e
 	}
 	return m.core.Translate(p, x, v)
 }
-func (m *MultivariatePolynomialManager) TranslateMany(p Polynomial, n uint32, xs PolynomialVariablesView, vs []util.Int, r *PolynomialRef) error {
+func (m *MultivariatePolynomialManager) TranslateMany(p Polynomial, n uint32, xs PolynomialVariablesView, vs []unumeral.Int, r *PolynomialRef) error {
 	if e := m.ready(); e != nil {
 		return e
 	}
 	return m.core.TranslateMany(p, n, xs, vs, r)
 }
-func (m *MultivariatePolynomialManager) TranslateVariables(p Polynomial, xs *PolynomialVariableDegrees, vs []util.Int, r *PolynomialRef) error {
+func (m *MultivariatePolynomialManager) TranslateVariables(p Polynomial, xs *PolynomialVariableDegrees, vs []unumeral.Int, r *PolynomialRef) error {
 	if e := m.ready(); e != nil {
 		return e
 	}

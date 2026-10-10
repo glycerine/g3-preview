@@ -2,7 +2,9 @@
 // src/ast/bv_decl_plugin.h:390-394.
 package ast
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+)
 
 func (m *ASTManager) bitVectorSortRecognized(s astNodeRef) (bool, error) {
 	if m.bitVectorPlugin == nil {
@@ -27,7 +29,7 @@ func (m *ASTManager) IsBitVectorSort(s ASTHandle) (bool, error) {
 	return m.bitVectorSortRecognized(r)
 }
 
-func (m *ASTManager) BitVectorNumeralForSort(value *util.OwnedRational, s ASTHandle) (ASTHandle, error) {
+func (m *ASTManager) BitVectorNumeralForSort(value *unumeral.OwnedRational, s ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}

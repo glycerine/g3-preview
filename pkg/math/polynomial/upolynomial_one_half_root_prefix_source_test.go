@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialHasOneHalfRootEveryActualReservationPrefix(t *testing.T) {
@@ -33,7 +33,7 @@ func TestUPolynomialHasOneHalfRootEveryActualReservationPrefix(t *testing.T) {
 			if body != nil && !numericPhysicalReservationRefusal(body) {
 				t.Fatal(body)
 			}
-			extra := []*util.Int{&q.values[0], &q.values[1]}
+			extra := []*unumeral.Int{&q.values[0], &q.values[1]}
 			algebraicCellSourcePhysical(t, c, []UPolynomial{poly, constant}, extra, nil)
 			if want := baseline + integerActualOwnedBytes(z) + p.oneHalfRootHistoryBytes; z.Budget().Used() != want {
 				t.Fatal("before-lift cold graph", z.Budget().Used(), want)
@@ -131,9 +131,9 @@ func TestUPolynomialHasOneHalfRootFieldPNActualPrefixes(t *testing.T) {
 			serviceMust(t, p.modular.SetZPUint64(17))
 			poly, e := p.NewPolynomial()
 			serviceMust(t, e)
-			values := make([]util.Int, 40)
+			values := make([]unumeral.Int, 40)
 			for i := range values {
-				values[i] = util.NewInt(1)
+				values[i] = unumeral.NewInt(1)
 			}
 			serviceMust(t, p.SetInts(poly, values))
 			v, e := p.wholeView(poly)
@@ -146,7 +146,7 @@ func TestUPolynomialHasOneHalfRootFieldPNActualPrefixes(t *testing.T) {
 			if body != nil && !numericPhysicalReservationRefusal(body) {
 				t.Fatal(body)
 			}
-			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&q.values[0], &q.values[1]}, nil)
+			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*unumeral.Int{&q.values[0], &q.values[1]}, nil)
 			if want := baseline + integerActualOwnedBytes(z) + p.oneHalfRootHistoryBytes; want != z.Budget().Used() {
 				t.Fatal("actual field cold beforelift", want, z.Budget().Used())
 			}

@@ -1,7 +1,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
 )
 
@@ -9,9 +9,9 @@ func TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults(t *testing.T) {
 	m, q, budget := upolySourceOwner(t)
 	b := upolyIsolationBinaryOwner(t, q, budget)
 	v := upolyIsolationVector(t, b)
-	var numeral util.Int
+	var numeral unumeral.Int
 	serviceMust(t, q.Integers().SetUint64(&numeral, 1<<40|1))
-	value := util.NewBinaryRational()
+	value := unumeral.NewBinaryRational()
 	serviceMust(t, b.SetIntegerPower(&value, &numeral, 7))
 	serviceMust(t, q.Integers().Del(&numeral))
 	serviceMust(t, v.PushCopy(&value))
@@ -24,7 +24,7 @@ func TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults(t *testing.T) {
 	t.Cleanup(func() { budget.FailAfter(-1) })
 	serviceMust(t, v.Resize(4097))
 	for _, row := range old {
-		if row != (util.BinaryRational{}) {
+		if row != (unumeral.BinaryRational{}) {
 			t.Fatal("relocated old binary field retains ownership", row)
 		}
 	}
@@ -32,7 +32,7 @@ func TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults(t *testing.T) {
 		t.Fatal("native relocation lost BIG binary ownership")
 	}
 	for i := 1; i < len(v.state.values); i++ {
-		if v.state.values[i] != (util.BinaryRational{}) {
+		if v.state.values[i] != (unumeral.BinaryRational{}) {
 			t.Fatal("default field", i)
 		}
 	}
@@ -49,7 +49,7 @@ func TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults(t *testing.T) {
 	for i := uint32(0); i < 33; i++ {
 		row, e := numericBinaryRationalManager_binarySlot(b, &v.state, i)
 		serviceMust(t, e)
-		if *row != (util.BinaryRational{}) {
+		if *row != (unumeral.BinaryRational{}) {
 			t.Fatal("reset/reextend default", i, *row)
 		}
 	}
@@ -86,7 +86,7 @@ func TestUPolynomialNativeIsolationStacksAndNumericTransfer(t *testing.T) {
 	}
 	for i := uint32(0); i < 4097; i++ {
 		row := ss.values[i+1]
-		if row.lowerSV != i || row.upperSV != i+1 || row.lower != (util.BinaryRational{}) || row.upper != (util.BinaryRational{}) {
+		if row.lowerSV != i || row.upperSV != i+1 || row.lower != (unumeral.BinaryRational{}) || row.upper != (unumeral.BinaryRational{}) {
 			t.Fatal("native Sturm frame", i, row)
 		}
 		frame := drs.values[i]

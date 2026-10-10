@@ -6,17 +6,18 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialCheapDuplicateAssertionBeforeZero(t *testing.T) {
 	m := polynomialCellFixture(t)
 	u, e := m.monomials.Unit()
 	serviceMust(t, e)
-	a := util.NewInt(3)
+	a := unumeral.NewInt(3)
 	serviceMust(t, m.cheap.add(&a, u, false))
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	e = m.cheap.add(&zero, u, false)
 	if polynomialSourceDebug {
 		if !errors.Is(e, ErrPolynomialAssertion) {
@@ -30,7 +31,7 @@ func TestPolynomialCheapResetReleasesBIG(t *testing.T) {
 	m := polynomialCellFixture(t)
 	u, e := m.monomials.Unit()
 	serviceMust(t, e)
-	var a util.Int
+	var a unumeral.Int
 	serviceMust(t, m.integer.SetInt64(&a, -1<<40))
 	t.Cleanup(func() { serviceMust(t, m.integer.Del(&a)) })
 	serviceMust(t, m.cheap.add(&a, u, false))
@@ -54,7 +55,7 @@ func TestPolynomialSOMResetStoppedAfterPhysicalFreeOwningCursor(t *testing.T) {
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Profile: profile, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: profile, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r, Profile: profile})
 	serviceMust(t, e)
@@ -77,7 +78,7 @@ func TestPolynomialSOMResetStoppedAfterPhysicalFreeOwningCursor(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		_ = mm.ids.Mk()
 	}
-	tmp := util.NewInt(2)
+	tmp := unumeral.NewInt(2)
 	p, e := m.MkConstantTake(&tmp)
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(p))
@@ -91,9 +92,9 @@ func TestPolynomialSOMResetStoppedAfterPhysicalFreeOwningCursor(t *testing.T) {
 	}
 	large, e := mm.MkMonomial(powers)
 	serviceMust(t, e)
-	a := util.NewInt(3)
+	a := unumeral.NewInt(3)
 	serviceMust(t, m.som.add(&a, small, false))
-	a = util.NewInt(5)
+	a = unumeral.NewInt(5)
 	serviceMust(t, m.som.add(&a, large, false))
 	contextTLSNearMinimum(t, r)
 	before := r.Stats().LiveBlocks
@@ -182,7 +183,7 @@ func TestPolynomialSOMCompactionDuplicateAssertionAndOwnedIntervals(t *testing.T
 	serviceMust(t, e)
 	before, e := m.monomialRefCount(u)
 	serviceMust(t, e)
-	for _, a := range []util.Int{util.NewInt(0), util.NewInt(5)} {
+	for _, a := range []unumeral.Int{unumeral.NewInt(0), unumeral.NewInt(5)} {
 		serviceMust(t, m.monomials.IncRef(u))
 		serviceMust(t, m.som.as.appendCoefficient(m, a))
 		serviceMust(t, m.som.ms.appendMonomial(m, u))

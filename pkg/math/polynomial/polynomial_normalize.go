@@ -6,7 +6,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialNormalizeScope struct {
@@ -15,14 +15,14 @@ type polynomialNormalizeScope struct {
 	directReceipt                    polynomialNormalizeInvocationReceipt
 	executing, finishing             bool
 	sourceCause                      error
-	normalize                        util.IntegerNormalizeInvocationReceipt
-	gcdRaw, divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
+	normalize                        unumeral.IntegerNormalizeInvocationReceipt
+	gcdRaw, divisionRaw, extendedRaw unumeral.IntegerRawInvocationReceipt
 
 	append  polynomialCheapAppendInvocationReceipt
 	factory polynomialFactoryInvocationReceipt
 
 	invocation                                   uint64
-	g, a                                         util.Int
+	g, a                                         unumeral.Int
 	active, gConstructed, aConstructed, topOwner bool
 	generation                                   uint64
 	cursor, ownCursor                            uint8
@@ -320,7 +320,7 @@ func (m *MultivariatePolynomialManager) normalizeWithFactorNumeralVectorHistory(
 	if e != nil {
 		return Polynomial{}, e
 	}
-	e = numericIntegerModularManager_gcdManyIndexedWithNormalizeReceipt(c.modular, util.IntegerArrayView{Allocator: c.monomials.allocator, Object: l.raw, Count: n, Offset: 12, Stride: 12}, &s.g, &s.directReceipt)
+	e = numericIntegerModularManager_gcdManyIndexedWithNormalizeReceipt(c.modular, unumeral.IntegerArrayView{Allocator: c.monomials.allocator, Object: l.raw, Count: n, Offset: 12, Stride: 12}, &s.g, &s.directReceipt)
 	if e != nil {
 		return Polynomial{}, e
 	}

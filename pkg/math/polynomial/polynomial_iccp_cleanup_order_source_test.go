@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This actual deletion callback selects the guarded signed-host TLS domain.
@@ -18,7 +19,7 @@ func TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals(t *testing.T) {
 	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: runtime, Profile: profile, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: runtime, Profile: profile, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: runtime, Profile: profile})
 	serviceMust(t, e)
@@ -41,7 +42,7 @@ func TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals(t *testing.T) {
 	out, e := NewPolynomialRef(c)
 	serviceMust(t, e)
 	var oldICCP polynomialICCPInvocationReceipt
-	var integerContent util.Int
+	var integerContent unumeral.Int
 	var cc, prim polynomialReference
 	serviceMust(t, m.iccpPartsWithReceipt(polynomialICCPUnownedTerms(t, c, []int32{1}, [][]MonomialPower{{{0, 1}}}), 0, &integerContent, &cc, &prim, &oldICCP))
 	serviceMust(t, cc.close(c))
@@ -144,10 +145,10 @@ func TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals(t *testing.T) {
 // This fixture owns inputs through the explicit public references only.
 func polynomialICCPUnownedTerms(t *testing.T, m *MultivariatePolynomialCore, as []int32, pws [][]MonomialPower) Polynomial {
 	t.Helper()
-	coeffs := make([]util.Int, len(as))
+	coeffs := make([]unumeral.Int, len(as))
 	terms := make([]Monomial, len(as))
 	for j := range as {
-		coeffs[j] = util.NewInt(as[j])
+		coeffs[j] = unumeral.NewInt(as[j])
 		var e error
 		terms[j], e = m.monomials.MkMonomial(pws[j])
 		serviceMust(t, e)

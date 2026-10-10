@@ -2,7 +2,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *UPolynomialManager) dropLocalVector(s *upolyVectorState) { m.reset(s); m.freeBacking(s) }
@@ -66,8 +66,8 @@ func (m *UPolynomialManager) extendedGCDWithCaller(a, b UPolynomialView, u, v, d
 		// A new reached invocation may replace only a completed source scope.
 		caller.extended = [6]upolyVectorState{}
 		caller.extendedDebug = [2]upolyVectorState{}
-		caller.extendedScoped = [2]util.Int{}
-		caller.monicRaw = [2]util.Int{}
+		caller.extendedScoped = [2]unumeral.Int{}
+		caller.monicRaw = [2]unumeral.Int{}
 		caller.extendedDebugConstructed = 0
 		caller.extendedDebugSource = 0
 		caller.extendedDebugOwn = 0
@@ -157,7 +157,7 @@ func (m *UPolynomialManager) extendedGCDWithCaller(a, b UPolynomialView, u, v, d
 	}
 }
 func (m *UPolynomialManager) extendedGCDFinish(u, v, d *upolyVectorState) error {
-	var inv, lc util.Int
+	var inv, lc unumeral.Int
 	defer m.modular.Del(&inv)
 	defer m.modular.Del(&lc)
 	if e := m.monic(m.stateView(d), &lc, &inv); e != nil {

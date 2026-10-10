@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialNegCompletedLocalGuardUnwind(t *testing.T) {
@@ -16,7 +15,7 @@ func TestPolynomialNegCompletedLocalGuardUnwind(t *testing.T) {
 		serviceMust(t, e)
 		serviceMust(t, m.monomials.IncRef(terms[i]))
 	}
-	coefficients := [2]util.Int{}
+	coefficients := [2]unumeral.Int{}
 	serviceMust(t, m.integer.SetInt64(&coefficients[0], 1<<40))
 	serviceMust(t, m.integer.SetInt64(&coefficients[1], 3<<40))
 	p, e := m.MkCoreTake(coefficients[:], terms[:])

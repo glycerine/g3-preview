@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialToNumeralSelectedVariableLiteralFilter(t *testing.T) {
@@ -18,7 +18,7 @@ func TestPolynomialToNumeralSelectedVariableLiteralFilter(t *testing.T) {
 	var receipt polynomialFactorNumeralVectorReceipt
 	serviceMust(t, full.toNumeralVectorVariableWithReceipt(p, 0, &output, &receipt))
 	values := full.upm.values(&output)
-	if output.size != 2 || len(values) < 4 || values[0] != util.NewInt(6) || values[1] != util.NewInt(9) || values[2] != util.NewInt(0) || values[3] != util.NewInt(0) {
+	if output.size != 2 || len(values) < 4 || values[0] != unumeral.NewInt(6) || values[1] != unumeral.NewInt(9) || values[2] != unumeral.NewInt(0) || values[3] != unumeral.NewInt(0) {
 		t.Fatal("source reserve degree then set_size trims rejected leading zeros", output.size, values)
 	}
 	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
@@ -36,10 +36,10 @@ func TestPolynomialToNumeralSelectedVariableEveryBIGPrefix(t *testing.T) {
 			z := full.core.integer
 			p := polynomialQueryTerms(t, full.core, []int32{1, 3}, [][]MonomialPower{{}, {{0, 1}}})
 			// Construct an actual BIG constant coefficient before the fault stream.
-			var big util.Int
-			one := util.NewInt(1)
+			var big unumeral.Int
+			one := unumeral.NewInt(1)
 			serviceMust(t, z.Mul2k(&one, 521, &big))
-			var coefficient util.Int
+			var coefficient unumeral.Int
 			serviceMust(t, z.Copy(&coefficient, &big))
 			bp, e := full.core.MkConstantTake(&coefficient)
 			serviceMust(t, e)
@@ -52,7 +52,7 @@ func TestPolynomialToNumeralSelectedVariableEveryBIGPrefix(t *testing.T) {
 			var receipt polynomialFactorNumeralVectorReceipt
 			z.Budget().FailAfter(prefix)
 			cause := full.toNumeralVectorVariableWithReceipt(p, 0, &output, &receipt)
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, bp, original}, []*util.Int{&big}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, bp, original}, []*unumeral.Int{&big}, 0)
 			if cause != nil && !numericPhysicalReservationRefusal(cause) {
 				t.Fatal(cause)
 			}
@@ -87,7 +87,7 @@ func TestPolynomialToNumeralSelectedVariablePublicOutputBinding(t *testing.T) {
 	serviceMust(t, full.ToNumeralVectorVariable(p, 0, out))
 	d, e := upm.descriptor(out)
 	serviceMust(t, e)
-	if d.state.size != 2 || upm.values(&d.state)[0] != util.NewInt(6) || upm.values(&d.state)[1] != util.NewInt(9) {
+	if d.state.size != 2 || upm.values(&d.state)[0] != unumeral.NewInt(6) || upm.values(&d.state)[1] != unumeral.NewInt(9) {
 		t.Fatal("actual public projection", d.state)
 	}
 	serviceMust(t, full.CleanupNumeralVectorConversion())
@@ -139,7 +139,7 @@ func TestPolynomialToNumeralSelectedVariableHistoryAcrossActualReuse(t *testing.
 	serviceMust(t, full.cleanupFactorNumeralVector(&refused, true))
 	var later polynomialFactorNumeralVectorReceipt
 	serviceMust(t, full.toNumeralVectorVariableWithReceipt(p, 0, &output, &later))
-	values := append([]util.Int(nil), full.upm.values(&output)...)
+	values := append([]unumeral.Int(nil), full.upm.values(&output)...)
 	used := z.Budget().Used()
 	serviceMust(t, full.cleanupFactorNumeralVector(&old, true))
 	archived, ok := full.factorNumeralVectorDiagnostic(&old)

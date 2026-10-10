@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Returning Go ErrorTransport profile: allocation refusal invokes a supported
@@ -37,16 +38,16 @@ func TestPolynomialNormalizeActualTransportOwnerSourceRefusal(t *testing.T) {
 	serviceMust(t, e)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	full, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	c := full.core
-	var a util.Int
+	var a unumeral.Int
 	limbs := make([]uint32, 65536)
 	limbs[0], limbs[len(limbs)-1] = 3, 1
 	serviceMust(t, q.Integers().SetLimbs(&a, limbs))
-	p, e := c.MkTerms([]util.Int{a}, []Monomial{c.monomials.unit})
+	p, e := c.MkTerms([]unumeral.Int{a}, []Monomial{c.monomials.unit})
 	serviceMust(t, e)
 	var caller polynomialReference
 	serviceMust(t, caller.assign(c, p))
@@ -57,7 +58,7 @@ func TestPolynomialNormalizeActualTransportOwnerSourceRefusal(t *testing.T) {
 	if !seen || !numericPhysicalReservationRefusal(returned) {
 		t.Fatal("real numeric Copy returning transport absent", seen, returned)
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p}, []*util.Int{&a}, 0, nil)
+	polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p}, []*unumeral.Int{&a}, 0, nil)
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, full.CleanupNormalization())
 	serviceMust(t, q.Integers().Del(&a))

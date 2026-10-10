@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialFactorsLifecycleCopySwapCountersAndMultiply(t *testing.T) {
@@ -86,11 +86,11 @@ func TestUPolynomialFactorsLexicalPowerFailureAndImmediateRoots(t *testing.T) {
 			t.Fatal(e)
 		}
 		p := upolySourceNew(t, m, nil)
-		var coefficient util.Int
+		var coefficient unumeral.Int
 		if e = m.IntegerManager().SetString(&coefficient, "12345678901234567890"); e != nil {
 			t.Fatal(e)
 		}
-		if e = m.SetInts(p, []util.Int{coefficient, util.NewInt(1)}); e != nil {
+		if e = m.SetInts(p, []unumeral.Int{coefficient, unumeral.NewInt(1)}); e != nil {
 			t.Fatal(e)
 		}
 		if e = m.IntegerManager().Del(&coefficient); e != nil {
@@ -109,7 +109,7 @@ func TestUPolynomialFactorsLexicalPowerFailureAndImmediateRoots(t *testing.T) {
 		b.FailAfter(-1)
 		if err == nil {
 			expected := upolySourceNew(t, m, nil)
-			inputs := make([]util.Int, 4)
+			inputs := make([]unumeral.Int, 4)
 			for i, text := range []string{"1881676372353657772490265749424677022198701224860897069000", "457247362597165102505715599625057156300", "37037036703703703670", "1"} {
 				if e = m.IntegerManager().SetString(&inputs[i], text); e != nil {
 					t.Fatal(e)

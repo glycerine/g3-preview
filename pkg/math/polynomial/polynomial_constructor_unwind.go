@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Only completed selected members unwind. No imp destructor body executes:
@@ -44,7 +44,7 @@ func (m *MultivariatePolynomialCore) unwindConstructorMembers() error {
 // After source member destruction, owning abort still has genuine numeral
 // fields. It uses the borrowed Integer owner directly, never a destroyed
 // modular source object or a repaired ID/directory member.
-func (m *MultivariatePolynomialCore) deleteNumeral(a *util.Int) error {
+func (m *MultivariatePolynomialCore) deleteNumeral(a *unumeral.Int) error {
 	if m.modularSourceDestroyed {
 		return m.integer.Del(a)
 	}

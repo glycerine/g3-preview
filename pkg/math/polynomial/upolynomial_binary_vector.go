@@ -5,16 +5,16 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyBinaryVectorState struct {
-	values []util.BinaryRational
+	values []unumeral.BinaryRational
 	size   uint32
 }
 type BinaryRationalVector struct {
 	self    *BinaryRationalVector
-	manager *util.BinaryRationalManager
+	manager *unumeral.BinaryRationalManager
 	state   upolyBinaryVectorState
 	header  uint64
 	closed  bool
@@ -24,7 +24,7 @@ type BinaryRationalVectorStats struct {
 	Size, Capacity, Initialized, OwnedNumeralCells uint32
 }
 
-func numericBinaryRationalManager_NewVector(m *util.BinaryRationalManager) (*BinaryRationalVector, error) {
+func numericBinaryRationalManager_NewVector(m *unumeral.BinaryRationalManager) (*BinaryRationalVector, error) {
 	if e := m.Open(); e != nil {
 		return nil, e
 	}
@@ -38,7 +38,7 @@ func numericBinaryRationalManager_NewVector(m *util.BinaryRationalManager) (*Bin
 }
 func (v *BinaryRationalVector) check() error {
 	if v == nil || v.self != v || v.manager == nil {
-		return util.ErrBinaryOwner
+		return unumeral.ErrBinaryOwner
 	}
 	if v.closed {
 		return arena.ErrClosed
@@ -54,7 +54,7 @@ func upolyBinaryExtend(s *upolyBinaryVectorState, n uint32) error {
 	}
 	old := s.values
 	if int(n) > len(old) {
-		s.values = append(old, make([]util.BinaryRational, int(n)-len(old))...)
+		s.values = append(old, make([]unumeral.BinaryRational, int(n)-len(old))...)
 		if len(old) != 0 && &old[0] != &s.values[0] {
 			clear(old)
 		}
@@ -63,7 +63,7 @@ func upolyBinaryExtend(s *upolyBinaryVectorState, n uint32) error {
 	s.size = n
 	return nil
 }
-func numericBinaryRationalManager_binaryPushDefault(m *util.BinaryRationalManager, s *upolyBinaryVectorState) (*util.BinaryRational, error) {
+func numericBinaryRationalManager_binaryPushDefault(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState) (*unumeral.BinaryRational, error) {
 	if s.size == math.MaxUint32 {
 		return nil, arena.ErrBounds
 	}
@@ -73,7 +73,7 @@ func numericBinaryRationalManager_binaryPushDefault(m *util.BinaryRationalManage
 	}
 	return &s.values[i], nil
 }
-func numericBinaryRationalManager_binarySlot(m *util.BinaryRationalManager, s *upolyBinaryVectorState, i uint32) (*util.BinaryRational, error) {
+func numericBinaryRationalManager_binarySlot(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState, i uint32) (*unumeral.BinaryRational, error) {
 	if polynomialSourceDebug && i >= s.size {
 		return nil, ErrUPolynomialAssertion
 	}
@@ -82,7 +82,7 @@ func numericBinaryRationalManager_binarySlot(m *util.BinaryRationalManager, s *u
 	}
 	return &s.values[i], nil
 }
-func numericBinaryRationalManager_binaryReset(m *util.BinaryRationalManager, s *upolyBinaryVectorState) error {
+func numericBinaryRationalManager_binaryReset(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState) error {
 	for i := uint32(0); i < s.size; i++ {
 		if e := m.Del(&s.values[i]); e != nil {
 			return e
@@ -91,14 +91,14 @@ func numericBinaryRationalManager_binaryReset(m *util.BinaryRationalManager, s *
 	s.size = 0
 	return nil
 }
-func numericBinaryRationalManager_binaryDestroy(m *util.BinaryRationalManager, s *upolyBinaryVectorState) error {
+func numericBinaryRationalManager_binaryDestroy(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState) error {
 	if e := numericBinaryRationalManager_binaryReset(m, s); e != nil {
 		return e
 	}
 	*s = upolyBinaryVectorState{}
 	return nil
 }
-func (v *BinaryRationalVector) PushCopy(a *util.BinaryRational) error {
+func (v *BinaryRationalVector) PushCopy(a *unumeral.BinaryRational) error {
 	if e := v.check(); e != nil {
 		return e
 	}
@@ -114,7 +114,7 @@ func (v *BinaryRationalVector) Size() (uint32, error) {
 	}
 	return v.state.size, nil
 }
-func (v *BinaryRationalVector) Read(i uint32, out *util.BinaryRational) error {
+func (v *BinaryRationalVector) Read(i uint32, out *unumeral.BinaryRational) error {
 	if e := v.check(); e != nil {
 		return e
 	}
@@ -124,7 +124,7 @@ func (v *BinaryRationalVector) Read(i uint32, out *util.BinaryRational) error {
 	}
 	return v.manager.Copy(out, a)
 }
-func (v *BinaryRationalVector) Set(i uint32, a *util.BinaryRational) error {
+func (v *BinaryRationalVector) Set(i uint32, a *unumeral.BinaryRational) error {
 	if e := v.check(); e != nil {
 		return e
 	}
@@ -218,7 +218,7 @@ func (v *BinaryRationalVector) Stats() BinaryRationalVectorStats {
 	}
 	return r
 }
-func (m *UPolynomialManager) isolationOwners(b *util.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
+func (m *UPolynomialManager) isolationOwners(b *unumeral.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
 	if e := m.check(); e != nil {
 		return e
 	}

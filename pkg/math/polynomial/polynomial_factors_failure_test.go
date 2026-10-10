@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialFactorsConstructorColdRefusal(t *testing.T) {
@@ -41,7 +42,7 @@ func TestPolynomialFactorsMultiplyEveryReservation(t *testing.T) {
 						serviceMust(t, f.Push(p, 3))
 						serviceMust(t, f.Push(p, 2))
 					}
-					c := util.Int{}
+					c := unumeral.Int{}
 					serviceMust(t, m.core.integer.Copy(&c, &m.core.integer.Two64))
 					defer func() { serviceMust(t, m.core.integer.Del(&c)) }()
 					serviceMust(t, f.SetConstant(&c))
@@ -50,7 +51,7 @@ func TestPolynomialFactorsMultiplyEveryReservation(t *testing.T) {
 					serviceMust(t, r.Assign(p))
 					m.core.integer.Budget().FailAfter(fail)
 					e = f.Multiply(r)
-					polynomialFactorsAudit(t, f, []Polynomial{p}, []*util.Int{&c}, r)
+					polynomialFactorsAudit(t, f, []Polynomial{p}, []*unumeral.Int{&c}, r)
 					if e != nil && !numericPhysicalReservationRefusal(e) {
 						t.Fatal("actual Multiply reservation", e)
 					}
@@ -62,12 +63,12 @@ func TestPolynomialFactorsMultiplyEveryReservation(t *testing.T) {
 					serviceMust(t, x)
 					serviceMust(t, m.core.CleanupValue(&later))
 					// Operation-local cleanup alone must retain caller reference publication.
-					polynomialFactorsAudit(t, f, []Polynomial{p}, []*util.Int{&c}, r)
+					polynomialFactorsAudit(t, f, []Polynomial{p}, []*unumeral.Int{&c}, r)
 					if e == nil {
 						result, x := r.Get()
 						serviceMust(t, x)
-						v := util.NewInt(0)
-						a := util.Int{}
+						v := unumeral.NewInt(0)
+						a := unumeral.Int{}
 						serviceMust(t, m.UnivariateEvaluate(result, 0, &v, &a))
 						eq, x := m.core.integer.Equal(&a, &c)
 						serviceMust(t, x)
@@ -164,7 +165,7 @@ func TestPolynomialFactorsDisplayEveryReservation(t *testing.T) {
 			f, e := NewPolynomialFactors(m)
 			serviceMust(t, e)
 			serviceMust(t, f.Push(p, 2))
-			c := util.Int{}
+			c := unumeral.Int{}
 			digits := make([]uint32, 130)
 			digits[129] = 1
 			serviceMust(t, m.core.integer.SetLimbs(&c, digits))
@@ -173,7 +174,7 @@ func TestPolynomialFactorsDisplayEveryReservation(t *testing.T) {
 			sink := &polynomialDisplayTestSink{}
 			m.core.integer.Budget().FailAfter(fail)
 			e = f.DisplayInto(sink)
-			polynomialFactorsAudit(t, f, []Polynomial{p}, []*util.Int{&c})
+			polynomialFactorsAudit(t, f, []Polynomial{p}, []*unumeral.Int{&c})
 			if e != nil && !numericPhysicalReservationRefusal(e) {
 				t.Fatal("actual factors display prefix", e)
 			}
@@ -205,7 +206,7 @@ func TestPolynomialFactorsConstantFactoryOwnsSingleton(t *testing.T) {
 	serviceMust(t, e)
 	f, e := NewPolynomialFactors(m)
 	serviceMust(t, e)
-	a := util.NewInt(17)
+	a := unumeral.NewInt(17)
 	serviceMust(t, f.SetConstant(&a))
 	r, e := NewPolynomialRef(m.core)
 	serviceMust(t, e)
@@ -235,7 +236,7 @@ func TestPolynomialFactorsSingletonForeignReplacement(t *testing.T) {
 	serviceMust(t, e)
 	f, e := NewPolynomialFactors(m)
 	serviceMust(t, e)
-	a := util.NewInt(17)
+	a := unumeral.NewInt(17)
 	serviceMust(t, f.SetConstant(&a))
 	r, e := NewPolynomialRef(m.core)
 	serviceMust(t, e)
@@ -249,7 +250,7 @@ func TestPolynomialFactorsSingletonForeignReplacement(t *testing.T) {
 	// Caller explicitly drains the old concrete construction, then starts a
 	// different generation. The retained factors receipt must not adopt it.
 	serviceMust(t, m.core.CleanupConstruction())
-	b := util.NewInt(23)
+	b := unumeral.NewInt(23)
 	budget.FailAfter(0)
 	_, foreignCause := m.core.MkConstantTake(&b)
 	if !numericPhysicalReservationRefusal(foreignCause) || !m.core.singletonReference {
@@ -257,13 +258,13 @@ func TestPolynomialFactorsSingletonForeignReplacement(t *testing.T) {
 	}
 	generation := m.core.singletonGeneration
 	pending := m.core.pending.generation
-	polynomialFactorsAudit(t, f, nil, []*util.Int{&b}, r)
+	polynomialFactorsAudit(t, f, nil, []*unumeral.Int{&b}, r)
 	budget.FailAfter(-1)
 	serviceMust(t, f.Cleanup())
 	if !m.core.singletonReference || m.core.singletonGeneration != generation || m.core.pending.generation != pending {
 		t.Fatal("own abort consumed foreign replacement")
 	}
-	polynomialFactorsAudit(t, f, nil, []*util.Int{&b}, r)
+	polynomialFactorsAudit(t, f, nil, []*unumeral.Int{&b}, r)
 	serviceMust(t, m.core.CleanupConstruction())
 	serviceMust(t, r.Close())
 	serviceMust(t, f.CloseChecked())
@@ -280,7 +281,7 @@ func TestPolynomialFactorsConstantHelpersEveryReservation(t *testing.T) {
 					m, p, _ := polynomialEvalFixture(t, nil)
 					f, e := NewPolynomialFactors(m)
 					serviceMust(t, e)
-					c := util.Int{}
+					c := unumeral.Int{}
 					serviceMust(t, m.core.integer.Copy(&c, &m.core.integer.Two64))
 					defer func() { serviceMust(t, m.core.integer.Del(&c)) }()
 					serviceMust(t, f.SetConstant(&c))
@@ -293,13 +294,13 @@ func TestPolynomialFactorsConstantHelpersEveryReservation(t *testing.T) {
 					case 2:
 						e = f.SetConstant(&c)
 					}
-					polynomialFactorsAudit(t, f, []Polynomial{p}, []*util.Int{&c})
+					polynomialFactorsAudit(t, f, []Polynomial{p}, []*unumeral.Int{&c})
 					if e != nil && !numericPhysicalReservationRefusal(e) {
 						t.Fatal(e)
 					}
 					m.core.integer.Budget().FailAfter(-1)
 					if e == nil {
-						expected := util.Int{}
+						expected := unumeral.Int{}
 						switch op {
 						case 0:
 							serviceMust(t, m.core.integer.SetLimbs(&expected, []uint32{0, 0, 0, 0, 1}))
@@ -319,7 +320,7 @@ func TestPolynomialFactorsConstantHelpersEveryReservation(t *testing.T) {
 					}
 					m.core.integer.Budget().FailAfter(-1)
 					serviceMust(t, f.Cleanup())
-					polynomialFactorsAudit(t, f, []Polynomial{p}, []*util.Int{&c})
+					polynomialFactorsAudit(t, f, []Polynomial{p}, []*unumeral.Int{&c})
 					serviceMust(t, f.CloseChecked())
 				})
 				if completed {

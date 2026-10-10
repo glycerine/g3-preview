@@ -2,9 +2,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorSignExtensionNumerals owns default r, its normalization return
@@ -12,9 +11,9 @@ import (
 type BitVectorSignExtensionNumerals struct {
 	self                   *BitVectorSignExtensionNumerals
 	manager                *ASTManager
-	values                 [3]util.OwnedRational
+	values                 [3]unumeral.OwnedRational
 	placed                 [3]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	norm                   ASTBitVectorNumeralInvocation
 	header                 uint64
@@ -68,7 +67,7 @@ func (n *BitVectorSignExtensionNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorSignExtensionNumerals) Read(arg ASTHandle, width *uint32) (bool, error) {
@@ -93,7 +92,7 @@ func (n *BitVectorSignExtensionNumerals) Evaluate(amount, width uint32) (ASTHand
 	q := m.numerals
 	resultWidth := width + amount
 	v, e := m.NormalizeSignedBitVectorValueWithInvocation(&n.values[0], width, &n.norm)
-	n.values[1], n.placed[1] = v, v != (util.OwnedRational{})
+	n.values[1], n.placed[1] = v, v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = m.BitVectorNumeralInvocationSourceReady(&n.norm)
 	}
@@ -111,7 +110,7 @@ func (n *BitVectorSignExtensionNumerals) Evaluate(amount, width uint32) (ASTHand
 		return ASTHandle{}, e
 	}
 	v, e = q.PowerOfTwoWithInvocation(resultWidth, &n.scalar)
-	n.values[2], n.placed[2] = v, v != (util.OwnedRational{})
+	n.values[2], n.placed[2] = v, v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}

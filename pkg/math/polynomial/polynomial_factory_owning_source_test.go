@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialFactoryOwningCloseRetainedActualResult(t *testing.T) {
@@ -45,7 +44,7 @@ func TestPolynomialFactoryOwningCloseRetainedActualResult(t *testing.T) {
 				})
 				var p Polynomial
 				if cheap {
-					a := util.NewInt(7)
+					a := unumeral.NewInt(7)
 					serviceMust(t, c.cheap.add(&a, c.monomials.unit, false))
 					p, e = c.cheap.mkWithFactoryReceipt(false, &receipt)
 				} else {
@@ -73,7 +72,7 @@ func TestPolynomialFactoryOwningCloseRetainedActualResult(t *testing.T) {
 				serviceMust(t, c.transferFactoryResult(&receipt, p))
 				serviceMust(t, c.DecRef(p))
 				if cheap {
-					a := util.NewInt(11)
+					a := unumeral.NewInt(11)
 					serviceMust(t, c.cheap.add(&a, c.monomials.unit, false))
 					p, e = c.cheap.mkWithFactoryReceipt(false, &receipt)
 				} else {
@@ -100,7 +99,7 @@ func TestPolynomialFactoryOwningConstructionActualPrefixes(t *testing.T) {
 				m := polynomialPSCFullFixture(t)
 				c := m.core
 				var appendReceipt polynomialCheapAppendInvocationReceipt
-				a := util.NewInt(7)
+				a := unumeral.NewInt(7)
 				if large {
 					limbs := make([]uint32, 8192)
 					limbs[0], limbs[len(limbs)-1] = 1, 1
@@ -117,17 +116,17 @@ func TestPolynomialFactoryOwningConstructionActualPrefixes(t *testing.T) {
 				if !c.matchesFactoryInvocation(&factoryReceipt) {
 					t.Fatal("real constructor authority missing")
 				}
-				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, c.factoryInvocation.result}, []*util.Int{&a, &c.cheap.appendScope.movingCoefficient}, 0)
+				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, c.factoryInvocation.result}, []*unumeral.Int{&a, &c.cheap.appendScope.movingCoefficient}, 0)
 				c.integer.Budget().FailAfter(-1)
 				// This is the actual named owner continuation, with no invocation
 				// receipt supplied by the test and no registry-derived roots.
 				serviceMust(t, c.CleanupConstruction())
-				if c.factoryInvocation.active || c.factoryInvocation.result != (Polynomial{}) || c.cheap.appendScope.movingCoefficient != (util.Int{}) {
+				if c.factoryInvocation.active || c.factoryInvocation.result != (Polynomial{}) || c.cheap.appendScope.movingCoefficient != (unumeral.Int{}) {
 					t.Fatal("generic construction cleanup retained an owned factory/NUM")
 				}
-				polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a}, 0)
+				polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&a}, 0)
 				serviceMust(t, c.cheap.cleanupAppendInvocation(&appendReceipt, true))
-				polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&a}, 0)
+				polynomialImpPhysicalAuditNamed(t, m, nil, []*unumeral.Int{&a}, 0)
 				if e == nil {
 					success = true
 					t.Log("first actual factory success", ordinal)

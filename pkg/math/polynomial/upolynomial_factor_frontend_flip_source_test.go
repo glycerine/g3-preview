@@ -3,10 +3,9 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialFactorFrontendActualFlipNumeral(t *testing.T) {
@@ -15,7 +14,7 @@ func TestUPolynomialFactorFrontendActualFlipNumeral(t *testing.T) {
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
 	var input upolyVectorState
-	serviceMust(t, m.set(&input, []util.Int{util.NewInt(-1), util.NewInt(0), util.NewInt(0), util.NewInt(-1)}))
+	serviceMust(t, m.set(&input, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(0), unumeral.NewInt(0), unumeral.NewInt(-1)}))
 	defer func() {
 		z.Budget().FailAfter(-1)
 		serviceMust(t, s.CleanupRetained())
@@ -29,7 +28,7 @@ func TestUPolynomialFactorFrontendActualFlipNumeral(t *testing.T) {
 	if q.invocation == 0 || q.constructed || q.executing {
 		t.Fatal("actual odd negative sign flip scoped NUM was not bound", q.invocation, q.constructed, q.executing)
 	}
-	var roots []*util.Int
+	var roots []*unumeral.Int
 	for i := range m.values(&input) {
 		roots = append(roots, &m.values(&input)[i])
 	}
@@ -45,10 +44,10 @@ func TestUPolynomialFactorFrontendActualFlipBIGPrefixes(t *testing.T) {
 			fs, e := m.NewFactors()
 			serviceMust(t, e)
 			var input upolyVectorState
-			var big util.Int
+			var big unumeral.Int
 			serviceMust(t, z.Integers().SetUint64(&big, 1099511627899))
 			serviceMust(t, z.Integers().Neg(&big))
-			serviceMust(t, m.set(&input, []util.Int{big, big}))
+			serviceMust(t, m.set(&input, []unumeral.Int{big, big}))
 			defer func() {
 				z.Budget().FailAfter(-1)
 				serviceMust(t, s.CleanupRetained())
@@ -57,7 +56,7 @@ func TestUPolynomialFactorFrontendActualFlipBIGPrefixes(t *testing.T) {
 				m.freeBacking(&input)
 				serviceMust(t, z.Integers().Del(&big))
 			}()
-			roots := []*util.Int{&big}
+			roots := []*unumeral.Int{&big}
 			for i := range m.values(&input) {
 				roots = append(roots, &m.values(&input)[i])
 			}
@@ -101,7 +100,7 @@ func TestUPolynomialFactorFrontendForeignFactorsClose(t *testing.T) {
 	foreign, e := m.NewFactors()
 	serviceMust(t, e)
 	var input upolyVectorState
-	serviceMust(t, m.set(&input, []util.Int{util.NewInt(1), util.NewInt(1), util.NewInt(0), util.NewInt(1)}))
+	serviceMust(t, m.set(&input, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1), unumeral.NewInt(0), unumeral.NewInt(1)}))
 	reached := false
 	m.config.Checkpoint = func() bool {
 		if !reached && s.frontend.executing {
@@ -131,7 +130,7 @@ func TestUPolynomialFactorFrontendForeignFactorsClose(t *testing.T) {
 	if !reached {
 		t.Fatal("actual caller checkpoint not reached")
 	}
-	roots := []*util.Int{}
+	roots := []*unumeral.Int{}
 	for i := range m.values(&input) {
 		roots = append(roots, &m.values(&input)[i])
 	}

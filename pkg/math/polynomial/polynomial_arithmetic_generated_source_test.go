@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialRegularProductActualCalleeAcquisition(t *testing.T) {
@@ -24,7 +23,7 @@ func TestPolynomialRegularProductActualCalleeAcquisition(t *testing.T) {
 		serviceMust(t, e)
 		var r polynomialArithmeticInvocationReceipt
 		serviceMust(t, c.som.acquireArithmeticInvocation(&r))
-		one := util.NewInt(1)
+		one := unumeral.NewInt(1)
 		c.integer.Budget().FailAfter(ordinal)
 		e = (c.som).addMulWithArithmeticReceipt(&one, term, p, &r)
 		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)

@@ -4,9 +4,8 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // These are literal class/action tests and independent finite models; the
@@ -86,7 +85,7 @@ func TestPolynomialFactorsMultiplyFiniteAndAlias(t *testing.T) {
 	defer func() { serviceMust(t, f.CloseChecked()) }()
 	serviceMust(t, f.Push(p, 2))
 	serviceMust(t, f.Push(p, 1))
-	c := util.NewInt(-2)
+	c := unumeral.NewInt(-2)
 	serviceMust(t, f.SetConstant(&c))
 	r, e := NewPolynomialRef(m.core)
 	serviceMust(t, e)
@@ -96,8 +95,8 @@ func TestPolynomialFactorsMultiplyFiniteAndAlias(t *testing.T) {
 	result, e := r.Get()
 	serviceMust(t, e)
 	// Independent expansion -2(x+1)^3, evaluated at the frozen scalar x=2.
-	v := util.NewInt(2)
-	out := util.Int{}
+	v := unumeral.NewInt(2)
+	out := unumeral.Int{}
 	defer func() { serviceMust(t, m.core.integer.Del(&out)) }()
 	serviceMust(t, m.UnivariateEvaluate(result, 0, &v, &out))
 	if (out).Cell != 0 || out.NativeScalar() != -54 {
@@ -119,14 +118,14 @@ func TestPolynomialFactorsLiteralDisplayAndConstantHelpers(t *testing.T) {
 	serviceMust(t, e)
 	defer func() { serviceMust(t, f.CloseChecked()) }()
 	serviceMust(t, f.Push(p, 3))
-	c := util.NewInt(-2)
+	c := unumeral.NewInt(-2)
 	serviceMust(t, f.SetConstant(&c))
 	sink := &polynomialDisplayTestSink{}
 	serviceMust(t, f.DisplayInto(sink))
 	if sink.text.String() != "-2 * (x0 + 1)^3" {
 		t.Fatal("source output sequence", sink.text.String())
 	}
-	c = util.NewInt(4)
+	c = unumeral.NewInt(4)
 	serviceMust(t, m.AccumulateFactorConstant(f, &c))
 	serviceMust(t, m.FlipFactorSign(f))
 	a, e := f.Constant()
@@ -166,7 +165,7 @@ func TestPolynomialFactorsModularAndZeroDegreeSource(t *testing.T) {
 	// Source SetDegree permits zero but Multiply tests only d>1. Thus this
 	// zero exponent is intentionally still one copy, not mathematical pow(0).
 	serviceMust(t, f.SetDegree(1, 0))
-	c := util.NewInt(5)
+	c := unumeral.NewInt(5)
 	// The source modular precondition requires actual balanced ring input.
 	serviceMust(t, m.core.modular.PNormalize(&c))
 	serviceMust(t, f.SetConstant(&c))
@@ -178,8 +177,8 @@ func TestPolynomialFactorsModularAndZeroDegreeSource(t *testing.T) {
 	serviceMust(t, f.Multiply(r))
 	result, e := r.Get()
 	serviceMust(t, e)
-	x := util.NewInt(2)
-	out := util.Int{}
+	x := unumeral.NewInt(2)
+	out := unumeral.Int{}
 	serviceMust(t, m.UnivariateEvaluate(result, 0, &x, &out))
 	if (out).Cell != 0 || out.NativeScalar() != -3 {
 		t.Fatal("literal balanced GF7 3*(2+1)^3", out)

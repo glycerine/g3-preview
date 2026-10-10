@@ -7,21 +7,22 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialRemoveOneHalfRootActualAmSourceStop(t *testing.T) {
 	c, p, rt := algebraicNegTLSFixture(t, nil)
 	z := p.config.Integer
-	var big, twice, negative util.Int
+	var big, twice, negative unumeral.Int
 	serviceMust(t, z.SetLimbs(&big, []uint32{1, 2, 3, 4}))
-	serviceMust(t, z.Mul(&big, &[]util.Int{util.NewInt(2)}[0], &twice))
+	serviceMust(t, z.Mul(&big, &[]unumeral.Int{unumeral.NewInt(2)}[0], &twice))
 	serviceMust(t, z.Copy(&negative, &big))
 	serviceMust(t, z.Neg(&negative))
 	input, e := p.NewPolynomial()
 	serviceMust(t, e)
-	serviceMust(t, p.SetInts(input, []util.Int{negative, twice}))
+	serviceMust(t, p.SetInts(input, []unumeral.Int{negative, twice}))
 	serviceMust(t, z.Del(&big))
 	serviceMust(t, z.Del(&twice))
 	serviceMust(t, z.Del(&negative))
@@ -86,7 +87,7 @@ func TestUPolynomialRemoveOneHalfRootActualAmSourceStop(t *testing.T) {
 	if (q.values[0]).Cell == 0 || (!z.Cell((q.values[0]).Cell).Released && !z.Cell((q.values[0]).Cell).CleanupPending) {
 		t.Fatal("lost actual consumed am descriptor")
 	}
-	algebraicCellSourcePhysical(t, c, []UPolynomial{input, out}, []*util.Int{&q.values[0]}, []umemory.Block{lane})
+	algebraicCellSourcePhysical(t, c, []UPolynomial{input, out}, []*unumeral.Int{&q.values[0]}, []umemory.Block{lane})
 	before := q.sourceRemaining
 	physical := rt.Stats()
 	used := z.Budget().Used()

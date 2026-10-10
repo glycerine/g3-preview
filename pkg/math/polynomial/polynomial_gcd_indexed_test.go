@@ -2,20 +2,19 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialIndexedArrayGCDEarlyOneLeavesTailUnread(t *testing.T) {
 	m := polynomialCellFixture(t)
 	v := &m.linearTerms
-	serviceMust(t, v.appendCoefficient(m, util.NewInt(1)))
-	serviceMust(t, v.appendCoefficient(m, util.NewInt(1)))
-	view := util.IntegerArrayView{Values: v.values, Count: 3}
-	var g util.Int
+	serviceMust(t, v.appendCoefficient(m, unumeral.NewInt(1)))
+	serviceMust(t, v.appendCoefficient(m, unumeral.NewInt(1)))
+	view := unumeral.IntegerArrayView{Values: v.values, Count: 3}
+	var g unumeral.Int
 	serviceMust(t, m.modular.GCDManyIndexed(view, &g))
-	if g != util.NewInt(1) {
+	if g != unumeral.NewInt(1) {
 		t.Fatal(g)
 	}
 	serviceMust(t, m.modular.Del(&g))
@@ -27,7 +26,7 @@ func TestPolynomialIndexedArrayGCDPreservesSliceSelfIdentity(t *testing.T) {
 	m := polynomialCellFixture(t)
 	ref, e := m.integer.Allocate(6, 2)
 	serviceMust(t, e)
-	as := [1]util.Int{{Val: -1, Cell: ref}}
+	as := [1]unumeral.Int{{Val: -1, Cell: ref}}
 	m.integer.PublishCell(ref)
 	m.integer.ResizeCell(ref, 2)
 	t.Cleanup(func() { serviceMust(t, m.integer.Del(&as[0])) })

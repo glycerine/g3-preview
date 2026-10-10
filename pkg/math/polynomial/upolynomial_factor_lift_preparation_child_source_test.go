@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -20,7 +21,7 @@ func TestUPolynomialFactorLiftPreparationCapturedCheckerSourceStop(t *testing.T)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	armed := false
 	var external umemory.Block
@@ -64,7 +65,7 @@ func TestUPolynomialFactorLiftPreparationCapturedCheckerSourceStop(t *testing.T)
 	zpe, e := NewRelatedUPolynomialManager(u)
 	serviceMust(t, e)
 	c.prime, c.lift = zp, zpe
-	var prime, pe util.Int
+	var prime, pe unumeral.Int
 	serviceMust(t, q.Integers().SetLimbs(&prime, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 	serviceMust(t, q.Integers().Mul(&prime, &prime, &pe))
 	serviceMust(t, zp.SetZP(&prime))
@@ -74,8 +75,8 @@ func TestUPolynomialFactorLiftPreparationCapturedCheckerSourceStop(t *testing.T)
 	lf, e := zpe.NewFactors()
 	serviceMust(t, e)
 	var f, a upolyVectorState
-	serviceMust(t, u.set(&f, []util.Int{util.NewInt(-1), util.NewInt(0), util.NewInt(1)}))
-	for _, v := range [][]util.Int{{util.NewInt(-1), util.NewInt(1)}, {util.NewInt(1), util.NewInt(1)}} {
+	serviceMust(t, u.set(&f, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(0), unumeral.NewInt(1)}))
+	for _, v := range [][]unumeral.Int{{unumeral.NewInt(-1), unumeral.NewInt(1)}, {unumeral.NewInt(1), unumeral.NewInt(1)}} {
 		serviceMust(t, u.set(&a, v))
 		serviceMust(t, pf.PushCopy(u.stateView(&a), 1))
 		serviceMust(t, lf.PushCopy(u.stateView(&a), 1))
@@ -84,7 +85,7 @@ func TestUPolynomialFactorLiftPreparationCapturedCheckerSourceStop(t *testing.T)
 	out, e := u.NewFactors()
 	serviceMust(t, e)
 	parent.zp, parent.zpe, parent.best, parent.lifted = zp, zpe, pf, lf
-	serviceMust(t, u.set(&parent.fpp, []util.Int{util.NewInt(-1), util.NewInt(0), util.NewInt(1)}))
+	serviceMust(t, u.set(&parent.fpp, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(0), unumeral.NewInt(1)}))
 	parent.constructed = 9
 	prep, e := s.beginPrimePreparation(out)
 	serviceMust(t, e)
@@ -93,7 +94,7 @@ func TestUPolynomialFactorLiftPreparationCapturedCheckerSourceStop(t *testing.T)
 	prep.enterCall()
 	c.outerConstructed = 4
 	for i := range c.outer {
-		serviceMust(t, u.set(&c.outer[i], []util.Int{util.NewInt(7)}))
+		serviceMust(t, u.set(&c.outer[i], []unumeral.Int{unumeral.NewInt(7)}))
 	}
 	c.finalLCInvConstructed = true
 	serviceMust(t, q.Integers().Copy(&c.finalLCInv, &q.Integers().Two64))

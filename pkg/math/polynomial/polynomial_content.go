@@ -2,19 +2,19 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialContentScope struct {
 	invocation                uint64
 	executing                 bool
 	receipt                   polynomialContentInvocationReceipt
-	normalize                 util.IntegerNormalizeInvocationReceipt
-	division, extended        util.IntegerRawInvocationReceipt
-	gcd                       util.IntegerRawInvocationReceipt
+	normalize                 unumeral.IntegerNormalizeInvocationReceipt
+	division, extended        unumeral.IntegerRawInvocationReceipt
+	gcd                       unumeral.IntegerRawInvocationReceipt
 	aiConstructed             bool
 	entered                   bool
-	ai                        util.Int
+	ai                        unumeral.Int
 	active, aiEnded, topOwner bool
 	generation                uint64
 	append                    polynomialCheapAppendInvocationReceipt
@@ -127,7 +127,7 @@ func (m *MultivariatePolynomialCore) finishIntegerContentPhase(owning, abort boo
 
 	return nil
 }
-func (m *MultivariatePolynomialCore) IntegerContent(p Polynomial, i *util.Int, c *PolynomialRef) error {
+func (m *MultivariatePolynomialCore) IntegerContent(p Polynomial, i *unumeral.Int, c *PolynomialRef) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -139,16 +139,16 @@ func (m *MultivariatePolynomialCore) IntegerContent(p Polynomial, i *util.Int, c
 	}
 	return m.integerContent(p, i, &c.root)
 }
-func (m *MultivariatePolynomialCore) integerContent(p Polynomial, i *util.Int, c *polynomialReference) error {
+func (m *MultivariatePolynomialCore) integerContent(p Polynomial, i *unumeral.Int, c *polynomialReference) error {
 	return m.integerContentWithReceipt(p, i, c, nil)
 }
-func (m *MultivariatePolynomialCore) integerContentWithReceipt(p Polynomial, i *util.Int, c *polynomialReference, r *polynomialContentInvocationReceipt) error {
+func (m *MultivariatePolynomialCore) integerContentWithReceipt(p Polynomial, i *unumeral.Int, c *polynomialReference, r *polynomialContentInvocationReceipt) error {
 	return m.integerContentWithReceipts(p, i, c, r, nil, nil)
 }
-func (m *MultivariatePolynomialCore) integerContentForICCPShortcut(p Polynomial, i *util.Int, c *polynomialReference, parent *MultivariatePolynomialManager, r *polynomialICCPInvocationReceipt) error {
+func (m *MultivariatePolynomialCore) integerContentForICCPShortcut(p Polynomial, i *unumeral.Int, c *polynomialReference, parent *MultivariatePolynomialManager, r *polynomialICCPInvocationReceipt) error {
 	return m.integerContentWithReceipts(p, i, c, nil, parent, r)
 }
-func (m *MultivariatePolynomialCore) beginContentInvocation(i *util.Int, receipt *polynomialContentInvocationReceipt, shortcut *MultivariatePolynomialManager, outer *polynomialICCPInvocationReceipt) (*polynomialContentScope, error) {
+func (m *MultivariatePolynomialCore) beginContentInvocation(i *unumeral.Int, receipt *polynomialContentInvocationReceipt, shortcut *MultivariatePolynomialManager, outer *polynomialICCPInvocationReceipt) (*polynomialContentScope, error) {
 	if shortcut != nil && (shortcut.self != shortcut || shortcut.core != m) {
 		return nil, ErrPolynomialOwner
 	}
@@ -174,7 +174,7 @@ func (m *MultivariatePolynomialCore) beginContentInvocation(i *util.Int, receipt
 	return s, nil
 }
 
-func (m *MultivariatePolynomialCore) integerContentWithReceipts(p Polynomial, i *util.Int, c *polynomialReference, receipt *polynomialContentInvocationReceipt, shortcut *MultivariatePolynomialManager, outer *polynomialICCPInvocationReceipt) (err error) {
+func (m *MultivariatePolynomialCore) integerContentWithReceipts(p Polynomial, i *unumeral.Int, c *polynomialReference, receipt *polynomialContentInvocationReceipt, shortcut *MultivariatePolynomialManager, outer *polynomialICCPInvocationReceipt) (err error) {
 	zero, e := m.IsZero(p)
 	if e != nil {
 		return e
@@ -218,7 +218,7 @@ func (m *MultivariatePolynomialCore) integerContentWithReceipts(p Polynomial, i 
 	if e != nil {
 		return e
 	}
-	view := util.IntegerArrayView{Allocator: m.monomials.allocator, Object: l.raw, Count: n, Offset: 12, Stride: 12}
+	view := unumeral.IntegerArrayView{Allocator: m.monomials.allocator, Object: l.raw, Count: n, Offset: 12, Stride: 12}
 	s, e := m.beginContentInvocation(i, receipt, shortcut, outer)
 	if e != nil {
 		return e
@@ -249,7 +249,7 @@ func (m *MultivariatePolynomialCore) integerContentWithReceipts(p Polynomial, i 
 		return e
 	}
 	// This is the literal reached scoped_numeral ai constructor, after reset.
-	s.ai = util.Int{}
+	s.ai = unumeral.Int{}
 	s.aiConstructed = true
 	top := m.pscReceipts.depth == 0
 	if e = m.pscEnter(); e != nil {
@@ -286,7 +286,7 @@ func (m *MultivariatePolynomialCore) integerContentWithReceipts(p Polynomial, i 
 // IntegerScalarContent is the source numeral-only overload. Unlike ic(p,a,c),
 // its first SET preserves a lone negative coefficient and its early-one test
 // occurs before reading the next coefficient.
-func (full *MultivariatePolynomialManager) IntegerScalarContent(p Polynomial, out *util.Int) error {
+func (full *MultivariatePolynomialManager) IntegerScalarContent(p Polynomial, out *unumeral.Int) error {
 	if e := full.ready(); e != nil {
 		return e
 	}
@@ -295,7 +295,7 @@ func (full *MultivariatePolynomialManager) IntegerScalarContent(p Polynomial, ou
 	}
 	return full.core.integerScalarContent(p, out)
 }
-func (m *MultivariatePolynomialCore) integerScalarContent(p Polynomial, out *util.Int) error {
+func (m *MultivariatePolynomialCore) integerScalarContent(p Polynomial, out *unumeral.Int) error {
 	zero, e := m.IsZero(p)
 	if e != nil {
 		return e

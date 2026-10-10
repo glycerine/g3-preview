@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI(t *testing.T) {
@@ -17,7 +17,7 @@ func TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI(t *testi
 			full := polynomialPSCFullFixture(t)
 			c := full.core
 			p := polynomialQueryTerms(t, c, []int32{1, 1, 1, 1}, [][]MonomialPower{{{0, 1}, {1, 1}}, {{0, 1}}, {{1, 1}}, nil})
-			var i util.Int
+			var i unumeral.Int
 			var content, primitive polynomialReference
 			var child polynomialICCPInvocationReceipt
 			t.Cleanup(func() {
@@ -29,7 +29,7 @@ func TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI(t *testi
 			})
 			c.integer.Budget().FailAfter(prefix)
 			body := full.iccpPartsWithReceipt(p, 0, &i, &content, &primitive, &child)
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*util.Int{&i}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*unumeral.Int{&i}, 0)
 			if body != nil && !numericPhysicalReservationRefusal(body) {
 				t.Fatal("source refusal category", prefix, body)
 			}
@@ -38,7 +38,7 @@ func TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI(t *testi
 			}
 			c.integer.Budget().FailAfter(-1)
 			serviceMust(t, full.CleanupContentPrimitiveParts())
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*util.Int{&i}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*unumeral.Int{&i}, 0)
 			for _, b := range []*polynomialSOM{&c.cheap, &c.cheap2} {
 				as, e := b.as.size(c)
 				serviceMust(t, e)
@@ -52,7 +52,7 @@ func TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI(t *testi
 				success = true
 				polynomialQueryExpect(t, c, content.value, map[[3]uint32]int64{{0, 1, 0}: 1, {}: 1})
 				polynomialQueryExpect(t, c, primitive.value, map[[3]uint32]int64{{1, 0, 0}: 1, {}: 1})
-				if i != util.NewInt(1) {
+				if i != unumeral.NewInt(1) {
 					t.Fatal("literal integer content", i)
 				}
 			}
@@ -69,7 +69,7 @@ func TestPolynomialICCPLaterCIAssignmentRetainsActualOldAndIncomingReferences(t 
 	full := polynomialPSCFullFixture(t)
 	c := full.core
 	p := polynomialQueryTerms(t, c, []int32{1, 3, 2, 1, 4, 3, 1, 5, 4}, [][]MonomialPower{{{0, 2}, {1, 2}}, {{0, 2}, {1, 1}}, {{0, 2}}, {{0, 1}, {1, 2}}, {{0, 1}, {1, 1}}, {{0, 1}}, {{1, 2}}, {{1, 1}}, nil})
-	var i util.Int
+	var i unumeral.Int
 	var content, primitive polynomialReference
 	var child polynomialICCPInvocationReceipt
 	var oldCI, incoming Polynomial
@@ -111,7 +111,7 @@ func TestPolynomialICCPLaterCIAssignmentRetainsActualOldAndIncomingReferences(t 
 	if !s.ciConstructed || !s.ci.assigning || !s.ci.decremented || s.ci.value != oldCI || s.ci.incoming != incoming || s.cursor != 0 {
 		t.Fatal("later assignment lost actual old ci/incoming or source cursor", s.ci, s.cursor, oldCI, incoming)
 	}
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*util.Int{&i}, h.header)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*unumeral.Int{&i}, h.header)
 	state, used := c.memory.State(), c.integer.Budget().Used()
 	cause := s.cleanupCause
 	if full.iccpSourceEnd(s) != cause || state != c.memory.State() || used != c.integer.Budget().Used() || s.ci.value != oldCI || s.ci.incoming != incoming {
@@ -122,7 +122,7 @@ func TestPolynomialICCPLaterCIAssignmentRetainsActualOldAndIncomingReferences(t 
 	if s.cleanupCause != cause || full.iccpInvocationSourceCause(&child) != cause {
 		t.Fatal("own acknowledgment erased first ICCP source cause", cause, s.cleanupCause, full.iccpInvocationSourceCause(&child))
 	}
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*util.Int{&i}, h.header)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*unumeral.Int{&i}, h.header)
 	var later polynomialICCPInvocationReceipt
 	serviceMust(t, full.iccpPartsWithReceipt(p, 0, &i, &content, &primitive, &later))
 	if later.frame != child.frame || later.invocation == child.invocation || full.hasICCPInvocationHistory(&child) || !errors.Is(body, ErrUPolynomialCanceled) || cause != ErrUPolynomialCanceled {
@@ -139,7 +139,7 @@ func TestPolynomialICCPNegSourceStopProtectsConstructedCI(t *testing.T) {
 		t.Run(fmt.Sprint(prefix), func(t *testing.T) {
 			full := polynomialPSCFullFixture(t)
 			c := full.core
-			var first, large, i util.Int
+			var first, large, i unumeral.Int
 			short, long := make([]uint32, 4096), make([]uint32, 8192)
 			short[len(short)-1] = 1
 			long[0], long[len(long)-1] = 1, 1
@@ -151,7 +151,7 @@ func TestPolynomialICCPNegSourceStopProtectsConstructedCI(t *testing.T) {
 			serviceMust(t, e)
 			x, e := c.monomials.MkVariable(0, 1)
 			serviceMust(t, e)
-			p, e := c.MkTerms([]util.Int{first, large}, []Monomial{xy, x})
+			p, e := c.MkTerms([]unumeral.Int{first, large}, []Monomial{xy, x})
 			serviceMust(t, e)
 			p = polynomialCaller(t, c, p)
 			var content, primitive polynomialReference
@@ -167,7 +167,7 @@ func TestPolynomialICCPNegSourceStopProtectsConstructedCI(t *testing.T) {
 			})
 			c.integer.Budget().FailAfter(prefix)
 			body := full.iccpPartsWithReceipt(p, 0, &i, &content, &primitive, &child)
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*util.Int{&first, &large, &i}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*unumeral.Int{&first, &large, &i}, 0)
 			var cause error
 			if child.frame != nil {
 				cause = c.negInvocationSourceCause(&child.frame.neg)
@@ -187,7 +187,7 @@ func TestPolynomialICCPNegSourceStopProtectsConstructedCI(t *testing.T) {
 			serviceMust(t, full.cleanupICCPInvocation(&child, false))
 			serviceMust(t, full.cleanupICCPInvocation(&child, true))
 			serviceMust(t, full.CleanupContentPrimitiveParts())
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*util.Int{&first, &large, &i}, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, content.value, content.incoming, primitive.value, primitive.incoming}, []*unumeral.Int{&first, &large, &i}, 0)
 			if cause != nil && full.iccpInvocationSourceCause(&child) != cause {
 				t.Fatal("own ACK erased ICCP Neg source history")
 			}

@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -182,7 +183,7 @@ func TestGlobalParamsServiceFinalizeRetainsCurrentBeforeActualConsumedNUMStop(t 
 	bg := arena.NewBudget(1 << 24)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
 	paramsMust(t, e)
-	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
@@ -230,7 +231,7 @@ func TestGlobalParamsServiceFinalizeRetainsCurrentBeforeActualConsumedNUMStop(t 
 	prefix, e := sy.Intern("completed-prefix")
 	paramsMust(t, e)
 	paramsMust(t, c.SetUInt(v, prefix, 42))
-	scoped, e := NewScopedInt(m)
+	scoped, e := unumeral.NewScopedInt(m)
 	paramsMust(t, e)
 	num, e := scoped.Get()
 	paramsMust(t, e)
@@ -243,7 +244,7 @@ func TestGlobalParamsServiceFinalizeRetainsCurrentBeforeActualConsumedNUMStop(t 
 	paramsMust(t, c.SetRat(v, key, &big))
 	paramsMust(t, q.Del(&big))
 	oldSlot, oldGeneration := v.Slot, v.Generation
-	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, v}}}
+	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, v}}}
 	before := numericAuditPhysical(t, m, extras)
 	gparamsServiceAudit(t, service, bg)
 	paramsDecTLSNearMinimum(t, r)

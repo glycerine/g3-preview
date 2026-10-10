@@ -2,9 +2,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestASTFloatingPointNumeralLiteralDeclarationsAndExternalDeletion(t *testing.T) {
@@ -29,8 +28,8 @@ func TestASTFloatingPointNumeralLiteralDeclarationsAndExternalDeletion(t *testin
 		{1, 128, false, 8, "NaN"}, {0, 128, false, 6, "+oo"}, {0, 128, true, 7, "-oo"},
 		{0, -127, false, 9, "+zero"}, {0, -127, true, 10, "-zero"}, {19, 3, false, 5, "fp.numeral"},
 	} {
-		sig := util.NewInt(tc.sig)
-		var value util.ArbitraryFloat
+		sig := unumeral.NewInt(tc.sig)
+		var value unumeral.ArbitraryFloat
 		astTestMust(t, p.numeric.SetComponents(&value, 8, 24, tc.sign, tc.exp, &sig))
 		app, e := p.mkNumeral(&value, g)
 		astTestMust(t, e)
@@ -80,8 +79,8 @@ func TestASTFloatingPointNumeralDeclarationEveryReservationPrefix(t *testing.T) 
 		_, e = m.RegisterFloatingPointPlugin()
 		astTestMust(t, e)
 		p := m.floatingPointPlugin
-		sig := util.NewInt(19)
-		var value util.ArbitraryFloat
+		sig := unumeral.NewInt(19)
+		var value unumeral.ArbitraryFloat
 		astTestMust(t, p.numeric.SetComponents(&value, 8, 24, false, 3, &sig))
 		base := b.Used() - m.Stats().AllocatedBytes - m.numerals.RuntimeOwner().Stats().TotalBytes
 		b.FailAfter(ordinal)
@@ -149,12 +148,12 @@ func TestASTFloatingPointNumeralReadUsesActualExternalRowAndSpecialSort(t *testi
 	}{
 		{19, 3, false, 19}, {0, 128, true, 0}, {0, 128, false, 0}, {1, 128, false, (1 << 23) - 1}, {0, -127, false, 0}, {0, -127, true, 0},
 	} {
-		sig := util.NewInt(tc.sig)
-		var source, out util.ArbitraryFloat
+		sig := unumeral.NewInt(tc.sig)
+		var source, out unumeral.ArbitraryFloat
 		astTestMust(t, p.numeric.SetComponents(&source, 8, 24, tc.sign, tc.exp, &sig))
 		app, e := p.mkNumeral(&source, nil)
 		astTestMust(t, e)
-		var receipt util.ArbitraryFloatValueCopyReceipt
+		var receipt unumeral.ArbitraryFloatValueCopyReceipt
 		found, e := p.isNumeral(app, &out, &receipt)
 		astTestMust(t, e)
 		if !found || out.EBits() != 8 || out.SBits() != 24 || out.Sign() != tc.sign || out.Exponent() != tc.exp {
@@ -186,11 +185,11 @@ func TestASTFloatingPointNumeralReadUnmatchedErasesOutput(t *testing.T) {
 	astTestMust(t, e)
 	n, e := m.internal(h)
 	astTestMust(t, e)
-	var receipt util.ArbitraryFloatValueCopyReceipt
+	var receipt unumeral.ArbitraryFloatValueCopyReceipt
 	used := m.BudgetField.Used()
 	m.BudgetField.FailAfter(0)
 	found, e := p.isNumeral(n, nil, &receipt)
-	if e != nil || found || receipt != (util.ArbitraryFloatValueCopyReceipt{}) || m.BudgetField.Used() != used {
+	if e != nil || found || receipt != (unumeral.ArbitraryFloatValueCopyReceipt{}) || m.BudgetField.Used() != used {
 		t.Fatal("unmatched source branch read output/receipt", found, e)
 	}
 	astFloatingPointConstructorRawGraph(t, m.numerals, p)

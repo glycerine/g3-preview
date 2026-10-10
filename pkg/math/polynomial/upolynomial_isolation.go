@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyDRSFrame struct{ parent, sizeFlags uint32 }
@@ -111,7 +111,7 @@ func (m *UPolynomialManager) pushDRSChildren(sz uint32, v UPolynomialView, p *up
 	}
 	return m.pushDRS(s, newUPolyDRSFrame(parent, sz, false))
 }
-func numericBinaryRationalManager_binaryLiteral(b *util.BinaryRationalManager, s *upolyBinaryVectorState, value util.BinaryRational) error {
+func numericBinaryRationalManager_binaryLiteral(b *unumeral.BinaryRationalManager, s *upolyBinaryVectorState, value unumeral.BinaryRational) error {
 	dst, e := numericBinaryRationalManager_binaryPushDefault(b, s)
 	if e != nil {
 		return e
@@ -119,12 +119,12 @@ func numericBinaryRationalManager_binaryLiteral(b *util.BinaryRationalManager, s
 	*dst = value
 	return nil
 }
-func (m *UPolynomialManager) addDRSInterval(s *upolyDRSStack, b *util.BinaryRationalManager, l, u *BinaryRationalVector) error {
-	lower, upper := util.NewBinaryInt(0), util.NewBinaryInt(1)
+func (m *UPolynomialManager) addDRSInterval(s *upolyDRSStack, b *unumeral.BinaryRationalManager, l, u *BinaryRationalVector) error {
+	lower, upper := unumeral.NewBinaryInt(0), unumeral.NewBinaryInt(1)
 	defer b.Del(&lower)
 	defer b.Del(&upper)
 	i := uint32(len(s.values)) - 1
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	for i != math.MaxUint32 {
 		if i >= uint32(len(s.values)) {
 			return arena.ErrBounds
@@ -158,11 +158,11 @@ func (m *UPolynomialManager) addDRSInterval(s *upolyDRSStack, b *util.BinaryRati
 	}
 	return b.Swap(&u.state.values[u.state.size-1], &upper)
 }
-func (m *UPolynomialManager) addDRSRoot(s *upolyDRSStack, b *util.BinaryRationalManager, r *BinaryRationalVector) error {
-	value := util.NewBinaryIntPower(1, 1)
+func (m *UPolynomialManager) addDRSRoot(s *upolyDRSStack, b *unumeral.BinaryRationalManager, r *BinaryRationalVector) error {
+	value := unumeral.NewBinaryIntPower(1, 1)
 	defer b.Del(&value)
 	i := uint32(len(s.values)) - 1
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	for i != math.MaxUint32 {
 		if i >= uint32(len(s.values)) {
 			return arena.ErrBounds
@@ -183,7 +183,7 @@ func (m *UPolynomialManager) addDRSRoot(s *upolyDRSStack, b *util.BinaryRational
 	}
 	return b.Swap(&r.state.values[r.state.size-1], &value)
 }
-func (m *UPolynomialManager) drsZeroOne(v UPolynomialView, b *util.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
+func (m *UPolynomialManager) drsZeroOne(v UPolynomialView, b *unumeral.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
 	k, e := m.DescartesBoundZeroOne(v)
 	if e != nil {
 		return e
@@ -192,10 +192,10 @@ func (m *UPolynomialManager) drsZeroOne(v UPolynomialView, b *util.BinaryRationa
 		return nil
 	}
 	if k == 1 {
-		if e = numericBinaryRationalManager_binaryLiteral(b, &l.state, util.NewBinaryInt(0)); e != nil {
+		if e = numericBinaryRationalManager_binaryLiteral(b, &l.state, unumeral.NewBinaryInt(0)); e != nil {
 			return e
 		}
-		return numericBinaryRationalManager_binaryLiteral(b, &u.state, util.NewBinaryInt(1))
+		return numericBinaryRationalManager_binaryLiteral(b, &u.state, unumeral.NewBinaryInt(1))
 	}
 	var q, p upolyVectorState
 	defer m.dropLocalVector(&q)
@@ -207,10 +207,10 @@ func (m *UPolynomialManager) drsZeroOne(v UPolynomialView, b *util.BinaryRationa
 		return e
 	}
 	if half {
-		if e = numericBinaryRationalManager_binaryLiteral(b, &r.state, util.NewBinaryIntPower(1, 1)); e != nil {
+		if e = numericBinaryRationalManager_binaryLiteral(b, &r.state, unumeral.NewBinaryIntPower(1, 1)); e != nil {
 			return e
 		}
-		divisor := upolyDivisorSpan{immediate: true, pair: [2]util.Int{util.NewInt(-1), util.NewInt(2)}}
+		divisor := upolyDivisorSpan{immediate: true, pair: [2]unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(2)}}
 		if polynomialSourceDebug {
 			yes, e := m.HasOneHalfRoot(v)
 			if e != nil {
@@ -292,7 +292,7 @@ func (m *UPolynomialManager) drsZeroOne(v UPolynomialView, b *util.BinaryRationa
 					return ErrUPolynomialAssertion
 				}
 			}
-			divisor := upolyDivisorSpan{immediate: true, pair: [2]util.Int{util.NewInt(-1), util.NewInt(2)}}
+			divisor := upolyDivisorSpan{immediate: true, pair: [2]unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(2)}}
 			if e = m.divSpanState(current, &divisor, &q); e != nil {
 				return e
 			}
@@ -307,7 +307,7 @@ func (m *UPolynomialManager) drsZeroOne(v UPolynomialView, b *util.BinaryRationa
 	}
 	return nil
 }
-func numericBinaryRationalManager_adjustBinary(b *util.BinaryRationalManager, v *BinaryRationalVector, start, k uint32, negative bool) error {
+func numericBinaryRationalManager_adjustBinary(b *unumeral.BinaryRationalManager, v *BinaryRationalVector, start, k uint32, negative bool) error {
 	n := v.state.size
 	for i := start; i < n; i++ {
 		slot, e := numericBinaryRationalManager_binarySlot(b, &v.state, i)
@@ -325,7 +325,7 @@ func numericBinaryRationalManager_adjustBinary(b *util.BinaryRationalManager, v 
 	}
 	return nil
 }
-func (m *UPolynomialManager) DRSIsolateRootsWithBounds(v UPolynomialView, neg, pos uint32, b *util.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
+func (m *UPolynomialManager) DRSIsolateRootsWithBounds(v UPolynomialView, neg, pos uint32, b *unumeral.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
 	if e := m.isolationOwners(b, r, l, u); e != nil {
 		return e
 	}
@@ -395,7 +395,7 @@ func (m *UPolynomialManager) DRSIsolateRootsWithBounds(v UPolynomialView, neg, p
 	}
 	return nil
 }
-func (m *UPolynomialManager) DRSIsolateRoots(v UPolynomialView, b *util.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
+func (m *UPolynomialManager) DRSIsolateRoots(v UPolynomialView, b *unumeral.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
 	if e := m.isolationOwners(b, r, l, u); e != nil {
 		return e
 	}
@@ -429,7 +429,7 @@ func (m *UPolynomialManager) DRSIsolateRoots(v UPolynomialView, b *util.BinaryRa
 	}
 	return m.DRSIsolateRootsWithBounds(m.stateView(&p), neg, pos, b, r, l, u)
 }
-func (m *UPolynomialManager) squareFreeNonzeroIsolate(v UPolynomialView, b *util.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
+func (m *UPolynomialManager) squareFreeNonzeroIsolate(v UPolynomialView, b *unumeral.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
 	if polynomialSourceDebug {
 		zero, e := m.HasZeroRoots(v)
 		if e != nil {
@@ -441,7 +441,7 @@ func (m *UPolynomialManager) squareFreeNonzeroIsolate(v UPolynomialView, b *util
 	}
 	return m.DRSIsolateRoots(v, b, r, l, u)
 }
-func (m *UPolynomialManager) SquareFreeIsolateRoots(v UPolynomialView, b *util.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
+func (m *UPolynomialManager) SquareFreeIsolateRoots(v UPolynomialView, b *unumeral.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
 	if e := m.isolationOwners(b, r, l, u); e != nil {
 		return e
 	}
@@ -461,7 +461,7 @@ func (m *UPolynomialManager) SquareFreeIsolateRoots(v UPolynomialView, b *util.B
 	if !zero {
 		return m.squareFreeNonzeroIsolate(v, b, r, l, u)
 	}
-	if e = numericBinaryRationalManager_binaryLiteral(b, &r.state, util.NewBinaryInt(0)); e != nil {
+	if e = numericBinaryRationalManager_binaryLiteral(b, &r.state, unumeral.NewBinaryInt(0)); e != nil {
 		return e
 	}
 	var nz upolyVectorState
@@ -480,7 +480,7 @@ func (m *UPolynomialManager) SquareFreeIsolateRoots(v UPolynomialView, b *util.B
 	}
 	return m.squareFreeNonzeroIsolate(m.stateView(&nz), b, r, l, u)
 }
-func (m *UPolynomialManager) IsolateRoots(v UPolynomialView, b *util.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
+func (m *UPolynomialManager) IsolateRoots(v UPolynomialView, b *unumeral.BinaryRationalManager, r, l, u *BinaryRationalVector) error {
 	if e := m.isolationOwners(b, r, l, u); e != nil {
 		return e
 	}

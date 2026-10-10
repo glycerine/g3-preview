@@ -3,8 +3,9 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Polynomial is a checked scalar locator, never an additional owning copy.
@@ -73,30 +74,30 @@ func (m *MultivariatePolynomialCore) write64(p Polynomial, o, v uint64) error {
 	}
 	return m.writeWord(p, o+4, uint32(v>>32))
 }
-func (m *MultivariatePolynomialCore) coefficientCore(p Polynomial, i uint32) (util.Int, error) {
+func (m *MultivariatePolynomialCore) coefficientCore(p Polynomial, i uint32) (unumeral.Int, error) {
 	n, e := m.readWord(p, 8)
 	if e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	if polynomialSourceDebug && i >= n {
-		return util.Int{}, ErrPolynomialAssertion
+		return unumeral.Int{}, ErrPolynomialAssertion
 	}
 	l, e := m.polynomialLocation(p)
 	if e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	if i >= l.initializedCoefficients {
-		return util.Int{}, ErrPolynomialPartial
+		return unumeral.Int{}, ErrPolynomialPartial
 	}
 	o := uint64(12) + uint64(i)*12
 	v, e := m.readWord(p, o)
 	if e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	r, e := m.read64(p, o+4)
-	return util.IntFromNativeWords([3]uint32{uint32(v), uint32(r), uint32(uint64(r) >> 32)}), e
+	return unumeral.IntFromNativeWords([3]uint32{uint32(v), uint32(r), uint32(uint64(r) >> 32)}), e
 }
-func (m *MultivariatePolynomialCore) writeCoefficient(p Polynomial, i uint32, a util.Int) error {
+func (m *MultivariatePolynomialCore) writeCoefficient(p Polynomial, i uint32, a unumeral.Int) error {
 	o := uint64(12) + uint64(i)*12
 	if e := m.writeWord(p, o, uint32(a.NativeScalar())); e != nil {
 		return e
@@ -159,9 +160,9 @@ func (m *MultivariatePolynomialCore) Info(p Polynomial) (PolynomialInfo, error) 
 	n, e := m.readWord(p, 8)
 	return PolynomialInfo{RefCount: r, ID: f & 0x7fffffff, Size: n, LexSorted: f>>31 != 0}, e
 }
-func (m *MultivariatePolynomialCore) Coefficient(p Polynomial, i uint32) (util.Int, error) {
+func (m *MultivariatePolynomialCore) Coefficient(p Polynomial, i uint32) (unumeral.Int, error) {
 	if e := m.check(); e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	return m.coefficientCore(p, i)
 }

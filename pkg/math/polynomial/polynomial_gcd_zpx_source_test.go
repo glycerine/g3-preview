@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialGCDGlexZPXIndependentCoefficientModel(t *testing.T) {
@@ -42,7 +41,7 @@ func TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel(t *testing.T) {
 	pr, e := NewPolynomialRef(c)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, cr.Close()); serviceMust(t, pr.Close()) })
-	var ci util.Int
+	var ci unumeral.Int
 	t.Cleanup(func() { serviceMust(t, c.integer.Del(&ci)) })
 	serviceMust(t, full.iccpZPX(p, 0, &ci, &cr.root, &pr.root))
 	polynomialQueryExpect(t, c, cr.root.value, map[[3]uint32]int64{{1, 0, 0}: 1, {}: 1})
@@ -92,7 +91,7 @@ func TestPolynomialGCDICCPZPXSourceShortcutTable(t *testing.T) {
 		pr, e := NewPolynomialRef(c)
 		serviceMust(t, e)
 		t.Cleanup(func() { serviceMust(t, cr.Close()); serviceMust(t, pr.Close()) })
-		var ci util.Int
+		var ci unumeral.Int
 		t.Cleanup(func() { serviceMust(t, c.integer.Del(&ci)) })
 		serviceMust(t, full.iccpZPX(p, 0, &ci, &cr.root, &pr.root))
 		got, e := c.integer.Int64(&ci)
@@ -117,14 +116,14 @@ func TestPolynomialGCDIntegerContentFieldChangeSourceInputAssertion(t *testing.T
 	r, e := NewPolynomialRef(c)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, r.Close()) })
-	var content util.Int
+	var content unumeral.Int
 	t.Cleanup(func() { serviceMust(t, c.integer.Del(&content)) })
 	e = c.IntegerContent(p, &content, r)
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, r.root.value, r.root.incoming}, []*util.Int{&content}, r.header)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, r.root.value, r.root.incoming}, []*unumeral.Int{&content}, r.header)
 	serviceMust(t, c.CleanupIntegerContent())
-	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, r.root.value, r.root.incoming}, []*util.Int{&content}, r.header)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, r.root.value, r.root.incoming}, []*unumeral.Int{&content}, r.header)
 	if polynomialSourceDebug {
-		if !errors.Is(e, util.ErrModularAssertion) {
+		if !errors.Is(e, unumeral.ErrModularAssertion) {
 			t.Fatalf("source div requires normalized dividend: %v", e)
 		}
 		return

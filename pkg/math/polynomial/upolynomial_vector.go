@@ -5,7 +5,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *UPolynomialManager) shrink(s *upolyVectorState, n uint32) error {
@@ -52,7 +52,7 @@ func (m *UPolynomialManager) Resize(p UPolynomial, n uint32) error {
 	}
 	return m.reserve(&d.state, n)
 }
-func (m *UPolynomialManager) PushCoefficient(p UPolynomial, n *util.Int) error {
+func (m *UPolynomialManager) PushCoefficient(p UPolynomial, n *unumeral.Int) error {
 	d, e := m.descriptor(p)
 	if e != nil {
 		return e

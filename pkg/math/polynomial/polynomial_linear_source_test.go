@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The source driver returns after tst_psc, so this fixture is dormant there.
@@ -19,12 +19,12 @@ func TestLinearRationalOriginalPolynomialFixture(t *testing.T) {
 	rows := [3][3]int64{{2, 1, -1}, {-3, -1, 2}, {-2, 1, 2}}
 	rhs := [3]int64{8, -11, -3}
 	for i := range rows {
-		as := [3]util.Rational{}
+		as := [3]unumeral.Rational{}
 		for j := range as {
-			as[j] = util.NewRational()
+			as[j] = unumeral.NewRational()
 			serviceMust(t, q.SetInt64(&as[j], rows[i][j]))
 		}
-		b := util.NewRational()
+		b := unumeral.NewRational()
 		serviceMust(t, q.SetInt64(&b, rhs[i]))
 		serviceMust(t, s.Add(uint32(i), as[:], &b))
 		for j := range as {
@@ -32,14 +32,14 @@ func TestLinearRationalOriginalPolynomialFixture(t *testing.T) {
 		}
 		serviceMust(t, q.Del(&b))
 	}
-	xs := [3]util.Rational{util.NewRational(), util.NewRational(), util.NewRational()}
+	xs := [3]unumeral.Rational{unumeral.NewRational(), unumeral.NewRational(), unumeral.NewRational()}
 	ok, e := s.Solve(xs[:])
 	serviceMust(t, e)
 	if !ok {
 		t.Fatal("source VERIFY solve")
 	}
 	for i, want := range [3]int64{2, 3, -1} {
-		r := util.NewRational()
+		r := unumeral.NewRational()
 		serviceMust(t, q.SetInt64(&r, want))
 		equal, e := q.Equal(&xs[i], &r)
 		serviceMust(t, e)
@@ -57,23 +57,23 @@ func TestLinearRationalSourcePivotAndSingularPublication(t *testing.T) {
 	s, e := NewRationalLinearSolver(q)
 	serviceMust(t, e)
 	serviceMust(t, s.Resize(2))
-	row0 := []util.Rational{util.NewRational(), util.NewRational()}
-	row1 := []util.Rational{util.NewRational(), util.NewRational()}
+	row0 := []unumeral.Rational{unumeral.NewRational(), unumeral.NewRational()}
+	row1 := []unumeral.Rational{unumeral.NewRational(), unumeral.NewRational()}
 	serviceMust(t, q.SetInt64(&row0[1], 1))
 	serviceMust(t, q.SetInt64(&row1[0], 1))
-	b0, b1 := util.NewRational(), util.NewRational()
+	b0, b1 := unumeral.NewRational(), unumeral.NewRational()
 	serviceMust(t, q.SetInt64(&b0, 3))
 	serviceMust(t, q.SetInt64(&b1, 7))
 	serviceMust(t, s.Add(0, row0, &b0))
 	serviceMust(t, s.Add(1, row1, &b1))
-	xs := []util.Rational{util.NewRational(), util.NewRational()}
+	xs := []unumeral.Rational{unumeral.NewRational(), unumeral.NewRational()}
 	ok, e := s.Solve(xs)
 	serviceMust(t, e)
 	if !ok {
 		t.Fatal("pivot not found")
 	}
 	// Actual source swaps A rows only. Do not repair b or replace the algorithm.
-	for i, want := range []*util.Rational{&b0, &b1} {
+	for i, want := range []*unumeral.Rational{&b0, &b1} {
 		eq, e := q.Equal(&xs[i], want)
 		serviceMust(t, e)
 		if !eq {
@@ -86,7 +86,7 @@ func TestLinearRationalSourcePivotAndSingularPublication(t *testing.T) {
 	if ok {
 		t.Fatal("zero matrix singular")
 	}
-	for i, want := range []*util.Rational{&b0, &b1} {
+	for i, want := range []*unumeral.Rational{&b0, &b1} {
 		eq, e := q.Equal(&xs[i], want)
 		serviceMust(t, e)
 		if !eq {
@@ -115,7 +115,7 @@ func TestLinearRationalSourceAddReachedInput(t *testing.T) {
 	s, e := NewRationalLinearSolver(q)
 	serviceMust(t, e)
 	serviceMust(t, s.Resize(2))
-	b := util.NewRational()
+	b := unumeral.NewRational()
 	serviceMust(t, q.SetInt64(&b, 9))
 	if e = s.Add(0, nil, &b); !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("reached input guard", e)
@@ -134,7 +134,7 @@ func TestLinearRationalSourceAddReachedInput(t *testing.T) {
 
 func TestLinearModularWholeSourceSolve(t *testing.T) {
 	q, _ := rationalManager(t, false)
-	m, e := util.NewIntegerModularManager(q.Integers())
+	m, e := unumeral.NewIntegerModularManager(q.Integers())
 	serviceMust(t, e)
 	serviceMust(t, m.SetZPUint64(97))
 	s, e := NewModularLinearSolver(m)
@@ -143,8 +143,8 @@ func TestLinearModularWholeSourceSolve(t *testing.T) {
 	rows := [3][3]int64{{2, 1, -1}, {-3, -1, 2}, {-2, 1, 2}}
 	rhs := [3]int64{8, -11, -3}
 	for i := range rows {
-		as := [3]util.Int{}
-		b := util.Int{}
+		as := [3]unumeral.Int{}
+		b := unumeral.Int{}
 		for j := range as {
 			serviceMust(t, m.SetInt64(&as[j], rows[i][j]))
 		}
@@ -155,14 +155,14 @@ func TestLinearModularWholeSourceSolve(t *testing.T) {
 		}
 		serviceMust(t, m.Del(&b))
 	}
-	xs := [3]util.Int{}
+	xs := [3]unumeral.Int{}
 	ok, e := s.Solve(xs[:])
 	serviceMust(t, e)
 	if !ok {
 		t.Fatal("modular solve")
 	}
 	for i, want := range [3]int64{2, 3, -1} {
-		a := util.Int{}
+		a := unumeral.Int{}
 		serviceMust(t, m.SetInt64(&a, want))
 		eq, e := m.Equal(&xs[i], &a)
 		serviceMust(t, e)
@@ -211,18 +211,18 @@ func TestLinearRationalFreshNullRHSFlush(t *testing.T) {
 		}
 	}()
 	serviceMust(t, s.Resize(1))
-	rhs := util.NewRational()
+	rhs := unumeral.NewRational()
 	serviceMust(t, q.SetString(&rhs, "79228162514264337593543950337"))
 	defer func() { budget.FailAfter(-1); serviceMust(t, q.Del(&rhs)) }()
 	baseline := q.Z.Memory.Stats().LiveBlocks
 	budget.FailAfter(0)
-	e = s.Add(0, []util.Rational{util.NewRational()}, &rhs)
+	e = s.Add(0, []unumeral.Rational{unumeral.NewRational()}, &rhs)
 	if !numericPhysicalReservationRefusal(e) {
 		t.Fatal("actual RHS copy refusal", e)
 	}
 	actual, e := s.RightHandSide(0)
 	serviceMust(t, e)
-	if (*actual.BorrowNumerator()).Cell != q.Z.FailedNullRef || (*actual.BorrowDenominator()) != util.NewInt(1) {
+	if (*actual.BorrowNumerator()).Cell != q.Z.FailedNullRef || (*actual.BorrowDenominator()) != unumeral.NewInt(1) {
 		t.Fatal("default RHS source prefix", actual)
 	}
 	linearDefaultPhysicalCensus(t, q, s, baseline)

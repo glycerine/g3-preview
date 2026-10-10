@@ -6,8 +6,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // An actual numerical/object refusal leaves a reached derivative invocation.
@@ -104,7 +104,7 @@ func TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort(t *testing.
 	m := polynomialPrimitiveFixtureWithProfile(t, umemory.SmallAllocatorProfile{PointerBits: 64})
 	c := m.core
 	p := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{{{0, 2}}, {{1, 2}}})
-	prime := util.NewInt(2)
+	prime := unumeral.NewInt(2)
 	serviceMust(t, c.modular.SetZP(&prime))
 	var original polynomialDerivativeInvocationReceipt
 	first, e := m.derivativeWithReceipt(p, 0, &original)
@@ -135,7 +135,7 @@ func TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort(t *testing.
 	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, first, repeated}, nil, 0)
 	// A later ordinary nonzero INC through the same source derivative engine
 	// consumes the older actual zero-ref root and its provenance at the leaf.
-	prime = util.NewInt(3)
+	prime = unumeral.NewInt(3)
 	serviceMust(t, c.modular.SetZP(&prime))
 	transferred, e := m.Derivative(p, 0)
 	serviceMust(t, e)

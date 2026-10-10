@@ -6,13 +6,14 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialCompositionScope struct {
-	a                                       util.Int
-	raw                                     [4]util.Int
+	a                                       unumeral.Int
+	raw                                     [4]unumeral.Int
 	rawMask                                 uint8
 	aCompleted                              bool
 	active, executing, stopped              bool
@@ -89,7 +90,7 @@ func (m *MultivariatePolynomialManager) finishComposition(cause error) error {
 	}
 	return cause
 }
-func (m *MultivariatePolynomialManager) compositionNumeral(op uint8, n *util.Int, k uint32, out *util.Int) error {
+func (m *MultivariatePolynomialManager) compositionNumeral(op uint8, n *unumeral.Int, k uint32, out *unumeral.Int) error {
 	z := m.core.integer
 	cell := z.PendingAllocationObject()
 	roots, e := z.SourceAllocator().PendingRoots()
@@ -162,7 +163,7 @@ func (m *MultivariatePolynomialManager) compositionVariable(x, d uint32, powers 
 	}
 	return a, e
 }
-func (m *MultivariatePolynomialManager) compositionAdd(a *util.Int, t Monomial) error {
+func (m *MultivariatePolynomialManager) compositionAdd(a *unumeral.Int, t Monomial) error {
 	s := &m.composition
 	consumed := false
 	e := m.core.cheap.addConsumed(a, t, false, &consumed)
@@ -670,7 +671,7 @@ func (m *MultivariatePolynomialManager) composeBody(p, q Polynomial, r *Polynomi
 		return e
 	}
 	s.degreeCompleted = true
-	s.a = util.Int{}
+	s.a = unumeral.Int{}
 	s.aCompleted = true
 	pos, e := m.compositionDegreePosition(d)
 	if e != nil {
@@ -753,10 +754,10 @@ func (m *MultivariatePolynomialManager) Compose(p, q Polynomial, r *PolynomialRe
 }
 func (m *MultivariatePolynomialManager) compositionLinear(x, y uint32, minus bool) (Polynomial, error) {
 	s := &m.composition
-	s.raw[0] = util.Int{}
+	s.raw[0] = unumeral.Int{}
 	s.rawMask |= 1
 	if minus {
-		s.raw[1] = util.Int{}
+		s.raw[1] = unumeral.Int{}
 		s.rawMask |= 2
 		// Source explicitly uses modular SET(-1), not the unsafe GF2 literal -1.
 		before := m.core.integer.PendingAllocationObject()
@@ -780,11 +781,11 @@ func (m *MultivariatePolynomialManager) compositionLinear(x, y uint32, minus boo
 		if e != nil {
 			return Polynomial{}, e
 		}
-		s.raw[2] = util.NewInt(1)
+		s.raw[2] = unumeral.NewInt(1)
 		s.raw[3] = s.raw[1].Move()
 		s.rawMask |= 12
 	} else {
-		s.raw[2], s.raw[3] = util.NewInt(1), util.NewInt(1)
+		s.raw[2], s.raw[3] = unumeral.NewInt(1), unumeral.NewInt(1)
 		s.rawMask |= 12
 	}
 	p, e := m.core.MkLinearTake(s.raw[2:4], []uint32{x, y}, &s.raw[0])
@@ -886,7 +887,7 @@ func (m *MultivariatePolynomialManager) ComposeXPlusY(p Polynomial, y uint32, r 
 	}
 	return m.composeBody(p, m.composition.local.value, r)
 }
-func (m *MultivariatePolynomialManager) ComposeXMinusConstant(p Polynomial, a *util.Int, r *PolynomialRef) (cause error) {
+func (m *MultivariatePolynomialManager) ComposeXMinusConstant(p Polynomial, a *unumeral.Int, r *PolynomialRef) (cause error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -1205,7 +1206,7 @@ func (c *MultivariatePolynomialCore) compositionNumericAfter(before polynomialCo
 	}
 	return cause
 }
-func (c *MultivariatePolynomialCore) compositionNumericCall(op uint8, a, b, d, out *util.Int) error {
+func (c *MultivariatePolynomialCore) compositionNumericCall(op uint8, a, b, d, out *unumeral.Int) error {
 	before, e := c.compositionNumericBefore()
 	if e != nil {
 		return e

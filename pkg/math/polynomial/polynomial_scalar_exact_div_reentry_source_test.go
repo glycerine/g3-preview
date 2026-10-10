@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Returning error transport is a supported Go callback. The polynomial borrow
@@ -33,12 +34,12 @@ func TestPolynomialScalarExactDivActualTransportGuardsWholeOwner(t *testing.T) {
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	full, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	c := full.core
-	var modulus util.Int
+	var modulus unumeral.Int
 	words := make([]uint32, 2048)
 	for i := range words {
 		words[i] = ^uint32(0)
@@ -54,7 +55,7 @@ func TestPolynomialScalarExactDivActualTransportGuardsWholeOwner(t *testing.T) {
 	serviceMust(t, e)
 	serviceMust(t, rt.SetMaxSize(1))
 	active = true
-	two := util.NewInt(2)
+	two := unumeral.NewInt(2)
 	result, cause := c.ExactDivScalar(c.unit, &two)
 	active = false
 	if calls != 1 || !numericPhysicalReservationRefusal(cause) {
@@ -63,7 +64,7 @@ func TestPolynomialScalarExactDivActualTransportGuardsWholeOwner(t *testing.T) {
 	if rejected != ErrPolynomialPending {
 		t.Error("executing scalar whole owner accepted destruction", rejected)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, nil, []*util.Int{&modulus}, 0, []umemory.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, full, nil, []*unumeral.Int{&modulus}, 0, []umemory.Block{held})
 	old := c.exactDivision.scalarReceipt
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, c.CleanupExactDivision())

@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup(t *testing.T) {
@@ -17,7 +18,7 @@ func TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup(t *testing.
 }
 func polynomialResultantDescriptorRefusal(t *testing.T, replacement bool) {
 	budget := arena.NewBudget(1 << 25)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 12, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 12, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		q.Close()
@@ -40,7 +41,7 @@ func polynomialResultantDescriptorRefusal(t *testing.T, replacement bool) {
 		ms[i], e = c.monomials.MkMonomial(powers[i])
 		serviceMust(t, e)
 	}
-	p, e := c.MkTerms([]util.Int{z.Two64, util.NewInt(1), util.NewInt(1), util.NewInt(2)}, ms)
+	p, e := c.MkTerms([]unumeral.Int{z.Two64, unumeral.NewInt(1), unumeral.NewInt(1), unumeral.NewInt(2)}, ms)
 	serviceMust(t, e)
 	polynomialCaller(t, c, p)
 	b := polynomialQueryTerms(t, c, []int32{1, 3}, [][]MonomialPower{{{0, 1}, {1, 1}}, nil})
@@ -54,8 +55,8 @@ func polynomialResultantDescriptorRefusal(t *testing.T, replacement bool) {
 		t.Fatal("actual bounded descriptor-after-physical prefix not reached", cause, z.PendingCell)
 	}
 	root := z.PendingCell
-	var foreign util.Int
-	var fillers [16]util.Int
+	var foreign unumeral.Int
+	var fillers [16]unumeral.Int
 	var filled int
 	t.Cleanup(func() {
 		for i := 0; i < filled; i++ {
@@ -65,7 +66,7 @@ func polynomialResultantDescriptorRefusal(t *testing.T, replacement bool) {
 	if replacement {
 		serviceMust(t, z.CleanupPendingAllocation())
 		for filled < len(fillers) {
-			foreign = util.NewInt(19)
+			foreign = unumeral.NewInt(19)
 			e = z.Copy(&foreign, &z.Two64)
 			if e != nil {
 				break
@@ -80,7 +81,7 @@ func polynomialResultantDescriptorRefusal(t *testing.T, replacement bool) {
 			t.Fatal("replacement must carry a distinct physical generation")
 		}
 		root = z.PendingCell
-		named := []*util.Int{&foreign}
+		named := []*unumeral.Int{&foreign}
 		for i := 0; i < filled; i++ {
 			named = append(named, &fillers[i])
 		}

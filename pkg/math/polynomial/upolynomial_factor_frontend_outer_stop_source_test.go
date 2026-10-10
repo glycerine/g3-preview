@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -23,7 +24,7 @@ func TestUPolynomialFactorFrontendActualOuterVectorSourceStop(t *testing.T) {
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
 	cfg.Cells.PageSize = 1
-	z, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	z, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: z.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -34,13 +35,13 @@ func TestUPolynomialFactorFrontendActualOuterVectorSourceStop(t *testing.T) {
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
 	var input, later upolyVectorState
-	var b util.Int
+	var b unumeral.Int
 	words := make([]uint32, 17)
 	words[16] = 128
 	serviceMust(t, z.Integers().SetLimbs(&b, words))
-	serviceMust(t, m.set(&input, []util.Int{util.NewInt(1), b, util.NewInt(1)}))
-	serviceMust(t, m.set(&later, []util.Int{util.NewInt(-1), util.NewInt(0), util.NewInt(1)}))
-	roots := []*util.Int{&b}
+	serviceMust(t, m.set(&input, []unumeral.Int{unumeral.NewInt(1), b, unumeral.NewInt(1)}))
+	serviceMust(t, m.set(&later, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(0), unumeral.NewInt(1)}))
+	roots := []*unumeral.Int{&b}
 	for i := range m.values(&input) {
 		roots = append(roots, &m.values(&input)[i])
 	}

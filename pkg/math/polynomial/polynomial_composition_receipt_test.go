@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialCompositionEveryReservation(t *testing.T) {
@@ -26,7 +27,7 @@ func TestPolynomialCompositionEveryReservation(t *testing.T) {
 						serviceMust(t, r.Close())
 					}()
 					var got Polynomial
-					c := util.NewInt(3)
+					c := unumeral.NewInt(3)
 					m.core.integer.Budget().FailAfter(ordinal)
 					switch op {
 					case 0:
@@ -50,7 +51,7 @@ func TestPolynomialCompositionEveryReservation(t *testing.T) {
 					if got != (Polynomial{}) {
 						polys = append(polys, got)
 					}
-					polynomialImpPhysicalAuditNamed(t, m, polys, []*util.Int{&c}, r.header)
+					polynomialImpPhysicalAuditNamed(t, m, polys, []*unumeral.Int{&c}, r.header)
 					if e == nil {
 						if op == 7 {
 							a, x := m.core.coefficientCore(r.root.value, 0)
@@ -72,7 +73,7 @@ func TestPolynomialCompositionEveryReservation(t *testing.T) {
 						serviceMust(t, m.core.IncRef(got))
 						serviceMust(t, m.core.DecRef(got))
 					}
-					polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming}, []*util.Int{&c}, r.header)
+					polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming}, []*unumeral.Int{&c}, r.header)
 				})
 				if success {
 					break
@@ -90,7 +91,7 @@ func TestPolynomialCompositionBigScalarOverloadEveryReservation(t *testing.T) {
 	for ordinal := int64(0); ordinal < 180; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{2, 0, 0}}, {7, [3]uint32{}}})
-			as := [3]util.Int{util.NewInt(5), {}, {}}
+			as := [3]unumeral.Int{unumeral.NewInt(5), {}, {}}
 			digits := make([]uint32, 80)
 			digits[0], digits[79] = 7, 1
 			serviceMust(t, m.core.integer.SetLimbs(&as[1], digits))
@@ -101,7 +102,7 @@ func TestPolynomialCompositionBigScalarOverloadEveryReservation(t *testing.T) {
 			serviceMust(t, m.core.IncRef(big))
 			r, e := NewPolynomialRef(m.core)
 			serviceMust(t, e)
-			holder := util.Int{}
+			holder := unumeral.Int{}
 			serviceMust(t, m.core.integer.SetLimbs(&holder, digits))
 			defer func() {
 				m.core.integer.Budget().FailAfter(-1)
@@ -112,7 +113,7 @@ func TestPolynomialCompositionBigScalarOverloadEveryReservation(t *testing.T) {
 			}()
 			m.core.integer.Budget().FailAfter(ordinal)
 			e = m.Compose(big, m.core.zero, r)
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, big, r.root.value, r.root.incoming}, []*util.Int{&holder}, r.header)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, big, r.root.value, r.root.incoming}, []*unumeral.Int{&holder}, r.header)
 			if e == nil {
 				success = true
 			} else if !numericPhysicalReservationRefusal(e) {
@@ -126,7 +127,7 @@ func TestPolynomialCompositionBigScalarOverloadEveryReservation(t *testing.T) {
 			if m.core.integer.PendingAllocationObject() != (umemory.ObjectRef{}) || m.core.constantScope.active || m.core.pending.value != (Polynomial{}) || m.core.singletonReference {
 				t.Fatal("operation abort lacks actual scalar overload leaf", m.core.integer.PendingAllocationObject(), m.core.constantScope.active)
 			}
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, big, r.root.value, r.root.incoming}, []*util.Int{&holder}, r.header)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, big, r.root.value, r.root.incoming}, []*unumeral.Int{&holder}, r.header)
 			if success {
 				a, e := m.core.coefficientCore(r.root.value, 0)
 				serviceMust(t, e)
@@ -157,7 +158,7 @@ func TestPolynomialCompositionRawZeroCohortAndBorrowedExisting(t *testing.T) {
 				prior, e = m.core.monomials.MkVariable(0, 3)
 				serviceMust(t, e)
 			}
-			as := [4]util.Int{{}, {}, {}, util.NewInt(1)}
+			as := [4]unumeral.Int{{}, {}, {}, unumeral.NewInt(1)}
 			ms := [4]Monomial{}
 			for i, d := range []uint32{5, 2, 1, 0} {
 				var e error
@@ -274,12 +275,12 @@ func TestPolynomialCompositionSameVariableBigCopyEveryReservation(t *testing.T) 
 			m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{1, 0, 0}}})
 			digits := make([]uint32, 80)
 			digits[0], digits[79] = 5, 1
-			as := [2]util.Int{{}, util.NewInt(1)}
+			as := [2]unumeral.Int{{}, unumeral.NewInt(1)}
 			serviceMust(t, m.core.integer.SetLimbs(&as[0], digits))
 			big, e := m.core.MkUnivariateTake(0, 1, as[:])
 			serviceMust(t, e)
 			serviceMust(t, m.core.IncRef(big))
-			holder := util.Int{}
+			holder := unumeral.Int{}
 			serviceMust(t, m.core.integer.SetLimbs(&holder, digits))
 			r, e := NewPolynomialRef(m.core)
 			serviceMust(t, e)
@@ -292,7 +293,7 @@ func TestPolynomialCompositionSameVariableBigCopyEveryReservation(t *testing.T) 
 			}()
 			m.core.integer.Budget().FailAfter(ordinal)
 			e = m.ComposeXMinusY(big, 0, r)
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, big, r.root.value, r.root.incoming}, []*util.Int{&holder}, r.header)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, big, r.root.value, r.root.incoming}, []*unumeral.Int{&holder}, r.header)
 			if e == nil {
 				success = true
 			} else if !numericPhysicalReservationRefusal(e) {
@@ -336,7 +337,7 @@ func TestPolynomialCompositionStoppedAuxiliaryPreservesDegreeScope(t *testing.T)
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		contextTLSFinish(t, rt, q.CloseChecked)
@@ -404,7 +405,7 @@ func TestPolynomialCompositionEarlyRoutesPreserveOlderContext(t *testing.T) {
 	if r.root.value != m.core.unit || m.composition.bodyCause != old || !m.composition.active {
 		t.Fatal("constant early route read/replaced old context")
 	}
-	zero := util.Int{}
+	zero := unumeral.Int{}
 	serviceMust(t, m.ComposeXMinusConstant(p, &zero, r))
 	if r.root.value != p || m.composition.bodyCause != old {
 		t.Fatal("zero-c route changed source context")
@@ -420,7 +421,7 @@ func TestPolynomialCompositionEarlyRoutesPreserveOlderContext(t *testing.T) {
 
 func TestPolynomialCompositionScalarForeignReplacement(t *testing.T) {
 	m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{1, 0, 0}}})
-	a := util.Int{}
+	a := unumeral.Int{}
 	digits := make([]uint32, 80)
 	digits[0], digits[79] = 5, 1
 	serviceMust(t, m.core.integer.SetLimbs(&a, digits))
@@ -434,7 +435,7 @@ func TestPolynomialCompositionScalarForeignReplacement(t *testing.T) {
 	m.core.integer.Budget().FailAfter(0)
 	_, cause := m.core.MkConstantTakeCopy(&a)
 	m.composition.executing = false
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&a}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&a}, 0)
 	if !numericPhysicalReservationRefusal(cause) || !m.core.constantScope.active || m.composition.constantGeneration == 0 {
 		t.Fatal("actual old scalar ctor refusal", cause)
 	}
@@ -443,7 +444,7 @@ func TestPolynomialCompositionScalarForeignReplacement(t *testing.T) {
 	serviceMust(t, m.core.cleanupConstantScope())
 	m.core.integer.Budget().FailAfter(0)
 	_, cause = m.core.MkConstantTakeCopy(&a)
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&a}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&a}, 0)
 	if !numericPhysicalReservationRefusal(cause) || !m.core.constantScope.active || m.core.constantGeneration == old {
 		t.Fatal("real later scalar ctor", cause)
 	}
@@ -454,7 +455,7 @@ func TestPolynomialCompositionScalarForeignReplacement(t *testing.T) {
 	if !testNumericScopeEqual(m.core.constantScope, later) || m.core.constantGeneration != generation {
 		t.Fatal("old receipt swept foreign scalar group")
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&a}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&a}, 0)
 }
 
 func TestPolynomialCompositionPostphysicalCellRawReceipt(t *testing.T) {
@@ -464,7 +465,7 @@ func TestPolynomialCompositionPostphysicalCellRawReceipt(t *testing.T) {
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		serviceMust(t, q.CloseChecked())
@@ -476,7 +477,7 @@ func TestPolynomialCompositionPostphysicalCellRawReceipt(t *testing.T) {
 	m, p, _ := polynomialEvalFixtureWithRationals(t, q, []polynomialEvalTerm{{1, [3]uint32{}}})
 	unit, e := m.core.monomials.Unit()
 	serviceMust(t, e)
-	as := make([]util.Int, 4000)
+	as := make([]unumeral.Int, 4000)
 	ms := make([]Monomial, 4000)
 	for i := range ms {
 		ms[i] = unit
@@ -534,7 +535,7 @@ func polynomialCompositionForeignDeletionCall(h *PolynomialDeletionHandler, c *M
 	if e = polynomialCompositionCallbackState.runtime.SetMaxSize(1); e != nil {
 		return e
 	}
-	as := [4000]util.Int{}
+	as := [4000]unumeral.Int{}
 	_, e = c.MkCoreTake(as[:], polynomialCompositionCallbackState.inputs[:])
 	return e
 }
@@ -545,7 +546,7 @@ func TestPolynomialCompositionDeletionCallbackOwnsForeignContinuation(t *testing
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		serviceMust(t, q.CloseChecked())
@@ -606,7 +607,7 @@ func TestPolynomialCompositionDeletionCallbackOwnsForeignContinuation(t *testing
 
 func TestPolynomialCompositionNumericPendingForeignReplacement(t *testing.T) {
 	b := arena.NewBudget(1 << 25)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		serviceMust(t, q.CloseChecked())
@@ -617,7 +618,7 @@ func TestPolynomialCompositionNumericPendingForeignReplacement(t *testing.T) {
 	m, p, _ := polynomialEvalFixtureWithRationals(t, q, []polynomialEvalTerm{{1, [3]uint32{1, 0, 0}}})
 	r, e := NewPolynomialRef(m.core)
 	serviceMust(t, e)
-	out := util.NewInt(11)
+	out := unumeral.NewInt(11)
 	defer func() {
 		serviceMust(t, m.CleanupComposition())
 		serviceMust(t, q.Integers().CleanupPendingAllocation())
@@ -625,7 +626,7 @@ func TestPolynomialCompositionNumericPendingForeignReplacement(t *testing.T) {
 		serviceMust(t, r.Close())
 	}()
 	cause := m.ComposeXMinusConstant(p, &q.Integers().Two64, r)
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming}, []*util.Int{&out}, r.header)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming}, []*unumeral.Int{&out}, r.header)
 	if !errors.Is(cause, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) || m.composition.numericPending != q.Integers().PendingCell.Object {
 		t.Fatal("actual raw coefficient Copy pending receipt", cause, q.Integers().PendingCell)
 	}
@@ -636,12 +637,12 @@ func TestPolynomialCompositionNumericPendingForeignReplacement(t *testing.T) {
 		t.Fatal("real later allocation generation", cause, q.Integers().PendingCell)
 	}
 	later := q.Integers().PendingCell
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming}, []*util.Int{&out}, r.header)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming}, []*unumeral.Int{&out}, r.header)
 	serviceMust(t, m.CleanupComposition())
 	if q.Integers().PendingCell != later {
 		t.Fatal("old ObjectRef receipt swept later full backing")
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming}, []*util.Int{&out}, r.header)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, r.root.value, r.root.incoming}, []*unumeral.Int{&out}, r.header)
 }
 
 func TestPolynomialCompositionUnsignedDegreeConstructorStop(t *testing.T) {
@@ -649,7 +650,7 @@ func TestPolynomialCompositionUnsignedDegreeConstructorStop(t *testing.T) {
 	term, e := m.core.monomials.MkVariable(0, ^uint32(0))
 	serviceMust(t, e)
 	serviceMust(t, m.core.monomials.IncRef(term))
-	large, e := m.core.MkCoreTake([]util.Int{util.NewInt(1)}, []Monomial{term})
+	large, e := m.core.MkCoreTake([]unumeral.Int{unumeral.NewInt(1)}, []Monomial{term})
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(large))
 	r, e := NewPolynomialRef(m.core)
@@ -691,12 +692,12 @@ func TestPolynomialCompositionStoppedConstantPrecedesOuterLocals(t *testing.T) {
 			s.degreeInput = p
 			s.degreeCompleted = true
 			s.aCompleted = true
-			s.a = util.NewInt(7)
+			s.a = unumeral.NewInt(7)
 			serviceMust(t, m.core.beginConstantScope())
 			defer func() { serviceMust(t, m.CleanupComposition()) }()
 			c := &m.core.constantScope
 			z := m.core.integer
-			large := util.Int{}
+			large := unumeral.Int{}
 			limbs := make([]uint32, 80)
 			for i := range limbs {
 				limbs[i] = 1
@@ -707,7 +708,7 @@ func TestPolynomialCompositionStoppedConstantPrecedesOuterLocals(t *testing.T) {
 			if rational {
 				c.rationalCompleted = true
 				target = &(*c.rational.BorrowNumerator())
-				(*c.rational.BorrowDenominator()) = util.NewInt(13)
+				(*c.rational.BorrowDenominator()) = unumeral.NewInt(13)
 			} else {
 				c.numeralCompleted = true
 			}
@@ -717,13 +718,13 @@ func TestPolynomialCompositionStoppedConstantPrecedesOuterLocals(t *testing.T) {
 			if !numericPhysicalReservationRefusal(body) || (target).Cell != z.FailedRef {
 				t.Fatal("actual destructive Copy prefix", body, (target).Cell)
 			}
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&large}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&large}, 0)
 			z.Budget().FailAfter(-1)
 			first := m.core.finishConstantScope(body)
 			if !errors.Is(first, arena.ErrInvalidSlot) {
 				t.Fatal("source dangling guard", first)
 			}
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&large}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&large}, 0)
 			firstSource := c.sourceCause
 			if c.cause != body {
 				t.Fatal("original Copy body cause overwritten")
@@ -746,7 +747,7 @@ func TestPolynomialCompositionStoppedConstantPrecedesOuterLocals(t *testing.T) {
 			if s.bodyCause != outerBody || s.sourceCause != outerSource || c.cause != body || c.sourceCause != firstSource {
 				t.Fatal("owning cleanup erased source history")
 			}
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&large}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&large}, 0)
 		})
 	}
 }
@@ -759,7 +760,7 @@ func TestPolynomialCompositionStoppedConstantPhysicalReleasePrecedesOuter(t *tes
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		contextTLSFinish(t, rt, q.CloseChecked)
@@ -788,7 +789,7 @@ func TestPolynomialCompositionStoppedConstantPhysicalReleasePrecedesOuter(t *tes
 	s.degreeInput = p
 	s.degreeCompleted = true
 	s.aCompleted = true
-	s.a = util.NewInt(7)
+	s.a = unumeral.NewInt(7)
 	serviceMust(t, m.core.beginConstantScope())
 	c := &m.core.constantScope
 	c.numeralCompleted = true
@@ -831,7 +832,7 @@ func TestPolynomialCompositionForeignStoppedConstantDoesNotPoisonOuter(t *testin
 	z := m.core.integer
 	serviceMust(t, m.core.beginConstantScope()) // No executing composition receives this invocation.
 	c.numeralCompleted = true
-	large := util.Int{}
+	large := unumeral.Int{}
 	limbs := make([]uint32, 80)
 	for i := range limbs {
 		limbs[i] = 1
@@ -844,7 +845,7 @@ func TestPolynomialCompositionForeignStoppedConstantDoesNotPoisonOuter(t *testin
 	if !numericPhysicalReservationRefusal(body) || (c.numeral).Cell != z.FailedRef {
 		t.Fatal("actual foreign destructive prefix", body)
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&large}, 0)
 	z.Budget().FailAfter(-1)
 	if e := m.core.finishConstantScope(body); !errors.Is(e, arena.ErrInvalidSlot) {
 		t.Fatal("foreign source stop", e)
@@ -852,7 +853,7 @@ func TestPolynomialCompositionForeignStoppedConstantDoesNotPoisonOuter(t *testin
 	defer func() { serviceMust(t, m.core.cleanupConstantScope()) }()
 	serviceMust(t, m.beginComposition())
 	s := &m.composition
-	s.a = util.NewInt(7)
+	s.a = unumeral.NewInt(7)
 	s.aCompleted = true
 	serviceMust(t, m.finishComposition(nil))
 	if s.stopped || s.aCompleted || !c.stopped || !c.active || c.cause != body {
@@ -862,7 +863,7 @@ func TestPolynomialCompositionForeignStoppedConstantDoesNotPoisonOuter(t *testin
 	if !c.active || !c.numeralCompleted {
 		t.Fatal("outer owning cleanup touched foreign callee")
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&large}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*unumeral.Int{&large}, 0)
 }
 
 // Actual returned-placement and public TLS leaf stop; helper-domain proof.
@@ -873,7 +874,7 @@ func TestPolynomialCompositionStoppedConstantResultHasSingleOwningCleanup(t *tes
 	cfg := serviceConfig(budget).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		contextTLSFinish(t, rt, q.CloseChecked)
@@ -902,13 +903,13 @@ func TestPolynomialCompositionStoppedConstantResultHasSingleOwningCleanup(t *tes
 	s.degreeInput = p
 	s.degreeCompleted = true
 	s.aCompleted = true
-	s.a = util.NewInt(7)
+	s.a = unumeral.NewInt(7)
 	serviceMust(t, m.core.beginConstantScope())
 	c := &m.core.constantScope
 	c.rationalCompleted = true
 	serviceMust(t, q.Integers().SetLimbs(&(*c.rational.BorrowNumerator()), []uint32{1, 1}))
 	serviceMust(t, q.Integers().EnsureOwnedCapacity(&(*c.rational.BorrowNumerator()), 40000))
-	value := util.NewInt(3)
+	value := unumeral.NewInt(3)
 	result, e := m.core.MkConstantTake(&value)
 	serviceMust(t, e)
 	c.result = result // Exact constantFromRationalScope returned-result assignment.

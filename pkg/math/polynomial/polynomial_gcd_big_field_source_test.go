@@ -3,10 +3,9 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math/big"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix(t *testing.T) {
@@ -17,12 +16,12 @@ func TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix(t *testing.T) {
 			full := polynomialPSCFullFixture(t)
 			c := full.core
 			z := c.integer
-			var prime util.Int
+			var prime unumeral.Int
 			pv := new(big.Int).Lsh(big.NewInt(1), 127)
 			pv.Sub(pv, big.NewInt(1))
 			serviceMust(t, z.SetString(&prime, pv.String()))
 			t.Cleanup(func() { serviceMust(t, z.Del(&prime)) })
-			as := []util.Int{{}, util.NewInt(1), util.NewInt(1)}
+			as := []unumeral.Int{{}, unumeral.NewInt(1), unumeral.NewInt(1)}
 			serviceMust(t, z.SetLimbs(&as[0], []uint32{19, 0, 1}))
 			t.Cleanup(func() { serviceMust(t, z.Del(&as[0])) })
 			powers := [][]MonomialPower{{{0, 1}}, {{1, 1}}, nil}
@@ -61,7 +60,7 @@ func TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix(t *testing.T) {
 			})
 			z.Budget().FailAfter(ordinal)
 			cause := full.modGCDRec(p, q, 11, 0, vars, &r.root)
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{common, a, b, p, q, r.root.value}, []*util.Int{&prime, &as[0]}, r.header)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{common, a, b, p, q, r.root.value}, []*unumeral.Int{&prime, &as[0]}, r.header)
 			z.Budget().FailAfter(-1)
 			if cause != nil {
 				if !numericPhysicalReservationRefusal(cause) {
@@ -69,7 +68,7 @@ func TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix(t *testing.T) {
 				}
 				failures++
 				serviceMust(t, full.CleanupGCD())
-				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{common, a, b, p, q, r.root.value}, []*util.Int{&prime, &as[0]}, r.header)
+				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{common, a, b, p, q, r.root.value}, []*unumeral.Int{&prime, &as[0]}, r.header)
 				return
 			}
 			success = true

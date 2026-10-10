@@ -9,10 +9,11 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func sxPolyOwner(t *testing.T) (*SexprPolynomialConverter, *util.SexprManager, *usymbol.Manager, *util.RationalService, *UPolynomialManager, UPolynomial) {
+func sxPolyOwner(t *testing.T) (*SexprPolynomialConverter, *util.SexprManager, *usymbol.Manager, *unumeral.RationalService, *UPolynomialManager, UPolynomial) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	sx, sy, q := sxOwner(t, b)
@@ -41,7 +42,7 @@ func sxPolySym(t *testing.T, sx *util.SexprManager, sy *usymbol.Manager, name st
 	sxMust(t, e)
 	return h
 }
-func sxPolyNum(t *testing.T, sx *util.SexprManager, q *util.RationalService, text string) util.SexprHandle {
+func sxPolyNum(t *testing.T, sx *util.SexprManager, q *unumeral.RationalService, text string) util.SexprHandle {
 	t.Helper()
 	v := sxNumber(t, q, text)
 	h, e := sx.MkNumeral(&v, 23, 29)
@@ -64,7 +65,7 @@ func sxPolyCoefficients(t *testing.T, m *UPolynomialManager, p UPolynomial, want
 		t.Fatal(n, want)
 	}
 	for i, w := range want {
-		var a util.Int
+		var a unumeral.Int
 		sxMust(t, m.ReadCoefficient(p, uint32(i), &a))
 		got, e := m.IntegerManager().Int32(&a)
 		sxMust(t, e)
@@ -117,7 +118,7 @@ func TestSexprPolynomialErrorsAndCompletedPrefix(t *testing.T) {
 		{sxPolyApp(t, sx, sy, "^", x, sxPolyNum(t, sx, q, "4294967296")), "invalid univariate polynomial, exponent must be an unsigned integer", 23, 29},
 	}
 	for _, a := range cases {
-		sxMust(t, p.SetInts(out, []util.Int{util.NewInt(41)}))
+		sxMust(t, p.SetInts(out, []unumeral.Int{unumeral.NewInt(41)}))
 		err := c.Convert(a.h, out)
 		var e *SexprPolynomialError
 		if !errors.As(err, &e) || e.Message != a.message || e.Line != a.line || e.Pos != a.pos {
@@ -126,7 +127,7 @@ func TestSexprPolynomialErrorsAndCompletedPrefix(t *testing.T) {
 	}
 	// First argument publishes before invalid exponent or later invalid argument.
 	sxPolyCoefficients(t, p, out, []int32{0, 1})
-	sxMust(t, p.SetInts(out, []util.Int{util.NewInt(41)}))
+	sxMust(t, p.SetInts(out, []unumeral.Int{unumeral.NewInt(41)}))
 	e := c.Convert(sxPolyApp(t, sx, sy, "+", x, sxPolySym(t, sx, sy, "y")), out)
 	if e == nil {
 		t.Fatal("accepted y")
@@ -160,7 +161,7 @@ func TestSexprPolynomialActualFaultPrefixes(t *testing.T) {
 			e := c.Convert(expr, out)
 			// Explicit source owners name node constants, service scopes/private locals,
 			// caller output and all converter scoped vectors BEFORE fault disabling.
-			upolyHenselAuditPhysical(t, []*UPolynomialManager{p}, nil, upolyPhysicalExtraOwners{RationalServices: []*util.RationalService{q}, SexprManagers: []*util.SexprManager{sx}})
+			upolyHenselAuditPhysical(t, []*UPolynomialManager{p}, nil, upolyPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, SexprManagers: []*util.SexprManager{sx}})
 			if e != nil {
 				if !upolyHenselAllocationRefusal(p.IntegerManager(), e) {
 					t.Fatal(e)

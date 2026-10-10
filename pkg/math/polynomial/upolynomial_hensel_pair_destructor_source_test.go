@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Actual Copy destroys the old cell before its refused replacement. This is
@@ -18,8 +18,8 @@ func TestUPolynomialHenselReachedVectorSourceStopPreservesBacking(t *testing.T) 
 	c, e := s.newSquareFreeScope()
 	serviceMust(t, e)
 	c.constructed = 1
-	serviceMust(t, m.set(&c.fpp, []util.Int{q.Integers().Two64}))
-	var large util.Int
+	serviceMust(t, m.set(&c.fpp, []unumeral.Int{q.Integers().Two64}))
+	var large unumeral.Int
 	words := make([]uint32, 80)
 	words[79] = 1
 	serviceMust(t, q.Integers().SetLimbs(&large, words))

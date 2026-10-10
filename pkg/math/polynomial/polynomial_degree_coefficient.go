@@ -2,8 +2,8 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *MultivariatePolynomialCore) IsZero(p Polynomial) (bool, error) {
@@ -251,10 +251,10 @@ func (m *MultivariatePolynomialCore) LeadingCoefficient(p Polynomial, x uint32) 
 	}
 	return m.Coeff(p, x, d)
 }
-func (m *MultivariatePolynomialCore) ConstantCoefficient(p Polynomial, x, k uint32, c *util.Int) (bool, error) {
+func (m *MultivariatePolynomialCore) ConstantCoefficient(p Polynomial, x, k uint32, c *unumeral.Int) (bool, error) {
 	return m.constantCoefficientWithReceipt(p, x, k, c, nil)
 }
-func (m *MultivariatePolynomialCore) constantCoefficientWithReceipt(p Polynomial, x, k uint32, c *util.Int, receipt *polynomialConstantCoefficientInvocationReceipt) (bool, error) {
+func (m *MultivariatePolynomialCore) constantCoefficientWithReceipt(p Polynomial, x, k uint32, c *unumeral.Int, receipt *polynomialConstantCoefficientInvocationReceipt) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
@@ -310,11 +310,11 @@ func (m *MultivariatePolynomialCore) constantCoefficientWithReceipt(p Polynomial
 			if e != nil {
 				return false, e
 			}
-			var child *util.IntegerCopyAllocationReceipt
+			var child *unumeral.IntegerCopyAllocationReceipt
 			if frame != nil {
 				child = &frame.copy
 			}
-			var normalized *util.IntegerNormalizeInvocationReceipt
+			var normalized *unumeral.IntegerNormalizeInvocationReceipt
 			if frame != nil {
 				normalized = &frame.normalize
 			}
@@ -439,35 +439,35 @@ func (m *MultivariatePolynomialCore) TotalDegree(p Polynomial) (uint32, error) {
 }
 
 // UnivariateCoefficient returns the borrowed scalar numeral, not an owning copy.
-func (m *MultivariatePolynomialCore) UnivariateCoefficient(p Polynomial, k uint32) (util.Int, error) {
+func (m *MultivariatePolynomialCore) UnivariateCoefficient(p Polynomial, k uint32) (unumeral.Int, error) {
 	if e := m.check(); e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	if polynomialSourceDebug {
 		univariate, e := m.IsUnivariate(p)
 		if e != nil {
-			return util.Int{}, e
+			return unumeral.Int{}, e
 		}
 		if !univariate {
-			return util.Int{}, ErrPolynomialAssertion
+			return unumeral.Int{}, ErrPolynomialAssertion
 		}
 	}
 	n, e := m.readWord(p, 8)
 	if e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	for i := uint32(0); i < n; i++ {
 		term, e := m.monomialCore(p, i)
 		if e != nil {
-			return util.Int{}, e
+			return unumeral.Int{}, e
 		}
 		d, e := m.monomials.degreeCore(term)
 		if e != nil {
-			return util.Int{}, e
+			return unumeral.Int{}, e
 		}
 		if d == k {
 			return m.coefficientCore(p, i)
 		}
 	}
-	return util.Int{}, nil
+	return unumeral.Int{}, nil
 }

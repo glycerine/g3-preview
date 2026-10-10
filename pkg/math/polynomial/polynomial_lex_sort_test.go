@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func polynomialLexFixture(t *testing.T) (*MultivariatePolynomialManager, Polynomial, []Monomial) {
@@ -24,7 +24,7 @@ func polynomialLexFixture(t *testing.T) (*MultivariatePolynomialManager, Polynom
 		ms[i], e = m.core.monomials.MkMonomial(powers[i])
 		serviceMust(t, e)
 	}
-	p, e := m.core.MkTerms([]util.Int{util.NewInt(11), util.NewInt(13), util.NewInt(17), util.NewInt(19), util.NewInt(23)}, ms)
+	p, e := m.core.MkTerms([]unumeral.Int{unumeral.NewInt(11), unumeral.NewInt(13), unumeral.NewInt(17), unumeral.NewInt(19), unumeral.NewInt(23)}, ms)
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(p))
 	t.Cleanup(func() {
@@ -70,7 +70,7 @@ func TestPolynomialLexSortIndependentRecursiveOrder(t *testing.T) {
 // Copy records a defined source-null pointer, although public Go reads reject it.
 func TestPolynomialLexSortFreshNullCoefficientRawPermutation(t *testing.T) {
 	m, p, ms := polynomialLexFixture(t)
-	primer, e := m.core.MkTerms([]util.Int{util.NewInt(11), util.NewInt(13), util.NewInt(17), util.NewInt(19), util.NewInt(23)}, ms)
+	primer, e := m.core.MkTerms([]unumeral.Int{unumeral.NewInt(11), unumeral.NewInt(13), unumeral.NewInt(17), unumeral.NewInt(19), unumeral.NewInt(23)}, ms)
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(primer))
 	serviceMust(t, m.LexSort(primer))
@@ -119,11 +119,11 @@ func polynomialLexNestedFixture(t *testing.T) (*MultivariatePolynomialManager, P
 	powers := [][]MonomialPower{{{0, 17}, {2, 1}}, {{0, 3}, {2, 1}}, {{1, 2}}, {{0, 2}, {1, 2}}, {{2, 2}}, nil}
 	ms := make([]Monomial, len(powers))
 	values := []int32{2, 3, 5, 7, 11, 13}
-	as := make([]util.Int, len(values))
+	as := make([]unumeral.Int, len(values))
 	for i := range ms {
 		ms[i], e = m.core.monomials.MkMonomial(powers[i])
 		serviceMust(t, e)
-		as[i] = util.NewInt(values[i])
+		as[i] = unumeral.NewInt(values[i])
 	}
 	p, e := m.core.MkTerms(as, ms)
 	serviceMust(t, e)
@@ -140,7 +140,7 @@ func TestPolynomialLexSortNestedGrowthIndependentFiniteModel(t *testing.T) {
 		serviceMust(t, e)
 		a, e := m.core.coefficientCore(p, uint32(i))
 		serviceMust(t, e)
-		if term != ms[index] || a != util.NewInt(values[index]) {
+		if term != ms[index] || a != unumeral.NewInt(values[index]) {
 			t.Fatal("nested independent order", i, term, a)
 		}
 	}
@@ -186,7 +186,7 @@ func TestPolynomialLexSortWrappedDegreeReachedBucket(t *testing.T) {
 	serviceMust(t, e)
 	y, e := m.core.monomials.MkMonomial([]MonomialPower{{1, 1}})
 	serviceMust(t, e)
-	p, e := m.core.MkTerms([]util.Int{util.NewInt(7), util.NewInt(11)}, []Monomial{x, y})
+	p, e := m.core.MkTerms([]unumeral.Int{unumeral.NewInt(7), unumeral.NewInt(11)}, []Monomial{x, y})
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(p))
 	defer func() { serviceMust(t, m.core.DecRef(p)); serviceMust(t, m.CloseChecked()) }()
@@ -214,7 +214,7 @@ func TestPolynomialLexSortWrappedDegreeReachedBucket(t *testing.T) {
 
 func TestPolynomialLexSortActualBigCoefficientOwnership(t *testing.T) {
 	m, _, ms := polynomialLexFixture(t)
-	as := make([]util.Int, 5)
+	as := make([]unumeral.Int, 5)
 	for i := range as {
 		serviceMust(t, m.core.integer.SetUint64(&as[i], uint64(1)<<40+uint64(i)))
 	}
@@ -225,7 +225,7 @@ func TestPolynomialLexSortActualBigCoefficientOwnership(t *testing.T) {
 		serviceMust(t, m.core.integer.Del(&as[i]))
 	}
 	defer func() { serviceMust(t, m.core.DecRef(p)) }()
-	refs := make([]util.Int, 5)
+	refs := make([]unumeral.Int, 5)
 	for i := uint32(0); i < 5; i++ {
 		term, e := m.core.monomialCore(p, i)
 		serviceMust(t, e)
@@ -260,9 +260,9 @@ func TestPolynomialLexSortNativeScratchGrowthAndReuse(t *testing.T) {
 	for pass := 0; pass < 2; pass++ {
 		p := original
 		if pass != 0 {
-			as := make([]util.Int, len(values))
+			as := make([]unumeral.Int, len(values))
 			for i, v := range values {
-				as[i] = util.NewInt(v)
+				as[i] = unumeral.NewInt(v)
 			}
 			var e error
 			p, e = m.core.MkTerms(as, ms)
@@ -282,7 +282,7 @@ func TestPolynomialLexSortNativeScratchGrowthAndReuse(t *testing.T) {
 			serviceMust(t, e)
 			a, e := m.core.coefficientCore(p, uint32(i))
 			serviceMust(t, e)
-			if term != ms[index] || a != util.NewInt(values[index]) {
+			if term != ms[index] || a != unumeral.NewInt(values[index]) {
 				t.Fatal("native lex growth/reuse changed term pair", pass, i)
 			}
 		}
@@ -303,7 +303,7 @@ func polynomialLexWrappedPolynomial(t *testing.T, m *MultivariatePolynomialManag
 	serviceMust(t, e)
 	y, e := m.core.monomials.MkMonomial([]MonomialPower{{1, 1}})
 	serviceMust(t, e)
-	p, e := m.core.MkTerms([]util.Int{util.NewInt(7), util.NewInt(11)}, []Monomial{x, y})
+	p, e := m.core.MkTerms([]unumeral.Int{unumeral.NewInt(7), unumeral.NewInt(11)}, []Monomial{x, y})
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(p))
 	t.Cleanup(func() { serviceMust(t, m.core.DecRef(p)) })
@@ -340,7 +340,7 @@ func TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse(t *testing.T) {
 func TestPolynomialLexSortNativeLargeBucketsIndependentGrid(t *testing.T) {
 	m, _, _, _ := polynomialLexNestedFixture(t)
 	ms := make([]Monomial, 0, 405)
-	as := make([]util.Int, 0, 405)
+	as := make([]unumeral.Int, 0, 405)
 	for z := uint32(0); z < 3; z++ {
 		for y := uint32(0); y < 5; y++ {
 			for x := uint32(0); x < 27; x++ {
@@ -353,7 +353,7 @@ func TestPolynomialLexSortNativeLargeBucketsIndependentGrid(t *testing.T) {
 				term, e := m.core.monomials.MkMonomial(powers)
 				serviceMust(t, e)
 				ms = append(ms, term)
-				as = append(as, util.NewInt(int32(len(ms))))
+				as = append(as, unumeral.NewInt(int32(len(ms))))
 			}
 		}
 	}

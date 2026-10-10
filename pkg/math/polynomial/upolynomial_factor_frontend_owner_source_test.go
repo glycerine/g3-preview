@@ -6,13 +6,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestUPolynomialFactorFrontendReachedGCDOwnerTransport(t *testing.T) {
 	b := arena.NewBudget(1 << 26)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: serviceConfig(b).Integers})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: serviceConfig(b).Integers})
 	serviceMust(t, e)
 	var s *UPolynomialFactorizationService
 	reached := false
@@ -48,7 +49,7 @@ func TestUPolynomialFactorFrontendReachedGCDOwnerTransport(t *testing.T) {
 	out, e := m.NewFactors()
 	serviceMust(t, e)
 	var input upolyVectorState
-	serviceMust(t, m.set(&input, []util.Int{util.NewInt(1), util.NewInt(1), util.NewInt(0), util.NewInt(1)}))
+	serviceMust(t, m.set(&input, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1), unumeral.NewInt(0), unumeral.NewInt(1)}))
 	defer func() {
 		b.FailAfter(-1)
 		if !s.closed {

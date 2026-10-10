@@ -1,12 +1,14 @@
 // Source: src/ast/arith_decl_plugin.cpp:632-639.
 package ast
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	// ArithmeticNumeralValueWithInvocation follows the caller's arith_util family
+	// identity, copies the stored value first, then reads the integer/real flag.
+	// Nonmatches leave both outputs and the invocation unread.
+)
 
-// ArithmeticNumeralValueWithInvocation follows the caller's arith_util family
-// identity, copies the stored value first, then reads the integer/real flag.
-// Nonmatches leave both outputs and the invocation unread.
-func (m *ASTManager) ArithmeticNumeralValueWithInvocation(family FamilyID, h ASTHandle, out *util.OwnedRational, integer *bool, c *util.RationalServiceInvocation) (bool, error) {
+func (m *ASTManager) ArithmeticNumeralValueWithInvocation(family FamilyID, h ASTHandle, out *unumeral.OwnedRational, integer *bool, c *unumeral.RationalServiceInvocation) (bool, error) {
 	if e := m.lock(); e != nil {
 		return false, e
 	}

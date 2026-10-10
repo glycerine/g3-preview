@@ -6,14 +6,14 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (a *polynomialSubstitutionArray) Contains(x uint32) (bool, error) {
 	p, e := a.positions.Position(x)
 	return p != ^uint32(0), e
 }
-func (a *polynomialSubstitutionArray) Rational(x uint32) (*util.Rational, error) {
+func (a *polynomialSubstitutionArray) Rational(x uint32) (*unumeral.Rational, error) {
 	p, e := a.positions.Position(x)
 	if e != nil {
 		return nil, e
@@ -161,7 +161,7 @@ func (m *MultivariatePolynomialCore) substitutionCleanup(owning bool) error {
 				if owning {
 					e = m.integer.Del(&s.tmp)
 				} else {
-					e = util.SourceIntegerDel(m.integer, &s.tmp)
+					e = unumeral.SourceIntegerDel(m.integer, &s.tmp)
 				}
 				if e != nil {
 					return e
@@ -175,7 +175,7 @@ func (m *MultivariatePolynomialCore) substitutionCleanup(owning bool) error {
 				if owning {
 					e = m.integer.Del(&s.newA)
 				} else {
-					e = util.SourceIntegerDel(m.integer, &s.newA)
+					e = unumeral.SourceIntegerDel(m.integer, &s.newA)
 				}
 				if e != nil {
 					return e
@@ -300,7 +300,7 @@ func (m *MultivariatePolynomialCore) generatedSubstitutionMonomial() (Monomial, 
 	}
 	return a, e
 }
-func (m *MultivariatePolynomialCore) addSubstitutionTerm(a *util.Int, term Monomial) error {
+func (m *MultivariatePolynomialCore) addSubstitutionTerm(a *unumeral.Int, term Monomial) error {
 	consumed := false
 	e := m.som.addConsumed(a, term, false, &consumed)
 	if consumed && m.generatedActive && m.generatedMonomial == term {
@@ -329,7 +329,7 @@ func (m *MultivariatePolynomialCore) addSubstitutionTerm(a *util.Int, term Monom
 
 // Source integer-array and single-value overloads. Raw arrays remain borrowed;
 // there is no copied-value staging or global component preflight.
-func (m *MultivariatePolynomialCore) SubstituteInteger(p Polynomial, x uint32, v *util.Int) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) SubstituteInteger(p Polynomial, x uint32, v *unumeral.Int) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -339,10 +339,10 @@ func (m *MultivariatePolynomialCore) SubstituteInteger(p Polynomial, x uint32, v
 	// The scalar overload is the same engine with one actual source pointer.
 	return m.substituteIntegers(p, 1, PolynomialVariablesView{}, nil, &x, v)
 }
-func (m *MultivariatePolynomialCore) SubstituteIntegers(p Polynomial, n uint32, xs PolynomialVariablesView, values []util.Int) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) SubstituteIntegers(p Polynomial, n uint32, xs PolynomialVariablesView, values []unumeral.Int) (Polynomial, error) {
 	return m.substituteIntegers(p, n, xs, values, nil, nil)
 }
-func (m *MultivariatePolynomialCore) substituteIntegers(p Polynomial, n uint32, xs PolynomialVariablesView, values []util.Int, oneX *uint32, oneValue *util.Int) (result Polynomial, err error) {
+func (m *MultivariatePolynomialCore) substituteIntegers(p Polynomial, n uint32, xs PolynomialVariablesView, values []unumeral.Int, oneX *uint32, oneValue *unumeral.Int) (result Polynomial, err error) {
 	if e := m.beginSubstitution(1); e != nil {
 		return Polynomial{}, e
 	}
@@ -416,7 +416,7 @@ func (m *MultivariatePolynomialCore) substituteIntegers(p Polynomial, n uint32, 
 				return Polynomial{}, e
 			}
 			if pos != ^uint32(0) {
-				var v *util.Int
+				var v *unumeral.Int
 				if oneX != nil {
 					if pos != 0 {
 						return Polynomial{}, arena.ErrBounds
@@ -517,7 +517,7 @@ func (m *MultivariatePolynomialCore) closeSubstitutionMembers() error {
 
 // The array wrapper constructs scoped_var_pos before entering the same real
 // rational-map algorithm. No rational snapshots or numeric prevalidation.
-func (m *MultivariatePolynomialCore) SubstituteRationals(p Polynomial, n uint32, xs PolynomialVariablesView, values []util.Rational) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) SubstituteRationals(p Polynomial, n uint32, xs PolynomialVariablesView, values []unumeral.Rational) (Polynomial, error) {
 	if e := m.beginSubstitution(2); e != nil {
 		return Polynomial{}, e
 	}

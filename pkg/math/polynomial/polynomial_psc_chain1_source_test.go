@@ -3,9 +3,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // This dormant alternative retains degree-indexed zeros and gains no active
@@ -39,7 +38,7 @@ func TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout(t *testing.T) {
 	serviceMust(t, e)
 	v, e := c.Coefficient(got, 0)
 	serviceMust(t, e)
-	if !constant || v != util.NewInt(2) {
+	if !constant || v != unumeral.NewInt(2) {
 		t.Fatal("independent p(-1)", constant, v)
 	}
 }

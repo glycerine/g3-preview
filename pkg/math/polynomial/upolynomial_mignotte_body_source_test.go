@@ -6,20 +6,21 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
-func mignotteDirectFixture(t *testing.T) (*util.RationalManager, *UPolynomialFactorizationService) {
+func mignotteDirectFixture(t *testing.T) (*unumeral.RationalManager, *UPolynomialFactorizationService) {
 	return henselDirectFixtureWithCheckpoint(t, func() bool { return true })
 }
-func henselDirectFixtureWithCheckpoint(t *testing.T, checkpoint func() bool) (*util.RationalManager, *UPolynomialFactorizationService) {
+func henselDirectFixtureWithCheckpoint(t *testing.T, checkpoint func() bool) (*unumeral.RationalManager, *UPolynomialFactorizationService) {
 	return henselDirectFixtureWithConfig(t, checkpoint, false)
 }
-func henselDirectFixtureWithConfig(t *testing.T, checkpoint func() bool, debugTag bool) (*util.RationalManager, *UPolynomialFactorizationService) {
+func henselDirectFixtureWithConfig(t *testing.T, checkpoint func() bool, debugTag bool) (*unumeral.RationalManager, *UPolynomialFactorizationService) {
 	t.Helper()
 	b := arena.NewBudget(1 << 26)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: serviceConfig(b).Integers})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: serviceConfig(b).Integers})
 	serviceMust(t, e)
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: checkpoint, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -40,16 +41,16 @@ func henselDirectFixtureWithConfig(t *testing.T, checkpoint func() bool, debugTa
 }
 func TestUPolynomialMignotteLiteralIndependentExponent(t *testing.T) {
 	for _, tc := range []struct {
-		a     []util.Int
+		a     []unumeral.Int
 		prime int32
 		want  uint32
-	}{{[]util.Int{util.NewInt(4), util.NewInt(0), util.NewInt(3)}, 2, 8}, {[]util.Int{util.NewInt(-2), util.NewInt(0), util.NewInt(1)}, 2, 4}, {[]util.Int{util.NewInt(-2), util.NewInt(0), util.NewInt(1)}, 3, 2}, {[]util.Int{util.NewInt(1), util.NewInt(0), util.NewInt(0), util.NewInt(0), util.NewInt(1)}, 2, 4}} {
+	}{{[]unumeral.Int{unumeral.NewInt(4), unumeral.NewInt(0), unumeral.NewInt(3)}, 2, 8}, {[]unumeral.Int{unumeral.NewInt(-2), unumeral.NewInt(0), unumeral.NewInt(1)}, 2, 4}, {[]unumeral.Int{unumeral.NewInt(-2), unumeral.NewInt(0), unumeral.NewInt(1)}, 3, 2}, {[]unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(0), unumeral.NewInt(0), unumeral.NewInt(0), unumeral.NewInt(1)}, 2, 4}} {
 		q, s := mignotteDirectFixture(t)
 		c, e := s.newSquareFreeScope()
 		serviceMust(t, e)
 		c.constructed = 1
 		serviceMust(t, s.manager.set(&c.fpp, tc.a))
-		prime := util.NewInt(tc.prime)
+		prime := unumeral.NewInt(tc.prime)
 		got, e := s.mignotteBound(s.manager.stateView(&c.fpp), &prime)
 		serviceMust(t, e)
 		if got != tc.want || c.mignotte.active || c.mignotte.sourceRemaining != 0 || (c.mignotte.norm).Cell != 0 || (c.mignotte.bound).Cell != 0 || (c.mignotte.tmp).Cell != 0 {
@@ -64,14 +65,14 @@ func TestUPolynomialMignotteBIGEveryActualSourcePrefix(t *testing.T) {
 	for ordinal := int64(0); ordinal < 2048 && !success; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			q, s := mignotteDirectFixture(t)
-			var big util.Int
+			var big unumeral.Int
 			serviceMust(t, q.Integers().SetLimbs(&big, []uint32{1, 0, 1}))
 			t.Cleanup(func() { serviceMust(t, q.Integers().Del(&big)) })
 			c, e := s.newSquareFreeScope()
 			serviceMust(t, e)
 			c.constructed = 1
-			serviceMust(t, s.manager.set(&c.fpp, []util.Int{util.NewInt(1), util.NewInt(0), big}))
-			prime := util.NewInt(3)
+			serviceMust(t, s.manager.set(&c.fpp, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(0), big}))
+			prime := unumeral.NewInt(3)
 			q.Budget().FailAfter(ordinal)
 			got, body := s.mignotteBound(s.manager.stateView(&c.fpp), &prime)
 			mignotteScopePhysicalAudit(t, q, s, &big, &prime)
@@ -106,12 +107,12 @@ func TestUPolynomialMignotteSourceDegreeAssertionBeforeNUM(t *testing.T) {
 	c, e := s.newSquareFreeScope()
 	serviceMust(t, e)
 	c.constructed = 1
-	coefficients := []util.Int{util.NewInt(1), util.NewInt(0), util.NewInt(1)}
+	coefficients := []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(0), unumeral.NewInt(1)}
 	if polynomialSourceDebug {
-		coefficients = []util.Int{util.NewInt(1), util.NewInt(1)}
+		coefficients = []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}
 	}
 	serviceMust(t, s.manager.set(&c.fpp, coefficients))
-	prime := util.NewInt(2)
+	prime := unumeral.NewInt(2)
 	before := q.Budget().Used()
 	_, e = s.mignotteBound(s.manager.stateView(&c.fpp), &prime)
 	if polynomialSourceDebug {

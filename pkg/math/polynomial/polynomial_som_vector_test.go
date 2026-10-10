@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialSOMVectorDefaultOwnerAndSourceMembers(t *testing.T) {
@@ -26,9 +26,9 @@ func TestPolynomialSOMVectorDefaultOwnerAndSourceMembers(t *testing.T) {
 	serviceMust(t, v.SetOwner(m))
 	x, e := m.monomials.MkVariable(0, 2)
 	serviceMust(t, e)
-	a := util.NewInt(3)
+	a := unumeral.NewInt(3)
 	serviceMust(t, b.Add(&a, x))
-	a = util.NewInt(4)
+	a = unumeral.NewInt(4)
 	serviceMust(t, b.Add(&a, x))
 	n, e := b.Size()
 	serviceMust(t, e)
@@ -140,7 +140,7 @@ func TestPolynomialSOMBufferAddEveryReservation(t *testing.T) {
 			serviceMust(t, e)
 			x, e := m.monomials.MkVariable(0, 2)
 			serviceMust(t, e)
-			var a util.Int
+			var a unumeral.Int
 			serviceMust(t, m.integer.SetString(&a, "1"+strings.Repeat("0", 4096)))
 			m.integer.Budget().FailAfter(ordinal)
 			e = b.Add(&a, x)
@@ -187,9 +187,9 @@ func TestPolynomialSOMVectorActualModularAndResetPrefix(t *testing.T) {
 	serviceMust(t, e)
 	x, e := m.monomials.MkVariable(0, 2)
 	serviceMust(t, e)
-	a := util.NewInt(6)
+	a := unumeral.NewInt(6)
 	serviceMust(t, b0.Add(&a, x))
-	a = util.NewInt(7)
+	a = unumeral.NewInt(7)
 	serviceMust(t, b0.Add(&a, x))
 	value, e := b0.Coefficient(0)
 	serviceMust(t, e)
@@ -198,7 +198,7 @@ func TestPolynomialSOMVectorActualModularAndResetPrefix(t *testing.T) {
 	if got != -4 {
 		t.Fatal("actual balanced Z17 manager accumulation", got)
 	}
-	a = util.NewInt(3)
+	a = unumeral.NewInt(3)
 	serviceMust(t, b1.Add(&a, x))
 	serviceMust(t, v.ResetN(1))
 	n, e := b0.Size()
@@ -233,13 +233,13 @@ func TestPolynomialSOMBufferZeroAndDuplicateNoColdReservation(t *testing.T) {
 	serviceMust(t, e)
 	x, e := m.monomials.MkVariable(0, 2)
 	serviceMust(t, e)
-	a := util.NewInt(2)
+	a := unumeral.NewInt(2)
 	serviceMust(t, b.Add(&a, x))
 	before := m.integer.Budget().Used()
 	m.integer.Budget().FailAfter(0)
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	serviceMust(t, b.Add(&zero, x))
-	a = util.NewInt(3)
+	a = unumeral.NewInt(3)
 	serviceMust(t, b.Add(&a, x))
 	if m.integer.Budget().Used() != before {
 		t.Fatal("early/duplicate branches reserved new cold ownership")
@@ -261,10 +261,10 @@ func TestPolynomialSOMBufferAddMulIndependentFiniteModel(t *testing.T) {
 	serviceMust(t, e)
 	u, e := m.monomials.Unit()
 	serviceMust(t, e)
-	p, e := m.MkTerms([]util.Int{util.NewInt(2), util.NewInt(3)}, []Monomial{x, u})
+	p, e := m.MkTerms([]unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(3)}, []Monomial{x, u})
 	serviceMust(t, e)
 	polynomialCaller(t, m, p)
-	factor := util.NewInt(4)
+	factor := unumeral.NewInt(4)
 	serviceMust(t, b.AddMul(&factor, x, p)) // 8*x^2 + 12*x
 	serviceMust(t, b.AddMul(&factor, x, p)) // duplicate branch => 16*x^2 + 24*x
 	for value := int64(-3); value <= 3; value++ {
@@ -317,10 +317,10 @@ func TestPolynomialSOMBufferAddMulEveryReservation(t *testing.T) {
 			serviceMust(t, e)
 			x, e := m.monomials.MkVariable(0, 1)
 			serviceMust(t, e)
-			p, e := m.MkTerms([]util.Int{util.NewInt(3)}, []Monomial{x})
+			p, e := m.MkTerms([]unumeral.Int{unumeral.NewInt(3)}, []Monomial{x})
 			serviceMust(t, e)
 			polynomialCaller(t, m, p)
-			var a util.Int
+			var a unumeral.Int
 			serviceMust(t, m.integer.SetString(&a, "1"+strings.Repeat("0", 4096)))
 			m.integer.Budget().FailAfter(ordinal)
 			e = b.AddMul(&a, x, p)
@@ -366,17 +366,17 @@ func TestPolynomialSOMBufferActualOverloadsAndUnreadZero(t *testing.T) {
 	serviceMust(t, e)
 	x, e := m.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
-	a := util.NewInt(2)
+	a := unumeral.NewInt(2)
 	serviceMust(t, source.Add(&a, x))
-	a = util.NewInt(3)
+	a = unumeral.NewInt(3)
 	u, e := m.monomials.Unit()
 	serviceMust(t, e)
 	serviceMust(t, source.Add(&a, u))
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	serviceMust(t, out.AddMulBuffer(&zero, x, nil)) // zero precedes source pointer read.
-	factor := util.NewInt(4)
+	factor := unumeral.NewInt(4)
 	serviceMust(t, out.AddMulBuffer(&factor, x, source))
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	serviceMust(t, out.AddScaledBuffer(&one, source)) // 8*x^2+14*x+3
 	result, e := out.Mk(false)
 	serviceMust(t, e)
@@ -426,9 +426,9 @@ func TestPolynomialSOMBufferSourceMaxAndDisplay(t *testing.T) {
 	serviceMust(t, e)
 	x, e := m.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
-	a := util.NewInt(3)
+	a := unumeral.NewInt(3)
 	serviceMust(t, b.Add(&a, x))
-	a = util.NewInt(-3)
+	a = unumeral.NewInt(-3)
 	serviceMust(t, b.Add(&a, x))
 	// Zero entries remain real fields until remove_zeros; max ignores them.
 	max, e := b.GradedLexMaxPosition()
@@ -436,7 +436,7 @@ func TestPolynomialSOMBufferSourceMaxAndDisplay(t *testing.T) {
 	if max != ^uint32(0) {
 		t.Fatal("source all-zero max", max)
 	}
-	a = util.NewInt(7)
+	a = unumeral.NewInt(7)
 	serviceMust(t, b.Add(&a, x))
 	max, e = b.GradedLexMaxPosition()
 	serviceMust(t, e)
@@ -466,7 +466,7 @@ func TestPolynomialSOMBufferSourceSortMovesCoefficients(t *testing.T) {
 	u, e := m.monomials.Unit()
 	serviceMust(t, e)
 	for i, t0 := range []Monomial{x, u, cube} {
-		a := util.NewInt([]int32{5, 7, 11}[i])
+		a := unumeral.NewInt([]int32{5, 7, 11}[i])
 		serviceMust(t, b.Add(&a, t0))
 	}
 	serviceMust(t, b.SortGradedLex())
@@ -492,7 +492,7 @@ func TestPolynomialSOMBufferNativeSortBIGMoves(t *testing.T) {
 	serviceMust(t, v.SetOwner(m))
 	b, e := v.At(0)
 	serviceMust(t, e)
-	var input util.Int
+	var input unumeral.Int
 	serviceMust(t, m.integer.SetString(&input, "12345678901234567890123456789012345678901234567890"))
 	t.Cleanup(func() {
 		m.integer.Budget().FailAfter(-1)
@@ -543,11 +543,11 @@ func TestPolynomialSOMBufferActualModDAndScalarOverloads(t *testing.T) {
 	serviceMust(t, e)
 	square, e := m.monomials.MkVariable(0, 2)
 	serviceMust(t, e)
-	a := util.NewInt(5)
+	a := unumeral.NewInt(5)
 	serviceMust(t, b.Add(&a, x))
-	a = util.NewInt(7)
+	a = unumeral.NewInt(7)
 	serviceMust(t, b.Add(&a, square))
-	a = util.NewInt(11)
+	a = unumeral.NewInt(11)
 	serviceMust(t, b.AddScalar(&a))
 	d, e := NewPolynomialVariableDegrees(m.memory)
 	serviceMust(t, e)
@@ -593,7 +593,7 @@ func TestPolynomialSOMBufferNeverAbortsBorrowedCalleeCreation(t *testing.T) {
 		t.Fatal("real borrowed callee construction refusal", e, m.monomials.creation.stage)
 	}
 	before := m.monomials.creation
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	serviceMust(t, b.AddMul(&zero, Monomial{}, Polynomial{}))
 	if b.generatedCall || b.calleeCall || m.generatedCalleePending {
 		t.Fatal("zero branch discovered foreign pending ownership")
@@ -626,10 +626,10 @@ func TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient(t *test
 	u, e := m.monomials.Unit()
 	serviceMust(t, e)
 	for i, term := range []Monomial{x, u, square} {
-		a := util.NewInt([]int32{2, 1, 7}[i])
+		a := unumeral.NewInt([]int32{2, 1, 7}[i])
 		serviceMust(t, b.Add(&a, term))
 	}
-	factor := util.NewInt(3)
+	factor := unumeral.NewInt(3)
 	serviceMust(t, b.AddMulBuffer(&factor, x, b))
 	// Source captures original size3, but each p->a(i) reads the live buffer.
 	// First updates future x^2 coefficient7->13; last multiplies13, not7.
@@ -665,7 +665,7 @@ func TestPolynomialSOMNativeMonomialSortIndependentPowers(t *testing.T) {
 		degree := i * 37 % n
 		term, e := m.monomials.MkVariable(0, degree)
 		serviceMust(t, e)
-		coefficient := util.NewInt(int32(3*degree + 5))
+		coefficient := unumeral.NewInt(int32(3*degree + 5))
 		serviceMust(t, b.Add(&coefficient, term))
 	}
 	beforeBytes, beforeStats := m.integer.Budget().Used(), m.memory.Stats()
@@ -690,7 +690,7 @@ func TestPolynomialSOMNativeMonomialSortIndependentPowers(t *testing.T) {
 	for i := uint32(0); i < n; i++ {
 		a, e := b.Coefficient(i)
 		serviceMust(t, e)
-		if a != util.NewInt(int32(3*(n-1-i)+5)) {
+		if a != unumeral.NewInt(int32(3*(n-1-i)+5)) {
 			t.Fatal("paired coefficient after native monomial permutation", i, a)
 		}
 	}

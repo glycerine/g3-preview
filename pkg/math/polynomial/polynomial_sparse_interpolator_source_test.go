@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialSparseInterpolatorIndependentThreeSamples(t *testing.T) {
@@ -18,7 +17,7 @@ func TestPolynomialSparseInterpolatorIndependentThreeSamples(t *testing.T) {
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, s.CloseChecked()); serviceMust(t, sk.CloseChecked()) })
 	for _, x := range []int32{0, 1, 2} {
-		in := util.NewInt(x)
+		in := unumeral.NewInt(x)
 		q := polynomialQueryTerms(t, m, []int32{x*x + 3*x + 2}, [][]MonomialPower{nil})
 		ok, e := s.Add(&in, q)
 		serviceMust(t, e)
@@ -71,7 +70,7 @@ func TestPolynomialSparseNativeMonomialGrowthAcross129Groups(t *testing.T) {
 	s, e := NewPolynomialSparseInterpolator(full, sk)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, s.CloseChecked()) })
-	input := util.NewInt(3)
+	input := unumeral.NewInt(3)
 	ok, e := s.Add(&input, p)
 	serviceMust(t, e)
 	if !ok {
@@ -129,12 +128,12 @@ func TestPolynomialSparseNativeNumeralGrowthAndReuse(t *testing.T) {
 		t.Fatal("native output construction charged container storage")
 	}
 	m.integer.Budget().FailAfter(0)
-	first, last := util.NewInt(13), util.NewInt(29)
+	first, last := unumeral.NewInt(13), unumeral.NewInt(29)
 	serviceMust(t, s.copyField(s.outputs, 0, &first))
 	serviceMust(t, s.copyField(s.outputs, size-1, &last))
 	for pass := 0; pass < 2; pass++ {
 		for i := int32(0); i < size; i++ {
-			input := util.NewInt(i)
+			input := unumeral.NewInt(i)
 			ok, e := s.Add(&input, m.zero)
 			serviceMust(t, e)
 			if !ok {
@@ -211,7 +210,7 @@ func TestPolynomialSparseNativeLocalsIndependentSeventeenSamples(t *testing.T) {
 				value -= 97
 			}
 			q := polynomialQueryTerms(t, m, []int32{value}, [][]MonomialPower{nil})
-			input := util.NewInt(point)
+			input := unumeral.NewInt(point)
 			ok, e := s.Add(&input, q)
 			serviceMust(t, e)
 			if !ok {

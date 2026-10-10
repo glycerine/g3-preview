@@ -5,7 +5,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (m *UPolynomialManager) HasZeroRoots(v UPolynomialView) (bool, error) {
@@ -175,7 +175,7 @@ func (m *UPolynomialManager) RemoveOneHalfRoot(v UPolynomialView, out UPolynomia
 			return ErrUPolynomialAssertion
 		}
 	}
-	divisor := upolyDivisorSpan{immediate: true, pair: [2]util.Int{util.NewInt(-1), util.NewInt(2)}}
+	divisor := upolyDivisorSpan{immediate: true, pair: [2]unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(2)}}
 	var power uint32
 	if e = m.divRemCoreSpanWithSourceContext(v, &divisor, &power, &m.div2, &m.div1, nil, nil, q.context()); e != nil {
 		return e
@@ -259,7 +259,7 @@ func (m *UPolynomialManager) DescartesBoundZeroOne(v UPolynomialView) (uint32, e
 	}
 	return changes, nil
 }
-func (m *UPolynomialManager) DescartesBoundInterval(v UPolynomialView, bqm *util.BinaryRationalManager, a, b *util.BinaryRational) (uint32, error) {
+func (m *UPolynomialManager) DescartesBoundInterval(v UPolynomialView, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational) (uint32, error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
@@ -278,7 +278,7 @@ func (m *UPolynomialManager) DescartesBoundInterval(v UPolynomialView, bqm *util
 		if e = m.TranslateBinaryViewInPlace(m.stateView(aux).WithCount(v.count), a); e != nil {
 			return 0, e
 		}
-		var difference util.BinaryRational
+		var difference unumeral.BinaryRational
 		defer bqm.Del(&difference)
 		if e = bqm.Sub(b, a, &difference); e != nil {
 			return 0, e
@@ -300,7 +300,7 @@ func (m *UPolynomialManager) DescartesBoundInterval(v UPolynomialView, bqm *util
 		if e = m.PMinusXViewInPlace(m.stateView(aux)); e != nil {
 			return 0, e
 		}
-		var mb, ma util.BinaryRational
+		var mb, ma unumeral.BinaryRational
 		defer bqm.Del(&mb)
 		defer bqm.Del(&ma)
 		if e = bqm.Copy(&mb, b); e != nil {
@@ -321,7 +321,7 @@ func (m *UPolynomialManager) DescartesBoundInterval(v UPolynomialView, bqm *util
 	if e != nil {
 		return 0, e
 	}
-	zero := util.NewBinaryInt(0)
+	zero := unumeral.NewBinaryInt(0)
 	if !hasZero {
 		r1, e := m.DescartesBoundInterval(v, bqm, a, &zero)
 		if e != nil {
@@ -358,7 +358,7 @@ func (m *UPolynomialManager) DescartesBoundInterval(v UPolynomialView, bqm *util
 	}
 	return 1, nil
 }
-func (m *UPolynomialManager) RootUpperBound(v UPolynomialView, out *util.Int) (cause error) {
+func (m *UPolynomialManager) RootUpperBound(v UPolynomialView, out *unumeral.Int) (cause error) {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -457,7 +457,7 @@ func (m *UPolynomialManager) RootUpperBound(v UPolynomialView, out *util.Int) (c
 			}
 		}
 	}
-	one := util.NewInt(1)
+	one := unumeral.NewInt(1)
 	if e = numericIntegerModularManager_addWithRootUpperContext(m.modular, minimum, maximum, out, context); e != nil {
 		return e
 	}

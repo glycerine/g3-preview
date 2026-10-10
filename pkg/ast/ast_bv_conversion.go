@@ -2,9 +2,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func (m *ASTManager) int2BVSize(ps []ASTParameter) (width int32, found bool, result error) {
@@ -98,7 +97,7 @@ func (p *astBitVectorPluginOwner) conversionDecl(k int32, width uint32, ps []AST
 
 // A successful parameter copy/destruction ends before the parser's type error.
 // Its numerical owner remains pending only if that actual copy/cleanup fails.
-func (m *ASTManager) copyInt2BVParameterRational(value *util.OwnedRational) (result error) {
+func (m *ASTManager) copyInt2BVParameterRational(value *unumeral.OwnedRational) (result error) {
 	previous := m.formatExecuting
 	m.formatExecuting = true
 	defer func() { m.formatExecuting = previous }()

@@ -4,8 +4,7 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyMignotteInvocationReceipt struct {
@@ -27,11 +26,11 @@ type upolyMignotteScope struct {
 	active, executing                          bool
 	constructed, sourceRemaining, ownRemaining uint8
 	sourceStarted, ownStarted                  bool
-	norm, bound, tmp                           util.Int
+	norm, bound, tmp                           unumeral.Int
 	numeric                                    polynomialNumericRoots
-	root                                       util.IntegerRootInvocationReceipt
-	addMul                                     util.IntegerAddMulInvocationReceipt
-	normalize                                  util.IntegerNormalizeInvocationReceipt
+	root                                       unumeral.IntegerRootInvocationReceipt
+	addMul                                     unumeral.IntegerAddMulInvocationReceipt
+	normalize                                  unumeral.IntegerNormalizeInvocationReceipt
 	bodyCause, sourceCause                     error
 }
 
@@ -57,7 +56,7 @@ func (s *UPolynomialFactorizationService) beginMignotteInvocation() (upolyMignot
 	q.receipt = upolyMignotteInvocationReceipt{s, s.scope, q, q.invocation}
 	return q.receipt, nil
 }
-func (q *upolyMignotteScope) numeral(i uint8) *util.Int {
+func (q *upolyMignotteScope) numeral(i uint8) *unumeral.Int {
 	switch i {
 	case 1:
 		return &q.norm
@@ -160,11 +159,11 @@ func (s *UPolynomialFactorizationService) cleanupMignotteInvocation(r *upolyMign
 
 // Pending identity reads only acknowledge consumption or refuse unsafe cleanup.
 // No returned inventory is copied into the old invocation's acquired authority.
-func (q *upolyMignotteScope) cleanupNumeric(z *util.IntegerManager) error {
+func (q *upolyMignotteScope) cleanupNumeric(z *unumeral.IntegerManager) error {
 	return cleanupUPolynomialNumericRoots(z, &q.numeric)
 }
-func cleanupUPolynomialNumericRoots(z *util.IntegerManager, r *polynomialNumericRoots) error {
-	return util.CleanupNumericAllocationRoots(z, &r.NumericAllocationRoots)
+func cleanupUPolynomialNumericRoots(z *unumeral.IntegerManager, r *polynomialNumericRoots) error {
+	return unumeral.CleanupNumericAllocationRoots(z, &r.NumericAllocationRoots)
 }
 
 // This chain protects actual synchronous scalar and destructor calls only.

@@ -3,10 +3,9 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialFactorConstantSuppliedReceiptRefusalBeforeBIGBody(t *testing.T) {
@@ -17,20 +16,20 @@ func TestPolynomialFactorConstantSuppliedReceiptRefusalBeforeBIGBody(t *testing.
 				fs, e := NewPolynomialFactors(full)
 				serviceMust(t, e)
 				z := full.core.integer
-				var a, out util.Int
+				var a, out unumeral.Int
 				digits := make([]uint32, 80)
 				digits[79] = 1
 				digits[0] = 7
 				serviceMust(t, z.SetLimbs(&a, digits))
 				serviceMust(t, z.Copy(&out, &z.Two64))
 				var prior, current polynomialFactorConstantInvocationReceipt
-				three := util.NewInt(3)
+				three := unumeral.NewInt(3)
 				serviceMust(t, fs.setConstantWithReceipt(&three, &prior))
 				s, e := fs.beginFactorConstant(0, &current)
 				serviceMust(t, e)
 				r := current
 				receiver := full.core.modular
-				var foreign *util.IntegerModularManager
+				var foreign *unumeral.IntegerModularManager
 				var nested polynomialNumeralOperationGuard
 				extra := uint64(0)
 				want := ErrPolynomialOwner
@@ -44,10 +43,10 @@ func TestPolynomialFactorConstantSuppliedReceiptRefusalBeforeBIGBody(t *testing.
 					copied := *fs
 					r.manager = &copied
 				case "foreignReceiver":
-					foreign, e = util.NewIntegerModularManager(z)
+					foreign, e = unumeral.NewIntegerModularManager(z)
 					serviceMust(t, e)
 					receiver = foreign
-					extra = uint64(reflect.TypeOf(util.IntegerModularManager{}).Size())
+					extra = uint64(reflect.TypeOf(unumeral.IntegerModularManager{}).Size())
 				case "callbackDepth":
 					full.core.callbackDepth++
 				case "nestedLeaf":
@@ -71,7 +70,7 @@ func TestPolynomialFactorConstantSuppliedReceiptRefusalBeforeBIGBody(t *testing.
 				if cause != want || out != before || integerString(t, z, &out) != value || z.Budget().Used() != used || state != rtStateForFactors(fs) || (s.numeric).NumericAllocationRoots != (numeric).NumericAllocationRoots {
 					t.Fatalf("invalid supplied receipt entered BIG numerical body: %v want %v", cause, want)
 				}
-				polynomialFactorsAuditExtra(t, fs, nil, []*util.Int{&a, &out}, extra)
+				polynomialFactorsAuditExtra(t, fs, nil, []*unumeral.Int{&a, &out}, extra)
 				full.core.callbackDepth = 0
 				if nested.executing {
 					nested.leave()

@@ -3,7 +3,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (s *UPolynomialFactorizationService) Factor(f UPolynomialView, out *UPolynomialFactors, params UPolynomialFactorParams) (bool, error) {
@@ -92,7 +92,7 @@ func (s *UPolynomialFactorizationService) factorQuadratic(p *upolyVectorState, f
 	if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Mul(a, c, ac); e != nil {
 		return e
 	}
-	minus4 := util.NewInt(-4)
+	minus4 := unumeral.NewInt(-4)
 	if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).AddMulTracked(b2, &minus4, ac, disc, &o.addMul); e != nil {
 		return e
 	}
@@ -129,7 +129,7 @@ func (s *UPolynomialFactorizationService) factorQuadratic(p *upolyVectorState, f
 	if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Add(b, root, &m.values(f2)[0]); e != nil {
 		return e
 	}
-	two := util.NewInt(2)
+	two := unumeral.NewInt(2)
 	if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Mul(a, &two, &m.values(f1)[1]); e != nil {
 		return e
 	}
@@ -204,7 +204,7 @@ func (s *UPolynomialFactorizationService) factorSqfPrimitiveWithReceipt(p *upoly
 func (s *UPolynomialFactorizationService) exactDivVerify(a, b UPolynomialView, out *upolyVectorState) error {
 	return s.exactDivVerifyWithSourceContext(a, b, out, nil, integerAllocationInvocationContext{})
 }
-func (s *UPolynomialFactorizationService) exactDivVerifyWithSourceContext(a, b UPolynomialView, out *upolyVectorState, child *util.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
+func (s *UPolynomialFactorizationService) exactDivVerifyWithSourceContext(a, b UPolynomialView, out *upolyVectorState, child *unumeral.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
 	yes, e := s.manager.exactDivStateWithSourceContext(a, b, out, child, context)
 	if e != nil {
 		return e
@@ -217,7 +217,7 @@ func (s *UPolynomialFactorizationService) exactDivVerifyWithSourceContext(a, b U
 func (s *UPolynomialFactorizationService) factorCore(f UPolynomialView, fs *UPolynomialFactors, params UPolynomialFactorParams) (completed bool, failure error) {
 	m := s.manager
 	if f.count == 0 {
-		zero := util.NewInt(0)
+		zero := unumeral.NewInt(0)
 		return true, s.setFrontendConstant(fs, &zero)
 	}
 	if f.count == 1 {

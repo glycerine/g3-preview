@@ -3,15 +3,14 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialNormalizeActualGCDCopyRefusalPreservesBodyHistory(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
-	p, e := c.MkTerms([]util.Int{c.integer.Two64}, []Monomial{c.monomials.unit})
+	p, e := c.MkTerms([]unumeral.Int{c.integer.Two64}, []Monomial{c.monomials.unit})
 	serviceMust(t, e)
 	p = polynomialCaller(t, c, p)
 	full.originalBudget.FailAfter(0)
@@ -39,7 +38,7 @@ func TestPolynomialNormalizeActualFailedGCDRawOwnedAfterOlderNUM(t *testing.T) {
 	for prefix := int64(0); prefix < 96; prefix++ {
 		full := polynomialPSCFullFixture(t)
 		c := full.core
-		var a, b util.Int
+		var a, b unumeral.Int
 		aw, bw := make([]uint32, 80), make([]uint32, 77)
 		aw[0], aw[79] = 6, 1<<29
 		bw[0], bw[76] = 10, 1<<27
@@ -47,7 +46,7 @@ func TestPolynomialNormalizeActualFailedGCDRawOwnedAfterOlderNUM(t *testing.T) {
 		serviceMust(t, c.integer.SetLimbs(&b, bw))
 		x, e := c.monomials.MkVariable(0, 1)
 		serviceMust(t, e)
-		p, e := c.MkTerms([]util.Int{a, b}, []Monomial{x, c.monomials.unit})
+		p, e := c.MkTerms([]unumeral.Int{a, b}, []Monomial{x, c.monomials.unit})
 		serviceMust(t, e)
 		p = polynomialCaller(t, c, p)
 		full.originalBudget.FailAfter(prefix)
@@ -57,7 +56,7 @@ func TestPolynomialNormalizeActualFailedGCDRawOwnedAfterOlderNUM(t *testing.T) {
 			reached = true
 			// The actual called Integer frame owns its five RAW fields and pending
 			// lower child roots; no manager registry or before/after census authority.
-			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p}, []*util.Int{&a, &b}, 0, nil)
+			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p}, []*unumeral.Int{&a, &b}, 0, nil)
 			serviceMust(t, full.cleanupNormalizationPhase(false))
 			if !raw.Active {
 				t.Error("false phase aborted unjoined RAW before caller NUM suffix")
@@ -71,7 +70,7 @@ func TestPolynomialNormalizeActualFailedGCDRawOwnedAfterOlderNUM(t *testing.T) {
 				t.Error("actual reached GCD RAW child omitted after older g NUM suffix", prefix)
 			}
 			serviceMust(t, c.integer.CleanupGCDRaw())
-			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p}, []*util.Int{&a, &b}, 0, nil)
+			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p}, []*unumeral.Int{&a, &b}, 0, nil)
 			serviceMust(t, c.integer.Del(&a))
 			serviceMust(t, c.integer.Del(&b))
 			break
@@ -91,7 +90,7 @@ func TestPolynomialCheapNormalizeActualGCDRawChild(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
 	b := &c.cheap
-	var a, z util.Int
+	var a, z unumeral.Int
 	aw, bw := make([]uint32, 80), make([]uint32, 77)
 	aw[0], aw[79] = 6, 1<<29
 	bw[0], bw[76] = 10, 1<<27
@@ -106,7 +105,7 @@ func TestPolynomialCheapNormalizeActualGCDRawChild(t *testing.T) {
 	if returned == nil || !c.integer.GcdRaw.Active {
 		t.Fatal("actual cheap GCD refusal", returned, c.integer.GcdRaw.Active)
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*util.Int{&a, &z}, 0, nil)
+	polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*unumeral.Int{&a, &z}, 0, nil)
 	body := b.gcdBodyCause
 	serviceMust(t, b.finishNormalizeNumeralPhase(true, false))
 	if !c.integer.GcdRaw.Active {
@@ -218,7 +217,7 @@ func TestPolynomialSOMNormalizeDirectCapturedInvocationGuards(t *testing.T) {
 func TestPolynomialNormalizeRetainedFrameRejectsBeforeForeignCheapReset(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
-	var aa, bb util.Int
+	var aa, bb unumeral.Int
 	aw, bw := make([]uint32, 80), make([]uint32, 77)
 	aw[0], aw[79] = 6, 1<<29
 	bw[0], bw[76] = 10, 1<<27
@@ -232,7 +231,7 @@ func TestPolynomialNormalizeRetainedFrameRejectsBeforeForeignCheapReset(t *testi
 	})
 	x0, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
-	p, e := c.MkTerms([]util.Int{aa, bb}, []Monomial{x0, c.monomials.unit})
+	p, e := c.MkTerms([]unumeral.Int{aa, bb}, []Monomial{x0, c.monomials.unit})
 	serviceMust(t, e)
 	p = polynomialCaller(t, c, p)
 	q := polynomialQueryTerms(t, c, []int32{9, -1}, [][]MonomialPower{{{0, 1}}, nil})
@@ -241,14 +240,14 @@ func TestPolynomialNormalizeRetainedFrameRejectsBeforeForeignCheapReset(t *testi
 	if !numericPhysicalReservationRefusal(first) || !full.normalization.active {
 		t.Fatal("actual retained initial SET", first)
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p, q}, []*util.Int{&aa, &bb}, 0, nil)
+	polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p, q}, []*unumeral.Int{&aa, &bb}, 0, nil)
 	// Later independently invoked actions lift the fault, then append a real
 	// foreign source row. They grant no authority to the stopped old frame.
 	full.originalBudget.FailAfter(-1)
 	serviceMust(t, c.modular.SetZPUint64(7))
 	x, e := c.monomials.MkVariable(0, 1)
 	serviceMust(t, e)
-	a := util.NewInt(3)
+	a := unumeral.NewInt(3)
 	serviceMust(t, c.cheap.add(&a, x, false))
 	before, e := c.cheap.ms.size(c)
 	serviceMust(t, e)
@@ -293,7 +292,7 @@ func TestPolynomialSOMNormalizeCopiedReceiverCannotDestroyActualNUM(t *testing.T
 	// RED-only physical-consumption recovery of this exact known descriptor;
 	// the production owning contract must refuse before touching it.
 	if got == nil {
-		b.gcd = util.Int{}
+		b.gcd = unumeral.Int{}
 	}
 	serviceMust(t, b.finishNormalizeNumeral(true))
 	polynomialImpPhysicalAuditValues(t, full, nil)
@@ -315,7 +314,7 @@ func TestPolynomialSOMNormalizeActualStandaloneMember(t *testing.T) {
 		serviceMust(t, c.IncRef(p))
 		a, e := c.Coefficient(p, 0)
 		serviceMust(t, e)
-		if a != util.NewInt(1) {
+		if a != unumeral.NewInt(1) {
 			t.Error("source gcd division changed constant")
 		}
 		serviceMust(t, c.DecRef(p))
@@ -334,7 +333,7 @@ func TestPolynomialSOMNormalizeStandaloneSourceOwnerProtectsActualChild(t *testi
 	serviceMust(t, b.Add(&c.integer.Two64, c.monomials.unit))
 	serviceMust(t, b.buffer.beginNormalizeNumeral(nil))
 	serviceMust(t, c.integer.Copy(&b.buffer.gcd, &c.integer.Two64))
-	beforeRaw, beforeStage, beforeNUM := append([]util.Int(nil), b.buffer.as.values...), b.sourceStage, b.buffer.gcd
+	beforeRaw, beforeStage, beforeNUM := append([]unumeral.Int(nil), b.buffer.as.values...), b.sourceStage, b.buffer.gcd
 	beforeRuntime := c.memory.State()
 	if e = b.SourceFinalize(); !errors.Is(e, ErrPolynomialPending) {
 		t.Error("source owner passed retained younger method NUM", e)

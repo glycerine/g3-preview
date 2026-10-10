@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialFactorInlineConstantAndResetAcquireNoHistoryReservation(t *testing.T) {
@@ -12,7 +11,7 @@ func TestPolynomialFactorInlineConstantAndResetAcquireNoHistoryReservation(t *te
 	f, e := NewPolynomialFactors(full)
 	serviceMust(t, e)
 	constant := polynomialQueryTerms(t, full.core, []int32{3}, [][]MonomialPower{{}})
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	for i := 0; i < 4; i++ {
 		full.originalBudget.FailAfter(0)
 		if e = full.Factor(constant, f, DefaultUPolynomialFactorParams()); e != nil {
@@ -48,7 +47,7 @@ func TestPolynomialFactorZeroErasesCoreWithUnrelatedRetainedCaller(t *testing.T)
 	full.originalBudget.FailAfter(0)
 	e = full.Factor(full.core.zero, f, DefaultUPolynomialFactorParams())
 	full.originalBudget.FailAfter(-1)
-	if e != nil || f.constant != util.NewInt(0) || full.factorRoot != old || old.frame.bodyCause != body || old.frame.sourceCause != source || old.frame.cleanupCause != own {
+	if e != nil || f.constant != unumeral.NewInt(0) || full.factorRoot != old || old.frame.bodyCause != body || old.frame.sourceCause != source || old.frame.cleanupCause != own {
 		t.Fatal("erased zero branch touched unrelated caller/allocated metadata", e)
 	}
 	serviceMust(t, full.CleanupFactor())

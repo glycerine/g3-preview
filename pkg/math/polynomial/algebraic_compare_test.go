@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -21,7 +22,7 @@ func algebraicCompareFixture(t *testing.T) (*AlgebraicRootCore, *UPolynomialMana
 }
 func algebraicCompareFixtureProfile(t *testing.T, guardProfile bool) (*AlgebraicRootCore, *UPolynomialManager, *algebraicCompareControl) {
 	t.Helper()
-	var s *util.RationalService
+	var s *unumeral.RationalService
 	profile := umemory.SmallAllocatorProfile{PointerBits: 64}
 	if !guardProfile {
 		s, _ = serviceNew(t)
@@ -33,7 +34,7 @@ func algebraicCompareFixtureProfile(t *testing.T, guardProfile bool) (*Algebraic
 		cfg.Integers.Memory = runtime
 		profile = umemory.SmallAllocatorProfile{PointerBits: 32, Debug: true}
 		cfg.Integers.Profile = profile
-		s, e = util.NewRationalService(cfg)
+		s, e = unumeral.NewRationalService(cfg)
 		serviceMust(t, e)
 		t.Cleanup(func() {
 			serviceMust(t, s.Close())
@@ -50,9 +51,9 @@ func algebraicCompareFixtureProfile(t *testing.T, guardProfile bool) (*Algebraic
 	serviceMust(t, e)
 	f, e := NewUPolynomialFactorizationService(p, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
-	b, e := util.NewBinaryRationalManager(s.Manager.Z, util.BinaryRationalConfig{Diagnostics: s})
+	b, e := unumeral.NewBinaryRationalManager(s.Manager.Z, unumeral.BinaryRationalConfig{Diagnostics: s})
 	serviceMust(t, e)
-	bi, e := util.NewBinaryIntervalManager(b)
+	bi, e := unumeral.NewBinaryIntervalManager(b)
 	serviceMust(t, e)
 	a, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: s.Manager.Z.Memory, Profile: profile})
 	serviceMust(t, e)
@@ -77,14 +78,14 @@ func algebraicCompareRoot(t *testing.T, c *AlgebraicRootCore, coeff []int32, ln 
 	p := c.config.Polynomials
 	poly, e := p.NewPolynomial()
 	serviceMust(t, e)
-	values := make([]util.Int, len(coeff))
+	values := make([]unumeral.Int, len(coeff))
 	for i, n := range coeff {
-		values[i] = util.NewInt(n)
+		values[i] = unumeral.NewInt(n)
 	}
 	serviceMust(t, p.SetInts(poly, values))
 	v, e := p.wholeView(poly)
 	serviceMust(t, e)
-	var l, u util.BinaryRational
+	var l, u unumeral.BinaryRational
 	serviceMust(t, c.config.Binary.SetInt32Power(&l, ln, lk))
 	serviceMust(t, c.config.Binary.SetInt32Power(&u, un, uk))
 	var a Algebraic
@@ -99,7 +100,7 @@ func TestAlgebraicCompareBasicAndRationalDispatch(t *testing.T) {
 	c, _, control := algebraicCompareFixture(t)
 	for n := int64(-3); n <= 3; n++ {
 		for d := int64(1); d <= 3; d++ {
-			q := util.NewRational()
+			q := unumeral.NewRational()
 			serviceMust(t, c.config.Rationals.SetFraction(&q, n, uint64(d)))
 			var a, z Algebraic
 			serviceMust(t, c.SetRational(&a, &q))
@@ -135,7 +136,7 @@ func TestAlgebraicCompareBasicAndRationalDispatch(t *testing.T) {
 		n, d int64
 		want int
 	}{{1, 1, 1}, {3, 2, -1}, {7, 5, 1}, {10, 7, -1}} {
-		q := util.NewRational()
+		q := unumeral.NewRational()
 		serviceMust(t, c.config.Rationals.SetFraction(&q, tc.n, uint64(tc.d)))
 		got, e := c.CompareRational(&a, &q)
 		serviceMust(t, e)
@@ -330,8 +331,8 @@ func TestAlgebraicCompareSturmTarskiIndependentOrder(t *testing.T) {
 func TestAlgebraicCompareBasicRepresentationBeforeLess(t *testing.T) {
 	c, _, control := algebraicCompareFixture(t)
 	a, b := Algebraic{}, Algebraic{}
-	raw := util.RationalFromBorrowedNumerals(util.NewInt(2), util.NewInt(4))
-	canonical := util.RationalFromBorrowedNumerals(util.NewInt(1), util.NewInt(2))
+	raw := unumeral.RationalFromBorrowedNumerals(unumeral.NewInt(2), unumeral.NewInt(4))
+	canonical := unumeral.RationalFromBorrowedNumerals(unumeral.NewInt(1), unumeral.NewInt(2))
 	serviceMust(t, c.SetRational(&a, &raw))
 	serviceMust(t, c.SetRational(&b, &canonical))
 	// Source eq is representation equality. Mathematically equal unreduced
@@ -463,17 +464,17 @@ func TestAlgebraicCompareSequenceStoppedDestructorRetainsOwner(t *testing.T) {
 	c, p, control := algebraicCompareFixtureProfile(t, true)
 	c.minMagnitude = 1
 	z := c.config.Rationals.Integers()
-	var k, n util.Int
+	var k, n unumeral.Int
 	serviceMust(t, z.SetLimbs(&k, []uint32{1, 0, 1}))
 	serviceMust(t, z.Mul2k(&k, 1, &n))
 	serviceMust(t, z.Neg(&n))
 	serviceMust(t, z.Dec(&n))
 	poly, e := p.NewPolynomial()
 	serviceMust(t, e)
-	serviceMust(t, p.SetInts(poly, []util.Int{n, util.NewInt(0), k}))
+	serviceMust(t, p.SetInts(poly, []unumeral.Int{n, unumeral.NewInt(0), k}))
 	v, e := p.wholeView(poly)
 	serviceMust(t, e)
-	var lower, upper util.BinaryRational
+	var lower, upper unumeral.BinaryRational
 	serviceMust(t, c.config.Binary.SetInt32(&lower, 1))
 	serviceMust(t, c.config.Binary.SetInt32(&upper, 2))
 	var a Algebraic
@@ -484,7 +485,7 @@ func TestAlgebraicCompareSequenceStoppedDestructorRetainsOwner(t *testing.T) {
 	serviceMust(t, z.Del(&k))
 	serviceMust(t, z.Del(&n))
 	b := algebraicCompareRoot(t, c, []int32{-3, 0, 1}, 1, 0, 2, 0, false)
-	var stopped util.NumericCellRef
+	var stopped unumeral.NumericCellRef
 	var requested uint64
 	// Explicit malformed ILP32 allocation metadata, not a valid source malloc
 	// failure: invalidate ONLY the actual completed sequence copy at a reached
@@ -526,7 +527,7 @@ func TestAlgebraicCompareSequenceStoppedDestructorRetainsOwner(t *testing.T) {
 		t.Fatal("cleanup bypassed stopped coefficient", e)
 	}
 	algebraicComparisonAudit(t, c, &a, &b)
-	q := util.RationalFromBorrowedNumerals(util.NewInt(1), util.NewInt(1))
+	q := unumeral.RationalFromBorrowedNumerals(unumeral.NewInt(1), unumeral.NewInt(1))
 	got, e := c.CompareRational(&a, &q)
 	serviceMust(t, e)
 	if got != 1 {

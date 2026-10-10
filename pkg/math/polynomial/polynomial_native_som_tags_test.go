@@ -1,9 +1,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialNativeSOMTagsPreserveAcquisitionAndForeignRows(t *testing.T) {
@@ -24,13 +23,13 @@ func TestPolynomialNativeSOMTagsPreserveAcquisitionAndForeignRows(t *testing.T) 
 			serviceMust(t, c.monomials.DecRef(term))
 		}
 	})
-	foreign := util.NewInt(17)
+	foreign := unumeral.NewInt(17)
 	serviceMust(t, c.cheap.add(&foreign, terms[0], false))
 	used, storage, cells := c.integer.Budget().Used(), c.memory.Stats(), c.integer.StorageStats()
 	var receipt polynomialCheapAppendInvocationReceipt
 	c.integer.Budget().FailAfter(0)
 	for i, term := range terms[1:] {
-		a := util.NewInt(int32(i + 1))
+		a := unumeral.NewInt(int32(i + 1))
 		serviceMust(t, c.cheap.addWithAppendReceipt(&a, term, false, &receipt))
 		n := i + 1
 		if c.cheap.coefficientOwners[n] != receipt.invocation || c.cheap.monomialOwners[n] != receipt.invocation || c.cheap.coefficientTransferred[n] != 0 || c.cheap.monomialTransferred[n] != 0 {

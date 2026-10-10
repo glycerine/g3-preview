@@ -4,13 +4,13 @@ package rewriter
 
 import (
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // bvCoefficientProduct copies into the caller's existing coefficient and only
 // then publishes the borrowed power product. Unmatched inputs leave outputs
 // and the caller's numerical invocation unread.
-func bvCoefficientProduct(m *ast.ASTManager, t ast.ASTHandle, coefficient *util.OwnedRational, product *ast.ASTHandle, c *util.RationalServiceInvocation) (bool, error) {
+func bvCoefficientProduct(m *ast.ASTManager, t ast.ASTHandle, coefficient *unumeral.OwnedRational, product *ast.ASTHandle, c *unumeral.RationalServiceInvocation) (bool, error) {
 	if m == nil {
 		return false, ast.ErrASTHandle
 	}

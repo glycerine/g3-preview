@@ -2,9 +2,8 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // The literal coeff(B,x,degB,r_B) call has two real cheap buffers. The
@@ -22,7 +21,7 @@ func TestPolynomialCoefficientReductActualTwoBufferOwnershipPrefixes(t *testing.
 		serviceMust(t, e)
 		unit, e := c.monomials.Unit()
 		serviceMust(t, e)
-		p, e := c.MkTerms([]util.Int{util.NewInt(2), util.NewInt(1)}, []Monomial{term, unit})
+		p, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(1)}, []Monomial{term, unit})
 		serviceMust(t, e)
 		p = polynomialCaller(t, c, p)
 		var reduct polynomialReference

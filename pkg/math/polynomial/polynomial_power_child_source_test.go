@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialPowerActualProductChildPrefixes(t *testing.T) {
@@ -100,7 +99,7 @@ func TestPolynomialPowerMatchedAbortPreservesForeignRegularRow(t *testing.T) {
 	}
 	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, out.value, out.incoming}, nil, 0)
 	c.integer.Budget().FailAfter(-1)
-	a := util.NewInt(7)
+	a := unumeral.NewInt(7)
 	serviceMust(t, c.som.add(&a, foreign, false))
 	before, e := c.monomialRefCount(foreign)
 	serviceMust(t, e)

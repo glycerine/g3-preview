@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialPMinusXActualMinimumCallbackProtectsCaller(t *testing.T) {
@@ -130,7 +130,7 @@ func TestUPolynomialPMinusXActualMinimumEveryPrefixAndInlineReuse(t *testing.T) 
 			z := c.config.Rationals.Integers()
 			poly, e := p.NewPolynomial()
 			serviceMust(t, e)
-			serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(1), util.NewInt(7), util.NewInt(2), util.NewInt(math.MinInt32), util.NewInt(1)}))
+			serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(7), unumeral.NewInt(2), unumeral.NewInt(math.MinInt32), unumeral.NewInt(1)}))
 			v, e := p.wholeView(poly)
 			serviceMust(t, e)
 			baseline := z.Budget().Used() - integerActualOwnedBytes(z) - p.knuthHistoryBytes
@@ -143,7 +143,7 @@ func TestUPolynomialPMinusXActualMinimumEveryPrefixAndInlineReuse(t *testing.T) 
 			}
 			coefficient, e := p.read(v, 1)
 			serviceMust(t, e)
-			if *coefficient != util.NewInt(-7) {
+			if *coefficient != unumeral.NewInt(-7) {
 				t.Fatal("earlier source odd NEG was restored/skipped", *coefficient)
 			}
 			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, nil, nil)
@@ -185,7 +185,7 @@ func TestUPolynomialPMinusXActualMinimumEveryPrefixAndInlineReuse(t *testing.T) 
 			}
 			term, e := p.read(sv, 1)
 			serviceMust(t, e)
-			if *term != util.NewInt(7) {
+			if *term != unumeral.NewInt(7) {
 				t.Fatal("inline double transform did not restore literal value", *term)
 			}
 			before := p.knuth
@@ -206,8 +206,8 @@ func TestUPolynomialPMinusXActualMinimumEveryPrefixAndInlineReuse(t *testing.T) 
 func TestUPolynomialPMinusXOldAcknowledgmentPreservesLaterActualRoots(t *testing.T) {
 	c, p := algebraicFixture(t)
 	z := c.config.Rationals.Integers()
-	var foreign util.Int
-	foreign = util.NewInt(17)
+	var foreign unumeral.Int
+	foreign = unumeral.NewInt(17)
 	savedForeign := foreign
 	defer func() { serviceMust(t, z.Del(&foreign)) }()
 	var old upolyKnuthInvocationReceipt
@@ -215,14 +215,14 @@ func TestUPolynomialPMinusXOldAcknowledgmentPreservesLaterActualRoots(t *testing
 	for prefix := int64(0); prefix < 64 && (!foundOld || !foundNew); prefix++ {
 		poly, e := p.NewPolynomial()
 		serviceMust(t, e)
-		serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(1), util.NewInt(math.MinInt32), util.NewInt(1)}))
+		serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(math.MinInt32), unumeral.NewInt(1)}))
 		v, e := p.wholeView(poly)
 		serviceMust(t, e)
 		z.Budget().FailAfter(prefix)
 		body := p.PMinusXViewInPlace(v)
 		q := &p.knuth
 		r := p.knuthReceipt()
-		algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&foreign}, nil)
+		algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*unumeral.Int{&foreign}, nil)
 		if foreign != savedForeign {
 			t.Fatal("unrelated actual BIG numeral changed")
 		}
@@ -237,7 +237,7 @@ func TestUPolynomialPMinusXOldAcknowledgmentPreservesLaterActualRoots(t *testing
 			if !reflect.DeepEqual(before, *q) || used != z.Budget().Used() || physical != z.RuntimeOwner().Stats() || *old.history != history || foreign != savedForeign {
 				t.Fatal("old ACK consumed later/foreign actual roots or history")
 			}
-			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&foreign}, nil)
+			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*unumeral.Int{&foreign}, nil)
 			foundNew = true
 		}
 		z.Budget().FailAfter(-1)

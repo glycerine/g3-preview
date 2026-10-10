@@ -7,19 +7,19 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func polynomialSkeletonInput(t *testing.T, m *MultivariatePolynomialCore) (Polynomial, []Monomial) {
 	t.Helper()
 	powers := [][]MonomialPower{{{0, 3}, {2, 1}}, {{0, 1}, {2, 1}}, {{1, 2}}, {{0, 2}, {1, 2}}, {{0, 4}}}
 	ms := make([]Monomial, len(powers))
-	as := make([]util.Int, len(powers))
+	as := make([]unumeral.Int, len(powers))
 	for i, p := range powers {
 		var e error
 		ms[i], e = m.monomials.MkMonomial(p)
 		serviceMust(t, e)
-		as[i] = util.NewInt(int32(5 + 2*i))
+		as[i] = unumeral.NewInt(int32(5 + 2*i))
 	}
 	p, e := m.MkTerms(as, ms)
 	serviceMust(t, e)
@@ -201,10 +201,10 @@ func TestPolynomialSkeletonDisplayReachedOwnerLifetime(t *testing.T) {
 
 func TestPolynomialSkeletonNativePurePowerGrowth(t *testing.T) {
 	m := polynomialCellFixture(t)
-	as := make([]util.Int, 129)
+	as := make([]unumeral.Int, 129)
 	ms := make([]Monomial, 129)
 	for i := range as {
-		as[i] = util.NewInt(1)
+		as[i] = unumeral.NewInt(1)
 		var e error
 		ms[i], e = m.monomials.MkVariable(0, uint32(i+1))
 		serviceMust(t, e)
@@ -291,10 +291,10 @@ func TestPolynomialSkeletonNativePayloadBounds(t *testing.T) {
 }
 func polynomialSkeletonOverflowInput(t *testing.T, m *MultivariatePolynomialCore) (Polynomial, []Monomial) {
 	t.Helper()
-	as := make([]util.Int, 129)
+	as := make([]unumeral.Int, 129)
 	ms := make([]Monomial, 129)
 	for i := range as {
-		as[i] = util.NewInt(1)
+		as[i] = unumeral.NewInt(1)
 		var e error
 		ms[i], e = m.monomials.MkVariable(0, uint32(i+1))
 		serviceMust(t, e)

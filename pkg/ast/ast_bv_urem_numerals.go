@@ -2,18 +2,17 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorUnsignedRemainderNumerals retains r1/r2 and reached norm/allone values.
 type BitVectorUnsignedRemainderNumerals struct {
 	self                   *BitVectorUnsignedRemainderNumerals
 	manager                *ASTManager
-	values                 [6]util.OwnedRational
+	values                 [6]unumeral.OwnedRational
 	placed                 [6]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	norm                   ASTBitVectorNumeralInvocation
 	header                 uint64
@@ -91,7 +90,7 @@ func (n *BitVectorUnsignedRemainderNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorUnsignedRemainderNumerals) Read(i int, arg ASTHandle, width *uint32) (bool, error) {
@@ -114,7 +113,7 @@ func (n *BitVectorUnsignedRemainderNumerals) Normalize(i int, width uint32) erro
 	}
 	v, e := n.manager.NormalizeBitVectorValueWithInvocation(&n.values[i], width, &n.norm)
 	n.values[2] = v
-	n.placed[2] = v != (util.OwnedRational{})
+	n.placed[2] = v != (unumeral.OwnedRational{})
 	if e != nil {
 		return n.fail(e)
 	}
@@ -168,7 +167,7 @@ func (n *BitVectorUnsignedRemainderNumerals) AllOnes(width uint32) error {
 	q := n.manager.numerals
 	v, e := q.PowerOfTwoWithInvocation(width, &n.scalar)
 	n.values[3] = v
-	n.placed[3] = v != (util.OwnedRational{})
+	n.placed[3] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -187,7 +186,7 @@ func (n *BitVectorUnsignedRemainderNumerals) AllOnes(width uint32) error {
 	}
 	v, e = q.SubWithInvocation(&n.values[3], &n.values[4], &n.scalar)
 	n.values[5] = v
-	n.placed[5] = v != (util.OwnedRational{})
+	n.placed[5] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}

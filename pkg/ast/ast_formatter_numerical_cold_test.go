@@ -2,15 +2,14 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Accounting for the explicitly borrowed global numeral service only. Actual
 // payload ownership is proved independently by the strict physical collector.
-func astFormatterRationalColdBytes(t *testing.T, q *util.RationalService) uint64 {
+func astFormatterRationalColdBytes(t *testing.T, q *unumeral.RationalService) uint64 {
 	t.Helper()
 	s := reflect.ValueOf(q).Elem()
 	if testFieldBySourceName(s, "self").Pointer() != reflect.ValueOf(q).Pointer() {

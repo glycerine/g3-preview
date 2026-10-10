@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type upolyDisplayScope struct {
@@ -18,12 +18,12 @@ type upolyDisplayScope struct {
 	invocation                                       uint64
 	active, executing, ownExecuting, sourceExecuting bool
 	smt, constructed, sourceEnded                    bool
-	numeral                                          util.Int
-	insertion                                        util.NumeralInsertionReceipt
-	characters                                       util.IntegerCharacterScope
-	characterFormatting                              util.NaturalFormattingScope
-	characterCaller                                  util.NumericCharacterCaller
-	normalize                                        util.IntegerNormalizeInvocationReceipt
+	numeral                                          unumeral.Int
+	insertion                                        unumeral.NumeralInsertionReceipt
+	characters                                       unumeral.IntegerCharacterScope
+	characterFormatting                              unumeral.NaturalFormattingScope
+	characterCaller                                  unumeral.NumericCharacterCaller
+	normalize                                        unumeral.IntegerNormalizeInvocationReceipt
 	numeric                                          polynomialNumericRoots
 	bodyCause, sourceCause, ownCause                 error
 }
@@ -110,15 +110,15 @@ func (q *upolyDisplayScope) endCall() {
 func (q *upolyDisplayScope) context() integerAllocationInvocationContext {
 	return integerAllocationInvocationContext{upolyDisplay: q, upolyDisplayInvocation: q.invocation}
 }
-func (c integerAllocationInvocationContext) upolyDisplayFrame(z *util.IntegerManager) *upolyDisplayScope {
+func (c integerAllocationInvocationContext) upolyDisplayFrame(z *unumeral.IntegerManager) *upolyDisplayScope {
 	q := c.upolyDisplay
 	if !q.actual() || q.owner.config.Integer != z || z == nil || !z.ValidOwner() || !q.active || !q.executing || !q.constructed || q.owner.callbackDepth != 0 || q.owner.currentDisplay != q || c.upolyDisplayInvocation != q.invocation {
 		return nil
 	}
 	return q
 }
-func (q *upolyDisplayScope) insert(out util.RationalSourceStream, a *util.Int) error {
-	q.characterCaller = util.NumericCharacterCaller{Characters: &q.characters, Formatting: &q.characterFormatting, Generation: q.invocation, Policy: q}
+func (q *upolyDisplayScope) insert(out unumeral.RationalSourceStream, a *unumeral.Int) error {
+	q.characterCaller = unumeral.NumericCharacterCaller{Characters: &q.characters, Formatting: &q.characterFormatting, Generation: q.invocation, Policy: q}
 	e := q.owner.config.Integer.InsertSourceIntegerTracked(out, a, &q.insertion, &q.characterCaller)
 	if q.insertion.SourceCause() != nil && q.sourceCause == nil {
 		q.sourceCause = q.insertion.SourceCause()
@@ -246,7 +246,7 @@ func (q *upolyDisplayScope) leaveCall() {
 	setUpolyDisplayCaller(q.owner.config.Integer, q.previousInteger)
 	q.previousInteger = nil
 }
-func numericIntegerManager_upolyDisplayCallerExecuting(z *util.IntegerManager) bool {
+func numericIntegerManager_upolyDisplayCallerExecuting(z *unumeral.IntegerManager) bool {
 	if z == nil || !z.ValidOwner() {
 		return false
 	}
@@ -265,7 +265,7 @@ func numericIntegerManager_upolyDisplayCallerExecuting(z *util.IntegerManager) b
 // Foreign callback numerical calls cannot adopt this executing display context.
 type upolyDisplayStream struct {
 	scope *upolyDisplayScope
-	out   util.RationalSourceStream
+	out   unumeral.RationalSourceStream
 }
 
 func (s upolyDisplayStream) AppendInt32(v int32) error {
@@ -284,9 +284,9 @@ func (s upolyDisplayStream) AppendNumeralText(v string) error {
 	return s.out.AppendNumeralText(v)
 }
 
-func numericIntegerModularManager_copyWithDisplayContext(m *util.IntegerModularManager, out, value *util.Int, c integerAllocationInvocationContext) error {
+func numericIntegerModularManager_copyWithDisplayContext(m *unumeral.IntegerModularManager, out, value *unumeral.Int, c integerAllocationInvocationContext) error {
 	if m == nil || m.Integers() == nil {
-		return util.ErrModularOwner
+		return unumeral.ErrModularOwner
 	}
 	q := c.upolyDisplayFrame(m.Integers())
 	if q == nil || q.owner.modular != m {
@@ -294,9 +294,9 @@ func numericIntegerModularManager_copyWithDisplayContext(m *util.IntegerModularM
 	}
 	return m.WithAllocationContext((c).utility(m.Integers())).Copy(out, value)
 }
-func numericIntegerModularManager_negWithDisplayContext(m *util.IntegerModularManager, out *util.Int, c integerAllocationInvocationContext) error {
+func numericIntegerModularManager_negWithDisplayContext(m *unumeral.IntegerModularManager, out *unumeral.Int, c integerAllocationInvocationContext) error {
 	if m == nil || m.Integers() == nil {
-		return util.ErrModularOwner
+		return unumeral.ErrModularOwner
 	}
 	q := c.upolyDisplayFrame(m.Integers())
 	if q == nil || q.owner.modular != m {
@@ -305,7 +305,7 @@ func numericIntegerModularManager_negWithDisplayContext(m *util.IntegerModularMa
 	return m.WithAllocationContext((c).utility(m.Integers())).Neg(out)
 }
 
-func (q *upolyDisplayScope) NumericCharacterValid(n *util.NaturalManager, executing bool) bool {
+func (q *upolyDisplayScope) NumericCharacterValid(n *unumeral.NaturalManager, executing bool) bool {
 	if !q.actual() || !q.active || q.owner.config.Integer.Naturals() != n {
 		return false
 	}

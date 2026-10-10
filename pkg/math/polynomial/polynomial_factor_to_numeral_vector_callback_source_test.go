@@ -5,8 +5,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialFactorToNumeralVectorTransportCannotRetireExecutingOwner(t *testing.T) {
@@ -18,8 +19,8 @@ func polynomialToNumeralVectorTransportCannotRetireExecutingOwner(t *testing.T, 
 			b := arena.NewBudget(1 << 27)
 			var full *MultivariatePolynomialManager
 			var fs *PolynomialFactors
-			var q *util.RationalManager
-			var callbackOut, callbackInput util.Int
+			var q *unumeral.RationalManager
+			var callbackOut, callbackInput unumeral.Int
 			var p Polynomial
 			var output upolyVectorState
 			var captured polynomialFactorNumeralVectorReceipt
@@ -83,7 +84,7 @@ func polynomialToNumeralVectorTransportCannotRetireExecutingOwner(t *testing.T, 
 			serviceMust(t, e)
 			cfg := serviceConfig(b).Integers
 			cfg.Memory = rt
-			q, e = util.NewRationalManager(util.RationalConfig{Integers: cfg})
+			q, e = unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 			serviceMust(t, e)
@@ -91,13 +92,13 @@ func polynomialToNumeralVectorTransportCannotRetireExecutingOwner(t *testing.T, 
 			serviceMust(t, e)
 			fs, e = NewPolynomialFactors(full)
 			serviceMust(t, e)
-			var a util.Int
+			var a unumeral.Int
 			digits := make([]uint32, 80)
 			digits[79] = 1
 			serviceMust(t, q.Integers().SetLimbs(&a, digits))
 			serviceMust(t, q.Integers().Copy(&callbackInput, &a))
 			serviceMust(t, q.Integers().Copy(&callbackOut, &q.Integers().Two64))
-			var coefficient util.Int
+			var coefficient unumeral.Int
 			serviceMust(t, q.Integers().Copy(&coefficient, &a))
 			p, e = full.core.MkConstantTake(&coefficient)
 			serviceMust(t, e)
@@ -119,7 +120,7 @@ func polynomialToNumeralVectorTransportCannotRetireExecutingOwner(t *testing.T, 
 			if !seen || !numericPhysicalReservationRefusal(cause) {
 				t.Fatal("actual SET returning transport", seen, cause)
 			}
-			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p}, []*util.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []umemory.Block{held})
+			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p}, []*unumeral.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []umemory.Block{held})
 			serviceMust(t, rt.SetMaxSize(0))
 			serviceMust(t, full.cleanupFactorNumeralVector(&full.factorNumeralVector.direct, false))
 			serviceMust(t, full.upm.reset(&output))

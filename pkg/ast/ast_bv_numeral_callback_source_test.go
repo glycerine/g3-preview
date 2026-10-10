@@ -12,8 +12,9 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -22,10 +23,10 @@ import (
 func TestASTBitVectorNumericalPowerRealCallbackOwnerGuard(t *testing.T) {
 	if os.Getenv("G3_BV_NUMERAL_CALLBACK_CHILD") == "1" {
 		b := arena.NewBudget(1 << 28)
-		var q, other *util.RationalService
+		var q, other *unumeral.RationalService
 		var rt *umemory.Runtime
 		var e error
-		var target, foreign util.OwnedRational
+		var target, foreign unumeral.OwnedRational
 		active, calls := false, 0
 		rt, e = umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 			if active {
@@ -56,9 +57,9 @@ func TestASTBitVectorNumericalPowerRealCallbackOwnerGuard(t *testing.T) {
 			return f
 		}})
 		astTestMust(t, e)
-		q, e = util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+		q, e = unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 		astTestMust(t, e)
-		other, e = util.PrepareRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+		other, e = unumeral.PrepareRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 		astTestMust(t, e)
 		target, e = q.NewValue()
 		astTestMust(t, e)
@@ -87,7 +88,7 @@ func TestASTBitVectorNumericalPowerRealCallbackOwnerGuard(t *testing.T) {
 		if e == nil || calls == 0 {
 			t.Fatal("actual numerical allocation did not reach transport", e, calls, rt.State())
 		}
-		upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{anchor}, nil, upolyPhysicalExtraOwners{ASTManagers: []*ASTManager{m}, RationalServices: []*util.RationalService{q}, CallerBlocks: []umemory.Block{padding}})
+		upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{anchor}, nil, upolyPhysicalExtraOwners{ASTManagers: []*ASTManager{m}, RationalServices: []*unumeral.RationalService{q}, CallerBlocks: []umemory.Block{padding}})
 		// The actual caller owns q and its lexical recovery, unlike the borrowed AST.
 		astTestMust(t, rt.SetMaxSize(0))
 		astTestMust(t, q.CleanupLexical())

@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestUPolynomialEvalSignIntEveryActualReservationPrefix(t *testing.T) {
@@ -23,7 +23,7 @@ func TestUPolynomialEvalSignIntEveryActualReservationPrefix(t *testing.T) {
 			serviceMust(t, e)
 			cv, e := p.wholeView(constant)
 			serviceMust(t, e)
-			var b util.Int
+			var b unumeral.Int
 			serviceMust(t, z.SetInt32(&b, math.MaxInt32))
 			baseline := z.Budget().Used() - integerActualOwnedBytes(z) - p.integerEvaluationHistoryBytes
 			z.Budget().FailAfter(prefix)
@@ -34,7 +34,7 @@ func TestUPolynomialEvalSignIntEveryActualReservationPrefix(t *testing.T) {
 			if body != nil && !numericPhysicalReservationRefusal(body) {
 				t.Fatal(body)
 			}
-			extra := []*util.Int{&b, &q.values[0]}
+			extra := []*unumeral.Int{&b, &q.values[0]}
 			if q.addMul.Frame != nil {
 				extra = append(extra, &q.addMul.Frame.Tmp)
 			}
@@ -119,7 +119,7 @@ func TestUPolynomialEvalSignIntLiteralHornerBranches(t *testing.T) {
 		n    int32
 		want int
 	}{{0, -1}, {1, -1}, {2, 1}, {-2, 1}} {
-		b := util.NewInt(tc.n)
+		b := unumeral.NewInt(tc.n)
 		z.Budget().FailAfter(0)
 		got, e := p.EvalSignInt(v, &b)
 		z.Budget().FailAfter(-1)

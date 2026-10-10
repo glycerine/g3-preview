@@ -4,10 +4,10 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (m *UPolynomialManager) isolationBinary(b *util.BinaryRationalManager) error {
+func (m *UPolynomialManager) isolationBinary(b *unumeral.BinaryRationalManager) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -16,7 +16,7 @@ func (m *UPolynomialManager) isolationBinary(b *util.BinaryRationalManager) erro
 	}
 	return b.Open()
 }
-func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *util.BinaryRationalManager, a, b *util.BinaryRational) (bool, error) {
+func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational) (bool, error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
@@ -35,7 +35,7 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *util.B
 		return true, nil
 	}
 	if sa == 0 && sb != 0 {
-		var next util.BinaryRational
+		var next unumeral.BinaryRational
 		defer bqm.Del(&next)
 		if e = bqm.Add(a, b, &next); e != nil {
 			return false, e
@@ -72,7 +72,7 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *util.B
 		}
 	}
 	if sa != 0 && sb == 0 {
-		var next util.BinaryRational
+		var next unumeral.BinaryRational
 		defer bqm.Del(&next)
 		if e = bqm.Add(a, b, &next); e != nil {
 			return false, e
@@ -116,7 +116,7 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *util.B
 	if polynomialSourceDebug && (sa != 0 || sb != 0) {
 		return false, ErrUPolynomialAssertion
 	}
-	var b1, a2, newA, newB util.BinaryRational
+	var b1, a2, newA, newB unumeral.BinaryRational
 	defer bqm.Del(&b1)
 	defer bqm.Del(&a2)
 	defer bqm.Del(&newA)
@@ -218,7 +218,7 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *util.B
 		}
 	}
 }
-func (m *UPolynomialManager) RefineCore(v UPolynomialView, sa int, bqm *util.BinaryRationalManager, a, b *util.BinaryRational) (bool, error) {
+func (m *UPolynomialManager) RefineCore(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational) (bool, error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
@@ -247,7 +247,7 @@ func (m *UPolynomialManager) RefineCore(v UPolynomialView, sa int, bqm *util.Bin
 			return false, ErrUPolynomialAssertion
 		}
 	}
-	var mid util.BinaryRational
+	var mid unumeral.BinaryRational
 	defer bqm.Del(&mid)
 	if e := bqm.Add(a, b, &mid); e != nil {
 		return false, e
@@ -279,7 +279,7 @@ func (m *UPolynomialManager) RefineCore(v UPolynomialView, sa int, bqm *util.Bin
 	}
 	return true, nil
 }
-func (m *UPolynomialManager) Refine(v UPolynomialView, bqm *util.BinaryRationalManager, a, b *util.BinaryRational) (bool, error) {
+func (m *UPolynomialManager) Refine(v UPolynomialView, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational) (bool, error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
@@ -292,7 +292,7 @@ func (m *UPolynomialManager) Refine(v UPolynomialView, bqm *util.BinaryRationalM
 	}
 	return m.RefineCore(v, sa, bqm, a, b)
 }
-func (m *UPolynomialManager) RefineCoreToPrecision(v UPolynomialView, sa int, bqm *util.BinaryRationalManager, a, b *util.BinaryRational, k uint32) (bool, error) {
+func (m *UPolynomialManager) RefineCoreToPrecision(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, k uint32) (bool, error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
@@ -315,7 +315,7 @@ func (m *UPolynomialManager) RefineCoreToPrecision(v UPolynomialView, sa int, bq
 			return false, ErrUPolynomialAssertion
 		}
 	}
-	var width util.BinaryRational
+	var width unumeral.BinaryRational
 	defer bqm.Del(&width)
 	for {
 		if e := m.checkpoint(); e != nil {
@@ -340,7 +340,7 @@ func (m *UPolynomialManager) RefineCoreToPrecision(v UPolynomialView, sa int, bq
 		}
 	}
 }
-func (m *UPolynomialManager) RefineToPrecision(v UPolynomialView, bqm *util.BinaryRationalManager, a, b *util.BinaryRational, k uint32) (bool, error) {
+func (m *UPolynomialManager) RefineToPrecision(v UPolynomialView, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, k uint32) (bool, error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
@@ -362,7 +362,7 @@ func (m *UPolynomialManager) RefineToPrecision(v UPolynomialView, bqm *util.Bina
 	}
 	return m.RefineCoreToPrecision(v, sa, bqm, a, b, k)
 }
-func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, qm *util.RationalManager, a, b *util.Rational, bqm *util.BinaryRationalManager, c, d *util.BinaryRational) (bool, error) {
+func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, qm *unumeral.RationalManager, a, b *unumeral.Rational, bqm *unumeral.BinaryRationalManager, c, d *unumeral.BinaryRational) (bool, error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
@@ -381,7 +381,7 @@ func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, 
 		return false, ErrUPolynomialAssertion
 	}
 	foundD := false
-	var lower, upper util.BinaryRational
+	var lower, upper unumeral.BinaryRational
 	defer bqm.Del(&lower)
 	defer bqm.Del(&upper)
 	exact, e := bqm.FromRational(qm, a, &lower)
@@ -637,7 +637,7 @@ func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, 
 	}
 	return true, nil
 }
-func (m *UPolynomialManager) NormalizeIntervalCore(v UPolynomialView, sa int, bqm *util.BinaryRationalManager, a, b *util.BinaryRational) (bool, error) {
+func (m *UPolynomialManager) NormalizeIntervalCore(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational) (bool, error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
@@ -712,6 +712,6 @@ func (m *UPolynomialManager) NormalizeIntervalCore(v UPolynomialView, sa int, bq
 	}
 	return true, nil
 }
-func (m *UPolynomialManager) NormalizeInterval(v UPolynomialView, bqm *util.BinaryRationalManager, a, b *util.BinaryRational) (bool, error) {
+func (m *UPolynomialManager) NormalizeInterval(v UPolynomialView, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational) (bool, error) {
 	return m.NormalizeIntervalCore(v, math.MinInt32, bqm, a, b)
 }

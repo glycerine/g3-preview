@@ -4,15 +4,14 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialVariableNumeralScope struct {
 	invocation                           uint64
 	active, executing, finishing         bool
-	copy                                 util.IntegerCopyAllocationReceipt
-	normalize                            util.IntegerNormalizeInvocationReceipt
+	copy                                 unumeral.IntegerCopyAllocationReceipt
+	normalize                            unumeral.IntegerNormalizeInvocationReceipt
 	bodyCause, sourceCause, cleanupCause error
 }
 type polynomialVariableNumeralInvocationReceipt struct {
@@ -22,8 +21,8 @@ type polynomialVariableNumeralInvocationReceipt struct {
 }
 type polynomialVariableNumeralHistory struct {
 	invocation                           uint64
-	copy                                 util.IntegerCopyAllocationReceipt
-	normalize                            util.IntegerNormalizeInvocationReceipt
+	copy                                 unumeral.IntegerCopyAllocationReceipt
+	normalize                            unumeral.IntegerNormalizeInvocationReceipt
 	bodyCause, sourceCause, cleanupCause error
 }
 
@@ -101,13 +100,13 @@ func (m *MultivariatePolynomialManager) IsVariable(p Polynomial, v *uint32) (boo
 	}
 	return c.modular.IsOne(&a)
 }
-func (m *MultivariatePolynomialManager) IsVariableNumeral(p Polynomial, v *uint32, n *util.Int) (bool, error) {
+func (m *MultivariatePolynomialManager) IsVariableNumeral(p Polynomial, v *uint32, n *unumeral.Int) (bool, error) {
 	if e := m.ready(); e != nil {
 		return false, e
 	}
 	return m.core.isVariableNumeralWithReceipt(p, v, n, nil)
 }
-func (c *MultivariatePolynomialCore) isVariableNumeralWithReceipt(p Polynomial, v *uint32, n *util.Int, r *polynomialVariableNumeralInvocationReceipt) (yes bool, err error) {
+func (c *MultivariatePolynomialCore) isVariableNumeralWithReceipt(p Polynomial, v *uint32, n *unumeral.Int, r *polynomialVariableNumeralInvocationReceipt) (yes bool, err error) {
 	if e := c.check(); e != nil {
 		return false, e
 	}

@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialHenselInitialSetZPFailureRetainsActualBodyCause(t *testing.T) {
@@ -19,7 +18,7 @@ func TestUPolynomialHenselInitialSetZPFailureRetainsActualBodyCause(t *testing.T
 	serviceMust(t, e)
 	zpe, e := NewRelatedUPolynomialManager(m)
 	serviceMust(t, e)
-	var p util.Int
+	var p unumeral.Int
 	serviceMust(t, q.Integers().SetLimbs(&p, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 	serviceMust(t, zp.SetZP(&p))
 	pf, e := zp.NewFactors()
@@ -27,8 +26,8 @@ func TestUPolynomialHenselInitialSetZPFailureRetainsActualBodyCause(t *testing.T
 	lf, e := zpe.NewFactors()
 	serviceMust(t, e)
 	var f, a upolyVectorState
-	serviceMust(t, m.set(&f, []util.Int{util.NewInt(-1), util.NewInt(0), util.NewInt(1)}))
-	serviceMust(t, m.set(&a, []util.Int{util.NewInt(-1), util.NewInt(1)}))
+	serviceMust(t, m.set(&f, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(0), unumeral.NewInt(1)}))
+	serviceMust(t, m.set(&a, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(1)}))
 	serviceMust(t, pf.PushCopy(m.stateView(&a), 1))
 	q.Budget().FailAfter(0)
 	body := s.henselFactorsWithCaller(m.stateView(&f), pf, 2, lf, c)
@@ -58,15 +57,15 @@ func TestUPolynomialHenselPublicFactorsEveryActualReservation(t *testing.T) {
 		serviceMust(t, e)
 		zpe, e := NewRelatedUPolynomialManager(m)
 		serviceMust(t, e)
-		five := util.NewInt(5)
+		five := unumeral.NewInt(5)
 		serviceMust(t, zp.SetZP(&five))
 		pf, e := zp.NewFactors()
 		serviceMust(t, e)
 		lf, e := zpe.NewFactors()
 		serviceMust(t, e)
 		var f, a upolyVectorState
-		serviceMust(t, m.set(&f, []util.Int{util.NewInt(-6), util.NewInt(0), util.NewInt(1)}))
-		for _, v := range [][]util.Int{{util.NewInt(-1), util.NewInt(1)}, {util.NewInt(1), util.NewInt(1)}} {
+		serviceMust(t, m.set(&f, []unumeral.Int{unumeral.NewInt(-6), unumeral.NewInt(0), unumeral.NewInt(1)}))
+		for _, v := range [][]unumeral.Int{{unumeral.NewInt(-1), unumeral.NewInt(1)}, {unumeral.NewInt(1), unumeral.NewInt(1)}} {
 			serviceMust(t, m.set(&a, v))
 			serviceMust(t, pf.PushCopy(m.stateView(&a), 1))
 		}
@@ -80,8 +79,8 @@ func TestUPolynomialHenselPublicFactorsEveryActualReservation(t *testing.T) {
 			if s.scope != nil || lf.count != 2 {
 				t.Fatal("public completed source header/publication")
 			}
-			for i, want := range []util.Int{util.NewInt(9), util.NewInt(-9)} {
-				if lf.factors[i].size != 2 || m.values(&lf.factors[i])[0] != want || m.values(&lf.factors[i])[1] != util.NewInt(1) {
+			for i, want := range []unumeral.Int{unumeral.NewInt(9), unumeral.NewInt(-9)} {
+				if lf.factors[i].size != 2 || m.values(&lf.factors[i])[0] != want || m.values(&lf.factors[i])[1] != unumeral.NewInt(1) {
 					t.Fatal("independent public factors", i)
 				}
 			}
@@ -89,7 +88,7 @@ func TestUPolynomialHenselPublicFactorsEveryActualReservation(t *testing.T) {
 
 		// Capture only diagnostic identity/value observations, never ownership.
 		var published [2]upolyVectorState
-		var values [2][2]util.Int
+		var values [2][2]unumeral.Int
 		publishedCount := lf.count
 		for i := uint32(0); i < publishedCount; i++ {
 			published[i] = lf.factors[i]

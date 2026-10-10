@@ -9,8 +9,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -93,7 +94,7 @@ func TestAlgebraicNegActualTransportOwnerAndTupleRefusal(t *testing.T) {
 	cfg := serviceConfig(budget)
 	cfg.Integers.Memory = rt
 	cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	s, e := util.NewRationalService(cfg)
+	s, e := unumeral.NewRationalService(cfg)
 	serviceMust(t, e)
 	p, e := NewUPolynomialManagerFromRationalService(s, UPolynomialConfig{Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -101,16 +102,16 @@ func TestAlgebraicNegActualTransportOwnerAndTupleRefusal(t *testing.T) {
 	serviceMust(t, e)
 	f, e := NewUPolynomialFactorizationService(p, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
-	b, e := util.NewBinaryRationalManager(s.Manager.Z, util.BinaryRationalConfig{Diagnostics: s})
+	b, e := unumeral.NewBinaryRationalManager(s.Manager.Z, unumeral.BinaryRationalConfig{Diagnostics: s})
 	serviceMust(t, e)
-	bi, e := util.NewBinaryIntervalManager(b)
+	bi, e := unumeral.NewBinaryIntervalManager(b)
 	serviceMust(t, e)
 	allocator, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: rt, Profile: cfg.Integers.Profile})
 	serviceMust(t, e)
 	c, e = NewAlgebraicRootCore(AlgebraicRootConfig{Rationals: s.Manager, Polynomials: p, Factors: f, Binary: b, Intervals: bi, Allocator: allocator, Checkpoint: p.config.Checkpoint, Cooperation: p.config.Cooperation})
 	serviceMust(t, e)
 	var a Algebraic
-	n := util.NewRational()
+	n := unumeral.NewRational()
 	var held umemory.Block
 	defer func() {
 		armed = false

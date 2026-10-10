@@ -2,4 +2,6 @@
 
 package util
 
-func (m *SexprManager) sexprBVDiagnostic(c *OwnedRational, base int64) error { return nil }
+import unumeral "github.com/glycerine/g3/pkg/util/numeral"
+
+func (m *SexprManager) sexprBVDiagnostic(c *unumeral.OwnedRational, base int64) error { return nil }

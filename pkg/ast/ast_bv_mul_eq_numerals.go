@@ -3,9 +3,8 @@
 package ast
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // BitVectorMulEqualityNumerals retains the original outer/block numerals and
@@ -13,9 +12,9 @@ import (
 type BitVectorMulEqualityNumerals struct {
 	self                   *BitVectorMulEqualityNumerals
 	manager                *ASTManager
-	values                 [9]util.OwnedRational
+	values                 [9]unumeral.OwnedRational
 	placed                 [9]bool
-	scalar                 util.RationalServiceInvocation
+	scalar                 unumeral.RationalServiceInvocation
 	call                   ASTBitVectorNumeralInvocation
 	header                 uint64
 	sourceCause            error
@@ -91,7 +90,7 @@ func (n *BitVectorMulEqualityNumerals) retire() error {
 	if e := n.scalar.EndContext(); e != nil {
 		return e
 	}
-	n.scalar = util.RationalServiceInvocation{}
+	n.scalar = unumeral.RationalServiceInvocation{}
 	return nil
 }
 func (n *BitVectorMulEqualityNumerals) Read(i int, arg ASTHandle, width *uint32) (bool, error) {
@@ -126,7 +125,7 @@ func (n *BitVectorMulEqualityNumerals) Product(a, b int) error {
 	}
 	v, e := n.manager.numerals.MulWithInvocation(&n.values[a], &n.values[b], &n.scalar)
 	n.values[7] = v
-	n.placed[7] = v != (util.OwnedRational{})
+	n.placed[7] = v != (unumeral.OwnedRational{})
 	if e == nil {
 		e = n.retire()
 	}
@@ -141,7 +140,7 @@ func (n *BitVectorMulEqualityNumerals) NormReturn(target int, width uint32) erro
 	}
 	v, e := n.manager.NormalizeBitVectorValueWithInvocation(&n.values[7], width, &n.call)
 	n.values[target] = v
-	n.placed[target] = v != (util.OwnedRational{})
+	n.placed[target] = v != (unumeral.OwnedRational{})
 	return n.fail(e)
 }
 func (n *BitVectorMulEqualityNumerals) IsOne(i int) (bool, error) {

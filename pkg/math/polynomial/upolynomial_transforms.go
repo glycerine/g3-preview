@@ -2,13 +2,13 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Concrete source overload dispatch: borrowed numerical parameters do not
 // escape the call, and their fields are reread at the actual source sites.
 
-func (m *UPolynomialManager) translate(v UPolynomialView, kind uint8, k uint32, z *util.Int, b *util.BinaryRational, q *util.Rational) error {
+func (m *UPolynomialManager) translate(v UPolynomialView, kind uint8, k uint32, z *unumeral.Int, b *unumeral.BinaryRational, q *unumeral.Rational) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -31,7 +31,7 @@ func (m *UPolynomialManager) translate(v UPolynomialView, kind uint8, k uint32, 
 			return e
 		}
 	}
-	var aux util.Int
+	var aux unumeral.Int
 	if kind == 1 {
 		defer m.modular.Del(&aux)
 	}
@@ -102,16 +102,16 @@ func (m *UPolynomialManager) TranslateOneViewInPlace(v UPolynomialView) error {
 func (m *UPolynomialManager) TranslatePowerTwoViewInPlace(v UPolynomialView, k uint32) error {
 	return m.translate(v, 1, k, nil, nil, nil)
 }
-func (m *UPolynomialManager) TranslateIntegerViewInPlace(v UPolynomialView, c *util.Int) error {
+func (m *UPolynomialManager) TranslateIntegerViewInPlace(v UPolynomialView, c *unumeral.Int) error {
 	return m.translate(v, 2, 0, c, nil, nil)
 }
-func (m *UPolynomialManager) TranslateBinaryViewInPlace(v UPolynomialView, b *util.BinaryRational) error {
+func (m *UPolynomialManager) TranslateBinaryViewInPlace(v UPolynomialView, b *unumeral.BinaryRational) error {
 	return m.translate(v, 3, 0, nil, b, nil)
 }
-func (m *UPolynomialManager) TranslateRationalViewInPlace(v UPolynomialView, b *util.Rational) error {
+func (m *UPolynomialManager) TranslateRationalViewInPlace(v UPolynomialView, b *unumeral.Rational) error {
 	return m.translate(v, 4, 0, nil, nil, b)
 }
-func (m *UPolynomialManager) translated(v UPolynomialView, out UPolynomial, kind uint8, k uint32, z *util.Int, b *util.BinaryRational, q *util.Rational) error {
+func (m *UPolynomialManager) translated(v UPolynomialView, out UPolynomial, kind uint8, k uint32, z *unumeral.Int, b *unumeral.BinaryRational, q *unumeral.Rational) error {
 	d, e := m.descriptor(out)
 	if e != nil {
 		return e
@@ -127,13 +127,13 @@ func (m *UPolynomialManager) TranslateOne(v UPolynomialView, out UPolynomial) er
 func (m *UPolynomialManager) TranslatePowerTwo(v UPolynomialView, k uint32, out UPolynomial) error {
 	return m.translated(v, out, 1, k, nil, nil, nil)
 }
-func (m *UPolynomialManager) TranslateInteger(v UPolynomialView, c *util.Int, out UPolynomial) error {
+func (m *UPolynomialManager) TranslateInteger(v UPolynomialView, c *unumeral.Int, out UPolynomial) error {
 	return m.translated(v, out, 2, 0, c, nil, nil)
 }
-func (m *UPolynomialManager) TranslateBinary(v UPolynomialView, b *util.BinaryRational, out UPolynomial) error {
+func (m *UPolynomialManager) TranslateBinary(v UPolynomialView, b *unumeral.BinaryRational, out UPolynomial) error {
 	return m.translated(v, out, 3, 0, nil, b, nil)
 }
-func (m *UPolynomialManager) TranslateRational(v UPolynomialView, b *util.Rational, out UPolynomial) error {
+func (m *UPolynomialManager) TranslateRational(v UPolynomialView, b *unumeral.Rational, out UPolynomial) error {
 	return m.translated(v, out, 4, 0, nil, nil, b)
 }
 func (m *UPolynomialManager) ComposeTwoDegreeDivideXViewInPlace(v UPolynomialView) error {
@@ -202,14 +202,14 @@ func (m *UPolynomialManager) ComposePowerTwoXViewInPlace(v UPolynomialView, k ui
 	}
 	return nil
 }
-func (m *UPolynomialManager) ComposeIntegerDegreeDivideXViewInPlace(v UPolynomialView, a *util.Int) error {
+func (m *UPolynomialManager) ComposeIntegerDegreeDivideXViewInPlace(v UPolynomialView, a *unumeral.Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}
 	if v.count <= 1 {
 		return nil
 	}
-	var ai util.Int
+	var ai unumeral.Int
 	defer m.modular.Del(&ai)
 	if e := m.modular.Copy(&ai, a); e != nil {
 		return e
@@ -235,14 +235,14 @@ func (m *UPolynomialManager) ComposeIntegerDegreeDivideXViewInPlace(v UPolynomia
 	}
 	return nil
 }
-func (m *UPolynomialManager) ComposeIntegerXViewInPlace(v UPolynomialView, b *util.Int) error {
+func (m *UPolynomialManager) ComposeIntegerXViewInPlace(v UPolynomialView, b *unumeral.Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}
 	if v.count <= 1 {
 		return nil
 	}
-	var bi util.Int
+	var bi unumeral.Int
 	defer m.modular.Del(&bi)
 	if e := m.modular.Copy(&bi, b); e != nil {
 		return e
@@ -267,7 +267,7 @@ func (m *UPolynomialManager) ComposeIntegerXViewInPlace(v UPolynomialView, b *ut
 	}
 	return nil
 }
-func (m *UPolynomialManager) ComposeBinaryXViewInPlace(v UPolynomialView, b *util.BinaryRational) error {
+func (m *UPolynomialManager) ComposeBinaryXViewInPlace(v UPolynomialView, b *unumeral.BinaryRational) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -277,7 +277,7 @@ func (m *UPolynomialManager) ComposeBinaryXViewInPlace(v UPolynomialView, b *uti
 	if b == nil {
 		return ErrUPolynomialOwner
 	}
-	var ci util.Int
+	var ci unumeral.Int
 	defer m.modular.Del(&ci)
 	if e := m.modular.SetInt32(&ci, 1); e != nil {
 		return e
@@ -311,7 +311,7 @@ func (m *UPolynomialManager) ComposeBinaryXViewInPlace(v UPolynomialView, b *uti
 	}
 	return nil
 }
-func (m *UPolynomialManager) ComposeRationalXViewInPlace(v UPolynomialView, q *util.Rational) error {
+func (m *UPolynomialManager) ComposeRationalXViewInPlace(v UPolynomialView, q *unumeral.Rational) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -321,7 +321,7 @@ func (m *UPolynomialManager) ComposeRationalXViewInPlace(v UPolynomialView, q *u
 	if q == nil {
 		return ErrUPolynomialOwner
 	}
-	var bc util.Int
+	var bc unumeral.Int
 	defer m.modular.Del(&bc)
 	if e := m.modular.Power(&(*q.BorrowDenominator()), v.count-1, &bc); e != nil {
 		return e

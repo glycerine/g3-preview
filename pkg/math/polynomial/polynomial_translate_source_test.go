@@ -9,14 +9,15 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialTranslateIndependentMultivariableIdentity(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{1, 3, 5}, [][]MonomialPower{{{0, 2}, {1, 1}}, {{0, 1}, {1, 1}}, nil})
-	two := util.NewInt(2)
+	two := unumeral.NewInt(2)
 	r, e := m.Translate(p, 0, &two)
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(r))
@@ -31,7 +32,7 @@ func TestPolynomialTranslateArraySourceAssignment(t *testing.T) {
 	r, e := NewPolynomialRef(m)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, r.Close()) })
-	serviceMust(t, m.TranslateMany(p, 2, xs, []util.Int{util.NewInt(2), util.NewInt(-3)}, r))
+	serviceMust(t, m.TranslateMany(p, 2, xs, []unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(-3)}, r))
 	got, e := r.Get()
 	serviceMust(t, e)
 	polynomialQueryExpect(t, m, got, map[[3]uint32]int64{{1, 1, 0}: 1, {1, 0, 0}: -3, {0, 1, 0}: 2, {0, 0, 0}: -5})
@@ -64,7 +65,7 @@ func TestPolynomialTranslateSourceShortCircuits(t *testing.T) {
 	if r != p {
 		t.Fatal("degree-zero did not return actual input")
 	}
-	zero := util.NewInt(0)
+	zero := unumeral.NewInt(0)
 	r, e = m.Translate(p, 0, &zero)
 	serviceMust(t, e)
 	if r != p || len(m.translateBuffers.children) != 0 {
@@ -94,7 +95,7 @@ func TestPolynomialTranslateCheckpointPrefixes(t *testing.T) {
 			visits, cooperations := 0, 0
 			m.config.Checkpoint = func() bool { visits++; return visits <= stop }
 			m.config.Cooperation = func() error { cooperations++; return nil }
-			v := util.NewInt(2)
+			v := unumeral.NewInt(2)
 			r, e := m.Translate(p, 0, &v)
 			if !errors.Is(e, ErrUPolynomialCanceled) || r != (Polynomial{}) {
 				t.Fatal(r, e)
@@ -118,7 +119,7 @@ func TestPolynomialTranslateEveryReservationPrefix(t *testing.T) {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			m := polynomialCellFixture(t)
 			p := polynomialQueryTerms(t, m, []int32{1, 3, 5}, [][]MonomialPower{{{0, 2}, {1, 1}}, {{0, 1}, {1, 1}}, nil})
-			shift := util.NewInt(2)
+			shift := unumeral.NewInt(2)
 			m.integer.Budget().FailAfter(fault)
 			out, e := m.Translate(p, 0, &shift)
 			named := []Polynomial{p}
@@ -158,7 +159,7 @@ func TestPolynomialTranslateManyEveryReservationPrefix(t *testing.T) {
 			xs, raw := variableHelperArray(t, m.memory, []uint32{0, 1})
 			out, e := NewPolynomialRef(m)
 			serviceMust(t, e)
-			values := []util.Int{util.NewInt(2), util.NewInt(-3)}
+			values := []unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(-3)}
 			m.integer.Budget().FailAfter(fault)
 			e = m.TranslateMany(p, 2, xs, values, out)
 			polynomialSOMPhysicalWithOwners(t, m, nil, nil, []umemory.Block{*raw}, []Polynomial{p}, []*PolynomialRef{out}, &values[0], &values[1])
@@ -192,7 +193,7 @@ func TestPolynomialTranslateCapturedVariablesAndWrapperProfiles(t *testing.T) {
 	serviceMust(t, m.memory.WriteUint32(raw, 0, 0))
 	xs := BorrowPolynomialVariables(m.memory, raw, 0)
 	serviceMust(t, m.memory.Deallocate(&raw))
-	e = m.TranslateMany(p, 1, xs, []util.Int{util.NewInt(2)}, out)
+	e = m.TranslateMany(p, 1, xs, []unumeral.Int{unumeral.NewInt(2)}, out)
 	if !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("captured backing read", e)
 	}
@@ -214,7 +215,7 @@ func TestPolynomialTranslateCapturedVariablesAndWrapperProfiles(t *testing.T) {
 			t.Fatal("release raw count/initial assignment prefix", e, out.root.value)
 		}
 	}
-	serviceMust(t, m.TranslateVariables(p, vector, []util.Int{util.NewInt(2)}, out))
+	serviceMust(t, m.TranslateVariables(p, vector, []unumeral.Int{unumeral.NewInt(2)}, out))
 	polynomialQueryExpect(t, m, out.root.value, map[[3]uint32]int64{{1, 0, 0}: 1, {0, 0, 0}: 7})
 }
 
@@ -286,15 +287,15 @@ func TestPolynomialTranslateBigCoefficientEveryReservationPrefix(t *testing.T) {
 			limbs := make([]uint32, 33)
 			limbs[0] = 17
 			limbs[32] = 1
-			var big util.Int
+			var big unumeral.Int
 			serviceMust(t, m.integer.SetLimbs(&big, limbs))
 			t.Cleanup(func() { serviceMust(t, m.integer.Del(&big)) })
 			term, e := m.monomials.MkVariable(0, 1)
 			serviceMust(t, e)
-			p, e := m.MkTerms([]util.Int{big, util.NewInt(1)}, []Monomial{term, m.monomials.unit})
+			p, e := m.MkTerms([]unumeral.Int{big, unumeral.NewInt(1)}, []Monomial{term, m.monomials.unit})
 			serviceMust(t, e)
 			p = polynomialCaller(t, m, p)
-			two := util.NewInt(2)
+			two := unumeral.NewInt(2)
 			m.integer.Budget().FailAfter(fault)
 			out, e := m.Translate(p, 0, &two)
 			polys := []Polynomial{p}
@@ -378,7 +379,7 @@ func TestPolynomialTranslateIndependentFiniteGrid(t *testing.T) {
 	t.Cleanup(func() { serviceMust(t, out.Close()) })
 	for dx := int64(-2); dx <= 2; dx++ {
 		for dy := int64(-2); dy <= 2; dy++ {
-			values := []util.Int{util.NewInt(int32(dx)), util.NewInt(int32(dy))}
+			values := []unumeral.Int{unumeral.NewInt(int32(dx)), unumeral.NewInt(int32(dy))}
 			serviceMust(t, m.TranslateMany(p, 2, xs, values, out))
 			for x := int64(-2); x <= 2; x++ {
 				for y := int64(-2); y <= 2; y++ {

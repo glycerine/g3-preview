@@ -6,13 +6,13 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type polynomialNewtonScope struct {
 	refsConstructed, cConstructed bool
 	kind, stage                   uint8
-	product, aux, c               util.Int
+	product, aux, c               unumeral.Int
 	temp, auxPoly, u              polynomialReference
 	body, cleanup                 error
 }
@@ -22,7 +22,7 @@ type polynomialNewtonScope struct {
 type PolynomialNewtonInterpolator struct {
 	self                   *PolynomialNewtonInterpolator
 	owner                  *MultivariatePolynomialCore
-	inputs, invs           []util.Int
+	inputs, invs           []unumeral.Int
 	vs                     polynomialReferenceVector
 	scope                  polynomialNewtonScope
 	resetCause             error
@@ -40,7 +40,7 @@ func NewPolynomialNewtonInterpolator(m *MultivariatePolynomialCore) (*Polynomial
 	if e := m.integer.Budget().Reserve(h); e != nil {
 		return nil, e
 	}
-	n := &PolynomialNewtonInterpolator{owner: m, header: h, invs: []util.Int{{}}}
+	n := &PolynomialNewtonInterpolator{owner: m, header: h, invs: []unumeral.Int{{}}}
 	n.self = n
 	return n, nil
 }
@@ -71,34 +71,34 @@ type PolynomialNewtonInputs struct{ owner *PolynomialNewtonInterpolator }
 func (n *PolynomialNewtonInterpolator) Inputs() PolynomialNewtonInputs {
 	return PolynomialNewtonInputs{owner: n}
 }
-func (v PolynomialNewtonInputs) Size() (uint32, error)          { return v.owner.NumSamplePoints() }
-func (v PolynomialNewtonInputs) Get(i uint32) (util.Int, error) { return v.owner.Input(i) }
+func (v PolynomialNewtonInputs) Size() (uint32, error)              { return v.owner.NumSamplePoints() }
+func (v PolynomialNewtonInputs) Get(i uint32) (unumeral.Int, error) { return v.owner.Input(i) }
 
-func (n *PolynomialNewtonInterpolator) Input(i uint32) (util.Int, error) {
+func (n *PolynomialNewtonInterpolator) Input(i uint32) (unumeral.Int, error) {
 	if n == nil || n.self != n {
-		return util.Int{}, ErrPolynomialOwner
+		return unumeral.Int{}, ErrPolynomialOwner
 	}
 	if n.closed || n.closing {
-		return util.Int{}, arena.ErrClosed
+		return unumeral.Int{}, arena.ErrClosed
 	}
 	if e := n.owner.check(); e != nil {
-		return util.Int{}, e
+		return unumeral.Int{}, e
 	}
 	if uint64(i) >= uint64(len(n.inputs)) {
 		if polynomialSourceDebug {
-			return util.Int{}, ErrPolynomialAssertion
+			return unumeral.Int{}, ErrPolynomialAssertion
 		}
-		return util.Int{}, arena.ErrBounds
+		return unumeral.Int{}, arena.ErrBounds
 	}
 	return n.inputs[i], nil
 }
-func (n *PolynomialNewtonInterpolator) pushNumeral(v *[]util.Int, a *util.Int) error {
+func (n *PolynomialNewtonInterpolator) pushNumeral(v *[]unumeral.Int, a *unumeral.Int) error {
 	// Publish a constructed zero numeral before SET; a failed numeric copy
 	// leaves its actual acquired resources in this owning entry.
-	*v = append(*v, util.Int{})
+	*v = append(*v, unumeral.Int{})
 	return n.owner.modular.Copy(&(*v)[len(*v)-1], a)
 }
-func (n *PolynomialNewtonInterpolator) destroyNumerals(v *[]util.Int, target uint32, cursor *uint32) error {
+func (n *PolynomialNewtonInterpolator) destroyNumerals(v *[]unumeral.Int, target uint32, cursor *uint32) error {
 	if *cursor < target {
 		*cursor = target
 	}
@@ -194,7 +194,7 @@ func (n *PolynomialNewtonInterpolator) finish(e error) error {
 	}
 	return polynomialNewtonJoin(e, d)
 }
-func (n *PolynomialNewtonInterpolator) Add(input *util.Int, output Polynomial) (err error) {
+func (n *PolynomialNewtonInterpolator) Add(input *unumeral.Int, output Polynomial) (err error) {
 	if e := n.open(); e != nil {
 		return e
 	}
@@ -324,7 +324,7 @@ func (n *PolynomialNewtonInterpolator) Add(input *util.Int, output Polynomial) (
 	}
 	return n.vs.push(m, s.auxPoly.value)
 }
-func (n *PolynomialNewtonInterpolator) scale(a *util.Int, p Polynomial) (Polynomial, error) {
+func (n *PolynomialNewtonInterpolator) scale(a *unumeral.Int, p Polynomial) (Polynomial, error) {
 	u, e := n.owner.monomials.Unit()
 	if e != nil {
 		return Polynomial{}, e
@@ -364,7 +364,7 @@ func (n *PolynomialNewtonInterpolator) Mk(x uint32, r *PolynomialRef) (err error
 	if e = s.u.assign(m, p); e != nil {
 		return e
 	}
-	s.c = util.Int{}
+	s.c = unumeral.Int{}
 	s.cConstructed = true
 	if d == math.MinInt32 {
 		return arena.ErrBounds
@@ -377,7 +377,7 @@ func (n *PolynomialNewtonInterpolator) Mk(x uint32, r *PolynomialRef) (err error
 		if e = m.modular.Neg(&s.c); e != nil {
 			return e
 		}
-		one := [1]util.Int{util.NewInt(1)}
+		one := [1]unumeral.Int{unumeral.NewInt(1)}
 		p, e = m.MkLinearTake(one[:], []uint32{x}, &s.c)
 		if e != nil {
 			return e
@@ -516,7 +516,7 @@ func (n *PolynomialNewtonInterpolator) closeMode(owning, abort bool) error {
 	return nil
 }
 
-func (n *PolynomialNewtonInterpolator) assertNumeralNormalized(a *util.Int) error {
+func (n *PolynomialNewtonInterpolator) assertNumeralNormalized(a *unumeral.Int) error {
 	if !polynomialSourceDebug {
 		return nil
 	}
@@ -551,7 +551,7 @@ func (n *PolynomialNewtonInterpolator) assertPolynomialNormalized(p Polynomial) 
 
 // NewtonInterpolation preserves the actual method-local interpolator until its
 // reached member destruction succeeds; its field is not reusable warm scratch.
-func (m *MultivariatePolynomialCore) NewtonInterpolation(x, d uint32, inputs []util.Int, outputs []Polynomial, r *PolynomialRef) (err error) {
+func (m *MultivariatePolynomialCore) NewtonInterpolation(x, d uint32, inputs []unumeral.Int, outputs []Polynomial, r *PolynomialRef) (err error) {
 	if e := m.check(); e != nil {
 		return e
 	}

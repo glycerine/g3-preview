@@ -3,11 +3,10 @@ package polynomial
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (m *MultivariatePolynomialManager) gcdCopyNumeral(s *polynomialGCDFunctionScope, a, out *util.Int) error {
+func (m *MultivariatePolynomialManager) gcdCopyNumeral(s *polynomialGCDFunctionScope, a, out *unumeral.Int) error {
 	before, e := polynomialNumericBefore(m.core.integer)
 	if e != nil {
 		return e

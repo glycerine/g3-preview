@@ -9,8 +9,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -32,7 +33,7 @@ func algebraicCellSourceFixtureProfile(t *testing.T, directTLS bool) (*Algebraic
 		profile.Debug = true // actual non-Windows debug allocator direct profile
 		config.Integers.Profile = profile
 	}
-	s, e := util.NewRationalService(config)
+	s, e := unumeral.NewRationalService(config)
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		serviceMust(t, s.Close())
@@ -52,9 +53,9 @@ func algebraicCellSourceFixtureProfile(t *testing.T, directTLS bool) (*Algebraic
 	serviceMust(t, e)
 	f, e := NewUPolynomialFactorizationService(p, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
-	b, e := util.NewBinaryRationalManager(s.Manager.Z, util.BinaryRationalConfig{Diagnostics: s})
+	b, e := unumeral.NewBinaryRationalManager(s.Manager.Z, unumeral.BinaryRationalConfig{Diagnostics: s})
 	serviceMust(t, e)
-	bi, e := util.NewBinaryIntervalManager(b)
+	bi, e := unumeral.NewBinaryIntervalManager(b)
 	serviceMust(t, e)
 	a, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: s.Manager.Z.Memory, Profile: profile})
 	serviceMust(t, e)
@@ -93,24 +94,24 @@ func algebraicCellSourceRecord(t *testing.T, c *AlgebraicRootCore, a *Algebraic)
 // Ownership is discovered from named caller/core fields, never from the live
 // descriptor registry. Registries are inspected only afterward to reject an
 // unmatched actual live object. Allocator free-pool chunks remain real roots.
-func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPolynomial, integers []*util.Int, raw []umemory.Block, values ...*Algebraic) {
+func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPolynomial, integers []*unumeral.Int, raw []umemory.Block, values ...*Algebraic) {
 	t.Helper()
 	z, p := c.config.Rationals.Integers(), c.config.Polynomials
-	refs := map[util.NumericCellRef]bool{}
-	addRef := func(ref util.NumericCellRef) {
+	refs := map[unumeral.NumericCellRef]bool{}
+	addRef := func(ref unumeral.NumericCellRef) {
 		if ref == 0 || z.IsFailureRef(ref) {
 			return
 		}
-		if !util.ValidNumericRef(z.Cells, ref) {
+		if !unumeral.ValidNumericRef(z.Cells, ref) {
 			t.Fatal("invalid named numeral", ref)
 		}
 		refs[ref] = true
 	}
-	intType := reflect.TypeOf(util.Int{})
+	intType := reflect.TypeOf(unumeral.Int{})
 	var fields func(reflect.Value)
 	fields = func(v reflect.Value) {
 		if v.Type() == intType {
-			addRef(util.NumericCellRef(testFieldBySourceName(v, "cell").Uint()))
+			addRef(unumeral.NumericCellRef(testFieldBySourceName(v, "cell").Uint()))
 			return
 		}
 		switch v.Kind() {
@@ -252,7 +253,7 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 			continue
 		}
 		if cell.Unpublished || cell.CleanupPending {
-			addRef(util.MakeNumericRef(arena.Slot(slot), z.Cells.State(arena.Slot(slot)).Generation))
+			addRef(unumeral.MakeNumericRef(arena.Slot(slot), z.Cells.State(arena.Slot(slot)).Generation))
 		}
 	}
 	if uint32(len(refs)) != z.Cells.Stats().Live {
@@ -301,7 +302,7 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 
 func TestAlgebraicCellSourceMutableNewAndExisting(t *testing.T) {
 	c, _ := algebraicCellSourceFixture(t)
-	q := util.NewRational()
+	q := unumeral.NewRational()
 	serviceMust(t, c.config.Rationals.SetFraction(&q, 7, 3))
 	serviceMust(t, c.config.Rationals.Integers().Mul2k(&(*q.BorrowNumerator()), 70, &(*q.BorrowNumerator())))
 	var a Algebraic
@@ -309,10 +310,10 @@ func TestAlgebraicCellSourceMutableNewAndExisting(t *testing.T) {
 	before := q
 	serviceMust(t, c.SetTake(&a, &q))
 	r := algebraicCellSourceRecord(t, c, &a)
-	if r.value != before || q != util.NewRational() {
+	if r.value != before || q != unumeral.NewRational() {
 		t.Fatal("new basic source swap did not transfer actual fields", r.value, q)
 	}
-	algebraicCellSourcePhysical(t, c, nil, []*util.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, nil, &a)
+	algebraicCellSourcePhysical(t, c, nil, []*unumeral.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, nil, &a)
 	serviceMust(t, c.config.Rationals.SetFraction(&q, 11, 5))
 	serviceMust(t, c.config.Rationals.Integers().Mul2k(&(*q.BorrowNumerator()), 70, &(*q.BorrowNumerator())))
 	before = q
@@ -329,12 +330,12 @@ func TestAlgebraicCellSourceMutableNewAndExisting(t *testing.T) {
 	if (*r.value.BorrowNumerator()).Cell == (*q.BorrowNumerator()).Cell {
 		t.Fatal("existing source Copy aliased physical numeral ownership")
 	}
-	algebraicCellSourcePhysical(t, c, nil, []*util.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, nil, &a)
+	algebraicCellSourcePhysical(t, c, nil, []*unumeral.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, nil, &a)
 }
 
 func TestAlgebraicCellSourceConstInputPreserved(t *testing.T) {
 	c, _ := algebraicCellSourceFixture(t)
-	q := util.NewRational()
+	q := unumeral.NewRational()
 	serviceMust(t, c.config.Rationals.SetFraction(&q, 13, 7))
 	serviceMust(t, c.config.Rationals.Integers().Mul2k(&(*q.BorrowNumerator()), 70, &(*q.BorrowNumerator())))
 	before := q
@@ -353,18 +354,18 @@ func TestAlgebraicCellSourceConstInputPreserved(t *testing.T) {
 	if (*r.value.BorrowNumerator()).Cell == (*q.BorrowNumerator()).Cell {
 		t.Fatal("const source Copy aliased actual big numerator")
 	}
-	algebraicCellSourcePhysical(t, c, nil, []*util.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, nil, &a)
+	algebraicCellSourcePhysical(t, c, nil, []*unumeral.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, nil, &a)
 }
 
 func TestAlgebraicCellSourceLeadingPositiveAndCopyFlags(t *testing.T) {
 	c, p := algebraicCellSourceFixture(t)
 	poly, e := p.NewPolynomial()
 	serviceMust(t, e)
-	serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(4), util.NewInt(0), util.NewInt(-2)}))
+	serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(4), unumeral.NewInt(0), unumeral.NewInt(-2)}))
 	t.Cleanup(func() { serviceMust(t, p.DelPolynomial(&poly)) })
 	v, e := p.wholeView(poly)
 	serviceMust(t, e)
-	lower, upper := util.BinaryRationalFromBorrowedNumeral(util.NewInt(1), 0), util.BinaryRationalFromBorrowedNumeral(util.NewInt(2), 0)
+	lower, upper := unumeral.BinaryRationalFromBorrowedNumeral(unumeral.NewInt(1), 0), unumeral.BinaryRationalFromBorrowedNumeral(unumeral.NewInt(2), 0)
 	var a, b Algebraic
 	t.Cleanup(func() { serviceMust(t, c.Del(&b)); serviceMust(t, c.Del(&a)) })
 	serviceMust(t, c.SetRoot(&a, v, &lower, &upper, true))
@@ -374,7 +375,7 @@ func TestAlgebraicCellSourceLeadingPositiveAndCopyFlags(t *testing.T) {
 	for i, want := range []int32{-2, 0, 1} {
 		x, e := p.read(vv, uint32(i))
 		serviceMust(t, e)
-		expected := util.NewInt(want)
+		expected := unumeral.NewInt(want)
 		eq, e := p.config.Integer.Equal(x, &expected)
 		serviceMust(t, e)
 		if !eq {
@@ -402,7 +403,7 @@ func TestAlgebraicCellSourceLeadingPositiveAndCopyFlags(t *testing.T) {
 
 func TestAlgebraicCellSourceCloseRefusesCaller(t *testing.T) {
 	c, _ := algebraicCellSourceFixture(t)
-	q := util.NewRational()
+	q := unumeral.NewRational()
 	serviceMust(t, c.config.Rationals.SetFraction(&q, 5, 2))
 	var a Algebraic
 	t.Cleanup(func() { serviceMust(t, c.Del(&a)); serviceMust(t, c.config.Rationals.Del(&q)) })
@@ -426,17 +427,17 @@ func TestAlgebraicCellSourceCopyDoesNotNormalize(t *testing.T) {
 	poly, e := p.NewPolynomial()
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, p.DelPolynomial(&poly)) })
-	serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(-2), util.NewInt(0), util.NewInt(1)}))
+	serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(-2), unumeral.NewInt(0), unumeral.NewInt(1)}))
 	v, e := p.wholeView(poly)
 	serviceMust(t, e)
-	lower, upper := util.BinaryRationalFromBorrowedNumeral(util.NewInt(1), 0), util.BinaryRationalFromBorrowedNumeral(util.NewInt(2), 0)
+	lower, upper := unumeral.BinaryRationalFromBorrowedNumeral(unumeral.NewInt(1), 0), unumeral.BinaryRationalFromBorrowedNumeral(unumeral.NewInt(2), 0)
 	var a, b Algebraic
 	t.Cleanup(func() { serviceMust(t, c.Del(&b)); serviceMust(t, c.Del(&a)) })
 	serviceMust(t, c.SetRoot(&a, v, &lower, &upper, true))
 	r := algebraicCellSourceRecord(t, c, &a)
 	// Scaling the actual stored coefficient array keeps the same root and
 	// interval. Source copy copies it verbatim; it never calls normalize_coeffs.
-	serviceMust(t, p.SetInts(r.poly, []util.Int{util.NewInt(-4), util.NewInt(0), util.NewInt(2)}))
+	serviceMust(t, p.SetInts(r.poly, []unumeral.Int{unumeral.NewInt(-4), unumeral.NewInt(0), unumeral.NewInt(2)}))
 	serviceMust(t, c.Copy(&b, &a))
 	copy := algebraicCellSourceRecord(t, c, &b)
 	v, e = p.wholeView(copy.poly)
@@ -444,7 +445,7 @@ func TestAlgebraicCellSourceCopyDoesNotNormalize(t *testing.T) {
 	for i, want := range []int32{-4, 0, 2} {
 		x, e := p.read(v, uint32(i))
 		serviceMust(t, e)
-		y := util.NewInt(want)
+		y := unumeral.NewInt(want)
 		equal, e := p.config.Integer.Equal(x, &y)
 		serviceMust(t, e)
 		if !equal {
@@ -458,10 +459,10 @@ func TestAlgebraicCellSourceDebugSignBeforeFlagPublication(t *testing.T) {
 	poly, e := p.NewPolynomial()
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, p.DelPolynomial(&poly)) })
-	serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(-2), util.NewInt(0), util.NewInt(1)}))
+	serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(-2), unumeral.NewInt(0), unumeral.NewInt(1)}))
 	v, e := p.wholeView(poly)
 	serviceMust(t, e)
-	lower, upper := util.BinaryRationalFromBorrowedNumeral(util.NewInt(1), 0), util.BinaryRationalFromBorrowedNumeral(util.NewInt(2), 0)
+	lower, upper := unumeral.BinaryRationalFromBorrowedNumeral(unumeral.NewInt(1), 0), unumeral.BinaryRationalFromBorrowedNumeral(unumeral.NewInt(2), 0)
 	var existing, fresh Algebraic
 	t.Cleanup(func() {
 		serviceMust(t, c.Del(&fresh))
@@ -474,7 +475,7 @@ func TestAlgebraicCellSourceDebugSignBeforeFlagPublication(t *testing.T) {
 	loc, e := c.location(&existing)
 	serviceMust(t, e)
 	serviceMust(t, c.store(loc, &old))
-	serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(-1), util.NewInt(0), util.NewInt(1)}))
+	serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(0), unumeral.NewInt(1)}))
 	v, e = p.wholeView(poly)
 	serviceMust(t, e)
 	e = c.SetRoot(&existing, v, &lower, &upper, true)
@@ -507,10 +508,10 @@ func TestAlgebraicCellSourceDebugUpperReadPrecedesSignPublication(t *testing.T) 
 	poly, e := p.NewPolynomial()
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, p.DelPolynomial(&poly)) })
-	serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(-2), util.NewInt(0), util.NewInt(1)}))
+	serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(-2), unumeral.NewInt(0), unumeral.NewInt(1)}))
 	v, e := p.wholeView(poly)
 	serviceMust(t, e)
-	lower, upper := util.BinaryRationalFromBorrowedNumeral(util.NewInt(-2), 0), util.BinaryRationalFromBorrowedNumeral(util.NewInt(-1), 0)
+	lower, upper := unumeral.BinaryRationalFromBorrowedNumeral(unumeral.NewInt(-2), 0), unumeral.BinaryRationalFromBorrowedNumeral(unumeral.NewInt(-1), 0)
 	var existing, fresh Algebraic
 	t.Cleanup(func() {
 		serviceMust(t, c.Del(&fresh))
@@ -521,7 +522,7 @@ func TestAlgebraicCellSourceDebugUpperReadPrecedesSignPublication(t *testing.T) 
 	if algebraicCellSourceRecord(t, c, &existing).flags&2 != 0 {
 		t.Fatal("fixture lower sign must be positive")
 	}
-	lower, upper = util.BinaryRationalFromBorrowedNumeral(util.NewInt(1), 0), util.BinaryRationalFromBorrowedNumeral(util.NewInt(1), 0)
+	lower, upper = unumeral.BinaryRationalFromBorrowedNumeral(unumeral.NewInt(1), 0), unumeral.BinaryRationalFromBorrowedNumeral(unumeral.NewInt(1), 0)
 	e = c.SetRoot(&existing, v, &lower, &upper, true)
 	if polynomialSourceDebug {
 		if !errors.Is(e, ErrUPolynomialAssertion) {
@@ -552,10 +553,10 @@ func TestAlgebraicCellSourceRootCopyDeletionOrder(t *testing.T) {
 	z := c.config.Rationals.Integers()
 	poly, e := p.NewPolynomial()
 	serviceMust(t, e)
-	serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(-2), util.NewInt(0), util.NewInt(1)}))
+	serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(-2), unumeral.NewInt(0), unumeral.NewInt(1)}))
 	t.Cleanup(func() { serviceMust(t, p.DelPolynomial(&poly)) })
-	one, two := util.NewInt(1), util.NewInt(2)
-	lower, upper := util.BinaryRationalFromBorrowedNumeral(util.Int{}, 70), util.BinaryRationalFromBorrowedNumeral(util.Int{}, 70)
+	one, two := unumeral.NewInt(1), unumeral.NewInt(2)
+	lower, upper := unumeral.BinaryRationalFromBorrowedNumeral(unumeral.Int{}, 70), unumeral.BinaryRationalFromBorrowedNumeral(unumeral.Int{}, 70)
 	serviceMust(t, z.Mul2k(&one, 70, &(*lower.BorrowNumerator())))
 	serviceMust(t, z.Mul2k(&two, 70, &(*upper.BorrowNumerator())))
 	t.Cleanup(func() { serviceMust(t, c.config.Binary.Del(&lower)); serviceMust(t, c.config.Binary.Del(&upper)) })
@@ -565,13 +566,13 @@ func TestAlgebraicCellSourceRootCopyDeletionOrder(t *testing.T) {
 	t.Cleanup(func() { serviceMust(t, c.Del(&dst)); serviceMust(t, c.Del(&src)) })
 	serviceMust(t, c.SetRoot(&src, v, &lower, &upper, true))
 	serviceMust(t, c.SetRoot(&dst, v, &lower, &upper, true))
-	negative := util.NewInt(-2)
-	var scaled util.Int
+	negative := unumeral.NewInt(-2)
+	var scaled unumeral.Int
 	serviceMust(t, z.Mul2k(&negative, 70, &scaled))
 	t.Cleanup(func() { serviceMust(t, z.Del(&scaled)) })
 	for _, a := range []*Algebraic{&src, &dst} {
 		r := algebraicCellSourceRecord(t, c, a)
-		serviceMust(t, p.SetInts(r.poly, []util.Int{scaled, util.NewInt(0), (*lower.BorrowNumerator())}))
+		serviceMust(t, p.SetInts(r.poly, []unumeral.Int{scaled, unumeral.NewInt(0), (*lower.BorrowNumerator())}))
 	}
 	old := algebraicCellSourceRecord(t, c, &dst)
 	if (*(*old.interval.BorrowLower()).BorrowNumerator()).Cell == 0 || (*(*old.interval.BorrowUpper()).BorrowNumerator()).Cell == 0 {
@@ -590,7 +591,7 @@ func TestAlgebraicCellSourceRootCopyDeletionOrder(t *testing.T) {
 	if uint32((first).Cell) != uint32(last) || z.Cells.State(arena.Slot(uint32((first).Cell))).Generation != lastGeneration+1 {
 		t.Fatal("first coefficient did not reuse last destroyed upper descriptor", (first).Cell, last)
 	}
-	if reflect.TypeOf(util.NumericCellRef(0)).Size() == 8 && (util.ValidNumericRef(z.Cells, (*(*old.interval.BorrowLower()).BorrowNumerator()).Cell) || util.ValidNumericRef(z.Cells, (*(*old.interval.BorrowUpper()).BorrowNumerator()).Cell)) {
+	if reflect.TypeOf(unumeral.NumericCellRef(0)).Size() == 8 && (unumeral.ValidNumericRef(z.Cells, (*(*old.interval.BorrowLower()).BorrowNumerator()).Cell) || unumeral.ValidNumericRef(z.Cells, (*(*old.interval.BorrowUpper()).BorrowNumerator()).Cell)) {
 		t.Fatal("root Copy retained old interval descriptors")
 	}
 }
@@ -617,7 +618,7 @@ func algebraicCellSourceTLSBoundary(t *testing.T, c *AlgebraicRootCore) umemory.
 
 func TestAlgebraicCellSourceConstCopyPrecedesCellAllocation(t *testing.T) {
 	c, _ := algebraicCellSourceFixtureProfile(t, true)
-	q := util.NewRational()
+	q := unumeral.NewRational()
 	serviceMust(t, c.config.Rationals.Integers().SetString(&(*q.BorrowNumerator()), "1267650600228229401496703205376")) // 2^100
 	before := q
 	var a Algebraic
@@ -641,7 +642,7 @@ func TestAlgebraicCellSourceConstCopyPrecedesCellAllocation(t *testing.T) {
 	if c.config.Rationals.Integers().Allocator.Stats().PendingBlocks == 0 {
 		t.Fatal("refused actual numerical allocation lost physical pending ownership")
 	}
-	algebraicCellSourcePhysical(t, c, nil, []*util.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, []umemory.Block{block}, &a)
+	algebraicCellSourcePhysical(t, c, nil, []*unumeral.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, []umemory.Block{block}, &a)
 	// Separate explicit caller teardown actions after immediate prefix checks.
 	serviceMust(t, runtime.SetMaxSize(0))
 	serviceMust(t, runtime.Deallocate(&block))
@@ -650,7 +651,7 @@ func TestAlgebraicCellSourceConstCopyPrecedesCellAllocation(t *testing.T) {
 
 func TestAlgebraicCellSourceMutableRefusalDoesNotConsumeInput(t *testing.T) {
 	c, _ := algebraicCellSourceFixtureProfile(t, true)
-	q := util.NewRational()
+	q := unumeral.NewRational()
 	serviceMust(t, c.config.Rationals.SetFraction(&q, 5, 3))
 	before := q
 	var a Algebraic
@@ -668,7 +669,7 @@ func TestAlgebraicCellSourceMutableRefusalDoesNotConsumeInput(t *testing.T) {
 	if c.config.Allocator.Stats().PendingBlocks != 1 {
 		t.Fatal("refused cell raw block lacks actual allocator pending owner", c.config.Allocator.Stats())
 	}
-	algebraicCellSourcePhysical(t, c, nil, []*util.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, []umemory.Block{block}, &a)
+	algebraicCellSourcePhysical(t, c, nil, []*unumeral.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, []umemory.Block{block}, &a)
 	serviceMust(t, runtime.SetMaxSize(0))
 	serviceMust(t, runtime.Deallocate(&block))
 	serviceMust(t, c.config.Allocator.CleanupPending())
@@ -682,13 +683,13 @@ func TestAlgebraicCellSourceAllPublicationFailurePrefixes(t *testing.T) {
 				t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 					c, p := algebraicCellSourceFixtureProfile(t, true)
 					z := c.config.Rationals.Integers()
-					q := util.NewRational()
+					q := unumeral.NewRational()
 					serviceMust(t, z.SetString(&(*q.BorrowNumerator()), "1267650600228229401496703205376"))
 					serviceMust(t, z.SetString(&(*q.BorrowDenominator()), "1208925819614629174706177"))
 					poly, e := p.NewPolynomial()
 					serviceMust(t, e)
-					serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(-2), util.NewInt(0), util.NewInt(1)}))
-					lower, upper := util.BinaryRationalFromBorrowedNumeral(util.NewInt(1), 0), util.BinaryRationalFromBorrowedNumeral(util.NewInt(2), 0)
+					serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(-2), unumeral.NewInt(0), unumeral.NewInt(1)}))
+					lower, upper := unumeral.BinaryRationalFromBorrowedNumeral(unumeral.NewInt(1), 0), unumeral.BinaryRationalFromBorrowedNumeral(unumeral.NewInt(2), 0)
 					v, e := p.wholeView(poly)
 					serviceMust(t, e)
 					var src, dst Algebraic
@@ -726,7 +727,7 @@ func TestAlgebraicCellSourceAllPublicationFailurePrefixes(t *testing.T) {
 					}
 					// At the exact source refusal: no fault disable, formatting,
 					// caller deletion, sourceguard repair, or cleanup has run.
-					algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, nil, &src, &dst)
+					algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*unumeral.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, nil, &src, &dst)
 					if e != nil {
 						if !numericPhysicalReservationRefusal(e) {
 							t.Fatal("unexpected source failure category", e)
@@ -759,7 +760,7 @@ func TestAlgebraicCellSourceAllPublicationFailurePrefixes(t *testing.T) {
 									if after.poly != r.poly || after.size != r.size {
 										t.Fatal("guard repaired/freed source array metadata")
 									}
-									algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, nil, &src, &dst)
+									algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*unumeral.Int{&(*q.BorrowNumerator()), &(*q.BorrowDenominator())}, nil, &src, &dst)
 									// Explicit caller owning abort is confined to cleanup;
 									// no source-mark/size repair or successful Del claim.
 									abortDestination = true

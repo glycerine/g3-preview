@@ -9,8 +9,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
@@ -37,7 +38,7 @@ func TestUPolynomialRecombinationTrialTransportProtectsActualCaller(t *testing.T
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
@@ -45,7 +46,7 @@ func TestUPolynomialRecombinationTrialTransportProtectsActualCaller(t *testing.T
 	serviceMust(t, e)
 	s, e = NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
-	var leading util.Int
+	var leading unumeral.Int
 	var held umemory.Block
 	fs, e := m.NewFactors()
 	serviceMust(t, e)
@@ -71,7 +72,7 @@ func TestUPolynomialRecombinationTrialTransportProtectsActualCaller(t *testing.T
 	parent.constructed = 2
 	serviceMust(t, q.Integers().Copy(&parent.p, &q.Integers().Two64))
 	var source upolyVectorState
-	serviceMust(t, m.set(&source, []util.Int{util.NewInt(1), util.NewInt(1)}))
+	serviceMust(t, m.set(&source, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}))
 	serviceMust(t, fs.PushCopy(m.stateView(&source), 1))
 	serviceMust(t, fs.PushCopy(m.stateView(&source), 1))
 	serviceMust(t, m.reset(&source))
@@ -124,7 +125,7 @@ func TestUPolynomialRecombinationTrialEveryActualBranchPrefix(t *testing.T) {
 				serviceMust(t, e)
 				var source upolyVectorState
 				trial, fpp := &parent.trial, &parent.fpp
-				for _, v := range [][]util.Int{{util.NewInt(1), util.NewInt(1)}, {util.NewInt(2), util.NewInt(1)}} {
+				for _, v := range [][]unumeral.Int{{unumeral.NewInt(1), unumeral.NewInt(1)}, {unumeral.NewInt(2), unumeral.NewInt(1)}} {
 					serviceMust(t, m.set(&source, v))
 					serviceMust(t, fs.PushCopy(m.stateView(&source), 1))
 				}
@@ -134,13 +135,13 @@ func TestUPolynomialRecombinationTrialEveryActualBranchPrefix(t *testing.T) {
 				parent.it.size = 1
 				parent.it.current[0] = 0
 				parent.it.current[1] = 2
-				var leading, constant util.Int
+				var leading, constant unumeral.Int
 				serviceMust(t, q.Integers().Copy(&leading, &q.Integers().Two64))
-				serviceMust(t, q.Integers().Mul(&leading, func() *util.Int { v := util.NewInt(2); return &v }(), &constant))
+				serviceMust(t, q.Integers().Mul(&leading, func() *unumeral.Int { v := unumeral.NewInt(2); return &v }(), &constant))
 				if !accept {
 					serviceMust(t, q.Integers().SetInt64(&constant, 7))
 				}
-				serviceMust(t, m.set(fpp, []util.Int{constant}))
+				serviceMust(t, m.set(fpp, []unumeral.Int{constant}))
 				q.Budget().FailAfter(ordinal)
 				used, body := s.selectFactorTrial(&parent.it, &leading, fpp, trial, left)
 				primeTrialPhysicalAuditAll(t, q, s, []*UPolynomialFactors{fs}, nil, &leading, &constant)
@@ -153,12 +154,12 @@ func TestUPolynomialRecombinationTrialEveryActualBranchPrefix(t *testing.T) {
 						t.Fatal("independent constant divisibility", left, accept, used)
 					}
 					if accept {
-						want := util.NewInt(1)
+						want := unumeral.NewInt(1)
 						if !left {
-							want = util.NewInt(2)
+							want = unumeral.NewInt(2)
 						}
 						v := m.values(trial)
-						if trial.size != 2 || v[0] != want || v[1] != util.NewInt(1) {
+						if trial.size != 2 || v[0] != want || v[1] != unumeral.NewInt(1) {
 							t.Fatal("independent selected complement", left, trial.size)
 						}
 					} else if trial.size != 0 {
@@ -203,7 +204,7 @@ func TestUPolynomialRecombinationTrialActualReleaseHistories(t *testing.T) {
 		cfg := serviceConfig(b).Integers
 		cfg.Memory = rt
 		cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-		q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+		q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 		serviceMust(t, e)
 		m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 		serviceMust(t, e)
@@ -339,12 +340,12 @@ func TestUPolynomialRecombinationTrialFiniteBIGEveryActualPrefix(t *testing.T) {
 			serviceMust(t, e)
 			zpe, e := NewRelatedUPolynomialManager(m)
 			serviceMust(t, e)
-			var p, b, b1, tail, middle util.Int
+			var p, b, b1, tail, middle unumeral.Int
 			serviceMust(t, q.Integers().SetLimbs(&p, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 			serviceMust(t, zpe.SetZP(&p))
 			serviceMust(t, q.Integers().Copy(&b, &q.Integers().Two64))
-			one := util.NewInt(1)
-			two := util.NewInt(2)
+			one := unumeral.NewInt(1)
+			two := unumeral.NewInt(2)
 			serviceMust(t, q.Integers().Add(&b, &one, &b1))
 			serviceMust(t, q.Integers().Add(&b, &two, &tail))
 			serviceMust(t, q.Integers().Mul(&b, &two, &middle))
@@ -352,8 +353,8 @@ func TestUPolynomialRecombinationTrialFiniteBIGEveryActualPrefix(t *testing.T) {
 			fs, e := zpe.NewFactors()
 			serviceMust(t, e)
 			var source upolyVectorState
-			for _, a := range []*util.Int{&b, &b1, &b, &b1} {
-				serviceMust(t, zpe.set(&source, []util.Int{*a, one}))
+			for _, a := range []*unumeral.Int{&b, &b1, &b, &b1} {
+				serviceMust(t, zpe.set(&source, []unumeral.Int{*a, one}))
 				serviceMust(t, fs.PushCopy(zpe.stateView(&source), 1))
 			}
 			serviceMust(t, zpe.reset(&source))
@@ -363,7 +364,7 @@ func TestUPolynomialRecombinationTrialFiniteBIGEveryActualPrefix(t *testing.T) {
 			parent.it.current[0] = 0
 			parent.it.current[1] = 1
 			parent.it.current[2] = 4
-			serviceMust(t, m.set(&parent.fpp, []util.Int{tail}))
+			serviceMust(t, m.set(&parent.fpp, []unumeral.Int{tail}))
 			q.Budget().FailAfter(ordinal)
 			used, body := s.selectFactorTrial(&parent.it, &one, &parent.fpp, &parent.trial, left)
 			primeTrialPhysicalAuditOwners(t, q, s, []*UPolynomialFactors{fs}, &p, &b, &b1, &tail, &middle)
@@ -372,7 +373,7 @@ func TestUPolynomialRecombinationTrialFiniteBIGEveryActualPrefix(t *testing.T) {
 					t.Fatal("actual BIG trial route", left, used, parent.trial.size)
 				}
 				v := zpe.values(&parent.trial)
-				for i, a := range []*util.Int{&tail, &middle, &one} {
+				for i, a := range []*unumeral.Int{&tail, &middle, &one} {
 					same, e := q.Integers().Equal(&v[i], a)
 					serviceMust(t, e)
 					if !same {
@@ -392,7 +393,7 @@ func TestUPolynomialRecombinationTrialFiniteBIGEveryActualPrefix(t *testing.T) {
 			serviceMust(t, s.CleanupRetained())
 			serviceMust(t, fs.Close())
 			serviceMust(t, zpe.Close())
-			for _, a := range []*util.Int{&p, &b, &b1, &tail, &middle} {
+			for _, a := range []*unumeral.Int{&p, &b, &b1, &tail, &middle} {
 				serviceMust(t, q.Integers().Del(a))
 			}
 			primeTrialPhysicalAudit(t, q, s)
@@ -441,7 +442,7 @@ func TestUPolynomialRecombinationTrialRelatedOwnerTransport(t *testing.T) {
 			cfg := serviceConfig(b).Integers
 			cfg.Memory = rt
 			cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 			serviceMust(t, e)
@@ -449,11 +450,11 @@ func TestUPolynomialRecombinationTrialRelatedOwnerTransport(t *testing.T) {
 			serviceMust(t, e)
 			s, e = NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 			serviceMust(t, e)
-			var leading util.Int
+			var leading unumeral.Int
 			var held umemory.Block
 			target, e = NewRelatedUPolynomialManager(m)
 			serviceMust(t, e)
-			var prime util.Int
+			var prime unumeral.Int
 			serviceMust(t, q.Integers().SetLimbs(&prime, []uint32{0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff}))
 			serviceMust(t, target.SetZP(&prime))
 			fs, e := target.NewFactors()
@@ -482,7 +483,7 @@ func TestUPolynomialRecombinationTrialRelatedOwnerTransport(t *testing.T) {
 			parent.constructed = 2
 			serviceMust(t, q.Integers().Copy(&parent.p, &q.Integers().Two64))
 			var source upolyVectorState
-			serviceMust(t, target.set(&source, []util.Int{util.NewInt(1), util.NewInt(1)}))
+			serviceMust(t, target.set(&source, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}))
 			serviceMust(t, fs.PushCopy(target.stateView(&source), 1))
 			serviceMust(t, fs.PushCopy(target.stateView(&source), 1))
 			serviceMust(t, target.reset(&source))
@@ -535,7 +536,7 @@ func TestUPolynomialRecombinationTrialActualCompiledChildSourceStopProtectsTmp(t
 		cfg := serviceConfig(b).Integers
 		cfg.Memory = rt
 		cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-		q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+		q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 		serviceMust(t, e)
 		m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 		serviceMust(t, e)
@@ -555,7 +556,7 @@ func TestUPolynomialRecombinationTrialActualCompiledChildSourceStopProtectsTmp(t
 		child, e := q.Integers().BeginDividesNumeralInvocation(context.utility(q.Integers()))
 		serviceMust(t, e)
 		savedChild := *child
-		childContext := util.NumericAllocationContext{BoolDivides: child, BoolDividesInvocation: child.Invocation}
+		childContext := unumeral.NumericAllocationContext{BoolDivides: child, BoolDividesInvocation: child.Invocation}
 		serviceMust(t, q.Integers().WithAllocationContext(childContext).CopyFromOwnerTracked(&child.Frame.Numeral, q.Integers(), &q.Integers().Two64, nil))
 		serviceMust(t, q.Integers().EnsureOwnedCapacity(&child.Frame.Numeral, 40000))
 		child.Frame.Executing = false

@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // This is the actual dormant input passed directly to the quadratic helper.
@@ -225,7 +226,7 @@ func TestPolynomialQuadraticForeignCallbackRootsSurviveOwnAbort(t *testing.T) {
 	f, e := NewPolynomialFactors(m)
 	serviceMust(t, e)
 	var foreign, deleted Polynomial
-	foreignNumber := util.Int{}
+	foreignNumber := unumeral.Int{}
 	calls := 0
 	h, e := NewPolynomialDeletionHandler(c.integer.Budget(), func(_ *PolynomialDeletionHandler, c *MultivariatePolynomialCore, current Polynomial) error {
 		if deleted != (Polynomial{}) {
@@ -264,13 +265,13 @@ func TestPolynomialQuadraticForeignCallbackRootsSurviveOwnAbort(t *testing.T) {
 		serviceMust(t, f.CloseChecked())
 	}()
 	cause := m.factorQuadraticSquareFreePrimitive(p, f, 0, 1)
-	polynomialFactorsAuditExtra(t, f, []Polynomial{p, foreign}, []*util.Int{&foreignNumber}, h.header)
+	polynomialFactorsAuditExtra(t, f, []Polynomial{p, foreign}, []*unumeral.Int{&foreignNumber}, h.header)
 	if !numericPhysicalReservationRefusal(cause) || calls != 1 || foreign == (Polynomial{}) {
 		t.Fatal("actual callback foreign roots then refusal", cause, calls)
 	}
 	c.integer.Budget().FailAfter(-1)
 	serviceMust(t, m.CleanupGCD())
-	polynomialFactorsAuditExtra(t, f, []Polynomial{p, foreign}, []*util.Int{&foreignNumber}, h.header)
+	polynomialFactorsAuditExtra(t, f, []Polynomial{p, foreign}, []*unumeral.Int{&foreignNumber}, h.header)
 	polynomialQueryExpect(t, c, foreign, map[[3]uint32]int64{{0, 0, 1}: 1})
 	value := integerString(t, c.integer, &foreignNumber)
 	if value != "18446744073709551616" || calls != 1 {
@@ -287,7 +288,7 @@ func TestPolynomialQuadraticYoungerSqrtSourceStopPreservesOlderLocal(t *testing.
 	cfg := serviceConfig(b).Integers
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})
 	serviceMust(t, e)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("helper checkpoint unreachable") }, Cooperation: func() error { panic("helper cooperation unreachable") }}})
 	serviceMust(t, e)
@@ -309,7 +310,7 @@ func TestPolynomialQuadraticYoungerSqrtSourceStopPreservesOlderLocal(t *testing.
 	// Ordinary source constructors and DEC warm the actual source ID freelist.
 	var warm [4]Polynomial
 	for i := range warm {
-		v := util.NewInt(int32(7 + i))
+		v := unumeral.NewInt(int32(7 + i))
 		warm[i], e = m.core.MkConstantTake(&v)
 		serviceMust(t, e)
 		serviceMust(t, m.core.IncRef(warm[i]))

@@ -2,18 +2,17 @@
 package polynomial
 
 import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestUPolynomialKnuthOldAcknowledgmentPreservesLaterActualRoots(t *testing.T) {
 	c, p := algebraicFixture(t)
 	z := c.config.Rationals.Integers()
-	var foreign util.Int
-	foreign = util.NewInt(17)
+	var foreign unumeral.Int
+	foreign = unumeral.NewInt(17)
 	savedForeign := foreign
 	defer func() { serviceMust(t, z.Del(&foreign)) }()
 	var old upolyKnuthInvocationReceipt
@@ -21,14 +20,14 @@ func TestUPolynomialKnuthOldAcknowledgmentPreservesLaterActualRoots(t *testing.T
 	for prefix := int64(0); prefix < 64 && (!foundOld || !foundNew); prefix++ {
 		poly, e := p.NewPolynomial()
 		serviceMust(t, e)
-		serviceMust(t, p.SetInts(poly, []util.Int{util.NewInt(1), util.NewInt(math.MinInt32), util.NewInt(1)}))
+		serviceMust(t, p.SetInts(poly, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(math.MinInt32), unumeral.NewInt(1)}))
 		v, e := p.wholeView(poly)
 		serviceMust(t, e)
 		z.Budget().FailAfter(prefix)
 		_, body := p.KnuthNegativeRootUpperBound(v)
 		q := &p.knuth
 		r := p.knuthReceipt()
-		algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&foreign}, nil)
+		algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*unumeral.Int{&foreign}, nil)
 		if foreign != savedForeign {
 			t.Fatal("unrelated actual BIG numeral changed")
 		}
@@ -43,7 +42,7 @@ func TestUPolynomialKnuthOldAcknowledgmentPreservesLaterActualRoots(t *testing.T
 			if !reflect.DeepEqual(before, *q) || used != z.Budget().Used() || physical != z.RuntimeOwner().Stats() || *old.history != history || foreign != savedForeign {
 				t.Fatal("old ACK consumed later/foreign actual roots or history")
 			}
-			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*util.Int{&foreign}, nil)
+			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, []*unumeral.Int{&foreign}, nil)
 			foundNew = true
 		}
 		z.Budget().FailAfter(-1)

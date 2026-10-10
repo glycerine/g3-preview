@@ -3,9 +3,8 @@ package polynomial
 
 import (
 	"fmt"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialContentModeSwitchSourceSet(t *testing.T) {
@@ -16,7 +15,7 @@ func TestPolynomialContentModeSwitchSourceSet(t *testing.T) {
 			p := polynomialQueryTerms(t, c, []int32{7}, [][]MonomialPower{nil})
 			r, e := NewPolynomialRef(c)
 			serviceMust(t, e)
-			var i util.Int
+			var i unumeral.Int
 			t.Cleanup(func() { serviceMust(t, c.modular.SetZ()); serviceMust(t, c.integer.Del(&i)); serviceMust(t, r.Close()) })
 			serviceMust(t, c.modular.SetZPUint64(5))
 			if scalar {
@@ -24,7 +23,7 @@ func TestPolynomialContentModeSwitchSourceSet(t *testing.T) {
 			} else {
 				serviceMust(t, c.IntegerContent(p, &i, r))
 			}
-			if i != util.NewInt(2) {
+			if i != unumeral.NewInt(2) {
 				t.Fatalf("source m_manager is mpzzp; SET(7) at prime5 must normalize to2; got %v", i)
 			}
 		})
@@ -41,7 +40,7 @@ func TestPolynomialIntegerContentFieldEveryActualReservationPrefix(t *testing.T)
 			p := polynomialQueryTerms(t, c, []int32{6, 10}, [][]MonomialPower{{{0, 1}}, nil})
 			out, e := NewPolynomialRef(c)
 			serviceMust(t, e)
-			var i util.Int
+			var i unumeral.Int
 			t.Cleanup(func() {
 				c.integer.Budget().FailAfter(-1)
 				serviceMust(t, c.CleanupIntegerContent())
@@ -53,16 +52,16 @@ func TestPolynomialIntegerContentFieldEveryActualReservationPrefix(t *testing.T)
 			if e != nil && !numericPhysicalReservationRefusal(e) {
 				t.Fatal("actual field content refusal", e)
 			}
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, out.root.value, out.root.incoming}, []*util.Int{&i}, out.header)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, out.root.value, out.root.incoming}, []*unumeral.Int{&i}, out.header)
 			c.integer.Budget().FailAfter(-1)
 			serviceMust(t, c.CleanupIntegerContent())
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, out.root.value, out.root.incoming}, []*util.Int{&i}, out.header)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, out.root.value, out.root.incoming}, []*unumeral.Int{&i}, out.header)
 			if e == nil {
-				if i != util.NewInt(2) {
+				if i != unumeral.NewInt(2) {
 					t.Fatal("source field integer GCD", i)
 				}
 				polynomialQueryExpect(t, c, out.root.value, map[[3]uint32]int64{{1, 0, 0}: 3, {}: 5})
-				if c.modular.DivTmp != util.NewInt(-11) || c.modular.InvTmp3 != util.NewInt(1) {
+				if c.modular.DivTmp != unumeral.NewInt(-11) || c.modular.InvTmp3 != unumeral.NewInt(1) {
 					t.Fatal("actual source div/inverse scratch", c.modular.DivTmp, c.modular.InvTmp3)
 				}
 				success = true
@@ -82,7 +81,7 @@ func TestPolynomialICCPZPXModeSwitchSourceSet(t *testing.T) {
 	serviceMust(t, e)
 	pr, e := NewPolynomialRef(c)
 	serviceMust(t, e)
-	var i util.Int
+	var i unumeral.Int
 	t.Cleanup(func() {
 		serviceMust(t, c.modular.SetZ())
 		serviceMust(t, c.integer.Del(&i))
@@ -91,7 +90,7 @@ func TestPolynomialICCPZPXModeSwitchSourceSet(t *testing.T) {
 	})
 	serviceMust(t, c.modular.SetZPUint64(5))
 	serviceMust(t, full.iccpZPX(p, 0, &i, &cr.root, &pr.root))
-	if i != util.NewInt(2) || cr.root.value != c.unit || pr.root.value != c.unit {
+	if i != unumeral.NewInt(2) || cr.root.value != c.unit || pr.root.value != c.unit {
 		t.Fatal("source modular constant shortcut", i, cr.root.value, pr.root.value)
 	}
 }

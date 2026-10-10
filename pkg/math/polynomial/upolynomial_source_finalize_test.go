@@ -6,16 +6,17 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Census uses named member/caller fields for numeral ownership and physical
 // backing extents for charged typed storage. It never acquires caller ownership
 // by walking descriptor locations.
-func upolynomialSourcePhysicalAudit(t *testing.T, q *util.RationalManager, u *UPolynomialManager, callers ...UPolynomial) {
+func upolynomialSourcePhysicalAudit(t *testing.T, q *unumeral.RationalManager, u *UPolynomialManager, callers ...UPolynomial) {
 	t.Helper()
-	roots := []*util.Int{&q.NTmp, &q.AddTmp1, &q.AddTmp2, &q.AddMulTmp.Num, &q.AddMulTmp.Den, &q.LtTmp1.Num, &q.LtTmp1.Den, &q.LtTmp2.Num, &q.LtTmp2.Den, &(*u.modular.BorrowModulus()), &u.modular.Lower, &u.modular.Upper, &u.modular.InvTmp1, &u.modular.InvTmp2, &u.modular.InvTmp3, &u.modular.DivTmp}
+	roots := []*unumeral.Int{&q.NTmp, &q.AddTmp1, &q.AddTmp2, &q.AddMulTmp.Num, &q.AddMulTmp.Den, &q.LtTmp1.Num, &q.LtTmp1.Den, &q.LtTmp2.Num, &q.LtTmp2.Den, &(*u.modular.BorrowModulus()), &u.modular.Lower, &u.modular.Upper, &u.modular.InvTmp1, &u.modular.InvTmp2, &u.modular.InvTmp3, &u.modular.DivTmp}
 	states := []*upolyVectorState{&u.db, &u.dbab1, &u.dbab2, &u.tr, &u.push, &u.basic, &u.div1, &u.div2, &u.exactDiv, &u.gcd1, &u.gcd2, &u.cra, &u.mgcd[0], &u.mgcd[1], &u.mgcd[2], &u.mgcd[3], &u.mgcd[4], &u.mgcd[5], &u.sqf1, &u.sqf2, &u.pw}
 	for _, p := range callers {
 		if p.origin != u.origin || p.slot == 0 {
@@ -52,7 +53,7 @@ func TestUPolynomialSourceFinalizePrivateMembersAndCaller(t *testing.T) {
 	serviceMust(t, e)
 	p, e := u.NewPolynomial()
 	serviceMust(t, e)
-	serviceMust(t, u.SetInts(p, []util.Int{util.NewInt(5), util.NewInt(2)}))
+	serviceMust(t, u.SetInts(p, []unumeral.Int{unumeral.NewInt(5), unumeral.NewInt(2)}))
 	members := [21]*upolyVectorState{&u.db, &u.dbab1, &u.dbab2, &u.tr, &u.push, &u.basic, &u.div1, &u.div2, &u.exactDiv, &u.gcd1, &u.gcd2, &u.cra, &u.mgcd[0], &u.mgcd[1], &u.mgcd[2], &u.mgcd[3], &u.mgcd[4], &u.mgcd[5], &u.sqf1, &u.sqf2, &u.pw}
 	var tokens [21]uint64
 	for i, s := range members {
@@ -95,7 +96,7 @@ func TestUPolynomialSourceFinalizeStoppedPrivateGuard(t *testing.T) {
 	serviceMust(t, e)
 	serviceMust(t, u.reserve(&u.db, 2))
 	serviceMust(t, q.Integers().SetUint64(&u.values(&u.db)[0], uint64(1)<<40))
-	u.values(&u.db)[1] = util.IntFromNativeWords([3]uint32{uint32(0), uint32(q.Integers().FailedRef), uint32(uint64(q.Integers().FailedRef) >> 32)})
+	u.values(&u.db)[1] = unumeral.IntFromNativeWords([3]uint32{uint32(0), uint32(q.Integers().FailedRef), uint32(uint64(q.Integers().FailedRef) >> 32)})
 	e = u.SourceFinalize()
 	if !errors.Is(e, arena.ErrInvalidSlot) || !u.sourceGuard || u.sourceIndex != 1 || (u.values(&u.db)[0]).Cell != 0 || u.db.backing == 0 {
 		t.Fatal("actual ascending completed prefix", e, u.sourceIndex, u.db)
@@ -118,7 +119,7 @@ func TestUPolynomialSourceFinalizeDerivedBackingBeforeCoreBody(t *testing.T) {
 		serviceMust(t, q.Integers().SetUint64(&u.values(s)[0], 1<<40))
 	}
 	serviceMust(t, u.reserve(&u.basic, 1))
-	u.values(&u.basic)[0] = util.IntFromNativeWords([3]uint32{uint32(0), uint32(q.Integers().FailedRef), uint32(uint64(q.Integers().FailedRef) >> 32)})
+	u.values(&u.basic)[0] = unumeral.IntFromNativeWords([3]uint32{uint32(0), uint32(q.Integers().FailedRef), uint32(uint64(q.Integers().FailedRef) >> 32)})
 	serviceMust(t, q.Integers().SetUint64(&(*u.modular.BorrowModulus()), 1<<45))
 	modulus := (*u.modular.BorrowModulus()).Cell
 	upolynomialSourcePhysicalAudit(t, q, u)
@@ -130,7 +131,7 @@ func TestUPolynomialSourceFinalizeDerivedBackingBeforeCoreBody(t *testing.T) {
 			t.Fatal("derived backing must die before base body", *s)
 		}
 	}
-	if u.basic.backing == 0 || (*u.modular.BorrowModulus()).Cell != modulus || !util.ValidNumericRef(q.Integers().Cells, modulus) {
+	if u.basic.backing == 0 || (*u.modular.BorrowModulus()).Cell != modulus || !unumeral.ValidNumericRef(q.Integers().Cells, modulus) {
 		t.Fatal("unreached member destruction")
 	}
 	upolynomialSourcePhysicalAudit(t, q, u)
@@ -165,7 +166,7 @@ func TestUPolynomialSourceFinalizeDoesNotOwnReleasedLeafRetry(t *testing.T) {
 	b := arena.NewBudget(1 << 25)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	serviceMust(t, e)
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { panic("unreached") }, Cooperation: func() error { panic("unreached") }})
 	serviceMust(t, e)
@@ -207,7 +208,7 @@ func TestUPolynomialSourceFinalizeFirstEntryConsumedLeafGuard(t *testing.T) {
 	b := arena.NewBudget(1 << 25)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
+	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: r, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	serviceMust(t, e)
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { panic("unreached") }, Cooperation: func() error { panic("unreached") }})
 	serviceMust(t, e)
