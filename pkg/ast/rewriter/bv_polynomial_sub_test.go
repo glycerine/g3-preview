@@ -50,9 +50,9 @@ func TestBVPolynomialSubtractionRetainsSourceProductsAndSkipsZero(t *testing.T) 
 
 }
 
-func TestBVPolynomialSubtractionEveryVectorAndFactoryReservation(t *testing.T) {
+func TestBVPolynomialSubtractionEveryOwnerAndFactoryReservation(t *testing.T) {
 	complete := false
-	sawUnpublished := false
+	failures := 0
 	for ordinal := int64(0); ordinal < 512 && !complete; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			c, g, _ := bvPolynomialParamsFixture(t)
@@ -75,13 +75,18 @@ func TestBVPolynomialSubtractionEveryVectorAndFactoryReservation(t *testing.T) {
 					t.Fatal(st)
 				}
 			} else {
+				failures++
 				if !errors.Is(body, arena.ErrInjectedFailure) {
 					t.Fatal(body)
 				}
 				if n := p.subtraction; n != nil {
-					pending, e := n.push.Unpublished()
-					astTestMust(t, e)
-					sawUnpublished = sawUnpublished || pending
+					for _, h := range n.args {
+						count, e := m.GetRefCount(h)
+						astTestMust(t, e)
+						if count == 0 {
+							t.Fatal("published native argument lost its reference")
+						}
+					}
 					if n.minusPlaced {
 						minus, e := m.RefGet(n.minusOne)
 						astTestMust(t, e)
@@ -114,8 +119,8 @@ func TestBVPolynomialSubtractionEveryVectorAndFactoryReservation(t *testing.T) {
 			}
 		})
 	}
-	if !complete || !sawUnpublished {
-		t.Fatal("missing success or retained INC", complete, sawUnpublished)
+	if !complete || failures == 0 {
+		t.Fatal("missing success or actual factory refusal", complete, failures)
 	}
 }
 

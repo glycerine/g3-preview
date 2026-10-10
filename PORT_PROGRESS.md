@@ -33690,3 +33690,34 @@ rerun. Counts remain 2102 units/677 APIs: 62 ported, 283 partial,
 Boolean caller storage is now native; BV/proof/sequence and other AST collection
 consumers still need auditing/migration. The complete external native caller
 migration and requested util root subpackage split remain unfinished.
+
+## Native BV subtraction argument roots
+
+The bit-vector subtraction lexical new_args owner now uses native []ASTHandle,
+with explicit INC before append and consumed-DEC-aware cleanup. The final add
+factory borrows that native slice directly. Removed ASTRefVector cold/payload
+storage, placement/saved-vector fields and unpublished push-growth receipts.
+Actual minus-one reference acquisition, literal/numerical source destruction,
+ordered raw product construction, zero skipping, singleton-before-sort behavior,
+source history and fixed REWRITE2 status remain. Retained roots stay on the
+subtraction owner until successful cleanup; completed source/own cleanup releases
+the native slice. This adds no C++ container/STL implementation credit.
+
+The owner/factory failure campaign now requires actual retained failures and
+success, verifies published native arguments have live owning references and
+retains the original blocked-call/pair/history checks. It no longer requires the
+removed simulated vector-growth failure or an unpublished INC receipt. Separate
+actual 65-bit numerical allocation/cleanup refusal campaigns remain unchanged.
+
+Validation: focused native subtraction/numerical cases passed (0.133s), same
+g3debug cases passed (0.169s). Full native rewriter passed (12.328s), and full
+native model/API/tactic/SAT tactic passed (0.055s/0.013s/0.025s/0.109s).
+Module-wide compilation, rewriter vet, manifest and diff checks passed. The
+preceding broad debug run remains the Boolean checkpoint with its three verified
+baseline exclusions; no claim of a complete g3debug pass is added. No full native
+module rerun. Counts remain 2102 units/677 APIs: 62 ported, 283 partial,
+1729 unported, two dead/deleted.
+
+Remaining BV addition/multiplication/trailing frames and other AST collection
+consumers still need migration. The complete native caller audit and requested
+root util subpackage split remain active and unfinished.

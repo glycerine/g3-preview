@@ -13,11 +13,8 @@ type bvPolynomialSubtraction struct {
 	literal                *ast.BitVectorPolynomialSubtractionLiteral
 	minusOne               ast.ASTRef
 	minusPlaced            bool
-	args, savedArgs        ast.ASTRefVector
-	argsPlaced             bool
+	args                   []ast.ASTHandle
 	pair                   [2]ast.ASTHandle
-	push                   ast.ASTRefVectorPushReceipt
-	pushed                 ast.ASTHandle
 	call                   ast.ASTBitVectorNumeralInvocation
 	header                 uint64
 	bodyCause, sourceCause error
@@ -34,12 +31,7 @@ func newBVPolynomialSubtraction(m *ast.ASTManager) (*bvPolynomialSubtraction, er
 	return p, nil
 }
 func (p *bvPolynomialSubtraction) append(h ast.ASTHandle) error {
-	p.pushed = h
-	e := p.manager.RefVectorPushTracked(p.args, h, &p.push)
-	if e == nil {
-		p.push = ast.ASTRefVectorPushReceipt{}
-	}
-	return e
+	return appendRewriterRoot(p.manager, &p.args, h)
 }
 func (p *bvPolynomialSubtraction) body(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef) error {
 	m := p.manager
@@ -53,12 +45,6 @@ func (p *bvPolynomialSubtraction) body(sort ast.ASTHandle, args ast.AppArguments
 	if e != nil {
 		return e
 	}
-	p.args, e = m.NewRefVector()
-	if e != nil {
-		return e
-	}
-	p.savedArgs = p.args
-	p.argsPlaced = true
 	first, e := args.At(0)
 	if e != nil {
 		return e
@@ -92,14 +78,7 @@ func (p *bvPolynomialSubtraction) body(sort ast.ASTHandle, args ast.AppArguments
 			return e
 		}
 	}
-	count, e := m.RefVectorSize(p.args)
-	if e != nil {
-		return e
-	}
-	view, e := m.RefVectorArgumentsRange(p.args, 0, count)
-	if e != nil {
-		return e
-	}
+	view := ast.SliceArguments(p.args)
 	node, e := m.MkBitVectorPolynomialAddWithInvocation(sort, view, &p.call)
 	if e != nil {
 		return e
@@ -123,13 +102,11 @@ func (p *bvPolynomialSubtraction) rewrite(sort ast.ASTHandle, args ast.AppArgume
 	if p.sourceCause != nil {
 		return p.sourceCause
 	}
-	if p.argsPlaced {
-		if e := p.manager.DelRefVector(&p.args); e != nil {
-			p.sourceCause = e
-			return e
-		}
-		p.argsPlaced = false
+	if e := shrinkRewriterRoots(p.manager, &p.args, 0); e != nil {
+		p.sourceCause = e
+		return e
 	}
+	p.args = nil
 	if p.minusPlaced {
 		if e := p.manager.DelRef(&p.minusOne); e != nil {
 			p.sourceCause = e
@@ -155,21 +132,10 @@ func (p *bvPolynomialSubtraction) Close() error {
 			return e
 		}
 	}
-	if p.argsPlaced {
-		if e := p.manager.DelRefVector(&p.args); e != nil {
-			return e
-		}
-		p.argsPlaced = false
-	}
-	pending, e := p.push.Unpublished()
-	if e != nil {
+	if e := shrinkRewriterRoots(p.manager, &p.args, 0); e != nil {
 		return e
 	}
-	if pending {
-		if e = p.manager.CompleteRefVectorPush(p.savedArgs, p.pushed, &p.push); e != nil {
-			return e
-		}
-	}
+	p.args = nil
 	if p.minusPlaced {
 		if e := p.manager.DelRef(&p.minusOne); e != nil {
 			return e
