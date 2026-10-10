@@ -222,6 +222,7 @@ type astBuiltinPluginState struct {
 }
 
 type ASTManager struct {
+	exprSubstitutions          map[arena.SmallBytesRef]*astExprSubstState
 	someValueProc              SomeValueProc
 	ArrayCardinality           *astArrayCardinalityFrame
 	arrayCardinalityInvocation uint64

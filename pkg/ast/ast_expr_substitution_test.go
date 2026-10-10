@@ -5,6 +5,38 @@ import (
 	"testing"
 )
 
+func TestASTExprSubstitutionNativeManagerTeardown(t *testing.T) {
+	for _, source := range []bool{false, true} {
+		t.Run(map[bool]string{false: "close", true: "source-finalize"}[source], func(t *testing.T) {
+			symbols, numerals, budget := astTestOwners(t)
+			baseline := budget.Used()
+			m, e := NewASTManager(ASTManagerConfig{Symbols: symbols, Numerals: numerals, Budget: budget})
+			astTestMust(t, e)
+			s, e := m.NewExprSubstitution()
+			astTestMust(t, e)
+			nodes := markTestNodes(t, m, 2)
+			astTestMust(t, m.ExprSubstitutionInsert(s, nodes[0], nodes[1], ASTHandle{}, ASTDependency{}))
+			if source {
+				astTestMust(t, m.SourceFinalize())
+				if len(m.exprSubstitutions) != 0 {
+					t.Fatal("source teardown retained native dictionaries")
+				}
+			}
+			astTestMust(t, m.Close())
+			if len(m.exprSubstitutions) != 0 || budget.Used() != baseline {
+				t.Fatal("manager teardown retained substitution storage", budget.Used(), baseline)
+			}
+			if _, e = m.ExprSubstitutionEmpty(s); e == nil {
+				t.Fatal("escaped owner accepted after manager teardown")
+			}
+			astTestMust(t, m.Close())
+			if budget.Used() != baseline {
+				t.Fatal("repeated close refunded native header twice")
+			}
+		})
+	}
+}
+
 // tst_expr_substitution registers a constructor/destructor, with no active
 // assertions; its BV rewriter and output sequence remains an unmet consumer.
 func TestASTExprSubstitutionRegisteredConstructorAndPolicies(t *testing.T) {
@@ -261,7 +293,7 @@ func TestASTExprSubstitutionNullOptionalOverwriteSourceProfiles(t *testing.T) {
 	astTestMust(t, m.DependencyDec(d1))
 	astTestMust(t, m.DependencyDec(d2))
 }
-func TestASTExprSubstitutionWarmNoAllocationsUnderRefusal(t *testing.T) {
+func TestASTExprSubstitutionNativeWarmOperationsUnderRefusal(t *testing.T) {
 	m := astTestManager(t)
 	key := astDependencyExpr(t, m, 11700)
 	value := astDependencyExpr(t, m, 11701)
@@ -273,7 +305,8 @@ func TestASTExprSubstitutionWarmNoAllocationsUnderRefusal(t *testing.T) {
 	astTestMust(t, m.ScopedExprSubstitutionInsert(scope, key, value, ASTHandle{}, ASTDependency{}))
 	astTestMust(t, m.ScopedExprSubstitutionPop(scope, 1))
 	m.BudgetField.FailAfter(0)
-	n := testing.AllocsPerRun(100, func() {
+	before := m.BudgetField.Used()
+	for i := 0; i < 100; i++ {
 		if e := m.ScopedExprSubstitutionPush(scope); e != nil {
 			panic(e)
 		}
@@ -287,10 +320,10 @@ func TestASTExprSubstitutionWarmNoAllocationsUnderRefusal(t *testing.T) {
 		if e := m.ScopedExprSubstitutionPop(scope, 1); e != nil {
 			panic(e)
 		}
-	})
+	}
 	m.BudgetField.FailAfter(-1)
-	if n != 0 {
-		t.Fatal(n)
+	if m.BudgetField.Used() != before {
+		t.Fatal("native dictionary charged storage")
 	}
 	astTestMust(t, m.DelScopedExprSubstitution(&scope))
 	astTestMust(t, m.DelExprSubstitution(&s))

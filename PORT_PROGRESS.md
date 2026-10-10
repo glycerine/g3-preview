@@ -32748,3 +32748,46 @@ SAT and SMT core. The initial full command exits nonzero for those old AST test
 expectations; the corrected full AST rerun supplies their terminal passing
 result without redundantly repeating the long unchanged native suites.
 Manifest evidence, gofmt and diff checks passed after all fixture updates.
+
+## Native owning expression substitution dictionaries
+
+Replaced the primary definition, optional proof and optional dependency tables
+with three concrete insertion-ordered insdict.Dict collections. Removed encoded
+bucket entries, probing, capacity/rehash arithmetic, tombstones, simulated
+backing reservation failures and reset cursors. A checked 16-byte scalar identity
+record binds a reflected charged Go state header to the manager's native
+registry; dictionary/map backing uses Go storage. Explicit destruction releases
+both actual records and headers. Manager close/source finalization drops native
+bindings after node teardown, without replaying dead AST reference callbacks.
+
+Actual key/value INC/DEC, definition/proof/dependency output order, policy
+snapshots, null-definition repeated fresh-branch quirks and optional-pointer
+publication before INC remain. Per-entry ownership flags record consumed
+references before returning real callback errors. Erase captures checked key
+identity before callbacks and can delete the dictionary entry after the last
+key reference dies. Reset stops on real callback errors with remaining entries
+available for retry; destruction drains consumed errors and preserves its owner
+when a reference callback remains unconsumed.
+
+Native tests cover 257 keys in all three tables with reservations disabled,
+exact reference counts, erase/reinsert discovery order, duplicate replacement,
+cleanup/reuse, last-key-reference erase, cold constructor refusal and foreign/
+stale identities. Existing independent ownership oracle, null-value source
+profiles, aliased outputs and actual callback cleanup checks remain. New manager
+teardown coverage verifies escaped handles are rejected, native registries are
+empty, headers refund exactly once and both Close and SourceFinalize followed
+by Close return to the external owners' budget baseline. Obsolete container
+capacity/probing refusal expectations were replaced with native behavior checks.
+The scoped wrapper's existing encoded owner, reference-vector trail and manual
+limits are unchanged except for querying the new dictionary's logical length;
+converting that storage remains open.
+
+Validation: focused native substitution checks passed (0.032s); final focused
+native coverage is included in the full AST pass (27.786s). Final g3debug
+substitution checks passed (0.027s); full native rewriter passed (13.075s).
+Module-wide compilation, AST/rewriter vet, manifest evidence, gofmt and diff
+checks passed. Source/API statuses remain 2102 units/677 APIs: 63 ported,
+284 partial, 1727 unported and two dead/deleted. No generic C++ container
+implementation credit is added. The util knot and complete split remain active:
+scoped substitution/other retained AST collections, SAT vectors, NumericTextStream
+consumers and internal util numeric/text/parameter dependency cycles remain.

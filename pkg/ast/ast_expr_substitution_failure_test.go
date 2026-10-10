@@ -31,7 +31,7 @@ func TestASTExprSubstitutionNativeDependencyEraseFinishesSameEntry(t *testing.T)
 	}
 	astTestMust(t, m.DelExprSubstitution(&s))
 }
-func TestASTExprSubstitutionDestructorExecutesSourceSparseReset(t *testing.T) {
+func TestASTExprSubstitutionNativeDestructorAfterSparseErase(t *testing.T) {
 	m := astTestManager(t)
 	s, e := m.NewExprSubstitution()
 	astTestMust(t, e)
@@ -44,17 +44,10 @@ func TestASTExprSubstitutionDestructorExecutesSourceSparseReset(t *testing.T) {
 	for i := 0; i < 95; i++ {
 		astTestMust(t, m.ExprSubstitutionErase(s, keys[i]))
 	}
-	table, e := m.substTable(s, 0)
-	astTestMust(t, e)
-	if table.capacity != 256 {
-		t.Fatal(table)
-	}
 	m.BudgetField.FailAfter(0)
 	e = m.DelExprSubstitution(&s)
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal("source sparse reset allocation must run before member destruction", e)
-	}
+	astTestMust(t, e)
 	if s != (ASTExprSubstitution{}) {
 		t.Fatal("fully consumed lexical owner must be reclaimed", s)
 	}
@@ -81,8 +74,10 @@ func TestASTExprSubstitutionResetRefusalKeepsConsumedKeyProgress(t *testing.T) {
 	}
 	table, e := m.substTable(s, 0)
 	astTestMust(t, e)
-	entry, e := m.substEntry(table.payload, table.index)
-	astTestMust(t, e)
+	entry, found := table.entries.Get2(uint64(key.slot)<<32 | uint64(key.generation))
+	if !found {
+		t.Fatal("stopped value entry lost")
+	}
 	if entry.owned != 2 {
 		t.Fatal("retain only unconsumed value", entry)
 	}
@@ -124,53 +119,37 @@ func TestASTExprSubstitutionConstructorEveryReservationPrefix(t *testing.T) {
 		t.Fatal("reservation sweep never reached success")
 	}
 }
-func TestASTExprSubstitutionPhysicalLayoutBoundsAndBorrowedProvenance(t *testing.T) {
-	for _, ty := range []reflect.Type{reflect.TypeOf(ASTExprSubstitution{}), reflect.TypeOf(ASTScopedExprSubstitution{}), reflect.TypeOf(astExprSubstTable{}), reflect.TypeOf(astExprSubstEntry{})} {
+func TestASTExprSubstitutionNativeOwnerIdentityAndBorrowedProvenance(t *testing.T) {
+	for _, ty := range []reflect.Type{reflect.TypeOf(ASTExprSubstitution{}), reflect.TypeOf(ASTScopedExprSubstitution{}), reflect.TypeOf(astExprSubstEntry{})} {
 		astTestMust(t, arena.ValidateRecordType(ty))
-	}
-	if n, e := astExprSubstTableBytes(8, 192); e != nil || n != 192 {
-		t.Fatal(n, e)
-	}
-	if _, e := astExprSubstTableBytes(8, 191); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal(e)
-	}
-	limit := uint32(uint64(^uint32(0)) / 24)
-	if _, e := astExprSubstTableBytes(limit+1, uint64(^uint32(0))); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal(e)
-	}
-	if _, e := astScopedExprSubstCapacity(0, 19); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal(e)
-	}
-	if n, e := astScopedExprSubstCapacity(2, 24); e != nil || n != 3 {
-		t.Fatal(n, e)
 	}
 	m := astTestManager(t)
 	s, e := m.NewExprSubstitutionPolicy(true, false)
 	astTestMust(t, e)
 	scope, e := m.NewScopedExprSubstitution(s)
 	astTestMust(t, e)
-	if n, e := m.allocator.Size(s.record); e != nil || n != 128 {
-		t.Fatal(n, e)
-	}
-	if n, e := m.allocator.Size(scope.record); e != nil || n != 48 {
-		t.Fatal(n, e)
+	if n, e := m.allocator.Size(s.record); e != nil || n != astExprSubstBytes {
+		t.Fatal("actual scalar owner identity", n, e)
 	}
 	primary, e := m.substTable(s, 0)
 	astTestMust(t, e)
 	dep, e := m.substTable(s, 2)
 	astTestMust(t, e)
-	proof, e := m.substTable(s, 1)
-	astTestMust(t, e)
-	if primary.payload == dep.payload || proof.capacity != 0 {
-		t.Fatal("actual distinct policy backing", primary, dep, proof)
+	if primary == dep {
+		t.Fatal("policy tables share dictionary state")
 	}
 	foreign := astTestManager(t)
 	if _, e := foreign.ExprSubstitutionEmpty(s); !errors.Is(e, ErrASTHandle) {
-		t.Fatal(e)
+		t.Fatal("foreign owner accepted", e)
 	}
 	astTestMust(t, m.DelScopedExprSubstitution(&scope))
+	stale := s
 	astTestMust(t, m.DelExprSubstitution(&s))
+	if _, e := m.ExprSubstitutionEmpty(stale); !errors.Is(e, ErrASTHandle) {
+		t.Fatal("dead owner accepted", e)
+	}
 }
+
 func TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction(t *testing.T) {
 	m := astTestManager(t)
 	base, payload := m.allocator.Stats().Live, m.vectorAllocator.Stats().Live
@@ -193,7 +172,7 @@ func TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction(t *te
 		t.Fatal("storage preparation precedes assertion", e)
 	}
 }
-func TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots(t *testing.T) {
+func TestASTExprSubstitutionNativeSparseResetReleasesDependencyRoots(t *testing.T) {
 	m := astTestManager(t)
 	s, e := m.NewExprSubstitutionCores(true)
 	astTestMust(t, e)
@@ -213,21 +192,14 @@ func TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots(t *testin
 	m.BudgetField.FailAfter(0)
 	e = m.ExprSubstitutionReset(s)
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
+	astTestMust(t, e)
 	rc, e := m.DependencyRefCount(dep)
 	astTestMust(t, e)
-	if rc != 6 {
-		t.Fatal("later dependency table must survive primary reset failure", rc)
+	if rc != 1 {
+		t.Fatal("native reset must release all core references", rc)
 	}
-	if m.vectorAllocator.Stats().Live != live-1 {
-		t.Fatal("source delete-before-reallocate prefix")
-	}
-	primary, e := m.substTable(s, 0)
-	astTestMust(t, e)
-	if primary.payload != (arena.SmallBytesRef{}) || primary.capacity != 128 {
-		t.Fatal(primary)
+	if m.vectorAllocator.Stats().Live != live {
+		t.Fatal("native reset changed unrelated vector storage")
 	}
 	astTestMust(t, m.ExprSubstitutionReset(s))
 	astTestMust(t, m.DelExprSubstitution(&s))
@@ -295,108 +267,95 @@ func TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix(t *testing.T
 	astTestMust(t, m.DelScopedExprSubstitution(&scope))
 	astTestMust(t, m.DelExprSubstitution(&s))
 }
-func TestASTExprSubstitutionLateEraseHashGuardReturnsRawConsumedPrefix(t *testing.T) {
+func TestASTExprSubstitutionNativeEraseAfterLastKeyReference(t *testing.T) {
 	m := astTestManager(t)
-	sort, e := m.MkBoolSort()
+	b, e := m.MkBoolSort()
 	astTestMust(t, e)
-	key, e := m.MkVar(12400, sort)
+	key, e := m.MkVar(12400, b)
 	astTestMust(t, e)
 	value := astDependencyExpr(t, m, 12401)
 	s, e := m.NewExprSubstitution()
 	astTestMust(t, e)
 	astTestMust(t, m.ExprSubstitutionInsert(s, key, value, ASTHandle{}, ASTDependency{}))
-	e = m.ExprSubstitutionErase(s, key)
-	if !errors.Is(e, ErrASTHandle) {
-		t.Fatal("source final hash would dereference freed key", e)
+	m.BudgetField.FailAfter(0)
+	astTestMust(t, m.ExprSubstitutionErase(s, key))
+	m.BudgetField.FailAfter(-1)
+	if _, e := m.GetRefCount(key); !errors.Is(e, ErrASTHandle) {
+		t.Fatal("sole-owned key was not destroyed", e)
 	}
-	table, e := m.substTable(s, 0)
+	empty, e := m.ExprSubstitutionEmpty(s)
 	astTestMust(t, e)
-	if table.size != 1 {
-		t.Fatal("erase was not reached", table)
+	if !empty {
+		t.Fatal("native erase retained a dead key")
 	}
-	for i := uint32(0); i < table.capacity; i++ {
-		a, e := m.substEntry(table.payload, i)
-		astTestMust(t, e)
-		if a.state == 1 && a.owned != 0 {
-			t.Fatal("callbacks already consumed", a)
-		}
-	}
-	astTestMust(t, m.ExprSubstitutionReset(s))
 	astTestMust(t, m.DelExprSubstitution(&s))
 }
-func TestASTExprSubstitutionFinalizeRefusalPreservesOldCapacity(t *testing.T) {
+
+func TestASTExprSubstitutionNativeCleanupWithReservationsDisabled(t *testing.T) {
 	m := astTestManager(t)
 	s, e := m.NewExprSubstitution()
 	astTestMust(t, e)
-	value := astDependencyExpr(t, m, 13000)
-	for i := uint32(0); i < 100; i++ {
-		key := astDependencyExpr(t, m, 13100+i)
+	value := astDependencyExpr(t, m, 12500)
+	for i := 0; i < 257; i++ {
+		key := astDependencyExpr(t, m, uint32(12600+i))
 		astTestMust(t, m.ExprSubstitutionInsert(s, key, value, ASTHandle{}, ASTDependency{}))
 	}
-	table, e := m.substTable(s, 0)
-	astTestMust(t, e)
-	if table.capacity != 256 {
-		t.Fatal(table)
-	}
+	before := m.BudgetField.Used()
 	m.BudgetField.FailAfter(0)
-	e = m.ExprSubstitutionCleanup(s)
-	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	table, e = m.substTable(s, 0)
-	astTestMust(t, e)
-	if table.capacity != 256 || table.payload != (arena.SmallBytesRef{}) {
-		t.Fatal("source alloc64 BEFORE publishing capacity64", table)
-	}
 	astTestMust(t, m.ExprSubstitutionCleanup(s))
+	astTestMust(t, m.ExprSubstitutionCleanup(s))
+	m.BudgetField.FailAfter(-1)
+	empty, e := m.ExprSubstitutionEmpty(s)
+	astTestMust(t, e)
+	if !empty || m.BudgetField.Used() != before {
+		t.Fatal("native cleanup changed actual object storage")
+	}
+	rc, e := m.GetRefCount(value)
+	astTestMust(t, e)
+	if rc != 1 {
+		t.Fatal("cleanup lost caller value retain", rc)
+	}
 	astTestMust(t, m.DelExprSubstitution(&s))
 }
-func TestASTExprSubstitutionCollisionsWrapAndLastTombstone(t *testing.T) {
+
+func TestASTExprSubstitutionNativeEraseReinsertDiscoveryOrder(t *testing.T) {
 	m := astTestManager(t)
 	s, e := m.NewExprSubstitution()
 	astTestMust(t, e)
-	value := astDependencyExpr(t, m, 13200)
-	var keys [5]ASTHandle
-	found := 0
-	sort, e := m.MkBoolSort()
-	astTestMust(t, e)
-	for i := uint32(0); found < len(keys) && i < 1000; i++ {
-		h, e := m.MkVar(13300+i, sort)
-		astTestMust(t, e)
-		if m.nodeAt(h.slot).hash&7 == 7 {
-			keys[found] = h
-			astTestPin(t, m, h)
-			found++
+	keys := markTestNodes(t, m, 4)
+	for _, key := range keys {
+		astTestMust(t, m.IncRef(key))
+	}
+	defer func() {
+		for _, key := range keys {
+			astTestMust(t, m.DecRef(key))
 		}
+	}()
+	value := astDependencyExpr(t, m, 13800)
+	for _, key := range keys {
+		astTestMust(t, m.ExprSubstitutionInsert(s, key, value, ASTHandle{}, ASTDependency{}))
 	}
-	if found != len(keys) {
-		t.Fatal("finite real AST hash collision search", found)
-	}
-	for i := 0; i < 4; i++ {
-		astTestMust(t, m.ExprSubstitutionInsert(s, keys[i], value, ASTHandle{}, ASTDependency{}))
-	}
-	table, e := m.substTable(s, 0)
-	astTestMust(t, e)
-	for i := 0; i < 4; i++ {
-		a, e := m.substEntry(table.payload, uint32(i+7)&7)
-		astTestMust(t, e)
-		if a.key != (astNodeRef{keys[i].slot, keys[i].generation}) {
-			t.Fatal("source used bucket must continue, wrap", i, a)
-		}
-	}
+	m.BudgetField.FailAfter(0)
 	astTestMust(t, m.ExprSubstitutionErase(s, keys[1]))
 	astTestMust(t, m.ExprSubstitutionErase(s, keys[2]))
-	astTestMust(t, m.ExprSubstitutionInsert(s, keys[4], value, ASTHandle{}, ASTDependency{}))
-	table, e = m.substTable(s, 0)
+	astTestMust(t, m.ExprSubstitutionInsert(s, keys[1], value, ASTHandle{}, ASTDependency{}))
+	t0, e := m.substTable(s, 0)
 	astTestMust(t, e)
-	a, e := m.substEntry(table.payload, 1)
-	astTestMust(t, e)
-	if a.key != (astNodeRef{keys[4].slot, keys[4].generation}) || table.deleted != 1 || table.size != 3 {
-		t.Fatal("last tombstone before free wins", a, table)
+	want := []ASTHandle{keys[0], keys[3], keys[1]}
+	i := 0
+	for _, entry := range t0.entries.All() {
+		if i >= len(want) || m.external(entry.key) != want[i] {
+			t.Fatal("native discovery order", i)
+		}
+		i++
+	}
+	m.BudgetField.FailAfter(-1)
+	if i != len(want) {
+		t.Fatal("lost native binding", i)
 	}
 	astTestMust(t, m.DelExprSubstitution(&s))
 }
+
 func TestASTExprSubstitutionNativeDependencyResetFinishesAllEntries(t *testing.T) {
 	m := astTestManager(t)
 	s, e := m.NewExprSubstitutionCores(true)
@@ -470,71 +429,84 @@ func TestASTScopedExprSubstitutionConstructorEveryReservationPrefix(t *testing.T
 		t.Fatal("scope sweep did not reach completion")
 	}
 }
-func TestASTExprSubstitutionGrowthFailurePreservesEachMapPrefix(t *testing.T) {
-	for _, which := range []uint32{0, 1, 2} {
-		m := astTestManager(t)
-		astTestMust(t, m.ToggleProofMode(ASTProofEnabled))
-		s, e := m.NewExprSubstitutionPolicy(true, true)
-		astTestMust(t, e)
-		value := astDependencyExpr(t, m, 16000)
-		proof, e := m.MkProofAsserted(value)
-		astTestMust(t, e)
-		astTestPin(t, m, proof)
-		dep, e := m.DependencyLeaf(value)
-		astTestMust(t, e)
-		astTestMust(t, m.DependencyInc(dep))
-		var keys [8]ASTHandle
-		for i := range keys {
-			keys[i] = astDependencyExpr(t, m, uint32(16001+i))
-		}
-		for i := 0; i < 7; i++ {
-			astTestMust(t, m.ExprSubstitutionInsert(s, keys[i], value, proof, dep))
-		}
-		// Expand earlier maps ahead of the tested source action. Each still uses
-		// its own real table, probe history and source rehash; no algorithm stub.
-		for i := uint32(0); i < which; i++ {
-			table, e := m.substTable(s, i)
-			astTestMust(t, e)
-			astTestMust(t, m.substRehash(s, i, &table, 16))
-		}
-		beforeRC, e := m.GetRefCount(keys[7])
-		astTestMust(t, e)
-		beforeDep, e := m.DependencyRefCount(dep)
-		astTestMust(t, e)
-		live := m.vectorAllocator.Stats().Live
-		m.BudgetField.FailAfter(0)
-		e = m.ExprSubstitutionInsert(s, keys[7], value, proof, dep)
-		m.BudgetField.FailAfter(-1)
-		if !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal(which, e)
-		}
-		rc, e := m.GetRefCount(keys[7])
-		astTestMust(t, e)
-		want := beforeRC
-		if which > 0 {
-			want++
-		}
-		if rc != want {
-			t.Fatal("primary publication before side growth", which, rc, want)
-		}
-		depRC, e := m.DependencyRefCount(dep)
-		astTestMust(t, e)
-		if depRC != beforeDep {
-			t.Fatal("failed optional table insertion precedes INC", which, depRC, beforeDep)
-		}
-		table, e := m.substTable(s, which)
-		astTestMust(t, e)
-		if table.capacity != 8 || table.size != 7 {
-			t.Fatal("unpublished growth failure", which, table)
-		}
-		if m.vectorAllocator.Stats().Live != live {
-			t.Fatal("no lost temporary table before Close")
-		}
-		astTestMust(t, m.DelExprSubstitution(&s))
-		astTestMust(t, m.DependencyDec(dep))
+func TestASTExprSubstitutionNativePolicyMapGrowthAndExactReferences(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ASTProofEnabled))
+	s, e := m.NewExprSubstitutionPolicy(true, true)
+	astTestMust(t, e)
+	value := astDependencyExpr(t, m, 16000)
+	proof, e := m.MkProofAsserted(value)
+	astTestMust(t, e)
+	astTestPin(t, m, proof)
+	dep, e := m.DependencyLeaf(value)
+	astTestMust(t, e)
+	astTestMust(t, m.DependencyInc(dep))
+	var keys []ASTHandle
+	for i := 0; i < 257; i++ {
+		keys = append(keys, astDependencyExpr(t, m, uint32(16001+i)))
 	}
+	valueRC, e := m.GetRefCount(value)
+	astTestMust(t, e)
+	proofRC, e := m.GetRefCount(proof)
+	astTestMust(t, e)
+	depRC, e := m.DependencyRefCount(dep)
+	astTestMust(t, e)
+	before := m.BudgetField.Used()
+	m.BudgetField.FailAfter(0)
+	for _, key := range keys {
+		astTestMust(t, m.ExprSubstitutionInsert(s, key, value, proof, dep))
+	}
+	for _, key := range keys {
+		var got, p ASTHandle
+		var d ASTDependency
+		found, e := m.ExprSubstitutionFindDependency(s, key, &got, &p, &d)
+		astTestMust(t, e)
+		rc, e := m.GetRefCount(key)
+		astTestMust(t, e)
+		if !found || got != value || p != proof || d != dep || rc != 2 {
+			t.Fatal("native policy publication", found, got, p, d, rc)
+		}
+	}
+	rc, e := m.GetRefCount(value)
+	astTestMust(t, e)
+	if rc != valueRC+257 {
+		t.Fatal("definition retains", rc, valueRC)
+	}
+	rc, e = m.GetRefCount(proof)
+	astTestMust(t, e)
+	if rc != proofRC+257 {
+		t.Fatal("proof retains", rc, proofRC)
+	}
+	drc, e := m.DependencyRefCount(dep)
+	astTestMust(t, e)
+	if drc != depRC+257 {
+		t.Fatal("dependency retains", drc, depRC)
+	}
+	if m.BudgetField.Used() != before {
+		t.Fatal("native maps charged bucket growth")
+	}
+	astTestMust(t, m.ExprSubstitutionReset(s))
+	m.BudgetField.FailAfter(-1)
+	rc, e = m.GetRefCount(value)
+	astTestMust(t, e)
+	if rc != valueRC {
+		t.Fatal("definition reset", rc, valueRC)
+	}
+	rc, e = m.GetRefCount(proof)
+	astTestMust(t, e)
+	if rc != proofRC {
+		t.Fatal("proof reset", rc, proofRC)
+	}
+	drc, e = m.DependencyRefCount(dep)
+	astTestMust(t, e)
+	if drc != depRC {
+		t.Fatal("dependency reset", drc, depRC)
+	}
+	astTestMust(t, m.DelExprSubstitution(&s))
+	astTestMust(t, m.DependencyDec(dep))
 }
-func TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry(t *testing.T) {
+
+func TestASTExprSubstitutionNativeGrowthAndDuplicateReplacement(t *testing.T) {
 	m := astTestManager(t)
 	s, e := m.NewExprSubstitution()
 	astTestMust(t, e)
@@ -549,13 +521,11 @@ func TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry(t *testing.T) 
 	m.BudgetField.FailAfter(0)
 	e = m.ExprSubstitutionInsert(s, keys[7], value, ASTHandle{}, ASTDependency{})
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
+	astTestMust(t, e)
 	astTestMust(t, m.ExprSubstitutionInsert(s, keys[7], value, ASTHandle{}, ASTDependency{}))
 	table, e := m.substTable(s, 0)
 	astTestMust(t, e)
-	if table.size != 8 {
+	if table.entries.Len() != 8 {
 		t.Fatal("retry must retain previous bindings", table)
 	}
 	astTestMust(t, m.DelExprSubstitution(&s))

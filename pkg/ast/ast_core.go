@@ -459,6 +459,7 @@ func (m *ASTManager) closeCore(source bool) error {
 		}
 		m.families = nil
 	}
+	m.releaseExprSubstitutionsAfterNodeTeardown()
 	if m.allocator != nil {
 		m.allocator.Close()
 		m.endSequenceContexts()

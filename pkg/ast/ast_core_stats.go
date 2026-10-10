@@ -21,6 +21,9 @@ func (m *ASTManager) Stats() ASTManagerStats {
 	}
 	s := ASTManagerStats{LiveNodes: m.liveNodes, LiveParameters: m.liveParameters, LiveInfos: m.liveInfos, LiveReferences: m.liveReferences, ArrayLiveCells: m.exprArrays.liveCells, OwnerBytes: m.ownerBytes, PageBytes: m.pageBytes, DirectoryBytes: m.directoryBytes}
 	s.AllocatedBytes = m.datatypePluginBytes() + m.auxiliaryPluginBytes() + m.floatingPointPluginBytes() + m.sequencePluginBytes() + m.plugins.bytes() + m.arrayCardinalityBytes() + m.arrayPluginBytes() + m.arithmeticPluginBytes() + m.bitVectorPluginBytes() + m.formatPluginBytes() + m.formatFramesBytes() + m.ppFramesBytes() + m.LowLevel.marks.exprs.bytes + m.LowLevel.marks.decls.bytes + s.OwnerBytes + s.PageBytes + s.DirectoryBytes + uint64(cap(m.builtin.userNames))*uint64(reflect.TypeOf(usymbol.Symbol{}).Size())
+	for _, state := range m.exprSubstitutions {
+		s.AllocatedBytes += state.header
+	}
 	s.AllocatedBytes += m.Limit.StorageBytes()
 	for f := m.traceAcquisitionHistory; f != nil; f = f.historyNext {
 		s.AllocatedBytes += f.bytes

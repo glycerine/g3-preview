@@ -326,7 +326,10 @@ func (m *ASTManager) ScopedExprSubstitutionEmpty(s ASTScopedExprSubstitution) (b
 		return false, e
 	}
 	t, e := m.substTable(a.subst, 0)
-	return t.size == 0, e
+	if e != nil {
+		return false, e
+	}
+	return t.entries.Len() == 0, nil
 }
 func (m *ASTManager) ScopedExprSubstitutionContains(s ASTScopedExprSubstitution, key ASTHandle) (bool, error) {
 	if e := m.lock(); e != nil {
