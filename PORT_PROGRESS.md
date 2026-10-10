@@ -35146,3 +35146,65 @@ checks pass. No dependency edges changed. Inventory remains28 partial/82 unporte
 LP units and repository62 ported/309 partial/1703 unported/two dead-deleted.
 Checkpoint5bebdc21 saved floating eta/settings. Exact eta applications, matrices,
 LU and the complete solver/test port remain required; the full goal continues.
+
+## Exact column eta transformations and precise tail polymorphism
+
+Ported the retained mpq/mpq and mpq/numeric_pair<mpq> column eta instances.
+RationalEtaMatrix owns its diagonal, ordered rational coefficient list and actual
+lexical arithmetic values in a borrowed numeral manager. PairEtaMatrix composes
+that common rational coefficient/right/sparse implementation and supplies its
+actual dense pair-left path. Both implement concrete precise tail interfaces,
+including explicit owning Close for the source virtual destructor reached by
+LU's tail deletion. No pair sparse-left template or generic callback algebra was
+introduced. Existing exact permutations bind to the same tail interfaces.
+
+Applications preserve source live pivot versus copied sparse pivot behavior,
+dense-right delayed publication versus sparse-right immediate mutation, literal
+index updates, duplicate/self coefficients in native versus debug assertion,
+first-match element views and ascending conjugation publication. Exact drops
+ignore float settings and test zero only; tiny fractions remain represented.
+Source rational operator* and operator/ copy their left operand before a compound
+update and copy the result on return from the reference expression. Concrete eta
+expression helpers preserve these owning lifetimes. Pair products form scalar-
+left coordinate expressions before copying them into the result pair; X-before-Y
+is the established explicit Go numerical evaluation profile. Stopped arithmetic
+retains lexical values until Close, while completed/partial caller vector fields
+remain caller-owned. Cleanup adopts only newly acquired numerical receipts.
+
+Independent tests cover240 rational matrix worlds (four rational dense/sparse
+applications plus pair dense-left, 1200 numerical applications), all24 size-four
+permutation conjugations/element views, and mixed exact permutation/eta tail
+chains in both type families and all four retained directions. Literal tests
+exercise cancellation/reappend index order, duplicate first-match lookup, source
+native self-entry behavior, zero default/acceptance, empty-index return before
+bounds and valid bounds/conjugation mutation prefixes. Actual stopped indexed-
+vector Add and older rational divisor-alias calls prove the matrix leaves those
+borrowed callers' receipts and frames intact.
+
+Fresh-manager physical reservation campaigns walk diagonal copy, outer/inner
+append parameters, coefficient division, dense/sparse left/right, pair left and
+large diagonal element operations to first success. Separate large-pivot and
+zero-destination cases reach anchor/expression/result-copy failures. Campaigns
+require injected/physical memout errors, check pending mutation guards, close
+actual lexical/field owners and compare named live cells and direct objects;
+all integer GCD/division and rational RAW groups must be consumed afterward.
+No manager-wide teardown or registry-root inference substitutes for that census.
+
+Full LP tests pass native65.093s/debug-checked87.698s,89.7%/91.5% overall statement
+coverage. Exact eta implementation89.4%/89.8%, reached rational expression
+helpers90%, exact tail bindings100%. Uncovered statements include child/cleanup
+error returns and the source precise sparse-left zero-drop branch: a valid
+nonzero rational pivot divided by a valid finite diagonal cannot become zero.
+No synthetic invalid arithmetic is used merely to hit that branch. Source
+formatting and complete matrix/LU integration still remain open, so the four
+source units retain partial status:28 partial/82 unported LP files. Repository
+ledger remains62 ported/309 partial/1703 unported/two dead-deleted. LP vet,
+portcheck, graph regeneration and diff checks pass. Prior checkpoint6490481b
+saved exact sparse coefficients. Next: exact row eta, sparse/static/dense matrices,
+LU and complete primal/dual/LAR solvers and their tests. Full objective continues.
+
+Final exact eta checks also validate each successful fault-campaign endpoint
+against independent rational matrix products or scalar fractions, rather than
+accepting cleanup accounting alone. Final precise tail owning-Close bindings and
+all exact eta tests pass native9.191s/debug12.438s; strengthened endpoint campaigns
+pass native8.873s/debug12.228s. Final LP vet and diff checks pass.

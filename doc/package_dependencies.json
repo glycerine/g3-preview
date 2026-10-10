@@ -1171,6 +1171,8 @@
       ],
       "production_files": [
         "assert_release.go",
+        "eta_exact_expression.go",
+        "eta_matrix_exact.go",
         "eta_matrix_float.go",
         "exact_eta_calls.go",
         "exact_priority_calls.go",
@@ -1195,6 +1197,7 @@
         "stacked_pair_vector.go",
         "stacked_value.go",
         "stacked_vector.go",
+        "tail_matrix_exact.go",
         "tail_matrix_float.go",
         "types.go"
       ]

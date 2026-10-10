@@ -6,7 +6,7 @@
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
-    "exact eta applications and LU factorization and priority-queue solver integration",
+    "exact row eta applications and LU factorization and priority-queue solver integration",
     "scaling and random updates",
     "primal/dual simplex and LAR solvers",
     "bounds/evidence, constraint scopes and explanations",
@@ -258,7 +258,9 @@
       "source": "src/util/lp/eta_matrix.h",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/eta_matrix_float.go"
+        "pkg/util/lp/eta_matrix_float.go",
+        "pkg/util/lp/eta_matrix_exact.go",
+        "pkg/util/lp/eta_exact_expression.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -266,14 +268,24 @@
         "TestLPSparseFloatVectorAndEtaLiteralStorage",
         "TestLPFloatEtaSparseToleranceAndOrderContracts",
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
-        "TestLPFloatEtaIEEEAndAssertionProfiles"
+        "TestLPFloatEtaIEEEAndAssertionProfiles",
+        "TestLPExactEtaIndependentMatrixProducts",
+        "TestLPExactEtaConjugationAndElements",
+        "TestLPExactEtaLiteralSparseAndBoundsPrefixes",
+        "TestLPExactEtaAllocationFailureCensus",
+        "TestLPExactEtaTailComposition",
+        "TestLPExactEtaReachedGuardsAndConjugationPrefixes",
+        "TestLPExactEtaStoppedDestinationOwnership",
+        "TestLPExactEtaLeavesOlderDivisionOwned"
       ]
     },
     {
       "source": "src/util/lp/eta_matrix.hpp",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/eta_matrix_float.go"
+        "pkg/util/lp/eta_matrix_float.go",
+        "pkg/util/lp/eta_matrix_exact.go",
+        "pkg/util/lp/eta_exact_expression.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -281,14 +293,24 @@
         "TestLPSparseFloatVectorAndEtaLiteralStorage",
         "TestLPFloatEtaSparseToleranceAndOrderContracts",
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
-        "TestLPFloatEtaIEEEAndAssertionProfiles"
+        "TestLPFloatEtaIEEEAndAssertionProfiles",
+        "TestLPExactEtaIndependentMatrixProducts",
+        "TestLPExactEtaConjugationAndElements",
+        "TestLPExactEtaLiteralSparseAndBoundsPrefixes",
+        "TestLPExactEtaAllocationFailureCensus",
+        "TestLPExactEtaTailComposition",
+        "TestLPExactEtaReachedGuardsAndConjugationPrefixes",
+        "TestLPExactEtaStoppedDestinationOwnership",
+        "TestLPExactEtaLeavesOlderDivisionOwned"
       ]
     },
     {
       "source": "src/util/lp/eta_matrix_instances.cpp",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/eta_matrix_float.go"
+        "pkg/util/lp/eta_matrix_float.go",
+        "pkg/util/lp/eta_matrix_exact.go",
+        "pkg/util/lp/eta_exact_expression.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -296,7 +318,15 @@
         "TestLPSparseFloatVectorAndEtaLiteralStorage",
         "TestLPFloatEtaSparseToleranceAndOrderContracts",
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
-        "TestLPFloatEtaIEEEAndAssertionProfiles"
+        "TestLPFloatEtaIEEEAndAssertionProfiles",
+        "TestLPExactEtaIndependentMatrixProducts",
+        "TestLPExactEtaConjugationAndElements",
+        "TestLPExactEtaLiteralSparseAndBoundsPrefixes",
+        "TestLPExactEtaAllocationFailureCensus",
+        "TestLPExactEtaTailComposition",
+        "TestLPExactEtaReachedGuardsAndConjugationPrefixes",
+        "TestLPExactEtaStoppedDestinationOwnership",
+        "TestLPExactEtaLeavesOlderDivisionOwned"
       ]
     },
     {
@@ -1079,7 +1109,8 @@
       "source": "src/util/lp/tail_matrix.h",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/tail_matrix_float.go"
+        "pkg/util/lp/tail_matrix_float.go",
+        "pkg/util/lp/tail_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -1087,7 +1118,9 @@
         "TestLPSparseFloatVectorAndEtaLiteralStorage",
         "TestLPFloatEtaSparseToleranceAndOrderContracts",
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
-        "TestLPFloatEtaIEEEAndAssertionProfiles"
+        "TestLPFloatEtaIEEEAndAssertionProfiles",
+        "TestLPExactEtaIndependentMatrixProducts",
+        "TestLPExactEtaTailComposition"
       ]
     },
     {
