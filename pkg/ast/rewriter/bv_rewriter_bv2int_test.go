@@ -294,7 +294,7 @@ func TestBVRewriterBV2IntEveryColdReservationAndPublication(t *testing.T) {
 	}
 }
 
-func TestBV2IntVectorReplacementConsumedOldReference(t *testing.T) {
+func TestBV2IntNativeRootReplacementConsumedOldReference(t *testing.T) {
 	m := astTestManager(t)
 	_, e := m.RegisterArithmeticPlugin()
 	astTestMust(t, e)
@@ -311,18 +311,18 @@ func TestBV2IntVectorReplacementConsumedOldReference(t *testing.T) {
 	astTestMust(t, e)
 	replacement, e := m.MkVar(2000, sort)
 	astTestMust(t, e)
-	var v bv2IntRefVector
-	astTestMust(t, v.push(m, old))
+	var roots []ast.ASTHandle
+	astTestMust(t, appendRewriterRoot(m, &roots, old))
 	m.Budget().FailAfter(0)
-	body := v.set(m, 0, replacement)
+	body := replaceRewriterRoot(m, &roots, 0, replacement)
 	m.Budget().FailAfter(-1)
 	astTestMust(t, body)
-	if !v.pending.IsNull() || v.values.Slice()[0] != replacement {
+	if len(roots) != 1 || roots[0] != replacement {
 		t.Fatal("native replacement did not publish acquired reference")
 	}
 	if _, e := m.GetRefCount(old); e == nil {
 		t.Fatal("native replacement retained old root")
 	}
-	astTestMust(t, v.close(m))
-	astTestMust(t, v.close(m))
+	astTestMust(t, shrinkRewriterRoots(m, &roots, 0))
+	astTestMust(t, shrinkRewriterRoots(m, &roots, 0))
 }

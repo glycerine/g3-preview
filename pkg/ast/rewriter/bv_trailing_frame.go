@@ -45,22 +45,18 @@ const (
 	bvTrailingEqFrame
 )
 
-// Checked Go wrapper storage is charged; native inline expr_ref/vector stack
-// layout is not claimed. Ref/vector DEC consumption remains in AST's owners.
+// Frame storage and actual reference/numeral owners remain charged. Native
+// owning argument slices preserve consumed-DEC cleanup without vector storage.
 type bvTrailingFrame struct {
 	owner                   *BVTrailing
 	next                    *bvTrailingFrame
 	header                  uint64
 	mode                    int
 	refs                    [2]ast.ASTRef
-	vector, pushVector      ast.ASTRefVector
-	vectorPlaced            bool
+	args                    []ast.ASTHandle
 	call                    bvTrailingCall
 	scope                   ast.ASTBitVectorNumeralScope
 	scopePlaced, scopeEnded bool
-	push                    ast.ASTRefVectorPushReceipt
-	pushArg                 ast.ASTHandle
-	args                    ast.ASTHandleBuffer
 	sourceDone, retired     bool
 	bodyCause, sourceCause  error
 }
@@ -82,45 +78,16 @@ func (f *bvTrailingFrame) newRef(i int) error {
 	}
 	return e
 }
-func (f *bvTrailingFrame) newVector() error {
-	v, e := f.owner.manager.NewRefVector()
-	if e == nil {
-		f.vector, f.pushVector, f.vectorPlaced = v, v, true
-	}
-	return e
-}
 func (f *bvTrailingFrame) pushArgValue(h ast.ASTHandle) error {
-	f.pushArg = h
-	if e := f.owner.manager.RefVectorPushTracked(f.vector, h, &f.push); e != nil {
-		return e
-	}
-	// Publication transferred the exact INC to vector storage. Failed push
-	// receipts remain address-stable for separate owning acknowledgment.
-	f.push = ast.ASTRefVectorPushReceipt{}
-	return nil
+	return appendRewriterRoot(f.owner.manager, &f.args, h)
 }
 func (f *bvTrailingFrame) makeApp(original ast.ASTHandle, kind int32) (ast.ASTHandle, error) {
 	m := f.owner.manager
-	n, e := m.RefVectorSize(f.vector)
-	if e != nil {
-		return ast.ASTHandle{}, e
-	}
-	for i := uint32(0); i < n; i++ {
-		h, e := m.RefVectorGet(f.vector, i)
-		if e != nil {
-			return ast.ASTHandle{}, e
-		}
-		if e = f.args.Push(m.Budget(), h); e != nil {
-			return ast.ASTHandle{}, e
-		}
-	}
 	fid, e := m.GetFamilyID(original)
 	if e != nil {
 		return ast.ASTHandle{}, e
 	}
-	// This checked interop buffer bridges compact vector storage and the
-	// existing slice factory. It adds no AST refs; its backing is charged.
-	return m.MkFamilyApp(fid, kind, nil, f.args.Slice())
+	return m.MkFamilyApp(fid, kind, nil, f.args)
 }
 func (f *bvTrailingFrame) delRef(i int) error {
 	if f.refs[i] == (ast.ASTRef{}) {
@@ -128,14 +95,11 @@ func (f *bvTrailingFrame) delRef(i int) error {
 	}
 	return f.owner.manager.DelRef(&f.refs[i])
 }
-func (f *bvTrailingFrame) delVector() error {
-	if !f.vectorPlaced {
-		return nil
-	}
-	if e := f.owner.manager.DelRefVector(&f.vector); e != nil {
+func (f *bvTrailingFrame) releaseArgs() error {
+	if e := shrinkRewriterRoots(f.owner.manager, &f.args, 0); e != nil {
 		return e
 	}
-	f.vectorPlaced = false
+	f.args = nil
 	return nil
 }
 func (f *bvTrailingFrame) destroy(own bool) error {
@@ -149,15 +113,6 @@ func (f *bvTrailingFrame) destroy(own bool) error {
 	if own {
 		if e := f.call.cleanup(m); e != nil {
 			return e
-		}
-		held, e := f.push.Unpublished()
-		if e != nil {
-			return e
-		}
-		if held {
-			if e := m.CompleteRefVectorPush(f.pushVector, f.pushArg, &f.push); e != nil {
-				return e
-			}
 		}
 		if f.scopePlaced {
 			if e := m.CleanupBitVectorNumeralScope(&f.scope); e != nil {
@@ -174,17 +129,16 @@ func (f *bvTrailingFrame) destroy(own bool) error {
 			}
 		}
 	}
-	f.args.Close(m.Budget())
 	switch f.mode {
 	case bvTrailingAddFrame:
 		if e := f.delRef(0); e != nil {
 			return e
 		}
-		if e := f.delVector(); e != nil {
+		if e := f.releaseArgs(); e != nil {
 			return e
 		}
 	case bvTrailingMulFrame, bvTrailingConcatFrame:
-		if e := f.delVector(); e != nil {
+		if e := f.releaseArgs(); e != nil {
 			return e
 		}
 		if e := f.delRef(0); e != nil {

@@ -31,9 +31,9 @@ func bvTrailingValueFixture(t *testing.T) (*ast.ASTManager, *BVTrailing, ast.Fam
 	return m, p, fid, q
 }
 
-func TestBVTrailingRemovalEveryColdReservation(t *testing.T) {
+func TestBVTrailingRemovalEveryOwnerAndFactoryReservation(t *testing.T) {
 	for _, mode := range []string{"compound", "wide-mul", "wide-add", "single-coefficient"} {
-		success, failures, pendingPush := false, 0, false
+		success, failures := false, 0
 		for ordinal := int64(0); ordinal < 512; ordinal++ {
 			t.Run(mode+"/"+strconv.FormatInt(ordinal, 10), func(t *testing.T) {
 				m, p, fid := bvTrailingFixture(t)
@@ -110,9 +110,13 @@ func TestBVTrailingRemovalEveryColdReservation(t *testing.T) {
 						t.Fatal("failed source operation retried", e)
 					}
 					for f := p.frames; f != nil; f = f.next {
-						held, e := f.push.Unpublished()
-						satOK(t, e)
-						pendingPush = pendingPush || held
+						for _, h := range f.args {
+							refs, e := m.GetRefCount(h)
+							satOK(t, e)
+							if refs == 0 {
+								t.Fatal("retained native frame root lost its reference")
+							}
+						}
 					}
 				} else {
 					success = true
@@ -131,13 +135,13 @@ func TestBVTrailingRemovalEveryColdReservation(t *testing.T) {
 				break
 			}
 		}
-		if !success || failures == 0 || mode != "single-coefficient" && !pendingPush {
-			t.Fatal("cold reservation horizon", mode, success, failures, pendingPush)
+		if !success || failures == 0 {
+			t.Fatal("owner/factory reservation horizon", mode, success, failures)
 		}
 	}
 }
 
-func TestBVTrailingRemovalNativeWideRefAndOlderVectorDestruction(t *testing.T) {
+func TestBVTrailingRemovalNativeWideRefAndOlderSliceDestruction(t *testing.T) {
 	m, p, _ := bvTrailingFixture(t)
 	sort, e := m.BitVectorSort(8)
 	satOK(t, e)
@@ -156,14 +160,25 @@ func TestBVTrailingRemovalNativeWideRefAndOlderVectorDestruction(t *testing.T) {
 	var call bvTrailingCall
 	parent, e := p.beginFrame(bvTrailingAddFrame, &call)
 	satOK(t, e)
-	satOK(t, parent.newVector())
 	satOK(t, parent.pushArgValue(older))
 	satOK(t, parent.newRef(0))
 	f, e := p.beginFrame(bvTrailingAddFrame, &parent.call)
 	satOK(t, e)
-	satOK(t, f.newVector())
-	satOK(t, f.pushArgValue(held))
 	satOK(t, f.newRef(0))
+	before := m.Budget().Used()
+	m.Budget().FailAfter(0)
+	for i := 0; i < 257; i++ {
+		satOK(t, f.pushArgValue(held))
+	}
+	m.Budget().FailAfter(-1)
+	if m.Budget().Used() != before {
+		t.Fatal("native root growth changed arena charge")
+	}
+	refs, e := m.GetRefCount(held)
+	satOK(t, e)
+	if refs != 257 {
+		t.Fatal("native argument root acquisition", refs)
+	}
 	satOK(t, m.SetRef(f.refs[0], root))
 	m.Budget().FailAfter(0)
 	var body error
@@ -171,7 +186,7 @@ func TestBVTrailingRemovalNativeWideRefAndOlderVectorDestruction(t *testing.T) {
 	parent.finish(&body)
 	m.Budget().FailAfter(-1)
 	satOK(t, body)
-	if f.refs[0] != (ast.ASTRef{}) || f.vectorPlaced || !f.sourceDone || parent.refs[0] != (ast.ASTRef{}) || parent.vectorPlaced || !parent.sourceDone {
+	if f.refs[0] != (ast.ASTRef{}) || f.args != nil || !f.sourceDone || parent.refs[0] != (ast.ASTRef{}) || parent.args != nil || !parent.sourceDone {
 		t.Fatal("native frame destruction did not finish children and parent")
 	}
 	satOK(t, p.Close())

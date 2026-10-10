@@ -9167,7 +9167,7 @@
         "TestASTArithmeticNumeralReadStoredFlagAndOrderedCopy",
         "TestBVRewriterBV2IntOriginalBranches",
         "TestBVRewriterBV2IntEveryColdReservationAndPublication",
-        "TestBV2IntVectorReplacementConsumedOldReference",
+        "TestBV2IntNativeRootReplacementConsumedOldReference",
         "TestASTBitVectorBV2IntEveryActualReservation"
       ],
       "conditionals": [
@@ -9225,7 +9225,7 @@
           "tests": [
             "TestBVRewriterBV2IntOriginalBranches",
             "TestBVRewriterBV2IntEveryColdReservationAndPublication",
-            "TestBV2IntVectorReplacementConsumedOldReference",
+            "TestBV2IntNativeRootReplacementConsumedOldReference",
             "TestASTBitVectorBV2IntEveryActualReservation"
           ]
         }
@@ -9233,7 +9233,7 @@
       "ownership": [
         "Plugin classification reads borrowed declaration metadata and acquires no references or allocations. Registered plugin tags preserve family identity without assuming numeric family IDs. Tests inspect actual stats under FailAfter(0).",
         "Arithmetic numeral reader borrows declaration metadata, recognizes against already-constructed caller utility family identity, copies parameter zero into physical receiver with actual scalar context, then reads parameter-one integer flag as nonzero. Nonmatches leave outputs/context unread. Tests prove raw zero/positive/negative flag semantics, retained value after malformed flag failure and nonmatch erasure of nil outputs. Numeric caller owns later metadata errors after a completed scalar copy; exact successful copy context can be retired independently.",
-        "Persistent derived BV owner retains the reached bv2int invocation on failure. Its concrete numeric block owns default v and reached literal two/returned general power, with exact scalar and arithmetic-factory receipts. Numeric full-expression values survive tmp assignment, then end before vector replacement; loop tmp ends after size update. Owning cleanup joins exact newer numeric children and pending incoming INC before loop tmp, then forward vector elements and older v. Source vector SET stores replacement only after old DEC; consumed old references are recorded before a returned refusal so cleanup never repeats them. Source final vector destruction precedes default v."
+        "Persistent derived BV owner retains the reached bv2int invocation on failure. Its concrete numeric block owns default v and reached literal two/returned general power, with exact scalar and arithmetic-factory receipts. Numeric full-expression values survive tmp assignment and end before argument replacement; loop tmp ends after size update. Argument ownership now uses native []ASTHandle, explicit INC on append, acquired replacement before consumed-DEC of the old root, and consumed-DEC-aware tail cleanup. Unconsumed roots and acquired replacements stay reachable on refusal. Owning cleanup joins actual newer numerical children, then loop tmp, argument roots and older v. Source argument destruction precedes default v. Removed the source vector wrapper, backing growth/reservation policy and incoming growth receipt. These native replacements add no generic/container implementation credit; actual numeral/factory refusals remain."
       ],
       "deviations": [
         "The selected predicate is connected to model interpretation/completion; whole-header and native representation/assertion/ownership audit are not credited. A declaration naming an unregistered plugin receives false in the checked Go adapter; native consumers require a nonnull registered plugin. Declaration-only numeral identity is a checked consumer adapter of the original app/decl identity recognizers, with no application construction or numerical parameter reads.",
@@ -21540,7 +21540,7 @@
         "TestASTBitVectorLeadingZeroRecursiveParentRetained",
         "TestBVRewriterBV2IntOriginalBranches",
         "TestBVRewriterBV2IntEveryColdReservationAndPublication",
-        "TestBV2IntVectorReplacementConsumedOldReference",
+        "TestBV2IntNativeRootReplacementConsumedOldReference",
         "TestASTBitVectorBV2IntEveryActualReservation",
         "TestBVRewriterDerivedRepeatAndZeroExtend",
         "TestBVRewriterDerivedExtendRepeatEveryColdReservation",
@@ -22644,7 +22644,7 @@
           "tests": [
             "TestBVRewriterBV2IntOriginalBranches",
             "TestBVRewriterBV2IntEveryColdReservationAndPublication",
-            "TestBV2IntVectorReplacementConsumedOldReference",
+            "TestBV2IntNativeRootReplacementConsumedOldReference",
             "TestASTBitVectorBV2IntEveryActualReservation"
           ]
         },
@@ -22939,7 +22939,7 @@
         "Persistent BV owner embeds an unsigned-numeral receipt in its actual charged header; OR/COMP have no default numerical local and reach the captured factory only after original guards. AND uses the concrete default-r/power/one/subtraction owner shared with the identical minus-one comparison expression, constructing r before numeral recognition even on FAILED. The expression remains live through NUM construction/output publication, then ends before older r. Younger captured factory joins before the numeric owner on failure; outer cause rejects replay and survives owning close. Nine cold caller branches cover FAILED, numeric/identity and symbolic ITE paths and published-old-DEC refusal. Width65 Runtime tests distinguish canonical/negative/noncanonical stored values, prove actual comparison/assignment lifetimes and exact factory joining with zero graphs.",
         "Int2BV places default val before arithmetic recognition, copies stored value before reading flag, then unsigned-normalizes into a distinct return and physically copies/ends it at assignment. The read integer flag is unused as in source. Original val remains through NUM/output publication and stops retain exact scalar/norm/factory children until owning close. Reverse conversion guards kind before base sort width and borrows base only on matching width. Cold numeric/reverse/width/no-match campaigns cover published-old-DEC failure and immutable cause; width65 real Runtime cases retain physical normalization and exact child ownDone with zero graphs.",
         "Each leading-zero recursive frame owns actual charged default v/returned div/literal two/scalar context and borrows its older frame. Default v precedes sort access and numeral read. Every positive iteration checks source DEBUG size guard before decrement, constructs numeral(2), returns original div, physically copies v and ends returned div then two at assignment. Source return ends older v. Successful recursive child closes before parent continues; refused child header never erases older frame. Failed youngest-to-oldest frame chain joins exact scalar prefixes through persistent owner close and preserves cause. Cold numeric/recursive/symbolic/mul/add campaigns and actual width65 max/high/zero/raw-negative division campaigns close all graphs to zero.",
-        "Persistent derived BV owner retains the reached bv2int invocation on failure. Its concrete numeric block owns default v and reached literal two/returned general power, with exact scalar and arithmetic-factory receipts. Numeric full-expression values survive tmp assignment, then end before vector replacement; loop tmp ends after size update. Owning cleanup joins exact newer numeric children and pending incoming INC before loop tmp, then forward vector elements and older v. Source vector SET stores replacement only after old DEC; consumed old references are recorded before a returned refusal so cleanup never repeats them. Source final vector destruction precedes default v.",
+        "Persistent derived BV owner retains the reached bv2int invocation on failure. Its concrete numeric block owns default v and reached literal two/returned general power, with exact scalar and arithmetic-factory receipts. Numeric full-expression values survive tmp assignment and end before argument replacement; loop tmp ends after size update. Argument ownership now uses native []ASTHandle, explicit INC on append, acquired replacement before consumed-DEC of the old root, and consumed-DEC-aware tail cleanup. Unconsumed roots and acquired replacements stay reachable on refusal. Owning cleanup joins actual newer numerical children, then loop tmp, argument roots and older v. Source argument destruction precedes default v. Removed the source vector wrapper, backing growth/reservation policy and incoming growth receipt. These native replacements add no generic/container implementation credit; actual numeral/factory refusals remain.",
         "Derived repeat retains its original borrowed inline16/geometric ptr_buffer in charged parent storage until successful output assignment and source return, or explicit owning close after refusal. Zero extension uses actual unsigned numeral invocation capture and borrowed pair storage; its exact stopped numerical child joins before older parent storage. Neither borrowed argument buffer duplicates AST ownership. Identity repeat1/extend0 reaches no buffer growth or numeral frame.",
         "The derived BV owner retains is_negatable default r and a distinct reached bitwise_not result. Exact scalar invocation captures the actual utility RAW complement child; successful return physically copies into r and ends the temporary at assignment before BV numeral factory entry. r remains live through output assignment, then source end. Exact stopped factory children join before older scalar/numerical values on owning close; copied/stopped owner guards and source/body history survive cleanup. False predicates do not read caller output storage. The numerical owner stays in pkg/ast to access existing manager-owned rational/factory continuations without changing pkg boundaries or introducing import cycles.",
         "The OR/XOR numerical prerequisite owns original default v1 then v2, and captures actual scalar bitwise RAW, normalization and numeral-factory children. Reached returned bitwise values are physically copied into v1 before source destruction. Power, signed literal one and subtraction return remain through caller comparison or numeral publication; opposite XOR toggles end the younger bitwise return first. Repeated mask all-one expressions preserve older literal two. Each modulo condition destroys its return before the void aliased division body. Stopped children and placed values remain for explicit owning cleanup; copied-owner guards and child history survive cleanup. The structural caller must construct this owner after its source mark planes and provide source buffer/reference destruction ordering.",
@@ -23352,7 +23352,7 @@
         "TestASTBitVectorLeadingZeroRecursiveParentRetained",
         "TestBVRewriterBV2IntOriginalBranches",
         "TestBVRewriterBV2IntEveryColdReservationAndPublication",
-        "TestBV2IntVectorReplacementConsumedOldReference",
+        "TestBV2IntNativeRootReplacementConsumedOldReference",
         "TestASTBitVectorBV2IntEveryActualReservation",
         "TestBVRewriterDerivedRepeatAndZeroExtend",
         "TestBVRewriterDerivedExtendRepeatEveryColdReservation",
@@ -24024,7 +24024,7 @@
           "tests": [
             "TestBVRewriterBV2IntOriginalBranches",
             "TestBVRewriterBV2IntEveryColdReservationAndPublication",
-            "TestBV2IntVectorReplacementConsumedOldReference",
+            "TestBV2IntNativeRootReplacementConsumedOldReference",
             "TestASTBitVectorBV2IntEveryActualReservation"
           ]
         },
@@ -24303,7 +24303,7 @@
         "Persistent BV owner embeds an unsigned-numeral receipt in its actual charged header; OR/COMP have no default numerical local and reach the captured factory only after original guards. AND uses the concrete default-r/power/one/subtraction owner shared with the identical minus-one comparison expression, constructing r before numeral recognition even on FAILED. The expression remains live through NUM construction/output publication, then ends before older r. Younger captured factory joins before the numeric owner on failure; outer cause rejects replay and survives owning close. Nine cold caller branches cover FAILED, numeric/identity and symbolic ITE paths and published-old-DEC refusal. Width65 Runtime tests distinguish canonical/negative/noncanonical stored values, prove actual comparison/assignment lifetimes and exact factory joining with zero graphs.",
         "Int2BV places default val before arithmetic recognition, copies stored value before reading flag, then unsigned-normalizes into a distinct return and physically copies/ends it at assignment. The read integer flag is unused as in source. Original val remains through NUM/output publication and stops retain exact scalar/norm/factory children until owning close. Reverse conversion guards kind before base sort width and borrows base only on matching width. Cold numeric/reverse/width/no-match campaigns cover published-old-DEC failure and immutable cause; width65 real Runtime cases retain physical normalization and exact child ownDone with zero graphs.",
         "Each leading-zero recursive frame owns actual charged default v/returned div/literal two/scalar context and borrows its older frame. Default v precedes sort access and numeral read. Every positive iteration checks source DEBUG size guard before decrement, constructs numeral(2), returns original div, physically copies v and ends returned div then two at assignment. Source return ends older v. Successful recursive child closes before parent continues; refused child header never erases older frame. Failed youngest-to-oldest frame chain joins exact scalar prefixes through persistent owner close and preserves cause. Cold numeric/recursive/symbolic/mul/add campaigns and actual width65 max/high/zero/raw-negative division campaigns close all graphs to zero.",
-        "Persistent derived BV owner retains the reached bv2int invocation on failure. Its concrete numeric block owns default v and reached literal two/returned general power, with exact scalar and arithmetic-factory receipts. Numeric full-expression values survive tmp assignment, then end before vector replacement; loop tmp ends after size update. Owning cleanup joins exact newer numeric children and pending incoming INC before loop tmp, then forward vector elements and older v. Source vector SET stores replacement only after old DEC; consumed old references are recorded before a returned refusal so cleanup never repeats them. Source final vector destruction precedes default v.",
+        "Persistent derived BV owner retains the reached bv2int invocation on failure. Its concrete numeric block owns default v and reached literal two/returned general power, with exact scalar and arithmetic-factory receipts. Numeric full-expression values survive tmp assignment and end before argument replacement; loop tmp ends after size update. Argument ownership now uses native []ASTHandle, explicit INC on append, acquired replacement before consumed-DEC of the old root, and consumed-DEC-aware tail cleanup. Unconsumed roots and acquired replacements stay reachable on refusal. Owning cleanup joins actual newer numerical children, then loop tmp, argument roots and older v. Source argument destruction precedes default v. Removed the source vector wrapper, backing growth/reservation policy and incoming growth receipt. These native replacements add no generic/container implementation credit; actual numeral/factory refusals remain.",
         "Derived repeat retains its original borrowed inline16/geometric ptr_buffer in charged parent storage until successful output assignment and source return, or explicit owning close after refusal. Zero extension uses actual unsigned numeral invocation capture and borrowed pair storage; its exact stopped numerical child joins before older parent storage. Neither borrowed argument buffer duplicates AST ownership. Identity repeat1/extend0 reaches no buffer growth or numeral frame.",
         "The derived BV owner retains is_negatable default r and a distinct reached bitwise_not result. Exact scalar invocation captures the actual utility RAW complement child; successful return physically copies into r and ends the temporary at assignment before BV numeral factory entry. r remains live through output assignment, then source end. Exact stopped factory children join before older scalar/numerical values on owning close; copied/stopped owner guards and source/body history survive cleanup. False predicates do not read caller output storage. The numerical owner stays in pkg/ast to access existing manager-owned rational/factory continuations without changing pkg boundaries or introducing import cycles.",
         "The OR/XOR numerical prerequisite owns original default v1 then v2, and captures actual scalar bitwise RAW, normalization and numeral-factory children. Reached returned bitwise values are physically copied into v1 before source destruction. Power, signed literal one and subtraction return remain through caller comparison or numeral publication; opposite XOR toggles end the younger bitwise return first. Repeated mask all-one expressions preserve older literal two. Each modulo condition destroys its return before the void aliased division body. Stopped children and placed values remain for explicit owning cleanup; copied-owner guards and child history survive cleanup. The structural caller must construct this owner after its source mark planes and provide source buffer/reference destruction ordering.",
@@ -24498,8 +24498,8 @@
         "TestBVTrailingOriginalStructuralRemoval",
         "TestBVTrailingRemovalUnknownAndShallowGuards",
         "TestBVTrailingRemovalZeroCoefficientReachedInvalidRead",
-        "TestBVTrailingRemovalEveryColdReservation",
-        "TestBVTrailingRemovalNativeWideRefAndOlderVectorDestruction",
+        "TestBVTrailingRemovalEveryOwnerAndFactoryReservation",
+        "TestBVTrailingRemovalNativeWideRefAndOlderSliceDestruction",
         "TestBVTrailingRemovalConcatUnchangedOutputSourceEdge",
         "TestBVTrailingRemovalActualRuntimeNumeralChild",
         "TestBVTrailingOriginalEqualityReduction",
@@ -24655,8 +24655,8 @@
             "TestBVTrailingOriginalStructuralRemoval",
             "TestBVTrailingRemovalUnknownAndShallowGuards",
             "TestBVTrailingRemovalZeroCoefficientReachedInvalidRead",
-            "TestBVTrailingRemovalEveryColdReservation",
-            "TestBVTrailingRemovalNativeWideRefAndOlderVectorDestruction",
+            "TestBVTrailingRemovalEveryOwnerAndFactoryReservation",
+            "TestBVTrailingRemovalNativeWideRefAndOlderSliceDestruction",
             "TestBVTrailingRemovalConcatUnchangedOutputSourceEdge",
             "TestBVTrailingRemovalActualRuntimeNumeralChild",
             "TestBVTrailingRemovalUnreadOperandsAndZeroInputGuard"
@@ -24677,10 +24677,10 @@
         "AST-owned address-stable numerical frame owns copied e_val and helper-local two. Direct division operates on e_val in place, increments count before the call in counting and after the call in removal, and retires each successful invocation completely before reusing that call site. Failed child contexts are retained for checked owning cleanup. Removal destroys two before nested NUM construction/publication; the copied numeral remains alive until caller exit. Exact nested constructor receipt joins before older DT. Actual cold numerical reservation campaigns retain source counts/output behavior and close shared graphs to zero budget.",
         "Five lazy depth caches each own one reference per inserted expression. Depth zero performs no cache allocation or INC. Table construction precedes key INC; growth/insertion follows it. A refused insertion retains that exact pending INC for owning closure. Reset visits depths one through five and table buckets in source order, resets only size>=condition or condition zero, and records actual DEC consumption even when child deletion returns an error. Owning Close resumes that cleanup cursor without a second DEC. Successful cache hits read only key/hash/bounds, erasing numeral/child traversal. Fresh cold campaigns close cache/extraction/AST/numeric/symbol owners to zero shared budget.",
         "The AST-owned address-stable c_val scope copies stored numerical metadata without normalization and holds that rational across subsequent AST calls through output publication. Nonnumeral default rational bookkeeping is erased. The unsigned numeral constructor is captured before entry, joined before older c_val DT and never retried at the same call site. Body and source-DT completion are separate; source readiness does not become true merely because owning cleanup ran. Successful scopes retire their exact invocation; failed scopes retain their actual plugin-list frame/context/header until plugin owning Close. Copied, ended, premature cleanup and uncaptured stopped-younger scopes reject. Actual Runtime campaigns refuse every reached read/constructor reservation until success and close the shared graph to zero budget.",
-        "Actual recursive call sites retain their entered structural frame and exact numerical invocation, captured at numerical frame entry before copy/two/division allocations. Successful returns retire before loop reuse; failed call sites reject reuse after owning cleanup. ADD constructs vector then tmp and destroys tmp then vector; MUL constructs tmp then vector/c_val and ends c_val then vector then tmp; CONCAT constructs new_last then vector and ends vector then new_last; equality constructs out1 then out2 and ends out2 then out1. A stopped exact child blocks older source DT. Failed vector pushes retain their exact unpublished INC receipt and original vector token across vector destruction, and owning closure acknowledges that acquisition once. AST ref/vector APIs record physical DEC consumption independently of later deletion errors. Reached frames remain on the actual owner list after body/source failure; owning Close drains youngest frames and numerical calls before pending cache INC/reset, without source replay or ambient-frame adoption."
+        "Actual recursive call sites retain their entered structural frame and exact numerical invocation, captured before numerical copy/two/division allocations. Successful returns retire before loop reuse; failed call sites reject reuse after owning cleanup. Owning argument storage now uses native []ASTHandle: append acquires each reference, consumed-DEC cleanup retains unreleased roots on the actual frame. ADD ends tmp before arguments; MUL ends c_val then arguments then tmp; CONCAT ends arguments then new_last; equality ends out2 then out1. A stopped exact child blocks older source cleanup. Removed source vector placement/token/header/payload/push-growth receipts and the vector-to-slice bridge; factories borrow native roots directly. Reached frames remain on the owner list after body/source failure; owning Close drains youngest frames and actual numerical calls before older cache cleanup, preserving source history. Native slice storage adds no container/growth implementation credit."
       ],
       "deviations": [
-        "All count/cache/removal/equality algorithm bodies are now selected, but whole-unit methods/ownership and native ABI are not credited. Standalone checked Go owners preserve pkg import boundaries and charge wrapper headers plus actual vector/table backing. The ref-vector-to-slice factory bridge adds a budgeted, non-owning handle buffer (inline sixteen then spill), whereas native c_ptr is borrowed directly; its layout/allocation ABI remains uncredited. Source TRACE/CTRACE diagnostics and native stack/vtable/pointer/allocator/fatal/assertion/exception ABI remain open. Go returning-error cleanup is not native-fatal resumability. Whole-unit status is partial, not ported.",
+        "Selected count/cache/removal/equality algorithms remain partial at whole-unit scope. Standalone checked Go owners preserve pkg boundaries. Actual frames/numerical/reference owners remain charged; removal argument storage is native owning slices passed directly to factories, with no compact-vector bridge or simulated container growth. TRACE/CTRACE diagnostics, native stack/vtable/pointer/allocator/fatal/assertion/exception ABI and independently injected stopped numerical source DT remain open. Go returning-error cleanup does not claim native-fatal resumability or whole-unit completion.",
         "Source edge behavior is retained: concat passes the full request to every child and can over-remove; an unknown child leaves new_last unchanged, so concat(x,zero4) removal of six returns four/null in release and reaches the full-width SASSERT in g3debug. Complete coefficient removal in MUL reaches is_numeral(null) before its zero-width guard; the Go boundary returns ErrASTHandle for that native invalid-pointer domain. ADD/equality VERIFY checks run in all source builds and a failed exact-removal check reaches release UNREACHABLE/undefined behavior; Go rejects that domain with ErrASTDomain and retains unchanged final output. These are qualifications, not repaired algorithms."
       ]
     },
@@ -24709,8 +24709,8 @@
         "TestBVTrailingOriginalStructuralRemoval",
         "TestBVTrailingRemovalUnknownAndShallowGuards",
         "TestBVTrailingRemovalZeroCoefficientReachedInvalidRead",
-        "TestBVTrailingRemovalEveryColdReservation",
-        "TestBVTrailingRemovalNativeWideRefAndOlderVectorDestruction",
+        "TestBVTrailingRemovalEveryOwnerAndFactoryReservation",
+        "TestBVTrailingRemovalNativeWideRefAndOlderSliceDestruction",
         "TestBVTrailingRemovalConcatUnchangedOutputSourceEdge",
         "TestBVTrailingRemovalActualRuntimeNumeralChild",
         "TestBVTrailingOriginalEqualityReduction",
@@ -24761,8 +24761,8 @@
             "TestBVTrailingOriginalStructuralRemoval",
             "TestBVTrailingRemovalUnknownAndShallowGuards",
             "TestBVTrailingRemovalZeroCoefficientReachedInvalidRead",
-            "TestBVTrailingRemovalEveryColdReservation",
-            "TestBVTrailingRemovalNativeWideRefAndOlderVectorDestruction",
+            "TestBVTrailingRemovalEveryOwnerAndFactoryReservation",
+            "TestBVTrailingRemovalNativeWideRefAndOlderSliceDestruction",
             "TestBVTrailingRemovalConcatUnchangedOutputSourceEdge",
             "TestBVTrailingRemovalActualRuntimeNumeralChild",
             "TestBVTrailingRemovalUnreadOperandsAndZeroInputGuard"
@@ -24781,10 +24781,10 @@
       ],
       "ownership": [
         "Five lazy depth caches each own one reference per inserted expression. Depth zero performs no cache allocation or INC. Table construction precedes key INC; growth/insertion follows it. A refused insertion retains that exact pending INC for owning closure. Reset visits depths one through five and table buckets in source order, resets only size>=condition or condition zero, and records actual DEC consumption even when child deletion returns an error. Owning Close resumes that cleanup cursor without a second DEC. Successful cache hits read only key/hash/bounds, erasing numeral/child traversal. Fresh cold campaigns close cache/extraction/AST/numeric/symbol owners to zero shared budget.",
-        "Actual recursive call sites retain their entered structural frame and exact numerical invocation, captured at numerical frame entry before copy/two/division allocations. Successful returns retire before loop reuse; failed call sites reject reuse after owning cleanup. ADD constructs vector then tmp and destroys tmp then vector; MUL constructs tmp then vector/c_val and ends c_val then vector then tmp; CONCAT constructs new_last then vector and ends vector then new_last; equality constructs out1 then out2 and ends out2 then out1. A stopped exact child blocks older source DT. Failed vector pushes retain their exact unpublished INC receipt and original vector token across vector destruction, and owning closure acknowledges that acquisition once. AST ref/vector APIs record physical DEC consumption independently of later deletion errors. Reached frames remain on the actual owner list after body/source failure; owning Close drains youngest frames and numerical calls before pending cache INC/reset, without source replay or ambient-frame adoption."
+        "Actual recursive call sites retain their entered structural frame and exact numerical invocation, captured before numerical copy/two/division allocations. Successful returns retire before loop reuse; failed call sites reject reuse after owning cleanup. Owning argument storage now uses native []ASTHandle: append acquires each reference, consumed-DEC cleanup retains unreleased roots on the actual frame. ADD ends tmp before arguments; MUL ends c_val then arguments then tmp; CONCAT ends arguments then new_last; equality ends out2 then out1. A stopped exact child blocks older source cleanup. Removed source vector placement/token/header/payload/push-growth receipts and the vector-to-slice bridge; factories borrow native roots directly. Reached frames remain on the owner list after body/source failure; owning Close drains youngest frames and actual numerical calls before older cache cleanup, preserving source history. Native slice storage adds no container/growth implementation credit."
       ],
       "deviations": [
-        "All count/cache/removal/equality algorithm bodies are now selected, but whole-unit methods/ownership and native ABI are not credited. Standalone checked Go owners preserve pkg import boundaries and charge wrapper headers plus actual vector/table backing. The ref-vector-to-slice factory bridge adds a budgeted, non-owning handle buffer (inline sixteen then spill), whereas native c_ptr is borrowed directly; its layout/allocation ABI remains uncredited. Source TRACE/CTRACE diagnostics and native stack/vtable/pointer/allocator/fatal/assertion/exception ABI remain open. Go returning-error cleanup is not native-fatal resumability. Whole-unit status is partial, not ported.",
+        "Selected count/cache/removal/equality algorithms remain partial at whole-unit scope. Standalone checked Go owners preserve pkg boundaries. Actual frames/numerical/reference owners remain charged; removal argument storage is native owning slices passed directly to factories, with no compact-vector bridge or simulated container growth. TRACE/CTRACE diagnostics, native stack/vtable/pointer/allocator/fatal/assertion/exception ABI and independently injected stopped numerical source DT remain open. Go returning-error cleanup does not claim native-fatal resumability or whole-unit completion.",
         "Source edge behavior is retained: concat passes the full request to every child and can over-remove; an unknown child leaves new_last unchanged, so concat(x,zero4) removal of six returns four/null in release and reaches the full-width SASSERT in g3debug. Complete coefficient removal in MUL reaches is_numeral(null) before its zero-width guard; the Go boundary returns ErrASTHandle for that native invalid-pointer domain. ADD/equality VERIFY checks run in all source builds and a failed exact-removal check reaches release UNREACHABLE/undefined behavior; Go rejects that domain with ErrASTDomain and retains unchanged final output. These are qualifications, not repaired algorithms."
       ]
     },
@@ -142055,7 +142055,7 @@
         "TestPolynomialReferenceVectorNativeGrowthResetAndReuse",
         "TestBVRewriterBV2IntOriginalBranches",
         "TestBVRewriterBV2IntEveryColdReservationAndPublication",
-        "TestBV2IntVectorReplacementConsumedOldReference",
+        "TestBV2IntNativeRootReplacementConsumedOldReference",
         "TestASTBitVectorBV2IntEveryActualReservation"
       ],
       "conditionals": [
@@ -142292,7 +142292,7 @@
           "tests": [
             "TestBVRewriterBV2IntOriginalBranches",
             "TestBVRewriterBV2IntEveryColdReservationAndPublication",
-            "TestBV2IntVectorReplacementConsumedOldReference",
+            "TestBV2IntNativeRootReplacementConsumedOldReference",
             "TestASTBitVectorBV2IntEveryActualReservation"
           ]
         }

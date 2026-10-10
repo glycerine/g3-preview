@@ -1,88 +1,15 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:1362-1406;
-// src/util/ref_vector.h:41-55,96-101,128-132.
+// Source: src/ast/rewriter/bv_rewriter.cpp:1362-1406.
 package rewriter
 
 import (
-	"github.com/glycerine/g3/pkg/ast"
 	"reflect"
+
+	"github.com/glycerine/g3/pkg/ast"
 )
-
-// Original expr_ref_vector: INC precedes push/growth and replacement DEC.
-// Retain an acquired replacement if DEC stops, recording consumption before
-// returning so owning cleanup cannot decrement the old reference twice.
-type bv2IntRefVector struct {
-	values  ast.ASTHandleVector
-	pending ast.ASTHandle
-}
-
-func (v *bv2IntRefVector) push(m *ast.ASTManager, h ast.ASTHandle) error {
-	if !v.pending.IsNull() {
-		return ast.ErrASTPending
-	}
-	if e := m.IncRef(h); e != nil {
-		return e
-	}
-	v.pending = h
-	if e := v.values.Push(m.Budget(), h); e != nil {
-		return e
-	}
-	v.pending = ast.ASTHandle{}
-	return nil
-}
-func (v *bv2IntRefVector) set(m *ast.ASTManager, i uint32, h ast.ASTHandle) error {
-	if !v.pending.IsNull() || i >= uint32(len(v.values.Slice())) {
-		return ast.ErrASTPending
-	}
-	if e := m.IncRef(h); e != nil {
-		return e
-	}
-	v.pending = h
-	consumed, e := m.DecRefConsumed(v.values.Slice()[i])
-	if consumed {
-		v.values.Slice()[i] = ast.ASTHandle{}
-	}
-	if e != nil {
-		return e
-	}
-	v.values.Slice()[i] = h
-	v.pending = ast.ASTHandle{}
-	return nil
-}
-func (v *bv2IntRefVector) endPending(m *ast.ASTManager) error {
-	if !v.pending.IsNull() {
-		consumed, e := m.DecRefConsumed(v.pending)
-		if consumed {
-			v.pending = ast.ASTHandle{}
-		}
-		if e != nil {
-			return e
-		}
-	}
-	return nil
-}
-func (v *bv2IntRefVector) close(m *ast.ASTManager) error {
-	if e := v.endPending(m); e != nil {
-		return e
-	}
-	for i, h := range v.values.Slice() {
-		if h.IsNull() {
-			continue
-		}
-		consumed, e := m.DecRefConsumed(h)
-		if consumed {
-			v.values.Slice()[i] = ast.ASTHandle{}
-		}
-		if e != nil {
-			return e
-		}
-	}
-	v.values.Close(m.Budget())
-	return nil
-}
 
 type bv2IntInvocation struct {
 	numerals *ast.BitVectorBV2IntNumerals
-	args     bv2IntRefVector
+	args     []ast.ASTHandle
 	tmp      ast.ASTRef
 	pair     [2]ast.ASTHandle
 	header   uint64
@@ -94,17 +21,15 @@ func (v *bv2IntInvocation) close(m *ast.ASTManager) error {
 			return e
 		}
 	}
-	if e := v.args.endPending(m); e != nil {
-		return e
-	}
 	if v.tmp != (ast.ASTRef{}) {
 		if e := m.DelRef(&v.tmp); e != nil {
 			return e
 		}
 	}
-	if e := v.args.close(m); e != nil {
+	if e := shrinkRewriterRoots(m, &v.args, 0); e != nil {
 		return e
 	}
+	v.args = nil
 	if v.numerals != nil {
 		if e := v.numerals.Close(); e != nil {
 			return e
@@ -181,7 +106,7 @@ func (p *BVRewriter) RewriteBV2Int(arg ast.ASTHandle, out ast.ASTRef) (st Rewrit
 						return st, e
 					}
 					i--
-					if e = m.SetRef(v.tmp, v.args.values.Slice()[i]); e != nil {
+					if e = m.SetRef(v.tmp, v.args[i]); e != nil {
 						return st, e
 					}
 					v.pair[0], e = n.Coefficient(size)
@@ -207,7 +132,7 @@ func (p *BVRewriter) RewriteBV2Int(arg ast.ASTHandle, out ast.ASTRef) (st Rewrit
 					if x != nil {
 						return st, x
 					}
-					if e = v.args.set(m, i, h); e != nil {
+					if e = replaceRewriterRoot(m, &v.args, i, h); e != nil {
 						return st, e
 					}
 					child, x := m.GetArg(arg, i)
@@ -270,7 +195,7 @@ func (p *BVRewriter) RewriteBV2Int(arg ast.ASTHandle, out ast.ASTRef) (st Rewrit
 		}
 	}
 	// Source vector is younger than default v.
-	if e = v.args.close(m); e != nil {
+	if e = shrinkRewriterRoots(m, &v.args, 0); e != nil {
 		return st, e
 	}
 	if e = n.SourceEnd(); e != nil {
@@ -292,7 +217,7 @@ func (p *BVRewriter) bv2IntChildren(v *bv2IntInvocation, arg ast.ASTHandle, coun
 		if e != nil {
 			return e
 		}
-		if e = v.args.push(p.manager, h); e != nil {
+		if e = appendRewriterRoot(p.manager, &v.args, h); e != nil {
 			return e
 		}
 	}
@@ -301,7 +226,7 @@ func (p *BVRewriter) bv2IntChildren(v *bv2IntInvocation, arg ast.ASTHandle, coun
 
 // Source: src/ast/arith_decl_plugin.h:373,381.
 func (p *BVRewriter) bv2IntArithmeticResult(v *bv2IntInvocation, kind int32) (ast.ASTHandle, error) {
-	hs := v.args.values.Slice()
+	hs := v.args
 	// Every child was constructed as a bv2int app (or a coefficient MUL app).
 	if len(hs) == 1 {
 		return hs[0], nil

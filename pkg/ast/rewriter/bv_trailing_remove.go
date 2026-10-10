@@ -82,9 +82,6 @@ func (p *BVTrailing) removeAdd(arg ast.ASTHandle, n uint32, out ast.ASTRef, dept
 		return 0, e
 	}
 	defer f.finish(&body)
-	if e = f.newVector(); e != nil {
-		return 0, e
-	}
 	if e = f.newRef(0); e != nil {
 		return 0, e
 	}
@@ -147,9 +144,6 @@ func (p *BVTrailing) removeMul(arg ast.ASTHandle, n uint32, out ast.ASTRef, dept
 	if ret == 0 {
 		return 0, m.SetRef(out, arg)
 	}
-	if e = f.newVector(); e != nil {
-		return 0, e
-	}
 	tmp, e := m.RefGet(f.refs[0])
 	if e != nil {
 		return 0, e
@@ -194,16 +188,13 @@ func (p *BVTrailing) removeMul(arg ast.ASTHandle, n uint32, out ast.ASTRef, dept
 			return 0, e
 		}
 	}
-	size, e := m.RefVectorSize(f.vector)
-	if e != nil {
-		return 0, e
-	}
+	size := len(f.args)
 	var h ast.ASTHandle
 	switch size {
 	case 0:
 		h, e = m.BitVectorNumeralUnsignedInScope(1, newWidth, &f.scope)
 	case 1:
-		h, e = m.RefVectorGet(f.vector, 0)
+		h = f.args[0]
 	default:
 		h, e = f.makeApp(arg, 6)
 	}
@@ -270,9 +261,6 @@ func (p *BVTrailing) removeConcat(arg ast.ASTHandle, n uint32, out ast.ASTRef, d
 		}
 		return removed, m.SetRef(out, ast.ASTHandle{})
 	}
-	if e = f.newVector(); e != nil {
-		return removed, e
-	}
 	for j := uint32(0); j < i; j++ {
 		h, e := m.GetArg(arg, j)
 		if e != nil {
@@ -287,13 +275,10 @@ func (p *BVTrailing) removeConcat(arg ast.ASTHandle, n uint32, out ast.ASTRef, d
 			return removed, e
 		}
 	}
-	size, e := m.RefVectorSize(f.vector)
-	if e != nil {
-		return removed, e
-	}
+	size := len(f.args)
 	var h ast.ASTHandle
 	if size == 1 {
-		h, e = m.RefVectorGet(f.vector, 0)
+		h = f.args[0]
 	} else {
 		h, e = f.makeApp(arg, 37)
 	}

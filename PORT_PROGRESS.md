@@ -33837,3 +33837,52 @@ A production-only search confirms no BV polynomial file still uses
 ASTHandleBuffer, ASTRefVector, ASTFastMark1/2 or the validity wrapper. Other BV,
 array, proof, sequence and AST consumers remain; the complete external native
 caller migration and requested util root split are unfinished.
+
+## Native BV trailing frames and BV-to-integer argument roots
+
+Trailing removal ADD/MUL/CONCAT frames now retain native owning []ASTHandle
+arguments. Removed vector cold/header/payload placement, original/saved vector
+identity, unpublished push-growth receipts and the redundant vector-to-buffer
+factory bridge. Factories borrow native argument roots directly. Append acquires
+each AST reference; consumed-DEC cleanup keeps unreleased roots reachable on the
+actual frame. ADD still ends tmp before arguments; MUL ends actual c_val scope,
+arguments then tmp; CONCAT ends arguments then new_last. Equality reference
+order, youngest-child/source blocking, depth-five recursion, source history,
+null/full-removal publication and original concat over-removal remain.
+
+BV-to-integer conversion now owns native []ASTHandle child/product arguments.
+Removed the bv2IntRefVector wrapper, slice wrapper storage and pending growth
+acquisition policy. Shared native root helpers acquire replacements before old
+DEC and preserve unconsumed references for cleanup. Actual numeral children,
+power/literal-two full-expression lifetime, right-to-left concat coefficient
+updates, loop temporary reference, size updates and output statuses remain.
+Source argument destruction still precedes default numeric v. Actual owning
+cleanup joins younger numerical children, loop tmp, roots and older v. These
+changes add no C++ container/STL or simulated backing-refusal implementation
+credit; manifest descriptions and retired vector-fault test claims were updated.
+
+Validation: focused final native/debug trailing and BV2Int passed
+(0.247s/0.369s). The frame destruction fixture acquires 257 cold argument roots
+with arena reservations disabled, checks unchanged charge and exact references,
+then retires younger/older frames and confirms all sole-owned roots are invalid.
+Fault campaigns check retained native frame roots have live references and cover
+actual owner/factory/numerical refusals through success; they no longer require
+removed unpublished vector-growth failures. Actual native replacement checks
+old-root consumption with reservations disabled and idempotent cleanup.
+Remaining g3debug rewriter passed (15.176s), excluding the same three verified
+baseline failures. Rewriter vet, manifest, gofmt and diff checks passed.
+
+The hourly full native module suite passed with -count=1, log
+/mnt/oldrog/tmp/g3-native-bv-owning-slices-module-full.log (completed around
+04:02 UTC October10). Included AST20.360s, rewriter11.235s, polynomial32.038s,
+util92.231s, SAT0.478s and every other native module package. Counts remain
+2102 units/677 APIs: 62 ported, 283 partial, 1729 unported, two dead/deleted.
+
+Refreshed receiver-aware util dependency audit still finds286 root production
+files,43 components and largest183. Remaining components include35 parameter/
+debug files,15 allocator/runtime,7 mpff,5 numeric-stream,3 sexpr and2 scoped
+numeral-buffer files. Native external migrations do not by themselves remove
+these internal numeric/text/parameter cycles. Other BV/array scratch, sequence/
+proof/scoped-mark/sorting-context references and further retained consumers need
+auditing/migration. The external native caller migration and complete requested
+util root subpackage split are unfinished.
