@@ -120614,7 +120614,9 @@
         "pkg/util/lp/lar_model_test.go",
         "pkg/util/lp/lar_row_dispatch.go",
         "pkg/util/lp/lar_pivot.go",
-        "pkg/util/lp/core_pivot_exact_test.go"
+        "pkg/util/lp/core_pivot_exact_test.go",
+        "pkg/util/lp/lar_explanation.go",
+        "pkg/util/lp/lar_explanation_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -120645,7 +120647,15 @@
         "TestLARPivotSourceBranchesAndMetadataGuards",
         "TestLARPivotTermSubstitutionSourceOffset",
         "TestLARPivotAdditionalEntryAndClearGuards",
-        "TestLARPivotNativeTableauPhysicalCopies"
+        "TestLARPivotNativeTableauPhysicalCopies",
+        "TestLARExplanationIndependentConstraintCombination",
+        "TestLARExplanationTermAliasAndOutput",
+        "TestLARExplanationConsumerRefusalPrefix",
+        "TestLARExplanationSourceTermLookupAndSkipOrder",
+        "TestLARExplanationLeavesConsumerDivisionOwned",
+        "TestLARExplanationMetadataOwnerAndZeroGuards",
+        "TestLARExplanationLeavesPartialBoundOwned",
+        "TestLARExplanationLiteralOriginalRowAfterLUPivot"
       ],
       "conditionals": [
         {
@@ -121118,6 +121128,21 @@
             "TestLARPivotAdditionalEntryAndClearGuards",
             "TestLARPivotNativeTableauPhysicalCopies"
           ]
+        },
+        {
+          "name": "explain_implied_bound original-row coefficient forwarding and signed lower/upper witness selection, term target/cell alias lookup with operator[] zero publication",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_explanation.go",
+          "tests": [
+            "TestLARExplanationIndependentConstraintCombination",
+            "TestLARExplanationTermAliasAndOutput",
+            "TestLARExplanationConsumerRefusalPrefix",
+            "TestLARExplanationSourceTermLookupAndSkipOrder",
+            "TestLARExplanationLeavesConsumerDivisionOwned",
+            "TestLARExplanationMetadataOwnerAndZeroGuards",
+            "TestLARExplanationLeavesPartialBoundOwned",
+            "TestLARExplanationLiteralOriginalRowAfterLUPivot"
+          ]
         }
       ],
       "ownership": [
@@ -121125,14 +121150,17 @@
         "LARSolver owns real exact/floating model/core fields and native external/internal directories. LARCoreSolver owns the single LARBounds state; the outer solver aliases it without copying or closing twice. Scoped witness/status metadata is composed alongside the exact type/bound fields. Both actual primal cores borrow live slice headers, outer settings and column namer. Constructor/registration errors return or retain concrete partial owners until Close; source child arithmetic is never wrapped in an outer numeric receipt segment.",
         "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction.",
         "Solver owns the lexical row iterator and analyzer until successful completion or explicit Close after failure. Analyzer closes before iterator, and both close before matrices/terms/core. Borrowed propagator keeps ownership of published bounds and virtual-hook calls. No model-level numeric capture adopts child calls; stopped dispatch preserves numeric generations. Source zero RHS is a nonallocating initialized local value copied into the actual analyzer.",
-        "LAR pivot calculation delegates to the concrete precise core and existing PairLU without outer capture or eager initialization of missing factorization/RowsNZ. Stopped core/model retain actual child owners. Full row scheduling owns only its lexical row analyzer/iterator; term substitution is owned by each actual working term, preserving original copies."
+        "LAR pivot calculation delegates to the concrete precise core and existing PairLU without outer capture or eager initialization of missing factorization/RowsNZ. Stopped core/model retain actual child owners. Full row scheduling owns only its lexical row analyzer/iterator; term substitution is owned by each actual working term, preserving original copies.",
+        "Explanation borrows the implied-bound metadata and propagator, forwards actual borrowed original-row coefficients in order, and owns no numeric copies or callback invocations. Evidence consumers own their accepted prefix and actual stopped calls. Both pooled/direct tests leave consumer-owned DivisionInvocationState unchanged across model/propagator destruction; separately stopped implied-bound construction likewise remains its own owner. Consumer operand copies are independently owned in these destruction tests; general retained row-cell borrows require the model to outlive their use."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",
         "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
         "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication.",
         "Tableau cutoff is strictly row length > maximum and precedes mode assertion/propagator access. Debug mode assertions preserve iterator construction order; native erases them. Pivot dispatch consumes actual already prepared precise pivot vector and source basis, without claiming calculate_implied_bounds_for_row, automatic pivot calculation or term substitution. Invalid row and nil/foreign propagator domains return explicit typed errors. No whole-unit promotion.",
-        "Source substitute_basis_var_in_terms_for_row passes zero-based k to term_is_used_as_row, which asserts is_term(k). Debug/checked rejects every nonempty term list at this assertion, after pivot calculation and before mutation/analysis. Native looks up literal k in ExternalToColumns: ordinary external variable zero can skip unregistered term zero. Preserve both profiles and original-term isolation; do not silently add the term-start offset or claim successful debug term-bearing propagation."
+        "Source substitute_basis_var_in_terms_for_row passes zero-based k to term_is_used_as_row, which asserts is_term(k). Debug/checked rejects every nonempty term list at this assertion, after pivot calculation and before mutation/analysis. Native looks up literal k in ExternalToColumns: ordinary external variable zero can skip unregistered term zero. Preserve both profiles and original-term isolation; do not silently add the term-start offset or claim successful debug term-bearing propagation.",
+        "Preserve source explanation profiles: target exclusion precedes row-cell term remapping; unregistered known terms insert zero-valued ExternalToColumns entries through source operator[] semantics, without publishing a column directory entry. Coefficients are original row values, never normalized; zero is not positive and is still forwarded. Invalid witness asserts in debug, while native forwards InvalidLARIndex. Nil/foreign/stopped bound/provider and invalid row/witness metadata use explicit typed guards. No full explanation/SMT integration promotion.",
+        "Actual LU counterexample with original row -2*x0-3*x1-x2=0, x0 in [-3,7], x1 in [2,11), and basic x2: normalized pivot analysis correctly derives x2 in (-47,0]. Source explanation uses normalized positive target sign against original negative coefficients, selecting lower witnesses for the lower implied bound and upper witnesses for the upper. Reconstructing those original-row combinations yields 0 for claimed lower -47 and -47 for claimed upper0. Preserve this source discrepancy; ordinary direct-row explanation proofs do not establish general LU explanation correctness."
       ]
     },
     {

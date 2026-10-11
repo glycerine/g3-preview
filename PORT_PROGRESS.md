@@ -38324,3 +38324,53 @@ tableau-copy campaigns; debug rejects those paths at the source assertions.
 Logs/profiles: /mnt/oldrog/tmp/g3-lar-pivot-{native,debug}.{log,cover}, supplemental
 *-guards.{log,cover}; union profiles use *-combined.cover. Whole LP implementation
 and upstream driver/test completion remain unachieved.
+
+
+### Port original-row implied-bound explanation — 2026-10-11
+
+Ported lar_solver.h explain_implied_bound. It derives target direction from the
+implied-bound metadata, maps valid term IDs, traverses the actual original row,
+skips the target before cell-term remapping, selects upper/lower witnesses by
+literal sign and forwards borrowed row coefficients in source order to the
+existing concrete evidence-consumer interface. It owns no numeric copies and
+never captures callback arithmetic. Known but unregistered terms preserve source
+operator[] zero-valued map insertion, including publication before invalid row
+access, without inventing a column directory entry. Zero coefficients remain
+non-positive and are forwarded. Invalid witness asserts in debug; native forwards
+the source sentinel. Explicit typed guards cover nil/foreign/stopped metadata
+and invalid row/witness domains. The default consumer's actual doh stream and
+writer refusals remain visible.
+
+160 independently generated exact row systems verify source witnesses against
+actual stored variable constraints: their weighted RHS combinations must prove
+the implied endpoint, with fixed/strict endpoints, all target/coefficient signs,
+original coefficient identity/order and no Runtime reservation during forwarding.
+These are general row-algorithm tests, not canonical-tableau or full Solve credit.
+Actual registered term aliases and full row-analysis-to-explanation integration
+are exercised. Reached zero-map insertion, skip-before-remap and invalid-witness
+profiles retain exact source prefixes. Consumer failures at each evidence position
+and stream refusal stop the model without owning the consumer's accepted prefix.
+Pooled/direct physical hooks reach a consumer-owned stopped division and preserve
+its generation through model/propagator Close; their numeric operands are separate
+caller owners. Pooled/direct real implied-bound construction refusal likewise
+remains separately owned through explanation rejection and enclosing destruction.
+No manufactured pending flags or allocator faults are used for these campaigns.
+
+An actual valid LU negative-basis fixture exposes a source explanation discrepancy:
+original row -2*x0-3*x1-x2=0 with x0 in[-3,7], x1 in[2,11) correctly produces
+normalized pivot bounds x2 in(-47,0]. Explain uses normalized positive target sign
+but original negative row coefficients, selecting low witnesses for claimed lower
+-47 and upper witnesses for claimed upper0. Exact constraint recombination yields
+0 and -47 respectively. Preserve both source output and independent correctness
+evidence; do not credit general LU explanation correctness or silently normalize.
+
+Final focused native suite passes0.312s and combined g3debug/g3checked0.304s.
+Explanation coverage48/50 (96%) native and49/50 (98%) debug/checked. Remaining
+Sign error guard is protected by matrix numeric provenance; native excludes the
+source debug witness assertion. Logs/profiles:
+/mnt/oldrog/tmp/g3-lar-explanation-{native,debug}.{log,cover}. Both LP vets pass;
+native module-wide test compilation passes. Graph adds one production
+filename and no new import edge. LP83 partial/27 unported; no whole-unit promotion.
+Whole exact optimization, model scopes, full propagation scheduling, remaining
+infeasibility/explanation/SMT integration and original drivers remain incomplete.
+The23:33 UTC full-native checkpoint predates this work; no hourly repeat is due.
