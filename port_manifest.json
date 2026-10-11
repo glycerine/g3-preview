@@ -119489,7 +119489,9 @@
         "pkg/util/lp/lar_model.go",
         "pkg/util/lp/lar_model_terms.go",
         "pkg/util/lp/lar_model_bounds.go",
-        "pkg/util/lp/lar_model_test.go"
+        "pkg/util/lp/lar_model_test.go",
+        "pkg/util/lp/lar_strategy.go",
+        "pkg/util/lp/lar_strategy_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -119504,7 +119506,13 @@
         "TestLARModelNestedTableauAndRowPropagation",
         "TestLARModelPhysicalFailurePrefixes",
         "TestLARModelDeferredEmptyTermsAndSourceGuards",
-        "TestLARModelLeavesOlderComparisonOwned"
+        "TestLARModelLeavesOlderComparisonOwned",
+        "TestLARStrategyIndependentThresholdModels",
+        "TestLARStrategyLUResizesAndPreservesSourceContents",
+        "TestLARStrategyDispatcherProfiles",
+        "TestLARStrategyFloatConversionSourceExtremes",
+        "TestLARStrategyReachedErrorPrefixes",
+        "TestLARStrategyDeferredRowsPhysicalOwnership"
       ],
       "assertions": [
         {
@@ -119799,19 +119807,34 @@
             "TestLARModelDeferredEmptyTermsAndSourceGuards",
             "TestLARModelLeavesOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "decide_on_strategy_and_adjust_initial_state / adjust_initial_state / adjust_initial_state_for_lu source229-263: strict witness-count threshold, strategy publication before adjustment, tableau-cost assertion/native fallthrough, actual floating matrix copy, resize and independent heading/basis assignment",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_strategy.go",
+          "tests": [
+            "TestLARStrategyIndependentThresholdModels",
+            "TestLARStrategyLUResizesAndPreservesSourceContents",
+            "TestLARStrategyDispatcherProfiles",
+            "TestLARStrategyFloatConversionSourceExtremes",
+            "TestLARStrategyReachedErrorPrefixes",
+            "TestLARStrategyDeferredRowsPhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
         "Concrete LARBounds owns actual StackedPairVector lower/upper values and replacement snapshots in a borrowed RationalManager, plus native column types, witness journals, status, infeasible-column state and changed-column set. Numeric-pair by-value constructor parameter and result are independently copied, the parameter dies before assignment, and partial temporaries/invocation receipts survive until explicit Close. Child bound-vector copies retain their own physical allocation roots.",
         "LARSolver owns real exact/floating model/core fields and native external/internal directories. LARCoreSolver owns the single LARBounds state; the outer solver aliases it without copying or closing twice. Scoped witness/status metadata is composed alongside the exact type/bound fields. Both actual primal cores borrow live slice headers, outer settings and column namer. Constructor/registration errors return or retain concrete partial owners until Close; source child arithmetic is never wrapped in an outer numeric receipt segment.",
-        "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction."
+        "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction.",
+        "Strategy initialization has no additional numerical owner. Real deferred tableau registration retains interrupted arithmetic in existing solver/term/primal owners until Close. Native floating slices own converted scalars; heading and basis copies do not alias the exact arrays. Pooled/direct physical refusal campaigns through success verify cleanup."
       ],
       "deviations": [
         "All five bound update branches and dispatch preserve source epsilon signs, strict/structural pair comparison, assignment/witness/change/status order and source conflict asymmetries. This implements the bound component, not a complete LAR solver. Full add_var/add_var_bound, matrix/basis, constraint publication/scopes and optimization remain unported.",
         "AppendFreeColumn initializes only the source bound fields, with witness/type/change-domain and low/upper publication; it does not claim complete source variable registration. Existing native scoped owners are exercised directly, without claiming whole-solver push/pop.",
         "Source boxed-upper conflict sets Infeasible then debug-asserts before recording the infeasible column; low-only conflicting upper bound retains low-only type, while upper-only conflicting lower bound first changes to boxed. Contradictory equality can update only a witness without changing stored bounds. These transitions are explicit regressions, not corrected interval metadata.",
         "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
-        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication."
+        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication.",
+        "Retained source strategy initialization and double matrix copy now execute. LU selection does not materialize deferred terms, initialize either factorization, assign floating nonbasis, clear existing matrix cells or resize row-offset scratch. Repeated copies append duplicates. Exact numerator and denominator convert separately, so overflow/underflow can produce Inf, omitted zero or NaN. Tableau-cost adjustment retains its source debug assertion and native fallthrough. Whole outer solve/model extraction/constraint validation and upstream drivers remain incomplete."
       ]
     },
     {
@@ -121084,7 +121107,9 @@
         "pkg/util/lp/lar_changed_bounds.go",
         "pkg/util/lp/lar_changed_bounds_test.go",
         "pkg/util/lp/lar_lu_extend.go",
-        "pkg/util/lp/lar_lu_extend_test.go"
+        "pkg/util/lp/lar_lu_extend_test.go",
+        "pkg/util/lp/lar_strategy.go",
+        "pkg/util/lp/lar_strategy_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -121160,7 +121185,13 @@
         "TestLARLUExtendIndependentBasisAndPolicy",
         "TestLARLUExtendDenseAndDegeneratedLifecycle",
         "TestLARLUExtendPhysicalOwnership",
-        "TestLARLUExtendEntryAndChildGuards"
+        "TestLARLUExtendEntryAndChildGuards",
+        "TestLARStrategyIndependentThresholdModels",
+        "TestLARStrategyLUResizesAndPreservesSourceContents",
+        "TestLARStrategyDispatcherProfiles",
+        "TestLARStrategyFloatConversionSourceExtremes",
+        "TestLARStrategyReachedErrorPrefixes",
+        "TestLARStrategyDeferredRowsPhysicalOwnership"
       ],
       "conditionals": [
         {
@@ -121728,6 +121759,19 @@
             "TestLARLUExtendPhysicalOwnership",
             "TestLARLUExtendEntryAndChildGuards"
           ]
+        },
+        {
+          "name": "copy_from_mpq_matrix source985-994 retained double/double: preserve resized nested row/column contents, append separately converted exact coefficients in source order, omit zero and preserve row-offset scratch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_strategy.go",
+          "tests": [
+            "TestLARStrategyIndependentThresholdModels",
+            "TestLARStrategyLUResizesAndPreservesSourceContents",
+            "TestLARStrategyDispatcherProfiles",
+            "TestLARStrategyFloatConversionSourceExtremes",
+            "TestLARStrategyReachedErrorPrefixes",
+            "TestLARStrategyDeferredRowsPhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -121742,7 +121786,8 @@
         "Cleanup keeps its source-local delta as a separate owner while exact-core/LU/basic-value children borrow it; a failure transfers the live delta to pendingCleanupDelta, which is destroyed after Core.Close. Outer capture covers only its own reduced-cost subtraction and zero assignment, never child operations. Core/child invocation identity and older caller comparisons survive the prescribed destruction order. Source local basic_columns_with_changed_cost is empty and distinct from the member set; native stale-cost and debug assertion behavior are independently reproduced.",
         "Whole-model scopes delegate actual tableau/core/bound/feasibility owners without outer numeric capture. Successful tail destruction publishes nil entries so Close skips already destroyed owners if a later source step fails; still-live constraints/current/original terms retain their independent owners. Row equation checks own exact pair sum/product and rational expression temporaries, stop on failure, and Close destroys only their own invocation receipts. Nested tableau/nonunit LU models, scope prefix failures, pooled/direct physical campaigns, source-local delta lifetime and older caller comparison identity are tested. Full LAR optimization/propagation orchestration remains incomplete.",
         "Changed-bound orchestration delegates actual core comparisons, clamp temporaries, indexed basis solves and tableau-cost owners without adopting their invocation receipts. A live nonbasic delta transfers to pendingCleanupDelta only on failure and is destroyed after Core.Close. Row and cost sets retain their prepared domains and existing marks; batch loops preserve source member order and successful prefixes. Full LAR Solve and propagation remain incomplete.",
-        "Preparation preserves ordinary-vector prefixes while clearing indexed scratch in source order; no parent numerical capture spans exact vector/queue/LU child operations. LU replacement keeps partial newly constructed factors published for owning cleanup, destroys old factors before replacement, deletes newly degenerated factors and preserves the source in-place extension result. Actual physical refusals, matrix-solve oracles and source mutation prefixes are tested. Full LAR solve/signature/exact optimization integration remains incomplete."
+        "Preparation preserves ordinary-vector prefixes while clearing indexed scratch in source order; no parent numerical capture spans exact vector/queue/LU child operations. LU replacement keeps partial newly constructed factors published for owning cleanup, destroys old factors before replacement, deletes newly degenerated factors and preserves the source in-place extension result. Actual physical refusals, matrix-solve oracles and source mutation prefixes are tested. Full LAR solve/signature/exact optimization integration remains incomplete.",
+        "Strategy initialization has no additional numerical owner. Real deferred tableau registration retains interrupted arithmetic in existing solver/term/primal owners until Close. Native floating slices own converted scalars; heading and basis copies do not alias the exact arrays. Pooled/direct physical refusal campaigns through success verify cleanup."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",
@@ -121752,7 +121797,8 @@
         "Source substitute_basis_var_in_terms_for_row passes zero-based k to term_is_used_as_row, which asserts is_term(k). Debug/checked rejects every nonempty term list at this assertion, after pivot calculation and before mutation/analysis. Native looks up literal k in ExternalToColumns: ordinary external variable zero can skip unregistered term zero. Preserve both profiles and original-term isolation; do not silently add the term-start offset or claim successful debug term-bearing propagation.",
         "Preserve source explanation profiles: target exclusion precedes row-cell term remapping; unregistered known terms insert zero-valued ExternalToColumns entries through source operator[] semantics, without publishing a column directory entry. Coefficients are original row values, never normalized; zero is not positive and is still forwarded. Invalid witness asserts in debug, while native forwards InvalidLARIndex. Nil/foreign/stopped bound/provider and invalid row/witness metadata use explicit typed guards. No full explanation/SMT integration promotion.",
         "Actual LU counterexample with original row -2*x0-3*x1-x2=0, x0 in [-3,7], x1 in [2,11), and basic x2: normalized pivot analysis correctly derives x2 in (-47,0]. Source explanation uses normalized positive target sign against original negative coefficients, selecting lower witnesses for the lower implied bound and upper witnesses for the upper. Reconstructing those original-row combinations yields 0 for claimed lower -47 and -47 for claimed upper0. Preserve this source discrepancy; ordinary direct-row explanation proofs do not establish general LU explanation correctness.",
-        "The source empty local changed-cost set omits updates recorded in the member set. In the retained tableau 2*x0+3*x1-x2=0, clamping x0 from0 to2 makes x2=4 exceed upper1 while stored basic cost remains0 (independent correct default-sign cost -1); native returns with stale costs and debug reports the source reduced-cost assertion. The discrepancy is preserved and tested."
+        "The source empty local changed-cost set omits updates recorded in the member set. In the retained tableau 2*x0+3*x1-x2=0, clamping x0 from0 to2 makes x2=4 exceed upper1 while stored basic cost remains0 (independent correct default-sign cost -1); native returns with stale costs and debug reports the source reduced-cost assertion. The discrepancy is preserved and tested.",
+        "Retained source strategy initialization and double matrix copy now execute. LU selection does not materialize deferred terms, initialize either factorization, assign floating nonbasis, clear existing matrix cells or resize row-offset scratch. Repeated copies append duplicates. Exact numerator and denominator convert separately, so overflow/underflow can produce Inf, omitted zero or NaN. Tableau-cost adjustment retains its source debug assertion and native fallthrough. Whole outer solve/model extraction/constraint validation and upstream drivers remain incomplete."
       ]
     },
     {
