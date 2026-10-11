@@ -1221,6 +1221,8 @@
         "lar_model_terms.go",
         "lar_pivot.go",
         "lar_row_dispatch.go",
+        "lar_scope_validate.go",
+        "lar_scopes.go",
         "lar_tableau_remove.go",
         "lar_term.go",
         "lu_column_exact.go",

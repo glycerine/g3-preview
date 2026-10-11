@@ -1,5 +1,6 @@
 // Source: src/util/lp/lar_solver.h and init_lar_solver.h: construction and
-// concrete variable registration. Full LAR optimization/scopes remain open.
+// concrete variable registration. Whole-model scopes are in lar_scopes.go;
+// full LAR optimization remains open.
 package lp
 
 import (
@@ -244,8 +245,10 @@ func (s *LARSolver) Close() error {
 		s.pendingConstraint = nil
 	}
 	for len(s.Constraints) > 0 {
-		if err := s.Constraints[0].Close(); err != nil {
-			return err
+		if s.Constraints[0] != nil {
+			if err := s.Constraints[0].Close(); err != nil {
+				return err
+			}
 		}
 		s.Constraints = s.Constraints[1:]
 	}
@@ -262,14 +265,18 @@ func (s *LARSolver) Close() error {
 		s.pendingTerm = nil
 	}
 	for len(s.Terms) > 0 {
-		if err := s.Terms[0].Close(); err != nil {
-			return err
+		if s.Terms[0] != nil {
+			if err := s.Terms[0].Close(); err != nil {
+				return err
+			}
 		}
 		s.Terms = s.Terms[1:]
 	}
 	for len(s.OriginalTerms) > 0 {
-		if err := s.OriginalTerms[0].Close(); err != nil {
-			return err
+		if s.OriginalTerms[0] != nil {
+			if err := s.OriginalTerms[0].Close(); err != nil {
+				return err
+			}
 		}
 		s.OriginalTerms = s.OriginalTerms[1:]
 	}
