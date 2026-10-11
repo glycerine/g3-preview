@@ -824,3 +824,13 @@ the06:58UTC run; it predates these Solve loops.
 Related exact iteration, tableau initialization/iteration and row-iteration checks
 pass native64.342s/debug150.424s. Both LP vets, native/debug module compilation,
 portcheck and diff checks pass. Source units remain partial.
+
+### Hourly full native exact Solve checkpoint started
+
+At07:44UTC October11 started full native module checks atbc47adfb:
+`go -C pkg test ./... -timeout=60m -count=1 -coverprofile=/mnt/oldrog/tmp/g3-exact-solve-module-native.cover`.
+Log: `/mnt/oldrog/tmp/g3-exact-solve-module-native.log`. Actual session36454
+was polled and confirmed live. Completion/coverage is not yet credited; resume
+by polling that handle. This checkpoint includes the exact LU/tableau Solve
+loops and prior row pricing/iteration additions. Latest completed checkpoint
+remains06:58UTC. Full LP remains84partial/26unported source units.
