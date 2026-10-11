@@ -1239,6 +1239,7 @@
         "lar_scope_validate.go",
         "lar_scopes.go",
         "lar_signature.go",
+        "lar_signature_float.go",
         "lar_tableau_remove.go",
         "lar_term.go",
         "lu_column_exact.go",

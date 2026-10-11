@@ -674,7 +674,9 @@
         "pkg/util/lp/lar_signature.go",
         "pkg/util/lp/lar_signature_test.go",
         "pkg/util/lp/lar_double_bounds.go",
-        "pkg/util/lp/lar_double_bounds_test.go"
+        "pkg/util/lp/lar_double_bounds_test.go",
+        "pkg/util/lp/lar_signature_float.go",
+        "pkg/util/lp/lar_signature_float_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -730,7 +732,13 @@
         "TestLARStrictDeltaPhysicalOwnership",
         "TestLARDoubleBoundsReachedPrefixes",
         "TestLARStrictDeltaAssertionAndOutputPrefixes",
-        "TestLARStrictDeltaPreservesOlderComparison"
+        "TestLARStrictDeltaPreservesOlderComparison",
+        "TestLARFloatingSignatureReachedPrefixes",
+        "TestLARFloatingSignatureFinalExtractionPrefix",
+        "TestLARFloatingSignaturePhysicalOwnership",
+        "TestLARFloatingSignatureIndependentFeasibilityModels",
+        "TestLARFloatingSignatureCancellationPrefixes",
+        "TestLARFloatingSignatureCancellationAfterPivot"
       ]
     },
     {
