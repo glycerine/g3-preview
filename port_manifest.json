@@ -118360,14 +118360,21 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/primal_breakpoint_float.go"
+        "pkg/util/lp/primal_breakpoint_float.go",
+        "pkg/util/lp/primal_breakpoint_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalBreakpointIndependentCrossings",
         "TestLPFloatPrimalBreakpointIndependentSlope",
         "TestLPFloatPrimalLeavingPathIntegration",
         "TestLPFloatPrimalBreakpointPublicationAndGuards",
-        "TestLPFloatPrimalLeavingReachedErrors"
+        "TestLPFloatPrimalLeavingReachedErrors",
+        "TestLPExactBreakpointIndependentRecordQueueOracle",
+        "TestLPExactBreakpointIndependentSlopeOracle",
+        "TestLPExactBreakpointPhysicalOwnership",
+        "TestLPExactBreakpointSourcePrefixesAndGuards",
+        "TestLPExactBreakpointClearBeforeStoppedQueue",
+        "TestLPExactBreakpointPreservesOlderComparisonOwner"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -118384,6 +118391,19 @@
             "TestLPFloatPrimalLeavingPathIntegration",
             "TestLPFloatPrimalBreakpointPublicationAndGuards",
             "TestLPFloatPrimalLeavingReachedErrors"
+          ]
+        },
+        {
+          "name": "live concrete numeric_pair<mpq> breakpoint record construction/copy and owned Delta destruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_breakpoint_exact.go",
+          "tests": [
+            "TestLPExactBreakpointIndependentRecordQueueOracle",
+            "TestLPExactBreakpointIndependentSlopeOracle",
+            "TestLPExactBreakpointPhysicalOwnership",
+            "TestLPExactBreakpointSourcePrefixesAndGuards",
+            "TestLPExactBreakpointClearBeforeStoppedQueue",
+            "TestLPExactBreakpointPreservesOlderComparisonOwner"
           ]
         }
       ],
@@ -124179,7 +124199,8 @@
         "pkg/util/lp/primal_price_exact.go",
         "pkg/util/lp/primal_price_exact_test.go",
         "pkg/util/lp/primal_bound_step_exact.go",
-        "pkg/util/lp/primal_bound_step_exact_test.go"
+        "pkg/util/lp/primal_bound_step_exact_test.go",
+        "pkg/util/lp/primal_breakpoint_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124242,7 +124263,13 @@
         "TestLPExactBoundStepLeavingRowsIndependentMembership",
         "TestLPExactBoundStepPhysicalOwnership",
         "TestLPExactBoundStepSourcePrefixesAndGuards",
-        "TestLPExactBoundStepPreservesOlderComparisonOwner"
+        "TestLPExactBoundStepPreservesOlderComparisonOwner",
+        "TestLPExactBreakpointIndependentRecordQueueOracle",
+        "TestLPExactBreakpointIndependentSlopeOracle",
+        "TestLPExactBreakpointPhysicalOwnership",
+        "TestLPExactBreakpointSourcePrefixesAndGuards",
+        "TestLPExactBreakpointClearBeforeStoppedQueue",
+        "TestLPExactBreakpointPreservesOlderComparisonOwner"
       ],
       "conditionals": [
         {
@@ -124665,6 +124692,19 @@
             "TestLPExactBoundStepPhysicalOwnership",
             "TestLPExactBoundStepSourcePrefixesAndGuards",
             "TestLPExactBoundStepPreservesOlderComparisonOwner"
+          ]
+        },
+        {
+          "name": "retained exact clear_breakpoints, add_breakpoint record-before-priority publication and change_slope_on_breakpoint with owned scalar expressions and literal fixed/entering source cases",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_breakpoint_exact.go",
+          "tests": [
+            "TestLPExactBreakpointIndependentRecordQueueOracle",
+            "TestLPExactBreakpointIndependentSlopeOracle",
+            "TestLPExactBreakpointPhysicalOwnership",
+            "TestLPExactBreakpointSourcePrefixesAndGuards",
+            "TestLPExactBreakpointClearBeforeStoppedQueue",
+            "TestLPExactBreakpointPreservesOlderComparisonOwner"
           ]
         }
       ],
@@ -125204,7 +125244,8 @@
         "pkg/util/lp/lu_column_exact.go",
         "pkg/util/lp/lu_column_test.go",
         "pkg/util/lp/lu_column_failure_test.go",
-        "pkg/util/lp/primal_harris_exact.go"
+        "pkg/util/lp/primal_harris_exact.go",
+        "pkg/util/lp/primal_breakpoint_exact.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
@@ -125225,7 +125266,13 @@
         "TestLPExactHarrisIndependentPairOracle",
         "TestLPExactHarrisPhysicalOwnership",
         "TestLPExactHarrisGuards",
-        "TestLPExactHarrisPreservesOlderComparisonOwner"
+        "TestLPExactHarrisPreservesOlderComparisonOwner",
+        "TestLPExactBreakpointIndependentRecordQueueOracle",
+        "TestLPExactBreakpointIndependentSlopeOracle",
+        "TestLPExactBreakpointPhysicalOwnership",
+        "TestLPExactBreakpointSourcePrefixesAndGuards",
+        "TestLPExactBreakpointClearBeforeStoppedQueue",
+        "TestLPExactBreakpointPreservesOlderComparisonOwner"
       ],
       "conditionals": [
         {
@@ -125309,6 +125356,19 @@
             "TestLPExactHarrisPhysicalOwnership",
             "TestLPExactHarrisGuards",
             "TestLPExactHarrisPreservesOlderComparisonOwner"
+          ]
+        },
+        {
+          "name": "live exact breakpoint pair lexicographic absolute-priority and rational slope absolute-value consumers",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_breakpoint_exact.go",
+          "tests": [
+            "TestLPExactBreakpointIndependentRecordQueueOracle",
+            "TestLPExactBreakpointIndependentSlopeOracle",
+            "TestLPExactBreakpointPhysicalOwnership",
+            "TestLPExactBreakpointSourcePrefixesAndGuards",
+            "TestLPExactBreakpointClearBeforeStoppedQueue",
+            "TestLPExactBreakpointPreservesOlderComparisonOwner"
           ]
         }
       ],
@@ -127170,7 +127230,8 @@
         "pkg/util/lp/primal_bound_step_exact_test.go",
         "pkg/util/lp/primal_inf_limit_exact.go",
         "pkg/util/lp/primal_harris_exact.go",
-        "pkg/util/lp/primal_basis_limit_exact.go"
+        "pkg/util/lp/primal_basis_limit_exact.go",
+        "pkg/util/lp/primal_breakpoint_exact.go"
       ],
       "tests": [
         "TestLPRationalPairArithmeticOracle",
@@ -127217,7 +127278,13 @@
         "TestLPExactBasisLimitPreservesOlderComparisonOwner",
         "TestLPExactBasisLimitSourceGuards",
         "TestLPExactBasisLimitScalarOutputAlias",
-        "TestLPExactBasisLimitBoxedComparisonPrefixes"
+        "TestLPExactBasisLimitBoxedComparisonPrefixes",
+        "TestLPExactBreakpointIndependentRecordQueueOracle",
+        "TestLPExactBreakpointIndependentSlopeOracle",
+        "TestLPExactBreakpointPhysicalOwnership",
+        "TestLPExactBreakpointSourcePrefixesAndGuards",
+        "TestLPExactBreakpointClearBeforeStoppedQueue",
+        "TestLPExactBreakpointPreservesOlderComparisonOwner"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -127325,6 +127392,19 @@
             "TestLPExactBasisLimitSourceGuards",
             "TestLPExactBasisLimitScalarOutputAlias",
             "TestLPExactBasisLimitBoxedComparisonPrefixes"
+          ]
+        },
+        {
+          "name": "live exact breakpoint delta by-value/constructor copies and lexicographic absolute-priority pair expression",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_breakpoint_exact.go",
+          "tests": [
+            "TestLPExactBreakpointIndependentRecordQueueOracle",
+            "TestLPExactBreakpointIndependentSlopeOracle",
+            "TestLPExactBreakpointPhysicalOwnership",
+            "TestLPExactBreakpointSourcePrefixesAndGuards",
+            "TestLPExactBreakpointClearBeforeStoppedQueue",
+            "TestLPExactBreakpointPreservesOlderComparisonOwner"
           ]
         }
       ],

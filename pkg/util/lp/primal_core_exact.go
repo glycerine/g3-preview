@@ -11,6 +11,7 @@ type PairPrimalCoreSolver struct {
 	*PairCoreSolverBase
 	Beta                                         *IndexedRationalVector
 	BreakpointQueue                              *PairPriorityQueue
+	Breakpoints                                  []*PairBreakpoint
 	EpsilonOfReducedCost, ConvertedHarrisEpsilon numeral.Rational
 	CostsBackup                                  *IndexedRationalVector
 	ColumnNormUpdateCounter, BlandModeThreshold  uint32
@@ -23,6 +24,8 @@ type PairPrimalCoreSolver struct {
 	pairWork                                     *IndexedPairVector
 	stepEpsilon                                  *IndexedPairVector
 	basisMultiplier                              *IndexedRationalVector
+	breakpointWork                               *IndexedPairVector
+	pendingBreakpoint                            *PairBreakpoint
 	stopped                                      bool
 }
 
@@ -72,7 +75,7 @@ func NewPairPrimalCoreSolver(in PairCoreInputs) (m *PairPrimalCoreSolver, err er
 	return m, nil
 }
 func (m *PairPrimalCoreSolver) ready() error {
-	if m.stopped || m.work != nil || m.pairWork != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.calls.pending() {
+	if m.stopped || m.work != nil || m.pairWork != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.breakpointWork != nil || m.pendingBreakpoint != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return m.PairCoreSolverBase.ready()
@@ -167,6 +170,18 @@ func (m *PairPrimalCoreSolver) Close() error {
 		}
 		m.stepEpsilon = nil
 	}
+	if m.pendingBreakpoint != nil {
+		if err := m.pendingBreakpoint.Delta.Del(m.manager); err != nil {
+			return err
+		}
+		m.pendingBreakpoint = nil
+	}
+	if m.breakpointWork != nil {
+		if err := m.breakpointWork.Close(); err != nil {
+			return err
+		}
+		m.breakpointWork = nil
+	}
 	if m.basisMultiplier != nil {
 		if err := m.basisMultiplier.Close(); err != nil {
 			return err
@@ -193,6 +208,9 @@ func (m *PairPrimalCoreSolver) Close() error {
 		if err := m.BreakpointQueue.Close(); err != nil {
 			return err
 		}
+	}
+	if err := m.destroyBreakpointRecords(); err != nil {
+		return err
 	}
 	if err := m.calls.cleanupRoots(m.manager); err != nil {
 		return err

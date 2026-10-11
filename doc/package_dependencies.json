@@ -1257,6 +1257,7 @@
         "primal_basis_dispatch_exact.go",
         "primal_basis_limit_exact.go",
         "primal_bound_step_exact.go",
+        "primal_breakpoint_exact.go",
         "primal_breakpoint_float.go",
         "primal_core_exact.go",
         "primal_core_float.go",
