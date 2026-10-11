@@ -668,7 +668,9 @@
         "pkg/util/lp/lar_prepare_exact.go",
         "pkg/util/lp/lar_prepare_exact_test.go",
         "pkg/util/lp/lar_prepare_float.go",
-        "pkg/util/lp/lar_prepare_float_test.go"
+        "pkg/util/lp/lar_prepare_float_test.go",
+        "pkg/util/lp/lar_infeasibility.go",
+        "pkg/util/lp/lar_infeasibility_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -702,7 +704,18 @@
         "TestLARPrepareExactActualPendingQueuePrefix",
         "TestLARPrepareExactStoppedPrimal",
         "TestLARPrepareFloatSourceVectorKinds",
-        "TestLARPrepareFloatFailurePrefixes"
+        "TestLARPrepareFloatFailurePrefixes",
+        "TestLARInfeasibilityReducedCostIndependentModels",
+        "TestLARInfeasibilityStoredRowIndependentModels",
+        "TestLARInfeasibilityPhysicalOwnership",
+        "TestLARInfeasibilityActualSolveExplanation",
+        "TestLARInfSignIndependentBoundAndEpsilonModels",
+        "TestLARInfeasibilityReachedPrefixes",
+        "TestLARInfeasibilityPreservesOlderComparison",
+        "TestLARInfeasibilityBasisOrderAndNonbasicScan",
+        "TestLARInfeasibilityStopsAtPendingExplanation",
+        "TestLARInfSignPreservesOlderComparison",
+        "TestLARInfeasibilityOwnsCopiedCoefficients"
       ]
     },
     {
@@ -716,7 +729,9 @@
         "pkg/util/lp/lar_prepare_exact.go",
         "pkg/util/lp/lar_prepare_exact_test.go",
         "pkg/util/lp/lar_prepare_float.go",
-        "pkg/util/lp/lar_prepare_float_test.go"
+        "pkg/util/lp/lar_prepare_float_test.go",
+        "pkg/util/lp/lar_infeasibility.go",
+        "pkg/util/lp/lar_infeasibility_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -738,7 +753,18 @@
         "TestLARPrepareExactActualPendingQueuePrefix",
         "TestLARPrepareExactStoppedPrimal",
         "TestLARPrepareFloatSourceVectorKinds",
-        "TestLARPrepareFloatFailurePrefixes"
+        "TestLARPrepareFloatFailurePrefixes",
+        "TestLARInfeasibilityReducedCostIndependentModels",
+        "TestLARInfeasibilityStoredRowIndependentModels",
+        "TestLARInfeasibilityPhysicalOwnership",
+        "TestLARInfeasibilityActualSolveExplanation",
+        "TestLARInfSignIndependentBoundAndEpsilonModels",
+        "TestLARInfeasibilityReachedPrefixes",
+        "TestLARInfeasibilityPreservesOlderComparison",
+        "TestLARInfeasibilityBasisOrderAndNonbasicScan",
+        "TestLARInfeasibilityStopsAtPendingExplanation",
+        "TestLARInfSignPreservesOlderComparison",
+        "TestLARInfeasibilityOwnsCopiedCoefficients"
       ]
     },
     {
@@ -1601,7 +1627,9 @@
         "pkg/util/lp/primal_price_rows_exact.go",
         "pkg/util/lp/primal_price_rows_exact_test.go",
         "pkg/util/lp/primal_iteration_rows_exact.go",
-        "pkg/util/lp/primal_iteration_rows_exact_test.go"
+        "pkg/util/lp/primal_iteration_rows_exact_test.go",
+        "pkg/util/lp/lar_infeasibility.go",
+        "pkg/util/lp/lar_infeasibility_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -1751,7 +1779,18 @@
         "TestLPExactRowAdvanceReachedPrefixes",
         "TestLPExactRowIterationPreservesOlderComparison",
         "TestLPExactRowIterationPermutedBasisAndMinimumLeaving",
-        "TestLPExactRowIterationThresholdAffectsCurrentSelection"
+        "TestLPExactRowIterationThresholdAffectsCurrentSelection",
+        "TestLARInfeasibilityReducedCostIndependentModels",
+        "TestLARInfeasibilityStoredRowIndependentModels",
+        "TestLARInfeasibilityPhysicalOwnership",
+        "TestLARInfeasibilityActualSolveExplanation",
+        "TestLARInfSignIndependentBoundAndEpsilonModels",
+        "TestLARInfeasibilityReachedPrefixes",
+        "TestLARInfeasibilityPreservesOlderComparison",
+        "TestLARInfeasibilityBasisOrderAndNonbasicScan",
+        "TestLARInfeasibilityStopsAtPendingExplanation",
+        "TestLARInfSignPreservesOlderComparison",
+        "TestLARInfeasibilityOwnsCopiedCoefficients"
       ]
     },
     {

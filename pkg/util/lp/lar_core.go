@@ -26,6 +26,7 @@ type LARCoreSolver struct {
 	StackedSimplexStrategy                StackedStrategy
 	Infeasibility                         *SparseRationalVector
 	InfeasibleSumSign                     int32
+	evidenceNegated                       *IndexedRationalVector
 	settings                              *Settings
 	manager                               *numeral.RationalManager
 	stopped                               bool
@@ -50,6 +51,16 @@ func (c *LARCoreSolver) NeedToPresolveWithDoubleSolver() bool {
 func (c *LARCoreSolver) IsTiny() bool  { return c.RA.RowCount() < 10 && c.RA.ColumnCount() < 20 }
 func (c *LARCoreSolver) IsEmpty() bool { return c.RA.RowCount() == 0 && c.RA.ColumnCount() == 0 }
 func (c *LARCoreSolver) Close() error {
+	// A stopped evidence append can still borrow its negated local or matrix.
+	if err := c.Infeasibility.Close(); err != nil {
+		return err
+	}
+	if c.evidenceNegated != nil {
+		if err := c.evidenceNegated.Close(); err != nil {
+			return err
+		}
+		c.evidenceNegated = nil
+	}
 	if c.DPrimal != nil {
 		if err := c.DPrimal.Close(); err != nil {
 			return err
@@ -76,5 +87,5 @@ func (c *LARCoreSolver) Close() error {
 	if err := c.RightSides.Close(); err != nil {
 		return err
 	}
-	return c.Infeasibility.Close()
+	return nil
 }

@@ -834,3 +834,39 @@ was polled and confirmed live. Completion/coverage is not yet credited; resume
 by polling that handle. This checkpoint includes the exact LU/tableau Solve
 loops and prior row pricing/iteration additions. Latest completed checkpoint
 remains06:58UTC. Full LP remains84partial/26unported source units.
+
+### LAR infeasibility linear combinations and retained bound signs
+
+Ported lar_core_solver.hpp:240-272 and the now-retained
+lp_primal_core_solver.h:156-168 bound-sign helper into lar_infeasibility.go.
+Row explanations copy every stored coefficient, including zero, in row order.
+Other strategies copy nonzero basic costs in basis order, then negated nonzero
+reduced costs in ascending nonbasic-column order. Source sign publication
+precedes destruction of the previous explanation. Unary-minus copies and
+make_pair/vector copies have separate concrete owning lifetimes. Core.Close
+cleans the stopped coefficient child before its borrowed numerical local and
+matrix; it does not adopt an older caller's comparison receipt.
+
+Verification:240 independent reduced-cost/equation worlds,240 rational/epsilon
+infeasible-row worlds with alternate stored order and explicit zero cells,
+240 independent bound-sign/epsilon worlds,120 multi-basis output-order worlds,
+180 actual infeasible core Solve-to-explanation integrations across all three
+strategies; nine reached metadata/assertion prefixes, actual stopped append,
+four pooled/direct allocation campaigns and two actual older comparison owners.
+Focused native0.894s/debug0.937s. New file90/110 statements (81.8%) native,
+99/110 (90.0%) debug/checked. Gaps protect invariant-established indices,
+valid scalar destruction/zero checks or belong to the opposite assertion
+profile; coverage measures implemented Go code, not source completion.
+
+Full LP remains84partial/26unported source units. Full LAR Solve, floating
+signature/presolve handoff, exact outer preparation and other remaining solver
+variants/diagnostics and complete source drivers remain open. The07:44UTC full
+native suite atbc47adfb is still live and predates this explanation addition;
+no new full-suite result or coverage is credited.
+
+Copied-source/output independence also passes for row and cost explanations.
+Related core-scope, model, scope-validation and exact Solve regressions pass
+native110.495s/debug165.926s on the final fixture configuration; focused
+core-scope/Solve integration passes2.887s/4.663s. Both LP vets, native/debug
+module compilation, portcheck and diff checks pass. Dependency graph refreshed.
+Full source units stay partial; the running native suite predates this increment.

@@ -120221,7 +120221,9 @@
         "pkg/util/lp/lar_prepare_exact.go",
         "pkg/util/lp/lar_prepare_exact_test.go",
         "pkg/util/lp/lar_prepare_float.go",
-        "pkg/util/lp/lar_prepare_float_test.go"
+        "pkg/util/lp/lar_prepare_float_test.go",
+        "pkg/util/lp/lar_infeasibility.go",
+        "pkg/util/lp/lar_infeasibility_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -120255,7 +120257,18 @@
         "TestLARPrepareExactActualPendingQueuePrefix",
         "TestLARPrepareExactStoppedPrimal",
         "TestLARPrepareFloatSourceVectorKinds",
-        "TestLARPrepareFloatFailurePrefixes"
+        "TestLARPrepareFloatFailurePrefixes",
+        "TestLARInfeasibilityReducedCostIndependentModels",
+        "TestLARInfeasibilityStoredRowIndependentModels",
+        "TestLARInfeasibilityPhysicalOwnership",
+        "TestLARInfeasibilityActualSolveExplanation",
+        "TestLARInfSignIndependentBoundAndEpsilonModels",
+        "TestLARInfeasibilityReachedPrefixes",
+        "TestLARInfeasibilityPreservesOlderComparison",
+        "TestLARInfeasibilityBasisOrderAndNonbasicScan",
+        "TestLARInfeasibilityStopsAtPendingExplanation",
+        "TestLARInfSignPreservesOlderComparison",
+        "TestLARInfeasibilityOwnsCopiedCoefficients"
       ],
       "conditionals": [
         {
@@ -120518,6 +120531,24 @@
             "TestLARPrepareFloatSourceVectorKinds",
             "TestLARPrepareFloatFailurePrefixes"
           ]
+        },
+        {
+          "name": "fill_not_improvable_zero_sum and row variant source240-272: sign-before-clear publication, stored row order, basis-cost order then ascending negated nonbasic reduced costs, owned unary-minus temporary through pair copies",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_infeasibility.go",
+          "tests": [
+            "TestLARInfeasibilityReducedCostIndependentModels",
+            "TestLARInfeasibilityStoredRowIndependentModels",
+            "TestLARInfeasibilityPhysicalOwnership",
+            "TestLARInfeasibilityActualSolveExplanation",
+            "TestLARInfSignIndependentBoundAndEpsilonModels",
+            "TestLARInfeasibilityReachedPrefixes",
+            "TestLARInfeasibilityPreservesOlderComparison",
+            "TestLARInfeasibilityBasisOrderAndNonbasicScan",
+            "TestLARInfeasibilityStopsAtPendingExplanation",
+            "TestLARInfSignPreservesOlderComparison",
+            "TestLARInfeasibilityOwnsCopiedCoefficients"
+          ]
         }
       ],
       "ownership": [
@@ -120532,7 +120563,8 @@
         "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
         "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication.",
         "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update.",
-        "Literal core scope profiles: only non-tableau mode snapshots/pops the rational matrix, bases and Markowitz counts; floating matrix always scopes. Pop gates on current strategy, restoring saved strategy only after basis handling. Surviving matrix coefficients, X/cost/D values, RHS and floating low/upper/cost vectors are not restored. Tableau copies current rational basis/nonbasis/headings to floating fields, even for actual empty floating matrix; outer solver must remove tableau columns first. Native push_vector preserves an oversized cached tail, while debug asserts before copying. Invalid zero/excess scope depths and explicit malformed links/headings/size profiles return typed errors after reached publication. No whole-model push/pop or strategy-migration completion is claimed."
+        "Literal core scope profiles: only non-tableau mode snapshots/pops the rational matrix, bases and Markowitz counts; floating matrix always scopes. Pop gates on current strategy, restoring saved strategy only after basis handling. Surviving matrix coefficients, X/cost/D values, RHS and floating low/upper/cost vectors are not restored. Tableau copies current rational basis/nonbasis/headings to floating fields, even for actual empty floating matrix; outer solver must remove tableau columns first. Native push_vector preserves an oversized cached tail, while debug asserts before copying. Invalid zero/excess scope depths and explicit malformed links/headings/size profiles return typed errors after reached publication. No whole-model push/pop or strategy-migration completion is claimed.",
+        "Concrete retained LAR infeasibility explanation consumer now ports inf_sign_of_column, which was not needed by row pricing alone. The existing typed sparse coefficient vector preserves source pair-copy lifetimes, zeros and order; a stopped negation/append remains owned until Core.Close. Full LAR Solve and signature/presolve integration remain open; no whole source-unit promotion."
       ]
     },
     {
@@ -120548,7 +120580,9 @@
         "pkg/util/lp/lar_prepare_exact.go",
         "pkg/util/lp/lar_prepare_exact_test.go",
         "pkg/util/lp/lar_prepare_float.go",
-        "pkg/util/lp/lar_prepare_float_test.go"
+        "pkg/util/lp/lar_prepare_float_test.go",
+        "pkg/util/lp/lar_infeasibility.go",
+        "pkg/util/lp/lar_infeasibility_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -120570,7 +120604,18 @@
         "TestLARPrepareExactActualPendingQueuePrefix",
         "TestLARPrepareExactStoppedPrimal",
         "TestLARPrepareFloatSourceVectorKinds",
-        "TestLARPrepareFloatFailurePrefixes"
+        "TestLARPrepareFloatFailurePrefixes",
+        "TestLARInfeasibilityReducedCostIndependentModels",
+        "TestLARInfeasibilityStoredRowIndependentModels",
+        "TestLARInfeasibilityPhysicalOwnership",
+        "TestLARInfeasibilityActualSolveExplanation",
+        "TestLARInfSignIndependentBoundAndEpsilonModels",
+        "TestLARInfeasibilityReachedPrefixes",
+        "TestLARInfeasibilityPreservesOlderComparison",
+        "TestLARInfeasibilityBasisOrderAndNonbasicScan",
+        "TestLARInfeasibilityStopsAtPendingExplanation",
+        "TestLARInfSignPreservesOlderComparison",
+        "TestLARInfeasibilityOwnsCopiedCoefficients"
       ],
       "assertions": [
         {
@@ -120681,6 +120726,24 @@
             "TestLARPrepareFloatSourceVectorKinds",
             "TestLARPrepareFloatFailurePrefixes"
           ]
+        },
+        {
+          "name": "fill_not_improvable_zero_sum and row variant source240-272: sign-before-clear publication, stored row order, basis-cost order then ascending negated nonbasic reduced costs, owned unary-minus temporary through pair copies",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_infeasibility.go",
+          "tests": [
+            "TestLARInfeasibilityReducedCostIndependentModels",
+            "TestLARInfeasibilityStoredRowIndependentModels",
+            "TestLARInfeasibilityPhysicalOwnership",
+            "TestLARInfeasibilityActualSolveExplanation",
+            "TestLARInfSignIndependentBoundAndEpsilonModels",
+            "TestLARInfeasibilityReachedPrefixes",
+            "TestLARInfeasibilityPreservesOlderComparison",
+            "TestLARInfeasibilityBasisOrderAndNonbasicScan",
+            "TestLARInfeasibilityStopsAtPendingExplanation",
+            "TestLARInfSignPreservesOlderComparison",
+            "TestLARInfeasibilityOwnsCopiedCoefficients"
+          ]
         }
       ],
       "ownership": [
@@ -120692,7 +120755,8 @@
       "deviations": [
         "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
         "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication.",
-        "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update."
+        "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update.",
+        "Concrete retained LAR infeasibility explanation consumer now ports inf_sign_of_column, which was not needed by row pricing alone. The existing typed sparse coefficient vector preserves source pair-copy lifetimes, zeros and order; a stopped negation/append remains owned until Core.Close. Full LAR Solve and signature/presolve integration remain open; no whole source-unit promotion."
       ]
     },
     {
@@ -123983,7 +124047,9 @@
         "pkg/util/lp/primal_price_rows_exact.go",
         "pkg/util/lp/primal_price_rows_exact_test.go",
         "pkg/util/lp/primal_iteration_rows_exact.go",
-        "pkg/util/lp/primal_iteration_rows_exact_test.go"
+        "pkg/util/lp/primal_iteration_rows_exact_test.go",
+        "pkg/util/lp/lar_infeasibility.go",
+        "pkg/util/lp/lar_infeasibility_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124133,7 +124199,18 @@
         "TestLPExactRowAdvanceReachedPrefixes",
         "TestLPExactRowIterationPreservesOlderComparison",
         "TestLPExactRowIterationPermutedBasisAndMinimumLeaving",
-        "TestLPExactRowIterationThresholdAffectsCurrentSelection"
+        "TestLPExactRowIterationThresholdAffectsCurrentSelection",
+        "TestLARInfeasibilityReducedCostIndependentModels",
+        "TestLARInfeasibilityStoredRowIndependentModels",
+        "TestLARInfeasibilityPhysicalOwnership",
+        "TestLARInfeasibilityActualSolveExplanation",
+        "TestLARInfSignIndependentBoundAndEpsilonModels",
+        "TestLARInfeasibilityReachedPrefixes",
+        "TestLARInfeasibilityPreservesOlderComparison",
+        "TestLARInfeasibilityBasisOrderAndNonbasicScan",
+        "TestLARInfeasibilityStopsAtPendingExplanation",
+        "TestLARInfSignPreservesOlderComparison",
+        "TestLARInfeasibilityOwnsCopiedCoefficients"
       ],
       "conditionals": [
         {
@@ -124635,6 +124712,24 @@
             "TestLPExactRowIterationPermutedBasisAndMinimumLeaving",
             "TestLPExactRowIterationThresholdAffectsCurrentSelection"
           ]
+        },
+        {
+          "name": "inf_sign_of_column source156-168: actual infeasible-column assertion, free/lower/upper/fixed/boxed signs and exact upper comparison",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_infeasibility.go",
+          "tests": [
+            "TestLARInfeasibilityReducedCostIndependentModels",
+            "TestLARInfeasibilityStoredRowIndependentModels",
+            "TestLARInfeasibilityPhysicalOwnership",
+            "TestLARInfeasibilityActualSolveExplanation",
+            "TestLARInfSignIndependentBoundAndEpsilonModels",
+            "TestLARInfeasibilityReachedPrefixes",
+            "TestLARInfeasibilityPreservesOlderComparison",
+            "TestLARInfeasibilityBasisOrderAndNonbasicScan",
+            "TestLARInfeasibilityStopsAtPendingExplanation",
+            "TestLARInfSignPreservesOlderComparison",
+            "TestLARInfeasibilityOwnsCopiedCoefficients"
+          ]
         }
       ],
       "ownership": [
@@ -124663,7 +124758,8 @@
         "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
         "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial.",
         "Row pricing uses typed pointer choices over stable stored row cells and native slices. Equal-damage candidates with a shorter column are appended without dropping earlier longer candidates, preserving source RNG and selection. Bland mode copies each new minimum coefficient immediately and rereads later cells through output aliases. 480 independent selection/damage/RNG models,300 rational/epsilon monoid models,200 infeasible grow models, live alias, reached metadata and pooled/direct physical failures with older caller comparisons. Uncalled sign-row eligibility and inf_sign_of_column helpers are not ported. Row iteration and full exact Solve remain open; whole source unit stays partial.",
-        "Exact row iteration preserves source repetition count increment before strict threshold comparison, unsigned wrap, and lack of outer loop counter increments. It refreshes entering infeasibility only after ChangeBasis; source can pivot into an infeasible entering bound and discover infeasibility on the next iteration. 320 independent rational/epsilon feasible pivots and120 independently infeasible two-step models, threshold profiles, reached prefixes, pooled/direct physical arithmetic failures and older caller comparison cleanup. Whole exact Solve and source unit remain partial."
+        "Exact row iteration preserves source repetition count increment before strict threshold comparison, unsigned wrap, and lack of outer loop counter increments. It refreshes entering infeasibility only after ChangeBasis; source can pivot into an infeasible entering bound and discover infeasibility on the next iteration. 320 independent rational/epsilon feasible pivots and120 independently infeasible two-step models, threshold profiles, reached prefixes, pooled/direct physical arithmetic failures and older caller comparison cleanup. Whole exact Solve and source unit remain partial.",
+        "Concrete retained LAR infeasibility explanation consumer now ports inf_sign_of_column, which was not needed by row pricing alone. The existing typed sparse coefficient vector preserves source pair-copy lifetimes, zeros and order; a stopped negation/append remains owned until Core.Close. Full LAR Solve and signature/presolve integration remain open; no whole source-unit promotion."
       ]
     },
     {
