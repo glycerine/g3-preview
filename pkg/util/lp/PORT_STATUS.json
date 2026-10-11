@@ -318,15 +318,43 @@
     },
     {
       "source": "src/util/lp/dense_matrix.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dense_matrix_float_debug.go",
+        "pkg/util/lp/matrix_float_debug.go",
+        "pkg/util/lp/lu_float_debug_matrix.go",
+        "pkg/util/lp/dense_matrix_float_debug_test.go"
+      ],
+      "tests": [
+        "TestLPDebugDenseOriginalSource",
+        "TestLPDebugDenseIndependentProductsAndApplications",
+        "TestLPDebugDenseCopyAssignmentAndFlattenedDomains",
+        "TestLPDebugDenseRectangularAndAliasedApplicationPrefixes",
+        "TestLPDebugDenseMatrixEqualityAndFailurePrefixes",
+        "TestLPDebugDenseConcretePermutationAndStaticConsumers",
+        "TestLPDebugDenseActualLUIdentities",
+        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
+      ]
     },
     {
       "source": "src/util/lp/dense_matrix.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dense_matrix_float_debug.go",
+        "pkg/util/lp/matrix_float_debug.go",
+        "pkg/util/lp/lu_float_debug_matrix.go",
+        "pkg/util/lp/dense_matrix_float_debug_test.go"
+      ],
+      "tests": [
+        "TestLPDebugDenseOriginalSource",
+        "TestLPDebugDenseIndependentProductsAndApplications",
+        "TestLPDebugDenseCopyAssignmentAndFlattenedDomains",
+        "TestLPDebugDenseRectangularAndAliasedApplicationPrefixes",
+        "TestLPDebugDenseMatrixEqualityAndFailurePrefixes",
+        "TestLPDebugDenseConcretePermutationAndStaticConsumers",
+        "TestLPDebugDenseActualLUIdentities",
+        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
+      ]
     },
     {
       "source": "src/util/lp/dense_matrix_instances.cpp",
@@ -4208,15 +4236,43 @@
     },
     {
       "source": "src/util/lp/matrix.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dense_matrix_float_debug.go",
+        "pkg/util/lp/matrix_float_debug.go",
+        "pkg/util/lp/lu_float_debug_matrix.go",
+        "pkg/util/lp/dense_matrix_float_debug_test.go"
+      ],
+      "tests": [
+        "TestLPDebugDenseOriginalSource",
+        "TestLPDebugDenseIndependentProductsAndApplications",
+        "TestLPDebugDenseCopyAssignmentAndFlattenedDomains",
+        "TestLPDebugDenseRectangularAndAliasedApplicationPrefixes",
+        "TestLPDebugDenseMatrixEqualityAndFailurePrefixes",
+        "TestLPDebugDenseConcretePermutationAndStaticConsumers",
+        "TestLPDebugDenseActualLUIdentities",
+        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
+      ]
     },
     {
       "source": "src/util/lp/matrix.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dense_matrix_float_debug.go",
+        "pkg/util/lp/matrix_float_debug.go",
+        "pkg/util/lp/lu_float_debug_matrix.go",
+        "pkg/util/lp/dense_matrix_float_debug_test.go"
+      ],
+      "tests": [
+        "TestLPDebugDenseOriginalSource",
+        "TestLPDebugDenseIndependentProductsAndApplications",
+        "TestLPDebugDenseCopyAssignmentAndFlattenedDomains",
+        "TestLPDebugDenseRectangularAndAliasedApplicationPrefixes",
+        "TestLPDebugDenseMatrixEqualityAndFailurePrefixes",
+        "TestLPDebugDenseConcretePermutationAndStaticConsumers",
+        "TestLPDebugDenseActualLUIdentities",
+        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
+      ]
     },
     {
       "source": "src/util/lp/matrix_instances.cpp",
@@ -5500,8 +5556,8 @@
     }
   ],
   "status_counts": {
-    "unported": 14,
-    "partial": 90,
+    "unported": 10,
+    "partial": 94,
     "reference_only": 6
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
@@ -9320,5 +9376,74 @@
     },
     "related_native_seconds": 2.099,
     "related_debug_checked_seconds": 1.982
+  },
+  "latest_debug_float_dense_increment": {
+    "scope": "Retained floating debug dense/matrix operations and actual LU basis/left/right/correctness consumers; exact variants/printing/upstream assertion wiring remain open",
+    "source_units_promoted_to_partial": [
+      "src/util/lp/dense_matrix.h",
+      "src/util/lp/dense_matrix.hpp",
+      "src/util/lp/matrix.h",
+      "src/util/lp/matrix.hpp"
+    ],
+    "test_groups": 8,
+    "independent_rectangular_product_and_square_application_worlds": 100,
+    "actual_lu_basis_worlds": 40,
+    "actual_lu_policy_runs": 80,
+    "focused_debug_seconds": 0.085,
+    "focused_debug_checked_seconds": 0.082,
+    "statement_coverage": {
+      "debug": {
+        "dense_matrix_float_debug.go": {
+          "covered": 57,
+          "total": 65,
+          "percent": 87.7
+        },
+        "matrix_float_debug.go": {
+          "covered": 49,
+          "total": 51,
+          "percent": 96.1
+        },
+        "lu_float_debug_matrix.go": {
+          "covered": 61,
+          "total": 66,
+          "percent": 92.4
+        }
+      },
+      "debug_checked": {
+        "dense_matrix_float_debug.go": {
+          "covered": 57,
+          "total": 65,
+          "percent": 87.7
+        },
+        "matrix_float_debug.go": {
+          "covered": 49,
+          "total": 51,
+          "percent": 96.1
+        },
+        "lu_float_debug_matrix.go": {
+          "covered": 61,
+          "total": 66,
+          "percent": 92.4
+        }
+      }
+    },
+    "coverage_note": "57/65 dense (87.7%),49/51 matrix (96.1%),61/66 LU integration (92.4%) in both debug profiles. Remaining guards mainly host-int allocation bounds, stable dimension/temporary setters, impossible publication failure after completed valid input, or delegated construction errors. Rectangular/aliased and malformed-storage inputs verify source flat indexing and different publication prefixes; typed actual eta/row-eta/diagonal/permutation and sparse/dense LU consumers are exercised. Original dense test is post-return and its unit typo is preserved without registered test-driver credit. Native profile excludes all three new production files.",
+    "verification": {
+      "focused_debug": "passed",
+      "focused_debug_checked": "passed",
+      "lp_vet_native": "passed",
+      "lp_vet_debug": "passed",
+      "lp_vet_debug_checked": "passed",
+      "module_compile_native": "passed",
+      "module_compile_debug": "passed",
+      "module_compile_debug_checked": "passed",
+      "related_debug": "passed",
+      "related_debug_checked": "passed",
+      "portcheck": "passed",
+      "dependency_graph": "passed",
+      "diff_check": "passed"
+    },
+    "related_debug_seconds": 0.604,
+    "related_debug_checked_seconds": 0.577
   }
 }
