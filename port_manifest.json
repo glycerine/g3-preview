@@ -108777,9 +108777,23 @@
       "path": "src/test/smt_reader.h",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/smt_reader.go",
+        "pkg/util/lp/smt_reader_constraint.go",
+        "pkg/util/lp/smt_reader_syntax.go"
+      ],
+      "tests": [
+        "TestLPSMTReaderIndependentConstraints",
+        "TestLPSMTReaderSyntaxAndState",
+        "TestLPSMTReaderIntegerAndAssertionDomains",
+        "TestLPSMTReaderActualFactoryAndNames",
+        "TestLPSMTReaderFileAndDiagnosticFailures",
+        "TestLPSMTReaderPhysicalOwnership",
+        "TestLPSMTReaderDiagnosticPrefixesAndGuards",
+        "TestLPSMTReaderOlderCallerComparison",
+        "TestLPSMTReaderErasedAssertionsAndMalformedTokens"
+      ],
       "assertions": [
         {
           "line": 124,
@@ -108836,9 +108850,73 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained constructor/read/parse_line and recursive ASCII-space/parenthesis syntax tree; repeated root children append, literal line handling and file close before constraint construction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/smt_reader.go",
+          "go_targets": [
+            "pkg/util/lp/smt_reader_syntax.go"
+          ],
+          "tests": [
+            "TestLPSMTReaderIndependentConstraints",
+            "TestLPSMTReaderSyntaxAndState",
+            "TestLPSMTReaderIntegerAndAssertionDomains",
+            "TestLPSMTReaderActualFactoryAndNames",
+            "TestLPSMTReaderFileAndDiagnosticFailures",
+            "TestLPSMTReaderPhysicalOwnership",
+            "TestLPSMTReaderDiagnosticPrefixesAndGuards",
+            "TestLPSMTReaderOlderCallerComparison",
+            "TestLPSMTReaderErasedAssertionsAndMalformedTokens"
+          ]
+        },
+        {
+          "name": "Retained comparison-kind, sum/product/unary coefficient, deliberately ignored explicit RHS, constant accumulation and owning constraint publication/copies",
+          "status": "ported",
+          "go_target": "pkg/util/lp/smt_reader_constraint.go",
+          "tests": [
+            "TestLPSMTReaderIndependentConstraints",
+            "TestLPSMTReaderSyntaxAndState",
+            "TestLPSMTReaderIntegerAndAssertionDomains",
+            "TestLPSMTReaderActualFactoryAndNames",
+            "TestLPSMTReaderFileAndDiagnosticFailures",
+            "TestLPSMTReaderPhysicalOwnership",
+            "TestLPSMTReaderDiagnosticPrefixesAndGuards",
+            "TestLPSMTReaderOlderCallerComparison",
+            "TestLPSMTReaderErasedAssertionsAndMalformedTokens"
+          ]
+        },
+        {
+          "name": "register_name/add_constraint_to_solver/fill_lar_solver/create_lar_solver: actual name IDs, single make_pair coefficient copy followed by vector rvalue move and source AddConstraint checked assertion/native no-op; partial factory owner returned",
+          "status": "ported",
+          "go_target": "pkg/util/lp/smt_reader.go",
+          "tests": [
+            "TestLPSMTReaderIndependentConstraints",
+            "TestLPSMTReaderSyntaxAndState",
+            "TestLPSMTReaderIntegerAndAssertionDomains",
+            "TestLPSMTReaderActualFactoryAndNames",
+            "TestLPSMTReaderFileAndDiagnosticFailures",
+            "TestLPSMTReaderPhysicalOwnership",
+            "TestLPSMTReaderDiagnosticPrefixesAndGuards",
+            "TestLPSMTReaderOlderCallerComparison",
+            "TestLPSMTReaderErasedAssertionsAndMalformedTokens"
+          ]
+        },
+        {
+          "name": "Unreached from_string<T>, prefix and lisp_elem::print plus fully commented alternative population helpers; retained source consumer scan only reaches read/is_ok/create_lar_solver from lp.cpp2479-2485",
+          "status": "dead_deleted",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Reader owns pending lexical constraint, pending vector-copy destination, published constraints and concrete factory pair population work. Source unary result moves into local coefficient; add_pair copies its by-value parameter and make_pair copies that lvalue before moving into vector. Source constraint vector publication copies coefficient members before RHS, then destroys the lexical original. Captures belong to actual vector/arithmetic owner; no reader capture wraps child operations.",
+        "Factory pair creation copies coefficient exactly once then transfers the rvalue root into native owning storage. Failed factory returns partial LAR owner to close before reader. Parser file closes before constraint construction. Four pooled/direct campaigns cover actual24-minimum-int coefficient parse and separately prepared1000-digit factory coefficients through native success/checked source assertion. Direct campaigns require physical refusal. Two actual older caller comparisons survive owner cleanup."
+      ],
+      "deviations": [
+        "Native Go strings/slices/files/strconv replace all C++ library text/container handling. Parsing intentionally remains the single-line :formula/and test grammar, with ASCII-space separators, duplicate/zero coefficients, root child accumulation, ignored explicit RHS and source native-erased assertion behavior. This is not a general SMT-LIB reader.",
+        "Native integer parsing accepts complete signed int32 strings and returns explicit errors for malformed libc prefix forms and overflow rather than implementing atoi. Unsupported relation kind stops with ErrBounds after source diagnostics instead of using uninitialized C++ m_kind; missing-index/nonprogress parser domains return explicit Go errors. Native non-EOF read/close/report failures are explicit and leave partial owners reachable for cleanup.",
+        "General source AddConstraint remains checked assertion/native no-op, so parser coefficient/RHS correctness and factory integration do not establish constrained SMT solving. Prepared1000-digit factory coefficients are public-field mutation fixtures, not claims that source atoi parses them. Full --smt file/CLI dispatch and whole-source audit remain open."
+      ]
     },
     {
       "path": "src/test/sorting_network.cpp",
