@@ -103016,7 +103016,8 @@
         "pkg/util/lp/driver_file_list.go",
         "pkg/util/lp/driver_mps_default_rational.go",
         "pkg/util/lp/driver_lar.go",
-        "pkg/util/lp/driver_lar_mps_file.go"
+        "pkg/util/lp/driver_lar_mps_file.go",
+        "pkg/util/lp/driver_lar_smt_file_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103152,7 +103153,15 @@
         "TestLPLARMPSInputEntryGuards",
         "TestLPLARMPSFileReportFailures",
         "TestLPLARMPSFilePhysicalOwnership",
-        "TestLPLARMPSFileOlderCallerComparison"
+        "TestLPLARMPSFileOlderCallerComparison",
+        "TestLPLARSMTFileSourceSecondMPSRead",
+        "TestLPLARSMTPolyglotRunAndComparison",
+        "TestLPLARSMTFileInputDispatch",
+        "TestLPLARSMTFileBadCreationAndCleanup",
+        "TestLPLARSMTFileReportFailures",
+        "TestLPLARSMTFilePhysicalOwnership",
+        "TestLPLARSMTFileOlderCallerComparison",
+        "TestLPLARSMTInputFailedSecondCreatorClose"
       ],
       "conditionals": [
         {
@@ -103972,6 +103981,21 @@
             "TestLPLARMPSFilePhysicalOwnership",
             "TestLPLARMPSFileOlderCallerComparison"
           ]
+        },
+        {
+          "name": "SMT branch of create_lar_solver_from_file (2477-2486) and generic test_lar_on_file/test_lar_solver (2499-2506,2529-2545): SMT population and creator scope, unconditional second MPS read, native LAR solve/comparison/randomize and file-before-list cleanup",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_lar_mps_file.go",
+          "tests": [
+            "TestLPLARSMTFileSourceSecondMPSRead",
+            "TestLPLARSMTPolyglotRunAndComparison",
+            "TestLPLARSMTFileInputDispatch",
+            "TestLPLARSMTFileBadCreationAndCleanup",
+            "TestLPLARSMTFileReportFailures",
+            "TestLPLARSMTFilePhysicalOwnership",
+            "TestLPLARSMTFileOlderCallerComparison",
+            "TestLPLARSMTInputFailedSecondCreatorClose"
+          ]
         }
       ],
       "ownership": [
@@ -103981,7 +104005,8 @@
         "Native file-list reader closes its file before solving. Sequential MPS list driver owns only the current child; each completed child closes before the next starts. Failed child remains reachable until Close succeeds, including real file-close failure and cleanup retry. Arguments and numerical manager remain borrowed.",
         "Auxiliary exact driver uses concrete solver defaults and ignores arguments as source does. Each named returned numeral survives its output plus trailing space, then dies before next expression. Objective returned numeral survives endl; failed children and expression locals remain reachable until explicit Close, with delegated captures retained by their actual owning child. Eight pooled/direct physical campaigns and two actual older caller comparisons verify cleanup ownership.",
         "LARRunDriver borrows its LAR solver, optional MPS reader and arguments. It owns concrete primal comparison and named snapshots, closing comparison before borrowed getter outputs; lexical infeasibility evidence closes at if-block end, with failed work reachable for explicit cleanup. Eight pooled/direct physical campaigns cover actual Solve, infeasibility, randomize and comparison through success; two actual older caller comparisons survive driver and solver/reader cleanup.",
-        "LAR MPS file driver owns creation reader, returned LAR solver, second reader and run driver. Successful CreateLARSolver leaves no parser-numeral borrows: column registration and source AddConstraint no-op/debug assertion are inspected; creation reader closes before second read as source scopes require. Failed creation retains reader until partial solver cleanup. Run driver closes before LAR solver and report reader; failed second list child remains reachable. Four pooled/direct physical campaigns and two actual older caller comparisons verify all prefixes."
+        "LAR MPS file driver owns creation reader, returned LAR solver, second reader and run driver. Successful CreateLARSolver leaves no parser-numeral borrows: column registration and source AddConstraint no-op/debug assertion are inspected; creation reader closes before second read as source scopes require. Failed creation retains reader until partial solver cleanup. Run driver closes before LAR solver and report reader; failed second list child remains reachable. Four pooled/direct physical campaigns and two actual older caller comparisons verify all prefixes.",
+        "Generic LARFileDriver/LARInputDriver own selected MPS or SMT creator, solver, unconditional second MPS reader and runner. Successful creator scope ends before second read; failed factory retains partial solver/creator. Close retries preserve failed Current and creator. Four pooled/direct physical campaigns, two older caller comparisons and real second-child file-close refusal verify ownership prefixes."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -104001,7 +104026,8 @@
         "File-list names use native Go strings and slices with literal byte preservation; no C++ string/stream/vector implementation. Missing-open diagnostic returns an empty list as source does. Native non-EOF read errors return completed names plus explicit error rather than suppressing the I/O failure as C++ read_line does. First empty line ends reading; final non-newline line is accepted; CR, whitespace, duplicates and relative names are unchanged.",
         "Auxiliary exact driver retains fresh tableau default zero reduced costs: 40 positive-objective bounded worlds report initial zero objective as source defaults do, without claiming mathematical optimality. No setup, minimum correction, limits or stopwatch is introduced. Exact dual unsupported rational(double) and missing sparsity metadata remain explicit source boundaries. Column names use the existing reader insertion order instead of C++ unordered-map iteration. Source diagnostics route to the configured native writer.",
         "run_lar_solver uses native Go writers, clock, slices and concrete rational vector snapshots. Source unused local solution map is represented by owning named-getter snapshots without a universal STL adapter; names use existing reader insertion order. Source compare branch prints LAR status without solving LAR or comparing values. Source raw primal comparison pointer is not deleted; Go explicit driver ownership closes it, avoiding a leaked numerical owner. Configured output redirects concrete solver diagnostics. Disabled directory traversal is not implemented.",
-        "MPS-specific LAR entry points port the retained MPS half, not the separate SMT reader/dispatch. Source two reads and file-before-list priority are retained. Missing individual files emit both parser diagnostics and return normally so list processing continues. Checked general AddConstraint asserts during initial factory before the second read; native retains the disabled constraint body and does not establish mathematical constrained-model solving. Native read/close/report errors remain explicit and partial owners permit cleanup retry."
+        "MPS-specific LAR entry points port the retained MPS half, not the separate SMT reader/dispatch. Source two reads and file-before-list priority are retained. Missing individual files emit both parser diagnostics and return normally so list processing continues. Checked general AddConstraint asserts during initial factory before the second read; native retains the disabled constraint body and does not establish mathematical constrained-model solving. Native read/close/report errors remain explicit and partial owners permit cleanup retry.",
+        "SMT creation retains source unconditional second MPS read: ordinary SMT-only input emits EOF then column/RHS diagnostics and returns without solving; empty SMT conjunction followed by valid MPS exercises actual solve/randomize/comparison. Invalid SMT creation with valid MPS second read reaches explicit nil-solver ErrBounds instead of C++ null dereference. Existing AddConstraint checked assertion/native no-op remains. Native Go files/slices/writers, no STL adapters. Top-level CLI and whole-source audit remain open."
       ]
     },
     {

@@ -10,7 +10,7 @@
     "remaining retained objective/preparation consumers and full primal/dual/LAR scaling integration; whole random-update source/driver audit",
     "remaining retained constructor/diagnostic/validator and optimization consumer audits; complete MPS/CLI upstream drivers",
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
-    "remaining SMT file creation/input dispatch and top-level CLI integration including empty directory branch; retained solve_some_mps and whole SMT reader audit",
+    "remaining top-level CLI integration including empty directory branch; retained solve_some_mps and whole SMT reader/LP audit",
     "component property tests, coverage and integration audits",
     "Remaining top-level test CLI dispatch, SMT file creation/input dispatch driver scenarios; remaining retained scaling/optimization consumers, whole-source/ownership audits and complete upstream LP/randomize drivers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
   ],
@@ -9154,25 +9154,68 @@
       "diff_check": "passed"
     }
   },
-  "running_full_native_checkpoint": {
-    "commit": "5c24ca3b",
-    "started_utc": "2026-10-11 21:36:01 UTC",
-    "command": [
-      "go",
-      "-C",
-      "pkg",
-      "test",
-      "-json",
-      "./...",
-      "-timeout=60m",
-      "-count=1",
-      "-coverprofile=/mnt/oldrog/tmp/g3-lp-smt-module-native.cover"
-    ],
-    "log": "/mnt/oldrog/tmp/g3-lp-smt-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-lp-smt-module-native.events.jsonl",
-    "profile": "/mnt/oldrog/tmp/g3-lp-smt-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-lp-smt-module-native.json",
-    "session_id": 32418,
-    "scope_warning": "Includes retained MPS setup/file/default drivers, MPS and LAR file-list integration, LAR run driver and retained SMT reader/factory through5c24ca3b, plus prior LP work. Actual session32418 returned live and was polled live after start. Completion and coverage are not credited; poll this same handle until terminal. Later edits after LP binary start are excluded from this checkpoint."
-  }
+  "latest_lar_smt_file_driver_increment": {
+    "scope": "Retained SMT branch of create_lar_solver_from_file and generic MPS/SMT file-before-list dispatch; source always-MPS second read retained; top-level CLI and whole-source audits remain open",
+    "source_units_promoted": false,
+    "test_groups": 8,
+    "independent_formula_file_worlds": 40,
+    "physical_campaigns": 4,
+    "older_caller_comparison_campaigns": 2,
+    "focused_native_seconds": 6.024,
+    "focused_debug_checked_seconds": 6.41,
+    "related_native_seconds": 20.62,
+    "related_debug_checked_seconds": 26.918,
+    "statement_coverage": {
+      "native": {
+        "covered": 102,
+        "total": 108,
+        "percent": 94.4
+      },
+      "debug_checked": {
+        "covered": 103,
+        "total": 108,
+        "percent": 95.4
+      }
+    },
+    "coverage_note": "Combined MPS/SMT file-driver coverage. Remaining guards cover stable successful creator/child destruction and native delegated factory failure. Four pooled/direct physical campaigns cover constrained SMT parsing through native success or checked AddConstraint assertion, and empty-conjunction actual comparison through success. Direct campaigns require physical refusal. Pure SMT files do not run the solver because the source always performs a second MPS read. EOF continues into column/RHS diagnostics; tests preserve this source prefix. Empty-conjunction/MPS polyglot files exercise actual solve/randomize/comparison without claiming constrained SMT mathematical solving.",
+    "verification": {
+      "focused_native": "passed",
+      "focused_debug_checked": "passed",
+      "related_native": "passed",
+      "related_debug_checked": "passed",
+      "lp_vet_native": "passed",
+      "lp_vet_debug_checked": "passed",
+      "module_compile_native": "passed",
+      "module_compile_debug_checked": "passed",
+      "portcheck": "passed",
+      "dependency_graph": "passed",
+      "diff_check": "passed"
+    }
+  },
+  "failed_full_native_checkpoints": [
+    {
+      "commit": "5c24ca3b",
+      "started_utc": "2026-10-11 21:36:01 UTC",
+      "command": [
+        "go",
+        "-C",
+        "pkg",
+        "test",
+        "-json",
+        "./...",
+        "-timeout=60m",
+        "-count=1",
+        "-coverprofile=/mnt/oldrog/tmp/g3-lp-smt-module-native.cover"
+      ],
+      "log": "/mnt/oldrog/tmp/g3-lp-smt-module-native.log",
+      "event_log": "/mnt/oldrog/tmp/g3-lp-smt-module-native.events.jsonl",
+      "profile": "/mnt/oldrog/tmp/g3-lp-smt-module-native.cover",
+      "status_file": "/mnt/oldrog/tmp/g3-lp-smt-module-native.json",
+      "session_id": 32418,
+      "scope_warning": "LP binary started2026-10-11T16:36:04.50309861-05:00 and excludes current generic SMT file integration. Latest successful full checkpoint remains93d0d780; this failed attempt does not replace it.",
+      "status": "failed_infrastructure",
+      "terminal_exit_code": 1,
+      "reason": "Actual session32418 returned terminal exit1: runner log/event write failed with OSError errno28 (no space left on device). No complete LP result or coverage credited. 62 package pass events and LP start observed; log stops during an LP test."
+    }
+  ]
 }

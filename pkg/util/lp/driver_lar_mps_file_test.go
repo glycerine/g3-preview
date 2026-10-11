@@ -29,7 +29,7 @@ func TestLPLARMPSFileIndependentFreeModels(t *testing.T) {
 		h := newLPPairHarness(t)
 		var out bytes.Buffer
 		name := lpMPSDriverFile(t, lpLARFreeMPS(count))
-		var d *LARMPSFileDriver
+		var d *LARFileDriver
 		clock := &lpMPSDriverClock{}
 		read := func() (uint64, error) {
 			if d.creator != nil || d.reader == nil || d.reader.file == nil || d.Solver == nil || len(d.Solver.GetListOfAllVarIndices()) != count {
@@ -37,7 +37,7 @@ func TestLPLARMPSFileIndependentFreeModels(t *testing.T) {
 			}
 			return clock.read()
 		}
-		d = NewLARMPSFileDriver(name, lpDriverArgs(t, "lp-test", "--randomize_lar"), h.m, MPSDriverConfig{Output: &out, Clock: read})
+		d = NewLARFileDriver(name, lpDriverArgs(t, "lp-test", "--randomize_lar"), h.m, MPSDriverConfig{Output: &out, Clock: read})
 		h.must(d.Run())
 		if !d.closed || d.Status != StatusOptimal || d.Iterations != 1 || clock.calls != 3 || d.Solver != nil || d.Runner != nil || d.reader != nil || out.String() != "status is OPTIMAL, processed for 2 seconds, and 1 iterations\nchecking randomize\n" {
 			t.Fatal(count, d.Status, d.Iterations, out.String())
@@ -73,7 +73,7 @@ func TestLPLARMPSInputDispatchAndFileList(t *testing.T) {
 		}
 		var out bytes.Buffer
 		clock := &lpMPSDriverClock{}
-		d := NewLARMPSInputDriver(lpDriverArgs(t, args...), h.m, MPSDriverConfig{Output: &out, Clock: clock.read})
+		d := NewLARInputDriver(lpDriverArgs(t, args...), h.m, MPSDriverConfig{Output: &out, Clock: clock.read})
 		h.must(d.Run())
 		if !reflect.DeepEqual(d.Files, want) || d.Completed != len(want) || d.Current != nil || !d.closed || clock.calls != 3*len(want) || strings.Count(out.String(), "status is OPTIMAL") != len(want) {
 			t.Fatal(profile, d.Files, d.Completed, clock.calls, out.String())
@@ -103,7 +103,7 @@ func TestLPLARMPSFileSourceBoundaries(t *testing.T) {
 			args = lpDriverArgs(t, "lp-test", "--compare_with_primal")
 		}
 		clock := &lpMPSDriverClock{}
-		d := NewLARMPSFileDriver(name, args, h.m, MPSDriverConfig{Output: &out, Clock: clock.read})
+		d := NewLARFileDriver(name, args, h.m, MPSDriverConfig{Output: &out, Clock: clock.read})
 		if profile == "nil-args" {
 			d.Arguments = nil
 		} else if profile == "nil-manager" {
@@ -158,14 +158,14 @@ func TestLPLARMPSFileFailedSecondChildAndClose(t *testing.T) {
 		name := lpMPSDriverFile(t, lpLARFreeMPS(2))
 		list := lpDriverListFile(t, name+"\n"+name+"\n"+name)
 		clock := &lpMPSDriverClock{failAt: 4}
-		var d *LARMPSInputDriver
+		var d *LARInputDriver
 		read := func() (uint64, error) {
 			if closeFile && clock.calls == 3 {
 				h.must(d.Current.reader.file.Close())
 			}
 			return clock.read()
 		}
-		d = NewLARMPSInputDriver(lpDriverArgs(t, "lp-test", "--filelist", list), h.m, MPSDriverConfig{Output: io.Discard, Clock: read})
+		d = NewLARInputDriver(lpDriverArgs(t, "lp-test", "--filelist", list), h.m, MPSDriverConfig{Output: io.Discard, Clock: read})
 		if err := d.Run(); err != lpErrMPSDriverClock || d.Completed != 1 || d.Current == nil || d.Current.Runner == nil || d.Current.Solver == nil || d.Current.closed {
 			t.Fatal(err, d.Completed, d.Current)
 		}
@@ -187,7 +187,7 @@ func TestLPLARMPSFileFailedSecondChildAndClose(t *testing.T) {
 func TestLPLARMPSInputEntryGuards(t *testing.T) {
 	for _, profile := range []string{"nil-args", "directory-list", "closed", "default-output"} {
 		args := lpDriverArgs(t, "lp-test", "--filelist", t.TempDir())
-		d := NewLARMPSInputDriver(args, nil, MPSDriverConfig{})
+		d := NewLARInputDriver(args, nil, MPSDriverConfig{})
 		switch profile {
 		case "nil-args":
 			d.Arguments = nil
@@ -204,7 +204,7 @@ func TestLPLARMPSInputEntryGuards(t *testing.T) {
 				t.Fatal("closed list ran")
 			}
 		case "default-output":
-			if d.config.Output != os.Stdout || NewLARMPSFileDriver("", args, nil, MPSDriverConfig{}).config.Output != os.Stdout {
+			if d.config.Output != os.Stdout || NewLARFileDriver("", args, nil, MPSDriverConfig{}).config.Output != os.Stdout {
 				t.Fatal("missing stdout")
 			}
 		}
@@ -213,7 +213,7 @@ func TestLPLARMPSInputEntryGuards(t *testing.T) {
 	// Missing individual files return normally, so the loop continues.
 	h := newLPPairHarness(t)
 	missing := filepath.Join(t.TempDir(), "missing.mps")
-	d := NewLARMPSInputDriver(lpDriverArgs(t, "lp-test", "--filelist", lpDriverListFile(t, missing+"\n"+missing)), h.m, MPSDriverConfig{Output: io.Discard})
+	d := NewLARInputDriver(lpDriverArgs(t, "lp-test", "--filelist", lpDriverListFile(t, missing+"\n"+missing)), h.m, MPSDriverConfig{Output: io.Discard})
 	h.must(d.Run())
 	if d.Completed != 2 {
 		t.Fatal(d.Completed)
@@ -232,7 +232,7 @@ func TestLPLARMPSFileReportFailures(t *testing.T) {
 		for accepted := 0; accepted <= len(want); accepted++ {
 			h := newLPPairHarness(t)
 			w := &lpResidualFailWriter{remaining: accepted}
-			d := NewLARMPSFileDriver(name, lpDriverArgs(t, "lp-test", "--randomize_lar"), h.m, MPSDriverConfig{Output: lpResidualWriterOnly{writer: w}, Clock: (&lpMPSDriverClock{}).read})
+			d := NewLARFileDriver(name, lpDriverArgs(t, "lp-test", "--randomize_lar"), h.m, MPSDriverConfig{Output: lpResidualWriterOnly{writer: w}, Clock: (&lpMPSDriverClock{}).read})
 			err := d.Run()
 			if w.String() != want[:accepted] || accepted < len(want) && err != lpErrResidualWrite || accepted == len(want) && err != nil {
 				t.Fatal(missing, accepted, err, w.String())
@@ -262,7 +262,7 @@ func TestLPLARMPSFilePhysicalOwnership(t *testing.T) {
 					if compare {
 						flags = append(flags, "--compare_with_primal")
 					}
-					d := NewLARMPSFileDriver(name, lpDriverArgs(t, flags...), h.m, MPSDriverConfig{Output: io.Discard, Clock: (&lpMPSDriverClock{}).read})
+					d := NewLARFileDriver(name, lpDriverArgs(t, flags...), h.m, MPSDriverConfig{Output: io.Discard, Clock: (&lpMPSDriverClock{}).read})
 					h.budget.FailAfter(ordinal)
 					err := d.Run()
 					h.budget.FailAfter(-1)
@@ -300,7 +300,7 @@ func TestLPLARMPSFileOlderCallerComparison(t *testing.T) {
 			if compare {
 				flags = append(flags, "--compare_with_primal")
 			}
-			d := NewLARMPSFileDriver(name, lpDriverArgs(t, flags...), h.m, MPSDriverConfig{Output: io.Discard, Clock: (&lpMPSDriverClock{}).read})
+			d := NewLARFileDriver(name, lpDriverArgs(t, flags...), h.m, MPSDriverConfig{Output: io.Discard, Clock: (&lpMPSDriverClock{}).read})
 			v := h.pair(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
 			var caller exactEtaCalls
 			before, err := caller.begin(h.m)

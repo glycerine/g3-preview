@@ -1,4 +1,4 @@
-// Source: src/test/lp.cpp:2486-2506,2529-2545 (MPS input branch).
+// Source: src/test/lp.cpp:2477-2506,2529-2545.
 package lp
 
 import (
@@ -7,12 +7,12 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-// LARMPSFileDriver owns the two readers and LAR solver of test_lar_on_file's
-// MPS branch. The creation reader dies before the second read on success;
+// LARFileDriver owns the two readers and LAR solver of test_lar_on_file.
+// The selected creation reader dies before the second read on success;
 // failed population retains it until the partial solver has closed.
-// Arguments and the manager are borrowed. This entry point selects MPS input;
-// the separate source SMT reader/dispatch remains to be ported.
-type LARMPSFileDriver struct {
+// Arguments and the manager are borrowed. The second read always uses MPS,
+// including when --smt selected the creation reader, as in the source.
+type LARFileDriver struct {
 	Name       string
 	Arguments  *DriverArguments
 	Solver     *LARSolver
@@ -20,6 +20,7 @@ type LARMPSFileDriver struct {
 	Status     Status
 	Iterations uint32
 	creator    *RationalMPSReader
+	smtCreator *SMTReader
 	reader     *RationalMPSReader
 	manager    *numeral.RationalManager
 	config     MPSDriverConfig
@@ -27,14 +28,14 @@ type LARMPSFileDriver struct {
 	closed     bool
 }
 
-func NewLARMPSFileDriver(name string, args *DriverArguments, manager *numeral.RationalManager, config MPSDriverConfig) *LARMPSFileDriver {
+func NewLARFileDriver(name string, args *DriverArguments, manager *numeral.RationalManager, config MPSDriverConfig) *LARFileDriver {
 	if config.Output == nil {
 		config.Output = os.Stdout
 	}
-	return &LARMPSFileDriver{Name: name, Arguments: args, manager: manager, config: config}
+	return &LARFileDriver{Name: name, Arguments: args, manager: manager, config: config}
 }
 
-func (d *LARMPSFileDriver) Run() error {
+func (d *LARFileDriver) Run() error {
 	if d.started || d.closed {
 		return ErrExactVectorPending
 	}
@@ -42,6 +43,31 @@ func (d *LARMPSFileDriver) Run() error {
 	if d.Arguments == nil {
 		return ErrBounds
 	}
+	var err error
+	if d.Arguments.OptionIsUsed("--smt") {
+		err = d.createSMT()
+	} else {
+		err = d.createMPS()
+	}
+	if err != nil {
+		return err
+	}
+	d.reader = OpenRationalMPSReader(d.manager, d.Name)
+	d.reader.Messages = d.config.Output
+	if err := d.reader.Read(); err != nil {
+		return err
+	}
+	if d.reader.IsOK() {
+		d.Runner = NewLARRunDriver(d.Solver, d.reader, d.Arguments, d.config)
+		if err := d.Runner.Run(); err != nil {
+			return err
+		}
+		d.Status, d.Iterations = d.Runner.Status, d.Solver.TotalIterations()
+	}
+	return d.Close()
+}
+
+func (d *LARFileDriver) createMPS() error {
 	d.creator = OpenRationalMPSReader(d.manager, d.Name)
 	d.creator.Messages = d.config.Output
 	if err := d.creator.Read(); err != nil {
@@ -62,22 +88,32 @@ func (d *LARMPSFileDriver) Run() error {
 		return err
 	}
 	d.creator = nil
-	d.reader = OpenRationalMPSReader(d.manager, d.Name)
-	d.reader.Messages = d.config.Output
-	if err := d.reader.Read(); err != nil {
-		return err
-	}
-	if d.reader.IsOK() {
-		d.Runner = NewLARRunDriver(d.Solver, d.reader, d.Arguments, d.config)
-		if err := d.Runner.Run(); err != nil {
-			return err
-		}
-		d.Status, d.Iterations = d.Runner.Status, d.Solver.TotalIterations()
-	}
-	return d.Close()
+	return nil
 }
 
-func (d *LARMPSFileDriver) Close() error {
+func (d *LARFileDriver) createSMT() error {
+	d.smtCreator = OpenSMTReader(d.manager, d.Name)
+	d.smtCreator.Messages = d.config.Output
+	if err := d.smtCreator.Read(); err != nil {
+		return err
+	}
+	if d.smtCreator.IsOK() {
+		var err error
+		d.Solver, err = d.smtCreator.CreateLARSolver()
+		if err != nil {
+			return err
+		}
+	} else if err := writeDriverLine(d.config.Output, "cannot process "+d.Name); err != nil {
+		return err
+	}
+	if err := d.smtCreator.Close(); err != nil {
+		return err
+	}
+	d.smtCreator = nil
+	return nil
+}
+
+func (d *LARFileDriver) Close() error {
 	if d.closed {
 		return nil
 	}
@@ -99,6 +135,12 @@ func (d *LARMPSFileDriver) Close() error {
 		}
 		d.creator = nil
 	}
+	if d.smtCreator != nil {
+		if err := d.smtCreator.Close(); err != nil {
+			return err
+		}
+		d.smtCreator = nil
+	}
 	if d.reader != nil {
 		if err := d.reader.Close(); err != nil {
 			return err
@@ -109,28 +151,28 @@ func (d *LARMPSFileDriver) Close() error {
 	return nil
 }
 
-// LARMPSInputDriver implements test_lar_solver's file-before-list dispatch for
-// MPS input. Completed files close before the next starts. A failed file remains
+// LARInputDriver implements test_lar_solver's file-before-list dispatch for
+// MPS or SMT creation. Completed files close before the next starts. A failed file remains
 // Current until Close; owning drivers must not be copied.
-type LARMPSInputDriver struct {
+type LARInputDriver struct {
 	Arguments *DriverArguments
 	Files     []string
 	Completed int
-	Current   *LARMPSFileDriver
+	Current   *LARFileDriver
 	manager   *numeral.RationalManager
 	config    MPSDriverConfig
 	started   bool
 	closed    bool
 }
 
-func NewLARMPSInputDriver(args *DriverArguments, manager *numeral.RationalManager, config MPSDriverConfig) *LARMPSInputDriver {
+func NewLARInputDriver(args *DriverArguments, manager *numeral.RationalManager, config MPSDriverConfig) *LARInputDriver {
 	if config.Output == nil {
 		config.Output = os.Stdout
 	}
-	return &LARMPSInputDriver{Arguments: args, manager: manager, config: config}
+	return &LARInputDriver{Arguments: args, manager: manager, config: config}
 }
 
-func (d *LARMPSInputDriver) Run() error {
+func (d *LARInputDriver) Run() error {
 	if d.started || d.closed {
 		return ErrExactVectorPending
 	}
@@ -148,7 +190,7 @@ func (d *LARMPSInputDriver) Run() error {
 		}
 	}
 	for _, file := range d.Files {
-		d.Current = NewLARMPSFileDriver(file, d.Arguments, d.manager, d.config)
+		d.Current = NewLARFileDriver(file, d.Arguments, d.manager, d.config)
 		if err := d.Current.Run(); err != nil {
 			return err
 		}
@@ -158,7 +200,7 @@ func (d *LARMPSInputDriver) Run() error {
 	return d.Close()
 }
 
-func (d *LARMPSInputDriver) Close() error {
+func (d *LARInputDriver) Close() error {
 	if d.closed {
 		return nil
 	}
