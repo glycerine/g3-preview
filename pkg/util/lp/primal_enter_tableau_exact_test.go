@@ -208,6 +208,7 @@ func TestLPExactTableauIterationIndependentOptima(t *testing.T) {
 		h.must(h.m.SetInt32(&m.EpsilonOfReducedCost, 0))
 		h.must(m.InitInfSet())
 		h.must(m.InitReducedCostsTableau())
+		h.must(m.InitRunTableau())
 		m.NonBasisList = []uint32{2, 1}
 		m.TotalIterations = 73
 		m.IterationsNoCostGrowth = 29

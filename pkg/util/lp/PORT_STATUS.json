@@ -969,7 +969,9 @@
         "pkg/util/lp/core_reconstruct_exact_test.go",
         "pkg/util/lp/core_update_exact.go",
         "pkg/util/lp/core_statistics_exact.go",
-        "pkg/util/lp/core_statistics_exact_test.go"
+        "pkg/util/lp/core_statistics_exact_test.go",
+        "pkg/util/lp/core_basis_tableau_exact.go",
+        "pkg/util/lp/primal_init_tableau_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1103,7 +1105,15 @@
         "TestLPPairStatisticsLiveLocalReentryGuard",
         "TestLPPairStatisticsPhysicalOwnership",
         "TestLPPairAllColumnsFeasibilityIndependentOracle",
-        "TestLPPairStatisticsReachedGuardsAndPrefixes"
+        "TestLPPairStatisticsReachedGuardsAndPrefixes",
+        "TestLPExactInitTableauIndependentStateModels",
+        "TestLPExactTableauBasisIndependentSingletonModels",
+        "TestLPExactTableauBasisRowIdentityIsNotChecked",
+        "TestLPExactInitTableauReachedPrefixes",
+        "TestLPExactInitTableauPhysicalOwnership",
+        "TestLPExactTableauBasisReachedMetadata",
+        "TestLPExactInitTableauRowsFailurePrefixes",
+        "TestLPExactInitTableauPreservesOlderComparison"
       ]
     },
     {
@@ -1585,7 +1595,9 @@
         "pkg/util/lp/primal_leaving_exact_test.go",
         "pkg/util/lp/primal_infeas_cost_exact.go",
         "pkg/util/lp/primal_iteration_exact.go",
-        "pkg/util/lp/primal_iteration_exact_test.go"
+        "pkg/util/lp/primal_iteration_exact_test.go",
+        "pkg/util/lp/primal_init_tableau_exact.go",
+        "pkg/util/lp/primal_init_tableau_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -1710,7 +1722,15 @@
         "TestLPExactIterationPricingAndAdvance",
         "TestLPExactIterationIndependentBoundedOptima",
         "TestLPExactEnterPhysicalOwnership",
-        "TestLPExactEnterPreservesOlderComparison"
+        "TestLPExactEnterPreservesOlderComparison",
+        "TestLPExactInitTableauIndependentStateModels",
+        "TestLPExactTableauBasisIndependentSingletonModels",
+        "TestLPExactTableauBasisRowIdentityIsNotChecked",
+        "TestLPExactInitTableauReachedPrefixes",
+        "TestLPExactInitTableauPhysicalOwnership",
+        "TestLPExactTableauBasisReachedMetadata",
+        "TestLPExactInitTableauRowsFailurePrefixes",
+        "TestLPExactInitTableauPreservesOlderComparison"
       ]
     },
     {
@@ -1931,7 +1951,9 @@
         "pkg/util/lp/primal_leaving_tableau_exact.go",
         "pkg/util/lp/primal_leaving_tableau_exact_test.go",
         "pkg/util/lp/primal_enter_tableau_exact.go",
-        "pkg/util/lp/primal_enter_tableau_exact_test.go"
+        "pkg/util/lp/primal_enter_tableau_exact_test.go",
+        "pkg/util/lp/primal_init_tableau_exact.go",
+        "pkg/util/lp/primal_init_tableau_exact_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -1976,7 +1998,15 @@
         "TestLPExactTableauIterationDispatchAndStops",
         "TestLPExactTableauEnterPhysicalOwnership",
         "TestLPExactTableauEnterRejectedIndexOwnsLocal",
-        "TestLPExactTableauEnterPreservesOlderComparison"
+        "TestLPExactTableauEnterPreservesOlderComparison",
+        "TestLPExactInitTableauIndependentStateModels",
+        "TestLPExactTableauBasisIndependentSingletonModels",
+        "TestLPExactTableauBasisRowIdentityIsNotChecked",
+        "TestLPExactInitTableauReachedPrefixes",
+        "TestLPExactInitTableauPhysicalOwnership",
+        "TestLPExactTableauBasisReachedMetadata",
+        "TestLPExactInitTableauRowsFailurePrefixes",
+        "TestLPExactInitTableauPreservesOlderComparison"
       ]
     },
     {

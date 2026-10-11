@@ -121740,7 +121740,9 @@
         "pkg/util/lp/core_reconstruct_exact_test.go",
         "pkg/util/lp/core_update_exact.go",
         "pkg/util/lp/core_statistics_exact.go",
-        "pkg/util/lp/core_statistics_exact_test.go"
+        "pkg/util/lp/core_statistics_exact_test.go",
+        "pkg/util/lp/core_basis_tableau_exact.go",
+        "pkg/util/lp/primal_init_tableau_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -121874,7 +121876,15 @@
         "TestLPPairStatisticsLiveLocalReentryGuard",
         "TestLPPairStatisticsPhysicalOwnership",
         "TestLPPairAllColumnsFeasibilityIndependentOracle",
-        "TestLPPairStatisticsReachedGuardsAndPrefixes"
+        "TestLPPairStatisticsReachedGuardsAndPrefixes",
+        "TestLPExactInitTableauIndependentStateModels",
+        "TestLPExactTableauBasisIndependentSingletonModels",
+        "TestLPExactTableauBasisRowIdentityIsNotChecked",
+        "TestLPExactInitTableauReachedPrefixes",
+        "TestLPExactInitTableauPhysicalOwnership",
+        "TestLPExactTableauBasisReachedMetadata",
+        "TestLPExactInitTableauRowsFailurePrefixes",
+        "TestLPExactInitTableauPreservesOlderComparison"
       ],
       "assertions": [
         {
@@ -122261,6 +122271,21 @@
             "TestLPPairAllColumnsFeasibilityIndependentOracle",
             "TestLPPairStatisticsReachedGuardsAndPrefixes"
           ]
+        },
+        {
+          "name": "need_to_pivot_to_basis_tableau source199-208: debug matrix validation, row-count basis traversal, nonempty guards and singleton unit values without extra row-identity constraint",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_basis_tableau_exact.go",
+          "tests": [
+            "TestLPExactInitTableauIndependentStateModels",
+            "TestLPExactTableauBasisIndependentSingletonModels",
+            "TestLPExactTableauBasisRowIdentityIsNotChecked",
+            "TestLPExactInitTableauReachedPrefixes",
+            "TestLPExactInitTableauPhysicalOwnership",
+            "TestLPExactTableauBasisReachedMetadata",
+            "TestLPExactInitTableauRowsFailurePrefixes",
+            "TestLPExactInitTableauPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -122287,7 +122312,8 @@
         "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open.",
         "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard.",
         "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update.",
-        "Statistics use Go io.Writer/fmt/strconv, retaining exact numeric-pair x+y/1000 evaluation before conversion and classic six-digit formatting; no STL stream implementation is ported. Reporting snapshots its by-value argument before output, inspects LU nonzero counts after cost text, and checks actual cancellation after successful output. Local cost/argument owners survive failures until captured child scratch is cleaned. Full precise/default-tableau Solve remains open."
+        "Statistics use Go io.Writer/fmt/strconv, retaining exact numeric-pair x+y/1000 evaluation before conversion and classic six-digit formatting; no STL stream implementation is ported. Reporting snapshots its by-value argument before output, inspects LU nonzero counts after cost text, and checks actual cancellation after successful output. Local cost/argument owners survive failures until captured child scratch is cleaned. Full precise/default-tableau Solve remains open.",
+        "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial."
       ]
     },
     {
@@ -123951,7 +123977,9 @@
         "pkg/util/lp/primal_leaving_exact_test.go",
         "pkg/util/lp/primal_infeas_cost_exact.go",
         "pkg/util/lp/primal_iteration_exact.go",
-        "pkg/util/lp/primal_iteration_exact_test.go"
+        "pkg/util/lp/primal_iteration_exact_test.go",
+        "pkg/util/lp/primal_init_tableau_exact.go",
+        "pkg/util/lp/primal_init_tableau_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124076,7 +124104,15 @@
         "TestLPExactIterationPricingAndAdvance",
         "TestLPExactIterationIndependentBoundedOptima",
         "TestLPExactEnterPhysicalOwnership",
-        "TestLPExactEnterPreservesOlderComparison"
+        "TestLPExactEnterPreservesOlderComparison",
+        "TestLPExactInitTableauIndependentStateModels",
+        "TestLPExactTableauBasisIndependentSingletonModels",
+        "TestLPExactTableauBasisRowIdentityIsNotChecked",
+        "TestLPExactInitTableauReachedPrefixes",
+        "TestLPExactInitTableauPhysicalOwnership",
+        "TestLPExactTableauBasisReachedMetadata",
+        "TestLPExactInitTableauRowsFailurePrefixes",
+        "TestLPExactInitTableauPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -124532,6 +124568,21 @@
             "TestLPExactEnterPhysicalOwnership",
             "TestLPExactEnterPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "basis_column_is_set_correctly, basis_columns_are_set_correctly source864-874 and init_tableau_rows source894-899: actual singleton shape, basis-order short circuit and Bland/set/repetition reset",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_init_tableau_exact.go",
+          "tests": [
+            "TestLPExactInitTableauIndependentStateModels",
+            "TestLPExactTableauBasisIndependentSingletonModels",
+            "TestLPExactTableauBasisRowIdentityIsNotChecked",
+            "TestLPExactInitTableauReachedPrefixes",
+            "TestLPExactInitTableauPhysicalOwnership",
+            "TestLPExactTableauBasisReachedMetadata",
+            "TestLPExactInitTableauRowsFailurePrefixes",
+            "TestLPExactInitTableauPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -124556,7 +124607,8 @@
         "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open.",
         "Zero-low constructor preserves base FEASIBLE status, beta/Harris initialization, debug predicate before dummy resize, and borrowed header identity. The Go header is safely empty before base construction; boxed debug reads guard the C++ not-yet-constructed dummy member domain. Source omitted pricing fields are not credited before InitRun; dead enter-price epsilon assignment is excluded because no retained read exists. Initial checks use exact zero/upper comparisons, not stored lower bounds/tolerance. Original smoke fixtures now use the actual constructor with empty upper bounds: explicit LU verifies independent optima; unchanged source default strategy instead hits !use_tableau assertion in debug and missing factorization ErrBounds guard in release. This does not claim default source solver correctness or completion of the whole upstream driver.",
         "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard.",
-        "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open."
+        "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
+        "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial."
       ]
     },
     {
@@ -125426,7 +125478,9 @@
         "pkg/util/lp/primal_leaving_tableau_exact.go",
         "pkg/util/lp/primal_leaving_tableau_exact_test.go",
         "pkg/util/lp/primal_enter_tableau_exact.go",
-        "pkg/util/lp/primal_enter_tableau_exact_test.go"
+        "pkg/util/lp/primal_enter_tableau_exact_test.go",
+        "pkg/util/lp/primal_init_tableau_exact.go",
+        "pkg/util/lp/primal_init_tableau_exact_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -125471,7 +125525,15 @@
         "TestLPExactTableauIterationDispatchAndStops",
         "TestLPExactTableauEnterPhysicalOwnership",
         "TestLPExactTableauEnterRejectedIndexOwnsLocal",
-        "TestLPExactTableauEnterPreservesOlderComparison"
+        "TestLPExactTableauEnterPreservesOlderComparison",
+        "TestLPExactInitTableauIndependentStateModels",
+        "TestLPExactTableauBasisIndependentSingletonModels",
+        "TestLPExactTableauBasisRowIdentityIsNotChecked",
+        "TestLPExactInitTableauReachedPrefixes",
+        "TestLPExactInitTableauPhysicalOwnership",
+        "TestLPExactTableauBasisReachedMetadata",
+        "TestLPExactInitTableauRowsFailurePrefixes",
+        "TestLPExactInitTableauPreservesOlderComparison"
       ],
       "assertions": [
         {
@@ -125669,6 +125731,22 @@
             "TestLPExactTableauEnterRejectedIndexOwnsLocal",
             "TestLPExactTableauEnterPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "init_run_tableau source323-346: pre-counter AX/basis checks, counter reset, existing InfSet validation, feasibility-only early return, optional backup, precise epsilon, conditional queue resize, row initialization and final reduced-cost/basis checks",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_init_tableau_exact.go",
+          "tests": [
+            "TestLPExactInitTableauIndependentStateModels",
+            "TestLPExactTableauBasisIndependentSingletonModels",
+            "TestLPExactTableauBasisRowIdentityIsNotChecked",
+            "TestLPExactInitTableauReachedPrefixes",
+            "TestLPExactInitTableauPhysicalOwnership",
+            "TestLPExactTableauBasisReachedMetadata",
+            "TestLPExactInitTableauRowsFailurePrefixes",
+            "TestLPExactInitTableauPreservesOlderComparison",
+            "TestLPExactTableauIterationIndependentOptima"
+          ]
         }
       ],
       "ownership": [
@@ -125680,7 +125758,8 @@
         "Tableau value arithmetic captures end before actual delegated feasibility/cost maintenance. Delta aliases reread after each full expression. Pivot bool is intentionally ignored before ChangeBasis as in source. Source normalizes pivot RHS but omits nonpivot RHS elimination: x0+2*x2=6,x1+3*x2=10 at X=(4,7,1), entering2 delta1 gives X=(2,4,2), stored B=(3,10), transformed second row dot1. Dedicated independent regression preserves and distinguishes this limitation. Whole tableau source remains partial.",
         "Tableau bound-flip full-expression pair remains owned through primal child updates and is excluded from child ready checks; owning advancement entry rejects an existing local. Close destroys child numerical receipts/scratch before this borrowed argument. Source status, early-return and zero/nonzero counter/list order retained.320 independent bound-flip models,120 pivot models,16 pooled/direct physical campaigns, aliases, cost restoration, reached guards and older comparison owners. Source nonzero-RHS debug stop and zero-pivot one-pass cost-switch recheck are preserved, not repaired. Whole tableau solver remains partial.",
         "Exact tableau leaving selection uses stored matrix coefficients and row lengths, not LU Ed/RowsNZ or circular random starts. Scalar -coefficient*direction expression and by-value multiplier remain separately owned through basis limiting; ratio local survives stopped bounds/comparisons.720 independent feasible/infeasible models, aliases, actual sparse metadata prefixes, twelve pooled/direct physical campaigns and older comparison cleanup. Invalid empty-candidate modulo is a typed guard. Full tableau solver remains partial.",
-        "Exact tableau entering uses an owned typed pair vector for the source automatic step; stopped children retain this borrowed local until Close destroys children first. OneIterationTableau reuses the existing source InfSetIsCorrect validator; TotalIterations belongs to outer Solve. Independent 320 entering models and120 bounded maximization models, repeated terminal iterations, reached child errors, pooled/direct failure campaigns and real older caller comparisons. Whole tableau initialization/Solve and source unit remain incomplete."
+        "Exact tableau entering uses an owned typed pair vector for the source automatic step; stopped children retain this borrowed local until Close destroys children first. OneIterationTableau reuses the existing source InfSetIsCorrect validator; TotalIterations belongs to outer Solve. Independent 320 entering models and120 bounded maximization models, repeated terminal iterations, reached child errors, pooled/direct failure campaigns and real older caller comparisons. Whole tableau initialization/Solve and source unit remain incomplete.",
+        "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial."
       ]
     },
     {

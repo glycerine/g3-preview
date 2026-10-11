@@ -10,14 +10,18 @@ primal and dual cores expose Solve, and outer LU primal/dual integration is impl
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
 
-Latest full native module checkpoint was observed complete at05:59UTC on
-October11 with exit0 and all64packages passing: LP1019.959s,88.1%
-(17264/19598). Log/profile: `/mnt/oldrog/tmp/g3-enter-module-native.{log,cover}`.
-Started05:41UTC at38aa92b1 with `-timeout=60m`. The profile includes exact
-basis updates, pivot consistency/reduced costs, different-column advancement,
-entering and iteration scheduling. It excludes ff07fcd0 statistics/cancellation/
-all-column helpers, separately verified in native/debug at140/153 (91.5%).
+Latest full native module checkpoint was observed complete at06:58UTC on
+October11 with exit0 and all64packages passing: LP1041.207s,87.9%
+(17746/20188). Log/profile:
+`/mnt/oldrog/tmp/g3-tableau-leaving-module-native.{log,cover}`.
+Started06:40UTC at16f0b947 with `-timeout=60m`. Includes statistics,
+tableau reduced-cost initialization, pricing, values/basis, advancement and
+leaving selection; predates5ebede32 entering/iteration and current initialization.
 Coverage measures existing Go code, not C++ port completion.
+
+Previous complete module checkpoint observed05:59UTC: all64packages passing,
+LP1019.959s,88.1% (17264/19598), started05:41UTC at38aa92b1;
+`/mnt/oldrog/tmp/g3-enter-module-native.{log,cover}`.
 
 Previous complete LP-only checkpoint:05:02UTC,1014.552s,88.3%
 (16878/19111), `/mnt/oldrog/tmp/g3-init-lp-native.{log,cover}`;
@@ -660,3 +664,50 @@ The full native module session64684, started06:40UTC at16f0b947, was actually
 polled again during this increment and remained live. No terminal result is
 credited. Its compiled scope predates this entering/iteration change; the last
 observed completed full-module checkpoint remains05:59UTC.
+
+## Observed completed hourly native tableau checkpoint
+
+At06:58UTC October11 polled the actual full native session64684 and observed
+terminal exit0. All64module packages passed; LP1041.207s,87.9% coverage
+(17746/20188 Go statements). Started06:40UTC at16f0b947, timeout60m.
+Log/profile: /mnt/oldrog/tmp/g3-tableau-leaving-module-native.{log,cover}.
+This checkpoint includes statistics and tableau work through leaving selection.
+It predates5ebede32 entering/iteration and the current initialization increment,
+which require their own focused checks. Earlier running records are historical.
+Full LP port remains84partial/26unported source units.
+
+## Exact tableau run initialization and basis predicates
+
+Ported init_run_tableau from lp_primal_core_solver_tableau.h:323-346,
+basis_column_is_set_correctly/basis_columns_are_set_correctly and
+init_tableau_rows from lp_primal_core_solver.h:864-874,894-899, and
+need_to_pivot_to_basis_tableau from lp_core_solver_base.h:199-208.
+Existing AX and singleton basis checks precede counter reset; InfSet validation
+follows reset. The feasibility-only early return precedes backup, epsilon,
+queue and row-mode changes. Precise initialization preserves the cost mode,
+existing membership/reduced costs and LU estimate/norm state; it does not
+recompute them. Queue resize is conditional on breakpoints. Row mode resets
+Bland state, clears/resizes its typed IntSet and then resets repeat count.
+The pivot-needed predicate tests singleton unit columns without adding a
+row-identity constraint. Empty native cell dereference receives a typed guard.
+
+Verification:240 independent state combinations across both strategies,
+infeasibility, feasibility-only, backups and breakpoints;160 independent
+singleton/pivot models; swapped unit-column row identities; eleven initializer
+prefix profiles, eight basis metadata profiles, actual IntSet clear failure,
+two pooled/direct physical backup campaigns and two real older comparison
+owners. The existing120 bounded optimum models now invoke InitRunTableau
+before their actual repeated OneIterationTableau calls. Source diagnostic
+failures are reached in order; borrowed headers and sparse crosslinks are
+restored before destruction. No universal numeric adapters were introduced.
+
+Related native LU initialization/tableau entering/iteration checks pass17.752s,
+debug26.806s. Final strengthened focused native0.470s/debug0.839s.
+Initializer statement coverage48/76 (63.2%) native,72/76 (94.7%) debug;
+pivot predicate25/32 (78.1%) native,29/32 (90.6%) debug. Native does not execute
+the source debug assertions. Remaining debug gaps guard valid member assignment,
+IntSet resize, already-validated pivot metadata, and a scalar predicate after
+matrix validation. Profiles: /mnt/oldrog/tmp/g3-init-tableau-{native,debug}-focused.cover.
+Both LP vets, native/debug module compilation, portcheck and diff checks pass.
+Full LP remains84partial/26unported units; row-mode iteration and exact
+Solve orchestration remain open. No whole-unit completion is credited.

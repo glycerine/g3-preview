@@ -5,8 +5,8 @@ package lp
 import "github.com/glycerine/g3/pkg/util/numeral"
 
 // PairPrimalCoreSolver is the retained exact primal core. Construction, bound
-// classification, tableau cost updates, exact pricing, LU advancement and
-// OneIteration are implemented; the complete Solve loop remains open. Inputs
+// classification, tableau initialization/iteration, exact pricing and LU
+// advancement/iteration are implemented; the complete Solve loop remains open. Inputs
 // are borrowed.
 type PairPrimalCoreSolver struct {
 	*PairCoreSolverBase
@@ -19,6 +19,8 @@ type PairPrimalCoreSolver struct {
 	SignOfEnteringDelta                          int32
 	NonBasisList                                 []uint32
 	LeftBasisTableau                             IntSet
+	BlandModeTableau                             bool
+	LeftBasisRepeated                            uint32
 	LeavingCandidates                            []uint32
 	calls                                        exactEtaCalls
 	work                                         *IndexedRationalVector
