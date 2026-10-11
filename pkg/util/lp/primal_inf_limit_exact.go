@@ -7,13 +7,21 @@ import "github.com/glycerine/g3/pkg/util/numeral"
 // assignment. Its caller has finished delegated base comparisons. The scalar
 // copy used by numeric_pair division is distinct from the borrowed multiplier.
 func (m *PairPrimalCoreSolver) limitExactBoundRatio(multiplier *numeral.Rational, x, bound, theta *RationalPair, unlimited *bool) (err error) {
+	return m.limitExactBoundRatioWithEps(multiplier, x, bound, theta, unlimited, nil, false)
+}
+
+func (m *PairPrimalCoreSolver) limitExactBoundRatioWithEps(multiplier *numeral.Rational, x, bound, theta *RationalPair, unlimited *bool, epsilon *RationalPair, positive bool) (err error) {
 	before, e := m.calls.begin(m.manager)
 	if e != nil {
 		return e
 	}
 	defer func() { err = m.calls.after(m.manager, before, err) }()
 	m.work = NewIndexedRationalVector(m.manager, 6)
-	m.pairWork = NewIndexedPairVector(m.manager, 2)
+	n := uint32(2)
+	if epsilon != nil {
+		n = 3
+	}
+	m.pairWork = NewIndexedPairVector(m.manager, n)
 	tmp, dx, dy, scalar, qx, qy := &m.work.Data[0], &m.work.Data[1], &m.work.Data[2], &m.work.Data[3], &m.work.Data[4], &m.work.Data[5]
 	if err = etaRationalDifference(m.manager, tmp, dx, &bound.X, &x.X); err != nil {
 		return err
@@ -27,6 +35,33 @@ func (m *PairPrimalCoreSolver) limitExactBoundRatio(multiplier *numeral.Rational
 	}
 	if err = m.manager.Copy(&difference.Y, dy); err != nil {
 		return err
+	}
+	if epsilon != nil {
+		adjusted := &m.pairWork.Data[2]
+		if positive {
+			// Pair addition evaluates the right pair's coordinate first.
+			err = etaRationalSum(m.manager, tmp, dx, &epsilon.X, &difference.X)
+		} else {
+			err = etaRationalDifference(m.manager, tmp, dx, &difference.X, &epsilon.X)
+		}
+		if err != nil {
+			return err
+		}
+		if positive {
+			err = etaRationalSum(m.manager, tmp, dy, &epsilon.Y, &difference.Y)
+		} else {
+			err = etaRationalDifference(m.manager, tmp, dy, &difference.Y, &epsilon.Y)
+		}
+		if err != nil {
+			return err
+		}
+		if err = m.manager.Copy(&adjusted.X, dx); err != nil {
+			return err
+		}
+		if err = m.manager.Copy(&adjusted.Y, dy); err != nil {
+			return err
+		}
+		difference = adjusted
 	}
 	if err = m.manager.Copy(scalar, multiplier); err != nil {
 		return err

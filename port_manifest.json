@@ -123642,7 +123642,8 @@
         "pkg/util/lp/primal_bound_step_exact.go",
         "pkg/util/lp/primal_bound_step_exact_test.go",
         "pkg/util/lp/primal_inf_limit_exact.go",
-        "pkg/util/lp/primal_harris_exact.go"
+        "pkg/util/lp/primal_harris_exact.go",
+        "pkg/util/lp/primal_basis_limit_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -123728,7 +123729,13 @@
         "TestLPExactHarrisIndependentPairOracle",
         "TestLPExactHarrisPhysicalOwnership",
         "TestLPExactHarrisGuards",
-        "TestLPExactHarrisPreservesOlderComparisonOwner"
+        "TestLPExactHarrisPreservesOlderComparisonOwner",
+        "TestLPExactBasisLimitIndependentPairOracle",
+        "TestLPExactBasisLimitPhysicalOwnership",
+        "TestLPExactBasisLimitPreservesOlderComparisonOwner",
+        "TestLPExactBasisLimitSourceGuards",
+        "TestLPExactBasisLimitScalarOutputAlias",
+        "TestLPExactBasisLimitBoxedComparisonPrefixes"
       ],
       "conditionals": [
         {
@@ -124095,6 +124102,19 @@
             "TestLPExactHarrisPhysicalOwnership",
             "TestLPExactHarrisGuards",
             "TestLPExactHarrisPreservesOlderComparisonOwner"
+          ]
+        },
+        {
+          "name": "retained precise limit_inf_on_upper_bound_m_neg, boxed positive/negative infeasibility limits and feasible positive/negative no-check basis-column limits with owned Harris epsilon and source final clamp",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_basis_limit_exact.go",
+          "tests": [
+            "TestLPExactBasisLimitIndependentPairOracle",
+            "TestLPExactBasisLimitPhysicalOwnership",
+            "TestLPExactBasisLimitPreservesOlderComparisonOwner",
+            "TestLPExactBasisLimitSourceGuards",
+            "TestLPExactBasisLimitScalarOutputAlias",
+            "TestLPExactBasisLimitBoxedComparisonPrefixes"
           ]
         }
       ],
@@ -127131,7 +127151,8 @@
         "pkg/util/lp/primal_bound_step_exact.go",
         "pkg/util/lp/primal_bound_step_exact_test.go",
         "pkg/util/lp/primal_inf_limit_exact.go",
-        "pkg/util/lp/primal_harris_exact.go"
+        "pkg/util/lp/primal_harris_exact.go",
+        "pkg/util/lp/primal_basis_limit_exact.go"
       ],
       "tests": [
         "TestLPRationalPairArithmeticOracle",
@@ -127172,7 +127193,13 @@
         "TestLPExactHarrisIndependentPairOracle",
         "TestLPExactHarrisPhysicalOwnership",
         "TestLPExactHarrisGuards",
-        "TestLPExactHarrisPreservesOlderComparisonOwner"
+        "TestLPExactHarrisPreservesOlderComparisonOwner",
+        "TestLPExactBasisLimitIndependentPairOracle",
+        "TestLPExactBasisLimitPhysicalOwnership",
+        "TestLPExactBasisLimitPreservesOlderComparisonOwner",
+        "TestLPExactBasisLimitSourceGuards",
+        "TestLPExactBasisLimitScalarOutputAlias",
+        "TestLPExactBasisLimitBoxedComparisonPrefixes"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -127267,6 +127294,19 @@
             "TestLPExactHarrisPhysicalOwnership",
             "TestLPExactHarrisGuards",
             "TestLPExactHarrisPreservesOlderComparisonOwner"
+          ]
+        },
+        {
+          "name": "live exact bound-minus-value plus/minus epsilon pair expression, scalar-copy division and output assignment in precise basis limits",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_basis_limit_exact.go",
+          "tests": [
+            "TestLPExactBasisLimitIndependentPairOracle",
+            "TestLPExactBasisLimitPhysicalOwnership",
+            "TestLPExactBasisLimitPreservesOlderComparisonOwner",
+            "TestLPExactBasisLimitSourceGuards",
+            "TestLPExactBasisLimitScalarOutputAlias",
+            "TestLPExactBasisLimitBoxedComparisonPrefixes"
           ]
         }
       ],
@@ -148562,7 +148602,8 @@
         "pkg/util/numeral/rational_service_bitwise_binary_invocation_test.go",
         "pkg/util/numeral/rational_service_zero_invocation.go",
         "pkg/util/numeral/rational_service_zero_invocation_test.go",
-        "pkg/util/lp/eta_exact_expression.go"
+        "pkg/util/lp/eta_exact_expression.go",
+        "pkg/util/lp/primal_basis_limit_exact.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -148753,7 +148794,13 @@
         "TestLPPairMakeFeasiblePhysicalOwnership",
         "TestLPPairMakeFeasibleLeavesOlderComparisonOwned",
         "TestLPPairMakeFeasibleDeltaBeforeFinalCopyRefusal",
-        "TestLPPairMakeFeasibleComparisonBeforeDeltaPublication"
+        "TestLPPairMakeFeasibleComparisonBeforeDeltaPublication",
+        "TestLPExactBasisLimitIndependentPairOracle",
+        "TestLPExactBasisLimitPhysicalOwnership",
+        "TestLPExactBasisLimitPreservesOlderComparisonOwner",
+        "TestLPExactBasisLimitSourceGuards",
+        "TestLPExactBasisLimitScalarOutputAlias",
+        "TestLPExactBasisLimitBoxedComparisonPrefixes"
       ],
       "conditionals": [
         {
@@ -149507,6 +149554,19 @@
             "TestLPPairMakeFeasibleLeavesOlderComparisonOwned",
             "TestLPPairMakeFeasibleDeltaBeforeFinalCopyRefusal",
             "TestLPPairMakeFeasibleComparisonBeforeDeltaPublication"
+          ]
+        },
+        {
+          "name": "live binary rational addition copied-left/compound-add/return-copy expression in precise basis bound adjustment",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_basis_limit_exact.go",
+          "tests": [
+            "TestLPExactBasisLimitIndependentPairOracle",
+            "TestLPExactBasisLimitPhysicalOwnership",
+            "TestLPExactBasisLimitPreservesOlderComparisonOwner",
+            "TestLPExactBasisLimitSourceGuards",
+            "TestLPExactBasisLimitScalarOutputAlias",
+            "TestLPExactBasisLimitBoxedComparisonPrefixes"
           ]
         }
       ],

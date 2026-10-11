@@ -22,6 +22,11 @@ func (m *PairPrimalCoreSolver) HarrisEpsForBound(bound, out *RationalPair) (err 
 	if bound == nil || out == nil {
 		return ErrBounds
 	}
+	return m.harrisEpsForBoundValue(bound, out)
+}
+
+// The same primal owner evaluates this while its bound-step epsilon is live.
+func (m *PairPrimalCoreSolver) harrisEpsForBoundValue(bound, out *RationalPair) (err error) {
 	before, e := m.calls.begin(m.manager)
 	if e != nil {
 		return e

@@ -1,7 +1,25 @@
-// Source: src/util/rational.h:462-464,480-493, reached exact eta expression temporaries.
+// Source: src/util/rational.h:449-451,462-464,480-493; reached exact expressions.
 package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
+
+// Source: src/util/rational.h binary operator+ copied-left expression.
+func etaRationalSum(m *numeral.RationalManager, temporary, out, left, right *numeral.Rational) error {
+	if err := m.Copy(temporary, left); err != nil {
+		return err
+	}
+	if err := m.Add(temporary, right, temporary); err != nil {
+		return err
+	}
+	if err := m.Copy(out, temporary); err != nil {
+		return err
+	}
+	if err := m.Del(temporary); err != nil {
+		return err
+	}
+	*temporary = numeral.NewRational()
+	return nil
+}
 
 // These two concrete expressions retain rational(left), its compound update,
 // and the copy on return from the resulting reference. The matrix owns both

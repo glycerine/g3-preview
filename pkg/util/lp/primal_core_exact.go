@@ -21,6 +21,7 @@ type PairPrimalCoreSolver struct {
 	calls                                        exactEtaCalls
 	work                                         *IndexedRationalVector
 	pairWork                                     *IndexedPairVector
+	stepEpsilon                                  *IndexedPairVector
 	stopped                                      bool
 }
 
@@ -70,7 +71,7 @@ func NewPairPrimalCoreSolver(in PairCoreInputs) (m *PairPrimalCoreSolver, err er
 	return m, nil
 }
 func (m *PairPrimalCoreSolver) ready() error {
-	if m.stopped || m.work != nil || m.pairWork != nil || m.calls.pending() {
+	if m.stopped || m.work != nil || m.pairWork != nil || m.stepEpsilon != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return m.PairCoreSolverBase.ready()
@@ -158,6 +159,12 @@ func (m *PairPrimalCoreSolver) Close() error {
 			return err
 		}
 		m.work = nil
+	}
+	if m.stepEpsilon != nil {
+		if err := m.stepEpsilon.Close(); err != nil {
+			return err
+		}
+		m.stepEpsilon = nil
 	}
 	if err := m.manager.Del(&m.ConvertedHarrisEpsilon); err != nil {
 		return err
