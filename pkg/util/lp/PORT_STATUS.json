@@ -1918,14 +1918,21 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/primal_cost_tableau_exact.go",
-        "pkg/util/lp/primal_cost_tableau_exact_test.go"
+        "pkg/util/lp/primal_cost_tableau_exact_test.go",
+        "pkg/util/lp/primal_tableau_init_cost_exact.go",
+        "pkg/util/lp/primal_tableau_init_cost_exact_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
         "TestLPPairTableauCostIndependentReducedCostOracle",
         "TestLPPairTableauCostSourcePrefixesAndGuards",
         "TestLPPairTableauCostPhysicalOwnership",
-        "TestLPPairTableauCostLeavesOlderComparisonOwned"
+        "TestLPPairTableauCostLeavesOlderComparisonOwned",
+        "TestLPExactTableauInitCostIndependentModels",
+        "TestLPExactTableauInitCostPhysicalOwnership",
+        "TestLPExactTableauInitCostLiveAliases",
+        "TestLPExactTableauInitCostReachedPrefixes",
+        "TestLPExactTableauInitCostPreservesOlderComparison"
       ]
     },
     {

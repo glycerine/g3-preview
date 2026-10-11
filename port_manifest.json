@@ -125413,14 +125413,21 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/primal_cost_tableau_exact.go",
-        "pkg/util/lp/primal_cost_tableau_exact_test.go"
+        "pkg/util/lp/primal_cost_tableau_exact_test.go",
+        "pkg/util/lp/primal_tableau_init_cost_exact.go",
+        "pkg/util/lp/primal_tableau_init_cost_exact_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
         "TestLPPairTableauCostIndependentReducedCostOracle",
         "TestLPPairTableauCostSourcePrefixesAndGuards",
         "TestLPPairTableauCostPhysicalOwnership",
-        "TestLPPairTableauCostLeavesOlderComparisonOwned"
+        "TestLPPairTableauCostLeavesOlderComparisonOwned",
+        "TestLPExactTableauInitCostIndependentModels",
+        "TestLPExactTableauInitCostPhysicalOwnership",
+        "TestLPExactTableauInitCostLiveAliases",
+        "TestLPExactTableauInitCostReachedPrefixes",
+        "TestLPExactTableauInitCostPreservesOlderComparison"
       ],
       "assertions": [
         {
@@ -125538,12 +125545,26 @@
             "TestLPPairTableauCostPhysicalOwnership",
             "TestLPPairTableauCostLeavesOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "init_reduced_costs_tableau source396-425: actual infeasibility activation/original-cost restoration followed by ascending live-column reduced costs",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_tableau_init_cost_exact.go",
+          "tests": [
+            "TestLPExactTableauInitCostIndependentModels",
+            "TestLPExactTableauInitCostPhysicalOwnership",
+            "TestLPExactTableauInitCostLiveAliases",
+            "TestLPExactTableauInitCostReachedPrefixes",
+            "TestLPExactTableauInitCostPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
         "Exact bound comparisons retain base-core invocation receipts; primal expression work owns the source difference/product parameters and returned values. Capture ends before delegated comparisons. The source publishes changed cost before updating reduced costs, preserves stored-row prefixes and rereads aliased delta; errors stop the owner, Close destroys actual owned invocations/work, and older caller comparisons remain untouched. Full tableau optimization and post-pop cleanup remain incomplete."
       ],
-      "deviations": []
+      "deviations": [
+        "Exact tableau reduced-cost initialization uses native dense slices and stored sparse columns; retained live costs/coefficient order, early feasibility-only return, actual child captures and physical arithmetic cleanup. Native/debug focused coverage48/51 (94.1%); independent320-model oracle, shifted aliases, stored-cell order, reached bounds, pooled/direct physical refusals and three older comparison owners. Whole tableau and source unit remain partial."
+      ]
     },
     {
       "path": "src/util/lp/lp_primal_simplex.h",
