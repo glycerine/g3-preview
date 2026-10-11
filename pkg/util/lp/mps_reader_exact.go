@@ -34,7 +34,6 @@ type rationalMPSRow struct {
 // iteration order is input order. Close after returned solver owners and before
 // the numeral manager. Failed lexical arithmetic retains its reached prefix
 // until Close; do not copy the reader or mutate its owning numeral pointers.
-// Exact primal/dual outer solver construction is not yet implemented here.
 type RationalMPSReader struct {
 	input                 *bufio.Reader
 	file                  *os.File

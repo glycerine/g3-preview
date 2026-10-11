@@ -1,10 +1,34 @@
-// Source: src/util/lp/mps_reader.h:680-739, exact lp_solver<mpq,mpq> population.
+// Source: src/util/lp/mps_reader.h:680-739,796-800, retained mpq/mpq consumers.
 package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 
-// fillRationalSolver populates the common exact model. Concrete outer primal
-// and dual creation/optimization are separate unfinished source consumers.
+// CreatePrimalSolver and CreateDualSolver preserve source rows-before-columns
+// population without gating creation on IsOK. On population failure the caller
+// owns the returned partial solver and must close it before this reader.
+func (m *RationalMPSReader) CreatePrimalSolver() (*RationalPrimalSimplex, error) {
+	if err := m.ready(); err != nil {
+		return nil, err
+	}
+	solver, err := NewRationalPrimalSimplex(m.manager)
+	if err != nil {
+		return solver, err
+	}
+	return solver, m.fillRationalSolver(solver.RationalLPSolver)
+}
+
+func (m *RationalMPSReader) CreateDualSolver() (*RationalDualSimplex, error) {
+	if err := m.ready(); err != nil {
+		return nil, err
+	}
+	solver, err := NewRationalDualSimplex(m.manager)
+	if err != nil {
+		return solver, err
+	}
+	return solver, m.fillRationalSolver(solver.RationalLPSolver)
+}
+
+// fillRationalSolver populates the shared exact model of either outer solver.
 func (m *RationalMPSReader) fillRationalSolver(s *RationalLPSolver) (err error) {
 	if err = m.ready(); err != nil {
 		return err

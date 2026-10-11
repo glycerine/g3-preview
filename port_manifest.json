@@ -102975,7 +102975,9 @@
         "pkg/util/lp/core_reconstruct_rational.go",
         "pkg/util/lp/core_reduced_cost_rational.go",
         "pkg/util/lp/core_snap_rational.go",
-        "pkg/util/lp/core_values_rational_test.go"
+        "pkg/util/lp/core_values_rational_test.go",
+        "pkg/util/lp/mps_populate_exact.go",
+        "pkg/util/lp/solver_named_rational.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103045,7 +103047,17 @@
         "TestLPRationalCoreValuesUpstreamSolveRationalBasis",
         "TestLPRationalCoreValuesPhysicalOwnership",
         "TestLPRationalCoreValuesSourcePrefixesAndGuards",
-        "TestLPRationalCoreValuesPreservesOlderComparison"
+        "TestLPRationalCoreValuesPreservesOlderComparison",
+        "TestLPRationalMPSOuterIndependentOptima",
+        "TestLPRationalMPSOuterIndependentClones",
+        "TestLPRationalMPSOuterFullDualSourceBoundary",
+        "TestLPRationalMPSOuterRetainedFile",
+        "TestLPRationalMPSOuterFactoryGuards",
+        "TestLPRationalMPSOuterFactoryPhysicalOwnership",
+        "TestLPRationalMPSOuterNamedLookup",
+        "TestLPRationalMPSOuterNamedPhysicalOwnership",
+        "TestLPRationalMPSOuterPreservesOlderComparison",
+        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
       ],
       "conditionals": [
         {
@@ -103744,6 +103756,23 @@
           "tests": [
             "TestLPRationalMPSUpstreamFileRandomizeDriver",
             "TestLARDriverQueryHeadingExtent"
+          ]
+        },
+        {
+          "name": "Retained solve_mps_rational/solve_mps_in_rational parse/create/optimization and symbolic-value consumer paths with independent exact min/max models; full CLI setup, timing and printing remain open",
+          "status": "partial",
+          "go_target": "pkg/util/lp/mps_outer_rational_test.go",
+          "tests": [
+            "TestLPRationalMPSOuterIndependentOptima",
+            "TestLPRationalMPSOuterIndependentClones",
+            "TestLPRationalMPSOuterFullDualSourceBoundary",
+            "TestLPRationalMPSOuterRetainedFile",
+            "TestLPRationalMPSOuterFactoryGuards",
+            "TestLPRationalMPSOuterFactoryPhysicalOwnership",
+            "TestLPRationalMPSOuterNamedLookup",
+            "TestLPRationalMPSOuterNamedPhysicalOwnership",
+            "TestLPRationalMPSOuterPreservesOlderComparison",
+            "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
           ]
         }
       ],
@@ -129957,7 +129986,8 @@
         "pkg/util/lp/solver_objective_exact.go",
         "pkg/util/lp/solver_objective_exact_test.go",
         "pkg/util/lp/solver_expression_exact.go",
-        "pkg/util/lp/solver_expression_exact_test.go"
+        "pkg/util/lp/solver_expression_exact_test.go",
+        "pkg/util/lp/solver_named_rational.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -130022,7 +130052,17 @@
         "TestLPRationalObjectiveBorrowedCoreAndAlias",
         "TestLPRationalObjectivePreservesOlderComparison",
         "TestLPRationalExpressionPhysicalReturnCopies",
-        "TestLPRationalExpressionPinConditionLifetime"
+        "TestLPRationalExpressionPinConditionLifetime",
+        "TestLPRationalMPSOuterIndependentOptima",
+        "TestLPRationalMPSOuterIndependentClones",
+        "TestLPRationalMPSOuterFullDualSourceBoundary",
+        "TestLPRationalMPSOuterRetainedFile",
+        "TestLPRationalMPSOuterFactoryGuards",
+        "TestLPRationalMPSOuterFactoryPhysicalOwnership",
+        "TestLPRationalMPSOuterNamedLookup",
+        "TestLPRationalMPSOuterNamedPhysicalOwnership",
+        "TestLPRationalMPSOuterPreservesOlderComparison",
+        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -130181,6 +130221,18 @@
             "TestLPRationalExpressionPhysicalReturnCopies",
             "TestLPRationalExpressionPinConditionLifetime"
           ]
+        },
+        {
+          "name": "get_column_value_by_name concrete retained exact primal/dual dispatch, native string lookup, missing-name exception and full uint32 index domain",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_named_rational.go",
+          "tests": [
+            "TestLPRationalMPSOuterIndependentOptima",
+            "TestLPRationalMPSOuterRetainedFile",
+            "TestLPRationalMPSOuterNamedLookup",
+            "TestLPRationalMPSOuterNamedPhysicalOwnership",
+            "TestLPRationalMPSOuterPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -130190,7 +130242,8 @@
         "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json.",
         "Parent raw receipts close before matrix/column/dense-output child receipts; children close before source coefficient/result/shift locals and input owners. Dense resize destroys actual owning suffix values before shortening. Displaced native matrices remain explicitly owned until Close; old caller comparisons are neither adopted nor consumed. See latest_exact_preparation_increment in pkg/util/lp/PORT_STATUS.json.",
         "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json.",
-        "Exact Costs and column children close before borrowed objective lexical copies; parent numerical receipts release before child/input values. Core X and caller result are borrowed through Close after error. Source getter, unary and product-copy owners are explicit; no exact core optimization is credited by accessor specialization."
+        "Exact Costs and column children close before borrowed objective lexical copies; parent numerical receipts release before child/input values. Core X and caller result are borrowed through Close after error. Source getter, unary and product-copy owners are explicit; no exact core optimization is credited by accessor specialization.",
+        "Named exact getters borrow the model name map and dispatch to the actual concrete outer value getter. They do no numerical work themselves and never adopt older caller comparison receipts; delegated column/common owners retain failed numerical copies until owning cleanup. A caller output can alias a model cost. Full uint32 map indices are used directly rather than narrowing through the signed get_column_index_by_name result."
       ],
       "deviations": [
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
@@ -130227,7 +130280,8 @@
         "pkg/util/lp/solver_expression_exact.go",
         "pkg/util/lp/solver_expression_exact_test.go",
         "pkg/util/lp/primal_solver_rational.go",
-        "pkg/util/lp/dual_objective_rational.go"
+        "pkg/util/lp/dual_objective_rational.go",
+        "pkg/util/lp/solver_named_rational.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -130292,7 +130346,17 @@
         "TestLPRationalPrimalOuterPhysicalOwnership",
         "TestLPRationalDualOuterIndependentPreparedVertices",
         "TestLPRationalDualOuterCostAliasesAndLifetime",
-        "TestLPRationalDualOuterPhysicalOwnership"
+        "TestLPRationalDualOuterPhysicalOwnership",
+        "TestLPRationalMPSOuterIndependentOptima",
+        "TestLPRationalMPSOuterIndependentClones",
+        "TestLPRationalMPSOuterFullDualSourceBoundary",
+        "TestLPRationalMPSOuterRetainedFile",
+        "TestLPRationalMPSOuterFactoryGuards",
+        "TestLPRationalMPSOuterFactoryPhysicalOwnership",
+        "TestLPRationalMPSOuterNamedLookup",
+        "TestLPRationalMPSOuterNamedPhysicalOwnership",
+        "TestLPRationalMPSOuterPreservesOlderComparison",
+        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
       ],
       "assertions": [
         {
@@ -130516,6 +130580,18 @@
             "TestLPRationalDualOuterCostAliasesAndLifetime",
             "TestLPRationalDualOuterPhysicalOwnership"
           ]
+        },
+        {
+          "name": "get_column_value_by_name concrete retained exact primal/dual dispatch, native string lookup, missing-name exception and full uint32 index domain",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_named_rational.go",
+          "tests": [
+            "TestLPRationalMPSOuterIndependentOptima",
+            "TestLPRationalMPSOuterRetainedFile",
+            "TestLPRationalMPSOuterNamedLookup",
+            "TestLPRationalMPSOuterNamedPhysicalOwnership",
+            "TestLPRationalMPSOuterPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -130525,7 +130601,8 @@
         "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json.",
         "Parent raw receipts close before matrix/column/dense-output child receipts; children close before source coefficient/result/shift locals and input owners. Dense resize destroys actual owning suffix values before shortening. Displaced native matrices remain explicitly owned until Close; old caller comparisons are neither adopted nor consumed. See latest_exact_preparation_increment in pkg/util/lp/PORT_STATUS.json.",
         "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json.",
-        "Exact Costs and column children close before borrowed objective lexical copies; parent numerical receipts release before child/input values. Core X and caller result are borrowed through Close after error. Source getter, unary and product-copy owners are explicit; no exact core optimization is credited by accessor specialization."
+        "Exact Costs and column children close before borrowed objective lexical copies; parent numerical receipts release before child/input values. Core X and caller result are borrowed through Close after error. Source getter, unary and product-copy owners are explicit; no exact core optimization is credited by accessor specialization.",
+        "Named exact getters borrow the model name map and dispatch to the actual concrete outer value getter. They do no numerical work themselves and never adopt older caller comparison receipts; delegated column/common owners retain failed numerical copies until owning cleanup. A caller output can alias a model cost. Full uint32 map indices are used directly rather than narrowing through the signed get_column_index_by_name result."
       ],
       "deviations": [
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
@@ -130550,7 +130627,8 @@
         "pkg/util/lp/solver_presolve_float.go",
         "pkg/util/lp/solver_presolve_float_test.go",
         "pkg/util/lp/dual_prepare_float.go",
-        "pkg/util/lp/dual_prepare_float_test.go"
+        "pkg/util/lp/dual_prepare_float_test.go",
+        "pkg/util/lp/solver_named_rational.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -130565,7 +130643,17 @@
         "TestLPFloatPresolveInputAndWriterErrorPrefixes",
         "TestLPFloatPresolveComposedErrorsAndPreparedProblem",
         "TestLPFloatDualCostFlipIEEEAndPublication",
-        "TestLPFloatDualPreparationIndependentModels"
+        "TestLPFloatDualPreparationIndependentModels",
+        "TestLPRationalMPSOuterIndependentOptima",
+        "TestLPRationalMPSOuterIndependentClones",
+        "TestLPRationalMPSOuterFullDualSourceBoundary",
+        "TestLPRationalMPSOuterRetainedFile",
+        "TestLPRationalMPSOuterFactoryGuards",
+        "TestLPRationalMPSOuterFactoryPhysicalOwnership",
+        "TestLPRationalMPSOuterNamedLookup",
+        "TestLPRationalMPSOuterNamedPhysicalOwnership",
+        "TestLPRationalMPSOuterPreservesOlderComparison",
+        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -130612,12 +130700,25 @@
             "TestLPFloatDualCostFlipIEEEAndPublication",
             "TestLPFloatDualPreparationIndependentModels"
           ]
+        },
+        {
+          "name": "get_column_value_by_name concrete retained exact primal/dual dispatch, native string lookup, missing-name exception and full uint32 index domain",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_named_rational.go",
+          "tests": [
+            "TestLPRationalMPSOuterIndependentOptima",
+            "TestLPRationalMPSOuterRetainedFile",
+            "TestLPRationalMPSOuterNamedLookup",
+            "TestLPRationalMPSOuterNamedPhysicalOwnership",
+            "TestLPRationalMPSOuterPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
         "Common floating state uses native slices/maps and insertion-ordered insdict dictionaries for rows/coefficients, preserving replacement position. FloatLPSolver owns its FloatStaticMatrix and column metadata; unscale clears the retired matrix before publishing reconstruction, then restores existing scale entries and refills RHS descending. No source vector/hash/STL storage emulation or fake allocation refusals. NewSettings error propagates real host-clock failure.",
         "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced.",
-        "Presolve uses native temporary key slices and erases dictionary entries only after each source scan. RHS subtraction and earlier variable pins publish immediately. Infeasibility returns before queued row deletion and term elimination. No fake numerical allocation/refusal layer or generic bound callback is introduced; surviving FloatColumnInfo pointers retain identity."
+        "Presolve uses native temporary key slices and erases dictionary entries only after each source scan. RHS subtraction and earlier variable pins publish immediately. Infeasibility returns before queued row deletion and term elimination. No fake numerical allocation/refusal layer or generic bound callback is introduced; surviving FloatColumnInfo pointers retain identity.",
+        "Named exact getters borrow the model name map and dispatch to the actual concrete outer value getter. They do no numerical work themselves and never adopt older caller comparison receipts; delegated column/common owners retain failed numerical copies until owning cleanup. A caller output can alias a model cost. Full uint32 map indices are used directly rather than narrowing through the signed get_column_index_by_name result."
       ],
       "deviations": [
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
@@ -132033,7 +132134,8 @@
         "pkg/util/lp/mps_reader_exact.go",
         "pkg/util/lp/mps_reader_exact_test.go",
         "pkg/util/lp/mps_populate_exact.go",
-        "pkg/util/lp/mps_populate_exact_test.go"
+        "pkg/util/lp/mps_populate_exact_test.go",
+        "pkg/util/lp/solver_named_rational.go"
       ],
       "tests": [
         "TestLPFloatMPSIndependentOptima",
@@ -132066,7 +132168,17 @@
         "TestLPRationalMPSCommonModelPhysicalOwnership",
         "TestLPRationalMPSCommonModelReachedGuards",
         "TestLPRationalMPSCommonModelDiagnosticPrefixes",
-        "TestLPRationalMPSCommonModelPreservesOlderComparison"
+        "TestLPRationalMPSCommonModelPreservesOlderComparison",
+        "TestLPRationalMPSOuterIndependentOptima",
+        "TestLPRationalMPSOuterIndependentClones",
+        "TestLPRationalMPSOuterFullDualSourceBoundary",
+        "TestLPRationalMPSOuterRetainedFile",
+        "TestLPRationalMPSOuterFactoryGuards",
+        "TestLPRationalMPSOuterFactoryPhysicalOwnership",
+        "TestLPRationalMPSOuterNamedLookup",
+        "TestLPRationalMPSOuterNamedPhysicalOwnership",
+        "TestLPRationalMPSOuterPreservesOlderComparison",
+        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
       ],
       "assertions": [
         {
@@ -132169,12 +132281,12 @@
           ]
         },
         {
-          "name": "Exact outer primal/dual MPS solver creation, complete upstream CLI/options/SMT driver scenarios",
+          "name": "Complete upstream CLI/options/SMT driver scenarios",
           "status": "unported",
           "tests": []
         },
         {
-          "name": "Concrete exact common model fill_solver row/column population; outer primal/dual construction and solve remain open",
+          "name": "Concrete exact common model fill_solver row/column population",
           "status": "ported",
           "go_target": "pkg/util/lp/mps_populate_exact.go",
           "tests": [
@@ -132184,15 +132296,34 @@
             "TestLPRationalMPSCommonModelDiagnosticPrefixes",
             "TestLPRationalMPSCommonModelPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "create_solver retained mpq/mpq primal and dual branches with actual rows-before-columns common population and partial-owner return",
+          "status": "ported",
+          "go_target": "pkg/util/lp/mps_populate_exact.go",
+          "tests": [
+            "TestLPRationalMPSOuterIndependentOptima",
+            "TestLPRationalMPSOuterIndependentClones",
+            "TestLPRationalMPSOuterFullDualSourceBoundary",
+            "TestLPRationalMPSOuterRetainedFile",
+            "TestLPRationalMPSOuterFactoryGuards",
+            "TestLPRationalMPSOuterFactoryPhysicalOwnership",
+            "TestLPRationalMPSOuterNamedLookup",
+            "TestLPRationalMPSOuterNamedPhysicalOwnership",
+            "TestLPRationalMPSOuterPreservesOlderComparison",
+            "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
+          ]
         }
       ],
       "ownership": [
         "RationalMPSReader owns initialized numeral pointers in a borrowed manager, parent exact receipts, lexical parsing/range/iteration locals and a child native coefficient vector. Cleanup cancels parent raw calls, then child population receipts, lexical locals, stored numerals and parent roots before closing the owned file. Returned partial solvers close before the reader. Overwritten row/range owners remain tracked until reader Close; native Go container reclamation does not reproduce source pointer leaks.",
-        "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json."
+        "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json.",
+        "Concrete exact MPS factories return the newly constructed primal/dual owner even when row, coefficient, bound or diagnostic population fails. Close that partial child before the reader because interrupted common-model numeral calls can borrow its by-value loop value. Ready/closed checks run before acquiring a new owner. Successful repeated creation yields independent column/constraint/coefficient owners; one child optimization failure does not stop the reader. Real older caller comparison receipts survive factory population and cleanup unchanged."
       ],
       "deviations": [
         "Native Go strings/bufio/strconv and insertion-ordered dictionaries replace STL streams/containers and libc numeric conversion. ASCII space/tab token/trim rules, fixed-field 8-byte row names/25-byte stride and column continuation preserve project parsing. Numeric tokens use Go ParseFloat on the first field; malformed libc atof prefix grammar is not emulated. Native writer errors and real file errors return reached publication prefixes; EOF retains source two-count line increment. Non-advancing ROWS header loop returns ErrMPSStalled, bare throw/undefined token domains become explicit errors. Source MI retains default lower flag, marker line still registers a column, LIMITMAX source shift assertion and zero/negative/IEEE range transformations are preserved. Dictionary insertion order defines deterministic replacement/source unordered traversal; partial constructed solvers are returned for cleanup. Native owner/file Close replaces source stream/container destruction. Dead string utility adapters and unused solver_row_count/range_count helpers are excluded; exact/dual/LAR creation and complete upstream CLI remain open.",
-        "Exact input uses the existing source rational parser directly, including scientific/fraction parser exceptions and digit-scanning across fixed-field trailing text. Native insertion order defines traversal where source unordered maps supplied none. Empty token/undefined/bare-throw/stalled-header domains have explicit error transport; actual diagnostic/file failures preserve reached publication. Source LAR filling stops on the first missing bound; numeric row-name ID mapping is independent of column indices. Executable AddConstraint remains a debug assertion/native zero no-op. Exact outer primal/dual construction and full CLI/options/SMT branches are not credited."
+        "Exact input uses the existing source rational parser directly, including scientific/fraction parser exceptions and digit-scanning across fixed-field trailing text. Native insertion order defines traversal where source unordered maps supplied none. Empty token/undefined/bare-throw/stalled-header domains have explicit error transport; actual diagnostic/file failures preserve reached publication. Source LAR filling stops on the first missing bound; numeric row-name ID mapping is independent of column indices. Executable AddConstraint remains a debug assertion/native zero no-op. Exact outer primal/dual construction and full CLI/options/SMT branches are not credited.",
+        "Exact primal/dual MPS construction is now ported through two concrete factory methods, matching the floating API without a generic virtual-solver adapter. Source create_solver does not gate on is_ok or parse input implicitly, and both behaviors are retained. The real exact primal path is checked against independent min/max vertex optima; exact dual full-entry tests preserve source rational(double) and omitted sparsity-extent boundaries. These supersede earlier notes that exact construction was unported; full CLI/options/SMT/timing/reporting drivers remain open."
       ]
     },
     {

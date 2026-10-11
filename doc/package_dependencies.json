@@ -1406,6 +1406,7 @@
         "solver_exact_model.go",
         "solver_expression_exact.go",
         "solver_float.go",
+        "solver_named_rational.go",
         "solver_objective_exact.go",
         "solver_prepare_exact.go",
         "solver_presolve_exact.go",
