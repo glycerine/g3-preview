@@ -7,7 +7,7 @@ import "github.com/glycerine/g3/pkg/util/numeral"
 // RationalPrimalCoreSolver borrows scalar model storage and owns exact primal
 // scratch. Construction, feasibility costs, initialization, entering pricing
 // bound-step/breakpoint helpers and circular leaving selection are implemented.
-// LU and tableau column/row iteration are implemented; full Solve remains open.
+// LU and tableau column/row iteration and precise Solve are implemented.
 // Constructor errors return a partial owner to Close before borrowed inputs.
 type RationalPrimalCoreSolver struct {
 	*RationalCoreSolverBase

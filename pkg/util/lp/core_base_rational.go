@@ -42,6 +42,8 @@ type RationalCoreSolverBase struct {
 	residualWork                                       *IndexedRationalVector
 	calls                                              exactEtaCalls
 	stopped, closed                                    bool
+	// Reporting locals remain live through calls into this owner.
+	statisticsCost, statisticsArgument *IndexedRationalVector
 }
 
 func NewRationalCoreSolverBase(in RationalCoreInputs) (m *RationalCoreSolverBase, err error) {
@@ -390,7 +392,7 @@ func (m *RationalCoreSolverBase) Close() error {
 			return err
 		}
 	}
-	for _, v := range []*IndexedRationalVector{m.valueWork, m.pivotWork, m.costWork, m.reconstructionWork, m.residualWork} {
+	for _, v := range []*IndexedRationalVector{m.valueWork, m.pivotWork, m.costWork, m.reconstructionWork, m.residualWork, m.statisticsArgument, m.statisticsCost} {
 		if v != nil {
 			if err := v.Close(); err != nil {
 				return err
@@ -399,6 +401,7 @@ func (m *RationalCoreSolverBase) Close() error {
 	}
 	m.valueWork, m.pivotWork, m.costWork, m.reconstructionWork = nil, nil, nil, nil
 	m.residualWork = nil
+	m.statisticsArgument, m.statisticsCost = nil, nil
 	if err := m.calls.cleanupRoots(m.manager); err != nil {
 		return err
 	}

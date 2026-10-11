@@ -122637,7 +122637,8 @@
         "pkg/util/lp/core_tableau_rational.go",
         "pkg/util/lp/core_tableau_rational_test.go",
         "pkg/util/lp/core_basis_tableau_rational.go",
-        "pkg/util/lp/primal_init_tableau_rational_test.go"
+        "pkg/util/lp/primal_init_tableau_rational_test.go",
+        "pkg/util/lp/core_statistics_rational.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122855,7 +122856,17 @@
         "TestLPRationalInitTableauPhysicalOwnership",
         "TestLPRationalTableauBasisReachedMetadata",
         "TestLPRationalInitTableauRowsFailurePrefixes",
-        "TestLPRationalInitTableauPreservesOlderComparison"
+        "TestLPRationalInitTableauPreservesOlderComparison",
+        "TestLPRationalStatisticsIndependentCostOracle",
+        "TestLPRationalStatisticsPreservesOlderComparison",
+        "TestLPRationalStatisticsGatesCountersAndCancellation",
+        "TestLPRationalStatisticsAllWriterPrefixes",
+        "TestLPRationalStatisticsByValueAndEvaluationOrder",
+        "TestLPRationalStatisticsScalarFloatProjection",
+        "TestLPRationalStatisticsLiveLocalReentryGuard",
+        "TestLPRationalStatisticsPhysicalOwnership",
+        "TestLPRationalAllColumnsFeasibilityIndependentOracle",
+        "TestLPRationalStatisticsReachedGuardsAndPrefixes"
       ],
       "assertions": [
         {
@@ -123407,6 +123418,23 @@
             "TestLPRationalInitTableauRowsFailurePrefixes",
             "TestLPRationalInitTableauPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "Concrete scalar iteration counters, by-value statistics output, scalar numeral-to-double projection and reporting/cancellation service ordering",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_statistics_rational.go",
+          "tests": [
+            "TestLPRationalStatisticsIndependentCostOracle",
+            "TestLPRationalStatisticsPreservesOlderComparison",
+            "TestLPRationalStatisticsGatesCountersAndCancellation",
+            "TestLPRationalStatisticsAllWriterPrefixes",
+            "TestLPRationalStatisticsByValueAndEvaluationOrder",
+            "TestLPRationalStatisticsScalarFloatProjection",
+            "TestLPRationalStatisticsLiveLocalReentryGuard",
+            "TestLPRationalStatisticsPhysicalOwnership",
+            "TestLPRationalAllColumnsFeasibilityIndependentOracle",
+            "TestLPRationalStatisticsReachedGuardsAndPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -123509,7 +123537,8 @@
         "pkg/util/lp/core_feasibility_rational_test.go",
         "pkg/util/lp/core_pivot_compare_rational.go",
         "pkg/util/lp/core_tableau_rational.go",
-        "pkg/util/lp/core_tableau_rational_test.go"
+        "pkg/util/lp/core_tableau_rational_test.go",
+        "pkg/util/lp/core_statistics_rational.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -123690,7 +123719,17 @@
         "TestLPRationalTableauMetadataAndStoppedGuards",
         "TestLPRationalTableauPhysicalFailureOwnership",
         "TestLPRationalTableauStoppedMatrixBeforeNormalization",
-        "TestLPRationalTableauPreservesOlderComparison"
+        "TestLPRationalTableauPreservesOlderComparison",
+        "TestLPRationalStatisticsIndependentCostOracle",
+        "TestLPRationalStatisticsPreservesOlderComparison",
+        "TestLPRationalStatisticsGatesCountersAndCancellation",
+        "TestLPRationalStatisticsAllWriterPrefixes",
+        "TestLPRationalStatisticsByValueAndEvaluationOrder",
+        "TestLPRationalStatisticsScalarFloatProjection",
+        "TestLPRationalStatisticsLiveLocalReentryGuard",
+        "TestLPRationalStatisticsPhysicalOwnership",
+        "TestLPRationalAllColumnsFeasibilityIndependentOracle",
+        "TestLPRationalStatisticsReachedGuardsAndPrefixes"
       ],
       "conditionals": [
         {
@@ -124272,6 +124311,23 @@
             "TestLPRationalTableauPhysicalFailureOwnership",
             "TestLPRationalTableauStoppedMatrixBeforeNormalization",
             "TestLPRationalTableauPreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "Concrete scalar iteration counters, by-value statistics output, scalar numeral-to-double projection and reporting/cancellation service ordering",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_statistics_rational.go",
+          "tests": [
+            "TestLPRationalStatisticsIndependentCostOracle",
+            "TestLPRationalStatisticsPreservesOlderComparison",
+            "TestLPRationalStatisticsGatesCountersAndCancellation",
+            "TestLPRationalStatisticsAllWriterPrefixes",
+            "TestLPRationalStatisticsByValueAndEvaluationOrder",
+            "TestLPRationalStatisticsScalarFloatProjection",
+            "TestLPRationalStatisticsLiveLocalReentryGuard",
+            "TestLPRationalStatisticsPhysicalOwnership",
+            "TestLPRationalAllColumnsFeasibilityIndependentOracle",
+            "TestLPRationalStatisticsReachedGuardsAndPrefixes"
           ]
         }
       ],
@@ -125433,7 +125489,8 @@
         "pkg/util/lp/primal_iteration_rows_rational.go",
         "pkg/util/lp/primal_iteration_rows_rational_test.go",
         "pkg/util/lp/primal_init_tableau_rational.go",
-        "pkg/util/lp/primal_init_tableau_rational_test.go"
+        "pkg/util/lp/primal_init_tableau_rational_test.go",
+        "pkg/util/lp/primal_solve_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -125719,7 +125776,22 @@
         "TestLPRationalInitTableauPhysicalOwnership",
         "TestLPRationalTableauBasisReachedMetadata",
         "TestLPRationalInitTableauRowsFailurePrefixes",
-        "TestLPRationalInitTableauPreservesOlderComparison"
+        "TestLPRationalInitTableauPreservesOlderComparison",
+        "TestLPRationalSolveLUIndependentBoundedOptima",
+        "TestLPRationalSolveTableauIndependentBoundedOptima",
+        "TestLPRationalSolveRowsIndependentFeasibilityAndInfeasibility",
+        "TestLPRationalSolveLimitsAndCancellationOrder",
+        "TestLPRationalSolveReportingAndWriteFailure",
+        "TestLPRationalSolvePreservedFallbackStatuses",
+        "TestLPRationalSolveUnboundedIndependentRays",
+        "TestLPRationalSolveFeasibilitySearchIndependentSolutions",
+        "TestLPRationalSolveInfeasibleIndependentBounds",
+        "TestLPRationalSolveTableauStaleCostCorrection",
+        "TestLPRationalSolveStoppedAndInitializationPrefixes",
+        "TestLPRationalSolvePhysicalOwnership",
+        "TestLPRationalSolveSingularFallbackAfterBoundFlip",
+        "TestLPRationalSolveFinalValidationReadsLiveBounds",
+        "TestLPRationalSolveTableauLiveStaleCostCorrection"
       ],
       "conditionals": [
         {
@@ -126484,6 +126556,28 @@
             "TestLPRationalInitTableauRowsFailurePrefixes",
             "TestLPRationalInitTableauPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "Concrete scalar full primal Solve dispatch, LU/tableau row/column iteration, limits/cancellation, fallback statuses and live final feasibility validation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solve_rational.go",
+          "tests": [
+            "TestLPRationalSolveLUIndependentBoundedOptima",
+            "TestLPRationalSolveTableauIndependentBoundedOptima",
+            "TestLPRationalSolveRowsIndependentFeasibilityAndInfeasibility",
+            "TestLPRationalSolveLimitsAndCancellationOrder",
+            "TestLPRationalSolveReportingAndWriteFailure",
+            "TestLPRationalSolvePreservedFallbackStatuses",
+            "TestLPRationalSolveUnboundedIndependentRays",
+            "TestLPRationalSolveFeasibilitySearchIndependentSolutions",
+            "TestLPRationalSolveInfeasibleIndependentBounds",
+            "TestLPRationalSolveTableauStaleCostCorrection",
+            "TestLPRationalSolveStoppedAndInitializationPrefixes",
+            "TestLPRationalSolvePhysicalOwnership",
+            "TestLPRationalSolveSingularFallbackAfterBoundFlip",
+            "TestLPRationalSolveFinalValidationReadsLiveBounds",
+            "TestLPRationalSolveTableauLiveStaleCostCorrection"
+          ]
         }
       ],
       "ownership": [
@@ -126596,7 +126690,8 @@
         "pkg/util/lp/primal_enter_rational.go",
         "pkg/util/lp/primal_iteration_rational.go",
         "pkg/util/lp/primal_cost_tableau_rational.go",
-        "pkg/util/lp/primal_cost_tableau_rational_test.go"
+        "pkg/util/lp/primal_cost_tableau_rational_test.go",
+        "pkg/util/lp/primal_solve_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -126835,7 +126930,22 @@
         "TestLPRationalTableauCostIndependentReducedCostOracle",
         "TestLPRationalTableauCostSourcePrefixesAndGuards",
         "TestLPRationalTableauCostPhysicalOwnership",
-        "TestLPRationalTableauCostLeavesOlderComparisonOwned"
+        "TestLPRationalTableauCostLeavesOlderComparisonOwned",
+        "TestLPRationalSolveLUIndependentBoundedOptima",
+        "TestLPRationalSolveTableauIndependentBoundedOptima",
+        "TestLPRationalSolveRowsIndependentFeasibilityAndInfeasibility",
+        "TestLPRationalSolveLimitsAndCancellationOrder",
+        "TestLPRationalSolveReportingAndWriteFailure",
+        "TestLPRationalSolvePreservedFallbackStatuses",
+        "TestLPRationalSolveUnboundedIndependentRays",
+        "TestLPRationalSolveFeasibilitySearchIndependentSolutions",
+        "TestLPRationalSolveInfeasibleIndependentBounds",
+        "TestLPRationalSolveTableauStaleCostCorrection",
+        "TestLPRationalSolveStoppedAndInitializationPrefixes",
+        "TestLPRationalSolvePhysicalOwnership",
+        "TestLPRationalSolveSingularFallbackAfterBoundFlip",
+        "TestLPRationalSolveFinalValidationReadsLiveBounds",
+        "TestLPRationalSolveTableauLiveStaleCostCorrection"
       ],
       "conditionals": [
         {
@@ -127633,6 +127743,28 @@
             "TestLPRationalTableauCostPhysicalOwnership",
             "TestLPRationalTableauCostLeavesOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "Concrete scalar full primal Solve dispatch, LU/tableau row/column iteration, limits/cancellation, fallback statuses and live final feasibility validation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solve_rational.go",
+          "tests": [
+            "TestLPRationalSolveLUIndependentBoundedOptima",
+            "TestLPRationalSolveTableauIndependentBoundedOptima",
+            "TestLPRationalSolveRowsIndependentFeasibilityAndInfeasibility",
+            "TestLPRationalSolveLimitsAndCancellationOrder",
+            "TestLPRationalSolveReportingAndWriteFailure",
+            "TestLPRationalSolvePreservedFallbackStatuses",
+            "TestLPRationalSolveUnboundedIndependentRays",
+            "TestLPRationalSolveFeasibilitySearchIndependentSolutions",
+            "TestLPRationalSolveInfeasibleIndependentBounds",
+            "TestLPRationalSolveTableauStaleCostCorrection",
+            "TestLPRationalSolveStoppedAndInitializationPrefixes",
+            "TestLPRationalSolvePhysicalOwnership",
+            "TestLPRationalSolveSingularFallbackAfterBoundFlip",
+            "TestLPRationalSolveFinalValidationReadsLiveBounds",
+            "TestLPRationalSolveTableauLiveStaleCostCorrection"
+          ]
         }
       ],
       "ownership": [
@@ -127915,7 +128047,8 @@
         "pkg/util/lp/primal_enter_tableau_rational.go",
         "pkg/util/lp/primal_enter_tableau_rational_test.go",
         "pkg/util/lp/primal_init_tableau_rational.go",
-        "pkg/util/lp/primal_init_tableau_rational_test.go"
+        "pkg/util/lp/primal_init_tableau_rational_test.go",
+        "pkg/util/lp/primal_solve_rational.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -128030,7 +128163,22 @@
         "TestLPRationalInitTableauPhysicalOwnership",
         "TestLPRationalTableauBasisReachedMetadata",
         "TestLPRationalInitTableauRowsFailurePrefixes",
-        "TestLPRationalInitTableauPreservesOlderComparison"
+        "TestLPRationalInitTableauPreservesOlderComparison",
+        "TestLPRationalSolveLUIndependentBoundedOptima",
+        "TestLPRationalSolveTableauIndependentBoundedOptima",
+        "TestLPRationalSolveRowsIndependentFeasibilityAndInfeasibility",
+        "TestLPRationalSolveLimitsAndCancellationOrder",
+        "TestLPRationalSolveReportingAndWriteFailure",
+        "TestLPRationalSolvePreservedFallbackStatuses",
+        "TestLPRationalSolveUnboundedIndependentRays",
+        "TestLPRationalSolveFeasibilitySearchIndependentSolutions",
+        "TestLPRationalSolveInfeasibleIndependentBounds",
+        "TestLPRationalSolveTableauStaleCostCorrection",
+        "TestLPRationalSolveStoppedAndInitializationPrefixes",
+        "TestLPRationalSolvePhysicalOwnership",
+        "TestLPRationalSolveSingularFallbackAfterBoundFlip",
+        "TestLPRationalSolveFinalValidationReadsLiveBounds",
+        "TestLPRationalSolveTableauLiveStaleCostCorrection"
       ],
       "assertions": [
         {
@@ -128369,6 +128517,28 @@
             "TestLPRationalTableauEnterRejectedIndexOwnsLocal",
             "TestLPRationalTableauEnterPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "Concrete scalar full primal Solve dispatch, LU/tableau row/column iteration, limits/cancellation, fallback statuses and live final feasibility validation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solve_rational.go",
+          "tests": [
+            "TestLPRationalSolveLUIndependentBoundedOptima",
+            "TestLPRationalSolveTableauIndependentBoundedOptima",
+            "TestLPRationalSolveRowsIndependentFeasibilityAndInfeasibility",
+            "TestLPRationalSolveLimitsAndCancellationOrder",
+            "TestLPRationalSolveReportingAndWriteFailure",
+            "TestLPRationalSolvePreservedFallbackStatuses",
+            "TestLPRationalSolveUnboundedIndependentRays",
+            "TestLPRationalSolveFeasibilitySearchIndependentSolutions",
+            "TestLPRationalSolveInfeasibleIndependentBounds",
+            "TestLPRationalSolveTableauStaleCostCorrection",
+            "TestLPRationalSolveStoppedAndInitializationPrefixes",
+            "TestLPRationalSolvePhysicalOwnership",
+            "TestLPRationalSolveSingularFallbackAfterBoundFlip",
+            "TestLPRationalSolveFinalValidationReadsLiveBounds",
+            "TestLPRationalSolveTableauLiveStaleCostCorrection"
+          ]
         }
       ],
       "ownership": [
@@ -128705,7 +128875,8 @@
         "pkg/util/lp/solver_presolve_exact.go",
         "pkg/util/lp/solver_presolve_exact_test.go",
         "pkg/util/lp/solver_exact_model.go",
-        "pkg/util/lp/solver_prepare_exact.go"
+        "pkg/util/lp/solver_prepare_exact.go",
+        "pkg/util/lp/core_statistics_rational.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
@@ -128758,7 +128929,17 @@
         "TestLPRationalPresolveCleanupOutputModes",
         "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
         "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
-        "TestLPRationalPresolveForeignBorrowedNumerals"
+        "TestLPRationalPresolveForeignBorrowedNumerals",
+        "TestLPRationalStatisticsIndependentCostOracle",
+        "TestLPRationalStatisticsPreservesOlderComparison",
+        "TestLPRationalStatisticsGatesCountersAndCancellation",
+        "TestLPRationalStatisticsAllWriterPrefixes",
+        "TestLPRationalStatisticsByValueAndEvaluationOrder",
+        "TestLPRationalStatisticsScalarFloatProjection",
+        "TestLPRationalStatisticsLiveLocalReentryGuard",
+        "TestLPRationalStatisticsPhysicalOwnership",
+        "TestLPRationalAllColumnsFeasibilityIndependentOracle",
+        "TestLPRationalStatisticsReachedGuardsAndPrefixes"
       ],
       "conditionals": [
         {
@@ -128895,6 +129076,23 @@
             "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
             "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
             "TestLPRationalPresolveForeignBorrowedNumerals"
+          ]
+        },
+        {
+          "name": "Concrete scalar iteration counters, by-value statistics output, scalar numeral-to-double projection and reporting/cancellation service ordering",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_statistics_rational.go",
+          "tests": [
+            "TestLPRationalStatisticsIndependentCostOracle",
+            "TestLPRationalStatisticsPreservesOlderComparison",
+            "TestLPRationalStatisticsGatesCountersAndCancellation",
+            "TestLPRationalStatisticsAllWriterPrefixes",
+            "TestLPRationalStatisticsByValueAndEvaluationOrder",
+            "TestLPRationalStatisticsScalarFloatProjection",
+            "TestLPRationalStatisticsLiveLocalReentryGuard",
+            "TestLPRationalStatisticsPhysicalOwnership",
+            "TestLPRationalAllColumnsFeasibilityIndependentOracle",
+            "TestLPRationalStatisticsReachedGuardsAndPrefixes"
           ]
         }
       ],
