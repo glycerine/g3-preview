@@ -122548,7 +122548,10 @@
         "pkg/util/lp/lar_signature_tableau.go",
         "pkg/util/lp/lar_signature_tableau_test.go",
         "pkg/util/lp/core_snap_exact.go",
-        "pkg/util/lp/core_snap_exact_test.go"
+        "pkg/util/lp/core_snap_exact_test.go",
+        "pkg/util/lp/core_base_rational.go",
+        "pkg/util/lp/core_basis_rational.go",
+        "pkg/util/lp/core_base_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122710,7 +122713,15 @@
         "TestLPExactSnapFixedPreservesEitherEndpoint",
         "TestLPExactSnapReachedPrefixes",
         "TestLPExactSnapPhysicalOwnership",
-        "TestLPExactSnapPreservesOlderComparison"
+        "TestLPExactSnapPreservesOlderComparison",
+        "TestLPRationalCoreIndependentLUSolves",
+        "TestLPRationalCoreExactBoundProfiles",
+        "TestLPRationalCoreBasisTraceAndTranspose",
+        "TestLPRationalCorePhysicalOwnership",
+        "TestLPRationalCoreConstructorAndDomains",
+        "TestLPRationalCorePreservesOlderComparison",
+        "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+        "TestLPRationalCoreReachedMetadataGuards"
       ],
       "assertions": [
         {
@@ -123153,6 +123164,21 @@
             "TestLPExactSnapPhysicalOwnership",
             "TestLPExactSnapPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "concrete retained mpq/mpq core constructor, headings, exact bounds/feasibility, LU entries and basis lifecycle",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_rational.go",
+          "tests": [
+            "TestLPRationalCoreIndependentLUSolves",
+            "TestLPRationalCoreExactBoundProfiles",
+            "TestLPRationalCoreBasisTraceAndTranspose",
+            "TestLPRationalCorePhysicalOwnership",
+            "TestLPRationalCoreConstructorAndDomains",
+            "TestLPRationalCorePreservesOlderComparison",
+            "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+            "TestLPRationalCoreReachedMetadataGuards"
+          ]
         }
       ],
       "ownership": [
@@ -123169,7 +123195,8 @@
         "Exact breakpoint collection retains difference/ratio and entering-span pair locals with the primal across record construction and queue enqueue. Scalar captures end before queue numerical work, so queue comparison receipts remain separate. Failure retains partial records and scratch for Close; older caller comparisons are preserved.",
         "Exact UpdateX captures its own arithmetic, retains scalar product expressions and the pair temporary with the core, and releases constructor scalar temporaries before compound subtraction. Entering updates precede ordered basic updates; precise mode leaves CopyXB unchanged. RestoreX retains the stored backup semantics, not an invented inverse. Stopped arithmetic can leave the current scalar partial; later destinations remain untouched. Close cleans raw invocations before scratch and allocation roots, preserving older caller comparisons.",
         "Residual dot products and LU reconstruction are delegated outside core numeral captures. Core-owned row residual/scalar scratch and RHS vectors survive child failures; the LU is destroyed before its borrowed reconstruction RHS. Matrix and LU numerical receipts stay separate from the core. Reverse row/basis publication, live output aliases, stale factorization residuals, diagnostic recomputation and older caller comparisons are preserved. Exact reconstruction uses one solve and does not import floating refinement work.",
-        "No additional outer-solve or snap owners. Actual exact pair assignment and reconstruction retain interrupted arithmetic in existing primal/core owners; stopped retries and older caller comparison identity are verified through Close with pooled/direct physical refusal campaigns."
+        "No additional outer-solve or snap owners. Actual exact pair assignment and reconstruction retain interrupted arithmetic in existing primal/core owners; stopped retries and older caller comparison identity are verified through Close with pooled/direct physical refusal campaigns.",
+        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -123229,7 +123256,10 @@
         "pkg/util/lp/core_statistics_exact.go",
         "pkg/util/lp/core_statistics_exact_test.go",
         "pkg/util/lp/core_position_exact.go",
-        "pkg/util/lp/lar_signature_test.go"
+        "pkg/util/lp/lar_signature_test.go",
+        "pkg/util/lp/core_base_rational.go",
+        "pkg/util/lp/core_basis_rational.go",
+        "pkg/util/lp/core_base_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -123362,7 +123392,15 @@
         "TestLARSignatureExtractionIndependentModels",
         "TestLARSignaturePreparationIndependentSystems",
         "TestLARSignatureReachedPrefixes",
-        "TestLARSignaturePhysicalOwnership"
+        "TestLARSignaturePhysicalOwnership",
+        "TestLPRationalCoreIndependentLUSolves",
+        "TestLPRationalCoreExactBoundProfiles",
+        "TestLPRationalCoreBasisTraceAndTranspose",
+        "TestLPRationalCorePhysicalOwnership",
+        "TestLPRationalCoreConstructorAndDomains",
+        "TestLPRationalCorePreservesOlderComparison",
+        "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+        "TestLPRationalCoreReachedMetadataGuards"
       ],
       "conditionals": [
         {
@@ -123854,6 +123892,21 @@
             "TestLARSignatureReachedPrefixes",
             "TestLARSignaturePhysicalOwnership"
           ]
+        },
+        {
+          "name": "concrete retained mpq/mpq core constructor, headings, exact bounds/feasibility, LU entries and basis lifecycle",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_rational.go",
+          "tests": [
+            "TestLPRationalCoreIndependentLUSolves",
+            "TestLPRationalCoreExactBoundProfiles",
+            "TestLPRationalCoreBasisTraceAndTranspose",
+            "TestLPRationalCorePhysicalOwnership",
+            "TestLPRationalCoreConstructorAndDomains",
+            "TestLPRationalCorePreservesOlderComparison",
+            "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+            "TestLPRationalCoreReachedMetadataGuards"
+          ]
         }
       ],
       "ownership": [
@@ -123867,7 +123920,8 @@
         "Exact validators own direct bound comparisons and source copied reduced-cost/product temporaries in base-core calls/pivotWork. Captures end before delegated matrix checks and diagnostics. Physical refusal campaigns preserve source prefixes, and Close destroys only newly owned invocations/work; older caller comparison receipts remain intact. Column diagnostics retain split stdout/output streams and report real writer, metadata and missing-reference errors. Native erases source assertions; complete solver/scopes integration remains incomplete.",
         "Reverse-column membership validation delegates base-owned exact comparisons; it never captures across a child owner or consumes an older caller comparison. Source diagnostics and actual metadata/output errors stop the validator, while false membership without an error leaves it reusable. Only current matrix columns are inspected; out-of-domain-tail set members are deliberately ignored, as upstream. Whole-model Pop invokes the actual helper only in debug/checked source assertion profiles.",
         "Exact UpdateX captures its own arithmetic, retains scalar product expressions and the pair temporary with the core, and releases constructor scalar temporaries before compound subtraction. Entering updates precede ordered basic updates; precise mode leaves CopyXB unchanged. RestoreX retains the stored backup semantics, not an invented inverse. Stopped arithmetic can leave the current scalar partial; later destinations remain untouched. Close cleans raw invocations before scratch and allocation roots, preserving older caller comparisons.",
-        "Residual dot products and LU reconstruction are delegated outside core numeral captures. Core-owned row residual/scalar scratch and RHS vectors survive child failures; the LU is destroyed before its borrowed reconstruction RHS. Matrix and LU numerical receipts stay separate from the core. Reverse row/basis publication, live output aliases, stale factorization residuals, diagnostic recomputation and older caller comparisons are preserved. Exact reconstruction uses one solve and does not import floating refinement work."
+        "Residual dot products and LU reconstruction are delegated outside core numeral captures. Core-owned row residual/scalar scratch and RHS vectors survive child failures; the LU is destroyed before its borrowed reconstruction RHS. Matrix and LU numerical receipts stay separate from the core. Reverse row/basis publication, live output aliases, stale factorization residuals, diagnostic recomputation and older caller comparisons are preserved. Exact reconstruction uses one solve and does not import floating refinement work.",
+        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -123901,7 +123955,10 @@
         "pkg/util/lp/primal_advance_float.go",
         "pkg/util/lp/core_statistics_float.go",
         "pkg/util/lp/core_basis_exact.go",
-        "pkg/util/lp/core_tableau_exact.go"
+        "pkg/util/lp/core_tableau_exact.go",
+        "pkg/util/lp/core_base_rational.go",
+        "pkg/util/lp/core_basis_rational.go",
+        "pkg/util/lp/core_base_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -123948,7 +124005,15 @@
         "TestLPPairTableauEmptyTargetAndNoPivot",
         "TestLPPairTableauMetadataAndStoppedGuards",
         "TestLPPairTableauPhysicalFailureOwnership",
-        "TestLPPairTableauStoppedMatrixBeforeNormalization"
+        "TestLPPairTableauStoppedMatrixBeforeNormalization",
+        "TestLPRationalCoreIndependentLUSolves",
+        "TestLPRationalCoreExactBoundProfiles",
+        "TestLPRationalCoreBasisTraceAndTranspose",
+        "TestLPRationalCorePhysicalOwnership",
+        "TestLPRationalCoreConstructorAndDomains",
+        "TestLPRationalCorePreservesOlderComparison",
+        "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+        "TestLPRationalCoreReachedMetadataGuards"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -124054,6 +124119,21 @@
             "TestLPPairTableauPhysicalFailureOwnership",
             "TestLPPairTableauStoppedMatrixBeforeNormalization"
           ]
+        },
+        {
+          "name": "concrete retained mpq/mpq core constructor, headings, exact bounds/feasibility, LU entries and basis lifecycle",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_rational.go",
+          "tests": [
+            "TestLPRationalCoreIndependentLUSolves",
+            "TestLPRationalCoreExactBoundProfiles",
+            "TestLPRationalCoreBasisTraceAndTranspose",
+            "TestLPRationalCorePhysicalOwnership",
+            "TestLPRationalCoreConstructorAndDomains",
+            "TestLPRationalCorePreservesOlderComparison",
+            "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+            "TestLPRationalCoreReachedMetadataGuards"
+          ]
         }
       ],
       "ownership": [
@@ -124061,7 +124141,8 @@
         "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair.",
         "Native local RHS and copied correction vectors are owned by the reconstruction call. Basic X publication, CopyXB capture and Ed/column-indexed updates follow source order. Numerical update uses actual LU/W and pivot rows; refactors destroy/replace the owned LU, failed constructors retain real partial owners. Feasible-only singular branch deletes LU and publishes nil; rollback restores actual headings, X and factorization.",
         "Exact basis edits mutate borrowed typed slice headers in source order. Tableau transposition swaps basis/headings before delegated matrix row copies; the matrix owns any stopped numerical copy, while the core stops without adopting child allocation roots. Pooled/direct physical failure campaigns verify immediate cleanup and named root census. Whole tableau pivot/removal and outer LAR Pop remain open.",
-        "Precise tableau normalization captures only core-owned pair/RHS and row-coefficient arithmetic; the core ends capture before delegating owning row elimination to RationalStaticMatrix. Reduced-cost expressions own temporary/product slots in pivotWork. Eight pooled/direct real allocation-refusal campaigns cover normalization, child elimination, reduced costs and combined pivot/cost work through success, verify reached-prefix values and reclaim every named numeral root. Full tableau optimization, outer removal and LAR scopes remain open."
+        "Precise tableau normalization captures only core-owned pair/RHS and row-coefficient arithmetic; the core ends capture before delegating owning row elimination to RationalStaticMatrix. Reduced-cost expressions own temporary/product slots in pivotWork. Eight pooled/direct real allocation-refusal campaigns cover normalization, child elimination, reduced costs and combined pivot/cost work through success, verify reached-prefix values and reclaim every named numeral root. Full tableau optimization, outer removal and LAR scopes remain open.",
+        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -128139,7 +128220,8 @@
         "pkg/util/lp/lu_ready_failure_test.go",
         "pkg/util/lp/core_statistics_exact.go",
         "pkg/util/lp/core_statistics_exact_test.go",
-        "pkg/util/lp/core_base_exact.go"
+        "pkg/util/lp/core_base_exact.go",
+        "pkg/util/lp/core_base_rational_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -128219,7 +128301,15 @@
         "TestLPPairStatisticsLiveLocalReentryGuard",
         "TestLPPairStatisticsPhysicalOwnership",
         "TestLPPairAllColumnsFeasibilityIndependentOracle",
-        "TestLPPairStatisticsReachedGuardsAndPrefixes"
+        "TestLPPairStatisticsReachedGuardsAndPrefixes",
+        "TestLPRationalCoreIndependentLUSolves",
+        "TestLPRationalCoreExactBoundProfiles",
+        "TestLPRationalCoreBasisTraceAndTranspose",
+        "TestLPRationalCorePhysicalOwnership",
+        "TestLPRationalCoreConstructorAndDomains",
+        "TestLPRationalCorePreservesOlderComparison",
+        "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+        "TestLPRationalCoreReachedMetadataGuards"
       ],
       "conditionals": [
         {
@@ -128494,6 +128584,21 @@
             "TestLPPairAllColumnsFeasibilityIndependentOracle",
             "TestLPPairStatisticsReachedGuardsAndPrefixes"
           ]
+        },
+        {
+          "name": "concrete mpq/mpq LU solve_Bd_faster indexed entry",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lu_column_exact.go",
+          "tests": [
+            "TestLPRationalCoreIndependentLUSolves",
+            "TestLPRationalCoreExactBoundProfiles",
+            "TestLPRationalCoreBasisTraceAndTranspose",
+            "TestLPRationalCorePhysicalOwnership",
+            "TestLPRationalCoreConstructorAndDomains",
+            "TestLPRationalCorePreservesOlderComparison",
+            "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+            "TestLPRationalCoreReachedMetadataGuards"
+          ]
         }
       ],
       "ownership": [
@@ -128504,7 +128609,8 @@
         "Floating refinement owns native yCopy and unsigned marker vectors; sparse correction preserves source residual workspace, dense correction clears it. Exact refinement adds no numerical owner or arithmetic and delegates to existing typed solves; foreign/stopped indexed callers reject before dense/sparse routing, retaining their own pending invocation through LU Close.",
         "Extension publishes Dim before U resize, then typed Q/R resize and row work; owned extension vector resizes before replacements. Each child retains its actual pending numerical calls. Exact zero pivot argument is immediate and introduces no owning allocation; LU captures no child calls. Real stopped U/Q/R children retain publication prefixes and are reclaimed by their existing owners.",
         "Typed factorization slots retire the old owner before constructing the replacement. On explicit Go constructor error, the slot owns the partial attempted replacement for Close; borrowed source/settings/caller values remain independent. Existing child call receipts govern failed constructor cleanup. Same-manager re-entry preserves source-invalid consumed scratch pointers and returns their real dead-slot error rather than rebuilding numerical scratch.",
-        "Prepared solves delegate numerical receipts to actual U/R and caller owners; LU Close does not consume caller-owned stopped vectors. T indices append without clearing; no second tails/Q application. Exact caller owner/pending guards precede U work."
+        "Prepared solves delegate numerical receipts to actual U/R and caller owners; LU Close does not consume caller-owned stopped vectors. T indices append without clearing; no second tails/Q application. Exact caller owner/pending guards precede U work.",
+        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization."
       ],
       "deviations": [
         "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Floating LU initial factorization and dense column/dense-indexed row solves are now implemented; remaining indexed column/refinement routes, updates and full upstream-driver integration remain open.",
@@ -128554,7 +128660,8 @@
         "pkg/util/lp/lu_ready_float.go",
         "pkg/util/lp/lu_ready_exact.go",
         "pkg/util/lp/lu_ready_test.go",
-        "pkg/util/lp/lu_ready_failure_test.go"
+        "pkg/util/lp/lu_ready_failure_test.go",
+        "pkg/util/lp/core_base_rational_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -128618,7 +128725,15 @@
         "TestLPLUPreparedSolvesToleranceAndSettings",
         "TestLPLUPreparedSolvesFailurePrefixes",
         "TestLPExactLUPreparedSolvesAllocationCensus",
-        "TestLPExactLUPreparedIndexedCallerOwnership"
+        "TestLPExactLUPreparedIndexedCallerOwnership",
+        "TestLPRationalCoreIndependentLUSolves",
+        "TestLPRationalCoreExactBoundProfiles",
+        "TestLPRationalCoreBasisTraceAndTranspose",
+        "TestLPRationalCorePhysicalOwnership",
+        "TestLPRationalCoreConstructorAndDomains",
+        "TestLPRationalCorePreservesOlderComparison",
+        "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+        "TestLPRationalCoreReachedMetadataGuards"
       ],
       "conditionals": [
         {
@@ -129020,6 +129135,21 @@
             "TestLPExactLUPreparedSolvesAllocationCensus",
             "TestLPExactLUPreparedIndexedCallerOwnership"
           ]
+        },
+        {
+          "name": "concrete mpq/mpq LU solve_Bd_faster indexed entry",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lu_column_exact.go",
+          "tests": [
+            "TestLPRationalCoreIndependentLUSolves",
+            "TestLPRationalCoreExactBoundProfiles",
+            "TestLPRationalCoreBasisTraceAndTranspose",
+            "TestLPRationalCorePhysicalOwnership",
+            "TestLPRationalCoreConstructorAndDomains",
+            "TestLPRationalCorePreservesOlderComparison",
+            "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+            "TestLPRationalCoreReachedMetadataGuards"
+          ]
         }
       ],
       "ownership": [
@@ -129029,7 +129159,8 @@
         "Entering-column destinations/workspace are borrowed owning indexed vectors. Source extraction and dense data assignment delegate numerical copy receipts to each actual destination, while tails/permutations/U retain their own arithmetic work. No LU-wide receipt capture is added. Dense assignment deep-copies every slot before clearing output index; sparse assignment preserves actual indexed-copy/self-alias behavior. Close LU children before destination then workspace; borrowed source remains live throughout cleanup.",
         "Floating refinement owns native yCopy and unsigned marker vectors; sparse correction preserves source residual workspace, dense correction clears it. Exact refinement adds no numerical owner or arithmetic and delegates to existing typed solves; foreign/stopped indexed callers reject before dense/sparse routing, retaining their own pending invocation through LU Close.",
         "Typed factorization slots retire the old owner before constructing the replacement. On explicit Go constructor error, the slot owns the partial attempted replacement for Close; borrowed source/settings/caller values remain independent. Existing child call receipts govern failed constructor cleanup. Same-manager re-entry preserves source-invalid consumed scratch pointers and returns their real dead-slot error rather than rebuilding numerical scratch.",
-        "Prepared solves delegate numerical receipts to actual U/R and caller owners; LU Close does not consume caller-owned stopped vectors. T indices append without clearing; no second tails/Q application. Exact caller owner/pending guards precede U work."
+        "Prepared solves delegate numerical receipts to actual U/R and caller owners; LU Close does not consume caller-owned stopped vectors. T indices append without clearing; no second tails/Q application. Exact caller owner/pending guards precede U work.",
+        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization."
       ],
       "deviations": [
         "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Floating LU initial factorization and dense column/dense-indexed row solves are now implemented; remaining indexed column/refinement routes, updates and full upstream-driver integration remain open.",

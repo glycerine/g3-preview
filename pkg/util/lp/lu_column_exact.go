@@ -141,3 +141,14 @@ func (m *PairLU) SolveBdFaster(entering uint32, d *IndexedRationalVector) (err e
 	}
 	return m.SolveByForTIndexedOnly(d, m.Settings)
 }
+
+func (m *RationalLU) SolveBdFaster(entering uint32, d *IndexedRationalVector) (err error) {
+	if err = m.ready(); err != nil {
+		return err
+	}
+	defer m.finish(&err)
+	if err = m.PrepareEntering(entering, d); err != nil {
+		return err
+	}
+	return m.SolveByForTIndexedOnly(d, m.Settings)
+}

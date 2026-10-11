@@ -1262,7 +1262,10 @@
         "pkg/util/lp/lar_signature_tableau.go",
         "pkg/util/lp/lar_signature_tableau_test.go",
         "pkg/util/lp/core_snap_exact.go",
-        "pkg/util/lp/core_snap_exact_test.go"
+        "pkg/util/lp/core_snap_exact_test.go",
+        "pkg/util/lp/core_base_rational.go",
+        "pkg/util/lp/core_basis_rational.go",
+        "pkg/util/lp/core_base_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1424,7 +1427,15 @@
         "TestLPExactSnapFixedPreservesEitherEndpoint",
         "TestLPExactSnapReachedPrefixes",
         "TestLPExactSnapPhysicalOwnership",
-        "TestLPExactSnapPreservesOlderComparison"
+        "TestLPExactSnapPreservesOlderComparison",
+        "TestLPRationalCoreIndependentLUSolves",
+        "TestLPRationalCoreExactBoundProfiles",
+        "TestLPRationalCoreBasisTraceAndTranspose",
+        "TestLPRationalCorePhysicalOwnership",
+        "TestLPRationalCoreConstructorAndDomains",
+        "TestLPRationalCorePreservesOlderComparison",
+        "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+        "TestLPRationalCoreReachedMetadataGuards"
       ]
     },
     {
@@ -1468,7 +1479,10 @@
         "pkg/util/lp/core_statistics_exact.go",
         "pkg/util/lp/core_statistics_exact_test.go",
         "pkg/util/lp/core_position_exact.go",
-        "pkg/util/lp/lar_signature_test.go"
+        "pkg/util/lp/lar_signature_test.go",
+        "pkg/util/lp/core_base_rational.go",
+        "pkg/util/lp/core_basis_rational.go",
+        "pkg/util/lp/core_base_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1601,7 +1615,15 @@
         "TestLARSignatureExtractionIndependentModels",
         "TestLARSignaturePreparationIndependentSystems",
         "TestLARSignatureReachedPrefixes",
-        "TestLARSignaturePhysicalOwnership"
+        "TestLARSignaturePhysicalOwnership",
+        "TestLPRationalCoreIndependentLUSolves",
+        "TestLPRationalCoreExactBoundProfiles",
+        "TestLPRationalCoreBasisTraceAndTranspose",
+        "TestLPRationalCorePhysicalOwnership",
+        "TestLPRationalCoreConstructorAndDomains",
+        "TestLPRationalCorePreservesOlderComparison",
+        "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+        "TestLPRationalCoreReachedMetadataGuards"
       ]
     },
     {
@@ -1621,7 +1643,10 @@
         "pkg/util/lp/primal_advance_float.go",
         "pkg/util/lp/core_statistics_float.go",
         "pkg/util/lp/core_basis_exact.go",
-        "pkg/util/lp/core_tableau_exact.go"
+        "pkg/util/lp/core_tableau_exact.go",
+        "pkg/util/lp/core_base_rational.go",
+        "pkg/util/lp/core_basis_rational.go",
+        "pkg/util/lp/core_base_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1668,7 +1693,15 @@
         "TestLPPairTableauEmptyTargetAndNoPivot",
         "TestLPPairTableauMetadataAndStoppedGuards",
         "TestLPPairTableauPhysicalFailureOwnership",
-        "TestLPPairTableauStoppedMatrixBeforeNormalization"
+        "TestLPPairTableauStoppedMatrixBeforeNormalization",
+        "TestLPRationalCoreIndependentLUSolves",
+        "TestLPRationalCoreExactBoundProfiles",
+        "TestLPRationalCoreBasisTraceAndTranspose",
+        "TestLPRationalCorePhysicalOwnership",
+        "TestLPRationalCoreConstructorAndDomains",
+        "TestLPRationalCorePreservesOlderComparison",
+        "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+        "TestLPRationalCoreReachedMetadataGuards"
       ]
     },
     {
@@ -2813,7 +2846,8 @@
         "pkg/util/lp/lu_ready_failure_test.go",
         "pkg/util/lp/core_statistics_exact.go",
         "pkg/util/lp/core_statistics_exact_test.go",
-        "pkg/util/lp/core_base_exact.go"
+        "pkg/util/lp/core_base_exact.go",
+        "pkg/util/lp/core_base_rational_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -2893,7 +2927,15 @@
         "TestLPPairStatisticsLiveLocalReentryGuard",
         "TestLPPairStatisticsPhysicalOwnership",
         "TestLPPairAllColumnsFeasibilityIndependentOracle",
-        "TestLPPairStatisticsReachedGuardsAndPrefixes"
+        "TestLPPairStatisticsReachedGuardsAndPrefixes",
+        "TestLPRationalCoreIndependentLUSolves",
+        "TestLPRationalCoreExactBoundProfiles",
+        "TestLPRationalCoreBasisTraceAndTranspose",
+        "TestLPRationalCorePhysicalOwnership",
+        "TestLPRationalCoreConstructorAndDomains",
+        "TestLPRationalCorePreservesOlderComparison",
+        "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+        "TestLPRationalCoreReachedMetadataGuards"
       ]
     },
     {
@@ -2927,7 +2969,8 @@
         "pkg/util/lp/lu_ready_float.go",
         "pkg/util/lp/lu_ready_exact.go",
         "pkg/util/lp/lu_ready_test.go",
-        "pkg/util/lp/lu_ready_failure_test.go"
+        "pkg/util/lp/lu_ready_failure_test.go",
+        "pkg/util/lp/core_base_rational_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -2991,7 +3034,15 @@
         "TestLPLUPreparedSolvesToleranceAndSettings",
         "TestLPLUPreparedSolvesFailurePrefixes",
         "TestLPExactLUPreparedSolvesAllocationCensus",
-        "TestLPExactLUPreparedIndexedCallerOwnership"
+        "TestLPExactLUPreparedIndexedCallerOwnership",
+        "TestLPRationalCoreIndependentLUSolves",
+        "TestLPRationalCoreExactBoundProfiles",
+        "TestLPRationalCoreBasisTraceAndTranspose",
+        "TestLPRationalCorePhysicalOwnership",
+        "TestLPRationalCoreConstructorAndDomains",
+        "TestLPRationalCorePreservesOlderComparison",
+        "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+        "TestLPRationalCoreReachedMetadataGuards"
       ]
     },
     {
@@ -5504,5 +5555,98 @@
       "/mnt/oldrog/tmp/g3-exact-objective-module-native.cover"
     ],
     "coverage_scope": "Includes exact matrix/RHS preparation, presolve and objective preparation committed at a8a7ef66; completion and coverage not yet credited."
+  },
+  "latest_rational_core_base_increment": {
+    "source": [
+      "src/util/lp/lp_core_solver_base.hpp:27-160",
+      "src/util/lp/lp_core_solver_base.hpp:480-514",
+      "src/util/lp/lp_core_solver_base.hpp:671-738",
+      "src/util/lp/lp_core_solver_base.h:77-99,245-253,448-514,605-612,665-668",
+      "src/util/lp/lp_core_solver_base.hpp:937-940",
+      "src/util/lp/lu.hpp:273-278"
+    ],
+    "retained_consumers": [
+      "src/util/lp/lp_primal_core_solver.hpp",
+      "src/util/lp/lp_dual_core_solver.hpp",
+      "src/test/lp.cpp:1725-1769"
+    ],
+    "go_targets": [
+      "pkg/util/lp/core_base_rational.go",
+      "pkg/util/lp/core_basis_rational.go",
+      "pkg/util/lp/core_base_rational_test.go",
+      "pkg/util/lp/lu_column_exact.go"
+    ],
+    "tests": [
+      "TestLPRationalCoreIndependentLUSolves",
+      "TestLPRationalCoreExactBoundProfiles",
+      "TestLPRationalCoreBasisTraceAndTranspose",
+      "TestLPRationalCorePhysicalOwnership",
+      "TestLPRationalCoreConstructorAndDomains",
+      "TestLPRationalCorePreservesOlderComparison",
+      "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
+      "TestLPRationalCoreReachedMetadataGuards"
+    ],
+    "coverage": {
+      "native": {
+        "core_base_rational.go": {
+          "covered": 205,
+          "total": 231,
+          "percent": 88.7
+        },
+        "core_basis_rational.go": {
+          "covered": 68,
+          "total": 70,
+          "percent": 97.1
+        },
+        "lu_column_exact.go:RationalLU.SolveBdFaster": {
+          "covered": 6,
+          "total": 6,
+          "percent": 100.0
+        }
+      },
+      "debug": {
+        "core_base_rational.go": {
+          "covered": 219,
+          "total": 231,
+          "percent": 94.8
+        },
+        "core_basis_rational.go": {
+          "covered": 69,
+          "total": 70,
+          "percent": 98.6
+        },
+        "lu_column_exact.go:RationalLU.SolveBdFaster": {
+          "covered": 6,
+          "total": 6,
+          "percent": 100.0
+        }
+      }
+    },
+    "focused_seconds": {
+      "native": 14.988,
+      "debug_checked": 24.307
+    },
+    "related_regression_seconds": {
+      "native": 81.209,
+      "debug_checked": 137.786
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-rational-core-native.cover",
+      "/mnt/oldrog/tmp/g3-rational-core-debug.cover"
+    ],
+    "validation": {
+      "native_lp_vet": "pass",
+      "debug_checked_lp_vet": "pass",
+      "native_module_compile": "pass",
+      "debug_checked_module_compile": "pass",
+      "source_portcheck": "pass: 2103 units, 677 APIs",
+      "dependency_graph": "refreshed: 64 native production packages",
+      "diff_check": "pass",
+      "permuted_basis_revalidation": {
+        "native_seconds": 0.016,
+        "debug_checked_seconds": 0.019
+      }
+    },
+    "evidence": "The concrete scalar mpq/mpq RationalCoreSolverBase now owns rational scratch and RationalLU for retained exact primal/dual consumers. Source construction, repeated heading initialization, descending nonbasis order, basis validation, exact bounds and feasibility, FillCB, SolveYB, both SolveBd entries, basis changes/restoration/traces and row transposition are implemented. RationalLU.SolveBdFaster supplies the missing scalar indexed entry. No pair or floating optimization adapter is used. The constructor retains partial owners on errors; initialization and child-LU failures stop the core. Parent raw receipts close before LU, LU closes before scratch, and input vectors/matrix and external output numerals remain borrowed through cleanup. Reinitialization destroys the old LU before replacement, and stale LU calls reject use. Source row transposition publishes basis/heading changes before a failed matrix copy. Source native/debug assertions and append/failure prefixes remain explicit. Eight test groups cover 80 independent triangular rational systems, with 81\u2013160-bit off-diagonal coefficients, independently constructed B*d and y*B, real rational solves, factorization replacement and lazy construction. Twenty-five exact bound/type/tolerance profiles check five positions including 1e-100 violations; zero, negative, huge, infinite and NaN floating tolerances are ignored. One hundred permuted basis/trace/row-copy worlds vary both column identities and coefficients. Eleven missing constructor inputs, an ownerless matrix, 44 reached metadata/domain profiles, stopped/closed entries and source partial-publication prefixes are checked. Sixteen pooled/direct physical campaigns through success cover construction, replacement, cost copying, both solves, lazy factorization and row copying; two further campaigns cover real comparison refusal. Every direct campaign requires actual refusal and ownership censuses pass. An actual older caller comparison survives core calls and Close. A foreign-reference fixture preserves the source sign-only early return, then rejects a reached invalid backing read without adopting the borrowed numeral. The initial fixture accidentally reused locally valid numerical slot IDs; it was corrected to exercise the actual invalid-read domain rather than assuming universal provenance checks. Base coverage is 205/231 statements (88.7%) native and 219/231 (94.8%) debug/checked; basis coverage is 68/70 (97.1%) and 69/70 (98.6%); the new rational faster LU entry is 6/6 (100%) in both. Remaining gaps chiefly protect valid capture/destruction, stable extents, source-disabled debug assertions and redundant guards. Focused core checks pass 14.988s native and 24.307s debug/checked; related pair/core, exact model/presolve/objective and LU regressions pass 81.209s/137.786s. Both LP vets and native/debug full-module compilation pass. Source portcheck passes (2103 units, 677 APIs), the graph is refreshed for 64 native production packages and diff checks pass. The strengthened permuted-basis fixture passes separately in 0.016s native/0.019s debug/checked after the focused coverage runs; production code is unchanged. Full native checkpoint a8a7ef66 is still running and predates this core increment; completion and its coverage are not credited here. Scalar core reduced-cost/value/pivot orchestration, exact primal/dual optimization, outer integration and full upstream drivers remain open. Inventory stays 88 partial/16 unported/6 reference_only, without whole-source promotion."
   }
 }
