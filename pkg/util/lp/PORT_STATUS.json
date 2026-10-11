@@ -7250,5 +7250,29 @@
       "diff check"
     ],
     "coverage_note": "Native erases many source assertion statements. Remaining checked gaps chiefly guard stable capture/destruction/metadata and extents already validated by delegated calls. Coverage measures implemented Go statements, not C++ completion."
+  },
+  "running_full_native_checkpoint": {
+    "status": "running",
+    "commit": "eb5c10f5",
+    "started_utc": "2026-10-11 17:09:16 UTC",
+    "runner_pid": 2,
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "-json",
+      "./...",
+      "-timeout=60m",
+      "-count=1",
+      "-coverprofile=/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.cover"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.json",
+    "go_pid": 5,
+    "session_id": 45678,
+    "scope_warning": "Checkpoint includes scalar breakpoint/leaving/pivot/LU advancement, entering/iteration, core tableau operations, primal tableau cost/value/basis exchange and reduced-cost initialization through eb5c10f5. Actual session45678 verified live; completion and coverage not yet credited."
   }
 }
