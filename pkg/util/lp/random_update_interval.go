@@ -345,8 +345,20 @@ func (c *LARCoreSolver) FindRandomShiftInterval(j uint32) (r *RandomUpdateInterv
 	if err != nil {
 		return r, err
 	}
+	if err = r.findForColumn(c, j); err != nil {
+		return r, err
+	}
+	if err = r.column.Close(); err != nil {
+		return r, err
+	}
+	r.column = nil
+	return r, nil
+}
+
+// findForColumn retains the same live iterator for the subsequent model shift.
+func (r *RandomUpdateInterval) findForColumn(c *LARCoreSolver, j uint32) (err error) {
 	if uint64(j) >= uint64(len(c.Bounds.Types.values)) || uint64(j) >= uint64(len(c.RX.Data)) {
-		return r, ErrBounds
+		return ErrBounds
 	}
 	switch c.Bounds.Types.values[j] {
 	case ColumnFree:
@@ -354,60 +366,56 @@ func (c *LARCoreSolver) FindRandomShiftInterval(j uint32) (r *RandomUpdateInterv
 		typ := c.Bounds.Types.values[j]
 		if typ != ColumnUpperBound {
 			if uint64(j) >= uint64(len(c.Bounds.Low.values)) {
-				return r, ErrBounds
+				return ErrBounds
 			}
 			if err = r.SetLowBound(&c.Bounds.Low.values[j]); err != nil {
-				return r, err
+				return err
 			}
 		}
 		if typ != ColumnLowBound {
 			if uint64(j) >= uint64(len(c.Bounds.Upper.values)) {
-				return r, ErrBounds
+				return ErrBounds
 			}
 			if err = r.SetUpperBound(&c.Bounds.Upper.values[j]); err != nil {
-				return r, err
+				return err
 			}
 		}
 	default:
 		if sourceDebugEnabled {
-			return r, ErrAssertion
+			return ErrAssertion
 		}
 	}
 	r.coefficient = NewIndexedRationalVector(c.manager, 1)
 	if err = r.column.Reset(); err != nil {
-		return r, err
+		return err
 	}
 	for {
 		i, ok, e := r.column.Next(&r.coefficient.Data[0])
 		if e != nil {
-			return r, e
+			return e
 		}
 		if !ok {
 			break
 		}
 		if uint64(i) >= uint64(len(c.RBasis)) {
-			return r, ErrBounds
+			return ErrBounds
 		}
 		if err = r.DiminishForBasic(c, &c.RX.Data[j], c.RBasis[i], &r.coefficient.Data[0]); err != nil {
-			return r, err
+			return err
 		}
 		empty, e := r.IsEmpty()
 		if e != nil {
-			return r, e
+			return e
 		}
 		if empty {
 			break
 		}
 	}
-	if err = r.column.Close(); err != nil {
-		return r, err
-	}
-	r.column = nil
 	if err = r.coefficient.Close(); err != nil {
-		return r, err
+		return err
 	}
 	r.coefficient = nil
-	return r, nil
+	return nil
 }
 
 // Draw preserves get_random_from_interval's one RNG read and 100000-point

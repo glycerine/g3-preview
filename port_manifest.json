@@ -121189,7 +121189,9 @@
         "pkg/util/lp/lar_propagate.go",
         "pkg/util/lp/lar_propagate_test.go",
         "pkg/util/lp/lar_conflict_certificate.go",
-        "pkg/util/lp/lar_conflict_certificate_test.go"
+        "pkg/util/lp/lar_conflict_certificate_test.go",
+        "pkg/util/lp/random_updater.go",
+        "pkg/util/lp/random_updater_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -121318,7 +121320,17 @@
         "TestLARConflictCertificatePreservesOlderComparison",
         "TestLARConflictCertificateEntryGuards",
         "TestLARConflictCertificateWitnessSelectionAndEmpty",
-        "TestLARConflictCertificateAssertionPrefixes"
+        "TestLARConflictCertificateAssertionPrefixes",
+        "TestLARRandomUpdaterFreeIndependentTrace",
+        "TestLARRandomUpdaterActualSolveFeasibility",
+        "TestLARRandomUpdaterBasicExpansionAndValueCounts",
+        "TestLARRandomUpdaterSourceCutoffAndEmpty",
+        "TestLARRandomUpdaterTermExpansion",
+        "TestLARRandomUpdaterPhysicalOwnership",
+        "TestLARRandomUpdaterIndependentBoundedShifts",
+        "TestLARRandomUpdaterReachedGuardsAndPrefixes",
+        "TestLARRandomUpdaterPreservesOlderComparison",
+        "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
       ],
       "conditionals": [
         {
@@ -121995,6 +122007,23 @@
             "TestLARConflictCertificateWitnessSelectionAndEmpty",
             "TestLARConflictCertificateAssertionPrefixes"
           ]
+        },
+        {
+          "name": "fill_var_set_for_random_update and random_update through actual concrete core updater (1363-1381)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/random_updater.go",
+          "tests": [
+            "TestLARRandomUpdaterFreeIndependentTrace",
+            "TestLARRandomUpdaterActualSolveFeasibility",
+            "TestLARRandomUpdaterBasicExpansionAndValueCounts",
+            "TestLARRandomUpdaterSourceCutoffAndEmpty",
+            "TestLARRandomUpdaterTermExpansion",
+            "TestLARRandomUpdaterPhysicalOwnership",
+            "TestLARRandomUpdaterIndependentBoundedShifts",
+            "TestLARRandomUpdaterReachedGuardsAndPrefixes",
+            "TestLARRandomUpdaterPreservesOlderComparison",
+            "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
+          ]
         }
       ],
       "ownership": [
@@ -122016,7 +122045,8 @@
         "Constraint validation retains its actual lexical model and coefficient/value owners on error; model assignment borrowers close before solver rational work. Writer failure retains the reached coefficient/value prefix until Close.",
         "Outer solve does not wrap child arithmetic in parent capture; actual LU/core/changed-bound/model owners retain reached failures and borrowed lexical values. Status publishes before debug validation; changed-column clearing follows propagation only on an ordinary return.",
         "Touched-row scheduling introduces no arithmetic capture; iterator/analyzer/propagator and hook/provider owners retain their own errors. Cancellation retains all row marks and completed bounds for replay; Close cleans the source lexical row owners without destroying the borrowed propagator.",
-        "Conflict extraction appends through the output vector owner, which must close before solver locals on a failed external append. Internal evidence closes first; coefficient export closes before the coefficient map; interrupted constraint FreeCoefficient/output copies retain lexical arithmetic values through cleanup. The debug result rational outlives pending final copy receipts. Direct arithmetic alone uses parent capture; child vector/map/constraint owners and older caller comparison state remain separate."
+        "Conflict extraction appends through the output vector owner, which must close before solver locals on a failed external append. Internal evidence closes first; coefficient export closes before the coefficient map; interrupted constraint FreeCoefficient/output copies retain lexical arithmetic values through cleanup. The debug result rational outlives pending final copy receipts. Direct arithmetic alone uses parent capture; child vector/map/constraint owners and older caller comparison state remain separate.",
+        "Updater owns copied hash keys, partial sampled outputs, old/new/delta/product pairs and column coefficient scratch. Close cleans parent raw calls then interval/iterator child receipts before borrowed output locals, and destroys keys/locals before the borrowed core. Output-to-model copies belong to updater receipts, not RX vector receipts; partial solver RandomUpdate retains the updater and closes it before Core. Child interval Draw, column iterator and primal validators keep their own receipts; old caller comparisons are not adopted."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",
@@ -129841,7 +129871,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/random_update_interval.go",
-        "pkg/util/lp/random_update_interval_test.go"
+        "pkg/util/lp/random_update_interval_test.go",
+        "pkg/util/lp/random_updater.go",
+        "pkg/util/lp/random_updater_test.go"
       ],
       "tests": [
         "TestLARRandomIntervalBoundIntersection",
@@ -129851,7 +129883,17 @@
         "TestLARRandomIntervalPhysicalOwnership",
         "TestLARRandomIntervalReachedGuards",
         "TestLARRandomIntervalEmptyStopsBeforeLaterColumn",
-        "TestLARRandomIntervalPreservesOlderComparison"
+        "TestLARRandomIntervalPreservesOlderComparison",
+        "TestLARRandomUpdaterFreeIndependentTrace",
+        "TestLARRandomUpdaterActualSolveFeasibility",
+        "TestLARRandomUpdaterBasicExpansionAndValueCounts",
+        "TestLARRandomUpdaterSourceCutoffAndEmpty",
+        "TestLARRandomUpdaterTermExpansion",
+        "TestLARRandomUpdaterPhysicalOwnership",
+        "TestLARRandomUpdaterIndependentBoundedShifts",
+        "TestLARRandomUpdaterReachedGuardsAndPrefixes",
+        "TestLARRandomUpdaterPreservesOlderComparison",
+        "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -129872,17 +129914,29 @@
           ]
         },
         {
-          "name": "constructor, value occurrence counting, model shifts and update traversal; whole random_update integration",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "name": "random_updater concrete constructor, occurrence-map add/remove, basic expansion, sorted update, cutoff/empty dispatch and exact model/basic shifts",
+          "status": "ported",
+          "go_target": "pkg/util/lp/random_updater.go",
+          "tests": [
+            "TestLARRandomUpdaterFreeIndependentTrace",
+            "TestLARRandomUpdaterActualSolveFeasibility",
+            "TestLARRandomUpdaterBasicExpansionAndValueCounts",
+            "TestLARRandomUpdaterSourceCutoffAndEmpty",
+            "TestLARRandomUpdaterTermExpansion",
+            "TestLARRandomUpdaterPhysicalOwnership",
+            "TestLARRandomUpdaterIndependentBoundedShifts",
+            "TestLARRandomUpdaterReachedGuardsAndPrefixes",
+            "TestLARRandomUpdaterPreservesOlderComparison",
+            "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
+          ]
         }
       ],
       "ownership": [
-        "Explicit interval owner retains exact endpoints, arithmetic locals, iterator output and direct-manager receipts through numerical failures. Close clears parent raw calls then iterator receipts before their coefficient output and interval locals; borrowed core/model/bounds and caller output outlive interval cleanup. Older caller comparison state is not adopted."
+        "Explicit interval owner retains exact endpoints, arithmetic locals, iterator output and direct-manager receipts through numerical failures. Close clears parent raw calls then iterator receipts before their coefficient output and interval locals; borrowed core/model/bounds and caller output outlive interval cleanup. Older caller comparison state is not adopted.",
+        "Updater owns copied hash keys, partial sampled outputs, old/new/delta/product pairs and column coefficient scratch. Close cleans parent raw calls then interval/iterator child receipts before borrowed output locals, and destroys keys/locals before the borrowed core. Output-to-model copies belong to updater receipts, not RX vector receipts; partial solver RandomUpdate retains the updater and closes it before Core. Child interval Draw, column iterator and primal validators keep their own receipts; old caller comparisons are not adopted."
       ],
       "deviations": [
-        "Native concrete Go endpoint ownership and typed guards replace raw C++ interval/result lifetime. Source equal/reversed interval behavior and RNG consumption are preserved; unused string diagnostics are not translated. Complete updater and upstream driver remain open."
+        "Native concrete Go endpoint ownership and typed guards replace raw C++ interval/result lifetime. Source equal/reversed interval behavior and RNG consumption are preserved; unused string diagnostics are not translated. Concrete updater and outer RandomUpdate are implemented; whole-source audits and complete upstream randomize/MPS drivers remain open."
       ]
     },
     {
@@ -129892,7 +129946,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/random_update_interval.go",
-        "pkg/util/lp/random_update_interval_test.go"
+        "pkg/util/lp/random_update_interval_test.go",
+        "pkg/util/lp/random_updater.go",
+        "pkg/util/lp/random_updater_test.go"
       ],
       "tests": [
         "TestLARRandomIntervalBoundIntersection",
@@ -129902,7 +129958,17 @@
         "TestLARRandomIntervalPhysicalOwnership",
         "TestLARRandomIntervalReachedGuards",
         "TestLARRandomIntervalEmptyStopsBeforeLaterColumn",
-        "TestLARRandomIntervalPreservesOlderComparison"
+        "TestLARRandomIntervalPreservesOlderComparison",
+        "TestLARRandomUpdaterFreeIndependentTrace",
+        "TestLARRandomUpdaterActualSolveFeasibility",
+        "TestLARRandomUpdaterBasicExpansionAndValueCounts",
+        "TestLARRandomUpdaterSourceCutoffAndEmpty",
+        "TestLARRandomUpdaterTermExpansion",
+        "TestLARRandomUpdaterPhysicalOwnership",
+        "TestLARRandomUpdaterIndependentBoundedShifts",
+        "TestLARRandomUpdaterReachedGuardsAndPrefixes",
+        "TestLARRandomUpdaterPreservesOlderComparison",
+        "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
       ],
       "assertions": [
         {
@@ -129997,30 +130063,76 @@
           ]
         },
         {
-          "name": "constructor, value occurrence counting, model shifts and update traversal; whole random_update integration",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "name": "random_updater concrete constructor, occurrence-map add/remove, basic expansion, sorted update, cutoff/empty dispatch and exact model/basic shifts",
+          "status": "ported",
+          "go_target": "pkg/util/lp/random_updater.go",
+          "tests": [
+            "TestLARRandomUpdaterFreeIndependentTrace",
+            "TestLARRandomUpdaterActualSolveFeasibility",
+            "TestLARRandomUpdaterBasicExpansionAndValueCounts",
+            "TestLARRandomUpdaterSourceCutoffAndEmpty",
+            "TestLARRandomUpdaterTermExpansion",
+            "TestLARRandomUpdaterPhysicalOwnership",
+            "TestLARRandomUpdaterIndependentBoundedShifts",
+            "TestLARRandomUpdaterReachedGuardsAndPrefixes",
+            "TestLARRandomUpdaterPreservesOlderComparison",
+            "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
+          ]
         }
       ],
       "ownership": [
-        "Explicit interval owner retains exact endpoints, arithmetic locals, iterator output and direct-manager receipts through numerical failures. Close clears parent raw calls then iterator receipts before their coefficient output and interval locals; borrowed core/model/bounds and caller output outlive interval cleanup. Older caller comparison state is not adopted."
+        "Explicit interval owner retains exact endpoints, arithmetic locals, iterator output and direct-manager receipts through numerical failures. Close clears parent raw calls then iterator receipts before their coefficient output and interval locals; borrowed core/model/bounds and caller output outlive interval cleanup. Older caller comparison state is not adopted.",
+        "Updater owns copied hash keys, partial sampled outputs, old/new/delta/product pairs and column coefficient scratch. Close cleans parent raw calls then interval/iterator child receipts before borrowed output locals, and destroys keys/locals before the borrowed core. Output-to-model copies belong to updater receipts, not RX vector receipts; partial solver RandomUpdate retains the updater and closes it before Core. Child interval Draw, column iterator and primal validators keep their own receipts; old caller comparisons are not adopted."
       ],
       "deviations": [
-        "Native concrete Go endpoint ownership and typed guards replace raw C++ interval/result lifetime. Source equal/reversed interval behavior and RNG consumption are preserved; unused string diagnostics are not translated. Complete updater and upstream driver remain open."
+        "Native concrete Go endpoint ownership and typed guards replace raw C++ interval/result lifetime. Source equal/reversed interval behavior and RNG consumption are preserved; unused string diagnostics are not translated. Concrete updater and outer RandomUpdate are implemented; whole-source audits and complete upstream randomize/MPS drivers remain open."
       ]
     },
     {
       "path": "src/util/lp/random_updater_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/random_updater.go",
+        "pkg/util/lp/random_updater_test.go"
+      ],
+      "tests": [
+        "TestLARRandomUpdaterFreeIndependentTrace",
+        "TestLARRandomUpdaterActualSolveFeasibility",
+        "TestLARRandomUpdaterBasicExpansionAndValueCounts",
+        "TestLARRandomUpdaterSourceCutoffAndEmpty",
+        "TestLARRandomUpdaterTermExpansion",
+        "TestLARRandomUpdaterPhysicalOwnership",
+        "TestLARRandomUpdaterIndependentBoundedShifts",
+        "TestLARRandomUpdaterReachedGuardsAndPrefixes",
+        "TestLARRandomUpdaterPreservesOlderComparison",
+        "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "retained concrete mpq/numeric_pair random_updater implementation inclusion",
+          "status": "ported",
+          "go_target": "pkg/util/lp/random_updater.go",
+          "tests": [
+            "TestLARRandomUpdaterFreeIndependentTrace",
+            "TestLARRandomUpdaterActualSolveFeasibility",
+            "TestLARRandomUpdaterBasicExpansionAndValueCounts",
+            "TestLARRandomUpdaterSourceCutoffAndEmpty",
+            "TestLARRandomUpdaterTermExpansion",
+            "TestLARRandomUpdaterPhysicalOwnership",
+            "TestLARRandomUpdaterIndependentBoundedShifts",
+            "TestLARRandomUpdaterReachedGuardsAndPrefixes",
+            "TestLARRandomUpdaterPreservesOlderComparison",
+            "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
+          ]
+        }
+      ],
+      "ownership": [
+        "Updater owns copied hash keys, partial sampled outputs, old/new/delta/product pairs and column coefficient scratch. Close cleans parent raw calls then interval/iterator child receipts before borrowed output locals, and destroys keys/locals before the borrowed core. Output-to-model copies belong to updater receipts, not RX vector receipts; partial solver RandomUpdate retains the updater and closes it before Core. Child interval Draw, column iterator and primal validators keep their own receipts; old caller comparisons are not adopted."
+      ],
       "deviations": []
     },
     {

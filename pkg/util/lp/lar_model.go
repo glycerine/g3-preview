@@ -39,6 +39,7 @@ type LARSolver struct {
 	explanationCoefficients                            *LARRationalModel
 	validationExplanation                              *SparseRationalVector
 	certificateResult                                  *numeral.Rational
+	randomUpdater                                      *RandomUpdater
 	calls                                              exactEtaCalls
 	manager                                            *numeral.RationalManager
 	stopped                                            bool
@@ -62,7 +63,7 @@ func NewLARSolver(m *numeral.RationalManager) (solver *LARSolver, err error) {
 	return solver, err
 }
 func (s *LARSolver) ready() error {
-	if s.stopped || s.Core == nil || s.Core.stopped || s.pendingCleanupDelta != nil || s.pendingConstraint != nil || s.pendingTerm != nil || s.pendingIterator != nil || s.pendingRowIterator != nil || s.pendingRowAnalyzer != nil || s.work != nil || s.rationalWork != nil || s.modelPairs != nil || s.modelSingles != nil || s.validationCoefficients != nil || s.explanationCoefficients != nil || s.certificateResult != nil || s.calls.pending() {
+	if s.stopped || s.Core == nil || s.Core.stopped || s.pendingCleanupDelta != nil || s.pendingConstraint != nil || s.pendingTerm != nil || s.pendingIterator != nil || s.pendingRowIterator != nil || s.pendingRowAnalyzer != nil || s.work != nil || s.rationalWork != nil || s.modelPairs != nil || s.modelSingles != nil || s.validationCoefficients != nil || s.explanationCoefficients != nil || s.certificateResult != nil || s.randomUpdater != nil || s.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return nil
@@ -241,6 +242,12 @@ func (s *LARSolver) NewBoundPropagator() *LARBoundPropagator {
 func (s *LARSolver) Close() error {
 	if err := s.calls.cleanupRaw(s.manager); err != nil {
 		return err
+	}
+	if s.randomUpdater != nil {
+		if err := s.randomUpdater.Close(); err != nil {
+			return err
+		}
+		s.randomUpdater = nil
 	}
 	if err := s.closeRowAnalysis(); err != nil {
 		return err

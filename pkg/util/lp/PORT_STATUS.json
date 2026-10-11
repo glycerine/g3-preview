@@ -7,7 +7,7 @@
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
     "remaining retained LU diagnostics and full solver/priority-queue lifecycle integration",
-    "precise scaling early return, exact LP preparation, full primal/dual/LAR scaling integration and random updates",
+    "precise scaling early return, exact LP preparation, full primal/dual/LAR scaling integration; whole random-update source/driver audit",
     "remaining primal constructors/diagnostics/validators, exact outer preparation, exact dual/LAR optimization, MPS source driver integration and complete upstream drivers",
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining quick_xplain/proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "exact MPS input, exact/LAR construction and complete upstream test-driver scenarios",
@@ -962,7 +962,9 @@
         "pkg/util/lp/lar_propagate.go",
         "pkg/util/lp/lar_propagate_test.go",
         "pkg/util/lp/lar_conflict_certificate.go",
-        "pkg/util/lp/lar_conflict_certificate_test.go"
+        "pkg/util/lp/lar_conflict_certificate_test.go",
+        "pkg/util/lp/random_updater.go",
+        "pkg/util/lp/random_updater_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -1091,7 +1093,17 @@
         "TestLARConflictCertificatePreservesOlderComparison",
         "TestLARConflictCertificateEntryGuards",
         "TestLARConflictCertificateWitnessSelectionAndEmpty",
-        "TestLARConflictCertificateAssertionPrefixes"
+        "TestLARConflictCertificateAssertionPrefixes",
+        "TestLARRandomUpdaterFreeIndependentTrace",
+        "TestLARRandomUpdaterActualSolveFeasibility",
+        "TestLARRandomUpdaterBasicExpansionAndValueCounts",
+        "TestLARRandomUpdaterSourceCutoffAndEmpty",
+        "TestLARRandomUpdaterTermExpansion",
+        "TestLARRandomUpdaterPhysicalOwnership",
+        "TestLARRandomUpdaterIndependentBoundedShifts",
+        "TestLARRandomUpdaterReachedGuardsAndPrefixes",
+        "TestLARRandomUpdaterPreservesOlderComparison",
+        "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
       ]
     },
     {
@@ -3187,7 +3199,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/random_update_interval.go",
-        "pkg/util/lp/random_update_interval_test.go"
+        "pkg/util/lp/random_update_interval_test.go",
+        "pkg/util/lp/random_updater.go",
+        "pkg/util/lp/random_updater_test.go"
       ],
       "tests": [
         "TestLARRandomIntervalBoundIntersection",
@@ -3197,7 +3211,17 @@
         "TestLARRandomIntervalPhysicalOwnership",
         "TestLARRandomIntervalReachedGuards",
         "TestLARRandomIntervalEmptyStopsBeforeLaterColumn",
-        "TestLARRandomIntervalPreservesOlderComparison"
+        "TestLARRandomIntervalPreservesOlderComparison",
+        "TestLARRandomUpdaterFreeIndependentTrace",
+        "TestLARRandomUpdaterActualSolveFeasibility",
+        "TestLARRandomUpdaterBasicExpansionAndValueCounts",
+        "TestLARRandomUpdaterSourceCutoffAndEmpty",
+        "TestLARRandomUpdaterTermExpansion",
+        "TestLARRandomUpdaterPhysicalOwnership",
+        "TestLARRandomUpdaterIndependentBoundedShifts",
+        "TestLARRandomUpdaterReachedGuardsAndPrefixes",
+        "TestLARRandomUpdaterPreservesOlderComparison",
+        "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
       ]
     },
     {
@@ -3205,7 +3229,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/random_update_interval.go",
-        "pkg/util/lp/random_update_interval_test.go"
+        "pkg/util/lp/random_update_interval_test.go",
+        "pkg/util/lp/random_updater.go",
+        "pkg/util/lp/random_updater_test.go"
       ],
       "tests": [
         "TestLARRandomIntervalBoundIntersection",
@@ -3215,14 +3241,38 @@
         "TestLARRandomIntervalPhysicalOwnership",
         "TestLARRandomIntervalReachedGuards",
         "TestLARRandomIntervalEmptyStopsBeforeLaterColumn",
-        "TestLARRandomIntervalPreservesOlderComparison"
+        "TestLARRandomIntervalPreservesOlderComparison",
+        "TestLARRandomUpdaterFreeIndependentTrace",
+        "TestLARRandomUpdaterActualSolveFeasibility",
+        "TestLARRandomUpdaterBasicExpansionAndValueCounts",
+        "TestLARRandomUpdaterSourceCutoffAndEmpty",
+        "TestLARRandomUpdaterTermExpansion",
+        "TestLARRandomUpdaterPhysicalOwnership",
+        "TestLARRandomUpdaterIndependentBoundedShifts",
+        "TestLARRandomUpdaterReachedGuardsAndPrefixes",
+        "TestLARRandomUpdaterPreservesOlderComparison",
+        "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
       ]
     },
     {
       "source": "src/util/lp/random_updater_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/random_updater.go",
+        "pkg/util/lp/random_updater_test.go"
+      ],
+      "tests": [
+        "TestLARRandomUpdaterFreeIndependentTrace",
+        "TestLARRandomUpdaterActualSolveFeasibility",
+        "TestLARRandomUpdaterBasicExpansionAndValueCounts",
+        "TestLARRandomUpdaterSourceCutoffAndEmpty",
+        "TestLARRandomUpdaterTermExpansion",
+        "TestLARRandomUpdaterPhysicalOwnership",
+        "TestLARRandomUpdaterIndependentBoundedShifts",
+        "TestLARRandomUpdaterReachedGuardsAndPrefixes",
+        "TestLARRandomUpdaterPreservesOlderComparison",
+        "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
+      ]
     },
     {
       "source": "src/util/lp/row_eta_matrix.h",
@@ -4100,8 +4150,8 @@
     }
   ],
   "status_counts": {
-    "unported": 23,
-    "partial": 87
+    "unported": 22,
+    "partial": 88
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -4549,6 +4599,66 @@
     "regression_seconds": {
       "native": 79.328,
       "debug_checked": 112.24
+    }
+  },
+  "latest_random_updater_increment": {
+    "sources": [
+      "src/util/lp/random_updater.h",
+      "src/util/lp/random_updater.hpp:28-35,130-151,166-225",
+      "src/util/lp/random_updater_instances.cpp",
+      "src/util/lp/lar_solver.h:1363-1381"
+    ],
+    "retained_consumers": [
+      "src/smt/theory_lra.cpp:1089",
+      "src/test/lp.cpp:2472"
+    ],
+    "go_target": "pkg/util/lp/random_updater.go",
+    "tests": [
+      "TestLARRandomUpdaterFreeIndependentTrace",
+      "TestLARRandomUpdaterActualSolveFeasibility",
+      "TestLARRandomUpdaterBasicExpansionAndValueCounts",
+      "TestLARRandomUpdaterSourceCutoffAndEmpty",
+      "TestLARRandomUpdaterTermExpansion",
+      "TestLARRandomUpdaterPhysicalOwnership",
+      "TestLARRandomUpdaterIndependentBoundedShifts",
+      "TestLARRandomUpdaterReachedGuardsAndPrefixes",
+      "TestLARRandomUpdaterPreservesOlderComparison",
+      "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
+    ],
+    "native_statements": {
+      "covered": 212,
+      "total": 274,
+      "percent": 77.4
+    },
+    "debug_checked_statements": {
+      "covered": 236,
+      "total": 274,
+      "percent": 86.1
+    },
+    "refactored_interval_statements": {
+      "native": {
+        "covered": 247,
+        "total": 303,
+        "percent": 81.5
+      },
+      "debug_checked": {
+        "covered": 265,
+        "total": 303,
+        "percent": 87.5
+      }
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-random-updater-native.cover",
+      "/mnt/oldrog/tmp/g3-random-updater-debug.cover"
+    ],
+    "focused_seconds": {
+      "native": 3.826,
+      "debug_checked": 5.998
+    },
+    "evidence": "Random-updater constructor, value occurrence counting, exact model shifts and ascending nonbasic traversal now implement random_updater.hpp:28-35,130-151,166-225 and lar_solver.h:1363-1381, retained by theory_lra.cpp:1089 and the lp.cpp:2472 randomize option. Native uint32 sets, sorted columns and concrete rational-pair hash buckets replace STL containers; owning copied keys resolve equality within a bucket. Basic requests expand the actual matrix row. Duplicate requests add value occurrences even when their column is already in the set. A dedicated four-column test preserves the resulting source early stop: stale zero count can make dictionary cardinality reach four while two actual model values still coincide. One actual tableau/LU column iterator survives interval construction and shift replay; columns with at least50 entries and empty intervals consume no RNG. Source order copies old X, removes its occurrence, samples, assigns model X, copies/records the new value, then updates actual basic values by a*delta and runs debug feasibility/residual checks.120 independent free-variable traces check sorted RNG/occurrence state;180 bounded systems across both tableau strategies and nonunit LU independently check sampled rational/epsilon values, clipped basic feasibility, matrix equations and exact early-stop RNG count.180 actual complete feasible solves, including strict constraints, run outer RandomUpdate, independently validate bounds and A*x=b, then extract/check a rational model against original constraints. Basic expansion, term duplicates, cutoff/empty profiles, unsigned count wrap, source failure prefixes and real residual diagnostics are covered. Sixteen pooled/direct physical refusal campaigns through success cover constructor copies through basic expansion, free/bounded shifts, growing destination numerals, actual tableau/LU basic updates and outer solver cleanup. Pooled paths may reuse warm storage; direct campaigns require refusal. An actual older caller comparison survives updater/core cleanup without adoption. New file212/274 statements (77.4%) native and236/274 (86.1%) debug/checked; refactored interval file247/303 (81.5%) native and265/303 (87.5%) debug/checked. Remaining blocks chiefly guard stable exact hash/equality, capture/cleanup and unchanged metadata; native additionally erases source validators. Focused native/debug3.826s/5.998s pass. Complete upstream randomize/MPS drivers, source audits and remaining optimization/scaling work remain open. Inventory is88 partial/22 unported after the concrete instance unit gains implementation/test targets; no whole-source promotion. Full native60516955 checkpoint predates this increment and remains separate evidence. Related full-solve/certificate/basic-delta/LU-extension/scopes/iterator regressions88.949s native/164.288s debug/checked pass. Both LP vets, native/debug module compilation, portcheck, dependency graph refresh and diff checks pass.",
+    "regression_seconds": {
+      "native": 88.949,
+      "debug_checked": 164.288
     }
   }
 }
