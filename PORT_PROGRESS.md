@@ -38517,3 +38517,39 @@ Focused native8.524s/debug14.513s; new file102/120 (85.0%) native,106/120 (88.3%
 ## Live hourly native tableau checkpoint
 
 At06:40UTC October11 started full native module checks at16f0b947: go -C pkg test ./... -timeout=60m -count=1 -coverprofile=/mnt/oldrog/tmp/g3-tableau-leaving-module-native.cover. Log: /mnt/oldrog/tmp/g3-tableau-leaving-module-native.log. Actual session64684 was polled and remained live after launch. No result/coverage is credited yet; resume by polling this exact handle. Compiled scope includes statistics, tableau reduced-cost initialization, pricing, value/basis updates, advancement and leaving selection. The last completed full native checkpoint remains the observed05:59UTC run. LP remains84 partial/26 unported source units.
+
+## Exact tableau entering and iteration dispatch
+
+Ported advance_on_entering_tableau and one_iteration_tableau from
+lp_primal_core_solver_tableau.h:23-41. The entering step is owned before the
+actual stored-column leaving scan, survives stopped child borrows, and is
+released after success. Unbounded status is published on no leaving column.
+OneIterationTableau delegates to actual tableau pricing, status selection and
+advancement, then invokes the already-ported descending InfSetIsCorrect in
+debug builds. TotalIterations remains owned by the outer Solve loop.
+
+Verification:320 independent exact-rational/epsilon entering models cover
+pivots, zero steps, bound flips, unboundedness, actual candidate RNG and
+feasibility-only returns.120 independent homogeneous capacity problems encode
+the constant with a fixed companion column and prove the maximum entering
+value, followed by three stable terminal iterations each. Nine dispatch/error
+profiles check pricing, reached advancement, stopped/local ownership, statuses
+and debug membership diagnostics/errors. Six pooled/direct physical campaigns
+check pivot/flip/unbounded cleanup; actual older caller comparisons remain
+owned through entering, iteration and destruction. Reused validator tests cover
+descending first-mismatch output, all-column membership and physical refusals.
+These homogeneous models do not resolve the recorded nonpivot-RHS limitation.
+
+Related tableau and validator regressions pass native102.833s/debug132.757s.
+New production file coverage31/37 (83.8%) native and36/37 (97.3%) debug;
+native excludes debug validation statements. Remaining debug gap is the
+local-step Close error return. Both LP vets, native/debug module compilation
+and portcheck pass. Profiles: /mnt/oldrog/tmp/g3-tableau-enter-{native,debug}.cover.
+Coverage measures implemented Go statements, not C++ completion. No whole-unit
+promotion: LP remains84 partial/26 unported. Tableau initialization, row-mode
+orchestration and Solve remain incomplete.
+
+The full native module session64684, started06:40UTC at16f0b947, was actually
+polled again during this increment and remained live. No terminal result is
+credited. Its compiled scope predates this entering/iteration change; the last
+observed completed full-module checkpoint remains05:59UTC.

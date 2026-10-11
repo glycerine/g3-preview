@@ -125424,7 +125424,9 @@
         "pkg/util/lp/primal_advance_tableau_exact_test.go",
         "pkg/util/lp/primal_core_exact.go",
         "pkg/util/lp/primal_leaving_tableau_exact.go",
-        "pkg/util/lp/primal_leaving_tableau_exact_test.go"
+        "pkg/util/lp/primal_leaving_tableau_exact_test.go",
+        "pkg/util/lp/primal_enter_tableau_exact.go",
+        "pkg/util/lp/primal_enter_tableau_exact_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -125463,7 +125465,13 @@
         "TestLPExactTableauLeavingPreservesOlderComparisonOwner",
         "TestLPExactTableauLeavingLiveBasisAliases",
         "TestLPExactTableauLeavingEnteringAliasNegativeFlip",
-        "TestLPExactTableauLeavingReachedPrefixes"
+        "TestLPExactTableauLeavingReachedPrefixes",
+        "TestLPExactTableauEnterIndependentModels",
+        "TestLPExactTableauIterationIndependentOptima",
+        "TestLPExactTableauIterationDispatchAndStops",
+        "TestLPExactTableauEnterPhysicalOwnership",
+        "TestLPExactTableauEnterRejectedIndexOwnsLocal",
+        "TestLPExactTableauEnterPreservesOlderComparison"
       ],
       "assertions": [
         {
@@ -125648,6 +125656,19 @@
             "TestLPExactTableauLeavingEnteringAliasNegativeFlip",
             "TestLPExactTableauLeavingReachedPrefixes"
           ]
+        },
+        {
+          "name": "advance_on_entering_tableau and one_iteration_tableau source23-41: owned step through leaving/advancement, unbounded publication, actual pricing/status dispatch and debug infeasibility-set validation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_enter_tableau_exact.go",
+          "tests": [
+            "TestLPExactTableauEnterIndependentModels",
+            "TestLPExactTableauIterationIndependentOptima",
+            "TestLPExactTableauIterationDispatchAndStops",
+            "TestLPExactTableauEnterPhysicalOwnership",
+            "TestLPExactTableauEnterRejectedIndexOwnsLocal",
+            "TestLPExactTableauEnterPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -125658,7 +125679,8 @@
         "Exact tableau pricing consumes source search-budget RNG before zero-budget early return and uses actual stored sparse column lengths independently of cached LU ColumnsNZ. Native Go sorting and slice rotation replace STL storage.320 independent scan/direction/RNG models, reached sort/bounds prefixes, six physical refusal campaigns and three older-comparison owners pass native/debug. Full tableau Solve remains open.",
         "Tableau value arithmetic captures end before actual delegated feasibility/cost maintenance. Delta aliases reread after each full expression. Pivot bool is intentionally ignored before ChangeBasis as in source. Source normalizes pivot RHS but omits nonpivot RHS elimination: x0+2*x2=6,x1+3*x2=10 at X=(4,7,1), entering2 delta1 gives X=(2,4,2), stored B=(3,10), transformed second row dot1. Dedicated independent regression preserves and distinguishes this limitation. Whole tableau source remains partial.",
         "Tableau bound-flip full-expression pair remains owned through primal child updates and is excluded from child ready checks; owning advancement entry rejects an existing local. Close destroys child numerical receipts/scratch before this borrowed argument. Source status, early-return and zero/nonzero counter/list order retained.320 independent bound-flip models,120 pivot models,16 pooled/direct physical campaigns, aliases, cost restoration, reached guards and older comparison owners. Source nonzero-RHS debug stop and zero-pivot one-pass cost-switch recheck are preserved, not repaired. Whole tableau solver remains partial.",
-        "Exact tableau leaving selection uses stored matrix coefficients and row lengths, not LU Ed/RowsNZ or circular random starts. Scalar -coefficient*direction expression and by-value multiplier remain separately owned through basis limiting; ratio local survives stopped bounds/comparisons.720 independent feasible/infeasible models, aliases, actual sparse metadata prefixes, twelve pooled/direct physical campaigns and older comparison cleanup. Invalid empty-candidate modulo is a typed guard. Full tableau solver remains partial."
+        "Exact tableau leaving selection uses stored matrix coefficients and row lengths, not LU Ed/RowsNZ or circular random starts. Scalar -coefficient*direction expression and by-value multiplier remain separately owned through basis limiting; ratio local survives stopped bounds/comparisons.720 independent feasible/infeasible models, aliases, actual sparse metadata prefixes, twelve pooled/direct physical campaigns and older comparison cleanup. Invalid empty-candidate modulo is a typed guard. Full tableau solver remains partial.",
+        "Exact tableau entering uses an owned typed pair vector for the source automatic step; stopped children retain this borrowed local until Close destroys children first. OneIterationTableau reuses the existing source InfSetIsCorrect validator; TotalIterations belongs to outer Solve. Independent 320 entering models and120 bounded maximization models, repeated terminal iterations, reached child errors, pooled/direct failure campaigns and real older caller comparisons. Whole tableau initialization/Solve and source unit remain incomplete."
       ]
     },
     {
