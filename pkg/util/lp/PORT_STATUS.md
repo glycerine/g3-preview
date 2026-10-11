@@ -12,6 +12,8 @@ Exact outer preparation, remaining dual/LAR variants, source diagnostics and
 complete upstream drivers remain incomplete. Go coverage does not measure
 unported C++ code.
 
+Full native module checkpoint started2026-10-11 at08:42:55UTC at555046ae with -timeout=60m; session25819. Log/profile: `/mnt/oldrog/tmp/g3-lar-catchup-module-native.{log,cover}`; durable runner status: `/mnt/oldrog/tmp/g3-lar-catchup-module-native.json`. Includes LAR explanations, exact feasibility, signatures, strict/double bounds, floating signature search and LU catch-up. Completion has not yet been observed; the earlier08:04UTC checkpoint remains the latest complete full-suite evidence.
+
 Latest full native module checkpoint was observed complete at08:04UTC on
 October11 with exit0 and all64packages passing: LP1137.344s,87.7%
 (18175/20730). Log/profile:

@@ -3911,5 +3911,25 @@
     "log": "/mnt/oldrog/tmp/g3-exact-solve-module-native.log",
     "profile": "/mnt/oldrog/tmp/g3-exact-solve-module-native.cover",
     "scope_warning": "Includes exact LU/tableau Solve and prior row iteration; predates f1171db3 LAR explanations and exact feasibility entry. Combined debug/checked scalar is an older scoped checkpoint, not a new complete debug run."
+  },
+  "active_full_native_checkpoint": {
+    "status": "running",
+    "commit": "555046ae",
+    "started_utc": "2026-10-11 08:42:55 UTC",
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "./...",
+      "-timeout=60m",
+      "-count=1",
+      "-coverprofile=/mnt/oldrog/tmp/g3-lar-catchup-module-native.cover"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-lar-catchup-module-native.log",
+    "profile": "/mnt/oldrog/tmp/g3-lar-catchup-module-native.cover",
+    "session_id": 25819,
+    "status_file": "/mnt/oldrog/tmp/g3-lar-catchup-module-native.json",
+    "scope_warning": "Started at555046ae including LAR explanations, feasibility, signatures, bound conversion, floating signature search and LU catch-up. Completion has not yet been observed; previous completed checkpoint remains authoritative."
   }
 }
