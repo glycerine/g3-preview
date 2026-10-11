@@ -17,9 +17,21 @@
   "units": [
     {
       "source": "src/util/lp/CMakeLists.txt",
-      "status": "unported",
+      "status": "platform_replacement",
       "go_targets": [],
-      "tests": []
+      "tests": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [],
+      "ownership": [
+        "Build metadata owns no runtime resource."
+      ],
+      "deviations": [
+        "Go module/import discovery and g3debug build constraints replace z3_add_component/includes. Preserve pkg/util/lp and the existing pkg split; no CMake/linker translation added.",
+        "CMake source enumeration and PYG registration are build inputs, not retained-consumer roots. Underlying algorithms and lp_params.pyg retain their independent partial audits.",
+        "Native and combined module compile gates passed after recent code changes; native full checkpoint ea1b46ec is now running. This build-file classification does not claim whole-LP completion.",
+        "Native build entry is pkg/go.mod. The manifest target field accepts Go source files only, so module/build metadata is recorded here rather than as a synthetic .go forwarding target."
+      ]
     },
     {
       "source": "src/util/lp/binary_heap_priority_queue.h",
@@ -358,9 +370,22 @@
     },
     {
       "source": "src/util/lp/dense_matrix_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "reference_only",
+      "go_targets": [
+        "pkg/util/lp/dense_matrix_float_debug.go",
+        "pkg/util/lp/matrix_float_debug.go"
+      ],
+      "tests": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [],
+      "ownership": [
+        "This reference translation unit defines no runtime object or owned resource. Implementation and lifecycle evidence belongs to its underlying source headers."
+      ],
+      "deviations": [
+        "Explicit dense-matrix instantiation declarations under Z3DEBUG only; no algorithm/object definitions. Retained concrete float debug consumers live in dense_matrix.hpp/matrix.hpp ports. Rational template declarations alone do not create live roots.",
+        "No Go template-instantiation adapter or source consumer was added merely to mirror C++ linker declarations."
+      ]
     },
     {
       "source": "src/util/lp/eta_matrix.h",
@@ -957,9 +982,21 @@
     },
     {
       "source": "src/util/lp/lar_core_solver_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "reference_only",
+      "go_targets": [
+        "pkg/util/lp/lar_core.go"
+      ],
+      "tests": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [],
+      "ownership": [
+        "This reference translation unit defines no runtime object or owned resource. Implementation and lifecycle evidence belongs to its underlying source headers."
+      ],
+      "deviations": [
+        "Include-only translation unit for lar_core_solver.hpp; no explicit instantiation or executable definition. Underlying LAR core source and ownership audits remain partial.",
+        "No Go template-instantiation adapter or source consumer was added merely to mirror C++ linker declarations."
+      ]
     },
     {
       "source": "src/util/lp/lar_solution_signature.h",
@@ -3584,9 +3621,21 @@
     },
     {
       "source": "src/util/lp/lp_settings_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "reference_only",
+      "go_targets": [
+        "pkg/util/lp/permutation_float.go"
+      ],
+      "tests": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [],
+      "ownership": [
+        "This reference translation unit defines no runtime object or owned resource. Implementation and lifecycle evidence belongs to its underlying source headers."
+      ],
+      "deviations": [
+        "Two explicit vectors_are_equal instantiation declarations only; no algorithm definitions. Retained concrete float vector predicate is implemented in permutation_float.go; declarations do not establish rational runtime consumers.",
+        "No Go template-instantiation adapter or source consumer was added merely to mirror C++ linker declarations."
+      ]
     },
     {
       "source": "src/util/lp/lp_solver.h",
@@ -4470,9 +4519,22 @@
     },
     {
       "source": "src/util/lp/matrix_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "reference_only",
+      "go_targets": [
+        "pkg/util/lp/matrix_float_debug.go",
+        "pkg/util/lp/matrix_float_debug_print.go"
+      ],
+      "tests": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [],
+      "ownership": [
+        "This reference translation unit defines no runtime object or owned resource. Implementation and lifecycle evidence belongs to its underlying source headers."
+      ],
+      "deviations": [
+        "Explicit matrix print/equality instantiation declarations under Z3DEBUG only; no algorithm/object definitions. Actual float debug consumers remain tracked by matrix.hpp; rational declarations are not live roots.",
+        "No Go template-instantiation adapter or source consumer was added merely to mirror C++ linker declarations."
+      ]
     },
     {
       "source": "src/util/lp/mps_reader.h",
@@ -5756,9 +5818,9 @@
     }
   ],
   "status_counts": {
-    "unported": 5,
+    "platform_replacement": 1,
     "partial": 94,
-    "reference_only": 6,
+    "reference_only": 10,
     "dead_deleted": 3,
     "ported": 2
   },
@@ -10257,5 +10319,43 @@
     ],
     "remaining": "Complete registered CLI scenarios/dispatch and whole retained algorithm, consumer, source-test and ownership audits; numeric_pair trait-unit completion is not claimed by wrapper audit.",
     "ledger_note": "Ported-unit method list contains retained/replaced methods only. Uncalled precise<X> is explicitly recorded in deviations; existing checker rejects dead_deleted method entries under a ported unit."
+  },
+  "running_full_native_checkpoint": {
+    "commit": "ea1b46ec",
+    "started_utc": "2026-10-11 23:37:38 UTC",
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "-json",
+      "./...",
+      "-timeout=60m",
+      "-count=1",
+      "-coverprofile=/mnt/oldrog/tmp/g3-lp-driver-check-module-native.cover"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.json",
+    "session_id": 9671,
+    "status": "running",
+    "scope_warning": "Actual exec session9671 confirmed live;63 package terminal events/no failures observed, LP has no terminal event. Production code snapshot includes driver/report/process/batch/dispatch/container/permutation/stacked/LAR examples through ea1b46ec. Later ledger-only build-glue classifications are checked separately. Do not credit full completion/coverage until actual terminal exit is observed."
+  },
+  "latest_lp_build_glue_audit": {
+    "scope": "Five previously unported build/instantiation units classified without inventing runtime ports",
+    "reference_units": [
+      "src/util/lp/dense_matrix_instances.cpp",
+      "src/util/lp/lar_core_solver_instances.cpp",
+      "src/util/lp/lp_settings_instances.cpp",
+      "src/util/lp/matrix_instances.cpp"
+    ],
+    "native_build_replacement": "src/util/lp/CMakeLists.txt",
+    "validation": "Source inspection after comment removal confirms all four C++ instance units contain only includes/conditionals/explicit instantiation declarations and no braces/algorithm/object definitions. Focused concrete debug dense/permutation/settings/LAR consumers native0.023s/combined0.030s pass.",
+    "coverage_note": "Build/instantiation declarations contain no runtime statements to cover. Existing concrete algorithm coverage belongs to underlying header ports; no source completion credit inferred from declarations.",
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-lp-build-glue-audit.txt"
+    ],
+    "remaining": "94 partial source units and whole retained consumer/test/ownership audits plus complete registered CLI execution. No unported label is not a completed port."
   }
 }

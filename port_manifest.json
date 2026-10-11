@@ -118396,7 +118396,7 @@
       "path": "src/util/lp/CMakeLists.txt",
       "component": "util",
       "role": "build_specification",
-      "status": "unported",
+      "status": "platform_replacement",
       "go_targets": [],
       "tests": [],
       "registrations": [
@@ -118405,11 +118405,18 @@
           "text": "z3_add_component(lp"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "Build metadata owns no runtime resource."
+      ],
+      "deviations": [
+        "Go module/import discovery and g3debug build constraints replace z3_add_component/includes. Preserve pkg/util/lp and the existing pkg split; no CMake/linker translation added.",
+        "CMake source enumeration and PYG registration are build inputs, not retained-consumer roots. Underlying algorithms and lp_params.pyg retain their independent partial audits.",
+        "Native and combined module compile gates passed after recent code changes; native full checkpoint ea1b46ec is now running. This build-file classification does not claim whole-LP completion.",
+        "Native build entry is pkg/go.mod. The manifest target field accepts Go source files only, so module/build metadata is recorded here rather than as a synthetic .go forwarding target."
+      ]
     },
     {
       "path": "src/util/lp/binary_heap_priority_queue.h",
@@ -119552,8 +119559,11 @@
       "path": "src/util/lp/dense_matrix_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
+      "status": "reference_only",
+      "go_targets": [
+        "pkg/util/lp/dense_matrix_float_debug.go",
+        "pkg/util/lp/matrix_float_debug.go"
+      ],
       "tests": [],
       "conditionals": [
         {
@@ -119565,11 +119575,16 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "This reference translation unit defines no runtime object or owned resource. Implementation and lifecycle evidence belongs to its underlying source headers."
+      ],
+      "deviations": [
+        "Explicit dense-matrix instantiation declarations under Z3DEBUG only; no algorithm/object definitions. Retained concrete float debug consumers live in dense_matrix.hpp/matrix.hpp ports. Rational template declarations alone do not create live roots.",
+        "No Go template-instantiation adapter or source consumer was added merely to mirror C++ linker declarations."
+      ]
     },
     {
       "path": "src/util/lp/eta_matrix.h",
@@ -122008,14 +122023,21 @@
       "path": "src/util/lp/lar_core_solver_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
+      "status": "reference_only",
+      "go_targets": [
+        "pkg/util/lp/lar_core.go"
+      ],
       "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "This reference translation unit defines no runtime object or owned resource. Implementation and lifecycle evidence belongs to its underlying source headers."
+      ],
+      "deviations": [
+        "Include-only translation unit for lar_core_solver.hpp; no explicit instantiation or executable definition. Underlying LAR core source and ownership audits remain partial.",
+        "No Go template-instantiation adapter or source consumer was added merely to mirror C++ linker declarations."
+      ]
     },
     {
       "path": "src/util/lp/lar_solution_signature.h",
@@ -130781,14 +130803,21 @@
       "path": "src/util/lp/lp_settings_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
+      "status": "reference_only",
+      "go_targets": [
+        "pkg/util/lp/permutation_float.go"
+      ],
       "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "This reference translation unit defines no runtime object or owned resource. Implementation and lifecycle evidence belongs to its underlying source headers."
+      ],
+      "deviations": [
+        "Two explicit vectors_are_equal instantiation declarations only; no algorithm definitions. Retained concrete float vector predicate is implemented in permutation_float.go; declarations do not establish rational runtime consumers.",
+        "No Go template-instantiation adapter or source consumer was added merely to mirror C++ linker declarations."
+      ]
     },
     {
       "path": "src/util/lp/lp_solver.h",
@@ -133418,8 +133447,11 @@
       "path": "src/util/lp/matrix_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
+      "status": "reference_only",
+      "go_targets": [
+        "pkg/util/lp/matrix_float_debug.go",
+        "pkg/util/lp/matrix_float_debug_print.go"
+      ],
       "tests": [],
       "conditionals": [
         {
@@ -133431,11 +133463,16 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "This reference translation unit defines no runtime object or owned resource. Implementation and lifecycle evidence belongs to its underlying source headers."
+      ],
+      "deviations": [
+        "Explicit matrix print/equality instantiation declarations under Z3DEBUG only; no algorithm/object definitions. Actual float debug consumers remain tracked by matrix.hpp; rational declarations are not live roots.",
+        "No Go template-instantiation adapter or source consumer was added merely to mirror C++ linker declarations."
+      ]
     },
     {
       "path": "src/util/lp/mps_reader.h",
