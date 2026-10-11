@@ -7764,5 +7764,30 @@
       "dependency graph refresh",
       "diff check"
     ]
+  },
+  "running_full_native_checkpoint": {
+    "status": "running",
+    "commit": "28ac20ab",
+    "started_utc": "2026-10-11 18:09:54 UTC",
+    "runner_pid": 2,
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "-json",
+      "./...",
+      "-timeout=60m",
+      "-count=1",
+      "-coverprofile=/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.cover"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.json",
+    "go_pid": 5,
+    "exec_session_id": 52535,
+    "completion_credited": false,
+    "coverage_credited": false
   }
 }
