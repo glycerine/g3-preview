@@ -422,3 +422,72 @@ func TestLPFloatScalerComposedFailurePrefixes(t *testing.T) {
 		t.Fatal(ok, err)
 	}
 }
+
+// Finite extreme inputs distinguish the source's literal max*min geometric
+// product from a mathematically equivalent overflow-safe geometric mean.
+func TestLPFloatScalerGeometricProductExtremes(t *testing.T) {
+	for _, value := range []float64{math.SmallestNonzeroFloat64, 1e-200, 1e200, math.MaxFloat64} {
+		m := lpScalerFixture(t, [][]float64{{value}}, []float64{-value})
+		if err := m.ScaleRowsWithGeometricMean(); err != nil {
+			t.Fatal(value, err)
+		}
+		if value < 1 {
+			// The positive product underflows to zero; strict .01 skips it.
+			if m.A.Rows[0][0].Value != value || (*m.B)[0] != -value {
+				t.Fatal("underflow must skip row", value, m.A.Rows, *m.B)
+			}
+		} else {
+			// The product overflows to infinity. Row multiplication by zero
+			// and RHS division by infinity retain the negative RHS zero.
+			if m.A.Rows[0][0].Value != 0 || (*m.B)[0] != 0 || !math.Signbit((*m.B)[0]) {
+				t.Fatal("overflow row publication", value, m.A.Rows, *m.B)
+			}
+		}
+		m = lpScalerFixture(t, [][]float64{{value}}, []float64{-value})
+		if err := m.ScaleColumnsWithGeometricMean(); err != nil {
+			t.Fatal(value, err)
+		}
+		// Underflow skips at the denominator cutoff; overflow instead yields
+		// candidate column scale zero and skips at the separate .1 cutoff.
+		if m.A.Rows[0][0].Value != value || (*m.B)[0] != -value || (*m.ColumnScale)[0] != 1 {
+			t.Fatal("column cutoff before publication", value, m.A.Rows, *m.B, *m.ColumnScale)
+		}
+	}
+}
+
+func TestLPFloatScalerExtremeDyadicRowsAndColumns(t *testing.T) {
+	for exponent := -1000; exponent <= 1000; exponent += 25 {
+		maximum := math.Ldexp(.75, exponent)
+		m := lpScalerFixture(t, [][]float64{{maximum / 2}}, []float64{-maximum})
+		*m.Minimum, *m.Maximum = .5, 1
+		if err := m.ScaleRow(0); err != nil {
+			t.Fatal(exponent, err)
+		}
+		// RHS, rather than A, determines the row multiplier. All numbers
+		// remain exactly dyadic; no implementation loop is used as an oracle.
+		if m.A.Rows[0][0].Value != .375 || (*m.B)[0] != -.75 || (*m.ColumnScale)[0] != 1 {
+			t.Fatal("row dyadic oracle", exponent, m.A.Rows, *m.B, *m.ColumnScale)
+		}
+		m = lpScalerFixture(t, [][]float64{{maximum}}, []float64{-maximum})
+		*m.Minimum, *m.Maximum = .5, 1
+		if err := m.ScaleColumn(0); err != nil {
+			t.Fatal(exponent, err)
+		}
+		if m.A.Rows[0][0].Value != .75 || (*m.ColumnScale)[0] != math.Ldexp(1, -exponent) || (*m.B)[0] != -maximum {
+			t.Fatal("column dyadic oracle", exponent, m.A.Rows, *m.B, *m.ColumnScale)
+		}
+	}
+	for _, boundary := range []float64{.5, 1} {
+		m := lpScalerFixture(t, [][]float64{{boundary}}, []float64{-boundary})
+		*m.Minimum, *m.Maximum = .5, 1
+		if err := m.ScaleRow(0); err != nil {
+			t.Fatal(err)
+		}
+		if err := m.ScaleColumn(0); err != nil {
+			t.Fatal(err)
+		}
+		if m.A.Rows[0][0].Value != boundary || (*m.B)[0] != -boundary || (*m.ColumnScale)[0] != 1 {
+			t.Fatal("inclusive endpoints", boundary)
+		}
+	}
+}

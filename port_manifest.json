@@ -121485,6 +121485,12 @@
             "TestLARRandomIntervalEmptyStopsBeforeLaterColumn",
             "TestLARRandomIntervalPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "scale_problem_for_doubles and its sole create_double_matrix helper have no retained root caller; whole-source reachability audit",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
         }
       ],
       "ownership": [
@@ -121511,7 +121517,8 @@
         "Floating signature search is implemented without a solver-status filter: source extracts after noncancelled infeasibility too. Full LAR basis catch-up and signature-guided exact solve remain open.",
         "Only retained pair and float forward catch-up plus the pair reverse consumer are implemented. Source unsigned threshold addition wraps; exact discarded LU is rebuilt immediately while discarded floating LU stays nil. Unmatched endpoint queues are discarded without forcing the requested basis; signature-guided exact solve and complete LAR orchestration remain open.",
         "Exact/floating nonbasic orders remain independent on the normal signature path; only the rollback fallback copies all metadata arrays. Coupled solver test fixtures now derive actual column/row count estimates rather than the scope-only sentinels, so exact pricing runs with valid source counts. Full signature-guided tableau and whole-LAR solve orchestration remain open.",
-        "Strict model delta selection now visits all set bounds against actual exact X; boxed-only bound conversion remains a separate source routine. Output copying begins after all column updates; input/output aliasing is supported. Whole rational model extraction, constraint validation, outer LARSolver orchestration and complete upstream drivers remain open."
+        "Strict model delta selection now visits all set bounds against actual exact X; boxed-only bound conversion remains a separate source routine. Output copying begins after all column updates; input/output aliasing is supported. Whole rational model extraction, constraint validation, outer LARSolver orchestration and complete upstream drivers remain open.",
+        "Whole-source scaling reachability: scale_problem_for_doubles (lar_core_solver.h:687-714) has no caller; create_double_matrix (638-645) is reached only by that dead helper. Exact scaler<mpq,mpq>::scale has only an explicit instantiation, since lp_solver::scale precise() returns before constructing a scaler. No standalone exact scaler or LAR scaling helper is ported. Live exact solver Scale is already implemented and tested with nil Settings by TestLPRationalPreparationIndependentMatricesAndRHS; floating assembly/scaling/restoration is tested independently by TestLPFloatSolverIndependentAssemblyScalingAndRestoration. Whole LP/LAR caller and ownership audits remain open."
       ]
     },
     {
@@ -134760,7 +134767,9 @@
         "TestLPFloatScalerSourceStopsAndPrefixes",
         "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
         "TestLPFloatScalerZeroToleranceIEEEAndResize",
-        "TestLPFloatScalerComposedFailurePrefixes"
+        "TestLPFloatScalerComposedFailurePrefixes",
+        "TestLPFloatScalerGeometricProductExtremes",
+        "TestLPFloatScalerExtremeDyadicRowsAndColumns"
       ],
       "assertions": [
         {
@@ -134772,7 +134781,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "retained double/double constructor, ratio/geometric scaling, max normalization and log/power-of-two paths (scaler.hpp:38-270), reached by lp_solver.hpp:118-122 and lar_core_solver.h:693-700",
+          "name": "retained double/double constructor, ratio/geometric scaling, max normalization and log/power-of-two paths (scaler.hpp:38-270), reached by lp_solver.hpp:118-122",
           "status": "ported",
           "go_target": "pkg/util/lp/scaler_float.go",
           "tests": [
@@ -134782,11 +134791,19 @@
             "TestLPFloatScalerSourceStopsAndPrefixes",
             "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
             "TestLPFloatScalerZeroToleranceIEEEAndResize",
-            "TestLPFloatScalerComposedFailurePrefixes"
+            "TestLPFloatScalerComposedFailurePrefixes",
+            "TestLPFloatScalerGeometricProductExtremes",
+            "TestLPFloatScalerExtremeDyadicRowsAndColumns"
           ]
         },
         {
-          "name": "explicit precise scale early return and complete solver integration audit",
+          "name": "standalone exact scaler scale early return: explicit instantiation only; actual precise solver short-circuits before scaler construction",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        },
+        {
+          "name": "remaining complete retained solver caller/ownership integration audit",
           "status": "unported",
           "go_target": "",
           "tests": []
@@ -134797,7 +134814,8 @@
       ],
       "deviations": [
         "Floating scale retains strict 0.01/0.1/zero thresholds, descending geometric/normalization order, ascending power scaling, original-ratio comparison, do/while postdecrement (reps+1 passes), and assigning rather than multiplying the power-column factor. Nonzero log balance propagates the existing source NOT_IMPLEMENTED stop; no mathematical logarithm is invented. Infinity or an invalid negative maximum can make source halving nonterminating: after an actual unchanged loop body Go returns ErrLPScalingStalled before matrix publication, a qualified domain guard rather than a native exception claim.",
-        "Whole-source search finds right_side_balance only in its declaration/definition; unused method is excluded. No registered source scaler test was found; new independent solution/diagonal-factor and numerical-order fixtures strengthen this component. Precise explicit scale and full LP/LAR caller orchestration are still open; no whole-unit completion claim."
+        "right_side_balance has declaration/definition only and no retained caller; excluded.",
+        "Whole-source scaling reachability: scale_problem_for_doubles (lar_core_solver.h:687-714) has no caller; create_double_matrix (638-645) is reached only by that dead helper. Exact scaler<mpq,mpq>::scale has only an explicit instantiation, since lp_solver::scale precise() returns before constructing a scaler. No standalone exact scaler or LAR scaling helper is ported. Live exact solver Scale is already implemented and tested with nil Settings by TestLPRationalPreparationIndependentMatricesAndRHS; floating assembly/scaling/restoration is tested independently by TestLPFloatSolverIndependentAssemblyScalingAndRestoration. Whole LP/LAR caller and ownership audits remain open."
       ]
     },
     {
@@ -134816,7 +134834,9 @@
         "TestLPFloatScalerSourceStopsAndPrefixes",
         "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
         "TestLPFloatScalerZeroToleranceIEEEAndResize",
-        "TestLPFloatScalerComposedFailurePrefixes"
+        "TestLPFloatScalerComposedFailurePrefixes",
+        "TestLPFloatScalerGeometricProductExtremes",
+        "TestLPFloatScalerExtremeDyadicRowsAndColumns"
       ],
       "assertions": [
         {
@@ -134836,7 +134856,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "retained double/double constructor, ratio/geometric scaling, max normalization and log/power-of-two paths (scaler.hpp:38-270), reached by lp_solver.hpp:118-122 and lar_core_solver.h:693-700",
+          "name": "retained double/double constructor, ratio/geometric scaling, max normalization and log/power-of-two paths (scaler.hpp:38-270), reached by lp_solver.hpp:118-122",
           "status": "ported",
           "go_target": "pkg/util/lp/scaler_float.go",
           "tests": [
@@ -134846,11 +134866,19 @@
             "TestLPFloatScalerSourceStopsAndPrefixes",
             "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
             "TestLPFloatScalerZeroToleranceIEEEAndResize",
-            "TestLPFloatScalerComposedFailurePrefixes"
+            "TestLPFloatScalerComposedFailurePrefixes",
+            "TestLPFloatScalerGeometricProductExtremes",
+            "TestLPFloatScalerExtremeDyadicRowsAndColumns"
           ]
         },
         {
-          "name": "explicit precise scale early return and complete solver integration audit",
+          "name": "standalone exact scaler scale early return: explicit instantiation only; actual precise solver short-circuits before scaler construction",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        },
+        {
+          "name": "remaining complete retained solver caller/ownership integration audit",
           "status": "unported",
           "go_target": "",
           "tests": []
@@ -134861,7 +134889,8 @@
       ],
       "deviations": [
         "Floating scale retains strict 0.01/0.1/zero thresholds, descending geometric/normalization order, ascending power scaling, original-ratio comparison, do/while postdecrement (reps+1 passes), and assigning rather than multiplying the power-column factor. Nonzero log balance propagates the existing source NOT_IMPLEMENTED stop; no mathematical logarithm is invented. Infinity or an invalid negative maximum can make source halving nonterminating: after an actual unchanged loop body Go returns ErrLPScalingStalled before matrix publication, a qualified domain guard rather than a native exception claim.",
-        "Whole-source search finds right_side_balance only in its declaration/definition; unused method is excluded. No registered source scaler test was found; new independent solution/diagonal-factor and numerical-order fixtures strengthen this component. Precise explicit scale and full LP/LAR caller orchestration are still open; no whole-unit completion claim."
+        "right_side_balance has declaration/definition only and no retained caller; excluded.",
+        "Whole-source scaling reachability: scale_problem_for_doubles (lar_core_solver.h:687-714) has no caller; create_double_matrix (638-645) is reached only by that dead helper. Exact scaler<mpq,mpq>::scale has only an explicit instantiation, since lp_solver::scale precise() returns before constructing a scaler. No standalone exact scaler or LAR scaling helper is ported. Live exact solver Scale is already implemented and tested with nil Settings by TestLPRationalPreparationIndependentMatricesAndRHS; floating assembly/scaling/restoration is tested independently by TestLPFloatSolverIndependentAssemblyScalingAndRestoration. Whole LP/LAR caller and ownership audits remain open."
       ]
     },
     {
@@ -134880,13 +134909,15 @@
         "TestLPFloatScalerSourceStopsAndPrefixes",
         "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
         "TestLPFloatScalerZeroToleranceIEEEAndResize",
-        "TestLPFloatScalerComposedFailurePrefixes"
+        "TestLPFloatScalerComposedFailurePrefixes",
+        "TestLPFloatScalerGeometricProductExtremes",
+        "TestLPFloatScalerExtremeDyadicRowsAndColumns"
       ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
         {
-          "name": "retained double/double constructor, ratio/geometric scaling, max normalization and log/power-of-two paths (scaler.hpp:38-270), reached by lp_solver.hpp:118-122 and lar_core_solver.h:693-700",
+          "name": "retained double/double constructor, ratio/geometric scaling, max normalization and log/power-of-two paths (scaler.hpp:38-270), reached by lp_solver.hpp:118-122",
           "status": "ported",
           "go_target": "pkg/util/lp/scaler_float.go",
           "tests": [
@@ -134896,11 +134927,19 @@
             "TestLPFloatScalerSourceStopsAndPrefixes",
             "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
             "TestLPFloatScalerZeroToleranceIEEEAndResize",
-            "TestLPFloatScalerComposedFailurePrefixes"
+            "TestLPFloatScalerComposedFailurePrefixes",
+            "TestLPFloatScalerGeometricProductExtremes",
+            "TestLPFloatScalerExtremeDyadicRowsAndColumns"
           ]
         },
         {
-          "name": "explicit precise scale early return and complete solver integration audit",
+          "name": "standalone exact scaler scale early return: explicit instantiation only; actual precise solver short-circuits before scaler construction",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        },
+        {
+          "name": "remaining complete retained solver caller/ownership integration audit",
           "status": "unported",
           "go_target": "",
           "tests": []
@@ -134911,7 +134950,8 @@
       ],
       "deviations": [
         "Floating scale retains strict 0.01/0.1/zero thresholds, descending geometric/normalization order, ascending power scaling, original-ratio comparison, do/while postdecrement (reps+1 passes), and assigning rather than multiplying the power-column factor. Nonzero log balance propagates the existing source NOT_IMPLEMENTED stop; no mathematical logarithm is invented. Infinity or an invalid negative maximum can make source halving nonterminating: after an actual unchanged loop body Go returns ErrLPScalingStalled before matrix publication, a qualified domain guard rather than a native exception claim.",
-        "Whole-source search finds right_side_balance only in its declaration/definition; unused method is excluded. No registered source scaler test was found; new independent solution/diagonal-factor and numerical-order fixtures strengthen this component. Precise explicit scale and full LP/LAR caller orchestration are still open; no whole-unit completion claim."
+        "right_side_balance has declaration/definition only and no retained caller; excluded.",
+        "Whole-source scaling reachability: scale_problem_for_doubles (lar_core_solver.h:687-714) has no caller; create_double_matrix (638-645) is reached only by that dead helper. Exact scaler<mpq,mpq>::scale has only an explicit instantiation, since lp_solver::scale precise() returns before constructing a scaler. No standalone exact scaler or LAR scaling helper is ported. Live exact solver Scale is already implemented and tested with nil Settings by TestLPRationalPreparationIndependentMatricesAndRHS; floating assembly/scaling/restoration is tested independently by TestLPFloatSolverIndependentAssemblyScalingAndRestoration. Whole LP/LAR caller and ownership audits remain open."
       ]
     },
     {

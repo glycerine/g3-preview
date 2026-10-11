@@ -7,12 +7,12 @@
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
     "remaining retained LU diagnostics and full solver/priority-queue lifecycle integration",
-    "remaining retained objective/preparation consumers and full primal/dual/LAR scaling integration; whole random-update source/driver audit",
+    "remaining retained objective/preparation consumers and complete retained primal/dual/LAR caller integration (uncalled LAR scaling helper excluded); whole random-update source/driver audit",
     "remaining retained constructor/diagnostic/validator and optimization consumer audits; complete MPS/CLI upstream drivers",
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining top-level CLI integration including empty directory branch; retained solve_some_mps and whole SMT reader/LP audit",
     "component property tests, coverage and integration audits",
-    "Remaining top-level test CLI dispatch, SMT file creation/input dispatch driver scenarios; remaining retained scaling/optimization consumers, whole-source/ownership audits and complete upstream LP/randomize drivers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
+    "Remaining top-level test CLI dispatch, SMT file creation/input dispatch driver scenarios; remaining retained optimization consumers and whole scaling audit, whole-source/ownership audits and complete upstream LP/randomize drivers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
   ],
   "units": [
     {
@@ -4811,7 +4811,9 @@
         "TestLPFloatScalerSourceStopsAndPrefixes",
         "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
         "TestLPFloatScalerZeroToleranceIEEEAndResize",
-        "TestLPFloatScalerComposedFailurePrefixes"
+        "TestLPFloatScalerComposedFailurePrefixes",
+        "TestLPFloatScalerGeometricProductExtremes",
+        "TestLPFloatScalerExtremeDyadicRowsAndColumns"
       ]
     },
     {
@@ -4828,7 +4830,9 @@
         "TestLPFloatScalerSourceStopsAndPrefixes",
         "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
         "TestLPFloatScalerZeroToleranceIEEEAndResize",
-        "TestLPFloatScalerComposedFailurePrefixes"
+        "TestLPFloatScalerComposedFailurePrefixes",
+        "TestLPFloatScalerGeometricProductExtremes",
+        "TestLPFloatScalerExtremeDyadicRowsAndColumns"
       ]
     },
     {
@@ -4845,7 +4849,9 @@
         "TestLPFloatScalerSourceStopsAndPrefixes",
         "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
         "TestLPFloatScalerZeroToleranceIEEEAndResize",
-        "TestLPFloatScalerComposedFailurePrefixes"
+        "TestLPFloatScalerComposedFailurePrefixes",
+        "TestLPFloatScalerGeometricProductExtremes",
+        "TestLPFloatScalerExtremeDyadicRowsAndColumns"
       ]
     },
     {
@@ -9649,5 +9655,37 @@
     },
     "related_debug_seconds": 0.524,
     "related_debug_checked_seconds": 0.541
+  },
+  "latest_scaling_reachability_audit": {
+    "scope": "Whole-source scaling reachability: scale_problem_for_doubles (lar_core_solver.h:687-714) has no caller; create_double_matrix (638-645) is reached only by that dead helper. Exact scaler<mpq,mpq>::scale has only an explicit instantiation, since lp_solver::scale precise() returns before constructing a scaler. No standalone exact scaler or LAR scaling helper is ported. Live exact solver Scale is already implemented and tested with nil Settings by TestLPRationalPreparationIndependentMatricesAndRHS; floating assembly/scaling/restoration is tested independently by TestLPFloatSolverIndependentAssemblyScalingAndRestoration. Whole LP/LAR caller and ownership audits remain open.",
+    "tests": [
+      "TestLPFloatScalerGeometricProductExtremes",
+      "TestLPFloatScalerExtremeDyadicRowsAndColumns"
+    ],
+    "focused_native_seconds": 0.84,
+    "focused_debug_checked_seconds": 0.98,
+    "scaler_statement_coverage": {
+      "native": {
+        "covered": 226,
+        "total": 260,
+        "percent": 86.9
+      },
+      "debug_checked": {
+        "covered": 229,
+        "total": 260,
+        "percent": 88.1
+      }
+    },
+    "evidence": "/mnt/oldrog/tmp/g3-scaling-reachability.txt; /mnt/oldrog/tmp/g3-scaling-audit-{native,checked}.cover",
+    "limitations": "No whole-unit promotion. Stable delegated access/multiply guards and logarithm-stopped balance branches remain uncovered; no invented failure injection or logarithm algorithm. Exact and floating solver integration tests are existing evidence rerun here. Full native checkpoint93d0d780 remains latest successful; failed5c24ca3b is not completion evidence.",
+    "validation": {
+      "related_native_seconds": 2.072,
+      "related_debug_checked_seconds": 2.469,
+      "lp_vet": "native and combined pass",
+      "module_compile": "native and combined pass",
+      "source_portcheck": "2103 units,677 APIs; pass",
+      "dependency_graph": "64 packages; refreshed",
+      "diff_check": "pass"
+    }
   }
 }
