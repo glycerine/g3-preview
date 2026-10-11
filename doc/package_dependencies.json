@@ -1172,6 +1172,7 @@
       "production_files": [
         "assert_release.go",
         "bound_propagator.go",
+        "column_info_exact.go",
         "column_info_float.go",
         "core_base_exact.go",
         "core_base_float.go",
@@ -1279,6 +1280,7 @@
         "lu_state.go",
         "lu_update_exact.go",
         "lu_update_float.go",
+        "mps_populate_exact.go",
         "mps_reader_exact.go",
         "mps_reader_float.go",
         "numeric_pair.go",
@@ -1341,6 +1343,7 @@
         "row_eta_matrix_float.go",
         "scaler_float.go",
         "settings.go",
+        "solver_exact_model.go",
         "solver_float.go",
         "solver_presolve_float.go",
         "sparse_float_vector.go",
