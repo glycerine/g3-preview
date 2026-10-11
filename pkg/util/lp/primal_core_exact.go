@@ -34,6 +34,9 @@ type PairPrimalCoreSolver struct {
 	// The source advance_on_entering local survives calls into this solver.
 	// Unlike expression scratch it must not prevent those child ready checks.
 	enteringStep *IndexedPairVector
+	// Tableau bound-flip expression remains live through primal child calls.
+	// Only its owning advancement entry checks it; errors stop the owner.
+	tableauDelta *IndexedPairVector
 	stopped      bool
 }
 
@@ -251,6 +254,12 @@ func (m *PairPrimalCoreSolver) Close() error {
 			return err
 		}
 		m.advanceDelta = nil
+	}
+	if m.tableauDelta != nil {
+		if err := m.tableauDelta.Close(); err != nil {
+			return err
+		}
+		m.tableauDelta = nil
 	}
 	if m.enteringStep != nil {
 		if err := m.enteringStep.Close(); err != nil {
