@@ -69,6 +69,32 @@ func (d *MPSFileDriver) Run() error {
 	if err != nil {
 		return err
 	}
+	return d.runConfigured(exact, compare)
+}
+
+// MPSDriverSolveOptions is the concrete explicit-argument solve_mps overload.
+// Callers retain their own snapshots of flags and limits; Arguments remains
+// borrowed for setup settings read later during the actual solve.
+type MPSDriverSolveOptions struct {
+	Minimum, Exact, Dual, CompareWithPrimal bool
+	MaxIterations, TimeLimit                uint32
+}
+
+func (d *MPSFileDriver) RunWithOptions(options MPSDriverSolveOptions) error {
+	if d.started || d.closed {
+		return ErrExactVectorPending
+	}
+	d.started = true
+	if d.Arguments == nil {
+		return ErrBounds
+	}
+	d.minimum, d.dual = options.Minimum, options.Dual
+	d.maxIterations, d.timeLimit = options.MaxIterations, options.TimeLimit
+	return d.runConfigured(options.Exact, options.CompareWithPrimal)
+}
+
+func (d *MPSFileDriver) runConfigured(exact, compare bool) error {
+	var err error
 	headline := "solving " + d.Name
 	if exact {
 		headline += " in rationals "

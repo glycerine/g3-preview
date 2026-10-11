@@ -1228,6 +1228,7 @@
         "driver_mps_known_float.go",
         "driver_mps_rational.go",
         "driver_option_catalogue.go",
+        "driver_process_file.go",
         "driver_settings.go",
         "dual_advance_float.go",
         "dual_advance_rational.go",
