@@ -3,13 +3,14 @@ package lp
 import (
 	"errors"
 	"fmt"
-	"github.com/glycerine/g3/pkg/arena"
-	umemory "github.com/glycerine/g3/pkg/util/memory"
-	"github.com/glycerine/g3/pkg/util/numeral"
 	"math/big"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestLPExactTableauInitCostIndependentModels(t *testing.T) {

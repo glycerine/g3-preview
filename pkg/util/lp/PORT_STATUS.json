@@ -1920,7 +1920,9 @@
         "pkg/util/lp/primal_cost_tableau_exact.go",
         "pkg/util/lp/primal_cost_tableau_exact_test.go",
         "pkg/util/lp/primal_tableau_init_cost_exact.go",
-        "pkg/util/lp/primal_tableau_init_cost_exact_test.go"
+        "pkg/util/lp/primal_tableau_init_cost_exact_test.go",
+        "pkg/util/lp/primal_price_tableau_exact.go",
+        "pkg/util/lp/primal_price_tableau_exact_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -1932,7 +1934,11 @@
         "TestLPExactTableauInitCostPhysicalOwnership",
         "TestLPExactTableauInitCostLiveAliases",
         "TestLPExactTableauInitCostReachedPrefixes",
-        "TestLPExactTableauInitCostPreservesOlderComparison"
+        "TestLPExactTableauInitCostPreservesOlderComparison",
+        "TestLPExactTableauPricingIndependentSelection",
+        "TestLPExactTableauPricingSortAndReachedPrefixes",
+        "TestLPExactTableauPricingPhysicalOwnership",
+        "TestLPExactTableauPricingOlderComparisonOwner"
       ]
     },
     {

@@ -1288,6 +1288,7 @@
         "primal_prepare_float.go",
         "primal_price_exact.go",
         "primal_price_float.go",
+        "primal_price_tableau_exact.go",
         "primal_refresh_float.go",
         "primal_solve_float.go",
         "primal_solver_float.go",

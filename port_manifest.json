@@ -125415,7 +125415,9 @@
         "pkg/util/lp/primal_cost_tableau_exact.go",
         "pkg/util/lp/primal_cost_tableau_exact_test.go",
         "pkg/util/lp/primal_tableau_init_cost_exact.go",
-        "pkg/util/lp/primal_tableau_init_cost_exact_test.go"
+        "pkg/util/lp/primal_tableau_init_cost_exact_test.go",
+        "pkg/util/lp/primal_price_tableau_exact.go",
+        "pkg/util/lp/primal_price_tableau_exact_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -125427,7 +125429,11 @@
         "TestLPExactTableauInitCostPhysicalOwnership",
         "TestLPExactTableauInitCostLiveAliases",
         "TestLPExactTableauInitCostReachedPrefixes",
-        "TestLPExactTableauInitCostPreservesOlderComparison"
+        "TestLPExactTableauInitCostPreservesOlderComparison",
+        "TestLPExactTableauPricingIndependentSelection",
+        "TestLPExactTableauPricingSortAndReachedPrefixes",
+        "TestLPExactTableauPricingPhysicalOwnership",
+        "TestLPExactTableauPricingOlderComparisonOwner"
       ],
       "assertions": [
         {
@@ -125557,13 +125563,25 @@
             "TestLPExactTableauInitCostReachedPrefixes",
             "TestLPExactTableauInitCostPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "choose_entering_column_tableau source51-94: actual random budget, stored-column minimum sparsity, strict-improvement budget, random ties and final list rotation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_price_tableau_exact.go",
+          "tests": [
+            "TestLPExactTableauPricingIndependentSelection",
+            "TestLPExactTableauPricingSortAndReachedPrefixes",
+            "TestLPExactTableauPricingPhysicalOwnership",
+            "TestLPExactTableauPricingOlderComparisonOwner"
+          ]
         }
       ],
       "ownership": [
         "Exact bound comparisons retain base-core invocation receipts; primal expression work owns the source difference/product parameters and returned values. Capture ends before delegated comparisons. The source publishes changed cost before updating reduced costs, preserves stored-row prefixes and rereads aliased delta; errors stop the owner, Close destroys actual owned invocations/work, and older caller comparisons remain untouched. Full tableau optimization and post-pop cleanup remain incomplete."
       ],
       "deviations": [
-        "Exact tableau reduced-cost initialization uses native dense slices and stored sparse columns; retained live costs/coefficient order, early feasibility-only return, actual child captures and physical arithmetic cleanup. Native/debug focused coverage48/51 (94.1%); independent320-model oracle, shifted aliases, stored-cell order, reached bounds, pooled/direct physical refusals and three older comparison owners. Whole tableau and source unit remain partial."
+        "Exact tableau reduced-cost initialization uses native dense slices and stored sparse columns; retained live costs/coefficient order, early feasibility-only return, actual child captures and physical arithmetic cleanup. Native/debug focused coverage48/51 (94.1%); independent320-model oracle, shifted aliases, stored-cell order, reached bounds, pooled/direct physical refusals and three older comparison owners. Whole tableau and source unit remain partial.",
+        "Exact tableau pricing consumes source search-budget RNG before zero-budget early return and uses actual stored sparse column lengths independently of cached LU ColumnsNZ. Native Go sorting and slice rotation replace STL storage.320 independent scan/direction/RNG models, reached sort/bounds prefixes, six physical refusal campaigns and three older-comparison owners pass native/debug. Full tableau Solve remains open."
       ]
     },
     {
