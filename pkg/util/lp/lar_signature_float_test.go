@@ -16,6 +16,12 @@ func lpLARFloatingSignatureFixture(t *testing.T, h *lpPairHarness, lower, extent
 	c := lpNewCoreScopeFixture(t, h)
 	h.must(c.PrefixR())
 	h.must(c.PrefixD())
+	// The scope fixture deliberately retains diagnostic count sentinels.
+	// This coupled solver fixture also runs exact pricing, whose estimates
+	// must describe the live matrix rather than those scope-only values.
+	clear(c.RPrimal.ColumnsNZ)
+	clear(c.RPrimal.RowsNZ)
+	h.must(c.RPrimal.InitColumnRowNonZeroes())
 	c.Bounds.Types.values[0] = ColumnLowBound
 	c.Bounds.Types.values[1] = ColumnBoxed
 	c.Bounds.Types.values[2] = ColumnFixed

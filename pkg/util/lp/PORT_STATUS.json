@@ -678,7 +678,9 @@
         "pkg/util/lp/lar_signature_float.go",
         "pkg/util/lp/lar_signature_float_test.go",
         "pkg/util/lp/lar_catchup.go",
-        "pkg/util/lp/lar_catchup_test.go"
+        "pkg/util/lp/lar_catchup_test.go",
+        "pkg/util/lp/lar_solve_signature.go",
+        "pkg/util/lp/lar_solve_signature_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -752,7 +754,16 @@
         "TestLARCatchUpPreservesOlderComparison",
         "TestLARCatchUpPairPendingPrimal",
         "TestLARCatchUpUnmatchedQueuesRetainBasis",
-        "TestLARCatchUpFloatingSearchExactIntegration"
+        "TestLARCatchUpFloatingSearchExactIntegration",
+        "TestLARSolveOnSignatureIndependentModels",
+        "TestLARSolveOnSignatureDegenerateRollback",
+        "TestLARSolveOnSignatureFallbackErrorBeforeSynchronization",
+        "TestLARSolveOnSignatureRoundedSingularBasisRollback",
+        "TestLARSolveOnSignatureCancellationPrefixes",
+        "TestLARSolveOnSignaturePostSolvePublication",
+        "TestLARSolveOnSignatureReachedPrefixes",
+        "TestLARSolveOnSignaturePhysicalOwnership",
+        "TestLARSolveOnSignaturePreservesOlderComparison"
       ]
     },
     {
