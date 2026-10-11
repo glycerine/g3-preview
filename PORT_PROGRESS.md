@@ -1,5 +1,7 @@
 # Port progress — authoritative TODO and FINISHED ledger
 
+Strict boxed delta and exact-to-double bound conversion now implement source667-685,737-788. Tests cover400 independent rational limiting-delta models,240 mixed-bound exact/IEEE worlds, pooled/direct physical refusal campaigns, reached metadata and publication prefixes, source pre/post assertions and an actual older caller comparison. Conversion publishes each floating bound only after both scalar conversions succeed; unused slots retain their prefix values. Exact valid endpoints can round reversed at the limiting delta, preserving native values and the source debug assertion after upper publication. Coverage114/158 (72.2%) native and137/158 (86.7%) debug/checked;23 statements are debug-only and remaining gaps protect captures, valid child destruction and scalar error paths. Focused0.453s/0.947s, related LAR/signature/feasibility1.883s/3.727s; both LP vets and native/debug module compilation pass. Latest full native checkpoint predates this increment; full LAR presolve/signature/solve integration remains open.
+
 SAT clause IDs now use the native `pkg/util/idgen` leaf. Typed `[]uint32`
 storage replaces the duplicate Runtime-backed unsigned vector, while the SAT
 Runtime remains the borrowed sticky-OOM provider and failure transport. LIFO

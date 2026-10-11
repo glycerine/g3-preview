@@ -9,27 +9,29 @@ import "github.com/glycerine/g3/pkg/util/numeral"
 // Settings, names and numeral manager are borrowed. Full LAR Solve remains open.
 // Do not copy. A partial constructor result must be closed.
 type LARCoreSolver struct {
-	Bounds                                *LARBounds
-	RA                                    *RationalStaticMatrix
-	RX, RightSides                        *IndexedPairVector
-	Costs                                 *IndexedRationalVector
-	RBasis, RNBasis                       []uint32
-	RHeading                              []int32
-	RPushedBasis, RColumnsNZ, RRowsNZ     StackedUintVector
-	DA                                    *FloatStaticMatrix
-	DX, DLow, DUpper, DRightSides, DCosts []float64
-	DBasis, DNBasis                       []uint32
-	DHeading                              []int32
-	DPushedBasis                          StackedUintVector
-	RPrimal                               *PairPrimalCoreSolver
-	DPrimal                               *FloatPrimalCoreSolver
-	StackedSimplexStrategy                StackedStrategy
-	Infeasibility                         *SparseRationalVector
-	InfeasibleSumSign                     int32
-	evidenceNegated                       *IndexedRationalVector
-	settings                              *Settings
-	manager                               *numeral.RationalManager
-	stopped                               bool
+	Bounds                                  *LARBounds
+	RA                                      *RationalStaticMatrix
+	RX, RightSides                          *IndexedPairVector
+	Costs                                   *IndexedRationalVector
+	RBasis, RNBasis                         []uint32
+	RHeading                                []int32
+	RPushedBasis, RColumnsNZ, RRowsNZ       StackedUintVector
+	DA                                      *FloatStaticMatrix
+	DX, DLow, DUpper, DRightSides, DCosts   []float64
+	DBasis, DNBasis                         []uint32
+	DHeading                                []int32
+	DPushedBasis                            StackedUintVector
+	RPrimal                                 *PairPrimalCoreSolver
+	DPrimal                                 *FloatPrimalCoreSolver
+	StackedSimplexStrategy                  StackedStrategy
+	Infeasibility                           *SparseRationalVector
+	InfeasibleSumSign                       int32
+	evidenceNegated                         *IndexedRationalVector
+	deltaWork, strictDelta, conversionDelta *IndexedRationalVector
+	calls                                   exactEtaCalls
+	settings                                *Settings
+	manager                                 *numeral.RationalManager
+	stopped                                 bool
 }
 
 func NewLARCoreSolver(m *numeral.RationalManager, s *Settings, names ColumnNamer) (core *LARCoreSolver, err error) {
@@ -51,6 +53,17 @@ func (c *LARCoreSolver) NeedToPresolveWithDoubleSolver() bool {
 func (c *LARCoreSolver) IsTiny() bool  { return c.RA.RowCount() < 10 && c.RA.ColumnCount() < 20 }
 func (c *LARCoreSolver) IsEmpty() bool { return c.RA.RowCount() == 0 && c.RA.ColumnCount() == 0 }
 func (c *LARCoreSolver) Close() error {
+	if err := c.calls.cleanupRaw(c.manager); err != nil {
+		return err
+	}
+	for _, local := range []**IndexedRationalVector{&c.deltaWork, &c.strictDelta, &c.conversionDelta} {
+		if *local != nil {
+			if err := (*local).Close(); err != nil {
+				return err
+			}
+			*local = nil
+		}
+	}
 	// A stopped evidence append can still borrow its negated local or matrix.
 	if err := c.Infeasibility.Close(); err != nil {
 		return err
@@ -87,5 +100,5 @@ func (c *LARCoreSolver) Close() error {
 	if err := c.RightSides.Close(); err != nil {
 		return err
 	}
-	return nil
+	return c.calls.cleanupRoots(c.manager)
 }
