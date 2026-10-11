@@ -123641,7 +123641,8 @@
         "pkg/util/lp/primal_price_exact_test.go",
         "pkg/util/lp/primal_bound_step_exact.go",
         "pkg/util/lp/primal_bound_step_exact_test.go",
-        "pkg/util/lp/primal_inf_limit_exact.go"
+        "pkg/util/lp/primal_inf_limit_exact.go",
+        "pkg/util/lp/primal_harris_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -123723,7 +123724,11 @@
         "TestLPExactInfLimitLiveAliases",
         "TestLPExactInfLimitPhysicalOwnership",
         "TestLPExactInfLimitSourceSignAndPendingGuards",
-        "TestLPExactInfLimitPreservesOlderComparisonOwner"
+        "TestLPExactInfLimitPreservesOlderComparisonOwner",
+        "TestLPExactHarrisIndependentPairOracle",
+        "TestLPExactHarrisPhysicalOwnership",
+        "TestLPExactHarrisGuards",
+        "TestLPExactHarrisPreservesOlderComparisonOwner"
       ],
       "conditionals": [
         {
@@ -124079,6 +124084,17 @@
             "TestLPExactInfLimitPhysicalOwnership",
             "TestLPExactInfLimitSourceSignAndPendingGuards",
             "TestLPExactInfLimitPreservesOlderComparisonOwner"
+          ]
+        },
+        {
+          "name": "precise harris_eps_for_bound full pair expression and zero_harris_eps scalar assignment",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_harris_exact.go",
+          "tests": [
+            "TestLPExactHarrisIndependentPairOracle",
+            "TestLPExactHarrisPhysicalOwnership",
+            "TestLPExactHarrisGuards",
+            "TestLPExactHarrisPreservesOlderComparisonOwner"
           ]
         }
       ],
@@ -125149,7 +125165,8 @@
         "pkg/util/lp/lu_column_float.go",
         "pkg/util/lp/lu_column_exact.go",
         "pkg/util/lp/lu_column_test.go",
-        "pkg/util/lp/lu_column_failure_test.go"
+        "pkg/util/lp/lu_column_failure_test.go",
+        "pkg/util/lp/primal_harris_exact.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
@@ -125166,7 +125183,11 @@
         "TestLPLUEnteringColumnLiteralStopsAndOwnership",
         "TestLPLUColumnDenseAssignmentGuardAndCopyPrefixes",
         "TestLPLUColumnDenseAssignmentLeavesStoppedCallerOwned",
-        "TestLPLUEnteringColumnTailReadAfterExtraction"
+        "TestLPLUEnteringColumnTailReadAfterExtraction",
+        "TestLPExactHarrisIndependentPairOracle",
+        "TestLPExactHarrisPhysicalOwnership",
+        "TestLPExactHarrisGuards",
+        "TestLPExactHarrisPreservesOlderComparisonOwner"
       ],
       "conditionals": [
         {
@@ -125239,6 +125260,17 @@
             "TestLPLUColumnDenseAssignmentGuardAndCopyPrefixes",
             "TestLPLUColumnDenseAssignmentLeavesStoppedCallerOwned",
             "TestLPLUEnteringColumnTailReadAfterExtraction"
+          ]
+        },
+        {
+          "name": "retained pair lexicographic abs consumer in precise primal Harris epsilon",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_harris_exact.go",
+          "tests": [
+            "TestLPExactHarrisIndependentPairOracle",
+            "TestLPExactHarrisPhysicalOwnership",
+            "TestLPExactHarrisGuards",
+            "TestLPExactHarrisPreservesOlderComparisonOwner"
           ]
         }
       ],
@@ -127098,7 +127130,8 @@
         "pkg/util/lp/eta_exact_expression.go",
         "pkg/util/lp/primal_bound_step_exact.go",
         "pkg/util/lp/primal_bound_step_exact_test.go",
-        "pkg/util/lp/primal_inf_limit_exact.go"
+        "pkg/util/lp/primal_inf_limit_exact.go",
+        "pkg/util/lp/primal_harris_exact.go"
       ],
       "tests": [
         "TestLPRationalPairArithmeticOracle",
@@ -127135,7 +127168,11 @@
         "TestLPExactInfLimitLiveAliases",
         "TestLPExactInfLimitPhysicalOwnership",
         "TestLPExactInfLimitSourceSignAndPendingGuards",
-        "TestLPExactInfLimitPreservesOlderComparisonOwner"
+        "TestLPExactInfLimitPreservesOlderComparisonOwner",
+        "TestLPExactHarrisIndependentPairOracle",
+        "TestLPExactHarrisPhysicalOwnership",
+        "TestLPExactHarrisGuards",
+        "TestLPExactHarrisPreservesOlderComparisonOwner"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -127219,6 +127256,17 @@
             "TestLPExactInfLimitPhysicalOwnership",
             "TestLPExactInfLimitSourceSignAndPendingGuards",
             "TestLPExactInfLimitPreservesOlderComparisonOwner"
+          ]
+        },
+        {
+          "name": "live precise Harris pair absolute, integer divisions, reversed-argument binary addition, rational scalar multiplication and returned pair construction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_harris_exact.go",
+          "tests": [
+            "TestLPExactHarrisIndependentPairOracle",
+            "TestLPExactHarrisPhysicalOwnership",
+            "TestLPExactHarrisGuards",
+            "TestLPExactHarrisPreservesOlderComparisonOwner"
           ]
         }
       ],
