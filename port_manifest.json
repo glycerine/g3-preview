@@ -124708,7 +124708,9 @@
         "pkg/util/lp/primal_enter_exact_test.go",
         "pkg/util/lp/primal_core_exact.go",
         "pkg/util/lp/primal_iteration_exact.go",
-        "pkg/util/lp/primal_iteration_exact_test.go"
+        "pkg/util/lp/primal_iteration_exact_test.go",
+        "pkg/util/lp/primal_solve_exact.go",
+        "pkg/util/lp/primal_solve_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124837,7 +124839,19 @@
         "TestLPExactEnterPhysicalOwnership",
         "TestLPExactIterationCountIndependentRNG",
         "TestLPExactIterationPricingAndAdvance",
-        "TestLPExactIterationIndependentBoundedOptima"
+        "TestLPExactIterationIndependentBoundedOptima",
+        "TestLPExactSolveLUIndependentBoundedOptima",
+        "TestLPExactSolveTableauIndependentBoundedOptima",
+        "TestLPExactSolveRowsIndependentFeasibilityAndInfeasibility",
+        "TestLPExactSolveLimitsAndCancellationOrder",
+        "TestLPExactSolveReportingAndWriteFailure",
+        "TestLPExactSolvePreservedFallbackStatuses",
+        "TestLPExactSolveUnboundedIndependentRays",
+        "TestLPExactSolveFeasibilitySearchIndependentSolutions",
+        "TestLPExactSolveInfeasibleIndependentBounds",
+        "TestLPExactSolveTableauStaleCostCorrection",
+        "TestLPExactSolveStoppedAndInitializationPrefixes",
+        "TestLPExactSolvePhysicalOwnership"
       ],
       "conditionals": [
         {
@@ -125414,6 +125428,25 @@
             "TestLPExactEnterPhysicalOwnership",
             "TestLPExactEnterPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "precise solve source864-966: actual LU init/iteration, source status fallbacks, feasible-only recheck, ordered iteration limits and final debug feasibility",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solve_exact.go",
+          "tests": [
+            "TestLPExactSolveLUIndependentBoundedOptima",
+            "TestLPExactSolveTableauIndependentBoundedOptima",
+            "TestLPExactSolveRowsIndependentFeasibilityAndInfeasibility",
+            "TestLPExactSolveLimitsAndCancellationOrder",
+            "TestLPExactSolveReportingAndWriteFailure",
+            "TestLPExactSolvePreservedFallbackStatuses",
+            "TestLPExactSolveUnboundedIndependentRays",
+            "TestLPExactSolveFeasibilitySearchIndependentSolutions",
+            "TestLPExactSolveInfeasibleIndependentBounds",
+            "TestLPExactSolveTableauStaleCostCorrection",
+            "TestLPExactSolveStoppedAndInitializationPrefixes",
+            "TestLPExactSolvePhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -125437,7 +125470,8 @@
         "Concrete exact specialization only. Source expression temporaries remain owned through numerical failure; real older comparison generations are preserved. Outer different-column advancement, precise Solve and full source diagnostics remain open.",
         "Precise advancement omits floating beta/residual/norm branches exactly as source traits require. Unary pair negation keeps scalar arguments and returned pair independently owned; caller assignment is X then Y. Capture ends before child solver calls. Stored CopyXB remains a caller responsibility; missing backup can report FLOATING_POINT_ERROR on rollback. Full advance_on_entering_precise, precise Solve and LAR orchestration remain open.",
         "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
-        "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open."
+        "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
+        "Exact Solve tests cover independent bounded optima, feasibility search, infeasible bounds and unbounded rays, source cancellation/reporting and initialization prefixes, native stale-cost correction versus debug refusal, and pooled/direct physical ownership. Source UNSTABLE is rejected in debug; tableau tentative fallback reaches the existing debug LU-cost assertion. Precise outer preparation and remaining LP variants remain open; no whole source-unit promotion."
       ]
     },
     {
@@ -125535,7 +125569,9 @@
         "pkg/util/lp/primal_enter_tableau_exact.go",
         "pkg/util/lp/primal_enter_tableau_exact_test.go",
         "pkg/util/lp/primal_init_tableau_exact.go",
-        "pkg/util/lp/primal_init_tableau_exact_test.go"
+        "pkg/util/lp/primal_init_tableau_exact_test.go",
+        "pkg/util/lp/primal_solve_exact.go",
+        "pkg/util/lp/primal_solve_exact_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -125588,7 +125624,19 @@
         "TestLPExactInitTableauPhysicalOwnership",
         "TestLPExactTableauBasisReachedMetadata",
         "TestLPExactInitTableauRowsFailurePrefixes",
-        "TestLPExactInitTableauPreservesOlderComparison"
+        "TestLPExactInitTableauPreservesOlderComparison",
+        "TestLPExactSolveLUIndependentBoundedOptima",
+        "TestLPExactSolveTableauIndependentBoundedOptima",
+        "TestLPExactSolveRowsIndependentFeasibilityAndInfeasibility",
+        "TestLPExactSolveLimitsAndCancellationOrder",
+        "TestLPExactSolveReportingAndWriteFailure",
+        "TestLPExactSolvePreservedFallbackStatuses",
+        "TestLPExactSolveUnboundedIndependentRays",
+        "TestLPExactSolveFeasibilitySearchIndependentSolutions",
+        "TestLPExactSolveInfeasibleIndependentBounds",
+        "TestLPExactSolveTableauStaleCostCorrection",
+        "TestLPExactSolveStoppedAndInitializationPrefixes",
+        "TestLPExactSolvePhysicalOwnership"
       ],
       "assertions": [
         {
@@ -125802,6 +125850,25 @@
             "TestLPExactInitTableauPreservesOlderComparison",
             "TestLPExactTableauIterationIndependentOptima"
           ]
+        },
+        {
+          "name": "precise solve_with_tableau source99-208: actual column/row dispatch, stale infeasibility-cost correction, LU fallbacks, ordered limits and double post-iteration cancellation reads",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solve_exact.go",
+          "tests": [
+            "TestLPExactSolveLUIndependentBoundedOptima",
+            "TestLPExactSolveTableauIndependentBoundedOptima",
+            "TestLPExactSolveRowsIndependentFeasibilityAndInfeasibility",
+            "TestLPExactSolveLimitsAndCancellationOrder",
+            "TestLPExactSolveReportingAndWriteFailure",
+            "TestLPExactSolvePreservedFallbackStatuses",
+            "TestLPExactSolveUnboundedIndependentRays",
+            "TestLPExactSolveFeasibilitySearchIndependentSolutions",
+            "TestLPExactSolveInfeasibleIndependentBounds",
+            "TestLPExactSolveTableauStaleCostCorrection",
+            "TestLPExactSolveStoppedAndInitializationPrefixes",
+            "TestLPExactSolvePhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -125814,7 +125881,8 @@
         "Tableau bound-flip full-expression pair remains owned through primal child updates and is excluded from child ready checks; owning advancement entry rejects an existing local. Close destroys child numerical receipts/scratch before this borrowed argument. Source status, early-return and zero/nonzero counter/list order retained.320 independent bound-flip models,120 pivot models,16 pooled/direct physical campaigns, aliases, cost restoration, reached guards and older comparison owners. Source nonzero-RHS debug stop and zero-pivot one-pass cost-switch recheck are preserved, not repaired. Whole tableau solver remains partial.",
         "Exact tableau leaving selection uses stored matrix coefficients and row lengths, not LU Ed/RowsNZ or circular random starts. Scalar -coefficient*direction expression and by-value multiplier remain separately owned through basis limiting; ratio local survives stopped bounds/comparisons.720 independent feasible/infeasible models, aliases, actual sparse metadata prefixes, twelve pooled/direct physical campaigns and older comparison cleanup. Invalid empty-candidate modulo is a typed guard. Full tableau solver remains partial.",
         "Exact tableau entering uses an owned typed pair vector for the source automatic step; stopped children retain this borrowed local until Close destroys children first. OneIterationTableau reuses the existing source InfSetIsCorrect validator; TotalIterations belongs to outer Solve. Independent 320 entering models and120 bounded maximization models, repeated terminal iterations, reached child errors, pooled/direct failure campaigns and real older caller comparisons. Whole tableau initialization/Solve and source unit remain incomplete.",
-        "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial."
+        "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial.",
+        "Exact Solve tests cover independent bounded optima, feasibility search, infeasible bounds and unbounded rays, source cancellation/reporting and initialization prefixes, native stale-cost correction versus debug refusal, and pooled/direct physical ownership. Source UNSTABLE is rejected in debug; tableau tentative fallback reaches the existing debug LU-cost assertion. Precise outer preparation and remaining LP variants remain open; no whole source-unit promotion."
       ]
     },
     {

@@ -38679,3 +38679,35 @@ module compilation, portcheck and diff checks pass. Coverage measures existing
 Go statements, not C++ port completion. LP remains84partial/26unported units;
 exact Solve orchestration remains open. Latest full native module checkpoint is
 the06:58UTC run at16f0b947, predating subsequent initialization/row work.
+
+### Exact primal Solve dispatch and complete core loops
+
+Ported precise `solve` (lp_primal_core_solver.hpp:864-966) and
+`solve_with_tableau` (tableau.h:99-208) into primal_solve_exact.go. Both call
+actual existing initialization, pricing, iteration, cost and LU owners. Counts
+on failure expose the reached counter, and errors stop the primal owner. LU
+checks cancellation only at iteration reporting; tableau additionally reads
+it after the ordered continuation conditions and again after normal exit.
+Preserved source tentative-unbounded/unstable LU fallbacks and debug assertions,
+feasibility-only status behavior and native stale-infeasibility-cost correction.
+
+Verification: 120 independent LU optima,160 tableau rational/epsilon optima,
+120 row-strategy feasibility/infeasibility worlds,160 feasible-search worlds,
+160 infeasible-bound worlds and160 independent unbounded-ray worlds; all three
+strategies' iteration limits and counting cancellation/error sequences; real
+statistics writer failures, stopped/heading prefixes, two stale-cost objective
+profiles and four pooled/direct physical allocation campaigns through success.
+Focused native0.902s/debug2.539s. New Solve file100/141 statements (70.9%)
+native,106/141 (75.2%) debug/checked. Remaining gaps include error propagation
+and rare fallback/cost-repair states, disabled assertions and final debug
+feasibility rejection; these gaps remain open for the coverage audit. Coverage
+measures implemented Go code and does not prove upstream completion.
+
+Full LP remains84 partial/26 unported source units. Exact outer preparation,
+remaining exact dual/LAR variants, source diagnostics and complete upstream
+solver drivers remain open. Latest completed full native checkpoint remains
+the06:58UTC run; it predates these Solve loops.
+
+Related exact iteration, tableau initialization/iteration and row-iteration checks
+pass native64.342s/debug150.424s. Both LP vets, native/debug module compilation,
+portcheck and diff checks pass. Source units remain partial.

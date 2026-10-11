@@ -8,7 +8,7 @@
     "indexed/sparse/static/dense matrices and transformations",
     "remaining retained LU diagnostics and full solver/priority-queue lifecycle integration",
     "precise scaling early return, exact LP preparation, full primal/dual/LAR scaling integration and random updates",
-    "remaining primal constructors/diagnostics/validators, exact/tableau core optimization and MPS source driver integration and complete drivers, exact primal preparation and LAR solvers",
+    "remaining primal constructors/diagnostics/validators, exact outer preparation, exact dual/LAR optimization, MPS source driver integration and complete upstream drivers",
     "remaining whole-LAR propagation scheduling and solve integration, remaining quick_xplain/proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "exact MPS input, exact/LAR construction and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits"
@@ -1794,7 +1794,9 @@
         "pkg/util/lp/primal_enter_exact_test.go",
         "pkg/util/lp/primal_core_exact.go",
         "pkg/util/lp/primal_iteration_exact.go",
-        "pkg/util/lp/primal_iteration_exact_test.go"
+        "pkg/util/lp/primal_iteration_exact_test.go",
+        "pkg/util/lp/primal_solve_exact.go",
+        "pkg/util/lp/primal_solve_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -1923,7 +1925,19 @@
         "TestLPExactEnterPhysicalOwnership",
         "TestLPExactIterationCountIndependentRNG",
         "TestLPExactIterationPricingAndAdvance",
-        "TestLPExactIterationIndependentBoundedOptima"
+        "TestLPExactIterationIndependentBoundedOptima",
+        "TestLPExactSolveLUIndependentBoundedOptima",
+        "TestLPExactSolveTableauIndependentBoundedOptima",
+        "TestLPExactSolveRowsIndependentFeasibilityAndInfeasibility",
+        "TestLPExactSolveLimitsAndCancellationOrder",
+        "TestLPExactSolveReportingAndWriteFailure",
+        "TestLPExactSolvePreservedFallbackStatuses",
+        "TestLPExactSolveUnboundedIndependentRays",
+        "TestLPExactSolveFeasibilitySearchIndependentSolutions",
+        "TestLPExactSolveInfeasibleIndependentBounds",
+        "TestLPExactSolveTableauStaleCostCorrection",
+        "TestLPExactSolveStoppedAndInitializationPrefixes",
+        "TestLPExactSolvePhysicalOwnership"
       ]
     },
     {
@@ -1974,7 +1988,9 @@
         "pkg/util/lp/primal_enter_tableau_exact.go",
         "pkg/util/lp/primal_enter_tableau_exact_test.go",
         "pkg/util/lp/primal_init_tableau_exact.go",
-        "pkg/util/lp/primal_init_tableau_exact_test.go"
+        "pkg/util/lp/primal_init_tableau_exact_test.go",
+        "pkg/util/lp/primal_solve_exact.go",
+        "pkg/util/lp/primal_solve_exact_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -2027,7 +2043,19 @@
         "TestLPExactInitTableauPhysicalOwnership",
         "TestLPExactTableauBasisReachedMetadata",
         "TestLPExactInitTableauRowsFailurePrefixes",
-        "TestLPExactInitTableauPreservesOlderComparison"
+        "TestLPExactInitTableauPreservesOlderComparison",
+        "TestLPExactSolveLUIndependentBoundedOptima",
+        "TestLPExactSolveTableauIndependentBoundedOptima",
+        "TestLPExactSolveRowsIndependentFeasibilityAndInfeasibility",
+        "TestLPExactSolveLimitsAndCancellationOrder",
+        "TestLPExactSolveReportingAndWriteFailure",
+        "TestLPExactSolvePreservedFallbackStatuses",
+        "TestLPExactSolveUnboundedIndependentRays",
+        "TestLPExactSolveFeasibilitySearchIndependentSolutions",
+        "TestLPExactSolveInfeasibleIndependentBounds",
+        "TestLPExactSolveTableauStaleCostCorrection",
+        "TestLPExactSolveStoppedAndInitializationPrefixes",
+        "TestLPExactSolvePhysicalOwnership"
       ]
     },
     {

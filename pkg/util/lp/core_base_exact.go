@@ -19,7 +19,8 @@ type PairCoreInputs struct {
 
 // PairCoreSolverBase owns exact scratch and its concrete PairLU. Inputs are
 // borrowed. This layer supplies construction, basis headings, precise bound
-// checks and LU entry points; the complete precise simplex loop remains open.
+// checks and LU entry points. PairPrimalCoreSolver supplies precise Solve;
+// exact outer preparation and the remaining solver variants remain open.
 // Constructor errors return a partial owner to Close. Do not copy this owner.
 type PairCoreSolverBase struct {
 	PairCoreInputs
