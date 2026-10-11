@@ -123808,7 +123808,8 @@
         "pkg/util/lp/primal_breakpoint_advance_exact.go",
         "pkg/util/lp/primal_breakpoint_advance_exact_test.go",
         "pkg/util/lp/primal_leaving_exact.go",
-        "pkg/util/lp/primal_leaving_exact_test.go"
+        "pkg/util/lp/primal_leaving_exact_test.go",
+        "pkg/util/lp/primal_infeas_cost_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -123923,7 +123924,12 @@
         "TestLPExactLeavingPreservesOlderComparisonOwner",
         "TestLPExactLeavingLiveBasisAliases",
         "TestLPExactLeavingEnteringAliasNegativeFlip",
-        "TestLPExactLeavingSecondRowMetadataAndSparseIndex"
+        "TestLPExactLeavingSecondRowMetadataAndSparseIndex",
+        "TestLPExactInfeasCostIndependentStateOracle",
+        "TestLPExactInfeasCostUnknownAndMembershipPrefixes",
+        "TestLPExactInfeasCostPhysicalOwnership",
+        "TestLPExactInfeasCostLeavesOlderComparisonOwned",
+        "TestLPExactInfeasCostMetadataBoundaries"
       ],
       "conditionals": [
         {
@@ -124355,6 +124361,18 @@
             "TestLPExactLeavingEnteringAliasNegativeFlip",
             "TestLPExactLeavingSecondRowMetadataAndSparseIndex"
           ]
+        },
+        {
+          "name": "retained exact need_to_switch_costs and init_infeasibility_after_update_x_if_inf; stored feasibility and changed-cost publication order",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_infeas_cost_exact.go",
+          "tests": [
+            "TestLPExactInfeasCostIndependentStateOracle",
+            "TestLPExactInfeasCostUnknownAndMembershipPrefixes",
+            "TestLPExactInfeasCostPhysicalOwnership",
+            "TestLPExactInfeasCostLeavesOlderComparisonOwned",
+            "TestLPExactInfeasCostMetadataBoundaries"
+          ]
         }
       ],
       "ownership": [
@@ -124410,7 +124428,8 @@
         "pkg/util/lp/primal_breakpoint_advance_exact.go",
         "pkg/util/lp/primal_breakpoint_advance_exact_test.go",
         "pkg/util/lp/primal_leaving_exact.go",
-        "pkg/util/lp/primal_leaving_exact_test.go"
+        "pkg/util/lp/primal_leaving_exact_test.go",
+        "pkg/util/lp/primal_infeas_cost_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124497,7 +124516,12 @@
         "TestLPExactLeavingPreservesOlderComparisonOwner",
         "TestLPExactLeavingLiveBasisAliases",
         "TestLPExactLeavingEnteringAliasNegativeFlip",
-        "TestLPExactLeavingSecondRowMetadataAndSparseIndex"
+        "TestLPExactLeavingSecondRowMetadataAndSparseIndex",
+        "TestLPExactInfeasCostIndependentStateOracle",
+        "TestLPExactInfeasCostUnknownAndMembershipPrefixes",
+        "TestLPExactInfeasCostPhysicalOwnership",
+        "TestLPExactInfeasCostLeavesOlderComparisonOwned",
+        "TestLPExactInfeasCostMetadataBoundaries"
       ],
       "conditionals": [
         {
@@ -124972,6 +124996,18 @@
             "TestLPExactLeavingLiveBasisAliases",
             "TestLPExactLeavingEnteringAliasNegativeFlip",
             "TestLPExactLeavingSecondRowMetadataAndSparseIndex"
+          ]
+        },
+        {
+          "name": "retained exact per-column, all-column and changed-basis infeasibility cost initialization; raw cost then membership then optional negation; descending columns and actual indexed zero entries",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_infeas_cost_exact.go",
+          "tests": [
+            "TestLPExactInfeasCostIndependentStateOracle",
+            "TestLPExactInfeasCostUnknownAndMembershipPrefixes",
+            "TestLPExactInfeasCostPhysicalOwnership",
+            "TestLPExactInfeasCostLeavesOlderComparisonOwned",
+            "TestLPExactInfeasCostMetadataBoundaries"
           ]
         }
       ],

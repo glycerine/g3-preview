@@ -1271,6 +1271,7 @@
         "primal_harris_exact.go",
         "primal_harris_float.go",
         "primal_inf_limit_exact.go",
+        "primal_infeas_cost_exact.go",
         "primal_initial_float.go",
         "primal_leaving_exact.go",
         "primal_prepare_float.go",
