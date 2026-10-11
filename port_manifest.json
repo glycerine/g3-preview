@@ -120223,7 +120223,9 @@
         "pkg/util/lp/lar_prepare_float.go",
         "pkg/util/lp/lar_prepare_float_test.go",
         "pkg/util/lp/lar_infeasibility.go",
-        "pkg/util/lp/lar_infeasibility_test.go"
+        "pkg/util/lp/lar_infeasibility_test.go",
+        "pkg/util/lp/lar_signature.go",
+        "pkg/util/lp/lar_signature_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -120268,7 +120270,12 @@
         "TestLARInfeasibilityBasisOrderAndNonbasicScan",
         "TestLARInfeasibilityStopsAtPendingExplanation",
         "TestLARInfSignPreservesOlderComparison",
-        "TestLARInfeasibilityOwnsCopiedCoefficients"
+        "TestLARInfeasibilityOwnsCopiedCoefficients",
+        "TestLARSignatureExactPositionIndependentModels",
+        "TestLARSignatureExtractionIndependentModels",
+        "TestLARSignaturePreparationIndependentSystems",
+        "TestLARSignatureReachedPrefixes",
+        "TestLARSignaturePhysicalOwnership"
       ],
       "conditionals": [
         {
@@ -120549,6 +120556,18 @@
             "TestLARInfSignPreservesOlderComparison",
             "TestLARInfeasibilityOwnsCopiedCoefficients"
           ]
+        },
+        {
+          "name": "native solution signature and concrete pair/float extraction and preparation source356-405,653-662; bound selection, RNG and actual LU reconstruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_signature.go",
+          "tests": [
+            "TestLARSignatureExactPositionIndependentModels",
+            "TestLARSignatureExtractionIndependentModels",
+            "TestLARSignaturePreparationIndependentSystems",
+            "TestLARSignatureReachedPrefixes",
+            "TestLARSignaturePhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -120564,7 +120583,8 @@
         "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication.",
         "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update.",
         "Literal core scope profiles: only non-tableau mode snapshots/pops the rational matrix, bases and Markowitz counts; floating matrix always scopes. Pop gates on current strategy, restoring saved strategy only after basis handling. Surviving matrix coefficients, X/cost/D values, RHS and floating low/upper/cost vectors are not restored. Tableau copies current rational basis/nonbasis/headings to floating fields, even for actual empty floating matrix; outer solver must remove tableau columns first. Native push_vector preserves an oversized cached tail, while debug asserts before copying. Invalid zero/excess scope depths and explicit malformed links/headings/size profiles return typed errors after reached publication. No whole-model push/pop or strategy-migration completion is claimed.",
-        "Concrete retained LAR infeasibility explanation consumer now ports inf_sign_of_column, which was not needed by row pricing alone. The existing typed sparse coefficient vector preserves source pair-copy lifetimes, zeros and order; a stopped negation/append remains owned until Core.Close. Full LAR Solve and signature/presolve integration remain open; no whole source-unit promotion."
+        "Concrete retained LAR infeasibility explanation consumer now ports inf_sign_of_column, which was not needed by row pricing alone. The existing typed sparse coefficient vector preserves source pair-copy lifetimes, zeros and order; a stopped negation/append remains owned until Core.Close. Full LAR Solve and signature/presolve integration remain open; no whole source-unit promotion.",
+        "Native uint32 map replaces unordered_map; preparation traverses ascending keys for reproducible RNG/error prefixes. C++ imposes no insertion-order contract. Exact and floating concrete consumers share only bound-selection control flow. Full signature/presolve/trace catch-up and LAR Solve remain open; no whole-unit promotion."
       ]
     },
     {
@@ -120776,14 +120796,38 @@
       "path": "src/util/lp/lar_solution_signature.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/lar_signature.go",
+        "pkg/util/lp/lar_signature_test.go"
+      ],
+      "tests": [
+        "TestLARSignatureExactPositionIndependentModels",
+        "TestLARSignatureExtractionIndependentModels",
+        "TestLARSignaturePreparationIndependentSystems",
+        "TestLARSignatureReachedPrefixes",
+        "TestLARSignaturePhysicalOwnership"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "native solution signature and concrete pair/float extraction and preparation source356-405,653-662; bound selection, RNG and actual LU reconstruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_signature.go",
+          "tests": [
+            "TestLARSignatureExactPositionIndependentModels",
+            "TestLARSignatureExtractionIndependentModels",
+            "TestLARSignaturePreparationIndependentSystems",
+            "TestLARSignatureReachedPrefixes",
+            "TestLARSignaturePhysicalOwnership"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Native uint32 map replaces unordered_map; preparation traverses ascending keys for reproducible RNG/error prefixes. C++ imposes no insertion-order contract. Exact and floating concrete consumers share only bound-selection control flow. Full signature/presolve/trace catch-up and LAR Solve remain open; no whole-unit promotion."
+      ]
     },
     {
       "path": "src/util/lp/lar_solver.h",
@@ -122441,7 +122485,9 @@
         "pkg/util/lp/core_pivot_compare_exact.go",
         "pkg/util/lp/core_pivot_compare_exact_test.go",
         "pkg/util/lp/core_statistics_exact.go",
-        "pkg/util/lp/core_statistics_exact_test.go"
+        "pkg/util/lp/core_statistics_exact_test.go",
+        "pkg/util/lp/core_position_exact.go",
+        "pkg/util/lp/lar_signature_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122569,7 +122615,12 @@
         "TestLPPairStatisticsLiveLocalReentryGuard",
         "TestLPPairStatisticsPhysicalOwnership",
         "TestLPPairAllColumnsFeasibilityIndependentOracle",
-        "TestLPPairStatisticsReachedGuardsAndPrefixes"
+        "TestLPPairStatisticsReachedGuardsAndPrefixes",
+        "TestLARSignatureExactPositionIndependentModels",
+        "TestLARSignatureExtractionIndependentModels",
+        "TestLARSignaturePreparationIndependentSystems",
+        "TestLARSignatureReachedPrefixes",
+        "TestLARSignaturePhysicalOwnership"
       ],
       "conditionals": [
         {
@@ -123049,6 +123100,18 @@
             "TestLPPairAllColumnsFeasibilityIndependentOracle",
             "TestLPPairStatisticsReachedGuardsAndPrefixes"
           ]
+        },
+        {
+          "name": "precise nonbasic bound position source893-914",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_position_exact.go",
+          "tests": [
+            "TestLARSignatureExactPositionIndependentModels",
+            "TestLARSignatureExtractionIndependentModels",
+            "TestLARSignaturePreparationIndependentSystems",
+            "TestLARSignatureReachedPrefixes",
+            "TestLARSignaturePhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -123073,7 +123136,8 @@
         "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard.",
         "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update.",
         "Concrete exact specialization only. Source expression temporaries remain owned through numerical failure; real older comparison generations are preserved. Outer different-column advancement, precise Solve and full source diagnostics remain open.",
-        "Statistics use Go io.Writer/fmt/strconv, retaining exact numeric-pair x+y/1000 evaluation before conversion and classic six-digit formatting; no STL stream implementation is ported. Reporting snapshots its by-value argument before output, inspects LU nonzero counts after cost text, and checks actual cancellation after successful output. Local cost/argument owners survive failures until captured child scratch is cleaned. Full precise/default-tableau Solve remains open."
+        "Statistics use Go io.Writer/fmt/strconv, retaining exact numeric-pair x+y/1000 evaluation before conversion and classic six-digit formatting; no STL stream implementation is ported. Reporting snapshots its by-value argument before output, inspects LU nonzero counts after cost text, and checks actual cancellation after successful output. Local cost/argument owners survive failures until captured child scratch is cleaned. Full precise/default-tableau Solve remains open.",
+        "Native uint32 map replaces unordered_map; preparation traverses ascending keys for reproducible RNG/error prefixes. C++ imposes no insertion-order contract. Exact and floating concrete consumers share only bound-selection control flow. Full signature/presolve/trace catch-up and LAR Solve remain open; no whole-unit promotion."
       ]
     },
     {

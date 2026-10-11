@@ -5,7 +5,7 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently 84 partial source units and 26 unported units. Floating
+There are currently 85 partial source units and 25 unported units. Floating
 primal/dual and exact primal cores expose Solve, including exact LU and both
 tableau strategies. Outer floating LU primal/dual integration is implemented.
 Exact outer preparation, remaining dual/LAR variants, source diagnostics and
@@ -904,3 +904,36 @@ Includes exact LU/tableau Solve and row pricing/iteration, predatesf1171db3
 LAR explanations and current feasibility entry. This is the latest completed
 full native checkpoint; these later additions have their own focused checks.
 Full LP remains84partial/26unported source units.
+
+### LAR solution signatures, concrete extraction and reconstruction
+
+Ported exact nonbasic position classification (core_solver_base.hpp:893-914),
+solution signature storage and both retained pair/float extraction/preparation
+consumers (lar_core_solver.h:356-405,653-662). Native uint32 maps replace the
+source unordered_map; ascending preparation keys give deterministic RNG/error
+prefixes without inventing an insertion-order requirement. Exact positions
+include epsilon coordinates and retain lower-bound precedence. Preparation
+preserves fixed-upper versus off-bound-fixed-lower selection, the native free
+fallthrough, boxed RNG, the rational heading assertion for either target, and
+source zero-RHS assertion before actual LU reconstruction. Exact assignment
+receipts end before delegated reconstruction, leaving stopped ownership local.
+
+Verification:500 independent exact position worlds;120 pair/float extraction
+worlds;320 known-solution reconstruction worlds with epsilon and independent
+RNG checks;24 reached metadata/assertion/clear/publication profiles; pooled and
+direct physical refusal campaigns through exact reconstruction. Related
+feasibility/explanation tests pass native1.463s/debug2.994s. Position file32/38
+(84.2%) both profiles; signature file102/129 (79.1%) native,113/129 (87.6%)
+debug. Remaining gaps guard inherited valid scalar/index invariants, nil map
+initialization and opposite-profile assertions; whole-source coverage is not
+inferred. Both vets pass; module compilation and portcheck recorded below.
+
+LP now85partial/25unported source units: the signature header has its first
+implementation mapping but is not yet promoted through whole-unit audit. Full
+signature/presolve and basis-trace handoff, LAR Solve, exact outer preparation
+and other remaining variants/diagnostics and upstream drivers remain open.
+Latest full native checkpoint remains08:04UTC atbc47adfb and predates these files.
+
+Native/debug module compilation, both vets, portcheck, dependency graph and
+diff checks pass. No full suite was repeated; the08:04UTC checkpoint remains
+the last completed native module run and predates this increment.

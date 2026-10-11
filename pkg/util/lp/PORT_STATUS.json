@@ -670,7 +670,9 @@
         "pkg/util/lp/lar_prepare_float.go",
         "pkg/util/lp/lar_prepare_float_test.go",
         "pkg/util/lp/lar_infeasibility.go",
-        "pkg/util/lp/lar_infeasibility_test.go"
+        "pkg/util/lp/lar_infeasibility_test.go",
+        "pkg/util/lp/lar_signature.go",
+        "pkg/util/lp/lar_signature_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -715,7 +717,12 @@
         "TestLARInfeasibilityBasisOrderAndNonbasicScan",
         "TestLARInfeasibilityStopsAtPendingExplanation",
         "TestLARInfSignPreservesOlderComparison",
-        "TestLARInfeasibilityOwnsCopiedCoefficients"
+        "TestLARInfeasibilityOwnsCopiedCoefficients",
+        "TestLARSignatureExactPositionIndependentModels",
+        "TestLARSignatureExtractionIndependentModels",
+        "TestLARSignaturePreparationIndependentSystems",
+        "TestLARSignatureReachedPrefixes",
+        "TestLARSignaturePhysicalOwnership"
       ]
     },
     {
@@ -775,9 +782,18 @@
     },
     {
       "source": "src/util/lp/lar_solution_signature.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/lar_signature.go",
+        "pkg/util/lp/lar_signature_test.go"
+      ],
+      "tests": [
+        "TestLARSignatureExactPositionIndependentModels",
+        "TestLARSignatureExtractionIndependentModels",
+        "TestLARSignaturePreparationIndependentSystems",
+        "TestLARSignatureReachedPrefixes",
+        "TestLARSignaturePhysicalOwnership"
+      ]
     },
     {
       "source": "src/util/lp/lar_solver.h",
@@ -1188,7 +1204,9 @@
         "pkg/util/lp/core_pivot_compare_exact.go",
         "pkg/util/lp/core_pivot_compare_exact_test.go",
         "pkg/util/lp/core_statistics_exact.go",
-        "pkg/util/lp/core_statistics_exact_test.go"
+        "pkg/util/lp/core_statistics_exact_test.go",
+        "pkg/util/lp/core_position_exact.go",
+        "pkg/util/lp/lar_signature_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1316,7 +1334,12 @@
         "TestLPPairStatisticsLiveLocalReentryGuard",
         "TestLPPairStatisticsPhysicalOwnership",
         "TestLPPairAllColumnsFeasibilityIndependentOracle",
-        "TestLPPairStatisticsReachedGuardsAndPrefixes"
+        "TestLPPairStatisticsReachedGuardsAndPrefixes",
+        "TestLARSignatureExactPositionIndependentModels",
+        "TestLARSignatureExtractionIndependentModels",
+        "TestLARSignaturePreparationIndependentSystems",
+        "TestLARSignatureReachedPrefixes",
+        "TestLARSignaturePhysicalOwnership"
       ]
     },
     {
@@ -3843,8 +3866,8 @@
     }
   ],
   "status_counts": {
-    "unported": 26,
-    "partial": 84
+    "unported": 25,
+    "partial": 85
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
