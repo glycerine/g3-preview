@@ -102,10 +102,11 @@ func (m *RationalCoreSolverBase) TransposeRowsTableau(i, j uint32) (err error) {
 
 // RestoreBasisChange reverses only an exchange that actually published the
 // entering column in the basis. The inverse exchange uses source append logic.
-func (m *RationalCoreSolverBase) RestoreBasisChange(entering, leaving uint32) error {
-	if err := m.ready(); err != nil {
+func (m *RationalCoreSolverBase) RestoreBasisChange(entering, leaving uint32) (err error) {
+	if err = m.ready(); err != nil {
 		return err
 	}
+	defer func() { m.stopped = err != nil }()
 	if uint64(entering) >= uint64(len(*m.Heading)) {
 		return ErrBounds
 	}

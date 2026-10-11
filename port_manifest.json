@@ -122572,7 +122572,13 @@
         "pkg/util/lp/core_values_rational_test.go",
         "pkg/util/lp/core_residual_rational.go",
         "pkg/util/lp/core_pivot_rational.go",
-        "pkg/util/lp/core_residual_pivot_rational_test.go"
+        "pkg/util/lp/core_residual_pivot_rational_test.go",
+        "pkg/util/lp/core_update_rational.go",
+        "pkg/util/lp/core_cost_validate_rational.go",
+        "pkg/util/lp/core_feasibility_rational.go",
+        "pkg/util/lp/core_update_rational_test.go",
+        "pkg/util/lp/core_cost_validate_rational_test.go",
+        "pkg/util/lp/core_feasibility_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122756,7 +122762,24 @@
         "TestLPRationalCoreResidualPivotPhysicalOwnership",
         "TestLPRationalCoreResidualPivotGuards",
         "TestLPRationalCorePivotCancellationAndStaleResidual",
-        "TestLPRationalCoreResidualPivotPreservesOlderComparison"
+        "TestLPRationalCoreResidualPivotPreservesOlderComparison",
+        "TestLPRationalCoreUpdateIndependentSystems",
+        "TestLPRationalCoreUpdateSingularRollback",
+        "TestLPRationalCoreUpdatePhysicalOwnership",
+        "TestLPRationalCoreRestoreDiagnosticsAndGuards",
+        "TestLPRationalCoreUpdateReachedGuards",
+        "TestLPRationalCoreUpdateOlderComparison",
+        "TestLPRationalCoreUpdateMissingBackupAndLiveStep",
+        "TestLPRationalCostValidatorsIndependentOracle",
+        "TestLPRationalReducedCostsIndependentMatrixOracle",
+        "TestLPRationalCostValidatorSourceDiagnosticsAndGuards",
+        "TestLPRationalPrintColumnInfoExactSplitAndRefusals",
+        "TestLPRationalCostValidatorsPhysicalOwnership",
+        "TestLPRationalPrintColumnInfoMetadataAndBorrowedValueGuards",
+        "TestLPRationalCostValidatorClosedDiagnosticAndDebugGuards",
+        "TestLPRationalFeasibilityIndependentMembership",
+        "TestLPRationalFeasibilityDiagnosticsAndGuards",
+        "TestLPRationalFeasibilityPhysicalComparisons"
       ],
       "assertions": [
         {
@@ -123243,6 +123266,30 @@
             "TestLPRationalCoreResidualPivotPreservesOlderComparison",
             "TestLPRationalCoreValuesUpstreamSolveRationalBasis"
           ]
+        },
+        {
+          "name": "retained scalar mpq/mpq LU basis/value updates and rollback, feasibility membership, exact cost/reduced-cost validators and column diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_update_rational.go",
+          "tests": [
+            "TestLPRationalCoreUpdateIndependentSystems",
+            "TestLPRationalCoreUpdateSingularRollback",
+            "TestLPRationalCoreUpdatePhysicalOwnership",
+            "TestLPRationalCoreRestoreDiagnosticsAndGuards",
+            "TestLPRationalCoreUpdateReachedGuards",
+            "TestLPRationalCoreUpdateOlderComparison",
+            "TestLPRationalCoreUpdateMissingBackupAndLiveStep",
+            "TestLPRationalCostValidatorsIndependentOracle",
+            "TestLPRationalReducedCostsIndependentMatrixOracle",
+            "TestLPRationalCostValidatorSourceDiagnosticsAndGuards",
+            "TestLPRationalPrintColumnInfoExactSplitAndRefusals",
+            "TestLPRationalCostValidatorsPhysicalOwnership",
+            "TestLPRationalPrintColumnInfoMetadataAndBorrowedValueGuards",
+            "TestLPRationalCostValidatorClosedDiagnosticAndDebugGuards",
+            "TestLPRationalFeasibilityIndependentMembership",
+            "TestLPRationalFeasibilityDiagnosticsAndGuards",
+            "TestLPRationalFeasibilityPhysicalComparisons"
+          ]
         }
       ],
       "ownership": [
@@ -123276,7 +123323,8 @@
         "Exact feasibility entry delegates actual LU/tableau Solve and validates nonbasic feasibility only under source debug; native early feasible return may ignore infeasible nonbasic values, as in source. Numerical errors keep the actual delegated owner receipts and stop the wrapper. Exact outer preparation and full LAR signature/Solve remain open; no whole source-unit promotion.",
         "Outer LAR Solve and exact nonbasic bound snapping are implemented with actual coupled solvers and source publication order. Direct tableau cancellation may become Optimal while values remain infeasible; floating timeout preserves TimeExhausted via its earlier return. Tests preserve these literal source behaviors. No whole-source-unit promotion; remaining source audits and upstream drivers remain open.",
         "Concrete scalar mpq/mpq core value updates/restoration, descending RHS reconstruction, precise LU solve, reduced costs, deterministic bound/free snapping, precise indexed residual bypass and ascending objective dot product now implement the retained source methods. UpdateX keeps delta a live reference and precise updates never populate CopyXB. Reconstruction uses the real RationalLU and publishes descending basic assignments, without floating refinement. Reduced costs skip zero Y before row reads. Source rational binary expressions copy the left operand and copy the compound-result reference on return; core products and corrected outer objective products/sums preserve these owners and physical failure prefixes. Parent raw receipts close before LU, LU before borrowed work, and temporary owners before parent roots. Seven test groups cover 100 independent triangular systems with 81-180-bit costs and independent RHS, transpose solve, reduced-cost and objective oracles; 360 update/restore worlds across LU/tableau traversal and live aliases; all source column types and unknown default; output aliasing and descending aliased copies; 27 reached domain profiles; stopped/closed calls and actual older comparison identity. Twenty-two pooled/direct physical campaigns run through success, require actual refusal for every direct campaign and pass ownership census. The literal upstream solve_rational fixture reconstructs a supplied known basis and checks objective24 using independent primal/dual certificates: no optimization search or complete upstream-driver credit. The initial reduced-cost guard fixture marked all columns basic; making the next column nonbasic corrects its expected reached cost read. Inventory remains 88 partial/16 unported/6 reference_only; no whole-source promotion. Scalar core residual/diagnostic queries, pivot and feasibility-search orchestration, exact primal/dual outer optimization, full upstream drivers and whole-source audits remain open. Audit earlier common exact preparation/presolve binary-expression temporaries against rational.h copy-on-return semantics; the objective correction does not prove those paths complete. Latest full native checkpoint a8a7ef66 predates scalar core base/values and the current objective-expression correction; focused coverage measures current Go statements only.",
-        "Concrete scalar mpq/mpq residual validation and FindXBySolving now execute the actual RationalStaticMatrix row product, copied rational difference, ascending first-mismatch query and exact diagnostic. The source second row product is recomputed inside printing; the earlier delta remains unchanged. FindXBySolving performs real precise LU reconstruction and returns false for a stale factorization whose reconstructed point violates the current matrix. Scalar inverse pivot rows clear/set the unit row, use actual RationalLU indexed transpose solving, and accumulate only nonbasic contributions through real IndexedRationalVector drop-tolerance storage. Exact cancellation removes membership and precise RowsNZ publication follows completed arithmetic. Row counters remain supplied by the outer caller, as in source; native assertions erase the settings read while debug observes it. Parent raw calls close before LU and child scratch, with borrowed model storage retained through cleanup. Seven new test groups cover100 independent 81-180-bit triangular bases with rotated column identities and all inverse rows;120 independent residual/reconstruction systems including signed1e-100 violations; exact diagnostic bytes, every writer refusal prefix, output-triggered X mutation, final flush/error and actual closed stdout;14 reached guard profiles, empty dimensions, cancellation and a stale-LU false result; ten pooled/direct physical campaigns through success covering residuals, reconstruction, inverse rows, pivot accumulation and printing. Every direct campaign requires actual physical refusal and ownership censuses pass. A real older1000-digit caller comparison survives residual/pivot calls and Close without adoption. Initial fixtures omitted outer RowsNZ sizing and LU strategy selection; correcting those source caller obligations resolved the reached guards without changing production algorithms. The literal upstream solve_rational known-basis fixture also runs real FindXBySolving validation, without optimizer/basis-search or complete-driver credit. Inventory remains88 partial/16 unported/6 reference_only; no whole-source promotion. Scalar feasibility/cost switching, pivot/basis update orchestration, primal/dual iteration and outer optimization, remaining diagnostics and full upstream drivers remain open. Latest full native checkpointa8a7ef66 predates scalar core base/value/expression corrections and this residual/pivot increment; focused coverage measures current Go statements only."
+        "Concrete scalar mpq/mpq residual validation and FindXBySolving now execute the actual RationalStaticMatrix row product, copied rational difference, ascending first-mismatch query and exact diagnostic. The source second row product is recomputed inside printing; the earlier delta remains unchanged. FindXBySolving performs real precise LU reconstruction and returns false for a stale factorization whose reconstructed point violates the current matrix. Scalar inverse pivot rows clear/set the unit row, use actual RationalLU indexed transpose solving, and accumulate only nonbasic contributions through real IndexedRationalVector drop-tolerance storage. Exact cancellation removes membership and precise RowsNZ publication follows completed arithmetic. Row counters remain supplied by the outer caller, as in source; native assertions erase the settings read while debug observes it. Parent raw calls close before LU and child scratch, with borrowed model storage retained through cleanup. Seven new test groups cover100 independent 81-180-bit triangular bases with rotated column identities and all inverse rows;120 independent residual/reconstruction systems including signed1e-100 violations; exact diagnostic bytes, every writer refusal prefix, output-triggered X mutation, final flush/error and actual closed stdout;14 reached guard profiles, empty dimensions, cancellation and a stale-LU false result; ten pooled/direct physical campaigns through success covering residuals, reconstruction, inverse rows, pivot accumulation and printing. Every direct campaign requires actual physical refusal and ownership censuses pass. A real older1000-digit caller comparison survives residual/pivot calls and Close without adoption. Initial fixtures omitted outer RowsNZ sizing and LU strategy selection; correcting those source caller obligations resolved the reached guards without changing production algorithms. The literal upstream solve_rational known-basis fixture also runs real FindXBySolving validation, without optimizer/basis-search or complete-driver credit. Inventory remains88 partial/16 unported/6 reference_only; no whole-source promotion. Scalar feasibility/cost switching, pivot/basis update orchestration, primal/dual iteration and outer optimization, remaining diagnostics and full upstream drivers remain open. Latest full native checkpointa8a7ef66 predates scalar core base/value/expression corrections and this residual/pivot increment; focused coverage measures current Go statements only.",
+        "Concrete scalar mpq/mpq LU basis/value update now performs live UpdateX, Suhl column replacement, forced full refactor, unconditional basis rollback, actual stored CopyXB restoration, refactor diagnostics and precise residual validation in source order. A successful ordinary exchange preserves caller status/counters; singular rollback is retained even for feasibility-only mode. Missing precise backup can produce FLOATING_POINT_ERROR before the unstable counter increment; no automatic backup or residual repair is introduced. Source metadata failure retains the completed factorization replacement or prior basis/heading publication. RestoreBasisChange now consistently stops the scalar core after an invalid heading, matching its mutating-call lifetime contract. Scalar all-column feasibility, infeasibility membership update/validation, column printer, nonbasic zero-cost assertions, per-column/aggregate infeasibility-cost checks and tableau reduced-cost validation are implemented. Cost validation reads the breakpoint setting before column metadata as in source; unknown native types return true, while debug asserts. The column printer preserves split streams: bounds/name/type go to its writer, heading/X to stdout. Seventeen test groups cover120 independent81-200-bit systems, rotated bases, sparse/dense LU thresholds, zero/nonzero steps, replacement/refactor lifecycle and actual post-exchange LU reconstruction; eight singular rollback profiles, missing backup and both live alias index orders;1600 independent cost-sign worlds including tiny1e-100 violations and contradictory bounds with source upper-first priority;160 independent reduced-cost matrices and160 membership worlds; reached extent/assertion/diagnostic/closed-stream profiles and exact source output. Twenty pooled/direct physical campaigns through success cover replacement, refactor, rollback, restoration, cost validation, reduced-cost arithmetic and feasibility comparisons. Direct campaigns require actual physical refusal and ownership censuses pass. Four actual older1000-digit comparison campaigns prove update/restore/refactor/basis cleanup does not adopt or consume caller identity. The initial inherited stopped-restore tests exposed the missing stop guard; an alias fixture assumed ascending LU direction order and was replaced by two explicit valid orders. The hard-coded numeric_pair<mpq> make_column_feasible remains pair-only: no scalar method or unused template adapter was invented. Inventory remains88 partial/16 unported/6 reference_only; no whole-source promotion. Concrete scalar primal/dual iteration, feasibility-cost construction/switching, outer optimization integration, remaining diagnostics and full upstream drivers remain open. Full native checkpoint7957befd is still running and predates this update/feasibility/cost increment; its completion and coverage are not credited here."
       ]
     },
     {
@@ -123333,7 +123381,13 @@
         "pkg/util/lp/core_values_rational_test.go",
         "pkg/util/lp/core_residual_rational.go",
         "pkg/util/lp/core_pivot_rational.go",
-        "pkg/util/lp/core_residual_pivot_rational_test.go"
+        "pkg/util/lp/core_residual_pivot_rational_test.go",
+        "pkg/util/lp/core_update_rational.go",
+        "pkg/util/lp/core_cost_validate_rational.go",
+        "pkg/util/lp/core_feasibility_rational.go",
+        "pkg/util/lp/core_update_rational_test.go",
+        "pkg/util/lp/core_cost_validate_rational_test.go",
+        "pkg/util/lp/core_feasibility_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -123488,7 +123542,24 @@
         "TestLPRationalCoreResidualPivotPhysicalOwnership",
         "TestLPRationalCoreResidualPivotGuards",
         "TestLPRationalCorePivotCancellationAndStaleResidual",
-        "TestLPRationalCoreResidualPivotPreservesOlderComparison"
+        "TestLPRationalCoreResidualPivotPreservesOlderComparison",
+        "TestLPRationalCoreUpdateIndependentSystems",
+        "TestLPRationalCoreUpdateSingularRollback",
+        "TestLPRationalCoreUpdatePhysicalOwnership",
+        "TestLPRationalCoreRestoreDiagnosticsAndGuards",
+        "TestLPRationalCoreUpdateReachedGuards",
+        "TestLPRationalCoreUpdateOlderComparison",
+        "TestLPRationalCoreUpdateMissingBackupAndLiveStep",
+        "TestLPRationalCostValidatorsIndependentOracle",
+        "TestLPRationalReducedCostsIndependentMatrixOracle",
+        "TestLPRationalCostValidatorSourceDiagnosticsAndGuards",
+        "TestLPRationalPrintColumnInfoExactSplitAndRefusals",
+        "TestLPRationalCostValidatorsPhysicalOwnership",
+        "TestLPRationalPrintColumnInfoMetadataAndBorrowedValueGuards",
+        "TestLPRationalCostValidatorClosedDiagnosticAndDebugGuards",
+        "TestLPRationalFeasibilityIndependentMembership",
+        "TestLPRationalFeasibilityDiagnosticsAndGuards",
+        "TestLPRationalFeasibilityPhysicalComparisons"
       ],
       "conditionals": [
         {
@@ -124024,6 +124095,30 @@
             "TestLPRationalCoreResidualPivotPreservesOlderComparison",
             "TestLPRationalCoreValuesUpstreamSolveRationalBasis"
           ]
+        },
+        {
+          "name": "retained scalar mpq/mpq LU basis/value updates and rollback, feasibility membership, exact cost/reduced-cost validators and column diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_update_rational.go",
+          "tests": [
+            "TestLPRationalCoreUpdateIndependentSystems",
+            "TestLPRationalCoreUpdateSingularRollback",
+            "TestLPRationalCoreUpdatePhysicalOwnership",
+            "TestLPRationalCoreRestoreDiagnosticsAndGuards",
+            "TestLPRationalCoreUpdateReachedGuards",
+            "TestLPRationalCoreUpdateOlderComparison",
+            "TestLPRationalCoreUpdateMissingBackupAndLiveStep",
+            "TestLPRationalCostValidatorsIndependentOracle",
+            "TestLPRationalReducedCostsIndependentMatrixOracle",
+            "TestLPRationalCostValidatorSourceDiagnosticsAndGuards",
+            "TestLPRationalPrintColumnInfoExactSplitAndRefusals",
+            "TestLPRationalCostValidatorsPhysicalOwnership",
+            "TestLPRationalPrintColumnInfoMetadataAndBorrowedValueGuards",
+            "TestLPRationalCostValidatorClosedDiagnosticAndDebugGuards",
+            "TestLPRationalFeasibilityIndependentMembership",
+            "TestLPRationalFeasibilityDiagnosticsAndGuards",
+            "TestLPRationalFeasibilityPhysicalComparisons"
+          ]
         }
       ],
       "ownership": [
@@ -124052,7 +124147,8 @@
         "Statistics use Go io.Writer/fmt/strconv, retaining exact numeric-pair x+y/1000 evaluation before conversion and classic six-digit formatting; no STL stream implementation is ported. Reporting snapshots its by-value argument before output, inspects LU nonzero counts after cost text, and checks actual cancellation after successful output. Local cost/argument owners survive failures until captured child scratch is cleaned. Full precise/default-tableau Solve remains open.",
         "Native uint32 map replaces unordered_map; preparation traverses ascending keys for reproducible RNG/error prefixes. C++ imposes no insertion-order contract. Exact and floating concrete consumers share only bound-selection control flow. Full signature/presolve/trace catch-up and LAR Solve remain open; no whole-unit promotion.",
         "Concrete scalar mpq/mpq core value updates/restoration, descending RHS reconstruction, precise LU solve, reduced costs, deterministic bound/free snapping, precise indexed residual bypass and ascending objective dot product now implement the retained source methods. UpdateX keeps delta a live reference and precise updates never populate CopyXB. Reconstruction uses the real RationalLU and publishes descending basic assignments, without floating refinement. Reduced costs skip zero Y before row reads. Source rational binary expressions copy the left operand and copy the compound-result reference on return; core products and corrected outer objective products/sums preserve these owners and physical failure prefixes. Parent raw receipts close before LU, LU before borrowed work, and temporary owners before parent roots. Seven test groups cover 100 independent triangular systems with 81-180-bit costs and independent RHS, transpose solve, reduced-cost and objective oracles; 360 update/restore worlds across LU/tableau traversal and live aliases; all source column types and unknown default; output aliasing and descending aliased copies; 27 reached domain profiles; stopped/closed calls and actual older comparison identity. Twenty-two pooled/direct physical campaigns run through success, require actual refusal for every direct campaign and pass ownership census. The literal upstream solve_rational fixture reconstructs a supplied known basis and checks objective24 using independent primal/dual certificates: no optimization search or complete upstream-driver credit. The initial reduced-cost guard fixture marked all columns basic; making the next column nonbasic corrects its expected reached cost read. Inventory remains 88 partial/16 unported/6 reference_only; no whole-source promotion. Scalar core residual/diagnostic queries, pivot and feasibility-search orchestration, exact primal/dual outer optimization, full upstream drivers and whole-source audits remain open. Audit earlier common exact preparation/presolve binary-expression temporaries against rational.h copy-on-return semantics; the objective correction does not prove those paths complete. Latest full native checkpoint a8a7ef66 predates scalar core base/values and the current objective-expression correction; focused coverage measures current Go statements only.",
-        "Concrete scalar mpq/mpq residual validation and FindXBySolving now execute the actual RationalStaticMatrix row product, copied rational difference, ascending first-mismatch query and exact diagnostic. The source second row product is recomputed inside printing; the earlier delta remains unchanged. FindXBySolving performs real precise LU reconstruction and returns false for a stale factorization whose reconstructed point violates the current matrix. Scalar inverse pivot rows clear/set the unit row, use actual RationalLU indexed transpose solving, and accumulate only nonbasic contributions through real IndexedRationalVector drop-tolerance storage. Exact cancellation removes membership and precise RowsNZ publication follows completed arithmetic. Row counters remain supplied by the outer caller, as in source; native assertions erase the settings read while debug observes it. Parent raw calls close before LU and child scratch, with borrowed model storage retained through cleanup. Seven new test groups cover100 independent 81-180-bit triangular bases with rotated column identities and all inverse rows;120 independent residual/reconstruction systems including signed1e-100 violations; exact diagnostic bytes, every writer refusal prefix, output-triggered X mutation, final flush/error and actual closed stdout;14 reached guard profiles, empty dimensions, cancellation and a stale-LU false result; ten pooled/direct physical campaigns through success covering residuals, reconstruction, inverse rows, pivot accumulation and printing. Every direct campaign requires actual physical refusal and ownership censuses pass. A real older1000-digit caller comparison survives residual/pivot calls and Close without adoption. Initial fixtures omitted outer RowsNZ sizing and LU strategy selection; correcting those source caller obligations resolved the reached guards without changing production algorithms. The literal upstream solve_rational known-basis fixture also runs real FindXBySolving validation, without optimizer/basis-search or complete-driver credit. Inventory remains88 partial/16 unported/6 reference_only; no whole-source promotion. Scalar feasibility/cost switching, pivot/basis update orchestration, primal/dual iteration and outer optimization, remaining diagnostics and full upstream drivers remain open. Latest full native checkpointa8a7ef66 predates scalar core base/value/expression corrections and this residual/pivot increment; focused coverage measures current Go statements only."
+        "Concrete scalar mpq/mpq residual validation and FindXBySolving now execute the actual RationalStaticMatrix row product, copied rational difference, ascending first-mismatch query and exact diagnostic. The source second row product is recomputed inside printing; the earlier delta remains unchanged. FindXBySolving performs real precise LU reconstruction and returns false for a stale factorization whose reconstructed point violates the current matrix. Scalar inverse pivot rows clear/set the unit row, use actual RationalLU indexed transpose solving, and accumulate only nonbasic contributions through real IndexedRationalVector drop-tolerance storage. Exact cancellation removes membership and precise RowsNZ publication follows completed arithmetic. Row counters remain supplied by the outer caller, as in source; native assertions erase the settings read while debug observes it. Parent raw calls close before LU and child scratch, with borrowed model storage retained through cleanup. Seven new test groups cover100 independent 81-180-bit triangular bases with rotated column identities and all inverse rows;120 independent residual/reconstruction systems including signed1e-100 violations; exact diagnostic bytes, every writer refusal prefix, output-triggered X mutation, final flush/error and actual closed stdout;14 reached guard profiles, empty dimensions, cancellation and a stale-LU false result; ten pooled/direct physical campaigns through success covering residuals, reconstruction, inverse rows, pivot accumulation and printing. Every direct campaign requires actual physical refusal and ownership censuses pass. A real older1000-digit caller comparison survives residual/pivot calls and Close without adoption. Initial fixtures omitted outer RowsNZ sizing and LU strategy selection; correcting those source caller obligations resolved the reached guards without changing production algorithms. The literal upstream solve_rational known-basis fixture also runs real FindXBySolving validation, without optimizer/basis-search or complete-driver credit. Inventory remains88 partial/16 unported/6 reference_only; no whole-source promotion. Scalar feasibility/cost switching, pivot/basis update orchestration, primal/dual iteration and outer optimization, remaining diagnostics and full upstream drivers remain open. Latest full native checkpointa8a7ef66 predates scalar core base/value/expression corrections and this residual/pivot increment; focused coverage measures current Go statements only.",
+        "Concrete scalar mpq/mpq LU basis/value update now performs live UpdateX, Suhl column replacement, forced full refactor, unconditional basis rollback, actual stored CopyXB restoration, refactor diagnostics and precise residual validation in source order. A successful ordinary exchange preserves caller status/counters; singular rollback is retained even for feasibility-only mode. Missing precise backup can produce FLOATING_POINT_ERROR before the unstable counter increment; no automatic backup or residual repair is introduced. Source metadata failure retains the completed factorization replacement or prior basis/heading publication. RestoreBasisChange now consistently stops the scalar core after an invalid heading, matching its mutating-call lifetime contract. Scalar all-column feasibility, infeasibility membership update/validation, column printer, nonbasic zero-cost assertions, per-column/aggregate infeasibility-cost checks and tableau reduced-cost validation are implemented. Cost validation reads the breakpoint setting before column metadata as in source; unknown native types return true, while debug asserts. The column printer preserves split streams: bounds/name/type go to its writer, heading/X to stdout. Seventeen test groups cover120 independent81-200-bit systems, rotated bases, sparse/dense LU thresholds, zero/nonzero steps, replacement/refactor lifecycle and actual post-exchange LU reconstruction; eight singular rollback profiles, missing backup and both live alias index orders;1600 independent cost-sign worlds including tiny1e-100 violations and contradictory bounds with source upper-first priority;160 independent reduced-cost matrices and160 membership worlds; reached extent/assertion/diagnostic/closed-stream profiles and exact source output. Twenty pooled/direct physical campaigns through success cover replacement, refactor, rollback, restoration, cost validation, reduced-cost arithmetic and feasibility comparisons. Direct campaigns require actual physical refusal and ownership censuses pass. Four actual older1000-digit comparison campaigns prove update/restore/refactor/basis cleanup does not adopt or consume caller identity. The initial inherited stopped-restore tests exposed the missing stop guard; an alias fixture assumed ascending LU direction order and was replaced by two explicit valid orders. The hard-coded numeric_pair<mpq> make_column_feasible remains pair-only: no scalar method or unused template adapter was invented. Inventory remains88 partial/16 unported/6 reference_only; no whole-source promotion. Concrete scalar primal/dual iteration, feasibility-cost construction/switching, outer optimization integration, remaining diagnostics and full upstream drivers remain open. Full native checkpoint7957befd is still running and predates this update/feasibility/cost increment; its completion and coverage are not credited here."
       ]
     },
     {
@@ -124077,7 +124173,13 @@
         "pkg/util/lp/core_tableau_exact.go",
         "pkg/util/lp/core_base_rational.go",
         "pkg/util/lp/core_basis_rational.go",
-        "pkg/util/lp/core_base_rational_test.go"
+        "pkg/util/lp/core_base_rational_test.go",
+        "pkg/util/lp/core_update_rational.go",
+        "pkg/util/lp/core_cost_validate_rational.go",
+        "pkg/util/lp/core_feasibility_rational.go",
+        "pkg/util/lp/core_update_rational_test.go",
+        "pkg/util/lp/core_cost_validate_rational_test.go",
+        "pkg/util/lp/core_feasibility_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -124132,7 +124234,24 @@
         "TestLPRationalCoreConstructorAndDomains",
         "TestLPRationalCorePreservesOlderComparison",
         "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
-        "TestLPRationalCoreReachedMetadataGuards"
+        "TestLPRationalCoreReachedMetadataGuards",
+        "TestLPRationalCoreUpdateIndependentSystems",
+        "TestLPRationalCoreUpdateSingularRollback",
+        "TestLPRationalCoreUpdatePhysicalOwnership",
+        "TestLPRationalCoreRestoreDiagnosticsAndGuards",
+        "TestLPRationalCoreUpdateReachedGuards",
+        "TestLPRationalCoreUpdateOlderComparison",
+        "TestLPRationalCoreUpdateMissingBackupAndLiveStep",
+        "TestLPRationalCostValidatorsIndependentOracle",
+        "TestLPRationalReducedCostsIndependentMatrixOracle",
+        "TestLPRationalCostValidatorSourceDiagnosticsAndGuards",
+        "TestLPRationalPrintColumnInfoExactSplitAndRefusals",
+        "TestLPRationalCostValidatorsPhysicalOwnership",
+        "TestLPRationalPrintColumnInfoMetadataAndBorrowedValueGuards",
+        "TestLPRationalCostValidatorClosedDiagnosticAndDebugGuards",
+        "TestLPRationalFeasibilityIndependentMembership",
+        "TestLPRationalFeasibilityDiagnosticsAndGuards",
+        "TestLPRationalFeasibilityPhysicalComparisons"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -124253,6 +124372,30 @@
             "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
             "TestLPRationalCoreReachedMetadataGuards"
           ]
+        },
+        {
+          "name": "retained scalar mpq/mpq LU basis/value updates and rollback, feasibility membership, exact cost/reduced-cost validators and column diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_update_rational.go",
+          "tests": [
+            "TestLPRationalCoreUpdateIndependentSystems",
+            "TestLPRationalCoreUpdateSingularRollback",
+            "TestLPRationalCoreUpdatePhysicalOwnership",
+            "TestLPRationalCoreRestoreDiagnosticsAndGuards",
+            "TestLPRationalCoreUpdateReachedGuards",
+            "TestLPRationalCoreUpdateOlderComparison",
+            "TestLPRationalCoreUpdateMissingBackupAndLiveStep",
+            "TestLPRationalCostValidatorsIndependentOracle",
+            "TestLPRationalReducedCostsIndependentMatrixOracle",
+            "TestLPRationalCostValidatorSourceDiagnosticsAndGuards",
+            "TestLPRationalPrintColumnInfoExactSplitAndRefusals",
+            "TestLPRationalCostValidatorsPhysicalOwnership",
+            "TestLPRationalPrintColumnInfoMetadataAndBorrowedValueGuards",
+            "TestLPRationalCostValidatorClosedDiagnosticAndDebugGuards",
+            "TestLPRationalFeasibilityIndependentMembership",
+            "TestLPRationalFeasibilityDiagnosticsAndGuards",
+            "TestLPRationalFeasibilityPhysicalComparisons"
+          ]
         }
       ],
       "ownership": [
@@ -124268,7 +124411,8 @@
         "Floating basis bookkeeping and reduced-cost/entering-column layer only. Full primal/dual/LAR optimization remains open; floating numerical pivot/update is now implemented. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added.",
         "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced.",
         "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open.",
-        "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded."
+        "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
+        "Concrete scalar mpq/mpq LU basis/value update now performs live UpdateX, Suhl column replacement, forced full refactor, unconditional basis rollback, actual stored CopyXB restoration, refactor diagnostics and precise residual validation in source order. A successful ordinary exchange preserves caller status/counters; singular rollback is retained even for feasibility-only mode. Missing precise backup can produce FLOATING_POINT_ERROR before the unstable counter increment; no automatic backup or residual repair is introduced. Source metadata failure retains the completed factorization replacement or prior basis/heading publication. RestoreBasisChange now consistently stops the scalar core after an invalid heading, matching its mutating-call lifetime contract. Scalar all-column feasibility, infeasibility membership update/validation, column printer, nonbasic zero-cost assertions, per-column/aggregate infeasibility-cost checks and tableau reduced-cost validation are implemented. Cost validation reads the breakpoint setting before column metadata as in source; unknown native types return true, while debug asserts. The column printer preserves split streams: bounds/name/type go to its writer, heading/X to stdout. Seventeen test groups cover120 independent81-200-bit systems, rotated bases, sparse/dense LU thresholds, zero/nonzero steps, replacement/refactor lifecycle and actual post-exchange LU reconstruction; eight singular rollback profiles, missing backup and both live alias index orders;1600 independent cost-sign worlds including tiny1e-100 violations and contradictory bounds with source upper-first priority;160 independent reduced-cost matrices and160 membership worlds; reached extent/assertion/diagnostic/closed-stream profiles and exact source output. Twenty pooled/direct physical campaigns through success cover replacement, refactor, rollback, restoration, cost validation, reduced-cost arithmetic and feasibility comparisons. Direct campaigns require actual physical refusal and ownership censuses pass. Four actual older1000-digit comparison campaigns prove update/restore/refactor/basis cleanup does not adopt or consume caller identity. The initial inherited stopped-restore tests exposed the missing stop guard; an alias fixture assumed ascending LU direction order and was replaced by two explicit valid orders. The hard-coded numeric_pair<mpq> make_column_feasible remains pair-only: no scalar method or unused template adapter was invented. Inventory remains88 partial/16 unported/6 reference_only; no whole-source promotion. Concrete scalar primal/dual iteration, feasibility-cost construction/switching, outer optimization integration, remaining diagnostics and full upstream drivers remain open. Full native checkpoint7957befd is still running and predates this update/feasibility/cost increment; its completion and coverage are not credited here."
       ]
     },
     {
