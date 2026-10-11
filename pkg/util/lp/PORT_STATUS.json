@@ -1,7 +1,7 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 87.1,
+  "native_statement_coverage_of_current_go_code": 86.8,
   "coverage_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion. Scalar pivot comparison and incremental reduced-cost files are newer and retain separate focused evidence. Scalar primal advancement files are newer and retain separate focused evidence. Scalar entering orchestration and iteration are newer and retain separate focused evidence. Scalar core tableau operations are newer and retain separate focused evidence. Scalar primal tableau cost maintenance is newer and retains separate focused evidence. Scalar primal tableau values/basis exchange and reduced-cost initialization are newer and retain separate focused evidence. Scalar primal tableau entering/leaving selection is newer and retains separate focused evidence.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
@@ -5143,23 +5143,23 @@
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
-    "commit": "eb5c10f5",
-    "started_utc": "2026-10-11 17:09:16 UTC",
-    "completed_utc": "2026-10-11 17:29:25 UTC",
+    "commit": "28ac20ab",
+    "started_utc": "2026-10-11 18:09:54 UTC",
+    "completed_utc": "2026-10-11 18:30:46 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.events.jsonl",
-    "profile": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.json",
+    "log": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.json",
     "packages": 64,
     "passed_packages": 63,
     "skipped_packages": 1,
     "packages_with_tests": 51,
-    "lp_seconds": 1205.938,
-    "lp_covered_statements": 24775,
-    "lp_statements": 28448,
-    "session_id": 45678,
-    "scope_warning": "Checkpoint includes scalar breakpoint/leaving/pivot/LU advancement, entering/iteration, core tableau operations, primal tableau cost/value/basis exchange and reduced-cost initialization through eb5c10f5. Excludes later scalar tableau selection, advancement/entering/iteration and current scalar tableau initialization/row work. Coverage measures existing Go statements, not C++ completion. Actual session45678 terminated with exit0."
+    "lp_seconds": 1247.007,
+    "lp_covered_statements": 25732,
+    "lp_statements": 29633,
+    "session_id": 52535,
+    "scope_warning": "Includes recent scalar tableau selection/advancement/initialization/rows, scalar full primal Solve/statistics and scalar dual construction/initial bound helpers through28ac20ab. Excludes later dual pricing3cc640ff, breakpoint/Harris candidates383d50c2 and current scalar full ratio work. Profile inspection includes primal_solve_rational.go, core_statistics_rational.go and dual_core_rational.go, excludes all later dual files. Coverage measures existing Go statements, not C++ completion. Actual session52535 terminated with exit0."
   },
   "full_native_checkpoint_history": [
     {
@@ -5309,6 +5309,25 @@
       "lp_statements": 27179,
       "session_id": 39459,
       "scope_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion."
+    },
+    {
+      "commit": "eb5c10f5",
+      "started_utc": "2026-10-11 17:09:16 UTC",
+      "completed_utc": "2026-10-11 17:29:25 UTC",
+      "exit_code": 0,
+      "log": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.log",
+      "event_log": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.events.jsonl",
+      "profile": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.cover",
+      "status_file": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.json",
+      "packages": 64,
+      "passed_packages": 63,
+      "skipped_packages": 1,
+      "packages_with_tests": 51,
+      "lp_seconds": 1205.938,
+      "lp_covered_statements": 24775,
+      "lp_statements": 28448,
+      "session_id": 45678,
+      "scope_warning": "Checkpoint includes scalar breakpoint/leaving/pivot/LU advancement, entering/iteration, core tableau operations, primal tableau cost/value/basis exchange and reduced-cost initialization through eb5c10f5. Excludes later scalar tableau selection, advancement/entering/iteration and current scalar tableau initialization/row work. Coverage measures existing Go statements, not C++ completion. Actual session45678 terminated with exit0."
     }
   ],
   "latest_tableau_catchup_increment": {
@@ -7814,31 +7833,6 @@
       "dependency graph refresh",
       "diff check"
     ]
-  },
-  "running_full_native_checkpoint": {
-    "status": "running",
-    "commit": "28ac20ab",
-    "started_utc": "2026-10-11 18:09:54 UTC",
-    "runner_pid": 2,
-    "command": [
-      "go",
-      "-C",
-      "pkg",
-      "test",
-      "-json",
-      "./...",
-      "-timeout=60m",
-      "-count=1",
-      "-coverprofile=/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.cover"
-    ],
-    "log": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.events.jsonl",
-    "profile": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.json",
-    "go_pid": 5,
-    "exec_session_id": 52535,
-    "completion_credited": false,
-    "coverage_credited": false
   },
   "latest_rational_dual_price_increment": {
     "scope": "Scalar dual edge/row pricing, leaving delta/sign and source row budget",
