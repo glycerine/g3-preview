@@ -1,8 +1,8 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 86.8,
-  "coverage_warning": "Latest completed native checkpoint28ac20ab measures25732/29633 LP statements (86.8%) and includes scalar full primal Solve/statistics and scalar dual initialization. It predates dual pricing, Harris candidates, full ratio, flip/value updates, beta/DSE and current advancement/recovery; focused evidence remains separate. Go statement coverage measures implemented Go code, not C++ source completion. Remaining retained source and complete upstream drivers remain open.",
+  "native_statement_coverage_of_current_go_code": 86.7,
+  "coverage_warning": "Latest completed native checkpoint82fa38d8 measures26877/31015 LP statements (86.7%); includes scalar dual pricing/candidates/full ratio, flips, beta/DSE and advancement/recovery. Predates scalar full dual Solve and scalar outer primal integration. Their focused evidence remains separate. Go statement coverage is not C++ source completion; remaining retained sources and complete upstream drivers remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -5261,23 +5261,23 @@
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
-    "commit": "28ac20ab",
-    "started_utc": "2026-10-11 18:09:54 UTC",
-    "completed_utc": "2026-10-11 18:30:46 UTC",
+    "commit": "82fa38d8",
+    "started_utc": "2026-10-11 19:16:19 UTC",
+    "completed_utc": "2026-10-11 19:37:37 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.events.jsonl",
-    "profile": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.json",
+    "log": "/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.json",
     "packages": 64,
     "passed_packages": 63,
     "skipped_packages": 1,
     "packages_with_tests": 51,
-    "lp_seconds": 1247.007,
-    "lp_covered_statements": 25732,
-    "lp_statements": 29633,
-    "session_id": 52535,
-    "scope_warning": "Includes recent scalar tableau selection/advancement/initialization/rows, scalar full primal Solve/statistics and scalar dual construction/initial bound helpers through28ac20ab. Excludes later dual pricing3cc640ff, breakpoint/Harris candidates383d50c2 and current scalar full ratio work. Profile inspection includes primal_solve_rational.go, core_statistics_rational.go and dual_core_rational.go, excludes all later dual files. Coverage measures existing Go statements, not C++ completion. Actual session52535 terminated with exit0."
+    "lp_seconds": 1275.235,
+    "lp_covered_statements": 26877,
+    "lp_statements": 31015,
+    "session_id": 40387,
+    "scope_warning": "Includes scalar dual pricing/candidates/full ratio, flips/value updates, beta/DSE and known-leaving basis advancement/recovery through82fa38d8, plus earlier scalar full primal Solve/statistics and initialization. Profile excludes dual_solve_rational.go and all scalar outer-primal files. Their focused evidence remains separate. Coverage measures implemented Go statements, not C++ completion. Actual session40387 returned terminal exit0."
   },
   "full_native_checkpoint_history": [
     {
@@ -5446,6 +5446,25 @@
       "lp_statements": 28448,
       "session_id": 45678,
       "scope_warning": "Checkpoint includes scalar breakpoint/leaving/pivot/LU advancement, entering/iteration, core tableau operations, primal tableau cost/value/basis exchange and reduced-cost initialization through eb5c10f5. Excludes later scalar tableau selection, advancement/entering/iteration and current scalar tableau initialization/row work. Coverage measures existing Go statements, not C++ completion. Actual session45678 terminated with exit0."
+    },
+    {
+      "commit": "28ac20ab",
+      "started_utc": "2026-10-11 18:09:54 UTC",
+      "completed_utc": "2026-10-11 18:30:46 UTC",
+      "exit_code": 0,
+      "log": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.log",
+      "event_log": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.events.jsonl",
+      "profile": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.cover",
+      "status_file": "/mnt/oldrog/tmp/g3-scalar-dual-initial-module-native.json",
+      "packages": 64,
+      "passed_packages": 63,
+      "skipped_packages": 1,
+      "packages_with_tests": 51,
+      "lp_seconds": 1247.007,
+      "lp_covered_statements": 25732,
+      "lp_statements": 29633,
+      "session_id": 52535,
+      "scope_warning": "Includes recent scalar tableau selection/advancement/initialization/rows, scalar full primal Solve/statistics and scalar dual construction/initial bound helpers through28ac20ab. Excludes later dual pricing3cc640ff, breakpoint/Harris candidates383d50c2 and current scalar full ratio work. Profile inspection includes primal_solve_rational.go, core_statistics_rational.go and dual_core_rational.go, excludes all later dual files. Coverage measures existing Go statements, not C++ completion. Actual session52535 terminated with exit0."
     }
   ],
   "latest_tableau_catchup_increment": {
@@ -8279,31 +8298,6 @@
       "dependency_graph": "64 packages; no unresolved imports",
       "diff_check": "passed"
     }
-  },
-  "running_full_native_checkpoint": {
-    "status": "running",
-    "commit": "82fa38d8",
-    "started_utc": "2026-10-11 19:16:19 UTC",
-    "runner_pid": 2,
-    "command": [
-      "go",
-      "-C",
-      "pkg",
-      "test",
-      "-json",
-      "./...",
-      "-timeout=60m",
-      "-count=1",
-      "-coverprofile=/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.cover"
-    ],
-    "log": "/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.events.jsonl",
-    "profile": "/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.json",
-    "go_pid": 5,
-    "runner_session": 40387,
-    "completion_credited": false,
-    "scope": "Scalar dual pricing/candidates/full ratio, bound-flip/value updates, beta/DSE and known-leaving basis advancement/recovery; includes earlier scalar full primal Solve/statistics and initialization. Full dual pricing loop/Solve and outer integration remain open."
   },
   "latest_rational_dual_solve_increment": {
     "scope": "Concrete scalar pricing loop, OneIteration and full prepared dual-core Solve",
