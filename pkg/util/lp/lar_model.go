@@ -36,6 +36,9 @@ type LARSolver struct {
 	modelSingles                                       *IndexedRationalVector
 	validationCoefficients                             *SparseRationalVector
 	validationModel                                    *LARRationalModel
+	explanationCoefficients                            *LARRationalModel
+	validationExplanation                              *SparseRationalVector
+	certificateResult                                  *numeral.Rational
 	calls                                              exactEtaCalls
 	manager                                            *numeral.RationalManager
 	stopped                                            bool
@@ -59,7 +62,7 @@ func NewLARSolver(m *numeral.RationalManager) (solver *LARSolver, err error) {
 	return solver, err
 }
 func (s *LARSolver) ready() error {
-	if s.stopped || s.Core == nil || s.Core.stopped || s.pendingCleanupDelta != nil || s.pendingConstraint != nil || s.pendingTerm != nil || s.pendingIterator != nil || s.pendingRowIterator != nil || s.pendingRowAnalyzer != nil || s.work != nil || s.rationalWork != nil || s.modelPairs != nil || s.modelSingles != nil || s.validationCoefficients != nil || s.calls.pending() {
+	if s.stopped || s.Core == nil || s.Core.stopped || s.pendingCleanupDelta != nil || s.pendingConstraint != nil || s.pendingTerm != nil || s.pendingIterator != nil || s.pendingRowIterator != nil || s.pendingRowAnalyzer != nil || s.work != nil || s.rationalWork != nil || s.modelPairs != nil || s.modelSingles != nil || s.validationCoefficients != nil || s.explanationCoefficients != nil || s.certificateResult != nil || s.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return nil
@@ -242,11 +245,24 @@ func (s *LARSolver) Close() error {
 	if err := s.closeRowAnalysis(); err != nil {
 		return err
 	}
+	if s.validationExplanation != nil {
+		if err := s.validationExplanation.Close(); err != nil {
+			return err
+		}
+		s.validationExplanation = nil
+	}
+
 	if s.validationCoefficients != nil {
 		if err := s.validationCoefficients.Close(); err != nil {
 			return err
 		}
 		s.validationCoefficients = nil
+	}
+	if s.explanationCoefficients != nil {
+		if err := s.explanationCoefficients.Close(); err != nil {
+			return err
+		}
+		s.explanationCoefficients = nil
 	}
 	if s.validationModel != nil {
 		if err := s.validationModel.Close(); err != nil {
@@ -324,6 +340,12 @@ func (s *LARSolver) Close() error {
 	}
 	if err := s.ColumnBuffer.Close(); err != nil {
 		return err
+	}
+	if s.certificateResult != nil {
+		if err := s.manager.Del(s.certificateResult); err != nil {
+			return err
+		}
+		s.certificateResult = nil
 	}
 	return s.calls.cleanupRoots(s.manager)
 }

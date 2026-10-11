@@ -85,8 +85,41 @@ func (s *LARSolver) printConstraintLeftSide(c LARStoredConstraint, out io.Writer
 	}
 	s.rationalWork = NewIndexedRationalVector(s.manager, 3)
 	w := s.rationalWork.Data // val, unary negation temporary, free coefficient.
-	for i := range s.validationCoefficients.Data {
-		cell := &s.validationCoefficients.Data[i]
+	if err = s.printColumnCombination(s.validationCoefficients.Data, out); err != nil {
+		return err
+	}
+	if err = s.validationCoefficients.Close(); err != nil {
+		return err
+	}
+	s.validationCoefficients = nil
+	if err = c.FreeCoefficient(&w[2]); err != nil {
+		return err
+	}
+	zero, e := s.manager.IsZero(&w[2])
+	if e != nil {
+		return e
+	}
+	if !zero {
+		if err = writeConstraintText(out, " + "); err != nil {
+			return err
+		}
+		text, e := s.manager.String(&w[2])
+		if e != nil {
+			return e
+		}
+		if err = writeConstraintText(out, text); err != nil {
+			return err
+		}
+	}
+	return s.closeConstraintValue()
+}
+
+// printColumnCombination borrows the source vector while the caller owns its
+// copied coefficient and unary-minus lexical values in rationalWork.
+func (s *LARSolver) printColumnCombination(coefficients []RationalSparseEntry, out io.Writer) (err error) {
+	w := s.rationalWork.Data
+	for i := range coefficients {
+		cell := &coefficients[i]
 		if err = s.rationalWork.copySlot(&w[0], &cell.Value); err != nil {
 			return err
 		}
@@ -154,28 +187,5 @@ func (s *LARSolver) printConstraintLeftSide(c LARStoredConstraint, out io.Writer
 		}
 		w[0] = numeral.NewRational()
 	}
-	if err = s.validationCoefficients.Close(); err != nil {
-		return err
-	}
-	s.validationCoefficients = nil
-	if err = c.FreeCoefficient(&w[2]); err != nil {
-		return err
-	}
-	zero, e := s.manager.IsZero(&w[2])
-	if e != nil {
-		return e
-	}
-	if !zero {
-		if err = writeConstraintText(out, " + "); err != nil {
-			return err
-		}
-		text, e := s.manager.String(&w[2])
-		if e != nil {
-			return e
-		}
-		if err = writeConstraintText(out, text); err != nil {
-			return err
-		}
-	}
-	return s.closeConstraintValue()
+	return nil
 }

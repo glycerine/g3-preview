@@ -121162,7 +121162,9 @@
         "pkg/util/lp/lar_solver_solve.go",
         "pkg/util/lp/lar_solver_solve_test.go",
         "pkg/util/lp/lar_propagate.go",
-        "pkg/util/lp/lar_propagate_test.go"
+        "pkg/util/lp/lar_propagate_test.go",
+        "pkg/util/lp/lar_conflict_certificate.go",
+        "pkg/util/lp/lar_conflict_certificate_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -121279,7 +121281,19 @@
         "TestLARTouchedRowsReachedPrefixes",
         "TestLARTouchedRowsLiveModeAndSourceTermBody",
         "TestLARTouchedRowsPhysicalOwnership",
-        "TestLARTouchedRowsPreservesOlderComparison"
+        "TestLARTouchedRowsPreservesOlderComparison",
+        "TestLARConflictCertificateActualSolves",
+        "TestLARConflictCertificateContradictoryColumn",
+        "TestLARConflictCertificateRelationOrientation",
+        "TestLARConflictCertificatePhysicalOwnership",
+        "TestLARConflictCertificateIndependentRightSums",
+        "TestLARConflictCertificateAllRelationAssertions",
+        "TestLARConflictCertificateZeroInsertionAndDiagnostics",
+        "TestLARConflictCertificateClosedDiagnostic",
+        "TestLARConflictCertificatePreservesOlderComparison",
+        "TestLARConflictCertificateEntryGuards",
+        "TestLARConflictCertificateWitnessSelectionAndEmpty",
+        "TestLARConflictCertificateAssertionPrefixes"
       ],
       "conditionals": [
         {
@@ -121937,6 +121951,25 @@
             "TestLARTouchedRowsPhysicalOwnership",
             "TestLARTouchedRowsPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "get_infeasibility_explanation, direct-column and signed core-row witness extraction, relation orientation, exact left/RHS sums and debug explanation validators (456-463,1090-1139,1158-1202,1242-1275)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_conflict_certificate.go",
+          "tests": [
+            "TestLARConflictCertificateActualSolves",
+            "TestLARConflictCertificateContradictoryColumn",
+            "TestLARConflictCertificateRelationOrientation",
+            "TestLARConflictCertificatePhysicalOwnership",
+            "TestLARConflictCertificateIndependentRightSums",
+            "TestLARConflictCertificateAllRelationAssertions",
+            "TestLARConflictCertificateZeroInsertionAndDiagnostics",
+            "TestLARConflictCertificateClosedDiagnostic",
+            "TestLARConflictCertificatePreservesOlderComparison",
+            "TestLARConflictCertificateEntryGuards",
+            "TestLARConflictCertificateWitnessSelectionAndEmpty",
+            "TestLARConflictCertificateAssertionPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -121957,7 +121990,8 @@
         "Solver owns lexical ret/product values and exported coefficient-vector temporary. Interrupted export remains in validationCoefficients and is closed before original owned constraints/terms; parent arithmetic receipts clean before borrowed model values are destroyed. Original model and constraints remain borrowed. Twelve pooled/direct physical campaigns for variable/term/general sum export and relation comparison plus an actual older caller comparison verify cleanup and invocation identity.",
         "Constraint validation retains its actual lexical model and coefficient/value owners on error; model assignment borrowers close before solver rational work. Writer failure retains the reached coefficient/value prefix until Close.",
         "Outer solve does not wrap child arithmetic in parent capture; actual LU/core/changed-bound/model owners retain reached failures and borrowed lexical values. Status publishes before debug validation; changed-column clearing follows propagation only on an ordinary return.",
-        "Touched-row scheduling introduces no arithmetic capture; iterator/analyzer/propagator and hook/provider owners retain their own errors. Cancellation retains all row marks and completed bounds for replay; Close cleans the source lexical row owners without destroying the borrowed propagator."
+        "Touched-row scheduling introduces no arithmetic capture; iterator/analyzer/propagator and hook/provider owners retain their own errors. Cancellation retains all row marks and completed bounds for replay; Close cleans the source lexical row owners without destroying the borrowed propagator.",
+        "Conflict extraction appends through the output vector owner, which must close before solver locals on a failed external append. Internal evidence closes first; coefficient export closes before the coefficient map; interrupted constraint FreeCoefficient/output copies retain lexical arithmetic values through cleanup. The debug result rational outlives pending final copy receipts. Direct arithmetic alone uses parent capture; child vector/map/constraint owners and older caller comparison state remain separate."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",
