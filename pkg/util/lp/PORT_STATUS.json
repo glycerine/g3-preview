@@ -9,7 +9,7 @@
     "remaining retained LU diagnostics and full solver/priority-queue lifecycle integration",
     "precise scaling early return, exact LP preparation, full primal/dual/LAR scaling integration; whole random-update source/driver audit",
     "remaining primal constructors/diagnostics/validators, exact outer preparation, exact dual/LAR optimization, MPS source driver integration and complete upstream drivers",
-    "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining quick_xplain/proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
+    "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "exact MPS input, exact/LAR construction and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits"
   ],
@@ -265,9 +265,10 @@
     },
     {
       "source": "src/util/lp/conversion_helper.h",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
-      "tests": []
+      "tests": [],
+      "reachability_audit": "Reference only: whole-src scan finds only the template and double specialization definitions plus the include at lar_solver.h:47. No conversion_helper instantiation or get_low_bound/get_upper_bound call through this class exists. Actual strict-bound conversion is implemented by lar_core_solver::get_bounds_for_double_solver and is separately ported; do not add an unused conversion adapter."
     },
     {
       "source": "src/util/lp/core_solver_pretty_printer.h",
@@ -382,9 +383,10 @@
     },
     {
       "source": "src/util/lp/hash_helper.h",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
-      "tests": []
+      "tests": [],
+      "reachability_audit": "Reference only: whole-src include/symbol scan finds no include of hash_helper.h and no caller of its declarations. Retained rational/numeric-pair hashing comes from the independent lp_utils.h definitions used by random_updater.h; those remain separately accounted. Do not duplicate unused std::hash specializations in Go."
     },
     {
       "source": "src/util/lp/implied_bound.h",
@@ -967,7 +969,8 @@
         "pkg/util/lp/random_updater_test.go",
         "pkg/util/lp/lar_maximize.go",
         "pkg/util/lp/lar_maximize_test.go",
-        "pkg/util/lp/lar_bound_query.go"
+        "pkg/util/lp/lar_bound_query.go",
+        "pkg/util/lp/lar_add_constraint.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -1125,7 +1128,12 @@
         "TestLARBoundQueryPhysicalOutputCopies",
         "TestLARBoundQueryReachedGuards",
         "TestLARBoundQueryActualNestedScopes",
-        "TestLARBoundQueryPreservesOlderComparison"
+        "TestLARBoundQueryPreservesOlderComparison",
+        "TestLARAddConstraintExecutableSourceProfiles",
+        "TestLARUpstreamTermDriver",
+        "TestLARUpstreamTotalInfeasibilityDriver",
+        "TestLARUpstreamTotalInfeasibilityThroughRetainedBounds",
+        "TestLARUpstreamTrianglePropagationDriver"
       ]
     },
     {
@@ -3206,15 +3214,17 @@
     },
     {
       "source": "src/util/lp/quick_xplain.cpp",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
-      "tests": []
+      "tests": [],
+      "reachability_audit": "Reference only: whole-src call scan finds no active caller of lar_solver::shrink_explanation_to_minimum. theory_lra.cpp:2213 comments out its invocation. Internal recursive quick_xplain calls do not create a retained root. Keep the original source as reference without a production Go implementation."
     },
     {
       "source": "src/util/lp/quick_xplain.h",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
-      "tests": []
+      "tests": [],
+      "reachability_audit": "Reference only: no retained solver/test calls shrink_explanation_to_minimum. Its sole external spelling is the commented call at src/smt/theory_lra.cpp:2213. The wrapper at lar_solver.h:1557-1561 is the only external quick_xplain::run caller and is itself uncalled. The class is declared/included and quick_xplain.cpp is listed by CMake, but neither fact supplies a retained runtime consumer. Do not port its dormant algorithm or add an adapter to make it live."
     },
     {
       "source": "src/util/lp/random_updater.h",
@@ -3418,9 +3428,10 @@
     },
     {
       "source": "src/util/lp/signature_bound_evidence.h",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
-      "tests": []
+      "tests": [],
+      "reachability_audit": "Reference only: whole-src scan finds bound_signature and signature_bound_evidence solely in their own definitions. Legacy evidence-member references in lar_solver.h:309-334 and bound_analyzer_on_row.h:279-299 are comments, not instantiations or executable consumers. Existing live implied_bound/explanation code is accounted separately."
     },
     {
       "source": "src/util/lp/sparse_matrix.h",
@@ -4151,9 +4162,10 @@
     },
     {
       "source": "src/util/lp/test_bound_analyzer.h",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
-      "tests": []
+      "tests": [],
+      "reachability_audit": "Reference only: included by bound_analyzer_on_row.h:24, but whole-src scan finds no test_bound_analyzer construction, declaration of an instance or method call outside its own class definition. Retained source/test code uses bound_analyzer_on_row instead. Preserve the original unused reference; do not create a second analyzer implementation merely to exercise dead code."
     },
     {
       "source": "src/util/lp/ul_pair.h",
@@ -4172,8 +4184,9 @@
     }
   ],
   "status_counts": {
-    "unported": 22,
-    "partial": 88
+    "unported": 16,
+    "partial": 88,
+    "reference_only": 6
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -4781,5 +4794,62 @@
       "debug_checked": 105.442
     },
     "evidence": "LAR bound queries now implement lar_solver.h:1203-1240, retained by theory_lra.cpp:1926,1934,2078,2081. Missing variables preserve all outputs; missing witnesses publish only InvalidLARIndex. Existing witnesses publish before the owned rational copy, then lower positive/upper negative epsilon determines strictness. External term IDs remain untranslated; the actual materialized column returns its normalized bound. Witness presence drives the query without source-absent column-type or constraint-count gates. Seven test groups cover100 independently intersected feasible constraint worlds, all epsilon signs, original/internal term IDs, actual nested feasible solves and Push/Pop restoration,14 reached guard profiles, four pooled/direct physical-copy campaigns through success and an actual older caller comparison. Contradictory boxed updates retain their separately tested source debug assertion; the feasible-query campaign rejects independently predicted contradictions before adding them. Caller outputs survive solver receipt cleanup; shortened owning test slices are restored before destruction. New implementation38/41 statements (92.7%) in both native and debug/checked. Three uncovered returns protect stable witness extent, completed copy capture and initialized epsilon sign predicates. Focused native0.156s/debug0.177s and related bounds/scopes/full-solve/certificate/constraint-evaluation regressions42.616s/105.442s pass. Both LP vets and native/debug module compilation pass. Complete upstream drivers and whole-source audits remain open; inventory stays88 partial/22 unported. Full native68b2c6ce checkpoint excludes maximization and bound queries; their focused evidence is separate."
+  },
+  "latest_reachability_audit": {
+    "scope": "whole src tree, including src/test; definitions, includes, call sites and surrounding comment blocks inspected",
+    "classification": "reference_only, not ported and not source deletion",
+    "source_units": [
+      "src/util/lp/quick_xplain.h",
+      "src/util/lp/quick_xplain.cpp",
+      "src/util/lp/conversion_helper.h",
+      "src/util/lp/hash_helper.h",
+      "src/util/lp/signature_bound_evidence.h",
+      "src/util/lp/test_bound_analyzer.h"
+    ],
+    "evidence": {
+      "src/util/lp/quick_xplain.h": "Reference only: no retained solver/test calls shrink_explanation_to_minimum. Its sole external spelling is the commented call at src/smt/theory_lra.cpp:2213. The wrapper at lar_solver.h:1557-1561 is the only external quick_xplain::run caller and is itself uncalled. The class is declared/included and quick_xplain.cpp is listed by CMake, but neither fact supplies a retained runtime consumer. Do not port its dormant algorithm or add an adapter to make it live.",
+      "src/util/lp/quick_xplain.cpp": "Reference only: whole-src call scan finds no active caller of lar_solver::shrink_explanation_to_minimum. theory_lra.cpp:2213 comments out its invocation. Internal recursive quick_xplain calls do not create a retained root. Keep the original source as reference without a production Go implementation.",
+      "src/util/lp/conversion_helper.h": "Reference only: whole-src scan finds only the template and double specialization definitions plus the include at lar_solver.h:47. No conversion_helper instantiation or get_low_bound/get_upper_bound call through this class exists. Actual strict-bound conversion is implemented by lar_core_solver::get_bounds_for_double_solver and is separately ported; do not add an unused conversion adapter.",
+      "src/util/lp/hash_helper.h": "Reference only: whole-src include/symbol scan finds no include of hash_helper.h and no caller of its declarations. Retained rational/numeric-pair hashing comes from the independent lp_utils.h definitions used by random_updater.h; those remain separately accounted. Do not duplicate unused std::hash specializations in Go.",
+      "src/util/lp/signature_bound_evidence.h": "Reference only: whole-src scan finds bound_signature and signature_bound_evidence solely in their own definitions. Legacy evidence-member references in lar_solver.h:309-334 and bound_analyzer_on_row.h:279-299 are comments, not instantiations or executable consumers. Existing live implied_bound/explanation code is accounted separately.",
+      "src/util/lp/test_bound_analyzer.h": "Reference only: included by bound_analyzer_on_row.h:24, but whole-src scan finds no test_bound_analyzer construction, declaration of an instance or method call outside its own class definition. Retained source/test code uses bound_analyzer_on_row instead. Preserve the original unused reference; do not create a second analyzer implementation merely to exercise dead code."
+    },
+    "scan": "rg -n quick_xplain|shrink_explanation_to_minimum|conversion_helper|signature_bound_evidence|bound_signature|test_bound_analyzer|hash_helper.h src (C++ and CMake files); broader repository scan confirms only original/cppsrc references"
+  },
+  "latest_upstream_lar_driver_increment": {
+    "source": [
+      "src/util/lp/lar_solver.h:1031-1052",
+      "src/test/lp.cpp:2711-2807"
+    ],
+    "go_targets": [
+      "pkg/util/lp/lar_add_constraint.go",
+      "pkg/util/lp/lar_upstream_driver_test.go"
+    ],
+    "tests": [
+      "TestLARAddConstraintExecutableSourceProfiles",
+      "TestLARUpstreamTermDriver",
+      "TestLARUpstreamTotalInfeasibilityDriver",
+      "TestLARUpstreamTotalInfeasibilityThroughRetainedBounds",
+      "TestLARUpstreamTrianglePropagationDriver"
+    ],
+    "native_statements": {
+      "covered": 5,
+      "total": 6,
+      "percent": 83.3
+    },
+    "debug_checked_statements": {
+      "covered": 6,
+      "total": 6,
+      "percent": 100.0
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-lar-upstream-native.cover",
+      "/mnt/oldrog/tmp/g3-lar-upstream-debug.cover"
+    ],
+    "focused_and_regression_seconds": {
+      "native": 4.51,
+      "debug_checked": 17.049
+    },
+    "evidence": "Upstream LAR test_term, test_evidence_for_total_inf_simple and test_bound_propagation_one_small_sample1 now replay src/test/lp.cpp:2711-2807 through the executable lar_solver.h:1031-1052 AddConstraint entry. The source normalization body is commented out: debug raises its assertion, while native returns0 without reading inputs or installing a constraint. Twelve valid/malformed relation profiles, including nil RHS, unknown kind, unregistered variable, refused allocation budget, prior real bound and stopped/closed owners check the exact prefix without a universal adapter. Native term solve materializes its deferred homogeneous term column and extracts a zero model; the original constant3 makes the displayed equality false, exposed explicitly. The upstream intended infeasibility sample instead reports Optimal from its two actual variable bounds, and triangle propagation yields no endpoint because its inequalities were ignored. These source outcomes are tested rather than credited as mathematically constrained solves. A separate test installs the infeasible example through retained AddTerm/AddVarBound, obtains Infeasible and independently verifies the real certificate with math/big.Rat. New AddConstraint body covers5/6 statements (83.3%) native and6/6 (100%) debug/checked; native excludes the source-erased assertion transport. Focused drivers plus full-solve/certificate/touched-row regressions pass4.510s native/17.049s debug/checked; both LP vets and both module compile gates pass. Whole-src reachability audit classifies six source units as reference_only: quick_xplain.h/.cpp, conversion_helper.h, hash_helper.h, signature_bound_evidence.h and test_bound_analyzer.h. No retained runtime caller/instantiation exists; includes, compiled definitions and commented code are not live consumers. Originals remain available as references, with no duplicate Go algorithm or adapter. Inventory is88 partial/16 unported/6 reference_only out of110 units; no whole-source promotion. The latest full native68b2c6ce checkpoint predates this increment, maximization and bound queries; their focused evidence is separate. Complete upstream drivers, remaining exact MPS/optimization/scaling integration and whole-source audits remain open. Source portcheck, dependency graph refresh and diff checks pass."
   }
 }

@@ -1217,6 +1217,7 @@
         "indexed_exact_vector.go",
         "indexed_vector.go",
         "int_set.go",
+        "lar_add_constraint.go",
         "lar_all_constraints.go",
         "lar_basic_delta.go",
         "lar_bound_query.go",
