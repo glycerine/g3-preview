@@ -1234,6 +1234,7 @@
         "lar_lu_extend.go",
         "lar_model.go",
         "lar_model_bounds.go",
+        "lar_model_delta.go",
         "lar_model_terms.go",
         "lar_pivot.go",
         "lar_prepare_exact.go",

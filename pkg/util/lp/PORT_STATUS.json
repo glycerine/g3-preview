@@ -694,7 +694,9 @@
         "pkg/util/lp/lar_signature_tableau.go",
         "pkg/util/lp/lar_signature_tableau_test.go",
         "pkg/util/lp/lar_solve_signature_tableau.go",
-        "pkg/util/lp/lar_solve_signature_tableau_test.go"
+        "pkg/util/lp/lar_solve_signature_tableau_test.go",
+        "pkg/util/lp/lar_model_delta.go",
+        "pkg/util/lp/lar_model_delta_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -804,7 +806,12 @@
         "TestLARSolveOnSignatureTableauReachedPrefixes",
         "TestLARSolveOnSignatureTableauPostSolvePublication",
         "TestLARSolveOnSignatureTableauPhysicalOwnership",
-        "TestLARSolveOnSignatureTableauPreservesOlderComparison"
+        "TestLARSolveOnSignatureTableauPreservesOlderComparison",
+        "TestLARModelDeltaIndependentBounds",
+        "TestLARModelDeltaReachedPrefixes",
+        "TestLARModelDeltaPhysicalOwnership",
+        "TestLARModelDeltaMixedColumnsAndLateFailure",
+        "TestLARModelDeltaPreservesOlderComparison"
       ]
     },
     {
@@ -4161,5 +4168,31 @@
     ],
     "qualification": "Native erases two source assertion returns; debug excludes the one native fallthrough statement after the tableau-cost assertion. Latest full native08dc15a1 checkpoint predates this addition. Whole outer LARSolver orchestration, model extraction/validation and upstream drivers remain open.",
     "evidence": "LAR strategy initialization now implements init_lar_solver.h:229-263 and the retained floating copy in lar_solver.h:985-994. The strict witness-count threshold publishes LU or tableau-rows before actual adjustment; dispatch preserves the tableau-cost debug assertion/native fallthrough. LU converts the real exact sparse matrix, resizes floating values while retaining their prefixes, and independently copies heading/basis.600 independent threshold worlds cover deferred/materialized terms and below/equal/above boundaries, with rational matrix values and reciprocal sparse links checked independently. Further tests cover directory growth/shrink, preserved nested cells and value prefixes, unchanged floating nonbasis and row-offset scratch, repeated-copy duplicates, separate numerator/denominator overflow/underflow (Inf, omitted zero, NaN), all dispatcher profiles, stopped/reached-error publication and two pooled/direct deferred-row physical refusal campaigns through success with cleanup census. Matrix-copy failure preserves its first converted cell and selected LU strategy before floating vector resize. Native55/57 statements (96.5%) and debug/checked56/57 (98.2%); remaining native statements are two erased assertions, while debug excludes native fallthrough after the tableau-cost assertion. Focused0.261s/0.334s, related model/LU/preparation/outer-core native/debug26.515s/28.082s pass. Both LP vets, native/debug module compilation, portcheck, graph refresh and diff checks pass. The full native08dc15a1 checkpoint predates this addition. Whole outer LARSolver solve, rational model extraction/constraint validation and complete upstream drivers remain open; inventory remains85 partial/25 unported."
+  },
+  "latest_model_delta_increment": {
+    "source": "src/util/lp/lar_core_solver.h:791-801",
+    "go_target": "pkg/util/lp/lar_model_delta.go",
+    "tests": [
+      "TestLARModelDeltaIndependentBounds",
+      "TestLARModelDeltaReachedPrefixes",
+      "TestLARModelDeltaPhysicalOwnership",
+      "TestLARModelDeltaMixedColumnsAndLateFailure",
+      "TestLARModelDeltaPreservesOlderComparison"
+    ],
+    "native_statements": {
+      "covered": 34,
+      "total": 37,
+      "percent": 91.9
+    },
+    "debug_checked_statements": {
+      "covered": 34,
+      "total": 37,
+      "percent": 91.9
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-lar-model-delta-native.cover",
+      "/mnt/oldrog/tmp/g3-lar-model-delta-debug.cover"
+    ],
+    "evidence": "Strict-bound model delta selection now implements lar_core_solver.h:791-801. It copies the initial rational into an owned local, visits exact columns in order, calls the actual UpdateDelta for each set lower then upper bound against current X, and copies the final delta only after all bound updates.400 independent rational/epsilon worlds cover free/low/upper/fixed/boxed profiles, limiting/nonlimiting slopes, equal fixed endpoints, input/output aliasing and independently checked concrete inequalities. Mixed-column success and late failure verify the cumulative minimum and retained first-column prefix. Twelve stopped/nil/extent/native-erasure/assertion profiles, six pooled/direct physical refusal campaigns through success for lower arithmetic, upper arithmetic and initial/output copies, and an actual older caller comparison verify publication and ownership through cleanup census. New file34/37 statements (91.9%) native and debug/checked. Remaining returns protect the second type lookup with unchanged types, valid local destruction and copy capture already guarded by pending state. Focused0.414s/0.536s and related bounds/model/strategy/outer-core native/debug26.393s/28.170s pass. Both LP vets, native/debug module compilation, portcheck, graph refresh and diff checks pass. Full native08dc15a1 checkpoint predates this increment. Collision-free rational model extraction, constraint validation, outer LARSolver Solve and complete upstream drivers remain open; inventory remains85 partial/25 unported."
   }
 }

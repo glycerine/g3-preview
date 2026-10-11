@@ -120262,7 +120262,9 @@
         "pkg/util/lp/lar_signature_tableau.go",
         "pkg/util/lp/lar_signature_tableau_test.go",
         "pkg/util/lp/lar_solve_signature_tableau.go",
-        "pkg/util/lp/lar_solve_signature_tableau_test.go"
+        "pkg/util/lp/lar_solve_signature_tableau_test.go",
+        "pkg/util/lp/lar_model_delta.go",
+        "pkg/util/lp/lar_model_delta_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -120372,7 +120374,12 @@
         "TestLARSolveOnSignatureTableauReachedPrefixes",
         "TestLARSolveOnSignatureTableauPostSolvePublication",
         "TestLARSolveOnSignatureTableauPhysicalOwnership",
-        "TestLARSolveOnSignatureTableauPreservesOlderComparison"
+        "TestLARSolveOnSignatureTableauPreservesOlderComparison",
+        "TestLARModelDeltaIndependentBounds",
+        "TestLARModelDeltaReachedPrefixes",
+        "TestLARModelDeltaPhysicalOwnership",
+        "TestLARModelDeltaMixedColumnsAndLateFailure",
+        "TestLARModelDeltaPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -120774,6 +120781,18 @@
             "TestLARSolveOnSignatureTableauPhysicalOwnership",
             "TestLARSolveOnSignatureTableauPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "find_delta_for_strict_bounds source791-801: owned initial delta, every set lower/upper bound against actual X in column order, final copy and lexical cleanup",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_model_delta.go",
+          "tests": [
+            "TestLARModelDeltaIndependentBounds",
+            "TestLARModelDeltaReachedPrefixes",
+            "TestLARModelDeltaPhysicalOwnership",
+            "TestLARModelDeltaMixedColumnsAndLateFailure",
+            "TestLARModelDeltaPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -120786,7 +120805,8 @@
         "LAR owns stopped delta arithmetic locals and direct scalar receipts; delegated vector/primal owners keep their own receipts. Cleanup releases direct invocation storage, owning delta vectors and borrowed consumers before numeral roots. No borrowed caller comparison is adopted.",
         "Floating signature search delegates exact scalar receipts to actual bound/signature owners and floating LU work to DPrimal. Returned basis-change trace is copied; cancellation retains source tracing and pre-search signature, including a completed pivot trace.",
         "Core owns the exact lexical catch-up column across child LU replacement. On failure, delegated LU/matrix/vector owners keep numerical receipts; Core closes the exact primal/LU before the borrowed catch-up column and then the model matrix. Native endpoint FIFOs contain only uint32 indices; floating work uses native storage. Actual older caller comparison state remains caller-owned.",
-        "Signature-guided solving delegates stopped numeric work to the actual exact primal/base/LU/matrix owners. The rollback fallback copies basis/heading/nonbasis arrays in source order before discarding the floating LU, preserves floating X and the input signature, and does not introduce a post-feasibility cancellation read. Normal cancellation leaves exact tracing enabled and does not catch up floating metadata. Actual older caller comparison state remains caller-owned."
+        "Signature-guided solving delegates stopped numeric work to the actual exact primal/base/LU/matrix owners. The rollback fallback copies basis/heading/nonbasis arrays in source order before discarding the floating LU, preserves floating X and the input signature, and does not introduce a post-feasibility cancellation read. Normal cancellation leaves exact tracing enabled and does not catch up floating metadata. Actual older caller comparison state remains caller-owned.",
+        "Strict model delta reuses the existing core-owned strictDelta local and actual UpdateDelta owned arithmetic. Initial/final copies are captured separately from child updates; interrupted locals survive until Core.Close. Six pooled/direct refusal campaigns and older comparison identity verify cleanup without adopting caller arithmetic."
       ],
       "deviations": [
         "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
@@ -120798,7 +120818,8 @@
         "Exact endpoints can round into reversed double bounds at the limiting delta; native preserves values and debug asserts after upper publication, matching source. General model delta and full LAR solve orchestration remain open.",
         "Floating signature search is implemented without a solver-status filter: source extracts after noncancelled infeasibility too. Full LAR basis catch-up and signature-guided exact solve remain open.",
         "Only retained pair and float forward catch-up plus the pair reverse consumer are implemented. Source unsigned threshold addition wraps; exact discarded LU is rebuilt immediately while discarded floating LU stays nil. Unmatched endpoint queues are discarded without forcing the requested basis; signature-guided exact solve and complete LAR orchestration remain open.",
-        "Exact/floating nonbasic orders remain independent on the normal signature path; only the rollback fallback copies all metadata arrays. Coupled solver test fixtures now derive actual column/row count estimates rather than the scope-only sentinels, so exact pricing runs with valid source counts. Full signature-guided tableau and whole-LAR solve orchestration remain open."
+        "Exact/floating nonbasic orders remain independent on the normal signature path; only the rollback fallback copies all metadata arrays. Coupled solver test fixtures now derive actual column/row count estimates rather than the scope-only sentinels, so exact pricing runs with valid source counts. Full signature-guided tableau and whole-LAR solve orchestration remain open.",
+        "Strict model delta selection now visits all set bounds against actual exact X; boxed-only bound conversion remains a separate source routine. Output copying begins after all column updates; input/output aliasing is supported. Whole rational model extraction, constraint validation, outer LARSolver orchestration and complete upstream drivers remain open."
       ]
     },
     {
