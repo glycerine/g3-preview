@@ -1243,6 +1243,7 @@
         "lar_pivot.go",
         "lar_prepare_exact.go",
         "lar_prepare_float.go",
+        "lar_propagate.go",
         "lar_row_dispatch.go",
         "lar_scope_validate.go",
         "lar_scopes.go",
