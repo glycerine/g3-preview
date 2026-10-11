@@ -122297,7 +122297,9 @@
         "pkg/util/lp/core_reconstruct_exact.go",
         "pkg/util/lp/core_reconstruct_exact_test.go",
         "pkg/util/lp/core_reduced_cost_exact.go",
-        "pkg/util/lp/core_update_exact.go"
+        "pkg/util/lp/core_update_exact.go",
+        "pkg/util/lp/core_pivot_compare_exact.go",
+        "pkg/util/lp/core_pivot_compare_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122411,7 +122413,11 @@
         "TestLPPairCoreRestoreSourceDiagnostics",
         "TestLPPairCoreUpdateRollbackStoredBackup",
         "TestLPPairCoreUpdateReachedGuards",
-        "TestLPPairCoreUpdateOlderComparison"
+        "TestLPPairCoreUpdateOlderComparison",
+        "TestLPPairPivotCompareIndependentOracle",
+        "TestLPPairPivotComparePhysicalOwnership",
+        "TestLPPairPivotCompareReachedGuards",
+        "TestLPPairPivotPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -122863,6 +122869,17 @@
             "TestLPPairCoreUpdateReachedGuards",
             "TestLPPairCoreUpdateOlderComparison"
           ]
+        },
+        {
+          "name": "precise pivots_in_column_and_row_are_different: zero/opposite signs and full exact normalized-difference expression",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_pivot_compare_exact.go",
+          "tests": [
+            "TestLPPairPivotCompareIndependentOracle",
+            "TestLPPairPivotComparePhysicalOwnership",
+            "TestLPPairPivotCompareReachedGuards",
+            "TestLPPairPivotPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -122885,7 +122902,8 @@
         "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open.",
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
         "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard.",
-        "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update."
+        "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update.",
+        "Concrete exact specialization only. Source expression temporaries remain owned through numerical failure; real older comparison generations are preserved. Outer different-column advancement, precise Solve and full source diagnostics remain open."
       ]
     },
     {
@@ -124494,7 +124512,9 @@
         "pkg/util/lp/primal_infeas_cost_exact.go",
         "pkg/util/lp/primal_cost_switch_exact.go",
         "pkg/util/lp/primal_init_run_exact.go",
-        "pkg/util/lp/primal_advance_equal_exact.go"
+        "pkg/util/lp/primal_advance_equal_exact.go",
+        "pkg/util/lp/primal_pivot_cost_exact.go",
+        "pkg/util/lp/primal_pivot_cost_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124601,7 +124621,12 @@
         "TestLPExactAdvanceEqualPhysicalOwnership",
         "TestLPExactAdvanceEqualLiveStepAliases",
         "TestLPExactAdvanceEqualSourcePrefixes",
-        "TestLPExactAdvanceEqualOlderComparison"
+        "TestLPExactAdvanceEqualOlderComparison",
+        "TestLPPairPivotCostIndependentBasisOracle",
+        "TestLPPairPivotCostLiveAliases",
+        "TestLPPairPivotCostPhysicalOwnership",
+        "TestLPPairPivotCostReachedPrefixes",
+        "TestLPPairPivotPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -125125,6 +125150,19 @@
             "TestLPExactAdvanceEqualSourcePrefixes",
             "TestLPExactAdvanceEqualOlderComparison"
           ]
+        },
+        {
+          "name": "precise update_reduced_costs_from_pivot_row: changed-basis headings, indexed live row order, local pivot/dq and stored-infeasibility correction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_pivot_cost_exact.go",
+          "tests": [
+            "TestLPPairPivotCostIndependentBasisOracle",
+            "TestLPPairPivotCostLiveAliases",
+            "TestLPPairPivotCostPhysicalOwnership",
+            "TestLPPairPivotCostReachedPrefixes",
+            "TestLPPairPivotPreservesOlderComparison",
+            "TestLPPairPivotPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -125144,7 +125182,8 @@
         "Floating norm/price updates preserve sparse index iteration including duplicates, absolute-source IEEE comparisons, first-operand std::max NaN behavior, fixed-column dot product before skipping writes, and reached mutation prefixes at native bounds guards. Definition-only calculate_column_norm_exactly debug helper is not copied. Exact/tableau recurrences and complete primal optimization integration remain open.",
         "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open.",
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
-        "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open."
+        "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open.",
+        "Concrete exact specialization only. Source expression temporaries remain owned through numerical failure; real older comparison generations are preserved. Outer different-column advancement, precise Solve and full source diagnostics remain open."
       ]
     },
     {

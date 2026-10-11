@@ -38435,3 +38435,9 @@ The23:33 UTC full-native checkpoint predates this work; no hourly repeat yet.
 Actual enlarged exact/floating factorizations constructed inside a scope also
 close successfully after the earlier dimensional rollback. Final native module-
 wide test compilation and source/evidence verification pass.
+
+## Exact pivot consistency and pivot-row reduced costs
+
+Ported precise pivots_in_column_and_row_are_different (lp_core_solver_base.hpp:920-935) and update_reduced_costs_from_pivot_row (lp_primal_core_solver.hpp:574-600). Full normalized-difference arithmetic is retained even for equal pivots; exact Harris tolerance uses zero rather than the floating setting. Reduced costs snapshot pivot/dq and retain live indexed row/cost references, source member publication and stored-infeasibility correction.
+
+Verification:320 independent comparison worlds;240 actual LU pivot rows checked against independent new-basis transpose solves; four live aliases; ten comparison and four cost pooled/direct physical campaigns; reached metadata guards and two actual older-comparison ownership profiles. An older stopped numeral comparison may cause subsequent arithmetic to return ErrInvalidSlot; its generation and roots survive both component and fixture Close. Focused native3.087s/debug5.090s; nearby regressions17.942s/26.744s. File coverage comparison58/69 both; cost53/69 native,60/69 debug. Remaining gaps are valid read/capture/constant/destruction guards and erased debug assertions. Both vets, native/debug module compilation and portcheck pass. Source inventory remains84 partial/26 unported LP units. Full precise different-column advancement, Solve and LAR orchestration remain open.
