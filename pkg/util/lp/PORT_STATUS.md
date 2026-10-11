@@ -10,17 +10,22 @@ primal and dual cores expose Solve, and outer LU primal/dual integration is impl
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
 
-Latest full native LP checkpoint was observed complete at05:02UTC on
-October11 with exit status0:1014.552s,88.3% (16878/19111). Log/profile:
-`/mnt/oldrog/tmp/g3-init-lp-native.{log,cover}`. Started04:45UTC with
-`-timeout=60m`; the profile includes exact cost switching and InitRun and
-predates same-column advancement and the subsequent core basis-update work.
-Coverage measures existing Go code, not unported C++ functionality.
+Latest full native module checkpoint was observed complete at05:59UTC on
+October11 with exit0 and all64packages passing: LP1019.959s,88.1%
+(17264/19598). Log/profile: `/mnt/oldrog/tmp/g3-enter-module-native.{log,cover}`.
+Started05:41UTC at38aa92b1 with `-timeout=60m`. The profile includes exact
+basis updates, pivot consistency/reduced costs, different-column advancement,
+entering and iteration scheduling. It excludes ff07fcd0 statistics/cancellation/
+all-column helpers, separately verified in native/debug at140/153 (91.5%).
+Coverage measures existing Go code, not C++ port completion.
 
-The preceding04:34UTC module attempt passed its other package checks but LP
-hit the default10-minute timeout; its partial LP coverage is not credited.
-The previous complete native module checkpoint remains03:52UTC, all64packages
-passing, LP979.695s,88.2% (16034/18173), started03:33UTC at0d330f87:
+Previous complete LP-only checkpoint:05:02UTC,1014.552s,88.3%
+(16878/19111), `/mnt/oldrog/tmp/g3-init-lp-native.{log,cover}`;
+includes cost switching and InitRun, predates subsequent advancement work.
+The04:34UTC module attempt passed its other package checks but LP hit the
+default10-minute timeout; that incomplete LP coverage is not credited.
+The earlier complete module checkpoint was03:52UTC, all64packages passing,
+LP979.695s,88.2% (16034/18173), started03:33UTC at0d330f87:
 `/mnt/oldrog/tmp/g3-breakpoint-module-native.{log,cover}`.
 
 Known source limitation: post-pop cleanup declares an empty local changed-cost
