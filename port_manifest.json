@@ -122638,7 +122638,8 @@
         "pkg/util/lp/core_tableau_rational_test.go",
         "pkg/util/lp/core_basis_tableau_rational.go",
         "pkg/util/lp/primal_init_tableau_rational_test.go",
-        "pkg/util/lp/core_statistics_rational.go"
+        "pkg/util/lp/core_statistics_rational.go",
+        "pkg/util/lp/core_dual_rational.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122866,7 +122867,11 @@
         "TestLPRationalStatisticsLiveLocalReentryGuard",
         "TestLPRationalStatisticsPhysicalOwnership",
         "TestLPRationalAllColumnsFeasibilityIndependentOracle",
-        "TestLPRationalStatisticsReachedGuardsAndPrefixes"
+        "TestLPRationalStatisticsReachedGuardsAndPrefixes",
+        "TestLPRationalDualBoundsIndependentOracle",
+        "TestLPRationalDualBoundsPlacementAndAssertionPrefix",
+        "TestLPRationalDualBoundsMetadataAndDiagnostics",
+        "TestLPRationalDualBoundsLiveAliasOrder"
       ],
       "assertions": [
         {
@@ -123435,6 +123440,17 @@
             "TestLPRationalAllColumnsFeasibilityIndependentOracle",
             "TestLPRationalStatisticsReachedGuardsAndPrefixes"
           ]
+        },
+        {
+          "name": "Concrete scalar dual feasibility, exact reduced-cost sign predicates and source-ordered nonbasic bound assignment with debug publication prefixes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_dual_rational.go",
+          "tests": [
+            "TestLPRationalDualBoundsIndependentOracle",
+            "TestLPRationalDualBoundsPlacementAndAssertionPrefix",
+            "TestLPRationalDualBoundsMetadataAndDiagnostics",
+            "TestLPRationalDualBoundsLiveAliasOrder"
+          ]
         }
       ],
       "ownership": [
@@ -123454,7 +123470,8 @@
         "No additional outer-solve or snap owners. Actual exact pair assignment and reconstruction retain interrupted arithmetic in existing primal/core owners; stopped retries and older caller comparison identity are verified through Close with pooled/direct physical refusal campaigns.",
         "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization.",
         "Scalar row normalization uses direct compound division on RHS before coefficients and final pivot-one assignment. Reduced-cost updates retain copied-left product/returned-reference scratch and live pivot-cost references until source-order subtraction finishes. Core capture ends before owning static-matrix elimination; each owner retains its own stopped receipts and older caller comparisons survive cleanup.",
-        "Scalar singleton/unit basis validation uses actual sparse column metadata and manager IsOne. Debug matrix validation precedes scanning, empty-column dereference is guarded, and row identity is not additionally required by the source."
+        "Scalar singleton/unit basis validation uses actual sparse column metadata and manager IsOne. Debug matrix validation precedes scanning, empty-column dereference is guarded, and row identity is not additionally required by the source.",
+        "Scalar dual construction returns a stopped partial owner on failure. Each numerical owner captures only its own calls; borrowed model/flags remain live until core/LU destruction. Dual vectors and member rationals close after base borrowers, before dual caller roots. No older caller comparison is adopted or consumed."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -123538,7 +123555,8 @@
         "pkg/util/lp/core_pivot_compare_rational.go",
         "pkg/util/lp/core_tableau_rational.go",
         "pkg/util/lp/core_tableau_rational_test.go",
-        "pkg/util/lp/core_statistics_rational.go"
+        "pkg/util/lp/core_statistics_rational.go",
+        "pkg/util/lp/core_dual_rational.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -123729,7 +123747,11 @@
         "TestLPRationalStatisticsLiveLocalReentryGuard",
         "TestLPRationalStatisticsPhysicalOwnership",
         "TestLPRationalAllColumnsFeasibilityIndependentOracle",
-        "TestLPRationalStatisticsReachedGuardsAndPrefixes"
+        "TestLPRationalStatisticsReachedGuardsAndPrefixes",
+        "TestLPRationalDualBoundsIndependentOracle",
+        "TestLPRationalDualBoundsPlacementAndAssertionPrefix",
+        "TestLPRationalDualBoundsMetadataAndDiagnostics",
+        "TestLPRationalDualBoundsLiveAliasOrder"
       ],
       "conditionals": [
         {
@@ -124329,6 +124351,17 @@
             "TestLPRationalAllColumnsFeasibilityIndependentOracle",
             "TestLPRationalStatisticsReachedGuardsAndPrefixes"
           ]
+        },
+        {
+          "name": "Concrete scalar dual feasibility, exact reduced-cost sign predicates and source-ordered nonbasic bound assignment with debug publication prefixes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_dual_rational.go",
+          "tests": [
+            "TestLPRationalDualBoundsIndependentOracle",
+            "TestLPRationalDualBoundsPlacementAndAssertionPrefix",
+            "TestLPRationalDualBoundsMetadataAndDiagnostics",
+            "TestLPRationalDualBoundsLiveAliasOrder"
+          ]
         }
       ],
       "ownership": [
@@ -124344,7 +124377,8 @@
         "Exact UpdateX captures its own arithmetic, retains scalar product expressions and the pair temporary with the core, and releases constructor scalar temporaries before compound subtraction. Entering updates precede ordered basic updates; precise mode leaves CopyXB unchanged. RestoreX retains the stored backup semantics, not an invented inverse. Stopped arithmetic can leave the current scalar partial; later destinations remain untouched. Close cleans raw invocations before scratch and allocation roots, preserving older caller comparisons.",
         "Residual dot products and LU reconstruction are delegated outside core numeral captures. Core-owned row residual/scalar scratch and RHS vectors survive child failures; the LU is destroyed before its borrowed reconstruction RHS. Matrix and LU numerical receipts stay separate from the core. Reverse row/basis publication, live output aliases, stale factorization residuals, diagnostic recomputation and older caller comparisons are preserved. Exact reconstruction uses one solve and does not import floating refinement work.",
         "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization.",
-        "Scalar row normalization uses direct compound division on RHS before coefficients and final pivot-one assignment. Reduced-cost updates retain copied-left product/returned-reference scratch and live pivot-cost references until source-order subtraction finishes. Core capture ends before owning static-matrix elimination; each owner retains its own stopped receipts and older caller comparisons survive cleanup."
+        "Scalar row normalization uses direct compound division on RHS before coefficients and final pivot-one assignment. Reduced-cost updates retain copied-left product/returned-reference scratch and live pivot-cost references until source-order subtraction finishes. Core capture ends before owning static-matrix elimination; each owner retains its own stopped receipts and older caller comparisons survive cleanup.",
+        "Scalar dual construction returns a stopped partial owner on failure. Each numerical owner captures only its own calls; borrowed model/flags remain live until core/LU destruction. Dual vectors and member rationals close after base borrowers, before dual caller roots. No older caller comparison is adopted or consumed."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -124660,7 +124694,8 @@
         "pkg/util/lp/dual_ratio_float.go",
         "pkg/util/lp/dual_flip_float.go",
         "pkg/util/lp/dual_advance_float.go",
-        "pkg/util/lp/dual_solve_float.go"
+        "pkg/util/lp/dual_solve_float.go",
+        "pkg/util/lp/dual_core_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -124698,7 +124733,13 @@
         "TestLPFloatDualSolveDebugPreconditionsAndGuards",
         "TestLPFloatDualPricingActualNumericalFailures",
         "TestLPFloatDualSolvePreconditionPublication",
-        "TestLPFloatDualSolveActualNoImprovementStop"
+        "TestLPFloatDualSolveActualNoImprovementStop",
+        "TestLPRationalDualCoreIndependentModels",
+        "TestLPRationalDualCoreDoneOrder",
+        "TestLPRationalDualCorePartialOwners",
+        "TestLPRationalDualCorePhysicalOwnership",
+        "TestLPRationalDualCoreLiveMetadataPrefixes",
+        "TestLPRationalDualCorePreservesOlderComparison"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -124782,9 +124823,24 @@
             "TestLPFloatDualSolvePreconditionPublication",
             "TestLPFloatDualSolveActualNoImprovementStop"
           ]
+        },
+        {
+          "name": "Concrete scalar mpq/mpq dual construction/lifecycle, descending eligible nonbasis restoration, Y/reduced-cost/basic-value reconstruction, initial bounds/betas and source Done ordering",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_core_rational.go",
+          "tests": [
+            "TestLPRationalDualCoreIndependentModels",
+            "TestLPRationalDualCoreDoneOrder",
+            "TestLPRationalDualCorePartialOwners",
+            "TestLPRationalDualCorePhysicalOwnership",
+            "TestLPRationalDualCoreLiveMetadataPrefixes",
+            "TestLPRationalDualCorePreservesOlderComparison"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Scalar dual construction returns a stopped partial owner on failure. Each numerical owner captures only its own calls; borrowed model/flags remain live until core/LU destruction. Dual vectors and member rationals close after base borrowers, before dual caller roots. No older caller comparison is adopted or consumed."
+      ],
       "deviations": [
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
         "Floating dual DSE calls the source prepared U/R solve without full scaling/tail transforms. On the explicit scaled triangular B, updated beta1 is0.0517578125 while the true new inverse-row squared norm is0.2666015625. This literal source discrepancy is preserved, not corrected. Boxed runaway snap writes low even when nearer upper; free recovery assigns zero before source debug assertion. Dead restore_d and commented-out xb_minus_delta_p_pivot_column have no retained source caller and are not ported.",
@@ -124803,7 +124859,8 @@
         "pkg/util/lp/dual_ratio_float.go",
         "pkg/util/lp/dual_flip_float.go",
         "pkg/util/lp/dual_advance_float.go",
-        "pkg/util/lp/dual_solve_float.go"
+        "pkg/util/lp/dual_solve_float.go",
+        "pkg/util/lp/dual_core_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -124841,7 +124898,13 @@
         "TestLPFloatDualSolveDebugPreconditionsAndGuards",
         "TestLPFloatDualPricingActualNumericalFailures",
         "TestLPFloatDualSolvePreconditionPublication",
-        "TestLPFloatDualSolveActualNoImprovementStop"
+        "TestLPFloatDualSolveActualNoImprovementStop",
+        "TestLPRationalDualCoreIndependentModels",
+        "TestLPRationalDualCoreDoneOrder",
+        "TestLPRationalDualCorePartialOwners",
+        "TestLPRationalDualCorePhysicalOwnership",
+        "TestLPRationalDualCoreLiveMetadataPrefixes",
+        "TestLPRationalDualCorePreservesOlderComparison"
       ],
       "assertions": [
         {
@@ -125047,9 +125110,24 @@
             "TestLPFloatDualSolvePreconditionPublication",
             "TestLPFloatDualSolveActualNoImprovementStop"
           ]
+        },
+        {
+          "name": "Concrete scalar mpq/mpq dual construction/lifecycle, descending eligible nonbasis restoration, Y/reduced-cost/basic-value reconstruction, initial bounds/betas and source Done ordering",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_core_rational.go",
+          "tests": [
+            "TestLPRationalDualCoreIndependentModels",
+            "TestLPRationalDualCoreDoneOrder",
+            "TestLPRationalDualCorePartialOwners",
+            "TestLPRationalDualCorePhysicalOwnership",
+            "TestLPRationalDualCoreLiveMetadataPrefixes",
+            "TestLPRationalDualCorePreservesOlderComparison"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Scalar dual construction returns a stopped partial owner on failure. Each numerical owner captures only its own calls; borrowed model/flags remain live until core/LU destruction. Dual vectors and member rationals close after base borrowers, before dual caller roots. No older caller comparison is adopted or consumed."
+      ],
       "deviations": [
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
         "Floating dual DSE calls the source prepared U/R solve without full scaling/tail transforms. On the explicit scaled triangular B, updated beta1 is0.0517578125 while the true new inverse-row squared norm is0.2666015625. This literal source discrepancy is preserved, not corrected. Boxed runaway snap writes low even when nearer upper; free recovery assigns zero before source debug assertion. Dead restore_d and commented-out xb_minus_delta_p_pivot_column have no retained source caller and are not ported.",

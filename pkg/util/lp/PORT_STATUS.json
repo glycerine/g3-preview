@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Scalar dual core and outer primal/dual optimization/scaling integration, remaining retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers."
+    "Remaining scalar dual pricing/ratio/basis advancement/full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers."
   ],
   "units": [
     {
@@ -1306,7 +1306,8 @@
         "pkg/util/lp/core_tableau_rational_test.go",
         "pkg/util/lp/core_basis_tableau_rational.go",
         "pkg/util/lp/primal_init_tableau_rational_test.go",
-        "pkg/util/lp/core_statistics_rational.go"
+        "pkg/util/lp/core_statistics_rational.go",
+        "pkg/util/lp/core_dual_rational.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1534,7 +1535,11 @@
         "TestLPRationalStatisticsLiveLocalReentryGuard",
         "TestLPRationalStatisticsPhysicalOwnership",
         "TestLPRationalAllColumnsFeasibilityIndependentOracle",
-        "TestLPRationalStatisticsReachedGuardsAndPrefixes"
+        "TestLPRationalStatisticsReachedGuardsAndPrefixes",
+        "TestLPRationalDualBoundsIndependentOracle",
+        "TestLPRationalDualBoundsPlacementAndAssertionPrefix",
+        "TestLPRationalDualBoundsMetadataAndDiagnostics",
+        "TestLPRationalDualBoundsLiveAliasOrder"
       ]
     },
     {
@@ -1599,7 +1604,8 @@
         "pkg/util/lp/core_pivot_compare_rational.go",
         "pkg/util/lp/core_tableau_rational.go",
         "pkg/util/lp/core_tableau_rational_test.go",
-        "pkg/util/lp/core_statistics_rational.go"
+        "pkg/util/lp/core_statistics_rational.go",
+        "pkg/util/lp/core_dual_rational.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1790,7 +1796,11 @@
         "TestLPRationalStatisticsLiveLocalReentryGuard",
         "TestLPRationalStatisticsPhysicalOwnership",
         "TestLPRationalAllColumnsFeasibilityIndependentOracle",
-        "TestLPRationalStatisticsReachedGuardsAndPrefixes"
+        "TestLPRationalStatisticsReachedGuardsAndPrefixes",
+        "TestLPRationalDualBoundsIndependentOracle",
+        "TestLPRationalDualBoundsPlacementAndAssertionPrefix",
+        "TestLPRationalDualBoundsMetadataAndDiagnostics",
+        "TestLPRationalDualBoundsLiveAliasOrder"
       ]
     },
     {
@@ -1912,7 +1922,8 @@
         "pkg/util/lp/dual_ratio_float.go",
         "pkg/util/lp/dual_flip_float.go",
         "pkg/util/lp/dual_advance_float.go",
-        "pkg/util/lp/dual_solve_float.go"
+        "pkg/util/lp/dual_solve_float.go",
+        "pkg/util/lp/dual_core_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -1950,7 +1961,13 @@
         "TestLPFloatDualSolveDebugPreconditionsAndGuards",
         "TestLPFloatDualPricingActualNumericalFailures",
         "TestLPFloatDualSolvePreconditionPublication",
-        "TestLPFloatDualSolveActualNoImprovementStop"
+        "TestLPFloatDualSolveActualNoImprovementStop",
+        "TestLPRationalDualCoreIndependentModels",
+        "TestLPRationalDualCoreDoneOrder",
+        "TestLPRationalDualCorePartialOwners",
+        "TestLPRationalDualCorePhysicalOwnership",
+        "TestLPRationalDualCoreLiveMetadataPrefixes",
+        "TestLPRationalDualCorePreservesOlderComparison"
       ]
     },
     {
@@ -1963,7 +1980,8 @@
         "pkg/util/lp/dual_ratio_float.go",
         "pkg/util/lp/dual_flip_float.go",
         "pkg/util/lp/dual_advance_float.go",
-        "pkg/util/lp/dual_solve_float.go"
+        "pkg/util/lp/dual_solve_float.go",
+        "pkg/util/lp/dual_core_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -2001,7 +2019,13 @@
         "TestLPFloatDualSolveDebugPreconditionsAndGuards",
         "TestLPFloatDualPricingActualNumericalFailures",
         "TestLPFloatDualSolvePreconditionPublication",
-        "TestLPFloatDualSolveActualNoImprovementStop"
+        "TestLPFloatDualSolveActualNoImprovementStop",
+        "TestLPRationalDualCoreIndependentModels",
+        "TestLPRationalDualCoreDoneOrder",
+        "TestLPRationalDualCorePartialOwners",
+        "TestLPRationalDualCorePhysicalOwnership",
+        "TestLPRationalDualCoreLiveMetadataPrefixes",
+        "TestLPRationalDualCorePreservesOlderComparison"
       ]
     },
     {
@@ -7684,6 +7708,60 @@
       "both module compile gates; checked linking rerun after temporary-space recovery",
       "source portcheck: 2103 units, 677 APIs",
       "dependency graph refresh: 64 packages",
+      "diff check"
+    ]
+  },
+  "latest_rational_dual_initial_increment": {
+    "scope": "Concrete retained mpq/mpq dual construction, initialization/reconstruction and dual bound feasibility",
+    "source_units_promoted": false,
+    "test_groups": 10,
+    "independent_exact_model_worlds": 160,
+    "independent_bound_worlds": 250,
+    "bound_placement_profiles": 15,
+    "done_order_profiles": 15,
+    "metadata_and_constructor_profiles": 24,
+    "physical_campaigns": 12,
+    "older_comparison_campaigns": 3,
+    "live_bound_aliases": 1,
+    "statement_coverage": {
+      "native": {
+        "core_dual_rational.go": {
+          "covered": 71,
+          "total": 92,
+          "percent": 77.2
+        },
+        "dual_core_rational.go": {
+          "covered": 110,
+          "total": 128,
+          "percent": 85.9
+        }
+      },
+      "debug_checked": {
+        "core_dual_rational.go": {
+          "covered": 76,
+          "total": 92,
+          "percent": 82.6
+        },
+        "dual_core_rational.go": {
+          "covered": 110,
+          "total": 128,
+          "percent": 85.9
+        }
+      }
+    },
+    "focused_native_seconds": 0.82,
+    "focused_debug_checked_seconds": 1.079,
+    "related_native_seconds": 21.851,
+    "related_debug_checked_seconds": 34.733,
+    "remaining": "Remaining scalar dual pricing/ratio/basis advancement/full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers.",
+    "coverage_note": "Coverage measures implemented Go statements, not C++ completion. Gaps principally guard stable call capture/destruction and ready/metadata states already checked by delegated owners. Native erases source bound-feasibility assertions; checked upper-bound feasibility asserts before native fallthrough. Full scalar dual algorithm remains open.",
+    "verification": [
+      "final focused native and debug/checked profiles",
+      "related scalar core/dual/reconstruction/reduced-cost/Solve and floating dual regressions in both profiles before final physical test strengthening; production unchanged except import spacing",
+      "both LP vets",
+      "both module compile gates",
+      "source portcheck",
+      "dependency graph refresh",
       "diff check"
     ]
   }
