@@ -4384,20 +4384,20 @@
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
-    "commit": "86cf064d",
-    "started_utc": "2026-10-11 13:12:27 UTC",
-    "completed_utc": "2026-10-11 13:30:51 UTC",
+    "commit": "a8a7ef66",
+    "started_utc": "2026-10-11 14:10:26 UTC",
+    "completed_utc": "2026-10-11 14:28:41 UTC",
     "exit_code": 0,
     "packages": 64,
     "packages_with_tests": 51,
-    "lp_seconds": 1101.828,
-    "lp_covered_statements": 21278,
-    "lp_statements": 24433,
-    "log": "/mnt/oldrog/tmp/g3-exact-input-model-module-native.log",
-    "profile": "/mnt/oldrog/tmp/g3-exact-input-model-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-exact-input-model-module-native.json",
-    "session_id": 13445,
-    "scope_warning": "Actual runner session13445 returned terminal exit0 and closed. Profile includes exact column/input-model/MPS population, maximization, bound queries and earlier LAR work. solver_prepare_exact.go is absent: the newer82df0244 exact matrix/RHS preparation has separate focused/regression evidence. Coverage measures existing Go statements, not C++ port completion."
+    "lp_seconds": 1092.255,
+    "lp_covered_statements": 21922,
+    "lp_statements": 25129,
+    "log": "/mnt/oldrog/tmp/g3-exact-objective-module-native.log",
+    "profile": "/mnt/oldrog/tmp/g3-exact-objective-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-exact-objective-module-native.json",
+    "session_id": 86760,
+    "scope_warning": "Actual runner session86760 returned terminal exit0 and closed. Profile includes solver_prepare_exact.go, solver_presolve_exact.go and solver_objective_exact.go. core_base_rational.go and core_basis_rational.go are absent: newer fc5774d3 scalar rational core retains separate passing focused/regression evidence. Coverage measures existing Go statements, not C++ port completion."
   },
   "full_native_checkpoint_history": [
     {
@@ -4481,6 +4481,22 @@
       "status_file": "/mnt/oldrog/tmp/g3-exact-input-model-module-native.json",
       "session_id": 13445,
       "scope_warning": "Actual runner session13445 returned terminal exit0 and closed. Profile includes exact column/input-model/MPS population, maximization, bound queries and earlier LAR work. solver_prepare_exact.go is absent: the newer82df0244 exact matrix/RHS preparation has separate focused/regression evidence. Coverage measures existing Go statements, not C++ port completion."
+    },
+    {
+      "commit": "a8a7ef66",
+      "started_utc": "2026-10-11 14:10:26 UTC",
+      "completed_utc": "2026-10-11 14:28:41 UTC",
+      "exit_code": 0,
+      "packages": 64,
+      "packages_with_tests": 51,
+      "lp_seconds": 1092.255,
+      "lp_covered_statements": 21922,
+      "lp_statements": 25129,
+      "log": "/mnt/oldrog/tmp/g3-exact-objective-module-native.log",
+      "profile": "/mnt/oldrog/tmp/g3-exact-objective-module-native.cover",
+      "status_file": "/mnt/oldrog/tmp/g3-exact-objective-module-native.json",
+      "session_id": 86760,
+      "scope_warning": "Actual runner session86760 returned terminal exit0 and closed. Profile includes solver_prepare_exact.go, solver_presolve_exact.go and solver_objective_exact.go. core_base_rational.go and core_basis_rational.go are absent: newer fc5774d3 scalar rational core retains separate passing focused/regression evidence. Coverage measures existing Go statements, not C++ port completion."
     }
   ],
   "latest_tableau_catchup_increment": {
@@ -5533,29 +5549,6 @@
     },
     "evidence": "Exact cost flipping, scaled-cost assignment and original-column reconstruction now implement retained lp_solver<mpq,mpq> source lp_solver.hpp:95-100,528-577. Costs owns a concrete exact dense vector. By-value getters, unary-minus copies, product left-operand copies and final assignments preserve numerical ownership and source publication order. Column children and Costs close before borrowed lexical work; caller outputs and borrowed core X storage remain alive through interrupted-call cleanup. Reconstruction specializes lp_core_solver_base.h:176-178, which directly returns X[j]; it does not implement or credit an exact optimization core or wrap the rational-pair solver. Fixed values precede index/scale reads; only unsigned -1 denotes an unmapped column, while other oversized indices reach extent guards. Missing scaled-cost mappings publish default external0 and a nil column as in source operator[]. Fixed-column and scale assertions stop debug builds at the actual source site; native fixed-column execution continues and native missing-scale execution retains the cost-copy prefix before guarding the invalid read. Six test groups cover160 independent81-240-bit rational models with positive/negative/zero costs and scales, all bound types, fixed priority and two cost flips,18 reached lookup/domain profiles, stopped/closed entries, output/core aliasing and rejection of foreign-manager numerals. Fourteen pooled/direct physical refusal campaigns through success cover flipping, scaled/unscaled signs and free/lower/upper/fixed reconstruction; direct campaigns require real refusal and all owner censuses pass. Actual older caller comparison identity survives flipping and Close. Real exact MPS parse/populate/matrix/RHS/scale/cost/value preparation preserves sticky FR: a later UP does not restore bounds. The initial MPS helper compile error and mistaken sticky-FR expectation were corrected and both final combined runs pass. New objective file98/105 statements (93.3%) native and99/105 (94.3%) debug/checked. Remaining blocks guard stable sign/destruction/small-constant paths and source-disabled assertions or the native-only invalid scale read. Combined exact input/column/MPS/preparation/presolve/objective passes8.504s native/10.958s debug/checked; related exact MPS and floating solver/presolve/primal/dual/MPS passes0.978s/1.227s. Both LP vets and both module compilation gates pass. Exact objective evaluation, concrete mpq/mpq primal/dual cores and outer optimization, factories, full upstream drivers and whole-source audits remain open. Inventory remains88 partial/16 unported/6 reference_only, with no whole-source promotion. Latest completed full native86cf064d checkpoint predates matrix preparation, presolve and this increment; focused evidence is separate."
   },
-  "active_full_native_checkpoint": {
-    "commit": "a8a7ef66",
-    "started": "2026-10-11T14:10:26.252067+00:00",
-    "command": [
-      "go",
-      "-C",
-      "pkg",
-      "test",
-      "./...",
-      "-count=1",
-      "-timeout=60m",
-      "-coverprofile=/mnt/oldrog/tmp/g3-exact-objective-module-native.cover"
-    ],
-    "state": "running",
-    "pid": 5,
-    "session_id": 86760,
-    "artifacts": [
-      "/mnt/oldrog/tmp/g3-exact-objective-module-native.json",
-      "/mnt/oldrog/tmp/g3-exact-objective-module-native.log",
-      "/mnt/oldrog/tmp/g3-exact-objective-module-native.cover"
-    ],
-    "coverage_scope": "Includes exact matrix/RHS preparation, presolve and objective preparation committed at a8a7ef66; completion and coverage not yet credited."
-  },
   "latest_rational_core_base_increment": {
     "source": [
       "src/util/lp/lp_core_solver_base.hpp:27-160",
@@ -5647,6 +5640,6 @@
         "debug_checked_seconds": 0.019
       }
     },
-    "evidence": "The concrete scalar mpq/mpq RationalCoreSolverBase now owns rational scratch and RationalLU for retained exact primal/dual consumers. Source construction, repeated heading initialization, descending nonbasis order, basis validation, exact bounds and feasibility, FillCB, SolveYB, both SolveBd entries, basis changes/restoration/traces and row transposition are implemented. RationalLU.SolveBdFaster supplies the missing scalar indexed entry. No pair or floating optimization adapter is used. The constructor retains partial owners on errors; initialization and child-LU failures stop the core. Parent raw receipts close before LU, LU closes before scratch, and input vectors/matrix and external output numerals remain borrowed through cleanup. Reinitialization destroys the old LU before replacement, and stale LU calls reject use. Source row transposition publishes basis/heading changes before a failed matrix copy. Source native/debug assertions and append/failure prefixes remain explicit. Eight test groups cover 80 independent triangular rational systems, with 81\u2013160-bit off-diagonal coefficients, independently constructed B*d and y*B, real rational solves, factorization replacement and lazy construction. Twenty-five exact bound/type/tolerance profiles check five positions including 1e-100 violations; zero, negative, huge, infinite and NaN floating tolerances are ignored. One hundred permuted basis/trace/row-copy worlds vary both column identities and coefficients. Eleven missing constructor inputs, an ownerless matrix, 44 reached metadata/domain profiles, stopped/closed entries and source partial-publication prefixes are checked. Sixteen pooled/direct physical campaigns through success cover construction, replacement, cost copying, both solves, lazy factorization and row copying; two further campaigns cover real comparison refusal. Every direct campaign requires actual refusal and ownership censuses pass. An actual older caller comparison survives core calls and Close. A foreign-reference fixture preserves the source sign-only early return, then rejects a reached invalid backing read without adopting the borrowed numeral. The initial fixture accidentally reused locally valid numerical slot IDs; it was corrected to exercise the actual invalid-read domain rather than assuming universal provenance checks. Base coverage is 205/231 statements (88.7%) native and 219/231 (94.8%) debug/checked; basis coverage is 68/70 (97.1%) and 69/70 (98.6%); the new rational faster LU entry is 6/6 (100%) in both. Remaining gaps chiefly protect valid capture/destruction, stable extents, source-disabled debug assertions and redundant guards. Focused core checks pass 14.988s native and 24.307s debug/checked; related pair/core, exact model/presolve/objective and LU regressions pass 81.209s/137.786s. Both LP vets and native/debug full-module compilation pass. Source portcheck passes (2103 units, 677 APIs), the graph is refreshed for 64 native production packages and diff checks pass. The strengthened permuted-basis fixture passes separately in 0.016s native/0.019s debug/checked after the focused coverage runs; production code is unchanged. Full native checkpoint a8a7ef66 is still running and predates this core increment; completion and its coverage are not credited here. Scalar core reduced-cost/value/pivot orchestration, exact primal/dual optimization, outer integration and full upstream drivers remain open. Inventory stays 88 partial/16 unported/6 reference_only, without whole-source promotion."
+    "evidence": "The concrete scalar mpq/mpq RationalCoreSolverBase now owns rational scratch and RationalLU for retained exact primal/dual consumers. Source construction, repeated heading initialization, descending nonbasis order, basis validation, exact bounds and feasibility, FillCB, SolveYB, both SolveBd entries, basis changes/restoration/traces and row transposition are implemented. RationalLU.SolveBdFaster supplies the missing scalar indexed entry. No pair or floating optimization adapter is used. The constructor retains partial owners on errors; initialization and child-LU failures stop the core. Parent raw receipts close before LU, LU closes before scratch, and input vectors/matrix and external output numerals remain borrowed through cleanup. Reinitialization destroys the old LU before replacement, and stale LU calls reject use. Source row transposition publishes basis/heading changes before a failed matrix copy. Source native/debug assertions and append/failure prefixes remain explicit. Eight test groups cover 80 independent triangular rational systems, with 81\u2013160-bit off-diagonal coefficients, independently constructed B*d and y*B, real rational solves, factorization replacement and lazy construction. Twenty-five exact bound/type/tolerance profiles check five positions including 1e-100 violations; zero, negative, huge, infinite and NaN floating tolerances are ignored. One hundred permuted basis/trace/row-copy worlds vary both column identities and coefficients. Eleven missing constructor inputs, an ownerless matrix, 44 reached metadata/domain profiles, stopped/closed entries and source partial-publication prefixes are checked. Sixteen pooled/direct physical campaigns through success cover construction, replacement, cost copying, both solves, lazy factorization and row copying; two further campaigns cover real comparison refusal. Every direct campaign requires actual refusal and ownership censuses pass. An actual older caller comparison survives core calls and Close. A foreign-reference fixture preserves the source sign-only early return, then rejects a reached invalid backing read without adopting the borrowed numeral. The initial fixture accidentally reused locally valid numerical slot IDs; it was corrected to exercise the actual invalid-read domain rather than assuming universal provenance checks. Base coverage is 205/231 statements (88.7%) native and 219/231 (94.8%) debug/checked; basis coverage is 68/70 (97.1%) and 69/70 (98.6%); the new rational faster LU entry is 6/6 (100%) in both. Remaining gaps chiefly protect valid capture/destruction, stable extents, source-disabled debug assertions and redundant guards. Focused core checks pass 14.988s native and 24.307s debug/checked; related pair/core, exact model/presolve/objective and LU regressions pass 81.209s/137.786s. Both LP vets and native/debug full-module compilation pass. Source portcheck passes (2103 units, 677 APIs), the graph is refreshed for 64 native production packages and diff checks pass. The strengthened permuted-basis fixture passes separately in 0.016s native/0.019s debug/checked after the focused coverage runs; production code is unchanged. Full native checkpoint a8a7ef66 completed at 14:28:41 UTC with exit0 across 64 packages (51 with tests), LP1092.255s and 21922/25129 statements (87.2%). Its profile predates this core increment; core coverage remains separate focused evidence, and no full native runner is active. Scalar core reduced-cost/value/pivot orchestration, exact primal/dual optimization, outer integration and full upstream drivers remain open. Inventory stays 88 partial/16 unported/6 reference_only, without whole-source promotion."
   }
 }
