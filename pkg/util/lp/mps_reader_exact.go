@@ -32,7 +32,9 @@ type rationalMPSRow struct {
 // RationalMPSReader parses exact numerals in a borrowed manager. Go text and
 // insertion-ordered dictionaries replace source string/unordered containers;
 // iteration order is input order. Close after returned solver owners and before
-// the numeral manager. Failed lexical arithmetic retains its reached prefix
+// the numeral manager, except that a successful CreateLARSolver leaves no
+// borrowed reader numerals and permits the source file driver's earlier Close.
+// Failed lexical arithmetic retains its reached prefix
 // until Close; do not copy the reader or mutate its owning numeral pointers.
 type RationalMPSReader struct {
 	input                 *bufio.Reader
@@ -755,6 +757,7 @@ func (m *RationalMPSReader) getVarIndex(name string) uint32 {
 // early return from column filling on the first absent bound. General row and
 // column constraints reach AddConstraint's source debug assertion/native no-op.
 // Return the partial solver on failure; close it before closing this reader.
+// On success no reader numerals remain borrowed by the solver.
 func (m *RationalMPSReader) CreateLARSolver() (solver *LARSolver, err error) {
 	if err = m.ready(); err != nil {
 		return nil, err

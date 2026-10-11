@@ -103015,7 +103015,8 @@
         "pkg/util/lp/driver_mps_rational.go",
         "pkg/util/lp/driver_file_list.go",
         "pkg/util/lp/driver_mps_default_rational.go",
-        "pkg/util/lp/driver_lar.go"
+        "pkg/util/lp/driver_lar.go",
+        "pkg/util/lp/driver_lar_mps_file.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103143,7 +103144,15 @@
         "TestLPLARDriverReportFlushAndLiveFields",
         "TestLPLARDriverPhysicalOwnership",
         "TestLPLARDriverActualComparisonReportAndLookupFailures",
-        "TestLPLARDriverOlderComparison"
+        "TestLPLARDriverOlderComparison",
+        "TestLPLARMPSFileIndependentFreeModels",
+        "TestLPLARMPSInputDispatchAndFileList",
+        "TestLPLARMPSFileSourceBoundaries",
+        "TestLPLARMPSFileFailedSecondChildAndClose",
+        "TestLPLARMPSInputEntryGuards",
+        "TestLPLARMPSFileReportFailures",
+        "TestLPLARMPSFilePhysicalOwnership",
+        "TestLPLARMPSFileOlderCallerComparison"
       ],
       "conditionals": [
         {
@@ -103948,6 +103957,21 @@
           "name": "Commented directory traversal/GLPK comparison implementation inside test_files_from_directory (2391-2413) is disabled; retained wrapper has an empty body and future CLI branch must return without traversal",
           "status": "dead_deleted",
           "tests": []
+        },
+        {
+          "name": "MPS branch of create_lar_solver_from_file and test_lar_on_file (2486-2506), file-before-list MPS branch of test_lar_solver (2529-2545): actual two reads with successful creation reader destruction before second read, native LAR run/comparison/randomize and sequential owning cleanup; SMT branch remains open",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_lar_mps_file.go",
+          "tests": [
+            "TestLPLARMPSFileIndependentFreeModels",
+            "TestLPLARMPSInputDispatchAndFileList",
+            "TestLPLARMPSFileSourceBoundaries",
+            "TestLPLARMPSFileFailedSecondChildAndClose",
+            "TestLPLARMPSInputEntryGuards",
+            "TestLPLARMPSFileReportFailures",
+            "TestLPLARMPSFilePhysicalOwnership",
+            "TestLPLARMPSFileOlderCallerComparison"
+          ]
         }
       ],
       "ownership": [
@@ -103956,7 +103980,8 @@
         "MPSFileDriver owns one actual reader and concrete primary/optional comparison solvers plus lexical exact objective work and its own numerical receipts. Parent captures only copied unary-negation/assignment and Float64 conversion, never owning solver getters. Raw driver receipts close before solvers, then readers, then driver objective roots; partial exact children can borrow reader or driver values. Successful Run closes at the source return boundary; failed Run retains owners until Close and cannot retry. Real older caller comparison receipts survive operations and cleanup unchanged. The objective survives output/endl flush but dies before running-watch time extraction.",
         "Native file-list reader closes its file before solving. Sequential MPS list driver owns only the current child; each completed child closes before the next starts. Failed child remains reachable until Close succeeds, including real file-close failure and cleanup retry. Arguments and numerical manager remain borrowed.",
         "Auxiliary exact driver uses concrete solver defaults and ignores arguments as source does. Each named returned numeral survives its output plus trailing space, then dies before next expression. Objective returned numeral survives endl; failed children and expression locals remain reachable until explicit Close, with delegated captures retained by their actual owning child. Eight pooled/direct physical campaigns and two actual older caller comparisons verify cleanup ownership.",
-        "LARRunDriver borrows its LAR solver, optional MPS reader and arguments. It owns concrete primal comparison and named snapshots, closing comparison before borrowed getter outputs; lexical infeasibility evidence closes at if-block end, with failed work reachable for explicit cleanup. Eight pooled/direct physical campaigns cover actual Solve, infeasibility, randomize and comparison through success; two actual older caller comparisons survive driver and solver/reader cleanup."
+        "LARRunDriver borrows its LAR solver, optional MPS reader and arguments. It owns concrete primal comparison and named snapshots, closing comparison before borrowed getter outputs; lexical infeasibility evidence closes at if-block end, with failed work reachable for explicit cleanup. Eight pooled/direct physical campaigns cover actual Solve, infeasibility, randomize and comparison through success; two actual older caller comparisons survive driver and solver/reader cleanup.",
+        "LAR MPS file driver owns creation reader, returned LAR solver, second reader and run driver. Successful CreateLARSolver leaves no parser-numeral borrows: column registration and source AddConstraint no-op/debug assertion are inspected; creation reader closes before second read as source scopes require. Failed creation retains reader until partial solver cleanup. Run driver closes before LAR solver and report reader; failed second list child remains reachable. Four pooled/direct physical campaigns and two actual older caller comparisons verify all prefixes."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -103975,7 +104000,8 @@
         "Native Go file/writer errors and injected host clock failures return reached prefixes with explicit Close for partial ownership; no C++ STL stream or raw-pointer leak adapter is added. Source headline spaces, floating signed zero, exact full-entry rational(double)/sparsity limits, FEASIBLE status on the scalar primal <= iteration boundary, 19/20-column threshold, seconds/1000 and span/iteration timing, and first-operand NaN behavior of the one-percent predicate remain literal. Prepared mismatch diagnostics use explicitly differing input models with actual independent solves; they do not claim ordinary matching inputs disagree. Global mutable STL formatting is not ported; existing native six-significant-digit formatting is used.",
         "File-list names use native Go strings and slices with literal byte preservation; no C++ string/stream/vector implementation. Missing-open diagnostic returns an empty list as source does. Native non-EOF read errors return completed names plus explicit error rather than suppressing the I/O failure as C++ read_line does. First empty line ends reading; final non-newline line is accepted; CR, whitespace, duplicates and relative names are unchanged.",
         "Auxiliary exact driver retains fresh tableau default zero reduced costs: 40 positive-objective bounded worlds report initial zero objective as source defaults do, without claiming mathematical optimality. No setup, minimum correction, limits or stopwatch is introduced. Exact dual unsupported rational(double) and missing sparsity metadata remain explicit source boundaries. Column names use the existing reader insertion order instead of C++ unordered-map iteration. Source diagnostics route to the configured native writer.",
-        "run_lar_solver uses native Go writers, clock, slices and concrete rational vector snapshots. Source unused local solution map is represented by owning named-getter snapshots without a universal STL adapter; names use existing reader insertion order. Source compare branch prints LAR status without solving LAR or comparing values. Source raw primal comparison pointer is not deleted; Go explicit driver ownership closes it, avoiding a leaked numerical owner. Configured output redirects concrete solver diagnostics. Disabled directory traversal is not implemented."
+        "run_lar_solver uses native Go writers, clock, slices and concrete rational vector snapshots. Source unused local solution map is represented by owning named-getter snapshots without a universal STL adapter; names use existing reader insertion order. Source compare branch prints LAR status without solving LAR or comparing values. Source raw primal comparison pointer is not deleted; Go explicit driver ownership closes it, avoiding a leaked numerical owner. Configured output redirects concrete solver diagnostics. Disabled directory traversal is not implemented.",
+        "MPS-specific LAR entry points port the retained MPS half, not the separate SMT reader/dispatch. Source two reads and file-before-list priority are retained. Missing individual files emit both parser diagnostics and return normally so list processing continues. Checked general AddConstraint asserts during initial factory before the second read; native retains the disabled constraint body and does not establish mathematical constrained-model solving. Native read/close/report errors remain explicit and partial owners permit cleanup retry."
       ]
     },
     {
@@ -132455,7 +132481,8 @@
         "pkg/util/lp/driver_mps.go",
         "pkg/util/lp/driver_mps_float.go",
         "pkg/util/lp/driver_mps_rational.go",
-        "pkg/util/lp/driver_mps_default_rational.go"
+        "pkg/util/lp/driver_mps_default_rational.go",
+        "pkg/util/lp/driver_lar_mps_file.go"
       ],
       "tests": [
         "TestLPFloatMPSIndependentOptima",
@@ -132522,7 +132549,15 @@
         "TestLPMPSDefaultRationalPreparedDualCost",
         "TestLPMPSDefaultRationalNumberPhysicalOwnership",
         "TestLPMPSDefaultRationalLiveNumberLifetime",
-        "TestLPMPSDefaultRationalOlderComparison"
+        "TestLPMPSDefaultRationalOlderComparison",
+        "TestLPLARMPSFileIndependentFreeModels",
+        "TestLPLARMPSInputDispatchAndFileList",
+        "TestLPLARMPSFileSourceBoundaries",
+        "TestLPLARMPSFileFailedSecondChildAndClose",
+        "TestLPLARMPSInputEntryGuards",
+        "TestLPLARMPSFileReportFailures",
+        "TestLPLARMPSFilePhysicalOwnership",
+        "TestLPLARMPSFileOlderCallerComparison"
       ],
       "assertions": [
         {
@@ -132685,7 +132720,8 @@
       "ownership": [
         "RationalMPSReader owns initialized numeral pointers in a borrowed manager, parent exact receipts, lexical parsing/range/iteration locals and a child native coefficient vector. Cleanup cancels parent raw calls, then child population receipts, lexical locals, stored numerals and parent roots before closing the owned file. Returned partial solvers close before the reader. Overwritten row/range owners remain tracked until reader Close; native Go container reclamation does not reproduce source pointer leaks.",
         "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json.",
-        "Concrete exact MPS factories return the newly constructed primal/dual owner even when row, coefficient, bound or diagnostic population fails. Close that partial child before the reader because interrupted common-model numeral calls can borrow its by-value loop value. Ready/closed checks run before acquiring a new owner. Successful repeated creation yields independent column/constraint/coefficient owners; one child optimization failure does not stop the reader. Real older caller comparison receipts survive factory population and cleanup unchanged."
+        "Concrete exact MPS factories return the newly constructed primal/dual owner even when row, coefficient, bound or diagnostic population fails. Close that partial child before the reader because interrupted common-model numeral calls can borrow its by-value loop value. Ready/closed checks run before acquiring a new owner. Successful repeated creation yields independent column/constraint/coefficient owners; one child optimization failure does not stop the reader. Real older caller comparison receipts survive factory population and cleanup unchanged.",
+        "Successful retained CreateLARSolver has no remaining parser-numeral borrows, permitting source create_lar_solver_from_file to close its reader before the second read; partial factory failures retain the reader until solver cleanup. Actual file-driver tests verify both reads, creator absence during run and allocation failure cleanup."
       ],
       "deviations": [
         "Native Go strings/bufio/strconv and insertion-ordered dictionaries replace STL streams/containers and libc numeric conversion. ASCII space/tab token/trim rules, fixed-field 8-byte row names/25-byte stride and column continuation preserve project parsing. Numeric tokens use Go ParseFloat on the first field; malformed libc atof prefix grammar is not emulated. Native writer errors and real file errors return reached publication prefixes; EOF retains source two-count line increment. Non-advancing ROWS header loop returns ErrMPSStalled, bare throw/undefined token domains become explicit errors. Source MI retains default lower flag, marker line still registers a column, LIMITMAX source shift assertion and zero/negative/IEEE range transformations are preserved. Dictionary insertion order defines deterministic replacement/source unordered traversal; partial constructed solvers are returned for cleanup. Native owner/file Close replaces source stream/container destruction. Dead string utility adapters and unused solver_row_count/range_count helpers are excluded; exact/dual/LAR creation and complete upstream CLI remain open.",

@@ -1218,6 +1218,7 @@
         "driver_arguments.go",
         "driver_file_list.go",
         "driver_lar.go",
+        "driver_lar_mps_file.go",
         "driver_mps.go",
         "driver_mps_default_rational.go",
         "driver_mps_float.go",
