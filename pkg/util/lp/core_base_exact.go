@@ -43,6 +43,9 @@ type PairCoreSolverBase struct {
 	feasibilityWork                         *IndexedPairVector
 	valueWork                               *IndexedPairVector
 	valueScalars                            *IndexedRationalVector
+	residualWork                            *IndexedPairVector
+	residualScalars                         *IndexedRationalVector
+	reconstructionWork                      *IndexedPairVector
 	stopped                                 bool
 }
 
@@ -78,7 +81,7 @@ func NewPairCoreSolverBase(in PairCoreInputs) (m *PairCoreSolverBase, err error)
 	return m, m.InitBasisHeadingAndNonBasicColumns()
 }
 func (m *PairCoreSolverBase) ready() error {
-	if m.stopped || m.pivotWork != nil || m.feasibilityWork != nil || m.valueWork != nil || m.valueScalars != nil || m.calls.pending() {
+	if m.stopped || m.pivotWork != nil || m.feasibilityWork != nil || m.valueWork != nil || m.valueScalars != nil || m.residualWork != nil || m.residualScalars != nil || m.reconstructionWork != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return nil
@@ -371,6 +374,24 @@ func (m *PairCoreSolverBase) Close() error {
 			return err
 		}
 		m.valueScalars = nil
+	}
+	if m.residualWork != nil {
+		if err := m.residualWork.Close(); err != nil {
+			return err
+		}
+		m.residualWork = nil
+	}
+	if m.residualScalars != nil {
+		if err := m.residualScalars.Close(); err != nil {
+			return err
+		}
+		m.residualScalars = nil
+	}
+	if m.reconstructionWork != nil {
+		if err := m.reconstructionWork.Close(); err != nil {
+			return err
+		}
+		m.reconstructionWork = nil
 	}
 	// A failed indexed add may still borrow its product input during cleanup.
 	// The same owner retains tableau reduced-cost expression temporaries.

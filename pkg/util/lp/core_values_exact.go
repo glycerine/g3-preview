@@ -4,10 +4,10 @@ package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 
-// subtractValueProduct evaluates the whole scalar*delta pair before publishing
+// subtractCoreValueProduct evaluates the whole scalar*delta pair before publishing
 // the compound subtraction. delta and scalar remain live references, including
 // when delta aliases a value changed by an earlier row or the entering update.
-func (m *PairCoreSolverBase) subtractValueProduct(j uint32, delta *RationalPair, scalar *numeral.Rational) (err error) {
+func (m *PairCoreSolverBase) subtractCoreValueProduct(dst, delta *RationalPair, scalar *numeral.Rational) (err error) {
 	m.valueScalars = NewIndexedRationalVector(m.manager, 3)
 	m.valueWork = NewIndexedPairVector(m.manager, 1)
 	tmp, x, y := &m.valueScalars.Data[0], &m.valueScalars.Data[1], &m.valueScalars.Data[2]
@@ -29,7 +29,7 @@ func (m *PairCoreSolverBase) subtractValueProduct(j uint32, delta *RationalPair,
 		return err
 	}
 	m.valueScalars = nil
-	if err = (*m.X)[j].Sub(m.manager, &(*m.X)[j], product); err != nil {
+	if err = dst.Sub(m.manager, dst, product); err != nil {
 		return err
 	}
 	if err = m.valueWork.Close(); err != nil {
@@ -66,7 +66,7 @@ func (m *PairCoreSolverBase) UpdateX(entering uint32, delta *RationalPair) (err 
 			if uint64(j) >= uint64(len(*m.X)) || uint64(i) >= uint64(len(m.Ed.Data)) {
 				return ErrBounds
 			}
-			if err = m.subtractValueProduct(j, delta, &m.Ed.Data[i]); err != nil {
+			if err = m.subtractCoreValueProduct(&(*m.X)[j], delta, &m.Ed.Data[i]); err != nil {
 				return err
 			}
 		}
@@ -86,7 +86,7 @@ func (m *PairCoreSolverBase) UpdateX(entering uint32, delta *RationalPair) (err 
 			if e != nil {
 				return e
 			}
-			if err = m.subtractValueProduct(j, delta, value); err != nil {
+			if err = m.subtractCoreValueProduct(&(*m.X)[j], delta, value); err != nil {
 				return err
 			}
 		}
