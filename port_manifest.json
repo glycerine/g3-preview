@@ -120235,7 +120235,9 @@
         "pkg/util/lp/lar_solve_signature.go",
         "pkg/util/lp/lar_solve_signature_test.go",
         "pkg/util/lp/lar_catchup_tableau.go",
-        "pkg/util/lp/lar_catchup_tableau_test.go"
+        "pkg/util/lp/lar_catchup_tableau_test.go",
+        "pkg/util/lp/lar_signature_tableau.go",
+        "pkg/util/lp/lar_signature_tableau_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -120327,7 +120329,16 @@
         "TestLARTableauCatchUpPreservesOlderComparison",
         "TestLARTableauCatchUpReversePivotErrorPrefix",
         "TestLARTableauCatchUpReversePhysicalOwnership",
-        "TestLARTableauCatchUpReducedCostsIndependentModel"
+        "TestLARTableauCatchUpReducedCostsIndependentModel",
+        "TestLARTableauSignatureUpdateIndependentModels",
+        "TestLARTableauSignaturePreparationIndependentSystems",
+        "TestLARTableauSignatureBoxedAdditiveSourcePrefix",
+        "TestLARTableauSignaturePhysicalOwnership",
+        "TestLARTableauSignatureUpdateReachedPrefixes",
+        "TestLARTableauSignaturePreparationReachedPrefixes",
+        "TestLARTableauSignatureRemovePendingCore",
+        "TestLARTableauSignaturePreservesOlderComparison",
+        "TestLARTableauSignaturePreparationMultipleRows"
       ],
       "conditionals": [
         {
@@ -120696,6 +120707,22 @@
             "TestLARTableauCatchUpReversePivotErrorPrefix",
             "TestLARTableauCatchUpReversePhysicalOwnership",
             "TestLARTableauCatchUpReducedCostsIndependentModel"
+          ]
+        },
+        {
+          "name": "tableau signature value/delta update and preparation source276-352; actual bound publications, owning rational/epsilon expressions, sparse-column basic updates and source infeasibility/residual assertions",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_signature_tableau.go",
+          "tests": [
+            "TestLARTableauSignatureUpdateIndependentModels",
+            "TestLARTableauSignaturePreparationIndependentSystems",
+            "TestLARTableauSignatureBoxedAdditiveSourcePrefix",
+            "TestLARTableauSignaturePhysicalOwnership",
+            "TestLARTableauSignatureUpdateReachedPrefixes",
+            "TestLARTableauSignaturePreparationReachedPrefixes",
+            "TestLARTableauSignatureRemovePendingCore",
+            "TestLARTableauSignaturePreservesOlderComparison",
+            "TestLARTableauSignaturePreparationMultipleRows"
           ]
         }
       ],
@@ -121989,7 +122016,9 @@
         "pkg/util/lp/core_basis_tableau_exact.go",
         "pkg/util/lp/primal_init_tableau_exact_test.go",
         "pkg/util/lp/primal_feasible_exact.go",
-        "pkg/util/lp/primal_feasible_exact_test.go"
+        "pkg/util/lp/primal_feasible_exact_test.go",
+        "pkg/util/lp/lar_signature_tableau.go",
+        "pkg/util/lp/lar_signature_tableau_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122136,7 +122165,16 @@
         "TestLPExactNonbasicIndependentBoundOracle",
         "TestLPExactFindFeasibleEntryPrefixes",
         "TestLPExactNonbasicEmptyAndStoppedValidation",
-        "TestLPExactFindFeasiblePhysicalOwnership"
+        "TestLPExactFindFeasiblePhysicalOwnership",
+        "TestLARTableauSignatureUpdateIndependentModels",
+        "TestLARTableauSignaturePreparationIndependentSystems",
+        "TestLARTableauSignatureBoxedAdditiveSourcePrefix",
+        "TestLARTableauSignaturePhysicalOwnership",
+        "TestLARTableauSignatureUpdateReachedPrefixes",
+        "TestLARTableauSignaturePreparationReachedPrefixes",
+        "TestLARTableauSignatureRemovePendingCore",
+        "TestLARTableauSignaturePreservesOlderComparison",
+        "TestLARTableauSignaturePreparationMultipleRows"
       ],
       "assertions": [
         {
@@ -122549,6 +122587,22 @@
             "TestLPExactFindFeasibleEntryPrefixes",
             "TestLPExactNonbasicEmptyAndStoppedValidation",
             "TestLPExactFindFeasiblePhysicalOwnership"
+          ]
+        },
+        {
+          "name": "remove_column_from_inf_set source685-688; erase before actual debug feasibility assertion, retained tableau signature consumer",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_signature_tableau.go",
+          "tests": [
+            "TestLARTableauSignatureUpdateIndependentModels",
+            "TestLARTableauSignaturePreparationIndependentSystems",
+            "TestLARTableauSignatureBoxedAdditiveSourcePrefix",
+            "TestLARTableauSignaturePhysicalOwnership",
+            "TestLARTableauSignatureUpdateReachedPrefixes",
+            "TestLARTableauSignaturePreparationReachedPrefixes",
+            "TestLARTableauSignatureRemovePendingCore",
+            "TestLARTableauSignaturePreservesOlderComparison",
+            "TestLARTableauSignaturePreparationMultipleRows"
           ]
         }
       ],

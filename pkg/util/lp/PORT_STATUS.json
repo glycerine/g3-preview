@@ -682,7 +682,9 @@
         "pkg/util/lp/lar_solve_signature.go",
         "pkg/util/lp/lar_solve_signature_test.go",
         "pkg/util/lp/lar_catchup_tableau.go",
-        "pkg/util/lp/lar_catchup_tableau_test.go"
+        "pkg/util/lp/lar_catchup_tableau_test.go",
+        "pkg/util/lp/lar_signature_tableau.go",
+        "pkg/util/lp/lar_signature_tableau_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -774,7 +776,16 @@
         "TestLARTableauCatchUpPreservesOlderComparison",
         "TestLARTableauCatchUpReversePivotErrorPrefix",
         "TestLARTableauCatchUpReversePhysicalOwnership",
-        "TestLARTableauCatchUpReducedCostsIndependentModel"
+        "TestLARTableauCatchUpReducedCostsIndependentModel",
+        "TestLARTableauSignatureUpdateIndependentModels",
+        "TestLARTableauSignaturePreparationIndependentSystems",
+        "TestLARTableauSignatureBoxedAdditiveSourcePrefix",
+        "TestLARTableauSignaturePhysicalOwnership",
+        "TestLARTableauSignatureUpdateReachedPrefixes",
+        "TestLARTableauSignaturePreparationReachedPrefixes",
+        "TestLARTableauSignatureRemovePendingCore",
+        "TestLARTableauSignaturePreservesOlderComparison",
+        "TestLARTableauSignaturePreparationMultipleRows"
       ]
     },
     {
@@ -1067,7 +1078,9 @@
         "pkg/util/lp/core_basis_tableau_exact.go",
         "pkg/util/lp/primal_init_tableau_exact_test.go",
         "pkg/util/lp/primal_feasible_exact.go",
-        "pkg/util/lp/primal_feasible_exact_test.go"
+        "pkg/util/lp/primal_feasible_exact_test.go",
+        "pkg/util/lp/lar_signature_tableau.go",
+        "pkg/util/lp/lar_signature_tableau_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1214,7 +1227,16 @@
         "TestLPExactNonbasicIndependentBoundOracle",
         "TestLPExactFindFeasibleEntryPrefixes",
         "TestLPExactNonbasicEmptyAndStoppedValidation",
-        "TestLPExactFindFeasiblePhysicalOwnership"
+        "TestLPExactFindFeasiblePhysicalOwnership",
+        "TestLARTableauSignatureUpdateIndependentModels",
+        "TestLARTableauSignaturePreparationIndependentSystems",
+        "TestLARTableauSignatureBoxedAdditiveSourcePrefix",
+        "TestLARTableauSignaturePhysicalOwnership",
+        "TestLARTableauSignatureUpdateReachedPrefixes",
+        "TestLARTableauSignaturePreparationReachedPrefixes",
+        "TestLARTableauSignatureRemovePendingCore",
+        "TestLARTableauSignaturePreservesOlderComparison",
+        "TestLARTableauSignaturePreparationMultipleRows"
       ]
     },
     {
@@ -3969,5 +3991,25 @@
     ],
     "qualification": "Remaining branches protect queue-selected endpoint, restored-basis and reverse-exchange invariants; native additionally erases source assertions. Full retained LAR/tableau orchestration and upstream drivers remain incomplete. Latest full native checkpoint predates this increment.",
     "evidence": "Tableau basis-trace catch-up now implements src/util/lp/lar_core_solver.h:533-582 using the shared delayed FIFO endpoint selector and actual exact tableau pivots. Basis metadata publishes before pivot arithmetic; an ordinary false pivot reverses only the last exchange and repivots the old basic column, while a Go numerical error preserves its reached source prefix. Tests cover200 independent chronological trace worlds with B*T=A, identity bases and reciprocal sparse links,80 independent reduced-cost models, first/late singular pivots, nonzero-RHS source behavior, nine reached metadata/stopped/assertion prefixes, reverse-pivot RHS failure, six pooled/direct physical refusal campaigns through success, and an actual older caller comparison. New file34/41 statements (82.9%) native and37/41 (90.2%) debug/checked. Remaining gaps protect selected-endpoint, restored-basis and reverse-exchange invariants; native additionally erases source assertions. Focused1.136s/1.823s; related LAR/signature/catch-up/exact-tableau82.556s/120.962s. Lower-level exact tableau regression suites pass41.497s/49.072s. Both LP vets and native/debug module compilation, portcheck and diff checks pass. The latest full native checkpoint at555046ae predates this addition. Signature-guided tableau value preparation/solve, whole-LAR orchestration and complete upstream drivers remain open; inventory remains85 partial/25 unported."
+  },
+  "latest_tableau_signature_increment": {
+    "source": "src/util/lp/lar_core_solver.h:276-352; lp_core_solver_base.h:685-688",
+    "go_target": "pkg/util/lp/lar_signature_tableau.go",
+    "native_statements": {
+      "covered": 148,
+      "total": 179,
+      "percent": 82.7
+    },
+    "debug_checked_statements": {
+      "covered": 168,
+      "total": 179,
+      "percent": 93.9
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-tableau-signature-native.cover",
+      "/mnt/oldrog/tmp/g3-tableau-signature-debug.cover"
+    ],
+    "qualification": "Remaining gaps primarily protect valid capture/copy/destructor and comparison/equality child errors; native additionally erases source assertions. Boxed additive source defect is preserved, not corrected. Latest full native checkpoint predates this addition; whole retained LAR/tableau orchestration and upstream drivers remain incomplete.",
+    "evidence": "Tableau signature preparation now implements src/util/lp/lar_core_solver.h:276-352 and the retained erase-before-feasibility helper in lp_core_solver_base.h:685-688. Exact rational/epsilon differences publish the lexical delta before replacing the nonbasic value; real sparse column links drive basic updates and real infeasibility/residual validators. Core-owned lexical and expression locals survive interrupted arithmetic, with primal borrowers closed before their cleanup.810 independent bound-update and one/multirow system worlds cover all retained positions, lower/upper/fixed/free/boxed cases, equal-value early returns versus not-at-bound zero deltas, both coordinates, unchanged signatures and basic-key skipping. Twenty-two metadata/stopped/native-erasure prefixes, actual diagnostic output, a pending base, six pooled/direct physical refusal campaigns through success and an actual older caller comparison cover ownership and publication. The source boxed-above-upper additive bug is preserved: x1=5, upper3 gives delta-2 then x1=8; debug erases membership and asserts before basic adjustment, while native changes x0 from-10 to-6 and leaves residual10 in x0+2*x1=0. New file148/179 statements (82.7%) native and168/179 (93.9%) debug/checked; remaining gaps primarily protect valid capture, copy/destructor errors and comparison/equality child errors, and native additionally erases source assertions. Focused0.877s/1.914s; related signature/tableau/exact feasibility82.698s/106.463s. Both LP vets, native/debug module compilation, portcheck and diff checks pass. Latest full native checkpoint at555046ae predates this addition. Tableau signature-guided solve orchestration, whole-LAR integration and complete upstream drivers remain open; inventory remains85 partial/25 unported."
   }
 }

@@ -29,6 +29,8 @@ type LARCoreSolver struct {
 	evidenceNegated                         *IndexedRationalVector
 	deltaWork, strictDelta, conversionDelta *IndexedRationalVector
 	catchUpWork                             *IndexedRationalVector
+	signatureDelta, signatureExpression     *IndexedPairVector
+	signatureScalars                        *IndexedRationalVector
 	calls                                   exactEtaCalls
 	settings                                *Settings
 	manager                                 *numeral.RationalManager
@@ -91,6 +93,22 @@ func (c *LARCoreSolver) Close() error {
 			return err
 		}
 		c.catchUpWork = nil
+	}
+	// A stopped primal validator may still borrow values reached while the
+	// tableau signature's lexical delta and expressions were live.
+	for _, local := range []**IndexedPairVector{&c.signatureExpression, &c.signatureDelta} {
+		if *local != nil {
+			if err := (*local).Close(); err != nil {
+				return err
+			}
+			*local = nil
+		}
+	}
+	if c.signatureScalars != nil {
+		if err := c.signatureScalars.Close(); err != nil {
+			return err
+		}
+		c.signatureScalars = nil
 	}
 	c.DA.Clear()
 	if err := c.RA.Close(); err != nil {
