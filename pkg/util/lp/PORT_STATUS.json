@@ -964,7 +964,9 @@
         "pkg/util/lp/lar_conflict_certificate.go",
         "pkg/util/lp/lar_conflict_certificate_test.go",
         "pkg/util/lp/random_updater.go",
-        "pkg/util/lp/random_updater_test.go"
+        "pkg/util/lp/random_updater_test.go",
+        "pkg/util/lp/lar_maximize.go",
+        "pkg/util/lp/lar_maximize_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -1103,7 +1105,19 @@
         "TestLARRandomUpdaterIndependentBoundedShifts",
         "TestLARRandomUpdaterReachedGuardsAndPrefixes",
         "TestLARRandomUpdaterPreservesOlderComparison",
-        "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
+        "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop",
+        "TestLARMaximizeIndependentBoxVertices",
+        "TestLARMaximizeUnboundedAndUnsupportedModes",
+        "TestLARMaximizeBasicTermAndPivot",
+        "TestLARMaximizeCostPreparationIndependentOracle",
+        "TestLARMaximizePhysicalOwnership",
+        "TestLARMaximizeEntryGuards",
+        "TestLARMaximizeZeroObjective",
+        "TestLARMaximizeReachedPrefixes",
+        "TestLARMaximizeDuplicateCostSourceAccumulation",
+        "TestLARMaximizeCancellationAndChildError",
+        "TestLARMaximizeDirectSourceStatuses",
+        "TestLARMaximizePreservesOlderComparison"
       ]
     },
     {
@@ -4682,5 +4696,51 @@
       "/mnt/oldrog/tmp/g3-random-updater-module-native.log",
       "/mnt/oldrog/tmp/g3-random-updater-module-native.cover"
     ]
+  },
+  "latest_maximize_increment": {
+    "source": "src/util/lp/lar_solver.h:552-663",
+    "retained_consumer": "src/smt/theory_lra.cpp:2355",
+    "go_target": "pkg/util/lp/lar_maximize.go",
+    "tests": [
+      "TestLARMaximizeIndependentBoxVertices",
+      "TestLARMaximizeUnboundedAndUnsupportedModes",
+      "TestLARMaximizeBasicTermAndPivot",
+      "TestLARMaximizeCostPreparationIndependentOracle",
+      "TestLARMaximizePhysicalOwnership",
+      "TestLARMaximizeEntryGuards",
+      "TestLARMaximizeZeroObjective",
+      "TestLARMaximizeReachedPrefixes",
+      "TestLARMaximizeDuplicateCostSourceAccumulation",
+      "TestLARMaximizeCancellationAndChildError",
+      "TestLARMaximizeDirectSourceStatuses",
+      "TestLARMaximizePreservesOlderComparison"
+    ],
+    "native_statements": {
+      "covered": 145,
+      "total": 192,
+      "percent": 75.5
+    },
+    "debug_checked_statements": {
+      "covered": 169,
+      "total": 192,
+      "percent": 88.0
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-lar-maximize-native.cover",
+      "/mnt/oldrog/tmp/g3-lar-maximize-debug.cover"
+    ],
+    "focused_seconds": {
+      "native": 0.472,
+      "debug_checked": 0.636
+    },
+    "regression_seconds": {
+      "native": 33.575,
+      "debug_checked": 54.838
+    },
+    "cost_regression_seconds": {
+      "native": 23.377,
+      "debug_checked": 26.296
+    },
+    "evidence": "LAR objective maximization now implements lar_solver.h:552-663, consumed by theory_lra.cpp:2355. Exact cost preparation exits infeasibility costs before source assertions, copies each objective cost and updates actual nonbasic/basic reduced costs in source order. Cleanup hijacks the actual infeasibility set to clear reached reduced costs, then checks all costs. The corrected solver switches tableau rows to costs for the real Core.Solve and restores rows only after an ordinary return; it disables BackupCosts and finally overwrites the primal status with Optimal even for an unbounded result. LU/undecided corrected entries preserve the source debug assertion/native false body. MaximizeTermOnTableau rejects only Unbounded and otherwise evaluates the actual rational/epsilon model, including a direct Infeasible result.160 independent box-vertex worlds, repeated optimizations and strict bounds verify exact maxima;120 independently checked bounded basic-term systems execute real basis pivots;160 independent cost-preparation worlds check full reduced costs and cleanup. Unbounded/unsupported modes, zero objectives,20 reached-prefix profiles, duplicate objective coefficients, cancellation/error settings publication, direct undecided/infeasible paths and an actual older caller comparison are covered. Source quirks remain: duplicate nonbasic entries overwrite costs but accumulate reduced costs; the costs-mode debug validator diagnoses the mismatch, while rows bypass that validator. Actual cancellation can report the unchanged current lower value through the source core status mapping; it is not credited as the mathematical maximum. Eight pooled/direct physical refusal campaigns through success cover nonbasic/basic preparation, weighted model evaluation and complete maximization, with term/output roots alive through child and solver cleanup. New file145/192 statements (75.5%) native and169/192 (88.0%) debug/checked. Remaining blocks principally guard stable exact predicates, capture and cleanup, final unchanged extents and failed scalar destruction; native additionally erases debug validation. Focused native/debug0.472s/0.636s; related full-solve/certificate/random/changed-bound regressions33.575s/54.838s and exact tableau-cost/validator regressions23.377s/26.296s pass. Both LP vets and native/debug module compilation pass. Complete upstream drivers, remaining scaling/optimization consumers and whole-source audits remain open; inventory remains88 partial/22 unported. Running full native68b2c6ce checkpoint started before this increment; completion and coverage are not yet credited. Source portcheck, dependency graph refresh and diff checks pass."
   }
 }

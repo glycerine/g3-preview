@@ -121191,7 +121191,9 @@
         "pkg/util/lp/lar_conflict_certificate.go",
         "pkg/util/lp/lar_conflict_certificate_test.go",
         "pkg/util/lp/random_updater.go",
-        "pkg/util/lp/random_updater_test.go"
+        "pkg/util/lp/random_updater_test.go",
+        "pkg/util/lp/lar_maximize.go",
+        "pkg/util/lp/lar_maximize_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -121330,7 +121332,19 @@
         "TestLARRandomUpdaterIndependentBoundedShifts",
         "TestLARRandomUpdaterReachedGuardsAndPrefixes",
         "TestLARRandomUpdaterPreservesOlderComparison",
-        "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
+        "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop",
+        "TestLARMaximizeIndependentBoxVertices",
+        "TestLARMaximizeUnboundedAndUnsupportedModes",
+        "TestLARMaximizeBasicTermAndPivot",
+        "TestLARMaximizeCostPreparationIndependentOracle",
+        "TestLARMaximizePhysicalOwnership",
+        "TestLARMaximizeEntryGuards",
+        "TestLARMaximizeZeroObjective",
+        "TestLARMaximizeReachedPrefixes",
+        "TestLARMaximizeDuplicateCostSourceAccumulation",
+        "TestLARMaximizeCancellationAndChildError",
+        "TestLARMaximizeDirectSourceStatuses",
+        "TestLARMaximizePreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -122024,6 +122038,25 @@
             "TestLARRandomUpdaterPreservesOlderComparison",
             "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
           ]
+        },
+        {
+          "name": "costs_are_zeros_for_r_solver, reduced_costs_are_zeroes_for_r_solver, prepare_costs_for_r_solver, set_costs_to_zero and maximize_term/tableau/corrected_r_solver (552-663)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_maximize.go",
+          "tests": [
+            "TestLARMaximizeIndependentBoxVertices",
+            "TestLARMaximizeUnboundedAndUnsupportedModes",
+            "TestLARMaximizeBasicTermAndPivot",
+            "TestLARMaximizeCostPreparationIndependentOracle",
+            "TestLARMaximizePhysicalOwnership",
+            "TestLARMaximizeEntryGuards",
+            "TestLARMaximizeZeroObjective",
+            "TestLARMaximizeReachedPrefixes",
+            "TestLARMaximizeDuplicateCostSourceAccumulation",
+            "TestLARMaximizeCancellationAndChildError",
+            "TestLARMaximizeDirectSourceStatuses",
+            "TestLARMaximizePreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -122046,7 +122079,8 @@
         "Outer solve does not wrap child arithmetic in parent capture; actual LU/core/changed-bound/model owners retain reached failures and borrowed lexical values. Status publishes before debug validation; changed-column clearing follows propagation only on an ordinary return.",
         "Touched-row scheduling introduces no arithmetic capture; iterator/analyzer/propagator and hook/provider owners retain their own errors. Cancellation retains all row marks and completed bounds for replay; Close cleans the source lexical row owners without destroying the borrowed propagator.",
         "Conflict extraction appends through the output vector owner, which must close before solver locals on a failed external append. Internal evidence closes first; coefficient export closes before the coefficient map; interrupted constraint FreeCoefficient/output copies retain lexical arithmetic values through cleanup. The debug result rational outlives pending final copy receipts. Direct arithmetic alone uses parent capture; child vector/map/constraint owners and older caller comparison state remain separate.",
-        "Updater owns copied hash keys, partial sampled outputs, old/new/delta/product pairs and column coefficient scratch. Close cleans parent raw calls then interval/iterator child receipts before borrowed output locals, and destroys keys/locals before the borrowed core. Output-to-model copies belong to updater receipts, not RX vector receipts; partial solver RandomUpdate retains the updater and closes it before Core. Child interval Draw, column iterator and primal validators keep their own receipts; old caller comparisons are not adopted."
+        "Updater owns copied hash keys, partial sampled outputs, old/new/delta/product pairs and column coefficient scratch. Close cleans parent raw calls then interval/iterator child receipts before borrowed output locals, and destroys keys/locals before the borrowed core. Output-to-model copies belong to updater receipts, not RX vector receipts; partial solver RandomUpdate retains the updater and closes it before Core. Child interval Draw, column iterator and primal validators keep their own receipts; old caller comparisons are not adopted.",
+        "Objective costs vector copies retain their own input receipts; external objective coefficients and output remain alive through solver cleanup. Negated basic-cost scratch belongs to the outer solver and survives stopped primal reduced-cost children until Core.Close. Direct weighted products and output accumulation use parent receipts; Core.Solve/validators remain child-owned. Strategy restoration and cost cleanup occur only after ordinary child return, preserving reached errors and older caller comparison identity."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",

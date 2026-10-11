@@ -1237,6 +1237,7 @@
         "lar_inf_cleanup.go",
         "lar_infeasibility.go",
         "lar_lu_extend.go",
+        "lar_maximize.go",
         "lar_model.go",
         "lar_model_bounds.go",
         "lar_model_delta.go",
