@@ -118404,7 +118404,9 @@
       "go_targets": [
         "pkg/util/lp/primal_breakpoint_float.go",
         "pkg/util/lp/primal_breakpoint_exact.go",
-        "pkg/util/lp/primal_breakpoint_rational.go"
+        "pkg/util/lp/primal_breakpoint_rational.go",
+        "pkg/util/lp/primal_breakpoint_collect_rational.go",
+        "pkg/util/lp/primal_breakpoint_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalBreakpointIndependentCrossings",
@@ -118423,7 +118425,18 @@
         "TestLPRationalPrimalBreakpointPhysicalOwnership",
         "TestLPRationalPrimalBreakpointReachedGuards",
         "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
-        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
+        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner",
+        "TestLPRationalPrimalBreakpointCollectIndependentDelta",
+        "TestLPRationalPrimalBreakpointCollectIndependentModel",
+        "TestLPRationalPrimalBreakpointCollectPhysicalOwnership",
+        "TestLPRationalPrimalBreakpointCollectGuardsAndPrefixes",
+        "TestLPRationalPrimalBreakpointTraversalPreservesOlderComparison",
+        "TestLPRationalPrimalBreakpointAdvanceIndependentOracle",
+        "TestLPRationalPrimalBreakpointAdvancePhysicalOwnership",
+        "TestLPRationalPrimalBreakpointAdvanceWrapper",
+        "TestLPRationalPrimalBreakpointAdvanceGuards",
+        "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
+        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -118466,6 +118479,27 @@
             "TestLPRationalPrimalBreakpointReachedGuards",
             "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
             "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
+          ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq breakpoint delta/row/entering collection, full sorted traversal, slope threshold and zero-slope RNG, precise wrapper assertion",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_breakpoint_collect_rational.go",
+            "pkg/util/lp/primal_breakpoint_advance_rational.go"
+          ],
+          "tests": [
+            "TestLPRationalPrimalBreakpointCollectIndependentDelta",
+            "TestLPRationalPrimalBreakpointCollectIndependentModel",
+            "TestLPRationalPrimalBreakpointCollectPhysicalOwnership",
+            "TestLPRationalPrimalBreakpointCollectGuardsAndPrefixes",
+            "TestLPRationalPrimalBreakpointTraversalPreservesOlderComparison",
+            "TestLPRationalPrimalBreakpointAdvanceIndependentOracle",
+            "TestLPRationalPrimalBreakpointAdvancePhysicalOwnership",
+            "TestLPRationalPrimalBreakpointAdvanceWrapper",
+            "TestLPRationalPrimalBreakpointAdvanceGuards",
+            "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
+            "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
           ]
         }
       ],
@@ -125258,7 +125292,9 @@
         "pkg/util/lp/primal_basis_limit_rational.go",
         "pkg/util/lp/primal_basis_dispatch_rational.go",
         "pkg/util/lp/primal_bound_rational_test.go",
-        "pkg/util/lp/primal_breakpoint_rational.go"
+        "pkg/util/lp/primal_breakpoint_rational.go",
+        "pkg/util/lp/primal_breakpoint_collect_rational.go",
+        "pkg/util/lp/primal_breakpoint_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -125469,7 +125505,18 @@
         "TestLPRationalPrimalBreakpointPhysicalOwnership",
         "TestLPRationalPrimalBreakpointReachedGuards",
         "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
-        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
+        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner",
+        "TestLPRationalPrimalBreakpointCollectIndependentDelta",
+        "TestLPRationalPrimalBreakpointCollectIndependentModel",
+        "TestLPRationalPrimalBreakpointCollectPhysicalOwnership",
+        "TestLPRationalPrimalBreakpointCollectGuardsAndPrefixes",
+        "TestLPRationalPrimalBreakpointTraversalPreservesOlderComparison",
+        "TestLPRationalPrimalBreakpointAdvanceIndependentOracle",
+        "TestLPRationalPrimalBreakpointAdvancePhysicalOwnership",
+        "TestLPRationalPrimalBreakpointAdvanceWrapper",
+        "TestLPRationalPrimalBreakpointAdvanceGuards",
+        "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
+        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
       ],
       "conditionals": [
         {
@@ -126092,6 +126139,27 @@
             "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
             "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
           ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq breakpoint delta/row/entering collection, full sorted traversal, slope threshold and zero-slope RNG, precise wrapper assertion",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_breakpoint_collect_rational.go",
+            "pkg/util/lp/primal_breakpoint_advance_rational.go"
+          ],
+          "tests": [
+            "TestLPRationalPrimalBreakpointCollectIndependentDelta",
+            "TestLPRationalPrimalBreakpointCollectIndependentModel",
+            "TestLPRationalPrimalBreakpointCollectPhysicalOwnership",
+            "TestLPRationalPrimalBreakpointCollectGuardsAndPrefixes",
+            "TestLPRationalPrimalBreakpointTraversalPreservesOlderComparison",
+            "TestLPRationalPrimalBreakpointAdvanceIndependentOracle",
+            "TestLPRationalPrimalBreakpointAdvancePhysicalOwnership",
+            "TestLPRationalPrimalBreakpointAdvanceWrapper",
+            "TestLPRationalPrimalBreakpointAdvanceGuards",
+            "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
+            "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
+          ]
         }
       ],
       "ownership": [
@@ -126191,7 +126259,9 @@
         "pkg/util/lp/primal_basis_limit_rational.go",
         "pkg/util/lp/primal_basis_dispatch_rational.go",
         "pkg/util/lp/primal_bound_rational_test.go",
-        "pkg/util/lp/primal_breakpoint_rational.go"
+        "pkg/util/lp/primal_breakpoint_rational.go",
+        "pkg/util/lp/primal_breakpoint_collect_rational.go",
+        "pkg/util/lp/primal_breakpoint_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -126382,7 +126452,18 @@
         "TestLPRationalPrimalBreakpointPhysicalOwnership",
         "TestLPRationalPrimalBreakpointReachedGuards",
         "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
-        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
+        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner",
+        "TestLPRationalPrimalBreakpointCollectIndependentDelta",
+        "TestLPRationalPrimalBreakpointCollectIndependentModel",
+        "TestLPRationalPrimalBreakpointCollectPhysicalOwnership",
+        "TestLPRationalPrimalBreakpointCollectGuardsAndPrefixes",
+        "TestLPRationalPrimalBreakpointTraversalPreservesOlderComparison",
+        "TestLPRationalPrimalBreakpointAdvanceIndependentOracle",
+        "TestLPRationalPrimalBreakpointAdvancePhysicalOwnership",
+        "TestLPRationalPrimalBreakpointAdvanceWrapper",
+        "TestLPRationalPrimalBreakpointAdvanceGuards",
+        "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
+        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
       ],
       "conditionals": [
         {
@@ -127080,6 +127161,27 @@
             "TestLPRationalPrimalBreakpointReachedGuards",
             "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
             "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
+          ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq breakpoint delta/row/entering collection, full sorted traversal, slope threshold and zero-slope RNG, precise wrapper assertion",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_breakpoint_collect_rational.go",
+            "pkg/util/lp/primal_breakpoint_advance_rational.go"
+          ],
+          "tests": [
+            "TestLPRationalPrimalBreakpointCollectIndependentDelta",
+            "TestLPRationalPrimalBreakpointCollectIndependentModel",
+            "TestLPRationalPrimalBreakpointCollectPhysicalOwnership",
+            "TestLPRationalPrimalBreakpointCollectGuardsAndPrefixes",
+            "TestLPRationalPrimalBreakpointTraversalPreservesOlderComparison",
+            "TestLPRationalPrimalBreakpointAdvanceIndependentOracle",
+            "TestLPRationalPrimalBreakpointAdvancePhysicalOwnership",
+            "TestLPRationalPrimalBreakpointAdvanceWrapper",
+            "TestLPRationalPrimalBreakpointAdvanceGuards",
+            "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
+            "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
           ]
         }
       ],

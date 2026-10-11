@@ -6,8 +6,8 @@ import "github.com/glycerine/g3/pkg/util/numeral"
 
 // RationalPrimalCoreSolver borrows scalar model storage and owns exact primal
 // scratch. Construction, feasibility costs, initialization, entering pricing
-// and scalar bound-step/breakpoint record/slope helpers are implemented.
-// Breakpoint collection, leaving traversal, pivot
+// and scalar bound-step/breakpoint collection/traversal helpers are implemented.
+// Circular leaving selection, pivot
 // iteration and full Solve remain open.
 // Constructor errors return a partial owner to Close before borrowed inputs.
 type RationalPrimalCoreSolver struct {
@@ -24,6 +24,7 @@ type RationalPrimalCoreSolver struct {
 	stepEpsilon, basisMultiplier                 *IndexedRationalVector
 	Breakpoints                                  []*RationalBreakpoint
 	breakpointWork                               *IndexedRationalVector
+	breakpointCollect, breakpointSlope           *IndexedRationalVector
 	pendingBreakpoint                            *RationalBreakpoint
 	stopped                                      bool
 }
@@ -74,7 +75,7 @@ func NewRationalPrimalCoreSolver(in RationalCoreInputs) (m *RationalPrimalCoreSo
 	return m, nil
 }
 func (m *RationalPrimalCoreSolver) ready() error {
-	if m.stopped || m.work != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.breakpointWork != nil || m.pendingBreakpoint != nil || m.calls.pending() {
+	if m.stopped || m.work != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.breakpointCollect != nil || m.breakpointSlope != nil || m.breakpointWork != nil || m.pendingBreakpoint != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return m.RationalCoreSolverBase.ready()
@@ -167,6 +168,18 @@ func (m *RationalPrimalCoreSolver) Close() error {
 			return err
 		}
 		m.work = nil
+	}
+	if m.breakpointCollect != nil {
+		if err := m.breakpointCollect.Close(); err != nil {
+			return err
+		}
+		m.breakpointCollect = nil
+	}
+	if m.breakpointSlope != nil {
+		if err := m.breakpointSlope.Close(); err != nil {
+			return err
+		}
+		m.breakpointSlope = nil
 	}
 	if m.pendingBreakpoint != nil {
 		if err := m.manager.Del(m.pendingBreakpoint.Delta); err != nil {

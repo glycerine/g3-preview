@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 87.3,
-  "coverage_warning": "Full native checkpoint7957befd includes scalar rational core base, basis, values, reconstruction, reduced costs, snapping, residuals and pivot rows, plus preparation/presolve expression corrections. Profile excludes core_update_rational.go, core_cost_validate_rational.go and core_feasibility_rational.go, and predates the newer RestoreBasisChange stopped guard. Their focused/regression evidence remains separate. Coverage measures existing Go statements, not C++ port completion. Scalar primal core, infeasibility-cost and cost-switching files are newer and retain separate focused evidence. Scalar primal initialization/pricing files are newer and retain separate focused evidence. Scalar Harris/bound/infeasibility/basis-limit/dispatch helpers are newer and retain separate focused evidence. Scalar breakpoint record/queue-priority/slope helpers are newer and retain separate focused evidence.",
+  "coverage_warning": "Full native checkpoint7957befd includes scalar rational core base, basis, values, reconstruction, reduced costs, snapping, residuals and pivot rows, plus preparation/presolve expression corrections. Profile excludes core_update_rational.go, core_cost_validate_rational.go and core_feasibility_rational.go, and predates the newer RestoreBasisChange stopped guard. Their focused/regression evidence remains separate. Coverage measures existing Go statements, not C++ port completion. Scalar primal core, infeasibility-cost and cost-switching files are newer and retain separate focused evidence. Scalar primal initialization/pricing files are newer and retain separate focused evidence. Scalar Harris/bound/infeasibility/basis-limit/dispatch helpers are newer and retain separate focused evidence. Scalar breakpoint record/queue-priority/slope helpers are newer and retain separate focused evidence. Scalar breakpoint collection/traversal files are newer and retain separate focused evidence.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -12,7 +12,8 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Scalar primal circular leaving selection and row-sparsity ties, breakpoint construction/traversal, advancement, tableau/LU pivot iteration and full Solve; scalar dual core and outer primal/dual optimization/scaling integration; remaining source diagnostics/audits and complete upstream drivers remain open. Full native7957befd predates these additions and does not measure them."
+    "Scalar primal circular leaving selection and row-sparsity ties, breakpoint construction/traversal, advancement, tableau/LU pivot iteration and full Solve; scalar dual core and outer primal/dual optimization/scaling integration; remaining source diagnostics/audits and complete upstream drivers remain open. Full native7957befd predates these additions and does not measure them.",
+    "Scalar circular leaving selection and row-sparsity ties, pivot advancement/iteration and full scalar Solve remain open after breakpoint collection/traversal; dual/outer integration and remaining source/upstream-driver audits remain incomplete."
   ],
   "units": [
     {
@@ -211,7 +212,9 @@
       "go_targets": [
         "pkg/util/lp/primal_breakpoint_float.go",
         "pkg/util/lp/primal_breakpoint_exact.go",
-        "pkg/util/lp/primal_breakpoint_rational.go"
+        "pkg/util/lp/primal_breakpoint_rational.go",
+        "pkg/util/lp/primal_breakpoint_collect_rational.go",
+        "pkg/util/lp/primal_breakpoint_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalBreakpointIndependentCrossings",
@@ -230,7 +233,18 @@
         "TestLPRationalPrimalBreakpointPhysicalOwnership",
         "TestLPRationalPrimalBreakpointReachedGuards",
         "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
-        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
+        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner",
+        "TestLPRationalPrimalBreakpointCollectIndependentDelta",
+        "TestLPRationalPrimalBreakpointCollectIndependentModel",
+        "TestLPRationalPrimalBreakpointCollectPhysicalOwnership",
+        "TestLPRationalPrimalBreakpointCollectGuardsAndPrefixes",
+        "TestLPRationalPrimalBreakpointTraversalPreservesOlderComparison",
+        "TestLPRationalPrimalBreakpointAdvanceIndependentOracle",
+        "TestLPRationalPrimalBreakpointAdvancePhysicalOwnership",
+        "TestLPRationalPrimalBreakpointAdvanceWrapper",
+        "TestLPRationalPrimalBreakpointAdvanceGuards",
+        "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
+        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
       ]
     },
     {
@@ -2094,7 +2108,9 @@
         "pkg/util/lp/primal_basis_limit_rational.go",
         "pkg/util/lp/primal_basis_dispatch_rational.go",
         "pkg/util/lp/primal_bound_rational_test.go",
-        "pkg/util/lp/primal_breakpoint_rational.go"
+        "pkg/util/lp/primal_breakpoint_rational.go",
+        "pkg/util/lp/primal_breakpoint_collect_rational.go",
+        "pkg/util/lp/primal_breakpoint_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2305,7 +2321,18 @@
         "TestLPRationalPrimalBreakpointPhysicalOwnership",
         "TestLPRationalPrimalBreakpointReachedGuards",
         "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
-        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
+        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner",
+        "TestLPRationalPrimalBreakpointCollectIndependentDelta",
+        "TestLPRationalPrimalBreakpointCollectIndependentModel",
+        "TestLPRationalPrimalBreakpointCollectPhysicalOwnership",
+        "TestLPRationalPrimalBreakpointCollectGuardsAndPrefixes",
+        "TestLPRationalPrimalBreakpointTraversalPreservesOlderComparison",
+        "TestLPRationalPrimalBreakpointAdvanceIndependentOracle",
+        "TestLPRationalPrimalBreakpointAdvancePhysicalOwnership",
+        "TestLPRationalPrimalBreakpointAdvanceWrapper",
+        "TestLPRationalPrimalBreakpointAdvanceGuards",
+        "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
+        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
       ]
     },
     {
@@ -2369,7 +2396,9 @@
         "pkg/util/lp/primal_basis_limit_rational.go",
         "pkg/util/lp/primal_basis_dispatch_rational.go",
         "pkg/util/lp/primal_bound_rational_test.go",
-        "pkg/util/lp/primal_breakpoint_rational.go"
+        "pkg/util/lp/primal_breakpoint_rational.go",
+        "pkg/util/lp/primal_breakpoint_collect_rational.go",
+        "pkg/util/lp/primal_breakpoint_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2560,7 +2589,18 @@
         "TestLPRationalPrimalBreakpointPhysicalOwnership",
         "TestLPRationalPrimalBreakpointReachedGuards",
         "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
-        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
+        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner",
+        "TestLPRationalPrimalBreakpointCollectIndependentDelta",
+        "TestLPRationalPrimalBreakpointCollectIndependentModel",
+        "TestLPRationalPrimalBreakpointCollectPhysicalOwnership",
+        "TestLPRationalPrimalBreakpointCollectGuardsAndPrefixes",
+        "TestLPRationalPrimalBreakpointTraversalPreservesOlderComparison",
+        "TestLPRationalPrimalBreakpointAdvanceIndependentOracle",
+        "TestLPRationalPrimalBreakpointAdvancePhysicalOwnership",
+        "TestLPRationalPrimalBreakpointAdvanceWrapper",
+        "TestLPRationalPrimalBreakpointAdvanceGuards",
+        "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
+        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
       ]
     },
     {
@@ -6707,5 +6747,57 @@
       "diff check",
       "source portcheck: 2103 units, 677 APIs"
     ]
+  },
+  "latest_rational_breakpoint_traversal_increment": {
+    "scope": "Retained scalar mpq/mpq breakpoint delta/row/entering collection, full sorted traversal, slope threshold and zero-slope RNG, precise wrapper assertion",
+    "source_units_promoted": false,
+    "focused_native_seconds": 1.917,
+    "focused_debug_checked_seconds": 2.898,
+    "related_native_seconds": 38.646,
+    "related_debug_checked_seconds": 54.8,
+    "related_scope_note": "Related regressions used the same production code before adding the final threshold/output physical test group; final focused tests include that group.",
+    "statement_coverage": {
+      "native": {
+        "primal_breakpoint_collect_rational.go": {
+          "covered": 123,
+          "total": 136,
+          "percent": 90.4
+        },
+        "primal_breakpoint_advance_rational.go": {
+          "covered": 79,
+          "total": 91,
+          "percent": 86.8
+        }
+      },
+      "debug_checked": {
+        "primal_breakpoint_collect_rational.go": {
+          "covered": 124,
+          "total": 136,
+          "percent": 91.2
+        },
+        "primal_breakpoint_advance_rational.go": {
+          "covered": 76,
+          "total": 91,
+          "percent": 83.5
+        }
+      }
+    },
+    "independent_worlds": {
+      "delta": 600,
+      "model_collection": 300,
+      "traversal": 480
+    },
+    "physical_campaigns": 14,
+    "older_comparison_campaigns": 4,
+    "verification": [
+      "both final focused profiles",
+      "both related regression profiles",
+      "both LP vets",
+      "both module compile gates",
+      "source portcheck: 2103 units, 677 APIs",
+      "dependency graph refresh: 64 packages",
+      "diff check"
+    ],
+    "remaining": "Scalar circular leaving selection, pivot advancement and iteration, full scalar Solve, dual/outer integration and remaining LP source/upstream-driver audits."
   }
 }
