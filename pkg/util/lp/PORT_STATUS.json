@@ -2839,7 +2839,11 @@
         "pkg/util/lp/primal_price_tableau_rational.go",
         "pkg/util/lp/primal_price_tableau_rational_test.go",
         "pkg/util/lp/primal_leaving_tableau_rational.go",
-        "pkg/util/lp/primal_leaving_tableau_rational_test.go"
+        "pkg/util/lp/primal_leaving_tableau_rational_test.go",
+        "pkg/util/lp/primal_advance_tableau_rational.go",
+        "pkg/util/lp/primal_advance_tableau_rational_test.go",
+        "pkg/util/lp/primal_enter_tableau_rational.go",
+        "pkg/util/lp/primal_enter_tableau_rational_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -2931,7 +2935,22 @@
         "TestLPRationalTableauLeavingPhysicalOwnership",
         "TestLPRationalTableauLeavingLiveAliases",
         "TestLPRationalTableauLeavingPreservesOlderComparison",
-        "TestLPRationalTableauLeavingReachedPrefixes"
+        "TestLPRationalTableauLeavingReachedPrefixes",
+        "TestLPRationalTableauAdvanceEqualIndependentModels",
+        "TestLPRationalTableauAdvancePivotIndependentModels",
+        "TestLPRationalTableauAdvancePhysicalOwnership",
+        "TestLPRationalTableauAdvanceEqualLiveStepAliases",
+        "TestLPRationalTableauAdvanceRestoresCostsAndEarlyReturn",
+        "TestLPRationalTableauAdvanceReachedPrefixes",
+        "TestLPRationalTableauAdvancePreservesOlderComparison",
+        "TestLPRationalTableauAdvanceNonzeroRHSSourceStop",
+        "TestLPRationalTableauAdvanceZeroPivotCostSwitchRecheck",
+        "TestLPRationalTableauEnterIndependentModels",
+        "TestLPRationalTableauIterationIndependentOptima",
+        "TestLPRationalTableauIterationDispatchAndStops",
+        "TestLPRationalTableauEnterPhysicalOwnership",
+        "TestLPRationalTableauEnterRejectedIndexOwnsLocal",
+        "TestLPRationalTableauEnterPreservesOlderComparison"
       ]
     },
     {
@@ -7338,5 +7357,58 @@
       "diff check"
     ],
     "coverage_note": "Remaining paths chiefly guard stable capture/destruction/metadata, already established sparse row extents and logically nonempty candidate sets. Native additionally erases source assertions. Coverage measures implemented Go statements, not C++ completion."
+  },
+  "latest_rational_tableau_advancement_increment": {
+    "scope": "Concrete scalar tableau advancement, entering orchestration and OneIterationTableau",
+    "source_units_promoted": false,
+    "independent_equal_worlds": 320,
+    "independent_pivot_worlds": 120,
+    "independent_entering_worlds": 320,
+    "independent_bounded_optimum_worlds": 120,
+    "physical_campaigns": 22,
+    "older_comparison_campaigns": 5,
+    "live_alias_profiles": 3,
+    "test_groups": 15,
+    "remaining": "Scalar primal tableau row selection/iteration and InitRunTableau/full Solve, scalar dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits.",
+    "coverage_note": "Coverage measures implemented Go statements, not C++ completion. Native erases source assertions. Remaining checked gaps chiefly guard stable capture, destruction and unchanged numeral metadata. Iteration optima initialize existing scalar row/column counts directly; InitRunTableau is not credited.",
+    "statement_coverage": {
+      "native": {
+        "primal_advance_tableau_rational.go": {
+          "covered": 74,
+          "total": 118,
+          "percent": 62.7
+        },
+        "primal_enter_tableau_rational.go": {
+          "covered": 31,
+          "total": 37,
+          "percent": 83.8
+        }
+      },
+      "debug_checked": {
+        "primal_advance_tableau_rational.go": {
+          "covered": 107,
+          "total": 118,
+          "percent": 90.7
+        },
+        "primal_enter_tableau_rational.go": {
+          "covered": 36,
+          "total": 37,
+          "percent": 97.3
+        }
+      }
+    },
+    "focused_native_seconds": 12.51,
+    "focused_debug_checked_seconds": 21.732,
+    "related_native_seconds": 121.837,
+    "related_debug_checked_seconds": 181.944,
+    "verification": [
+      "both final focused profiles",
+      "related scalar tableau/primal/LU advancement/entering/iteration and existing pair tableau regressions: unchanged production before final minimum-negation witness strengthening",
+      "both LP vets",
+      "both module compile gates",
+      "source portcheck: 2103 units, 677 APIs",
+      "dependency graph refresh: 64 packages",
+      "diff check"
+    ]
   }
 }
