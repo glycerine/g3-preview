@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 87.3,
-  "coverage_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion.",
+  "coverage_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion. Scalar pivot comparison and incremental reduced-cost files are newer and retain separate focused evidence.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -1300,7 +1300,8 @@
         "pkg/util/lp/core_feasibility_rational.go",
         "pkg/util/lp/core_update_rational_test.go",
         "pkg/util/lp/core_cost_validate_rational_test.go",
-        "pkg/util/lp/core_feasibility_rational_test.go"
+        "pkg/util/lp/core_feasibility_rational_test.go",
+        "pkg/util/lp/core_pivot_compare_rational.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1501,7 +1502,10 @@
         "TestLPRationalCostValidatorClosedDiagnosticAndDebugGuards",
         "TestLPRationalFeasibilityIndependentMembership",
         "TestLPRationalFeasibilityDiagnosticsAndGuards",
-        "TestLPRationalFeasibilityPhysicalComparisons"
+        "TestLPRationalFeasibilityPhysicalComparisons",
+        "TestLPRationalPivotCompareIndependentOracle",
+        "TestLPRationalPivotComparePhysicalOwnership",
+        "TestLPRationalPivotCompareReachedGuards"
       ]
     },
     {
@@ -1562,7 +1566,8 @@
         "pkg/util/lp/core_feasibility_rational.go",
         "pkg/util/lp/core_update_rational_test.go",
         "pkg/util/lp/core_cost_validate_rational_test.go",
-        "pkg/util/lp/core_feasibility_rational_test.go"
+        "pkg/util/lp/core_feasibility_rational_test.go",
+        "pkg/util/lp/core_pivot_compare_rational.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1734,7 +1739,10 @@
         "TestLPRationalCostValidatorClosedDiagnosticAndDebugGuards",
         "TestLPRationalFeasibilityIndependentMembership",
         "TestLPRationalFeasibilityDiagnosticsAndGuards",
-        "TestLPRationalFeasibilityPhysicalComparisons"
+        "TestLPRationalFeasibilityPhysicalComparisons",
+        "TestLPRationalPivotCompareIndependentOracle",
+        "TestLPRationalPivotComparePhysicalOwnership",
+        "TestLPRationalPivotCompareReachedGuards"
       ]
     },
     {
@@ -2110,7 +2118,8 @@
         "pkg/util/lp/primal_breakpoint_rational.go",
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
         "pkg/util/lp/primal_breakpoint_advance_rational.go",
-        "pkg/util/lp/primal_leaving_rational.go"
+        "pkg/util/lp/primal_leaving_rational.go",
+        "pkg/util/lp/primal_pivot_cost_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2338,7 +2347,12 @@
         "TestLPRationalPrimalLeavingGuardsAndBreakpointDispatch",
         "TestLPRationalPrimalLeavingLiveAliases",
         "TestLPRationalPrimalLeavingSecondRowMetadataAndSparseIndex",
-        "TestLPRationalPrimalLeavingPreservesOlderComparison"
+        "TestLPRationalPrimalLeavingPreservesOlderComparison",
+        "TestLPRationalPivotCostIndependentBasisOracle",
+        "TestLPRationalPivotCostLiveAliases",
+        "TestLPRationalPivotCostPhysicalOwnership",
+        "TestLPRationalPivotCostReachedPrefixes",
+        "TestLPRationalPivotPreservesOlderComparison"
       ]
     },
     {
@@ -2405,7 +2419,8 @@
         "pkg/util/lp/primal_breakpoint_rational.go",
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
         "pkg/util/lp/primal_breakpoint_advance_rational.go",
-        "pkg/util/lp/primal_leaving_rational.go"
+        "pkg/util/lp/primal_leaving_rational.go",
+        "pkg/util/lp/primal_pivot_cost_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2613,7 +2628,12 @@
         "TestLPRationalPrimalLeavingGuardsAndBreakpointDispatch",
         "TestLPRationalPrimalLeavingLiveAliases",
         "TestLPRationalPrimalLeavingSecondRowMetadataAndSparseIndex",
-        "TestLPRationalPrimalLeavingPreservesOlderComparison"
+        "TestLPRationalPrimalLeavingPreservesOlderComparison",
+        "TestLPRationalPivotCostIndependentBasisOracle",
+        "TestLPRationalPivotCostLiveAliases",
+        "TestLPRationalPivotCostPhysicalOwnership",
+        "TestLPRationalPivotCostReachedPrefixes",
+        "TestLPRationalPivotPreservesOlderComparison"
       ]
     },
     {
@@ -6841,5 +6861,55 @@
       "dependency graph refresh: 64 packages",
       "diff check"
     ]
+  },
+  "latest_rational_pivot_cost_increment": {
+    "source_units_promoted": false,
+    "focused_native_seconds": 3.026,
+    "focused_debug_checked_seconds": 5.224,
+    "statement_coverage": {
+      "native": {
+        "core_pivot_compare_rational.go": {
+          "covered": 58,
+          "total": 69,
+          "percent": 84.1
+        },
+        "primal_pivot_cost_rational.go": {
+          "covered": 53,
+          "total": 69,
+          "percent": 76.8
+        }
+      },
+      "debug_checked": {
+        "core_pivot_compare_rational.go": {
+          "covered": 58,
+          "total": 69,
+          "percent": 84.1
+        },
+        "primal_pivot_cost_rational.go": {
+          "covered": 60,
+          "total": 69,
+          "percent": 87.0
+        }
+      }
+    },
+    "independent_pivot_comparison_worlds": 320,
+    "independent_actual_lu_exchange_cost_worlds": 240,
+    "physical_campaigns": 14,
+    "older_comparison_campaigns": 2,
+    "verification": [
+      "both final focused profiles",
+      "both LP vets",
+      "both module compile gates",
+      "both related regression profiles",
+      "source portcheck: 2103 units, 677 APIs",
+      "dependency graph refresh: 64 packages",
+      "diff check"
+    ],
+    "remaining": "Scalar pivot advancement and iteration/full Solve, dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits.",
+    "related_profile_seconds": [
+      64.658,
+      94.832
+    ],
+    "related_scope_note": "Both native and debug/checked regressions used unchanged production code before strengthening the cost oracle to actual LU replacement; final focused tests cover that stronger oracle."
   }
 }

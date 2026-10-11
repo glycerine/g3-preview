@@ -122632,7 +122632,8 @@
         "pkg/util/lp/core_feasibility_rational.go",
         "pkg/util/lp/core_update_rational_test.go",
         "pkg/util/lp/core_cost_validate_rational_test.go",
-        "pkg/util/lp/core_feasibility_rational_test.go"
+        "pkg/util/lp/core_feasibility_rational_test.go",
+        "pkg/util/lp/core_pivot_compare_rational.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122833,7 +122834,10 @@
         "TestLPRationalCostValidatorClosedDiagnosticAndDebugGuards",
         "TestLPRationalFeasibilityIndependentMembership",
         "TestLPRationalFeasibilityDiagnosticsAndGuards",
-        "TestLPRationalFeasibilityPhysicalComparisons"
+        "TestLPRationalFeasibilityPhysicalComparisons",
+        "TestLPRationalPivotCompareIndependentOracle",
+        "TestLPRationalPivotComparePhysicalOwnership",
+        "TestLPRationalPivotCompareReachedGuards"
       ],
       "assertions": [
         {
@@ -123344,6 +123348,16 @@
             "TestLPRationalFeasibilityDiagnosticsAndGuards",
             "TestLPRationalFeasibilityPhysicalComparisons"
           ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq pivot-column/row zero/sign check and full normalized rational drift/Harris expression",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_pivot_compare_rational.go",
+          "tests": [
+            "TestLPRationalPivotCompareIndependentOracle",
+            "TestLPRationalPivotComparePhysicalOwnership",
+            "TestLPRationalPivotCompareReachedGuards"
+          ]
         }
       ],
       "ownership": [
@@ -123441,7 +123455,8 @@
         "pkg/util/lp/core_feasibility_rational.go",
         "pkg/util/lp/core_update_rational_test.go",
         "pkg/util/lp/core_cost_validate_rational_test.go",
-        "pkg/util/lp/core_feasibility_rational_test.go"
+        "pkg/util/lp/core_feasibility_rational_test.go",
+        "pkg/util/lp/core_pivot_compare_rational.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -123613,7 +123628,10 @@
         "TestLPRationalCostValidatorClosedDiagnosticAndDebugGuards",
         "TestLPRationalFeasibilityIndependentMembership",
         "TestLPRationalFeasibilityDiagnosticsAndGuards",
-        "TestLPRationalFeasibilityPhysicalComparisons"
+        "TestLPRationalFeasibilityPhysicalComparisons",
+        "TestLPRationalPivotCompareIndependentOracle",
+        "TestLPRationalPivotComparePhysicalOwnership",
+        "TestLPRationalPivotCompareReachedGuards"
       ],
       "conditionals": [
         {
@@ -124172,6 +124190,16 @@
             "TestLPRationalFeasibilityIndependentMembership",
             "TestLPRationalFeasibilityDiagnosticsAndGuards",
             "TestLPRationalFeasibilityPhysicalComparisons"
+          ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq pivot-column/row zero/sign check and full normalized rational drift/Harris expression",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_pivot_compare_rational.go",
+          "tests": [
+            "TestLPRationalPivotCompareIndependentOracle",
+            "TestLPRationalPivotComparePhysicalOwnership",
+            "TestLPRationalPivotCompareReachedGuards"
           ]
         }
       ],
@@ -125295,7 +125323,8 @@
         "pkg/util/lp/primal_breakpoint_rational.go",
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
         "pkg/util/lp/primal_breakpoint_advance_rational.go",
-        "pkg/util/lp/primal_leaving_rational.go"
+        "pkg/util/lp/primal_leaving_rational.go",
+        "pkg/util/lp/primal_pivot_cost_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -125523,7 +125552,12 @@
         "TestLPRationalPrimalLeavingGuardsAndBreakpointDispatch",
         "TestLPRationalPrimalLeavingLiveAliases",
         "TestLPRationalPrimalLeavingSecondRowMetadataAndSparseIndex",
-        "TestLPRationalPrimalLeavingPreservesOlderComparison"
+        "TestLPRationalPrimalLeavingPreservesOlderComparison",
+        "TestLPRationalPivotCostIndependentBasisOracle",
+        "TestLPRationalPivotCostLiveAliases",
+        "TestLPRationalPivotCostPhysicalOwnership",
+        "TestLPRationalPivotCostReachedPrefixes",
+        "TestLPRationalPivotPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -126180,6 +126214,18 @@
             "TestLPRationalPrimalLeavingSecondRowMetadataAndSparseIndex",
             "TestLPRationalPrimalLeavingPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq post-exchange reduced-cost update from stored pivot row, live references and infeasible leaving cost correction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_pivot_cost_rational.go",
+          "tests": [
+            "TestLPRationalPivotCostIndependentBasisOracle",
+            "TestLPRationalPivotCostLiveAliases",
+            "TestLPRationalPivotCostPhysicalOwnership",
+            "TestLPRationalPivotCostReachedPrefixes",
+            "TestLPRationalPivotPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -126282,7 +126328,8 @@
         "pkg/util/lp/primal_breakpoint_rational.go",
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
         "pkg/util/lp/primal_breakpoint_advance_rational.go",
-        "pkg/util/lp/primal_leaving_rational.go"
+        "pkg/util/lp/primal_leaving_rational.go",
+        "pkg/util/lp/primal_pivot_cost_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -126490,7 +126537,12 @@
         "TestLPRationalPrimalLeavingGuardsAndBreakpointDispatch",
         "TestLPRationalPrimalLeavingLiveAliases",
         "TestLPRationalPrimalLeavingSecondRowMetadataAndSparseIndex",
-        "TestLPRationalPrimalLeavingPreservesOlderComparison"
+        "TestLPRationalPrimalLeavingPreservesOlderComparison",
+        "TestLPRationalPivotCostIndependentBasisOracle",
+        "TestLPRationalPivotCostLiveAliases",
+        "TestLPRationalPivotCostPhysicalOwnership",
+        "TestLPRationalPivotCostReachedPrefixes",
+        "TestLPRationalPivotPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -127222,6 +127274,18 @@
             "TestLPRationalPrimalLeavingLiveAliases",
             "TestLPRationalPrimalLeavingSecondRowMetadataAndSparseIndex",
             "TestLPRationalPrimalLeavingPreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq post-exchange reduced-cost update from stored pivot row, live references and infeasible leaving cost correction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_pivot_cost_rational.go",
+          "tests": [
+            "TestLPRationalPivotCostIndependentBasisOracle",
+            "TestLPRationalPivotCostLiveAliases",
+            "TestLPRationalPivotCostPhysicalOwnership",
+            "TestLPRationalPivotCostReachedPrefixes",
+            "TestLPRationalPivotPreservesOlderComparison"
           ]
         }
       ],
