@@ -125294,7 +125294,8 @@
         "pkg/util/lp/primal_bound_rational_test.go",
         "pkg/util/lp/primal_breakpoint_rational.go",
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
-        "pkg/util/lp/primal_breakpoint_advance_rational.go"
+        "pkg/util/lp/primal_breakpoint_advance_rational.go",
+        "pkg/util/lp/primal_leaving_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -125516,7 +125517,13 @@
         "TestLPRationalPrimalBreakpointAdvanceWrapper",
         "TestLPRationalPrimalBreakpointAdvanceGuards",
         "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
-        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
+        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures",
+        "TestLPRationalPrimalLeavingIndependentModels",
+        "TestLPRationalPrimalLeavingPhysicalOwnership",
+        "TestLPRationalPrimalLeavingGuardsAndBreakpointDispatch",
+        "TestLPRationalPrimalLeavingLiveAliases",
+        "TestLPRationalPrimalLeavingSecondRowMetadataAndSparseIndex",
+        "TestLPRationalPrimalLeavingPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -126160,6 +126167,19 @@
             "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
             "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
           ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq precise circular leaving selection, by-value basis multiplier, exact ratio/sparsity ties, entering flip and breakpoint dispatch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_leaving_rational.go",
+          "tests": [
+            "TestLPRationalPrimalLeavingIndependentModels",
+            "TestLPRationalPrimalLeavingPhysicalOwnership",
+            "TestLPRationalPrimalLeavingGuardsAndBreakpointDispatch",
+            "TestLPRationalPrimalLeavingLiveAliases",
+            "TestLPRationalPrimalLeavingSecondRowMetadataAndSparseIndex",
+            "TestLPRationalPrimalLeavingPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -126261,7 +126281,8 @@
         "pkg/util/lp/primal_bound_rational_test.go",
         "pkg/util/lp/primal_breakpoint_rational.go",
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
-        "pkg/util/lp/primal_breakpoint_advance_rational.go"
+        "pkg/util/lp/primal_breakpoint_advance_rational.go",
+        "pkg/util/lp/primal_leaving_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -126463,7 +126484,13 @@
         "TestLPRationalPrimalBreakpointAdvanceWrapper",
         "TestLPRationalPrimalBreakpointAdvanceGuards",
         "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
-        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
+        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures",
+        "TestLPRationalPrimalLeavingIndependentModels",
+        "TestLPRationalPrimalLeavingPhysicalOwnership",
+        "TestLPRationalPrimalLeavingGuardsAndBreakpointDispatch",
+        "TestLPRationalPrimalLeavingLiveAliases",
+        "TestLPRationalPrimalLeavingSecondRowMetadataAndSparseIndex",
+        "TestLPRationalPrimalLeavingPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -127182,6 +127209,19 @@
             "TestLPRationalPrimalBreakpointAdvanceGuards",
             "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
             "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
+          ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq precise circular leaving selection, by-value basis multiplier, exact ratio/sparsity ties, entering flip and breakpoint dispatch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_leaving_rational.go",
+          "tests": [
+            "TestLPRationalPrimalLeavingIndependentModels",
+            "TestLPRationalPrimalLeavingPhysicalOwnership",
+            "TestLPRationalPrimalLeavingGuardsAndBreakpointDispatch",
+            "TestLPRationalPrimalLeavingLiveAliases",
+            "TestLPRationalPrimalLeavingSecondRowMetadataAndSparseIndex",
+            "TestLPRationalPrimalLeavingPreservesOlderComparison"
           ]
         }
       ],

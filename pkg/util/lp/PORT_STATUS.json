@@ -12,8 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Scalar primal circular leaving selection and row-sparsity ties, breakpoint construction/traversal, advancement, tableau/LU pivot iteration and full Solve; scalar dual core and outer primal/dual optimization/scaling integration; remaining source diagnostics/audits and complete upstream drivers remain open. Full native7957befd predates these additions and does not measure them.",
-    "Scalar circular leaving selection and row-sparsity ties, pivot advancement/iteration and full scalar Solve remain open after breakpoint collection/traversal; dual/outer integration and remaining source/upstream-driver audits remain incomplete."
+    "Scalar pivot advancement/iteration and complete scalar Solve, dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits."
   ],
   "units": [
     {
@@ -2110,7 +2109,8 @@
         "pkg/util/lp/primal_bound_rational_test.go",
         "pkg/util/lp/primal_breakpoint_rational.go",
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
-        "pkg/util/lp/primal_breakpoint_advance_rational.go"
+        "pkg/util/lp/primal_breakpoint_advance_rational.go",
+        "pkg/util/lp/primal_leaving_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2332,7 +2332,13 @@
         "TestLPRationalPrimalBreakpointAdvanceWrapper",
         "TestLPRationalPrimalBreakpointAdvanceGuards",
         "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
-        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
+        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures",
+        "TestLPRationalPrimalLeavingIndependentModels",
+        "TestLPRationalPrimalLeavingPhysicalOwnership",
+        "TestLPRationalPrimalLeavingGuardsAndBreakpointDispatch",
+        "TestLPRationalPrimalLeavingLiveAliases",
+        "TestLPRationalPrimalLeavingSecondRowMetadataAndSparseIndex",
+        "TestLPRationalPrimalLeavingPreservesOlderComparison"
       ]
     },
     {
@@ -2398,7 +2404,8 @@
         "pkg/util/lp/primal_bound_rational_test.go",
         "pkg/util/lp/primal_breakpoint_rational.go",
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
-        "pkg/util/lp/primal_breakpoint_advance_rational.go"
+        "pkg/util/lp/primal_breakpoint_advance_rational.go",
+        "pkg/util/lp/primal_leaving_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2600,7 +2607,13 @@
         "TestLPRationalPrimalBreakpointAdvanceWrapper",
         "TestLPRationalPrimalBreakpointAdvanceGuards",
         "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
-        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
+        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures",
+        "TestLPRationalPrimalLeavingIndependentModels",
+        "TestLPRationalPrimalLeavingPhysicalOwnership",
+        "TestLPRationalPrimalLeavingGuardsAndBreakpointDispatch",
+        "TestLPRationalPrimalLeavingLiveAliases",
+        "TestLPRationalPrimalLeavingSecondRowMetadataAndSparseIndex",
+        "TestLPRationalPrimalLeavingPreservesOlderComparison"
       ]
     },
     {
@@ -6794,5 +6807,39 @@
       "diff check"
     ],
     "remaining": "Scalar circular leaving selection, pivot advancement and iteration, full scalar Solve, dual/outer integration and remaining LP source/upstream-driver audits."
+  },
+  "latest_rational_leaving_increment": {
+    "scope": "Retained scalar mpq/mpq precise circular leaving selection, by-value basis multiplier, exact ratio/sparsity ties, entering flip and breakpoint dispatch",
+    "source_units_promoted": false,
+    "focused_native_seconds": 2.002,
+    "focused_debug_checked_seconds": 3.304,
+    "statement_coverage": {
+      "native": {
+        "covered": 127,
+        "total": 146,
+        "percent": 87.0
+      },
+      "debug_checked": {
+        "covered": 131,
+        "total": 146,
+        "percent": 89.7
+      }
+    },
+    "independent_feasible_models": 480,
+    "independent_infeasible_models": 480,
+    "physical_campaigns": 8,
+    "older_comparison_campaigns": 1,
+    "remaining": "Scalar pivot advancement/iteration and complete scalar Solve, dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits.",
+    "related_native_seconds": 45.514,
+    "related_debug_checked_seconds": 65.651,
+    "verification": [
+      "both final focused profiles",
+      "both related regression profiles",
+      "both LP vets",
+      "both module compile gates",
+      "source portcheck: 2103 units, 677 APIs",
+      "dependency graph refresh: 64 packages",
+      "diff check"
+    ]
   }
 }

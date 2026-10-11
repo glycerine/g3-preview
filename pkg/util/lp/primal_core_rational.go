@@ -6,9 +6,8 @@ import "github.com/glycerine/g3/pkg/util/numeral"
 
 // RationalPrimalCoreSolver borrows scalar model storage and owns exact primal
 // scratch. Construction, feasibility costs, initialization, entering pricing
-// and scalar bound-step/breakpoint collection/traversal helpers are implemented.
-// Circular leaving selection, pivot
-// iteration and full Solve remain open.
+// bound-step/breakpoint helpers and circular leaving selection are implemented.
+// Pivot advancement/iteration and full Solve remain open.
 // Constructor errors return a partial owner to Close before borrowed inputs.
 type RationalPrimalCoreSolver struct {
 	*RationalCoreSolverBase
@@ -19,9 +18,11 @@ type RationalPrimalCoreSolver struct {
 	ColumnNormUpdateCounter, BlandModeThreshold  uint32
 	SignOfEnteringDelta                          int32
 	NonBasisList                                 []uint32
+	LeavingCandidates                            []uint32
 	calls                                        exactEtaCalls
 	work                                         *IndexedRationalVector
 	stepEpsilon, basisMultiplier                 *IndexedRationalVector
+	leavingMultiplier, leavingRatio              *IndexedRationalVector
 	Breakpoints                                  []*RationalBreakpoint
 	breakpointWork                               *IndexedRationalVector
 	breakpointCollect, breakpointSlope           *IndexedRationalVector
@@ -75,7 +76,7 @@ func NewRationalPrimalCoreSolver(in RationalCoreInputs) (m *RationalPrimalCoreSo
 	return m, nil
 }
 func (m *RationalPrimalCoreSolver) ready() error {
-	if m.stopped || m.work != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.breakpointCollect != nil || m.breakpointSlope != nil || m.breakpointWork != nil || m.pendingBreakpoint != nil || m.calls.pending() {
+	if m.stopped || m.work != nil || m.leavingMultiplier != nil || m.leavingRatio != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.breakpointCollect != nil || m.breakpointSlope != nil || m.breakpointWork != nil || m.pendingBreakpoint != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return m.RationalCoreSolverBase.ready()
@@ -168,6 +169,18 @@ func (m *RationalPrimalCoreSolver) Close() error {
 			return err
 		}
 		m.work = nil
+	}
+	if m.leavingMultiplier != nil {
+		if err := m.leavingMultiplier.Close(); err != nil {
+			return err
+		}
+		m.leavingMultiplier = nil
+	}
+	if m.leavingRatio != nil {
+		if err := m.leavingRatio.Close(); err != nil {
+			return err
+		}
+		m.leavingRatio = nil
 	}
 	if m.breakpointCollect != nil {
 		if err := m.breakpointCollect.Close(); err != nil {
