@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 86.5,
-  "coverage_warning": "Completed native checkpoint93d0d780 measures27928/32295 LP statements (86.5%). Includes scalar full dual Solve, scalar outer integration, exact MPS factories/named accessors and driver argument/settings/setup. Excludes later driver_mps*.go; separate focused coverage is89.3% dispatch/cleanup,92.3% floating and87.5% exact in both profiles. Go statement coverage is not C++ source completion; retained source audits and complete upstream drivers remain open. Later driver_file_list.go is also excluded from the completed full checkpoint; focused native/checked evidence covers42/42 statements (100%). Later auxiliary driver_mps_default_rational.go is excluded from the completed full checkpoint; focused evidence covers70/76 statements (92.1%) in both profiles.",
+  "coverage_warning": "Completed native checkpoint93d0d780 measures27928/32295 LP statements (86.5%). Includes scalar full dual Solve, scalar outer integration, exact MPS factories/named accessors and driver argument/settings/setup. Excludes later driver_mps*.go; separate focused coverage is89.3% dispatch/cleanup,92.3% floating and87.5% exact in both profiles. Go statement coverage is not C++ source completion; retained source audits and complete upstream drivers remain open. Later driver_file_list.go is also excluded from the completed full checkpoint; focused native/checked evidence covers42/42 statements (100%). Later auxiliary driver_mps_default_rational.go is excluded from the completed full checkpoint; focused evidence covers70/76 statements (92.1%) in both profiles. Later driver_lar.go is excluded from the completed full checkpoint; focused native/checked coverage is93/101 statements (92.1%).",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -10,9 +10,9 @@
     "remaining retained objective/preparation consumers and full primal/dual/LAR scaling integration; whole random-update source/driver audit",
     "remaining retained constructor/diagnostic/validator and optimization consumer audits; complete MPS/CLI upstream drivers",
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
-    "remaining top-level CLI dispatch, LAR file-list integration and directory/SMT input driver scenarios",
+    "remaining top-level CLI dispatch including empty directory branch, LAR file creation/file-list integration and SMT input driver scenarios",
     "component property tests, coverage and integration audits",
-    "Remaining top-level test CLI dispatch, LAR file-list/directory/SMT driver scenarios; remaining retained scaling/optimization consumers, whole-source/ownership audits and complete upstream LP/randomize drivers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
+    "Remaining top-level test CLI dispatch, LAR file creation/file-list/SMT driver scenarios; remaining retained scaling/optimization consumers, whole-source/ownership audits and complete upstream LP/randomize drivers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
   ],
   "units": [
     {
@@ -9006,5 +9006,46 @@
       "dependency_graph": "passed",
       "diff_check": "passed"
     }
+  },
+  "latest_lar_run_driver_increment": {
+    "scope": "Retained run_lar_solver and named solution getter consumer; LAR file/list/SMT creation and top-level CLI integration remain open",
+    "source_units_promoted": false,
+    "test_groups": 9,
+    "independent_feasible_infeasible_worlds": 40,
+    "randomize_cap_variables": 110,
+    "physical_campaigns": 8,
+    "older_caller_comparison_campaigns": 2,
+    "clock_failure_profiles": 3,
+    "entry_option_profiles": 5,
+    "focused_native_seconds": 1.727,
+    "focused_debug_checked_seconds": 5.816,
+    "statement_coverage": {
+      "native": {
+        "covered": 93,
+        "total": 101,
+        "percent": 92.1
+      },
+      "debug_checked": {
+        "covered": 93,
+        "total": 101,
+        "percent": 92.1
+      }
+    },
+    "coverage_note": "Remaining returns guard invalid-status conversion, stable evidence/comparison/value destruction, nonoptimal-warning output, delegated randomization failure and comparison final endl flush. Eight physical campaigns reach actual solve/infeasibility/randomize/comparison success; compare mode intentionally prints initial LAR OPTIMAL without calling LAR Solve. Mathematical feasibility is checked independently after actual randomized models.",
+    "verification": {
+      "focused_native": "passed",
+      "focused_debug_checked": "passed",
+      "lp_vet_native": "passed",
+      "lp_vet_debug_checked": "passed",
+      "module_compile_native": "passed",
+      "module_compile_debug_checked": "passed",
+      "related_native": "passed",
+      "related_debug_checked": "passed",
+      "portcheck": "passed",
+      "dependency_graph": "passed",
+      "diff_check": "passed"
+    },
+    "related_native_seconds": 24.251,
+    "related_debug_checked_seconds": 39.992
   }
 }

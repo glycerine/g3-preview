@@ -103014,7 +103014,8 @@
         "pkg/util/lp/driver_mps_float.go",
         "pkg/util/lp/driver_mps_rational.go",
         "pkg/util/lp/driver_file_list.go",
-        "pkg/util/lp/driver_mps_default_rational.go"
+        "pkg/util/lp/driver_mps_default_rational.go",
+        "pkg/util/lp/driver_lar.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103133,7 +103134,16 @@
         "TestLPMPSDefaultRationalPreparedDualCost",
         "TestLPMPSDefaultRationalNumberPhysicalOwnership",
         "TestLPMPSDefaultRationalLiveNumberLifetime",
-        "TestLPMPSDefaultRationalOlderComparison"
+        "TestLPMPSDefaultRationalOlderComparison",
+        "TestLPLARDriverIndependentSolves",
+        "TestLPLARDriverRandomizeHundredCap",
+        "TestLPLARDriverComparison",
+        "TestLPLARDriverClockAndOptionPrefixes",
+        "TestLPLARDriverReportFailures",
+        "TestLPLARDriverReportFlushAndLiveFields",
+        "TestLPLARDriverPhysicalOwnership",
+        "TestLPLARDriverActualComparisonReportAndLookupFailures",
+        "TestLPLARDriverOlderComparison"
       ],
       "conditionals": [
         {
@@ -103917,6 +103927,27 @@
             "TestLPMPSDefaultRationalLiveNumberLifetime",
             "TestLPMPSDefaultRationalOlderComparison"
           ]
+        },
+        {
+          "name": "run_lar_solver/get_solution_map (2416-2477): selected option publication, actual Solve/clock/status/iterations, lexical infeasibility evidence, capped RandomUpdate and actual default primal comparison/named-value snapshots; file creation/dispatch integration remains open",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_lar.go",
+          "tests": [
+            "TestLPLARDriverIndependentSolves",
+            "TestLPLARDriverRandomizeHundredCap",
+            "TestLPLARDriverComparison",
+            "TestLPLARDriverClockAndOptionPrefixes",
+            "TestLPLARDriverReportFailures",
+            "TestLPLARDriverReportFlushAndLiveFields",
+            "TestLPLARDriverPhysicalOwnership",
+            "TestLPLARDriverActualComparisonReportAndLookupFailures",
+            "TestLPLARDriverOlderComparison"
+          ]
+        },
+        {
+          "name": "Commented directory traversal/GLPK comparison implementation inside test_files_from_directory (2391-2413) is disabled; retained wrapper has an empty body and future CLI branch must return without traversal",
+          "status": "dead_deleted",
+          "tests": []
         }
       ],
       "ownership": [
@@ -103924,7 +103955,8 @@
         "Exact setup publishes limits before calling the actual owning FlipCosts child; driver settings publish only after its ordinary return. No parent numerical capture wraps child cost getter/copy/negation/setter operations. Interrupted source cost-flip prefixes and borrowed older comparison receipts survive common model cleanup.",
         "MPSFileDriver owns one actual reader and concrete primary/optional comparison solvers plus lexical exact objective work and its own numerical receipts. Parent captures only copied unary-negation/assignment and Float64 conversion, never owning solver getters. Raw driver receipts close before solvers, then readers, then driver objective roots; partial exact children can borrow reader or driver values. Successful Run closes at the source return boundary; failed Run retains owners until Close and cannot retry. Real older caller comparison receipts survive operations and cleanup unchanged. The objective survives output/endl flush but dies before running-watch time extraction.",
         "Native file-list reader closes its file before solving. Sequential MPS list driver owns only the current child; each completed child closes before the next starts. Failed child remains reachable until Close succeeds, including real file-close failure and cleanup retry. Arguments and numerical manager remain borrowed.",
-        "Auxiliary exact driver uses concrete solver defaults and ignores arguments as source does. Each named returned numeral survives its output plus trailing space, then dies before next expression. Objective returned numeral survives endl; failed children and expression locals remain reachable until explicit Close, with delegated captures retained by their actual owning child. Eight pooled/direct physical campaigns and two actual older caller comparisons verify cleanup ownership."
+        "Auxiliary exact driver uses concrete solver defaults and ignores arguments as source does. Each named returned numeral survives its output plus trailing space, then dies before next expression. Objective returned numeral survives endl; failed children and expression locals remain reachable until explicit Close, with delegated captures retained by their actual owning child. Eight pooled/direct physical campaigns and two actual older caller comparisons verify cleanup ownership.",
+        "LARRunDriver borrows its LAR solver, optional MPS reader and arguments. It owns concrete primal comparison and named snapshots, closing comparison before borrowed getter outputs; lexical infeasibility evidence closes at if-block end, with failed work reachable for explicit cleanup. Eight pooled/direct physical campaigns cover actual Solve, infeasibility, randomize and comparison through success; two actual older caller comparisons survive driver and solver/reader cleanup."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -103942,7 +103974,8 @@
         "Project parser/option/assignment order is preserved using Go strings and standard numeric parsers. Nonempty malformed, libc-style trailing numeric prefixes or signed-int32 overflow return explicit Go parse errors instead of porting libc atoi/atof grammar or claiming undefined C++ overflow behavior. Valid signed-int32 tokens preserve unsigned assignment then signed setting/enum narrowing; float settings retain six-significant-digit reports and IEEE values. Nil report writer suppresses driver reports; source CLI consumer uses stdout. External GLPK execution, full CLI dispatch, file-list/directory/SMT/reporting/timing branches remain open.",
         "Native Go file/writer errors and injected host clock failures return reached prefixes with explicit Close for partial ownership; no C++ STL stream or raw-pointer leak adapter is added. Source headline spaces, floating signed zero, exact full-entry rational(double)/sparsity limits, FEASIBLE status on the scalar primal <= iteration boundary, 19/20-column threshold, seconds/1000 and span/iteration timing, and first-operand NaN behavior of the one-percent predicate remain literal. Prepared mismatch diagnostics use explicitly differing input models with actual independent solves; they do not claim ordinary matching inputs disagree. Global mutable STL formatting is not ported; existing native six-significant-digit formatting is used.",
         "File-list names use native Go strings and slices with literal byte preservation; no C++ string/stream/vector implementation. Missing-open diagnostic returns an empty list as source does. Native non-EOF read errors return completed names plus explicit error rather than suppressing the I/O failure as C++ read_line does. First empty line ends reading; final non-newline line is accepted; CR, whitespace, duplicates and relative names are unchanged.",
-        "Auxiliary exact driver retains fresh tableau default zero reduced costs: 40 positive-objective bounded worlds report initial zero objective as source defaults do, without claiming mathematical optimality. No setup, minimum correction, limits or stopwatch is introduced. Exact dual unsupported rational(double) and missing sparsity metadata remain explicit source boundaries. Column names use the existing reader insertion order instead of C++ unordered-map iteration. Source diagnostics route to the configured native writer."
+        "Auxiliary exact driver retains fresh tableau default zero reduced costs: 40 positive-objective bounded worlds report initial zero objective as source defaults do, without claiming mathematical optimality. No setup, minimum correction, limits or stopwatch is introduced. Exact dual unsupported rational(double) and missing sparsity metadata remain explicit source boundaries. Column names use the existing reader insertion order instead of C++ unordered-map iteration. Source diagnostics route to the configured native writer.",
+        "run_lar_solver uses native Go writers, clock, slices and concrete rational vector snapshots. Source unused local solution map is represented by owning named-getter snapshots without a universal STL adapter; names use existing reader insertion order. Source compare branch prints LAR status without solving LAR or comparing values. Source raw primal comparison pointer is not deleted; Go explicit driver ownership closes it, avoiding a leaked numerical owner. Configured output redirects concrete solver diagnostics. Disabled directory traversal is not implemented."
       ]
     },
     {
