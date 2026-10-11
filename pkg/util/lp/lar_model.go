@@ -32,6 +32,8 @@ type LARSolver struct {
 	pendingRowAnalyzer                                 *LARRowBoundAnalyzer
 	work                                               *IndexedPairVector
 	rationalWork                                       *IndexedRationalVector
+	modelPairs                                         *IndexedPairVector
+	modelSingles                                       *IndexedRationalVector
 	calls                                              exactEtaCalls
 	manager                                            *numeral.RationalManager
 	stopped                                            bool
@@ -55,7 +57,7 @@ func NewLARSolver(m *numeral.RationalManager) (solver *LARSolver, err error) {
 	return solver, err
 }
 func (s *LARSolver) ready() error {
-	if s.stopped || s.Core == nil || s.Core.stopped || s.pendingCleanupDelta != nil || s.pendingConstraint != nil || s.pendingTerm != nil || s.pendingIterator != nil || s.pendingRowIterator != nil || s.pendingRowAnalyzer != nil || s.work != nil || s.rationalWork != nil || s.calls.pending() {
+	if s.stopped || s.Core == nil || s.Core.stopped || s.pendingCleanupDelta != nil || s.pendingConstraint != nil || s.pendingTerm != nil || s.pendingIterator != nil || s.pendingRowIterator != nil || s.pendingRowAnalyzer != nil || s.work != nil || s.rationalWork != nil || s.modelPairs != nil || s.modelSingles != nil || s.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return nil
@@ -296,6 +298,9 @@ func (s *LARSolver) Close() error {
 			return err
 		}
 		s.work = nil
+	}
+	if err := s.closeModelSets(); err != nil {
+		return err
 	}
 	if s.rationalWork != nil {
 		if err := s.rationalWork.Close(); err != nil {

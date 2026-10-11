@@ -928,7 +928,9 @@
         "pkg/util/lp/lar_lu_extend.go",
         "pkg/util/lp/lar_lu_extend_test.go",
         "pkg/util/lp/lar_strategy.go",
-        "pkg/util/lp/lar_strategy_test.go"
+        "pkg/util/lp/lar_strategy_test.go",
+        "pkg/util/lp/lar_get_model.go",
+        "pkg/util/lp/lar_get_model_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -1010,7 +1012,14 @@
         "TestLARStrategyDispatcherProfiles",
         "TestLARStrategyFloatConversionSourceExtremes",
         "TestLARStrategyReachedErrorPrefixes",
-        "TestLARStrategyDeferredRowsPhysicalOwnership"
+        "TestLARStrategyDeferredRowsPhysicalOwnership",
+        "TestLARGetModelIndependentCollisionChains",
+        "TestLARGetModelStrictBoundsAndRepeatedOutput",
+        "TestLARGetModelEmptyAndReachedPrefixes",
+        "TestLARGetModelPhysicalOwnership",
+        "TestLARGetModelRetryAndLateErrorPublication",
+        "TestLARGetModelPreservesOlderComparison",
+        "TestLARGetModelDeepCollisionPhysicalOwnership"
       ]
     },
     {
@@ -4194,5 +4203,34 @@
       "/mnt/oldrog/tmp/g3-lar-model-delta-debug.cover"
     ],
     "evidence": "Strict-bound model delta selection now implements lar_core_solver.h:791-801. It copies the initial rational into an owned local, visits exact columns in order, calls the actual UpdateDelta for each set lower then upper bound against current X, and copies the final delta only after all bound updates.400 independent rational/epsilon worlds cover free/low/upper/fixed/boxed profiles, limiting/nonlimiting slopes, equal fixed endpoints, input/output aliasing and independently checked concrete inequalities. Mixed-column success and late failure verify the cumulative minimum and retained first-column prefix. Twelve stopped/nil/extent/native-erasure/assertion profiles, six pooled/direct physical refusal campaigns through success for lower arithmetic, upper arithmetic and initial/output copies, and an actual older caller comparison verify publication and ownership through cleanup census. New file34/37 statements (91.9%) native and debug/checked. Remaining returns protect the second type lookup with unchanged types, valid local destruction and copy capture already guarded by pending state. Focused0.414s/0.536s and related bounds/model/strategy/outer-core native/debug26.393s/28.170s pass. Both LP vets, native/debug module compilation, portcheck, graph refresh and diff checks pass. Full native08dc15a1 checkpoint predates this increment. Collision-free rational model extraction, constraint validation, outer LARSolver Solve and complete upstream drivers remain open; inventory remains85 partial/25 unported."
+  },
+  "latest_rational_model_increment": {
+    "source": "src/util/lp/lar_solver.h:1278-1303",
+    "go_target": "pkg/util/lp/lar_get_model.go",
+    "tests": [
+      "TestLARGetModelIndependentCollisionChains",
+      "TestLARGetModelStrictBoundsAndRepeatedOutput",
+      "TestLARGetModelEmptyAndReachedPrefixes",
+      "TestLARGetModelPhysicalOwnership",
+      "TestLARGetModelRetryAndLateErrorPublication",
+      "TestLARGetModelPreservesOlderComparison",
+      "TestLARGetModelDeepCollisionPhysicalOwnership"
+    ],
+    "native_statements": {
+      "covered": 121,
+      "total": 143,
+      "percent": 84.6
+    },
+    "debug_checked_statements": {
+      "covered": 122,
+      "total": 143,
+      "percent": 85.3
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-lar-get-model-native.cover",
+      "/mnt/oldrog/tmp/g3-lar-get-model-debug.cover"
+    ],
+    "qualification": "Remaining blocks chiefly protect valid capture, initialized small constants, exact-set hash/equality on stable owned values, native-only vector growth guards and destruction/cleanup failures. Native also erases source status assertion. Physical campaigns reach actual epsilon-halving refusal. Latest full native08dc15a1 checkpoint predates this increment; constraint validation, outer LARSolver Solve and complete upstream drivers remain open.",
+    "evidence": "Rational model extraction now implements lar_solver.h:1278-1303. GetModel uses the actual strict-bound delta, checks source status after delta preparation, inserts owned exact pairs and concrete singles into native hash buckets with exact equality, halves epsilon on distinct-pair collisions, and publishes column values incrementally without clearing unrelated entries. The concrete LARRationalModel owns native uint32-to-rational entries; interrupted output assignments retain their own receipts and may still borrow the solver current single, so output cleanup precedes solver cleanup.160 independent shifted/scaled worlds cover zero through seven chronological collisions, duplicate pairs, hash-bucket equality resolution, internal column keys, existing output prefixes/unrelated entries, no cancellation reads and nonaliasing values. Strict-bound/repeated-output tests and empty/stopped/foreign/status/error profiles verify source entry order. A late malformed value after a retry verifies earlier outputs change from the first delta to the next while later entries retain their old values. Six pooled/direct physical campaigns cover large plain/colliding/duplicate values and forty successive collisions; the latter reaches real allocation refusal during epsilon halving beyond inline denominator storage. Actual older caller comparison identity and cleanup census pass. New file121/143 statements (84.6%) native and122/143 (85.3%) debug/checked. Remaining blocks chiefly protect valid capture, initialized small constants, hash/equality on stable exact set values, native vector growth guards and destruction/cleanup errors; native additionally erases the source status assertion. Focused11.562s/24.223s pass; related model/strategy/outer-core/scope native/debug regressions105.951s/164.696s pass. Both LP vets, native/debug module compilation, portcheck, graph refresh and diff checks pass. Full native08dc15a1 checkpoint predates this increment. Constraint validation, whole outer LARSolver Solve and complete upstream drivers remain open; inventory remains85 partial/25 unported."
   }
 }

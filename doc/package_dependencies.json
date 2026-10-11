@@ -1229,6 +1229,7 @@
         "lar_core_scopes.go",
         "lar_double_bounds.go",
         "lar_explanation.go",
+        "lar_get_model.go",
         "lar_inf_cleanup.go",
         "lar_infeasibility.go",
         "lar_lu_extend.go",
