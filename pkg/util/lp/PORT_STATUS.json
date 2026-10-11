@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Scalar dual pricing loop, OneIteration and full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers."
+    "Exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers."
   ],
   "units": [
     {
@@ -1954,7 +1954,8 @@
         "pkg/util/lp/dual_ratio_rational.go",
         "pkg/util/lp/dual_flip_rational.go",
         "pkg/util/lp/dual_beta_rational.go",
-        "pkg/util/lp/dual_advance_rational.go"
+        "pkg/util/lp/dual_advance_rational.go",
+        "pkg/util/lp/dual_solve_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -2049,7 +2050,19 @@
         "TestLPRationalDualAdvancePreservesOlderComparison",
         "TestLPRationalDualAdvanceMetadataAndStoppedPrefixes",
         "TestLPRationalDualAdvanceUpperLeavingSnapAndReconstruct",
-        "TestLPRationalDualAdvanceActualSingularFallback"
+        "TestLPRationalDualAdvanceActualSingularFallback",
+        "TestLPRationalDualSolveIndependentVertices",
+        "TestLPRationalDualSolvePricingIndependentRecordBudget",
+        "TestLPRationalDualSolveLimitsCancellationAndUnbounded",
+        "TestLPRationalDualSolveIterationRNGAndForbidden",
+        "TestLPRationalDualSolveEmptyAndPricingGuards",
+        "TestLPRationalDualSolveReportingBytePrefixes",
+        "TestLPRationalDualSolvePhysicalOwnership",
+        "TestLPRationalDualSolvePreservesOlderComparison",
+        "TestLPRationalDualSolveCheckedPreconditionOrder",
+        "TestLPRationalDualSolvePricingActualRecovery",
+        "TestLPRationalDualSolveTentativeFullScan",
+        "TestLPRationalDualSolveNoGrowthStrictLimit"
       ]
     },
     {
@@ -2069,7 +2082,8 @@
         "pkg/util/lp/dual_ratio_rational.go",
         "pkg/util/lp/dual_flip_rational.go",
         "pkg/util/lp/dual_beta_rational.go",
-        "pkg/util/lp/dual_advance_rational.go"
+        "pkg/util/lp/dual_advance_rational.go",
+        "pkg/util/lp/dual_solve_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -2164,7 +2178,19 @@
         "TestLPRationalDualAdvancePreservesOlderComparison",
         "TestLPRationalDualAdvanceMetadataAndStoppedPrefixes",
         "TestLPRationalDualAdvanceUpperLeavingSnapAndReconstruct",
-        "TestLPRationalDualAdvanceActualSingularFallback"
+        "TestLPRationalDualAdvanceActualSingularFallback",
+        "TestLPRationalDualSolveIndependentVertices",
+        "TestLPRationalDualSolvePricingIndependentRecordBudget",
+        "TestLPRationalDualSolveLimitsCancellationAndUnbounded",
+        "TestLPRationalDualSolveIterationRNGAndForbidden",
+        "TestLPRationalDualSolveEmptyAndPricingGuards",
+        "TestLPRationalDualSolveReportingBytePrefixes",
+        "TestLPRationalDualSolvePhysicalOwnership",
+        "TestLPRationalDualSolvePreservesOlderComparison",
+        "TestLPRationalDualSolveCheckedPreconditionOrder",
+        "TestLPRationalDualSolvePricingActualRecovery",
+        "TestLPRationalDualSolveTentativeFullScan",
+        "TestLPRationalDualSolveNoGrowthStrictLimit"
       ]
     },
     {
@@ -8278,5 +8304,56 @@
     "runner_session": 40387,
     "completion_credited": false,
     "scope": "Scalar dual pricing/candidates/full ratio, bound-flip/value updates, beta/DSE and known-leaving basis advancement/recovery; includes earlier scalar full primal Solve/statistics and initialization. Full dual pricing loop/Solve and outer integration remain open."
+  },
+  "latest_rational_dual_solve_increment": {
+    "scope": "Concrete scalar pricing loop, OneIteration and full prepared dual-core Solve",
+    "source_units_promoted": false,
+    "test_groups": 12,
+    "independent_exact_optimum_worlds": 120,
+    "independent_pricing_worlds": 500,
+    "tentative_full_scan_profiles": 80,
+    "limit_cancellation_profiles": 8,
+    "strict_no_growth_profiles": 2,
+    "forbidden_rng_profiles": 6,
+    "pricing_guard_profiles": 6,
+    "checked_precondition_profiles": 5,
+    "actual_rollback_profiles": 2,
+    "physical_campaigns": 6,
+    "older_comparison_campaigns": 3,
+    "focused_native_seconds": 2.645,
+    "focused_debug_checked_seconds": 2.883,
+    "related_native_seconds": 30.88,
+    "related_debug_checked_seconds": 39.506,
+    "statement_coverage": {
+      "native": {
+        "dual_solve_rational.go": {
+          "covered": 102,
+          "total": 130,
+          "percent": 78.5
+        }
+      },
+      "debug_checked": {
+        "dual_solve_rational.go": {
+          "covered": 114,
+          "total": 130,
+          "percent": 87.7
+        }
+      }
+    },
+    "remaining": "Exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers.",
+    "coverage_note": "Independent exact vertex enumeration validates native optima, residuals, bounds and reduced costs; checked pivots retain the actual beta floating-constructor assertion and unchanged initial basis. Checked real exchanges stop before false-advance recovery; native source assertions are erased. Other gaps chiefly guard stable capture/destruction, ready state and delegated metadata. Coverage measures implemented Go statements, not C++ source completion.",
+    "verification": {
+      "focused_native": "passed",
+      "focused_debug_checked": "passed",
+      "related_native": "passed before final two test-only groups; final focused profiles include all groups",
+      "related_debug_checked": "passed before final two test-only groups; final focused profiles include all groups",
+      "lp_vet_native": "passed",
+      "lp_vet_debug_checked": "passed",
+      "module_compile_native": "passed",
+      "module_compile_debug_checked": "passed",
+      "source_portcheck": "passed: 2103 units, 677 APIs",
+      "dependency_graph": "64 packages; no unresolved imports",
+      "diff_check": "passed"
+    }
   }
 }
