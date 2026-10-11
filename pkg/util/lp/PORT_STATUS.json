@@ -1065,7 +1065,8 @@
         "pkg/util/lp/lar_maximize_test.go",
         "pkg/util/lp/lar_bound_query.go",
         "pkg/util/lp/lar_add_constraint.go",
-        "pkg/util/lp/lar_driver_queries.go"
+        "pkg/util/lp/lar_driver_queries.go",
+        "pkg/util/lp/lar_implied_display.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -1230,7 +1231,29 @@
         "TestLARUpstreamTotalInfeasibilityThroughRetainedBounds",
         "TestLARUpstreamTrianglePropagationDriver",
         "TestLPRationalMPSUpstreamFileRandomizeDriver",
-        "TestLARDriverQueryHeadingExtent"
+        "TestLARDriverQueryHeadingExtent",
+        "TestLARImpliedDisplaySourceText",
+        "TestLARImpliedDisplayEveryOutputPrefix",
+        "TestLARImpliedDisplayPhysicalOwnership",
+        "TestLARImpliedDisplayReachedGuards",
+        "TestLARImpliedDisplayPreservesOlderComparison"
+      ],
+      "methods": [
+        {
+          "name": "print_implied_bound and print_term: original-term rendering, exact relation/bound and source newline/endl order",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_implied_display.go",
+          "tests": [
+            "TestLARImpliedDisplaySourceText",
+            "TestLARImpliedDisplayEveryOutputPrefix",
+            "TestLARImpliedDisplayPhysicalOwnership",
+            "TestLARImpliedDisplayReachedGuards",
+            "TestLARImpliedDisplayPreservesOlderComparison"
+          ]
+        }
+      ],
+      "deviations": [
+        "Implied-bound printing retains source original terms and all newline/endl positions. Original term coefficient order uses the existing insertion-ordered dictionary instead of unordered C++ bucket order. Existing native Go writer errors and explicit borrowed manager/owner guards apply; no whole LAR, SMT trace transport or CLI scenario completion credit."
       ]
     },
     {
@@ -10357,5 +10380,40 @@
       "/mnt/oldrog/tmp/g3-lp-build-glue-audit.txt"
     ],
     "remaining": "94 partial source units and whole retained consumer/test/ownership audits plus complete registered CLI execution. No unported label is not a completed port."
+  },
+  "latest_implied_bound_display_increment": {
+    "scope": "Retained lar_solver print_implied_bound/print_term; complete CLI scenarios and whole source audits remain open",
+    "tests": [
+      "TestLARImpliedDisplaySourceText",
+      "TestLARImpliedDisplayEveryOutputPrefix",
+      "TestLARImpliedDisplayPhysicalOwnership",
+      "TestLARImpliedDisplayReachedGuards",
+      "TestLARImpliedDisplayPreservesOlderComparison"
+    ],
+    "coverage": {
+      "native": {
+        "covered": 62,
+        "statements": 68,
+        "percent": 91.2
+      },
+      "combined_debug_checked": {
+        "covered": 62,
+        "statements": 68,
+        "percent": 91.2
+      }
+    },
+    "coverage_warning": "Six gaps guard delegated zero/string/cleanup errors, source-invariant relation encoding and already-stopped standalone PrintTerm entry. No synthetic child failure hooks.",
+    "source_fidelity": [
+      "OriginalTerms rather than potentially substituted Terms printed; independently modified current term ignored.",
+      "Initial newline does not flush; term number, relation/bound and final marker execute source endl.",
+      "Existing insertion-order term dictionary replaces C++ unordered bucket order."
+    ],
+    "ownership_evidence": "Every byte and2 variable/3 term endl refusal prefixes; pooled/direct physical refusal-through-success with cleanup/root censuses; two actual older1000-digit caller comparisons preserve invocation identity. Empty/zero terms, reached owner/pending/short-write guards.",
+    "validation": "Focused implied and related constraint display native0.527s/combined0.575s; both LP vets and module compile gates passed.",
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-lar-implied-display-native.cover",
+      "/mnt/oldrog/tmp/g3-lar-implied-display-debug.cover"
+    ],
+    "remaining": "Complete registered bound-propagation scenarios, CLI execution/entry binding and retained-source/consumer/ownership audits."
   }
 }

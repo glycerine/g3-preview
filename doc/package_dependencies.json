@@ -1288,6 +1288,7 @@
         "lar_driver_queries.go",
         "lar_explanation.go",
         "lar_get_model.go",
+        "lar_implied_display.go",
         "lar_inf_cleanup.go",
         "lar_infeasibility.go",
         "lar_lu_extend.go",
