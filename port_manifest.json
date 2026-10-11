@@ -122640,7 +122640,8 @@
         "pkg/util/lp/primal_init_tableau_rational_test.go",
         "pkg/util/lp/core_statistics_rational.go",
         "pkg/util/lp/core_dual_rational.go",
-        "pkg/util/lp/dual_breakpoint_rational.go"
+        "pkg/util/lp/dual_breakpoint_rational.go",
+        "pkg/util/lp/dual_ratio_rational.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122879,7 +122880,15 @@
         "TestLPRationalDualBreakpointPhysicalOwnership",
         "TestLPRationalDualBreakpointMetadataPrefixes",
         "TestLPRationalDualBreakpointPreservesOlderComparison",
-        "TestLPRationalDualBreakpointLiveHarrisOutput"
+        "TestLPRationalDualBreakpointLiveHarrisOutput",
+        "TestLPRationalDualRatioIndependentGroups",
+        "TestLPRationalDualRatioLossIndependentOracleAndAliases",
+        "TestLPRationalDualRatioEmptyAndLastGroup",
+        "TestLPRationalDualRatioPhysicalOwnership",
+        "TestLPRationalDualRatioBoundSpanAliases",
+        "TestLPRationalDualRatioSetOrderAndShortCircuit",
+        "TestLPRationalDualRatioMetadataAndStoppedPrefixes",
+        "TestLPRationalDualRatioPreservesOlderComparison"
       ],
       "assertions": [
         {
@@ -123472,6 +123481,21 @@
             "TestLPRationalDualBreakpointMetadataPrefixes",
             "TestLPRationalDualBreakpointPreservesOlderComparison",
             "TestLPRationalDualBreakpointLiveHarrisOutput"
+          ]
+        },
+        {
+          "name": "Retained scalar copied-left upper-minus-lower bound span and separate returned value",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_ratio_rational.go",
+          "tests": [
+            "TestLPRationalDualRatioIndependentGroups",
+            "TestLPRationalDualRatioLossIndependentOracleAndAliases",
+            "TestLPRationalDualRatioEmptyAndLastGroup",
+            "TestLPRationalDualRatioPhysicalOwnership",
+            "TestLPRationalDualRatioBoundSpanAliases",
+            "TestLPRationalDualRatioSetOrderAndShortCircuit",
+            "TestLPRationalDualRatioMetadataAndStoppedPrefixes",
+            "TestLPRationalDualRatioPreservesOlderComparison"
           ]
         }
       ],
@@ -124741,7 +124765,8 @@
         "pkg/util/lp/dual_solve_float.go",
         "pkg/util/lp/dual_core_rational.go",
         "pkg/util/lp/dual_price_rational.go",
-        "pkg/util/lp/dual_breakpoint_rational.go"
+        "pkg/util/lp/dual_breakpoint_rational.go",
+        "pkg/util/lp/dual_ratio_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -124800,7 +124825,15 @@
         "TestLPRationalDualBreakpointPhysicalOwnership",
         "TestLPRationalDualBreakpointMetadataPrefixes",
         "TestLPRationalDualBreakpointPreservesOlderComparison",
-        "TestLPRationalDualBreakpointLiveHarrisOutput"
+        "TestLPRationalDualBreakpointLiveHarrisOutput",
+        "TestLPRationalDualRatioIndependentGroups",
+        "TestLPRationalDualRatioLossIndependentOracleAndAliases",
+        "TestLPRationalDualRatioEmptyAndLastGroup",
+        "TestLPRationalDualRatioPhysicalOwnership",
+        "TestLPRationalDualRatioBoundSpanAliases",
+        "TestLPRationalDualRatioSetOrderAndShortCircuit",
+        "TestLPRationalDualRatioMetadataAndStoppedPrefixes",
+        "TestLPRationalDualRatioPreservesOlderComparison"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -124926,12 +124959,28 @@
             "TestLPRationalDualBreakpointPreservesOlderComparison",
             "TestLPRationalDualBreakpointLiveHarrisOutput"
           ]
+        },
+        {
+          "name": "Concrete scalar full ratio test, exact flip displacement and grouped candidate consumption, last-group preservation, theta assignment and tentative/unbounded transitions",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_ratio_rational.go",
+          "tests": [
+            "TestLPRationalDualRatioIndependentGroups",
+            "TestLPRationalDualRatioLossIndependentOracleAndAliases",
+            "TestLPRationalDualRatioEmptyAndLastGroup",
+            "TestLPRationalDualRatioPhysicalOwnership",
+            "TestLPRationalDualRatioBoundSpanAliases",
+            "TestLPRationalDualRatioSetOrderAndShortCircuit",
+            "TestLPRationalDualRatioMetadataAndStoppedPrefixes",
+            "TestLPRationalDualRatioPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
         "Scalar dual construction returns a stopped partial owner on failure. Each numerical owner captures only its own calls; borrowed model/flags remain live until core/LU destruction. Dual vectors and member rationals close after base borrowers, before dual caller roots. No older caller comparison is adopted or consumed.",
         "Dual pricing owns copied-left expression scratch and the separate row-local return value. Only actual arithmetic owners capture calls; child edge calls do not adopt parent or older caller comparisons. A failed expression retains lexical values until base borrowers close, then pricing locals close before dual caller roots.",
-        "Scalar Harris, tight-time, Q and combined-driver lexical values remain live through actual child calls. Copied-left shifts/quotients and copied-input abs/return values preserve numerical prefixes; comparisons retain source operand order. Only each numerical owner captures its own calls; caller-owned older comparisons survive all child and solver cleanup."
+        "Scalar Harris, tight-time, Q and combined-driver lexical values remain live through actual child calls. Copied-left shifts/quotients and copied-input abs/return values preserve numerical prefixes; comparisons retain source operand order. Only each numerical owner captures its own calls; caller-owned older comparisons survive all child and solver cleanup.",
+        "Base-owned bound-span arithmetic finishes capture before dual products/abs/compound loss sums. Ratio loss/trial locals remain owned through stopped children; the trial dies on loop break before theta evaluation. Source flipped membership publishes before member Delta copy and breakpoint erasure. Raw receipts close before base borrowers, then expression locals and member roots; older caller comparisons survive cleanup."
       ],
       "deviations": [
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
@@ -124954,7 +125003,8 @@
         "pkg/util/lp/dual_solve_float.go",
         "pkg/util/lp/dual_core_rational.go",
         "pkg/util/lp/dual_price_rational.go",
-        "pkg/util/lp/dual_breakpoint_rational.go"
+        "pkg/util/lp/dual_breakpoint_rational.go",
+        "pkg/util/lp/dual_ratio_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -125013,7 +125063,15 @@
         "TestLPRationalDualBreakpointPhysicalOwnership",
         "TestLPRationalDualBreakpointMetadataPrefixes",
         "TestLPRationalDualBreakpointPreservesOlderComparison",
-        "TestLPRationalDualBreakpointLiveHarrisOutput"
+        "TestLPRationalDualBreakpointLiveHarrisOutput",
+        "TestLPRationalDualRatioIndependentGroups",
+        "TestLPRationalDualRatioLossIndependentOracleAndAliases",
+        "TestLPRationalDualRatioEmptyAndLastGroup",
+        "TestLPRationalDualRatioPhysicalOwnership",
+        "TestLPRationalDualRatioBoundSpanAliases",
+        "TestLPRationalDualRatioSetOrderAndShortCircuit",
+        "TestLPRationalDualRatioMetadataAndStoppedPrefixes",
+        "TestLPRationalDualRatioPreservesOlderComparison"
       ],
       "assertions": [
         {
@@ -125261,12 +125319,28 @@
             "TestLPRationalDualBreakpointPreservesOlderComparison",
             "TestLPRationalDualBreakpointLiveHarrisOutput"
           ]
+        },
+        {
+          "name": "Concrete scalar full ratio test, exact flip displacement and grouped candidate consumption, last-group preservation, theta assignment and tentative/unbounded transitions",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_ratio_rational.go",
+          "tests": [
+            "TestLPRationalDualRatioIndependentGroups",
+            "TestLPRationalDualRatioLossIndependentOracleAndAliases",
+            "TestLPRationalDualRatioEmptyAndLastGroup",
+            "TestLPRationalDualRatioPhysicalOwnership",
+            "TestLPRationalDualRatioBoundSpanAliases",
+            "TestLPRationalDualRatioSetOrderAndShortCircuit",
+            "TestLPRationalDualRatioMetadataAndStoppedPrefixes",
+            "TestLPRationalDualRatioPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
         "Scalar dual construction returns a stopped partial owner on failure. Each numerical owner captures only its own calls; borrowed model/flags remain live until core/LU destruction. Dual vectors and member rationals close after base borrowers, before dual caller roots. No older caller comparison is adopted or consumed.",
         "Dual pricing owns copied-left expression scratch and the separate row-local return value. Only actual arithmetic owners capture calls; child edge calls do not adopt parent or older caller comparisons. A failed expression retains lexical values until base borrowers close, then pricing locals close before dual caller roots.",
-        "Scalar Harris, tight-time, Q and combined-driver lexical values remain live through actual child calls. Copied-left shifts/quotients and copied-input abs/return values preserve numerical prefixes; comparisons retain source operand order. Only each numerical owner captures its own calls; caller-owned older comparisons survive all child and solver cleanup."
+        "Scalar Harris, tight-time, Q and combined-driver lexical values remain live through actual child calls. Copied-left shifts/quotients and copied-input abs/return values preserve numerical prefixes; comparisons retain source operand order. Only each numerical owner captures its own calls; caller-owned older comparisons survive all child and solver cleanup.",
+        "Base-owned bound-span arithmetic finishes capture before dual products/abs/compound loss sums. Ratio loss/trial locals remain owned through stopped children; the trial dies on loop break before theta evaluation. Source flipped membership publishes before member Delta copy and breakpoint erasure. Raw receipts close before base borrowers, then expression locals and member roots; older caller comparisons survive cleanup."
       ],
       "deviations": [
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",

@@ -21,7 +21,8 @@ type RationalDualCoreSolver struct {
 	// Pricing locals stay alive through calls to the child edge expression.
 	pricingValue *IndexedRationalVector
 	// Candidate-selection locals remain live through numerical child calls.
-	harrisValues, tightValue, qValues, harrisDelta *IndexedRationalVector
+	harrisValues, tightValue, qValues, harrisDelta  *IndexedRationalVector
+	flipLossValues, flipSpan, ratioLoss, ratioTrial *IndexedRationalVector
 }
 
 func NewRationalDualCoreSolver(in RationalCoreInputs, canEnter *[]bool) (m *RationalDualCoreSolver, err error) {
@@ -188,7 +189,7 @@ func (m *RationalDualCoreSolver) Close() error {
 	if err := m.RationalCoreSolverBase.Close(); err != nil {
 		return err
 	}
-	for _, v := range []*IndexedRationalVector{m.AWave, m.Betas, m.priceWork, m.pricingValue, m.harrisValues, m.tightValue, m.qValues, m.harrisDelta} {
+	for _, v := range []*IndexedRationalVector{m.AWave, m.Betas, m.priceWork, m.pricingValue, m.harrisValues, m.tightValue, m.qValues, m.harrisDelta, m.flipLossValues, m.flipSpan, m.ratioLoss, m.ratioTrial} {
 		if v != nil {
 			if err := v.Close(); err != nil {
 				return err
@@ -198,6 +199,7 @@ func (m *RationalDualCoreSolver) Close() error {
 	m.AWave, m.Betas = nil, nil
 	m.priceWork, m.pricingValue = nil, nil
 	m.harrisValues, m.tightValue, m.qValues, m.harrisDelta = nil, nil, nil, nil
+	m.flipLossValues, m.flipSpan, m.ratioLoss, m.ratioTrial = nil, nil, nil, nil
 	for _, v := range []*numeral.Rational{&m.HarrisTolerance, &m.Delta, &m.ThetaD, &m.ThetaP} {
 		if err := m.manager.Del(v); err != nil {
 			return err
