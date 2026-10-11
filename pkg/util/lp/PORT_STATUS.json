@@ -5481,5 +5481,28 @@
       "diff_check": "pass"
     },
     "evidence": "Exact cost flipping, scaled-cost assignment and original-column reconstruction now implement retained lp_solver<mpq,mpq> source lp_solver.hpp:95-100,528-577. Costs owns a concrete exact dense vector. By-value getters, unary-minus copies, product left-operand copies and final assignments preserve numerical ownership and source publication order. Column children and Costs close before borrowed lexical work; caller outputs and borrowed core X storage remain alive through interrupted-call cleanup. Reconstruction specializes lp_core_solver_base.h:176-178, which directly returns X[j]; it does not implement or credit an exact optimization core or wrap the rational-pair solver. Fixed values precede index/scale reads; only unsigned -1 denotes an unmapped column, while other oversized indices reach extent guards. Missing scaled-cost mappings publish default external0 and a nil column as in source operator[]. Fixed-column and scale assertions stop debug builds at the actual source site; native fixed-column execution continues and native missing-scale execution retains the cost-copy prefix before guarding the invalid read. Six test groups cover160 independent81-240-bit rational models with positive/negative/zero costs and scales, all bound types, fixed priority and two cost flips,18 reached lookup/domain profiles, stopped/closed entries, output/core aliasing and rejection of foreign-manager numerals. Fourteen pooled/direct physical refusal campaigns through success cover flipping, scaled/unscaled signs and free/lower/upper/fixed reconstruction; direct campaigns require real refusal and all owner censuses pass. Actual older caller comparison identity survives flipping and Close. Real exact MPS parse/populate/matrix/RHS/scale/cost/value preparation preserves sticky FR: a later UP does not restore bounds. The initial MPS helper compile error and mistaken sticky-FR expectation were corrected and both final combined runs pass. New objective file98/105 statements (93.3%) native and99/105 (94.3%) debug/checked. Remaining blocks guard stable sign/destruction/small-constant paths and source-disabled assertions or the native-only invalid scale read. Combined exact input/column/MPS/preparation/presolve/objective passes8.504s native/10.958s debug/checked; related exact MPS and floating solver/presolve/primal/dual/MPS passes0.978s/1.227s. Both LP vets and both module compilation gates pass. Exact objective evaluation, concrete mpq/mpq primal/dual cores and outer optimization, factories, full upstream drivers and whole-source audits remain open. Inventory remains88 partial/16 unported/6 reference_only, with no whole-source promotion. Latest completed full native86cf064d checkpoint predates matrix preparation, presolve and this increment; focused evidence is separate."
+  },
+  "active_full_native_checkpoint": {
+    "commit": "a8a7ef66",
+    "started": "2026-10-11T14:10:26.252067+00:00",
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "./...",
+      "-count=1",
+      "-timeout=60m",
+      "-coverprofile=/mnt/oldrog/tmp/g3-exact-objective-module-native.cover"
+    ],
+    "state": "running",
+    "pid": 5,
+    "session_id": 86760,
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-exact-objective-module-native.json",
+      "/mnt/oldrog/tmp/g3-exact-objective-module-native.log",
+      "/mnt/oldrog/tmp/g3-exact-objective-module-native.cover"
+    ],
+    "coverage_scope": "Includes exact matrix/RHS preparation, presolve and objective preparation committed at a8a7ef66; completion and coverage not yet credited."
   }
 }
