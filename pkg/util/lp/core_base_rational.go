@@ -23,23 +23,24 @@ type RationalCoreInputs struct {
 // entry points; primal/dual optimization is still supplied by later layers.
 type RationalCoreSolverBase struct {
 	RationalCoreInputs
-	Status                                  Status
-	TotalIterations, IterationsNoCostGrowth uint32
-	InfSet                                  *IntSet
-	UsingInfeasCosts                        bool
-	PivotRowB1, PivotRow, W, Ed             *IndexedRationalVector
-	Y, D, ColumnNorms, SteepestEdge         *IndexedRationalVector
-	CopyXB                                  *IndexedRationalVector
-	Factorization                           *RationalLU
-	BasisSortCounter                        uint32
-	Trace                                   []uint32
-	Tracing                                 bool
-	PivotedRows                             *IntSet
-	LookForFeasibleSolutionOnly             bool
-	ColumnsNZ, RowsNZ                       []uint32
-	manager                                 *numeral.RationalManager
-	calls                                   exactEtaCalls
-	stopped, closed                         bool
+	Status                                             Status
+	TotalIterations, IterationsNoCostGrowth            uint32
+	InfSet                                             *IntSet
+	UsingInfeasCosts                                   bool
+	PivotRowB1, PivotRow, W, Ed                        *IndexedRationalVector
+	Y, D, ColumnNorms, SteepestEdge                    *IndexedRationalVector
+	CopyXB                                             *IndexedRationalVector
+	Factorization                                      *RationalLU
+	BasisSortCounter                                   uint32
+	Trace                                              []uint32
+	Tracing                                            bool
+	PivotedRows                                        *IntSet
+	LookForFeasibleSolutionOnly                        bool
+	ColumnsNZ, RowsNZ                                  []uint32
+	manager                                            *numeral.RationalManager
+	valueWork, reconstructionWork, pivotWork, costWork *IndexedRationalVector
+	calls                                              exactEtaCalls
+	stopped, closed                                    bool
 }
 
 func NewRationalCoreSolverBase(in RationalCoreInputs) (m *RationalCoreSolverBase, err error) {
@@ -77,7 +78,7 @@ func NewRationalCoreSolverBase(in RationalCoreInputs) (m *RationalCoreSolverBase
 	return m, m.InitBasisHeadingAndNonBasicColumns()
 }
 func (m *RationalCoreSolverBase) ready() error {
-	if m.closed || m.stopped || m.calls.pending() {
+	if m.closed || m.stopped || m.valueWork != nil || m.reconstructionWork != nil || m.pivotWork != nil || m.costWork != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return nil
@@ -388,6 +389,14 @@ func (m *RationalCoreSolverBase) Close() error {
 			return err
 		}
 	}
+	for _, v := range []*IndexedRationalVector{m.valueWork, m.pivotWork, m.costWork, m.reconstructionWork} {
+		if v != nil {
+			if err := v.Close(); err != nil {
+				return err
+			}
+		}
+	}
+	m.valueWork, m.pivotWork, m.costWork, m.reconstructionWork = nil, nil, nil, nil
 	if err := m.calls.cleanupRoots(m.manager); err != nil {
 		return err
 	}

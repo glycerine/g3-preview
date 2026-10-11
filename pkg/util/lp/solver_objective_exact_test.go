@@ -145,7 +145,7 @@ func TestLPRationalObjectiveSourceLookupAndFixedPrefixes(t *testing.T) {
 					if m.work == nil {
 						t.Fatal("missing native cost-copy prefix")
 					}
-					lpSparseRationalCheck(t, h, &m.work.Data[1], big.NewRat(7, 13))
+					lpSparseRationalCheck(t, h, &m.work.Data[0], big.NewRat(7, 13))
 				}
 			case "missing-maps":
 				delete(m.CoreColumnsToExternal, 0)
@@ -182,7 +182,7 @@ func TestLPRationalObjectiveSourceLookupAndFixedPrefixes(t *testing.T) {
 				if m.work == nil {
 					t.Fatal("extent check erased source product")
 				}
-				lpSparseRationalCheck(t, h, &m.work.Data[1], big.NewRat(49, 169))
+				lpSparseRationalCheck(t, h, &m.work.Data[2], big.NewRat(49, 169))
 			case "short-scale":
 				h.must(m.ColumnScale.resizeData(0))
 				err = m.ColumnValueFromCore(10, []numeral.Rational{one.X}, &out.X)

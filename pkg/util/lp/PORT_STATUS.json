@@ -1,8 +1,8 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 87.1,
-  "coverage_warning": "Full native module checkpoint86cf064d completed2026-10-11 at13:30:51UTC with exit0 across all64packages (51 with tests): LP1101.828s,21278/24433 statements (87.1%). Actual runner session13445 returned terminal exit0 and closed; no full native runner remains active. Durable status/log/profile: /mnt/oldrog/tmp/g3-exact-input-model-module-native.{json,log,cover}. Profile confirms exact column/input-model/MPS population, lar_maximize.go and lar_bound_query.go are included, while solver_prepare_exact.go is absent. Newer82df0244 exact matrix/RHS preparation retains separate passing focused/regression evidence. Coverage measures existing Go statements, not C++ completion.",
+  "native_statement_coverage_of_current_go_code": 87.2,
+  "coverage_warning": "Latest completed full native checkpoint a8a7ef66 at2026-10-11 14:28:41UTC: 21922/25129 LP statements (87.2%), LP1092.255s, all64 packages passed. Actual runner session86760 returned terminal exit0 and closed. Profile includes solver_prepare_exact.go, solver_presolve_exact.go and solver_objective_exact.go. core_base_rational.go and core_basis_rational.go are absent: newer fc5774d3 scalar rational core retains separate passing focused/regression evidence. Coverage measures existing Go statements, not C++ port completion. Current core_values/reconstruct/reduced_cost/snap_rational files and corrected objective expression owners are newer and are not credited to this profile.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -11,7 +11,8 @@
     "remaining primal constructors/diagnostics/validators, exact outer preparation, exact dual/LAR optimization, MPS source driver integration and complete upstream drivers",
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
-    "component property tests, coverage and integration audits"
+    "component property tests, coverage and integration audits",
+    "Scalar core residual/diagnostic queries, pivot and feasibility-search orchestration, exact primal/dual outer optimization, full upstream drivers and whole-source audits remain open. Audit earlier common exact preparation/presolve binary-expression temporaries against rational.h copy-on-return semantics; the objective correction does not prove those paths complete. Latest full native checkpoint a8a7ef66 predates scalar core base/values and the current objective-expression correction; focused coverage measures current Go statements only."
   ],
   "units": [
     {
@@ -1265,7 +1266,12 @@
         "pkg/util/lp/core_snap_exact_test.go",
         "pkg/util/lp/core_base_rational.go",
         "pkg/util/lp/core_basis_rational.go",
-        "pkg/util/lp/core_base_rational_test.go"
+        "pkg/util/lp/core_base_rational_test.go",
+        "pkg/util/lp/core_values_rational.go",
+        "pkg/util/lp/core_reconstruct_rational.go",
+        "pkg/util/lp/core_reduced_cost_rational.go",
+        "pkg/util/lp/core_snap_rational.go",
+        "pkg/util/lp/core_values_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1435,7 +1441,14 @@
         "TestLPRationalCoreConstructorAndDomains",
         "TestLPRationalCorePreservesOlderComparison",
         "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
-        "TestLPRationalCoreReachedMetadataGuards"
+        "TestLPRationalCoreReachedMetadataGuards",
+        "TestLPRationalCoreValuesIndependentReconstructionAndCosts",
+        "TestLPRationalCoreValuesUpdateRestoreAndLiveDelta",
+        "TestLPRationalCoreValuesSnapAndAliasedCopies",
+        "TestLPRationalCoreValuesUpstreamSolveRationalBasis",
+        "TestLPRationalCoreValuesPhysicalOwnership",
+        "TestLPRationalCoreValuesSourcePrefixesAndGuards",
+        "TestLPRationalCoreValuesPreservesOlderComparison"
       ]
     },
     {
@@ -1482,7 +1495,12 @@
         "pkg/util/lp/lar_signature_test.go",
         "pkg/util/lp/core_base_rational.go",
         "pkg/util/lp/core_basis_rational.go",
-        "pkg/util/lp/core_base_rational_test.go"
+        "pkg/util/lp/core_base_rational_test.go",
+        "pkg/util/lp/core_values_rational.go",
+        "pkg/util/lp/core_reconstruct_rational.go",
+        "pkg/util/lp/core_reduced_cost_rational.go",
+        "pkg/util/lp/core_snap_rational.go",
+        "pkg/util/lp/core_values_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1623,7 +1641,14 @@
         "TestLPRationalCoreConstructorAndDomains",
         "TestLPRationalCorePreservesOlderComparison",
         "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
-        "TestLPRationalCoreReachedMetadataGuards"
+        "TestLPRationalCoreReachedMetadataGuards",
+        "TestLPRationalCoreValuesIndependentReconstructionAndCosts",
+        "TestLPRationalCoreValuesUpdateRestoreAndLiveDelta",
+        "TestLPRationalCoreValuesSnapAndAliasedCopies",
+        "TestLPRationalCoreValuesUpstreamSolveRationalBasis",
+        "TestLPRationalCoreValuesPhysicalOwnership",
+        "TestLPRationalCoreValuesSourcePrefixesAndGuards",
+        "TestLPRationalCoreValuesPreservesOlderComparison"
       ]
     },
     {
@@ -2847,7 +2872,12 @@
         "pkg/util/lp/core_statistics_exact.go",
         "pkg/util/lp/core_statistics_exact_test.go",
         "pkg/util/lp/core_base_exact.go",
-        "pkg/util/lp/core_base_rational_test.go"
+        "pkg/util/lp/core_base_rational_test.go",
+        "pkg/util/lp/core_values_rational.go",
+        "pkg/util/lp/core_reconstruct_rational.go",
+        "pkg/util/lp/core_reduced_cost_rational.go",
+        "pkg/util/lp/core_snap_rational.go",
+        "pkg/util/lp/core_values_rational_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -2935,7 +2965,14 @@
         "TestLPRationalCoreConstructorAndDomains",
         "TestLPRationalCorePreservesOlderComparison",
         "TestLPRationalCoreComparisonRefusalAndForeignBorrow",
-        "TestLPRationalCoreReachedMetadataGuards"
+        "TestLPRationalCoreReachedMetadataGuards",
+        "TestLPRationalCoreValuesIndependentReconstructionAndCosts",
+        "TestLPRationalCoreValuesUpdateRestoreAndLiveDelta",
+        "TestLPRationalCoreValuesSnapAndAliasedCopies",
+        "TestLPRationalCoreValuesUpstreamSolveRationalBasis",
+        "TestLPRationalCoreValuesPhysicalOwnership",
+        "TestLPRationalCoreValuesSourcePrefixesAndGuards",
+        "TestLPRationalCoreValuesPreservesOlderComparison"
       ]
     },
     {
@@ -3070,7 +3107,12 @@
         "pkg/util/lp/lu_ready_float.go",
         "pkg/util/lp/lu_ready_exact.go",
         "pkg/util/lp/lu_ready_test.go",
-        "pkg/util/lp/lu_ready_failure_test.go"
+        "pkg/util/lp/lu_ready_failure_test.go",
+        "pkg/util/lp/core_values_rational.go",
+        "pkg/util/lp/core_reconstruct_rational.go",
+        "pkg/util/lp/core_reduced_cost_rational.go",
+        "pkg/util/lp/core_snap_rational.go",
+        "pkg/util/lp/core_values_rational_test.go"
       ],
       "tests": [
         "TestLPFloatLUIndependentFactorizationAndSolves",
@@ -3128,7 +3170,14 @@
         "TestLPLUPreparedSolvesToleranceAndSettings",
         "TestLPLUPreparedSolvesFailurePrefixes",
         "TestLPExactLUPreparedSolvesAllocationCensus",
-        "TestLPExactLUPreparedIndexedCallerOwnership"
+        "TestLPExactLUPreparedIndexedCallerOwnership",
+        "TestLPRationalCoreValuesIndependentReconstructionAndCosts",
+        "TestLPRationalCoreValuesUpdateRestoreAndLiveDelta",
+        "TestLPRationalCoreValuesSnapAndAliasedCopies",
+        "TestLPRationalCoreValuesUpstreamSolveRationalBasis",
+        "TestLPRationalCoreValuesPhysicalOwnership",
+        "TestLPRationalCoreValuesSourcePrefixesAndGuards",
+        "TestLPRationalCoreValuesPreservesOlderComparison"
       ]
     },
     {
@@ -4397,7 +4446,7 @@
     "profile": "/mnt/oldrog/tmp/g3-exact-objective-module-native.cover",
     "status_file": "/mnt/oldrog/tmp/g3-exact-objective-module-native.json",
     "session_id": 86760,
-    "scope_warning": "Actual runner session86760 returned terminal exit0 and closed. Profile includes solver_prepare_exact.go, solver_presolve_exact.go and solver_objective_exact.go. core_base_rational.go and core_basis_rational.go are absent: newer fc5774d3 scalar rational core retains separate passing focused/regression evidence. Coverage measures existing Go statements, not C++ port completion."
+    "scope_warning": "Actual runner session86760 returned terminal exit0 and closed. Profile includes solver_prepare_exact.go, solver_presolve_exact.go and solver_objective_exact.go. core_base_rational.go and core_basis_rational.go are absent: newer fc5774d3 scalar rational core retains separate passing focused/regression evidence. Coverage measures existing Go statements, not C++ port completion. Current core_values/reconstruct/reduced_cost/snap_rational files and corrected objective expression owners are newer and are not credited to this profile."
   },
   "full_native_checkpoint_history": [
     {
@@ -5641,5 +5690,113 @@
       }
     },
     "evidence": "The concrete scalar mpq/mpq RationalCoreSolverBase now owns rational scratch and RationalLU for retained exact primal/dual consumers. Source construction, repeated heading initialization, descending nonbasis order, basis validation, exact bounds and feasibility, FillCB, SolveYB, both SolveBd entries, basis changes/restoration/traces and row transposition are implemented. RationalLU.SolveBdFaster supplies the missing scalar indexed entry. No pair or floating optimization adapter is used. The constructor retains partial owners on errors; initialization and child-LU failures stop the core. Parent raw receipts close before LU, LU closes before scratch, and input vectors/matrix and external output numerals remain borrowed through cleanup. Reinitialization destroys the old LU before replacement, and stale LU calls reject use. Source row transposition publishes basis/heading changes before a failed matrix copy. Source native/debug assertions and append/failure prefixes remain explicit. Eight test groups cover 80 independent triangular rational systems, with 81\u2013160-bit off-diagonal coefficients, independently constructed B*d and y*B, real rational solves, factorization replacement and lazy construction. Twenty-five exact bound/type/tolerance profiles check five positions including 1e-100 violations; zero, negative, huge, infinite and NaN floating tolerances are ignored. One hundred permuted basis/trace/row-copy worlds vary both column identities and coefficients. Eleven missing constructor inputs, an ownerless matrix, 44 reached metadata/domain profiles, stopped/closed entries and source partial-publication prefixes are checked. Sixteen pooled/direct physical campaigns through success cover construction, replacement, cost copying, both solves, lazy factorization and row copying; two further campaigns cover real comparison refusal. Every direct campaign requires actual refusal and ownership censuses pass. An actual older caller comparison survives core calls and Close. A foreign-reference fixture preserves the source sign-only early return, then rejects a reached invalid backing read without adopting the borrowed numeral. The initial fixture accidentally reused locally valid numerical slot IDs; it was corrected to exercise the actual invalid-read domain rather than assuming universal provenance checks. Base coverage is 205/231 statements (88.7%) native and 219/231 (94.8%) debug/checked; basis coverage is 68/70 (97.1%) and 69/70 (98.6%); the new rational faster LU entry is 6/6 (100%) in both. Remaining gaps chiefly protect valid capture/destruction, stable extents, source-disabled debug assertions and redundant guards. Focused core checks pass 14.988s native and 24.307s debug/checked; related pair/core, exact model/presolve/objective and LU regressions pass 81.209s/137.786s. Both LP vets and native/debug full-module compilation pass. Source portcheck passes (2103 units, 677 APIs), the graph is refreshed for 64 native production packages and diff checks pass. The strengthened permuted-basis fixture passes separately in 0.016s native/0.019s debug/checked after the focused coverage runs; production code is unchanged. Full native checkpoint a8a7ef66 completed at 14:28:41 UTC with exit0 across 64 packages (51 with tests), LP1092.255s and 21922/25129 statements (87.2%). Its profile predates this core increment; core coverage remains separate focused evidence, and no full native runner is active. Scalar core reduced-cost/value/pivot orchestration, exact primal/dual optimization, outer integration and full upstream drivers remain open. Inventory stays 88 partial/16 unported/6 reference_only, without whole-source promotion."
+  },
+  "latest_rational_core_values_increment": {
+    "source": [
+      "src/util/lp/lp_core_solver_base.hpp:261-263,334-348,460-473,758-796,831-836,868-891",
+      "src/util/lp/lp_core_solver_base.h:153-155",
+      "src/util/lp/lu.h:48-57",
+      "src/util/lp/lp_solver.hpp:528-577",
+      "src/util/rational.h:449-451,480-482"
+    ],
+    "go_targets": [
+      "pkg/util/lp/core_values_rational.go",
+      "pkg/util/lp/core_reconstruct_rational.go",
+      "pkg/util/lp/core_reduced_cost_rational.go",
+      "pkg/util/lp/core_snap_rational.go",
+      "pkg/util/lp/core_values_rational_test.go",
+      "pkg/util/lp/core_base_rational.go",
+      "pkg/util/lp/solver_objective_exact.go",
+      "pkg/util/lp/solver_objective_exact_test.go"
+    ],
+    "tests": [
+      "TestLPRationalCoreValuesIndependentReconstructionAndCosts",
+      "TestLPRationalCoreValuesUpdateRestoreAndLiveDelta",
+      "TestLPRationalCoreValuesSnapAndAliasedCopies",
+      "TestLPRationalCoreValuesUpstreamSolveRationalBasis",
+      "TestLPRationalCoreValuesPhysicalOwnership",
+      "TestLPRationalCoreValuesSourcePrefixesAndGuards",
+      "TestLPRationalCoreValuesPreservesOlderComparison"
+    ],
+    "coverage": {
+      "native": {
+        "core_reconstruct_rational.go": {
+          "covered": 59,
+          "total": 65,
+          "percent": 90.8
+        },
+        "core_reduced_cost_rational.go": {
+          "covered": 52,
+          "total": 57,
+          "percent": 91.2
+        },
+        "core_snap_rational.go": {
+          "covered": 34,
+          "total": 37,
+          "percent": 91.9
+        },
+        "core_values_rational.go": {
+          "covered": 96,
+          "total": 113,
+          "percent": 85.0
+        },
+        "solver_objective_exact.go": {
+          "covered": 98,
+          "total": 107,
+          "percent": 91.6
+        }
+      },
+      "debug": {
+        "core_reconstruct_rational.go": {
+          "covered": 59,
+          "total": 65,
+          "percent": 90.8
+        },
+        "core_reduced_cost_rational.go": {
+          "covered": 52,
+          "total": 57,
+          "percent": 91.2
+        },
+        "core_snap_rational.go": {
+          "covered": 34,
+          "total": 37,
+          "percent": 91.9
+        },
+        "core_values_rational.go": {
+          "covered": 97,
+          "total": 113,
+          "percent": 85.8
+        },
+        "solver_objective_exact.go": {
+          "covered": 99,
+          "total": 107,
+          "percent": 92.5
+        }
+      }
+    },
+    "focused_seconds": {
+      "native": 3.264,
+      "debug_checked": 3.739
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-rational-core-values-native.cover",
+      "/mnt/oldrog/tmp/g3-rational-core-values-debug.cover"
+    ],
+    "evidence": "Concrete scalar mpq/mpq core value updates/restoration, descending RHS reconstruction, precise LU solve, reduced costs, deterministic bound/free snapping, precise indexed residual bypass and ascending objective dot product now implement the retained source methods. UpdateX keeps delta a live reference and precise updates never populate CopyXB. Reconstruction uses the real RationalLU and publishes descending basic assignments, without floating refinement. Reduced costs skip zero Y before row reads. Source rational binary expressions copy the left operand and copy the compound-result reference on return; core products and corrected outer objective products/sums preserve these owners and physical failure prefixes. Parent raw receipts close before LU, LU before borrowed work, and temporary owners before parent roots. Seven test groups cover 100 independent triangular systems with 81-180-bit costs and independent RHS, transpose solve, reduced-cost and objective oracles; 360 update/restore worlds across LU/tableau traversal and live aliases; all source column types and unknown default; output aliasing and descending aliased copies; 27 reached domain profiles; stopped/closed calls and actual older comparison identity. Twenty-two pooled/direct physical campaigns run through success, require actual refusal for every direct campaign and pass ownership census. The literal upstream solve_rational fixture reconstructs a supplied known basis and checks objective24 using independent primal/dual certificates: no optimization search or complete upstream-driver credit. The initial reduced-cost guard fixture marked all columns basic; making the next column nonbasic corrects its expected reached cost read. Inventory remains 88 partial/16 unported/6 reference_only; no whole-source promotion.",
+    "remaining_work": "Scalar core residual/diagnostic queries, pivot and feasibility-search orchestration, exact primal/dual outer optimization, full upstream drivers and whole-source audits remain open. Audit earlier common exact preparation/presolve binary-expression temporaries against rational.h copy-on-return semantics; the objective correction does not prove those paths complete. Latest full native checkpoint a8a7ef66 predates scalar core base/values and the current objective-expression correction; focused coverage measures current Go statements only.",
+    "related_regression_seconds": {
+      "native": 74.054,
+      "debug_checked": 117.032
+    },
+    "related_regression_pattern": "TestLP(RationalCore|Rational(Input|Column|Prepar|Presolve|Objective)|PairCore|RationalLU)",
+    "validation": {
+      "native_lp_vet": "pass",
+      "debug_checked_lp_vet": "pass",
+      "native_module_compile": "pass",
+      "debug_checked_module_compile": "pass",
+      "diff_check": "pass",
+      "source_portcheck": "pass: 2103 units, 677 APIs",
+      "dependency_graph": "refreshed: 64 native production packages"
+    }
   }
 }

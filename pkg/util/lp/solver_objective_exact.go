@@ -60,7 +60,7 @@ func (m *RationalLPSolver) SetScaledCost(j uint32) (err error) {
 	if c == nil {
 		return ErrBounds
 	}
-	m.work = NewIndexedRationalVector(m.manager, 2)
+	m.work = NewIndexedRationalVector(m.manager, 3)
 	if err = c.GetCost(&m.work.Data[0]); err != nil {
 		return err
 	}
@@ -78,20 +78,16 @@ func (m *RationalLPSolver) SetScaledCost(j uint32) (err error) {
 			return err
 		}
 	}
-	// rational operator* copies its left operand before the multiplication.
-	if err = m.work.copySlot(&m.work.Data[1], &m.work.Data[0]); err != nil {
-		return err
-	}
 	if uint64(j) >= uint64(len(m.ColumnScale.Data)) {
 		return ErrBounds
 	}
-	if err = m.presolveMultiply(&m.work.Data[1], &m.ColumnScale.Data[j], &m.work.Data[1]); err != nil {
+	if err = m.objectiveProduct(&m.work.Data[1], &m.work.Data[2], &m.work.Data[0], &m.ColumnScale.Data[j]); err != nil {
 		return err
 	}
 	if m.Costs == nil || uint64(j) >= uint64(len(m.Costs.Data)) {
 		return ErrBounds
 	}
-	if err = m.Costs.copySlot(&m.Costs.Data[j], &m.work.Data[1]); err != nil {
+	if err = m.Costs.copySlot(&m.Costs.Data[j], &m.work.Data[2]); err != nil {
 		return err
 	}
 	return m.finishPreparationWork()
@@ -125,45 +121,55 @@ func (m *RationalLPSolver) ColumnValueFromCore(column uint32, coreX []numeral.Ra
 	if uint64(j) >= uint64(len(coreX)) || m.ColumnScale == nil || uint64(j) >= uint64(len(m.ColumnScale.Data)) {
 		return ErrBounds
 	}
-	m.work = NewIndexedRationalVector(m.manager, 4)
+	m.work = NewIndexedRationalVector(m.manager, 6)
 	w := m.work
-	if err = w.copySlot(&w.Data[0], &coreX[j]); err != nil {
+	if err = m.objectiveProduct(&w.Data[0], &w.Data[1], &coreX[j], &m.ColumnScale.Data[j]); err != nil {
 		return err
 	}
-	if err = m.presolveMultiply(&w.Data[0], &m.ColumnScale.Data[j], &w.Data[0]); err != nil {
-		return err
-	}
-	value := &w.Data[0]
+	value := &w.Data[1]
 	if !c.IsFree() {
 		if !c.IsFlipped() {
-			if err = c.GetLowBound(&w.Data[1]); err != nil {
+			if err = c.GetLowBound(&w.Data[2]); err != nil {
 				return err
 			}
-			if err = w.copySlot(&w.Data[2], value); err != nil {
-				return err
-			}
-			value = &w.Data[2]
 		} else {
-			if err = w.copySlot(&w.Data[2], value); err != nil {
+			if err = w.copySlot(&w.Data[3], value); err != nil {
 				return err
 			}
-			if err = m.presolveNegate(&w.Data[2]); err != nil {
-				return err
-			}
-			if err = c.GetUpperBound(&w.Data[1]); err != nil {
-				return err
-			}
-			if err = w.copySlot(&w.Data[3], &w.Data[2]); err != nil {
+			if err = m.presolveNegate(&w.Data[3]); err != nil {
 				return err
 			}
 			value = &w.Data[3]
+			if err = c.GetUpperBound(&w.Data[2]); err != nil {
+				return err
+			}
 		}
-		if err = m.presolveAdd(value, &w.Data[1], value); err != nil {
+		if err = m.objectiveSum(&w.Data[4], &w.Data[5], value, &w.Data[2]); err != nil {
 			return err
 		}
+		value = &w.Data[5]
 	}
 	if err = m.copyValue(out, value); err != nil {
 		return err
 	}
 	return m.finishPreparationWork()
+}
+
+// Source rational binary expressions return a copy of the compound result
+// reference. Capture these concrete calls without enclosing child getters.
+func (m *RationalLPSolver) objectiveProduct(tmp, out, left, right *numeral.Rational) (err error) {
+	before, e := m.calls.begin(m.manager)
+	if e != nil {
+		return e
+	}
+	err = etaRationalProduct(m.manager, tmp, out, left, right)
+	return m.calls.after(m.manager, before, err)
+}
+func (m *RationalLPSolver) objectiveSum(tmp, out, left, right *numeral.Rational) (err error) {
+	before, e := m.calls.begin(m.manager)
+	if e != nil {
+		return e
+	}
+	err = etaRationalSum(m.manager, tmp, out, left, right)
+	return m.calls.after(m.manager, before, err)
 }
