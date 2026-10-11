@@ -1187,6 +1187,7 @@
         "core_residual_exact.go",
         "core_statistics_float.go",
         "core_tableau_exact.go",
+        "core_update_exact.go",
         "core_update_float.go",
         "core_values_exact.go",
         "core_values_float.go",

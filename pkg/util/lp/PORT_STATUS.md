@@ -10,14 +10,18 @@ primal and dual cores expose Solve, and outer LU primal/dual integration is impl
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
 
-Latest full native module checkpoint was observed complete at03:52UTC on
-October11 with exit status0 and all64packages passing: LP979.695s,
-88.2% (16034/18173). Log/profile:
+Latest full native LP checkpoint was observed complete at05:02UTC on
+October11 with exit status0:1014.552s,88.3% (16878/19111). Log/profile:
+`/mnt/oldrog/tmp/g3-init-lp-native.{log,cover}`. Started04:45UTC with
+`-timeout=60m`; the profile includes exact cost switching and InitRun and
+predates same-column advancement and the subsequent core basis-update work.
+Coverage measures existing Go code, not unported C++ functionality.
+
+The preceding04:34UTC module attempt passed its other package checks but LP
+hit the default10-minute timeout; its partial LP coverage is not credited.
+The previous complete native module checkpoint remains03:52UTC, all64packages
+passing, LP979.695s,88.2% (16034/18173), started03:33UTC at0d330f87:
 `/mnt/oldrog/tmp/g3-breakpoint-module-native.{log,cover}`.
-The run started03:33UTC at0d330f87 and covers exact bound-step, Harris epsilon,
-basis dispatch and breakpoint record/slope additions. It predates the collector
-and traversal additions, which have separate focused checks. Coverage measures
-existing Go code, not unported C++ functionality.
 
 Known source limitation: post-pop cleanup declares an empty local changed-cost
 set, while basic-value updates record changes in a different member set. With
@@ -537,7 +541,7 @@ Tests pass240 independent rational matrix/bound/state worlds with all five colum
 
 The new file26/28 statements (92.9%) native and combined debug/checked. Two gaps protect capture after ready and valid inline-zero member assignment. Focused5.056s/7.535s and previous cost/row-recomputation regressions7.209s/10.019s pass. Both LP vets, module-wide compilation in both profiles and source-ledger verification pass. Profiles: `/mnt/oldrog/tmp/g3-init-run-{native,debug}.cover`. Inventory remains84 partial/26 unported; exact advancement and complete precise Solve remain incomplete. Production graph edges are unchanged.
 
-Full-test correction: the04:34UTC native module run exited1 because LP reached Go's default10-minute timeout during TestLPExactLUAllocationFailureCensus (dense direct pair column profile), with no earlier failing assertion reported. The previous successful LP run took979.695s, so that timeout was insufficient. Other module package results are retained in `/mnt/oldrog/tmp/g3-reduced-module-native.log`; its incomplete LP coverage is not credited. A full LP retry started04:45UTC with `-timeout=60m`, including the cost-switch and InitRun additions: `/mnt/oldrog/tmp/g3-init-lp-native.{log,cover}`. Its completion has not yet been observed; the latest successful full native coverage remains the03:52UTC checkpoint.
+Full-test correction: the04:34UTC native module run exited1 because LP reached Go's default10-minute timeout during TestLPExactLUAllocationFailureCensus (dense direct pair column profile), with no earlier failing assertion reported. The previous successful LP run took979.695s, so that timeout was insufficient. Other module package results are retained in `/mnt/oldrog/tmp/g3-reduced-module-native.log`; its incomplete LP coverage is not credited. A full LP retry started04:45UTC with `-timeout=60m`, including the cost-switch and InitRun additions: `/mnt/oldrog/tmp/g3-init-lp-native.{log,cover}`. It subsequently passed at05:02UTC with exit0:1014.552s,88.3% (16878/19111); it predates same-column advancement and the core basis-update addition.
 
 ### Exact same-column advancement — 2026-10-11
 
@@ -545,4 +549,14 @@ AdvanceOnEnteringEqualLeaving now executes the precise source path: debug full r
 
 Tests pass200 independent rational/epsilon matrix and bound worlds with all cost-mode/feasibility-only combinations, signed and zero directions, actual nonunit LU column solves, independently computed updates/costs/reduced costs and source stored-membership behavior. Three live step aliases (entering and both basic values) prove expression snapshot behavior. Eight pooled/direct physical campaigns run through success; positive/negative and cost-switch direct campaigns explicitly reach stopped child receipts while the advancement pair remains borrowed and scalar constructor temporaries are gone. Two older-caller comparison profiles preserve their generations through solver/fixture cleanup, allowing successful inline work. Residual stdout, nil/negative indices, cost-zero assertions, changed-index/late-bound failures and tableau native/debug dispatch prefixes pass. Feasibility-only success retains the prior iteration counter; a later failure also retains it.
 
-The new file45/62 statements (72.6%) native and56/62 (90.3%) combined debug/checked. Twelve native gaps are the disabled source debug assertion blocks. Five common gaps guard capture after ready, inline sign initialization, valid scalar/pair destruction and the precise indexed-check error; debug adds a valid cost-zero read error guard. Focused1.694s native/2.863s debug; preceding value/reconstruction/initialization/cost-switch regressions14.430s/22.193s pass. Both LP vets, module-wide compilation in both profiles and source-ledger verification pass. Profiles: `/mnt/oldrog/tmp/g3-advance-equal-{native,debug}.cover`. The04:45UTC full LP retry remains running and predates this advancement addition; no new full native coverage is credited. Inventory remains84 partial/26 unported. Different-column advancement, full basis/value integration and complete precise Solve remain incomplete. Production graph edges are unchanged.
+The new file45/62 statements (72.6%) native and56/62 (90.3%) combined debug/checked. Twelve native gaps are the disabled source debug assertion blocks. Five common gaps guard capture after ready, inline sign initialization, valid scalar/pair destruction and the precise indexed-check error; debug adds a valid cost-zero read error guard. Focused1.694s native/2.863s debug; preceding value/reconstruction/initialization/cost-switch regressions14.430s/22.193s pass. Both LP vets, module-wide compilation in both profiles and source-ledger verification pass. Profiles: `/mnt/oldrog/tmp/g3-advance-equal-{native,debug}.cover`. The04:45UTC full LP retry subsequently passed at05:02UTC (1014.552s,88.3%) and predates this advancement addition; the new helper has separate focused checks. Inventory remains84 partial/26 unported. Different-column advancement, full basis/value integration and complete precise Solve remain incomplete. Production graph edges are unchanged.
+
+### Exact basis/value update and rollback — 2026-10-11
+
+The precise core now implements InitLU, RestoreBasisChange, RestoreXAndRefactor and UpdateBasisAndX. Nonzero steps publish value updates before LU replacement/refactor and metadata changes; zero steps still exchange the basis. Successful incremental replacement uses the actual prepared W and pivot-row coefficient. Forced or degenerate replacement changes the basis before rebuilding LU. Exact mode always rolls back a degenerate new basis, including feasibility-only mode; the floating-only early exit and residual-repair branch are not introduced. Restoration uses stored CopyXB and the source metadata early return, cancels inverse trace pairs, rebuilds the old LU and preserves residual diagnostics, writer/error prefixes, status and iteration order.
+
+Tests pass120 independent rational/epsilon systems with permuted nonunit bases, dense/sparse factors, zero/nonzero steps and independently constructed incoming columns B*d. They check actual replacement versus forced refactor, basis/headings/nonbasic positions and trace, exact X updates and an independent new-LU solve. Eight singular rollback profiles cover both feasibility modes, forced/incremental attempts and zero/nonzero steps with real supplied backups. Two additional profiles prove the source empty-backup limitation: only indexed basic values restore to stored zeros, the residual is printed and FLOATING_POINT_ERROR returns before the iteration increment. Direct restore tests cover an actually degenerate old basis, RHS residuals, debug writer refusal and stored-backup behavior. Reached metadata guards verify value updates before missing LU, LU replacement before a partial metadata failure, and metadata failure before forced refactor. Eight pooled/direct physical campaigns and four older-caller comparison profiles pass with separate core/LU ownership and complete root census.
+
+New file77/83 statements (92.8%) native and81/83 (97.6%) combined debug/checked. Five native gaps are disabled source debug residual-assertion statements; the remaining common gap guards a valid input's IsZero read. Debug also leaves the assertion failure after an already successful restoration residual check uncovered. Focused1.473s native/2.332s debug. Previous value/reconstruction/same-column advancement checks6.512s/10.906s and basis/pivot regressions1.453s/1.397s pass. Both LP vets, module-wide compilation in both profiles and source-ledger verification pass. Profiles: `/mnt/oldrog/tmp/g3-core-update-{native,debug}.cover`. Source inventory remains84 partial/26 unported. Different-column advancement, pivot consistency comparison and complete precise Solve remain incomplete. Production graph edges are unchanged.
+
+Full native LP checkpoint observed05:02UTC passed1014.552s with88.3% (16878/19111). Its source profile includes cost switching and InitRun and excludes same-column advancement and this core basis-update file; those later additions have focused checks. No full test process remains running from that checkpoint.

@@ -121737,7 +121737,8 @@
         "pkg/util/lp/core_residual_exact.go",
         "pkg/util/lp/core_residual_exact_test.go",
         "pkg/util/lp/core_reconstruct_exact.go",
-        "pkg/util/lp/core_reconstruct_exact_test.go"
+        "pkg/util/lp/core_reconstruct_exact_test.go",
+        "pkg/util/lp/core_update_exact.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -121854,7 +121855,14 @@
         "TestLPPairCoreReconstructGuardsAndPrefixes",
         "TestLPPairCoreReconstructPhysicalOwnership",
         "TestLPPairCoreReconstructStoppedLUKeepsRHS",
-        "TestLPPairCoreReconstructPreservesOlderComparisonOwner"
+        "TestLPPairCoreReconstructPreservesOlderComparisonOwner",
+        "TestLPPairCoreUpdateIndependentSystems",
+        "TestLPPairCoreUpdateSingularRollback",
+        "TestLPPairCoreUpdatePhysicalOwnership",
+        "TestLPPairCoreRestoreSourceDiagnostics",
+        "TestLPPairCoreUpdateRollbackStoredBackup",
+        "TestLPPairCoreUpdateReachedGuards",
+        "TestLPPairCoreUpdateOlderComparison"
       ],
       "assertions": [
         {
@@ -122210,6 +122218,20 @@
             "TestLPPairCoreReconstructStoppedLUKeepsRHS",
             "TestLPPairCoreReconstructPreservesOlderComparisonOwner"
           ]
+        },
+        {
+          "name": "retained exact restore_basis_change: nonbasic entering early return before leaving access, unconditional inverse exchange and trace cancellation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_update_exact.go",
+          "tests": [
+            "TestLPPairCoreUpdateIndependentSystems",
+            "TestLPPairCoreUpdateSingularRollback",
+            "TestLPPairCoreUpdatePhysicalOwnership",
+            "TestLPPairCoreRestoreSourceDiagnostics",
+            "TestLPPairCoreUpdateRollbackStoredBackup",
+            "TestLPPairCoreUpdateReachedGuards",
+            "TestLPPairCoreUpdateOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -122274,7 +122296,8 @@
         "pkg/util/lp/core_residual_exact_test.go",
         "pkg/util/lp/core_reconstruct_exact.go",
         "pkg/util/lp/core_reconstruct_exact_test.go",
-        "pkg/util/lp/core_reduced_cost_exact.go"
+        "pkg/util/lp/core_reduced_cost_exact.go",
+        "pkg/util/lp/core_update_exact.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122381,7 +122404,14 @@
         "TestLPPairReducedCostLiveAliases",
         "TestLPPairReducedCostPhysicalOwnership",
         "TestLPPairReducedCostLeavesOlderComparisonOwned",
-        "TestLPPairReducedCostReachedGuardsAndPrefixes"
+        "TestLPPairReducedCostReachedGuardsAndPrefixes",
+        "TestLPPairCoreUpdateIndependentSystems",
+        "TestLPPairCoreUpdateSingularRollback",
+        "TestLPPairCoreUpdatePhysicalOwnership",
+        "TestLPPairCoreRestoreSourceDiagnostics",
+        "TestLPPairCoreUpdateRollbackStoredBackup",
+        "TestLPPairCoreUpdateReachedGuards",
+        "TestLPPairCoreUpdateOlderComparison"
       ],
       "conditionals": [
         {
@@ -122818,6 +122848,20 @@
             "TestLPPairReducedCostPhysicalOwnership",
             "TestLPPairReducedCostLeavesOlderComparisonOwned",
             "TestLPPairReducedCostReachedGuardsAndPrefixes"
+          ]
+        },
+        {
+          "name": "retained exact update_basis_and_x, restore_x_and_refactor and init_lu: precise value update, LU replacement/refactor and unconditional exact rollback including feasibility-only; source stored CopyXB and diagnostics/status/counter prefixes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_update_exact.go",
+          "tests": [
+            "TestLPPairCoreUpdateIndependentSystems",
+            "TestLPPairCoreUpdateSingularRollback",
+            "TestLPPairCoreUpdatePhysicalOwnership",
+            "TestLPPairCoreRestoreSourceDiagnostics",
+            "TestLPPairCoreUpdateRollbackStoredBackup",
+            "TestLPPairCoreUpdateReachedGuards",
+            "TestLPPairCoreUpdateOlderComparison"
           ]
         }
       ],
