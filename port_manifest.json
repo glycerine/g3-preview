@@ -123981,7 +123981,9 @@
         "pkg/util/lp/primal_init_tableau_exact.go",
         "pkg/util/lp/primal_init_tableau_exact_test.go",
         "pkg/util/lp/primal_price_rows_exact.go",
-        "pkg/util/lp/primal_price_rows_exact_test.go"
+        "pkg/util/lp/primal_price_rows_exact_test.go",
+        "pkg/util/lp/primal_iteration_rows_exact.go",
+        "pkg/util/lp/primal_iteration_rows_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124122,7 +124124,16 @@
         "TestLPExactRowPricingPhysicalOwnership",
         "TestLPExactRowPricingReachedPrefixes",
         "TestLPExactRowPricingPreservesOlderComparison",
-        "TestLPExactRowPredicatesReachedShortCircuits"
+        "TestLPExactRowPredicatesReachedShortCircuits",
+        "TestLPExactRowIterationIndependentFeasibleModels",
+        "TestLPExactRowIterationTwoStepInfeasibility",
+        "TestLPExactRowIterationRepetitionThreshold",
+        "TestLPExactRowIterationPhysicalOwnership",
+        "TestLPExactRowIterationReachedPrefixes",
+        "TestLPExactRowAdvanceReachedPrefixes",
+        "TestLPExactRowIterationPreservesOlderComparison",
+        "TestLPExactRowIterationPermutedBasisAndMinimumLeaving",
+        "TestLPExactRowIterationThresholdAffectsCurrentSelection"
       ],
       "conditionals": [
         {
@@ -124608,6 +124619,22 @@
             "TestLPExactRowPricingPreservesOlderComparison",
             "TestLPExactRowPredicatesReachedShortCircuits"
           ]
+        },
+        {
+          "name": "advance_on_entering_and_leaving_tableau_rows and one_iteration_tableau_rows source446-449,483-511: minimum infeasible leaving column, source repetition threshold/wrap, actual row selector, owned theta expression, ignored pivot result, post-basis entering membership, leaving-bound assertion and status publication",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_iteration_rows_exact.go",
+          "tests": [
+            "TestLPExactRowIterationIndependentFeasibleModels",
+            "TestLPExactRowIterationTwoStepInfeasibility",
+            "TestLPExactRowIterationRepetitionThreshold",
+            "TestLPExactRowIterationPhysicalOwnership",
+            "TestLPExactRowIterationReachedPrefixes",
+            "TestLPExactRowAdvanceReachedPrefixes",
+            "TestLPExactRowIterationPreservesOlderComparison",
+            "TestLPExactRowIterationPermutedBasisAndMinimumLeaving",
+            "TestLPExactRowIterationThresholdAffectsCurrentSelection"
+          ]
         }
       ],
       "ownership": [
@@ -124619,7 +124646,8 @@
         "Precise bound-step expressions own separate pair result and rational parameter scratch through failed arithmetic/assignment. Primal Close cleans newly captured raw invocations before pair-result and rational scratch, retaining caller-owned outputs and older caller comparisons. LimitTheta publishes unlimited=false only after complete output assignment; rejected bound flips still publish their step. Leaving selection delegates feasibility/bound comparisons without adopting base receipts and preserves infeasibility-set iteration state. Full precise ratio/breakpoint/advance/Solve remains incomplete.",
         "Exact breakpoint collection retains difference/ratio and entering-span pair locals with the primal across record construction and queue enqueue. Scalar captures end before queue numerical work, so queue comparison receipts remain separate. Failure retains partial records and scratch for Close; older caller comparisons are preserved.",
         "Owned traversal slope survives queue dequeues and nested slope/threshold expressions. Parent numerical capture ends before queue calls; queue comparison receipts remain separate. Failed dequeue preserves the source queue prefix and all records; failed output assignment retains traversal slope for Close. Older caller comparison generations are preserved. Debug exact wrapper rejects precise()==false before collection, matching source assertion.",
-        "Precise leaving scan owns full -ed*direction expression separately from the by-value basis multiplier, keeping it alive through delegated bound helpers. A distinct ratio local survives repeated row calculations and rejected entering bound flips. Each child retains its own numerical receipts; primal Close cleans raw invocations before all expression/ratio locals. Candidate and output failure prefixes, live input/output alias rereads and older caller comparisons are retained."
+        "Precise leaving scan owns full -ed*direction expression separately from the by-value basis multiplier, keeping it alive through delegated bound helpers. A distinct ratio local survives repeated row calculations and rejected entering bound flips. Each child retains its own numerical receipts; primal Close cleans raw invocations before all expression/ratio locals. Candidate and output failure prefixes, live input/output alias rereads and older caller comparisons are retained.",
+        "Row iteration bound/coefficient/theta locals are excluded from child ready guards and retained through stopped child borrows. Arithmetic difference temporary and raw receipts unwind before base children; base Close destroys child numerical receipts and scratch before theta, coefficient and bound locals. Only owning row-iteration entry rejects preexisting locals. Caller-owned theta in direct advancement remains borrowed."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
@@ -124634,7 +124662,8 @@
         "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard.",
         "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
         "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial.",
-        "Row pricing uses typed pointer choices over stable stored row cells and native slices. Equal-damage candidates with a shorter column are appended without dropping earlier longer candidates, preserving source RNG and selection. Bland mode copies each new minimum coefficient immediately and rereads later cells through output aliases. 480 independent selection/damage/RNG models,300 rational/epsilon monoid models,200 infeasible grow models, live alias, reached metadata and pooled/direct physical failures with older caller comparisons. Uncalled sign-row eligibility and inf_sign_of_column helpers are not ported. Row iteration and full exact Solve remain open; whole source unit stays partial."
+        "Row pricing uses typed pointer choices over stable stored row cells and native slices. Equal-damage candidates with a shorter column are appended without dropping earlier longer candidates, preserving source RNG and selection. Bland mode copies each new minimum coefficient immediately and rereads later cells through output aliases. 480 independent selection/damage/RNG models,300 rational/epsilon monoid models,200 infeasible grow models, live alias, reached metadata and pooled/direct physical failures with older caller comparisons. Uncalled sign-row eligibility and inf_sign_of_column helpers are not ported. Row iteration and full exact Solve remain open; whole source unit stays partial.",
+        "Exact row iteration preserves source repetition count increment before strict threshold comparison, unsigned wrap, and lack of outer loop counter increments. It refreshes entering infeasibility only after ChangeBasis; source can pivot into an infeasible entering bound and discover infeasibility on the next iteration. 320 independent rational/epsilon feasible pivots and120 independently infeasible two-step models, threshold profiles, reached prefixes, pooled/direct physical arithmetic failures and older caller comparison cleanup. Whole exact Solve and source unit remain partial."
       ]
     },
     {

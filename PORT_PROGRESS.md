@@ -38636,3 +38636,46 @@ source-debug-only native checks, scalar sign/capture errors and metadata/default
 branches protected by earlier debug feasibility checks. Profiles:
 /mnt/oldrog/tmp/g3-row-price-{native,debug}-focused.cover. Go coverage does not
 measure unported C++ implementation or establish whole-source completion.
+
+## Exact tableau row iteration and post-pivot membership
+
+Ported one_iteration_tableau_rows and advance_on_entering_and_leaving_tableau_rows
+from lp_primal_core_solver.h:446-449,483-511. The minimum infeasible-column scan
+produces an owned bound before repetition tracking. Repeated leaving columns
+increment unsigned history before the strict threshold test; crossing the threshold
+activates Bland selection in this same iteration. The heading maps the leaving
+column to its stored row. Theta is the owned exact (old X - copied bound)/copied
+coefficient, with the subtraction temporary destroyed before child advancement.
+The source ignores the pivot bool, publishes the basis, and only then refreshes
+entering membership. Debug checks the leaving value against the copied bound.
+Row iteration does not increment or reset outer loop counters.
+
+Bound/coefficient/theta locals remain alive through stopped child borrows.
+Owning row iteration rejects preexisting locals; child ready checks permit those
+arguments. Close destroys primal expression receipts and base child receipts/scratch
+before theta/coefficient/bound locals in reverse construction order. Direct
+advancement keeps caller theta borrowed.
+
+Verification:320 independent rational/epsilon feasible pivots followed by stable
+terminal iterations;120 independently infeasible systems requiring a pivot into an
+infeasible entering bound and a second no-entering iteration;80 two-row models
+with permuted basis, reversed InfSet storage order and heading dispatch; five
+threshold/equality/wrap/already-Bland profiles and a two-candidate test proving
+threshold switching affects current selection without RNG consumption. Ten owner
+prefix profiles and six direct advancement prefixes verify locals, history and
+post-basis error order. Ten pooled/direct physical campaigns cover bound copies,
+large theta arithmetic/coefficient division, entering-bound refresh and inline
+minimum integer negation. Two actual older caller comparisons remain owned
+through operation and destruction. No source algorithm was narrowed.
+
+Focused native66.045s/debug146.332s with statement coverage69/88 (78.4%) native
+and78/88 (88.6%) debug in primal_iteration_rows_exact.go. Native excludes debug
+equality checks. Remaining debug gaps guard local/temporary destruction,
+arithmetic capture entry and already-reached metadata, or final equality
+error/mismatch after a successful exact clamp. Additional permuted-basis/threshold
+checks separately pass native0.023s/debug0.033s. Profiles:
+/mnt/oldrog/tmp/g3-row-iteration-{native,debug}.cover. Both LP vets, native/debug
+module compilation, portcheck and diff checks pass. Coverage measures existing
+Go statements, not C++ port completion. LP remains84partial/26unported units;
+exact Solve orchestration remains open. Latest full native module checkpoint is
+the06:58UTC run at16f0b947, predating subsequent initialization/row work.

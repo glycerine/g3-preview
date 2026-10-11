@@ -1599,7 +1599,9 @@
         "pkg/util/lp/primal_init_tableau_exact.go",
         "pkg/util/lp/primal_init_tableau_exact_test.go",
         "pkg/util/lp/primal_price_rows_exact.go",
-        "pkg/util/lp/primal_price_rows_exact_test.go"
+        "pkg/util/lp/primal_price_rows_exact_test.go",
+        "pkg/util/lp/primal_iteration_rows_exact.go",
+        "pkg/util/lp/primal_iteration_rows_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -1740,7 +1742,16 @@
         "TestLPExactRowPricingPhysicalOwnership",
         "TestLPExactRowPricingReachedPrefixes",
         "TestLPExactRowPricingPreservesOlderComparison",
-        "TestLPExactRowPredicatesReachedShortCircuits"
+        "TestLPExactRowPredicatesReachedShortCircuits",
+        "TestLPExactRowIterationIndependentFeasibleModels",
+        "TestLPExactRowIterationTwoStepInfeasibility",
+        "TestLPExactRowIterationRepetitionThreshold",
+        "TestLPExactRowIterationPhysicalOwnership",
+        "TestLPExactRowIterationReachedPrefixes",
+        "TestLPExactRowAdvanceReachedPrefixes",
+        "TestLPExactRowIterationPreservesOlderComparison",
+        "TestLPExactRowIterationPermutedBasisAndMinimumLeaving",
+        "TestLPExactRowIterationThresholdAffectsCurrentSelection"
       ]
     },
     {

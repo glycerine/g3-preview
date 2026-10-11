@@ -40,7 +40,11 @@ type PairPrimalCoreSolver struct {
 	// Tableau bound-flip expression remains live through primal child calls.
 	// Only its owning advancement entry checks it; errors stop the owner.
 	tableauDelta *IndexedPairVector
-	stopped      bool
+	// Row iteration automatic values remain borrowed through child updates.
+	rowIterationBound       *IndexedPairVector
+	rowIterationCoefficient *IndexedRationalVector
+	rowIterationTheta       *IndexedPairVector
+	stopped                 bool
 }
 
 func NewPairPrimalCoreSolver(in PairCoreInputs) (m *PairPrimalCoreSolver, err error) {
@@ -270,5 +274,9 @@ func (m *PairPrimalCoreSolver) Close() error {
 		}
 		m.enteringStep = nil
 	}
+	if err := m.closeRowIterationLocals(); err != nil {
+		return err
+	}
+
 	return nil
 }
