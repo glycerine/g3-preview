@@ -122635,7 +122635,9 @@
         "pkg/util/lp/core_feasibility_rational_test.go",
         "pkg/util/lp/core_pivot_compare_rational.go",
         "pkg/util/lp/core_tableau_rational.go",
-        "pkg/util/lp/core_tableau_rational_test.go"
+        "pkg/util/lp/core_tableau_rational_test.go",
+        "pkg/util/lp/core_basis_tableau_rational.go",
+        "pkg/util/lp/primal_init_tableau_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122845,7 +122847,15 @@
         "TestLPRationalTableauMetadataAndStoppedGuards",
         "TestLPRationalTableauPhysicalFailureOwnership",
         "TestLPRationalTableauStoppedMatrixBeforeNormalization",
-        "TestLPRationalTableauPreservesOlderComparison"
+        "TestLPRationalTableauPreservesOlderComparison",
+        "TestLPRationalInitTableauIndependentStateModels",
+        "TestLPRationalTableauBasisIndependentSingletonModels",
+        "TestLPRationalTableauBasisRowIdentityIsNotChecked",
+        "TestLPRationalInitTableauReachedPrefixes",
+        "TestLPRationalInitTableauPhysicalOwnership",
+        "TestLPRationalTableauBasisReachedMetadata",
+        "TestLPRationalInitTableauRowsFailurePrefixes",
+        "TestLPRationalInitTableauPreservesOlderComparison"
       ],
       "assertions": [
         {
@@ -123379,6 +123389,24 @@
             "TestLPRationalTableauStoppedMatrixBeforeNormalization",
             "TestLPRationalTableauPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "Concrete scalar mpq/mpq singleton/unit basis-column tableau pivot predicate preserving source row-identity behavior",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/core_basis_tableau_rational.go",
+            "pkg/util/lp/primal_init_tableau_rational_test.go"
+          ],
+          "tests": [
+            "TestLPRationalInitTableauIndependentStateModels",
+            "TestLPRationalTableauBasisIndependentSingletonModels",
+            "TestLPRationalTableauBasisRowIdentityIsNotChecked",
+            "TestLPRationalInitTableauReachedPrefixes",
+            "TestLPRationalInitTableauPhysicalOwnership",
+            "TestLPRationalTableauBasisReachedMetadata",
+            "TestLPRationalInitTableauRowsFailurePrefixes",
+            "TestLPRationalInitTableauPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -123397,7 +123425,8 @@
         "Residual dot products and LU reconstruction are delegated outside core numeral captures. Core-owned row residual/scalar scratch and RHS vectors survive child failures; the LU is destroyed before its borrowed reconstruction RHS. Matrix and LU numerical receipts stay separate from the core. Reverse row/basis publication, live output aliases, stale factorization residuals, diagnostic recomputation and older caller comparisons are preserved. Exact reconstruction uses one solve and does not import floating refinement work.",
         "No additional outer-solve or snap owners. Actual exact pair assignment and reconstruction retain interrupted arithmetic in existing primal/core owners; stopped retries and older caller comparison identity are verified through Close with pooled/direct physical refusal campaigns.",
         "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization.",
-        "Scalar row normalization uses direct compound division on RHS before coefficients and final pivot-one assignment. Reduced-cost updates retain copied-left product/returned-reference scratch and live pivot-cost references until source-order subtraction finishes. Core capture ends before owning static-matrix elimination; each owner retains its own stopped receipts and older caller comparisons survive cleanup."
+        "Scalar row normalization uses direct compound division on RHS before coefficients and final pivot-one assignment. Reduced-cost updates retain copied-left product/returned-reference scratch and live pivot-cost references until source-order subtraction finishes. Core capture ends before owning static-matrix elimination; each owner retains its own stopped receipts and older caller comparisons survive cleanup.",
+        "Scalar singleton/unit basis validation uses actual sparse column metadata and manager IsOne. Debug matrix validation precedes scanning, empty-column dereference is guarded, and row identity is not additionally required by the source."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -125396,7 +125425,15 @@
         "pkg/util/lp/primal_enter_rational.go",
         "pkg/util/lp/primal_iteration_rational.go",
         "pkg/util/lp/primal_cost_tableau_rational.go",
-        "pkg/util/lp/primal_cost_tableau_rational_test.go"
+        "pkg/util/lp/primal_cost_tableau_rational_test.go",
+        "pkg/util/lp/primal_price_rows_rational.go",
+        "pkg/util/lp/primal_price_rows_rational_test.go",
+        "pkg/util/lp/primal_leaving_rows_rational.go",
+        "pkg/util/lp/primal_leaving_rows_rational_test.go",
+        "pkg/util/lp/primal_iteration_rows_rational.go",
+        "pkg/util/lp/primal_iteration_rows_rational_test.go",
+        "pkg/util/lp/primal_init_tableau_rational.go",
+        "pkg/util/lp/primal_init_tableau_rational_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -125655,7 +125692,34 @@
         "TestLPRationalTableauCostIndependentReducedCostOracle",
         "TestLPRationalTableauCostSourcePrefixesAndGuards",
         "TestLPRationalTableauCostPhysicalOwnership",
-        "TestLPRationalTableauCostLeavesOlderComparisonOwned"
+        "TestLPRationalTableauCostLeavesOlderComparisonOwned",
+        "TestLPRationalRowPricingIndependentSelection",
+        "TestLPRationalRowMonoidIndependentScalarBounds",
+        "TestLPRationalRowNeedsToGrowIndependentModels",
+        "TestLPRationalRowPricingBlandLiveOutputAlias",
+        "TestLPRationalRowPricingPhysicalOwnership",
+        "TestLPRationalRowPricingReachedPrefixes",
+        "TestLPRationalRowPricingPreservesOlderComparison",
+        "TestLPRationalRowPredicatesReachedShortCircuits",
+        "TestLPRationalRowLeavingIndependentMembership",
+        "TestLPRationalRowLeavingReachedPrefixes",
+        "TestLPRationalRowIterationIndependentFeasibleModels",
+        "TestLPRationalRowIterationTwoStepInfeasibility",
+        "TestLPRationalRowIterationRepetitionThreshold",
+        "TestLPRationalRowIterationPhysicalOwnership",
+        "TestLPRationalRowIterationReachedPrefixes",
+        "TestLPRationalRowAdvanceReachedPrefixes",
+        "TestLPRationalRowIterationPreservesOlderComparison",
+        "TestLPRationalRowIterationPermutedBasisAndMinimumLeaving",
+        "TestLPRationalRowIterationThresholdAffectsCurrentSelection",
+        "TestLPRationalInitTableauIndependentStateModels",
+        "TestLPRationalTableauBasisIndependentSingletonModels",
+        "TestLPRationalTableauBasisRowIdentityIsNotChecked",
+        "TestLPRationalInitTableauReachedPrefixes",
+        "TestLPRationalInitTableauPhysicalOwnership",
+        "TestLPRationalTableauBasisReachedMetadata",
+        "TestLPRationalInitTableauRowsFailurePrefixes",
+        "TestLPRationalInitTableauPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -126377,6 +126441,49 @@
             "TestLPRationalTableauCostPhysicalOwnership",
             "TestLPRationalTableauCostLeavesOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "Concrete scalar mpq/mpq row predicates, actual sparse damage/length selection, Bland mode, minimum-index leaving bound, copied subtraction/division theta and actual tableau row iteration",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_price_rows_rational.go",
+            "pkg/util/lp/primal_price_rows_rational_test.go",
+            "pkg/util/lp/primal_leaving_rows_rational.go",
+            "pkg/util/lp/primal_leaving_rows_rational_test.go",
+            "pkg/util/lp/primal_iteration_rows_rational.go",
+            "pkg/util/lp/primal_iteration_rows_rational_test.go",
+            "pkg/util/lp/primal_init_tableau_rational.go",
+            "pkg/util/lp/primal_init_tableau_rational_test.go"
+          ],
+          "tests": [
+            "TestLPRationalRowPricingIndependentSelection",
+            "TestLPRationalRowMonoidIndependentScalarBounds",
+            "TestLPRationalRowNeedsToGrowIndependentModels",
+            "TestLPRationalRowPricingBlandLiveOutputAlias",
+            "TestLPRationalRowPricingPhysicalOwnership",
+            "TestLPRationalRowPricingReachedPrefixes",
+            "TestLPRationalRowPricingPreservesOlderComparison",
+            "TestLPRationalRowPredicatesReachedShortCircuits",
+            "TestLPRationalRowLeavingIndependentMembership",
+            "TestLPRationalRowLeavingReachedPrefixes",
+            "TestLPRationalRowIterationIndependentFeasibleModels",
+            "TestLPRationalRowIterationTwoStepInfeasibility",
+            "TestLPRationalRowIterationRepetitionThreshold",
+            "TestLPRationalRowIterationPhysicalOwnership",
+            "TestLPRationalRowIterationReachedPrefixes",
+            "TestLPRationalRowAdvanceReachedPrefixes",
+            "TestLPRationalRowIterationPreservesOlderComparison",
+            "TestLPRationalRowIterationPermutedBasisAndMinimumLeaving",
+            "TestLPRationalRowIterationThresholdAffectsCurrentSelection",
+            "TestLPRationalInitTableauIndependentStateModels",
+            "TestLPRationalTableauBasisIndependentSingletonModels",
+            "TestLPRationalTableauBasisRowIdentityIsNotChecked",
+            "TestLPRationalInitTableauReachedPrefixes",
+            "TestLPRationalInitTableauPhysicalOwnership",
+            "TestLPRationalTableauBasisReachedMetadata",
+            "TestLPRationalInitTableauRowsFailurePrefixes",
+            "TestLPRationalInitTableauPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -126391,7 +126498,8 @@
         "Precise leaving scan owns full -ed*direction expression separately from the by-value basis multiplier, keeping it alive through delegated bound helpers. A distinct ratio local survives repeated row calculations and rejected entering bound flips. Each child retains its own numerical receipts; primal Close cleans raw invocations before all expression/ratio locals. Candidate and output failure prefixes, live input/output alias rereads and older caller comparisons are retained.",
         "Row iteration bound/coefficient/theta locals are excluded from child ready guards and retained through stopped child borrows. Arithmetic difference temporary and raw receipts unwind before base children; base Close destroys child numerical receipts and scratch before theta, coefficient and bound locals. Only owning row-iteration entry rejects preexisting locals. Caller-owned theta in direct advancement remains borrowed.",
         "Scalar entering orchestration creates its owning step only after SolveBd. The step stays live through leaving and advancement calls, including stopped delegated borrows. Close releases base/queue arithmetic before the step; child ready guards allow the live step, while the owning entering entry rejects an existing step. OneIteration preserves source status ordering and does not increment TotalIterations.",
-        "Scalar tableau infeasibility-cost lookup delegates bound comparisons to the base and assigns only the returned inline -1/0/1 cost in primal capture. Cost changes own copied-left difference and returned delta, publish new basic cost before stored-row reduced-cost updates, and retain expression scratch through stopped arithmetic. Live delta aliases are reread for each row cell; InfSet membership belongs to the caller and is unchanged. Older caller comparisons remain owned by the caller."
+        "Scalar tableau infeasibility-cost lookup delegates bound comparisons to the base and assigns only the returned inline -1/0/1 cost in primal capture. Cost changes own copied-left difference and returned delta, publish new basic cost before stored-row reduced-cost updates, and retain expression scratch through stopped arithmetic. Live delta aliases are reread for each row cell; InfSet membership belongs to the caller and is unchanged. Older caller comparisons remain owned by the caller.",
+        "Scalar row iteration owns bound, coefficient and theta locals outside ready guards, with an explicit iteration entry guard; base and queue borrowers close before locals. Copied-left scalar subtraction and division retain separate returned-reference values; division borrows its scalar denominator. Bound and coefficient copies capture only primal-owned numerical calls; base predicates retain their own receipts. Live output aliases and actual older caller comparisons retain source publication and ownership. Tableau initialization does not recompute existing membership or reduced costs and confines its direct scalar capture to epsilon assignment."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
@@ -127805,7 +127913,9 @@
         "pkg/util/lp/primal_advance_tableau_rational.go",
         "pkg/util/lp/primal_advance_tableau_rational_test.go",
         "pkg/util/lp/primal_enter_tableau_rational.go",
-        "pkg/util/lp/primal_enter_tableau_rational_test.go"
+        "pkg/util/lp/primal_enter_tableau_rational_test.go",
+        "pkg/util/lp/primal_init_tableau_rational.go",
+        "pkg/util/lp/primal_init_tableau_rational_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -127912,7 +128022,15 @@
         "TestLPRationalTableauIterationDispatchAndStops",
         "TestLPRationalTableauEnterPhysicalOwnership",
         "TestLPRationalTableauEnterRejectedIndexOwnsLocal",
-        "TestLPRationalTableauEnterPreservesOlderComparison"
+        "TestLPRationalTableauEnterPreservesOlderComparison",
+        "TestLPRationalInitTableauIndependentStateModels",
+        "TestLPRationalTableauBasisIndependentSingletonModels",
+        "TestLPRationalTableauBasisRowIdentityIsNotChecked",
+        "TestLPRationalInitTableauReachedPrefixes",
+        "TestLPRationalInitTableauPhysicalOwnership",
+        "TestLPRationalTableauBasisReachedMetadata",
+        "TestLPRationalInitTableauRowsFailurePrefixes",
+        "TestLPRationalInitTableauPreservesOlderComparison"
       ],
       "assertions": [
         {
@@ -128226,6 +128344,31 @@
             "TestLPRationalTableauEnterRejectedIndexOwnsLocal",
             "TestLPRationalTableauEnterPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "Concrete scalar mpq/mpq tableau run initialization: pre-counter residual/basis checks, existing membership/cost preservation, early return, backup/epsilon/conditional queue/row initialization and final validators",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_init_tableau_rational.go",
+            "pkg/util/lp/primal_init_tableau_rational_test.go",
+            "pkg/util/lp/primal_enter_tableau_rational_test.go"
+          ],
+          "tests": [
+            "TestLPRationalInitTableauIndependentStateModels",
+            "TestLPRationalTableauBasisIndependentSingletonModels",
+            "TestLPRationalTableauBasisRowIdentityIsNotChecked",
+            "TestLPRationalInitTableauReachedPrefixes",
+            "TestLPRationalInitTableauPhysicalOwnership",
+            "TestLPRationalTableauBasisReachedMetadata",
+            "TestLPRationalInitTableauRowsFailurePrefixes",
+            "TestLPRationalInitTableauPreservesOlderComparison",
+            "TestLPRationalTableauEnterIndependentModels",
+            "TestLPRationalTableauIterationIndependentOptima",
+            "TestLPRationalTableauIterationDispatchAndStops",
+            "TestLPRationalTableauEnterPhysicalOwnership",
+            "TestLPRationalTableauEnterRejectedIndexOwnsLocal",
+            "TestLPRationalTableauEnterPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -128233,7 +128376,8 @@
         "Scalar tableau infeasibility-cost lookup delegates bound comparisons to the base and assigns only the returned inline -1/0/1 cost in primal capture. Cost changes own copied-left difference and returned delta, publish new basic cost before stored-row reduced-cost updates, and retain expression scratch through stopped arithmetic. Live delta aliases are reread for each row cell; InfSet membership belongs to the caller and is unchanged. Older caller comparisons remain owned by the caller.",
         "Scalar tableau UpdateX captures entering Add and each copied-left delta*coefficient/compound subtraction separately in the base before delegated primal cost/feasibility operations. Value expressions retain base-owned work through stops; primal cost changes retain only their own work/receipts. Delta remains live through cost changes, including aliases to D. Tableau initialization switches/restores dense costs before ascending heading scan and retains each copied-left basic-cost*coefficient product. Parent Close releases delegated borrowers before retained arguments. Borrowed headers are restored before owner cleanup in metadata/alias tests.",
         "Tableau leaving owns copied unary -coefficient and copied-left multiplication/returned-reference result through the by-value basis-bound dispatcher, plus a separate scalar ratio owner. Primal and delegated base keep separate numerical receipts; copied ratio assignments, repeated canonical equalities, candidate prefixes and live coefficient/bound/output aliases follow source order. Pricing delegates eligibility comparisons and rotates only the selected candidate after reading its sign. Actual matrix sizes and stored order are used regardless of cached LU metadata; older caller comparisons remain owned by the caller.",
-        "Scalar equal-column advancement owns the copied-left t*sign full-expression result in a distinct tableauDelta until UpdateXTableau finishes. Its scalar work closes before child borrowing; ready permits this local through delegated primal updates, while both owning advancement entries reject preexisting locals. Close destroys base/queue borrowers before retained tableau delta and entering step. Scalar unary negation preserves separate assignment. Entering owns its local before actual leaving selection and retains it through stopped advancement; old caller comparisons are not adopted."
+        "Scalar equal-column advancement owns the copied-left t*sign full-expression result in a distinct tableauDelta until UpdateXTableau finishes. Its scalar work closes before child borrowing; ready permits this local through delegated primal updates, while both owning advancement entries reject preexisting locals. Close destroys base/queue borrowers before retained tableau delta and entering step. Scalar unary negation preserves separate assignment. Entering owns its local before actual leaving selection and retains it through stopped advancement; old caller comparisons are not adopted.",
+        "Scalar row iteration owns bound, coefficient and theta locals outside ready guards, with an explicit iteration entry guard; base and queue borrowers close before locals. Copied-left scalar subtraction and division retain separate returned-reference values; division borrows its scalar denominator. Bound and coefficient copies capture only primal-owned numerical calls; base predicates retain their own receipts. Live output aliases and actual older caller comparisons retain source publication and ownership. Tableau initialization does not recompute existing membership or reduced costs and confines its direct scalar capture to epsilon assignment."
       ],
       "deviations": [
         "Exact tableau reduced-cost initialization uses native dense slices and stored sparse columns; retained live costs/coefficient order, early feasibility-only return, actual child captures and physical arithmetic cleanup. Native/debug focused coverage48/51 (94.1%); independent320-model oracle, shifted aliases, stored-cell order, reached bounds, pooled/direct physical refusals and three older comparison owners. Whole tableau and source unit remain partial.",

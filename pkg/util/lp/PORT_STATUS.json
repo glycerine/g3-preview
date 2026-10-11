@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Scalar primal tableau advancement and full Solve, scalar dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits."
+    "Scalar primal full Solve and source dispatch/limits/cancellation/statistics integration, scalar dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits."
   ],
   "units": [
     {
@@ -1303,7 +1303,9 @@
         "pkg/util/lp/core_feasibility_rational_test.go",
         "pkg/util/lp/core_pivot_compare_rational.go",
         "pkg/util/lp/core_tableau_rational.go",
-        "pkg/util/lp/core_tableau_rational_test.go"
+        "pkg/util/lp/core_tableau_rational_test.go",
+        "pkg/util/lp/core_basis_tableau_rational.go",
+        "pkg/util/lp/primal_init_tableau_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1513,7 +1515,15 @@
         "TestLPRationalTableauMetadataAndStoppedGuards",
         "TestLPRationalTableauPhysicalFailureOwnership",
         "TestLPRationalTableauStoppedMatrixBeforeNormalization",
-        "TestLPRationalTableauPreservesOlderComparison"
+        "TestLPRationalTableauPreservesOlderComparison",
+        "TestLPRationalInitTableauIndependentStateModels",
+        "TestLPRationalTableauBasisIndependentSingletonModels",
+        "TestLPRationalTableauBasisRowIdentityIsNotChecked",
+        "TestLPRationalInitTableauReachedPrefixes",
+        "TestLPRationalInitTableauPhysicalOwnership",
+        "TestLPRationalTableauBasisReachedMetadata",
+        "TestLPRationalInitTableauRowsFailurePrefixes",
+        "TestLPRationalInitTableauPreservesOlderComparison"
       ]
     },
     {
@@ -2149,7 +2159,15 @@
         "pkg/util/lp/primal_enter_rational.go",
         "pkg/util/lp/primal_iteration_rational.go",
         "pkg/util/lp/primal_cost_tableau_rational.go",
-        "pkg/util/lp/primal_cost_tableau_rational_test.go"
+        "pkg/util/lp/primal_cost_tableau_rational_test.go",
+        "pkg/util/lp/primal_price_rows_rational.go",
+        "pkg/util/lp/primal_price_rows_rational_test.go",
+        "pkg/util/lp/primal_leaving_rows_rational.go",
+        "pkg/util/lp/primal_leaving_rows_rational_test.go",
+        "pkg/util/lp/primal_iteration_rows_rational.go",
+        "pkg/util/lp/primal_iteration_rows_rational_test.go",
+        "pkg/util/lp/primal_init_tableau_rational.go",
+        "pkg/util/lp/primal_init_tableau_rational_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2408,7 +2426,34 @@
         "TestLPRationalTableauCostIndependentReducedCostOracle",
         "TestLPRationalTableauCostSourcePrefixesAndGuards",
         "TestLPRationalTableauCostPhysicalOwnership",
-        "TestLPRationalTableauCostLeavesOlderComparisonOwned"
+        "TestLPRationalTableauCostLeavesOlderComparisonOwned",
+        "TestLPRationalRowPricingIndependentSelection",
+        "TestLPRationalRowMonoidIndependentScalarBounds",
+        "TestLPRationalRowNeedsToGrowIndependentModels",
+        "TestLPRationalRowPricingBlandLiveOutputAlias",
+        "TestLPRationalRowPricingPhysicalOwnership",
+        "TestLPRationalRowPricingReachedPrefixes",
+        "TestLPRationalRowPricingPreservesOlderComparison",
+        "TestLPRationalRowPredicatesReachedShortCircuits",
+        "TestLPRationalRowLeavingIndependentMembership",
+        "TestLPRationalRowLeavingReachedPrefixes",
+        "TestLPRationalRowIterationIndependentFeasibleModels",
+        "TestLPRationalRowIterationTwoStepInfeasibility",
+        "TestLPRationalRowIterationRepetitionThreshold",
+        "TestLPRationalRowIterationPhysicalOwnership",
+        "TestLPRationalRowIterationReachedPrefixes",
+        "TestLPRationalRowAdvanceReachedPrefixes",
+        "TestLPRationalRowIterationPreservesOlderComparison",
+        "TestLPRationalRowIterationPermutedBasisAndMinimumLeaving",
+        "TestLPRationalRowIterationThresholdAffectsCurrentSelection",
+        "TestLPRationalInitTableauIndependentStateModels",
+        "TestLPRationalTableauBasisIndependentSingletonModels",
+        "TestLPRationalTableauBasisRowIdentityIsNotChecked",
+        "TestLPRationalInitTableauReachedPrefixes",
+        "TestLPRationalInitTableauPhysicalOwnership",
+        "TestLPRationalTableauBasisReachedMetadata",
+        "TestLPRationalInitTableauRowsFailurePrefixes",
+        "TestLPRationalInitTableauPreservesOlderComparison"
       ]
     },
     {
@@ -2843,7 +2888,9 @@
         "pkg/util/lp/primal_advance_tableau_rational.go",
         "pkg/util/lp/primal_advance_tableau_rational_test.go",
         "pkg/util/lp/primal_enter_tableau_rational.go",
-        "pkg/util/lp/primal_enter_tableau_rational_test.go"
+        "pkg/util/lp/primal_enter_tableau_rational_test.go",
+        "pkg/util/lp/primal_init_tableau_rational.go",
+        "pkg/util/lp/primal_init_tableau_rational_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -2950,7 +2997,15 @@
         "TestLPRationalTableauIterationDispatchAndStops",
         "TestLPRationalTableauEnterPhysicalOwnership",
         "TestLPRationalTableauEnterRejectedIndexOwnsLocal",
-        "TestLPRationalTableauEnterPreservesOlderComparison"
+        "TestLPRationalTableauEnterPreservesOlderComparison",
+        "TestLPRationalInitTableauIndependentStateModels",
+        "TestLPRationalTableauBasisIndependentSingletonModels",
+        "TestLPRationalTableauBasisRowIdentityIsNotChecked",
+        "TestLPRationalInitTableauReachedPrefixes",
+        "TestLPRationalInitTableauPhysicalOwnership",
+        "TestLPRationalTableauBasisReachedMetadata",
+        "TestLPRationalInitTableauRowsFailurePrefixes",
+        "TestLPRationalInitTableauPreservesOlderComparison"
       ]
     },
     {
@@ -7403,6 +7458,94 @@
       "both module compile gates",
       "source portcheck: 2103 units, 677 APIs",
       "dependency graph refresh: 64 packages",
+      "diff check"
+    ]
+  },
+  "latest_rational_tableau_rows_increment": {
+    "scope": "Concrete scalar tableau initialization, row pricing/leaving/iteration and singleton/unit basis validation",
+    "source_units_promoted": false,
+    "test_groups": 27,
+    "independent_initialization_worlds": 240,
+    "independent_basis_worlds": 160,
+    "independent_pricing_worlds": 480,
+    "independent_monoid_worlds": 300,
+    "independent_grow_worlds": 200,
+    "independent_leaving_worlds": 160,
+    "independent_row_feasibility_worlds": 320,
+    "independent_two_step_infeasibility_worlds": 120,
+    "independent_permuted_basis_worlds": 80,
+    "existing_bounded_optima_now_using_real_initialization": 120,
+    "physical_campaigns": 20,
+    "older_comparison_campaigns": 8,
+    "statement_coverage": {
+      "native": {
+        "core_basis_tableau_rational.go": {
+          "covered": 25,
+          "total": 32,
+          "percent": 78.1
+        },
+        "primal_init_tableau_rational.go": {
+          "covered": 48,
+          "total": 76,
+          "percent": 63.2
+        },
+        "primal_iteration_rows_rational.go": {
+          "covered": 69,
+          "total": 88,
+          "percent": 78.4
+        },
+        "primal_leaving_rows_rational.go": {
+          "covered": 40,
+          "total": 48,
+          "percent": 83.3
+        },
+        "primal_price_rows_rational.go": {
+          "covered": 154,
+          "total": 166,
+          "percent": 92.8
+        }
+      },
+      "debug_checked": {
+        "core_basis_tableau_rational.go": {
+          "covered": 29,
+          "total": 32,
+          "percent": 90.6
+        },
+        "primal_init_tableau_rational.go": {
+          "covered": 72,
+          "total": 76,
+          "percent": 94.7
+        },
+        "primal_iteration_rows_rational.go": {
+          "covered": 78,
+          "total": 88,
+          "percent": 88.6
+        },
+        "primal_leaving_rows_rational.go": {
+          "covered": 39,
+          "total": 48,
+          "percent": 81.2
+        },
+        "primal_price_rows_rational.go": {
+          "covered": 157,
+          "total": 166,
+          "percent": 94.6
+        }
+      }
+    },
+    "focused_native_seconds": 22.235,
+    "focused_debug_checked_seconds": 43.103,
+    "remaining": "Scalar primal full Solve and source dispatch/limits/cancellation/statistics integration, scalar dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits.",
+    "coverage_note": "Coverage measures implemented Go statements, not C++ completion. Native erases source assertions; checked gaps chiefly guard stable capture/destruction, unchanged numeral metadata and extents already checked by delegated predicates.",
+    "related_native_seconds": 216.15,
+    "related_debug_checked_seconds": 384.107,
+    "verification": [
+      "both focused profiles including actual initialization in existing bounded optimization models",
+      "related scalar initialization/row/tableau/primal and existing pair row/tableau/initialization/leaving regressions, native and debug/checked",
+      "both LP vets",
+      "both module compile gates",
+      "source portcheck: 2103 units, 677 APIs",
+      "dependency graph refresh: 64 packages, no unresolved imports",
       "diff check"
     ]
   }

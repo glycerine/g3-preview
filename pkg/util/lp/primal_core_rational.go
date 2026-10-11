@@ -7,7 +7,7 @@ import "github.com/glycerine/g3/pkg/util/numeral"
 // RationalPrimalCoreSolver borrows scalar model storage and owns exact primal
 // scratch. Construction, feasibility costs, initialization, entering pricing
 // bound-step/breakpoint helpers and circular leaving selection are implemented.
-// LU advancement is implemented; iteration/tableau advancement and full Solve remain open.
+// LU and tableau column/row iteration are implemented; full Solve remains open.
 // Constructor errors return a partial owner to Close before borrowed inputs.
 type RationalPrimalCoreSolver struct {
 	*RationalCoreSolverBase
@@ -18,6 +18,9 @@ type RationalPrimalCoreSolver struct {
 	ColumnNormUpdateCounter, BlandModeThreshold  uint32
 	SignOfEnteringDelta                          int32
 	NonBasisList                                 []uint32
+	LeftBasisTableau                             IntSet
+	BlandModeTableau                             bool
+	LeftBasisRepeated, InfRowIndexForTableau     uint32
 	LeavingCandidates                            []uint32
 	calls                                        exactEtaCalls
 	work                                         *IndexedRationalVector
@@ -26,11 +29,15 @@ type RationalPrimalCoreSolver struct {
 	advanceDelta                                 *IndexedRationalVector
 	enteringStep                                 *IndexedRationalVector
 	tableauDelta                                 *IndexedRationalVector
-	Breakpoints                                  []*RationalBreakpoint
-	breakpointWork                               *IndexedRationalVector
-	breakpointCollect, breakpointSlope           *IndexedRationalVector
-	pendingBreakpoint                            *RationalBreakpoint
-	stopped                                      bool
+	// Automatic row-iteration values remain live through primal child calls.
+	rowIterationBound                  *IndexedRationalVector
+	rowIterationCoefficient            *IndexedRationalVector
+	rowIterationTheta                  *IndexedRationalVector
+	Breakpoints                        []*RationalBreakpoint
+	breakpointWork                     *IndexedRationalVector
+	breakpointCollect, breakpointSlope *IndexedRationalVector
+	pendingBreakpoint                  *RationalBreakpoint
+	stopped                            bool
 }
 
 func NewRationalPrimalCoreSolver(in RationalCoreInputs) (m *RationalPrimalCoreSolver, err error) {
@@ -166,6 +173,9 @@ func (m *RationalPrimalCoreSolver) Close() error {
 		if err := m.BreakpointQueue.Close(); err != nil {
 			return err
 		}
+	}
+	if err := m.closeRowIterationLocals(); err != nil {
+		return err
 	}
 	if m.enteringStep != nil {
 		if err := m.enteringStep.Close(); err != nil {
