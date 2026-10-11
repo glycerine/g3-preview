@@ -127793,7 +127793,11 @@
         "pkg/util/lp/primal_solve_exact.go",
         "pkg/util/lp/primal_solve_exact_test.go",
         "pkg/util/lp/primal_cost_tableau_rational.go",
-        "pkg/util/lp/primal_cost_tableau_rational_test.go"
+        "pkg/util/lp/primal_cost_tableau_rational_test.go",
+        "pkg/util/lp/primal_values_tableau_rational.go",
+        "pkg/util/lp/primal_values_tableau_rational_test.go",
+        "pkg/util/lp/primal_tableau_init_cost_rational.go",
+        "pkg/util/lp/primal_tableau_init_cost_rational_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -127863,7 +127867,20 @@
         "TestLPRationalTableauCostIndependentReducedCostOracle",
         "TestLPRationalTableauCostSourcePrefixesAndGuards",
         "TestLPRationalTableauCostPhysicalOwnership",
-        "TestLPRationalTableauCostLeavesOlderComparisonOwned"
+        "TestLPRationalTableauCostLeavesOlderComparisonOwned",
+        "TestLPRationalTableauValuesIndependentModels",
+        "TestLPRationalTableauBasisIndependentElimination",
+        "TestLPRationalTableauValuesPhysicalOwnership",
+        "TestLPRationalTableauValuesLiveDeltaAliases",
+        "TestLPRationalTableauValuesReachedPrefixes",
+        "TestLPRationalTableauValuesPreservesOlderComparison",
+        "TestLPRationalTableauBasisNonzeroRHSSourceLimitation",
+        "TestLPRationalTableauValuesLiveReducedCostStep",
+        "TestLPRationalTableauInitCostIndependentModels",
+        "TestLPRationalTableauInitCostPhysicalOwnership",
+        "TestLPRationalTableauInitCostLiveAliases",
+        "TestLPRationalTableauInitCostReachedPrefixes",
+        "TestLPRationalTableauInitCostPreservesOlderComparison"
       ],
       "assertions": [
         {
@@ -128108,11 +128125,35 @@
             "TestLPRationalTableauCostPhysicalOwnership",
             "TestLPRationalTableauCostLeavesOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "Concrete scalar mpq/mpq tableau value updates and basis exchange; full tableau reduced-cost initialization with cost switching and live aliases",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_values_tableau_rational.go",
+            "pkg/util/lp/primal_tableau_init_cost_rational.go"
+          ],
+          "tests": [
+            "TestLPRationalTableauValuesIndependentModels",
+            "TestLPRationalTableauBasisIndependentElimination",
+            "TestLPRationalTableauValuesPhysicalOwnership",
+            "TestLPRationalTableauValuesLiveDeltaAliases",
+            "TestLPRationalTableauValuesReachedPrefixes",
+            "TestLPRationalTableauValuesPreservesOlderComparison",
+            "TestLPRationalTableauBasisNonzeroRHSSourceLimitation",
+            "TestLPRationalTableauValuesLiveReducedCostStep",
+            "TestLPRationalTableauInitCostIndependentModels",
+            "TestLPRationalTableauInitCostPhysicalOwnership",
+            "TestLPRationalTableauInitCostLiveAliases",
+            "TestLPRationalTableauInitCostReachedPrefixes",
+            "TestLPRationalTableauInitCostPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
         "Exact bound comparisons retain base-core invocation receipts; primal expression work owns the source difference/product parameters and returned values. Capture ends before delegated comparisons. The source publishes changed cost before updating reduced costs, preserves stored-row prefixes and rereads aliased delta; errors stop the owner, Close destroys actual owned invocations/work, and older caller comparisons remain untouched. Full tableau optimization and post-pop cleanup remain incomplete.",
-        "Scalar tableau infeasibility-cost lookup delegates bound comparisons to the base and assigns only the returned inline -1/0/1 cost in primal capture. Cost changes own copied-left difference and returned delta, publish new basic cost before stored-row reduced-cost updates, and retain expression scratch through stopped arithmetic. Live delta aliases are reread for each row cell; InfSet membership belongs to the caller and is unchanged. Older caller comparisons remain owned by the caller."
+        "Scalar tableau infeasibility-cost lookup delegates bound comparisons to the base and assigns only the returned inline -1/0/1 cost in primal capture. Cost changes own copied-left difference and returned delta, publish new basic cost before stored-row reduced-cost updates, and retain expression scratch through stopped arithmetic. Live delta aliases are reread for each row cell; InfSet membership belongs to the caller and is unchanged. Older caller comparisons remain owned by the caller.",
+        "Scalar tableau UpdateX captures entering Add and each copied-left delta*coefficient/compound subtraction separately in the base before delegated primal cost/feasibility operations. Value expressions retain base-owned work through stops; primal cost changes retain only their own work/receipts. Delta remains live through cost changes, including aliases to D. Tableau initialization switches/restores dense costs before ascending heading scan and retains each copied-left basic-cost*coefficient product. Parent Close releases delegated borrowers before retained arguments. Borrowed headers are restored before owner cleanup in metadata/alias tests."
       ],
       "deviations": [
         "Exact tableau reduced-cost initialization uses native dense slices and stored sparse columns; retained live costs/coefficient order, early feasibility-only return, actual child captures and physical arithmetic cleanup. Native/debug focused coverage48/51 (94.1%); independent320-model oracle, shifted aliases, stored-cell order, reached bounds, pooled/direct physical refusals and three older comparison owners. Whole tableau and source unit remain partial.",

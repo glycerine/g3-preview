@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 87.3,
-  "coverage_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion. Scalar pivot comparison and incremental reduced-cost files are newer and retain separate focused evidence. Scalar primal advancement files are newer and retain separate focused evidence. Scalar entering orchestration and iteration are newer and retain separate focused evidence. Scalar core tableau operations are newer and retain separate focused evidence. Scalar primal tableau cost maintenance is newer and retains separate focused evidence.",
+  "coverage_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion. Scalar pivot comparison and incremental reduced-cost files are newer and retain separate focused evidence. Scalar primal advancement files are newer and retain separate focused evidence. Scalar entering orchestration and iteration are newer and retain separate focused evidence. Scalar core tableau operations are newer and retain separate focused evidence. Scalar primal tableau cost maintenance is newer and retains separate focused evidence. Scalar primal tableau values/basis exchange and reduced-cost initialization are newer and retain separate focused evidence.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -2831,7 +2831,11 @@
         "pkg/util/lp/primal_solve_exact.go",
         "pkg/util/lp/primal_solve_exact_test.go",
         "pkg/util/lp/primal_cost_tableau_rational.go",
-        "pkg/util/lp/primal_cost_tableau_rational_test.go"
+        "pkg/util/lp/primal_cost_tableau_rational_test.go",
+        "pkg/util/lp/primal_values_tableau_rational.go",
+        "pkg/util/lp/primal_values_tableau_rational_test.go",
+        "pkg/util/lp/primal_tableau_init_cost_rational.go",
+        "pkg/util/lp/primal_tableau_init_cost_rational_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -2901,7 +2905,20 @@
         "TestLPRationalTableauCostIndependentReducedCostOracle",
         "TestLPRationalTableauCostSourcePrefixesAndGuards",
         "TestLPRationalTableauCostPhysicalOwnership",
-        "TestLPRationalTableauCostLeavesOlderComparisonOwned"
+        "TestLPRationalTableauCostLeavesOlderComparisonOwned",
+        "TestLPRationalTableauValuesIndependentModels",
+        "TestLPRationalTableauBasisIndependentElimination",
+        "TestLPRationalTableauValuesPhysicalOwnership",
+        "TestLPRationalTableauValuesLiveDeltaAliases",
+        "TestLPRationalTableauValuesReachedPrefixes",
+        "TestLPRationalTableauValuesPreservesOlderComparison",
+        "TestLPRationalTableauBasisNonzeroRHSSourceLimitation",
+        "TestLPRationalTableauValuesLiveReducedCostStep",
+        "TestLPRationalTableauInitCostIndependentModels",
+        "TestLPRationalTableauInitCostPhysicalOwnership",
+        "TestLPRationalTableauInitCostLiveAliases",
+        "TestLPRationalTableauInitCostReachedPrefixes",
+        "TestLPRationalTableauInitCostPreservesOlderComparison"
       ]
     },
     {
@@ -7180,5 +7197,58 @@
       "diff check"
     ],
     "coverage_note": "Remaining uncovered returns chiefly guard stable capture/destruction/inline numeral reads and native-erased source assertions. Coverage measures implemented Go statements, not C++ completion."
+  },
+  "latest_rational_tableau_values_increment": {
+    "scope": "Concrete scalar tableau values/basis exchange and full reduced-cost initialization/cost switching",
+    "source_units_promoted": false,
+    "statement_coverage": {
+      "native": {
+        "primal_tableau_init_cost_rational.go": {
+          "covered": 48,
+          "total": 51,
+          "percent": 94.1
+        },
+        "primal_values_tableau_rational.go": {
+          "covered": 61,
+          "total": 83,
+          "percent": 73.5
+        }
+      },
+      "debug_checked": {
+        "primal_tableau_init_cost_rational.go": {
+          "covered": 48,
+          "total": 51,
+          "percent": 94.1
+        },
+        "primal_values_tableau_rational.go": {
+          "covered": 78,
+          "total": 83,
+          "percent": 94.0
+        }
+      }
+    },
+    "independent_value_models": 240,
+    "independent_basis_exchange_models": 120,
+    "independent_cost_initialization_models": 320,
+    "physical_campaigns": 12,
+    "older_comparison_campaigns": 6,
+    "live_value_alias_models": 6,
+    "live_reduced_cost_step_models": 2,
+    "live_cost_initialization_alias_models": 2,
+    "remaining": "Scalar primal tableau selection/advancement/row iteration and full Solve, scalar dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits.",
+    "focused_native_seconds": 1.601,
+    "focused_debug_checked_seconds": 2.323,
+    "related_native_seconds": 78.394,
+    "related_debug_checked_seconds": 99.693,
+    "verification": [
+      "both final focused profiles",
+      "both related scalar tableau/primal and existing pair tableau value/basis/initialization regressions; unchanged production before final extra metadata/retry/link-repair tests",
+      "both LP vets",
+      "both module compile gates",
+      "source portcheck: 2103 units, 677 APIs",
+      "dependency graph refresh: 64 packages",
+      "diff check"
+    ],
+    "coverage_note": "Native erases many source assertion statements. Remaining checked gaps chiefly guard stable capture/destruction/metadata and extents already validated by delegated calls. Coverage measures implemented Go statements, not C++ completion."
   }
 }
