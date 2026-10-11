@@ -1262,6 +1262,7 @@
         "primal_harris_float.go",
         "primal_initial_float.go",
         "primal_prepare_float.go",
+        "primal_price_exact.go",
         "primal_price_float.go",
         "primal_refresh_float.go",
         "primal_solve_float.go",

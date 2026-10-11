@@ -123636,7 +123636,9 @@
         "pkg/util/lp/primal_cost_tableau_exact.go",
         "pkg/util/lp/primal_cost_tableau_exact_test.go",
         "pkg/util/lp/lar_prepare_exact.go",
-        "pkg/util/lp/lar_prepare_exact_test.go"
+        "pkg/util/lp/lar_prepare_exact_test.go",
+        "pkg/util/lp/primal_price_exact.go",
+        "pkg/util/lp/primal_price_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -123700,7 +123702,14 @@
         "TestLARPrepareExactNZIndependentSparseCounts",
         "TestLARPrepareExactFailurePrefixes",
         "TestLARPrepareExactActualPendingQueuePrefix",
-        "TestLARPrepareExactStoppedPrimal"
+        "TestLARPrepareExactStoppedPrimal",
+        "TestLPExactPrimalPricingIndependentEligibility",
+        "TestLPExactPrimalPricingIndependentScanRotationAndRNG",
+        "TestLPExactPrimalPricingSortSourcesAndCounter",
+        "TestLPExactPrimalPricingPhysicalOwnership",
+        "TestLPExactPrimalPricingSourceGuardsAndPrefixes",
+        "TestLPExactPrimalPricingOlderComparisonOwner",
+        "TestLPExactPrimalPricingBreakpointDirection"
       ],
       "conditionals": [
         {
@@ -124018,13 +124027,28 @@
             "TestLARPrepareExactActualPendingQueuePrefix",
             "TestLARPrepareExactStoppedPrimal"
           ]
+        },
+        {
+          "name": "retained mpq/impq precise column eligibility and breakpoint epsilon eligibility, rational sort_non_basis with source zero-count comparator, and choose_entering_column_presize strict-improvement budget, tie RNG, direction and list rotation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_price_exact.go",
+          "tests": [
+            "TestLPExactPrimalPricingIndependentEligibility",
+            "TestLPExactPrimalPricingIndependentScanRotationAndRNG",
+            "TestLPExactPrimalPricingSortSourcesAndCounter",
+            "TestLPExactPrimalPricingPhysicalOwnership",
+            "TestLPExactPrimalPricingSourceGuardsAndPrefixes",
+            "TestLPExactPrimalPricingOlderComparisonOwner",
+            "TestLPExactPrimalPricingBreakpointDirection"
+          ]
         }
       ],
       "ownership": [
         "Primal stage-one core owns native beta, empty concrete floating breakpoint queue, normalized cost backup and traversal slice; inherits actual borrowed solver vectors and owned floating LU/scratch. Failed base construction returns its real partial owner before derived initialization. Native []uint32 replaces the source candidate list; rotation changes only this list, while sort publishes nonbasis headings in order.",
         "Exact core borrows actual input slice headers, matrix, settings, column namer and manager. It owns initialized rational/pair scratch and concrete PairLU; partial constructor results require Close. Base owns its direct comparison/cost-copy calls, while child LU calls retain their own generations and caller outputs own their published values. Derived epsilon owns source quotient expression temporaries. Destruction releases derived members, base factorization body, then reverse-order base scratch; borrowed model fields survive.",
         "Exact bound comparisons retain base-core invocation receipts; primal expression work owns the source difference/product parameters and returned values. Capture ends before delegated comparisons. The source publishes changed cost before updating reduced costs, preserves stored-row prefixes and rereads aliased delta; errors stop the owner, Close destroys actual owned invocations/work, and older caller comparisons remain untouched. Full tableau optimization and post-pop cleanup remain incomplete.",
-        "Preparation preserves ordinary-vector prefixes while clearing indexed scratch in source order; no parent numerical capture spans exact vector/queue/LU child operations. LU replacement keeps partial newly constructed factors published for owning cleanup, destroys old factors before replacement, deletes newly degenerated factors and preserves the source in-place extension result. Actual physical refusals, matrix-solve oracles and source mutation prefixes are tested. Full LAR solve/signature/exact optimization integration remains incomplete."
+        "Preparation preserves ordinary-vector prefixes while clearing indexed scratch in source order; no parent numerical capture spans exact vector/queue/LU child operations. LU replacement keeps partial newly constructed factors published for owning cleanup, destroys old factors before replacement, deletes newly degenerated factors and preserves the source in-place extension result. Actual physical refusals, matrix-solve oracles and source mutation prefixes are tested. Full LAR solve/signature/exact optimization integration remains incomplete.",
+        "Exact pricing delegates lexicographic bound comparisons to PairCoreSolverBase; the primal separately owns newly created epsilon-negation values and rational comparison receipts. No parent capture spans a numerical child. Allocation-failure campaigns retain source publication prefixes, partial epsilon expressions and owning teardown; older caller comparisons retain invocation identity. Sorting uses Go sort with literal source count comparison and does not promise a C++ implementation-dependent zero/equal-key order. Full exact Solve/advancement remains incomplete."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
@@ -124057,7 +124081,9 @@
         "pkg/util/lp/primal_solve_float.go",
         "pkg/util/lp/primal_feasible_float.go",
         "pkg/util/lp/primal_cost_tableau_exact.go",
-        "pkg/util/lp/primal_cost_tableau_exact_test.go"
+        "pkg/util/lp/primal_cost_tableau_exact_test.go",
+        "pkg/util/lp/primal_price_exact.go",
+        "pkg/util/lp/primal_price_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124107,7 +124133,14 @@
         "TestLPPairTableauCostIndependentReducedCostOracle",
         "TestLPPairTableauCostSourcePrefixesAndGuards",
         "TestLPPairTableauCostPhysicalOwnership",
-        "TestLPPairTableauCostLeavesOlderComparisonOwned"
+        "TestLPPairTableauCostLeavesOlderComparisonOwned",
+        "TestLPExactPrimalPricingIndependentEligibility",
+        "TestLPExactPrimalPricingIndependentScanRotationAndRNG",
+        "TestLPExactPrimalPricingSortSourcesAndCounter",
+        "TestLPExactPrimalPricingPhysicalOwnership",
+        "TestLPExactPrimalPricingSourceGuardsAndPrefixes",
+        "TestLPExactPrimalPricingOlderComparisonOwner",
+        "TestLPExactPrimalPricingBreakpointDirection"
       ],
       "conditionals": [
         {
@@ -124504,11 +124537,26 @@
             "TestLPPairTableauCostPhysicalOwnership",
             "TestLPPairTableauCostLeavesOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "retained mpq/impq precise column eligibility and breakpoint epsilon eligibility, rational sort_non_basis with source zero-count comparator, and choose_entering_column_presize strict-improvement budget, tie RNG, direction and list rotation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_price_exact.go",
+          "tests": [
+            "TestLPExactPrimalPricingIndependentEligibility",
+            "TestLPExactPrimalPricingIndependentScanRotationAndRNG",
+            "TestLPExactPrimalPricingSortSourcesAndCounter",
+            "TestLPExactPrimalPricingPhysicalOwnership",
+            "TestLPExactPrimalPricingSourceGuardsAndPrefixes",
+            "TestLPExactPrimalPricingOlderComparisonOwner",
+            "TestLPExactPrimalPricingBreakpointDirection"
+          ]
         }
       ],
       "ownership": [
         "Primal stage-one core owns native beta, empty concrete floating breakpoint queue, normalized cost backup and traversal slice; inherits actual borrowed solver vectors and owned floating LU/scratch. Failed base construction returns its real partial owner before derived initialization. Native []uint32 replaces the source candidate list; rotation changes only this list, while sort publishes nonbasis headings in order.",
-        "Exact bound comparisons retain base-core invocation receipts; primal expression work owns the source difference/product parameters and returned values. Capture ends before delegated comparisons. The source publishes changed cost before updating reduced costs, preserves stored-row prefixes and rereads aliased delta; errors stop the owner, Close destroys actual owned invocations/work, and older caller comparisons remain untouched. Full tableau optimization and post-pop cleanup remain incomplete."
+        "Exact bound comparisons retain base-core invocation receipts; primal expression work owns the source difference/product parameters and returned values. Capture ends before delegated comparisons. The source publishes changed cost before updating reduced costs, preserves stored-row prefixes and rereads aliased delta; errors stop the owner, Close destroys actual owned invocations/work, and older caller comparisons remain untouched. Full tableau optimization and post-pop cleanup remain incomplete.",
+        "Exact pricing delegates lexicographic bound comparisons to PairCoreSolverBase; the primal separately owns newly created epsilon-negation values and rational comparison receipts. No parent capture spans a numerical child. Allocation-failure campaigns retain source publication prefixes, partial epsilon expressions and owning teardown; older caller comparisons retain invocation identity. Sorting uses Go sort with literal source count comparison and does not promise a C++ implementation-dependent zero/equal-key order. Full exact Solve/advancement remains incomplete."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
