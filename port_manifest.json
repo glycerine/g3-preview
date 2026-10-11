@@ -103019,7 +103019,11 @@
         "pkg/util/lp/driver_lar_mps_file.go",
         "pkg/util/lp/driver_lar_smt_file_test.go",
         "pkg/util/lp/driver_mps_known_float.go",
-        "pkg/util/lp/driver_mps_known_float_test.go"
+        "pkg/util/lp/driver_mps_known_float_test.go",
+        "pkg/util/lp/stacked_map.go",
+        "pkg/util/lp/stacked_map_test.go",
+        "pkg/util/lp/stacked_set.go",
+        "pkg/util/lp/stacked_set_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103169,7 +103173,13 @@
         "TestLPMPSKnownFloatMissingEmptyInfeasibleAndThreshold",
         "TestLPMPSKnownFloatReportFailures",
         "TestLPMPSKnownFloatLiveReadsAndCleanup",
-        "TestLPMPSKnownFloatPreparedReportThresholdAndGuards"
+        "TestLPMPSKnownFloatPreparedReportThresholdAndGuards",
+        "TestLPStackedIntFloatMapSource",
+        "TestLPStackedIntFloatMapSnapshotOracle",
+        "TestLPStackedIntFloatMapSourceCancellationAndIEEE",
+        "TestLPStackedIntSetSource",
+        "TestLPStackedIntSetSnapshotOracle",
+        "TestLPStackedIntSetCheckedFailurePrefix"
       ],
       "conditionals": [
         {
@@ -104016,6 +104026,19 @@
             "TestLPMPSKnownFloatReportFailures",
             "TestLPMPSKnownFloatLiveReadsAndCleanup",
             "TestLPMPSKnownFloatPreparedReportThresholdAndGuards"
+          ]
+        },
+        {
+          "name": "test_stacked_map_itself (1933-1970) and debug-only test_stacked_set (2029-2050) retained concrete sequences, with independent rollback snapshot campaigns",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_map_test.go",
+          "tests": [
+            "TestLPStackedIntFloatMapSource",
+            "TestLPStackedIntFloatMapSnapshotOracle",
+            "TestLPStackedIntFloatMapSourceCancellationAndIEEE",
+            "TestLPStackedIntSetSource",
+            "TestLPStackedIntSetSnapshotOracle",
+            "TestLPStackedIntSetCheckedFailurePrefix"
           ]
         }
       ],
@@ -136443,9 +136466,16 @@
       "path": "src/util/lp/stacked_map.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/stacked_map.go",
+        "pkg/util/lp/stacked_map_test.go"
+      ],
+      "tests": [
+        "TestLPStackedIntFloatMapSource",
+        "TestLPStackedIntFloatMapSnapshotOracle",
+        "TestLPStackedIntFloatMapSourceCancellationAndIEEE"
+      ],
       "assertions": [
         {
           "line": 51,
@@ -136470,17 +136500,40 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete int/double retained assignment/emplace_replace, push/pop/erase with change cancellation and original-value restoration",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_map.go",
+          "tests": [
+            "TestLPStackedIntFloatMapSource",
+            "TestLPStackedIntFloatMapSnapshotOracle",
+            "TestLPStackedIntFloatMapSourceCancellationAndIEEE"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native Go maps/slices own concrete scalar storage. Frames release map references before slice truncation; zero value is ready, copying after use aliases owned backing. No numerical arena roots or fake STL allocation-accounting layer."
+      ],
+      "deviations": [
+        "Whole-source scan finds only src/test/lp.cpp concrete instantiation, not production LAR consumers (includes alone do not count). Only operations reached by retained source tests are publicly exposed. Uncalled lookup/size/clear/proxy conversion or set erase methods and other template instantiations are not implemented. Whole-source/consumer audit and CLI dispatch remain open, so no whole-unit promotion. Native Go map iteration order is irrelevant for scalar rollback; set Values is a borrowed read-only view corresponding to const source operator().",
+        "Source equality governs changes inside scopes: signed zero compares equal and does not replace; NaN never cancels original-value tracking. Reinserted old key with retained original-change entry reaches source checked erase assertion; native continues, and pop restores original. Independent snapshot oracle tolerates only the actual checked assertion prefix without deleting logical state."
+      ]
     },
     {
       "path": "src/util/lp/stacked_unordered_set.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/stacked_set.go",
+        "pkg/util/lp/stacked_set_test.go"
+      ],
+      "tests": [
+        "TestLPStackedIntSetSource",
+        "TestLPStackedIntSetSnapshotOracle",
+        "TestLPStackedIntSetCheckedFailurePrefix"
+      ],
       "assertions": [
         {
           "line": 99,
@@ -136489,9 +136542,25 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete int retained insert, push/pop and const set view, debug snapshot assertion before frame removal",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_set.go",
+          "tests": [
+            "TestLPStackedIntSetSource",
+            "TestLPStackedIntSetSnapshotOracle",
+            "TestLPStackedIntSetCheckedFailurePrefix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native Go maps/slices own concrete scalar storage. Frames release map references before slice truncation; zero value is ready, copying after use aliases owned backing. No numerical arena roots or fake STL allocation-accounting layer."
+      ],
+      "deviations": [
+        "Whole-source scan finds only src/test/lp.cpp concrete instantiation, not production LAR consumers (includes alone do not count). Only operations reached by retained source tests are publicly exposed. Uncalled lookup/size/clear/proxy conversion or set erase methods and other template instantiations are not implemented. Whole-source/consumer audit and CLI dispatch remain open, so no whole-unit promotion. Native Go map iteration order is irrelevant for scalar rollback; set Values is a borrowed read-only view corresponding to const source operator().",
+        "Original set driver is Z3DEBUG-only; same native sequence is additional independent evidence. Uncalled erase leaves erased-set restoration/cancellation unreachable in retained ordinary consumers. Checked corrupted-borrowed-view fixtures exercise actual assertion-before-frame-removal, not an ordinary valid const-source mutation. Native coverage excludes checked snapshot-validation bodies."
+      ]
     },
     {
       "path": "src/util/lp/stacked_value.h",

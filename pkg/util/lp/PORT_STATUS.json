@@ -5233,15 +5233,29 @@
     },
     {
       "source": "src/util/lp/stacked_map.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/stacked_map.go",
+        "pkg/util/lp/stacked_map_test.go"
+      ],
+      "tests": [
+        "TestLPStackedIntFloatMapSource",
+        "TestLPStackedIntFloatMapSnapshotOracle",
+        "TestLPStackedIntFloatMapSourceCancellationAndIEEE"
+      ]
     },
     {
       "source": "src/util/lp/stacked_unordered_set.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/stacked_set.go",
+        "pkg/util/lp/stacked_set_test.go"
+      ],
+      "tests": [
+        "TestLPStackedIntSetSource",
+        "TestLPStackedIntSetSnapshotOracle",
+        "TestLPStackedIntSetCheckedFailurePrefix"
+      ]
     },
     {
       "source": "src/util/lp/stacked_value.h",
@@ -5486,8 +5500,8 @@
     }
   ],
   "status_counts": {
-    "unported": 16,
-    "partial": 88,
+    "unported": 14,
+    "partial": 90,
     "reference_only": 6
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
@@ -9253,5 +9267,58 @@
       "dependency_graph": "passed",
       "diff_check": "passed"
     }
+  },
+  "latest_stacked_map_set_increment": {
+    "scope": "Concrete retained int/double stacked-map and int stacked-set consumer closures, original driver sequences and independent oracle tests; no unused template/API port",
+    "source_units_promoted_to_partial": [
+      "src/util/lp/stacked_map.h",
+      "src/util/lp/stacked_unordered_set.h"
+    ],
+    "test_groups": 6,
+    "snapshot_oracle_operations_per_container": 100000,
+    "focused_native_seconds": 0.666,
+    "focused_debug_checked_seconds": 0.699,
+    "statement_coverage": {
+      "native": {
+        "stacked_map.go": {
+          "covered": 45,
+          "total": 47,
+          "percent": 95.7
+        },
+        "stacked_set.go": {
+          "covered": 27,
+          "total": 34,
+          "percent": 79.4
+        }
+      },
+      "debug_checked": {
+        "stacked_map.go": {
+          "covered": 46,
+          "total": 47,
+          "percent": 97.9
+        },
+        "stacked_set.go": {
+          "covered": 32,
+          "total": 34,
+          "percent": 94.1
+        }
+      }
+    },
+    "coverage_note": "Map checked46/47 and native45/47: absent-new-key assertion needs unretained clear/corrupted state. Set checked32/34 and native27/34: erased cancellation/restoration needs unretained erase; native also omits checked assertion bodies. Two corrupted read-only view fixtures cover checked length/membership assertion prefixes; direct source rollback sequences and independent full-map/set snapshot oracles cover legitimate operation paths. No numerical-arena physical-failure or complete CLI credit.",
+    "verification": {
+      "focused_native": "passed",
+      "focused_debug_checked": "passed",
+      "related_stacked_native": "passed",
+      "related_stacked_debug_checked": "passed",
+      "lp_vet_native": "passed",
+      "lp_vet_debug_checked": "passed",
+      "module_compile_native": "passed",
+      "module_compile_debug_checked": "passed",
+      "portcheck": "passed",
+      "dependency_graph": "passed",
+      "diff_check": "passed"
+    },
+    "related_native_seconds": 2.099,
+    "related_debug_checked_seconds": 1.982
   }
 }
