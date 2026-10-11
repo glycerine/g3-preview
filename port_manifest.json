@@ -120284,7 +120284,9 @@
         "pkg/util/lp/lar_solve_signature_tableau.go",
         "pkg/util/lp/lar_solve_signature_tableau_test.go",
         "pkg/util/lp/lar_model_delta.go",
-        "pkg/util/lp/lar_model_delta_test.go"
+        "pkg/util/lp/lar_model_delta_test.go",
+        "pkg/util/lp/random_update_interval.go",
+        "pkg/util/lp/random_update_interval_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -120399,7 +120401,15 @@
         "TestLARModelDeltaReachedPrefixes",
         "TestLARModelDeltaPhysicalOwnership",
         "TestLARModelDeltaMixedColumnsAndLateFailure",
-        "TestLARModelDeltaPreservesOlderComparison"
+        "TestLARModelDeltaPreservesOlderComparison",
+        "TestLARRandomIntervalBoundIntersection",
+        "TestLARRandomIntervalBasicIndependentOracle",
+        "TestLARRandomIntervalDrawIndependentLattice",
+        "TestLARRandomIntervalActualTableauAndNonunitLU",
+        "TestLARRandomIntervalPhysicalOwnership",
+        "TestLARRandomIntervalReachedGuards",
+        "TestLARRandomIntervalEmptyStopsBeforeLaterColumn",
+        "TestLARRandomIntervalPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -120812,6 +120822,21 @@
             "TestLARModelDeltaPhysicalOwnership",
             "TestLARModelDeltaMixedColumnsAndLateFailure",
             "TestLARModelDeltaPreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "get_column_iterator actual tableau column or exact SolveBd indexed column (806-814)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/random_update_interval.go",
+          "tests": [
+            "TestLARRandomIntervalBoundIntersection",
+            "TestLARRandomIntervalBasicIndependentOracle",
+            "TestLARRandomIntervalDrawIndependentLattice",
+            "TestLARRandomIntervalActualTableauAndNonunitLU",
+            "TestLARRandomIntervalPhysicalOwnership",
+            "TestLARRandomIntervalReachedGuards",
+            "TestLARRandomIntervalEmptyStopsBeforeLaterColumn",
+            "TestLARRandomIntervalPreservesOlderComparison"
           ]
         }
       ],
@@ -129813,22 +129838,72 @@
       "path": "src/util/lp/random_updater.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/random_update_interval.go",
+        "pkg/util/lp/random_update_interval_test.go"
+      ],
+      "tests": [
+        "TestLARRandomIntervalBoundIntersection",
+        "TestLARRandomIntervalBasicIndependentOracle",
+        "TestLARRandomIntervalDrawIndependentLattice",
+        "TestLARRandomIntervalActualTableauAndNonunitLU",
+        "TestLARRandomIntervalPhysicalOwnership",
+        "TestLARRandomIntervalReachedGuards",
+        "TestLARRandomIntervalEmptyStopsBeforeLaterColumn",
+        "TestLARRandomIntervalPreservesOlderComparison"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "interval bound intersection, empty and containment predicates; nonbasic interval, basic feasibility clipping, actual column interval traversal and random lattice sampling",
+          "status": "ported",
+          "go_target": "pkg/util/lp/random_update_interval.go",
+          "tests": [
+            "TestLARRandomIntervalBoundIntersection",
+            "TestLARRandomIntervalBasicIndependentOracle",
+            "TestLARRandomIntervalDrawIndependentLattice",
+            "TestLARRandomIntervalActualTableauAndNonunitLU",
+            "TestLARRandomIntervalPhysicalOwnership",
+            "TestLARRandomIntervalReachedGuards",
+            "TestLARRandomIntervalEmptyStopsBeforeLaterColumn",
+            "TestLARRandomIntervalPreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "constructor, value occurrence counting, model shifts and update traversal; whole random_update integration",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Explicit interval owner retains exact endpoints, arithmetic locals, iterator output and direct-manager receipts through numerical failures. Close clears parent raw calls then iterator receipts before their coefficient output and interval locals; borrowed core/model/bounds and caller output outlive interval cleanup. Older caller comparison state is not adopted."
+      ],
+      "deviations": [
+        "Native concrete Go endpoint ownership and typed guards replace raw C++ interval/result lifetime. Source equal/reversed interval behavior and RNG consumption are preserved; unused string diagnostics are not translated. Complete updater and upstream driver remain open."
+      ]
     },
     {
       "path": "src/util/lp/random_updater.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/random_update_interval.go",
+        "pkg/util/lp/random_update_interval_test.go"
+      ],
+      "tests": [
+        "TestLARRandomIntervalBoundIntersection",
+        "TestLARRandomIntervalBasicIndependentOracle",
+        "TestLARRandomIntervalDrawIndependentLattice",
+        "TestLARRandomIntervalActualTableauAndNonunitLU",
+        "TestLARRandomIntervalPhysicalOwnership",
+        "TestLARRandomIntervalReachedGuards",
+        "TestLARRandomIntervalEmptyStopsBeforeLaterColumn",
+        "TestLARRandomIntervalPreservesOlderComparison"
+      ],
       "assertions": [
         {
           "line": 54,
@@ -129905,9 +129980,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "interval bound intersection, empty and containment predicates; nonbasic interval, basic feasibility clipping, actual column interval traversal and random lattice sampling",
+          "status": "ported",
+          "go_target": "pkg/util/lp/random_update_interval.go",
+          "tests": [
+            "TestLARRandomIntervalBoundIntersection",
+            "TestLARRandomIntervalBasicIndependentOracle",
+            "TestLARRandomIntervalDrawIndependentLattice",
+            "TestLARRandomIntervalActualTableauAndNonunitLU",
+            "TestLARRandomIntervalPhysicalOwnership",
+            "TestLARRandomIntervalReachedGuards",
+            "TestLARRandomIntervalEmptyStopsBeforeLaterColumn",
+            "TestLARRandomIntervalPreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "constructor, value occurrence counting, model shifts and update traversal; whole random_update integration",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Explicit interval owner retains exact endpoints, arithmetic locals, iterator output and direct-manager receipts through numerical failures. Close clears parent raw calls then iterator receipts before their coefficient output and interval locals; borrowed core/model/bounds and caller output outlive interval cleanup. Older caller comparison state is not adopted."
+      ],
+      "deviations": [
+        "Native concrete Go endpoint ownership and typed guards replace raw C++ interval/result lifetime. Source equal/reversed interval behavior and RNG consumption are preserved; unused string diagnostics are not translated. Complete updater and upstream driver remain open."
+      ]
     },
     {
       "path": "src/util/lp/random_updater_instances.cpp",
