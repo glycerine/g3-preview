@@ -1175,6 +1175,7 @@
         "column_info_float.go",
         "core_base_exact.go",
         "core_base_float.go",
+        "core_basis_exact.go",
         "core_dual_float.go",
         "core_iteration_float.go",
         "core_pivot_exact.go",

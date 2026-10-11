@@ -10,7 +10,11 @@ primal and dual cores expose Solve, and outer LU primal/dual integration is impl
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
 
-Latest hourly native module log completed at 23:33 UTC with every package
+A new hourly native module run including exact basis/transpose work is running;
+results are pending. Log/profile:
+`/mnt/oldrog/tmp/g3-pair-basis-module-native.{log,cover}`.
+
+Previous hourly native module log completed at 23:33 UTC with every package
 reporting success: LP 515.173s, 88.8% (13701/15421). The original process handle
 is no longer available; the completed log and coverage profile are retained.
 This snapshot includes LAR registration before the final assertion-wrapper
@@ -61,6 +65,7 @@ from the120 independently verified bounded optima.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Exact basis changes and tableau row transposition | 1600 independent basis exchanges and trace cancellation; 80 randomized matrices with 30 row swaps each; detached-nonbasic recovery and source guard/publication prefixes; pooled/direct physical row-copy failure campaigns through success and exact root census | Broader exact-core/basis/scope regressions47.835s native and76.311s debug/checked; new file98.4% native (62/63),100% debug/checked (63/63). Native erases one assertion return. Matrix owns stopped copies after the published basis swap. Tableau pivot/column removal and outer LAR scopes remain open |
 | LAR core scope lifecycle | 1600 independent nested snapshots; precise bound/type/count restoration and descending nonbasis reconstruction; actual factorization destruction and separate snapshot ownership; surviving value/extents, actual tableau bindings and current-mode profiles; four pooled/direct restoration campaigns plus pending child Push prefixes, stopped and metadata guards | Core scopes67.5% native (83/123),87.0% debug/checked (107/123). Twenty-four assertion-related statements explain the profile difference; remaining16 are child/cleanup/invariant guards. Outer tableau removal, feasibility cleanup and whole-model scopes remain open |
 | Implied-bound original-row explanations | 160 independent exact constraint-combination proofs, signed targets/raw coefficient order/identity, fixed/strict endpoints; aliases and zero-map publication/skip ordering; refusal prefixes and owner guards; pooled/direct consumer-owned division and separately stopped bound construction; actual negative-basis LU counterexample | Explanation96% native (48/50),98% debug/checked (49/50). Sign error guard is protected by matrix provenance; native erases witness assertion. Opposite-endpoint LU source discrepancy is preserved; full explanation correctness is not claimed |
 | Exact pivot calculation and per-row calculate/substitute/analyze dispatch | 100 independent B*D basis worlds and inverse-row oracle; permuted bases/cancellation; actual model strict bounds; source offset assertion/native collision and fallback; six inverse/accumulation/scheduling physical campaigns plus two native substitution and two native tableau-copy campaigns; metadata/stopped-entry guards | Union of expanded/supplemental profiles: exact pivot91.4% native (53/58),93.1% debug (54/58); LAR pivot90.2% native (55/61),75.4% debug (46/61). Debug blocks13 statements at earlier source assertions; two remaining resize guards follow successful clearing. Full optimization/scopes/explanations remain open |

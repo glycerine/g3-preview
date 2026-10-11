@@ -870,7 +870,8 @@
         "pkg/util/lp/core_base_exact.go",
         "pkg/util/lp/core_base_exact_test.go",
         "pkg/util/lp/core_pivot_exact.go",
-        "pkg/util/lp/core_pivot_exact_test.go"
+        "pkg/util/lp/core_pivot_exact_test.go",
+        "pkg/util/lp/core_basis_exact.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -938,7 +939,11 @@
         "TestLARPivotPhysicalFailurePrefixes",
         "TestLARPivotSourceBranchesAndMetadataGuards",
         "TestLARPivotAdditionalEntryAndClearGuards",
-        "TestLARPivotNativeTableauPhysicalCopies"
+        "TestLARPivotNativeTableauPhysicalCopies",
+        "TestLPPairBasisIndependentMembershipAndTrace",
+        "TestLPPairBasisDetachedAndSourceGuardPrefixes",
+        "TestLPPairBasisTableauTransposeIndependentRows",
+        "TestLPPairBasisTransposePhysicalFailureOwnership"
       ]
     },
     {
@@ -962,7 +967,8 @@
         "pkg/util/lp/core_base_exact.go",
         "pkg/util/lp/core_base_exact_test.go",
         "pkg/util/lp/core_pivot_exact.go",
-        "pkg/util/lp/core_pivot_exact_test.go"
+        "pkg/util/lp/core_pivot_exact_test.go",
+        "pkg/util/lp/core_basis_exact.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1027,7 +1033,11 @@
         "TestLARPivotPhysicalFailurePrefixes",
         "TestLARPivotSourceBranchesAndMetadataGuards",
         "TestLARPivotAdditionalEntryAndClearGuards",
-        "TestLARPivotNativeTableauPhysicalCopies"
+        "TestLARPivotNativeTableauPhysicalCopies",
+        "TestLPPairBasisIndependentMembershipAndTrace",
+        "TestLPPairBasisDetachedAndSourceGuardPrefixes",
+        "TestLPPairBasisTableauTransposeIndependentRows",
+        "TestLPPairBasisTransposePhysicalFailureOwnership"
       ]
     },
     {
@@ -1045,7 +1055,8 @@
         "pkg/util/lp/core_values_float_test.go",
         "pkg/util/lp/core_update_float_test.go",
         "pkg/util/lp/primal_advance_float.go",
-        "pkg/util/lp/core_statistics_float.go"
+        "pkg/util/lp/core_statistics_float.go",
+        "pkg/util/lp/core_basis_exact.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1083,7 +1094,11 @@
         "TestLPFloatPrimalSolveStopsAndStatuses",
         "TestLPFloatPrimalIterationBudgetAndStatistics",
         "TestLPFloatPrimalStatisticsGuardsAndIEEE",
-        "TestLPFloatPrimalSolveAndIterationReachedGuards"
+        "TestLPFloatPrimalSolveAndIterationReachedGuards",
+        "TestLPPairBasisIndependentMembershipAndTrace",
+        "TestLPPairBasisDetachedAndSourceGuardPrefixes",
+        "TestLPPairBasisTableauTransposeIndependentRows",
+        "TestLPPairBasisTransposePhysicalFailureOwnership"
       ]
     },
     {
