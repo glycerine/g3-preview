@@ -103052,7 +103052,8 @@
         "pkg/util/lp/driver_stacked.go",
         "pkg/util/lp/driver_stacked_test.go",
         "pkg/util/lp/driver_lar_examples.go",
-        "pkg/util/lp/driver_lar_examples_test.go"
+        "pkg/util/lp/driver_lar_examples_test.go",
+        "pkg/util/lp/driver_bound_propagation.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103271,7 +103272,11 @@
         "TestLPLARExamplesActualSourceProfiles",
         "TestLPLARExamplesReportFailurePrefixes",
         "TestLPLARExamplesSmallNumeralOwnership",
-        "TestLPLARExamplesPreserveOlderComparison"
+        "TestLPLARExamplesPreserveOlderComparison",
+        "TestLPBoundPropagationActualSourceCases",
+        "TestLPBoundPropagationOutputPrefixes",
+        "TestLPBoundPropagationSmallNumeralOwnership",
+        "TestLPBoundPropagationPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -104308,6 +104313,17 @@
             "TestLPLARExamplesSmallNumeralOwnership",
             "TestLPLARExamplesPreserveOlderComparison"
           ]
+        },
+        {
+          "name": "retained test_bound_propagation src2759-2967 executable parent and seven scenarios in literal order; source-disabled native general constraints and first debug assertion preserved",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_bound_propagation.go",
+          "tests": [
+            "TestLPBoundPropagationActualSourceCases",
+            "TestLPBoundPropagationOutputPrefixes",
+            "TestLPBoundPropagationSmallNumeralOwnership",
+            "TestLPBoundPropagationPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -104350,7 +104366,8 @@
         "LU check file parser uses stdlib strings and strict signed32/float conversions; signed-to-unsigned wrapping remains for valid source integers. EOF/short tokens return explicit errors instead of source nonterminating read loops/out-of-range token access. Failed open emits source diagnostic then returns the actual OS error before source invalid dimensions access. The row substring probe consumes the first non-row line; wrong first row token emits literal diagnostic and still parses. No uncalled indexed-vector reader is added. Debug residual retains source relative max normalization, strict >1e-6 and unordered IEEE behavior; source dense/indexed copy is native owned storage. Complete top-level CLI remains open.",
         "Ordinary CHECK_GLPK_SOLUTION-undefined report path only: external glpsol invocation, process_test_file output redirection and solve_some_mps orchestration remain open. Source integer0 exceptions map to ErrDriverReport; native I/O and writer errors remain explicit, strict Go float conversion qualifies malformed atof domains. Literal first Status substring/first Objective/last cost and exact2/5/3 tokens remain. Equal nonoptimal statuses earn no success; UNDEFINED versus INFEASIBLE/UNBOUNDED earns success; counters wrap unsigned32. Actual MPS compare-with-primal output selects later four-token primal cost and throws, preserving the source mismatch. No full CLI or GLPK integration claim.",
         "run_glpk uses native os/exec literal argv for the same glpsol options, discards stdout and inherits stderr; unquoted shell tokenization and raw POSIX wait-bit encoding are not ported. Only source zero/nonzero distinction is consumed; native launch error is retained separately and counts as nonzero/inconclusive after glpk-failed diagnostic. Actual GLPK5.0 independently solves16 fixed-format boxed-knapsack inputs across exact/float/min/max, including space/semicolon filenames; fixtures use contiguous fixed-format columns/bounds, since earlier loose source-parser-only fixtures are invalid for GLPK. Real LAR report lowercase status versus comparison uppercase Status preserves source report exception. Reports use explicit writer routing instead of process-global cout redirection. Source ostream silent failures are explicit Go writer/close errors. --compare_with_primal is deliberately false in process_test_file even when arguments contain it; initial min/exact snapshots precede processing output, dual/LAR/GLPK flags remain later live reads. Complete solve_some_mps/catalogue/top-level CLI remain open; no whole-source promotion.",
-        "Source catalogue minimum keys omit HOME prefix; Go preserves108 path order and all13 literal keys, including mismatch for nonempty HOME and actual matches for present empty HOME. Missing HOME emits no newline/flush; precise/GLPK empty-loop behavior remains, float missing catalogue stops before invalid source prelude indexing. Source const-char handlers have no retained loop throw producer (no literal/variable char throws in src/util, only known-solution status literal outside handlers and unused mem_copy_hook in lp.cpp); no unused exception-text adapter is introduced. Real source std::string bound exception transports ErrMPSUnhandled and propagates through batch, as do integer report exceptions/native errors. Existing explicit directory failures diagnose then continue; Go preserves literal slash split, uses native directory service and qualifies no-slash bare throw as ErrBounds. Global /tmp/test default remains; tests use isolated explicit paths rather than changing shared default directory. Full registered top-level CLI dispatch and whole retained-source/ownership audits remain open; no whole-unit promotion."
+        "Source catalogue minimum keys omit HOME prefix; Go preserves108 path order and all13 literal keys, including mismatch for nonempty HOME and actual matches for present empty HOME. Missing HOME emits no newline/flush; precise/GLPK empty-loop behavior remains, float missing catalogue stops before invalid source prelude indexing. Source const-char handlers have no retained loop throw producer (no literal/variable char throws in src/util, only known-solution status literal outside handlers and unused mem_copy_hook in lp.cpp); no unused exception-text adapter is introduced. Real source std::string bound exception transports ErrMPSUnhandled and propagates through batch, as do integer report exceptions/native errors. Existing explicit directory failures diagnose then continue; Go preserves literal slash split, uses native directory service and qualifies no-slash bare throw as ErrBounds. Global /tmp/test default remains; tests use isolated explicit paths rather than changing shared default directory. Full registered top-level CLI dispatch and whole retained-source/ownership audits remain open; no whole-unit promotion.",
+        "Bound-propagation registered parent executes total-u, triangle, one-row, bounded-row, two-rows, mixed-row, total-l. Native ignored general constraints yield OPTIMAL with no found bounds; only triangle explicit AddTerm creates two rows. Debug stops at first AddConstraint before bounds/solve/propagator; total-u/l initial reports precede solver construction and do not flush. Triangle diagnostic is endl; found-bound report uses actual PrintImpliedBound if any. Local source ev is never populated, so first final total-l assertion is false; earlier mandatory AddConstraint assertion makes this and following contains_j_kind unreachable in debug. No unused contains_j_kind adapter, unused relevance lambda or commented sample is ported. All literals fit small numerals; pooled/direct allocation-disabled profiles prove unchanged custom budget rather than inventing large source inputs. Complete top-level CLI action execution/argv binding and retained-source/ownership audits remain open."
       ]
     },
     {

@@ -10415,5 +10415,40 @@
       "/mnt/oldrog/tmp/g3-lar-implied-display-debug.cover"
     ],
     "remaining": "Complete registered bound-propagation scenarios, CLI execution/entry binding and retained-source/consumer/ownership audits."
+  },
+  "latest_bound_propagation_cli_increment": {
+    "scope": "Complete retained test_bound_propagation parent and seven literal executable scenarios; top-level CLI executor remains open",
+    "tests": [
+      "TestLPBoundPropagationActualSourceCases",
+      "TestLPBoundPropagationOutputPrefixes",
+      "TestLPBoundPropagationSmallNumeralOwnership",
+      "TestLPBoundPropagationPreservesOlderComparison"
+    ],
+    "coverage": {
+      "native": {
+        "covered": 118,
+        "statements": 147,
+        "percent": 80.3
+      },
+      "combined_debug_checked": {
+        "covered": 76,
+        "statements": 147,
+        "percent": 51.7
+      }
+    },
+    "coverage_warning": "Debug asserts at first AddConstraint and cannot reach bound installation, Solve or reporting except initial total-u/l lines. Native actual source models have no found bounds; found-bound print loop has no actual scenario witness. Other gaps guard stable delegated numerical/cleanup failures and source assertions. No synthetic child hooks or corrected source models.",
+    "source_fidelity": [
+      "Literal parent order and general constraints disabled natively/asserting in debug preserved.",
+      "Native counts constraints[3,1,1,3,2,1,3], columns[3,5,2,2,3,2,3]; triangle2terms/2rows; allOPTIMAL/no found bounds.",
+      "Total-u/l reports before solver construction without flush; triangle diagnostic uses endl.",
+      "Total-l enables presolve before third bound. Unpopulated ev first assertion false and following contains helper unreachable after earlier AddConstraint debug stop; unused lambda/commented samples excluded."
+    ],
+    "ownership_evidence": "Every per-case/parent report byte plus triangle endl failure proves completed child counts/absent later children. All7 cases pooled/direct FailAfter(0) preserve budget usage;3 actual older1000-digit caller comparisons retain invocation identity after child work and Close. Failed children remain owned; successful snapshots have no live numerical children; root censuses pass.",
+    "validation": "Focused native0.356s/combined0.327s; related upstream/implied/examples native0.479s/combined0.481s; both LP vets pass. Both native/debug module compile gates, source portcheck (2103 units/677 APIs) and dependency graph refresh (64 packages/no unresolved imports) pass.",
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-bound-propagation-driver-native.cover",
+      "/mnt/oldrog/tmp/g3-bound-propagation-driver-debug.cover"
+    ],
+    "remaining": "Other retained registered scenarios and full top-level action execution/argv entry binding; whole-source/consumer/ownership audits."
   }
 }

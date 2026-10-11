@@ -1216,6 +1216,7 @@
         "diagonal_matrix_exact.go",
         "diagonal_matrix_float.go",
         "driver_arguments.go",
+        "driver_bound_propagation.go",
         "driver_container_scenarios.go",
         "driver_dispatch.go",
         "driver_file_list.go",
