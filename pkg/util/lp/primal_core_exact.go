@@ -5,8 +5,9 @@ package lp
 import "github.com/glycerine/g3/pkg/util/numeral"
 
 // PairPrimalCoreSolver is the retained exact primal core. Construction, bound
-// classification, tableau cost updates, exact pricing and LU entry points are
-// implemented; the complete Solve loop remains open. Inputs are borrowed.
+// classification, tableau cost updates, exact pricing, LU advancement and
+// OneIteration are implemented; the complete Solve loop remains open. Inputs
+// are borrowed.
 type PairPrimalCoreSolver struct {
 	*PairCoreSolverBase
 	Beta                                         *IndexedRationalVector
@@ -30,7 +31,10 @@ type PairPrimalCoreSolver struct {
 	leavingMultiplier                            *IndexedRationalVector
 	leavingRatio                                 *IndexedPairVector
 	advanceDelta                                 *IndexedPairVector
-	stopped                                      bool
+	// The source advance_on_entering local survives calls into this solver.
+	// Unlike expression scratch it must not prevent those child ready checks.
+	enteringStep *IndexedPairVector
+	stopped      bool
 }
 
 func NewPairPrimalCoreSolver(in PairCoreInputs) (m *PairPrimalCoreSolver, err error) {
@@ -247,6 +251,12 @@ func (m *PairPrimalCoreSolver) Close() error {
 			return err
 		}
 		m.advanceDelta = nil
+	}
+	if m.enteringStep != nil {
+		if err := m.enteringStep.Close(); err != nil {
+			return err
+		}
+		m.enteringStep = nil
 	}
 	return nil
 }

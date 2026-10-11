@@ -1559,7 +1559,9 @@
         "pkg/util/lp/primal_breakpoint_advance_exact_test.go",
         "pkg/util/lp/primal_leaving_exact.go",
         "pkg/util/lp/primal_leaving_exact_test.go",
-        "pkg/util/lp/primal_infeas_cost_exact.go"
+        "pkg/util/lp/primal_infeas_cost_exact.go",
+        "pkg/util/lp/primal_iteration_exact.go",
+        "pkg/util/lp/primal_iteration_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -1679,7 +1681,12 @@
         "TestLPExactInfeasCostUnknownAndMembershipPrefixes",
         "TestLPExactInfeasCostPhysicalOwnership",
         "TestLPExactInfeasCostLeavesOlderComparisonOwned",
-        "TestLPExactInfeasCostMetadataBoundaries"
+        "TestLPExactInfeasCostMetadataBoundaries",
+        "TestLPExactIterationCountIndependentRNG",
+        "TestLPExactIterationPricingAndAdvance",
+        "TestLPExactIterationIndependentBoundedOptima",
+        "TestLPExactEnterPhysicalOwnership",
+        "TestLPExactEnterPreservesOlderComparison"
       ]
     },
     {
@@ -1717,7 +1724,12 @@
         "pkg/util/lp/primal_pivot_cost_exact.go",
         "pkg/util/lp/primal_pivot_cost_exact_test.go",
         "pkg/util/lp/primal_advance_exact.go",
-        "pkg/util/lp/primal_advance_exact_test.go"
+        "pkg/util/lp/primal_advance_exact_test.go",
+        "pkg/util/lp/primal_enter_exact.go",
+        "pkg/util/lp/primal_enter_exact_test.go",
+        "pkg/util/lp/primal_core_exact.go",
+        "pkg/util/lp/primal_iteration_exact.go",
+        "pkg/util/lp/primal_iteration_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -1839,7 +1851,14 @@
         "TestLPExactAdvanceDifferentRollback",
         "TestLPExactAdvanceDifferentSourcePrefixes",
         "TestLPExactAdvanceDifferentCostSwitchPhysicalOwnership",
-        "TestLPExactAdvanceDifferentMinimumNegation"
+        "TestLPExactAdvanceDifferentMinimumNegation",
+        "TestLPExactEnterSourceAndChildPrefixes",
+        "TestLPExactEnterPreservesOlderComparison",
+        "TestLPExactEnterIndependentModels",
+        "TestLPExactEnterPhysicalOwnership",
+        "TestLPExactIterationCountIndependentRNG",
+        "TestLPExactIterationPricingAndAdvance",
+        "TestLPExactIterationIndependentBoundedOptima"
       ]
     },
     {

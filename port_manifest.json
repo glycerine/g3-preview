@@ -123889,7 +123889,9 @@
         "pkg/util/lp/primal_breakpoint_advance_exact_test.go",
         "pkg/util/lp/primal_leaving_exact.go",
         "pkg/util/lp/primal_leaving_exact_test.go",
-        "pkg/util/lp/primal_infeas_cost_exact.go"
+        "pkg/util/lp/primal_infeas_cost_exact.go",
+        "pkg/util/lp/primal_iteration_exact.go",
+        "pkg/util/lp/primal_iteration_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124009,7 +124011,12 @@
         "TestLPExactInfeasCostUnknownAndMembershipPrefixes",
         "TestLPExactInfeasCostPhysicalOwnership",
         "TestLPExactInfeasCostLeavesOlderComparisonOwned",
-        "TestLPExactInfeasCostMetadataBoundaries"
+        "TestLPExactInfeasCostMetadataBoundaries",
+        "TestLPExactIterationCountIndependentRNG",
+        "TestLPExactIterationPricingAndAdvance",
+        "TestLPExactIterationIndependentBoundedOptima",
+        "TestLPExactEnterPhysicalOwnership",
+        "TestLPExactEnterPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -124453,6 +124460,18 @@
             "TestLPExactInfeasCostLeavesOlderComparisonOwned",
             "TestLPExactInfeasCostMetadataBoundaries"
           ]
+        },
+        {
+          "name": "decide_on_status_when_cannot_find_entering: source cost-switch assertion and stored-feasibility OPTIMAL/INFEASIBLE transition",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_iteration_exact.go",
+          "tests": [
+            "TestLPExactIterationCountIndependentRNG",
+            "TestLPExactIterationPricingAndAdvance",
+            "TestLPExactIterationIndependentBoundedOptima",
+            "TestLPExactEnterPhysicalOwnership",
+            "TestLPExactEnterPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -124476,7 +124495,8 @@
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
         "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open.",
         "Zero-low constructor preserves base FEASIBLE status, beta/Harris initialization, debug predicate before dummy resize, and borrowed header identity. The Go header is safely empty before base construction; boxed debug reads guard the C++ not-yet-constructed dummy member domain. Source omitted pricing fields are not credited before InitRun; dead enter-price epsilon assignment is excluded because no retained read exists. Initial checks use exact zero/upper comparisons, not stored lower bounds/tolerance. Original smoke fixtures now use the actual constructor with empty upper bounds: explicit LU verifies independent optima; unchanged source default strategy instead hits !use_tableau assertion in debug and missing factorization ErrBounds guard in release. This does not claim default source solver correctness or completion of the whole upstream driver.",
-        "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard."
+        "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard.",
+        "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open."
       ]
     },
     {
@@ -124516,7 +124536,12 @@
         "pkg/util/lp/primal_pivot_cost_exact.go",
         "pkg/util/lp/primal_pivot_cost_exact_test.go",
         "pkg/util/lp/primal_advance_exact.go",
-        "pkg/util/lp/primal_advance_exact_test.go"
+        "pkg/util/lp/primal_advance_exact_test.go",
+        "pkg/util/lp/primal_enter_exact.go",
+        "pkg/util/lp/primal_enter_exact_test.go",
+        "pkg/util/lp/primal_core_exact.go",
+        "pkg/util/lp/primal_iteration_exact.go",
+        "pkg/util/lp/primal_iteration_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124638,7 +124663,14 @@
         "TestLPExactAdvanceDifferentRollback",
         "TestLPExactAdvanceDifferentSourcePrefixes",
         "TestLPExactAdvanceDifferentCostSwitchPhysicalOwnership",
-        "TestLPExactAdvanceDifferentMinimumNegation"
+        "TestLPExactAdvanceDifferentMinimumNegation",
+        "TestLPExactEnterSourceAndChildPrefixes",
+        "TestLPExactEnterPreservesOlderComparison",
+        "TestLPExactEnterIndependentModels",
+        "TestLPExactEnterPhysicalOwnership",
+        "TestLPExactIterationCountIndependentRNG",
+        "TestLPExactIterationPricingAndAdvance",
+        "TestLPExactIterationIndependentBoundedOptima"
       ],
       "conditionals": [
         {
@@ -125192,6 +125224,29 @@
             "TestLPExactAdvanceDifferentCostSwitchPhysicalOwnership",
             "TestLPExactAdvanceDifferentMinimumNegation"
           ]
+        },
+        {
+          "name": "precise advance_on_entering and advance_on_entering_precise: actual SolveBd before local step construction; precise leaving and advance dispatch; source UNBOUNDED status; retained step lifetime through stopped children",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_enter_exact.go",
+          "tests": [
+            "TestLPExactEnterSourceAndChildPrefixes",
+            "TestLPExactEnterPreservesOlderComparison",
+            "TestLPExactEnterIndependentModels",
+            "TestLPExactEnterPhysicalOwnership"
+          ]
+        },
+        {
+          "name": "get_number_of_non_basic_column_to_try_for_enter and one_iteration: wrapped unsigned percentage budget, tentative-unbounded early return, actual exact pricing/advance and no-entering decision",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_iteration_exact.go",
+          "tests": [
+            "TestLPExactIterationCountIndependentRNG",
+            "TestLPExactIterationPricingAndAdvance",
+            "TestLPExactIterationIndependentBoundedOptima",
+            "TestLPExactEnterPhysicalOwnership",
+            "TestLPExactEnterPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -125213,7 +125268,9 @@
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
         "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open.",
         "Concrete exact specialization only. Source expression temporaries remain owned through numerical failure; real older comparison generations are preserved. Outer different-column advancement, precise Solve and full source diagnostics remain open.",
-        "Precise advancement omits floating beta/residual/norm branches exactly as source traits require. Unary pair negation keeps scalar arguments and returned pair independently owned; caller assignment is X then Y. Capture ends before child solver calls. Stored CopyXB remains a caller responsibility; missing backup can report FLOATING_POINT_ERROR on rollback. Full advance_on_entering_precise, precise Solve and LAR orchestration remain open."
+        "Precise advancement omits floating beta/residual/norm branches exactly as source traits require. Unary pair negation keeps scalar arguments and returned pair independently owned; caller assignment is X then Y. Capture ends before child solver calls. Stored CopyXB remains a caller responsibility; missing backup can report FLOATING_POINT_ERROR on rollback. Full advance_on_entering_precise, precise Solve and LAR orchestration remain open.",
+        "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
+        "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open."
       ]
     },
     {
