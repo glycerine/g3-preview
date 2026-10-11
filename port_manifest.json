@@ -125417,7 +125417,9 @@
         "pkg/util/lp/primal_tableau_init_cost_exact.go",
         "pkg/util/lp/primal_tableau_init_cost_exact_test.go",
         "pkg/util/lp/primal_price_tableau_exact.go",
-        "pkg/util/lp/primal_price_tableau_exact_test.go"
+        "pkg/util/lp/primal_price_tableau_exact_test.go",
+        "pkg/util/lp/primal_values_tableau_exact.go",
+        "pkg/util/lp/primal_values_tableau_exact_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -125433,7 +125435,14 @@
         "TestLPExactTableauPricingIndependentSelection",
         "TestLPExactTableauPricingSortAndReachedPrefixes",
         "TestLPExactTableauPricingPhysicalOwnership",
-        "TestLPExactTableauPricingOlderComparisonOwner"
+        "TestLPExactTableauPricingOlderComparisonOwner",
+        "TestLPExactTableauValuesIndependentModels",
+        "TestLPExactTableauBasisIndependentElimination",
+        "TestLPExactTableauValuesPhysicalOwnership",
+        "TestLPExactTableauValuesLiveDeltaAliases",
+        "TestLPExactTableauValuesReachedPrefixes",
+        "TestLPExactTableauValuesPreservesOlderComparison",
+        "TestLPExactTableauBasisNonzeroRHSSourceLimitation"
       ],
       "assertions": [
         {
@@ -125574,6 +125583,20 @@
             "TestLPExactTableauPricingPhysicalOwnership",
             "TestLPExactTableauPricingOlderComparisonOwner"
           ]
+        },
+        {
+          "name": "update_x_tableau and update_basis_and_x_tableau source350-383: entering-first live-delta arithmetic, per-cell feasibility/cost changes, tableau pivot and basis publication",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_values_tableau_exact.go",
+          "tests": [
+            "TestLPExactTableauValuesIndependentModels",
+            "TestLPExactTableauBasisIndependentElimination",
+            "TestLPExactTableauValuesPhysicalOwnership",
+            "TestLPExactTableauValuesLiveDeltaAliases",
+            "TestLPExactTableauValuesReachedPrefixes",
+            "TestLPExactTableauValuesPreservesOlderComparison",
+            "TestLPExactTableauBasisNonzeroRHSSourceLimitation"
+          ]
         }
       ],
       "ownership": [
@@ -125581,7 +125604,8 @@
       ],
       "deviations": [
         "Exact tableau reduced-cost initialization uses native dense slices and stored sparse columns; retained live costs/coefficient order, early feasibility-only return, actual child captures and physical arithmetic cleanup. Native/debug focused coverage48/51 (94.1%); independent320-model oracle, shifted aliases, stored-cell order, reached bounds, pooled/direct physical refusals and three older comparison owners. Whole tableau and source unit remain partial.",
-        "Exact tableau pricing consumes source search-budget RNG before zero-budget early return and uses actual stored sparse column lengths independently of cached LU ColumnsNZ. Native Go sorting and slice rotation replace STL storage.320 independent scan/direction/RNG models, reached sort/bounds prefixes, six physical refusal campaigns and three older-comparison owners pass native/debug. Full tableau Solve remains open."
+        "Exact tableau pricing consumes source search-budget RNG before zero-budget early return and uses actual stored sparse column lengths independently of cached LU ColumnsNZ. Native Go sorting and slice rotation replace STL storage.320 independent scan/direction/RNG models, reached sort/bounds prefixes, six physical refusal campaigns and three older-comparison owners pass native/debug. Full tableau Solve remains open.",
+        "Tableau value arithmetic captures end before actual delegated feasibility/cost maintenance. Delta aliases reread after each full expression. Pivot bool is intentionally ignored before ChangeBasis as in source. Source normalizes pivot RHS but omits nonpivot RHS elimination: x0+2*x2=6,x1+3*x2=10 at X=(4,7,1), entering2 delta1 gives X=(2,4,2), stored B=(3,10), transformed second row dot1. Dedicated independent regression preserves and distinguishes this limitation. Whole tableau source remains partial."
       ]
     },
     {
