@@ -5052,5 +5052,26 @@
       "dependency_graph": "refreshed",
       "diff_check": "pass"
     }
+  },
+  "active_full_native_checkpoint": {
+    "commit": "86cf064d",
+    "started": "2026-10-11T13:12:27.103542+00:00",
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "./...",
+      "-count=1",
+      "-timeout=60m",
+      "-coverprofile=/mnt/oldrog/tmp/g3-exact-input-model-module-native.cover"
+    ],
+    "state": "running",
+    "pid": 4,
+    "session_id": 13445,
+    "log": "/mnt/oldrog/tmp/g3-exact-input-model-module-native.log",
+    "profile": "/mnt/oldrog/tmp/g3-exact-input-model-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-exact-input-model-module-native.json",
+    "observation": "Actual tool session13445 polled and returned running; completion and coverage not yet credited."
   }
 }
