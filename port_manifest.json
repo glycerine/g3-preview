@@ -120668,7 +120668,9 @@
         "pkg/util/lp/lar_scopes.go",
         "pkg/util/lp/lar_scopes_test.go",
         "pkg/util/lp/lar_scope_validate.go",
-        "pkg/util/lp/lar_scope_validate_test.go"
+        "pkg/util/lp/lar_scope_validate_test.go",
+        "pkg/util/lp/lar_changed_bounds.go",
+        "pkg/util/lp/lar_changed_bounds_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -120734,7 +120736,13 @@
         "TestLARScopeValidatorPhysicalOwnership",
         "TestLARScopeOperationsLeaveOlderComparisonOwned",
         "TestLARScopesActualUndecidedDeferredTerms",
-        "TestLARScopesPivotedTableauKeepsSurvivingBasis"
+        "TestLARScopesPivotedTableauKeepsSurvivingBasis",
+        "TestLARChangedBoundsIndependentTableauOracle",
+        "TestLARChangedBoundsBasicMembershipTransitions",
+        "TestLARChangedBoundsActualLURowsAndValues",
+        "TestLARChangedBoundsPhysicalOwnership",
+        "TestLARChangedBoundsSourcePrefixesAndRetainedMarks",
+        "TestLARChangedBoundsStoppedEntries"
       ],
       "conditionals": [
         {
@@ -121277,6 +121285,19 @@
             "TestLARScopeValidatorPhysicalOwnership",
             "TestLARScopeOperationsLeaveOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "detect_rows_of_bound_change_column_for_nbasic_column and tableau variant, both changed-column row wrappers and batch scheduling; update_x_and_inf_costs_for_column(s)_with_changed_bounds and tableau cost-refresh orchestration",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_changed_bounds.go",
+          "tests": [
+            "TestLARChangedBoundsIndependentTableauOracle",
+            "TestLARChangedBoundsBasicMembershipTransitions",
+            "TestLARChangedBoundsActualLURowsAndValues",
+            "TestLARChangedBoundsPhysicalOwnership",
+            "TestLARChangedBoundsSourcePrefixesAndRetainedMarks",
+            "TestLARChangedBoundsStoppedEntries"
+          ]
         }
       ],
       "ownership": [
@@ -121289,7 +121310,8 @@
         "Tableau removal preserves source reverse cell/column destruction, normalized RHS and basis-before-transpose prefixes, source RHS tail pop and surviving model data. Outer reduced-cost expression temporaries belong to rationalWork and captures end before core pivot, matrix deletion or row transpose children. Numeric column removal does not restore outer witnesses, terms, constraints, types/bounds or directories. Debug-only basis validation is a native true stub. Whole LAR scopes/feasibility cleanup and optimization remain open.",
         "Column feasibility retains source rational parameter/return-pair temporaries in the exact core until successful delta assignment and cleanup, before replacing x. Delta is caller-owned and may be partially assigned; physical refusals and older comparison identity are tested. LAR basic updates own product expressions, ending capture before real PairLU/column-buffer and core membership children. Source tableau cost marks precede membership updates, and LU visits only solved sparse indices. Whole after-Pop infeasibility cleanup, cost recomputation, outer scopes and full exact optimization remain open.",
         "Cleanup keeps its source-local delta as a separate owner while exact-core/LU/basic-value children borrow it; a failure transfers the live delta to pendingCleanupDelta, which is destroyed after Core.Close. Outer capture covers only its own reduced-cost subtraction and zero assignment, never child operations. Core/child invocation identity and older caller comparisons survive the prescribed destruction order. Source local basic_columns_with_changed_cost is empty and distinct from the member set; native stale-cost and debug assertion behavior are independently reproduced.",
-        "Whole-model scopes delegate actual tableau/core/bound/feasibility owners without outer numeric capture. Successful tail destruction publishes nil entries so Close skips already destroyed owners if a later source step fails; still-live constraints/current/original terms retain their independent owners. Row equation checks own exact pair sum/product and rational expression temporaries, stop on failure, and Close destroys only their own invocation receipts. Nested tableau/nonunit LU models, scope prefix failures, pooled/direct physical campaigns, source-local delta lifetime and older caller comparison identity are tested. Full LAR optimization/propagation orchestration remains incomplete."
+        "Whole-model scopes delegate actual tableau/core/bound/feasibility owners without outer numeric capture. Successful tail destruction publishes nil entries so Close skips already destroyed owners if a later source step fails; still-live constraints/current/original terms retain their independent owners. Row equation checks own exact pair sum/product and rational expression temporaries, stop on failure, and Close destroys only their own invocation receipts. Nested tableau/nonunit LU models, scope prefix failures, pooled/direct physical campaigns, source-local delta lifetime and older caller comparison identity are tested. Full LAR optimization/propagation orchestration remains incomplete.",
+        "Changed-bound orchestration delegates actual core comparisons, clamp temporaries, indexed basis solves and tableau-cost owners without adopting their invocation receipts. A live nonbasic delta transfers to pendingCleanupDelta only on failure and is destroyed after Core.Close. Row and cost sets retain their prepared domains and existing marks; batch loops preserve source member order and successful prefixes. Full LAR Solve and propagation remain incomplete."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",
