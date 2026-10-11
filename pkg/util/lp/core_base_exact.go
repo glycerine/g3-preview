@@ -40,6 +40,7 @@ type PairCoreSolverBase struct {
 	manager                                 *numeral.RationalManager
 	calls                                   exactEtaCalls
 	pivotWork                               *IndexedRationalVector
+	feasibilityWork                         *IndexedPairVector
 	stopped                                 bool
 }
 
@@ -75,7 +76,7 @@ func NewPairCoreSolverBase(in PairCoreInputs) (m *PairCoreSolverBase, err error)
 	return m, m.InitBasisHeadingAndNonBasicColumns()
 }
 func (m *PairCoreSolverBase) ready() error {
-	if m.stopped || m.pivotWork != nil || m.calls.pending() {
+	if m.stopped || m.pivotWork != nil || m.feasibilityWork != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return nil
@@ -350,6 +351,12 @@ func (m *PairCoreSolverBase) Close() error {
 		if err := v.Close(); err != nil {
 			return err
 		}
+	}
+	if m.feasibilityWork != nil {
+		if err := m.feasibilityWork.Close(); err != nil {
+			return err
+		}
+		m.feasibilityWork = nil
 	}
 	// A failed indexed add may still borrow its product input during cleanup.
 	// The same owner retains tableau reduced-cost expression temporaries.

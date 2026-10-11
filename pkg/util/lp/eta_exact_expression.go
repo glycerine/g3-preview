@@ -1,4 +1,4 @@
-// Source: src/util/rational.h:480-493, reached exact eta expression temporaries.
+// Source: src/util/rational.h:462-464,480-493, reached exact eta expression temporaries.
 package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
@@ -29,6 +29,25 @@ func etaRationalQuotient(m *numeral.RationalManager, temporary, out, left, right
 		return err
 	}
 	if err := m.Div(temporary, right, temporary); err != nil {
+		return err
+	}
+	if err := m.Copy(out, temporary); err != nil {
+		return err
+	}
+	if err := m.Del(temporary); err != nil {
+		return err
+	}
+	*temporary = numeral.NewRational()
+	return nil
+}
+
+// etaRationalDifference retains rational(left), compound subtraction and the
+// return-value copy used by numeric_pair's two-coordinate constructor.
+func etaRationalDifference(m *numeral.RationalManager, temporary, out, left, right *numeral.Rational) error {
+	if err := m.Copy(temporary, left); err != nil {
+		return err
+	}
+	if err := m.Sub(temporary, right, temporary); err != nil {
 		return err
 	}
 	if err := m.Copy(out, temporary); err != nil {

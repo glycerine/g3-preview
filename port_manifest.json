@@ -120661,7 +120661,8 @@
         "pkg/util/lp/core_pivot_exact_test.go",
         "pkg/util/lp/lar_explanation.go",
         "pkg/util/lp/lar_explanation_test.go",
-        "pkg/util/lp/lar_tableau_remove.go"
+        "pkg/util/lp/lar_tableau_remove.go",
+        "pkg/util/lp/lar_basic_delta.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -120705,7 +120706,11 @@
         "TestLARTableauPopEmptyColumnsAndReverseOrder",
         "TestLARTableauBasisSwapPopAndBottomRightFirstLink",
         "TestLARTableauRemovalPhysicalOwnership",
-        "TestLARTableauRemovalSourceGuardsAndPrefixes"
+        "TestLARTableauRemovalSourceGuardsAndPrefixes",
+        "TestLARBasicDeltaActualClampPreservesTableauEquations",
+        "TestLARBasicDeltaIndependentNonunitLU",
+        "TestLARBasicDeltaSourcePrefixesAndStoppedGuards",
+        "TestLARBasicDeltaPhysicalOwnership"
       ],
       "conditionals": [
         {
@@ -121205,6 +121210,17 @@
             "TestLARTableauRemovalPhysicalOwnership",
             "TestLARTableauRemovalSourceGuardsAndPrefixes"
           ]
+        },
+        {
+          "name": "change_basic_x_by_delta_on_column through tableau coefficients and real indexed PairLU solve_Bd",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_basic_delta.go",
+          "tests": [
+            "TestLARBasicDeltaActualClampPreservesTableauEquations",
+            "TestLARBasicDeltaIndependentNonunitLU",
+            "TestLARBasicDeltaSourcePrefixesAndStoppedGuards",
+            "TestLARBasicDeltaPhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -121214,7 +121230,8 @@
         "Solver owns the lexical row iterator and analyzer until successful completion or explicit Close after failure. Analyzer closes before iterator, and both close before matrices/terms/core. Borrowed propagator keeps ownership of published bounds and virtual-hook calls. No model-level numeric capture adopts child calls; stopped dispatch preserves numeric generations. Source zero RHS is a nonallocating initialized local value copied into the actual analyzer.",
         "LAR pivot calculation delegates to the concrete precise core and existing PairLU without outer capture or eager initialization of missing factorization/RowsNZ. Stopped core/model retain actual child owners. Full row scheduling owns only its lexical row analyzer/iterator; term substitution is owned by each actual working term, preserving original copies.",
         "Explanation borrows the implied-bound metadata and propagator, forwards actual borrowed original-row coefficients in order, and owns no numeric copies or callback invocations. Evidence consumers own their accepted prefix and actual stopped calls. Both pooled/direct tests leave consumer-owned DivisionInvocationState unchanged across model/propagator destruction; separately stopped implied-bound construction likewise remains its own owner. Consumer operand copies are independently owned in these destruction tests; general retained row-cell borrows require the model to outlive their use.",
-        "Tableau removal preserves source reverse cell/column destruction, normalized RHS and basis-before-transpose prefixes, source RHS tail pop and surviving model data. Outer reduced-cost expression temporaries belong to rationalWork and captures end before core pivot, matrix deletion or row transpose children. Numeric column removal does not restore outer witnesses, terms, constraints, types/bounds or directories. Debug-only basis validation is a native true stub. Whole LAR scopes/feasibility cleanup and optimization remain open."
+        "Tableau removal preserves source reverse cell/column destruction, normalized RHS and basis-before-transpose prefixes, source RHS tail pop and surviving model data. Outer reduced-cost expression temporaries belong to rationalWork and captures end before core pivot, matrix deletion or row transpose children. Numeric column removal does not restore outer witnesses, terms, constraints, types/bounds or directories. Debug-only basis validation is a native true stub. Whole LAR scopes/feasibility cleanup and optimization remain open.",
+        "Column feasibility retains source rational parameter/return-pair temporaries in the exact core until successful delta assignment and cleanup, before replacing x. Delta is caller-owned and may be partially assigned; physical refusals and older comparison identity are tested. LAR basic updates own product expressions, ending capture before real PairLU/column-buffer and core membership children. Source tableau cost marks precede membership updates, and LU visits only solved sparse indices. Whole after-Pop infeasibility cleanup, cost recomputation, outer scopes and full exact optimization remain open."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",
@@ -121526,7 +121543,9 @@
         "pkg/util/lp/core_pivot_exact.go",
         "pkg/util/lp/core_pivot_exact_test.go",
         "pkg/util/lp/core_basis_exact.go",
-        "pkg/util/lp/core_tableau_exact.go"
+        "pkg/util/lp/core_tableau_exact.go",
+        "pkg/util/lp/core_feasibility_exact.go",
+        "pkg/util/lp/eta_exact_expression.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -121603,7 +121622,14 @@
         "TestLPPairTableauEmptyTargetAndNoPivot",
         "TestLPPairTableauMetadataAndStoppedGuards",
         "TestLPPairTableauPhysicalFailureOwnership",
-        "TestLPPairTableauStoppedMatrixBeforeNormalization"
+        "TestLPPairTableauStoppedMatrixBeforeNormalization",
+        "TestLPPairMakeFeasibleIndependentLexicographicOracle",
+        "TestLPPairMakeFeasibleAliasesAndSourceOrder",
+        "TestLPPairMakeFeasibleMetadataAndStoppedGuards",
+        "TestLPPairMakeFeasiblePhysicalOwnership",
+        "TestLPPairMakeFeasibleLeavesOlderComparisonOwned",
+        "TestLPPairMakeFeasibleDeltaBeforeFinalCopyRefusal",
+        "TestLPPairMakeFeasibleComparisonBeforeDeltaPublication"
       ],
       "assertions": [
         {
@@ -121870,6 +121896,20 @@
             "TestLPPairTableauPhysicalFailureOwnership",
             "TestLPPairTableauStoppedMatrixBeforeNormalization"
           ]
+        },
+        {
+          "name": "precise make_column_feasible and update_column_in_inf_set; exact bound-first clamp and independently owned output delta",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_feasibility_exact.go",
+          "tests": [
+            "TestLPPairMakeFeasibleIndependentLexicographicOracle",
+            "TestLPPairMakeFeasibleAliasesAndSourceOrder",
+            "TestLPPairMakeFeasibleMetadataAndStoppedGuards",
+            "TestLPPairMakeFeasiblePhysicalOwnership",
+            "TestLPPairMakeFeasibleLeavesOlderComparisonOwned",
+            "TestLPPairMakeFeasibleDeltaBeforeFinalCopyRefusal",
+            "TestLPPairMakeFeasibleComparisonBeforeDeltaPublication"
+          ]
         }
       ],
       "ownership": [
@@ -121879,7 +121919,8 @@
         "Exact core borrows actual input slice headers, matrix, settings, column namer and manager. It owns initialized rational/pair scratch and concrete PairLU; partial constructor results require Close. Base owns its direct comparison/cost-copy calls, while child LU calls retain their own generations and caller outputs own their published values. Derived epsilon owns source quotient expression temporaries. Destruction releases derived members, base factorization body, then reverse-order base scratch; borrowed model fields survive.",
         "Precise inverse calculation delegates numeric ownership to the actual indexed PairLU. Core pivot accumulation owns source product/return-value temporaries in pivotWork and captures only their arithmetic, ending each segment before child indexed-vector addition. PivotRow retains its own stopped AddWithDropTolerance; core product inputs survive until that vector is closed. Stopped exact core guards and named numeral-root census cover actual physical failures.",
         "Exact basis edits mutate borrowed typed slice headers in source order. Tableau transposition swaps basis/headings before delegated matrix row copies; the matrix owns any stopped numerical copy, while the core stops without adopting child allocation roots. Pooled/direct physical failure campaigns verify immediate cleanup and named root census. Whole tableau pivot/removal and outer LAR Pop remain open.",
-        "Precise tableau normalization captures only core-owned pair/RHS and row-coefficient arithmetic; the core ends capture before delegating owning row elimination to RationalStaticMatrix. Reduced-cost expressions own temporary/product slots in pivotWork. Eight pooled/direct real allocation-refusal campaigns cover normalization, child elimination, reduced costs and combined pivot/cost work through success, verify reached-prefix values and reclaim every named numeral root. Full tableau optimization, outer removal and LAR scopes remain open."
+        "Precise tableau normalization captures only core-owned pair/RHS and row-coefficient arithmetic; the core ends capture before delegating owning row elimination to RationalStaticMatrix. Reduced-cost expressions own temporary/product slots in pivotWork. Eight pooled/direct real allocation-refusal campaigns cover normalization, child elimination, reduced costs and combined pivot/cost work through success, verify reached-prefix values and reclaim every named numeral root. Full tableau optimization, outer removal and LAR scopes remain open.",
+        "Column feasibility retains source rational parameter/return-pair temporaries in the exact core until successful delta assignment and cleanup, before replacing x. Delta is caller-owned and may be partially assigned; physical refusals and older comparison identity are tested. LAR basic updates own product expressions, ending capture before real PairLU/column-buffer and core membership children. Source tableau cost marks precede membership updates, and LU visits only solved sparse indices. Whole after-Pop infeasibility cleanup, cost recomputation, outer scopes and full exact optimization remain open."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -126605,7 +126646,9 @@
         "pkg/util/lp/numeric_pair.go",
         "pkg/util/lp/static_matrix_float.go",
         "pkg/util/lp/core_base_float.go",
-        "pkg/util/lp/core_base_float_test.go"
+        "pkg/util/lp/core_base_float_test.go",
+        "pkg/util/lp/core_feasibility_exact.go",
+        "pkg/util/lp/eta_exact_expression.go"
       ],
       "tests": [
         "TestLPRationalPairArithmeticOracle",
@@ -126624,7 +126667,14 @@
         "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
         "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes",
         "TestLPFloatStaticMatrixQueriesAndColumnCopies",
-        "TestLPFloatCoreFeasibilityExactDyadicOracle"
+        "TestLPFloatCoreFeasibilityExactDyadicOracle",
+        "TestLPPairMakeFeasibleIndependentLexicographicOracle",
+        "TestLPPairMakeFeasibleAliasesAndSourceOrder",
+        "TestLPPairMakeFeasibleMetadataAndStoppedGuards",
+        "TestLPPairMakeFeasiblePhysicalOwnership",
+        "TestLPPairMakeFeasibleLeavesOlderComparisonOwned",
+        "TestLPPairMakeFeasibleDeltaBeforeFinalCopyRefusal",
+        "TestLPPairMakeFeasibleComparisonBeforeDeltaPublication"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -126674,10 +126724,25 @@
           "tests": [
             "TestLPFloatCoreFeasibilityExactDyadicOracle"
           ]
+        },
+        {
+          "name": "live numeric_pair binary subtraction expression, returned pair construction and assignment used by exact column feasibility",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_feasibility_exact.go",
+          "tests": [
+            "TestLPPairMakeFeasibleIndependentLexicographicOracle",
+            "TestLPPairMakeFeasibleAliasesAndSourceOrder",
+            "TestLPPairMakeFeasibleMetadataAndStoppedGuards",
+            "TestLPPairMakeFeasiblePhysicalOwnership",
+            "TestLPPairMakeFeasibleLeavesOlderComparisonOwned",
+            "TestLPPairMakeFeasibleDeltaBeforeFinalCopyRefusal",
+            "TestLPPairMakeFeasibleComparisonBeforeDeltaPublication"
+          ]
         }
       ],
       "ownership": [
-        "Pairs own two real util/numeral.Rational values in a borrowed caller-owned RationalManager. Native storage moves tokens; shallow copying is forbidden. Copy/arithmetic run X before Y, retaining completed destination prefixes. Explicit Del releases Y before X; manager outlives all values. Production uses project numerals; math/big is only an independent test oracle."
+        "Pairs own two real util/numeral.Rational values in a borrowed caller-owned RationalManager. Native storage moves tokens; shallow copying is forbidden. Copy/arithmetic run X before Y, retaining completed destination prefixes. Explicit Del releases Y before X; manager outlives all values. Production uses project numerals; math/big is only an independent test oracle.",
+        "Column feasibility retains source rational parameter/return-pair temporaries in the exact core until successful delta assignment and cleanup, before replacing x. Delta is caller-owned and may be partially assigned; physical refusals and older comparison identity are tested. LAR basic updates own product expressions, ending capture before real PairLU/column-buffer and core membership children. Source tableau cost marks precede membership updates, and LU visits only solved sparse indices. Whole after-Pop infeasibility cleanup, cost recomputation, outer scopes and full exact optimization remain open."
       ],
       "deviations": [
         "Concrete numeric_pair<mpq> subset only. Remaining numeric traits, conversions and any reached project specializations remain open. Definition-only numeric_pair<double> and undefined pair-times-pair/pair-divided-by-pair bodies gain no invented adapters or source credit.",
@@ -148151,7 +148216,14 @@
         "TestLPExactEtaAllocationFailureCensus",
         "TestLPExactEtaIndependentMatrixProducts",
         "TestLPExactRowEtaIndependentMatrixProducts",
-        "TestLPExactRowEtaAllocationFailureCensus"
+        "TestLPExactRowEtaAllocationFailureCensus",
+        "TestLPPairMakeFeasibleIndependentLexicographicOracle",
+        "TestLPPairMakeFeasibleAliasesAndSourceOrder",
+        "TestLPPairMakeFeasibleMetadataAndStoppedGuards",
+        "TestLPPairMakeFeasiblePhysicalOwnership",
+        "TestLPPairMakeFeasibleLeavesOlderComparisonOwned",
+        "TestLPPairMakeFeasibleDeltaBeforeFinalCopyRefusal",
+        "TestLPPairMakeFeasibleComparisonBeforeDeltaPublication"
       ],
       "conditionals": [
         {
@@ -148892,6 +148964,20 @@
             "TestLPExactRowEtaIndependentMatrixProducts",
             "TestLPExactRowEtaAllocationFailureCensus"
           ]
+        },
+        {
+          "name": "retained rational binary subtraction compound-and-return-copy expression inside precise feasibility delta",
+          "status": "ported",
+          "go_target": "pkg/util/lp/eta_exact_expression.go",
+          "tests": [
+            "TestLPPairMakeFeasibleIndependentLexicographicOracle",
+            "TestLPPairMakeFeasibleAliasesAndSourceOrder",
+            "TestLPPairMakeFeasibleMetadataAndStoppedGuards",
+            "TestLPPairMakeFeasiblePhysicalOwnership",
+            "TestLPPairMakeFeasibleLeavesOlderComparisonOwned",
+            "TestLPPairMakeFeasibleDeltaBeforeFinalCopyRefusal",
+            "TestLPPairMakeFeasibleComparisonBeforeDeltaPublication"
+          ]
         }
       ],
       "ownership": [
@@ -148916,7 +149002,8 @@
         "AbsWithInvocation shares original unary abs body, copies input into distinct physical work before sign removal and transfers its returned owner under actual caller allocation context. Direct tests cover positive/negative/fraction/big inputs, unchanged borrowed input, returned-value survival after invocation retirement, every actual cold copy reservation and exact ownership/history cleanup. No integer division adjustment frame is introduced.",
         "PowerWithInvocation captures the actual reached RAW PowerGeneration in the caller invocation, routes original copy/set/Mul through its allocation context and joins only that matching power child. Younger normalization/integer children join before the older power numeral; NUM then DEN cleanup retains generation/cursor/cause history. Older completed calls cannot adopt newer stopped power frames. A reached child source-end cause stops older facade source destruction before its epilogue.",
         "General bitwise complement owns original a1/a2/m/tmp in a matching IntegerRawScope with reached Count4. Actual caller receipt captures the RAW generation before copying, and context routes original copy/set/mod/Mul/Add/Div actions and allocation outcomes into that frame. Body refusal retains locals without implicit source DEL; successful source end releases them forward in original order. Exact owning cleanup joins only matching cohorts, preserves source/body/generation history and is integrated into integer manager close. Small inputs at width<=63 acquire no general RAW frame. Independent physical audits name the new retained fields rather than weakening descriptor ownership checks.",
-        "The scalar invocation borrows the service original static zero and writes through the caller owned destination. NUM/DEN copies use the exact allocation context; no extra owned rational is constructed or source-destroyed. Actual Runtime tests replace big NUM/DEN values while allocation is refused, preserve the static field and close the graph to zero budget."
+        "The scalar invocation borrows the service original static zero and writes through the caller owned destination. NUM/DEN copies use the exact allocation context; no extra owned rational is constructed or source-destroyed. Actual Runtime tests replace big NUM/DEN values while allocation is refused, preserve the static field and close the graph to zero budget.",
+        "Column feasibility retains source rational parameter/return-pair temporaries in the exact core until successful delta assignment and cleanup, before replacing x. Delta is caller-owned and may be partially assigned; physical refusals and older comparison identity are tested. LAR basic updates own product expressions, ending capture before real PairLU/column-buffer and core membership children. Source tableau cost marks precede membership updates, and LU visits only solved sparse indices. Whole after-Pop infeasibility cleanup, cost recomputation, outer scopes and full exact optimization remain open."
       ],
       "deviations": [
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
