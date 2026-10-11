@@ -9904,5 +9904,36 @@
       "dependency_graph": "64 packages; refreshed",
       "diff_check": "pass"
     }
+  },
+  "latest_cli_preparation_increment": {
+    "scope": "test_lp_local preparation and source branch selection only; selected action execution remains outstanding",
+    "tests": [
+      "TestLPDriverPreparationSourcePrecedence",
+      "TestLPDriverPreparationEmptyOptionsAndDebugStage",
+      "TestLPDriverPreparationSolveOptionsAndParseFailure",
+      "TestLPDriverPreparationReportFailurePrefixes"
+    ],
+    "native_coverage": {
+      "covered": 52,
+      "statements": 67,
+      "percent": 77.6
+    },
+    "combined_debug_checked_coverage": {
+      "covered": 66,
+      "statements": 67,
+      "percent": 98.5
+    },
+    "coverage_gaps": "Native profile includes debug-only code. Combined gap is stable delegated NewSettings failure guard.",
+    "validation": "Focused native0.120s/combined0.111s; related argument/settings/preparation native0.055s/combined0.058s; both LP vets and module compilation passed.",
+    "source_findings": [
+      "Directory test body and finalize are empty; commented directory enumeration excluded.",
+      "Tests after unconditional final return remain unreachable.",
+      "Unused resized mpq vector has no retained value consumer."
+    ],
+    "remaining": "Concrete execution of all retained selected test/solve actions, argv+2 entry binding and whole-source/consumer/ownership audits.",
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-dispatch-native.cover",
+      "/mnt/oldrog/tmp/g3-dispatch-debug.cover"
+    ]
   }
 }

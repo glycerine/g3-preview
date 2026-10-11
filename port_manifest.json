@@ -103039,7 +103039,9 @@
         "pkg/util/lp/driver_process_file_test.go",
         "pkg/util/lp/driver_mps_batch.go",
         "pkg/util/lp/driver_mps_catalogue.go",
-        "pkg/util/lp/driver_mps_batch_test.go"
+        "pkg/util/lp/driver_mps_batch_test.go",
+        "pkg/util/lp/driver_dispatch.go",
+        "pkg/util/lp/driver_dispatch_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103240,7 +103242,11 @@
         "TestLPMPSBatchChildFailurePrefixes",
         "TestLPMPSBatchPhysicalChildOwnership",
         "TestLPMPSBatchOlderCallerComparison",
-        "TestLPMPSBatchEveryPreludeFailurePrefix"
+        "TestLPMPSBatchEveryPreludeFailurePrefix",
+        "TestLPDriverPreparationSourcePrecedence",
+        "TestLPDriverPreparationEmptyOptionsAndDebugStage",
+        "TestLPDriverPreparationSolveOptionsAndParseFailure",
+        "TestLPDriverPreparationReportFailurePrefixes"
       ],
       "conditionals": [
         {
@@ -104210,6 +104216,25 @@
           "status": "dead_deleted",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "test_lp_local argument preparation and branch selection only: resize/parse/print, source precedence, debug settings stage, exact/min/dual/limits; selected calls are not executed by this stage",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_dispatch.go",
+          "tests": [
+            "TestLPDriverPreparationSourcePrecedence",
+            "TestLPDriverPreparationEmptyOptionsAndDebugStage",
+            "TestLPDriverPreparationSolveOptionsAndParseFailure",
+            "TestLPDriverPreparationReportFailurePrefixes"
+          ]
+        },
+        {
+          "name": "test_files_from_directory src2391-2419 and finalize src2090-2096 contain only commented bodies; directory option selects an empty action, no directory traversal retained",
+          "status": "reference_only",
+          "tests": [
+            "TestLPDriverPreparationSourcePrecedence",
+            "TestLPDriverPreparationEmptyOptionsAndDebugStage"
+          ]
         }
       ],
       "ownership": [
