@@ -1715,7 +1715,9 @@
         "pkg/util/lp/primal_init_run_exact.go",
         "pkg/util/lp/primal_advance_equal_exact.go",
         "pkg/util/lp/primal_pivot_cost_exact.go",
-        "pkg/util/lp/primal_pivot_cost_exact_test.go"
+        "pkg/util/lp/primal_pivot_cost_exact_test.go",
+        "pkg/util/lp/primal_advance_exact.go",
+        "pkg/util/lp/primal_advance_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -1827,7 +1829,17 @@
         "TestLPPairPivotCostLiveAliases",
         "TestLPPairPivotCostPhysicalOwnership",
         "TestLPPairPivotCostReachedPrefixes",
-        "TestLPPairPivotPreservesOlderComparison"
+        "TestLPPairPivotPreservesOlderComparison",
+        "TestLPExactAdvanceDifferentLiveSteps",
+        "TestLPExactAdvanceDifferentOlderComparison",
+        "TestLPExactAdvanceDifferentIndependentSystems",
+        "TestLPExactAdvanceDifferentPivotOutcomes",
+        "TestLPExactAdvanceDifferentPhysicalOwnership",
+        "TestLPExactAdvanceDifferentRestoresCosts",
+        "TestLPExactAdvanceDifferentRollback",
+        "TestLPExactAdvanceDifferentSourcePrefixes",
+        "TestLPExactAdvanceDifferentCostSwitchPhysicalOwnership",
+        "TestLPExactAdvanceDifferentMinimumNegation"
       ]
     },
     {
