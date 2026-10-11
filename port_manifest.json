@@ -127410,7 +127410,9 @@
         "pkg/util/lp/dual_prepare_float_test.go",
         "pkg/util/lp/dual_solver_float.go",
         "pkg/util/lp/solver_exact_model.go",
-        "pkg/util/lp/solver_exact_model_test.go"
+        "pkg/util/lp/solver_exact_model_test.go",
+        "pkg/util/lp/solver_prepare_exact.go",
+        "pkg/util/lp/solver_prepare_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -127441,7 +127443,17 @@
         "TestLPRationalInputModelSourceReplacementAndNames",
         "TestLPRationalInputModelPhysicalOwnership",
         "TestLPRationalInputModelEntryGuards",
-        "TestLPRationalInputModelUpstreamSolveRationalInput"
+        "TestLPRationalInputModelUpstreamSolveRationalInput",
+        "TestLPRationalPreparationIndependentMatricesAndRHS",
+        "TestLPRationalPreparationSourceMappingPrefixes",
+        "TestLPRationalPreparationDenseResizeAndExactScale",
+        "TestLPRationalPreparationDescendingRHSAndCounters",
+        "TestLPRationalPreparationPhysicalOwnership",
+        "TestLPRationalPreparationSeparateEntriesAndRepeatedMapping",
+        "TestLPRationalPreparationReachedDomains",
+        "TestLPRationalPreparationActualMPSPipeline",
+        "TestLPRationalPreparationPreservesOlderComparison",
+        "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -127463,9 +127475,20 @@
         },
         {
           "name": "exact common solver data preparation, full optimization integration and retained diagnostics",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/util/lp/solver_prepare_exact.go",
+          "tests": [
+            "TestLPRationalPreparationIndependentMatricesAndRHS",
+            "TestLPRationalPreparationSourceMappingPrefixes",
+            "TestLPRationalPreparationDenseResizeAndExactScale",
+            "TestLPRationalPreparationDescendingRHSAndCounters",
+            "TestLPRationalPreparationPhysicalOwnership",
+            "TestLPRationalPreparationSeparateEntriesAndRepeatedMapping",
+            "TestLPRationalPreparationReachedDomains",
+            "TestLPRationalPreparationActualMPSPipeline",
+            "TestLPRationalPreparationPreservesOlderComparison",
+            "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
+          ]
         },
         {
           "name": "retained floating presolve row extrema, zero/equality/inequality decisions, boundary pinning, fixed/zero term elimination, deferred row erasure and cleanup (lp_solver.hpp:168-412)",
@@ -127527,13 +127550,31 @@
             "TestLPRationalInputModelEntryGuards",
             "TestLPRationalInputModelUpstreamSolveRationalInput"
           ]
+        },
+        {
+          "name": "Concrete mpq/mpq external/core maps, exact matrix/RHS shifts, slack/artificial counts, precise scale bypass and matrix/RHS reconstruction (lp_solver.hpp:412-534,111-116; lp_solver.h:229-235)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_prepare_exact.go",
+          "tests": [
+            "TestLPRationalPreparationIndependentMatricesAndRHS",
+            "TestLPRationalPreparationSourceMappingPrefixes",
+            "TestLPRationalPreparationDenseResizeAndExactScale",
+            "TestLPRationalPreparationDescendingRHSAndCounters",
+            "TestLPRationalPreparationPhysicalOwnership",
+            "TestLPRationalPreparationSeparateEntriesAndRepeatedMapping",
+            "TestLPRationalPreparationReachedDomains",
+            "TestLPRationalPreparationActualMPSPipeline",
+            "TestLPRationalPreparationPreservesOlderComparison",
+            "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
+          ]
         }
       ],
       "ownership": [
         "Common floating state uses native slices/maps and insertion-ordered insdict dictionaries for rows/coefficients, preserving replacement position. FloatLPSolver owns its FloatStaticMatrix and column metadata; unscale clears the retired matrix before publishing reconstruction, then restores existing scale entries and refills RHS descending. No source vector/hash/STL storage emulation or fake allocation refusals. NewSettings error propagates real host-clock failure.",
         "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced.",
         "Presolve uses native temporary key slices and erases dictionary entries only after each source scan. RHS subtraction and earlier variable pins publish immediately. Infeasibility returns before queued row deletion and term elimination. No fake numerical allocation/refusal layer or generic bound callback is introduced; surviving FloatColumnInfo pointers retain identity.",
-        "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json."
+        "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json.",
+        "Parent raw receipts close before matrix/column/dense-output child receipts; children close before source coefficient/result/shift locals and input owners. Dense resize destroys actual owning suffix values before shortening. Displaced native matrices remain explicitly owned until Close; old caller comparisons are neither adopted nor consumed. See latest_exact_preparation_increment in pkg/util/lp/PORT_STATUS.json."
       ],
       "deviations": [
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
@@ -127559,7 +127600,9 @@
         "pkg/util/lp/dual_prepare_float.go",
         "pkg/util/lp/dual_prepare_float_test.go",
         "pkg/util/lp/solver_exact_model.go",
-        "pkg/util/lp/solver_exact_model_test.go"
+        "pkg/util/lp/solver_exact_model_test.go",
+        "pkg/util/lp/solver_prepare_exact.go",
+        "pkg/util/lp/solver_prepare_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -127584,7 +127627,17 @@
         "TestLPRationalInputModelSourceReplacementAndNames",
         "TestLPRationalInputModelPhysicalOwnership",
         "TestLPRationalInputModelEntryGuards",
-        "TestLPRationalInputModelUpstreamSolveRationalInput"
+        "TestLPRationalInputModelUpstreamSolveRationalInput",
+        "TestLPRationalPreparationIndependentMatricesAndRHS",
+        "TestLPRationalPreparationSourceMappingPrefixes",
+        "TestLPRationalPreparationDenseResizeAndExactScale",
+        "TestLPRationalPreparationDescendingRHSAndCounters",
+        "TestLPRationalPreparationPhysicalOwnership",
+        "TestLPRationalPreparationSeparateEntriesAndRepeatedMapping",
+        "TestLPRationalPreparationReachedDomains",
+        "TestLPRationalPreparationActualMPSPipeline",
+        "TestLPRationalPreparationPreservesOlderComparison",
+        "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
       ],
       "assertions": [
         {
@@ -127664,9 +127717,20 @@
         },
         {
           "name": "exact common solver data preparation, full optimization integration and retained diagnostics",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/util/lp/solver_prepare_exact.go",
+          "tests": [
+            "TestLPRationalPreparationIndependentMatricesAndRHS",
+            "TestLPRationalPreparationSourceMappingPrefixes",
+            "TestLPRationalPreparationDenseResizeAndExactScale",
+            "TestLPRationalPreparationDescendingRHSAndCounters",
+            "TestLPRationalPreparationPhysicalOwnership",
+            "TestLPRationalPreparationSeparateEntriesAndRepeatedMapping",
+            "TestLPRationalPreparationReachedDomains",
+            "TestLPRationalPreparationActualMPSPipeline",
+            "TestLPRationalPreparationPreservesOlderComparison",
+            "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
+          ]
         },
         {
           "name": "retained floating presolve row extrema, zero/equality/inequality decisions, boundary pinning, fixed/zero term elimination, deferred row erasure and cleanup (lp_solver.hpp:168-412)",
@@ -127715,13 +127779,31 @@
             "TestLPRationalInputModelEntryGuards",
             "TestLPRationalInputModelUpstreamSolveRationalInput"
           ]
+        },
+        {
+          "name": "Concrete mpq/mpq external/core maps, exact matrix/RHS shifts, slack/artificial counts, precise scale bypass and matrix/RHS reconstruction (lp_solver.hpp:412-534,111-116; lp_solver.h:229-235)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_prepare_exact.go",
+          "tests": [
+            "TestLPRationalPreparationIndependentMatricesAndRHS",
+            "TestLPRationalPreparationSourceMappingPrefixes",
+            "TestLPRationalPreparationDenseResizeAndExactScale",
+            "TestLPRationalPreparationDescendingRHSAndCounters",
+            "TestLPRationalPreparationPhysicalOwnership",
+            "TestLPRationalPreparationSeparateEntriesAndRepeatedMapping",
+            "TestLPRationalPreparationReachedDomains",
+            "TestLPRationalPreparationActualMPSPipeline",
+            "TestLPRationalPreparationPreservesOlderComparison",
+            "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
+          ]
         }
       ],
       "ownership": [
         "Common floating state uses native slices/maps and insertion-ordered insdict dictionaries for rows/coefficients, preserving replacement position. FloatLPSolver owns its FloatStaticMatrix and column metadata; unscale clears the retired matrix before publishing reconstruction, then restores existing scale entries and refills RHS descending. No source vector/hash/STL storage emulation or fake allocation refusals. NewSettings error propagates real host-clock failure.",
         "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced.",
         "Presolve uses native temporary key slices and erases dictionary entries only after each source scan. RHS subtraction and earlier variable pins publish immediately. Infeasibility returns before queued row deletion and term elimination. No fake numerical allocation/refusal layer or generic bound callback is introduced; surviving FloatColumnInfo pointers retain identity.",
-        "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json."
+        "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json.",
+        "Parent raw receipts close before matrix/column/dense-output child receipts; children close before source coefficient/result/shift locals and input owners. Dense resize destroys actual owning suffix values before shortening. Displaced native matrices remain explicitly owned until Close; old caller comparisons are neither adopted nor consumed. See latest_exact_preparation_increment in pkg/util/lp/PORT_STATUS.json."
       ],
       "deviations": [
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",

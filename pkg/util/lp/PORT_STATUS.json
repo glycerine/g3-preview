@@ -2566,7 +2566,9 @@
         "pkg/util/lp/dual_prepare_float_test.go",
         "pkg/util/lp/dual_solver_float.go",
         "pkg/util/lp/solver_exact_model.go",
-        "pkg/util/lp/solver_exact_model_test.go"
+        "pkg/util/lp/solver_exact_model_test.go",
+        "pkg/util/lp/solver_prepare_exact.go",
+        "pkg/util/lp/solver_prepare_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -2597,7 +2599,17 @@
         "TestLPRationalInputModelSourceReplacementAndNames",
         "TestLPRationalInputModelPhysicalOwnership",
         "TestLPRationalInputModelEntryGuards",
-        "TestLPRationalInputModelUpstreamSolveRationalInput"
+        "TestLPRationalInputModelUpstreamSolveRationalInput",
+        "TestLPRationalPreparationIndependentMatricesAndRHS",
+        "TestLPRationalPreparationSourceMappingPrefixes",
+        "TestLPRationalPreparationDenseResizeAndExactScale",
+        "TestLPRationalPreparationDescendingRHSAndCounters",
+        "TestLPRationalPreparationPhysicalOwnership",
+        "TestLPRationalPreparationSeparateEntriesAndRepeatedMapping",
+        "TestLPRationalPreparationReachedDomains",
+        "TestLPRationalPreparationActualMPSPipeline",
+        "TestLPRationalPreparationPreservesOlderComparison",
+        "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
       ]
     },
     {
@@ -2613,7 +2625,9 @@
         "pkg/util/lp/dual_prepare_float.go",
         "pkg/util/lp/dual_prepare_float_test.go",
         "pkg/util/lp/solver_exact_model.go",
-        "pkg/util/lp/solver_exact_model_test.go"
+        "pkg/util/lp/solver_exact_model_test.go",
+        "pkg/util/lp/solver_prepare_exact.go",
+        "pkg/util/lp/solver_prepare_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -2638,7 +2652,17 @@
         "TestLPRationalInputModelSourceReplacementAndNames",
         "TestLPRationalInputModelPhysicalOwnership",
         "TestLPRationalInputModelEntryGuards",
-        "TestLPRationalInputModelUpstreamSolveRationalInput"
+        "TestLPRationalInputModelUpstreamSolveRationalInput",
+        "TestLPRationalPreparationIndependentMatricesAndRHS",
+        "TestLPRationalPreparationSourceMappingPrefixes",
+        "TestLPRationalPreparationDenseResizeAndExactScale",
+        "TestLPRationalPreparationDescendingRHSAndCounters",
+        "TestLPRationalPreparationPhysicalOwnership",
+        "TestLPRationalPreparationSeparateEntriesAndRepeatedMapping",
+        "TestLPRationalPreparationReachedDomains",
+        "TestLPRationalPreparationActualMPSPipeline",
+        "TestLPRationalPreparationPreservesOlderComparison",
+        "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
       ]
     },
     {
@@ -5073,5 +5097,105 @@
     "profile": "/mnt/oldrog/tmp/g3-exact-input-model-module-native.cover",
     "status_file": "/mnt/oldrog/tmp/g3-exact-input-model-module-native.json",
     "observation": "Actual tool session13445 polled and returned running; completion and coverage not yet credited."
+  },
+  "latest_exact_preparation_increment": {
+    "source": [
+      "src/util/lp/lp_solver.hpp:412-534,111-116",
+      "src/util/lp/lp_solver.h:229-235"
+    ],
+    "retained_consumers": [
+      "src/util/lp/lp_primal_simplex.hpp",
+      "src/util/lp/lp_dual_simplex.hpp",
+      "src/test/lp.cpp:1725-1769"
+    ],
+    "go_targets": [
+      "pkg/util/lp/solver_prepare_exact.go",
+      "pkg/util/lp/solver_prepare_exact_test.go",
+      "pkg/util/lp/solver_exact_model.go"
+    ],
+    "tests": [
+      "TestLPRationalPreparationIndependentMatricesAndRHS",
+      "TestLPRationalPreparationSourceMappingPrefixes",
+      "TestLPRationalPreparationDenseResizeAndExactScale",
+      "TestLPRationalPreparationDescendingRHSAndCounters",
+      "TestLPRationalPreparationPhysicalOwnership",
+      "TestLPRationalPreparationSeparateEntriesAndRepeatedMapping",
+      "TestLPRationalPreparationReachedDomains",
+      "TestLPRationalPreparationActualMPSPipeline",
+      "TestLPRationalPreparationPreservesOlderComparison",
+      "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
+    ],
+    "coverage": {
+      "native": {
+        "solver_prepare_exact.go": {
+          "covered": 228,
+          "total": 247,
+          "percent": 92.3
+        },
+        "solver_exact_model.go": {
+          "covered": 148,
+          "total": 165,
+          "percent": 89.7
+        },
+        "column_info_exact.go": {
+          "covered": 171,
+          "total": 195,
+          "percent": 87.7
+        },
+        "mps_populate_exact.go": {
+          "covered": 58,
+          "total": 61,
+          "percent": 95.1
+        }
+      },
+      "debug": {
+        "solver_prepare_exact.go": {
+          "covered": 229,
+          "total": 247,
+          "percent": 92.7
+        },
+        "solver_exact_model.go": {
+          "covered": 149,
+          "total": 165,
+          "percent": 90.3
+        },
+        "column_info_exact.go": {
+          "covered": 155,
+          "total": 195,
+          "percent": 79.5
+        },
+        "mps_populate_exact.go": {
+          "covered": 57,
+          "total": 61,
+          "percent": 93.4
+        }
+      }
+    },
+    "focused_seconds": {
+      "native": 1.793,
+      "debug_checked": 2.174
+    },
+    "combined_focused_seconds": {
+      "native": 3.211,
+      "debug_checked": 3.803
+    },
+    "related_regression_seconds": {
+      "native": 6.935,
+      "debug_checked": 7.468
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-exact-preparation-native.cover",
+      "/mnt/oldrog/tmp/g3-exact-preparation-debug.cover"
+    ],
+    "evidence": "Concrete lp_solver<mpq,mpq> external/core mapping, exact matrix assembly, low-bound row shifts, RHS preparation, auxiliary counts, precise scaling and reconstruction now implement lp_solver.hpp:412-534, lp_solver.h:229-235 and the precise scale early return at lp_solver.hpp:111-116. Actual RationalStaticMatrix and dense Rational vectors hold coefficients/RHS/scales, without a rational-pair or floating optimization adapter. Coefficient loop copies precede column lookups and assertions. Upper-only columns negate actual matrix coefficients, while RHS shifts use original coefficients and fixed/upper/lower/free source shift priority. RHS rows execute in descending core order; small exact scale values never consult floating settings or incur synthetic container-allocation fees. Matrix and dense-output receipts close before borrowed lexical coefficient/results; column output receipts close before shift locals. Native repeated fill retains displaced matrix owners until Close instead of reproducing a source pointer leak. Source mapping is deliberately not repaired: repeating mapping starts the newcomer counter at0 and can overwrite an existing core-to-external entry. Ten new test groups cover160 independently checked81-240-bit rational matrix worlds, exact shifts and RHS, reciprocal sparse links, all bound types, dense resize ownership, reconstruction, source empty input, fixed/zero/missing-column prefixes, all three relations and unknown kinds, signed invalid indices, unsigned counter wrap,19 reached input-domain profiles and11 stopped entry points. Late failures preserve completed row cells, copied next coefficients, accumulated shift sums, descending RHS updates and counts. Ten pooled/direct physical campaigns through success exercise unflipped/flipped assembly, row shift, RHS assignment and full reconstruction. Exact scale succeeds even with the next physical reservation refused, for both pooled/direct managers. Actual older caller comparison identity survives interrupted RHS preparation and destruction; real exact MPS parsing/population feeds matrix/RHS/scale, retaining the source MI default lower flag. New preparation file228/247 statements (92.3%) native,229/247 (92.7%) debug/checked. Remaining blocks principally guard initialized numerical predicates, valid call capture, destruction/resize and unchanged child extents; native additionally erases the existing-matrix assertion. Focused preparation1.793s/2.174s and combined column/input/MPS/preparation3.211s/3.803s pass. Related exact model/parser, floating solver/primal/dual/MPS and exact static matrix regressions6.935s/7.468s pass. Initial compilation/coverage attempts exhausted temporary storage; after removing12GiB of old regenerable task Go-cache entries, both affected checks were rerun successfully. Both LP vets and native/debug module compilation pass. Exact presolve, objective/value preparation and concrete mpq/mpq primal/dual cores/outer optimization, MPS factories and full upstream solve drivers remain open. Inventory stays88 partial/16 unported/6 reference_only; no whole-source promotion. Running full native86cf064d checkpoint started before this preparation increment; completion and coverage are not credited here.",
+    "validation": {
+      "native_lp_vet": "pass",
+      "debug_checked_lp_vet": "pass",
+      "native_module_compile": "pass",
+      "debug_checked_module_compile": "pass",
+      "source_portcheck": "pass",
+      "dependency_graph": "refreshed",
+      "diff_check": "pass"
+    }
   }
 }
