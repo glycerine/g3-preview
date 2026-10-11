@@ -4660,5 +4660,27 @@
       "native": 88.949,
       "debug_checked": 164.288
     }
+  },
+  "active_full_native_checkpoint": {
+    "commit": "68b2c6ce",
+    "started": "2026-10-11T11:52:26.136702+00:00",
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "./...",
+      "-count=1",
+      "-timeout=60m",
+      "-coverprofile=/mnt/oldrog/tmp/g3-random-updater-module-native.cover"
+    ],
+    "state": "running",
+    "pid": 5,
+    "runner_session": 24264,
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-random-updater-module-native.json",
+      "/mnt/oldrog/tmp/g3-random-updater-module-native.log",
+      "/mnt/oldrog/tmp/g3-random-updater-module-native.cover"
+    ]
   }
 }
