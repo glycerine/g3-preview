@@ -21,6 +21,7 @@ type PairPrimalCoreSolver struct {
 	LeftBasisTableau                             IntSet
 	BlandModeTableau                             bool
 	LeftBasisRepeated                            uint32
+	InfRowIndexForTableau                        uint32
 	LeavingCandidates                            []uint32
 	calls                                        exactEtaCalls
 	work                                         *IndexedRationalVector

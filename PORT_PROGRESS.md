@@ -38600,3 +38600,39 @@ matrix validation. Profiles: /mnt/oldrog/tmp/g3-init-tableau-{native,debug}-focu
 Both LP vets, native/debug module compilation, portcheck and diff checks pass.
 Full LP remains84partial/26unported units; row-mode iteration and exact
 Solve orchestration remain open. No whole-unit completion is credited.
+
+## Exact tableau row-based entering-column selection
+
+Ported the retained row-pricing helpers in lp_primal_core_solver.h:140-154,
+174-318: needs_to_grow, monoid_can_decrease/increase, actual stored-column
+non-free-basic damage counting, and the normal/Bland beneficial-column scans.
+The normal scan preserves the initial damage/length thresholds, short-circuit
+RNG order and source accumulation of older candidates when an equally damaging
+shorter column is accepted. Selection may therefore still choose an earlier
+longer column. Bland scans stored row order and copies each improving minimum
+coefficient immediately; output aliases can change a later candidate before
+its eligibility is read. Infeasible-row index is published only after an empty
+candidate scan. Candidate pointers borrow stable row cells; copied scalar output
+and numeric receipts remain with their actual owners. No source-dead sign-row
+eligibility or inf_sign_of_column helper was ported.
+
+Verification:480 independent selection/damage/RNG worlds with contradictory
+cached column/row counts and explicit older-longer choice witnesses;300 exact
+rational/epsilon monoid models, including zero coefficients;200 infeasible
+needs-to-grow profiles; one live Bland coefficient-output alias;24 scan-prefix
+profiles covering both modes, malformed metadata, nil output and source
+short-circuits;22 direct predicate-prefix cases; eight pooled/direct physical
+campaigns for coefficient copies and bound/grow comparisons; four real older
+caller comparison owners preserved through operation and destruction.
+Related initialization/tableau-iteration checks pass native14.855s/debug21.209s.
+Both LP vets, native/debug module compilation, portcheck and diff checks pass.
+Full LP remains84partial/26unported source units; row iteration and exact
+Solve orchestration remain open. The latest completed full module checkpoint
+is the06:58UTC run at16f0b947, which predates these row-pricing changes.
+
+Final focused runs pass native14.495s/debug20.418s. New production statement
+coverage154/166 (92.8%) native and157/166 (94.6%) debug. Remaining gaps are
+source-debug-only native checks, scalar sign/capture errors and metadata/default
+branches protected by earlier debug feasibility checks. Profiles:
+/mnt/oldrog/tmp/g3-row-price-{native,debug}-focused.cover. Go coverage does not
+measure unported C++ implementation or establish whole-source completion.

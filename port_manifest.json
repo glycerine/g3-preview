@@ -123979,7 +123979,9 @@
         "pkg/util/lp/primal_iteration_exact.go",
         "pkg/util/lp/primal_iteration_exact_test.go",
         "pkg/util/lp/primal_init_tableau_exact.go",
-        "pkg/util/lp/primal_init_tableau_exact_test.go"
+        "pkg/util/lp/primal_init_tableau_exact_test.go",
+        "pkg/util/lp/primal_price_rows_exact.go",
+        "pkg/util/lp/primal_price_rows_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124112,7 +124114,15 @@
         "TestLPExactInitTableauPhysicalOwnership",
         "TestLPExactTableauBasisReachedMetadata",
         "TestLPExactInitTableauRowsFailurePrefixes",
-        "TestLPExactInitTableauPreservesOlderComparison"
+        "TestLPExactInitTableauPreservesOlderComparison",
+        "TestLPExactRowPricingIndependentSelection",
+        "TestLPExactRowMonoidIndependentLexicographicBounds",
+        "TestLPExactRowNeedsToGrowIndependentModels",
+        "TestLPExactRowPricingBlandLiveOutputAlias",
+        "TestLPExactRowPricingPhysicalOwnership",
+        "TestLPExactRowPricingReachedPrefixes",
+        "TestLPExactRowPricingPreservesOlderComparison",
+        "TestLPExactRowPredicatesReachedShortCircuits"
       ],
       "conditionals": [
         {
@@ -124583,6 +124593,21 @@
             "TestLPExactInitTableauRowsFailurePrefixes",
             "TestLPExactInitTableauPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "needs_to_grow, monoid_can_decrease/increase, get_number_of_basic_vars_that_might_become_inf, find_beneficial_column_in_row_tableau_rows and Bland variant source140-154,174-318: live bound/coefficient checks, actual stored-column damage, source tie accumulation/RNG and incremental Bland output copies",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_price_rows_exact.go",
+          "tests": [
+            "TestLPExactRowPricingIndependentSelection",
+            "TestLPExactRowMonoidIndependentLexicographicBounds",
+            "TestLPExactRowNeedsToGrowIndependentModels",
+            "TestLPExactRowPricingBlandLiveOutputAlias",
+            "TestLPExactRowPricingPhysicalOwnership",
+            "TestLPExactRowPricingReachedPrefixes",
+            "TestLPExactRowPricingPreservesOlderComparison",
+            "TestLPExactRowPredicatesReachedShortCircuits"
+          ]
         }
       ],
       "ownership": [
@@ -124608,7 +124633,8 @@
         "Zero-low constructor preserves base FEASIBLE status, beta/Harris initialization, debug predicate before dummy resize, and borrowed header identity. The Go header is safely empty before base construction; boxed debug reads guard the C++ not-yet-constructed dummy member domain. Source omitted pricing fields are not credited before InitRun; dead enter-price epsilon assignment is excluded because no retained read exists. Initial checks use exact zero/upper comparisons, not stored lower bounds/tolerance. Original smoke fixtures now use the actual constructor with empty upper bounds: explicit LU verifies independent optima; unchanged source default strategy instead hits !use_tableau assertion in debug and missing factorization ErrBounds guard in release. This does not claim default source solver correctness or completion of the whole upstream driver.",
         "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard.",
         "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
-        "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial."
+        "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial.",
+        "Row pricing uses typed pointer choices over stable stored row cells and native slices. Equal-damage candidates with a shorter column are appended without dropping earlier longer candidates, preserving source RNG and selection. Bland mode copies each new minimum coefficient immediately and rereads later cells through output aliases. 480 independent selection/damage/RNG models,300 rational/epsilon monoid models,200 infeasible grow models, live alias, reached metadata and pooled/direct physical failures with older caller comparisons. Uncalled sign-row eligibility and inf_sign_of_column helpers are not ported. Row iteration and full exact Solve remain open; whole source unit stays partial."
       ]
     },
     {
