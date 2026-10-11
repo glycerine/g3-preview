@@ -102969,7 +102969,8 @@
         "pkg/util/lp/primal_initial_float_test.go",
         "pkg/util/lp/mps_reader_float.go",
         "pkg/util/lp/mps_reader_float_test.go",
-        "pkg/util/lp/lar_upstream_driver_test.go"
+        "pkg/util/lp/lar_upstream_driver_test.go",
+        "pkg/util/lp/mps_reader_exact_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103030,7 +103031,9 @@
         "TestLARUpstreamTermDriver",
         "TestLARUpstreamTotalInfeasibilityDriver",
         "TestLARUpstreamTotalInfeasibilityThroughRetainedBounds",
-        "TestLARUpstreamTrianglePropagationDriver"
+        "TestLARUpstreamTrianglePropagationDriver",
+        "TestLPRationalMPSUpstreamFileRandomizeDriver",
+        "TestLARDriverQueryHeadingExtent"
       ],
       "conditionals": [
         {
@@ -103720,6 +103723,15 @@
             "TestLARUpstreamTermDriver",
             "TestLARUpstreamTotalInfeasibilityDriver",
             "TestLARUpstreamTrianglePropagationDriver"
+          ]
+        },
+        {
+          "name": "MPS read/create and run_lar_solver Solve/randomize/GetModel pipeline (2449-2507); full options/SMT/primal-comparison branches remain open",
+          "status": "partial",
+          "go_target": "pkg/util/lp/mps_reader_exact_test.go",
+          "tests": [
+            "TestLPRationalMPSUpstreamFileRandomizeDriver",
+            "TestLARDriverQueryHeadingExtent"
           ]
         }
       ],
@@ -121220,7 +121232,8 @@
         "pkg/util/lp/lar_maximize.go",
         "pkg/util/lp/lar_maximize_test.go",
         "pkg/util/lp/lar_bound_query.go",
-        "pkg/util/lp/lar_add_constraint.go"
+        "pkg/util/lp/lar_add_constraint.go",
+        "pkg/util/lp/lar_driver_queries.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -121383,7 +121396,9 @@
         "TestLARUpstreamTermDriver",
         "TestLARUpstreamTotalInfeasibilityDriver",
         "TestLARUpstreamTotalInfeasibilityThroughRetainedBounds",
-        "TestLARUpstreamTrianglePropagationDriver"
+        "TestLARUpstreamTrianglePropagationDriver",
+        "TestLPRationalMPSUpstreamFileRandomizeDriver",
+        "TestLARDriverQueryHeadingExtent"
       ],
       "conditionals": [
         {
@@ -122127,6 +122142,15 @@
           "name": "shrink_explanation_to_minimum (1557-1561)",
           "status": "reference_only",
           "tests": []
+        },
+        {
+          "name": "get_total_iterations and get_list_of_all_var_indices (464-473)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_driver_queries.go",
+          "tests": [
+            "TestLPRationalMPSUpstreamFileRandomizeDriver",
+            "TestLARDriverQueryHeadingExtent"
+          ]
         }
       ],
       "ownership": [
@@ -122152,7 +122176,8 @@
         "Updater owns copied hash keys, partial sampled outputs, old/new/delta/product pairs and column coefficient scratch. Close cleans parent raw calls then interval/iterator child receipts before borrowed output locals, and destroys keys/locals before the borrowed core. Output-to-model copies belong to updater receipts, not RX vector receipts; partial solver RandomUpdate retains the updater and closes it before Core. Child interval Draw, column iterator and primal validators keep their own receipts; old caller comparisons are not adopted.",
         "Objective costs vector copies retain their own input receipts; external objective coefficients and output remain alive through solver cleanup. Negated basic-cost scratch belongs to the outer solver and survives stopped primal reduced-cost children until Core.Close. Direct weighted products and output accumulation use parent receipts; Core.Solve/validators remain child-owned. Strategy restoration and cost cleanup occur only after ordinary child return, preserving reached errors and older caller comparison identity.",
         "Bound-query value copies belong to outer exact receipts. Caller outputs outlive solver cleanup after interrupted copies; witness precedes numerical copying and strictness publishes only after the sign predicate succeeds. Older caller comparison state is neither adopted nor consumed.",
-        "AddConstraint executable body reads no expression, kind or RHS and owns no input copy or matrix/constraint publication. Debug source assertion becomes ErrAssertion with stopped-owner transport. Native returns0 and permits later operations; disabled normalization code is not implemented or credited."
+        "AddConstraint executable body reads no expression, kind or RHS and owns no input copy or matrix/constraint publication. Debug source assertion becomes ErrAssertion with stopped-owner transport. Native returns0 and permits later operations; disabled normalization code is not implemented or credited.",
+        "Driver column lists are native detached uint32 slices in heading order, including materialized terms. Iteration count borrows the existing unsigned primal counter; neither query owns numeral data."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",
@@ -129028,7 +129053,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/mps_reader_float.go",
-        "pkg/util/lp/mps_reader_float_test.go"
+        "pkg/util/lp/mps_reader_float_test.go",
+        "pkg/util/lp/mps_reader_exact.go",
+        "pkg/util/lp/mps_reader_exact_test.go"
       ],
       "tests": [
         "TestLPFloatMPSIndependentOptima",
@@ -129042,7 +129069,21 @@
         "TestLPFloatMPSUnrangedRelationsAndNumericPrefixes",
         "TestLPFloatMPSDualIndependentMinMax",
         "TestLPFloatMPSDualStoredAndPopulationIsolation",
-        "TestLPFloatMPSDualPopulationErrorPrefixes"
+        "TestLPFloatMPSDualPopulationErrorPrefixes",
+        "TestLPRationalMPSIndependentExactModels",
+        "TestLPRationalMPSBoundTypes",
+        "TestLPRationalMPSExactTokenSemantics",
+        "TestLPRationalMPSLARPopulationSourcePaths",
+        "TestLPRationalMPSFileAndEntryLifetime",
+        "TestLPRationalMPSPhysicalReadOwnership",
+        "TestLPRationalMPSFixedFieldsAndRepeatedPublication",
+        "TestLPRationalMPSBoundsAndRangeSectionOrders",
+        "TestLPRationalMPSMalformedDiagnosticPrefixes",
+        "TestLPRationalMPSPhysicalPopulationOwnership",
+        "TestLPRationalMPSPreservesOlderComparison",
+        "TestLPRationalMPSReadAndConversionFailurePrefixes",
+        "TestLPRationalMPSUpstreamFileRandomizeDriver",
+        "TestLARDriverQueryHeadingExtent"
       ],
       "assertions": [
         {
@@ -129114,10 +129155,25 @@
           ]
         },
         {
-          "name": "Exact MPS values, LAR variable/constraint construction and full upstream CLI scenarios",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "name": "Exact mpq MPS input, all sections and fixed fallbacks, native LAR column-before-row population and source error/publication prefixes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/mps_reader_exact.go",
+          "tests": [
+            "TestLPRationalMPSIndependentExactModels",
+            "TestLPRationalMPSBoundTypes",
+            "TestLPRationalMPSExactTokenSemantics",
+            "TestLPRationalMPSLARPopulationSourcePaths",
+            "TestLPRationalMPSFileAndEntryLifetime",
+            "TestLPRationalMPSPhysicalReadOwnership",
+            "TestLPRationalMPSFixedFieldsAndRepeatedPublication",
+            "TestLPRationalMPSBoundsAndRangeSectionOrders",
+            "TestLPRationalMPSMalformedDiagnosticPrefixes",
+            "TestLPRationalMPSPhysicalPopulationOwnership",
+            "TestLPRationalMPSPreservesOlderComparison",
+            "TestLPRationalMPSReadAndConversionFailurePrefixes",
+            "TestLPRationalMPSUpstreamFileRandomizeDriver",
+            "TestLARDriverQueryHeadingExtent"
+          ]
         },
         {
           "name": "Floating dual solver creation and shared concrete floating rows-before-columns population, independent primal/dual minimum/maximum workflow",
@@ -129128,11 +129184,19 @@
             "TestLPFloatMPSDualStoredAndPopulationIsolation",
             "TestLPFloatMPSDualPopulationErrorPrefixes"
           ]
+        },
+        {
+          "name": "Exact outer primal/dual MPS solver creation, complete upstream CLI/options/SMT driver scenarios",
+          "status": "unported",
+          "tests": []
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "RationalMPSReader owns initialized numeral pointers in a borrowed manager, parent exact receipts, lexical parsing/range/iteration locals and a child native coefficient vector. Cleanup cancels parent raw calls, then child population receipts, lexical locals, stored numerals and parent roots before closing the owned file. Returned partial solvers close before the reader. Overwritten row/range owners remain tracked until reader Close; native Go container reclamation does not reproduce source pointer leaks."
+      ],
       "deviations": [
-        "Native Go strings/bufio/strconv and insertion-ordered dictionaries replace STL streams/containers and libc numeric conversion. ASCII space/tab token/trim rules, fixed-field 8-byte row names/25-byte stride and column continuation preserve project parsing. Numeric tokens use Go ParseFloat on the first field; malformed libc atof prefix grammar is not emulated. Native writer errors and real file errors return reached publication prefixes; EOF retains source two-count line increment. Non-advancing ROWS header loop returns ErrMPSStalled, bare throw/undefined token domains become explicit errors. Source MI retains default lower flag, marker line still registers a column, LIMITMAX source shift assertion and zero/negative/IEEE range transformations are preserved. Dictionary insertion order defines deterministic replacement/source unordered traversal; partial constructed solvers are returned for cleanup. Native owner/file Close replaces source stream/container destruction. Dead string utility adapters and unused solver_row_count/range_count helpers are excluded; exact/dual/LAR creation and complete upstream CLI remain open."
+        "Native Go strings/bufio/strconv and insertion-ordered dictionaries replace STL streams/containers and libc numeric conversion. ASCII space/tab token/trim rules, fixed-field 8-byte row names/25-byte stride and column continuation preserve project parsing. Numeric tokens use Go ParseFloat on the first field; malformed libc atof prefix grammar is not emulated. Native writer errors and real file errors return reached publication prefixes; EOF retains source two-count line increment. Non-advancing ROWS header loop returns ErrMPSStalled, bare throw/undefined token domains become explicit errors. Source MI retains default lower flag, marker line still registers a column, LIMITMAX source shift assertion and zero/negative/IEEE range transformations are preserved. Dictionary insertion order defines deterministic replacement/source unordered traversal; partial constructed solvers are returned for cleanup. Native owner/file Close replaces source stream/container destruction. Dead string utility adapters and unused solver_row_count/range_count helpers are excluded; exact/dual/LAR creation and complete upstream CLI remain open.",
+        "Exact input uses the existing source rational parser directly, including scientific/fraction parser exceptions and digit-scanning across fixed-field trailing text. Native insertion order defines traversal where source unordered maps supplied none. Empty token/undefined/bare-throw/stalled-header domains have explicit error transport; actual diagnostic/file failures preserve reached publication. Source LAR filling stops on the first missing bound; numeric row-name ID mapping is independent of column indices. Executable AddConstraint remains a debug assertion/native zero no-op. Exact outer primal/dual construction and full CLI/options/SMT branches are not credited."
       ]
     },
     {
