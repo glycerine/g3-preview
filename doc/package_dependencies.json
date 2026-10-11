@@ -1224,6 +1224,7 @@
         "driver_lar.go",
         "driver_lar_examples.go",
         "driver_lar_mps_file.go",
+        "driver_lp_zero.go",
         "driver_lu_check.go",
         "driver_lu_check_native.go",
         "driver_mps.go",

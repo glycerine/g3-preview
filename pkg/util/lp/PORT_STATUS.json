@@ -10450,5 +10450,39 @@
       "/mnt/oldrog/tmp/g3-bound-propagation-driver-debug.cover"
     ],
     "remaining": "Other retained registered scenarios and full top-level action execution/argv entry binding; whole-source/consumer/ownership audits."
+  },
+  "latest_lp_zero_cli_increment": {
+    "scope": "Executable retained test_lp_0 with literal default strategy/upper-only constructor; no repaired default solve credit",
+    "tests": [
+      "TestLPLPZeroDriverActualSourceProfile",
+      "TestLPLPZeroDriverEveryReportPrefix",
+      "TestLPLPZeroDriverIndependentStorage"
+    ],
+    "coverage": {
+      "native": {
+        "covered": 39,
+        "statements": 45,
+        "percent": 86.7
+      },
+      "combined_debug_checked": {
+        "covered": 39,
+        "statements": 45,
+        "percent": 86.7
+      }
+    },
+    "coverage_warning": "Gaps guard infallible literal matrix/DotRow/config/constructor/Close operations and successful post-Solve cleanup unreachable in actual default source profile. Native reports ErrBounds for absent factorization; debug preserves source assertion. Existing explicit LU fixtures prove independent optimal values separately.",
+    "source_fidelity": [
+      "Literal matrix, X, DotRow-derived B, basis/cost/types and simple xN names retained.",
+      "Default Settings unchanged: tableau rows,20million iterations, normalized cost backup, empty upper vector and owned zero-low header.",
+      "Native guarded missing-factorization/error and debug reduced-cost assertion occur before iterations; initial endl report precedes all construction."
+    ],
+    "ownership_evidence": "Every report byte, endl refusal and short nil-error write leaves all children absent. Actual default failure retains Core and vector headers until Close. Independent drivers share no model headers/matrix; repeat/closed guards covered. All storage is native floating Go storage.",
+    "test_corrections": "Expected ascending nonbasic order corrected to actual source descending order. Actual nil-error short-write fixture found shared writeDriverLine missing count validation; fixed using existing checked text writer.",
+    "validation": "Focused native0.075s/combined0.085s; related driver/report/primal literal fixtures native0.990s/combined0.917s; both LP vets pass. Both module compile gates, source portcheck (2103 units/677 APIs) and dependency graph refresh (64 packages/no unresolved imports) pass.",
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-lp-zero-driver-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-zero-driver-debug.cover"
+    ],
+    "remaining": "Other retained registered scenarios, complete top-level action execution/argv entry binding, whole-source/consumer/ownership audits."
   }
 }

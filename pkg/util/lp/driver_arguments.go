@@ -111,7 +111,7 @@ func writeDriverLine(out io.Writer, line string) error {
 	if out == nil {
 		return nil
 	}
-	if _, err := io.WriteString(out, line+"\n"); err != nil {
+	if err := writeConstraintText(out, line+"\n"); err != nil {
 		return err
 	}
 	return dualFlush(out)

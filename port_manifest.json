@@ -103053,7 +103053,8 @@
         "pkg/util/lp/driver_stacked_test.go",
         "pkg/util/lp/driver_lar_examples.go",
         "pkg/util/lp/driver_lar_examples_test.go",
-        "pkg/util/lp/driver_bound_propagation.go"
+        "pkg/util/lp/driver_bound_propagation.go",
+        "pkg/util/lp/driver_lp_zero.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103276,7 +103277,10 @@
         "TestLPBoundPropagationActualSourceCases",
         "TestLPBoundPropagationOutputPrefixes",
         "TestLPBoundPropagationSmallNumeralOwnership",
-        "TestLPBoundPropagationPreservesOlderComparison"
+        "TestLPBoundPropagationPreservesOlderComparison",
+        "TestLPLPZeroDriverActualSourceProfile",
+        "TestLPLPZeroDriverEveryReportPrefix",
+        "TestLPLPZeroDriverIndependentStorage"
       ],
       "conditionals": [
         {
@@ -103916,7 +103920,7 @@
           ]
         },
         {
-          "name": "test_lp_0/test_lp_1 numerical fixtures solved through retained stage-one LU profile, strengthened with independent exhaustive vertex optima; original upper-only constructor/default profile and complete driver remain open",
+          "name": "test_lp_0/test_lp_1 numerical fixtures through retained stage-one LU profile, independently verified by exhaustive vertex optima; original default test_lp_0 driver tracked separately, complete test_lp_1 driver remains open",
           "status": "partial",
           "go_targets": [
             "pkg/util/lp/primal_solve_float_test.go"
@@ -104324,6 +104328,16 @@
             "TestLPBoundPropagationSmallNumeralOwnership",
             "TestLPBoundPropagationPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "retained test_lp_0 src529-569 executable literal model and original upper-only constructor/default strategy; native missing-factorization guard and debug tableau assertion preserved",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_lp_zero.go",
+          "tests": [
+            "TestLPLPZeroDriverActualSourceProfile",
+            "TestLPLPZeroDriverEveryReportPrefix",
+            "TestLPLPZeroDriverIndependentStorage"
+          ]
         }
       ],
       "ownership": [
@@ -104367,7 +104381,8 @@
         "Ordinary CHECK_GLPK_SOLUTION-undefined report path only: external glpsol invocation, process_test_file output redirection and solve_some_mps orchestration remain open. Source integer0 exceptions map to ErrDriverReport; native I/O and writer errors remain explicit, strict Go float conversion qualifies malformed atof domains. Literal first Status substring/first Objective/last cost and exact2/5/3 tokens remain. Equal nonoptimal statuses earn no success; UNDEFINED versus INFEASIBLE/UNBOUNDED earns success; counters wrap unsigned32. Actual MPS compare-with-primal output selects later four-token primal cost and throws, preserving the source mismatch. No full CLI or GLPK integration claim.",
         "run_glpk uses native os/exec literal argv for the same glpsol options, discards stdout and inherits stderr; unquoted shell tokenization and raw POSIX wait-bit encoding are not ported. Only source zero/nonzero distinction is consumed; native launch error is retained separately and counts as nonzero/inconclusive after glpk-failed diagnostic. Actual GLPK5.0 independently solves16 fixed-format boxed-knapsack inputs across exact/float/min/max, including space/semicolon filenames; fixtures use contiguous fixed-format columns/bounds, since earlier loose source-parser-only fixtures are invalid for GLPK. Real LAR report lowercase status versus comparison uppercase Status preserves source report exception. Reports use explicit writer routing instead of process-global cout redirection. Source ostream silent failures are explicit Go writer/close errors. --compare_with_primal is deliberately false in process_test_file even when arguments contain it; initial min/exact snapshots precede processing output, dual/LAR/GLPK flags remain later live reads. Complete solve_some_mps/catalogue/top-level CLI remain open; no whole-source promotion.",
         "Source catalogue minimum keys omit HOME prefix; Go preserves108 path order and all13 literal keys, including mismatch for nonempty HOME and actual matches for present empty HOME. Missing HOME emits no newline/flush; precise/GLPK empty-loop behavior remains, float missing catalogue stops before invalid source prelude indexing. Source const-char handlers have no retained loop throw producer (no literal/variable char throws in src/util, only known-solution status literal outside handlers and unused mem_copy_hook in lp.cpp); no unused exception-text adapter is introduced. Real source std::string bound exception transports ErrMPSUnhandled and propagates through batch, as do integer report exceptions/native errors. Existing explicit directory failures diagnose then continue; Go preserves literal slash split, uses native directory service and qualifies no-slash bare throw as ErrBounds. Global /tmp/test default remains; tests use isolated explicit paths rather than changing shared default directory. Full registered top-level CLI dispatch and whole retained-source/ownership audits remain open; no whole-unit promotion.",
-        "Bound-propagation registered parent executes total-u, triangle, one-row, bounded-row, two-rows, mixed-row, total-l. Native ignored general constraints yield OPTIMAL with no found bounds; only triangle explicit AddTerm creates two rows. Debug stops at first AddConstraint before bounds/solve/propagator; total-u/l initial reports precede solver construction and do not flush. Triangle diagnostic is endl; found-bound report uses actual PrintImpliedBound if any. Local source ev is never populated, so first final total-l assertion is false; earlier mandatory AddConstraint assertion makes this and following contains_j_kind unreachable in debug. No unused contains_j_kind adapter, unused relevance lambda or commented sample is ported. All literals fit small numerals; pooled/direct allocation-disabled profiles prove unchanged custom budget rather than inventing large source inputs. Complete top-level CLI action execution/argv binding and retained-source/ownership audits remain open."
+        "Bound-propagation registered parent executes total-u, triangle, one-row, bounded-row, two-rows, mixed-row, total-l. Native ignored general constraints yield OPTIMAL with no found bounds; only triangle explicit AddTerm creates two rows. Debug stops at first AddConstraint before bounds/solve/propagator; total-u/l initial reports precede solver construction and do not flush. Triangle diagnostic is endl; found-bound report uses actual PrintImpliedBound if any. Local source ev is never populated, so first final total-l assertion is false; earlier mandatory AddConstraint assertion makes this and following contains_j_kind unreachable in debug. No unused contains_j_kind adapter, unused relevance lambda or commented sample is ported. All literals fit small numerals; pooled/direct allocation-disabled profiles prove unchanged custom budget rather than inventing large source inputs. Complete top-level CLI action execution/argv binding and retained-source/ownership audits remain open.",
+        "Original test_lp_0 now executes source endl report before any model construction, literal sparse3x7 matrix, DotRow-derived B, X/basis/cost/type vectors, default Settings, simple xN names and actual zero-low constructor/Solve. Default source tableau profile has no floating LU: debug InitReducedCosts asserts, native reaches typed ErrBounds missing-factorization guard. No silent LU strategy override or default-model optimal-solve credit; existing explicit LU numerical fixtures/exhaustive vertices remain separate. Failed core stays owned until Close and borrows actual driver slice headers. Corrected shared writeDriverLine to return io.ErrShortWrite on a short nil-error write before flush/child construction. Initial test assumed ascending NBasis; source init builds descending, corrected expected[6,5,4,3] and headings[0,1,2,-4,-3,-2,-1]. Complete CLI dispatch/entry binding and retained-source/ownership audits remain open."
       ]
     },
     {
