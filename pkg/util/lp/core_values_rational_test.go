@@ -278,6 +278,11 @@ func TestLPRationalCoreValuesUpstreamSolveRationalBasis(t *testing.T) {
 	c, e := NewRationalCoreSolverBase(RationalCoreInputs{A: m.A, B: &m.B.Data, X: &x.Data, Costs: &m.Costs.Data, Basis: &basis, NBasis: &nb, Heading: &heading, ColumnTypes: &types, LowBounds: &lo.Data, UpperBounds: &hi.Data, Settings: m.Settings, Names: m})
 	h.must(e)
 	h.must(c.SolveAxEqualsB())
+	ok, e := c.FindXBySolving()
+	h.must(e)
+	if !ok {
+		t.Fatal("upstream known basis failed exact residual validation")
+	}
 	h.must(c.InitReducedCostsForOneIteration())
 	out := h.pair("91", "0")
 	h.must(c.GetCost(&out.X))

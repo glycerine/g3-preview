@@ -39,6 +39,7 @@ type RationalCoreSolverBase struct {
 	ColumnsNZ, RowsNZ                                  []uint32
 	manager                                            *numeral.RationalManager
 	valueWork, reconstructionWork, pivotWork, costWork *IndexedRationalVector
+	residualWork                                       *IndexedRationalVector
 	calls                                              exactEtaCalls
 	stopped, closed                                    bool
 }
@@ -78,7 +79,7 @@ func NewRationalCoreSolverBase(in RationalCoreInputs) (m *RationalCoreSolverBase
 	return m, m.InitBasisHeadingAndNonBasicColumns()
 }
 func (m *RationalCoreSolverBase) ready() error {
-	if m.closed || m.stopped || m.valueWork != nil || m.reconstructionWork != nil || m.pivotWork != nil || m.costWork != nil || m.calls.pending() {
+	if m.closed || m.stopped || m.valueWork != nil || m.reconstructionWork != nil || m.pivotWork != nil || m.costWork != nil || m.residualWork != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return nil
@@ -389,7 +390,7 @@ func (m *RationalCoreSolverBase) Close() error {
 			return err
 		}
 	}
-	for _, v := range []*IndexedRationalVector{m.valueWork, m.pivotWork, m.costWork, m.reconstructionWork} {
+	for _, v := range []*IndexedRationalVector{m.valueWork, m.pivotWork, m.costWork, m.reconstructionWork, m.residualWork} {
 		if v != nil {
 			if err := v.Close(); err != nil {
 				return err
@@ -397,6 +398,7 @@ func (m *RationalCoreSolverBase) Close() error {
 		}
 	}
 	m.valueWork, m.pivotWork, m.costWork, m.reconstructionWork = nil, nil, nil, nil
+	m.residualWork = nil
 	if err := m.calls.cleanupRoots(m.manager); err != nil {
 		return err
 	}
