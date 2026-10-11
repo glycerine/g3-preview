@@ -1220,6 +1220,7 @@
         "lar_bound_witness.go",
         "lar_bounds.go",
         "lar_catchup.go",
+        "lar_catchup_tableau.go",
         "lar_changed_bounds.go",
         "lar_constraints.go",
         "lar_core.go",

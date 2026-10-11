@@ -120233,7 +120233,9 @@
         "pkg/util/lp/lar_catchup.go",
         "pkg/util/lp/lar_catchup_test.go",
         "pkg/util/lp/lar_solve_signature.go",
-        "pkg/util/lp/lar_solve_signature_test.go"
+        "pkg/util/lp/lar_solve_signature_test.go",
+        "pkg/util/lp/lar_catchup_tableau.go",
+        "pkg/util/lp/lar_catchup_tableau_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -120316,7 +120318,16 @@
         "TestLARSolveOnSignaturePostSolvePublication",
         "TestLARSolveOnSignatureReachedPrefixes",
         "TestLARSolveOnSignaturePhysicalOwnership",
-        "TestLARSolveOnSignaturePreservesOlderComparison"
+        "TestLARSolveOnSignaturePreservesOlderComparison",
+        "TestLARTableauCatchUpIndependentTraceModels",
+        "TestLARTableauCatchUpFalsePivotRestoresLastExchange",
+        "TestLARTableauCatchUpNonzeroRHSSourcePrefix",
+        "TestLARTableauCatchUpReachedPrefixes",
+        "TestLARTableauCatchUpPhysicalOwnership",
+        "TestLARTableauCatchUpPreservesOlderComparison",
+        "TestLARTableauCatchUpReversePivotErrorPrefix",
+        "TestLARTableauCatchUpReversePhysicalOwnership",
+        "TestLARTableauCatchUpReducedCostsIndependentModel"
       ],
       "conditionals": [
         {
@@ -120669,6 +120680,22 @@
             "TestLARSolveOnSignatureReachedPrefixes",
             "TestLARSolveOnSignaturePhysicalOwnership",
             "TestLARSolveOnSignaturePreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "tableau basis-trace catch-up source533-582; actual delayed FIFO selection, basis-before-pivot publication, last-exchange reversal and actual reverse pivot",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_catchup_tableau.go",
+          "tests": [
+            "TestLARTableauCatchUpIndependentTraceModels",
+            "TestLARTableauCatchUpFalsePivotRestoresLastExchange",
+            "TestLARTableauCatchUpNonzeroRHSSourcePrefix",
+            "TestLARTableauCatchUpReachedPrefixes",
+            "TestLARTableauCatchUpPhysicalOwnership",
+            "TestLARTableauCatchUpPreservesOlderComparison",
+            "TestLARTableauCatchUpReversePivotErrorPrefix",
+            "TestLARTableauCatchUpReversePhysicalOwnership",
+            "TestLARTableauCatchUpReducedCostsIndependentModel"
           ]
         }
       ],

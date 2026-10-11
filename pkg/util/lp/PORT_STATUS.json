@@ -680,7 +680,9 @@
         "pkg/util/lp/lar_catchup.go",
         "pkg/util/lp/lar_catchup_test.go",
         "pkg/util/lp/lar_solve_signature.go",
-        "pkg/util/lp/lar_solve_signature_test.go"
+        "pkg/util/lp/lar_solve_signature_test.go",
+        "pkg/util/lp/lar_catchup_tableau.go",
+        "pkg/util/lp/lar_catchup_tableau_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -763,7 +765,16 @@
         "TestLARSolveOnSignaturePostSolvePublication",
         "TestLARSolveOnSignatureReachedPrefixes",
         "TestLARSolveOnSignaturePhysicalOwnership",
-        "TestLARSolveOnSignaturePreservesOlderComparison"
+        "TestLARSolveOnSignaturePreservesOlderComparison",
+        "TestLARTableauCatchUpIndependentTraceModels",
+        "TestLARTableauCatchUpFalsePivotRestoresLastExchange",
+        "TestLARTableauCatchUpNonzeroRHSSourcePrefix",
+        "TestLARTableauCatchUpReachedPrefixes",
+        "TestLARTableauCatchUpPhysicalOwnership",
+        "TestLARTableauCatchUpPreservesOlderComparison",
+        "TestLARTableauCatchUpReversePivotErrorPrefix",
+        "TestLARTableauCatchUpReversePhysicalOwnership",
+        "TestLARTableauCatchUpReducedCostsIndependentModel"
       ]
     },
     {
@@ -3938,5 +3949,25 @@
       "profile": "/mnt/oldrog/tmp/g3-exact-solve-module-native.cover",
       "scope_warning": "Includes exact LU/tableau Solve and prior row iteration; predates f1171db3 LAR explanations and exact feasibility entry. Combined debug/checked scalar is an older scoped checkpoint, not a new complete debug run."
     }
-  ]
+  ],
+  "latest_tableau_catchup_increment": {
+    "source": "src/util/lp/lar_core_solver.h:533-582",
+    "go_target": "pkg/util/lp/lar_catchup_tableau.go",
+    "native_statements": {
+      "covered": 34,
+      "total": 41,
+      "percent": 82.9
+    },
+    "debug_checked_statements": {
+      "covered": 37,
+      "total": 41,
+      "percent": 90.2
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-tableau-catchup-native.cover",
+      "/mnt/oldrog/tmp/g3-tableau-catchup-debug.cover"
+    ],
+    "qualification": "Remaining branches protect queue-selected endpoint, restored-basis and reverse-exchange invariants; native additionally erases source assertions. Full retained LAR/tableau orchestration and upstream drivers remain incomplete. Latest full native checkpoint predates this increment.",
+    "evidence": "Tableau basis-trace catch-up now implements src/util/lp/lar_core_solver.h:533-582 using the shared delayed FIFO endpoint selector and actual exact tableau pivots. Basis metadata publishes before pivot arithmetic; an ordinary false pivot reverses only the last exchange and repivots the old basic column, while a Go numerical error preserves its reached source prefix. Tests cover200 independent chronological trace worlds with B*T=A, identity bases and reciprocal sparse links,80 independent reduced-cost models, first/late singular pivots, nonzero-RHS source behavior, nine reached metadata/stopped/assertion prefixes, reverse-pivot RHS failure, six pooled/direct physical refusal campaigns through success, and an actual older caller comparison. New file34/41 statements (82.9%) native and37/41 (90.2%) debug/checked. Remaining gaps protect selected-endpoint, restored-basis and reverse-exchange invariants; native additionally erases source assertions. Focused1.136s/1.823s; related LAR/signature/catch-up/exact-tableau82.556s/120.962s. Lower-level exact tableau regression suites pass41.497s/49.072s. Both LP vets and native/debug module compilation, portcheck and diff checks pass. The latest full native checkpoint at555046ae predates this addition. Signature-guided tableau value preparation/solve, whole-LAR orchestration and complete upstream drivers remain open; inventory remains85 partial/25 unported."
+  }
 }
