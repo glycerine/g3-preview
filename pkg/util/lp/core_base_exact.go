@@ -352,6 +352,7 @@ func (m *PairCoreSolverBase) Close() error {
 		}
 	}
 	// A failed indexed add may still borrow its product input during cleanup.
+	// The same owner retains tableau reduced-cost expression temporaries.
 	if m.pivotWork != nil {
 		if err := m.pivotWork.Close(); err != nil {
 			return err
