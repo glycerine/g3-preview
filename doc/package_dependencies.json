@@ -1223,6 +1223,7 @@
         "lar_catchup.go",
         "lar_catchup_tableau.go",
         "lar_changed_bounds.go",
+        "lar_constraint_eval.go",
         "lar_constraints.go",
         "lar_core.go",
         "lar_core_basis_check.go",

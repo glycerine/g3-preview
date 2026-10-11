@@ -121132,7 +121132,9 @@
         "pkg/util/lp/lar_strategy.go",
         "pkg/util/lp/lar_strategy_test.go",
         "pkg/util/lp/lar_get_model.go",
-        "pkg/util/lp/lar_get_model_test.go"
+        "pkg/util/lp/lar_get_model_test.go",
+        "pkg/util/lp/lar_constraint_eval.go",
+        "pkg/util/lp/lar_constraint_eval_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -121221,7 +121223,12 @@
         "TestLARGetModelPhysicalOwnership",
         "TestLARGetModelRetryAndLateErrorPublication",
         "TestLARGetModelPreservesOlderComparison",
-        "TestLARGetModelDeepCollisionPhysicalOwnership"
+        "TestLARGetModelDeepCollisionPhysicalOwnership",
+        "TestLARConstraintEvalIndependentRelations",
+        "TestLARConstraintEvalReachedPrefixes",
+        "TestLARConstraintEvalPhysicalOwnership",
+        "TestLARConstraintEvalExtractedStrictTermModel",
+        "TestLARConstraintEvalPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -121816,6 +121823,18 @@
             "TestLARGetModelPreservesOlderComparison",
             "TestLARGetModelDeepCollisionPhysicalOwnership"
           ]
+        },
+        {
+          "name": "get_left_side_val source1347-1357 and constraint_holds source1069-1081: actual polymorphic free coefficient and owning coefficient export, ordered rational products/sums, required model lookup and all five exact relations",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_constraint_eval.go",
+          "tests": [
+            "TestLARConstraintEvalIndependentRelations",
+            "TestLARConstraintEvalReachedPrefixes",
+            "TestLARConstraintEvalPhysicalOwnership",
+            "TestLARConstraintEvalExtractedStrictTermModel",
+            "TestLARConstraintEvalPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -121832,7 +121851,8 @@
         "Changed-bound orchestration delegates actual core comparisons, clamp temporaries, indexed basis solves and tableau-cost owners without adopting their invocation receipts. A live nonbasic delta transfers to pendingCleanupDelta only on failure and is destroyed after Core.Close. Row and cost sets retain their prepared domains and existing marks; batch loops preserve source member order and successful prefixes. Full LAR Solve and propagation remain incomplete.",
         "Preparation preserves ordinary-vector prefixes while clearing indexed scratch in source order; no parent numerical capture spans exact vector/queue/LU child operations. LU replacement keeps partial newly constructed factors published for owning cleanup, destroys old factors before replacement, deletes newly degenerated factors and preserves the source in-place extension result. Actual physical refusals, matrix-solve oracles and source mutation prefixes are tested. Full LAR solve/signature/exact optimization integration remains incomplete.",
         "Strategy initialization has no additional numerical owner. Real deferred tableau registration retains interrupted arithmetic in existing solver/term/primal owners until Close. Native floating slices own converted scalars; heading and basis copies do not alias the exact arrays. Pooled/direct physical refusal campaigns through success verify cleanup.",
-        "LARRationalModel is a concrete native uint32-to-owned-rational map in a borrowed manager; assignments create the initialized entry before copying. Solver-owned rational expression/delta locals and concrete owned pair/single vectors retain interrupted arithmetic and set entries through cleanup. Hash buckets are native maps with exact equality resolving collisions. A stopped output assignment can borrow the solver current single: output Close precedes solver Close on failure. Six pooled/direct physical campaigns cover plain/colliding large values and forty collision halvings, with retry publication and older comparison identity tests."
+        "LARRationalModel is a concrete native uint32-to-owned-rational map in a borrowed manager; assignments create the initialized entry before copying. Solver-owned rational expression/delta locals and concrete owned pair/single vectors retain interrupted arithmetic and set entries through cleanup. Hash buckets are native maps with exact equality resolving collisions. A stopped output assignment can borrow the solver current single: output Close precedes solver Close on failure. Six pooled/direct physical campaigns cover plain/colliding large values and forty collision halvings, with retry publication and older comparison identity tests.",
+        "Solver owns lexical ret/product values and exported coefficient-vector temporary. Interrupted export remains in validationCoefficients and is closed before original owned constraints/terms; parent arithmetic receipts clean before borrowed model values are destroyed. Original model and constraints remain borrowed. Twelve pooled/direct physical campaigns for variable/term/general sum export and relation comparison plus an actual older caller comparison verify cleanup and invocation identity."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",
@@ -121844,7 +121864,8 @@
         "Actual LU counterexample with original row -2*x0-3*x1-x2=0, x0 in [-3,7], x1 in [2,11), and basic x2: normalized pivot analysis correctly derives x2 in (-47,0]. Source explanation uses normalized positive target sign against original negative coefficients, selecting lower witnesses for the lower implied bound and upper witnesses for the upper. Reconstructing those original-row combinations yields 0 for claimed lower -47 and -47 for claimed upper0. Preserve this source discrepancy; ordinary direct-row explanation proofs do not establish general LU explanation correctness.",
         "The source empty local changed-cost set omits updates recorded in the member set. In the retained tableau 2*x0+3*x1-x2=0, clamping x0 from0 to2 makes x2=4 exceed upper1 while stored basic cost remains0 (independent correct default-sign cost -1); native returns with stale costs and debug reports the source reduced-cost assertion. The discrepancy is preserved and tested.",
         "Retained source strategy initialization and double matrix copy now execute. LU selection does not materialize deferred terms, initialize either factorization, assign floating nonbasis, clear existing matrix cells or resize row-offset scratch. Repeated copies append duplicates. Exact numerator and denominator convert separately, so overflow/underflow can produce Inf, omitted zero or NaN. Tableau-cost adjustment retains its source debug assertion and native fallthrough. Whole outer solve/model extraction/constraint validation and upstream drivers remain incomplete.",
-        "Rational GetModel now executes the actual strict-bound delta and source retry algorithm. Native concrete map/hash-bucket storage replaces STL containers; numeric values and lexical set entries retain explicit copy/destruction lifetimes. Pair/single identity uses existing exact numeral hash/equality, without decimal-string serialization or generic adapters. Output keys are internal column indices, existing unrelated entries survive, duplicate pairs may share singles, and no cancellation read is added. Constraint validation and whole outer LARSolver Solve remain open; no whole-source-unit promotion."
+        "Rational GetModel now executes the actual strict-bound delta and source retry algorithm. Native concrete map/hash-bucket storage replaces STL containers; numeric values and lexical set entries retain explicit copy/destruction lifetimes. Pair/single identity uses existing exact numeral hash/equality, without decimal-string serialization or generic adapters. Output keys are internal column indices, existing unrelated entries survive, duplicate pairs may share singles, and no cancellation read is added. Constraint validation and whole outer LARSolver Solve remain open; no whole-source-unit promotion.",
+        "Constraint left-side evaluation and all five exact relation checks now execute against LARRationalModel. Term free coefficients come from the actual borrowed original term, general duplicate and zero coefficients remain ordered and are not skipped, and missing model values assert in debug / return ErrBounds natively. Unknown relations evaluate the left side before debug assertion/native false. Whole AllConstraintsHold diagnostic/cancellation wrapper and outer LARSolver Solve remain open; no whole-source-unit promotion."
       ]
     },
     {
