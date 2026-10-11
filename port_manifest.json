@@ -124449,7 +124449,8 @@
         "pkg/util/lp/primal_leaving_exact_test.go",
         "pkg/util/lp/primal_infeas_cost_exact.go",
         "pkg/util/lp/primal_cost_switch_exact.go",
-        "pkg/util/lp/primal_init_run_exact.go"
+        "pkg/util/lp/primal_init_run_exact.go",
+        "pkg/util/lp/primal_advance_equal_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124551,7 +124552,12 @@
         "TestLPExactInitRunPhysicalOwnership",
         "TestLPExactInitRunSourcePrefixes",
         "TestLPExactInitRunAlreadyStoppedQueue",
-        "TestLPExactInitRunLeavesOlderComparisonOwned"
+        "TestLPExactInitRunLeavesOlderComparisonOwned",
+        "TestLPExactAdvanceEqualIndependentModels",
+        "TestLPExactAdvanceEqualPhysicalOwnership",
+        "TestLPExactAdvanceEqualLiveStepAliases",
+        "TestLPExactAdvanceEqualSourcePrefixes",
+        "TestLPExactAdvanceEqualOlderComparison"
       ],
       "conditionals": [
         {
@@ -125062,6 +125068,18 @@
             "TestLPExactInitRunSourcePrefixes",
             "TestLPExactInitRunAlreadyStoppedQueue",
             "TestLPExactInitRunLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "retained exact advance_on_entering_equal_leaving: pre-residual debug assertion, owned signed step through UpdateX, precise indexed early return, changed infeasibility costs, stored cost switching and source counter prefixes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_advance_equal_exact.go",
+          "tests": [
+            "TestLPExactAdvanceEqualIndependentModels",
+            "TestLPExactAdvanceEqualPhysicalOwnership",
+            "TestLPExactAdvanceEqualLiveStepAliases",
+            "TestLPExactAdvanceEqualSourcePrefixes",
+            "TestLPExactAdvanceEqualOlderComparison"
           ]
         }
       ],
@@ -127601,7 +127619,8 @@
         "pkg/util/lp/core_residual_exact.go",
         "pkg/util/lp/core_residual_exact_test.go",
         "pkg/util/lp/core_reconstruct_exact.go",
-        "pkg/util/lp/core_reconstruct_exact_test.go"
+        "pkg/util/lp/core_reconstruct_exact_test.go",
+        "pkg/util/lp/primal_advance_equal_exact.go"
       ],
       "tests": [
         "TestLPRationalPairArithmeticOracle",
@@ -127682,7 +127701,12 @@
         "TestLPPairCoreReconstructGuardsAndPrefixes",
         "TestLPPairCoreReconstructPhysicalOwnership",
         "TestLPPairCoreReconstructStoppedLUKeepsRHS",
-        "TestLPPairCoreReconstructPreservesOlderComparisonOwner"
+        "TestLPPairCoreReconstructPreservesOlderComparisonOwner",
+        "TestLPExactAdvanceEqualIndependentModels",
+        "TestLPExactAdvanceEqualPhysicalOwnership",
+        "TestLPExactAdvanceEqualLiveStepAliases",
+        "TestLPExactAdvanceEqualSourcePrefixes",
+        "TestLPExactAdvanceEqualOlderComparison"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -127866,6 +127890,18 @@
             "TestLPPairCoreReconstructPhysicalOwnership",
             "TestLPPairCoreReconstructStoppedLUKeepsRHS",
             "TestLPPairCoreReconstructPreservesOlderComparisonOwner"
+          ]
+        },
+        {
+          "name": "retained numeric_pair rational/int scalar-left product for exact primal advancement; by-value coordinate construction and full-expression lifetime through the borrowed update call",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_advance_equal_exact.go",
+          "tests": [
+            "TestLPExactAdvanceEqualIndependentModels",
+            "TestLPExactAdvanceEqualPhysicalOwnership",
+            "TestLPExactAdvanceEqualLiveStepAliases",
+            "TestLPExactAdvanceEqualSourcePrefixes",
+            "TestLPExactAdvanceEqualOlderComparison"
           ]
         }
       ],

@@ -1257,6 +1257,7 @@
         "permutation.go",
         "permutation_exact.go",
         "permutation_float.go",
+        "primal_advance_equal_exact.go",
         "primal_advance_float.go",
         "primal_basis_dispatch_exact.go",
         "primal_basis_limit_exact.go",
