@@ -1216,6 +1216,7 @@
         "diagonal_matrix_exact.go",
         "diagonal_matrix_float.go",
         "dual_advance_float.go",
+        "dual_beta_rational.go",
         "dual_breakpoint_rational.go",
         "dual_core_float.go",
         "dual_core_rational.go",
