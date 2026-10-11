@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 87.3,
-  "coverage_warning": "Full native checkpoint7957befd includes scalar rational core base, basis, values, reconstruction, reduced costs, snapping, residuals and pivot rows, plus preparation/presolve expression corrections. Profile excludes core_update_rational.go, core_cost_validate_rational.go and core_feasibility_rational.go, and predates the newer RestoreBasisChange stopped guard. Their focused/regression evidence remains separate. Coverage measures existing Go statements, not C++ port completion. Scalar primal core, infeasibility-cost and cost-switching files are newer and retain separate focused evidence. Scalar primal initialization/pricing files are newer and retain separate focused evidence. Scalar Harris/bound/infeasibility/basis-limit/dispatch helpers are newer and retain separate focused evidence. Scalar breakpoint record/queue-priority/slope helpers are newer and retain separate focused evidence. Scalar breakpoint collection/traversal files are newer and retain separate focused evidence.",
+  "coverage_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -4756,20 +4756,22 @@
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
-    "commit": "7957befd",
-    "started_utc": "2026-10-11 15:09:21 UTC",
-    "completed_utc": "2026-10-11 15:28:05 UTC",
+    "commit": "1cee195e",
+    "started_utc": "2026-10-11 16:08:21 UTC",
+    "completed_utc": "2026-10-11 16:27:50 UTC",
     "exit_code": 0,
+    "log": "/mnt/oldrog/tmp/g3-rational-bound-module-native.log",
+    "profile": "/mnt/oldrog/tmp/g3-rational-bound-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-rational-bound-module-native.json",
     "packages": 64,
+    "passed_packages": 63,
+    "skipped_packages": 1,
     "packages_with_tests": 51,
-    "lp_seconds": 1112.736,
-    "lp_covered_statements": 22580,
-    "lp_statements": 25871,
-    "log": "/mnt/oldrog/tmp/g3-rational-core-module-native.log",
-    "profile": "/mnt/oldrog/tmp/g3-rational-core-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-rational-core-module-native.json",
-    "session_id": 1721,
-    "scope_warning": "Full native checkpoint7957befd includes scalar rational core base, basis, values, reconstruction, reduced costs, snapping, residuals and pivot rows, plus preparation/presolve expression corrections. Profile excludes core_update_rational.go, core_cost_validate_rational.go and core_feasibility_rational.go, and predates the newer RestoreBasisChange stopped guard. Their focused/regression evidence remains separate. Coverage measures existing Go statements, not C++ port completion."
+    "lp_seconds": 1156.594,
+    "lp_covered_statements": 23716,
+    "lp_statements": 27179,
+    "session_id": 39459,
+    "scope_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion."
   },
   "full_native_checkpoint_history": [
     {
@@ -4885,6 +4887,22 @@
       "status_file": "/mnt/oldrog/tmp/g3-exact-objective-module-native.json",
       "session_id": 86760,
       "scope_warning": "Actual runner session86760 returned terminal exit0 and closed. Profile includes solver_prepare_exact.go, solver_presolve_exact.go and solver_objective_exact.go. core_base_rational.go and core_basis_rational.go are absent: newer fc5774d3 scalar rational core retains separate passing focused/regression evidence. Coverage measures existing Go statements, not C++ port completion. Current core_values/reconstruct/reduced_cost/snap_rational files and corrected objective expression owners are newer and are not credited to this profile."
+    },
+    {
+      "commit": "7957befd",
+      "started_utc": "2026-10-11 15:09:21 UTC",
+      "completed_utc": "2026-10-11 15:28:05 UTC",
+      "exit_code": 0,
+      "packages": 64,
+      "packages_with_tests": 51,
+      "lp_seconds": 1112.736,
+      "lp_covered_statements": 22580,
+      "lp_statements": 25871,
+      "log": "/mnt/oldrog/tmp/g3-rational-core-module-native.log",
+      "profile": "/mnt/oldrog/tmp/g3-rational-core-module-native.cover",
+      "status_file": "/mnt/oldrog/tmp/g3-rational-core-module-native.json",
+      "session_id": 1721,
+      "scope_warning": "Full native checkpoint7957befd includes scalar rational core base, basis, values, reconstruction, reduced costs, snapping, residuals and pivot rows, plus preparation/presolve expression corrections. Profile excludes core_update_rational.go, core_cost_validate_rational.go and core_feasibility_rational.go, and predates the newer RestoreBasisChange stopped guard. Their focused/regression evidence remains separate. Coverage measures existing Go statements, not C++ port completion."
     }
   ],
   "latest_tableau_catchup_increment": {
@@ -6690,29 +6708,6 @@
       "debug_checked": 157.577,
       "scope_warning": "Predates final separate flip assignment correction; final focused and related evidence covers the corrected source."
     }
-  },
-  "active_full_native_checkpoint": {
-    "commit": "1cee195e",
-    "started_utc": "2026-10-11 16:08:21 UTC",
-    "status": "running",
-    "runner_pid": 3,
-    "command": [
-      "go",
-      "-C",
-      "pkg",
-      "test",
-      "-json",
-      "./...",
-      "-count=1",
-      "-timeout=60m",
-      "-coverprofile=/mnt/oldrog/tmp/g3-rational-bound-module-native.cover"
-    ],
-    "event_log": "/mnt/oldrog/tmp/g3-rational-bound-module-native.events.jsonl",
-    "log": "/mnt/oldrog/tmp/g3-rational-bound-module-native.log",
-    "profile": "/mnt/oldrog/tmp/g3-rational-bound-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-rational-bound-module-native.json",
-    "go_pid": 5,
-    "session_id": 39459
   },
   "latest_rational_breakpoint_increment": {
     "scope": "Retained scalar mpq/mpq breakpoint record construction/copy, owned delta destruction, scalar absolute queue priority and slope changes",
