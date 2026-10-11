@@ -121193,7 +121193,8 @@
         "pkg/util/lp/random_updater.go",
         "pkg/util/lp/random_updater_test.go",
         "pkg/util/lp/lar_maximize.go",
-        "pkg/util/lp/lar_maximize_test.go"
+        "pkg/util/lp/lar_maximize_test.go",
+        "pkg/util/lp/lar_bound_query.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -121344,7 +121345,14 @@
         "TestLARMaximizeDuplicateCostSourceAccumulation",
         "TestLARMaximizeCancellationAndChildError",
         "TestLARMaximizeDirectSourceStatuses",
-        "TestLARMaximizePreservesOlderComparison"
+        "TestLARMaximizePreservesOlderComparison",
+        "TestLARBoundQueryActualConstraintIntersections",
+        "TestLARBoundQueryPublicationAndTermIndices",
+        "TestLARBoundQueryWitnessAndEpsilonSigns",
+        "TestLARBoundQueryPhysicalOutputCopies",
+        "TestLARBoundQueryReachedGuards",
+        "TestLARBoundQueryActualNestedScopes",
+        "TestLARBoundQueryPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -122057,6 +122065,20 @@
             "TestLARMaximizeDirectSourceStatuses",
             "TestLARMaximizePreservesOlderComparison"
           ]
+        },
+        {
+          "name": "has_lower_bound and has_upper_bound witness/value/strictness publication (1203-1240)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_bound_query.go",
+          "tests": [
+            "TestLARBoundQueryActualConstraintIntersections",
+            "TestLARBoundQueryPublicationAndTermIndices",
+            "TestLARBoundQueryWitnessAndEpsilonSigns",
+            "TestLARBoundQueryPhysicalOutputCopies",
+            "TestLARBoundQueryReachedGuards",
+            "TestLARBoundQueryActualNestedScopes",
+            "TestLARBoundQueryPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -122080,7 +122102,8 @@
         "Touched-row scheduling introduces no arithmetic capture; iterator/analyzer/propagator and hook/provider owners retain their own errors. Cancellation retains all row marks and completed bounds for replay; Close cleans the source lexical row owners without destroying the borrowed propagator.",
         "Conflict extraction appends through the output vector owner, which must close before solver locals on a failed external append. Internal evidence closes first; coefficient export closes before the coefficient map; interrupted constraint FreeCoefficient/output copies retain lexical arithmetic values through cleanup. The debug result rational outlives pending final copy receipts. Direct arithmetic alone uses parent capture; child vector/map/constraint owners and older caller comparison state remain separate.",
         "Updater owns copied hash keys, partial sampled outputs, old/new/delta/product pairs and column coefficient scratch. Close cleans parent raw calls then interval/iterator child receipts before borrowed output locals, and destroys keys/locals before the borrowed core. Output-to-model copies belong to updater receipts, not RX vector receipts; partial solver RandomUpdate retains the updater and closes it before Core. Child interval Draw, column iterator and primal validators keep their own receipts; old caller comparisons are not adopted.",
-        "Objective costs vector copies retain their own input receipts; external objective coefficients and output remain alive through solver cleanup. Negated basic-cost scratch belongs to the outer solver and survives stopped primal reduced-cost children until Core.Close. Direct weighted products and output accumulation use parent receipts; Core.Solve/validators remain child-owned. Strategy restoration and cost cleanup occur only after ordinary child return, preserving reached errors and older caller comparison identity."
+        "Objective costs vector copies retain their own input receipts; external objective coefficients and output remain alive through solver cleanup. Negated basic-cost scratch belongs to the outer solver and survives stopped primal reduced-cost children until Core.Close. Direct weighted products and output accumulation use parent receipts; Core.Solve/validators remain child-owned. Strategy restoration and cost cleanup occur only after ordinary child return, preserving reached errors and older caller comparison identity.",
+        "Bound-query value copies belong to outer exact receipts. Caller outputs outlive solver cleanup after interrupted copies; witness precedes numerical copying and strictness publishes only after the sign predicate succeeds. Older caller comparison state is neither adopted nor consumed."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",

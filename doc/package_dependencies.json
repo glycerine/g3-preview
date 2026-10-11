@@ -1219,6 +1219,7 @@
         "int_set.go",
         "lar_all_constraints.go",
         "lar_basic_delta.go",
+        "lar_bound_query.go",
         "lar_bound_witness.go",
         "lar_bounds.go",
         "lar_catchup.go",
