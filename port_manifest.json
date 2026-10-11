@@ -130118,7 +130118,9 @@
         "pkg/util/lp/solver_exact_model.go",
         "pkg/util/lp/solver_prepare_exact.go",
         "pkg/util/lp/core_statistics_rational.go",
-        "pkg/util/lp/driver_settings.go"
+        "pkg/util/lp/driver_settings.go",
+        "pkg/util/lp/matrix_float_debug_print.go",
+        "pkg/util/lp/matrix_float_debug_print_test.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
@@ -130191,7 +130193,13 @@
         "TestLPDriverSetupActualMPSMinMax",
         "TestLPDriverSetupLimitsAndFailurePrefixes",
         "TestLPDriverSetupPhysicalOwnership",
-        "TestLPDriverSetupPreservesOlderComparison"
+        "TestLPDriverSetupPreservesOlderComparison",
+        "TestLPDebugMatrixPrintSourceFixtures",
+        "TestLPDebugMatrixPrintIndependentColumnWorlds",
+        "TestLPDebugMatrixPrintConcreteOverloads",
+        "TestLPDebugMatrixPrintEveryByteAndFlush",
+        "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
+        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
       ],
       "conditionals": [
         {
@@ -130359,18 +130367,33 @@
             "TestLPDriverSetupPhysicalOwnership",
             "TestLPDriverSetupPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "Retained floating debug matrix/string-table byte widths, per-space print_blanks, row endl flushes; base final blank line versus static/sparse/submatrix LU overloads; native T_to_string(double) formatting",
+          "status": "ported",
+          "go_target": "pkg/util/lp/matrix_float_debug_print.go",
+          "tests": [
+            "TestLPDebugMatrixPrintSourceFixtures",
+            "TestLPDebugMatrixPrintIndependentColumnWorlds",
+            "TestLPDebugMatrixPrintConcreteOverloads",
+            "TestLPDebugMatrixPrintEveryByteAndFlush",
+            "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
+            "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
+          ]
         }
       ],
       "ownership": [
         "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim.",
         "Settings owns concrete random state, stats and an existing source-backed Stopwatch; custom resource limits and io.Writer transports are borrowed. No OS stream/STL port or callback numerical algebra. NewSettings returns a partially initialized owner with an explicit host clock error if the real default stopwatch cannot start.",
-        "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json."
+        "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json.",
+        "Native Go string tables snapshot all numeric matrix cells before output. String-table printing borrows slice headers by value and rereads live cell strings after padding. Widths/temporary rows are native scalar/string storage, without numerical arena roots or C++ STL representations."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
         "Default time resource uses the existing Linux stopwatch process CPU/Getrusage microsecond profile; this does not claim nanosecond clock_gettime equivalence. Clock-read errors are explicit Go errors. Exact tolerance predicates, generic numeric helpers and full solver integration remain open. Native public fields replace trivial source accessors; nil resource limit selects the retained default service.",
         "Entering-column preparation and solve_Bd now execute retained double/mpq/mpq-pair paths. The precise ratio10 and floating ratio120 use source unsigned multiplication and strict comparison against destination PRE-assignment size. Dense route copies every data slot then clears index and scans dimension descending; sparse route uses indexed assignment and actual graph solve (floating residual correction). Pair-only faster route follows its actual retained core-solver caller. Source unindexed values, sparse self-assignment zeroing, dense self-assignment, configurable drop/precise zero behavior and error-publication prefixes remain literal. Native Go storage replaces vector internals; no STL adapter or unused faster/template route is ported. Suhl updates, row restoration, error-check/refinement orchestration, extension and full upstream driver remain open.",
-        "Statistics use Go io.Writer/fmt/strconv, retaining exact numeric-pair x+y/1000 evaluation before conversion and classic six-digit formatting; no STL stream implementation is ported. Reporting snapshots its by-value argument before output, inspects LU nonzero counts after cost text, and checks actual cancellation after successful output. Local cost/argument owners survive failures until captured child scratch is cleaned. Full precise/default-tableau Solve remains open."
+        "Statistics use Go io.Writer/fmt/strconv, retaining exact numeric-pair x+y/1000 evaluation before conversion and classic six-digit formatting; no STL stream implementation is ported. Reporting snapshots its by-value argument before output, inspects LU nonzero counts after cost text, and checks actual cancellation after successful output. Local cost/argument owners survive failures until captured child scratch is cleaned. Full precise/default-tableau Solve remains open.",
+        "Floating debug printers preserve byte rather than rune widths, trailing spaces, per-space writer insertions and row/final endl flushes. Width subtraction is unsigned32 before signed32 narrowing; negative print_blanks count reaches explicit ErrBounds before undefined signed-decrement behavior. Ragged/index/report/native stream errors stop with actual completed output prefix. Base pointer overload adds a final blank line; static/sparse/submatrix overloads do not. Whole source units, exact numeral/pair T_to_string ownership and complete upstream diagnostic/assertion/CLI wiring remain open. Unused static printer local get_domain result has no retained numerical effect and no STL set implementation is introduced."
       ]
     },
     {
@@ -131392,7 +131415,9 @@
         "pkg/util/lp/dense_matrix_float_debug.go",
         "pkg/util/lp/matrix_float_debug.go",
         "pkg/util/lp/lu_float_debug_matrix.go",
-        "pkg/util/lp/dense_matrix_float_debug_test.go"
+        "pkg/util/lp/dense_matrix_float_debug_test.go",
+        "pkg/util/lp/matrix_float_debug_print.go",
+        "pkg/util/lp/matrix_float_debug_print_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -131495,7 +131520,13 @@
         "TestLPDebugDenseMatrixEqualityAndFailurePrefixes",
         "TestLPDebugDenseConcretePermutationAndStaticConsumers",
         "TestLPDebugDenseActualLUIdentities",
-        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
+        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes",
+        "TestLPDebugMatrixPrintSourceFixtures",
+        "TestLPDebugMatrixPrintIndependentColumnWorlds",
+        "TestLPDebugMatrixPrintConcreteOverloads",
+        "TestLPDebugMatrixPrintEveryByteAndFlush",
+        "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
+        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
       ],
       "conditionals": [
         {
@@ -131814,6 +131845,19 @@
             "TestLPDebugDenseActualLUIdentities",
             "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
           ]
+        },
+        {
+          "name": "Retained floating debug matrix/string-table byte widths, per-space print_blanks, row endl flushes; base final blank line versus static/sparse/submatrix LU overloads; native T_to_string(double) formatting",
+          "status": "ported",
+          "go_target": "pkg/util/lp/matrix_float_debug_print.go",
+          "tests": [
+            "TestLPDebugMatrixPrintSourceFixtures",
+            "TestLPDebugMatrixPrintIndependentColumnWorlds",
+            "TestLPDebugMatrixPrintConcreteOverloads",
+            "TestLPDebugMatrixPrintEveryByteAndFlush",
+            "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
+            "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
+          ]
         }
       ],
       "ownership": [
@@ -131825,7 +131869,8 @@
         "Extension publishes Dim before U resize, then typed Q/R resize and row work; owned extension vector resizes before replacements. Each child retains its actual pending numerical calls. Exact zero pivot argument is immediate and introduces no owning allocation; LU captures no child calls. Real stopped U/Q/R children retain publication prefixes and are reclaimed by their existing owners.",
         "Typed factorization slots retire the old owner before constructing the replacement. On explicit Go constructor error, the slot owns the partial attempted replacement for Close; borrowed source/settings/caller values remain independent. Existing child call receipts govern failed constructor cleanup. Same-manager re-entry preserves source-invalid consumed scratch pointers and returns their real dead-slot error rather than rebuilding numerical scratch.",
         "Prepared solves delegate numerical receipts to actual U/R and caller owners; LU Close does not consume caller-owned stopped vectors. T indices append without clearing; no second tails/Q application. Exact caller owner/pending guards precede U work.",
-        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization."
+        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization.",
+        "Native Go string tables snapshot all numeric matrix cells before output. String-table printing borrows slice headers by value and rereads live cell strings after padding. Widths/temporary rows are native scalar/string storage, without numerical arena roots or C++ STL representations."
       ],
       "deviations": [
         "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Floating LU initial factorization and dense column/dense-indexed row solves are now implemented; remaining indexed column/refinement routes, updates and full upstream-driver integration remain open.",
@@ -131841,7 +131886,8 @@
         "Prepared-solve coverage is scoped to retained concrete types. Indexed-X solve_By at lu.hpp:160-165 is a source unimplemented assertion stub and is not credited. Full LU diagnostics and solver integration remain incomplete.",
         "Statistics use Go io.Writer/fmt/strconv, retaining exact numeric-pair x+y/1000 evaluation before conversion and classic six-digit formatting; no STL stream implementation is ported. Reporting snapshots its by-value argument before output, inspects LU nonzero counts after cost text, and checks actual cancellation after successful output. Local cost/argument owners survive failures until captured child scratch is cleaned. Full precise/default-tableau Solve remains open.",
         "Concrete scalar mpq/mpq core value updates/restoration, descending RHS reconstruction, precise LU solve, reduced costs, deterministic bound/free snapping, precise indexed residual bypass and ascending objective dot product now implement the retained source methods. UpdateX keeps delta a live reference and precise updates never populate CopyXB. Reconstruction uses the real RationalLU and publishes descending basic assignments, without floating refinement. Reduced costs skip zero Y before row reads. Source rational binary expressions copy the left operand and copy the compound-result reference on return; core products and corrected outer objective products/sums preserve these owners and physical failure prefixes. Parent raw receipts close before LU, LU before borrowed work, and temporary owners before parent roots. Seven test groups cover 100 independent triangular systems with 81-180-bit costs and independent RHS, transpose solve, reduced-cost and objective oracles; 360 update/restore worlds across LU/tableau traversal and live aliases; all source column types and unknown default; output aliasing and descending aliased copies; 27 reached domain profiles; stopped/closed calls and actual older comparison identity. Twenty-two pooled/direct physical campaigns run through success, require actual refusal for every direct campaign and pass ownership census. The literal upstream solve_rational fixture reconstructs a supplied known basis and checks objective24 using independent primal/dual certificates: no optimization search or complete upstream-driver credit. The initial reduced-cost guard fixture marked all columns basic; making the next column nonbasic corrects its expected reached cost read. Inventory remains 88 partial/16 unported/6 reference_only; no whole-source promotion. Scalar core residual/diagnostic queries, pivot and feasibility-search orchestration, exact primal/dual outer optimization, full upstream drivers and whole-source audits remain open. Audit earlier common exact preparation/presolve binary-expression temporaries against rational.h copy-on-return semantics; the objective correction does not prove those paths complete. Latest full native checkpoint a8a7ef66 predates scalar core base/values and the current objective-expression correction; focused coverage measures current Go statements only.",
-        "Floating debug matrix consumers use concrete native Go dense storage and double-valued interface. Actual40 basis worlds with sparse/dense policies verify left transformed B equals Q*U*R. Existing source tolerance accepts NaN/like-signed infinity unordered differences. Debug matrix printing, exact coefficient variants, tail_product/check_apply consumer integration and remaining upstream assertion wiring stay open; original post-return dense fixture is independent coverage only."
+        "Floating debug matrix consumers use concrete native Go dense storage and double-valued interface. Actual40 basis worlds with sparse/dense policies verify left transformed B equals Q*U*R. Existing source tolerance accepts NaN/like-signed infinity unordered differences. Debug matrix printing, exact coefficient variants, tail_product/check_apply consumer integration and remaining upstream assertion wiring stay open; original post-return dense fixture is independent coverage only.",
+        "Floating debug printers preserve byte rather than rune widths, trailing spaces, per-space writer insertions and row/final endl flushes. Width subtraction is unsigned32 before signed32 narrowing; negative print_blanks count reaches explicit ErrBounds before undefined signed-decrement behavior. Ragged/index/report/native stream errors stop with actual completed output prefix. Base pointer overload adds a final blank line; static/sparse/submatrix overloads do not. Whole source units, exact numeral/pair T_to_string ownership and complete upstream diagnostic/assertion/CLI wiring remain open. Unused static printer local get_domain result has no retained numerical effect and no STL set implementation is introduced."
       ]
     },
     {
@@ -131882,7 +131928,9 @@
         "pkg/util/lp/dense_matrix_float_debug.go",
         "pkg/util/lp/matrix_float_debug.go",
         "pkg/util/lp/lu_float_debug_matrix.go",
-        "pkg/util/lp/dense_matrix_float_debug_test.go"
+        "pkg/util/lp/dense_matrix_float_debug_test.go",
+        "pkg/util/lp/matrix_float_debug_print.go",
+        "pkg/util/lp/matrix_float_debug_print_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -131962,7 +132010,13 @@
         "TestLPDebugDenseMatrixEqualityAndFailurePrefixes",
         "TestLPDebugDenseConcretePermutationAndStaticConsumers",
         "TestLPDebugDenseActualLUIdentities",
-        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
+        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes",
+        "TestLPDebugMatrixPrintSourceFixtures",
+        "TestLPDebugMatrixPrintIndependentColumnWorlds",
+        "TestLPDebugMatrixPrintConcreteOverloads",
+        "TestLPDebugMatrixPrintEveryByteAndFlush",
+        "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
+        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
       ],
       "conditionals": [
         {
@@ -132394,6 +132448,19 @@
             "TestLPDebugDenseActualLUIdentities",
             "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
           ]
+        },
+        {
+          "name": "Retained floating debug matrix/string-table byte widths, per-space print_blanks, row endl flushes; base final blank line versus static/sparse/submatrix LU overloads; native T_to_string(double) formatting",
+          "status": "ported",
+          "go_target": "pkg/util/lp/matrix_float_debug_print.go",
+          "tests": [
+            "TestLPDebugMatrixPrintSourceFixtures",
+            "TestLPDebugMatrixPrintIndependentColumnWorlds",
+            "TestLPDebugMatrixPrintConcreteOverloads",
+            "TestLPDebugMatrixPrintEveryByteAndFlush",
+            "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
+            "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
+          ]
         }
       ],
       "ownership": [
@@ -132404,7 +132471,8 @@
         "Floating refinement owns native yCopy and unsigned marker vectors; sparse correction preserves source residual workspace, dense correction clears it. Exact refinement adds no numerical owner or arithmetic and delegates to existing typed solves; foreign/stopped indexed callers reject before dense/sparse routing, retaining their own pending invocation through LU Close.",
         "Typed factorization slots retire the old owner before constructing the replacement. On explicit Go constructor error, the slot owns the partial attempted replacement for Close; borrowed source/settings/caller values remain independent. Existing child call receipts govern failed constructor cleanup. Same-manager re-entry preserves source-invalid consumed scratch pointers and returns their real dead-slot error rather than rebuilding numerical scratch.",
         "Prepared solves delegate numerical receipts to actual U/R and caller owners; LU Close does not consume caller-owned stopped vectors. T indices append without clearing; no second tails/Q application. Exact caller owner/pending guards precede U work.",
-        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization."
+        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization.",
+        "Native Go string tables snapshot all numeric matrix cells before output. String-table printing borrows slice headers by value and rereads live cell strings after padding. Widths/temporary rows are native scalar/string storage, without numerical arena roots or C++ STL representations."
       ],
       "deviations": [
         "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Floating LU initial factorization and dense column/dense-indexed row solves are now implemented; remaining indexed column/refinement routes, updates and full upstream-driver integration remain open.",
@@ -132417,7 +132485,8 @@
         "Row error-check/refinement now supersedes earlier open-refinement notes: all six retained double/mpq/mpq-pair public methods execute source lu.hpp:313-478. Floating uses one residual correction, full A column-count strict ratio120, passed drop tolerance for residuals and fixed1e-14 for correction cleanup. Precise paths skip residual arithmetic and use strict unsigned ratio30. Source #if0 residual and unused templates are excluded; native Go slices replace vector storage. Independent exact residual/solution worlds, sparse/dense threshold boundaries, approximate-factor one-correction fixtures, post-Suhl integration, actual allocation refusals and caller ownership verify behavior. Dimension extension, complete upstream drivers and scaling/simplex/LAR/MPS remain open; whole units stay partial.",
         "init_factorization now has three concrete Go functions for retained explicit instances. Constructor failure publishes the attempted Go owner for explicit cleanup rather than leaving the C++ deleted old pointer dangling. No transactional retention of the old factorization or numerical manager repair is invented. Twelve independent sparse/dense basis worlds cover nil/replacement/invalid construction and reordered bases; four pooled/direct campaigns walk real refusals and replacement after stopped construction, including actual Add/SubMul consumed-scratch re-entry guards. Complete solver caller integration and debug diagnostics remain open.",
         "Prepared-solve coverage is scoped to retained concrete types. Indexed-X solve_By at lu.hpp:160-165 is a source unimplemented assertion stub and is not credited. Full LU diagnostics and solver integration remain incomplete.",
-        "Floating debug matrix consumers use concrete native Go dense storage and double-valued interface. Actual40 basis worlds with sparse/dense policies verify left transformed B equals Q*U*R. Existing source tolerance accepts NaN/like-signed infinity unordered differences. Debug matrix printing, exact coefficient variants, tail_product/check_apply consumer integration and remaining upstream assertion wiring stay open; original post-return dense fixture is independent coverage only."
+        "Floating debug matrix consumers use concrete native Go dense storage and double-valued interface. Actual40 basis worlds with sparse/dense policies verify left transformed B equals Q*U*R. Existing source tolerance accepts NaN/like-signed infinity unordered differences. Debug matrix printing, exact coefficient variants, tail_product/check_apply consumer integration and remaining upstream assertion wiring stay open; original post-return dense fixture is independent coverage only.",
+        "Floating debug printers preserve byte rather than rune widths, trailing spaces, per-space writer insertions and row/final endl flushes. Width subtraction is unsigned32 before signed32 narrowing; negative print_blanks count reaches explicit ErrBounds before undefined signed-decrement behavior. Ragged/index/report/native stream errors stop with actual completed output prefix. Base pointer overload adds a final blank line; static/sparse/submatrix overloads do not. Whole source units, exact numeral/pair T_to_string ownership and complete upstream diagnostic/assertion/CLI wiring remain open. Unused static printer local get_domain result has no retained numerical effect and no STL set implementation is introduced."
       ]
     },
     {
@@ -132709,7 +132778,9 @@
         "pkg/util/lp/dense_matrix_float_debug.go",
         "pkg/util/lp/matrix_float_debug.go",
         "pkg/util/lp/lu_float_debug_matrix.go",
-        "pkg/util/lp/dense_matrix_float_debug_test.go"
+        "pkg/util/lp/dense_matrix_float_debug_test.go",
+        "pkg/util/lp/matrix_float_debug_print.go",
+        "pkg/util/lp/matrix_float_debug_print_test.go"
       ],
       "tests": [
         "TestLPDebugDenseOriginalSource",
@@ -132719,7 +132790,13 @@
         "TestLPDebugDenseMatrixEqualityAndFailurePrefixes",
         "TestLPDebugDenseConcretePermutationAndStaticConsumers",
         "TestLPDebugDenseActualLUIdentities",
-        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
+        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes",
+        "TestLPDebugMatrixPrintSourceFixtures",
+        "TestLPDebugMatrixPrintIndependentColumnWorlds",
+        "TestLPDebugMatrixPrintConcreteOverloads",
+        "TestLPDebugMatrixPrintEveryByteAndFlush",
+        "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
+        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
       ],
       "conditionals": [
         {
@@ -132748,14 +132825,29 @@
             "TestLPDebugDenseActualLUIdentities",
             "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
           ]
+        },
+        {
+          "name": "Retained floating debug matrix/string-table byte widths, per-space print_blanks, row endl flushes; base final blank line versus static/sparse/submatrix LU overloads; native T_to_string(double) formatting",
+          "status": "ported",
+          "go_target": "pkg/util/lp/matrix_float_debug_print.go",
+          "tests": [
+            "TestLPDebugMatrixPrintSourceFixtures",
+            "TestLPDebugMatrixPrintIndependentColumnWorlds",
+            "TestLPDebugMatrixPrintConcreteOverloads",
+            "TestLPDebugMatrixPrintEveryByteAndFlush",
+            "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
+            "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
+          ]
         }
       ],
       "ownership": [
-        "Debug-only native Go float slices own copied dense storage and lexical product/vector temporaries. Copy and dense assignment deep-copy storage; partial constructors/products return reached owner/prefix. Dense left application computes entire temporary before publication; generic apply_to_vector snapshots input then publishes each completed row. No numerical arena roots or STL storage implementation."
+        "Debug-only native Go float slices own copied dense storage and lexical product/vector temporaries. Copy and dense assignment deep-copy storage; partial constructors/products return reached owner/prefix. Dense left application computes entire temporary before publication; generic apply_to_vector snapshots input then publishes each completed row. No numerical arena roots or STL storage implementation.",
+        "Native Go string tables snapshot all numeric matrix cells before output. String-table printing borrows slice headers by value and rereads live cell strings after padding. Widths/temporary rows are native scalar/string storage, without numerical arena roots or C++ STL representations."
       ],
       "deviations": [
         "g3debug build scope matches source Z3DEBUG. Concrete FloatDebugMatrix transports floating values with explicit Go index errors; no any-valued callback layer or generic template. Unsigned32 rows*columns and flat offsets retain wrap/spill behavior; ErrBounds precedes actual invalid storage access. Exact scalar/pair coefficient variants, source formatting and whole-source/ownership audit remain open, so no whole-unit promotion.",
-        "Uncalled base-matrix assignment (source invalid raw-array assignment), multiply-assign, pivot/swap/scale and extra rectangular/right/vector-X variants are not invented. Original test_dense_matrix is behind an unconditional return; direct fixture preserves its zero-unit typo without registered driver credit. Actual live consumers include LU get_B/left/right/is_correct and swap debug views; complete upstream assertion wiring remains open."
+        "Uncalled base-matrix assignment (source invalid raw-array assignment), multiply-assign, pivot/swap/scale and extra rectangular/right/vector-X variants are not invented. Original test_dense_matrix is behind an unconditional return; direct fixture preserves its zero-unit typo without registered driver credit. Actual live consumers include LU get_B/left/right/is_correct and swap debug views; complete upstream assertion wiring remains open.",
+        "Floating debug printers preserve byte rather than rune widths, trailing spaces, per-space writer insertions and row/final endl flushes. Width subtraction is unsigned32 before signed32 narrowing; negative print_blanks count reaches explicit ErrBounds before undefined signed-decrement behavior. Ragged/index/report/native stream errors stop with actual completed output prefix. Base pointer overload adds a final blank line; static/sparse/submatrix overloads do not. Whole source units, exact numeral/pair T_to_string ownership and complete upstream diagnostic/assertion/CLI wiring remain open. Unused static printer local get_domain result has no retained numerical effect and no STL set implementation is introduced."
       ]
     },
     {
@@ -132767,7 +132859,9 @@
         "pkg/util/lp/dense_matrix_float_debug.go",
         "pkg/util/lp/matrix_float_debug.go",
         "pkg/util/lp/lu_float_debug_matrix.go",
-        "pkg/util/lp/dense_matrix_float_debug_test.go"
+        "pkg/util/lp/dense_matrix_float_debug_test.go",
+        "pkg/util/lp/matrix_float_debug_print.go",
+        "pkg/util/lp/matrix_float_debug_print_test.go"
       ],
       "tests": [
         "TestLPDebugDenseOriginalSource",
@@ -132777,7 +132871,13 @@
         "TestLPDebugDenseMatrixEqualityAndFailurePrefixes",
         "TestLPDebugDenseConcretePermutationAndStaticConsumers",
         "TestLPDebugDenseActualLUIdentities",
-        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
+        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes",
+        "TestLPDebugMatrixPrintSourceFixtures",
+        "TestLPDebugMatrixPrintIndependentColumnWorlds",
+        "TestLPDebugMatrixPrintConcreteOverloads",
+        "TestLPDebugMatrixPrintEveryByteAndFlush",
+        "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
+        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
       ],
       "conditionals": [
         {
@@ -132806,14 +132906,29 @@
             "TestLPDebugDenseActualLUIdentities",
             "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
           ]
+        },
+        {
+          "name": "Retained floating debug matrix/string-table byte widths, per-space print_blanks, row endl flushes; base final blank line versus static/sparse/submatrix LU overloads; native T_to_string(double) formatting",
+          "status": "ported",
+          "go_target": "pkg/util/lp/matrix_float_debug_print.go",
+          "tests": [
+            "TestLPDebugMatrixPrintSourceFixtures",
+            "TestLPDebugMatrixPrintIndependentColumnWorlds",
+            "TestLPDebugMatrixPrintConcreteOverloads",
+            "TestLPDebugMatrixPrintEveryByteAndFlush",
+            "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
+            "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
+          ]
         }
       ],
       "ownership": [
-        "Debug-only native Go float slices own copied dense storage and lexical product/vector temporaries. Copy and dense assignment deep-copy storage; partial constructors/products return reached owner/prefix. Dense left application computes entire temporary before publication; generic apply_to_vector snapshots input then publishes each completed row. No numerical arena roots or STL storage implementation."
+        "Debug-only native Go float slices own copied dense storage and lexical product/vector temporaries. Copy and dense assignment deep-copy storage; partial constructors/products return reached owner/prefix. Dense left application computes entire temporary before publication; generic apply_to_vector snapshots input then publishes each completed row. No numerical arena roots or STL storage implementation.",
+        "Native Go string tables snapshot all numeric matrix cells before output. String-table printing borrows slice headers by value and rereads live cell strings after padding. Widths/temporary rows are native scalar/string storage, without numerical arena roots or C++ STL representations."
       ],
       "deviations": [
         "g3debug build scope matches source Z3DEBUG. Concrete FloatDebugMatrix transports floating values with explicit Go index errors; no any-valued callback layer or generic template. Unsigned32 rows*columns and flat offsets retain wrap/spill behavior; ErrBounds precedes actual invalid storage access. Exact scalar/pair coefficient variants, source formatting and whole-source/ownership audit remain open, so no whole-unit promotion.",
-        "Uncalled base-matrix assignment (source invalid raw-array assignment), multiply-assign, pivot/swap/scale and extra rectangular/right/vector-X variants are not invented. Original test_dense_matrix is behind an unconditional return; direct fixture preserves its zero-unit typo without registered driver credit. Actual live consumers include LU get_B/left/right/is_correct and swap debug views; complete upstream assertion wiring remains open."
+        "Uncalled base-matrix assignment (source invalid raw-array assignment), multiply-assign, pivot/swap/scale and extra rectangular/right/vector-X variants are not invented. Original test_dense_matrix is behind an unconditional return; direct fixture preserves its zero-unit typo without registered driver credit. Actual live consumers include LU get_B/left/right/is_correct and swap debug views; complete upstream assertion wiring remains open.",
+        "Floating debug printers preserve byte rather than rune widths, trailing spaces, per-space writer insertions and row/final endl flushes. Width subtraction is unsigned32 before signed32 narrowing; negative print_blanks count reaches explicit ErrBounds before undefined signed-decrement behavior. Ragged/index/report/native stream errors stop with actual completed output prefix. Base pointer overload adds a final blank line; static/sparse/submatrix overloads do not. Whole source units, exact numeral/pair T_to_string ownership and complete upstream diagnostic/assertion/CLI wiring remain open. Unused static printer local get_domain result has no retained numerical effect and no STL set implementation is introduced."
       ]
     },
     {
