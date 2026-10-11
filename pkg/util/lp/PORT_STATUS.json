@@ -9,7 +9,7 @@
     "remaining retained LU diagnostics and full solver/priority-queue lifecycle integration",
     "precise scaling early return, exact LP preparation, full primal/dual/LAR scaling integration and random updates",
     "remaining primal constructors/diagnostics/validators, exact outer preparation, exact dual/LAR optimization, MPS source driver integration and complete upstream drivers",
-    "remaining whole-LAR propagation scheduling and solve integration, remaining quick_xplain/proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
+    "remaining whole-LAR propagation scheduling, optimization callers and complete upstream solve drivers, remaining quick_xplain/proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "exact MPS input, exact/LAR construction and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits"
   ],
@@ -942,7 +942,9 @@
         "pkg/util/lp/lar_all_constraints.go",
         "pkg/util/lp/lar_all_constraints_test.go",
         "pkg/util/lp/lar_constraint_display.go",
-        "pkg/util/lp/lar_constraint_display_test.go"
+        "pkg/util/lp/lar_constraint_display_test.go",
+        "pkg/util/lp/lar_solver_solve.go",
+        "pkg/util/lp/lar_solver_solve_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -1045,7 +1047,15 @@
         "TestLARConstraintDisplaySourceText",
         "TestLARConstraintDisplayEveryWriterPrefix",
         "TestLARConstraintDisplayReachedPrefixes",
-        "TestLARConstraintDisplayPhysicalOwnership"
+        "TestLARConstraintDisplayPhysicalOwnership",
+        "TestLARFullSolveIndependentModels",
+        "TestLARFullSolveOptimizationAndRepeatedCalls",
+        "TestLARFullSolveCancellationAndDiagnosticPrefixes",
+        "TestLARFullSolvePhysicalOwnership",
+        "TestLARFullSolvePreparationAndValidationErrors",
+        "TestLARFullSolveInfeasibleEarlyReturnAndSelection",
+        "TestLARFullSolvePreservesOlderComparison",
+        "TestLARFullSolveUndecidedSelectionAndFailure"
       ]
     },
     {
@@ -4339,5 +4349,34 @@
     "log": "/mnt/oldrog/tmp/g3-lar-validation-module-native.log",
     "coverage_profile": "/mnt/oldrog/tmp/g3-lar-validation-module-native.cover",
     "qualification": "Started after constraint validation commit; completion not yet observed. Poll session8876 before using terminal runner status or crediting coverage."
+  },
+  "latest_outer_lar_solver_increment": {
+    "source": "src/util/lp/lar_solver.h:433-454,851-869",
+    "go_target": "pkg/util/lp/lar_solver_solve.go",
+    "tests": [
+      "TestLARFullSolveIndependentModels",
+      "TestLARFullSolveOptimizationAndRepeatedCalls",
+      "TestLARFullSolveCancellationAndDiagnosticPrefixes",
+      "TestLARFullSolvePhysicalOwnership",
+      "TestLARFullSolvePreparationAndValidationErrors",
+      "TestLARFullSolveInfeasibleEarlyReturnAndSelection",
+      "TestLARFullSolvePreservesOlderComparison",
+      "TestLARFullSolveUndecidedSelectionAndFailure"
+    ],
+    "native_statements": {
+      "covered": 49,
+      "total": 57,
+      "percent": 86.0
+    },
+    "debug_checked_statements": {
+      "covered": 55,
+      "total": 57,
+      "percent": 96.5
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-lar-full-solve-native.cover",
+      "/mnt/oldrog/tmp/g3-lar-full-solve-debug.cover"
+    ],
+    "evidence": "Outer LARSolver FindFeasibleSolution, Solve and SolveWithCoreSolver now implement lar_solver.h:433-454,851-869 using the actual strategy initialization, exact/floating LU extension, exact prefix, changed-bound feasibility/cost updates, coupled core Solve, status publication and touched-row detection. The infeasible early return retains changed columns; strategy selection and the feasible-only flag precede that early return in FindFeasibleSolution. Ordinary Solve clears changed columns after optional propagation; errors retain the reached prefix.360 independently checked systems span all three strategies, strict/non-strict bounds and feasible/impossible rational term inequalities with original constants; extracted models satisfy independent rational inequalities and actual constraints. Direct core/repeated solves, bound-propagation toggles, early contradictory bounds, both undecided threshold branches, deferred-term/pending-core errors,21 cancellation/diagnostic worlds and four preparation/validation errors verify source order. Twelve pooled/direct physical refusal campaigns through success use large bounds and large matrix coefficients, and an actual older caller comparison survives owner cleanup. Source behavior is preserved: LU signature solving sets feasible-only even after a direct Solve entry; the floating term-row basis sign can leave the double presolver feasible while the exact model violates its upper bound, so cancellation may publish Optimal. A fixed term bound forces the separate floating TimeExhausted route. Tableau-cost direct optimization with active feasibility costs reaches DecideOnStatusWhenCannotFindEntering need_to_switch_costs assertion in debug and continues to Optimal in native; no silent cost-switch repair. New file49/57 statements (86.0%) native and55/57 (96.5%) debug/checked. Remaining debug branches guard final changed-set clearing and the cost-set extent derived from the actual model vector; native additionally erases final model validation. Focused native/debug2.828s/12.625s and related LAR native/debug55.307s/63.758s pass. Full native checkpoint60516955 is still running and predates this increment; completion and coverage are not credited. Complete upstream drivers, remaining optimization/scaling/random-update/diagnostic paths and whole-source audits remain open; inventory remains85 partial/25 unported. Both LP vets, native/debug module compilation, source portcheck, graph refresh and diff checks pass."
   }
 }

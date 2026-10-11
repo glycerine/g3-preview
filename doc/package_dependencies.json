@@ -1252,6 +1252,7 @@
         "lar_solve.go",
         "lar_solve_signature.go",
         "lar_solve_signature_tableau.go",
+        "lar_solver_solve.go",
         "lar_strategy.go",
         "lar_tableau_remove.go",
         "lar_term.go",
