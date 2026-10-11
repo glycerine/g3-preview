@@ -1183,6 +1183,7 @@
         "core_pivot_exact.go",
         "core_pivot_float.go",
         "core_reconstruct_exact.go",
+        "core_reduced_cost_exact.go",
         "core_residual_exact.go",
         "core_statistics_float.go",
         "core_tableau_exact.go",

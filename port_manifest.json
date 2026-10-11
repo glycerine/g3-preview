@@ -122273,7 +122273,8 @@
         "pkg/util/lp/core_residual_exact.go",
         "pkg/util/lp/core_residual_exact_test.go",
         "pkg/util/lp/core_reconstruct_exact.go",
-        "pkg/util/lp/core_reconstruct_exact_test.go"
+        "pkg/util/lp/core_reconstruct_exact_test.go",
+        "pkg/util/lp/core_reduced_cost_exact.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122375,7 +122376,12 @@
         "TestLPPairCoreReconstructGuardsAndPrefixes",
         "TestLPPairCoreReconstructPhysicalOwnership",
         "TestLPPairCoreReconstructStoppedLUKeepsRHS",
-        "TestLPPairCoreReconstructPreservesOlderComparisonOwner"
+        "TestLPPairCoreReconstructPreservesOlderComparisonOwner",
+        "TestLPPairReducedCostIndependentSystems",
+        "TestLPPairReducedCostLiveAliases",
+        "TestLPPairReducedCostPhysicalOwnership",
+        "TestLPPairReducedCostLeavesOlderComparisonOwned",
+        "TestLPPairReducedCostReachedGuardsAndPrefixes"
       ],
       "conditionals": [
         {
@@ -122800,6 +122806,18 @@
             "TestLPPairCoreReconstructPhysicalOwnership",
             "TestLPPairCoreReconstructStoppedLUKeepsRHS",
             "TestLPPairCoreReconstructPreservesOlderComparisonOwner"
+          ]
+        },
+        {
+          "name": "retained exact fill_reduced_costs_from_m_y_by_rows and init_reduced_costs_for_one_iteration; descending initialization/rows, stored cell order, live scalar references and separately owned precise LU transpose solve",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_reduced_cost_exact.go",
+          "tests": [
+            "TestLPPairReducedCostIndependentSystems",
+            "TestLPPairReducedCostLiveAliases",
+            "TestLPPairReducedCostPhysicalOwnership",
+            "TestLPPairReducedCostLeavesOlderComparisonOwned",
+            "TestLPPairReducedCostReachedGuardsAndPrefixes"
           ]
         }
       ],
