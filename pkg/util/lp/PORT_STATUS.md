@@ -10,14 +10,14 @@ primal and dual cores expose Solve, and outer LU primal/dual integration is impl
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
 
-Latest hourly native module run completed at02:51UTC on October11 with
-observed exit status0 and all64packages passing: LP933.542s,88.4% (15389/17416).
-Log/profile: `/mnt/oldrog/tmp/g3-pricing-module-native.{log,cover}`.
-The02:35UTC code snapshot is pricing commit77ddf509: whole-model scopes,
-changed-bound updates, exact/floating preparation and precise pricing are included.
-The snapshot predates bound-step and subsequent infeasibility-limit additions;
-those have separate focused checks. Coverage measures existing Go code,
-not unported C++ functionality.
+Latest full native module checkpoint was observed complete at03:52UTC on
+October11 with exit status0 and all64packages passing: LP979.695s,
+88.2% (16034/18173). Log/profile:
+`/mnt/oldrog/tmp/g3-breakpoint-module-native.{log,cover}`.
+The run started03:33UTC at0d330f87 and covers exact bound-step, Harris epsilon,
+basis dispatch and breakpoint record/slope additions. It predates the collector
+and traversal additions, which have separate focused checks. Coverage measures
+existing Go code, not unported C++ functionality.
 
 Known source limitation: post-pop cleanup declares an empty local changed-cost
 set, while basic-value updates record changes in a different member set. With
@@ -69,6 +69,7 @@ from the120 independently verified bounded optima.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Exact sorted-breakpoint traversal and native/debug leaving wrapper | 480 independent rational/queue-order/slope models; strict epsilon threshold, zero-slope RNG and exhaustion; live output/record aliases; six pooled/direct physical campaigns; real stopped-queue and older-caller comparison profiles | Traversal79/91 (86.8%) native,76/91 (83.5%) debug/checked. Debug exact wrapper asserts before fill; native-only wrapper/fallback paths account for profile differences. Other gaps are protected capture/copy/sign/destruction and child invariants. All breakpoint regressions2.982s/4.268s and both vets pass. Full precise leaving ratio scan, advancement and Solve remain open |
 | Exact breakpoint collection | 600 independent pair delta worlds;200 actual two-row LAR models; eight pooled/direct physical campaigns; three older-caller comparison profiles; equality, indexed zero coefficients, source row order and signed boxed entering spans | Collector147/170 (86.5%) native,148/170 (87.1%) debug/checked. Focused breakpoint regressions2.128s/3.057s and both LP vets pass. Remaining gaps are protected capture/copy/sign/destruction and metadata guards. Randomized traversal, full precise leaving selection and Solve remain open |
 | Exact breakpoint records, priorities, clearing and slope updates | 180 independent signed pair/priority worlds;360 slope worlds with actual LAR headings and aliases; fourteen pooled/direct ownership campaigns; signed-minimum cases; two older comparisons; real stopped-queue clear prefix | Native79.9% (123/154), debug/checked84.4% (130/154). Gaps qualify valid copy/zero/capture/destruction and opposite-profile guards. Full collection, randomized traversal and precise leaving/advance/Solve remain open |
 | Exact basis-column theta dispatch | 2400 independent pair worlds across five column types, stored feasibility and both directions; sixteen scalar/output aliases; eighteen copy/physical-expression campaigns; five older-caller comparison profiles and source guards | Native86.8% (59/68), debug/checked88.2% (60/68). Gaps protect capture/sign/index, final zero comparison and valid cleanup. Full precise leaving/ratio, breakpoints, advancement and Solve remain open |

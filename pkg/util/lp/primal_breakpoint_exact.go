@@ -142,6 +142,10 @@ func (m *PairPrimalCoreSolver) ChangeSlopeOnBreakpoint(entering uint32, b *PairB
 		return err
 	}
 	defer func() { m.stopped = err != nil }()
+	return m.changeSlopeOnBreakpointValue(entering, b, slope)
+}
+
+func (m *PairPrimalCoreSolver) changeSlopeOnBreakpointValue(entering uint32, b *PairBreakpoint, slope *numeral.Rational) (err error) {
 	if b == nil || b.Delta == nil || slope == nil {
 		return ErrBounds
 	}
