@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 86.7,
-  "coverage_warning": "Latest completed native checkpoint82fa38d8 measures26877/31015 LP statements (86.7%); includes scalar dual pricing/candidates/full ratio, flips, beta/DSE and advancement/recovery. Predates scalar full dual Solve and scalar outer primal/dual integration and exact MPS factories/named accessors. Their focused evidence remains separate. Go statement coverage is not C++ source completion; remaining retained sources and complete upstream drivers remain open.",
+  "coverage_warning": "Latest completed native checkpoint82fa38d8 measures26877/31015 LP statements (86.7%); includes scalar dual pricing/candidates/full ratio, flips, beta/DSE and advancement/recovery. Predates scalar full dual Solve and scalar outer primal/dual integration and exact MPS factories/named accessors and LP option/setup driver integration. Their focused evidence remains separate. Go statement coverage is not C++ source completion; remaining retained sources and complete upstream drivers remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -10,9 +10,9 @@
     "remaining retained objective/preparation consumers and full primal/dual/LAR scaling integration; whole random-update source/driver audit",
     "remaining retained constructor/diagnostic/validator and optimization consumer audits; complete MPS/CLI upstream drivers",
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
-    "full CLI/options/SMT input, setup/printing/timing and primal-comparison branches and complete upstream test-driver scenarios",
+    "full CLI dispatch, file-list/directory/SMT input, printing/timing and primal-comparison branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Full CLI/options/SMT/reporting/timing and primal-comparison driver branches, remaining scaling and retained optimization consumers, whole-source/ownership audits and complete upstream LP/randomize drivers. Exact dual source unsupported rational constructors and omitted sparsity extents remain explicit source-limit audit obligations."
+    "Full CLI dispatch, file-list/directory/SMT, reporting/timing and primal-comparison driver branches; remaining scaling/optimization consumers, whole-source/ownership audits and complete upstream LP/randomize drivers. Exact dual unsupported rational constructors and omitted sparsity extents remain explicit source-limit audit obligations."
   ],
   "units": [
     {
@@ -3454,7 +3454,8 @@
         "pkg/util/lp/solver_presolve_exact_test.go",
         "pkg/util/lp/solver_exact_model.go",
         "pkg/util/lp/solver_prepare_exact.go",
-        "pkg/util/lp/core_statistics_rational.go"
+        "pkg/util/lp/core_statistics_rational.go",
+        "pkg/util/lp/driver_settings.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
@@ -3515,7 +3516,17 @@
         "TestLPRationalStatisticsLiveLocalReentryGuard",
         "TestLPRationalStatisticsPhysicalOwnership",
         "TestLPRationalAllColumnsFeasibilityIndependentOracle",
-        "TestLPRationalStatisticsReachedGuardsAndPrefixes"
+        "TestLPRationalStatisticsReachedGuardsAndPrefixes",
+        "TestLPDriverArgumentCatalogue",
+        "TestLPDriverArgumentSourcePrefixesAndAccumulation",
+        "TestLPDriverArgumentPrintAndOutputFailures",
+        "TestLPDriverArgumentNumericDomains",
+        "TestLPDriverSettingsDefaultsAndOverrides",
+        "TestLPDriverSettingsDiagnosticPublication",
+        "TestLPDriverSetupActualMPSMinMax",
+        "TestLPDriverSetupLimitsAndFailurePrefixes",
+        "TestLPDriverSetupPhysicalOwnership",
+        "TestLPDriverSetupPreservesOlderComparison"
       ]
     },
     {
@@ -3560,7 +3571,8 @@
         "pkg/util/lp/solver_objective_exact_test.go",
         "pkg/util/lp/solver_expression_exact.go",
         "pkg/util/lp/solver_expression_exact_test.go",
-        "pkg/util/lp/solver_named_rational.go"
+        "pkg/util/lp/solver_named_rational.go",
+        "pkg/util/lp/driver_settings.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -3635,7 +3647,17 @@
         "TestLPRationalMPSOuterNamedLookup",
         "TestLPRationalMPSOuterNamedPhysicalOwnership",
         "TestLPRationalMPSOuterPreservesOlderComparison",
-        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
+        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes",
+        "TestLPDriverArgumentCatalogue",
+        "TestLPDriverArgumentSourcePrefixesAndAccumulation",
+        "TestLPDriverArgumentPrintAndOutputFailures",
+        "TestLPDriverArgumentNumericDomains",
+        "TestLPDriverSettingsDefaultsAndOverrides",
+        "TestLPDriverSettingsDiagnosticPublication",
+        "TestLPDriverSetupActualMPSMinMax",
+        "TestLPDriverSetupLimitsAndFailurePrefixes",
+        "TestLPDriverSetupPhysicalOwnership",
+        "TestLPDriverSetupPreservesOlderComparison"
       ]
     },
     {
@@ -5416,7 +5438,7 @@
     "lp_covered_statements": 26877,
     "lp_statements": 31015,
     "session_id": 40387,
-    "scope_warning": "Includes scalar dual pricing/candidates/full ratio, flips/value updates, beta/DSE and known-leaving basis advancement/recovery through82fa38d8, plus earlier scalar full primal Solve/statistics and initialization. Profile excludes dual_solve_rational.go and all scalar outer-primal and outer-dual files and the later exact MPS factories/named accessors. Their focused evidence remains separate. Coverage measures implemented Go statements, not C++ completion. Actual session40387 returned terminal exit0."
+    "scope_warning": "Includes scalar dual pricing/candidates/full ratio, flips/value updates, beta/DSE and known-leaving basis advancement/recovery through82fa38d8, plus earlier scalar full primal Solve/statistics and initialization. Profile excludes dual_solve_rational.go and all scalar outer-primal and outer-dual files and the later exact MPS factories/named accessors and LP option/setup driver integration. Their focused evidence remains separate. Coverage measures implemented Go statements, not C++ completion. Actual session40387 returned terminal exit0."
   },
   "full_native_checkpoint_history": [
     {
@@ -8676,6 +8698,66 @@
       "focused_debug_checked": "passed",
       "integrated_mps_native": "passed",
       "integrated_mps_debug_checked": "passed",
+      "related_native": "passed",
+      "related_debug_checked": "passed",
+      "lp_vet_native": "passed",
+      "lp_vet_debug_checked": "passed",
+      "module_compile_native": "passed",
+      "module_compile_debug_checked": "passed",
+      "portcheck": "passed",
+      "dependency_graph": "passed",
+      "diff_check": "passed"
+    }
+  },
+  "latest_lp_driver_increment": {
+    "scope": "Retained LP argument parser/catalogue, integer/double option consumers, driver settings publication and concrete exact/floating solver setup",
+    "lp_source_units_promoted": false,
+    "new_test_groups": 10,
+    "catalogue_options": 45,
+    "independent_boxed_mps_worlds": 30,
+    "actual_min_max_solves": 180,
+    "actual_exact_primal_solves": 60,
+    "actual_floating_primal_solves": 60,
+    "actual_floating_dual_solves": 60,
+    "exact_setup_prefix_profiles": 5,
+    "floating_setup_prefix_profiles": 4,
+    "physical_campaigns": 2,
+    "older_comparison_campaigns": 1,
+    "focused_native_seconds": 0.477,
+    "focused_debug_checked_seconds": 0.462,
+    "related_native_seconds": 14.598,
+    "related_debug_checked_seconds": 16.692,
+    "statement_coverage": {
+      "native": {
+        "driver_arguments.go": {
+          "covered": 86,
+          "total": 86,
+          "percent": 100.0
+        },
+        "driver_settings.go": {
+          "covered": 73,
+          "total": 73,
+          "percent": 100.0
+        }
+      },
+      "debug_checked": {
+        "driver_arguments.go": {
+          "covered": 86,
+          "total": 86,
+          "percent": 100.0
+        },
+        "driver_settings.go": {
+          "covered": 73,
+          "total": 73,
+          "percent": 100.0
+        }
+      }
+    },
+    "coverage_note": "Argument handling 86/86 and settings/setup 73/73 statements (100%) in both modes, including every report-byte and endl flush failure, parse error publication and owning setup failure prefixes. Catalogue is static data, with all 45 registrations independently tested. Go statement coverage does not establish full driver or C++ source completion.",
+    "remaining": "Full CLI dispatch, file-list/directory/SMT, reporting/timing and primal-comparison driver branches; remaining scaling/optimization consumers, whole-source/ownership audits and complete upstream LP/randomize drivers. Exact dual unsupported rational constructors and omitted sparsity extents remain explicit source-limit audit obligations.",
+    "verification": {
+      "focused_native": "passed",
+      "focused_debug_checked": "passed",
       "related_native": "passed",
       "related_debug_checked": "passed",
       "lp_vet_native": "passed",

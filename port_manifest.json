@@ -99606,14 +99606,43 @@
       "path": "src/test/argument_parser.h",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/driver_arguments.go"
+      ],
+      "tests": [
+        "TestLPDriverArgumentCatalogue",
+        "TestLPDriverArgumentSourcePrefixesAndAccumulation",
+        "TestLPDriverArgumentPrintAndOutputFailures",
+        "TestLPDriverArgumentNumericDomains",
+        "TestLPDriverSettingsDefaultsAndOverrides",
+        "TestLPDriverSettingsDiagnosticPublication",
+        "TestLPDriverSetupActualMPSMinMax",
+        "TestLPDriverSetupLimitsAndFailurePrefixes",
+        "TestLPDriverSetupPhysicalOwnership",
+        "TestLPDriverSetupPreservesOlderComparison"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained LP constructor, parse, option_is_used/get_option_value, usage_string and print with native strings/maps and accumulated source publication",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_arguments.go",
+          "tests": [
+            "TestLPDriverArgumentCatalogue",
+            "TestLPDriverArgumentSourcePrefixesAndAccumulation",
+            "TestLPDriverArgumentPrintAndOutputFailures",
+            "TestLPDriverArgumentNumericDomains"
+          ]
+        }
+      ],
+      "ownership": [
+        "DriverArguments owns a copied native argument slice, native flag/free-argument storage and insertion-ordered value dictionary. Repeated Parse accumulates free arguments and used options like source; duplicate values replace in their existing insertion position. Printed source set flags sort lexicographically. No C++ string/container/contains overload implementation is ported."
+      ],
+      "deviations": [
+        "Native registration order and value insertion order replace unspecified source unordered traversal; lexical flag order matches the source set. Source parse rejects unknown - and // prefixes, whereas usage lists - and backslash prefixes; the mismatch is retained. Missing trailing values preserve earlier used flags/values. Native writer errors and endl Flush errors return the actual emitted prefix. Whole-source audit remains open; dead generic registration/contains/starts_with wrappers are not invented."
+      ]
     },
     {
       "path": "src/test/arith_rewriter.cpp",
@@ -102977,7 +103006,10 @@
         "pkg/util/lp/core_snap_rational.go",
         "pkg/util/lp/core_values_rational_test.go",
         "pkg/util/lp/mps_populate_exact.go",
-        "pkg/util/lp/solver_named_rational.go"
+        "pkg/util/lp/solver_named_rational.go",
+        "pkg/util/lp/driver_arguments.go",
+        "pkg/util/lp/driver_option_catalogue.go",
+        "pkg/util/lp/driver_settings.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103057,7 +103089,17 @@
         "TestLPRationalMPSOuterNamedLookup",
         "TestLPRationalMPSOuterNamedPhysicalOwnership",
         "TestLPRationalMPSOuterPreservesOlderComparison",
-        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
+        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes",
+        "TestLPDriverArgumentCatalogue",
+        "TestLPDriverArgumentSourcePrefixesAndAccumulation",
+        "TestLPDriverArgumentPrintAndOutputFailures",
+        "TestLPDriverArgumentNumericDomains",
+        "TestLPDriverSettingsDefaultsAndOverrides",
+        "TestLPDriverSettingsDiagnosticPublication",
+        "TestLPDriverSetupActualMPSMinMax",
+        "TestLPDriverSetupLimitsAndFailurePrefixes",
+        "TestLPDriverSetupPhysicalOwnership",
+        "TestLPDriverSetupPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -103724,7 +103766,7 @@
           ]
         },
         {
-          "name": "solve_mps_double retained primal parsing/construction/optimization path with independent fixtures; dual/compare, CLI setup/printing/timing and exact/LAR scenarios remain open",
+          "name": "solve_mps_double retained primal parsing/construction/optimization path with independent fixtures; dual/compare, CLI dispatch/printing/timing and exact/LAR scenarios remain open",
           "status": "partial",
           "go_target": "pkg/util/lp/mps_reader_float.go",
           "tests": [
@@ -103759,7 +103801,7 @@
           ]
         },
         {
-          "name": "Retained solve_mps_rational/solve_mps_in_rational parse/create/optimization and symbolic-value consumer paths with independent exact min/max models; full CLI setup, timing and printing remain open",
+          "name": "Retained solve_mps_rational/solve_mps_in_rational parse/create/optimization and symbolic-value consumer paths with independent exact min/max models; full CLI dispatch, timing and printing remain open",
           "status": "partial",
           "go_target": "pkg/util/lp/mps_outer_rational_test.go",
           "tests": [
@@ -103774,10 +103816,28 @@
             "TestLPRationalMPSOuterPreservesOlderComparison",
             "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
           ]
+        },
+        {
+          "name": "setup_args_parser complete 45-option catalogue, get_int/get_double option consumers, update_settings, setup_solver exact/floating and get_time_limit_and_max_iters_from_parser",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_settings.go",
+          "tests": [
+            "TestLPDriverArgumentCatalogue",
+            "TestLPDriverArgumentSourcePrefixesAndAccumulation",
+            "TestLPDriverArgumentPrintAndOutputFailures",
+            "TestLPDriverArgumentNumericDomains",
+            "TestLPDriverSettingsDefaultsAndOverrides",
+            "TestLPDriverSettingsDiagnosticPublication",
+            "TestLPDriverSetupActualMPSMinMax",
+            "TestLPDriverSetupLimitsAndFailurePrefixes",
+            "TestLPDriverSetupPhysicalOwnership",
+            "TestLPDriverSetupPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
-        "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim."
+        "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim.",
+        "Exact setup publishes limits before calling the actual owning FlipCosts child; driver settings publish only after its ordinary return. No parent numerical capture wraps child cost getter/copy/negation/setter operations. Interrupted source cost-flip prefixes and borrowed older comparison receipts survive common model cleanup."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -103791,7 +103851,8 @@
         "Zero-low constructor preserves base FEASIBLE status, beta/Harris initialization, debug predicate before dummy resize, and borrowed header identity. The Go header is safely empty before base construction; boxed debug reads guard the C++ not-yet-constructed dummy member domain. Source omitted pricing fields are not credited before InitRun; dead enter-price epsilon assignment is excluded because no retained read exists. Initial checks use exact zero/upper comparisons, not stored lower bounds/tolerance. Original smoke fixtures now use the actual constructor with empty upper bounds: explicit LU verifies independent optima; unchanged source default strategy instead hits !use_tableau assertion in debug and missing factorization ErrBounds guard in release. This does not claim default source solver correctness or completion of the whole upstream driver.",
         "Native Go strings/bufio/strconv and insertion-ordered dictionaries replace STL streams/containers and libc numeric conversion. ASCII space/tab token/trim rules, fixed-field 8-byte row names/25-byte stride and column continuation preserve project parsing. Numeric tokens use Go ParseFloat on the first field; malformed libc atof prefix grammar is not emulated. Native writer errors and real file errors return reached publication prefixes; EOF retains source two-count line increment. Non-advancing ROWS header loop returns ErrMPSStalled, bare throw/undefined token domains become explicit errors. Source MI retains default lower flag, marker line still registers a column, LIMITMAX source shift assertion and zero/negative/IEEE range transformations are preserved. Dictionary insertion order defines deterministic replacement/source unordered traversal; partial constructed solvers are returned for cleanup. Native owner/file Close replaces source stream/container destruction. Dead string utility adapters and unused solver_row_count/range_count helpers are excluded; exact/dual/LAR creation and complete upstream CLI remain open.",
         "Literal upstream examples stop at the source add_constraint debug assertion; native ignores those calls. Native term model is tested including its deferred materialized column; the infeasibility sample remains feasible, and ignored triangle inequalities yield no implied endpoints. These source limitations are exposed explicitly. Alternate retained-bound installation is tested separately and is not substituted for the original driver.",
-        "Concrete scalar mpq/mpq core value updates/restoration, descending RHS reconstruction, precise LU solve, reduced costs, deterministic bound/free snapping, precise indexed residual bypass and ascending objective dot product now implement the retained source methods. UpdateX keeps delta a live reference and precise updates never populate CopyXB. Reconstruction uses the real RationalLU and publishes descending basic assignments, without floating refinement. Reduced costs skip zero Y before row reads. Source rational binary expressions copy the left operand and copy the compound-result reference on return; core products and corrected outer objective products/sums preserve these owners and physical failure prefixes. Parent raw receipts close before LU, LU before borrowed work, and temporary owners before parent roots. Seven test groups cover 100 independent triangular systems with 81-180-bit costs and independent RHS, transpose solve, reduced-cost and objective oracles; 360 update/restore worlds across LU/tableau traversal and live aliases; all source column types and unknown default; output aliasing and descending aliased copies; 27 reached domain profiles; stopped/closed calls and actual older comparison identity. Twenty-two pooled/direct physical campaigns run through success, require actual refusal for every direct campaign and pass ownership census. The literal upstream solve_rational fixture reconstructs a supplied known basis and checks objective24 using independent primal/dual certificates: no optimization search or complete upstream-driver credit. The initial reduced-cost guard fixture marked all columns basic; making the next column nonbasic corrects its expected reached cost read. Inventory remains 88 partial/16 unported/6 reference_only; no whole-source promotion. Scalar core residual/diagnostic queries, pivot and feasibility-search orchestration, exact primal/dual outer optimization, full upstream drivers and whole-source audits remain open. Audit earlier common exact preparation/presolve binary-expression temporaries against rational.h copy-on-return semantics; the objective correction does not prove those paths complete. Latest full native checkpoint a8a7ef66 predates scalar core base/values and the current objective-expression correction; focused coverage measures current Go statements only."
+        "Concrete scalar mpq/mpq core value updates/restoration, descending RHS reconstruction, precise LU solve, reduced costs, deterministic bound/free snapping, precise indexed residual bypass and ascending objective dot product now implement the retained source methods. UpdateX keeps delta a live reference and precise updates never populate CopyXB. Reconstruction uses the real RationalLU and publishes descending basic assignments, without floating refinement. Reduced costs skip zero Y before row reads. Source rational binary expressions copy the left operand and copy the compound-result reference on return; core products and corrected outer objective products/sums preserve these owners and physical failure prefixes. Parent raw receipts close before LU, LU before borrowed work, and temporary owners before parent roots. Seven test groups cover 100 independent triangular systems with 81-180-bit costs and independent RHS, transpose solve, reduced-cost and objective oracles; 360 update/restore worlds across LU/tableau traversal and live aliases; all source column types and unknown default; output aliasing and descending aliased copies; 27 reached domain profiles; stopped/closed calls and actual older comparison identity. Twenty-two pooled/direct physical campaigns run through success, require actual refusal for every direct campaign and pass ownership census. The literal upstream solve_rational fixture reconstructs a supplied known basis and checks objective24 using independent primal/dual certificates: no optimization search or complete upstream-driver credit. The initial reduced-cost guard fixture marked all columns basic; making the next column nonbasic corrects its expected reached cost read. Inventory remains 88 partial/16 unported/6 reference_only; no whole-source promotion. Scalar core residual/diagnostic queries, pivot and feasibility-search orchestration, exact primal/dual outer optimization, full upstream drivers and whole-source audits remain open. Audit earlier common exact preparation/presolve binary-expression temporaries against rational.h copy-on-return semantics; the objective correction does not prove those paths complete. Latest full native checkpoint a8a7ef66 predates scalar core base/values and the current objective-expression correction; focused coverage measures current Go statements only.",
+        "Project parser/option/assignment order is preserved using Go strings and standard numeric parsers. Nonempty malformed, libc-style trailing numeric prefixes or signed-int32 overflow return explicit Go parse errors instead of porting libc atoi/atof grammar or claiming undefined C++ overflow behavior. Valid signed-int32 tokens preserve unsigned assignment then signed setting/enum narrowing; float settings retain six-significant-digit reports and IEEE values. Nil report writer suppresses driver reports; source CLI consumer uses stdout. External GLPK execution, full CLI dispatch, file-list/directory/SMT/reporting/timing branches remain open."
       ]
     },
     {
@@ -129659,7 +129720,8 @@
         "pkg/util/lp/solver_presolve_exact_test.go",
         "pkg/util/lp/solver_exact_model.go",
         "pkg/util/lp/solver_prepare_exact.go",
-        "pkg/util/lp/core_statistics_rational.go"
+        "pkg/util/lp/core_statistics_rational.go",
+        "pkg/util/lp/driver_settings.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
@@ -129722,7 +129784,17 @@
         "TestLPRationalStatisticsLiveLocalReentryGuard",
         "TestLPRationalStatisticsPhysicalOwnership",
         "TestLPRationalAllColumnsFeasibilityIndependentOracle",
-        "TestLPRationalStatisticsReachedGuardsAndPrefixes"
+        "TestLPRationalStatisticsReachedGuardsAndPrefixes",
+        "TestLPDriverArgumentCatalogue",
+        "TestLPDriverArgumentSourcePrefixesAndAccumulation",
+        "TestLPDriverArgumentPrintAndOutputFailures",
+        "TestLPDriverArgumentNumericDomains",
+        "TestLPDriverSettingsDefaultsAndOverrides",
+        "TestLPDriverSettingsDiagnosticPublication",
+        "TestLPDriverSetupActualMPSMinMax",
+        "TestLPDriverSetupLimitsAndFailurePrefixes",
+        "TestLPDriverSetupPhysicalOwnership",
+        "TestLPDriverSetupPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -129877,6 +129949,19 @@
             "TestLPRationalAllColumnsFeasibilityIndependentOracle",
             "TestLPRationalStatisticsReachedGuardsAndPrefixes"
           ]
+        },
+        {
+          "name": "Actual retained LP driver field/strategy/random-seed updates with diagnostic-before-assignment and endl flush publication",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_settings.go",
+          "tests": [
+            "TestLPDriverSettingsDefaultsAndOverrides",
+            "TestLPDriverSettingsDiagnosticPublication",
+            "TestLPDriverSetupActualMPSMinMax",
+            "TestLPDriverSetupLimitsAndFailurePrefixes",
+            "TestLPDriverSetupPhysicalOwnership",
+            "TestLPDriverSetupPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -129987,7 +130072,8 @@
         "pkg/util/lp/solver_objective_exact_test.go",
         "pkg/util/lp/solver_expression_exact.go",
         "pkg/util/lp/solver_expression_exact_test.go",
-        "pkg/util/lp/solver_named_rational.go"
+        "pkg/util/lp/solver_named_rational.go",
+        "pkg/util/lp/driver_settings.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -130062,7 +130148,17 @@
         "TestLPRationalMPSOuterNamedLookup",
         "TestLPRationalMPSOuterNamedPhysicalOwnership",
         "TestLPRationalMPSOuterPreservesOlderComparison",
-        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
+        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes",
+        "TestLPDriverArgumentCatalogue",
+        "TestLPDriverArgumentSourcePrefixesAndAccumulation",
+        "TestLPDriverArgumentPrintAndOutputFailures",
+        "TestLPDriverArgumentNumericDomains",
+        "TestLPDriverSettingsDefaultsAndOverrides",
+        "TestLPDriverSettingsDiagnosticPublication",
+        "TestLPDriverSetupActualMPSMinMax",
+        "TestLPDriverSetupLimitsAndFailurePrefixes",
+        "TestLPDriverSetupPhysicalOwnership",
+        "TestLPDriverSetupPreservesOlderComparison"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -130232,6 +130328,19 @@
             "TestLPRationalMPSOuterNamedLookup",
             "TestLPRationalMPSOuterNamedPhysicalOwnership",
             "TestLPRationalMPSOuterPreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "Concrete exact/floating set_time_limit and set_max_iterations_per_stage source consumers in setup_solver, before objective flip/settings",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_settings.go",
+          "tests": [
+            "TestLPDriverSettingsDefaultsAndOverrides",
+            "TestLPDriverSettingsDiagnosticPublication",
+            "TestLPDriverSetupActualMPSMinMax",
+            "TestLPDriverSetupLimitsAndFailurePrefixes",
+            "TestLPDriverSetupPhysicalOwnership",
+            "TestLPDriverSetupPreservesOlderComparison"
           ]
         }
       ],
@@ -132281,7 +132390,7 @@
           ]
         },
         {
-          "name": "Complete upstream CLI/options/SMT driver scenarios",
+          "name": "Complete upstream CLI dispatch/SMT/reporting/timing driver scenarios",
           "status": "unported",
           "tests": []
         },
