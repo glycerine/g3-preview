@@ -103012,7 +103012,8 @@
         "pkg/util/lp/driver_settings.go",
         "pkg/util/lp/driver_mps.go",
         "pkg/util/lp/driver_mps_float.go",
-        "pkg/util/lp/driver_mps_rational.go"
+        "pkg/util/lp/driver_mps_rational.go",
+        "pkg/util/lp/driver_file_list.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103118,7 +103119,12 @@
         "TestLPMPSDriverPreservesOlderComparison",
         "TestLPMPSDriverEmptyAndInfeasibleFiles",
         "TestLPMPSDriverFileCloseFailure",
-        "TestLPMPSDriverLiveReportEvaluation"
+        "TestLPMPSDriverLiveReportEvaluation",
+        "TestLPDriverFileListLiteralLines",
+        "TestLPDriverFileListReadAndReportFailures",
+        "TestLPDriverFileListActualSolvesAndLifetime",
+        "TestLPDriverFileListFailedChildCleanup",
+        "TestLPDriverFileListIOFailurePrefixes"
       ],
       "conditionals": [
         {
@@ -103875,12 +103881,25 @@
             "TestLPMPSDriverFileCloseFailure",
             "TestLPMPSDriverLiveReportEvaluation"
           ]
+        },
+        {
+          "name": "read_line/get_file_names_from_file_list (1772-1780,2508-2527) and retained sequential MPS --filelist solve loop (3149-3154); full CLI dispatch and LAR file-list consumer remain open",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_file_list.go",
+          "tests": [
+            "TestLPDriverFileListLiteralLines",
+            "TestLPDriverFileListReadAndReportFailures",
+            "TestLPDriverFileListActualSolvesAndLifetime",
+            "TestLPDriverFileListFailedChildCleanup",
+            "TestLPDriverFileListIOFailurePrefixes"
+          ]
         }
       ],
       "ownership": [
         "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim.",
         "Exact setup publishes limits before calling the actual owning FlipCosts child; driver settings publish only after its ordinary return. No parent numerical capture wraps child cost getter/copy/negation/setter operations. Interrupted source cost-flip prefixes and borrowed older comparison receipts survive common model cleanup.",
-        "MPSFileDriver owns one actual reader and concrete primary/optional comparison solvers plus lexical exact objective work and its own numerical receipts. Parent captures only copied unary-negation/assignment and Float64 conversion, never owning solver getters. Raw driver receipts close before solvers, then readers, then driver objective roots; partial exact children can borrow reader or driver values. Successful Run closes at the source return boundary; failed Run retains owners until Close and cannot retry. Real older caller comparison receipts survive operations and cleanup unchanged. The objective survives output/endl flush but dies before running-watch time extraction."
+        "MPSFileDriver owns one actual reader and concrete primary/optional comparison solvers plus lexical exact objective work and its own numerical receipts. Parent captures only copied unary-negation/assignment and Float64 conversion, never owning solver getters. Raw driver receipts close before solvers, then readers, then driver objective roots; partial exact children can borrow reader or driver values. Successful Run closes at the source return boundary; failed Run retains owners until Close and cannot retry. Real older caller comparison receipts survive operations and cleanup unchanged. The objective survives output/endl flush but dies before running-watch time extraction.",
+        "Native file-list reader closes its file before solving. Sequential MPS list driver owns only the current child; each completed child closes before the next starts. Failed child remains reachable until Close succeeds, including real file-close failure and cleanup retry. Arguments and numerical manager remain borrowed."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -103896,7 +103915,8 @@
         "Literal upstream examples stop at the source add_constraint debug assertion; native ignores those calls. Native term model is tested including its deferred materialized column; the infeasibility sample remains feasible, and ignored triangle inequalities yield no implied endpoints. These source limitations are exposed explicitly. Alternate retained-bound installation is tested separately and is not substituted for the original driver.",
         "Concrete scalar mpq/mpq core value updates/restoration, descending RHS reconstruction, precise LU solve, reduced costs, deterministic bound/free snapping, precise indexed residual bypass and ascending objective dot product now implement the retained source methods. UpdateX keeps delta a live reference and precise updates never populate CopyXB. Reconstruction uses the real RationalLU and publishes descending basic assignments, without floating refinement. Reduced costs skip zero Y before row reads. Source rational binary expressions copy the left operand and copy the compound-result reference on return; core products and corrected outer objective products/sums preserve these owners and physical failure prefixes. Parent raw receipts close before LU, LU before borrowed work, and temporary owners before parent roots. Seven test groups cover 100 independent triangular systems with 81-180-bit costs and independent RHS, transpose solve, reduced-cost and objective oracles; 360 update/restore worlds across LU/tableau traversal and live aliases; all source column types and unknown default; output aliasing and descending aliased copies; 27 reached domain profiles; stopped/closed calls and actual older comparison identity. Twenty-two pooled/direct physical campaigns run through success, require actual refusal for every direct campaign and pass ownership census. The literal upstream solve_rational fixture reconstructs a supplied known basis and checks objective24 using independent primal/dual certificates: no optimization search or complete upstream-driver credit. The initial reduced-cost guard fixture marked all columns basic; making the next column nonbasic corrects its expected reached cost read. Inventory remains 88 partial/16 unported/6 reference_only; no whole-source promotion. Scalar core residual/diagnostic queries, pivot and feasibility-search orchestration, exact primal/dual outer optimization, full upstream drivers and whole-source audits remain open. Audit earlier common exact preparation/presolve binary-expression temporaries against rational.h copy-on-return semantics; the objective correction does not prove those paths complete. Latest full native checkpoint a8a7ef66 predates scalar core base/values and the current objective-expression correction; focused coverage measures current Go statements only.",
         "Project parser/option/assignment order is preserved using Go strings and standard numeric parsers. Nonempty malformed, libc-style trailing numeric prefixes or signed-int32 overflow return explicit Go parse errors instead of porting libc atoi/atof grammar or claiming undefined C++ overflow behavior. Valid signed-int32 tokens preserve unsigned assignment then signed setting/enum narrowing; float settings retain six-significant-digit reports and IEEE values. Nil report writer suppresses driver reports; source CLI consumer uses stdout. External GLPK execution, full CLI dispatch, file-list/directory/SMT/reporting/timing branches remain open.",
-        "Native Go file/writer errors and injected host clock failures return reached prefixes with explicit Close for partial ownership; no C++ STL stream or raw-pointer leak adapter is added. Source headline spaces, floating signed zero, exact full-entry rational(double)/sparsity limits, FEASIBLE status on the scalar primal <= iteration boundary, 19/20-column threshold, seconds/1000 and span/iteration timing, and first-operand NaN behavior of the one-percent predicate remain literal. Prepared mismatch diagnostics use explicitly differing input models with actual independent solves; they do not claim ordinary matching inputs disagree. Global mutable STL formatting is not ported; existing native six-significant-digit formatting is used."
+        "Native Go file/writer errors and injected host clock failures return reached prefixes with explicit Close for partial ownership; no C++ STL stream or raw-pointer leak adapter is added. Source headline spaces, floating signed zero, exact full-entry rational(double)/sparsity limits, FEASIBLE status on the scalar primal <= iteration boundary, 19/20-column threshold, seconds/1000 and span/iteration timing, and first-operand NaN behavior of the one-percent predicate remain literal. Prepared mismatch diagnostics use explicitly differing input models with actual independent solves; they do not claim ordinary matching inputs disagree. Global mutable STL formatting is not ported; existing native six-significant-digit formatting is used.",
+        "File-list names use native Go strings and slices with literal byte preservation; no C++ string/stream/vector implementation. Missing-open diagnostic returns an empty list as source does. Native non-EOF read errors return completed names plus explicit error rather than suppressing the I/O failure as C++ read_line does. First empty line ends reading; final non-newline line is accepted; CR, whitespace, duplicates and relative names are unchanged."
       ]
     },
     {
