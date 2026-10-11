@@ -125324,7 +125324,9 @@
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
         "pkg/util/lp/primal_breakpoint_advance_rational.go",
         "pkg/util/lp/primal_leaving_rational.go",
-        "pkg/util/lp/primal_pivot_cost_rational.go"
+        "pkg/util/lp/primal_pivot_cost_rational.go",
+        "pkg/util/lp/primal_advance_equal_rational.go",
+        "pkg/util/lp/primal_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -125557,7 +125559,22 @@
         "TestLPRationalPivotCostLiveAliases",
         "TestLPRationalPivotCostPhysicalOwnership",
         "TestLPRationalPivotCostReachedPrefixes",
-        "TestLPRationalPivotPreservesOlderComparison"
+        "TestLPRationalPivotPreservesOlderComparison",
+        "TestLPRationalAdvanceEqualIndependentModels",
+        "TestLPRationalAdvanceEqualPhysicalOwnership",
+        "TestLPRationalAdvanceEqualLiveStepAliases",
+        "TestLPRationalAdvanceEqualSourcePrefixes",
+        "TestLPRationalAdvanceEqualOlderComparison",
+        "TestLPRationalAdvanceDifferentLiveSteps",
+        "TestLPRationalAdvanceDifferentOlderComparison",
+        "TestLPRationalAdvanceDifferentIndependentSystems",
+        "TestLPRationalAdvanceDifferentPivotOutcomes",
+        "TestLPRationalAdvanceDifferentPhysicalOwnership",
+        "TestLPRationalAdvanceDifferentRestoresCosts",
+        "TestLPRationalAdvanceDifferentRollback",
+        "TestLPRationalAdvanceDifferentSourcePrefixes",
+        "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
+        "TestLPRationalAdvanceDifferentMinimumNegation"
       ],
       "conditionals": [
         {
@@ -126226,6 +126243,31 @@
             "TestLPRationalPivotCostReachedPrefixes",
             "TestLPRationalPivotPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq equal entering/leaving and LU basis-exchange advancement, scalar t*sign/unary assignment, refactor/rollback and cost/list publication",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_advance_equal_rational.go",
+            "pkg/util/lp/primal_advance_rational.go"
+          ],
+          "tests": [
+            "TestLPRationalAdvanceEqualIndependentModels",
+            "TestLPRationalAdvanceEqualPhysicalOwnership",
+            "TestLPRationalAdvanceEqualLiveStepAliases",
+            "TestLPRationalAdvanceEqualSourcePrefixes",
+            "TestLPRationalAdvanceEqualOlderComparison",
+            "TestLPRationalAdvanceDifferentLiveSteps",
+            "TestLPRationalAdvanceDifferentOlderComparison",
+            "TestLPRationalAdvanceDifferentIndependentSystems",
+            "TestLPRationalAdvanceDifferentPivotOutcomes",
+            "TestLPRationalAdvanceDifferentPhysicalOwnership",
+            "TestLPRationalAdvanceDifferentRestoresCosts",
+            "TestLPRationalAdvanceDifferentRollback",
+            "TestLPRationalAdvanceDifferentSourcePrefixes",
+            "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
+            "TestLPRationalAdvanceDifferentMinimumNegation"
+          ]
         }
       ],
       "ownership": [
@@ -126329,7 +126371,9 @@
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
         "pkg/util/lp/primal_breakpoint_advance_rational.go",
         "pkg/util/lp/primal_leaving_rational.go",
-        "pkg/util/lp/primal_pivot_cost_rational.go"
+        "pkg/util/lp/primal_pivot_cost_rational.go",
+        "pkg/util/lp/primal_advance_equal_rational.go",
+        "pkg/util/lp/primal_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -126542,7 +126586,22 @@
         "TestLPRationalPivotCostLiveAliases",
         "TestLPRationalPivotCostPhysicalOwnership",
         "TestLPRationalPivotCostReachedPrefixes",
-        "TestLPRationalPivotPreservesOlderComparison"
+        "TestLPRationalPivotPreservesOlderComparison",
+        "TestLPRationalAdvanceEqualIndependentModels",
+        "TestLPRationalAdvanceEqualPhysicalOwnership",
+        "TestLPRationalAdvanceEqualLiveStepAliases",
+        "TestLPRationalAdvanceEqualSourcePrefixes",
+        "TestLPRationalAdvanceEqualOlderComparison",
+        "TestLPRationalAdvanceDifferentLiveSteps",
+        "TestLPRationalAdvanceDifferentOlderComparison",
+        "TestLPRationalAdvanceDifferentIndependentSystems",
+        "TestLPRationalAdvanceDifferentPivotOutcomes",
+        "TestLPRationalAdvanceDifferentPhysicalOwnership",
+        "TestLPRationalAdvanceDifferentRestoresCosts",
+        "TestLPRationalAdvanceDifferentRollback",
+        "TestLPRationalAdvanceDifferentSourcePrefixes",
+        "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
+        "TestLPRationalAdvanceDifferentMinimumNegation"
       ],
       "conditionals": [
         {
@@ -127286,6 +127345,31 @@
             "TestLPRationalPivotCostPhysicalOwnership",
             "TestLPRationalPivotCostReachedPrefixes",
             "TestLPRationalPivotPreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq equal entering/leaving and LU basis-exchange advancement, scalar t*sign/unary assignment, refactor/rollback and cost/list publication",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_advance_equal_rational.go",
+            "pkg/util/lp/primal_advance_rational.go"
+          ],
+          "tests": [
+            "TestLPRationalAdvanceEqualIndependentModels",
+            "TestLPRationalAdvanceEqualPhysicalOwnership",
+            "TestLPRationalAdvanceEqualLiveStepAliases",
+            "TestLPRationalAdvanceEqualSourcePrefixes",
+            "TestLPRationalAdvanceEqualOlderComparison",
+            "TestLPRationalAdvanceDifferentLiveSteps",
+            "TestLPRationalAdvanceDifferentOlderComparison",
+            "TestLPRationalAdvanceDifferentIndependentSystems",
+            "TestLPRationalAdvanceDifferentPivotOutcomes",
+            "TestLPRationalAdvanceDifferentPhysicalOwnership",
+            "TestLPRationalAdvanceDifferentRestoresCosts",
+            "TestLPRationalAdvanceDifferentRollback",
+            "TestLPRationalAdvanceDifferentSourcePrefixes",
+            "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
+            "TestLPRationalAdvanceDifferentMinimumNegation"
           ]
         }
       ],

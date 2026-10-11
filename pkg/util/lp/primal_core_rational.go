@@ -7,7 +7,7 @@ import "github.com/glycerine/g3/pkg/util/numeral"
 // RationalPrimalCoreSolver borrows scalar model storage and owns exact primal
 // scratch. Construction, feasibility costs, initialization, entering pricing
 // bound-step/breakpoint helpers and circular leaving selection are implemented.
-// Pivot advancement/iteration and full Solve remain open.
+// LU advancement is implemented; iteration/tableau advancement and full Solve remain open.
 // Constructor errors return a partial owner to Close before borrowed inputs.
 type RationalPrimalCoreSolver struct {
 	*RationalCoreSolverBase
@@ -23,6 +23,7 @@ type RationalPrimalCoreSolver struct {
 	work                                         *IndexedRationalVector
 	stepEpsilon, basisMultiplier                 *IndexedRationalVector
 	leavingMultiplier, leavingRatio              *IndexedRationalVector
+	advanceDelta                                 *IndexedRationalVector
 	Breakpoints                                  []*RationalBreakpoint
 	breakpointWork                               *IndexedRationalVector
 	breakpointCollect, breakpointSlope           *IndexedRationalVector
@@ -76,7 +77,7 @@ func NewRationalPrimalCoreSolver(in RationalCoreInputs) (m *RationalPrimalCoreSo
 	return m, nil
 }
 func (m *RationalPrimalCoreSolver) ready() error {
-	if m.stopped || m.work != nil || m.leavingMultiplier != nil || m.leavingRatio != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.breakpointCollect != nil || m.breakpointSlope != nil || m.breakpointWork != nil || m.pendingBreakpoint != nil || m.calls.pending() {
+	if m.stopped || m.advanceDelta != nil || m.work != nil || m.leavingMultiplier != nil || m.leavingRatio != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.breakpointCollect != nil || m.breakpointSlope != nil || m.breakpointWork != nil || m.pendingBreakpoint != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return m.RationalCoreSolverBase.ready()
@@ -163,6 +164,12 @@ func (m *RationalPrimalCoreSolver) Close() error {
 		if err := m.BreakpointQueue.Close(); err != nil {
 			return err
 		}
+	}
+	if m.advanceDelta != nil {
+		if err := m.advanceDelta.Close(); err != nil {
+			return err
+		}
+		m.advanceDelta = nil
 	}
 	if m.work != nil {
 		if err := m.work.Close(); err != nil {

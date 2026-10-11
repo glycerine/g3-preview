@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 87.3,
-  "coverage_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion. Scalar pivot comparison and incremental reduced-cost files are newer and retain separate focused evidence.",
+  "coverage_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion. Scalar pivot comparison and incremental reduced-cost files are newer and retain separate focused evidence. Scalar primal advancement files are newer and retain separate focused evidence.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Scalar pivot advancement/iteration and complete scalar Solve, dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits."
+    "Scalar primal iteration/tableau advancement/full Solve, scalar dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits."
   ],
   "units": [
     {
@@ -2119,7 +2119,9 @@
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
         "pkg/util/lp/primal_breakpoint_advance_rational.go",
         "pkg/util/lp/primal_leaving_rational.go",
-        "pkg/util/lp/primal_pivot_cost_rational.go"
+        "pkg/util/lp/primal_pivot_cost_rational.go",
+        "pkg/util/lp/primal_advance_equal_rational.go",
+        "pkg/util/lp/primal_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2352,7 +2354,22 @@
         "TestLPRationalPivotCostLiveAliases",
         "TestLPRationalPivotCostPhysicalOwnership",
         "TestLPRationalPivotCostReachedPrefixes",
-        "TestLPRationalPivotPreservesOlderComparison"
+        "TestLPRationalPivotPreservesOlderComparison",
+        "TestLPRationalAdvanceEqualIndependentModels",
+        "TestLPRationalAdvanceEqualPhysicalOwnership",
+        "TestLPRationalAdvanceEqualLiveStepAliases",
+        "TestLPRationalAdvanceEqualSourcePrefixes",
+        "TestLPRationalAdvanceEqualOlderComparison",
+        "TestLPRationalAdvanceDifferentLiveSteps",
+        "TestLPRationalAdvanceDifferentOlderComparison",
+        "TestLPRationalAdvanceDifferentIndependentSystems",
+        "TestLPRationalAdvanceDifferentPivotOutcomes",
+        "TestLPRationalAdvanceDifferentPhysicalOwnership",
+        "TestLPRationalAdvanceDifferentRestoresCosts",
+        "TestLPRationalAdvanceDifferentRollback",
+        "TestLPRationalAdvanceDifferentSourcePrefixes",
+        "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
+        "TestLPRationalAdvanceDifferentMinimumNegation"
       ]
     },
     {
@@ -2420,7 +2437,9 @@
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
         "pkg/util/lp/primal_breakpoint_advance_rational.go",
         "pkg/util/lp/primal_leaving_rational.go",
-        "pkg/util/lp/primal_pivot_cost_rational.go"
+        "pkg/util/lp/primal_pivot_cost_rational.go",
+        "pkg/util/lp/primal_advance_equal_rational.go",
+        "pkg/util/lp/primal_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2633,7 +2652,22 @@
         "TestLPRationalPivotCostLiveAliases",
         "TestLPRationalPivotCostPhysicalOwnership",
         "TestLPRationalPivotCostReachedPrefixes",
-        "TestLPRationalPivotPreservesOlderComparison"
+        "TestLPRationalPivotPreservesOlderComparison",
+        "TestLPRationalAdvanceEqualIndependentModels",
+        "TestLPRationalAdvanceEqualPhysicalOwnership",
+        "TestLPRationalAdvanceEqualLiveStepAliases",
+        "TestLPRationalAdvanceEqualSourcePrefixes",
+        "TestLPRationalAdvanceEqualOlderComparison",
+        "TestLPRationalAdvanceDifferentLiveSteps",
+        "TestLPRationalAdvanceDifferentOlderComparison",
+        "TestLPRationalAdvanceDifferentIndependentSystems",
+        "TestLPRationalAdvanceDifferentPivotOutcomes",
+        "TestLPRationalAdvanceDifferentPhysicalOwnership",
+        "TestLPRationalAdvanceDifferentRestoresCosts",
+        "TestLPRationalAdvanceDifferentRollback",
+        "TestLPRationalAdvanceDifferentSourcePrefixes",
+        "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
+        "TestLPRationalAdvanceDifferentMinimumNegation"
       ]
     },
     {
@@ -6911,5 +6945,53 @@
       94.832
     ],
     "related_scope_note": "Both native and debug/checked regressions used unchanged production code before strengthening the cost oracle to actual LU replacement; final focused tests cover that stronger oracle."
+  },
+  "latest_rational_advancement_increment": {
+    "scope": "Retained scalar mpq/mpq equal entering/leaving and LU basis-exchange advancement, scalar t*sign/unary assignment, refactor/rollback and cost/list publication",
+    "source_units_promoted": false,
+    "focused_native_seconds": 1.82,
+    "focused_debug_checked_seconds": 2.834,
+    "statement_coverage": {
+      "native": {
+        "primal_advance_equal_rational.go": {
+          "covered": 39,
+          "total": 56,
+          "percent": 69.6
+        },
+        "primal_advance_rational.go": {
+          "covered": 81,
+          "total": 122,
+          "percent": 66.4
+        }
+      },
+      "debug_checked": {
+        "primal_advance_equal_rational.go": {
+          "covered": 49,
+          "total": 56,
+          "percent": 87.5
+        },
+        "primal_advance_rational.go": {
+          "covered": 111,
+          "total": 122,
+          "percent": 91.0
+        }
+      }
+    },
+    "independent_equal_models": 200,
+    "independent_basis_exchange_systems": 160,
+    "physical_campaigns": 18,
+    "older_comparison_campaigns": 3,
+    "remaining": "Scalar primal iteration/tableau advancement/full Solve, scalar dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits.",
+    "related_native_seconds": 45.238,
+    "related_debug_checked_seconds": 65.943,
+    "verification": [
+      "both final focused profiles",
+      "both related regression profiles",
+      "both LP vets",
+      "both module compile gates",
+      "source portcheck: 2103 units, 677 APIs",
+      "dependency graph refresh: 64 packages",
+      "diff check"
+    ]
   }
 }
