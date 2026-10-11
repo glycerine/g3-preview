@@ -121806,7 +121806,9 @@
         "pkg/util/lp/core_statistics_exact.go",
         "pkg/util/lp/core_statistics_exact_test.go",
         "pkg/util/lp/core_basis_tableau_exact.go",
-        "pkg/util/lp/primal_init_tableau_exact_test.go"
+        "pkg/util/lp/primal_init_tableau_exact_test.go",
+        "pkg/util/lp/primal_feasible_exact.go",
+        "pkg/util/lp/primal_feasible_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -121948,7 +121950,12 @@
         "TestLPExactInitTableauPhysicalOwnership",
         "TestLPExactTableauBasisReachedMetadata",
         "TestLPExactInitTableauRowsFailurePrefixes",
-        "TestLPExactInitTableauPreservesOlderComparison"
+        "TestLPExactInitTableauPreservesOlderComparison",
+        "TestLPExactFindFeasibleIndependentSystems",
+        "TestLPExactNonbasicIndependentBoundOracle",
+        "TestLPExactFindFeasibleEntryPrefixes",
+        "TestLPExactNonbasicEmptyAndStoppedValidation",
+        "TestLPExactFindFeasiblePhysicalOwnership"
       ],
       "assertions": [
         {
@@ -122350,6 +122357,18 @@
             "TestLPExactInitTableauRowsFailurePrefixes",
             "TestLPExactInitTableauPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "precise non_basic_columns_are_set_correctly source541-548: actual nonbasic order, exact bound/epsilon feasibility including interior boxed values, first failed-column diagnostic and false return",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_feasible_exact.go",
+          "tests": [
+            "TestLPExactFindFeasibleIndependentSystems",
+            "TestLPExactNonbasicIndependentBoundOracle",
+            "TestLPExactFindFeasibleEntryPrefixes",
+            "TestLPExactNonbasicEmptyAndStoppedValidation",
+            "TestLPExactFindFeasiblePhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -122377,7 +122396,8 @@
         "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard.",
         "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update.",
         "Statistics use Go io.Writer/fmt/strconv, retaining exact numeric-pair x+y/1000 evaluation before conversion and classic six-digit formatting; no STL stream implementation is ported. Reporting snapshots its by-value argument before output, inspects LU nonzero counts after cost text, and checks actual cancellation after successful output. Local cost/argument owners survive failures until captured child scratch is cleaned. Full precise/default-tableau Solve remains open.",
-        "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial."
+        "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial.",
+        "Exact feasibility entry delegates actual LU/tableau Solve and validates nonbasic feasibility only under source debug; native early feasible return may ignore infeasible nonbasic values, as in source. Numerical errors keep the actual delegated owner receipts and stop the wrapper. Exact outer preparation and full LAR signature/Solve remain open; no whole source-unit promotion."
       ]
     },
     {
@@ -124049,7 +124069,9 @@
         "pkg/util/lp/primal_iteration_rows_exact.go",
         "pkg/util/lp/primal_iteration_rows_exact_test.go",
         "pkg/util/lp/lar_infeasibility.go",
-        "pkg/util/lp/lar_infeasibility_test.go"
+        "pkg/util/lp/lar_infeasibility_test.go",
+        "pkg/util/lp/primal_feasible_exact.go",
+        "pkg/util/lp/primal_feasible_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124210,7 +124232,12 @@
         "TestLARInfeasibilityBasisOrderAndNonbasicScan",
         "TestLARInfeasibilityStopsAtPendingExplanation",
         "TestLARInfSignPreservesOlderComparison",
-        "TestLARInfeasibilityOwnsCopiedCoefficients"
+        "TestLARInfeasibilityOwnsCopiedCoefficients",
+        "TestLPExactFindFeasibleIndependentSystems",
+        "TestLPExactNonbasicIndependentBoundOracle",
+        "TestLPExactFindFeasibleEntryPrefixes",
+        "TestLPExactNonbasicEmptyAndStoppedValidation",
+        "TestLPExactFindFeasiblePhysicalOwnership"
       ],
       "conditionals": [
         {
@@ -124730,6 +124757,18 @@
             "TestLARInfSignPreservesOlderComparison",
             "TestLARInfeasibilityOwnsCopiedCoefficients"
           ]
+        },
+        {
+          "name": "precise find_feasible_solution source1043-1048: publish feasibility-only flag before debug nonbasic validation, UNKNOWN before actual Solve, source early return and failure prefixes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_feasible_exact.go",
+          "tests": [
+            "TestLPExactFindFeasibleIndependentSystems",
+            "TestLPExactNonbasicIndependentBoundOracle",
+            "TestLPExactFindFeasibleEntryPrefixes",
+            "TestLPExactNonbasicEmptyAndStoppedValidation",
+            "TestLPExactFindFeasiblePhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -124759,7 +124798,8 @@
         "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial.",
         "Row pricing uses typed pointer choices over stable stored row cells and native slices. Equal-damage candidates with a shorter column are appended without dropping earlier longer candidates, preserving source RNG and selection. Bland mode copies each new minimum coefficient immediately and rereads later cells through output aliases. 480 independent selection/damage/RNG models,300 rational/epsilon monoid models,200 infeasible grow models, live alias, reached metadata and pooled/direct physical failures with older caller comparisons. Uncalled sign-row eligibility and inf_sign_of_column helpers are not ported. Row iteration and full exact Solve remain open; whole source unit stays partial.",
         "Exact row iteration preserves source repetition count increment before strict threshold comparison, unsigned wrap, and lack of outer loop counter increments. It refreshes entering infeasibility only after ChangeBasis; source can pivot into an infeasible entering bound and discover infeasibility on the next iteration. 320 independent rational/epsilon feasible pivots and120 independently infeasible two-step models, threshold profiles, reached prefixes, pooled/direct physical arithmetic failures and older caller comparison cleanup. Whole exact Solve and source unit remain partial.",
-        "Concrete retained LAR infeasibility explanation consumer now ports inf_sign_of_column, which was not needed by row pricing alone. The existing typed sparse coefficient vector preserves source pair-copy lifetimes, zeros and order; a stopped negation/append remains owned until Core.Close. Full LAR Solve and signature/presolve integration remain open; no whole source-unit promotion."
+        "Concrete retained LAR infeasibility explanation consumer now ports inf_sign_of_column, which was not needed by row pricing alone. The existing typed sparse coefficient vector preserves source pair-copy lifetimes, zeros and order; a stopped negation/append remains owned until Core.Close. Full LAR Solve and signature/presolve integration remain open; no whole source-unit promotion.",
+        "Exact feasibility entry delegates actual LU/tableau Solve and validates nonbasic feasibility only under source debug; native early feasible return may ignore infeasible nonbasic values, as in source. Numerical errors keep the actual delegated owner receipts and stop the wrapper. Exact outer preparation and full LAR signature/Solve remain open; no whole source-unit promotion."
       ]
     },
     {
@@ -124806,7 +124846,9 @@
         "pkg/util/lp/primal_iteration_exact.go",
         "pkg/util/lp/primal_iteration_exact_test.go",
         "pkg/util/lp/primal_solve_exact.go",
-        "pkg/util/lp/primal_solve_exact_test.go"
+        "pkg/util/lp/primal_solve_exact_test.go",
+        "pkg/util/lp/primal_feasible_exact.go",
+        "pkg/util/lp/primal_feasible_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124947,7 +124989,12 @@
         "TestLPExactSolveInfeasibleIndependentBounds",
         "TestLPExactSolveTableauStaleCostCorrection",
         "TestLPExactSolveStoppedAndInitializationPrefixes",
-        "TestLPExactSolvePhysicalOwnership"
+        "TestLPExactSolvePhysicalOwnership",
+        "TestLPExactFindFeasibleIndependentSystems",
+        "TestLPExactNonbasicIndependentBoundOracle",
+        "TestLPExactFindFeasibleEntryPrefixes",
+        "TestLPExactNonbasicEmptyAndStoppedValidation",
+        "TestLPExactFindFeasiblePhysicalOwnership"
       ],
       "conditionals": [
         {
@@ -125543,6 +125590,18 @@
             "TestLPExactSolveStoppedAndInitializationPrefixes",
             "TestLPExactSolvePhysicalOwnership"
           ]
+        },
+        {
+          "name": "precise find_feasible_solution source1043-1048: publish feasibility-only flag before debug nonbasic validation, UNKNOWN before actual Solve, source early return and failure prefixes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_feasible_exact.go",
+          "tests": [
+            "TestLPExactFindFeasibleIndependentSystems",
+            "TestLPExactNonbasicIndependentBoundOracle",
+            "TestLPExactFindFeasibleEntryPrefixes",
+            "TestLPExactNonbasicEmptyAndStoppedValidation",
+            "TestLPExactFindFeasiblePhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -125567,7 +125626,8 @@
         "Precise advancement omits floating beta/residual/norm branches exactly as source traits require. Unary pair negation keeps scalar arguments and returned pair independently owned; caller assignment is X then Y. Capture ends before child solver calls. Stored CopyXB remains a caller responsibility; missing backup can report FLOATING_POINT_ERROR on rollback. Full advance_on_entering_precise, precise Solve and LAR orchestration remain open.",
         "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
         "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
-        "Exact Solve tests cover independent bounded optima, feasibility search, infeasible bounds and unbounded rays, source cancellation/reporting and initialization prefixes, native stale-cost correction versus debug refusal, and pooled/direct physical ownership. Source UNSTABLE is rejected in debug; tableau tentative fallback reaches the existing debug LU-cost assertion. Precise outer preparation and remaining LP variants remain open; no whole source-unit promotion."
+        "Exact Solve tests cover independent bounded optima, feasibility search, infeasible bounds and unbounded rays, source cancellation/reporting and initialization prefixes, native stale-cost correction versus debug refusal, and pooled/direct physical ownership. Source UNSTABLE is rejected in debug; tableau tentative fallback reaches the existing debug LU-cost assertion. Precise outer preparation and remaining LP variants remain open; no whole source-unit promotion.",
+        "Exact feasibility entry delegates actual LU/tableau Solve and validates nonbasic feasibility only under source debug; native early feasible return may ignore infeasible nonbasic values, as in source. Numerical errors keep the actual delegated owner receipts and stop the wrapper. Exact outer preparation and full LAR signature/Solve remain open; no whole source-unit promotion."
       ]
     },
     {

@@ -1279,6 +1279,7 @@
         "primal_cost_tableau_exact.go",
         "primal_enter_exact.go",
         "primal_enter_tableau_exact.go",
+        "primal_feasible_exact.go",
         "primal_feasible_float.go",
         "primal_harris_exact.go",
         "primal_harris_float.go",

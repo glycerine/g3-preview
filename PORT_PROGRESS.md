@@ -38757,3 +38757,35 @@ native110.495s/debug165.926s on the final fixture configuration; focused
 core-scope/Solve integration passes2.887s/4.663s. Both LP vets, native/debug
 module compilation, portcheck and diff checks pass. Dependency graph refreshed.
 Full source units stay partial; the running native suite predates this increment.
+
+### Exact feasibility entry and nonbasic feasibility validation
+
+Ported the retained mpq/impq find_feasible_solution entry from
+lp_primal_core_solver.hpp:1043-1048 and its actual nonbasic validator from
+lp_core_solver_base.h:541-548 into primal_feasible_exact.go. The feasibility-only
+flag publishes before debug validation; UNKNOWN publishes only after successful
+validation, before actual LU/tableau Solve. The validator accepts interior boxed
+values and prints the first infeasible nonbasic column. Native skips the debug
+validation, retaining source early-return behavior for inconsistent inputs.
+
+Verification:360 independent exact rational/epsilon feasible systems across all
+three strategies;360 independent nonbasic bound worlds, empty and stopped
+validators, eighteen entry/error/assertion prefix profiles, and six pooled/direct
+allocation-refusal campaigns through actual feasibility Solve and cleanup.
+Focused native0.477s/debug1.691s. New file20/25 statements (80.0%) native,
+25/25 (100%) debug/checked. The five native gaps are source debug-only checks.
+Related exact Solve/LAR explanation regressions pass1.691s/3.482s. Both LP vets,
+native/debug module compilation, portcheck and diff checks pass. Full LP remains84partial/26unported source units; full LAR signature/Solve,
+exact outer preparation, remaining variants/diagnostics and complete upstream
+drivers remain open. Coverage measures existing Go code, not source completion.
+
+### Completed full native exact Solve checkpoint
+
+Session36454 was observed terminal with exit0 at08:04UTC October11.
+All64packages passed; LP1137.344s,87.7% (18175/20730 statements).
+Started07:44UTC atbc47adfb; log/profile:
+`/mnt/oldrog/tmp/g3-exact-solve-module-native.{log,cover}`.
+Includes exact LU/tableau Solve and row pricing/iteration, predatesf1171db3
+LAR explanations and current feasibility entry. This is the latest completed
+full native checkpoint; these later additions have their own focused checks.
+Full LP remains84partial/26unported source units.
