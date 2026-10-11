@@ -10,7 +10,7 @@
     "remaining retained objective/preparation consumers and complete retained primal/dual/LAR caller integration (uncalled LAR scaling helper excluded); whole random-update source/driver audit",
     "remaining retained constructor/diagnostic/validator and optimization consumer audits; complete MPS/CLI upstream drivers",
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
-    "remaining top-level CLI integration including empty directory branch; retained solve_some_mps and whole SMT reader/LP audit",
+    "remaining top-level CLI integration including empty directory branch and complete registered test dispatch; whole retained SMT reader/LP audit",
     "component property tests, coverage and integration audits",
     "Remaining top-level test CLI dispatch, SMT file creation/input dispatch driver scenarios; remaining retained optimization consumers and whole scaling audit, whole-source/ownership audits and complete upstream LP/randomize drivers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
   ],
@@ -9854,5 +9854,55 @@
     },
     "artifacts": "/mnt/oldrog/tmp/g3-process-file-{native,debug}.cover; /mnt/oldrog/tmp/g3-process-file-reachability.txt",
     "limitations": "Remaining Close error guards follow delegated stable MPS/LAR cleanup. No whole-source promotion. solve_some_mps/catalogue/top-level CLI remain open. Running full native a4d0e129 session87618 predates new report/process drivers; no terminal result credited. Latest successful full native93d0d780 remains historical evidence."
+  },
+  "latest_mps_batch_increment": {
+    "source": "src/test/lp.cpp:1479-1724 selected native Linux consumer",
+    "go_targets": [
+      "pkg/util/lp/driver_mps_batch.go",
+      "pkg/util/lp/driver_mps_catalogue.go",
+      "pkg/util/lp/driver_mps_batch_test.go"
+    ],
+    "tests": [
+      "TestLPMPSCatalogueLiteralOrderAndMinimumPrefix",
+      "TestLPMPSCatalogueMissingHomeReport",
+      "TestLPMPSBatchFloatPreludeAndIndependentLoopSolve",
+      "TestLPMPSBatchDefaultExactAndPreludeStops",
+      "TestLPMPSBatchActualGLPKCatalogue",
+      "TestLPMPSBatchNativeEnvironmentAndArgumentGuards",
+      "TestLPMPSBatchDirectoryAndPathSources",
+      "TestLPMPSBatchSummaryReportsAndLiveCounters",
+      "TestLPMPSBatchChildFailurePrefixes",
+      "TestLPMPSBatchPhysicalChildOwnership",
+      "TestLPMPSBatchOlderCallerComparison",
+      "TestLPMPSBatchEveryPreludeFailurePrefix"
+    ],
+    "focused_native_seconds": 2.177,
+    "focused_debug_checked_seconds": 2.191,
+    "coverage": {
+      "native": [
+        139,
+        143,
+        97.2
+      ],
+      "debug_checked": [
+        139,
+        143,
+        97.2
+      ]
+    },
+    "actual_external_solver": "GLPK5.0:216 complete catalogue solves per profile (108 floating maxima and108 exact minima), each with independent boxed-knapsack coefficients; representative reported optima checked independently. Tests skip external-dependent groups only if glpsol unavailable; current run uses installed executable.",
+    "physical_campaigns": 2,
+    "older_caller_comparison_campaigns": 1,
+    "artifacts": "/mnt/oldrog/tmp/g3-mps-batch-{native,debug}.cover; /mnt/oldrog/tmp/g3-mps-batch-catalogue-audit.txt; /mnt/oldrog/tmp/g3-mps-batch-reachability.txt",
+    "limitations": "Four uncovered guards: fixed global /tmp/test default intentionally not created in isolated tests; split failure unreachable for fresh literal slash-containing catalogue; two stable delegated cleanup errors. No whole-source promotion. Complete top-level CLI dispatch and whole source/consumer/ownership audit remain open. Completed full native a4d0e129 session87618 predates batch/reports/process drivers; focused evidence separate.",
+    "validation": {
+      "related_native_seconds": 12.32,
+      "related_debug_checked_seconds": 13.149,
+      "lp_vet": "native and combined pass",
+      "module_compile": "native and combined pass",
+      "source_portcheck": "2103 units,677 APIs; pass",
+      "dependency_graph": "64 packages; refreshed",
+      "diff_check": "pass"
+    }
   }
 }

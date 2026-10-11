@@ -103036,7 +103036,10 @@
         "pkg/util/lp/driver_glpk_reports.go",
         "pkg/util/lp/driver_glpk_reports_test.go",
         "pkg/util/lp/driver_process_file.go",
-        "pkg/util/lp/driver_process_file_test.go"
+        "pkg/util/lp/driver_process_file_test.go",
+        "pkg/util/lp/driver_mps_batch.go",
+        "pkg/util/lp/driver_mps_catalogue.go",
+        "pkg/util/lp/driver_mps_batch_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103225,7 +103228,19 @@
         "TestLPProcessFilePhysicalChildOwnership",
         "TestLPProcessFilePreservesOlderComparison",
         "TestLPProcessFileRealClosedReportFailure",
-        "TestLPProcessFileActualLARGLPKReportMismatch"
+        "TestLPProcessFileActualLARGLPKReportMismatch",
+        "TestLPMPSCatalogueLiteralOrderAndMinimumPrefix",
+        "TestLPMPSCatalogueMissingHomeReport",
+        "TestLPMPSBatchFloatPreludeAndIndependentLoopSolve",
+        "TestLPMPSBatchDefaultExactAndPreludeStops",
+        "TestLPMPSBatchActualGLPKCatalogue",
+        "TestLPMPSBatchNativeEnvironmentAndArgumentGuards",
+        "TestLPMPSBatchDirectoryAndPathSources",
+        "TestLPMPSBatchSummaryReportsAndLiveCounters",
+        "TestLPMPSBatchChildFailurePrefixes",
+        "TestLPMPSBatchPhysicalChildOwnership",
+        "TestLPMPSBatchOlderCallerComparison",
+        "TestLPMPSBatchEveryPreludeFailurePrefix"
       ],
       "conditionals": [
         {
@@ -104166,6 +104181,35 @@
             "TestLPProcessFileRealClosedReportFailure",
             "TestLPProcessFileActualLARGLPKReportMismatch"
           ]
+        },
+        {
+          "name": "retained Linux solve_some_mps src1479-1724:108 ordered HOME catalogue entries/13 literal minimum keys, directory/path helpers, nine-call floating prelude, default exact108 loop and ordinary actual GLPK108 loop/summary",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_mps_batch.go",
+          "go_targets": [
+            "pkg/util/lp/driver_mps_catalogue.go",
+            "pkg/util/lp/driver_mps_batch_test.go"
+          ],
+          "tests": [
+            "TestLPMPSCatalogueLiteralOrderAndMinimumPrefix",
+            "TestLPMPSCatalogueMissingHomeReport",
+            "TestLPMPSBatchFloatPreludeAndIndependentLoopSolve",
+            "TestLPMPSBatchDefaultExactAndPreludeStops",
+            "TestLPMPSBatchActualGLPKCatalogue",
+            "TestLPMPSBatchNativeEnvironmentAndArgumentGuards",
+            "TestLPMPSBatchDirectoryAndPathSources",
+            "TestLPMPSBatchSummaryReportsAndLiveCounters",
+            "TestLPMPSBatchChildFailurePrefixes",
+            "TestLPMPSBatchPhysicalChildOwnership",
+            "TestLPMPSBatchOlderCallerComparison",
+            "TestLPMPSBatchEveryPreludeFailurePrefix"
+          ]
+        },
+        {
+          "name": "const-char loop catch handlers in solve_some_mps have no retained throw producer: only live literal throw is known-solution prelude outside handlers; mem_cpy_place_holder hook is declaration/definition only",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
         }
       ],
       "ownership": [
@@ -104180,7 +104224,8 @@
         "Known floating MPS consumer reuses MPSFileDriver ownership: solver closes before reader, successful scope auto-closes and failed default solve/report/real file-close retains owner for retry. Borrowed native expected-value map copies each value for its iteration; Go native floating storage has no exact-arena roots.",
         "LUCheckFileDriver retains actual open file on parse/report/close failure, closes successful file before NewSettings/NewFloatLU, closes actual LU after solve/residual or explicit owning cleanup. Matrix, basis, work and solution use native Go float slices; no exact numerical arena campaign applies. Remaining source bytes after basis_end are ignored, matching commented vector read. Failed native os.File Close retains its actual descriptor object and error; external close has no fabricated recovery.",
         "GLPK report readers own each local os.File only for its actual read and close on return, retaining parsed scalar/string snapshots. Native Go strings/slices replace STL token containers. Comparison borrows live uint32 counters, leaves inconclusives untouched, reopens actual paths for cost reads, publishes status failure after diagnostics but cost failure before diagnostics. No exact numerical arena work is introduced; actual solver-output integration closes MPS driver owners before report reads and checks exact root census.",
-        "ProcessFileDriver borrows manager/arguments/live counters and owns actual os.File and concrete MPS/LAR child. Successful report stays open through actual external command/comparison; actual child Run closes successful solver scope. Caught source exception retains original CaughtError and publishes failure only after catching diagnostic; owning cleanup closes failed child before report and remains retryable. Physical pooled/direct exact-child campaigns run through genuine failure to success, with exact censuses; actual older1000-digit caller comparisons survive both MPS and LAR routes. External close retains descriptor metadata and actual error, not fabricated recovery."
+        "ProcessFileDriver borrows manager/arguments/live counters and owns actual os.File and concrete MPS/LAR child. Successful report stays open through actual external command/comparison; actual child Run closes successful solver scope. Caught source exception retains original CaughtError and publishes failure only after catching diagnostic; owning cleanup closes failed child before report and remains retryable. Physical pooled/direct exact-child campaigns run through genuine failure to success, with exact censuses; actual older1000-digit caller comparisons survive both MPS and LAR routes. External close retains descriptor metadata and actual error, not fabricated recovery.",
+        "MPSBatchDriver owns native catalogue slice/map and one concrete MPS/ProcessFile child at a time, borrowing arguments and manager. Failed children remain for Close; successful default/MPS/Process scopes close before next file. Summary counters use actual separate source insertion reads, preserving live writer callback changes. Two pooled/direct physical default-exact child campaigns run through actual failures to success and exact root census; actual older1000-digit caller comparison remains owned by caller through child and batch cleanup. Native Run reads real HOME after limit parsing; concrete RunWithHome binds caller supplied getenv result without mutating process environment."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -104206,7 +104251,8 @@
         "Floating debug matrix consumers use concrete native Go dense storage and double-valued interface. Actual40 basis worlds with sparse/dense policies verify left transformed B equals Q*U*R. Existing source tolerance accepts NaN/like-signed infinity unordered differences. Debug matrix printing, exact coefficient variants, tail_product/check_apply consumer integration and remaining upstream assertion wiring stay open; original post-return dense fixture is independent coverage only.",
         "LU check file parser uses stdlib strings and strict signed32/float conversions; signed-to-unsigned wrapping remains for valid source integers. EOF/short tokens return explicit errors instead of source nonterminating read loops/out-of-range token access. Failed open emits source diagnostic then returns the actual OS error before source invalid dimensions access. The row substring probe consumes the first non-row line; wrong first row token emits literal diagnostic and still parses. No uncalled indexed-vector reader is added. Debug residual retains source relative max normalization, strict >1e-6 and unordered IEEE behavior; source dense/indexed copy is native owned storage. Complete top-level CLI remains open.",
         "Ordinary CHECK_GLPK_SOLUTION-undefined report path only: external glpsol invocation, process_test_file output redirection and solve_some_mps orchestration remain open. Source integer0 exceptions map to ErrDriverReport; native I/O and writer errors remain explicit, strict Go float conversion qualifies malformed atof domains. Literal first Status substring/first Objective/last cost and exact2/5/3 tokens remain. Equal nonoptimal statuses earn no success; UNDEFINED versus INFEASIBLE/UNBOUNDED earns success; counters wrap unsigned32. Actual MPS compare-with-primal output selects later four-token primal cost and throws, preserving the source mismatch. No full CLI or GLPK integration claim.",
-        "run_glpk uses native os/exec literal argv for the same glpsol options, discards stdout and inherits stderr; unquoted shell tokenization and raw POSIX wait-bit encoding are not ported. Only source zero/nonzero distinction is consumed; native launch error is retained separately and counts as nonzero/inconclusive after glpk-failed diagnostic. Actual GLPK5.0 independently solves16 fixed-format boxed-knapsack inputs across exact/float/min/max, including space/semicolon filenames; fixtures use contiguous fixed-format columns/bounds, since earlier loose source-parser-only fixtures are invalid for GLPK. Real LAR report lowercase status versus comparison uppercase Status preserves source report exception. Reports use explicit writer routing instead of process-global cout redirection. Source ostream silent failures are explicit Go writer/close errors. --compare_with_primal is deliberately false in process_test_file even when arguments contain it; initial min/exact snapshots precede processing output, dual/LAR/GLPK flags remain later live reads. Complete solve_some_mps/catalogue/top-level CLI remain open; no whole-source promotion."
+        "run_glpk uses native os/exec literal argv for the same glpsol options, discards stdout and inherits stderr; unquoted shell tokenization and raw POSIX wait-bit encoding are not ported. Only source zero/nonzero distinction is consumed; native launch error is retained separately and counts as nonzero/inconclusive after glpk-failed diagnostic. Actual GLPK5.0 independently solves16 fixed-format boxed-knapsack inputs across exact/float/min/max, including space/semicolon filenames; fixtures use contiguous fixed-format columns/bounds, since earlier loose source-parser-only fixtures are invalid for GLPK. Real LAR report lowercase status versus comparison uppercase Status preserves source report exception. Reports use explicit writer routing instead of process-global cout redirection. Source ostream silent failures are explicit Go writer/close errors. --compare_with_primal is deliberately false in process_test_file even when arguments contain it; initial min/exact snapshots precede processing output, dual/LAR/GLPK flags remain later live reads. Complete solve_some_mps/catalogue/top-level CLI remain open; no whole-source promotion.",
+        "Source catalogue minimum keys omit HOME prefix; Go preserves108 path order and all13 literal keys, including mismatch for nonempty HOME and actual matches for present empty HOME. Missing HOME emits no newline/flush; precise/GLPK empty-loop behavior remains, float missing catalogue stops before invalid source prelude indexing. Source const-char handlers have no retained loop throw producer (no literal/variable char throws in src/util, only known-solution status literal outside handlers and unused mem_copy_hook in lp.cpp); no unused exception-text adapter is introduced. Real source std::string bound exception transports ErrMPSUnhandled and propagates through batch, as do integer report exceptions/native errors. Existing explicit directory failures diagnose then continue; Go preserves literal slash split, uses native directory service and qualifies no-slash bare throw as ErrBounds. Global /tmp/test default remains; tests use isolated explicit paths rather than changing shared default directory. Full registered top-level CLI dispatch and whole retained-source/ownership audits remain open; no whole-unit promotion."
       ]
     },
     {

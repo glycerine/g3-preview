@@ -1223,6 +1223,8 @@
         "driver_lu_check.go",
         "driver_lu_check_native.go",
         "driver_mps.go",
+        "driver_mps_batch.go",
+        "driver_mps_catalogue.go",
         "driver_mps_default_rational.go",
         "driver_mps_float.go",
         "driver_mps_known_float.go",
