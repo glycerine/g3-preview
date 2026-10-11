@@ -1185,6 +1185,7 @@
         "core_statistics_float.go",
         "core_tableau_exact.go",
         "core_update_float.go",
+        "core_values_exact.go",
         "core_values_float.go",
         "diagonal_matrix_exact.go",
         "diagonal_matrix_float.go",
