@@ -28,6 +28,7 @@ type LARCoreSolver struct {
 	InfeasibleSumSign                       int32
 	evidenceNegated                         *IndexedRationalVector
 	deltaWork, strictDelta, conversionDelta *IndexedRationalVector
+	catchUpWork                             *IndexedRationalVector
 	calls                                   exactEtaCalls
 	settings                                *Settings
 	manager                                 *numeral.RationalManager
@@ -83,6 +84,13 @@ func (c *LARCoreSolver) Close() error {
 		if err := c.RPrimal.Close(); err != nil {
 			return err
 		}
+	}
+	// A stopped LU replacement can still borrow the catch-up column.
+	if c.catchUpWork != nil {
+		if err := c.catchUpWork.Close(); err != nil {
+			return err
+		}
+		c.catchUpWork = nil
 	}
 	c.DA.Clear()
 	if err := c.RA.Close(); err != nil {

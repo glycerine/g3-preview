@@ -120229,7 +120229,9 @@
         "pkg/util/lp/lar_double_bounds.go",
         "pkg/util/lp/lar_double_bounds_test.go",
         "pkg/util/lp/lar_signature_float.go",
-        "pkg/util/lp/lar_signature_float_test.go"
+        "pkg/util/lp/lar_signature_float_test.go",
+        "pkg/util/lp/lar_catchup.go",
+        "pkg/util/lp/lar_catchup_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -120291,7 +120293,19 @@
         "TestLARFloatingSignaturePhysicalOwnership",
         "TestLARFloatingSignatureIndependentFeasibilityModels",
         "TestLARFloatingSignatureCancellationPrefixes",
-        "TestLARFloatingSignatureCancellationAfterPivot"
+        "TestLARFloatingSignatureCancellationAfterPivot",
+        "TestLARCatchUpIndependentTraceModels",
+        "TestLARCatchUpReverseIndependentModels",
+        "TestLARCatchUpDegenerationContinuesBasis",
+        "TestLARCatchUpNilThresholdAndUnsignedCounter",
+        "TestLARCatchUpReachedErrorPrefixes",
+        "TestLARCatchUpReverseReachedPrefixes",
+        "TestLARCatchUpPhysicalOwnership",
+        "TestLARCatchUpQueueReachedExtents",
+        "TestLARCatchUpPreservesOlderComparison",
+        "TestLARCatchUpPairPendingPrimal",
+        "TestLARCatchUpUnmatchedQueuesRetainBasis",
+        "TestLARCatchUpFloatingSearchExactIntegration"
       ],
       "conditionals": [
         {
@@ -120610,6 +120624,25 @@
             "TestLARFloatingSignatureCancellationPrefixes",
             "TestLARFloatingSignatureCancellationAfterPivot"
           ]
+        },
+        {
+          "name": "concrete exact and floating LU trace catch-up source407-482; delayed FIFO endpoint selection, unsigned200 threshold, degenerated continuation, exact rebuild and retained exact reverse consumer",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_catchup.go",
+          "tests": [
+            "TestLARCatchUpIndependentTraceModels",
+            "TestLARCatchUpReverseIndependentModels",
+            "TestLARCatchUpDegenerationContinuesBasis",
+            "TestLARCatchUpNilThresholdAndUnsignedCounter",
+            "TestLARCatchUpReachedErrorPrefixes",
+            "TestLARCatchUpReverseReachedPrefixes",
+            "TestLARCatchUpPhysicalOwnership",
+            "TestLARCatchUpQueueReachedExtents",
+            "TestLARCatchUpPreservesOlderComparison",
+            "TestLARCatchUpPairPendingPrimal",
+            "TestLARCatchUpUnmatchedQueuesRetainBasis",
+            "TestLARCatchUpFloatingSearchExactIntegration"
+          ]
         }
       ],
       "ownership": [
@@ -120620,7 +120653,8 @@
         "Tableau removal preserves source reverse cell/column destruction, normalized RHS and basis-before-transpose prefixes, source RHS tail pop and surviving model data. Outer reduced-cost expression temporaries belong to rationalWork and captures end before core pivot, matrix deletion or row transpose children. Numeric column removal does not restore outer witnesses, terms, constraints, types/bounds or directories. Debug-only basis validation is a native true stub. Whole LAR scopes/feasibility cleanup and optimization remain open.",
         "Preparation preserves ordinary-vector prefixes while clearing indexed scratch in source order; no parent numerical capture spans exact vector/queue/LU child operations. LU replacement keeps partial newly constructed factors published for owning cleanup, destroys old factors before replacement, deletes newly degenerated factors and preserves the source in-place extension result. Actual physical refusals, matrix-solve oracles and source mutation prefixes are tested. Full LAR solve/signature/exact optimization integration remains incomplete.",
         "LAR owns stopped delta arithmetic locals and direct scalar receipts; delegated vector/primal owners keep their own receipts. Cleanup releases direct invocation storage, owning delta vectors and borrowed consumers before numeral roots. No borrowed caller comparison is adopted.",
-        "Floating signature search delegates exact scalar receipts to actual bound/signature owners and floating LU work to DPrimal. Returned basis-change trace is copied; cancellation retains source tracing and pre-search signature, including a completed pivot trace."
+        "Floating signature search delegates exact scalar receipts to actual bound/signature owners and floating LU work to DPrimal. Returned basis-change trace is copied; cancellation retains source tracing and pre-search signature, including a completed pivot trace.",
+        "Core owns the exact lexical catch-up column across child LU replacement. On failure, delegated LU/matrix/vector owners keep numerical receipts; Core closes the exact primal/LU before the borrowed catch-up column and then the model matrix. Native endpoint FIFOs contain only uint32 indices; floating work uses native storage. Actual older caller comparison state remains caller-owned."
       ],
       "deviations": [
         "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
@@ -120630,7 +120664,8 @@
         "Concrete retained LAR infeasibility explanation consumer now ports inf_sign_of_column, which was not needed by row pricing alone. The existing typed sparse coefficient vector preserves source pair-copy lifetimes, zeros and order; a stopped negation/append remains owned until Core.Close. Full LAR Solve and signature/presolve integration remain open; no whole source-unit promotion.",
         "Native uint32 map replaces unordered_map; preparation traverses ascending keys for reproducible RNG/error prefixes. C++ imposes no insertion-order contract. Exact and floating concrete consumers share only bound-selection control flow. Full signature/presolve/trace catch-up and LAR Solve remain open; no whole-unit promotion.",
         "Exact endpoints can round into reversed double bounds at the limiting delta; native preserves values and debug asserts after upper publication, matching source. General model delta and full LAR solve orchestration remain open.",
-        "Floating signature search is implemented without a solver-status filter: source extracts after noncancelled infeasibility too. Full LAR basis catch-up and signature-guided exact solve remain open."
+        "Floating signature search is implemented without a solver-status filter: source extracts after noncancelled infeasibility too. Full LAR basis catch-up and signature-guided exact solve remain open.",
+        "Only retained pair and float forward catch-up plus the pair reverse consumer are implemented. Source unsigned threshold addition wraps; exact discarded LU is rebuilt immediately while discarded floating LU stays nil. Unmatched endpoint queues are discarded without forcing the requested basis; signature-guided exact solve and complete LAR orchestration remain open."
       ]
     },
     {

@@ -676,7 +676,9 @@
         "pkg/util/lp/lar_double_bounds.go",
         "pkg/util/lp/lar_double_bounds_test.go",
         "pkg/util/lp/lar_signature_float.go",
-        "pkg/util/lp/lar_signature_float_test.go"
+        "pkg/util/lp/lar_signature_float_test.go",
+        "pkg/util/lp/lar_catchup.go",
+        "pkg/util/lp/lar_catchup_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -738,7 +740,19 @@
         "TestLARFloatingSignaturePhysicalOwnership",
         "TestLARFloatingSignatureIndependentFeasibilityModels",
         "TestLARFloatingSignatureCancellationPrefixes",
-        "TestLARFloatingSignatureCancellationAfterPivot"
+        "TestLARFloatingSignatureCancellationAfterPivot",
+        "TestLARCatchUpIndependentTraceModels",
+        "TestLARCatchUpReverseIndependentModels",
+        "TestLARCatchUpDegenerationContinuesBasis",
+        "TestLARCatchUpNilThresholdAndUnsignedCounter",
+        "TestLARCatchUpReachedErrorPrefixes",
+        "TestLARCatchUpReverseReachedPrefixes",
+        "TestLARCatchUpPhysicalOwnership",
+        "TestLARCatchUpQueueReachedExtents",
+        "TestLARCatchUpPreservesOlderComparison",
+        "TestLARCatchUpPairPendingPrimal",
+        "TestLARCatchUpUnmatchedQueuesRetainBasis",
+        "TestLARCatchUpFloatingSearchExactIntegration"
       ]
     },
     {
