@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 87.3,
-  "coverage_warning": "Full native checkpoint7957befd includes scalar rational core base, basis, values, reconstruction, reduced costs, snapping, residuals and pivot rows, plus preparation/presolve expression corrections. Profile excludes core_update_rational.go, core_cost_validate_rational.go and core_feasibility_rational.go, and predates the newer RestoreBasisChange stopped guard. Their focused/regression evidence remains separate. Coverage measures existing Go statements, not C++ port completion. Scalar primal core, infeasibility-cost and cost-switching files are newer and retain separate focused evidence.",
+  "coverage_warning": "Full native checkpoint7957befd includes scalar rational core base, basis, values, reconstruction, reduced costs, snapping, residuals and pivot rows, plus preparation/presolve expression corrections. Profile excludes core_update_rational.go, core_cost_validate_rational.go and core_feasibility_rational.go, and predates the newer RestoreBasisChange stopped guard. Their focused/regression evidence remains separate. Coverage measures existing Go statements, not C++ port completion. Scalar primal core, infeasibility-cost and cost-switching files are newer and retain separate focused evidence. Scalar primal initialization/pricing files are newer and retain separate focused evidence.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Scalar primal pricing, breakpoint traversal, initialization, tableau/LU iteration and Solve; scalar dual core and outer optimization/scaling integration; remaining source diagnostics/audits and complete upstream drivers remain open. Full native7957befd predates these additions and does not measure them."
+    "Scalar primal leaving selection, breakpoint advancement, tableau/LU pivot iteration and full Solve; scalar dual core and outer primal/dual optimization/scaling integration; remaining source diagnostics/audits and complete upstream drivers remain open. Full native7957befd predates these additions and does not measure them."
   ],
   "units": [
     {
@@ -2076,7 +2076,11 @@
         "pkg/util/lp/primal_cost_switch_rational.go",
         "pkg/util/lp/primal_core_rational_test.go",
         "pkg/util/lp/primal_infeas_cost_rational_test.go",
-        "pkg/util/lp/primal_cost_switch_rational_test.go"
+        "pkg/util/lp/primal_cost_switch_rational_test.go",
+        "pkg/util/lp/primal_init_run_rational.go",
+        "pkg/util/lp/primal_price_rational.go",
+        "pkg/util/lp/primal_init_run_rational_test.go",
+        "pkg/util/lp/primal_price_rational_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2255,7 +2259,23 @@
         "TestLPRationalPrimalCostBackupDenseReplacement",
         "TestLPRationalPrimalCostSwitchPhysicalOwnership",
         "TestLPRationalPrimalCostSwitchSourcePrefixes",
-        "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned"
+        "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned",
+        "TestLPRationalPrimalInitRunIndependentModels",
+        "TestLPRationalPrimalInitRunPhysicalOwnership",
+        "TestLPRationalPrimalInitRunSourcePrefixes",
+        "TestLPRationalPrimalInitRunAlreadyStoppedQueue",
+        "TestLPRationalPrimalInitRunLeavesOlderComparisonOwned",
+        "TestLPRationalPrimalPricingIndependentEligibility",
+        "TestLPRationalPrimalPricingTerminalStatus",
+        "TestLPRationalPrimalPricingActualInitializationPipeline",
+        "TestLPRationalPrimalPricingSettingsAndEarlyReturns",
+        "TestLPRationalPrimalPricingIndependentScanRotationAndRNG",
+        "TestLPRationalPrimalPricingSortSourcesAndCounter",
+        "TestLPRationalPrimalPricingPhysicalOwnership",
+        "TestLPRationalPrimalPricingSourceGuardsAndPrefixes",
+        "TestLPRationalPrimalPricingOlderComparisonOwner",
+        "TestLPRationalPrimalPricingBreakpointDirection",
+        "TestLPRationalPrimalPricingCountIndependentRNG"
       ]
     },
     {
@@ -2308,7 +2328,11 @@
         "pkg/util/lp/primal_cost_switch_rational.go",
         "pkg/util/lp/primal_core_rational_test.go",
         "pkg/util/lp/primal_infeas_cost_rational_test.go",
-        "pkg/util/lp/primal_cost_switch_rational_test.go"
+        "pkg/util/lp/primal_cost_switch_rational_test.go",
+        "pkg/util/lp/primal_init_run_rational.go",
+        "pkg/util/lp/primal_price_rational.go",
+        "pkg/util/lp/primal_init_run_rational_test.go",
+        "pkg/util/lp/primal_price_rational_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2467,7 +2491,23 @@
         "TestLPRationalPrimalCostBackupDenseReplacement",
         "TestLPRationalPrimalCostSwitchPhysicalOwnership",
         "TestLPRationalPrimalCostSwitchSourcePrefixes",
-        "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned"
+        "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned",
+        "TestLPRationalPrimalInitRunIndependentModels",
+        "TestLPRationalPrimalInitRunPhysicalOwnership",
+        "TestLPRationalPrimalInitRunSourcePrefixes",
+        "TestLPRationalPrimalInitRunAlreadyStoppedQueue",
+        "TestLPRationalPrimalInitRunLeavesOlderComparisonOwned",
+        "TestLPRationalPrimalPricingIndependentEligibility",
+        "TestLPRationalPrimalPricingTerminalStatus",
+        "TestLPRationalPrimalPricingActualInitializationPipeline",
+        "TestLPRationalPrimalPricingSettingsAndEarlyReturns",
+        "TestLPRationalPrimalPricingIndependentScanRotationAndRNG",
+        "TestLPRationalPrimalPricingSortSourcesAndCounter",
+        "TestLPRationalPrimalPricingPhysicalOwnership",
+        "TestLPRationalPrimalPricingSourceGuardsAndPrefixes",
+        "TestLPRationalPrimalPricingOlderComparisonOwner",
+        "TestLPRationalPrimalPricingBreakpointDirection",
+        "TestLPRationalPrimalPricingCountIndependentRNG"
       ]
     },
     {
@@ -2485,7 +2525,11 @@
         "pkg/util/lp/primal_cost_switch_rational.go",
         "pkg/util/lp/primal_core_rational_test.go",
         "pkg/util/lp/primal_infeas_cost_rational_test.go",
-        "pkg/util/lp/primal_cost_switch_rational_test.go"
+        "pkg/util/lp/primal_cost_switch_rational_test.go",
+        "pkg/util/lp/primal_init_run_rational.go",
+        "pkg/util/lp/primal_price_rational.go",
+        "pkg/util/lp/primal_init_run_rational_test.go",
+        "pkg/util/lp/primal_price_rational_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2514,7 +2558,23 @@
         "TestLPRationalPrimalCostBackupDenseReplacement",
         "TestLPRationalPrimalCostSwitchPhysicalOwnership",
         "TestLPRationalPrimalCostSwitchSourcePrefixes",
-        "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned"
+        "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned",
+        "TestLPRationalPrimalInitRunIndependentModels",
+        "TestLPRationalPrimalInitRunPhysicalOwnership",
+        "TestLPRationalPrimalInitRunSourcePrefixes",
+        "TestLPRationalPrimalInitRunAlreadyStoppedQueue",
+        "TestLPRationalPrimalInitRunLeavesOlderComparisonOwned",
+        "TestLPRationalPrimalPricingIndependentEligibility",
+        "TestLPRationalPrimalPricingTerminalStatus",
+        "TestLPRationalPrimalPricingActualInitializationPipeline",
+        "TestLPRationalPrimalPricingSettingsAndEarlyReturns",
+        "TestLPRationalPrimalPricingIndependentScanRotationAndRNG",
+        "TestLPRationalPrimalPricingSortSourcesAndCounter",
+        "TestLPRationalPrimalPricingPhysicalOwnership",
+        "TestLPRationalPrimalPricingSourceGuardsAndPrefixes",
+        "TestLPRationalPrimalPricingOlderComparisonOwner",
+        "TestLPRationalPrimalPricingBreakpointDirection",
+        "TestLPRationalPrimalPricingCountIndependentRNG"
       ]
     },
     {
@@ -6318,6 +6378,91 @@
       "source_portcheck": "2103 units, 677 APIs; pass",
       "dependency_graph": "64 packages; refreshed",
       "diff_check": "pass"
+    }
+  },
+  "latest_rational_primal_pricing_increment": {
+    "source": [
+      "src/util/lp/lp_primal_core_solver.h:524-527,826-838",
+      "src/util/lp/lp_primal_core_solver.hpp:31-57,82-110,151-232,643-663,841-853"
+    ],
+    "retained_consumers": [
+      "src/util/lp/lp_primal_core_solver.hpp:864-966,1050-1060",
+      "src/util/lp/lp_primal_core_solver_instances.cpp:35-36",
+      "src/util/lp/lp_primal_simplex.hpp:248-259"
+    ],
+    "go_targets": [
+      "pkg/util/lp/primal_init_run_rational.go",
+      "pkg/util/lp/primal_price_rational.go",
+      "pkg/util/lp/primal_init_run_rational_test.go",
+      "pkg/util/lp/primal_price_rational_test.go",
+      "pkg/util/lp/primal_core_rational.go"
+    ],
+    "tests": [
+      "TestLPRationalPrimalInitRunIndependentModels",
+      "TestLPRationalPrimalInitRunPhysicalOwnership",
+      "TestLPRationalPrimalInitRunSourcePrefixes",
+      "TestLPRationalPrimalInitRunAlreadyStoppedQueue",
+      "TestLPRationalPrimalInitRunLeavesOlderComparisonOwned",
+      "TestLPRationalPrimalPricingIndependentEligibility",
+      "TestLPRationalPrimalPricingTerminalStatus",
+      "TestLPRationalPrimalPricingActualInitializationPipeline",
+      "TestLPRationalPrimalPricingSettingsAndEarlyReturns",
+      "TestLPRationalPrimalPricingIndependentScanRotationAndRNG",
+      "TestLPRationalPrimalPricingSortSourcesAndCounter",
+      "TestLPRationalPrimalPricingPhysicalOwnership",
+      "TestLPRationalPrimalPricingSourceGuardsAndPrefixes",
+      "TestLPRationalPrimalPricingOlderComparisonOwner",
+      "TestLPRationalPrimalPricingBreakpointDirection",
+      "TestLPRationalPrimalPricingCountIndependentRNG"
+    ],
+    "coverage": {
+      "native": {
+        "primal_init_run_rational.go": {
+          "covered": 41,
+          "total": 43,
+          "percent": 95.3
+        },
+        "primal_price_rational.go": {
+          "covered": 200,
+          "total": 221,
+          "percent": 90.5
+        }
+      },
+      "debug": {
+        "primal_init_run_rational.go": {
+          "covered": 41,
+          "total": 43,
+          "percent": 95.3
+        },
+        "primal_price_rational.go": {
+          "covered": 212,
+          "total": 221,
+          "percent": 95.9
+        }
+      }
+    },
+    "focused_seconds": {
+      "native": 10.802,
+      "debug_checked": 15.152
+    },
+    "related_regression_seconds": {
+      "native": 59.79,
+      "debug_checked": 84.044
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-rational-primal-pricing-native.cover",
+      "/mnt/oldrog/tmp/g3-rational-primal-pricing-debug.cover"
+    ],
+    "evidence": "Concrete scalar mpq/mpq InitRun resets sort/iteration counters, rebuilds actual basic infeasibility, preserves the feasible feasibility-only early return, backs up dense rational costs when enabled, sets exact pricing epsilon zero, resizes the real RationalPriorityQueue without clearing membership, invokes scalar cost switching and real LU reduced costs, and refreshes zero sparsity estimates only when the column-count extent differs. Exact mode retains ColumnNormUpdateCounter and avoids floating column norms. Scalar pricing implements ordinary and breakpoint eligibility, exact bound comparisons and copied unary-negative epsilon, source sparsity sorting for tableau/LU, inverse-heading/list publication, strict-improvement budget consumption, tie-only RNG, selected-column rotation and sign reversal in breakpoint mode. Source zero/nonzero sort incomparability is preserved through native Go sort; no C++ standard-library implementation or portable tie ordering is invented. NumberOfNonBasicColumnsToTryForEnter preserves tentative-unbounded bypass, threshold300, unsigned32 percentage multiplication/wrap, zero bypass and one source RNG draw. DecideOnStatusWhenCannotFindEntering preserves checked cost-switch assertion before infeasible/optimal publication, without changing counters. Sixteen test groups cover240 independent rational initialization models,315 exact eligibility/breakpoint profiles,160 independent scan/RNG worlds,72 unsigned budget/RNG profiles,12 terminal status profiles and120 actual initialization-to-pricing systems with81-200-bit nonunit diagonal bases and signed1e-100 reduced costs. The latter run actual rational LU reconstruction/residual validation after pricing. Eighteen pooled/direct physical campaigns run through success over run setup, dense backup, exact costs, bound/epsilon comparisons and actual candidate scan; direct campaigns require physical refusal and ownership censuses pass. A real pending rational queue comparison is retained across InitRun refusal. Six actual older1000-digit caller comparison campaigns survive initialization/pricing and Close without adoption. Reached bounds/metadata/assertions/heading-prefix/zero-sort/late-settings/early-bypass/stopped profiles are tested. A reused tableau-key guard initially retained the LU fixture setting; its final explicit tableau setting now exercises the intended actual matrix-key guard. No production algorithm changed for that fixture correction. Focused checks pass10.802s native/15.152s debug/checked; related scalar core/primal/LU and pair initialization/pricing/cost regressions pass59.790s/84.044s. Both LP vets, both full-module compilation gates, dependency graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_init_run_rational.go 41/43 (95.3%); native primal_price_rational.go 200/221 (90.5%); debug primal_init_run_rational.go 41/43 (95.3%); debug primal_price_rational.go 212/221 (95.9%). Uncovered blocks chiefly guard stable expression capture/destruction, unchanged extents and valid numeral sign reads; native additionally erases checked bound/assertion branches. Inventory remains88 partial/16 unported/6 reference_only; no whole-source or complete upstream-driver promotion.",
+    "remaining_work": "Scalar primal leaving selection, breakpoint advancement, tableau/LU pivot iteration and full Solve; scalar dual core and outer primal/dual optimization/scaling integration; remaining source diagnostics/audits and complete upstream drivers remain open. Full native7957befd predates these additions and does not measure them.",
+    "validation": {
+      "lp_vet_native": "pass",
+      "lp_vet_debug_checked": "pass",
+      "module_compile_native": "pass",
+      "module_compile_debug_checked": "pass",
+      "dependency_graph": "64 packages; refreshed",
+      "diff_check": "pass",
+      "source_portcheck": "2103 units, 677 APIs; pass"
     }
   }
 }

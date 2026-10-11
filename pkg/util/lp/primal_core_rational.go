@@ -5,8 +5,8 @@ package lp
 import "github.com/glycerine/g3/pkg/util/numeral"
 
 // RationalPrimalCoreSolver borrows scalar model storage and owns exact primal
-// scratch. Construction and feasibility-cost setup are implemented; primal
-// pricing, iteration and full Solve integration remain open.
+// scratch. Construction, feasibility costs, run initialization and precise
+// entering pricing are implemented; pivot iteration and full Solve remain open.
 // Constructor errors return a partial owner to Close before borrowed inputs.
 type RationalPrimalCoreSolver struct {
 	*RationalCoreSolverBase
@@ -16,6 +16,7 @@ type RationalPrimalCoreSolver struct {
 	CostsBackup                                  *IndexedRationalVector
 	ColumnNormUpdateCounter, BlandModeThreshold  uint32
 	SignOfEnteringDelta                          int32
+	NonBasisList                                 []uint32
 	calls                                        exactEtaCalls
 	work                                         *IndexedRationalVector
 	stopped                                      bool
