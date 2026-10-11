@@ -120196,7 +120196,8 @@
         "pkg/util/lp/lar_pivot.go",
         "pkg/util/lp/core_pivot_exact_test.go",
         "pkg/util/lp/lar_core_scopes.go",
-        "pkg/util/lp/lar_core_scopes_test.go"
+        "pkg/util/lp/lar_core_scopes_test.go",
+        "pkg/util/lp/lar_core_basis_check.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -120222,7 +120223,8 @@
         "TestLARCoreScopesStoppedChildAndMatrixPrefixes",
         "TestLARCoreScopesCachedSnapshotSizePrefixes",
         "TestLARCoreScopesUnscopedExtentsAndModeMismatch",
-        "TestLARCoreScopesRetiresUpdatedFactorizations"
+        "TestLARCoreScopesRetiresUpdatedFactorizations",
+        "TestLARCoreTableauBasisValidatorSourceProfiles"
       ],
       "conditionals": [
         {
@@ -120459,13 +120461,22 @@
             "TestLARCoreScopesUnscopedExtentsAndModeMismatch",
             "TestLARCoreScopesRetiresUpdatedFactorizations"
           ]
+        },
+        {
+          "name": "r_basis_is_OK debug-only precise tableau unit-column and nonbasis-domain validation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_core_basis_check.go",
+          "tests": [
+            "TestLARCoreTableauBasisValidatorSourceProfiles"
+          ]
         }
       ],
       "ownership": [
         "LARSolver owns real exact/floating model/core fields and native external/internal directories. LARCoreSolver owns the single LARBounds state; the outer solver aliases it without copying or closing twice. Scoped witness/status metadata is composed alongside the exact type/bound fields. Both actual primal cores borrow live slice headers, outer settings and column namer. Constructor/registration errors return or retain concrete partial owners until Close; source child arithmetic is never wrapped in an outer numeric receipt segment.",
         "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction.",
         "LAR pivot calculation delegates to the concrete precise core and existing PairLU without outer capture or eager initialization of missing factorization/RowsNZ. Stopped core/model retain actual child owners. Full row scheduling owns only its lexical row analyzer/iterator; term substitution is owned by each actual working term, preserving original copies.",
-        "Core scopes borrow the existing exact/floating primal objects and their live headers. Exact scoped bounds own their restoration copies, numeric journals and actual partial-copy roots; neither core nor matrix adopts bound-child calls. Matrix scopes own dimensional rollback and removed row cells. Pop closes each actual factorization and publishes nil only after successful destruction; exact X/cost/D and floating X resize independently. Restored basis/count slices are owning copies of typed snapshot values, not aliases. Outer status/witness/constraint/term/directory scopes remain the outer solver responsibility."
+        "Core scopes borrow the existing exact/floating primal objects and their live headers. Exact scoped bounds own their restoration copies, numeric journals and actual partial-copy roots; neither core nor matrix adopts bound-child calls. Matrix scopes own dimensional rollback and removed row cells. Pop closes each actual factorization and publishes nil only after successful destruction; exact X/cost/D and floating X resize independently. Restored basis/count slices are owning copies of typed snapshot values, not aliases. Outer status/witness/constraint/term/directory scopes remain the outer solver responsibility.",
+        "Tableau removal preserves source reverse cell/column destruction, normalized RHS and basis-before-transpose prefixes, source RHS tail pop and surviving model data. Outer reduced-cost expression temporaries belong to rationalWork and captures end before core pivot, matrix deletion or row transpose children. Numeric column removal does not restore outer witnesses, terms, constraints, types/bounds or directories. Debug-only basis validation is a native true stub. Whole LAR scopes/feasibility cleanup and optimization remain open."
       ],
       "deviations": [
         "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
@@ -120649,7 +120660,8 @@
         "pkg/util/lp/lar_pivot.go",
         "pkg/util/lp/core_pivot_exact_test.go",
         "pkg/util/lp/lar_explanation.go",
-        "pkg/util/lp/lar_explanation_test.go"
+        "pkg/util/lp/lar_explanation_test.go",
+        "pkg/util/lp/lar_tableau_remove.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -120688,7 +120700,12 @@
         "TestLARExplanationLeavesConsumerDivisionOwned",
         "TestLARExplanationMetadataOwnerAndZeroGuards",
         "TestLARExplanationLeavesPartialBoundOwned",
-        "TestLARExplanationLiteralOriginalRowAfterLUPivot"
+        "TestLARExplanationLiteralOriginalRowAfterLUPivot",
+        "TestLARTableauRemovalIndependentSurvivingModel",
+        "TestLARTableauPopEmptyColumnsAndReverseOrder",
+        "TestLARTableauBasisSwapPopAndBottomRightFirstLink",
+        "TestLARTableauRemovalPhysicalOwnership",
+        "TestLARTableauRemovalSourceGuardsAndPrefixes"
       ],
       "conditionals": [
         {
@@ -121176,6 +121193,18 @@
             "TestLARExplanationLeavesPartialBoundOwned",
             "TestLARExplanationLiteralOriginalRowAfterLUPivot"
           ]
+        },
+        {
+          "name": "tableau row/column removal, bottom-right selection and transpose, last-basis/nonbasis swap-pop, reverse PopTableau numerical lifecycle",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_tableau_remove.go",
+          "tests": [
+            "TestLARTableauRemovalIndependentSurvivingModel",
+            "TestLARTableauPopEmptyColumnsAndReverseOrder",
+            "TestLARTableauBasisSwapPopAndBottomRightFirstLink",
+            "TestLARTableauRemovalPhysicalOwnership",
+            "TestLARTableauRemovalSourceGuardsAndPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -121184,7 +121213,8 @@
         "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction.",
         "Solver owns the lexical row iterator and analyzer until successful completion or explicit Close after failure. Analyzer closes before iterator, and both close before matrices/terms/core. Borrowed propagator keeps ownership of published bounds and virtual-hook calls. No model-level numeric capture adopts child calls; stopped dispatch preserves numeric generations. Source zero RHS is a nonallocating initialized local value copied into the actual analyzer.",
         "LAR pivot calculation delegates to the concrete precise core and existing PairLU without outer capture or eager initialization of missing factorization/RowsNZ. Stopped core/model retain actual child owners. Full row scheduling owns only its lexical row analyzer/iterator; term substitution is owned by each actual working term, preserving original copies.",
-        "Explanation borrows the implied-bound metadata and propagator, forwards actual borrowed original-row coefficients in order, and owns no numeric copies or callback invocations. Evidence consumers own their accepted prefix and actual stopped calls. Both pooled/direct tests leave consumer-owned DivisionInvocationState unchanged across model/propagator destruction; separately stopped implied-bound construction likewise remains its own owner. Consumer operand copies are independently owned in these destruction tests; general retained row-cell borrows require the model to outlive their use."
+        "Explanation borrows the implied-bound metadata and propagator, forwards actual borrowed original-row coefficients in order, and owns no numeric copies or callback invocations. Evidence consumers own their accepted prefix and actual stopped calls. Both pooled/direct tests leave consumer-owned DivisionInvocationState unchanged across model/propagator destruction; separately stopped implied-bound construction likewise remains its own owner. Consumer operand copies are independently owned in these destruction tests; general retained row-cell borrows require the model to outlive their use.",
+        "Tableau removal preserves source reverse cell/column destruction, normalized RHS and basis-before-transpose prefixes, source RHS tail pop and surviving model data. Outer reduced-cost expression temporaries belong to rationalWork and captures end before core pivot, matrix deletion or row transpose children. Numeric column removal does not restore outer witnesses, terms, constraints, types/bounds or directories. Debug-only basis validation is a native true stub. Whole LAR scopes/feasibility cleanup and optimization remain open."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",

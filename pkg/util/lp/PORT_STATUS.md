@@ -10,19 +10,13 @@ primal and dual cores expose Solve, and outer LU primal/dual integration is impl
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
 
-A new hourly native module run including exact basis/transpose work is running;
-results are pending. It predates the subsequent exact tableau-pivot additions,
-which have separate focused checks. Log/profile:
-`/mnt/oldrog/tmp/g3-pair-basis-module-native.{log,cover}`.
-
-Previous hourly native module log completed at 23:33 UTC with every package
-reporting success: LP 515.173s, 88.8% (13701/15421). The original process handle
-is no longer available; the completed log and coverage profile are retained.
-This snapshot includes LAR registration before the final assertion-wrapper
-correction and additional stopped-entry/older-comparison tests; final focused
-native/debug checks validate those changes. Coverage measures current Go code,
-not unported C++ functionality.
-Log/profile: `/mnt/oldrog/tmp/g3-lar-model-module-native.{log,cover}`.
+Latest hourly native module run completed at 00:39 UTC on October11 with
+exit status0 and every package passing: LP613.329s,88.8% (14048/15826).
+Log/profile: `/mnt/oldrog/tmp/g3-pair-basis-module-native.{log,cover}`.
+This snapshot includes exact basis changes and row transposition, and predates
+subsequent exact tableau pivoting and removal. Those additions have separate
+focused native/debug checks. Coverage measures existing Go code, not unported
+C++ functionality.
 
 Known source limitation: implied-bound explanation selects witnesses using the
 normalized pivot target sign while forwarding original-row coefficients. With
@@ -66,6 +60,7 @@ from the120 independently verified bounded optima.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| LAR tableau row/column removal and debug basis validation | 160 independent surviving models with basic/nonbasic removed terms, signed costs and row swaps; literal RHS tail pop and unchanged outer state; reverse multi-column pop, both basis swap-pop paths and first-link selection; eight pooled/direct physical campaigns through success, actual embedded-core ownership, metadata and stopped prefixes | Removal78.1% native (168/215),88.4% debug/checked (190/215); validator7.1% native (2/28, debug body disabled),92.9% debug (26/28). Remaining gaps are disabled assertions and protected guard/cleanup errors. Focused scope/removal regressions33.958s native,35.791s debug/checked. Whole LAR scopes, feasibility cleanup and optimization remain open |
 | Exact tableau normalization, column elimination and reduced-cost pivot | 160 independent exact matrix/RHS/cost oracles; source empty-target false ordering, absent/zero pivots and metadata/stopped-matrix guards; eight pooled/direct physical campaigns through success with core/child ownership, normalized RHS and retained pivot-cost prefixes | New file117/126 (92.9%) in both profiles; native/basis/scope regressions28.670s, debug/checked33.938s. Nine gaps are provenance/earlier-ready protected errors, allocation-free cleanup errors and invariant-protected assertions. Full tableau optimization and LAR removal/scopes remain open |
 | Exact basis changes and tableau row transposition | 1600 independent basis exchanges and trace cancellation; 80 randomized matrices with 30 row swaps each; detached-nonbasic recovery and source guard/publication prefixes; pooled/direct physical row-copy failure campaigns through success and exact root census | Broader exact-core/basis/scope regressions47.835s native and76.311s debug/checked; new file98.4% native (62/63),100% debug/checked (63/63). Native erases one assertion return. Matrix owns stopped copies after the published basis swap. Tableau pivot/column removal and outer LAR scopes remain open |
 | LAR core scope lifecycle | 1600 independent nested snapshots; precise bound/type/count restoration and descending nonbasis reconstruction; actual factorization destruction and separate snapshot ownership; surviving value/extents, actual tableau bindings and current-mode profiles; four pooled/direct restoration campaigns plus pending child Push prefixes, stopped and metadata guards | Core scopes67.5% native (83/123),87.0% debug/checked (107/123). Twenty-four assertion-related statements explain the profile difference; remaining16 are child/cleanup/invariant guards. Outer tableau removal, feasibility cleanup and whole-model scopes remain open |
