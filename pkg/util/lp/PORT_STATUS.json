@@ -4331,5 +4331,13 @@
       "/mnt/oldrog/tmp/g3-lar-validation-debug.cover"
     ],
     "evidence": "LAR all-constraint validation and retained diagnostic output now implement lar_solver.h:1054-1067,1309-1318,1332-1337,1359-1362 and the concrete rational column_namer.h:73-97 printer. AllConstraintsHold reads cancellation once before extraction, obtains the actual collision-free rational model, checks constraints in source order and prints only the first violation. Solver-owned temporary model values close before solver arithmetic locals after an interrupted assignment. Exact printing preserves coefficient order, signs including zero, original term constants, relation spelling and newline/flush behavior.600 independent model worlds cover all five relations, three RHS positions and two epsilon collisions. Cancellation/error prefixes, actual closed stdout, every writer byte prefix, short writes, flush failure, unknown-kind assertion/native output and an actual older caller comparison verify publication and cleanup. Four validation and six printer pooled/direct physical refusal campaigns run through success. Native/debug focused tests pass0.976s/1.177s. Validation covers26/29 statements (89.7%) in both profiles; printer covers94/111 (84.7%) native and95/111 (85.6%) debug/checked. Remaining branches chiefly guard initialized numeral destruction, stable numeral predicates, valid capture, nil/foreign inputs and an already-stopped temporary model. Whole outer LARSolver Solve, remaining diagnostics and complete upstream drivers remain open; inventory remains85 partial/25 unported. Full native08dc15a1 checkpoint predates this increment. Related LAR regressions pass42.887s native/58.016s debug/checked. Both LP vets, both module compilation gates, source portcheck, refreshed dependency graph and diff checks pass."
+  },
+  "active_full_native_checkpoint": {
+    "commit": "60516955",
+    "session_id": 8876,
+    "runner_status": "/mnt/oldrog/tmp/g3-lar-validation-module-native.json",
+    "log": "/mnt/oldrog/tmp/g3-lar-validation-module-native.log",
+    "coverage_profile": "/mnt/oldrog/tmp/g3-lar-validation-module-native.cover",
+    "qualification": "Started after constraint validation commit; completion not yet observed. Poll session8876 before using terminal runner status or crediting coverage."
   }
 }
