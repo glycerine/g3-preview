@@ -6629,5 +6629,28 @@
       "debug_checked": 157.577,
       "scope_warning": "Predates final separate flip assignment correction; final focused and related evidence covers the corrected source."
     }
+  },
+  "active_full_native_checkpoint": {
+    "commit": "1cee195e",
+    "started_utc": "2026-10-11 16:08:21 UTC",
+    "status": "running",
+    "runner_pid": 3,
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-timeout=60m",
+      "-coverprofile=/mnt/oldrog/tmp/g3-rational-bound-module-native.cover"
+    ],
+    "event_log": "/mnt/oldrog/tmp/g3-rational-bound-module-native.events.jsonl",
+    "log": "/mnt/oldrog/tmp/g3-rational-bound-module-native.log",
+    "profile": "/mnt/oldrog/tmp/g3-rational-bound-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-rational-bound-module-native.json",
+    "go_pid": 5,
+    "session_id": 39459
   }
 }
