@@ -129102,7 +129102,9 @@
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/solver_float.go",
         "pkg/util/lp/primal_solver_float.go",
-        "pkg/util/lp/primal_validate_float.go"
+        "pkg/util/lp/primal_validate_float.go",
+        "pkg/util/lp/primal_prepare_rational.go",
+        "pkg/util/lp/primal_solver_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalPreparedBasisIndependentOracle",
@@ -129119,7 +129121,16 @@
         "TestLPFloatPrimalValidationToleranceAndIEEE",
         "TestLPFloatPrimalValidationOutputAndMutationPrefixes",
         "TestLPFloatPrimalValidationMissingMetadata",
-        "TestLPFloatPrimalOuterIndependentVertices"
+        "TestLPFloatPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterEmptyAndTerminal",
+        "TestLPRationalPrimalStageIndependentRows",
+        "TestLPRationalPrimalOuterFreshTableauSourcePrefix",
+        "TestLPRationalPrimalOuterPhysicalOwnership",
+        "TestLPRationalPrimalOuterPreservesOlderComparison",
+        "TestLPRationalPrimalStageMetadataPublication",
+        "TestLPRationalPrimalStageReporterAndFlush",
+        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -129169,18 +129180,36 @@
             "TestLPFloatPrimalValidationMissingMetadata",
             "TestLPFloatPrimalOuterIndependentVertices"
           ]
+        },
+        {
+          "name": "Concrete scalar outer primal preparation, residual-column stage one, full prepared/core construction and FindMaximalSolution, original-column/current-cost access and owning destruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solver_rational.go",
+          "tests": [
+            "TestLPRationalPrimalOuterIndependentVertices",
+            "TestLPRationalPrimalOuterEmptyAndTerminal",
+            "TestLPRationalPrimalStageIndependentRows",
+            "TestLPRationalPrimalOuterFreshTableauSourcePrefix",
+            "TestLPRationalPrimalOuterPhysicalOwnership",
+            "TestLPRationalPrimalOuterPreservesOlderComparison",
+            "TestLPRationalPrimalStageMetadataPublication",
+            "TestLPRationalPrimalStageReporterAndFlush",
+            "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges"
+          ]
         }
       ],
       "ownership": [
         "FloatPrimalSimplex embeds common floating state; actual X/basis/nonbasis/heading/type/upper-bound fields use native Go slices in FloatLPSolver, with a primal low-bound slice. Preparation retains resized X/basis prefixes, clears low bounds/costs, and appends actual matrix columns before later vector guards. Row values and basis/type/low/upper writes retain source publication order. No fake core solver or optimization result is substituted.",
-        "Unsigned total_vars in set_core_solver_bounds wraps exactly before resizing. The solve_with_total_inf prefix retains unsigned addition then the selected signed Linux int conversion; a negative extent has an explicit Go guard before growth. Both domain guard and writer failures are qualified Go transports, not native allocation/ostream exception claims."
+        "Unsigned total_vars in set_core_solver_bounds wraps exactly before resizing. The solve_with_total_inf prefix retains unsigned addition then the selected signed Linux int conversion; a negative extent has an explicit Go guard before growth. Both domain guard and writer failures are qualified Go transports, not native allocation/ostream exception claims.",
+        "Outer scalar stage vectors, lexical row/bound/column-cost/accumulator values and numerical receipts belong to RationalPrimalSimplex. Actual model/matrix/column/core children capture only their own arithmetic. Constructor refusal retains a partial core without publishing CoreSolver; successful construction publishes before Solve, while status and iteration counters publish only after successful child return. Partial/current/displaced cores close before the model, vectors and remaining outer roots. Repeated source pointer replacement retains displaced Go owners for cleanup."
       ],
       "deviations": [
         "Retained find_maximal_solution calls set_core_solver_bounds then solve_with_total_inf. This active path adds one signed residual column per row, with fixed type for equality and low-bound type for inequalities. It preserves negative initial values/bound violations and zero residual cost; original structural costs are scaled afterwards. Source artificial counters still affect bound-vector size even though this path does not construct the alternative artificial variables.",
         "Whole-source reachability finds fill_costs_and_x_for_first_stage_solver only in declaration/definition and its own row-helper call; init_buffer and set_zero_bound likewise have no retained caller. Those unused alternative initializers are excluded instead of porting template bodies. Actual core optimization, exact types, diagnostics and registered driver completion remain open; whole units stay partial.",
         "120 independent prepared problems verify [A,D]X=B, signed diagonal basis, retained coefficients, bounds, costs and dimensions. Actual sparse/forced-dense LU factors solve both orientations against independent diagonal products. IEEE/signed-zero, prefix failures, unknown relations, unsigned counter wrap, output errors and empty-program source early return are covered. Empty preparation alone may return source OPTIMAL; no nonempty optimization completion is claimed.",
         "Outer LU path uses actual presolve/preparation/scaling/core Solve. Sorted external numeric indices choose deterministic source unordered objective-sum order. Partial Go constructor owner is closed before returning its error without publishing CoreSolver. The source upper-only flip/type inconsistency is preserved and tested: maximize -x with x<=3,z>=0,-x+z<=2 reports optimal x=3,cost=-3 although independent true optimum is x=-2,cost=2. No source algorithm correction is silently applied. Default tableau/precise variants, source diagnostics/solution validators and complete original driver integration remain open.",
-        "Native map[string]float64 solution values and insertion-ordered coefficient rows replace C++ unordered maps. External column keys sort numerically for deterministic bounds diagnostics. Ordinary Go writers use shared classic-six-digit number text, with reached I/O error/sum prefixes qualified separately from C++ nonthrowing stream state. Missing constraint operator[] publishes a default key then returns ErrBounds before source indeterminate double/enum reads. Exact tolerance and IEEE behavior retained, including NaN acceptance by row predicates and fixed-flag-only nonenforcement in bounds_hold. Definition-only get_array_from_map is excluded; exact validators and complete source test/parser consumers remain open."
+        "Native map[string]float64 solution values and insertion-ordered coefficient rows replace C++ unordered maps. External column keys sort numerically for deterministic bounds diagnostics. Ordinary Go writers use shared classic-six-digit number text, with reached I/O error/sum prefixes qualified separately from C++ nonthrowing stream state. Missing constraint operator[] publishes a default key then returns ErrBounds before source indeterminate double/enum reads. Exact tolerance and IEEE behavior retained, including NaN acceptance by row predicates and fixed-flag-only nonenforcement in bounds_hold. Definition-only get_array_from_map is excluded; exact validators and complete source test/parser consumers remain open.",
+        "Retained source primal preparation flips upper-only structural coefficients/costs but leaves column_type upper_bound and its default exact upper zero. Ninety ordinary independent LP models verify mathematical optima; thirty flipped models independently enumerate both intended and actual source domains and require exercised disagreement, preserving the source behavior rather than silently changing the type. Fresh tableau_rows returns initial zero-cost point as OPTIMAL in both modes; tableau_costs native likewise returns that point while checked rejects uninitialized reduced costs. Explicit source-prefix tests distinguish these limitations from LU optimization. No C++ repair or added automatic initialization is invented."
       ]
     },
     {
@@ -129193,7 +129222,9 @@
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/solver_float.go",
         "pkg/util/lp/primal_solver_float.go",
-        "pkg/util/lp/primal_validate_float.go"
+        "pkg/util/lp/primal_validate_float.go",
+        "pkg/util/lp/primal_prepare_rational.go",
+        "pkg/util/lp/primal_solver_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalPreparedBasisIndependentOracle",
@@ -129210,7 +129241,16 @@
         "TestLPFloatPrimalValidationToleranceAndIEEE",
         "TestLPFloatPrimalValidationOutputAndMutationPrefixes",
         "TestLPFloatPrimalValidationMissingMetadata",
-        "TestLPFloatPrimalOuterIndependentVertices"
+        "TestLPFloatPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterEmptyAndTerminal",
+        "TestLPRationalPrimalStageIndependentRows",
+        "TestLPRationalPrimalOuterFreshTableauSourcePrefix",
+        "TestLPRationalPrimalOuterPhysicalOwnership",
+        "TestLPRationalPrimalOuterPreservesOlderComparison",
+        "TestLPRationalPrimalStageMetadataPublication",
+        "TestLPRationalPrimalStageReporterAndFlush",
+        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges"
       ],
       "assertions": [
         {
@@ -129302,18 +129342,36 @@
             "TestLPFloatPrimalValidationMissingMetadata",
             "TestLPFloatPrimalOuterIndependentVertices"
           ]
+        },
+        {
+          "name": "Concrete scalar outer primal preparation, residual-column stage one, full prepared/core construction and FindMaximalSolution, original-column/current-cost access and owning destruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solver_rational.go",
+          "tests": [
+            "TestLPRationalPrimalOuterIndependentVertices",
+            "TestLPRationalPrimalOuterEmptyAndTerminal",
+            "TestLPRationalPrimalStageIndependentRows",
+            "TestLPRationalPrimalOuterFreshTableauSourcePrefix",
+            "TestLPRationalPrimalOuterPhysicalOwnership",
+            "TestLPRationalPrimalOuterPreservesOlderComparison",
+            "TestLPRationalPrimalStageMetadataPublication",
+            "TestLPRationalPrimalStageReporterAndFlush",
+            "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges"
+          ]
         }
       ],
       "ownership": [
         "FloatPrimalSimplex embeds common floating state; actual X/basis/nonbasis/heading/type/upper-bound fields use native Go slices in FloatLPSolver, with a primal low-bound slice. Preparation retains resized X/basis prefixes, clears low bounds/costs, and appends actual matrix columns before later vector guards. Row values and basis/type/low/upper writes retain source publication order. No fake core solver or optimization result is substituted.",
-        "Unsigned total_vars in set_core_solver_bounds wraps exactly before resizing. The solve_with_total_inf prefix retains unsigned addition then the selected signed Linux int conversion; a negative extent has an explicit Go guard before growth. Both domain guard and writer failures are qualified Go transports, not native allocation/ostream exception claims."
+        "Unsigned total_vars in set_core_solver_bounds wraps exactly before resizing. The solve_with_total_inf prefix retains unsigned addition then the selected signed Linux int conversion; a negative extent has an explicit Go guard before growth. Both domain guard and writer failures are qualified Go transports, not native allocation/ostream exception claims.",
+        "Outer scalar stage vectors, lexical row/bound/column-cost/accumulator values and numerical receipts belong to RationalPrimalSimplex. Actual model/matrix/column/core children capture only their own arithmetic. Constructor refusal retains a partial core without publishing CoreSolver; successful construction publishes before Solve, while status and iteration counters publish only after successful child return. Partial/current/displaced cores close before the model, vectors and remaining outer roots. Repeated source pointer replacement retains displaced Go owners for cleanup."
       ],
       "deviations": [
         "Retained find_maximal_solution calls set_core_solver_bounds then solve_with_total_inf. This active path adds one signed residual column per row, with fixed type for equality and low-bound type for inequalities. It preserves negative initial values/bound violations and zero residual cost; original structural costs are scaled afterwards. Source artificial counters still affect bound-vector size even though this path does not construct the alternative artificial variables.",
         "Whole-source reachability finds fill_costs_and_x_for_first_stage_solver only in declaration/definition and its own row-helper call; init_buffer and set_zero_bound likewise have no retained caller. Those unused alternative initializers are excluded instead of porting template bodies. Actual core optimization, exact types, diagnostics and registered driver completion remain open; whole units stay partial.",
         "120 independent prepared problems verify [A,D]X=B, signed diagonal basis, retained coefficients, bounds, costs and dimensions. Actual sparse/forced-dense LU factors solve both orientations against independent diagonal products. IEEE/signed-zero, prefix failures, unknown relations, unsigned counter wrap, output errors and empty-program source early return are covered. Empty preparation alone may return source OPTIMAL; no nonempty optimization completion is claimed.",
         "Outer LU path uses actual presolve/preparation/scaling/core Solve. Sorted external numeric indices choose deterministic source unordered objective-sum order. Partial Go constructor owner is closed before returning its error without publishing CoreSolver. The source upper-only flip/type inconsistency is preserved and tested: maximize -x with x<=3,z>=0,-x+z<=2 reports optimal x=3,cost=-3 although independent true optimum is x=-2,cost=2. No source algorithm correction is silently applied. Default tableau/precise variants, source diagnostics/solution validators and complete original driver integration remain open.",
-        "Native map[string]float64 solution values and insertion-ordered coefficient rows replace C++ unordered maps. External column keys sort numerically for deterministic bounds diagnostics. Ordinary Go writers use shared classic-six-digit number text, with reached I/O error/sum prefixes qualified separately from C++ nonthrowing stream state. Missing constraint operator[] publishes a default key then returns ErrBounds before source indeterminate double/enum reads. Exact tolerance and IEEE behavior retained, including NaN acceptance by row predicates and fixed-flag-only nonenforcement in bounds_hold. Definition-only get_array_from_map is excluded; exact validators and complete source test/parser consumers remain open."
+        "Native map[string]float64 solution values and insertion-ordered coefficient rows replace C++ unordered maps. External column keys sort numerically for deterministic bounds diagnostics. Ordinary Go writers use shared classic-six-digit number text, with reached I/O error/sum prefixes qualified separately from C++ nonthrowing stream state. Missing constraint operator[] publishes a default key then returns ErrBounds before source indeterminate double/enum reads. Exact tolerance and IEEE behavior retained, including NaN acceptance by row predicates and fixed-flag-only nonenforcement in bounds_hold. Definition-only get_array_from_map is excluded; exact validators and complete source test/parser consumers remain open.",
+        "Retained source primal preparation flips upper-only structural coefficients/costs but leaves column_type upper_bound and its default exact upper zero. Ninety ordinary independent LP models verify mathematical optima; thirty flipped models independently enumerate both intended and actual source domains and require exercised disagreement, preserving the source behavior rather than silently changing the type. Fresh tableau_rows returns initial zero-cost point as OPTIMAL in both modes; tableau_costs native likewise returns that point while checked rejects uninitialized reduced costs. Explicit source-prefix tests distinguish these limitations from LU optimization. No C++ repair or added automatic initialization is invented."
       ]
     },
     {
@@ -129325,7 +129383,9 @@
         "pkg/util/lp/primal_prepare_float.go",
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/solver_float.go",
-        "pkg/util/lp/primal_validate_float.go"
+        "pkg/util/lp/primal_validate_float.go",
+        "pkg/util/lp/primal_prepare_rational.go",
+        "pkg/util/lp/primal_solver_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalPreparedBasisIndependentOracle",
@@ -129337,7 +129397,16 @@
         "TestLPFloatPrimalValidationToleranceAndIEEE",
         "TestLPFloatPrimalValidationOutputAndMutationPrefixes",
         "TestLPFloatPrimalValidationMissingMetadata",
-        "TestLPFloatPrimalOuterIndependentVertices"
+        "TestLPFloatPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterEmptyAndTerminal",
+        "TestLPRationalPrimalStageIndependentRows",
+        "TestLPRationalPrimalOuterFreshTableauSourcePrefix",
+        "TestLPRationalPrimalOuterPhysicalOwnership",
+        "TestLPRationalPrimalOuterPreservesOlderComparison",
+        "TestLPRationalPrimalStageMetadataPublication",
+        "TestLPRationalPrimalStageReporterAndFlush",
+        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -129373,17 +129442,35 @@
             "TestLPFloatPrimalValidationMissingMetadata",
             "TestLPFloatPrimalOuterIndependentVertices"
           ]
+        },
+        {
+          "name": "Concrete scalar outer primal preparation, residual-column stage one, full prepared/core construction and FindMaximalSolution, original-column/current-cost access and owning destruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solver_rational.go",
+          "tests": [
+            "TestLPRationalPrimalOuterIndependentVertices",
+            "TestLPRationalPrimalOuterEmptyAndTerminal",
+            "TestLPRationalPrimalStageIndependentRows",
+            "TestLPRationalPrimalOuterFreshTableauSourcePrefix",
+            "TestLPRationalPrimalOuterPhysicalOwnership",
+            "TestLPRationalPrimalOuterPreservesOlderComparison",
+            "TestLPRationalPrimalStageMetadataPublication",
+            "TestLPRationalPrimalStageReporterAndFlush",
+            "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges"
+          ]
         }
       ],
       "ownership": [
         "FloatPrimalSimplex embeds common floating state; actual X/basis/nonbasis/heading/type/upper-bound fields use native Go slices in FloatLPSolver, with a primal low-bound slice. Preparation retains resized X/basis prefixes, clears low bounds/costs, and appends actual matrix columns before later vector guards. Row values and basis/type/low/upper writes retain source publication order. No fake core solver or optimization result is substituted.",
-        "Unsigned total_vars in set_core_solver_bounds wraps exactly before resizing. The solve_with_total_inf prefix retains unsigned addition then the selected signed Linux int conversion; a negative extent has an explicit Go guard before growth. Both domain guard and writer failures are qualified Go transports, not native allocation/ostream exception claims."
+        "Unsigned total_vars in set_core_solver_bounds wraps exactly before resizing. The solve_with_total_inf prefix retains unsigned addition then the selected signed Linux int conversion; a negative extent has an explicit Go guard before growth. Both domain guard and writer failures are qualified Go transports, not native allocation/ostream exception claims.",
+        "Outer scalar stage vectors, lexical row/bound/column-cost/accumulator values and numerical receipts belong to RationalPrimalSimplex. Actual model/matrix/column/core children capture only their own arithmetic. Constructor refusal retains a partial core without publishing CoreSolver; successful construction publishes before Solve, while status and iteration counters publish only after successful child return. Partial/current/displaced cores close before the model, vectors and remaining outer roots. Repeated source pointer replacement retains displaced Go owners for cleanup."
       ],
       "deviations": [
         "Retained find_maximal_solution calls set_core_solver_bounds then solve_with_total_inf. This active path adds one signed residual column per row, with fixed type for equality and low-bound type for inequalities. It preserves negative initial values/bound violations and zero residual cost; original structural costs are scaled afterwards. Source artificial counters still affect bound-vector size even though this path does not construct the alternative artificial variables.",
         "Whole-source reachability finds fill_costs_and_x_for_first_stage_solver only in declaration/definition and its own row-helper call; init_buffer and set_zero_bound likewise have no retained caller. Those unused alternative initializers are excluded instead of porting template bodies. Actual core optimization, exact types, diagnostics and registered driver completion remain open; whole units stay partial.",
         "120 independent prepared problems verify [A,D]X=B, signed diagonal basis, retained coefficients, bounds, costs and dimensions. Actual sparse/forced-dense LU factors solve both orientations against independent diagonal products. IEEE/signed-zero, prefix failures, unknown relations, unsigned counter wrap, output errors and empty-program source early return are covered. Empty preparation alone may return source OPTIMAL; no nonempty optimization completion is claimed.",
-        "Native map[string]float64 solution values and insertion-ordered coefficient rows replace C++ unordered maps. External column keys sort numerically for deterministic bounds diagnostics. Ordinary Go writers use shared classic-six-digit number text, with reached I/O error/sum prefixes qualified separately from C++ nonthrowing stream state. Missing constraint operator[] publishes a default key then returns ErrBounds before source indeterminate double/enum reads. Exact tolerance and IEEE behavior retained, including NaN acceptance by row predicates and fixed-flag-only nonenforcement in bounds_hold. Definition-only get_array_from_map is excluded; exact validators and complete source test/parser consumers remain open."
+        "Native map[string]float64 solution values and insertion-ordered coefficient rows replace C++ unordered maps. External column keys sort numerically for deterministic bounds diagnostics. Ordinary Go writers use shared classic-six-digit number text, with reached I/O error/sum prefixes qualified separately from C++ nonthrowing stream state. Missing constraint operator[] publishes a default key then returns ErrBounds before source indeterminate double/enum reads. Exact tolerance and IEEE behavior retained, including NaN acceptance by row predicates and fixed-flag-only nonenforcement in bounds_hold. Definition-only get_array_from_map is excluded; exact validators and complete source test/parser consumers remain open.",
+        "Retained source primal preparation flips upper-only structural coefficients/costs but leaves column_type upper_bound and its default exact upper zero. Ninety ordinary independent LP models verify mathematical optima; thirty flipped models independently enumerate both intended and actual source domains and require exercised disagreement, preserving the source behavior rather than silently changing the type. Fresh tableau_rows returns initial zero-cost point as OPTIMAL in both modes; tableau_costs native likewise returns that point while checked rejects uninitialized reduced costs. Explicit source-prefix tests distinguish these limitations from LU optimization. No C++ repair or added automatic initialization is invented."
       ]
     },
     {
@@ -130003,7 +130090,8 @@
         "pkg/util/lp/solver_objective_exact.go",
         "pkg/util/lp/solver_objective_exact_test.go",
         "pkg/util/lp/solver_expression_exact.go",
-        "pkg/util/lp/solver_expression_exact_test.go"
+        "pkg/util/lp/solver_expression_exact_test.go",
+        "pkg/util/lp/primal_solver_rational.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -130062,7 +130150,10 @@
         "TestLPRationalObjectiveBorrowedCoreAndAlias",
         "TestLPRationalObjectivePreservesOlderComparison",
         "TestLPRationalExpressionPhysicalReturnCopies",
-        "TestLPRationalExpressionPinConditionLifetime"
+        "TestLPRationalExpressionPinConditionLifetime",
+        "TestLPRationalPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
+        "TestLPRationalPrimalOuterPhysicalOwnership"
       ],
       "assertions": [
         {
@@ -130265,6 +130356,16 @@
           "tests": [
             "TestLPRationalExpressionPhysicalReturnCopies",
             "TestLPRationalExpressionPinConditionLifetime"
+          ]
+        },
+        {
+          "name": "Concrete scalar get_column_cost_value through the actual exact outer virtual column-value accessor, copied-left product and lexical current-cost sum",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solver_rational.go",
+          "tests": [
+            "TestLPRationalPrimalOuterIndependentVertices",
+            "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
+            "TestLPRationalPrimalOuterPhysicalOwnership"
           ]
         }
       ],

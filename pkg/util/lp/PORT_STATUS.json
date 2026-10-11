@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers."
+    "Exact outer dual preparation/optimization and full MPS/CLI/scaling integration, retained LP whole-source/consumer audits and complete upstream LP/options/randomize test drivers."
   ],
   "units": [
     {
@@ -3275,7 +3275,9 @@
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/solver_float.go",
         "pkg/util/lp/primal_solver_float.go",
-        "pkg/util/lp/primal_validate_float.go"
+        "pkg/util/lp/primal_validate_float.go",
+        "pkg/util/lp/primal_prepare_rational.go",
+        "pkg/util/lp/primal_solver_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalPreparedBasisIndependentOracle",
@@ -3292,7 +3294,16 @@
         "TestLPFloatPrimalValidationToleranceAndIEEE",
         "TestLPFloatPrimalValidationOutputAndMutationPrefixes",
         "TestLPFloatPrimalValidationMissingMetadata",
-        "TestLPFloatPrimalOuterIndependentVertices"
+        "TestLPFloatPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterEmptyAndTerminal",
+        "TestLPRationalPrimalStageIndependentRows",
+        "TestLPRationalPrimalOuterFreshTableauSourcePrefix",
+        "TestLPRationalPrimalOuterPhysicalOwnership",
+        "TestLPRationalPrimalOuterPreservesOlderComparison",
+        "TestLPRationalPrimalStageMetadataPublication",
+        "TestLPRationalPrimalStageReporterAndFlush",
+        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges"
       ]
     },
     {
@@ -3303,7 +3314,9 @@
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/solver_float.go",
         "pkg/util/lp/primal_solver_float.go",
-        "pkg/util/lp/primal_validate_float.go"
+        "pkg/util/lp/primal_validate_float.go",
+        "pkg/util/lp/primal_prepare_rational.go",
+        "pkg/util/lp/primal_solver_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalPreparedBasisIndependentOracle",
@@ -3320,7 +3333,16 @@
         "TestLPFloatPrimalValidationToleranceAndIEEE",
         "TestLPFloatPrimalValidationOutputAndMutationPrefixes",
         "TestLPFloatPrimalValidationMissingMetadata",
-        "TestLPFloatPrimalOuterIndependentVertices"
+        "TestLPFloatPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterEmptyAndTerminal",
+        "TestLPRationalPrimalStageIndependentRows",
+        "TestLPRationalPrimalOuterFreshTableauSourcePrefix",
+        "TestLPRationalPrimalOuterPhysicalOwnership",
+        "TestLPRationalPrimalOuterPreservesOlderComparison",
+        "TestLPRationalPrimalStageMetadataPublication",
+        "TestLPRationalPrimalStageReporterAndFlush",
+        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges"
       ]
     },
     {
@@ -3330,7 +3352,9 @@
         "pkg/util/lp/primal_prepare_float.go",
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/solver_float.go",
-        "pkg/util/lp/primal_validate_float.go"
+        "pkg/util/lp/primal_validate_float.go",
+        "pkg/util/lp/primal_prepare_rational.go",
+        "pkg/util/lp/primal_solver_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalPreparedBasisIndependentOracle",
@@ -3342,7 +3366,16 @@
         "TestLPFloatPrimalValidationToleranceAndIEEE",
         "TestLPFloatPrimalValidationOutputAndMutationPrefixes",
         "TestLPFloatPrimalValidationMissingMetadata",
-        "TestLPFloatPrimalOuterIndependentVertices"
+        "TestLPFloatPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterEmptyAndTerminal",
+        "TestLPRationalPrimalStageIndependentRows",
+        "TestLPRationalPrimalOuterFreshTableauSourcePrefix",
+        "TestLPRationalPrimalOuterPhysicalOwnership",
+        "TestLPRationalPrimalOuterPreservesOlderComparison",
+        "TestLPRationalPrimalStageMetadataPublication",
+        "TestLPRationalPrimalStageReporterAndFlush",
+        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges"
       ]
     },
     {
@@ -3558,7 +3591,8 @@
         "pkg/util/lp/solver_objective_exact.go",
         "pkg/util/lp/solver_objective_exact_test.go",
         "pkg/util/lp/solver_expression_exact.go",
-        "pkg/util/lp/solver_expression_exact_test.go"
+        "pkg/util/lp/solver_expression_exact_test.go",
+        "pkg/util/lp/primal_solver_rational.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -8341,6 +8375,66 @@
       "focused_debug_checked": "passed",
       "related_native": "passed before final two test-only groups; final focused profiles include all groups",
       "related_debug_checked": "passed before final two test-only groups; final focused profiles include all groups",
+      "lp_vet_native": "passed",
+      "lp_vet_debug_checked": "passed",
+      "module_compile_native": "passed",
+      "module_compile_debug_checked": "passed",
+      "source_portcheck": "passed: 2103 units, 677 APIs",
+      "dependency_graph": "64 packages; no unresolved imports",
+      "diff_check": "passed"
+    }
+  },
+  "latest_rational_primal_outer_increment": {
+    "scope": "Concrete scalar outer primal stage preparation, core construction, full FindMaximalSolution, external values/current cost and explicit owning destruction",
+    "source_units_promoted": false,
+    "test_groups": 9,
+    "independent_lu_worlds": 120,
+    "ordinary_mathematical_optimum_worlds": 90,
+    "flipped_source_domain_worlds": 30,
+    "independent_stage_models": 120,
+    "terminal_profiles": 5,
+    "fresh_tableau_source_profiles": 2,
+    "metadata_publication_profiles": 15,
+    "physical_campaigns": 14,
+    "older_comparison_campaigns": 7,
+    "objective_alias_profiles": 2,
+    "focused_native_seconds": 2.008,
+    "focused_debug_checked_seconds": 2.895,
+    "related_native_seconds": 48.255,
+    "related_debug_checked_seconds": 66.882,
+    "statement_coverage": {
+      "native": {
+        "primal_prepare_rational.go": {
+          "covered": 155,
+          "total": 187,
+          "percent": 82.9
+        },
+        "primal_solver_rational.go": {
+          "covered": 107,
+          "total": 133,
+          "percent": 80.5
+        }
+      },
+      "debug_checked": {
+        "primal_prepare_rational.go": {
+          "covered": 155,
+          "total": 187,
+          "percent": 82.9
+        },
+        "primal_solver_rational.go": {
+          "covered": 107,
+          "total": 133,
+          "percent": 80.5
+        }
+      }
+    },
+    "remaining": "Exact outer dual preparation/optimization and full MPS/CLI/scaling integration, retained LP whole-source/consumer audits and complete upstream LP/options/randomize test drivers.",
+    "coverage_note": "Remaining blocks chiefly guard stable numerical capture/destruction, delegated metadata, unreachable size conversion in actual allocations, partial constructor failures and displaced core lifetimes. Source upper-only flip/type and fresh tableau initialization limitations are explicitly retained and tested, not credited as mathematical optima. Go statement coverage does not establish C++ completion.",
+    "verification": {
+      "focused_native": "passed",
+      "focused_debug_checked": "passed",
+      "related_native": "passed",
+      "related_debug_checked": "passed",
       "lp_vet_native": "passed",
       "lp_vet_debug_checked": "passed",
       "module_compile_native": "passed",
