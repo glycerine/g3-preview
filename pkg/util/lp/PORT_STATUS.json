@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 86.7,
-  "coverage_warning": "Latest completed native checkpoint82fa38d8 measures26877/31015 LP statements (86.7%); includes scalar dual pricing/candidates/full ratio, flips, beta/DSE and advancement/recovery. Predates scalar full dual Solve and scalar outer primal integration. Their focused evidence remains separate. Go statement coverage is not C++ source completion; remaining retained sources and complete upstream drivers remain open.",
+  "coverage_warning": "Latest completed native checkpoint82fa38d8 measures26877/31015 LP statements (86.7%); includes scalar dual pricing/candidates/full ratio, flips, beta/DSE and advancement/recovery. Predates scalar full dual Solve and scalar outer primal/dual integration. Their focused evidence remains separate. Go statement coverage is not C++ source completion; remaining retained sources and complete upstream drivers remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Exact outer dual preparation/optimization and full MPS/CLI/scaling integration, retained LP whole-source/consumer audits and complete upstream LP/options/randomize test drivers."
+    "Full exact/floating MPS/CLI/scaling consumer integration, retained LP whole-source and ownership audits and complete upstream LP/options/randomize test drivers; explicitly audit exact dual source unsupported rational constructors and omitted sparsity-count extents without silently repairing C++ behavior."
   ],
   "units": [
     {
@@ -2212,7 +2212,10 @@
       "go_targets": [
         "pkg/util/lp/dual_prepare_float.go",
         "pkg/util/lp/dual_prepare_float_test.go",
-        "pkg/util/lp/dual_solver_float.go"
+        "pkg/util/lp/dual_solver_float.go",
+        "pkg/util/lp/dual_prepare_rational.go",
+        "pkg/util/lp/dual_solver_rational.go",
+        "pkg/util/lp/dual_objective_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -2225,7 +2228,23 @@
         "TestLPFloatDualOuterEmptyFailuresAndPublication",
         "TestLPFloatDualOuterRelationsFreeAndStatuses",
         "TestLPFloatDualOuterActualStopsAndMetadata",
-        "TestLPFloatDualOuterReachedChildFailures"
+        "TestLPFloatDualOuterReachedChildFailures",
+        "TestLPRationalDualOuterIndependentPreparedVertices",
+        "TestLPRationalDualOuterFullEntrySourceBounds",
+        "TestLPRationalDualOuterPreparationIndependentRows",
+        "TestLPRationalDualOuterStageStatusExactZero",
+        "TestLPRationalDualOuterStageTwoPublication",
+        "TestLPRationalDualOuterFirstStructuralSourceBoundary",
+        "TestLPRationalDualOuterFixTypesAndBoxWidth",
+        "TestLPRationalDualOuterPhysicalOwnership",
+        "TestLPRationalDualOuterPreservesOlderComparison",
+        "TestLPRationalDualOuterPreparedInfeasible",
+        "TestLPRationalDualOuterMetadataPublication",
+        "TestLPRationalDualOuterStageReporterAndFlush",
+        "TestLPRationalDualOuterCostAliasesAndLifetime",
+        "TestLPRationalDualOuterCopyCompletedPrefix",
+        "TestLPRationalDualOuterLogicalStageTransitions",
+        "TestLPRationalDualOuterPresolveRejectsBeforeStages"
       ]
     },
     {
@@ -2234,7 +2253,10 @@
       "go_targets": [
         "pkg/util/lp/dual_prepare_float.go",
         "pkg/util/lp/dual_prepare_float_test.go",
-        "pkg/util/lp/dual_solver_float.go"
+        "pkg/util/lp/dual_solver_float.go",
+        "pkg/util/lp/dual_prepare_rational.go",
+        "pkg/util/lp/dual_solver_rational.go",
+        "pkg/util/lp/dual_objective_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -2247,7 +2269,23 @@
         "TestLPFloatDualOuterEmptyFailuresAndPublication",
         "TestLPFloatDualOuterRelationsFreeAndStatuses",
         "TestLPFloatDualOuterActualStopsAndMetadata",
-        "TestLPFloatDualOuterReachedChildFailures"
+        "TestLPFloatDualOuterReachedChildFailures",
+        "TestLPRationalDualOuterIndependentPreparedVertices",
+        "TestLPRationalDualOuterFullEntrySourceBounds",
+        "TestLPRationalDualOuterPreparationIndependentRows",
+        "TestLPRationalDualOuterStageStatusExactZero",
+        "TestLPRationalDualOuterStageTwoPublication",
+        "TestLPRationalDualOuterFirstStructuralSourceBoundary",
+        "TestLPRationalDualOuterFixTypesAndBoxWidth",
+        "TestLPRationalDualOuterPhysicalOwnership",
+        "TestLPRationalDualOuterPreservesOlderComparison",
+        "TestLPRationalDualOuterPreparedInfeasible",
+        "TestLPRationalDualOuterMetadataPublication",
+        "TestLPRationalDualOuterStageReporterAndFlush",
+        "TestLPRationalDualOuterCostAliasesAndLifetime",
+        "TestLPRationalDualOuterCopyCompletedPrefix",
+        "TestLPRationalDualOuterLogicalStageTransitions",
+        "TestLPRationalDualOuterPresolveRejectsBeforeStages"
       ]
     },
     {
@@ -2256,12 +2294,31 @@
       "go_targets": [
         "pkg/util/lp/dual_solver_float.go",
         "pkg/util/lp/dual_solver_float_test.go",
-        "pkg/util/lp/mps_dual_float_test.go"
+        "pkg/util/lp/mps_dual_float_test.go",
+        "pkg/util/lp/dual_prepare_rational.go",
+        "pkg/util/lp/dual_solver_rational.go",
+        "pkg/util/lp/dual_objective_rational.go"
       ],
       "tests": [
         "TestLPFloatDualOuterIndependentVertices",
         "TestLPFloatDualOuterRelationsFreeAndStatuses",
-        "TestLPFloatMPSDualIndependentMinMax"
+        "TestLPFloatMPSDualIndependentMinMax",
+        "TestLPRationalDualOuterIndependentPreparedVertices",
+        "TestLPRationalDualOuterFullEntrySourceBounds",
+        "TestLPRationalDualOuterPreparationIndependentRows",
+        "TestLPRationalDualOuterStageStatusExactZero",
+        "TestLPRationalDualOuterStageTwoPublication",
+        "TestLPRationalDualOuterFirstStructuralSourceBoundary",
+        "TestLPRationalDualOuterFixTypesAndBoxWidth",
+        "TestLPRationalDualOuterPhysicalOwnership",
+        "TestLPRationalDualOuterPreservesOlderComparison",
+        "TestLPRationalDualOuterPreparedInfeasible",
+        "TestLPRationalDualOuterMetadataPublication",
+        "TestLPRationalDualOuterStageReporterAndFlush",
+        "TestLPRationalDualOuterCostAliasesAndLifetime",
+        "TestLPRationalDualOuterCopyCompletedPrefix",
+        "TestLPRationalDualOuterLogicalStageTransitions",
+        "TestLPRationalDualOuterPresolveRejectsBeforeStages"
       ]
     },
     {
@@ -3592,7 +3649,8 @@
         "pkg/util/lp/solver_objective_exact_test.go",
         "pkg/util/lp/solver_expression_exact.go",
         "pkg/util/lp/solver_expression_exact_test.go",
-        "pkg/util/lp/primal_solver_rational.go"
+        "pkg/util/lp/primal_solver_rational.go",
+        "pkg/util/lp/dual_objective_rational.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -3651,7 +3709,10 @@
         "TestLPRationalObjectiveBorrowedCoreAndAlias",
         "TestLPRationalObjectivePreservesOlderComparison",
         "TestLPRationalExpressionPhysicalReturnCopies",
-        "TestLPRationalExpressionPinConditionLifetime"
+        "TestLPRationalExpressionPinConditionLifetime",
+        "TestLPRationalDualOuterIndependentPreparedVertices",
+        "TestLPRationalDualOuterCostAliasesAndLifetime",
+        "TestLPRationalDualOuterPhysicalOwnership"
       ]
     },
     {
@@ -5311,7 +5372,7 @@
     "lp_covered_statements": 26877,
     "lp_statements": 31015,
     "session_id": 40387,
-    "scope_warning": "Includes scalar dual pricing/candidates/full ratio, flips/value updates, beta/DSE and known-leaving basis advancement/recovery through82fa38d8, plus earlier scalar full primal Solve/statistics and initialization. Profile excludes dual_solve_rational.go and all scalar outer-primal files. Their focused evidence remains separate. Coverage measures implemented Go statements, not C++ completion. Actual session40387 returned terminal exit0."
+    "scope_warning": "Includes scalar dual pricing/candidates/full ratio, flips/value updates, beta/DSE and known-leaving basis advancement/recovery through82fa38d8, plus earlier scalar full primal Solve/statistics and initialization. Profile excludes dual_solve_rational.go and all scalar outer-primal and outer-dual files. Their focused evidence remains separate. Coverage measures implemented Go statements, not C++ completion. Actual session40387 returned terminal exit0."
   },
   "full_native_checkpoint_history": [
     {
@@ -8443,5 +8504,71 @@
       "dependency_graph": "64 packages; no unresolved imports",
       "diff_check": "passed"
     }
+  },
+  "latest_rational_dual_outer_increment": {
+    "scope": "Concrete scalar outer dual preparation, slack/artificial columns, append-only RHS backup and descending restore, first/second stage orchestration, full entry, exact objective and owning destruction",
+    "source_units_promoted": false,
+    "test_groups": 16,
+    "independently_enumerated_prepared_stage_two_models": 120,
+    "independent_row_preparation_models": 160,
+    "physical_campaigns": 18,
+    "older_comparison_campaigns": 8,
+    "metadata_publication_profiles": 17,
+    "focused_native_seconds": 2.48,
+    "focused_debug_checked_seconds": 2.749,
+    "statement_coverage": {
+      "native": {
+        "dual_prepare_rational.go": {
+          "covered": 300,
+          "total": 407,
+          "percent": 73.7
+        },
+        "dual_solver_rational.go": {
+          "covered": 119,
+          "total": 144,
+          "percent": 82.6
+        },
+        "dual_objective_rational.go": {
+          "covered": 73,
+          "total": 91,
+          "percent": 80.2
+        }
+      },
+      "debug_checked": {
+        "dual_prepare_rational.go": {
+          "covered": 268,
+          "total": 407,
+          "percent": 65.8
+        },
+        "dual_solver_rational.go": {
+          "covered": 113,
+          "total": 144,
+          "percent": 78.5
+        },
+        "dual_objective_rational.go": {
+          "covered": 70,
+          "total": 91,
+          "percent": 76.9
+        }
+      }
+    },
+    "remaining": "Full exact/floating MPS/CLI/scaling consumer integration, retained LP whole-source and ownership audits and complete upstream LP/options/randomize test drivers; explicitly audit exact dual source unsupported rational constructors and omitted sparsity-count extents without silently repairing C++ behavior.",
+    "source_limits": "Checked first structural rational(double) assertion and checked pivot beta assertion; native full-entry sparsity metadata bounds failure. Prepared exact Stage2 vertex tests supply explicit metadata and use existing native zero-floor convention. They do not prove mathematical full-entry optimization or defined C++ execution beyond UNREACHABLE.",
+    "coverage_note": "Uncovered blocks primarily guard numerical receipt capture/destruction, delegated extents and partial constructor paths; checked mode cannot reach structural preparation after its unconditional source assertion or real exchanges after the beta assertion. Native erases source assertions. Coverage measures Go statements, not whole C++ source completion.",
+    "verification": {
+      "focused_native": "passed",
+      "focused_debug_checked": "passed",
+      "lp_vet_native": "passed",
+      "lp_vet_debug_checked": "passed",
+      "module_compile_native": "passed",
+      "module_compile_debug_checked": "passed",
+      "related_native": "passed",
+      "related_debug_checked": "passed",
+      "portcheck": "passed",
+      "dependency_graph": "passed",
+      "diff_check": "passed"
+    },
+    "related_native_seconds": 42.188,
+    "related_debug_checked_seconds": 54.709
   }
 }

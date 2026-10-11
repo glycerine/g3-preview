@@ -125635,7 +125635,10 @@
       "go_targets": [
         "pkg/util/lp/dual_prepare_float.go",
         "pkg/util/lp/dual_prepare_float_test.go",
-        "pkg/util/lp/dual_solver_float.go"
+        "pkg/util/lp/dual_solver_float.go",
+        "pkg/util/lp/dual_prepare_rational.go",
+        "pkg/util/lp/dual_solver_rational.go",
+        "pkg/util/lp/dual_objective_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -125648,7 +125651,23 @@
         "TestLPFloatDualOuterEmptyFailuresAndPublication",
         "TestLPFloatDualOuterRelationsFreeAndStatuses",
         "TestLPFloatDualOuterActualStopsAndMetadata",
-        "TestLPFloatDualOuterReachedChildFailures"
+        "TestLPFloatDualOuterReachedChildFailures",
+        "TestLPRationalDualOuterIndependentPreparedVertices",
+        "TestLPRationalDualOuterFullEntrySourceBounds",
+        "TestLPRationalDualOuterPreparationIndependentRows",
+        "TestLPRationalDualOuterStageStatusExactZero",
+        "TestLPRationalDualOuterStageTwoPublication",
+        "TestLPRationalDualOuterFirstStructuralSourceBoundary",
+        "TestLPRationalDualOuterFixTypesAndBoxWidth",
+        "TestLPRationalDualOuterPhysicalOwnership",
+        "TestLPRationalDualOuterPreservesOlderComparison",
+        "TestLPRationalDualOuterPreparedInfeasible",
+        "TestLPRationalDualOuterMetadataPublication",
+        "TestLPRationalDualOuterStageReporterAndFlush",
+        "TestLPRationalDualOuterCostAliasesAndLifetime",
+        "TestLPRationalDualOuterCopyCompletedPrefix",
+        "TestLPRationalDualOuterLogicalStageTransitions",
+        "TestLPRationalDualOuterPresolveRejectsBeforeStages"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -125683,12 +125702,38 @@
             "TestLPFloatDualOuterActualStopsAndMetadata",
             "TestLPFloatDualOuterReachedChildFailures"
           ]
+        },
+        {
+          "name": "Concrete scalar outer dual preparation, slack/artificial columns, append-only RHS backup and descending restore, first/second stage orchestration, full entry, exact objective and owning destruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_solver_rational.go",
+          "tests": [
+            "TestLPRationalDualOuterIndependentPreparedVertices",
+            "TestLPRationalDualOuterFullEntrySourceBounds",
+            "TestLPRationalDualOuterPreparationIndependentRows",
+            "TestLPRationalDualOuterStageStatusExactZero",
+            "TestLPRationalDualOuterStageTwoPublication",
+            "TestLPRationalDualOuterFirstStructuralSourceBoundary",
+            "TestLPRationalDualOuterFixTypesAndBoxWidth",
+            "TestLPRationalDualOuterPhysicalOwnership",
+            "TestLPRationalDualOuterPreservesOlderComparison",
+            "TestLPRationalDualOuterPreparedInfeasible",
+            "TestLPRationalDualOuterMetadataPublication",
+            "TestLPRationalDualOuterStageReporterAndFlush",
+            "TestLPRationalDualOuterCostAliasesAndLifetime",
+            "TestLPRationalDualOuterCopyCompletedPrefix",
+            "TestLPRationalDualOuterLogicalStageTransitions",
+            "TestLPRationalDualOuterPresolveRejectsBeforeStages"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "RationalDualSimplex owns stage vectors and lexical row, bound, copied-RHS, column-cost and accumulator values. Actual model/matrix/column/core children retain their own numerical scopes. RHS push_back copies successfully before publishing a new BCopy owning slot, then zeros the source; failed copies remain lexical and earlier published slots survive. Raw numerical receipts close before partial/current/displaced cores, common model children, stage vectors and outer roots. Repeated successful core replacement retains displaced owners for cleanup. Older caller comparison receipts remain unchanged."
+      ],
       "deviations": [
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
-        "Native sorted external indices fix deterministic traversal for source unordered objective summation. Source stage-two status switch omits ITERATIONS_EXHAUSTED: debug asserts before iteration publication; native leaves outer status unchanged and publishes counts, including uint32 addition wrap. Default tableau profile still lacks a core LU and reports explicit constructor bounds error with partial owner cleanup; only explicit LU is credited as successful optimization."
+        "Native sorted external indices fix deterministic traversal for source unordered objective summation. Source stage-two status switch omits ITERATIONS_EXHAUSTED: debug asserts before iteration publication; native leaves outer status unchanged and publishes counts, including uint32 addition wrap. Default tableau profile still lacks a core LU and reports explicit constructor bounds error with partial owner cleanup; only explicit LU is credited as successful optimization.",
+        "The unconditional first-structural T(1e4) calls source rational(double), which is UNREACHABLE even for boxed columns. Checked mode stops after the first structural-map assertion and before column lookup; native follows the existing exact-LP default-zero convention, without claiming defined C++ behavior beyond builtin-unreachable. The retained outer dual constructor also omits RowsNZ/ColumnsNZ extents, so actual full-entry native pivoting returns ErrBounds at the reached sparsity write. Prepared Stage2 tests explicitly supply those metadata extents and bypass earlier unsupported structural preparation; their independent optima do not establish a working full exact entry. Checked real pivots stop at the separate source beta rational(double) assertion. No implicit metadata sizing, rational float conversion or unused fill_x_with_zeros adapter was invented. Stage2 source default status does not map iteration exhaustion; native preserves the prior outer status and publishes counters, while checked asserts before counters."
       ]
     },
     {
@@ -125699,7 +125744,10 @@
       "go_targets": [
         "pkg/util/lp/dual_prepare_float.go",
         "pkg/util/lp/dual_prepare_float_test.go",
-        "pkg/util/lp/dual_solver_float.go"
+        "pkg/util/lp/dual_solver_float.go",
+        "pkg/util/lp/dual_prepare_rational.go",
+        "pkg/util/lp/dual_solver_rational.go",
+        "pkg/util/lp/dual_objective_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -125712,7 +125760,23 @@
         "TestLPFloatDualOuterEmptyFailuresAndPublication",
         "TestLPFloatDualOuterRelationsFreeAndStatuses",
         "TestLPFloatDualOuterActualStopsAndMetadata",
-        "TestLPFloatDualOuterReachedChildFailures"
+        "TestLPFloatDualOuterReachedChildFailures",
+        "TestLPRationalDualOuterIndependentPreparedVertices",
+        "TestLPRationalDualOuterFullEntrySourceBounds",
+        "TestLPRationalDualOuterPreparationIndependentRows",
+        "TestLPRationalDualOuterStageStatusExactZero",
+        "TestLPRationalDualOuterStageTwoPublication",
+        "TestLPRationalDualOuterFirstStructuralSourceBoundary",
+        "TestLPRationalDualOuterFixTypesAndBoxWidth",
+        "TestLPRationalDualOuterPhysicalOwnership",
+        "TestLPRationalDualOuterPreservesOlderComparison",
+        "TestLPRationalDualOuterPreparedInfeasible",
+        "TestLPRationalDualOuterMetadataPublication",
+        "TestLPRationalDualOuterStageReporterAndFlush",
+        "TestLPRationalDualOuterCostAliasesAndLifetime",
+        "TestLPRationalDualOuterCopyCompletedPrefix",
+        "TestLPRationalDualOuterLogicalStageTransitions",
+        "TestLPRationalDualOuterPresolveRejectsBeforeStages"
       ],
       "assertions": [
         {
@@ -125805,12 +125869,38 @@
             "TestLPFloatDualOuterActualStopsAndMetadata",
             "TestLPFloatDualOuterReachedChildFailures"
           ]
+        },
+        {
+          "name": "Concrete scalar outer dual preparation, slack/artificial columns, append-only RHS backup and descending restore, first/second stage orchestration, full entry, exact objective and owning destruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_solver_rational.go",
+          "tests": [
+            "TestLPRationalDualOuterIndependentPreparedVertices",
+            "TestLPRationalDualOuterFullEntrySourceBounds",
+            "TestLPRationalDualOuterPreparationIndependentRows",
+            "TestLPRationalDualOuterStageStatusExactZero",
+            "TestLPRationalDualOuterStageTwoPublication",
+            "TestLPRationalDualOuterFirstStructuralSourceBoundary",
+            "TestLPRationalDualOuterFixTypesAndBoxWidth",
+            "TestLPRationalDualOuterPhysicalOwnership",
+            "TestLPRationalDualOuterPreservesOlderComparison",
+            "TestLPRationalDualOuterPreparedInfeasible",
+            "TestLPRationalDualOuterMetadataPublication",
+            "TestLPRationalDualOuterStageReporterAndFlush",
+            "TestLPRationalDualOuterCostAliasesAndLifetime",
+            "TestLPRationalDualOuterCopyCompletedPrefix",
+            "TestLPRationalDualOuterLogicalStageTransitions",
+            "TestLPRationalDualOuterPresolveRejectsBeforeStages"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "RationalDualSimplex owns stage vectors and lexical row, bound, copied-RHS, column-cost and accumulator values. Actual model/matrix/column/core children retain their own numerical scopes. RHS push_back copies successfully before publishing a new BCopy owning slot, then zeros the source; failed copies remain lexical and earlier published slots survive. Raw numerical receipts close before partial/current/displaced cores, common model children, stage vectors and outer roots. Repeated successful core replacement retains displaced owners for cleanup. Older caller comparison receipts remain unchanged."
+      ],
       "deviations": [
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
-        "Native sorted external indices fix deterministic traversal for source unordered objective summation. Source stage-two status switch omits ITERATIONS_EXHAUSTED: debug asserts before iteration publication; native leaves outer status unchanged and publishes counts, including uint32 addition wrap. Default tableau profile still lacks a core LU and reports explicit constructor bounds error with partial owner cleanup; only explicit LU is credited as successful optimization."
+        "Native sorted external indices fix deterministic traversal for source unordered objective summation. Source stage-two status switch omits ITERATIONS_EXHAUSTED: debug asserts before iteration publication; native leaves outer status unchanged and publishes counts, including uint32 addition wrap. Default tableau profile still lacks a core LU and reports explicit constructor bounds error with partial owner cleanup; only explicit LU is credited as successful optimization.",
+        "The unconditional first-structural T(1e4) calls source rational(double), which is UNREACHABLE even for boxed columns. Checked mode stops after the first structural-map assertion and before column lookup; native follows the existing exact-LP default-zero convention, without claiming defined C++ behavior beyond builtin-unreachable. The retained outer dual constructor also omits RowsNZ/ColumnsNZ extents, so actual full-entry native pivoting returns ErrBounds at the reached sparsity write. Prepared Stage2 tests explicitly supply those metadata extents and bypass earlier unsupported structural preparation; their independent optima do not establish a working full exact entry. Checked real pivots stop at the separate source beta rational(double) assertion. No implicit metadata sizing, rational float conversion or unused fill_x_with_zeros adapter was invented. Stage2 source default status does not map iteration exhaustion; native preserves the prior outer status and publishes counters, while checked asserts before counters."
       ]
     },
     {
@@ -125821,12 +125911,31 @@
       "go_targets": [
         "pkg/util/lp/dual_solver_float.go",
         "pkg/util/lp/dual_solver_float_test.go",
-        "pkg/util/lp/mps_dual_float_test.go"
+        "pkg/util/lp/mps_dual_float_test.go",
+        "pkg/util/lp/dual_prepare_rational.go",
+        "pkg/util/lp/dual_solver_rational.go",
+        "pkg/util/lp/dual_objective_rational.go"
       ],
       "tests": [
         "TestLPFloatDualOuterIndependentVertices",
         "TestLPFloatDualOuterRelationsFreeAndStatuses",
-        "TestLPFloatMPSDualIndependentMinMax"
+        "TestLPFloatMPSDualIndependentMinMax",
+        "TestLPRationalDualOuterIndependentPreparedVertices",
+        "TestLPRationalDualOuterFullEntrySourceBounds",
+        "TestLPRationalDualOuterPreparationIndependentRows",
+        "TestLPRationalDualOuterStageStatusExactZero",
+        "TestLPRationalDualOuterStageTwoPublication",
+        "TestLPRationalDualOuterFirstStructuralSourceBoundary",
+        "TestLPRationalDualOuterFixTypesAndBoxWidth",
+        "TestLPRationalDualOuterPhysicalOwnership",
+        "TestLPRationalDualOuterPreservesOlderComparison",
+        "TestLPRationalDualOuterPreparedInfeasible",
+        "TestLPRationalDualOuterMetadataPublication",
+        "TestLPRationalDualOuterStageReporterAndFlush",
+        "TestLPRationalDualOuterCostAliasesAndLifetime",
+        "TestLPRationalDualOuterCopyCompletedPrefix",
+        "TestLPRationalDualOuterLogicalStageTransitions",
+        "TestLPRationalDualOuterPresolveRejectsBeforeStages"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -125845,11 +125954,37 @@
           "name": "mpq/mpq find_maximal_solution and get_current_cost instantiations",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "Concrete scalar outer dual preparation, slack/artificial columns, append-only RHS backup and descending restore, first/second stage orchestration, full entry, exact objective and owning destruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_solver_rational.go",
+          "tests": [
+            "TestLPRationalDualOuterIndependentPreparedVertices",
+            "TestLPRationalDualOuterFullEntrySourceBounds",
+            "TestLPRationalDualOuterPreparationIndependentRows",
+            "TestLPRationalDualOuterStageStatusExactZero",
+            "TestLPRationalDualOuterStageTwoPublication",
+            "TestLPRationalDualOuterFirstStructuralSourceBoundary",
+            "TestLPRationalDualOuterFixTypesAndBoxWidth",
+            "TestLPRationalDualOuterPhysicalOwnership",
+            "TestLPRationalDualOuterPreservesOlderComparison",
+            "TestLPRationalDualOuterPreparedInfeasible",
+            "TestLPRationalDualOuterMetadataPublication",
+            "TestLPRationalDualOuterStageReporterAndFlush",
+            "TestLPRationalDualOuterCostAliasesAndLifetime",
+            "TestLPRationalDualOuterCopyCompletedPrefix",
+            "TestLPRationalDualOuterLogicalStageTransitions",
+            "TestLPRationalDualOuterPresolveRejectsBeforeStages"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "RationalDualSimplex owns stage vectors and lexical row, bound, copied-RHS, column-cost and accumulator values. Actual model/matrix/column/core children retain their own numerical scopes. RHS push_back copies successfully before publishing a new BCopy owning slot, then zeros the source; failed copies remain lexical and earlier published slots survive. Raw numerical receipts close before partial/current/displaced cores, common model children, stage vectors and outer roots. Repeated successful core replacement retains displaced owners for cleanup. Older caller comparison receipts remain unchanged."
+      ],
       "deviations": [
-        "Floating instantiations execute actual two-stage LU solve and original-coordinate objective reconstruction; exact rational instantiations remain open. Source default tableau and documented floating source discrepancies are not credited as generally correct optimization."
+        "Floating instantiations execute actual two-stage LU solve and original-coordinate objective reconstruction; exact rational instantiations remain open. Source default tableau and documented floating source discrepancies are not credited as generally correct optimization.",
+        "The unconditional first-structural T(1e4) calls source rational(double), which is UNREACHABLE even for boxed columns. Checked mode stops after the first structural-map assertion and before column lookup; native follows the existing exact-LP default-zero convention, without claiming defined C++ behavior beyond builtin-unreachable. The retained outer dual constructor also omits RowsNZ/ColumnsNZ extents, so actual full-entry native pivoting returns ErrBounds at the reached sparsity write. Prepared Stage2 tests explicitly supply those metadata extents and bypass earlier unsupported structural preparation; their independent optima do not establish a working full exact entry. Checked real pivots stop at the separate source beta rational(double) assertion. No implicit metadata sizing, rational float conversion or unused fill_x_with_zeros adapter was invented. Stage2 source default status does not map iteration exhaustion; native preserves the prior outer status and publishes counters, while checked asserts before counters."
       ]
     },
     {
@@ -130091,7 +130226,8 @@
         "pkg/util/lp/solver_objective_exact_test.go",
         "pkg/util/lp/solver_expression_exact.go",
         "pkg/util/lp/solver_expression_exact_test.go",
-        "pkg/util/lp/primal_solver_rational.go"
+        "pkg/util/lp/primal_solver_rational.go",
+        "pkg/util/lp/dual_objective_rational.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -130153,7 +130289,10 @@
         "TestLPRationalExpressionPinConditionLifetime",
         "TestLPRationalPrimalOuterIndependentVertices",
         "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
-        "TestLPRationalPrimalOuterPhysicalOwnership"
+        "TestLPRationalPrimalOuterPhysicalOwnership",
+        "TestLPRationalDualOuterIndependentPreparedVertices",
+        "TestLPRationalDualOuterCostAliasesAndLifetime",
+        "TestLPRationalDualOuterPhysicalOwnership"
       ],
       "assertions": [
         {
@@ -130366,6 +130505,16 @@
             "TestLPRationalPrimalOuterIndependentVertices",
             "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
             "TestLPRationalPrimalOuterPhysicalOwnership"
+          ]
+        },
+        {
+          "name": "Concrete scalar dual objective consumer through actual external-column getter, copied-left product, lexical sum and copied unary-negative return",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_objective_rational.go",
+          "tests": [
+            "TestLPRationalDualOuterIndependentPreparedVertices",
+            "TestLPRationalDualOuterCostAliasesAndLifetime",
+            "TestLPRationalDualOuterPhysicalOwnership"
           ]
         }
       ],
