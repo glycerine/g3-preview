@@ -103009,7 +103009,10 @@
         "pkg/util/lp/solver_named_rational.go",
         "pkg/util/lp/driver_arguments.go",
         "pkg/util/lp/driver_option_catalogue.go",
-        "pkg/util/lp/driver_settings.go"
+        "pkg/util/lp/driver_settings.go",
+        "pkg/util/lp/driver_mps.go",
+        "pkg/util/lp/driver_mps_float.go",
+        "pkg/util/lp/driver_mps_rational.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103099,7 +103102,23 @@
         "TestLPDriverSetupActualMPSMinMax",
         "TestLPDriverSetupLimitsAndFailurePrefixes",
         "TestLPDriverSetupPhysicalOwnership",
-        "TestLPDriverSetupPreservesOlderComparison"
+        "TestLPDriverSetupPreservesOlderComparison",
+        "TestLPMPSDriverIndependentFileMinMax",
+        "TestLPMPSDriverPercentSourceDomains",
+        "TestLPMPSDriverClockFailurePrefixes",
+        "TestLPMPSDriverEntryAndSourceLimits",
+        "TestLPMPSDriverVariableReportThreshold",
+        "TestLPMPSDriverRationalCostLifetime",
+        "TestLPMPSDriverReportByteAndFlushFailures",
+        "TestLPMPSDriverPreparedComparisonDiagnostics",
+        "TestLPMPSDriverComparisonReportFailures",
+        "TestLPMPSDriverNamedAndComparisonGuards",
+        "TestLPMPSDriverObjectivePhysicalOwnership",
+        "TestLPMPSDriverFullRunPhysicalOwnership",
+        "TestLPMPSDriverPreservesOlderComparison",
+        "TestLPMPSDriverEmptyAndInfeasibleFiles",
+        "TestLPMPSDriverFileCloseFailure",
+        "TestLPMPSDriverLiveReportEvaluation"
       ],
       "conditionals": [
         {
@@ -103766,7 +103785,7 @@
           ]
         },
         {
-          "name": "solve_mps_double retained primal parsing/construction/optimization path with independent fixtures; dual/compare, CLI dispatch/printing/timing and exact/LAR scenarios remain open",
+          "name": "solve_mps_double retained primal parsing/construction/optimization fixtures; full concrete driver implementation and verification are recorded separately",
           "status": "partial",
           "go_target": "pkg/util/lp/mps_reader_float.go",
           "tests": [
@@ -103801,7 +103820,7 @@
           ]
         },
         {
-          "name": "Retained solve_mps_rational/solve_mps_in_rational parse/create/optimization and symbolic-value consumer paths with independent exact min/max models; full CLI dispatch, timing and printing remain open",
+          "name": "Retained exact MPS parse/create/optimization and symbolic-value fixtures; auxiliary solve_mps_in_rational defaults/no-setup/named-value wrapper remains open, while setup-based solve_mps_rational is recorded separately",
           "status": "partial",
           "go_target": "pkg/util/lp/mps_outer_rational_test.go",
           "tests": [
@@ -103833,11 +103852,35 @@
             "TestLPDriverSetupPhysicalOwnership",
             "TestLPDriverSetupPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "solve_mps overloads and solve_mps_double/solve_mps_rational full file read/create/setup/solve/status/objective/timing paths; actual optional floating primal comparison, print_x/compare_solutions and values_are_one_percent_close",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_mps.go",
+          "tests": [
+            "TestLPMPSDriverIndependentFileMinMax",
+            "TestLPMPSDriverPercentSourceDomains",
+            "TestLPMPSDriverClockFailurePrefixes",
+            "TestLPMPSDriverEntryAndSourceLimits",
+            "TestLPMPSDriverVariableReportThreshold",
+            "TestLPMPSDriverRationalCostLifetime",
+            "TestLPMPSDriverReportByteAndFlushFailures",
+            "TestLPMPSDriverPreparedComparisonDiagnostics",
+            "TestLPMPSDriverComparisonReportFailures",
+            "TestLPMPSDriverNamedAndComparisonGuards",
+            "TestLPMPSDriverObjectivePhysicalOwnership",
+            "TestLPMPSDriverFullRunPhysicalOwnership",
+            "TestLPMPSDriverPreservesOlderComparison",
+            "TestLPMPSDriverEmptyAndInfeasibleFiles",
+            "TestLPMPSDriverFileCloseFailure",
+            "TestLPMPSDriverLiveReportEvaluation"
+          ]
         }
       ],
       "ownership": [
         "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim.",
-        "Exact setup publishes limits before calling the actual owning FlipCosts child; driver settings publish only after its ordinary return. No parent numerical capture wraps child cost getter/copy/negation/setter operations. Interrupted source cost-flip prefixes and borrowed older comparison receipts survive common model cleanup."
+        "Exact setup publishes limits before calling the actual owning FlipCosts child; driver settings publish only after its ordinary return. No parent numerical capture wraps child cost getter/copy/negation/setter operations. Interrupted source cost-flip prefixes and borrowed older comparison receipts survive common model cleanup.",
+        "MPSFileDriver owns one actual reader and concrete primary/optional comparison solvers plus lexical exact objective work and its own numerical receipts. Parent captures only copied unary-negation/assignment and Float64 conversion, never owning solver getters. Raw driver receipts close before solvers, then readers, then driver objective roots; partial exact children can borrow reader or driver values. Successful Run closes at the source return boundary; failed Run retains owners until Close and cannot retry. Real older caller comparison receipts survive operations and cleanup unchanged. The objective survives output/endl flush but dies before running-watch time extraction."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -103852,7 +103895,8 @@
         "Native Go strings/bufio/strconv and insertion-ordered dictionaries replace STL streams/containers and libc numeric conversion. ASCII space/tab token/trim rules, fixed-field 8-byte row names/25-byte stride and column continuation preserve project parsing. Numeric tokens use Go ParseFloat on the first field; malformed libc atof prefix grammar is not emulated. Native writer errors and real file errors return reached publication prefixes; EOF retains source two-count line increment. Non-advancing ROWS header loop returns ErrMPSStalled, bare throw/undefined token domains become explicit errors. Source MI retains default lower flag, marker line still registers a column, LIMITMAX source shift assertion and zero/negative/IEEE range transformations are preserved. Dictionary insertion order defines deterministic replacement/source unordered traversal; partial constructed solvers are returned for cleanup. Native owner/file Close replaces source stream/container destruction. Dead string utility adapters and unused solver_row_count/range_count helpers are excluded; exact/dual/LAR creation and complete upstream CLI remain open.",
         "Literal upstream examples stop at the source add_constraint debug assertion; native ignores those calls. Native term model is tested including its deferred materialized column; the infeasibility sample remains feasible, and ignored triangle inequalities yield no implied endpoints. These source limitations are exposed explicitly. Alternate retained-bound installation is tested separately and is not substituted for the original driver.",
         "Concrete scalar mpq/mpq core value updates/restoration, descending RHS reconstruction, precise LU solve, reduced costs, deterministic bound/free snapping, precise indexed residual bypass and ascending objective dot product now implement the retained source methods. UpdateX keeps delta a live reference and precise updates never populate CopyXB. Reconstruction uses the real RationalLU and publishes descending basic assignments, without floating refinement. Reduced costs skip zero Y before row reads. Source rational binary expressions copy the left operand and copy the compound-result reference on return; core products and corrected outer objective products/sums preserve these owners and physical failure prefixes. Parent raw receipts close before LU, LU before borrowed work, and temporary owners before parent roots. Seven test groups cover 100 independent triangular systems with 81-180-bit costs and independent RHS, transpose solve, reduced-cost and objective oracles; 360 update/restore worlds across LU/tableau traversal and live aliases; all source column types and unknown default; output aliasing and descending aliased copies; 27 reached domain profiles; stopped/closed calls and actual older comparison identity. Twenty-two pooled/direct physical campaigns run through success, require actual refusal for every direct campaign and pass ownership census. The literal upstream solve_rational fixture reconstructs a supplied known basis and checks objective24 using independent primal/dual certificates: no optimization search or complete upstream-driver credit. The initial reduced-cost guard fixture marked all columns basic; making the next column nonbasic corrects its expected reached cost read. Inventory remains 88 partial/16 unported/6 reference_only; no whole-source promotion. Scalar core residual/diagnostic queries, pivot and feasibility-search orchestration, exact primal/dual outer optimization, full upstream drivers and whole-source audits remain open. Audit earlier common exact preparation/presolve binary-expression temporaries against rational.h copy-on-return semantics; the objective correction does not prove those paths complete. Latest full native checkpoint a8a7ef66 predates scalar core base/values and the current objective-expression correction; focused coverage measures current Go statements only.",
-        "Project parser/option/assignment order is preserved using Go strings and standard numeric parsers. Nonempty malformed, libc-style trailing numeric prefixes or signed-int32 overflow return explicit Go parse errors instead of porting libc atoi/atof grammar or claiming undefined C++ overflow behavior. Valid signed-int32 tokens preserve unsigned assignment then signed setting/enum narrowing; float settings retain six-significant-digit reports and IEEE values. Nil report writer suppresses driver reports; source CLI consumer uses stdout. External GLPK execution, full CLI dispatch, file-list/directory/SMT/reporting/timing branches remain open."
+        "Project parser/option/assignment order is preserved using Go strings and standard numeric parsers. Nonempty malformed, libc-style trailing numeric prefixes or signed-int32 overflow return explicit Go parse errors instead of porting libc atoi/atof grammar or claiming undefined C++ overflow behavior. Valid signed-int32 tokens preserve unsigned assignment then signed setting/enum narrowing; float settings retain six-significant-digit reports and IEEE values. Nil report writer suppresses driver reports; source CLI consumer uses stdout. External GLPK execution, full CLI dispatch, file-list/directory/SMT/reporting/timing branches remain open.",
+        "Native Go file/writer errors and injected host clock failures return reached prefixes with explicit Close for partial ownership; no C++ STL stream or raw-pointer leak adapter is added. Source headline spaces, floating signed zero, exact full-entry rational(double)/sparsity limits, FEASIBLE status on the scalar primal <= iteration boundary, 19/20-column threshold, seconds/1000 and span/iteration timing, and first-operand NaN behavior of the one-percent predicate remain literal. Prepared mismatch diagnostics use explicitly differing input models with actual independent solves; they do not claim ordinary matching inputs disagree. Global mutable STL formatting is not ported; existing native six-significant-digit formatting is used."
       ]
     },
     {
@@ -130073,7 +130117,8 @@
         "pkg/util/lp/solver_expression_exact.go",
         "pkg/util/lp/solver_expression_exact_test.go",
         "pkg/util/lp/solver_named_rational.go",
-        "pkg/util/lp/driver_settings.go"
+        "pkg/util/lp/driver_settings.go",
+        "pkg/util/lp/driver_mps_float.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -130158,7 +130203,23 @@
         "TestLPDriverSetupActualMPSMinMax",
         "TestLPDriverSetupLimitsAndFailurePrefixes",
         "TestLPDriverSetupPhysicalOwnership",
-        "TestLPDriverSetupPreservesOlderComparison"
+        "TestLPDriverSetupPreservesOlderComparison",
+        "TestLPMPSDriverIndependentFileMinMax",
+        "TestLPMPSDriverPercentSourceDomains",
+        "TestLPMPSDriverClockFailurePrefixes",
+        "TestLPMPSDriverEntryAndSourceLimits",
+        "TestLPMPSDriverVariableReportThreshold",
+        "TestLPMPSDriverRationalCostLifetime",
+        "TestLPMPSDriverReportByteAndFlushFailures",
+        "TestLPMPSDriverPreparedComparisonDiagnostics",
+        "TestLPMPSDriverComparisonReportFailures",
+        "TestLPMPSDriverNamedAndComparisonGuards",
+        "TestLPMPSDriverObjectivePhysicalOwnership",
+        "TestLPMPSDriverFullRunPhysicalOwnership",
+        "TestLPMPSDriverPreservesOlderComparison",
+        "TestLPMPSDriverEmptyAndInfeasibleFiles",
+        "TestLPMPSDriverFileCloseFailure",
+        "TestLPMPSDriverLiveReportEvaluation"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -130342,6 +130403,17 @@
             "TestLPDriverSetupPhysicalOwnership",
             "TestLPDriverSetupPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "get_column_value_by_name retained floating driver dispatch through actual concrete primal/dual/comparison getters, full uint32 name map and source exception text",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_mps_float.go",
+          "tests": [
+            "TestLPMPSDriverIndependentFileMinMax",
+            "TestLPMPSDriverPreparedComparisonDiagnostics",
+            "TestLPMPSDriverNamedAndComparisonGuards",
+            "TestLPMPSDriverReportByteAndFlushFailures"
+          ]
         }
       ],
       "ownership": [
@@ -130390,7 +130462,8 @@
         "pkg/util/lp/solver_expression_exact_test.go",
         "pkg/util/lp/primal_solver_rational.go",
         "pkg/util/lp/dual_objective_rational.go",
-        "pkg/util/lp/solver_named_rational.go"
+        "pkg/util/lp/solver_named_rational.go",
+        "pkg/util/lp/driver_mps_float.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -130465,7 +130538,23 @@
         "TestLPRationalMPSOuterNamedLookup",
         "TestLPRationalMPSOuterNamedPhysicalOwnership",
         "TestLPRationalMPSOuterPreservesOlderComparison",
-        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
+        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes",
+        "TestLPMPSDriverIndependentFileMinMax",
+        "TestLPMPSDriverPercentSourceDomains",
+        "TestLPMPSDriverClockFailurePrefixes",
+        "TestLPMPSDriverEntryAndSourceLimits",
+        "TestLPMPSDriverVariableReportThreshold",
+        "TestLPMPSDriverRationalCostLifetime",
+        "TestLPMPSDriverReportByteAndFlushFailures",
+        "TestLPMPSDriverPreparedComparisonDiagnostics",
+        "TestLPMPSDriverComparisonReportFailures",
+        "TestLPMPSDriverNamedAndComparisonGuards",
+        "TestLPMPSDriverObjectivePhysicalOwnership",
+        "TestLPMPSDriverFullRunPhysicalOwnership",
+        "TestLPMPSDriverPreservesOlderComparison",
+        "TestLPMPSDriverEmptyAndInfeasibleFiles",
+        "TestLPMPSDriverFileCloseFailure",
+        "TestLPMPSDriverLiveReportEvaluation"
       ],
       "assertions": [
         {
@@ -130701,6 +130790,17 @@
             "TestLPRationalMPSOuterNamedPhysicalOwnership",
             "TestLPRationalMPSOuterPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "get_column_value_by_name retained floating driver dispatch through actual concrete primal/dual/comparison getters, full uint32 name map and source exception text",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_mps_float.go",
+          "tests": [
+            "TestLPMPSDriverIndependentFileMinMax",
+            "TestLPMPSDriverPreparedComparisonDiagnostics",
+            "TestLPMPSDriverNamedAndComparisonGuards",
+            "TestLPMPSDriverReportByteAndFlushFailures"
+          ]
         }
       ],
       "ownership": [
@@ -130737,7 +130837,8 @@
         "pkg/util/lp/solver_presolve_float_test.go",
         "pkg/util/lp/dual_prepare_float.go",
         "pkg/util/lp/dual_prepare_float_test.go",
-        "pkg/util/lp/solver_named_rational.go"
+        "pkg/util/lp/solver_named_rational.go",
+        "pkg/util/lp/driver_mps_float.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -130762,7 +130863,23 @@
         "TestLPRationalMPSOuterNamedLookup",
         "TestLPRationalMPSOuterNamedPhysicalOwnership",
         "TestLPRationalMPSOuterPreservesOlderComparison",
-        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
+        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes",
+        "TestLPMPSDriverIndependentFileMinMax",
+        "TestLPMPSDriverPercentSourceDomains",
+        "TestLPMPSDriverClockFailurePrefixes",
+        "TestLPMPSDriverEntryAndSourceLimits",
+        "TestLPMPSDriverVariableReportThreshold",
+        "TestLPMPSDriverRationalCostLifetime",
+        "TestLPMPSDriverReportByteAndFlushFailures",
+        "TestLPMPSDriverPreparedComparisonDiagnostics",
+        "TestLPMPSDriverComparisonReportFailures",
+        "TestLPMPSDriverNamedAndComparisonGuards",
+        "TestLPMPSDriverObjectivePhysicalOwnership",
+        "TestLPMPSDriverFullRunPhysicalOwnership",
+        "TestLPMPSDriverPreservesOlderComparison",
+        "TestLPMPSDriverEmptyAndInfeasibleFiles",
+        "TestLPMPSDriverFileCloseFailure",
+        "TestLPMPSDriverLiveReportEvaluation"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -130820,6 +130937,17 @@
             "TestLPRationalMPSOuterNamedLookup",
             "TestLPRationalMPSOuterNamedPhysicalOwnership",
             "TestLPRationalMPSOuterPreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "get_column_value_by_name retained floating driver dispatch through actual concrete primal/dual/comparison getters, full uint32 name map and source exception text",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_mps_float.go",
+          "tests": [
+            "TestLPMPSDriverIndependentFileMinMax",
+            "TestLPMPSDriverPreparedComparisonDiagnostics",
+            "TestLPMPSDriverNamedAndComparisonGuards",
+            "TestLPMPSDriverReportByteAndFlushFailures"
           ]
         }
       ],
@@ -132244,7 +132372,10 @@
         "pkg/util/lp/mps_reader_exact_test.go",
         "pkg/util/lp/mps_populate_exact.go",
         "pkg/util/lp/mps_populate_exact_test.go",
-        "pkg/util/lp/solver_named_rational.go"
+        "pkg/util/lp/solver_named_rational.go",
+        "pkg/util/lp/driver_mps.go",
+        "pkg/util/lp/driver_mps_float.go",
+        "pkg/util/lp/driver_mps_rational.go"
       ],
       "tests": [
         "TestLPFloatMPSIndependentOptima",
@@ -132287,7 +132418,23 @@
         "TestLPRationalMPSOuterNamedLookup",
         "TestLPRationalMPSOuterNamedPhysicalOwnership",
         "TestLPRationalMPSOuterPreservesOlderComparison",
-        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
+        "TestLPRationalMPSOuterFactoryDiagnosticPrefixes",
+        "TestLPMPSDriverIndependentFileMinMax",
+        "TestLPMPSDriverPercentSourceDomains",
+        "TestLPMPSDriverClockFailurePrefixes",
+        "TestLPMPSDriverEntryAndSourceLimits",
+        "TestLPMPSDriverVariableReportThreshold",
+        "TestLPMPSDriverRationalCostLifetime",
+        "TestLPMPSDriverReportByteAndFlushFailures",
+        "TestLPMPSDriverPreparedComparisonDiagnostics",
+        "TestLPMPSDriverComparisonReportFailures",
+        "TestLPMPSDriverNamedAndComparisonGuards",
+        "TestLPMPSDriverObjectivePhysicalOwnership",
+        "TestLPMPSDriverFullRunPhysicalOwnership",
+        "TestLPMPSDriverPreservesOlderComparison",
+        "TestLPMPSDriverEmptyAndInfeasibleFiles",
+        "TestLPMPSDriverFileCloseFailure",
+        "TestLPMPSDriverLiveReportEvaluation"
       ],
       "assertions": [
         {
@@ -132390,7 +132537,7 @@
           ]
         },
         {
-          "name": "Complete upstream CLI dispatch/SMT/reporting/timing driver scenarios",
+          "name": "Remaining top-level test CLI dispatch, file-list/directory/SMT and auxiliary exact-no-setup driver scenarios",
           "status": "unported",
           "tests": []
         },
@@ -132421,6 +132568,29 @@
             "TestLPRationalMPSOuterNamedPhysicalOwnership",
             "TestLPRationalMPSOuterPreservesOlderComparison",
             "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
+          ]
+        },
+        {
+          "name": "Actual retained MPS file-driver parsing, concrete primal/dual factory and independent comparison reconstruction consumers",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_mps.go",
+          "tests": [
+            "TestLPMPSDriverIndependentFileMinMax",
+            "TestLPMPSDriverPercentSourceDomains",
+            "TestLPMPSDriverClockFailurePrefixes",
+            "TestLPMPSDriverEntryAndSourceLimits",
+            "TestLPMPSDriverVariableReportThreshold",
+            "TestLPMPSDriverRationalCostLifetime",
+            "TestLPMPSDriverReportByteAndFlushFailures",
+            "TestLPMPSDriverPreparedComparisonDiagnostics",
+            "TestLPMPSDriverComparisonReportFailures",
+            "TestLPMPSDriverNamedAndComparisonGuards",
+            "TestLPMPSDriverObjectivePhysicalOwnership",
+            "TestLPMPSDriverFullRunPhysicalOwnership",
+            "TestLPMPSDriverPreservesOlderComparison",
+            "TestLPMPSDriverEmptyAndInfeasibleFiles",
+            "TestLPMPSDriverFileCloseFailure",
+            "TestLPMPSDriverLiveReportEvaluation"
           ]
         }
       ],
