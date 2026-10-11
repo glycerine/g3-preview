@@ -1220,6 +1220,7 @@
         "dual_core_float.go",
         "dual_core_rational.go",
         "dual_flip_float.go",
+        "dual_flip_rational.go",
         "dual_initial_float.go",
         "dual_prepare_float.go",
         "dual_price_rational.go",

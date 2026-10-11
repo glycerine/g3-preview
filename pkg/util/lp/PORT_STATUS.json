@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 86.8,
-  "coverage_warning": "Latest completed native checkpoint28ac20ab measures25732/29633 LP statements (86.8%) and includes scalar full primal Solve/statistics and scalar dual initialization. It excludes later dual pricing3cc640ff, Harris candidate selection383d50c2 and current full ratio work; their focused evidence is separate. Go statement coverage measures implemented Go code, not C++ source completion. Remaining retained source and upstream drivers remain open.",
+  "coverage_warning": "Latest completed native checkpoint28ac20ab measures25732/29633 LP statements (86.8%) and includes scalar full primal Solve/statistics and scalar dual initialization. It excludes later dual pricing3cc640ff, Harris candidate selection383d50c2 and current full ratio work; their focused evidence is separate. Go statement coverage measures implemented Go code, not C++ source completion. Remaining retained source and upstream drivers remain open. Current scalar dual flip/value/beta update work is also newer than the completed full-native checkpoint; its focused coverage is separate.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Scalar dual basis advancement, value/reduced-cost/beta updates, pricing loop and full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers."
+    "Scalar dual beta recurrence/reinitialization, basis advancement/recovery, pricing loop and full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers."
   ],
   "units": [
     {
@@ -1951,7 +1951,8 @@
         "pkg/util/lp/dual_core_rational.go",
         "pkg/util/lp/dual_price_rational.go",
         "pkg/util/lp/dual_breakpoint_rational.go",
-        "pkg/util/lp/dual_ratio_rational.go"
+        "pkg/util/lp/dual_ratio_rational.go",
+        "pkg/util/lp/dual_flip_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -2018,7 +2019,15 @@
         "TestLPRationalDualRatioBoundSpanAliases",
         "TestLPRationalDualRatioSetOrderAndShortCircuit",
         "TestLPRationalDualRatioMetadataAndStoppedPrefixes",
-        "TestLPRationalDualRatioPreservesOlderComparison"
+        "TestLPRationalDualRatioPreservesOlderComparison",
+        "TestLPRationalDualFlipIndependentSystems",
+        "TestLPRationalDualFlipPhysicalOwnership",
+        "TestLPRationalDualFlipSignedAliases",
+        "TestLPRationalDualFlipColumnLiveDeltaAndOrder",
+        "TestLPRationalDualFlipEmptyAndNoFlips",
+        "TestLPRationalDualFlipPreservesOlderComparison",
+        "TestLPRationalDualFlipMetadataAndPrefixes",
+        "TestLPRationalDualFlipSourcePublicationOrder"
       ]
     },
     {
@@ -2035,7 +2044,8 @@
         "pkg/util/lp/dual_core_rational.go",
         "pkg/util/lp/dual_price_rational.go",
         "pkg/util/lp/dual_breakpoint_rational.go",
-        "pkg/util/lp/dual_ratio_rational.go"
+        "pkg/util/lp/dual_ratio_rational.go",
+        "pkg/util/lp/dual_flip_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -2102,7 +2112,15 @@
         "TestLPRationalDualRatioBoundSpanAliases",
         "TestLPRationalDualRatioSetOrderAndShortCircuit",
         "TestLPRationalDualRatioMetadataAndStoppedPrefixes",
-        "TestLPRationalDualRatioPreservesOlderComparison"
+        "TestLPRationalDualRatioPreservesOlderComparison",
+        "TestLPRationalDualFlipIndependentSystems",
+        "TestLPRationalDualFlipPhysicalOwnership",
+        "TestLPRationalDualFlipSignedAliases",
+        "TestLPRationalDualFlipColumnLiveDeltaAndOrder",
+        "TestLPRationalDualFlipEmptyAndNoFlips",
+        "TestLPRationalDualFlipPreservesOlderComparison",
+        "TestLPRationalDualFlipMetadataAndPrefixes",
+        "TestLPRationalDualFlipSourcePublicationOrder"
       ]
     },
     {
@@ -5004,7 +5022,10 @@
         "TestLPExactStaticFillLiteralWorkspaceAndPublication",
         "TestLPExactStaticFillAllocationFailureCensus",
         "TestLPExactStaticFillBoundsAndLiteralStops",
-        "TestLPExactStaticFillAndTermLeaveOlderComparisonOwned"
+        "TestLPExactStaticFillAndTermLeaveOlderComparisonOwned",
+        "TestLPRationalDualFlipColumnLiveDeltaAndOrder",
+        "TestLPRationalDualFlipPhysicalOwnership",
+        "TestLPRationalDualFlipSourcePublicationOrder"
       ]
     },
     {
@@ -7995,5 +8016,52 @@
       "dependency_graph": "64 packages, no unresolved imports",
       "diff_check": "passed"
     }
+  },
+  "latest_rational_dual_flip_increment": {
+    "scope": "Concrete scalar bound-flip displacement, reduced-cost/basic-value update, flip application and exact leaving beta",
+    "source_units_promoted": false,
+    "test_groups": 8,
+    "independent_exact_systems": 180,
+    "physical_campaigns": 14,
+    "older_comparison_campaigns": 7,
+    "signed_span_output_aliases": 8,
+    "live_scalar_column_orders": 2,
+    "metadata_stopped_profiles": 16,
+    "source_publication_profiles": 3,
+    "focused_native_seconds": 5.661,
+    "focused_debug_checked_seconds": 8.967,
+    "related_native_seconds": 40.735,
+    "related_debug_checked_seconds": 66.663,
+    "statement_coverage": {
+      "native": {
+        "dual_flip_rational.go": {
+          "covered": 157,
+          "total": 183,
+          "percent": 85.8
+        }
+      },
+      "debug_checked": {
+        "dual_flip_rational.go": {
+          "covered": 165,
+          "total": 183,
+          "percent": 90.2
+        }
+      }
+    },
+    "verification": {
+      "focused_native": "passed",
+      "focused_debug_checked": "passed",
+      "related_native": "passed before final apply-copy fixture strengthening; final focus includes it",
+      "related_debug_checked": "passed before final apply-copy fixture strengthening; final focus includes it",
+      "lp_vet_native": "passed",
+      "lp_vet_debug_checked": "passed",
+      "module_compile_native": "passed",
+      "module_compile_debug_checked": "passed",
+      "source_portcheck": "passed",
+      "dependency_graph": "64 packages; no unresolved imports",
+      "diff_check": "passed"
+    },
+    "remaining": "Scalar dual beta recurrence/reinitialization, basis advancement/recovery, pricing loop and full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers.",
+    "coverage_note": "Go statement coverage is not whole C++ completion. Uncovered checked blocks chiefly guard stable capture/destruction and source extents already checked by children. Native erases debug bound assertions. Actual LU displacement, reduced-cost arithmetic, matrix stored order, source set order and failed update prefixes have independent evidence."
   }
 }
