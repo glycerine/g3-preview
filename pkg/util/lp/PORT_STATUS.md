@@ -12,6 +12,8 @@ Exact outer preparation, remaining dual/LAR variants, source diagnostics and
 complete upstream drivers remain incomplete. Go coverage does not measure
 unported C++ code.
 
+Full native module checkpoint started2026-10-11 at09:41:38UTC at08dc15a1 with -timeout=60m; session81239. Log/profile: `/mnt/oldrog/tmp/g3-lar-tableau-module-native.{log,cover}`; durable runner status: `/mnt/oldrog/tmp/g3-lar-tableau-module-native.json`. Includes signature-guided exact LU solving, exact tableau catch-up, signature preparation and signature-guided tableau solving. The specific live session was polled after launch; completion has not yet been observed and no new whole-suite coverage is credited. The08:42UTC run remains the latest completed full native checkpoint.
+
 Full native module checkpoint at555046ae completed2026-10-11 at09:02:15UTC with exit0 and all64packages passing. LP1150.668s,87.5% statement coverage (18720/21386). Log/profile: `/mnt/oldrog/tmp/g3-lar-catchup-module-native.{log,cover}`; durable runner status: `/mnt/oldrog/tmp/g3-lar-catchup-module-native.json`. Includes exact Solve, LAR explanations, exact feasibility, signatures, strict/double bounds, floating signature search and LU catch-up. Predates3afe877d signature-guided exact solving and subsequent tableau work; its focused/regression evidence remains separate. Coverage measures existing Go statements, not C++ port completion.
 
 Previous full native module checkpoint was observed complete at08:04UTC on
