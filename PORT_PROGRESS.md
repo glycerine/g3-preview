@@ -38374,3 +38374,64 @@ filename and no new import edge. LP83 partial/27 unported; no whole-unit promoti
 Whole exact optimization, model scopes, full propagation scheduling, remaining
 infeasibility/explanation/SMT integration and original drivers remain incomplete.
 The23:33 UTC full-native checkpoint predates this work; no hourly repeat is due.
+
+
+### Port LAR core scope lifecycle — 2026-10-11
+
+Ported lar_core_solver.h push/pop, concrete unsigned push_vector, pop_basis and
+pop_markowitz_counts. Source debug assertions precede Push publication. Strategy
+and types snapshot first; non-tableau rational dimensions precede lower/upper
+bound scopes, rational basis/count snapshots, floating dimensions and the final
+floating basis snapshot. Pop restores rational dimensions, lower/upper bounds
+and types, retires exact factorization, resizes exact X/cost/D, restores counts,
+pops floating dimensions, retires floating factorization, resizes floating X,
+restores/copies bases, then restores strategy and validates source headings.
+No outer numeric capture adopts a matrix or bound child's stopped calls.
+
+Only the actual source core fields are scoped. Matrices restore dimensions, not
+surviving coefficients. X/cost/D surviving values remain current; RHS and floating
+low/upper/cost vectors remain unscoped. Tableau skips rational/basis/count scopes
+and copies current exact basis/nonbasis/headings into floating fields, including
+the real tableau model with an empty floating matrix. Outer status/witness,
+terms/constraints/directories and tableau-column deletion remain the model's
+responsibility. Branches use current strategy before restoring the saved value.
+Explicit unmatched-mode tests preserve leftover rational scopes or the reached
+missing-count-scope guard; they do not implement strategy migration. Native
+push_vector preserves an oversized cached tail; debug asserts before copying.
+
+1600 independent nested operations compare full numeric/type/basis/count snapshots
+and matrix dimensions, with multi-level Pop and growth of basic/nonbasic columns.
+Nonbasis reconstruction is checked independently in descending column order.
+Restored native basis/count values do not alias typed snapshot storage. Real
+exact/floating factorization owners become closed and slots nil on successful
+Pop. Surviving exact/floating values, coefficients and RHS, retained floating
+bound/cost extents, actual tableau bindings and strategy-dependent profiles are
+verified. Source invalid-depth and stopped primal/matrix, malformed links and
+cached snapshot/debug guards preserve their exact publication prefixes.
+
+Four pooled/direct lower/upper restoration campaigns enumerate actual numeric
+copy refusal through success and check rational matrix rollback before bounds,
+lower-before-upper completion, types/factorizations/floating state not yet popped,
+stopped entry points and named numeric-root cleanup. Equal-size destinations
+initially reused payloads; changing the destination to zero forces actual journal
+restoration allocation. Refusal need not leave an active numeric allocation root
+when reserve fails before publication, so tests assert real errors/prefixes rather
+than fabricate pending flags. Four actual failed lower/upper journal-copy fixtures
+also verify partial Push snapshots before the bound child's pending guard, with
+unchanged child invocation generations. No synthetic allocator failure is used.
+
+Final focused native suite passes1.419s and combined g3debug/g3checked1.375s.
+Core scope coverage83/123 (67.5%) native,107/123 (87.0%) debug/checked. Twenty-four
+assertion-related statements account for the profile difference; remaining16
+statements are child/cleanup and invariant-protected metadata error returns.
+Logs/profiles: /mnt/oldrog/tmp/g3-lar-core-scopes-{native,debug}.{log,cover}.
+Both LP vets pass. Module-wide compilation and source verification are finalized
+below. Graph adds one production filename and no import edges. LP83 partial/
+27 unported; no whole source-unit promotion. Outer whole-model pop still requires
+tableau removal and feasibility cleanup; full exact optimization, propagation,
+remaining explanations/SMT integration and original drivers remain open.
+The23:33 UTC full-native checkpoint predates this work; no hourly repeat yet.
+
+Actual enlarged exact/floating factorizations constructed inside a scope also
+close successfully after the earlier dimensional rollback. Final native module-
+wide test compilation and source/evidence verification pass.

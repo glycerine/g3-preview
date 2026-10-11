@@ -1207,6 +1207,7 @@
         "lar_bounds.go",
         "lar_constraints.go",
         "lar_core.go",
+        "lar_core_scopes.go",
         "lar_explanation.go",
         "lar_model.go",
         "lar_model_bounds.go",
