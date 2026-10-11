@@ -125221,7 +125221,13 @@
         "pkg/util/lp/lar_infeasibility.go",
         "pkg/util/lp/lar_infeasibility_test.go",
         "pkg/util/lp/primal_feasible_exact.go",
-        "pkg/util/lp/primal_feasible_exact_test.go"
+        "pkg/util/lp/primal_feasible_exact_test.go",
+        "pkg/util/lp/primal_core_rational.go",
+        "pkg/util/lp/primal_infeas_cost_rational.go",
+        "pkg/util/lp/primal_cost_switch_rational.go",
+        "pkg/util/lp/primal_core_rational_test.go",
+        "pkg/util/lp/primal_infeas_cost_rational_test.go",
+        "pkg/util/lp/primal_cost_switch_rational_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -125387,7 +125393,20 @@
         "TestLPExactNonbasicIndependentBoundOracle",
         "TestLPExactFindFeasibleEntryPrefixes",
         "TestLPExactNonbasicEmptyAndStoppedValidation",
-        "TestLPExactFindFeasiblePhysicalOwnership"
+        "TestLPExactFindFeasiblePhysicalOwnership",
+        "TestLPRationalPrimalConstructionAndMembershipOracle",
+        "TestLPRationalPrimalConstructionAndBoundsPhysicalOwnership",
+        "TestLPRationalPrimalConstructionAndReachedGuards",
+        "TestLPRationalPrimalInfeasCostUnknownAndMembershipPrefixes",
+        "TestLPRationalPrimalInfeasCostPhysicalOwnership",
+        "TestLPRationalPrimalInfeasCostLeavesOlderComparisonOwned",
+        "TestLPRationalPrimalInfeasCostMetadataBoundaries",
+        "TestLPRationalPrimalInfeasCostIndependentStateOracle",
+        "TestLPRationalPrimalCostSwitchIndependentModels",
+        "TestLPRationalPrimalCostBackupDenseReplacement",
+        "TestLPRationalPrimalCostSwitchPhysicalOwnership",
+        "TestLPRationalPrimalCostSwitchSourcePrefixes",
+        "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -125919,6 +125938,30 @@
             "TestLPExactNonbasicEmptyAndStoppedValidation",
             "TestLPExactFindFeasiblePhysicalOwnership"
           ]
+        },
+        {
+          "name": "Concrete scalar mpq/mpq stage-one constructor, InitInfSet and lower-first out-of-bounds sign, infeasibility-cost construction/update, dense precise backup/restoration and InitReducedCosts actual LU dispatch; source h403-408,783-821,901-934 and hpp630-639,1103-1118,1170-1225,1292-1304",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_core_rational.go",
+            "pkg/util/lp/primal_infeas_cost_rational.go",
+            "pkg/util/lp/primal_cost_switch_rational.go"
+          ],
+          "tests": [
+            "TestLPRationalPrimalConstructionAndMembershipOracle",
+            "TestLPRationalPrimalConstructionAndBoundsPhysicalOwnership",
+            "TestLPRationalPrimalConstructionAndReachedGuards",
+            "TestLPRationalPrimalInfeasCostUnknownAndMembershipPrefixes",
+            "TestLPRationalPrimalInfeasCostPhysicalOwnership",
+            "TestLPRationalPrimalInfeasCostLeavesOlderComparisonOwned",
+            "TestLPRationalPrimalInfeasCostMetadataBoundaries",
+            "TestLPRationalPrimalInfeasCostIndependentStateOracle",
+            "TestLPRationalPrimalCostSwitchIndependentModels",
+            "TestLPRationalPrimalCostBackupDenseReplacement",
+            "TestLPRationalPrimalCostSwitchPhysicalOwnership",
+            "TestLPRationalPrimalCostSwitchSourcePrefixes",
+            "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
@@ -125949,7 +125992,8 @@
         "Row pricing uses typed pointer choices over stable stored row cells and native slices. Equal-damage candidates with a shorter column are appended without dropping earlier longer candidates, preserving source RNG and selection. Bland mode copies each new minimum coefficient immediately and rereads later cells through output aliases. 480 independent selection/damage/RNG models,300 rational/epsilon monoid models,200 infeasible grow models, live alias, reached metadata and pooled/direct physical failures with older caller comparisons. Uncalled sign-row eligibility and inf_sign_of_column helpers are not ported. Row iteration and full exact Solve remain open; whole source unit stays partial.",
         "Exact row iteration preserves source repetition count increment before strict threshold comparison, unsigned wrap, and lack of outer loop counter increments. It refreshes entering infeasibility only after ChangeBasis; source can pivot into an infeasible entering bound and discover infeasibility on the next iteration. 320 independent rational/epsilon feasible pivots and120 independently infeasible two-step models, threshold profiles, reached prefixes, pooled/direct physical arithmetic failures and older caller comparison cleanup. Whole exact Solve and source unit remain partial.",
         "Concrete retained LAR infeasibility explanation consumer now ports inf_sign_of_column, which was not needed by row pricing alone. The existing typed sparse coefficient vector preserves source pair-copy lifetimes, zeros and order; a stopped negation/append remains owned until Core.Close. Full LAR Solve and signature/presolve integration remain open; no whole source-unit promotion.",
-        "Exact feasibility entry delegates actual LU/tableau Solve and validates nonbasic feasibility only under source debug; native early feasible return may ignore infeasible nonbasic values, as in source. Numerical errors keep the actual delegated owner receipts and stop the wrapper. Exact outer preparation and full LAR signature/Solve remain open; no whole source-unit promotion."
+        "Exact feasibility entry delegates actual LU/tableau Solve and validates nonbasic feasibility only under source debug; native early feasible return may ignore infeasible nonbasic values, as in source. Numerical errors keep the actual delegated owner receipts and stop the wrapper. Exact outer preparation and full LAR signature/Solve remain open; no whole source-unit promotion.",
+        "Concrete scalar mpq/mpq stage-one primal construction now uses the actual RationalCoreSolverBase, RationalPriorityQueue, rational Beta, exact copied quotient epsilon1/10000000, empty dense cost backup, threshold1000 and UNKNOWN status. Precise Harris epsilon remains zero even for NaN floating tolerance. InitInfSet clears then visits basic columns in ascending order; out-of-bounds delta sign checks lower before upper. Cost initialization preserves descending all-column traversal, actual Ed.Index order including stored zeros, upper-first contradictory-bound priority, zero nonbasic costs, membership publication before optional copied unary negation, native unknown-type old-cost retention and checked assertions. Changed-basis and after-update variants preserve source flag/erase order. Precise backup copies every dense cost, destroys old values before publishing/copying replacement storage and performs no floating normalization. InitReducedCosts switches feasibility costs or restores the dense backup, preserves the feasibility-only early return and invokes the actual rational LU transpose solve and reduced-cost reconstruction. Parent raw receipts close before delegated base work and primal values remain alive through its cleanup. Thirteen test groups cover640 independently calculated cost/membership transition worlds,240 independent rational matrix/cost-switch systems and160 constructor/bound/membership worlds, including signed1e-100 violations, all column types and contradictory bounds. Twenty-two pooled/direct physical campaigns in native and20 in checked profiles run through success, exercising real LU construction, bound comparisons, cost negation, dense replacement, restoration and delegated reduced-cost arithmetic. Direct campaigns require actual physical refusal and all ownership censuses pass. Six actual older1000-digit caller comparison campaigns survive child calls and cleanup without adoption. Reached missing-input/base-assertion/extent/ascending-prefix/nonbasic bypass/late-settings profiles and stopped/closed calls are tested. Native focused checks pass14.047s; debug/checked15.338s. Statement coverage native/debug: primal core86/101 (85.1%)/84/101 (83.2%); cost switching40/44 (90.9%)/41/44 (93.2%); infeasibility costs115/123 (93.5%)/114/123 (92.7%). Remaining blocks chiefly guard stable numeral capture/destruction, valid metadata and unreachable constructor epsilon-allocation failure with these small constants; checked excludes native unknown-type branches. No whole-source or complete upstream-driver promotion; inventory remains88 partial/16 unported/6 reference_only. Related scalar rational core/LU and existing pair cost/infeasibility regressions pass74.482s native/117.646s debug/checked. Both LP vets, both full-module compilation gates, source portcheck (2103 units,677 APIs), dependency graph refresh (64 packages) and diff checks pass."
       ]
     },
     {
@@ -125998,7 +126042,13 @@
         "pkg/util/lp/primal_solve_exact.go",
         "pkg/util/lp/primal_solve_exact_test.go",
         "pkg/util/lp/primal_feasible_exact.go",
-        "pkg/util/lp/primal_feasible_exact_test.go"
+        "pkg/util/lp/primal_feasible_exact_test.go",
+        "pkg/util/lp/primal_core_rational.go",
+        "pkg/util/lp/primal_infeas_cost_rational.go",
+        "pkg/util/lp/primal_cost_switch_rational.go",
+        "pkg/util/lp/primal_core_rational_test.go",
+        "pkg/util/lp/primal_infeas_cost_rational_test.go",
+        "pkg/util/lp/primal_cost_switch_rational_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -126144,7 +126194,20 @@
         "TestLPExactNonbasicIndependentBoundOracle",
         "TestLPExactFindFeasibleEntryPrefixes",
         "TestLPExactNonbasicEmptyAndStoppedValidation",
-        "TestLPExactFindFeasiblePhysicalOwnership"
+        "TestLPExactFindFeasiblePhysicalOwnership",
+        "TestLPRationalPrimalConstructionAndMembershipOracle",
+        "TestLPRationalPrimalConstructionAndBoundsPhysicalOwnership",
+        "TestLPRationalPrimalConstructionAndReachedGuards",
+        "TestLPRationalPrimalInfeasCostUnknownAndMembershipPrefixes",
+        "TestLPRationalPrimalInfeasCostPhysicalOwnership",
+        "TestLPRationalPrimalInfeasCostLeavesOlderComparisonOwned",
+        "TestLPRationalPrimalInfeasCostMetadataBoundaries",
+        "TestLPRationalPrimalInfeasCostIndependentStateOracle",
+        "TestLPRationalPrimalCostSwitchIndependentModels",
+        "TestLPRationalPrimalCostBackupDenseReplacement",
+        "TestLPRationalPrimalCostSwitchPhysicalOwnership",
+        "TestLPRationalPrimalCostSwitchSourcePrefixes",
+        "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -126752,6 +126815,30 @@
             "TestLPExactNonbasicEmptyAndStoppedValidation",
             "TestLPExactFindFeasiblePhysicalOwnership"
           ]
+        },
+        {
+          "name": "Concrete scalar mpq/mpq stage-one constructor, InitInfSet and lower-first out-of-bounds sign, infeasibility-cost construction/update, dense precise backup/restoration and InitReducedCosts actual LU dispatch; source h403-408,783-821,901-934 and hpp630-639,1103-1118,1170-1225,1292-1304",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_core_rational.go",
+            "pkg/util/lp/primal_infeas_cost_rational.go",
+            "pkg/util/lp/primal_cost_switch_rational.go"
+          ],
+          "tests": [
+            "TestLPRationalPrimalConstructionAndMembershipOracle",
+            "TestLPRationalPrimalConstructionAndBoundsPhysicalOwnership",
+            "TestLPRationalPrimalConstructionAndReachedGuards",
+            "TestLPRationalPrimalInfeasCostUnknownAndMembershipPrefixes",
+            "TestLPRationalPrimalInfeasCostPhysicalOwnership",
+            "TestLPRationalPrimalInfeasCostLeavesOlderComparisonOwned",
+            "TestLPRationalPrimalInfeasCostMetadataBoundaries",
+            "TestLPRationalPrimalInfeasCostIndependentStateOracle",
+            "TestLPRationalPrimalCostSwitchIndependentModels",
+            "TestLPRationalPrimalCostBackupDenseReplacement",
+            "TestLPRationalPrimalCostSwitchPhysicalOwnership",
+            "TestLPRationalPrimalCostSwitchSourcePrefixes",
+            "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
@@ -126777,7 +126864,8 @@
         "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
         "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
         "Exact Solve tests cover independent bounded optima, feasibility search, infeasible bounds and unbounded rays, source cancellation/reporting and initialization prefixes, native stale-cost correction versus debug refusal, and pooled/direct physical ownership. Source UNSTABLE is rejected in debug; tableau tentative fallback reaches the existing debug LU-cost assertion. Precise outer preparation and remaining LP variants remain open; no whole source-unit promotion.",
-        "Exact feasibility entry delegates actual LU/tableau Solve and validates nonbasic feasibility only under source debug; native early feasible return may ignore infeasible nonbasic values, as in source. Numerical errors keep the actual delegated owner receipts and stop the wrapper. Exact outer preparation and full LAR signature/Solve remain open; no whole source-unit promotion."
+        "Exact feasibility entry delegates actual LU/tableau Solve and validates nonbasic feasibility only under source debug; native early feasible return may ignore infeasible nonbasic values, as in source. Numerical errors keep the actual delegated owner receipts and stop the wrapper. Exact outer preparation and full LAR signature/Solve remain open; no whole source-unit promotion.",
+        "Concrete scalar mpq/mpq stage-one primal construction now uses the actual RationalCoreSolverBase, RationalPriorityQueue, rational Beta, exact copied quotient epsilon1/10000000, empty dense cost backup, threshold1000 and UNKNOWN status. Precise Harris epsilon remains zero even for NaN floating tolerance. InitInfSet clears then visits basic columns in ascending order; out-of-bounds delta sign checks lower before upper. Cost initialization preserves descending all-column traversal, actual Ed.Index order including stored zeros, upper-first contradictory-bound priority, zero nonbasic costs, membership publication before optional copied unary negation, native unknown-type old-cost retention and checked assertions. Changed-basis and after-update variants preserve source flag/erase order. Precise backup copies every dense cost, destroys old values before publishing/copying replacement storage and performs no floating normalization. InitReducedCosts switches feasibility costs or restores the dense backup, preserves the feasibility-only early return and invokes the actual rational LU transpose solve and reduced-cost reconstruction. Parent raw receipts close before delegated base work and primal values remain alive through its cleanup. Thirteen test groups cover640 independently calculated cost/membership transition worlds,240 independent rational matrix/cost-switch systems and160 constructor/bound/membership worlds, including signed1e-100 violations, all column types and contradictory bounds. Twenty-two pooled/direct physical campaigns in native and20 in checked profiles run through success, exercising real LU construction, bound comparisons, cost negation, dense replacement, restoration and delegated reduced-cost arithmetic. Direct campaigns require actual physical refusal and all ownership censuses pass. Six actual older1000-digit caller comparison campaigns survive child calls and cleanup without adoption. Reached missing-input/base-assertion/extent/ascending-prefix/nonbasic bypass/late-settings profiles and stopped/closed calls are tested. Native focused checks pass14.047s; debug/checked15.338s. Statement coverage native/debug: primal core86/101 (85.1%)/84/101 (83.2%); cost switching40/44 (90.9%)/41/44 (93.2%); infeasibility costs115/123 (93.5%)/114/123 (92.7%). Remaining blocks chiefly guard stable numeral capture/destruction, valid metadata and unreachable constructor epsilon-allocation failure with these small constants; checked excludes native unknown-type branches. No whole-source or complete upstream-driver promotion; inventory remains88 partial/16 unported/6 reference_only. Related scalar rational core/LU and existing pair cost/infeasibility regressions pass74.482s native/117.646s debug/checked. Both LP vets, both full-module compilation gates, source portcheck (2103 units,677 APIs), dependency graph refresh (64 packages) and diff checks pass."
       ]
     },
     {
@@ -126791,7 +126879,13 @@
         "pkg/util/lp/primal_core_float_test.go",
         "pkg/util/lp/primal_price_float_test.go",
         "pkg/util/lp/primal_prepare_float_test.go",
-        "pkg/util/lp/primal_feasible_float.go"
+        "pkg/util/lp/primal_feasible_float.go",
+        "pkg/util/lp/primal_core_rational.go",
+        "pkg/util/lp/primal_infeas_cost_rational.go",
+        "pkg/util/lp/primal_cost_switch_rational.go",
+        "pkg/util/lp/primal_core_rational_test.go",
+        "pkg/util/lp/primal_infeas_cost_rational_test.go",
+        "pkg/util/lp/primal_cost_switch_rational_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -126807,7 +126901,20 @@
         "TestLPFloatPrimalPreparedBasisIndependentOracle",
         "TestLPFloatPrimalFindFeasibleIndependentSystems",
         "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
-        "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
+        "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes",
+        "TestLPRationalPrimalConstructionAndMembershipOracle",
+        "TestLPRationalPrimalConstructionAndBoundsPhysicalOwnership",
+        "TestLPRationalPrimalConstructionAndReachedGuards",
+        "TestLPRationalPrimalInfeasCostUnknownAndMembershipPrefixes",
+        "TestLPRationalPrimalInfeasCostPhysicalOwnership",
+        "TestLPRationalPrimalInfeasCostLeavesOlderComparisonOwned",
+        "TestLPRationalPrimalInfeasCostMetadataBoundaries",
+        "TestLPRationalPrimalInfeasCostIndependentStateOracle",
+        "TestLPRationalPrimalCostSwitchIndependentModels",
+        "TestLPRationalPrimalCostBackupDenseReplacement",
+        "TestLPRationalPrimalCostSwitchPhysicalOwnership",
+        "TestLPRationalPrimalCostSwitchSourcePrefixes",
+        "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -126842,6 +126949,30 @@
             "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
             "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
           ]
+        },
+        {
+          "name": "Concrete scalar mpq/mpq stage-one constructor, InitInfSet and lower-first out-of-bounds sign, infeasibility-cost construction/update, dense precise backup/restoration and InitReducedCosts actual LU dispatch; source h403-408,783-821,901-934 and hpp630-639,1103-1118,1170-1225,1292-1304",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_core_rational.go",
+            "pkg/util/lp/primal_infeas_cost_rational.go",
+            "pkg/util/lp/primal_cost_switch_rational.go"
+          ],
+          "tests": [
+            "TestLPRationalPrimalConstructionAndMembershipOracle",
+            "TestLPRationalPrimalConstructionAndBoundsPhysicalOwnership",
+            "TestLPRationalPrimalConstructionAndReachedGuards",
+            "TestLPRationalPrimalInfeasCostUnknownAndMembershipPrefixes",
+            "TestLPRationalPrimalInfeasCostPhysicalOwnership",
+            "TestLPRationalPrimalInfeasCostLeavesOlderComparisonOwned",
+            "TestLPRationalPrimalInfeasCostMetadataBoundaries",
+            "TestLPRationalPrimalInfeasCostIndependentStateOracle",
+            "TestLPRationalPrimalCostSwitchIndependentModels",
+            "TestLPRationalPrimalCostBackupDenseReplacement",
+            "TestLPRationalPrimalCostSwitchPhysicalOwnership",
+            "TestLPRationalPrimalCostSwitchSourcePrefixes",
+            "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
@@ -126850,7 +126981,8 @@
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
         "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced.",
-        "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open."
+        "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open.",
+        "Concrete scalar mpq/mpq stage-one primal construction now uses the actual RationalCoreSolverBase, RationalPriorityQueue, rational Beta, exact copied quotient epsilon1/10000000, empty dense cost backup, threshold1000 and UNKNOWN status. Precise Harris epsilon remains zero even for NaN floating tolerance. InitInfSet clears then visits basic columns in ascending order; out-of-bounds delta sign checks lower before upper. Cost initialization preserves descending all-column traversal, actual Ed.Index order including stored zeros, upper-first contradictory-bound priority, zero nonbasic costs, membership publication before optional copied unary negation, native unknown-type old-cost retention and checked assertions. Changed-basis and after-update variants preserve source flag/erase order. Precise backup copies every dense cost, destroys old values before publishing/copying replacement storage and performs no floating normalization. InitReducedCosts switches feasibility costs or restores the dense backup, preserves the feasibility-only early return and invokes the actual rational LU transpose solve and reduced-cost reconstruction. Parent raw receipts close before delegated base work and primal values remain alive through its cleanup. Thirteen test groups cover640 independently calculated cost/membership transition worlds,240 independent rational matrix/cost-switch systems and160 constructor/bound/membership worlds, including signed1e-100 violations, all column types and contradictory bounds. Twenty-two pooled/direct physical campaigns in native and20 in checked profiles run through success, exercising real LU construction, bound comparisons, cost negation, dense replacement, restoration and delegated reduced-cost arithmetic. Direct campaigns require actual physical refusal and all ownership censuses pass. Six actual older1000-digit caller comparison campaigns survive child calls and cleanup without adoption. Reached missing-input/base-assertion/extent/ascending-prefix/nonbasic bypass/late-settings profiles and stopped/closed calls are tested. Native focused checks pass14.047s; debug/checked15.338s. Statement coverage native/debug: primal core86/101 (85.1%)/84/101 (83.2%); cost switching40/44 (90.9%)/41/44 (93.2%); infeasibility costs115/123 (93.5%)/114/123 (92.7%). Remaining blocks chiefly guard stable numeral capture/destruction, valid metadata and unreachable constructor epsilon-allocation failure with these small constants; checked excludes native unknown-type branches. No whole-source or complete upstream-driver promotion; inventory remains88 partial/16 unported/6 reference_only. Related scalar rational core/LU and existing pair cost/infeasibility regressions pass74.482s native/117.646s debug/checked. Both LP vets, both full-module compilation gates, source portcheck (2103 units,677 APIs), dependency graph refresh (64 packages) and diff checks pass."
       ]
     },
     {
