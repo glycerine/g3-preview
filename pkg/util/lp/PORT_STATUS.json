@@ -9153,5 +9153,26 @@
       "dependency_graph": "passed",
       "diff_check": "passed"
     }
+  },
+  "running_full_native_checkpoint": {
+    "commit": "5c24ca3b",
+    "started_utc": "2026-10-11 21:36:01 UTC",
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "-json",
+      "./...",
+      "-timeout=60m",
+      "-count=1",
+      "-coverprofile=/mnt/oldrog/tmp/g3-lp-smt-module-native.cover"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-lp-smt-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-lp-smt-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-lp-smt-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-lp-smt-module-native.json",
+    "session_id": 32418,
+    "scope_warning": "Includes retained MPS setup/file/default drivers, MPS and LAR file-list integration, LAR run driver and retained SMT reader/factory through5c24ca3b, plus prior LP work. Actual session32418 returned live and was polled live after start. Completion and coverage are not credited; poll this same handle until terminal. Later edits after LP binary start are excluded from this checkpoint."
   }
 }
