@@ -117,11 +117,9 @@ func TestLPDebugDenseIndependentProductsAndApplications(t *testing.T) {
 		w[rows], w[rows+1] = 777, 888
 		expected := append(lpFloatMatrixVector(square, w[:rows], false), 777, 888)
 		m := lpDebugDense(t, square)
-		w2 := append([]float64(nil), w...)
 		lpStaticMust(t, m.ApplyLeft(w))
-		lpStaticMust(t, ApplyFloatDebugMatrixToVector(m, w2))
-		if !reflect.DeepEqual(w, expected) || !reflect.DeepEqual(w2, expected) {
-			t.Fatal(world, w, w2, expected)
+		if !reflect.DeepEqual(w, expected) {
+			t.Fatal(world, w, expected)
 		}
 	}
 }
@@ -191,16 +189,9 @@ func TestLPDebugDenseRectangularAndAliasedApplicationPrefixes(t *testing.T) {
 	if tall.ApplyLeft(w) != ErrBounds || !reflect.DeepEqual(w, []float64{1, 2, 3}) {
 		t.Fatal(w)
 	}
-	// Generic helper publishes row0 before the later flattened read fails.
-	if ApplyFloatDebugMatrixToVector(tall, w) != ErrBounds || w[0] != 14 || w[1] != 26 || w[2] != 3 {
-		t.Fatal(w)
-	}
 	square := lpDebugDense(t, [][]float64{{1, 2}, {3, 4}})
 	if square.ApplyLeft([]float64{1}) != ErrBounds {
 		t.Fatal("short vector")
-	}
-	if ApplyFloatDebugMatrixToVector(square, []float64{1}) != ErrBounds {
-		t.Fatal("short snapshot")
 	}
 	lpStaticMust(t, square.ApplyLeft(square.values[:2]))
 	if !reflect.DeepEqual(square.values, []float64{5, 11, 3, 4}) {
@@ -209,7 +200,6 @@ func TestLPDebugDenseRectangularAndAliasedApplicationPrefixes(t *testing.T) {
 	empty, err := NewFloatDenseMatrix(0, 3)
 	lpStaticMust(t, err)
 	lpStaticMust(t, empty.ApplyLeft(nil))
-	lpStaticMust(t, ApplyFloatDebugMatrixToVector(empty, nil))
 }
 func TestLPDebugDenseMatrixEqualityAndFailurePrefixes(t *testing.T) {
 	for _, world := range []struct {
@@ -252,9 +242,7 @@ func TestLPDebugDenseMatrixEqualityAndFailurePrefixes(t *testing.T) {
 	if _, err := FloatDebugMatricesEqual(nil, a); err != ErrBounds {
 		t.Fatal(err)
 	}
-	if err := ApplyFloatDebugMatrixToVector(nil, nil); err != ErrBounds {
-		t.Fatal(err)
-	}
+
 }
 func TestLPDebugDenseConcretePermutationAndStaticConsumers(t *testing.T) {
 	a := NewFloatStaticMatrix(3, 2)
@@ -294,7 +282,16 @@ func TestLPDebugDenseActualLUIdentities(t *testing.T) {
 			a := lpFloatLUSource(t, b, basis)
 			m, err := NewFloatLU(a, basis, lpFloatLUSettings(density))
 			lpStaticMust(t, err)
-			equal, err := m.DebugIsCorrect(basis)
+			correct, err := m.DebugIsCorrect(basis)
+			lpStaticMust(t, err)
+			if !correct {
+				t.Fatal(world, density, "source is_correct")
+			}
+			left, err := m.LeftDebugMatrix(basis)
+			lpStaticMust(t, err)
+			right, err := m.RightDebugMatrix()
+			lpStaticMust(t, err)
+			equal, err := FloatDebugMatricesEqual(left, right)
 			lpStaticMust(t, err)
 			if !equal {
 				t.Fatal(world, density, "LU identity")
@@ -312,11 +309,14 @@ func TestLPDebugDenseActualLUIdentities(t *testing.T) {
 				}
 			}
 			m.SetStatus(LUDegenerated)
-			if equal, err = m.DebugIsCorrect(basis); err != nil || equal {
-				t.Fatal(equal, err)
+			if correct, err = m.DebugIsCorrect(basis); err != nil || correct {
+				t.Fatal(correct, err)
 			}
 			lpStaticMust(t, m.Close())
 			if _, err = m.DebugIsCorrect(basis); err != ErrLUClosed {
+				t.Fatal(err)
+			}
+			if _, err = m.LeftDebugMatrix(basis); err != ErrLUClosed {
 				t.Fatal(err)
 			}
 		}
@@ -348,7 +348,16 @@ func TestLPDebugDenseLUTailBindingsAndFailurePrefixes(t *testing.T) {
 		lpStaticMust(t, err)
 		w1, w2 := []float64{2, 3, 4}, []float64{2, 3, 4}
 		lpStaticMust(t, tail.ApplyLeft(w1))
-		lpStaticMust(t, ApplyFloatDebugMatrixToVector(view, w2))
+		values := make([][]float64, 3)
+		for i := range values {
+			values[i] = make([]float64, 3)
+			for j := range values[i] {
+				value, err := view.Element(uint32(i), uint32(j))
+				lpStaticMust(t, err)
+				values[i][j] = value
+			}
+		}
+		w2 = lpFloatMatrixVector(values, w2, false)
 		for i := range w1 {
 			if math.Abs(w1[i]-w2[i]) > 1e-12 {
 				t.Fatal(tail, w1, w2)

@@ -1,6 +1,6 @@
 //go:build g3debug
 
-// Source: src/util/lp/matrix.hpp:75-129; lu.hpp:26-83; lp_settings.h:377-379.
+// Source: src/util/lp/matrix.hpp:75-129; lu.hpp:48-83; lp_settings.h:377-379.
 package lp
 
 import "io"
@@ -136,16 +136,4 @@ func PrintFloatSparseDebugMatrix(m *FloatSparseMatrix, out io.Writer) error {
 		return ErrBounds
 	}
 	return printFloatDebugMatrixRows(m, m.RowCount(), m.ColumnCount(), out)
-}
-func PrintFloatDebugSubmatrix(m *FloatSparseMatrix, rows, columns uint32, out io.Writer) error {
-	if m == nil {
-		return ErrBounds
-	}
-	if rows > m.RowCount() {
-		rows = m.RowCount()
-	}
-	if columns > m.ColumnCount() {
-		columns = m.ColumnCount()
-	}
-	return printFloatDebugMatrixRows(m, rows, columns, out)
 }

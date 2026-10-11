@@ -85,22 +85,7 @@ func TestLPDebugMatrixPrintConcreteOverloads(t *testing.T) {
 			t.Fatal(base, w.buffer.String(), w.flushes)
 		}
 	}
-	for _, dims := range [][2]uint32{{0, 2}, {1, 1}, {2, 2}, {99, 99}, {2, 0}} {
-		var out bytes.Buffer
-		lpStaticMust(t, PrintFloatDebugSubmatrix(sparse, dims[0], dims[1], &out))
-		want := "1  0 \n0 22 \n"
-		switch dims {
-		case [2]uint32{0, 2}:
-			want = ""
-		case [2]uint32{1, 1}:
-			want = "1 \n"
-		case [2]uint32{2, 0}:
-			want = "\n\n"
-		}
-		if out.String() != want {
-			t.Fatal(dims, out.String(), want)
-		}
-	}
+
 	var out bytes.Buffer
 	lpStaticMust(t, PrintFloatSparseDebugMatrix(sparse, &out))
 	if out.String() != "1  0 \n0 22 \n" {
@@ -175,7 +160,7 @@ func TestLPDebugMatrixPrintMalformedAndGetterPrefixes(t *testing.T) {
 	if err := printFloatDebugMatrixRows(broken, 2, 2, &out); err != ErrBounds || out.Len() != 0 {
 		t.Fatal(err, out.String())
 	}
-	if PrintFloatDebugMatrix(nil, &out) != ErrBounds || PrintFloatStaticDebugMatrix(nil, &out) != ErrBounds || PrintFloatSparseDebugMatrix(nil, &out) != ErrBounds || PrintFloatDebugSubmatrix(nil, 1, 1, &out) != ErrBounds {
+	if PrintFloatDebugMatrix(nil, &out) != ErrBounds || PrintFloatStaticDebugMatrix(nil, &out) != ErrBounds || PrintFloatSparseDebugMatrix(nil, &out) != ErrBounds {
 		t.Fatal("nil matrix")
 	}
 	if _, err := floatDebugMatrixStrings(nil, 0, 0); err != ErrBounds {

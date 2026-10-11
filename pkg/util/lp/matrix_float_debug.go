@@ -64,29 +64,3 @@ func FloatDebugMatricesEqual(a, b FloatDebugMatrix) (bool, error) {
 	}
 	return true, nil
 }
-
-// ApplyFloatDebugMatrixToVector snapshots w before row-by-row publication.
-// Unlike FloatDenseMatrix.ApplyLeft, a later failing element leaves the already
-// completed output rows visible, matching matrix.hpp apply_to_vector.
-func ApplyFloatDebugMatrixToVector(m FloatDebugMatrix, w []float64) error {
-	if m == nil {
-		return ErrBounds
-	}
-	n := m.RowCount()
-	if uint64(n) > uint64(len(w)) {
-		return ErrBounds
-	}
-	snapshot := append([]float64(nil), w[:int(n)]...)
-	for i := uint32(0); i < n; i++ {
-		value := 0.0
-		for j := uint32(0); j < n; j++ {
-			a, err := m.Element(i, j)
-			if err != nil {
-				return err
-			}
-			value += a * snapshot[j]
-		}
-		w[i] = value
-	}
-	return nil
-}

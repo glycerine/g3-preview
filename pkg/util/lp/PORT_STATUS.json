@@ -300,19 +300,19 @@
     },
     {
       "source": "src/util/lp/core_solver_pretty_printer.h",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": []
     },
     {
       "source": "src/util/lp/core_solver_pretty_printer.hpp",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": []
     },
     {
       "source": "src/util/lp/core_solver_pretty_printer_instances.cpp",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": []
     },
@@ -5623,9 +5623,10 @@
     }
   ],
   "status_counts": {
-    "unported": 10,
+    "unported": 7,
     "partial": 94,
-    "reference_only": 6
+    "reference_only": 6,
+    "dead_deleted": 3
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -9550,5 +9551,103 @@
     },
     "related_debug_seconds": 0.535,
     "related_debug_checked_seconds": 0.57
+  },
+  "latest_debug_reachability_audit": {
+    "scope": "Whole-source named consumer scan for LU/matrix/core pretty-printer debug helpers; remove uncalled Go wrappers and retain actual source is_correct callers",
+    "dead_source_units": [
+      "src/util/lp/core_solver_pretty_printer.h",
+      "src/util/lp/core_solver_pretty_printer.hpp",
+      "src/util/lp/core_solver_pretty_printer_instances.cpp"
+    ],
+    "excluded_helpers": [
+      "LU tail_product",
+      "LU check_vector_w/check_apply_lp_lists_to_w/check_apply_matrix_to_vector",
+      "matrix apply_to_vector",
+      "LU print_submatrix",
+      "core pretty_print and pretty-printer closure"
+    ],
+    "retained_helpers": [
+      "LU is_correct called by ten retained test SASSERT sites",
+      "LU get_B/get_left_side/get_right_side",
+      "floating base/static/sparse matrix printing",
+      "dense left application reached by check_lu_from_file"
+    ],
+    "removed_go_wrappers": [
+      "ApplyFloatDebugMatrixToVector",
+      "PrintFloatDebugSubmatrix"
+    ],
+    "audit_evidence": {
+      "source_scope": "src/**/*.{h,hpp,cpp}, native rg scans; comments, includes and explicit instantiation declarations distinguished from actual calls",
+      "pretty_scan": "/mnt/oldrog/tmp/g3-lp-pretty-reachability-full.txt",
+      "helper_scan": "/mnt/oldrog/tmp/g3-lp-helper-reachability.txt",
+      "is_correct_call_sites": "src/test/lp.cpp:245,255,267,280,292,311,405,410,452,499"
+    },
+    "source_algorithms_promoted": false,
+    "focused_debug_seconds": 0.086,
+    "focused_debug_checked_seconds": 0.085,
+    "current_statement_coverage": {
+      "debug": {
+        "dense_matrix_float_debug.go": {
+          "covered": 57,
+          "total": 65,
+          "percent": 87.7
+        },
+        "matrix_float_debug.go": {
+          "covered": 34,
+          "total": 36,
+          "percent": 94.4
+        },
+        "lu_float_debug_matrix.go": {
+          "covered": 61,
+          "total": 66,
+          "percent": 92.4
+        },
+        "matrix_float_debug_print.go": {
+          "covered": 73,
+          "total": 74,
+          "percent": 98.6
+        }
+      },
+      "debug_checked": {
+        "dense_matrix_float_debug.go": {
+          "covered": 57,
+          "total": 65,
+          "percent": 87.7
+        },
+        "matrix_float_debug.go": {
+          "covered": 34,
+          "total": 36,
+          "percent": 94.4
+        },
+        "lu_float_debug_matrix.go": {
+          "covered": 61,
+          "total": 66,
+          "percent": 92.4
+        },
+        "matrix_float_debug_print.go": {
+          "covered": 73,
+          "total": 74,
+          "percent": 98.6
+        }
+      }
+    },
+    "coverage_note": "Current debug profiles supersede earlier per-increment coverage for changed files. Generic apply_to_vector/submatrix output tests are removed with their unused implementations. Retained eight dense and six printer groups pass; independent LU identity tests also compare actual left/right matrices alongside retained is_correct. Core pretty-printer exclusion has no implementation/test coverage claim. Exact variants/upstream retained-driver and whole-source audits remain open.",
+    "verification": {
+      "focused_debug": "passed",
+      "focused_debug_checked": "passed",
+      "lp_vet_native": "passed",
+      "lp_vet_debug": "passed",
+      "lp_vet_debug_checked": "passed",
+      "module_compile_native": "passed",
+      "module_compile_debug": "passed",
+      "module_compile_debug_checked": "passed",
+      "related_debug": "passed",
+      "portcheck": "passed",
+      "dependency_graph": "passed",
+      "diff_check": "passed",
+      "related_debug_checked": "passed"
+    },
+    "related_debug_seconds": 0.524,
+    "related_debug_checked_seconds": 0.541
   }
 }
