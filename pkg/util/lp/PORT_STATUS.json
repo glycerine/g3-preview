@@ -1,7 +1,7 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 87.3,
+  "native_statement_coverage_of_current_go_code": 87.1,
   "coverage_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion. Scalar pivot comparison and incremental reduced-cost files are newer and retain separate focused evidence. Scalar primal advancement files are newer and retain separate focused evidence. Scalar entering orchestration and iteration are newer and retain separate focused evidence. Scalar core tableau operations are newer and retain separate focused evidence. Scalar primal tableau cost maintenance is newer and retains separate focused evidence. Scalar primal tableau values/basis exchange and reduced-cost initialization are newer and retain separate focused evidence. Scalar primal tableau entering/leaving selection is newer and retains separate focused evidence.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
@@ -4933,22 +4933,23 @@
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
-    "commit": "1cee195e",
-    "started_utc": "2026-10-11 16:08:21 UTC",
-    "completed_utc": "2026-10-11 16:27:50 UTC",
+    "commit": "eb5c10f5",
+    "started_utc": "2026-10-11 17:09:16 UTC",
+    "completed_utc": "2026-10-11 17:29:25 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-rational-bound-module-native.log",
-    "profile": "/mnt/oldrog/tmp/g3-rational-bound-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-rational-bound-module-native.json",
+    "log": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.json",
     "packages": 64,
     "passed_packages": 63,
     "skipped_packages": 1,
     "packages_with_tests": 51,
-    "lp_seconds": 1156.594,
-    "lp_covered_statements": 23716,
-    "lp_statements": 27179,
-    "session_id": 39459,
-    "scope_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion."
+    "lp_seconds": 1205.938,
+    "lp_covered_statements": 24775,
+    "lp_statements": 28448,
+    "session_id": 45678,
+    "scope_warning": "Checkpoint includes scalar breakpoint/leaving/pivot/LU advancement, entering/iteration, core tableau operations, primal tableau cost/value/basis exchange and reduced-cost initialization through eb5c10f5. Excludes later scalar tableau selection, advancement/entering/iteration and current scalar tableau initialization/row work. Coverage measures existing Go statements, not C++ completion. Actual session45678 terminated with exit0."
   },
   "full_native_checkpoint_history": [
     {
@@ -5080,6 +5081,24 @@
       "status_file": "/mnt/oldrog/tmp/g3-rational-core-module-native.json",
       "session_id": 1721,
       "scope_warning": "Full native checkpoint7957befd includes scalar rational core base, basis, values, reconstruction, reduced costs, snapping, residuals and pivot rows, plus preparation/presolve expression corrections. Profile excludes core_update_rational.go, core_cost_validate_rational.go and core_feasibility_rational.go, and predates the newer RestoreBasisChange stopped guard. Their focused/regression evidence remains separate. Coverage measures existing Go statements, not C++ port completion."
+    },
+    {
+      "commit": "1cee195e",
+      "started_utc": "2026-10-11 16:08:21 UTC",
+      "completed_utc": "2026-10-11 16:27:50 UTC",
+      "exit_code": 0,
+      "log": "/mnt/oldrog/tmp/g3-rational-bound-module-native.log",
+      "profile": "/mnt/oldrog/tmp/g3-rational-bound-module-native.cover",
+      "status_file": "/mnt/oldrog/tmp/g3-rational-bound-module-native.json",
+      "packages": 64,
+      "passed_packages": 63,
+      "skipped_packages": 1,
+      "packages_with_tests": 51,
+      "lp_seconds": 1156.594,
+      "lp_covered_statements": 23716,
+      "lp_statements": 27179,
+      "session_id": 39459,
+      "scope_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion."
     }
   ],
   "latest_tableau_catchup_increment": {
@@ -7282,30 +7301,6 @@
       "diff check"
     ],
     "coverage_note": "Native erases many source assertion statements. Remaining checked gaps chiefly guard stable capture/destruction/metadata and extents already validated by delegated calls. Coverage measures implemented Go statements, not C++ completion."
-  },
-  "running_full_native_checkpoint": {
-    "status": "running",
-    "commit": "eb5c10f5",
-    "started_utc": "2026-10-11 17:09:16 UTC",
-    "runner_pid": 2,
-    "command": [
-      "go",
-      "-C",
-      "pkg",
-      "test",
-      "-json",
-      "./...",
-      "-timeout=60m",
-      "-count=1",
-      "-coverprofile=/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.cover"
-    ],
-    "log": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.events.jsonl",
-    "profile": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-scalar-tableau-values-module-native.json",
-    "go_pid": 5,
-    "session_id": 45678,
-    "scope_warning": "Checkpoint includes scalar breakpoint/leaving/pivot/LU advancement, entering/iteration, core tableau operations, primal tableau cost/value/basis exchange and reduced-cost initialization through eb5c10f5. Actual session45678 verified live; completion and coverage not yet credited."
   },
   "latest_rational_tableau_selection_increment": {
     "scope": "Concrete scalar tableau entering pricing and ordered leaving selection with actual sparse sizes and source RNG",
