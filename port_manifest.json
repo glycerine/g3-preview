@@ -123688,7 +123688,9 @@
         "pkg/util/lp/primal_breakpoint_collect_exact.go",
         "pkg/util/lp/primal_breakpoint_collect_exact_test.go",
         "pkg/util/lp/primal_breakpoint_advance_exact.go",
-        "pkg/util/lp/primal_breakpoint_advance_exact_test.go"
+        "pkg/util/lp/primal_breakpoint_advance_exact_test.go",
+        "pkg/util/lp/primal_leaving_exact.go",
+        "pkg/util/lp/primal_leaving_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -123795,7 +123797,15 @@
         "TestLPExactBreakpointAdvanceWrapperAndGuards",
         "TestLPExactBreakpointAdvancePhysicalOwnership",
         "TestLPExactBreakpointAdvancePreservesOlderComparisonOwner",
-        "TestLPExactBreakpointAdvanceAlreadyStoppedQueue"
+        "TestLPExactBreakpointAdvanceAlreadyStoppedQueue",
+        "TestLPExactLeavingIndependentFeasibleModels",
+        "TestLPExactLeavingGuardsAndBreakpointDispatch",
+        "TestLPExactLeavingPhysicalOwnership",
+        "TestLPExactLeavingIndependentInfeasibleModels",
+        "TestLPExactLeavingPreservesOlderComparisonOwner",
+        "TestLPExactLeavingLiveBasisAliases",
+        "TestLPExactLeavingEnteringAliasNegativeFlip",
+        "TestLPExactLeavingSecondRowMetadataAndSparseIndex"
       ],
       "conditionals": [
         {
@@ -124212,6 +124222,21 @@
             "TestLPExactBreakpointAdvancePreservesOlderComparisonOwner",
             "TestLPExactBreakpointAdvanceAlreadyStoppedQueue"
           ]
+        },
+        {
+          "name": "retained exact leaving selector and same-owner basis dispatcher/bound-flip consumers while full-expression multiplier and ratio locals remain alive",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_leaving_exact.go",
+          "tests": [
+            "TestLPExactLeavingIndependentFeasibleModels",
+            "TestLPExactLeavingGuardsAndBreakpointDispatch",
+            "TestLPExactLeavingPhysicalOwnership",
+            "TestLPExactLeavingIndependentInfeasibleModels",
+            "TestLPExactLeavingPreservesOlderComparisonOwner",
+            "TestLPExactLeavingLiveBasisAliases",
+            "TestLPExactLeavingEnteringAliasNegativeFlip",
+            "TestLPExactLeavingSecondRowMetadataAndSparseIndex"
+          ]
         }
       ],
       "ownership": [
@@ -124222,7 +124247,8 @@
         "Exact pricing delegates lexicographic bound comparisons to PairCoreSolverBase; the primal separately owns newly created epsilon-negation values and rational comparison receipts. No parent capture spans a numerical child. Allocation-failure campaigns retain source publication prefixes, partial epsilon expressions and owning teardown; older caller comparisons retain invocation identity. Sorting uses Go sort with literal source count comparison and does not promise a C++ implementation-dependent zero/equal-key order. Full exact Solve/advancement remains incomplete.",
         "Precise bound-step expressions own separate pair result and rational parameter scratch through failed arithmetic/assignment. Primal Close cleans newly captured raw invocations before pair-result and rational scratch, retaining caller-owned outputs and older caller comparisons. LimitTheta publishes unlimited=false only after complete output assignment; rejected bound flips still publish their step. Leaving selection delegates feasibility/bound comparisons without adopting base receipts and preserves infeasibility-set iteration state. Full precise ratio/breakpoint/advance/Solve remains incomplete.",
         "Exact breakpoint collection retains difference/ratio and entering-span pair locals with the primal across record construction and queue enqueue. Scalar captures end before queue numerical work, so queue comparison receipts remain separate. Failure retains partial records and scratch for Close; older caller comparisons are preserved.",
-        "Owned traversal slope survives queue dequeues and nested slope/threshold expressions. Parent numerical capture ends before queue calls; queue comparison receipts remain separate. Failed dequeue preserves the source queue prefix and all records; failed output assignment retains traversal slope for Close. Older caller comparison generations are preserved. Debug exact wrapper rejects precise()==false before collection, matching source assertion."
+        "Owned traversal slope survives queue dequeues and nested slope/threshold expressions. Parent numerical capture ends before queue calls; queue comparison receipts remain separate. Failed dequeue preserves the source queue prefix and all records; failed output assignment retains traversal slope for Close. Older caller comparison generations are preserved. Debug exact wrapper rejects precise()==false before collection, matching source assertion.",
+        "Precise leaving scan owns full -ed*direction expression separately from the by-value basis multiplier, keeping it alive through delegated bound helpers. A distinct ratio local survives repeated row calculations and rejected entering bound flips. Each child retains its own numerical receipts; primal Close cleans raw invocations before all expression/ratio locals. Candidate and output failure prefixes, live input/output alias rereads and older caller comparisons are retained."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
@@ -124264,7 +124290,9 @@
         "pkg/util/lp/primal_breakpoint_collect_exact.go",
         "pkg/util/lp/primal_breakpoint_collect_exact_test.go",
         "pkg/util/lp/primal_breakpoint_advance_exact.go",
-        "pkg/util/lp/primal_breakpoint_advance_exact_test.go"
+        "pkg/util/lp/primal_breakpoint_advance_exact_test.go",
+        "pkg/util/lp/primal_leaving_exact.go",
+        "pkg/util/lp/primal_leaving_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124343,7 +124371,15 @@
         "TestLPExactBreakpointAdvanceWrapperAndGuards",
         "TestLPExactBreakpointAdvancePhysicalOwnership",
         "TestLPExactBreakpointAdvancePreservesOlderComparisonOwner",
-        "TestLPExactBreakpointAdvanceAlreadyStoppedQueue"
+        "TestLPExactBreakpointAdvanceAlreadyStoppedQueue",
+        "TestLPExactLeavingIndependentFeasibleModels",
+        "TestLPExactLeavingGuardsAndBreakpointDispatch",
+        "TestLPExactLeavingPhysicalOwnership",
+        "TestLPExactLeavingIndependentInfeasibleModels",
+        "TestLPExactLeavingPreservesOlderComparisonOwner",
+        "TestLPExactLeavingLiveBasisAliases",
+        "TestLPExactLeavingEnteringAliasNegativeFlip",
+        "TestLPExactLeavingSecondRowMetadataAndSparseIndex"
       ],
       "conditionals": [
         {
@@ -124804,6 +124840,21 @@
             "TestLPExactBreakpointAdvancePreservesOlderComparisonOwner",
             "TestLPExactBreakpointAdvanceAlreadyStoppedQueue"
           ]
+        },
+        {
+          "name": "retained exact find_leaving_and_t_precise: breakpoint dispatch, circular indexed first-limit and ratio scan, sparsity/candidate ties, source equality expressions, limited/unlimited entering flips and RNG prefixes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_leaving_exact.go",
+          "tests": [
+            "TestLPExactLeavingIndependentFeasibleModels",
+            "TestLPExactLeavingGuardsAndBreakpointDispatch",
+            "TestLPExactLeavingPhysicalOwnership",
+            "TestLPExactLeavingIndependentInfeasibleModels",
+            "TestLPExactLeavingPreservesOlderComparisonOwner",
+            "TestLPExactLeavingLiveBasisAliases",
+            "TestLPExactLeavingEnteringAliasNegativeFlip",
+            "TestLPExactLeavingSecondRowMetadataAndSparseIndex"
+          ]
         }
       ],
       "ownership": [
@@ -124812,7 +124863,8 @@
         "Exact pricing delegates lexicographic bound comparisons to PairCoreSolverBase; the primal separately owns newly created epsilon-negation values and rational comparison receipts. No parent capture spans a numerical child. Allocation-failure campaigns retain source publication prefixes, partial epsilon expressions and owning teardown; older caller comparisons retain invocation identity. Sorting uses Go sort with literal source count comparison and does not promise a C++ implementation-dependent zero/equal-key order. Full exact Solve/advancement remains incomplete.",
         "Precise bound-step expressions own separate pair result and rational parameter scratch through failed arithmetic/assignment. Primal Close cleans newly captured raw invocations before pair-result and rational scratch, retaining caller-owned outputs and older caller comparisons. LimitTheta publishes unlimited=false only after complete output assignment; rejected bound flips still publish their step. Leaving selection delegates feasibility/bound comparisons without adopting base receipts and preserves infeasibility-set iteration state. Full precise ratio/breakpoint/advance/Solve remains incomplete.",
         "Exact breakpoint collection retains difference/ratio and entering-span pair locals with the primal across record construction and queue enqueue. Scalar captures end before queue numerical work, so queue comparison receipts remain separate. Failure retains partial records and scratch for Close; older caller comparisons are preserved.",
-        "Owned traversal slope survives queue dequeues and nested slope/threshold expressions. Parent numerical capture ends before queue calls; queue comparison receipts remain separate. Failed dequeue preserves the source queue prefix and all records; failed output assignment retains traversal slope for Close. Older caller comparison generations are preserved. Debug exact wrapper rejects precise()==false before collection, matching source assertion."
+        "Owned traversal slope survives queue dequeues and nested slope/threshold expressions. Parent numerical capture ends before queue calls; queue comparison receipts remain separate. Failed dequeue preserves the source queue prefix and all records; failed output assignment retains traversal slope for Close. Older caller comparison generations are preserved. Debug exact wrapper rejects precise()==false before collection, matching source assertion.",
+        "Precise leaving scan owns full -ed*direction expression separately from the by-value basis multiplier, keeping it alive through delegated bound helpers. A distinct ratio local survives repeated row calculations and rejected entering bound flips. Each child retains its own numerical receipts; primal Close cleans raw invocations before all expression/ratio locals. Candidate and output failure prefixes, live input/output alias rereads and older caller comparisons are retained."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
@@ -127333,7 +127385,9 @@
         "pkg/util/lp/primal_basis_limit_exact.go",
         "pkg/util/lp/primal_breakpoint_exact.go",
         "pkg/util/lp/primal_breakpoint_collect_exact.go",
-        "pkg/util/lp/primal_breakpoint_collect_exact_test.go"
+        "pkg/util/lp/primal_breakpoint_collect_exact_test.go",
+        "pkg/util/lp/primal_leaving_exact.go",
+        "pkg/util/lp/primal_leaving_exact_test.go"
       ],
       "tests": [
         "TestLPRationalPairArithmeticOracle",
@@ -127391,7 +127445,15 @@
         "TestLPExactBreakpointCollectIndependentModelOracle",
         "TestLPExactBreakpointCollectPhysicalOwnership",
         "TestLPExactBreakpointCollectGuardsAndPrefixes",
-        "TestLPExactBreakpointCollectPreservesOlderComparisonOwner"
+        "TestLPExactBreakpointCollectPreservesOlderComparisonOwner",
+        "TestLPExactLeavingIndependentFeasibleModels",
+        "TestLPExactLeavingGuardsAndBreakpointDispatch",
+        "TestLPExactLeavingPhysicalOwnership",
+        "TestLPExactLeavingIndependentInfeasibleModels",
+        "TestLPExactLeavingPreservesOlderComparisonOwner",
+        "TestLPExactLeavingLiveBasisAliases",
+        "TestLPExactLeavingEnteringAliasNegativeFlip",
+        "TestLPExactLeavingSecondRowMetadataAndSparseIndex"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -127525,12 +127587,28 @@
             "TestLPExactBreakpointCollectGuardsAndPrefixes",
             "TestLPExactBreakpointCollectPreservesOlderComparisonOwner"
           ]
+        },
+        {
+          "name": "retained exact leaving selector pair assignment, lexicographic strict ordering and separate canonical equality consumers",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_leaving_exact.go",
+          "tests": [
+            "TestLPExactLeavingIndependentFeasibleModels",
+            "TestLPExactLeavingGuardsAndBreakpointDispatch",
+            "TestLPExactLeavingPhysicalOwnership",
+            "TestLPExactLeavingIndependentInfeasibleModels",
+            "TestLPExactLeavingPreservesOlderComparisonOwner",
+            "TestLPExactLeavingLiveBasisAliases",
+            "TestLPExactLeavingEnteringAliasNegativeFlip",
+            "TestLPExactLeavingSecondRowMetadataAndSparseIndex"
+          ]
         }
       ],
       "ownership": [
         "Pairs own two real util/numeral.Rational values in a borrowed caller-owned RationalManager. Native storage moves tokens; shallow copying is forbidden. Copy/arithmetic run X before Y, retaining completed destination prefixes. Explicit Del releases Y before X; manager outlives all values. Production uses project numerals; math/big is only an independent test oracle.",
         "Column feasibility retains source rational parameter/return-pair temporaries in the exact core until successful delta assignment and cleanup, before replacing x. Delta is caller-owned and may be partially assigned; physical refusals and older comparison identity are tested. LAR basic updates own product expressions, ending capture before real PairLU/column-buffer and core membership children. Source tableau cost marks precede membership updates, and LU visits only solved sparse indices. Whole after-Pop infeasibility cleanup, cost recomputation, outer scopes and full exact optimization remain open.",
-        "Exact breakpoint collection retains difference/ratio and entering-span pair locals with the primal across record construction and queue enqueue. Scalar captures end before queue numerical work, so queue comparison receipts remain separate. Failure retains partial records and scratch for Close; older caller comparisons are preserved."
+        "Exact breakpoint collection retains difference/ratio and entering-span pair locals with the primal across record construction and queue enqueue. Scalar captures end before queue numerical work, so queue comparison receipts remain separate. Failure retains partial records and scratch for Close; older caller comparisons are preserved.",
+        "Precise leaving scan owns full -ed*direction expression separately from the by-value basis multiplier, keeping it alive through delegated bound helpers. A distinct ratio local survives repeated row calculations and rejected entering bound flips. Each child retains its own numerical receipts; primal Close cleans raw invocations before all expression/ratio locals. Candidate and output failure prefixes, live input/output alias rereads and older caller comparisons are retained."
       ],
       "deviations": [
         "Concrete numeric_pair<mpq> subset only. Remaining numeric traits, conversions and any reached project specializations remain open. Definition-only numeric_pair<double> and undefined pair-times-pair/pair-divided-by-pair bodies gain no invented adapters or source credit.",

@@ -23,6 +23,10 @@ func (m *PairPrimalCoreSolver) LimitThetaOnBasisColumn(j uint32, multiplier *num
 		return err
 	}
 	defer func() { m.stopped = err != nil }()
+	return m.limitThetaOnBasisColumnValue(j, multiplier, theta, unlimited)
+}
+
+func (m *PairPrimalCoreSolver) limitThetaOnBasisColumnValue(j uint32, multiplier *numeral.Rational, theta *RationalPair, unlimited *bool) (err error) {
 	if multiplier == nil || theta == nil || unlimited == nil || uint64(j) >= uint64(len(*m.ColumnTypes)) {
 		return ErrBounds
 	}

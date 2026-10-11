@@ -27,6 +27,8 @@ type PairPrimalCoreSolver struct {
 	breakpointWork                               *IndexedPairVector
 	pendingBreakpoint                            *PairBreakpoint
 	breakpointSlope                              *IndexedRationalVector
+	leavingMultiplier                            *IndexedRationalVector
+	leavingRatio                                 *IndexedPairVector
 	stopped                                      bool
 }
 
@@ -76,7 +78,7 @@ func NewPairPrimalCoreSolver(in PairCoreInputs) (m *PairPrimalCoreSolver, err er
 	return m, nil
 }
 func (m *PairPrimalCoreSolver) ready() error {
-	if m.stopped || m.work != nil || m.pairWork != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.breakpointWork != nil || m.pendingBreakpoint != nil || m.breakpointSlope != nil || m.calls.pending() {
+	if m.stopped || m.work != nil || m.pairWork != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.breakpointWork != nil || m.pendingBreakpoint != nil || m.breakpointSlope != nil || m.leavingMultiplier != nil || m.leavingRatio != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return m.PairCoreSolverBase.ready()
@@ -170,6 +172,18 @@ func (m *PairPrimalCoreSolver) Close() error {
 			return err
 		}
 		m.breakpointSlope = nil
+	}
+	if m.leavingMultiplier != nil {
+		if err := m.leavingMultiplier.Close(); err != nil {
+			return err
+		}
+		m.leavingMultiplier = nil
+	}
+	if m.leavingRatio != nil {
+		if err := m.leavingRatio.Close(); err != nil {
+			return err
+		}
+		m.leavingRatio = nil
 	}
 	if m.stepEpsilon != nil {
 		if err := m.stepEpsilon.Close(); err != nil {

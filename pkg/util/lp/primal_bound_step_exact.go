@@ -93,6 +93,10 @@ func (m *PairPrimalCoreSolver) TryJumpToAnotherBoundOnEntering(j uint32, theta, 
 		return false, err
 	}
 	defer func() { m.stopped = err != nil }()
+	return m.tryJumpToAnotherBoundOnEnteringValue(j, theta, t, unlimited)
+}
+
+func (m *PairPrimalCoreSolver) tryJumpToAnotherBoundOnEnteringValue(j uint32, theta, t *RationalPair, unlimited bool) (jump bool, err error) {
 	if uint64(j) >= uint64(len(*m.ColumnTypes)) {
 		return false, ErrBounds
 	}
@@ -140,6 +144,10 @@ func (m *PairPrimalCoreSolver) TryJumpToAnotherBoundOnEnteringUnlimited(j uint32
 		return false, err
 	}
 	defer func() { m.stopped = err != nil }()
+	return m.tryJumpToAnotherBoundOnEnteringUnlimitedValue(j, t)
+}
+
+func (m *PairPrimalCoreSolver) tryJumpToAnotherBoundOnEnteringUnlimitedValue(j uint32, t *RationalPair) (jump bool, err error) {
 	if uint64(j) >= uint64(len(*m.ColumnTypes)) {
 		return false, ErrBounds
 	}
