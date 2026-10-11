@@ -5988,5 +5988,29 @@
       "debug_checked": 126.499
     },
     "related_regression_pattern": "TestLP(RationalCore|Rational(Input|Column|Prepar|Presolve|Objective|Expression)|PairCore|PairPivot|RationalLU)"
+  },
+  "active_full_native_checkpoint": {
+    "commit": "7957befd",
+    "started_utc": "2026-10-11 15:09:21 UTC",
+    "status": "running",
+    "runner_pid": 3,
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-timeout=60m",
+      "-coverprofile=/mnt/oldrog/tmp/g3-rational-core-module-native.cover"
+    ],
+    "event_log": "/mnt/oldrog/tmp/g3-rational-core-module-native.events.jsonl",
+    "log": "/mnt/oldrog/tmp/g3-rational-core-module-native.log",
+    "profile": "/mnt/oldrog/tmp/g3-rational-core-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-rational-core-module-native.json",
+    "go_pid": 5,
+    "session_id": 1721,
+    "scope_warning": "Actual runner session1721 returned running. Completion and full coverage are not yet credited. This checkpoint includes committed scalar rational core base, values, preparation/presolve expression corrections and residual/pivot increment7957befd."
   }
 }
