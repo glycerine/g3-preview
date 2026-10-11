@@ -10,18 +10,12 @@ primal and dual cores expose Solve, and outer LU primal/dual integration is impl
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
 
-An hourly native module run started at 01:34 UTC on October11 with
-`/mnt/oldrog/tmp/g3-inf-cleanup-module-native.{log,cover}`. It is still running;
-no passing full-suite result is claimed. Its snapshot includes post-pop cleanup
-and validators and predates subsequently strengthened test-only guards/campaigns.
-
-Latest hourly native module run completed at 00:39 UTC on October11 with
-exit status0 and every package passing: LP613.329s,88.8% (14048/15826).
-Log/profile: `/mnt/oldrog/tmp/g3-pair-basis-module-native.{log,cover}`.
-This snapshot includes exact basis changes and row transposition, and predates
-subsequent exact tableau pivoting/removal, feasibility/basic-delta and
-infeasibility-cost updates.
-Those additions have separate
+Latest hourly native module run completed at 01:48 UTC on October11 with
+exit status0 and all64packages passing: LP826.982s,88.3% (14837/16806).
+Log/profile: `/mnt/oldrog/tmp/g3-inf-cleanup-module-native.{log,cover}`.
+This snapshot includes post-pop infeasibility cleanup and cost validators,
+and predates subsequently strengthened test-only campaigns/guards and whole-model
+scope/row-equation/infeasibility-set additions. Those additions have separate
 focused native/debug checks. Coverage measures existing Go code, not unported
 C++ functionality.
 
