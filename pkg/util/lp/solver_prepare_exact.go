@@ -175,7 +175,7 @@ func (m *RationalLPSolver) lowBoundShift(row uint32, out *numeral.Rational) erro
 	if r == nil {
 		return ErrBounds
 	}
-	m.shiftWork = NewIndexedRationalVector(m.manager, 3)
+	m.shiftWork = NewIndexedRationalVector(m.manager, 4)
 	w := m.shiftWork
 	for j, value := range r.All() {
 		if value == nil {
@@ -198,7 +198,7 @@ func (m *RationalLPSolver) lowBoundShift(row uint32, out *numeral.Rational) erro
 		if err != nil {
 			return err
 		}
-		err = m.manager.Mul(&w.Data[0], &w.Data[1], &w.Data[2])
+		err = etaRationalProduct(m.manager, &w.Data[3], &w.Data[2], &w.Data[0], &w.Data[1])
 		if err = m.calls.after(m.manager, b, err); err != nil {
 			return err
 		}
@@ -239,7 +239,7 @@ func (m *RationalLPSolver) fillB() error {
 		if err := lpSolverDomain(exists && c != nil && c.RightSide != nil); err != nil {
 			return err
 		}
-		m.work = NewIndexedRationalVector(m.manager, 2)
+		m.work = NewIndexedRationalVector(m.manager, 3)
 		if err := m.lowBoundShift(ext, &m.work.Data[0]); err != nil {
 			return err
 		}
@@ -247,7 +247,7 @@ func (m *RationalLPSolver) fillB() error {
 		if err != nil {
 			return err
 		}
-		err = m.manager.Sub(c.RightSide, &m.work.Data[0], &m.work.Data[1])
+		err = etaRationalDifference(m.manager, &m.work.Data[2], &m.work.Data[1], c.RightSide, &m.work.Data[0])
 		if err = m.calls.after(m.manager, b, err); err != nil {
 			return err
 		}

@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Scalar core residual/diagnostic queries, pivot and feasibility-search orchestration, exact primal/dual outer optimization, full upstream drivers and whole-source audits remain open. Audit earlier common exact preparation/presolve binary-expression temporaries against rational.h copy-on-return semantics; the objective correction does not prove those paths complete. Latest full native checkpoint a8a7ef66 predates scalar core base/values and the current objective-expression correction; focused coverage measures current Go statements only."
+    "Remaining scalar core residual/diagnostic queries, pivot/feasibility orchestration, exact primal/dual optimization and full upstream drivers. Targeted common preparation/presolve binary-expression copy audit is now corrected; whole-source and remaining numeral-expression audits remain open."
   ],
   "units": [
     {
@@ -2650,7 +2650,9 @@
         "pkg/util/lp/solver_presolve_exact.go",
         "pkg/util/lp/solver_presolve_exact_test.go",
         "pkg/util/lp/solver_objective_exact.go",
-        "pkg/util/lp/solver_objective_exact_test.go"
+        "pkg/util/lp/solver_objective_exact_test.go",
+        "pkg/util/lp/solver_expression_exact.go",
+        "pkg/util/lp/solver_expression_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -2713,7 +2715,9 @@
         "TestLPRationalObjectivePhysicalOwnership",
         "TestLPRationalObjectiveActualMPSPreparation",
         "TestLPRationalObjectiveBorrowedCoreAndAlias",
-        "TestLPRationalObjectivePreservesOlderComparison"
+        "TestLPRationalObjectivePreservesOlderComparison",
+        "TestLPRationalExpressionPhysicalReturnCopies",
+        "TestLPRationalExpressionPinConditionLifetime"
       ]
     },
     {
@@ -2735,7 +2739,9 @@
         "pkg/util/lp/solver_presolve_exact.go",
         "pkg/util/lp/solver_presolve_exact_test.go",
         "pkg/util/lp/solver_objective_exact.go",
-        "pkg/util/lp/solver_objective_exact_test.go"
+        "pkg/util/lp/solver_objective_exact_test.go",
+        "pkg/util/lp/solver_expression_exact.go",
+        "pkg/util/lp/solver_expression_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -2792,7 +2798,9 @@
         "TestLPRationalObjectivePhysicalOwnership",
         "TestLPRationalObjectiveActualMPSPreparation",
         "TestLPRationalObjectiveBorrowedCoreAndAlias",
-        "TestLPRationalObjectivePreservesOlderComparison"
+        "TestLPRationalObjectivePreservesOlderComparison",
+        "TestLPRationalExpressionPhysicalReturnCopies",
+        "TestLPRationalExpressionPinConditionLifetime"
       ]
     },
     {
@@ -5798,5 +5806,91 @@
       "source_portcheck": "pass: 2103 units, 677 APIs",
       "dependency_graph": "refreshed: 64 native production packages"
     }
+  },
+  "latest_exact_expression_increment": {
+    "source": [
+      "src/util/rational.h:449-482",
+      "src/util/lp/lp_solver.hpp:168-411,504-577"
+    ],
+    "go_targets": [
+      "pkg/util/lp/solver_expression_exact.go",
+      "pkg/util/lp/solver_expression_exact_test.go",
+      "pkg/util/lp/solver_prepare_exact.go",
+      "pkg/util/lp/solver_presolve_exact.go",
+      "pkg/util/lp/solver_objective_exact.go"
+    ],
+    "tests": [
+      "TestLPRationalExpressionPhysicalReturnCopies",
+      "TestLPRationalExpressionPinConditionLifetime"
+    ],
+    "coverage": {
+      "native": {
+        "solver_expression_exact.go": {
+          "covered": 12,
+          "total": 15,
+          "percent": 80.0
+        },
+        "solver_objective_exact.go": {
+          "covered": 90,
+          "total": 97,
+          "percent": 92.8
+        },
+        "solver_prepare_exact.go": {
+          "covered": 229,
+          "total": 249,
+          "percent": 92.0
+        },
+        "solver_presolve_exact.go": {
+          "covered": 307,
+          "total": 332,
+          "percent": 92.5
+        }
+      },
+      "debug": {
+        "solver_expression_exact.go": {
+          "covered": 12,
+          "total": 15,
+          "percent": 80.0
+        },
+        "solver_objective_exact.go": {
+          "covered": 91,
+          "total": 97,
+          "percent": 93.8
+        },
+        "solver_prepare_exact.go": {
+          "covered": 230,
+          "total": 249,
+          "percent": 92.4
+        },
+        "solver_presolve_exact.go": {
+          "covered": 306,
+          "total": 332,
+          "percent": 92.2
+        }
+      }
+    },
+    "focused_seconds": {
+      "native": 11.087,
+      "debug_checked": 13.813
+    },
+    "related_regression_seconds": {
+      "native": 0.915,
+      "debug_checked": 1.194
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-exact-expression-native.cover",
+      "/mnt/oldrog/tmp/g3-exact-expression-debug.cover"
+    ],
+    "validation": {
+      "native_lp_vet": "pass",
+      "debug_checked_lp_vet": "pass",
+      "native_module_compile": "pass",
+      "debug_checked_module_compile": "pass",
+      "source_portcheck": "pass:2103 units,677 APIs",
+      "dependency_graph": "refreshed:64 native production packages",
+      "diff_check": "pass"
+    },
+    "evidence": "Corrective common exact expression audit now preserves rational.h copied-left/compound-update/returned-reference-copy semantics in low-bound row shifts, RHS subtraction, presolve extrema, pinning conditions, row-classification differences and fixed-column elimination. Compound +=, -= and *= remain direct operations. Concrete scalar expression helpers also serve existing objective expressions; no callback arithmetic or unused template adapter is added. Pin-condition products are destroyed before the bound getter and unary-minus condition temporaries before pinning. Six additional direct physical campaigns run through success and each proves an actual returned-reference-copy refusal: the completed exact expression temporary equals an independent big.Rat result while its return destination remains incomplete, including a partially published destination with an invalid backing slot. Witnesses exclude active normalization/GCD/division receipts, so a failed normalization cannot masquerade as a completed expression. Earlier interrupted compound operations can leave an invalid temporary until receipt cleanup; the inspection test accepts only the actual ErrInvalidSlot domain for those earlier prefixes, then requires a valid completed-product witness and a final successful call. A closed-child getter fixture proves the completed condition owners are zero before that getter, while the source coefficient local stays alive. Its initial setup omitted explicit column registration and was corrected; final combined native/debug checks pass. Existing independent arithmetic oracles and pooled/direct preparation/presolve refusal campaigns still pass. Source inventory remains88 partial/16 unported/6 reference_only; no whole-unit promotion.",
+    "limitations": "Coverage native/debug: expression helpers12/15 (80.0%) both, with uncovered blocks rejecting already pending receipts; preparation229/249 (92.0%)/230/249 (92.4%); presolve307/332 (92.5%)/306/332 (92.2%); objective90/97 (92.8%)/91/97 (93.8%). Other uncovered blocks chiefly guard stable capture, predicates, destruction and source assertion alternatives. Combined exact input/column/preparation/presolve/objective/core-values/expression checks pass11.087s/13.813s. Related actual rational MPS and floating common/presolve/primal-outer/dual-preparation/cost regressions pass0.915s/1.194s. Both LP vets and full-module native/debug compilation pass. Full native checkpointa8a7ef66 predates these corrections; no full suite rerun inside the hourly interval. Complete scalar residual/pivot/optimization integration and full upstream drivers remain open."
   }
 }

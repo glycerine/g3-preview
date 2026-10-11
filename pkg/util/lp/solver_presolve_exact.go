@@ -9,6 +9,8 @@ import (
 	"github.com/glycerine/insdict"
 )
 
+// Compound assignments mutate their existing left operand. Binary expressions
+// instead use expressionProduct/expressionDifference and own the return copy.
 func (m *RationalLPSolver) presolveMultiply(a, b, out *numeral.Rational) error {
 	bef, err := m.calls.begin(m.manager)
 	if err != nil {
@@ -52,7 +54,7 @@ func (m *RationalLPSolver) presolveRowBound(row *insdict.Dict[uint32, *numeral.R
 	if row == nil {
 		return false, ErrBounds
 	}
-	m.shiftWork = NewIndexedRationalVector(m.manager, 3)
+	m.shiftWork = NewIndexedRationalVector(m.manager, 4)
 	w := m.shiftWork
 	defer func() {
 		if err == nil {
@@ -99,7 +101,7 @@ func (m *RationalLPSolver) presolveRowBound(row *insdict.Dict[uint32, *numeral.R
 		if err != nil {
 			return false, err
 		}
-		if err = m.presolveMultiply(&w.Data[1], &w.Data[0], &w.Data[2]); err != nil {
+		if err = m.expressionProduct(&w.Data[3], &w.Data[2], &w.Data[1], &w.Data[0]); err != nil {
 			return false, err
 		}
 		if err = m.presolveAdd(out, &w.Data[2], out); err != nil {
@@ -133,7 +135,7 @@ func (m *RationalLPSolver) pinVars(row *insdict.Dict[uint32, *numeral.Rational],
 	if sign == nil {
 		return ErrBounds
 	}
-	m.pinWork = NewIndexedRationalVector(m.manager, 5)
+	m.pinWork = NewIndexedRationalVector(m.manager, 6)
 	w := m.pinWork
 	defer func() {
 		if err == nil {
@@ -167,7 +169,7 @@ func (m *RationalLPSolver) pinVars(row *insdict.Dict[uint32, *numeral.Rational],
 		if err = w.copySlot(&w.Data[2], &w.Data[1]); err != nil {
 			return err
 		} // T a
-		if err = m.presolveMultiply(&w.Data[2], &w.Data[0], &w.Data[3]); err != nil {
+		if err = m.expressionProduct(&w.Data[5], &w.Data[3], &w.Data[2], &w.Data[0]); err != nil {
 			return err
 		}
 		var upper bool
@@ -175,6 +177,11 @@ func (m *RationalLPSolver) pinVars(row *insdict.Dict[uint32, *numeral.Rational],
 		if err != nil {
 			return err
 		}
+		// The condition's product dies before entering either branch.
+		if err = m.manager.Del(&w.Data[3]); err != nil {
+			return err
+		}
+		w.Data[3] = numeral.NewRational()
 		if upper {
 			err = c.GetUpperBound(&w.Data[4])
 		} else {
@@ -238,9 +245,9 @@ func (m *RationalLPSolver) rowBoundObsolete(row *insdict.Dict[uint32, *numeral.R
 		return false, err
 	}
 	if maximum {
-		err = m.presolveSubtract(&w.Data[0], bound, &w.Data[3])
+		err = m.expressionDifference(&w.Data[5], &w.Data[3], &w.Data[0], bound)
 	} else {
-		err = m.presolveSubtract(bound, &w.Data[0], &w.Data[3])
+		err = m.expressionDifference(&w.Data[5], &w.Data[3], bound, &w.Data[0])
 	}
 	if err != nil {
 		return false, err
@@ -268,6 +275,11 @@ func (m *RationalLPSolver) rowBoundObsolete(row *insdict.Dict[uint32, *numeral.R
 	if err != nil {
 		return false, err
 	}
+	// The unary-minus condition temporary dies before pinning the row.
+	if err = m.manager.Del(&w.Data[4]); err != nil {
+		return false, err
+	}
+	w.Data[4] = numeral.NewRational()
 	if !positive {
 		sign := numeral.NewRational()
 		n := int64(-1)
@@ -303,7 +315,7 @@ func (m *RationalLPSolver) rowIsObsolete(row *insdict.Dict[uint32, *numeral.Rati
 	if c.RightSide == nil {
 		return false, ErrBounds
 	}
-	m.work = NewIndexedRationalVector(m.manager, 5)
+	m.work = NewIndexedRationalVector(m.manager, 6)
 	defer func() {
 		if err == nil {
 			err = m.finishPreparationWork()
@@ -384,14 +396,14 @@ func (m *RationalLPSolver) removeFixedFromRow(index uint32, row *insdict.Dict[ui
 		}
 		if ci.Fixed {
 			removed = append(removed, j)
-			m.work = NewIndexedRationalVector(m.manager, 3)
+			m.work = NewIndexedRationalVector(m.manager, 4)
 			if err = m.work.copySlot(&m.work.Data[0], value); err != nil {
 				return err
 			}
 			if err = ci.GetFixedValue(&m.work.Data[1]); err != nil {
 				return err
 			}
-			if err = m.presolveMultiply(&m.work.Data[0], &m.work.Data[1], &m.work.Data[2]); err != nil {
+			if err = m.expressionProduct(&m.work.Data[3], &m.work.Data[2], &m.work.Data[0], &m.work.Data[1]); err != nil {
 				return err
 			}
 			if err = m.presolveSubtract(c.RightSide, &m.work.Data[2], c.RightSide); err != nil {

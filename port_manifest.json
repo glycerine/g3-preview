@@ -127608,7 +127608,9 @@
         "pkg/util/lp/solver_presolve_exact.go",
         "pkg/util/lp/solver_presolve_exact_test.go",
         "pkg/util/lp/solver_objective_exact.go",
-        "pkg/util/lp/solver_objective_exact_test.go"
+        "pkg/util/lp/solver_objective_exact_test.go",
+        "pkg/util/lp/solver_expression_exact.go",
+        "pkg/util/lp/solver_expression_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -127671,7 +127673,9 @@
         "TestLPRationalObjectivePhysicalOwnership",
         "TestLPRationalObjectiveActualMPSPreparation",
         "TestLPRationalObjectiveBorrowedCoreAndAlias",
-        "TestLPRationalObjectivePreservesOlderComparison"
+        "TestLPRationalObjectivePreservesOlderComparison",
+        "TestLPRationalExpressionPhysicalReturnCopies",
+        "TestLPRationalExpressionPinConditionLifetime"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -127821,6 +127825,15 @@
             "TestLPRationalObjectiveBorrowedCoreAndAlias",
             "TestLPRationalObjectivePreservesOlderComparison"
           ]
+        },
+        {
+          "name": "retained mpq/mpq common solver binary product/sum/difference expression owners, return copies and condition lifetime audit",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_expression_exact.go",
+          "tests": [
+            "TestLPRationalExpressionPhysicalReturnCopies",
+            "TestLPRationalExpressionPinConditionLifetime"
+          ]
         }
       ],
       "ownership": [
@@ -127838,7 +127851,8 @@
         "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested.",
         "Floating presolve now supersedes earlier open-presolve notes. Independent exact box-corner extrema verify 100 randomized boxes and 1500 relation/RHS decisions; strict directional tolerance, missing/zero bounds, IEEE, source error prefixes and cleanup-to-scaling integration are tested. Cleanup preserves source d=(try_to_remove_some_rows()>0): logs count successful passes, not removed rows, and fixed-term substitution alone does not force another pass. Go writer errors return after source mutations; native ostream badbit/global binding is not claimed. Exact presolve and full simplex/LAR drivers remain open; whole source units remain partial.",
         "Outer LU path uses actual presolve/preparation/scaling/core Solve. Sorted external numeric indices choose deterministic source unordered objective-sum order. Partial Go constructor owner is closed before returning its error without publishing CoreSolver. The source upper-only flip/type inconsistency is preserved and tested: maximize -x with x<=3,z>=0,-x+z<=2 reports optimal x=3,cost=-3 although independent true optimum is x=-2,cost=2. No source algorithm correction is silently applied. Default tableau/precise variants, source diagnostics/solution validators and complete original driver integration remain open.",
-        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit."
+        "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
+        "Corrective common exact expression audit now preserves rational.h copied-left/compound-update/returned-reference-copy semantics in low-bound row shifts, RHS subtraction, presolve extrema, pinning conditions, row-classification differences and fixed-column elimination. Compound +=, -= and *= remain direct operations. Concrete scalar expression helpers also serve existing objective expressions; no callback arithmetic or unused template adapter is added. Pin-condition products are destroyed before the bound getter and unary-minus condition temporaries before pinning. Six additional direct physical campaigns run through success and each proves an actual returned-reference-copy refusal: the completed exact expression temporary equals an independent big.Rat result while its return destination remains incomplete, including a partially published destination with an invalid backing slot. Witnesses exclude active normalization/GCD/division receipts, so a failed normalization cannot masquerade as a completed expression. Earlier interrupted compound operations can leave an invalid temporary until receipt cleanup; the inspection test accepts only the actual ErrInvalidSlot domain for those earlier prefixes, then requires a valid completed-product witness and a final successful call. A closed-child getter fixture proves the completed condition owners are zero before that getter, while the source coefficient local stays alive. Its initial setup omitted explicit column registration and was corrected; final combined native/debug checks pass. Existing independent arithmetic oracles and pooled/direct preparation/presolve refusal campaigns still pass. Source inventory remains88 partial/16 unported/6 reference_only; no whole-unit promotion. Coverage native/debug: expression helpers12/15 (80.0%) both, with uncovered blocks rejecting already pending receipts; preparation229/249 (92.0%)/230/249 (92.4%); presolve307/332 (92.5%)/306/332 (92.2%); objective90/97 (92.8%)/91/97 (93.8%). Other uncovered blocks chiefly guard stable capture, predicates, destruction and source assertion alternatives. Combined exact input/column/preparation/presolve/objective/core-values/expression checks pass11.087s/13.813s. Related actual rational MPS and floating common/presolve/primal-outer/dual-preparation/cost regressions pass0.915s/1.194s. Both LP vets and full-module native/debug compilation pass. Full native checkpointa8a7ef66 predates these corrections; no full suite rerun inside the hourly interval. Complete scalar residual/pivot/optimization integration and full upstream drivers remain open."
       ]
     },
     {
@@ -127862,7 +127876,9 @@
         "pkg/util/lp/solver_presolve_exact.go",
         "pkg/util/lp/solver_presolve_exact_test.go",
         "pkg/util/lp/solver_objective_exact.go",
-        "pkg/util/lp/solver_objective_exact_test.go"
+        "pkg/util/lp/solver_objective_exact_test.go",
+        "pkg/util/lp/solver_expression_exact.go",
+        "pkg/util/lp/solver_expression_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -127919,7 +127935,9 @@
         "TestLPRationalObjectivePhysicalOwnership",
         "TestLPRationalObjectiveActualMPSPreparation",
         "TestLPRationalObjectiveBorrowedCoreAndAlias",
-        "TestLPRationalObjectivePreservesOlderComparison"
+        "TestLPRationalObjectivePreservesOlderComparison",
+        "TestLPRationalExpressionPhysicalReturnCopies",
+        "TestLPRationalExpressionPinConditionLifetime"
       ],
       "assertions": [
         {
@@ -128114,6 +128132,15 @@
             "TestLPRationalObjectiveBorrowedCoreAndAlias",
             "TestLPRationalObjectivePreservesOlderComparison"
           ]
+        },
+        {
+          "name": "retained mpq/mpq common solver binary product/sum/difference expression owners, return copies and condition lifetime audit",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_expression_exact.go",
+          "tests": [
+            "TestLPRationalExpressionPhysicalReturnCopies",
+            "TestLPRationalExpressionPinConditionLifetime"
+          ]
         }
       ],
       "ownership": [
@@ -128132,7 +128159,8 @@
         "Floating presolve now supersedes earlier open-presolve notes. Independent exact box-corner extrema verify 100 randomized boxes and 1500 relation/RHS decisions; strict directional tolerance, missing/zero bounds, IEEE, source error prefixes and cleanup-to-scaling integration are tested. Cleanup preserves source d=(try_to_remove_some_rows()>0): logs count successful passes, not removed rows, and fixed-term substitution alone does not force another pass. Go writer errors return after source mutations; native ostream badbit/global binding is not claimed. Exact presolve and full simplex/LAR drivers remain open; whole source units remain partial.",
         "Outer LU path uses actual presolve/preparation/scaling/core Solve. Sorted external numeric indices choose deterministic source unordered objective-sum order. Partial Go constructor owner is closed before returning its error without publishing CoreSolver. The source upper-only flip/type inconsistency is preserved and tested: maximize -x with x<=3,z>=0,-x+z<=2 reports optimal x=3,cost=-3 although independent true optimum is x=-2,cost=2. No source algorithm correction is silently applied. Default tableau/precise variants, source diagnostics/solution validators and complete original driver integration remain open.",
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
-        "Corrective scalar objective expression audit: rational binary product and sum copy the left operand, apply the compound operator, then copy its returned reference. Objective work now owns both temporary and returned result, preserving physical failure prefixes. Existing six objective test groups and 14 pooled/direct campaigns pass with updated owner-prefix expectations; coverage98/107 native,99/107 debug. This does not credit complete exact optimization or prove earlier preparation/presolve expression lifetime fidelity; that audit remains open."
+        "Corrective scalar objective expression audit: rational binary product and sum copy the left operand, apply the compound operator, then copy its returned reference. Objective work now owns both temporary and returned result, preserving physical failure prefixes. Existing six objective test groups and 14 pooled/direct campaigns pass with updated owner-prefix expectations; coverage98/107 native,99/107 debug. This does not credit complete exact optimization or prove earlier preparation/presolve expression lifetime fidelity; that audit remains open.",
+        "Corrective common exact expression audit now preserves rational.h copied-left/compound-update/returned-reference-copy semantics in low-bound row shifts, RHS subtraction, presolve extrema, pinning conditions, row-classification differences and fixed-column elimination. Compound +=, -= and *= remain direct operations. Concrete scalar expression helpers also serve existing objective expressions; no callback arithmetic or unused template adapter is added. Pin-condition products are destroyed before the bound getter and unary-minus condition temporaries before pinning. Six additional direct physical campaigns run through success and each proves an actual returned-reference-copy refusal: the completed exact expression temporary equals an independent big.Rat result while its return destination remains incomplete, including a partially published destination with an invalid backing slot. Witnesses exclude active normalization/GCD/division receipts, so a failed normalization cannot masquerade as a completed expression. Earlier interrupted compound operations can leave an invalid temporary until receipt cleanup; the inspection test accepts only the actual ErrInvalidSlot domain for those earlier prefixes, then requires a valid completed-product witness and a final successful call. A closed-child getter fixture proves the completed condition owners are zero before that getter, while the source coefficient local stays alive. Its initial setup omitted explicit column registration and was corrected; final combined native/debug checks pass. Existing independent arithmetic oracles and pooled/direct preparation/presolve refusal campaigns still pass. Source inventory remains88 partial/16 unported/6 reference_only; no whole-unit promotion. Coverage native/debug: expression helpers12/15 (80.0%) both, with uncovered blocks rejecting already pending receipts; preparation229/249 (92.0%)/230/249 (92.4%); presolve307/332 (92.5%)/306/332 (92.2%); objective90/97 (92.8%)/91/97 (93.8%). Other uncovered blocks chiefly guard stable capture, predicates, destruction and source assertion alternatives. Combined exact input/column/preparation/presolve/objective/core-values/expression checks pass11.087s/13.813s. Related actual rational MPS and floating common/presolve/primal-outer/dual-preparation/cost regressions pass0.915s/1.194s. Both LP vets and full-module native/debug compilation pass. Full native checkpointa8a7ef66 predates these corrections; no full suite rerun inside the hourly interval. Complete scalar residual/pivot/optimization integration and full upstream drivers remain open."
       ]
     },
     {
@@ -151577,7 +151605,9 @@
         "pkg/util/numeral/rational_service_zero_invocation_test.go",
         "pkg/util/lp/eta_exact_expression.go",
         "pkg/util/lp/primal_basis_limit_exact.go",
-        "pkg/util/lp/primal_basis_dispatch_exact.go"
+        "pkg/util/lp/primal_basis_dispatch_exact.go",
+        "pkg/util/lp/solver_expression_exact.go",
+        "pkg/util/lp/solver_expression_exact_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -151779,7 +151809,9 @@
         "TestLPExactBasisDispatchPhysicalOwnership",
         "TestLPExactBasisDispatchPreservesOlderComparisonOwner",
         "TestLPExactBasisDispatchGuardsAndZeroDirection",
-        "TestLPExactBasisDispatchMultiplierOutputAlias"
+        "TestLPExactBasisDispatchMultiplierOutputAlias",
+        "TestLPRationalExpressionPhysicalReturnCopies",
+        "TestLPRationalExpressionPinConditionLifetime"
       ],
       "conditionals": [
         {
@@ -152559,6 +152591,15 @@
             "TestLPExactBasisDispatchGuardsAndZeroDirection",
             "TestLPExactBasisDispatchMultiplierOutputAlias"
           ]
+        },
+        {
+          "name": "retained mpq/mpq common solver binary product/sum/difference expression owners, return copies and condition lifetime audit",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_expression_exact.go",
+          "tests": [
+            "TestLPRationalExpressionPhysicalReturnCopies",
+            "TestLPRationalExpressionPinConditionLifetime"
+          ]
         }
       ],
       "ownership": [
@@ -152606,7 +152647,8 @@
         "Added exact invocation forms for less/greater without changing the comparison algorithm. Greater reverses operands as original operator> does. The caller embeds/charges its invocation; no per-call numeric header is introduced. A reached synchronized raw comparison cohort receives a generation captured at entry by its actual invocation; cleanup only joins matching cohorts, so an older completed call cannot adopt a newer failed comparison. Source end stops retain cursor/cause independently of owning cleanup; native allocator/stack/pointer/assertion/fatal/exception ABI and native-fatal resumability are uncredited. The BV hoist comparator consumes these operations, while whole polynomial core/hoisting integration remains required.",
         "Compound multiplication now captures its actual numerical child in RationalServiceInvocation, using the same physical caller receiver as operator*= rather than a returned temporary/copy assignment. Raw multiplication preserves NUM-before-DEN publication, integer shortcut and normalization generation ownership. Tests refuse every reached actual Runtime reservation for distinct and self-aliasing fractions, inspect component prefixes, reject copied/stopped receipts and close owner graphs without leaks. These body refusal campaigns do not separately establish a stopped source destructor or native fatal resumability. Native stack/pointer/layout/allocator/assertion/fatal/exception ABI and whole-unit completion remain uncredited.",
         "General power retains original repeated squaring, zero exponent result one, final unused square and actual uint32 mask-wrap qualification. Integer and fractional exponent65 cold campaigns cover every reached body reservation and exact owning release, without establishing independently stopped source-destructor or native fatal resumability. No native stack/layout/allocator/assertion/exception ABI or whole-unit completion is credited; bv2int integration remains required.",
-        "The original general complement retains its final multiplier update/division and width0 big-input copy/default declarations. Four cold actual Runtime campaigns prove independent finite results, input preservation, body refusal without source DEL, older-generation isolation, copied context rejection and complete owning cleanup. A 4097-bit non-TLS Runtime callback reaches an actual allocation-count refusal and proves executing cleanup guards; TLS count checks remain deferred until source synchronization. Native width63 signed-overflow mask remains the existing guarded adaptation, not new valid native ABI credit. Independently stopped source DT, native fatal resumability, native stack/layout/allocator/assertion/exception ABI and whole-unit completion remain uncredited. is_negatable and bvnot integration remain required."
+        "The original general complement retains its final multiplier update/division and width0 big-input copy/default declarations. Four cold actual Runtime campaigns prove independent finite results, input preservation, body refusal without source DEL, older-generation isolation, copied context rejection and complete owning cleanup. A 4097-bit non-TLS Runtime callback reaches an actual allocation-count refusal and proves executing cleanup guards; TLS count checks remain deferred until source synchronization. Native width63 signed-overflow mask remains the existing guarded adaptation, not new valid native ABI credit. Independently stopped source DT, native fatal resumability, native stack/layout/allocator/assertion/exception ABI and whole-unit completion remain uncredited. is_negatable and bvnot integration remain required.",
+        "Corrective common exact expression audit now preserves rational.h copied-left/compound-update/returned-reference-copy semantics in low-bound row shifts, RHS subtraction, presolve extrema, pinning conditions, row-classification differences and fixed-column elimination. Compound +=, -= and *= remain direct operations. Concrete scalar expression helpers also serve existing objective expressions; no callback arithmetic or unused template adapter is added. Pin-condition products are destroyed before the bound getter and unary-minus condition temporaries before pinning. Six additional direct physical campaigns run through success and each proves an actual returned-reference-copy refusal: the completed exact expression temporary equals an independent big.Rat result while its return destination remains incomplete, including a partially published destination with an invalid backing slot. Witnesses exclude active normalization/GCD/division receipts, so a failed normalization cannot masquerade as a completed expression. Earlier interrupted compound operations can leave an invalid temporary until receipt cleanup; the inspection test accepts only the actual ErrInvalidSlot domain for those earlier prefixes, then requires a valid completed-product witness and a final successful call. A closed-child getter fixture proves the completed condition owners are zero before that getter, while the source coefficient local stays alive. Its initial setup omitted explicit column registration and was corrected; final combined native/debug checks pass. Existing independent arithmetic oracles and pooled/direct preparation/presolve refusal campaigns still pass. Source inventory remains88 partial/16 unported/6 reference_only; no whole-unit promotion. Coverage native/debug: expression helpers12/15 (80.0%) both, with uncovered blocks rejecting already pending receipts; preparation229/249 (92.0%)/230/249 (92.4%); presolve307/332 (92.5%)/306/332 (92.2%); objective90/97 (92.8%)/91/97 (93.8%). Other uncovered blocks chiefly guard stable capture, predicates, destruction and source assertion alternatives. Combined exact input/column/preparation/presolve/objective/core-values/expression checks pass11.087s/13.813s. Related actual rational MPS and floating common/presolve/primal-outer/dual-preparation/cost regressions pass0.915s/1.194s. Both LP vets and full-module native/debug compilation pass. Full native checkpointa8a7ef66 predates these corrections; no full suite rerun inside the hourly interval. Complete scalar residual/pivot/optimization integration and full upstream drivers remain open."
       ]
     },
     {

@@ -1350,6 +1350,7 @@
         "scaler_float.go",
         "settings.go",
         "solver_exact_model.go",
+        "solver_expression_exact.go",
         "solver_float.go",
         "solver_objective_exact.go",
         "solver_prepare_exact.go",

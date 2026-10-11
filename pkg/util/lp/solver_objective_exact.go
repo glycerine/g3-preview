@@ -81,7 +81,7 @@ func (m *RationalLPSolver) SetScaledCost(j uint32) (err error) {
 	if uint64(j) >= uint64(len(m.ColumnScale.Data)) {
 		return ErrBounds
 	}
-	if err = m.objectiveProduct(&m.work.Data[1], &m.work.Data[2], &m.work.Data[0], &m.ColumnScale.Data[j]); err != nil {
+	if err = m.expressionProduct(&m.work.Data[1], &m.work.Data[2], &m.work.Data[0], &m.ColumnScale.Data[j]); err != nil {
 		return err
 	}
 	if m.Costs == nil || uint64(j) >= uint64(len(m.Costs.Data)) {
@@ -123,7 +123,7 @@ func (m *RationalLPSolver) ColumnValueFromCore(column uint32, coreX []numeral.Ra
 	}
 	m.work = NewIndexedRationalVector(m.manager, 6)
 	w := m.work
-	if err = m.objectiveProduct(&w.Data[0], &w.Data[1], &coreX[j], &m.ColumnScale.Data[j]); err != nil {
+	if err = m.expressionProduct(&w.Data[0], &w.Data[1], &coreX[j], &m.ColumnScale.Data[j]); err != nil {
 		return err
 	}
 	value := &w.Data[1]
@@ -144,7 +144,7 @@ func (m *RationalLPSolver) ColumnValueFromCore(column uint32, coreX []numeral.Ra
 				return err
 			}
 		}
-		if err = m.objectiveSum(&w.Data[4], &w.Data[5], value, &w.Data[2]); err != nil {
+		if err = m.expressionSum(&w.Data[4], &w.Data[5], value, &w.Data[2]); err != nil {
 			return err
 		}
 		value = &w.Data[5]
@@ -153,23 +153,4 @@ func (m *RationalLPSolver) ColumnValueFromCore(column uint32, coreX []numeral.Ra
 		return err
 	}
 	return m.finishPreparationWork()
-}
-
-// Source rational binary expressions return a copy of the compound result
-// reference. Capture these concrete calls without enclosing child getters.
-func (m *RationalLPSolver) objectiveProduct(tmp, out, left, right *numeral.Rational) (err error) {
-	before, e := m.calls.begin(m.manager)
-	if e != nil {
-		return e
-	}
-	err = etaRationalProduct(m.manager, tmp, out, left, right)
-	return m.calls.after(m.manager, before, err)
-}
-func (m *RationalLPSolver) objectiveSum(tmp, out, left, right *numeral.Rational) (err error) {
-	before, e := m.calls.begin(m.manager)
-	if e != nil {
-		return e
-	}
-	err = etaRationalSum(m.manager, tmp, out, left, right)
-	return m.calls.after(m.manager, before, err)
 }
