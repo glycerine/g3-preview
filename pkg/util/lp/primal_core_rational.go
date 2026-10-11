@@ -24,6 +24,7 @@ type RationalPrimalCoreSolver struct {
 	stepEpsilon, basisMultiplier                 *IndexedRationalVector
 	leavingMultiplier, leavingRatio              *IndexedRationalVector
 	advanceDelta                                 *IndexedRationalVector
+	enteringStep                                 *IndexedRationalVector
 	Breakpoints                                  []*RationalBreakpoint
 	breakpointWork                               *IndexedRationalVector
 	breakpointCollect, breakpointSlope           *IndexedRationalVector
@@ -164,6 +165,12 @@ func (m *RationalPrimalCoreSolver) Close() error {
 		if err := m.BreakpointQueue.Close(); err != nil {
 			return err
 		}
+	}
+	if m.enteringStep != nil {
+		if err := m.enteringStep.Close(); err != nil {
+			return err
+		}
+		m.enteringStep = nil
 	}
 	if m.advanceDelta != nil {
 		if err := m.advanceDelta.Close(); err != nil {

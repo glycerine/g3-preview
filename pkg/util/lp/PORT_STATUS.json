@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 87.3,
-  "coverage_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion. Scalar pivot comparison and incremental reduced-cost files are newer and retain separate focused evidence. Scalar primal advancement files are newer and retain separate focused evidence.",
+  "coverage_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion. Scalar pivot comparison and incremental reduced-cost files are newer and retain separate focused evidence. Scalar primal advancement files are newer and retain separate focused evidence. Scalar entering orchestration and iteration are newer and retain separate focused evidence.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Scalar primal iteration/tableau advancement/full Solve, scalar dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits."
+    "Scalar primal tableau advancement and full Solve, scalar dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits."
   ],
   "units": [
     {
@@ -2121,7 +2121,9 @@
         "pkg/util/lp/primal_leaving_rational.go",
         "pkg/util/lp/primal_pivot_cost_rational.go",
         "pkg/util/lp/primal_advance_equal_rational.go",
-        "pkg/util/lp/primal_advance_rational.go"
+        "pkg/util/lp/primal_advance_rational.go",
+        "pkg/util/lp/primal_enter_rational.go",
+        "pkg/util/lp/primal_iteration_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2369,7 +2371,13 @@
         "TestLPRationalAdvanceDifferentRollback",
         "TestLPRationalAdvanceDifferentSourcePrefixes",
         "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
-        "TestLPRationalAdvanceDifferentMinimumNegation"
+        "TestLPRationalAdvanceDifferentMinimumNegation",
+        "TestLPRationalEnterSourceAndChildPrefixes",
+        "TestLPRationalEnterPreservesOlderComparison",
+        "TestLPRationalEnterIndependentModels",
+        "TestLPRationalEnterPhysicalOwnership",
+        "TestLPRationalIterationPricingAndAdvance",
+        "TestLPRationalIterationIndependentBoundedOptima"
       ]
     },
     {
@@ -2439,7 +2447,9 @@
         "pkg/util/lp/primal_leaving_rational.go",
         "pkg/util/lp/primal_pivot_cost_rational.go",
         "pkg/util/lp/primal_advance_equal_rational.go",
-        "pkg/util/lp/primal_advance_rational.go"
+        "pkg/util/lp/primal_advance_rational.go",
+        "pkg/util/lp/primal_enter_rational.go",
+        "pkg/util/lp/primal_iteration_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2667,7 +2677,13 @@
         "TestLPRationalAdvanceDifferentRollback",
         "TestLPRationalAdvanceDifferentSourcePrefixes",
         "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
-        "TestLPRationalAdvanceDifferentMinimumNegation"
+        "TestLPRationalAdvanceDifferentMinimumNegation",
+        "TestLPRationalEnterSourceAndChildPrefixes",
+        "TestLPRationalEnterPreservesOlderComparison",
+        "TestLPRationalEnterIndependentModels",
+        "TestLPRationalEnterPhysicalOwnership",
+        "TestLPRationalIterationPricingAndAdvance",
+        "TestLPRationalIterationIndependentBoundedOptima"
       ]
     },
     {
@@ -6993,5 +7009,54 @@
       "dependency graph refresh: 64 packages",
       "diff check"
     ]
+  },
+  "latest_rational_iteration_increment": {
+    "scope": "Concrete scalar entering orchestration and one_iteration; source hpp771-790,1050-1060",
+    "source_units_promoted": false,
+    "focused_native_seconds": 0.746,
+    "focused_debug_checked_seconds": 0.956,
+    "statement_coverage": {
+      "native": {
+        "primal_enter_rational.go": {
+          "covered": 20,
+          "total": 23,
+          "percent": 87.0
+        },
+        "primal_iteration_rational.go": {
+          "covered": 13,
+          "total": 13,
+          "percent": 100.0
+        }
+      },
+      "debug_checked": {
+        "primal_enter_rational.go": {
+          "covered": 21,
+          "total": 23,
+          "percent": 91.3
+        },
+        "primal_iteration_rational.go": {
+          "covered": 13,
+          "total": 13,
+          "percent": 100.0
+        }
+      }
+    },
+    "independent_entering_models": 320,
+    "independent_bounded_optimum_models": 120,
+    "physical_campaigns": 12,
+    "older_comparison_campaigns": 2,
+    "remaining": "Scalar primal tableau advancement and full Solve, scalar dual/outer optimization/scaling integration and remaining LP source/upstream-driver audits.",
+    "related_native_seconds": 44.278,
+    "related_debug_checked_seconds": 63.095,
+    "verification": [
+      "both final focused profiles",
+      "both related regression profiles with unchanged production code before adding final budget-error test",
+      "both LP vets",
+      "both module compile gates",
+      "source portcheck: 2103 units, 677 APIs",
+      "dependency graph refresh: 64 packages",
+      "diff check"
+    ],
+    "coverage_note": "Uncovered entering paths guard preexisting local ownership and destruction failure; native additionally erases its negative-entering source assertion. Iteration orchestration has full statement coverage. Coverage measures implemented Go statements, not C++ completion."
   }
 }

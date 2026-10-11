@@ -125326,7 +125326,9 @@
         "pkg/util/lp/primal_leaving_rational.go",
         "pkg/util/lp/primal_pivot_cost_rational.go",
         "pkg/util/lp/primal_advance_equal_rational.go",
-        "pkg/util/lp/primal_advance_rational.go"
+        "pkg/util/lp/primal_advance_rational.go",
+        "pkg/util/lp/primal_enter_rational.go",
+        "pkg/util/lp/primal_iteration_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -125574,7 +125576,13 @@
         "TestLPRationalAdvanceDifferentRollback",
         "TestLPRationalAdvanceDifferentSourcePrefixes",
         "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
-        "TestLPRationalAdvanceDifferentMinimumNegation"
+        "TestLPRationalAdvanceDifferentMinimumNegation",
+        "TestLPRationalEnterSourceAndChildPrefixes",
+        "TestLPRationalEnterPreservesOlderComparison",
+        "TestLPRationalEnterIndependentModels",
+        "TestLPRationalEnterPhysicalOwnership",
+        "TestLPRationalIterationPricingAndAdvance",
+        "TestLPRationalIterationIndependentBoundedOptima"
       ],
       "conditionals": [
         {
@@ -126268,6 +126276,22 @@
             "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
             "TestLPRationalAdvanceDifferentMinimumNegation"
           ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq entering orchestration and one_iteration with actual LU solve, precise leaving selection, advancement and terminal status decision",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_enter_rational.go",
+            "pkg/util/lp/primal_iteration_rational.go"
+          ],
+          "tests": [
+            "TestLPRationalEnterSourceAndChildPrefixes",
+            "TestLPRationalEnterPreservesOlderComparison",
+            "TestLPRationalEnterIndependentModels",
+            "TestLPRationalEnterPhysicalOwnership",
+            "TestLPRationalIterationPricingAndAdvance",
+            "TestLPRationalIterationIndependentBoundedOptima"
+          ]
         }
       ],
       "ownership": [
@@ -126280,7 +126304,8 @@
         "Exact breakpoint collection retains difference/ratio and entering-span pair locals with the primal across record construction and queue enqueue. Scalar captures end before queue numerical work, so queue comparison receipts remain separate. Failure retains partial records and scratch for Close; older caller comparisons are preserved.",
         "Owned traversal slope survives queue dequeues and nested slope/threshold expressions. Parent numerical capture ends before queue calls; queue comparison receipts remain separate. Failed dequeue preserves the source queue prefix and all records; failed output assignment retains traversal slope for Close. Older caller comparison generations are preserved. Debug exact wrapper rejects precise()==false before collection, matching source assertion.",
         "Precise leaving scan owns full -ed*direction expression separately from the by-value basis multiplier, keeping it alive through delegated bound helpers. A distinct ratio local survives repeated row calculations and rejected entering bound flips. Each child retains its own numerical receipts; primal Close cleans raw invocations before all expression/ratio locals. Candidate and output failure prefixes, live input/output alias rereads and older caller comparisons are retained.",
-        "Row iteration bound/coefficient/theta locals are excluded from child ready guards and retained through stopped child borrows. Arithmetic difference temporary and raw receipts unwind before base children; base Close destroys child numerical receipts and scratch before theta, coefficient and bound locals. Only owning row-iteration entry rejects preexisting locals. Caller-owned theta in direct advancement remains borrowed."
+        "Row iteration bound/coefficient/theta locals are excluded from child ready guards and retained through stopped child borrows. Arithmetic difference temporary and raw receipts unwind before base children; base Close destroys child numerical receipts and scratch before theta, coefficient and bound locals. Only owning row-iteration entry rejects preexisting locals. Caller-owned theta in direct advancement remains borrowed.",
+        "Scalar entering orchestration creates its owning step only after SolveBd. The step stays live through leaving and advancement calls, including stopped delegated borrows. Close releases base/queue arithmetic before the step; child ready guards allow the live step, while the owning entering entry rejects an existing step. OneIteration preserves source status ordering and does not increment TotalIterations."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
@@ -126373,7 +126398,9 @@
         "pkg/util/lp/primal_leaving_rational.go",
         "pkg/util/lp/primal_pivot_cost_rational.go",
         "pkg/util/lp/primal_advance_equal_rational.go",
-        "pkg/util/lp/primal_advance_rational.go"
+        "pkg/util/lp/primal_advance_rational.go",
+        "pkg/util/lp/primal_enter_rational.go",
+        "pkg/util/lp/primal_iteration_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -126601,7 +126628,13 @@
         "TestLPRationalAdvanceDifferentRollback",
         "TestLPRationalAdvanceDifferentSourcePrefixes",
         "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
-        "TestLPRationalAdvanceDifferentMinimumNegation"
+        "TestLPRationalAdvanceDifferentMinimumNegation",
+        "TestLPRationalEnterSourceAndChildPrefixes",
+        "TestLPRationalEnterPreservesOlderComparison",
+        "TestLPRationalEnterIndependentModels",
+        "TestLPRationalEnterPhysicalOwnership",
+        "TestLPRationalIterationPricingAndAdvance",
+        "TestLPRationalIterationIndependentBoundedOptima"
       ],
       "conditionals": [
         {
@@ -127371,6 +127404,22 @@
             "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
             "TestLPRationalAdvanceDifferentMinimumNegation"
           ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq entering orchestration and one_iteration with actual LU solve, precise leaving selection, advancement and terminal status decision",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_enter_rational.go",
+            "pkg/util/lp/primal_iteration_rational.go"
+          ],
+          "tests": [
+            "TestLPRationalEnterSourceAndChildPrefixes",
+            "TestLPRationalEnterPreservesOlderComparison",
+            "TestLPRationalEnterIndependentModels",
+            "TestLPRationalEnterPhysicalOwnership",
+            "TestLPRationalIterationPricingAndAdvance",
+            "TestLPRationalIterationIndependentBoundedOptima"
+          ]
         }
       ],
       "ownership": [
@@ -127380,7 +127429,8 @@
         "Precise bound-step expressions own separate pair result and rational parameter scratch through failed arithmetic/assignment. Primal Close cleans newly captured raw invocations before pair-result and rational scratch, retaining caller-owned outputs and older caller comparisons. LimitTheta publishes unlimited=false only after complete output assignment; rejected bound flips still publish their step. Leaving selection delegates feasibility/bound comparisons without adopting base receipts and preserves infeasibility-set iteration state. Full precise ratio/breakpoint/advance/Solve remains incomplete.",
         "Exact breakpoint collection retains difference/ratio and entering-span pair locals with the primal across record construction and queue enqueue. Scalar captures end before queue numerical work, so queue comparison receipts remain separate. Failure retains partial records and scratch for Close; older caller comparisons are preserved.",
         "Owned traversal slope survives queue dequeues and nested slope/threshold expressions. Parent numerical capture ends before queue calls; queue comparison receipts remain separate. Failed dequeue preserves the source queue prefix and all records; failed output assignment retains traversal slope for Close. Older caller comparison generations are preserved. Debug exact wrapper rejects precise()==false before collection, matching source assertion.",
-        "Precise leaving scan owns full -ed*direction expression separately from the by-value basis multiplier, keeping it alive through delegated bound helpers. A distinct ratio local survives repeated row calculations and rejected entering bound flips. Each child retains its own numerical receipts; primal Close cleans raw invocations before all expression/ratio locals. Candidate and output failure prefixes, live input/output alias rereads and older caller comparisons are retained."
+        "Precise leaving scan owns full -ed*direction expression separately from the by-value basis multiplier, keeping it alive through delegated bound helpers. A distinct ratio local survives repeated row calculations and rejected entering bound flips. Each child retains its own numerical receipts; primal Close cleans raw invocations before all expression/ratio locals. Candidate and output failure prefixes, live input/output alias rereads and older caller comparisons are retained.",
+        "Scalar entering orchestration creates its owning step only after SolveBd. The step stays live through leaving and advancement calls, including stopped delegated borrows. Close releases base/queue arithmetic before the step; child ready guards allow the live step, while the owning entering entry rejects an existing step. OneIteration preserves source status ordering and does not increment TotalIterations."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
