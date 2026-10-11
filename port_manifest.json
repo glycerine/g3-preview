@@ -103048,7 +103048,9 @@
         "pkg/util/lp/driver_permutation_debug.go",
         "pkg/util/lp/driver_permutation_native.go",
         "pkg/util/lp/driver_permutation_test.go",
-        "pkg/util/lp/driver_permutation_debug_test.go"
+        "pkg/util/lp/driver_permutation_debug_test.go",
+        "pkg/util/lp/driver_stacked.go",
+        "pkg/util/lp/driver_stacked_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103260,7 +103262,10 @@
         "TestLPIntSetPrintActualEndl",
         "TestLPDriverPermutationIndependentResults",
         "TestLPDriverPermutationReportFailures",
-        "TestLPDriverPermutationDebugActualProductChecks"
+        "TestLPDriverPermutationDebugActualProductChecks",
+        "TestLPDriverStackedIndependentResults",
+        "TestLPDriverStackedReportAndPublicationFailures",
+        "TestLPDriverStackedSetEquality"
       ],
       "conditionals": [
         {
@@ -104275,6 +104280,16 @@
             "TestLPDriverPermutationIndependentResults",
             "TestLPDriverPermutationReportFailures",
             "TestLPDriverPermutationDebugActualProductChecks"
+          ]
+        },
+        {
+          "name": "retained test_stacked src1933-2058 executable CLI scenario: literal map/unsigned/vector scopes and debug-only set, reports and restored state",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_stacked.go",
+          "tests": [
+            "TestLPDriverStackedIndependentResults",
+            "TestLPDriverStackedReportAndPublicationFailures",
+            "TestLPDriverStackedSetEquality"
           ]
         }
       ],

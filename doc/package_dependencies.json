@@ -1236,6 +1236,7 @@
         "driver_permutation_native.go",
         "driver_process_file.go",
         "driver_settings.go",
+        "driver_stacked.go",
         "dual_advance_float.go",
         "dual_advance_rational.go",
         "dual_beta_rational.go",

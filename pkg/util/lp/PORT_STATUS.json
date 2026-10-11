@@ -10014,5 +10014,41 @@
       "/mnt/oldrog/tmp/g3-permutation-driver-debug.cover"
     ],
     "remaining": "Other retained registered scenarios, complete CLI execution and argv+2 binding; retained-source/consumer/ownership audits."
+  },
+  "latest_stacked_cli_scenario_increment": {
+    "scope": "Executable retained --smap scenario; complete CLI execution and other registered scenarios remain open",
+    "tests": [
+      "TestLPDriverStackedIndependentResults",
+      "TestLPDriverStackedReportAndPublicationFailures",
+      "TestLPDriverStackedSetEquality"
+    ],
+    "coverage": {
+      "native": {
+        "covered": 104,
+        "statements": 149,
+        "percent": 69.8
+      },
+      "combined_debug_checked": {
+        "covered": 127,
+        "statements": 149,
+        "percent": 85.2
+      }
+    },
+    "combined_function_coverage_percent": {
+      "Run": 100.0,
+      "runMap": 87.9,
+      "runValue": 85.7,
+      "runVector": 73.5,
+      "runSet": 82.8,
+      "driverStackedSetsEqual": 100.0
+    },
+    "coverage_warning": "All successful source operations and report failures covered; remaining common statements guard stable child errors/invariants. Native profile includes erased debug set body. No artificial failure hooks added.",
+    "validation": "Focused native0.080s/combined0.082s; related all stacked/preparation native2.051s/combined2.107s; both LP vets and module compile gates passed.",
+    "evidence": "Independent final map{0:3,2:3}, unsigned4/no scopes, vector[0,1,2,3,7] with retained scope sizes[0,2], debug set{1,2,3}/no scopes. Every byte/endl refusal checks exact completed scenario prefix and value/scope publications. Separate runs own independent native storage.25 finite equality cases.",
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-stacked-driver-native.cover",
+      "/mnt/oldrog/tmp/g3-stacked-driver-debug.cover"
+    ],
+    "remaining": "Other retained registered scenarios, complete CLI action execution and argv+2 entry; whole retained-source/consumer/ownership audits."
   }
 }
