@@ -9217,5 +9217,41 @@
       "terminal_exit_code": 1,
       "reason": "Actual session32418 returned terminal exit1: runner log/event write failed with OSError errno28 (no space left on device). No complete LP result or coverage credited. 62 package pass events and LP start observed; log stops during an LP test."
     }
-  ]
+  ],
+  "latest_known_float_driver_increment": {
+    "scope": "Retained solve_mps_with_known_solution default floating consumer; solve_some_mps/CLI and whole-source audit remain open",
+    "source_units_promoted": false,
+    "test_groups": 6,
+    "actual_default_file_worlds": 80,
+    "focused_native_seconds": 0.168,
+    "focused_debug_checked_seconds": 0.182,
+    "related_native_seconds": 20.43,
+    "related_debug_checked_seconds": 27.622,
+    "statement_coverage": {
+      "native": {
+        "covered": 74,
+        "total": 83,
+        "percent": 89.2
+      },
+      "debug_checked": {
+        "covered": 82,
+        "total": 83,
+        "percent": 98.8
+      }
+    },
+    "coverage_note": "Checked82/83, native74/83. Native excludes all checked-only assertion getter bodies; delegated default factory failure remains uncovered. Actual file entry covers default source failures, missing/empty/infeasible and row-free sources. Prepared actual LU-solved fixtures with explicit fixed values cover report success, mismatches, exact epsilon/adjacent value, NaN/infinities, live status/cost/diagnostic/checked getter reads, every report byte/endl flush, 19/20 column threshold and real file-close retry. Prepared reporting is not full default solving credit. Native Go floating slices/maps have no exact arena physical campaigns.",
+    "verification": {
+      "focused_native": "passed",
+      "focused_debug_checked": "passed",
+      "related_native": "passed",
+      "related_debug_checked": "passed",
+      "lp_vet_native": "passed",
+      "lp_vet_debug_checked": "passed",
+      "module_compile_native": "passed",
+      "module_compile_debug_checked": "passed",
+      "portcheck": "passed",
+      "dependency_graph": "passed",
+      "diff_check": "passed"
+    }
+  }
 }

@@ -103017,7 +103017,9 @@
         "pkg/util/lp/driver_mps_default_rational.go",
         "pkg/util/lp/driver_lar.go",
         "pkg/util/lp/driver_lar_mps_file.go",
-        "pkg/util/lp/driver_lar_smt_file_test.go"
+        "pkg/util/lp/driver_lar_smt_file_test.go",
+        "pkg/util/lp/driver_mps_known_float.go",
+        "pkg/util/lp/driver_mps_known_float_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103161,7 +103163,13 @@
         "TestLPLARSMTFileReportFailures",
         "TestLPLARSMTFilePhysicalOwnership",
         "TestLPLARSMTFileOlderCallerComparison",
-        "TestLPLARSMTInputFailedSecondCreatorClose"
+        "TestLPLARSMTInputFailedSecondCreatorClose",
+        "TestLPMPSKnownFloatSourceDefaults",
+        "TestLPMPSKnownFloatMismatchDomains",
+        "TestLPMPSKnownFloatMissingEmptyInfeasibleAndThreshold",
+        "TestLPMPSKnownFloatReportFailures",
+        "TestLPMPSKnownFloatLiveReadsAndCleanup",
+        "TestLPMPSKnownFloatPreparedReportThresholdAndGuards"
       ],
       "conditionals": [
         {
@@ -103996,6 +104004,19 @@
             "TestLPLARSMTFileOlderCallerComparison",
             "TestLPLARSMTInputFailedSecondCreatorClose"
           ]
+        },
+        {
+          "name": "solve_mps_with_known_solution (1380-1419), reached by solve_some_mps: actual default floating reader/factory/Find and status/value checks, diagnostic getter rereads, source assertions/exception, cost and named reporting",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_mps_known_float.go",
+          "tests": [
+            "TestLPMPSKnownFloatSourceDefaults",
+            "TestLPMPSKnownFloatMismatchDomains",
+            "TestLPMPSKnownFloatMissingEmptyInfeasibleAndThreshold",
+            "TestLPMPSKnownFloatReportFailures",
+            "TestLPMPSKnownFloatLiveReadsAndCleanup",
+            "TestLPMPSKnownFloatPreparedReportThresholdAndGuards"
+          ]
         }
       ],
       "ownership": [
@@ -104006,7 +104027,8 @@
         "Auxiliary exact driver uses concrete solver defaults and ignores arguments as source does. Each named returned numeral survives its output plus trailing space, then dies before next expression. Objective returned numeral survives endl; failed children and expression locals remain reachable until explicit Close, with delegated captures retained by their actual owning child. Eight pooled/direct physical campaigns and two actual older caller comparisons verify cleanup ownership.",
         "LARRunDriver borrows its LAR solver, optional MPS reader and arguments. It owns concrete primal comparison and named snapshots, closing comparison before borrowed getter outputs; lexical infeasibility evidence closes at if-block end, with failed work reachable for explicit cleanup. Eight pooled/direct physical campaigns cover actual Solve, infeasibility, randomize and comparison through success; two actual older caller comparisons survive driver and solver/reader cleanup.",
         "LAR MPS file driver owns creation reader, returned LAR solver, second reader and run driver. Successful CreateLARSolver leaves no parser-numeral borrows: column registration and source AddConstraint no-op/debug assertion are inspected; creation reader closes before second read as source scopes require. Failed creation retains reader until partial solver cleanup. Run driver closes before LAR solver and report reader; failed second list child remains reachable. Four pooled/direct physical campaigns and two actual older caller comparisons verify all prefixes.",
-        "Generic LARFileDriver/LARInputDriver own selected MPS or SMT creator, solver, unconditional second MPS reader and runner. Successful creator scope ends before second read; failed factory retains partial solver/creator. Close retries preserve failed Current and creator. Four pooled/direct physical campaigns, two older caller comparisons and real second-child file-close refusal verify ownership prefixes."
+        "Generic LARFileDriver/LARInputDriver own selected MPS or SMT creator, solver, unconditional second MPS reader and runner. Successful creator scope ends before second read; failed factory retains partial solver/creator. Close retries preserve failed Current and creator. Four pooled/direct physical campaigns, two older caller comparisons and real second-child file-close refusal verify ownership prefixes.",
+        "Known floating MPS consumer reuses MPSFileDriver ownership: solver closes before reader, successful scope auto-closes and failed default solve/report/real file-close retains owner for retry. Borrowed native expected-value map copies each value for its iteration; Go native floating storage has no exact-arena roots."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -104027,7 +104049,8 @@
         "Auxiliary exact driver retains fresh tableau default zero reduced costs: 40 positive-objective bounded worlds report initial zero objective as source defaults do, without claiming mathematical optimality. No setup, minimum correction, limits or stopwatch is introduced. Exact dual unsupported rational(double) and missing sparsity metadata remain explicit source boundaries. Column names use the existing reader insertion order instead of C++ unordered-map iteration. Source diagnostics route to the configured native writer.",
         "run_lar_solver uses native Go writers, clock, slices and concrete rational vector snapshots. Source unused local solution map is represented by owning named-getter snapshots without a universal STL adapter; names use existing reader insertion order. Source compare branch prints LAR status without solving LAR or comparing values. Source raw primal comparison pointer is not deleted; Go explicit driver ownership closes it, avoiding a leaked numerical owner. Configured output redirects concrete solver diagnostics. Disabled directory traversal is not implemented.",
         "MPS-specific LAR entry points port the retained MPS half, not the separate SMT reader/dispatch. Source two reads and file-before-list priority are retained. Missing individual files emit both parser diagnostics and return normally so list processing continues. Checked general AddConstraint asserts during initial factory before the second read; native retains the disabled constraint body and does not establish mathematical constrained-model solving. Native read/close/report errors remain explicit and partial owners permit cleanup retry.",
-        "SMT creation retains source unconditional second MPS read: ordinary SMT-only input emits EOF then column/RHS diagnostics and returns without solving; empty SMT conjunction followed by valid MPS exercises actual solve/randomize/comparison. Invalid SMT creation with valid MPS second read reaches explicit nil-solver ErrBounds instead of C++ null dereference. Existing AddConstraint checked assertion/native no-op remains. Native Go files/slices/writers, no STL adapters. Top-level CLI and whole-source audit remain open."
+        "SMT creation retains source unconditional second MPS read: ordinary SMT-only input emits EOF then column/RHS diagnostics and returns without solving; empty SMT conjunction followed by valid MPS exercises actual solve/randomize/comparison. Invalid SMT creation with valid MPS second read reaches explicit nil-solver ErrBounds instead of C++ null dereference. Existing AddConstraint checked assertion/native no-op remains. Native Go files/slices/writers, no STL adapters. Top-level CLI and whole-source audit remain open.",
+        "RunFloatKnownSolution retains source constructor defaults, with no argument settings or clock. Ordinary nonempty default floating/tableau models lack usable LU: checked primal reaches source assertion, native primal and both dual profiles reach ErrBounds; no source repair or successful default optimization is credited. Prepared actual LU solves plus explicitly fixed accessor values exercise otherwise blocked reporting and are separate from full entry. Sorted Go expected map keys replace unspecified unordered traversal. ErrDriverStatusWrong transports source string exception; checked preceding SASSERT remains. Diagnostic and assertion each reread actual getter; NaN skips >= diagnostic but fails checked < assertion."
       ]
     },
     {
