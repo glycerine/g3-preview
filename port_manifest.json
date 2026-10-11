@@ -103050,7 +103050,9 @@
         "pkg/util/lp/driver_permutation_test.go",
         "pkg/util/lp/driver_permutation_debug_test.go",
         "pkg/util/lp/driver_stacked.go",
-        "pkg/util/lp/driver_stacked_test.go"
+        "pkg/util/lp/driver_stacked_test.go",
+        "pkg/util/lp/driver_lar_examples.go",
+        "pkg/util/lp/driver_lar_examples_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103265,7 +103267,11 @@
         "TestLPDriverPermutationDebugActualProductChecks",
         "TestLPDriverStackedIndependentResults",
         "TestLPDriverStackedReportAndPublicationFailures",
-        "TestLPDriverStackedSetEquality"
+        "TestLPDriverStackedSetEquality",
+        "TestLPLARExamplesActualSourceProfiles",
+        "TestLPLARExamplesReportFailurePrefixes",
+        "TestLPLARExamplesSmallNumeralOwnership",
+        "TestLPLARExamplesPreserveOlderComparison"
       ],
       "conditionals": [
         {
@@ -104290,6 +104296,17 @@
             "TestLPDriverStackedIndependentResults",
             "TestLPDriverStackedReportAndPublicationFailures",
             "TestLPDriverStackedSetEquality"
+          ]
+        },
+        {
+          "name": "retained test_term and test_evidence_for_total_inf_simple src2711-2759 executable drivers: literal actual AddVar/AddTerm/AddVarBound/AddConstraint/Solve/GetModel and reports; disabled source constraints/debug assertion preserved",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_lar_examples.go",
+          "tests": [
+            "TestLPLARExamplesActualSourceProfiles",
+            "TestLPLARExamplesReportFailurePrefixes",
+            "TestLPLARExamplesSmallNumeralOwnership",
+            "TestLPLARExamplesPreserveOlderComparison"
           ]
         }
       ],

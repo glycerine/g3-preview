@@ -10050,5 +10050,50 @@
       "/mnt/oldrog/tmp/g3-stacked-driver-debug.cover"
     ],
     "remaining": "Other retained registered scenarios, complete CLI action execution and argv+2 entry; whole retained-source/consumer/ownership audits."
+  },
+  "latest_lar_cli_examples_increment": {
+    "scope": "Executable retained --term and --eti examples; complete CLI and other registered scenarios remain open",
+    "tests": [
+      "TestLPLARExamplesActualSourceProfiles",
+      "TestLPLARExamplesReportFailurePrefixes",
+      "TestLPLARExamplesSmallNumeralOwnership",
+      "TestLPLARExamplesPreserveOlderComparison"
+    ],
+    "coverage": {
+      "native": {
+        "covered": 97,
+        "statements": 120,
+        "percent": 80.8
+      },
+      "combined_debug_checked": {
+        "covered": 58,
+        "statements": 120,
+        "percent": 48.3
+      }
+    },
+    "native_function_coverage_percent": {
+      "NewLARExampleDriver": 100.0,
+      "begin": 84.2,
+      "variables": 80.0,
+      "solveAndReport": 81.8,
+      "RunTerm": 84.6,
+      "RunEvidence": 72.7,
+      "Close": 78.3
+    },
+    "coverage_warning": "Debug AddConstraint asserts before Solve/report/GetModel; later statements are unreachable in this source profile. Native gaps chiefly stable delegated numerical/cleanup errors and source-invariant assertions. Successful actual source paths and report refusals covered.",
+    "validation": "Focused native0.272s/combined0.237s; related source example/AddConstraint/GetModel native11.889s/combined24.210s; both LP vets and module compile gates passed.",
+    "source_fidelity": [
+      "General AddConstraint normalization is commented out: debug stops at first call, native term is unconstrained and evidence example retains only its two feasible bounds; both native results OPTIMAL.",
+      "Term model is three zero columns named v0,v1,v1000000, exposing disabled source equality; no constrained-solve credit.",
+      "Source unordered-map bucket output replaced with ascending column IDs; strings and numeric values preserved.",
+      "Evidence source local model is never populated."
+    ],
+    "ownership_evidence": "Every output byte/endl refusal closes model before solver/literals; reports retain completed solution prefixes. Two actual older1000-digit comparisons survive driver child work and owning cleanup without receipt adoption; root censuses pass. Both examples complete in pooled/direct mode with FailAfter(0) and unchanged custom budget: all reached numbers fit small representation.",
+    "test_corrections": "Initial unused bytes import removed. Initial campaign wrongly required a physical refusal from small-number examples; observed zero custom allocations, replaced with explicit allocation-disabled/unchanged-budget checks rather than altering source model.",
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-lar-examples-native.cover",
+      "/mnt/oldrog/tmp/g3-lar-examples-debug.cover"
+    ],
+    "remaining": "Other retained registered scenarios, full top-level execution and argv+2 entry binding; retained-source/consumer/ownership audits."
   }
 }

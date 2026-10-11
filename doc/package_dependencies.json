@@ -1221,6 +1221,7 @@
         "driver_file_list.go",
         "driver_glpk_reports.go",
         "driver_lar.go",
+        "driver_lar_examples.go",
         "driver_lar_mps_file.go",
         "driver_lu_check.go",
         "driver_lu_check_native.go",
