@@ -124768,7 +124768,8 @@
         "pkg/util/lp/dual_breakpoint_rational.go",
         "pkg/util/lp/dual_ratio_rational.go",
         "pkg/util/lp/dual_flip_rational.go",
-        "pkg/util/lp/dual_beta_rational.go"
+        "pkg/util/lp/dual_beta_rational.go",
+        "pkg/util/lp/dual_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -124851,7 +124852,19 @@
         "TestLPRationalDualBetaPreservesOlderComparison",
         "TestLPRationalDualBetaMetadataAndPrefixes",
         "TestLPRationalDualBetaPreparedDenseStage",
-        "TestLPRationalDualBetaReinitializationHasNoFloor"
+        "TestLPRationalDualBetaReinitializationHasNoFloor",
+        "TestLPRationalDualAdvanceIndependentExchanges",
+        "TestLPRationalDualAdvanceActualRecovery",
+        "TestLPRationalDualAdvanceRevertAndRecoverPositions",
+        "TestLPRationalDualAdvanceSnapIndependentProfiles",
+        "TestLPRationalDualAdvanceDoneAndNoCandidate",
+        "TestLPRationalDualAdvanceCostDiagnosticThresholds",
+        "TestLPRationalDualAdvanceDiagnosticWriterPrefixes",
+        "TestLPRationalDualAdvancePhysicalOwnership",
+        "TestLPRationalDualAdvancePreservesOlderComparison",
+        "TestLPRationalDualAdvanceMetadataAndStoppedPrefixes",
+        "TestLPRationalDualAdvanceUpperLeavingSnapAndReconstruct",
+        "TestLPRationalDualAdvanceActualSingularFallback"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -125022,6 +125035,25 @@
             "TestLPRationalDualBetaPreparedDenseStage",
             "TestLPRationalDualBetaReinitializationHasNoFloor"
           ]
+        },
+        {
+          "name": "Concrete scalar known-leaving advancement, basis exchange/update, snapping/reconstruction, actual LU rollback/recovery and reduced-cost diagnostic",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_advance_rational.go",
+          "tests": [
+            "TestLPRationalDualAdvanceIndependentExchanges",
+            "TestLPRationalDualAdvanceActualRecovery",
+            "TestLPRationalDualAdvanceRevertAndRecoverPositions",
+            "TestLPRationalDualAdvanceSnapIndependentProfiles",
+            "TestLPRationalDualAdvanceDoneAndNoCandidate",
+            "TestLPRationalDualAdvanceCostDiagnosticThresholds",
+            "TestLPRationalDualAdvanceDiagnosticWriterPrefixes",
+            "TestLPRationalDualAdvancePhysicalOwnership",
+            "TestLPRationalDualAdvancePreservesOlderComparison",
+            "TestLPRationalDualAdvanceMetadataAndStoppedPrefixes",
+            "TestLPRationalDualAdvanceUpperLeavingSnapAndReconstruct",
+            "TestLPRationalDualAdvanceActualSingularFallback"
+          ]
         }
       ],
       "ownership": [
@@ -125030,13 +125062,16 @@
         "Scalar Harris, tight-time, Q and combined-driver lexical values remain live through actual child calls. Copied-left shifts/quotients and copied-input abs/return values preserve numerical prefixes; comparisons retain source operand order. Only each numerical owner captures its own calls; caller-owned older comparisons survive all child and solver cleanup.",
         "Base-owned bound-span arithmetic finishes capture before dual products/abs/compound loss sums. Ratio loss/trial locals remain owned through stopped children; the trial dies on loop break before theta evaluation. Source flipped membership publishes before member Delta copy and breakpoint erasure. Raw receipts close before base borrowers, then expression locals and member roots; older caller comparisons survive cleanup.",
         "Signed spans and process argument locals remain owned through actual base/matrix numerical children. Parent captures cover only its own copied-left products, compound reduced-cost/value updates and copied unary negation. Matrix and LU retain their own stopped receipts; dual Close finishes base borrowers before its lexical/member roots. Source descending basic/beta traversal and ascending flipped membership are retained.",
-        "The owning inverse-row vector survives actual LU child calls and stopped exact arithmetic. Parent captures cover only own reciprocal/product/sum/copy calls; base LU borrowers close before inverse-row lexical storage. Recurrence preserves copied-left expression returns, member beta publication before local beta copy, descending row traversal, copied Ed coefficient and expression destruction before the next source floor construction. Older caller comparisons are not adopted."
+        "The owning inverse-row vector survives actual LU child calls and stopped exact arithmetic. Parent captures cover only own reciprocal/product/sum/copy calls; base LU borrowers close before inverse-row lexical storage. Recurrence preserves copied-left expression returns, member beta publication before local beta copy, descending row traversal, copied Ed coefficient and expression destruction before the next source floor construction. Older caller comparisons are not adopted.",
+        "Diagnostic dot/cost values stay live through actual matrix child work and output, while copied-left differences and copied-input absolute/return temporaries finish before the diagnostic body. Owning advancement scopes do not surround child numerical calls. Base LU borrowers close before retained diagnostic values. Source status/counter, theta, flipped membership, basis publication, refactor and recovery order remain intact; older caller comparisons survive without adoption."
       ],
       "deviations": [
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
         "Floating dual DSE calls the source prepared U/R solve without full scaling/tail transforms. On the explicit scaled triangular B, updated beta1 is0.0517578125 while the true new inverse-row squared norm is0.2666015625. This literal source discrepancy is preserved, not corrected. Boxed runaway snap writes low even when nearer upper; free recovery assigns zero before source debug assertion. Dead restore_d and commented-out xb_minus_delta_p_pivot_column have no retained source caller and are not ported.",
         "Source OneIteration resets Unstable to Feasible without clearing forbidden rows. Actual stale-LU/drop refusal can forbid the only infeasible row; a later iteration reports Optimal while X remains infeasible. Regression preserves this source state transition and does not claim general dual optimization correctness. Zero-row/modulo-zero and out-of-domain floating-to-uint conversion are typed bounds errors; RNG runs before modulo-zero guard.",
-        "Retained scalar update_betas reaches T(0.0001), whose rational(double) constructor is UNREACHABLE. The existing exact-LP port convention is retained: checked asserts after reciprocal construction before beta publication; native keeps a default-zero floor. No rational 1/10000 or floating conversion was invented. Native results do not establish defined C++ behavior past __builtin_unreachable; full scalar dual integration and upstream audits remain open."
+        "Retained scalar update_betas reaches T(0.0001), whose rational(double) constructor is UNREACHABLE. The existing exact-LP port convention is retained: checked asserts after reciprocal construction before beta publication; native keeps a default-zero floor. No rational 1/10000 or floating conversion was invented. Native results do not establish defined C++ behavior past __builtin_unreachable; full scalar dual integration and upstream audits remain open.",
+        "Source boxed runaway snapping writes the low bound even when nearer/equidistant to upper; free recovery zeroes then falls through to a checked assertion. Both behaviors are retained. Checked advancement stops at update_betas rational(double) assertion before exchange; native uses the existing exact-LP zero-floor convention, not a positive invented rational floor.",
+        "Whole-source call scan found restore_d, xb_minus_delta_p_pivot_column, snap_xN_to_bounds and snap_runaway_nonbasic_columns only in definitions/declarations (plus a commented call). No unused scalar adapters were ported for these helpers; retained pricing/iteration/Solve consumers remain open."
       ]
     },
     {
@@ -125057,7 +125092,8 @@
         "pkg/util/lp/dual_breakpoint_rational.go",
         "pkg/util/lp/dual_ratio_rational.go",
         "pkg/util/lp/dual_flip_rational.go",
-        "pkg/util/lp/dual_beta_rational.go"
+        "pkg/util/lp/dual_beta_rational.go",
+        "pkg/util/lp/dual_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -125140,7 +125176,19 @@
         "TestLPRationalDualBetaPreservesOlderComparison",
         "TestLPRationalDualBetaMetadataAndPrefixes",
         "TestLPRationalDualBetaPreparedDenseStage",
-        "TestLPRationalDualBetaReinitializationHasNoFloor"
+        "TestLPRationalDualBetaReinitializationHasNoFloor",
+        "TestLPRationalDualAdvanceIndependentExchanges",
+        "TestLPRationalDualAdvanceActualRecovery",
+        "TestLPRationalDualAdvanceRevertAndRecoverPositions",
+        "TestLPRationalDualAdvanceSnapIndependentProfiles",
+        "TestLPRationalDualAdvanceDoneAndNoCandidate",
+        "TestLPRationalDualAdvanceCostDiagnosticThresholds",
+        "TestLPRationalDualAdvanceDiagnosticWriterPrefixes",
+        "TestLPRationalDualAdvancePhysicalOwnership",
+        "TestLPRationalDualAdvancePreservesOlderComparison",
+        "TestLPRationalDualAdvanceMetadataAndStoppedPrefixes",
+        "TestLPRationalDualAdvanceUpperLeavingSnapAndReconstruct",
+        "TestLPRationalDualAdvanceActualSingularFallback"
       ],
       "assertions": [
         {
@@ -125433,6 +125481,25 @@
             "TestLPRationalDualBetaPreparedDenseStage",
             "TestLPRationalDualBetaReinitializationHasNoFloor"
           ]
+        },
+        {
+          "name": "Concrete scalar known-leaving advancement, basis exchange/update, snapping/reconstruction, actual LU rollback/recovery and reduced-cost diagnostic",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_advance_rational.go",
+          "tests": [
+            "TestLPRationalDualAdvanceIndependentExchanges",
+            "TestLPRationalDualAdvanceActualRecovery",
+            "TestLPRationalDualAdvanceRevertAndRecoverPositions",
+            "TestLPRationalDualAdvanceSnapIndependentProfiles",
+            "TestLPRationalDualAdvanceDoneAndNoCandidate",
+            "TestLPRationalDualAdvanceCostDiagnosticThresholds",
+            "TestLPRationalDualAdvanceDiagnosticWriterPrefixes",
+            "TestLPRationalDualAdvancePhysicalOwnership",
+            "TestLPRationalDualAdvancePreservesOlderComparison",
+            "TestLPRationalDualAdvanceMetadataAndStoppedPrefixes",
+            "TestLPRationalDualAdvanceUpperLeavingSnapAndReconstruct",
+            "TestLPRationalDualAdvanceActualSingularFallback"
+          ]
         }
       ],
       "ownership": [
@@ -125441,13 +125508,16 @@
         "Scalar Harris, tight-time, Q and combined-driver lexical values remain live through actual child calls. Copied-left shifts/quotients and copied-input abs/return values preserve numerical prefixes; comparisons retain source operand order. Only each numerical owner captures its own calls; caller-owned older comparisons survive all child and solver cleanup.",
         "Base-owned bound-span arithmetic finishes capture before dual products/abs/compound loss sums. Ratio loss/trial locals remain owned through stopped children; the trial dies on loop break before theta evaluation. Source flipped membership publishes before member Delta copy and breakpoint erasure. Raw receipts close before base borrowers, then expression locals and member roots; older caller comparisons survive cleanup.",
         "Signed spans and process argument locals remain owned through actual base/matrix numerical children. Parent captures cover only its own copied-left products, compound reduced-cost/value updates and copied unary negation. Matrix and LU retain their own stopped receipts; dual Close finishes base borrowers before its lexical/member roots. Source descending basic/beta traversal and ascending flipped membership are retained.",
-        "The owning inverse-row vector survives actual LU child calls and stopped exact arithmetic. Parent captures cover only own reciprocal/product/sum/copy calls; base LU borrowers close before inverse-row lexical storage. Recurrence preserves copied-left expression returns, member beta publication before local beta copy, descending row traversal, copied Ed coefficient and expression destruction before the next source floor construction. Older caller comparisons are not adopted."
+        "The owning inverse-row vector survives actual LU child calls and stopped exact arithmetic. Parent captures cover only own reciprocal/product/sum/copy calls; base LU borrowers close before inverse-row lexical storage. Recurrence preserves copied-left expression returns, member beta publication before local beta copy, descending row traversal, copied Ed coefficient and expression destruction before the next source floor construction. Older caller comparisons are not adopted.",
+        "Diagnostic dot/cost values stay live through actual matrix child work and output, while copied-left differences and copied-input absolute/return temporaries finish before the diagnostic body. Owning advancement scopes do not surround child numerical calls. Base LU borrowers close before retained diagnostic values. Source status/counter, theta, flipped membership, basis publication, refactor and recovery order remain intact; older caller comparisons survive without adoption."
       ],
       "deviations": [
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
         "Floating dual DSE calls the source prepared U/R solve without full scaling/tail transforms. On the explicit scaled triangular B, updated beta1 is0.0517578125 while the true new inverse-row squared norm is0.2666015625. This literal source discrepancy is preserved, not corrected. Boxed runaway snap writes low even when nearer upper; free recovery assigns zero before source debug assertion. Dead restore_d and commented-out xb_minus_delta_p_pivot_column have no retained source caller and are not ported.",
         "Source OneIteration resets Unstable to Feasible without clearing forbidden rows. Actual stale-LU/drop refusal can forbid the only infeasible row; a later iteration reports Optimal while X remains infeasible. Regression preserves this source state transition and does not claim general dual optimization correctness. Zero-row/modulo-zero and out-of-domain floating-to-uint conversion are typed bounds errors; RNG runs before modulo-zero guard.",
-        "Retained scalar update_betas reaches T(0.0001), whose rational(double) constructor is UNREACHABLE. The existing exact-LP port convention is retained: checked asserts after reciprocal construction before beta publication; native keeps a default-zero floor. No rational 1/10000 or floating conversion was invented. Native results do not establish defined C++ behavior past __builtin_unreachable; full scalar dual integration and upstream audits remain open."
+        "Retained scalar update_betas reaches T(0.0001), whose rational(double) constructor is UNREACHABLE. The existing exact-LP port convention is retained: checked asserts after reciprocal construction before beta publication; native keeps a default-zero floor. No rational 1/10000 or floating conversion was invented. Native results do not establish defined C++ behavior past __builtin_unreachable; full scalar dual integration and upstream audits remain open.",
+        "Source boxed runaway snapping writes the low bound even when nearer/equidistant to upper; free recovery zeroes then falls through to a checked assertion. Both behaviors are retained. Checked advancement stops at update_betas rational(double) assertion before exchange; native uses the existing exact-LP zero-floor convention, not a positive invented rational floor.",
+        "Whole-source call scan found restore_d, xb_minus_delta_p_pivot_column, snap_xN_to_bounds and snap_runaway_nonbasic_columns only in definitions/declarations (plus a commented call). No unused scalar adapters were ported for these helpers; retained pricing/iteration/Solve consumers remain open."
       ]
     },
     {

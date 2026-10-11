@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 86.8,
-  "coverage_warning": "Latest completed native checkpoint28ac20ab measures25732/29633 LP statements (86.8%) and includes scalar full primal Solve/statistics and scalar dual initialization. It predates dual pricing, Harris candidates, full ratio, flip/value updates and current beta/DSE work; their focused evidence remains separate. Go statement coverage measures implemented Go code, not C++ source completion. Remaining retained source and complete upstream drivers remain open.",
+  "coverage_warning": "Latest completed native checkpoint28ac20ab measures25732/29633 LP statements (86.8%) and includes scalar full primal Solve/statistics and scalar dual initialization. It predates dual pricing, Harris candidates, full ratio, flip/value updates, beta/DSE and current advancement/recovery; focused evidence remains separate. Go statement coverage measures implemented Go code, not C++ source completion. Remaining retained source and complete upstream drivers remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Scalar dual basis advancement/recovery, reduced-cost restoration and diagnostics, pricing loop and full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers."
+    "Scalar dual pricing loop, OneIteration and full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers."
   ],
   "units": [
     {
@@ -1953,7 +1953,8 @@
         "pkg/util/lp/dual_breakpoint_rational.go",
         "pkg/util/lp/dual_ratio_rational.go",
         "pkg/util/lp/dual_flip_rational.go",
-        "pkg/util/lp/dual_beta_rational.go"
+        "pkg/util/lp/dual_beta_rational.go",
+        "pkg/util/lp/dual_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -2036,7 +2037,19 @@
         "TestLPRationalDualBetaPreservesOlderComparison",
         "TestLPRationalDualBetaMetadataAndPrefixes",
         "TestLPRationalDualBetaPreparedDenseStage",
-        "TestLPRationalDualBetaReinitializationHasNoFloor"
+        "TestLPRationalDualBetaReinitializationHasNoFloor",
+        "TestLPRationalDualAdvanceIndependentExchanges",
+        "TestLPRationalDualAdvanceActualRecovery",
+        "TestLPRationalDualAdvanceRevertAndRecoverPositions",
+        "TestLPRationalDualAdvanceSnapIndependentProfiles",
+        "TestLPRationalDualAdvanceDoneAndNoCandidate",
+        "TestLPRationalDualAdvanceCostDiagnosticThresholds",
+        "TestLPRationalDualAdvanceDiagnosticWriterPrefixes",
+        "TestLPRationalDualAdvancePhysicalOwnership",
+        "TestLPRationalDualAdvancePreservesOlderComparison",
+        "TestLPRationalDualAdvanceMetadataAndStoppedPrefixes",
+        "TestLPRationalDualAdvanceUpperLeavingSnapAndReconstruct",
+        "TestLPRationalDualAdvanceActualSingularFallback"
       ]
     },
     {
@@ -2055,7 +2068,8 @@
         "pkg/util/lp/dual_breakpoint_rational.go",
         "pkg/util/lp/dual_ratio_rational.go",
         "pkg/util/lp/dual_flip_rational.go",
-        "pkg/util/lp/dual_beta_rational.go"
+        "pkg/util/lp/dual_beta_rational.go",
+        "pkg/util/lp/dual_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -2138,7 +2152,19 @@
         "TestLPRationalDualBetaPreservesOlderComparison",
         "TestLPRationalDualBetaMetadataAndPrefixes",
         "TestLPRationalDualBetaPreparedDenseStage",
-        "TestLPRationalDualBetaReinitializationHasNoFloor"
+        "TestLPRationalDualBetaReinitializationHasNoFloor",
+        "TestLPRationalDualAdvanceIndependentExchanges",
+        "TestLPRationalDualAdvanceActualRecovery",
+        "TestLPRationalDualAdvanceRevertAndRecoverPositions",
+        "TestLPRationalDualAdvanceSnapIndependentProfiles",
+        "TestLPRationalDualAdvanceDoneAndNoCandidate",
+        "TestLPRationalDualAdvanceCostDiagnosticThresholds",
+        "TestLPRationalDualAdvanceDiagnosticWriterPrefixes",
+        "TestLPRationalDualAdvancePhysicalOwnership",
+        "TestLPRationalDualAdvancePreservesOlderComparison",
+        "TestLPRationalDualAdvanceMetadataAndStoppedPrefixes",
+        "TestLPRationalDualAdvanceUpperLeavingSnapAndReconstruct",
+        "TestLPRationalDualAdvanceActualSingularFallback"
       ]
     },
     {
@@ -8174,6 +8200,57 @@
       "module_compile_debug_checked": "passed",
       "source_portcheck": "passed",
       "dependency_graph": "64 packages, no unresolved imports",
+      "diff_check": "passed"
+    }
+  },
+  "latest_rational_dual_advance_increment": {
+    "scope": "Concrete scalar basis advancement/recovery, runaway snapping and reduced-cost diagnostics",
+    "source_units_promoted": false,
+    "test_groups": 12,
+    "independent_exact_exchange_worlds": 120,
+    "independent_snap_profiles": 48,
+    "cost_threshold_profiles": 12,
+    "recover_boundary_profiles": 6,
+    "dual_recovery_profiles": 2,
+    "singular_exchange_fallback_profiles": 2,
+    "upper_leaving_snap_reconstruction_profiles": 1,
+    "physical_campaigns": 12,
+    "older_comparison_campaigns": 6,
+    "metadata_stopped_profiles": 19,
+    "focused_native_seconds": 1.616,
+    "focused_debug_checked_seconds": 1.763,
+    "statement_coverage": {
+      "native": {
+        "dual_advance_rational.go": {
+          "covered": 234,
+          "total": 282,
+          "percent": 83.0
+        }
+      },
+      "debug_checked": {
+        "dual_advance_rational.go": {
+          "covered": 197,
+          "total": 282,
+          "percent": 69.9
+        }
+      }
+    },
+    "remaining": "Scalar dual pricing loop, OneIteration and full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers.",
+    "coverage_note": "Checked beta rational(double) assertion prevents the source exchange body; tests verify the actual earlier ratio/pivot/DSE prefix and unchanged basis/values. Native exchanges include independent source beta recurrence with the existing zero-floor convention, actual refactor/singular rollback and reconstruction. Other gaps chiefly guard stable capture/destruction, delegated extents and exact drift/residual failure paths unreachable in the valid nonsingular models. Coverage is not C++ source completion.",
+    "direct_revert_profiles": 2,
+    "related_native_seconds": 48.365,
+    "related_debug_checked_seconds": 68.403,
+    "verification": {
+      "focused_native": "passed",
+      "focused_debug_checked": "passed",
+      "related_native": "passed",
+      "related_debug_checked": "passed",
+      "lp_vet_native": "passed",
+      "lp_vet_debug_checked": "passed",
+      "module_compile_native": "passed",
+      "module_compile_debug_checked": "passed",
+      "source_portcheck": "passed",
+      "dependency_graph": "64 packages; no unresolved imports",
       "diff_check": "passed"
     }
   }
