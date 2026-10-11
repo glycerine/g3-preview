@@ -122633,7 +122633,9 @@
         "pkg/util/lp/core_update_rational_test.go",
         "pkg/util/lp/core_cost_validate_rational_test.go",
         "pkg/util/lp/core_feasibility_rational_test.go",
-        "pkg/util/lp/core_pivot_compare_rational.go"
+        "pkg/util/lp/core_pivot_compare_rational.go",
+        "pkg/util/lp/core_tableau_rational.go",
+        "pkg/util/lp/core_tableau_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122837,7 +122839,13 @@
         "TestLPRationalFeasibilityPhysicalComparisons",
         "TestLPRationalPivotCompareIndependentOracle",
         "TestLPRationalPivotComparePhysicalOwnership",
-        "TestLPRationalPivotCompareReachedGuards"
+        "TestLPRationalPivotCompareReachedGuards",
+        "TestLPRationalTableauIndependentEliminationAndCosts",
+        "TestLPRationalTableauEmptyTargetAndNoPivot",
+        "TestLPRationalTableauMetadataAndStoppedGuards",
+        "TestLPRationalTableauPhysicalFailureOwnership",
+        "TestLPRationalTableauStoppedMatrixBeforeNormalization",
+        "TestLPRationalTableauPreservesOlderComparison"
       ],
       "assertions": [
         {
@@ -123358,6 +123366,19 @@
             "TestLPRationalPivotComparePhysicalOwnership",
             "TestLPRationalPivotCompareReachedGuards"
           ]
+        },
+        {
+          "name": "Concrete scalar mpq/mpq tableau row normalization, column elimination with reciprocal links and pivoted-row publication, and incremental reduced-cost pivot update",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_tableau_rational.go",
+          "tests": [
+            "TestLPRationalTableauIndependentEliminationAndCosts",
+            "TestLPRationalTableauEmptyTargetAndNoPivot",
+            "TestLPRationalTableauMetadataAndStoppedGuards",
+            "TestLPRationalTableauPhysicalFailureOwnership",
+            "TestLPRationalTableauStoppedMatrixBeforeNormalization",
+            "TestLPRationalTableauPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -123375,7 +123396,8 @@
         "Exact UpdateX captures its own arithmetic, retains scalar product expressions and the pair temporary with the core, and releases constructor scalar temporaries before compound subtraction. Entering updates precede ordered basic updates; precise mode leaves CopyXB unchanged. RestoreX retains the stored backup semantics, not an invented inverse. Stopped arithmetic can leave the current scalar partial; later destinations remain untouched. Close cleans raw invocations before scratch and allocation roots, preserving older caller comparisons.",
         "Residual dot products and LU reconstruction are delegated outside core numeral captures. Core-owned row residual/scalar scratch and RHS vectors survive child failures; the LU is destroyed before its borrowed reconstruction RHS. Matrix and LU numerical receipts stay separate from the core. Reverse row/basis publication, live output aliases, stale factorization residuals, diagnostic recomputation and older caller comparisons are preserved. Exact reconstruction uses one solve and does not import floating refinement work.",
         "No additional outer-solve or snap owners. Actual exact pair assignment and reconstruction retain interrupted arithmetic in existing primal/core owners; stopped retries and older caller comparison identity are verified through Close with pooled/direct physical refusal campaigns.",
-        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization."
+        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization.",
+        "Scalar row normalization uses direct compound division on RHS before coefficients and final pivot-one assignment. Reduced-cost updates retain copied-left product/returned-reference scratch and live pivot-cost references until source-order subtraction finishes. Core capture ends before owning static-matrix elimination; each owner retains its own stopped receipts and older caller comparisons survive cleanup."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -123456,7 +123478,9 @@
         "pkg/util/lp/core_update_rational_test.go",
         "pkg/util/lp/core_cost_validate_rational_test.go",
         "pkg/util/lp/core_feasibility_rational_test.go",
-        "pkg/util/lp/core_pivot_compare_rational.go"
+        "pkg/util/lp/core_pivot_compare_rational.go",
+        "pkg/util/lp/core_tableau_rational.go",
+        "pkg/util/lp/core_tableau_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -123631,7 +123655,13 @@
         "TestLPRationalFeasibilityPhysicalComparisons",
         "TestLPRationalPivotCompareIndependentOracle",
         "TestLPRationalPivotComparePhysicalOwnership",
-        "TestLPRationalPivotCompareReachedGuards"
+        "TestLPRationalPivotCompareReachedGuards",
+        "TestLPRationalTableauIndependentEliminationAndCosts",
+        "TestLPRationalTableauEmptyTargetAndNoPivot",
+        "TestLPRationalTableauMetadataAndStoppedGuards",
+        "TestLPRationalTableauPhysicalFailureOwnership",
+        "TestLPRationalTableauStoppedMatrixBeforeNormalization",
+        "TestLPRationalTableauPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -124201,6 +124231,19 @@
             "TestLPRationalPivotComparePhysicalOwnership",
             "TestLPRationalPivotCompareReachedGuards"
           ]
+        },
+        {
+          "name": "Concrete scalar mpq/mpq tableau row normalization, column elimination with reciprocal links and pivoted-row publication, and incremental reduced-cost pivot update",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_tableau_rational.go",
+          "tests": [
+            "TestLPRationalTableauIndependentEliminationAndCosts",
+            "TestLPRationalTableauEmptyTargetAndNoPivot",
+            "TestLPRationalTableauMetadataAndStoppedGuards",
+            "TestLPRationalTableauPhysicalFailureOwnership",
+            "TestLPRationalTableauStoppedMatrixBeforeNormalization",
+            "TestLPRationalTableauPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -124215,7 +124258,8 @@
         "Reverse-column membership validation delegates base-owned exact comparisons; it never captures across a child owner or consumes an older caller comparison. Source diagnostics and actual metadata/output errors stop the validator, while false membership without an error leaves it reusable. Only current matrix columns are inspected; out-of-domain-tail set members are deliberately ignored, as upstream. Whole-model Pop invokes the actual helper only in debug/checked source assertion profiles.",
         "Exact UpdateX captures its own arithmetic, retains scalar product expressions and the pair temporary with the core, and releases constructor scalar temporaries before compound subtraction. Entering updates precede ordered basic updates; precise mode leaves CopyXB unchanged. RestoreX retains the stored backup semantics, not an invented inverse. Stopped arithmetic can leave the current scalar partial; later destinations remain untouched. Close cleans raw invocations before scratch and allocation roots, preserving older caller comparisons.",
         "Residual dot products and LU reconstruction are delegated outside core numeral captures. Core-owned row residual/scalar scratch and RHS vectors survive child failures; the LU is destroyed before its borrowed reconstruction RHS. Matrix and LU numerical receipts stay separate from the core. Reverse row/basis publication, live output aliases, stale factorization residuals, diagnostic recomputation and older caller comparisons are preserved. Exact reconstruction uses one solve and does not import floating refinement work.",
-        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization."
+        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization.",
+        "Scalar row normalization uses direct compound division on RHS before coefficients and final pivot-one assignment. Reduced-cost updates retain copied-left product/returned-reference scratch and live pivot-cost references until source-order subtraction finishes. Core capture ends before owning static-matrix elimination; each owner retains its own stopped receipts and older caller comparisons survive cleanup."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -124261,7 +124305,9 @@
         "pkg/util/lp/core_feasibility_rational.go",
         "pkg/util/lp/core_update_rational_test.go",
         "pkg/util/lp/core_cost_validate_rational_test.go",
-        "pkg/util/lp/core_feasibility_rational_test.go"
+        "pkg/util/lp/core_feasibility_rational_test.go",
+        "pkg/util/lp/core_tableau_rational.go",
+        "pkg/util/lp/core_tableau_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -124333,7 +124379,13 @@
         "TestLPRationalCostValidatorClosedDiagnosticAndDebugGuards",
         "TestLPRationalFeasibilityIndependentMembership",
         "TestLPRationalFeasibilityDiagnosticsAndGuards",
-        "TestLPRationalFeasibilityPhysicalComparisons"
+        "TestLPRationalFeasibilityPhysicalComparisons",
+        "TestLPRationalTableauIndependentEliminationAndCosts",
+        "TestLPRationalTableauEmptyTargetAndNoPivot",
+        "TestLPRationalTableauMetadataAndStoppedGuards",
+        "TestLPRationalTableauPhysicalFailureOwnership",
+        "TestLPRationalTableauStoppedMatrixBeforeNormalization",
+        "TestLPRationalTableauPreservesOlderComparison"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -124478,6 +124530,19 @@
             "TestLPRationalFeasibilityDiagnosticsAndGuards",
             "TestLPRationalFeasibilityPhysicalComparisons"
           ]
+        },
+        {
+          "name": "Concrete scalar mpq/mpq tableau row normalization, column elimination with reciprocal links and pivoted-row publication, and incremental reduced-cost pivot update",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_tableau_rational.go",
+          "tests": [
+            "TestLPRationalTableauIndependentEliminationAndCosts",
+            "TestLPRationalTableauEmptyTargetAndNoPivot",
+            "TestLPRationalTableauMetadataAndStoppedGuards",
+            "TestLPRationalTableauPhysicalFailureOwnership",
+            "TestLPRationalTableauStoppedMatrixBeforeNormalization",
+            "TestLPRationalTableauPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -124486,7 +124551,8 @@
         "Native local RHS and copied correction vectors are owned by the reconstruction call. Basic X publication, CopyXB capture and Ed/column-indexed updates follow source order. Numerical update uses actual LU/W and pivot rows; refactors destroy/replace the owned LU, failed constructors retain real partial owners. Feasible-only singular branch deletes LU and publishes nil; rollback restores actual headings, X and factorization.",
         "Exact basis edits mutate borrowed typed slice headers in source order. Tableau transposition swaps basis/headings before delegated matrix row copies; the matrix owns any stopped numerical copy, while the core stops without adopting child allocation roots. Pooled/direct physical failure campaigns verify immediate cleanup and named root census. Whole tableau pivot/removal and outer LAR Pop remain open.",
         "Precise tableau normalization captures only core-owned pair/RHS and row-coefficient arithmetic; the core ends capture before delegating owning row elimination to RationalStaticMatrix. Reduced-cost expressions own temporary/product slots in pivotWork. Eight pooled/direct real allocation-refusal campaigns cover normalization, child elimination, reduced costs and combined pivot/cost work through success, verify reached-prefix values and reclaim every named numeral root. Full tableau optimization, outer removal and LAR scopes remain open.",
-        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization."
+        "Concrete scalar core borrows matrix/input headers and outputs; partial constructors close before inputs. Parent receipts release raw state before LU and LU before scratch; external outputs outlive core Close after error. Basis/heading publication precedes transpose copies. This does not credit primal/dual optimization.",
+        "Scalar row normalization uses direct compound division on RHS before coefficients and final pivot-one assignment. Reduced-cost updates retain copied-left product/returned-reference scratch and live pivot-cost references until source-order subtraction finishes. Core capture ends before owning static-matrix elimination; each owner retains its own stopped receipts and older caller comparisons survive cleanup."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",

@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 87.3,
-  "coverage_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion. Scalar pivot comparison and incremental reduced-cost files are newer and retain separate focused evidence. Scalar primal advancement files are newer and retain separate focused evidence. Scalar entering orchestration and iteration are newer and retain separate focused evidence.",
+  "coverage_warning": "Full native checkpoint1cee195e includes scalar rational core updates/feasibility, primal construction/costs, initialization/pricing and bound-step helpers. It predates scalar breakpoint records/collection/traversal and circular leaving selection; those retain separate focused evidence. Coverage measures existing Go statements, not C++ port completion. Scalar pivot comparison and incremental reduced-cost files are newer and retain separate focused evidence. Scalar primal advancement files are newer and retain separate focused evidence. Scalar entering orchestration and iteration are newer and retain separate focused evidence. Scalar core tableau operations are newer and retain separate focused evidence.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -1301,7 +1301,9 @@
         "pkg/util/lp/core_update_rational_test.go",
         "pkg/util/lp/core_cost_validate_rational_test.go",
         "pkg/util/lp/core_feasibility_rational_test.go",
-        "pkg/util/lp/core_pivot_compare_rational.go"
+        "pkg/util/lp/core_pivot_compare_rational.go",
+        "pkg/util/lp/core_tableau_rational.go",
+        "pkg/util/lp/core_tableau_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1505,7 +1507,13 @@
         "TestLPRationalFeasibilityPhysicalComparisons",
         "TestLPRationalPivotCompareIndependentOracle",
         "TestLPRationalPivotComparePhysicalOwnership",
-        "TestLPRationalPivotCompareReachedGuards"
+        "TestLPRationalPivotCompareReachedGuards",
+        "TestLPRationalTableauIndependentEliminationAndCosts",
+        "TestLPRationalTableauEmptyTargetAndNoPivot",
+        "TestLPRationalTableauMetadataAndStoppedGuards",
+        "TestLPRationalTableauPhysicalFailureOwnership",
+        "TestLPRationalTableauStoppedMatrixBeforeNormalization",
+        "TestLPRationalTableauPreservesOlderComparison"
       ]
     },
     {
@@ -1567,7 +1575,9 @@
         "pkg/util/lp/core_update_rational_test.go",
         "pkg/util/lp/core_cost_validate_rational_test.go",
         "pkg/util/lp/core_feasibility_rational_test.go",
-        "pkg/util/lp/core_pivot_compare_rational.go"
+        "pkg/util/lp/core_pivot_compare_rational.go",
+        "pkg/util/lp/core_tableau_rational.go",
+        "pkg/util/lp/core_tableau_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1742,7 +1752,13 @@
         "TestLPRationalFeasibilityPhysicalComparisons",
         "TestLPRationalPivotCompareIndependentOracle",
         "TestLPRationalPivotComparePhysicalOwnership",
-        "TestLPRationalPivotCompareReachedGuards"
+        "TestLPRationalPivotCompareReachedGuards",
+        "TestLPRationalTableauIndependentEliminationAndCosts",
+        "TestLPRationalTableauEmptyTargetAndNoPivot",
+        "TestLPRationalTableauMetadataAndStoppedGuards",
+        "TestLPRationalTableauPhysicalFailureOwnership",
+        "TestLPRationalTableauStoppedMatrixBeforeNormalization",
+        "TestLPRationalTableauPreservesOlderComparison"
       ]
     },
     {
@@ -1771,7 +1787,9 @@
         "pkg/util/lp/core_feasibility_rational.go",
         "pkg/util/lp/core_update_rational_test.go",
         "pkg/util/lp/core_cost_validate_rational_test.go",
-        "pkg/util/lp/core_feasibility_rational_test.go"
+        "pkg/util/lp/core_feasibility_rational_test.go",
+        "pkg/util/lp/core_tableau_rational.go",
+        "pkg/util/lp/core_tableau_rational_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1843,7 +1861,13 @@
         "TestLPRationalCostValidatorClosedDiagnosticAndDebugGuards",
         "TestLPRationalFeasibilityIndependentMembership",
         "TestLPRationalFeasibilityDiagnosticsAndGuards",
-        "TestLPRationalFeasibilityPhysicalComparisons"
+        "TestLPRationalFeasibilityPhysicalComparisons",
+        "TestLPRationalTableauIndependentEliminationAndCosts",
+        "TestLPRationalTableauEmptyTargetAndNoPivot",
+        "TestLPRationalTableauMetadataAndStoppedGuards",
+        "TestLPRationalTableauPhysicalFailureOwnership",
+        "TestLPRationalTableauStoppedMatrixBeforeNormalization",
+        "TestLPRationalTableauPreservesOlderComparison"
       ]
     },
     {
@@ -7058,5 +7082,43 @@
       "diff check"
     ],
     "coverage_note": "Uncovered entering paths guard preexisting local ownership and destruction failure; native additionally erases its negative-entering source assertion. Iteration orchestration has full statement coverage. Coverage measures implemented Go statements, not C++ completion."
+  },
+  "latest_rational_core_tableau_increment": {
+    "scope": "Concrete mpq/mpq row normalization, stored-column elimination and incremental reduced-cost tableau pivot",
+    "source_units_promoted": false,
+    "focused_native_seconds": 17.143,
+    "focused_debug_checked_seconds": 20.377,
+    "statement_coverage": {
+      "native": {
+        "core_tableau_rational.go": {
+          "covered": 117,
+          "total": 126,
+          "percent": 92.9
+        }
+      },
+      "debug_checked": {
+        "core_tableau_rational.go": {
+          "covered": 117,
+          "total": 126,
+          "percent": 92.9
+        }
+      }
+    },
+    "independent_elimination_worlds": 160,
+    "physical_campaigns": 8,
+    "older_comparison_campaigns": 3,
+    "remaining": "Scalar primal tableau costs/values/leaving/advancement/row iteration and full Solve; scalar dual/outer optimization/scaling integration; remaining LP source/upstream-driver audits.",
+    "related_native_seconds": 107.647,
+    "related_debug_checked_seconds": 155.767,
+    "verification": [
+      "both final focused profiles",
+      "both related core/tableau regression profiles",
+      "both LP vets",
+      "both module compile gates",
+      "source portcheck: 2103 units, 677 APIs",
+      "dependency graph refresh: 64 packages, no unresolved imports",
+      "diff check"
+    ],
+    "coverage_note": "Remaining uncovered returns guard stable numeral metadata/capture/destruction and logically unreachable column-link assertions. Coverage measures implemented Go statements, not C++ completion."
   }
 }

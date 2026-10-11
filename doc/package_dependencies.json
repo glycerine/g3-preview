@@ -1203,6 +1203,7 @@
         "core_statistics_exact.go",
         "core_statistics_float.go",
         "core_tableau_exact.go",
+        "core_tableau_rational.go",
         "core_update_exact.go",
         "core_update_float.go",
         "core_update_rational.go",
