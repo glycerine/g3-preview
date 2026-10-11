@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Remaining scalar dual pricing loop/ratio test/basis advancement/full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers."
+    "Scalar full dual ratio-test displacement/flip accounting and orchestration, basis advancement/pricing loop/full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers."
   ],
   "units": [
     {
@@ -1307,7 +1307,8 @@
         "pkg/util/lp/core_basis_tableau_rational.go",
         "pkg/util/lp/primal_init_tableau_rational_test.go",
         "pkg/util/lp/core_statistics_rational.go",
-        "pkg/util/lp/core_dual_rational.go"
+        "pkg/util/lp/core_dual_rational.go",
+        "pkg/util/lp/dual_breakpoint_rational.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1539,7 +1540,14 @@
         "TestLPRationalDualBoundsIndependentOracle",
         "TestLPRationalDualBoundsPlacementAndAssertionPrefix",
         "TestLPRationalDualBoundsMetadataAndDiagnostics",
-        "TestLPRationalDualBoundsLiveAliasOrder"
+        "TestLPRationalDualBoundsLiveAliasOrder",
+        "TestLPRationalDualBreakpointEligibilityExactOracle",
+        "TestLPRationalDualBreakpointHarrisIndependentWindows",
+        "TestLPRationalDualBreakpointPositionAndEmptySourceProfiles",
+        "TestLPRationalDualBreakpointPhysicalOwnership",
+        "TestLPRationalDualBreakpointMetadataPrefixes",
+        "TestLPRationalDualBreakpointPreservesOlderComparison",
+        "TestLPRationalDualBreakpointLiveHarrisOutput"
       ]
     },
     {
@@ -1605,7 +1613,8 @@
         "pkg/util/lp/core_tableau_rational.go",
         "pkg/util/lp/core_tableau_rational_test.go",
         "pkg/util/lp/core_statistics_rational.go",
-        "pkg/util/lp/core_dual_rational.go"
+        "pkg/util/lp/core_dual_rational.go",
+        "pkg/util/lp/dual_breakpoint_rational.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1800,7 +1809,14 @@
         "TestLPRationalDualBoundsIndependentOracle",
         "TestLPRationalDualBoundsPlacementAndAssertionPrefix",
         "TestLPRationalDualBoundsMetadataAndDiagnostics",
-        "TestLPRationalDualBoundsLiveAliasOrder"
+        "TestLPRationalDualBoundsLiveAliasOrder",
+        "TestLPRationalDualBreakpointEligibilityExactOracle",
+        "TestLPRationalDualBreakpointHarrisIndependentWindows",
+        "TestLPRationalDualBreakpointPositionAndEmptySourceProfiles",
+        "TestLPRationalDualBreakpointPhysicalOwnership",
+        "TestLPRationalDualBreakpointMetadataPrefixes",
+        "TestLPRationalDualBreakpointPreservesOlderComparison",
+        "TestLPRationalDualBreakpointLiveHarrisOutput"
       ]
     },
     {
@@ -1924,7 +1940,8 @@
         "pkg/util/lp/dual_advance_float.go",
         "pkg/util/lp/dual_solve_float.go",
         "pkg/util/lp/dual_core_rational.go",
-        "pkg/util/lp/dual_price_rational.go"
+        "pkg/util/lp/dual_price_rational.go",
+        "pkg/util/lp/dual_breakpoint_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -1976,7 +1993,14 @@
         "TestLPRationalDualPriceLiveOutputAliases",
         "TestLPRationalDualPriceSignAndDualFeasibility",
         "TestLPRationalDualPriceMetadataAndAssertionPrefixes",
-        "TestLPRationalDualPricePreservesOlderComparison"
+        "TestLPRationalDualPricePreservesOlderComparison",
+        "TestLPRationalDualBreakpointEligibilityExactOracle",
+        "TestLPRationalDualBreakpointHarrisIndependentWindows",
+        "TestLPRationalDualBreakpointPositionAndEmptySourceProfiles",
+        "TestLPRationalDualBreakpointPhysicalOwnership",
+        "TestLPRationalDualBreakpointMetadataPrefixes",
+        "TestLPRationalDualBreakpointPreservesOlderComparison",
+        "TestLPRationalDualBreakpointLiveHarrisOutput"
       ]
     },
     {
@@ -1991,7 +2015,8 @@
         "pkg/util/lp/dual_advance_float.go",
         "pkg/util/lp/dual_solve_float.go",
         "pkg/util/lp/dual_core_rational.go",
-        "pkg/util/lp/dual_price_rational.go"
+        "pkg/util/lp/dual_price_rational.go",
+        "pkg/util/lp/dual_breakpoint_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -2043,7 +2068,14 @@
         "TestLPRationalDualPriceLiveOutputAliases",
         "TestLPRationalDualPriceSignAndDualFeasibility",
         "TestLPRationalDualPriceMetadataAndAssertionPrefixes",
-        "TestLPRationalDualPricePreservesOlderComparison"
+        "TestLPRationalDualPricePreservesOlderComparison",
+        "TestLPRationalDualBreakpointEligibilityExactOracle",
+        "TestLPRationalDualBreakpointHarrisIndependentWindows",
+        "TestLPRationalDualBreakpointPositionAndEmptySourceProfiles",
+        "TestLPRationalDualBreakpointPhysicalOwnership",
+        "TestLPRationalDualBreakpointMetadataPrefixes",
+        "TestLPRationalDualBreakpointPreservesOlderComparison",
+        "TestLPRationalDualBreakpointLiveHarrisOutput"
       ]
     },
     {
@@ -7845,6 +7877,50 @@
     "verification": [
       "both final focused profiles after source switch fallthrough simplification",
       "related scalar dual/core/reduced-cost/reconstruction/Solve and floating dual regressions, both profiles",
+      "both LP vets",
+      "both module compile gates",
+      "source portcheck: 2103 units, 677 APIs",
+      "dependency graph refresh: 64 packages",
+      "diff check"
+    ]
+  },
+  "latest_rational_dual_breakpoint_increment": {
+    "scope": "Scalar ratio-test candidate eligibility, Harris/tight-set timing, Q selection and nonbasic position",
+    "source_units_promoted": false,
+    "test_groups": 7,
+    "eligibility_worlds": 162,
+    "harris_independent_windows": 240,
+    "nonbasic_position_profiles": 18,
+    "empty_source_profiles": 2,
+    "physical_campaigns": 12,
+    "older_comparison_campaigns": 5,
+    "live_harris_output_aliases": 4,
+    "metadata_assertion_profiles": 13,
+    "statement_coverage": {
+      "native": {
+        "dual_breakpoint_rational.go": {
+          "covered": 236,
+          "total": 298,
+          "percent": 79.2
+        }
+      },
+      "debug_checked": {
+        "dual_breakpoint_rational.go": {
+          "covered": 256,
+          "total": 298,
+          "percent": 85.9
+        }
+      }
+    },
+    "focused_native_seconds": 6.138,
+    "focused_debug_checked_seconds": 10.604,
+    "remaining": "Scalar full dual ratio-test displacement/flip accounting and orchestration, basis advancement/pricing loop/full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers.",
+    "coverage_note": "Coverage measures implemented Go statements, not C++ completion. Gaps principally guard stable capture/destruction and ready/metadata states already validated by delegated owners. Native erases precise Harris bound-difference assertions. Full ratio-test flip accounting and orchestration remain open.",
+    "related_native_seconds": 31.184,
+    "related_debug_checked_seconds": 48.714,
+    "verification": [
+      "both focused native and debug/checked profiles with live Harris output aliases",
+      "related scalar dual/core/reduced-cost/reconstruction/Solve and floating dual regressions in both profiles",
       "both LP vets",
       "both module compile gates",
       "source portcheck: 2103 units, 677 APIs",
