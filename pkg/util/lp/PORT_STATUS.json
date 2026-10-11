@@ -3891,15 +3891,141 @@
     },
     {
       "source": "src/util/lp/lp_utils.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/lp/solver_float.go",
+        "pkg/util/lp/column_info_float.go"
+      ],
+      "tests": [
+        "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+        "TestLPFloatPrimalValidationToleranceAndIEEE",
+        "TestLPIndexedFloatVectorContracts"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "numeric_traits<double>::g_zero=0.0 and g_one=1.0 definitions: all-source scan finds no later write; native concrete zero/one literals preserve retained value consumers",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_float.go",
+          "tests": [
+            "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+            "TestLPFloatPrimalValidationToleranceAndIEEE",
+            "TestLPIndexedFloatVectorContracts"
+          ]
+        }
+      ],
+      "ownership": [
+        "Only two static scalar definitions; no allocated storage or owned child lifetime. Retained code reads numeric values, not mutable global state."
+      ],
+      "deviations": [
+        "No Go mutable global cells were added for source constant values. All-source g_zero/g_one references are the declarations, const-reference trait accessors and these definitions."
+      ]
     },
     {
       "source": "src/util/lp/lp_utils.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/lp/lar_model.go",
+        "pkg/util/lp/lar_model_bounds.go",
+        "pkg/util/lp/bound_propagator.go",
+        "pkg/util/lp/lar_get_model.go",
+        "pkg/util/lp/numeric_pair.go",
+        "pkg/util/lp/indexed_vector.go",
+        "pkg/util/lp/indexed_exact_vector.go",
+        "pkg/util/lp/solver_float.go",
+        "pkg/util/lp/solver_prepare_exact.go",
+        "pkg/util/lp/primal_validate_float.go",
+        "pkg/util/lp/dual_prepare_float.go",
+        "pkg/util/lp/solver_named_rational.go",
+        "pkg/util/lp/driver_mps_float.go"
+      ],
+      "tests": [
+        "TestLARModelIndependentVariableDirectories",
+        "TestLARModelIndependentTermRowsAndBounds",
+        "TestLARBoundPropagatorIndependentStrongestOracle",
+        "TestLARGetModelIndependentCollisionChains",
+        "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+        "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+        "TestLPFloatPrimalValidationMissingMetadata",
+        "TestLPFloatPrimalValidationToleranceAndIEEE",
+        "TestLPFloatDualPreparationSourcePrefixes",
+        "TestLPRationalObjectiveSourceLookupAndFixedPrefixes",
+        "TestLPRationalPairOrderSignsAndFormatting",
+        "TestLPIndexedFloatVectorContracts",
+        "TestLPIndexedUintVectorContracts",
+        "TestLPIndexedFloatVectorIndependentSparseOracle",
+        "TestLPIndexedUintVectorIndependentSparseOracle"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "try_get_val: four executable unsigned map lookups in variable/term registration and strongest bound tracking; two lar_solver.h mentions are commented",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_model.go",
+          "tests": [
+            "TestLARModelIndependentVariableDirectories",
+            "TestLARModelIndependentTermRowsAndBounds",
+            "TestLARBoundPropagatorIndependentStrongestOracle"
+          ]
+        },
+        {
+          "name": "contains map membership: registration assertions, remaining-term materialization and pivot term membership use native comma-ok lookups",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_model.go",
+          "tests": [
+            "TestLARModelIndependentVariableDirectories",
+            "TestLARModelIndependentTermRowsAndBounds"
+          ]
+        },
+        {
+          "name": "zero_of_type/one_of_type/is_zero/is_pos/is_neg: retained unsigned, double, rational and rational-pair value operations use native literals/comparisons and concrete owning numeral methods",
+          "status": "ported",
+          "go_target": "pkg/util/lp/numeric_pair.go",
+          "tests": [
+            "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+            "TestLPFloatPrimalValidationMissingMetadata",
+            "TestLPFloatPrimalValidationToleranceAndIEEE",
+            "TestLPRationalPairOrderSignsAndFormatting",
+            "TestLPIndexedFloatVectorContracts",
+            "TestLPIndexedUintVectorContracts",
+            "TestLPIndexedFloatVectorIndependentSparseOracle",
+            "TestLPIndexedUintVectorIndependentSparseOracle"
+          ]
+        },
+        {
+          "name": "throw_exception/exception alias: six retained named-value, named-solution, dual-bound, fixed-column and missing-row producers use existing Go error transports; no exception-class adapter",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_float.go",
+          "tests": [
+            "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+            "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+            "TestLPFloatPrimalValidationMissingMetadata",
+            "TestLPFloatPrimalValidationToleranceAndIEEE",
+            "TestLPFloatDualPreparationSourcePrefixes",
+            "TestLPRationalObjectiveSourceLookupAndFixedPrefixes"
+          ]
+        },
+        {
+          "name": "std hash rational/pair/numeric_pair specializations and hash_combine supply STL buckets only; native typed map/set bookkeeping with exact collision equality replaces them",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_get_model.go",
+          "tests": [
+            "TestLARGetModelIndependentCollisionChains"
+          ]
+        }
+      ],
+      "ownership": [
+        "Stateless forwarding helpers do not own source containers or numerals. Native maps own their own storage; concrete numeric owners retain actual arithmetic calls, failure prefixes and cleanup.",
+        "Canonical numeric zero/one references are consumed as values by retained callers. No generic Go wrappers or STL storage/hash adapter is retained."
+      ],
+      "deviations": [
+        "Native Go map lookups and error values replace source unordered_map/default_exception wrappers. Source STL bucket hash values and layout are not a port contract; exact key equality/collision semantics are retained.",
+        "Standalone precise wrapper is unused; direct precise trait decisions remain concrete. Source primal refactor has no caller and its throw site is excluded.",
+        "Coverage is measured on actual concrete Go consumer files, not a synthetic forwarding layer. Remaining whole-LP audits remain separate from this support-unit audit.",
+        "Excluded source method precise<X>(): whole-src explicit-template-call search has no matches. This unused forwarding definition is recorded here because the portcheck schema requires every method listed under a ported unit to have a Go target and tests; no unused adapter or artificial test was added."
+      ]
     },
     {
       "source": "src/util/lp/lu.h",
@@ -5630,10 +5756,11 @@
     }
   ],
   "status_counts": {
-    "unported": 7,
+    "unported": 5,
     "partial": 94,
     "reference_only": 6,
-    "dead_deleted": 3
+    "dead_deleted": 3,
+    "ported": 2
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -10095,5 +10222,40 @@
       "/mnt/oldrog/tmp/g3-lar-examples-debug.cover"
     ],
     "remaining": "Other retained registered scenarios, full top-level execution and argv+2 entry binding; retained-source/consumer/ownership audits."
+  },
+  "latest_lp_utils_support_audit": {
+    "scope": "Whole retained lp_utils.h/.cpp support definitions and concrete consumers; both source units audited ported via existing native replacements",
+    "tests": [
+      "TestLARModelIndependentVariableDirectories",
+      "TestLARModelIndependentTermRowsAndBounds",
+      "TestLARBoundPropagatorIndependentStrongestOracle",
+      "TestLARGetModelIndependentCollisionChains",
+      "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+      "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+      "TestLPFloatPrimalValidationMissingMetadata",
+      "TestLPFloatPrimalValidationToleranceAndIEEE",
+      "TestLPFloatDualPreparationSourcePrefixes",
+      "TestLPRationalObjectiveSourceLookupAndFixedPrefixes",
+      "TestLPRationalPairOrderSignsAndFormatting",
+      "TestLPIndexedFloatVectorContracts",
+      "TestLPIndexedUintVectorContracts",
+      "TestLPIndexedFloatVectorIndependentSparseOracle",
+      "TestLPIndexedUintVectorIndependentSparseOracle"
+    ],
+    "validation": "Fifteen focused existing source-consumer groups native0.412s/combined0.448s pass; coverage profiles on actual concrete code. No new forwarding code or mirrored standard-library tests added.",
+    "source_findings": [
+      "Four executable try_get_val calls; two lar_solver.h mentions inside block comments.",
+      "Standalone precise template wrapper has no call in all src.",
+      "Seven throw_exception producers: uncalled primal refactor excluded; six retained producers mapped to existing Go error paths.",
+      "Source static floating g_zero/g_one have no later writes.",
+      "STL rational/pair hash functors supply container buckets; exact equality/collision membership retained by native concrete maps and owning numeral hash/equality operations."
+    ],
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-lp-utils-reachability.txt",
+      "/mnt/oldrog/tmp/g3-lp-utils-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-utils-debug.cover"
+    ],
+    "remaining": "Complete registered CLI scenarios/dispatch and whole retained algorithm, consumer, source-test and ownership audits; numeric_pair trait-unit completion is not claimed by wrapper audit.",
+    "ledger_note": "Ported-unit method list contains retained/replaced methods only. Uncalled precise<X> is explicitly recorded in deviations; existing checker rejects dead_deleted method entries under a ported unit."
   }
 }
