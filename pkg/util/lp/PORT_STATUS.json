@@ -8768,5 +8768,26 @@
       "dependency_graph": "passed",
       "diff_check": "passed"
     }
+  },
+  "running_full_native_checkpoint": {
+    "commit": "93d0d780",
+    "started_utc": "2026-10-11 20:25:55 UTC",
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "-json",
+      "./...",
+      "-timeout=60m",
+      "-count=1",
+      "-coverprofile=/mnt/oldrog/tmp/g3-lp-driver-module-native.cover"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-lp-driver-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-lp-driver-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-lp-driver-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-lp-driver-module-native.json",
+    "session_id": 57972,
+    "scope_warning": "Includes scalar full dual Solve, outer primal/dual preparation and orchestration, exact MPS factories/named accessors and LP argument/settings/setup integration through93d0d780, plus prior LP work. Started runner returned a live session; completion and coverage are not credited. Poll actual session57972 until its terminal exit. Go coverage is separate from C++ completion."
   }
 }
