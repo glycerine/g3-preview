@@ -10,8 +10,9 @@ import (
 )
 
 type RationalConstraint struct {
-	RightSide *numeral.Rational
-	Relation  LPRelation
+	RightSide   *numeral.Rational
+	Relation    LPRelation
+	relationSet bool // source default constructor leaves the relation indeterminate
 }
 
 // RationalLPSolver owns the exact input model shared by the source primal and
@@ -37,6 +38,7 @@ type RationalLPSolver struct {
 	calls                                  exactEtaCalls
 	work                                   *IndexedRationalVector
 	shiftWork                              *IndexedRationalVector
+	pinWork                                *IndexedRationalVector
 	previousMatrices                       []*RationalStaticMatrix
 	values                                 []*numeral.Rational
 	stopped, closed                        bool
@@ -61,7 +63,7 @@ func NewRationalLPSolver(m *numeral.RationalManager) (*RationalLPSolver, error) 
 	}, nil
 }
 func (m *RationalLPSolver) ready() error {
-	if m.closed || m.stopped || m.work != nil || m.shiftWork != nil || m.calls.pending() {
+	if m.closed || m.stopped || m.work != nil || m.shiftWork != nil || m.pinWork != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return nil
@@ -160,6 +162,7 @@ func (m *RationalLPSolver) AddConstraint(relation LPRelation, rhs *numeral.Ratio
 		return err
 	}
 	c.Relation = relation
+	c.relationSet = true
 	if err = w.Close(); err != nil {
 		return err
 	}
@@ -287,7 +290,7 @@ func (m *RationalLPSolver) Close() error {
 			}
 		}
 	}
-	for _, v := range []*IndexedRationalVector{m.B, m.ColumnScale, m.shiftWork} {
+	for _, v := range []*IndexedRationalVector{m.B, m.ColumnScale, m.shiftWork, m.pinWork} {
 		if v != nil {
 			if err := v.Close(); err != nil {
 				return err
@@ -295,6 +298,7 @@ func (m *RationalLPSolver) Close() error {
 		}
 	}
 	m.shiftWork = nil
+	m.pinWork = nil
 	if m.work != nil {
 		if err := m.work.Close(); err != nil {
 			return err

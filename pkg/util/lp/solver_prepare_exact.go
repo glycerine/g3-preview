@@ -334,6 +334,9 @@ func (m *RationalLPSolver) countSlacksForRow(i uint32) error {
 	if err := lpSolverDomain(exists && c != nil); err != nil {
 		return err
 	}
+	if !c.relationSet {
+		return ErrBounds
+	}
 	switch c.Relation {
 	case RelationEqual:
 		m.Artificials++

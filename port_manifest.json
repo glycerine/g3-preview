@@ -127158,7 +127158,11 @@
         "pkg/util/lp/primal_breakpoint_exact.go",
         "pkg/util/lp/core_statistics_exact.go",
         "pkg/util/lp/core_statistics_exact_test.go",
-        "pkg/util/lp/core_base_exact.go"
+        "pkg/util/lp/core_base_exact.go",
+        "pkg/util/lp/solver_presolve_exact.go",
+        "pkg/util/lp/solver_presolve_exact_test.go",
+        "pkg/util/lp/solver_exact_model.go",
+        "pkg/util/lp/solver_prepare_exact.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
@@ -127195,7 +127199,23 @@
         "TestLPPairStatisticsLiveLocalReentryGuard",
         "TestLPPairStatisticsPhysicalOwnership",
         "TestLPPairAllColumnsFeasibilityIndependentOracle",
-        "TestLPPairStatisticsReachedGuardsAndPrefixes"
+        "TestLPPairStatisticsReachedGuardsAndPrefixes",
+        "TestLPRationalPresolveIndependentCornerExtrema",
+        "TestLPRationalPresolveUnknownBoundsAndZeroRead",
+        "TestLPRationalPresolveIndependentRowClassificationAndPinning",
+        "TestLPRationalPresolveZeroRowsAndUnknownRelations",
+        "TestLPRationalPresolveFixedEliminationAndRelease",
+        "TestLPRationalPresolveDeferredErasureAndFailurePrefixes",
+        "TestLPRationalPresolveCleanupPassesAndDiagnostics",
+        "TestLPRationalPresolvePhysicalOwnership",
+        "TestLPRationalPresolvePreservesOlderComparison",
+        "TestLPRationalPresolvePinSignsAndMissingBoundAssertions",
+        "TestLPRationalPresolveOneSidedClassification",
+        "TestLPRationalPresolveReachedGuards",
+        "TestLPRationalPresolveCleanupOutputModes",
+        "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
+        "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
+        "TestLPRationalPresolveForeignBorrowedNumerals"
       ],
       "conditionals": [
         {
@@ -127310,11 +127330,35 @@
             "TestLPPairAllColumnsFeasibilityIndependentOracle",
             "TestLPPairStatisticsReachedGuardsAndPrefixes"
           ]
+        },
+        {
+          "name": "Retained precise val_is_smaller_than_eps(mpq,double) predicate: t<=0, ignoring floating tolerance, consumed by exact presolve (lp_settings.h:350-356)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_presolve_exact.go",
+          "tests": [
+            "TestLPRationalPresolveIndependentCornerExtrema",
+            "TestLPRationalPresolveUnknownBoundsAndZeroRead",
+            "TestLPRationalPresolveIndependentRowClassificationAndPinning",
+            "TestLPRationalPresolveZeroRowsAndUnknownRelations",
+            "TestLPRationalPresolveFixedEliminationAndRelease",
+            "TestLPRationalPresolveDeferredErasureAndFailurePrefixes",
+            "TestLPRationalPresolveCleanupPassesAndDiagnostics",
+            "TestLPRationalPresolvePhysicalOwnership",
+            "TestLPRationalPresolvePreservesOlderComparison",
+            "TestLPRationalPresolvePinSignsAndMissingBoundAssertions",
+            "TestLPRationalPresolveOneSidedClassification",
+            "TestLPRationalPresolveReachedGuards",
+            "TestLPRationalPresolveCleanupOutputModes",
+            "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
+            "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
+            "TestLPRationalPresolveForeignBorrowedNumerals"
+          ]
         }
       ],
       "ownership": [
         "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim.",
-        "Settings owns concrete random state, stats and an existing source-backed Stopwatch; custom resource limits and io.Writer transports are borrowed. No OS stream/STL port or callback numerical algebra. NewSettings returns a partially initialized owner with an explicit host clock error if the real default stopwatch cannot start."
+        "Settings owns concrete random state, stats and an existing source-backed Stopwatch; custom resource limits and io.Writer transports are borrowed. No OS stream/STL port or callback numerical algebra. NewSettings returns a partially initialized owner with an explicit host clock error if the real default stopwatch cannot start.",
+        "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -127412,7 +127456,9 @@
         "pkg/util/lp/solver_exact_model.go",
         "pkg/util/lp/solver_exact_model_test.go",
         "pkg/util/lp/solver_prepare_exact.go",
-        "pkg/util/lp/solver_prepare_exact_test.go"
+        "pkg/util/lp/solver_prepare_exact_test.go",
+        "pkg/util/lp/solver_presolve_exact.go",
+        "pkg/util/lp/solver_presolve_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -127453,7 +127499,23 @@
         "TestLPRationalPreparationReachedDomains",
         "TestLPRationalPreparationActualMPSPipeline",
         "TestLPRationalPreparationPreservesOlderComparison",
-        "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
+        "TestLPRationalPreparationLateFailuresKeepReachedPrefix",
+        "TestLPRationalPresolveIndependentCornerExtrema",
+        "TestLPRationalPresolveUnknownBoundsAndZeroRead",
+        "TestLPRationalPresolveIndependentRowClassificationAndPinning",
+        "TestLPRationalPresolveZeroRowsAndUnknownRelations",
+        "TestLPRationalPresolveFixedEliminationAndRelease",
+        "TestLPRationalPresolveDeferredErasureAndFailurePrefixes",
+        "TestLPRationalPresolveCleanupPassesAndDiagnostics",
+        "TestLPRationalPresolvePhysicalOwnership",
+        "TestLPRationalPresolvePreservesOlderComparison",
+        "TestLPRationalPresolvePinSignsAndMissingBoundAssertions",
+        "TestLPRationalPresolveOneSidedClassification",
+        "TestLPRationalPresolveReachedGuards",
+        "TestLPRationalPresolveCleanupOutputModes",
+        "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
+        "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
+        "TestLPRationalPresolveForeignBorrowedNumerals"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -127567,6 +127629,29 @@
             "TestLPRationalPreparationPreservesOlderComparison",
             "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
           ]
+        },
+        {
+          "name": "Concrete mpq/mpq row bounds, signed endpoint pinning, exact row classification, fixed/zero elimination, deferred row erasure and cleanup (lp_solver.hpp:168-411; lp_solver.h:187-193)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_presolve_exact.go",
+          "tests": [
+            "TestLPRationalPresolveIndependentCornerExtrema",
+            "TestLPRationalPresolveUnknownBoundsAndZeroRead",
+            "TestLPRationalPresolveIndependentRowClassificationAndPinning",
+            "TestLPRationalPresolveZeroRowsAndUnknownRelations",
+            "TestLPRationalPresolveFixedEliminationAndRelease",
+            "TestLPRationalPresolveDeferredErasureAndFailurePrefixes",
+            "TestLPRationalPresolveCleanupPassesAndDiagnostics",
+            "TestLPRationalPresolvePhysicalOwnership",
+            "TestLPRationalPresolvePreservesOlderComparison",
+            "TestLPRationalPresolvePinSignsAndMissingBoundAssertions",
+            "TestLPRationalPresolveOneSidedClassification",
+            "TestLPRationalPresolveReachedGuards",
+            "TestLPRationalPresolveCleanupOutputModes",
+            "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
+            "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
+            "TestLPRationalPresolveForeignBorrowedNumerals"
+          ]
         }
       ],
       "ownership": [
@@ -127574,7 +127659,8 @@
         "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced.",
         "Presolve uses native temporary key slices and erases dictionary entries only after each source scan. RHS subtraction and earlier variable pins publish immediately. Infeasibility returns before queued row deletion and term elimination. No fake numerical allocation/refusal layer or generic bound callback is introduced; surviving FloatColumnInfo pointers retain identity.",
         "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json.",
-        "Parent raw receipts close before matrix/column/dense-output child receipts; children close before source coefficient/result/shift locals and input owners. Dense resize destroys actual owning suffix values before shortening. Displaced native matrices remain explicitly owned until Close; old caller comparisons are neither adopted nor consumed. See latest_exact_preparation_increment in pkg/util/lp/PORT_STATUS.json."
+        "Parent raw receipts close before matrix/column/dense-output child receipts; children close before source coefficient/result/shift locals and input owners. Dense resize destroys actual owning suffix values before shortening. Displaced native matrices remain explicitly owned until Close; old caller comparisons are neither adopted nor consumed. See latest_exact_preparation_increment in pkg/util/lp/PORT_STATUS.json.",
+        "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json."
       ],
       "deviations": [
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
@@ -127602,7 +127688,9 @@
         "pkg/util/lp/solver_exact_model.go",
         "pkg/util/lp/solver_exact_model_test.go",
         "pkg/util/lp/solver_prepare_exact.go",
-        "pkg/util/lp/solver_prepare_exact_test.go"
+        "pkg/util/lp/solver_prepare_exact_test.go",
+        "pkg/util/lp/solver_presolve_exact.go",
+        "pkg/util/lp/solver_presolve_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -127637,7 +127725,23 @@
         "TestLPRationalPreparationReachedDomains",
         "TestLPRationalPreparationActualMPSPipeline",
         "TestLPRationalPreparationPreservesOlderComparison",
-        "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
+        "TestLPRationalPreparationLateFailuresKeepReachedPrefix",
+        "TestLPRationalPresolveIndependentCornerExtrema",
+        "TestLPRationalPresolveUnknownBoundsAndZeroRead",
+        "TestLPRationalPresolveIndependentRowClassificationAndPinning",
+        "TestLPRationalPresolveZeroRowsAndUnknownRelations",
+        "TestLPRationalPresolveFixedEliminationAndRelease",
+        "TestLPRationalPresolveDeferredErasureAndFailurePrefixes",
+        "TestLPRationalPresolveCleanupPassesAndDiagnostics",
+        "TestLPRationalPresolvePhysicalOwnership",
+        "TestLPRationalPresolvePreservesOlderComparison",
+        "TestLPRationalPresolvePinSignsAndMissingBoundAssertions",
+        "TestLPRationalPresolveOneSidedClassification",
+        "TestLPRationalPresolveReachedGuards",
+        "TestLPRationalPresolveCleanupOutputModes",
+        "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
+        "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
+        "TestLPRationalPresolveForeignBorrowedNumerals"
       ],
       "assertions": [
         {
@@ -127796,6 +127900,29 @@
             "TestLPRationalPreparationPreservesOlderComparison",
             "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
           ]
+        },
+        {
+          "name": "Concrete mpq/mpq row bounds, signed endpoint pinning, exact row classification, fixed/zero elimination, deferred row erasure and cleanup (lp_solver.hpp:168-411; lp_solver.h:187-193)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_presolve_exact.go",
+          "tests": [
+            "TestLPRationalPresolveIndependentCornerExtrema",
+            "TestLPRationalPresolveUnknownBoundsAndZeroRead",
+            "TestLPRationalPresolveIndependentRowClassificationAndPinning",
+            "TestLPRationalPresolveZeroRowsAndUnknownRelations",
+            "TestLPRationalPresolveFixedEliminationAndRelease",
+            "TestLPRationalPresolveDeferredErasureAndFailurePrefixes",
+            "TestLPRationalPresolveCleanupPassesAndDiagnostics",
+            "TestLPRationalPresolvePhysicalOwnership",
+            "TestLPRationalPresolvePreservesOlderComparison",
+            "TestLPRationalPresolvePinSignsAndMissingBoundAssertions",
+            "TestLPRationalPresolveOneSidedClassification",
+            "TestLPRationalPresolveReachedGuards",
+            "TestLPRationalPresolveCleanupOutputModes",
+            "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
+            "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
+            "TestLPRationalPresolveForeignBorrowedNumerals"
+          ]
         }
       ],
       "ownership": [
@@ -127803,7 +127930,8 @@
         "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced.",
         "Presolve uses native temporary key slices and erases dictionary entries only after each source scan. RHS subtraction and earlier variable pins publish immediately. Infeasibility returns before queued row deletion and term elimination. No fake numerical allocation/refusal layer or generic bound callback is introduced; surviving FloatColumnInfo pointers retain identity.",
         "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json.",
-        "Parent raw receipts close before matrix/column/dense-output child receipts; children close before source coefficient/result/shift locals and input owners. Dense resize destroys actual owning suffix values before shortening. Displaced native matrices remain explicitly owned until Close; old caller comparisons are neither adopted nor consumed. See latest_exact_preparation_increment in pkg/util/lp/PORT_STATUS.json."
+        "Parent raw receipts close before matrix/column/dense-output child receipts; children close before source coefficient/result/shift locals and input owners. Dense resize destroys actual owning suffix values before shortening. Displaced native matrices remain explicitly owned until Close; old caller comparisons are neither adopted nor consumed. See latest_exact_preparation_increment in pkg/util/lp/PORT_STATUS.json.",
+        "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json."
       ],
       "deviations": [
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
