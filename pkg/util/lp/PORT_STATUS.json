@@ -622,7 +622,8 @@
         "TestLPIntSetDenseOrderResizeAndGuards",
         "TestLPIntSetShrinkRetainsSourceIndexAndReachedClearPrefix",
         "TestLPIntSetIndependentFiniteMembership",
-        "TestLPIntSetPrintOrderAndWriterFailure"
+        "TestLPIntSetPrintOrderAndWriterFailure",
+        "TestLPIntSetPrintActualEndl"
       ]
     },
     {
@@ -9935,5 +9936,40 @@
       "/mnt/oldrog/tmp/g3-dispatch-native.cover",
       "/mnt/oldrog/tmp/g3-dispatch-debug.cover"
     ]
+  },
+  "latest_container_cli_scenarios_increment": {
+    "scope": "Executable retained integer-set and integer/pair priority-queue CLI scenarios; full CLI execution still outstanding",
+    "tests": [
+      "TestLPContainerDriverLiteralReports",
+      "TestLPContainerDriverReportFailurePrefixes",
+      "TestLPContainerDriverSharedRandomAndGuards",
+      "TestLPIntSetPrintActualEndl"
+    ],
+    "fix": "IntSet.Print now flushes after successful newline, preserving source endl.",
+    "coverage": {
+      "native_scenarios": {
+        "covered": 54,
+        "statements": 88,
+        "percent": 61.4
+      },
+      "combined_debug_checked_scenarios": {
+        "covered": 60,
+        "statements": 88,
+        "percent": 68.2
+      },
+      "int_set_both": {
+        "covered": 48,
+        "statements": 48,
+        "percent": 100.0
+      }
+    },
+    "coverage_warning": "All successful source scenario operations and output failures covered. Uncovered wrapper statements are stable delegated failures/invariant assertions; native also excludes debug drain. Existing independent container oracles remain in related regressions. No fabricated child failure hook introduced.",
+    "validation": "Focused native0.100s/combined0.103s; related priority/pair/set/preparation native32.731s/combined50.359s; both LP vets and module compilation passed.",
+    "random_evidence": "100 independent seeds each consume300 pair-helper draws then300 priority-helper draws; independent uint32 recurrence checks shared next draw. Every byte and endl refusal checks whether the300-draw child was reached.",
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-container-driver-native.cover",
+      "/mnt/oldrog/tmp/g3-container-driver-debug.cover"
+    ],
+    "remaining": "Other retained registered scenarios and complete CLI action execution/entry binding; whole retained-source and ownership audits."
   }
 }

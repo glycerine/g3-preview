@@ -103041,7 +103041,9 @@
         "pkg/util/lp/driver_mps_catalogue.go",
         "pkg/util/lp/driver_mps_batch_test.go",
         "pkg/util/lp/driver_dispatch.go",
-        "pkg/util/lp/driver_dispatch_test.go"
+        "pkg/util/lp/driver_dispatch_test.go",
+        "pkg/util/lp/driver_container_scenarios.go",
+        "pkg/util/lp/driver_container_scenarios_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103246,7 +103248,11 @@
         "TestLPDriverPreparationSourcePrecedence",
         "TestLPDriverPreparationEmptyOptionsAndDebugStage",
         "TestLPDriverPreparationSolveOptionsAndParseFailure",
-        "TestLPDriverPreparationReportFailurePrefixes"
+        "TestLPDriverPreparationReportFailurePrefixes",
+        "TestLPContainerDriverLiteralReports",
+        "TestLPContainerDriverReportFailurePrefixes",
+        "TestLPContainerDriverSharedRandomAndGuards",
+        "TestLPIntSetPrintActualEndl"
       ],
       "conditionals": [
         {
@@ -104234,6 +104240,17 @@
           "tests": [
             "TestLPDriverPreparationSourcePrecedence",
             "TestLPDriverPreparationEmptyOptionsAndDebugStage"
+          ]
+        },
+        {
+          "name": "retained test_int_set and test_binary_priority_queue/test_upair_queue executable scenarios: three set endl reports, literal heap updates, debug-only second drain, shared concrete random generator300 draws and final report",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_container_scenarios.go",
+          "tests": [
+            "TestLPContainerDriverLiteralReports",
+            "TestLPContainerDriverReportFailurePrefixes",
+            "TestLPContainerDriverSharedRandomAndGuards",
+            "TestLPIntSetPrintActualEndl"
           ]
         }
       ],
@@ -120693,7 +120710,8 @@
         "TestLPIntSetDenseOrderResizeAndGuards",
         "TestLPIntSetShrinkRetainsSourceIndexAndReachedClearPrefix",
         "TestLPIntSetIndependentFiniteMembership",
-        "TestLPIntSetPrintOrderAndWriterFailure"
+        "TestLPIntSetPrintOrderAndWriterFailure",
+        "TestLPIntSetPrintActualEndl"
       ],
       "assertions": [
         {
@@ -120738,6 +120756,14 @@
             "TestLPIntSetShrinkRetainsSourceIndexAndReachedClearPrefix",
             "TestLPIntSetIndependentFiniteMembership",
             "TestLPIntSetPrintOrderAndWriterFailure"
+          ]
+        },
+        {
+          "name": "print source endl flush follows successful newline; actual empty/nonempty flush refusal",
+          "status": "ported",
+          "go_target": "pkg/util/lp/int_set.go",
+          "tests": [
+            "TestLPIntSetPrintActualEndl"
           ]
         }
       ],

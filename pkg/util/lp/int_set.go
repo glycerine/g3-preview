@@ -93,7 +93,7 @@ func (s *IntSet) Clear() error {
 }
 
 // Print uses Go formatting for the source sequence of unsigned/space/newline
-// insertions. File ownership and flushing belong to the caller.
+// insertions, followed by the source endl flush. File ownership is borrowed.
 func (s *IntSet) Print(out io.Writer) error {
 	for _, j := range s.index {
 		if _, err := fmt.Fprintf(out, "%d ", j); err != nil {
@@ -101,5 +101,8 @@ func (s *IntSet) Print(out io.Writer) error {
 		}
 	}
 	_, err := fmt.Fprintln(out)
-	return err
+	if err != nil {
+		return err
+	}
+	return dualFlush(out)
 }
