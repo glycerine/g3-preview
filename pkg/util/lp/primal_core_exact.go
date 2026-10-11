@@ -20,6 +20,7 @@ type PairPrimalCoreSolver struct {
 	LeavingCandidates                            []uint32
 	calls                                        exactEtaCalls
 	work                                         *IndexedRationalVector
+	pairWork                                     *IndexedPairVector
 	stopped                                      bool
 }
 
@@ -69,7 +70,7 @@ func NewPairPrimalCoreSolver(in PairCoreInputs) (m *PairPrimalCoreSolver, err er
 	return m, nil
 }
 func (m *PairPrimalCoreSolver) ready() error {
-	if m.stopped || m.work != nil || m.calls.pending() {
+	if m.stopped || m.work != nil || m.pairWork != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return m.PairCoreSolverBase.ready()
@@ -145,6 +146,12 @@ func (m *PairPrimalCoreSolver) GetColumnOutOfBoundsDeltaSign(j uint32) (int32, e
 func (m *PairPrimalCoreSolver) Close() error {
 	if err := m.calls.cleanupRaw(m.manager); err != nil {
 		return err
+	}
+	if m.pairWork != nil {
+		if err := m.pairWork.Close(); err != nil {
+			return err
+		}
+		m.pairWork = nil
 	}
 	if m.work != nil {
 		if err := m.work.Close(); err != nil {
