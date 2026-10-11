@@ -17,6 +17,9 @@ type RationalDualCoreSolver struct {
 	EnteringBoundaryPosition                             NonBasicColumnValuePosition
 	calls                                                exactEtaCalls
 	stopped                                              bool
+	priceWork                                            *IndexedRationalVector
+	// Pricing locals stay alive through calls to the child edge expression.
+	pricingValue *IndexedRationalVector
 }
 
 func NewRationalDualCoreSolver(in RationalCoreInputs, canEnter *[]bool) (m *RationalDualCoreSolver, err error) {
@@ -55,7 +58,7 @@ func NewRationalDualCoreSolver(in RationalCoreInputs, canEnter *[]bool) (m *Rati
 	return m, m.FillNonBasisWithOnlyAbleToEnterColumns()
 }
 func (m *RationalDualCoreSolver) ready() error {
-	if m.stopped || m.calls.pending() {
+	if m.stopped || m.priceWork != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return m.RationalCoreSolverBase.ready()
@@ -183,7 +186,7 @@ func (m *RationalDualCoreSolver) Close() error {
 	if err := m.RationalCoreSolverBase.Close(); err != nil {
 		return err
 	}
-	for _, v := range []*IndexedRationalVector{m.AWave, m.Betas} {
+	for _, v := range []*IndexedRationalVector{m.AWave, m.Betas, m.priceWork, m.pricingValue} {
 		if v != nil {
 			if err := v.Close(); err != nil {
 				return err
@@ -191,6 +194,7 @@ func (m *RationalDualCoreSolver) Close() error {
 		}
 	}
 	m.AWave, m.Betas = nil, nil
+	m.priceWork, m.pricingValue = nil, nil
 	for _, v := range []*numeral.Rational{&m.HarrisTolerance, &m.Delta, &m.ThetaD, &m.ThetaP} {
 		if err := m.manager.Del(v); err != nil {
 			return err

@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Remaining scalar dual pricing/ratio/basis advancement/full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers."
+    "Remaining scalar dual pricing loop/ratio test/basis advancement/full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers."
   ],
   "units": [
     {
@@ -1923,7 +1923,8 @@
         "pkg/util/lp/dual_flip_float.go",
         "pkg/util/lp/dual_advance_float.go",
         "pkg/util/lp/dual_solve_float.go",
-        "pkg/util/lp/dual_core_rational.go"
+        "pkg/util/lp/dual_core_rational.go",
+        "pkg/util/lp/dual_price_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -1967,7 +1968,15 @@
         "TestLPRationalDualCorePartialOwners",
         "TestLPRationalDualCorePhysicalOwnership",
         "TestLPRationalDualCoreLiveMetadataPrefixes",
-        "TestLPRationalDualCorePreservesOlderComparison"
+        "TestLPRationalDualCorePreservesOlderComparison",
+        "TestLPRationalDualPriceIndependentExactOracle",
+        "TestLPRationalDualPriceDeltaAndSignSourceProfiles",
+        "TestLPRationalDualPriceRowBudgetAndStatus",
+        "TestLPRationalDualPricePhysicalOwnership",
+        "TestLPRationalDualPriceLiveOutputAliases",
+        "TestLPRationalDualPriceSignAndDualFeasibility",
+        "TestLPRationalDualPriceMetadataAndAssertionPrefixes",
+        "TestLPRationalDualPricePreservesOlderComparison"
       ]
     },
     {
@@ -1981,7 +1990,8 @@
         "pkg/util/lp/dual_flip_float.go",
         "pkg/util/lp/dual_advance_float.go",
         "pkg/util/lp/dual_solve_float.go",
-        "pkg/util/lp/dual_core_rational.go"
+        "pkg/util/lp/dual_core_rational.go",
+        "pkg/util/lp/dual_price_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -2025,7 +2035,15 @@
         "TestLPRationalDualCorePartialOwners",
         "TestLPRationalDualCorePhysicalOwnership",
         "TestLPRationalDualCoreLiveMetadataPrefixes",
-        "TestLPRationalDualCorePreservesOlderComparison"
+        "TestLPRationalDualCorePreservesOlderComparison",
+        "TestLPRationalDualPriceIndependentExactOracle",
+        "TestLPRationalDualPriceDeltaAndSignSourceProfiles",
+        "TestLPRationalDualPriceRowBudgetAndStatus",
+        "TestLPRationalDualPricePhysicalOwnership",
+        "TestLPRationalDualPriceLiveOutputAliases",
+        "TestLPRationalDualPriceSignAndDualFeasibility",
+        "TestLPRationalDualPriceMetadataAndAssertionPrefixes",
+        "TestLPRationalDualPricePreservesOlderComparison"
       ]
     },
     {
@@ -7789,5 +7807,49 @@
     "exec_session_id": 52535,
     "completion_credited": false,
     "coverage_credited": false
+  },
+  "latest_rational_dual_price_increment": {
+    "scope": "Scalar dual edge/row pricing, leaving delta/sign and source row budget",
+    "source_units_promoted": false,
+    "test_groups": 8,
+    "independent_exact_pricing_worlds": 400,
+    "delta_sign_profiles": 60,
+    "row_budget_profiles": 36,
+    "exact_delta_sign_worlds": 35,
+    "physical_campaigns": 12,
+    "older_comparison_campaigns": 3,
+    "live_output_aliases": 12,
+    "metadata_assertion_profiles": 13,
+    "statement_coverage": {
+      "native": {
+        "dual_price_rational.go": {
+          "covered": 204,
+          "total": 254,
+          "percent": 80.3
+        }
+      },
+      "debug_checked": {
+        "dual_price_rational.go": {
+          "covered": 209,
+          "total": 254,
+          "percent": 82.3
+        }
+      }
+    },
+    "focused_native_seconds": 2.576,
+    "focused_debug_checked_seconds": 3.373,
+    "remaining": "Remaining scalar dual pricing loop/ratio test/basis advancement/full Solve, exact outer primal/dual optimization and scaling integration, retained LP source audits and complete upstream LP/MPS/CLI/options/randomize drivers.",
+    "coverage_note": "Coverage measures implemented Go statements, not C++ completion. Gaps chiefly guard stable capture/destruction and ready/metadata states, plus native fallthrough bodies stopped by source checked assertions. Scalar full dual pricing-loop/ratio/advancement integration remains open.",
+    "related_native_seconds": 25.1,
+    "related_debug_checked_seconds": 38.057,
+    "verification": [
+      "both final focused profiles after source switch fallthrough simplification",
+      "related scalar dual/core/reduced-cost/reconstruction/Solve and floating dual regressions, both profiles",
+      "both LP vets",
+      "both module compile gates",
+      "source portcheck: 2103 units, 677 APIs",
+      "dependency graph refresh: 64 packages",
+      "diff check"
+    ]
   }
 }

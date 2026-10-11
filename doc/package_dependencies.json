@@ -1221,6 +1221,7 @@
         "dual_flip_float.go",
         "dual_initial_float.go",
         "dual_prepare_float.go",
+        "dual_price_rational.go",
         "dual_ratio_float.go",
         "dual_solve_float.go",
         "dual_solver_float.go",

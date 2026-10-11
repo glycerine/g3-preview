@@ -124695,7 +124695,8 @@
         "pkg/util/lp/dual_flip_float.go",
         "pkg/util/lp/dual_advance_float.go",
         "pkg/util/lp/dual_solve_float.go",
-        "pkg/util/lp/dual_core_rational.go"
+        "pkg/util/lp/dual_core_rational.go",
+        "pkg/util/lp/dual_price_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -124739,7 +124740,15 @@
         "TestLPRationalDualCorePartialOwners",
         "TestLPRationalDualCorePhysicalOwnership",
         "TestLPRationalDualCoreLiveMetadataPrefixes",
-        "TestLPRationalDualCorePreservesOlderComparison"
+        "TestLPRationalDualCorePreservesOlderComparison",
+        "TestLPRationalDualPriceIndependentExactOracle",
+        "TestLPRationalDualPriceDeltaAndSignSourceProfiles",
+        "TestLPRationalDualPriceRowBudgetAndStatus",
+        "TestLPRationalDualPricePhysicalOwnership",
+        "TestLPRationalDualPriceLiveOutputAliases",
+        "TestLPRationalDualPriceSignAndDualFeasibility",
+        "TestLPRationalDualPriceMetadataAndAssertionPrefixes",
+        "TestLPRationalDualPricePreservesOlderComparison"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -124836,10 +124845,26 @@
             "TestLPRationalDualCoreLiveMetadataPrefixes",
             "TestLPRationalDualCorePreservesOlderComparison"
           ]
+        },
+        {
+          "name": "Concrete scalar copied-left/compound-square edge steepness and row pricing, source delta/sign switch fallthrough including upper-only squared delta, exact delta-sign/dual feasibility, RNG row budget and tentative-unbounded status transition",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_price_rational.go",
+          "tests": [
+            "TestLPRationalDualPriceIndependentExactOracle",
+            "TestLPRationalDualPriceDeltaAndSignSourceProfiles",
+            "TestLPRationalDualPriceRowBudgetAndStatus",
+            "TestLPRationalDualPricePhysicalOwnership",
+            "TestLPRationalDualPriceLiveOutputAliases",
+            "TestLPRationalDualPriceSignAndDualFeasibility",
+            "TestLPRationalDualPriceMetadataAndAssertionPrefixes",
+            "TestLPRationalDualPricePreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
-        "Scalar dual construction returns a stopped partial owner on failure. Each numerical owner captures only its own calls; borrowed model/flags remain live until core/LU destruction. Dual vectors and member rationals close after base borrowers, before dual caller roots. No older caller comparison is adopted or consumed."
+        "Scalar dual construction returns a stopped partial owner on failure. Each numerical owner captures only its own calls; borrowed model/flags remain live until core/LU destruction. Dual vectors and member rationals close after base borrowers, before dual caller roots. No older caller comparison is adopted or consumed.",
+        "Dual pricing owns copied-left expression scratch and the separate row-local return value. Only actual arithmetic owners capture calls; child edge calls do not adopt parent or older caller comparisons. A failed expression retains lexical values until base borrowers close, then pricing locals close before dual caller roots."
       ],
       "deviations": [
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
@@ -124860,7 +124885,8 @@
         "pkg/util/lp/dual_flip_float.go",
         "pkg/util/lp/dual_advance_float.go",
         "pkg/util/lp/dual_solve_float.go",
-        "pkg/util/lp/dual_core_rational.go"
+        "pkg/util/lp/dual_core_rational.go",
+        "pkg/util/lp/dual_price_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -124904,7 +124930,15 @@
         "TestLPRationalDualCorePartialOwners",
         "TestLPRationalDualCorePhysicalOwnership",
         "TestLPRationalDualCoreLiveMetadataPrefixes",
-        "TestLPRationalDualCorePreservesOlderComparison"
+        "TestLPRationalDualCorePreservesOlderComparison",
+        "TestLPRationalDualPriceIndependentExactOracle",
+        "TestLPRationalDualPriceDeltaAndSignSourceProfiles",
+        "TestLPRationalDualPriceRowBudgetAndStatus",
+        "TestLPRationalDualPricePhysicalOwnership",
+        "TestLPRationalDualPriceLiveOutputAliases",
+        "TestLPRationalDualPriceSignAndDualFeasibility",
+        "TestLPRationalDualPriceMetadataAndAssertionPrefixes",
+        "TestLPRationalDualPricePreservesOlderComparison"
       ],
       "assertions": [
         {
@@ -125123,10 +125157,26 @@
             "TestLPRationalDualCoreLiveMetadataPrefixes",
             "TestLPRationalDualCorePreservesOlderComparison"
           ]
+        },
+        {
+          "name": "Concrete scalar copied-left/compound-square edge steepness and row pricing, source delta/sign switch fallthrough including upper-only squared delta, exact delta-sign/dual feasibility, RNG row budget and tentative-unbounded status transition",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_price_rational.go",
+          "tests": [
+            "TestLPRationalDualPriceIndependentExactOracle",
+            "TestLPRationalDualPriceDeltaAndSignSourceProfiles",
+            "TestLPRationalDualPriceRowBudgetAndStatus",
+            "TestLPRationalDualPricePhysicalOwnership",
+            "TestLPRationalDualPriceLiveOutputAliases",
+            "TestLPRationalDualPriceSignAndDualFeasibility",
+            "TestLPRationalDualPriceMetadataAndAssertionPrefixes",
+            "TestLPRationalDualPricePreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
-        "Scalar dual construction returns a stopped partial owner on failure. Each numerical owner captures only its own calls; borrowed model/flags remain live until core/LU destruction. Dual vectors and member rationals close after base borrowers, before dual caller roots. No older caller comparison is adopted or consumed."
+        "Scalar dual construction returns a stopped partial owner on failure. Each numerical owner captures only its own calls; borrowed model/flags remain live until core/LU destruction. Dual vectors and member rationals close after base borrowers, before dual caller roots. No older caller comparison is adopted or consumed.",
+        "Dual pricing owns copied-left expression scratch and the separate row-local return value. Only actual arithmetic owners capture calls; child edge calls do not adopt parent or older caller comparisons. A failed expression retains lexical values until base borrowers close, then pricing locals close before dual caller roots."
       ],
       "deviations": [
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
