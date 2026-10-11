@@ -17,6 +17,11 @@ func (m *PairPrimalCoreSolver) LimitTheta(lim, theta *RationalPair, unlimited *b
 		return e
 	}
 	defer func() { err = m.calls.after(m.manager, before, err) }()
+	return m.limitThetaValue(lim, theta, unlimited)
+}
+
+// The same primal owner calls this while its ratio expression remains live.
+func (m *PairPrimalCoreSolver) limitThetaValue(lim, theta *RationalPair, unlimited *bool) (err error) {
 	if *unlimited {
 		if err = theta.Copy(m.manager, lim); err != nil {
 			return err

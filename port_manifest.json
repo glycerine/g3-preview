@@ -123640,7 +123640,8 @@
         "pkg/util/lp/primal_price_exact.go",
         "pkg/util/lp/primal_price_exact_test.go",
         "pkg/util/lp/primal_bound_step_exact.go",
-        "pkg/util/lp/primal_bound_step_exact_test.go"
+        "pkg/util/lp/primal_bound_step_exact_test.go",
+        "pkg/util/lp/primal_inf_limit_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -123717,7 +123718,12 @@
         "TestLPExactBoundStepLeavingRowsIndependentMembership",
         "TestLPExactBoundStepPhysicalOwnership",
         "TestLPExactBoundStepSourcePrefixesAndGuards",
-        "TestLPExactBoundStepPreservesOlderComparisonOwner"
+        "TestLPExactBoundStepPreservesOlderComparisonOwner",
+        "TestLPExactInfLimitIndependentPairOracle",
+        "TestLPExactInfLimitLiveAliases",
+        "TestLPExactInfLimitPhysicalOwnership",
+        "TestLPExactInfLimitSourceSignAndPendingGuards",
+        "TestLPExactInfLimitPreservesOlderComparisonOwner"
       ],
       "conditionals": [
         {
@@ -124061,6 +124067,18 @@
             "TestLPExactBoundStepPhysicalOwnership",
             "TestLPExactBoundStepSourcePrefixesAndGuards",
             "TestLPExactBoundStepPreservesOlderComparisonOwner"
+          ]
+        },
+        {
+          "name": "retained precise limit_inf_on_bound_m_neg, limit_inf_on_bound_m_pos and limit_inf_on_low_bound_m_pos with source equality/minimum publication and independent base/primal cleanup ownership",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_inf_limit_exact.go",
+          "tests": [
+            "TestLPExactInfLimitIndependentPairOracle",
+            "TestLPExactInfLimitLiveAliases",
+            "TestLPExactInfLimitPhysicalOwnership",
+            "TestLPExactInfLimitSourceSignAndPendingGuards",
+            "TestLPExactInfLimitPreservesOlderComparisonOwner"
           ]
         }
       ],
@@ -127079,7 +127097,8 @@
         "pkg/util/lp/core_feasibility_exact.go",
         "pkg/util/lp/eta_exact_expression.go",
         "pkg/util/lp/primal_bound_step_exact.go",
-        "pkg/util/lp/primal_bound_step_exact_test.go"
+        "pkg/util/lp/primal_bound_step_exact_test.go",
+        "pkg/util/lp/primal_inf_limit_exact.go"
       ],
       "tests": [
         "TestLPRationalPairArithmeticOracle",
@@ -127111,7 +127130,12 @@
         "TestLPExactBoundStepLeavingRowsIndependentMembership",
         "TestLPExactBoundStepPhysicalOwnership",
         "TestLPExactBoundStepSourcePrefixesAndGuards",
-        "TestLPExactBoundStepPreservesOlderComparisonOwner"
+        "TestLPExactBoundStepPreservesOlderComparisonOwner",
+        "TestLPExactInfLimitIndependentPairOracle",
+        "TestLPExactInfLimitLiveAliases",
+        "TestLPExactInfLimitPhysicalOwnership",
+        "TestLPExactInfLimitSourceSignAndPendingGuards",
+        "TestLPExactInfLimitPreservesOlderComparisonOwner"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -127183,6 +127207,18 @@
           ],
           "go_targets": [
             "pkg/util/lp/primal_bound_step_exact.go"
+          ]
+        },
+        {
+          "name": "live numeric_pair binary subtraction and division expression for precise infeasibility limits, including local scalar copy, returned pair construction and caller assignment",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_inf_limit_exact.go",
+          "tests": [
+            "TestLPExactInfLimitIndependentPairOracle",
+            "TestLPExactInfLimitLiveAliases",
+            "TestLPExactInfLimitPhysicalOwnership",
+            "TestLPExactInfLimitSourceSignAndPendingGuards",
+            "TestLPExactInfLimitPreservesOlderComparisonOwner"
           ]
         }
       ],
