@@ -124448,7 +124448,8 @@
         "pkg/util/lp/primal_leaving_exact.go",
         "pkg/util/lp/primal_leaving_exact_test.go",
         "pkg/util/lp/primal_infeas_cost_exact.go",
-        "pkg/util/lp/primal_cost_switch_exact.go"
+        "pkg/util/lp/primal_cost_switch_exact.go",
+        "pkg/util/lp/primal_init_run_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124545,7 +124546,12 @@
         "TestLPExactCostBackupDenseReplacement",
         "TestLPExactCostSwitchPhysicalOwnership",
         "TestLPExactCostSwitchSourcePrefixes",
-        "TestLPExactCostSwitchLeavesOlderComparisonOwned"
+        "TestLPExactCostSwitchLeavesOlderComparisonOwned",
+        "TestLPExactInitRunIndependentModels",
+        "TestLPExactInitRunPhysicalOwnership",
+        "TestLPExactInitRunSourcePrefixes",
+        "TestLPExactInitRunAlreadyStoppedQueue",
+        "TestLPExactInitRunLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -125044,6 +125050,18 @@
             "TestLPExactCostSwitchPhysicalOwnership",
             "TestLPExactCostSwitchSourcePrefixes",
             "TestLPExactCostSwitchLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "retained precise init_run: counter and membership reset, feasible-only early return, exact backup/epsilon/queue/reduced-cost order, conditional nonzero-estimate refresh and preserved queue entries",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_init_run_exact.go",
+          "tests": [
+            "TestLPExactInitRunIndependentModels",
+            "TestLPExactInitRunPhysicalOwnership",
+            "TestLPExactInitRunSourcePrefixes",
+            "TestLPExactInitRunAlreadyStoppedQueue",
+            "TestLPExactInitRunLeavesOlderComparisonOwned"
           ]
         }
       ],
