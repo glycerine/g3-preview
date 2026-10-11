@@ -103043,7 +103043,12 @@
         "pkg/util/lp/driver_dispatch.go",
         "pkg/util/lp/driver_dispatch_test.go",
         "pkg/util/lp/driver_container_scenarios.go",
-        "pkg/util/lp/driver_container_scenarios_test.go"
+        "pkg/util/lp/driver_container_scenarios_test.go",
+        "pkg/util/lp/driver_permutation.go",
+        "pkg/util/lp/driver_permutation_debug.go",
+        "pkg/util/lp/driver_permutation_native.go",
+        "pkg/util/lp/driver_permutation_test.go",
+        "pkg/util/lp/driver_permutation_debug_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103252,7 +103257,10 @@
         "TestLPContainerDriverLiteralReports",
         "TestLPContainerDriverReportFailurePrefixes",
         "TestLPContainerDriverSharedRandomAndGuards",
-        "TestLPIntSetPrintActualEndl"
+        "TestLPIntSetPrintActualEndl",
+        "TestLPDriverPermutationIndependentResults",
+        "TestLPDriverPermutationReportFailures",
+        "TestLPDriverPermutationDebugActualProductChecks"
       ],
       "conditionals": [
         {
@@ -104251,6 +104259,22 @@
             "TestLPContainerDriverReportFailurePrefixes",
             "TestLPContainerDriverSharedRandomAndGuards",
             "TestLPIntSetPrintActualEndl"
+          ]
+        },
+        {
+          "name": "retained test_permutations src1014-1072 executable scenario: both reverse-right compositions, actual debug inverse/dense matrix product/equality, dense/indexed application and source floating vector equality",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_permutation.go",
+          "go_targets": [
+            "pkg/util/lp/driver_permutation_debug.go",
+            "pkg/util/lp/driver_permutation_native.go",
+            "pkg/util/lp/driver_permutation_test.go",
+            "pkg/util/lp/driver_permutation_debug_test.go"
+          ],
+          "tests": [
+            "TestLPDriverPermutationIndependentResults",
+            "TestLPDriverPermutationReportFailures",
+            "TestLPDriverPermutationDebugActualProductChecks"
           ]
         }
       ],

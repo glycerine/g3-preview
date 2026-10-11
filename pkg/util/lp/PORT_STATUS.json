@@ -9971,5 +9971,48 @@
       "/mnt/oldrog/tmp/g3-container-driver-debug.cover"
     ],
     "remaining": "Other retained registered scenarios and complete CLI action execution/entry binding; whole retained-source and ownership audits."
+  },
+  "latest_permutation_cli_scenario_increment": {
+    "scope": "Executable retained --test_perm scenario; other actions and complete top-level execution remain open",
+    "tests": [
+      "TestLPDriverPermutationIndependentResults",
+      "TestLPDriverPermutationReportFailures",
+      "TestLPDriverPermutationDebugActualProductChecks"
+    ],
+    "coverage": {
+      "native_driver": {
+        "covered": 24,
+        "statements": 37,
+        "percent": 64.9
+      },
+      "combined_debug_checked_driver": {
+        "covered": 26,
+        "statements": 37,
+        "percent": 70.3
+      },
+      "debug_product_check": {
+        "covered": 13,
+        "statements": 15,
+        "percent": 86.7
+      },
+      "native_stub": {
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0
+      }
+    },
+    "coverage_warning": "Successful literal scenario operations, all report byte and endl failure prefixes and repeat-run guards covered. Remaining common gaps are stable child errors and invariant assertions; debug helper gaps are stable inverse/equality delegated errors. No fabricated mutation/failure hooks added.",
+    "validation": "Focused native0.075s/combined0.074s; related permutation/floating/debug-dense/preparation native0.055s/combined0.067s; both LP vets and module compile gates passed.",
+    "evidence": "Actual result mappings independently checked as [3,1,4,2,0] and [3,0,1,4,2], dense/indexed result [0,0,0,3,1] and ordered sparse indices[4,3]; reverse maps and every matrix element checked. All120 five-element permutations use independent integer matrix product oracle, then actual swapped products must fail debug equality.",
+    "implementation_notes": [
+      "Source debug vector equality delegates to existing relative floating predicate, not exact comparison.",
+      "Debug clone/inverse/dense product are actual source operations; unused native clone construction is omitted.",
+      "Initial test referenced nonexistent lpAllPermutations; corrected to existing lpPermutations helper before passing gates."
+    ],
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-permutation-driver-native.cover",
+      "/mnt/oldrog/tmp/g3-permutation-driver-debug.cover"
+    ],
+    "remaining": "Other retained registered scenarios, complete CLI execution and argv+2 binding; retained-source/consumer/ownership audits."
   }
 }
