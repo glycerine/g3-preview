@@ -124447,7 +124447,8 @@
         "pkg/util/lp/primal_breakpoint_advance_exact_test.go",
         "pkg/util/lp/primal_leaving_exact.go",
         "pkg/util/lp/primal_leaving_exact_test.go",
-        "pkg/util/lp/primal_infeas_cost_exact.go"
+        "pkg/util/lp/primal_infeas_cost_exact.go",
+        "pkg/util/lp/primal_cost_switch_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124539,7 +124540,12 @@
         "TestLPExactInfeasCostUnknownAndMembershipPrefixes",
         "TestLPExactInfeasCostPhysicalOwnership",
         "TestLPExactInfeasCostLeavesOlderComparisonOwned",
-        "TestLPExactInfeasCostMetadataBoundaries"
+        "TestLPExactInfeasCostMetadataBoundaries",
+        "TestLPExactCostSwitchIndependentModels",
+        "TestLPExactCostBackupDenseReplacement",
+        "TestLPExactCostSwitchPhysicalOwnership",
+        "TestLPExactCostSwitchSourcePrefixes",
+        "TestLPExactCostSwitchLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -125026,6 +125032,18 @@
             "TestLPExactInfeasCostPhysicalOwnership",
             "TestLPExactInfeasCostLeavesOlderComparisonOwned",
             "TestLPExactInfeasCostMetadataBoundaries"
+          ]
+        },
+        {
+          "name": "retained precise backup_and_normalize_costs and init_reduced_costs; dense destroy-before-copy cost assignment, stored-feasibility switch, feasibility-only early return, restoration flag and LU delegation order",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_cost_switch_exact.go",
+          "tests": [
+            "TestLPExactCostSwitchIndependentModels",
+            "TestLPExactCostBackupDenseReplacement",
+            "TestLPExactCostSwitchPhysicalOwnership",
+            "TestLPExactCostSwitchSourcePrefixes",
+            "TestLPExactCostSwitchLeavesOlderComparisonOwned"
           ]
         }
       ],
