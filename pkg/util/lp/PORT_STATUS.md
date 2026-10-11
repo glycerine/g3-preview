@@ -5,7 +5,7 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently 83 partial source units and 27 unported units. The floating
+There are currently 84 partial source units and 26 unported units. The floating
 primal and dual cores expose Solve, and outer LU primal/dual integration is implemented.
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
@@ -14,7 +14,8 @@ Latest hourly native module run completed at 00:39 UTC on October11 with
 exit status0 and every package passing: LP613.329s,88.8% (14048/15826).
 Log/profile: `/mnt/oldrog/tmp/g3-pair-basis-module-native.{log,cover}`.
 This snapshot includes exact basis changes and row transposition, and predates
-subsequent exact tableau pivoting/removal and feasibility/basic-delta updates.
+subsequent exact tableau pivoting/removal, feasibility/basic-delta and
+infeasibility-cost updates.
 Those additions have separate
 focused native/debug checks. Coverage measures existing Go code, not unported
 C++ functionality.
@@ -61,6 +62,7 @@ from the120 independently verified bounded optima.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Exact infeasibility costs and tableau reduced-cost updates | 1600 independent lexicographic worlds across all five types, including inverted intervals and nonbasic early return; 160 two-row rational cost oracles; source zero-delta/publication prefixes, alias rereads and metadata guards; eight pooled/direct failure campaigns through success and older caller comparison identity | New file90.4% native (103/114),93.0% debug/checked (106/114). Native omits three assertion returns; remaining eight gaps are protected capture guards, allocation-free cleanup and valid-value zero/copy guards. Focused17.040s native,18.144s debug/checked; both vets, port ledger and module compilation pass. Complete post-pop cleanup, outer scopes and tableau optimization remain open |
 | Exact feasibility clamp, membership and LAR basic-value delta updates | 1600 independent lexicographic worlds with all five types and untouched/aliased delta;160 actual clamp/tableau equation models and100 nonunit LU oracles;18 pooled/direct campaigns through success including comparison-before-publication, final copy after delta publication, real LU children and older caller comparison identity | Combined focused profiles: feasibility84.1% native (90/107),95.3% debug (102/107); basic updates92.0% both (69/75); difference expression90% both (9/10), membership100%. Twelve feasibility statements are disabled debug checks; remaining gaps are protected guard/child/cleanup errors. Main101.204s native,116.045s debug; added comparison/metadata15.472s/16.478s. Basis/scope regressions, both vets and native module compilation pass. Full post-pop cleanup/cost recomputation, outer scopes and optimization remain open |
 | LAR tableau row/column removal and debug basis validation | 160 independent surviving models with basic/nonbasic removed terms, signed costs and row swaps; literal RHS tail pop and unchanged outer state; reverse multi-column pop, both basis swap-pop paths and first-link selection; eight pooled/direct physical campaigns through success, actual embedded-core ownership, metadata and stopped prefixes | Removal78.1% native (168/215),88.4% debug/checked (190/215); validator7.1% native (2/28, debug body disabled),92.9% debug (26/28). Remaining gaps are disabled assertions and protected guard/cleanup errors. Focused scope/removal regressions33.958s native,35.791s debug/checked. Whole LAR scopes, feasibility cleanup and optimization remain open |
 | Exact tableau normalization, column elimination and reduced-cost pivot | 160 independent exact matrix/RHS/cost oracles; source empty-target false ordering, absent/zero pivots and metadata/stopped-matrix guards; eight pooled/direct physical campaigns through success with core/child ownership, normalized RHS and retained pivot-cost prefixes | New file117/126 (92.9%) in both profiles; native/basis/scope regressions28.670s, debug/checked33.938s. Nine gaps are provenance/earlier-ready protected errors, allocation-free cleanup errors and invariant-protected assertions. Full tableau optimization and LAR removal/scopes remain open |

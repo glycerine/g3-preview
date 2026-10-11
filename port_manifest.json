@@ -123380,7 +123380,9 @@
         "pkg/util/lp/primal_initial_float.go",
         "pkg/util/lp/primal_initial_float_test.go",
         "pkg/util/lp/primal_core_exact.go",
-        "pkg/util/lp/core_base_exact_test.go"
+        "pkg/util/lp/core_base_exact_test.go",
+        "pkg/util/lp/primal_cost_tableau_exact.go",
+        "pkg/util/lp/primal_cost_tableau_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -123434,7 +123436,12 @@
         "TestLPPairCoreIndependentLexicographicFeasibility",
         "TestLPPairCorePhysicalFailurePrefixes",
         "TestLPPairCoreSourceAssertionsAndPublication",
-        "TestLPPairCoreLeavesOlderComparisonOwned"
+        "TestLPPairCoreLeavesOlderComparisonOwned",
+        "TestLPPairTableauCostIndependentLexicographicOracle",
+        "TestLPPairTableauCostIndependentReducedCostOracle",
+        "TestLPPairTableauCostSourcePrefixesAndGuards",
+        "TestLPPairTableauCostPhysicalOwnership",
+        "TestLPPairTableauCostLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -123727,11 +123734,24 @@
             "TestLPPairCoreSourceAssertionsAndPublication",
             "TestLPPairCoreLeavesOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "retained mpq/impq infeasibility cost and tableau cost-update entry points; exact row reduced-cost recurrence with old-minus-new delta",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_cost_tableau_exact.go",
+          "tests": [
+            "TestLPPairTableauCostIndependentLexicographicOracle",
+            "TestLPPairTableauCostIndependentReducedCostOracle",
+            "TestLPPairTableauCostSourcePrefixesAndGuards",
+            "TestLPPairTableauCostPhysicalOwnership",
+            "TestLPPairTableauCostLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
         "Primal stage-one core owns native beta, empty concrete floating breakpoint queue, normalized cost backup and traversal slice; inherits actual borrowed solver vectors and owned floating LU/scratch. Failed base construction returns its real partial owner before derived initialization. Native []uint32 replaces the source candidate list; rotation changes only this list, while sort publishes nonbasis headings in order.",
-        "Exact core borrows actual input slice headers, matrix, settings, column namer and manager. It owns initialized rational/pair scratch and concrete PairLU; partial constructor results require Close. Base owns its direct comparison/cost-copy calls, while child LU calls retain their own generations and caller outputs own their published values. Derived epsilon owns source quotient expression temporaries. Destruction releases derived members, base factorization body, then reverse-order base scratch; borrowed model fields survive."
+        "Exact core borrows actual input slice headers, matrix, settings, column namer and manager. It owns initialized rational/pair scratch and concrete PairLU; partial constructor results require Close. Base owns its direct comparison/cost-copy calls, while child LU calls retain their own generations and caller outputs own their published values. Derived epsilon owns source quotient expression temporaries. Destruction releases derived members, base factorization body, then reverse-order base scratch; borrowed model fields survive.",
+        "Exact bound comparisons retain base-core invocation receipts; primal expression work owns the source difference/product parameters and returned values. Capture ends before delegated comparisons. The source publishes changed cost before updating reduced costs, preserves stored-row prefixes and rereads aliased delta; errors stop the owner, Close destroys actual owned invocations/work, and older caller comparisons remain untouched. Full tableau optimization and post-pop cleanup remain incomplete."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
@@ -123762,7 +123782,9 @@
         "pkg/util/lp/primal_refresh_float.go",
         "pkg/util/lp/primal_advance_float.go",
         "pkg/util/lp/primal_solve_float.go",
-        "pkg/util/lp/primal_feasible_float.go"
+        "pkg/util/lp/primal_feasible_float.go",
+        "pkg/util/lp/primal_cost_tableau_exact.go",
+        "pkg/util/lp/primal_cost_tableau_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -123807,7 +123829,12 @@
         "TestLPFloatPrimalSolveAndIterationReachedGuards",
         "TestLPFloatPrimalFindFeasibleIndependentSystems",
         "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
-        "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
+        "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes",
+        "TestLPPairTableauCostIndependentLexicographicOracle",
+        "TestLPPairTableauCostIndependentReducedCostOracle",
+        "TestLPPairTableauCostSourcePrefixesAndGuards",
+        "TestLPPairTableauCostPhysicalOwnership",
+        "TestLPPairTableauCostLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -124192,10 +124219,23 @@
             "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
             "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
           ]
+        },
+        {
+          "name": "retained mpq/impq get_infeasibility_cost_for_column: nonbasic zero, upper-first fixed/boxed strict lexicographic comparisons and breakpoint-dependent sign",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_cost_tableau_exact.go",
+          "tests": [
+            "TestLPPairTableauCostIndependentLexicographicOracle",
+            "TestLPPairTableauCostIndependentReducedCostOracle",
+            "TestLPPairTableauCostSourcePrefixesAndGuards",
+            "TestLPPairTableauCostPhysicalOwnership",
+            "TestLPPairTableauCostLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
-        "Primal stage-one core owns native beta, empty concrete floating breakpoint queue, normalized cost backup and traversal slice; inherits actual borrowed solver vectors and owned floating LU/scratch. Failed base construction returns its real partial owner before derived initialization. Native []uint32 replaces the source candidate list; rotation changes only this list, while sort publishes nonbasis headings in order."
+        "Primal stage-one core owns native beta, empty concrete floating breakpoint queue, normalized cost backup and traversal slice; inherits actual borrowed solver vectors and owned floating LU/scratch. Failed base construction returns its real partial owner before derived initialization. Native []uint32 replaces the source candidate list; rotation changes only this list, while sort publishes nonbasis headings in order.",
+        "Exact bound comparisons retain base-core invocation receipts; primal expression work owns the source difference/product parameters and returned values. Capture ends before delegated comparisons. The source publishes changed cost before updating reduced costs, preserves stored-row prefixes and rereads aliased delta; errors stop the owner, Close destroys actual owned invocations/work, and older caller comparisons remain untouched. Full tableau optimization and post-pop cleanup remain incomplete."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
@@ -124285,9 +124325,18 @@
       "path": "src/util/lp/lp_primal_core_solver_tableau.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/primal_cost_tableau_exact.go",
+        "pkg/util/lp/primal_cost_tableau_exact_test.go"
+      ],
+      "tests": [
+        "TestLPPairTableauCostIndependentLexicographicOracle",
+        "TestLPPairTableauCostIndependentReducedCostOracle",
+        "TestLPPairTableauCostSourcePrefixesAndGuards",
+        "TestLPPairTableauCostPhysicalOwnership",
+        "TestLPPairTableauCostLeavesOlderComparisonOwned"
+      ],
       "assertions": [
         {
           "line": 31,
@@ -124392,8 +124441,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "retained mpq/impq update_inf_cost_for_column_tableau: zero-delta early return, cost publication before stored-row reduced-cost updates",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_cost_tableau_exact.go",
+          "tests": [
+            "TestLPPairTableauCostIndependentLexicographicOracle",
+            "TestLPPairTableauCostIndependentReducedCostOracle",
+            "TestLPPairTableauCostSourcePrefixesAndGuards",
+            "TestLPPairTableauCostPhysicalOwnership",
+            "TestLPPairTableauCostLeavesOlderComparisonOwned"
+          ]
+        }
+      ],
+      "ownership": [
+        "Exact bound comparisons retain base-core invocation receipts; primal expression work owns the source difference/product parameters and returned values. Capture ends before delegated comparisons. The source publishes changed cost before updating reduced costs, preserves stored-row prefixes and rereads aliased delta; errors stop the owner, Close destroys actual owned invocations/work, and older caller comparisons remain untouched. Full tableau optimization and post-pop cleanup remain incomplete."
+      ],
       "deviations": []
     },
     {

@@ -1249,6 +1249,7 @@
         "primal_breakpoint_float.go",
         "primal_core_exact.go",
         "primal_core_float.go",
+        "primal_cost_tableau_exact.go",
         "primal_feasible_float.go",
         "primal_harris_float.go",
         "primal_initial_float.go",
