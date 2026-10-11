@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 86.5,
-  "coverage_warning": "Completed native checkpoint93d0d780 measures27928/32295 LP statements (86.5%). Includes scalar full dual Solve, scalar outer integration, exact MPS factories/named accessors and driver argument/settings/setup. Excludes later driver_mps*.go; separate focused coverage is89.3% dispatch/cleanup,92.3% floating and87.5% exact in both profiles. Go statement coverage is not C++ source completion; retained source audits and complete upstream drivers remain open. Later driver_file_list.go is also excluded from the completed full checkpoint; focused native/checked evidence covers42/42 statements (100%).",
+  "coverage_warning": "Completed native checkpoint93d0d780 measures27928/32295 LP statements (86.5%). Includes scalar full dual Solve, scalar outer integration, exact MPS factories/named accessors and driver argument/settings/setup. Excludes later driver_mps*.go; separate focused coverage is89.3% dispatch/cleanup,92.3% floating and87.5% exact in both profiles. Go statement coverage is not C++ source completion; retained source audits and complete upstream drivers remain open. Later driver_file_list.go is also excluded from the completed full checkpoint; focused native/checked evidence covers42/42 statements (100%). Later auxiliary driver_mps_default_rational.go is excluded from the completed full checkpoint; focused evidence covers70/76 statements (92.1%) in both profiles.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -10,9 +10,9 @@
     "remaining retained objective/preparation consumers and full primal/dual/LAR scaling integration; whole random-update source/driver audit",
     "remaining retained constructor/diagnostic/validator and optimization consumer audits; complete MPS/CLI upstream drivers",
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
-    "remaining top-level CLI dispatch, LAR file-list integration, directory/SMT input and auxiliary exact-no-setup driver scenarios",
+    "remaining top-level CLI dispatch, LAR file-list integration and directory/SMT input driver scenarios",
     "component property tests, coverage and integration audits",
-    "Remaining top-level test CLI dispatch, LAR file-list/directory/SMT and auxiliary exact-no-setup driver scenarios; remaining retained scaling/optimization consumers, whole-source/ownership audits and complete upstream LP/randomize drivers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
+    "Remaining top-level test CLI dispatch, LAR file-list/directory/SMT driver scenarios; remaining retained scaling/optimization consumers, whole-source/ownership audits and complete upstream LP/randomize drivers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
   ],
   "units": [
     {
@@ -8966,5 +8966,45 @@
     },
     "related_native_seconds": 8.53,
     "related_debug_checked_seconds": 9.207
+  },
+  "latest_lp_default_rational_driver_increment": {
+    "scope": "Actual auxiliary solve_mps_in_rational default/no-setup exact MPS driver, named values, objective and temporary ownership",
+    "source_units_promoted": false,
+    "test_groups": 8,
+    "source_default_worlds": 40,
+    "entry_profiles": 12,
+    "name_threshold_profiles": 2,
+    "physical_campaigns": 8,
+    "older_caller_comparison_campaigns": 2,
+    "focused_native_seconds": 2.739,
+    "focused_debug_checked_seconds": 2.961,
+    "related_native_seconds": 20.722,
+    "related_debug_checked_seconds": 22.181,
+    "statement_coverage": {
+      "native": {
+        "covered": 70,
+        "total": 76,
+        "percent": 92.1
+      },
+      "debug_checked": {
+        "covered": 70,
+        "total": 76,
+        "percent": 92.1
+      }
+    },
+    "coverage_note": "Remaining returns chiefly guard missing-file diagnostic write, partial factory error, delegated invalid status and stable numerical capture/destruction. Prepared dual getter campaigns are separate from full solving; full exact dual nonempty optimization still reaches source limitations. Forty source-default worlds establish retained zero initial objective, not mathematical optimum.",
+    "verification": {
+      "focused_native": "passed",
+      "focused_debug_checked": "passed",
+      "related_native": "passed",
+      "related_debug_checked": "passed",
+      "lp_vet_native": "passed",
+      "lp_vet_debug_checked": "passed",
+      "module_compile_native": "passed",
+      "module_compile_debug_checked": "passed",
+      "portcheck": "passed",
+      "dependency_graph": "passed",
+      "diff_check": "passed"
+    }
   }
 }
