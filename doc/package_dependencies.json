@@ -1285,6 +1285,7 @@
         "primal_initial_float.go",
         "primal_iteration_exact.go",
         "primal_leaving_exact.go",
+        "primal_leaving_tableau_exact.go",
         "primal_pivot_cost_exact.go",
         "primal_prepare_float.go",
         "primal_price_exact.go",

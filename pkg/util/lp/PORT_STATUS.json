@@ -1927,7 +1927,9 @@
         "pkg/util/lp/primal_values_tableau_exact_test.go",
         "pkg/util/lp/primal_advance_tableau_exact.go",
         "pkg/util/lp/primal_advance_tableau_exact_test.go",
-        "pkg/util/lp/primal_core_exact.go"
+        "pkg/util/lp/primal_core_exact.go",
+        "pkg/util/lp/primal_leaving_tableau_exact.go",
+        "pkg/util/lp/primal_leaving_tableau_exact_test.go"
       ],
       "tests": [
         "TestLPPairTableauCostIndependentLexicographicOracle",
@@ -1959,7 +1961,14 @@
         "TestLPExactTableauAdvanceReachedPrefixes",
         "TestLPExactTableauAdvancePreservesOlderComparison",
         "TestLPExactTableauAdvanceNonzeroRHSSourceStop",
-        "TestLPExactTableauAdvanceZeroPivotCostSwitchRecheck"
+        "TestLPExactTableauAdvanceZeroPivotCostSwitchRecheck",
+        "TestLPExactTableauLeavingIndependentFeasibleModels",
+        "TestLPExactTableauLeavingPhysicalOwnership",
+        "TestLPExactTableauLeavingIndependentInfeasibleModels",
+        "TestLPExactTableauLeavingPreservesOlderComparisonOwner",
+        "TestLPExactTableauLeavingLiveBasisAliases",
+        "TestLPExactTableauLeavingEnteringAliasNegativeFlip",
+        "TestLPExactTableauLeavingReachedPrefixes"
       ]
     },
     {
