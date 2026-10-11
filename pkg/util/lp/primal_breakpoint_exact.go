@@ -114,6 +114,11 @@ func (m *PairPrimalCoreSolver) AddBreakpoint(j uint32, delta *RationalPair, typ 
 		return err
 	}
 	defer func() { m.stopped = err != nil }()
+	return m.addBreakpointValue(j, delta, typ)
+}
+
+// Called by this primal's collection expression while its pair locals live.
+func (m *PairPrimalCoreSolver) addBreakpointValue(j uint32, delta *RationalPair, typ BreakpointType) (err error) {
 	if delta == nil {
 		return ErrBounds
 	}

@@ -121729,7 +121729,9 @@
         "pkg/util/lp/core_cost_validate_exact.go",
         "pkg/util/lp/core_cost_validate_exact_test.go",
         "pkg/util/lp/lar_scope_validate.go",
-        "pkg/util/lp/lar_scope_validate_test.go"
+        "pkg/util/lp/lar_scope_validate_test.go",
+        "pkg/util/lp/primal_breakpoint_collect_exact.go",
+        "pkg/util/lp/primal_breakpoint_collect_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -121826,7 +121828,12 @@
         "TestLARScopeInfSetIndependentLexicographicOracle",
         "TestLARScopeValidatorMetadataAndStoppedGuards",
         "TestLARScopeValidatorPhysicalOwnership",
-        "TestLARScopeOperationsLeaveOlderComparisonOwned"
+        "TestLARScopeOperationsLeaveOlderComparisonOwned",
+        "TestLPExactBreakpointCollectIndependentDeltaOracle",
+        "TestLPExactBreakpointCollectIndependentModelOracle",
+        "TestLPExactBreakpointCollectPhysicalOwnership",
+        "TestLPExactBreakpointCollectGuardsAndPrefixes",
+        "TestLPExactBreakpointCollectPreservesOlderComparisonOwner"
       ],
       "assertions": [
         {
@@ -122134,6 +122141,18 @@
             "TestLARScopeValidatorPhysicalOwnership",
             "TestLARScopeOperationsLeaveOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "retained exact bound_span consumer for boxed entering breakpoints",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_breakpoint_collect_exact.go",
+          "tests": [
+            "TestLPExactBreakpointCollectIndependentDeltaOracle",
+            "TestLPExactBreakpointCollectIndependentModelOracle",
+            "TestLPExactBreakpointCollectPhysicalOwnership",
+            "TestLPExactBreakpointCollectGuardsAndPrefixes",
+            "TestLPExactBreakpointCollectPreservesOlderComparisonOwner"
+          ]
         }
       ],
       "ownership": [
@@ -122146,7 +122165,8 @@
         "Precise tableau normalization captures only core-owned pair/RHS and row-coefficient arithmetic; the core ends capture before delegating owning row elimination to RationalStaticMatrix. Reduced-cost expressions own temporary/product slots in pivotWork. Eight pooled/direct real allocation-refusal campaigns cover normalization, child elimination, reduced costs and combined pivot/cost work through success, verify reached-prefix values and reclaim every named numeral root. Full tableau optimization, outer removal and LAR scopes remain open.",
         "Column feasibility retains source rational parameter/return-pair temporaries in the exact core until successful delta assignment and cleanup, before replacing x. Delta is caller-owned and may be partially assigned; physical refusals and older comparison identity are tested. LAR basic updates own product expressions, ending capture before real PairLU/column-buffer and core membership children. Source tableau cost marks precede membership updates, and LU visits only solved sparse indices. Whole after-Pop infeasibility cleanup, cost recomputation, outer scopes and full exact optimization remain open.",
         "Exact validators own direct bound comparisons and source copied reduced-cost/product temporaries in base-core calls/pivotWork. Captures end before delegated matrix checks and diagnostics. Physical refusal campaigns preserve source prefixes, and Close destroys only newly owned invocations/work; older caller comparison receipts remain intact. Column diagnostics retain split stdout/output streams and report real writer, metadata and missing-reference errors. Native erases source assertions; complete solver/scopes integration remains incomplete.",
-        "Reverse-column membership validation delegates base-owned exact comparisons; it never captures across a child owner or consumes an older caller comparison. Source diagnostics and actual metadata/output errors stop the validator, while false membership without an error leaves it reusable. Only current matrix columns are inspected; out-of-domain-tail set members are deliberately ignored, as upstream. Whole-model Pop invokes the actual helper only in debug/checked source assertion profiles."
+        "Reverse-column membership validation delegates base-owned exact comparisons; it never captures across a child owner or consumes an older caller comparison. Source diagnostics and actual metadata/output errors stop the validator, while false membership without an error leaves it reusable. Only current matrix columns are inspected; out-of-domain-tail set members are deliberately ignored, as upstream. Whole-model Pop invokes the actual helper only in debug/checked source assertion profiles.",
+        "Exact breakpoint collection retains difference/ratio and entering-span pair locals with the primal across record construction and queue enqueue. Scalar captures end before queue numerical work, so queue comparison receipts remain separate. Failure retains partial records and scratch for Close; older caller comparisons are preserved."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -123664,7 +123684,9 @@
         "pkg/util/lp/primal_inf_limit_exact.go",
         "pkg/util/lp/primal_harris_exact.go",
         "pkg/util/lp/primal_basis_limit_exact.go",
-        "pkg/util/lp/primal_basis_dispatch_exact.go"
+        "pkg/util/lp/primal_basis_dispatch_exact.go",
+        "pkg/util/lp/primal_breakpoint_collect_exact.go",
+        "pkg/util/lp/primal_breakpoint_collect_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -123761,7 +123783,12 @@
         "TestLPExactBasisDispatchPhysicalOwnership",
         "TestLPExactBasisDispatchPreservesOlderComparisonOwner",
         "TestLPExactBasisDispatchGuardsAndZeroDirection",
-        "TestLPExactBasisDispatchMultiplierOutputAlias"
+        "TestLPExactBasisDispatchMultiplierOutputAlias",
+        "TestLPExactBreakpointCollectIndependentDeltaOracle",
+        "TestLPExactBreakpointCollectIndependentModelOracle",
+        "TestLPExactBreakpointCollectPhysicalOwnership",
+        "TestLPExactBreakpointCollectGuardsAndPrefixes",
+        "TestLPExactBreakpointCollectPreservesOlderComparisonOwner"
       ],
       "conditionals": [
         {
@@ -124154,6 +124181,18 @@
             "TestLPExactBasisDispatchGuardsAndZeroDirection",
             "TestLPExactBasisDispatchMultiplierOutputAlias"
           ]
+        },
+        {
+          "name": "concrete rational and rational-pair same_sign_with_entering_delta consumers in exact breakpoint collection",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_breakpoint_collect_exact.go",
+          "tests": [
+            "TestLPExactBreakpointCollectIndependentDeltaOracle",
+            "TestLPExactBreakpointCollectIndependentModelOracle",
+            "TestLPExactBreakpointCollectPhysicalOwnership",
+            "TestLPExactBreakpointCollectGuardsAndPrefixes",
+            "TestLPExactBreakpointCollectPreservesOlderComparisonOwner"
+          ]
         }
       ],
       "ownership": [
@@ -124162,7 +124201,8 @@
         "Exact bound comparisons retain base-core invocation receipts; primal expression work owns the source difference/product parameters and returned values. Capture ends before delegated comparisons. The source publishes changed cost before updating reduced costs, preserves stored-row prefixes and rereads aliased delta; errors stop the owner, Close destroys actual owned invocations/work, and older caller comparisons remain untouched. Full tableau optimization and post-pop cleanup remain incomplete.",
         "Preparation preserves ordinary-vector prefixes while clearing indexed scratch in source order; no parent numerical capture spans exact vector/queue/LU child operations. LU replacement keeps partial newly constructed factors published for owning cleanup, destroys old factors before replacement, deletes newly degenerated factors and preserves the source in-place extension result. Actual physical refusals, matrix-solve oracles and source mutation prefixes are tested. Full LAR solve/signature/exact optimization integration remains incomplete.",
         "Exact pricing delegates lexicographic bound comparisons to PairCoreSolverBase; the primal separately owns newly created epsilon-negation values and rational comparison receipts. No parent capture spans a numerical child. Allocation-failure campaigns retain source publication prefixes, partial epsilon expressions and owning teardown; older caller comparisons retain invocation identity. Sorting uses Go sort with literal source count comparison and does not promise a C++ implementation-dependent zero/equal-key order. Full exact Solve/advancement remains incomplete.",
-        "Precise bound-step expressions own separate pair result and rational parameter scratch through failed arithmetic/assignment. Primal Close cleans newly captured raw invocations before pair-result and rational scratch, retaining caller-owned outputs and older caller comparisons. LimitTheta publishes unlimited=false only after complete output assignment; rejected bound flips still publish their step. Leaving selection delegates feasibility/bound comparisons without adopting base receipts and preserves infeasibility-set iteration state. Full precise ratio/breakpoint/advance/Solve remains incomplete."
+        "Precise bound-step expressions own separate pair result and rational parameter scratch through failed arithmetic/assignment. Primal Close cleans newly captured raw invocations before pair-result and rational scratch, retaining caller-owned outputs and older caller comparisons. LimitTheta publishes unlimited=false only after complete output assignment; rejected bound flips still publish their step. Leaving selection delegates feasibility/bound comparisons without adopting base receipts and preserves infeasibility-set iteration state. Full precise ratio/breakpoint/advance/Solve remains incomplete.",
+        "Exact breakpoint collection retains difference/ratio and entering-span pair locals with the primal across record construction and queue enqueue. Scalar captures end before queue numerical work, so queue comparison receipts remain separate. Failure retains partial records and scratch for Close; older caller comparisons are preserved."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
@@ -124200,7 +124240,9 @@
         "pkg/util/lp/primal_price_exact_test.go",
         "pkg/util/lp/primal_bound_step_exact.go",
         "pkg/util/lp/primal_bound_step_exact_test.go",
-        "pkg/util/lp/primal_breakpoint_exact.go"
+        "pkg/util/lp/primal_breakpoint_exact.go",
+        "pkg/util/lp/primal_breakpoint_collect_exact.go",
+        "pkg/util/lp/primal_breakpoint_collect_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -124269,7 +124311,12 @@
         "TestLPExactBreakpointPhysicalOwnership",
         "TestLPExactBreakpointSourcePrefixesAndGuards",
         "TestLPExactBreakpointClearBeforeStoppedQueue",
-        "TestLPExactBreakpointPreservesOlderComparisonOwner"
+        "TestLPExactBreakpointPreservesOlderComparisonOwner",
+        "TestLPExactBreakpointCollectIndependentDeltaOracle",
+        "TestLPExactBreakpointCollectIndependentModelOracle",
+        "TestLPExactBreakpointCollectPhysicalOwnership",
+        "TestLPExactBreakpointCollectGuardsAndPrefixes",
+        "TestLPExactBreakpointCollectPreservesOlderComparisonOwner"
       ],
       "conditionals": [
         {
@@ -124706,13 +124753,26 @@
             "TestLPExactBreakpointClearBeforeStoppedQueue",
             "TestLPExactBreakpointPreservesOlderComparisonOwner"
           ]
+        },
+        {
+          "name": "retained exact try_add_breakpoint, try_add_breakpoint_in_row and fill_breakpoints_array; equality direction, indexed row order and signed boxed entering span",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_breakpoint_collect_exact.go",
+          "tests": [
+            "TestLPExactBreakpointCollectIndependentDeltaOracle",
+            "TestLPExactBreakpointCollectIndependentModelOracle",
+            "TestLPExactBreakpointCollectPhysicalOwnership",
+            "TestLPExactBreakpointCollectGuardsAndPrefixes",
+            "TestLPExactBreakpointCollectPreservesOlderComparisonOwner"
+          ]
         }
       ],
       "ownership": [
         "Primal stage-one core owns native beta, empty concrete floating breakpoint queue, normalized cost backup and traversal slice; inherits actual borrowed solver vectors and owned floating LU/scratch. Failed base construction returns its real partial owner before derived initialization. Native []uint32 replaces the source candidate list; rotation changes only this list, while sort publishes nonbasis headings in order.",
         "Exact bound comparisons retain base-core invocation receipts; primal expression work owns the source difference/product parameters and returned values. Capture ends before delegated comparisons. The source publishes changed cost before updating reduced costs, preserves stored-row prefixes and rereads aliased delta; errors stop the owner, Close destroys actual owned invocations/work, and older caller comparisons remain untouched. Full tableau optimization and post-pop cleanup remain incomplete.",
         "Exact pricing delegates lexicographic bound comparisons to PairCoreSolverBase; the primal separately owns newly created epsilon-negation values and rational comparison receipts. No parent capture spans a numerical child. Allocation-failure campaigns retain source publication prefixes, partial epsilon expressions and owning teardown; older caller comparisons retain invocation identity. Sorting uses Go sort with literal source count comparison and does not promise a C++ implementation-dependent zero/equal-key order. Full exact Solve/advancement remains incomplete.",
-        "Precise bound-step expressions own separate pair result and rational parameter scratch through failed arithmetic/assignment. Primal Close cleans newly captured raw invocations before pair-result and rational scratch, retaining caller-owned outputs and older caller comparisons. LimitTheta publishes unlimited=false only after complete output assignment; rejected bound flips still publish their step. Leaving selection delegates feasibility/bound comparisons without adopting base receipts and preserves infeasibility-set iteration state. Full precise ratio/breakpoint/advance/Solve remains incomplete."
+        "Precise bound-step expressions own separate pair result and rational parameter scratch through failed arithmetic/assignment. Primal Close cleans newly captured raw invocations before pair-result and rational scratch, retaining caller-owned outputs and older caller comparisons. LimitTheta publishes unlimited=false only after complete output assignment; rejected bound flips still publish their step. Leaving selection delegates feasibility/bound comparisons without adopting base receipts and preserves infeasibility-set iteration state. Full precise ratio/breakpoint/advance/Solve remains incomplete.",
+        "Exact breakpoint collection retains difference/ratio and entering-span pair locals with the primal across record construction and queue enqueue. Scalar captures end before queue numerical work, so queue comparison receipts remain separate. Failure retains partial records and scratch for Close; older caller comparisons are preserved."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
@@ -127231,7 +127291,9 @@
         "pkg/util/lp/primal_inf_limit_exact.go",
         "pkg/util/lp/primal_harris_exact.go",
         "pkg/util/lp/primal_basis_limit_exact.go",
-        "pkg/util/lp/primal_breakpoint_exact.go"
+        "pkg/util/lp/primal_breakpoint_exact.go",
+        "pkg/util/lp/primal_breakpoint_collect_exact.go",
+        "pkg/util/lp/primal_breakpoint_collect_exact_test.go"
       ],
       "tests": [
         "TestLPRationalPairArithmeticOracle",
@@ -127284,7 +127346,12 @@
         "TestLPExactBreakpointPhysicalOwnership",
         "TestLPExactBreakpointSourcePrefixesAndGuards",
         "TestLPExactBreakpointClearBeforeStoppedQueue",
-        "TestLPExactBreakpointPreservesOlderComparisonOwner"
+        "TestLPExactBreakpointPreservesOlderComparisonOwner",
+        "TestLPExactBreakpointCollectIndependentDeltaOracle",
+        "TestLPExactBreakpointCollectIndependentModelOracle",
+        "TestLPExactBreakpointCollectPhysicalOwnership",
+        "TestLPExactBreakpointCollectGuardsAndPrefixes",
+        "TestLPExactBreakpointCollectPreservesOlderComparisonOwner"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -127406,11 +127473,24 @@
             "TestLPExactBreakpointClearBeforeStoppedQueue",
             "TestLPExactBreakpointPreservesOlderComparisonOwner"
           ]
+        },
+        {
+          "name": "retained exact breakpoint subtraction, copied-scalar binary division and unary negation of entering bound span",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_breakpoint_collect_exact.go",
+          "tests": [
+            "TestLPExactBreakpointCollectIndependentDeltaOracle",
+            "TestLPExactBreakpointCollectIndependentModelOracle",
+            "TestLPExactBreakpointCollectPhysicalOwnership",
+            "TestLPExactBreakpointCollectGuardsAndPrefixes",
+            "TestLPExactBreakpointCollectPreservesOlderComparisonOwner"
+          ]
         }
       ],
       "ownership": [
         "Pairs own two real util/numeral.Rational values in a borrowed caller-owned RationalManager. Native storage moves tokens; shallow copying is forbidden. Copy/arithmetic run X before Y, retaining completed destination prefixes. Explicit Del releases Y before X; manager outlives all values. Production uses project numerals; math/big is only an independent test oracle.",
-        "Column feasibility retains source rational parameter/return-pair temporaries in the exact core until successful delta assignment and cleanup, before replacing x. Delta is caller-owned and may be partially assigned; physical refusals and older comparison identity are tested. LAR basic updates own product expressions, ending capture before real PairLU/column-buffer and core membership children. Source tableau cost marks precede membership updates, and LU visits only solved sparse indices. Whole after-Pop infeasibility cleanup, cost recomputation, outer scopes and full exact optimization remain open."
+        "Column feasibility retains source rational parameter/return-pair temporaries in the exact core until successful delta assignment and cleanup, before replacing x. Delta is caller-owned and may be partially assigned; physical refusals and older comparison identity are tested. LAR basic updates own product expressions, ending capture before real PairLU/column-buffer and core membership children. Source tableau cost marks precede membership updates, and LU visits only solved sparse indices. Whole after-Pop infeasibility cleanup, cost recomputation, outer scopes and full exact optimization remain open.",
+        "Exact breakpoint collection retains difference/ratio and entering-span pair locals with the primal across record construction and queue enqueue. Scalar captures end before queue numerical work, so queue comparison receipts remain separate. Failure retains partial records and scratch for Close; older caller comparisons are preserved."
       ],
       "deviations": [
         "Concrete numeric_pair<mpq> subset only. Remaining numeric traits, conversions and any reached project specializations remain open. Definition-only numeric_pair<double> and undefined pair-times-pair/pair-divided-by-pair bodies gain no invented adapters or source credit.",
