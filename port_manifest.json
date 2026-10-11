@@ -103032,7 +103032,9 @@
         "pkg/util/lp/driver_lu_check_debug.go",
         "pkg/util/lp/driver_lu_check_native.go",
         "pkg/util/lp/driver_lu_check_test.go",
-        "pkg/util/lp/driver_lu_check_debug_test.go"
+        "pkg/util/lp/driver_lu_check_debug_test.go",
+        "pkg/util/lp/driver_glpk_reports.go",
+        "pkg/util/lp/driver_glpk_reports_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103203,7 +103205,14 @@
         "TestLPLUCheckFileReportAndFileFailures",
         "TestLPLUCheckFileFlushAndMissingReportFailures",
         "TestLPLUCheckDebugResidualSourceTolerance",
-        "TestLPLUCheckDebugResidualFailurePrefixes"
+        "TestLPLUCheckDebugResidualFailurePrefixes",
+        "TestLPGLPKReportLiteralFieldSelection",
+        "TestLPGLPKReportStatusCrossProduct",
+        "TestLPGLPKReportIndependentCostComparisons",
+        "TestLPGLPKReportDiagnosticsAndNativeReadErrors",
+        "TestLPGLPKReportPublicationAndComparisonFailures",
+        "TestLPGLPKReportActualMPSDriverIntegration",
+        "TestLPGLPKReportDiagnosticFlushFailures"
       ],
       "conditionals": [
         {
@@ -104105,6 +104114,23 @@
           "status": "dead_deleted",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "retained ordinary GLPK report comparison src2132-2264: actual readonly file status/GLPK-first-objective/LP-last-cost parsing, status exceptions, source counters and cost tolerance/reporting",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_glpk_reports.go",
+          "go_targets": [
+            "pkg/util/lp/driver_glpk_reports_test.go"
+          ],
+          "tests": [
+            "TestLPGLPKReportLiteralFieldSelection",
+            "TestLPGLPKReportStatusCrossProduct",
+            "TestLPGLPKReportIndependentCostComparisons",
+            "TestLPGLPKReportDiagnosticsAndNativeReadErrors",
+            "TestLPGLPKReportPublicationAndComparisonFailures",
+            "TestLPGLPKReportActualMPSDriverIntegration",
+            "TestLPGLPKReportDiagnosticFlushFailures"
+          ]
         }
       ],
       "ownership": [
@@ -104117,7 +104143,8 @@
         "LAR MPS file driver owns creation reader, returned LAR solver, second reader and run driver. Successful CreateLARSolver leaves no parser-numeral borrows: column registration and source AddConstraint no-op/debug assertion are inspected; creation reader closes before second read as source scopes require. Failed creation retains reader until partial solver cleanup. Run driver closes before LAR solver and report reader; failed second list child remains reachable. Four pooled/direct physical campaigns and two actual older caller comparisons verify all prefixes.",
         "Generic LARFileDriver/LARInputDriver own selected MPS or SMT creator, solver, unconditional second MPS reader and runner. Successful creator scope ends before second read; failed factory retains partial solver/creator. Close retries preserve failed Current and creator. Four pooled/direct physical campaigns, two older caller comparisons and real second-child file-close refusal verify ownership prefixes.",
         "Known floating MPS consumer reuses MPSFileDriver ownership: solver closes before reader, successful scope auto-closes and failed default solve/report/real file-close retains owner for retry. Borrowed native expected-value map copies each value for its iteration; Go native floating storage has no exact-arena roots.",
-        "LUCheckFileDriver retains actual open file on parse/report/close failure, closes successful file before NewSettings/NewFloatLU, closes actual LU after solve/residual or explicit owning cleanup. Matrix, basis, work and solution use native Go float slices; no exact numerical arena campaign applies. Remaining source bytes after basis_end are ignored, matching commented vector read. Failed native os.File Close retains its actual descriptor object and error; external close has no fabricated recovery."
+        "LUCheckFileDriver retains actual open file on parse/report/close failure, closes successful file before NewSettings/NewFloatLU, closes actual LU after solve/residual or explicit owning cleanup. Matrix, basis, work and solution use native Go float slices; no exact numerical arena campaign applies. Remaining source bytes after basis_end are ignored, matching commented vector read. Failed native os.File Close retains its actual descriptor object and error; external close has no fabricated recovery.",
+        "GLPK report readers own each local os.File only for its actual read and close on return, retaining parsed scalar/string snapshots. Native Go strings/slices replace STL token containers. Comparison borrows live uint32 counters, leaves inconclusives untouched, reopens actual paths for cost reads, publishes status failure after diagnostics but cost failure before diagnostics. No exact numerical arena work is introduced; actual solver-output integration closes MPS driver owners before report reads and checks exact root census."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -104141,7 +104168,8 @@
         "SMT creation retains source unconditional second MPS read: ordinary SMT-only input emits EOF then column/RHS diagnostics and returns without solving; empty SMT conjunction followed by valid MPS exercises actual solve/randomize/comparison. Invalid SMT creation with valid MPS second read reaches explicit nil-solver ErrBounds instead of C++ null dereference. Existing AddConstraint checked assertion/native no-op remains. Native Go files/slices/writers, no STL adapters. Top-level CLI and whole-source audit remain open.",
         "RunFloatKnownSolution retains source constructor defaults, with no argument settings or clock. Ordinary nonempty default floating/tableau models lack usable LU: checked primal reaches source assertion, native primal and both dual profiles reach ErrBounds; no source repair or successful default optimization is credited. Prepared actual LU solves plus explicitly fixed accessor values exercise otherwise blocked reporting and are separate from full entry. Sorted Go expected map keys replace unspecified unordered traversal. ErrDriverStatusWrong transports source string exception; checked preceding SASSERT remains. Diagnostic and assertion each reread actual getter; NaN skips >= diagnostic but fails checked < assertion.",
         "Floating debug matrix consumers use concrete native Go dense storage and double-valued interface. Actual40 basis worlds with sparse/dense policies verify left transformed B equals Q*U*R. Existing source tolerance accepts NaN/like-signed infinity unordered differences. Debug matrix printing, exact coefficient variants, tail_product/check_apply consumer integration and remaining upstream assertion wiring stay open; original post-return dense fixture is independent coverage only.",
-        "LU check file parser uses stdlib strings and strict signed32/float conversions; signed-to-unsigned wrapping remains for valid source integers. EOF/short tokens return explicit errors instead of source nonterminating read loops/out-of-range token access. Failed open emits source diagnostic then returns the actual OS error before source invalid dimensions access. The row substring probe consumes the first non-row line; wrong first row token emits literal diagnostic and still parses. No uncalled indexed-vector reader is added. Debug residual retains source relative max normalization, strict >1e-6 and unordered IEEE behavior; source dense/indexed copy is native owned storage. Complete top-level CLI remains open."
+        "LU check file parser uses stdlib strings and strict signed32/float conversions; signed-to-unsigned wrapping remains for valid source integers. EOF/short tokens return explicit errors instead of source nonterminating read loops/out-of-range token access. Failed open emits source diagnostic then returns the actual OS error before source invalid dimensions access. The row substring probe consumes the first non-row line; wrong first row token emits literal diagnostic and still parses. No uncalled indexed-vector reader is added. Debug residual retains source relative max normalization, strict >1e-6 and unordered IEEE behavior; source dense/indexed copy is native owned storage. Complete top-level CLI remains open.",
+        "Ordinary CHECK_GLPK_SOLUTION-undefined report path only: external glpsol invocation, process_test_file output redirection and solve_some_mps orchestration remain open. Source integer0 exceptions map to ErrDriverReport; native I/O and writer errors remain explicit, strict Go float conversion qualifies malformed atof domains. Literal first Status substring/first Objective/last cost and exact2/5/3 tokens remain. Equal nonoptimal statuses earn no success; UNDEFINED versus INFEASIBLE/UNBOUNDED earns success; counters wrap unsigned32. Actual MPS compare-with-primal output selects later four-token primal cost and throws, preserving the source mismatch. No full CLI or GLPK integration claim."
       ]
     },
     {

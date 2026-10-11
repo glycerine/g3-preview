@@ -9770,5 +9770,44 @@
     "status_file": "/mnt/oldrog/tmp/g3-lp-lu-check-module-native.json",
     "go_pid": 4,
     "exec_session": 87618
+  },
+  "latest_glpk_report_comparison_increment": {
+    "source": "src/test/lp.cpp:2132-2264 ordinary CHECK_GLPK_SOLUTION-undefined path",
+    "go_targets": [
+      "pkg/util/lp/driver_glpk_reports.go",
+      "pkg/util/lp/driver_glpk_reports_test.go"
+    ],
+    "tests": [
+      "TestLPGLPKReportLiteralFieldSelection",
+      "TestLPGLPKReportStatusCrossProduct",
+      "TestLPGLPKReportIndependentCostComparisons",
+      "TestLPGLPKReportDiagnosticsAndNativeReadErrors",
+      "TestLPGLPKReportPublicationAndComparisonFailures",
+      "TestLPGLPKReportActualMPSDriverIntegration",
+      "TestLPGLPKReportDiagnosticFlushFailures"
+    ],
+    "focused_native_seconds": 0.15,
+    "focused_debug_checked_seconds": 0.176,
+    "coverage": {
+      "native": [
+        101,
+        101,
+        100.0
+      ],
+      "debug_checked": [
+        101,
+        101,
+        100.0
+      ]
+    },
+    "evidence": "/mnt/oldrog/tmp/g3-glpk-reports-{native,debug}.cover; /mnt/oldrog/tmp/g3-glpk-reports-reachability.txt",
+    "limitations": "External glpsol execution, process_test_file and solve_some_mps remain open; no whole-unit/CLI claim. Running full native a4d0e129 session87618 predates this file and has no terminal result yet. Latest successful full native remains93d0d780.",
+    "validation": {
+      "lp_vet": "native and combined pass",
+      "module_compile": "native and combined pass",
+      "source_portcheck": "2103 units,677 APIs; pass",
+      "dependency_graph": "64 packages; refreshed",
+      "diff_check": "pass"
+    }
   }
 }
