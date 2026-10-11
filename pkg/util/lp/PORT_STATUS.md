@@ -10,19 +10,14 @@ primal and dual cores expose Solve, and outer LU primal/dual integration is impl
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
 
-Latest hourly native module run completed at 01:48 UTC on October11 with
-exit status0 and all64packages passing: LP826.982s,88.3% (14837/16806).
-Log/profile: `/mnt/oldrog/tmp/g3-inf-cleanup-module-native.{log,cover}`.
-This snapshot includes post-pop infeasibility cleanup and cost validators,
-and predates subsequently strengthened test-only campaigns/guards and whole-model
-scope/row-equation/infeasibility-set additions. Those additions have separate
-focused native/debug checks. Coverage measures existing Go code, not unported
-C++ functionality.
-
-The next hourly native module run started at02:35UTC on October11 from
-pricing commit77ddf509 and is still pending. Log/profile:
-`/mnt/oldrog/tmp/g3-pricing-module-native.{log,cover}`. Its code snapshot
-includes LAR preparation and precise pricing, and predates the bound-step additions.
+Latest hourly native module run completed at02:51UTC on October11 with
+observed exit status0 and all64packages passing: LP933.542s,88.4% (15389/17416).
+Log/profile: `/mnt/oldrog/tmp/g3-pricing-module-native.{log,cover}`.
+The02:35UTC code snapshot is pricing commit77ddf509: whole-model scopes,
+changed-bound updates, exact/floating preparation and precise pricing are included.
+The snapshot predates bound-step and subsequent infeasibility-limit additions;
+those have separate focused checks. Coverage measures existing Go code,
+not unported C++ functionality.
 
 Known source limitation: post-pop cleanup declares an empty local changed-cost
 set, while basic-value updates record changes in a different member set. With
