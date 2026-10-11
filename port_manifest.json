@@ -120662,7 +120662,9 @@
         "pkg/util/lp/lar_explanation.go",
         "pkg/util/lp/lar_explanation_test.go",
         "pkg/util/lp/lar_tableau_remove.go",
-        "pkg/util/lp/lar_basic_delta.go"
+        "pkg/util/lp/lar_basic_delta.go",
+        "pkg/util/lp/lar_inf_cleanup.go",
+        "pkg/util/lp/lar_inf_cleanup_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -120710,7 +120712,13 @@
         "TestLARBasicDeltaActualClampPreservesTableauEquations",
         "TestLARBasicDeltaIndependentNonunitLU",
         "TestLARBasicDeltaSourcePrefixesAndStoppedGuards",
-        "TestLARBasicDeltaPhysicalOwnership"
+        "TestLARBasicDeltaPhysicalOwnership",
+        "TestLARInfCleanupIndependentTableauModel",
+        "TestLARInfCleanupActualNonunitLU",
+        "TestLARInfCleanupTableauCostsAndEmptyLocalSet",
+        "TestLARInfCleanupSetSnapshotAndSourcePrefixes",
+        "TestLARInfCleanupPhysicalOwnerBoundaries",
+        "TestLARInfCleanupAndCostValidatorLeaveOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -121221,6 +121229,19 @@
             "TestLARBasicDeltaSourcePrefixesAndStoppedGuards",
             "TestLARBasicDeltaPhysicalOwnership"
           ]
+        },
+        {
+          "name": "retained exact clean_large_elements_after_pop/shrink_inf_set_after_pop and clean_inf_set_of_r_solver_after_pop: source snapshot order, nonbasic clamp/basic delta, cost erasure, basic feasibility filtering, tableau cost refresh and actual debug validation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_inf_cleanup.go",
+          "tests": [
+            "TestLARInfCleanupIndependentTableauModel",
+            "TestLARInfCleanupActualNonunitLU",
+            "TestLARInfCleanupTableauCostsAndEmptyLocalSet",
+            "TestLARInfCleanupSetSnapshotAndSourcePrefixes",
+            "TestLARInfCleanupPhysicalOwnerBoundaries",
+            "TestLARInfCleanupAndCostValidatorLeaveOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
@@ -121231,7 +121252,8 @@
         "LAR pivot calculation delegates to the concrete precise core and existing PairLU without outer capture or eager initialization of missing factorization/RowsNZ. Stopped core/model retain actual child owners. Full row scheduling owns only its lexical row analyzer/iterator; term substitution is owned by each actual working term, preserving original copies.",
         "Explanation borrows the implied-bound metadata and propagator, forwards actual borrowed original-row coefficients in order, and owns no numeric copies or callback invocations. Evidence consumers own their accepted prefix and actual stopped calls. Both pooled/direct tests leave consumer-owned DivisionInvocationState unchanged across model/propagator destruction; separately stopped implied-bound construction likewise remains its own owner. Consumer operand copies are independently owned in these destruction tests; general retained row-cell borrows require the model to outlive their use.",
         "Tableau removal preserves source reverse cell/column destruction, normalized RHS and basis-before-transpose prefixes, source RHS tail pop and surviving model data. Outer reduced-cost expression temporaries belong to rationalWork and captures end before core pivot, matrix deletion or row transpose children. Numeric column removal does not restore outer witnesses, terms, constraints, types/bounds or directories. Debug-only basis validation is a native true stub. Whole LAR scopes/feasibility cleanup and optimization remain open.",
-        "Column feasibility retains source rational parameter/return-pair temporaries in the exact core until successful delta assignment and cleanup, before replacing x. Delta is caller-owned and may be partially assigned; physical refusals and older comparison identity are tested. LAR basic updates own product expressions, ending capture before real PairLU/column-buffer and core membership children. Source tableau cost marks precede membership updates, and LU visits only solved sparse indices. Whole after-Pop infeasibility cleanup, cost recomputation, outer scopes and full exact optimization remain open."
+        "Column feasibility retains source rational parameter/return-pair temporaries in the exact core until successful delta assignment and cleanup, before replacing x. Delta is caller-owned and may be partially assigned; physical refusals and older comparison identity are tested. LAR basic updates own product expressions, ending capture before real PairLU/column-buffer and core membership children. Source tableau cost marks precede membership updates, and LU visits only solved sparse indices. Whole after-Pop infeasibility cleanup, cost recomputation, outer scopes and full exact optimization remain open.",
+        "Cleanup keeps its source-local delta as a separate owner while exact-core/LU/basic-value children borrow it; a failure transfers the live delta to pendingCleanupDelta, which is destroyed after Core.Close. Outer capture covers only its own reduced-cost subtraction and zero assignment, never child operations. Core/child invocation identity and older caller comparisons survive the prescribed destruction order. Source local basic_columns_with_changed_cost is empty and distinct from the member set; native stale-cost and debug assertion behavior are independently reproduced."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",
@@ -121240,7 +121262,8 @@
         "Tableau cutoff is strictly row length > maximum and precedes mode assertion/propagator access. Debug mode assertions preserve iterator construction order; native erases them. Pivot dispatch consumes actual already prepared precise pivot vector and source basis, without claiming calculate_implied_bounds_for_row, automatic pivot calculation or term substitution. Invalid row and nil/foreign propagator domains return explicit typed errors. No whole-unit promotion.",
         "Source substitute_basis_var_in_terms_for_row passes zero-based k to term_is_used_as_row, which asserts is_term(k). Debug/checked rejects every nonempty term list at this assertion, after pivot calculation and before mutation/analysis. Native looks up literal k in ExternalToColumns: ordinary external variable zero can skip unregistered term zero. Preserve both profiles and original-term isolation; do not silently add the term-start offset or claim successful debug term-bearing propagation.",
         "Preserve source explanation profiles: target exclusion precedes row-cell term remapping; unregistered known terms insert zero-valued ExternalToColumns entries through source operator[] semantics, without publishing a column directory entry. Coefficients are original row values, never normalized; zero is not positive and is still forwarded. Invalid witness asserts in debug, while native forwards InvalidLARIndex. Nil/foreign/stopped bound/provider and invalid row/witness metadata use explicit typed guards. No full explanation/SMT integration promotion.",
-        "Actual LU counterexample with original row -2*x0-3*x1-x2=0, x0 in [-3,7], x1 in [2,11), and basic x2: normalized pivot analysis correctly derives x2 in (-47,0]. Source explanation uses normalized positive target sign against original negative coefficients, selecting lower witnesses for the lower implied bound and upper witnesses for the upper. Reconstructing those original-row combinations yields 0 for claimed lower -47 and -47 for claimed upper0. Preserve this source discrepancy; ordinary direct-row explanation proofs do not establish general LU explanation correctness."
+        "Actual LU counterexample with original row -2*x0-3*x1-x2=0, x0 in [-3,7], x1 in [2,11), and basic x2: normalized pivot analysis correctly derives x2 in (-47,0]. Source explanation uses normalized positive target sign against original negative coefficients, selecting lower witnesses for the lower implied bound and upper witnesses for the upper. Reconstructing those original-row combinations yields 0 for claimed lower -47 and -47 for claimed upper0. Preserve this source discrepancy; ordinary direct-row explanation proofs do not establish general LU explanation correctness.",
+        "The source empty local changed-cost set omits updates recorded in the member set. In the retained tableau 2*x0+3*x1-x2=0, clamping x0 from0 to2 makes x2=4 exceed upper1 while stored basic cost remains0 (independent correct default-sign cost -1); native returns with stale costs and debug reports the source reduced-cost assertion. The discrepancy is preserved and tested."
       ]
     },
     {
@@ -121545,7 +121568,9 @@
         "pkg/util/lp/core_basis_exact.go",
         "pkg/util/lp/core_tableau_exact.go",
         "pkg/util/lp/core_feasibility_exact.go",
-        "pkg/util/lp/eta_exact_expression.go"
+        "pkg/util/lp/eta_exact_expression.go",
+        "pkg/util/lp/core_cost_validate_exact.go",
+        "pkg/util/lp/core_cost_validate_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -121629,7 +121654,15 @@
         "TestLPPairMakeFeasiblePhysicalOwnership",
         "TestLPPairMakeFeasibleLeavesOlderComparisonOwned",
         "TestLPPairMakeFeasibleDeltaBeforeFinalCopyRefusal",
-        "TestLPPairMakeFeasibleComparisonBeforeDeltaPublication"
+        "TestLPPairMakeFeasibleComparisonBeforeDeltaPublication",
+        "TestLPPairCostValidatorsIndependentOracle",
+        "TestLPPairReducedCostsIndependentMatrixOracle",
+        "TestLPPairCostValidatorSourceDiagnosticsAndGuards",
+        "TestLPPairPrintColumnInfoExactSplitAndRefusals",
+        "TestLPPairCostValidatorsPhysicalOwnership",
+        "TestLPPairPrintColumnInfoMetadataAndBorrowedValueGuards",
+        "TestLPPairCostValidatorClosedDiagnosticAndDebugGuards",
+        "TestLARInfCleanupAndCostValidatorLeaveOlderComparisonOwned"
       ],
       "assertions": [
         {
@@ -121910,6 +121943,21 @@
             "TestLPPairMakeFeasibleDeltaBeforeFinalCopyRefusal",
             "TestLPPairMakeFeasibleComparisonBeforeDeltaPublication"
           ]
+        },
+        {
+          "name": "retained mpq/impq column diagnostics, debug-only nonbasic zero-cost checks, per-column and whole infeasibility-cost validators and full reduced_costs_are_correct_tableau with actual matrix validation and exact stored-column recurrence",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_cost_validate_exact.go",
+          "tests": [
+            "TestLPPairCostValidatorsIndependentOracle",
+            "TestLPPairReducedCostsIndependentMatrixOracle",
+            "TestLPPairCostValidatorSourceDiagnosticsAndGuards",
+            "TestLPPairPrintColumnInfoExactSplitAndRefusals",
+            "TestLPPairCostValidatorsPhysicalOwnership",
+            "TestLPPairPrintColumnInfoMetadataAndBorrowedValueGuards",
+            "TestLPPairCostValidatorClosedDiagnosticAndDebugGuards",
+            "TestLARInfCleanupAndCostValidatorLeaveOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
@@ -121920,7 +121968,8 @@
         "Precise inverse calculation delegates numeric ownership to the actual indexed PairLU. Core pivot accumulation owns source product/return-value temporaries in pivotWork and captures only their arithmetic, ending each segment before child indexed-vector addition. PivotRow retains its own stopped AddWithDropTolerance; core product inputs survive until that vector is closed. Stopped exact core guards and named numeral-root census cover actual physical failures.",
         "Exact basis edits mutate borrowed typed slice headers in source order. Tableau transposition swaps basis/headings before delegated matrix row copies; the matrix owns any stopped numerical copy, while the core stops without adopting child allocation roots. Pooled/direct physical failure campaigns verify immediate cleanup and named root census. Whole tableau pivot/removal and outer LAR Pop remain open.",
         "Precise tableau normalization captures only core-owned pair/RHS and row-coefficient arithmetic; the core ends capture before delegating owning row elimination to RationalStaticMatrix. Reduced-cost expressions own temporary/product slots in pivotWork. Eight pooled/direct real allocation-refusal campaigns cover normalization, child elimination, reduced costs and combined pivot/cost work through success, verify reached-prefix values and reclaim every named numeral root. Full tableau optimization, outer removal and LAR scopes remain open.",
-        "Column feasibility retains source rational parameter/return-pair temporaries in the exact core until successful delta assignment and cleanup, before replacing x. Delta is caller-owned and may be partially assigned; physical refusals and older comparison identity are tested. LAR basic updates own product expressions, ending capture before real PairLU/column-buffer and core membership children. Source tableau cost marks precede membership updates, and LU visits only solved sparse indices. Whole after-Pop infeasibility cleanup, cost recomputation, outer scopes and full exact optimization remain open."
+        "Column feasibility retains source rational parameter/return-pair temporaries in the exact core until successful delta assignment and cleanup, before replacing x. Delta is caller-owned and may be partially assigned; physical refusals and older comparison identity are tested. LAR basic updates own product expressions, ending capture before real PairLU/column-buffer and core membership children. Source tableau cost marks precede membership updates, and LU visits only solved sparse indices. Whole after-Pop infeasibility cleanup, cost recomputation, outer scopes and full exact optimization remain open.",
+        "Exact validators own direct bound comparisons and source copied reduced-cost/product temporaries in base-core calls/pivotWork. Captures end before delegated matrix checks and diagnostics. Physical refusal campaigns preserve source prefixes, and Close destroys only newly owned invocations/work; older caller comparison receipts remain intact. Column diagnostics retain split stdout/output streams and report real writer, metadata and missing-reference errors. Native erases source assertions; complete solver/scopes integration remains incomplete."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -121958,7 +122007,9 @@
         "pkg/util/lp/core_pivot_exact.go",
         "pkg/util/lp/core_pivot_exact_test.go",
         "pkg/util/lp/core_basis_exact.go",
-        "pkg/util/lp/core_tableau_exact.go"
+        "pkg/util/lp/core_tableau_exact.go",
+        "pkg/util/lp/core_cost_validate_exact.go",
+        "pkg/util/lp/core_cost_validate_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122032,7 +122083,15 @@
         "TestLPPairTableauEmptyTargetAndNoPivot",
         "TestLPPairTableauMetadataAndStoppedGuards",
         "TestLPPairTableauPhysicalFailureOwnership",
-        "TestLPPairTableauStoppedMatrixBeforeNormalization"
+        "TestLPPairTableauStoppedMatrixBeforeNormalization",
+        "TestLPPairCostValidatorsIndependentOracle",
+        "TestLPPairReducedCostsIndependentMatrixOracle",
+        "TestLPPairCostValidatorSourceDiagnosticsAndGuards",
+        "TestLPPairPrintColumnInfoExactSplitAndRefusals",
+        "TestLPPairCostValidatorsPhysicalOwnership",
+        "TestLPPairPrintColumnInfoMetadataAndBorrowedValueGuards",
+        "TestLPPairCostValidatorClosedDiagnosticAndDebugGuards",
+        "TestLARInfCleanupAndCostValidatorLeaveOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -122395,6 +122454,21 @@
             "TestLPPairTableauPhysicalFailureOwnership",
             "TestLPPairTableauStoppedMatrixBeforeNormalization"
           ]
+        },
+        {
+          "name": "retained mpq/impq column diagnostics, debug-only nonbasic zero-cost checks, per-column and whole infeasibility-cost validators and full reduced_costs_are_correct_tableau with actual matrix validation and exact stored-column recurrence",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_cost_validate_exact.go",
+          "tests": [
+            "TestLPPairCostValidatorsIndependentOracle",
+            "TestLPPairReducedCostsIndependentMatrixOracle",
+            "TestLPPairCostValidatorSourceDiagnosticsAndGuards",
+            "TestLPPairPrintColumnInfoExactSplitAndRefusals",
+            "TestLPPairCostValidatorsPhysicalOwnership",
+            "TestLPPairPrintColumnInfoMetadataAndBorrowedValueGuards",
+            "TestLPPairCostValidatorClosedDiagnosticAndDebugGuards",
+            "TestLARInfCleanupAndCostValidatorLeaveOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
@@ -122404,7 +122478,8 @@
         "Exact core borrows actual input slice headers, matrix, settings, column namer and manager. It owns initialized rational/pair scratch and concrete PairLU; partial constructor results require Close. Base owns its direct comparison/cost-copy calls, while child LU calls retain their own generations and caller outputs own their published values. Derived epsilon owns source quotient expression temporaries. Destruction releases derived members, base factorization body, then reverse-order base scratch; borrowed model fields survive.",
         "Precise inverse calculation delegates numeric ownership to the actual indexed PairLU. Core pivot accumulation owns source product/return-value temporaries in pivotWork and captures only their arithmetic, ending each segment before child indexed-vector addition. PivotRow retains its own stopped AddWithDropTolerance; core product inputs survive until that vector is closed. Stopped exact core guards and named numeral-root census cover actual physical failures.",
         "Exact basis edits mutate borrowed typed slice headers in source order. Tableau transposition swaps basis/headings before delegated matrix row copies; the matrix owns any stopped numerical copy, while the core stops without adopting child allocation roots. Pooled/direct physical failure campaigns verify immediate cleanup and named root census. Whole tableau pivot/removal and outer LAR Pop remain open.",
-        "Precise tableau normalization captures only core-owned pair/RHS and row-coefficient arithmetic; the core ends capture before delegating owning row elimination to RationalStaticMatrix. Reduced-cost expressions own temporary/product slots in pivotWork. Eight pooled/direct real allocation-refusal campaigns cover normalization, child elimination, reduced costs and combined pivot/cost work through success, verify reached-prefix values and reclaim every named numeral root. Full tableau optimization, outer removal and LAR scopes remain open."
+        "Precise tableau normalization captures only core-owned pair/RHS and row-coefficient arithmetic; the core ends capture before delegating owning row elimination to RationalStaticMatrix. Reduced-cost expressions own temporary/product slots in pivotWork. Eight pooled/direct real allocation-refusal campaigns cover normalization, child elimination, reduced costs and combined pivot/cost work through success, verify reached-prefix values and reclaim every named numeral root. Full tableau optimization, outer removal and LAR scopes remain open.",
+        "Exact validators own direct bound comparisons and source copied reduced-cost/product temporaries in base-core calls/pivotWork. Captures end before delegated matrix checks and diagnostics. Physical refusal campaigns preserve source prefixes, and Close destroys only newly owned invocations/work; older caller comparison receipts remain intact. Column diagnostics retain split stdout/output streams and report real writer, metadata and missing-reference errors. Native erases source assertions; complete solver/scopes integration remains incomplete."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",

@@ -25,6 +25,7 @@ type LARSolver struct {
 	Constraints                                        []LARStoredConstraint
 	pendingConstraint                                  LARStoredConstraint
 	pendingTerm                                        *LARTerm
+	pendingCleanupDelta                                *RationalPair
 	pendingIterator                                    *LARTermIterator
 	pendingRowIterator                                 RationalLinearIterator
 	pendingRowAnalyzer                                 *LARRowBoundAnalyzer
@@ -53,7 +54,7 @@ func NewLARSolver(m *numeral.RationalManager) (solver *LARSolver, err error) {
 	return solver, err
 }
 func (s *LARSolver) ready() error {
-	if s.stopped || s.Core == nil || s.Core.stopped || s.pendingConstraint != nil || s.pendingTerm != nil || s.pendingIterator != nil || s.pendingRowIterator != nil || s.pendingRowAnalyzer != nil || s.work != nil || s.rationalWork != nil || s.calls.pending() {
+	if s.stopped || s.Core == nil || s.Core.stopped || s.pendingCleanupDelta != nil || s.pendingConstraint != nil || s.pendingTerm != nil || s.pendingIterator != nil || s.pendingRowIterator != nil || s.pendingRowAnalyzer != nil || s.work != nil || s.rationalWork != nil || s.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return nil
@@ -276,6 +277,12 @@ func (s *LARSolver) Close() error {
 		if err := s.Core.Close(); err != nil {
 			return err
 		}
+	}
+	if s.pendingCleanupDelta != nil {
+		if err := s.pendingCleanupDelta.Del(s.manager); err != nil {
+			return err
+		}
+		s.pendingCleanupDelta = nil
 	}
 	if s.work != nil {
 		if err := s.work.Close(); err != nil {

@@ -10,6 +10,11 @@ primal and dual cores expose Solve, and outer LU primal/dual integration is impl
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
 
+An hourly native module run started at 01:34 UTC on October11 with
+`/mnt/oldrog/tmp/g3-inf-cleanup-module-native.{log,cover}`. It is still running;
+no passing full-suite result is claimed. Its snapshot includes post-pop cleanup
+and validators and predates subsequently strengthened test-only guards/campaigns.
+
 Latest hourly native module run completed at 00:39 UTC on October11 with
 exit status0 and every package passing: LP613.329s,88.8% (14048/15826).
 Log/profile: `/mnt/oldrog/tmp/g3-pair-basis-module-native.{log,cover}`.
@@ -19,6 +24,14 @@ infeasibility-cost updates.
 Those additions have separate
 focused native/debug checks. Coverage measures existing Go code, not unported
 C++ functionality.
+
+Known source limitation: post-pop cleanup declares an empty local changed-cost
+set, while basic-value updates record changes in a different member set. With
+`2*x0+3*x1-x2=0`, clamping `x0` from0 to2 makes `x2=4` exceed upper1.
+Its independently correct default-sign infeasibility cost is -1, but cleanup
+leaves stored cost0 and reduced costs unchanged. Native returns that source
+state; debug detects the cost mismatch in the real reduced-cost assertion.
+Both profiles are tested; this behavior is preserved for source fidelity.
 
 Known source limitation: implied-bound explanation selects witnesses using the
 normalized pivot target sign while forwarding original-row coefficients. With
@@ -62,6 +75,7 @@ from the120 independently verified bounded optima.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Post-pop exact infeasibility cleanup and real cost/reduced-cost diagnostics | 160 independent two-nonbasic tableau models,100 actual nonunit LU models,1600 independent strict lexicographic cost worlds and160 rational matrix oracles; source snapshot/swap-pop order, cost publication and separate empty local/member set;16 pooled/direct failure campaigns through success, older caller comparison identity, exact split streams, missing-reference and stopped-child guards | Combined focused profiles: cleanup81.2% native (69/85),91.8% debug/checked (78/85); validators/diagnostics82.5% native (175/212),92.9% debug/checked (197/212). Cleanup has nine debug-only covered statements; validator profiles differ by24 debug-only covered statements and two native-only returns. Remaining gaps qualify protected capture/cleanup/value guards or prior assertion/child invariants. Main21.929s/24.345s native/debug; strengthened campaigns7.302s/8.238s and print guards0.057s/0.041s pass. Outer whole-model scopes and optimization remain open |
 | Exact infeasibility costs and tableau reduced-cost updates | 1600 independent lexicographic worlds across all five types, including inverted intervals and nonbasic early return; 160 two-row rational cost oracles; source zero-delta/publication prefixes, alias rereads and metadata guards; eight pooled/direct failure campaigns through success and older caller comparison identity | New file90.4% native (103/114),93.0% debug/checked (106/114). Native omits three assertion returns; remaining eight gaps are protected capture guards, allocation-free cleanup and valid-value zero/copy guards. Focused17.040s native,18.144s debug/checked; both vets, port ledger and module compilation pass. Complete post-pop cleanup, outer scopes and tableau optimization remain open |
 | Exact feasibility clamp, membership and LAR basic-value delta updates | 1600 independent lexicographic worlds with all five types and untouched/aliased delta;160 actual clamp/tableau equation models and100 nonunit LU oracles;18 pooled/direct campaigns through success including comparison-before-publication, final copy after delta publication, real LU children and older caller comparison identity | Combined focused profiles: feasibility84.1% native (90/107),95.3% debug (102/107); basic updates92.0% both (69/75); difference expression90% both (9/10), membership100%. Twelve feasibility statements are disabled debug checks; remaining gaps are protected guard/child/cleanup errors. Main101.204s native,116.045s debug; added comparison/metadata15.472s/16.478s. Basis/scope regressions, both vets and native module compilation pass. Full post-pop cleanup/cost recomputation, outer scopes and optimization remain open |
 | LAR tableau row/column removal and debug basis validation | 160 independent surviving models with basic/nonbasic removed terms, signed costs and row swaps; literal RHS tail pop and unchanged outer state; reverse multi-column pop, both basis swap-pop paths and first-link selection; eight pooled/direct physical campaigns through success, actual embedded-core ownership, metadata and stopped prefixes | Removal78.1% native (168/215),88.4% debug/checked (190/215); validator7.1% native (2/28, debug body disabled),92.9% debug (26/28). Remaining gaps are disabled assertions and protected guard/cleanup errors. Focused scope/removal regressions33.958s native,35.791s debug/checked. Whole LAR scopes, feasibility cleanup and optimization remain open |
