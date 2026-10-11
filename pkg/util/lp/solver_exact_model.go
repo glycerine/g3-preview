@@ -29,7 +29,7 @@ type RationalLPSolver struct {
 	CoreColumnsToExternal                  map[uint32]uint32
 	ExternalRowsToCore, CoreRowsToExternal map[uint32]uint32
 	A                                      *RationalStaticMatrix
-	B, ColumnScale                         *IndexedRationalVector
+	B, ColumnScale, Costs                  *IndexedRationalVector
 	Artificials, Slacks                    uint32
 	Status                                 Status
 	TotalIterations                        uint32
@@ -60,6 +60,7 @@ func NewRationalLPSolver(m *numeral.RationalManager) (*RationalLPSolver, error) 
 		NamesToColumns: make(map[string]uint32), CoreColumnsToExternal: make(map[uint32]uint32),
 		ExternalRowsToCore: make(map[uint32]uint32), CoreRowsToExternal: make(map[uint32]uint32),
 		B: NewIndexedRationalVector(m, 0), ColumnScale: NewIndexedRationalVector(m, 0),
+		Costs: NewIndexedRationalVector(m, 0),
 	}, nil
 }
 func (m *RationalLPSolver) ready() error {
@@ -290,7 +291,7 @@ func (m *RationalLPSolver) Close() error {
 			}
 		}
 	}
-	for _, v := range []*IndexedRationalVector{m.B, m.ColumnScale, m.shiftWork, m.pinWork} {
+	for _, v := range []*IndexedRationalVector{m.B, m.ColumnScale, m.Costs, m.shiftWork, m.pinWork} {
 		if v != nil {
 			if err := v.Close(); err != nil {
 				return err

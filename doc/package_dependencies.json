@@ -1345,6 +1345,7 @@
         "settings.go",
         "solver_exact_model.go",
         "solver_float.go",
+        "solver_objective_exact.go",
         "solver_prepare_exact.go",
         "solver_presolve_exact.go",
         "solver_presolve_float.go",

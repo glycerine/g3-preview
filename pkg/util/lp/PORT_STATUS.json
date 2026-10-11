@@ -7,7 +7,7 @@
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
     "remaining retained LU diagnostics and full solver/priority-queue lifecycle integration",
-    "remaining exact objective/value and outer primal/dual preparation, full primal/dual/LAR scaling integration; whole random-update source/driver audit",
+    "remaining exact objective evaluation and outer primal/dual preparation, full primal/dual/LAR scaling integration; whole random-update source/driver audit",
     "remaining primal constructors/diagnostics/validators, exact outer preparation, exact dual/LAR optimization, MPS source driver integration and complete upstream drivers",
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
@@ -2590,7 +2590,9 @@
         "pkg/util/lp/solver_prepare_exact.go",
         "pkg/util/lp/solver_prepare_exact_test.go",
         "pkg/util/lp/solver_presolve_exact.go",
-        "pkg/util/lp/solver_presolve_exact_test.go"
+        "pkg/util/lp/solver_presolve_exact_test.go",
+        "pkg/util/lp/solver_objective_exact.go",
+        "pkg/util/lp/solver_objective_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -2647,7 +2649,13 @@
         "TestLPRationalPresolveCleanupOutputModes",
         "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
         "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
-        "TestLPRationalPresolveForeignBorrowedNumerals"
+        "TestLPRationalPresolveForeignBorrowedNumerals",
+        "TestLPRationalObjectiveIndependentCostsAndReconstruction",
+        "TestLPRationalObjectiveSourceLookupAndFixedPrefixes",
+        "TestLPRationalObjectivePhysicalOwnership",
+        "TestLPRationalObjectiveActualMPSPreparation",
+        "TestLPRationalObjectiveBorrowedCoreAndAlias",
+        "TestLPRationalObjectivePreservesOlderComparison"
       ]
     },
     {
@@ -2667,7 +2675,9 @@
         "pkg/util/lp/solver_prepare_exact.go",
         "pkg/util/lp/solver_prepare_exact_test.go",
         "pkg/util/lp/solver_presolve_exact.go",
-        "pkg/util/lp/solver_presolve_exact_test.go"
+        "pkg/util/lp/solver_presolve_exact_test.go",
+        "pkg/util/lp/solver_objective_exact.go",
+        "pkg/util/lp/solver_objective_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -2718,7 +2728,13 @@
         "TestLPRationalPresolveCleanupOutputModes",
         "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
         "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
-        "TestLPRationalPresolveForeignBorrowedNumerals"
+        "TestLPRationalPresolveForeignBorrowedNumerals",
+        "TestLPRationalObjectiveIndependentCostsAndReconstruction",
+        "TestLPRationalObjectiveSourceLookupAndFixedPrefixes",
+        "TestLPRationalObjectivePhysicalOwnership",
+        "TestLPRationalObjectiveActualMPSPreparation",
+        "TestLPRationalObjectiveBorrowedCoreAndAlias",
+        "TestLPRationalObjectivePreservesOlderComparison"
       ]
     },
     {
@@ -5391,5 +5407,79 @@
       "dependency_graph": "refreshed",
       "diff_check": "pass"
     }
+  },
+  "latest_exact_objective_increment": {
+    "source": [
+      "src/util/lp/lp_solver.hpp:95-100",
+      "src/util/lp/lp_solver.hpp:528-577",
+      "src/util/lp/lp_core_solver_base.h:176-178"
+    ],
+    "retained_consumers": [
+      "src/util/lp/lp_primal_simplex.hpp:51-56",
+      "src/util/lp/lp_dual_simplex.hpp:351",
+      "src/util/lp/lp_primal_simplex.h:99-100",
+      "src/util/lp/lp_dual_simplex.h:89-90"
+    ],
+    "go_targets": [
+      "pkg/util/lp/solver_objective_exact.go",
+      "pkg/util/lp/solver_objective_exact_test.go",
+      "pkg/util/lp/solver_exact_model.go"
+    ],
+    "tests": [
+      "TestLPRationalObjectiveIndependentCostsAndReconstruction",
+      "TestLPRationalObjectiveSourceLookupAndFixedPrefixes",
+      "TestLPRationalObjectivePhysicalOwnership",
+      "TestLPRationalObjectiveActualMPSPreparation",
+      "TestLPRationalObjectiveBorrowedCoreAndAlias",
+      "TestLPRationalObjectivePreservesOlderComparison"
+    ],
+    "coverage": {
+      "native": {
+        "solver_exact_model.go": {
+          "covered": 150,
+          "total": 167,
+          "percent": 89.8
+        },
+        "solver_objective_exact.go": {
+          "covered": 98,
+          "total": 105,
+          "percent": 93.3
+        }
+      },
+      "debug": {
+        "solver_exact_model.go": {
+          "covered": 151,
+          "total": 167,
+          "percent": 90.4
+        },
+        "solver_objective_exact.go": {
+          "covered": 99,
+          "total": 105,
+          "percent": 94.3
+        }
+      }
+    },
+    "combined_focused_seconds": {
+      "native": 8.504,
+      "debug_checked": 10.958
+    },
+    "related_regression_seconds": {
+      "native": 0.978,
+      "debug_checked": 1.227
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-exact-objective-native.cover",
+      "/mnt/oldrog/tmp/g3-exact-objective-debug.cover"
+    ],
+    "validation": {
+      "native_lp_vet": "pass",
+      "debug_checked_lp_vet": "pass",
+      "native_module_compile": "pass",
+      "debug_checked_module_compile": "pass",
+      "source_portcheck": "pass: 2103 units, 677 APIs",
+      "dependency_graph": "refreshed: 64 native production packages",
+      "diff_check": "pass"
+    },
+    "evidence": "Exact cost flipping, scaled-cost assignment and original-column reconstruction now implement retained lp_solver<mpq,mpq> source lp_solver.hpp:95-100,528-577. Costs owns a concrete exact dense vector. By-value getters, unary-minus copies, product left-operand copies and final assignments preserve numerical ownership and source publication order. Column children and Costs close before borrowed lexical work; caller outputs and borrowed core X storage remain alive through interrupted-call cleanup. Reconstruction specializes lp_core_solver_base.h:176-178, which directly returns X[j]; it does not implement or credit an exact optimization core or wrap the rational-pair solver. Fixed values precede index/scale reads; only unsigned -1 denotes an unmapped column, while other oversized indices reach extent guards. Missing scaled-cost mappings publish default external0 and a nil column as in source operator[]. Fixed-column and scale assertions stop debug builds at the actual source site; native fixed-column execution continues and native missing-scale execution retains the cost-copy prefix before guarding the invalid read. Six test groups cover160 independent81-240-bit rational models with positive/negative/zero costs and scales, all bound types, fixed priority and two cost flips,18 reached lookup/domain profiles, stopped/closed entries, output/core aliasing and rejection of foreign-manager numerals. Fourteen pooled/direct physical refusal campaigns through success cover flipping, scaled/unscaled signs and free/lower/upper/fixed reconstruction; direct campaigns require real refusal and all owner censuses pass. Actual older caller comparison identity survives flipping and Close. Real exact MPS parse/populate/matrix/RHS/scale/cost/value preparation preserves sticky FR: a later UP does not restore bounds. The initial MPS helper compile error and mistaken sticky-FR expectation were corrected and both final combined runs pass. New objective file98/105 statements (93.3%) native and99/105 (94.3%) debug/checked. Remaining blocks guard stable sign/destruction/small-constant paths and source-disabled assertions or the native-only invalid scale read. Combined exact input/column/MPS/preparation/presolve/objective passes8.504s native/10.958s debug/checked; related exact MPS and floating solver/presolve/primal/dual/MPS passes0.978s/1.227s. Both LP vets and both module compilation gates pass. Exact objective evaluation, concrete mpq/mpq primal/dual cores and outer optimization, factories, full upstream drivers and whole-source audits remain open. Inventory remains88 partial/16 unported/6 reference_only, with no whole-source promotion. Latest completed full native86cf064d checkpoint predates matrix preparation, presolve and this increment; focused evidence is separate."
   }
 }

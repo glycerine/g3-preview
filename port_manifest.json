@@ -127458,7 +127458,9 @@
         "pkg/util/lp/solver_prepare_exact.go",
         "pkg/util/lp/solver_prepare_exact_test.go",
         "pkg/util/lp/solver_presolve_exact.go",
-        "pkg/util/lp/solver_presolve_exact_test.go"
+        "pkg/util/lp/solver_presolve_exact_test.go",
+        "pkg/util/lp/solver_objective_exact.go",
+        "pkg/util/lp/solver_objective_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -127515,7 +127517,13 @@
         "TestLPRationalPresolveCleanupOutputModes",
         "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
         "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
-        "TestLPRationalPresolveForeignBorrowedNumerals"
+        "TestLPRationalPresolveForeignBorrowedNumerals",
+        "TestLPRationalObjectiveIndependentCostsAndReconstruction",
+        "TestLPRationalObjectiveSourceLookupAndFixedPrefixes",
+        "TestLPRationalObjectivePhysicalOwnership",
+        "TestLPRationalObjectiveActualMPSPreparation",
+        "TestLPRationalObjectiveBorrowedCoreAndAlias",
+        "TestLPRationalObjectivePreservesOlderComparison"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -127652,6 +127660,19 @@
             "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
             "TestLPRationalPresolveForeignBorrowedNumerals"
           ]
+        },
+        {
+          "name": "retained mpq/mpq cost flipping, scaled-cost assignment and direct core-X original-column reconstruction (lp_solver.hpp:95-100,528-577)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_objective_exact.go",
+          "tests": [
+            "TestLPRationalObjectiveIndependentCostsAndReconstruction",
+            "TestLPRationalObjectiveSourceLookupAndFixedPrefixes",
+            "TestLPRationalObjectivePhysicalOwnership",
+            "TestLPRationalObjectiveActualMPSPreparation",
+            "TestLPRationalObjectiveBorrowedCoreAndAlias",
+            "TestLPRationalObjectivePreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -127660,7 +127681,8 @@
         "Presolve uses native temporary key slices and erases dictionary entries only after each source scan. RHS subtraction and earlier variable pins publish immediately. Infeasibility returns before queued row deletion and term elimination. No fake numerical allocation/refusal layer or generic bound callback is introduced; surviving FloatColumnInfo pointers retain identity.",
         "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json.",
         "Parent raw receipts close before matrix/column/dense-output child receipts; children close before source coefficient/result/shift locals and input owners. Dense resize destroys actual owning suffix values before shortening. Displaced native matrices remain explicitly owned until Close; old caller comparisons are neither adopted nor consumed. See latest_exact_preparation_increment in pkg/util/lp/PORT_STATUS.json.",
-        "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json."
+        "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json.",
+        "Exact Costs and column children close before borrowed objective lexical copies; parent numerical receipts release before child/input values. Core X and caller result are borrowed through Close after error. Source getter, unary and product-copy owners are explicit; no exact core optimization is credited by accessor specialization."
       ],
       "deviations": [
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
@@ -127690,7 +127712,9 @@
         "pkg/util/lp/solver_prepare_exact.go",
         "pkg/util/lp/solver_prepare_exact_test.go",
         "pkg/util/lp/solver_presolve_exact.go",
-        "pkg/util/lp/solver_presolve_exact_test.go"
+        "pkg/util/lp/solver_presolve_exact_test.go",
+        "pkg/util/lp/solver_objective_exact.go",
+        "pkg/util/lp/solver_objective_exact_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -127741,7 +127765,13 @@
         "TestLPRationalPresolveCleanupOutputModes",
         "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
         "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
-        "TestLPRationalPresolveForeignBorrowedNumerals"
+        "TestLPRationalPresolveForeignBorrowedNumerals",
+        "TestLPRationalObjectiveIndependentCostsAndReconstruction",
+        "TestLPRationalObjectiveSourceLookupAndFixedPrefixes",
+        "TestLPRationalObjectivePhysicalOwnership",
+        "TestLPRationalObjectiveActualMPSPreparation",
+        "TestLPRationalObjectiveBorrowedCoreAndAlias",
+        "TestLPRationalObjectivePreservesOlderComparison"
       ],
       "assertions": [
         {
@@ -127923,6 +127953,19 @@
             "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
             "TestLPRationalPresolveForeignBorrowedNumerals"
           ]
+        },
+        {
+          "name": "retained mpq/mpq cost flipping, scaled-cost assignment and direct core-X original-column reconstruction (lp_solver.hpp:95-100,528-577)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_objective_exact.go",
+          "tests": [
+            "TestLPRationalObjectiveIndependentCostsAndReconstruction",
+            "TestLPRationalObjectiveSourceLookupAndFixedPrefixes",
+            "TestLPRationalObjectivePhysicalOwnership",
+            "TestLPRationalObjectiveActualMPSPreparation",
+            "TestLPRationalObjectiveBorrowedCoreAndAlias",
+            "TestLPRationalObjectivePreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -127931,7 +127974,8 @@
         "Presolve uses native temporary key slices and erases dictionary entries only after each source scan. RHS subtraction and earlier variable pins publish immediately. Infeasibility returns before queued row deletion and term elimination. No fake numerical allocation/refusal layer or generic bound callback is introduced; surviving FloatColumnInfo pointers retain identity.",
         "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json.",
         "Parent raw receipts close before matrix/column/dense-output child receipts; children close before source coefficient/result/shift locals and input owners. Dense resize destroys actual owning suffix values before shortening. Displaced native matrices remain explicitly owned until Close; old caller comparisons are neither adopted nor consumed. See latest_exact_preparation_increment in pkg/util/lp/PORT_STATUS.json.",
-        "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json."
+        "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json.",
+        "Exact Costs and column children close before borrowed objective lexical copies; parent numerical receipts release before child/input values. Core X and caller result are borrowed through Close after error. Source getter, unary and product-copy owners are explicit; no exact core optimization is credited by accessor specialization."
       ],
       "deviations": [
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
