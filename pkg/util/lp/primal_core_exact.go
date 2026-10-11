@@ -22,6 +22,7 @@ type PairPrimalCoreSolver struct {
 	work                                         *IndexedRationalVector
 	pairWork                                     *IndexedPairVector
 	stepEpsilon                                  *IndexedPairVector
+	basisMultiplier                              *IndexedRationalVector
 	stopped                                      bool
 }
 
@@ -71,7 +72,7 @@ func NewPairPrimalCoreSolver(in PairCoreInputs) (m *PairPrimalCoreSolver, err er
 	return m, nil
 }
 func (m *PairPrimalCoreSolver) ready() error {
-	if m.stopped || m.work != nil || m.pairWork != nil || m.stepEpsilon != nil || m.calls.pending() {
+	if m.stopped || m.work != nil || m.pairWork != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return m.PairCoreSolverBase.ready()
@@ -165,6 +166,12 @@ func (m *PairPrimalCoreSolver) Close() error {
 			return err
 		}
 		m.stepEpsilon = nil
+	}
+	if m.basisMultiplier != nil {
+		if err := m.basisMultiplier.Close(); err != nil {
+			return err
+		}
+		m.basisMultiplier = nil
 	}
 	if err := m.manager.Del(&m.ConvertedHarrisEpsilon); err != nil {
 		return err

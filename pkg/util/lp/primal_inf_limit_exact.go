@@ -113,6 +113,10 @@ func (m *PairPrimalCoreSolver) LimitInfOnBoundMNeg(multiplier *numeral.Rational,
 		return false, err
 	}
 	defer func() { m.stopped = err != nil }()
+	return m.limitInfOnBoundMNegValue(multiplier, x, bound, theta, unlimited)
+}
+
+func (m *PairPrimalCoreSolver) limitInfOnBoundMNegValue(multiplier *numeral.Rational, x, bound, theta *RationalPair, unlimited *bool) (limited bool, err error) {
 	if multiplier == nil || x == nil || bound == nil || theta == nil || unlimited == nil {
 		return false, ErrBounds
 	}
@@ -149,6 +153,10 @@ func (m *PairPrimalCoreSolver) LimitInfOnBoundMPos(multiplier *numeral.Rational,
 		return false, err
 	}
 	defer func() { m.stopped = err != nil }()
+	return m.limitInfOnBoundMPosValue(multiplier, x, bound, theta, unlimited)
+}
+
+func (m *PairPrimalCoreSolver) limitInfOnBoundMPosValue(multiplier *numeral.Rational, x, bound, theta *RationalPair, unlimited *bool) (limited bool, err error) {
 	if multiplier == nil || x == nil || bound == nil || theta == nil || unlimited == nil {
 		return false, ErrBounds
 	}
@@ -187,6 +195,10 @@ func (m *PairPrimalCoreSolver) LimitInfOnLowBoundMPos(multiplier *numeral.Ration
 		return err
 	}
 	defer func() { m.stopped = err != nil }()
+	return m.limitInfOnLowBoundMPosValue(multiplier, x, bound, theta, unlimited)
+}
+
+func (m *PairPrimalCoreSolver) limitInfOnLowBoundMPosValue(multiplier *numeral.Rational, x, bound, theta *RationalPair, unlimited *bool) (err error) {
 	if multiplier == nil || x == nil || bound == nil || theta == nil || unlimited == nil {
 		return ErrBounds
 	}

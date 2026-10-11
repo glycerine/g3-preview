@@ -123643,7 +123643,8 @@
         "pkg/util/lp/primal_bound_step_exact_test.go",
         "pkg/util/lp/primal_inf_limit_exact.go",
         "pkg/util/lp/primal_harris_exact.go",
-        "pkg/util/lp/primal_basis_limit_exact.go"
+        "pkg/util/lp/primal_basis_limit_exact.go",
+        "pkg/util/lp/primal_basis_dispatch_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -123735,7 +123736,12 @@
         "TestLPExactBasisLimitPreservesOlderComparisonOwner",
         "TestLPExactBasisLimitSourceGuards",
         "TestLPExactBasisLimitScalarOutputAlias",
-        "TestLPExactBasisLimitBoxedComparisonPrefixes"
+        "TestLPExactBasisLimitBoxedComparisonPrefixes",
+        "TestLPExactBasisDispatchIndependentPairOracle",
+        "TestLPExactBasisDispatchPhysicalOwnership",
+        "TestLPExactBasisDispatchPreservesOlderComparisonOwner",
+        "TestLPExactBasisDispatchGuardsAndZeroDirection",
+        "TestLPExactBasisDispatchMultiplierOutputAlias"
       ],
       "conditionals": [
         {
@@ -124115,6 +124121,18 @@
             "TestLPExactBasisLimitSourceGuards",
             "TestLPExactBasisLimitScalarOutputAlias",
             "TestLPExactBasisLimitBoxedComparisonPrefixes"
+          ]
+        },
+        {
+          "name": "precise limit_theta_on_basis_column full column-type/InfSet/direction dispatch, inlined one-bound forwarding wrappers, owning by-value scalar and final limited-theta clamp",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_basis_dispatch_exact.go",
+          "tests": [
+            "TestLPExactBasisDispatchIndependentPairOracle",
+            "TestLPExactBasisDispatchPhysicalOwnership",
+            "TestLPExactBasisDispatchPreservesOlderComparisonOwner",
+            "TestLPExactBasisDispatchGuardsAndZeroDirection",
+            "TestLPExactBasisDispatchMultiplierOutputAlias"
           ]
         }
       ],
@@ -148603,7 +148621,8 @@
         "pkg/util/numeral/rational_service_zero_invocation.go",
         "pkg/util/numeral/rational_service_zero_invocation_test.go",
         "pkg/util/lp/eta_exact_expression.go",
-        "pkg/util/lp/primal_basis_limit_exact.go"
+        "pkg/util/lp/primal_basis_limit_exact.go",
+        "pkg/util/lp/primal_basis_dispatch_exact.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -148800,7 +148819,12 @@
         "TestLPExactBasisLimitPreservesOlderComparisonOwner",
         "TestLPExactBasisLimitSourceGuards",
         "TestLPExactBasisLimitScalarOutputAlias",
-        "TestLPExactBasisLimitBoxedComparisonPrefixes"
+        "TestLPExactBasisLimitBoxedComparisonPrefixes",
+        "TestLPExactBasisDispatchIndependentPairOracle",
+        "TestLPExactBasisDispatchPhysicalOwnership",
+        "TestLPExactBasisDispatchPreservesOlderComparisonOwner",
+        "TestLPExactBasisDispatchGuardsAndZeroDirection",
+        "TestLPExactBasisDispatchMultiplierOutputAlias"
       ],
       "conditionals": [
         {
@@ -149567,6 +149591,18 @@
             "TestLPExactBasisLimitSourceGuards",
             "TestLPExactBasisLimitScalarOutputAlias",
             "TestLPExactBasisLimitBoxedComparisonPrefixes"
+          ]
+        },
+        {
+          "name": "live copied rational by-value multiplier lifetime in exact primal basis-column dispatch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_basis_dispatch_exact.go",
+          "tests": [
+            "TestLPExactBasisDispatchIndependentPairOracle",
+            "TestLPExactBasisDispatchPhysicalOwnership",
+            "TestLPExactBasisDispatchPreservesOlderComparisonOwner",
+            "TestLPExactBasisDispatchGuardsAndZeroDirection",
+            "TestLPExactBasisDispatchMultiplierOutputAlias"
           ]
         }
       ],

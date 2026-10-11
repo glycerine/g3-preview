@@ -22,6 +22,10 @@ func (m *PairPrimalCoreSolver) LimitInfOnUpperBoundMNeg(multiplier *numeral.Rati
 		return err
 	}
 	defer func() { m.stopped = err != nil }()
+	return m.limitInfOnUpperBoundMNegValue(multiplier, x, bound, theta, unlimited)
+}
+
+func (m *PairPrimalCoreSolver) limitInfOnUpperBoundMNegValue(multiplier *numeral.Rational, x, bound, theta *RationalPair, unlimited *bool) (err error) {
 	if multiplier == nil || x == nil || bound == nil || theta == nil || unlimited == nil {
 		return ErrBounds
 	}
@@ -61,6 +65,10 @@ func (m *PairPrimalCoreSolver) limitBoxedTheta(j uint32, multiplier *numeral.Rat
 		return err
 	}
 	defer func() { m.stopped = err != nil }()
+	return m.limitBoxedThetaValue(j, multiplier, theta, unlimited, positive)
+}
+
+func (m *PairPrimalCoreSolver) limitBoxedThetaValue(j uint32, multiplier *numeral.Rational, theta *RationalPair, unlimited *bool, positive bool) (err error) {
 	if multiplier == nil || theta == nil || unlimited == nil || uint64(j) >= uint64(len(*m.X)) || uint64(j) >= uint64(len(*m.LowBounds)) || uint64(j) >= uint64(len(*m.UpperBounds)) {
 		return ErrBounds
 	}
@@ -137,6 +145,10 @@ func (m *PairPrimalCoreSolver) limitFeasibleTheta(j uint32, multiplier *numeral.
 		return err
 	}
 	defer func() { m.stopped = err != nil }()
+	return m.limitFeasibleThetaValue(j, multiplier, theta, unlimited, positive)
+}
+
+func (m *PairPrimalCoreSolver) limitFeasibleThetaValue(j uint32, multiplier *numeral.Rational, theta *RationalPair, unlimited *bool, positive bool) (err error) {
 	bounds := m.LowBounds
 	if positive {
 		bounds = m.UpperBounds
