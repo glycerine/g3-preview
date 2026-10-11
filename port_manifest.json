@@ -120237,7 +120237,9 @@
         "pkg/util/lp/lar_catchup_tableau.go",
         "pkg/util/lp/lar_catchup_tableau_test.go",
         "pkg/util/lp/lar_signature_tableau.go",
-        "pkg/util/lp/lar_signature_tableau_test.go"
+        "pkg/util/lp/lar_signature_tableau_test.go",
+        "pkg/util/lp/lar_solve_signature_tableau.go",
+        "pkg/util/lp/lar_solve_signature_tableau_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -120338,7 +120340,16 @@
         "TestLARTableauSignaturePreparationReachedPrefixes",
         "TestLARTableauSignatureRemovePendingCore",
         "TestLARTableauSignaturePreservesOlderComparison",
-        "TestLARTableauSignaturePreparationMultipleRows"
+        "TestLARTableauSignaturePreparationMultipleRows",
+        "TestLARSolveOnSignatureTableauIndependentModels",
+        "TestLARSolveOnSignatureTableauSingularFallback",
+        "TestLARSolveOnSignatureTableauRoundedSingularFallback",
+        "TestLARSolveOnSignatureTableauCancellationPrefixes",
+        "TestLARSolveOnSignatureTableauFallbackCancellation",
+        "TestLARSolveOnSignatureTableauReachedPrefixes",
+        "TestLARSolveOnSignatureTableauPostSolvePublication",
+        "TestLARSolveOnSignatureTableauPhysicalOwnership",
+        "TestLARSolveOnSignatureTableauPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -120723,6 +120734,22 @@
             "TestLARTableauSignatureRemovePendingCore",
             "TestLARTableauSignaturePreservesOlderComparison",
             "TestLARTableauSignaturePreparationMultipleRows"
+          ]
+        },
+        {
+          "name": "tableau solve_on_signature_tableau source487-515; actual exact tableau catch-up and preparation, feasibility, singular last-exchange fallback, source metadata copy/LU disposal and tracing/cancellation/float catch-up",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_solve_signature_tableau.go",
+          "tests": [
+            "TestLARSolveOnSignatureTableauIndependentModels",
+            "TestLARSolveOnSignatureTableauSingularFallback",
+            "TestLARSolveOnSignatureTableauRoundedSingularFallback",
+            "TestLARSolveOnSignatureTableauCancellationPrefixes",
+            "TestLARSolveOnSignatureTableauFallbackCancellation",
+            "TestLARSolveOnSignatureTableauReachedPrefixes",
+            "TestLARSolveOnSignatureTableauPostSolvePublication",
+            "TestLARSolveOnSignatureTableauPhysicalOwnership",
+            "TestLARSolveOnSignatureTableauPreservesOlderComparison"
           ]
         }
       ],

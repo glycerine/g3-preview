@@ -1244,6 +1244,7 @@
         "lar_signature_float.go",
         "lar_signature_tableau.go",
         "lar_solve_signature.go",
+        "lar_solve_signature_tableau.go",
         "lar_tableau_remove.go",
         "lar_term.go",
         "lu_column_exact.go",
