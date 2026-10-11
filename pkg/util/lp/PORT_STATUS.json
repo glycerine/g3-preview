@@ -8253,5 +8253,30 @@
       "dependency_graph": "64 packages; no unresolved imports",
       "diff_check": "passed"
     }
+  },
+  "running_full_native_checkpoint": {
+    "status": "running",
+    "commit": "82fa38d8",
+    "started_utc": "2026-10-11 19:16:19 UTC",
+    "runner_pid": 2,
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "-json",
+      "./...",
+      "-timeout=60m",
+      "-count=1",
+      "-coverprofile=/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.cover"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-scalar-dual-advance-module-native.json",
+    "go_pid": 5,
+    "runner_session": 40387,
+    "completion_credited": false,
+    "scope": "Scalar dual pricing/candidates/full ratio, bound-flip/value updates, beta/DSE and known-leaving basis advancement/recovery; includes earlier scalar full primal Solve/statistics and initialization. Full dual pricing loop/Solve and outer integration remain open."
   }
 }
