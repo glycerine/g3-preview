@@ -35,6 +35,7 @@ type LARSolver struct {
 	modelPairs                                         *IndexedPairVector
 	modelSingles                                       *IndexedRationalVector
 	validationCoefficients                             *SparseRationalVector
+	validationModel                                    *LARRationalModel
 	calls                                              exactEtaCalls
 	manager                                            *numeral.RationalManager
 	stopped                                            bool
@@ -246,6 +247,12 @@ func (s *LARSolver) Close() error {
 			return err
 		}
 		s.validationCoefficients = nil
+	}
+	if s.validationModel != nil {
+		if err := s.validationModel.Close(); err != nil {
+			return err
+		}
+		s.validationModel = nil
 	}
 	if s.pendingConstraint != nil {
 		if err := s.pendingConstraint.Close(); err != nil {

@@ -118482,10 +118482,16 @@
       "go_targets": [
         "pkg/util/lp/core_base_float.go",
         "pkg/util/lp/core_base_float_test.go",
-        "pkg/util/lp/primal_prepare_float_test.go"
+        "pkg/util/lp/primal_prepare_float_test.go",
+        "pkg/util/lp/lar_constraint_display.go",
+        "pkg/util/lp/lar_constraint_display_test.go"
       ],
       "tests": [
-        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+        "TestLPFloatPrimalPreparedBasisIndependentOracle",
+        "TestLARConstraintDisplaySourceText",
+        "TestLARConstraintDisplayEveryWriterPrefix",
+        "TestLARConstraintDisplayReachedPrefixes",
+        "TestLARConstraintDisplayPhysicalOwnership"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -118497,11 +118503,25 @@
           "tests": [
             "TestLPFloatPrimalPreparedBasisIndependentOracle"
           ]
+        },
+        {
+          "name": "retained concrete rational constraint and column-combination output",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_constraint_display.go",
+          "tests": [
+            "TestLARConstraintDisplaySourceText",
+            "TestLARConstraintDisplayEveryWriterPrefix",
+            "TestLARConstraintDisplayReachedPrefixes",
+            "TestLARConstraintDisplayPhysicalOwnership"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Constraint validation retains its actual lexical model and coefficient/value owners on error; model assignment borrowers close before solver rational work. Writer failure retains the reached coefficient/value prefix until Close."
+      ],
       "deviations": [
-        "Only the actual project naming interface is represented; linear iterator and formatted-combination diagnostics remain open. No generic numeric callback adapter is introduced."
+        "Only the actual project naming interface is represented; linear iterator and formatted-combination diagnostics remain open. No generic numeric callback adapter is introduced.",
+        "Go io.Writer errors and optional Flush() errors stop at the reached output prefix; no STL stream implementation is ported. LAR all-constraint validation and retained diagnostic output now implement lar_solver.h:1054-1067,1309-1318,1332-1337,1359-1362 and the concrete rational column_namer.h:73-97 printer. AllConstraintsHold reads cancellation once before extraction, obtains the actual collision-free rational model, checks constraints in source order and prints only the first violation. Solver-owned temporary model values close before solver arithmetic locals after an interrupted assignment. Exact printing preserves coefficient order, signs including zero, original term constants, relation spelling and newline/flush behavior.600 independent model worlds cover all five relations, three RHS positions and two epsilon collisions. Cancellation/error prefixes, actual closed stdout, every writer byte prefix, short writes, flush failure, unknown-kind assertion/native output and an actual older caller comparison verify publication and cleanup. Four validation and six printer pooled/direct physical refusal campaigns run through success. Native/debug focused tests pass0.976s/1.177s. Validation covers26/29 statements (89.7%) in both profiles; printer covers94/111 (84.7%) native and95/111 (85.6%) debug/checked. Remaining branches chiefly guard initialized numeral destruction, stable numeral predicates, valid capture, nil/foreign inputs and an already-stopped temporary model. Whole outer LARSolver Solve, remaining diagnostics and complete upstream drivers remain open; inventory remains85 partial/25 unported. Full native08dc15a1 checkpoint predates this increment. Related LAR regressions pass42.887s native/58.016s debug/checked. Both LP vets, both module compilation gates, source portcheck, refreshed dependency graph and diff checks pass."
       ]
     },
     {
@@ -121134,7 +121154,11 @@
         "pkg/util/lp/lar_get_model.go",
         "pkg/util/lp/lar_get_model_test.go",
         "pkg/util/lp/lar_constraint_eval.go",
-        "pkg/util/lp/lar_constraint_eval_test.go"
+        "pkg/util/lp/lar_constraint_eval_test.go",
+        "pkg/util/lp/lar_all_constraints.go",
+        "pkg/util/lp/lar_all_constraints_test.go",
+        "pkg/util/lp/lar_constraint_display.go",
+        "pkg/util/lp/lar_constraint_display_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -121228,7 +121252,16 @@
         "TestLARConstraintEvalReachedPrefixes",
         "TestLARConstraintEvalPhysicalOwnership",
         "TestLARConstraintEvalExtractedStrictTermModel",
-        "TestLARConstraintEvalPreservesOlderComparison"
+        "TestLARConstraintEvalPreservesOlderComparison",
+        "TestLARAllConstraintsIndependentModels",
+        "TestLARAllConstraintsCancellationAndReachedPrefixes",
+        "TestLARAllConstraintsPhysicalOwnership",
+        "TestLARAllConstraintsClosedStdoutPrefix",
+        "TestLARAllConstraintsPreservesOlderComparison",
+        "TestLARConstraintDisplaySourceText",
+        "TestLARConstraintDisplayEveryWriterPrefix",
+        "TestLARConstraintDisplayReachedPrefixes",
+        "TestLARConstraintDisplayPhysicalOwnership"
       ],
       "conditionals": [
         {
@@ -121835,6 +121868,29 @@
             "TestLARConstraintEvalExtractedStrictTermModel",
             "TestLARConstraintEvalPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "all_constraints_hold cancellation/model/first-violation diagnostic",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_all_constraints.go",
+          "tests": [
+            "TestLARAllConstraintsIndependentModels",
+            "TestLARAllConstraintsCancellationAndReachedPrefixes",
+            "TestLARAllConstraintsPhysicalOwnership",
+            "TestLARAllConstraintsClosedStdoutPrefix",
+            "TestLARAllConstraintsPreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "retained concrete rational constraint and column-combination output",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_constraint_display.go",
+          "tests": [
+            "TestLARConstraintDisplaySourceText",
+            "TestLARConstraintDisplayEveryWriterPrefix",
+            "TestLARConstraintDisplayReachedPrefixes",
+            "TestLARConstraintDisplayPhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -121852,7 +121908,8 @@
         "Preparation preserves ordinary-vector prefixes while clearing indexed scratch in source order; no parent numerical capture spans exact vector/queue/LU child operations. LU replacement keeps partial newly constructed factors published for owning cleanup, destroys old factors before replacement, deletes newly degenerated factors and preserves the source in-place extension result. Actual physical refusals, matrix-solve oracles and source mutation prefixes are tested. Full LAR solve/signature/exact optimization integration remains incomplete.",
         "Strategy initialization has no additional numerical owner. Real deferred tableau registration retains interrupted arithmetic in existing solver/term/primal owners until Close. Native floating slices own converted scalars; heading and basis copies do not alias the exact arrays. Pooled/direct physical refusal campaigns through success verify cleanup.",
         "LARRationalModel is a concrete native uint32-to-owned-rational map in a borrowed manager; assignments create the initialized entry before copying. Solver-owned rational expression/delta locals and concrete owned pair/single vectors retain interrupted arithmetic and set entries through cleanup. Hash buckets are native maps with exact equality resolving collisions. A stopped output assignment can borrow the solver current single: output Close precedes solver Close on failure. Six pooled/direct physical campaigns cover plain/colliding large values and forty collision halvings, with retry publication and older comparison identity tests.",
-        "Solver owns lexical ret/product values and exported coefficient-vector temporary. Interrupted export remains in validationCoefficients and is closed before original owned constraints/terms; parent arithmetic receipts clean before borrowed model values are destroyed. Original model and constraints remain borrowed. Twelve pooled/direct physical campaigns for variable/term/general sum export and relation comparison plus an actual older caller comparison verify cleanup and invocation identity."
+        "Solver owns lexical ret/product values and exported coefficient-vector temporary. Interrupted export remains in validationCoefficients and is closed before original owned constraints/terms; parent arithmetic receipts clean before borrowed model values are destroyed. Original model and constraints remain borrowed. Twelve pooled/direct physical campaigns for variable/term/general sum export and relation comparison plus an actual older caller comparison verify cleanup and invocation identity.",
+        "Constraint validation retains its actual lexical model and coefficient/value owners on error; model assignment borrowers close before solver rational work. Writer failure retains the reached coefficient/value prefix until Close."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",
@@ -121865,7 +121922,8 @@
         "The source empty local changed-cost set omits updates recorded in the member set. In the retained tableau 2*x0+3*x1-x2=0, clamping x0 from0 to2 makes x2=4 exceed upper1 while stored basic cost remains0 (independent correct default-sign cost -1); native returns with stale costs and debug reports the source reduced-cost assertion. The discrepancy is preserved and tested.",
         "Retained source strategy initialization and double matrix copy now execute. LU selection does not materialize deferred terms, initialize either factorization, assign floating nonbasis, clear existing matrix cells or resize row-offset scratch. Repeated copies append duplicates. Exact numerator and denominator convert separately, so overflow/underflow can produce Inf, omitted zero or NaN. Tableau-cost adjustment retains its source debug assertion and native fallthrough. Whole outer solve/model extraction/constraint validation and upstream drivers remain incomplete.",
         "Rational GetModel now executes the actual strict-bound delta and source retry algorithm. Native concrete map/hash-bucket storage replaces STL containers; numeric values and lexical set entries retain explicit copy/destruction lifetimes. Pair/single identity uses existing exact numeral hash/equality, without decimal-string serialization or generic adapters. Output keys are internal column indices, existing unrelated entries survive, duplicate pairs may share singles, and no cancellation read is added. Constraint validation and whole outer LARSolver Solve remain open; no whole-source-unit promotion.",
-        "Constraint left-side evaluation and all five exact relation checks now execute against LARRationalModel. Term free coefficients come from the actual borrowed original term, general duplicate and zero coefficients remain ordered and are not skipped, and missing model values assert in debug / return ErrBounds natively. Unknown relations evaluate the left side before debug assertion/native false. Whole AllConstraintsHold diagnostic/cancellation wrapper and outer LARSolver Solve remain open; no whole-source-unit promotion."
+        "Constraint left-side evaluation and all five exact relation checks now execute against LARRationalModel. Term free coefficients come from the actual borrowed original term, general duplicate and zero coefficients remain ordered and are not skipped, and missing model values assert in debug / return ErrBounds natively. Unknown relations evaluate the left side before debug assertion/native false. Whole AllConstraintsHold diagnostic/cancellation wrapper and outer LARSolver Solve remain open; no whole-source-unit promotion.",
+        "Go io.Writer errors and optional Flush() errors stop at the reached output prefix; no STL stream implementation is ported. LAR all-constraint validation and retained diagnostic output now implement lar_solver.h:1054-1067,1309-1318,1332-1337,1359-1362 and the concrete rational column_namer.h:73-97 printer. AllConstraintsHold reads cancellation once before extraction, obtains the actual collision-free rational model, checks constraints in source order and prints only the first violation. Solver-owned temporary model values close before solver arithmetic locals after an interrupted assignment. Exact printing preserves coefficient order, signs including zero, original term constants, relation spelling and newline/flush behavior.600 independent model worlds cover all five relations, three RHS positions and two epsilon collisions. Cancellation/error prefixes, actual closed stdout, every writer byte prefix, short writes, flush failure, unknown-kind assertion/native output and an actual older caller comparison verify publication and cleanup. Four validation and six printer pooled/direct physical refusal campaigns run through success. Native/debug focused tests pass0.976s/1.177s. Validation covers26/29 statements (89.7%) in both profiles; printer covers94/111 (84.7%) native and95/111 (85.6%) debug/checked. Remaining branches chiefly guard initialized numeral destruction, stable numeral predicates, valid capture, nil/foreign inputs and an already-stopped temporary model. Whole outer LARSolver Solve, remaining diagnostics and complete upstream drivers remain open; inventory remains85 partial/25 unported. Full native08dc15a1 checkpoint predates this increment. Related LAR regressions pass42.887s native/58.016s debug/checked. Both LP vets, both module compilation gates, source portcheck, refreshed dependency graph and diff checks pass."
       ]
     },
     {

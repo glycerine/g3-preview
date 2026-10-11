@@ -247,10 +247,16 @@
       "go_targets": [
         "pkg/util/lp/core_base_float.go",
         "pkg/util/lp/core_base_float_test.go",
-        "pkg/util/lp/primal_prepare_float_test.go"
+        "pkg/util/lp/primal_prepare_float_test.go",
+        "pkg/util/lp/lar_constraint_display.go",
+        "pkg/util/lp/lar_constraint_display_test.go"
       ],
       "tests": [
-        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+        "TestLPFloatPrimalPreparedBasisIndependentOracle",
+        "TestLARConstraintDisplaySourceText",
+        "TestLARConstraintDisplayEveryWriterPrefix",
+        "TestLARConstraintDisplayReachedPrefixes",
+        "TestLARConstraintDisplayPhysicalOwnership"
       ]
     },
     {
@@ -932,7 +938,11 @@
         "pkg/util/lp/lar_get_model.go",
         "pkg/util/lp/lar_get_model_test.go",
         "pkg/util/lp/lar_constraint_eval.go",
-        "pkg/util/lp/lar_constraint_eval_test.go"
+        "pkg/util/lp/lar_constraint_eval_test.go",
+        "pkg/util/lp/lar_all_constraints.go",
+        "pkg/util/lp/lar_all_constraints_test.go",
+        "pkg/util/lp/lar_constraint_display.go",
+        "pkg/util/lp/lar_constraint_display_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -1026,7 +1036,16 @@
         "TestLARConstraintEvalReachedPrefixes",
         "TestLARConstraintEvalPhysicalOwnership",
         "TestLARConstraintEvalExtractedStrictTermModel",
-        "TestLARConstraintEvalPreservesOlderComparison"
+        "TestLARConstraintEvalPreservesOlderComparison",
+        "TestLARAllConstraintsIndependentModels",
+        "TestLARAllConstraintsCancellationAndReachedPrefixes",
+        "TestLARAllConstraintsPhysicalOwnership",
+        "TestLARAllConstraintsClosedStdoutPrefix",
+        "TestLARAllConstraintsPreservesOlderComparison",
+        "TestLARConstraintDisplaySourceText",
+        "TestLARConstraintDisplayEveryWriterPrefix",
+        "TestLARConstraintDisplayReachedPrefixes",
+        "TestLARConstraintDisplayPhysicalOwnership"
       ]
     },
     {
@@ -4266,5 +4285,51 @@
     ],
     "qualification": "Remaining blocks chiefly protect valid capture and initialized product/vector destruction. Native erases assertion branches; debug erases their native missing-value/unknown-kind alternatives. Latest full native08dc15a1 checkpoint predates this increment. AllConstraintsHold diagnostic wrapper, outer LARSolver Solve and complete upstream drivers remain open.",
     "evidence": "Exact constraint evaluation now implements lar_solver.h:1069-1081,1347-1357. GetLeftSideVal obtains the actual polymorphic free coefficient and owning coefficient-vector export, performs every model lookup and ordered exact product/sum, then copies the complete result. ConstraintHolds evaluates that same source sum before all five relations or the unknown-kind assertion/native false. Solver-owned partial exports close before their original constraints/terms; borrowed model values outlive failed solver cleanup.1800 independent rational worlds cover variable/term/general constraints, all five relations and both sides/equality, original term constants, merged term coefficients versus retained general duplicates/zeros, and complete lexical cleanup. Nine reached stopped/nil/foreign/missing/unknown profiles include required lookup of a retained zero coefficient. Twelve pooled/direct physical refusal campaigns through success separately exercise value export and relation evaluation, including actual coefficient/free-value copies, products, sums and comparisons. An actual older caller comparison remains untouched. Real variable registration, strict term bound insertion and model extraction integrate with evaluation: collision at epsilon1/2 forces1/4, values become9/4 and11/4, original 2*x0-3*x1+5 evaluates5/4 despite a changed working-term constant. New file73/81 statements (90.1%) native and debug/checked. Remaining returns chiefly protect valid capture and initialized product/vector destruction; native/debug erase opposite assertion/alternative branches. Focused3.475s/4.917s and related constraint/term/model/strategy/outer-core native/debug46.352s/62.132s pass. Both LP vets, native/debug module compilation, portcheck, graph refresh and diff checks pass. Full native08dc15a1 checkpoint predates this increment. AllConstraintsHold cancellation/diagnostic wrapper, whole outer LARSolver Solve and complete upstream drivers remain open; inventory remains85 partial/25 unported."
+  },
+  "latest_constraint_validation_increment": {
+    "sources": [
+      "src/util/lp/lar_solver.h:1054-1067,1309-1318,1332-1337,1359-1362",
+      "src/util/lp/column_namer.h:73-97"
+    ],
+    "go_targets": [
+      "pkg/util/lp/lar_all_constraints.go",
+      "pkg/util/lp/lar_constraint_display.go"
+    ],
+    "tests": [
+      "TestLARAllConstraintsIndependentModels",
+      "TestLARAllConstraintsCancellationAndReachedPrefixes",
+      "TestLARAllConstraintsPhysicalOwnership",
+      "TestLARAllConstraintsClosedStdoutPrefix",
+      "TestLARAllConstraintsPreservesOlderComparison",
+      "TestLARConstraintDisplaySourceText",
+      "TestLARConstraintDisplayEveryWriterPrefix",
+      "TestLARConstraintDisplayReachedPrefixes",
+      "TestLARConstraintDisplayPhysicalOwnership"
+    ],
+    "native_statements": {
+      "lar_all_constraints.go": [
+        26,
+        29
+      ],
+      "lar_constraint_display.go": [
+        94,
+        111
+      ]
+    },
+    "debug_checked_statements": {
+      "lar_all_constraints.go": [
+        26,
+        29
+      ],
+      "lar_constraint_display.go": [
+        95,
+        111
+      ]
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-lar-validation-native.cover",
+      "/mnt/oldrog/tmp/g3-lar-validation-debug.cover"
+    ],
+    "evidence": "LAR all-constraint validation and retained diagnostic output now implement lar_solver.h:1054-1067,1309-1318,1332-1337,1359-1362 and the concrete rational column_namer.h:73-97 printer. AllConstraintsHold reads cancellation once before extraction, obtains the actual collision-free rational model, checks constraints in source order and prints only the first violation. Solver-owned temporary model values close before solver arithmetic locals after an interrupted assignment. Exact printing preserves coefficient order, signs including zero, original term constants, relation spelling and newline/flush behavior.600 independent model worlds cover all five relations, three RHS positions and two epsilon collisions. Cancellation/error prefixes, actual closed stdout, every writer byte prefix, short writes, flush failure, unknown-kind assertion/native output and an actual older caller comparison verify publication and cleanup. Four validation and six printer pooled/direct physical refusal campaigns run through success. Native/debug focused tests pass0.976s/1.177s. Validation covers26/29 statements (89.7%) in both profiles; printer covers94/111 (84.7%) native and95/111 (85.6%) debug/checked. Remaining branches chiefly guard initialized numeral destruction, stable numeral predicates, valid capture, nil/foreign inputs and an already-stopped temporary model. Whole outer LARSolver Solve, remaining diagnostics and complete upstream drivers remain open; inventory remains85 partial/25 unported. Full native08dc15a1 checkpoint predates this increment. Related LAR regressions pass42.887s native/58.016s debug/checked. Both LP vets, both module compilation gates, source portcheck, refreshed dependency graph and diff checks pass."
   }
 }
