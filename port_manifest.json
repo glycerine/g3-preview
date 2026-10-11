@@ -103027,7 +103027,12 @@
         "pkg/util/lp/dense_matrix_float_debug.go",
         "pkg/util/lp/matrix_float_debug.go",
         "pkg/util/lp/lu_float_debug_matrix.go",
-        "pkg/util/lp/dense_matrix_float_debug_test.go"
+        "pkg/util/lp/dense_matrix_float_debug_test.go",
+        "pkg/util/lp/driver_lu_check.go",
+        "pkg/util/lp/driver_lu_check_debug.go",
+        "pkg/util/lp/driver_lu_check_native.go",
+        "pkg/util/lp/driver_lu_check_test.go",
+        "pkg/util/lp/driver_lu_check_debug_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103191,7 +103196,14 @@
         "TestLPDebugDenseMatrixEqualityAndFailurePrefixes",
         "TestLPDebugDenseConcretePermutationAndStaticConsumers",
         "TestLPDebugDenseActualLUIdentities",
-        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
+        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes",
+        "TestLPLUCheckFileIndependentSolutions",
+        "TestLPLUCheckFileLiteralReadOrderAndAssertions",
+        "TestLPLUCheckFileMalformedAndTruncatedPrefixes",
+        "TestLPLUCheckFileReportAndFileFailures",
+        "TestLPLUCheckFileFlushAndMissingReportFailures",
+        "TestLPLUCheckDebugResidualSourceTolerance",
+        "TestLPLUCheckDebugResidualFailurePrefixes"
       ],
       "conditionals": [
         {
@@ -104067,6 +104079,32 @@
             "TestLPDebugDenseActualLUIdentities",
             "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
           ]
+        },
+        {
+          "name": "retained --checklu file consumer src2568-2620,2639-2668,3126-3130: literal dimensions/row/basis parsing, real file close before actual floating LU factorization, fixed entering26 SolveBd and debug dense-basis residual",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_lu_check.go",
+          "go_targets": [
+            "pkg/util/lp/driver_lu_check_debug.go",
+            "pkg/util/lp/driver_lu_check_native.go",
+            "pkg/util/lp/driver_lu_check_test.go",
+            "pkg/util/lp/driver_lu_check_debug_test.go"
+          ],
+          "tests": [
+            "TestLPLUCheckFileIndependentSolutions",
+            "TestLPLUCheckFileLiteralReadOrderAndAssertions",
+            "TestLPLUCheckFileMalformedAndTruncatedPrefixes",
+            "TestLPLUCheckFileReportAndFileFailures",
+            "TestLPLUCheckFileFlushAndMissingReportFailures",
+            "TestLPLUCheckDebugResidualSourceTolerance",
+            "TestLPLUCheckDebugResidualFailurePrefixes"
+          ]
+        },
+        {
+          "name": "read_indexed_vector source2622-2637 has only a commented check_lu call and no retained root caller; excluded",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
         }
       ],
       "ownership": [
@@ -104078,7 +104116,8 @@
         "LARRunDriver borrows its LAR solver, optional MPS reader and arguments. It owns concrete primal comparison and named snapshots, closing comparison before borrowed getter outputs; lexical infeasibility evidence closes at if-block end, with failed work reachable for explicit cleanup. Eight pooled/direct physical campaigns cover actual Solve, infeasibility, randomize and comparison through success; two actual older caller comparisons survive driver and solver/reader cleanup.",
         "LAR MPS file driver owns creation reader, returned LAR solver, second reader and run driver. Successful CreateLARSolver leaves no parser-numeral borrows: column registration and source AddConstraint no-op/debug assertion are inspected; creation reader closes before second read as source scopes require. Failed creation retains reader until partial solver cleanup. Run driver closes before LAR solver and report reader; failed second list child remains reachable. Four pooled/direct physical campaigns and two actual older caller comparisons verify all prefixes.",
         "Generic LARFileDriver/LARInputDriver own selected MPS or SMT creator, solver, unconditional second MPS reader and runner. Successful creator scope ends before second read; failed factory retains partial solver/creator. Close retries preserve failed Current and creator. Four pooled/direct physical campaigns, two older caller comparisons and real second-child file-close refusal verify ownership prefixes.",
-        "Known floating MPS consumer reuses MPSFileDriver ownership: solver closes before reader, successful scope auto-closes and failed default solve/report/real file-close retains owner for retry. Borrowed native expected-value map copies each value for its iteration; Go native floating storage has no exact-arena roots."
+        "Known floating MPS consumer reuses MPSFileDriver ownership: solver closes before reader, successful scope auto-closes and failed default solve/report/real file-close retains owner for retry. Borrowed native expected-value map copies each value for its iteration; Go native floating storage has no exact-arena roots.",
+        "LUCheckFileDriver retains actual open file on parse/report/close failure, closes successful file before NewSettings/NewFloatLU, closes actual LU after solve/residual or explicit owning cleanup. Matrix, basis, work and solution use native Go float slices; no exact numerical arena campaign applies. Remaining source bytes after basis_end are ignored, matching commented vector read. Failed native os.File Close retains its actual descriptor object and error; external close has no fabricated recovery."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -104101,7 +104140,8 @@
         "MPS-specific LAR entry points port the retained MPS half, not the separate SMT reader/dispatch. Source two reads and file-before-list priority are retained. Missing individual files emit both parser diagnostics and return normally so list processing continues. Checked general AddConstraint asserts during initial factory before the second read; native retains the disabled constraint body and does not establish mathematical constrained-model solving. Native read/close/report errors remain explicit and partial owners permit cleanup retry.",
         "SMT creation retains source unconditional second MPS read: ordinary SMT-only input emits EOF then column/RHS diagnostics and returns without solving; empty SMT conjunction followed by valid MPS exercises actual solve/randomize/comparison. Invalid SMT creation with valid MPS second read reaches explicit nil-solver ErrBounds instead of C++ null dereference. Existing AddConstraint checked assertion/native no-op remains. Native Go files/slices/writers, no STL adapters. Top-level CLI and whole-source audit remain open.",
         "RunFloatKnownSolution retains source constructor defaults, with no argument settings or clock. Ordinary nonempty default floating/tableau models lack usable LU: checked primal reaches source assertion, native primal and both dual profiles reach ErrBounds; no source repair or successful default optimization is credited. Prepared actual LU solves plus explicitly fixed accessor values exercise otherwise blocked reporting and are separate from full entry. Sorted Go expected map keys replace unspecified unordered traversal. ErrDriverStatusWrong transports source string exception; checked preceding SASSERT remains. Diagnostic and assertion each reread actual getter; NaN skips >= diagnostic but fails checked < assertion.",
-        "Floating debug matrix consumers use concrete native Go dense storage and double-valued interface. Actual40 basis worlds with sparse/dense policies verify left transformed B equals Q*U*R. Existing source tolerance accepts NaN/like-signed infinity unordered differences. Debug matrix printing, exact coefficient variants, tail_product/check_apply consumer integration and remaining upstream assertion wiring stay open; original post-return dense fixture is independent coverage only."
+        "Floating debug matrix consumers use concrete native Go dense storage and double-valued interface. Actual40 basis worlds with sparse/dense policies verify left transformed B equals Q*U*R. Existing source tolerance accepts NaN/like-signed infinity unordered differences. Debug matrix printing, exact coefficient variants, tail_product/check_apply consumer integration and remaining upstream assertion wiring stay open; original post-return dense fixture is independent coverage only.",
+        "LU check file parser uses stdlib strings and strict signed32/float conversions; signed-to-unsigned wrapping remains for valid source integers. EOF/short tokens return explicit errors instead of source nonterminating read loops/out-of-range token access. Failed open emits source diagnostic then returns the actual OS error before source invalid dimensions access. The row substring probe consumes the first non-row line; wrong first row token emits literal diagnostic and still parses. No uncalled indexed-vector reader is added. Debug residual retains source relative max normalization, strict >1e-6 and unordered IEEE behavior; source dense/indexed copy is native owned storage. Complete top-level CLI remains open."
       ]
     },
     {

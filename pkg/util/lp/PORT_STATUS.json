@@ -9687,5 +9687,65 @@
       "dependency_graph": "64 packages; refreshed",
       "diff_check": "pass"
     }
+  },
+  "latest_lu_check_file_driver_increment": {
+    "source": "src/test/lp.cpp:2568-2620,2639-2668,3126-3130",
+    "go_targets": [
+      "pkg/util/lp/driver_lu_check.go",
+      "pkg/util/lp/driver_lu_check_debug.go",
+      "pkg/util/lp/driver_lu_check_native.go",
+      "pkg/util/lp/driver_lu_check_test.go",
+      "pkg/util/lp/driver_lu_check_debug_test.go"
+    ],
+    "tests": [
+      "TestLPLUCheckFileIndependentSolutions",
+      "TestLPLUCheckFileLiteralReadOrderAndAssertions",
+      "TestLPLUCheckFileMalformedAndTruncatedPrefixes",
+      "TestLPLUCheckFileReportAndFileFailures",
+      "TestLPLUCheckFileFlushAndMissingReportFailures",
+      "TestLPLUCheckDebugResidualSourceTolerance",
+      "TestLPLUCheckDebugResidualFailurePrefixes"
+    ],
+    "focused_native_seconds": 0.095,
+    "focused_debug_checked_seconds": 0.098,
+    "coverage": {
+      "driver_lu_check.go": {
+        "native": [
+          120,
+          130,
+          92.3
+        ],
+        "debug_checked": [
+          120,
+          130,
+          92.3
+        ]
+      },
+      "driver_lu_check_debug.go": {
+        "debug_checked": [
+          20,
+          22,
+          90.9
+        ]
+      },
+      "driver_lu_check_native.go": {
+        "native": [
+          1,
+          1,
+          100.0
+        ]
+      }
+    },
+    "limitations": "No whole-source promotion or complete CLI claim. Actual floating/native Go storage; no numerical arena physical failure campaign. Remaining guards chiefly stable NewSettings/construction/destruction and delegated parser/matrix reads. Latest successful full native93d0d780 predates these files; failed5c24ca3b provides no completion evidence.",
+    "artifacts": "/mnt/oldrog/tmp/g3-lu-check-{native,debug}.cover and /mnt/oldrog/tmp/g3-lu-check-reachability.txt",
+    "validation": {
+      "related_native_seconds": 0.583,
+      "related_debug_checked_seconds": 0.511,
+      "lp_vet": "native and combined pass",
+      "module_compile": "native and combined pass",
+      "source_portcheck": "2103 units,677 APIs; pass",
+      "dependency_graph": "64 packages; refreshed",
+      "diff_check": "pass"
+    }
   }
 }
