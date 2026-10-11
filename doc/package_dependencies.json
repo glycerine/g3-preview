@@ -1186,6 +1186,7 @@
         "core_reconstruct_exact.go",
         "core_reduced_cost_exact.go",
         "core_residual_exact.go",
+        "core_statistics_exact.go",
         "core_statistics_float.go",
         "core_tableau_exact.go",
         "core_update_exact.go",

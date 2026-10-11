@@ -967,7 +967,9 @@
         "pkg/util/lp/core_residual_exact_test.go",
         "pkg/util/lp/core_reconstruct_exact.go",
         "pkg/util/lp/core_reconstruct_exact_test.go",
-        "pkg/util/lp/core_update_exact.go"
+        "pkg/util/lp/core_update_exact.go",
+        "pkg/util/lp/core_statistics_exact.go",
+        "pkg/util/lp/core_statistics_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1091,7 +1093,17 @@
         "TestLPPairCoreRestoreSourceDiagnostics",
         "TestLPPairCoreUpdateRollbackStoredBackup",
         "TestLPPairCoreUpdateReachedGuards",
-        "TestLPPairCoreUpdateOlderComparison"
+        "TestLPPairCoreUpdateOlderComparison",
+        "TestLPPairStatisticsIndependentCostOracle",
+        "TestLPPairStatisticsPreservesOlderComparison",
+        "TestLPPairStatisticsGatesCountersAndCancellation",
+        "TestLPPairStatisticsAllWriterPrefixes",
+        "TestLPPairStatisticsByValueAndEvaluationOrder",
+        "TestLPPairStatisticsExactProjectionBeforeFloat",
+        "TestLPPairStatisticsLiveLocalReentryGuard",
+        "TestLPPairStatisticsPhysicalOwnership",
+        "TestLPPairAllColumnsFeasibilityIndependentOracle",
+        "TestLPPairStatisticsReachedGuardsAndPrefixes"
       ]
     },
     {
@@ -1131,7 +1143,9 @@
         "pkg/util/lp/core_reduced_cost_exact.go",
         "pkg/util/lp/core_update_exact.go",
         "pkg/util/lp/core_pivot_compare_exact.go",
-        "pkg/util/lp/core_pivot_compare_exact_test.go"
+        "pkg/util/lp/core_pivot_compare_exact_test.go",
+        "pkg/util/lp/core_statistics_exact.go",
+        "pkg/util/lp/core_statistics_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -1249,7 +1263,17 @@
         "TestLPPairPivotCompareIndependentOracle",
         "TestLPPairPivotComparePhysicalOwnership",
         "TestLPPairPivotCompareReachedGuards",
-        "TestLPPairPivotPreservesOlderComparison"
+        "TestLPPairPivotPreservesOlderComparison",
+        "TestLPPairStatisticsIndependentCostOracle",
+        "TestLPPairStatisticsPreservesOlderComparison",
+        "TestLPPairStatisticsGatesCountersAndCancellation",
+        "TestLPPairStatisticsAllWriterPrefixes",
+        "TestLPPairStatisticsByValueAndEvaluationOrder",
+        "TestLPPairStatisticsExactProjectionBeforeFloat",
+        "TestLPPairStatisticsLiveLocalReentryGuard",
+        "TestLPPairStatisticsPhysicalOwnership",
+        "TestLPPairAllColumnsFeasibilityIndependentOracle",
+        "TestLPPairStatisticsReachedGuardsAndPrefixes"
       ]
     },
     {
@@ -1993,7 +2017,10 @@
         "pkg/util/lp/lu_column_test.go",
         "pkg/util/lp/lu_column_failure_test.go",
         "pkg/util/lp/primal_harris_exact.go",
-        "pkg/util/lp/primal_breakpoint_exact.go"
+        "pkg/util/lp/primal_breakpoint_exact.go",
+        "pkg/util/lp/core_statistics_exact.go",
+        "pkg/util/lp/core_statistics_exact_test.go",
+        "pkg/util/lp/core_base_exact.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
@@ -2018,7 +2045,17 @@
         "TestLPExactBreakpointPhysicalOwnership",
         "TestLPExactBreakpointSourcePrefixesAndGuards",
         "TestLPExactBreakpointClearBeforeStoppedQueue",
-        "TestLPExactBreakpointPreservesOlderComparisonOwner"
+        "TestLPExactBreakpointPreservesOlderComparisonOwner",
+        "TestLPPairStatisticsIndependentCostOracle",
+        "TestLPPairStatisticsPreservesOlderComparison",
+        "TestLPPairStatisticsGatesCountersAndCancellation",
+        "TestLPPairStatisticsAllWriterPrefixes",
+        "TestLPPairStatisticsByValueAndEvaluationOrder",
+        "TestLPPairStatisticsExactProjectionBeforeFloat",
+        "TestLPPairStatisticsLiveLocalReentryGuard",
+        "TestLPPairStatisticsPhysicalOwnership",
+        "TestLPPairAllColumnsFeasibilityIndependentOracle",
+        "TestLPPairStatisticsReachedGuardsAndPrefixes"
       ]
     },
     {
@@ -2188,7 +2225,10 @@
         "pkg/util/lp/lu_ready_float.go",
         "pkg/util/lp/lu_ready_exact.go",
         "pkg/util/lp/lu_ready_test.go",
-        "pkg/util/lp/lu_ready_failure_test.go"
+        "pkg/util/lp/lu_ready_failure_test.go",
+        "pkg/util/lp/core_statistics_exact.go",
+        "pkg/util/lp/core_statistics_exact_test.go",
+        "pkg/util/lp/core_base_exact.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -2258,7 +2298,17 @@
         "TestLPLUPreparedSolvesToleranceAndSettings",
         "TestLPLUPreparedSolvesFailurePrefixes",
         "TestLPExactLUPreparedSolvesAllocationCensus",
-        "TestLPExactLUPreparedIndexedCallerOwnership"
+        "TestLPExactLUPreparedIndexedCallerOwnership",
+        "TestLPPairStatisticsIndependentCostOracle",
+        "TestLPPairStatisticsPreservesOlderComparison",
+        "TestLPPairStatisticsGatesCountersAndCancellation",
+        "TestLPPairStatisticsAllWriterPrefixes",
+        "TestLPPairStatisticsByValueAndEvaluationOrder",
+        "TestLPPairStatisticsExactProjectionBeforeFloat",
+        "TestLPPairStatisticsLiveLocalReentryGuard",
+        "TestLPPairStatisticsPhysicalOwnership",
+        "TestLPPairAllColumnsFeasibilityIndependentOracle",
+        "TestLPPairStatisticsReachedGuardsAndPrefixes"
       ]
     },
     {

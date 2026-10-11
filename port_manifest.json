@@ -121738,7 +121738,9 @@
         "pkg/util/lp/core_residual_exact_test.go",
         "pkg/util/lp/core_reconstruct_exact.go",
         "pkg/util/lp/core_reconstruct_exact_test.go",
-        "pkg/util/lp/core_update_exact.go"
+        "pkg/util/lp/core_update_exact.go",
+        "pkg/util/lp/core_statistics_exact.go",
+        "pkg/util/lp/core_statistics_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -121862,7 +121864,17 @@
         "TestLPPairCoreRestoreSourceDiagnostics",
         "TestLPPairCoreUpdateRollbackStoredBackup",
         "TestLPPairCoreUpdateReachedGuards",
-        "TestLPPairCoreUpdateOlderComparison"
+        "TestLPPairCoreUpdateOlderComparison",
+        "TestLPPairStatisticsIndependentCostOracle",
+        "TestLPPairStatisticsPreservesOlderComparison",
+        "TestLPPairStatisticsGatesCountersAndCancellation",
+        "TestLPPairStatisticsAllWriterPrefixes",
+        "TestLPPairStatisticsByValueAndEvaluationOrder",
+        "TestLPPairStatisticsExactProjectionBeforeFloat",
+        "TestLPPairStatisticsLiveLocalReentryGuard",
+        "TestLPPairStatisticsPhysicalOwnership",
+        "TestLPPairAllColumnsFeasibilityIndependentOracle",
+        "TestLPPairStatisticsReachedGuardsAndPrefixes"
       ],
       "assertions": [
         {
@@ -122232,6 +122244,23 @@
             "TestLPPairCoreUpdateReachedGuards",
             "TestLPPairCoreUpdateOlderComparison"
           ]
+        },
+        {
+          "name": "precise get_cost and inc_total_iterations: concrete dense objective and post-incremented solver/global counters",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_statistics_exact.go",
+          "tests": [
+            "TestLPPairStatisticsIndependentCostOracle",
+            "TestLPPairStatisticsPreservesOlderComparison",
+            "TestLPPairStatisticsGatesCountersAndCancellation",
+            "TestLPPairStatisticsAllWriterPrefixes",
+            "TestLPPairStatisticsByValueAndEvaluationOrder",
+            "TestLPPairStatisticsExactProjectionBeforeFloat",
+            "TestLPPairStatisticsLiveLocalReentryGuard",
+            "TestLPPairStatisticsPhysicalOwnership",
+            "TestLPPairAllColumnsFeasibilityIndependentOracle",
+            "TestLPPairStatisticsReachedGuardsAndPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -122257,7 +122286,8 @@
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
         "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open.",
         "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard.",
-        "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update."
+        "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update.",
+        "Statistics use Go io.Writer/fmt/strconv, retaining exact numeric-pair x+y/1000 evaluation before conversion and classic six-digit formatting; no STL stream implementation is ported. Reporting snapshots its by-value argument before output, inspects LU nonzero counts after cost text, and checks actual cancellation after successful output. Local cost/argument owners survive failures until captured child scratch is cleaned. Full precise/default-tableau Solve remains open."
       ]
     },
     {
@@ -122299,7 +122329,9 @@
         "pkg/util/lp/core_reduced_cost_exact.go",
         "pkg/util/lp/core_update_exact.go",
         "pkg/util/lp/core_pivot_compare_exact.go",
-        "pkg/util/lp/core_pivot_compare_exact_test.go"
+        "pkg/util/lp/core_pivot_compare_exact_test.go",
+        "pkg/util/lp/core_statistics_exact.go",
+        "pkg/util/lp/core_statistics_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -122417,7 +122449,17 @@
         "TestLPPairPivotCompareIndependentOracle",
         "TestLPPairPivotComparePhysicalOwnership",
         "TestLPPairPivotCompareReachedGuards",
-        "TestLPPairPivotPreservesOlderComparison"
+        "TestLPPairPivotPreservesOlderComparison",
+        "TestLPPairStatisticsIndependentCostOracle",
+        "TestLPPairStatisticsPreservesOlderComparison",
+        "TestLPPairStatisticsGatesCountersAndCancellation",
+        "TestLPPairStatisticsAllWriterPrefixes",
+        "TestLPPairStatisticsByValueAndEvaluationOrder",
+        "TestLPPairStatisticsExactProjectionBeforeFloat",
+        "TestLPPairStatisticsLiveLocalReentryGuard",
+        "TestLPPairStatisticsPhysicalOwnership",
+        "TestLPPairAllColumnsFeasibilityIndependentOracle",
+        "TestLPPairStatisticsReachedGuardsAndPrefixes"
       ],
       "conditionals": [
         {
@@ -122880,6 +122922,23 @@
             "TestLPPairPivotCompareReachedGuards",
             "TestLPPairPivotPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "precise print_statistics, cost-reporting iteration/cancellation wrapper, time_is_over and descending all-column feasibility validator",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_statistics_exact.go",
+          "tests": [
+            "TestLPPairStatisticsIndependentCostOracle",
+            "TestLPPairStatisticsPreservesOlderComparison",
+            "TestLPPairStatisticsGatesCountersAndCancellation",
+            "TestLPPairStatisticsAllWriterPrefixes",
+            "TestLPPairStatisticsByValueAndEvaluationOrder",
+            "TestLPPairStatisticsExactProjectionBeforeFloat",
+            "TestLPPairStatisticsLiveLocalReentryGuard",
+            "TestLPPairStatisticsPhysicalOwnership",
+            "TestLPPairAllColumnsFeasibilityIndependentOracle",
+            "TestLPPairStatisticsReachedGuardsAndPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -122903,7 +122962,8 @@
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
         "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard.",
         "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update.",
-        "Concrete exact specialization only. Source expression temporaries remain owned through numerical failure; real older comparison generations are preserved. Outer different-column advancement, precise Solve and full source diagnostics remain open."
+        "Concrete exact specialization only. Source expression temporaries remain owned through numerical failure; real older comparison generations are preserved. Outer different-column advancement, precise Solve and full source diagnostics remain open.",
+        "Statistics use Go io.Writer/fmt/strconv, retaining exact numeric-pair x+y/1000 evaluation before conversion and classic six-digit formatting; no STL stream implementation is ported. Reporting snapshots its by-value argument before output, inspects LU nonzero counts after cost text, and checks actual cancellation after successful output. Local cost/argument owners survive failures until captured child scratch is cleaned. Full precise/default-tableau Solve remains open."
       ]
     },
     {
@@ -125793,7 +125853,10 @@
         "pkg/util/lp/lu_column_test.go",
         "pkg/util/lp/lu_column_failure_test.go",
         "pkg/util/lp/primal_harris_exact.go",
-        "pkg/util/lp/primal_breakpoint_exact.go"
+        "pkg/util/lp/primal_breakpoint_exact.go",
+        "pkg/util/lp/core_statistics_exact.go",
+        "pkg/util/lp/core_statistics_exact_test.go",
+        "pkg/util/lp/core_base_exact.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
@@ -125820,7 +125883,17 @@
         "TestLPExactBreakpointPhysicalOwnership",
         "TestLPExactBreakpointSourcePrefixesAndGuards",
         "TestLPExactBreakpointClearBeforeStoppedQueue",
-        "TestLPExactBreakpointPreservesOlderComparisonOwner"
+        "TestLPExactBreakpointPreservesOlderComparisonOwner",
+        "TestLPPairStatisticsIndependentCostOracle",
+        "TestLPPairStatisticsPreservesOlderComparison",
+        "TestLPPairStatisticsGatesCountersAndCancellation",
+        "TestLPPairStatisticsAllWriterPrefixes",
+        "TestLPPairStatisticsByValueAndEvaluationOrder",
+        "TestLPPairStatisticsExactProjectionBeforeFloat",
+        "TestLPPairStatisticsLiveLocalReentryGuard",
+        "TestLPPairStatisticsPhysicalOwnership",
+        "TestLPPairAllColumnsFeasibilityIndependentOracle",
+        "TestLPPairStatisticsReachedGuardsAndPrefixes"
       ],
       "conditionals": [
         {
@@ -125918,6 +125991,23 @@
             "TestLPExactBreakpointClearBeforeStoppedQueue",
             "TestLPExactBreakpointPreservesOlderComparisonOwner"
           ]
+        },
+        {
+          "name": "T_to_string(numeric_pair<mpq>): exact x+y/1000 projection before rational get_double and six-digit classic presentation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_statistics_exact.go",
+          "tests": [
+            "TestLPPairStatisticsIndependentCostOracle",
+            "TestLPPairStatisticsPreservesOlderComparison",
+            "TestLPPairStatisticsGatesCountersAndCancellation",
+            "TestLPPairStatisticsAllWriterPrefixes",
+            "TestLPPairStatisticsByValueAndEvaluationOrder",
+            "TestLPPairStatisticsExactProjectionBeforeFloat",
+            "TestLPPairStatisticsLiveLocalReentryGuard",
+            "TestLPPairStatisticsPhysicalOwnership",
+            "TestLPPairAllColumnsFeasibilityIndependentOracle",
+            "TestLPPairStatisticsReachedGuardsAndPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -125927,7 +126017,8 @@
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
         "Default time resource uses the existing Linux stopwatch process CPU/Getrusage microsecond profile; this does not claim nanosecond clock_gettime equivalence. Clock-read errors are explicit Go errors. Exact tolerance predicates, generic numeric helpers and full solver integration remain open. Native public fields replace trivial source accessors; nil resource limit selects the retained default service.",
-        "Entering-column preparation and solve_Bd now execute retained double/mpq/mpq-pair paths. The precise ratio10 and floating ratio120 use source unsigned multiplication and strict comparison against destination PRE-assignment size. Dense route copies every data slot then clears index and scans dimension descending; sparse route uses indexed assignment and actual graph solve (floating residual correction). Pair-only faster route follows its actual retained core-solver caller. Source unindexed values, sparse self-assignment zeroing, dense self-assignment, configurable drop/precise zero behavior and error-publication prefixes remain literal. Native Go storage replaces vector internals; no STL adapter or unused faster/template route is ported. Suhl updates, row restoration, error-check/refinement orchestration, extension and full upstream driver remain open."
+        "Entering-column preparation and solve_Bd now execute retained double/mpq/mpq-pair paths. The precise ratio10 and floating ratio120 use source unsigned multiplication and strict comparison against destination PRE-assignment size. Dense route copies every data slot then clears index and scans dimension descending; sparse route uses indexed assignment and actual graph solve (floating residual correction). Pair-only faster route follows its actual retained core-solver caller. Source unindexed values, sparse self-assignment zeroing, dense self-assignment, configurable drop/precise zero behavior and error-publication prefixes remain literal. Native Go storage replaces vector internals; no STL adapter or unused faster/template route is ported. Suhl updates, row restoration, error-check/refinement orchestration, extension and full upstream driver remain open.",
+        "Statistics use Go io.Writer/fmt/strconv, retaining exact numeric-pair x+y/1000 evaluation before conversion and classic six-digit formatting; no STL stream implementation is ported. Reporting snapshots its by-value argument before output, inspects LU nonzero counts after cost text, and checks actual cancellation after successful output. Local cost/argument owners survive failures until captured child scratch is cleaned. Full precise/default-tableau Solve remains open."
       ]
     },
     {
@@ -126449,7 +126540,10 @@
         "pkg/util/lp/lu_ready_float.go",
         "pkg/util/lp/lu_ready_exact.go",
         "pkg/util/lp/lu_ready_test.go",
-        "pkg/util/lp/lu_ready_failure_test.go"
+        "pkg/util/lp/lu_ready_failure_test.go",
+        "pkg/util/lp/core_statistics_exact.go",
+        "pkg/util/lp/core_statistics_exact_test.go",
+        "pkg/util/lp/core_base_exact.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -126519,7 +126613,17 @@
         "TestLPLUPreparedSolvesToleranceAndSettings",
         "TestLPLUPreparedSolvesFailurePrefixes",
         "TestLPExactLUPreparedSolvesAllocationCensus",
-        "TestLPExactLUPreparedIndexedCallerOwnership"
+        "TestLPExactLUPreparedIndexedCallerOwnership",
+        "TestLPPairStatisticsIndependentCostOracle",
+        "TestLPPairStatisticsPreservesOlderComparison",
+        "TestLPPairStatisticsGatesCountersAndCancellation",
+        "TestLPPairStatisticsAllWriterPrefixes",
+        "TestLPPairStatisticsByValueAndEvaluationOrder",
+        "TestLPPairStatisticsExactProjectionBeforeFloat",
+        "TestLPPairStatisticsLiveLocalReentryGuard",
+        "TestLPPairStatisticsPhysicalOwnership",
+        "TestLPPairAllColumnsFeasibilityIndependentOracle",
+        "TestLPPairStatisticsReachedGuardsAndPrefixes"
       ],
       "conditionals": [
         {
@@ -126777,6 +126881,23 @@
             "TestLPExactLUPreparedSolvesAllocationCensus",
             "TestLPExactLUPreparedIndexedCallerOwnership"
           ]
+        },
+        {
+          "name": "retained dot_product<mpq,numeric_pair<mpq>>: ascending dense scalar-left products and pair accumulation; only the actual exact specialization",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_statistics_exact.go",
+          "tests": [
+            "TestLPPairStatisticsIndependentCostOracle",
+            "TestLPPairStatisticsPreservesOlderComparison",
+            "TestLPPairStatisticsGatesCountersAndCancellation",
+            "TestLPPairStatisticsAllWriterPrefixes",
+            "TestLPPairStatisticsByValueAndEvaluationOrder",
+            "TestLPPairStatisticsExactProjectionBeforeFloat",
+            "TestLPPairStatisticsLiveLocalReentryGuard",
+            "TestLPPairStatisticsPhysicalOwnership",
+            "TestLPPairAllColumnsFeasibilityIndependentOracle",
+            "TestLPPairStatisticsReachedGuardsAndPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -126800,7 +126921,8 @@
         "Row error-check/refinement now supersedes earlier open-refinement notes: all six retained double/mpq/mpq-pair public methods execute source lu.hpp:313-478. Floating uses one residual correction, full A column-count strict ratio120, passed drop tolerance for residuals and fixed1e-14 for correction cleanup. Precise paths skip residual arithmetic and use strict unsigned ratio30. Source #if0 residual and unused templates are excluded; native Go slices replace vector storage. Independent exact residual/solution worlds, sparse/dense threshold boundaries, approximate-factor one-correction fixtures, post-Suhl integration, actual allocation refusals and caller ownership verify behavior. Dimension extension, complete upstream drivers and scaling/simplex/LAR/MPS remain open; whole units stay partial.",
         "Dimension extension now executes retained lu.h:308-366 for double/double and mpq/numeric_pair, the actual types reached by lar_core_solver.h:74-76 and lar_solver.h:853-855,902-925. No retained scalar mpq/mpq extension consumer exists, so no such unused specialization is added. Native unordered maps replace unordered_set; traversal/fault ordinal counts may vary with allowed set order. Source caller must refactor when dense tails exist or counter+set size reaches200; full caller integration remains open. Original test_small_lu four replacements plus subsequent two-row extension now has independent solution/factorization assertions; source diagnostic output and complete --test_lu driver remain open. Full LP solver remains incomplete; no whole-unit promotion.",
         "init_factorization now has three concrete Go functions for retained explicit instances. Constructor failure publishes the attempted Go owner for explicit cleanup rather than leaving the C++ deleted old pointer dangling. No transactional retention of the old factorization or numerical manager repair is invented. Twelve independent sparse/dense basis worlds cover nil/replacement/invalid construction and reordered bases; four pooled/direct campaigns walk real refusals and replacement after stopped construction, including actual Add/SubMul consumed-scratch re-entry guards. Complete solver caller integration and debug diagnostics remain open.",
-        "Prepared-solve coverage is scoped to retained concrete types. Indexed-X solve_By at lu.hpp:160-165 is a source unimplemented assertion stub and is not credited. Full LU diagnostics and solver integration remain incomplete."
+        "Prepared-solve coverage is scoped to retained concrete types. Indexed-X solve_By at lu.hpp:160-165 is a source unimplemented assertion stub and is not credited. Full LU diagnostics and solver integration remain incomplete.",
+        "Statistics use Go io.Writer/fmt/strconv, retaining exact numeric-pair x+y/1000 evaluation before conversion and classic six-digit formatting; no STL stream implementation is ported. Reporting snapshots its by-value argument before output, inspects LU nonzero counts after cost text, and checks actual cancellation after successful output. Local cost/argument owners survive failures until captured child scratch is cleaned. Full precise/default-tableau Solve remains open."
       ]
     },
     {

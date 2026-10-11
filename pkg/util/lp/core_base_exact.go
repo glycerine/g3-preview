@@ -38,15 +38,18 @@ type PairCoreSolverBase struct {
 	LookForFeasibleSolutionOnly             bool
 	ColumnsNZ, RowsNZ                       []uint32
 	manager                                 *numeral.RationalManager
-	calls                                   exactEtaCalls
-	pivotWork                               *IndexedRationalVector
-	feasibilityWork                         *IndexedPairVector
-	valueWork                               *IndexedPairVector
-	valueScalars                            *IndexedRationalVector
-	residualWork                            *IndexedPairVector
-	residualScalars                         *IndexedRationalVector
-	reconstructionWork                      *IndexedPairVector
-	stopped                                 bool
+	// Source statistics locals survive calls into this owner. They do not
+	// block child ready checks; an interrupted operation stops the owner.
+	statisticsCost, statisticsArgument *IndexedPairVector
+	calls                              exactEtaCalls
+	pivotWork                          *IndexedRationalVector
+	feasibilityWork                    *IndexedPairVector
+	valueWork                          *IndexedPairVector
+	valueScalars                       *IndexedRationalVector
+	residualWork                       *IndexedPairVector
+	residualScalars                    *IndexedRationalVector
+	reconstructionWork                 *IndexedPairVector
+	stopped                            bool
 }
 
 func NewPairCoreSolverBase(in PairCoreInputs) (m *PairCoreSolverBase, err error) {
@@ -400,6 +403,18 @@ func (m *PairCoreSolverBase) Close() error {
 			return err
 		}
 		m.pivotWork = nil
+	}
+	if m.statisticsArgument != nil {
+		if err := m.statisticsArgument.Close(); err != nil {
+			return err
+		}
+		m.statisticsArgument = nil
+	}
+	if m.statisticsCost != nil {
+		if err := m.statisticsCost.Close(); err != nil {
+			return err
+		}
+		m.statisticsCost = nil
 	}
 	return m.calls.cleanupRoots(m.manager)
 }
