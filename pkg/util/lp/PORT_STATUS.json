@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 87.3,
-  "coverage_warning": "Full native checkpoint7957befd includes scalar rational core base, basis, values, reconstruction, reduced costs, snapping, residuals and pivot rows, plus preparation/presolve expression corrections. Profile excludes core_update_rational.go, core_cost_validate_rational.go and core_feasibility_rational.go, and predates the newer RestoreBasisChange stopped guard. Their focused/regression evidence remains separate. Coverage measures existing Go statements, not C++ port completion. Scalar primal core, infeasibility-cost and cost-switching files are newer and retain separate focused evidence. Scalar primal initialization/pricing files are newer and retain separate focused evidence.",
+  "coverage_warning": "Full native checkpoint7957befd includes scalar rational core base, basis, values, reconstruction, reduced costs, snapping, residuals and pivot rows, plus preparation/presolve expression corrections. Profile excludes core_update_rational.go, core_cost_validate_rational.go and core_feasibility_rational.go, and predates the newer RestoreBasisChange stopped guard. Their focused/regression evidence remains separate. Coverage measures existing Go statements, not C++ port completion. Scalar primal core, infeasibility-cost and cost-switching files are newer and retain separate focused evidence. Scalar primal initialization/pricing files are newer and retain separate focused evidence. Scalar Harris/bound/infeasibility/basis-limit/dispatch helpers are newer and retain separate focused evidence.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -12,7 +12,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "remaining exact outer primal/dual MPS construction, full CLI/options/SMT input branches and complete upstream test-driver scenarios",
     "component property tests, coverage and integration audits",
-    "Scalar primal leaving selection, breakpoint advancement, tableau/LU pivot iteration and full Solve; scalar dual core and outer primal/dual optimization/scaling integration; remaining source diagnostics/audits and complete upstream drivers remain open. Full native7957befd predates these additions and does not measure them."
+    "Scalar primal circular leaving selection and row-sparsity ties, breakpoint construction/traversal, advancement, tableau/LU pivot iteration and full Solve; scalar dual core and outer primal/dual optimization/scaling integration; remaining source diagnostics/audits and complete upstream drivers remain open. Full native7957befd predates these additions and does not measure them."
   ],
   "units": [
     {
@@ -2080,7 +2080,13 @@
         "pkg/util/lp/primal_init_run_rational.go",
         "pkg/util/lp/primal_price_rational.go",
         "pkg/util/lp/primal_init_run_rational_test.go",
-        "pkg/util/lp/primal_price_rational_test.go"
+        "pkg/util/lp/primal_price_rational_test.go",
+        "pkg/util/lp/primal_harris_rational.go",
+        "pkg/util/lp/primal_bound_step_rational.go",
+        "pkg/util/lp/primal_inf_limit_rational.go",
+        "pkg/util/lp/primal_basis_limit_rational.go",
+        "pkg/util/lp/primal_basis_dispatch_rational.go",
+        "pkg/util/lp/primal_bound_rational_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2275,7 +2281,17 @@
         "TestLPRationalPrimalPricingSourceGuardsAndPrefixes",
         "TestLPRationalPrimalPricingOlderComparisonOwner",
         "TestLPRationalPrimalPricingBreakpointDirection",
-        "TestLPRationalPrimalPricingCountIndependentRNG"
+        "TestLPRationalPrimalPricingCountIndependentRNG",
+        "TestLPRationalPrimalHarrisIndependentScalarOracle",
+        "TestLPRationalPrimalBoundStepIndependentFlipsAndAliases",
+        "TestLPRationalPrimalLimitThetaIndependentMinimum",
+        "TestLPRationalPrimalInfLimitIndependentScalarOracle",
+        "TestLPRationalPrimalBasisLimitIndependentScalarOracle",
+        "TestLPRationalPrimalBasisDispatchIndependentScalarOracle",
+        "TestLPRationalPrimalBoundPhysicalOwnership",
+        "TestLPRationalPrimalBoundReachedGuards",
+        "TestLPRationalPrimalBoundPreservesOlderComparison",
+        "TestLPRationalPrimalBoundReturnedReferenceCopies"
       ]
     },
     {
@@ -2332,7 +2348,13 @@
         "pkg/util/lp/primal_init_run_rational.go",
         "pkg/util/lp/primal_price_rational.go",
         "pkg/util/lp/primal_init_run_rational_test.go",
-        "pkg/util/lp/primal_price_rational_test.go"
+        "pkg/util/lp/primal_price_rational_test.go",
+        "pkg/util/lp/primal_harris_rational.go",
+        "pkg/util/lp/primal_bound_step_rational.go",
+        "pkg/util/lp/primal_inf_limit_rational.go",
+        "pkg/util/lp/primal_basis_limit_rational.go",
+        "pkg/util/lp/primal_basis_dispatch_rational.go",
+        "pkg/util/lp/primal_bound_rational_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2507,7 +2529,17 @@
         "TestLPRationalPrimalPricingSourceGuardsAndPrefixes",
         "TestLPRationalPrimalPricingOlderComparisonOwner",
         "TestLPRationalPrimalPricingBreakpointDirection",
-        "TestLPRationalPrimalPricingCountIndependentRNG"
+        "TestLPRationalPrimalPricingCountIndependentRNG",
+        "TestLPRationalPrimalHarrisIndependentScalarOracle",
+        "TestLPRationalPrimalBoundStepIndependentFlipsAndAliases",
+        "TestLPRationalPrimalLimitThetaIndependentMinimum",
+        "TestLPRationalPrimalInfLimitIndependentScalarOracle",
+        "TestLPRationalPrimalBasisLimitIndependentScalarOracle",
+        "TestLPRationalPrimalBasisDispatchIndependentScalarOracle",
+        "TestLPRationalPrimalBoundPhysicalOwnership",
+        "TestLPRationalPrimalBoundReachedGuards",
+        "TestLPRationalPrimalBoundPreservesOlderComparison",
+        "TestLPRationalPrimalBoundReturnedReferenceCopies"
       ]
     },
     {
@@ -2529,7 +2561,13 @@
         "pkg/util/lp/primal_init_run_rational.go",
         "pkg/util/lp/primal_price_rational.go",
         "pkg/util/lp/primal_init_run_rational_test.go",
-        "pkg/util/lp/primal_price_rational_test.go"
+        "pkg/util/lp/primal_price_rational_test.go",
+        "pkg/util/lp/primal_harris_rational.go",
+        "pkg/util/lp/primal_bound_step_rational.go",
+        "pkg/util/lp/primal_inf_limit_rational.go",
+        "pkg/util/lp/primal_basis_limit_rational.go",
+        "pkg/util/lp/primal_basis_dispatch_rational.go",
+        "pkg/util/lp/primal_bound_rational_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2574,7 +2612,17 @@
         "TestLPRationalPrimalPricingSourceGuardsAndPrefixes",
         "TestLPRationalPrimalPricingOlderComparisonOwner",
         "TestLPRationalPrimalPricingBreakpointDirection",
-        "TestLPRationalPrimalPricingCountIndependentRNG"
+        "TestLPRationalPrimalPricingCountIndependentRNG",
+        "TestLPRationalPrimalHarrisIndependentScalarOracle",
+        "TestLPRationalPrimalBoundStepIndependentFlipsAndAliases",
+        "TestLPRationalPrimalLimitThetaIndependentMinimum",
+        "TestLPRationalPrimalInfLimitIndependentScalarOracle",
+        "TestLPRationalPrimalBasisLimitIndependentScalarOracle",
+        "TestLPRationalPrimalBasisDispatchIndependentScalarOracle",
+        "TestLPRationalPrimalBoundPhysicalOwnership",
+        "TestLPRationalPrimalBoundReachedGuards",
+        "TestLPRationalPrimalBoundPreservesOlderComparison",
+        "TestLPRationalPrimalBoundReturnedReferenceCopies"
       ]
     },
     {
@@ -6463,6 +6511,123 @@
       "dependency_graph": "64 packages; refreshed",
       "diff_check": "pass",
       "source_portcheck": "2103 units, 677 APIs; pass"
+    }
+  },
+  "latest_rational_bound_increment": {
+    "source": [
+      "src/util/lp/lp_primal_core_solver.h:329,337-368,539-742",
+      "src/util/lp/lp_primal_core_solver.hpp:353-409",
+      "src/util/rational.h:449-493,507-511"
+    ],
+    "retained_consumers": [
+      "src/util/lp/lp_primal_core_solver.hpp:411-475",
+      "src/util/lp/lp_primal_core_solver_instances.cpp:35-36",
+      "src/util/lp/lp_primal_simplex.hpp:248-259"
+    ],
+    "go_targets": [
+      "pkg/util/lp/primal_harris_rational.go",
+      "pkg/util/lp/primal_bound_step_rational.go",
+      "pkg/util/lp/primal_inf_limit_rational.go",
+      "pkg/util/lp/primal_basis_limit_rational.go",
+      "pkg/util/lp/primal_basis_dispatch_rational.go",
+      "pkg/util/lp/primal_bound_rational_test.go",
+      "pkg/util/lp/primal_core_rational.go"
+    ],
+    "tests": [
+      "TestLPRationalPrimalHarrisIndependentScalarOracle",
+      "TestLPRationalPrimalBoundStepIndependentFlipsAndAliases",
+      "TestLPRationalPrimalLimitThetaIndependentMinimum",
+      "TestLPRationalPrimalInfLimitIndependentScalarOracle",
+      "TestLPRationalPrimalBasisLimitIndependentScalarOracle",
+      "TestLPRationalPrimalBasisDispatchIndependentScalarOracle",
+      "TestLPRationalPrimalBoundPhysicalOwnership",
+      "TestLPRationalPrimalBoundReachedGuards",
+      "TestLPRationalPrimalBoundPreservesOlderComparison",
+      "TestLPRationalPrimalBoundReturnedReferenceCopies"
+    ],
+    "coverage": {
+      "native": {
+        "primal_basis_dispatch_rational.go": {
+          "covered": 60,
+          "total": 69,
+          "percent": 87.0
+        },
+        "primal_basis_limit_rational.go": {
+          "covered": 93,
+          "total": 113,
+          "percent": 82.3
+        },
+        "primal_bound_step_rational.go": {
+          "covered": 81,
+          "total": 95,
+          "percent": 85.3
+        },
+        "primal_harris_rational.go": {
+          "covered": 36,
+          "total": 42,
+          "percent": 85.7
+        },
+        "primal_inf_limit_rational.go": {
+          "covered": 81,
+          "total": 105,
+          "percent": 77.1
+        }
+      },
+      "debug": {
+        "primal_basis_dispatch_rational.go": {
+          "covered": 61,
+          "total": 69,
+          "percent": 88.4
+        },
+        "primal_basis_limit_rational.go": {
+          "covered": 100,
+          "total": 113,
+          "percent": 88.5
+        },
+        "primal_bound_step_rational.go": {
+          "covered": 86,
+          "total": 95,
+          "percent": 90.5
+        },
+        "primal_harris_rational.go": {
+          "covered": 36,
+          "total": 42,
+          "percent": 85.7
+        },
+        "primal_inf_limit_rational.go": {
+          "covered": 91,
+          "total": 105,
+          "percent": 86.7
+        }
+      }
+    },
+    "focused_seconds": {
+      "native": 9.694,
+      "debug_checked": 15.598
+    },
+    "coverage_profiles": [
+      "/mnt/oldrog/tmp/g3-rational-bound-native.cover",
+      "/mnt/oldrog/tmp/g3-rational-bound-debug.cover"
+    ],
+    "evidence": "Concrete scalar mpq/mpq bound-step helpers now retain the actual rational expression graph: copied abs(bound), abs/10, scalar1 on the left of addition, shifted value on the left of Harris multiplication, final divide-by3 and every binary operator returned-reference copy. Harris output represents the returned value; a bound flip separately owns its returned subtraction and assignment into t. A source audit added this distinct assignment before final validation. Ratio limits retain bound-x, optional scalar plus/minus epsilon, division by the borrowed multiplier and std::min argument order through native Go comparisons. No numeric_pair coordinate construction or copied scalar denominator is introduced. Basis dispatch owns the source by-value multiplier, uses the stored global infeasibility set rather than recomputing X feasibility, preserves upper/lower/boxed/fixed branch and equality behavior, computes upper-bound epsilon for the source boxed-positive lower target, and clamps an already limited negative theta even on free columns. Exact Harris defaults to zero but the full expression executes; independent nonzero-member worlds test its scalar order without crediting an unused restore_harris_eps adapter. Bound-flip helpers preserve output publication even when the limit rejects the flip, live output/limit aliases and the boxed-only unlimited path without adding its absent nonnegative assertion. Parent raw receipts close before delegated base work and expression/epsilon/by-value owners. Ten test groups cover5120 independent scalar oracle worlds:240 Harris,480 bound flips,160 minima,1440 precise infeasible-bound limits,1200 basis limits and1600 global infeasibility/type/sign dispatch worlds. Borrowed model bounds/X/multiplier and output aliases are checked. Twenty-eight pooled/direct physical campaigns run through success across actual scalar expressions, comparisons, copies and dispatch; every direct campaign requires physical refusal and all ownership censuses pass. Four additional direct campaigns prove completed Harris product, bound quotient, flip returned subtraction and flip assignment refusal: the valid completed temporary equals independent big.Rat arithmetic while the destination remains incomplete, with no active rational normalization/integer GCD/division receipt. Earlier interrupted compound values may have ErrInvalidSlot backing; only that inspection domain is accepted before requiring a valid witness and eventual success. Eight actual older1000-digit caller comparison campaigns survive child calls and Close without adoption. Twenty-six reached nil/extent/sign/assertion/unknown-type/zero-direction/closed profiles test source publication and early bypasses. An initial physical flip fixture placed X above its upper bound; correcting its denominator restores a nonnegative step, while separate negative-step assertion and unlimited-path profiles remain. No production source assertion was relaxed. Final focused checks pass9.694s native/15.598s debug/checked. Both LP vets, both full-module compilation gates, graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_basis_dispatch_rational.go 60/69 (87.0%); native primal_basis_limit_rational.go 93/113 (82.3%); native primal_bound_step_rational.go 81/95 (85.3%); native primal_harris_rational.go 36/42 (85.7%); native primal_inf_limit_rational.go 81/105 (77.1%); debug primal_basis_dispatch_rational.go 61/69 (88.4%); debug primal_basis_limit_rational.go 100/113 (88.5%); debug primal_bound_step_rational.go 86/95 (90.5%); debug primal_harris_rational.go 36/42 (85.7%); debug primal_inf_limit_rational.go 91/105 (86.7%). Remaining blocks chiefly guard stable expression capture/destruction, unchanged numeral metadata and selected typed extent/sign errors; native additionally erases source assertion branches. Inventory remains88 partial/16 unported/6 reference_only; no whole-source or complete upstream-driver promotion. Final related scalar primal and existing pair bound/Harris/infeasibility/basis regressions pass88.533s native/124.535s debug/checked after the separate flip assignment correction. Source portcheck passes (2103 units,677 APIs). Earlier broader scalar core regressions pass109.178s/157.577s before that final local flip assignment correction; final focused and related checks cover the corrected source.",
+    "remaining_work": "Scalar primal circular leaving selection and row-sparsity ties, breakpoint construction/traversal, advancement, tableau/LU pivot iteration and full Solve; scalar dual core and outer primal/dual optimization/scaling integration; remaining source diagnostics/audits and complete upstream drivers remain open. Full native7957befd predates these additions and does not measure them.",
+    "validation": {
+      "lp_vet_native": "pass",
+      "lp_vet_debug_checked": "pass",
+      "module_compile_native": "pass",
+      "module_compile_debug_checked": "pass",
+      "dependency_graph": "64 packages; refreshed",
+      "diff_check": "pass",
+      "source_portcheck": "2103 units, 677 APIs; pass"
+    },
+    "related_regression_seconds": {
+      "native": 88.533,
+      "debug_checked": 124.535
+    },
+    "earlier_broader_regression_seconds": {
+      "native": 109.178,
+      "debug_checked": 157.577,
+      "scope_warning": "Predates final separate flip assignment correction; final focused and related evidence covers the corrected source."
     }
   }
 }

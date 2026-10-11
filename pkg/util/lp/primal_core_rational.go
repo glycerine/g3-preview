@@ -5,8 +5,9 @@ package lp
 import "github.com/glycerine/g3/pkg/util/numeral"
 
 // RationalPrimalCoreSolver borrows scalar model storage and owns exact primal
-// scratch. Construction, feasibility costs, run initialization and precise
-// entering pricing are implemented; pivot iteration and full Solve remain open.
+// scratch. Construction, feasibility costs, initialization, entering pricing
+// and scalar bound-step helpers are implemented. Leaving traversal, pivot
+// iteration and full Solve remain open.
 // Constructor errors return a partial owner to Close before borrowed inputs.
 type RationalPrimalCoreSolver struct {
 	*RationalCoreSolverBase
@@ -19,6 +20,7 @@ type RationalPrimalCoreSolver struct {
 	NonBasisList                                 []uint32
 	calls                                        exactEtaCalls
 	work                                         *IndexedRationalVector
+	stepEpsilon, basisMultiplier                 *IndexedRationalVector
 	stopped                                      bool
 }
 
@@ -68,7 +70,7 @@ func NewRationalPrimalCoreSolver(in RationalCoreInputs) (m *RationalPrimalCoreSo
 	return m, nil
 }
 func (m *RationalPrimalCoreSolver) ready() error {
-	if m.stopped || m.work != nil || m.calls.pending() {
+	if m.stopped || m.work != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return m.RationalCoreSolverBase.ready()
@@ -155,6 +157,18 @@ func (m *RationalPrimalCoreSolver) Close() error {
 			return err
 		}
 		m.work = nil
+	}
+	if m.stepEpsilon != nil {
+		if err := m.stepEpsilon.Close(); err != nil {
+			return err
+		}
+		m.stepEpsilon = nil
+	}
+	if m.basisMultiplier != nil {
+		if err := m.basisMultiplier.Close(); err != nil {
+			return err
+		}
+		m.basisMultiplier = nil
 	}
 	if err := m.manager.Del(&m.ConvertedHarrisEpsilon); err != nil {
 		return err
