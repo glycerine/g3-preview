@@ -6,7 +6,8 @@ import "github.com/glycerine/g3/pkg/util/numeral"
 
 // RationalPrimalCoreSolver borrows scalar model storage and owns exact primal
 // scratch. Construction, feasibility costs, initialization, entering pricing
-// and scalar bound-step helpers are implemented. Leaving traversal, pivot
+// and scalar bound-step/breakpoint record/slope helpers are implemented.
+// Breakpoint collection, leaving traversal, pivot
 // iteration and full Solve remain open.
 // Constructor errors return a partial owner to Close before borrowed inputs.
 type RationalPrimalCoreSolver struct {
@@ -21,6 +22,9 @@ type RationalPrimalCoreSolver struct {
 	calls                                        exactEtaCalls
 	work                                         *IndexedRationalVector
 	stepEpsilon, basisMultiplier                 *IndexedRationalVector
+	Breakpoints                                  []*RationalBreakpoint
+	breakpointWork                               *IndexedRationalVector
+	pendingBreakpoint                            *RationalBreakpoint
 	stopped                                      bool
 }
 
@@ -70,7 +74,7 @@ func NewRationalPrimalCoreSolver(in RationalCoreInputs) (m *RationalPrimalCoreSo
 	return m, nil
 }
 func (m *RationalPrimalCoreSolver) ready() error {
-	if m.stopped || m.work != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.calls.pending() {
+	if m.stopped || m.work != nil || m.stepEpsilon != nil || m.basisMultiplier != nil || m.breakpointWork != nil || m.pendingBreakpoint != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return m.RationalCoreSolverBase.ready()
@@ -152,11 +156,29 @@ func (m *RationalPrimalCoreSolver) Close() error {
 	if err := m.RationalCoreSolverBase.Close(); err != nil {
 		return err
 	}
+	// Queue arithmetic can still borrow the breakpoint priority expression.
+	if m.BreakpointQueue != nil {
+		if err := m.BreakpointQueue.Close(); err != nil {
+			return err
+		}
+	}
 	if m.work != nil {
 		if err := m.work.Close(); err != nil {
 			return err
 		}
 		m.work = nil
+	}
+	if m.pendingBreakpoint != nil {
+		if err := m.manager.Del(m.pendingBreakpoint.Delta); err != nil {
+			return err
+		}
+		m.pendingBreakpoint = nil
+	}
+	if m.breakpointWork != nil {
+		if err := m.breakpointWork.Close(); err != nil {
+			return err
+		}
+		m.breakpointWork = nil
 	}
 	if m.stepEpsilon != nil {
 		if err := m.stepEpsilon.Close(); err != nil {
@@ -186,10 +208,8 @@ func (m *RationalPrimalCoreSolver) Close() error {
 			return err
 		}
 	}
-	if m.BreakpointQueue != nil {
-		if err := m.BreakpointQueue.Close(); err != nil {
-			return err
-		}
+	if err := m.destroyBreakpointRecords(); err != nil {
+		return err
 	}
 	return m.calls.cleanupRoots(m.manager)
 }

@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 87.3,
-  "coverage_warning": "Full native checkpoint7957befd includes scalar rational core base, basis, values, reconstruction, reduced costs, snapping, residuals and pivot rows, plus preparation/presolve expression corrections. Profile excludes core_update_rational.go, core_cost_validate_rational.go and core_feasibility_rational.go, and predates the newer RestoreBasisChange stopped guard. Their focused/regression evidence remains separate. Coverage measures existing Go statements, not C++ port completion. Scalar primal core, infeasibility-cost and cost-switching files are newer and retain separate focused evidence. Scalar primal initialization/pricing files are newer and retain separate focused evidence. Scalar Harris/bound/infeasibility/basis-limit/dispatch helpers are newer and retain separate focused evidence.",
+  "coverage_warning": "Full native checkpoint7957befd includes scalar rational core base, basis, values, reconstruction, reduced costs, snapping, residuals and pivot rows, plus preparation/presolve expression corrections. Profile excludes core_update_rational.go, core_cost_validate_rational.go and core_feasibility_rational.go, and predates the newer RestoreBasisChange stopped guard. Their focused/regression evidence remains separate. Coverage measures existing Go statements, not C++ port completion. Scalar primal core, infeasibility-cost and cost-switching files are newer and retain separate focused evidence. Scalar primal initialization/pricing files are newer and retain separate focused evidence. Scalar Harris/bound/infeasibility/basis-limit/dispatch helpers are newer and retain separate focused evidence. Scalar breakpoint record/queue-priority/slope helpers are newer and retain separate focused evidence.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -210,7 +210,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/primal_breakpoint_float.go",
-        "pkg/util/lp/primal_breakpoint_exact.go"
+        "pkg/util/lp/primal_breakpoint_exact.go",
+        "pkg/util/lp/primal_breakpoint_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalBreakpointIndependentCrossings",
@@ -223,7 +224,13 @@
         "TestLPExactBreakpointPhysicalOwnership",
         "TestLPExactBreakpointSourcePrefixesAndGuards",
         "TestLPExactBreakpointClearBeforeStoppedQueue",
-        "TestLPExactBreakpointPreservesOlderComparisonOwner"
+        "TestLPExactBreakpointPreservesOlderComparisonOwner",
+        "TestLPRationalPrimalBreakpointIndependentRecords",
+        "TestLPRationalPrimalBreakpointIndependentSlopes",
+        "TestLPRationalPrimalBreakpointPhysicalOwnership",
+        "TestLPRationalPrimalBreakpointReachedGuards",
+        "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
+        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
       ]
     },
     {
@@ -2086,7 +2093,8 @@
         "pkg/util/lp/primal_inf_limit_rational.go",
         "pkg/util/lp/primal_basis_limit_rational.go",
         "pkg/util/lp/primal_basis_dispatch_rational.go",
-        "pkg/util/lp/primal_bound_rational_test.go"
+        "pkg/util/lp/primal_bound_rational_test.go",
+        "pkg/util/lp/primal_breakpoint_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2291,7 +2299,13 @@
         "TestLPRationalPrimalBoundPhysicalOwnership",
         "TestLPRationalPrimalBoundReachedGuards",
         "TestLPRationalPrimalBoundPreservesOlderComparison",
-        "TestLPRationalPrimalBoundReturnedReferenceCopies"
+        "TestLPRationalPrimalBoundReturnedReferenceCopies",
+        "TestLPRationalPrimalBreakpointIndependentRecords",
+        "TestLPRationalPrimalBreakpointIndependentSlopes",
+        "TestLPRationalPrimalBreakpointPhysicalOwnership",
+        "TestLPRationalPrimalBreakpointReachedGuards",
+        "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
+        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
       ]
     },
     {
@@ -2354,7 +2368,8 @@
         "pkg/util/lp/primal_inf_limit_rational.go",
         "pkg/util/lp/primal_basis_limit_rational.go",
         "pkg/util/lp/primal_basis_dispatch_rational.go",
-        "pkg/util/lp/primal_bound_rational_test.go"
+        "pkg/util/lp/primal_bound_rational_test.go",
+        "pkg/util/lp/primal_breakpoint_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -2539,7 +2554,13 @@
         "TestLPRationalPrimalBoundPhysicalOwnership",
         "TestLPRationalPrimalBoundReachedGuards",
         "TestLPRationalPrimalBoundPreservesOlderComparison",
-        "TestLPRationalPrimalBoundReturnedReferenceCopies"
+        "TestLPRationalPrimalBoundReturnedReferenceCopies",
+        "TestLPRationalPrimalBreakpointIndependentRecords",
+        "TestLPRationalPrimalBreakpointIndependentSlopes",
+        "TestLPRationalPrimalBreakpointPhysicalOwnership",
+        "TestLPRationalPrimalBreakpointReachedGuards",
+        "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
+        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
       ]
     },
     {
@@ -6652,5 +6673,39 @@
     "status_file": "/mnt/oldrog/tmp/g3-rational-bound-module-native.json",
     "go_pid": 5,
     "session_id": 39459
+  },
+  "latest_rational_breakpoint_increment": {
+    "scope": "Retained scalar mpq/mpq breakpoint record construction/copy, owned delta destruction, scalar absolute queue priority and slope changes",
+    "source_units_promoted": false,
+    "focused_native_seconds": 0.462,
+    "focused_debug_checked_seconds": 0.633,
+    "statement_coverage": {
+      "native": {
+        "covered": 107,
+        "total": 136,
+        "percent": 78.7
+      },
+      "debug_checked": {
+        "covered": 114,
+        "total": 136,
+        "percent": 83.8
+      }
+    },
+    "independent_record_worlds": 180,
+    "independent_slope_worlds": 480,
+    "physical_campaigns": 8,
+    "older_comparison_campaigns": 2,
+    "remaining": "Scalar breakpoint collection/traversal, circular leaving selection, pivot advancement and complete scalar Solve remain open. Complete LP implementation/upstream drivers and audits remain incomplete.",
+    "related_native_seconds": 37.678,
+    "related_debug_checked_seconds": 51.775,
+    "verification": [
+      "both focused profiles",
+      "both related regression profiles",
+      "both LP vets",
+      "both module compile gates",
+      "dependency graph refresh",
+      "diff check",
+      "source portcheck: 2103 units, 677 APIs"
+    ]
   }
 }

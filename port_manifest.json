@@ -118403,7 +118403,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/primal_breakpoint_float.go",
-        "pkg/util/lp/primal_breakpoint_exact.go"
+        "pkg/util/lp/primal_breakpoint_exact.go",
+        "pkg/util/lp/primal_breakpoint_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalBreakpointIndependentCrossings",
@@ -118416,7 +118417,13 @@
         "TestLPExactBreakpointPhysicalOwnership",
         "TestLPExactBreakpointSourcePrefixesAndGuards",
         "TestLPExactBreakpointClearBeforeStoppedQueue",
-        "TestLPExactBreakpointPreservesOlderComparisonOwner"
+        "TestLPExactBreakpointPreservesOlderComparisonOwner",
+        "TestLPRationalPrimalBreakpointIndependentRecords",
+        "TestLPRationalPrimalBreakpointIndependentSlopes",
+        "TestLPRationalPrimalBreakpointPhysicalOwnership",
+        "TestLPRationalPrimalBreakpointReachedGuards",
+        "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
+        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -118446,6 +118453,19 @@
             "TestLPExactBreakpointSourcePrefixesAndGuards",
             "TestLPExactBreakpointClearBeforeStoppedQueue",
             "TestLPExactBreakpointPreservesOlderComparisonOwner"
+          ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq breakpoint record construction/copy, owned delta destruction, scalar absolute queue priority and slope changes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_breakpoint_rational.go",
+          "tests": [
+            "TestLPRationalPrimalBreakpointIndependentRecords",
+            "TestLPRationalPrimalBreakpointIndependentSlopes",
+            "TestLPRationalPrimalBreakpointPhysicalOwnership",
+            "TestLPRationalPrimalBreakpointReachedGuards",
+            "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
+            "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
           ]
         }
       ],
@@ -125237,7 +125257,8 @@
         "pkg/util/lp/primal_inf_limit_rational.go",
         "pkg/util/lp/primal_basis_limit_rational.go",
         "pkg/util/lp/primal_basis_dispatch_rational.go",
-        "pkg/util/lp/primal_bound_rational_test.go"
+        "pkg/util/lp/primal_bound_rational_test.go",
+        "pkg/util/lp/primal_breakpoint_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -125442,7 +125463,13 @@
         "TestLPRationalPrimalBoundPhysicalOwnership",
         "TestLPRationalPrimalBoundReachedGuards",
         "TestLPRationalPrimalBoundPreservesOlderComparison",
-        "TestLPRationalPrimalBoundReturnedReferenceCopies"
+        "TestLPRationalPrimalBoundReturnedReferenceCopies",
+        "TestLPRationalPrimalBreakpointIndependentRecords",
+        "TestLPRationalPrimalBreakpointIndependentSlopes",
+        "TestLPRationalPrimalBreakpointPhysicalOwnership",
+        "TestLPRationalPrimalBreakpointReachedGuards",
+        "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
+        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
       ],
       "conditionals": [
         {
@@ -126052,6 +126079,19 @@
             "TestLPRationalPrimalBoundPreservesOlderComparison",
             "TestLPRationalPrimalBoundReturnedReferenceCopies"
           ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq breakpoint record construction/copy, owned delta destruction, scalar absolute queue priority and slope changes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_breakpoint_rational.go",
+          "tests": [
+            "TestLPRationalPrimalBreakpointIndependentRecords",
+            "TestLPRationalPrimalBreakpointIndependentSlopes",
+            "TestLPRationalPrimalBreakpointPhysicalOwnership",
+            "TestLPRationalPrimalBreakpointReachedGuards",
+            "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
+            "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
+          ]
         }
       ],
       "ownership": [
@@ -126150,7 +126190,8 @@
         "pkg/util/lp/primal_inf_limit_rational.go",
         "pkg/util/lp/primal_basis_limit_rational.go",
         "pkg/util/lp/primal_basis_dispatch_rational.go",
-        "pkg/util/lp/primal_bound_rational_test.go"
+        "pkg/util/lp/primal_bound_rational_test.go",
+        "pkg/util/lp/primal_breakpoint_rational.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -126335,7 +126376,13 @@
         "TestLPRationalPrimalBoundPhysicalOwnership",
         "TestLPRationalPrimalBoundReachedGuards",
         "TestLPRationalPrimalBoundPreservesOlderComparison",
-        "TestLPRationalPrimalBoundReturnedReferenceCopies"
+        "TestLPRationalPrimalBoundReturnedReferenceCopies",
+        "TestLPRationalPrimalBreakpointIndependentRecords",
+        "TestLPRationalPrimalBreakpointIndependentSlopes",
+        "TestLPRationalPrimalBreakpointPhysicalOwnership",
+        "TestLPRationalPrimalBreakpointReachedGuards",
+        "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
+        "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
       ],
       "conditionals": [
         {
@@ -127020,6 +127067,19 @@
             "TestLPRationalPrimalBoundReachedGuards",
             "TestLPRationalPrimalBoundPreservesOlderComparison",
             "TestLPRationalPrimalBoundReturnedReferenceCopies"
+          ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq breakpoint record construction/copy, owned delta destruction, scalar absolute queue priority and slope changes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_breakpoint_rational.go",
+          "tests": [
+            "TestLPRationalPrimalBreakpointIndependentRecords",
+            "TestLPRationalPrimalBreakpointIndependentSlopes",
+            "TestLPRationalPrimalBreakpointPhysicalOwnership",
+            "TestLPRationalPrimalBreakpointReachedGuards",
+            "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
+            "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
           ]
         }
       ],

@@ -1314,6 +1314,7 @@
         "primal_breakpoint_collect_exact.go",
         "primal_breakpoint_exact.go",
         "primal_breakpoint_float.go",
+        "primal_breakpoint_rational.go",
         "primal_core_exact.go",
         "primal_core_float.go",
         "primal_core_rational.go",
