@@ -92208,11 +92208,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/arith/bound_equation_store.go",
-        "pkg/tactic/arith/bound_equation_store_test.go"
+        "pkg/tactic/arith/bound_equation_store_test.go",
+        "pkg/tactic/arith/bound_values.go",
+        "pkg/tactic/arith/bound_values_test.go"
       ],
       "tests": [
         "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
-        "TestBoundEquationStoreRationalConstructionAndCancellation"
+        "TestBoundEquationStoreRationalConstructionAndCancellation",
+        "TestBoundEquationStoreExactBoundsRoundingConflictAndPolynomial",
+        "TestBoundEquationStoreRationalStrictTieAndRelaxedApproximation"
       ],
       "conditionals": [
         {
@@ -92319,6 +92323,15 @@
           ]
         },
         {
+          "name": "exact level-zero lower/upper assertions, integer rounding, strict improvements, relaxed approximation, feasibility conflict and concrete rational polynomial-bound query",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_values.go",
+          "tests": [
+            "TestBoundEquationStoreExactBoundsRoundingConflictAndPolynomial",
+            "TestBoundEquationStoreRationalStrictTieAndRelaxedApproximation"
+          ]
+        },
+        {
           "name": "bound propagation, scope trails, bound ownership, params, statistics and conflict/explanation paths",
           "status": "unported",
           "go_target": null,
@@ -92326,10 +92339,12 @@
         }
       ],
       "ownership": [
-        "The equation store owns each accepted linear equation; watch lists contain constraint indexes only. DeleteConstraints releases equations in insertion order and clears watch lists. Rational numeral manager remains borrowed."
+        "The equation store owns each accepted linear equation; watch lists contain constraint indexes only. DeleteConstraints releases equations in insertion order and clears watch lists. Rational numeral manager remains borrowed.",
+        "Each accepted bound owns a rational copy; replaced bounds remain on the insertion trail and are destroyed in reverse insertion order when the store closes. Query outputs are caller-owned copies."
       ],
       "deviations": [
-        "This concrete equation/watch-list owner covers the source setup and cleanup path only. It does not yet run source init_eq propagation or maintain bound/trail state. Invalid variable IDs return Go bounds errors instead of indexing outside source vectors."
+        "This concrete equation/watch-list owner covers the source setup and cleanup path only. It does not yet run source init_eq propagation or maintain bound/trail state. Invalid variable IDs return Go bounds errors instead of indexing outside source vectors.",
+        "This increment covers level-zero bound values and the rational get_bound instantiation. Derived/assumption kind, propagation, scopes and trail undo remain open."
       ]
     },
     {
@@ -92339,11 +92354,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/arith/bound_equation_store.go",
-        "pkg/tactic/arith/bound_equation_store_test.go"
+        "pkg/tactic/arith/bound_equation_store_test.go",
+        "pkg/tactic/arith/bound_values.go",
+        "pkg/tactic/arith/bound_values_test.go"
       ],
       "tests": [
         "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
-        "TestBoundEquationStoreRationalConstructionAndCancellation"
+        "TestBoundEquationStoreRationalConstructionAndCancellation",
+        "TestBoundEquationStoreExactBoundsRoundingConflictAndPolynomial",
+        "TestBoundEquationStoreRationalStrictTieAndRelaxedApproximation"
       ],
       "conditionals": [
         {
@@ -92394,6 +92413,15 @@
           ]
         },
         {
+          "name": "exact level-zero lower/upper assertions, integer rounding, strict improvements, relaxed approximation, feasibility conflict and concrete rational polynomial-bound query",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_values.go",
+          "tests": [
+            "TestBoundEquationStoreExactBoundsRoundingConflictAndPolynomial",
+            "TestBoundEquationStoreRationalStrictTieAndRelaxedApproximation"
+          ]
+        },
+        {
           "name": "bound propagation, scope trails, bound ownership, params, statistics and conflict/explanation paths",
           "status": "unported",
           "go_target": null,
@@ -92401,10 +92429,12 @@
         }
       ],
       "ownership": [
-        "The equation store owns each accepted linear equation; watch lists contain constraint indexes only. DeleteConstraints releases equations in insertion order and clears watch lists. Rational numeral manager remains borrowed."
+        "The equation store owns each accepted linear equation; watch lists contain constraint indexes only. DeleteConstraints releases equations in insertion order and clears watch lists. Rational numeral manager remains borrowed.",
+        "Each accepted bound owns a rational copy; replaced bounds remain on the insertion trail and are destroyed in reverse insertion order when the store closes. Query outputs are caller-owned copies."
       ],
       "deviations": [
-        "This concrete equation/watch-list owner covers the source setup and cleanup path only. It does not yet run source init_eq propagation or maintain bound/trail state. Invalid variable IDs return Go bounds errors instead of indexing outside source vectors."
+        "This concrete equation/watch-list owner covers the source setup and cleanup path only. It does not yet run source init_eq propagation or maintain bound/trail state. Invalid variable IDs return Go bounds errors instead of indexing outside source vectors.",
+        "This increment covers level-zero bound values and the rational get_bound instantiation. Derived/assumption kind, propagation, scopes and trail undo remain open."
       ]
     },
     {

@@ -12,9 +12,13 @@ import (
 // by the bound propagator. Propagation and bound trails belong to later paths.
 type BoundEquationStore struct {
 	self        *BoundEquationStore
+	manager     *numeral.RationalManager
 	equations   *LinearEquationManager
 	constraints []equationConstraint
 	variables   []equationVariable
+	trail       []*equationBound
+	conflict    uint32
+	timestamp   uint32
 	closed      bool
 }
 
@@ -27,6 +31,8 @@ type equationVariable struct {
 	active  bool
 	integer bool
 	watches []uint32
+	lower   *equationBound
+	upper   *equationBound
 }
 
 func NewBoundEquationStore(m *numeral.RationalManager) (*BoundEquationStore, error) {
@@ -34,7 +40,7 @@ func NewBoundEquationStore(m *numeral.RationalManager) (*BoundEquationStore, err
 	if err != nil {
 		return nil, err
 	}
-	s := &BoundEquationStore{equations: equations}
+	s := &BoundEquationStore{manager: m, equations: equations, conflict: noEquationPosition}
 	s.self = s
 	return s, nil
 }
@@ -65,6 +71,7 @@ func (s *BoundEquationStore) MkVar(x uint32, integer bool) error {
 		return arena.ErrInvalidSlot
 	}
 	v.active, v.integer, v.watches = true, integer, v.watches[:0]
+	v.lower, v.upper = nil, nil
 	return nil
 }
 
@@ -184,6 +191,12 @@ func (s *BoundEquationStore) Close() error {
 	if s.closed {
 		return nil
 	}
+	for i := len(s.trail) - 1; i >= 0; i-- {
+		if err := s.manager.Del(&s.trail[i].value); err != nil {
+			return err
+		}
+	}
+	s.trail = nil
 	if err := s.DeleteConstraints(); err != nil {
 		return err
 	}
