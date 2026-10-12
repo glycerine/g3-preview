@@ -291,4 +291,141 @@ func TestRationalIntervalRetainedPredicatesAddSubAndOwnership(t *testing.T) {
 	assertPower(2, "[0, 9]") // equal maxima prefer closed lower endpoint
 	setPowerInput("-3", "3", true, true)
 	assertPower(2, "[0, 9)")
+	assertInverse := func(want string) {
+		t.Helper()
+		must(c.Inv(a))
+		out.Reset()
+		must(c.Display(&out))
+		if out.String() != want {
+			t.Fatalf("interval inverse = %q, want %q", out.String(), want)
+		}
+	}
+	setPowerInput("2", "4", false, false)
+	assertInverse("[1/4, 1/2]")
+	must(c.Inv(c))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[2, 4]" {
+		t.Fatalf("aliased inverse = %q", out.String())
+	}
+	setPowerInput("0", "4", true, false)
+	assertInverse("[1/4, +oo)")
+	setPowerInput("2", "4", false, false)
+	must(a.ResetUpper())
+	assertInverse("(0, 1/2]")
+	setPowerInput("-4", "-2", false, false)
+	assertInverse("[-1/2, -1/4]")
+	must(a.ResetLower())
+	assertInverse("[-1/2, 0)")
+	setPowerInput("-4", "0", false, true)
+	assertInverse("(-oo, -1/4]")
+	setPowerInput("-1", "1", false, false)
+	if err := c.Inv(a); err != ErrExtendedDomain {
+		t.Fatalf("zero-containing inverse error = %v", err)
+	}
+	quotInputs := map[byte][2]string{'N': {"-4", "-2"}, 'M': {"-2", "4"}, 'P': {"2", "4"}}
+	quotWant := map[string]string{
+		"NN": "[1/2, 2]", "NP": "[-2, -1/2]",
+		"MN": "[-2, 1]", "MP": "[-1, 2]",
+		"PN": "[-2, -1/2]", "PP": "[1/2, 2]",
+	}
+	setQuot := func(dst *RationalInterval, class byte) {
+		t.Helper()
+		bounds := quotInputs[class]
+		must(m.SetString(&lower, bounds[0]))
+		must(m.SetString(&upper, bounds[1]))
+		must(dst.SetFinite(&lower, &upper, false, false))
+	}
+	for pair, want := range quotWant {
+		setQuot(a, pair[0])
+		setQuot(b, pair[1])
+		must(c.Div(a, b))
+		out.Reset()
+		must(c.Display(&out))
+		if out.String() != want {
+			t.Fatalf("interval quotient %s = %q, want %q", pair, out.String(), want)
+		}
+	}
+	setQuot(a, 'P')
+	setQuot(b, 'P')
+	must(c.SetFrom(b))
+	must(c.Div(a, c))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[1/2, 2]" {
+		t.Fatalf("aliased denominator quotient = %q", out.String())
+	}
+	if err := a.Div(a, b); err != arena.ErrInvalidSlot {
+		t.Fatalf("numerator alias accepted: %v", err)
+	}
+	must(m.SetInt32(&lower, 0))
+	must(m.SetInt32(&upper, 0))
+	must(a.SetFinite(&lower, &upper, false, false))
+	must(c.Div(a, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[0, 0]" {
+		t.Fatalf("zero numerator quotient = %q", out.String())
+	}
+	setQuot(a, 'P')
+	must(m.SetInt32(&lower, 0))
+	must(m.SetInt32(&upper, 2))
+	must(b.SetFinite(&lower, &upper, true, false))
+	must(c.Div(a, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[1, +oo)" {
+		t.Fatalf("positive open-zero divisor = %q", out.String())
+	}
+	setQuot(a, 'N')
+	must(c.Div(a, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "(-oo, -1]" {
+		t.Fatalf("negative over positive open zero = %q", out.String())
+	}
+	setQuot(a, 'M')
+	must(c.Div(a, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "(-oo, +oo)" {
+		t.Fatalf("mixed open-zero divisor = %q", out.String())
+	}
+	setQuot(a, 'N')
+	must(m.SetInt32(&lower, -2))
+	must(m.SetInt32(&upper, 0))
+	must(b.SetFinite(&lower, &upper, false, true))
+	must(c.Div(a, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[1, +oo)" {
+		t.Fatalf("negative open-zero divisor = %q", out.String())
+	}
+	setQuot(a, 'P')
+	must(c.Div(a, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "(-oo, -1]" {
+		t.Fatalf("positive over negative open zero = %q", out.String())
+	}
+	setQuot(a, 'M')
+	must(c.Div(a, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "(-oo, +oo)" {
+		t.Fatalf("mixed over negative open zero = %q", out.String())
+	}
+	setQuot(a, 'P')
+	setQuot(b, 'P')
+	must(b.ResetUpper())
+	must(c.Div(a, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "(0, 2]" {
+		t.Fatalf("infinite divisor quotient = %q", out.String())
+	}
+	setPowerInput("-1", "1", false, false)
+	if err := c.Div(b, a); err != ErrExtendedDomain {
+		t.Fatalf("zero-containing divisor error = %v", err)
+	}
 }

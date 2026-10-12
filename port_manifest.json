@@ -34495,7 +34495,9 @@
         "pkg/math/interval/rational_interval.go",
         "pkg/math/interval/rational_interval_test.go",
         "pkg/math/interval/rational_interval_mul.go",
-        "pkg/math/interval/rational_interval_power.go"
+        "pkg/math/interval/rational_interval_power.go",
+        "pkg/math/interval/rational_interval_inv.go",
+        "pkg/math/interval/rational_interval_div.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
@@ -34875,6 +34877,22 @@
           "name": "Concrete mpq interval powers: n=1 copy, positive and negative even, crossing-zero equal-max tie, odd monotonic, infinity and in-place endpoints (src/math/interval/interval_def.h:1271-1378)",
           "status": "partial",
           "go_target": "pkg/math/interval/rational_interval_power.go",
+          "tests": [
+            "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+          ]
+        },
+        {
+          "name": "Concrete mpq reciprocal: positive and negative intervals, open zero and infinite bounds, alias-safe owned endpoint scratch (src/math/interval/interval_def.h:1503-1590)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/rational_interval_inv.go",
+          "tests": [
+            "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+          ]
+        },
+        {
+          "name": "Concrete mpq interval division: source six sign branches, open-zero and infinite denominator bounds, zero numerator and numerator-alias precondition (src/math/interval/interval_def.h:1672-1849)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/rational_interval_div.go",
           "tests": [
             "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
           ]
@@ -115039,7 +115057,9 @@
         "pkg/math/interval/rational_interval.go",
         "pkg/math/interval/rational_interval_test.go",
         "pkg/math/interval/rational_interval_mul.go",
-        "pkg/math/interval/rational_interval_power.go"
+        "pkg/math/interval/rational_interval_power.go",
+        "pkg/math/interval/rational_interval_inv.go",
+        "pkg/math/interval/rational_interval_div.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",
