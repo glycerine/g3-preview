@@ -115845,8 +115845,8 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "constructor/destructor and implicit deep copy/assignment",
-          "status": "partial",
+          "name": "retained SAT int-heap constructor/destructor and implicit deep copy/assignment, excluding process-global assertion transport",
+          "status": "ported",
           "go_target": "pkg/util/heap/heap.go",
           "tests": [
             "TestHeapSourceAssertions",
@@ -115856,7 +115856,9 @@
             "TestHeapEpochBoundsIteratorAndComparatorSwap",
             "TestHeapSourceBoundsGrowth",
             "TestHeapCopyAndAllocationSizeBoundary",
-            "TestHeapSwapSecondReservationAndFinitePeak"
+            "TestHeapSwapSecondReservationAndFinitePeak",
+            "TestHeapAssignmentSourceDestroyedFirstMember",
+            "TestHeapLegacyCopiedCloseRejectsBeforeRefund"
           ]
         },
         {

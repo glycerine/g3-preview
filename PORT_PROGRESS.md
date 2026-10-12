@@ -39547,3 +39547,17 @@ wrap. A focused public rewriter test checks width-64 extraction from a
 65-bit literal, extraction with a shift count of 64, logical shifts at 63,
 and signed arithmetic shifts at 1 and 64. These two selected helpers are
 credited as ported; other `util.h` methods remain under audit.
+
+### Retained SAT integer-heap lifetime audit
+
+The concrete `heap<sat::var_queue::lt>` constructor, destructor, implicit copy
+and assignment paths in `src/util/heap.h` map to `pkg/util/heap.Int` and its
+SAT queue caller. The comparator borrows the activity vector; clone and
+assignment preserve that borrow while copying value and inverse-index arrays
+independently. Constructor failure and clone failure release completed owners;
+assignment copies the comparator before replacing the two arrays in source
+order and retains a stopped, destructively updated owner on a refused copy.
+Existing focused owner, deep-copy, allocation-frontier and SAT queue checks
+pass in native and checked/debug profiles on CPUs 8–16. This selected method
+row moves to ported. `heap.h` remains partial for SMT and other concrete
+instantiations, process-global assertion transport and full source audit.
