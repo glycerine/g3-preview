@@ -436,6 +436,7 @@
       ],
       "production_files": [
         "binary_extended.go",
+        "fixed_extended.go",
         "rational_extended.go",
         "rational_interval.go",
         "rational_interval_deps.go",
@@ -1755,6 +1756,7 @@
         "mpfx_convert.go",
         "mpfx_core.go",
         "mpfx_ops.go",
+        "mpfx_predicates.go",
         "mpn.go",
         "mpn_cstring.go",
         "mpn_display_raw.go",

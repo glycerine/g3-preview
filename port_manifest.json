@@ -115206,13 +115206,16 @@
         "pkg/math/realclosure/binary_interval_mul.go",
         "pkg/math/realclosure/binary_interval_inv.go",
         "pkg/math/realclosure/binary_interval_div.go",
-        "pkg/util/numeral/mpbq_format.go"
+        "pkg/util/numeral/mpbq_format.go",
+        "pkg/math/interval/fixed_extended.go",
+        "pkg/math/interval/fixed_extended_test.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
         "TestRealClosureBinaryExtendedNumeralBranches",
-        "TestRealClosureBinaryIntervalRetainedCore"
+        "TestRealClosureBinaryIntervalRetainedCore",
+        "TestSubpavingFixedExtendedRetainedBranches"
       ],
       "conditionals": [
         {
@@ -115296,6 +115299,14 @@
           "tests": [
             "TestRealClosureBinaryIntervalRetainedCore"
           ]
+        },
+        {
+          "name": "Concrete mpfx extended-number finite/infinity sign, order, negation, add/sub/mul/div, reciprocal and power reached by subpaving interval template (src/util/ext_numeral.h:27-344)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/fixed_extended.go",
+          "tests": [
+            "TestSubpavingFixedExtendedRetainedBranches"
+          ]
         }
       ],
       "ownership": [
@@ -115303,7 +115314,8 @@
       ],
       "deviations": [
         "No generic manager-interface translation is retained. The sole production consumer is the unported math/interval subsystem; implement its concrete numeral specialization beside that consumer when interval is ported. src/test/ext_numeral.cpp is test-only and supplies no production reason to retain an unused Go abstraction.",
-        "Whole-source instantiation audit found real-closure mpbq and subpaving mpq/mpfx/mpf/mpff/hwf consumers; the concrete rational and binary-rational Go paths do not close all retained instantiations."
+        "Whole-source instantiation audit found real-closure mpbq and subpaving mpq/mpfx/mpf/mpff/hwf consumers; the concrete rational and binary-rational Go paths do not close all retained instantiations.",
+        "The concrete mpfx extended-number path is present but not yet wired to a subpaving interval owner; this does not complete the live subpaving instantiation."
       ]
     },
     {
@@ -147095,14 +147107,17 @@
         "pkg/util/numeral/mpfx_ops.go",
         "pkg/util/numeral/mpfx_ops_test.go",
         "pkg/util/numeral/mpfx_convert.go",
-        "pkg/util/numeral/mpfx_convert_test.go"
+        "pkg/util/numeral/mpfx_convert_test.go",
+        "pkg/util/numeral/mpfx_predicates.go",
+        "pkg/util/numeral/mpfx_predicates_test.go"
       ],
       "tests": [
         "TestFixedPointRetainedArithmeticAndDirectedRounding",
         "TestFixedPointRangeOwnershipAndPublication",
         "TestFixedPointRetainedFloorCeilInverseAndPower",
         "TestFixedPointPowerAliasExtraSquareAndCeilOverflow",
-        "TestFixedPointRetainedRationalIntegerConversionAndDisplay"
+        "TestFixedPointRetainedRationalIntegerConversionAndDisplay",
+        "TestFixedPointRetainedOrderingSignsIncrementAndSwap"
       ],
       "conditionals": [
         {
@@ -147364,6 +147379,14 @@
           "tests": [
             "TestFixedPointRetainedRationalIntegerConversionAndDisplay"
           ]
+        },
+        {
+          "name": "Retained mpfx sign/one predicates, six exact comparison relations, source increment/decrement and owned numeral swap reached by subpaving bounds and coefficient storage (src/util/mpfx.h:160-247; src/util/mpfx.cpp:316-417)",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpfx_predicates.go",
+          "tests": [
+            "TestFixedPointRetainedOrderingSignsIncrementAndSwap"
+          ]
         }
       ],
       "ownership": [
@@ -147386,14 +147409,17 @@
         "pkg/util/numeral/mpfx_ops.go",
         "pkg/util/numeral/mpfx_ops_test.go",
         "pkg/util/numeral/mpfx_convert.go",
-        "pkg/util/numeral/mpfx_convert_test.go"
+        "pkg/util/numeral/mpfx_convert_test.go",
+        "pkg/util/numeral/mpfx_predicates.go",
+        "pkg/util/numeral/mpfx_predicates_test.go"
       ],
       "tests": [
         "TestFixedPointRetainedArithmeticAndDirectedRounding",
         "TestFixedPointRangeOwnershipAndPublication",
         "TestFixedPointRetainedFloorCeilInverseAndPower",
         "TestFixedPointPowerAliasExtraSquareAndCeilOverflow",
-        "TestFixedPointRetainedRationalIntegerConversionAndDisplay"
+        "TestFixedPointRetainedRationalIntegerConversionAndDisplay",
+        "TestFixedPointRetainedOrderingSignsIncrementAndSwap"
       ],
       "conditionals": [
         {
@@ -147432,6 +147458,14 @@
           "go_target": "pkg/util/numeral/mpfx_convert.go",
           "tests": [
             "TestFixedPointRetainedRationalIntegerConversionAndDisplay"
+          ]
+        },
+        {
+          "name": "Retained mpfx sign/one predicates, six exact comparison relations, source increment/decrement and owned numeral swap reached by subpaving bounds and coefficient storage (src/util/mpfx.h:160-247; src/util/mpfx.cpp:316-417)",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpfx_predicates.go",
+          "tests": [
+            "TestFixedPointRetainedOrderingSignsIncrementAndSwap"
           ]
         }
       ],
