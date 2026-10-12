@@ -33800,6 +33800,8 @@
         "pkg/math/euclid/equation_test.go",
         "pkg/math/euclid/numeral_buffer_sort.go",
         "pkg/math/euclid/numeral_buffer_sort_test.go",
+        "pkg/math/euclid/solver_setup.go",
+        "pkg/math/euclid/solver_setup_test.go",
         "pkg/util/numeral/scoped_numeral.go"
       ],
       "tests": [
@@ -33807,7 +33809,10 @@
         "TestEuclideanEquationHeaderRefusalPrecedesBufferMutation",
         "TestEuclideanEquationUnsortedDecompositionBranch",
         "TestEuclideanIntegerBufferSortAndRawSwap",
-        "TestEuclideanRationalBufferSortAndRawSwap"
+        "TestEuclideanRationalBufferSortAndRawSwap",
+        "TestEuclideanPositionSourceBinarySearch",
+        "TestEuclideanSetupVariableJustificationAndEquationOwnership",
+        "TestEuclideanSetupHeaderRefusalBeforeBuffers"
       ],
       "assertions": [
         {
@@ -33894,13 +33899,24 @@
           ]
         },
         {
+          "name": "imp pre-elimination constructor, pos, mk_var and mk_justification metadata/buffer publication, owned equation-list cleanup",
+          "status": "partial",
+          "go_target": "pkg/math/euclid/solver_setup.go",
+          "tests": [
+            "TestEuclideanPositionSourceBinarySearch",
+            "TestEuclideanSetupVariableJustificationAndEquationOwnership",
+            "TestEuclideanSetupHeaderRefusalBeforeBuffers"
+          ]
+        },
+        {
           "name": "elimination, decomposition and model/justification algorithms",
           "status": "unported"
         }
       ],
       "ownership": [
         "The partial sort path borrows the rational manager, copies coefficient numerals into typed owned buffer slots, sorts scalar IDs, then swaps each raw numeral with its source-indexed slot. A whole-slice raw swap transfers numeral ownership between the equation slice and buffer without cloning.",
-        "The concrete equation allocates its owner header first, copies coefficients into indexed reusable slots, transfers them into its vectors with sort_core, then owns its constant, integer coefficients and rational justifications. del_eq releases those in that order, leaving caller inputs and reusable buffers separately owned."
+        "The concrete equation allocates its owner header first, copies coefficients into indexed reusable slots, transfers them into its vectors with sort_core, then owns its constant, integer coefficients and rational justifications. del_eq releases those in that order, leaving caller inputs and reusable buffers separately owned.",
+        "The pre-elimination setup borrows its rational manager, publishes variable metadata before the matching integer buffer slot, publishes a justification buffer slot before incrementing its ID, owns equation pointers in source list order, and closes its rational then integer member buffers in reverse declaration order."
       ],
       "deviations": [
         "The Euclidean solver body is not yet ported; this covers its concrete numeric buffer, sort, and equation construction/destruction paths only."
@@ -155519,11 +155535,14 @@
       "go_targets": [
         "pkg/util/numeral/scoped_numeral.go",
         "pkg/math/euclid/numeral_buffer_sort.go",
-        "pkg/math/euclid/numeral_buffer_sort_test.go"
+        "pkg/math/euclid/numeral_buffer_sort_test.go",
+        "pkg/math/euclid/solver_setup.go",
+        "pkg/math/euclid/solver_setup_test.go"
       ],
       "tests": [
         "TestEuclideanIntegerBufferSortAndRawSwap",
-        "TestEuclideanRationalBufferSortAndRawSwap"
+        "TestEuclideanRationalBufferSortAndRawSwap",
+        "TestEuclideanSetupVariableJustificationAndEquationOwnership"
       ],
       "conditionals": [
         {
@@ -155543,7 +155562,8 @@
           "status": "partial",
           "go_target": "pkg/util/numeral/scoped_numeral.go",
           "tests": [
-            "TestEuclideanIntegerBufferSortAndRawSwap"
+            "TestEuclideanIntegerBufferSortAndRawSwap",
+            "TestEuclideanSetupVariableJustificationAndEquationOwnership"
           ]
         },
         {
@@ -155551,7 +155571,8 @@
           "status": "partial",
           "go_target": "pkg/util/numeral/scoped_numeral.go",
           "tests": [
-            "TestEuclideanRationalBufferSortAndRawSwap"
+            "TestEuclideanRationalBufferSortAndRawSwap",
+            "TestEuclideanSetupVariableJustificationAndEquationOwnership"
           ]
         }
       ],

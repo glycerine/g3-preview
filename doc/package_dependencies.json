@@ -414,7 +414,8 @@
       ],
       "production_files": [
         "equation.go",
-        "numeral_buffer_sort.go"
+        "numeral_buffer_sort.go",
+        "solver_setup.go"
       ]
     },
     {

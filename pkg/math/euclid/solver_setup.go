@@ -1,0 +1,173 @@
+// Source: src/math/euclid/euclidean_solver.cpp:44-65,506-565.
+package euclid
+
+import (
+	"reflect"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/numeral"
+)
+
+const nullEquationIndex = ^uint32(0)
+
+// position finds a variable in the source's sorted equation ID slice.
+func position(xs []uint32, x uint32) uint32 {
+	if len(xs) == 0 {
+		return nullEquationIndex
+	}
+	low, high := 0, len(xs)-1
+	for low <= high {
+		mid := low + (high-low)/2
+		switch {
+		case x > xs[mid]:
+			low = mid + 1
+		case x < xs[mid]:
+			high = mid - 1
+		default:
+			return uint32(mid)
+		}
+	}
+	return nullEquationIndex
+}
+
+// solverSetup is the concrete pre-elimination owner of Euclidean variables,
+// justifications, reusable numeral buffers and newly constructed equations.
+// It borrows its rational manager. Equation normalization and substitution
+// are separate pending source operations.
+type solverSetup struct {
+	self               *solverSetup
+	manager            *numeral.RationalManager
+	asBuffer           *numeral.ScopedIntVector
+	bsBuffer           *numeral.ScopedRationalVector
+	parameter          []bool
+	solved             []uint32
+	occurrences        [][]uint32
+	nextJustification  uint32
+	equations          []*equation
+	equationCloseIndex int
+	header             uint64
+	closed             bool
+	stop               error
+}
+
+func newSolverSetup(m *numeral.RationalManager) (*solverSetup, error) {
+	if m == nil || m.BudgetField == nil || m.Integers() == nil {
+		return nil, arena.ErrInvalidSlot
+	}
+	header := uint64(reflect.TypeOf(solverSetup{}).Size())
+	if e := m.BudgetField.Reserve(header); e != nil {
+		return nil, e
+	}
+	as, e := numeral.NewScopedIntVector(m.Integers())
+	if e != nil {
+		m.BudgetField.Release(header)
+		return nil, e
+	}
+	bs, e := numeral.NewScopedRationalVector(m)
+	if e != nil {
+		_ = as.Close()
+		m.BudgetField.Release(header)
+		return nil, e
+	}
+	s := &solverSetup{manager: m, asBuffer: as, bsBuffer: bs, header: header}
+	s.self = s
+	return s, nil
+}
+
+func (s *solverSetup) open() error {
+	if s == nil || s.self != s || s.manager == nil {
+		return arena.ErrInvalidSlot
+	}
+	if s.closed {
+		return arena.ErrClosed
+	}
+	if s.stop != nil {
+		return s.stop
+	}
+	return nil
+}
+
+// mkVar preserves the source publication order: three metadata vectors,
+// then a copied zero numeral in the ID-indexed coefficient buffer.
+func (s *solverSetup) mkVar(parameter bool) (uint32, error) {
+	if e := s.open(); e != nil {
+		return 0, e
+	}
+	if uint64(len(s.solved)) >= uint64(^uint32(0)) {
+		return 0, arena.ErrBounds
+	}
+	x := uint32(len(s.solved))
+	s.parameter = append(s.parameter, parameter)
+	s.solved = append(s.solved, nullEquationIndex)
+	s.occurrences = append(s.occurrences, nil)
+	zero := numeral.NewInt(0)
+	if e := s.asBuffer.Push(&zero); e != nil {
+		s.stop = e
+		return 0, e
+	}
+	return x, nil
+}
+
+// mkJustification appends the zero buffer slot before advancing the ID.
+func (s *solverSetup) mkJustification() (uint32, error) {
+	if e := s.open(); e != nil {
+		return 0, e
+	}
+	if s.nextJustification == ^uint32(0) {
+		return 0, arena.ErrBounds
+	}
+	j := s.nextJustification
+	zero := numeral.NewRational()
+	if e := s.bsBuffer.Push(&zero); e != nil {
+		s.stop = e
+		return 0, e
+	}
+	s.nextJustification++
+	return j, nil
+}
+
+// addEquation covers mk_eq and the pre-normalization publication to the
+// source equation list. The solver owner retains the returned equation.
+func (s *solverSetup) addEquation(as []numeral.Int, xs []uint32, c *numeral.Int,
+	bs []numeral.Rational, js []uint32, sortJustifications bool) (*equation, error) {
+	if e := s.open(); e != nil {
+		return nil, e
+	}
+	eq, e := makeEquation(s.manager, as, xs, c, bs, js, s.asBuffer, s.bsBuffer, sortJustifications)
+	if e != nil {
+		s.stop = e
+		return nil, e
+	}
+	s.equations = append(s.equations, eq)
+	return eq, nil
+}
+
+// Close destroys equations in source list order, then the member buffers in
+// reverse declaration order.
+// The borrowed rational manager remains with its caller.
+func (s *solverSetup) Close() error {
+	if s == nil || s.self != s {
+		return arena.ErrInvalidSlot
+	}
+	if s.closed {
+		return nil
+	}
+	for s.equationCloseIndex < len(s.equations) {
+		if e := s.equations[s.equationCloseIndex].Close(); e != nil {
+			return e
+		}
+		s.equations[s.equationCloseIndex] = nil
+		s.equationCloseIndex++
+	}
+	if e := s.bsBuffer.Close(); e != nil {
+		return e
+	}
+	if e := s.asBuffer.Close(); e != nil {
+		return e
+	}
+	s.manager.BudgetField.Release(s.header)
+	s.header = 0
+	s.parameter, s.solved, s.occurrences, s.equations = nil, nil, nil, nil
+	s.closed = true
+	return nil
+}
