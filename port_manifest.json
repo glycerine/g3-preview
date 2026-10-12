@@ -34618,7 +34618,9 @@
         "pkg/math/subpaving/fast_interval_div.go",
         "pkg/math/subpaving/fast_interval_div_test.go",
         "pkg/math/subpaving/fast_interval_scalar.go",
-        "pkg/math/subpaving/fast_interval_scalar_test.go"
+        "pkg/math/subpaving/fast_interval_scalar_test.go",
+        "pkg/math/subpaving/fast_interval_power.go",
+        "pkg/math/subpaving/fast_interval_power_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34630,7 +34632,8 @@
         "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingFastIntervalMulSignClasses",
         "TestSubpavingFastIntervalDivSignBranches",
-        "TestSubpavingFastIntervalScalarMulDiv"
+        "TestSubpavingFastIntervalScalarMulDiv",
+        "TestSubpavingFastIntervalPowerRetainedCases"
       ],
       "conditionals": [
         {
@@ -34734,7 +34737,9 @@
         "pkg/math/subpaving/fast_interval_div.go",
         "pkg/math/subpaving/fast_interval_div_test.go",
         "pkg/math/subpaving/fast_interval_scalar.go",
-        "pkg/math/subpaving/fast_interval_scalar_test.go"
+        "pkg/math/subpaving/fast_interval_scalar_test.go",
+        "pkg/math/subpaving/fast_interval_power.go",
+        "pkg/math/subpaving/fast_interval_power_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34751,7 +34756,8 @@
         "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingFastIntervalMulSignClasses",
         "TestSubpavingFastIntervalDivSignBranches",
-        "TestSubpavingFastIntervalScalarMulDiv"
+        "TestSubpavingFastIntervalScalarMulDiv",
+        "TestSubpavingFastIntervalPowerRetainedCases"
       ],
       "conditionals": [
         {
@@ -35246,6 +35252,14 @@
           "go_target": "pkg/math/subpaving/fast_interval_scalar.go",
           "tests": [
             "TestSubpavingFastIntervalScalarMulDiv"
+          ]
+        },
+        {
+          "name": "Concrete mpff interval powers: positive/negative even, mixed equal-max tie, odd monotonic, infinite bounds and in-place output (src/math/interval/interval_def.h:1271-1378)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_interval_power.go",
+          "tests": [
+            "TestSubpavingFastIntervalPowerRetainedCases"
           ]
         }
       ],
@@ -49988,14 +50002,17 @@
         "pkg/math/subpaving/fast_interval_div.go",
         "pkg/math/subpaving/fast_interval_div_test.go",
         "pkg/math/subpaving/fast_interval_scalar.go",
-        "pkg/math/subpaving/fast_interval_scalar_test.go"
+        "pkg/math/subpaving/fast_interval_scalar_test.go",
+        "pkg/math/subpaving/fast_interval_power.go",
+        "pkg/math/subpaving/fast_interval_power_test.go"
       ],
       "tests": [
         "TestSubpavingFastMutableIntervalRetainedCore",
         "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingFastIntervalMulSignClasses",
         "TestSubpavingFastIntervalDivSignBranches",
-        "TestSubpavingFastIntervalScalarMulDiv"
+        "TestSubpavingFastIntervalScalarMulDiv",
+        "TestSubpavingFastIntervalPowerRetainedCases"
       ],
       "conditionals": [
         {
@@ -50145,7 +50162,9 @@
         "pkg/math/subpaving/fast_interval_div.go",
         "pkg/math/subpaving/fast_interval_div_test.go",
         "pkg/math/subpaving/fast_interval_scalar.go",
-        "pkg/math/subpaving/fast_interval_scalar_test.go"
+        "pkg/math/subpaving/fast_interval_scalar_test.go",
+        "pkg/math/subpaving/fast_interval_power.go",
+        "pkg/math/subpaving/fast_interval_power_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50180,7 +50199,8 @@
         "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingFastIntervalMulSignClasses",
         "TestSubpavingFastIntervalDivSignBranches",
-        "TestSubpavingFastIntervalScalarMulDiv"
+        "TestSubpavingFastIntervalScalarMulDiv",
+        "TestSubpavingFastIntervalPowerRetainedCases"
       ],
       "conditionals": [
         {
