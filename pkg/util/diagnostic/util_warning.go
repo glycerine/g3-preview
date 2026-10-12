@@ -2,6 +2,7 @@
 package diagnostic
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -39,6 +40,33 @@ func (s *WarningService) SetWarningStream(stream io.Writer) error {
 	}
 	s.stream = stream
 	return nil
+}
+
+// Warningf covers retained warning_msg calls using Go's %s and %d formatting.
+// String arguments are C-string views at those source sites.
+func (s *WarningService) Warningf(format string, args ...any) error {
+	if s == nil {
+		return arena.ErrConfig
+	}
+	if !s.enabled {
+		return nil
+	}
+	if i := strings.IndexByte(format, 0); i >= 0 {
+		format = format[:i]
+	}
+	copied := false
+	for i, arg := range args {
+		if value, ok := arg.(string); ok {
+			if end := strings.IndexByte(value, 0); end >= 0 {
+				if !copied {
+					args = append([]any(nil), args...)
+					copied = true
+				}
+				args[i] = value[:end]
+			}
+		}
+	}
+	return s.Warning(fmt.Sprintf(format, args...))
 }
 
 // Warning writes one literal C-string message. On the selected Linux AMD64

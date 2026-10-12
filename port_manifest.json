@@ -166738,6 +166738,7 @@
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
         "TestWarningSourceBorrowedStreamTruncationAndFallback",
+        "TestWarningFormattedStringAndIntegerRoutes",
         "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
       ],
       "conditionals": [
@@ -166808,9 +166809,12 @@
           ]
         },
         {
-          "name": "formatted variadic warning_msg and format2ostream used by unported source clients",
-          "status": "unported",
-          "tests": []
+          "name": "selected warning_msg %s/%d formatted emission; full format2ostream and other C format profiles remain",
+          "status": "partial",
+          "go_target": "pkg/util/diagnostic/util_warning.go",
+          "tests": [
+            "TestWarningFormattedStringAndIntegerRoutes"
+          ]
         },
         {
           "name": "set_error_stream and disable_error_msg_prefix write-only globals with no source reader",
@@ -166824,10 +166828,10 @@
         }
       ],
       "ownership": [
-        "WarningService owns only the enable scalar and borrows optional io.Writer streams. EnvParamsRuntime updates the same warning-enable state used by warning emission; no-format writes retain source prefix, newline, C-string boundary and selected Linux AMD64 custom-stream truncation."
+        "WarningService owns only the enable scalar and borrows optional io.Writer streams. EnvParamsRuntime updates the same warning-enable state used by warning emission; literal and selected formatted writes retain source prefix, newline, C-string boundary and selected Linux AMD64 custom-stream truncation."
       ],
       "deviations": [
-        "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Formatted variadic callers and the shell/AST warning call sites remain to be ported; no C varargs or C++ standard-stream implementation is introduced."
+        "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Selected %s/%d warning calls use Go fmt with C-string input boundaries; other C format profiles, format2ostream exception integration and shell/AST warning call sites remain open. No C varargs or C++ standard-stream implementation is introduced."
       ]
     },
     {
@@ -166842,6 +166846,7 @@
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
         "TestWarningSourceBorrowedStreamTruncationAndFallback",
+        "TestWarningFormattedStringAndIntegerRoutes",
         "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
       ],
       "conditionals": [
@@ -166872,16 +166877,19 @@
           "tests": []
         },
         {
-          "name": "formatted variadic warning_msg and format2ostream for live future callers",
-          "status": "unported",
-          "tests": []
+          "name": "selected warning_msg %s/%d formatted emission; full format2ostream and other C format profiles remain",
+          "status": "partial",
+          "go_target": "pkg/util/diagnostic/util_warning.go",
+          "tests": [
+            "TestWarningFormattedStringAndIntegerRoutes"
+          ]
         }
       ],
       "ownership": [
         "WarningService borrows selected output streams and owns only its enable flag. The unused warning_displayer class has no Go adapter."
       ],
       "deviations": [
-        "The concrete warning service is now reached by EnvParamsRuntime. C++ stream internals and C varargs are not copied; direct formatted warning callers remain unported."
+        "The concrete warning service is reached by EnvParamsRuntime. Selected %s/%d warning calls use Go fmt with C-string input boundaries; other C format profiles, format2ostream exception integration and direct shell/AST warning call sites remain open. C++ stream internals and C varargs are not copied."
       ]
     },
     {

@@ -52,3 +52,31 @@ func TestWarningSourceBorrowedStreamTruncationAndFallback(t *testing.T) {
 		t.Fatal("default FILE route must not truncate", len(got))
 	}
 }
+
+func TestWarningFormattedStringAndIntegerRoutes(t *testing.T) {
+	var stderr, diagnostic bytes.Buffer
+	s := NewWarningService(&stderr)
+	args := []any{"left\x00ignored", 17}
+	if e := s.Warningf("value %s at %d%%\x00ignored", args...); e != nil {
+		t.Fatal(e)
+	}
+	if got := stderr.String(); got != "WARNING: value left at 17%\n" || args[0] != "left\x00ignored" {
+		t.Fatal(got, args)
+	}
+	if e := s.SetWarningStream(&diagnostic); e != nil {
+		t.Fatal(e)
+	}
+	long := strings.Repeat("x", 1100)
+	if e := s.Warningf("%s-%d", long, 3); e != nil {
+		t.Fatal(e)
+	}
+	if got := diagnostic.String(); got != "WARNING: "+long[:1023]+"\n" {
+		t.Fatal("formatted stream truncation", len(got))
+	}
+	if e := s.Enable(false); e != nil {
+		t.Fatal(e)
+	}
+	if e := s.Warningf("suppressed %d", 2); e != nil || stderr.String() != "WARNING: value left at 17%\n" {
+		t.Fatal(e, stderr.String())
+	}
+}

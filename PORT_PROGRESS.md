@@ -39781,3 +39781,16 @@ checked nontermination result. Focused native and debug tests verify the
 sequence, iterator increment, owner balance and finalization. This supersedes
 the older prime vector/backing accounting notes above; the source units remain
 partial for global binding, finalization and synchronization obligations.
+
+### Selected formatted warning emission
+
+`src/util/warning.cpp` has retained warning callers that pass C-style `%s` and
+`%d` arguments. `pkg/util/diagnostic.WarningService` now accepts those values
+through `Warningf`, using Go `fmt` and preserving C-string boundaries for the
+format and string arguments. It shares the existing enabled state, borrowed
+stream route, prefix, newline and Linux AMD64 1,023-byte stream truncation.
+The focused test checks mixed string/integer formatting, an embedded NUL in a
+string argument, a literal percent sign, caller argument preservation,
+truncation and disabled emission. Other C format specifiers, the separate
+`format2ostream` exception constructor, and direct shell/AST warning consumers
+remain open; both warning source units stay partial.
