@@ -165524,11 +165524,6 @@
           ]
         },
         {
-          "name": "escaped external custom ostream state/badbit/exception behavior",
-          "status": "unported",
-          "tests": []
-        },
-        {
           "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_verbose_context.go",
@@ -165548,7 +165543,7 @@
         "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events."
       ],
       "deviations": [
-        "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound."
+        "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound. C++ ostream badbit, exception flags, and formatting state are standard-library internals rather than project escaped behavior and are excluded; Go Write reports io.Writer errors."
       ]
     },
     {
@@ -165826,11 +165821,6 @@
           ]
         },
         {
-          "name": "escaped external custom ostream state/badbit/exception behavior",
-          "status": "unported",
-          "tests": []
-        },
-        {
           "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_verbose_context.go",
@@ -165850,7 +165840,7 @@
         "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events."
       ],
       "deviations": [
-        "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound.",
+        "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound. C++ ostream badbit, exception flags, and formatting state are standard-library internals rather than project escaped behavior and are excluded; Go Write reports io.Writer errors.",
         "Arithmetic small numeral caches, BV sort/fixed/conversion caches and bit2bool nested rows now use native slices with direct zero-gap filling/indexing. Removed astFormatRefVector, resizeNull geometric backing and reflected byte/capacity charges, plus duplicate bit2bool logical-size state. Sort acquired flags remain native metadata for actual successful INC leaves; fixed declaration interrupted-INC metadata preserves source publish-before-INC and explicit owning abort. Removed arithmetic cachePending since no fallible storage step remains after successful INC. Actual numerical/factory invocation cleanup, validation/publication order and ascending consumed-DEC retirement remain. Existing actual constructor/numeric reservation campaigns are retained; growth-only unpublished-cache expectations are retired. A native integration grows nested/conversion/sort caches under disabled arena reservations, preserves earlier cache pins, checks validation prefixes and completes source finalization. Cached arithmetic numerals retain one pin across repeated disabled-budget lookups. Prior source-capacity/refusal geometry claims are superseded; no generic C++ container or STL implementation credit is added."
       ]
     },
