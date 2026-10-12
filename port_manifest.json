@@ -114980,18 +114980,15 @@
       "path": "src/util/hash.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/hash/hash.go",
         "pkg/util/hash/runtime/runtime_bytes.go",
-        "pkg/util/hash/runtime/runtime_bytes_test.go",
-        "pkg/util/hash/runtime/runtime_bytes_bounded.go",
-        "pkg/util/hash/runtime/runtime_bytes_bounded_test.go",
-        "pkg/util/hash/hash_test.go"
+        "pkg/util/hash/runtime/runtime_bytes_bounded.go"
       ],
       "tests": [
         "TestSourceHashVectors",
-        "TestCompositeVisitOrder",
+        "TestWordReaderSourceVectors",
         "TestRuntimeBytesSourceLengthAndSignedTail",
         "TestRuntimeBytesReachedDescendingTailRead",
         "TestRuntimeBytesBoundedActualReachedLoads",
@@ -115003,100 +115000,32 @@
           "text": "SASSERT(sizeof(unsigned) == 4);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "hash_u",
+          "name": "string_hash unsigned-32/little-endian word loop, signed-character falling tail, length/init mixing and zero-length no-read path (hash.cpp:23-93)",
           "status": "ported",
           "go_target": "pkg/util/hash/hash.go",
           "tests": [
             "TestSourceHashVectors",
-            "TestCompositeVisitOrder"
-          ]
-        },
-        {
-          "name": "hash_ull",
-          "status": "ported",
-          "go_target": "pkg/util/hash/hash.go",
-          "tests": [
-            "TestSourceHashVectors",
-            "TestCompositeVisitOrder"
-          ]
-        },
-        {
-          "name": "combine_hash",
-          "status": "ported",
-          "go_target": "pkg/util/hash/hash.go",
-          "tests": [
-            "TestSourceHashVectors",
-            "TestCompositeVisitOrder"
-          ]
-        },
-        {
-          "name": "hash_u_u",
-          "status": "ported",
-          "go_target": "pkg/util/hash/hash.go",
-          "tests": [
-            "TestSourceHashVectors",
-            "TestCompositeVisitOrder"
-          ]
-        },
-        {
-          "name": "mix",
-          "status": "ported",
-          "go_target": "pkg/util/hash/hash.go",
-          "tests": [
-            "TestSourceHashVectors",
-            "TestCompositeVisitOrder"
-          ]
-        },
-        {
-          "name": "string_hash",
-          "status": "ported",
-          "go_target": "pkg/util/hash/hash.go",
-          "tests": [
-            "TestSourceHashVectors",
-            "TestCompositeVisitOrder"
-          ]
-        },
-        {
-          "name": "get_composite_hash",
-          "status": "ported",
-          "go_target": "pkg/util/hash/hash.go",
-          "tests": [
-            "TestSourceHashVectors",
-            "TestCompositeVisitOrder"
-          ]
-        },
-        {
-          "name": "Concrete borrowed Runtime bytes string_hash: little-endian word loads, signed-char descending tail and zero-length no-read route",
-          "status": "partial",
-          "go_target": "pkg/util/hash/runtime/runtime_bytes.go",
-          "tests": [
+            "TestWordReaderSourceVectors",
             "TestRuntimeBytesSourceLengthAndSignedTail",
-            "TestRuntimeBytesReachedDescendingTailRead"
-          ]
-        },
-        {
-          "name": "Shared concrete Runtime bounded/unbounded and actual cold inline-word source string_hash engine; bounds and initialization checked only at reached loads",
-          "status": "partial",
-          "go_target": "pkg/util/hash/runtime/runtime_bytes_bounded.go",
-          "tests": [
+            "TestRuntimeBytesReachedDescendingTailRead",
             "TestRuntimeBytesBoundedActualReachedLoads",
             "TestInlineWordBytesActualColdAndReadOrder"
+          ],
+          "go_targets": [
+            "pkg/util/hash/runtime/runtime_bytes.go",
+            "pkg/util/hash/runtime/runtime_bytes_bounded.go"
           ]
         }
       ],
       "ownership": [
-        "No retained caller data; baseline little-endian/signed-char policy explicit. Generic hash-table/container functors not yet audited; see PORT_PROGRESS.md#audit-utilhash-port-status-md.",
-        "Call-local concrete reader borrows Runtime/block/offset/requested extent or the actual cold word and initialization mask; zero length touches no provider. Actual source12-byte loops and descending signed-char tails share the same engine; no copied byte buffer."
+        "string_hash borrows caller bytes only during the call and retains no data. Go String uses immutable string bytes; WordBytes, WordReader and concrete runtime byte readers borrow their current backing and read only the words or tail bytes reached by the source algorithm. Zero-length input reads no provider."
       ],
       "deviations": [
-        "Selected little-endian/signed-char source profile; global/other ABI transport remains open.",
-        "Borrow-time length remains advisory checked-borrow metadata; source Hash/Eq and char-pointer query comparisons no longer use it as source strlen/strcmp authority. Changing an inserted spelling can invalidate its cached table hash; source-valid regression changes the uninserted caller buffer, including before insertion, then leaves stored bytes unchanged. BytesRegion uses existing zeroed Go backing rather than Runtime initialized-byte tracking; raw oversized extent tests are checked/source-undefined guard-domain proof only. Source memcpy whole-word codec uses selected little-endian ascending byte loads and signed-char descending tails. Native libc optimized strcmp/strlen, sizeof(unsigned) assertion/global provider binding, other char/compiler/ABI profiles and legacy transactional Reset/Finalize/Intersect remain explicit open obligations. No registered char-pointer test driver exists; src/test/hashtable.cpp registered int_set/safe_int_set is not credited by these independent tests.",
-        "Reached uint64 region offset addition rejects overflow before token/payload access; zero-n erases the guard. Genuine checked Go helper-domain RED, not native CString algorithm credit.",
-        "Hash algorithms now live in independent util/hash. Retained numerical, AST and polynomial consumers import that package directly; runtime-backed checked readers use its MixState operation while remaining at their actual storage owner. AST and symbol duplicate mixing/string-hash bodies are replaced by the shared implementation. Hash golden tests and source_hash.json moved with the package. Algorithms, signed tails, callback visit order and concrete storage ownership are unchanged; this is package separation, not new port completion credit."
+        "The selected source platform has 32-bit unsigned words, little-endian word loads and signed char promotion. Go uint32 and explicit byte decoding preserve that project hash algorithm; invalid borrowed extents are diagnosed by Go guards. Alternate C++ ABI representations and source memcpy mechanics are platform details, not separate hash algorithms. Inline hash_u, hash_ull, combine_hash, mix and composite templates belong to hash.h."
       ]
     },
     {
