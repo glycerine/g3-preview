@@ -158880,7 +158880,7 @@
       "path": "src/util/prime_generator.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/prime/generator.go",
         "pkg/util/prime/generator_test.go",
@@ -158921,7 +158921,7 @@
       "methods": [
         {
           "name": "Explicit-owner constructor, exact odd/filter/append loops, cache lookup and literal reversed growth guard, finalization, borrowed iterator increment-before-lookup",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/prime/generator.go",
           "tests": [
             "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
@@ -158932,7 +158932,7 @@
         },
         {
           "name": "Registered 10000-prime campaign with actual IntegerManager root and 2073824 divisor ENSURE executions",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/prime_generator_source_test.go",
           "tests": [
             "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot"
@@ -158940,7 +158940,7 @@
         },
         {
           "name": "Eager default prime service, captured local/default iterator increment-before-read and finalize same generator",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/prime/service.go",
           "tests": [
             "TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes",
@@ -158956,7 +158956,7 @@
         },
         {
           "name": "prime_generator.cpp:99-107 explicit Go borrowed generator binding and actual multivariate Factor backend config; accessor is not a C++ getter.",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/prime/service.go",
           "tests": [
             "TestDefaultPrimeBorrowExactBindingAndFinalizedIdentity",
@@ -158968,7 +158968,7 @@
         },
         {
           "name": "eager process g_prime_generator, nullptr default iterator, borrowed polynomial default prime backend and callable finalizer",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/prime/service.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_service.go"
@@ -158987,14 +158987,14 @@
       ],
       "deviations": [
         "Native Go slices replace source vector capacity, overflow and backing allocation behavior. The literal source reversed nonterminating growth executes one complete 16384 body then checks its repeated condition; later indefinite iterations are not executed.",
-        "The eager process singleton and null/default iterator binding are now present for the selected single-goroutine Go profile. OpenMP locking is outside that profile. The source has no prime print/flush operation. Generated shell/API process-finalizer wiring remains open; the callable Go finalizer is available."
+        "The eager process singleton and null/default iterator binding are present for the selected single-goroutine Go profile; OpenMP locking is outside that profile. The source has no prime print/flush operation. The ADD_FINALIZER text in prime_generator.h:52 is commented out, and no retained production caller invokes prime_iterator::finalize. Go exposes the callable FinalizeProcessGenerator and releases process memory at exit without a source-absent registration hook."
       ]
     },
     {
       "path": "src/util/prime_generator.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/prime/generator.go",
         "pkg/util/prime/generator_test.go",
@@ -159035,7 +159035,7 @@
       "methods": [
         {
           "name": "Explicit-owner constructor, exact odd/filter/append loops, cache lookup and literal reversed growth guard, finalization, borrowed iterator increment-before-lookup",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/prime/generator.go",
           "tests": [
             "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
@@ -159046,7 +159046,7 @@
         },
         {
           "name": "Registered 10000-prime campaign with actual IntegerManager root and 2073824 divisor ENSURE executions",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/prime_generator_source_test.go",
           "tests": [
             "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot"
@@ -159054,7 +159054,7 @@
         },
         {
           "name": "Eager default prime service, captured local/default iterator increment-before-read and finalize same generator",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/prime/service.go",
           "tests": [
             "TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes",
@@ -159070,8 +159070,11 @@
         },
         {
           "name": "default-constructed process prime iterator and static finalizer entry",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/prime/service.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_service.go"
+          ],
           "tests": [
             "TestProcessDefaultPrimeIteratorEagerSharedCache",
             "TestUPolynomialFactorDefaultProcessPrimeBinding"
@@ -159085,7 +159088,7 @@
       ],
       "deviations": [
         "Native Go slices replace source vector capacity, overflow and backing allocation behavior. The literal source reversed nonterminating growth executes one complete 16384 body then checks its repeated condition; later indefinite iterations are not executed.",
-        "The eager process singleton and null/default iterator binding are now present for the selected single-goroutine Go profile. OpenMP locking is outside that profile. The source has no prime print/flush operation. Generated shell/API process-finalizer wiring remains open; the callable Go finalizer is available."
+        "The eager process singleton and null/default iterator binding are present for the selected single-goroutine Go profile; OpenMP locking is outside that profile. The source has no prime print/flush operation. The ADD_FINALIZER text in prime_generator.h:52 is commented out, and no retained production caller invokes prime_iterator::finalize. Go exposes the callable FinalizeProcessGenerator and releases process memory at exit without a source-absent registration hook."
       ]
     },
     {
