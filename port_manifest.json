@@ -136506,7 +136506,7 @@
       "path": "src/util/lp/random_updater.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/random_update_interval.go",
         "pkg/util/lp/random_update_interval_test.go",
@@ -136533,8 +136533,8 @@
         "TestLARRandomUpdaterPreservesOlderComparison",
         "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "interval bound intersection, empty and containment predicates; nonbasic interval, basic feasibility clipping, actual column interval traversal and random lattice sampling",
@@ -136574,14 +136574,14 @@
         "Updater owns copied hash keys, partial sampled outputs, old/new/delta/product pairs and column coefficient scratch. Close cleans parent raw calls then interval/iterator child receipts before borrowed output locals, and destroys keys/locals before the borrowed core. Output-to-model copies belong to updater receipts, not RX vector receipts; partial solver RandomUpdate retains the updater and closes it before Core. Child interval Draw, column iterator and primal validators keep their own receipts; old caller comparisons are not adopted."
       ],
       "deviations": [
-        "Native concrete Go endpoint ownership and typed guards replace raw C++ interval/result lifetime. Source equal/reversed interval behavior and RNG consumption are preserved; unused string diagnostics are not translated. Concrete updater and outer RandomUpdate are implemented; whole-source audits and complete upstream randomize/MPS drivers remain open."
+        "Native concrete Go endpoint ownership and typed guards replace raw C++ interval/result lifetime. Source equal/reversed interval behavior and RNG consumption are preserved; unused string diagnostics are not translated. Concrete updater and outer RandomUpdate are implemented; complete upstream randomize/MPS driver units remain open."
       ]
     },
     {
       "path": "src/util/lp/random_updater.hpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/random_update_interval.go",
         "pkg/util/lp/random_update_interval_test.go",
@@ -136682,8 +136682,8 @@
           "text": "SASSERT(it != m_values.end());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "interval bound intersection, empty and containment predicates; nonbasic interval, basic feasibility clipping, actual column interval traversal and random lattice sampling",
@@ -136723,14 +136723,14 @@
         "Updater owns copied hash keys, partial sampled outputs, old/new/delta/product pairs and column coefficient scratch. Close cleans parent raw calls then interval/iterator child receipts before borrowed output locals, and destroys keys/locals before the borrowed core. Output-to-model copies belong to updater receipts, not RX vector receipts; partial solver RandomUpdate retains the updater and closes it before Core. Child interval Draw, column iterator and primal validators keep their own receipts; old caller comparisons are not adopted."
       ],
       "deviations": [
-        "Native concrete Go endpoint ownership and typed guards replace raw C++ interval/result lifetime. Source equal/reversed interval behavior and RNG consumption are preserved; unused string diagnostics are not translated. Concrete updater and outer RandomUpdate are implemented; whole-source audits and complete upstream randomize/MPS drivers remain open."
+        "Native concrete Go endpoint ownership and typed guards replace raw C++ interval/result lifetime. Source equal/reversed interval behavior and RNG consumption are preserved; unused string diagnostics are not translated. Concrete updater and outer RandomUpdate are implemented; complete upstream randomize/MPS driver units remain open."
       ]
     },
     {
       "path": "src/util/lp/random_updater_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/random_updater.go",
         "pkg/util/lp/random_updater_test.go"
@@ -136747,8 +136747,8 @@
         "TestLARRandomUpdaterPreservesOlderComparison",
         "TestLARRandomUpdaterDuplicateRequestsPreserveSourceStop"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained concrete mpq/numeric_pair random_updater implementation inclusion",
@@ -173290,5 +173290,44 @@
       "/mnt/oldrog/tmp/g3-lp-indexed-vector-final-debug.cover"
     ],
     "final_indexed_native_seconds": 21.371
+  },
+  "latest_random_updater_retained_audit": {
+    "scope": "Whole retained random_updater.h/.hpp/instances.cpp audit: the concrete numeric-pair updater and interval implement every reached source method. Source consumers are lar_solver.h random_update, theory_lra.cpp and test/lp.cpp; the separate theory_arith random_update is unrelated. Unused interval lbs/rbs/to_str diagnostics and STL container internals remain excluded. Independent tests cover 120 sorted free-variable worlds, 180 bounded shifts over tableau/LU, 180 full feasible solves with exact bounds and A*x=b, 1200 endpoint intersections, 400 basic-column worlds, 2880 lattice draws, and 160 actual tableau/LU intervals. Thirty-two pooled/direct physical campaigns reach success after allocation refusals and check owned cleanup and caller isolation; interval success endpoints, reversed predicates and sampled rational/epsilon output now have independent exact assertions. Source value occurrence counts include duplicate requests even though column visits deduplicate; equal endpoints are empty for shifting but included by Contains; the >=50 column cutoff and empty-interval stop consume no RNG. All three source units are ported with method and ownership audits complete. Larger LAR/SMT solver and input-driver units remain independently partial. Focused native/combined random groups pass at 3.789s/5.939s. File statement counts from the focused profiles before endpoint-only test assertions: updater 212/274 native, 236/274 combined; interval 247/303 native, 265/303 combined. Uncovered blocks are mainly stable numeric failure/guard cleanup and debug-erased checks. The running full native revision55b06c96 predates this audit and is not evidence for this change. CPUs8-16/GOMAXPROCS9.",
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "source_units": [
+      "src/util/lp/random_updater.h",
+      "src/util/lp/random_updater.hpp",
+      "src/util/lp/random_updater_instances.cpp"
+    ],
+    "focused_native_seconds": 3.789,
+    "focused_combined_seconds": 5.939,
+    "whole_go_file_focused_covered_total": {
+      "native": {
+        "random_updater.go": [
+          212,
+          274
+        ],
+        "random_update_interval.go": [
+          247,
+          303
+        ]
+      },
+      "debug": {
+        "random_updater.go": [
+          236,
+          274
+        ],
+        "random_update_interval.go": [
+          265,
+          303
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-random-updater-audit-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-random-updater-audit-debug.cover"
+    ],
+    "full_suite_qualification": "Revision55b06c96 is still running and predates this audit; prior completed full checkpoint8f2961ca also predates it."
   }
 }

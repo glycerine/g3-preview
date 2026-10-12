@@ -318,18 +318,20 @@ func TestLARRandomIntervalPhysicalOwnership(t *testing.T) {
 					}
 					out := h.pair("97", "101")
 					random := s.Settings.random
-					_ = random.Next()
+					drawIndex := random.Next() % 100000
+					nextAfterDraw := random.Next()
 					h.budget.FailAfter(ordinal)
 					var err error
+					var predicate bool
 					switch op {
 					case "low":
 						err = r.SetLowBound(v)
 					case "upper":
 						err = r.SetUpperBound(v)
 					case "empty":
-						_, err = r.IsEmpty()
+						predicate, err = r.IsEmpty()
 					case "contains":
-						_, err = r.Contains(v)
+						predicate, err = r.Contains(v)
 					case "basic":
 						err = r.DiminishForBasic(c, &c.RX.Data[0], 2, &v.X)
 					case "find-tableau", "find-LU":
@@ -339,10 +341,28 @@ func TestLARRandomIntervalPhysicalOwnership(t *testing.T) {
 						err = r.Draw(s.Settings, out)
 					}
 					h.budget.FailAfter(-1)
-					if op == "draw" && s.Settings.RandomNext() != random.Next() {
+					if op == "draw" && s.Settings.RandomNext() != nextAfterDraw {
 						t.Fatal("draw did not consume exactly one RNG value on this prefix")
 					}
 					if err == nil {
+						switch op {
+						case "low":
+							if !r.LowSet { t.Fatal("missing low endpoint") }
+							h.check(&r.Low, mustLPRat(t, large), mustLPRat(t, large))
+						case "upper":
+							if !r.UpperSet { t.Fatal("missing upper endpoint") }
+							h.check(&r.Upper, mustLPRat(t, large), mustLPRat(t, large))
+						case "empty":
+							if !predicate { t.Fatal("wrong interval predicate", op) }
+						case "contains":
+							if predicate { t.Fatal("reversed interval contains low endpoint") }
+						case "draw":
+							lo := mustLPRat(t, large)
+							hi := big.NewRat(1, 7)
+							fraction := new(big.Rat).SetFrac64(int64(drawIndex), 100000)
+							y := new(big.Rat).Add(lo, new(big.Rat).Mul(fraction, new(big.Rat).Sub(hi, lo)))
+							h.check(out, lo, y)
+						}
 						done = true
 					} else {
 						failures++

@@ -6642,7 +6642,7 @@
     },
     {
       "source": "src/util/lp/random_updater.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/random_update_interval.go",
         "pkg/util/lp/random_update_interval_test.go",
@@ -6672,7 +6672,7 @@
     },
     {
       "source": "src/util/lp/random_updater.hpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/random_update_interval.go",
         "pkg/util/lp/random_update_interval_test.go",
@@ -6702,7 +6702,7 @@
     },
     {
       "source": "src/util/lp/random_updater_instances.cpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/random_updater.go",
         "pkg/util/lp/random_updater_test.go"
@@ -8131,10 +8131,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 61,
+    "ported": 64,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 34
+    "partial": 31
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -14444,5 +14444,44 @@
       "/mnt/oldrog/tmp/g3-lp-indexed-vector-final-debug.cover"
     ],
     "final_indexed_native_seconds": 21.371
+  },
+  "latest_random_updater_retained_audit": {
+    "scope": "Whole retained random_updater.h/.hpp/instances.cpp audit: the concrete numeric-pair updater and interval implement every reached source method. Source consumers are lar_solver.h random_update, theory_lra.cpp and test/lp.cpp; the separate theory_arith random_update is unrelated. Unused interval lbs/rbs/to_str diagnostics and STL container internals remain excluded. Independent tests cover 120 sorted free-variable worlds, 180 bounded shifts over tableau/LU, 180 full feasible solves with exact bounds and A*x=b, 1200 endpoint intersections, 400 basic-column worlds, 2880 lattice draws, and 160 actual tableau/LU intervals. Thirty-two pooled/direct physical campaigns reach success after allocation refusals and check owned cleanup and caller isolation; interval success endpoints, reversed predicates and sampled rational/epsilon output now have independent exact assertions. Source value occurrence counts include duplicate requests even though column visits deduplicate; equal endpoints are empty for shifting but included by Contains; the >=50 column cutoff and empty-interval stop consume no RNG. All three source units are ported with method and ownership audits complete. Larger LAR/SMT solver and input-driver units remain independently partial. Focused native/combined random groups pass at 3.789s/5.939s. File statement counts from the focused profiles before endpoint-only test assertions: updater 212/274 native, 236/274 combined; interval 247/303 native, 265/303 combined. Uncovered blocks are mainly stable numeric failure/guard cleanup and debug-erased checks. The running full native revision55b06c96 predates this audit and is not evidence for this change. CPUs8-16/GOMAXPROCS9.",
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "source_units": [
+      "src/util/lp/random_updater.h",
+      "src/util/lp/random_updater.hpp",
+      "src/util/lp/random_updater_instances.cpp"
+    ],
+    "focused_native_seconds": 3.789,
+    "focused_combined_seconds": 5.939,
+    "whole_go_file_focused_covered_total": {
+      "native": {
+        "random_updater.go": [
+          212,
+          274
+        ],
+        "random_update_interval.go": [
+          247,
+          303
+        ]
+      },
+      "debug": {
+        "random_updater.go": [
+          236,
+          274
+        ],
+        "random_update_interval.go": [
+          265,
+          303
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-random-updater-audit-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-random-updater-audit-debug.cover"
+    ],
+    "full_suite_qualification": "Revision55b06c96 is still running and predates this audit; prior completed full checkpoint8f2961ca also predates it."
   }
 }
