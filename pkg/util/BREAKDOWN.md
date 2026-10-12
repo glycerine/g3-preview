@@ -721,6 +721,7 @@ must receive a concrete typed extended-numeral implementation when it is ported.
 critical_flet          dlist                   ext_gcd
 obj_ref_hashtable      object_allocator        permutation
 ptr_scoped_buffer      resource_limit          total_order
+uint_map
 ```
 
 `dlist`, `resource_limit`, `permutation.cpp`, and `obj_ref_hashtable.h` are
@@ -732,6 +733,10 @@ known caller. `permutation.h` has live free-function consumers; retain only
 that behavior. Recheck the entire
 C++ tree before deleting a unit because a lack of current Go consumers alone
 does not prove that upstream Z3 code is dead.
+
+`uint_map.h` is reference-only: its sole include is the test-only
+`total_order.h`. The `uint_map` in `src/test/uint_set.cpp` is a separate local
+type over `util/map.h`, not an instantiation of this header.
 
 These are source units rather than a claim that each file defines one class.
 Some define templates or free functions. Includes are recorded at translation

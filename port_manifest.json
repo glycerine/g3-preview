@@ -165066,7 +165066,7 @@
       "path": "src/util/uint_map.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -165091,29 +165091,10 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [
-        {
-          "name": "contains and both find overloads",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "insert sparse growth and replacement",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "erase and reset",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        }
-      ],
+      "methods": [],
       "ownership": [],
       "deviations": [
-        "No generic Go adapter is retained. Future consumers should use concrete typed slices indexed by uint32; no interface-valued root utility is required."
+        "Whole-source include and symbol audit: src/util/uint_map.h is included only by src/util/total_order.h, whose sole consumer is src/test/total_order.cpp. No production source instantiates util::uint_map; src/test/uint_set.cpp declares a separate local uint_map based on util/map.h. Both utility headers remain upstream reference sources with no retained Go consumer, so no generic Go adapter is required. A future production consumer should use concrete typed slices or maps."
       ]
     },
     {

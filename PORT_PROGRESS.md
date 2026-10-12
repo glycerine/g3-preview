@@ -39310,3 +39310,12 @@ both native and `g3debug,g3checked` profiles on CPUs 0–7. Source `tst_and`
 has an empty body, so the independent oracle supplies the AND check. The
 remaining `tbv_manager` algorithms belong to their own source unit; the
 fixed-manager word access needed by that friend is available as Word/WriteWord.
+
+### Uint-map retained-consumer audit
+
+`src/util/uint_map.h` is reference-only. Its sole source include is
+`src/util/total_order.h`, and that header is used only by the standalone
+`src/test/total_order.cpp` suite. `src/test/uint_set.cpp` defines a different
+local `uint_map` from `util/map.h`. The unused generic `uint_map` method rows
+were removed from the port ledger; no production Go adapter is needed. The
+upstream source header remains available for reference.
