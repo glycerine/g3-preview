@@ -330,32 +330,20 @@ func (v *BinaryInterval) display(w io.Writer, pretty bool) error {
 	if v.upperOpen {
 		right = ")"
 	}
-	ls, us := "-oo", "+oo"
-	if pretty {
-		ls, us = "-&infin;", "+&infin;"
+	if _, err := io.WriteString(w, left); err != nil {
+		return err
 	}
-	var err error
-	if !v.lowerInf {
-		if pretty {
-			ls, err = v.numbers.PrettyString(&v.lower)
-		} else {
-			ls, err = v.numbers.String(&v.lower)
-		}
-		if err != nil {
-			return err
-		}
+	e := interval.BinaryExtended{Numbers: v.numbers}
+	if err := e.Display(w, &v.lower, v.lowerKind(), pretty); err != nil {
+		return err
 	}
-	if !v.upperInf {
-		if pretty {
-			us, err = v.numbers.PrettyString(&v.upper)
-		} else {
-			us, err = v.numbers.String(&v.upper)
-		}
-		if err != nil {
-			return err
-		}
+	if _, err := io.WriteString(w, ", "); err != nil {
+		return err
 	}
-	_, err = io.WriteString(w, left+ls+", "+us+right)
+	if err := e.Display(w, &v.upper, v.upperKind(), pretty); err != nil {
+		return err
+	}
+	_, err := io.WriteString(w, right)
 	return err
 }
 

@@ -9,6 +9,24 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
+type fixedDisplayRefusal struct {
+	bytes.Buffer
+	remaining int
+	err       error
+}
+
+func (w *fixedDisplayRefusal) Write(p []byte) (int, error) {
+	if w.remaining == 0 {
+		return 0, w.err
+	}
+	w.remaining--
+	return w.Buffer.Write(p)
+}
+
+func (w *fixedDisplayRefusal) WriteString(s string) (int, error) {
+	return w.Write([]byte(s))
+}
+
 func TestSubpavingFixedMutableIntervalRetainedCore(t *testing.T) {
 	m, err := numeral.NewFixedPointManager(2, 1)
 	if err != nil {
@@ -69,7 +87,12 @@ func TestSubpavingFixedMutableIntervalRetainedCore(t *testing.T) {
 		t.Fatal("unbounded interval excludes zero")
 	}
 	set(a, -3, 2, 2, 1, true, false) // (-3/2,2]
-	set(b, 1, 2, 3, 2, false, true)  // [1/2,3/2)
+	writeErr := errors.New("fixed upper endpoint refused")
+	refused := &fixedDisplayRefusal{remaining: 3, err: writeErr}
+	if err := a.Display(refused); !errors.Is(err, writeErr) || refused.String() != "(-3/2, " {
+		t.Fatalf("fixed display refusal = (%q, %v)", refused.String(), err)
+	}
+	set(b, 1, 2, 3, 2, false, true) // [1/2,3/2)
 	contains, err = a.ContainsZero()
 	must(err)
 	if !contains {

@@ -4,6 +4,7 @@ package interval
 
 import (
 	"errors"
+	"io"
 
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -14,6 +15,38 @@ type BinaryExtended struct {
 	Numbers           *numeral.BinaryRationalManager
 	DivisionPrecision uint32
 	RoundUp           bool
+}
+
+// Display writes the concrete real-closure endpoint in source ext_numeral
+// spelling. Infinite endpoints never inspect their numeral storage.
+func (e BinaryExtended) Display(w io.Writer, a *numeral.BinaryRational, k ExtendedKind, pretty bool) error {
+	var s string
+	switch k {
+	case MinusInfinity:
+		if pretty {
+			s = "-&infin;"
+		} else {
+			s = "-oo"
+		}
+	case PlusInfinity:
+		if pretty {
+			s = "+&infin;"
+		} else {
+			s = "+oo"
+		}
+	default:
+		var err error
+		if pretty {
+			s, err = e.Numbers.PrettyString(a)
+		} else {
+			s, err = e.Numbers.String(a)
+		}
+		if err != nil {
+			return err
+		}
+	}
+	_, err := io.WriteString(w, s)
+	return err
 }
 
 func (e BinaryExtended) IsZero(a *numeral.BinaryRational, k ExtendedKind) (bool, error) {

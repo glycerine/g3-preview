@@ -3,6 +3,8 @@
 package interval
 
 import (
+	"io"
+
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -10,6 +12,26 @@ import (
 // rounding direction is selected by the concrete caller before an operation.
 type FixedExtended struct {
 	Numbers *numeral.FixedPointManager
+}
+
+// Display writes the concrete subpaving endpoint in source ext_numeral
+// spelling. Infinite endpoints never inspect their numeral storage.
+func (e FixedExtended) Display(w io.Writer, a *numeral.FixedPoint, k ExtendedKind) error {
+	var s string
+	switch k {
+	case MinusInfinity:
+		s = "-oo"
+	case PlusInfinity:
+		s = "+oo"
+	default:
+		var err error
+		s, err = e.Numbers.String(a)
+		if err != nil {
+			return err
+		}
+	}
+	_, err := io.WriteString(w, s)
+	return err
 }
 
 func (e FixedExtended) IsZero(a *numeral.FixedPoint, k ExtendedKind) (bool, error) {

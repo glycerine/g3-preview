@@ -10,6 +10,24 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
+type binaryDisplayRefusal struct {
+	bytes.Buffer
+	remaining int
+	err       error
+}
+
+func (w *binaryDisplayRefusal) Write(p []byte) (int, error) {
+	if w.remaining == 0 {
+		return 0, w.err
+	}
+	w.remaining--
+	return w.Buffer.Write(p)
+}
+
+func (w *binaryDisplayRefusal) WriteString(s string) (int, error) {
+	return w.Write([]byte(s))
+}
+
 func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 	budget := arena.NewBudget(1 << 28)
 	q, err := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{
@@ -72,6 +90,11 @@ func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 	must(a.DisplayPP(&out))
 	if out.String() != "(-3/2, 2]" {
 		t.Fatalf("finite pretty interval = %q", out.String())
+	}
+	writeErr := errors.New("binary upper endpoint refused")
+	refused := &binaryDisplayRefusal{remaining: 3, err: writeErr}
+	if err := a.DisplayPP(refused); !errors.Is(err, writeErr) || refused.String() != "(-3/2, " {
+		t.Fatalf("pretty display refusal = (%q, %v)", refused.String(), err)
 	}
 	must(m.SetInt32Power(&lo, -3, 3))
 	must(m.SetInt32Power(&hi, 5, 2))

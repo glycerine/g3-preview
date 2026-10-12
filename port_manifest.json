@@ -115446,6 +115446,14 @@
           ]
         },
         {
+          "name": "Concrete mpbq extended-number display: finite and signed-infinity endpoints reached by real-closure interval display (src/util/ext_numeral.h:323-333)",
+          "status": "ported",
+          "go_target": "pkg/math/realclosure/binary_interval.go",
+          "tests": [
+            "TestRealClosureBinaryIntervalRetainedCore"
+          ]
+        },
+        {
           "name": "Concrete mpq extended-number display: source-order finite and signed-infinity endpoint insertion reached by interval_manager (src/util/ext_numeral.h:321-333)",
           "status": "ported",
           "go_target": "pkg/math/interval/rational_extended.go",
@@ -115460,10 +115468,18 @@
           "tests": [
             "TestSubpavingFixedExtendedRetainedBranches"
           ]
+        },
+        {
+          "name": "Concrete mpfx extended-number display: finite and signed-infinity endpoints reached by subpaving interval display (src/util/ext_numeral.h:323-333)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_interval.go",
+          "tests": [
+            "TestSubpavingFixedMutableIntervalRetainedCore"
+          ]
         }
       ],
       "ownership": [
-        "RationalExtended borrows the rational manager and operand numerals. Finite arithmetic writes its caller-owned output; infinity results reset that output numerator/denominator using the manager, preserving source cleanup. Its display writes to the caller-owned writer in source order."
+        "Concrete rational, binary-rational and fixed-point extended operations borrow their numeral managers and operands. Finite arithmetic writes caller-owned outputs; infinity results reset outputs through the manager. Their displays write to caller-owned writers in source insertion order."
       ],
       "deviations": [
         "No generic manager-interface translation is retained. Concrete mpq, mpbq and mpfx specializations live beside their interval and subpaving consumers. src/test/ext_numeral.cpp is test-only.",
