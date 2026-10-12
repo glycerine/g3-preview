@@ -100335,7 +100335,8 @@
         "pkg/tactic/ufbv/match_subst.go",
         "pkg/tactic/ufbv/match_subst_apply.go",
         "pkg/tactic/ufbv/rewrite_rule_index.go",
-        "pkg/tactic/ufbv/rewrite_back_index.go"
+        "pkg/tactic/ufbv/rewrite_back_index.go",
+        "pkg/tactic/ufbv/rewrite_demodulator_schedule.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
@@ -100345,7 +100346,8 @@
         "TestMatchSubstConcretePairCacheAndVariableBindings",
         "TestMatchSubstTwoOffsetRHSAndQuantifierShift",
         "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators",
-        "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
+        "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
+        "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
       ],
       "conditionals": [
         {
@@ -100515,13 +100517,21 @@
           "tests": [
             "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
           ]
+        },
+        {
+          "name": "can_rewrite and reschedule_demodulators child-first match, forward/backward removal and main-todo transfer",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
+          "tests": [
+            "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
+          ]
         }
       ],
       "ownership": [
         "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction. The matcher borrows pair-cache keys but retains each substitution target until reset or close. The forward rule index retains one reference each to quantifier, LHS and RHS until index close."
       ],
       "deviations": [
-        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, forward-rule dispatch/removal and processed-formula rescheduling are ported; demodulator rescheduling, the remaining UFBV rewrite loop and tactic integration remain open."
+        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, forward-rule dispatch/removal and both rescheduling paths are ported; the remaining UFBV rewrite loop and tactic integration remain open."
       ]
     },
     {
@@ -100537,7 +100547,8 @@
         "pkg/tactic/ufbv/match_subst.go",
         "pkg/tactic/ufbv/match_subst_apply.go",
         "pkg/tactic/ufbv/rewrite_rule_index.go",
-        "pkg/tactic/ufbv/rewrite_back_index.go"
+        "pkg/tactic/ufbv/rewrite_back_index.go",
+        "pkg/tactic/ufbv/rewrite_demodulator_schedule.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
@@ -100547,7 +100558,8 @@
         "TestMatchSubstConcretePairCacheAndVariableBindings",
         "TestMatchSubstTwoOffsetRHSAndQuantifierShift",
         "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators",
-        "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
+        "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
+        "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
       ],
       "conditionals": [
         {
@@ -100610,6 +100622,14 @@
           "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
           "tests": [
             "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
+          ]
+        },
+        {
+          "name": "concrete can_rewrite and demodulator rescheduling across forward/backward indexes",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
+          "tests": [
+            "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
           ]
         }
       ],
@@ -156929,7 +156949,8 @@
         "pkg/smtcore/smt_model_finder_hint_cycle.go",
         "pkg/smtcore/smt_model_finder_hint_indexes.go",
         "pkg/tactic/ufbv/rewrite_rule_index.go",
-        "pkg/tactic/ufbv/rewrite_back_index.go"
+        "pkg/tactic/ufbv/rewrite_back_index.go",
+        "pkg/tactic/ufbv/rewrite_demodulator_schedule.go"
       ],
       "tests": [
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
@@ -156992,7 +157013,8 @@
         "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations",
         "TestModelFinderHintPreprocessIndexesAndResidueCandidates",
         "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators",
-        "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
+        "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
+        "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
       ],
       "conditionals": [
         {
@@ -157139,6 +157161,14 @@
           "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
           "tests": [
             "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
+          ]
+        },
+        {
+          "name": "UFBV demodulator occurrence snapshot and forward/backward object-set removal",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
+          "tests": [
+            "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
           ]
         }
       ],
@@ -161018,7 +161048,8 @@
         "pkg/ast/rewriter/bv_rewriter_concat_test.go",
         "pkg/tactic/ufbv/rewrite_traversal.go",
         "pkg/tactic/ufbv/rewrite_traversal_test.go",
-        "pkg/tactic/ufbv/rewrite_back_index.go"
+        "pkg/tactic/ufbv/rewrite_back_index.go",
+        "pkg/tactic/ufbv/rewrite_demodulator_schedule.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -161036,7 +161067,8 @@
         "TestPolynomialPSCBufferNativeStoppedReferenceCleanup",
         "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
         "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
-        "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
+        "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
+        "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
       ],
       "conditionals": [
         {
@@ -161136,6 +161168,14 @@
           "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
           "tests": [
             "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
+          ]
+        },
+        {
+          "name": "concrete UFBV main todo receives demodulator root after forward-index removal",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
+          "tests": [
+            "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
           ]
         }
       ],
