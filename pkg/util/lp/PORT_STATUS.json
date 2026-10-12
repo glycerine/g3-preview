@@ -4,7 +4,7 @@
   "native_statement_coverage_of_current_go_code": 86.6,
   "coverage_warning": "Latest completed full native checkpointc32fb569 measures29932/34582 LP statements86.6%; not a measurement of later current code. Actual session40124 terminal exit0 and package/profile inspection verified. Excludes all debug-only code and later preparation short-write/three numeric benchmarks/executor changes. Later increments have separate focused coverage and scalar full-count evidence. Go statement coverage is not C++ completion; whole retained-source/consumer/ownership/SMT/CLI audits remain open.",
   "remaining_work": [
-    "lp_params.hpp live generated constructor/getters: borrowed local ParamsRef, acquired lp module reference, local/module/default fallback for rep_freq/min/print_stats/simplex_strategy/bprop_on_pivoted_rows; actual shell/lp_frontend.cpp and smt/theory_lra.cpp consumers",
+    "Complete containing shell/lp_frontend.cpp and smt/theory_lra.cpp parameter/runtime integration; isolated generated LPParams constructor/getters and actual LP consumer value tests are complete",
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
     "remaining retained LU diagnostics and full solver/priority-queue lifecycle integration",
@@ -2895,32 +2895,97 @@
     },
     {
       "source": "src/util/lp/lp_params.hpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/util/lp/gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/util/lp/lp_params.go",
+        "pkg/util/lp/lp_params_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestLPParamsFiveGettersFallbackAndLiveLocal",
+        "TestLPParamsModuleCopySharingDetachmentAndCurrentReplacement",
+        "TestLPParamsDefaultEmptyOwnerGuardsAndBorrowedLifetime",
+        "TestLPParamsConstructorReservationFailuresAndClose",
+        "TestLPParamsMissingGlobalAndAcquiredModuleLifetime",
+        "TestLPParamsRetainedShellAndLRAConsumerValues",
+        "TestLPParameterCatalogSchema",
+        "TestLPParameterCatalogReachedFailurePrefixes",
+        "TestLPParameterCatalogNativeStorageIgnoresRuntimeReservationFault"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "borrowed-local/acquired-module constructor, rep_freq/min/print_stats/simplex_strategy/bprop_on_pivoted_rows and implicit module destructor",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lp_params.go",
+          "tests": [
+            "TestLPParamsFiveGettersFallbackAndLiveLocal",
+            "TestLPParamsModuleCopySharingDetachmentAndCurrentReplacement",
+            "TestLPParamsDefaultEmptyOwnerGuardsAndBorrowedLifetime",
+            "TestLPParamsConstructorReservationFailuresAndClose",
+            "TestLPParamsMissingGlobalAndAcquiredModuleLifetime",
+            "TestLPParamsRetainedShellAndLRAConsumerValues"
+          ]
+        }
+      ],
+      "ownership": [
+        "Borrow local ParamsRef object without early value validation; capture exactly one owning lp module reference. Existing ModuleParamsOwner concrete frame owns that reference and destructor receipt, charged separately from the single LPParams header. Null default local has no dynamic backing. Constructor failure unwinds reached frame storage; nonnil partial header remains explicitly closeable. Copy-on-write and shared reset are delegated to real ParamsContext; no value clone or repeated registry lookup. Close is identity-checked/idempotent and never releases the borrowed local/context/global service."
+      ],
+      "deviations": [
+        "Explicit injected GlobalParamsService replaces the source global borrow; containing shell/SMT runtime binding remains independently partial. Invalid borrowed lifetimes and shallow owning copies return typed Go errors. No unused whole-object copy adapter or Python generator runtime is introduced."
       ]
     },
     {
       "source": "src/util/lp/lp_params.pyg",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/gparams_catalog_collectors_test.go",
-        "pkg/util/lp/gparams_catalog_collectors.go"
+        "pkg/util/lp/gparams_catalog_collectors.go",
+        "pkg/util/lp/lp_params.go",
+        "pkg/util/lp/lp_params_test.go"
       ],
       "tests": [
         "TestLPParameterCatalogSchema",
         "TestLPParameterCatalogReachedFailurePrefixes",
-        "TestLPParameterCatalogNativeStorageIgnoresRuntimeReservationFault"
+        "TestLPParameterCatalogNativeStorageIgnoresRuntimeReservationFault",
+        "TestLPParamsFiveGettersFallbackAndLiveLocal",
+        "TestLPParamsModuleCopySharingDetachmentAndCurrentReplacement",
+        "TestLPParamsDefaultEmptyOwnerGuardsAndBorrowedLifetime",
+        "TestLPParamsConstructorReservationFailuresAndClose",
+        "TestLPParamsMissingGlobalAndAcquiredModuleLifetime",
+        "TestLPParamsRetainedShellAndLRAConsumerValues"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "borrowed-local/acquired-module constructor, rep_freq/min/print_stats/simplex_strategy/bprop_on_pivoted_rows and implicit module destructor",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lp_params.go",
+          "tests": [
+            "TestLPParamsFiveGettersFallbackAndLiveLocal",
+            "TestLPParamsModuleCopySharingDetachmentAndCurrentReplacement",
+            "TestLPParamsDefaultEmptyOwnerGuardsAndBorrowedLifetime",
+            "TestLPParamsConstructorReservationFailuresAndClose",
+            "TestLPParamsMissingGlobalAndAcquiredModuleLifetime",
+            "TestLPParamsRetainedShellAndLRAConsumerValues"
+          ]
+        }
+      ],
+      "ownership": [
+        "Borrow local ParamsRef object without early value validation; capture exactly one owning lp module reference. Existing ModuleParamsOwner concrete frame owns that reference and destructor receipt, charged separately from the single LPParams header. Null default local has no dynamic backing. Constructor failure unwinds reached frame storage; nonnil partial header remains explicitly closeable. Copy-on-write and shared reset are delegated to real ParamsContext; no value clone or repeated registry lookup. Close is identity-checked/idempotent and never releases the borrowed local/context/global service."
+      ],
+      "deviations": [
+        "Explicit injected GlobalParamsService replaces the source global borrow; containing shell/SMT runtime binding remains independently partial. Invalid borrowed lifetimes and shallow owning copies return typed Go errors. No unused whole-object copy adapter or Python generator runtime is introduced."
       ]
     },
     {
@@ -6457,8 +6522,8 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "partial": 82,
-    "ported": 13,
+    "partial": 77,
+    "ported": 18,
     "reference_only": 10,
     "dead_deleted": 3
   },
@@ -11515,32 +11580,6 @@
     "full_registered_run_verified": false,
     "whole_unit_promotion": false
   },
-  "running_pair_benchmark_checkpoint": {
-    "status": "running",
-    "commit": "dada87f0",
-    "started_utc": "2026-10-12 01:13:47 UTC",
-    "runner_pid": 2,
-    "command": [
-      "go",
-      "-C",
-      "pkg",
-      "test",
-      "./util/lp",
-      "-run",
-      "^$",
-      "-bench",
-      "^BenchmarkLPPairSource1000000$",
-      "-benchtime=1x",
-      "-count=1",
-      "-timeout=120m"
-    ],
-    "log": "/mnt/oldrog/tmp/g3-lp-pair-benchmark-full-native.log",
-    "status_file": "/mnt/oldrog/tmp/g3-lp-pair-benchmark-full-native.json",
-    "scope": "Actual numeric-pair source benchmark1000000 outer iterations/10000000products; independent exact result and successful owner cleanup required. Not a full module test.",
-    "go_pid": 5,
-    "actual_exec_session": 70865,
-    "completion_verified": false
-  },
   "latest_scalar_benchmark_checkpoint": {
     "status": "completed",
     "commit": "5920ba19",
@@ -11639,5 +11678,83 @@
     "focused_debug_seconds": 0.695,
     "consumer_native_seconds": 82.91,
     "consumer_debug_seconds": 139.937
+  },
+  "latest_pair_benchmark_checkpoint": {
+    "status": "failed",
+    "commit": "dada87f0",
+    "started_utc": "2026-10-12 01:13:47 UTC",
+    "runner_pid": 2,
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "./util/lp",
+      "-run",
+      "^$",
+      "-bench",
+      "^BenchmarkLPPairSource1000000$",
+      "-benchtime=1x",
+      "-count=1",
+      "-timeout=120m"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-lp-pair-benchmark-full-native.log",
+    "status_file": "/mnt/oldrog/tmp/g3-lp-pair-benchmark-full-native.json",
+    "scope": "Actual numeric-pair source benchmark1000000 outer iterations/10000000products; independent exact result and successful owner cleanup required. Not a full module test.",
+    "go_pid": 5,
+    "actual_exec_session": 70865,
+    "completion_verified": false,
+    "exit_code": 1,
+    "completed_utc": "2026-10-12 01:31:05 UTC",
+    "full_registered_pair_count_verified": false,
+    "scope_warning": "Terminal session70865 exit1: signal: killed, package1028.980s. No result, count, or owning cleanup verdict. SIGKILL cause unknown; inspected session cgroup reports no OOM kills. No full-count completion credit."
+  },
+  "latest_generated_lp_params_audit": {
+    "summary": "Completed lp_params.hpp/PYG retained constructor, all five getters and descriptor collection. Concrete LPParams borrows the actual local reference, acquires one module reference at construction, and uses the existing concrete Params fallback/ownership engines. Getters observe local replacement, shared module resets, source copy-on-write detachment and unsigned values without snapshotting or looking up a new current registry. Nil local selects an embedded empty reference; failed constructor storage is returned for Close, only owned module/frame/header storage is released. Six new test groups include25 independent key/fallback worlds, local mutation after construction, module detachment/shared reset/current replacement/finalization, default-empty and shallow-copy/reentrant/lifetime guards, every cold constructor reservation through success, missing-current failure/unwind, and30 actual floating-cost/settings/LAR strategy/pivot-row-link consumer worlds. Native and combined debug/checked focused tests each0.076s; lp_params.go59/62statements95.2% both. Remaining returns guard configuration identities already checked, closed borrowed context default construction, and delegated cleanup failure. Both LP vets pass. This completes the small generated parameter unit, not the containing shell/SMT entry points or process-global binding. No full-suite measurement of this increment. Source roots captured in /mnt/oldrog/tmp/g3-lp-params-consumers-audit.txt. Commands/tests restricted to CPUs8\u201316 and GOMAXPROCS9.",
+    "native_statements": {
+      "covered": 59,
+      "total": 62
+    },
+    "combined_debug_checked_statements": {
+      "covered": 59,
+      "total": 62
+    }
+  },
+  "running_pair_benchmark_checkpoint": {
+    "status": "running",
+    "commit": "d72a5561",
+    "started_utc": "2026-10-12 03:28:51 UTC",
+    "runner_pid": 2,
+    "cpu_affinity": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "./util/lp",
+      "-run",
+      "^$",
+      "-bench",
+      "^BenchmarkLPPairSource1000000$",
+      "-benchtime=1x",
+      "-count=1",
+      "-timeout=120m"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-lp-pair-benchmark-cpu8-16.log",
+    "status_file": "/mnt/oldrog/tmp/g3-lp-pair-benchmark-cpu8-16.json",
+    "scope": "Actual one million outer iterations / ten million products; independent exact result, count and owning cleanup required. Working tree includes LP parameter owner.",
+    "go_pid": 5,
+    "actual_exec_session": 71810,
+    "completion_verified": false
   }
 }

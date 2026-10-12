@@ -127092,19 +127092,30 @@
       "path": "src/util/lp/lp_params.hpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/util/lp/gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/util/lp/lp_params.go",
+        "pkg/util/lp/lp_params_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestLPParamsFiveGettersFallbackAndLiveLocal",
+        "TestLPParamsModuleCopySharingDetachmentAndCurrentReplacement",
+        "TestLPParamsDefaultEmptyOwnerGuardsAndBorrowedLifetime",
+        "TestLPParamsConstructorReservationFailuresAndClose",
+        "TestLPParamsMissingGlobalAndAcquiredModuleLifetime",
+        "TestLPParamsRetainedShellAndLRAConsumerValues",
+        "TestLPParameterCatalogSchema",
+        "TestLPParameterCatalogReachedFailurePrefixes",
+        "TestLPParameterCatalogNativeStorageIgnoresRuntimeReservationFault"
       ],
       "conditionals": [
         {
@@ -127116,11 +127127,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order",
           "status": "ported",
           "go_target": "pkg/util/lp/gparams_catalog_collectors.go",
           "tests": [
@@ -127133,29 +127144,52 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "borrowed-local/acquired-module constructor, rep_freq/min/print_stats/simplex_strategy/bprop_on_pivoted_rows and implicit module destructor",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lp_params.go",
+          "tests": [
+            "TestLPParamsFiveGettersFallbackAndLiveLocal",
+            "TestLPParamsModuleCopySharingDetachmentAndCurrentReplacement",
+            "TestLPParamsDefaultEmptyOwnerGuardsAndBorrowedLifetime",
+            "TestLPParamsConstructorReservationFailuresAndClose",
+            "TestLPParamsMissingGlobalAndAcquiredModuleLifetime",
+            "TestLPParamsRetainedShellAndLRAConsumerValues"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Borrow local ParamsRef object without early value validation; capture exactly one owning lp module reference. Existing ModuleParamsOwner concrete frame owns that reference and destructor receipt, charged separately from the single LPParams header. Null default local has no dynamic backing. Constructor failure unwinds reached frame storage; nonnil partial header remains explicitly closeable. Copy-on-write and shared reset are delegated to real ParamsContext; no value clone or repeated registry lookup. Close is identity-checked/idempotent and never releases the borrowed local/context/global service."
       ],
-      "deviations": []
+      "deviations": [
+        "Explicit injected GlobalParamsService replaces the source global borrow; containing shell/SMT runtime binding remains independently partial. Invalid borrowed lifetimes and shallow owning copies return typed Go errors. No unused whole-object copy adapter or Python generator runtime is introduced."
+      ]
     },
     {
       "path": "src/util/lp/lp_params.pyg",
       "component": "util",
       "role": "generated_input",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/gparams_catalog_collectors_test.go",
-        "pkg/util/lp/gparams_catalog_collectors.go"
+        "pkg/util/lp/gparams_catalog_collectors.go",
+        "pkg/util/lp/lp_params.go",
+        "pkg/util/lp/lp_params_test.go"
       ],
       "tests": [
         "TestLPParameterCatalogSchema",
         "TestLPParameterCatalogReachedFailurePrefixes",
-        "TestLPParameterCatalogNativeStorageIgnoresRuntimeReservationFault"
+        "TestLPParameterCatalogNativeStorageIgnoresRuntimeReservationFault",
+        "TestLPParamsFiveGettersFallbackAndLiveLocal",
+        "TestLPParamsModuleCopySharingDetachmentAndCurrentReplacement",
+        "TestLPParamsDefaultEmptyOwnerGuardsAndBorrowedLifetime",
+        "TestLPParamsConstructorReservationFailuresAndClose",
+        "TestLPParamsMissingGlobalAndAcquiredModuleLifetime",
+        "TestLPParamsRetainedShellAndLRAConsumerValues"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "independent five-parameter catalog schema, every reached kind-collision prefix and native backing under Runtime refusal",
@@ -127166,10 +127200,27 @@
             "TestLPParameterCatalogReachedFailurePrefixes",
             "TestLPParameterCatalogNativeStorageIgnoresRuntimeReservationFault"
           ]
+        },
+        {
+          "name": "borrowed-local/acquired-module constructor, rep_freq/min/print_stats/simplex_strategy/bprop_on_pivoted_rows and implicit module destructor",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lp_params.go",
+          "tests": [
+            "TestLPParamsFiveGettersFallbackAndLiveLocal",
+            "TestLPParamsModuleCopySharingDetachmentAndCurrentReplacement",
+            "TestLPParamsDefaultEmptyOwnerGuardsAndBorrowedLifetime",
+            "TestLPParamsConstructorReservationFailuresAndClose",
+            "TestLPParamsMissingGlobalAndAcquiredModuleLifetime",
+            "TestLPParamsRetainedShellAndLRAConsumerValues"
+          ]
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "Borrow local ParamsRef object without early value validation; capture exactly one owning lp module reference. Existing ModuleParamsOwner concrete frame owns that reference and destructor receipt, charged separately from the single LPParams header. Null default local has no dynamic backing. Constructor failure unwinds reached frame storage; nonnil partial header remains explicitly closeable. Copy-on-write and shared reset are delegated to real ParamsContext; no value clone or repeated registry lookup. Close is identity-checked/idempotent and never releases the borrowed local/context/global service."
+      ],
+      "deviations": [
+        "Explicit injected GlobalParamsService replaces the source global borrow; containing shell/SMT runtime binding remains independently partial. Invalid borrowed lifetimes and shallow owning copies return typed Go errors. No unused whole-object copy adapter or Python generator runtime is introduced."
+      ]
     },
     {
       "path": "src/util/lp/lp_primal_core_solver.h",
