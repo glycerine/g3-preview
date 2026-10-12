@@ -33806,6 +33806,8 @@
         "pkg/math/euclid/apply_solution_test.go",
         "pkg/math/euclid/normalize.go",
         "pkg/math/euclid/normalize_test.go",
+        "pkg/math/euclid/pivot.go",
+        "pkg/math/euclid/pivot_test.go",
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go",
         "pkg/util/numeral/scoped_numeral.go"
@@ -33823,6 +33825,8 @@
         "TestEuclideanNormalizeUnitGCDPreservesEquation",
         "TestEuclideanConstantOnlyTrivialAndContradictoryEquations",
         "TestEuclideanAssertEquationSubstitutesThenNormalizes",
+        "TestEuclideanSelectNextPivotSourceTiesAndUnitStop",
+        "TestEuclideanEliminateUnitSubstitutesOccurrences",
         "TestEuclideanPositionSourceBinarySearch",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership",
         "TestEuclideanSetupHeaderRefusalBeforeBuffers",
@@ -33952,6 +33956,15 @@
           ]
         },
         {
+          "name": "select_next_var coefficient/occurrence/equation-size priority and elim_unit substitution of retained occurrences at cpp:224-284,575-622",
+          "status": "partial",
+          "go_target": "pkg/math/euclid/pivot.go",
+          "tests": [
+            "TestEuclideanSelectNextPivotSourceTiesAndUnitStop",
+            "TestEuclideanEliminateUnitSubstitutesOccurrences"
+          ]
+        },
+        {
           "name": "elimination, decomposition and model/justification algorithms",
           "status": "unported"
         }
@@ -33964,7 +33977,7 @@
       ],
       "deviations": [
         "Source normalize_eq checks divisibility of the constant but divides only variable coefficients and justification coefficients by their gcd. The Go path retains that exact result. After source normalize_eq destroys an empty zero equality, assert_eq still calls add_occs on its null slot; Go skips that invalid dereference.",
-        "Pivot selection/elimination, decomposition and the public solver API remain unported; the concrete assertion and substitution paths currently operate on internally owned equations."
+        "Unit-pivot selection and elimination are ported with source occurrence and solution ownership order; non-unit decomposition and the public solver API remain unported. The concrete assertion and substitution paths currently operate on internally owned equations."
       ]
     },
     {

@@ -31,10 +31,9 @@ func position(xs []uint32, x uint32) uint32 {
 	return nullEquationIndex
 }
 
-// solverSetup is the concrete pre-elimination owner of Euclidean variables,
-// justifications, reusable numeral buffers and newly constructed equations.
-// It borrows its rational manager. Equation normalization and substitution
-// are separate pending source operations.
+// solverSetup owns the currently reached Euclidean variable, equation,
+// substitution, normalization and unit-pivot state. It borrows its rational
+// manager; non-unit decomposition and the public solver remain pending.
 type solverSetup struct {
 	self               *solverSetup
 	manager            *numeral.RationalManager
@@ -49,6 +48,11 @@ type solverSetup struct {
 	occurrences        [][]uint32
 	nextJustification  uint32
 	inconsistent       uint32
+	nextX              uint32
+	nextEq             uint32
+	nextA              numeral.Int
+	nextPosA           bool
+	nextADone          bool
 	equations          []*equation
 	solution           []*equation
 	equationCloseIndex int
@@ -93,7 +97,7 @@ func newSolverSetup(m *numeral.RationalManager) (*solverSetup, error) {
 		return nil, e
 	}
 	s := &solverSetup{manager: m, asBuffer: as, bsBuffer: bs, tmpAs: tmpAs, tmpBs: tmpBs,
-		inconsistent: nullEquationIndex, header: header}
+		inconsistent: nullEquationIndex, nextX: nullEquationIndex, nextEq: nullEquationIndex, header: header}
 	s.self = s
 	s.queue, e = heap.New(16, heap.Config{Budget: m.BudgetField, Less: func(a, b int32) bool {
 		return s.solved[a] < s.solved[b]
@@ -201,8 +205,8 @@ func (s *solverSetup) addEquation(as []numeral.Int, xs []uint32, c *numeral.Int,
 	return eq, nil
 }
 
-// Close destroys equations in source list order, then the member buffers in
-// reverse declaration order.
+// Close destroys the selected coefficient, equation lists and then member
+// buffers in source destructor and reverse declaration order.
 // The borrowed rational manager remains with its caller.
 func (s *solverSetup) Close() error {
 	if s == nil || s.self != s {
@@ -210,6 +214,12 @@ func (s *solverSetup) Close() error {
 	}
 	if s.closed {
 		return nil
+	}
+	if !s.nextADone {
+		if e := s.manager.Integers().Del(&s.nextA); e != nil {
+			return e
+		}
+		s.nextADone = true
 	}
 	for s.equationCloseIndex < len(s.equations) {
 		if s.equations[s.equationCloseIndex] == nil {
