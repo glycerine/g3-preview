@@ -158,6 +158,18 @@ func TestLPRationalPermutationDenseAllocationFailureCensus(t *testing.T) {
 					}
 					h.budget.FailAfter(-1)
 					if err == nil {
+						// The successful endpoint must produce the literal swapped
+						// coordinates, including the untouched input buffer.
+						wantX, _ := new(big.Rat).SetString(strings.Repeat("1234567890", 100) + "/7")
+						xs := []*big.Rat{big.NewRat(1, 1), wantX}
+						for i := 0; i < 2; i++ {
+							wi, xi := i, 1-i
+							if op != "left" && !strings.HasSuffix(op, "-X") {
+								wi, xi = 1-i, i
+							}
+							lpCheckExactPermutationCoordinate(t, h, &w.Data[i], xs[wi])
+							lpCheckExactPermutationCoordinate(t, h, &x.Data[i], xs[xi])
+						}
 						successes++
 						done = true
 					} else {
@@ -331,6 +343,21 @@ func TestLPPairPermutationDenseAllocationFailureCensus(t *testing.T) {
 					}
 					h.budget.FailAfter(-1)
 					if err == nil {
+						// The successful endpoint must produce the literal swapped
+						// coordinates, including the untouched input buffer.
+						wantX, _ := new(big.Rat).SetString(strings.Repeat("1234567890", 100) + "/7")
+						wantY, _ := new(big.Rat).SetString(strings.Repeat("9876543210", 100) + "/11")
+						xs := []*big.Rat{big.NewRat(1, 1), wantX}
+						ys := []*big.Rat{big.NewRat(-2, 1), wantY}
+						for i := 0; i < 2; i++ {
+							wi, xi := i, 1-i
+							if op != "left" && !strings.HasSuffix(op, "-X") {
+								wi, xi = 1-i, i
+							}
+							lpCheckExactPermutationCoordinate(t, h, &w.Data[i], xs[wi])
+							lpCheckExactPermutationCoordinate(t, h, &x.Data[i].X, xs[xi])
+							lpCheckExactPermutationCoordinate(t, h, &x.Data[i].Y, ys[xi])
+						}
 						successes++
 						done = true
 					} else {
@@ -503,6 +530,22 @@ func TestLPRationalPermutationSparseAllocationFailureCensus(t *testing.T) {
 					}
 					h.budget.FailAfter(-1)
 					if err == nil {
+						// For P=[2,0,1] and w=[b,0,a], these two literal
+						// products also fix the source insertion order.
+						aWant, _ := new(big.Rat).SetString(strings.Repeat("1234567890", 100) + "/7")
+						bWant, _ := new(big.Rat).SetString(strings.Repeat("9876543210", 100) + "/11")
+						want := []*big.Rat{aWant, bWant, big.NewRat(0, 1)}
+						indices := []uint32{0, 1}
+						if op == "right" || op == "reverse-left" {
+							want = []*big.Rat{big.NewRat(0, 1), aWant, bWant}
+							indices = []uint32{1, 2}
+						}
+						for i := range want {
+							lpCheckExactPermutationCoordinate(t, h, &w.Data[i], want[i])
+						}
+						if !reflect.DeepEqual(w.Index, indices) {
+							t.Fatalf("index order: got %v want %v", w.Index, indices)
+						}
 						successes++
 						done = true
 					} else {
@@ -707,6 +750,22 @@ func TestLPPairPermutationSparseAllocationFailureCensus(t *testing.T) {
 					}
 					h.budget.FailAfter(-1)
 					if err == nil {
+						// For P=[2,0,1] and w=[b,0,a], these two literal
+						// products also fix the source insertion order.
+						aWant, _ := new(big.Rat).SetString(strings.Repeat("1234567890", 100) + "/7")
+						bWant, _ := new(big.Rat).SetString(strings.Repeat("9876543210", 100) + "/11")
+						want := []*big.Rat{aWant, bWant, big.NewRat(0, 1)}
+						indices := []uint32{0, 1}
+						if op == "right" || op == "reverse-left" {
+							want = []*big.Rat{big.NewRat(0, 1), aWant, bWant}
+							indices = []uint32{1, 2}
+						}
+						for i := range want {
+							lpCheckExactPermutationCoordinate(t, h, &w.Data[i], want[i])
+						}
+						if !reflect.DeepEqual(w.Index, indices) {
+							t.Fatalf("index order: got %v want %v", w.Index, indices)
+						}
 						successes++
 						done = true
 					} else {

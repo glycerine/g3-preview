@@ -135673,7 +135673,7 @@
       "path": "src/util/lp/permutation_matrix.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/permutation.go",
         "pkg/util/lp/permutation_float.go",
@@ -135701,7 +135701,8 @@
         "TestLPRationalPermutationAllDenseGuardProfiles",
         "TestLPPairPermutationAllDenseGuardProfiles",
         "TestLPRationalPermutationStoppedDestinationOwnership",
-        "TestLPPairPermutationStoppedDestinationOwnership"
+        "TestLPPairPermutationStoppedDestinationOwnership",
+        "TestLPFloatPermutationLargerSparseInputPrefixes"
       ],
       "conditionals": [
         {
@@ -135735,8 +135736,8 @@
           "text": "SASSERT(i < size() && pi < size());  m_permutation[i] = pi;  m_rev[pi] = i;  }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "shared unsigned forward/reverse/work mapping, literal set/init/resize, entry/identity, transpositions and four composition bodies",
@@ -135757,7 +135758,8 @@
             "TestLPFloatPermutationIndependentDenseAndSparseProducts",
             "TestLPFloatPermutationSource",
             "TestLPPermutationGuardPrefixesAndFloatingComparisons",
-            "TestLPPermutationShrunkDomainPreservesReachedPrefixes"
+            "TestLPPermutationShrunkDomainPreservesReachedPrefixes",
+            "TestLPFloatPermutationLargerSparseInputPrefixes"
           ]
         },
         {
@@ -135782,29 +135784,59 @@
             "TestLPRationalPermutationStoppedDestinationOwnership",
             "TestLPPairPermutationStoppedDestinationOwnership"
           ]
+        },
+        {
+          "name": "retained floating debug inverse construction and matrix dimensions/entry; exact variants excluded",
+          "status": "ported",
+          "go_target": "pkg/util/lp/permutation_float.go",
+          "tests": [
+            "TestLPFloatPermutationSource",
+            "TestLPPermutationGuardPrefixesAndFloatingComparisons"
+          ]
         }
       ],
       "ownership": [
         "Native Go uint32/float64 slices replace source vector internals. Shared index algorithms are concrete unsigned operations; floating applications own separate T/X work buffers. Sparse transformations preserve source copy/clear/replace and index order, including reached invalid-domain prefixes. No generic/any-valued algebra layer or simulated slice allocation failures.",
         "Exact T/X buffers and sparse lexical copies own concrete project numerals through existing typed indexed-vector call receipts. All scalar assignments deep-copy; stopped raw generations and physical allocations remain with the actual invoking owner. Destination sparse writes belong to their indexed vector; permutation Close cannot consume its stopped invocation. Native Go backing is uncharged and no source vector/STL adapter is ported.",
-        "Permutation allocation fault campaigns now cover both pooled and direct physical allocation for all six dense and four sparse operations of RationalPermutation and PairPermutation (40 campaigns total). Each walks real refusals through first success, requires physical-allocation errors, checks pending-owner guards, and verifies named numerical roots after cleanup; dense campaigns also check caller coordinates after permutation Close. Production implementation unchanged. Whole permutation units remain partial pending retained-source/LU integration audit."
+        "Permutation allocation fault campaigns now cover both pooled and direct physical allocation for all six dense and four sparse operations of RationalPermutation and PairPermutation (40 campaigns total). Each walks real refusals through first success, requires physical-allocation errors, checks pending-owner guards, and verifies named numerical roots after cleanup; dense campaigns also check caller coordinates after permutation Close. Production implementation unchanged. Whole permutation units remain partial pending retained-source/LU integration audit.",
+        "Whole retained permutation operation/ownership audit: native unsigned mapping, source Set and resize/init publication, both transpositions, four literal composition bodies and self-alias behavior; actual float64/float64, mpq/mpq and mpq/impq dense applications and float64/mpq indexed transformations. Separate owning exact T/X buffers, lexical sparse copies and debug dense snapshot/difference lifetimes preserve source traversal, publication and destruction order. Actual LU solve/update/extension, sparse mapping/swaps, dense-block/conjugation and original floating permutation test consumers checked. No source repair of nonbijective mappings, stale shrink domains, right-self compositions, duplicate sparse indices or unconditional indexed_vector::is_OK. Source empty/identity/default construction uses native zero-valued buffers; float matrix/inverse values construction retained. Unused exact debug/inverse/values adapters removed in 29cb5a7d; source compact printer, is_even and declaration-only shrink excluded. This completes the three permutation units only; containing LU/sparse/dense/CLI/SMT audits remain separate."
       ],
       "deviations": [
-        "Formatting and complete LU/matrix integration remain open; no whole-unit promotion. Declaration-only shrink_by_one_identity has no source body or caller and receives no invented adapter.",
         "Literal transpositions exchange the opposite dense-matrix side from their names, while multiplication conventions follow the source bodies. Right self products and reverse-right self products read already-mutated entries; they are not repaired into group operations. Resize preserves stale mappings on shrink, and typed Go guards retain each reached valid prefix.",
         "Dense size SASSERT uses existing explicit debug error profile; native traversals preserve source in-range prefixes and guard only actual invalid indexing. Debug ApplyRightIndexed executes the actual preliminary dense transform and final source relative comparison, so diagnostic failure prefixes differ from native. Shared process-global debug/stream binding is not claimed.",
         "Exact indexed applications retain their real lexical copies after a failed call until owner Close. Dense caller coordinates retain completed/partial assignments; permutation cleanup deletes only its own buffers and acquired roots. Exact debug equality executes subtraction and zero inspection, rather than floating conversion or structural equality. Source Init/Resize publishes identity mappings only after numeric buffer resizing."
       ],
       "retained_source_exclusions": [
         "Exact mpq/mpq and mpq/impq get_inverse and length+values construction: no retained source caller. Only floating original test invokes get_inverse; exact Go adapters and mirror tests removed. Exact fixtures use identity construction plus Set.",
-        "Exact permutation debug matrix row_count/column_count/get_elem: no retained source debug matrix consumer. Removed unused Go adapters; actual floating debug matrix/inverse remains."
-      ]
+        "Exact permutation debug matrix row_count/column_count/get_elem: no retained source debug matrix consumer. Removed unused Go adapters; actual floating debug matrix/inverse remains.",
+        {
+          "source_methods": [
+            "permutation_matrix::print",
+            "is_even"
+          ],
+          "reason": "No retained caller in whole-src/LP-driver scan. Compact permutation print is not the separately retained matrix print_matrix function."
+        },
+        {
+          "source_methods": [
+            "shrink_by_one_identity"
+          ],
+          "reason": "Declaration only, no source implementation or caller; no invented Go method."
+        },
+        {
+          "source_methods": [
+            "unused generic L copy/clear/reverse-left instantiations",
+            "saved ref proxies and whole-owner assignment adapters"
+          ],
+          "reason": "Retained transformations use concrete float64 or mpq sparse vectors and actual exact T/X dense buffers. Native Go values/slices and Set implement reached index operations; unused templates/STL are excluded."
+        }
+      ],
+      "evidence": "Whole retained permutation operation/ownership audit: native unsigned mapping, source Set and resize/init publication, both transpositions, four literal composition bodies and self-alias behavior; actual float64/float64, mpq/mpq and mpq/impq dense applications and float64/mpq indexed transformations. Separate owning exact T/X buffers, lexical sparse copies and debug dense snapshot/difference lifetimes preserve source traversal, publication and destruction order. Actual LU solve/update/extension, sparse mapping/swaps, dense-block/conjugation and original floating permutation test consumers checked. No source repair of nonbijective mappings, stale shrink domains, right-self compositions, duplicate sparse indices or unconditional indexed_vector::is_OK. Source empty/identity/default construction uses native zero-valued buffers; float matrix/inverse values construction retained. Unused exact debug/inverse/values adapters removed in 29cb5a7d; source compact printer, is_even and declaration-only shrink excluded. This completes the three permutation units only; containing LU/sparse/dense/CLI/SMT audits remain separate."
     },
     {
       "path": "src/util/lp/permutation_matrix.hpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/permutation.go",
         "pkg/util/lp/permutation_float.go",
@@ -135836,7 +135868,8 @@
         "TestLPPairPermutationStoppedDestinationOwnership",
         "TestLPPermutationExactVectorEqualityCopiedLeftAndEarlyReturn",
         "TestLPPermutationExactVectorEqualityLengthAndEmpty",
-        "TestLPPermutationExactVectorEqualityPhysicalRefusals"
+        "TestLPPermutationExactVectorEqualityPhysicalRefusals",
+        "TestLPFloatPermutationLargerSparseInputPrefixes"
       ],
       "conditionals": [
         {
@@ -135978,8 +136011,8 @@
           "text": "SASSERT(q.size() == size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "shared unsigned forward/reverse/work mapping, literal set/init/resize, entry/identity, transpositions and four composition bodies",
@@ -136000,7 +136033,8 @@
             "TestLPFloatPermutationIndependentDenseAndSparseProducts",
             "TestLPFloatPermutationSource",
             "TestLPPermutationGuardPrefixesAndFloatingComparisons",
-            "TestLPPermutationShrunkDomainPreservesReachedPrefixes"
+            "TestLPPermutationShrunkDomainPreservesReachedPrefixes",
+            "TestLPFloatPermutationLargerSparseInputPrefixes"
           ]
         },
         {
@@ -136035,30 +136069,60 @@
             "TestLPPermutationExactVectorEqualityLengthAndEmpty",
             "TestLPPermutationExactVectorEqualityPhysicalRefusals"
           ]
+        },
+        {
+          "name": "retained floating debug inverse construction and matrix dimensions/entry; exact variants excluded",
+          "status": "ported",
+          "go_target": "pkg/util/lp/permutation_float.go",
+          "tests": [
+            "TestLPFloatPermutationSource",
+            "TestLPPermutationGuardPrefixesAndFloatingComparisons"
+          ]
         }
       ],
       "ownership": [
         "Native Go uint32/float64 slices replace source vector internals. Shared index algorithms are concrete unsigned operations; floating applications own separate T/X work buffers. Sparse transformations preserve source copy/clear/replace and index order, including reached invalid-domain prefixes. No generic/any-valued algebra layer or simulated slice allocation failures.",
         "Exact T/X buffers and sparse lexical copies own concrete project numerals through existing typed indexed-vector call receipts. All scalar assignments deep-copy; stopped raw generations and physical allocations remain with the actual invoking owner. Destination sparse writes belong to their indexed vector; permutation Close cannot consume its stopped invocation. Native Go backing is uncharged and no source vector/STL adapter is ported.",
-        "Debug equality scratch owns the copied-left and returned difference slots plus existing exact call receipts. Returned temporary is destroyed before next element/early false; failed operations retain reached storage for scratch Close. Other source methods/whole-owner audits remain independently partial.",
-        "Permutation allocation fault campaigns now cover both pooled and direct physical allocation for all six dense and four sparse operations of RationalPermutation and PairPermutation (40 campaigns total). Each walks real refusals through first success, requires physical-allocation errors, checks pending-owner guards, and verifies named numerical roots after cleanup; dense campaigns also check caller coordinates after permutation Close. Production implementation unchanged. Whole permutation units remain partial pending retained-source/LU integration audit."
+        "Debug equality scratch owns the copied-left and returned difference slots plus existing exact call receipts. Returned temporary is destroyed before next element/early false; failed operations retain reached storage for scratch Close. Containing LU/sparse/dense audits remain separate.",
+        "Permutation allocation fault campaigns now cover both pooled and direct physical allocation for all six dense and four sparse operations of RationalPermutation and PairPermutation (40 campaigns total). Each walks real refusals through first success, requires physical-allocation errors, checks pending-owner guards, and verifies named numerical roots after cleanup; dense campaigns also check caller coordinates after permutation Close. Production implementation unchanged. Whole permutation units remain partial pending retained-source/LU integration audit.",
+        "Whole retained permutation operation/ownership audit: native unsigned mapping, source Set and resize/init publication, both transpositions, four literal composition bodies and self-alias behavior; actual float64/float64, mpq/mpq and mpq/impq dense applications and float64/mpq indexed transformations. Separate owning exact T/X buffers, lexical sparse copies and debug dense snapshot/difference lifetimes preserve source traversal, publication and destruction order. Actual LU solve/update/extension, sparse mapping/swaps, dense-block/conjugation and original floating permutation test consumers checked. No source repair of nonbijective mappings, stale shrink domains, right-self compositions, duplicate sparse indices or unconditional indexed_vector::is_OK. Source empty/identity/default construction uses native zero-valued buffers; float matrix/inverse values construction retained. Unused exact debug/inverse/values adapters removed in 29cb5a7d; source compact printer, is_even and declaration-only shrink excluded. This completes the three permutation units only; containing LU/sparse/dense/CLI/SMT audits remain separate."
       ],
       "deviations": [
-        "Formatting and complete LU/matrix integration remain open; no whole-unit promotion. Declaration-only shrink_by_one_identity has no source body or caller and receives no invented adapter.",
         "Literal transpositions exchange the opposite dense-matrix side from their names, while multiplication conventions follow the source bodies. Right self products and reverse-right self products read already-mutated entries; they are not repaired into group operations. Resize preserves stale mappings on shrink, and typed Go guards retain each reached valid prefix.",
         "Dense size SASSERT uses existing explicit debug error profile; native traversals preserve source in-range prefixes and guard only actual invalid indexing. Debug ApplyRightIndexed executes the actual preliminary dense transform and final source relative comparison, so diagnostic failure prefixes differ from native. Shared process-global debug/stream binding is not claimed.",
         "Exact indexed applications retain their real lexical copies after a failed call until owner Close. Dense caller coordinates retain completed/partial assignments; permutation cleanup deletes only its own buffers and acquired roots. Exact debug equality executes subtraction and zero inspection, rather than floating conversion or structural equality. Source Init/Resize publishes identity mappings only after numeric buffer resizing."
       ],
       "retained_source_exclusions": [
         "Exact mpq/mpq and mpq/impq get_inverse and length+values construction: no retained source caller. Only floating original test invokes get_inverse; exact Go adapters and mirror tests removed. Exact fixtures use identity construction plus Set.",
-        "Exact permutation debug matrix row_count/column_count/get_elem: no retained source debug matrix consumer. Removed unused Go adapters; actual floating debug matrix/inverse remains."
-      ]
+        "Exact permutation debug matrix row_count/column_count/get_elem: no retained source debug matrix consumer. Removed unused Go adapters; actual floating debug matrix/inverse remains.",
+        {
+          "source_methods": [
+            "permutation_matrix::print",
+            "is_even"
+          ],
+          "reason": "No retained caller in whole-src/LP-driver scan. Compact permutation print is not the separately retained matrix print_matrix function."
+        },
+        {
+          "source_methods": [
+            "shrink_by_one_identity"
+          ],
+          "reason": "Declaration only, no source implementation or caller; no invented Go method."
+        },
+        {
+          "source_methods": [
+            "unused generic L copy/clear/reverse-left instantiations",
+            "saved ref proxies and whole-owner assignment adapters"
+          ],
+          "reason": "Retained transformations use concrete float64 or mpq sparse vectors and actual exact T/X dense buffers. Native Go values/slices and Set implement reached index operations; unused templates/STL are excluded."
+        }
+      ],
+      "evidence": "Whole retained permutation operation/ownership audit: native unsigned mapping, source Set and resize/init publication, both transpositions, four literal composition bodies and self-alias behavior; actual float64/float64, mpq/mpq and mpq/impq dense applications and float64/mpq indexed transformations. Separate owning exact T/X buffers, lexical sparse copies and debug dense snapshot/difference lifetimes preserve source traversal, publication and destruction order. Actual LU solve/update/extension, sparse mapping/swaps, dense-block/conjugation and original floating permutation test consumers checked. No source repair of nonbijective mappings, stale shrink domains, right-self compositions, duplicate sparse indices or unconditional indexed_vector::is_OK. Source empty/identity/default construction uses native zero-valued buffers; float matrix/inverse values construction retained. Unused exact debug/inverse/values adapters removed in 29cb5a7d; source compact printer, is_even and declaration-only shrink excluded. This completes the three permutation units only; containing LU/sparse/dense/CLI/SMT audits remain separate."
     },
     {
       "path": "src/util/lp/permutation_matrix_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/permutation.go",
         "pkg/util/lp/permutation_float.go",
@@ -136086,10 +136150,11 @@
         "TestLPRationalPermutationAllDenseGuardProfiles",
         "TestLPPairPermutationAllDenseGuardProfiles",
         "TestLPRationalPermutationStoppedDestinationOwnership",
-        "TestLPPairPermutationStoppedDestinationOwnership"
+        "TestLPPairPermutationStoppedDestinationOwnership",
+        "TestLPFloatPermutationLargerSparseInputPrefixes"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "shared unsigned forward/reverse/work mapping, literal set/init/resize, entry/identity, transpositions and four composition bodies",
@@ -136110,7 +136175,8 @@
             "TestLPFloatPermutationIndependentDenseAndSparseProducts",
             "TestLPFloatPermutationSource",
             "TestLPPermutationGuardPrefixesAndFloatingComparisons",
-            "TestLPPermutationShrunkDomainPreservesReachedPrefixes"
+            "TestLPPermutationShrunkDomainPreservesReachedPrefixes",
+            "TestLPFloatPermutationLargerSparseInputPrefixes"
           ]
         },
         {
@@ -136135,23 +136201,53 @@
             "TestLPRationalPermutationStoppedDestinationOwnership",
             "TestLPPairPermutationStoppedDestinationOwnership"
           ]
+        },
+        {
+          "name": "retained floating debug inverse construction and matrix dimensions/entry; exact variants excluded",
+          "status": "ported",
+          "go_target": "pkg/util/lp/permutation_float.go",
+          "tests": [
+            "TestLPFloatPermutationSource",
+            "TestLPPermutationGuardPrefixesAndFloatingComparisons"
+          ]
         }
       ],
       "ownership": [
         "Native Go uint32/float64 slices replace source vector internals. Shared index algorithms are concrete unsigned operations; floating applications own separate T/X work buffers. Sparse transformations preserve source copy/clear/replace and index order, including reached invalid-domain prefixes. No generic/any-valued algebra layer or simulated slice allocation failures.",
         "Exact T/X buffers and sparse lexical copies own concrete project numerals through existing typed indexed-vector call receipts. All scalar assignments deep-copy; stopped raw generations and physical allocations remain with the actual invoking owner. Destination sparse writes belong to their indexed vector; permutation Close cannot consume its stopped invocation. Native Go backing is uncharged and no source vector/STL adapter is ported.",
-        "Permutation allocation fault campaigns now cover both pooled and direct physical allocation for all six dense and four sparse operations of RationalPermutation and PairPermutation (40 campaigns total). Each walks real refusals through first success, requires physical-allocation errors, checks pending-owner guards, and verifies named numerical roots after cleanup; dense campaigns also check caller coordinates after permutation Close. Production implementation unchanged. Whole permutation units remain partial pending retained-source/LU integration audit."
+        "Permutation allocation fault campaigns now cover both pooled and direct physical allocation for all six dense and four sparse operations of RationalPermutation and PairPermutation (40 campaigns total). Each walks real refusals through first success, requires physical-allocation errors, checks pending-owner guards, and verifies named numerical roots after cleanup; dense campaigns also check caller coordinates after permutation Close. Production implementation unchanged. Whole permutation units remain partial pending retained-source/LU integration audit.",
+        "Whole retained permutation operation/ownership audit: native unsigned mapping, source Set and resize/init publication, both transpositions, four literal composition bodies and self-alias behavior; actual float64/float64, mpq/mpq and mpq/impq dense applications and float64/mpq indexed transformations. Separate owning exact T/X buffers, lexical sparse copies and debug dense snapshot/difference lifetimes preserve source traversal, publication and destruction order. Actual LU solve/update/extension, sparse mapping/swaps, dense-block/conjugation and original floating permutation test consumers checked. No source repair of nonbijective mappings, stale shrink domains, right-self compositions, duplicate sparse indices or unconditional indexed_vector::is_OK. Source empty/identity/default construction uses native zero-valued buffers; float matrix/inverse values construction retained. Unused exact debug/inverse/values adapters removed in 29cb5a7d; source compact printer, is_even and declaration-only shrink excluded. This completes the three permutation units only; containing LU/sparse/dense/CLI/SMT audits remain separate."
       ],
       "deviations": [
-        "Formatting and complete LU/matrix integration remain open; no whole-unit promotion. Declaration-only shrink_by_one_identity has no source body or caller and receives no invented adapter.",
         "Literal transpositions exchange the opposite dense-matrix side from their names, while multiplication conventions follow the source bodies. Right self products and reverse-right self products read already-mutated entries; they are not repaired into group operations. Resize preserves stale mappings on shrink, and typed Go guards retain each reached valid prefix.",
         "Dense size SASSERT uses existing explicit debug error profile; native traversals preserve source in-range prefixes and guard only actual invalid indexing. Debug ApplyRightIndexed executes the actual preliminary dense transform and final source relative comparison, so diagnostic failure prefixes differ from native. Shared process-global debug/stream binding is not claimed.",
         "Exact indexed applications retain their real lexical copies after a failed call until owner Close. Dense caller coordinates retain completed/partial assignments; permutation cleanup deletes only its own buffers and acquired roots. Exact debug equality executes subtraction and zero inspection, rather than floating conversion or structural equality. Source Init/Resize publishes identity mappings only after numeric buffer resizing."
       ],
       "retained_source_exclusions": [
         "Exact mpq/mpq and mpq/impq get_inverse and length+values construction: no retained source caller. Only floating original test invokes get_inverse; exact Go adapters and mirror tests removed. Exact fixtures use identity construction plus Set.",
-        "Exact permutation debug matrix row_count/column_count/get_elem: no retained source debug matrix consumer. Removed unused Go adapters; actual floating debug matrix/inverse remains."
-      ]
+        "Exact permutation debug matrix row_count/column_count/get_elem: no retained source debug matrix consumer. Removed unused Go adapters; actual floating debug matrix/inverse remains.",
+        {
+          "source_methods": [
+            "permutation_matrix::print",
+            "is_even"
+          ],
+          "reason": "No retained caller in whole-src/LP-driver scan. Compact permutation print is not the separately retained matrix print_matrix function."
+        },
+        {
+          "source_methods": [
+            "shrink_by_one_identity"
+          ],
+          "reason": "Declaration only, no source implementation or caller; no invented Go method."
+        },
+        {
+          "source_methods": [
+            "unused generic L copy/clear/reverse-left instantiations",
+            "saved ref proxies and whole-owner assignment adapters"
+          ],
+          "reason": "Retained transformations use concrete float64 or mpq sparse vectors and actual exact T/X dense buffers. Native Go values/slices and Set implement reached index operations; unused templates/STL are excluded."
+        }
+      ],
+      "evidence": "Whole retained permutation operation/ownership audit: native unsigned mapping, source Set and resize/init publication, both transpositions, four literal composition bodies and self-alias behavior; actual float64/float64, mpq/mpq and mpq/impq dense applications and float64/mpq indexed transformations. Separate owning exact T/X buffers, lexical sparse copies and debug dense snapshot/difference lifetimes preserve source traversal, publication and destruction order. Actual LU solve/update/extension, sparse mapping/swaps, dense-block/conjugation and original floating permutation test consumers checked. No source repair of nonbijective mappings, stale shrink domains, right-self compositions, duplicate sparse indices or unconditional indexed_vector::is_OK. Source empty/identity/default construction uses native zero-valued buffers; float matrix/inverse values construction retained. Unused exact debug/inverse/values adapters removed in 29cb5a7d; source compact printer, is_even and declaration-only shrink excluded. This completes the three permutation units only; containing LU/sparse/dense/CLI/SMT audits remain separate."
     },
     {
       "path": "src/util/lp/quick_xplain.cpp",
@@ -172419,5 +172515,58 @@
       "/mnt/oldrog/tmp/g3-lp-permutation-retained-debug.cover"
     ],
     "verification": "All 64 packages compile in native and combined debug/checked modes; both LP vets and source portcheck pass (2103 units/677 APIs, 111 ported/329 partial/1620 unported/5 dead_deleted)."
+  },
+  "latest_permutation_support_audit": {
+    "scope": "Whole retained permutation operation/ownership audit: native unsigned mapping, source Set and resize/init publication, both transpositions, four literal composition bodies and self-alias behavior; actual float64/float64, mpq/mpq and mpq/impq dense applications and float64/mpq indexed transformations. Separate owning exact T/X buffers, lexical sparse copies and debug dense snapshot/difference lifetimes preserve source traversal, publication and destruction order. Actual LU solve/update/extension, sparse mapping/swaps, dense-block/conjugation and original floating permutation test consumers checked. No source repair of nonbijective mappings, stale shrink domains, right-self compositions, duplicate sparse indices or unconditional indexed_vector::is_OK. Source empty/identity/default construction uses native zero-valued buffers; float matrix/inverse values construction retained. Unused exact debug/inverse/values adapters removed in 29cb5a7d; source compact printer, is_even and declaration-only shrink excluded. This completes the three permutation units only; containing LU/sparse/dense/CLI/SMT audits remain separate.",
+    "source_audit": [
+      "/mnt/oldrog/tmp/g3-lp-permutation-consumers-audit.txt",
+      "/mnt/oldrog/tmp/g3-lp-permutation-owner-operations-audit.txt",
+      "/mnt/oldrog/tmp/g3-lp-permutation-method-consumers-audit.txt"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "consumer_tests_native_seconds": 9.622,
+    "consumer_tests_combined_seconds": 11.947,
+    "fault_campaigns": 40,
+    "new_checks": "Every physical-fault success endpoint now checks literal transformed coordinates, pair Y and untouched buffer; sparse endpoints check all data and exact index order. Four float larger-indexed-input worlds check source reached mutation/diagnostic prefixes.",
+    "full_suite_qualification": "Latest full native8f2961ca predates recent changes; no new full-suite claim.",
+    "focused_native_seconds": 16.692,
+    "focused_combined_seconds": 21.949,
+    "whole_go_file_focused_covered_total": {
+      "native": {
+        "permutation.go": [
+          104,
+          114
+        ],
+        "permutation_exact.go": [
+          410,
+          503
+        ],
+        "permutation_float.go": [
+          182,
+          203
+        ]
+      },
+      "debug": {
+        "permutation.go": [
+          106,
+          114
+        ],
+        "permutation_exact.go": [
+          459,
+          503
+        ],
+        "permutation_float.go": [
+          191,
+          203
+        ]
+      }
+    },
+    "coverage_qualification": "Focused whole-file counts include Go domain/owner guards. Remaining branches include in-range publication checks protected by mapping/buffer invariants, malformed mapping guards, delegated stable destructor/cleanup errors and erased native debug paths. Source indexed is_OK returns true unconditionally; no replacement validator or synthetic allocator failure is added. Debug floating comparison keeps source relative tolerance and NaN/Inf outcomes. No claim of 100% coverage.",
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-permutation-final-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-permutation-final-debug.cover"
+    ],
+    "verification": "Both LP vets and source portcheck pass; 2103 units/677 APIs,114 ported/326 partial/1620 unported/5 dead_deleted. Previous 29cb5a7d all64package native/combined compile gates cover unchanged production implementation."
   }
 }

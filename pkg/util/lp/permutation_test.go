@@ -583,3 +583,47 @@ func TestLPPermutationShrunkDomainPreservesReachedPrefixes(t *testing.T) {
 		t.Fatal(err, v)
 	}
 }
+
+// The indexed vector can be larger than the permutation while all of its
+// indices remain valid for its own storage. Check the reached source mutation
+// prefix when the later permutation lookup is outside the smaller mapping.
+func TestLPFloatPermutationLargerSparseInputPrefixes(t *testing.T) {
+	for _, op := range []string{"left", "reverse-left", "right", "reverse-right"} {
+		t.Run(op, func(t *testing.T) {
+			p, err := FloatPermutationFromValues(2, []uint32{1, 0})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if p.IsDense() {
+				t.Fatal("permutation tail reported dense")
+			}
+			w := NewIndexedFloatVector(3)
+			w.Data[2], w.Data[0] = 9, 3
+			w.Index = []uint32{2, 0}
+			switch op {
+			case "left":
+				err = p.ApplyLeftIndexed(w)
+			case "reverse-left":
+				err = p.ApplyReverseLeftIndexed(w)
+			case "right":
+				err = p.ApplyRightIndexed(w)
+			case "reverse-right":
+				err = p.ApplyReverseRightIndexed(w)
+			}
+			wantErr := ErrBounds
+			wantData := []float64{0, 0, 0}
+			wantIndex := []uint32{}
+			if op == "left" || op == "reverse-left" {
+				wantData = []float64{0, 3, 0}
+				wantIndex = []uint32{2, 1}
+			} else if op == "right" && sourceDebugTests {
+				wantErr = ErrAssertion
+				wantData = []float64{3, 0, 9}
+				wantIndex = []uint32{2, 0}
+			}
+			if err != wantErr || !reflect.DeepEqual(w.Data, wantData) || !reflect.DeepEqual(w.Index, wantIndex) {
+				t.Fatalf("got %v data=%v indices=%v; want %v data=%v indices=%v", err, w.Data, w.Index, wantErr, wantData, wantIndex)
+			}
+		})
+	}
+}
