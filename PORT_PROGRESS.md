@@ -31036,11 +31036,11 @@ Focused native and g3debug union-find checks pass (0.004s/0.005s). Util vet, led
 
 ### util file: backtrackable_set.h
 
-Ported the complete retained behavior as exported BacktrackableSet and BacktrackableSetEvent APIs without Go generics. The live source specialization stores quantifier pointers, so comparable Go values preserve pointer identity through map[any]struct{}. Insert/erase no-ops, nested trail boundaries, reverse restoration callbacks, reset without callbacks, empty/contains queries and unordered value snapshots are covered.
+Historical note: an earlier exported BacktrackableSet and BacktrackableSetEvent adapter used map[any]struct{} and was later removed because it was generic and had no retained Go consumer. The current concrete SMT quantifier-set port is recorded at the end of this ledger.
 
-Corrected src/util/backtrackable_set.h:62-65. Its level-zero erase branch calls insert, while the scoped branch and method contract remove the element. The Go implementation deletes it, and the focused regression distinguishes the incorrect retained value from the required empty result.
+The earlier adapter changed src/util/backtrackable_set.h:62-65 so level-zero erase deleted the element despite the source calling insert. That removed adapter is not evidence of current source fidelity; the concrete SMT specialization preserves the source branch.
 
-Focused native and g3debug backtrackable-set checks pass (0.004s/0.005s). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:66 ported,287 partial,1744 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.
+At that historical checkpoint, focused native and g3debug backtrackable-set checks passed; the inventory counts in the next paragraph were from that older revision and do not describe the current tree.
 
 ### util file: uint_map.h
 
@@ -39912,3 +39912,5 @@ and debug tests check both pair contents and unchanged reference counts.
 Retained `src/util/dec_ref_util.h` API specialization: the concrete context-owned AST map now holds one reference per key and value, increments replacement values before releasing old values, and releases key then value on erase, reset and object destruction. The local `expr_map` to API map transfer retains pairs before the source closes. Focused native and checked/debug tests pass on CPUs 8-16. The API C wrapper, key AST-vector object and pretty printer remain open; `src/api/api_ast_map.cpp/.h` and `dec_ref_util.h` stay partial. SMT, command and tactic map specializations remain open.
 
 The sole production `src/util/array_map.h` specialization is the UFBV rewrite cache: AST expression ID to `(expression, done)`. A concrete Go cache now preserves insertion-time key/value references, replacement order, lazy timestamp reset, timestamp-wrap cleanup and destructor cleanup. Native and checked/debug focused tests pass on CPUs 8-16. `erase`, `flush` and `finalize` have no UFBV caller and are excluded, as are counters used only by `flush`. The UFBV rewriter and tactic are still unported, so `array_map.h` and the rewriter units remain partial until the cache is integrated with the actual rewrite path.
+
+The only production `src/util/backtrackable_set.h` instantiations are the SMT model-finder hint solver's `m_residue` and `m_satisfied` quantifier sets. A concrete Go set now stores borrowed AST quantifier handles in a map and records typed insertion/deletion trails. Nested pops invoke the satisfied-set event callback before each reverse edit, in LIFO order; reset clears state without callbacks. The source's level-zero `erase`-calls-`insert` branch is preserved and tested, although the model-finder call is always inside a pushed scope. Focused native and checked/debug tests pass on CPUs 8-16. The hint solver, quantifier-info callback binding and broader model finder remain unported, so the header and source consumer stay partial. The older ledger paragraph at line 31041 describes a removed Go translation and is superseded by this concrete port.

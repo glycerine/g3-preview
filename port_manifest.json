@@ -83136,9 +83136,15 @@
       "path": "src/smt/smt_model_finder.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_model_finder_quantifier_set.go",
+        "pkg/smtcore/smt_model_finder_quantifier_set_test.go"
+      ],
+      "tests": [
+        "TestModelFinderScopedQuantifierSetTrailsAndEvents",
+        "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch"
+      ],
       "assertions": [
         {
           "line": 101,
@@ -83539,9 +83545,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "hint_solver m_residue and m_satisfied scoped quantifier-set storage",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_model_finder_quantifier_set.go",
+          "tests": [
+            "TestModelFinderScopedQuantifierSetTrailsAndEvents",
+            "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch"
+          ]
+        }
+      ],
+      "ownership": [
+        "The scoped sets borrow quantifier handles; the satisfied-set undo callback clears the corresponding quantifier_info choice before each reverse set edit."
+      ],
+      "deviations": [
+        "Only the scoped quantifier-set storage is ported; hint_solver search, quantifier_info ownership and callbacks, and model-finder algorithms remain open."
+      ]
     },
     {
       "path": "src/smt/smt_model_finder.h",
@@ -111380,9 +111400,15 @@
       "path": "src/util/backtrackable_set.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_model_finder_quantifier_set.go",
+        "pkg/smtcore/smt_model_finder_quantifier_set_test.go"
+      ],
+      "tests": [
+        "TestModelFinderScopedQuantifierSetTrailsAndEvents",
+        "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -111405,10 +111431,22 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "concrete SMT model-finder quantifier sets: insert, erase, contains, empty, scope push/pop, reset and borrowed iteration snapshot",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_model_finder_quantifier_set.go",
+          "tests": [
+            "TestModelFinderScopedQuantifierSetTrailsAndEvents",
+            "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch"
+          ]
+        }
+      ],
+      "ownership": [
+        "The sets borrow quantifier AST handles. Scoped edits trail values without retaining AST references; pop invokes the satisfied-set event handler before reversing each edit, in last-in-first-out order. Reset drops scopes and trails without invoking undo callbacks."
+      ],
       "deviations": [
-        "No Go adapter is retained. The live quantifier-pointer specialization belongs to the unported SMT model finder and should use a concrete typed map plus typed undo slices when ported."
+        "A concrete Go map and typed undo slices replace the source quantifier-pointer hashtable and vectors. The model-finder hint solver and quantifier_info callback integration remain unported. Source level-zero erase calls insert and is preserved; the actual model-finder erase call is scoped."
       ]
     },
     {
