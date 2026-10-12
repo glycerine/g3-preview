@@ -170,7 +170,30 @@ func (d *RationalBenchmarkDriver) Close() error {
 			return err
 		}
 		if d.work != nil {
-			if err := d.work.Close(); err != nil {
+			if err := d.work.calls.cleanupRaw(d.manager); err != nil {
+				return err
+			}
+			// Lexical expression work dies before x, then c; vector cells
+			// within each source vector are destroyed from front to back.
+			for i := 25; i >= 20; i-- {
+				if err := d.manager.Del(&d.work.Data[i]); err != nil {
+					return err
+				}
+				d.work.Data[i] = numeral.NewRational()
+			}
+			for i := 10; i < 20; i++ {
+				if err := d.manager.Del(&d.work.Data[i]); err != nil {
+					return err
+				}
+				d.work.Data[i] = numeral.NewRational()
+			}
+			for i := 0; i < 10; i++ {
+				if err := d.manager.Del(&d.work.Data[i]); err != nil {
+					return err
+				}
+				d.work.Data[i] = numeral.NewRational()
+			}
+			if err := d.work.calls.cleanupRoots(d.manager); err != nil {
 				return err
 			}
 			d.work = nil

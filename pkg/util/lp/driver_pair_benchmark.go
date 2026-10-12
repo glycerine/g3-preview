@@ -218,13 +218,45 @@ func (d *PairBenchmarkDriver) Close() error {
 			return err
 		}
 		if d.pairs != nil {
-			if err := d.pairs.Close(); err != nil {
+			if err := d.pairs.calls.cleanupRaw(d.manager); err != nil {
+				return err
+			}
+			// r, product and constructor temporary die before vector x.
+			for i := 12; i >= 10; i-- {
+				if err := d.pairs.Data[i].Del(d.manager); err != nil {
+					return err
+				}
+				d.pairs.Data[i] = NewRationalPair()
+			}
+			for i := 0; i < 10; i++ {
+				if err := d.pairs.Data[i].Del(d.manager); err != nil {
+					return err
+				}
+				d.pairs.Data[i] = NewRationalPair()
+			}
+			if err := d.pairs.calls.cleanupRoots(d.manager); err != nil {
 				return err
 			}
 			d.pairs = nil
 		}
 		if d.scalars != nil {
-			if err := d.scalars.Close(); err != nil {
+			if err := d.scalars.calls.cleanupRaw(d.manager); err != nil {
+				return err
+			}
+			for i := 13; i >= 10; i-- {
+				if err := d.manager.Del(&d.scalars.Data[i]); err != nil {
+					return err
+				}
+				d.scalars.Data[i] = numeral.NewRational()
+			}
+			// Vector c is declared before x and destroys its cells forward.
+			for i := 0; i < 10; i++ {
+				if err := d.manager.Del(&d.scalars.Data[i]); err != nil {
+					return err
+				}
+				d.scalars.Data[i] = numeral.NewRational()
+			}
+			if err := d.scalars.calls.cleanupRoots(d.manager); err != nil {
 				return err
 			}
 			d.scalars = nil
