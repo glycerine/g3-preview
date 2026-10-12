@@ -1152,7 +1152,7 @@
     },
     {
       "source": "src/util/lp/indexed_vector.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/indexed_vector.go",
         "pkg/util/lp/indexed_exact_vector.go",
@@ -1193,7 +1193,7 @@
         "TestLPRationalBenchmarkIndependentArithmeticAndInputs",
         "TestLPRationalBenchmarkPhysicalRefusalOwnership"
       ],
-      "retained_increment_evidence": "Retained indexed-vector audit increment: removed dead floating dictionary/equality adapters and unsigned Assign/Equal/ClearAll/dictionary/erase/add/drop/cleanup/restore helpers. Unsigned LU markers retain only construction, data/index access, clear, resize, set and unconditional debug IsOK. Source scans show set_value_as_in_dictionary only at its definition; indexed equality has no retained caller. Updated native tests to use retained set operations and an independent1000-world ordered marker-union oracle. Expanded rational/pair set/assign/clone/add/drop physical failure campaigns to pooled/direct allocation,20total, with independent big.Rat success values, exact index, unchanged borrowed source after cleanup, named root census, no orphan raw frames and pending guards. Corrected exact shrink to destroy removed coefficients forward from new end and publish shorter length after all releases; fresh cells replace deleted values. Added pooled/direct hidden-owner shrink/grow test. Whole indexed units remain partial pending the distinction between actual source vector forward destruction and lexical scratch owners that currently share the indexed holder, and remaining exact template-root review. Persistent exact vector members of pair core and primal core now destroy dense coefficients forward, matching util/vector.h::destroy_elements; reverse lexical Close remains for expression work. Pair core and indexed vector focused native/checked tests pass. Other retained exact vector owners and template-root reachability still need audit; unit remains partial. Additional retained static_matrix.h m_work_vector, square_dense_submatrix.h m_work_vector and lar_solver.h m_column_buffer members now release exact dense elements forward; focused native/checked matrix, dense-block and LAR ownership groups pass. Other owners/root audit remains open. Rational/pair LU persistent row-eta, extension and y-copy indexed members now close their dense elements forward. Whole retained class-field declaration scan covers core, primal, static matrix, dense submatrix, LAR and LU; source pretty-printer fields are dead_deleted. Local source indexed-vector temporaries and template-root reachability remain open, so unit status is partial. Live local exact indexed_vector in lar_core_solver.h:432 LU catch-up now closes its dense elements forward on success and stopped-owner cleanup. Native/checked LAR catch-up groups and physical ownership pass. Other lexical indexed-vector candidates are disabled, uncalled or reached only by floating paths; remaining whole template/helper reachability still needs final audit. Retained src/test/lp.cpp test_rationals and scalar benchmark vector locals now destroy lexical expression slots in reverse, then each source vector c/x in forward element order. Both benchmark arithmetic/report/physical tests pass native and checked. Helper print_vector(pair) remains represented by retained CLI benchmark output.",
+      "retained_increment_evidence": "Whole retained indexed-vector method, consumer and lifetime audit: actual double, unsigned and mpq indexed operations use concrete Go slices and exact numeral owners; pair holder supports reached vector< pair > ownership. Source self-assignment, duplicate SetValue publication/assertion, unconditional is_OK, strict floating 1e-14 drop, precise zero, copy-constructor versus sparse assignment, forward shrink and forward destruction of source vectors are represented. Persistent core, primal, LU, static matrix, dense block and LAR owners and the reached local LAR catch-up vector use forward close. Mixed rational/pair benchmarks unwind lexical work in reverse, then vector c/x elements forward; reached pair print_vector output is tested. Uncalled dictionary/equality/debug printer helpers and dead template paths are excluded by whole-source scan. Direct and consumer native/checked tests pass with combined current file coverage indexed_exact_vector.go 322/362 and indexed_vector.go 110/112 in both builds; remaining exact branches guard delegated numeric/destructor errors or invariants. Containing solver, matrix and CLI whole audits remain separate.",
       "retained_source_exclusions": [
         {
           "source_methods": [
@@ -1202,12 +1202,21 @@
             "unused unsigned vector operations"
           ],
           "reason": "No retained callers; source unsigned m_ii in LU refinement uses only clear/resize/set and public data/index reads. Removed dead Go adapters and mirror checks."
+        },
+        {
+          "source_methods": [
+            "indexed_vector::print",
+            "print_vector except retained pair CLI call",
+            "print_sparse_vector",
+            "buffer print helper"
+          ],
+          "reason": "Whole source scan finds no retained dynamic call to indexed_vector::print, print_sparse_vector or buffer print helper. The sole reached print_vector helper is numeric_pair<mpq> output in src/test/lp.cpp test_rationals, implemented and tested by PairBenchmarkDriver. Other print_vector explicit instantiations serve only uncalled lu::print or standalone definitions."
         }
       ]
     },
     {
       "source": "src/util/lp/indexed_vector.hpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/indexed_vector.go",
         "pkg/util/lp/indexed_exact_vector.go",
@@ -1248,7 +1257,7 @@
         "TestLPRationalBenchmarkIndependentArithmeticAndInputs",
         "TestLPRationalBenchmarkPhysicalRefusalOwnership"
       ],
-      "retained_increment_evidence": "Retained indexed-vector audit increment: removed dead floating dictionary/equality adapters and unsigned Assign/Equal/ClearAll/dictionary/erase/add/drop/cleanup/restore helpers. Unsigned LU markers retain only construction, data/index access, clear, resize, set and unconditional debug IsOK. Source scans show set_value_as_in_dictionary only at its definition; indexed equality has no retained caller. Updated native tests to use retained set operations and an independent1000-world ordered marker-union oracle. Expanded rational/pair set/assign/clone/add/drop physical failure campaigns to pooled/direct allocation,20total, with independent big.Rat success values, exact index, unchanged borrowed source after cleanup, named root census, no orphan raw frames and pending guards. Corrected exact shrink to destroy removed coefficients forward from new end and publish shorter length after all releases; fresh cells replace deleted values. Added pooled/direct hidden-owner shrink/grow test. Whole indexed units remain partial pending the distinction between actual source vector forward destruction and lexical scratch owners that currently share the indexed holder, and remaining exact template-root review. Persistent exact vector members of pair core and primal core now destroy dense coefficients forward, matching util/vector.h::destroy_elements; reverse lexical Close remains for expression work. Pair core and indexed vector focused native/checked tests pass. Other retained exact vector owners and template-root reachability still need audit; unit remains partial. Additional retained static_matrix.h m_work_vector, square_dense_submatrix.h m_work_vector and lar_solver.h m_column_buffer members now release exact dense elements forward; focused native/checked matrix, dense-block and LAR ownership groups pass. Other owners/root audit remains open. Rational/pair LU persistent row-eta, extension and y-copy indexed members now close their dense elements forward. Whole retained class-field declaration scan covers core, primal, static matrix, dense submatrix, LAR and LU; source pretty-printer fields are dead_deleted. Local source indexed-vector temporaries and template-root reachability remain open, so unit status is partial. Live local exact indexed_vector in lar_core_solver.h:432 LU catch-up now closes its dense elements forward on success and stopped-owner cleanup. Native/checked LAR catch-up groups and physical ownership pass. Other lexical indexed-vector candidates are disabled, uncalled or reached only by floating paths; remaining whole template/helper reachability still needs final audit. Retained src/test/lp.cpp test_rationals and scalar benchmark vector locals now destroy lexical expression slots in reverse, then each source vector c/x in forward element order. Both benchmark arithmetic/report/physical tests pass native and checked. Helper print_vector(pair) remains represented by retained CLI benchmark output.",
+      "retained_increment_evidence": "Whole retained indexed-vector method, consumer and lifetime audit: actual double, unsigned and mpq indexed operations use concrete Go slices and exact numeral owners; pair holder supports reached vector< pair > ownership. Source self-assignment, duplicate SetValue publication/assertion, unconditional is_OK, strict floating 1e-14 drop, precise zero, copy-constructor versus sparse assignment, forward shrink and forward destruction of source vectors are represented. Persistent core, primal, LU, static matrix, dense block and LAR owners and the reached local LAR catch-up vector use forward close. Mixed rational/pair benchmarks unwind lexical work in reverse, then vector c/x elements forward; reached pair print_vector output is tested. Uncalled dictionary/equality/debug printer helpers and dead template paths are excluded by whole-source scan. Direct and consumer native/checked tests pass with combined current file coverage indexed_exact_vector.go 322/362 and indexed_vector.go 110/112 in both builds; remaining exact branches guard delegated numeric/destructor errors or invariants. Containing solver, matrix and CLI whole audits remain separate.",
       "retained_source_exclusions": [
         {
           "source_methods": [
@@ -1257,12 +1266,21 @@
             "unused unsigned vector operations"
           ],
           "reason": "No retained callers; source unsigned m_ii in LU refinement uses only clear/resize/set and public data/index reads. Removed dead Go adapters and mirror checks."
+        },
+        {
+          "source_methods": [
+            "indexed_vector::print",
+            "print_vector except retained pair CLI call",
+            "print_sparse_vector",
+            "buffer print helper"
+          ],
+          "reason": "Whole source scan finds no retained dynamic call to indexed_vector::print, print_sparse_vector or buffer print helper. The sole reached print_vector helper is numeric_pair<mpq> output in src/test/lp.cpp test_rationals, implemented and tested by PairBenchmarkDriver. Other print_vector explicit instantiations serve only uncalled lu::print or standalone definitions."
         }
       ]
     },
     {
       "source": "src/util/lp/indexed_vector_instances.cpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/indexed_vector.go",
         "pkg/util/lp/indexed_exact_vector.go",
@@ -1303,7 +1321,7 @@
         "TestLPRationalBenchmarkIndependentArithmeticAndInputs",
         "TestLPRationalBenchmarkPhysicalRefusalOwnership"
       ],
-      "retained_increment_evidence": "Retained indexed-vector audit increment: removed dead floating dictionary/equality adapters and unsigned Assign/Equal/ClearAll/dictionary/erase/add/drop/cleanup/restore helpers. Unsigned LU markers retain only construction, data/index access, clear, resize, set and unconditional debug IsOK. Source scans show set_value_as_in_dictionary only at its definition; indexed equality has no retained caller. Updated native tests to use retained set operations and an independent1000-world ordered marker-union oracle. Expanded rational/pair set/assign/clone/add/drop physical failure campaigns to pooled/direct allocation,20total, with independent big.Rat success values, exact index, unchanged borrowed source after cleanup, named root census, no orphan raw frames and pending guards. Corrected exact shrink to destroy removed coefficients forward from new end and publish shorter length after all releases; fresh cells replace deleted values. Added pooled/direct hidden-owner shrink/grow test. Whole indexed units remain partial pending the distinction between actual source vector forward destruction and lexical scratch owners that currently share the indexed holder, and remaining exact template-root review. Persistent exact vector members of pair core and primal core now destroy dense coefficients forward, matching util/vector.h::destroy_elements; reverse lexical Close remains for expression work. Pair core and indexed vector focused native/checked tests pass. Other retained exact vector owners and template-root reachability still need audit; unit remains partial. Additional retained static_matrix.h m_work_vector, square_dense_submatrix.h m_work_vector and lar_solver.h m_column_buffer members now release exact dense elements forward; focused native/checked matrix, dense-block and LAR ownership groups pass. Other owners/root audit remains open. Rational/pair LU persistent row-eta, extension and y-copy indexed members now close their dense elements forward. Whole retained class-field declaration scan covers core, primal, static matrix, dense submatrix, LAR and LU; source pretty-printer fields are dead_deleted. Local source indexed-vector temporaries and template-root reachability remain open, so unit status is partial. Live local exact indexed_vector in lar_core_solver.h:432 LU catch-up now closes its dense elements forward on success and stopped-owner cleanup. Native/checked LAR catch-up groups and physical ownership pass. Other lexical indexed-vector candidates are disabled, uncalled or reached only by floating paths; remaining whole template/helper reachability still needs final audit. Retained src/test/lp.cpp test_rationals and scalar benchmark vector locals now destroy lexical expression slots in reverse, then each source vector c/x in forward element order. Both benchmark arithmetic/report/physical tests pass native and checked. Helper print_vector(pair) remains represented by retained CLI benchmark output.",
+      "retained_increment_evidence": "Whole retained indexed-vector method, consumer and lifetime audit: actual double, unsigned and mpq indexed operations use concrete Go slices and exact numeral owners; pair holder supports reached vector< pair > ownership. Source self-assignment, duplicate SetValue publication/assertion, unconditional is_OK, strict floating 1e-14 drop, precise zero, copy-constructor versus sparse assignment, forward shrink and forward destruction of source vectors are represented. Persistent core, primal, LU, static matrix, dense block and LAR owners and the reached local LAR catch-up vector use forward close. Mixed rational/pair benchmarks unwind lexical work in reverse, then vector c/x elements forward; reached pair print_vector output is tested. Uncalled dictionary/equality/debug printer helpers and dead template paths are excluded by whole-source scan. Direct and consumer native/checked tests pass with combined current file coverage indexed_exact_vector.go 322/362 and indexed_vector.go 110/112 in both builds; remaining exact branches guard delegated numeric/destructor errors or invariants. Containing solver, matrix and CLI whole audits remain separate.",
       "retained_source_exclusions": [
         {
           "source_methods": [
@@ -1312,6 +1330,15 @@
             "unused unsigned vector operations"
           ],
           "reason": "No retained callers; source unsigned m_ii in LU refinement uses only clear/resize/set and public data/index reads. Removed dead Go adapters and mirror checks."
+        },
+        {
+          "source_methods": [
+            "indexed_vector::print",
+            "print_vector except retained pair CLI call",
+            "print_sparse_vector",
+            "buffer print helper"
+          ],
+          "reason": "Whole source scan finds no retained dynamic call to indexed_vector::print, print_sparse_vector or buffer print helper. The sole reached print_vector helper is numeric_pair<mpq> output in src/test/lp.cpp test_rationals, implemented and tested by PairBenchmarkDriver. Other print_vector explicit instantiations serve only uncalled lu::print or standalone definitions."
         }
       ]
     },
@@ -8180,10 +8207,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 67,
+    "ported": 70,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 28
+    "partial": 25
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -14790,5 +14817,67 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_suite_qualification": "Latest completed full native55b06c96 predates this correction; focused native/debug and compile/vet/portcheck gates are separate evidence."
+  },
+  "latest_indexed_vector_whole_audit": {
+    "scope": "Whole retained indexed_vector.h/.hpp/instances.cpp method, helper reachability and ownership audit. Actual double, unsigned, mpq and concrete pair-holder consumers use Go slices plus exact numeral owners. Source self-assignment clearing, duplicate SetValue publication/assertion, unconditional is_OK, strict floating 1e-14 drop, exact zero, copy-constructor versus sparse assignment, forward shrink and source-forward indexed-vector element destruction are represented. The reached pair CLI print_vector helper is implemented in PairBenchmarkDriver. No source STL container implementation, dead dictionary/equality/debug printer, disabled local copy, or uncalled template body is ported. Containing solver/matrix/CLI audits remain separate.",
+    "source_units": [
+      "src/util/lp/indexed_vector.h",
+      "src/util/lp/indexed_vector.hpp",
+      "src/util/lp/indexed_vector_instances.cpp"
+    ],
+    "retained_local_audit": "Exact local lar_core_solver.h catch_up_in_lu is implemented with forward close. lu.hpp disabled find_error copy and square_dense_submatrix.h disabled wcopy are excluded. lp_core_solver_base.hpp pivot_fixed_vars_from_basis has no retained caller. lp_primal_core_solver.hpp calculate_column_norm_exactly requires non-precise T. sparse_matrix.hpp double_solve_U_y indexed is called by LU only for non-precise T. src/test/lp.cpp indexed locals use native float storage.",
+    "go_targets": [
+      "pkg/util/lp/indexed_vector.go",
+      "pkg/util/lp/indexed_exact_vector.go",
+      "pkg/util/lp/exact_vector_calls.go"
+    ],
+    "tests": [
+      "TestLPIndexed",
+      "TestLPPairCore",
+      "TestLPExactLU",
+      "TestLARCatchUp",
+      "TestLPPairBenchmark",
+      "TestLPRationalBenchmark"
+    ],
+    "combined_current_go_file_coverage": {
+      "native": {
+        "indexed_exact_vector.go": [
+          322,
+          362
+        ],
+        "indexed_vector.go": [
+          110,
+          112
+        ]
+      },
+      "debug": {
+        "indexed_exact_vector.go": [
+          322,
+          362
+        ],
+        "indexed_vector.go": [
+          110,
+          112
+        ]
+      }
+    },
+    "coverage_qualification": "Uncovered exact statements are delegated numeric/destructor error returns, source assertion profile branches, or invariant-protected paths; actual physical refusal campaigns are tested without synthetic failure adapters. Go statement coverage does not claim completion of containing algorithms.",
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-indexed-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-indexed-whole-debug.cover",
+      "/mnt/oldrog/tmp/g3-lp-indexed-forward-owner-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-indexed-forward-owner-debug.cover",
+      "/mnt/oldrog/tmp/g3-lp-indexed-forward-matrix-lar-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-indexed-forward-matrix-lar-debug.cover",
+      "/mnt/oldrog/tmp/g3-lp-indexed-forward-lu-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-indexed-forward-lu-debug.cover",
+      "/mnt/oldrog/tmp/g3-lp-indexed-forward-catchup-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-indexed-forward-catchup-debug.cover",
+      "/mnt/oldrog/tmp/g3-lp-benchmark-vector-owner-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-benchmark-vector-owner-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Latest completed full native55b06c96 predates recent lifetime corrections; focused native/debug, compile/vet and portcheck gates are separate evidence."
   }
 }
