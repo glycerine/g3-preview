@@ -100334,7 +100334,8 @@
         "pkg/tactic/ufbv/rewrite_traversal_test.go",
         "pkg/tactic/ufbv/match_subst.go",
         "pkg/tactic/ufbv/match_subst_apply.go",
-        "pkg/tactic/ufbv/rewrite_rule_index.go"
+        "pkg/tactic/ufbv/rewrite_rule_index.go",
+        "pkg/tactic/ufbv/rewrite_back_index.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
@@ -100343,7 +100344,8 @@
         "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
         "TestMatchSubstConcretePairCacheAndVariableBindings",
         "TestMatchSubstTwoOffsetRHSAndQuantifierShift",
-        "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
+        "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators",
+        "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
       ],
       "conditionals": [
         {
@@ -100505,13 +100507,21 @@
           "tests": [
             "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
           ]
+        },
+        {
+          "name": "add_back_idx_proc, remove_back_idx_proc and reschedule_processed concrete source traversal and selected queue transfer",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
+          "tests": [
+            "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
+          ]
         }
       ],
       "ownership": [
         "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction. The matcher borrows pair-cache keys but retains each substitution target until reset or close. The forward rule index retains one reference each to quantifier, LHS and RHS until index close."
       ],
       "deviations": [
-        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, forward-rule dispatch and removal are ported; the remaining UFBV rewrite loop, rescheduling and tactic integration remain open."
+        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, forward-rule dispatch/removal and processed-formula rescheduling are ported; demodulator rescheduling, the remaining UFBV rewrite loop and tactic integration remain open."
       ]
     },
     {
@@ -100526,7 +100536,8 @@
         "pkg/tactic/ufbv/rewrite_traversal_test.go",
         "pkg/tactic/ufbv/match_subst.go",
         "pkg/tactic/ufbv/match_subst_apply.go",
-        "pkg/tactic/ufbv/rewrite_rule_index.go"
+        "pkg/tactic/ufbv/rewrite_rule_index.go",
+        "pkg/tactic/ufbv/rewrite_back_index.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
@@ -100535,7 +100546,8 @@
         "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
         "TestMatchSubstConcretePairCacheAndVariableBindings",
         "TestMatchSubstTwoOffsetRHSAndQuantifierShift",
-        "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
+        "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators",
+        "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
       ],
       "conditionals": [
         {
@@ -100590,6 +100602,14 @@
           "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
           "tests": [
             "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
+          ]
+        },
+        {
+          "name": "concrete back_idx/processed object maps and owning main todo queue",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
+          "tests": [
+            "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
           ]
         }
       ],
@@ -156908,7 +156928,8 @@
         "pkg/ast/rewriter/bv_trailing_table.go",
         "pkg/smtcore/smt_model_finder_hint_cycle.go",
         "pkg/smtcore/smt_model_finder_hint_indexes.go",
-        "pkg/tactic/ufbv/rewrite_rule_index.go"
+        "pkg/tactic/ufbv/rewrite_rule_index.go",
+        "pkg/tactic/ufbv/rewrite_back_index.go"
       ],
       "tests": [
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
@@ -156970,7 +156991,8 @@
         "TestBVTrailingEveryColdCountReservation",
         "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations",
         "TestModelFinderHintPreprocessIndexesAndResidueCandidates",
-        "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
+        "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators",
+        "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
       ],
       "conditionals": [
         {
@@ -157109,6 +157131,14 @@
           "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
           "tests": [
             "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
+          ]
+        },
+        {
+          "name": "UFBV back_idx and processed concrete expression object sets/maps with source occurrence rescheduling",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
+          "tests": [
+            "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
           ]
         }
       ],
@@ -160987,7 +161017,8 @@
         "pkg/ast/rewriter/bv_rewriter_concat.go",
         "pkg/ast/rewriter/bv_rewriter_concat_test.go",
         "pkg/tactic/ufbv/rewrite_traversal.go",
-        "pkg/tactic/ufbv/rewrite_traversal_test.go"
+        "pkg/tactic/ufbv/rewrite_traversal_test.go",
+        "pkg/tactic/ufbv/rewrite_back_index.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -161004,7 +161035,8 @@
         "TestPolynomialPSCBufferNativeGrowthAndReuse",
         "TestPolynomialPSCBufferNativeStoppedReferenceCleanup",
         "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
-        "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
+        "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
+        "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
       ],
       "conditionals": [
         {
@@ -161096,6 +161128,14 @@
           "tests": [
             "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
             "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
+          ]
+        },
+        {
+          "name": "concrete UFBV main todo reference slice for processed-formula rescheduling and cleanup",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
+          "tests": [
+            "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
           ]
         }
       ],
