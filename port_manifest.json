@@ -155752,7 +155752,7 @@
       "path": "src/util/obj_ref_hashtable.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -155765,11 +155765,13 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Dead-source audit: the header defines only the obj_ref_map template. Recursive searches over the complete src tree found no include of util/obj_ref_hashtable.h and no obj_ref_map use outside this header, including in source tests and generators. No live instantiation or Go implementation is required. The unused pkg/util/cppsrc/util mirror header is deleted."
+      ]
     },
     {
       "path": "src/util/obj_triple_hashtable.h",
