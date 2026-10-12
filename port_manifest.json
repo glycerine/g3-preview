@@ -76938,11 +76938,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_dyn_ack_triples.go",
-        "pkg/smtcore/smt_dyn_ack_pairs.go"
+        "pkg/smtcore/smt_dyn_ack_pairs.go",
+        "pkg/smtcore/smt_dyn_ack_schedule.go"
       ],
       "tests": [
         "TestDynAckTripleOccurrencesThresholdInstantiationAndReset",
-        "TestDynAckPairOccurrencesLiveGCAndOwnedApps"
+        "TestDynAckPairOccurrencesLiveGCAndOwnedApps",
+        "TestDynAckSchedulePairPriorityGCAndCumulativeBudget"
       ],
       "conditionals": [
         {
@@ -77134,6 +77136,14 @@
           "tests": [
             "TestDynAckPairOccurrencesLiveGCAndOwnedApps"
           ]
+        },
+        {
+          "name": "propagate_eh cumulative conflict budget, pair-before-triple queue scheduling and pair-GC cadence with search reset",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_dyn_ack_schedule.go",
+          "tests": [
+            "TestDynAckSchedulePairPriorityGCAndCumulativeBudget"
+          ]
         }
       ],
       "ownership": [
@@ -77141,7 +77151,7 @@
         "The concrete pair app vector retains both application references per new observation row; live GC releases instantiated or decayed rows, and search reset releases remaining rows. Pair maps and candidate queue borrow app identities."
       ],
       "deviations": [
-        "The triple and pair occurrence maps and instantiated sets use native Go maps instead of C++ hashtable storage. The source gc_triples body has no caller and is excluded. SMT clause construction, propagation and enclosing context integration remain open."
+        "The triple and pair occurrence maps and instantiated sets use native Go maps instead of C++ hashtable storage. The source gc_triples body has no caller and is excluded. The concrete propagation scheduler selects pair and triple records in source order; SMT clause construction and enclosing context integration remain open."
       ]
     },
     {
@@ -77151,11 +77161,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_dyn_ack_triples.go",
-        "pkg/smtcore/smt_dyn_ack_pairs.go"
+        "pkg/smtcore/smt_dyn_ack_pairs.go",
+        "pkg/smtcore/smt_dyn_ack_schedule.go"
       ],
       "tests": [
         "TestDynAckTripleOccurrencesThresholdInstantiationAndReset",
-        "TestDynAckPairOccurrencesLiveGCAndOwnedApps"
+        "TestDynAckPairOccurrencesLiveGCAndOwnedApps",
+        "TestDynAckSchedulePairPriorityGCAndCumulativeBudget"
       ],
       "conditionals": [
         {
@@ -77193,13 +77205,21 @@
           "tests": [
             "TestDynAckPairOccurrencesLiveGCAndOwnedApps"
           ]
+        },
+        {
+          "name": "pair/triple propagation heads, GC cadence and cumulative instance counters",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_dyn_ack_schedule.go",
+          "tests": [
+            "TestDynAckSchedulePairPriorityGCAndCumulativeBudget"
+          ]
         }
       ],
       "ownership": [
         "The Go triple and pair states own application references through explicit typed slices and borrow AST handles in maps and queues."
       ],
       "deviations": [
-        "The enclosing context/clause lifecycle and source search hooks remain open."
+        "Pair and triple scheduling now follows the source propagation order and reset counters; the enclosing context/clause lifecycle and source event hooks remain open."
       ]
     },
     {
@@ -157752,7 +157772,7 @@
       "path": "src/util/obj_triple_hashtable.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "platform_replacement",
       "go_targets": [
         "pkg/smtcore/smt_dyn_ack_triples.go"
       ],
@@ -157775,8 +157795,8 @@
           "text": "void set_hash(unsigned h) { SASSERT(h == m_data.hash()); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained dyn_ack obj_triple_map<app,app,app,unsigned> find/insert/erase/reset occurrence counts",
@@ -157799,7 +157819,7 @@
         "The source map and set borrow each triple's app pointers; the enclosing dyn_ack m_apps vector retains three references per newly observed triple. The Go owner mirrors this with native maps, a typed app-row slice and explicit three-reference release on search reset or close."
       ],
       "deviations": [
-        "Only the concrete dyn_ack app/app/app to unsigned map and instantiated triple set are retained production instantiations. Native Go maps replace hashtable allocation, cached hashes, tombstones and bucket iteration. Full dyn_ack context integration remains open before whole-unit completion is claimed."
+        "Only the concrete dyn_ack app/app/app to unsigned map and instantiated triple set are retained production instantiations. Native Go maps replace hashtable allocation, cached hashes, tombstones and bucket iteration. Enclosing dyn_ack context and clause integration remains open in its own source units; no separate C++ triple-hashtable behavior remains to port."
       ]
     },
     {
