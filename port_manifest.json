@@ -3554,9 +3554,15 @@
       "path": "src/api/api_ast_map.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/api/api_ast_map_object.go",
+        "pkg/api/api_ast_map_object_test.go"
+      ],
+      "tests": [
+        "TestAPIASTMapConcreteReferenceCleanup",
+        "TestAPIASTMapExpressionPairTransfer"
+      ],
       "assertions": [
         {
           "line": 110,
@@ -3565,17 +3571,44 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "context-owned AST map construction, contains, find, insert, erase, reset, size and borrowed key snapshot",
+          "status": "partial",
+          "go_target": "pkg/api/api_ast_map_object.go",
+          "tests": [
+            "TestAPIASTMapConcreteReferenceCleanup"
+          ]
+        },
+        {
+          "name": "API quantifier-elimination expression-pair transfer",
+          "status": "ported",
+          "go_target": "pkg/api/api_ast_map_object.go",
+          "tests": [
+            "TestAPIASTMapExpressionPairTransfer"
+          ]
+        }
+      ],
+      "ownership": [
+        "The context owns the map object; the map increments one AST reference per key and value, increments replacement values before decrementing old values, and releases key then value on erase, reset and object destruction."
+      ],
+      "deviations": [
+        "External Z3_ast_map C API binding, AST-vector wrapper for keys, and source pretty printing remain open. Keys currently returns a borrowed Go slice snapshot."
+      ]
     },
     {
       "path": "src/api/api_ast_map.h",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/api/api_ast_map_object.go",
+        "pkg/api/api_ast_map_object_test.go"
+      ],
+      "tests": [
+        "TestAPIASTMapConcreteReferenceCleanup",
+        "TestAPIASTMapExpressionPairTransfer"
+      ],
       "conditionals": [
         {
           "line": 18,
@@ -3588,9 +3621,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Z3_ast_map_ref owner and typed AST map storage",
+          "status": "partial",
+          "go_target": "pkg/api/api_ast_map_object.go",
+          "tests": [
+            "TestAPIASTMapConcreteReferenceCleanup"
+          ]
+        }
+      ],
+      "ownership": [
+        "The derived context object releases map-owned AST key/value references before its base object releases its budget receipt."
+      ],
+      "deviations": [
+        "The source C API wrapper and AST-vector returned by keys are not yet ported."
+      ]
     },
     {
       "path": "src/api/api_ast_vector.cpp",
@@ -113610,10 +113656,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_expr_map.go",
-        "pkg/ast/ast_expr_map_test.go"
+        "pkg/ast/ast_expr_map_test.go",
+        "pkg/api/api_ast_map_object.go",
+        "pkg/api/api_ast_map_object_test.go"
       ],
       "tests": [
-        "TestASTExprMapConcreteReferenceCleanup"
+        "TestASTExprMapConcreteReferenceCleanup",
+        "TestAPIASTMapConcreteReferenceCleanup"
       ],
       "conditionals": [
         {
@@ -113633,7 +113682,8 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_expr_map.go",
           "tests": [
-            "TestASTExprMapConcreteReferenceCleanup"
+            "TestASTExprMapConcreteReferenceCleanup",
+            "TestAPIASTMapConcreteReferenceCleanup"
           ]
         },
         {
@@ -113650,10 +113700,10 @@
         }
       ],
       "ownership": [
-        "Each live helper borrows its manager and mutates an owning map. For every entry, the key/value or value reference decrements occur before map.reset; the AST expr_map reset calls proof-value cleanup before key/value cleanup. A Go consumer must retire consumed references even when a later destructor reports an error."
+        "Each live helper borrows its manager and mutates an owning map. For every entry, the key/value or value reference decrements occur before map.reset; the AST expr_map reset calls proof-value cleanup before key/value cleanup. The API AST map increments incoming values before decrementing replacements and releases keys before values. A Go consumer must retire consumed references even when a later destructor reports an error."
       ],
       "deviations": [
-        "No generic Go ref-count map adapter is retained. The AST expr_map now has a concrete proof-first/key-value-second cleanup implementation. API, SMT, command, and tactic map owners remain unported; implement their release order in typed Go collections. The separate dec_ref_collection_values in ref_util.h is not a specialization of this header."
+        "No generic Go ref-count map adapter is retained. The AST expr_map has concrete proof-first/key-value-second cleanup; the API AST map has a concrete key/value owner. SMT, command, and tactic map owners remain unported; implement their release order in typed Go collections. The separate dec_ref_collection_values in ref_util.h is not a specialization of this header."
       ]
     },
     {

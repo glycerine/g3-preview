@@ -39909,3 +39909,4 @@ open. `Pairs` now provides the borrowed key/value snapshot needed by the
 retained API quantifier-elimination transfer; the future API caller must
 increment both references before the expression map closes. Focused native
 and debug tests check both pair contents and unchanged reference counts.
+Retained `src/util/dec_ref_util.h` API specialization: the concrete context-owned AST map now holds one reference per key and value, increments replacement values before releasing old values, and releases key then value on erase, reset and object destruction. The local `expr_map` to API map transfer retains pairs before the source closes. Focused native and checked/debug tests pass on CPUs 8-16. The API C wrapper, key AST-vector object and pretty printer remain open; `src/api/api_ast_map.cpp/.h` and `dec_ref_util.h` stay partial. SMT, command and tactic map specializations remain open.
