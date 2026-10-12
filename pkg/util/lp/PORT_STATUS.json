@@ -3592,7 +3592,7 @@
     },
     {
       "source": "src/util/lp/lp_primal_core_solver.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/primal_core_float.go",
         "pkg/util/lp/primal_price_float.go",
@@ -3977,11 +3977,12 @@
         "TestLPRationalSolveSingularFallbackAfterBoundFlip",
         "TestLPRationalSolveFinalValidationReadsLiveBounds",
         "TestLPRationalSolveTableauLiveStaleCostCorrection"
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained primal-core audit for double/double, mpq/numeric_pair<mpq> and mpq/mpq: typed Go implements stage-one infeasibility/cost lifecycle, Harris and breakpoint pricing/leaving, LU/tableau value and reduced-cost updates, entering/advancement, row strategy, precise and floating Solve, feasibility-only entry and source status/cancellation/reporting order. The precise pair and scalar implementations retain separate owned numeral expressions and child LU/tableau lifetimes; stopped children close before borrowed local step values and older caller comparison receipts remain owned by callers. Source double solve_with_tableau and double tableau basis update are explicitly emitted but have no retained entry because solve dispatch requires precise T; no dead float tableau adapter is added. Definition-only helpers and STL internals are excluded. Current native and g3debug,g3checked focused primal/Solve groups pass, along with prior focused tableau groups and full native checkpoint17ecadb7 on unchanged Go code. Representative native coverage: primal_core_float158/165, harris_float134/136, breakpoint_float112/120, price_float89/99, solve_float61/84, core_rational117/149, price_rational200/221, leaving_rational128/146 and solve_rational102/141; checked coverage is similar or higher. LAR outer and CLI source audits remain separate."
     },
     {
       "source": "src/util/lp/lp_primal_core_solver.hpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/primal_core_float.go",
         "pkg/util/lp/primal_price_float.go",
@@ -4306,11 +4307,12 @@
         "TestLPRationalSolveSingularFallbackAfterBoundFlip",
         "TestLPRationalSolveFinalValidationReadsLiveBounds",
         "TestLPRationalSolveTableauLiveStaleCostCorrection"
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained primal-core audit for double/double, mpq/numeric_pair<mpq> and mpq/mpq: typed Go implements stage-one infeasibility/cost lifecycle, Harris and breakpoint pricing/leaving, LU/tableau value and reduced-cost updates, entering/advancement, row strategy, precise and floating Solve, feasibility-only entry and source status/cancellation/reporting order. The precise pair and scalar implementations retain separate owned numeral expressions and child LU/tableau lifetimes; stopped children close before borrowed local step values and older caller comparison receipts remain owned by callers. Source double solve_with_tableau and double tableau basis update are explicitly emitted but have no retained entry because solve dispatch requires precise T; no dead float tableau adapter is added. Definition-only helpers and STL internals are excluded. Current native and g3debug,g3checked focused primal/Solve groups pass, along with prior focused tableau groups and full native checkpoint17ecadb7 on unchanged Go code. Representative native coverage: primal_core_float158/165, harris_float134/136, breakpoint_float112/120, price_float89/99, solve_float61/84, core_rational117/149, price_rational200/221, leaving_rational128/146 and solve_rational102/141; checked coverage is similar or higher. LAR outer and CLI source audits remain separate."
     },
     {
       "source": "src/util/lp/lp_primal_core_solver_instances.cpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/primal_core_float.go",
         "pkg/util/lp/primal_price_float.go",
@@ -4333,7 +4335,12 @@
         "pkg/util/lp/primal_inf_limit_rational.go",
         "pkg/util/lp/primal_basis_limit_rational.go",
         "pkg/util/lp/primal_basis_dispatch_rational.go",
-        "pkg/util/lp/primal_bound_rational_test.go"
+        "pkg/util/lp/primal_bound_rational_test.go",
+        "pkg/util/lp/primal_solve_float.go",
+        "pkg/util/lp/primal_solve_exact.go",
+        "pkg/util/lp/primal_solve_rational.go",
+        "pkg/util/lp/primal_values_tableau_exact.go",
+        "pkg/util/lp/primal_feasible_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -4388,8 +4395,49 @@
         "TestLPRationalPrimalBoundPhysicalOwnership",
         "TestLPRationalPrimalBoundReachedGuards",
         "TestLPRationalPrimalBoundPreservesOlderComparison",
-        "TestLPRationalPrimalBoundReturnedReferenceCopies"
-      ]
+        "TestLPRationalPrimalBoundReturnedReferenceCopies",
+        "TestLPFloatPrimalSolveOriginalNumericalFixtures",
+        "TestLPFloatPrimalSolveIndependentVertices",
+        "TestLPFloatPrimalSolveStopsAndStatuses",
+        "TestLPFloatPrimalIterationBudgetAndStatistics",
+        "TestLPFloatPrimalStatisticsGuardsAndIEEE",
+        "TestLPFloatPrimalSolveAndIterationReachedGuards",
+        "TestLPExactSolveLUIndependentBoundedOptima",
+        "TestLPExactSolveTableauIndependentBoundedOptima",
+        "TestLPExactSolveRowsIndependentFeasibilityAndInfeasibility",
+        "TestLPExactSolveLimitsAndCancellationOrder",
+        "TestLPExactSolveReportingAndWriteFailure",
+        "TestLPExactSolvePreservedFallbackStatuses",
+        "TestLPExactSolveUnboundedIndependentRays",
+        "TestLPExactSolveFeasibilitySearchIndependentSolutions",
+        "TestLPExactSolveInfeasibleIndependentBounds",
+        "TestLPExactSolveTableauStaleCostCorrection",
+        "TestLPExactSolveStoppedAndInitializationPrefixes",
+        "TestLPExactSolvePhysicalOwnership",
+        "TestLPExactFindFeasibleIndependentSystems",
+        "TestLPExactNonbasicIndependentBoundOracle",
+        "TestLPExactFindFeasibleEntryPrefixes",
+        "TestLPExactNonbasicEmptyAndStoppedValidation",
+        "TestLPExactFindFeasiblePhysicalOwnership",
+        "TestLPRationalSolveLUIndependentBoundedOptima",
+        "TestLPRationalSolveTableauIndependentBoundedOptima",
+        "TestLPRationalSolveRowsIndependentFeasibilityAndInfeasibility",
+        "TestLPRationalSolveLimitsAndCancellationOrder",
+        "TestLPRationalSolveReportingAndWriteFailure",
+        "TestLPRationalSolvePreservedFallbackStatuses",
+        "TestLPRationalSolveUnboundedIndependentRays",
+        "TestLPRationalSolveFeasibilitySearchIndependentSolutions",
+        "TestLPRationalSolveInfeasibleIndependentBounds",
+        "TestLPRationalSolveTableauStaleCostCorrection",
+        "TestLPRationalSolveStoppedAndInitializationPrefixes",
+        "TestLPRationalSolvePhysicalOwnership",
+        "TestLPRationalSolveSingularFallbackAfterBoundFlip",
+        "TestLPRationalSolveFinalValidationReadsLiveBounds",
+        "TestLPRationalSolveTableauLiveStaleCostCorrection",
+        "TestLPExactTableauValuesIndependentModels",
+        "TestLPRationalTableauValuesIndependentModels"
+      ],
+      "retained_source_audit_evidence": "Whole retained primal-core audit for double/double, mpq/numeric_pair<mpq> and mpq/mpq: typed Go implements stage-one infeasibility/cost lifecycle, Harris and breakpoint pricing/leaving, LU/tableau value and reduced-cost updates, entering/advancement, row strategy, precise and floating Solve, feasibility-only entry and source status/cancellation/reporting order. The precise pair and scalar implementations retain separate owned numeral expressions and child LU/tableau lifetimes; stopped children close before borrowed local step values and older caller comparison receipts remain owned by callers. Source double solve_with_tableau and double tableau basis update are explicitly emitted but have no retained entry because solve dispatch requires precise T; no dead float tableau adapter is added. Definition-only helpers and STL internals are excluded. Current native and g3debug,g3checked focused primal/Solve groups pass, along with prior focused tableau groups and full native checkpoint17ecadb7 on unchanged Go code. Representative native coverage: primal_core_float158/165, harris_float134/136, breakpoint_float112/120, price_float89/99, solve_float61/84, core_rational117/149, price_rational200/221, leaving_rational128/146 and solve_rational102/141; checked coverage is similar or higher. LAR outer and CLI source audits remain separate."
     },
     {
       "source": "src/util/lp/lp_primal_core_solver_tableau.h",
@@ -8324,10 +8372,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 89,
+    "ported": 92,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 6
+    "partial": 3
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -15464,6 +15512,32 @@
     "profiles": [
       "/mnt/oldrog/tmp/g3-lp-dual-whole-native.cover",
       "/mnt/oldrog/tmp/g3-lp-dual-whole-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed on unchanged Go code; focused checked evidence is separate."
+  },
+  "latest_primal_core_whole_audit": {
+    "source_units": [
+      "src/util/lp/lp_primal_core_solver.h",
+      "src/util/lp/lp_primal_core_solver.hpp",
+      "src/util/lp/lp_primal_core_solver_instances.cpp"
+    ],
+    "scope": "Whole retained primal-core audit for double/double, mpq/numeric_pair<mpq> and mpq/mpq: typed Go implements stage-one infeasibility/cost lifecycle, Harris and breakpoint pricing/leaving, LU/tableau value and reduced-cost updates, entering/advancement, row strategy, precise and floating Solve, feasibility-only entry and source status/cancellation/reporting order. The precise pair and scalar implementations retain separate owned numeral expressions and child LU/tableau lifetimes; stopped children close before borrowed local step values and older caller comparison receipts remain owned by callers. Source double solve_with_tableau and double tableau basis update are explicitly emitted but have no retained entry because solve dispatch requires precise T; no dead float tableau adapter is added. Definition-only helpers and STL internals are excluded. Current native and g3debug,g3checked focused primal/Solve groups pass, along with prior focused tableau groups and full native checkpoint17ecadb7 on unchanged Go code. Representative native coverage: primal_core_float158/165, harris_float134/136, breakpoint_float112/120, price_float89/99, solve_float61/84, core_rational117/149, price_rational200/221, leaving_rational128/146 and solve_rational102/141; checked coverage is similar or higher. LAR outer and CLI source audits remain separate.",
+    "focused_tests": [
+      "TestLPFloatPrimal",
+      "TestLPExactPrimal",
+      "TestLPRationalPrimal",
+      "TestLPExactSolve",
+      "TestLPRationalSolve",
+      "TestLPExactFindFeasible",
+      "TestLPRationalFindFeasible"
+    ],
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-primal-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-primal-whole-debug.cover",
+      "/mnt/oldrog/tmp/g3-lp-tableau-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-tableau-whole-debug.cover"
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,

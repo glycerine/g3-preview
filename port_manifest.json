@@ -128016,7 +128016,7 @@
       "path": "src/util/lp/lp_primal_core_solver.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/primal_core_float.go",
         "pkg/util/lp/primal_price_float.go",
@@ -128099,7 +128099,8 @@
         "pkg/util/lp/primal_iteration_rows_rational_test.go",
         "pkg/util/lp/primal_init_tableau_rational.go",
         "pkg/util/lp/primal_init_tableau_rational_test.go",
-        "pkg/util/lp/primal_solve_rational.go"
+        "pkg/util/lp/primal_solve_rational.go",
+        "pkg/util/lp/primal_solve_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -128550,8 +128551,8 @@
           "text": "SASSERT(initial_x_is_correct());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained floating stage-one constructor, infeasibility set/cost lifecycle, cost normalization/backup and restoration, complete LU init_run preparation, randomized initial column norms, entering eligibility/pricing/sort/rotation",
@@ -128572,7 +128573,8 @@
             "TestLPFloatPrimalPricingBudgetAndIEEE",
             "TestLPFloatPrimalPricingPublicationAndAssertions",
             "TestLPFloatPrimalPreparedBasisIndependentOracle"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_core_float.go"
         },
         {
           "name": "Retained double/double Harris tolerance, feasible/infeasible column step limits, sparse Harris theta, randomized maximum-pivot leaving selection and entering bound flip",
@@ -128585,7 +128587,8 @@
             "TestLPFloatPrimalHarrisInfeasibleCrossings",
             "TestLPFloatPrimalHarrisIEEEAndPrefixes",
             "TestLPFloatPrimalHarrisReachedGuards"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_harris_float.go"
         },
         {
           "name": "Retained floating breakpoint records, exact-zero/sign gate, row/entering breakpoint construction, queue lifecycle, slope change, first-breakpoint double selection and complete floating find_leaving_and_t routing",
@@ -128599,7 +128602,8 @@
             "TestLPFloatPrimalLeavingPathIntegration",
             "TestLPFloatPrimalBreakpointPublicationAndGuards",
             "TestLPFloatPrimalLeavingReachedErrors"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_breakpoint_float.go"
         },
         {
           "name": "Retained floating reduced-cost pivot recurrence, entering reduced-cost refresh/drift/profitability classification, cost-switch predicate, actual indexed LU beta solve, entering norm, periodic norm initialization and steepest-edge norm updates",
@@ -128613,7 +128617,8 @@
             "TestLPFloatPrimalRefreshIEEEAndCostTransitions",
             "TestLPFloatPrimalRefreshPublicationAndGuards",
             "TestLPFloatPrimalNormUpdateReachedBounds"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_refresh_float.go"
         },
         {
           "name": "Floating bound-flip, entering/leaving pivot and full entering advance orchestration, drift/refactor/residual recovery and source tentative-unbounded/unstable status transitions",
@@ -128631,7 +128636,8 @@
             "TestLPFloatPrimalAdvanceActualNumericalRefusals",
             "TestLPFloatPrimalAdvanceReachedGuards",
             "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_advance_float.go"
         },
         {
           "name": "Retained double stage-one randomized entering budget, status decision, one_iteration and full solve loop with actual pivot/refactor/cancellation services",
@@ -128646,7 +128652,8 @@
             "TestLPFloatPrimalIterationBudgetAndStatistics",
             "TestLPFloatPrimalStatisticsGuardsAndIEEE",
             "TestLPFloatPrimalSolveAndIterationReachedGuards"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_solve_float.go"
         },
         {
           "name": "Retained floating feasibility-only entry point, debug nonbasic feasibility precheck and source split-stream column diagnostics",
@@ -128955,7 +128962,8 @@
             "TestLPRationalPrimalCostSwitchPhysicalOwnership",
             "TestLPRationalPrimalCostSwitchSourcePrefixes",
             "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_core_rational.go"
         },
         {
           "name": "Concrete scalar mpq/mpq precise InitRun, zero-only sparse-count initialization, ordinary/breakpoint pricing eligibility, source nonbasis sort/headings/list, strict-improvement/tie-RNG entering scan, unsigned randomized candidate budget and no-entering status decision; source h524-527,826-838 and hpp31-57,82-110,151-232,643-663,841-853",
@@ -128984,7 +128992,8 @@
             "TestLPRationalPrimalPricingOlderComparisonOwner",
             "TestLPRationalPrimalPricingBreakpointDirection",
             "TestLPRationalPrimalPricingCountIndependentRNG"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_price_rational.go"
         },
         {
           "name": "Concrete scalar mpq/mpq Harris epsilon, limit_theta, bound flip/unlimited flip, precise infeasible-bound limits, feasible/boxed basis limits and by-value basis dispatcher; source h329,337-368,539-742 and hpp353-409, with scalar rational.h returned-reference copies and separate flip assignment",
@@ -129009,7 +129018,8 @@
             "TestLPRationalPrimalBoundReachedGuards",
             "TestLPRationalPrimalBoundPreservesOlderComparison",
             "TestLPRationalPrimalBoundReturnedReferenceCopies"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_bound_step_rational.go"
         },
         {
           "name": "Retained scalar mpq/mpq breakpoint record construction/copy, owned delta destruction, scalar absolute queue priority and slope changes",
@@ -129043,7 +129053,8 @@
             "TestLPRationalPrimalBreakpointAdvanceGuards",
             "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
             "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_breakpoint_collect_rational.go"
         },
         {
           "name": "Retained scalar mpq/mpq precise circular leaving selection, by-value basis multiplier, exact ratio/sparsity ties, entering flip and breakpoint dispatch",
@@ -129093,7 +129104,8 @@
             "TestLPRationalAdvanceDifferentSourcePrefixes",
             "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
             "TestLPRationalAdvanceDifferentMinimumNegation"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_advance_rational.go"
         },
         {
           "name": "Retained scalar mpq/mpq entering orchestration and one_iteration with actual LU solve, precise leaving selection, advancement and terminal status decision",
@@ -129109,7 +129121,8 @@
             "TestLPRationalEnterPhysicalOwnership",
             "TestLPRationalIterationPricingAndAdvance",
             "TestLPRationalIterationIndependentBoundedOptima"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_enter_rational.go"
         },
         {
           "name": "Concrete scalar mpq/mpq tableau infeasibility cost lookup, incremental basic-column cost changes and reduced-cost row updates",
@@ -129164,7 +129177,8 @@
             "TestLPRationalTableauBasisReachedMetadata",
             "TestLPRationalInitTableauRowsFailurePrefixes",
             "TestLPRationalInitTableauPreservesOlderComparison"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_price_rows_rational.go"
         },
         {
           "name": "Concrete scalar full primal Solve dispatch, LU/tableau row/column iteration, limits/cancellation, fallback statuses and live final feasibility validation",
@@ -129186,6 +129200,25 @@
             "TestLPRationalSolveSingularFallbackAfterBoundFlip",
             "TestLPRationalSolveFinalValidationReadsLiveBounds",
             "TestLPRationalSolveTableauLiveStaleCostCorrection"
+          ]
+        },
+        {
+          "name": "Retained precise mpq/impq Solve declaration: LU/tableau dispatch, ordered limits/status fallbacks and final feasibility validation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solve_exact.go",
+          "tests": [
+            "TestLPExactSolveLUIndependentBoundedOptima",
+            "TestLPExactSolveTableauIndependentBoundedOptima",
+            "TestLPExactSolveRowsIndependentFeasibilityAndInfeasibility",
+            "TestLPExactSolveLimitsAndCancellationOrder",
+            "TestLPExactSolveReportingAndWriteFailure",
+            "TestLPExactSolvePreservedFallbackStatuses",
+            "TestLPExactSolveUnboundedIndependentRays",
+            "TestLPExactSolveFeasibilitySearchIndependentSolutions",
+            "TestLPExactSolveInfeasibleIndependentBounds",
+            "TestLPExactSolveTableauStaleCostCorrection",
+            "TestLPExactSolveStoppedAndInitializationPrefixes",
+            "TestLPExactSolvePhysicalOwnership"
           ]
         }
       ],
@@ -129216,21 +129249,22 @@
         "Zero-low constructor preserves base FEASIBLE status, beta/Harris initialization, debug predicate before dummy resize, and borrowed header identity. The Go header is safely empty before base construction; boxed debug reads guard the C++ not-yet-constructed dummy member domain. Source omitted pricing fields are not credited before InitRun; dead enter-price epsilon assignment is excluded because no retained read exists. Initial checks use exact zero/upper comparisons, not stored lower bounds/tolerance. Original smoke fixtures now use the actual constructor with empty upper bounds: explicit LU verifies independent optima; unchanged source default strategy instead hits !use_tableau assertion in debug and missing factorization ErrBounds guard in release. This does not claim default source solver correctness or completion of the whole upstream driver.",
         "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard.",
         "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
-        "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial.",
-        "Row pricing uses typed pointer choices over stable stored row cells and native slices. Equal-damage candidates with a shorter column are appended without dropping earlier longer candidates, preserving source RNG and selection. Bland mode copies each new minimum coefficient immediately and rereads later cells through output aliases. 480 independent selection/damage/RNG models,300 rational/epsilon monoid models,200 infeasible grow models, live alias, reached metadata and pooled/direct physical failures with older caller comparisons. Uncalled sign-row eligibility and inf_sign_of_column helpers are not ported. Row iteration and full exact Solve remain open; whole source unit stays partial.",
+        "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Containing LAR/CLI source audits remain separate.",
+        "Row pricing uses typed pointer choices over stable stored row cells and native slices. Equal-damage candidates with a shorter column are appended without dropping earlier longer candidates, preserving source RNG and selection. Bland mode copies each new minimum coefficient immediately and rereads later cells through output aliases. 480 independent selection/damage/RNG models,300 rational/epsilon monoid models,200 infeasible grow models, live alias, reached metadata and pooled/direct physical failures with older caller comparisons. Uncalled sign-row eligibility and inf_sign_of_column helpers are not ported. Row iteration and full exact Solve remain open; containing LAR/CLI source audits remain separate.",
         "Exact row iteration preserves source repetition count increment before strict threshold comparison, unsigned wrap, and lack of outer loop counter increments. It refreshes entering infeasibility only after ChangeBasis; source can pivot into an infeasible entering bound and discover infeasibility on the next iteration. 320 independent rational/epsilon feasible pivots and120 independently infeasible two-step models, threshold profiles, reached prefixes, pooled/direct physical arithmetic failures and older caller comparison cleanup. Whole exact Solve and source unit remain partial.",
-        "Concrete retained LAR infeasibility explanation consumer now ports inf_sign_of_column, which was not needed by row pricing alone. The existing typed sparse coefficient vector preserves source pair-copy lifetimes, zeros and order; a stopped negation/append remains owned until Core.Close. Full LAR Solve and signature/presolve integration remain open; no whole source-unit promotion.",
-        "Exact feasibility entry delegates actual LU/tableau Solve and validates nonbasic feasibility only under source debug; native early feasible return may ignore infeasible nonbasic values, as in source. Numerical errors keep the actual delegated owner receipts and stop the wrapper. Exact outer preparation and full LAR signature/Solve remain open; no whole source-unit promotion.",
+        "Concrete retained LAR infeasibility explanation consumer now ports inf_sign_of_column, which was not needed by row pricing alone. The existing typed sparse coefficient vector preserves source pair-copy lifetimes, zeros and order; a stopped negation/append remains owned until Core.Close. Full LAR Solve and signature/presolve integration remain open; containing LAR/CLI source audits remain separate.",
+        "Exact feasibility entry delegates actual LU/tableau Solve and validates nonbasic feasibility only under source debug; native early feasible return may ignore infeasible nonbasic values, as in source. Numerical errors keep the actual delegated owner receipts and stop the wrapper. Exact outer preparation and full LAR signature/Solve remain open; containing LAR/CLI source audits remain separate.",
         "Concrete scalar mpq/mpq stage-one primal construction now uses the actual RationalCoreSolverBase, RationalPriorityQueue, rational Beta, exact copied quotient epsilon1/10000000, empty dense cost backup, threshold1000 and UNKNOWN status. Precise Harris epsilon remains zero even for NaN floating tolerance. InitInfSet clears then visits basic columns in ascending order; out-of-bounds delta sign checks lower before upper. Cost initialization preserves descending all-column traversal, actual Ed.Index order including stored zeros, upper-first contradictory-bound priority, zero nonbasic costs, membership publication before optional copied unary negation, native unknown-type old-cost retention and checked assertions. Changed-basis and after-update variants preserve source flag/erase order. Precise backup copies every dense cost, destroys old values before publishing/copying replacement storage and performs no floating normalization. InitReducedCosts switches feasibility costs or restores the dense backup, preserves the feasibility-only early return and invokes the actual rational LU transpose solve and reduced-cost reconstruction. Parent raw receipts close before delegated base work and primal values remain alive through its cleanup. Thirteen test groups cover640 independently calculated cost/membership transition worlds,240 independent rational matrix/cost-switch systems and160 constructor/bound/membership worlds, including signed1e-100 violations, all column types and contradictory bounds. Twenty-two pooled/direct physical campaigns in native and20 in checked profiles run through success, exercising real LU construction, bound comparisons, cost negation, dense replacement, restoration and delegated reduced-cost arithmetic. Direct campaigns require actual physical refusal and all ownership censuses pass. Six actual older1000-digit caller comparison campaigns survive child calls and cleanup without adoption. Reached missing-input/base-assertion/extent/ascending-prefix/nonbasic bypass/late-settings profiles and stopped/closed calls are tested. Native focused checks pass14.047s; debug/checked15.338s. Statement coverage native/debug: primal core86/101 (85.1%)/84/101 (83.2%); cost switching40/44 (90.9%)/41/44 (93.2%); infeasibility costs115/123 (93.5%)/114/123 (92.7%). Remaining blocks chiefly guard stable numeral capture/destruction, valid metadata and unreachable constructor epsilon-allocation failure with these small constants; checked excludes native unknown-type branches. No whole-source or complete upstream-driver promotion; inventory remains88 partial/16 unported/6 reference_only. Related scalar rational core/LU and existing pair cost/infeasibility regressions pass74.482s native/117.646s debug/checked. Both LP vets, both full-module compilation gates, source portcheck (2103 units,677 APIs), dependency graph refresh (64 packages) and diff checks pass.",
-        "Concrete scalar mpq/mpq InitRun resets sort/iteration counters, rebuilds actual basic infeasibility, preserves the feasible feasibility-only early return, backs up dense rational costs when enabled, sets exact pricing epsilon zero, resizes the real RationalPriorityQueue without clearing membership, invokes scalar cost switching and real LU reduced costs, and refreshes zero sparsity estimates only when the column-count extent differs. Exact mode retains ColumnNormUpdateCounter and avoids floating column norms. Scalar pricing implements ordinary and breakpoint eligibility, exact bound comparisons and copied unary-negative epsilon, source sparsity sorting for tableau/LU, inverse-heading/list publication, strict-improvement budget consumption, tie-only RNG, selected-column rotation and sign reversal in breakpoint mode. Source zero/nonzero sort incomparability is preserved through native Go sort; no C++ standard-library implementation or portable tie ordering is invented. NumberOfNonBasicColumnsToTryForEnter preserves tentative-unbounded bypass, threshold300, unsigned32 percentage multiplication/wrap, zero bypass and one source RNG draw. DecideOnStatusWhenCannotFindEntering preserves checked cost-switch assertion before infeasible/optimal publication, without changing counters. Sixteen test groups cover240 independent rational initialization models,315 exact eligibility/breakpoint profiles,160 independent scan/RNG worlds,72 unsigned budget/RNG profiles,12 terminal status profiles and120 actual initialization-to-pricing systems with81-200-bit nonunit diagonal bases and signed1e-100 reduced costs. The latter run actual rational LU reconstruction/residual validation after pricing. Eighteen pooled/direct physical campaigns run through success over run setup, dense backup, exact costs, bound/epsilon comparisons and actual candidate scan; direct campaigns require physical refusal and ownership censuses pass. A real pending rational queue comparison is retained across InitRun refusal. Six actual older1000-digit caller comparison campaigns survive initialization/pricing and Close without adoption. Reached bounds/metadata/assertions/heading-prefix/zero-sort/late-settings/early-bypass/stopped profiles are tested. A reused tableau-key guard initially retained the LU fixture setting; its final explicit tableau setting now exercises the intended actual matrix-key guard. No production algorithm changed for that fixture correction. Focused checks pass10.802s native/15.152s debug/checked; related scalar core/primal/LU and pair initialization/pricing/cost regressions pass59.790s/84.044s. Both LP vets, both full-module compilation gates, dependency graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_init_run_rational.go 41/43 (95.3%); native primal_price_rational.go 200/221 (90.5%); debug primal_init_run_rational.go 41/43 (95.3%); debug primal_price_rational.go 212/221 (95.9%). Uncovered blocks chiefly guard stable expression capture/destruction, unchanged extents and valid numeral sign reads; native additionally erases checked bound/assertion branches. Inventory remains88 partial/16 unported/6 reference_only; no whole-source or complete upstream-driver promotion.",
-        "Concrete scalar mpq/mpq bound-step helpers now retain the actual rational expression graph: copied abs(bound), abs/10, scalar1 on the left of addition, shifted value on the left of Harris multiplication, final divide-by3 and every binary operator returned-reference copy. Harris output represents the returned value; a bound flip separately owns its returned subtraction and assignment into t. A source audit added this distinct assignment before final validation. Ratio limits retain bound-x, optional scalar plus/minus epsilon, division by the borrowed multiplier and std::min argument order through native Go comparisons. No numeric_pair coordinate construction or copied scalar denominator is introduced. Basis dispatch owns the source by-value multiplier, uses the stored global infeasibility set rather than recomputing X feasibility, preserves upper/lower/boxed/fixed branch and equality behavior, computes upper-bound epsilon for the source boxed-positive lower target, and clamps an already limited negative theta even on free columns. Exact Harris defaults to zero but the full expression executes; independent nonzero-member worlds test its scalar order without crediting an unused restore_harris_eps adapter. Bound-flip helpers preserve output publication even when the limit rejects the flip, live output/limit aliases and the boxed-only unlimited path without adding its absent nonnegative assertion. Parent raw receipts close before delegated base work and expression/epsilon/by-value owners. Ten test groups cover5120 independent scalar oracle worlds:240 Harris,480 bound flips,160 minima,1440 precise infeasible-bound limits,1200 basis limits and1600 global infeasibility/type/sign dispatch worlds. Borrowed model bounds/X/multiplier and output aliases are checked. Twenty-eight pooled/direct physical campaigns run through success across actual scalar expressions, comparisons, copies and dispatch; every direct campaign requires physical refusal and all ownership censuses pass. Four additional direct campaigns prove completed Harris product, bound quotient, flip returned subtraction and flip assignment refusal: the valid completed temporary equals independent big.Rat arithmetic while the destination remains incomplete, with no active rational normalization/integer GCD/division receipt. Earlier interrupted compound values may have ErrInvalidSlot backing; only that inspection domain is accepted before requiring a valid witness and eventual success. Eight actual older1000-digit caller comparison campaigns survive child calls and Close without adoption. Twenty-six reached nil/extent/sign/assertion/unknown-type/zero-direction/closed profiles test source publication and early bypasses. An initial physical flip fixture placed X above its upper bound; correcting its denominator restores a nonnegative step, while separate negative-step assertion and unlimited-path profiles remain. No production source assertion was relaxed. Final focused checks pass9.694s native/15.598s debug/checked. Both LP vets, both full-module compilation gates, graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_basis_dispatch_rational.go 60/69 (87.0%); native primal_basis_limit_rational.go 93/113 (82.3%); native primal_bound_step_rational.go 81/95 (85.3%); native primal_harris_rational.go 36/42 (85.7%); native primal_inf_limit_rational.go 81/105 (77.1%); debug primal_basis_dispatch_rational.go 61/69 (88.4%); debug primal_basis_limit_rational.go 100/113 (88.5%); debug primal_bound_step_rational.go 86/95 (90.5%); debug primal_harris_rational.go 36/42 (85.7%); debug primal_inf_limit_rational.go 91/105 (86.7%). Remaining blocks chiefly guard stable expression capture/destruction, unchanged numeral metadata and selected typed extent/sign errors; native additionally erases source assertion branches. Inventory remains88 partial/16 unported/6 reference_only; no whole-source or complete upstream-driver promotion. Final related scalar primal and existing pair bound/Harris/infeasibility/basis regressions pass88.533s native/124.535s debug/checked after the separate flip assignment correction. Source portcheck passes (2103 units,677 APIs). Earlier broader scalar core regressions pass109.178s/157.577s before that final local flip assignment correction; final focused and related checks cover the corrected source."
-      ]
+        "Concrete scalar mpq/mpq InitRun resets sort/iteration counters, rebuilds actual basic infeasibility, preserves the feasible feasibility-only early return, backs up dense rational costs when enabled, sets exact pricing epsilon zero, resizes the real RationalPriorityQueue without clearing membership, invokes scalar cost switching and real LU reduced costs, and refreshes zero sparsity estimates only when the column-count extent differs. Exact mode retains ColumnNormUpdateCounter and avoids floating column norms. Scalar pricing implements ordinary and breakpoint eligibility, exact bound comparisons and copied unary-negative epsilon, source sparsity sorting for tableau/LU, inverse-heading/list publication, strict-improvement budget consumption, tie-only RNG, selected-column rotation and sign reversal in breakpoint mode. Source zero/nonzero sort incomparability is preserved through native Go sort; no C++ standard-library implementation or portable tie ordering is invented. NumberOfNonBasicColumnsToTryForEnter preserves tentative-unbounded bypass, threshold300, unsigned32 percentage multiplication/wrap, zero bypass and one source RNG draw. DecideOnStatusWhenCannotFindEntering preserves checked cost-switch assertion before infeasible/optimal publication, without changing counters. Sixteen test groups cover240 independent rational initialization models,315 exact eligibility/breakpoint profiles,160 independent scan/RNG worlds,72 unsigned budget/RNG profiles,12 terminal status profiles and120 actual initialization-to-pricing systems with81-200-bit nonunit diagonal bases and signed1e-100 reduced costs. The latter run actual rational LU reconstruction/residual validation after pricing. Eighteen pooled/direct physical campaigns run through success over run setup, dense backup, exact costs, bound/epsilon comparisons and actual candidate scan; direct campaigns require physical refusal and ownership censuses pass. A real pending rational queue comparison is retained across InitRun refusal. Six actual older1000-digit caller comparison campaigns survive initialization/pricing and Close without adoption. Reached bounds/metadata/assertions/heading-prefix/zero-sort/late-settings/early-bypass/stopped profiles are tested. A reused tableau-key guard initially retained the LU fixture setting; its final explicit tableau setting now exercises the intended actual matrix-key guard. No production algorithm changed for that fixture correction. Focused checks pass10.802s native/15.152s debug/checked; related scalar core/primal/LU and pair initialization/pricing/cost regressions pass59.790s/84.044s. Both LP vets, both full-module compilation gates, dependency graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_init_run_rational.go 41/43 (95.3%); native primal_price_rational.go 200/221 (90.5%); debug primal_init_run_rational.go 41/43 (95.3%); debug primal_price_rational.go 212/221 (95.9%). Uncovered blocks chiefly guard stable expression capture/destruction, unchanged extents and valid numeral sign reads; native additionally erases checked bound/assertion branches. Inventory remains88 partial/16 unported/6 reference_only; containing LAR/CLI source audits remain separate.",
+        "Concrete scalar mpq/mpq bound-step helpers now retain the actual rational expression graph: copied abs(bound), abs/10, scalar1 on the left of addition, shifted value on the left of Harris multiplication, final divide-by3 and every binary operator returned-reference copy. Harris output represents the returned value; a bound flip separately owns its returned subtraction and assignment into t. A source audit added this distinct assignment before final validation. Ratio limits retain bound-x, optional scalar plus/minus epsilon, division by the borrowed multiplier and std::min argument order through native Go comparisons. No numeric_pair coordinate construction or copied scalar denominator is introduced. Basis dispatch owns the source by-value multiplier, uses the stored global infeasibility set rather than recomputing X feasibility, preserves upper/lower/boxed/fixed branch and equality behavior, computes upper-bound epsilon for the source boxed-positive lower target, and clamps an already limited negative theta even on free columns. Exact Harris defaults to zero but the full expression executes; independent nonzero-member worlds test its scalar order without crediting an unused restore_harris_eps adapter. Bound-flip helpers preserve output publication even when the limit rejects the flip, live output/limit aliases and the boxed-only unlimited path without adding its absent nonnegative assertion. Parent raw receipts close before delegated base work and expression/epsilon/by-value owners. Ten test groups cover5120 independent scalar oracle worlds:240 Harris,480 bound flips,160 minima,1440 precise infeasible-bound limits,1200 basis limits and1600 global infeasibility/type/sign dispatch worlds. Borrowed model bounds/X/multiplier and output aliases are checked. Twenty-eight pooled/direct physical campaigns run through success across actual scalar expressions, comparisons, copies and dispatch; every direct campaign requires physical refusal and all ownership censuses pass. Four additional direct campaigns prove completed Harris product, bound quotient, flip returned subtraction and flip assignment refusal: the valid completed temporary equals independent big.Rat arithmetic while the destination remains incomplete, with no active rational normalization/integer GCD/division receipt. Earlier interrupted compound values may have ErrInvalidSlot backing; only that inspection domain is accepted before requiring a valid witness and eventual success. Eight actual older1000-digit caller comparison campaigns survive child calls and Close without adoption. Twenty-six reached nil/extent/sign/assertion/unknown-type/zero-direction/closed profiles test source publication and early bypasses. An initial physical flip fixture placed X above its upper bound; correcting its denominator restores a nonnegative step, while separate negative-step assertion and unlimited-path profiles remain. No production source assertion was relaxed. Final focused checks pass9.694s native/15.598s debug/checked. Both LP vets, both full-module compilation gates, graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_basis_dispatch_rational.go 60/69 (87.0%); native primal_basis_limit_rational.go 93/113 (82.3%); native primal_bound_step_rational.go 81/95 (85.3%); native primal_harris_rational.go 36/42 (85.7%); native primal_inf_limit_rational.go 81/105 (77.1%); debug primal_basis_dispatch_rational.go 61/69 (88.4%); debug primal_basis_limit_rational.go 100/113 (88.5%); debug primal_bound_step_rational.go 86/95 (90.5%); debug primal_harris_rational.go 36/42 (85.7%); debug primal_inf_limit_rational.go 91/105 (86.7%). Remaining blocks chiefly guard stable expression capture/destruction, unchanged numeral metadata and selected typed extent/sign errors; native additionally erases source assertion branches. Inventory remains88 partial/16 unported/6 reference_only; containing LAR/CLI source audits remain separate. Final related scalar primal and existing pair bound/Harris/infeasibility/basis regressions pass88.533s native/124.535s debug/checked after the separate flip assignment correction. Source portcheck passes (2103 units,677 APIs). Earlier broader scalar core regressions pass109.178s/157.577s before that final local flip assignment correction; final focused and related checks cover the corrected source."
+      ],
+      "retained_source_audit_evidence": "Whole retained primal-core audit for double/double, mpq/numeric_pair<mpq> and mpq/mpq: typed Go implements stage-one infeasibility/cost lifecycle, Harris and breakpoint pricing/leaving, LU/tableau value and reduced-cost updates, entering/advancement, row strategy, precise and floating Solve, feasibility-only entry and source status/cancellation/reporting order. The precise pair and scalar implementations retain separate owned numeral expressions and child LU/tableau lifetimes; stopped children close before borrowed local step values and older caller comparison receipts remain owned by callers. Source double solve_with_tableau and double tableau basis update are explicitly emitted but have no retained entry because solve dispatch requires precise T; no dead float tableau adapter is added. Definition-only helpers and STL internals are excluded. Current native and g3debug,g3checked focused primal/Solve groups pass, along with prior focused tableau groups and full native checkpoint17ecadb7 on unchanged Go code. Representative native coverage: primal_core_float158/165, harris_float134/136, breakpoint_float112/120, price_float89/99, solve_float61/84, core_rational117/149, price_rational200/221, leaving_rational128/146 and solve_rational102/141; checked coverage is similar or higher. LAR outer and CLI source audits remain separate."
     },
     {
       "path": "src/util/lp/lp_primal_core_solver.hpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/primal_core_float.go",
         "pkg/util/lp/primal_price_float.go",
@@ -129832,8 +129866,8 @@
           "text": "SASSERT(false);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained floating stage-one constructor, infeasibility set/cost lifecycle, cost normalization/backup and restoration, complete LU init_run preparation, randomized initial column norms, entering eligibility/pricing/sort/rotation",
@@ -129854,7 +129888,8 @@
             "TestLPFloatPrimalPricingBudgetAndIEEE",
             "TestLPFloatPrimalPricingPublicationAndAssertions",
             "TestLPFloatPrimalPreparedBasisIndependentOracle"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_core_float.go"
         },
         {
           "name": "Retained double/double Harris tolerance, feasible/infeasible column step limits, sparse Harris theta, randomized maximum-pivot leaving selection and entering bound flip",
@@ -129867,7 +129902,8 @@
             "TestLPFloatPrimalHarrisInfeasibleCrossings",
             "TestLPFloatPrimalHarrisIEEEAndPrefixes",
             "TestLPFloatPrimalHarrisReachedGuards"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_harris_float.go"
         },
         {
           "name": "Retained floating breakpoint records, exact-zero/sign gate, row/entering breakpoint construction, queue lifecycle, slope change, first-breakpoint double selection and complete floating find_leaving_and_t routing",
@@ -129881,7 +129917,8 @@
             "TestLPFloatPrimalLeavingPathIntegration",
             "TestLPFloatPrimalBreakpointPublicationAndGuards",
             "TestLPFloatPrimalLeavingReachedErrors"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_breakpoint_float.go"
         },
         {
           "name": "Retained floating reduced-cost pivot recurrence, entering reduced-cost refresh/drift/profitability classification, cost-switch predicate, actual indexed LU beta solve, entering norm, periodic norm initialization and steepest-edge norm updates",
@@ -129895,7 +129932,8 @@
             "TestLPFloatPrimalRefreshIEEEAndCostTransitions",
             "TestLPFloatPrimalRefreshPublicationAndGuards",
             "TestLPFloatPrimalNormUpdateReachedBounds"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_refresh_float.go"
         },
         {
           "name": "Floating bound-flip, entering/leaving pivot and full entering advance orchestration, drift/refactor/residual recovery and source tentative-unbounded/unstable status transitions",
@@ -129913,7 +129951,8 @@
             "TestLPFloatPrimalAdvanceActualNumericalRefusals",
             "TestLPFloatPrimalAdvanceReachedGuards",
             "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_advance_float.go"
         },
         {
           "name": "Retained double stage-one randomized entering budget, status decision, one_iteration and full solve loop with actual pivot/refactor/cancellation services",
@@ -129928,7 +129967,8 @@
             "TestLPFloatPrimalIterationBudgetAndStatistics",
             "TestLPFloatPrimalStatisticsGuardsAndIEEE",
             "TestLPFloatPrimalSolveAndIterationReachedGuards"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_solve_float.go"
         },
         {
           "name": "Retained floating feasibility-only entry point, debug nonbasic feasibility precheck and source split-stream column diagnostics",
@@ -130185,7 +130225,8 @@
             "TestLPRationalPrimalCostSwitchPhysicalOwnership",
             "TestLPRationalPrimalCostSwitchSourcePrefixes",
             "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_core_rational.go"
         },
         {
           "name": "Concrete scalar mpq/mpq precise InitRun, zero-only sparse-count initialization, ordinary/breakpoint pricing eligibility, source nonbasis sort/headings/list, strict-improvement/tie-RNG entering scan, unsigned randomized candidate budget and no-entering status decision; source h524-527,826-838 and hpp31-57,82-110,151-232,643-663,841-853",
@@ -130214,7 +130255,8 @@
             "TestLPRationalPrimalPricingOlderComparisonOwner",
             "TestLPRationalPrimalPricingBreakpointDirection",
             "TestLPRationalPrimalPricingCountIndependentRNG"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_price_rational.go"
         },
         {
           "name": "Concrete scalar mpq/mpq Harris epsilon, limit_theta, bound flip/unlimited flip, precise infeasible-bound limits, feasible/boxed basis limits and by-value basis dispatcher; source h329,337-368,539-742 and hpp353-409, with scalar rational.h returned-reference copies and separate flip assignment",
@@ -130239,7 +130281,8 @@
             "TestLPRationalPrimalBoundReachedGuards",
             "TestLPRationalPrimalBoundPreservesOlderComparison",
             "TestLPRationalPrimalBoundReturnedReferenceCopies"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_bound_step_rational.go"
         },
         {
           "name": "Retained scalar mpq/mpq breakpoint record construction/copy, owned delta destruction, scalar absolute queue priority and slope changes",
@@ -130273,7 +130316,8 @@
             "TestLPRationalPrimalBreakpointAdvanceGuards",
             "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
             "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_breakpoint_collect_rational.go"
         },
         {
           "name": "Retained scalar mpq/mpq precise circular leaving selection, by-value basis multiplier, exact ratio/sparsity ties, entering flip and breakpoint dispatch",
@@ -130323,7 +130367,8 @@
             "TestLPRationalAdvanceDifferentSourcePrefixes",
             "TestLPRationalAdvanceDifferentCostSwitchPhysicalOwnership",
             "TestLPRationalAdvanceDifferentMinimumNegation"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_advance_rational.go"
         },
         {
           "name": "Retained scalar mpq/mpq entering orchestration and one_iteration with actual LU solve, precise leaving selection, advancement and terminal status decision",
@@ -130339,7 +130384,8 @@
             "TestLPRationalEnterPhysicalOwnership",
             "TestLPRationalIterationPricingAndAdvance",
             "TestLPRationalIterationIndependentBoundedOptima"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_enter_rational.go"
         },
         {
           "name": "Concrete scalar mpq/mpq tableau infeasibility cost lookup, incremental basic-column cost changes and reduced-cost row updates",
@@ -130400,18 +130446,19 @@
         "Precise advancement omits floating beta/residual/norm branches exactly as source traits require. Unary pair negation keeps scalar arguments and returned pair independently owned; caller assignment is X then Y. Capture ends before child solver calls. Stored CopyXB remains a caller responsibility; missing backup can report FLOATING_POINT_ERROR on rollback. Full advance_on_entering_precise, precise Solve and LAR orchestration remain open.",
         "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
         "Source advance_on_entering local pair remains owned through actual child calls. It does not block child ready checks, but any failure stops the outer owner. Close cleans primal/base child receipts and scratch before deleting that local. Exact dispatch has no floating residual/refresh or second unbounded-observation repair. Complete precise Solve, default tableau loop and LAR orchestration remain open.",
-        "Exact Solve tests cover independent bounded optima, feasibility search, infeasible bounds and unbounded rays, source cancellation/reporting and initialization prefixes, native stale-cost correction versus debug refusal, and pooled/direct physical ownership. Source UNSTABLE is rejected in debug; tableau tentative fallback reaches the existing debug LU-cost assertion. Precise outer preparation and remaining LP variants remain open; no whole source-unit promotion.",
-        "Exact feasibility entry delegates actual LU/tableau Solve and validates nonbasic feasibility only under source debug; native early feasible return may ignore infeasible nonbasic values, as in source. Numerical errors keep the actual delegated owner receipts and stop the wrapper. Exact outer preparation and full LAR signature/Solve remain open; no whole source-unit promotion.",
+        "Exact Solve tests cover independent bounded optima, feasibility search, infeasible bounds and unbounded rays, source cancellation/reporting and initialization prefixes, native stale-cost correction versus debug refusal, and pooled/direct physical ownership. Source UNSTABLE is rejected in debug; tableau tentative fallback reaches the existing debug LU-cost assertion. Precise outer preparation and remaining LP variants remain open; containing LAR/CLI source audits remain separate.",
+        "Exact feasibility entry delegates actual LU/tableau Solve and validates nonbasic feasibility only under source debug; native early feasible return may ignore infeasible nonbasic values, as in source. Numerical errors keep the actual delegated owner receipts and stop the wrapper. Exact outer preparation and full LAR signature/Solve remain open; containing LAR/CLI source audits remain separate.",
         "Concrete scalar mpq/mpq stage-one primal construction now uses the actual RationalCoreSolverBase, RationalPriorityQueue, rational Beta, exact copied quotient epsilon1/10000000, empty dense cost backup, threshold1000 and UNKNOWN status. Precise Harris epsilon remains zero even for NaN floating tolerance. InitInfSet clears then visits basic columns in ascending order; out-of-bounds delta sign checks lower before upper. Cost initialization preserves descending all-column traversal, actual Ed.Index order including stored zeros, upper-first contradictory-bound priority, zero nonbasic costs, membership publication before optional copied unary negation, native unknown-type old-cost retention and checked assertions. Changed-basis and after-update variants preserve source flag/erase order. Precise backup copies every dense cost, destroys old values before publishing/copying replacement storage and performs no floating normalization. InitReducedCosts switches feasibility costs or restores the dense backup, preserves the feasibility-only early return and invokes the actual rational LU transpose solve and reduced-cost reconstruction. Parent raw receipts close before delegated base work and primal values remain alive through its cleanup. Thirteen test groups cover640 independently calculated cost/membership transition worlds,240 independent rational matrix/cost-switch systems and160 constructor/bound/membership worlds, including signed1e-100 violations, all column types and contradictory bounds. Twenty-two pooled/direct physical campaigns in native and20 in checked profiles run through success, exercising real LU construction, bound comparisons, cost negation, dense replacement, restoration and delegated reduced-cost arithmetic. Direct campaigns require actual physical refusal and all ownership censuses pass. Six actual older1000-digit caller comparison campaigns survive child calls and cleanup without adoption. Reached missing-input/base-assertion/extent/ascending-prefix/nonbasic bypass/late-settings profiles and stopped/closed calls are tested. Native focused checks pass14.047s; debug/checked15.338s. Statement coverage native/debug: primal core86/101 (85.1%)/84/101 (83.2%); cost switching40/44 (90.9%)/41/44 (93.2%); infeasibility costs115/123 (93.5%)/114/123 (92.7%). Remaining blocks chiefly guard stable numeral capture/destruction, valid metadata and unreachable constructor epsilon-allocation failure with these small constants; checked excludes native unknown-type branches. No whole-source or complete upstream-driver promotion; inventory remains88 partial/16 unported/6 reference_only. Related scalar rational core/LU and existing pair cost/infeasibility regressions pass74.482s native/117.646s debug/checked. Both LP vets, both full-module compilation gates, source portcheck (2103 units,677 APIs), dependency graph refresh (64 packages) and diff checks pass.",
-        "Concrete scalar mpq/mpq InitRun resets sort/iteration counters, rebuilds actual basic infeasibility, preserves the feasible feasibility-only early return, backs up dense rational costs when enabled, sets exact pricing epsilon zero, resizes the real RationalPriorityQueue without clearing membership, invokes scalar cost switching and real LU reduced costs, and refreshes zero sparsity estimates only when the column-count extent differs. Exact mode retains ColumnNormUpdateCounter and avoids floating column norms. Scalar pricing implements ordinary and breakpoint eligibility, exact bound comparisons and copied unary-negative epsilon, source sparsity sorting for tableau/LU, inverse-heading/list publication, strict-improvement budget consumption, tie-only RNG, selected-column rotation and sign reversal in breakpoint mode. Source zero/nonzero sort incomparability is preserved through native Go sort; no C++ standard-library implementation or portable tie ordering is invented. NumberOfNonBasicColumnsToTryForEnter preserves tentative-unbounded bypass, threshold300, unsigned32 percentage multiplication/wrap, zero bypass and one source RNG draw. DecideOnStatusWhenCannotFindEntering preserves checked cost-switch assertion before infeasible/optimal publication, without changing counters. Sixteen test groups cover240 independent rational initialization models,315 exact eligibility/breakpoint profiles,160 independent scan/RNG worlds,72 unsigned budget/RNG profiles,12 terminal status profiles and120 actual initialization-to-pricing systems with81-200-bit nonunit diagonal bases and signed1e-100 reduced costs. The latter run actual rational LU reconstruction/residual validation after pricing. Eighteen pooled/direct physical campaigns run through success over run setup, dense backup, exact costs, bound/epsilon comparisons and actual candidate scan; direct campaigns require physical refusal and ownership censuses pass. A real pending rational queue comparison is retained across InitRun refusal. Six actual older1000-digit caller comparison campaigns survive initialization/pricing and Close without adoption. Reached bounds/metadata/assertions/heading-prefix/zero-sort/late-settings/early-bypass/stopped profiles are tested. A reused tableau-key guard initially retained the LU fixture setting; its final explicit tableau setting now exercises the intended actual matrix-key guard. No production algorithm changed for that fixture correction. Focused checks pass10.802s native/15.152s debug/checked; related scalar core/primal/LU and pair initialization/pricing/cost regressions pass59.790s/84.044s. Both LP vets, both full-module compilation gates, dependency graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_init_run_rational.go 41/43 (95.3%); native primal_price_rational.go 200/221 (90.5%); debug primal_init_run_rational.go 41/43 (95.3%); debug primal_price_rational.go 212/221 (95.9%). Uncovered blocks chiefly guard stable expression capture/destruction, unchanged extents and valid numeral sign reads; native additionally erases checked bound/assertion branches. Inventory remains88 partial/16 unported/6 reference_only; no whole-source or complete upstream-driver promotion.",
-        "Concrete scalar mpq/mpq bound-step helpers now retain the actual rational expression graph: copied abs(bound), abs/10, scalar1 on the left of addition, shifted value on the left of Harris multiplication, final divide-by3 and every binary operator returned-reference copy. Harris output represents the returned value; a bound flip separately owns its returned subtraction and assignment into t. A source audit added this distinct assignment before final validation. Ratio limits retain bound-x, optional scalar plus/minus epsilon, division by the borrowed multiplier and std::min argument order through native Go comparisons. No numeric_pair coordinate construction or copied scalar denominator is introduced. Basis dispatch owns the source by-value multiplier, uses the stored global infeasibility set rather than recomputing X feasibility, preserves upper/lower/boxed/fixed branch and equality behavior, computes upper-bound epsilon for the source boxed-positive lower target, and clamps an already limited negative theta even on free columns. Exact Harris defaults to zero but the full expression executes; independent nonzero-member worlds test its scalar order without crediting an unused restore_harris_eps adapter. Bound-flip helpers preserve output publication even when the limit rejects the flip, live output/limit aliases and the boxed-only unlimited path without adding its absent nonnegative assertion. Parent raw receipts close before delegated base work and expression/epsilon/by-value owners. Ten test groups cover5120 independent scalar oracle worlds:240 Harris,480 bound flips,160 minima,1440 precise infeasible-bound limits,1200 basis limits and1600 global infeasibility/type/sign dispatch worlds. Borrowed model bounds/X/multiplier and output aliases are checked. Twenty-eight pooled/direct physical campaigns run through success across actual scalar expressions, comparisons, copies and dispatch; every direct campaign requires physical refusal and all ownership censuses pass. Four additional direct campaigns prove completed Harris product, bound quotient, flip returned subtraction and flip assignment refusal: the valid completed temporary equals independent big.Rat arithmetic while the destination remains incomplete, with no active rational normalization/integer GCD/division receipt. Earlier interrupted compound values may have ErrInvalidSlot backing; only that inspection domain is accepted before requiring a valid witness and eventual success. Eight actual older1000-digit caller comparison campaigns survive child calls and Close without adoption. Twenty-six reached nil/extent/sign/assertion/unknown-type/zero-direction/closed profiles test source publication and early bypasses. An initial physical flip fixture placed X above its upper bound; correcting its denominator restores a nonnegative step, while separate negative-step assertion and unlimited-path profiles remain. No production source assertion was relaxed. Final focused checks pass9.694s native/15.598s debug/checked. Both LP vets, both full-module compilation gates, graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_basis_dispatch_rational.go 60/69 (87.0%); native primal_basis_limit_rational.go 93/113 (82.3%); native primal_bound_step_rational.go 81/95 (85.3%); native primal_harris_rational.go 36/42 (85.7%); native primal_inf_limit_rational.go 81/105 (77.1%); debug primal_basis_dispatch_rational.go 61/69 (88.4%); debug primal_basis_limit_rational.go 100/113 (88.5%); debug primal_bound_step_rational.go 86/95 (90.5%); debug primal_harris_rational.go 36/42 (85.7%); debug primal_inf_limit_rational.go 91/105 (86.7%). Remaining blocks chiefly guard stable expression capture/destruction, unchanged numeral metadata and selected typed extent/sign errors; native additionally erases source assertion branches. Inventory remains88 partial/16 unported/6 reference_only; no whole-source or complete upstream-driver promotion. Final related scalar primal and existing pair bound/Harris/infeasibility/basis regressions pass88.533s native/124.535s debug/checked after the separate flip assignment correction. Source portcheck passes (2103 units,677 APIs). Earlier broader scalar core regressions pass109.178s/157.577s before that final local flip assignment correction; final focused and related checks cover the corrected source."
-      ]
+        "Concrete scalar mpq/mpq InitRun resets sort/iteration counters, rebuilds actual basic infeasibility, preserves the feasible feasibility-only early return, backs up dense rational costs when enabled, sets exact pricing epsilon zero, resizes the real RationalPriorityQueue without clearing membership, invokes scalar cost switching and real LU reduced costs, and refreshes zero sparsity estimates only when the column-count extent differs. Exact mode retains ColumnNormUpdateCounter and avoids floating column norms. Scalar pricing implements ordinary and breakpoint eligibility, exact bound comparisons and copied unary-negative epsilon, source sparsity sorting for tableau/LU, inverse-heading/list publication, strict-improvement budget consumption, tie-only RNG, selected-column rotation and sign reversal in breakpoint mode. Source zero/nonzero sort incomparability is preserved through native Go sort; no C++ standard-library implementation or portable tie ordering is invented. NumberOfNonBasicColumnsToTryForEnter preserves tentative-unbounded bypass, threshold300, unsigned32 percentage multiplication/wrap, zero bypass and one source RNG draw. DecideOnStatusWhenCannotFindEntering preserves checked cost-switch assertion before infeasible/optimal publication, without changing counters. Sixteen test groups cover240 independent rational initialization models,315 exact eligibility/breakpoint profiles,160 independent scan/RNG worlds,72 unsigned budget/RNG profiles,12 terminal status profiles and120 actual initialization-to-pricing systems with81-200-bit nonunit diagonal bases and signed1e-100 reduced costs. The latter run actual rational LU reconstruction/residual validation after pricing. Eighteen pooled/direct physical campaigns run through success over run setup, dense backup, exact costs, bound/epsilon comparisons and actual candidate scan; direct campaigns require physical refusal and ownership censuses pass. A real pending rational queue comparison is retained across InitRun refusal. Six actual older1000-digit caller comparison campaigns survive initialization/pricing and Close without adoption. Reached bounds/metadata/assertions/heading-prefix/zero-sort/late-settings/early-bypass/stopped profiles are tested. A reused tableau-key guard initially retained the LU fixture setting; its final explicit tableau setting now exercises the intended actual matrix-key guard. No production algorithm changed for that fixture correction. Focused checks pass10.802s native/15.152s debug/checked; related scalar core/primal/LU and pair initialization/pricing/cost regressions pass59.790s/84.044s. Both LP vets, both full-module compilation gates, dependency graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_init_run_rational.go 41/43 (95.3%); native primal_price_rational.go 200/221 (90.5%); debug primal_init_run_rational.go 41/43 (95.3%); debug primal_price_rational.go 212/221 (95.9%). Uncovered blocks chiefly guard stable expression capture/destruction, unchanged extents and valid numeral sign reads; native additionally erases checked bound/assertion branches. Inventory remains88 partial/16 unported/6 reference_only; containing LAR/CLI source audits remain separate.",
+        "Concrete scalar mpq/mpq bound-step helpers now retain the actual rational expression graph: copied abs(bound), abs/10, scalar1 on the left of addition, shifted value on the left of Harris multiplication, final divide-by3 and every binary operator returned-reference copy. Harris output represents the returned value; a bound flip separately owns its returned subtraction and assignment into t. A source audit added this distinct assignment before final validation. Ratio limits retain bound-x, optional scalar plus/minus epsilon, division by the borrowed multiplier and std::min argument order through native Go comparisons. No numeric_pair coordinate construction or copied scalar denominator is introduced. Basis dispatch owns the source by-value multiplier, uses the stored global infeasibility set rather than recomputing X feasibility, preserves upper/lower/boxed/fixed branch and equality behavior, computes upper-bound epsilon for the source boxed-positive lower target, and clamps an already limited negative theta even on free columns. Exact Harris defaults to zero but the full expression executes; independent nonzero-member worlds test its scalar order without crediting an unused restore_harris_eps adapter. Bound-flip helpers preserve output publication even when the limit rejects the flip, live output/limit aliases and the boxed-only unlimited path without adding its absent nonnegative assertion. Parent raw receipts close before delegated base work and expression/epsilon/by-value owners. Ten test groups cover5120 independent scalar oracle worlds:240 Harris,480 bound flips,160 minima,1440 precise infeasible-bound limits,1200 basis limits and1600 global infeasibility/type/sign dispatch worlds. Borrowed model bounds/X/multiplier and output aliases are checked. Twenty-eight pooled/direct physical campaigns run through success across actual scalar expressions, comparisons, copies and dispatch; every direct campaign requires physical refusal and all ownership censuses pass. Four additional direct campaigns prove completed Harris product, bound quotient, flip returned subtraction and flip assignment refusal: the valid completed temporary equals independent big.Rat arithmetic while the destination remains incomplete, with no active rational normalization/integer GCD/division receipt. Earlier interrupted compound values may have ErrInvalidSlot backing; only that inspection domain is accepted before requiring a valid witness and eventual success. Eight actual older1000-digit caller comparison campaigns survive child calls and Close without adoption. Twenty-six reached nil/extent/sign/assertion/unknown-type/zero-direction/closed profiles test source publication and early bypasses. An initial physical flip fixture placed X above its upper bound; correcting its denominator restores a nonnegative step, while separate negative-step assertion and unlimited-path profiles remain. No production source assertion was relaxed. Final focused checks pass9.694s native/15.598s debug/checked. Both LP vets, both full-module compilation gates, graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_basis_dispatch_rational.go 60/69 (87.0%); native primal_basis_limit_rational.go 93/113 (82.3%); native primal_bound_step_rational.go 81/95 (85.3%); native primal_harris_rational.go 36/42 (85.7%); native primal_inf_limit_rational.go 81/105 (77.1%); debug primal_basis_dispatch_rational.go 61/69 (88.4%); debug primal_basis_limit_rational.go 100/113 (88.5%); debug primal_bound_step_rational.go 86/95 (90.5%); debug primal_harris_rational.go 36/42 (85.7%); debug primal_inf_limit_rational.go 91/105 (86.7%). Remaining blocks chiefly guard stable expression capture/destruction, unchanged numeral metadata and selected typed extent/sign errors; native additionally erases source assertion branches. Inventory remains88 partial/16 unported/6 reference_only; containing LAR/CLI source audits remain separate. Final related scalar primal and existing pair bound/Harris/infeasibility/basis regressions pass88.533s native/124.535s debug/checked after the separate flip assignment correction. Source portcheck passes (2103 units,677 APIs). Earlier broader scalar core regressions pass109.178s/157.577s before that final local flip assignment correction; final focused and related checks cover the corrected source."
+      ],
+      "retained_source_audit_evidence": "Whole retained primal-core audit for double/double, mpq/numeric_pair<mpq> and mpq/mpq: typed Go implements stage-one infeasibility/cost lifecycle, Harris and breakpoint pricing/leaving, LU/tableau value and reduced-cost updates, entering/advancement, row strategy, precise and floating Solve, feasibility-only entry and source status/cancellation/reporting order. The precise pair and scalar implementations retain separate owned numeral expressions and child LU/tableau lifetimes; stopped children close before borrowed local step values and older caller comparison receipts remain owned by callers. Source double solve_with_tableau and double tableau basis update are explicitly emitted but have no retained entry because solve dispatch requires precise T; no dead float tableau adapter is added. Definition-only helpers and STL internals are excluded. Current native and g3debug,g3checked focused primal/Solve groups pass, along with prior focused tableau groups and full native checkpoint17ecadb7 on unchanged Go code. Representative native coverage: primal_core_float158/165, harris_float134/136, breakpoint_float112/120, price_float89/99, solve_float61/84, core_rational117/149, price_rational200/221, leaving_rational128/146 and solve_rational102/141; checked coverage is similar or higher. LAR outer and CLI source audits remain separate."
     },
     {
       "path": "src/util/lp/lp_primal_core_solver_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/primal_core_float.go",
         "pkg/util/lp/primal_price_float.go",
@@ -130434,7 +130481,12 @@
         "pkg/util/lp/primal_inf_limit_rational.go",
         "pkg/util/lp/primal_basis_limit_rational.go",
         "pkg/util/lp/primal_basis_dispatch_rational.go",
-        "pkg/util/lp/primal_bound_rational_test.go"
+        "pkg/util/lp/primal_bound_rational_test.go",
+        "pkg/util/lp/primal_solve_float.go",
+        "pkg/util/lp/primal_solve_exact.go",
+        "pkg/util/lp/primal_solve_rational.go",
+        "pkg/util/lp/primal_values_tableau_exact.go",
+        "pkg/util/lp/primal_feasible_exact.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -130489,10 +130541,50 @@
         "TestLPRationalPrimalBoundPhysicalOwnership",
         "TestLPRationalPrimalBoundReachedGuards",
         "TestLPRationalPrimalBoundPreservesOlderComparison",
-        "TestLPRationalPrimalBoundReturnedReferenceCopies"
+        "TestLPRationalPrimalBoundReturnedReferenceCopies",
+        "TestLPFloatPrimalSolveOriginalNumericalFixtures",
+        "TestLPFloatPrimalSolveIndependentVertices",
+        "TestLPFloatPrimalSolveStopsAndStatuses",
+        "TestLPFloatPrimalIterationBudgetAndStatistics",
+        "TestLPFloatPrimalStatisticsGuardsAndIEEE",
+        "TestLPFloatPrimalSolveAndIterationReachedGuards",
+        "TestLPExactSolveLUIndependentBoundedOptima",
+        "TestLPExactSolveTableauIndependentBoundedOptima",
+        "TestLPExactSolveRowsIndependentFeasibilityAndInfeasibility",
+        "TestLPExactSolveLimitsAndCancellationOrder",
+        "TestLPExactSolveReportingAndWriteFailure",
+        "TestLPExactSolvePreservedFallbackStatuses",
+        "TestLPExactSolveUnboundedIndependentRays",
+        "TestLPExactSolveFeasibilitySearchIndependentSolutions",
+        "TestLPExactSolveInfeasibleIndependentBounds",
+        "TestLPExactSolveTableauStaleCostCorrection",
+        "TestLPExactSolveStoppedAndInitializationPrefixes",
+        "TestLPExactSolvePhysicalOwnership",
+        "TestLPExactFindFeasibleIndependentSystems",
+        "TestLPExactNonbasicIndependentBoundOracle",
+        "TestLPExactFindFeasibleEntryPrefixes",
+        "TestLPExactNonbasicEmptyAndStoppedValidation",
+        "TestLPExactFindFeasiblePhysicalOwnership",
+        "TestLPRationalSolveLUIndependentBoundedOptima",
+        "TestLPRationalSolveTableauIndependentBoundedOptima",
+        "TestLPRationalSolveRowsIndependentFeasibilityAndInfeasibility",
+        "TestLPRationalSolveLimitsAndCancellationOrder",
+        "TestLPRationalSolveReportingAndWriteFailure",
+        "TestLPRationalSolvePreservedFallbackStatuses",
+        "TestLPRationalSolveUnboundedIndependentRays",
+        "TestLPRationalSolveFeasibilitySearchIndependentSolutions",
+        "TestLPRationalSolveInfeasibleIndependentBounds",
+        "TestLPRationalSolveTableauStaleCostCorrection",
+        "TestLPRationalSolveStoppedAndInitializationPrefixes",
+        "TestLPRationalSolvePhysicalOwnership",
+        "TestLPRationalSolveSingularFallbackAfterBoundFlip",
+        "TestLPRationalSolveFinalValidationReadsLiveBounds",
+        "TestLPRationalSolveTableauLiveStaleCostCorrection",
+        "TestLPExactTableauValuesIndependentModels",
+        "TestLPRationalTableauValuesIndependentModels"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained floating stage-one constructor, infeasibility set/cost lifecycle, cost normalization/backup and restoration, complete LU init_run preparation, randomized initial column norms, entering eligibility/pricing/sort/rotation",
@@ -130513,7 +130605,8 @@
             "TestLPFloatPrimalPricingBudgetAndIEEE",
             "TestLPFloatPrimalPricingPublicationAndAssertions",
             "TestLPFloatPrimalPreparedBasisIndependentOracle"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_core_float.go"
         },
         {
           "name": "Retained floating feasibility-only entry point, debug nonbasic feasibility precheck and source split-stream column diagnostics",
@@ -130547,7 +130640,8 @@
             "TestLPRationalPrimalCostSwitchPhysicalOwnership",
             "TestLPRationalPrimalCostSwitchSourcePrefixes",
             "TestLPRationalPrimalCostSwitchLeavesOlderComparisonOwned"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_core_rational.go"
         },
         {
           "name": "Concrete scalar mpq/mpq precise InitRun, zero-only sparse-count initialization, ordinary/breakpoint pricing eligibility, source nonbasis sort/headings/list, strict-improvement/tie-RNG entering scan, unsigned randomized candidate budget and no-entering status decision; source h524-527,826-838 and hpp31-57,82-110,151-232,643-663,841-853",
@@ -130576,7 +130670,8 @@
             "TestLPRationalPrimalPricingOlderComparisonOwner",
             "TestLPRationalPrimalPricingBreakpointDirection",
             "TestLPRationalPrimalPricingCountIndependentRNG"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_price_rational.go"
         },
         {
           "name": "Concrete scalar mpq/mpq Harris epsilon, limit_theta, bound flip/unlimited flip, precise infeasible-bound limits, feasible/boxed basis limits and by-value basis dispatcher; source h329,337-368,539-742 and hpp353-409, with scalar rational.h returned-reference copies and separate flip assignment",
@@ -130601,20 +130696,94 @@
             "TestLPRationalPrimalBoundReachedGuards",
             "TestLPRationalPrimalBoundPreservesOlderComparison",
             "TestLPRationalPrimalBoundReturnedReferenceCopies"
+          ],
+          "go_target": "pkg/util/lp/primal_bound_step_rational.go"
+        },
+        {
+          "name": "Floating find_feasible_solution and ordinary Solve dispatch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solve_float.go",
+          "tests": [
+            "TestLPFloatPrimalSolveOriginalNumericalFixtures",
+            "TestLPFloatPrimalSolveIndependentVertices",
+            "TestLPFloatPrimalSolveStopsAndStatuses",
+            "TestLPFloatPrimalIterationBudgetAndStatistics",
+            "TestLPFloatPrimalStatisticsGuardsAndIEEE",
+            "TestLPFloatPrimalSolveAndIterationReachedGuards",
+            "TestLPFloatPrimalFindFeasibleIndependentSystems",
+            "TestLPFloatPrimalFeasibleCheckAndDiagnostic",
+            "TestLPFloatPrimalFeasibleDiagnosticFailurePrefixes"
+          ]
+        },
+        {
+          "name": "Precise mpq/impq find_feasible_solution and Solve dispatch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solve_exact.go",
+          "tests": [
+            "TestLPExactSolveLUIndependentBoundedOptima",
+            "TestLPExactSolveTableauIndependentBoundedOptima",
+            "TestLPExactSolveRowsIndependentFeasibilityAndInfeasibility",
+            "TestLPExactSolveLimitsAndCancellationOrder",
+            "TestLPExactSolveReportingAndWriteFailure",
+            "TestLPExactSolvePreservedFallbackStatuses",
+            "TestLPExactSolveUnboundedIndependentRays",
+            "TestLPExactSolveFeasibilitySearchIndependentSolutions",
+            "TestLPExactSolveInfeasibleIndependentBounds",
+            "TestLPExactSolveTableauStaleCostCorrection",
+            "TestLPExactSolveStoppedAndInitializationPrefixes",
+            "TestLPExactSolvePhysicalOwnership",
+            "TestLPExactFindFeasibleIndependentSystems",
+            "TestLPExactNonbasicIndependentBoundOracle",
+            "TestLPExactFindFeasibleEntryPrefixes",
+            "TestLPExactNonbasicEmptyAndStoppedValidation",
+            "TestLPExactFindFeasiblePhysicalOwnership"
+          ]
+        },
+        {
+          "name": "Precise mpq/mpq Solve and tableau dispatch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solve_rational.go",
+          "tests": [
+            "TestLPRationalSolveLUIndependentBoundedOptima",
+            "TestLPRationalSolveTableauIndependentBoundedOptima",
+            "TestLPRationalSolveRowsIndependentFeasibilityAndInfeasibility",
+            "TestLPRationalSolveLimitsAndCancellationOrder",
+            "TestLPRationalSolveReportingAndWriteFailure",
+            "TestLPRationalSolvePreservedFallbackStatuses",
+            "TestLPRationalSolveUnboundedIndependentRays",
+            "TestLPRationalSolveFeasibilitySearchIndependentSolutions",
+            "TestLPRationalSolveInfeasibleIndependentBounds",
+            "TestLPRationalSolveTableauStaleCostCorrection",
+            "TestLPRationalSolveStoppedAndInitializationPrefixes",
+            "TestLPRationalSolvePhysicalOwnership",
+            "TestLPRationalSolveSingularFallbackAfterBoundFlip",
+            "TestLPRationalSolveFinalValidationReadsLiveBounds",
+            "TestLPRationalSolveTableauLiveStaleCostCorrection"
+          ]
+        },
+        {
+          "name": "Precise mpq/impq and mpq/mpq tableau basis/value update instantiations",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_values_tableau_exact.go",
+          "tests": [
+            "TestLPExactTableauValuesIndependentModels",
+            "TestLPRationalTableauValuesIndependentModels"
           ]
         }
       ],
       "ownership": [
-        "Primal stage-one core owns native beta, empty concrete floating breakpoint queue, normalized cost backup and traversal slice; inherits actual borrowed solver vectors and owned floating LU/scratch. Failed base construction returns its real partial owner before derived initialization. Native []uint32 replaces the source candidate list; rotation changes only this list, while sort publishes nonbasis headings in order."
+        "Primal stage-one core owns native beta, empty concrete floating breakpoint queue, normalized cost backup and traversal slice; inherits actual borrowed solver vectors and owned floating LU/scratch. Failed base construction returns its real partial owner before derived initialization. Native []uint32 replaces the source candidate list; rotation changes only this list, while sort publishes nonbasis headings in order.",
+        "Explicit precise Solve and tableau basis-update forms own typed pair or rational values and returned partial children; floating Solve uses native scalar storage. Source emitted floating tableau symbols are unreachable through precise-gated Solve dispatch."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
         "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced.",
         "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open.",
         "Concrete scalar mpq/mpq stage-one primal construction now uses the actual RationalCoreSolverBase, RationalPriorityQueue, rational Beta, exact copied quotient epsilon1/10000000, empty dense cost backup, threshold1000 and UNKNOWN status. Precise Harris epsilon remains zero even for NaN floating tolerance. InitInfSet clears then visits basic columns in ascending order; out-of-bounds delta sign checks lower before upper. Cost initialization preserves descending all-column traversal, actual Ed.Index order including stored zeros, upper-first contradictory-bound priority, zero nonbasic costs, membership publication before optional copied unary negation, native unknown-type old-cost retention and checked assertions. Changed-basis and after-update variants preserve source flag/erase order. Precise backup copies every dense cost, destroys old values before publishing/copying replacement storage and performs no floating normalization. InitReducedCosts switches feasibility costs or restores the dense backup, preserves the feasibility-only early return and invokes the actual rational LU transpose solve and reduced-cost reconstruction. Parent raw receipts close before delegated base work and primal values remain alive through its cleanup. Thirteen test groups cover640 independently calculated cost/membership transition worlds,240 independent rational matrix/cost-switch systems and160 constructor/bound/membership worlds, including signed1e-100 violations, all column types and contradictory bounds. Twenty-two pooled/direct physical campaigns in native and20 in checked profiles run through success, exercising real LU construction, bound comparisons, cost negation, dense replacement, restoration and delegated reduced-cost arithmetic. Direct campaigns require actual physical refusal and all ownership censuses pass. Six actual older1000-digit caller comparison campaigns survive child calls and cleanup without adoption. Reached missing-input/base-assertion/extent/ascending-prefix/nonbasic bypass/late-settings profiles and stopped/closed calls are tested. Native focused checks pass14.047s; debug/checked15.338s. Statement coverage native/debug: primal core86/101 (85.1%)/84/101 (83.2%); cost switching40/44 (90.9%)/41/44 (93.2%); infeasibility costs115/123 (93.5%)/114/123 (92.7%). Remaining blocks chiefly guard stable numeral capture/destruction, valid metadata and unreachable constructor epsilon-allocation failure with these small constants; checked excludes native unknown-type branches. No whole-source or complete upstream-driver promotion; inventory remains88 partial/16 unported/6 reference_only. Related scalar rational core/LU and existing pair cost/infeasibility regressions pass74.482s native/117.646s debug/checked. Both LP vets, both full-module compilation gates, source portcheck (2103 units,677 APIs), dependency graph refresh (64 packages) and diff checks pass.",
-        "Concrete scalar mpq/mpq InitRun resets sort/iteration counters, rebuilds actual basic infeasibility, preserves the feasible feasibility-only early return, backs up dense rational costs when enabled, sets exact pricing epsilon zero, resizes the real RationalPriorityQueue without clearing membership, invokes scalar cost switching and real LU reduced costs, and refreshes zero sparsity estimates only when the column-count extent differs. Exact mode retains ColumnNormUpdateCounter and avoids floating column norms. Scalar pricing implements ordinary and breakpoint eligibility, exact bound comparisons and copied unary-negative epsilon, source sparsity sorting for tableau/LU, inverse-heading/list publication, strict-improvement budget consumption, tie-only RNG, selected-column rotation and sign reversal in breakpoint mode. Source zero/nonzero sort incomparability is preserved through native Go sort; no C++ standard-library implementation or portable tie ordering is invented. NumberOfNonBasicColumnsToTryForEnter preserves tentative-unbounded bypass, threshold300, unsigned32 percentage multiplication/wrap, zero bypass and one source RNG draw. DecideOnStatusWhenCannotFindEntering preserves checked cost-switch assertion before infeasible/optimal publication, without changing counters. Sixteen test groups cover240 independent rational initialization models,315 exact eligibility/breakpoint profiles,160 independent scan/RNG worlds,72 unsigned budget/RNG profiles,12 terminal status profiles and120 actual initialization-to-pricing systems with81-200-bit nonunit diagonal bases and signed1e-100 reduced costs. The latter run actual rational LU reconstruction/residual validation after pricing. Eighteen pooled/direct physical campaigns run through success over run setup, dense backup, exact costs, bound/epsilon comparisons and actual candidate scan; direct campaigns require physical refusal and ownership censuses pass. A real pending rational queue comparison is retained across InitRun refusal. Six actual older1000-digit caller comparison campaigns survive initialization/pricing and Close without adoption. Reached bounds/metadata/assertions/heading-prefix/zero-sort/late-settings/early-bypass/stopped profiles are tested. A reused tableau-key guard initially retained the LU fixture setting; its final explicit tableau setting now exercises the intended actual matrix-key guard. No production algorithm changed for that fixture correction. Focused checks pass10.802s native/15.152s debug/checked; related scalar core/primal/LU and pair initialization/pricing/cost regressions pass59.790s/84.044s. Both LP vets, both full-module compilation gates, dependency graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_init_run_rational.go 41/43 (95.3%); native primal_price_rational.go 200/221 (90.5%); debug primal_init_run_rational.go 41/43 (95.3%); debug primal_price_rational.go 212/221 (95.9%). Uncovered blocks chiefly guard stable expression capture/destruction, unchanged extents and valid numeral sign reads; native additionally erases checked bound/assertion branches. Inventory remains88 partial/16 unported/6 reference_only; no whole-source or complete upstream-driver promotion.",
-        "Concrete scalar mpq/mpq bound-step helpers now retain the actual rational expression graph: copied abs(bound), abs/10, scalar1 on the left of addition, shifted value on the left of Harris multiplication, final divide-by3 and every binary operator returned-reference copy. Harris output represents the returned value; a bound flip separately owns its returned subtraction and assignment into t. A source audit added this distinct assignment before final validation. Ratio limits retain bound-x, optional scalar plus/minus epsilon, division by the borrowed multiplier and std::min argument order through native Go comparisons. No numeric_pair coordinate construction or copied scalar denominator is introduced. Basis dispatch owns the source by-value multiplier, uses the stored global infeasibility set rather than recomputing X feasibility, preserves upper/lower/boxed/fixed branch and equality behavior, computes upper-bound epsilon for the source boxed-positive lower target, and clamps an already limited negative theta even on free columns. Exact Harris defaults to zero but the full expression executes; independent nonzero-member worlds test its scalar order without crediting an unused restore_harris_eps adapter. Bound-flip helpers preserve output publication even when the limit rejects the flip, live output/limit aliases and the boxed-only unlimited path without adding its absent nonnegative assertion. Parent raw receipts close before delegated base work and expression/epsilon/by-value owners. Ten test groups cover5120 independent scalar oracle worlds:240 Harris,480 bound flips,160 minima,1440 precise infeasible-bound limits,1200 basis limits and1600 global infeasibility/type/sign dispatch worlds. Borrowed model bounds/X/multiplier and output aliases are checked. Twenty-eight pooled/direct physical campaigns run through success across actual scalar expressions, comparisons, copies and dispatch; every direct campaign requires physical refusal and all ownership censuses pass. Four additional direct campaigns prove completed Harris product, bound quotient, flip returned subtraction and flip assignment refusal: the valid completed temporary equals independent big.Rat arithmetic while the destination remains incomplete, with no active rational normalization/integer GCD/division receipt. Earlier interrupted compound values may have ErrInvalidSlot backing; only that inspection domain is accepted before requiring a valid witness and eventual success. Eight actual older1000-digit caller comparison campaigns survive child calls and Close without adoption. Twenty-six reached nil/extent/sign/assertion/unknown-type/zero-direction/closed profiles test source publication and early bypasses. An initial physical flip fixture placed X above its upper bound; correcting its denominator restores a nonnegative step, while separate negative-step assertion and unlimited-path profiles remain. No production source assertion was relaxed. Final focused checks pass9.694s native/15.598s debug/checked. Both LP vets, both full-module compilation gates, graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_basis_dispatch_rational.go 60/69 (87.0%); native primal_basis_limit_rational.go 93/113 (82.3%); native primal_bound_step_rational.go 81/95 (85.3%); native primal_harris_rational.go 36/42 (85.7%); native primal_inf_limit_rational.go 81/105 (77.1%); debug primal_basis_dispatch_rational.go 61/69 (88.4%); debug primal_basis_limit_rational.go 100/113 (88.5%); debug primal_bound_step_rational.go 86/95 (90.5%); debug primal_harris_rational.go 36/42 (85.7%); debug primal_inf_limit_rational.go 91/105 (86.7%). Remaining blocks chiefly guard stable expression capture/destruction, unchanged numeral metadata and selected typed extent/sign errors; native additionally erases source assertion branches. Inventory remains88 partial/16 unported/6 reference_only; no whole-source or complete upstream-driver promotion. Final related scalar primal and existing pair bound/Harris/infeasibility/basis regressions pass88.533s native/124.535s debug/checked after the separate flip assignment correction. Source portcheck passes (2103 units,677 APIs). Earlier broader scalar core regressions pass109.178s/157.577s before that final local flip assignment correction; final focused and related checks cover the corrected source."
-      ]
+        "Concrete scalar mpq/mpq InitRun resets sort/iteration counters, rebuilds actual basic infeasibility, preserves the feasible feasibility-only early return, backs up dense rational costs when enabled, sets exact pricing epsilon zero, resizes the real RationalPriorityQueue without clearing membership, invokes scalar cost switching and real LU reduced costs, and refreshes zero sparsity estimates only when the column-count extent differs. Exact mode retains ColumnNormUpdateCounter and avoids floating column norms. Scalar pricing implements ordinary and breakpoint eligibility, exact bound comparisons and copied unary-negative epsilon, source sparsity sorting for tableau/LU, inverse-heading/list publication, strict-improvement budget consumption, tie-only RNG, selected-column rotation and sign reversal in breakpoint mode. Source zero/nonzero sort incomparability is preserved through native Go sort; no C++ standard-library implementation or portable tie ordering is invented. NumberOfNonBasicColumnsToTryForEnter preserves tentative-unbounded bypass, threshold300, unsigned32 percentage multiplication/wrap, zero bypass and one source RNG draw. DecideOnStatusWhenCannotFindEntering preserves checked cost-switch assertion before infeasible/optimal publication, without changing counters. Sixteen test groups cover240 independent rational initialization models,315 exact eligibility/breakpoint profiles,160 independent scan/RNG worlds,72 unsigned budget/RNG profiles,12 terminal status profiles and120 actual initialization-to-pricing systems with81-200-bit nonunit diagonal bases and signed1e-100 reduced costs. The latter run actual rational LU reconstruction/residual validation after pricing. Eighteen pooled/direct physical campaigns run through success over run setup, dense backup, exact costs, bound/epsilon comparisons and actual candidate scan; direct campaigns require physical refusal and ownership censuses pass. A real pending rational queue comparison is retained across InitRun refusal. Six actual older1000-digit caller comparison campaigns survive initialization/pricing and Close without adoption. Reached bounds/metadata/assertions/heading-prefix/zero-sort/late-settings/early-bypass/stopped profiles are tested. A reused tableau-key guard initially retained the LU fixture setting; its final explicit tableau setting now exercises the intended actual matrix-key guard. No production algorithm changed for that fixture correction. Focused checks pass10.802s native/15.152s debug/checked; related scalar core/primal/LU and pair initialization/pricing/cost regressions pass59.790s/84.044s. Both LP vets, both full-module compilation gates, dependency graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_init_run_rational.go 41/43 (95.3%); native primal_price_rational.go 200/221 (90.5%); debug primal_init_run_rational.go 41/43 (95.3%); debug primal_price_rational.go 212/221 (95.9%). Uncovered blocks chiefly guard stable expression capture/destruction, unchanged extents and valid numeral sign reads; native additionally erases checked bound/assertion branches. Inventory remains88 partial/16 unported/6 reference_only; containing LAR/CLI source audits remain separate.",
+        "Concrete scalar mpq/mpq bound-step helpers now retain the actual rational expression graph: copied abs(bound), abs/10, scalar1 on the left of addition, shifted value on the left of Harris multiplication, final divide-by3 and every binary operator returned-reference copy. Harris output represents the returned value; a bound flip separately owns its returned subtraction and assignment into t. A source audit added this distinct assignment before final validation. Ratio limits retain bound-x, optional scalar plus/minus epsilon, division by the borrowed multiplier and std::min argument order through native Go comparisons. No numeric_pair coordinate construction or copied scalar denominator is introduced. Basis dispatch owns the source by-value multiplier, uses the stored global infeasibility set rather than recomputing X feasibility, preserves upper/lower/boxed/fixed branch and equality behavior, computes upper-bound epsilon for the source boxed-positive lower target, and clamps an already limited negative theta even on free columns. Exact Harris defaults to zero but the full expression executes; independent nonzero-member worlds test its scalar order without crediting an unused restore_harris_eps adapter. Bound-flip helpers preserve output publication even when the limit rejects the flip, live output/limit aliases and the boxed-only unlimited path without adding its absent nonnegative assertion. Parent raw receipts close before delegated base work and expression/epsilon/by-value owners. Ten test groups cover5120 independent scalar oracle worlds:240 Harris,480 bound flips,160 minima,1440 precise infeasible-bound limits,1200 basis limits and1600 global infeasibility/type/sign dispatch worlds. Borrowed model bounds/X/multiplier and output aliases are checked. Twenty-eight pooled/direct physical campaigns run through success across actual scalar expressions, comparisons, copies and dispatch; every direct campaign requires physical refusal and all ownership censuses pass. Four additional direct campaigns prove completed Harris product, bound quotient, flip returned subtraction and flip assignment refusal: the valid completed temporary equals independent big.Rat arithmetic while the destination remains incomplete, with no active rational normalization/integer GCD/division receipt. Earlier interrupted compound values may have ErrInvalidSlot backing; only that inspection domain is accepted before requiring a valid witness and eventual success. Eight actual older1000-digit caller comparison campaigns survive child calls and Close without adoption. Twenty-six reached nil/extent/sign/assertion/unknown-type/zero-direction/closed profiles test source publication and early bypasses. An initial physical flip fixture placed X above its upper bound; correcting its denominator restores a nonnegative step, while separate negative-step assertion and unlimited-path profiles remain. No production source assertion was relaxed. Final focused checks pass9.694s native/15.598s debug/checked. Both LP vets, both full-module compilation gates, graph refresh (64 packages) and diff checks pass. Per-file statement coverage: native primal_basis_dispatch_rational.go 60/69 (87.0%); native primal_basis_limit_rational.go 93/113 (82.3%); native primal_bound_step_rational.go 81/95 (85.3%); native primal_harris_rational.go 36/42 (85.7%); native primal_inf_limit_rational.go 81/105 (77.1%); debug primal_basis_dispatch_rational.go 61/69 (88.4%); debug primal_basis_limit_rational.go 100/113 (88.5%); debug primal_bound_step_rational.go 86/95 (90.5%); debug primal_harris_rational.go 36/42 (85.7%); debug primal_inf_limit_rational.go 91/105 (86.7%). Remaining blocks chiefly guard stable expression capture/destruction, unchanged numeral metadata and selected typed extent/sign errors; native additionally erases source assertion branches. Inventory remains88 partial/16 unported/6 reference_only; containing LAR/CLI source audits remain separate. Final related scalar primal and existing pair bound/Harris/infeasibility/basis regressions pass88.533s native/124.535s debug/checked after the separate flip assignment correction. Source portcheck passes (2103 units,677 APIs). Earlier broader scalar core regressions pass109.178s/157.577s before that final local flip assignment correction; final focused and related checks cover the corrected source."
+      ],
+      "retained_source_audit_evidence": "Whole retained primal-core audit for double/double, mpq/numeric_pair<mpq> and mpq/mpq: typed Go implements stage-one infeasibility/cost lifecycle, Harris and breakpoint pricing/leaving, LU/tableau value and reduced-cost updates, entering/advancement, row strategy, precise and floating Solve, feasibility-only entry and source status/cancellation/reporting order. The precise pair and scalar implementations retain separate owned numeral expressions and child LU/tableau lifetimes; stopped children close before borrowed local step values and older caller comparison receipts remain owned by callers. Source double solve_with_tableau and double tableau basis update are explicitly emitted but have no retained entry because solve dispatch requires precise T; no dead float tableau adapter is added. Definition-only helpers and STL internals are excluded. Current native and g3debug,g3checked focused primal/Solve groups pass, along with prior focused tableau groups and full native checkpoint17ecadb7 on unchanged Go code. Representative native coverage: primal_core_float158/165, harris_float134/136, breakpoint_float112/120, price_float89/99, solve_float61/84, core_rational117/149, price_rational200/221, leaving_rational128/146 and solve_rational102/141; checked coverage is similar or higher. LAR outer and CLI source audits remain separate."
     },
     {
       "path": "src/util/lp/lp_primal_core_solver_tableau.h",
@@ -174399,6 +174568,32 @@
     "profiles": [
       "/mnt/oldrog/tmp/g3-lp-dual-whole-native.cover",
       "/mnt/oldrog/tmp/g3-lp-dual-whole-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed on unchanged Go code; focused checked evidence is separate."
+  },
+  "latest_primal_core_whole_audit": {
+    "source_units": [
+      "src/util/lp/lp_primal_core_solver.h",
+      "src/util/lp/lp_primal_core_solver.hpp",
+      "src/util/lp/lp_primal_core_solver_instances.cpp"
+    ],
+    "scope": "Whole retained primal-core audit for double/double, mpq/numeric_pair<mpq> and mpq/mpq: typed Go implements stage-one infeasibility/cost lifecycle, Harris and breakpoint pricing/leaving, LU/tableau value and reduced-cost updates, entering/advancement, row strategy, precise and floating Solve, feasibility-only entry and source status/cancellation/reporting order. The precise pair and scalar implementations retain separate owned numeral expressions and child LU/tableau lifetimes; stopped children close before borrowed local step values and older caller comparison receipts remain owned by callers. Source double solve_with_tableau and double tableau basis update are explicitly emitted but have no retained entry because solve dispatch requires precise T; no dead float tableau adapter is added. Definition-only helpers and STL internals are excluded. Current native and g3debug,g3checked focused primal/Solve groups pass, along with prior focused tableau groups and full native checkpoint17ecadb7 on unchanged Go code. Representative native coverage: primal_core_float158/165, harris_float134/136, breakpoint_float112/120, price_float89/99, solve_float61/84, core_rational117/149, price_rational200/221, leaving_rational128/146 and solve_rational102/141; checked coverage is similar or higher. LAR outer and CLI source audits remain separate.",
+    "focused_tests": [
+      "TestLPFloatPrimal",
+      "TestLPExactPrimal",
+      "TestLPRationalPrimal",
+      "TestLPExactSolve",
+      "TestLPRationalSolve",
+      "TestLPExactFindFeasible",
+      "TestLPRationalFindFeasible"
+    ],
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-primal-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-primal-whole-debug.cover",
+      "/mnt/oldrog/tmp/g3-lp-tableau-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-tableau-whole-debug.cover"
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
