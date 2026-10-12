@@ -77167,7 +77167,8 @@
       "tests": [
         "TestDynAckTripleOccurrencesThresholdInstantiationAndReset",
         "TestDynAckPairOccurrencesLiveGCAndOwnedApps",
-        "TestDynAckSchedulePairPriorityGCAndCumulativeBudget"
+        "TestDynAckSchedulePairPriorityGCAndCumulativeBudget",
+        "TestDynAckScheduleSourceEventGates"
       ],
       "conditionals": [
         {
@@ -77213,13 +77214,21 @@
           "tests": [
             "TestDynAckSchedulePairPriorityGCAndCumulativeBudget"
           ]
+        },
+        {
+          "name": "used_cg_eh, cg_conflict_eh and used_eq_eh strategy gates before concrete pair/triple occurrence transitions",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_dyn_ack_schedule.go",
+          "tests": [
+            "TestDynAckScheduleSourceEventGates"
+          ]
         }
       ],
       "ownership": [
         "The Go triple and pair states own application references through explicit typed slices and borrow AST handles in maps and queues."
       ],
       "deviations": [
-        "Pair and triple scheduling now follows the source propagation order and reset counters; the enclosing context/clause lifecycle and source event hooks remain open."
+        "Pair and triple scheduling, source event gates and reset counters are represented. The enclosing context call sites and clause lifecycle remain open."
       ]
     },
     {
@@ -78464,7 +78473,8 @@
         "pkg/smtcore/util_smt_dyn_ack_params.go",
         "pkg/smtcore/util_smt_dyn_ack_params_source_test.go",
         "pkg/util/params/util_module_params_source.go",
-        "pkg/smtcore/util_smt_array_params_source_test.go"
+        "pkg/smtcore/util_smt_array_params_source_test.go",
+        "pkg/smtcore/smt_dyn_ack_schedule.go"
       ],
       "tests": [
         "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
@@ -78476,7 +78486,8 @@
         "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile",
         "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
         "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
-        "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry"
+        "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
+        "TestDynAckScheduleSourceEventGates"
       ],
       "conditionals": [
         {
@@ -78516,6 +78527,14 @@
           ],
           "go_targets": [
             "pkg/smtcore/util_smt_array_params_source_test.go"
+          ]
+        },
+        {
+          "name": "DACK_DISABLED, DACK_ROOT and DACK_CR enumerator values and concrete source event dispatch",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_dyn_ack_schedule.go",
+          "tests": [
+            "TestDynAckScheduleSourceEventGates"
           ]
         }
       ],

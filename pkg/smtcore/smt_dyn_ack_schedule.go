@@ -1,4 +1,5 @@
-// Source: src/smt/dyn_ack.cpp:118-138,315-340; src/smt/dyn_ack.h:49-69.
+// Source: src/smt/dyn_ack.cpp:118-138,315-340; src/smt/dyn_ack.h:49-120;
+// src/smt/params/dyn_ack_params.h:23-29.
 package smtcore
 
 import (
@@ -14,6 +15,14 @@ type dynAckCandidate struct {
 	triple dynAckTriple
 	isPair bool
 }
+
+type dynAckStrategy uint8
+
+const (
+	dynAckDisabled dynAckStrategy = iota
+	dynAckRoot
+	dynAckConflictResolution
+)
 
 type dynAckSchedule struct {
 	pairs        *dynAckPairState
@@ -37,12 +46,69 @@ func newDynAckSchedule(pairs *dynAckPairState, triples *dynAckTripleState, gcEve
 	return &dynAckSchedule{pairs: pairs, triples: triples, gcEvery: gcEvery, factor: factor}, nil
 }
 
+func validDynAckStrategy(strategy dynAckStrategy) bool {
+	return strategy <= dynAckConflictResolution
+}
+
+// usedCongruence follows used_cg_eh; its strategy guard precedes cg_eh's
+// application preconditions and occurrence accounting.
+func (s *dynAckSchedule) usedCongruence(n1, n2 ast.ASTHandle, strategy dynAckStrategy) error {
+	if s == nil {
+		return ast.ErrASTHandle
+	}
+	if !validDynAckStrategy(strategy) {
+		return ast.ErrASTDomain
+	}
+	if e := s.pairs.check(); e != nil {
+		return e
+	}
+	if strategy == dynAckConflictResolution {
+		return s.pairs.congruenceEvent(n1, n2)
+	}
+	return nil
+}
+
+// conflictCongruence follows cg_conflict_eh.
+func (s *dynAckSchedule) conflictCongruence(n1, n2 ast.ASTHandle, strategy dynAckStrategy) error {
+	if s == nil {
+		return ast.ErrASTHandle
+	}
+	if !validDynAckStrategy(strategy) {
+		return ast.ErrASTDomain
+	}
+	if e := s.pairs.check(); e != nil {
+		return e
+	}
+	if strategy == dynAckRoot {
+		return s.pairs.congruenceEvent(n1, n2)
+	}
+	return nil
+}
+
+// usedEquality follows used_eq_eh. Its gate is independent of the pair
+// strategy, including when pair-mode propagation is disabled.
+func (s *dynAckSchedule) usedEquality(n1, n2, representative ast.ASTHandle, enabled bool) error {
+	if s == nil {
+		return ast.ErrASTHandle
+	}
+	if e := s.triples.check(); e != nil {
+		return e
+	}
+	if enabled {
+		return s.triples.eqEvent(n1, n2, representative)
+	}
+	return nil
+}
+
 // propagate selects reached candidate records using the source cumulative
 // conflict budget. The caller must construct clauses and invoke each state's
 // markInstantiated transition for selected records in returned order.
-func (s *dynAckSchedule) propagate(conflicts uint32, enabled bool) ([]dynAckCandidate, error) {
+func (s *dynAckSchedule) propagate(conflicts uint32, strategy dynAckStrategy) ([]dynAckCandidate, error) {
 	if s == nil {
 		return nil, ast.ErrASTHandle
+	}
+	if !validDynAckStrategy(strategy) {
+		return nil, ast.ErrASTDomain
 	}
 	if e := s.pairs.check(); e != nil {
 		return nil, e
@@ -50,7 +116,7 @@ func (s *dynAckSchedule) propagate(conflicts uint32, enabled bool) ([]dynAckCand
 	if e := s.triples.check(); e != nil {
 		return nil, e
 	}
-	if !enabled {
+	if strategy == dynAckDisabled {
 		return nil, nil
 	}
 	s.propagations++
