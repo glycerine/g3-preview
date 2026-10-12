@@ -39707,3 +39707,16 @@ reservation. A focused 3-, 17-, and 20-argument test verifies the exact
 adjacent-pair order and resulting conjunction across that growth boundary.
 The concrete buffer specialization is credited as a platform replacement;
 other `buffer.h` uses remain partial.
+
+### AST proof and expression sort buffers
+
+The retained `ptr_buffer<sort>` in `basic_decl_plugin::mk_proof_decl`
+(`src/ast/ast.cpp:738-744`) and the inherited expression overload
+(`src/ast/ast.cpp:625-632`) now use native `[]ASTHandle` scratch in Go. The
+proof domain still appends its Bool sort after every Proof sort, and expression
+dispatch still reads each argument and its sort before declaration lookup.
+Manual arena charging for temporary slice growth is removed. Proof domains
+with 15, 16, 17, and 33 entries and bit-vector concat expressions with 17,
+18, and 20 arguments cover order and growth. The older sort-buffer spill
+refusal assertions for this expression path are superseded by these native
+slice checks; owning AST node allocations remain independently fault-tested.

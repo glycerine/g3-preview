@@ -98,7 +98,7 @@ func TestASTBitVectorFixedExprOverloadBypassesSortBuffer(t *testing.T) {
 		args[i] = x
 	}
 	// Cache is already warm. A wrong associative tail is checked directly before
-	// the base sort-buffer allocation and before constructing an application.
+	// source sort collection and before constructing an application.
 	b, e := m.MkTrue()
 	astTestMust(t, e)
 	args[17] = b
@@ -257,7 +257,7 @@ func TestASTBitVectorParameterizedEveryFactoryReservation(t *testing.T) {
 	}
 }
 
-func TestASTBitVectorParameterizedExpressionFallbackKeepsSortBuffer(t *testing.T) {
+func TestASTBitVectorParameterizedExpressionFallbackNativeSortSlice(t *testing.T) {
 	m := astTestManager(t)
 	_, e := m.RegisterArithmeticPlugin()
 	astTestMust(t, e)
@@ -268,24 +268,20 @@ func TestASTBitVectorParameterizedExpressionFallbackKeepsSortBuffer(t *testing.T
 	x, e := m.MkConst(astTestSymbol(t, m, "bv-fallback-expr"), s)
 	astTestMust(t, e)
 	astTestPin(t, m, x)
-	args := make([]ASTHandle, 18)
+	args := make([]ASTHandle, 20)
 	for i := range args {
 		args[i] = x
 	}
-	m.Budget().FailAfter(0)
-	_, body := m.MkFamilyApp(fid, 37, nil, args)
-	m.Budget().FailAfter(-1)
-	if !errors.Is(body, arena.ErrInjectedFailure) {
-		t.Fatal("concat must retain source sort-buffer spill", body)
-	}
-	h, e := m.MkFamilyApp(fid, 37, nil, args)
-	astTestMust(t, e)
-	astTestPin(t, m, h)
-	sort, e := m.GetSort(h)
-	astTestMust(t, e)
-	width, ok, e := m.bitVectorSortWidth(fid, sort)
-	astTestMust(t, e)
-	if !ok || width != 144 {
-		t.Fatal("actual concat application", width, ok)
+	for _, count := range []int{17, 18, 20} {
+		h, err := m.MkFamilyApp(fid, 37, nil, args[:count])
+		astTestMust(t, err)
+		astTestPin(t, m, h)
+		sort, err := m.GetSort(h)
+		astTestMust(t, err)
+		width, ok, err := m.bitVectorSortWidth(fid, sort)
+		astTestMust(t, err)
+		if !ok || width != int32(count*8) {
+			t.Fatal("actual concat application", count, width, ok)
+		}
 	}
 }

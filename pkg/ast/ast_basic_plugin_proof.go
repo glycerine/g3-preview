@@ -2,7 +2,6 @@ package ast
 
 import (
 	"math"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
@@ -88,32 +87,13 @@ func astProofDescription(k int32, requested uint32) (name string, parents uint32
 	return "", parents, false
 }
 func (m *ASTManager) newProofDecl(name string, k int32, ps []ASTParameter, parents uint32, pin bool) (astNodeRef, error) {
-	// ptr_buffer<sort> has lexical inline16/doubling storage. The trailing Bool
-	// sort is appended after all Proof sorts; overflow has an old/new peak.
+	// The trailing Bool sort follows all Proof sorts in the source domain.
 	var inline [16]ASTHandle
 	domain := inline[:0]
-	var bytes uint64
-	defer func() { m.BudgetField.Release(bytes) }()
 	if parents == math.MaxUint32 {
 		return astNodeRef{}, arena.ErrBounds
 	}
 	for i := uint32(0); i <= parents; i++ {
-		if len(domain) == cap(domain) {
-			n := uint64(cap(domain)) * 2
-			width := uint64(reflect.TypeOf(ASTHandle{}).Size())
-			if n > math.MaxUint32 || n > uint64(^uint(0)>>1)/width {
-				return astNodeRef{}, arena.ErrBounds
-			}
-			nextBytes := n * width
-			if e := m.BudgetField.Reserve(nextBytes); e != nil {
-				return astNodeRef{}, e
-			}
-			next := make([]ASTHandle, len(domain), int(n))
-			copy(next, domain)
-			m.BudgetField.Release(bytes)
-			domain = next
-			bytes = nextBytes
-		}
 		sort := m.basic.proofSort
 		if i == parents {
 			sort = m.basic.boolSort

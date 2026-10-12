@@ -3,7 +3,6 @@ package ast
 
 import (
 	"math"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
@@ -154,12 +153,10 @@ func (m *ASTManager) mkFamilyApp(fid FamilyID, k int32, ps []ASTParameter, args 
 }
 
 func (m *ASTManager) mkFamilyAppDomainArguments(fid FamilyID, k int32, ps []ASTParameter, args AppArguments) (astNodeRef, error) {
-	// Source decl_plugin's expr overload builds a lexical ptr_buffer of sorts;
-	// basic directly routes common operators but the same sorts have no callbacks.
+	// Source decl_plugin's expr overload collects sorts in a lexical ptr_buffer;
+	// use a native typed slice for those borrowed sort handles.
 	var inline [16]ASTHandle
 	domain := inline[:0]
-	var bytes uint64
-	defer func() { m.BudgetField.Release(bytes) }()
 	for i := uint32(0); i < args.Count(); i++ {
 		h, e := args.At(i)
 		if e != nil {
@@ -172,22 +169,6 @@ func (m *ASTManager) mkFamilyAppDomainArguments(fid FamilyID, k int32, ps []ASTP
 		s, e := m.sortOf(r)
 		if e != nil {
 			return astNodeRef{}, e
-		}
-		if len(domain) == cap(domain) {
-			n := uint64(cap(domain)) * 2
-			width := uint64(reflect.TypeOf(ASTHandle{}).Size())
-			if n > math.MaxUint32 || n > uint64(^uint(0)>>1)/width {
-				return astNodeRef{}, arena.ErrBounds
-			}
-			nextBytes := n * width
-			if e = m.BudgetField.Reserve(nextBytes); e != nil {
-				return astNodeRef{}, e
-			}
-			next := make([]ASTHandle, len(domain), int(n))
-			copy(next, domain)
-			m.BudgetField.Release(bytes)
-			bytes = nextBytes
-			domain = next
 		}
 		domain = append(domain, m.external(s))
 	}

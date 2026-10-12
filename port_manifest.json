@@ -12795,7 +12795,7 @@
         "TestASTBitVectorParameterizedValidationAndIgnoredConcatParameters",
         "TestASTBitVectorParameterizedLargeSortIsUncached",
         "TestASTBitVectorParameterizedEveryFactoryReservation",
-        "TestASTBitVectorParameterizedExpressionFallbackKeepsSortBuffer",
+        "TestASTBitVectorParameterizedExpressionFallbackNativeSortSlice",
         "TestASTBitVectorRawNumeralDeclarationDoesNotConstructApp",
         "TestASTBitVectorRawNumeralFactoryNormalizationAndValidation",
         "TestASTBitVectorRawNumeralEveryActualNumericalReservation",
@@ -13004,7 +13004,7 @@
             "TestASTBitVectorParameterizedValidationAndIgnoredConcatParameters",
             "TestASTBitVectorParameterizedLargeSortIsUncached",
             "TestASTBitVectorParameterizedEveryFactoryReservation",
-            "TestASTBitVectorParameterizedExpressionFallbackKeepsSortBuffer"
+            "TestASTBitVectorParameterizedExpressionFallbackNativeSortSlice"
           ]
         },
         {
@@ -111742,6 +111742,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_basic_plugin_proof.go",
+        "pkg/ast/ast_core_plugin_dispatch.go",
+        "pkg/ast/ast_proof_native_domain_test.go",
         "pkg/ast/ast_core_factories.go",
         "pkg/ast/ast_chainable_native_buffer_test.go",
         "pkg/tactic/tactic_stored_model.go",
@@ -111767,6 +111770,8 @@
         "pkg/ast/ast_label.go"
       ],
       "tests": [
+        "TestASTProofDeclarationNativeDomainSliceOrderAndGrowth",
+        "TestASTBitVectorParameterizedExpressionFallbackNativeSortSlice",
         "TestASTChainableNativePairBufferOrderAndGrowth",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
         "TestTacticStoredModelLabelsSnapshotAndAppend",
@@ -111916,6 +111921,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "AST basic proof declaration ptr_buffer<sort> parent domain and trailing Bool sort use native typed Go slice",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_basic_plugin_proof.go",
+          "tests": [
+            "TestASTProofDeclarationNativeDomainSliceOrderAndGrowth"
+          ]
+        },
+        {
+          "name": "AST inherited decl_plugin expression overload ptr_buffer<sort> uses native typed Go slice",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_core_plugin_dispatch.go",
+          "tests": [
+            "TestASTBitVectorParameterizedExpressionFallbackNativeSortSlice"
+          ]
+        },
         {
           "name": "AST chainable mk_app ptr_buffer<expr> adjacent binary applications and final conjunction use native typed Go slice",
           "status": "platform_replacement",
