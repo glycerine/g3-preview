@@ -39274,3 +39274,20 @@ handler and resource-cancellation tests pass native and `g3debug,g3checked`
 on CPUs 0–7. The source unit is whole-ported with a concrete type; the
 polymorphic `event_handler.h` and OS timer/signal delivery remain separate
 partial work.
+
+### Unsigned approximate set completion
+
+The concrete 64-bit unsigned `approx_set` used by SMT matching now lives in
+`pkg/util/bitset/approx.go`. It preserves modulo-64 collisions, value set
+algebra, ascending source iterator order, `size`, and the exact `{0, 31, 63}`
+display form. Existing SAT 32-bit and SMT literal 64-bit instantiations remain
+in their concrete packages. A source declaration scan found no other retained
+template instantiation, so `src/util/approx_set.h` and `.cpp` are whole-ported
+at the utility level. SMT matching and conflict-resolution drivers retain
+their own porting work.
+
+The new known-output and independent 256×256 finite algebra tests pass on
+CPUs 0–7. Full `util/bitset`, `sat`, and `smtcore` package tests pass native
+and `g3debug,g3checked`; `go vet ./util/bitset` and `portcheck` pass. Go's
+`math/bits`, `strings.Builder`, and `strconv` replace source bit scans and
+C++ stream formatting while preserving the project set algorithm and text.

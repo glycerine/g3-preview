@@ -110977,32 +110977,34 @@
       "path": "src/util/approx_set.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/util/bitset/approx.go"],
+      "tests": ["TestApproxSetSource64ResiduesDisplayAndIterator", "TestApproxSetIndependentFiniteAlgebra"],
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Concrete uint64 unsigned set algebra, source iterator and remaining-word equality; complete display and size bodies (approx_set.h:43-158,162-233; approx_set.cpp:22-51)",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
+          "name": "approx_set::display and size ascending 64-bit residue traversal (approx_set.cpp:22-51)",
+          "status": "ported",
+          "go_target": "pkg/util/bitset/approx.go",
+          "tests": ["TestApproxSetSource64ResiduesDisplayAndIterator", "TestApproxSetIndependentFiniteAlgebra"]
         }
       ],
       "ownership": [
-        "Inline uint64 set and scalar iterator own no payload. Borrowed constructor span is not retained. Const display executes actual separate CString/unsigned insertion leaves and immediate stream cold graphs before lifting refusals."
+        "Concrete ApproxSet is an inline uint64 value with no owned payload; String builds and returns a Go string. Its ascending residue order and exact braces/comma-space text preserve the project display algorithm."
       ],
       "deviations": [
-        "Concrete unsigned/default-word specialization uses the selected NumericTextStream profile; no generic Go implementation or source loop replacement. Header remains partial beyond the proved concrete specializations; no SMT context/driver completion credit."
-      ]
+        "Go strings.Builder and strconv replace C++ ostream/C-string formatting internals. No native stream failure or C++ ABI equivalence is claimed; SMT MAM caller porting remains separate."
+      ],
+      "retained_source_audit_evidence": "Both approx_set.cpp methods are implemented by concrete pkg/util/bitset/ApproxSet. Display visits occupied positions 0..63 in ascending order and emits {i, j}; size counts the same occupied positions. Known collision/display and independent 256x256 finite algebra tests pass native and g3debug,g3checked on CPUs0-7."
     },
     {
       "path": "src/util/approx_set.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/util/bitset/approx.go",
         "pkg/sat/sat_approx_set.go",
         "pkg/smtcore/smt_literal_approx_set.go",
         "pkg/smtcore/smt_literal_approx_set_source_test.go",
@@ -111011,6 +111013,8 @@
         "pkg/sat/sat_approx_set_test.go"
       ],
       "tests": [
+        "TestApproxSetSource64ResiduesDisplayAndIterator",
+        "TestApproxSetIndependentFiniteAlgebra",
         "TestSATApproximation",
         "TestSMTLiteralApproxSetSource64CollisionAndSentinels",
         "TestSMTLiteralApproxSetIndependentFiniteResidueAlgebra",
@@ -111065,9 +111069,9 @@
         },
         {
           "name": "Concrete uint64 unsigned set algebra, source iterator and remaining-word equality; complete display and size bodies (approx_set.h:43-158,162-233; approx_set.cpp:22-51)",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/util/bitset/approx.go",
+          "tests": ["TestApproxSetSource64ResiduesDisplayAndIterator", "TestApproxSetIndependentFiniteAlgebra"]
         },
         {
           "name": "Complete remaining uint32 constructors, literal/variable mapping, value union/intersection and equality/subsumption; all six actual fork template aliases audited (approx_set.h:25-233; sat_types.h:115-119; sat_solver.h:419; smt_literal.h:114-116; smt_conflict_resolution.h:34)",
@@ -111080,16 +111084,17 @@
         }
       ],
       "ownership": [
-        "Scalar uint32 SAT specialization only; generic adapters, 64-bit specialization and iterator remain unported.",
+        "Concrete uint32 SAT specializations and uint64 SMT literal/unsigned specializations are inline scalar values with no payload ownership. No universal template adapter is retained.",
         "Concrete inline uint64 specialization owns no payload; range constructor only borrows input literals and preserves source iteration/collision behavior. No generics, ticket, owning wrapper or exact-set replacement.",
-        "Inline uint64 set and scalar iterator own no payload. Borrowed constructor span is not retained. Const display executes actual separate CString/unsigned insertion leaves and immediate stream cold graphs before lifting refusals.",
+        "The unsigned ApproxSet constructor copies residue bits from its caller values; ForEach scans a copied word in ascending order. Its String owns only a local Go builder.",
         "All actual fork instantiations are concrete: uint32 unsigned variable/level and SAT literal indices, uint64 unsigned and signed SMT literal indices. Both word traits, all inline constructors/operators/predicates, unsigned iterator remaining-word equality and ostream display/size are now implemented. Historical generic/64-bit/iterator warnings are superseded for this file by these concrete source-audited counterparts; no generics, payload ownership, RC or exact-set substitution."
       ],
       "deviations": [
-        "This closes the complete literal_approx_set specialization, not generic approximate-set families, uint64 unsigned iterator/display/size, literal vector storage, AST-aware display, other SMT types or actual context/conflict-resolution drivers.",
-        "Concrete unsigned/default-word specialization uses the selected NumericTextStream profile; no generic Go implementation or source loop replacement. Header remains partial beyond the proved concrete specializations; no SMT context/driver completion credit.",
+        "The inline utility operations are complete for retained source instantiations; SAT/SMT/MAM driver algorithms and unrelated literal/vector storage remain separate source units.",
+        "Go math/bits, strings.Builder and strconv replace source bit scans and C++ ostream formatting while preserving residue order and output text. Native ostream failure and C++ ABI equivalence are outside this Go port.",
         "C++ template syntax is replaced with concrete Go implementations for every instantiated production alias, as required by the no-generics policy. Source-required value copying uses Go inline-word value semantics; all six actual aliases were found by reading their originating declarations without reference content hashing. This header completion supplies utility functionality only, with no solver/context/conflict-resolution/MAM driver credit."
-      ]
+      ],
+      "retained_source_audit_evidence": "Full source declaration/instantiation scan: source defines one unsigned 64-bit approx_set plus five concrete approx_set_tpl aliases in SAT/smt_literal/smt_conflict_resolution; all map to pkg/util/bitset, pkg/sat and pkg/smtcore typed values. The formerly open unsigned iterator/display/size surface is covered by TestApproxSetSource64ResiduesDisplayAndIterator and TestApproxSetIndependentFiniteAlgebra. No generic or uninstantiated template is ported."
     },
     {
       "path": "src/util/array.h",
