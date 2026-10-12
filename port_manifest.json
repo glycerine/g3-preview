@@ -34614,7 +34614,9 @@
         "pkg/math/subpaving/fast_interval_arith.go",
         "pkg/math/subpaving/fast_interval_arith_test.go",
         "pkg/math/subpaving/fast_interval_mul.go",
-        "pkg/math/subpaving/fast_interval_mul_test.go"
+        "pkg/math/subpaving/fast_interval_mul_test.go",
+        "pkg/math/subpaving/fast_interval_div.go",
+        "pkg/math/subpaving/fast_interval_div_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34624,7 +34626,8 @@
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
         "TestSubpavingFastMutableIntervalRetainedCore",
         "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
-        "TestSubpavingFastIntervalMulSignClasses"
+        "TestSubpavingFastIntervalMulSignClasses",
+        "TestSubpavingFastIntervalDivSignBranches"
       ],
       "conditionals": [
         {
@@ -34724,7 +34727,9 @@
         "pkg/math/subpaving/fast_interval_arith.go",
         "pkg/math/subpaving/fast_interval_arith_test.go",
         "pkg/math/subpaving/fast_interval_mul.go",
-        "pkg/math/subpaving/fast_interval_mul_test.go"
+        "pkg/math/subpaving/fast_interval_mul_test.go",
+        "pkg/math/subpaving/fast_interval_div.go",
+        "pkg/math/subpaving/fast_interval_div_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34739,7 +34744,8 @@
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
         "TestSubpavingFastMutableIntervalRetainedCore",
         "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
-        "TestSubpavingFastIntervalMulSignClasses"
+        "TestSubpavingFastIntervalMulSignClasses",
+        "TestSubpavingFastIntervalDivSignBranches"
       ],
       "conditionals": [
         {
@@ -35218,6 +35224,14 @@
           "go_target": "pkg/math/subpaving/fast_interval_mul.go",
           "tests": [
             "TestSubpavingFastIntervalMulSignClasses"
+          ]
+        },
+        {
+          "name": "Concrete mpff interval division: six sign branches, open-zero and infinite denominator bounds, directed results and denominator alias (src/math/interval/interval_def.h:1672-1849)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_interval_div.go",
+          "tests": [
+            "TestSubpavingFastIntervalDivSignBranches"
           ]
         }
       ],
@@ -49956,12 +49970,15 @@
         "pkg/math/subpaving/fast_interval_arith.go",
         "pkg/math/subpaving/fast_interval_arith_test.go",
         "pkg/math/subpaving/fast_interval_mul.go",
-        "pkg/math/subpaving/fast_interval_mul_test.go"
+        "pkg/math/subpaving/fast_interval_mul_test.go",
+        "pkg/math/subpaving/fast_interval_div.go",
+        "pkg/math/subpaving/fast_interval_div_test.go"
       ],
       "tests": [
         "TestSubpavingFastMutableIntervalRetainedCore",
         "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
-        "TestSubpavingFastIntervalMulSignClasses"
+        "TestSubpavingFastIntervalMulSignClasses",
+        "TestSubpavingFastIntervalDivSignBranches"
       ],
       "conditionals": [
         {
@@ -50107,7 +50124,9 @@
         "pkg/math/subpaving/fast_interval_arith.go",
         "pkg/math/subpaving/fast_interval_arith_test.go",
         "pkg/math/subpaving/fast_interval_mul.go",
-        "pkg/math/subpaving/fast_interval_mul_test.go"
+        "pkg/math/subpaving/fast_interval_mul_test.go",
+        "pkg/math/subpaving/fast_interval_div.go",
+        "pkg/math/subpaving/fast_interval_div_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50140,7 +50159,8 @@
         "TestSubpavingFixedRoundRobinSingletonAndUndecidedChild",
         "TestSubpavingFastMutableIntervalRetainedCore",
         "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
-        "TestSubpavingFastIntervalMulSignClasses"
+        "TestSubpavingFastIntervalMulSignClasses",
+        "TestSubpavingFastIntervalDivSignBranches"
       ],
       "conditionals": [
         {
