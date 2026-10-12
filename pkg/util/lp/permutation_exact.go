@@ -20,10 +20,6 @@ func NewRationalPermutation(m *numeral.RationalManager, size uint32) *RationalPe
 	return &RationalPermutation{Permutation: *NewPermutation(size), manager: m,
 		tBuffer: NewIndexedRationalVector(m, size), xBuffer: NewIndexedRationalVector(m, size)}
 }
-func RationalPermutationFromValues(m *numeral.RationalManager, size uint32, values []uint32) (*RationalPermutation, error) {
-	indices, err := PermutationFromValues(size, values)
-	return &RationalPermutation{Permutation: *indices, manager: m, tBuffer: NewIndexedRationalVector(m, size), xBuffer: NewIndexedRationalVector(m, size)}, err
-}
 
 func (p *RationalPermutation) ready() error {
 	if p.scratch != nil {
@@ -72,11 +68,6 @@ func (p *RationalPermutation) Resize(size uint32) error {
 	return nil
 }
 
-func (p *RationalPermutation) Inverse() (*RationalPermutation, error) {
-	return RationalPermutationFromValues(p.manager, p.Size(), p.reverse)
-}
-func (p *RationalPermutation) RowCount() uint32    { return p.Size() }
-func (p *RationalPermutation) ColumnCount() uint32 { return p.Size() }
 func (p *RationalPermutation) Close() error {
 	if p.scratch != nil {
 		if err := p.scratch.close(); err != nil {
@@ -282,10 +273,6 @@ func NewPairPermutation(m *numeral.RationalManager, size uint32) *PairPermutatio
 	return &PairPermutation{Permutation: *NewPermutation(size), manager: m,
 		tBuffer: NewIndexedRationalVector(m, size), xBuffer: NewIndexedPairVector(m, size)}
 }
-func PairPermutationFromValues(m *numeral.RationalManager, size uint32, values []uint32) (*PairPermutation, error) {
-	indices, err := PermutationFromValues(size, values)
-	return &PairPermutation{Permutation: *indices, manager: m, tBuffer: NewIndexedRationalVector(m, size), xBuffer: NewIndexedPairVector(m, size)}, err
-}
 
 func (p *PairPermutation) ready() error {
 	if p.scratch != nil {
@@ -334,11 +321,6 @@ func (p *PairPermutation) Resize(size uint32) error {
 	return nil
 }
 
-func (p *PairPermutation) Inverse() (*PairPermutation, error) {
-	return PairPermutationFromValues(p.manager, p.Size(), p.reverse)
-}
-func (p *PairPermutation) RowCount() uint32    { return p.Size() }
-func (p *PairPermutation) ColumnCount() uint32 { return p.Size() }
 func (p *PairPermutation) Close() error {
 	if p.scratch != nil {
 		if err := p.scratch.close(); err != nil {
@@ -861,20 +843,6 @@ func (s *exactPermutationScratch) equal(w *IndexedRationalVector) (bool, error) 
 		}
 	}
 	return true, nil
-}
-
-func (p *RationalPermutation) Element(i, j uint32) (numeral.Rational, error) {
-	value, err := p.Entry(i, j)
-	out := numeral.NewRational()
-	out.Num = numeral.NewInt(int32(value))
-	return out, err
-}
-
-func (p *PairPermutation) Element(i, j uint32) (numeral.Rational, error) {
-	value, err := p.Entry(i, j)
-	out := numeral.NewRational()
-	out.Num = numeral.NewInt(int32(value))
-	return out, err
 }
 
 // Buffer destructors precede identity-tail publication in the source. Keep

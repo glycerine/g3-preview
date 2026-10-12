@@ -135794,6 +135794,10 @@
         "Literal transpositions exchange the opposite dense-matrix side from their names, while multiplication conventions follow the source bodies. Right self products and reverse-right self products read already-mutated entries; they are not repaired into group operations. Resize preserves stale mappings on shrink, and typed Go guards retain each reached valid prefix.",
         "Dense size SASSERT uses existing explicit debug error profile; native traversals preserve source in-range prefixes and guard only actual invalid indexing. Debug ApplyRightIndexed executes the actual preliminary dense transform and final source relative comparison, so diagnostic failure prefixes differ from native. Shared process-global debug/stream binding is not claimed.",
         "Exact indexed applications retain their real lexical copies after a failed call until owner Close. Dense caller coordinates retain completed/partial assignments; permutation cleanup deletes only its own buffers and acquired roots. Exact debug equality executes subtraction and zero inspection, rather than floating conversion or structural equality. Source Init/Resize publishes identity mappings only after numeric buffer resizing."
+      ],
+      "retained_source_exclusions": [
+        "Exact mpq/mpq and mpq/impq get_inverse and length+values construction: no retained source caller. Only floating original test invokes get_inverse; exact Go adapters and mirror tests removed. Exact fixtures use identity construction plus Set.",
+        "Exact permutation debug matrix row_count/column_count/get_elem: no retained source debug matrix consumer. Removed unused Go adapters; actual floating debug matrix/inverse remains."
       ]
     },
     {
@@ -136044,6 +136048,10 @@
         "Literal transpositions exchange the opposite dense-matrix side from their names, while multiplication conventions follow the source bodies. Right self products and reverse-right self products read already-mutated entries; they are not repaired into group operations. Resize preserves stale mappings on shrink, and typed Go guards retain each reached valid prefix.",
         "Dense size SASSERT uses existing explicit debug error profile; native traversals preserve source in-range prefixes and guard only actual invalid indexing. Debug ApplyRightIndexed executes the actual preliminary dense transform and final source relative comparison, so diagnostic failure prefixes differ from native. Shared process-global debug/stream binding is not claimed.",
         "Exact indexed applications retain their real lexical copies after a failed call until owner Close. Dense caller coordinates retain completed/partial assignments; permutation cleanup deletes only its own buffers and acquired roots. Exact debug equality executes subtraction and zero inspection, rather than floating conversion or structural equality. Source Init/Resize publishes identity mappings only after numeric buffer resizing."
+      ],
+      "retained_source_exclusions": [
+        "Exact mpq/mpq and mpq/impq get_inverse and length+values construction: no retained source caller. Only floating original test invokes get_inverse; exact Go adapters and mirror tests removed. Exact fixtures use identity construction plus Set.",
+        "Exact permutation debug matrix row_count/column_count/get_elem: no retained source debug matrix consumer. Removed unused Go adapters; actual floating debug matrix/inverse remains."
       ]
     },
     {
@@ -136139,6 +136147,10 @@
         "Literal transpositions exchange the opposite dense-matrix side from their names, while multiplication conventions follow the source bodies. Right self products and reverse-right self products read already-mutated entries; they are not repaired into group operations. Resize preserves stale mappings on shrink, and typed Go guards retain each reached valid prefix.",
         "Dense size SASSERT uses existing explicit debug error profile; native traversals preserve source in-range prefixes and guard only actual invalid indexing. Debug ApplyRightIndexed executes the actual preliminary dense transform and final source relative comparison, so diagnostic failure prefixes differ from native. Shared process-global debug/stream binding is not claimed.",
         "Exact indexed applications retain their real lexical copies after a failed call until owner Close. Dense caller coordinates retain completed/partial assignments; permutation cleanup deletes only its own buffers and acquired roots. Exact debug equality executes subtraction and zero inspection, rather than floating conversion or structural equality. Source Init/Resize publishes identity mappings only after numeric buffer resizing."
+      ],
+      "retained_source_exclusions": [
+        "Exact mpq/mpq and mpq/impq get_inverse and length+values construction: no retained source caller. Only floating original test invokes get_inverse; exact Go adapters and mirror tests removed. Exact fixtures use identity construction plus Set.",
+        "Exact permutation debug matrix row_count/column_count/get_elem: no retained source debug matrix consumer. Removed unused Go adapters; actual floating debug matrix/inverse remains."
       ]
     },
     {
@@ -172343,5 +172355,69 @@
       }
     },
     "verification": "Both LP vets and source portcheck pass: 2103 units, 677 APIs; 111 ported, 329 partial, 1620 unported, 5 dead/deleted."
+  },
+  "latest_permutation_retained_adapter_audit": {
+    "scope": "Removed unused exact permutation inverse, values constructors and debug matrix-view adapters; retained concrete exact transformations unchanged.",
+    "source_evidence": [
+      "Whole src no-ignore get_inverse scan has only src/test/lp.cpp:1042 floating double/double caller.",
+      "Whole src permutation_matrix file scan limits consumers to LP owners and original float driver; actual LU/sparse/square owner initializers use one-argument dimension construction. Values construction is reached from floating get_inverse only.",
+      "Previous retained debug-matrix audit identifies actual floating LU/driver views; additional exact debug views have no retained roots."
+    ],
+    "removed_production_methods": [
+      "RationalPermutationFromValues",
+      "PairPermutationFromValues",
+      "RationalPermutation.Inverse",
+      "PairPermutation.Inverse",
+      "RationalPermutation.RowCount",
+      "PairPermutation.RowCount",
+      "RationalPermutation.ColumnCount",
+      "PairPermutation.ColumnCount",
+      "RationalPermutation.Element",
+      "PairPermutation.Element"
+    ],
+    "test_fixtures": "Concrete test helpers use retained identity construction followed by Set. Removed dead-constructor invalid-input tests and exact debug/inverse mirror tests; independent dense/sparse products, fault campaigns, resize/mutation prefixes and eta tail composition checks retained.",
+    "source_audit": "/mnt/oldrog/tmp/g3-lp-permutation-consumers-audit.txt",
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "whole_unit_status": "partial",
+    "full_suite_qualification": "No current full native suite claim; 8f2961ca predates recent production changes.",
+    "focused_native_seconds": 52.051,
+    "focused_combined_debug_checked_seconds": 67.147,
+    "tests": "TestLP.*(Permutation|Eta)",
+    "whole_go_file_focused_covered_total": {
+      "native": {
+        "permutation.go": [
+          104,
+          114
+        ],
+        "permutation_exact.go": [
+          410,
+          503
+        ],
+        "permutation_float.go": [
+          178,
+          203
+        ]
+      },
+      "debug": {
+        "permutation.go": [
+          106,
+          114
+        ],
+        "permutation_exact.go": [
+          459,
+          503
+        ],
+        "permutation_float.go": [
+          188,
+          203
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-permutation-retained-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-permutation-retained-debug.cover"
+    ],
+    "verification": "All 64 packages compile in native and combined debug/checked modes; both LP vets and source portcheck pass (2103 units/677 APIs, 111 ported/329 partial/1620 unported/5 dead_deleted)."
   }
 }

@@ -10,6 +10,28 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
+// Exact fixtures use the retained identity constructor and individual Set
+// operations. The source values constructor is reached only by float inverse.
+func lpTestRationalPermutation(m *numeral.RationalManager, size uint32, values []uint32) (*RationalPermutation, error) {
+	p := NewRationalPermutation(m, size)
+	for i, value := range values {
+		if err := p.Set(uint32(i), value); err != nil {
+			return p, err
+		}
+	}
+	return p, nil
+}
+
+func lpTestPairPermutation(m *numeral.RationalManager, size uint32, values []uint32) (*PairPermutation, error) {
+	p := NewPairPermutation(m, size)
+	for i, value := range values {
+		if err := p.Set(uint32(i), value); err != nil {
+			return p, err
+		}
+	}
+	return p, nil
+}
+
 // Ordinary matrix arithmetic is independent of the implementation's mapping
 // traversal and temporary buffers. Every scalar is an exact fraction.
 func lpExactPermutationProduct(m [][]int, in []*big.Rat, right, inverse bool) []*big.Rat {
@@ -51,7 +73,7 @@ func TestLPRationalPermutationIndependentDenseProducts(t *testing.T) {
 		oracleY[i], _ = new(big.Rat).SetString(second[i])
 	}
 	for _, values := range lpPermutations(4) {
-		p, err := RationalPermutationFromValues(h.m, 4, values)
+		p, err := lpTestRationalPermutation(h.m, 4, values)
 		h.must(err)
 		for _, op := range []string{"left", "right", "reverse-left-T", "reverse-left-X", "reverse-right-T", "reverse-right-X"} {
 			w := NewIndexedRationalVector(h.m, 4)
@@ -87,15 +109,12 @@ func TestLPRationalPermutationIndependentDenseProducts(t *testing.T) {
 			h.must(x.Close())
 			h.must(w.Close())
 		}
-		inverse, err := p.Inverse()
-		h.must(err)
-		lpPermutationCheckMatrix(t, &inverse.Permutation, lpMatrixTranspose(lpPermutationMatrix(values)))
-		h.must(inverse.Close())
 		h.must(p.Close())
 		h.must(p.Close())
 	}
 	lpExactVectorNamedCensus(t, h, nil)
 }
+
 // Each campaign walks actual physical refusals through its first success.
 // Direct allocation exposes copy prefixes that pooled storage may reuse; both
 // profiles must preserve the caller coordinates and release the owner roots.
@@ -114,7 +133,7 @@ func TestLPRationalPermutationDenseAllocationFailureCensus(t *testing.T) {
 					}
 					small := h.pair("1", "-2")
 					large := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
-					p, err := RationalPermutationFromValues(h.m, 2, []uint32{1, 0})
+					p, err := lpTestRationalPermutation(h.m, 2, []uint32{1, 0})
 					h.must(err)
 					w := NewIndexedRationalVector(h.m, 2)
 					x := NewIndexedRationalVector(h.m, 2)
@@ -184,7 +203,7 @@ func TestLPRationalPermutationDenseAllocationFailureCensus(t *testing.T) {
 
 func TestLPRationalPermutationResizeAndGuardContracts(t *testing.T) {
 	h := newLPPairHarness(t)
-	p, err := RationalPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
+	p, err := lpTestRationalPermutation(h.m, 3, []uint32{2, 0, 1})
 	h.must(err)
 	large := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
 	w := NewIndexedRationalVector(h.m, 3)
@@ -203,7 +222,7 @@ func TestLPRationalPermutationResizeAndGuardContracts(t *testing.T) {
 		t.Fatal(err)
 	}
 	h.must(p.Init(5))
-	if !p.IsIdentity() || p.RowCount() != 5 || p.ColumnCount() != 5 {
+	if !p.IsIdentity() || p.Size() != 5 {
 		t.Fatal(p.Values())
 	}
 	if err := p.ApplyRight(w.Data); err != map[bool]error{true: ErrAssertion, false: ErrBounds}[sourceDebugTests] {
@@ -216,16 +235,7 @@ func TestLPRationalPermutationResizeAndGuardContracts(t *testing.T) {
 	h.must(w.Close())
 	h.must(x.Close())
 	lpExactVectorNamedCensus(t, h, nil)
-	bad, err := RationalPermutationFromValues(h.m, 2, []uint32{0})
-	if err != ErrBounds {
-		t.Fatal(err)
-	}
-	h.must(bad.Close())
-	bad, err = RationalPermutationFromValues(h.m, 2, []uint32{0, 3})
-	if err != ErrBounds {
-		t.Fatal(err)
-	}
-	h.must(bad.Close())
+
 }
 
 func TestLPPairPermutationIndependentDenseProducts(t *testing.T) {
@@ -240,7 +250,7 @@ func TestLPPairPermutationIndependentDenseProducts(t *testing.T) {
 		oracleY[i], _ = new(big.Rat).SetString(second[i])
 	}
 	for _, values := range lpPermutations(4) {
-		p, err := PairPermutationFromValues(h.m, 4, values)
+		p, err := lpTestPairPermutation(h.m, 4, values)
 		h.must(err)
 		for _, op := range []string{"left", "right", "reverse-left-T", "reverse-left-X", "reverse-right-T", "reverse-right-X"} {
 			w := NewIndexedRationalVector(h.m, 4)
@@ -276,10 +286,6 @@ func TestLPPairPermutationIndependentDenseProducts(t *testing.T) {
 			h.must(x.Close())
 			h.must(w.Close())
 		}
-		inverse, err := p.Inverse()
-		h.must(err)
-		lpPermutationCheckMatrix(t, &inverse.Permutation, lpMatrixTranspose(lpPermutationMatrix(values)))
-		h.must(inverse.Close())
 		h.must(p.Close())
 		h.must(p.Close())
 	}
@@ -300,7 +306,7 @@ func TestLPPairPermutationDenseAllocationFailureCensus(t *testing.T) {
 					}
 					small := h.pair("1", "-2")
 					large := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
-					p, err := PairPermutationFromValues(h.m, 2, []uint32{1, 0})
+					p, err := lpTestPairPermutation(h.m, 2, []uint32{1, 0})
 					h.must(err)
 					w := NewIndexedRationalVector(h.m, 2)
 					x := NewIndexedPairVector(h.m, 2)
@@ -370,7 +376,7 @@ func TestLPPairPermutationDenseAllocationFailureCensus(t *testing.T) {
 
 func TestLPPairPermutationResizeAndGuardContracts(t *testing.T) {
 	h := newLPPairHarness(t)
-	p, err := PairPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
+	p, err := lpTestPairPermutation(h.m, 3, []uint32{2, 0, 1})
 	h.must(err)
 	large := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
 	w := NewIndexedRationalVector(h.m, 3)
@@ -389,7 +395,7 @@ func TestLPPairPermutationResizeAndGuardContracts(t *testing.T) {
 		t.Fatal(err)
 	}
 	h.must(p.Init(5))
-	if !p.IsIdentity() || p.RowCount() != 5 || p.ColumnCount() != 5 {
+	if !p.IsIdentity() || p.Size() != 5 {
 		t.Fatal(p.Values())
 	}
 	if err := p.ApplyRight(w.Data); err != map[bool]error{true: ErrAssertion, false: ErrBounds}[sourceDebugTests] {
@@ -402,16 +408,7 @@ func TestLPPairPermutationResizeAndGuardContracts(t *testing.T) {
 	h.must(w.Close())
 	h.must(x.Close())
 	lpExactVectorNamedCensus(t, h, nil)
-	bad, err := PairPermutationFromValues(h.m, 2, []uint32{0})
-	if err != ErrBounds {
-		t.Fatal(err)
-	}
-	h.must(bad.Close())
-	bad, err = PairPermutationFromValues(h.m, 2, []uint32{0, 3})
-	if err != ErrBounds {
-		t.Fatal(err)
-	}
-	h.must(bad.Close())
+
 }
 
 func TestLPRationalPermutationIndependentSparseProducts(t *testing.T) {
@@ -424,7 +421,7 @@ func TestLPRationalPermutationIndependentSparseProducts(t *testing.T) {
 		original[i], _ = new(big.Rat).SetString(text)
 	}
 	for _, values := range lpPermutations(4) {
-		p, err := RationalPermutationFromValues(h.m, 4, values)
+		p, err := lpTestRationalPermutation(h.m, 4, values)
 		h.must(err)
 		for _, op := range []string{"left", "right", "reverse-left", "reverse-right"} {
 			w := NewIndexedRationalVector(h.m, 4)
@@ -488,7 +485,7 @@ func TestLPRationalPermutationSparseAllocationFailureCensus(t *testing.T) {
 					}
 					a := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
 					b := h.pair(strings.Repeat("9876543210", 100)+"/11", "0")
-					p, err := RationalPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
+					p, err := lpTestRationalPermutation(h.m, 3, []uint32{2, 0, 1})
 					h.must(err)
 					w := NewIndexedRationalVector(h.m, 3)
 					h.must(w.SetValue(&a.X, 2))
@@ -540,7 +537,7 @@ func TestLPRationalPermutationSparseGuardAndMutationPrefixes(t *testing.T) {
 	h := newLPPairHarness(t)
 	value := h.pair("3/7", "0")
 	for _, op := range []string{"left", "right", "reverse-left", "reverse-right"} {
-		p, err := RationalPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
+		p, err := lpTestRationalPermutation(h.m, 3, []uint32{2, 0, 1})
 		h.must(err)
 		w := NewIndexedRationalVector(h.m, 3)
 		h.must(w.SetValue(&value.X, 0))
@@ -579,7 +576,7 @@ func TestLPRationalPermutationSparseGuardAndMutationPrefixes(t *testing.T) {
 	}
 	// A stale shrunk mapping fails after sparse data clearing and the first
 	// descending replacement, retaining the exact completed source prefix.
-	p, err := RationalPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
+	p, err := lpTestRationalPermutation(h.m, 3, []uint32{2, 0, 1})
 	h.must(err)
 	h.must(p.Resize(2))
 	w := NewIndexedRationalVector(h.m, 2)
@@ -596,7 +593,7 @@ func TestLPRationalPermutationSparseGuardAndMutationPrefixes(t *testing.T) {
 	h.must(p.Close())
 	h.must(w.Close())
 	// Source debug compares dense data including values absent from the index.
-	p, err = RationalPermutationFromValues(h.m, 2, []uint32{1, 0})
+	p, err = lpTestRationalPermutation(h.m, 2, []uint32{1, 0})
 	h.must(err)
 	w = NewIndexedRationalVector(h.m, 2)
 	h.must(w.copySlot(&w.Data[0], &value.X))
@@ -628,7 +625,7 @@ func TestLPPairPermutationIndependentSparseProducts(t *testing.T) {
 		original[i], _ = new(big.Rat).SetString(text)
 	}
 	for _, values := range lpPermutations(4) {
-		p, err := PairPermutationFromValues(h.m, 4, values)
+		p, err := lpTestPairPermutation(h.m, 4, values)
 		h.must(err)
 		for _, op := range []string{"left", "right", "reverse-left", "reverse-right"} {
 			w := NewIndexedRationalVector(h.m, 4)
@@ -692,7 +689,7 @@ func TestLPPairPermutationSparseAllocationFailureCensus(t *testing.T) {
 					}
 					a := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
 					b := h.pair(strings.Repeat("9876543210", 100)+"/11", "0")
-					p, err := PairPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
+					p, err := lpTestPairPermutation(h.m, 3, []uint32{2, 0, 1})
 					h.must(err)
 					w := NewIndexedRationalVector(h.m, 3)
 					h.must(w.SetValue(&a.X, 2))
@@ -744,7 +741,7 @@ func TestLPPairPermutationSparseGuardAndMutationPrefixes(t *testing.T) {
 	h := newLPPairHarness(t)
 	value := h.pair("3/7", "0")
 	for _, op := range []string{"left", "right", "reverse-left", "reverse-right"} {
-		p, err := PairPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
+		p, err := lpTestPairPermutation(h.m, 3, []uint32{2, 0, 1})
 		h.must(err)
 		w := NewIndexedRationalVector(h.m, 3)
 		h.must(w.SetValue(&value.X, 0))
@@ -783,7 +780,7 @@ func TestLPPairPermutationSparseGuardAndMutationPrefixes(t *testing.T) {
 	}
 	// A stale shrunk mapping fails after sparse data clearing and the first
 	// descending replacement, retaining the exact completed source prefix.
-	p, err := PairPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
+	p, err := lpTestPairPermutation(h.m, 3, []uint32{2, 0, 1})
 	h.must(err)
 	h.must(p.Resize(2))
 	w := NewIndexedRationalVector(h.m, 2)
@@ -800,7 +797,7 @@ func TestLPPairPermutationSparseGuardAndMutationPrefixes(t *testing.T) {
 	h.must(p.Close())
 	h.must(w.Close())
 	// Source debug compares dense data including values absent from the index.
-	p, err = PairPermutationFromValues(h.m, 2, []uint32{1, 0})
+	p, err = lpTestPairPermutation(h.m, 2, []uint32{1, 0})
 	h.must(err)
 	w = NewIndexedRationalVector(h.m, 2)
 	h.must(w.copySlot(&w.Data[0], &value.X))
@@ -887,20 +884,6 @@ func TestLPRationalPermutationAllDenseGuardProfiles(t *testing.T) {
 	p := NewRationalPermutation(h.m, 2)
 	h.must(p.Set(0, 1))
 	h.must(p.Set(1, 0))
-	for i := uint32(0); i < 2; i++ {
-		for j := uint32(0); j < 3; j++ {
-			value, err := p.Element(i, j)
-			h.must(err)
-			want := int64(0)
-			if i+j == 1 {
-				want = 1
-			}
-			lpCheckExactPermutationCoordinate(t, h, &value, big.NewRat(want, 1))
-		}
-	}
-	if _, err := p.Element(2, 0); err != ErrBounds {
-		t.Fatal(err)
-	}
 	h.must(p.Resize(4))
 	if !reflect.DeepEqual(p.Values(), []uint32{1, 0, 2, 3}) {
 		t.Fatal(p.Values())
@@ -974,20 +957,6 @@ func TestLPPairPermutationAllDenseGuardProfiles(t *testing.T) {
 	p := NewPairPermutation(h.m, 2)
 	h.must(p.Set(0, 1))
 	h.must(p.Set(1, 0))
-	for i := uint32(0); i < 2; i++ {
-		for j := uint32(0); j < 3; j++ {
-			value, err := p.Element(i, j)
-			h.must(err)
-			want := int64(0)
-			if i+j == 1 {
-				want = 1
-			}
-			lpCheckExactPermutationCoordinate(t, h, &value, big.NewRat(want, 1))
-		}
-	}
-	if _, err := p.Element(2, 0); err != ErrBounds {
-		t.Fatal(err)
-	}
 	h.must(p.Resize(4))
 	if !reflect.DeepEqual(p.Values(), []uint32{1, 0, 2, 3}) {
 		t.Fatal(p.Values())
