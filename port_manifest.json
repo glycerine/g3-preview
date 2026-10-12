@@ -102978,7 +102978,7 @@
       "path": "src/test/lp.cpp",
       "component": "test",
       "role": "test",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/int_set_test.go",
         "pkg/util/lp/stacked_value_test.go",
@@ -103872,8 +103872,8 @@
           "text": "SASSERT(s.size() == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "test_int_set (--test_int_set) and test_stacked_unsigned via test_stacked (--smap)",
@@ -103890,14 +103890,6 @@
           "go_target": "pkg/util/lp/stacked_vector_test.go",
           "tests": [
             "TestLPStackedVectorSource"
-          ]
-        },
-        {
-          "name": "--test_mpq ten-term numeric-pair accumulation with deterministic exact expected result",
-          "status": "partial",
-          "go_target": "pkg/util/lp/numeric_pair_test.go",
-          "tests": [
-            "TestLPRationalPairSourceAccumulation"
           ]
         },
         {
@@ -103925,23 +103917,6 @@
             "TestLPFloatSparseOriginalInitU",
             "TestLPFloatSparseBasisIndependentOracle",
             "TestLPFloatSparseBasisLiteralStops"
-          ]
-        },
-        {
-          "name": "test_small_lu and test_larger_lu_with_holes initial basis factorization fixtures; their update sequences and --test_lu driver remain open",
-          "status": "partial",
-          "go_target": "pkg/util/lp/lu_float_test.go",
-          "tests": [
-            "TestLPFloatLUSourceSmallInitialBasis",
-            "TestLPFloatLUSourceInitialBasisWithHoles"
-          ]
-        },
-        {
-          "name": "test_small_lu first prepare_entering(2,w) stage with independently verified basis solution; full update sequence remains open",
-          "status": "partial",
-          "go_target": "pkg/util/lp/lu_column_test.go",
-          "tests": [
-            "TestLPLUEnteringColumnUpstreamSmallPreparation"
           ]
         },
         {
@@ -103974,21 +103949,6 @@
           ]
         },
         {
-          "name": "test_lp_0/test_lp_1 numerical fixtures through retained stage-one LU profile, independently verified by exhaustive vertex optima; original default test_lp_0 driver tracked separately, complete test_lp_1 driver remains open",
-          "status": "partial",
-          "go_targets": [
-            "pkg/util/lp/primal_solve_float_test.go"
-          ],
-          "tests": [
-            "TestLPFloatPrimalSolveOriginalNumericalFixtures",
-            "TestLPFloatPrimalSolveIndependentVertices",
-            "TestLPFloatPrimalSolveStopsAndStatuses",
-            "TestLPFloatPrimalIterationBudgetAndStatistics",
-            "TestLPFloatPrimalStatisticsGuardsAndIEEE",
-            "TestLPFloatPrimalSolveAndIterationReachedGuards"
-          ]
-        },
-        {
           "name": "Floating constructor without low-bound argument, owned zero-low dummy header and literal initial-X validator; original test_lp_0/1 through that constructor with explicit LU plus unchanged default-profile guards",
           "status": "ported",
           "go_target": "pkg/util/lp/primal_initial_float.go",
@@ -104001,22 +103961,6 @@
           ]
         },
         {
-          "name": "solve_mps_double retained primal parsing/construction/optimization fixtures; full concrete driver implementation and verification are recorded separately",
-          "status": "partial",
-          "go_target": "pkg/util/lp/mps_reader_float.go",
-          "tests": [
-            "TestLPFloatMPSIndependentOptima",
-            "TestLPFloatMPSFileBoundsRangesIntegration",
-            "TestLPFloatMPSAllBoundsAndRanges",
-            "TestLPFloatMPSFixedFieldsAndPublication",
-            "TestLPFloatMPSMalformedAndStreamPrefixes",
-            "TestLPFloatMPSFileReadFailure",
-            "TestLPFloatMPSDiagnosticRefusalCampaigns",
-            "TestLPFloatMPSSourceDomainPrefixes",
-            "TestLPFloatMPSUnrangedRelationsAndNumericPrefixes"
-          ]
-        },
-        {
           "name": "test_term (2711-2739), test_evidence_for_total_inf_simple (2741-2759), test_bound_propagation_one_small_sample1 (2760-2807)",
           "status": "ported",
           "go_target": "pkg/util/lp/lar_upstream_driver_test.go",
@@ -104024,32 +103968,6 @@
             "TestLARUpstreamTermDriver",
             "TestLARUpstreamTotalInfeasibilityDriver",
             "TestLARUpstreamTrianglePropagationDriver"
-          ]
-        },
-        {
-          "name": "MPS read/create and run_lar_solver Solve/randomize/GetModel pipeline (2449-2507); full options/SMT/primal-comparison branches remain open",
-          "status": "partial",
-          "go_target": "pkg/util/lp/mps_reader_exact_test.go",
-          "tests": [
-            "TestLPRationalMPSUpstreamFileRandomizeDriver",
-            "TestLARDriverQueryHeadingExtent"
-          ]
-        },
-        {
-          "name": "Retained exact MPS parse/create/optimization and symbolic-value fixtures; concrete setup-based and auxiliary default drivers are recorded separately",
-          "status": "partial",
-          "go_target": "pkg/util/lp/mps_outer_rational_test.go",
-          "tests": [
-            "TestLPRationalMPSOuterIndependentOptima",
-            "TestLPRationalMPSOuterIndependentClones",
-            "TestLPRationalMPSOuterFullDualSourceBoundary",
-            "TestLPRationalMPSOuterRetainedFile",
-            "TestLPRationalMPSOuterFactoryGuards",
-            "TestLPRationalMPSOuterFactoryPhysicalOwnership",
-            "TestLPRationalMPSOuterNamedLookup",
-            "TestLPRationalMPSOuterNamedPhysicalOwnership",
-            "TestLPRationalMPSOuterPreservesOlderComparison",
-            "TestLPRationalMPSOuterFactoryDiagnosticPrefixes"
           ]
         },
         {
@@ -104134,11 +104052,6 @@
             "TestLPLARDriverActualComparisonReportAndLookupFailures",
             "TestLPLARDriverOlderComparison"
           ]
-        },
-        {
-          "name": "Commented directory traversal/GLPK comparison implementation inside test_files_from_directory (2391-2413) is disabled; retained wrapper has an empty body and future CLI branch must return without traversal",
-          "status": "dead_deleted",
-          "tests": []
         },
         {
           "name": "MPS branch of create_lar_solver_from_file and test_lar_on_file (2486-2506), file-before-list MPS branch of test_lar_solver (2529-2545): actual two reads with successful creation reader destruction before second read, native LAR run/comparison/randomize and sequential owning cleanup; SMT branch remains open",
@@ -104232,12 +104145,6 @@
           ]
         },
         {
-          "name": "read_indexed_vector source2622-2637 has only a commented check_lu call and no retained root caller; excluded",
-          "status": "dead_deleted",
-          "go_target": "",
-          "tests": []
-        },
-        {
           "name": "retained ordinary GLPK report comparison src2132-2264: actual readonly file status/GLPK-first-objective/LP-last-cost parsing, status exceptions, source counters and cost tolerance/reporting",
           "status": "ported",
           "go_target": "pkg/util/lp/driver_glpk_reports.go",
@@ -104300,12 +104207,6 @@
           ]
         },
         {
-          "name": "const-char loop catch handlers in solve_some_mps have no retained throw producer: only live literal throw is known-solution prelude outside handlers; mem_cpy_place_holder hook is declaration/definition only",
-          "status": "dead_deleted",
-          "go_target": "",
-          "tests": []
-        },
-        {
           "name": "test_lp_local argument preparation and branch selection only: resize/parse/print, source precedence, debug settings stage, exact/min/dual/limits; selected calls are not executed by this stage",
           "status": "ported",
           "go_target": "pkg/util/lp/driver_dispatch.go",
@@ -104315,14 +104216,6 @@
             "TestLPDriverPreparationSolveOptionsAndParseFailure",
             "TestLPDriverPreparationReportFailurePrefixes",
             "TestLPDriverPreparationShortWritePublication"
-          ]
-        },
-        {
-          "name": "test_files_from_directory src2391-2419 and finalize src2090-2096 contain only commented bodies; directory option selects an empty action, no directory traversal retained",
-          "status": "reference_only",
-          "tests": [
-            "TestLPDriverPreparationSourcePrecedence",
-            "TestLPDriverPreparationEmptyOptionsAndDebugStage"
           ]
         },
         {
@@ -104470,23 +104363,6 @@
             "TestLPPairBenchmarkPreservesOlderComparison",
             "TestLPNumericBenchmarkLiteralApproximateReports"
           ]
-        },
-        {
-          "name": "test_lp_local/tst_lp concrete selected-call executor and argv+2 entry, native/debug/Linux branches; numeric-pair full-count and whole driver consumer audit remain independently open",
-          "status": "partial",
-          "go_target": "pkg/util/lp/driver_execute.go",
-          "tests": [
-            "TestLPExecutionActualExamplesAndSourceFailures",
-            "TestLPExecutionDebugBranchesAndSourceExit",
-            "TestLPExecutionDebugLARActualFile",
-            "TestLPExecutionDebugReportFailureRetainsCurrentChild",
-            "TestLPExecutionEntryContainersAndPrecedence",
-            "TestLPExecutionEveryReportByteAndFlushPrefix",
-            "TestLPExecutionLUFileAndNumericBenchmarkSetup",
-            "TestLPExecutionLinuxBatchStopsBeforeOpeningCatalogueFile",
-            "TestLPExecutionMPSIndependentObjectivesAndFileList",
-            "TestLPExecutionMPSPhysicalFailureOwnership"
-          ]
         }
       ],
       "ownership": [
@@ -104547,8 +104423,10 @@
         "Private scalar benchmark iteration bound is used only by focused tests; public Run retains500000 and standard benchmark checks actual full count. Full-count execution remains unverified at this increment. No source arithmetic shortcut or synthetic allocator hooks.",
         "Private pair benchmark iteration bound is for focused tests only; public Run retains1000000 and standard benchmark independently checks full count and exact result. Full-count execution not credited at implementation commit; no source arithmetic shortcut or unused generic adapter.",
         "Source debug-only branches are erased without g3debug, solve_some_mps call is Linux-only, commented directory body is an executable no-op, too-short argv+2 returns ErrBounds and source exit(1) is transported as ExitCode/ErrAssertion. Actual scalar full counts verified5920ba19; pair full count and whole external driver/global consumer audit remain open.",
-        "Numeric benchmarks print source approximate T_to_string results, with exact live accumulators independently checked before formatting. Pair input streaming retains the generic exact-coordinate template lookup. Full count evidence predates final-report correction; later focused report/ownership checks are separate evidence."
-      ]
+        "Numeric benchmarks print source approximate T_to_string results, with exact live accumulators independently checked before formatting. Pair input streaming retains the generic exact-coordinate template lookup. Full count evidence predates final-report correction; later focused report/ownership checks are separate evidence.",
+        "Whole-source test-driver exclusions: test_lp_1 and test_lp_primal_core_solver have no retained dispatch caller; code after test_lp_local unconditional return is dead. Commented test_files_from_directory/constraint bodies and uncalled read_indexed_vector have no executable implementation to port. finalize and directory selection execute as source no-ops. Earlier partial milestones for pair benchmark, LU, test_lp_0, MPS/LAR and selected-call execution are superseded by complete typed drivers and independent tests; current full-count benchmarks pass after final-report correction."
+      ],
+      "retained_source_audit_evidence": "Whole retained src/test/lp.cpp test-driver audit: executable argument parsing and precedence, native/debug/Linux dispatch, container/permutation/heap/stack scenarios, debug LU and swap fixtures, floating/exact MPS and LAR file/list/batch paths, rational and pair benchmarks, bound-propagation examples, diagnostics and source failure/report prefixes have concrete Go drivers and named tests. Earlier partial method rows are superseded by later full executable driver groups. test_lp_1 is reached only by uncalled test_lp_primal_core_solver; other code after test_lp_local unconditional return, commented directory/constraint bodies, uncalled read_indexed_vector, and const-char catch handlers without a throw producer are excluded. The retained no-op finalize/directory option and add_constraint assertion/native return are preserved. Public scalar compound and binary-plus benchmarks passed current 500000-iteration counts; public pair benchmark passed current 1000000-iteration/10000000-product count, independent exact accumulator, final approximate report, and cleanup. Focused CLI native/checked tests pass16.361s/20.281s. CPUs8-16/GOMAXPROCS9; full native checkpoint17ecadb7 validates unchanged Go production code, with test-only portability fix49887f72 separately verified."
     },
     {
       "path": "src/test/main.cpp",
@@ -174606,5 +174484,27 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_suite_qualification": "Full native checkpoint 17ecadb7 passed on unchanged Go production code."
+  },
+  "latest_lp_test_driver_whole_audit": {
+    "source_units": [
+      "src/test/lp.cpp"
+    ],
+    "scope": "Whole retained src/test/lp.cpp test-driver audit: executable argument parsing and precedence, native/debug/Linux dispatch, container/permutation/heap/stack scenarios, debug LU and swap fixtures, floating/exact MPS and LAR file/list/batch paths, rational and pair benchmarks, bound-propagation examples, diagnostics and source failure/report prefixes have concrete Go drivers and named tests. Earlier partial method rows are superseded by later full executable driver groups. test_lp_1 is reached only by uncalled test_lp_primal_core_solver; other code after test_lp_local unconditional return, commented directory/constraint bodies, uncalled read_indexed_vector, and const-char catch handlers without a throw producer are excluded. The retained no-op finalize/directory option and add_constraint assertion/native return are preserved. Public scalar compound and binary-plus benchmarks passed current 500000-iteration counts; public pair benchmark passed current 1000000-iteration/10000000-product count, independent exact accumulator, final approximate report, and cleanup. Focused CLI native/checked tests pass16.361s/20.281s. CPUs8-16/GOMAXPROCS9; full native checkpoint17ecadb7 validates unchanged Go production code, with test-only portability fix49887f72 separately verified.",
+    "focused_cli_tests": {
+      "native": "PASS 16.361s",
+      "g3debug_g3checked": "PASS 20.281s"
+    },
+    "focused_profiles": [
+      "/mnt/oldrog/tmp/g3-lp-cli-audit-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-cli-audit-debug.cover"
+    ],
+    "full_count_benchmarks": {
+      "BenchmarkLPRationalSource500000/compound": "PASS 322.022s",
+      "BenchmarkLPRationalSource500000/binary_plus": "PASS 347.286s",
+      "BenchmarkLPPairSource1000000": "PASS 1126.764s"
+    },
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_native_checkpoint": "17ecadb7"
   }
 }

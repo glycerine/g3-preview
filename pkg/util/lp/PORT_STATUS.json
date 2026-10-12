@@ -1,11 +1,9 @@
 {
-  "scope": "All 110 retained src/util/lp source units have audited ported, reference-only, dead, or platform-replacement dispositions. Upstream src/test/lp.cpp test-driver audit remains partial pending current full-count benchmark verification.",
+  "scope": "Complete retained src/util/lp implementation and src/test/lp.cpp upstream test drivers. All 110 LP library source units have audited ported, reference-only, dead, or platform-replacement dispositions.",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 86.5,
-  "coverage_warning": "Current full native checkpoint17ecadb7 passed on unchanged Go production code: LP30177/34898 statements (86.5%), 64 module package paths with63 pass/1 skip. Subsequent test-only portability fix49887f72 passed repeated focused native/checked tests; its broader diagnostic groups passed. Ninety-one ported LP source units have native-profile LP Go targets, with the lowest target aggregate at77.4%; four matrix units are debug-only and have focused checked profiles. The historical91.7% combined checked figure predates the current checkpoint and is not a current full checked measurement. Statement coverage alone does not establish C++ source fidelity.",
-  "remaining_work": [
-    "Complete current full-count pair/scalar benchmark verification and reconcile the independently tracked src/test/lp.cpp driver audit."
-  ],
+  "coverage_warning": "Current full native checkpoint17ecadb7 passed on unchanged Go production code: LP30177/34898 statements (86.5%),64 module package paths with63 pass/1 skip. Subsequent test-only portability fix49887f72 passed repeated focused native/checked tests and broader diagnostic groups. Ninety-one ported LP source units have native-profile LP Go targets, with the lowest target aggregate at77.4%; four matrix units are debug-only with focused checked profiles. Current full-count scalar and pair benchmark validators pass after final-report correction. Historical91.7% combined checked figure predates the current checkpoint and is not a current full checked measurement. Statement coverage alone does not establish C++ source fidelity.",
+  "remaining_work": [],
   "units": [
     {
       "source": "src/util/lp/CMakeLists.txt",
@@ -15581,5 +15579,27 @@
     "native_profile": "/mnt/oldrog/tmp/g3-lp-current-native.cover",
     "qualification": "The four debug-only source units are covered by focused checked profiles; source-target aggregates overlap and are not independent percentages. Upstream src/test/lp.cpp audit remains separate.",
     "native_profile_go_files_with_zero_coverage": 0
+  },
+  "latest_lp_test_driver_whole_audit": {
+    "source_units": [
+      "src/test/lp.cpp"
+    ],
+    "scope": "Whole retained src/test/lp.cpp test-driver audit: executable argument parsing and precedence, native/debug/Linux dispatch, container/permutation/heap/stack scenarios, debug LU and swap fixtures, floating/exact MPS and LAR file/list/batch paths, rational and pair benchmarks, bound-propagation examples, diagnostics and source failure/report prefixes have concrete Go drivers and named tests. Earlier partial method rows are superseded by later full executable driver groups. test_lp_1 is reached only by uncalled test_lp_primal_core_solver; other code after test_lp_local unconditional return, commented directory/constraint bodies, uncalled read_indexed_vector, and const-char catch handlers without a throw producer are excluded. The retained no-op finalize/directory option and add_constraint assertion/native return are preserved. Public scalar compound and binary-plus benchmarks passed current 500000-iteration counts; public pair benchmark passed current 1000000-iteration/10000000-product count, independent exact accumulator, final approximate report, and cleanup. Focused CLI native/checked tests pass16.361s/20.281s. CPUs8-16/GOMAXPROCS9; full native checkpoint17ecadb7 validates unchanged Go production code, with test-only portability fix49887f72 separately verified.",
+    "focused_cli_tests": {
+      "native": "PASS 16.361s",
+      "g3debug_g3checked": "PASS 20.281s"
+    },
+    "focused_profiles": [
+      "/mnt/oldrog/tmp/g3-lp-cli-audit-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-cli-audit-debug.cover"
+    ],
+    "full_count_benchmarks": {
+      "BenchmarkLPRationalSource500000/compound": "PASS 322.022s",
+      "BenchmarkLPRationalSource500000/binary_plus": "PASS 347.286s",
+      "BenchmarkLPPairSource1000000": "PASS 1126.764s"
+    },
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_native_checkpoint": "17ecadb7"
   }
 }
