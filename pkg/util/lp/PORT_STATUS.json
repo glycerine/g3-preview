@@ -4194,11 +4194,31 @@
       "go_targets": [
         "pkg/util/lp/types.go",
         "pkg/util/lp/assert_debug.go",
-        "pkg/util/lp/assert_release.go"
+        "pkg/util/lp/assert_release.go",
+        "pkg/util/lp/permutation_exact.go",
+        "pkg/util/lp/permutation_vector_equality_debug_test.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
-        "TestLPSourceStatusFallbackAndParserAsymmetry"
+        "TestLPSourceStatusFallbackAndParserAsymmetry",
+        "TestLPPermutationExactVectorEqualityCopiedLeftAndEarlyReturn",
+        "TestLPPermutationExactVectorEqualityLengthAndEmpty",
+        "TestLPPermutationExactVectorEqualityPhysicalRefusals"
+      ],
+      "methods": [
+        {
+          "name": "retained precise vectors_are_equal binary subtraction expression and lexical per-element destruction in permutation debug validation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/permutation_exact.go",
+          "tests": [
+            "TestLPPermutationExactVectorEqualityCopiedLeftAndEarlyReturn",
+            "TestLPPermutationExactVectorEqualityLengthAndEmpty",
+            "TestLPPermutationExactVectorEqualityPhysicalRefusals"
+          ]
+        }
+      ],
+      "ownership": [
+        "Debug equality scratch owns the copied-left and returned difference slots plus existing exact call receipts. Returned temporary is destroyed before next element/early false; failed operations retain reached storage for scratch Close. Other source methods/whole-owner audits remain independently partial."
       ]
     },
     {
@@ -5345,7 +5365,8 @@
       "go_targets": [
         "pkg/util/lp/permutation.go",
         "pkg/util/lp/permutation_float.go",
-        "pkg/util/lp/permutation_exact.go"
+        "pkg/util/lp/permutation_exact.go",
+        "pkg/util/lp/permutation_vector_equality_debug_test.go"
       ],
       "tests": [
         "TestLPPermutationIndependentMatrixProducts",
@@ -5369,7 +5390,25 @@
         "TestLPRationalPermutationAllDenseGuardProfiles",
         "TestLPPairPermutationAllDenseGuardProfiles",
         "TestLPRationalPermutationStoppedDestinationOwnership",
-        "TestLPPairPermutationStoppedDestinationOwnership"
+        "TestLPPairPermutationStoppedDestinationOwnership",
+        "TestLPPermutationExactVectorEqualityCopiedLeftAndEarlyReturn",
+        "TestLPPermutationExactVectorEqualityLengthAndEmpty",
+        "TestLPPermutationExactVectorEqualityPhysicalRefusals"
+      ],
+      "methods": [
+        {
+          "name": "retained precise vectors_are_equal binary subtraction expression and lexical per-element destruction in permutation debug validation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/permutation_exact.go",
+          "tests": [
+            "TestLPPermutationExactVectorEqualityCopiedLeftAndEarlyReturn",
+            "TestLPPermutationExactVectorEqualityLengthAndEmpty",
+            "TestLPPermutationExactVectorEqualityPhysicalRefusals"
+          ]
+        }
+      ],
+      "ownership": [
+        "Debug equality scratch owns the copied-left and returned difference slots plus existing exact call receipts. Returned temporary is destroyed before next element/early false; failed operations retain reached storage for scratch Close. Other source methods/whole-owner audits remain independently partial."
       ]
     },
     {
@@ -11908,5 +11947,12 @@
     "go_pid": 5,
     "actual_exec_session": 89234,
     "completion_verified": false
+  },
+  "latest_precise_vector_equality_increment": {
+    "summary": "Retained lp_settings.hpp precise vectors_are_equal helper now preserves the binary rational subtraction lifetime at its actual permutation debug consumer: copied left operand, compound subtraction, returned-value copy, then destruction before each next element or early false return. The previous direct Sub skipped those source copies. exactPermutationScratch owns two concrete numeral slots and existing call receipts, with no generic callback/unused adapter. Three g3debug test groups cover30 large-number independent equal/first-to-last mismatch worlds, empty/unequal extents, and pooled/direct physical refusal campaigns through success with exact ownership census after cleanup. Focused combined0.871s, helper17/20statements85.0%; three uncovered returns guard stable delegated begin/IsZero/destructor errors. Related actual rational/pair permutation tests pass combined10.810s; native/debug LP vets pass. Source operand mutation and transport prefixes remain owning until scratch Close. Full native8f2961ca/session89234 is still running and predates this debug-only correction; no current-code full coverage claim. Whole settings/permutation units remain independently partial, LP inventory20ported/75partial/10reference_only/3dead_deleted/2platform_replacement. Profile /mnt/oldrog/tmp/g3-lp-vector-equality-debug.cover. CPU affinity8\u201316 retained.",
+    "combined_debug_checked_helper_statements": {
+      "covered": 17,
+      "total": 20
+    }
   }
 }

@@ -829,24 +829,33 @@ func exactPermutationRight(p *Permutation, w *IndexedRationalVector, s *exactPer
 	}
 	return nil
 }
+
+// Source: lp_settings.hpp:94-103, reached by permutation_matrix.hpp assertions.
 func (s *exactPermutationScratch) equal(w *IndexedRationalVector) (bool, error) {
 	if len(s.debug.Data) != len(w.Data) {
 		return false, nil
 	}
-	s.difference = NewIndexedRationalVector(w.manager, 1)
+	s.difference = NewIndexedRationalVector(w.manager, 2)
+	temporary, out := &s.difference.Data[0], &s.difference.Data[1]
 	for i := range w.Data {
 		before, err := s.difference.calls.begin(w.manager)
 		if err != nil {
 			return false, err
 		}
-		err = w.manager.Sub(&s.debug.Data[i], &w.Data[i], &s.difference.Data[0])
+		err = etaRationalDifference(w.manager, temporary, out, &s.debug.Data[i], &w.Data[i])
 		if err = s.difference.calls.after(w.manager, before, err); err != nil {
 			return false, err
 		}
-		zero, err := w.manager.IsZero(&s.difference.Data[0])
+		zero, err := w.manager.IsZero(out)
 		if err != nil {
 			return false, err
 		}
+		// The subtraction's returned temporary dies before the next element or
+		// early false return, independently of the containing debug snapshot.
+		if err = w.manager.Del(out); err != nil {
+			return false, err
+		}
+		*out = numeral.NewRational()
 		if !zero {
 			return false, nil
 		}

@@ -131091,11 +131091,16 @@
       "go_targets": [
         "pkg/util/lp/types.go",
         "pkg/util/lp/assert_debug.go",
-        "pkg/util/lp/assert_release.go"
+        "pkg/util/lp/assert_release.go",
+        "pkg/util/lp/permutation_exact.go",
+        "pkg/util/lp/permutation_vector_equality_debug_test.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
-        "TestLPSourceStatusFallbackAndParserAsymmetry"
+        "TestLPSourceStatusFallbackAndParserAsymmetry",
+        "TestLPPermutationExactVectorEqualityCopiedLeftAndEarlyReturn",
+        "TestLPPermutationExactVectorEqualityLengthAndEmpty",
+        "TestLPPermutationExactVectorEqualityPhysicalRefusals"
       ],
       "conditionals": [
         {
@@ -131132,10 +131137,21 @@
             "TestLPSourceEnumsAndSpellings",
             "TestLPSourceStatusFallbackAndParserAsymmetry"
           ]
+        },
+        {
+          "name": "retained precise vectors_are_equal binary subtraction expression and lexical per-element destruction in permutation debug validation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/permutation_exact.go",
+          "tests": [
+            "TestLPPermutationExactVectorEqualityCopiedLeftAndEarlyReturn",
+            "TestLPPermutationExactVectorEqualityLengthAndEmpty",
+            "TestLPPermutationExactVectorEqualityPhysicalRefusals"
+          ]
         }
       ],
       "ownership": [
-        "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim."
+        "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim.",
+        "Debug equality scratch owns the copied-left and returned difference slots plus existing exact call receipts. Returned temporary is destroyed before next element/early false; failed operations retain reached storage for scratch Close. Other source methods/whole-owner audits remain independently partial."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller."
@@ -134540,7 +134556,8 @@
       "go_targets": [
         "pkg/util/lp/permutation.go",
         "pkg/util/lp/permutation_float.go",
-        "pkg/util/lp/permutation_exact.go"
+        "pkg/util/lp/permutation_exact.go",
+        "pkg/util/lp/permutation_vector_equality_debug_test.go"
       ],
       "tests": [
         "TestLPPermutationIndependentMatrixProducts",
@@ -134564,7 +134581,10 @@
         "TestLPRationalPermutationAllDenseGuardProfiles",
         "TestLPPairPermutationAllDenseGuardProfiles",
         "TestLPRationalPermutationStoppedDestinationOwnership",
-        "TestLPPairPermutationStoppedDestinationOwnership"
+        "TestLPPairPermutationStoppedDestinationOwnership",
+        "TestLPPermutationExactVectorEqualityCopiedLeftAndEarlyReturn",
+        "TestLPPermutationExactVectorEqualityLengthAndEmpty",
+        "TestLPPermutationExactVectorEqualityPhysicalRefusals"
       ],
       "conditionals": [
         {
@@ -134753,11 +134773,22 @@
             "TestLPRationalPermutationStoppedDestinationOwnership",
             "TestLPPairPermutationStoppedDestinationOwnership"
           ]
+        },
+        {
+          "name": "retained precise vectors_are_equal binary subtraction expression and lexical per-element destruction in permutation debug validation",
+          "status": "ported",
+          "go_target": "pkg/util/lp/permutation_exact.go",
+          "tests": [
+            "TestLPPermutationExactVectorEqualityCopiedLeftAndEarlyReturn",
+            "TestLPPermutationExactVectorEqualityLengthAndEmpty",
+            "TestLPPermutationExactVectorEqualityPhysicalRefusals"
+          ]
         }
       ],
       "ownership": [
         "Native Go uint32/float64 slices replace source vector internals. Shared index algorithms are concrete unsigned operations; floating applications own separate T/X work buffers. Sparse transformations preserve source copy/clear/replace and index order, including reached invalid-domain prefixes. No generic/any-valued algebra layer or simulated slice allocation failures.",
-        "Exact T/X buffers and sparse lexical copies own concrete project numerals through existing typed indexed-vector call receipts. All scalar assignments deep-copy; stopped raw generations and physical allocations remain with the actual invoking owner. Destination sparse writes belong to their indexed vector; permutation Close cannot consume its stopped invocation. Native Go backing is uncharged and no source vector/STL adapter is ported."
+        "Exact T/X buffers and sparse lexical copies own concrete project numerals through existing typed indexed-vector call receipts. All scalar assignments deep-copy; stopped raw generations and physical allocations remain with the actual invoking owner. Destination sparse writes belong to their indexed vector; permutation Close cannot consume its stopped invocation. Native Go backing is uncharged and no source vector/STL adapter is ported.",
+        "Debug equality scratch owns the copied-left and returned difference slots plus existing exact call receipts. Returned temporary is destroyed before next element/early false; failed operations retain reached storage for scratch Close. Other source methods/whole-owner audits remain independently partial."
       ],
       "deviations": [
         "Formatting and complete LU/matrix integration remain open; no whole-unit promotion. Declaration-only shrink_by_one_identity has no source body or caller and receives no invented adapter.",
