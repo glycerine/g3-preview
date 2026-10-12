@@ -7195,7 +7195,7 @@
     },
     {
       "source": "src/util/lp/sparse_matrix.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/sparse_matrix_float.go",
         "pkg/util/lp/sparse_matrix_exact.go",
@@ -7319,7 +7319,8 @@
       ],
       "deviations": [
         "Debug --test_swaps retains shared10x10 fill and100 random attempts per helper. Despite its name, second helper calls swap_rows and TransposeRight; actual source equality fails for noncommuting exchanges. First helper TransposeLeft compensates all100 attempts. Independent dense-array/RNG oracle verifies50 seeds, exact reports/flushes, final logical matrix and draw count. Diagnostic setter stores zeros and two directions independently; source two-argument indexed_value m_other is indeterminate and never read by retained fill/Get/swap/print path. Native Other zero is an unobserved representation value, not reciprocal-link/elimination semantics; no universal or public Set adapter added. Native build erases entire debug scenario. Complete CLI execution/entry and whole-source/ownership audits remain open."
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained sparse_matrix.h declaration/inline audit for double/double and mpq/mpq or mpq/numeric_pair<mpq>: concrete typed Go matrices implement basis copy, reciprocal row/column links, permutation-adjusted queries, elimination, maximum-head ordering, active/pivot queues, eta creation, column replacement/restoration, dense/indexed triangular solves, float refinement, resize and live row/column graph traversal. The header inline permutation compositions and active predicates follow source order. Debug swap setters/diagnostics pass their separate checked tests. Unused debug checkers, uncalled template overloads, definition-only column deletion and unreachable post-return driver methods are excluded; sparse_matrix.hpp and LU/solver source units retain independent audits. Native and g3debug,g3checked focused sparse tests pass. Representative native coverage: float basis60/60, exact basis114/121, float elimination151/160, exact elimination189/209, exact pivot160/178, exact active97/103, exact eta64/68, exact indexed solve92/103 and exact dense solve116/125; checked results are similar or higher. Exact numeral cells, temporary products and stopped calls retain physical ownership; older caller comparison receipts stay borrowed."
     },
     {
       "source": "src/util/lp/sparse_matrix.hpp",
@@ -8264,10 +8265,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 77,
+    "ported": 78,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 18
+    "partial": 17
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -15208,6 +15209,26 @@
     "profiles": [
       "/mnt/oldrog/tmp/g3-lp-static-header-native.cover",
       "/mnt/oldrog/tmp/g3-lp-static-header-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+  },
+  "latest_sparse_matrix_header_whole_audit": {
+    "source_units": [
+      "src/util/lp/sparse_matrix.h"
+    ],
+    "scope": "Whole retained sparse_matrix.h declaration/inline audit for double/double and mpq/mpq or mpq/numeric_pair<mpq>: concrete typed Go matrices implement basis copy, reciprocal row/column links, permutation-adjusted queries, elimination, maximum-head ordering, active/pivot queues, eta creation, column replacement/restoration, dense/indexed triangular solves, float refinement, resize and live row/column graph traversal. The header inline permutation compositions and active predicates follow source order. Debug swap setters/diagnostics pass their separate checked tests. Unused debug checkers, uncalled template overloads, definition-only column deletion and unreachable post-return driver methods are excluded; sparse_matrix.hpp and LU/solver source units retain independent audits. Native and g3debug,g3checked focused sparse tests pass. Representative native coverage: float basis60/60, exact basis114/121, float elimination151/160, exact elimination189/209, exact pivot160/178, exact active97/103, exact eta64/68, exact indexed solve92/103 and exact dense solve116/125; checked results are similar or higher. Exact numeral cells, temporary products and stopped calls retain physical ownership; older caller comparison receipts stay borrowed.",
+    "focused_tests": [
+      "TestLPExactSparse",
+      "TestLPFloatSparse",
+      "TestLPSparse",
+      "TestLPDriverSwap",
+      "TestLPDriverSwaps"
+    ],
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-sparse-header-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-sparse-header-debug.cover"
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
