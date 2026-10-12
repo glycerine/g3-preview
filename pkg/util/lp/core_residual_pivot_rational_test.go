@@ -317,7 +317,7 @@ func TestLPRationalCoreResidualPivotGuards(t *testing.T) {
 				_, err = m.AMultXIsOff()
 				want = ErrExactVectorPending
 			case "stdout-closed":
-				closed, e := os.CreateTemp("/mnt/oldrog/tmp", "g3-rational-residual-")
+				closed, e := os.CreateTemp(t.TempDir(), "g3-rational-residual-")
 				h.must(e)
 				h.must(closed.Close())
 				old := os.Stdout

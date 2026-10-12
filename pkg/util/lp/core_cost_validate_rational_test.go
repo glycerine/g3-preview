@@ -298,7 +298,7 @@ func TestLPRationalPrintColumnInfoExactSplitAndRefusals(t *testing.T) {
 				t.Fatal("nil writer")
 			}
 			old := os.Stdout
-			closed, e := os.CreateTemp("/mnt/oldrog/tmp", "g3-closed-stdout-")
+			closed, e := os.CreateTemp(t.TempDir(), "g3-closed-stdout-")
 			h.must(e)
 			h.must(closed.Close())
 			os.Stdout = closed
@@ -539,7 +539,7 @@ func TestLPRationalCostValidatorClosedDiagnosticAndDebugGuards(t *testing.T) {
 			}
 			if strings.HasSuffix(which, "output") {
 				old := os.Stdout
-				closed, e := os.CreateTemp("/mnt/oldrog/tmp", "g3-closed-diagnostic-")
+				closed, e := os.CreateTemp(t.TempDir(), "g3-closed-diagnostic-")
 				h.must(e)
 				h.must(closed.Close())
 				os.Stdout = closed

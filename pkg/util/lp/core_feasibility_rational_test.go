@@ -89,7 +89,7 @@ func TestLPRationalFeasibilityDiagnosticsAndGuards(t *testing.T) {
 				f.types[1] = ColumnLowBound
 				h.must(h.m.SetInt32(&f.x.Data[1], -1))
 				if phase == "closed-stdout" {
-					closed, e := os.CreateTemp("/mnt/oldrog/tmp", "g3-feasibility-closed-")
+					closed, e := os.CreateTemp(t.TempDir(), "g3-feasibility-closed-")
 					h.must(e)
 					h.must(closed.Close())
 					old := os.Stdout

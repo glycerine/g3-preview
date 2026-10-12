@@ -186,7 +186,7 @@ func TestLPPairCoreResidualGuardsAndClosedStdout(t *testing.T) {
 		var off bool
 		var err error
 		if op == "closed-output" {
-			closed, e := os.CreateTemp("/mnt/oldrog/tmp", "g3-residual-closed-")
+			closed, e := os.CreateTemp(t.TempDir(), "g3-residual-closed-")
 			h.must(e)
 			h.must(closed.Close())
 			old := os.Stdout

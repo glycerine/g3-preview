@@ -176,7 +176,7 @@ func TestLARScopeValidatorMetadataAndStoppedGuards(t *testing.T) {
 			case "inf-stdout":
 				h.must(c.RPrimal.InfSet.Insert(2))
 				old := os.Stdout
-				closed, e := os.CreateTemp("/mnt/oldrog/tmp", "g3-closed-inf-")
+				closed, e := os.CreateTemp(t.TempDir(), "g3-closed-inf-")
 				h.must(e)
 				h.must(closed.Close())
 				os.Stdout = closed
