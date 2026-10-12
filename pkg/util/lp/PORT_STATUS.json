@@ -11456,5 +11456,31 @@
     ],
     "full_registered_run_verified": false,
     "whole_unit_promotion": false
+  },
+  "running_pair_benchmark_checkpoint": {
+    "status": "running",
+    "commit": "dada87f0",
+    "started_utc": "2026-10-12 01:13:47 UTC",
+    "runner_pid": 2,
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "./util/lp",
+      "-run",
+      "^$",
+      "-bench",
+      "^BenchmarkLPPairSource1000000$",
+      "-benchtime=1x",
+      "-count=1",
+      "-timeout=120m"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-lp-pair-benchmark-full-native.log",
+    "status_file": "/mnt/oldrog/tmp/g3-lp-pair-benchmark-full-native.json",
+    "scope": "Actual numeric-pair source benchmark1000000 outer iterations/10000000products; independent exact result and successful owner cleanup required. Not a full module test.",
+    "go_pid": 5,
+    "actual_exec_session": 70865,
+    "completion_verified": false
   }
 }
