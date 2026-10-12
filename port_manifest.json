@@ -34616,7 +34616,9 @@
         "pkg/math/subpaving/fast_interval_mul.go",
         "pkg/math/subpaving/fast_interval_mul_test.go",
         "pkg/math/subpaving/fast_interval_div.go",
-        "pkg/math/subpaving/fast_interval_div_test.go"
+        "pkg/math/subpaving/fast_interval_div_test.go",
+        "pkg/math/subpaving/fast_interval_scalar.go",
+        "pkg/math/subpaving/fast_interval_scalar_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34627,7 +34629,8 @@
         "TestSubpavingFastMutableIntervalRetainedCore",
         "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingFastIntervalMulSignClasses",
-        "TestSubpavingFastIntervalDivSignBranches"
+        "TestSubpavingFastIntervalDivSignBranches",
+        "TestSubpavingFastIntervalScalarMulDiv"
       ],
       "conditionals": [
         {
@@ -34729,7 +34732,9 @@
         "pkg/math/subpaving/fast_interval_mul.go",
         "pkg/math/subpaving/fast_interval_mul_test.go",
         "pkg/math/subpaving/fast_interval_div.go",
-        "pkg/math/subpaving/fast_interval_div_test.go"
+        "pkg/math/subpaving/fast_interval_div_test.go",
+        "pkg/math/subpaving/fast_interval_scalar.go",
+        "pkg/math/subpaving/fast_interval_scalar_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34745,7 +34750,8 @@
         "TestSubpavingFastMutableIntervalRetainedCore",
         "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingFastIntervalMulSignClasses",
-        "TestSubpavingFastIntervalDivSignBranches"
+        "TestSubpavingFastIntervalDivSignBranches",
+        "TestSubpavingFastIntervalScalarMulDiv"
       ],
       "conditionals": [
         {
@@ -35232,6 +35238,14 @@
           "go_target": "pkg/math/subpaving/fast_interval_div.go",
           "tests": [
             "TestSubpavingFastIntervalDivSignBranches"
+          ]
+        },
+        {
+          "name": "Concrete mpff interval scalar multiply/divide: zero reset, signed bound reversal, directed scalar reciprocal and destination alias (src/math/interval/interval_def.h:839-925)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_interval_scalar.go",
+          "tests": [
+            "TestSubpavingFastIntervalScalarMulDiv"
           ]
         }
       ],
@@ -49972,13 +49986,16 @@
         "pkg/math/subpaving/fast_interval_mul.go",
         "pkg/math/subpaving/fast_interval_mul_test.go",
         "pkg/math/subpaving/fast_interval_div.go",
-        "pkg/math/subpaving/fast_interval_div_test.go"
+        "pkg/math/subpaving/fast_interval_div_test.go",
+        "pkg/math/subpaving/fast_interval_scalar.go",
+        "pkg/math/subpaving/fast_interval_scalar_test.go"
       ],
       "tests": [
         "TestSubpavingFastMutableIntervalRetainedCore",
         "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingFastIntervalMulSignClasses",
-        "TestSubpavingFastIntervalDivSignBranches"
+        "TestSubpavingFastIntervalDivSignBranches",
+        "TestSubpavingFastIntervalScalarMulDiv"
       ],
       "conditionals": [
         {
@@ -50126,7 +50143,9 @@
         "pkg/math/subpaving/fast_interval_mul.go",
         "pkg/math/subpaving/fast_interval_mul_test.go",
         "pkg/math/subpaving/fast_interval_div.go",
-        "pkg/math/subpaving/fast_interval_div_test.go"
+        "pkg/math/subpaving/fast_interval_div_test.go",
+        "pkg/math/subpaving/fast_interval_scalar.go",
+        "pkg/math/subpaving/fast_interval_scalar_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50160,7 +50179,8 @@
         "TestSubpavingFastMutableIntervalRetainedCore",
         "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingFastIntervalMulSignClasses",
-        "TestSubpavingFastIntervalDivSignBranches"
+        "TestSubpavingFastIntervalDivSignBranches",
+        "TestSubpavingFastIntervalScalarMulDiv"
       ],
       "conditionals": [
         {
