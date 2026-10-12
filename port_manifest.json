@@ -164264,11 +164264,28 @@
       "status": "unported",
       "go_targets": [],
       "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "set_timeout: replace process-global scoped_timer and its owning event handler",
+          "status": "unported"
+        },
+        {
+          "name": "register_on_timeout_proc: replace borrowed process-global callback",
+          "status": "unported"
+        },
+        {
+          "name": "g_timeout_eh::operator(): print, set caller, invoke callback, delete timer, clear pointer, throw timeout error",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "g_timeout owns one replaceable scoped_timer, which owns a newly allocated g_timeout_eh. g_on_timeout borrows a function pointer. On timeout, the handler writes to process stdout, invokes the borrowed callback, deletes and nulls the global timer, then throws ERR_TIMEOUT. The shell frontends install callbacks; shell/main.cpp sets the timer. No Go shell/process owner currently binds these globals."
+      ],
+      "deviations": [
+        "The existing util/control.ScopedTimer implements a lower timer mechanism but does not implement these process-global timeout controls or shell callback/output/error ordering. Port a concrete shell-owned service with the shell consumers; do not credit the lower timer as timeout.cpp."
+      ]
     },
     {
       "path": "src/util/timeout.h",
@@ -164287,11 +164304,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "set_timeout(long)",
+          "status": "unported"
+        },
+        {
+          "name": "register_on_timeout_proc(void (*)())",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Both declarations mutate process-global state defined in timeout.cpp. The callback is borrowed; the timer and its event handler are owned by the global timeout slot."
+      ],
+      "deviations": [
+        "Production direct callers are shell/main.cpp and the shell frontends; cnf_backbones.cpp is a test caller. The header remains unported until its concrete shell users are ported."
+      ]
     },
     {
       "path": "src/util/timer.cpp",

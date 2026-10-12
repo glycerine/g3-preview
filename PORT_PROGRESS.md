@@ -39616,3 +39616,15 @@ the outer callback is restored before it resumes and that the original plugin
 path is restored after an error. This selected live template instantiation is
 credited as ported; no generic Go `flet` or unused source specialization is
 added. Other `util.h` uses and the whole header remain partial.
+
+### Shell timeout ownership audit
+
+`src/util/timeout.h/.cpp` are audited but remain unported. The production callers
+are `src/shell/main.cpp` and the shell frontends; `src/test/cnf_backbones.cpp`
+is test-only. The source owns a replaceable process-global `scoped_timer` and
+event handler, borrows a process-global timeout callback, and on expiry writes
+`timeout\n`, records the caller, invokes the callback, deletes/nulls the timer,
+then throws `ERR_TIMEOUT`. `pkg/util/control.ScopedTimer` covers the lower timer
+mechanism but does not implement this shell-facing global sequence. The manifest
+now records each unported operation and ownership edge so the shell consumer
+port can implement one concrete service without a generic global adapter.
