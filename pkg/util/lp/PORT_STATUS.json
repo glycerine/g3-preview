@@ -4635,7 +4635,7 @@
     },
     {
       "source": "src/util/lp/lp_settings.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/types.go",
         "pkg/util/lp/settings.go",
@@ -4739,7 +4739,9 @@
         "TestLPSettingsBorrowedLimitAndContinuingDefaultTimer",
         "TestLPSettingsIndependentRandomOwnersAndReseeding",
         "TestLPSettingsAllToleranceFieldsRemainLive",
-        "TestLPSettingsDefaultTimerRestartFailureRetainsElapsed"
+        "TestLPSettingsDefaultTimerRestartFailureRetainsElapsed",
+        "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
+        "TestLPFloatScalerSourceStopsAndPrefixes"
       ],
       "ownership": [
         "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim.",
@@ -4747,6 +4749,22 @@
         "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json.",
         "Native Go string tables snapshot all numeric matrix cells before output. String-table printing borrows slice headers by value and rereads live cell strings after padding. Widths/temporary rows are native scalar/string storage, without numerical arena roots or C++ STL representations.",
         "Settings default timer continues while a borrowed resource provider is selected; provider replacement observes live state and transports its bool/error without clock reads. Returning to the Go nil-selected default does not restart its watch. Running queries stop/start; restart failure preserves stopped elapsed prefix. Independent settings objects own distinct RNG streams, reseeding one does not affect another."
+      ],
+      "retained_source_audit_evidence": "Whole retained lp_settings.h declaration, service, helper and ownership audit: source enum/status values and asymmetric spelling/parser, all settings defaults and strategy/tolerance predicates, borrowed resource limit and default process timer, independent random generator, stats reset, output streams and LP_OUT publication are represented. Live ratio_of_index_size_to_all_size constants select float/exact LU routes. max_abs_in_vector participates in floating primal cost normalization; print_blanks in live matrix debug output; ensure_increasing in static/sparse pivot indexes; precise val_is_smaller_than_eps and exact pair T_to_string retain their source paths. The vectors_are_equal bodies belong to the separately audited lp_settings.hpp. Debug D and ddd have no retained caller; dead pretty-printer internals do not create a consumer. Native/checked settings, enum, float-primal/scaler, driver settings and debug-matrix tests pass. Current focused coverage is settings.go26/27 and types.go32/32 in both builds; the uncovered settings statement is delegated stopwatch-construction failure. Containing solver, matrix, MPS and CLI whole-source audits remain separate.",
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "D",
+            "lp_settings::ddd"
+          ],
+          "reason": "Whole-src scan finds no retained call to D or read/write of the debug-only ddd field."
+        },
+        {
+          "source_methods": [
+            "core_solver_pretty_printer-only print_blanks calls"
+          ],
+          "reason": "The pretty_print wrapper has no retained dynamic caller; live matrix diagnostic print_blanks calls are implemented and tested."
+        }
       ]
     },
     {
@@ -8237,10 +8255,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 71,
+    "ported": 72,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 24
+    "partial": 23
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -14982,5 +15000,57 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_suite_qualification": "Latest completed full native55b06c96 predates this audit and previous lifetime corrections; focused native/debug and portcheck evidence is separate."
+  },
+  "latest_lp_settings_h_retained_audit": {
+    "scope": "Whole retained lp_settings.h declaration, service, helper and ownership audit: source enum/status values and asymmetric spelling/parser, all settings defaults and strategy/tolerance predicates, borrowed resource limit and default process timer, independent random generator, stats reset, output streams and LP_OUT publication are represented. Live ratio_of_index_size_to_all_size constants select float/exact LU routes. max_abs_in_vector participates in floating primal cost normalization; print_blanks in live matrix debug output; ensure_increasing in static/sparse pivot indexes; precise val_is_smaller_than_eps and exact pair T_to_string retain their source paths. The vectors_are_equal bodies belong to the separately audited lp_settings.hpp. Debug D and ddd have no retained caller; dead pretty-printer internals do not create a consumer. Native/checked settings, enum, float-primal/scaler, driver settings and debug-matrix tests pass. Current focused coverage is settings.go26/27 and types.go32/32 in both builds; the uncovered settings statement is delegated stopwatch-construction failure. Containing solver, matrix, MPS and CLI whole-source audits remain separate.",
+    "source_units": [
+      "src/util/lp/lp_settings.h"
+    ],
+    "go_targets": [
+      "pkg/util/lp/settings.go",
+      "pkg/util/lp/types.go",
+      "pkg/util/lp/primal_core_float.go",
+      "pkg/util/lp/matrix_float_debug_print.go",
+      "pkg/util/lp/driver_settings.go"
+    ],
+    "focused_tests": [
+      "TestLPSettings",
+      "TestLPDriverSettings",
+      "TestLPSource",
+      "TestLPDebugMatrixPrint",
+      "TestLPFloatPrimalCore",
+      "TestLPFloatScaler"
+    ],
+    "combined_current_go_file_coverage": {
+      "native": {
+        "settings.go": [
+          26,
+          27
+        ],
+        "types.go": [
+          32,
+          32
+        ]
+      },
+      "debug": {
+        "settings.go": [
+          26,
+          27
+        ],
+        "types.go": [
+          32,
+          32
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-settings-h-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-settings-h-whole-debug.cover",
+      "/mnt/oldrog/tmp/g3-lp-settings-enums-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-settings-enums-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Latest completed full native55b06c96 predates this audit and recent lifetime corrections; focused native/debug and portcheck evidence is separate."
   }
 }
