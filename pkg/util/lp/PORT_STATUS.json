@@ -6075,11 +6075,14 @@
     },
     {
       "source": "src/util/lp/sparse_vector.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/sparse_float_vector.go",
         "pkg/util/lp/sparse_rational_vector.go",
-        "pkg/util/lp/exact_eta_calls.go"
+        "pkg/util/lp/exact_eta_calls.go",
+        "pkg/util/lp/sparse_rational_vector_test.go",
+        "pkg/util/lp/eta_matrix_exact.go",
+        "pkg/util/lp/row_eta_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -6092,8 +6095,11 @@
         "TestLPSparseRationalVectorLiteralAliasesAndZero",
         "TestLPSparseRationalVectorAllocationFailureCensus",
         "TestLPSparseRationalVectorLeavesOlderDivisionOwned",
-        "TestLPExactEtaCallsRetainedIntegerDivision"
-      ]
+        "TestLPExactEtaCallsRetainedIntegerDivision",
+        "TestLPExactEtaIndependentMatrixProducts",
+        "TestLPExactRowEtaIndependentMatrixProducts"
+      ],
+      "audit_note": "Whole retained-source/ownership audit completes sparse_vector.h for actual double/mpq coefficient storage in eta and row-eta matrices; rational-pair solver coefficients remain mpq. Whole no-ignore scan finds only those two template members. Existing concrete implementations preserve insertion order, duplicates, explicit zeros, first-match debug value lookup, size and reference-divisor mutation order. Exact append owns the value parameter, pair temporary and stored copy; owning Close releases failed append/call receipts and published coefficients. Native storage uses Go slices. Expanded TestLPSparseRationalVectorAllocationFailureCensus to both pooled and direct allocation: ten append/lookup/divide/negative-divide/aliased-divide physical campaigns through success, unfinished-publication checks, stopped-owner guards, retained alias temporary and exact named-cell/direct-block cleanup census. Independent rational oracle, literal aliases/tiny-exact/zero divisor, older division ownership and real eta/row-eta matrix products pass native10.063s/combined11.244s. Float body11/12statements91.7% native,12/12100% combined; rational54/6287.1% native,55/6288.7% combined; seven combined gaps guard delegated begin/IsZero/destructor failures. Both LP vets pass. No production changes or unused template adapters. LP inventory23ported/72partial/10reference_only/3dead_deleted/2platform_replacement. Full native8f2961ca predates this expanded test; existing production bodies unchanged. Profiles /mnt/oldrog/tmp/g3-lp-sparse-vector-audit-{native,debug}.cover; source audit /mnt/oldrog/tmp/g3-lp-sparse-vector-consumers-audit.txt (26 references). CPUs8\u201316/GOMAXPROCS9 retained."
     },
     {
       "source": "src/util/lp/square_dense_submatrix.h",
@@ -6702,8 +6708,8 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "partial": 73,
-    "ported": 22,
+    "partial": 72,
+    "ported": 23,
     "reference_only": 10,
     "dead_deleted": 3
   },
@@ -12036,5 +12042,28 @@
       3,
       3
     ]
+  },
+  "latest_sparse_vector_support_audit": {
+    "summary": "Whole retained-source/ownership audit completes sparse_vector.h for actual double/mpq coefficient storage in eta and row-eta matrices; rational-pair solver coefficients remain mpq. Whole no-ignore scan finds only those two template members. Existing concrete implementations preserve insertion order, duplicates, explicit zeros, first-match debug value lookup, size and reference-divisor mutation order. Exact append owns the value parameter, pair temporary and stored copy; owning Close releases failed append/call receipts and published coefficients. Native storage uses Go slices. Expanded TestLPSparseRationalVectorAllocationFailureCensus to both pooled and direct allocation: ten append/lookup/divide/negative-divide/aliased-divide physical campaigns through success, unfinished-publication checks, stopped-owner guards, retained alias temporary and exact named-cell/direct-block cleanup census. Independent rational oracle, literal aliases/tiny-exact/zero divisor, older division ownership and real eta/row-eta matrix products pass native10.063s/combined11.244s. Float body11/12statements91.7% native,12/12100% combined; rational54/6287.1% native,55/6288.7% combined; seven combined gaps guard delegated begin/IsZero/destructor failures. Both LP vets pass. No production changes or unused template adapters. LP inventory23ported/72partial/10reference_only/3dead_deleted/2platform_replacement. Full native8f2961ca predates this expanded test; existing production bodies unchanged. Profiles /mnt/oldrog/tmp/g3-lp-sparse-vector-audit-{native,debug}.cover; source audit /mnt/oldrog/tmp/g3-lp-sparse-vector-consumers-audit.txt (26 references). CPUs8\u201316/GOMAXPROCS9 retained.",
+    "native_statement_coverage": {
+      "float": [
+        11,
+        12
+      ],
+      "rational": [
+        54,
+        62
+      ]
+    },
+    "combined_statement_coverage": {
+      "float": [
+        12,
+        12
+      ],
+      "rational": [
+        55,
+        62
+      ]
+    }
   }
 }

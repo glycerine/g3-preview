@@ -106,78 +106,85 @@ func TestLPSparseRationalVectorLiteralAliasesAndZero(t *testing.T) {
 }
 
 func TestLPSparseRationalVectorAllocationFailureCensus(t *testing.T) {
-	for _, op := range []string{"append", "lookup", "divide", "negative-divide", "alias-divide"} {
-		failures, successes, rawStops := 0, 0, 0
-		for ordinal := int64(0); ordinal < 150; ordinal++ {
-			done := false
-			t.Run(fmt.Sprintf("%s/%d", op, ordinal), func(t *testing.T) {
-				h := newLPPairHarness(t)
-				p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/13")
-				if op == "negative-divide" {
-					h.must(h.m.Neg(&p.X))
-				}
-				out := h.pair("0", "0")
-				v := NewSparseRationalVector(h.m)
-				t.Cleanup(func() { h.budget.FailAfter(-1); h.must(v.Close()) })
-				if op != "append" {
-					h.must(v.Append(1, &p.X))
-					h.must(v.Append(3, &p.Y))
-				}
-				h.budget.FailAfter(ordinal)
-				var err error
-				switch op {
-				case "append":
-					err = v.Append(7, &p.X)
-				case "lookup":
-					err = v.At(1, &out.X)
-				case "divide", "negative-divide":
-					err = v.Divide(&p.Y)
-				case "alias-divide":
-					err = v.Divide(&v.Data[0].Value)
-				}
-				h.budget.FailAfter(-1)
-				if err == nil {
-					successes++
-					done = true
-				} else {
-					if !lpExactPriorityPhysicalRefusal(err) {
-						t.Fatal(err)
+	for _, direct := range []bool{false, true} {
+		for _, op := range []string{"append", "lookup", "divide", "negative-divide", "alias-divide"} {
+			failures, successes, rawStops := 0, 0, 0
+			for ordinal := int64(0); ordinal < 150; ordinal++ {
+				done := false
+				t.Run(fmt.Sprintf("direct=%v/%s/%d", direct, op, ordinal), func(t *testing.T) {
+					var h *lpPairHarness
+					if direct {
+						h = lpNewDirectSparseHarness(t)
+					} else {
+						h = newLPPairHarness(t)
 					}
-					failures++
-					if op == "append" && v.Size() != 0 {
-						t.Fatal("published incomplete coefficient")
+					p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/13")
+					if op == "negative-divide" {
+						h.must(h.m.Neg(&p.X))
 					}
-				}
-				if v.calls.division != 0 {
-					rawStops++
-				}
-				if v.ready() != nil {
-					if e := v.Append(9, &p.X); e != ErrExactVectorPending {
-						t.Fatal(e)
+					out := h.pair("0", "0")
+					v := NewSparseRationalVector(h.m)
+					t.Cleanup(func() { h.budget.FailAfter(-1); h.must(v.Close()) })
+					if op != "append" {
+						h.must(v.Append(1, &p.X))
+						h.must(v.Append(3, &p.Y))
 					}
-					if e := v.At(1, &out.X); e != ErrExactVectorPending {
-						t.Fatal(e)
+					h.budget.FailAfter(ordinal)
+					var err error
+					switch op {
+					case "append":
+						err = v.Append(7, &p.X)
+					case "lookup":
+						err = v.At(1, &out.X)
+					case "divide", "negative-divide":
+						err = v.Divide(&p.Y)
+					case "alias-divide":
+						err = v.Divide(&v.Data[0].Value)
 					}
-					if e := v.Divide(&p.Y); e != ErrExactVectorPending {
-						t.Fatal(e)
+					h.budget.FailAfter(-1)
+					if err == nil {
+						successes++
+						done = true
+					} else {
+						if !lpExactPriorityPhysicalRefusal(err) {
+							t.Fatal(err)
+						}
+						failures++
+						if op == "append" && v.Size() != 0 {
+							t.Fatal("published incomplete coefficient")
+						}
 					}
+					if v.calls.division != 0 {
+						rawStops++
+					}
+					if v.ready() != nil {
+						if e := v.Append(9, &p.X); e != ErrExactVectorPending {
+							t.Fatal(e)
+						}
+						if e := v.At(1, &out.X); e != ErrExactVectorPending {
+							t.Fatal(e)
+						}
+						if e := v.Divide(&p.Y); e != ErrExactVectorPending {
+							t.Fatal(e)
+						}
+					}
+					h.must(v.Close())
+					h.must(v.Close())
+					lpExactVectorNamedCensus(t, h, nil)
+					if h.m.DivisionInvocationState().Active || h.m.RawInvocationState().Active != [3]bool{} {
+						t.Fatal("orphan numeral frame")
+					}
+				})
+				if done {
+					break
 				}
-				h.must(v.Close())
-				h.must(v.Close())
-				lpExactVectorNamedCensus(t, h, nil)
-				if h.m.DivisionInvocationState().Active || h.m.RawInvocationState().Active != [3]bool{} {
-					t.Fatal("orphan numeral frame")
-				}
-			})
-			if done {
-				break
 			}
-		}
-		if failures == 0 || successes != 1 {
-			t.Fatal(op, failures, successes)
-		}
-		if op == "alias-divide" && rawStops == 0 {
-			t.Fatal("no retained alias temporary exercised")
+			if failures == 0 || successes != 1 {
+				t.Fatal(op, failures, successes)
+			}
+			if op == "alias-divide" && rawStops == 0 {
+				t.Fatal("no retained alias temporary exercised")
+			}
 		}
 	}
 }
