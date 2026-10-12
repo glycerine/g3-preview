@@ -83783,14 +83783,17 @@
         "pkg/smtcore/smt_model_finder_hint_cycle.go",
         "pkg/smtcore/smt_model_finder_hint_cycle_test.go",
         "pkg/smtcore/smt_model_finder_hint_indexes.go",
-        "pkg/smtcore/smt_model_finder_hint_indexes_test.go"
+        "pkg/smtcore/smt_model_finder_hint_indexes_test.go",
+        "pkg/smtcore/smt_model_finder_hint_greedy.go",
+        "pkg/smtcore/smt_model_finder_hint_greedy_test.go"
       ],
       "tests": [
         "TestModelFinderScopedQuantifierSetTrailsAndEvents",
         "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
         "TestModelFinderHintSatisfiedResidueSourceScopeTransitions",
         "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations",
-        "TestModelFinderHintPreprocessIndexesAndResidueCandidates"
+        "TestModelFinderHintPreprocessIndexesAndResidueCandidates",
+        "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"
       ],
       "assertions": [
         {
@@ -84226,13 +84229,21 @@
           "tests": [
             "TestModelFinderHintPreprocessIndexesAndResidueCandidates"
           ]
+        },
+        {
+          "name": "hint_solver greedy function/definition and residue recursion, process(func_decl*) entry and depth-ten cutoff",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_greedy.go",
+          "tests": [
+            "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"
+          ]
         }
       ],
       "ownership": [
         "The scoped sets borrow quantifier handles; the satisfied-set undo callback clears the corresponding quantifier_info choice before each reverse set edit."
       ],
       "deviations": [
-        "The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback, selected-definition cycle check, iterative candidate filtering and Q_f/Q_f_def indexes are ported with borrowed AST handles. Full quantifier_info and cond_macro ownership, greedy search and broader model-finder algorithms remain open."
+        "The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback, selected-definition cycle check, iterative candidate filtering, Q_f/Q_f_def indexes and bounded greedy search are ported with borrowed AST handles. Full quantifier_info and cond_macro ownership, interpretation publication and broader model-finder algorithms remain open."
       ]
     },
     {
@@ -112355,17 +112366,20 @@
       "path": "src/util/backtrackable_set.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_model_finder_quantifier_set.go",
         "pkg/smtcore/smt_model_finder_quantifier_set_test.go",
         "pkg/smtcore/smt_model_finder_hint_search.go",
-        "pkg/smtcore/smt_model_finder_hint_search_test.go"
+        "pkg/smtcore/smt_model_finder_hint_search_test.go",
+        "pkg/smtcore/smt_model_finder_hint_greedy.go",
+        "pkg/smtcore/smt_model_finder_hint_greedy_test.go"
       ],
       "tests": [
         "TestModelFinderScopedQuantifierSetTrailsAndEvents",
         "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
-        "TestModelFinderHintSatisfiedResidueSourceScopeTransitions"
+        "TestModelFinderHintSatisfiedResidueSourceScopeTransitions",
+        "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"
       ],
       "conditionals": [
         {
@@ -112392,12 +112406,13 @@
       "methods": [
         {
           "name": "concrete SMT model-finder quantifier sets: insert, erase, contains, empty, scope push/pop, reset and borrowed iteration snapshot",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_quantifier_set.go",
           "tests": [
             "TestModelFinderScopedQuantifierSetTrailsAndEvents",
             "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
-            "TestModelFinderHintSatisfiedResidueSourceScopeTransitions"
+            "TestModelFinderHintSatisfiedResidueSourceScopeTransitions",
+            "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"
           ]
         }
       ],
@@ -112405,7 +112420,7 @@
         "The sets borrow quantifier AST handles. Scoped edits trail values without retaining AST references; pop invokes the satisfied-set event handler before reversing each edit, in last-in-first-out order. Reset drops scopes and trails without invoking undo callbacks."
       ],
       "deviations": [
-        "A concrete Go map and typed undo slices replace the source quantifier-pointer hashtable and vectors. The hint solver's satisfied/residue transition now binds the undo callback to its chosen-function state; macro indexes, quantifier_info ownership and greedy search remain open. Source level-zero erase calls insert and is preserved; the actual model-finder erase call is scoped."
+        "The only retained production instantiations are hint_solver's residue and satisfied quantifier sets. Native Go maps and typed undo slices implement their full operations, including the chosen-function callback and nested greedy branch rollback. Source level-zero erase calls insert and is preserved; the actual model-finder erase call is scoped. Full model-finder ownership and output remain separate unfinished source units."
       ]
     },
     {
