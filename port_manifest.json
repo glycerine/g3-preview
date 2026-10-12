@@ -49867,7 +49867,9 @@
         "pkg/math/subpaving/fixed_context_propagate_test.go",
         "pkg/math/subpaving/fixed_context_recent_test.go",
         "pkg/math/subpaving/fixed_split.go",
-        "pkg/math/subpaving/fixed_split_test.go"
+        "pkg/math/subpaving/fixed_split_test.go",
+        "pkg/math/subpaving/fixed_selector.go",
+        "pkg/math/subpaving/fixed_selector_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -49895,7 +49897,9 @@
         "TestSubpavingFixedContextRecentChildRejectsChangedParentTrail",
         "TestSubpavingFixedMidpointSourceCasesAndNoInterior",
         "TestSubpavingFixedMidpointChildrenPropagateDefinition",
-        "TestSubpavingFixedMidpointIntegerChildNormalization"
+        "TestSubpavingFixedMidpointIntegerChildNormalization",
+        "TestSubpavingFixedRoundRobinSourceDecisionAndDefinitionSkip",
+        "TestSubpavingFixedRoundRobinSingletonAndUndecidedChild"
       ],
       "conditionals": [
         {
@@ -50018,7 +50022,9 @@
         "pkg/math/subpaving/fixed_context_propagate_test.go",
         "pkg/math/subpaving/fixed_context_recent_test.go",
         "pkg/math/subpaving/fixed_split.go",
-        "pkg/math/subpaving/fixed_split_test.go"
+        "pkg/math/subpaving/fixed_split_test.go",
+        "pkg/math/subpaving/fixed_selector.go",
+        "pkg/math/subpaving/fixed_selector_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50041,7 +50047,9 @@
         "TestSubpavingFixedContextRecentChildRejectsChangedParentTrail",
         "TestSubpavingFixedMidpointSourceCasesAndNoInterior",
         "TestSubpavingFixedMidpointChildrenPropagateDefinition",
-        "TestSubpavingFixedMidpointIntegerChildNormalization"
+        "TestSubpavingFixedMidpointIntegerChildNormalization",
+        "TestSubpavingFixedRoundRobinSourceDecisionAndDefinitionSkip",
+        "TestSubpavingFixedRoundRobinSingletonAndUndecidedChild"
       ],
       "assertions": [
         {

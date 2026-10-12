@@ -16,6 +16,7 @@ type FixedBound struct {
 	variable  uint32
 	lower     bool
 	open      bool
+	decision  bool
 	prev      *FixedBound
 	timestamp uint64
 }

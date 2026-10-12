@@ -259,6 +259,7 @@ func (c *FixedContext) publishBound(n *FixedNode, variable uint32, value *numera
 	}
 	b := n.trail
 	b.timestamp = c.timestamp
+	b.decision = !enqueue
 	if enqueue {
 		c.queue = append(c.queue, b)
 	}
