@@ -9,7 +9,7 @@ import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func TestASTModelValueNameInlineAndOverflowAccounting(t *testing.T) {
+func TestASTModelValueNameNativeBytesAndWarmBudget(t *testing.T) {
 	m := astTestManager(t)
 	name := astTestSymbol(t, m, "S")
 	want, e := m.modelValueName(name, -2147483648)
@@ -25,21 +25,26 @@ func TestASTModelValueNameInlineAndOverflowAccounting(t *testing.T) {
 	var failure error
 	n := testing.AllocsPerRun(100, func() { got, failure = m.modelValueName(name, -2147483648) })
 	m.BudgetField.FailAfter(-1)
-	if failure != nil || got != want || n != 1 || m.BudgetField.Used() != before {
-		t.Fatal("inline64 warmed model name", got, failure, n, m.BudgetField.Used(), before)
+	if failure != nil || got != want || n > 2 || m.BudgetField.Used() != before {
+		t.Fatal("warmed model name", got, failure, n, m.BudgetField.Used(), before)
 	}
 	long := astTestSymbol(t, m, strings.Repeat("q", 130))
+	longName, e := m.modelValueName(long, 0)
+	astTestMust(t, e)
+	longText, e := m.Symbols.String(longName)
+	astTestMust(t, e)
+	if longText != strings.Repeat("q", 130)+"!val!0" {
+		t.Fatal("long model name", longText)
+	}
 	before = m.BudgetField.Used()
 	qBefore, e := m.numerals.Stats()
 	astTestMust(t, e)
-	// The first 64→128 overflow allocation succeeds; 128→256 fails.
-	// Its lexical buffer must be destroyed before this operation returns.
-	m.BudgetField.FailAfter(1)
-	_, e = m.modelValueName(long, 0)
+	m.BudgetField.FailAfter(0)
+	got, e = m.modelValueName(long, 0)
 	m.BudgetField.FailAfter(-1)
 	qAfter, statsError := m.numerals.Stats()
-	if !errors.Is(e, arena.ErrInjectedFailure) || m.BudgetField.Used() != before || statsError != nil || qAfter != qBefore {
-		t.Fatal("overflow buffer failure cleanup", e, m.BudgetField.Used(), before)
+	if e != nil || got != longName || m.BudgetField.Used() != before || statsError != nil || qAfter != qBefore {
+		t.Fatal("native byte scratch charged the arena", got, e, m.BudgetField.Used(), before)
 	}
 }
 

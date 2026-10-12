@@ -9730,7 +9730,7 @@
         "TestASTMarkRefFastCallbacksAndFailurePrefix",
         "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
         "TestASTMetadataIgnoredFields",
-        "TestASTModelValueNameInlineAndOverflowAccounting",
+        "TestASTModelValueNameNativeBytesAndWarmBudget",
         "TestASTNamedNodeFieldsAndSortNullInfoPredicates",
         "TestASTParameterDoubleHashSourceDomain",
         "TestASTPayloadArithmeticFiniteBoundaries",
@@ -10544,7 +10544,7 @@
             "TestASTAllEagerPluginBranches",
             "TestASTBasicCacheNativeGrowthPreservesEntriesAndZeroGaps",
             "TestASTBuiltinValueAndDefaultPluginPolicies",
-            "TestASTModelValueNameInlineAndOverflowAccounting",
+            "TestASTModelValueNameNativeBytesAndWarmBudget",
             "TestASTSymbolBytesGrowthBeforeDuplicateAndActualGraph",
             "TestASTSymbolBytesInputOwnsSpellingAndWarmLongHit"
           ],
@@ -10986,7 +10986,7 @@
         "TestASTMarkRefFastCallbacksAndFailurePrefix",
         "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
         "TestASTMetadataIgnoredFields",
-        "TestASTModelValueNameInlineAndOverflowAccounting",
+        "TestASTModelValueNameNativeBytesAndWarmBudget",
         "TestASTNamedNodeFieldsAndSortNullInfoPredicates",
         "TestASTParameterDoubleHashSourceDomain",
         "TestASTPayloadArithmeticFiniteBoundaries",
@@ -11535,7 +11535,7 @@
             "TestASTAllEagerPluginBranches",
             "TestASTBasicCacheNativeGrowthPreservesEntriesAndZeroGaps",
             "TestASTBuiltinValueAndDefaultPluginPolicies",
-            "TestASTModelValueNameInlineAndOverflowAccounting",
+            "TestASTModelValueNameNativeBytesAndWarmBudget",
             "TestASTSymbolBytesGrowthBeforeDuplicateAndActualGraph",
             "TestASTSymbolBytesInputOwnsSpellingAndWarmLongHit"
           ],
@@ -163750,7 +163750,7 @@
       ],
       "tests": [
         "TestASTFreshFuncDeclNullAndSuffixSourceNames",
-        "TestASTModelValueNameInlineAndOverflowAccounting"
+        "TestASTModelValueNameNativeBytesAndWarmBudget"
       ],
       "conditionals": [
         {
@@ -163800,9 +163800,18 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Retained AST model-value string_buffer<64> name construction and C-string interning use bytes.Buffer",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_core_symbols.go",
+          "tests": [
+            "TestASTModelValueNameNativeBytesAndWarmBudget"
+          ]
+        }
+      ],
       "ownership": [
-        "Retained Go consumers own their concrete native buffer directly: AST fresh declarations use a local bytes.Buffer, symbol text uses strconv, and AST model-value names use a local byte slice with a 64-byte inline array and charged overflow because that caller's source failure prefix is observable. No shared string_buffer owner or template implementation is retained. The unused util/text.Buffer wrapper and its tests were deleted earlier."
+        "Retained Go consumers own their concrete native buffer directly: AST fresh declarations and model-value names use local bytes.Buffer values, while symbol text uses strconv. AST model-value name scratch is not charged to the arena; its borrowed symbol read and terminating C-string interning order remain. No shared string_buffer owner or template implementation is retained. The unused util/text.Buffer wrapper and its tests were deleted earlier."
       ],
       "deviations": [
         "Platform replacement of the buffer primitive only. Source-specific naming, integer formatting, C-string termination and failure ordering remain obligations of each retained caller; this disposition does not port unrelated AST, SMT, shell or test-driver algorithms. The upstream source header remains live and is not classified as dead. Focused AST fresh-name/model-value tests and util/symbol/util/text tests pass native, with AST checks also passing g3debug,g3checked on CPUs 0-7."

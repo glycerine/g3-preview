@@ -39720,3 +39720,14 @@ with 15, 16, 17, and 33 entries and bit-vector concat expressions with 17,
 18, and 20 arguments cover order and growth. The older sort-buffer spill
 refusal assertions for this expression path are superseded by these native
 slice checks; owning AST node allocations remain independently fault-tested.
+
+### AST model-value name bytes
+
+The retained model-value declaration names at `src/ast/ast.cpp:1239-1243`
+use temporary `string_buffer<64>` storage before interning. Go now builds
+the same borrowed sort spelling, `!val!`, signed index, and terminating NUL
+with `bytes.Buffer`, then interns its bytes. Long names grow through Go-owned
+scratch without arena reservations. Focused tests cover exact negative-index
+and long-name text, a warm long-name lookup under a disabled arena budget,
+and unchanged numeral-owner state. This credits the live string-buffer
+consumer as a platform replacement.
