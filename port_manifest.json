@@ -49862,7 +49862,9 @@
         "pkg/math/subpaving/fixed_polynomial.go",
         "pkg/math/subpaving/fixed_polynomial_test.go",
         "pkg/math/subpaving/fixed_monomial.go",
-        "pkg/math/subpaving/fixed_monomial_test.go"
+        "pkg/math/subpaving/fixed_monomial_test.go",
+        "pkg/math/subpaving/fixed_context_propagate.go",
+        "pkg/math/subpaving/fixed_context_propagate_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -49882,7 +49884,10 @@
         "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
         "TestSubpavingFixedMonomialOddUnboundedDownward",
         "TestSubpavingFixedMonomialProductDownward",
-        "TestSubpavingFixedMonomialSourceThreeFactorDownwardScratch"
+        "TestSubpavingFixedMonomialSourceThreeFactorDownwardScratch",
+        "TestSubpavingFixedContextQueuedDefinitionWatchers",
+        "TestSubpavingFixedContextQueuedCancellationResumes",
+        "TestSubpavingFixedContextInitialDefinitionSweep"
       ],
       "conditionals": [
         {
@@ -50000,7 +50005,9 @@
         "pkg/math/subpaving/fixed_polynomial.go",
         "pkg/math/subpaving/fixed_polynomial_test.go",
         "pkg/math/subpaving/fixed_monomial.go",
-        "pkg/math/subpaving/fixed_monomial_test.go"
+        "pkg/math/subpaving/fixed_monomial_test.go",
+        "pkg/math/subpaving/fixed_context_propagate.go",
+        "pkg/math/subpaving/fixed_context_propagate_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50015,7 +50022,10 @@
         "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
         "TestSubpavingFixedMonomialOddUnboundedDownward",
         "TestSubpavingFixedMonomialProductDownward",
-        "TestSubpavingFixedMonomialSourceThreeFactorDownwardScratch"
+        "TestSubpavingFixedMonomialSourceThreeFactorDownwardScratch",
+        "TestSubpavingFixedContextQueuedDefinitionWatchers",
+        "TestSubpavingFixedContextQueuedCancellationResumes",
+        "TestSubpavingFixedContextInitialDefinitionSweep"
       ],
       "assertions": [
         {

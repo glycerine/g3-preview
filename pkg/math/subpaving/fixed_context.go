@@ -30,6 +30,8 @@ type FixedContext struct {
 	arithmeticFailed bool
 	timestamp        uint64
 	queue            []*FixedBound
+	queueHead        int
+	numVisited       uint64
 	polynomials      map[uint32]*FixedPolynomial
 	monomials        map[uint32]*FixedMonomial
 	watchers         [][]uint32
@@ -167,6 +169,7 @@ func (c *FixedContext) Close() error {
 		return err
 	}
 	c.queue = nil
+	c.queueHead = 0
 	c.closed = true
 	return nil
 }
