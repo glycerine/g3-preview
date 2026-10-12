@@ -136567,10 +136567,12 @@
       "path": "src/util/lp/scaler.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/scaler_float.go",
-        "pkg/util/lp/scaler_test.go"
+        "pkg/util/lp/scaler_test.go",
+        "pkg/util/lp/solver_float.go",
+        "pkg/util/lp/solver_prepare_exact.go"
       ],
       "tests": [
         "TestLPFloatScalerIndependentSolutionOracle",
@@ -136581,7 +136583,11 @@
         "TestLPFloatScalerZeroToleranceIEEEAndResize",
         "TestLPFloatScalerComposedFailurePrefixes",
         "TestLPFloatScalerGeometricProductExtremes",
-        "TestLPFloatScalerExtremeDyadicRowsAndColumns"
+        "TestLPFloatScalerExtremeDyadicRowsAndColumns",
+        "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+        "TestLPRationalPreparationIndependentMatricesAndRHS",
+        "TestLPFloatPrimalOuterIndependentVertices",
+        "TestLPFloatDualOuterIndependentVertices"
       ],
       "assertions": [
         {
@@ -136589,8 +136595,8 @@
           "text": "SASSERT(m_column_scale.size() == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained double/double constructor, ratio/geometric scaling, max normalization and log/power-of-two paths (scaler.hpp:38-270), reached by lp_solver.hpp:118-122",
@@ -136609,35 +136615,62 @@
           ]
         },
         {
-          "name": "standalone exact scaler scale early return: explicit instantiation only; actual precise solver short-circuits before scaler construction",
-          "status": "dead_deleted",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "remaining complete retained solver caller/ownership integration audit",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "name": "Retained floating common solver construction/Scale and exact precise bypass caller integration",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_float.go",
+          "go_targets": [
+            "pkg/util/lp/solver_prepare_exact.go"
+          ],
+          "tests": [
+            "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+            "TestLPRationalPreparationIndependentMatricesAndRHS",
+            "TestLPFloatPrimalOuterIndependentVertices",
+            "TestLPFloatDualOuterIndependentVertices"
+          ]
         }
       ],
       "ownership": [
-        "FloatScaler borrows matrix, RHS and column-scale slice headers, threshold values and settings. Native Go slices replace source vector storage. Constructor preserves release resize prefixes and source debug empty-vector assertion. Row/column products publish before later RHS/column-scale bounds guards; no transactional rollback or source allocation emulation. Caller owns restoration after rejected scaling."
+        "FloatScaler borrows matrix, RHS and column-scale slice headers, threshold values and settings. Native Go slices replace source vector storage. Constructor preserves release resize prefixes and source debug empty-vector assertion. Row/column products publish before later RHS/column-scale bounds guards; no transactional rollback or source allocation emulation. Caller owns restoration after rejected scaling.",
+        "FloatScaler borrows A, B/ColumnScale native slice headers, min/max references and Settings; no owning numerical children. Common solver retains reconstruction responsibility; exact precise bypass never constructs scaler."
       ],
       "deviations": [
+        "Whole retained-source/borrowed-input audit completes scaler.h/.hpp/instances.cpp. All actual double/double constructor, matrix min/max/ratios, descending geometric row/column passes, original-ratio do/while postdecrement loop, ratio-selected max normalization, log-balance dispatch and ascending row/column power-of-two passes are concretely implemented. Scaler borrows matrix, RHS and scale slice headers, scaling min/max references and Settings; no numerical resource/Close or generic callback is introduced. No-ignore whole-src27reference scan finds only live common solver template call at lp_solver.hpp:121; LAR scale_problem_for_doubles has no caller and create_double_matrix is reached only by that dead helper. right_side_balance is definition/declaration only. Standalone exact scale has explicit instantiation only: live RationalLPSolver.Scale short-circuits precise arithmetic before scaler construction and is separately tested. Exclusions gain no fake Go target/test credit. Existing nine scaler test groups cover160 independent transformed solution worlds, row/column order, exact0.01/0.1 cutoffs, original-ratio stopping/reps+1 passes, borrowed input mutation, zero/IEEE/resize/assertion/error prefixes, geometric underflow/overflow and extreme dyadic scales; actual common/primal/dual consumers are also checked. Focused native0.848s/combined0.936s pass. scaler_float.go226/260statements86.9% native,229/26088.1% combined. Remaining branches transport impossible in-range matrix method errors, erased native/checked assertion profiles, or log-balance improvement unavailable because nonzero source numeric_traits::log is unimplemented; no fake logarithm or failure hook. Literal column power scale assignment and qualified nonterminating-domain ErrLPScalingStalled guard preserved. Both LP vets already pass for unchanged production code; source checker remains unchanged. Common solver audit now resolves stale scaler caller-audit placeholder, without closing separate matrix/core/LAR/CLI/SMT units. LP inventory42ported/53partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates recent common report corrections and dead-adapter removal; focused evidence is current. Profiles /mnt/oldrog/tmp/g3-lp-scaler-audit-{native,debug}.cover; source audit /mnt/oldrog/tmp/g3-lp-scaler-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "Floating scale retains strict 0.01/0.1/zero thresholds, descending geometric/normalization order, ascending power scaling, original-ratio comparison, do/while postdecrement (reps+1 passes), and assigning rather than multiplying the power-column factor. Nonzero log balance propagates the existing source NOT_IMPLEMENTED stop; no mathematical logarithm is invented. Infinity or an invalid negative maximum can make source halving nonterminating: after an actual unchanged loop body Go returns ErrLPScalingStalled before matrix publication, a qualified domain guard rather than a native exception claim.",
         "right_side_balance has declaration/definition only and no retained caller; excluded.",
         "Whole-source scaling reachability: scale_problem_for_doubles (lar_core_solver.h:687-714) has no caller; create_double_matrix (638-645) is reached only by that dead helper. Exact scaler<mpq,mpq>::scale has only an explicit instantiation, since lp_solver::scale precise() returns before constructing a scaler. No standalone exact scaler or LAR scaling helper is ported. Live exact solver Scale is already implemented and tested with nil Settings by TestLPRationalPreparationIndependentMatricesAndRHS; floating assembly/scaling/restoration is tested independently by TestLPFloatSolverIndependentAssemblyScalingAndRestoration. Whole LP/LAR caller and ownership audits remain open."
+      ],
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "right_side_balance"
+          ],
+          "reason": "Whole no-ignore src scan finds declaration/definition only; no retained caller."
+        },
+        {
+          "source_methods": [
+            "scaler<mpq,mpq>::scale"
+          ],
+          "reason": "Explicit instantiation only. The live common precise solver returns before constructing scaler; no unused exact scaler adapter added."
+        },
+        {
+          "source_methods": [
+            "lar_core_solver::scale_problem_for_doubles",
+            "lar_core_solver::create_double_matrix"
+          ],
+          "reason": "Uncalled containing LAR helper and its sole internal matrix builder are not retained scaler consumer roots."
+        }
       ]
     },
     {
       "path": "src/util/lp/scaler.hpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/scaler_float.go",
-        "pkg/util/lp/scaler_test.go"
+        "pkg/util/lp/scaler_test.go",
+        "pkg/util/lp/solver_float.go",
+        "pkg/util/lp/solver_prepare_exact.go"
       ],
       "tests": [
         "TestLPFloatScalerIndependentSolutionOracle",
@@ -136648,7 +136681,11 @@
         "TestLPFloatScalerZeroToleranceIEEEAndResize",
         "TestLPFloatScalerComposedFailurePrefixes",
         "TestLPFloatScalerGeometricProductExtremes",
-        "TestLPFloatScalerExtremeDyadicRowsAndColumns"
+        "TestLPFloatScalerExtremeDyadicRowsAndColumns",
+        "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+        "TestLPRationalPreparationIndependentMatricesAndRHS",
+        "TestLPFloatPrimalOuterIndependentVertices",
+        "TestLPFloatDualOuterIndependentVertices"
       ],
       "assertions": [
         {
@@ -136664,8 +136701,8 @@
           "text": "SASSERT(max > zero_of_type<T>() && min > zero_of_type<T>());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained double/double constructor, ratio/geometric scaling, max normalization and log/power-of-two paths (scaler.hpp:38-270), reached by lp_solver.hpp:118-122",
@@ -136684,35 +136721,62 @@
           ]
         },
         {
-          "name": "standalone exact scaler scale early return: explicit instantiation only; actual precise solver short-circuits before scaler construction",
-          "status": "dead_deleted",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "remaining complete retained solver caller/ownership integration audit",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "name": "Retained floating common solver construction/Scale and exact precise bypass caller integration",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_float.go",
+          "go_targets": [
+            "pkg/util/lp/solver_prepare_exact.go"
+          ],
+          "tests": [
+            "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+            "TestLPRationalPreparationIndependentMatricesAndRHS",
+            "TestLPFloatPrimalOuterIndependentVertices",
+            "TestLPFloatDualOuterIndependentVertices"
+          ]
         }
       ],
       "ownership": [
-        "FloatScaler borrows matrix, RHS and column-scale slice headers, threshold values and settings. Native Go slices replace source vector storage. Constructor preserves release resize prefixes and source debug empty-vector assertion. Row/column products publish before later RHS/column-scale bounds guards; no transactional rollback or source allocation emulation. Caller owns restoration after rejected scaling."
+        "FloatScaler borrows matrix, RHS and column-scale slice headers, threshold values and settings. Native Go slices replace source vector storage. Constructor preserves release resize prefixes and source debug empty-vector assertion. Row/column products publish before later RHS/column-scale bounds guards; no transactional rollback or source allocation emulation. Caller owns restoration after rejected scaling.",
+        "FloatScaler borrows A, B/ColumnScale native slice headers, min/max references and Settings; no owning numerical children. Common solver retains reconstruction responsibility; exact precise bypass never constructs scaler."
       ],
       "deviations": [
+        "Whole retained-source/borrowed-input audit completes scaler.h/.hpp/instances.cpp. All actual double/double constructor, matrix min/max/ratios, descending geometric row/column passes, original-ratio do/while postdecrement loop, ratio-selected max normalization, log-balance dispatch and ascending row/column power-of-two passes are concretely implemented. Scaler borrows matrix, RHS and scale slice headers, scaling min/max references and Settings; no numerical resource/Close or generic callback is introduced. No-ignore whole-src27reference scan finds only live common solver template call at lp_solver.hpp:121; LAR scale_problem_for_doubles has no caller and create_double_matrix is reached only by that dead helper. right_side_balance is definition/declaration only. Standalone exact scale has explicit instantiation only: live RationalLPSolver.Scale short-circuits precise arithmetic before scaler construction and is separately tested. Exclusions gain no fake Go target/test credit. Existing nine scaler test groups cover160 independent transformed solution worlds, row/column order, exact0.01/0.1 cutoffs, original-ratio stopping/reps+1 passes, borrowed input mutation, zero/IEEE/resize/assertion/error prefixes, geometric underflow/overflow and extreme dyadic scales; actual common/primal/dual consumers are also checked. Focused native0.848s/combined0.936s pass. scaler_float.go226/260statements86.9% native,229/26088.1% combined. Remaining branches transport impossible in-range matrix method errors, erased native/checked assertion profiles, or log-balance improvement unavailable because nonzero source numeric_traits::log is unimplemented; no fake logarithm or failure hook. Literal column power scale assignment and qualified nonterminating-domain ErrLPScalingStalled guard preserved. Both LP vets already pass for unchanged production code; source checker remains unchanged. Common solver audit now resolves stale scaler caller-audit placeholder, without closing separate matrix/core/LAR/CLI/SMT units. LP inventory42ported/53partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates recent common report corrections and dead-adapter removal; focused evidence is current. Profiles /mnt/oldrog/tmp/g3-lp-scaler-audit-{native,debug}.cover; source audit /mnt/oldrog/tmp/g3-lp-scaler-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "Floating scale retains strict 0.01/0.1/zero thresholds, descending geometric/normalization order, ascending power scaling, original-ratio comparison, do/while postdecrement (reps+1 passes), and assigning rather than multiplying the power-column factor. Nonzero log balance propagates the existing source NOT_IMPLEMENTED stop; no mathematical logarithm is invented. Infinity or an invalid negative maximum can make source halving nonterminating: after an actual unchanged loop body Go returns ErrLPScalingStalled before matrix publication, a qualified domain guard rather than a native exception claim.",
         "right_side_balance has declaration/definition only and no retained caller; excluded.",
         "Whole-source scaling reachability: scale_problem_for_doubles (lar_core_solver.h:687-714) has no caller; create_double_matrix (638-645) is reached only by that dead helper. Exact scaler<mpq,mpq>::scale has only an explicit instantiation, since lp_solver::scale precise() returns before constructing a scaler. No standalone exact scaler or LAR scaling helper is ported. Live exact solver Scale is already implemented and tested with nil Settings by TestLPRationalPreparationIndependentMatricesAndRHS; floating assembly/scaling/restoration is tested independently by TestLPFloatSolverIndependentAssemblyScalingAndRestoration. Whole LP/LAR caller and ownership audits remain open."
+      ],
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "right_side_balance"
+          ],
+          "reason": "Whole no-ignore src scan finds declaration/definition only; no retained caller."
+        },
+        {
+          "source_methods": [
+            "scaler<mpq,mpq>::scale"
+          ],
+          "reason": "Explicit instantiation only. The live common precise solver returns before constructing scaler; no unused exact scaler adapter added."
+        },
+        {
+          "source_methods": [
+            "lar_core_solver::scale_problem_for_doubles",
+            "lar_core_solver::create_double_matrix"
+          ],
+          "reason": "Uncalled containing LAR helper and its sole internal matrix builder are not retained scaler consumer roots."
+        }
       ]
     },
     {
       "path": "src/util/lp/scaler_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/scaler_float.go",
-        "pkg/util/lp/scaler_test.go"
+        "pkg/util/lp/scaler_test.go",
+        "pkg/util/lp/solver_float.go",
+        "pkg/util/lp/solver_prepare_exact.go"
       ],
       "tests": [
         "TestLPFloatScalerIndependentSolutionOracle",
@@ -136723,10 +136787,14 @@
         "TestLPFloatScalerZeroToleranceIEEEAndResize",
         "TestLPFloatScalerComposedFailurePrefixes",
         "TestLPFloatScalerGeometricProductExtremes",
-        "TestLPFloatScalerExtremeDyadicRowsAndColumns"
+        "TestLPFloatScalerExtremeDyadicRowsAndColumns",
+        "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+        "TestLPRationalPreparationIndependentMatricesAndRHS",
+        "TestLPFloatPrimalOuterIndependentVertices",
+        "TestLPFloatDualOuterIndependentVertices"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained double/double constructor, ratio/geometric scaling, max normalization and log/power-of-two paths (scaler.hpp:38-270), reached by lp_solver.hpp:118-122",
@@ -136745,25 +136813,50 @@
           ]
         },
         {
-          "name": "standalone exact scaler scale early return: explicit instantiation only; actual precise solver short-circuits before scaler construction",
-          "status": "dead_deleted",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "remaining complete retained solver caller/ownership integration audit",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "name": "Retained floating common solver construction/Scale and exact precise bypass caller integration",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_float.go",
+          "go_targets": [
+            "pkg/util/lp/solver_prepare_exact.go"
+          ],
+          "tests": [
+            "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+            "TestLPRationalPreparationIndependentMatricesAndRHS",
+            "TestLPFloatPrimalOuterIndependentVertices",
+            "TestLPFloatDualOuterIndependentVertices"
+          ]
         }
       ],
       "ownership": [
-        "FloatScaler borrows matrix, RHS and column-scale slice headers, threshold values and settings. Native Go slices replace source vector storage. Constructor preserves release resize prefixes and source debug empty-vector assertion. Row/column products publish before later RHS/column-scale bounds guards; no transactional rollback or source allocation emulation. Caller owns restoration after rejected scaling."
+        "FloatScaler borrows matrix, RHS and column-scale slice headers, threshold values and settings. Native Go slices replace source vector storage. Constructor preserves release resize prefixes and source debug empty-vector assertion. Row/column products publish before later RHS/column-scale bounds guards; no transactional rollback or source allocation emulation. Caller owns restoration after rejected scaling.",
+        "FloatScaler borrows A, B/ColumnScale native slice headers, min/max references and Settings; no owning numerical children. Common solver retains reconstruction responsibility; exact precise bypass never constructs scaler."
       ],
       "deviations": [
+        "Whole retained-source/borrowed-input audit completes scaler.h/.hpp/instances.cpp. All actual double/double constructor, matrix min/max/ratios, descending geometric row/column passes, original-ratio do/while postdecrement loop, ratio-selected max normalization, log-balance dispatch and ascending row/column power-of-two passes are concretely implemented. Scaler borrows matrix, RHS and scale slice headers, scaling min/max references and Settings; no numerical resource/Close or generic callback is introduced. No-ignore whole-src27reference scan finds only live common solver template call at lp_solver.hpp:121; LAR scale_problem_for_doubles has no caller and create_double_matrix is reached only by that dead helper. right_side_balance is definition/declaration only. Standalone exact scale has explicit instantiation only: live RationalLPSolver.Scale short-circuits precise arithmetic before scaler construction and is separately tested. Exclusions gain no fake Go target/test credit. Existing nine scaler test groups cover160 independent transformed solution worlds, row/column order, exact0.01/0.1 cutoffs, original-ratio stopping/reps+1 passes, borrowed input mutation, zero/IEEE/resize/assertion/error prefixes, geometric underflow/overflow and extreme dyadic scales; actual common/primal/dual consumers are also checked. Focused native0.848s/combined0.936s pass. scaler_float.go226/260statements86.9% native,229/26088.1% combined. Remaining branches transport impossible in-range matrix method errors, erased native/checked assertion profiles, or log-balance improvement unavailable because nonzero source numeric_traits::log is unimplemented; no fake logarithm or failure hook. Literal column power scale assignment and qualified nonterminating-domain ErrLPScalingStalled guard preserved. Both LP vets already pass for unchanged production code; source checker remains unchanged. Common solver audit now resolves stale scaler caller-audit placeholder, without closing separate matrix/core/LAR/CLI/SMT units. LP inventory42ported/53partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates recent common report corrections and dead-adapter removal; focused evidence is current. Profiles /mnt/oldrog/tmp/g3-lp-scaler-audit-{native,debug}.cover; source audit /mnt/oldrog/tmp/g3-lp-scaler-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "Floating scale retains strict 0.01/0.1/zero thresholds, descending geometric/normalization order, ascending power scaling, original-ratio comparison, do/while postdecrement (reps+1 passes), and assigning rather than multiplying the power-column factor. Nonzero log balance propagates the existing source NOT_IMPLEMENTED stop; no mathematical logarithm is invented. Infinity or an invalid negative maximum can make source halving nonterminating: after an actual unchanged loop body Go returns ErrLPScalingStalled before matrix publication, a qualified domain guard rather than a native exception claim.",
         "right_side_balance has declaration/definition only and no retained caller; excluded.",
         "Whole-source scaling reachability: scale_problem_for_doubles (lar_core_solver.h:687-714) has no caller; create_double_matrix (638-645) is reached only by that dead helper. Exact scaler<mpq,mpq>::scale has only an explicit instantiation, since lp_solver::scale precise() returns before constructing a scaler. No standalone exact scaler or LAR scaling helper is ported. Live exact solver Scale is already implemented and tested with nil Settings by TestLPRationalPreparationIndependentMatricesAndRHS; floating assembly/scaling/restoration is tested independently by TestLPFloatSolverIndependentAssemblyScalingAndRestoration. Whole LP/LAR caller and ownership audits remain open."
+      ],
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "right_side_balance"
+          ],
+          "reason": "Whole no-ignore src scan finds declaration/definition only; no retained caller."
+        },
+        {
+          "source_methods": [
+            "scaler<mpq,mpq>::scale"
+          ],
+          "reason": "Explicit instantiation only. The live common precise solver returns before constructing scaler; no unused exact scaler adapter added."
+        },
+        {
+          "source_methods": [
+            "lar_core_solver::scale_problem_for_doubles",
+            "lar_core_solver::create_double_matrix"
+          ],
+          "reason": "Uncalled containing LAR helper and its sole internal matrix builder are not retained scaler consumer roots."
+        }
       ]
     },
     {
