@@ -265,24 +265,6 @@ func TestOwnershipAndRemainingMethods(t *testing.T) {
 		t.Fatal("contains false")
 	}
 }
-func TestFastReset(t *testing.T) {
-	var f FastReset
-	f.Push(true)
-	f.Push(false)
-	f.Push(true)
-	f.Set(0, true)
-	f.Set(2, false)
-	f.Reset()
-	if f.Size() != 3 || f.Get(0) || f.Get(1) || f.Get(2) {
-		t.Fatal("fast reset preserves size, clears indexed bits")
-	}
-	f.Set(1, true)
-	f.Fill0()
-	if f.Get(1) {
-		t.Fatal("fill0")
-	}
-}
-
 // Hash values recorded from actual C++ string_hash over {1,0,0,0,3,0,0,0}.
 func TestSourceHashByteRounding(t *testing.T) {
 	var want []uint32

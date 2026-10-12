@@ -258,35 +258,3 @@ func (v *Vector) String() string {
 // Hash preserves get_hash's floor(size/8) byte length, including omission of
 // incomplete final bytes. Word bytes follow the source little-endian baseline.
 func (v *Vector) Hash() uint32 { return wordBytes(v.words, v.size/8, 0) }
-
-// FastReset records every set-to-one operation, including duplicates, and clears
-// those bits on Reset without changing the logical length.
-type FastReset struct {
-	vector     Vector
-	oneIndices []uint32
-}
-
-func (v *FastReset) Size() uint32      { return v.vector.Size() }
-func (v *FastReset) Get(i uint32) bool { return v.vector.Get(i) }
-func (v *FastReset) Set(i uint32, val bool) {
-	if val {
-		v.oneIndices = append(v.oneIndices, i)
-	}
-	v.vector.Set(i, val)
-}
-func (v *FastReset) Push(val bool) {
-	if val {
-		v.oneIndices = append(v.oneIndices, v.vector.Size())
-	}
-	v.vector.Push(val)
-}
-func (v *FastReset) Fill0() { v.vector.Fill0(); v.oneIndices = v.oneIndices[:0] }
-func (v *FastReset) Reset() {
-	n := v.vector.Size()
-	for _, i := range v.oneIndices {
-		if i < n {
-			v.vector.Unset(i)
-		}
-	}
-	v.oneIndices = v.oneIndices[:0]
-}

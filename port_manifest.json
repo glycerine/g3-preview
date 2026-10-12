@@ -111627,7 +111627,7 @@
           ]
         },
         {
-          "name": "native variable-width bit vector and fast-reset specialization",
+          "name": "native variable-width bit vector",
           "status": "ported",
           "go_target": "pkg/util/bitset/vector.go",
           "tests": [
@@ -111643,24 +111643,15 @@
       "ownership": [
         "Vector owns word storage; Clone/Assign copy, Swap transfers, source growth and stale bits retained. Full audit and test mapping pending package report.",
         "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md.",
-        "payload-only unsigned array; no svector header for base",
-        "bits++ before push allocation; Resize bits published after writes",
-        "Assign bits first and source-null early return retains old capacity/pointer",
-        "raw provider provenance moves with pointer; bitcount/capacity also swapped, cold original Budget unchanged",
-        "copy ctor copies whole capacity; failed bit_vector ctor has no source class dtor",
-        "FR base ctor before member ctor; failed member ctor invokes completed base dtor only",
-        "FR member destructor before base, each stopped cause retained; owning abort separate",
-        "source-stopped FR forbids ordinary mutations; body stop does not substitute for reached source destructor",
-        "actual TLS header-complete pending uses Deallocate; actual headerless partial uses CleanupPartial",
-        "floor(bits/8) Hash cutoff and source signed chars/descending tail reads",
-        "pure cold scalar queries ignore body cause/pending after completed object body refusal",
-        "nonzero Hash propagates reached raw guard instead of substituting sticky body cause; zero bytes never dereference provider"
+        "Native Vector owns Go word storage; Clone and Assign copy, Swap transfers, and growth preserves source stale bits.",
+        "Hash reads floor(size/8) bytes from the current words. AST marks retain their separate concrete typed ownership."
       ],
       "deviations": [
         "Legacy bitset.Vector Go-slice profile remains partial and unchanged",
         "Actual global DebugContext assertion enable/tag and process-global memory wiring remain open; selected default source g3debug assertions execute",
         "inactive display #else and inactive tst1/tst2 not executed",
         "The redundant Runtime/Block translation was deleted; native typed storage lives in util/bitset and AST mark specializations retain their own typed storage.",
+        "fr_bit_vector has no source caller or Go production consumer. Its test-only FastReset copy was removed; no live source behavior depends on that specialization.",
         "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations."
       ]
     },
@@ -111769,7 +111760,7 @@
           ]
         },
         {
-          "name": "native variable-width bit vector and fast-reset specialization",
+          "name": "native variable-width bit vector",
           "status": "ported",
           "go_target": "pkg/util/bitset/vector.go",
           "tests": [
@@ -111785,24 +111776,15 @@
       "ownership": [
         "Vector owns word storage; Clone/Assign copy, Swap transfers, source growth and stale bits retained. Full audit and test mapping pending package report.",
         "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md.",
-        "payload-only unsigned array; no svector header for base",
-        "bits++ before push allocation; Resize bits published after writes",
-        "Assign bits first and source-null early return retains old capacity/pointer",
-        "raw provider provenance moves with pointer; bitcount/capacity also swapped, cold original Budget unchanged",
-        "copy ctor copies whole capacity; failed bit_vector ctor has no source class dtor",
-        "FR base ctor before member ctor; failed member ctor invokes completed base dtor only",
-        "FR member destructor before base, each stopped cause retained; owning abort separate",
-        "source-stopped FR forbids ordinary mutations; body stop does not substitute for reached source destructor",
-        "actual TLS header-complete pending uses Deallocate; actual headerless partial uses CleanupPartial",
-        "floor(bits/8) Hash cutoff and source signed chars/descending tail reads",
-        "pure cold scalar queries ignore body cause/pending after completed object body refusal",
-        "nonzero Hash propagates reached raw guard instead of substituting sticky body cause; zero bytes never dereference provider"
+        "Native Vector owns Go word storage; Clone and Assign copy, Swap transfers, and growth preserves source stale bits.",
+        "Hash reads floor(size/8) bytes from the current words. AST marks retain their separate concrete typed ownership."
       ],
       "deviations": [
         "Legacy bitset.Vector Go-slice profile remains partial and unchanged",
         "Actual global DebugContext assertion enable/tag and process-global memory wiring remain open; selected default source g3debug assertions execute",
         "inactive display #else and inactive tst1/tst2 not executed",
         "The redundant Runtime/Block translation was deleted; native typed storage lives in util/bitset and AST mark specializations retain their own typed storage.",
+        "fr_bit_vector has no source caller or Go production consumer. Its test-only FastReset copy was removed; no live source behavior depends on that specialization.",
         "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations."
       ]
     },
