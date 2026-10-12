@@ -5785,8 +5785,10 @@
         "TestLPDebugMatrixPrintConcreteOverloads",
         "TestLPDebugMatrixPrintEveryByteAndFlush",
         "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
-        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
-      ]
+        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots",
+        "TestLPDiagonalTailConstructorOwnsValueAndDebugReciprocal"
+      ],
+      "diagonal_retained_source_qualification": "Retained one_elem_on_diag diagonal-tail audit inside lu.h/.hpp: actual double/double, mpq/mpq and mpq/impq construction, non-dense query, dense X-left/T-right, indexed T-left/right and reverse-permutation conjugation are implemented. Floating debug matrix view remains reached through LU. Exact debug matrix getters/dimensions and the unused copy constructor have no retained consumers and are excluded; removed exact view methods, dimension storage and its LU assignment. Preserved exact debug constructor reciprocal computation and ownership, including real allocation-failure prefixes. New constructor oracle mutates caller coefficient, applies both exact tail kinds, closes owners and verifies independent outputs with pooled/direct allocation. Fourteen physical refusal campaigns now check stored coefficient and debug reciprocal success endpoints; stopped borrowed input checks cover both allocators. Close unwinds owned calls, lexical work, reciprocal, then stored coefficient. Whole LU units remain partial."
     },
     {
       "source": "src/util/lp/lu.hpp",
@@ -5912,8 +5914,10 @@
         "TestLPDebugMatrixPrintConcreteOverloads",
         "TestLPDebugMatrixPrintEveryByteAndFlush",
         "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
-        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
-      ]
+        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots",
+        "TestLPDiagonalTailConstructorOwnsValueAndDebugReciprocal"
+      ],
+      "diagonal_retained_source_qualification": "Retained one_elem_on_diag diagonal-tail audit inside lu.h/.hpp: actual double/double, mpq/mpq and mpq/impq construction, non-dense query, dense X-left/T-right, indexed T-left/right and reverse-permutation conjugation are implemented. Floating debug matrix view remains reached through LU. Exact debug matrix getters/dimensions and the unused copy constructor have no retained consumers and are excluded; removed exact view methods, dimension storage and its LU assignment. Preserved exact debug constructor reciprocal computation and ownership, including real allocation-failure prefixes. New constructor oracle mutates caller coefficient, applies both exact tail kinds, closes owners and verifies independent outputs with pooled/direct allocation. Fourteen physical refusal campaigns now check stored coefficient and debug reciprocal success endpoints; stopped borrowed input checks cover both allocators. Close unwinds owned calls, lexical work, reciprocal, then stored coefficient. Whole LU units remain partial."
     },
     {
       "source": "src/util/lp/lu_instances.cpp",
@@ -14059,7 +14063,7 @@
   },
   "pending_full_native_checkpoint": {
     "revision": "3516687c",
-    "status": "running",
+    "status": "timed_out",
     "session_id": 44703,
     "started_utc": "2026-10-12 05:44:50 UTC",
     "cpu_affinity": "8-16",
@@ -14072,7 +14076,15 @@
       "coverage": "/mnt/oldrog/tmp/g3-lp-eta-module-native.cover"
     },
     "cache_cleanup_record": "/mnt/oldrog/tmp/g3-lp-eta-full-native-cache-cleanup.json",
-    "qualification": "Includes retained permutation/eta audits, report fixes and bound-analyzer lifetime fix. No result or coverage credit until terminal success and profile inspection; last completed full checkpoint remains8f2961ca."
+    "qualification": "Incomplete run; no full-suite result or coverage credit. Revision3516687c predates row-eta/diagonal changes. Next full run needs explicit longer timeout. Last completed full checkpoint remains8f2961ca.",
+    "exit_code": 1,
+    "ended_utc": "2026-10-12 05:55:17 UTC",
+    "package_results": {
+      "pass": 62,
+      "skip": 1,
+      "fail": 1
+    },
+    "failure": "LP exceeded default Go10m test timeout; panic in TestLARScopeValidatorPhysicalOwnership/direct=false/row/1."
   },
   "latest_row_eta_support_audit": {
     "scope": "Whole retained row_eta_matrix source/ownership audit: actual double/double, mpq/mpq and mpq/impq constructors, non-dense tail, by-value append, dense X-left/T-right, indexed T-left/right and descending permutation conjugation are implemented. Source row_start is never read; exact debug views, local_to_X, invalid unused diagonal getter and compact print are excluded. Floating debug view is retained by actual LU matrix consumers. Source live dense row versus copied sparse-left accumulator, precise zero branches, empty-index behavior, strict floating drop tests, insertion/erase order, self/duplicate terms and reached invalid-domain prefixes remain literal. Corrected Close to unwind owned child sparse call locals, then row-eta lexical work, then stored row coefficients. Caller destination and older raw invocation generations remain independent. Removed unused exact debug matrix adapters; conjugation oracle uses all24permutations and four retained basis-vector ApplyLeft products. Removed dead lookup fault scenario and expanded fourteen retained fault campaigns to pooled/direct allocation (28total), preserving endpoint oracle, named roots, pending guards and index-before-result-copy refusal requirements. Stopped-destination/older-raw ownership checks also use both allocator modes. Containing sparse/dense/LU/CLI/SMT audits remain separate.",
@@ -14115,5 +14127,50 @@
     "consumer_tests_combined_seconds": 9.241,
     "coverage_qualification": "Remaining exact uncovered returns guard stable delegated numeric/cleanup errors and invariant-protected copies/checks. Floating native uncovered return is erased source assertion; combined row_eta_matrix_float is88/88. No synthetic failures or 100% exact coverage claim.",
     "verification": "All64package native/combined compile gates, both LP vets and source portcheck pass: 2103units/677APIs,120ported/320partial/1620unported/5dead_deleted."
+  },
+  "latest_diagonal_support_audit": {
+    "scope": "Retained one_elem_on_diag diagonal-tail audit inside lu.h/.hpp: actual double/double, mpq/mpq and mpq/impq construction, non-dense query, dense X-left/T-right, indexed T-left/right and reverse-permutation conjugation are implemented. Floating debug matrix view remains reached through LU. Exact debug matrix getters/dimensions and the unused copy constructor have no retained consumers and are excluded; removed exact view methods, dimension storage and its LU assignment. Preserved exact debug constructor reciprocal computation and ownership, including real allocation-failure prefixes. New constructor oracle mutates caller coefficient, applies both exact tail kinds, closes owners and verifies independent outputs with pooled/direct allocation. Fourteen physical refusal campaigns now check stored coefficient and debug reciprocal success endpoints; stopped borrowed input checks cover both allocators. Close unwinds owned calls, lexical work, reciprocal, then stored coefficient. Whole LU units remain partial.",
+    "focused_native_seconds": 11.437,
+    "focused_combined_seconds": 13.467,
+    "additional_consumer_native_seconds": 0.027,
+    "additional_consumer_combined_seconds": 0.03,
+    "whole_go_file_focused_covered_total": {
+      "native": {
+        "diagonal_matrix_exact.go": [
+          93,
+          108
+        ],
+        "diagonal_matrix_float.go": [
+          36,
+          37
+        ]
+      },
+      "debug": {
+        "diagonal_matrix_exact.go": [
+          96,
+          108
+        ],
+        "diagonal_matrix_float.go": [
+          37,
+          37
+        ],
+        "diagonal_matrix_debug.go": [
+          8,
+          8
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-diagonal-audit-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-diagonal-audit-debug.cover"
+    ],
+    "source_audits": [
+      "/mnt/oldrog/tmp/g3-lp-diagonal-consumers-audit.txt"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "coverage_qualification": "Remaining exact uncovered returns guard stable delegated begin/check/destructor errors and the precise zero-after-nonzero-division branch, which has no ordinary producer. Native debug computations are erased. No synthetic errors or complete exact coverage claim.",
+    "verification": "Native/combined focused diagonal and actual LU consumer tests, both LP vets, all64package compile gates and source portcheck pass:2103units/677APIs,120ported/320partial/1620unported/5dead_deleted.",
+    "full_suite_qualification": "Full native3516687c ended exit1 at default Go10m LP timeout;62packages passed,1skipped. It predates row-eta and this diagonal audit. No full-suite success/current-code coverage credit."
   }
 }

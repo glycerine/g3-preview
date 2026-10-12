@@ -7,7 +7,7 @@ import "github.com/glycerine/g3/pkg/util/numeral"
 // The manager and destination vectors are borrowed. Close a failed tail before
 // closing its caller-owned partial destination. Do not shallow-copy owners.
 type RationalDiagonalMatrix struct {
-	index, length  uint32
+	index          uint32
 	value, inverse numeral.Rational
 	manager        *numeral.RationalManager
 	calls          exactEtaCalls

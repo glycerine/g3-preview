@@ -85,6 +85,14 @@ func TestLPDiagonalTailAllocationFailureCensus(t *testing.T) {
 								t.Fatal("caller adopted tail receipt")
 							}
 						}
+						if err == nil {
+							d, _ := new(big.Rat).SetString(divisor)
+							lpSparseRationalCheck(t, h, &m.value, d)
+							lpSparseRationalCheck(t, h, &coefficient.X, d)
+							if sourceDebugTests {
+								lpSparseRationalCheck(t, h, &m.inverse, new(big.Rat).Inv(d))
+							}
+						}
 						h.must(m.Close())
 						d, _ := new(big.Rat).SetString(divisor)
 						want := new(big.Rat).Inv(d)
@@ -132,46 +140,53 @@ func TestLPDiagonalTailAllocationFailureCensus(t *testing.T) {
 }
 
 func TestLPDiagonalTailBorrowedStoppedInput(t *testing.T) {
-	matched := false
-	for ordinal := int64(0); ordinal < 80 && !matched; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			h := newLPPairHarness(t)
-			d := h.pair("2", "0")
-			m, err := NewRationalDiagonalMatrix(h.m, 0, &d.X)
-			h.must(err)
-			p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/13")
-			v := NewIndexedRationalVector(h.m, 1)
-			h.must(v.SetValue(&p.X, 0))
-			h.budget.FailAfter(ordinal)
-			err = v.Add(0, &p.Y)
-			h.budget.FailAfter(-1)
-			if v.calls.pending() {
-				if !lpExactPriorityPhysicalRefusal(err) {
-					t.Fatal(err)
+	for _, direct := range []bool{false, true} {
+		matched := false
+		for ordinal := int64(0); ordinal < 80 && !matched; ordinal++ {
+			t.Run(fmt.Sprintf("direct=%t/%d", direct, ordinal), func(t *testing.T) {
+				var h *lpPairHarness
+				if direct {
+					h = lpNewDirectSparseHarness(t)
+				} else {
+					h = newLPPairHarness(t)
 				}
-				matched = true
-				before := h.m.RawInvocationState()
-				if err := m.ApplyRightIndexed(v); err != ErrExactVectorPending {
-					t.Fatalf("right stopped input %v", err)
+				d := h.pair("2", "0")
+				m, err := NewRationalDiagonalMatrix(h.m, 0, &d.X)
+				h.must(err)
+				p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/13")
+				v := NewIndexedRationalVector(h.m, 1)
+				h.must(v.SetValue(&p.X, 0))
+				h.budget.FailAfter(ordinal)
+				err = v.Add(0, &p.Y)
+				h.budget.FailAfter(-1)
+				if v.calls.pending() {
+					if !lpExactPriorityPhysicalRefusal(err) {
+						t.Fatal(err)
+					}
+					matched = true
+					before := h.m.RawInvocationState()
+					if err := m.ApplyRightIndexed(v); err != ErrExactVectorPending {
+						t.Fatalf("right stopped input %v", err)
+					}
+					if err := m.ApplyLeftToT(v, nil); err != ErrExactVectorPending {
+						t.Fatalf("left stopped input %v", err)
+					}
+					if m.work != nil || m.calls.pending() {
+						t.Fatal("tail adopted caller receipt")
+					}
+					h.must(m.Close())
+					if h.m.RawInvocationState() != before {
+						t.Fatal("tail consumed caller receipt")
+					}
+				} else {
+					h.must(m.Close())
 				}
-				if err := m.ApplyLeftToT(v, nil); err != ErrExactVectorPending {
-					t.Fatalf("left stopped input %v", err)
-				}
-				if m.work != nil || m.calls.pending() {
-					t.Fatal("tail adopted caller receipt")
-				}
-				h.must(m.Close())
-				if h.m.RawInvocationState() != before {
-					t.Fatal("tail consumed caller receipt")
-				}
-			} else {
-				h.must(m.Close())
-			}
-			h.must(v.Close())
-			lpExactVectorNamedCensus(t, h, nil)
-		})
-	}
-	if !matched {
-		t.Fatal("no actual stopped input")
+				h.must(v.Close())
+				lpExactVectorNamedCensus(t, h, nil)
+			})
+		}
+		if !matched {
+			t.Fatal("no actual stopped input")
+		}
 	}
 }

@@ -362,9 +362,6 @@ func (m *exactLUState) restoreExactUpdateBump(start, end uint32) error {
 	if err != nil {
 		return err
 	}
-	if sourceDebugEnabled {
-		m.pendingDiagonal.length = m.Dim
-	}
 	return nil
 }
 

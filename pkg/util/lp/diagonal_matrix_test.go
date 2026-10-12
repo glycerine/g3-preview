@@ -238,3 +238,50 @@ func TestLPDiagonalTailBoundsAndOwnerGuards(t *testing.T) {
 	}
 	h.must(p.Close())
 }
+
+// A live constructor copies its value parameter and owns the debug reciprocal
+// even when no exact debug matrix getter consumes it. Caller mutation must not
+// change either tail's later application.
+func TestLPDiagonalTailConstructorOwnsValueAndDebugReciprocal(t *testing.T) {
+	for _, direct := range []bool{false, true} {
+		for _, text := range []string{"-7/3", "123456789123456789123456789/170141183460469231731687303715884105727"} {
+			t.Run(fmt.Sprintf("direct=%t/%s", direct, text), func(t *testing.T) {
+				var h *lpPairHarness
+				if direct {
+					h = lpNewDirectSparseHarness(t)
+				} else {
+					h = newLPPairHarness(t)
+				}
+				value := h.pair(text, "0")
+				original, _ := new(big.Rat).SetString(text)
+				reciprocal := new(big.Rat).Inv(original)
+				m, err := NewRationalDiagonalMatrix(h.m, 0, &value.X)
+				h.must(err)
+				p, err := NewPairDiagonalMatrix(h.m, 0, &value.X)
+				h.must(err)
+				h.must(h.m.SetInt64(&value.X, 2))
+				lpSparseRationalCheck(t, h, &m.value, original)
+				lpSparseRationalCheck(t, h, &p.value, original)
+				if sourceDebugTests {
+					lpSparseRationalCheck(t, h, &m.inverse, reciprocal)
+					lpSparseRationalCheck(t, h, &p.inverse, reciprocal)
+				}
+				v := lpExactVectorFromOracle(h, []*big.Rat{big.NewRat(1, 1)})
+				pairs := NewIndexedPairVector(h.m, 1)
+				h.must(h.m.SetInt64(&pairs.Data[0].X, 1))
+				h.must(h.m.SetInt64(&pairs.Data[0].Y, 2))
+				h.must(m.ApplyLeft(v.Data))
+				h.must(p.ApplyLeft(pairs.Data))
+				h.must(p.Close())
+				h.must(m.Close())
+				h.must(m.Close())
+				lpSparseRationalCheck(t, h, &v.Data[0], reciprocal)
+				h.check(&pairs.Data[0], reciprocal, new(big.Rat).Mul(reciprocal, big.NewRat(2, 1)))
+				lpExactVectorNamedCensus(t, h, []*numeral.Rational{&v.Data[0], &pairs.Data[0].X, &pairs.Data[0].Y})
+				h.must(v.Close())
+				h.must(pairs.Close())
+				lpExactVectorNamedCensus(t, h, nil)
+			})
+		}
+	}
+}
