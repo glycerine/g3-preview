@@ -96,78 +96,92 @@ func TestLPRationalPermutationIndependentDenseProducts(t *testing.T) {
 	}
 	lpExactVectorNamedCensus(t, h, nil)
 }
+// Each campaign walks actual physical refusals through its first success.
+// Direct allocation exposes copy prefixes that pooled storage may reuse; both
+// profiles must preserve the caller coordinates and release the owner roots.
 func TestLPRationalPermutationDenseAllocationFailureCensus(t *testing.T) {
-	for _, op := range []string{"left", "right", "reverse-left-T", "reverse-left-X", "reverse-right-T", "reverse-right-X"} {
-		failures, successes := 0, 0
-		for fail := int64(0); fail < 80; fail++ {
-			done := false
-			t.Run(fmt.Sprintf("%s/%d", op, fail), func(t *testing.T) {
-				h := newLPPairHarness(t)
-				small := h.pair("1", "-2")
-				large := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
-				p, err := RationalPermutationFromValues(h.m, 2, []uint32{1, 0})
-				h.must(err)
-				w := NewIndexedRationalVector(h.m, 2)
-				x := NewIndexedRationalVector(h.m, 2)
-				for i, v := range []*RationalPair{small, large} {
-					h.must(w.copySlot(&w.Data[i], &v.X))
-					h.must(x.copySlot(&x.Data[i], &v.X))
-				}
-				h.budget.FailAfter(fail)
-				switch op {
-				case "left":
-					err = p.ApplyLeft(x.Data)
-				case "right":
-					err = p.ApplyRight(w.Data)
-				case "reverse-left-T":
-					err = p.ApplyReverseLeftToT(w.Data)
-				case "reverse-left-X":
-					err = p.ApplyReverseLeftToX(x.Data)
-				case "reverse-right-T":
-					err = p.ApplyReverseRightToT(w.Data)
-				case "reverse-right-X":
-					err = p.ApplyReverseRightToX(x.Data)
-				}
-				h.budget.FailAfter(-1)
-				if err == nil {
-					successes++
-					done = true
-				} else {
-					failures++
-				}
-				if p.tBuffer.calls.pending() || p.xBuffer.calls.pending() {
-					if e := p.Init(2); e != ErrExactVectorPending {
-						t.Fatal("pending mutation", e)
+	for _, direct := range []bool{false, true} {
+		for _, op := range []string{"left", "right", "reverse-left-T", "reverse-left-X", "reverse-right-T", "reverse-right-X"} {
+			failures, successes := 0, 0
+			for fail := int64(0); fail < 80; fail++ {
+				done := false
+				t.Run(fmt.Sprintf("direct=%t/%s/%d", direct, op, fail), func(t *testing.T) {
+					var h *lpPairHarness
+					if direct {
+						h = lpNewDirectSparseHarness(t)
+					} else {
+						h = newLPPairHarness(t)
 					}
-					if e := p.ApplyRight(w.Data); e != ErrExactVectorPending {
-						t.Fatal("pending application", e)
+					small := h.pair("1", "-2")
+					large := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
+					p, err := RationalPermutationFromValues(h.m, 2, []uint32{1, 0})
+					h.must(err)
+					w := NewIndexedRationalVector(h.m, 2)
+					x := NewIndexedRationalVector(h.m, 2)
+					for i, v := range []*RationalPair{small, large} {
+						h.must(w.copySlot(&w.Data[i], &v.X))
+						h.must(x.copySlot(&x.Data[i], &v.X))
 					}
+					h.budget.FailAfter(fail)
+					switch op {
+					case "left":
+						err = p.ApplyLeft(x.Data)
+					case "right":
+						err = p.ApplyRight(w.Data)
+					case "reverse-left-T":
+						err = p.ApplyReverseLeftToT(w.Data)
+					case "reverse-left-X":
+						err = p.ApplyReverseLeftToX(x.Data)
+					case "reverse-right-T":
+						err = p.ApplyReverseRightToT(w.Data)
+					case "reverse-right-X":
+						err = p.ApplyReverseRightToX(x.Data)
+					}
+					h.budget.FailAfter(-1)
+					if err == nil {
+						successes++
+						done = true
+					} else {
+						if !lpExactPriorityPhysicalRefusal(err) {
+							t.Fatalf("unexpected allocation failure: %v", err)
+						}
+						failures++
+					}
+					if p.tBuffer.calls.pending() || p.xBuffer.calls.pending() {
+						if e := p.Init(2); e != ErrExactVectorPending {
+							t.Fatal("pending mutation", e)
+						}
+						if e := p.ApplyRight(w.Data); e != ErrExactVectorPending {
+							t.Fatal("pending application", e)
+						}
+					}
+					h.must(p.Close())
+					h.must(p.Close())
+					// The caller retains its partially assigned coordinates after owner Close.
+					// Check actual named ownership before deleting those inputs.
+					extra := []*numeral.Rational{}
+					for i := range w.Data {
+						extra = append(extra, &w.Data[i])
+					}
+					for i := range x.Data {
+						extra = append(extra, &x.Data[i])
+					}
+					lpExactVectorNamedCensus(t, h, extra)
+					h.must(w.Close())
+					h.must(x.Close())
+					lpExactVectorNamedCensus(t, h, nil)
+				})
+				if done {
+					break
 				}
-				h.must(p.Close())
-				h.must(p.Close())
-				// The caller retains its partially assigned coordinates after owner Close.
-				// Check actual named ownership before deleting those inputs.
-				extra := []*numeral.Rational{}
-				for i := range w.Data {
-					extra = append(extra, &w.Data[i])
-				}
-				for i := range x.Data {
-					extra = append(extra, &x.Data[i])
-				}
-				lpExactVectorNamedCensus(t, h, extra)
-				h.must(w.Close())
-				h.must(x.Close())
-				lpExactVectorNamedCensus(t, h, nil)
-			})
-			if done {
-				break
 			}
-		}
-		if failures == 0 || successes != 1 {
-			t.Fatal("incomplete fault campaign", op, failures, successes)
+			if failures == 0 || successes != 1 {
+				t.Fatal("incomplete fault campaign", op, failures, successes)
+			}
 		}
 	}
 }
+
 func TestLPRationalPermutationResizeAndGuardContracts(t *testing.T) {
 	h := newLPPairHarness(t)
 	p, err := RationalPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
@@ -272,77 +286,88 @@ func TestLPPairPermutationIndependentDenseProducts(t *testing.T) {
 	lpExactVectorNamedCensus(t, h, nil)
 }
 func TestLPPairPermutationDenseAllocationFailureCensus(t *testing.T) {
-	for _, op := range []string{"left", "right", "reverse-left-T", "reverse-left-X", "reverse-right-T", "reverse-right-X"} {
-		failures, successes := 0, 0
-		for fail := int64(0); fail < 80; fail++ {
-			done := false
-			t.Run(fmt.Sprintf("%s/%d", op, fail), func(t *testing.T) {
-				h := newLPPairHarness(t)
-				small := h.pair("1", "-2")
-				large := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
-				p, err := PairPermutationFromValues(h.m, 2, []uint32{1, 0})
-				h.must(err)
-				w := NewIndexedRationalVector(h.m, 2)
-				x := NewIndexedPairVector(h.m, 2)
-				for i, v := range []*RationalPair{small, large} {
-					h.must(w.copySlot(&w.Data[i], &v.X))
-					h.must(x.copySlot(&x.Data[i], v))
-				}
-				h.budget.FailAfter(fail)
-				switch op {
-				case "left":
-					err = p.ApplyLeft(x.Data)
-				case "right":
-					err = p.ApplyRight(w.Data)
-				case "reverse-left-T":
-					err = p.ApplyReverseLeftToT(w.Data)
-				case "reverse-left-X":
-					err = p.ApplyReverseLeftToX(x.Data)
-				case "reverse-right-T":
-					err = p.ApplyReverseRightToT(w.Data)
-				case "reverse-right-X":
-					err = p.ApplyReverseRightToX(x.Data)
-				}
-				h.budget.FailAfter(-1)
-				if err == nil {
-					successes++
-					done = true
-				} else {
-					failures++
-				}
-				if p.tBuffer.calls.pending() || p.xBuffer.calls.pending() {
-					if e := p.Init(2); e != ErrExactVectorPending {
-						t.Fatal("pending mutation", e)
+	for _, direct := range []bool{false, true} {
+		for _, op := range []string{"left", "right", "reverse-left-T", "reverse-left-X", "reverse-right-T", "reverse-right-X"} {
+			failures, successes := 0, 0
+			for fail := int64(0); fail < 80; fail++ {
+				done := false
+				t.Run(fmt.Sprintf("direct=%t/%s/%d", direct, op, fail), func(t *testing.T) {
+					var h *lpPairHarness
+					if direct {
+						h = lpNewDirectSparseHarness(t)
+					} else {
+						h = newLPPairHarness(t)
 					}
-					if e := p.ApplyRight(w.Data); e != ErrExactVectorPending {
-						t.Fatal("pending application", e)
+					small := h.pair("1", "-2")
+					large := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
+					p, err := PairPermutationFromValues(h.m, 2, []uint32{1, 0})
+					h.must(err)
+					w := NewIndexedRationalVector(h.m, 2)
+					x := NewIndexedPairVector(h.m, 2)
+					for i, v := range []*RationalPair{small, large} {
+						h.must(w.copySlot(&w.Data[i], &v.X))
+						h.must(x.copySlot(&x.Data[i], v))
 					}
+					h.budget.FailAfter(fail)
+					switch op {
+					case "left":
+						err = p.ApplyLeft(x.Data)
+					case "right":
+						err = p.ApplyRight(w.Data)
+					case "reverse-left-T":
+						err = p.ApplyReverseLeftToT(w.Data)
+					case "reverse-left-X":
+						err = p.ApplyReverseLeftToX(x.Data)
+					case "reverse-right-T":
+						err = p.ApplyReverseRightToT(w.Data)
+					case "reverse-right-X":
+						err = p.ApplyReverseRightToX(x.Data)
+					}
+					h.budget.FailAfter(-1)
+					if err == nil {
+						successes++
+						done = true
+					} else {
+						if !lpExactPriorityPhysicalRefusal(err) {
+							t.Fatalf("unexpected allocation failure: %v", err)
+						}
+						failures++
+					}
+					if p.tBuffer.calls.pending() || p.xBuffer.calls.pending() {
+						if e := p.Init(2); e != ErrExactVectorPending {
+							t.Fatal("pending mutation", e)
+						}
+						if e := p.ApplyRight(w.Data); e != ErrExactVectorPending {
+							t.Fatal("pending application", e)
+						}
+					}
+					h.must(p.Close())
+					h.must(p.Close())
+					// The caller retains its partially assigned coordinates after owner Close.
+					// Check actual named ownership before deleting those inputs.
+					extra := []*numeral.Rational{}
+					for i := range w.Data {
+						extra = append(extra, &w.Data[i])
+					}
+					for i := range x.Data {
+						extra = append(extra, &x.Data[i].X, &x.Data[i].Y)
+					}
+					lpExactVectorNamedCensus(t, h, extra)
+					h.must(w.Close())
+					h.must(x.Close())
+					lpExactVectorNamedCensus(t, h, nil)
+				})
+				if done {
+					break
 				}
-				h.must(p.Close())
-				h.must(p.Close())
-				// The caller retains its partially assigned coordinates after owner Close.
-				// Check actual named ownership before deleting those inputs.
-				extra := []*numeral.Rational{}
-				for i := range w.Data {
-					extra = append(extra, &w.Data[i])
-				}
-				for i := range x.Data {
-					extra = append(extra, &x.Data[i].X, &x.Data[i].Y)
-				}
-				lpExactVectorNamedCensus(t, h, extra)
-				h.must(w.Close())
-				h.must(x.Close())
-				lpExactVectorNamedCensus(t, h, nil)
-			})
-			if done {
-				break
 			}
-		}
-		if failures == 0 || successes != 1 {
-			t.Fatal("incomplete fault campaign", op, failures, successes)
+			if failures == 0 || successes != 1 {
+				t.Fatal("incomplete fault campaign", op, failures, successes)
+			}
 		}
 	}
 }
+
 func TestLPPairPermutationResizeAndGuardContracts(t *testing.T) {
 	h := newLPPairHarness(t)
 	p, err := PairPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
@@ -449,57 +474,68 @@ func TestLPRationalPermutationIndependentSparseProducts(t *testing.T) {
 	lpExactVectorNamedCensus(t, h, nil)
 }
 func TestLPRationalPermutationSparseAllocationFailureCensus(t *testing.T) {
-	for _, op := range []string{"left", "right", "reverse-left", "reverse-right"} {
-		failures, successes := 0, 0
-		for fail := int64(0); fail < 100; fail++ {
-			done := false
-			t.Run(fmt.Sprintf("%s/%d", op, fail), func(t *testing.T) {
-				h := newLPPairHarness(t)
-				a := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
-				b := h.pair(strings.Repeat("9876543210", 100)+"/11", "0")
-				p, err := RationalPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
-				h.must(err)
-				w := NewIndexedRationalVector(h.m, 3)
-				h.must(w.SetValue(&a.X, 2))
-				h.must(w.SetValue(&b.X, 0))
-				h.budget.FailAfter(fail)
-				switch op {
-				case "left":
-					err = p.ApplyLeftIndexed(w)
-				case "right":
-					err = p.ApplyRightIndexed(w)
-				case "reverse-left":
-					err = p.ApplyReverseLeftIndexed(w)
-				case "reverse-right":
-					err = p.ApplyReverseRightIndexed(w)
-				}
-				h.budget.FailAfter(-1)
-				if err == nil {
-					successes++
-					done = true
-				} else {
-					failures++
-				}
-				if p.scratch != nil {
-					if e := p.Resize(3); e != ErrExactVectorPending {
-						t.Fatal("stopped lexical owner", e)
+	for _, direct := range []bool{false, true} {
+		for _, op := range []string{"left", "right", "reverse-left", "reverse-right"} {
+			failures, successes := 0, 0
+			for fail := int64(0); fail < 100; fail++ {
+				done := false
+				t.Run(fmt.Sprintf("direct=%t/%s/%d", direct, op, fail), func(t *testing.T) {
+					var h *lpPairHarness
+					if direct {
+						h = lpNewDirectSparseHarness(t)
+					} else {
+						h = newLPPairHarness(t)
 					}
+					a := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
+					b := h.pair(strings.Repeat("9876543210", 100)+"/11", "0")
+					p, err := RationalPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
+					h.must(err)
+					w := NewIndexedRationalVector(h.m, 3)
+					h.must(w.SetValue(&a.X, 2))
+					h.must(w.SetValue(&b.X, 0))
+					h.budget.FailAfter(fail)
+					switch op {
+					case "left":
+						err = p.ApplyLeftIndexed(w)
+					case "right":
+						err = p.ApplyRightIndexed(w)
+					case "reverse-left":
+						err = p.ApplyReverseLeftIndexed(w)
+					case "reverse-right":
+						err = p.ApplyReverseRightIndexed(w)
+					}
+					h.budget.FailAfter(-1)
+					if err == nil {
+						successes++
+						done = true
+					} else {
+						if !lpExactPriorityPhysicalRefusal(err) {
+							t.Fatalf("unexpected allocation failure: %v", err)
+						}
+						failures++
+					}
+					if p.scratch != nil {
+						if e := p.Resize(3); e != ErrExactVectorPending {
+							t.Fatal("stopped lexical owner", e)
+						}
+					}
+					// Destination numerical roots belong to w; lexical copies and preliminary
+					// dense/debug arithmetic belong to p. Neither owner can consume the other.
+					h.must(p.Close())
+					h.must(w.Close())
+					lpExactVectorNamedCensus(t, h, nil)
+				})
+				if done {
+					break
 				}
-				// Destination numerical roots belong to w; lexical copies and preliminary
-				// dense/debug arithmetic belong to p. Neither owner can consume the other.
-				h.must(p.Close())
-				h.must(w.Close())
-				lpExactVectorNamedCensus(t, h, nil)
-			})
-			if done {
-				break
 			}
-		}
-		if failures == 0 || successes != 1 {
-			t.Fatal("incomplete fault campaign", op, failures, successes)
+			if failures == 0 || successes != 1 {
+				t.Fatal("incomplete fault campaign", op, failures, successes)
+			}
 		}
 	}
 }
+
 func TestLPRationalPermutationSparseGuardAndMutationPrefixes(t *testing.T) {
 	h := newLPPairHarness(t)
 	value := h.pair("3/7", "0")
@@ -642,57 +678,68 @@ func TestLPPairPermutationIndependentSparseProducts(t *testing.T) {
 	lpExactVectorNamedCensus(t, h, nil)
 }
 func TestLPPairPermutationSparseAllocationFailureCensus(t *testing.T) {
-	for _, op := range []string{"left", "right", "reverse-left", "reverse-right"} {
-		failures, successes := 0, 0
-		for fail := int64(0); fail < 100; fail++ {
-			done := false
-			t.Run(fmt.Sprintf("%s/%d", op, fail), func(t *testing.T) {
-				h := newLPPairHarness(t)
-				a := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
-				b := h.pair(strings.Repeat("9876543210", 100)+"/11", "0")
-				p, err := PairPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
-				h.must(err)
-				w := NewIndexedRationalVector(h.m, 3)
-				h.must(w.SetValue(&a.X, 2))
-				h.must(w.SetValue(&b.X, 0))
-				h.budget.FailAfter(fail)
-				switch op {
-				case "left":
-					err = p.ApplyLeftIndexed(w)
-				case "right":
-					err = p.ApplyRightIndexed(w)
-				case "reverse-left":
-					err = p.ApplyReverseLeftIndexed(w)
-				case "reverse-right":
-					err = p.ApplyReverseRightIndexed(w)
-				}
-				h.budget.FailAfter(-1)
-				if err == nil {
-					successes++
-					done = true
-				} else {
-					failures++
-				}
-				if p.scratch != nil {
-					if e := p.Resize(3); e != ErrExactVectorPending {
-						t.Fatal("stopped lexical owner", e)
+	for _, direct := range []bool{false, true} {
+		for _, op := range []string{"left", "right", "reverse-left", "reverse-right"} {
+			failures, successes := 0, 0
+			for fail := int64(0); fail < 100; fail++ {
+				done := false
+				t.Run(fmt.Sprintf("direct=%t/%s/%d", direct, op, fail), func(t *testing.T) {
+					var h *lpPairHarness
+					if direct {
+						h = lpNewDirectSparseHarness(t)
+					} else {
+						h = newLPPairHarness(t)
 					}
+					a := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
+					b := h.pair(strings.Repeat("9876543210", 100)+"/11", "0")
+					p, err := PairPermutationFromValues(h.m, 3, []uint32{2, 0, 1})
+					h.must(err)
+					w := NewIndexedRationalVector(h.m, 3)
+					h.must(w.SetValue(&a.X, 2))
+					h.must(w.SetValue(&b.X, 0))
+					h.budget.FailAfter(fail)
+					switch op {
+					case "left":
+						err = p.ApplyLeftIndexed(w)
+					case "right":
+						err = p.ApplyRightIndexed(w)
+					case "reverse-left":
+						err = p.ApplyReverseLeftIndexed(w)
+					case "reverse-right":
+						err = p.ApplyReverseRightIndexed(w)
+					}
+					h.budget.FailAfter(-1)
+					if err == nil {
+						successes++
+						done = true
+					} else {
+						if !lpExactPriorityPhysicalRefusal(err) {
+							t.Fatalf("unexpected allocation failure: %v", err)
+						}
+						failures++
+					}
+					if p.scratch != nil {
+						if e := p.Resize(3); e != ErrExactVectorPending {
+							t.Fatal("stopped lexical owner", e)
+						}
+					}
+					// Destination numerical roots belong to w; lexical copies and preliminary
+					// dense/debug arithmetic belong to p. Neither owner can consume the other.
+					h.must(p.Close())
+					h.must(w.Close())
+					lpExactVectorNamedCensus(t, h, nil)
+				})
+				if done {
+					break
 				}
-				// Destination numerical roots belong to w; lexical copies and preliminary
-				// dense/debug arithmetic belong to p. Neither owner can consume the other.
-				h.must(p.Close())
-				h.must(w.Close())
-				lpExactVectorNamedCensus(t, h, nil)
-			})
-			if done {
-				break
 			}
-		}
-		if failures == 0 || successes != 1 {
-			t.Fatal("incomplete fault campaign", op, failures, successes)
+			if failures == 0 || successes != 1 {
+				t.Fatal("incomplete fault campaign", op, failures, successes)
+			}
 		}
 	}
 }
+
 func TestLPPairPermutationSparseGuardAndMutationPrefixes(t *testing.T) {
 	h := newLPPairHarness(t)
 	value := h.pair("3/7", "0")

@@ -6215,6 +6215,9 @@
         "TestLPPairPermutationAllDenseGuardProfiles",
         "TestLPRationalPermutationStoppedDestinationOwnership",
         "TestLPPairPermutationStoppedDestinationOwnership"
+      ],
+      "ownership": [
+        "Permutation allocation fault campaigns now cover both pooled and direct physical allocation for all six dense and four sparse operations of RationalPermutation and PairPermutation (40 campaigns total). Each walks real refusals through first success, requires physical-allocation errors, checks pending-owner guards, and verifies named numerical roots after cleanup; dense campaigns also check caller coordinates after permutation Close. Production implementation unchanged. Whole permutation units remain partial pending retained-source/LU integration audit."
       ]
     },
     {
@@ -6266,7 +6269,8 @@
         }
       ],
       "ownership": [
-        "Debug equality scratch owns the copied-left and returned difference slots plus existing exact call receipts. Returned temporary is destroyed before next element/early false; failed operations retain reached storage for scratch Close. Other source methods/whole-owner audits remain independently partial."
+        "Debug equality scratch owns the copied-left and returned difference slots plus existing exact call receipts. Returned temporary is destroyed before next element/early false; failed operations retain reached storage for scratch Close. Other source methods/whole-owner audits remain independently partial.",
+        "Permutation allocation fault campaigns now cover both pooled and direct physical allocation for all six dense and four sparse operations of RationalPermutation and PairPermutation (40 campaigns total). Each walks real refusals through first success, requires physical-allocation errors, checks pending-owner guards, and verifies named numerical roots after cleanup; dense campaigns also check caller coordinates after permutation Close. Production implementation unchanged. Whole permutation units remain partial pending retained-source/LU integration audit."
       ]
     },
     {
@@ -6300,6 +6304,9 @@
         "TestLPPairPermutationAllDenseGuardProfiles",
         "TestLPRationalPermutationStoppedDestinationOwnership",
         "TestLPPairPermutationStoppedDestinationOwnership"
+      ],
+      "ownership": [
+        "Permutation allocation fault campaigns now cover both pooled and direct physical allocation for all six dense and four sparse operations of RationalPermutation and PairPermutation (40 campaigns total). Each walks real refusals through first success, requires physical-allocation errors, checks pending-owner guards, and verifies named numerical roots after cleanup; dense campaigns also check caller coordinates after permutation Close. Production implementation unchanged. Whole permutation units remain partial pending retained-source/LU integration audit."
       ]
     },
     {
@@ -13384,5 +13391,53 @@
     },
     "combined_debug_checked_seconds": 2.452,
     "lu_file_check_seconds": 0.027
+  },
+  "latest_permutation_allocation_increment": {
+    "scope": "Permutation allocation fault campaigns now cover both pooled and direct physical allocation for all six dense and four sparse operations of RationalPermutation and PairPermutation (40 campaigns total). Each walks real refusals through first success, requires physical-allocation errors, checks pending-owner guards, and verifies named numerical roots after cleanup; dense campaigns also check caller coordinates after permutation Close. Production implementation unchanged. Whole permutation units remain partial pending retained-source/LU integration audit.",
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "campaigns": 40,
+    "focused_native_seconds": 14.825,
+    "focused_combined_debug_checked_seconds": 21.321,
+    "native_permutation_suite_seconds": 16.609,
+    "profiles": {
+      "native": "/mnt/oldrog/tmp/g3-lp-permutation-allocation-native.cover",
+      "combined": "/mnt/oldrog/tmp/g3-lp-permutation-allocation-debug.cover"
+    },
+    "whole_unit_status": "partial",
+    "cache_cleanup_record": "/mnt/oldrog/tmp/g3-lp-permutation-cache-cleanup.json",
+    "full_suite_qualification": "Latest full native checkpoint 8f2961ca predates this test expansion and recent production corrections; no new full-suite claim.",
+    "combined_permutation_suite_seconds": 21.795,
+    "whole_go_file_focused_covered_total": {
+      "native": {
+        "permutation.go": [
+          104,
+          114
+        ],
+        "permutation_exact.go": [
+          428,
+          521
+        ],
+        "permutation_float.go": [
+          178,
+          203
+        ]
+      },
+      "debug": {
+        "permutation.go": [
+          106,
+          114
+        ],
+        "permutation_exact.go": [
+          477,
+          521
+        ],
+        "permutation_float.go": [
+          188,
+          203
+        ]
+      }
+    },
+    "verification": "Both LP vets and source portcheck pass: 2103 units, 677 APIs; 111 ported, 329 partial, 1620 unported, 5 dead/deleted."
   }
 }
