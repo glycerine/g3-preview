@@ -99340,9 +99340,15 @@
       "path": "src/tactic/ufbv/ufbv_rewriter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/ufbv/rewrite_cache.go",
+        "pkg/tactic/ufbv/rewrite_cache_test.go"
+      ],
+      "tests": [
+        "TestRewriteCacheSourceLazyResetAndReferenceOrder",
+        "TestRewriteCacheSourceTimestampWrap"
+      ],
       "conditionals": [
         {
           "line": 74,
@@ -99461,17 +99467,37 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "rewrite cache insert, contains/get and lazy reset use sites",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_cache.go",
+          "tests": [
+            "TestRewriteCacheSourceLazyResetAndReferenceOrder",
+            "TestRewriteCacheSourceTimestampWrap"
+          ]
+        }
+      ],
+      "ownership": [
+        "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction."
+      ],
+      "deviations": [
+        "Only the concrete rewrite-cache storage is ported; the UFBV rewriting algorithm, matcher, and tactic integration remain open."
+      ]
     },
     {
       "path": "src/tactic/ufbv/ufbv_rewriter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/ufbv/rewrite_cache.go",
+        "pkg/tactic/ufbv/rewrite_cache_test.go"
+      ],
+      "tests": [
+        "TestRewriteCacheSourceLazyResetAndReferenceOrder",
+        "TestRewriteCacheSourceTimestampWrap"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -99484,9 +99510,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "rewrite_cache_map and plugin reference callbacks",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_cache.go",
+          "tests": [
+            "TestRewriteCacheSourceLazyResetAndReferenceOrder",
+            "TestRewriteCacheSourceTimestampWrap"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete plugin borrows its AST manager and retains each stored key and expression value; the bool payload is a scalar."
+      ],
+      "deviations": [
+        "The surrounding UFBV rewriter declarations and matcher are not yet ported."
+      ]
     },
     {
       "path": "src/tactic/ufbv/ufbv_rewriter_tactic.cpp",
@@ -111279,9 +111319,15 @@
       "path": "src/util/array_map.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/ufbv/rewrite_cache.go",
+        "pkg/tactic/ufbv/rewrite_cache_test.go"
+      ],
+      "tests": [
+        "TestRewriteCacheSourceLazyResetAndReferenceOrder",
+        "TestRewriteCacheSourceTimestampWrap"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -111306,11 +111352,29 @@
           "text": "SASSERT(m_garbage > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete UFBV expr-to-(expr,bool) rewrite cache: contains, get, insert, reset and destruction",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_cache.go",
+          "tests": [
+            "TestRewriteCacheSourceLazyResetAndReferenceOrder",
+            "TestRewriteCacheSourceTimestampWrap"
+          ]
+        },
+        {
+          "name": "erase, flush and finalize have no retained UFBV call site",
+          "status": "dead_deleted"
+        }
+      ],
+      "ownership": [
+        "The sole production specialization is array_map<expr*, pair<expr*,bool>,plugin> in ufbv_rewriter. The plugin increments the expression key then expression value before a replacement decrements the old key then value. Reset advances a timestamp without releasing stale entries; replacement, timestamp wrap, and destruction release them."
+      ],
+      "deviations": [
+        "A Go map keyed by AST ID replaces the source optional-entry vector. The concrete cache is not yet wired into the unported UFBV rewriter. Unused erase/flush/finalize and the counters needed only by flush are excluded; no generic array_map adapter is added."
+      ]
     },
     {
       "path": "src/util/backtrackable_set.h",
