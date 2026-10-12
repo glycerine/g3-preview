@@ -34610,7 +34610,9 @@
         "pkg/math/subpaving/fixed_interval_root.go",
         "pkg/math/subpaving/fixed_interval_root_test.go",
         "pkg/math/subpaving/fast_interval.go",
-        "pkg/math/subpaving/fast_interval_test.go"
+        "pkg/math/subpaving/fast_interval_test.go",
+        "pkg/math/subpaving/fast_interval_arith.go",
+        "pkg/math/subpaving/fast_interval_arith_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34618,7 +34620,8 @@
         "TestRealClosureBinaryIntervalRetainedCore",
         "TestFixedRootRetainedNewtonAndCertifiedBounds",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
-        "TestSubpavingFastMutableIntervalRetainedCore"
+        "TestSubpavingFastMutableIntervalRetainedCore",
+        "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
       ],
       "conditionals": [
         {
@@ -34712,7 +34715,11 @@
         "pkg/math/interval/fixed_root.go",
         "pkg/math/interval/fixed_root_test.go",
         "pkg/math/subpaving/fixed_interval_root.go",
-        "pkg/math/subpaving/fixed_interval_root_test.go"
+        "pkg/math/subpaving/fixed_interval_root_test.go",
+        "pkg/math/subpaving/fast_interval.go",
+        "pkg/math/subpaving/fast_interval_test.go",
+        "pkg/math/subpaving/fast_interval_arith.go",
+        "pkg/math/subpaving/fast_interval_arith_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34724,7 +34731,9 @@
         "TestSubpavingFixedIntervalMulSignClasses",
         "TestSubpavingFixedIntervalDivSignBranches",
         "TestFixedRootRetainedNewtonAndCertifiedBounds",
-        "TestSubpavingFixedIntervalXnEqYRetainedCases"
+        "TestSubpavingFixedIntervalXnEqYRetainedCases",
+        "TestSubpavingFastMutableIntervalRetainedCore",
+        "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
       ],
       "conditionals": [
         {
@@ -35187,6 +35196,14 @@
           "go_target": "pkg/math/subpaving/fast_interval.go",
           "tests": [
             "TestSubpavingFastMutableIntervalRetainedCore"
+          ]
+        },
+        {
+          "name": "Concrete mpff interval negation, directed addition and subtraction with alias-safe endpoint scratch (src/math/interval/interval_def.h:704-837)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_interval_arith.go",
+          "tests": [
+            "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
           ]
         }
       ],
@@ -49921,10 +49938,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/subpaving/fast_interval.go",
-        "pkg/math/subpaving/fast_interval_test.go"
+        "pkg/math/subpaving/fast_interval_test.go",
+        "pkg/math/subpaving/fast_interval_arith.go",
+        "pkg/math/subpaving/fast_interval_arith_test.go"
       ],
       "tests": [
-        "TestSubpavingFastMutableIntervalRetainedCore"
+        "TestSubpavingFastMutableIntervalRetainedCore",
+        "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
       ],
       "conditionals": [
         {
@@ -49944,7 +49964,8 @@
           "status": "partial",
           "go_target": "pkg/math/subpaving/fast_interval.go",
           "tests": [
-            "TestSubpavingFastMutableIntervalRetainedCore"
+            "TestSubpavingFastMutableIntervalRetainedCore",
+            "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
           ]
         }
       ],
@@ -50065,7 +50086,9 @@
         "pkg/math/subpaving/fixed_selector.go",
         "pkg/math/subpaving/fixed_selector_test.go",
         "pkg/math/subpaving/fast_interval.go",
-        "pkg/math/subpaving/fast_interval_test.go"
+        "pkg/math/subpaving/fast_interval_test.go",
+        "pkg/math/subpaving/fast_interval_arith.go",
+        "pkg/math/subpaving/fast_interval_arith_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50096,7 +50119,8 @@
         "TestSubpavingFixedMidpointIntegerChildNormalization",
         "TestSubpavingFixedRoundRobinSourceDecisionAndDefinitionSkip",
         "TestSubpavingFixedRoundRobinSingletonAndUndecidedChild",
-        "TestSubpavingFastMutableIntervalRetainedCore"
+        "TestSubpavingFastMutableIntervalRetainedCore",
+        "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
       ],
       "conditionals": [
         {
@@ -50198,7 +50222,8 @@
           "status": "partial",
           "go_target": "pkg/math/subpaving/fast_interval.go",
           "tests": [
-            "TestSubpavingFastMutableIntervalRetainedCore"
+            "TestSubpavingFastMutableIntervalRetainedCore",
+            "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
           ]
         }
       ],
