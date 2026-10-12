@@ -39894,5 +39894,15 @@ map, and command user-tactic map. The AST expression map resets proof values
 before expression keys and values. These helpers borrow their managers and
 release references before resetting each map; consumed references must stay
 retired if later cleanup reports an error. `dec_ref_keys` has no retained
-production caller. The concrete Go map owners remain unported, so the header
-stays unported and no generic reference-map adapter is introduced.
+production caller. Each live operation belongs in its concrete Go map owner;
+no generic reference-map adapter is introduced.
+
+`pkg/ast.ASTExprMap` now supplies the first concrete live specialization.
+It owns expression key/value references and optional proofs, increments a
+replacement value before releasing the old value, erases in value/proof/key
+order, and resets all proof values before expression keys and values. Focused
+tests use real AST reference counts across insertion, replacement,
+self-replacement, erase, reset, proof-policy flush and close. This moves
+`dec_ref_util.h` and `src/ast/expr_map.h/.cpp` to partial. Their remaining
+API/rewriter/Spacer call sites, API iteration and exact checked failure
+prefixes remain open.

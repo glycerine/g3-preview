@@ -14091,28 +14091,51 @@
       "path": "src/ast/expr_map.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_expr_map.go",
+        "pkg/ast/ast_expr_map_test.go"
+      ],
+      "tests": [
+        "TestASTExprMapConcreteReferenceCleanup"
+      ],
       "assertions": [
         {
           "line": 47,
           "text": "SASSERT(entry_pr != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor proof-mode snapshot, insert replacement INC-before-DEC, get, erase, reset and flush",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_expr_map.go",
+          "tests": [
+            "TestASTExprMapConcreteReferenceCleanup"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete Go map owns one retained key/value pair and optional proof per entry. Reset decrements all proof values before keys and values; erase removes the entry before releasing value, proof and key. The owning map must close before its AST manager."
+      ],
+      "deviations": [
+        "Native Go map storage replaces obj_map. Checked cleanup retains unconsumed references for explicit retry. Retained API/rewriter/Spacer callers, iterator traversal and exact source failure prefixes remain open."
+      ]
     },
     {
       "path": "src/ast/expr_map.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_expr_map.go",
+        "pkg/ast/ast_expr_map_test.go"
+      ],
+      "tests": [
+        "TestASTExprMapConcreteReferenceCleanup"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -14123,11 +14146,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete expression map insert/get/contains/erase/reset/flush and set_store_proofs",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_expr_map.go",
+          "tests": [
+            "TestASTExprMapConcreteReferenceCleanup"
+          ]
+        },
+        {
+          "name": "begin/end iterator used by retained API quantifier elimination",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "ASTExprMap owns references to its expression keys, expression values and optional proofs; it borrows the AST manager and must close before that manager."
+      ],
+      "deviations": [
+        "Native Go typed map replaces source obj_map. Retained consumers and API iterator traversal are not yet bound."
+      ]
     },
     {
       "path": "src/ast/expr_stat.cpp",
@@ -113561,9 +113601,14 @@
       "path": "src/util/dec_ref_util.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_expr_map.go",
+        "pkg/ast/ast_expr_map_test.go"
+      ],
+      "tests": [
+        "TestASTExprMapConcreteReferenceCleanup"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -113579,11 +113624,19 @@
       "methods": [
         {
           "name": "dec_ref_key_values for AST expr_map, API AST map and recover_01_tactic bool-to-int map",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/ast/ast_expr_map.go",
+          "tests": [
+            "TestASTExprMapConcreteReferenceCleanup"
+          ]
         },
         {
           "name": "dec_ref_values for AST expr_map proof table, SMT name-to-assertion map and command user-tactic declarations",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/ast/ast_expr_map.go",
+          "tests": [
+            "TestASTExprMapConcreteReferenceCleanup"
+          ]
         },
         {
           "name": "dec_ref_keys has no retained production call site",
@@ -113594,7 +113647,7 @@
         "Each live helper borrows its manager and mutates an owning map. For every entry, the key/value or value reference decrements occur before map.reset; the AST expr_map reset calls proof-value cleanup before key/value cleanup. A Go consumer must retire consumed references even when a later destructor reports an error."
       ],
       "deviations": [
-        "No generic Go ref-count map adapter is retained. Implement the live decrement/reset order in each concrete AST, API, SMT, command, and tactic map owner using typed Go collections. The separate dec_ref_collection_values in ref_util.h is not a specialization of this header."
+        "No generic Go ref-count map adapter is retained. The AST expr_map now has a concrete proof-first/key-value-second cleanup implementation. API, SMT, command, and tactic map owners remain unported; implement their release order in typed Go collections. The separate dec_ref_collection_values in ref_util.h is not a specialization of this header."
       ]
     },
     {
