@@ -39319,3 +39319,14 @@ fixed-manager word access needed by that friend is available as Word/WriteWord.
 local `uint_map` from `util/map.h`. The unused generic `uint_map` method rows
 were removed from the port ledger; no production Go adapter is needed. The
 upstream source header remains available for reference.
+
+### Symbol buffer specialization audit
+
+`symbol.h` had an unported row for inserting symbols into nondefault
+`string_buffer<SZ>` instantiations. A source call-site audit found symbol
+insertion only in default-width AST fresh-declaration naming. The 32-byte
+fresh-sort/var buffers append C strings, and the 128-byte buffer in
+`symbol.cpp` appends a literal and integer. The unused method row is removed
+without crediting a generic adapter. Retained Go callers use `Symbol.Display`
+and their native buffers. Focused symbol spelling tests pass native and
+`g3debug,g3checked`, and AST fresh-name checks pass native on CPUs 0–7.

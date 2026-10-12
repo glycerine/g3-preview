@@ -164257,11 +164257,6 @@
           ]
         },
         {
-          "name": "string_buffer symbol insertion for other INITIAL_SIZE template instantiations",
-          "status": "unported",
-          "tests": []
-        },
-        {
           "name": "initialize_symbols/finalize_symbols explicit table pointer: completed publication, null finalize, identity-preserving shortcut and reinitialize",
           "status": "ported",
           "go_target": "pkg/util/symbol/service.go",
@@ -164305,7 +164300,7 @@
         "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
         "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
         "Supported scalar ostream representation only; native pointer encoding and full locale/global stream bindings remain separate obligations.",
-        "Unused string_buffer symbol insertion specialization and its implementation credit are removed. Actual fresh-name and parameter-output callers use checked Display strings and native buffers.",
+        "A retained-source call-site audit found symbol insertion only into default string_buffer<64> during AST fresh-declaration naming; string_buffer<32> fresh-sort/var paths append C strings and string_buffer<128> in symbol.cpp appends a literal plus an integer. No other INITIAL_SIZE symbol-insertion instantiation is live. The unused method row is removed, not counted as a port. Actual fresh-name and parameter-output callers use checked Display strings and native buffers.",
         "The retained SMT symbol output action now belongs to GlobalParamsService.AppendSymbolTo rather than NumericTextStream. Assertion/provider checks and native symbol spelling resolution stay in the parameter-service layer; AST low-level printing reads its own symbol spelling directly. No stream-to-global-service dependency or new template/STL implementation is introduced."
       ]
     },
