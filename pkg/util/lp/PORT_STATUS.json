@@ -8139,14 +8139,13 @@
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
-    "commit": "8f2961ca",
-    "started_utc": "2026-10-12 03:53:59 UTC",
-    "completed_utc": "2026-10-12 04:18:29 UTC",
+    "commit": "55b06c96",
+    "started_utc": "2026-10-12 10:47 UTC",
+    "completed_utc": "2026-10-12 11:14:25 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.events.jsonl",
-    "profile": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.json",
+    "log": "/mnt/oldrog/tmp/g3-lp-indexed-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-lp-indexed-module-native.json",
+    "profile": "/mnt/oldrog/tmp/g3-lp-indexed-module-native.cover",
     "cpu_affinity": [
       8,
       9,
@@ -8158,15 +8157,18 @@
       15,
       16
     ],
+    "GOMAXPROCS": 9,
+    "package_parallelism": 2,
+    "package_timeout": "30m",
     "packages": 64,
     "passed_packages": 63,
     "skipped_packages": 1,
     "packages_with_tests": 51,
-    "lp_seconds": 1442.72,
-    "lp_covered_statements": 30253,
-    "lp_statements": 34954,
-    "session_id": 89234,
-    "scope_warning": "Full native module checkpoint 8f2961ca completed successfully; actual session 89234 terminal exit 0 observed and closed. All 64 packages processed: 63 pass, one skip, 51 with named tests. LP 1442.720s, 30253/34954 statements (86.6%). Includes LPParams, scoped-container tests, numeric benchmark final-report correction and actual CLI executor. Excludes later debug-only precise-vector equality correction and indexed-value audit tests; these have separate focused evidence. Go benchmark full-count loops are separate checkpoints. CPU affinity 8\u201316, GOMAXPROCS=9. No whole-LP completion claim."
+    "lp_seconds": 1567.175,
+    "lp_covered_statements": 30137,
+    "lp_statements": 34842,
+    "session_id": 64751,
+    "scope_warning": "Full native module checkpoint55b06c96 completed successfully: session64751 exited0 at2026-10-12 11:14:25UTC after starting10:47UTC. All64 package paths processed,63pass/1skip/51with named tests; LP1567.175s and30137/34842 statements(86.5%) in the inspected profile. The run used CPUs8-16/GOMAXPROCS9, two package jobs and a30m per-package timeout. It includes the diagonal/square-dense audits and indexed-vector increment through revision55b06c96. It predates random-updater/term/constraint/settings audits, the insdict v0.10.1 pin and added numeric-pair physical tests; those have separate focused validation and are not credited to this full suite. No whole-LP completion claim. Artifacts /mnt/oldrog/tmp/g3-lp-indexed-module-native.{json,log,cover}."
   },
   "full_native_checkpoint_history": [
     {
@@ -8430,6 +8432,36 @@
       "lp_statements": 34582,
       "session_id": 40124,
       "scope_warning": "Native module checkpointc32fb569 completed successfully: actual session40124 terminal exit0 observed and closed,2026-10-12 00:55:56\u201301:19:18UTC. All64packages processed,63pass/1skip/51with named tests; LP1397.137s,29932/34582statements86.6%. Actual profile contains no driver_rational_benchmark/driver_pair_benchmark/driver_execute files: includes native column copied-left fix, iterator/column/settings tests and preceding native work; excludes all debug-only LU scenarios and later preparation short-write correction/benchmark/executor increments. Profiles and terminal package events inspected; no whole-LP completion claim. Artifacts /mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.{json,log,cover,events.jsonl}."
+    },
+    {
+      "commit": "8f2961ca",
+      "started_utc": "2026-10-12 03:53:59 UTC",
+      "completed_utc": "2026-10-12 04:18:29 UTC",
+      "exit_code": 0,
+      "log": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.log",
+      "event_log": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.events.jsonl",
+      "profile": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.cover",
+      "status_file": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.json",
+      "cpu_affinity": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "packages": 64,
+      "passed_packages": 63,
+      "skipped_packages": 1,
+      "packages_with_tests": 51,
+      "lp_seconds": 1442.72,
+      "lp_covered_statements": 30253,
+      "lp_statements": 34954,
+      "session_id": 89234,
+      "scope_warning": "Full native module checkpoint 8f2961ca completed successfully; actual session 89234 terminal exit 0 observed and closed. All 64 packages processed: 63 pass, one skip, 51 with named tests. LP 1442.720s, 30253/34954 statements (86.6%). Includes LPParams, scoped-container tests, numeric benchmark final-report correction and actual CLI executor. Excludes later debug-only precise-vector equality correction and indexed-value audit tests; these have separate focused evidence. Go benchmark full-count loops are separate checkpoints. CPU affinity 8\u201316, GOMAXPROCS=9. No whole-LP completion claim."
     }
   ],
   "latest_tableau_catchup_increment": {
@@ -14173,23 +14205,6 @@
     "consumer_tests_combined_seconds": 11.27,
     "verification": "All64package native/combined compile gates, both LP vets and source portcheck pass; 2103units/677APIs,117ported/323partial/1620unported/5dead_deleted.",
     "coverage_qualification": "Whole-Go-file focus covers retained numerical paths; remaining exact returns guard invariant-protected bounds, stable delegated cleanup/check errors and unavailable precise zero-drop branches. Floating one native uncovered return is erased source assertion. Sparse helper extraction preserves standalone Close behavior; coefficients are deleted only by Close, not closeCall."
-  },
-  "pending_full_native_checkpoint": {
-    "revision": "55b06c96",
-    "status": "running",
-    "session_id": 64751,
-    "started_utc": "2026-10-12 10:47 UTC",
-    "cpu_affinity": "8-16",
-    "GOMAXPROCS": 9,
-    "package_parallelism": 2,
-    "timeout": "30m per package",
-    "command": "go -C pkg test ./... -p 2 -count=1 -timeout=30m -coverprofile=/mnt/oldrog/tmp/g3-lp-indexed-module-native.cover -json",
-    "artifacts": {
-      "json": "/mnt/oldrog/tmp/g3-lp-indexed-module-native.json",
-      "stderr": "/mnt/oldrog/tmp/g3-lp-indexed-module-native.log",
-      "coverage": "/mnt/oldrog/tmp/g3-lp-indexed-module-native.cover"
-    },
-    "qualification": "Package results are provisional until terminal exit0 and profile inspection. Revision55b06c96 includes completed diagonal/square-dense and indexed increment; subsequent source edits are outside this checkpoint. Previous completed full8f2961ca is still last successful checkpoint."
   },
   "latest_row_eta_support_audit": {
     "scope": "Whole retained row_eta_matrix source/ownership audit: actual double/double, mpq/mpq and mpq/impq constructors, non-dense tail, by-value append, dense X-left/T-right, indexed T-left/right and descending permutation conjugation are implemented. Source row_start is never read; exact debug views, local_to_X, invalid unused diagonal getter and compact print are excluded. Floating debug view is retained by actual LU matrix consumers. Source live dense row versus copied sparse-left accumulator, precise zero branches, empty-index behavior, strict floating drop tests, insertion/erase order, self/duplicate terms and reached invalid-domain prefixes remain literal. Corrected Close to unwind owned child sparse call locals, then row-eta lexical work, then stored row coefficients. Caller destination and older raw invocation generations remain independent. Removed unused exact debug matrix adapters; conjugation oracle uses all24permutations and four retained basis-vector ApplyLeft products. Removed dead lookup fault scenario and expanded fourteen retained fault campaigns to pooled/direct allocation (28total), preserving endpoint oracle, named roots, pending guards and index-before-result-copy refusal requirements. Stopped-destination/older-raw ownership checks also use both allocator modes. Containing sparse/dense/LU/CLI/SMT audits remain separate.",
