@@ -758,6 +758,7 @@
         "fixed_interval_power.go",
         "fixed_interval_root.go",
         "fixed_interval_scalar.go",
+        "fixed_monomial.go",
         "fixed_node.go",
         "fixed_node_predicates.go",
         "fixed_polynomial.go"

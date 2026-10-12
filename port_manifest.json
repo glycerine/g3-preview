@@ -49860,7 +49860,9 @@
         "pkg/math/subpaving/fixed_context_bounds.go",
         "pkg/math/subpaving/fixed_context_bounds_test.go",
         "pkg/math/subpaving/fixed_polynomial.go",
-        "pkg/math/subpaving/fixed_polynomial_test.go"
+        "pkg/math/subpaving/fixed_polynomial_test.go",
+        "pkg/math/subpaving/fixed_monomial.go",
+        "pkg/math/subpaving/fixed_monomial_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -49876,7 +49878,11 @@
         "TestSubpavingFixedContextPropagateCandidateAndRootPrecision",
         "TestSubpavingFixedContextRelevanceArithmeticFailure",
         "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant",
-        "TestSubpavingFixedPolynomialSingleUnboundedAndDuplicates"
+        "TestSubpavingFixedPolynomialSingleUnboundedAndDuplicates",
+        "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
+        "TestSubpavingFixedMonomialOddUnboundedDownward",
+        "TestSubpavingFixedMonomialProductDownward",
+        "TestSubpavingFixedMonomialSourceThreeFactorDownwardScratch"
       ],
       "conditionals": [
         {
@@ -49992,7 +49998,9 @@
         "pkg/math/subpaving/fixed_context_bounds.go",
         "pkg/math/subpaving/fixed_context_bounds_test.go",
         "pkg/math/subpaving/fixed_polynomial.go",
-        "pkg/math/subpaving/fixed_polynomial_test.go"
+        "pkg/math/subpaving/fixed_polynomial_test.go",
+        "pkg/math/subpaving/fixed_monomial.go",
+        "pkg/math/subpaving/fixed_monomial_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50003,7 +50011,11 @@
         "TestSubpavingFixedContextPropagateCandidateAndRootPrecision",
         "TestSubpavingFixedContextRelevanceArithmeticFailure",
         "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant",
-        "TestSubpavingFixedPolynomialSingleUnboundedAndDuplicates"
+        "TestSubpavingFixedPolynomialSingleUnboundedAndDuplicates",
+        "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
+        "TestSubpavingFixedMonomialOddUnboundedDownward",
+        "TestSubpavingFixedMonomialProductDownward",
+        "TestSubpavingFixedMonomialSourceThreeFactorDownwardScratch"
       ],
       "assertions": [
         {
