@@ -147245,7 +147245,7 @@
       "path": "src/util/mpfx.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/numeral/mpfx_core.go",
         "pkg/util/numeral/mpfx_core_test.go",
@@ -147499,12 +147499,12 @@
           "text": "SASSERT(is_zero(a) == ::is_zero(m_total_sz, words(a)));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete mpfx default word-sized scale/range, owned zero/reset/copy, signed integer and ratio setters, exact add/sub/compare, and directed mul/div (src/util/mpfx.cpp:28-83,90-100,133-249,316-520)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_core.go",
           "tests": [
             "TestFixedPointRetainedArithmeticAndDirectedRounding",
@@ -147513,7 +147513,7 @@
         },
         {
           "name": "Retained mpfx reciprocal, directed floor/ceil and power with distinct-output repeated products versus aliased/larger repeated-square order and source extra final square (src/util/mpfx.h:260-278; src/util/mpfx.cpp:558-650)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_ops.go",
           "tests": [
             "TestFixedPointRetainedFloorCeilInverseAndPower",
@@ -147522,7 +147522,7 @@
         },
         {
           "name": "Retained subpaving mpz/mpq conversion and mpfx binary rational display: exact integer paths, fractional prior-destination sign and directed rounding, exact back-conversion (src/util/mpfx.cpp:251-315,704-743,758-787,842-854)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_convert.go",
           "tests": [
             "TestFixedPointRetainedRationalIntegerConversionAndDisplay"
@@ -147530,7 +147530,7 @@
         },
         {
           "name": "Retained mpfx sign/one predicates, six exact comparison relations, source increment/decrement and owned numeral swap reached by subpaving bounds and coefficient storage (src/util/mpfx.h:160-247; src/util/mpfx.cpp:316-417)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_predicates.go",
           "tests": [
             "TestFixedPointRetainedOrderingSignsIncrementAndSwap"
@@ -147538,7 +147538,7 @@
         },
         {
           "name": "Retained integer-word prev_power_of_two query for subpaving nth-root approximation (src/util/mpfx.cpp:864-868)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_power_of_two.go",
           "tests": [
             "TestFixedPointPrevPowerOfTwoSourceIntegerWords"
@@ -147549,7 +147549,7 @@
         "FixedPointManager owns configuration and tracks live concrete numerals; each FixedPoint owns an independent signed scaled big.Int. Publication stages arithmetic before mutating destination, including aliased inputs."
       ],
       "deviations": [
-        "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. Selected numerical bounds and rounding are preserved, but source pool allocation, diagnostic assertion and failure timing are not claimed. Remaining mpfx shifts, specialized queries, decimal/SMT2/raw formats and complete subpaving consumer integration are open.",
+        "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. Retained numerical bounds and rounding are preserved; source pool allocation, diagnostic assertion and failure timing are not claimed. The retained production mpfx consumer is subpaving via subpaving_mpfx.h, subpaving.cpp and subpaving_tactic.cpp. Its interval and definition paths use the covered manager operations. div2k, is_power_of_two, epsilon setters, machine-word queries and decimal/SMT2/raw formats have no retained production mpfx call site; source-only tests and optional trace formatting do not require a Go manager adapter. The unfinished subpaving solver remains tracked by its separate source units.",
         "The source 32-bit power mask loop does not terminate after wrapping at a high-bit exponent; Go reports ErrFixedPointDomain for that input. Floor/ceil overflow leaves the Go numeral unchanged after staged calculation; source clears fractional words before detecting carry overflow.",
         "The source noninteger mpq setter reads the existing destination sign (mpfx.cpp:285), even when the incoming rational has the opposite sign. The concrete Go setter preserves this observed branch; the integer mpq branch uses the input sign. Go conversion crosses manager owners through exact numeral text rather than copying C++ limbs."
       ]
@@ -147558,7 +147558,7 @@
       "path": "src/util/mpfx.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/numeral/mpfx_core.go",
         "pkg/util/numeral/mpfx_core_test.go",
@@ -147590,12 +147590,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete mpfx default word-sized scale/range, owned zero/reset/copy, signed integer and ratio setters, exact add/sub/compare, and directed mul/div (src/util/mpfx.cpp:28-83,90-100,133-249,316-520)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_core.go",
           "tests": [
             "TestFixedPointRetainedArithmeticAndDirectedRounding",
@@ -147604,7 +147604,7 @@
         },
         {
           "name": "Retained mpfx reciprocal, directed floor/ceil and power with distinct-output repeated products versus aliased/larger repeated-square order and source extra final square (src/util/mpfx.h:260-278; src/util/mpfx.cpp:558-650)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_ops.go",
           "tests": [
             "TestFixedPointRetainedFloorCeilInverseAndPower",
@@ -147613,7 +147613,7 @@
         },
         {
           "name": "Retained subpaving mpz/mpq conversion and mpfx binary rational display: exact integer paths, fractional prior-destination sign and directed rounding, exact back-conversion (src/util/mpfx.cpp:251-315,704-743,758-787,842-854)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_convert.go",
           "tests": [
             "TestFixedPointRetainedRationalIntegerConversionAndDisplay"
@@ -147621,7 +147621,7 @@
         },
         {
           "name": "Retained mpfx sign/one predicates, six exact comparison relations, source increment/decrement and owned numeral swap reached by subpaving bounds and coefficient storage (src/util/mpfx.h:160-247; src/util/mpfx.cpp:316-417)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_predicates.go",
           "tests": [
             "TestFixedPointRetainedOrderingSignsIncrementAndSwap"
@@ -147629,7 +147629,7 @@
         },
         {
           "name": "Retained integer-word prev_power_of_two query for subpaving nth-root approximation (src/util/mpfx.cpp:864-868)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_power_of_two.go",
           "tests": [
             "TestFixedPointPrevPowerOfTwoSourceIntegerWords"
@@ -147640,7 +147640,7 @@
         "FixedPointManager owns configuration and tracks live concrete numerals; each FixedPoint owns an independent signed scaled big.Int. Publication stages arithmetic before mutating destination, including aliased inputs."
       ],
       "deviations": [
-        "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. Selected numerical bounds and rounding are preserved, but source pool allocation, diagnostic assertion and failure timing are not claimed. Remaining mpfx shifts, specialized queries, decimal/SMT2/raw formats and complete subpaving consumer integration are open.",
+        "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. Retained numerical bounds and rounding are preserved; source pool allocation, diagnostic assertion and failure timing are not claimed. The retained production mpfx consumer is subpaving via subpaving_mpfx.h, subpaving.cpp and subpaving_tactic.cpp. Its interval and definition paths use the covered manager operations. div2k, is_power_of_two, epsilon setters, machine-word queries and decimal/SMT2/raw formats have no retained production mpfx call site; source-only tests and optional trace formatting do not require a Go manager adapter. The unfinished subpaving solver remains tracked by its separate source units.",
         "The source 32-bit power mask loop does not terminate after wrapping at a high-bit exponent; Go reports ErrFixedPointDomain for that input. Floor/ceil overflow leaves the Go numeral unchanged after staged calculation; source clears fractional words before detecting carry overflow.",
         "The source noninteger mpq setter reads the existing destination sign (mpfx.cpp:285), even when the incoming rational has the opposite sign. The concrete Go setter preserves this observed branch; the integer mpq branch uses the input sign. Go conversion crosses manager owners through exact numeral text rather than copying C++ limbs."
       ]
