@@ -34535,7 +34535,9 @@
         "pkg/math/subpaving/fixed_interval_power.go",
         "pkg/math/subpaving/fixed_interval_power_test.go",
         "pkg/math/subpaving/fixed_interval_mul.go",
-        "pkg/math/subpaving/fixed_interval_mul_test.go"
+        "pkg/math/subpaving/fixed_interval_mul_test.go",
+        "pkg/math/subpaving/fixed_interval_div.go",
+        "pkg/math/subpaving/fixed_interval_div_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34544,7 +34546,8 @@
         "TestSubpavingFixedMutableIntervalRetainedCore",
         "TestSubpavingFixedIntervalScalarMulDiv",
         "TestSubpavingFixedIntervalPowerRetainedCases",
-        "TestSubpavingFixedIntervalMulSignClasses"
+        "TestSubpavingFixedIntervalMulSignClasses",
+        "TestSubpavingFixedIntervalDivSignBranches"
       ],
       "conditionals": [
         {
@@ -49821,13 +49824,16 @@
         "pkg/math/subpaving/fixed_interval_power.go",
         "pkg/math/subpaving/fixed_interval_power_test.go",
         "pkg/math/subpaving/fixed_interval_mul.go",
-        "pkg/math/subpaving/fixed_interval_mul_test.go"
+        "pkg/math/subpaving/fixed_interval_mul_test.go",
+        "pkg/math/subpaving/fixed_interval_div.go",
+        "pkg/math/subpaving/fixed_interval_div_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
         "TestSubpavingFixedIntervalScalarMulDiv",
         "TestSubpavingFixedIntervalPowerRetainedCases",
-        "TestSubpavingFixedIntervalMulSignClasses"
+        "TestSubpavingFixedIntervalMulSignClasses",
+        "TestSubpavingFixedIntervalDivSignBranches"
       ],
       "conditionals": [
         {
