@@ -6052,7 +6052,7 @@
     },
     {
       "source": "src/util/lp/lu_instances.cpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/lu_state.go",
         "pkg/util/lp/lu_float.go",
@@ -6146,7 +6146,8 @@
         "TestLPRationalCoreValuesPhysicalOwnership",
         "TestLPRationalCoreValuesSourcePrefixesAndGuards",
         "TestLPRationalCoreValuesPreservesOlderComparison"
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained explicit LU instantiation audit: live double/double, mpq/mpq and mpq/numeric_pair<mpq> constructors, lifecycle, prepared/column/row solves, Suhl replacement, row refinement and concrete scalar dot products map to typed Go float, rational or pair implementations. Emitted indexed-X solve_By symbols point to the source assertion-only stub and have no retained caller; exact debug printers and other emitted helpers without reached consumers are excluded. Native and g3debug,g3checked focused diagonal/LU/debug-dense groups pass, including source small-LU replacement sequences, independent sparse/dense worlds and physical exact numeral ownership. Representative native file coverage: LU float107/130, exact factorization118/141, exact solve74/74, float update141/155, exact update264/300 and float refine110/121; checked counts are similar or higher. Containing solver and remaining LU definition audits are separate."
     },
     {
       "source": "src/util/lp/matrix.h",
@@ -8268,10 +8269,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 81,
+    "ported": 82,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 14
+    "partial": 13
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -15282,6 +15283,26 @@
       "src/util/lp/lu.h"
     ],
     "scope": "Whole retained lu.h header audit: double/double, mpq/mpq and mpq/numeric_pair<mpq> live LU declarations and inline behavior map to concrete typed Go factorization, prepared solves, entering-column routes, Suhl column update, row residual check, extension, lifecycle, status/refactor/tail queries and diagonal tails. The retained scalar and pair dot-product instantiations use concrete Go arithmetic. Floating debug dense identities and printers are covered separately; debug-only tail_product, vector-check and print_submatrix call chains are dead, and indexed-X solve_By is the source unimplemented assertion stub with no retained caller. Source copy-constructor-only and uncalled print/template adapters are excluded. Native and g3debug,g3checked focused diagonal/LU/debug-dense groups pass, including independent basis worlds, source small-LU sequences, physical rational refusals and older caller comparison identity. Representative native file coverage: diagonal float36/37, exact93/108, LU float107/130, exact factorization118/141, exact solve74/74, float update141/155, exact update264/300, float refine110/121; checked covers diagonal float37/37, exact96/108, LU float111/130, exact factorization123/141, float update145/155, exact update265/300, debug matrix61/66. lu.hpp, lu_instances.cpp and containing solver audits remain separate.",
+    "focused_tests": [
+      "TestLPDiagonalTail",
+      "TestLPFloatLU",
+      "TestLPExactLU",
+      "TestLPLU",
+      "TestLPDebugDense"
+    ],
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-lu-header-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-lu-header-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Current full native suite is running from17ecadb7 and is not yet a completed checkpoint; focused native/debug and portcheck evidence is separate."
+  },
+  "latest_lu_instances_whole_audit": {
+    "source_units": [
+      "src/util/lp/lu_instances.cpp"
+    ],
+    "scope": "Whole retained explicit LU instantiation audit: live double/double, mpq/mpq and mpq/numeric_pair<mpq> constructors, lifecycle, prepared/column/row solves, Suhl replacement, row refinement and concrete scalar dot products map to typed Go float, rational or pair implementations. Emitted indexed-X solve_By symbols point to the source assertion-only stub and have no retained caller; exact debug printers and other emitted helpers without reached consumers are excluded. Native and g3debug,g3checked focused diagonal/LU/debug-dense groups pass, including source small-LU replacement sequences, independent sparse/dense worlds and physical exact numeral ownership. Representative native file coverage: LU float107/130, exact factorization118/141, exact solve74/74, float update141/155, exact update264/300 and float refine110/121; checked counts are similar or higher. Containing solver and remaining LU definition audits are separate.",
     "focused_tests": [
       "TestLPDiagonalTail",
       "TestLPFloatLU",
