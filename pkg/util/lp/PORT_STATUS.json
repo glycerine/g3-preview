@@ -2898,14 +2898,15 @@
     },
     {
       "source": "src/util/lp/lp_dual_simplex.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/dual_prepare_float.go",
         "pkg/util/lp/dual_prepare_float_test.go",
         "pkg/util/lp/dual_solver_float.go",
         "pkg/util/lp/dual_prepare_rational.go",
         "pkg/util/lp/dual_solver_rational.go",
-        "pkg/util/lp/dual_objective_rational.go"
+        "pkg/util/lp/dual_objective_rational.go",
+        "pkg/util/lp/matrix_statistics_report_test.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -2934,19 +2935,23 @@
         "TestLPRationalDualOuterCostAliasesAndLifetime",
         "TestLPRationalDualOuterCopyCompletedPrefix",
         "TestLPRationalDualOuterLogicalStageTransitions",
-        "TestLPRationalDualOuterPresolveRejectsBeforeStages"
-      ]
+        "TestLPRationalDualOuterPresolveRejectsBeforeStages",
+        "TestLPFloatMatrixStatisticsReportBoundaries",
+        "TestLPRationalMatrixStatisticsShortWrites"
+      ],
+      "audit_note": "Whole retained-source/ownership audit completes lp_dual_simplex.h/.hpp/instances.cpp for double/double and mpq/mpq wrappers. All retained stage-one fields, signed slack/artificial columns, append-only RHS backup/descending restore, logical/structural stage-two restoration, core construction/Solve/status/iteration publication, original column/objective reconstruction and destruction are concretely implemented. Source omissions/boundaries remain literal: stage-two default status does not map iteration exhaustion; exact first-structural T(1e4) is unsupported rational(double), native follows existing zero profile/checked asserts before lookup, full exact entry retains omitted RowsNZ/ColumnsNZ extents and actual pivot error, checked real beta conversion stops remain unchanged. Prepared optima are separate evidence and do not establish valid full exact source entry beyond these boundaries. Whole-source no-ignore scan finds fill_x_with_zeros declaration/definition only; removed its unused floating Go adapter and mirror checks, no exact adapter added. Found/corrected shared lp_solver.h:253-255 statistics report: floating primal/dual now honor actual std::endl flush, all four float/exact primal/dual callers reject short nil-error writes through existing checked line writer; exact paths retain one flush. Added two source-derived report groups: every output byte with ordinary/short-nil error, failed endl/successful flush counts, prepared matrix/vector prefixes, primal cost setup after successful report only, dual core publication after successful report only and exact ownership census. Report focus native0.273s/combined0.294s; full dual wrapper groups native2.598s/combined2.947s; both LP vets pass. Float statistics helper4/4statements100% both. Whole-Go-file focused covered/total {\"native\":{\"dual_objective_rational.go\":[73,91],\"dual_prepare_float.go\":[249,295],\"dual_prepare_rational.go\":[300,407],\"dual_solver_float.go\":[115,129],\"dual_solver_rational.go\":[117,142]},\"debug\":{\"dual_objective_rational.go\":[70,91],\"dual_prepare_float.go\":[252,295],\"dual_prepare_rational.go\":[268,407],\"dual_solver_float.go\":[116,129],\"dual_solver_rational.go\":[111,142]}}. Checked rational preparation coverage is lower because its real first-structural assertion prevents later branches; no fake bypass is introduced for source coverage. Native map/slice storage and concrete exact owners preserve retained project algorithms; no C++/STL/template adapters. Completes the three outer dual files only; core/common solver/driver audits remain separate. LP inventory36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates report corrections. Profiles /mnt/oldrog/tmp/g3-lp-dual-wrapper-audit-{native,debug}.cover;30-reference source audit /mnt/oldrog/tmp/g3-lp-dual-wrapper-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/lp_dual_simplex.hpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/dual_prepare_float.go",
         "pkg/util/lp/dual_prepare_float_test.go",
         "pkg/util/lp/dual_solver_float.go",
         "pkg/util/lp/dual_prepare_rational.go",
         "pkg/util/lp/dual_solver_rational.go",
-        "pkg/util/lp/dual_objective_rational.go"
+        "pkg/util/lp/dual_objective_rational.go",
+        "pkg/util/lp/matrix_statistics_report_test.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -2975,19 +2980,23 @@
         "TestLPRationalDualOuterCostAliasesAndLifetime",
         "TestLPRationalDualOuterCopyCompletedPrefix",
         "TestLPRationalDualOuterLogicalStageTransitions",
-        "TestLPRationalDualOuterPresolveRejectsBeforeStages"
-      ]
+        "TestLPRationalDualOuterPresolveRejectsBeforeStages",
+        "TestLPFloatMatrixStatisticsReportBoundaries",
+        "TestLPRationalMatrixStatisticsShortWrites"
+      ],
+      "audit_note": "Whole retained-source/ownership audit completes lp_dual_simplex.h/.hpp/instances.cpp for double/double and mpq/mpq wrappers. All retained stage-one fields, signed slack/artificial columns, append-only RHS backup/descending restore, logical/structural stage-two restoration, core construction/Solve/status/iteration publication, original column/objective reconstruction and destruction are concretely implemented. Source omissions/boundaries remain literal: stage-two default status does not map iteration exhaustion; exact first-structural T(1e4) is unsupported rational(double), native follows existing zero profile/checked asserts before lookup, full exact entry retains omitted RowsNZ/ColumnsNZ extents and actual pivot error, checked real beta conversion stops remain unchanged. Prepared optima are separate evidence and do not establish valid full exact source entry beyond these boundaries. Whole-source no-ignore scan finds fill_x_with_zeros declaration/definition only; removed its unused floating Go adapter and mirror checks, no exact adapter added. Found/corrected shared lp_solver.h:253-255 statistics report: floating primal/dual now honor actual std::endl flush, all four float/exact primal/dual callers reject short nil-error writes through existing checked line writer; exact paths retain one flush. Added two source-derived report groups: every output byte with ordinary/short-nil error, failed endl/successful flush counts, prepared matrix/vector prefixes, primal cost setup after successful report only, dual core publication after successful report only and exact ownership census. Report focus native0.273s/combined0.294s; full dual wrapper groups native2.598s/combined2.947s; both LP vets pass. Float statistics helper4/4statements100% both. Whole-Go-file focused covered/total {\"native\":{\"dual_objective_rational.go\":[73,91],\"dual_prepare_float.go\":[249,295],\"dual_prepare_rational.go\":[300,407],\"dual_solver_float.go\":[115,129],\"dual_solver_rational.go\":[117,142]},\"debug\":{\"dual_objective_rational.go\":[70,91],\"dual_prepare_float.go\":[252,295],\"dual_prepare_rational.go\":[268,407],\"dual_solver_float.go\":[116,129],\"dual_solver_rational.go\":[111,142]}}. Checked rational preparation coverage is lower because its real first-structural assertion prevents later branches; no fake bypass is introduced for source coverage. Native map/slice storage and concrete exact owners preserve retained project algorithms; no C++/STL/template adapters. Completes the three outer dual files only; core/common solver/driver audits remain separate. LP inventory36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates report corrections. Profiles /mnt/oldrog/tmp/g3-lp-dual-wrapper-audit-{native,debug}.cover;30-reference source audit /mnt/oldrog/tmp/g3-lp-dual-wrapper-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/lp_dual_simplex_instances.cpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/dual_solver_float.go",
         "pkg/util/lp/dual_solver_float_test.go",
         "pkg/util/lp/mps_dual_float_test.go",
         "pkg/util/lp/dual_prepare_rational.go",
         "pkg/util/lp/dual_solver_rational.go",
-        "pkg/util/lp/dual_objective_rational.go"
+        "pkg/util/lp/dual_objective_rational.go",
+        "pkg/util/lp/matrix_statistics_report_test.go"
       ],
       "tests": [
         "TestLPFloatDualOuterIndependentVertices",
@@ -3008,8 +3017,11 @@
         "TestLPRationalDualOuterCostAliasesAndLifetime",
         "TestLPRationalDualOuterCopyCompletedPrefix",
         "TestLPRationalDualOuterLogicalStageTransitions",
-        "TestLPRationalDualOuterPresolveRejectsBeforeStages"
-      ]
+        "TestLPRationalDualOuterPresolveRejectsBeforeStages",
+        "TestLPFloatMatrixStatisticsReportBoundaries",
+        "TestLPRationalMatrixStatisticsShortWrites"
+      ],
+      "audit_note": "Whole retained-source/ownership audit completes lp_dual_simplex.h/.hpp/instances.cpp for double/double and mpq/mpq wrappers. All retained stage-one fields, signed slack/artificial columns, append-only RHS backup/descending restore, logical/structural stage-two restoration, core construction/Solve/status/iteration publication, original column/objective reconstruction and destruction are concretely implemented. Source omissions/boundaries remain literal: stage-two default status does not map iteration exhaustion; exact first-structural T(1e4) is unsupported rational(double), native follows existing zero profile/checked asserts before lookup, full exact entry retains omitted RowsNZ/ColumnsNZ extents and actual pivot error, checked real beta conversion stops remain unchanged. Prepared optima are separate evidence and do not establish valid full exact source entry beyond these boundaries. Whole-source no-ignore scan finds fill_x_with_zeros declaration/definition only; removed its unused floating Go adapter and mirror checks, no exact adapter added. Found/corrected shared lp_solver.h:253-255 statistics report: floating primal/dual now honor actual std::endl flush, all four float/exact primal/dual callers reject short nil-error writes through existing checked line writer; exact paths retain one flush. Added two source-derived report groups: every output byte with ordinary/short-nil error, failed endl/successful flush counts, prepared matrix/vector prefixes, primal cost setup after successful report only, dual core publication after successful report only and exact ownership census. Report focus native0.273s/combined0.294s; full dual wrapper groups native2.598s/combined2.947s; both LP vets pass. Float statistics helper4/4statements100% both. Whole-Go-file focused covered/total {\"native\":{\"dual_objective_rational.go\":[73,91],\"dual_prepare_float.go\":[249,295],\"dual_prepare_rational.go\":[300,407],\"dual_solver_float.go\":[115,129],\"dual_solver_rational.go\":[117,142]},\"debug\":{\"dual_objective_rational.go\":[70,91],\"dual_prepare_float.go\":[252,295],\"dual_prepare_rational.go\":[268,407],\"dual_solver_float.go\":[116,129],\"dual_solver_rational.go\":[111,142]}}. Checked rational preparation coverage is lower because its real first-structural assertion prevents later branches; no fake bypass is introduced for source coverage. Native map/slice storage and concrete exact owners preserve retained project algorithms; no C++/STL/template adapters. Completes the three outer dual files only; core/common solver/driver audits remain separate. LP inventory36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates report corrections. Profiles /mnt/oldrog/tmp/g3-lp-dual-wrapper-audit-{native,debug}.cover;30-reference source audit /mnt/oldrog/tmp/g3-lp-dual-wrapper-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/lp_params.hpp",
@@ -4090,7 +4102,8 @@
         "pkg/util/lp/primal_validate_float.go",
         "pkg/util/lp/primal_prepare_rational.go",
         "pkg/util/lp/primal_solver_rational.go",
-        "pkg/util/lp/primal_validate_float_test.go"
+        "pkg/util/lp/primal_validate_float_test.go",
+        "pkg/util/lp/matrix_statistics_report_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalPreparedBasisIndependentOracle",
@@ -4116,7 +4129,9 @@
         "TestLPRationalPrimalStageMetadataPublication",
         "TestLPRationalPrimalStageReporterAndFlush",
         "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
-        "TestLPFloatPrimalValidationEveryReportByteAndEndl"
+        "TestLPFloatPrimalValidationEveryReportByteAndEndl",
+        "TestLPFloatMatrixStatisticsReportBoundaries",
+        "TestLPRationalMatrixStatisticsShortWrites"
       ],
       "audit_note": "Whole retained-source/ownership audit completes lp_primal_simplex.h/.hpp/instances.cpp for actual double/double and mpq/mpq wrappers: initialization/preparation, residual-column basis assembly, core construction/Solve/status/iteration publication, original column/objective access and owning destruction. Retained named solution validators are floating only; no unused exact validators added. Source refactor, original_rows, alternative artificial initializers, init_buffer, set_zero_bound, undefined get_array_from_map and redundant derived get_or_create_column_info have no retained caller. Constructor/status fields use concrete Go owners/native fields; inherited base column lookup remains live. Full source scan includes ignored .hpp files and distinguishes explicit instantiations from consumer roots. Found and corrected two actual validator std::endl omissions: completed row and mismatch reports now flush through existing writer helper, and each insertion rejects short nil-error writes. Added TestLPFloatPrimalValidationEveryReportByteAndEndl: all byte prefixes for every relation plus a satisfied equality, explicit and nil-error short writes, sum-before/after each term, each flush failure, successful flush counts and no missing-constraint map publication before row endl succeeds. Existing fallible writer fixture now uses named buffer to prevent io.WriteString bypassing Write. Validation focus native0.072s/combined0.074s;76/78statements97.4% both. Full wrapper preparation/independent-vertex/status/alias/physical-ownership/metadata/report tests native2.098s/combined2.928s; per-file covered/total {\"native\":{\"primal_prepare_float.go\":[101,105],\"primal_prepare_rational.go\":[155,187],\"primal_solver_float.go\":[54,63],\"primal_solver_rational.go\":[107,133],\"primal_validate_float.go\":[76,78]},\"debug\":{\"primal_prepare_float.go\":[101,105],\"primal_prepare_rational.go\":[155,187],\"primal_solver_float.go\":[54,63],\"primal_solver_rational.go\":[107,133],\"primal_validate_float.go\":[76,78]}}. Both LP vets pass. Retained source limitations preserved: upper-only flip/type inconsistency, fresh tableau initial-zero OPTIMAL and checked uninitialized reduced-cost assertion. No mathematical/source repair, generic callback or unused template adapter. Core, common solver and source driver whole-unit audits remain separate; this audit closes only the three primal wrapper files. LP inventory33ported/62partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates the report fix. Profiles /mnt/oldrog/tmp/g3-lp-primal-wrapper-audit-{native,debug}.cover;66-reference source audit /mnt/oldrog/tmp/g3-lp-primal-wrapper-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9."
     },
@@ -4131,7 +4146,8 @@
         "pkg/util/lp/primal_validate_float.go",
         "pkg/util/lp/primal_prepare_rational.go",
         "pkg/util/lp/primal_solver_rational.go",
-        "pkg/util/lp/primal_validate_float_test.go"
+        "pkg/util/lp/primal_validate_float_test.go",
+        "pkg/util/lp/matrix_statistics_report_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalPreparedBasisIndependentOracle",
@@ -4157,7 +4173,9 @@
         "TestLPRationalPrimalStageMetadataPublication",
         "TestLPRationalPrimalStageReporterAndFlush",
         "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
-        "TestLPFloatPrimalValidationEveryReportByteAndEndl"
+        "TestLPFloatPrimalValidationEveryReportByteAndEndl",
+        "TestLPFloatMatrixStatisticsReportBoundaries",
+        "TestLPRationalMatrixStatisticsShortWrites"
       ],
       "audit_note": "Whole retained-source/ownership audit completes lp_primal_simplex.h/.hpp/instances.cpp for actual double/double and mpq/mpq wrappers: initialization/preparation, residual-column basis assembly, core construction/Solve/status/iteration publication, original column/objective access and owning destruction. Retained named solution validators are floating only; no unused exact validators added. Source refactor, original_rows, alternative artificial initializers, init_buffer, set_zero_bound, undefined get_array_from_map and redundant derived get_or_create_column_info have no retained caller. Constructor/status fields use concrete Go owners/native fields; inherited base column lookup remains live. Full source scan includes ignored .hpp files and distinguishes explicit instantiations from consumer roots. Found and corrected two actual validator std::endl omissions: completed row and mismatch reports now flush through existing writer helper, and each insertion rejects short nil-error writes. Added TestLPFloatPrimalValidationEveryReportByteAndEndl: all byte prefixes for every relation plus a satisfied equality, explicit and nil-error short writes, sum-before/after each term, each flush failure, successful flush counts and no missing-constraint map publication before row endl succeeds. Existing fallible writer fixture now uses named buffer to prevent io.WriteString bypassing Write. Validation focus native0.072s/combined0.074s;76/78statements97.4% both. Full wrapper preparation/independent-vertex/status/alias/physical-ownership/metadata/report tests native2.098s/combined2.928s; per-file covered/total {\"native\":{\"primal_prepare_float.go\":[101,105],\"primal_prepare_rational.go\":[155,187],\"primal_solver_float.go\":[54,63],\"primal_solver_rational.go\":[107,133],\"primal_validate_float.go\":[76,78]},\"debug\":{\"primal_prepare_float.go\":[101,105],\"primal_prepare_rational.go\":[155,187],\"primal_solver_float.go\":[54,63],\"primal_solver_rational.go\":[107,133],\"primal_validate_float.go\":[76,78]}}. Both LP vets pass. Retained source limitations preserved: upper-only flip/type inconsistency, fresh tableau initial-zero OPTIMAL and checked uninitialized reduced-cost assertion. No mathematical/source repair, generic callback or unused template adapter. Core, common solver and source driver whole-unit audits remain separate; this audit closes only the three primal wrapper files. LP inventory33ported/62partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates the report fix. Profiles /mnt/oldrog/tmp/g3-lp-primal-wrapper-audit-{native,debug}.cover;66-reference source audit /mnt/oldrog/tmp/g3-lp-primal-wrapper-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9."
     },
@@ -4389,7 +4407,8 @@
         "pkg/util/lp/solver_expression_exact_test.go",
         "pkg/util/lp/solver_named_rational.go",
         "pkg/util/lp/driver_settings.go",
-        "pkg/util/lp/driver_mps_float.go"
+        "pkg/util/lp/driver_mps_float.go",
+        "pkg/util/lp/matrix_statistics_report_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -4490,7 +4509,9 @@
         "TestLPMPSDriverPreservesOlderComparison",
         "TestLPMPSDriverEmptyAndInfeasibleFiles",
         "TestLPMPSDriverFileCloseFailure",
-        "TestLPMPSDriverLiveReportEvaluation"
+        "TestLPMPSDriverLiveReportEvaluation",
+        "TestLPFloatMatrixStatisticsReportBoundaries",
+        "TestLPRationalMatrixStatisticsShortWrites"
       ]
     },
     {
@@ -6788,8 +6809,8 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 33,
-    "partial": 62,
+    "ported": 36,
+    "partial": 59,
     "reference_only": 10,
     "dead_deleted": 3
   },
@@ -12303,5 +12324,58 @@
   },
   "latest_primal_wrapper_metadata_correction": {
     "summary": "Corrective metadata follow-up to cf16a0fe: source checker initially rejected existing floating primal method records lacking primary go_target, then rejected uncalled-source exclusion records mixed into the retained method list. Added five primary targets already present in go_targets; moved the five dead/undefined declaration records to explicit retained_source_exclusions with deviations documenting that they gain no invented target/tests/ported-method credit. Checker rules unchanged. Actual source portcheck now exits0:2103units/677APIs,95ported/345partial/1620unported/5dead_deleted. Focused native/combined tests and vets passed before this metadata-only correction. LP inventory remains33ported/62partial/10reference_only/3dead_deleted/2platform_replacement. Commands restricted to CPUs8\u201316."
+  },
+  "latest_dual_wrapper_support_audit": {
+    "summary": "Whole retained-source/ownership audit completes lp_dual_simplex.h/.hpp/instances.cpp for double/double and mpq/mpq wrappers. All retained stage-one fields, signed slack/artificial columns, append-only RHS backup/descending restore, logical/structural stage-two restoration, core construction/Solve/status/iteration publication, original column/objective reconstruction and destruction are concretely implemented. Source omissions/boundaries remain literal: stage-two default status does not map iteration exhaustion; exact first-structural T(1e4) is unsupported rational(double), native follows existing zero profile/checked asserts before lookup, full exact entry retains omitted RowsNZ/ColumnsNZ extents and actual pivot error, checked real beta conversion stops remain unchanged. Prepared optima are separate evidence and do not establish valid full exact source entry beyond these boundaries. Whole-source no-ignore scan finds fill_x_with_zeros declaration/definition only; removed its unused floating Go adapter and mirror checks, no exact adapter added. Found/corrected shared lp_solver.h:253-255 statistics report: floating primal/dual now honor actual std::endl flush, all four float/exact primal/dual callers reject short nil-error writes through existing checked line writer; exact paths retain one flush. Added two source-derived report groups: every output byte with ordinary/short-nil error, failed endl/successful flush counts, prepared matrix/vector prefixes, primal cost setup after successful report only, dual core publication after successful report only and exact ownership census. Report focus native0.273s/combined0.294s; full dual wrapper groups native2.598s/combined2.947s; both LP vets pass. Float statistics helper4/4statements100% both. Whole-Go-file focused covered/total {\"native\":{\"dual_objective_rational.go\":[73,91],\"dual_prepare_float.go\":[249,295],\"dual_prepare_rational.go\":[300,407],\"dual_solver_float.go\":[115,129],\"dual_solver_rational.go\":[117,142]},\"debug\":{\"dual_objective_rational.go\":[70,91],\"dual_prepare_float.go\":[252,295],\"dual_prepare_rational.go\":[268,407],\"dual_solver_float.go\":[116,129],\"dual_solver_rational.go\":[111,142]}}. Checked rational preparation coverage is lower because its real first-structural assertion prevents later branches; no fake bypass is introduced for source coverage. Native map/slice storage and concrete exact owners preserve retained project algorithms; no C++/STL/template adapters. Completes the three outer dual files only; core/common solver/driver audits remain separate. LP inventory36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates report corrections. Profiles /mnt/oldrog/tmp/g3-lp-dual-wrapper-audit-{native,debug}.cover;30-reference source audit /mnt/oldrog/tmp/g3-lp-dual-wrapper-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
+    "focused_go_file_statement_coverage": {
+      "native": {
+        "dual_objective_rational.go": [
+          73,
+          91
+        ],
+        "dual_prepare_float.go": [
+          249,
+          295
+        ],
+        "dual_prepare_rational.go": [
+          300,
+          407
+        ],
+        "dual_solver_float.go": [
+          115,
+          129
+        ],
+        "dual_solver_rational.go": [
+          117,
+          142
+        ]
+      },
+      "debug": {
+        "dual_objective_rational.go": [
+          70,
+          91
+        ],
+        "dual_prepare_float.go": [
+          252,
+          295
+        ],
+        "dual_prepare_rational.go": [
+          268,
+          407
+        ],
+        "dual_solver_float.go": [
+          116,
+          129
+        ],
+        "dual_solver_rational.go": [
+          111,
+          142
+        ]
+      }
+    },
+    "native_and_combined_float_statistics_statements": [
+      4,
+      4
+    ]
   }
 }

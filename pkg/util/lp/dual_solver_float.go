@@ -12,8 +12,7 @@ func (m *FloatLPSolver) PrintStatisticsOnA(out io.Writer) error {
 	if m.A == nil || out == nil {
 		return ErrBounds
 	}
-	_, err := fmt.Fprintf(out, "extended A[%d,%d]\n", m.A.RowCount(), m.A.ColumnCount())
-	return err
+	return writeDriverLine(out, fmt.Sprintf("extended A[%d,%d]", m.A.RowCount(), m.A.ColumnCount()))
 }
 func (m *FloatDualSimplex) DecideOnStatusAfterStage1() error {
 	if m.CoreSolver == nil {

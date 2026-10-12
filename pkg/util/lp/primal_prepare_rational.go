@@ -293,10 +293,7 @@ func (m *RationalPrimalSimplex) PrepareStageOneTotalInf() (err error) {
 		return ErrBounds
 	}
 	if m.Settings.MessageOut != nil {
-		if _, err = fmt.Fprintf(m.Settings.MessageOut, "extended A[%d,%d]\n", m.A.RowCount(), m.A.ColumnCount()); err != nil {
-			return err
-		}
-		if err = dualFlush(m.Settings.MessageOut); err != nil {
+		if err = writeDriverLine(m.Settings.MessageOut, fmt.Sprintf("extended A[%d,%d]", m.A.RowCount(), m.A.ColumnCount())); err != nil {
 			return err
 		}
 	}

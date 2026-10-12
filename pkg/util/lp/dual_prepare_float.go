@@ -388,19 +388,6 @@ func (m *FloatDualSimplex) RestoreRightSides() error {
 	}
 	return nil
 }
-func (m *FloatDualSimplex) FillXWithZeros() error {
-	if m.A == nil {
-		return ErrBounds
-	}
-	for j := m.A.ColumnCount(); j > 0; {
-		j--
-		if uint64(j) >= uint64(len(m.X)) {
-			return ErrBounds
-		}
-		m.X[j] = 0
-	}
-	return nil
-}
 func (m *FloatDualSimplex) FixLogicalForStage2(j uint32) error {
 	if sourceDebugEnabled && j < m.numberOfCoreStructurals() {
 		return ErrAssertion

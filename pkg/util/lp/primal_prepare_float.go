@@ -1,8 +1,6 @@
 // Source: src/util/lp/lp_primal_simplex.hpp:51-56,63-68,146-165,189-250.
 package lp
 
-import "fmt"
-
 // FloatPrimalSimplex owns the floating core and borrows its prepared vectors
 // into that core for optimization and external solution reconstruction.
 type FloatPrimalSimplex struct {
@@ -181,7 +179,7 @@ func (m *FloatPrimalSimplex) PrepareStageOneTotalInf() error {
 		return err
 	}
 	if m.Settings.MessageOut != nil {
-		if _, err := fmt.Fprintf(m.Settings.MessageOut, "extended A[%d,%d]\n", m.A.RowCount(), m.A.ColumnCount()); err != nil {
+		if err := m.PrintStatisticsOnA(m.Settings.MessageOut); err != nil {
 			return err
 		}
 	}

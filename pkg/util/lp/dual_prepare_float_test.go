@@ -348,15 +348,7 @@ func TestLPFloatDualPreparationSourcePrefixes(t *testing.T) {
 	if !reflect.DeepEqual(m.B, []float64{9, 8, 3}) {
 		t.Fatal(m.B)
 	}
-	m.X = []float64{3, 4, 5}
-	lpStaticMust(t, m.FillXWithZeros())
-	if !reflect.DeepEqual(m.X, []float64{0, 0, 5}) {
-		t.Fatal(m.X)
-	}
-	m.X = []float64{8}
-	if err := m.FillXWithZeros(); err != ErrBounds || m.X[0] != 8 {
-		t.Fatal(err)
-	}
+
 }
 
 func TestLPFloatDualPreparationIEEEAndResize(t *testing.T) {
@@ -603,7 +595,7 @@ func TestLPFloatDualPreparationMetadataAndStageTwoPrefixes(t *testing.T) {
 	if err := m.RestoreRightSides(); err != ErrBounds || !reflect.DeepEqual(m.B, before) {
 		t.Fatal(err)
 	}
-	for method := 0; method < 8; method++ {
+	for method := 0; method < 7; method++ {
 		m = lpFloatDual(t)
 		switch method {
 		case 0:
@@ -617,10 +609,8 @@ func TestLPFloatDualPreparationMetadataAndStageTwoPrefixes(t *testing.T) {
 		case 4:
 			err = m.RestoreRightSides()
 		case 5:
-			err = m.FillXWithZeros()
-		case 6:
 			err = m.UnmarkColumnsAndFixStructuralCosts()
-		case 7:
+		case 6:
 			err = m.FillFirstStageRow(0, nil, nil)
 		}
 		if err != ErrBounds {
