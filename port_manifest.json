@@ -161546,31 +161546,26 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "destructor and reset with forward owned-pointer destruction",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
+          "name": "concrete polynomial m_mgcd_skeletons: nil-slot growth, indexed borrow, set identity/replacement, forward reset and derived destruction",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_skeleton_vector.go",
+          "tests": [
+            "TestPolynomialSkeletonVectorSourceOperations",
+            "TestPolynomialSkeletonVectorNativeReplacementPreservesChildOrder",
+            "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
+            "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor"
+          ]
         },
         {
-          "name": "push_back, indexed access, size and empty",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "set identity no-op and old-pointer destruction before replacement",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "pop_back and resize with reverse shrink destruction and nil growth",
+          "name": "remaining concrete tactical manager/core/goal, algebraic sequence/interval, command builtin, and SMT sequence/string pointer owners",
           "status": "partial",
           "go_target": "",
           "tests": []
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The polynomial manager owns m_mgcd_skeletons; its Go skeleton vector owns published children, destroys an old child before publishing a replacement, resets in ascending slot order, and retains real stopped children for later owning completion. Other live specializations have separate owners and cannot be credited from this one."
+      ],
       "deviations": [
         "No generic scoped pointer vector exists in Go. Current polynomial targets use concrete typed vectors and explicit cleanup; remaining live specializations should be implemented beside their consumers.",
         "SOM, Newton and skeleton child collections now use concrete native Go pointer slices instead of Runtime child-ID vectors and charged duplicate directories. Actual child construction failures, source destructor order, stopped reference/numeral cleanup and owning completion remain. Newton separately retains only actual unjoined child roots after source Flush; skeletons retain actual published contexts for later owning completion after replacement/source destruction. Native slice allocation and release are not Runtime faultpoints or charged blocks; obsolete push/directory/TLS-vector-free failure fixtures are retired. Source and owning physical censuses still enumerate actual child resources. Independent 4098-slot skeleton growth/replacement and 129-child SOM owner-charge checks supplement retained real child failure tests. No whole-unit completion credit is added."
