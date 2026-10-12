@@ -140,6 +140,22 @@ func (v *BinaryRationalVector) Reset() error {
 	}
 	return numericBinaryRationalManager_binaryReset(v.manager, &v.state)
 }
+
+// resetManagerNumerals is mpbq_manager::reset(mpbq_vector&), reached before
+// square-free root isolation. Unlike scoped-vector teardown, it resets each
+// numeral's value and exponent before dropping the logical vector length.
+func (v *BinaryRationalVector) resetManagerNumerals() error {
+	if e := v.check(); e != nil {
+		return e
+	}
+	for i := uint32(0); i < v.state.size; i++ {
+		if e := v.manager.Reset(&v.state.values[i]); e != nil {
+			return e
+		}
+	}
+	v.state.size = 0
+	return nil
+}
 func (v *BinaryRationalVector) Shrink(n uint32) error {
 	if e := v.check(); e != nil {
 		return e

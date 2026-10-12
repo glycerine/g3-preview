@@ -445,13 +445,13 @@ func (m *UPolynomialManager) SquareFreeIsolateRoots(v UPolynomialView, b *unumer
 	if e := m.isolationOwners(b, r, l, u); e != nil {
 		return e
 	}
-	if e := r.Reset(); e != nil {
+	if e := r.resetManagerNumerals(); e != nil {
 		return e
 	}
-	if e := l.Reset(); e != nil {
+	if e := l.resetManagerNumerals(); e != nil {
 		return e
 	}
-	if e := u.Reset(); e != nil {
+	if e := u.resetManagerNumerals(); e != nil {
 		return e
 	}
 	zero, e := m.HasZeroRoots(v)

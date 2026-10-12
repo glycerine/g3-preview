@@ -1,9 +1,41 @@
 package polynomial
 
 import (
-	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	"errors"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
+
+func TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard(t *testing.T) {
+	m, q, budget := upolySourceOwner(t)
+	b := upolyIsolationBinaryOwner(t, q, budget)
+	roots, lowers, uppers := upolyIsolationVector(t, b), upolyIsolationVector(t, b), upolyIsolationVector(t, b)
+	var n unumeral.Int
+	serviceMust(t, q.Integers().SetUint64(&n, 1<<40|1))
+	a := unumeral.NewBinaryRational()
+	serviceMust(t, b.SetIntegerPower(&a, &n, 7))
+	serviceMust(t, q.Integers().Del(&n))
+	for _, v := range []*BinaryRationalVector{roots, lowers, uppers} {
+		serviceMust(t, v.PushCopy(&a))
+	}
+	serviceMust(t, b.Del(&a))
+	p := upolySourceNew(t, m, []int32{1})
+	err := m.SquareFreeIsolateRoots(mustUPolyView(t, m, p).WithCount(0), b, roots, lowers, uppers)
+	if polynomialSourceDebug {
+		if !errors.Is(err, ErrUPolynomialAssertion) {
+			t.Fatal("expected source zero-size assertion", err)
+		}
+	} else if !errors.Is(err, arena.ErrBounds) {
+		t.Fatal("expected zero-size read refusal", err)
+	}
+	for _, v := range []*BinaryRationalVector{roots, lowers, uppers} {
+		if v.state.size != 0 || v.state.values[0] != (unumeral.BinaryRational{}) {
+			t.Fatal("manager reset must clear raw numeral before guard", v.state)
+		}
+	}
+}
 
 func TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults(t *testing.T) {
 	m, q, budget := upolySourceOwner(t)

@@ -13,13 +13,19 @@ func TestPolynomialFactorBackendActualBorrowedBinding(t *testing.T) {
 	if full.factorService != nil {
 		t.Fatal("backend must be lazy")
 	}
-	if _, e := full.factorizationService(); e != ErrUPolynomialOwner {
-		t.Fatal("unbound reached backend guard", e)
+	defaultPrimes, e := primegen.BorrowProcessGenerator()
+	serviceMust(t, e)
+	service, e := full.factorizationService()
+	serviceMust(t, e)
+	if service.config.Primes != defaultPrimes || service != full.factorService {
+		t.Fatal("default backend must borrow the process generator")
 	}
+	serviceMust(t, service.Close())
+	full.factorService = nil
 	primes, e := primegen.NewGenerator(full.core.integer.Budget())
 	serviceMust(t, e)
 	full.factorConfig = UPolynomialFactorizationConfig{Primes: primes}
-	service, e := full.factorizationService()
+	service, e = full.factorizationService()
 	serviceMust(t, e)
 	if service.config.Primes != primes || service.manager != full.upm || service != full.factorService {
 		t.Fatal("actual borrowed pointer and actual UP receiver")

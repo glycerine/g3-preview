@@ -143200,6 +143200,7 @@
         "pkg/util/numeral/mpbq_debug_release.go",
         "pkg/util/numeral/scoped_binary.go",
         "pkg/math/polynomial/upolynomial_binary_vector.go",
+        "pkg/math/polynomial/upolynomial_isolation.go",
         "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
         "pkg/util/numeral/mpbq_display_scope.go",
         "pkg/util/numeral/mpbq_display_scope_test.go",
@@ -143229,7 +143230,8 @@
         "TestBinarySourceEndLabelsAndInlineWarm",
         "TestBinarySourceEndLabelGuardedPhysicalFreeContinuation",
         "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
-        "TestUPolynomialNativeIsolationStacksAndNumericTransfer"
+        "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
+        "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard"
       ],
       "conditionals": [
         {
@@ -143646,6 +143648,14 @@
           "tests": []
         },
         {
+          "name": "mpbq_manager::reset(mpbq_vector&) ascending scalar reset before square-free isolation",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_binary_vector.go",
+          "tests": [
+            "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard"
+          ]
+        },
+        {
           "name": "concrete binary vector logical reserve/resize, owning move growth and ascending reset; isolation frame specializations",
           "status": "partial",
           "go_target": "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
@@ -143693,6 +143703,7 @@
         "pkg/util/numeral/mpbq_debug_release.go",
         "pkg/util/numeral/scoped_binary.go",
         "pkg/math/polynomial/upolynomial_binary_vector.go",
+        "pkg/math/polynomial/upolynomial_isolation.go",
         "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
         "pkg/util/numeral/mpbq_display_scope.go",
         "pkg/util/numeral/mpbq_display_scope_test.go",
@@ -143722,7 +143733,8 @@
         "TestBinarySourceEndLabelsAndInlineWarm",
         "TestBinarySourceEndLabelGuardedPhysicalFreeContinuation",
         "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
-        "TestUPolynomialNativeIsolationStacksAndNumericTransfer"
+        "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
+        "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard"
       ],
       "conditionals": [
         {
@@ -143888,6 +143900,14 @@
           "name": "TRACE/STRACE actions and inherited custom ostream persistent flags/locale/stream state integration",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "mpbq_manager::reset(mpbq_vector&) ascending scalar reset before square-free isolation",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_binary_vector.go",
+          "tests": [
+            "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard"
+          ]
         },
         {
           "name": "concrete binary vector logical reserve/resize, owning move growth and ascending reset; isolation frame specializations",
