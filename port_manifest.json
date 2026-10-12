@@ -113970,7 +113970,7 @@
       "path": "src/util/env_params.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
@@ -114004,8 +114004,8 @@
           ]
         },
         {
-          "name": "updt_params borrowed global params, then verbosity, warning, memory size, allocation count and watermark updates in source order; direct caller src/shell/main.cpp:297 remains unported",
-          "status": "partial",
+          "name": "updt_params borrowed global params, then verbosity, warning, memory size, allocation count and watermark updates in source order",
+          "status": "ported",
           "go_target": "pkg/util/params/util_env_params.go",
           "tests": [
             "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
@@ -114013,7 +114013,7 @@
         }
       ],
       "ownership": [
-        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Concrete EnvParamsRuntime borrows GlobalParams, VerboseContext, memory.Runtime and WarningService, and owns no independent storage. Source-ordered updates, warning suppression/resumption and size_t saturation are tested; the direct shell caller remains unported. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
+        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Concrete EnvParamsRuntime borrows GlobalParams, VerboseContext, memory.Runtime and WarningService, and owns no independent storage. Source-ordered updates, warning suppression/resumption and size_t saturation are tested; the direct shell integration remains assigned to src/shell/main.cpp. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
       ],
       "deviations": []
     },
@@ -114021,7 +114021,7 @@
       "path": "src/util/env_params.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
@@ -114065,8 +114065,8 @@
           ]
         },
         {
-          "name": "updt_params borrowed global params, then verbosity, warning, memory size, allocation count and watermark updates in source order; direct caller src/shell/main.cpp:297 remains unported",
-          "status": "partial",
+          "name": "updt_params borrowed global params, then verbosity, warning, memory size, allocation count and watermark updates in source order",
+          "status": "ported",
           "go_target": "pkg/util/params/util_env_params.go",
           "tests": [
             "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
@@ -114074,7 +114074,7 @@
         }
       ],
       "ownership": [
-        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Concrete EnvParamsRuntime borrows GlobalParams, VerboseContext, memory.Runtime and WarningService, and owns no independent storage. Source-ordered updates, warning suppression/resumption and size_t saturation are tested; the direct shell caller remains unported. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
+        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Concrete EnvParamsRuntime borrows GlobalParams, VerboseContext, memory.Runtime and WarningService, and owns no independent storage. Source-ordered updates, warning suppression/resumption and size_t saturation are tested; the direct shell integration remains assigned to src/shell/main.cpp. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
       ],
       "deviations": []
     },

@@ -39402,8 +39402,10 @@ conversion saturates at the configured 32-bit or 64-bit `size_t` limit,
 including the source `UINT_MAX` sentinel; watermark receives raw units as in
 the source code. A closed memory owner leaves earlier verbosity and warning
 assignments visible. Focused native and checked tests exercise the updates,
-partial prefix, and conversion boundary on CPUs 8–16. The units remain
-partial because their direct caller `src/shell/main.cpp:297` is not yet in Go.
+partial prefix, and conversion boundary on CPUs 8–16. Both util source
+operations are implemented, so `env_params.h/.cpp` are now credited as ported.
+The direct call at `src/shell/main.cpp:297` remains an unported shell
+integration obligation, tracked with that separate source unit.
 
 ### Warning state and literal output
 
