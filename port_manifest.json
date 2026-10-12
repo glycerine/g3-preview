@@ -159182,7 +159182,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/ast_expr_substitution_ops.go"
+        "pkg/ast/ast_expr_substitution_ops.go",
+        "pkg/ast/ast_shared_occs.go"
       ],
       "tests": [
         "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
@@ -159215,7 +159216,10 @@
         "TestASTScopedExprSubstitutionNativeColdTrailPush",
         "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
         "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-        "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop"
+        "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop",
+        "TestASTSharedOccurrencesNativeResetDiscoveryOrderDestruction",
+        "TestASTSharedOccurrencesNativeWideDeletionReset",
+        "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow"
       ],
       "conditionals": [
         {
@@ -159269,15 +159273,28 @@
           ]
         },
         {
-          "name": "generic two-manager and same-manager key/value cleanup, keys-only cleanup, values-only cleanup and collection cleanup",
+          "name": "Concrete shared_occs dec_ref_collection_values on retained expression set during reset, cleanup and destruction",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_shared_occs.go",
+          "tests": [
+            "TestASTSharedOccurrencesNativeResetDiscoveryOrderDestruction",
+            "TestASTSharedOccurrencesNativeWideDeletionReset",
+            "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow"
+          ]
+        },
+        {
+          "name": "Remaining live concrete keys-only, values-only, key/value and collection cleanup in other AST, tactic, SMT, API and subpaving consumers",
           "status": "partial",
           "go_target": "",
           "tests": []
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "AST shared occurrences owns one reference per distinct expression in an insertion-ordered dictionary. Reset and Close decrement each remaining expression once and clear its entry after a consumed decrement, retaining unfinished entries for typed cleanup refusal. The AST manager owns node storage; no generic reference manager or collection adapter is retained."
+      ],
       "deviations": [
-        "No generic Go adapter is retained. Each live decrement-and-clear operation belongs in its concrete consumer with compiler-checked element and manager types."
+        "No generic Go adapter is retained. Each live decrement-and-clear operation belongs in its concrete consumer with compiler-checked element and manager types.",
+        "Source shared_occs reset calls dec_ref_collection_values then resets the set. Go deletes consumed entries incrementally so an interrupted typed decrement can resume without double release; successful completion reaches the same empty set and reference counts."
       ]
     },
     {
