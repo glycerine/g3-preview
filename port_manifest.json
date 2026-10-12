@@ -119320,23 +119320,29 @@
       "path": "src/util/lp/column_namer.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/core_base_float.go",
         "pkg/util/lp/core_base_float_test.go",
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/lar_constraint_display.go",
-        "pkg/util/lp/lar_constraint_display_test.go"
+        "pkg/util/lp/lar_constraint_display_test.go",
+        "pkg/util/lp/lar_implied_display.go",
+        "pkg/util/lp/lar_conflict_certificate.go"
       ],
       "tests": [
         "TestLPFloatPrimalPreparedBasisIndependentOracle",
         "TestLARConstraintDisplaySourceText",
         "TestLARConstraintDisplayEveryWriterPrefix",
         "TestLARConstraintDisplayReachedPrefixes",
-        "TestLARConstraintDisplayPhysicalOwnership"
+        "TestLARConstraintDisplayPhysicalOwnership",
+        "TestLARImpliedDisplaySourceText",
+        "TestLARImpliedDisplayEveryOutputPrefix",
+        "TestLARImpliedDisplayPhysicalOwnership",
+        "TestLARConflictCertificateZeroInsertionAndDiagnostics"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained column_namer virtual name contract borrowed by floating core",
@@ -119359,11 +119365,13 @@
         }
       ],
       "ownership": [
-        "Constraint validation retains its actual lexical model and coefficient/value owners on error; model assignment borrowers close before solver rational work. Writer failure retains the reached coefficient/value prefix until Close."
+        "Constraint validation retains its actual lexical model and coefficient/value owners on error; model assignment borrowers close before solver rational work. Writer failure retains the reached coefficient/value prefix until Close.",
+        "ColumnNamer borrows its concrete owner. Concrete rational formatter owns only the copied coefficient/unary-minus scratch through LARSolver; actual copied coefficient vector and scratch remain reachable on failure and Close releases them. Unused iterator wrappers have no retained ownership root."
       ],
       "deviations": [
         "Only the actual project naming interface is represented; linear iterator and formatted-combination diagnostics remain open. No generic numeric callback adapter is introduced.",
-        "Go io.Writer errors and optional Flush() errors stop at the reached output prefix; no STL stream implementation is ported. LAR all-constraint validation and retained diagnostic output now implement lar_solver.h:1054-1067,1309-1318,1332-1337,1359-1362 and the concrete rational column_namer.h:73-97 printer. AllConstraintsHold reads cancellation once before extraction, obtains the actual collision-free rational model, checks constraints in source order and prints only the first violation. Solver-owned temporary model values close before solver arithmetic locals after an interrupted assignment. Exact printing preserves coefficient order, signs including zero, original term constants, relation spelling and newline/flush behavior.600 independent model worlds cover all five relations, three RHS positions and two epsilon collisions. Cancellation/error prefixes, actual closed stdout, every writer byte prefix, short writes, flush failure, unknown-kind assertion/native output and an actual older caller comparison verify publication and cleanup. Four validation and six printer pooled/direct physical refusal campaigns run through success. Native/debug focused tests pass0.976s/1.177s. Validation covers26/29 statements (89.7%) in both profiles; printer covers94/111 (84.7%) native and95/111 (85.6%) debug/checked. Remaining branches chiefly guard initialized numeral destruction, stable numeral predicates, valid capture, nil/foreign inputs and an already-stopped temporary model. Whole outer LARSolver Solve, remaining diagnostics and complete upstream drivers remain open; inventory remains85 partial/25 unported. Full native08dc15a1 checkpoint predates this increment. Related LAR regressions pass42.887s native/58.016s debug/checked. Both LP vets, both module compilation gates, source portcheck, refreshed dependency graph and diff checks pass."
+        "Go io.Writer errors and optional Flush() errors stop at the reached output prefix; no STL stream implementation is ported. LAR all-constraint validation and retained diagnostic output now implement lar_solver.h:1054-1067,1309-1318,1332-1337,1359-1362 and the concrete rational column_namer.h:73-97 printer. AllConstraintsHold reads cancellation once before extraction, obtains the actual collision-free rational model, checks constraints in source order and prints only the first violation. Solver-owned temporary model values close before solver arithmetic locals after an interrupted assignment. Exact printing preserves coefficient order, signs including zero, original term constants, relation spelling and newline/flush behavior.600 independent model worlds cover all five relations, three RHS positions and two epsilon collisions. Cancellation/error prefixes, actual closed stdout, every writer byte prefix, short writes, flush failure, unknown-kind assertion/native output and an actual older caller comparison verify publication and cleanup. Four validation and six printer pooled/direct physical refusal campaigns run through success. Native/debug focused tests pass0.976s/1.177s. Validation covers26/29 statements (89.7%) in both profiles; printer covers94/111 (84.7%) native and95/111 (85.6%) debug/checked. Remaining branches chiefly guard initialized numeral destruction, stable numeral predicates, valid capture, nil/foreign inputs and an already-stopped temporary model. Whole outer LARSolver Solve, remaining diagnostics and complete upstream drivers remain open; inventory remains85 partial/25 unported. Full native08dc15a1 checkpoint predates this increment. Related LAR regressions pass42.887s native/58.016s debug/checked. Both LP vets, both module compilation gates, source portcheck, refreshed dependency graph and diff checks pass.",
+        "Whole retained naming audit: native borrowed ColumnNamer interface implements only project name contract. Concrete mpq column-combination printer is shared by actual constraint, original-term and conflict-certificate consumers (lar_solver.h1138/1333/1344). Whole-src scan finds print_linear_iterator/print_linear_iterator_indices_only definitions only and indices-only formatter reached solely by that unused wrapper. These unused templates have no live instantiation and are excluded rather than ported as generic iterator/callback adapters. Commented explicit instantiation at lp_core_solver_base_instances.cpp127 is not a root. Existing concrete format/sign/zero/large-rational/output-prefix/physical-ownership tests plus original-term implied-bound printer tests cover retained body. Named strings use Go standard library; no STL or native ostream implementation port. Existing coefficient order uses native retained insertion order; Go writer errors and explicit manager provenance/lifetime guards are qualified adaptations. This closes this support header, not whole LAR/SMT/CLI work."
       ]
     },
     {
@@ -119994,16 +120002,19 @@
       "path": "src/util/lp/implied_bound.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/implied_bound.go",
-        "pkg/util/lp/implied_bound_test.go"
+        "pkg/util/lp/implied_bound_test.go",
+        "pkg/util/lp/implied_bound_audit_test.go"
       ],
       "tests": [
         "TestLPImpliedBoundKindsAndStrings",
         "TestLPImpliedBoundIndependentExactAndEvidence",
         "TestLPImpliedBoundConstructionPhysicalRefusals",
-        "TestLPImpliedBoundAssignmentPhysicalRefusals"
+        "TestLPImpliedBoundAssignmentPhysicalRefusals",
+        "TestLPImpliedBoundDirectAndAliasOwnership",
+        "TestLPImpliedBoundPreservesOlderComparison"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -120015,7 +120026,9 @@
           "tests": [
             "TestLPImpliedBoundIndependentExactAndEvidence",
             "TestLPImpliedBoundConstructionPhysicalRefusals",
-            "TestLPImpliedBoundAssignmentPhysicalRefusals"
+            "TestLPImpliedBoundAssignmentPhysicalRefusals",
+            "TestLPImpliedBoundDirectAndAliasOwnership",
+            "TestLPImpliedBoundPreservesOlderComparison"
           ]
         },
         {
@@ -120024,7 +120037,9 @@
           "go_target": "pkg/util/lp/implied_bound.go",
           "tests": [
             "TestLPImpliedBoundKindsAndStrings",
-            "TestLPImpliedBoundIndependentExactAndEvidence"
+            "TestLPImpliedBoundIndependentExactAndEvidence",
+            "TestLPImpliedBoundDirectAndAliasOwnership",
+            "TestLPImpliedBoundPreservesOlderComparison"
           ]
         },
         {
@@ -120033,7 +120048,9 @@
           "go_target": "pkg/util/lp/implied_bound.go",
           "tests": [
             "TestLPImpliedBoundConstructionPhysicalRefusals",
-            "TestLPImpliedBoundAssignmentPhysicalRefusals"
+            "TestLPImpliedBoundAssignmentPhysicalRefusals",
+            "TestLPImpliedBoundDirectAndAliasOwnership",
+            "TestLPImpliedBoundPreservesOlderComparison"
           ]
         }
       ],
@@ -120041,7 +120058,8 @@
         "Bound is independently owned in a borrowed RationalManager. Stopped copies retain partial values and actual invocation receipts until explicit Close. Evidence fields publish only after the rational copy succeeds."
       ],
       "deviations": [
-        "Retained scalar fields, kind, equality and generated copy assignment are implemented. Full LAR bound-propagator, row analyzer and explanation integration remain unported. Source default constructor leaves scalar evidence unspecified; Go zero fields are not credited as initialized source evidence."
+        "Retained scalar fields, kind, equality and generated copy assignment are implemented. Full LAR bound-propagator, row analyzer and explanation integration remain unported. Source default constructor leaves scalar evidence unspecified; Go zero fields are not credited as initialized source evidence.",
+        "Whole retained record audit: owning rational constructor, compiler-generated copy assignment, kind/equality and destructor replacement are implemented. Four live concrete constructor sites are lp_bound_propagator.cpp51/54/60/63; replacement uses Assign and vector publication owns an independent record. Actual found-bound consumers include LAR explanation/validation/printing and SMT theory_lra.cpp1321-1322/1371. SMT integration itself remains a separate external-package obligation, not a missing record algorithm. Empty source default constructor leaves scalar evidence indeterminate and has no retained live construction path: local test ev vectors remain empty, found-bound vector only receives explicit owning values, historical lar_solver helper bodies are block comments, and test_bound_analyzer has no retained roots. Do not credit Go zero fields as source initialized evidence or add a default adapter. Canonical rational equality uses integer numerator/denominator comparison, no rational cross-product allocation. Whole-source integration claims in earlier deviations were stale; current concrete LAR propagation/explanation/printing have independent focused evidence. New pooled/direct construction/assignment/self-alias campaigns and actual older caller comparisons close record-owned copies without adopting caller invocation state."
       ]
     },
     {
@@ -138429,7 +138447,7 @@
       "path": "src/util/lp/ul_pair.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/implied_bound.go",
         "pkg/util/lp/implied_bound_test.go",
@@ -138441,8 +138459,8 @@
         "TestLARBoundWitnessSourceValueSemantics",
         "TestLARBoundWitnessKindStreamAndFailures"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "lconstraint_kind signed relation encoding",
@@ -138474,7 +138492,8 @@
       ],
       "deviations": [
         "Relation encoding/stream output and retained ul_pair witness value semantics are implemented. LAR bound update/explanation integration remains incomplete. The source free coefficient-index compare helper has no retained caller found and is not introduced.",
-        "Unknown enum stream output is ?? without assertion, independently of the lar_constraints string formatter. Go io.Writer errors and accepted prefixes replace ostream transport."
+        "Unknown enum stream output is ?? without assertion, independently of the lar_constraints string formatter. Go io.Writer errors and accepted prefixes replace ostream transport.",
+        "Whole retained witness audit: signed relation enum, source stream overload, default/row constructors, reference accessors, copy and ==/!= map to concrete kinds/output and pointer-free native LARBoundWitnesses fields/value operations. Actual source init_lar_solver.h39 appends ul_pair(unsigned(-1)); lar_solver.h683-691 copies/updates/publishes witnesses and explanation/bound-query consumers read them. Existing scope/interval/explanation tests exercise actual Go witness stack. Free coefficient-index compare has no caller in LP/test/SMT retained consumer tree and no lp::compare external call; no unused adapter added. Empty/default sentinel is explicit InvalidLARIndex; host writer borrows output with errors/short nil-error writes diagnosed. Earlier broader LAR-integration note was stale; external SMT transport and whole LARSolver remain independently audited partial units."
       ]
     },
     {

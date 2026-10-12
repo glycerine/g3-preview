@@ -3,6 +3,7 @@ package lp
 import (
 	"bytes"
 	"errors"
+	"io"
 	"math/rand/v2"
 	"testing"
 )
@@ -71,6 +72,10 @@ func TestLARBoundWitnessKindStreamAndFailures(t *testing.T) {
 			w := &larConstraintPrefixWriter{remaining: accepted, err: failure}
 			if err := WriteLConstraintKind(w, tc.kind); !errors.Is(err, failure) || w.output.String() != tc.text[:accepted] {
 				t.Fatal(w.output.String(), err)
+			}
+			short := &larConstraintPrefixWriter{remaining: accepted}
+			if err := WriteLConstraintKind(short, tc.kind); !errors.Is(err, io.ErrShortWrite) || short.output.String() != tc.text[:accepted] {
+				t.Fatal("short kind stream", short.output.String(), err)
 			}
 		}
 	}

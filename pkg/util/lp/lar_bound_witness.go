@@ -36,6 +36,5 @@ func WriteLConstraintKind(w io.Writer, kind LConstraintKind) error {
 	case LConstraintEQ:
 		text = "="
 	}
-	_, err := io.WriteString(w, text)
-	return err
+	return writeConstraintText(w, text)
 }
