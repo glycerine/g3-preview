@@ -39433,3 +39433,12 @@ earlier ledger claim; it does not change the already verified immutable
 message/error-code implementation. Future formatted callers should use Go
 standard-library formatting at their concrete sites. Focused warning,
 environment and exception checks plus source portcheck pass on CPUs 8–16.
+
+### Product iterator retained BV caller
+
+`src/util/util.cpp:112-119` and its `util.h` declaration now map to the
+concrete `pkg/util/productiter.Next` uint32 coordinate step. The retained BV
+polynomial Cartesian multiplication calls this subpackage directly; its old
+local copy was removed. First-coordinate-fast carry, terminal reset, and
+unsigned wrap are checked alongside the existing multiplication order/limit
+integration. The rest of `util.h/.cpp` remains partial.

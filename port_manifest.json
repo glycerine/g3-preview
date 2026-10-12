@@ -25746,7 +25746,7 @@
         "pkg/ast/rewriter/bv_polynomial_make_add.go",
         "pkg/ast/rewriter/bv_polynomial_make_add_test.go",
         "pkg/ast/rewriter/bv_polynomial_mul_core.go",
-        "pkg/ast/rewriter/bv_polynomial_mul_buffers.go",
+        "pkg/util/productiter/next.go",
         "pkg/ast/rewriter/bv_polynomial_mul_core_test.go",
         "pkg/ast/ast_bv_polynomial_mul_numerals.go",
         "pkg/ast/ast_bv_polynomial_mul_numerals_test.go",
@@ -26257,7 +26257,7 @@
         "pkg/ast/rewriter/bv_polynomial_make_add.go",
         "pkg/ast/rewriter/bv_polynomial_make_add_test.go",
         "pkg/ast/rewriter/bv_polynomial_mul_core.go",
-        "pkg/ast/rewriter/bv_polynomial_mul_buffers.go",
+        "pkg/util/productiter/next.go",
         "pkg/ast/rewriter/bv_polynomial_mul_core_test.go",
         "pkg/ast/ast_bv_polynomial_mul_numerals.go",
         "pkg/ast/ast_bv_polynomial_mul_numerals_test.go",
@@ -165150,6 +165150,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/productiter/next.go",
         "pkg/util/random/generator.go",
         "pkg/util/numeral/mpz_log.go",
         "pkg/util/sexpr/util_sexpr.go",
@@ -165162,6 +165163,7 @@
         "pkg/util/diagnostic/util_small_object_allocator_stream.go"
       ],
       "tests": [
+        "TestSourceProductIteratorOrderCarryAndWrap",
         "TestSourceRandomVectors",
         "TestShuffleTraversal",
         "TestSourceZeroSeed",
@@ -165251,6 +165253,18 @@
           ]
         },
         {
+          "name": "product_iterator_next uint32 coordinate carry used by BV polynomial Cartesian multiplication",
+          "status": "ported",
+          "go_target": "pkg/util/productiter/next.go",
+          "go_targets": [
+            "pkg/ast/rewriter/bv_polynomial_mul_core.go"
+          ],
+          "tests": [
+            "TestSourceProductIteratorOrderCarryAndWrap",
+            "TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit"
+          ]
+        },
+        {
           "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_verbose_context.go",
@@ -165279,6 +165293,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/productiter/next.go",
         "pkg/util/random/generator.go",
         "pkg/util/numeral/mpz_log.go",
         "pkg/util/sexpr/util_sexpr.go",
@@ -165292,6 +165307,7 @@
         "pkg/util/memory/runtime.go"
       ],
       "tests": [
+        "TestSourceProductIteratorOrderCarryAndWrap",
         "TestSourceRandomVectors",
         "TestShuffleTraversal",
         "TestSourceZeroSeed",
@@ -165547,6 +165563,18 @@
             "TestEscapedThirteenSourcePrintedFixtures",
             "TestEscapedIndependentByteIndentAndTrim",
             "TestEscapedWriterAndSizeBound"
+          ]
+        },
+        {
+          "name": "product_iterator_next uint32 coordinate carry used by BV polynomial Cartesian multiplication",
+          "status": "ported",
+          "go_target": "pkg/util/productiter/next.go",
+          "go_targets": [
+            "pkg/ast/rewriter/bv_polynomial_mul_core.go"
+          ],
+          "tests": [
+            "TestSourceProductIteratorOrderCarryAndWrap",
+            "TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit"
           ]
         },
         {

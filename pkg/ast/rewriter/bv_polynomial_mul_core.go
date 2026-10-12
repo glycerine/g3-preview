@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/productiter"
 )
 
 var ErrBVPolynomialMonomialBlowup = errors.New("sum of monomials blowup")
@@ -356,7 +357,7 @@ func (p *BVPolynomialMultiplicationCore) expand(sort ast.ASTHandle, args ast.App
 		if e = appendRewriterRoot(m, &p.sum, node); e != nil {
 			return RewriteFailed, e
 		}
-		if !bvPolynomialProductNext(p.sizes, p.iterator) {
+		if !productiter.Next(p.sizes, p.iterator) {
 			break
 		}
 	}
