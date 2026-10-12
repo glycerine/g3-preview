@@ -9684,7 +9684,8 @@
         "pkg/ast/ast_bv_arguments.go",
         "pkg/ast/ast_bv_concat_arguments_test.go",
         "pkg/ast/ast_bv_add_arguments_test.go",
-        "pkg/ast/ast_dependency_consumed_test.go"
+        "pkg/ast/ast_dependency_consumed_test.go",
+        "pkg/ast/ast_label.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -9827,7 +9828,8 @@
         "TestASTProofQuantReaderMalformedParameterKeepsAppendPrefix",
         "TestASTProofHyperNativeWideReaderExactOwnershipAndIndependentOutputs",
         "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix",
-        "TestASTDependencyDecConsumedActualRootOwnership"
+        "TestASTDependencyDecConsumedActualRootOwnership",
+        "TestASTLabelConcreteSymbolBufferAndRecognition"
       ],
       "conditionals": [
         {
@@ -10806,6 +10808,14 @@
           "tests": [
             "TestASTBitVectorAddBorrowedCommonSuffix"
           ]
+        },
+        {
+          "name": "mk_label/mk_label_lit and is_label/is_label_lit: concrete label parameters and append-on-match symbol buffers",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_label.go",
+          "tests": [
+            "TestASTLabelConcreteSymbolBufferAndRecognition"
+          ]
         }
       ],
       "ownership": [
@@ -10928,7 +10938,8 @@
         "pkg/ast/ast_debug_ref_count.go",
         "pkg/ast/ast_some_value_proc_test.go",
         "pkg/ast/ast_rewriter_access.go",
-        "pkg/ast/ast_dependency_consumed_test.go"
+        "pkg/ast/ast_dependency_consumed_test.go",
+        "pkg/ast/ast_label.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -11069,7 +11080,8 @@
         "TestASTProofQuantReaderMalformedParameterKeepsAppendPrefix",
         "TestASTProofHyperNativeWideReaderExactOwnershipAndIndependentOutputs",
         "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix",
-        "TestASTDependencyDecConsumedActualRootOwnership"
+        "TestASTDependencyDecConsumedActualRootOwnership",
+        "TestASTLabelConcreteSymbolBufferAndRecognition"
       ],
       "conditionals": [
         {
@@ -11737,6 +11749,14 @@
           "go_target": "pkg/ast/ast_core_span_factories.go",
           "tests": [
             "TestASTAppArgumentSubrangesRemainBorrowedAndBounded"
+          ]
+        },
+        {
+          "name": "retained label constructors and symbol-buffer readers, including unchanged outputs on nonmatch",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_label.go",
+          "tests": [
+            "TestASTLabelConcreteSymbolBufferAndRecognition"
           ]
         }
       ],
@@ -111737,7 +111757,8 @@
         "pkg/util/numeral/mpn_storage.go",
         "pkg/util/numeral/mpn_native_division_test.go",
         "pkg/math/polynomial/polynomial_iccp.go",
-        "pkg/math/polynomial/polynomial_gcd_monomial_buffer.go"
+        "pkg/math/polynomial/polynomial_gcd_monomial_buffer.go",
+        "pkg/ast/ast_label.go"
       ],
       "tests": [
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
@@ -111817,7 +111838,8 @@
         "TestPolynomialSparseNativeNumeralGrowthAndReuse",
         "TestPolynomialSparseNativeLocalsIndependentSeventeenSamples",
         "TestPolynomialPSCBufferNativeGrowthAndReuse",
-        "TestPolynomialPSCBufferNativeStoppedReferenceCleanup"
+        "TestPolynomialPSCBufferNativeStoppedReferenceCleanup",
+        "TestASTLabelConcreteSymbolBufferAndRecognition"
       ],
       "conditionals": [
         {
@@ -112023,6 +112045,14 @@
             "TestRationalBuffer16SourceDestructionStopsBeforeLaterElements",
             "TestRationalBuffer16ConstructionAndShallowCopyGuards",
             "TestRationalBuffer16EveryActualCopyReservation"
+          ]
+        },
+        {
+          "name": "AST label construction and recognition use native typed Go parameter and symbol slices",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_label.go",
+          "tests": [
+            "TestASTLabelConcreteSymbolBufferAndRecognition"
           ]
         }
       ],

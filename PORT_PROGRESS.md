@@ -39659,3 +39659,16 @@ fail an otherwise matching read. The checks now run only after a miss. Focused
 coverage includes a stored symbol, unsigned-to-rational conversion, a stored
 numeral, and missing-key errors for both default types. The source units stay
 partial for their remaining lifetime and process-global obligations.
+
+### AST label symbol-buffer consumer
+
+`src/ast/ast.cpp:2265-2309` constructs positive/negative labels and label
+literals with parameter buffers, then appends their symbol parameters to an
+existing output buffer only on a matching declaration. The concrete Go AST
+manager now exposes `MkLabel`, `MkLabelLit`, `IsLabel`, and `IsLabelLit` over
+typed Go slices. It preserves name order, existing output prefixes and
+unchanged outputs on nonmatches. Temporary parameter records are released
+after declaration-owned copies are made, including on a foreign-name failure.
+This credits the retained `buffer<parameter>`/`buffer<symbol>` label use without
+adding a generic C++ buffer adapter; other AST and buffer source paths remain
+partial.
