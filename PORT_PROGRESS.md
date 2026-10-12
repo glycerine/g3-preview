@@ -39486,6 +39486,13 @@ coefficient and monomial cycles remain implemented in `pkg/math/polynomial`.
 reference-only. `src/util/permutation.h` stays partial: its separate NLSAT
 clause-pointer instantiation must be ported with the NLSAT consumer.
 
+The polynomial specialization's two in-place permutation passes are now
+credited as ported in the manifest. The native degree buckets and mapping,
+signed cycle markers, captured coefficient/monomial payloads, and paired term
+identity are exercised by focused source-backed tests. The header remains
+partial because the retained NLSAT clause-pointer specialization has no Go
+consumer yet.
+
 ### Unported util headers: source-consumer order
 
 A direct-include and concrete-instantiation scan of the 22 still-unported
