@@ -33812,6 +33812,8 @@
         "pkg/math/euclid/decompose_test.go",
         "pkg/math/euclid/solve.go",
         "pkg/math/euclid/solve_test.go",
+        "pkg/math/euclid/normalize_query.go",
+        "pkg/math/euclid/normalize_query_test.go",
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go",
         "pkg/util/numeral/scoped_numeral.go"
@@ -33838,6 +33840,8 @@
         "TestEuclideanSolveNonUnitThenUnitToParameterSolution",
         "TestEuclideanSolveContradictionAfterUnitSubstitution",
         "TestEuclideanSolveEmptyAndAlreadyInconsistent",
+        "TestEuclideanNormalizeQueryAfterNonUnitSolve",
+        "TestEuclideanNormalizeQueryJustificationAndConstantOnly",
         "TestEuclideanPositionSourceBinarySearch",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership",
         "TestEuclideanSetupHeaderRefusalBeforeBuffers",
@@ -33997,7 +34001,16 @@
           ]
         },
         {
-          "name": "normalize/query and public solver algorithms",
+          "name": "normalize query applies solution and computes remaining coefficient gcd, constant and justification IDs at cpp:735-783",
+          "status": "partial",
+          "go_target": "pkg/math/euclid/normalize_query.go",
+          "tests": [
+            "TestEuclideanNormalizeQueryAfterNonUnitSolve",
+            "TestEuclideanNormalizeQueryJustificationAndConstantOnly"
+          ]
+        },
+        {
+          "name": "public solver wrapper, reset and display",
           "status": "unported"
         }
       ],
@@ -34010,7 +34023,7 @@
       ],
       "deviations": [
         "Source normalize_eq checks divisibility of the constant but divides only variable coefficients and justification coefficients by their gcd. The Go path retains that exact result. After source normalize_eq destroys an empty zero equality, assert_eq still calls add_occs on its null slot; Go skips that invalid dereference.",
-        "Unit and non-unit elimination and the internal solve loop are ported with source occurrence and solution ownership order. Source svector::erase(value) ignores an absent occurrence, which happens for a decomposition parameter in the compacted original equation; Go matches this no-op. Normalize/query methods and the public solver API remain unported."
+        "Unit and non-unit elimination, internal solve and normalize-query paths are ported with source occurrence and solution ownership order. Source svector::erase(value) ignores an absent occurrence, which happens for a decomposition parameter in the compacted original equation; Go matches this no-op. The public solver wrapper, reset and display remain unported."
       ]
     },
     {
@@ -116161,7 +116174,9 @@
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go",
         "pkg/math/euclid/apply_solution.go",
-        "pkg/math/euclid/apply_solution_test.go"
+        "pkg/math/euclid/apply_solution_test.go",
+        "pkg/math/euclid/normalize_query.go",
+        "pkg/math/euclid/normalize_query_test.go"
       ],
       "tests": [
         "TestHeapBudgetsFailuresSwapAndWarm",
@@ -116190,7 +116205,9 @@
         "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
         "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards",
         "TestEuclideanSetupSolvedVariableQueue",
-        "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap"
+        "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
+        "TestEuclideanNormalizeQueryAfterNonUnitSolve",
+        "TestEuclideanNormalizeQueryJustificationAndConstantOnly"
       ],
       "conditionals": [
         {
@@ -155639,6 +155656,8 @@
         "pkg/math/euclid/apply_solution_test.go",
         "pkg/math/euclid/decompose.go",
         "pkg/math/euclid/decompose_test.go",
+        "pkg/math/euclid/normalize_query.go",
+        "pkg/math/euclid/normalize_query_test.go",
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go"
       ],
@@ -155652,6 +155671,8 @@
         "TestEuclideanNonUnitDecompositionZeroRemainderDropsOccurrence",
         "TestEuclideanNonUnitDecompositionSubstitutesOtherEquations",
         "TestEuclideanNonUnitDecompositionNegativeOtherCoefficient",
+        "TestEuclideanNormalizeQueryAfterNonUnitSolve",
+        "TestEuclideanNormalizeQueryJustificationAndConstantOnly",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership"
       ],
       "conditionals": [
