@@ -113926,14 +113926,18 @@
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/util/params/util_gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/util/params/util_env_params.go",
+        "pkg/util/memory/runtime.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
+        "TestRuntimeSourceMegabytesToBytesSaturatesAtSizeT"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -113952,12 +113956,15 @@
         },
         {
           "name": "updt_params borrowed global params, then verbosity, warning, memory size, allocation count and watermark updates in source order; direct caller src/shell/main.cpp:297 remains unported",
-          "status": "unported",
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/util/params/util_env_params.go",
+          "tests": [
+            "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
+          ]
         }
       ],
       "ownership": [
-        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Runtime updt_params borrows gparams::get_ref and owns no independent storage; its only direct source caller is the unported shell entry point. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
+        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Concrete EnvParamsRuntime borrows GlobalParams, VerboseContext and memory.Runtime; it owns no storage beyond the warning-enable scalar. Source-ordered runtime updates and size_t saturation are tested, while the direct shell caller and warning-message routing remain unported. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
       ],
       "deviations": []
     },
@@ -113970,14 +113977,18 @@
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/util/params/util_gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/util/params/util_env_params.go",
+        "pkg/util/memory/runtime.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
+        "TestRuntimeSourceMegabytesToBytesSaturatesAtSizeT"
       ],
       "conditionals": [
         {
@@ -114006,12 +114017,15 @@
         },
         {
           "name": "updt_params borrowed global params, then verbosity, warning, memory size, allocation count and watermark updates in source order; direct caller src/shell/main.cpp:297 remains unported",
-          "status": "unported",
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/util/params/util_env_params.go",
+          "tests": [
+            "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
+          ]
         }
       ],
       "ownership": [
-        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Runtime updt_params borrows gparams::get_ref and owns no independent storage; its only direct source caller is the unported shell entry point. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
+        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Concrete EnvParamsRuntime borrows GlobalParams, VerboseContext and memory.Runtime; it owns no storage beyond the warning-enable scalar. Source-ordered runtime updates and size_t saturation are tested, while the direct shell caller and warning-message routing remain unported. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
       ],
       "deviations": []
     },
@@ -165274,7 +165288,8 @@
         "pkg/util/memory/small_allocator.go",
         "pkg/util/memory/allocator_io.go",
         "pkg/util/diagnostic/util_small_object_allocator.go",
-        "pkg/util/diagnostic/util_small_object_allocator_stream.go"
+        "pkg/util/diagnostic/util_small_object_allocator_stream.go",
+        "pkg/util/memory/runtime.go"
       ],
       "tests": [
         "TestSourceRandomVectors",
@@ -165296,7 +165311,8 @@
         "TestVerboseContextColdRefusalAndExactCharge",
         "TestVerboseContextAllocatorEveryOutputRefusal",
         "TestVerboseContextClosedLevelReachedBeforeOutput",
-        "TestVerboseContextWarmOutputAndNullAdapter"
+        "TestVerboseContextWarmOutputAndNullAdapter",
+        "TestRuntimeSourceMegabytesToBytesSaturatesAtSizeT"
       ],
       "conditionals": [
         {
@@ -165544,6 +165560,14 @@
             "TestVerboseContextAllocatorEveryOutputRefusal",
             "TestVerboseContextClosedLevelReachedBeforeOutput",
             "TestVerboseContextWarmOutputAndNullAdapter"
+          ]
+        },
+        {
+          "name": "megabytes_to_bytes for env_params runtime with UINT_MAX and size_t overflow saturation",
+          "status": "ported",
+          "go_target": "pkg/util/memory/runtime.go",
+          "tests": [
+            "TestRuntimeSourceMegabytesToBytesSaturatesAtSizeT"
           ]
         }
       ],

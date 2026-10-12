@@ -39395,10 +39395,13 @@ portcheck validates the dispositions on CPUs 8–16.
 
 `src/util/env_params.h/.cpp` has exactly two static operations. The five
 ordered `collect_param_descrs` entries already live in the concrete Go
-catalog. The remaining `updt_params` reads a borrowed global `params_ref`,
-then writes verbosity, warning enablement, maximum memory size, maximum
-allocation count, and high watermark in that order. Its only direct source
-caller is `src/shell/main.cpp:297`, which is still unported. Both units remain
-partial with that runtime operation recorded explicitly. This audit avoids a
-detached process-global adapter while the shell entry point is absent;
-existing catalog tests and source portcheck cover the implemented boundary.
+catalog. Concrete `EnvParamsRuntime.Update` now reads the borrowed global
+`params_ref`, then writes verbosity, warning enablement, maximum memory size,
+maximum allocation count, and high watermark in source order. The memory
+conversion saturates at the configured 32-bit or 64-bit `size_t` limit,
+including the source `UINT_MAX` sentinel; watermark receives raw units as in
+the source code. A closed memory owner leaves earlier verbosity and warning
+assignments visible. Focused native and checked tests exercise the updates,
+partial prefix, and conversion boundary on CPUs 8–16. The units remain
+partial because their direct caller `src/shell/main.cpp:297` and the actual
+warning-message routing are not yet in Go.

@@ -349,6 +349,23 @@ func (m *Runtime) SetMaxSize(n uint64) error {
 	m.accounting.maxSize = int64(n)
 	return nil
 }
+
+// SetMaxSizeMegabytes preserves util.h's saturating megabytes_to_bytes
+// conversion before memory_manager.cpp stores the resulting size_t limit.
+func (m *Runtime) SetMaxSizeMegabytes(mb uint32) error {
+	if e := m.open(); e != nil {
+		return e
+	}
+	limit := uint64(^uint64(0))
+	if m.config.SizeTBits == 32 {
+		limit = uint64(^uint32(0))
+	}
+	bytes := uint64(mb) << 20
+	if mb == ^uint32(0) || bytes > limit {
+		bytes = limit
+	}
+	return m.SetMaxSize(bytes)
+}
 func (m *Runtime) SetMaxCount(n uint64) error {
 	if e := m.open(); e != nil {
 		return e
