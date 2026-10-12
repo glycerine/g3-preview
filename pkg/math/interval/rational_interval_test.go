@@ -102,6 +102,59 @@ func TestRationalIntervalRetainedPredicatesAddSubAndOwnership(t *testing.T) {
 	if equal {
 		t.Fatal("distinct intervals equal")
 	}
+	must(c.Neg(a))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[-2, 3/2)" {
+		t.Fatalf("interval negation = %q", out.String())
+	}
+	must(c.Neg(c))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "(-3/2, 2]" {
+		t.Fatalf("in-place interval negation = %q", out.String())
+	}
+	must(m.SetInt32(&point, -2))
+	must(c.MulScalar(&point, a))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[-4, 3)" {
+		t.Fatalf("negative scalar multiplication = %q", out.String())
+	}
+	must(c.DivScalar(a, &point))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[-1, 3/4)" {
+		t.Fatalf("negative scalar division = %q", out.String())
+	}
+	must(m.SetInt32(&point, 0))
+	must(c.MulScalar(&point, a))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "(-oo, +oo)" {
+		t.Fatalf("source zero-scalar reset = %q", out.String())
+	}
+	must(b.ResetLower()) // (-oo, 5/2)
+	must(m.SetInt32(&point, 2))
+	must(c.MulScalar(&point, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "(-oo, 5)" {
+		t.Fatalf("positive scalar with infinite lower = %q", out.String())
+	}
+	must(m.SetInt32(&point, -2))
+	must(c.MulScalar(&point, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "(-5, +oo)" {
+		t.Fatalf("negative scalar with infinite lower = %q", out.String())
+	}
+	must(c.Neg(b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "(-5/2, +oo)" {
+		t.Fatalf("one-sided negation = %q", out.String())
+	}
 	must(b.Reset())
 	must(c.Add(a, b))
 	out.Reset()

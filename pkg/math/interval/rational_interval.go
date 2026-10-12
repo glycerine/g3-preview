@@ -80,14 +80,31 @@ func (v *RationalInterval) Reset() error {
 	if err := v.open(); err != nil {
 		return err
 	}
+	if err := v.ResetLower(); err != nil {
+		return err
+	}
+	return v.ResetUpper()
+}
+
+func (v *RationalInterval) ResetLower() error {
+	if err := v.open(); err != nil {
+		return err
+	}
 	if err := v.numbers.Reset(&v.lower); err != nil {
+		return err
+	}
+	v.lowerInf, v.lowerOpen = true, true
+	return nil
+}
+
+func (v *RationalInterval) ResetUpper() error {
+	if err := v.open(); err != nil {
 		return err
 	}
 	if err := v.numbers.Reset(&v.upper); err != nil {
 		return err
 	}
-	v.lowerInf, v.upperInf = true, true
-	v.lowerOpen, v.upperOpen = true, true
+	v.upperInf, v.upperOpen = true, true
 	return nil
 }
 
@@ -235,6 +252,153 @@ func (v *RationalInterval) Sub(a, b *RationalInterval) error {
 	}
 	v.lowerInf, v.upperInf = lk == MinusInfinity, uk == PlusInfinity
 	v.lowerOpen, v.upperOpen = a.lowerOpen || b.upperOpen, a.upperOpen || b.lowerOpen
+	return v.CheckInvariant()
+}
+
+// Neg follows the source endpoint swap, including the in-place finite case.
+func (v *RationalInterval) Neg(a *RationalInterval) error {
+	if err := v.open(); err != nil {
+		return err
+	}
+	if err := a.open(); err != nil {
+		return err
+	}
+	if v.numbers != a.numbers {
+		return arena.ErrInvalidSlot
+	}
+	m := v.numbers
+	lo, uo := a.lowerOpen, a.upperOpen
+	if a.lowerInf {
+		if a.upperInf {
+			return v.Reset()
+		}
+		if err := m.Copy(&v.lower, &a.upper); err != nil {
+			return err
+		}
+		if err := m.Neg(&v.lower); err != nil {
+			return err
+		}
+		if err := m.Reset(&v.upper); err != nil {
+			return err
+		}
+		v.lowerInf, v.upperInf = false, true
+		v.lowerOpen, v.upperOpen = uo, true
+	} else if a.upperInf {
+		if err := m.Copy(&v.upper, &a.lower); err != nil {
+			return err
+		}
+		if err := m.Neg(&v.upper); err != nil {
+			return err
+		}
+		if err := m.Reset(&v.lower); err != nil {
+			return err
+		}
+		v.lowerInf, v.upperInf = true, false
+		v.lowerOpen, v.upperOpen = true, lo
+	} else {
+		if v == a {
+			if err := m.Swap(&v.lower, &v.upper); err != nil {
+				return err
+			}
+		} else {
+			if err := m.Copy(&v.lower, &a.upper); err != nil {
+				return err
+			}
+			if err := m.Copy(&v.upper, &a.lower); err != nil {
+				return err
+			}
+		}
+		if err := m.Neg(&v.lower); err != nil {
+			return err
+		}
+		if err := m.Neg(&v.upper); err != nil {
+			return err
+		}
+		v.lowerInf, v.upperInf = false, false
+		v.lowerOpen, v.upperOpen = uo, lo
+	}
+	return v.CheckInvariant()
+}
+
+// MulScalar and DivScalar preserve the source div_mul zero-scalar branch:
+// it resets the destination to the unbounded interval.
+func (v *RationalInterval) MulScalar(k *numeral.Rational, a *RationalInterval) error {
+	return v.divMul(k, a, false)
+}
+
+func (v *RationalInterval) DivScalar(a *RationalInterval, k *numeral.Rational) error {
+	return v.divMul(k, a, true)
+}
+
+func (v *RationalInterval) divMul(k *numeral.Rational, a *RationalInterval, inverse bool) (err error) {
+	if err = v.open(); err != nil {
+		return err
+	}
+	if err = a.open(); err != nil {
+		return err
+	}
+	if v.numbers != a.numbers {
+		return arena.ErrInvalidSlot
+	}
+	m := v.numbers
+	z, err := m.IsZero(k)
+	if err != nil {
+		return err
+	}
+	if z {
+		return v.Reset()
+	}
+	positive, err := m.IsPos(k)
+	if err != nil {
+		return err
+	}
+	// The source uses manager-owned scratch numerals and swaps them with the
+	// destination. Local owned numerals have the same transfer and cleanup.
+	lower, upper := numeral.NewRational(), numeral.NewRational()
+	defer func() { err = errors.Join(err, m.Del(&lower), m.Del(&upper)) }()
+	factor := k
+	if inverse {
+		inv := numeral.NewRational()
+		defer func() { err = errors.Join(err, m.Del(&inv)) }()
+		if err = m.Inv(k, &inv); err != nil {
+			return err
+		}
+		factor = &inv
+	}
+	e := RationalExtended{Numbers: m}
+	var lk, uk ExtendedKind
+	if positive {
+		lk, err = e.Mul(&a.lower, a.lowerKind(), factor, Finite, &lower)
+		if err != nil {
+			return err
+		}
+		uk, err = e.Mul(&a.upper, a.upperKind(), factor, Finite, &upper)
+		if err != nil {
+			return err
+		}
+	} else {
+		lk, err = e.Mul(&a.upper, a.upperKind(), factor, Finite, &lower)
+		if err != nil {
+			return err
+		}
+		uk, err = e.Mul(&a.lower, a.lowerKind(), factor, Finite, &upper)
+		if err != nil {
+			return err
+		}
+	}
+	lo, uo := a.lowerOpen, a.upperOpen
+	if err = m.Swap(&v.lower, &lower); err != nil {
+		return err
+	}
+	if err = m.Swap(&v.upper, &upper); err != nil {
+		return err
+	}
+	v.lowerInf, v.upperInf = lk == MinusInfinity, uk == PlusInfinity
+	if positive {
+		v.lowerOpen, v.upperOpen = lo, uo
+	} else {
+		v.lowerOpen, v.upperOpen = uo, lo
+	}
 	return v.CheckInvariant()
 }
 
