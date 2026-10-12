@@ -2344,7 +2344,7 @@
     },
     {
       "source": "src/util/lp/lp_core_solver_base.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/core_base_float.go",
         "pkg/util/lp/core_base_float_test.go",
@@ -2665,11 +2665,12 @@
         "TestLPRationalDualRatioSetOrderAndShortCircuit",
         "TestLPRationalDualRatioMetadataAndStoppedPrefixes",
         "TestLPRationalDualRatioPreservesOlderComparison"
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained base-core audit for double/double, mpq/mpq and mpq/numeric_pair<mpq>: constructor and headings, bound/feasibility predicates, basis and nonbasis exchanges, LU preparation/solves, RHS and residual reconstruction, pivot row/tableau updates, reduced costs, diagnostics, iteration/time/statistics and typed value ownership have concrete Go implementations. The native source pretty_print closure and commented pointer/template helpers have no retained caller and are excluded. Source debug assertions and release prefixes are exercised by current native full suite and focused native/g3debug,g3checked core, statistics, tableau, dual-ratio and cost-validator groups. Representative focused native coverage: float base135/152, values118/124, iteration92/97, pivot25/26, exact base170/232, scalar base211/238, scalar statistics79/85 and pair tableau117/126; checked completion group reaches rational dual bounds75/92, breakpoint256/298 and tableau basis21/32. Rational cells and copied-left expression temporaries remain owned through stopped calls; child LU/vector owners close before borrowed parent inputs, and older caller comparison receipts are not adopted. Current full native checkpoint17ecadb7 passed on the same Go code; containing primal, dual and LAR source units remain separate."
     },
     {
       "source": "src/util/lp/lp_core_solver_base.hpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/core_base_float.go",
         "pkg/util/lp/core_base_float_test.go",
@@ -2934,7 +2935,8 @@
         "TestLPRationalDualBreakpointMetadataPrefixes",
         "TestLPRationalDualBreakpointPreservesOlderComparison",
         "TestLPRationalDualBreakpointLiveHarrisOutput"
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained base-core audit for double/double, mpq/mpq and mpq/numeric_pair<mpq>: constructor and headings, bound/feasibility predicates, basis and nonbasis exchanges, LU preparation/solves, RHS and residual reconstruction, pivot row/tableau updates, reduced costs, diagnostics, iteration/time/statistics and typed value ownership have concrete Go implementations. The native source pretty_print closure and commented pointer/template helpers have no retained caller and are excluded. Source debug assertions and release prefixes are exercised by current native full suite and focused native/g3debug,g3checked core, statistics, tableau, dual-ratio and cost-validator groups. Representative focused native coverage: float base135/152, values118/124, iteration92/97, pivot25/26, exact base170/232, scalar base211/238, scalar statistics79/85 and pair tableau117/126; checked completion group reaches rational dual bounds75/92, breakpoint256/298 and tableau basis21/32. Rational cells and copied-left expression temporaries remain owned through stopped calls; child LU/vector owners close before borrowed parent inputs, and older caller comparison receipts are not adopted. Current full native checkpoint17ecadb7 passed on the same Go code; containing primal, dual and LAR source units remain separate."
     },
     {
       "source": "src/util/lp/lp_core_solver_base_instances.cpp",
@@ -8271,10 +8273,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 84,
+    "ported": 86,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 11
+    "partial": 9
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -15366,5 +15368,35 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
+  },
+  "latest_core_base_header_and_definitions_whole_audit": {
+    "source_units": [
+      "src/util/lp/lp_core_solver_base.h",
+      "src/util/lp/lp_core_solver_base.hpp"
+    ],
+    "scope": "Whole retained base-core audit for double/double, mpq/mpq and mpq/numeric_pair<mpq>: constructor and headings, bound/feasibility predicates, basis and nonbasis exchanges, LU preparation/solves, RHS and residual reconstruction, pivot row/tableau updates, reduced costs, diagnostics, iteration/time/statistics and typed value ownership have concrete Go implementations. The native source pretty_print closure and commented pointer/template helpers have no retained caller and are excluded. Source debug assertions and release prefixes are exercised by current native full suite and focused native/g3debug,g3checked core, statistics, tableau, dual-ratio and cost-validator groups. Representative focused native coverage: float base135/152, values118/124, iteration92/97, pivot25/26, exact base170/232, scalar base211/238, scalar statistics79/85 and pair tableau117/126; checked completion group reaches rational dual bounds75/92, breakpoint256/298 and tableau basis21/32. Rational cells and copied-left expression temporaries remain owned through stopped calls; child LU/vector owners close before borrowed parent inputs, and older caller comparison receipts are not adopted. Current full native checkpoint17ecadb7 passed on the same Go code; containing primal, dual and LAR source units remain separate.",
+    "focused_tests": [
+      "TestLPFloatCore",
+      "TestLPPairCore",
+      "TestLPRationalCore",
+      "TestLPExactSnap",
+      "TestLPFloatPrimalIteration",
+      "TestLPPairStatistics",
+      "TestLPRationalStatistics",
+      "TestLPPairTableau",
+      "TestLPRationalTableau",
+      "TestLPRationalDualBounds",
+      "TestLPRationalDualBreakpoint"
+    ],
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-base-core-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-base-core-debug.cover",
+      "/mnt/oldrog/tmp/g3-lp-base-extra-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-base-extra-debug.cover",
+      "/mnt/oldrog/tmp/g3-lp-base-completion-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered. Focused checked evidence remains separate."
   }
 }
