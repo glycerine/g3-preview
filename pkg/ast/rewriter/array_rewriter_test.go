@@ -201,7 +201,7 @@ func TestArrayRewriterOriginalSortingConstantAndIteRules(t *testing.T) {
 	}
 }
 
-func TestArrayRewriterOriginalStoreBufferSpillRefusal(t *testing.T) {
+func TestArrayRewriterOriginalStoreNativeBufferWarmReuse(t *testing.T) {
 	m, c, g, p := boolRewriterConfigFixture(t)
 	fid, e := m.RegisterArrayPlugin()
 	satOK(t, e)
@@ -258,23 +258,27 @@ func TestArrayRewriterOriginalStoreBufferSpillRefusal(t *testing.T) {
 	}
 	satOK(t, m.SetRef(out, no))
 	baseline := m.Budget().Used()
-	m.Budget().FailAfter(0)
+	if !ast.ASTSourceDebug {
+		// Debug assertion work has its own reached allocation path.
+		m.Budget().FailAfter(0)
+	}
 	status, e = rw.MkAppCore(d, ast.SliceArguments(args), out)
 	m.Budget().FailAfter(-1)
-	if status != RewriteFailed || !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal("buffer refusal", status, e)
+	if status != RewriteDone || e != nil {
+		t.Fatal("native buffer warm rewrite", status, e)
 	}
 	got, e := m.RefGet(out)
 	satOK(t, e)
-	if got != no || m.Budget().Used() != baseline {
-		t.Fatal("spill cleanup/output")
+	if got != want || m.Budget().Used() != baseline {
+		t.Fatal("native buffer charged custom storage", got, m.Budget().Used(), baseline)
 	}
+	satOK(t, m.SetRef(out, no))
 	status, e = rw.MkAppCore(d, ast.SliceArguments(args), out)
 	satOK(t, e)
 	got, e = m.RefGet(out)
 	satOK(t, e)
 	if status != RewriteDone || got != want {
-		t.Fatal("spill reuse")
+		t.Fatal("native buffer reuse")
 	}
 }
 

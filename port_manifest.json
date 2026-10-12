@@ -19151,7 +19151,7 @@
       "tests": [
         "TestArrayRewriterOriginalStoreSelectAndFirstUncertainIndex",
         "TestArrayRewriterOriginalSortingConstantAndIteRules",
-        "TestArrayRewriterOriginalStoreBufferSpillRefusal",
+        "TestArrayRewriterOriginalStoreNativeBufferWarmReuse",
         "TestArrayRewriterConstructorRefusalsAndParameterFallback",
         "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin",
         "TestArrayRewriterOriginalSelectAsArray",
@@ -19253,7 +19253,7 @@
           "tests": [
             "TestArrayRewriterOriginalStoreSelectAndFirstUncertainIndex",
             "TestArrayRewriterOriginalSortingConstantAndIteRules",
-            "TestArrayRewriterOriginalStoreBufferSpillRefusal",
+            "TestArrayRewriterOriginalStoreNativeBufferWarmReuse",
             "TestArrayRewriterConstructorRefusalsAndParameterFallback",
             "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin"
           ]
@@ -19340,7 +19340,7 @@
       "tests": [
         "TestArrayRewriterOriginalStoreSelectAndFirstUncertainIndex",
         "TestArrayRewriterOriginalSortingConstantAndIteRules",
-        "TestArrayRewriterOriginalStoreBufferSpillRefusal",
+        "TestArrayRewriterOriginalStoreNativeBufferWarmReuse",
         "TestArrayRewriterConstructorRefusalsAndParameterFallback",
         "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin",
         "TestArrayRewriterOriginalSelectAsArray",
@@ -19374,7 +19374,7 @@
           "tests": [
             "TestArrayRewriterOriginalStoreSelectAndFirstUncertainIndex",
             "TestArrayRewriterOriginalSortingConstantAndIteRules",
-            "TestArrayRewriterOriginalStoreBufferSpillRefusal",
+            "TestArrayRewriterOriginalStoreNativeBufferWarmReuse",
             "TestArrayRewriterConstructorRefusalsAndParameterFallback",
             "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin"
           ]
@@ -115670,8 +115670,8 @@
           ]
         },
         {
-          "name": "concrete append-only obj_map<expr,pair<unsigned,unsigned>> source hash/key comparison, linear probing, capacity-eight strict three-quarter pre-insert growth, source-order rehash and table iteration (src/util/obj_hashtable.h:58-105,144-159; src/util/hashtable.h:155-214,219-227,244-256,377-396,494-510)",
-          "status": "partial",
+          "name": "Retained BV trailing obj_map<expr,pair<unsigned,unsigned>> uses ordered insdict with complete typed ASTHandle keys and owned expression references",
+          "status": "platform_replacement",
           "go_target": "pkg/ast/rewriter/bv_trailing_table.go",
           "tests": [
             "TestBVTrailingConstructorBorrowsExtractionOwner",
@@ -115723,7 +115723,7 @@
         "Statistics config models HASHTABLE_STATISTICS compiled class profile; mixed statistics/nonstatistics swaps reject before mutation. Concrete field UINT64_MAX arithmetic codec proves unsigned wrap, not a claim that bounded fixture generated that many collisions. Source-defined selected Runtime and legacy statistics and narrow existing ostream profile are implemented; native ABI/global allocator, other pointer-specializations and full arbitrary ostream locale/exception profiles remain partial. No registered char-pointer driver credit. Source has get_num_collision, not a new display_statistics method; dump reuses exact existing insertion chain without changing collision count.",
         "These are Go owner/config guard-domain proofs, not native C++ algorithm failure or source copy-constructor credit. Four real accidental-Go-copy public actions previously returned success, with Close/source DT releasing original owner bytes; they now reject without affecting original backing/state/cause/charges. No new storage or source allocator events.",
         "Selected Runtime32/64 and legacy char-pointer/int32 engines implement literal source action/publication order and real shared assertion transport; representation geometry is not native ABI. Source source-pointer/runtime provider/borrowed spelling lifetime qualifications remain explicit. Malformed uninitialized value and dangling DT, closed assertion provider, and host ErrorTransport reentry are Go guard-domain proofs rather than ordinary native math REDs. Registered src/test/map.cpp:23-44 exact14 ENSURE credit remains unchanged, independent tests add none. Core dump key_data ostream instantiation lacks a source-defined operator<<; no fabricated value formatting is supplied. Other entry/key/value/native/global/compiler profiles remain partial.",
-        "BV trailing count-cache specialization uses concrete Go entry storage and checked AST identity handles without generics, at its rewriter consumer to avoid import cycles. It preserves selected append-only probing/growth/iteration algorithms and key reference ownership; generic map APIs, native object-pointer/sentinel/entry layout and Runtime allocator/exception/fatal ABI remain uncredited.",
+        "BV trailing count-cache specialization uses insdict.Dict v0.10.1 with complete typed ASTHandle keys and insertion-order cleanup. Source probing, rehash, bucket growth, pointer/sentinel layout and their allocation failure points are replaced by native Go storage. The consumer retains one owned expression reference per entry and preserves lookup, insertion and reset behavior; other template specializations remain separate.",
         "SAT antecedents now use map[uint32]*satSolverIndexSet and concrete insdict.Dict[uint32,struct{}] sets. Map values are deep copies; duplicate replacement preserves the mapped row identity and replaces its contents. Native insertion order replaces physical bucket order. Removed source hashtable capacity, probing, tombstones, Runtime backing/pointer headers, eager inactive nested values, temporary copies and container allocation/destructor refusal states. Only actual map/frame headers remain charged. Borrowed ordered iterator views are invalidated by key changes, assignment, reset or close; duplicates preserve the view. Reset/close drops mapped sets and rejects stale borrowed rows. Cold header refusal, 257-value growth/replacement, independent 4096-operation union/assignment oracle, borrowed lifetime and retained consequence algorithms are covered. No generic C++ hashtable/map implementation credit is added.",
         "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added.",
         "Model constant/function/universe consumers now use ordered insdict.Dict directly, with native owner entries and no source probing/rehash implementation. Their functional ordering/ownership validation is consumer evidence, not a claim to port unused hashtable templates."
@@ -155390,8 +155390,8 @@
           ]
         },
         {
-          "name": "concrete append-only obj_map<expr,pair<unsigned,unsigned>> source hash/key comparison, linear probing, capacity-eight strict three-quarter pre-insert growth, source-order rehash and table iteration (src/util/obj_hashtable.h:58-105,144-159; src/util/hashtable.h:155-214,219-227,244-256,377-396,494-510)",
-          "status": "partial",
+          "name": "Retained BV trailing obj_map<expr,pair<unsigned,unsigned>> uses ordered insdict with complete typed ASTHandle keys and owned expression references",
+          "status": "platform_replacement",
           "go_target": "pkg/ast/rewriter/bv_trailing_table.go",
           "tests": [
             "TestBVTrailingConstructorBorrowsExtractionOwner",
@@ -155408,7 +155408,7 @@
       ],
       "deviations": [
         "Container probing, tombstones, capacity arithmetic, simulated storage failures and backing-only epochs are replaced by native Go collections. Iterators borrow an insertion-order view invalidated by key changes/reset/close. Consumed cleanup keys are removed before returning callback errors. SMT2 display remains open; these consumers add no C++ generic container implementation credit. See PORT_PROGRESS.md#native-sparse-marks-and-shared-occurrence-collections.",
-        "BV trailing count-cache specialization uses concrete Go entry storage and checked AST identity handles without generics, at its rewriter consumer to avoid import cycles. It preserves selected append-only probing/growth/iteration algorithms and key reference ownership; generic map APIs, native object-pointer/sentinel/entry layout and Runtime allocator/exception/fatal ABI remain uncredited.",
+        "BV trailing count-cache specialization uses insdict.Dict v0.10.1 with complete typed ASTHandle keys and insertion-order cleanup. Source probing, rehash, bucket growth, pointer/sentinel layout and their allocation failure points are replaced by native Go storage. The consumer retains one owned expression reference per entry and preserves lookup, insertion and reset behavior; other template specializations remain separate.",
         "Model constant/function/universe consumers now use ordered insdict.Dict directly, with native owner entries and no source probing/rehash implementation. Their functional ordering/ownership validation is consumer evidence, not a claim to port unused hashtable templates."
       ]
     },

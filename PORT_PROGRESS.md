@@ -39731,3 +39731,24 @@ scratch without arena reservations. Focused tests cover exact negative-index
 and long-name text, a warm long-name lookup under a disabled arena budget,
 and unchanged numeral-owner state. This credits the live string-buffer
 consumer as a platform replacement.
+
+### BV trailing cache handle identity
+
+The retained count cache at `src/ast/rewriter/bv_trailing.cpp:338-373`
+uses `obj_map<expr, pair<unsigned,unsigned>>` and owns one reference for each
+cached expression. Its Go consumer already keeps entries in `insdict.Dict`
+for deterministic reference cleanup. The dictionary now keys directly by
+the complete `ASTHandle` instead of encoding only slot and generation into
+`uint64`; equality includes the owning manager identity. Lookup, insertion,
+ordered cleanup and cache reset retain their tested behavior. The concrete
+table specialization is credited as a native collection replacement in
+`obj_hashtable.h` and `hashtable.h`; their other live specializations remain
+partial.
+
+The earlier AST expression-overload native-slice migration also removes the
+sort-buffer reservation formerly assumed by the array rewriter's warm store
+test. That test now verifies the actual cached rewrite succeeds with arena
+reservations disabled in the native profile, publishes the expected output and
+leaves the arena balance unchanged. Checked debug assertions retain their own
+allocation path. The old spill-refusal expectation was container mechanics,
+not a retained array-rewriter algorithm requirement.
