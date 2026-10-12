@@ -99,13 +99,10 @@ func (m *ASTManager) finalizeBasic() error {
 	return failure
 }
 func (m *ASTManager) destroyPluginBacking() {
-	width := uint64(reflect.TypeOf(astNodeRef{}).Size())
-	m.BudgetField.Release(uint64(cap(m.basic.eq)+cap(m.basic.ite)+cap(m.basic.oeq)) * width)
 	m.basic.eq = nil
 	m.basic.ite = nil
 	m.basic.oeq = nil
 	for i := range m.basic.proofCaches {
-		m.BudgetField.Release(uint64(cap(m.basic.proofCaches[i])) * width)
 		m.basic.proofCaches[i] = nil
 	}
 	m.BudgetField.Release(uint64(cap(m.builtin.userNames)) * uint64(reflect.TypeOf(usymbol.Symbol{}).Size()))

@@ -3,7 +3,6 @@ package ast
 
 import (
 	"math"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
@@ -81,30 +80,10 @@ func (m *ASTManager) resizeDeclCache(cache *[]astNodeRef, needed uint32) error {
 	if uint64(needed) <= uint64(len(*cache)) {
 		return nil
 	}
-	width := uint64(reflect.TypeOf(astNodeRef{}).Size())
-	if uint64(needed) > uint64(^uint(0)>>1)/width {
+	if uint64(needed) > uint64(^uint(0)>>1) {
 		return arena.ErrBounds
 	}
-	// Source vector::resize expands one capacity at a time. A later
-	// allocation failure retains earlier backing growth, but not the size.
-	for uint64(needed) > uint64(cap(*cache)) {
-		old := uint32(cap(*cache))
-		if old == ^uint32(0) {
-			return arena.ErrBounds
-		}
-		n, e := astDirectoryGrowth(old, old+1, width)
-		if e != nil {
-			return e
-		}
-		if e = m.BudgetField.Reserve(uint64(n) * width); e != nil {
-			return e
-		}
-		next := make([]astNodeRef, len(*cache), int(n))
-		copy(next, *cache)
-		m.BudgetField.Release(uint64(cap(*cache)) * width)
-		*cache = next
-	}
-	*cache = (*cache)[:needed]
+	*cache = append(*cache, make([]astNodeRef, int(needed)-len(*cache))...)
 	return nil
 }
 func (m *ASTManager) joinSorts(a, b astNodeRef) (astNodeRef, error) {

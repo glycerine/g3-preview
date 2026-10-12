@@ -39522,3 +39522,16 @@ together and reversing each array keeps the quantifiers distinct, including
 the source restriction that patterns and no-patterns cannot coexist. This
 completes the AST uses of this selected `util.h` method; the rest of the
 header remains partial.
+
+### Retained `force_ptr_array_size` AST cache uses
+
+The source helper at `util.h:318-322` grows basic equality/ITE and bit-vector
+sort/declaration caches through `ast.cpp:988,1004` and
+`bv_decl_plugin.cpp:144-278`. The bit-vector caches already use native Go
+slices. The basic declaration and proof caches now do the same: growth keeps
+existing handles, fills skipped indexes with zero values, and no longer
+models C++ vector capacity or charges Go slice backing to the arena budget.
+Plugin cleanup drops those slices without releasing a nonexistent arena
+reservation. Focused tests verify growth, zero gaps, preserved handles and
+bit-vector cache ownership. This concrete retained helper is credited as
+ported; `util.h` remains partial for other methods.

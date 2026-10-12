@@ -9692,7 +9692,7 @@
         "TestASTAllEagerPluginBranches",
         "TestASTAllFiveKindsAndQuantifierIdentity",
         "TestASTArrayHashPermanentActualSourceVectors",
-        "TestASTBasicCacheResizeRetainsEachSourceExpansion",
+        "TestASTBasicCacheNativeGrowthPreservesEntriesAndZeroGaps",
         "TestASTBuiltinValueAndDefaultPluginPolicies",
         "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
         "TestASTConstructorRejectsClosedBorrowedNumeralOwnerBeforeGrowth",
@@ -10539,7 +10539,7 @@
           "go_target": "pkg/ast/ast_builtin_plugins.go",
           "tests": [
             "TestASTAllEagerPluginBranches",
-            "TestASTBasicCacheResizeRetainsEachSourceExpansion",
+            "TestASTBasicCacheNativeGrowthPreservesEntriesAndZeroGaps",
             "TestASTBuiltinValueAndDefaultPluginPolicies",
             "TestASTModelValueNameInlineAndOverflowAccounting",
             "TestASTSymbolBytesGrowthBeforeDuplicateAndActualGraph",
@@ -10936,7 +10936,7 @@
         "TestASTAllEagerPluginBranches",
         "TestASTAllFiveKindsAndQuantifierIdentity",
         "TestASTArrayHashPermanentActualSourceVectors",
-        "TestASTBasicCacheResizeRetainsEachSourceExpansion",
+        "TestASTBasicCacheNativeGrowthPreservesEntriesAndZeroGaps",
         "TestASTBuiltinValueAndDefaultPluginPolicies",
         "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
         "TestASTConstructorRejectsClosedBorrowedNumeralOwnerBeforeGrowth",
@@ -11518,7 +11518,7 @@
           "go_target": "pkg/ast/ast_builtin_plugins.go",
           "tests": [
             "TestASTAllEagerPluginBranches",
-            "TestASTBasicCacheResizeRetainsEachSourceExpansion",
+            "TestASTBasicCacheNativeGrowthPreservesEntriesAndZeroGaps",
             "TestASTBuiltinValueAndDefaultPluginPolicies",
             "TestASTModelValueNameInlineAndOverflowAccounting",
             "TestASTSymbolBytesGrowthBeforeDuplicateAndActualGraph",
@@ -165283,7 +165283,12 @@
         "pkg/util/diagnostic/util_small_object_allocator.go",
         "pkg/util/diagnostic/util_small_object_allocator_stream.go",
         "pkg/util/memory/runtime.go",
-        "pkg/ast/ast_table_hash.go"
+        "pkg/ast/ast_table_hash.go",
+        "pkg/ast/ast_basic_plugin.go",
+        "pkg/ast/ast_basic_plugin_finalize.go",
+        "pkg/ast/ast_bv_plugin.go",
+        "pkg/ast/ast_bv_fixed_decl.go",
+        "pkg/ast/ast_bv_conversion.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -165308,7 +165313,10 @@
         "TestVerboseContextClosedLevelReachedBeforeOutput",
         "TestVerboseContextWarmOutputAndNullAdapter",
         "TestRuntimeSourceMegabytesToBytesSaturatesAtSizeT",
-        "TestASTSourceCompareArraysDeclarationAndApplicationOrder"
+        "TestASTSourceCompareArraysDeclarationAndApplicationOrder",
+        "TestASTSourceCompareArraysQuantifierOrder",
+        "TestASTBasicCacheNativeGrowthPreservesEntriesAndZeroGaps",
+        "TestASTBitVectorNativeCacheGrowthPreservesValidationAndOwnership"
       ],
       "conditionals": [
         {
@@ -165586,13 +165594,23 @@
             "TestASTSourceCompareArraysDeclarationAndApplicationOrder",
             "TestASTSourceCompareArraysQuantifierOrder"
           ]
+        },
+        {
+          "name": "force_ptr_array_size retained basic and bit-vector declaration cache extents (util.h:318-322; ast.cpp:988,1004; bv_decl_plugin.cpp:144-278)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_basic_plugin.go",
+          "tests": [
+            "TestASTBasicCacheNativeGrowthPreservesEntriesAndZeroGaps",
+            "TestASTBitVectorNativeCacheGrowthPreservesValidationAndOwnership"
+          ]
         }
       ],
       "ownership": [
         "Random state owner-local, shuffle borrows caller sequence. Other util methods unported.",
         "The escaped leaf borrows nullable input synchronously and writes to a caller-owned io.Writer or returns a caller-owned string. Standard library builders replace C++ vector and stream storage.",
         "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events.",
-        "AST canonical-table comparison reads borrowed concrete declaration-domain, application-argument, and quantifier sort/name/pattern/no-pattern storage in order; Go node handles and symbols preserve source identity and native table storage. No standalone C++ array template is ported."
+        "AST canonical-table comparison reads borrowed concrete declaration-domain, application-argument, and quantifier sort/name/pattern/no-pattern storage in order; Go node handles and symbols preserve source identity and native table storage. No standalone C++ array template is ported.",
+        "The retained basic and bit-vector declaration caches grow native Go slices to the requested index, preserving prior handles and zero-valued gaps. Their backing is ordinary Go memory, not a charged arena allocation."
       ],
       "deviations": [
         "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound. C++ ostream badbit, exception flags, and formatting state are standard-library internals rather than project escaped behavior and are excluded; Go Write reports io.Writer errors.",
