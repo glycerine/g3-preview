@@ -198,3 +198,37 @@ func TestLPExactDenseBlockIndexedLiteralInputsAndGrowth(t *testing.T) {
 	h.must(parent.Close())
 	lpExactVectorNamedCensus(t, h, nil)
 }
+
+// The retained dense-right algorithm treats newly appended parent coordinates
+// as identity rows and replaces trailing caller slots with initialized zeros.
+func TestLPExactDenseBlockDenseRightParentGrowth(t *testing.T) {
+	for _, direct := range []bool{false, true} {
+		t.Run(fmt.Sprint(direct), func(t *testing.T) {
+			var h *lpPairHarness
+			if direct {
+				h = lpNewDirectSparseHarness(t)
+			} else {
+				h = newLPPairHarness(t)
+			}
+			parent := lpNewExactSparse(t, h, 3)
+			m, err := NewRationalSquareDenseSubmatrix(parent, 1)
+			h.must(err)
+			for i, x := range []int64{2, 3, 5, 7} {
+				h.must(h.m.SetInt64(&m.Data[i], x))
+			}
+			h.must(parent.Resize(5))
+			v := NewIndexedRationalVector(h.m, 6)
+			for i, x := range []int64{11, 13, 17, 19, 23, 29} {
+				h.must(h.m.SetInt64(&v.Data[i], x))
+			}
+			h.must(m.ApplyRight(v.Data))
+			h.must(m.Close())
+			for i, x := range []int64{11, 111, 158, 19, 23, 0} {
+				lpSparseRationalCheck(t, h, &v.Data[i], big.NewRat(x, 1))
+			}
+			h.must(v.Close())
+			h.must(parent.Close())
+			lpExactVectorNamedCensus(t, h, nil)
+		})
+	}
+}

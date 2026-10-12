@@ -134,46 +134,53 @@ func TestLPExactDenseBlockAllocationFailureCensus(t *testing.T) {
 
 // A dense owner may observe an older stopped comparison but must never adopt it.
 func TestLPExactDenseBlockLeavesOlderComparisonOwned(t *testing.T) {
-	matched := false
-	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			h := newLPPairHarness(t)
-			p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/13")
-			parent := lpNewExactSparse(t, h, 2)
-			h.must(parent.AddNewElement(0, 0, &p.X))
-			h.must(parent.AddNewElement(0, 1, &p.Y))
-			var caller exactPriorityCalls
-			b, err := caller.begin(h.m)
-			h.must(err)
-			h.budget.FailAfter(ordinal)
-			_, err = h.m.Compare(&p.X, &p.Y)
-			h.budget.FailAfter(-1)
-			err = caller.after(h.m, b, err)
-			older := h.m.ComparisonInvocationState()
-			if older.Active {
-				if !lpExactPriorityPhysicalRefusal(err) {
-					t.Fatal(err)
+	for _, direct := range []bool{false, true} {
+		matched := false
+		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
+			t.Run(fmt.Sprintf("direct=%t/%d", direct, ordinal), func(t *testing.T) {
+				var h *lpPairHarness
+				if direct {
+					h = lpNewDirectSparseHarness(t)
+				} else {
+					h = newLPPairHarness(t)
 				}
-				matched = true
-				// Construction copies coefficients without using the foreign comparison.
-				m, err := NewRationalSquareDenseSubmatrix(parent, 0)
+				p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/13")
+				parent := lpNewExactSparse(t, h, 2)
+				h.must(parent.AddNewElement(0, 0, &p.X))
+				h.must(parent.AddNewElement(0, 1, &p.Y))
+				var caller exactPriorityCalls
+				b, err := caller.begin(h.m)
 				h.must(err)
-				_, err = m.FindPivotColumn(0)
-				if err != numeral.ErrRationalRawArithmeticPending || m.calls.comparison != 0 {
-					t.Fatal("older comparison ownership", err, m.calls.comparison)
+				h.budget.FailAfter(ordinal)
+				_, err = h.m.Compare(&p.X, &p.Y)
+				h.budget.FailAfter(-1)
+				err = caller.after(h.m, b, err)
+				older := h.m.ComparisonInvocationState()
+				if older.Active {
+					if !lpExactPriorityPhysicalRefusal(err) {
+						t.Fatal(err)
+					}
+					matched = true
+					// Construction copies coefficients without using the foreign comparison.
+					m, err := NewRationalSquareDenseSubmatrix(parent, 0)
+					h.must(err)
+					_, err = m.FindPivotColumn(0)
+					if err != numeral.ErrRationalRawArithmeticPending || m.calls.comparison != 0 {
+						t.Fatal("older comparison ownership", err, m.calls.comparison)
+					}
+					h.must(m.Close())
+					if h.m.ComparisonInvocationState() != older {
+						t.Fatal("closed caller's comparison")
+					}
 				}
-				h.must(m.Close())
-				if h.m.ComparisonInvocationState() != older {
-					t.Fatal("closed caller's comparison")
-				}
-			}
-			h.must(caller.cleanupRaw(h.m))
-			h.must(caller.cleanupRoots(h.m))
-			h.must(parent.Close())
-			lpExactVectorNamedCensus(t, h, nil)
-		})
-	}
-	if !matched {
-		t.Fatal("no real comparison refusal")
+				h.must(caller.cleanupRaw(h.m))
+				h.must(caller.cleanupRoots(h.m))
+				h.must(parent.Close())
+				lpExactVectorNamedCensus(t, h, nil)
+			})
+		}
+		if !matched {
+			t.Fatal("no real comparison refusal")
+		}
 	}
 }

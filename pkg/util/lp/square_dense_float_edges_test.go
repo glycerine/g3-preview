@@ -19,6 +19,19 @@ func lpFloatBlockFixture(t *testing.T, start uint32) *FloatSquareDenseSubmatrix 
 	return m
 }
 
+func TestLPFloatDenseBlockDenseRightParentGrowth(t *testing.T) {
+	parent := newFloatSparseMatrix(3)
+	m, err := NewFloatSquareDenseSubmatrix(parent, 1)
+	lpStaticMust(t, err)
+	m.Data = []float64{2, 3, 5, 7}
+	lpStaticMust(t, parent.Resize(5))
+	v := []float64{11, 13, 17, 19, 23, 29}
+	lpStaticMust(t, m.ApplyRight(v))
+	if !reflect.DeepEqual(v, []float64{11, 111, 158, 19, 23, 0}) {
+		t.Fatal("dense-right grown parent", v)
+	}
+}
+
 func TestLPFloatDenseBlockNewEntriesAndLiteralPivots(t *testing.T) {
 	parent := newFloatSparseMatrix(2)
 	lpStaticMust(t, parent.AddNewElement(1, 0, 9))

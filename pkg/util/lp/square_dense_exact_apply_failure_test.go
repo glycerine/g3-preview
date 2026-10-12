@@ -101,7 +101,13 @@ func TestLPExactDenseBlockApplicationAllocationFailureCensus(t *testing.T) {
 								for i := range want {
 									h.check(&pw.Data[i], want[i], wantY[i])
 								}
-							} else if route != "pair-constructor" {
+							} else if route == "pair-constructor" {
+								for i := start; i < n; i++ {
+									for j := start; j < n; j++ {
+										lpSparseRationalCheck(t, h, &m.Data[(i-start)*m.Dim+j-start], a[i][j])
+									}
+								}
+							} else {
 								for i := range want {
 									lpSparseRationalCheck(t, h, &v.Data[i], want[i])
 								}
@@ -172,47 +178,54 @@ func TestLPExactDenseBlockApplicationAllocationFailureCensus(t *testing.T) {
 }
 
 func TestLPExactDenseBlockLeavesStoppedIndexedCallerOwned(t *testing.T) {
-	matched := false
-	for ordinal := int64(0); ordinal < 100 && !matched; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			h := lpNewDirectSparseHarness(t)
-			parent := lpNewExactSparse(t, h, 2)
-			m, err := NewRationalSquareDenseSubmatrix(parent, 0)
-			h.must(err)
-			p := h.pair("1"+strings.Repeat("0", 120)+"/7", "2"+strings.Repeat("0", 120)+"/13")
-			v := NewIndexedRationalVector(h.m, 2)
-			h.must(h.m.Copy(&v.Data[0], &p.Y))
-			v.Index = []uint32{0}
-			h.budget.FailAfter(ordinal)
-			err = v.Add(0, &p.X)
-			h.budget.FailAfter(-1)
-			if err != nil && !lpExactPriorityPhysicalRefusal(err) {
-				t.Fatal(err)
-			}
-			if v.calls.pending() {
-				matched = true
-				before := h.m.RawInvocationState()
-				if err = m.ApplyLeftToT(v, nil); err != ErrExactVectorPending {
+	for _, direct := range []bool{false, true} {
+		matched := false
+		for ordinal := int64(0); ordinal < 100 && !matched; ordinal++ {
+			t.Run(fmt.Sprintf("direct=%t/%d", direct, ordinal), func(t *testing.T) {
+				var h *lpPairHarness
+				if direct {
+					h = lpNewDirectSparseHarness(t)
+				} else {
+					h = newLPPairHarness(t)
+				}
+				parent := lpNewExactSparse(t, h, 2)
+				m, err := NewRationalSquareDenseSubmatrix(parent, 0)
+				h.must(err)
+				p := h.pair("1"+strings.Repeat("0", 120)+"/7", "2"+strings.Repeat("0", 120)+"/13")
+				v := NewIndexedRationalVector(h.m, 2)
+				h.must(h.m.Copy(&v.Data[0], &p.Y))
+				v.Index = []uint32{0}
+				h.budget.FailAfter(ordinal)
+				err = v.Add(0, &p.X)
+				h.budget.FailAfter(-1)
+				if err != nil && !lpExactPriorityPhysicalRefusal(err) {
 					t.Fatal(err)
 				}
-				if err = m.ApplyRightIndexed(v); err != ErrExactVectorPending {
-					t.Fatal(err)
-				}
-				if m.work != nil || m.calls.pending() {
-					t.Fatal("adopted stopped caller")
+				if v.calls.pending() {
+					matched = true
+					before := h.m.RawInvocationState()
+					if err = m.ApplyLeftToT(v, nil); err != ErrExactVectorPending {
+						t.Fatal(err)
+					}
+					if err = m.ApplyRightIndexed(v); err != ErrExactVectorPending {
+						t.Fatal(err)
+					}
+					if m.work != nil || m.calls.pending() {
+						t.Fatal("adopted stopped caller")
+					}
+					h.must(m.Close())
+					if h.m.RawInvocationState() != before {
+						t.Fatal("closed caller invocation")
+					}
 				}
 				h.must(m.Close())
-				if h.m.RawInvocationState() != before {
-					t.Fatal("closed caller invocation")
-				}
-			}
-			h.must(m.Close())
-			h.must(v.Close())
-			h.must(parent.Close())
-			lpExactVectorNamedCensus(t, h, nil)
-		})
-	}
-	if !matched {
-		t.Fatal("no actual stopped indexed caller")
+				h.must(v.Close())
+				h.must(parent.Close())
+				lpExactVectorNamedCensus(t, h, nil)
+			})
+		}
+		if !matched {
+			t.Fatal("no actual stopped indexed caller")
+		}
 	}
 }

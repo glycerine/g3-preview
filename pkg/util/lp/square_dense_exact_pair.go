@@ -159,6 +159,9 @@ func (m *PairSquareDenseSubmatrix) Close() error {
 	if err := m.calls.cleanupRaw(m.manager); err != nil {
 		return err
 	}
+	if err := m.WorkVector.calls.cleanupRaw(m.manager); err != nil {
+		return err
+	}
 	// Scalar construction temporaries precede the containing pair/vector owners.
 	if m.work != nil {
 		if err := m.closeWork(); err != nil {

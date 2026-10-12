@@ -369,6 +369,12 @@ func (m *RationalSquareDenseSubmatrix) Close() error {
 	if err := m.calls.cleanupRaw(m.manager); err != nil {
 		return err
 	}
+	// An interrupted workspace Add is nested inside the indexed-right call.
+	// Unwind its numeric locals before destroying the argument product, while
+	// retaining stored workspace cells until their member destructor below.
+	if err := m.WorkVector.calls.cleanupRaw(m.manager); err != nil {
+		return err
+	}
 	if m.work != nil {
 		if err := m.closeWork(); err != nil {
 			return err
