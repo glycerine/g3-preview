@@ -722,14 +722,15 @@
     },
     {
       "source": "src/util/lp/indexed_value.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/sparse_matrix_float.go",
         "pkg/util/lp/sparse_matrix_exact.go",
         "pkg/util/lp/sparse_matrix_float_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_pivots.go",
-        "pkg/util/lp/sparse_matrix_float_pivots.go"
+        "pkg/util/lp/sparse_matrix_float_pivots.go",
+        "pkg/util/lp/indexed_value_audit_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -753,7 +754,51 @@
         "TestLPSparsePivotLiteralQueueAndThresholds",
         "TestLPSparsePivotBoundsAndPublicationPrefixes",
         "TestLPExactSparsePivotAllocationFailureCensus",
-        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison"
+        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison",
+        "TestLPIndexedValueRationalConstructorAndAssignmentPublication",
+        "TestLPIndexedValueByValueSetterAndAliasedArgument"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained double coefficient record fields/construct/copy/assignment/setter and borrowed field access",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_float.go",
+          "tests": [
+            "TestLPFloatSparseBasisIndependentOracle",
+            "TestLPFloatSparseBasisLiteralStops"
+          ]
+        },
+        {
+          "name": "retained mpq constructor/member and owning insertion copy with reached parameter/member destruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact.go",
+          "tests": [
+            "TestLPIndexedValueRationalConstructorAndAssignmentPublication",
+            "TestLPIndexedValueByValueSetterAndAliasedArgument",
+            "TestLPExactSparseBasisIndependentOracle",
+            "TestLPExactSparseBasisAllocationFailureCensus"
+          ]
+        },
+        {
+          "name": "retained mpq value-before-metadata record assignment and by-value set_value, including aliased source argument",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact_elimination.go",
+          "tests": [
+            "TestLPIndexedValueRationalConstructorAndAssignmentPublication",
+            "TestLPIndexedValueByValueSetterAndAliasedArgument",
+            "TestLPExactSparseIndependentMutationOracle",
+            "TestLPExactSparseMutationAllocationFailureCensus",
+            "TestLPExactSparseMutationLeavesOlderComparisonOwned"
+          ]
+        }
+      ],
+      "ownership": [
+        "Float records are native scalar values. Rational records own numeral cells; constructor/assignment/setter copies use actual typed manager calls, source parameter/member temporaries and matrix call receipts. Scalar metadata publishes after the owning value copy. Rows and columns own separate values and are closed in reverse source member order. Failed temporary/member storage remains reachable for concrete matrix Close; borrowed source records are unchanged. No arbitrary callback or standalone unused template owner introduced."
+      ],
+      "deviations": [
+        "Only live double/mpq record specializations. Unused default constructor, standalone value() wrapper and commented check_vector_for_small_values calls do not require adapters. Two-argument constructor does not initialize Other in C++; Go zero-valued storage is not credited as a defined source reciprocal offset. STL internals and reads of indeterminate metadata remain excluded."
       ]
     },
     {
@@ -6637,8 +6682,8 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "partial": 75,
-    "ported": 20,
+    "partial": 74,
+    "ported": 21,
     "reference_only": 10,
     "dead_deleted": 3
   },
@@ -11953,6 +11998,23 @@
     "combined_debug_checked_helper_statements": {
       "covered": 17,
       "total": 20
+    }
+  },
+  "latest_indexed_value_support_audit": {
+    "summary": "Whole retained-source/ownership audit completes indexed_value.h for actual double/mpq coefficient records in sparse LU storage, mutations and dense-tail replacement. Existing FloatIndexedValue/RationalIndexedValue native fields and concrete appendIndexed/assignIndexed/setIndexedValue already implement source value copies and value-before-index/other publication. Added two source-derived test groups: eight pooled/direct physical refusal campaigns through success across constructor publication, record assignment, by-value setter and aliased setter; verify no unfinished row publication, unchanged metadata after failed numeric assignment, borrowed source preservation, and exact cleanup census. Related independent floating/exact sparse basis, real sparse mutations, allocation failures and older-caller checks pass native14.049s/combined14.747s. Concrete rational constructor14/16statements87.5%, assignment4/4100%, setter8/988.9%, aggregate26/2989.7% both; three gaps guard source member/parameter destructor errors. No production changes, callback adapters or other template kinds needed. Whole no-ignore scan captures61 indexed-value/helper references: check_vector_for_small_values appears only in its definition and four commented call sites, so no dead helper is ported. Unused default-constructor metadata and the two-argument constructor Other field are indeterminate C++; no claim they initialize to zero or define a reciprocal link. Full scalar fields are native values; exact records own their cells through concrete matrix/journal owners and actual numerical receipts. Full native checkpoint8f2961ca/session89234 is still running and predates these new tests; completion not credited. LP inventory21ported/74partial/10reference_only/3dead_deleted/2platform_replacement. Source audit /mnt/oldrog/tmp/g3-lp-indexed-value-consumers-audit.txt; profiles /mnt/oldrog/tmp/g3-lp-indexed-value-audit-{native,debug}.cover. Commands restricted to CPUs8\u201316.",
+    "native_and_combined_helper_statements": {
+      "constructor": [
+        14,
+        16
+      ],
+      "assignment": [
+        4,
+        4
+      ],
+      "setter": [
+        8,
+        9
+      ]
     }
   }
 }
