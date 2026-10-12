@@ -45,6 +45,8 @@ digraph packages {
   "math/euclid" -> "util/numeral";
   "math/interval" [style=filled, fillcolor="#eeeeee"];
   "math/interval" -> "arena";
+  "math/interval" -> "util/control";
+  "math/interval" -> "util/cooperate";
   "math/interval" -> "util/numeral";
   "math/polynomial" [style=filled, fillcolor="#eeeeee"];
   "math/polynomial" -> "arena";

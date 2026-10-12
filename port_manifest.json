@@ -34442,12 +34442,18 @@
         "pkg/math/interval/rational_interval_deps.go",
         "pkg/math/interval/rational_interval_deps_test.go",
         "pkg/math/realclosure/binary_interval.go",
-        "pkg/math/realclosure/binary_interval_test.go"
+        "pkg/math/realclosure/binary_interval_test.go",
+        "pkg/math/interval/fixed_root.go",
+        "pkg/math/interval/fixed_root_test.go",
+        "pkg/math/subpaving/fixed_interval_root.go",
+        "pkg/math/subpaving/fixed_interval_root_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
         "TestRationalIntervalSourceDependencyMasks",
-        "TestRealClosureBinaryIntervalRetainedCore"
+        "TestRealClosureBinaryIntervalRetainedCore",
+        "TestFixedRootRetainedNewtonAndCertifiedBounds",
+        "TestSubpavingFixedIntervalXnEqYRetainedCases"
       ],
       "conditionals": [
         {
@@ -34537,7 +34543,11 @@
         "pkg/math/subpaving/fixed_interval_mul.go",
         "pkg/math/subpaving/fixed_interval_mul_test.go",
         "pkg/math/subpaving/fixed_interval_div.go",
-        "pkg/math/subpaving/fixed_interval_div_test.go"
+        "pkg/math/subpaving/fixed_interval_div_test.go",
+        "pkg/math/interval/fixed_root.go",
+        "pkg/math/interval/fixed_root_test.go",
+        "pkg/math/subpaving/fixed_interval_root.go",
+        "pkg/math/subpaving/fixed_interval_root_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34547,7 +34557,9 @@
         "TestSubpavingFixedIntervalScalarMulDiv",
         "TestSubpavingFixedIntervalPowerRetainedCases",
         "TestSubpavingFixedIntervalMulSignClasses",
-        "TestSubpavingFixedIntervalDivSignBranches"
+        "TestSubpavingFixedIntervalDivSignBranches",
+        "TestFixedRootRetainedNewtonAndCertifiedBounds",
+        "TestSubpavingFixedIntervalXnEqYRetainedCases"
       ],
       "conditionals": [
         {
@@ -34991,10 +35003,21 @@
           "tests": [
             "TestRealClosureBinaryIntervalRetainedCore"
           ]
+        },
+        {
+          "name": "Concrete mpfx nth-root Newton approximation, directed bound certification and xn_eq_y monomial inverse image (src/math/interval/interval_def.h:189-380,1390-1478)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/fixed_root.go",
+          "tests": [
+            "TestFixedRootRetainedNewtonAndCertifiedBounds",
+            "TestSubpavingFixedIntervalXnEqYRetainedCases"
+          ]
         }
       ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The source nth_root_pos fallback declares a scoped numeral named one but never sets it to one before comparing A, so a subunit input can produce reversed [1,A]. The concrete Go path initializes one and returns the source-commented conservative [0,1] enclosure."
+      ]
     },
     {
       "path": "src/math/interval/interval_mpq.cpp",
@@ -49830,7 +49853,9 @@
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
         "pkg/math/subpaving/fixed_node_predicates.go",
-        "pkg/math/subpaving/fixed_node_predicates_test.go"
+        "pkg/math/subpaving/fixed_node_predicates_test.go",
+        "pkg/math/subpaving/fixed_interval_root.go",
+        "pkg/math/subpaving/fixed_interval_root_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -49839,7 +49864,8 @@
         "TestSubpavingFixedIntervalMulSignClasses",
         "TestSubpavingFixedIntervalDivSignBranches",
         "TestSubpavingFixedNodeConstantIntervalViews",
-        "TestSubpavingFixedNodeBoundPredicates"
+        "TestSubpavingFixedNodeBoundPredicates",
+        "TestSubpavingFixedIntervalXnEqYRetainedCases"
       ],
       "conditionals": [
         {
@@ -49948,11 +49974,14 @@
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
         "pkg/math/subpaving/fixed_node_predicates.go",
-        "pkg/math/subpaving/fixed_node_predicates_test.go"
+        "pkg/math/subpaving/fixed_node_predicates_test.go",
+        "pkg/math/subpaving/fixed_interval_root.go",
+        "pkg/math/subpaving/fixed_interval_root_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
-        "TestSubpavingFixedNodeBoundPredicates"
+        "TestSubpavingFixedNodeBoundPredicates",
+        "TestSubpavingFixedIntervalXnEqYRetainedCases"
       ],
       "assertions": [
         {
