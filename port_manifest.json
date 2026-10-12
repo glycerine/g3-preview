@@ -165288,7 +165288,10 @@
         "pkg/ast/ast_basic_plugin_finalize.go",
         "pkg/ast/ast_bv_plugin.go",
         "pkg/ast/ast_bv_fixed_decl.go",
-        "pkg/ast/ast_bv_conversion.go"
+        "pkg/ast/ast_bv_conversion.go",
+        "pkg/ast/ast_bv_extract_numerals.go",
+        "pkg/ast/ast_bv_logical_shift_numerals.go",
+        "pkg/ast/ast_bv_arithmetic_shift_numerals.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -165316,7 +165319,8 @@
         "TestASTSourceCompareArraysDeclarationAndApplicationOrder",
         "TestASTSourceCompareArraysQuantifierOrder",
         "TestASTBasicCacheNativeGrowthPreservesEntriesAndZeroGaps",
-        "TestASTBitVectorNativeCacheGrowthPreservesValidationAndOwnership"
+        "TestASTBitVectorNativeCacheGrowthPreservesValidationAndOwnership",
+        "TestBVRewriterSourceSaturatingUint64ShiftBoundaries"
       ],
       "conditionals": [
         {
@@ -165596,6 +165600,14 @@
           ]
         },
         {
+          "name": "shift_right and shift_left uint64 saturating shifts for retained BV extract/logical/arithmetic rewrites (util.h:131-139; bv_rewriter.cpp:684,814,863,909-921)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_bv_extract_numerals.go",
+          "tests": [
+            "TestBVRewriterSourceSaturatingUint64ShiftBoundaries"
+          ]
+        },
+        {
           "name": "force_ptr_array_size retained basic and bit-vector declaration cache extents (util.h:318-322; ast.cpp:988,1004; bv_decl_plugin.cpp:144-278)",
           "status": "ported",
           "go_target": "pkg/ast/ast_basic_plugin.go",
@@ -165610,7 +165622,8 @@
         "The escaped leaf borrows nullable input synchronously and writes to a caller-owned io.Writer or returns a caller-owned string. Standard library builders replace C++ vector and stream storage.",
         "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events.",
         "AST canonical-table comparison reads borrowed concrete declaration-domain, application-argument, and quantifier sort/name/pattern/no-pattern storage in order; Go node handles and symbols preserve source identity and native table storage. No standalone C++ array template is ported.",
-        "The retained basic and bit-vector declaration caches grow native Go slices to the requested index, preserving prior handles and zero-valued gaps. Their backing is ordinary Go memory, not a charged arena allocation."
+        "The retained basic and bit-vector declaration caches grow native Go slices to the requested index, preserving prior handles and zero-valued gaps. Their backing is ordinary Go memory, not a charged arena allocation.",
+        "Retained BV numeric extract, logical shift, and arithmetic shift paths use uint64 Go shifts; shift counts of 64 or more saturate to zero, including the source width-64 all-ones mask expression."
       ],
       "deviations": [
         "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound. C++ ostream badbit, exception flags, and formatting state are standard-library internals rather than project escaped behavior and are excluded; Go Write reports io.Writer errors.",

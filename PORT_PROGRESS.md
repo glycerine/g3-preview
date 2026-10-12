@@ -39535,3 +39535,15 @@ Plugin cleanup drops those slices without releasing a nonexistent arena
 reservation. Focused tests verify growth, zero gaps, preserved handles and
 bit-vector cache ownership. This concrete retained helper is credited as
 ported; `util.h` remains partial for other methods.
+
+### Retained saturating 64-bit shift helpers
+
+`src/util/util.h:131-139` defines `shift_right` and `shift_left` so counts of
+64 or more yield zero. The reached bit-vector extract, logical-shift and
+arithmetic-shift rewrites at `bv_rewriter.cpp:684,814,863,909-921` use those
+helpers. Their Go numeric paths use `uint64` shifts with the same saturation;
+the width-64 `(1 << 64) - 1` expression still produces all ones after unsigned
+wrap. A focused public rewriter test checks width-64 extraction from a
+65-bit literal, extraction with a shift count of 64, logical shifts at 63,
+and signed arithmetic shifts at 1 and 64. These two selected helpers are
+credited as ported; other `util.h` methods remain under audit.
