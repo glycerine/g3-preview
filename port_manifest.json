@@ -114388,7 +114388,7 @@
       "path": "src/util/fixed_bit_vector.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/bitset/fixed.go"
       ],
@@ -114402,8 +114402,8 @@
         "TestFixedBoundedOracle",
         "TestFixedBudgetsAndReuse"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "fixed_bit_vector access/masks/set/unset/get",
@@ -114497,19 +114497,18 @@
         }
       ],
       "ownership": [
-        "Manager owns pooled fixed-width word descriptors and embedded zero root. Explicit Clone/Assign/Deallocate/Reset/Close. Source allocator replaced by arena; full named method ledger is in PORT_PROGRESS.md#audit-bitset-port-status-md.",
-        "Actual Runtime unsigned payload; scalar checked location/provenance acquired on allocation, concrete nonowning operand views and raw captured Runtime/block/offset lifetime. Inline cold m0 has actual per-byte initialization mask; no shadow arrays. Explicit direct caller allocations outlive allocator destruction, pooled chunks do not. Source destructor keeps first stop; explicit owning abort uses actual child pending/cursor/completed receipt, not statistics or registry-derived authority.",
-        "Supplied Runtime/block/offset is a borrowed source address; receiver counter/class/freelist selects actions, no donor chunk adoption. Actual pointer codec sidecars belong to receiver, donor payload/page remains caller-owned. Exact raw invocation serial/stage/count and matching active ObjectRef release guard prevent duplicate owning continuation. SourceFinalize stays sticky; only explicit CleanupStopped discards the current stopped invocation via AbortRawInvocation, preserving source count/history and all donor/provider data."
+        "FixedManager owns arena.Words pooled fixed-width uint32 storage and a manager-local zero-width root identity. FixedRef is a slot/generation value valid only with that owner. Clone/Assign copy words, Deallocate releases a live slot, Reset invalidates prior generations, and Close releases the pool and charged cold header. Source small_object_allocator internals are replaced by arena."
       ],
       "deviations": [
-        "The redundant Runtime/Block translation was deleted; the typed fixed-width manager imports arena directly."
-      ]
+        "The redundant Runtime/Block translation was deleted; typed storage imports arena directly. Go bounds/owner errors replace C++ undefined pointer access. Source raw m_data word access for tbv_manager is represented by Word/WriteWord; the tbv algorithms remain separate."
+      ],
+      "retained_source_audit_evidence": "Whole fixed_bit_vector.cpp and fixed_bit_vector.h audit: all declared access, allocation, deallocation, copy/range, fill/AND/OR/NOT, mask/equality/containment, hash and display methods map to pkg/util/bitset/fixed.go. Source tst1/tst_or/tst_eq assertions, width boundaries, alias range traversal, hash vectors, independent bounded oracle, budgets, stale refs and zero-width root tests pass native and g3debug,g3checked on CPUs0-7. The source tst_and body is empty; the independent oracle checks AND."
     },
     {
       "path": "src/util/fixed_bit_vector.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/bitset/fixed.go"
       ],
@@ -114551,8 +114550,8 @@
           "text": "SASSERT(lo <= hi && hi < num_bits());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "fixed_bit_vector access/masks/set/unset/get",
@@ -114646,13 +114645,12 @@
         }
       ],
       "ownership": [
-        "Manager owns pooled fixed-width word descriptors and embedded zero root. Explicit Clone/Assign/Deallocate/Reset/Close. Source allocator replaced by arena; full named method ledger is in PORT_PROGRESS.md#audit-bitset-port-status-md.",
-        "Actual Runtime unsigned payload; scalar checked location/provenance acquired on allocation, concrete nonowning operand views and raw captured Runtime/block/offset lifetime. Inline cold m0 has actual per-byte initialization mask; no shadow arrays. Explicit direct caller allocations outlive allocator destruction, pooled chunks do not. Source destructor keeps first stop; explicit owning abort uses actual child pending/cursor/completed receipt, not statistics or registry-derived authority.",
-        "Supplied Runtime/block/offset is a borrowed source address; receiver counter/class/freelist selects actions, no donor chunk adoption. Actual pointer codec sidecars belong to receiver, donor payload/page remains caller-owned. Exact raw invocation serial/stage/count and matching active ObjectRef release guard prevent duplicate owning continuation. SourceFinalize stays sticky; only explicit CleanupStopped discards the current stopped invocation via AbortRawInvocation, preserving source count/history and all donor/provider data."
+        "FixedManager owns arena.Words pooled fixed-width uint32 storage and a manager-local zero-width root identity. FixedRef is a slot/generation value valid only with that owner. Clone/Assign copy words, Deallocate releases a live slot, Reset invalidates prior generations, and Close releases the pool and charged cold header. Source small_object_allocator internals are replaced by arena."
       ],
       "deviations": [
-        "The redundant Runtime/Block translation was deleted; the typed fixed-width manager imports arena directly."
-      ]
+        "The redundant Runtime/Block translation was deleted; typed storage imports arena directly. Go bounds/owner errors replace C++ undefined pointer access. Source raw m_data word access for tbv_manager is represented by Word/WriteWord; the tbv algorithms remain separate."
+      ],
+      "retained_source_audit_evidence": "Whole fixed_bit_vector.cpp and fixed_bit_vector.h audit: all declared access, allocation, deallocation, copy/range, fill/AND/OR/NOT, mask/equality/containment, hash and display methods map to pkg/util/bitset/fixed.go. Source tst1/tst_or/tst_eq assertions, width boundaries, alias range traversal, hash vectors, independent bounded oracle, budgets, stale refs and zero-width root tests pass native and g3debug,g3checked on CPUs0-7. The source tst_and body is empty; the independent oracle checks AND."
     },
     {
       "path": "src/util/gparams.cpp",

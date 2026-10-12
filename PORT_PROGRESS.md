@@ -39291,3 +39291,22 @@ CPUs 0–7. Full `util/bitset`, `sat`, and `smtcore` package tests pass native
 and `g3debug,g3checked`; `go vet ./util/bitset` and `portcheck` pass. Go's
 `math/bits`, `strings.Builder`, and `strconv` replace source bit scans and
 C++ stream formatting while preserving the project set algorithm and text.
+
+### Fixed-width bit-vector whole-source audit
+
+`src/util/fixed_bit_vector.h` and `.cpp` are now whole-ported into the concrete
+`pkg/util/bitset/FixedManager`. The source declarations and bodies map to
+manager-owned fixed-width words, a shared zero-width root, explicit allocation,
+clone/copy/deallocation/reset, bit and word access, range copy, fill and Boolean
+operations, masked equality/containment, hash, and display. The copied
+Runtime/Block allocator implementation had already been removed; its stale
+ownership claims are retired. `arena.Words` owns the pooled backing and
+slot/generation references prevent stale or cross-owner use.
+
+The source `tst1`, `tst_or`, and `tst_eq` assertions, width boundaries,
+forward alias copying, hash fixtures, independent bounded Boolean oracle,
+failure accounting, zero-width identity, and stale-reference checks pass in
+both native and `g3debug,g3checked` profiles on CPUs 0–7. Source `tst_and`
+has an empty body, so the independent oracle supplies the AND check. The
+remaining `tbv_manager` algorithms belong to their own source unit; the
+fixed-manager word access needed by that friend is available as Word/WriteWord.
