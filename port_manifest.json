@@ -33800,6 +33800,8 @@
         "pkg/math/euclid/equation_test.go",
         "pkg/math/euclid/numeral_buffer_sort.go",
         "pkg/math/euclid/numeral_buffer_sort_test.go",
+        "pkg/math/euclid/addmul.go",
+        "pkg/math/euclid/addmul_test.go",
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go",
         "pkg/util/numeral/scoped_numeral.go"
@@ -33810,6 +33812,8 @@
         "TestEuclideanEquationUnsortedDecompositionBranch",
         "TestEuclideanIntegerBufferSortAndRawSwap",
         "TestEuclideanRationalBufferSortAndRawSwap",
+        "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
+        "TestEuclideanRationalAddmulMergedJustifications",
         "TestEuclideanPositionSourceBinarySearch",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership",
         "TestEuclideanSetupHeaderRefusalBeforeBuffers",
@@ -33908,6 +33912,15 @@
             "TestEuclideanSetupVariableJustificationAndEquationOwnership",
             "TestEuclideanSetupHeaderRefusalBeforeBuffers",
             "TestEuclideanSetupSolvedVariableQueue"
+          ]
+        },
+        {
+          "name": "concrete mpz and mpq addmul sorted-row merge with occurrence and queue updates at cpp:329-419",
+          "status": "partial",
+          "go_target": "pkg/math/euclid/addmul.go",
+          "tests": [
+            "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
+            "TestEuclideanRationalAddmulMergedJustifications"
           ]
         },
         {
@@ -155541,12 +155554,16 @@
         "pkg/util/numeral/scoped_numeral.go",
         "pkg/math/euclid/numeral_buffer_sort.go",
         "pkg/math/euclid/numeral_buffer_sort_test.go",
+        "pkg/math/euclid/addmul.go",
+        "pkg/math/euclid/addmul_test.go",
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go"
       ],
       "tests": [
         "TestEuclideanIntegerBufferSortAndRawSwap",
         "TestEuclideanRationalBufferSortAndRawSwap",
+        "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
+        "TestEuclideanRationalAddmulMergedJustifications",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership"
       ],
       "conditionals": [
@@ -155585,7 +155602,7 @@
         "The buffer borrows its numeral manager and owns a manager-copy of each appended mpz/mpq value. Pop destroys the last value; reset and the destructor destroy values in ascending slot order. swap(svector&) transfers raw numeral storage in both directions, so the receiving owner must later delete its acquired numeral payloads. c_ptr and indexed access borrow mutable slots and become stale after slice growth or swap."
       ],
       "deviations": [
-        "No generic Go numeral-buffer adapter is retained. Concrete typed scoped numeral vectors now expose borrowed indexed/c_ptr-style views and raw-slice storage swaps; the Euclidean sort path uses them and remains isolated until its solver owner is ported. Other arithmetic tactic and SMT consumers remain open."
+        "No generic Go numeral-buffer adapter is retained. Concrete typed scoped numeral vectors now expose borrowed indexed/c_ptr-style views and raw-slice storage swaps; Euclidean sorting and the integer/rational addmul row merges use them within a partial solver owner. Other arithmetic tactic and SMT consumers remain open."
       ]
     },
     {
