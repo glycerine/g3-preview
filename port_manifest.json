@@ -114978,9 +114978,14 @@
       "path": "src/util/ext_numeral.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/interval/rational_extended.go",
+        "pkg/math/interval/rational_extended_test.go"
+      ],
+      "tests": [
+        "TestRationalExtendedIntervalBranches"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -115039,8 +115044,19 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "Concrete mpq extended-number signs, comparison, arithmetic, reciprocal and power reached by interval_manager (src/util/ext_numeral.h:27-344)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/rational_extended.go",
+          "tests": [
+            "TestRationalExtendedIntervalBranches"
+          ]
+        }
+      ],
+      "ownership": [
+        "RationalExtended borrows the rational manager and operand numerals. Finite arithmetic writes its caller-owned output; infinity results reset that output numerator/denominator using the manager, preserving source cleanup. The interval manager consumer remains unported."
+      ],
       "deviations": [
         "No generic manager-interface translation is retained. The sole production consumer is the unported math/interval subsystem; implement its concrete numeral specialization beside that consumer when interval is ported. src/test/ext_numeral.cpp is test-only and supplies no production reason to retain an unused Go abstraction."
       ]

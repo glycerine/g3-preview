@@ -43,6 +43,8 @@ digraph packages {
   "math/euclid" -> "arena";
   "math/euclid" -> "util/heap";
   "math/euclid" -> "util/numeral";
+  "math/interval" [style=filled, fillcolor="#eeeeee"];
+  "math/interval" -> "util/numeral";
   "math/polynomial" [style=filled, fillcolor="#eeeeee"];
   "math/polynomial" -> "arena";
   "math/polynomial" -> "clibrand";

@@ -429,6 +429,15 @@
       ]
     },
     {
+      "package": "math/interval",
+      "imports": [
+        "util/numeral"
+      ],
+      "production_files": [
+        "rational_extended.go"
+      ]
+    },
+    {
       "package": "math/polynomial",
       "imports": [
         "arena",
