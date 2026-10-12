@@ -39442,3 +39442,12 @@ polynomial Cartesian multiplication calls this subpackage directly; its old
 local copy was removed. First-coordinate-fast carry, terminal reset, and
 unsigned wrap are checked alongside the existing multiplication order/limit
 integration. The rest of `util.h/.cpp` remains partial.
+
+### Permutation caller specialization correction
+
+No production Go package imported `pkg/util/permutation`; its uint32 slice
+adapter and test-only assertions were removed. The retained polynomial
+coefficient and monomial cycles remain implemented in `pkg/math/polynomial`.
+`src/test/permutation.cpp` has its test body disabled by `#if 0`, so it is
+reference-only. `src/util/permutation.h` stays partial: its separate NLSAT
+clause-pointer instantiation must be ported with the NLSAT consumer.

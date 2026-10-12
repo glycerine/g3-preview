@@ -198,7 +198,7 @@ self-contained in Go or depend only on `arena` or the standard library.
 | `util/escaped` | `escaped` from `util.h/.cpp` | Extracted. Standard `io.Writer` and `strings.Builder` preserve live formatting behavior; the custom string buffer and its internal allocation-failure surface are gone. |
 | `util/prime` | `prime_generator` | Extracted. Plain typed `[]uint64` slices replace the copied vector shape while retaining the source prime sequence, growth schedule, and budget-failure prefixes. The eager default binding and borrowed iterator live beside the generator; polynomial factorization imports the leaf directly. |
 | `util/sortnet` | `sorting_network` | The Runtime-backed unsigned specialization was test-only and is deleted. The live concrete AST specialization stays in `ast`; revisit a leaf only when another ported production consumer can share a non-generic API. |
-| `util/permutation` | live free operations from `permutation.h` | Extracted as concrete `uint32` slice operations. `permutation.cpp` itself has no production caller; its root Runtime/vector class duplicate and representation-only tests are deleted. |
+| `util/permutation` | live free operations from `permutation.h` | The polynomial coefficient/monomial cycles live in their concrete `math/polynomial` caller. The unused uint32-only adapter is deleted; port the distinct NLSAT clause-pointer cycle with its retained consumer. `permutation.cpp` has no production caller. |
 | `util/stack` | `stack` | Put the arena-backed implementation in a package that imports `pkg/arena` directly. |
 
 The `lbool` boundary is now direct: SAT, tactic, API, AST, and model code import

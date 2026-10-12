@@ -281,7 +281,8 @@
         "ast",
         "util/messages",
         "util/numeral",
-        "util/params"
+        "util/params",
+        "util/productiter"
       ],
       "production_files": [
         "array_rewriter.go",
@@ -303,7 +304,6 @@
         "bv_polynomial_make_add.go",
         "bv_polynomial_make_mul.go",
         "bv_polynomial_merge.go",
-        "bv_polynomial_mul_buffers.go",
         "bv_polynomial_mul_core.go",
         "bv_polynomial_mul_hoist.go",
         "bv_polynomial_neg.go",
@@ -1035,6 +1035,7 @@
         "arena"
       ],
       "production_files": [
+        "approx.go",
         "fixed.go",
         "hash.go",
         "uint_set.go",
@@ -1100,7 +1101,8 @@
         "util_numeric_char_input.go",
         "util_small_object_allocator.go",
         "util_small_object_allocator_stream.go",
-        "util_verbose_context.go"
+        "util_verbose_context.go",
+        "util_warning.go"
       ]
     },
     {
@@ -1164,6 +1166,7 @@
     {
       "package": "util/lp",
       "imports": [
+        "arena",
         "util/numeral",
         "util/params",
         "util/random",
@@ -1321,6 +1324,7 @@
         "lar_strategy.go",
         "lar_tableau_remove.go",
         "lar_term.go",
+        "lp_params.go",
         "lu_column_exact.go",
         "lu_column_float.go",
         "lu_exact.go",
@@ -1440,6 +1444,7 @@
         "solver_exact_model.go",
         "solver_expression_exact.go",
         "solver_float.go",
+        "solver_model_report_float.go",
         "solver_named_rational.go",
         "solver_objective_exact.go",
         "solver_prepare_exact.go",
@@ -1769,12 +1774,14 @@
       "imports": [
         "arena",
         "util/diagnostic",
+        "util/memory",
         "util/numeral",
         "util/symbol",
         "util/text",
         "util/z3exception"
       ],
       "production_files": [
+        "util_env_params.go",
         "util_gparams.go",
         "util_gparams_catalog.go",
         "util_gparams_catalog_collectors.go",
@@ -1809,14 +1816,6 @@
       ]
     },
     {
-      "package": "util/permutation",
-      "imports": [],
-      "production_files": [
-        "apply.go",
-        "debug_off.go"
-      ]
-    },
-    {
       "package": "util/prime",
       "imports": [
         "arena"
@@ -1825,6 +1824,13 @@
         "generator.go",
         "release.go",
         "service.go"
+      ]
+    },
+    {
+      "package": "util/productiter",
+      "imports": [],
+      "production_files": [
+        "next.go"
       ]
     },
     {

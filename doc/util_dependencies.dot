@@ -35,6 +35,7 @@ digraph packages {
   "util/idgen" -> "arena";
   "util/lbool" [style=filled, fillcolor="#dceafa"];
   "util/lp" [style=filled, fillcolor="#dceafa"];
+  "util/lp" -> "arena";
   "util/lp" -> "util/numeral";
   "util/lp" -> "util/params";
   "util/lp" -> "util/random";
@@ -53,13 +54,14 @@ digraph packages {
   "util/params" [style=filled, fillcolor="#dceafa"];
   "util/params" -> "arena";
   "util/params" -> "util/diagnostic";
+  "util/params" -> "util/memory";
   "util/params" -> "util/numeral";
   "util/params" -> "util/symbol";
   "util/params" -> "util/text";
   "util/params" -> "util/z3exception";
-  "util/permutation" [style=filled, fillcolor="#dceafa"];
   "util/prime" [style=filled, fillcolor="#dceafa"];
   "util/prime" -> "arena";
+  "util/productiter" [style=filled, fillcolor="#dceafa"];
   "util/random" [style=filled, fillcolor="#dceafa"];
   "util/sexpr" [style=filled, fillcolor="#dceafa"];
   "util/sexpr" -> "arena";
