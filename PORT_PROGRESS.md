@@ -39752,3 +39752,17 @@ reservations disabled in the native profile, publishes the expected output and
 leaves the arena balance unchanged. Checked debug assertions retain their own
 allocation path. The old spill-refusal expectation was container mechanics,
 not a retained array-rewriter algorithm requirement.
+
+### Native prime candidate scratch
+
+`prime_generator::process_next_k_numbers` builds a temporary `svector<uint64_t>`
+of odd candidates before filtering and appending primes to its persistent
+cache. The Go consumer now uses a native `[]uint64` for that local list. The
+odd-number, divisor and publication order is unchanged; candidate growth no
+longer consumes arena reservations or introduces source-vector failure points.
+The persistent prime cache still owns its charged storage. Under a disabled
+arena budget, a growth attempt can publish primes into spare cache capacity
+before its first cache allocation is refused. The focused service test checks
+that retained prefix against independent trial division and verifies the
+arena balance. Prime source units remain partial for their global-service and
+other recorded obligations.

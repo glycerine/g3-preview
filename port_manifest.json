@@ -107821,7 +107821,7 @@
         }
       ],
       "ownership": [
-        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; lexical todo destroys backing on each error with actual published cache prefix retained. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md."
+        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; temporary candidate todo uses a native Go slice without arena reservations, while cache allocation refusal retains its published prime prefix. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md."
       ],
       "deviations": [
         "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checked repeated-condition guard; later indefinite source allocation prefixes are not claimed.",
@@ -157591,7 +157591,7 @@
         }
       ],
       "ownership": [
-        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; lexical todo destroys backing on each error with actual published cache prefix retained. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md.",
+        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; temporary candidate todo uses a native Go slice without arena reservations, while cache allocation refusal retains its published prime prefix. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md.",
         "Named reflected cold owners and real delegated table/cache storage; all actual constructor/growth/erase refusal prefixes audited before disabling faults; borrowed region/generator lifetimes remain explicit.",
         "BorrowGenerator returns exact existing pointer without owning or refunding it; Finalize preserves object identity and reached emptied-vector Bounds behavior. Full Factor closes its lazy UP service and does not close the borrowed generator."
       ],
@@ -157679,7 +157679,7 @@
         }
       ],
       "ownership": [
-        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; lexical todo destroys backing on each error with actual published cache prefix retained. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md.",
+        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; temporary candidate todo uses a native Go slice without arena reservations, while cache allocation refusal retains its published prime prefix. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md.",
         "Named reflected cold owners and real delegated table/cache storage; all actual constructor/growth/erase refusal prefixes audited before disabling faults; borrowed region/generator lifetimes remain explicit."
       ],
       "deviations": [

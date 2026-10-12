@@ -165,8 +165,20 @@ func TestDefaultPrimeIndexWrapAndActualGrowthRefusal(t *testing.T) {
 	before := s.Stats()
 	b.FailAfter(0)
 	_, e = it.Next()
-	if !errors.Is(e, arena.ErrInjectedFailure) || it.index != before.Generator.Count+1 || s.Stats() != before || b.Used() != before.TotalBytes {
-		t.Fatal(e, it.index, s.Stats(), before, b.Used())
+	after := s.Stats()
+	if !errors.Is(e, arena.ErrInjectedFailure) || it.index != before.Generator.Count+1 ||
+		after.Generator.Count <= before.Generator.Count || after.Generator.Count > after.Generator.Capacity ||
+		after.TotalBytes != before.TotalBytes || b.Used() != before.TotalBytes {
+		t.Fatal(e, it.index, after, before, b.Used())
+	}
+	for i := before.Generator.Count; i < after.Generator.Count; i++ {
+		p, e := s.generator.At(i)
+		primeMust(t, e)
+		for d := uint64(2); d <= p/d; d++ {
+			if p%d == 0 {
+				t.Fatal("published composite", i, p)
+			}
+		}
 	}
 	b.FailAfter(-1)
 }

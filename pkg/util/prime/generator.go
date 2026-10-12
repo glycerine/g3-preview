@@ -108,20 +108,17 @@ func (g *Generator) check() error {
 func (g *Generator) Check() error { return g.check() }
 
 // process translates the source ascending odd candidate/filter/append loops.
-// todo is a lexical source svector; its actual heap backing is always refunded
-// before a Go error return. The already published cache prefix is retained.
+// The temporary candidate list uses native Go slice storage; the already
+// published prime-cache prefix is retained if its allocation is refused.
 func (g *Generator) process(k uint64) error {
 	if len(g.primes) == 0 {
 		return arena.ErrBounds
 	} // actual source back() read
 	var todo []uint64
-	defer releasePrimeValues(g.budget, &todo)
 	begin := g.primes[len(g.primes)-1] + 2
 	end := begin + k
 	for i := begin; i < end; i += 2 {
-		if e := appendPrimeValue(g.budget, &todo, i); e != nil {
-			return e
-		}
+		todo = append(todo, i)
 	}
 	j := uint32(1)
 	if sourceDebug && (uint32(len(g.primes)) <= j || g.primes[j] != 3) {

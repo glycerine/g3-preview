@@ -113,7 +113,7 @@ func TestPrimeGeneratorConstructorAndSparseFailureAccounting(t *testing.T) {
 		_, e = g.At(191)
 		st := g.Stats()
 		if b.Used() != st.TotalBytes || st.TotalBytes != st.OwnerBytes+st.BackingBytes {
-			t.Fatal("temporary todo refunded immediately", ordinal, e, st, b.Used())
+			t.Fatal("native candidate scratch charged arena", ordinal, e, st, b.Used())
 		}
 		if e != nil && !errors.Is(e, ErrNontermination) && !errors.Is(e, arena.ErrInjectedFailure) {
 			t.Fatal(ordinal, e)
