@@ -8,27 +8,27 @@ import (
 )
 
 // EnvParamsRuntime binds the source process-global update to its concrete Go
-// owners. It borrows all three owners and retains only the warning-enable bit.
+// owners. It borrows all four owners and retains no independent state.
 type EnvParamsRuntime struct {
 	globals  *GlobalParams
 	verbose  *diagnostic.VerboseContext
 	memory   *memory.Runtime
-	warnings bool
+	warnings *diagnostic.WarningService
 }
 
-func NewEnvParamsRuntime(g *GlobalParams, v *diagnostic.VerboseContext, m *memory.Runtime) (*EnvParamsRuntime, error) {
-	if g == nil || v == nil || m == nil {
+func NewEnvParamsRuntime(g *GlobalParams, v *diagnostic.VerboseContext, m *memory.Runtime, w *diagnostic.WarningService) (*EnvParamsRuntime, error) {
+	if g == nil || v == nil || m == nil || w == nil {
 		return nil, arena.ErrConfig
 	}
-	return &EnvParamsRuntime{globals: g, verbose: v, memory: m, warnings: true}, nil
+	return &EnvParamsRuntime{globals: g, verbose: v, memory: m, warnings: w}, nil
 }
 
-func (e *EnvParamsRuntime) WarningsEnabled() bool { return e != nil && e.warnings }
+func (e *EnvParamsRuntime) WarningsEnabled() bool { return e != nil && e.warnings.Enabled() }
 
 // Update follows the five source statements. A later failed getter or setter
 // leaves earlier assignments visible, as env_params::updt_params does.
 func (e *EnvParamsRuntime) Update() error {
-	if e == nil || e.globals == nil || e.verbose == nil || e.memory == nil {
+	if e == nil || e.globals == nil || e.verbose == nil || e.memory == nil || e.warnings == nil {
 		return arena.ErrConfig
 	}
 	p, err := e.globals.GetRef()
@@ -52,7 +52,9 @@ func (e *EnvParamsRuntime) Update() error {
 	if err != nil {
 		return err
 	}
-	e.warnings = enabled
+	if err = e.warnings.Enable(enabled); err != nil {
+		return err
+	}
 	maxSize := "memory_max_size"
 	megabytes, err := e.globals.ContextField.GetUIntName(p, &maxSize, 0)
 	if err != nil {

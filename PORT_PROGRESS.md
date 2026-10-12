@@ -39403,5 +39403,19 @@ including the source `UINT_MAX` sentinel; watermark receives raw units as in
 the source code. A closed memory owner leaves earlier verbosity and warning
 assignments visible. Focused native and checked tests exercise the updates,
 partial prefix, and conversion boundary on CPUs 8–16. The units remain
-partial because their direct caller `src/shell/main.cpp:297` and the actual
-warning-message routing are not yet in Go.
+partial because their direct caller `src/shell/main.cpp:297` is not yet in Go.
+
+### Warning state and literal output
+
+`src/util/warning.h/.cpp` now have a concrete single-goroutine
+`WarningService` reached by `EnvParamsRuntime.Update`. The source default
+enable flag, stdout/stderr selection, borrowed warning stream, `WARNING: `
+prefix, C-string termination, newline, and Linux AMD64 1023-byte custom
+stream body limit are covered. `warning_displayer` preserves sign-once and
+reset, including a sign consumed while warnings are disabled. The environment
+update now changes the same enable flag used by emitted warnings; a later
+memory-owner failure preserves that earlier visible change. Focused native and
+checked tests pass on CPUs 8–16. Formatted variadic warnings, the unported
+shell/AST call sites, and `format2ostream` remain open, so both warning units
+are partial. The error-stream/prefix globals have no source reader and are
+retained only as source reference.

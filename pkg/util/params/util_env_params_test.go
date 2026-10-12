@@ -1,6 +1,7 @@
 package params
 
 import (
+	"bytes"
 	"errors"
 	"testing"
 
@@ -10,7 +11,7 @@ import (
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func envParamsRuntimeFixture(t *testing.T) (*GlobalParams, *diagnostic.VerboseContext, *umemory.Runtime, *EnvParamsRuntime) {
+func envParamsRuntimeFixture(t *testing.T) (*GlobalParams, *diagnostic.VerboseContext, *umemory.Runtime, *EnvParamsRuntime, *bytes.Buffer) {
 	t.Helper()
 	ctx, sy, _ := paramsTestOwner(t)
 	b := arena.NewBudget(1 << 24)
@@ -34,7 +35,9 @@ func envParamsRuntimeFixture(t *testing.T) (*GlobalParams, *diagnostic.VerboseCo
 	paramsMust(t, e)
 	m, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	paramsMust(t, e)
-	env, e := NewEnvParamsRuntime(g, v, m)
+	stderr := &bytes.Buffer{}
+	warnings := diagnostic.NewWarningService(nil, stderr)
+	env, e := NewEnvParamsRuntime(g, v, m, warnings)
 	paramsMust(t, e)
 	t.Cleanup(func() {
 		paramsMust(t, m.Close())
@@ -45,17 +48,21 @@ func envParamsRuntimeFixture(t *testing.T) (*GlobalParams, *diagnostic.VerboseCo
 			t.Fatal("environment owner storage", b.Used())
 		}
 	})
-	return g, v, m, env
+	return g, v, m, env, stderr
 }
 
 func TestEnvParamsRuntimeSourceOrderAndRawWatermark(t *testing.T) {
-	g, v, m, env := envParamsRuntimeFixture(t)
+	g, v, m, env, stderr := envParamsRuntimeFixture(t)
 	paramsMust(t, v.SetVerbosityLevel(9))
 	paramsMust(t, env.Update())
 	level, e := v.VerbosityLevel()
 	paramsMust(t, e)
 	if level != 9 || !env.WarningsEnabled() {
 		t.Fatal("source defaults", level, env.WarningsEnabled())
+	}
+	paramsMust(t, env.warnings.Warning("default"))
+	if stderr.String() != "WARNING: default\n" {
+		t.Fatal("default warning route", stderr.String())
 	}
 	for _, pair := range [][2]string{{"verbose", "17"}, {"warning", "false"}, {"memory_max_size", "1"}, {"memory_max_alloc_count", "3"}, {"memory_high_watermark", "5"}} {
 		paramsMust(t, g.SetName(pair[0], pair[1]))
@@ -65,6 +72,10 @@ func TestEnvParamsRuntimeSourceOrderAndRawWatermark(t *testing.T) {
 	paramsMust(t, e)
 	if level != 17 || env.WarningsEnabled() {
 		t.Fatal("ordered scalar updates", level, env.WarningsEnabled())
+	}
+	paramsMust(t, env.warnings.Warning("suppressed"))
+	if stderr.String() != "WARNING: default\n" {
+		t.Fatal("warning toggle did not suppress output", stderr.String())
 	}
 	count, e := m.ConfiguredMaxAllocationCount()
 	paramsMust(t, e)
@@ -89,5 +100,9 @@ func TestEnvParamsRuntimeSourceOrderAndRawWatermark(t *testing.T) {
 	paramsMust(t, e)
 	if level != 23 || !env.WarningsEnabled() {
 		t.Fatal("completed source prefix lost", level, env.WarningsEnabled())
+	}
+	paramsMust(t, env.warnings.Warning("resumed"))
+	if stderr.String() != "WARNING: default\nWARNING: resumed\n" {
+		t.Fatal("warning toggle did not resume output", stderr.String())
 	}
 }

@@ -113964,7 +113964,7 @@
         }
       ],
       "ownership": [
-        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Concrete EnvParamsRuntime borrows GlobalParams, VerboseContext and memory.Runtime; it owns no storage beyond the warning-enable scalar. Source-ordered runtime updates and size_t saturation are tested, while the direct shell caller and warning-message routing remain unported. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
+        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Concrete EnvParamsRuntime borrows GlobalParams, VerboseContext, memory.Runtime and WarningService, and owns no independent storage. Source-ordered updates, warning suppression/resumption and size_t saturation are tested; the direct shell caller remains unported. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
       ],
       "deviations": []
     },
@@ -114025,7 +114025,7 @@
         }
       ],
       "ownership": [
-        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Concrete EnvParamsRuntime borrows GlobalParams, VerboseContext and memory.Runtime; it owns no storage beyond the warning-enable scalar. Source-ordered runtime updates and size_t saturation are tested, while the direct shell caller and warning-message routing remain unported. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
+        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Concrete EnvParamsRuntime borrows GlobalParams, VerboseContext, memory.Runtime and WarningService, and owns no independent storage. Source-ordered updates, warning suppression/resumption and size_t saturation are tested; the direct shell caller remains unported. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
       ],
       "deviations": []
     },
@@ -166502,9 +166502,16 @@
       "path": "src/util/warning.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/diagnostic/util_warning.go",
+        "pkg/util/params/util_env_params.go"
+      ],
+      "tests": [
+        "TestWarningSourceDefaultRoutingAndDisabledState",
+        "TestWarningSourceBorrowedStreamTruncationAndDisplayer",
+        "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
+      ],
       "conditionals": [
         {
           "line": 27,
@@ -166551,21 +166558,59 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "send_warnings_to_stdout, enable_warning_messages and borrowed set_warning_stream state",
+          "status": "ported",
+          "go_target": "pkg/util/diagnostic/util_warning.go",
+          "tests": [
+            "TestWarningSourceDefaultRoutingAndDisabledState",
+            "TestWarningSourceBorrowedStreamTruncationAndDisplayer"
+          ]
+        },
+        {
+          "name": "warning_msg no-format C-string, prefix, newline, default FILE route and Linux AMD64 ostream truncation",
+          "status": "ported",
+          "go_target": "pkg/util/diagnostic/util_warning.go",
+          "tests": [
+            "TestWarningSourceDefaultRoutingAndDisabledState",
+            "TestWarningSourceBorrowedStreamTruncationAndDisplayer"
+          ]
+        },
+        {
+          "name": "formatted variadic warning_msg and format2ostream used by unported source clients",
+          "status": "unported",
+          "tests": []
+        },
+        {
+          "name": "set_error_stream and disable_error_msg_prefix write-only globals with no source reader",
+          "status": "reference_only",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "WarningService owns only scalar flags and borrows optional io.Writer streams. EnvParamsRuntime updates the same warning-enable state used by warning emission; literal writes retain source prefix, newline, C-string boundary and selected Linux AMD64 custom-stream truncation."
+      ],
       "deviations": [
-        "Earlier Go util_printf and util_warning translations and their tests were deleted in 589e99f8 because the diagnostic process graph had no Go consumer. No current production Go implementation or tests cover this unit; retained source warning call sites still need native behavior when their consumers are ported. Use Go formatting and io.Writer facilities rather than C varargs or standard-stream internals."
+        "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Formatted variadic callers and the shell/AST warning call sites remain to be ported; no C varargs or C++ standard-stream implementation is introduced."
       ]
     },
     {
       "path": "src/util/warning.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/diagnostic/util_warning.go",
+        "pkg/util/params/util_env_params.go"
+      ],
+      "tests": [
+        "TestWarningSourceDefaultRoutingAndDisabledState",
+        "TestWarningSourceBorrowedStreamTruncationAndDisplayer",
+        "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -166576,12 +166621,37 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "warning state and literal message emission",
+          "status": "ported",
+          "go_target": "pkg/util/diagnostic/util_warning.go",
+          "tests": [
+            "TestWarningSourceDefaultRoutingAndDisabledState",
+            "TestWarningSourceBorrowedStreamTruncationAndDisplayer"
+          ]
+        },
+        {
+          "name": "warning_displayer sign-once and reset, including disabled sign consumption",
+          "status": "ported",
+          "go_target": "pkg/util/diagnostic/util_warning.go",
+          "tests": [
+            "TestWarningSourceBorrowedStreamTruncationAndDisplayer"
+          ]
+        },
+        {
+          "name": "formatted variadic warning_msg and format2ostream for live future callers",
+          "status": "unported",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "WarningDisplayer borrows WarningService and message bytes; service borrows selected output streams and owns only scalar flags."
+      ],
       "deviations": [
-        "Earlier Go util_printf and util_warning translations and their tests were deleted in 589e99f8 because the diagnostic process graph had no Go consumer. No current production Go implementation or tests cover this unit; retained source warning call sites still need native behavior when their consumers are ported. Use Go formatting and io.Writer facilities rather than C varargs or standard-stream internals."
+        "The concrete warning service is now reached by EnvParamsRuntime. C++ stream internals and C varargs are not copied; direct formatted warning callers remain unported."
       ]
     },
     {
