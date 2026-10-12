@@ -6588,7 +6588,7 @@
     },
     {
       "source": "src/util/lp/tail_matrix.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/tail_matrix_float.go",
         "pkg/util/lp/tail_matrix_exact.go",
@@ -6600,7 +6600,16 @@
         "pkg/util/lp/square_dense_exact_apply_test.go",
         "pkg/util/lp/square_dense_exact_apply_failure_test.go",
         "pkg/util/lp/square_dense_exact_apply_edges_test.go",
-        "pkg/util/lp/square_dense_exact_debug_test.go"
+        "pkg/util/lp/square_dense_exact_debug_test.go",
+        "pkg/util/lp/lu_float_solve.go",
+        "pkg/util/lp/lu_exact_solve.go",
+        "pkg/util/lp/lu_column_float.go",
+        "pkg/util/lp/lu_column_exact.go",
+        "pkg/util/lp/lu_exact.go",
+        "pkg/util/lp/lu_extend_exact.go",
+        "pkg/util/lp/lu_extend_float.go",
+        "pkg/util/lp/lu_float_debug_matrix.go",
+        "pkg/util/lp/driver_holes_lu_debug.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -6618,8 +6627,19 @@
         "TestLPExactDenseBlockApplicationErrorPrefixes",
         "TestLPExactDenseBlockLeavesStoppedIndexedCallerOwned",
         "TestLPExactDenseBlockDebugViewAndLChecks",
-        "TestLPExactDenseBlockDebugViewAllocationFailure"
-      ]
+        "TestLPExactDenseBlockDebugViewAllocationFailure",
+        "TestLPLUPreparedSolvesIndependentOracle",
+        "TestLPLUPreparedSolvesToleranceAndSettings",
+        "TestLPLUFactorizationReplacementIndependentOracle",
+        "TestLPExactLUFactorizationReplacementAllocationCensus",
+        "TestLPExactLUUpdateIndependentBasisOracle",
+        "TestLPLUExtensionIndependentBasisOracle",
+        "TestLPLUExtensionDenseRefactorQuery",
+        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes",
+        "TestLPDiagonalTailDebugDenseView",
+        "TestLPHolesLUDriverIndependentTailReportOracle"
+      ],
+      "audit_note": "Whole retained-source audit completes tail_matrix.h: three concrete FloatTailMatrix/RationalTailMatrix/PairTailMatrix interfaces cover all five virtual operations for actual double/double, mpq/mpq and mpq/pair consumers. Actual LU uses forward dense/indexed left application, reverse dense/indexed right application and IsDense extension queries. Rational/pair LU Close destroys published owning tails from the front, retaining a failed current child for retry; floating native values use Go reclamation. The source base destructor has no body/state. All five derived families (eta, row eta, permutation, square dense and one-element diagonal) have concrete bindings. Retained debug matrix inheritance is used by floating LU correctness and holes-driver views, with real dimension binding; source check_vector_w/check_apply_lp_lists_to_w/check_apply_matrix_to_vector form an uncalled diagnostic chain, and tail_product has no caller. No unused exact debug dispatch or universal adapter added. Focused native8.487s/combined10.423s exercise independent products, prepared solves, factorization replacement, exact ownership/refusal checks and updates; all three interface wrapper statements covered in both profiles. Additional native extension/query0.120s and combined extension/holes-report0.155s pass; combined debug tail-binding/diagonal-view0.004s passes. No production change or new tests needed. This closes the interface header only; LU, matrix and derived algorithm whole-source audits remain separate. LP inventory22ported/73partial/10reference_only/3dead_deleted/2platform_replacement. CPU affinity8\u201316/GOMAXPROCS9. Source audit /mnt/oldrog/tmp/g3-lp-tail-matrix-consumers-audit.txt (40 references); focused profiles /mnt/oldrog/tmp/g3-lp-tail-contract-{native,debug}.cover."
     },
     {
       "source": "src/util/lp/test_bound_analyzer.h",
@@ -6682,8 +6702,8 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "partial": 74,
-    "ported": 21,
+    "partial": 73,
+    "ported": 22,
     "reference_only": 10,
     "dead_deleted": 3
   },
@@ -12009,5 +12029,12 @@
         9
       ]
     }
+  },
+  "latest_tail_matrix_support_audit": {
+    "summary": "Whole retained-source audit completes tail_matrix.h: three concrete FloatTailMatrix/RationalTailMatrix/PairTailMatrix interfaces cover all five virtual operations for actual double/double, mpq/mpq and mpq/pair consumers. Actual LU uses forward dense/indexed left application, reverse dense/indexed right application and IsDense extension queries. Rational/pair LU Close destroys published owning tails from the front, retaining a failed current child for retry; floating native values use Go reclamation. The source base destructor has no body/state. All five derived families (eta, row eta, permutation, square dense and one-element diagonal) have concrete bindings. Retained debug matrix inheritance is used by floating LU correctness and holes-driver views, with real dimension binding; source check_vector_w/check_apply_lp_lists_to_w/check_apply_matrix_to_vector form an uncalled diagnostic chain, and tail_product has no caller. No unused exact debug dispatch or universal adapter added. Focused native8.487s/combined10.423s exercise independent products, prepared solves, factorization replacement, exact ownership/refusal checks and updates; all three interface wrapper statements covered in both profiles. Additional native extension/query0.120s and combined extension/holes-report0.155s pass; combined debug tail-binding/diagonal-view0.004s passes. No production change or new tests needed. This closes the interface header only; LU, matrix and derived algorithm whole-source audits remain separate. LP inventory22ported/73partial/10reference_only/3dead_deleted/2platform_replacement. CPU affinity8\u201316/GOMAXPROCS9. Source audit /mnt/oldrog/tmp/g3-lp-tail-matrix-consumers-audit.txt (40 references); focused profiles /mnt/oldrog/tmp/g3-lp-tail-contract-{native,debug}.cover.",
+    "native_and_combined_wrapper_statements": [
+      3,
+      3
+    ]
   }
 }
