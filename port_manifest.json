@@ -112851,11 +112851,44 @@
           "text": "SASSERT(!tgt.contains(kv.m_key));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "set_intersection: func_decl and relation column sets in retained MUZ consumers",
+          "status": "unported"
+        },
+        {
+          "name": "set_difference: func_decl dependency sets and compiler delta maps in retained MUZ consumers",
+          "status": "unported"
+        },
+        {
+          "name": "set_union: expr hypothesis sets, func_decl output sets, and PDR lemma sets in retained AST/MUZ consumers",
+          "status": "unported"
+        },
+        {
+          "name": "unite_disjoint_maps and collect_map_range: concrete pred2idx/reg_idx compiler paths",
+          "status": "unported"
+        },
+        {
+          "name": "print_container: relation signatures/facts and instruction column/control vectors",
+          "status": "unported"
+        },
+        {
+          "name": "containers_equal: unsigned joined-column pointer ranges in explanation relation",
+          "status": "unported"
+        },
+        {
+          "name": "print_map and find_index: no retained production call sites",
+          "status": "dead_deleted"
+        }
+      ],
+      "ownership": [
+        "All helpers borrow their input collections; set operations mutate only the target. set_intersection first records keys to remove so it does not erase while iterating its target. unite_disjoint_maps requires absent target keys before insertion. collect_map_range appends borrowed scalar register indexes in source map traversal order."
+      ],
+      "deviations": [
+        "No generic Go container adapter is retained. Port the live operations at their concrete AST/MUZ consumers using typed Go maps and slices, preserving set mutation and compiler traversal order. Use Go text formatting for live print_container calls; do not port C++ stream machinery. print_map and find_index have no retained production callers."
+      ]
     },
     {
       "path": "src/util/cooperate.cpp",

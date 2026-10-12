@@ -39848,3 +39848,15 @@ The explicit `open_trace` and `close_trace` functions have no caller in
 not be copied into Go. The trace manifest now separates these dead controls
 from conditional macro emission, which has many retained source call sites and
 remains an open trace obligation.
+
+### Container helper consumer audit
+
+`src/util/container_util.h` now has a concrete retained-call audit. AST proof
+hypotheses and MUZ rule, PDR, relation, and compiler code call its set and map
+helpers; the explanation relation compares unsigned column ranges, and
+relation/instruction printers use `print_container`. The target collections
+are borrowed, with mutation confined to the target; intersection defers
+deletion until after iteration, and compiler map-range collection preserves
+source traversal order. `print_map` and `find_index` have no retained
+production callers. The header stays unported until the concrete AST/MUZ
+consumers use typed Go maps and slices and Go text formatting.
