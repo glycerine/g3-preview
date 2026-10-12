@@ -6,13 +6,59 @@ import "github.com/glycerine/g3/pkg/ast"
 type matchPair struct{ pattern, instance ast.ASTHandle }
 
 // matchSubst is the concrete expression-pair cache and variable binding state
-// used by UFBV's instance check. The AST manager owns every borrowed handle.
+// used by UFBV's instance check. The cache and todo borrow AST handles; each
+// inserted substitution binding retains its target until reset or close.
 type matchSubst struct {
 	manager  *ast.ASTManager
 	cache    map[matchPair]struct{}
 	bindings map[ast.ASTHandle]ast.ASTHandle
+	owned    []ast.ASTHandle
 	todo     []matchPair
 	allEqual bool
+	closed   bool
+}
+
+func (s *matchSubst) bind(pattern, instance ast.ASTHandle) error {
+	if e := s.manager.IncRef(instance); e != nil {
+		return e
+	}
+	s.owned = append(s.owned, instance)
+	s.bindings[pattern] = instance
+	return nil
+}
+
+// substitution::reset clears lookup before releasing its m_refs vector.
+// Keep an unconsumed reference in owned so cleanup can be retried.
+func (s *matchSubst) resetBindings() error {
+	clear(s.bindings)
+	for len(s.owned) != 0 {
+		h := s.owned[0]
+		consumed, e := s.manager.DecRefConsumed(h)
+		if consumed {
+			s.owned[0] = ast.ASTHandle{}
+			s.owned = s.owned[1:]
+		}
+		if e != nil {
+			return e
+		}
+		if !consumed {
+			return ast.ErrASTPending
+		}
+	}
+	return nil
+}
+
+func (s *matchSubst) close() error {
+	if s == nil || s.closed {
+		return nil
+	}
+	if e := s.resetBindings(); e != nil {
+		return e
+	}
+	clear(s.cache)
+	s.todo = nil
+	s.closed = true
+	return nil
 }
 
 func newMatchSubst(m *ast.ASTManager) (*matchSubst, error) {
@@ -53,7 +99,9 @@ func (s *matchSubst) bindIdentical(root ast.ASTHandle) (bool, error) {
 			if bound, found := s.bindings[h]; found && bound != h {
 				return false, nil
 			}
-			s.bindings[h] = h
+			if e := s.bind(h, h); e != nil {
+				return false, e
+			}
 		case ast.ASTQuantifier:
 			return false, nil
 		case ast.ASTApp:
@@ -78,7 +126,7 @@ func (s *matchSubst) bindIdentical(root ast.ASTHandle) (bool, error) {
 // matchArgs follows match_subst::match_args, including its quick equal and
 // quick declaration-failure paths. args are the proposed instance arguments.
 func (s *matchSubst) matchArgs(lhs ast.ASTHandle, args []ast.ASTHandle) (bool, error) {
-	if s == nil || s.manager == nil {
+	if s == nil || s.manager == nil || s.closed {
 		return false, ast.ErrASTDomain
 	}
 	clear(s.cache)
@@ -118,7 +166,9 @@ func (s *matchSubst) matchArgs(lhs ast.ASTHandle, args []ast.ASTHandle) (bool, e
 	if s.allEqual {
 		return true, nil
 	}
-	clear(s.bindings)
+	if e := s.resetBindings(); e != nil {
+		return false, e
+	}
 	for len(s.todo) != 0 {
 		i := len(s.todo) - 1
 		p := s.todo[i]
@@ -130,7 +180,11 @@ func (s *matchSubst) matchArgs(lhs ast.ASTHandle, args []ast.ASTHandle) (bool, e
 			if bound, found := s.bindings[p.pattern]; found && bound != p.instance {
 				return false, nil
 			}
-			s.bindings[p.pattern] = p.instance
+			if _, found := s.bindings[p.pattern]; !found {
+				if e := s.bind(p.pattern, p.instance); e != nil {
+					return false, e
+				}
+			}
 			s.todo = s.todo[:i]
 			continue
 		}
@@ -210,7 +264,7 @@ func (s *matchSubst) matchArgs(lhs ast.ASTHandle, args []ast.ASTHandle) (bool, e
 // isInstance is match_subst::operator()(expr*,expr*), which only checks
 // matching and does not construct a rewritten RHS.
 func (s *matchSubst) isInstance(pattern, instance ast.ASTHandle) (bool, error) {
-	if s == nil || s.manager == nil {
+	if s == nil || s.manager == nil || s.closed {
 		return false, ast.ErrASTDomain
 	}
 	clear(s.cache)

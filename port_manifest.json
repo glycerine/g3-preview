@@ -100440,7 +100440,7 @@
           ]
         },
         {
-          "name": "match_subst expression instance-check traversal, repeated-variable bindings and concrete expression-pair cache",
+          "name": "match_subst expression instance-check traversal, owning repeated-variable bindings and concrete expression-pair cache",
           "status": "partial",
           "go_target": "pkg/tactic/ufbv/match_subst.go",
           "tests": [
@@ -100449,7 +100449,7 @@
         }
       ],
       "ownership": [
-        "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction."
+        "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction. The matcher borrows pair-cache keys but retains each substitution target until reset or close."
       ],
       "deviations": [
         "The concrete rewrite cache, reverse child-visit/cycle step and match_subst expression instance check are ported; matcher RHS substitution, remaining UFBV rewrite loop and tactic integration remain open."
@@ -100506,7 +100506,7 @@
           ]
         },
         {
-          "name": "match_subst concrete expression-pair cache and borrowed AST matcher state",
+          "name": "match_subst concrete borrowed expression-pair cache and owned substitution target state",
           "status": "partial",
           "go_target": "pkg/tactic/ufbv/match_subst.go",
           "tests": [
@@ -161165,7 +161165,8 @@
         "pkg/ast/rewriter/bv_rewriter_bv2int.go",
         "pkg/ast/rewriter/bv_rewriter_bv2int_test.go",
         "pkg/ast/ast_bv_bv2int_numerals.go",
-        "pkg/ast/ast_bv_bv2int_numerals_test.go"
+        "pkg/ast/ast_bv_bv2int_numerals_test.go",
+        "pkg/tactic/ufbv/match_subst.go"
       ],
       "tests": [
         "TestSexprAccessorsAndScalarIterator",
@@ -161224,7 +161225,8 @@
         "TestBVRewriterBV2IntOriginalBranches",
         "TestBVRewriterBV2IntEveryColdReservationAndPublication",
         "TestBV2IntNativeRootReplacementConsumedOldReference",
-        "TestASTBitVectorBV2IntEveryActualReservation"
+        "TestASTBitVectorBV2IntEveryActualReservation",
+        "TestMatchSubstConcretePairCacheAndVariableBindings"
       ],
       "conditionals": [
         {
@@ -161385,6 +161387,14 @@
             "TestBVRewriterBV2IntEveryColdReservationAndPublication",
             "TestBV2IntNativeRootReplacementConsumedOldReference",
             "TestASTBitVectorBV2IntEveryActualReservation"
+          ]
+        },
+        {
+          "name": "UFBV match_subst substitution m_refs concrete AST target retention, ascending reset and close",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/match_subst.go",
+          "tests": [
+            "TestMatchSubstConcretePairCacheAndVariableBindings"
           ]
         }
       ],

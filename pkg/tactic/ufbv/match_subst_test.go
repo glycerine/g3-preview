@@ -47,16 +47,33 @@ func TestMatchSubstConcretePairCacheAndVariableBindings(t *testing.T) {
 	instance := app(f, ga, ga)
 	s, e := newMatchSubst(m)
 	cacheMust(t, e)
+	t.Cleanup(func() { cacheMust(t, s.close()) })
+	baseA, e := m.GetRefCount(a)
+	cacheMust(t, e)
+	baseC, e := m.GetRefCount(c)
+	cacheMust(t, e)
 	ok, e := s.isInstance(pattern, instance)
 	cacheMust(t, e)
 	if !ok || s.bindings[x] != a || len(s.cache) != 1 {
 		t.Fatal("shared expression pair must be cached and bind x once", ok, s.bindings, s.cache)
+	}
+	refs, e := m.GetRefCount(a)
+	cacheMust(t, e)
+	if refs != baseA+1 {
+		t.Fatal("substitution binding must retain its instance", refs, baseA)
 	}
 
 	ok, e = s.isInstance(pattern, app(f, ga, gc))
 	cacheMust(t, e)
 	if ok {
 		t.Fatal("repeated variable bound to different arguments")
+	}
+	refsA, e := m.GetRefCount(a)
+	cacheMust(t, e)
+	refsC, e := m.GetRefCount(c)
+	cacheMust(t, e)
+	if refsA != baseA || refsC != baseC+1 {
+		t.Fatal("reset must release old binding; failed match retains partial new binding", refsA, refsC)
 	}
 	ok, e = s.isInstance(pattern, app(f, ga, app(h, a)))
 	cacheMust(t, e)
@@ -92,5 +109,9 @@ func TestMatchSubstConcretePairCacheAndVariableBindings(t *testing.T) {
 	cacheMust(t, e)
 	if !ok || !s.allEqual {
 		t.Fatal("source equal-arguments fast path", ok, s.allEqual)
+	}
+	cacheMust(t, s.close())
+	if len(s.owned) != 0 || len(s.bindings) != 0 {
+		t.Fatal("matcher close retained substitution bindings")
 	}
 }
