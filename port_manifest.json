@@ -130511,7 +130511,7 @@
       "path": "src/util/lp/lp_primal_core_solver_tableau.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/primal_cost_tableau_exact.go",
         "pkg/util/lp/primal_cost_tableau_exact_test.go",
@@ -130782,8 +130782,8 @@
           "text": "SASSERT(this->m_using_infeas_costs);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained mpq/impq update_inf_cost_for_column_tableau: zero-delta early return, cost publication before stored-row reduced-cost updates",
@@ -130945,7 +130945,8 @@
             "TestLPRationalTableauInitCostLiveAliases",
             "TestLPRationalTableauInitCostReachedPrefixes",
             "TestLPRationalTableauInitCostPreservesOlderComparison"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_values_tableau_rational.go"
         },
         {
           "name": "Concrete scalar mpq/mpq tableau entering-column pricing and ordered leaving scan with actual sparse row/column sizes, bound flips and source RNG",
@@ -130964,7 +130965,8 @@
             "TestLPRationalTableauLeavingLiveAliases",
             "TestLPRationalTableauLeavingPreservesOlderComparison",
             "TestLPRationalTableauLeavingReachedPrefixes"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_price_tableau_rational.go"
         },
         {
           "name": "Concrete scalar mpq/mpq tableau signed advancement, entering orchestration and OneIterationTableau with source cost/list/counter publication",
@@ -130991,7 +130993,8 @@
             "TestLPRationalTableauEnterPhysicalOwnership",
             "TestLPRationalTableauEnterRejectedIndexOwnsLocal",
             "TestLPRationalTableauEnterPreservesOlderComparison"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_advance_tableau_rational.go"
         },
         {
           "name": "Concrete scalar mpq/mpq tableau run initialization: pre-counter residual/basis checks, existing membership/cost preservation, early return, backup/epsilon/conditional queue/row initialization and final validators",
@@ -131016,10 +131019,11 @@
             "TestLPRationalTableauEnterPhysicalOwnership",
             "TestLPRationalTableauEnterRejectedIndexOwnsLocal",
             "TestLPRationalTableauEnterPreservesOlderComparison"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_init_tableau_rational.go"
         },
         {
-          "name": "Concrete scalar full primal Solve dispatch, LU/tableau row/column iteration, limits/cancellation, fallback statuses and live final feasibility validation",
+          "name": "Concrete scalar mpq/mpq tableau Solve: exact dispatch, row/column iteration, limits/cancellation, fallback statuses and live final feasibility validation",
           "status": "ported",
           "go_target": "pkg/util/lp/primal_solve_rational.go",
           "tests": [
@@ -131042,7 +131046,7 @@
         }
       ],
       "ownership": [
-        "Exact bound comparisons retain base-core invocation receipts; primal expression work owns the source difference/product parameters and returned values. Capture ends before delegated comparisons. The source publishes changed cost before updating reduced costs, preserves stored-row prefixes and rereads aliased delta; errors stop the owner, Close destroys actual owned invocations/work, and older caller comparisons remain untouched. Full tableau optimization and post-pop cleanup remain incomplete.",
+        "Exact bound comparisons retain base-core invocation receipts; primal expression work owns the source difference/product parameters and returned values. Capture ends before delegated comparisons. The source publishes changed cost before updating reduced costs, preserves stored-row prefixes and rereads aliased delta; errors stop the owner, Close destroys actual owned invocations/work, and older caller comparisons remain untouched. Full tableau cleanup is exercised by the current ownership tests.",
         "Scalar tableau infeasibility-cost lookup delegates bound comparisons to the base and assigns only the returned inline -1/0/1 cost in primal capture. Cost changes own copied-left difference and returned delta, publish new basic cost before stored-row reduced-cost updates, and retain expression scratch through stopped arithmetic. Live delta aliases are reread for each row cell; InfSet membership belongs to the caller and is unchanged. Older caller comparisons remain owned by the caller.",
         "Scalar tableau UpdateX captures entering Add and each copied-left delta*coefficient/compound subtraction separately in the base before delegated primal cost/feasibility operations. Value expressions retain base-owned work through stops; primal cost changes retain only their own work/receipts. Delta remains live through cost changes, including aliases to D. Tableau initialization switches/restores dense costs before ascending heading scan and retains each copied-left basic-cost*coefficient product. Parent Close releases delegated borrowers before retained arguments. Borrowed headers are restored before owner cleanup in metadata/alias tests.",
         "Tableau leaving owns copied unary -coefficient and copied-left multiplication/returned-reference result through the by-value basis-bound dispatcher, plus a separate scalar ratio owner. Primal and delegated base keep separate numerical receipts; copied ratio assignments, repeated canonical equalities, candidate prefixes and live coefficient/bound/output aliases follow source order. Pricing delegates eligibility comparisons and rotates only the selected candidate after reading its sign. Actual matrix sizes and stored order are used regardless of cached LU metadata; older caller comparisons remain owned by the caller.",
@@ -131050,15 +131054,16 @@
         "Scalar row iteration owns bound, coefficient and theta locals outside ready guards, with an explicit iteration entry guard; base and queue borrowers close before locals. Copied-left scalar subtraction and division retain separate returned-reference values; division borrows its scalar denominator. Bound and coefficient copies capture only primal-owned numerical calls; base predicates retain their own receipts. Live output aliases and actual older caller comparisons retain source publication and ownership. Tableau initialization does not recompute existing membership or reduced costs and confines its direct scalar capture to epsilon assignment."
       ],
       "deviations": [
-        "Exact tableau reduced-cost initialization uses native dense slices and stored sparse columns; retained live costs/coefficient order, early feasibility-only return, actual child captures and physical arithmetic cleanup. Native/debug focused coverage48/51 (94.1%); independent320-model oracle, shifted aliases, stored-cell order, reached bounds, pooled/direct physical refusals and three older comparison owners. Whole tableau and source unit remain partial.",
-        "Exact tableau pricing consumes source search-budget RNG before zero-budget early return and uses actual stored sparse column lengths independently of cached LU ColumnsNZ. Native Go sorting and slice rotation replace STL storage.320 independent scan/direction/RNG models, reached sort/bounds prefixes, six physical refusal campaigns and three older-comparison owners pass native/debug. Full tableau Solve remains open.",
-        "Tableau value arithmetic captures end before actual delegated feasibility/cost maintenance. Delta aliases reread after each full expression. Pivot bool is intentionally ignored before ChangeBasis as in source. Source normalizes pivot RHS but omits nonpivot RHS elimination: x0+2*x2=6,x1+3*x2=10 at X=(4,7,1), entering2 delta1 gives X=(2,4,2), stored B=(3,10), transformed second row dot1. Dedicated independent regression preserves and distinguishes this limitation. Whole tableau source remains partial.",
-        "Tableau bound-flip full-expression pair remains owned through primal child updates and is excluded from child ready checks; owning advancement entry rejects an existing local. Close destroys child numerical receipts/scratch before this borrowed argument. Source status, early-return and zero/nonzero counter/list order retained.320 independent bound-flip models,120 pivot models,16 pooled/direct physical campaigns, aliases, cost restoration, reached guards and older comparison owners. Source nonzero-RHS debug stop and zero-pivot one-pass cost-switch recheck are preserved, not repaired. Whole tableau solver remains partial.",
-        "Exact tableau leaving selection uses stored matrix coefficients and row lengths, not LU Ed/RowsNZ or circular random starts. Scalar -coefficient*direction expression and by-value multiplier remain separately owned through basis limiting; ratio local survives stopped bounds/comparisons.720 independent feasible/infeasible models, aliases, actual sparse metadata prefixes, twelve pooled/direct physical campaigns and older comparison cleanup. Invalid empty-candidate modulo is a typed guard. Full tableau solver remains partial.",
-        "Exact tableau entering uses an owned typed pair vector for the source automatic step; stopped children retain this borrowed local until Close destroys children first. OneIterationTableau reuses the existing source InfSetIsCorrect validator; TotalIterations belongs to outer Solve. Independent 320 entering models and120 bounded maximization models, repeated terminal iterations, reached child errors, pooled/direct failure campaigns and real older caller comparisons. Whole tableau initialization/Solve and source unit remain incomplete.",
-        "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Source unit and full solver remain partial.",
-        "Exact Solve tests cover independent bounded optima, feasibility search, infeasible bounds and unbounded rays, source cancellation/reporting and initialization prefixes, native stale-cost correction versus debug refusal, and pooled/direct physical ownership. Source UNSTABLE is rejected in debug; tableau tentative fallback reaches the existing debug LU-cost assertion. Precise outer preparation and remaining LP variants remain open; no whole source-unit promotion."
-      ]
+        "Exact tableau reduced-cost initialization uses native dense slices and stored sparse columns; retained live costs/coefficient order, early feasibility-only return, actual child captures and physical arithmetic cleanup. Native/debug focused coverage48/51 (94.1%); independent320-model oracle, shifted aliases, stored-cell order, reached bounds, pooled/direct physical refusals and three older comparison owners. Containing primal core and LAR units are audited separately.",
+        "Exact tableau pricing consumes source search-budget RNG before zero-budget early return and uses actual stored sparse column lengths independently of cached LU ColumnsNZ. Native Go sorting and slice rotation replace STL storage.320 independent scan/direction/RNG models, reached sort/bounds prefixes, six physical refusal campaigns and three older-comparison owners pass native/debug. Containing primal core and LAR units are audited separately.",
+        "Tableau value arithmetic captures end before actual delegated feasibility/cost maintenance. Delta aliases reread after each full expression. Pivot bool is intentionally ignored before ChangeBasis as in source. Source normalizes pivot RHS but omits nonpivot RHS elimination: x0+2*x2=6,x1+3*x2=10 at X=(4,7,1), entering2 delta1 gives X=(2,4,2), stored B=(3,10), transformed second row dot1. Dedicated independent regression preserves and distinguishes this limitation. Containing primal core and LAR units are audited separately.",
+        "Tableau bound-flip full-expression pair remains owned through primal child updates and is excluded from child ready checks; owning advancement entry rejects an existing local. Close destroys child numerical receipts/scratch before this borrowed argument. Source status, early-return and zero/nonzero counter/list order retained.320 independent bound-flip models,120 pivot models,16 pooled/direct physical campaigns, aliases, cost restoration, reached guards and older comparison owners. Source nonzero-RHS debug stop and zero-pivot one-pass cost-switch recheck are preserved, not repaired. Containing primal core and LAR units are audited separately.",
+        "Exact tableau leaving selection uses stored matrix coefficients and row lengths, not LU Ed/RowsNZ or circular random starts. Scalar -coefficient*direction expression and by-value multiplier remain separately owned through basis limiting; ratio local survives stopped bounds/comparisons.720 independent feasible/infeasible models, aliases, actual sparse metadata prefixes, twelve pooled/direct physical campaigns and older comparison cleanup. Invalid empty-candidate modulo is a typed guard. Containing primal core and LAR units are audited separately.",
+        "Exact tableau entering uses an owned typed pair vector for the source automatic step; stopped children retain this borrowed local until Close destroys children first. OneIterationTableau reuses the existing source InfSetIsCorrect validator; TotalIterations belongs to outer Solve. Independent 320 entering models and120 bounded maximization models, repeated terminal iterations, reached child errors, pooled/direct failure campaigns and real older caller comparisons. Containing primal core and LAR units are audited separately.",
+        "Precise tableau initialization preserves existing InfSet and cost mode, validates without recomputing reduced costs, and resizes the breakpoint queue only when enabled. Native typed IntSet state replaces source row-mode storage. 240 independent state profiles,160 singleton/pivot models, metadata/source-prefix tests, pooled/direct physical backup failures and older comparison ownership; initialization feeds120 actual repeated optimization models. Empty basic-column dereference is guarded in native and asserted in debug. Containing primal core and LAR units are audited separately.",
+        "Exact Solve tests cover independent bounded optima, feasibility search, infeasible bounds and unbounded rays, source cancellation/reporting and initialization prefixes, native stale-cost correction versus debug refusal, and pooled/direct physical ownership. Source UNSTABLE is rejected in debug; tableau tentative fallback reaches the existing debug LU-cost assertion. Containing primal core and LAR units are audited separately."
+      ],
+      "retained_source_audit_evidence": "Whole retained tableau header audit: source solve() dispatch reaches solve_with_tableau only for precise T, so the explicitly instantiated double/double tableau symbols are compiled but have no retained source consumer. Both live mpq/impq and mpq/mpq paths implement one-iteration dispatch, entering price, leaving/ratio, bound-flip and pivot advancement, run initialization, value/reduced-cost maintenance and outer tableau solve in concrete typed Go. Native and g3debug,g3checked focused exact/scalar tableau and Solve groups pass. Independent optimum, feasibility, infeasibility, unbounded, alias, source-prefix, owned numerical-call and older-caller comparison tests exercise both paths. Current focused native coverage includes pricing44/47 and45/47, leaving103/120 each, reduced-cost initialization48/51 each, and scalar cost103/114; checked build covers the assertion-heavy advancement, initialization and value paths more deeply. Source dead commented-out row pricing and unreached floating tableau instantiations are excluded."
     },
     {
       "path": "src/util/lp/lp_primal_simplex.h",
@@ -174030,6 +174035,27 @@
     "profiles": [
       "/mnt/oldrog/tmp/g3-lp-mps-reader-whole-native.cover",
       "/mnt/oldrog/tmp/g3-lp-mps-reader-whole-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+  },
+  "latest_primal_tableau_whole_audit": {
+    "source_units": [
+      "src/util/lp/lp_primal_core_solver_tableau.h"
+    ],
+    "scope": "Whole retained tableau header audit: source solve() dispatch reaches solve_with_tableau only for precise T, so the explicitly instantiated double/double tableau symbols are compiled but have no retained source consumer. Both live mpq/impq and mpq/mpq paths implement one-iteration dispatch, entering price, leaving/ratio, bound-flip and pivot advancement, run initialization, value/reduced-cost maintenance and outer tableau solve in concrete typed Go. Native and g3debug,g3checked focused exact/scalar tableau and Solve groups pass. Independent optimum, feasibility, infeasibility, unbounded, alias, source-prefix, owned numerical-call and older-caller comparison tests exercise both paths. Current focused native coverage includes pricing44/47 and45/47, leaving103/120 each, reduced-cost initialization48/51 each, and scalar cost103/114; checked build covers the assertion-heavy advancement, initialization and value paths more deeply. Source dead commented-out row pricing and unreached floating tableau instantiations are excluded.",
+    "focused_tests": [
+      "TestLPExactTableau",
+      "TestLPRationalTableau",
+      "TestLPExactInitTableau",
+      "TestLPRationalInitTableau",
+      "TestLPExactSolve",
+      "TestLPRationalSolve"
+    ],
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-tableau-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-tableau-whole-debug.cover"
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,

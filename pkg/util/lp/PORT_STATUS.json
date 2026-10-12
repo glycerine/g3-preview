@@ -4339,7 +4339,7 @@
     },
     {
       "source": "src/util/lp/lp_primal_core_solver_tableau.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/primal_cost_tableau_exact.go",
         "pkg/util/lp/primal_cost_tableau_exact_test.go",
@@ -4507,7 +4507,8 @@
         "TestLPRationalSolveSingularFallbackAfterBoundFlip",
         "TestLPRationalSolveFinalValidationReadsLiveBounds",
         "TestLPRationalSolveTableauLiveStaleCostCorrection"
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained tableau header audit: source solve() dispatch reaches solve_with_tableau only for precise T, so the explicitly instantiated double/double tableau symbols are compiled but have no retained source consumer. Both live mpq/impq and mpq/mpq paths implement one-iteration dispatch, entering price, leaving/ratio, bound-flip and pivot advancement, run initialization, value/reduced-cost maintenance and outer tableau solve in concrete typed Go. Native and g3debug,g3checked focused exact/scalar tableau and Solve groups pass. Independent optimum, feasibility, infeasibility, unbounded, alias, source-prefix, owned numerical-call and older-caller comparison tests exercise both paths. Current focused native coverage includes pricing44/47 and45/47, leaving103/120 each, reduced-cost initialization48/51 each, and scalar cost103/114; checked build covers the assertion-heavy advancement, initialization and value paths more deeply. Source dead commented-out row pricing and unreached floating tableau instantiations are excluded."
     },
     {
       "source": "src/util/lp/lp_primal_simplex.h",
@@ -8260,10 +8261,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 73,
+    "ported": 74,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 22
+    "partial": 21
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -15126,6 +15127,27 @@
     "profiles": [
       "/mnt/oldrog/tmp/g3-lp-mps-reader-whole-native.cover",
       "/mnt/oldrog/tmp/g3-lp-mps-reader-whole-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+  },
+  "latest_primal_tableau_whole_audit": {
+    "source_units": [
+      "src/util/lp/lp_primal_core_solver_tableau.h"
+    ],
+    "scope": "Whole retained tableau header audit: source solve() dispatch reaches solve_with_tableau only for precise T, so the explicitly instantiated double/double tableau symbols are compiled but have no retained source consumer. Both live mpq/impq and mpq/mpq paths implement one-iteration dispatch, entering price, leaving/ratio, bound-flip and pivot advancement, run initialization, value/reduced-cost maintenance and outer tableau solve in concrete typed Go. Native and g3debug,g3checked focused exact/scalar tableau and Solve groups pass. Independent optimum, feasibility, infeasibility, unbounded, alias, source-prefix, owned numerical-call and older-caller comparison tests exercise both paths. Current focused native coverage includes pricing44/47 and45/47, leaving103/120 each, reduced-cost initialization48/51 each, and scalar cost103/114; checked build covers the assertion-heavy advancement, initialization and value paths more deeply. Source dead commented-out row pricing and unreached floating tableau instantiations are excluded.",
+    "focused_tests": [
+      "TestLPExactTableau",
+      "TestLPRationalTableau",
+      "TestLPExactInitTableau",
+      "TestLPRationalInitTableau",
+      "TestLPExactSolve",
+      "TestLPRationalSolve"
+    ],
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-tableau-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-tableau-whole-debug.cover"
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
