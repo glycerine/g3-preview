@@ -39604,3 +39604,15 @@ parameter call maps to `GlobalParamsService.AppendSymbolTo`; null, borrowed
 string and signed numerical formatting have focused coverage. Marked-symbol
 assertion transport and complete source output-failure behavior remain open,
 so no further completion credit follows from this recheck.
+
+### Retained AST `flet` callback scope
+
+`util.h:291-304` constructs `flet<some_value_proc*>` in
+`ast.cpp:2561-2582`, replacing `m_some_value_proc` only through the lexical
+`get_some_value` call. The concrete Go AST manager saves the borrowed previous
+callback and restores it with `defer` after normal, nested and failed calls.
+The existing nested callback and fallback-allocation-refusal tests verify that
+the outer callback is restored before it resumes and that the original plugin
+path is restored after an error. This selected live template instantiation is
+credited as ported; no generic Go `flet` or unused source specialization is
+added. Other `util.h` uses and the whole header remain partial.

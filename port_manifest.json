@@ -165299,7 +165299,8 @@
         "pkg/ast/ast_bv_logical_shift_numerals.go",
         "pkg/ast/ast_bv_arithmetic_shift_numerals.go",
         "pkg/util/numeral/mpz_power_shift.go",
-        "pkg/util/bitset/uint_set.go"
+        "pkg/util/bitset/uint_set.go",
+        "pkg/ast/ast_builtin_plugins_values.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -165331,7 +165332,9 @@
         "TestBVRewriterSourceSaturatingUint64ShiftBoundaries",
         "TestIntegerPowerAndShiftIndependent",
         "TestUintSetSourceTst1",
-        "TestUintSetIndependentBoundedOracle"
+        "TestUintSetIndependentBoundedOracle",
+        "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
+        "TestASTSomeValueProcFallbackReservationFailureRestores"
       ],
       "conditionals": [
         {
@@ -165632,6 +165635,15 @@
           ]
         },
         {
+          "name": "flet<some_value_proc*> lexical callback replacement in retained AST get_some_value (util.h:291-304; ast.cpp:2561-2582)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_builtin_plugins_values.go",
+          "tests": [
+            "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
+            "TestASTSomeValueProcFallbackReservationFailureRestores"
+          ]
+        },
+        {
           "name": "shift_right and shift_left uint64 saturating shifts for retained BV extract/logical/arithmetic rewrites (util.h:131-139; bv_rewriter.cpp:684,814,863,909-921)",
           "status": "ported",
           "go_target": "pkg/ast/ast_bv_extract_numerals.go",
@@ -165656,7 +165668,8 @@
         "AST canonical-table comparison reads borrowed concrete declaration-domain, application-argument, and quantifier sort/name/pattern/no-pattern storage in order; Go node handles and symbols preserve source identity and native table storage. No standalone C++ array template is ported.",
         "The retained basic and bit-vector declaration caches grow native Go slices to the requested index, preserving prior handles and zero-valued gaps. Their backing is ordinary Go memory, not a charged arena allocation.",
         "Retained BV numeric extract, logical shift, and arithmetic shift paths use uint64 Go shifts; shift counts of 64 or more saturate to zero, including the source width-64 all-ones mask expression.",
-        "The retained integer small-positive power-of-two predicate uses uint32 bit arithmetic; uint_set cardinality uses Go's 32-bit popcount over each source word. Other helper consumers in unported packages are not credited."
+        "The retained integer small-positive power-of-two predicate uses uint32 bit arithmetic; uint_set cardinality uses Go's 32-bit popcount over each source word. Other helper consumers in unported packages are not credited.",
+        "AST get_some_value temporarily replaces its borrowed callback pointer and restores the previous pointer on normal, nested, and failed returns. The concrete Go defer substitutes the source flet<some_value_proc*> destructor."
       ],
       "deviations": [
         "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound. C++ ostream badbit, exception flags, and formatting state are standard-library internals rather than project escaped behavior and are excluded; Go Write reports io.Writer errors.",
