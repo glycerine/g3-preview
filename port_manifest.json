@@ -92212,7 +92212,9 @@
         "pkg/tactic/arith/bound_values.go",
         "pkg/tactic/arith/bound_values_test.go",
         "pkg/tactic/arith/bound_propagation.go",
-        "pkg/tactic/arith/bound_propagation_test.go"
+        "pkg/tactic/arith/bound_propagation_test.go",
+        "pkg/tactic/arith/bound_scopes.go",
+        "pkg/tactic/arith/bound_scopes_test.go"
       ],
       "tests": [
         "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
@@ -92221,7 +92223,9 @@
         "TestBoundEquationStoreRationalStrictTieAndRelaxedApproximation",
         "TestBoundEquationImmediateAndWatchedPropagation",
         "TestBoundEquationNegativeCoefficientAndDeadConstraint",
-        "TestBoundEquationFullyBoundedTighteningAndStrictness"
+        "TestBoundEquationFullyBoundedTighteningAndStrictness",
+        "TestBoundEquationNestedScopesRestoreExactBoundsAndConflict",
+        "TestBoundEquationScopedInsertionReinitializesAfterPop"
       ],
       "conditionals": [
         {
@@ -92347,7 +92351,16 @@
           ]
         },
         {
-          "name": "scope push/pop and trail undo, assumption/derived explanation, parameter updates, complete statistics and source diagnostic/failure paths",
+          "name": "scope push/pop, reverse bound-trail undo, timestamp/cursor/conflict restoration and scoped insertion reinitialization",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_scopes.go",
+          "tests": [
+            "TestBoundEquationNestedScopesRestoreExactBoundsAndConflict",
+            "TestBoundEquationScopedInsertionReinitializesAfterPop"
+          ]
+        },
+        {
+          "name": "assumption/derived explanation traversal, parameter updates, complete statistics and source diagnostic/failure paths",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -92355,12 +92368,14 @@
       ],
       "ownership": [
         "The equation store owns each accepted linear equation; watch lists contain constraint indexes only. DeleteConstraints releases equations in insertion order and clears watch lists. Rational numeral manager remains borrowed.",
-        "Each accepted bound owns a rational copy; replaced bounds remain on the insertion trail and are destroyed in reverse insertion order when the store closes. Query outputs are caller-owned copies."
+        "Each accepted bound owns a rational copy; replaced bounds remain on the insertion trail and are destroyed in reverse insertion order when the store closes. Query outputs are caller-owned copies.",
+        "Pop releases scoped rational bounds in reverse trail order and restores previous bound pointers; scoped constraint reinitialization creates new owned bounds at the surviving level."
       ],
       "deviations": [
         "This concrete equation/watch-list owner covers the source setup and cleanup path only. It does not yet run source init_eq propagation or maintain bound/trail state. Invalid variable IDs return Go bounds errors instead of indexing outside source vectors.",
         "This increment covers level-zero bound values and the rational get_bound instantiation. Derived/assumption kind, propagation, scopes and trail undo remain open.",
-        "Level-zero equation insertion now propagates immediately; subsequent bound events revisit watched constraints under the source timestamp gate. Scopes, explanation history, full parameter service and complete source failure behavior remain open."
+        "Level-zero equation insertion now propagates immediately; subsequent bound events revisit watched constraints under the source timestamp gate. Scopes, explanation history, full parameter service and complete source failure behavior remain open.",
+        "Scope storage uses native Go slices; a reactivated variable with detached earlier bounds still releases those trail-owned numerals safely during close. Explanation traversal and complete source failure behavior remain open."
       ]
     },
     {
@@ -92374,7 +92389,9 @@
         "pkg/tactic/arith/bound_values.go",
         "pkg/tactic/arith/bound_values_test.go",
         "pkg/tactic/arith/bound_propagation.go",
-        "pkg/tactic/arith/bound_propagation_test.go"
+        "pkg/tactic/arith/bound_propagation_test.go",
+        "pkg/tactic/arith/bound_scopes.go",
+        "pkg/tactic/arith/bound_scopes_test.go"
       ],
       "tests": [
         "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
@@ -92383,7 +92400,9 @@
         "TestBoundEquationStoreRationalStrictTieAndRelaxedApproximation",
         "TestBoundEquationImmediateAndWatchedPropagation",
         "TestBoundEquationNegativeCoefficientAndDeadConstraint",
-        "TestBoundEquationFullyBoundedTighteningAndStrictness"
+        "TestBoundEquationFullyBoundedTighteningAndStrictness",
+        "TestBoundEquationNestedScopesRestoreExactBoundsAndConflict",
+        "TestBoundEquationScopedInsertionReinitializesAfterPop"
       ],
       "conditionals": [
         {
@@ -92453,7 +92472,16 @@
           ]
         },
         {
-          "name": "scope push/pop and trail undo, assumption/derived explanation, parameter updates, complete statistics and source diagnostic/failure paths",
+          "name": "scope push/pop, reverse bound-trail undo, timestamp/cursor/conflict restoration and scoped insertion reinitialization",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_scopes.go",
+          "tests": [
+            "TestBoundEquationNestedScopesRestoreExactBoundsAndConflict",
+            "TestBoundEquationScopedInsertionReinitializesAfterPop"
+          ]
+        },
+        {
+          "name": "assumption/derived explanation traversal, parameter updates, complete statistics and source diagnostic/failure paths",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -92461,12 +92489,14 @@
       ],
       "ownership": [
         "The equation store owns each accepted linear equation; watch lists contain constraint indexes only. DeleteConstraints releases equations in insertion order and clears watch lists. Rational numeral manager remains borrowed.",
-        "Each accepted bound owns a rational copy; replaced bounds remain on the insertion trail and are destroyed in reverse insertion order when the store closes. Query outputs are caller-owned copies."
+        "Each accepted bound owns a rational copy; replaced bounds remain on the insertion trail and are destroyed in reverse insertion order when the store closes. Query outputs are caller-owned copies.",
+        "Pop releases scoped rational bounds in reverse trail order and restores previous bound pointers; scoped constraint reinitialization creates new owned bounds at the surviving level."
       ],
       "deviations": [
         "This concrete equation/watch-list owner covers the source setup and cleanup path only. It does not yet run source init_eq propagation or maintain bound/trail state. Invalid variable IDs return Go bounds errors instead of indexing outside source vectors.",
         "This increment covers level-zero bound values and the rational get_bound instantiation. Derived/assumption kind, propagation, scopes and trail undo remain open.",
-        "Level-zero equation insertion now propagates immediately; subsequent bound events revisit watched constraints under the source timestamp gate. Scopes, explanation history, full parameter service and complete source failure behavior remain open."
+        "Level-zero equation insertion now propagates immediately; subsequent bound events revisit watched constraints under the source timestamp gate. Scopes, explanation history, full parameter service and complete source failure behavior remain open.",
+        "Scope storage uses native Go slices; a reactivated variable with detached earlier bounds still releases those trail-owned numerals safely during close. Explanation traversal and complete source failure behavior remain open."
       ]
     },
     {

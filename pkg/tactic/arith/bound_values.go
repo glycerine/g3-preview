@@ -12,24 +12,27 @@ import (
 // equationBound owns one rational value. Earlier bounds remain on the trail
 // until the owner closes.
 type equationBound struct {
-	value     numeral.Rational
-	approx    float64
-	strict    bool
-	x         uint32
-	lower     bool
-	timestamp uint32
-	prev      *equationBound
+	value           numeral.Rational
+	approx          float64
+	strict          bool
+	x               uint32
+	lower           bool
+	level           uint32
+	derived         bool
+	constraintIndex uint32
+	timestamp       uint32
+	prev            *equationBound
 }
 
 func (s *BoundEquationStore) AssertLower(x uint32, k *numeral.Rational, strict bool) (bool, error) {
-	return s.assertBound(x, k, strict, true, false)
+	return s.assertBound(x, k, strict, true, false, noEquationPosition)
 }
 
 func (s *BoundEquationStore) AssertUpper(x uint32, k *numeral.Rational, strict bool) (bool, error) {
-	return s.assertBound(x, k, strict, false, false)
+	return s.assertBound(x, k, strict, false, false, noEquationPosition)
 }
 
-func (s *BoundEquationStore) assertBound(x uint32, k *numeral.Rational, strict, lower, derived bool) (accepted bool, err error) {
+func (s *BoundEquationStore) assertBound(x uint32, k *numeral.Rational, strict, lower, derived bool, constraintIndex uint32) (accepted bool, err error) {
 	if err = s.open(); err != nil {
 		return false, err
 	}
@@ -100,7 +103,9 @@ func (s *BoundEquationStore) assertBound(x uint32, k *numeral.Rational, strict, 
 		approx = 0.000001 * math.Ceil(approx*1000000-0.0000001)
 	}
 	b := &equationBound{value: numeral.NewRational(), approx: approx,
-		strict: strict, x: x, lower: lower, timestamp: s.timestamp, prev: old}
+		strict: strict, x: x, lower: lower, level: uint32(len(s.scopes)),
+		derived: derived && len(s.scopes) != 0, constraintIndex: constraintIndex,
+		timestamp: s.timestamp, prev: old}
 	if err = m.Copy(&b.value, &working); err != nil {
 		return false, errors.Join(err, m.Del(&b.value))
 	}

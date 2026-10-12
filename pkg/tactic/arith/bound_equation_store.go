@@ -17,6 +17,8 @@ type BoundEquationStore struct {
 	constraints    []equationConstraint
 	variables      []equationVariable
 	trail          []*equationBound
+	scopes         []equationScope
+	reinitStack    []uint32
 	qhead          int
 	conflict       uint32
 	timestamp      uint32
@@ -151,8 +153,12 @@ func (s *BoundEquationStore) addEquation(eq *LinearEquation) (uint32, error) {
 	for _, x := range eq.xs {
 		s.variables[x].watches = append(s.variables[x].watches, index)
 	}
-	if _, err := s.propagateEquation(index); err != nil {
+	propagated, err := s.propagateEquation(index)
+	if err != nil {
 		return index, err
+	}
+	if propagated && len(s.scopes) != 0 {
+		s.reinitStack = append(s.reinitStack, index)
 	}
 	return index, nil
 }
@@ -180,11 +186,13 @@ func (s *BoundEquationStore) Watches(x uint32) ([]uint32, error) {
 }
 
 // DeleteConstraints closes equations in source insertion order and clears all
-// watch lists. The source allows this only at scope level zero; this owner has
-// no scope stack yet.
+// watch lists. The source allows this only at scope level zero.
 func (s *BoundEquationStore) DeleteConstraints() error {
 	if err := s.open(); err != nil {
 		return err
+	}
+	if len(s.scopes) != 0 {
+		return arena.ErrInvalidSlot
 	}
 	for i := range s.constraints {
 		if err := s.constraints[i].eq.Close(); err != nil {
@@ -192,6 +200,7 @@ func (s *BoundEquationStore) DeleteConstraints() error {
 		}
 	}
 	s.constraints = nil
+	s.reinitStack = nil
 	for i := range s.variables {
 		s.variables[i].watches = nil
 	}
@@ -205,12 +214,10 @@ func (s *BoundEquationStore) Close() error {
 	if s.closed {
 		return nil
 	}
-	for i := len(s.trail) - 1; i >= 0; i-- {
-		if err := s.manager.Del(&s.trail[i].value); err != nil {
-			return err
-		}
+	if err := s.undoTrail(0); err != nil {
+		return err
 	}
-	s.trail = nil
+	s.scopes = nil
 	if err := s.DeleteConstraints(); err != nil {
 		return err
 	}
