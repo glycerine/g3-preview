@@ -111184,7 +111184,7 @@
       "path": "src/util/backtrackable_set.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "unported",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -111209,32 +111209,7 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [
-        {
-          "name": "default_eh and backtrackable_set constructor/event policy",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "insert, erase, contains and empty",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "push_scope, pop_scope reverse restoration and reset",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "begin/end iteration",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        }
-      ],
+      "methods": [],
       "ownership": [],
       "deviations": [
         "No Go adapter is retained. The live quantifier-pointer specialization belongs to the unported SMT model finder and should use a concrete typed map plus typed undo slices when ported."
@@ -114202,7 +114177,7 @@
       "path": "src/util/ext_numeral.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "unported",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -114263,14 +114238,7 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [
-        {
-          "name": "Original enum/sign/assignment/unary/arithmetic/power/comparison/display branch bodies through non-generic concrete operand-slot manager protocol and actual rational binding (ext_numeral.h:25-345)",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        }
-      ],
+      "methods": [],
       "ownership": [],
       "deviations": [
         "No generic manager-interface translation is retained. The sole production consumer is the unported math/interval subsystem; implement its concrete numeral specialization beside that consumer when interval is ported. src/test/ext_numeral.cpp is test-only and supplies no production reason to retain an unused Go abstraction."
@@ -118396,7 +118364,7 @@
       "path": "src/util/list.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "unported",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -118411,32 +118379,7 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [
-        {
-          "name": "list constructor and mutable/const head and tail access",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "iterator dereference, prefix/postfix advance and equality",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "length",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "non-destructive append with copied prefix and shared suffix",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        }
-      ],
+      "methods": [],
       "ownership": [],
       "deviations": [
         "No Go adapter is retained. The production instantiations belong to unported SMT consumers; port each concrete value type there with a typed Go node or slice when that consumer arrives."
@@ -157500,7 +157443,7 @@
       "path": "src/util/pool.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "unported",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -157515,26 +157458,7 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [
-        {
-          "name": "pool::pool and pool::~pool establish an empty cache and destroy every cached object from first to last",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "pool::mk allocates when empty and otherwise removes and returns the last recycled object",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "pool::recycle appends the transferred object to the retained cache",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        }
-      ],
+      "methods": [],
       "ownership": [],
       "deviations": [
         "No generic Go adapter is retained. Live production specializations belong to their unported consumers and should use concrete typed slices with explicit reset/destruction behavior."
@@ -161541,7 +161465,7 @@
       "path": "src/util/scoped_vector.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "unported",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -161590,38 +161514,7 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [
-        {
-          "name": "constructor, push_scope and multi-level pop_scope rollback",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "indexed read, direct ref and copy-on-write set",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "iterator owner equality, dereference and prefix/postfix advance",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "push_back, pop_back, erase_and_swap, size and empty",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "set_index trail publication and invariant",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        }
-      ],
+      "methods": [],
       "ownership": [],
       "deviations": [
         "No Go adapter is retained. The live theory-sequence specialization belongs to unported SMT code and should be implemented there with concrete typed slices and scope indices."
@@ -164291,8 +164184,13 @@
       "component": "util",
       "role": "production",
       "status": "partial",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/ast_family.go"
+      ],
+      "tests": [
+        "TestFamilySourceRegistrationAndQueries",
+        "TestFamilySourceEnumerationOrderAndPrefixes"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -164317,83 +164215,29 @@
           "text": "SASSERT(m_trail_stack.size() == old_size);"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
-          "name": "int32 constructor/destructor",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
+          "name": "AST family_id find/contains/insert and domain/range enumeration used by ast_manager",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_family.go",
+          "tests": [
+            "TestFamilySourceRegistrationAndQueries",
+            "TestFamilySourceEnumerationOrderAndPrefixes"
+          ]
         },
         {
-          "name": "int32 key_data constructors/hash/equality and sentinel hash_entry methods",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "int32 reset",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "int32 find/contains",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "int32 get_scope_level",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "int32 insert",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "int32 begin_scope/end_scope",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "int32 append",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "int32 get_range/get_dom",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "implicit copy constructor/assignment",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "other payload specializations",
+          "name": "scoped symbol-table operations for retained parser and other concrete consumers",
           "status": "unported",
           "tests": []
         }
       ],
       "ownership": [
-        "Borrowed SymbolManager outlives the concrete int32 table. Scalar entry/trail/scope records, cold mutex/header, all backing capacities and transaction workspace are budgeted. Reverse undo preserves physical sentinels and retained data. See PORT_PROGRESS.md#audit-symbol-table-port-status-md.",
-        "Explicit Clone rehashes USED source buckets at source capacity and copies live marked vector history/capacities. Assign stages destination reset/replay policy and source vector copies; manager/Budget stay with destination. See PORT_PROGRESS.md#audit-symbol-table-port-status-md."
+        "AST FamilyManager borrows its symbol manager, owns an insertion-ordered dictionary and registration-order name slice, and closes before the borrowed manager. Scoped undo tables and clone/assignment staging from the deleted generic translation are not retained."
       ],
       "deviations": [
-        "Global symbol domain becomes explicit borrowed owner; invalid sentinel/foreign/dead keys and iterator-invalidating self append return typed precondition errors.",
-        "Potentially allocating scope undo/append replay source actions on a charged physical graph before atomic publication. Go initializes unused scalar payloads. No-allocation preflight retains warm source paths.",
-        "Charged physical staging preserves destination on predictable assignment failure, including complete old+new peaks; new Clone mutex is freshly initialized. Source unconstructed spare vector cells become zero scalar storage."
+        "The generic scoped Go symbol table and tests were deleted in 8e22e4f5. AST family_id operations now use insdict and native slices in pkg/ast/ast_family.go; that consumer never invokes begin_scope, end_scope, append, reset, or table cloning. Its enumeration uses insertion order. Other live source instantiations remain to be ported with their consumers, without restoring an unused generic adapter."
       ]
     },
     {
@@ -164604,7 +164448,7 @@
       "path": "src/util/top_sort.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "unported",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -164629,32 +164473,7 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [
-        {
-          "name": "insert dependency-set ownership and replacement",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "traverse registered dependencies with cycle detection and missing-key early return",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "topological_sort state reset and dependency-first publication",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "top_sorted const result access",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        }
-      ],
+      "methods": [],
       "ownership": [],
       "deviations": [
         "No generic Go adapter is retained. The sole production specialization is top_sort<sort> in the unported AST declaration collector; implement a concrete sort-pointer traversal in package ast when that consumer is ported."
