@@ -126206,7 +126206,7 @@
       "path": "src/util/lp/lp_core_solver_base_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/core_base_float.go",
         "pkg/util/lp/core_base_float_test.go",
@@ -126312,8 +126312,8 @@
         "TestLPRationalTableauStoppedMatrixBeforeNormalization",
         "TestLPRationalTableauPreservesOlderComparison"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained double/double constructor/init, basis heading and nonbasic initialization/validation, bound feasibility and infeasibility-set update",
@@ -126359,7 +126359,8 @@
             "TestLPFloatCoreNumericalUpdateAndPivotGuards",
             "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
             "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
-          ]
+          ],
+          "go_target": "pkg/util/lp/core_values_float.go"
         },
         {
           "name": "Floating column/row pivot consistency comparison",
@@ -126377,7 +126378,8 @@
             "TestLPFloatPrimalAdvanceActualNumericalRefusals",
             "TestLPFloatPrimalAdvanceReachedGuards",
             "TestLPFloatPrimalAdvanceBoundFlipReachedErrors"
-          ]
+          ],
+          "go_target": "pkg/util/lp/core_pivot_float.go"
         },
         {
           "name": "Floating iteration/statistics/time service, cost and nonbasis-zero assertions",
@@ -126392,7 +126394,8 @@
             "TestLPFloatPrimalIterationBudgetAndStatistics",
             "TestLPFloatPrimalStatisticsGuardsAndIEEE",
             "TestLPFloatPrimalSolveAndIterationReachedGuards"
-          ]
+          ],
+          "go_target": "pkg/util/lp/core_statistics_float.go"
         },
         {
           "name": "precise core basis exchanges and tracing, basis transpose and tableau row transpose with source basis-before-matrix publication",
@@ -126468,11 +126471,6 @@
             "TestLPRationalTableauStoppedMatrixBeforeNormalization",
             "TestLPRationalTableauPreservesOlderComparison"
           ]
-        },
-        {
-          "name": "Explicit pretty_print instantiations have no retained caller; whole-source reachability scan finds definitions/declarations/internal dead-chain calls only",
-          "status": "dead_deleted",
-          "tests": []
         }
       ],
       "ownership": [
@@ -126491,8 +126489,10 @@
         "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open.",
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
         "Concrete scalar mpq/mpq LU basis/value update now performs live UpdateX, Suhl column replacement, forced full refactor, unconditional basis rollback, actual stored CopyXB restoration, refactor diagnostics and precise residual validation in source order. A successful ordinary exchange preserves caller status/counters; singular rollback is retained even for feasibility-only mode. Missing precise backup can produce FLOATING_POINT_ERROR before the unstable counter increment; no automatic backup or residual repair is introduced. Source metadata failure retains the completed factorization replacement or prior basis/heading publication. RestoreBasisChange now consistently stops the scalar core after an invalid heading, matching its mutating-call lifetime contract. Scalar all-column feasibility, infeasibility membership update/validation, column printer, nonbasic zero-cost assertions, per-column/aggregate infeasibility-cost checks and tableau reduced-cost validation are implemented. Cost validation reads the breakpoint setting before column metadata as in source; unknown native types return true, while debug asserts. The column printer preserves split streams: bounds/name/type go to its writer, heading/X to stdout. Seventeen test groups cover120 independent81-200-bit systems, rotated bases, sparse/dense LU thresholds, zero/nonzero steps, replacement/refactor lifecycle and actual post-exchange LU reconstruction; eight singular rollback profiles, missing backup and both live alias index orders;1600 independent cost-sign worlds including tiny1e-100 violations and contradictory bounds with source upper-first priority;160 independent reduced-cost matrices and160 membership worlds; reached extent/assertion/diagnostic/closed-stream profiles and exact source output. Twenty pooled/direct physical campaigns through success cover replacement, refactor, rollback, restoration, cost validation, reduced-cost arithmetic and feasibility comparisons. Direct campaigns require actual physical refusal and ownership censuses pass. Four actual older1000-digit comparison campaigns prove update/restore/refactor/basis cleanup does not adopt or consume caller identity. The initial inherited stopped-restore tests exposed the missing stop guard; an alias fixture assumed ascending LU direction order and was replaced by two explicit valid orders. The hard-coded numeric_pair<mpq> make_column_feasible remains pair-only: no scalar method or unused template adapter was invented. Inventory remains88 partial/16 unported/6 reference_only; no whole-source promotion. Concrete scalar primal/dual iteration, feasibility-cost construction/switching, outer optimization integration, remaining diagnostics and full upstream drivers remain open. Full native checkpoint7957befd is still running and predates this update/feasibility/cost increment; its completion and coverage are not credited here.",
-        "Reachability correction: uncalled LU tail_product/vector-check chain, matrix apply_to_vector, print_submatrix and core pretty_print closure are excluded. Earlier Go generic-vector and submatrix-print wrappers/direct tests were removed. lu::is_correct is RETAINED: src/test/lp.cpp245,255,267,280,292,311,405,410,452,499 contain actual SASSERT calls. Float LU DebugIsCorrect and independent left/right matrix identity tests remain. No exact-matrix or whole-LP completion inferred."
-      ]
+        "Reachability correction: uncalled LU tail_product/vector-check chain, matrix apply_to_vector, print_submatrix and core pretty_print closure are excluded. Earlier Go generic-vector and submatrix-print wrappers/direct tests were removed. lu::is_correct is RETAINED: src/test/lp.cpp245,255,267,280,292,311,405,410,452,499 contain actual SASSERT calls. Float LU DebugIsCorrect and independent left/right matrix identity tests remain. No exact-matrix or whole-LP completion inferred.",
+        "Excluded after retained-consumer reachability scan: Explicit pretty_print instantiations have no retained caller; whole-source reachability scan finds definitions/declarations/internal dead-chain calls only."
+      ],
+      "retained_source_audit_evidence": "Whole retained lp_core_solver_base explicit-instantiation audit: actual double/double, mpq/mpq and mpq/numeric_pair<mpq> constructor, basis, LU, value/reconstruction, pivot, bound, feasibility and statistics symbols map to concrete typed Go core-base implementations. Source pretty_print instantiations have no retained caller and are excluded; commented template emissions and STL internals have no Go adapters. Current native and g3debug,g3checked focused core-base and statistics/tableau/dual-ratio groups pass, including independent basis/value systems, exact numeral owner failures and reached diagnostic prefixes. Representative current focused native coverage: float base135/152, values118/124, iteration92/97, pivot25/26, exact base170/232, scalar base211/238, scalar statistics79/85 and pair tableau117/126; checked coverage is similar or higher. Whole source consumers still belong to separate header/definitions and solver audits."
     },
     {
       "path": "src/util/lp/lp_dual_core_solver.h",
@@ -174214,6 +174214,31 @@
     "profiles": [
       "/mnt/oldrog/tmp/g3-lp-lu-header-native.cover",
       "/mnt/oldrog/tmp/g3-lp-lu-header-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Current full native suite is running from17ecadb7 and is not yet a completed checkpoint; focused native/debug and portcheck evidence is separate."
+  },
+  "latest_core_base_instances_whole_audit": {
+    "source_units": [
+      "src/util/lp/lp_core_solver_base_instances.cpp"
+    ],
+    "scope": "Whole retained lp_core_solver_base explicit-instantiation audit: actual double/double, mpq/mpq and mpq/numeric_pair<mpq> constructor, basis, LU, value/reconstruction, pivot, bound, feasibility and statistics symbols map to concrete typed Go core-base implementations. Source pretty_print instantiations have no retained caller and are excluded; commented template emissions and STL internals have no Go adapters. Current native and g3debug,g3checked focused core-base and statistics/tableau/dual-ratio groups pass, including independent basis/value systems, exact numeral owner failures and reached diagnostic prefixes. Representative current focused native coverage: float base135/152, values118/124, iteration92/97, pivot25/26, exact base170/232, scalar base211/238, scalar statistics79/85 and pair tableau117/126; checked coverage is similar or higher. Whole source consumers still belong to separate header/definitions and solver audits.",
+    "focused_tests": [
+      "TestLPFloatCore",
+      "TestLPPairCore",
+      "TestLPRationalCore",
+      "TestLPExactSnap",
+      "TestLPFloatPrimalIteration",
+      "TestLPPairStatistics",
+      "TestLPRationalStatistics",
+      "TestLPPairTableau"
+    ],
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-base-core-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-base-core-debug.cover",
+      "/mnt/oldrog/tmp/g3-lp-base-extra-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-base-extra-debug.cover"
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,

@@ -2938,7 +2938,7 @@
     },
     {
       "source": "src/util/lp/lp_core_solver_base_instances.cpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/core_base_float.go",
         "pkg/util/lp/core_base_float_test.go",
@@ -3043,7 +3043,8 @@
         "TestLPRationalTableauPhysicalFailureOwnership",
         "TestLPRationalTableauStoppedMatrixBeforeNormalization",
         "TestLPRationalTableauPreservesOlderComparison"
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained lp_core_solver_base explicit-instantiation audit: actual double/double, mpq/mpq and mpq/numeric_pair<mpq> constructor, basis, LU, value/reconstruction, pivot, bound, feasibility and statistics symbols map to concrete typed Go core-base implementations. Source pretty_print instantiations have no retained caller and are excluded; commented template emissions and STL internals have no Go adapters. Current native and g3debug,g3checked focused core-base and statistics/tableau/dual-ratio groups pass, including independent basis/value systems, exact numeral owner failures and reached diagnostic prefixes. Representative current focused native coverage: float base135/152, values118/124, iteration92/97, pivot25/26, exact base170/232, scalar base211/238, scalar statistics79/85 and pair tableau117/126; checked coverage is similar or higher. Whole source consumers still belong to separate header/definitions and solver audits."
     },
     {
       "source": "src/util/lp/lp_dual_core_solver.h",
@@ -8270,10 +8271,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 83,
+    "ported": 84,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 12
+    "partial": 11
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -15334,6 +15335,31 @@
     "profiles": [
       "/mnt/oldrog/tmp/g3-lp-lu-header-native.cover",
       "/mnt/oldrog/tmp/g3-lp-lu-header-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Current full native suite is running from17ecadb7 and is not yet a completed checkpoint; focused native/debug and portcheck evidence is separate."
+  },
+  "latest_core_base_instances_whole_audit": {
+    "source_units": [
+      "src/util/lp/lp_core_solver_base_instances.cpp"
+    ],
+    "scope": "Whole retained lp_core_solver_base explicit-instantiation audit: actual double/double, mpq/mpq and mpq/numeric_pair<mpq> constructor, basis, LU, value/reconstruction, pivot, bound, feasibility and statistics symbols map to concrete typed Go core-base implementations. Source pretty_print instantiations have no retained caller and are excluded; commented template emissions and STL internals have no Go adapters. Current native and g3debug,g3checked focused core-base and statistics/tableau/dual-ratio groups pass, including independent basis/value systems, exact numeral owner failures and reached diagnostic prefixes. Representative current focused native coverage: float base135/152, values118/124, iteration92/97, pivot25/26, exact base170/232, scalar base211/238, scalar statistics79/85 and pair tableau117/126; checked coverage is similar or higher. Whole source consumers still belong to separate header/definitions and solver audits.",
+    "focused_tests": [
+      "TestLPFloatCore",
+      "TestLPPairCore",
+      "TestLPRationalCore",
+      "TestLPExactSnap",
+      "TestLPFloatPrimalIteration",
+      "TestLPPairStatistics",
+      "TestLPRationalStatistics",
+      "TestLPPairTableau"
+    ],
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-base-core-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-base-core-debug.cover",
+      "/mnt/oldrog/tmp/g3-lp-base-extra-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-base-extra-debug.cover"
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
