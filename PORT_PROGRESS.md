@@ -39884,3 +39884,15 @@ the default binding. `FinalizeProcessGenerator` exposes the source finalizer
 action; generated shell/API shutdown wiring remains open. The source prime
 files contain no print/flush operation, so the old ledger obligation for one
 was removed.
+
+### Reference-map cleanup consumer audit
+
+`src/util/dec_ref_util.h` has two live operation families:
+`dec_ref_key_values` in the AST expression map, API AST map, and arithmetic
+recovery tactic; `dec_ref_values` in the AST proof table, SMT assertion-name
+map, and command user-tactic map. The AST expression map resets proof values
+before expression keys and values. These helpers borrow their managers and
+release references before resetting each map; consumed references must stay
+retired if later cleanup reports an error. `dec_ref_keys` has no retained
+production caller. The concrete Go map owners remain unported, so the header
+stays unported and no generic reference-map adapter is introduced.

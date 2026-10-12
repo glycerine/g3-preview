@@ -113574,11 +113574,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "dec_ref_key_values for AST expr_map, API AST map and recover_01_tactic bool-to-int map",
+          "status": "unported"
+        },
+        {
+          "name": "dec_ref_values for AST expr_map proof table, SMT name-to-assertion map and command user-tactic declarations",
+          "status": "unported"
+        },
+        {
+          "name": "dec_ref_keys has no retained production call site",
+          "status": "dead_deleted"
+        }
+      ],
+      "ownership": [
+        "Each live helper borrows its manager and mutates an owning map. For every entry, the key/value or value reference decrements occur before map.reset; the AST expr_map reset calls proof-value cleanup before key/value cleanup. A Go consumer must retire consumed references even when a later destructor reports an error."
+      ],
+      "deviations": [
+        "No generic Go ref-count map adapter is retained. Implement the live decrement/reset order in each concrete AST, API, SMT, command, and tactic map owner using typed Go collections. The separate dec_ref_collection_values in ref_util.h is not a specialization of this header."
+      ]
     },
     {
       "path": "src/util/dependency.h",
