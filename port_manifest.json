@@ -95704,9 +95704,13 @@
       "path": "src/tactic/bv/max_bv_sharing_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/bv/max_bv_sharing_reduce.go"
+      ],
+      "tests": [
+        "TestSharingReducerOrderedPairsReuseAndNumeralPosition"
+      ],
       "conditionals": [
         {
           "line": 153,
@@ -95741,9 +95745,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "rw_cfg concrete BV expr-pair caches and reduce_ac_app ordered reuse/tree grouping",
+          "status": "ported",
+          "go_target": "pkg/tactic/bv/max_bv_sharing_reduce.go",
+          "tests": [
+            "TestSharingReducerOrderedPairsReuseAndNumeralPosition"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete reducer retains cached pair operands and generated apps as AST roots through Close. The enclosing goal traversal, proofs, parameters, budgets, and tactic lifecycle remain unported."
+      ],
+      "deviations": [
+        "The four obj_pair_hashtable<expr,expr> instantiations use typed Go maps keyed by ordered AST-handle pairs; C++ hash buckets are not retained."
+      ]
     },
     {
       "path": "src/tactic/bv/max_bv_sharing_tactic.h",
@@ -157496,13 +157513,15 @@
         "pkg/smtcore/smt_model_finder_hint_indexes.go",
         "pkg/smtcore/smt_model_finder_hint_plan.go",
         "pkg/tactic/ufbv/match_subst.go",
-        "pkg/smtcore/smt_dyn_ack_pairs.go"
+        "pkg/smtcore/smt_dyn_ack_pairs.go",
+        "pkg/tactic/bv/max_bv_sharing_reduce.go"
       ],
       "tests": [
         "TestModelFinderHintPreprocessIndexesAndResidueCandidates",
         "TestModelFinderHintPlanPartitionAndRunReset",
         "TestMatchSubstConcretePairCacheAndVariableBindings",
-        "TestDynAckPairOccurrencesLiveGCAndOwnedApps"
+        "TestDynAckPairOccurrencesLiveGCAndOwnedApps",
+        "TestSharingReducerOrderedPairsReuseAndNumeralPosition"
       ],
       "conditionals": [
         {
@@ -157547,10 +157566,19 @@
           "tests": [
             "TestDynAckPairOccurrencesLiveGCAndOwnedApps"
           ]
+        },
+        {
+          "name": "max_bv_sharing rw_cfg four obj_pair_hashtable<expr,expr> ordered pair sets",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/bv/max_bv_sharing_reduce.go",
+          "tests": [
+            "TestSharingReducerOrderedPairsReuseAndNumeralPosition"
+          ]
         }
       ],
       "ownership": [
-        "The hint solver borrows function, definition and quantifier AST identities. Its Q_f_def map owns native set membership; full cond_macro and quantifier_info lifetimes remain in the enclosing model finder. The UFBV matcher's pair set borrows expression handles from its AST manager and owns only map membership. The dyn_ack pair maps borrow app identities retained by its owning app vector."
+        "The hint solver borrows function, definition and quantifier AST identities. Its Q_f_def map owns native set membership; full cond_macro and quantifier_info lifetimes remain in the enclosing model finder. The UFBV matcher's pair set borrows expression handles from its AST manager and owns only map membership. The dyn_ack pair maps borrow app identities retained by its owning app vector.",
+        "The BV sharing reducer retains each cached expr pair operand and each newly built application until Close; the native typed maps own pair membership only."
       ],
       "deviations": [
         "The selected Q_f_def and dyn_ack count specializations use native Go maps keyed by typed AST-handle pairs; the former has native quantifier sets and the latter uses a native instantiated set. C++ cached hashes, sentinel buckets and probing are not ported. Other retained pair-map and pair-hashtable consumers remain open."
