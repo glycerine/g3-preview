@@ -10,13 +10,17 @@ import (
 )
 
 func cacheFixture(t *testing.T) *ast.ASTManager {
+	return cacheFixtureProofMode(t, ast.ASTProofDisabled)
+}
+
+func cacheFixtureProofMode(t *testing.T, proofMode ast.ASTProofMode) *ast.ASTManager {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)
 	s, e := symbol.NewManager(symbol.Config{Budget: b})
 	cacheMust(t, e)
 	q, e := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	cacheMust(t, e)
-	m, e := ast.NewASTManager(ast.ASTManagerConfig{Symbols: s, Numerals: q, Budget: b})
+	m, e := ast.NewASTManager(ast.ASTManagerConfig{Symbols: s, Numerals: q, Budget: b, ProofMode: proofMode})
 	cacheMust(t, e)
 	t.Cleanup(func() {
 		cacheMust(t, m.Close())

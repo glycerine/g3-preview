@@ -97721,7 +97721,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_goal.go",
-        "pkg/tactic/tactic_goal_ownership.go"
+        "pkg/tactic/tactic_goal_ownership.go",
+        "pkg/tactic/tactic_package_boundary.go"
       ],
       "tests": [
         "TestTacticGoalAssertionSplittingAndSourceOrder",
@@ -100758,9 +100759,14 @@
       "path": "src/tactic/ufbv/ufbv_rewriter_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/ufbv/rewrite_tactic.go"
+      ],
+      "tests": [
+        "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
+        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+      ],
       "assertions": [
         {
           "line": 39,
@@ -100773,17 +100779,36 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete tactic construction, no-proof and proof-bypass goal application, unsat-core guard and close",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
+          "tests": [
+            "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
+            "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+          ]
+        }
+      ],
+      "ownership": [
+        "The Go tactic owns the configured Boolean reducer and borrows AST/parameter services. The processor owns indexes and main todo references only during one Apply; output and proof references survive goal reset until assertion completes."
+      ],
+      "deviations": [
+        "The result goal is the caller's owner; converter outputs are absent because the source sets all three to null. Translation to another manager, parameter-description reporting, cleanup reconstruction and full tactic registry integration remain open."
+      ]
     },
     {
       "path": "src/tactic/ufbv/ufbv_rewriter_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/ufbv/rewrite_tactic.go"
+      ],
+      "tests": [
+        "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
+        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -100796,9 +100821,21 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "concrete UFBV rewriter tactic constructor and Apply goal entry",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
+          "tests": [
+            "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
+            "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The concrete Go constructor takes the existing parameter context and global service needed by its Boolean reducer; full tactic registration, translate and parameter reporting remain open."
+      ]
     },
     {
       "path": "src/tactic/ufbv/ufbv_tactic.cpp",
@@ -161175,7 +161212,8 @@
         "pkg/tactic/ufbv/rewrite_back_index.go",
         "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
         "pkg/tactic/ufbv/rewrite_loop.go",
-        "pkg/tactic/ufbv/rewrite_formula_process.go"
+        "pkg/tactic/ufbv/rewrite_formula_process.go",
+        "pkg/tactic/ufbv/rewrite_tactic.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -161196,7 +161234,9 @@
         "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
         "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot",
         "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier",
-        "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
+        "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults",
+        "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
+        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
       ],
       "conditionals": [
         {
@@ -161320,6 +161360,15 @@
           "go_target": "pkg/tactic/ufbv/rewrite_formula_process.go",
           "tests": [
             "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
+          ]
+        },
+        {
+          "name": "concrete UFBV tactic formula/proof vectors use typed Go slices and independent AST references across goal reset",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
+          "tests": [
+            "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
+            "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
           ]
         }
       ],
