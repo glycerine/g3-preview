@@ -135655,7 +135655,8 @@
         "TestLPExactAdvanceEqualPhysicalOwnership",
         "TestLPExactAdvanceEqualLiveStepAliases",
         "TestLPExactAdvanceEqualSourcePrefixes",
-        "TestLPExactAdvanceEqualOlderComparison"
+        "TestLPExactAdvanceEqualOlderComparison",
+        "TestLPRationalPairPhysicalArithmeticPrefixes"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -135668,7 +135669,8 @@
             "TestLPRationalPairArithmeticOracle",
             "TestLPRationalPairOrderSignsAndFormatting",
             "TestLPRationalPairCoordinateErrorPrefixes",
-            "TestLPRationalPairSourceAccumulation"
+            "TestLPRationalPairSourceAccumulation",
+            "TestLPRationalPairPhysicalArithmeticPrefixes"
           ]
         },
         {
@@ -173416,5 +173418,31 @@
     ],
     "coverage_qualification": "Focused package coverage is diluted by unrelated LP files; retained methods and caller branches are exercised. No whole-Go-file coverage claim for shared types/permutation files.",
     "full_suite_qualification": "Revision55b06c96 predates this source audit and later dependency pin."
+  },
+  "latest_numeric_pair_retained_increment": {
+    "scope": "Retained numeric_pair<mpq> direct arithmetic audit: RationalPair now has twelve pooled/direct physical prefix campaigns for copy, add, subtract, scale, divide and in-place negate. The first five require a reached direct allocation refusal before successful exact big.Rat endpoints and unchanged borrowed inputs; in-place negate correctly has no physical allocation but its large-number result and cleanup are checked. The entire numeric_pair.go file is covered65/65 statements by focused native and debug/checked pair tests. The source numeric_pair<double> specializations have no retained external consumer in a whole-src scan; pair-times-pair and pair-divided-by-pair bodies are undefined in source and receive no adapter. numeric_pair.h remains partial because the wider scalar numeric_traits and convert_struct consumers across MPS, scaling and bound algorithms still require a whole-header reachability/ownership audit. Focused pair campaigns pass native and debug/checked; the running full native revision55b06c96 predates this test and is not current-code evidence. CPUs8-16/GOMAXPROCS9.",
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "source_unit": "src/util/lp/numeric_pair.h",
+    "whole_go_file_focused_covered_total": {
+      "native": {
+        "numeric_pair.go": [
+          65,
+          65
+        ]
+      },
+      "debug": {
+        "numeric_pair.go": [
+          65,
+          65
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-numeric-pair-audit-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-numeric-pair-audit-debug.cover"
+    ],
+    "whole_source_qualification": "The source header remains partial until retained scalar traits and conversions are audited across consumers.",
+    "full_suite_qualification": "Revision55b06c96 predates this added test and dependency pin."
   }
 }

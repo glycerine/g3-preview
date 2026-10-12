@@ -1,13 +1,89 @@
 package lp
 
 import (
+	"fmt"
 	"math/big"
 	"math/rand/v2"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
+
+func TestLPRationalPairPhysicalArithmeticPrefixes(t *testing.T) {
+	large := strings.Repeat("1234567890", 18) + "7/13"
+	ax := mustLPRat(t, large)
+	ay := big.NewRat(-7, 13)
+	bx := big.NewRat(-5, 11)
+	by := mustLPRat(t, large)
+	for _, direct := range []bool{false, true} {
+		for _, op := range []string{"copy", "add", "sub", "scale", "divide", "negate"} {
+			finished, failures := false, 0
+			for ordinal := int64(0); ordinal < 256 && !finished; ordinal++ {
+				t.Run(fmt.Sprintf("%t/%s/%d", direct, op, ordinal), func(t *testing.T) {
+					var h *lpPairHarness
+					if direct {
+						h = lpNewDirectSparseHarness(t)
+					} else {
+						h = newLPPairHarness(t)
+					}
+					a, b, out := h.pair(large, "-7/13"), h.pair("-5/11", large), h.pair("9", "10")
+					if op == "negate" {
+						out = h.pair(large, large)
+					}
+					h.budget.FailAfter(ordinal)
+					var err error
+					switch op {
+					case "copy":
+						err = out.Copy(h.m, a)
+					case "add":
+						err = out.Add(h.m, a, b)
+					case "sub":
+						err = out.Sub(h.m, a, b)
+					case "scale":
+						err = out.Scale(h.m, a, &b.X)
+					case "divide":
+						err = out.Divide(h.m, a, &b.X)
+					case "negate":
+						err = out.Negate(h.m)
+					}
+					h.budget.FailAfter(-1)
+					if err != nil {
+						failures++
+						if !lpExactPriorityPhysicalRefusal(err) {
+							t.Fatal(err)
+						}
+					} else {
+						finished = true
+						var wantX, wantY *big.Rat
+						switch op {
+						case "copy":
+							wantX, wantY = ax, ay
+						case "add":
+							wantX, wantY = new(big.Rat).Add(ax, bx), new(big.Rat).Add(ay, by)
+						case "sub":
+							wantX, wantY = new(big.Rat).Sub(ax, bx), new(big.Rat).Sub(ay, by)
+						case "scale":
+							wantX, wantY = new(big.Rat).Mul(ax, bx), new(big.Rat).Mul(ay, bx)
+						case "divide":
+							wantX, wantY = new(big.Rat).Quo(ax, bx), new(big.Rat).Quo(ay, bx)
+						case "negate":
+							wantX, wantY = new(big.Rat).Neg(ax), new(big.Rat).Neg(by)
+						}
+						h.check(out, wantX, wantY)
+					}
+					h.check(a, ax, ay)
+					h.check(b, bx, by)
+				})
+			}
+			// In-place sign changes touch existing numerals without allocation.
+			if !finished || direct && op != "negate" && failures == 0 {
+				t.Fatal("incomplete arithmetic failure campaign", direct, op, finished, failures)
+			}
+		}
+	}
+}
 
 type lpPairHarness struct {
 	t      *testing.T
