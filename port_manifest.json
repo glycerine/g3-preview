@@ -164751,9 +164751,13 @@
       "path": "src/util/trace.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/diagnostic/util_trace_tags.go"
+      ],
+      "tests": [
+        "TestTraceTagsSourceControlAndFinalize"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -164780,21 +164784,41 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "enable_trace, disable_trace, enable_all_trace, is_trace_enabled and finalize_trace tag state",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/diagnostic/util_trace_tags.go",
+          "tests": [
+            "TestTraceTagsSourceControlAndFinalize"
+          ]
+        },
+        {
+          "name": "open_trace, close_trace and optional _TRACE file/TRACE_CODE/TRACE/STRACE/CTRACE emission",
+          "status": "unported",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Caller-bound TraceTags owns a native Go map of C-string tag values; Finalize drops the table but preserves enable-all. Source process singleton and optional trace-file writer remain separate."
+      ],
       "deviations": [
-        "The earlier caller-bound Go TraceContext and tests were deleted in 589e99f8 with the unconsumed diagnostic process graph. No current Go implementation covers trace tags, explicit trace controls, or the enabled trace output profile. Resolve retained source controls and trace consumers when their Go callers are ported."
+        "Explicit retained shell/API trace controls now have caller-bound native map tag state, with C-string keys, lazy table initialization and source finalize/all-flag order. The old unconsumed TraceContext remains deleted. Process singleton wiring, _TRACE file output and macro call-site emission await their concrete callers."
       ]
     },
     {
       "path": "src/util/trace.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/diagnostic/util_trace_tags.go"
+      ],
+      "tests": [
+        "TestTraceTagsSourceControlAndFinalize"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -164833,12 +164857,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "enable_trace, disable_trace, enable_all_trace, is_trace_enabled and finalize_trace tag state",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/diagnostic/util_trace_tags.go",
+          "tests": [
+            "TestTraceTagsSourceControlAndFinalize"
+          ]
+        },
+        {
+          "name": "open_trace, close_trace and optional _TRACE file/TRACE_CODE/TRACE/STRACE/CTRACE emission",
+          "status": "unported",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Caller-bound TraceTags owns a native Go map of C-string tag values; Finalize drops the table but preserves enable-all. Source process singleton and optional trace-file writer remain separate."
+      ],
       "deviations": [
-        "The earlier caller-bound Go TraceContext and tests were deleted in 589e99f8 with the unconsumed diagnostic process graph. No current Go implementation covers trace tags, explicit trace controls, or the enabled trace output profile. Resolve retained source controls and trace consumers when their Go callers are ported."
+        "Explicit retained shell/API trace controls now have caller-bound native map tag state, with C-string keys, lazy table initialization and source finalize/all-flag order. The old unconsumed TraceContext remains deleted. Process singleton wiring, _TRACE file output and macro call-site emission await their concrete callers."
       ]
     },
     {

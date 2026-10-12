@@ -39830,3 +39830,15 @@ single-zero and three-limb cases including `UINT32_MAX`. This supplies the
 retained trace-enabled numerical path's text operation without C++ ostream
 state. TRACE activation and its stream lifecycle remain separate, so both MPN
 source units stay partial.
+
+### Trace tag controls for retained callers
+
+`src/shell/main.cpp:251` and `src/api/api_context.cpp:408-418` call the
+explicit trace-tag controls, so `src/util/trace.h/.cpp` has a live retained
+consumer path. `pkg/util/diagnostic.TraceTags` now keeps those tags in a native
+Go map, using C-string key boundaries and the source lazy table, all-flag,
+disable and finalize order. In particular, finalize releases the tag table
+without clearing enable-all. Focused native and debug tests cover those
+transitions. This supersedes the older ledger note about the deleted,
+unconsumed TraceContext. Process singleton wiring, `_TRACE` file output and
+macro-site emission remain open, so both trace source units are partial.
