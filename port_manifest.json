@@ -164561,9 +164561,15 @@
       "path": "src/util/top_sort.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_sort_dependency_order.go",
+        "pkg/ast/ast_sort_dependency_order_test.go"
+      ],
+      "tests": [
+        "TestSortDependencyOrderRetainedSourceTraversal",
+        "TestSortDependencyOrderCycleAndUncollectedRoot"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -164586,10 +164592,22 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "top_sort<sort> insertion and preorder/completion-stack traversal for decl_collector::order_deps",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_sort_dependency_order.go",
+          "tests": [
+            "TestSortDependencyOrderRetainedSourceTraversal",
+            "TestSortDependencyOrderCycleAndUncollectedRoot"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete AST sort-order state owns copied dependency-handle slices and borrows the referenced AST sort objects. Duplicate collected roots retain one traversal entry; dependencies absent from the collected root table are skipped. No source-owned dependency-set allocations are reproduced in Go."
+      ],
       "deviations": [
-        "No generic Go adapter is retained. The sole production specialization is top_sort<sort> in the unported AST declaration collector; implement a concrete sort-pointer traversal in package ast when that consumer is ported."
+        "Only the retained top_sort<sort> specialization is implemented using concrete ASTHandle maps and slices in package ast; no generic adapter or C++ hash-table traversal order is retained. The AST declaration collector still needs its visit/collect_deps/order_deps integration, so this source unit remains partial."
       ]
     },
     {

@@ -39860,3 +39860,14 @@ deletion until after iteration, and compiler map-range collection preserves
 source traversal order. `print_map` and `find_index` have no retained
 production callers. The header stays unported until the concrete AST/MUZ
 consumers use typed Go maps and slices and Go text formatting.
+
+### Concrete sort dependency traversal
+
+The sole production `src/util/top_sort.h` specialization is
+`top_sort<sort>` in `src/ast/decl_collector.cpp`. `pkg/ast` now has a concrete
+`ASTHandle` preorder/completion-stack traversal for this path. It processes
+each collected sort once, emits dependencies before dependents, ignores
+uncollected dependency sorts, and retains the source's cycle traversal.
+Focused tests cover a shared dependency, duplicate collection, an omitted
+built-in sort, repeat calls, and a cycle. The declaration collector's visits
+and dependency gathering are still unported, so the header remains partial.
