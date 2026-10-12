@@ -146396,7 +146396,8 @@
         "pkg/util/numeral/rational_source_stream.go",
         "pkg/util/numeral/numeral_insertion_receipt.go",
         "pkg/ast/ast_low_level_printer_source_test.go",
-        "pkg/util/numeral/mpn_native_division_test.go"
+        "pkg/util/numeral/mpn_native_division_test.go",
+        "pkg/util/numeral/mpn_display_raw.go"
       ],
       "tests": [
         "TestNaturalArithmeticOracle",
@@ -146475,7 +146476,8 @@
         "TestNaturalNativeDivisionResizeClearsRegrowth",
         "TestNaturalNativeAddbackUnderRuntimeRefusal",
         "TestNaturalNativeScratchExcludedFromRuntimeStats",
-        "TestFastFloatDecimalNativeDivisionWithoutReservations"
+        "TestFastFloatDecimalNativeDivisionWithoutReservations",
+        "TestMPNDisplayRawSourceLimbOrder"
       ],
       "conditionals": [
         {
@@ -146811,9 +146813,12 @@
           ]
         },
         {
-          "name": "display_raw",
-          "status": "unported",
-          "tests": []
+          "name": "display_raw descending limb text through a native Go writer; trace call-site integration remains",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpn_display_raw.go",
+          "tests": [
+            "TestMPNDisplayRawSourceLimbOrder"
+          ]
         },
         {
           "name": "trace(a,b,op)",
@@ -147003,6 +147008,7 @@
         "Small signed insertion differs from big signed-char CString insertion; CString strlen precedes sentry. Exact active character invocation view, typed actual destructor cause and acquired NUM/char/local roots retained; existing Go ErrorTransport callback guard is an explicit adapter profile, not native callback equivalence."
       ],
       "deviations": [
+        "MPN display_raw writes exact bracketed descending decimal limbs through io.Writer, replacing C++ ostream insertion. TRACE/STRACE call-site activation and stream-state handling remain separate.",
         "Go guards actual endangered reads/writes and retained lexical-holder reuse without blocking source paths that never reach those holders. Algorithm D allocates add-back storage only at the source borrow branch. Runtime owns real source allocations and initialized-byte state; no Words shadows represent limb scratch. Final escaped Go strings are caller-owned. Exact character-buffer/output lifetime, broader public source span domains, diagnostic transport, architecture profiles and OMP/global integration remain separate obligations.",
         "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
@@ -147036,7 +147042,8 @@
         "pkg/util/numeral/mpn_cstring.go",
         "pkg/util/numeral/mpzzp_normalize_allocation_receipt.go",
         "pkg/math/polynomial/polynomial_constant_normalize_receipt_source_test.go",
-        "pkg/util/numeral/mpn_native_division_test.go"
+        "pkg/util/numeral/mpn_native_division_test.go",
+        "pkg/util/numeral/mpn_display_raw.go"
       ],
       "tests": [
         "TestNaturalArithmeticOracle",
@@ -147080,7 +147087,8 @@
         "TestNaturalNativeDivisionResizeClearsRegrowth",
         "TestNaturalNativeAddbackUnderRuntimeRefusal",
         "TestNaturalNativeScratchExcludedFromRuntimeStats",
-        "TestFastFloatDecimalNativeDivisionWithoutReservations"
+        "TestFastFloatDecimalNativeDivisionWithoutReservations",
+        "TestMPNDisplayRawSourceLimbOrder"
       ],
       "conditionals": [
         {
@@ -147354,9 +147362,12 @@
           ]
         },
         {
-          "name": "display_raw",
-          "status": "unported",
-          "tests": []
+          "name": "display_raw descending limb text through a native Go writer; trace call-site integration remains",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpn_display_raw.go",
+          "tests": [
+            "TestMPNDisplayRawSourceLimbOrder"
+          ]
         },
         {
           "name": "trace(a,b,op)",
@@ -147458,6 +147469,7 @@
         "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161)."
       ],
       "deviations": [
+        "MPN display_raw writes exact bracketed descending decimal limbs through io.Writer, replacing C++ ostream insertion. TRACE/STRACE call-site activation and stream-state handling remain separate.",
         "Go guards actual endangered reads/writes and retained lexical-holder reuse without blocking source paths that never reach those holders. Algorithm D allocates add-back storage only at the source borrow branch. Runtime owns real source allocations and initialized-byte state; no Words shadows represent limb scratch. Final escaped Go strings are caller-owned. Exact character-buffer/output lifetime, broader public source span domains, diagnostic transport, architecture profiles and OMP/global integration remain separate obligations.",
         "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",

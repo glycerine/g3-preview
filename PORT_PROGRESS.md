@@ -39819,3 +39819,14 @@ NUL handling and truncation. This credits the selected formatter consumer in
 `z3_exception.h/.cpp` and `warning.h/.cpp`. The source test's stderr print,
 other C format profiles and unported MUZ/parser callers remain open; the four
 utility source units stay partial.
+
+### MPN raw-limb display
+
+`mpn_manager::display_raw` (`src/util/mpn.cpp:400-404`) emits square brackets
+and decimal limbs from highest index down, separated by `|`; an empty vector
+emits `[]`. The concrete `NaturalManager.DisplayRaw` now writes that text to
+an `io.Writer` with Go integer formatting. A focused test covers empty,
+single-zero and three-limb cases including `UINT32_MAX`. This supplies the
+retained trace-enabled numerical path's text operation without C++ ostream
+state. TRACE activation and its stream lifecycle remain separate, so both MPN
+source units stay partial.
