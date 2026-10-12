@@ -39451,3 +39451,34 @@ coefficient and monomial cycles remain implemented in `pkg/math/polynomial`.
 `src/test/permutation.cpp` has its test body disabled by `#if 0`, so it is
 reference-only. `src/util/permutation.h` stays partial: its separate NLSAT
 clause-pointer instantiation must be ported with the NLSAT consumer.
+
+### Unported util headers: source-consumer order
+
+A direct-include and concrete-instantiation scan of the 22 still-unported
+`src/util` units identifies the consumer to port alongside each unit. An
+include alone is not port credit; these entries remain unported in the ledger.
+The current Go production graph does not provide the indicated consumer body.
+
+| `src/util` unit(s) | Retained source consumer to port with it |
+| --- | --- |
+| `array.h` | `math/realclosure/realclosure.cpp`: fixed `ptr_array<value>` polynomials and `array<polynomial/int/sign_condition*>` sign-determination storage. `sarray<p2s>` is an unused typedef. |
+| `array_map.h` | `tactic/ufbv/ufbv_rewriter.h`: `array_map<expr*, expr_bool_pair, plugin>`. |
+| `backtrackable_set.h` | `smt/smt_model_finder.cpp`: scoped quantifier sets and event-handler specialization. |
+| `container_util.h` | `ast/proofs/proof_utils.cpp` calls `set_union`; `muz/base/dl_util.h` also includes the header. |
+| `dec_ref_util.h` | `ast/expr_map.cpp`, API AST map, command context, tactics, and SMT cleanup of concrete maps. |
+| `ext_numeral.h` | `math/interval/interval.h` uses the infinity-kind arithmetic; the other direct consumer is `src/test/ext_numeral.cpp`. |
+| `list.h` | SMT enode/relevancy lists; `src/test/list.cpp` separately covers the region-list append algorithm. |
+| `mpfx.h/.cpp` | `math/subpaving` floating fixed-point consumer and its tactic; the other direct consumer is `src/test/mpfx.cpp`. |
+| `numeral_buffer.h` | Euclidean solver, arithmetic tactics, and SMT integer arithmetic. Polynomial's `_scoped_numeral_buffer` is a different source type. |
+| `obj_pair_hashtable.h`, `obj_pair_set.h`, `obj_triple_hashtable.h` | Concrete AST pattern, SMT, tactic, QE, and MUZ pair tables; the pair set and triple table occur in SMT conflict resolution/dynamic acknowledgment. |
+| `parray.h` | AST manager declares expression/dependency arrays consumed by `tactic/goal.h`; subpaving has a separate bound-array instantiation. |
+| `plugin_manager.h`, `pool.h`, `scoped_vector.h` | SMT theory/model factories, MAM enode-vector pools, and sequence-theory scoped equations respectively. |
+| `timeout.h/.cpp` | `shell/main.cpp` calls `set_timeout`; frontends include the API. The Go shell body is still absent. |
+| `top_sort.h` | `ast/decl_collector.cpp` dependency ordering for sorts. |
+| `trace.h/.cpp` | Direct tag configuration occurs in shell/tests; TRACE macro sites span SAT/AST/util. `_TRACE` gating and the few direct `is_trace_enabled` readers need a consumer-specific audit. |
+
+The `array.h` manifest now records realclosure's exact live element types and
+its region-backed destruction order. This identifies realclosure as the next
+consumer prerequisite for that header, while the current Go `pkg/math/realclosure`
+contains only parameter catalog code and source mirrors. Other partial util
+units with already ported Go callers can advance independently of this table.

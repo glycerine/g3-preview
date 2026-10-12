@@ -111136,9 +111136,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "realclosure ptr_array<value> polynomial and array<polynomial/int/sign_condition*> fixed storage, set/index/size/c_ptr/finalize",
+          "status": "unported",
+          "tests": []
+        },
+        {
+          "name": "sarray<p2s> sign-pair typedef without construction or method call",
+          "status": "reference_only",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The sole production include is src/math/realclosure/realclosure.cpp. Its sign_det creates region-allocated fixed arrays; del_sign_det retires pointed sign-condition chains, polynomial values, and array backing in separate source steps (realclosure.cpp:799-810). The realclosure consumer has no Go body yet."
+      ],
+      "deviations": [
+        "Use concrete Go slices in the realclosure port; do not add a generic array<T> or copy C++ allocation headers. The similarly named src/api/c++/z3++.h array is a different class."
+      ]
     },
     {
       "path": "src/util/array_map.h",
