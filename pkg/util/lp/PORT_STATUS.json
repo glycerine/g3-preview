@@ -11302,5 +11302,24 @@
     "source_unit_status": "lp_settings.h/.hpp remain partial; no whole-source completion credit",
     "evidence": "/mnt/oldrog/tmp/g3-lp-settings-lifetime-audit.txt",
     "full_native_checkpoint_excludes_new_tests": true
+  },
+  "latest_small_lu_cli_increment": {
+    "go_target": "pkg/util/lp/driver_small_lu_debug.go",
+    "tests": [
+      "TestLPSmallLUDriverLiteralScenario",
+      "TestLPSmallLUDriverIndependentExtendedSolves",
+      "TestLPSmallLUDriverReportFailurePrefixes"
+    ],
+    "coverage": {
+      "profile": "g3debug,g3checked",
+      "covered": 70,
+      "statements": 85,
+      "percent": 82.4
+    },
+    "focused_seconds": 0.09,
+    "evidence": "/mnt/oldrog/tmp/g3-small-lu-driver-debug.cover",
+    "full_native_checkpoint_excludes_debug_only_scenario": true,
+    "remaining": "Other LU scenarios and full top-level test dispatch/entry; whole-source/consumer/ownership audits.",
+    "related_lu_regressions_seconds": 0.347
   }
 }
