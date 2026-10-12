@@ -21,6 +21,12 @@ type astExprMapEntry struct {
 	proofOwned        bool
 }
 
+// ASTExprMapPair is a borrowed key/value view for the retained API
+// quantifier-elimination transfer. It does not own references.
+type ASTExprMapPair struct {
+	Key, Value ASTHandle
+}
+
 func NewASTExprMap(m *ASTManager) (*ASTExprMap, error) {
 	if e := m.lock(); e != nil {
 		return nil, e
@@ -144,6 +150,21 @@ func (s *ASTExprMap) Get(key ASTHandle) (value, proof ASTHandle, found bool, err
 func (s *ASTExprMap) Contains(key ASTHandle) (bool, error) {
 	_, _, found, e := s.Get(key)
 	return found, e
+}
+
+// Pairs snapshots the source begin/end iterator's expression map. Callers
+// that retain a pair beyond this map's lifetime must increment both AST refs.
+func (s *ASTExprMap) Pairs() ([]ASTExprMapPair, error) {
+	m, e := s.lock()
+	if e != nil {
+		return nil, e
+	}
+	defer m.mu.Unlock()
+	pairs := make([]ASTExprMapPair, 0, len(s.entries))
+	for _, entry := range s.entries {
+		pairs = append(pairs, ASTExprMapPair{Key: m.external(entry.key), Value: m.external(entry.value)})
+	}
+	return pairs, nil
 }
 
 func (s *ASTExprMap) releaseProof(m *ASTManager, entry *astExprMapEntry) error {

@@ -70,3 +70,63 @@ func TestASTExprMapConcreteReferenceCleanup(t *testing.T) {
 	}
 	astTestMust(t, m.DecRef(p))
 }
+
+func TestASTExprMapBorrowedPairsForAPITransfer(t *testing.T) {
+	m := astTestManager(t)
+	nodes := markTestNodes(t, m, 3)
+	for _, h := range nodes {
+		astTestMust(t, m.IncRef(h))
+	}
+	s, e := NewASTExprMapWithProofs(m, false)
+	astTestMust(t, e)
+	astTestMust(t, s.Insert(nodes[0], nodes[1], ASTHandle{}))
+	astTestMust(t, s.Insert(nodes[2], nodes[0], ASTHandle{}))
+	before := make([]uint32, len(nodes))
+	for i, h := range nodes {
+		before[i], e = m.GetRefCount(h)
+		astTestMust(t, e)
+	}
+	pairs, e := s.Pairs()
+	astTestMust(t, e)
+	if len(pairs) != 2 {
+		t.Fatal("API transfer pair count", len(pairs))
+	}
+	got := make(map[ASTHandle]ASTHandle, len(pairs))
+	for _, pair := range pairs {
+		got[pair.Key] = pair.Value
+	}
+	if got[nodes[0]] != nodes[1] || got[nodes[2]] != nodes[0] {
+		t.Fatal("API transfer pair contents", got)
+	}
+	for i, h := range nodes {
+		rc, e := m.GetRefCount(h)
+		if e != nil || rc != before[i] {
+			t.Fatal("borrowed snapshot changed ownership", i, rc, before[i], e)
+		}
+	}
+	// API transfer increments both sides before the local expression map dies.
+	for _, pair := range pairs {
+		astTestMust(t, m.IncRef(pair.Key))
+		astTestMust(t, m.IncRef(pair.Value))
+	}
+	astTestMust(t, s.Reset())
+	if pairs, e = s.Pairs(); e != nil || len(pairs) != 0 {
+		t.Fatal("reset retained API pairs", pairs, e)
+	}
+	for i, h := range nodes {
+		rc, e := m.GetRefCount(h)
+		if e != nil || rc != before[i] {
+			t.Fatal("API transfer lost a live pair", i, rc, before[i], e)
+		}
+	}
+	astTestMust(t, s.Close())
+	for _, pair := range got {
+		astTestMust(t, m.DecRef(pair))
+	}
+	for key := range got {
+		astTestMust(t, m.DecRef(key))
+	}
+	for _, h := range nodes {
+		astTestMust(t, m.DecRef(h))
+	}
+}

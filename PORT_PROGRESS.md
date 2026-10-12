@@ -39904,5 +39904,8 @@ order, and resets all proof values before expression keys and values. Focused
 tests use real AST reference counts across insertion, replacement,
 self-replacement, erase, reset, proof-policy flush and close. This moves
 `dec_ref_util.h` and `src/ast/expr_map.h/.cpp` to partial. Their remaining
-API/rewriter/Spacer call sites, API iteration and exact checked failure
-prefixes remain open.
+API/rewriter/Spacer call sites and exact checked failure prefixes remain
+open. `Pairs` now provides the borrowed key/value snapshot needed by the
+retained API quantifier-elimination transfer; the future API caller must
+increment both references before the expression map closes. Focused native
+and debug tests check both pair contents and unchanged reference counts.
