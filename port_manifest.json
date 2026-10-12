@@ -34529,13 +34529,16 @@
         "pkg/math/realclosure/binary_interval_div.go",
         "pkg/math/subpaving/fixed_interval.go",
         "pkg/math/subpaving/fixed_interval_arith.go",
-        "pkg/math/subpaving/fixed_interval_test.go"
+        "pkg/math/subpaving/fixed_interval_test.go",
+        "pkg/math/subpaving/fixed_interval_scalar.go",
+        "pkg/math/subpaving/fixed_interval_scalar_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
         "TestRationalIntervalSourceDependencyMasks",
         "TestRealClosureBinaryIntervalRetainedCore",
-        "TestSubpavingFixedMutableIntervalRetainedCore"
+        "TestSubpavingFixedMutableIntervalRetainedCore",
+        "TestSubpavingFixedIntervalScalarMulDiv"
       ],
       "conditionals": [
         {
@@ -49806,10 +49809,13 @@
       "go_targets": [
         "pkg/math/subpaving/fixed_interval.go",
         "pkg/math/subpaving/fixed_interval_arith.go",
-        "pkg/math/subpaving/fixed_interval_test.go"
+        "pkg/math/subpaving/fixed_interval_test.go",
+        "pkg/math/subpaving/fixed_interval_scalar.go",
+        "pkg/math/subpaving/fixed_interval_scalar_test.go"
       ],
       "tests": [
-        "TestSubpavingFixedMutableIntervalRetainedCore"
+        "TestSubpavingFixedMutableIntervalRetainedCore",
+        "TestSubpavingFixedIntervalScalarMulDiv"
       ],
       "conditionals": [
         {
