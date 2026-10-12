@@ -1752,6 +1752,7 @@
         "mpff_limbs.go",
         "mpff_predicates.go",
         "mpff_ref.go",
+        "mpfx_convert.go",
         "mpfx_core.go",
         "mpfx_ops.go",
         "mpn.go",

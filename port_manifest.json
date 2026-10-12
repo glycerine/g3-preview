@@ -147093,13 +147093,16 @@
         "pkg/util/numeral/mpfx_core.go",
         "pkg/util/numeral/mpfx_core_test.go",
         "pkg/util/numeral/mpfx_ops.go",
-        "pkg/util/numeral/mpfx_ops_test.go"
+        "pkg/util/numeral/mpfx_ops_test.go",
+        "pkg/util/numeral/mpfx_convert.go",
+        "pkg/util/numeral/mpfx_convert_test.go"
       ],
       "tests": [
         "TestFixedPointRetainedArithmeticAndDirectedRounding",
         "TestFixedPointRangeOwnershipAndPublication",
         "TestFixedPointRetainedFloorCeilInverseAndPower",
-        "TestFixedPointPowerAliasExtraSquareAndCeilOverflow"
+        "TestFixedPointPowerAliasExtraSquareAndCeilOverflow",
+        "TestFixedPointRetainedRationalIntegerConversionAndDisplay"
       ],
       "conditionals": [
         {
@@ -147353,14 +147356,23 @@
             "TestFixedPointRetainedFloorCeilInverseAndPower",
             "TestFixedPointPowerAliasExtraSquareAndCeilOverflow"
           ]
+        },
+        {
+          "name": "Retained subpaving mpz/mpq conversion and mpfx binary rational display: exact integer paths, fractional prior-destination sign and directed rounding, exact back-conversion (src/util/mpfx.cpp:251-315,704-743,758-787,842-854)",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpfx_convert.go",
+          "tests": [
+            "TestFixedPointRetainedRationalIntegerConversionAndDisplay"
+          ]
         }
       ],
       "ownership": [
         "FixedPointManager owns configuration and tracks live concrete numerals; each FixedPoint owns an independent signed scaled big.Int. Publication stages arithmetic before mutating destination, including aliased inputs."
       ],
       "deviations": [
-        "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. This preserves selected numerical bounds and rounding, but source pool allocation, diagnostic assertion and failure timing are not claimed. Remaining mpfx conversion, shifts, floor/ceil, power, display and complete subpaving consumer integration are open.",
-        "The source 32-bit power mask loop does not terminate after wrapping at a high-bit exponent; Go reports ErrFixedPointDomain for that input. Floor/ceil overflow leaves the Go numeral unchanged after staged calculation; source clears fractional words before detecting carry overflow."
+        "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. Selected numerical bounds and rounding are preserved, but source pool allocation, diagnostic assertion and failure timing are not claimed. Remaining mpfx shifts, specialized queries, decimal/SMT2/raw formats and complete subpaving consumer integration are open.",
+        "The source 32-bit power mask loop does not terminate after wrapping at a high-bit exponent; Go reports ErrFixedPointDomain for that input. Floor/ceil overflow leaves the Go numeral unchanged after staged calculation; source clears fractional words before detecting carry overflow.",
+        "The source noninteger mpq setter reads the existing destination sign (mpfx.cpp:285), even when the incoming rational has the opposite sign. The concrete Go setter preserves this observed branch; the integer mpq branch uses the input sign. Go conversion crosses manager owners through exact numeral text rather than copying C++ limbs."
       ]
     },
     {
@@ -147372,13 +147384,16 @@
         "pkg/util/numeral/mpfx_core.go",
         "pkg/util/numeral/mpfx_core_test.go",
         "pkg/util/numeral/mpfx_ops.go",
-        "pkg/util/numeral/mpfx_ops_test.go"
+        "pkg/util/numeral/mpfx_ops_test.go",
+        "pkg/util/numeral/mpfx_convert.go",
+        "pkg/util/numeral/mpfx_convert_test.go"
       ],
       "tests": [
         "TestFixedPointRetainedArithmeticAndDirectedRounding",
         "TestFixedPointRangeOwnershipAndPublication",
         "TestFixedPointRetainedFloorCeilInverseAndPower",
-        "TestFixedPointPowerAliasExtraSquareAndCeilOverflow"
+        "TestFixedPointPowerAliasExtraSquareAndCeilOverflow",
+        "TestFixedPointRetainedRationalIntegerConversionAndDisplay"
       ],
       "conditionals": [
         {
@@ -147410,14 +147425,23 @@
             "TestFixedPointRetainedFloorCeilInverseAndPower",
             "TestFixedPointPowerAliasExtraSquareAndCeilOverflow"
           ]
+        },
+        {
+          "name": "Retained subpaving mpz/mpq conversion and mpfx binary rational display: exact integer paths, fractional prior-destination sign and directed rounding, exact back-conversion (src/util/mpfx.cpp:251-315,704-743,758-787,842-854)",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpfx_convert.go",
+          "tests": [
+            "TestFixedPointRetainedRationalIntegerConversionAndDisplay"
+          ]
         }
       ],
       "ownership": [
         "FixedPointManager owns configuration and tracks live concrete numerals; each FixedPoint owns an independent signed scaled big.Int. Publication stages arithmetic before mutating destination, including aliased inputs."
       ],
       "deviations": [
-        "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. This preserves selected numerical bounds and rounding, but source pool allocation, diagnostic assertion and failure timing are not claimed. Remaining mpfx conversion, shifts, floor/ceil, power, display and complete subpaving consumer integration are open.",
-        "The source 32-bit power mask loop does not terminate after wrapping at a high-bit exponent; Go reports ErrFixedPointDomain for that input. Floor/ceil overflow leaves the Go numeral unchanged after staged calculation; source clears fractional words before detecting carry overflow."
+        "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. Selected numerical bounds and rounding are preserved, but source pool allocation, diagnostic assertion and failure timing are not claimed. Remaining mpfx shifts, specialized queries, decimal/SMT2/raw formats and complete subpaving consumer integration are open.",
+        "The source 32-bit power mask loop does not terminate after wrapping at a high-bit exponent; Go reports ErrFixedPointDomain for that input. Floor/ceil overflow leaves the Go numeral unchanged after staged calculation; source clears fractional words before detecting carry overflow.",
+        "The source noninteger mpq setter reads the existing destination sign (mpfx.cpp:285), even when the incoming rational has the opposite sign. The concrete Go setter preserves this observed branch; the integer mpq branch uses the input sign. Go conversion crosses manager owners through exact numeral text rather than copying C++ limbs."
       ]
     },
     {
