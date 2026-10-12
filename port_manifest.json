@@ -112146,7 +112146,7 @@
       "path": "src/util/cancel_eh.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/control/cancel_handler.go"
       ],
@@ -112165,8 +112165,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "reslimit cancellation specialization constructor/destructor",
@@ -112200,11 +112200,12 @@
         }
       ],
       "ownership": [
-        "Cold borrowed reslimit owner; explicit close once, serialized event invocation. Other specializations and OS dispatch pending. See PORT_PROGRESS.md#audit-rlimit-port-status-md."
+        "The sole retained template instantiation is cancel_eh<reslimit>. The concrete Go handler borrows its Reslimit, records only the first event caller, increments cancellation once, and decrements on explicit Close if invoked. Invoke and Close are serialized by the caller. OS dispatch and other event_handler subclasses belong to separate source units. See PORT_PROGRESS.md#audit-rlimit-port-status-md."
       ],
       "deviations": [
         "Concrete resource specialization replaces C++ template/virtual dispatch; repeated explicit close harmless."
-      ]
+      ],
+      "retained_source_audit_evidence": "A complete src search for cancel_eh<...> finds only cancel_eh<reslimit> in production callers. The entire template body (constructor, virtual destructor, one-shot operator(), canceled()) is mapped to pkg/util/control/cancel_handler.go. TestCancelHandlerSourceLifetime, TestCancelHandlerSourceNestedAndReset, TestCancelHandlerWarmNoAllocation and resource cancellation tests pass native and g3debug,g3checked on CPUs0-7. Other event_handler subclasses and OS signal/timer delivery are tracked by their own source files."
     },
     {
       "path": "src/util/chashtable.h",

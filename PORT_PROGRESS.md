@@ -39263,3 +39263,14 @@ strings from `util/messages`. All remaining `.cpp` methods were already mapped
 and audited. `util/control` and `util/messages` pass native and
 `g3debug,g3checked` tests on CPUs 0–7; the cancellation tests check both exact
 message branches. This does not change the broader util port status.
+
+### Concrete cancel handler completion
+
+`src/util/cancel_eh.h` has one retained instantiation: `cancel_eh<reslimit>`.
+The source search found no other template type in production callers. Its
+constructor, one-shot event invocation, caller ID, cancellation query, and
+destructor decrement map to `pkg/util/control/cancel_handler.go`. Focused
+handler and resource-cancellation tests pass native and `g3debug,g3checked`
+on CPUs 0–7. The source unit is whole-ported with a concrete type; the
+polymorphic `event_handler.h` and OS timer/signal delivery remain separate
+partial work.
