@@ -113935,11 +113935,11 @@
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
         "TestGlobalParamsCatalogDispatcherFaultRoots"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "collect_param_descrs five ordered environment descriptors",
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams_catalog_collectors.go",
           "tests": [
@@ -113949,10 +113949,15 @@
             "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ]
+        },
+        {
+          "name": "updt_params borrowed global params, then verbosity, warning, memory size, allocation count and watermark updates in source order; direct caller src/shell/main.cpp:297 remains unported",
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Runtime updt_params borrows gparams::get_ref and owns no independent storage; its only direct source caller is the unported shell entry point. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
       ],
       "deviations": []
     },
@@ -113984,11 +113989,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "collect_param_descrs five ordered environment descriptors",
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams_catalog_collectors.go",
           "tests": [
@@ -113998,10 +114003,15 @@
             "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
             "TestGlobalParamsCatalogDispatcherFaultRoots"
           ]
+        },
+        {
+          "name": "updt_params borrowed global params, then verbosity, warning, memory size, allocation count and watermark updates in source order; direct caller src/shell/main.cpp:297 remains unported",
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Descriptor collection uses the owning catalog with borrowed description bytes; all 458 ordered metadata rows are independently checked. Runtime updt_params borrows gparams::get_ref and owns no independent storage; its only direct source caller is the unported shell entry point. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md."
       ],
       "deviations": []
     },

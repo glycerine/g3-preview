@@ -39390,3 +39390,15 @@ for source inspection. This does not change the status of `mpf`, `mpff`, or
 other floating-point implementations that still have live consumers. No
 generic Go hardware-float or float-to-numeral wrapper was added. Source
 portcheck validates the dispositions on CPUs 8–16.
+
+### Environment parameter runtime boundary
+
+`src/util/env_params.h/.cpp` has exactly two static operations. The five
+ordered `collect_param_descrs` entries already live in the concrete Go
+catalog. The remaining `updt_params` reads a borrowed global `params_ref`,
+then writes verbosity, warning enablement, maximum memory size, maximum
+allocation count, and high watermark in that order. Its only direct source
+caller is `src/shell/main.cpp:297`, which is still unported. Both units remain
+partial with that runtime operation recorded explicitly. This audit avoids a
+detached process-global adapter while the shell entry point is absent;
+existing catalog tests and source portcheck cover the implemented boundary.
