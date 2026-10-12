@@ -238,100 +238,139 @@ func TestLPIndexedRationalVectorExactSparseOracle(t *testing.T) {
 }
 
 func TestLPIndexedRationalVectorAllocationFailureCensus(t *testing.T) {
-	for _, op := range []string{"set", "assign", "clone", "add", "drop"} {
-		failures, successes := 0, 0
-		for fail := int64(0); fail < 80; fail++ {
-			done := false
-			t.Run(fmt.Sprintf("%s/%d", op, fail), func(t *testing.T) {
-				h := newLPPairHarness(t)
-				p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
-				other := h.pair(strings.Repeat("7654321090", 100)+"/13", strings.Repeat("3456789012", 100)+"/17")
-				v := NewIndexedRationalVector(h.m, 2)
-				src := NewIndexedRationalVector(h.m, 2)
-				h.must(src.SetValue(&p.X, 0))
-				if op == "add" || op == "drop" {
-					h.must(v.SetValue(&other.X, 0))
-				}
+	for _, direct := range []bool{false, true} {
+		for _, op := range []string{"set", "assign", "clone", "add", "drop"} {
+			failures, successes := 0, 0
+			for fail := int64(0); fail < 1200; fail++ {
+				done := false
+				t.Run(fmt.Sprintf("%s/direct=%t/%d", op, direct, fail), func(t *testing.T) {
+					var h *lpPairHarness
+					if direct {
+						h = lpNewDirectSparseHarness(t)
+					} else {
+						h = newLPPairHarness(t)
+					}
+					p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
+					other := h.pair(strings.Repeat("7654321090", 100)+"/13", strings.Repeat("3456789012", 100)+"/17")
+					v := NewIndexedRationalVector(h.m, 2)
+					src := NewIndexedRationalVector(h.m, 2)
+					h.must(src.SetValue(&p.X, 0))
+					// Clone owns hidden dense cells; Assign copies only indexed cells.
+					h.must(h.m.Copy(&src.Data[1], &other.X))
+					if op == "add" || op == "drop" {
+						h.must(v.SetValue(&other.X, 0))
+					}
 
-				h.budget.FailAfter(fail)
-				var err error
-				var cloned *IndexedRationalVector
-				switch op {
-				case "set":
-					err = v.SetValue(&p.X, 0)
-				case "assign":
-					err = v.Assign(src)
-				case "clone":
-					cloned, err = src.Clone()
-				case "add":
-					err = v.Add(0, &p.X)
-				case "drop":
-					err = v.AddWithDropTolerance(0, &p.X)
-				}
-				h.budget.FailAfter(-1)
-				if err == nil {
-					successes++
-					done = true
-				} else {
-					failures++
-				}
-				pending := v.calls.pending()
-				if op == "clone" {
-					pending = cloned.calls.pending()
-				}
-				if pending {
-					target := v
+					h.budget.FailAfter(fail)
+					var err error
+					var cloned *IndexedRationalVector
+					switch op {
+					case "set":
+						err = v.SetValue(&p.X, 0)
+					case "assign":
+						err = v.Assign(src)
+					case "clone":
+						cloned, err = src.Clone()
+					case "add":
+						err = v.Add(0, &p.X)
+					case "drop":
+						err = v.AddWithDropTolerance(0, &p.X)
+					}
+					h.budget.FailAfter(-1)
+					if err == nil {
+						successes++
+						done = true
+						target := v
+						if cloned != nil {
+							target = cloned
+						}
+						px, _ := new(big.Rat).SetString(strings.Repeat("1234567890", 100) + "/7")
+						ox, _ := new(big.Rat).SetString(strings.Repeat("7654321090", 100) + "/13")
+						if op == "add" || op == "drop" {
+							px.Add(px, ox)
+						}
+
+						lpSparseRationalCheck(t, h, &target.Data[0], px)
+						hidden := new(big.Rat)
+						if op == "clone" {
+							hidden.Set(ox)
+						}
+						lpSparseRationalCheck(t, h, &target.Data[1], hidden)
+
+						if !reflect.DeepEqual(target.Index, []uint32{0}) {
+							t.Fatal("success index", target.Index)
+						}
+
+					} else {
+						if !lpExactPriorityPhysicalRefusal(err) {
+							t.Fatal(err)
+						}
+						failures++
+					}
+					pending := v.calls.pending()
 					if op == "clone" {
-						target = cloned
+						pending = cloned.calls.pending()
 					}
-					if err := target.Add(0, &p.X); err != ErrExactVectorPending {
-						t.Fatal(err)
+					if pending {
+						target := v
+						if op == "clone" {
+							target = cloned
+						}
+						if err := target.Add(0, &p.X); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.AddWithDropTolerance(0, &p.X); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.Clear(); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.ClearAll(); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.CleanUp(); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.RestoreIndex(); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.Assign(src); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.SetValue(&p.X, 0); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
 					}
-					if err := target.AddWithDropTolerance(0, &p.X); err != ErrExactVectorPending {
-						t.Fatal(err)
+					if cloned != nil {
+						h.must(cloned.Close())
 					}
-					if err := target.Clear(); err != ErrExactVectorPending {
-						t.Fatal(err)
+					h.must(v.Close())
+					var extra []*numeral.Rational
+					for i := range src.Data {
+						extra = append(extra, &src.Data[i])
 					}
-					if err := target.ClearAll(); err != ErrExactVectorPending {
-						t.Fatal(err)
-					}
-					if err := target.CleanUp(); err != ErrExactVectorPending {
-						t.Fatal(err)
-					}
-					if err := target.RestoreIndex(); err != ErrExactVectorPending {
-						t.Fatal(err)
-					}
-					if err := target.Assign(src); err != ErrExactVectorPending {
-						t.Fatal(err)
-					}
-					if err := target.SetValue(&p.X, 0); err != ErrExactVectorPending {
-						t.Fatal(err)
-					}
-				}
-				if cloned != nil {
-					h.must(cloned.Close())
-				}
-				h.must(v.Close())
-				var extra []*numeral.Rational
-				for i := range src.Data {
-					extra = append(extra, &src.Data[i])
-				}
-				lpExactVectorNamedCensus(t, h, extra)
+					lpExactVectorNamedCensus(t, h, extra)
 
-				// Source raw manager scratch may have retained physical capacity; ensure
-				// invocation metadata itself and concrete vector copies have been consumed.
-				if state := h.m.RawInvocationState(); state.Active != [3]bool{} {
-					t.Fatal("raw invocation retained", state)
+					// Source raw manager scratch may have retained physical capacity; ensure
+					// invocation metadata itself and concrete vector copies have been consumed.
+					if state := h.m.RawInvocationState(); state.Active != [3]bool{} {
+						t.Fatal("raw invocation retained", state)
+					}
+
+					px, _ := new(big.Rat).SetString(strings.Repeat("1234567890", 100) + "/7")
+
+					lpSparseRationalCheck(t, h, &src.Data[0], px)
+
+					h.must(src.Close())
+					lpExactVectorNamedCensus(t, h, nil)
+				})
+				if done {
+					break
 				}
-				h.must(src.Close())
-			})
-			if done {
-				break
 			}
-		}
-		if failures == 0 || successes != 1 {
-			t.Fatal("incomplete fault campaign", op, failures, successes)
+			if failures == 0 || successes != 1 {
+				t.Fatal("incomplete fault campaign", op, failures, successes)
+			}
 		}
 	}
 }
@@ -564,100 +603,144 @@ func TestLPIndexedPairVectorExactSparseOracle(t *testing.T) {
 }
 
 func TestLPIndexedPairVectorAllocationFailureCensus(t *testing.T) {
-	for _, op := range []string{"set", "assign", "clone", "add", "drop"} {
-		failures, successes := 0, 0
-		for fail := int64(0); fail < 80; fail++ {
-			done := false
-			t.Run(fmt.Sprintf("%s/%d", op, fail), func(t *testing.T) {
-				h := newLPPairHarness(t)
-				p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
-				other := h.pair(strings.Repeat("7654321090", 100)+"/13", strings.Repeat("3456789012", 100)+"/17")
-				v := NewIndexedPairVector(h.m, 2)
-				src := NewIndexedPairVector(h.m, 2)
-				h.must(src.SetValue(p, 0))
-				if op == "add" || op == "drop" {
-					h.must(v.SetValue(other, 0))
-				}
+	for _, direct := range []bool{false, true} {
+		for _, op := range []string{"set", "assign", "clone", "add", "drop"} {
+			failures, successes := 0, 0
+			for fail := int64(0); fail < 1200; fail++ {
+				done := false
+				t.Run(fmt.Sprintf("%s/direct=%t/%d", op, direct, fail), func(t *testing.T) {
+					var h *lpPairHarness
+					if direct {
+						h = lpNewDirectSparseHarness(t)
+					} else {
+						h = newLPPairHarness(t)
+					}
+					p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
+					other := h.pair(strings.Repeat("7654321090", 100)+"/13", strings.Repeat("3456789012", 100)+"/17")
+					v := NewIndexedPairVector(h.m, 2)
+					src := NewIndexedPairVector(h.m, 2)
+					h.must(src.SetValue(p, 0))
+					// Clone owns hidden dense cells; Assign copies only indexed cells.
+					h.must(src.Data[1].Copy(h.m, other))
+					if op == "add" || op == "drop" {
+						h.must(v.SetValue(other, 0))
+					}
 
-				h.budget.FailAfter(fail)
-				var err error
-				var cloned *IndexedPairVector
-				switch op {
-				case "set":
-					err = v.SetValue(p, 0)
-				case "assign":
-					err = v.Assign(src)
-				case "clone":
-					cloned, err = src.Clone()
-				case "add":
-					err = v.Add(0, p)
-				case "drop":
-					err = v.AddWithDropTolerance(0, p)
-				}
-				h.budget.FailAfter(-1)
-				if err == nil {
-					successes++
-					done = true
-				} else {
-					failures++
-				}
-				pending := v.calls.pending()
-				if op == "clone" {
-					pending = cloned.calls.pending()
-				}
-				if pending {
-					target := v
+					h.budget.FailAfter(fail)
+					var err error
+					var cloned *IndexedPairVector
+					switch op {
+					case "set":
+						err = v.SetValue(p, 0)
+					case "assign":
+						err = v.Assign(src)
+					case "clone":
+						cloned, err = src.Clone()
+					case "add":
+						err = v.Add(0, p)
+					case "drop":
+						err = v.AddWithDropTolerance(0, p)
+					}
+					h.budget.FailAfter(-1)
+					if err == nil {
+						successes++
+						done = true
+						target := v
+						if cloned != nil {
+							target = cloned
+						}
+						px, _ := new(big.Rat).SetString(strings.Repeat("1234567890", 100) + "/7")
+						py, _ := new(big.Rat).SetString(strings.Repeat("9876543210", 100) + "/11")
+						ox, _ := new(big.Rat).SetString(strings.Repeat("7654321090", 100) + "/13")
+						oy, _ := new(big.Rat).SetString(strings.Repeat("3456789012", 100) + "/17")
+						if op == "add" || op == "drop" {
+							px.Add(px, ox)
+							py.Add(py, oy)
+						}
+
+						h.check(&target.Data[0], px, py)
+						hiddenX, hiddenY := new(big.Rat), new(big.Rat)
+						if op == "clone" {
+							hiddenX.Set(ox)
+							hiddenY.Set(oy)
+						}
+						h.check(&target.Data[1], hiddenX, hiddenY)
+
+						if !reflect.DeepEqual(target.Index, []uint32{0}) {
+							t.Fatal("success index", target.Index)
+						}
+
+					} else {
+						if !lpExactPriorityPhysicalRefusal(err) {
+							t.Fatal(err)
+						}
+						failures++
+					}
+					pending := v.calls.pending()
 					if op == "clone" {
-						target = cloned
+						pending = cloned.calls.pending()
 					}
-					if err := target.Add(0, p); err != ErrExactVectorPending {
-						t.Fatal(err)
+					if pending {
+						target := v
+						if op == "clone" {
+							target = cloned
+						}
+						if err := target.Add(0, p); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.AddWithDropTolerance(0, p); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.Clear(); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.ClearAll(); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.CleanUp(); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.RestoreIndex(); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.Assign(src); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
+						if err := target.SetValue(p, 0); err != ErrExactVectorPending {
+							t.Fatal(err)
+						}
 					}
-					if err := target.AddWithDropTolerance(0, p); err != ErrExactVectorPending {
-						t.Fatal(err)
+					if cloned != nil {
+						h.must(cloned.Close())
 					}
-					if err := target.Clear(); err != ErrExactVectorPending {
-						t.Fatal(err)
+					h.must(v.Close())
+					var extra []*numeral.Rational
+					for i := range src.Data {
+						extra = append(extra, &src.Data[i].X, &src.Data[i].Y)
 					}
-					if err := target.ClearAll(); err != ErrExactVectorPending {
-						t.Fatal(err)
-					}
-					if err := target.CleanUp(); err != ErrExactVectorPending {
-						t.Fatal(err)
-					}
-					if err := target.RestoreIndex(); err != ErrExactVectorPending {
-						t.Fatal(err)
-					}
-					if err := target.Assign(src); err != ErrExactVectorPending {
-						t.Fatal(err)
-					}
-					if err := target.SetValue(p, 0); err != ErrExactVectorPending {
-						t.Fatal(err)
-					}
-				}
-				if cloned != nil {
-					h.must(cloned.Close())
-				}
-				h.must(v.Close())
-				var extra []*numeral.Rational
-				for i := range src.Data {
-					extra = append(extra, &src.Data[i].X, &src.Data[i].Y)
-				}
-				lpExactVectorNamedCensus(t, h, extra)
+					lpExactVectorNamedCensus(t, h, extra)
 
-				// Source raw manager scratch may have retained physical capacity; ensure
-				// invocation metadata itself and concrete vector copies have been consumed.
-				if state := h.m.RawInvocationState(); state.Active != [3]bool{} {
-					t.Fatal("raw invocation retained", state)
+					// Source raw manager scratch may have retained physical capacity; ensure
+					// invocation metadata itself and concrete vector copies have been consumed.
+					if state := h.m.RawInvocationState(); state.Active != [3]bool{} {
+						t.Fatal("raw invocation retained", state)
+					}
+
+					px, _ := new(big.Rat).SetString(strings.Repeat("1234567890", 100) + "/7")
+
+					py, _ := new(big.Rat).SetString(strings.Repeat("9876543210", 100) + "/11")
+					h.check(&src.Data[0], px, py)
+
+					h.must(src.Close())
+					lpExactVectorNamedCensus(t, h, nil)
+				})
+				if done {
+					break
 				}
-				h.must(src.Close())
-			})
-			if done {
-				break
 			}
-		}
-		if failures == 0 || successes != 1 {
-			t.Fatal("incomplete fault campaign", op, failures, successes)
+			if failures == 0 || successes != 1 {
+				t.Fatal("incomplete fault campaign", op, failures, successes)
+			}
 		}
 	}
 }
@@ -888,5 +971,49 @@ func TestLPIndexedExactVectorNormalizationFailureOwnership(t *testing.T) {
 	}
 	if integerReceipts == 0 {
 		t.Fatal("no actual integer normalization receipt")
+	}
+}
+
+func TestLPIndexedExactVectorShrinkHiddenOwners(t *testing.T) {
+	for _, direct := range []bool{false, true} {
+		t.Run(fmt.Sprint(direct), func(t *testing.T) {
+			var h *lpPairHarness
+			if direct {
+				h = lpNewDirectSparseHarness(t)
+			} else {
+				h = newLPPairHarness(t)
+			}
+			xText := strings.Repeat("1234567890", 30) + "/7"
+			yText := strings.Repeat("9876543210", 30) + "/13"
+			p := h.pair(xText, yText)
+			x, _ := new(big.Rat).SetString(xText)
+			y, _ := new(big.Rat).SetString(yText)
+			v := NewIndexedRationalVector(h.m, 5)
+			pv := NewIndexedPairVector(h.m, 5)
+			for i := range v.Data {
+				h.must(h.m.Copy(&v.Data[i], &p.X))
+				h.must(pv.Data[i].Copy(h.m, p))
+			}
+			// Only slot2 is indexed: shrink must release hidden slots3 and4,
+			// preserving independently owned hidden slots0 and1.
+			v.Index, pv.Index = []uint32{2}, []uint32{2}
+			h.must(v.Resize(2))
+			h.must(pv.Resize(2))
+			h.must(p.Del(h.m))
+			var roots []*numeral.Rational
+			for i := range v.Data {
+				lpSparseRationalCheck(t, h, &v.Data[i], x)
+				h.check(&pv.Data[i], x, y)
+				roots = append(roots, &v.Data[i], &pv.Data[i].X, &pv.Data[i].Y)
+			}
+			lpExactVectorNamedCensus(t, h, roots)
+			h.must(v.Resize(3))
+			h.must(pv.Resize(3))
+			lpSparseRationalCheck(t, h, &v.Data[2], new(big.Rat))
+			h.check(&pv.Data[2], new(big.Rat), new(big.Rat))
+			h.must(v.Close())
+			h.must(pv.Close())
+			lpExactVectorNamedCensus(t, h, nil)
+		})
 	}
 }

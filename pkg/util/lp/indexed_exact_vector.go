@@ -67,13 +67,16 @@ func (v *IndexedRationalVector) ClearAll() error {
 	return nil
 }
 func (v *IndexedRationalVector) resizeData(size uint32) error {
-	for uint64(len(v.Data)) > uint64(size) {
-		last := len(v.Data) - 1
-		loc := &v.Data[last]
-		if err := v.manager.Del(loc); err != nil {
-			return err
+	// The source destroys removed coefficients from the new end forward,
+	// publishing the shorter extent only after all destructors finish.
+	if uint64(size) < uint64(len(v.Data)) {
+		for i := size; uint64(i) < uint64(len(v.Data)); i++ {
+			if err := v.manager.Del(&v.Data[i]); err != nil {
+				return err
+			}
+			v.Data[i] = numeral.NewRational()
 		}
-		v.Data = v.Data[:last]
+		v.Data = v.Data[:size]
 	}
 	for uint64(len(v.Data)) < uint64(size) {
 		v.Data = append(v.Data, numeral.NewRational())
@@ -351,13 +354,14 @@ func (v *IndexedPairVector) ClearAll() error {
 	return nil
 }
 func (v *IndexedPairVector) resizeData(size uint32) error {
-	for uint64(len(v.Data)) > uint64(size) {
-		last := len(v.Data) - 1
-		loc := &v.Data[last]
-		if err := loc.Del(v.manager); err != nil {
-			return err
+	if uint64(size) < uint64(len(v.Data)) {
+		for i := size; uint64(i) < uint64(len(v.Data)); i++ {
+			if err := v.Data[i].Del(v.manager); err != nil {
+				return err
+			}
+			v.Data[i] = NewRationalPair()
 		}
-		v.Data = v.Data[:last]
+		v.Data = v.Data[:size]
 	}
 	for uint64(len(v.Data)) < uint64(size) {
 		v.Data = append(v.Data, NewRationalPair())

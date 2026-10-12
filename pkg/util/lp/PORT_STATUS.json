@@ -1174,7 +1174,19 @@
         "TestLPIndexedPairVectorAllocationFailureCensus",
         "TestLPIndexedRationalVectorOlderRawInvocationIdentity",
         "TestLPIndexedPairVectorOlderRawInvocationIdentity",
-        "TestLPIndexedExactVectorNormalizationFailureOwnership"
+        "TestLPIndexedExactVectorNormalizationFailureOwnership",
+        "TestLPIndexedExactVectorShrinkHiddenOwners"
+      ],
+      "retained_increment_evidence": "Retained indexed-vector audit increment: removed dead floating dictionary/equality adapters and unsigned Assign/Equal/ClearAll/dictionary/erase/add/drop/cleanup/restore helpers. Unsigned LU markers retain only construction, data/index access, clear, resize, set and unconditional debug IsOK. Source scans show set_value_as_in_dictionary only at its definition; indexed equality has no retained caller. Updated native tests to use retained set operations and an independent1000-world ordered marker-union oracle. Expanded rational/pair set/assign/clone/add/drop physical failure campaigns to pooled/direct allocation,20total, with independent big.Rat success values, exact index, unchanged borrowed source after cleanup, named root census, no orphan raw frames and pending guards. Corrected exact shrink to destroy removed coefficients forward from new end and publish shorter length after all releases; fresh cells replace deleted values. Added pooled/direct hidden-owner shrink/grow test. Whole indexed units remain partial pending the distinction between actual source vector forward destruction and lexical scratch owners that currently share the indexed holder, and remaining exact template-root review.",
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "set_value_as_in_dictionary",
+            "operator==",
+            "unused unsigned vector operations"
+          ],
+          "reason": "No retained callers; source unsigned m_ii in LU refinement uses only clear/resize/set and public data/index reads. Removed dead Go adapters and mirror checks."
+        }
       ]
     },
     {
@@ -1201,7 +1213,19 @@
         "TestLPIndexedPairVectorAllocationFailureCensus",
         "TestLPIndexedRationalVectorOlderRawInvocationIdentity",
         "TestLPIndexedPairVectorOlderRawInvocationIdentity",
-        "TestLPIndexedExactVectorNormalizationFailureOwnership"
+        "TestLPIndexedExactVectorNormalizationFailureOwnership",
+        "TestLPIndexedExactVectorShrinkHiddenOwners"
+      ],
+      "retained_increment_evidence": "Retained indexed-vector audit increment: removed dead floating dictionary/equality adapters and unsigned Assign/Equal/ClearAll/dictionary/erase/add/drop/cleanup/restore helpers. Unsigned LU markers retain only construction, data/index access, clear, resize, set and unconditional debug IsOK. Source scans show set_value_as_in_dictionary only at its definition; indexed equality has no retained caller. Updated native tests to use retained set operations and an independent1000-world ordered marker-union oracle. Expanded rational/pair set/assign/clone/add/drop physical failure campaigns to pooled/direct allocation,20total, with independent big.Rat success values, exact index, unchanged borrowed source after cleanup, named root census, no orphan raw frames and pending guards. Corrected exact shrink to destroy removed coefficients forward from new end and publish shorter length after all releases; fresh cells replace deleted values. Added pooled/direct hidden-owner shrink/grow test. Whole indexed units remain partial pending the distinction between actual source vector forward destruction and lexical scratch owners that currently share the indexed holder, and remaining exact template-root review.",
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "set_value_as_in_dictionary",
+            "operator==",
+            "unused unsigned vector operations"
+          ],
+          "reason": "No retained callers; source unsigned m_ii in LU refinement uses only clear/resize/set and public data/index reads. Removed dead Go adapters and mirror checks."
+        }
       ]
     },
     {
@@ -1228,7 +1252,19 @@
         "TestLPIndexedPairVectorAllocationFailureCensus",
         "TestLPIndexedRationalVectorOlderRawInvocationIdentity",
         "TestLPIndexedPairVectorOlderRawInvocationIdentity",
-        "TestLPIndexedExactVectorNormalizationFailureOwnership"
+        "TestLPIndexedExactVectorNormalizationFailureOwnership",
+        "TestLPIndexedExactVectorShrinkHiddenOwners"
+      ],
+      "retained_increment_evidence": "Retained indexed-vector audit increment: removed dead floating dictionary/equality adapters and unsigned Assign/Equal/ClearAll/dictionary/erase/add/drop/cleanup/restore helpers. Unsigned LU markers retain only construction, data/index access, clear, resize, set and unconditional debug IsOK. Source scans show set_value_as_in_dictionary only at its definition; indexed equality has no retained caller. Updated native tests to use retained set operations and an independent1000-world ordered marker-union oracle. Expanded rational/pair set/assign/clone/add/drop physical failure campaigns to pooled/direct allocation,20total, with independent big.Rat success values, exact index, unchanged borrowed source after cleanup, named root census, no orphan raw frames and pending guards. Corrected exact shrink to destroy removed coefficients forward from new end and publish shorter length after all releases; fresh cells replace deleted values. Added pooled/direct hidden-owner shrink/grow test. Whole indexed units remain partial pending the distinction between actual source vector forward destruction and lexical scratch owners that currently share the indexed holder, and remaining exact template-root review.",
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "set_value_as_in_dictionary",
+            "operator==",
+            "unused unsigned vector operations"
+          ],
+          "reason": "No retained callers; source unsigned m_ii in LU refinement uses only clear/resize/set and public data/index reads. Removed dead Go adapters and mirror checks."
+        }
       ]
     },
     {
@@ -14342,5 +14378,79 @@
     ],
     "coverage_qualification": "Uncovered statements primarily guard malformed permutations/bounds and stable delegated numeric/destructor errors. Native source debug bodies are erased; source-internal row/column product precondition checks are not reached through ordinary callers. No complete statement-coverage claim or synthetic failure adapters.",
     "verification": "Native/combined focused dense groups and actual LU factorization/replacement/debug consumers, both LP vets, all64package compile gates and source portcheck pass:2103units/677APIs,123ported/317partial/1620unported/5dead_deleted."
+  },
+  "latest_indexed_vector_retained_increment": {
+    "scope": "Retained indexed-vector audit increment: removed dead floating dictionary/equality adapters and unsigned Assign/Equal/ClearAll/dictionary/erase/add/drop/cleanup/restore helpers. Unsigned LU markers retain only construction, data/index access, clear, resize, set and unconditional debug IsOK. Source scans show set_value_as_in_dictionary only at its definition; indexed equality has no retained caller. Updated native tests to use retained set operations and an independent1000-world ordered marker-union oracle. Expanded rational/pair set/assign/clone/add/drop physical failure campaigns to pooled/direct allocation,20total, with independent big.Rat success values, exact index, hidden dense Clone copies versus indexed-only Assign, unchanged borrowed source after cleanup, named root census, no orphan raw frames and pending guards. Corrected exact shrink to destroy removed coefficients forward from new end and publish shorter length after all releases; fresh cells replace deleted values. Added pooled/direct hidden-owner shrink/grow test. Whole indexed units remain partial pending the distinction between actual source vector forward destruction and lexical scratch owners that currently share the indexed holder, and remaining exact template-root review.",
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "source_audits": [
+      "/mnt/oldrog/tmp/g3-lp-indexed-vector-consumers-audit.txt",
+      "/mnt/oldrog/tmp/g3-lp-indexed-vector-method-consumers-audit.txt",
+      "/mnt/oldrog/tmp/g3-lp-indexed-vector-global-types-audit.txt"
+    ],
+    "source_shrink_evidence": "src/util/vector.h:389-405 releases removed elements forward, updates size after loop. This informs numeral ownership order only; no source container/STL implementation port.",
+    "full_suite_qualification": "Full3516687c timed out and predates current changes; last completed8f2961ca predates recent fixes. No current full-suite result/coverage credit.",
+    "focused_native_seconds": 25.532,
+    "focused_combined_seconds": 33.225,
+    "pair_printer_native_seconds": 0.496,
+    "pair_printer_combined_seconds": 0.867,
+    "whole_go_file_focused_covered_total": {
+      "native": {
+        "indexed_exact_vector.go": [
+          306,
+          340
+        ],
+        "indexed_vector.go": [
+          110,
+          112
+        ]
+      },
+      "debug": {
+        "indexed_exact_vector.go": [
+          306,
+          340
+        ],
+        "indexed_vector.go": [
+          110,
+          112
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-indexed-vector-final-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-indexed-vector-final-debug.cover"
+    ],
+    "coverage_qualification": "Exact uncovered returns are mostly guard stable delegated numeric/destructor failures and invariant protected branches. Native indexed storage110/112 and debug110/112; two uncovered returns are erased or bypassed duplicate-assertion fallthrough. No synthetic failure or complete exact coverage claim.",
+    "dense_sparse_consumer_tests_native_seconds": 7.023,
+    "dense_sparse_consumer_tests_combined_seconds": 9.458,
+    "verification": "Native/combined indexed vector and LU refinement groups, dense/sparse consumer groups, retained pair printer tests, both LP vets, all64package compile gates and source portcheck pass:2103units/677APIs,123ported/317partial/1620unported/5dead_deleted.",
+    "final_indexed_combined_seconds": 22.514,
+    "final_whole_go_file_focused_covered_total": {
+      "native": {
+        "indexed_exact_vector.go": [
+          306,
+          340
+        ],
+        "indexed_vector.go": [
+          110,
+          112
+        ]
+      },
+      "debug": {
+        "indexed_exact_vector.go": [
+          306,
+          340
+        ],
+        "indexed_vector.go": [
+          110,
+          112
+        ]
+      }
+    },
+    "final_profiles": [
+      "/mnt/oldrog/tmp/g3-lp-indexed-vector-final-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-indexed-vector-final-debug.cover"
+    ],
+    "final_indexed_native_seconds": 21.371
   }
 }

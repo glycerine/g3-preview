@@ -60,28 +60,6 @@ func (v *IndexedFloatVector) Assign(y *IndexedFloatVector) error {
 	return nil
 }
 
-// Equal deliberately preserves source operator==: it compares the sets of
-// indexes, then m_data with itself. Other data values and extents are ignored.
-func (v *IndexedFloatVector) Equal(y *IndexedFloatVector) bool {
-	theirs, ours := make(map[uint32]bool, len(y.Index)), make(map[uint32]bool, len(v.Index))
-	for _, i := range y.Index {
-		theirs[i] = true
-	}
-	for _, i := range v.Index {
-		ours[i] = true
-	}
-	for _, i := range y.Index {
-		if !ours[i] {
-			return false
-		}
-	}
-	for _, i := range v.Index {
-		if !theirs[i] {
-			return false
-		}
-	}
-	return true
-}
 func (v *IndexedFloatVector) SetValue(value float64, index uint32) error {
 	if uint64(index) >= uint64(len(v.Data)) {
 		return ErrBounds
@@ -96,16 +74,6 @@ func (v *IndexedFloatVector) SetValue(value float64, index uint32) error {
 		}
 	}
 	v.Index = append(v.Index, index)
-	return nil
-}
-func (v *IndexedFloatVector) SetAsDictionary(index uint32) error {
-	if uint64(index) >= uint64(len(v.Data)) {
-		return ErrBounds
-	}
-	if v.Data[index] == 0 {
-		v.Index = append(v.Index, index)
-		v.Data[index] = 1
-	}
 	return nil
 }
 func (v *IndexedFloatVector) EraseFromIndex(j uint32) {
@@ -180,9 +148,9 @@ func (v *IndexedFloatVector) RestoreIndex() {
 // IsOK preserves the upstream debug body, whose first statement returns true.
 func (v *IndexedFloatVector) IsOK() bool { return true }
 
-// IndexedUintVector has the source public dense data and ordered sparse index.
-// Matrix algorithms may edit Data and Index directly; RestoreIndex rebuilds the
-// index from data. Zero value is empty. Do not shallow-copy after first use.
+// IndexedUintVector stores the unsigned markers used by LU row refinement.
+// The retained source uses clear, resize, set_value and public data/index reads.
+// Zero value is empty. Do not shallow-copy after first use.
 type IndexedUintVector struct {
 	Data  []uint32
 	Index []uint32
@@ -203,7 +171,6 @@ func (v *IndexedUintVector) Clear() error {
 	v.Index = v.Index[:0]
 	return nil
 }
-func (v *IndexedUintVector) ClearAll() { clear(v.Data); v.Index = v.Index[:0] }
 func (v *IndexedUintVector) Resize(size uint32) error {
 	if err := v.Clear(); err != nil {
 		return err
@@ -214,52 +181,6 @@ func (v *IndexedUintVector) Resize(size uint32) error {
 		v.Data = append(v.Data, make([]uint32, int(size)-len(v.Data))...)
 	}
 	return nil
-}
-func (v *IndexedUintVector) Assign(y *IndexedUintVector) error {
-	// Source clears old indexed data before reading y, including self assignment.
-	for _, i := range v.Index {
-		if uint64(i) >= uint64(len(v.Data)) {
-			return ErrBounds
-		}
-		v.Data[i] = 0
-	}
-	v.Index = append(v.Index[:0], y.Index...)
-	n := len(y.Data)
-	if n <= len(v.Data) {
-		v.Data = v.Data[:n]
-	} else {
-		v.Data = append(v.Data, make([]uint32, n-len(v.Data))...)
-	}
-	for _, i := range v.Index {
-		if uint64(i) >= uint64(n) {
-			return ErrBounds
-		}
-		v.Data[i] = y.Data[i]
-	}
-	return nil
-}
-
-// Equal deliberately preserves source operator==: it compares the sets of
-// indexes, then m_data with itself. Other data values and extents are ignored.
-func (v *IndexedUintVector) Equal(y *IndexedUintVector) bool {
-	theirs, ours := make(map[uint32]bool, len(y.Index)), make(map[uint32]bool, len(v.Index))
-	for _, i := range y.Index {
-		theirs[i] = true
-	}
-	for _, i := range v.Index {
-		ours[i] = true
-	}
-	for _, i := range y.Index {
-		if !ours[i] {
-			return false
-		}
-	}
-	for _, i := range v.Index {
-		if !theirs[i] {
-			return false
-		}
-	}
-	return true
 }
 func (v *IndexedUintVector) SetValue(value uint32, index uint32) error {
 	if uint64(index) >= uint64(len(v.Data)) {
@@ -276,82 +197,6 @@ func (v *IndexedUintVector) SetValue(value uint32, index uint32) error {
 	}
 	v.Index = append(v.Index, index)
 	return nil
-}
-func (v *IndexedUintVector) SetAsDictionary(index uint32) error {
-	if uint64(index) >= uint64(len(v.Data)) {
-		return ErrBounds
-	}
-	if v.Data[index] == 0 {
-		v.Index = append(v.Index, index)
-		v.Data[index] = 1
-	}
-	return nil
-}
-func (v *IndexedUintVector) EraseFromIndex(j uint32) {
-	for k, i := range v.Index {
-		if i == j {
-			copy(v.Index[k:], v.Index[k+1:])
-			v.Index = v.Index[:len(v.Index)-1]
-			return
-		}
-	}
-}
-func (v *IndexedUintVector) Add(j uint32, value uint32) error {
-	if uint64(j) >= uint64(len(v.Data)) {
-		return ErrBounds
-	}
-	wasZero := v.Data[j] == 0
-	v.Data[j] += value
-	if v.Data[j] == 0 {
-		if !wasZero {
-			v.EraseFromIndex(j)
-		}
-	} else if wasZero {
-		v.Index = append(v.Index, j)
-	}
-	return nil
-}
-func (v *IndexedUintVector) AddWithDropTolerance(j uint32, value uint32) error {
-	if uint64(j) >= uint64(len(v.Data)) {
-		return ErrBounds
-	}
-	wasZero := v.Data[j] == 0
-	v.Data[j] += value
-	x := v.Data[j]
-	if indexedUintSmall(x) {
-		v.Data[j] = 0
-		if !wasZero {
-			v.EraseFromIndex(j)
-		}
-	} else if wasZero {
-		v.Index = append(v.Index, j)
-	}
-	return nil
-}
-func indexedUintSmall(v uint32) bool { return v == 0 }
-func (v *IndexedUintVector) CleanUp() error {
-	var indexCopy []uint32
-	for _, i := range v.Index {
-		if uint64(i) >= uint64(len(v.Data)) {
-			return ErrBounds
-		}
-		x := v.Data[i]
-		if !indexedUintSmall(x) {
-			indexCopy = append(indexCopy, i)
-		}
-	}
-	v.Index = indexCopy
-	return nil
-}
-func (v *IndexedUintVector) RestoreIndex() {
-	v.Index = v.Index[:0]
-	for i, x := range v.Data {
-		if indexedUintSmall(x) {
-			v.Data[i] = 0
-		} else {
-			v.Index = append(v.Index, uint32(i))
-		}
-	}
 }
 
 // IsOK preserves the upstream debug body, whose first statement returns true.
