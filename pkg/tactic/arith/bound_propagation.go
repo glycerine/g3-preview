@@ -93,7 +93,7 @@ func (s *BoundEquationStore) propagateExact(index uint32, position int, lower bo
 	if err = s.manager.DivInt(&k, &eq.as[position], &k); err != nil {
 		return false, err
 	}
-	return s.assertBound(eq.xs[position], &k, strict, lower, true, index)
+	return s.assertBound(eq.xs[position], &k, strict, lower, true)
 }
 
 func (s *BoundEquationStore) propagateEquation(index uint32) (bool, error) {
