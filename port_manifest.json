@@ -107785,10 +107785,9 @@
       "tests": [
         "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot",
         "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
-        "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
-        "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
-        "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
-        "TestPrimeGeneratorUnsignedSourceExtent"
+        "TestPrimeIteratorIndexBeforeNativeGrowthWrapAndColdOwner",
+        "TestPrimeGeneratorConstructorAndSparseNativeStorage",
+        "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain"
       ],
       "assertions": [
         {
@@ -107805,10 +107804,9 @@
           "go_target": "pkg/util/prime/generator.go",
           "tests": [
             "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
-            "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
-            "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
-            "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
-            "TestPrimeGeneratorUnsignedSourceExtent"
+            "TestPrimeIteratorIndexBeforeNativeGrowthWrapAndColdOwner",
+            "TestPrimeGeneratorConstructorAndSparseNativeStorage",
+            "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain"
           ]
         },
         {
@@ -107821,11 +107819,11 @@
         }
       ],
       "ownership": [
-        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; temporary candidate todo uses a native Go slice without arena reservations, while cache allocation refusal retains its published prime prefix. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md."
+        "Charged concrete cold cache owner; native []uint64 slices hold persistent primes and temporary candidates without arena backing reservations. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md."
       ],
       "deviations": [
-        "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checked repeated-condition guard; later indefinite source allocation prefixes are not claimed.",
-        "Unsigned source vector extent checks remain separate from full typed-array extent guards; wrapped undersized raw allocation/header behavior and source memory-runtime vector integration remain open. Full prime source units remain partial."
+        "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checks the repeated condition; later indefinite iterations are not executed.",
+        "Native Go slice growth replaces source vector capacity, overflow and backing allocation behavior. Full prime source units remain partial for global-service and synchronization obligations."
       ]
     },
     {
@@ -157519,16 +157517,15 @@
       "tests": [
         "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot",
         "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
-        "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
-        "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
+        "TestPrimeIteratorIndexBeforeNativeGrowthWrapAndColdOwner",
+        "TestPrimeGeneratorConstructorAndSparseNativeStorage",
         "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
-        "TestPrimeGeneratorUnsignedSourceExtent",
         "TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes",
         "TestDefaultPrimeRegisteredSequential10000IndependentSieve",
         "TestDefaultPrimeEveryEagerConstructionRefusal",
         "TestDefaultPrimeLocalAndCachedWarmSourceRoutes",
         "TestDefaultPrimeRegisteredIntegerRootAssertions",
-        "TestDefaultPrimeIndexWrapAndActualGrowthRefusal",
+        "TestDefaultPrimeIndexWrapAndNativeGrowth",
         "TestDefaultPrimeBorrowExactBindingAndFinalizedIdentity",
         "TestDefaultPrimeBorrowFullPolynomialFactorEndToEnd"
       ],
@@ -157547,10 +157544,9 @@
           "go_target": "pkg/util/prime/generator.go",
           "tests": [
             "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
-            "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
-            "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
-            "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
-            "TestPrimeGeneratorUnsignedSourceExtent"
+            "TestPrimeIteratorIndexBeforeNativeGrowthWrapAndColdOwner",
+            "TestPrimeGeneratorConstructorAndSparseNativeStorage",
+            "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain"
           ]
         },
         {
@@ -157571,7 +157567,7 @@
             "TestDefaultPrimeEveryEagerConstructionRefusal",
             "TestDefaultPrimeLocalAndCachedWarmSourceRoutes",
             "TestDefaultPrimeRegisteredIntegerRootAssertions",
-            "TestDefaultPrimeIndexWrapAndActualGrowthRefusal"
+            "TestDefaultPrimeIndexWrapAndNativeGrowth"
           ],
           "go_targets": [
             "pkg/util/numeral/prime_service_integer_integration_test.go"
@@ -157591,13 +157587,13 @@
         }
       ],
       "ownership": [
-        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; temporary candidate todo uses a native Go slice without arena reservations, while cache allocation refusal retains its published prime prefix. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md.",
+        "Charged concrete cold cache owner; native []uint64 slices hold persistent primes and temporary candidates without arena backing reservations. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md.",
         "Named reflected cold owners and real delegated table/cache storage; all actual constructor/growth/erase refusal prefixes audited before disabling faults; borrowed region/generator lifetimes remain explicit.",
         "BorrowGenerator returns exact existing pointer without owning or refunding it; Finalize preserves object identity and reached emptied-vector Bounds behavior. Full Factor closes its lazy UP service and does not close the borrowed generator."
       ],
       "deviations": [
-        "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checked repeated-condition guard; later indefinite source allocation prefixes are not claimed.",
-        "Unsigned source vector extent checks remain separate from full typed-array extent guards; wrapped undersized raw allocation/header behavior and source memory-runtime vector integration remain open. Full prime source units remain partial.",
+        "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checks the repeated condition; later indefinite iterations are not executed.",
+        "Native Go slice growth replaces source vector capacity, overflow and backing allocation behavior. Full prime source units remain partial for global-service and synchronization obligations.",
         "Explicit caller-bound single-lane service; source-global shared Runtime allocation and process singleton binding remain open. OpenMP and source print/flush remain open; source reversed sparse-growth loop unchanged, finalization does not recreate cache."
       ]
     },
@@ -157617,16 +157613,15 @@
       "tests": [
         "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot",
         "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
-        "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
-        "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
+        "TestPrimeIteratorIndexBeforeNativeGrowthWrapAndColdOwner",
+        "TestPrimeGeneratorConstructorAndSparseNativeStorage",
         "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
-        "TestPrimeGeneratorUnsignedSourceExtent",
         "TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes",
         "TestDefaultPrimeRegisteredSequential10000IndependentSieve",
         "TestDefaultPrimeEveryEagerConstructionRefusal",
         "TestDefaultPrimeLocalAndCachedWarmSourceRoutes",
         "TestDefaultPrimeRegisteredIntegerRootAssertions",
-        "TestDefaultPrimeIndexWrapAndActualGrowthRefusal"
+        "TestDefaultPrimeIndexWrapAndNativeGrowth"
       ],
       "conditionals": [
         {
@@ -157647,10 +157642,9 @@
           "go_target": "pkg/util/prime/generator.go",
           "tests": [
             "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
-            "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
-            "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
-            "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
-            "TestPrimeGeneratorUnsignedSourceExtent"
+            "TestPrimeIteratorIndexBeforeNativeGrowthWrapAndColdOwner",
+            "TestPrimeGeneratorConstructorAndSparseNativeStorage",
+            "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain"
           ]
         },
         {
@@ -157671,7 +157665,7 @@
             "TestDefaultPrimeEveryEagerConstructionRefusal",
             "TestDefaultPrimeLocalAndCachedWarmSourceRoutes",
             "TestDefaultPrimeRegisteredIntegerRootAssertions",
-            "TestDefaultPrimeIndexWrapAndActualGrowthRefusal"
+            "TestDefaultPrimeIndexWrapAndNativeGrowth"
           ],
           "go_targets": [
             "pkg/util/numeral/prime_service_integer_integration_test.go"
@@ -157679,12 +157673,12 @@
         }
       ],
       "ownership": [
-        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; temporary candidate todo uses a native Go slice without arena reservations, while cache allocation refusal retains its published prime prefix. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md.",
+        "Charged concrete cold cache owner; native []uint64 slices hold persistent primes and temporary candidates without arena backing reservations. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md.",
         "Named reflected cold owners and real delegated table/cache storage; all actual constructor/growth/erase refusal prefixes audited before disabling faults; borrowed region/generator lifetimes remain explicit."
       ],
       "deviations": [
-        "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checked repeated-condition guard; later indefinite source allocation prefixes are not claimed.",
-        "Unsigned source vector extent checks remain separate from full typed-array extent guards; wrapped undersized raw allocation/header behavior and source memory-runtime vector integration remain open. Full prime source units remain partial.",
+        "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checks the repeated condition; later indefinite iterations are not executed.",
+        "Native Go slice growth replaces source vector capacity, overflow and backing allocation behavior. Full prime source units remain partial for global-service and synchronization obligations.",
         "Explicit caller-bound single-lane service; source-global shared Runtime allocation and process singleton binding remain open. OpenMP and source print/flush remain open; source reversed sparse-growth loop unchanged, finalization does not recreate cache."
       ]
     },

@@ -11,7 +11,7 @@ import (
 var ErrServiceOwner = errors.New("g3: invalid default prime service owner")
 
 // The actual generator is eagerly constructed with this binding, before any
-// memory initialization call. Finalize clears its vector and keeps its identity.
+// memory initialization call. Finalize clears its slice and keeps its identity.
 // The enclosing header is charged cold Go binding metadata, not a source malloc
 // event. Process-global initialization remains a separate obligation.
 type DefaultService struct {
@@ -112,7 +112,7 @@ func (it *ServiceIterator) Next() (uint64, error) {
 
 // BorrowGenerator is an explicit Go binding for the default pointer selected
 // by prime_generator.cpp:99-107. It preserves the actual eager object, including
-// the empty-vector state after Finalize; the caller does not own the generator.
+// the empty-slice state after Finalize; the caller does not own the generator.
 func (s *DefaultService) BorrowGenerator() (*Generator, error) {
 	if e := s.open(); e != nil {
 		return nil, e

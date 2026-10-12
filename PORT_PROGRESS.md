@@ -39766,3 +39766,18 @@ before its first cache allocation is refused. The focused service test checks
 that retained prefix against independent trial division and verifies the
 arena balance. Prime source units remain partial for their global-service and
 other recorded obligations.
+
+### Native persistent prime cache
+
+The prime generator's persistent `svector<uint64_t>` cache now also uses a
+native `[]uint64`. Its values and source odd-candidate/filter/append order are
+unchanged, while capacity growth and backing storage no longer consume arena
+reservations. The generator's cold owner header remains charged. The former
+source-vector capacity codec, allocation-refusal sweeps and unsigned vector
+extent test are retired as container mechanics. With arena reservations
+disabled, a cold cache still grows through the 10,000-prime source fixture,
+and the reversed sparse-index loop still publishes 2,016 primes before its
+checked nontermination result. Focused native and debug tests verify the
+sequence, iterator increment, owner balance and finalization. This supersedes
+the older prime vector/backing accounting notes above; the source units remain
+partial for global binding, finalization and synchronization obligations.

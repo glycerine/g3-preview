@@ -35,7 +35,7 @@ func TestPrimeGeneratorSparseReadAndReversedLoopPrefixes(t *testing.T) {
 		}
 	}
 }
-func TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner(t *testing.T) {
+func TestPrimeIteratorIndexBeforeNativeGrowthWrapAndColdOwner(t *testing.T) {
 	budget := arena.NewBudget(1 << 20)
 	g, e := NewGenerator(budget)
 	if e != nil {
@@ -55,8 +55,9 @@ func TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner(t *testing.T) {
 	}
 	budget.FailAfter(0)
 	it.Index = 32
-	if _, e = it.Next(); !errors.Is(e, arena.ErrInjectedFailure) || it.Index != 33 {
-		t.Fatal("increment BEFORE growth refusal", it.Index, e)
+	before := budget.Used()
+	if p, e = it.Next(); e != nil || p != 137 || it.Index != 33 || budget.Used() != before {
+		t.Fatal("native cache growth charged arena", p, it.Index, e, budget.Used(), before)
 	}
 	budget.FailAfter(-1)
 	copyOwner := *g
@@ -77,78 +78,53 @@ func TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner(t *testing.T) {
 	}
 }
 
-func TestPrimeGeneratorConstructorAndSparseFailureAccounting(t *testing.T) {
-	refused, success := 0, 0
-	for ordinal := int64(0); ordinal < 80; ordinal++ {
+func TestPrimeGeneratorConstructorAndSparseNativeStorage(t *testing.T) {
+	for ordinal := int64(0); ordinal < 2; ordinal++ {
 		b := arena.NewBudget(1 << 24)
 		b.FailAfter(ordinal)
 		g, e := NewGenerator(b)
-		if e != nil {
-			refused++
+		if ordinal == 0 {
 			if !errors.Is(e, arena.ErrInjectedFailure) || g != nil || b.Used() != 0 {
 				t.Fatal(ordinal, g, e, b.Used())
 			}
 		} else {
-			success++
+			if e != nil || g.Stats().BackingBytes != 0 || b.Used() != g.Stats().OwnerBytes {
+				t.Fatal(ordinal, g, e, b.Used())
+			}
 			if e = g.Close(); e != nil {
 				t.Fatal(e)
 			}
 			if b.Used() != 0 {
 				t.Fatal(b.Used())
 			}
-			break
 		}
 	}
-	if refused == 0 || success != 1 {
-		t.Fatal(refused, success)
+	b := arena.NewBudget(1 << 24)
+	g, e := NewGenerator(b)
+	if e != nil {
+		t.Fatal(e)
 	}
-	late, finished := 0, 0
-	for ordinal := int64(0); ordinal < 160; ordinal++ {
-		b := arena.NewBudget(1 << 24)
-		g, e := NewGenerator(b)
-		if e != nil {
-			t.Fatal(e)
+	b.FailAfter(0)
+	_, e = g.At(191)
+	st := g.Stats()
+	if !errors.Is(e, ErrNontermination) || st.Count != 2016 || st.BackingBytes != 0 || b.Used() != st.OwnerBytes {
+		t.Fatal("native cache and candidate storage", e, st, b.Used())
+	}
+	// Independent primality oracle checks every actually published prefix.
+	for i := uint32(0); i < st.Count; i++ {
+		p, err := g.At(i)
+		if err != nil {
+			t.Fatal(err)
 		}
-		b.FailAfter(ordinal)
-		_, e = g.At(191)
-		st := g.Stats()
-		if b.Used() != st.TotalBytes || st.TotalBytes != st.OwnerBytes+st.BackingBytes {
-			t.Fatal("native candidate scratch charged arena", ordinal, e, st, b.Used())
-		}
-		if e != nil && !errors.Is(e, ErrNontermination) && !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal(ordinal, e)
-		}
-		if st.Count > 191 && errors.Is(e, arena.ErrInjectedFailure) {
-			late++
-		}
-		if errors.Is(e, ErrNontermination) {
-			finished++
-		}
-		// Independent primality oracle checks every actually published prefix.
-		for i := uint32(0); i < st.Count; i++ {
-			p, err := g.At(i)
-			if err != nil {
-				t.Fatal(err)
-			}
-			for d := uint64(2); d <= p/d; d++ {
-				if p%d == 0 {
-					t.Fatal("published composite", ordinal, i, p)
-				}
+		for d := uint64(2); d <= p/d; d++ {
+			if p%d == 0 {
+				t.Fatal("published composite", i, p)
 			}
 		}
-		b.FailAfter(-1)
-		if e = g.Close(); e != nil {
-			t.Fatal(e)
-		}
-		if b.Used() != 0 {
-			t.Fatal(b.Used())
-		}
-		if finished != 0 {
-			break
-		}
 	}
-	if late == 0 || finished != 1 {
-		t.Fatal("actual late reversed-loop refusals", late, finished)
+	b.FailAfter(-1)
+	if e = g.Close(); e != nil || b.Used() != 0 {
+		t.Fatal(e, b.Used())
 	}
 }
 func TestPrimeGeneratorWarmCachedReadAndFinalizeDomain(t *testing.T) {
@@ -191,18 +167,5 @@ func TestPrimeGeneratorWarmCachedReadAndFinalizeDomain(t *testing.T) {
 	var zero Generator
 	if e = zero.Close(); !errors.Is(e, arena.ErrConfig) {
 		t.Fatal(e)
-	}
-}
-func TestPrimeGeneratorUnsignedSourceExtent(t *testing.T) {
-	n, oldBytes, newBytes, e := primeSourceCapacity(536870912)
-	if e != nil || n != 805306368 || oldBytes != 8 || newBytes != 2147483656 {
-		t.Fatal(n, oldBytes, newBytes, e)
-	}
-	if _, _, e = primeNextCapacity(536870912, ^uint64(0)); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("actual full array versus wrapped source allocation", e)
-	}
-	n, oldBytes, newBytes, e = primeSourceCapacity(357913941)
-	if !errors.Is(e, arena.ErrBounds) || n != 536870912 || newBytes > oldBytes {
-		t.Fatal(n, oldBytes, newBytes, e)
 	}
 }
