@@ -1,0 +1,128 @@
+// Source: src/math/subpaving/subpaving_t.h:146-237 and
+// src/math/subpaving/subpaving_t_def.h:296-348, concrete config_mpfx.
+package subpaving
+
+import (
+	"errors"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/numeral"
+)
+
+// FixedBound owns its numeral. A node's lower/upper arrays borrow bounds;
+// each bound's creating node retains ownership until that node closes.
+type FixedBound struct {
+	value    *numeral.FixedPoint
+	variable uint32
+	lower    bool
+	open     bool
+	prev     *FixedBound
+}
+
+// FixedNode keeps the source's per-variable bound views and shared parent
+// bounds. PushBound receives a bound already selected by the context; bound
+// relevance, normalization and conflict propagation belong to that context.
+type FixedNode struct {
+	self         *FixedNode
+	numbers      *numeral.FixedPointManager
+	parent       *FixedNode
+	lower, upper []*FixedBound
+	owned        []*FixedBound
+	trail        *FixedBound
+	children     uint32
+	closed       bool
+}
+
+func NewFixedNode(m *numeral.FixedPointManager, variables uint32, parent *FixedNode) (*FixedNode, error) {
+	if m == nil {
+		return nil, arena.ErrInvalidSlot
+	}
+	if parent != nil {
+		if err := parent.open(); err != nil {
+			return nil, err
+		}
+		if parent.numbers != m || uint32(len(parent.lower)) != variables {
+			return nil, arena.ErrInvalidSlot
+		}
+	}
+	n := &FixedNode{numbers: m, parent: parent, lower: make([]*FixedBound, variables), upper: make([]*FixedBound, variables)}
+	n.self = n
+	if parent != nil {
+		copy(n.lower, parent.lower)
+		copy(n.upper, parent.upper)
+		n.trail = parent.trail
+		parent.children++
+	}
+	return n, nil
+}
+
+func (n *FixedNode) open() error {
+	if n == nil || n.self != n || n.numbers == nil {
+		return arena.ErrInvalidSlot
+	}
+	if n.closed {
+		return arena.ErrClosed
+	}
+	return nil
+}
+
+func (n *FixedNode) bound(variable uint32, lower bool) (*FixedBound, error) {
+	if err := n.open(); err != nil {
+		return nil, err
+	}
+	if variable >= uint32(len(n.lower)) {
+		return nil, arena.ErrInvalidSlot
+	}
+	if lower {
+		return n.lower[variable], nil
+	}
+	return n.upper[variable], nil
+}
+
+func (n *FixedNode) PushBound(variable uint32, value *numeral.FixedPoint, lower, open bool) error {
+	if err := n.open(); err != nil {
+		return err
+	}
+	if variable >= uint32(len(n.lower)) {
+		return arena.ErrInvalidSlot
+	}
+	v, err := n.numbers.New()
+	if err != nil {
+		return err
+	}
+	if err = n.numbers.Copy(v, value); err != nil {
+		return errors.Join(err, v.Close())
+	}
+	b := &FixedBound{value: v, variable: variable, lower: lower, open: open, prev: n.trail}
+	n.owned = append(n.owned, b)
+	n.trail = b
+	if lower {
+		n.lower[variable] = b
+	} else {
+		n.upper[variable] = b
+	}
+	return nil
+}
+
+func (n *FixedNode) Close() (err error) {
+	if err = n.open(); err != nil {
+		if n != nil && n.self == n && n.closed {
+			return nil
+		}
+		return err
+	}
+	if n.children != 0 {
+		return arena.ErrInvalidSlot
+	}
+	for i := len(n.owned) - 1; i >= 0; i-- {
+		err = errors.Join(err, n.owned[i].value.Close())
+	}
+	if err != nil {
+		return err
+	}
+	n.closed = true
+	if n.parent != nil {
+		n.parent.children--
+	}
+	return nil
+}

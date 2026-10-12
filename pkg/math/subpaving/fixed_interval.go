@@ -14,12 +14,15 @@ import (
 // FixedInterval is the mutable, numeral-owning subpaving scratch interval.
 // Constant node/variable views borrow bounds and are represented separately.
 type FixedInterval struct {
-	self                 *FixedInterval
-	numbers              *numeral.FixedPointManager
-	lower, upper         *numeral.FixedPoint
-	lowerInf, upperInf   bool
-	lowerOpen, upperOpen bool
-	closed               bool
+	self                   *FixedInterval
+	numbers                *numeral.FixedPointManager
+	lower, upper           *numeral.FixedPoint
+	ownedLower, ownedUpper *numeral.FixedPoint
+	constantNode           *FixedNode
+	constantVariable       uint32
+	lowerInf, upperInf     bool
+	lowerOpen, upperOpen   bool
+	closed                 bool
 }
 
 func NewFixedInterval(m *numeral.FixedPointManager) (*FixedInterval, error) {
@@ -34,7 +37,7 @@ func NewFixedInterval(m *numeral.FixedPointManager) (*FixedInterval, error) {
 	if err != nil {
 		return nil, errors.Join(err, lower.Close())
 	}
-	v := &FixedInterval{numbers: m, lower: lower, upper: upper, lowerInf: true, upperInf: true, lowerOpen: true, upperOpen: true}
+	v := &FixedInterval{numbers: m, lower: lower, upper: upper, ownedLower: lower, ownedUpper: upper, lowerInf: true, upperInf: true, lowerOpen: true, upperOpen: true}
 	v.self = v
 	return v, nil
 }
@@ -46,11 +49,56 @@ func (v *FixedInterval) open() error {
 	if v.closed {
 		return arena.ErrClosed
 	}
+	if v.constantNode != nil {
+		lower, err := v.constantNode.bound(v.constantVariable, true)
+		if err != nil {
+			return err
+		}
+		upper, err := v.constantNode.bound(v.constantVariable, false)
+		if err != nil {
+			return err
+		}
+		v.lower, v.upper = v.ownedLower, v.ownedUpper
+		v.lowerInf, v.upperInf = lower == nil, upper == nil
+		v.lowerOpen, v.upperOpen = lower == nil || lower.open, upper == nil || upper.open
+		if lower != nil {
+			v.lower = lower.value
+		}
+		if upper != nil {
+			v.upper = upper.value
+		}
+	}
+	return nil
+}
+
+// SetConstant binds this scratch interval to a live node/variable pair. Each
+// subsequent read resolves the node's current bounds, as the source does.
+func (v *FixedInterval) SetConstant(node *FixedNode, variable uint32) error {
+	if err := v.open(); err != nil {
+		return err
+	}
+	if node == nil || node.numbers != v.numbers {
+		return arena.ErrInvalidSlot
+	}
+	if _, err := node.bound(variable, true); err != nil {
+		return err
+	}
+	v.constantNode, v.constantVariable = node, variable
+	return v.open()
+}
+
+func (v *FixedInterval) mutable() error {
+	if err := v.open(); err != nil {
+		return err
+	}
+	if v.constantNode != nil {
+		return arena.ErrInvalidSlot
+	}
 	return nil
 }
 
 func (v *FixedInterval) pair(other *FixedInterval) error {
-	if err := v.open(); err != nil {
+	if err := v.mutable(); err != nil {
 		return err
 	}
 	if err := other.open(); err != nil {
@@ -77,7 +125,7 @@ func (v *FixedInterval) upperKind() interval.ExtendedKind {
 }
 
 func (v *FixedInterval) SetFinite(lower, upper *numeral.FixedPoint, lowerOpen, upperOpen bool) error {
-	if err := v.open(); err != nil {
+	if err := v.mutable(); err != nil {
 		return err
 	}
 	cmp, err := v.numbers.Compare(lower, upper)
@@ -99,7 +147,7 @@ func (v *FixedInterval) SetFinite(lower, upper *numeral.FixedPoint, lowerOpen, u
 }
 
 func (v *FixedInterval) ResetLower() error {
-	if err := v.open(); err != nil {
+	if err := v.mutable(); err != nil {
 		return err
 	}
 	if err := v.numbers.Reset(v.lower); err != nil {
@@ -110,7 +158,7 @@ func (v *FixedInterval) ResetLower() error {
 }
 
 func (v *FixedInterval) ResetUpper() error {
-	if err := v.open(); err != nil {
+	if err := v.mutable(); err != nil {
 		return err
 	}
 	if err := v.numbers.Reset(v.upper); err != nil {
@@ -234,7 +282,7 @@ func (v *FixedInterval) Close() error {
 	if v.closed {
 		return nil
 	}
-	if err := errors.Join(v.lower.Close(), v.upper.Close()); err != nil {
+	if err := errors.Join(v.ownedLower.Close(), v.ownedUpper.Close()); err != nil {
 		return err
 	}
 	v.closed = true

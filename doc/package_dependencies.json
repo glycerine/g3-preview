@@ -746,7 +746,12 @@
       ],
       "production_files": [
         "fixed_interval.go",
-        "fixed_interval_arith.go"
+        "fixed_interval_arith.go",
+        "fixed_interval_div.go",
+        "fixed_interval_mul.go",
+        "fixed_interval_power.go",
+        "fixed_interval_scalar.go",
+        "fixed_node.go"
       ]
     },
     {

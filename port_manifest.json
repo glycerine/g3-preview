@@ -49826,14 +49826,17 @@
         "pkg/math/subpaving/fixed_interval_mul.go",
         "pkg/math/subpaving/fixed_interval_mul_test.go",
         "pkg/math/subpaving/fixed_interval_div.go",
-        "pkg/math/subpaving/fixed_interval_div_test.go"
+        "pkg/math/subpaving/fixed_interval_div_test.go",
+        "pkg/math/subpaving/fixed_node.go",
+        "pkg/math/subpaving/fixed_node_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
         "TestSubpavingFixedIntervalScalarMulDiv",
         "TestSubpavingFixedIntervalPowerRetainedCases",
         "TestSubpavingFixedIntervalMulSignClasses",
-        "TestSubpavingFixedIntervalDivSignBranches"
+        "TestSubpavingFixedIntervalDivSignBranches",
+        "TestSubpavingFixedNodeConstantIntervalViews"
       ],
       "conditionals": [
         {
@@ -49937,9 +49940,14 @@
       "path": "src/math/subpaving/subpaving_t_def.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/subpaving/fixed_node.go",
+        "pkg/math/subpaving/fixed_node_test.go"
+      ],
+      "tests": [
+        "TestSubpavingFixedNodeConstantIntervalViews"
+      ],
       "assertions": [
         {
           "line": 85,
@@ -158239,9 +158247,14 @@
       "path": "src/util/parray.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/subpaving/fixed_node.go",
+        "pkg/math/subpaving/fixed_node_test.go"
+      ],
+      "tests": [
+        "TestSubpavingFixedNodeConstantIntervalViews"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -158510,14 +158523,22 @@
           "tests": []
         },
         {
-          "name": "real AST expression/dependency callbacks, subpaving bounds and other template configurations",
+          "name": "remaining real AST expression/dependency callbacks, subpaving context integration and other template configurations",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "Concrete subpaving bound-array copy, indexed lookup and set with borrowed bound identity",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fixed_node.go",
+          "tests": [
+            "TestSubpavingFixedNodeConstantIntervalViews"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "No Go persistent-array implementation remains. Retained goal consumers use native owning slices with independent copies; generic parray algorithms and their standalone stress workload are not ported or credited. The source subpaving specialization remains unported in its consumer. This source is not classified as dead."
+        "No generic Go persistent-array implementation remains. Retained goal consumers use native owning slices with independent copies; generic parray algorithms and their standalone stress workload are not ported or credited. The concrete subpaving bound arrays now copy slices into child nodes and preserve borrowed bound identities, but the surrounding subpaving context remains partial. This source is not classified as dead."
       ]
     },
     {
