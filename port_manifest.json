@@ -28120,7 +28120,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/rewriter/var_substitution.go",
-        "pkg/ast/rewriter/var_substitution_test.go"
+        "pkg/ast/rewriter/var_substitution_test.go",
+        "pkg/ast/rewriter/unused_vars_ufbv.go"
       ],
       "tests": [
         "TestVarSubstitutionOriginalRegisteredIdentities",
@@ -28128,7 +28129,8 @@
         "TestVarSubstitutionCancellationPreservesOutputAndReuses",
         "TestVarSubstitutionColdConstructionCleanup",
         "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
-        "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset"
+        "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset",
+        "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"
       ],
       "assertions": [
         {
@@ -28192,6 +28194,14 @@
             "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
             "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset"
           ]
+        },
+        {
+          "name": "UFBV default elim_unused_vars ground-body bypass, used-declaration selection and variable/annotation remapping",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/unused_vars_ufbv.go",
+          "tests": [
+            "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"
+          ]
         }
       ],
       "ownership": [
@@ -28199,7 +28209,7 @@
         "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path."
       ],
       "deviations": [
-        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. Other var_subst translation-unit facilities (unused-variable elimination, instantiate, free-variable enumeration) remain unported. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
+        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. The UFBV empty-params unused-variable elimination path is now concrete; nondefault parameters, instantiate, free-variable enumeration and other consumers remain open. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
       ]
     },
     {
@@ -28209,7 +28219,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/rewriter/var_substitution.go",
-        "pkg/ast/rewriter/var_substitution_test.go"
+        "pkg/ast/rewriter/var_substitution_test.go",
+        "pkg/ast/rewriter/unused_vars_ufbv.go"
       ],
       "tests": [
         "TestVarSubstitutionOriginalRegisteredIdentities",
@@ -28217,7 +28228,8 @@
         "TestVarSubstitutionCancellationPreservesOutputAndReuses",
         "TestVarSubstitutionColdConstructionCleanup",
         "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
-        "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset"
+        "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset",
+        "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"
       ],
       "conditionals": [
         {
@@ -28257,6 +28269,14 @@
             "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
             "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset"
           ]
+        },
+        {
+          "name": "UFBV default unused_vars_eliminator over concrete used-vars collection and var_subst",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/unused_vars_ufbv.go",
+          "tests": [
+            "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"
+          ]
         }
       ],
       "ownership": [
@@ -28264,7 +28284,7 @@
         "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path."
       ],
       "deviations": [
-        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. Other var_subst translation-unit facilities (unused-variable elimination, instantiate, free-variable enumeration) remain unported. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
+        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. The UFBV empty-params unused-variable elimination path is now concrete; nondefault parameters, instantiate, free-variable enumeration and other consumers remain open. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
       ]
     },
     {
@@ -29341,22 +29361,43 @@
       "path": "src/ast/used_vars.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/used_vars_ufbv.go"
+      ],
+      "tests": [
+        "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete UFBV used_vars process/reset, quantifier-depth free-variable collection and presence/count predicates",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/used_vars_ufbv.go",
+          "tests": [
+            "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
+          ]
+        }
+      ],
+      "ownership": [
+        "The UFBV collector borrows AST expressions and sorts; native slices and expression-depth map own only membership and traversal state."
+      ],
+      "deviations": [
+        "A native Go map keys by expression and binder depth instead of the source shared-node hashtable; other used_vars consumers remain open."
+      ]
     },
     {
       "path": "src/ast/used_vars.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/used_vars_ufbv.go"
+      ],
+      "tests": [
+        "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -29369,9 +29410,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete UFBV used_vars found sorts, reset/process and uses_all/uses_a/count",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/used_vars_ufbv.go",
+          "tests": [
+            "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
+          ]
+        }
+      ],
+      "ownership": [
+        "Found sort handles are borrowed from the AST manager; native slice storage is owned by the collector."
+      ],
+      "deviations": [
+        "Only the UFBV elim_unused_vars consumer is credited; other source callers remain open."
+      ]
     },
     {
       "path": "src/ast/well_sorted.cpp",
@@ -116779,7 +116833,8 @@
         "pkg/sat/sat_solver_index_iterator_source_test.go",
         "pkg/sat/sat_solver_mutex_pair_set_test.go",
         "pkg/util/hash/runtime/runtime_bytes_bounded.go",
-        "pkg/ast/rewriter/bv_trailing_table.go"
+        "pkg/ast/rewriter/bv_trailing_table.go",
+        "pkg/ast/rewriter/used_vars_ufbv.go"
       ],
       "tests": [
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
@@ -116851,7 +116906,8 @@
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
         "TestBVTrailingNativeWideDeletionReset",
         "TestBVTrailingEveryColdCountReservation",
-        "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"
+        "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations",
+        "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
       ],
       "conditionals": [
         {
@@ -117146,6 +117202,14 @@
             "TestBVTrailingCacheGrowthAndEqualThresholdReset",
             "TestBVTrailingNativeWideDeletionReset",
             "TestBVTrailingEveryColdCountReservation"
+          ]
+        },
+        {
+          "name": "Retained used_vars expr-depth cache uses a native Go map keyed by borrowed AST handle and quantifier depth",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/rewriter/used_vars_ufbv.go",
+          "tests": [
+            "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
           ]
         }
       ],
