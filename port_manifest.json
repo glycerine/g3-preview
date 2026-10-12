@@ -34612,7 +34612,9 @@
         "pkg/math/subpaving/fast_interval.go",
         "pkg/math/subpaving/fast_interval_test.go",
         "pkg/math/subpaving/fast_interval_arith.go",
-        "pkg/math/subpaving/fast_interval_arith_test.go"
+        "pkg/math/subpaving/fast_interval_arith_test.go",
+        "pkg/math/subpaving/fast_interval_mul.go",
+        "pkg/math/subpaving/fast_interval_mul_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34621,7 +34623,8 @@
         "TestFixedRootRetainedNewtonAndCertifiedBounds",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
         "TestSubpavingFastMutableIntervalRetainedCore",
-        "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
+        "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
+        "TestSubpavingFastIntervalMulSignClasses"
       ],
       "conditionals": [
         {
@@ -34719,7 +34722,9 @@
         "pkg/math/subpaving/fast_interval.go",
         "pkg/math/subpaving/fast_interval_test.go",
         "pkg/math/subpaving/fast_interval_arith.go",
-        "pkg/math/subpaving/fast_interval_arith_test.go"
+        "pkg/math/subpaving/fast_interval_arith_test.go",
+        "pkg/math/subpaving/fast_interval_mul.go",
+        "pkg/math/subpaving/fast_interval_mul_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34733,7 +34738,8 @@
         "TestFixedRootRetainedNewtonAndCertifiedBounds",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
         "TestSubpavingFastMutableIntervalRetainedCore",
-        "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
+        "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
+        "TestSubpavingFastIntervalMulSignClasses"
       ],
       "conditionals": [
         {
@@ -35204,6 +35210,14 @@
           "go_target": "pkg/math/subpaving/fast_interval_arith.go",
           "tests": [
             "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
+          ]
+        },
+        {
+          "name": "Concrete mpff interval multiplication: nine sign classes, zero/infinity bounds, mixed extrema ties, directed products and destination alias (src/math/interval/interval_def.h:1017-1214)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_interval_mul.go",
+          "tests": [
+            "TestSubpavingFastIntervalMulSignClasses"
           ]
         }
       ],
@@ -49940,11 +49954,14 @@
         "pkg/math/subpaving/fast_interval.go",
         "pkg/math/subpaving/fast_interval_test.go",
         "pkg/math/subpaving/fast_interval_arith.go",
-        "pkg/math/subpaving/fast_interval_arith_test.go"
+        "pkg/math/subpaving/fast_interval_arith_test.go",
+        "pkg/math/subpaving/fast_interval_mul.go",
+        "pkg/math/subpaving/fast_interval_mul_test.go"
       ],
       "tests": [
         "TestSubpavingFastMutableIntervalRetainedCore",
-        "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
+        "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
+        "TestSubpavingFastIntervalMulSignClasses"
       ],
       "conditionals": [
         {
@@ -50088,7 +50105,9 @@
         "pkg/math/subpaving/fast_interval.go",
         "pkg/math/subpaving/fast_interval_test.go",
         "pkg/math/subpaving/fast_interval_arith.go",
-        "pkg/math/subpaving/fast_interval_arith_test.go"
+        "pkg/math/subpaving/fast_interval_arith_test.go",
+        "pkg/math/subpaving/fast_interval_mul.go",
+        "pkg/math/subpaving/fast_interval_mul_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50120,7 +50139,8 @@
         "TestSubpavingFixedRoundRobinSourceDecisionAndDefinitionSkip",
         "TestSubpavingFixedRoundRobinSingletonAndUndecidedChild",
         "TestSubpavingFastMutableIntervalRetainedCore",
-        "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
+        "TestSubpavingFastIntervalNegAddSubDirectedAndAlias",
+        "TestSubpavingFastIntervalMulSignClasses"
       ],
       "conditionals": [
         {
