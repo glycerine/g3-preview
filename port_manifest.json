@@ -13738,14 +13738,24 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/ast_sort_dependency_order.go"
+        "pkg/ast/ast_sort_dependency_order.go",
+        "pkg/ast/ast_decl_collector.go"
       ],
       "tests": [
-        "TestSortDependencyOrderCollectsActualSortParameters"
+        "TestSortDependencyOrderCollectsActualSortParameters",
+        "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
       ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "decl_collector::visit and order_deps for uninterpreted sorts, declarations, applications and quantifiers",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_decl_collector.go",
+          "tests": [
+            "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
+          ]
+        },
         {
           "name": "decl_collector::collect_deps parameter-sort edges for actual AST sort metadata",
           "status": "partial",
@@ -13759,7 +13769,7 @@
         "The selected parameter-sort dependency collection borrows real AST metadata while the manager is open and stores handle identities in Go slices; full declaration-collector ownership remains open."
       ],
       "deviations": [
-        "Datatype constructor dependencies and the enclosing visit/order_deps integration remain unported."
+        "Datatype constructor/accessor dependencies and full SMT printer integration remain unported; the selected null/user-family AST graph uses the concrete collector."
       ]
     },
     {
@@ -13768,10 +13778,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/ast_sort_dependency_order.go"
+        "pkg/ast/ast_sort_dependency_order.go",
+        "pkg/ast/ast_decl_collector.go"
       ],
       "tests": [
-        "TestSortDependencyOrderCollectsActualSortParameters"
+        "TestSortDependencyOrderCollectsActualSortParameters",
+        "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
       ],
       "conditionals": [
         {
@@ -13787,6 +13799,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "decl_collector::visit and order_deps for uninterpreted sorts, declarations, applications and quantifiers",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_decl_collector.go",
+          "tests": [
+            "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
+          ]
+        },
+        {
           "name": "decl_collector::collect_deps parameter-sort edges for actual AST sort metadata",
           "status": "partial",
           "go_target": "pkg/ast/ast_sort_dependency_order.go",
@@ -13799,7 +13819,7 @@
         "The selected parameter-sort dependency collection borrows real AST metadata while the manager is open and stores handle identities in Go slices; full declaration-collector ownership remains open."
       ],
       "deviations": [
-        "Datatype constructor dependencies and the enclosing visit/order_deps integration remain unported."
+        "Datatype constructor/accessor dependencies and full SMT printer integration remain unported; the selected null/user-family AST graph uses the concrete collector."
       ]
     },
     {
@@ -166014,12 +166034,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_sort_dependency_order.go",
-        "pkg/ast/ast_sort_dependency_order_test.go"
+        "pkg/ast/ast_sort_dependency_order_test.go",
+        "pkg/ast/ast_decl_collector.go",
+        "pkg/ast/ast_decl_collector_test.go"
       ],
       "tests": [
         "TestSortDependencyOrderRetainedSourceTraversal",
         "TestSortDependencyOrderCycleAndUncollectedRoot",
-        "TestSortDependencyOrderCollectsActualSortParameters"
+        "TestSortDependencyOrderCollectsActualSortParameters",
+        "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
       ],
       "conditionals": [
         {
@@ -166051,7 +166074,8 @@
           "tests": [
             "TestSortDependencyOrderRetainedSourceTraversal",
             "TestSortDependencyOrderCycleAndUncollectedRoot",
-            "TestSortDependencyOrderCollectsActualSortParameters"
+            "TestSortDependencyOrderCollectsActualSortParameters",
+            "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
           ]
         }
       ],
@@ -166059,7 +166083,7 @@
         "The concrete AST sort-order state owns copied dependency-handle slices and borrows the referenced AST sort objects. Duplicate collected roots retain one traversal entry; dependencies absent from the collected root table are skipped. No source-owned dependency-set allocations are reproduced in Go."
       ],
       "deviations": [
-        "Only the retained top_sort<sort> specialization is implemented using concrete ASTHandle maps and slices in package ast; no generic adapter or C++ hash-table traversal order is retained. Real AST metadata now supplies parameter-sort edges; datatype constructor edges and the enclosing visit/order_deps integration remain open, so this source unit stays partial."
+        "Only the retained top_sort<sort> specialization is implemented using concrete ASTHandle maps and slices in package ast; no generic adapter or C++ hash-table traversal order is retained. A concrete declaration collector now visits null/user-family AST graphs and orders their sorts; datatype constructor edges and full SMT printer integration remain open, so this source unit stays partial."
       ]
     },
     {
