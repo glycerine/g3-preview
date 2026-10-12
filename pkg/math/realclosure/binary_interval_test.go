@@ -55,6 +55,11 @@ func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 	if out.String() != "(-oo, +oo)" {
 		t.Fatalf("default interval = %q", out.String())
 	}
+	out.Reset()
+	must(a.DisplayPP(&out))
+	if out.String() != "(-&infin;, +&infin;)" {
+		t.Fatalf("default pretty interval = %q", out.String())
+	}
 	z, err := a.ContainsZero()
 	must(err)
 	if !z {
@@ -63,6 +68,19 @@ func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 	must(m.SetInt32Power(&lo, -3, 1))
 	must(m.SetInt32(&hi, 2))
 	must(a.SetFinite(&lo, &hi, true, false)) // (-3/2,2]
+	out.Reset()
+	must(a.DisplayPP(&out))
+	if out.String() != "(-3/2, 2]" {
+		t.Fatalf("finite pretty interval = %q", out.String())
+	}
+	must(m.SetInt32Power(&lo, -3, 3))
+	must(m.SetInt32Power(&hi, 5, 2))
+	must(c.SetFinite(&lo, &hi, false, true))
+	out.Reset()
+	must(c.DisplayPP(&out))
+	if out.String() != "[-3/2<sup>3</sup>, 5/2<sup>2</sup>)" {
+		t.Fatalf("powered pretty interval = %q", out.String())
+	}
 	must(m.SetInt32(&lo, 1))
 	must(m.SetInt32Power(&hi, 3, 1))
 	must(b.SetFinite(&lo, &hi, false, true)) // [1,3/2)
@@ -117,6 +135,11 @@ func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 	must(c.Display(&out))
 	if out.String() != "[-2, +oo)" {
 		t.Fatalf("one-sided binary neg = %q", out.String())
+	}
+	out.Reset()
+	must(c.DisplayPP(&out))
+	if out.String() != "[-2, +&infin;)" {
+		t.Fatalf("one-sided pretty interval = %q", out.String())
 	}
 	must(b.Reset())
 	must(c.Add(a, b))

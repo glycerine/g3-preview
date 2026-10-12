@@ -311,6 +311,15 @@ func (v *BinaryInterval) Add(a, b *BinaryInterval) error {
 }
 
 func (v *BinaryInterval) Display(w io.Writer) error {
+	return v.display(w, false)
+}
+
+// DisplayPP is the retained real-closure HTML-style interval formatter.
+func (v *BinaryInterval) DisplayPP(w io.Writer) error {
+	return v.display(w, true)
+}
+
+func (v *BinaryInterval) display(w io.Writer, pretty bool) error {
 	if err := v.open(); err != nil {
 		return err
 	}
@@ -322,15 +331,26 @@ func (v *BinaryInterval) Display(w io.Writer) error {
 		right = ")"
 	}
 	ls, us := "-oo", "+oo"
+	if pretty {
+		ls, us = "-&infin;", "+&infin;"
+	}
 	var err error
 	if !v.lowerInf {
-		ls, err = v.numbers.String(&v.lower)
+		if pretty {
+			ls, err = v.numbers.PrettyString(&v.lower)
+		} else {
+			ls, err = v.numbers.String(&v.lower)
+		}
 		if err != nil {
 			return err
 		}
 	}
 	if !v.upperInf {
-		us, err = v.numbers.String(&v.upper)
+		if pretty {
+			us, err = v.numbers.PrettyString(&v.upper)
+		} else {
+			us, err = v.numbers.String(&v.upper)
+		}
 		if err != nil {
 			return err
 		}

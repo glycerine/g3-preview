@@ -34495,6 +34495,14 @@
           "tests": [
             "TestRationalIntervalSourceDependencyMasks"
           ]
+        },
+        {
+          "name": "Retained mpbq_config display_pp declaration and real-closure pretty interval call (src/math/interval/interval.h:233)",
+          "status": "ported",
+          "go_target": "pkg/math/realclosure/binary_interval.go",
+          "tests": [
+            "TestRealClosureBinaryIntervalRetainedCore"
+          ]
         }
       ],
       "ownership": [],
@@ -34956,6 +34964,14 @@
           "name": "Concrete mpbq_config interval division with directed precision, open zero/infinite bounds, alias and owned scratch (src/math/interval/interval_def.h:1663-1849)",
           "status": "partial",
           "go_target": "pkg/math/realclosure/binary_interval_div.go",
+          "tests": [
+            "TestRealClosureBinaryIntervalRetainedCore"
+          ]
+        },
+        {
+          "name": "Concrete mpbq_config interval display_pp: open/closed delimiters, pretty binary endpoints and infinity entities (src/math/interval/interval_def.h:646-653)",
+          "status": "ported",
+          "go_target": "pkg/math/realclosure/binary_interval.go",
           "tests": [
             "TestRealClosureBinaryIntervalRetainedCore"
           ]
@@ -48782,6 +48798,14 @@
           "name": "Concrete mpbq_config interval division with directed precision, open zero/infinite bounds, alias and owned scratch (src/math/interval/interval_def.h:1663-1849)",
           "status": "partial",
           "go_target": "pkg/math/realclosure/binary_interval_div.go",
+          "tests": [
+            "TestRealClosureBinaryIntervalRetainedCore"
+          ]
+        },
+        {
+          "name": "Retained real-closure pretty interval display dispatch through mpbq_config (src/math/realclosure/realclosure.cpp:5882-5888)",
+          "status": "ported",
+          "go_target": "pkg/math/realclosure/binary_interval.go",
           "tests": [
             "TestRealClosureBinaryIntervalRetainedCore"
           ]
@@ -115181,7 +115205,8 @@
         "pkg/math/realclosure/binary_interval_test.go",
         "pkg/math/realclosure/binary_interval_mul.go",
         "pkg/math/realclosure/binary_interval_inv.go",
-        "pkg/math/realclosure/binary_interval_div.go"
+        "pkg/math/realclosure/binary_interval_div.go",
+        "pkg/util/numeral/mpbq_format.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",
@@ -115262,6 +115287,14 @@
           "go_target": "pkg/math/interval/binary_extended.go",
           "tests": [
             "TestRealClosureBinaryExtendedNumeralBranches"
+          ]
+        },
+        {
+          "name": "Concrete mpbq extended-number display_pp: finite exponent markup and signed infinity entities reached by real-closure interval display (src/util/ext_numeral.h:335-345)",
+          "status": "ported",
+          "go_target": "pkg/math/realclosure/binary_interval.go",
+          "tests": [
+            "TestRealClosureBinaryIntervalRetainedCore"
           ]
         }
       ],
