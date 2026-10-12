@@ -100235,11 +100235,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/ufbv/rewrite_cache.go",
-        "pkg/tactic/ufbv/rewrite_cache_test.go"
+        "pkg/tactic/ufbv/rewrite_cache_test.go",
+        "pkg/tactic/ufbv/rewrite_traversal.go",
+        "pkg/tactic/ufbv/rewrite_traversal_test.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
-        "TestRewriteCacheSourceTimestampWrap"
+        "TestRewriteCacheSourceTimestampWrap",
+        "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
+        "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
       ],
       "conditionals": [
         {
@@ -100368,13 +100372,22 @@
             "TestRewriteCacheSourceLazyResetAndReferenceOrder",
             "TestRewriteCacheSourceTimestampWrap"
           ]
+        },
+        {
+          "name": "rewrite_visit_children reverse scheduling and actual array-map cycle completion",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_traversal.go",
+          "tests": [
+            "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
+            "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
+          ]
         }
       ],
       "ownership": [
         "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction."
       ],
       "deviations": [
-        "Only the concrete rewrite-cache storage is ported; the UFBV rewriting algorithm, matcher, and tactic integration remain open."
+        "The concrete cache and reverse child-visit/cycle step are ported; the remaining UFBV rewrite loop, matcher, and tactic integration remain open."
       ]
     },
     {
@@ -100384,11 +100397,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/ufbv/rewrite_cache.go",
-        "pkg/tactic/ufbv/rewrite_cache_test.go"
+        "pkg/tactic/ufbv/rewrite_cache_test.go",
+        "pkg/tactic/ufbv/rewrite_traversal.go",
+        "pkg/tactic/ufbv/rewrite_traversal_test.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
-        "TestRewriteCacheSourceTimestampWrap"
+        "TestRewriteCacheSourceTimestampWrap",
+        "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
+        "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
       ],
       "conditionals": [
         {
@@ -100410,6 +100427,15 @@
           "tests": [
             "TestRewriteCacheSourceLazyResetAndReferenceOrder",
             "TestRewriteCacheSourceTimestampWrap"
+          ]
+        },
+        {
+          "name": "concrete owning rewrite todo and cache child-visit state",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_traversal.go",
+          "tests": [
+            "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
+            "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
           ]
         }
       ],
@@ -112214,11 +112240,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/ufbv/rewrite_cache.go",
-        "pkg/tactic/ufbv/rewrite_cache_test.go"
+        "pkg/tactic/ufbv/rewrite_cache_test.go",
+        "pkg/tactic/ufbv/rewrite_traversal.go",
+        "pkg/tactic/ufbv/rewrite_traversal_test.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
-        "TestRewriteCacheSourceTimestampWrap"
+        "TestRewriteCacheSourceTimestampWrap",
+        "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
+        "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
       ],
       "conditionals": [
         {
@@ -112259,13 +112289,22 @@
         {
           "name": "erase, flush and finalize have no retained UFBV call site",
           "status": "dead_deleted"
+        },
+        {
+          "name": "concrete cache contains/get/insert use in reverse UFBV child traversal and cycle detection",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_traversal.go",
+          "tests": [
+            "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
+            "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
+          ]
         }
       ],
       "ownership": [
         "The sole production specialization is array_map<expr*, pair<expr*,bool>,plugin> in ufbv_rewriter. The plugin increments the expression key then expression value before a replacement decrements the old key then value. Reset advances a timestamp without releasing stale entries; replacement, timestamp wrap, and destruction release them."
       ],
       "deviations": [
-        "A Go map keyed by AST ID replaces the source optional-entry vector. The concrete cache is not yet wired into the unported UFBV rewriter. Unused erase/flush/finalize and the counters needed only by flush are excluded; no generic array_map adapter is added."
+        "A Go map keyed by AST ID replaces the source optional-entry vector. The concrete cache now runs in the selected UFBV child visitor; the enclosing rewrite loop remains open. Unused erase/flush/finalize and the counters needed only by flush are excluded; no generic array_map adapter is added."
       ]
     },
     {
@@ -160724,7 +160763,9 @@
         "pkg/math/polynomial/polynomial_psc_cleanup_reentry_source_test.go",
         "pkg/math/polynomial/polynomial_psc_next_invocation_source_test.go",
         "pkg/ast/rewriter/bv_rewriter_concat.go",
-        "pkg/ast/rewriter/bv_rewriter_concat_test.go"
+        "pkg/ast/rewriter/bv_rewriter_concat_test.go",
+        "pkg/tactic/ufbv/rewrite_traversal.go",
+        "pkg/tactic/ufbv/rewrite_traversal_test.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -160739,7 +160780,9 @@
         "TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndStoppedReset",
         "TestPolynomialGCDICCPZPXNativeMonomialGrowthIndependentModel",
         "TestPolynomialPSCBufferNativeGrowthAndReuse",
-        "TestPolynomialPSCBufferNativeStoppedReferenceCleanup"
+        "TestPolynomialPSCBufferNativeStoppedReferenceCleanup",
+        "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
+        "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
       ],
       "conditionals": [
         {
@@ -160822,6 +160865,15 @@
           "tests": [
             "TestBVConcatNativeRootsPushPopAndForwardDestruction",
             "TestBVRewriterConcatEveryColdReservationAndPublication"
+          ]
+        },
+        {
+          "name": "concrete UFBV rewrite todo with INC-before-push, pop-before-DEC and ascending teardown",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_traversal.go",
+          "tests": [
+            "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
+            "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
           ]
         }
       ],
