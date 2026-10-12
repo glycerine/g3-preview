@@ -163,10 +163,9 @@ func (s *solverSetup) noteCanceledTerm(x uint32, updateOcc, updateQueue bool, eq
 	}
 	if updateOcc && x != exceptVar {
 		i := slices.Index(s.occurrences[x], eqIndex)
-		if i < 0 {
-			return arena.ErrInvalidSlot
+		if i >= 0 {
+			s.occurrences[x] = slices.Delete(s.occurrences[x], i, i+1)
 		}
-		s.occurrences[x] = slices.Delete(s.occurrences[x], i, i+1)
 	}
 	if updateQueue && s.solved[x] != nullEquationIndex && s.queue.Contains(int32(x)) {
 		return s.queue.Erase(int32(x))

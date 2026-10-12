@@ -99,7 +99,7 @@ func (s *solverSetup) eraseOccurrence(x, eqIndex uint32) error {
 	}
 	i := slices.Index(s.occurrences[x], eqIndex)
 	if i < 0 {
-		return arena.ErrInvalidSlot
+		return nil // source svector::erase(value) ignores an absent value
 	}
 	s.occurrences[x] = slices.Delete(s.occurrences[x], i, i+1)
 	return nil

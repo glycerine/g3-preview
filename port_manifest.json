@@ -33810,6 +33810,8 @@
         "pkg/math/euclid/pivot_test.go",
         "pkg/math/euclid/decompose.go",
         "pkg/math/euclid/decompose_test.go",
+        "pkg/math/euclid/solve.go",
+        "pkg/math/euclid/solve_test.go",
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go",
         "pkg/util/numeral/scoped_numeral.go"
@@ -33833,6 +33835,9 @@
         "TestEuclideanNonUnitDecompositionZeroRemainderDropsOccurrence",
         "TestEuclideanNonUnitDecompositionSubstitutesOtherEquations",
         "TestEuclideanNonUnitDecompositionNegativeOtherCoefficient",
+        "TestEuclideanSolveNonUnitThenUnitToParameterSolution",
+        "TestEuclideanSolveContradictionAfterUnitSubstitution",
+        "TestEuclideanSolveEmptyAndAlreadyInconsistent",
         "TestEuclideanPositionSourceBinarySearch",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership",
         "TestEuclideanSetupHeaderRefusalBeforeBuffers",
@@ -33982,7 +33987,17 @@
           ]
         },
         {
-          "name": "solve loop, normalize/query and model/justification algorithms",
+          "name": "solve loop unit/non-unit dispatch, completion and inconsistency exits at cpp:708-730",
+          "status": "partial",
+          "go_target": "pkg/math/euclid/solve.go",
+          "tests": [
+            "TestEuclideanSolveNonUnitThenUnitToParameterSolution",
+            "TestEuclideanSolveContradictionAfterUnitSubstitution",
+            "TestEuclideanSolveEmptyAndAlreadyInconsistent"
+          ]
+        },
+        {
+          "name": "normalize/query and public solver algorithms",
           "status": "unported"
         }
       ],
@@ -33995,7 +34010,7 @@
       ],
       "deviations": [
         "Source normalize_eq checks divisibility of the constant but divides only variable coefficients and justification coefficients by their gcd. The Go path retains that exact result. After source normalize_eq destroys an empty zero equality, assert_eq still calls add_occs on its null slot; Go skips that invalid dereference.",
-        "Unit and non-unit elimination paths are ported with source occurrence and solution ownership order; the solve loop, normalize/query methods and public solver API remain unported. The concrete assertion and substitution paths currently operate on internally owned equations."
+        "Unit and non-unit elimination and the internal solve loop are ported with source occurrence and solution ownership order. Source svector::erase(value) ignores an absent occurrence, which happens for a decomposition parameter in the compacted original equation; Go matches this no-op. Normalize/query methods and the public solver API remain unported."
       ]
     },
     {
