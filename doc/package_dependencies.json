@@ -413,6 +413,7 @@
         "util/numeral"
       ],
       "production_files": [
+        "equation.go",
         "numeral_buffer_sort.go"
       ]
     },

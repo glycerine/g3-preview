@@ -33796,11 +33796,16 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/euclid/equation.go",
+        "pkg/math/euclid/equation_test.go",
         "pkg/math/euclid/numeral_buffer_sort.go",
         "pkg/math/euclid/numeral_buffer_sort_test.go",
         "pkg/util/numeral/scoped_numeral.go"
       ],
       "tests": [
+        "TestEuclideanEquationConstructionSortAndOwnedRelease",
+        "TestEuclideanEquationHeaderRefusalPrecedesBufferMutation",
+        "TestEuclideanEquationUnsortedDecompositionBranch",
         "TestEuclideanIntegerBufferSortAndRawSwap",
         "TestEuclideanRationalBufferSortAndRawSwap"
       ],
@@ -33879,15 +33884,26 @@
           ]
         },
         {
-          "name": "equation ownership, elimination, decomposition and model/justification algorithms",
+          "name": "equation construction mk_eq and del_eq owned numeral release at cpp:153-170,291-312",
+          "status": "partial",
+          "go_target": "pkg/math/euclid/equation.go",
+          "tests": [
+            "TestEuclideanEquationConstructionSortAndOwnedRelease",
+            "TestEuclideanEquationHeaderRefusalPrecedesBufferMutation",
+            "TestEuclideanEquationUnsortedDecompositionBranch"
+          ]
+        },
+        {
+          "name": "elimination, decomposition and model/justification algorithms",
           "status": "unported"
         }
       ],
       "ownership": [
-        "The ported sort path borrows the rational manager, copies coefficient numerals into typed owned buffer slots, sorts scalar IDs, then swaps each raw numeral with its source-indexed slot. A whole-slice raw swap transfers numeral ownership between the equation slice and buffer without cloning."
+        "The partial sort path borrows the rational manager, copies coefficient numerals into typed owned buffer slots, sorts scalar IDs, then swaps each raw numeral with its source-indexed slot. A whole-slice raw swap transfers numeral ownership between the equation slice and buffer without cloning.",
+        "The concrete equation allocates its owner header first, copies coefficients into indexed reusable slots, transfers them into its vectors with sort_core, then owns its constant, integer coefficients and rational justifications. del_eq releases those in that order, leaving caller inputs and reusable buffers separately owned."
       ],
       "deviations": [
-        "The Euclidean solver body is not yet ported; this is its concrete numeric buffer and sort path only."
+        "The Euclidean solver body is not yet ported; this covers its concrete numeric buffer, sort, and equation construction/destruction paths only."
       ]
     },
     {
