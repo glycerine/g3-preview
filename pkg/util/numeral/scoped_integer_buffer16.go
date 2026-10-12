@@ -84,6 +84,36 @@ func (b *ScopedIntegerBuffer16) Push(v *Int) error {
 	return e
 }
 
+// MultiplyAt is the reached process_add numerator-scaling operation. It
+// retains any allocation prefix produced by an interrupted in-place multiply.
+func (b *ScopedIntegerBuffer16) MultiplyAt(i uint32, factor *Int) error {
+	if e := b.check(); e != nil {
+		return e
+	}
+	if b.sourceCause != nil {
+		return b.sourceCause
+	}
+	if b.bodyCause != nil {
+		return b.bodyCause
+	}
+	if uint64(i) >= uint64(len(b.values)) {
+		return arena.ErrBounds
+	}
+	before, e := CaptureNumericAllocationRoots(b.manager)
+	if e != nil {
+		b.bodyCause = e
+		return e
+	}
+	at := &b.values[i]
+	e = b.manager.Mul(at, factor, at)
+	after := b.numeric.After(b.manager, before)
+	e = JoinNumericErrors(e, after)
+	if e != nil {
+		b.bodyCause = e
+	}
+	return e
+}
+
 func (b *ScopedIntegerBuffer16) sourceDelete(i int) error {
 	a := b.values[i]
 	_, e := SourceNumeralDel(b.manager, &a)

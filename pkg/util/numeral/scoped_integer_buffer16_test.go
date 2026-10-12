@@ -24,7 +24,7 @@ func TestScopedIntegerBuffer16CopiesMutableSubpavingCoefficients(t *testing.T) {
 	if text != "18446744073709551616" {
 		t.Fatal("subpaving numerator buffer must own a deep source copy", text)
 	}
-	serviceMust(t, z.Mul(got, &denominator, got))
+	serviceMust(t, ns.MultiplyAt(0, &denominator))
 	text, e = z.String(got)
 	serviceMust(t, e)
 	if text != "55340232221128654848" {
@@ -68,5 +68,29 @@ func TestScopedIntegerBuffer16FailedCopyRetainsOwningCleanup(t *testing.T) {
 		t.Fatal("failed source set must leave its initialized destination row", e, b.Count())
 	}
 	serviceMust(t, b.SourceClose())
+	serviceMust(t, b.Cleanup())
+}
+
+func TestScopedIntegerBuffer16FailedInPlaceScaleRetainsOwningCleanup(t *testing.T) {
+	z, budget := mpzPublicationDirectOwner(t)
+	var b ScopedIntegerBuffer16
+	serviceMust(t, b.Construct(z))
+	t.Cleanup(func() { serviceMust(t, b.Cleanup()) })
+	var large Int
+	limbs := make([]uint32, 8192)
+	limbs[0], limbs[len(limbs)-1] = 23, 1
+	serviceMust(t, z.SetLimbs(&large, limbs))
+	t.Cleanup(func() { serviceMust(t, z.Del(&large)) })
+	serviceMust(t, b.Push(&large))
+	budget.FailAfter(0)
+	e := b.MultiplyAt(0, &large)
+	budget.FailAfter(-1)
+	if !numericPhysicalReservationRefusal(e) || b.bodyCause == nil {
+		t.Fatal("in-place coefficient scale must retain its failed numeric frame", e)
+	}
+	if next := b.MultiplyAt(0, &large); next != b.bodyCause {
+		t.Fatal("stopped scale must prevent a second source mutation", next, b.bodyCause)
+	}
+	_ = b.SourceClose() // source cleanup can stop on a partially published numeral
 	serviceMust(t, b.Cleanup())
 }

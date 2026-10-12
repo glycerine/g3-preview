@@ -163157,7 +163157,8 @@
         "TestScopedBufferReviewStoppedSourceBlocksMutation",
         "TestScopedBufferReviewReleaseShrinkAboveSize",
         "TestScopedIntegerBuffer16CopiesMutableSubpavingCoefficients",
-        "TestScopedIntegerBuffer16FailedCopyRetainsOwningCleanup"
+        "TestScopedIntegerBuffer16FailedCopyRetainsOwningCleanup",
+        "TestScopedIntegerBuffer16FailedInPlaceScaleRetainsOwningCleanup"
       ],
       "conditionals": [
         {
@@ -163188,12 +163189,13 @@
           ]
         },
         {
-          "name": "Concrete unsynch_mpz_manager scoped integer buffers for expr2subpaving process_add: deep push, mutable element access, borrowed c_ptr view and ascending destructor cleanup",
+          "name": "Concrete unsynch_mpz_manager scoped integer buffers for expr2subpaving process_add: deep push, in-place numerator scaling, borrowed c_ptr view and ascending destructor cleanup",
           "status": "partial",
           "go_target": "pkg/util/numeral/scoped_integer_buffer16.go",
           "tests": [
             "TestScopedIntegerBuffer16CopiesMutableSubpavingCoefficients",
-            "TestScopedIntegerBuffer16FailedCopyRetainsOwningCleanup"
+            "TestScopedIntegerBuffer16FailedCopyRetainsOwningCleanup",
+            "TestScopedIntegerBuffer16FailedInPlaceScaleRetainsOwningCleanup"
           ]
         }
       ],
