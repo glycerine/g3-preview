@@ -164881,7 +164881,7 @@
       "path": "src/util/uint_set.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/bitset/uint_set.go",
         "pkg/util/cliques/cliques.go",
@@ -164895,6 +164895,7 @@
         "TestUintSetSourceTst3",
         "TestUintSetSourceTst4",
         "TestUintSetSourceTst5PrintedExpectations",
+        "TestUintSetSparseHighWordDisplay",
         "TestUintSetSourcePaddingCapacityAndCopies",
         "TestUintSetTraversal",
         "TestUintSetWeightedHashWrap",
@@ -164947,12 +164948,12 @@
           "text": "SASSERT(invariant());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "constructors/destructor/copy assignment/swap/reset",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/bitset/uint_set.go",
           "tests": [
             "TestUintSetSourceTst1",
@@ -164973,7 +164974,7 @@
         },
         {
           "name": "get_max_elem/empty/insert/remove/contains/num_elems",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/bitset/uint_set.go",
           "tests": [
             "TestUintSetSourceTst1",
@@ -165056,7 +165057,7 @@
           ]
         },
         {
-          "name": "Selected same-Runtime max_cliques uint_set bit-word insert/remove/reset/first/intersection/iteration source24-225",
+          "name": "Concrete max_cliques uint_set bit-word insert/remove/reset/first/intersection/iteration (max_cliques.h:24-225)",
           "status": "ported",
           "go_target": "pkg/util/cliques/cliques.go",
           "tests": [
@@ -165073,16 +165074,10 @@
         }
       ],
       "ownership": [
-        "Concrete owned uint32 words; source capacity, copy and ascending traversal preserved. UintSet-key map tst5 integration is now translated by bitset.UintSetMap. See PORT_PROGRESS.md#audit-bitset-port-status-md.",
-        "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See PORT_PROGRESS.md#audit-bitset-port-status-md.",
-        "One actual Runtime unsigned svector plus its named pending token; reflected cold owner is separately charged. Exact consumed field receipt preserves source dangling assignment after physical destroy. Copy constructor automatically runs the completed base destructor before failure return, retaining cold/pending abort context only. Ordinary destructor stop/cause is sticky; CleanupStopped separately acknowledges actual consumed storage. Immediate named graph accounts blocks, initialization bitmap and once-only cold charges.",
-        "Swap exchanges actual block and concrete physical-provider provenance without allocation, copy or charge transfer; cold wrappers retain original Budgets, moved raw growth/free use the adopted provider. Cached iterator Value reads no owner; scan_idx debug invariant precedes reached membership/word reads. Both providers must outlive exchanged backing."
+        "bitset.UintSet owns native uint32 word storage. Clone and Assign copy logical words without aliasing; Assign retains source capacity, Reset retains receiver capacity, Swap exchanges backing slices, and Close releases the slice. The concrete max_cliques owner keeps its own typed uint32 slices."
       ],
       "deviations": [
-        "Invalid extent/capacity overflow diagnosed before growth; source get_max_elem would wrap.",
-        "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered.",
-        "Selected explicit-provider/default-enabled assertion profile; process-global assertion binding, endangered wrapped extents, native ostream failbit/libc rand profile and legacy bitset allocation topology remain open. New random campaign executes source assertion expressions with an independent deterministic stream, not the exact libc sequence; broad test driver remains partial.",
-        "The copied C++ iterator and hash/equality functor wrappers were replaced by typed ascending ForEach traversal plus direct Equal and Hash methods. The redundant Runtime/Block translation was deleted."
+        "Native Go slices replace C++ vector allocation; invalid extents and capacity overflow are diagnosed before growth. Ascending ForEach replaces the copied C++ iterator and direct Equal/Hash methods replace its functor wrappers. String emits the same ordered text through Go string construction, scanning occupied words. C++ ostream flags, process assertion wiring, libc rand in the source test driver, and the test-only uint_set-key map are outside this live utility algorithm. The deleted Runtime/Block and UintSetMap translations receive no port credit."
       ]
     },
     {

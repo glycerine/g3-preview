@@ -156,6 +156,20 @@ func TestUintSetSourceTst5PrintedExpectations(t *testing.T) {
 		t.Fatal("value-key copies must be independent")
 	}
 }
+
+func TestUintSetSparseHighWordDisplay(t *testing.T) {
+	var s bitset.UintSet
+	s.Insert(1 << 20)
+	s.Insert(1)
+	if got := s.String(); got != "{1, 1048576}" {
+		t.Fatal(got)
+	}
+	s.Remove(1 << 20)
+	if got := s.String(); got != "{1}" {
+		t.Fatal(got)
+	}
+}
+
 func TestUintSetSourcePaddingCapacityAndCopies(t *testing.T) {
 	var a, b bitset.UintSet
 	b.Insert(96)

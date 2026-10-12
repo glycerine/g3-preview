@@ -194,17 +194,15 @@ func (s *UintSet) String() string {
 	var out strings.Builder
 	out.WriteByte('{')
 	first := true
-	n := s.MaxElem() + 1
-	for i := uint32(0); i < n; i++ {
-		if s.Contains(i) {
-			if first {
-				first = false
-			} else {
-				out.WriteString(", ")
-			}
-			out.WriteString(strconv.FormatUint(uint64(i), 10))
+	s.ForEach(func(i uint32) bool {
+		if first {
+			first = false
+		} else {
+			out.WriteString(", ")
 		}
-	}
+		out.WriteString(strconv.FormatUint(uint64(i), 10))
+		return true
+	})
 	out.WriteByte('}')
 	return out.String()
 }
