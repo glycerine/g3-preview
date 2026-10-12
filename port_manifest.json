@@ -83767,11 +83767,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_model_finder_quantifier_set.go",
-        "pkg/smtcore/smt_model_finder_quantifier_set_test.go"
+        "pkg/smtcore/smt_model_finder_quantifier_set_test.go",
+        "pkg/smtcore/smt_model_finder_hint_search.go",
+        "pkg/smtcore/smt_model_finder_hint_search_test.go"
       ],
       "tests": [
         "TestModelFinderScopedQuantifierSetTrailsAndEvents",
-        "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch"
+        "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
+        "TestModelFinderHintSatisfiedResidueSourceScopeTransitions"
       ],
       "assertions": [
         {
@@ -84180,7 +84183,16 @@
           "go_target": "pkg/smtcore/smt_model_finder_quantifier_set.go",
           "tests": [
             "TestModelFinderScopedQuantifierSetTrailsAndEvents",
-            "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch"
+            "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
+            "TestModelFinderHintSatisfiedResidueSourceScopeTransitions"
+          ]
+        },
+        {
+          "name": "hint_solver update_satisfied_residue with scoped set undo and quantifier_info chosen-function reset",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_search.go",
+          "tests": [
+            "TestModelFinderHintSatisfiedResidueSourceScopeTransitions"
           ]
         }
       ],
@@ -84188,7 +84200,7 @@
         "The scoped sets borrow quantifier handles; the satisfied-set undo callback clears the corresponding quantifier_info choice before each reverse set edit."
       ],
       "deviations": [
-        "Only the scoped quantifier-set storage is ported; hint_solver search, quantifier_info ownership and callbacks, and model-finder algorithms remain open."
+        "The scoped quantifier sets, update_satisfied_residue transition and satisfied-set undo callback are ported with borrowed AST handles. Macro indexes, quantifier_info ownership, greedy search and broader model-finder algorithms remain open."
       ]
     },
     {
@@ -112314,11 +112326,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_model_finder_quantifier_set.go",
-        "pkg/smtcore/smt_model_finder_quantifier_set_test.go"
+        "pkg/smtcore/smt_model_finder_quantifier_set_test.go",
+        "pkg/smtcore/smt_model_finder_hint_search.go",
+        "pkg/smtcore/smt_model_finder_hint_search_test.go"
       ],
       "tests": [
         "TestModelFinderScopedQuantifierSetTrailsAndEvents",
-        "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch"
+        "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
+        "TestModelFinderHintSatisfiedResidueSourceScopeTransitions"
       ],
       "conditionals": [
         {
@@ -112349,7 +112364,8 @@
           "go_target": "pkg/smtcore/smt_model_finder_quantifier_set.go",
           "tests": [
             "TestModelFinderScopedQuantifierSetTrailsAndEvents",
-            "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch"
+            "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
+            "TestModelFinderHintSatisfiedResidueSourceScopeTransitions"
           ]
         }
       ],
@@ -112357,7 +112373,7 @@
         "The sets borrow quantifier AST handles. Scoped edits trail values without retaining AST references; pop invokes the satisfied-set event handler before reversing each edit, in last-in-first-out order. Reset drops scopes and trails without invoking undo callbacks."
       ],
       "deviations": [
-        "A concrete Go map and typed undo slices replace the source quantifier-pointer hashtable and vectors. The model-finder hint solver and quantifier_info callback integration remain unported. Source level-zero erase calls insert and is preserved; the actual model-finder erase call is scoped."
+        "A concrete Go map and typed undo slices replace the source quantifier-pointer hashtable and vectors. The hint solver's satisfied/residue transition now binds the undo callback to its chosen-function state; macro indexes, quantifier_info ownership and greedy search remain open. Source level-zero erase calls insert and is preserved; the actual model-finder erase call is scoped."
       ]
     },
     {
