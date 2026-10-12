@@ -429,21 +429,20 @@ func (v *RationalInterval) Display(w io.Writer) error {
 	if v.upperOpen {
 		right = ")"
 	}
-	ls, us := "-oo", "+oo"
-	var err error
-	if !v.lowerInf {
-		ls, err = v.numbers.String(&v.lower)
-		if err != nil {
-			return err
-		}
+	if _, err := io.WriteString(w, left); err != nil {
+		return err
 	}
-	if !v.upperInf {
-		us, err = v.numbers.String(&v.upper)
-		if err != nil {
-			return err
-		}
+	e := RationalExtended{Numbers: v.numbers}
+	if err := e.Display(w, &v.lower, v.lowerKind()); err != nil {
+		return err
 	}
-	_, err = io.WriteString(w, left+ls+", "+us+right)
+	if _, err := io.WriteString(w, ", "); err != nil {
+		return err
+	}
+	if err := e.Display(w, &v.upper, v.upperKind()); err != nil {
+		return err
+	}
+	_, err := io.WriteString(w, right)
 	return err
 }
 

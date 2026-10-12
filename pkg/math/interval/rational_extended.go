@@ -4,6 +4,7 @@ package interval
 
 import (
 	"errors"
+	"io"
 
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -22,6 +23,26 @@ var ErrExtendedDomain = errors.New("interval: undefined extended rational operat
 // RationalExtended borrows the rational manager. Infinity operations reset
 // their output numeral, as the source does, even though its kind is infinite.
 type RationalExtended struct{ Numbers *numeral.RationalManager }
+
+// Display writes the retained ext_numeral endpoint spelling. Infinite kinds
+// do not inspect the numeral, whose storage is reset by the interval owner.
+func (e RationalExtended) Display(w io.Writer, a *numeral.Rational, k ExtendedKind) error {
+	switch k {
+	case MinusInfinity:
+		_, err := io.WriteString(w, "-oo")
+		return err
+	case PlusInfinity:
+		_, err := io.WriteString(w, "+oo")
+		return err
+	default:
+		s, err := e.Numbers.String(a)
+		if err != nil {
+			return err
+		}
+		_, err = io.WriteString(w, s)
+		return err
+	}
+}
 
 func (e RationalExtended) IsZero(a *numeral.Rational, k ExtendedKind) (bool, error) {
 	if k != Finite {

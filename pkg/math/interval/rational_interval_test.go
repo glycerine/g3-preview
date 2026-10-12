@@ -2,11 +2,30 @@ package interval
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
+
+type failAfterWrites struct {
+	bytes.Buffer
+	remaining int
+	err       error
+}
+
+func (w *failAfterWrites) Write(p []byte) (int, error) {
+	if w.remaining == 0 {
+		return 0, w.err
+	}
+	w.remaining--
+	return w.Buffer.Write(p)
+}
+
+func (w *failAfterWrites) WriteString(s string) (int, error) {
+	return w.Write([]byte(s))
+}
 
 func TestRationalIntervalRetainedPredicatesAddSubAndOwnership(t *testing.T) {
 	budget := arena.NewBudget(1 << 30)
@@ -57,6 +76,13 @@ func TestRationalIntervalRetainedPredicatesAddSubAndOwnership(t *testing.T) {
 	must(a.Display(&out))
 	if out.String() != "(-3/2, 2]" {
 		t.Fatalf("interval display = %q", out.String())
+	}
+	// Source interval display inserts each component in order. A failed
+	// upper endpoint write must leave the already emitted prefix intact.
+	writeErr := errors.New("upper endpoint refused")
+	refused := &failAfterWrites{remaining: 3, err: writeErr}
+	if err := a.Display(refused); !errors.Is(err, writeErr) || refused.String() != "(-3/2, " {
+		t.Fatalf("display refusal = (%q, %v)", refused.String(), err)
 	}
 	before, err := a.Before(b)
 	must(err)

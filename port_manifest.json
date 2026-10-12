@@ -115446,6 +115446,14 @@
           ]
         },
         {
+          "name": "Concrete mpq extended-number display: source-order finite and signed-infinity endpoint insertion reached by interval_manager (src/util/ext_numeral.h:321-333)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/rational_extended.go",
+          "tests": [
+            "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+          ]
+        },
+        {
           "name": "Concrete mpfx extended-number finite/infinity sign, order, negation, add/sub/mul/div, reciprocal and power reached by subpaving interval template (src/util/ext_numeral.h:27-344)",
           "status": "partial",
           "go_target": "pkg/math/interval/fixed_extended.go",
@@ -115455,12 +115463,12 @@
         }
       ],
       "ownership": [
-        "RationalExtended borrows the rational manager and operand numerals. Finite arithmetic writes its caller-owned output; infinity results reset that output numerator/denominator using the manager, preserving source cleanup. The interval manager consumer remains unported."
+        "RationalExtended borrows the rational manager and operand numerals. Finite arithmetic writes its caller-owned output; infinity results reset that output numerator/denominator using the manager, preserving source cleanup. Its display writes to the caller-owned writer in source order."
       ],
       "deviations": [
-        "No generic manager-interface translation is retained. The sole production consumer is the unported math/interval subsystem; implement its concrete numeral specialization beside that consumer when interval is ported. src/test/ext_numeral.cpp is test-only and supplies no production reason to retain an unused Go abstraction.",
+        "No generic manager-interface translation is retained. Concrete mpq, mpbq and mpfx specializations live beside their interval and subpaving consumers. src/test/ext_numeral.cpp is test-only.",
         "Whole-source instantiation audit found real-closure mpbq and subpaving mpq/mpfx/mpf/mpff/hwf consumers; the concrete rational and binary-rational Go paths do not close all retained instantiations.",
-        "The concrete mpfx extended-number path is present but not yet wired to a subpaving interval owner; this does not complete the live subpaving instantiation."
+        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner; whole subpaving and other extended-number instantiations remain unfinished."
       ]
     },
     {
