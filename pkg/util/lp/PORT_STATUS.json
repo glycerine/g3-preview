@@ -7452,7 +7452,7 @@
     },
     {
       "source": "src/util/lp/sparse_matrix_instances.cpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/sparse_matrix_float.go",
         "pkg/util/lp/sparse_matrix_exact.go",
@@ -7549,7 +7549,8 @@
         "TestLPSparseExtensionNativeInlineOnes",
         "TestLPSparseExtensionBoundsShrinkAndStoppedOwner",
         "TestLPSparseExtensionPublicationErrors"
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained sparse-matrix explicit instantiation audit: double/double, mpq/mpq and mpq/numeric_pair<mpq> basis, pivot, eta, replacement, dense and indexed solve symbols with actual retained callers map to concrete float or shared rational Go code. Float indexed refinement is live; precise double_solve_U_y instantiations are emitted but unreachable because retained LU precise branches return after solve_U_y and are excluded. Debug triangular checkers and definition-only overloads without retained calls are likewise excluded. Native and g3debug,g3checked focused sparse tests and checked swap diagnostics pass on the same concrete matrix implementations; representative native coverage is float basis60/60, exact basis114/121, float elimination151/160, exact elimination189/209, exact pivot160/178, exact active97/103, exact eta64/68 and exact dense solve116/125. Rational ownership tracks each copied cell/product and stopped manager invocation, never adopting older caller comparison receipts."
     },
     {
       "source": "src/util/lp/sparse_vector.h",
@@ -8265,10 +8266,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 78,
+    "ported": 79,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 17
+    "partial": 16
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -15219,6 +15220,26 @@
       "src/util/lp/sparse_matrix.h"
     ],
     "scope": "Whole retained sparse_matrix.h declaration/inline audit for double/double and mpq/mpq or mpq/numeric_pair<mpq>: concrete typed Go matrices implement basis copy, reciprocal row/column links, permutation-adjusted queries, elimination, maximum-head ordering, active/pivot queues, eta creation, column replacement/restoration, dense/indexed triangular solves, float refinement, resize and live row/column graph traversal. The header inline permutation compositions and active predicates follow source order. Debug swap setters/diagnostics pass their separate checked tests. Unused debug checkers, uncalled template overloads, definition-only column deletion and unreachable post-return driver methods are excluded; sparse_matrix.hpp and LU/solver source units retain independent audits. Native and g3debug,g3checked focused sparse tests pass. Representative native coverage: float basis60/60, exact basis114/121, float elimination151/160, exact elimination189/209, exact pivot160/178, exact active97/103, exact eta64/68, exact indexed solve92/103 and exact dense solve116/125; checked results are similar or higher. Exact numeral cells, temporary products and stopped calls retain physical ownership; older caller comparison receipts stay borrowed.",
+    "focused_tests": [
+      "TestLPExactSparse",
+      "TestLPFloatSparse",
+      "TestLPSparse",
+      "TestLPDriverSwap",
+      "TestLPDriverSwaps"
+    ],
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-sparse-header-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-sparse-header-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+  },
+  "latest_sparse_matrix_instances_whole_audit": {
+    "source_units": [
+      "src/util/lp/sparse_matrix_instances.cpp"
+    ],
+    "scope": "Whole retained sparse-matrix explicit instantiation audit: double/double, mpq/mpq and mpq/numeric_pair<mpq> basis, pivot, eta, replacement, dense and indexed solve symbols with actual retained callers map to concrete float or shared rational Go code. Float indexed refinement is live; precise double_solve_U_y instantiations are emitted but unreachable because retained LU precise branches return after solve_U_y and are excluded. Debug triangular checkers and definition-only overloads without retained calls are likewise excluded. Native and g3debug,g3checked focused sparse tests and checked swap diagnostics pass on the same concrete matrix implementations; representative native coverage is float basis60/60, exact basis114/121, float elimination151/160, exact elimination189/209, exact pivot160/178, exact active97/103, exact eta64/68 and exact dense solve116/125. Rational ownership tracks each copied cell/product and stopped manager invocation, never adopting older caller comparison receipts.",
     "focused_tests": [
       "TestLPExactSparse",
       "TestLPFloatSparse",
