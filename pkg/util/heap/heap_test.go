@@ -190,7 +190,7 @@ func TestHeapIndependentMutableOracle(t *testing.T) {
 	}
 }
 
-func TestHeapSourceShapeFindLEAndLifetime(t *testing.T) {
+func TestHeapSourceShapeAndLifetime(t *testing.T) {
 	h := testInt(t, 20, Config{})
 	for _, v := range []int32{4, 2, 6, 1, 3, 5, 7} {
 		heapMust(t, h.Insert(v))
@@ -207,14 +207,6 @@ func TestHeapSourceShapeFindLEAndLifetime(t *testing.T) {
 	heapMust(t, e)
 	if text != "1\n 2\n  4\n  3\n 5\n  6\n  7\n" {
 		t.Fatal("source display", text)
-	}
-	result, e := h.FindLE(5, []int32{99})
-	heapMust(t, e)
-	want = []int32{99, 1, 5, 2, 3, 4}
-	for i, v := range want {
-		if result[i] != v {
-			t.Fatal("source right-first LIFO walk", result)
-		}
 	}
 	it := h.Begin()
 	if v, e := it.Value(); e != nil || v != 1 {
@@ -313,80 +305,6 @@ func TestHeapBudgetsFailuresSwapAndWarm(t *testing.T) {
 	if b.Used() != 0 {
 		t.Fatal("owner close leak")
 	}
-}
-
-func TestHeapFindLEFailureAndSourceCapacity(t *testing.T) {
-	for fail := int64(0); fail < 16; fail++ {
-		b := arena.NewBudget(1 << 20)
-		h := testInt(t, 16, Config{Budget: b})
-		for i := int32(1); i <= 7; i++ {
-			heapMust(t, h.Insert(i))
-		}
-		dst := make([]int32, 1, 16)
-		dst[0] = 99
-		whole := dst[:cap(dst)]
-		for i := 1; i < len(whole); i++ {
-			whole[i] = 88
-		}
-		b.FailAfter(fail)
-		got, e := h.FindLE(7, dst)
-		b.FailAfter(-1)
-		want := []int32{99, 1, 3, 7, 6, 2, 5, 4}
-		if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal(e)
-		}
-		if len(got) > len(want) {
-			t.Fatal("excess query output", got)
-		}
-		for i, x := range got {
-			if x != want[i] {
-				t.Fatal("immediate source traversal prefix", fail, got)
-			}
-		}
-		for i := len(got); i < len(whole); i++ {
-			if whole[i] != 88 {
-				t.Fatal("query wrote beyond published prefix", i)
-			}
-		}
-		if e == nil && len(got) != len(want) {
-			t.Fatal("source traversal", got)
-		}
-		if !h.CheckInvariant() || h.Size() != 7 {
-			t.Fatal("query altered heap")
-		}
-		heapMust(t, h.Close())
-		if b.Used() != 0 {
-			t.Fatal("failed query leaked storage")
-		}
-	}
-	b := arena.NewBudget(1 << 20)
-	h := testInt(t, 16, Config{Budget: b})
-	for i := int32(0); i < 10; i++ {
-		heapMust(t, h.Insert(i))
-	}
-	dst := make([]int32, 0, 10)
-	var e error
-	dst, e = h.FindLE(100, dst)
-	heapMust(t, e)
-	b.FailAfter(0)
-	if got, e := h.FindLE(100, dst[:0]); !errors.Is(e, arena.ErrInjectedFailure) || len(got) != 0 {
-		t.Fatal("fresh lexical todo must reserve", got, e)
-	}
-	b.FailAfter(-1)
-	before := b.Used()
-	if n := testing.AllocsPerRun(100, func() {
-		var err error
-		dst, err = h.FindLE(100, dst[:0])
-		if err != nil {
-			panic(err)
-		}
-	}); n == 0 {
-		t.Fatal("source fresh lexical todo allocation omitted")
-	}
-	if b.Used() != before {
-		t.Fatal("lexical query storage leak")
-	}
-
 }
 
 func TestHeapEpochBoundsIteratorAndComparatorSwap(t *testing.T) {
@@ -488,10 +406,6 @@ func TestHeapCopyAndAllocationSizeBoundary(t *testing.T) {
 	for _, v := range []int32{4, 2, 6, 1} {
 		heapMust(t, h.Insert(v))
 	}
-	var out []int32
-	var e error
-	out, e = h.FindLE(6, out)
-	heapMust(t, e)
 	copyBudget := arena.NewBudget(1 << 20)
 	c, e := h.Clone(copyBudget)
 	heapMust(t, e)

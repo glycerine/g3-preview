@@ -1,9 +1,8 @@
-// Source: src/util/heap.h:27-28,272-285; src/util/vector.h:102-129,191-202.
+// Source: src/util/heap.h:27-28; src/util/vector.h:102-129,191-202.
 package heap
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -32,29 +31,4 @@ func TestHeapAssignmentSourceDestroyedFirstMember(t *testing.T) {
 	}
 	b.FailAfter(-1)
 	heapMust(t, dst.CleanupStopped())
-}
-
-func TestHeapFindLESourceOutputBeforeChildGrowth(t *testing.T) {
-	b := arena.NewBudget(1 << 20)
-	h := testInt(t, 16, Config{Budget: b})
-	for i := int32(1); i <= 7; i++ {
-		heapMust(t, h.Insert(i))
-	}
-	dst := make([]int32, 1, 16)
-	dst[0] = 99
-	before := b.Used()
-	b.FailAfter(1)
-	got, e := h.FindLE(7, dst)
-	// Fresh todo capacity two accepts root's left/right. Processing right=3
-	// publishes value3, then pushes left6 before right7 requires capacity3.
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatalf("child growth refusal: %v", e)
-	}
-	if !reflect.DeepEqual(got, []int32{99, 1, 3}) {
-		t.Fatalf("source immediate output prefix: %v", got)
-	}
-	if b.Used() != before {
-		t.Fatalf("lexical todo did not destruct: %d -> %d", before, b.Used())
-	}
-	b.FailAfter(-1)
 }

@@ -357,39 +357,6 @@ func (h *Int) AppendValues(dst []int32) ([]int32, error) {
 	return append(dst, h.values[1:]...), nil
 }
 
-// FindLE appends each visited value before its separate left/right todo pushes.
-// The source todo is lexical and discarded at return.
-func (h *Int) FindLE(v int32, dst []int32) ([]int32, error) {
-	if e := h.alive(); e != nil {
-		return dst, e
-	}
-	var todo []int32
-	defer func() { h.budget.Release(uint64(cap(todo)) * 4) }()
-	if e := h.grow(&todo, 1); e != nil {
-		return dst, e
-	}
-	todo = append(todo, 1)
-	for len(todo) > 0 {
-		i := todo[len(todo)-1]
-		todo = todo[:len(todo)-1]
-		if i >= int32(len(h.values)) || h.lt(v, h.values[i]) {
-			continue
-		}
-		dst = append(dst, h.values[i])
-		if i < 0 || i > int32(^uint32(0)>>2) {
-			return dst, ErrIndexDomain
-		}
-		if e := h.grow(&todo, len(todo)+1); e != nil {
-			return dst, e
-		}
-		todo = append(todo, i<<1)
-		if e := h.grow(&todo, len(todo)+1); e != nil {
-			return dst, e
-		}
-		todo = append(todo, (i<<1)+1)
-	}
-	return dst, nil
-}
 func (h *Int) Display() (string, error) {
 	if e := h.alive(); e != nil {
 		return "", e
@@ -462,7 +429,7 @@ func (h *Int) Swap(other *Int) error {
 }
 
 // Clone implements the source implicit heap copy constructor. Vector capacities
-// are copied exactly; the source's local FindLE workspaces are not copied.
+// are copied exactly.
 func (h *Int) Clone(budget *arena.Budget) (*Int, error) {
 	if e := h.alive(); e != nil {
 		return nil, e
