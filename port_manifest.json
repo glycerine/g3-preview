@@ -49828,7 +49828,9 @@
         "pkg/math/subpaving/fixed_interval_div.go",
         "pkg/math/subpaving/fixed_interval_div_test.go",
         "pkg/math/subpaving/fixed_node.go",
-        "pkg/math/subpaving/fixed_node_test.go"
+        "pkg/math/subpaving/fixed_node_test.go",
+        "pkg/math/subpaving/fixed_node_predicates.go",
+        "pkg/math/subpaving/fixed_node_predicates_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -49836,7 +49838,8 @@
         "TestSubpavingFixedIntervalPowerRetainedCases",
         "TestSubpavingFixedIntervalMulSignClasses",
         "TestSubpavingFixedIntervalDivSignBranches",
-        "TestSubpavingFixedNodeConstantIntervalViews"
+        "TestSubpavingFixedNodeConstantIntervalViews",
+        "TestSubpavingFixedNodeBoundPredicates"
       ],
       "conditionals": [
         {
@@ -49943,10 +49946,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/subpaving/fixed_node.go",
-        "pkg/math/subpaving/fixed_node_test.go"
+        "pkg/math/subpaving/fixed_node_test.go",
+        "pkg/math/subpaving/fixed_node_predicates.go",
+        "pkg/math/subpaving/fixed_node_predicates_test.go"
       ],
       "tests": [
-        "TestSubpavingFixedNodeConstantIntervalViews"
+        "TestSubpavingFixedNodeConstantIntervalViews",
+        "TestSubpavingFixedNodeBoundPredicates"
       ],
       "assertions": [
         {
@@ -147151,7 +147157,9 @@
         "pkg/util/numeral/mpfx_convert.go",
         "pkg/util/numeral/mpfx_convert_test.go",
         "pkg/util/numeral/mpfx_predicates.go",
-        "pkg/util/numeral/mpfx_predicates_test.go"
+        "pkg/util/numeral/mpfx_predicates_test.go",
+        "pkg/util/numeral/mpfx_power_of_two.go",
+        "pkg/util/numeral/mpfx_power_of_two_test.go"
       ],
       "tests": [
         "TestFixedPointRetainedArithmeticAndDirectedRounding",
@@ -147159,7 +147167,8 @@
         "TestFixedPointRetainedFloorCeilInverseAndPower",
         "TestFixedPointPowerAliasExtraSquareAndCeilOverflow",
         "TestFixedPointRetainedRationalIntegerConversionAndDisplay",
-        "TestFixedPointRetainedOrderingSignsIncrementAndSwap"
+        "TestFixedPointRetainedOrderingSignsIncrementAndSwap",
+        "TestFixedPointPrevPowerOfTwoSourceIntegerWords"
       ],
       "conditionals": [
         {
@@ -147429,6 +147438,14 @@
           "tests": [
             "TestFixedPointRetainedOrderingSignsIncrementAndSwap"
           ]
+        },
+        {
+          "name": "Retained integer-word prev_power_of_two query for subpaving nth-root approximation (src/util/mpfx.cpp:864-868)",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpfx_power_of_two.go",
+          "tests": [
+            "TestFixedPointPrevPowerOfTwoSourceIntegerWords"
+          ]
         }
       ],
       "ownership": [
@@ -147453,7 +147470,9 @@
         "pkg/util/numeral/mpfx_convert.go",
         "pkg/util/numeral/mpfx_convert_test.go",
         "pkg/util/numeral/mpfx_predicates.go",
-        "pkg/util/numeral/mpfx_predicates_test.go"
+        "pkg/util/numeral/mpfx_predicates_test.go",
+        "pkg/util/numeral/mpfx_power_of_two.go",
+        "pkg/util/numeral/mpfx_power_of_two_test.go"
       ],
       "tests": [
         "TestFixedPointRetainedArithmeticAndDirectedRounding",
@@ -147461,7 +147480,8 @@
         "TestFixedPointRetainedFloorCeilInverseAndPower",
         "TestFixedPointPowerAliasExtraSquareAndCeilOverflow",
         "TestFixedPointRetainedRationalIntegerConversionAndDisplay",
-        "TestFixedPointRetainedOrderingSignsIncrementAndSwap"
+        "TestFixedPointRetainedOrderingSignsIncrementAndSwap",
+        "TestFixedPointPrevPowerOfTwoSourceIntegerWords"
       ],
       "conditionals": [
         {
@@ -147508,6 +147528,14 @@
           "go_target": "pkg/util/numeral/mpfx_predicates.go",
           "tests": [
             "TestFixedPointRetainedOrderingSignsIncrementAndSwap"
+          ]
+        },
+        {
+          "name": "Retained integer-word prev_power_of_two query for subpaving nth-root approximation (src/util/mpfx.cpp:864-868)",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpfx_power_of_two.go",
+          "tests": [
+            "TestFixedPointPrevPowerOfTwoSourceIntegerWords"
           ]
         }
       ],

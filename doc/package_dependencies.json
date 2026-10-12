@@ -751,7 +751,8 @@
         "fixed_interval_mul.go",
         "fixed_interval_power.go",
         "fixed_interval_scalar.go",
-        "fixed_node.go"
+        "fixed_node.go",
+        "fixed_node_predicates.go"
       ]
     },
     {
@@ -1773,6 +1774,7 @@
         "mpfx_convert.go",
         "mpfx_core.go",
         "mpfx_ops.go",
+        "mpfx_power_of_two.go",
         "mpfx_predicates.go",
         "mpn.go",
         "mpn_cstring.go",
