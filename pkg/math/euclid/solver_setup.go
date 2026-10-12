@@ -48,6 +48,7 @@ type solverSetup struct {
 	solved             []uint32
 	occurrences        [][]uint32
 	nextJustification  uint32
+	inconsistent       uint32
 	equations          []*equation
 	solution           []*equation
 	equationCloseIndex int
@@ -91,7 +92,8 @@ func newSolverSetup(m *numeral.RationalManager) (*solverSetup, error) {
 		m.BudgetField.Release(header)
 		return nil, e
 	}
-	s := &solverSetup{manager: m, asBuffer: as, bsBuffer: bs, tmpAs: tmpAs, tmpBs: tmpBs, header: header}
+	s := &solverSetup{manager: m, asBuffer: as, bsBuffer: bs, tmpAs: tmpAs, tmpBs: tmpBs,
+		inconsistent: nullEquationIndex, header: header}
 	s.self = s
 	s.queue, e = heap.New(16, heap.Config{Budget: m.BudgetField, Less: func(a, b int32) bool {
 		return s.solved[a] < s.solved[b]

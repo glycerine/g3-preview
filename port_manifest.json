@@ -33804,6 +33804,8 @@
         "pkg/math/euclid/addmul_test.go",
         "pkg/math/euclid/apply_solution.go",
         "pkg/math/euclid/apply_solution_test.go",
+        "pkg/math/euclid/normalize.go",
+        "pkg/math/euclid/normalize_test.go",
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go",
         "pkg/util/numeral/scoped_numeral.go"
@@ -33817,6 +33819,10 @@
         "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
         "TestEuclideanRationalAddmulMergedJustifications",
         "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
+        "TestEuclideanAssertEquationNormalizeAndOccurrences",
+        "TestEuclideanNormalizeUnitGCDPreservesEquation",
+        "TestEuclideanConstantOnlyTrivialAndContradictoryEquations",
+        "TestEuclideanAssertEquationSubstitutesThenNormalizes",
         "TestEuclideanPositionSourceBinarySearch",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership",
         "TestEuclideanSetupHeaderRefusalBeforeBuffers",
@@ -33935,6 +33941,17 @@
           ]
         },
         {
+          "name": "assert_eq publication, apply_solution, normalize_eq gcd/divisibility and add_occs at cpp:173-222,504-510,547-564",
+          "status": "partial",
+          "go_target": "pkg/math/euclid/normalize.go",
+          "tests": [
+            "TestEuclideanAssertEquationNormalizeAndOccurrences",
+            "TestEuclideanNormalizeUnitGCDPreservesEquation",
+            "TestEuclideanConstantOnlyTrivialAndContradictoryEquations",
+            "TestEuclideanAssertEquationSubstitutesThenNormalizes"
+          ]
+        },
+        {
           "name": "elimination, decomposition and model/justification algorithms",
           "status": "unported"
         }
@@ -33946,7 +33963,8 @@
         "Solved-equation promotion transfers one equation pointer from the todo list to the solution list. apply_solution swaps integer and rational row storage through reusable owned numeral buffers; the old target row remains in its buffer until the next reset or solver destruction. The coefficient borrowed from that old row remains alive across the rational merge."
       ],
       "deviations": [
-        "Normalization, pivot elimination, decomposition and the public solver API remain unported; the concrete substitution path currently operates on internally owned equations."
+        "Source normalize_eq checks divisibility of the constant but divides only variable coefficients and justification coefficients by their gcd. The Go path retains that exact result. After source normalize_eq destroys an empty zero equality, assert_eq still calls add_occs on its null slot; Go skips that invalid dereference.",
+        "Pivot selection/elimination, decomposition and the public solver API remain unported; the concrete assertion and substitution paths currently operate on internally owned equations."
       ]
     },
     {
