@@ -1,0 +1,105 @@
+package ufbv
+
+import (
+	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/symbol"
+)
+
+func TestRewriteRuleIndexTriesRulesAndOwnsDemodulators(t *testing.T) {
+	m := cacheFixture(t)
+	b, e := m.MkBoolSort()
+	cacheMust(t, e)
+	pin := func(h ast.ASTHandle) ast.ASTHandle {
+		t.Helper()
+		cacheMust(t, m.IncRef(h))
+		t.Cleanup(func() { cacheMust(t, m.DecRef(h)) })
+		return h
+	}
+	makeDecl := func(name uint32, arity int) ast.ASTHandle {
+		t.Helper()
+		domain := make([]ast.ASTHandle, arity)
+		for i := range domain {
+			domain[i] = b
+		}
+		h, e := m.MkFuncDecl(symbol.Numerical(name), domain, b, ast.ASTFuncDeclInfo{})
+		cacheMust(t, e)
+		return pin(h)
+	}
+	app := func(d ast.ASTHandle, args ...ast.ASTHandle) ast.ASTHandle {
+		t.Helper()
+		h, e := m.MkApp(d, args)
+		cacheMust(t, e)
+		return pin(h)
+	}
+	x, e := m.MkVar(0, b)
+	cacheMust(t, e)
+	pin(x)
+	y, e := m.MkVar(1, b)
+	cacheMust(t, e)
+	pin(y)
+	f, g, ad, bd := makeDecl(51, 2), makeDecl(52, 1), makeDecl(53, 0), makeDecl(54, 0)
+	a, c := app(ad), app(bd)
+	firstLHS, secondLHS := app(f, x, x), app(f, x, y)
+	firstRHS, secondRHS := app(g, x), app(g, y)
+	want := app(g, c)
+	q := func(name uint32) ast.ASTHandle {
+		h, e := m.MkQuantifier(ast.ASTQuantifierSpec{
+			Forall: true, Sorts: []ast.ASTHandle{b},
+			Names: []symbol.Symbol{symbol.Numerical(name)}, Body: x,
+		})
+		cacheMust(t, e)
+		return pin(h)
+	}
+	q1, q2 := q(55), q(56)
+	base := make(map[ast.ASTHandle]uint32)
+	for _, h := range []ast.ASTHandle{q1, firstLHS, firstRHS, q2, secondLHS, secondRHS} {
+		base[h], e = m.GetRefCount(h)
+		cacheMust(t, e)
+	}
+	r, e := newRewriteRuleIndex(m)
+	cacheMust(t, e)
+	t.Cleanup(func() { cacheMust(t, r.close()) })
+	cacheMust(t, r.insert(q1, firstLHS, firstRHS))
+	cacheMust(t, r.insert(q2, secondLHS, secondRHS))
+	for h, refs := range base {
+		got, e := m.GetRefCount(h)
+		cacheMust(t, e)
+		if got != refs+1 {
+			t.Fatal("indexed rule must retain quantifier and both expressions", h, got, refs)
+		}
+	}
+	if len(r.byFunc[f]) != 2 {
+		t.Fatal("forward index lost a rule")
+	}
+	out, matched, e := r.tryRewrite(f, []ast.ASTHandle{a, c})
+	cacheMust(t, e)
+	if !matched {
+		t.Fatal("second demodulator should match after first repeated-variable refusal")
+	}
+	got, e := m.RefGet(out)
+	cacheMust(t, e)
+	if got != want {
+		t.Fatal("rewrite1 selected wrong RHS", got, want)
+	}
+	miss, matched, e := r.tryRewrite(f, []ast.ASTHandle{a})
+	cacheMust(t, e)
+	if matched || miss != (ast.ASTRef{}) {
+		t.Fatal("arity mismatch should skip indexed rules")
+	}
+	cacheMust(t, r.close())
+	for h, refs := range base {
+		got, e := m.GetRefCount(h)
+		cacheMust(t, e)
+		if got != refs {
+			t.Fatal("index close leaked a rule reference", h, got, refs)
+		}
+	}
+	got, e = m.RefGet(out)
+	cacheMust(t, e)
+	if got != want {
+		t.Fatal("caller result must outlive rule index")
+	}
+	cacheMust(t, m.DelRef(&out))
+}

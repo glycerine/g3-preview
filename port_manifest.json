@@ -100333,7 +100333,8 @@
         "pkg/tactic/ufbv/rewrite_traversal.go",
         "pkg/tactic/ufbv/rewrite_traversal_test.go",
         "pkg/tactic/ufbv/match_subst.go",
-        "pkg/tactic/ufbv/match_subst_apply.go"
+        "pkg/tactic/ufbv/match_subst_apply.go",
+        "pkg/tactic/ufbv/rewrite_rule_index.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
@@ -100341,7 +100342,8 @@
         "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
         "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
         "TestMatchSubstConcretePairCacheAndVariableBindings",
-        "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
+        "TestMatchSubstTwoOffsetRHSAndQuantifierShift",
+        "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
       ],
       "conditionals": [
         {
@@ -100495,13 +100497,21 @@
           "tests": [
             "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
           ]
+        },
+        {
+          "name": "insert_fwd_idx and rewrite1 concrete quantifier index, arity filtering and matcher dispatch",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
+          "tests": [
+            "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
+          ]
         }
       ],
       "ownership": [
-        "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction. The matcher borrows pair-cache keys but retains each substitution target until reset or close."
+        "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction. The matcher borrows pair-cache keys but retains each substitution target until reset or close. The forward rule index retains one reference each to quantifier, LHS and RHS until index close."
       ],
       "deviations": [
-        "The concrete rewrite cache, reverse child-visit/cycle step and match_subst expression instance check plus two-offset RHS application are ported; the remaining UFBV rewrite loop and tactic integration remain open."
+        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, and forward-rule dispatch are ported; the remaining UFBV rewrite loop, rule removal/rescheduling and tactic integration remain open."
       ]
     },
     {
@@ -100515,7 +100525,8 @@
         "pkg/tactic/ufbv/rewrite_traversal.go",
         "pkg/tactic/ufbv/rewrite_traversal_test.go",
         "pkg/tactic/ufbv/match_subst.go",
-        "pkg/tactic/ufbv/match_subst_apply.go"
+        "pkg/tactic/ufbv/match_subst_apply.go",
+        "pkg/tactic/ufbv/rewrite_rule_index.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
@@ -100523,7 +100534,8 @@
         "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
         "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
         "TestMatchSubstConcretePairCacheAndVariableBindings",
-        "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
+        "TestMatchSubstTwoOffsetRHSAndQuantifierShift",
+        "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
       ],
       "conditionals": [
         {
@@ -100571,10 +100583,18 @@
           "tests": [
             "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
           ]
+        },
+        {
+          "name": "concrete fwd_idx/demodulator2lhs_rhs ownership and rewrite1 dispatch",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
+          "tests": [
+            "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
+          ]
         }
       ],
       "ownership": [
-        "The concrete plugin borrows its AST manager and retains each stored key and expression value; the bool payload is a scalar."
+        "The concrete plugin borrows its AST manager and retains each stored key and expression value; the bool payload is a scalar. The rule index separately retains each indexed quantifier, LHS and RHS."
       ],
       "deviations": [
         "The matcher uses a concrete Go pair map and two-offset RHS substitution; the surrounding UFBV rewriter remains open."
@@ -156887,7 +156907,8 @@
         "pkg/ast/ast_expr_substitution_ops.go",
         "pkg/ast/rewriter/bv_trailing_table.go",
         "pkg/smtcore/smt_model_finder_hint_cycle.go",
-        "pkg/smtcore/smt_model_finder_hint_indexes.go"
+        "pkg/smtcore/smt_model_finder_hint_indexes.go",
+        "pkg/tactic/ufbv/rewrite_rule_index.go"
       ],
       "tests": [
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
@@ -156948,7 +156969,8 @@
         "TestBVTrailingNativeWideDeletionReset",
         "TestBVTrailingEveryColdCountReservation",
         "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations",
-        "TestModelFinderHintPreprocessIndexesAndResidueCandidates"
+        "TestModelFinderHintPreprocessIndexesAndResidueCandidates",
+        "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
       ],
       "conditionals": [
         {
@@ -157079,6 +157101,14 @@
           "go_target": "pkg/smtcore/smt_model_finder_hint_indexes.go",
           "tests": [
             "TestModelFinderHintPreprocessIndexesAndResidueCandidates"
+          ]
+        },
+        {
+          "name": "UFBV fwd_idx and demodulator2lhs_rhs concrete declaration and quantifier object maps",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
+          "tests": [
+            "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
           ]
         }
       ],
