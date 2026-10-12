@@ -40,13 +40,18 @@ type solverSetup struct {
 	manager            *numeral.RationalManager
 	asBuffer           *numeral.ScopedIntVector
 	bsBuffer           *numeral.ScopedRationalVector
+	tmpAs              *numeral.ScopedIntVector
+	tmpBs              *numeral.ScopedRationalVector
+	tmpXs              []uint32
 	queue              *heap.Int
 	parameter          []bool
 	solved             []uint32
 	occurrences        [][]uint32
 	nextJustification  uint32
 	equations          []*equation
+	solution           []*equation
 	equationCloseIndex int
+	solutionCloseIndex int
 	header             uint64
 	closed             bool
 	stop               error
@@ -71,12 +76,29 @@ func newSolverSetup(m *numeral.RationalManager) (*solverSetup, error) {
 		m.BudgetField.Release(header)
 		return nil, e
 	}
-	s := &solverSetup{manager: m, asBuffer: as, bsBuffer: bs, header: header}
+	tmpAs, e := numeral.NewScopedIntVector(m.Integers())
+	if e != nil {
+		_ = bs.Close()
+		_ = as.Close()
+		m.BudgetField.Release(header)
+		return nil, e
+	}
+	tmpBs, e := numeral.NewScopedRationalVector(m)
+	if e != nil {
+		_ = tmpAs.Close()
+		_ = bs.Close()
+		_ = as.Close()
+		m.BudgetField.Release(header)
+		return nil, e
+	}
+	s := &solverSetup{manager: m, asBuffer: as, bsBuffer: bs, tmpAs: tmpAs, tmpBs: tmpBs, header: header}
 	s.self = s
 	s.queue, e = heap.New(16, heap.Config{Budget: m.BudgetField, Less: func(a, b int32) bool {
 		return s.solved[a] < s.solved[b]
 	}})
 	if e != nil {
+		_ = tmpBs.Close()
+		_ = tmpAs.Close()
 		_ = bs.Close()
 		_ = as.Close()
 		m.BudgetField.Release(header)
@@ -188,13 +210,30 @@ func (s *solverSetup) Close() error {
 		return nil
 	}
 	for s.equationCloseIndex < len(s.equations) {
+		if s.equations[s.equationCloseIndex] == nil {
+			s.equationCloseIndex++
+			continue
+		}
 		if e := s.equations[s.equationCloseIndex].Close(); e != nil {
 			return e
 		}
 		s.equations[s.equationCloseIndex] = nil
 		s.equationCloseIndex++
 	}
+	for s.solutionCloseIndex < len(s.solution) {
+		if e := s.solution[s.solutionCloseIndex].Close(); e != nil {
+			return e
+		}
+		s.solution[s.solutionCloseIndex] = nil
+		s.solutionCloseIndex++
+	}
 	if e := s.queue.Close(); e != nil {
+		return e
+	}
+	if e := s.tmpBs.Close(); e != nil {
+		return e
+	}
+	if e := s.tmpAs.Close(); e != nil {
 		return e
 	}
 	if e := s.bsBuffer.Close(); e != nil {
@@ -205,7 +244,7 @@ func (s *solverSetup) Close() error {
 	}
 	s.manager.BudgetField.Release(s.header)
 	s.header = 0
-	s.parameter, s.solved, s.occurrences, s.equations = nil, nil, nil, nil
+	s.parameter, s.solved, s.occurrences, s.equations, s.solution = nil, nil, nil, nil, nil
 	s.closed = true
 	return nil
 }

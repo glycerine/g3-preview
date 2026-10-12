@@ -33802,6 +33802,8 @@
         "pkg/math/euclid/numeral_buffer_sort_test.go",
         "pkg/math/euclid/addmul.go",
         "pkg/math/euclid/addmul_test.go",
+        "pkg/math/euclid/apply_solution.go",
+        "pkg/math/euclid/apply_solution_test.go",
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go",
         "pkg/util/numeral/scoped_numeral.go"
@@ -33814,6 +33816,7 @@
         "TestEuclideanRationalBufferSortAndRawSwap",
         "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
         "TestEuclideanRationalAddmulMergedJustifications",
+        "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
         "TestEuclideanPositionSourceBinarySearch",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership",
         "TestEuclideanSetupHeaderRefusalBeforeBuffers",
@@ -33924,6 +33927,14 @@
           ]
         },
         {
+          "name": "solved-equation ownership transfer and apply_solution sorted-row substitution with newly exposed solved-variable queue work at cpp:422-461,615-618",
+          "status": "partial",
+          "go_target": "pkg/math/euclid/apply_solution.go",
+          "tests": [
+            "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap"
+          ]
+        },
+        {
           "name": "elimination, decomposition and model/justification algorithms",
           "status": "unported"
         }
@@ -33931,10 +33942,11 @@
       "ownership": [
         "The partial sort path borrows the rational manager, copies coefficient numerals into typed owned buffer slots, sorts scalar IDs, then swaps each raw numeral with its source-indexed slot. A whole-slice raw swap transfers numeral ownership between the equation slice and buffer without cloning.",
         "The concrete equation allocates its owner header first, copies coefficients into indexed reusable slots, transfers them into its vectors with sort_core, then owns its constant, integer coefficients and rational justifications. del_eq releases those in that order, leaving caller inputs and reusable buffers separately owned.",
-        "The pre-elimination setup borrows its rational manager, publishes variable metadata before the matching integer buffer slot, reserves that ID in a concrete solved-index-priority heap, publishes a justification buffer slot before incrementing its ID, owns equation pointers in source list order, and closes its heap, rational and integer member buffers in reverse declaration order."
+        "The pre-elimination setup borrows its rational manager, publishes variable metadata before the matching integer buffer slot, reserves that ID in a concrete solved-index-priority heap, publishes a justification buffer slot before incrementing its ID, owns equation pointers in source list order, and closes its heap, rational and integer member buffers in reverse declaration order.",
+        "Solved-equation promotion transfers one equation pointer from the todo list to the solution list. apply_solution swaps integer and rational row storage through reusable owned numeral buffers; the old target row remains in its buffer until the next reset or solver destruction. The coefficient borrowed from that old row remains alive across the rational merge."
       ],
       "deviations": [
-        "The Euclidean solver body is not yet ported; this covers its concrete numeric buffer, sort, and equation construction/destruction paths only."
+        "Normalization, pivot elimination, decomposition and the public solver API remain unported; the concrete substitution path currently operates on internally owned equations."
       ]
     },
     {
@@ -116083,7 +116095,9 @@
         "pkg/util/heap/source_prefix_test.go",
         "pkg/sat/sat_var_queue_native_test.go",
         "pkg/math/euclid/solver_setup.go",
-        "pkg/math/euclid/solver_setup_test.go"
+        "pkg/math/euclid/solver_setup_test.go",
+        "pkg/math/euclid/apply_solution.go",
+        "pkg/math/euclid/apply_solution_test.go"
       ],
       "tests": [
         "TestHeapBudgetsFailuresSwapAndWarm",
@@ -116111,7 +116125,8 @@
         "TestDebugMacroVerifyConditionIsNotErasedByAssertionSwitch",
         "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
         "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards",
-        "TestEuclideanSetupSolvedVariableQueue"
+        "TestEuclideanSetupSolvedVariableQueue",
+        "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap"
       ],
       "conditionals": [
         {
@@ -155556,6 +155571,8 @@
         "pkg/math/euclid/numeral_buffer_sort_test.go",
         "pkg/math/euclid/addmul.go",
         "pkg/math/euclid/addmul_test.go",
+        "pkg/math/euclid/apply_solution.go",
+        "pkg/math/euclid/apply_solution_test.go",
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go"
       ],
@@ -155564,6 +155581,7 @@
         "TestEuclideanRationalBufferSortAndRawSwap",
         "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
         "TestEuclideanRationalAddmulMergedJustifications",
+        "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership"
       ],
       "conditionals": [
