@@ -8052,7 +8052,7 @@
     },
     {
       "source": "src/util/lp/static_matrix.hpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/static_matrix_float.go",
         "pkg/util/lp/static_matrix_exact.go",
@@ -8097,7 +8097,8 @@
         "TestLPExactStaticFillAllocationFailureCensus",
         "TestLPExactStaticFillBoundsAndLiteralStops",
         "TestLPExactStaticFillAndTermLeaveOlderComparisonOwned"
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained static_matrix.hpp audit: init/clear/add/set, indexed extraction, absolute extrema, linked-cell pivot, row/column consistency, element lookup, dimension and transposition work, and float balance diagnostics are represented by concrete float and rational matrix methods. Live term-with-basis fill is defined in the paired header and uses the same owned matrix state. Source basis-pointer copy constructor, lowest_row_in_column, forget_last_columns/remove_last_column, cross_out_row helpers, divide_row and uncalled work-vector helpers have no retained source consumer and are excluded. The float balance call reaches numeric_traits<double>::log NOT_IMPLEMENTED_YET for nonzero values, preserved as an explicit stop. Rational matrix operations own initialized cells, arithmetic calls, transposition copies and partially published prefixes; older caller comparison receipts remain borrowed. Focused native and g3debug,g3checked matrix/iterator/dual-flip groups pass using the paired header profiles: float320/352 and329/352, rational266/293 and270/293, products185/202 both, scopes118/133 and125/133, fill96/113 both."
     },
     {
       "source": "src/util/lp/static_matrix_instances.cpp",
@@ -8262,10 +8263,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 75,
+    "ported": 76,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 20
+    "partial": 19
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -15159,6 +15160,25 @@
       "src/util/lp/static_matrix.h"
     ],
     "scope": "Whole retained static_matrix.h audit: float and rational concrete matrices cover linked row/column cells, explicit zeros/duplicates, scope dimensions, transpose, pivot and scaling, element/ref access, row/column queries, vector and row products, ordered domain, debug consistency and actual term-with-basis row fill. The retained float balance path preserves the source NOT_IMPLEMENTED_YET stop for nonzero terms. Uncalled basis-copy constructor, lowest-row, forget-last-columns, cross-out-row, divide-row, work-vector helpers and unconditional get_max_val_in_row assertion are excluded; definitions in static_matrix.hpp retain their own audit. Rational matrix owns each initialized row numeral and stopped arithmetic call, preserves child/vector ownership, and does not adopt older caller comparison receipts. Current focused native/checked static-matrix, iterator and rational dual-flip tests pass: float static_matrix_float.go320/352 and329/352, rational static_matrix_exact.go266/293 and270/293, products185/202 both, scopes118/133 and125/133, fill96/113 both.",
+    "focused_tests": [
+      "TestLPFloatStaticMatrix",
+      "TestLPExactStatic",
+      "TestLPRationalIterators",
+      "TestLPRationalDualFlip"
+    ],
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-static-header-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-static-header-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+  },
+  "latest_static_matrix_hpp_whole_audit": {
+    "source_units": [
+      "src/util/lp/static_matrix.hpp"
+    ],
+    "scope": "Whole retained static_matrix.hpp audit: init/clear/add/set, indexed extraction, absolute extrema, linked-cell pivot, row/column consistency, element lookup, dimension and transposition work, and float balance diagnostics are represented by concrete float and rational matrix methods. Live term-with-basis fill is defined in the paired header and uses the same owned matrix state. Source basis-pointer copy constructor, lowest_row_in_column, forget_last_columns/remove_last_column, cross_out_row helpers, divide_row and uncalled work-vector helpers have no retained source consumer and are excluded. The float balance call reaches numeric_traits<double>::log NOT_IMPLEMENTED_YET for nonzero values, preserved as an explicit stop. Rational matrix operations own initialized cells, arithmetic calls, transposition copies and partially published prefixes; older caller comparison receipts remain borrowed. Focused native and g3debug,g3checked matrix/iterator/dual-flip groups pass using the paired header profiles: float320/352 and329/352, rational266/293 and270/293, products185/202 both, scopes118/133 and125/133, fill96/113 both.",
     "focused_tests": [
       "TestLPFloatStaticMatrix",
       "TestLPExactStatic",
