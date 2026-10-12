@@ -20,7 +20,7 @@ func lpPairBenchmarkOracle(seed, iterations uint32) ([]*big.Rat, string, string,
 		prefix += "(" + v.RatString() + ", 0) "
 	}
 	prefix += "\n"
-	text := "(" + result.RatString() + ", 0)"
+	text := lpBenchmarkNumberOracle(result)
 	return inputs, prefix, text, state
 }
 
@@ -255,9 +255,25 @@ func BenchmarkLPPairSource1000000(b *testing.B) {
 		}
 	})
 	_, _, want, _ := lpPairBenchmarkOracle(19, 1000000)
+	_, exact, _ := lpScalarBenchmarkOracle(19, 1000000)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		d := NewPairBenchmarkDriver(m, MPSDriverConfig{Output: io.Discard})
+		var d *PairBenchmarkDriver
+		checked := false
+		out := &lpMPSDriverActionWriter{action: func(text string) error {
+			if text == "operation with rationals " {
+				actual, e := d.pairs.Data[10].String(m)
+				if e != nil {
+					b.Fatal(e)
+				}
+				if actual != "("+exact.RatString()+", 0)" {
+					b.Fatal("independent exact accumulator", actual, exact)
+				}
+				checked = true
+			}
+			return nil
+		}}
+		d = NewPairBenchmarkDriver(m, MPSDriverConfig{Output: out})
 		b.Cleanup(func() {
 			if err := d.Close(); err != nil {
 				b.Error(err)
@@ -266,7 +282,7 @@ func BenchmarkLPPairSource1000000(b *testing.B) {
 		if err := d.Run(z3rand.New(19)); err != nil {
 			b.Fatal(err)
 		}
-		if d.CompletedIterations != 1000000 || d.CompletedProducts != 10000000 || d.ResultText != want || !d.closed {
+		if !checked || d.CompletedIterations != 1000000 || d.CompletedProducts != 10000000 || d.ResultText != want || !d.closed {
 			b.Fatal("registered count/result/cleanup", d)
 		}
 	}

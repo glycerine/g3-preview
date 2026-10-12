@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"math/big"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -27,6 +28,12 @@ func lpScalarBenchmarkOracle(seed, iterations uint32) ([]*big.Rat, *big.Rat, uin
 	}
 	result.Mul(result, new(big.Rat).SetInt64(int64(iterations)))
 	return inputs, result, state
+}
+
+// Independent exact arithmetic is converted only for the source's report.
+func lpBenchmarkNumberOracle(v *big.Rat) string {
+	number, _ := v.Float64()
+	return strconv.FormatFloat(number, 'g', 6, 64)
 }
 
 func lpBenchmarkClock() func() (uint64, error) {
@@ -56,8 +63,8 @@ func TestLPRationalBenchmarkIndependentArithmeticAndInputs(t *testing.T) {
 				d = NewRationalBenchmarkDriver(h.m, plus, MPSDriverConfig{Output: w, Clock: lpBenchmarkClock()})
 				r := z3rand.New(seed)
 				h.must(d.runIterations(r, iterations))
-				report := "operation with rationals no pairs 2\n" + want.RatString() + "\n"
-				if !inspected || w.buffer.String() != report || d.ResultText != want.RatString() || d.CompletedIterations != iterations || d.Coefficients != 10 || d.Values != 10 || d.work != nil || !d.closed || d.calls.pending() {
+				report := "operation with rationals no pairs 2\n" + lpBenchmarkNumberOracle(want) + "\n"
+				if !inspected || w.buffer.String() != report || d.ResultText != lpBenchmarkNumberOracle(want) || d.CompletedIterations != iterations || d.Coefficients != 10 || d.Values != 10 || d.work != nil || !d.closed || d.calls.pending() {
 					t.Fatal(d, w.buffer.String(), report)
 				}
 				state = state*214013 + 2531011
@@ -76,7 +83,7 @@ func TestLPRationalBenchmarkIndependentArithmeticAndInputs(t *testing.T) {
 
 func TestLPRationalBenchmarkReportFailureAndFlushPrefixes(t *testing.T) {
 	_, want, _ := lpScalarBenchmarkOracle(17, 1)
-	report := "operation with rationals no pairs 2\n" + want.RatString() + "\n"
+	report := "operation with rationals no pairs 2\n" + lpBenchmarkNumberOracle(want) + "\n"
 	for _, plus := range []bool{false, true} {
 		for _, cause := range []error{nil, lpErrResidualWrite} {
 			for n := 0; n < len(report); n++ {
@@ -176,7 +183,7 @@ func TestLPRationalBenchmarkPhysicalRefusalOwnership(t *testing.T) {
 					if err == nil {
 						done = true
 						_, want, _ := lpScalarBenchmarkOracle(19, 1)
-						if d.ResultText != want.RatString() || !d.closed {
+						if d.ResultText != lpBenchmarkNumberOracle(want) || !d.closed {
 							t.Fatal("completed result", d.ResultText)
 						}
 					} else {
@@ -273,7 +280,22 @@ func BenchmarkLPRationalSource500000(b *testing.B) {
 			_, want, _ := lpScalarBenchmarkOracle(19, 500000)
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				d := NewRationalBenchmarkDriver(m, plus, MPSDriverConfig{Output: io.Discard})
+				var d *RationalBenchmarkDriver
+				checked := false
+				out := &lpMPSDriverActionWriter{action: func(text string) error {
+					if text == "operation with rationals no pairs " {
+						actual, e := m.String(&d.work.Data[20])
+						if e != nil {
+							b.Fatal(e)
+						}
+						if actual != want.RatString() {
+							b.Fatal("independent exact accumulator", actual, want)
+						}
+						checked = true
+					}
+					return nil
+				}}
+				d = NewRationalBenchmarkDriver(m, plus, MPSDriverConfig{Output: out})
 				b.Cleanup(func() {
 					if err := d.Close(); err != nil {
 						b.Error(err)
@@ -282,10 +304,37 @@ func BenchmarkLPRationalSource500000(b *testing.B) {
 				if err := d.Run(z3rand.New(19)); err != nil {
 					b.Fatal(err)
 				}
-				if d.CompletedIterations != 500000 || d.ResultText != want.RatString() || !d.closed {
+				if !checked || d.CompletedIterations != 500000 || d.ResultText != lpBenchmarkNumberOracle(want) || !d.closed {
 					b.Fatal("registered count/result/cleanup", d.CompletedIterations, d.ResultText)
 				}
 			}
 		})
+	}
+}
+
+func TestLPNumericBenchmarkLiteralApproximateReports(t *testing.T) {
+	// Literals independently calculated from the source LCG and exact fractions.
+	for _, tc := range []struct {
+		seed, iterations uint32
+		want             string
+	}{{0, 0, "0"}, {1, 1, "27.828"}, {19, 3, "69.4297"}} {
+		for _, plus := range []bool{false, true} {
+			h := newLPPairHarness(t)
+			out := &lpDriverFlushWriter{}
+			d := NewRationalBenchmarkDriver(h.m, plus, MPSDriverConfig{Output: out, Clock: lpBenchmarkClock()})
+			h.must(d.runIterations(z3rand.New(tc.seed), tc.iterations))
+			if d.ResultText != tc.want || out.String() != "operation with rationals no pairs 2\n"+tc.want+"\n" {
+				t.Fatal(tc, plus, d.ResultText, out.String())
+			}
+			lpExactVectorNamedCensus(t, h, nil)
+		}
+		h := newLPPairHarness(t)
+		out := &lpDriverFlushWriter{}
+		d := NewPairBenchmarkDriver(h.m, MPSDriverConfig{Output: out, Clock: lpBenchmarkClock()})
+		h.must(d.runIterations(z3rand.New(tc.seed), tc.iterations))
+		if d.ResultText != tc.want || !strings.HasSuffix(out.String(), "operation with rationals 2\n"+tc.want+"\n") {
+			t.Fatal(tc, d.ResultText, out.String())
+		}
+		lpExactVectorNamedCensus(t, h, nil)
 	}
 }

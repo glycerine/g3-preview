@@ -11,7 +11,7 @@
     "remaining retained objective/preparation consumers and complete retained primal/dual/LAR caller integration (uncalled LAR scaling helper excluded); whole random-update source/driver audit",
     "remaining retained constructor/diagnostic/validator and optimization consumer audits; complete MPS/CLI upstream drivers",
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
-    "Complete registered CLI runtime/consumer/ownership audit, full numeric-pair benchmark count verification and whole retained SMT reader/LP audit",
+    "Complete registered CLI runtime/consumer/ownership audit, whole retained SMT reader/LP audit",
     "component property tests, coverage and integration audits",
     "Complete retained source/ownership/SMT and process-global driver consumer audits; remaining optimization/scaling/randomize consumers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
   ],
@@ -11756,48 +11756,7 @@
     "consumer_debug_seconds": 139.937
   },
   "latest_pair_benchmark_checkpoint": {
-    "status": "failed",
-    "commit": "dada87f0",
-    "started_utc": "2026-10-12 01:13:47 UTC",
-    "runner_pid": 2,
-    "command": [
-      "go",
-      "-C",
-      "pkg",
-      "test",
-      "./util/lp",
-      "-run",
-      "^$",
-      "-bench",
-      "^BenchmarkLPPairSource1000000$",
-      "-benchtime=1x",
-      "-count=1",
-      "-timeout=120m"
-    ],
-    "log": "/mnt/oldrog/tmp/g3-lp-pair-benchmark-full-native.log",
-    "status_file": "/mnt/oldrog/tmp/g3-lp-pair-benchmark-full-native.json",
-    "scope": "Actual numeric-pair source benchmark1000000 outer iterations/10000000products; independent exact result and successful owner cleanup required. Not a full module test.",
-    "go_pid": 5,
-    "actual_exec_session": 70865,
-    "completion_verified": false,
-    "exit_code": 1,
-    "completed_utc": "2026-10-12 01:31:05 UTC",
-    "full_registered_pair_count_verified": false,
-    "scope_warning": "Terminal session70865 exit1: signal: killed, package1028.980s. No result, count, or owning cleanup verdict. SIGKILL cause unknown; inspected session cgroup reports no OOM kills. No full-count completion credit."
-  },
-  "latest_generated_lp_params_audit": {
-    "summary": "Completed lp_params.hpp/PYG retained constructor, all five getters and descriptor collection. Concrete LPParams borrows the actual local reference, acquires one module reference at construction, and uses the existing concrete Params fallback/ownership engines. Getters observe local replacement, shared module resets, source copy-on-write detachment and unsigned values without snapshotting or looking up a new current registry. Nil local selects an embedded empty reference; failed constructor storage is returned for Close, only owned module/frame/header storage is released. Six new test groups include25 independent key/fallback worlds, local mutation after construction, module detachment/shared reset/current replacement/finalization, default-empty and shallow-copy/reentrant/lifetime guards, every cold constructor reservation through success, missing-current failure/unwind, and30 actual floating-cost/settings/LAR strategy/pivot-row-link consumer worlds. Native and combined debug/checked focused tests each0.076s; lp_params.go59/62statements95.2% both. Remaining returns guard configuration identities already checked, closed borrowed context default construction, and delegated cleanup failure. Both LP vets pass. This completes the small generated parameter unit, not the containing shell/SMT entry points or process-global binding. No full-suite measurement of this increment. Source roots captured in /mnt/oldrog/tmp/g3-lp-params-consumers-audit.txt. Commands/tests restricted to CPUs8\u201316 and GOMAXPROCS9.",
-    "native_statements": {
-      "covered": 59,
-      "total": 62
-    },
-    "combined_debug_checked_statements": {
-      "covered": 59,
-      "total": 62
-    }
-  },
-  "running_pair_benchmark_checkpoint": {
-    "status": "running",
+    "status": "completed",
     "commit": "d72a5561",
     "started_utc": "2026-10-12 03:28:51 UTC",
     "runner_pid": 2,
@@ -11831,7 +11790,23 @@
     "scope": "Actual one million outer iterations / ten million products; independent exact result, count and owning cleanup required. Working tree includes LP parameter owner.",
     "go_pid": 5,
     "actual_exec_session": 71810,
-    "completion_verified": false
+    "completion_verified": true,
+    "exit_code": 0,
+    "completed_utc": "2026-10-12 03:48:24 UTC",
+    "full_registered_pair_count_verified": true,
+    "report_revision_included": false,
+    "scope_warning": "Pair full-count retry completed successfully: session71810 observed terminal exit0 and closed,2026-10-12 03:28:51\u201303:48:24UTC. Actual BenchmarkLPPairSource1000000-9 one sample1161705120683ns/op; package1161.713s, PASS. Literal1000000 iterations/10000000products, independent exact result and successful owning cleanup verified. CPU affinity8\u201316/GOMAXPROCS9. Compiled before the subsequent T_to_string final-report correction; this proves the full arithmetic/count/cleanup campaign, not that later report revision. Runner memory sampling recorded the Go launcher only, so no test-process memory conclusion is inferred. Artifacts /mnt/oldrog/tmp/g3-lp-pair-benchmark-cpu8-16.{json,log,memory.jsonl}."
+  },
+  "latest_generated_lp_params_audit": {
+    "summary": "Completed lp_params.hpp/PYG retained constructor, all five getters and descriptor collection. Concrete LPParams borrows the actual local reference, acquires one module reference at construction, and uses the existing concrete Params fallback/ownership engines. Getters observe local replacement, shared module resets, source copy-on-write detachment and unsigned values without snapshotting or looking up a new current registry. Nil local selects an embedded empty reference; failed constructor storage is returned for Close, only owned module/frame/header storage is released. Six new test groups include25 independent key/fallback worlds, local mutation after construction, module detachment/shared reset/current replacement/finalization, default-empty and shallow-copy/reentrant/lifetime guards, every cold constructor reservation through success, missing-current failure/unwind, and30 actual floating-cost/settings/LAR strategy/pivot-row-link consumer worlds. Native and combined debug/checked focused tests each0.076s; lp_params.go59/62statements95.2% both. Remaining returns guard configuration identities already checked, closed borrowed context default construction, and delegated cleanup failure. Both LP vets pass. This completes the small generated parameter unit, not the containing shell/SMT entry points or process-global binding. No full-suite measurement of this increment. Source roots captured in /mnt/oldrog/tmp/g3-lp-params-consumers-audit.txt. Commands/tests restricted to CPUs8\u201316 and GOMAXPROCS9.",
+    "native_statements": {
+      "covered": 59,
+      "total": 62
+    },
+    "combined_debug_checked_statements": {
+      "covered": 59,
+      "total": 62
+    }
   },
   "latest_stacked_map_support_audit": {
     "summary": "Whole retained-source/ownership audit completes stacked_map.h. No-ignore scan finds only test_stacked_map_itself/test_stacked (--smap), concrete int/double; actual operations are immediate subscript assignment/emplace_replace, push, saturating pop and erase. Existing Go Set/Push/Pop/Erase preserve source first-old-value/cancel-back journal rules and source native/debug erase assertions. No saved proxy/key borrow, ref-to-ref assignment, lookup/contains/size/clear/map-view, owner copies or additional template instantiations are reached; unused adapters excluded. Native Go maps/slices own storage and popped frames clear both map references. Existing40*2500 independent snapshot worlds, original sequence, original-value cancellation, signed zeros/NaN payload/Inf and source erase assertion behavior pass; native0.142s, combined0.142s, stacked_map.go45/47statements95.7% native46/4797.9% combined. Remaining native returns are erased assertions; debug remaining absent-value/new-key guard has no ordinary producer. Related retained CLI report/publication/set scenarios pass native0.004s/combined0.005s. No production change or redundant tests required. LP inventory19ported/76partial/10reference_only/3dead_deleted/2platform_replacement. Source audit /mnt/oldrog/tmp/g3-lp-stacked-map-consumers-audit.txt; profiles /mnt/oldrog/tmp/g3-lp-map-audit-{native,debug}.cover. All commands restricted to CPUs8\u201316.",
@@ -11860,5 +11835,41 @@
         97
       ]
     }
+  },
+  "pair_benchmark_checkpoint_history": [
+    {
+      "status": "failed",
+      "commit": "dada87f0",
+      "started_utc": "2026-10-12 01:13:47 UTC",
+      "runner_pid": 2,
+      "command": [
+        "go",
+        "-C",
+        "pkg",
+        "test",
+        "./util/lp",
+        "-run",
+        "^$",
+        "-bench",
+        "^BenchmarkLPPairSource1000000$",
+        "-benchtime=1x",
+        "-count=1",
+        "-timeout=120m"
+      ],
+      "log": "/mnt/oldrog/tmp/g3-lp-pair-benchmark-full-native.log",
+      "status_file": "/mnt/oldrog/tmp/g3-lp-pair-benchmark-full-native.json",
+      "scope": "Actual numeric-pair source benchmark1000000 outer iterations/10000000products; independent exact result and successful owner cleanup required. Not a full module test.",
+      "go_pid": 5,
+      "actual_exec_session": 70865,
+      "completion_verified": false,
+      "exit_code": 1,
+      "completed_utc": "2026-10-12 01:31:05 UTC",
+      "full_registered_pair_count_verified": false,
+      "scope_warning": "Terminal session70865 exit1: signal: killed, package1028.980s. No result, count, or owning cleanup verdict. SIGKILL cause unknown; inspected session cgroup reports no OOM kills. No full-count completion credit."
+    }
+  ],
+  "latest_numeric_benchmark_report_correction": {
+    "summary": "Corrected retained numeric benchmark final reports to src/util/lp/lp_settings.h T_to_string overloads: scalar result converts through real RationalManager.Float64; pair result evaluates literal X+Y/mpq(1000) with concrete copied-left quotient/sum temporaries, converts to double and destroys lexical temporaries before formatting. Final output uses source six-significant-digit stream text. Input pair vector deliberately remains exact: numeric_pair::to_string resolves its earlier generic coordinate template, whereas direct final T_to_string selects the later concrete overload. A minimal standalone C++11 lookup probe confirms that declaration-order distinction; no C/cgo dependency or project/STL port introduced. Existing independent math/big arithmetic checks remain; full-count benchmark validators now inspect the exact live accumulator before final formatting instead of treating the approximate report as an exact oracle. Added9 literal source-report worlds (zero,27.828,69.4297 across scalar compound/plus/pair). All original report-byte/endl/timer/physical failure/older-caller tests plus actual CLI executor checks pass native1.148s/combined1.636s. Both LP vets pass before the final literal-only test addition. Focused profiles /mnt/oldrog/tmp/g3-lp-benchmark-report-{native,debug}.cover. Full pair count checkpoint on CPUs8\u201316 passed separately before this final-report correction; full current-code count/report combination remains separately verifiable. LP whole-source inventory remains20ported/75partial/10reference_only/3dead_deleted/2platform_replacement.",
+    "full_count_evidence_predates_report_correction": true
   }
 }

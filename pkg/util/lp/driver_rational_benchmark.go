@@ -125,7 +125,10 @@ func (d *RationalBenchmarkDriver) runIterations(random *z3rand.Generator, iterat
 	if err != nil {
 		return err
 	}
-	d.ResultText, err = d.manager.String(&w[20])
+	number, err := d.manager.Float64(&w[20])
+	if err == nil {
+		d.ResultText = floatLPNumberText(number)
+	}
 	if err = d.calls.after(d.manager, before, err); err != nil {
 		return err
 	}

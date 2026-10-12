@@ -104446,7 +104446,7 @@
           ]
         },
         {
-          "name": "test_rationals_no_numeric_pairs/test_rationals_no_numeric_pairs_plus: literal500000 Run, actual full native counts/results/cleanup verified at5920ba19; focused setup/report/failure profiles native/checked",
+          "name": "test_rationals_no_numeric_pairs/test_rationals_no_numeric_pairs_plus: literal500000 Run, full count/exact result/cleanup at5920ba19; subsequent source approximate final reports independently focused-tested",
           "status": "ported",
           "go_target": "pkg/util/lp/driver_rational_benchmark.go",
           "tests": [
@@ -104454,19 +104454,21 @@
             "TestLPRationalBenchmarkReportFailureAndFlushPrefixes",
             "TestLPRationalBenchmarkClockAndOwnerBoundaries",
             "TestLPRationalBenchmarkPhysicalRefusalOwnership",
-            "TestLPRationalBenchmarkPreservesOlderComparison"
+            "TestLPRationalBenchmarkPreservesOlderComparison",
+            "TestLPNumericBenchmarkLiteralApproximateReports"
           ]
         },
         {
-          "name": "test_rationals: literal1000000 Run/10000000products implemented; focused input/vector-report/loop/cleanup verified; actual full-count execution pending",
-          "status": "partial",
+          "name": "test_rationals: literal1000000 Run/10000000products; full count/exact result/cleanup passed CPU8\u201316 checkpoint; subsequent source approximate final report independently focused-tested",
+          "status": "ported",
           "go_target": "pkg/util/lp/driver_pair_benchmark.go",
           "tests": [
             "TestLPPairBenchmarkIndependentInputsProductsAndReport",
             "TestLPPairBenchmarkEveryReportByteAndEndlRefusal",
             "TestLPPairBenchmarkClockAndOwnerBoundaries",
             "TestLPPairBenchmarkPhysicalRefusalOwnership",
-            "TestLPPairBenchmarkPreservesOlderComparison"
+            "TestLPPairBenchmarkPreservesOlderComparison",
+            "TestLPNumericBenchmarkLiteralApproximateReports"
           ]
         },
         {
@@ -104543,7 +104545,8 @@
         "Preparation header and usage short nil-error writes stop with io.ErrShortWrite before later publication; exact-length success and every byte prefix tested. Top-level selected-call execution remains separately open.",
         "Private scalar benchmark iteration bound is used only by focused tests; public Run retains500000 and standard benchmark checks actual full count. Full-count execution remains unverified at this increment. No source arithmetic shortcut or synthetic allocator hooks.",
         "Private pair benchmark iteration bound is for focused tests only; public Run retains1000000 and standard benchmark independently checks full count and exact result. Full-count execution not credited at implementation commit; no source arithmetic shortcut or unused generic adapter.",
-        "Source debug-only branches are erased without g3debug, solve_some_mps call is Linux-only, commented directory body is an executable no-op, too-short argv+2 returns ErrBounds and source exit(1) is transported as ExitCode/ErrAssertion. Actual scalar full counts verified5920ba19; pair full count and whole external driver/global consumer audit remain open."
+        "Source debug-only branches are erased without g3debug, solve_some_mps call is Linux-only, commented directory body is an executable no-op, too-short argv+2 returns ErrBounds and source exit(1) is transported as ExitCode/ErrAssertion. Actual scalar full counts verified5920ba19; pair full count and whole external driver/global consumer audit remain open.",
+        "Numeric benchmarks print source approximate T_to_string results, with exact live accumulators independently checked before formatting. Pair input streaming retains the generic exact-coordinate template lookup. Full count evidence predates final-report correction; later focused report/ownership checks are separate evidence."
       ]
     },
     {

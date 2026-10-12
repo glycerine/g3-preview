@@ -173,7 +173,33 @@ func (d *PairBenchmarkDriver) runIterations(random *z3rand.Generator, iterations
 	if err != nil {
 		return err
 	}
-	d.ResultText, err = p[10].String(d.manager)
+	// lp_settings.h:336-342 selects the concrete pair overload here.
+	// The earlier vector stream uses numeric_pair::to_string's generic
+	// coordinate helper (declared before these overloads), hence exact inputs.
+	thousand, tmp, quotient, sum := &s[10], &s[11], &s[12], &s[13]
+	err = d.manager.SetInt32(thousand, 1000)
+	if err == nil {
+		err = etaRationalQuotient(d.manager, tmp, quotient, &p[10].Y, thousand)
+	}
+	if err == nil {
+		err = etaRationalSum(d.manager, tmp, sum, &p[10].X, quotient)
+	}
+	var number float64
+	if err == nil {
+		number, err = d.manager.Float64(sum)
+	}
+	// The arithmetic expression's temporaries die before the stream formats r.
+	if err == nil {
+		for i := 13; i >= 10; i-- {
+			if err = d.manager.Del(&s[i]); err != nil {
+				break
+			}
+			s[i] = numeral.NewRational()
+		}
+	}
+	if err == nil {
+		d.ResultText = floatLPNumberText(number)
+	}
 	if err = d.calls.after(d.manager, before, err); err != nil {
 		return err
 	}
