@@ -12,18 +12,43 @@ type matchSubst struct {
 	manager  *ast.ASTManager
 	cache    map[matchPair]struct{}
 	bindings map[ast.ASTHandle]ast.ASTHandle
+	byIndex  map[uint32]ast.ASTHandle
 	owned    []ast.ASTHandle
+	scratch  []ast.ASTHandle
 	todo     []matchPair
 	allEqual bool
 	closed   bool
 }
 
 func (s *matchSubst) bind(pattern, instance ast.ASTHandle) error {
+	index, e := s.manager.GetVarIndex(pattern)
+	if e != nil {
+		return e
+	}
 	if e := s.manager.IncRef(instance); e != nil {
 		return e
 	}
 	s.owned = append(s.owned, instance)
 	s.bindings[pattern] = instance
+	s.byIndex[index] = instance
+	return nil
+}
+
+func (s *matchSubst) releaseScratch() error {
+	for len(s.scratch) != 0 {
+		h := s.scratch[0]
+		consumed, e := s.manager.DecRefConsumed(h)
+		if consumed {
+			s.scratch[0] = ast.ASTHandle{}
+			s.scratch = s.scratch[1:]
+		}
+		if e != nil {
+			return e
+		}
+		if !consumed {
+			return ast.ErrASTPending
+		}
+	}
 	return nil
 }
 
@@ -31,6 +56,10 @@ func (s *matchSubst) bind(pattern, instance ast.ASTHandle) error {
 // Keep an unconsumed reference in owned so cleanup can be retried.
 func (s *matchSubst) resetBindings() error {
 	clear(s.bindings)
+	clear(s.byIndex)
+	if e := s.releaseScratch(); e != nil {
+		return e
+	}
 	for len(s.owned) != 0 {
 		h := s.owned[0]
 		consumed, e := s.manager.DecRefConsumed(h)
@@ -65,7 +94,7 @@ func newMatchSubst(m *ast.ASTManager) (*matchSubst, error) {
 	if m == nil {
 		return nil, ast.ErrASTDomain
 	}
-	return &matchSubst{manager: m, cache: make(map[matchPair]struct{}), bindings: make(map[ast.ASTHandle]ast.ASTHandle)}, nil
+	return &matchSubst{manager: m, cache: make(map[matchPair]struct{}), bindings: make(map[ast.ASTHandle]ast.ASTHandle), byIndex: make(map[uint32]ast.ASTHandle)}, nil
 }
 
 func (s *matchSubst) sameDecl(a, b ast.ASTHandle) (bool, error) {
@@ -96,7 +125,11 @@ func (s *matchSubst) bindIdentical(root ast.ASTHandle) (bool, error) {
 		}
 		switch kind {
 		case ast.ASTVar:
-			if bound, found := s.bindings[h]; found && bound != h {
+			index, e := s.manager.GetVarIndex(h)
+			if e != nil {
+				return false, e
+			}
+			if bound, found := s.byIndex[index]; found && bound != h {
 				return false, nil
 			}
 			if e := s.bind(h, h); e != nil {
@@ -177,10 +210,14 @@ func (s *matchSubst) matchArgs(lhs ast.ASTHandle, args []ast.ASTHandle) (bool, e
 			return false, e
 		}
 		if pk == ast.ASTVar {
-			if bound, found := s.bindings[p.pattern]; found && bound != p.instance {
+			index, e := s.manager.GetVarIndex(p.pattern)
+			if e != nil {
+				return false, e
+			}
+			if bound, found := s.byIndex[index]; found && bound != p.instance {
 				return false, nil
 			}
-			if _, found := s.bindings[p.pattern]; !found {
+			if _, found := s.byIndex[index]; !found {
 				if e := s.bind(p.pattern, p.instance); e != nil {
 					return false, e
 				}

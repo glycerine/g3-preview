@@ -28894,9 +28894,15 @@
       "path": "src/ast/substitution/substitution.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/ufbv/match_subst.go",
+        "pkg/tactic/ufbv/match_subst_apply.go"
+      ],
+      "tests": [
+        "TestMatchSubstConcretePairCacheAndVariableBindings",
+        "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
+      ],
       "assertions": [
         {
           "line": 52,
@@ -28933,17 +28939,36 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "UFBV concrete substitution reset, offset-0 variable lookup and offset-1 target preservation, app/quantifier body and annotation application",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/match_subst_apply.go",
+          "tests": [
+            "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
+          ]
+        }
+      ],
+      "ownership": [
+        "UFBV matcher bindings retain each target expression; generated application and quantifier results are rooted by the matcher until reset or close, while the returned ASTRef owns the published result."
+      ],
+      "deviations": [
+        "Only the UFBV call with two zero-delta offsets is translated. General scoped substitution, nonzero deltas, cycle detection, comparison and other consumers remain open."
+      ]
     },
     {
       "path": "src/ast/substitution/substitution.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/ufbv/match_subst.go",
+        "pkg/tactic/ufbv/match_subst_apply.go"
+      ],
+      "tests": [
+        "TestMatchSubstConcretePairCacheAndVariableBindings",
+        "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
+      ],
       "conditionals": [
         {
           "line": 33,
@@ -28978,9 +29003,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "UFBV concrete variable binding insertion/find/reset and two-offset zero-delta apply",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/match_subst_apply.go",
+          "tests": [
+            "TestMatchSubstConcretePairCacheAndVariableBindings",
+            "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
+          ]
+        }
+      ],
+      "ownership": [
+        "The UFBV matcher retains each substitution target and holds rewritten AST nodes until reset or close; its returned ASTRef owns the result independently."
+      ],
+      "deviations": [
+        "Concrete UFBV-only two-offset substitution replaces the source generic offset tables; other retained substitution APIs and callers remain open."
+      ]
     },
     {
       "path": "src/ast/substitution/substitution_tree.cpp",
@@ -100293,14 +100332,16 @@
         "pkg/tactic/ufbv/rewrite_cache_test.go",
         "pkg/tactic/ufbv/rewrite_traversal.go",
         "pkg/tactic/ufbv/rewrite_traversal_test.go",
-        "pkg/tactic/ufbv/match_subst.go"
+        "pkg/tactic/ufbv/match_subst.go",
+        "pkg/tactic/ufbv/match_subst_apply.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
         "TestRewriteCacheSourceTimestampWrap",
         "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
         "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
-        "TestMatchSubstConcretePairCacheAndVariableBindings"
+        "TestMatchSubstConcretePairCacheAndVariableBindings",
+        "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
       ],
       "conditionals": [
         {
@@ -100446,13 +100487,21 @@
           "tests": [
             "TestMatchSubstConcretePairCacheAndVariableBindings"
           ]
+        },
+        {
+          "name": "match_subst rewrite-rule RHS through concrete offset-tagged substitution and quantifier shifting",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/match_subst_apply.go",
+          "tests": [
+            "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
+          ]
         }
       ],
       "ownership": [
         "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction. The matcher borrows pair-cache keys but retains each substitution target until reset or close."
       ],
       "deviations": [
-        "The concrete rewrite cache, reverse child-visit/cycle step and match_subst expression instance check are ported; matcher RHS substitution, remaining UFBV rewrite loop and tactic integration remain open."
+        "The concrete rewrite cache, reverse child-visit/cycle step and match_subst expression instance check plus two-offset RHS application are ported; the remaining UFBV rewrite loop and tactic integration remain open."
       ]
     },
     {
@@ -100465,14 +100514,16 @@
         "pkg/tactic/ufbv/rewrite_cache_test.go",
         "pkg/tactic/ufbv/rewrite_traversal.go",
         "pkg/tactic/ufbv/rewrite_traversal_test.go",
-        "pkg/tactic/ufbv/match_subst.go"
+        "pkg/tactic/ufbv/match_subst.go",
+        "pkg/tactic/ufbv/match_subst_apply.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
         "TestRewriteCacheSourceTimestampWrap",
         "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
         "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
-        "TestMatchSubstConcretePairCacheAndVariableBindings"
+        "TestMatchSubstConcretePairCacheAndVariableBindings",
+        "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
       ],
       "conditionals": [
         {
@@ -100512,13 +100563,21 @@
           "tests": [
             "TestMatchSubstConcretePairCacheAndVariableBindings"
           ]
+        },
+        {
+          "name": "match_subst concrete rewrite-rule RHS result and quantified substitution state",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/match_subst_apply.go",
+          "tests": [
+            "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
+          ]
         }
       ],
       "ownership": [
         "The concrete plugin borrows its AST manager and retains each stored key and expression value; the bool payload is a scalar."
       ],
       "deviations": [
-        "The matcher expression instance-check path uses a concrete Go pair map; RHS substitution and the surrounding UFBV rewriter remain open."
+        "The matcher uses a concrete Go pair map and two-offset RHS substitution; the surrounding UFBV rewriter remains open."
       ]
     },
     {
