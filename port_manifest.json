@@ -150796,7 +150796,7 @@
         },
         {
           "name": "is/get uint64/int64 rational assertions",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpq_inspect.go",
           "tests": [
             "TestSourceRationalConversionAssertions",
