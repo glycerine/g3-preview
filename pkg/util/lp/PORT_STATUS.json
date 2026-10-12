@@ -11341,5 +11341,36 @@
     "remaining": "Holes scenario and parent test_lu; full top-level CLI execution/entry, other scenarios and whole-source/consumer/ownership audits.",
     "full_native_checkpoint_excludes_debug_only_scenarios": true,
     "evidence": "/mnt/oldrog/tmp/g3-larger-lu-driver-debug.cover"
+  },
+  "latest_lu_parent_cli_increment": {
+    "go_targets": [
+      "pkg/util/lp/driver_holes_lu_debug.go",
+      "pkg/util/lp/driver_lu_tests_debug.go"
+    ],
+    "tests": [
+      "TestLPHolesLUDriverIndependentTailReportOracle",
+      "TestLPHolesLUDriverDropProfiles",
+      "TestLPHolesLUDriverReportFailurePrefixes",
+      "TestLPLUTestDriverSourceParentSequence",
+      "TestLPLUTestDriverParentReportFailurePrefixes",
+      "TestLPLUTestDriverStopsOnChildAndExitFailures"
+    ],
+    "coverage": {
+      "profile": "g3debug,g3checked",
+      "driver_holes_lu_debug.go": {
+        "covered": 58,
+        "statements": 69,
+        "percent": 84.1
+      },
+      "driver_lu_tests_debug.go": {
+        "covered": 34,
+        "statements": 38,
+        "percent": 89.5
+      }
+    },
+    "focused_seconds": 1.818,
+    "full_native_checkpoint_excludes_debug_only_scenarios": true,
+    "evidence": "/mnt/oldrog/tmp/g3-lu-parent-driver-debug.cover",
+    "remaining": "Full top-level test CLI dispatch/entry and other scenarios; whole retained-source/consumer/ownership audits."
   }
 }
