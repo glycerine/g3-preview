@@ -13936,5 +13936,22 @@
     "consumer_tests_combined_seconds": 11.27,
     "verification": "All64package native/combined compile gates, both LP vets and source portcheck pass; 2103units/677APIs,117ported/323partial/1620unported/5dead_deleted.",
     "coverage_qualification": "Whole-Go-file focus covers retained numerical paths; remaining exact returns guard invariant-protected bounds, stable delegated cleanup/check errors and unavailable precise zero-drop branches. Floating one native uncovered return is erased source assertion. Sparse helper extraction preserves standalone Close behavior; coefficients are deleted only by Close, not closeCall."
+  },
+  "pending_full_native_checkpoint": {
+    "revision": "3516687c",
+    "status": "running",
+    "session_id": 44703,
+    "started_utc": "2026-10-12 05:44:50 UTC",
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "package_parallelism": 2,
+    "command": "go -C pkg test ./... -p 2 -count=1 -coverprofile=/mnt/oldrog/tmp/g3-lp-eta-module-native.cover -json",
+    "artifacts": {
+      "json": "/mnt/oldrog/tmp/g3-lp-eta-module-native.json",
+      "stderr": "/mnt/oldrog/tmp/g3-lp-eta-module-native.log",
+      "coverage": "/mnt/oldrog/tmp/g3-lp-eta-module-native.cover"
+    },
+    "cache_cleanup_record": "/mnt/oldrog/tmp/g3-lp-eta-full-native-cache-cleanup.json",
+    "qualification": "Includes retained permutation/eta audits, report fixes and bound-analyzer lifetime fix. No result or coverage credit until terminal success and profile inspection; last completed full checkpoint remains8f2961ca."
   }
 }
