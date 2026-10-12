@@ -39561,3 +39561,29 @@ Existing focused owner, deep-copy, allocation-frontier and SAT queue checks
 pass in native and checked/debug profiles on CPUs 8–16. This selected method
 row moves to ported. `heap.h` remains partial for SMT and other concrete
 instantiations, process-global assertion transport and full source audit.
+
+### Retained power-of-two and popcount primitives
+
+`util.h:85` supplies the unsigned power-of-two predicate reached by the small
+positive `mpz_manager::is_power_of_two` branch. `pkg/util/numeral` checks the
+same `uint32` bit condition before finding its exponent; the existing
+independent integer-power test covers zero, negatives, adjacent nonpowers,
+small powers and larger multiword powers. `util.h:112-128` supplies the
+32-bit word count used by `uint_set::num_elems`; `pkg/util/bitset` uses
+`bits.OnesCount32` per source word, with the registered source set campaign
+and independent bounded oracle checking cardinality across word boundaries.
+These selected retained helper uses are credited as ported. Other direct
+users in unported source consumers remain outside this credit.
+
+### Verbosity source-boundary split
+
+`util.cpp:20-40` holds process-global level and stream pointers. The reached
+allocator and environment-parameter callers use the concrete
+`pkg/util/diagnostic.VerboseContext`: its level reads occur at source gate
+points, stream selection borrows the current pointer, and setters preserve
+subsequent reads. Native and checked/debug focused allocator/parameter tests
+pass on CPUs 8–16, so that selected explicit-context behavior is credited as
+ported in `util.h/.cpp`. The default `std::cerr` binding and process-global
+setter/getter wiring belong to the still-unported shell and command-context
+consumers and remain separate unported method rows. No unused global Go
+adapter is introduced; both source units remain partial.

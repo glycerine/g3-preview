@@ -165245,8 +165245,8 @@
           ]
         },
         {
-          "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
-          "status": "partial",
+          "name": "Selected explicit-context verbosity scalar and borrowed stream getters/setters with allocator IF_VERBOSE level rereads and once-per-chain stream selection",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_verbose_context.go",
           "tests": [
             "TestVerboseContextMutableAllocatorSelection",
@@ -165256,6 +165256,10 @@
             "TestVerboseContextClosedLevelReachedBeforeOutput",
             "TestVerboseContextWarmOutputAndNullAdapter"
           ]
+        },
+        {
+          "name": "process-global verbosity and stderr default binding for retained shell/command-context callers",
+          "status": "unported"
         }
       ],
       "ownership": [
@@ -165293,7 +165297,9 @@
         "pkg/ast/ast_bv_conversion.go",
         "pkg/ast/ast_bv_extract_numerals.go",
         "pkg/ast/ast_bv_logical_shift_numerals.go",
-        "pkg/ast/ast_bv_arithmetic_shift_numerals.go"
+        "pkg/ast/ast_bv_arithmetic_shift_numerals.go",
+        "pkg/util/numeral/mpz_power_shift.go",
+        "pkg/util/bitset/uint_set.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -165322,7 +165328,10 @@
         "TestASTSourceCompareArraysQuantifierOrder",
         "TestASTBasicCacheNativeGrowthPreservesEntriesAndZeroGaps",
         "TestASTBitVectorNativeCacheGrowthPreservesValidationAndOwnership",
-        "TestBVRewriterSourceSaturatingUint64ShiftBoundaries"
+        "TestBVRewriterSourceSaturatingUint64ShiftBoundaries",
+        "TestIntegerPowerAndShiftIndependent",
+        "TestUintSetSourceTst1",
+        "TestUintSetIndependentBoundedOracle"
       ],
       "conditionals": [
         {
@@ -165572,8 +165581,8 @@
           ]
         },
         {
-          "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
-          "status": "partial",
+          "name": "Selected explicit-context verbosity scalar and borrowed stream getters/setters with allocator IF_VERBOSE level rereads and once-per-chain stream selection",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_verbose_context.go",
           "tests": [
             "TestVerboseContextMutableAllocatorSelection",
@@ -165583,6 +165592,10 @@
             "TestVerboseContextClosedLevelReachedBeforeOutput",
             "TestVerboseContextWarmOutputAndNullAdapter"
           ]
+        },
+        {
+          "name": "process-global verbosity and stderr default binding for retained shell/command-context callers",
+          "status": "unported"
         },
         {
           "name": "megabytes_to_bytes for env_params runtime with UINT_MAX and size_t overflow saturation",
@@ -165599,6 +165612,23 @@
           "tests": [
             "TestASTSourceCompareArraysDeclarationAndApplicationOrder",
             "TestASTSourceCompareArraysQuantifierOrder"
+          ]
+        },
+        {
+          "name": "is_power_of_two uint32 primitive in retained mpz small-positive branch (util.h:85; mpz.cpp:1518)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_power_shift.go",
+          "tests": [
+            "TestIntegerPowerAndShiftIndependent"
+          ]
+        },
+        {
+          "name": "get_num_1bits uint32 popcount in retained uint_set::num_elems (util.h:112-128; uint_set.h:83-90)",
+          "status": "ported",
+          "go_target": "pkg/util/bitset/uint_set.go",
+          "tests": [
+            "TestUintSetSourceTst1",
+            "TestUintSetIndependentBoundedOracle"
           ]
         },
         {
@@ -165625,7 +165655,8 @@
         "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events.",
         "AST canonical-table comparison reads borrowed concrete declaration-domain, application-argument, and quantifier sort/name/pattern/no-pattern storage in order; Go node handles and symbols preserve source identity and native table storage. No standalone C++ array template is ported.",
         "The retained basic and bit-vector declaration caches grow native Go slices to the requested index, preserving prior handles and zero-valued gaps. Their backing is ordinary Go memory, not a charged arena allocation.",
-        "Retained BV numeric extract, logical shift, and arithmetic shift paths use uint64 Go shifts; shift counts of 64 or more saturate to zero, including the source width-64 all-ones mask expression."
+        "Retained BV numeric extract, logical shift, and arithmetic shift paths use uint64 Go shifts; shift counts of 64 or more saturate to zero, including the source width-64 all-ones mask expression.",
+        "The retained integer small-positive power-of-two predicate uses uint32 bit arithmetic; uint_set cardinality uses Go's 32-bit popcount over each source word. Other helper consumers in unported packages are not credited."
       ],
       "deviations": [
         "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound. C++ ostream badbit, exception flags, and formatting state are standard-library internals rather than project escaped behavior and are excluded; Go Write reports io.Writer errors.",
