@@ -6287,7 +6287,7 @@
     },
     {
       "source": "src/util/lp/mps_reader.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/mps_reader_float.go",
         "pkg/util/lp/mps_reader_float_test.go",
@@ -6357,8 +6357,13 @@
         "TestLPMPSDriverPreservesOlderComparison",
         "TestLPMPSDriverEmptyAndInfeasibleFiles",
         "TestLPMPSDriverFileCloseFailure",
-        "TestLPMPSDriverLiveReportEvaluation"
-      ]
+        "TestLPMPSDriverLiveReportEvaluation",
+        "TestLPMPSBatchFloatPreludeAndIndependentLoopSolve",
+        "TestLPMPSBatchDirectoryAndPathSources",
+        "TestLPLARMPSFileIndependentFreeModels",
+        "TestLPLARSMTFileInputDispatch"
+      ],
+      "retained_source_audit_evidence": "Whole retained mps_reader.h audit for the actual double/double and mpq/mpq instantiations: NAME/ROWS/COLUMNS/RHS/BOUNDS/RANGES, fixed and token fields, malformed diagnostics, source section order, bound defaults, range expansion, stream/file lifetime, column names, concrete primal/dual solver factories and mpq LAR column-before-row population are implemented. Go strings/bufio/strconv and insdict replace native C++/C library internals while preserving project parsing and reached publication. The reader does not parse implicitly during create_solver and does not gate creation on is_ok; partial returned owners are closed before the reader. Actual MPS batch and LAR MPS/SMT file consumers pass native/checked. Current native file coverage: mps_reader_float.go357/381, mps_reader_exact.go449/501, mps_populate_exact.go68/73, solver_named_rational.go16/16; checked360/381,448/501,67/73,16/16. Most remaining branches are delegated numeric/IO errors, source-undefined input guards or unreachable exact nil-message assertion; no synthetic adapters. src/test/lp.cpp CLI/options/file-list/directory/SMT dispatch has its own partial root unit and is not part of this header completion."
     },
     {
       "source": "src/util/lp/numeric_pair.h",
@@ -8255,10 +8260,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 72,
+    "ported": 73,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 23
+    "partial": 22
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -15052,5 +15057,78 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_suite_qualification": "Latest completed full native55b06c96 predates this audit and recent lifetime corrections; focused native/debug and portcheck evidence is separate."
+  },
+  "latest_mps_reader_whole_audit": {
+    "scope": "Whole retained mps_reader.h audit for the actual double/double and mpq/mpq instantiations: NAME/ROWS/COLUMNS/RHS/BOUNDS/RANGES, fixed and token fields, malformed diagnostics, source section order, bound defaults, range expansion, stream/file lifetime, column names, concrete primal/dual solver factories and mpq LAR column-before-row population are implemented. Go strings/bufio/strconv and insdict replace native C++/C library internals while preserving project parsing and reached publication. The reader does not parse implicitly during create_solver and does not gate creation on is_ok; partial returned owners are closed before the reader. Actual MPS batch and LAR MPS/SMT file consumers pass native/checked. Current native file coverage: mps_reader_float.go357/381, mps_reader_exact.go449/501, mps_populate_exact.go68/73, solver_named_rational.go16/16; checked360/381,448/501,67/73,16/16. Most remaining branches are delegated numeric/IO errors, source-undefined input guards or unreachable exact nil-message assertion; no synthetic adapters. src/test/lp.cpp CLI/options/file-list/directory/SMT dispatch has its own partial root unit and is not part of this header completion.",
+    "source_units": [
+      "src/util/lp/mps_reader.h"
+    ],
+    "go_targets": [
+      "pkg/util/lp/mps_reader_float.go",
+      "pkg/util/lp/mps_reader_exact.go",
+      "pkg/util/lp/mps_populate_exact.go",
+      "pkg/util/lp/solver_named_rational.go"
+    ],
+    "focused_tests": [
+      "TestLPFloatMPS",
+      "TestLPRationalMPS",
+      "TestLPMPSBatch",
+      "TestLPLARMPS",
+      "TestLPLARSMT",
+      "TestLPMPSDefault"
+    ],
+    "focused_go_file_coverage": {
+      "native": {
+        "mps_reader_float.go": [
+          357,
+          381
+        ],
+        "mps_reader_exact.go": [
+          449,
+          501
+        ],
+        "mps_populate_exact.go": [
+          68,
+          73
+        ],
+        "solver_named_rational.go": [
+          16,
+          16
+        ],
+        "driver_mps_batch.go": [
+          139,
+          143
+        ]
+      },
+      "debug": {
+        "mps_reader_float.go": [
+          360,
+          381
+        ],
+        "mps_reader_exact.go": [
+          448,
+          501
+        ],
+        "mps_populate_exact.go": [
+          67,
+          73
+        ],
+        "solver_named_rational.go": [
+          16,
+          16
+        ],
+        "driver_mps_batch.go": [
+          139,
+          143
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-mps-reader-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-mps-reader-whole-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
   }
 }

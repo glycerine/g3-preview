@@ -104521,7 +104521,7 @@
         "All four --test_lu mathematical scenarios now execute in Go: small fixture and two-row extension, cyclic-square larger fixture, holes fixture including its replacement and default-random fixture with both replacements. Larger fixtures run source density0.7 plus forced sparse/dense policies and independent basis factorization/known row-column/refined-solve checks. Source global g_rand starts at random_gen default0; independent Go test owner preserves that recurrence and first-row golden draws. Actual command parsing, diagnostic output and whole upstream driver execution remain open; no complete src/test/lp.cpp promotion.",
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
         "Zero-low constructor preserves base FEASIBLE status, beta/Harris initialization, debug predicate before dummy resize, and borrowed header identity. The Go header is safely empty before base construction; boxed debug reads guard the C++ not-yet-constructed dummy member domain. Source omitted pricing fields are not credited before InitRun; dead enter-price epsilon assignment is excluded because no retained read exists. Initial checks use exact zero/upper comparisons, not stored lower bounds/tolerance. Original smoke fixtures now use the actual constructor with empty upper bounds: explicit LU verifies independent optima; unchanged source default strategy instead hits !use_tableau assertion in debug and missing factorization ErrBounds guard in release. This does not claim default source solver correctness or completion of the whole upstream driver.",
-        "Native Go strings/bufio/strconv and insertion-ordered dictionaries replace STL streams/containers and libc numeric conversion. ASCII space/tab token/trim rules, fixed-field 8-byte row names/25-byte stride and column continuation preserve project parsing. Numeric tokens use Go ParseFloat on the first field; malformed libc atof prefix grammar is not emulated. Native writer errors and real file errors return reached publication prefixes; EOF retains source two-count line increment. Non-advancing ROWS header loop returns ErrMPSStalled, bare throw/undefined token domains become explicit errors. Source MI retains default lower flag, marker line still registers a column, LIMITMAX source shift assertion and zero/negative/IEEE range transformations are preserved. Dictionary insertion order defines deterministic replacement/source unordered traversal; partial constructed solvers are returned for cleanup. Native owner/file Close replaces source stream/container destruction. Dead string utility adapters and unused solver_row_count/range_count helpers are excluded; exact/dual/LAR creation and complete upstream CLI remain open.",
+        "Native Go strings/bufio/strconv and insertion-ordered dictionaries replace STL streams/containers and libc numeric conversion. ASCII space/tab token/trim rules, fixed-field 8-byte row names/25-byte stride and column continuation preserve project parsing. Numeric tokens use Go ParseFloat on the first field; malformed libc atof prefix grammar is not emulated. Native writer errors and real file errors return reached publication prefixes; EOF retains source two-count line increment. Non-advancing ROWS header loop returns ErrMPSStalled, bare throw/undefined token domains become explicit errors. Source MI retains default lower flag, marker line still registers a column, LIMITMAX source shift assertion and zero/negative/IEEE range transformations are preserved. Dictionary insertion order defines deterministic replacement/source unordered traversal; partial constructed solvers are returned for cleanup. Native owner/file Close replaces source stream/container destruction. Dead string utility adapters and unused solver_row_count/range_count helpers are excluded; containing upstream CLI audit remains separate under src/test/lp.cpp.",
         "Literal upstream examples stop at the source add_constraint debug assertion; native ignores those calls. Native term model is tested including its deferred materialized column; the infeasibility sample remains feasible, and ignored triangle inequalities yield no implied endpoints. These source limitations are exposed explicitly. Alternate retained-bound installation is tested separately and is not substituted for the original driver.",
         "Concrete scalar mpq/mpq core value updates/restoration, descending RHS reconstruction, precise LU solve, reduced costs, deterministic bound/free snapping, precise indexed residual bypass and ascending objective dot product now implement the retained source methods. UpdateX keeps delta a live reference and precise updates never populate CopyXB. Reconstruction uses the real RationalLU and publishes descending basic assignments, without floating refinement. Reduced costs skip zero Y before row reads. Source rational binary expressions copy the left operand and copy the compound-result reference on return; core products and corrected outer objective products/sums preserve these owners and physical failure prefixes. Parent raw receipts close before LU, LU before borrowed work, and temporary owners before parent roots. Seven test groups cover 100 independent triangular systems with 81-180-bit costs and independent RHS, transpose solve, reduced-cost and objective oracles; 360 update/restore worlds across LU/tableau traversal and live aliases; all source column types and unknown default; output aliasing and descending aliased copies; 27 reached domain profiles; stopped/closed calls and actual older comparison identity. Twenty-two pooled/direct physical campaigns run through success, require actual refusal for every direct campaign and pass ownership census. The literal upstream solve_rational fixture reconstructs a supplied known basis and checks objective24 using independent primal/dual certificates: no optimization search or complete upstream-driver credit. The initial reduced-cost guard fixture marked all columns basic; making the next column nonbasic corrects its expected reached cost read. Inventory remains 88 partial/16 unported/6 reference_only; no whole-source promotion. Scalar core residual/diagnostic queries, pivot and feasibility-search orchestration, exact primal/dual outer optimization, full upstream drivers and whole-source audits remain open. Audit earlier common exact preparation/presolve binary-expression temporaries against rational.h copy-on-return semantics; the objective correction does not prove those paths complete. Latest full native checkpoint a8a7ef66 predates scalar core base/values and the current objective-expression correction; focused coverage measures current Go statements only.",
         "Project parser/option/assignment order is preserved using Go strings and standard numeric parsers. Nonempty malformed, libc-style trailing numeric prefixes or signed-int32 overflow return explicit Go parse errors instead of porting libc atoi/atof grammar or claiming undefined C++ overflow behavior. Valid signed-int32 tokens preserve unsigned assignment then signed setting/enum narrowing; float settings retain six-significant-digit reports and IEEE values. Nil report writer suppresses driver reports; source CLI consumer uses stdout. External GLPK execution, full CLI dispatch, file-list/directory/SMT/reporting/timing branches remain open.",
@@ -135407,7 +135407,7 @@
       "path": "src/util/lp/mps_reader.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/mps_reader_float.go",
         "pkg/util/lp/mps_reader_float_test.go",
@@ -135495,7 +135495,10 @@
         "TestLPLARMPSInputEntryGuards",
         "TestLPLARMPSFileReportFailures",
         "TestLPLARMPSFilePhysicalOwnership",
-        "TestLPLARMPSFileOlderCallerComparison"
+        "TestLPLARMPSFileOlderCallerComparison",
+        "TestLPMPSBatchFloatPreludeAndIndependentLoopSolve",
+        "TestLPMPSBatchDirectoryAndPathSources",
+        "TestLPLARSMTFileInputDispatch"
       ],
       "assertions": [
         {
@@ -135531,8 +135534,8 @@
           "text": "SASSERT(o != nullptr);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Floating MPS file/stream input, NAME/ROWS/COLUMNS/RHS/BOUNDS/RANGES parsing and fixed-column fallbacks",
@@ -135598,11 +135601,6 @@
           ]
         },
         {
-          "name": "Remaining top-level test CLI dispatch, LAR file-list integration and directory/SMT driver scenarios",
-          "status": "unported",
-          "tests": []
-        },
-        {
           "name": "Concrete exact common model fill_solver row/column population",
           "status": "ported",
           "go_target": "pkg/util/lp/mps_populate_exact.go",
@@ -135659,13 +135657,15 @@
         "RationalMPSReader owns initialized numeral pointers in a borrowed manager, parent exact receipts, lexical parsing/range/iteration locals and a child native coefficient vector. Cleanup cancels parent raw calls, then child population receipts, lexical locals, stored numerals and parent roots before closing the owned file. Returned partial solvers close before the reader. Overwritten row/range owners remain tracked until reader Close; native Go container reclamation does not reproduce source pointer leaks.",
         "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json.",
         "Concrete exact MPS factories return the newly constructed primal/dual owner even when row, coefficient, bound or diagnostic population fails. Close that partial child before the reader because interrupted common-model numeral calls can borrow its by-value loop value. Ready/closed checks run before acquiring a new owner. Successful repeated creation yields independent column/constraint/coefficient owners; one child optimization failure does not stop the reader. Real older caller comparison receipts survive factory population and cleanup unchanged.",
-        "Successful retained CreateLARSolver has no remaining parser-numeral borrows, permitting source create_lar_solver_from_file to close its reader before the second read; partial factory failures retain the reader until solver cleanup. Actual file-driver tests verify both reads, creator absence during run and allocation failure cleanup."
+        "Successful retained CreateLARSolver has no remaining parser-numeral borrows, permitting source create_lar_solver_from_file to close its reader before the second read; partial factory failures retain the reader until solver cleanup. Actual file-driver tests verify both reads, creator absence during run and allocation failure cleanup.",
+        "Both concrete reader instances own row, column, bound and file state while factories return separately owned partial solvers. Exact numeral roots and raw calls close after child population work; Go insertion-ordered dictionaries preserve reached parser publication order. CLI driver owners are audited under src/test/lp.cpp rather than this header."
       ],
       "deviations": [
-        "Native Go strings/bufio/strconv and insertion-ordered dictionaries replace STL streams/containers and libc numeric conversion. ASCII space/tab token/trim rules, fixed-field 8-byte row names/25-byte stride and column continuation preserve project parsing. Numeric tokens use Go ParseFloat on the first field; malformed libc atof prefix grammar is not emulated. Native writer errors and real file errors return reached publication prefixes; EOF retains source two-count line increment. Non-advancing ROWS header loop returns ErrMPSStalled, bare throw/undefined token domains become explicit errors. Source MI retains default lower flag, marker line still registers a column, LIMITMAX source shift assertion and zero/negative/IEEE range transformations are preserved. Dictionary insertion order defines deterministic replacement/source unordered traversal; partial constructed solvers are returned for cleanup. Native owner/file Close replaces source stream/container destruction. Dead string utility adapters and unused solver_row_count/range_count helpers are excluded; exact/dual/LAR creation and complete upstream CLI remain open.",
-        "Exact input uses the existing source rational parser directly, including scientific/fraction parser exceptions and digit-scanning across fixed-field trailing text. Native insertion order defines traversal where source unordered maps supplied none. Empty token/undefined/bare-throw/stalled-header domains have explicit error transport; actual diagnostic/file failures preserve reached publication. Source LAR filling stops on the first missing bound; numeric row-name ID mapping is independent of column indices. Executable AddConstraint remains a debug assertion/native zero no-op. Exact outer primal/dual construction and full CLI/options/SMT branches are not credited.",
-        "Exact primal/dual MPS construction is now ported through two concrete factory methods, matching the floating API without a generic virtual-solver adapter. Source create_solver does not gate on is_ok or parse input implicitly, and both behaviors are retained. The real exact primal path is checked against independent min/max vertex optima; exact dual full-entry tests preserve source rational(double) and omitted sparsity-extent boundaries. These supersede earlier notes that exact construction was unported; full CLI/options/SMT/timing/reporting drivers remain open."
-      ]
+        "Native Go strings/bufio/strconv and insertion-ordered dictionaries replace STL streams/containers and libc numeric conversion. ASCII space/tab token/trim rules, fixed-field 8-byte row names/25-byte stride and column continuation preserve project parsing. Numeric tokens use Go ParseFloat on the first field; malformed libc atof prefix grammar is not emulated. Native writer errors and real file errors return reached publication prefixes; EOF retains source two-count line increment. Non-advancing ROWS header loop returns ErrMPSStalled, bare throw/undefined token domains become explicit errors. Source MI retains default lower flag, marker line still registers a column, LIMITMAX source shift assertion and zero/negative/IEEE range transformations are preserved. Dictionary insertion order defines deterministic replacement/source unordered traversal; partial constructed solvers are returned for cleanup. Native owner/file Close replaces source stream/container destruction. Dead string utility adapters and unused solver_row_count/range_count helpers are excluded; containing upstream CLI audit remains separate under src/test/lp.cpp.",
+        "Exact input uses the existing source rational parser directly, including scientific/fraction parser exceptions and digit-scanning across fixed-field trailing text. Native insertion order defines traversal where source unordered maps supplied none. Empty token/undefined/bare-throw/stalled-header domains have explicit error transport; actual diagnostic/file failures preserve reached publication. Source LAR filling stops on the first missing bound; numeric row-name ID mapping is independent of column indices. Executable AddConstraint remains a debug assertion/native zero no-op. Containing CLI/options/SMT branches are audited separately under src/test/lp.cpp.",
+        "Exact primal/dual MPS construction is now ported through two concrete factory methods, matching the floating API without a generic virtual-solver adapter. Source create_solver does not gate on is_ok or parse input implicitly, and both behaviors are retained. The real exact primal path is checked against independent min/max vertex optima; exact dual full-entry tests preserve source rational(double) and omitted sparsity-extent boundaries. These supersede earlier notes that exact construction was unported; containing CLI/options/SMT/timing/reporting driver audits remain separate under src/test/lp.cpp."
+      ],
+      "retained_source_audit_evidence": "Whole retained mps_reader.h audit for the actual double/double and mpq/mpq instantiations: NAME/ROWS/COLUMNS/RHS/BOUNDS/RANGES, fixed and token fields, malformed diagnostics, source section order, bound defaults, range expansion, stream/file lifetime, column names, concrete primal/dual solver factories and mpq LAR column-before-row population are implemented. Go strings/bufio/strconv and insdict replace native C++/C library internals while preserving project parsing and reached publication. The reader does not parse implicitly during create_solver and does not gate creation on is_ok; partial returned owners are closed before the reader. Actual MPS batch and LAR MPS/SMT file consumers pass native/checked. Current native file coverage: mps_reader_float.go357/381, mps_reader_exact.go449/501, mps_populate_exact.go68/73, solver_named_rational.go16/16; checked360/381,448/501,67/73,16/16. Most remaining branches are delegated numeric/IO errors, source-undefined input guards or unreachable exact nil-message assertion; no synthetic adapters. src/test/lp.cpp CLI/options/file-list/directory/SMT dispatch has its own partial root unit and is not part of this header completion."
     },
     {
       "path": "src/util/lp/numeric_pair.h",
@@ -173961,5 +173961,78 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_suite_qualification": "Latest completed full native55b06c96 predates this audit and recent lifetime corrections; focused native/debug and portcheck evidence is separate."
+  },
+  "latest_mps_reader_whole_audit": {
+    "scope": "Whole retained mps_reader.h audit for the actual double/double and mpq/mpq instantiations: NAME/ROWS/COLUMNS/RHS/BOUNDS/RANGES, fixed and token fields, malformed diagnostics, source section order, bound defaults, range expansion, stream/file lifetime, column names, concrete primal/dual solver factories and mpq LAR column-before-row population are implemented. Go strings/bufio/strconv and insdict replace native C++/C library internals while preserving project parsing and reached publication. The reader does not parse implicitly during create_solver and does not gate creation on is_ok; partial returned owners are closed before the reader. Actual MPS batch and LAR MPS/SMT file consumers pass native/checked. Current native file coverage: mps_reader_float.go357/381, mps_reader_exact.go449/501, mps_populate_exact.go68/73, solver_named_rational.go16/16; checked360/381,448/501,67/73,16/16. Most remaining branches are delegated numeric/IO errors, source-undefined input guards or unreachable exact nil-message assertion; no synthetic adapters. src/test/lp.cpp CLI/options/file-list/directory/SMT dispatch has its own partial root unit and is not part of this header completion.",
+    "source_units": [
+      "src/util/lp/mps_reader.h"
+    ],
+    "go_targets": [
+      "pkg/util/lp/mps_reader_float.go",
+      "pkg/util/lp/mps_reader_exact.go",
+      "pkg/util/lp/mps_populate_exact.go",
+      "pkg/util/lp/solver_named_rational.go"
+    ],
+    "focused_tests": [
+      "TestLPFloatMPS",
+      "TestLPRationalMPS",
+      "TestLPMPSBatch",
+      "TestLPLARMPS",
+      "TestLPLARSMT",
+      "TestLPMPSDefault"
+    ],
+    "focused_go_file_coverage": {
+      "native": {
+        "mps_reader_float.go": [
+          357,
+          381
+        ],
+        "mps_reader_exact.go": [
+          449,
+          501
+        ],
+        "mps_populate_exact.go": [
+          68,
+          73
+        ],
+        "solver_named_rational.go": [
+          16,
+          16
+        ],
+        "driver_mps_batch.go": [
+          139,
+          143
+        ]
+      },
+      "debug": {
+        "mps_reader_float.go": [
+          360,
+          381
+        ],
+        "mps_reader_exact.go": [
+          448,
+          501
+        ],
+        "mps_populate_exact.go": [
+          67,
+          73
+        ],
+        "solver_named_rational.go": [
+          16,
+          16
+        ],
+        "driver_mps_batch.go": [
+          139,
+          143
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-mps-reader-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-mps-reader-whole-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
   }
 }
