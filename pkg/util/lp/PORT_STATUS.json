@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 86.6,
-  "coverage_warning": "Completed native checkpoint a4d0e129 measures29041/33519 LP statements (86.6%); includes LU check file driver and earlier retained MPS/LAR/SMT/scaling/stacked-map work. Actual session87618 terminal exit0 observed. Native excludes all g3debug-only dense/matrix/printer/residual files. Later GLPK reports/process/batch drivers are absent from this profile and retain separate focused evidence. Go statement coverage is not C++ source completion; whole retained-source/consumer/ownership audits and top-level driver work remain open.",
+  "coverage_warning": "Completed native checkpoint ea1b46ec measures29711/34323 LP statements (86.6%); actual session9671 terminal exit0 observed. All64 packages processed:63pass/1skip/51with named tests. Includes GLPK reports/process/batch and preparation/container/permutation/stacked/LAR examples. Excludes debug-only code and later implied-bound printing, bound-propagation scenarios, LP-zero driver/report fix and debug swaps; their focused profiles remain separate. Go statement coverage is not C++ completion; retained-source/consumer/ownership and complete top-level CLI audits remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -5106,7 +5106,8 @@
         "pkg/util/lp/sparse_matrix_exact_extend.go",
         "pkg/util/lp/sparse_matrix_extend_test.go",
         "pkg/util/lp/sparse_matrix_float_restore.go",
-        "pkg/util/lp/sparse_matrix_exact_restore.go"
+        "pkg/util/lp/sparse_matrix_exact_restore.go",
+        "pkg/util/lp/driver_swaps_debug.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -5180,7 +5181,24 @@
         "TestLPExactSparseRowRestoreAllocationCensus",
         "TestLPSparseRowRestoreBoundsAndPrefixes",
         "TestLPExactSparseRowRestoreLeavesStoppedCallerOwned",
-        "TestLPExactSparseRowRestoreTinyAndForeign"
+        "TestLPExactSparseRowRestoreTinyAndForeign",
+        "TestLPDriverSwapsIndependentSourceOracle",
+        "TestLPDriverSwapsOutputPrefixes",
+        "TestLPDriverSwapSetterAndGuards"
+      ],
+      "methods": [
+        {
+          "name": "retained double diagnostic set src66-105 for live fill_matrix: stored zeros and independent row/column scans; unobserved indeterminate reciprocal-offset member excluded",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_swaps_debug.go",
+          "tests": [
+            "TestLPDriverSwapsIndependentSourceOracle",
+            "TestLPDriverSwapSetterAndGuards"
+          ]
+        }
+      ],
+      "deviations": [
+        "Debug --test_swaps retains shared10x10 fill and100 random attempts per helper. Despite its name, second helper calls swap_rows and TransposeRight; actual source equality fails for noncommuting exchanges. First helper TransposeLeft compensates all100 attempts. Independent dense-array/RNG oracle verifies50 seeds, exact reports/flushes, final logical matrix and draw count. Diagnostic setter stores zeros and two directions independently; source two-argument indexed_value m_other is indeterminate and never read by retained fill/Get/swap/print path. Native Other zero is an unobserved representation value, not reciprocal-link/elimination semantics; no universal or public Set adapter added. Native build erases entire debug scenario. Complete CLI execution/entry and whole-source/ownership audits remain open."
       ]
     },
     {
@@ -5216,7 +5234,8 @@
         "pkg/util/lp/sparse_matrix_exact_extend.go",
         "pkg/util/lp/sparse_matrix_extend_test.go",
         "pkg/util/lp/sparse_matrix_float_restore.go",
-        "pkg/util/lp/sparse_matrix_exact_restore.go"
+        "pkg/util/lp/sparse_matrix_exact_restore.go",
+        "pkg/util/lp/driver_swaps_debug.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -5290,7 +5309,24 @@
         "TestLPExactSparseRowRestoreAllocationCensus",
         "TestLPSparseRowRestoreBoundsAndPrefixes",
         "TestLPExactSparseRowRestoreLeavesStoppedCallerOwned",
-        "TestLPExactSparseRowRestoreTinyAndForeign"
+        "TestLPExactSparseRowRestoreTinyAndForeign",
+        "TestLPDriverSwapsIndependentSourceOracle",
+        "TestLPDriverSwapsOutputPrefixes",
+        "TestLPDriverSwapSetterAndGuards"
+      ],
+      "methods": [
+        {
+          "name": "retained double diagnostic set src66-105 for live fill_matrix: stored zeros and independent row/column scans; unobserved indeterminate reciprocal-offset member excluded",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_swaps_debug.go",
+          "tests": [
+            "TestLPDriverSwapsIndependentSourceOracle",
+            "TestLPDriverSwapSetterAndGuards"
+          ]
+        }
+      ],
+      "deviations": [
+        "Debug --test_swaps retains shared10x10 fill and100 random attempts per helper. Despite its name, second helper calls swap_rows and TransposeRight; actual source equality fails for noncommuting exchanges. First helper TransposeLeft compensates all100 attempts. Independent dense-array/RNG oracle verifies50 seeds, exact reports/flushes, final logical matrix and draw count. Diagnostic setter stores zeros and two directions independently; source two-argument indexed_value m_other is indeterminate and never read by retained fill/Get/swap/print path. Native Other zero is an unobserved representation value, not reciprocal-link/elimination semantics; no universal or public Set adapter added. Native build erases entire debug scenario. Complete CLI execution/entry and whole-source/ownership audits remain open."
       ]
     },
     {
@@ -5849,23 +5885,23 @@
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
-    "commit": "a4d0e129",
-    "started_utc": "2026-10-11 22:37:32 UTC",
-    "completed_utc": "2026-10-11 23:01:28 UTC",
+    "commit": "ea1b46ec",
+    "started_utc": "2026-10-11 23:37:38 UTC",
+    "completed_utc": "2026-10-12 00:01:48 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-lp-lu-check-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-lp-lu-check-module-native.events.jsonl",
-    "profile": "/mnt/oldrog/tmp/g3-lp-lu-check-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-lp-lu-check-module-native.json",
+    "log": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.json",
     "packages": 64,
     "passed_packages": 63,
     "skipped_packages": 1,
     "packages_with_tests": 51,
-    "lp_seconds": 1432.865,
-    "lp_covered_statements": 29041,
-    "lp_statements": 33519,
-    "session_id": 87618,
-    "scope_warning": "Actual session87618 returned terminal exit0 and is closed. Includes native LP implementation/tests through a4d0e129 (LU check file driver and earlier scaling/scoped-map/known-solution/LAR/SMT/MPS increments). Native excludes g3debug dense/printer/residual files. Profile inspection confirms driver_glpk_reports.go, driver_process_file.go and driver_mps_batch.go absent; their later focused evidence is separate. Go statement coverage is not C++ completion."
+    "lp_seconds": 1446.829,
+    "lp_covered_statements": 29711,
+    "lp_statements": 34323,
+    "session_id": 9671,
+    "scope_warning": "Actual exec session9671 returned terminal exit0 and is closed. Native snapshot ea1b46ec includes GLPK reports/process/batch, preparation/container/permutation/stacked/LAR examples and earlier LP work. Excludes all g3debug-only code and later implied-bound printing5eee9473, bound-propagation scenarios ee3256cf, LP-zero driver/report fix79c34156 and current debug swap scenario; those keep separate focused evidence. Go statement coverage is not C++ completion."
   },
   "full_native_checkpoint_history": [
     {
@@ -6091,6 +6127,25 @@
       "lp_statements": 32295,
       "session_id": 57972,
       "scope_warning": "Includes scalar full dual Solve, both scalar outer solvers, exact MPS factories/named accessors and driver arguments/settings/setup through93d0d780. Actual session57972 returned terminal exit0. LP binary started before driver_mps*.go; these files are absent from the profile and retain separate focused native/checked evidence. Coverage measures implemented Go statements, not C++ completion."
+    },
+    {
+      "commit": "a4d0e129",
+      "started_utc": "2026-10-11 22:37:32 UTC",
+      "completed_utc": "2026-10-11 23:01:28 UTC",
+      "exit_code": 0,
+      "log": "/mnt/oldrog/tmp/g3-lp-lu-check-module-native.log",
+      "event_log": "/mnt/oldrog/tmp/g3-lp-lu-check-module-native.events.jsonl",
+      "profile": "/mnt/oldrog/tmp/g3-lp-lu-check-module-native.cover",
+      "status_file": "/mnt/oldrog/tmp/g3-lp-lu-check-module-native.json",
+      "packages": 64,
+      "passed_packages": 63,
+      "skipped_packages": 1,
+      "packages_with_tests": 51,
+      "lp_seconds": 1432.865,
+      "lp_covered_statements": 29041,
+      "lp_statements": 33519,
+      "session_id": 87618,
+      "scope_warning": "Actual session87618 returned terminal exit0 and is closed. Includes native LP implementation/tests through a4d0e129 (LU check file driver and earlier scaling/scoped-map/known-solution/LAR/SMT/MPS increments). Native excludes g3debug dense/printer/residual files. Profile inspection confirms driver_glpk_reports.go, driver_process_file.go and driver_mps_batch.go absent; their later focused evidence is separate. Go statement coverage is not C++ completion."
     }
   ],
   "latest_tableau_catchup_increment": {
@@ -10343,28 +10398,6 @@
     "remaining": "Complete registered CLI scenarios/dispatch and whole retained algorithm, consumer, source-test and ownership audits; numeric_pair trait-unit completion is not claimed by wrapper audit.",
     "ledger_note": "Ported-unit method list contains retained/replaced methods only. Uncalled precise<X> is explicitly recorded in deviations; existing checker rejects dead_deleted method entries under a ported unit."
   },
-  "running_full_native_checkpoint": {
-    "commit": "ea1b46ec",
-    "started_utc": "2026-10-11 23:37:38 UTC",
-    "command": [
-      "go",
-      "-C",
-      "pkg",
-      "test",
-      "-json",
-      "./...",
-      "-timeout=60m",
-      "-count=1",
-      "-coverprofile=/mnt/oldrog/tmp/g3-lp-driver-check-module-native.cover"
-    ],
-    "log": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.events.jsonl",
-    "profile": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.json",
-    "session_id": 9671,
-    "status": "running",
-    "scope_warning": "Actual exec session9671 confirmed live;63 package terminal events/no failures observed, LP has no terminal event. Production code snapshot includes driver/report/process/batch/dispatch/container/permutation/stacked/LAR examples through ea1b46ec. Later ledger-only build-glue classifications are checked separately. Do not credit full completion/coverage until actual terminal exit is observed."
-  },
   "latest_lp_build_glue_audit": {
     "scope": "Five previously unported build/instantiation units classified without inventing runtime ports",
     "reference_units": [
@@ -10484,5 +10517,32 @@
       "/mnt/oldrog/tmp/g3-lp-zero-driver-debug.cover"
     ],
     "remaining": "Other retained registered scenarios, complete top-level action execution/argv entry binding, whole-source/consumer/ownership audits."
+  },
+  "latest_swap_cli_increment": {
+    "scope": "Retained g3debug --test_swaps parent/fill/row and misnamed column helper; native excludes the entire scenario",
+    "tests": [
+      "TestLPDriverSwapsIndependentSourceOracle",
+      "TestLPDriverSwapsOutputPrefixes",
+      "TestLPDriverSwapSetterAndGuards"
+    ],
+    "coverage": {
+      "combined_debug_checked": {
+        "covered": 88,
+        "statements": 98,
+        "percent": 89.8
+      }
+    },
+    "coverage_warning": "Gaps guard delegated stable extent/product/equality/copy/transposition/fill operations and successful completion unreachable in actual failing second source helper. No repaired column swap, synthetic child hook or full native scenario credit.",
+    "source_fidelity": [
+      "10x10 descending fill stores all100 entries including zero; diagnostic row/column scans independent and source m_other unobserved.",
+      "First helper all100 attempts uses row swaps/TransposeLeft; second also swaps rows but uses TransposeRight, reaching real source assertion.",
+      "Same matrix/shared generator across helpers; actual dense copy/product/equality and exact sparse overload printing with row endl and separate trailing endl."
+    ],
+    "ownership_evidence": "50 independent dense-array/unsigned-recurrence worlds verify exact report/flush/final logical matrix and random draw count. Every initial report/matrix byte plus selected pre/postmutation stages through both helpers and every selected endl failure checks numerical publications and RNG prefixes. Failed lexical products remain until Close; native storage only. Independent directional overwrite/stored zero/permuted setter and nil/repeat/closed/extent guards. Source dimension assertion runs before permutation reads; separate shortened-backing-vector fixture proves reached Go extent guard.",
+    "validation": "Focused combined0.985s; related debug matrix/permutation0.012s; combined LP vet, both native/debug module compile gates, source portcheck (2103 units/677 APIs) and dependency graph refresh (64 packages/no unresolved imports) pass.",
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-swap-driver-debug.cover"
+    ],
+    "remaining": "Other retained registered scenarios, complete CLI execution/argv entry binding and whole-source/consumer/ownership audits."
   }
 }

@@ -103054,7 +103054,8 @@
         "pkg/util/lp/driver_lar_examples.go",
         "pkg/util/lp/driver_lar_examples_test.go",
         "pkg/util/lp/driver_bound_propagation.go",
-        "pkg/util/lp/driver_lp_zero.go"
+        "pkg/util/lp/driver_lp_zero.go",
+        "pkg/util/lp/driver_swaps_debug.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103280,7 +103281,10 @@
         "TestLPBoundPropagationPreservesOlderComparison",
         "TestLPLPZeroDriverActualSourceProfile",
         "TestLPLPZeroDriverEveryReportPrefix",
-        "TestLPLPZeroDriverIndependentStorage"
+        "TestLPLPZeroDriverIndependentStorage",
+        "TestLPDriverSwapsIndependentSourceOracle",
+        "TestLPDriverSwapsOutputPrefixes",
+        "TestLPDriverSwapSetterAndGuards"
       ],
       "conditionals": [
         {
@@ -104338,6 +104342,16 @@
             "TestLPLPZeroDriverEveryReportPrefix",
             "TestLPLPZeroDriverIndependentStorage"
           ]
+        },
+        {
+          "name": "retained debug test_swap_rows_with_permutation and test_swap_cols_with_permutation src626-668 plus fill_matrix/--test_swaps binding; actual source right-composition assertion retained",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_swaps_debug.go",
+          "tests": [
+            "TestLPDriverSwapsIndependentSourceOracle",
+            "TestLPDriverSwapsOutputPrefixes",
+            "TestLPDriverSwapSetterAndGuards"
+          ]
         }
       ],
       "ownership": [
@@ -104382,7 +104396,8 @@
         "run_glpk uses native os/exec literal argv for the same glpsol options, discards stdout and inherits stderr; unquoted shell tokenization and raw POSIX wait-bit encoding are not ported. Only source zero/nonzero distinction is consumed; native launch error is retained separately and counts as nonzero/inconclusive after glpk-failed diagnostic. Actual GLPK5.0 independently solves16 fixed-format boxed-knapsack inputs across exact/float/min/max, including space/semicolon filenames; fixtures use contiguous fixed-format columns/bounds, since earlier loose source-parser-only fixtures are invalid for GLPK. Real LAR report lowercase status versus comparison uppercase Status preserves source report exception. Reports use explicit writer routing instead of process-global cout redirection. Source ostream silent failures are explicit Go writer/close errors. --compare_with_primal is deliberately false in process_test_file even when arguments contain it; initial min/exact snapshots precede processing output, dual/LAR/GLPK flags remain later live reads. Complete solve_some_mps/catalogue/top-level CLI remain open; no whole-source promotion.",
         "Source catalogue minimum keys omit HOME prefix; Go preserves108 path order and all13 literal keys, including mismatch for nonempty HOME and actual matches for present empty HOME. Missing HOME emits no newline/flush; precise/GLPK empty-loop behavior remains, float missing catalogue stops before invalid source prelude indexing. Source const-char handlers have no retained loop throw producer (no literal/variable char throws in src/util, only known-solution status literal outside handlers and unused mem_copy_hook in lp.cpp); no unused exception-text adapter is introduced. Real source std::string bound exception transports ErrMPSUnhandled and propagates through batch, as do integer report exceptions/native errors. Existing explicit directory failures diagnose then continue; Go preserves literal slash split, uses native directory service and qualifies no-slash bare throw as ErrBounds. Global /tmp/test default remains; tests use isolated explicit paths rather than changing shared default directory. Full registered top-level CLI dispatch and whole retained-source/ownership audits remain open; no whole-unit promotion.",
         "Bound-propagation registered parent executes total-u, triangle, one-row, bounded-row, two-rows, mixed-row, total-l. Native ignored general constraints yield OPTIMAL with no found bounds; only triangle explicit AddTerm creates two rows. Debug stops at first AddConstraint before bounds/solve/propagator; total-u/l initial reports precede solver construction and do not flush. Triangle diagnostic is endl; found-bound report uses actual PrintImpliedBound if any. Local source ev is never populated, so first final total-l assertion is false; earlier mandatory AddConstraint assertion makes this and following contains_j_kind unreachable in debug. No unused contains_j_kind adapter, unused relevance lambda or commented sample is ported. All literals fit small numerals; pooled/direct allocation-disabled profiles prove unchanged custom budget rather than inventing large source inputs. Complete top-level CLI action execution/argv binding and retained-source/ownership audits remain open.",
-        "Original test_lp_0 now executes source endl report before any model construction, literal sparse3x7 matrix, DotRow-derived B, X/basis/cost/type vectors, default Settings, simple xN names and actual zero-low constructor/Solve. Default source tableau profile has no floating LU: debug InitReducedCosts asserts, native reaches typed ErrBounds missing-factorization guard. No silent LU strategy override or default-model optimal-solve credit; existing explicit LU numerical fixtures/exhaustive vertices remain separate. Failed core stays owned until Close and borrows actual driver slice headers. Corrected shared writeDriverLine to return io.ErrShortWrite on a short nil-error write before flush/child construction. Initial test assumed ascending NBasis; source init builds descending, corrected expected[6,5,4,3] and headings[0,1,2,-4,-3,-2,-1]. Complete CLI dispatch/entry binding and retained-source/ownership audits remain open."
+        "Original test_lp_0 now executes source endl report before any model construction, literal sparse3x7 matrix, DotRow-derived B, X/basis/cost/type vectors, default Settings, simple xN names and actual zero-low constructor/Solve. Default source tableau profile has no floating LU: debug InitReducedCosts asserts, native reaches typed ErrBounds missing-factorization guard. No silent LU strategy override or default-model optimal-solve credit; existing explicit LU numerical fixtures/exhaustive vertices remain separate. Failed core stays owned until Close and borrows actual driver slice headers. Corrected shared writeDriverLine to return io.ErrShortWrite on a short nil-error write before flush/child construction. Initial test assumed ascending NBasis; source init builds descending, corrected expected[6,5,4,3] and headings[0,1,2,-4,-3,-2,-1]. Complete CLI dispatch/entry binding and retained-source/ownership audits remain open.",
+        "Debug --test_swaps retains shared10x10 fill and100 random attempts per helper. Despite its name, second helper calls swap_rows and TransposeRight; actual source equality fails for noncommuting exchanges. First helper TransposeLeft compensates all100 attempts. Independent dense-array/RNG oracle verifies50 seeds, exact reports/flushes, final logical matrix and draw count. Diagnostic setter stores zeros and two directions independently; source two-argument indexed_value m_other is indeterminate and never read by retained fill/Get/swap/print path. Native Other zero is an unobserved representation value, not reciprocal-link/elimination semantics; no universal or public Set adapter added. Native build erases entire debug scenario. Complete CLI execution/entry and whole-source/ownership audits remain open."
       ]
     },
     {
@@ -135478,7 +135493,8 @@
         "pkg/util/lp/sparse_matrix_exact_extend.go",
         "pkg/util/lp/sparse_matrix_extend_test.go",
         "pkg/util/lp/sparse_matrix_float_restore.go",
-        "pkg/util/lp/sparse_matrix_exact_restore.go"
+        "pkg/util/lp/sparse_matrix_exact_restore.go",
+        "pkg/util/lp/driver_swaps_debug.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -135552,7 +135568,10 @@
         "TestLPExactSparseRowRestoreAllocationCensus",
         "TestLPSparseRowRestoreBoundsAndPrefixes",
         "TestLPExactSparseRowRestoreLeavesStoppedCallerOwned",
-        "TestLPExactSparseRowRestoreTinyAndForeign"
+        "TestLPExactSparseRowRestoreTinyAndForeign",
+        "TestLPDriverSwapsIndependentSourceOracle",
+        "TestLPDriverSwapsOutputPrefixes",
+        "TestLPDriverSwapSetterAndGuards"
       ],
       "conditionals": [
         {
@@ -135806,6 +135825,15 @@
             "TestLPExactSparseRowRestoreLeavesStoppedCallerOwned",
             "TestLPExactSparseRowRestoreTinyAndForeign"
           ]
+        },
+        {
+          "name": "retained double diagnostic set src66-105 for live fill_matrix: stored zeros and independent row/column scans; unobserved indeterminate reciprocal-offset member excluded",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_swaps_debug.go",
+          "tests": [
+            "TestLPDriverSwapsIndependentSourceOracle",
+            "TestLPDriverSwapSetterAndGuards"
+          ]
         }
       ],
       "ownership": [
@@ -135836,7 +135864,8 @@
         "Floating indexed refinement uses source unsigned products and strict sparse/dense density comparison, residual Add without rounding, source traversal-order sparse correction and fixed 1e-14 cleanup. Dense correction updates dimension slots descending and rebuilds the index across all dense slots, including trailing data. The copy constructor retains unindexed data; assignment would not. Precise refinement remains unreachable in retained LU and is not ported. Remaining sparse diagnostics, full LU, solvers and upstream integration remain open.",
         "Retained sparse resize preserves existing workspace flags/values, shortening counters and pivot queue. New int/bool entries are zero, not constructor WorkPivot=-1. Queue Resize changes only its priority/index extent, not the pair directory, including an initially empty directory. Native shrink follows source assertion erasure: headers remain while permutation/work extents shrink; debug rejects before mutation. Counts include stored zeros/duplicates and ignore active counters. Independent120-world/eight-round dense oracle and pooled/direct zero-reservation inline-one tests cover retained behavior.",
         "Remaining-source caller audit: sparse get_non_zero_column_in_row, full-row/triangular/max/backlink/debug queue/score/print checkers have no retained consumers; triangular checker LU references are comments, and explicit instantiations alone are not callers. Sparse add_columns_at_the_end/delete_column and unadjusted remove_zero_elements helper are definition-only; fill_reachable_indices and adjusted set_row_from_work declarations lack live bodies. Sparse multiply_from_left occurs only in sparse_matrix_with_permutaions_test, whose sole dispatch is after unconditional return finalize(0) in src/test/lp.cpp:3240. These unused methods are not ported or credited as executed upstream tests. Retained right/reverse-left compositions are reached at lu.hpp:480-481,790-791; resize at lu.h:311 and count at lu.h:257. Full LU and retained original driver integration remain open; no whole-unit promotion.",
-        "Retained Suhl prerequisite sparse_matrix.hpp:337-400 consumes a physical row and logical column workspace. Existing entries run backward; precise by-value local, row assignment, column setter and workspace clearing retain literal owning copy order. New entries run in index order; index clears before maximum refresh. Exact drop tolerance is zero regardless of floating settings. Native tiny nonzero removal can be reinserted by the later indexed append; debug asserts after removal. 800 independent coordinate-map/permutation worlds, duplicate/hidden workspace and strict tolerance/IEEE cases, reached bounds prefixes and six pooled/direct physical refusal campaigns verify matrix-before-caller cleanup and named ownership census. Suhl orchestration and full upstream LU scenarios remain open; no whole-unit promotion."
+        "Retained Suhl prerequisite sparse_matrix.hpp:337-400 consumes a physical row and logical column workspace. Existing entries run backward; precise by-value local, row assignment, column setter and workspace clearing retain literal owning copy order. New entries run in index order; index clears before maximum refresh. Exact drop tolerance is zero regardless of floating settings. Native tiny nonzero removal can be reinserted by the later indexed append; debug asserts after removal. 800 independent coordinate-map/permutation worlds, duplicate/hidden workspace and strict tolerance/IEEE cases, reached bounds prefixes and six pooled/direct physical refusal campaigns verify matrix-before-caller cleanup and named ownership census. Suhl orchestration and full upstream LU scenarios remain open; no whole-unit promotion.",
+        "Debug --test_swaps retains shared10x10 fill and100 random attempts per helper. Despite its name, second helper calls swap_rows and TransposeRight; actual source equality fails for noncommuting exchanges. First helper TransposeLeft compensates all100 attempts. Independent dense-array/RNG oracle verifies50 seeds, exact reports/flushes, final logical matrix and draw count. Diagnostic setter stores zeros and two directions independently; source two-argument indexed_value m_other is indeterminate and never read by retained fill/Get/swap/print path. Native Other zero is an unobserved representation value, not reciprocal-link/elimination semantics; no universal or public Set adapter added. Native build erases entire debug scenario. Complete CLI execution/entry and whole-source/ownership audits remain open."
       ]
     },
     {
@@ -135874,7 +135903,8 @@
         "pkg/util/lp/sparse_matrix_exact_extend.go",
         "pkg/util/lp/sparse_matrix_extend_test.go",
         "pkg/util/lp/sparse_matrix_float_restore.go",
-        "pkg/util/lp/sparse_matrix_exact_restore.go"
+        "pkg/util/lp/sparse_matrix_exact_restore.go",
+        "pkg/util/lp/driver_swaps_debug.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -135948,7 +135978,10 @@
         "TestLPExactSparseRowRestoreAllocationCensus",
         "TestLPSparseRowRestoreBoundsAndPrefixes",
         "TestLPExactSparseRowRestoreLeavesStoppedCallerOwned",
-        "TestLPExactSparseRowRestoreTinyAndForeign"
+        "TestLPExactSparseRowRestoreTinyAndForeign",
+        "TestLPDriverSwapsIndependentSourceOracle",
+        "TestLPDriverSwapsOutputPrefixes",
+        "TestLPDriverSwapSetterAndGuards"
       ],
       "conditionals": [
         {
@@ -136386,6 +136419,15 @@
             "TestLPExactSparseRowRestoreLeavesStoppedCallerOwned",
             "TestLPExactSparseRowRestoreTinyAndForeign"
           ]
+        },
+        {
+          "name": "retained double diagnostic set src66-105 for live fill_matrix: stored zeros and independent row/column scans; unobserved indeterminate reciprocal-offset member excluded",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_swaps_debug.go",
+          "tests": [
+            "TestLPDriverSwapsIndependentSourceOracle",
+            "TestLPDriverSwapSetterAndGuards"
+          ]
         }
       ],
       "ownership": [
@@ -136416,7 +136458,8 @@
         "Floating indexed refinement uses source unsigned products and strict sparse/dense density comparison, residual Add without rounding, source traversal-order sparse correction and fixed 1e-14 cleanup. Dense correction updates dimension slots descending and rebuilds the index across all dense slots, including trailing data. The copy constructor retains unindexed data; assignment would not. Precise refinement remains unreachable in retained LU and is not ported. Remaining sparse diagnostics, full LU, solvers and upstream integration remain open.",
         "Retained sparse resize preserves existing workspace flags/values, shortening counters and pivot queue. New int/bool entries are zero, not constructor WorkPivot=-1. Queue Resize changes only its priority/index extent, not the pair directory, including an initially empty directory. Native shrink follows source assertion erasure: headers remain while permutation/work extents shrink; debug rejects before mutation. Counts include stored zeros/duplicates and ignore active counters. Independent120-world/eight-round dense oracle and pooled/direct zero-reservation inline-one tests cover retained behavior.",
         "Remaining-source caller audit: sparse get_non_zero_column_in_row, full-row/triangular/max/backlink/debug queue/score/print checkers have no retained consumers; triangular checker LU references are comments, and explicit instantiations alone are not callers. Sparse add_columns_at_the_end/delete_column and unadjusted remove_zero_elements helper are definition-only; fill_reachable_indices and adjusted set_row_from_work declarations lack live bodies. Sparse multiply_from_left occurs only in sparse_matrix_with_permutaions_test, whose sole dispatch is after unconditional return finalize(0) in src/test/lp.cpp:3240. These unused methods are not ported or credited as executed upstream tests. Retained right/reverse-left compositions are reached at lu.hpp:480-481,790-791; resize at lu.h:311 and count at lu.h:257. Full LU and retained original driver integration remain open; no whole-unit promotion.",
-        "Retained Suhl prerequisite sparse_matrix.hpp:337-400 consumes a physical row and logical column workspace. Existing entries run backward; precise by-value local, row assignment, column setter and workspace clearing retain literal owning copy order. New entries run in index order; index clears before maximum refresh. Exact drop tolerance is zero regardless of floating settings. Native tiny nonzero removal can be reinserted by the later indexed append; debug asserts after removal. 800 independent coordinate-map/permutation worlds, duplicate/hidden workspace and strict tolerance/IEEE cases, reached bounds prefixes and six pooled/direct physical refusal campaigns verify matrix-before-caller cleanup and named ownership census. Suhl orchestration and full upstream LU scenarios remain open; no whole-unit promotion."
+        "Retained Suhl prerequisite sparse_matrix.hpp:337-400 consumes a physical row and logical column workspace. Existing entries run backward; precise by-value local, row assignment, column setter and workspace clearing retain literal owning copy order. New entries run in index order; index clears before maximum refresh. Exact drop tolerance is zero regardless of floating settings. Native tiny nonzero removal can be reinserted by the later indexed append; debug asserts after removal. 800 independent coordinate-map/permutation worlds, duplicate/hidden workspace and strict tolerance/IEEE cases, reached bounds prefixes and six pooled/direct physical refusal campaigns verify matrix-before-caller cleanup and named ownership census. Suhl orchestration and full upstream LU scenarios remain open; no whole-unit promotion.",
+        "Debug --test_swaps retains shared10x10 fill and100 random attempts per helper. Despite its name, second helper calls swap_rows and TransposeRight; actual source equality fails for noncommuting exchanges. First helper TransposeLeft compensates all100 attempts. Independent dense-array/RNG oracle verifies50 seeds, exact reports/flushes, final logical matrix and draw count. Diagnostic setter stores zeros and two directions independently; source two-argument indexed_value m_other is indeterminate and never read by retained fill/Get/swap/print path. Native Other zero is an unobserved representation value, not reciprocal-link/elimination semantics; no universal or public Set adapter added. Native build erases entire debug scenario. Complete CLI execution/entry and whole-source/ownership audits remain open."
       ]
     },
     {
