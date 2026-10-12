@@ -1,19 +1,10 @@
 {
-  "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
+  "scope": "All 110 retained src/util/lp source units have audited ported, reference-only, dead, or platform-replacement dispositions. Upstream src/test/lp.cpp test-driver audit remains partial pending current full-count benchmark verification.",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 86.6,
-  "coverage_warning": "Latest completed full native checkpoint8f2961ca measures30253/34954 LP statements86.6%; not a measurement of current code. Actual session89234 terminal exit0 and package/profile inspection verified. Excludes later debug-only precise-vector correction, indexed-value audit tests and subsequent reporting/common solver/analyzer changes. Later increments have separate focused coverage. Go statement coverage is not C++ completion; remaining whole retained-source/consumer/ownership/SMT/CLI audits remain open.",
+  "native_statement_coverage_of_current_go_code": 86.5,
+  "coverage_warning": "Current full native checkpoint17ecadb7 passed on unchanged Go production code: LP30177/34898 statements (86.5%), 64 module package paths with63 pass/1 skip. Subsequent test-only portability fix49887f72 passed repeated focused native/checked tests; its broader diagnostic groups passed. Ninety-one ported LP source units have native-profile LP Go targets, with the lowest target aggregate at77.4%; four matrix units are debug-only and have focused checked profiles. The historical91.7% combined checked figure predates the current checkpoint and is not a current full checked measurement. Statement coverage alone does not establish C++ source fidelity.",
   "remaining_work": [
-    "Complete containing shell/lp_frontend.cpp and smt/theory_lra.cpp parameter/runtime integration; isolated generated LPParams constructor/getters and actual LP consumer value tests are complete",
-    "remaining exact/floating numeric traits and conversions",
-    "indexed/sparse/static/dense matrices and transformations",
-    "remaining retained LU diagnostics and full solver/priority-queue lifecycle integration",
-    "remaining retained objective/preparation consumers and complete retained primal/dual/LAR caller integration (uncalled LAR scaling helper excluded); whole random-update source/driver audit",
-    "remaining retained constructor/diagnostic/validator and optimization consumer audits; complete MPS/CLI upstream drivers",
-    "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
-    "Complete registered CLI runtime/consumer/ownership audit, whole retained SMT reader/LP audit",
-    "component property tests, coverage and integration audits",
-    "Complete retained source/ownership/SMT and process-global driver consumer audits; remaining optimization/scaling/randomize consumers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
+    "Complete current full-count pair/scalar benchmark verification and reconcile the independently tracked src/test/lp.cpp driver audit."
   ],
   "units": [
     {
@@ -8383,7 +8374,6 @@
     "reference_only": 10,
     "dead_deleted": 3
   },
-  "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
     "commit": "17ecadb7",
     "started_utc": "2026-10-12 12:10:46 UTC",
@@ -8416,7 +8406,7 @@
     "module_covered_statements": 129239,
     "module_statements": 170244,
     "session_id": 69692,
-    "scope_warning": "Full native module checkpoint17ecadb7 exited0 at2026-10-12 12:34:47UTC:64 package paths,63pass/1skip/51with named tests; LP1392.052s and30177/34898 statements(86.5%), module129239/170244(75.9%). The run used CPUs8-16/GOMAXPROCS9, two package jobs and a30m per-package timeout. Subsequent commits through ab9379e8 changed only ledgers/documentation, so the checkpoint validates current Go code. Focused checked runs remain separate; LP source audit is not complete."
+    "scope_warning": "Full native module checkpoint17ecadb7 exited0 at2026-10-12 12:34:47UTC:64 package paths,63pass/1skip/51with named tests; LP30177/34898 statements(86.5%), module129239/170244(75.9%). CPUs8-16/GOMAXPROCS9, two package jobs and30m per-package timeout. Go production code is unchanged through test-only fix49887f72; eight affected diagnostic groups passed ten repeats in both native/checked builds and broader groups passed once."
   },
   "full_native_checkpoint_history": [
     {
@@ -15567,5 +15557,29 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_suite_qualification": "Full native checkpoint 17ecadb7 passes on unchanged Go code; subsequent work changes ledgers only."
+  },
+  "historical_combined_debug_checked_statement_coverage": 91.7,
+  "latest_lp_coverage_audit": {
+    "current_native_checkpoint": "17ecadb7",
+    "current_native_lp_statements": {
+      "covered": 30177,
+      "total": 34898,
+      "percent": 86.5
+    },
+    "source_units": 110,
+    "ported_source_units": 95,
+    "ported_units_with_measurable_native_lp_targets": 91,
+    "lowest_native_unit_target_aggregate_percent": 77.4,
+    "debug_only_matrix_units": 4,
+    "debug_only_profiles": [
+      "/mnt/oldrog/tmp/g3-lp-dense-float-checked.cover",
+      "/mnt/oldrog/tmp/g3-lp-debug-matrix-print-checked.cover"
+    ],
+    "ported_unit_named_test_references": 4121,
+    "missing_named_go_tests": 0,
+    "missing_go_target_files": 0,
+    "native_profile": "/mnt/oldrog/tmp/g3-lp-current-native.cover",
+    "qualification": "The four debug-only source units are covered by focused checked profiles; source-target aggregates overlap and are not independent percentages. Upstream src/test/lp.cpp audit remains separate.",
+    "native_profile_go_files_with_zero_coverage": 0
   }
 }
