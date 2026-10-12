@@ -381,7 +381,7 @@ func (m *RationalSquareDenseSubmatrix) Close() error {
 		}
 		m.work = nil
 	}
-	if err := m.WorkVector.Close(); err != nil {
+	if err := m.WorkVector.CloseForward(); err != nil {
 		return err
 	}
 	// Source vector destruction visits coefficients forward.

@@ -474,7 +474,7 @@ func (m *RationalStaticMatrix) Close() error {
 		m.work = nil
 	}
 	if m.WorkVector != nil {
-		if err := m.WorkVector.Close(); err != nil {
+		if err := m.WorkVector.CloseForward(); err != nil {
 			return err
 		}
 	}

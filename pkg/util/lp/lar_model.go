@@ -345,7 +345,7 @@ func (s *LARSolver) Close() error {
 		}
 		s.rationalWork = nil
 	}
-	if err := s.ColumnBuffer.Close(); err != nil {
+	if err := s.ColumnBuffer.CloseForward(); err != nil {
 		return err
 	}
 	if s.certificateResult != nil {
