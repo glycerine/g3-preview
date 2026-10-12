@@ -5,7 +5,7 @@ package arith
 import (
 	"errors"
 	"io"
-	"slices"
+	"sort"
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -35,8 +35,8 @@ func (e *LinearEquation) Pos(x uint32) uint32 {
 	if e == nil || e.closed {
 		return noEquationPosition
 	}
-	i, found := slices.BinarySearch(e.xs, x)
-	if !found {
+	i := sort.Search(len(e.xs), func(i int) bool { return e.xs[i] >= x })
+	if i == len(e.xs) || e.xs[i] != x {
 		return noEquationPosition
 	}
 	return uint32(i)
@@ -213,7 +213,7 @@ func (l *LinearEquationManager) MkInt(as []numeral.Int, xs []uint32, normalized 
 			return nil, e
 		}
 	}
-	slices.Sort(xs[:size])
+	sort.Slice(xs[:size], func(i, j int) bool { return xs[i] < xs[j] })
 	for i := 0; i < size; i++ {
 		slot, e := l.valBuffer.BorrowSlot(xs[i])
 		if e != nil {

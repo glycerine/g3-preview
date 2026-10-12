@@ -5,7 +5,7 @@ package ufbv
 import (
 	"errors"
 	"math"
-	"slices"
+	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -145,7 +145,7 @@ func (c *rewriteCache) reallyFlush() error {
 	for id := range c.entries {
 		ids = append(ids, id)
 	}
-	slices.Sort(ids) // source optional-entry vector is visited by ascending ID
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] }) // source optional-entry vector is visited by ascending ID
 	for _, id := range ids {
 		entry := c.entries[id]
 		delete(c.entries, id)

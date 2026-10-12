@@ -1,7 +1,6 @@
 package euclid
 
 import (
-	"slices"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -73,7 +72,7 @@ func TestEuclideanNormalizeQueryJustificationAndConstantOnly(t *testing.T) {
 	euclidMust(t, s.normalizeQuery([]numeral.Int{coefficient}, []uint32{0},
 		&constant, &aPrime, &cPrime, &js))
 	checkEuclideanQueryResult(t, z, &aPrime, &cPrime, "0", "1")
-	if !slices.Equal(js, []uint32{j}) {
+	if !equalUint32Slices(js, []uint32{j}) {
 		t.Fatalf("justification IDs = %v, want [%d]", js, j)
 	}
 	// Empty input clears the previous justification result and copies c.

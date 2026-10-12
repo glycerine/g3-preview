@@ -1,7 +1,6 @@
 package euclid
 
 import (
-	"slices"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -84,9 +83,9 @@ func TestEuclideanEliminateUnitSubstitutesOccurrences(t *testing.T) {
 			}
 			euclidMust(t, s.eliminateUnit())
 			if s.solved[0] != 0 || s.equations[0] != nil || len(s.solution) != 1 ||
-				!slices.Equal(s.equations[1].xs, []uint32{1, 2}) ||
-				len(s.occurrences[0]) != 0 || !slices.Equal(s.occurrences[1], []uint32{1}) ||
-				!slices.Equal(s.occurrences[2], []uint32{1}) {
+				!equalUint32Slices(s.equations[1].xs, []uint32{1, 2}) ||
+				len(s.occurrences[0]) != 0 || !equalUint32Slices(s.occurrences[1], []uint32{1}) ||
+				!equalUint32Slices(s.occurrences[2], []uint32{1}) {
 				t.Fatalf("elimination ownership/occurrences: solved=%v xs=%v occ=%v", s.solved, s.equations[1].xs, s.occurrences)
 			}
 			wantA, wantC, wantB := "-4", "2", "-2"
@@ -100,7 +99,7 @@ func TestEuclideanEliminateUnitSubstitutesOccurrences(t *testing.T) {
 			euclidMust(t, e)
 			b, e := m.String(&eq.bs[0])
 			euclidMust(t, e)
-			if a != wantA || c != wantC || b != wantB || !slices.Equal(eq.js, []uint32{0, 1}) {
+			if a != wantA || c != wantC || b != wantB || !equalUint32Slices(eq.js, []uint32{0, 1}) {
 				t.Fatalf("substituted equation: a=%s c=%s b=%s js=%v", a, c, b, eq.js)
 			}
 			euclidMust(t, s.Close())

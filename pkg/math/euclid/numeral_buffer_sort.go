@@ -3,7 +3,7 @@
 package euclid
 
 import (
-	"slices"
+	"sort"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -19,7 +19,7 @@ func sortIntCore(as []numeral.Int, xs []uint32, buffer *numeral.ScopedIntVector)
 	if e != nil {
 		return e
 	}
-	slices.Sort(xs)
+	sort.Slice(xs, func(i, j int) bool { return xs[i] < xs[j] })
 	for i, x := range xs {
 		slot, e := buffer.BorrowSlot(x)
 		if e != nil {
@@ -56,7 +56,7 @@ func sortRationalCore(as []numeral.Rational, xs []uint32, buffer *numeral.Scoped
 	if e != nil {
 		return e
 	}
-	slices.Sort(xs)
+	sort.Slice(xs, func(i, j int) bool { return xs[i] < xs[j] })
 	for i, x := range xs {
 		slot, e := buffer.BorrowSlot(x)
 		if e != nil {

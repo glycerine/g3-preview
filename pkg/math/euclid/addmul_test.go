@@ -1,7 +1,6 @@
 package euclid
 
 import (
-	"slices"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -25,15 +24,15 @@ func TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue(t *testing.T) {
 	var out []uint32
 	s.occurrences[3] = []uint32{7}
 	euclidMust(t, s.addmulInt(as1, xs1, &k, as2, xs2, buffer, &out, true, false, 7, nullEquationIndex))
-	if !slices.Equal(out, []uint32{0, 1, 4, 5}) || !slices.Equal(s.occurrences[0], []uint32{7}) ||
-		!slices.Equal(s.occurrences[4], []uint32{7}) || len(s.occurrences[3]) != 0 {
+	if !equalUint32Slices(out, []uint32{0, 1, 4, 5}) || !equalUint32Slices(s.occurrences[0], []uint32{7}) ||
+		!equalUint32Slices(s.occurrences[4], []uint32{7}) || len(s.occurrences[3]) != 0 {
 		t.Fatalf("merged ids or occurrences: %v, %v", out, s.occurrences)
 	}
 	checkEuclideanIntBuffer(t, z, buffer, []string{"4", "3", "6", "7"})
 	// The excluded variable keeps its occurrence while its coefficient cancels.
 	s.occurrences[3] = []uint32{7}
 	euclidMust(t, s.addmulInt(as1, xs1, &k, as2, xs2, buffer, &out, true, false, 7, 3))
-	if !slices.Equal(s.occurrences[3], []uint32{7}) {
+	if !equalUint32Slices(s.occurrences[3], []uint32{7}) {
 		t.Fatal("excluded occurrence was removed")
 	}
 	// The queue variant inserts solved new terms and erases a canceled term.
@@ -92,7 +91,7 @@ func TestEuclideanRationalAddmulMergedJustifications(t *testing.T) {
 	var out []uint32
 	k := numeral.NewInt(1)
 	euclidMust(t, s.addmulRational(bs1, []uint32{1, 3}, &k, bs2, []uint32{0, 3, 4}, buffer, &out))
-	if !slices.Equal(out, []uint32{0, 1, 4}) {
+	if !equalUint32Slices(out, []uint32{0, 1, 4}) {
 		t.Fatalf("merged justification IDs = %v", out)
 	}
 	values, e := buffer.BorrowedValues()

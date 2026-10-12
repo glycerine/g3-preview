@@ -3,7 +3,6 @@ package euclid
 
 import (
 	"errors"
-	"slices"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -97,11 +96,7 @@ func (s *solverSetup) eraseOccurrence(x, eqIndex uint32) error {
 	if x >= uint32(len(s.occurrences)) {
 		return arena.ErrBounds
 	}
-	i := slices.Index(s.occurrences[x], eqIndex)
-	if i < 0 {
-		return nil // source svector::erase(value) ignores an absent value
-	}
-	s.occurrences[x] = slices.Delete(s.occurrences[x], i, i+1)
+	s.occurrences[x] = eraseOccurrenceValue(s.occurrences[x], eqIndex)
 	return nil
 }
 

@@ -1,7 +1,6 @@
 package euclid
 
 import (
-	"slices"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -44,7 +43,7 @@ func TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap(t *testing.T) {
 	euclidMust(t, s.promoteSolvedEquation(1, 1))
 	target := add([]int32{3}, []uint32{0}, 5, "1/5", 2)
 	euclidMust(t, s.applySolutionToEquation(target))
-	if !slices.Equal(target.xs, []uint32{2}) || !slices.Equal(target.js, []uint32{0, 1, 2}) || !s.queue.Empty() {
+	if !equalUint32Slices(target.xs, []uint32{2}) || !equalUint32Slices(target.js, []uint32{0, 1, 2}) || !s.queue.Empty() {
 		t.Fatalf("substituted IDs or queue: %v, %v, empty=%v", target.xs, target.js, s.queue.Empty())
 	}
 	for i, want := range []string{"3"} {
@@ -71,7 +70,7 @@ func TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap(t *testing.T) {
 	}
 	// Reapplying the same solution set must leave the normalized target alone.
 	euclidMust(t, s.applySolutionToEquation(target))
-	if !slices.Equal(target.xs, []uint32{2}) || !slices.Equal(target.js, []uint32{0, 1, 2}) {
+	if !equalUint32Slices(target.xs, []uint32{2}) || !equalUint32Slices(target.js, []uint32{0, 1, 2}) {
 		t.Fatal("repeat substitution changed target")
 	}
 	euclidMust(t, s.Close())

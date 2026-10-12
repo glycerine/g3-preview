@@ -1,7 +1,6 @@
 package euclid
 
 import (
-	"slices"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -30,9 +29,9 @@ func TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation(t *testing.T
 			}
 			euclidMust(t, s.decomposeAndEliminate())
 			if len(s.solved) != 3 || !s.parameter[2] || s.solved[0] != 0 ||
-				!slices.Equal(s.equations[0].xs, []uint32{1, 2}) ||
-				!slices.Equal(s.solution[0].xs, []uint32{0, 1, 2}) ||
-				len(s.occurrences[0]) != 0 || !slices.Equal(s.occurrences[1], []uint32{0}) ||
+				!equalUint32Slices(s.equations[0].xs, []uint32{1, 2}) ||
+				!equalUint32Slices(s.solution[0].xs, []uint32{0, 1, 2}) ||
+				len(s.occurrences[0]) != 0 || !equalUint32Slices(s.occurrences[1], []uint32{0}) ||
 				len(s.occurrences[2]) != 0 {
 				t.Fatalf("decomposition IDs/occurrences: solved=%v todo=%v solution=%v occ=%v",
 					s.solved, s.equations[0].xs, s.solution[0].xs, s.occurrences)
@@ -67,8 +66,8 @@ func TestEuclideanNonUnitDecompositionZeroRemainderDropsOccurrence(t *testing.T)
 		t.Fatalf("selected x%d, want x0", s.nextX)
 	}
 	euclidMust(t, s.decomposeAndEliminate())
-	if !slices.Equal(s.equations[0].xs, []uint32{2, 3}) ||
-		len(s.occurrences[1]) != 0 || !slices.Equal(s.occurrences[2], []uint32{0}) {
+	if !equalUint32Slices(s.equations[0].xs, []uint32{2, 3}) ||
+		len(s.occurrences[1]) != 0 || !equalUint32Slices(s.occurrences[2], []uint32{0}) {
 		t.Fatalf("zero remainder retained variable: xs=%v occ=%v", s.equations[0].xs, s.occurrences)
 	}
 	checkEuclideanEquation(t, z, s.equations[0], []string{"1", "2"}, "0")
@@ -93,9 +92,9 @@ func TestEuclideanNonUnitDecompositionSubstitutesOtherEquations(t *testing.T) {
 		t.Fatalf("selected pivot x%d eq%d", s.nextX, s.nextEq)
 	}
 	euclidMust(t, s.decomposeAndEliminate())
-	if !slices.Equal(s.equations[1].xs, []uint32{1, 2, 3}) ||
-		len(s.occurrences[0]) != 0 || !slices.Equal(s.occurrences[1], []uint32{0, 1}) ||
-		!slices.Equal(s.occurrences[2], []uint32{1}) || !slices.Equal(s.occurrences[3], []uint32{1}) {
+	if !equalUint32Slices(s.equations[1].xs, []uint32{1, 2, 3}) ||
+		len(s.occurrences[0]) != 0 || !equalUint32Slices(s.occurrences[1], []uint32{0, 1}) ||
+		!equalUint32Slices(s.occurrences[2], []uint32{1}) || !equalUint32Slices(s.occurrences[3], []uint32{1}) {
 		t.Fatalf("decomposition substitution IDs/occurrences: xs=%v occ=%v", s.equations[1].xs, s.occurrences)
 	}
 	checkEuclideanEquation(t, z, s.equations[1], []string{"-5", "7", "5"}, "-4")

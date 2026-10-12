@@ -1,7 +1,6 @@
 package euclid
 
 import (
-	"slices"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -23,7 +22,7 @@ func TestEuclideanAssertEquationNormalizeAndOccurrences(t *testing.T) {
 	euclidMust(t, s.assertEquation(as, []uint32{0, 1}, &c, j))
 	eq := s.equations[0]
 	if eq == nil || s.inconsistent != nullEquationIndex ||
-		!slices.Equal(s.occurrences[0], []uint32{0}) || !slices.Equal(s.occurrences[1], []uint32{0}) {
+		!equalUint32Slices(s.occurrences[0], []uint32{0}) || !equalUint32Slices(s.occurrences[1], []uint32{0}) {
 		t.Fatal("normalized equation publication or occurrence lists")
 	}
 	for i, want := range []string{"-2", "3"} {
@@ -45,7 +44,7 @@ func TestEuclideanAssertEquationNormalizeAndOccurrences(t *testing.T) {
 	bad := []numeral.Int{numeral.NewInt(4)}
 	badC := numeral.NewInt(6)
 	euclidMust(t, s.assertEquation(bad, []uint32{0}, &badC, nullEquationIndex))
-	if s.inconsistent != 1 || s.equations[1] == nil || !slices.Equal(s.occurrences[0], []uint32{0, 1}) {
+	if s.inconsistent != 1 || s.equations[1] == nil || !equalUint32Slices(s.occurrences[0], []uint32{0, 1}) {
 		t.Fatal("gcd divisibility contradiction or source occurrence publication")
 	}
 	before := len(s.equations)
@@ -74,7 +73,7 @@ func TestEuclideanNormalizeUnitGCDPreservesEquation(t *testing.T) {
 	as := []numeral.Int{numeral.NewInt(-2), numeral.NewInt(3)}
 	c := numeral.NewInt(5)
 	euclidMust(t, s.assertEquation(as, []uint32{0, 1}, &c, nullEquationIndex))
-	if s.inconsistent != nullEquationIndex || !slices.Equal(s.equations[0].xs, []uint32{0, 1}) {
+	if s.inconsistent != nullEquationIndex || !equalUint32Slices(s.equations[0].xs, []uint32{0, 1}) {
 		t.Fatal("unit gcd changed equation")
 	}
 	for i, want := range []string{"-2", "3"} {
@@ -132,8 +131,8 @@ func TestEuclideanAssertEquationSubstitutesThenNormalizes(t *testing.T) {
 	c := numeral.NewInt(2)
 	euclidMust(t, s.assertEquation(as, []uint32{0}, &c, 1))
 	eq := s.equations[1]
-	if eq == nil || s.inconsistent != nullEquationIndex || !slices.Equal(eq.xs, []uint32{1}) ||
-		!slices.Equal(eq.js, []uint32{0, 1}) || !slices.Equal(s.occurrences[1], []uint32{1}) {
+	if eq == nil || s.inconsistent != nullEquationIndex || !equalUint32Slices(eq.xs, []uint32{1}) ||
+		!equalUint32Slices(eq.js, []uint32{0, 1}) || !equalUint32Slices(s.occurrences[1], []uint32{1}) {
 		t.Fatal("assertion did not substitute, normalize and publish occurrences")
 	}
 	gotA, e := z.String(&eq.as[0])

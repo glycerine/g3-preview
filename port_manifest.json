@@ -8993,7 +8993,8 @@
         "pkg/ast/ast_arith_numeral_read_test.go",
         "pkg/ast/ast_arith_numeral_invocation.go",
         "pkg/ast/ast_arith_numeral_invocation_test.go",
-        "pkg/ast/ast_arith_numeral_text.go"
+        "pkg/ast/ast_arith_numeral_text.go",
+        "pkg/tactic/arith/polynomial_builder.go"
       ],
       "tests": [
         "TestASTArithmeticSourceRegistrationAndDeclarations",
@@ -9192,6 +9193,9 @@
           "name": "Retained arithmetic tactic numeral recognition: read exact rational parameter text and integer flag from OP_NUM (src/ast/arith_decl_plugin.cpp:632-639)",
           "status": "ported",
           "go_target": "pkg/ast/ast_arith_numeral_text.go",
+          "go_targets": [
+            "pkg/tactic/arith/polynomial_builder.go"
+          ],
           "tests": [
             "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer"
           ]
@@ -9231,7 +9235,8 @@
         "pkg/ast/rewriter/bv_rewriter_bv2int_test.go",
         "pkg/ast/ast_bv_bv2int_numerals.go",
         "pkg/ast/ast_bv_bv2int_numerals_test.go",
-        "pkg/ast/ast_arith_numeral_text.go"
+        "pkg/ast/ast_arith_numeral_text.go",
+        "pkg/tactic/arith/polynomial_builder.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
@@ -35008,6 +35013,9 @@
           "name": "Concrete mpfx nth-root Newton approximation, directed bound certification and xn_eq_y monomial inverse image (src/math/interval/interval_def.h:189-380,1390-1478)",
           "status": "partial",
           "go_target": "pkg/math/interval/fixed_root.go",
+          "go_targets": [
+            "pkg/math/subpaving/fixed_interval_root.go"
+          ],
           "tests": [
             "TestFixedRootRetainedNewtonAndCertifiedBounds",
             "TestSubpavingFixedIntervalXnEqYRetainedCases"
@@ -114593,6 +114601,9 @@
           "name": "dec_ref_key_values for AST expr_map, API AST map and recover_01_tactic bool-to-int map",
           "status": "partial",
           "go_target": "pkg/ast/ast_expr_map.go",
+          "go_targets": [
+            "pkg/api/api_ast_map_object.go"
+          ],
           "tests": [
             "TestASTExprMapConcreteReferenceCleanup",
             "TestAPIASTMapConcreteReferenceCleanup"
@@ -156577,6 +156588,10 @@
           "name": "concrete mpz buffers in euclidean_solver, linear_equation, bound_propagator and theory_arith_int: indexed mutable numeral, deep-copy push, source logical-size reserve, ascending reset, borrowed c_ptr and raw-vector swap",
           "status": "partial",
           "go_target": "pkg/util/numeral/scoped_numeral.go",
+          "go_targets": [
+            "pkg/math/euclid/numeral_buffer_sort.go",
+            "pkg/math/euclid/solver_setup.go"
+          ],
           "tests": [
             "TestEuclideanIntegerBufferSortAndRawSwap",
             "TestIntegerNumeralBufferSourceReserveIndexesAndOwnsSlots",
@@ -156587,6 +156602,10 @@
           "name": "concrete mpq buffers in euclidean_solver and propagate_ineqs_tactic: indexed mutable numeral, deep-copy push, ascending reset, borrowed c_ptr and raw-vector swap where reached",
           "status": "partial",
           "go_target": "pkg/util/numeral/scoped_numeral.go",
+          "go_targets": [
+            "pkg/math/euclid/numeral_buffer_sort.go",
+            "pkg/math/euclid/solver_setup.go"
+          ],
           "tests": [
             "TestEuclideanRationalBufferSortAndRawSwap",
             "TestEuclideanSetupVariableJustificationAndEquationOwnership"
@@ -166929,7 +166948,9 @@
         "pkg/ast/ast_bv_arithmetic_shift_numerals.go",
         "pkg/util/numeral/mpz_power_shift.go",
         "pkg/util/bitset/uint_set.go",
-        "pkg/ast/ast_builtin_plugins_values.go"
+        "pkg/ast/ast_builtin_plugins_values.go",
+        "pkg/ast/rewriter/bv_rewriter_shift.go",
+        "pkg/test/uint_set_test.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -167258,6 +167279,9 @@
           "name": "get_num_1bits uint32 popcount in retained uint_set::num_elems (util.h:112-128; uint_set.h:83-90)",
           "status": "ported",
           "go_target": "pkg/util/bitset/uint_set.go",
+          "go_targets": [
+            "pkg/test/uint_set_test.go"
+          ],
           "tests": [
             "TestUintSetSourceTst1",
             "TestUintSetIndependentBoundedOracle"
@@ -167276,6 +167300,9 @@
           "name": "shift_right and shift_left uint64 saturating shifts for retained BV extract/logical/arithmetic rewrites (util.h:131-139; bv_rewriter.cpp:684,814,863,909-921)",
           "status": "ported",
           "go_target": "pkg/ast/ast_bv_extract_numerals.go",
+          "go_targets": [
+            "pkg/ast/rewriter/bv_rewriter_shift.go"
+          ],
           "tests": [
             "TestBVRewriterSourceSaturatingUint64ShiftBoundaries"
           ]

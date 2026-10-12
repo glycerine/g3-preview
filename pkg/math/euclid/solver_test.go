@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"slices"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -50,7 +49,7 @@ func TestEuclideanPublicSolverBorrowedManagerSolveNormalizeReset(t *testing.T) {
 	var js []uint32
 	euclidMust(t, s.Normalize([]numeral.Int{two}, []uint32{x}, &three, &aPrime, &cPrime, &js))
 	checkEuclideanQueryResult(t, z, &aPrime, &cPrime, "0", "1")
-	if !slices.Equal(js, []uint32{j}) {
+	if !equalUint32Slices(js, []uint32{j}) {
 		t.Fatalf("query justifications = %v", js)
 	}
 	out.Reset()
@@ -129,13 +128,13 @@ func TestEuclideanPublicSolverContradictionExplanationAndDisplay(t *testing.T) {
 	}
 	js, e := s.GetJustification()
 	euclidMust(t, e)
-	if !slices.Equal(js, []uint32{j0, j1}) {
+	if !equalUint32Slices(js, []uint32{j0, j1}) {
 		t.Fatalf("explanation IDs = %v", js)
 	}
 	js[0] = 99
 	js, e = s.GetJustification()
 	euclidMust(t, e)
-	if !slices.Equal(js, []uint32{j0, j1}) {
+	if !equalUint32Slices(js, []uint32{j0, j1}) {
 		t.Fatal("caller changed solver explanation")
 	}
 	var out bytes.Buffer

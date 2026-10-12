@@ -3,7 +3,6 @@ package euclid
 
 import (
 	"errors"
-	"slices"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -162,10 +161,7 @@ func (s *solverSetup) noteCanceledTerm(x uint32, updateOcc, updateQueue bool, eq
 		return arena.ErrBounds
 	}
 	if updateOcc && x != exceptVar {
-		i := slices.Index(s.occurrences[x], eqIndex)
-		if i >= 0 {
-			s.occurrences[x] = slices.Delete(s.occurrences[x], i, i+1)
-		}
+		s.occurrences[x] = eraseOccurrenceValue(s.occurrences[x], eqIndex)
 	}
 	if updateQueue && s.solved[x] != nullEquationIndex && s.queue.Contains(int32(x)) {
 		return s.queue.Erase(int32(x))
