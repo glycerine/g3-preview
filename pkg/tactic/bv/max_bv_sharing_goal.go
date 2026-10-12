@@ -3,18 +3,25 @@ package bv
 
 import (
 	"errors"
+	"math"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
+
+var ErrSharingMaxSteps = errors.New("max. steps exceeded")
+var ErrSharingMaxMemory = errors.New("max. memory exceeded")
 
 // SharingGoalPass applies the concrete BV sharing reducer to goal formulas.
 // Parameter/resource limits and lifecycle remain in the enclosing tactic's
 // unfinished scope.
 type SharingGoalPass struct {
-	manager *ast.ASTManager
-	family  ast.FamilyID
-	maxArgs uint32
+	manager   *ast.ASTManager
+	family    ast.FamilyID
+	maxArgs   uint32
+	maxSteps  uint32
+	maxMemory uint64
 }
 
 func NewSharingGoalPass(m *ast.ASTManager, maxArgs uint32) (*SharingGoalPass, error) {
@@ -25,7 +32,61 @@ func NewSharingGoalPass(m *ast.ASTManager, maxArgs uint32) (*SharingGoalPass, er
 	if e != nil {
 		return nil, e
 	}
-	return &SharingGoalPass{manager: m, family: fid, maxArgs: maxArgs}, nil
+	return &SharingGoalPass{manager: m, family: fid, maxArgs: maxArgs, maxSteps: math.MaxUint32, maxMemory: math.MaxUint64}, nil
+}
+
+// UpdateParams reads the three unsigned settings used by rw_cfg::updt_params.
+// The Go budget accounts for the manager's cohort when enforcing max_memory.
+func (p *SharingGoalPass) UpdateParams(c *uparams.ParamsContext, value *uparams.ParamsRef) error {
+	if p == nil || p.manager == nil || c == nil || c.SymbolsField != p.manager.Symbols {
+		return ast.ErrASTHandle
+	}
+	memName, stepsName, argsName := "max_memory", "max_steps", "max_args"
+	mem, e := c.GetUIntName(value, &memName, math.MaxUint32)
+	if e != nil {
+		return e
+	}
+	steps, e := c.GetUIntName(value, &stepsName, math.MaxUint32)
+	if e != nil {
+		return e
+	}
+	args, e := c.GetUIntName(value, &argsName, 128)
+	if e != nil {
+		return e
+	}
+	limit := uint64(mem) << 20
+	if mem == math.MaxUint32 {
+		limit = math.MaxUint64
+	}
+	p.maxMemory, p.maxSteps, p.maxArgs = limit, steps, args
+	return nil
+}
+
+func NewSharingGoalPassWithParams(m *ast.ASTManager, c *uparams.ParamsContext, value *uparams.ParamsRef) (*SharingGoalPass, error) {
+	p, e := NewSharingGoalPass(m, 128)
+	if e != nil {
+		return nil, e
+	}
+	if e = p.UpdateParams(c, value); e != nil {
+		return nil, e
+	}
+	return p, nil
+}
+
+type sharingWalk struct {
+	pass  *SharingGoalPass
+	steps uint32
+}
+
+func (w *sharingWalk) advance() error {
+	w.steps++
+	if w.pass.manager.Budget().Used() > w.pass.maxMemory {
+		return ErrSharingMaxMemory
+	}
+	if w.steps > w.pass.maxSteps {
+		return ErrSharingMaxSteps
+	}
+	return nil
 }
 
 // Apply follows the source's sequential goal updates: pairs found in an
@@ -53,6 +114,7 @@ func (p *SharingGoalPass) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error
 		return nil, e
 	}
 	for i := uint32(0); i < n; i++ {
+		walk := sharingWalk{pass: p}
 		current, e := goal.Size()
 		if e != nil {
 			return nil, e
@@ -71,7 +133,7 @@ func (p *SharingGoalPass) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error
 		var rewritten, rewrittenProof ast.ASTHandle
 		if proofs {
 			var step sharingProofResult
-			step, e = p.rewriteWithProof(form, r, proofMemo)
+			step, e = p.rewriteWithProof(form, r, proofMemo, &walk)
 			if e != nil {
 				return nil, e
 			}
@@ -90,7 +152,7 @@ func (p *SharingGoalPass) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error
 				}
 			}
 		} else {
-			rewritten, e = p.rewriteApplication(form, r, memo)
+			rewritten, e = p.rewriteApplication(form, r, memo, &walk)
 			if e != nil {
 				return nil, e
 			}
@@ -105,7 +167,10 @@ func (p *SharingGoalPass) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error
 	return goal, nil
 }
 
-func (p *SharingGoalPass) rewriteApplication(h ast.ASTHandle, r *SharingReducer, memo map[ast.ASTHandle]ast.ASTHandle) (ast.ASTHandle, error) {
+func (p *SharingGoalPass) rewriteApplication(h ast.ASTHandle, r *SharingReducer, memo map[ast.ASTHandle]ast.ASTHandle, walk *sharingWalk) (ast.ASTHandle, error) {
+	if e := walk.advance(); e != nil {
+		return ast.ASTHandle{}, e
+	}
 	original := h
 	if mapped, ok := memo[h]; ok {
 		return mapped, nil
@@ -116,7 +181,7 @@ func (p *SharingGoalPass) rewriteApplication(h ast.ASTHandle, r *SharingReducer,
 	}
 	if kind != ast.ASTApp {
 		if kind == ast.ASTQuantifier {
-			return p.rewriteQuantifier(h, r, memo)
+			return p.rewriteQuantifier(h, r, memo, walk)
 		}
 		memo[h] = h
 		return h, nil
@@ -136,8 +201,11 @@ func (p *SharingGoalPass) rewriteApplication(h ast.ASTHandle, r *SharingReducer,
 		if e != nil {
 			return ast.ASTHandle{}, e
 		}
-		args[i], e = p.rewriteApplication(arg, r, memo)
+		args[i], e = p.rewriteApplication(arg, r, memo, walk)
 		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if e := walk.advance(); e != nil {
 			return ast.ASTHandle{}, e
 		}
 		changed = changed || args[i] != arg
@@ -161,13 +229,16 @@ func (p *SharingGoalPass) rewriteApplication(h ast.ASTHandle, r *SharingReducer,
 	return h, nil
 }
 
-func (p *SharingGoalPass) rewriteQuantifier(q ast.ASTHandle, r *SharingReducer, memo map[ast.ASTHandle]ast.ASTHandle) (ast.ASTHandle, error) {
+func (p *SharingGoalPass) rewriteQuantifier(q ast.ASTHandle, r *SharingReducer, memo map[ast.ASTHandle]ast.ASTHandle, walk *sharingWalk) (ast.ASTHandle, error) {
 	body, e := p.manager.GetQuantifierBody(q)
 	if e != nil {
 		return ast.ASTHandle{}, e
 	}
-	newBody, e := p.rewriteApplication(body, r, memo)
+	newBody, e := p.rewriteApplication(body, r, memo, walk)
 	if e != nil {
+		return ast.ASTHandle{}, e
+	}
+	if e := walk.advance(); e != nil {
 		return ast.ASTHandle{}, e
 	}
 	changed := newBody != body
@@ -181,8 +252,11 @@ func (p *SharingGoalPass) rewriteQuantifier(q ast.ASTHandle, r *SharingReducer, 
 		if e != nil {
 			return ast.ASTHandle{}, e
 		}
-		patterns[i], e = p.rewriteApplication(old, r, memo)
+		patterns[i], e = p.rewriteApplication(old, r, memo, walk)
 		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if e := walk.advance(); e != nil {
 			return ast.ASTHandle{}, e
 		}
 		changed = changed || patterns[i] != old
@@ -197,8 +271,11 @@ func (p *SharingGoalPass) rewriteQuantifier(q ast.ASTHandle, r *SharingReducer, 
 		if e != nil {
 			return ast.ASTHandle{}, e
 		}
-		noPatterns[i], e = p.rewriteApplication(old, r, memo)
+		noPatterns[i], e = p.rewriteApplication(old, r, memo, walk)
 		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if e := walk.advance(); e != nil {
 			return ast.ASTHandle{}, e
 		}
 		changed = changed || noPatterns[i] != old

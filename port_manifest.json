@@ -95715,7 +95715,8 @@
         "TestSharingGoalPassReusesEarlierFormulaAndUpdatesDepth",
         "TestSharingGoalPassVisitsQuantifiedBody",
         "TestSharingGoalPassProofChainsCongruenceAndRewrite",
-        "TestSharingGoalPassProofQuantifierIntroduction"
+        "TestSharingGoalPassProofQuantifierIntroduction",
+        "TestSharingGoalPassSourceParamsAndResourceLimits"
       ],
       "conditionals": [
         {
@@ -95777,13 +95778,22 @@
             "TestSharingGoalPassProofChainsCongruenceAndRewrite",
             "TestSharingGoalPassProofQuantifierIntroduction"
           ]
+        },
+        {
+          "name": "rw_cfg updt_params and max_steps_exceeded settings for max_args, max_steps, and max_memory",
+          "status": "partial",
+          "go_target": "pkg/tactic/bv/max_bv_sharing_goal.go",
+          "tests": [
+            "TestSharingGoalPassSourceParamsAndResourceLimits"
+          ]
         }
       ],
       "ownership": [
-        "The concrete reducer retains cached pair operands and generated apps as AST roots through Close. The goal pass retains rebuilt applications, quantifiers, and proof nodes until goal updates acquire their own roots. Parameters, resource checks, and full tactic lifecycle remain unported."
+        "The concrete reducer retains cached pair operands and generated apps as AST roots through Close. The goal pass retains rebuilt applications, quantifiers, and proof nodes until goal updates acquire their own roots. Parameter values are copied from the borrowed ParamsContext; full tactic lifecycle remains unported."
       ],
       "deviations": [
-        "The four obj_pair_hashtable<expr,expr> instantiations use typed Go maps keyed by ordered AST-handle pairs; C++ hash buckets are not retained."
+        "The four obj_pair_hashtable<expr,expr> instantiations use typed Go maps keyed by ordered AST-handle pairs; C++ hash buckets are not retained.",
+        "The Go max_memory guard measures the AST manager's shared arena budget rather than the C++ process-global memory allocation size. Rewriter frame steps are counted along the concrete recursive traversal; conditional-fold and cache-shortcut step equivalence remains unaudited."
       ]
     },
     {

@@ -8,7 +8,10 @@ type sharingProofResult struct {
 	expr, proof ast.ASTHandle
 }
 
-func (p *SharingGoalPass) rewriteWithProof(h ast.ASTHandle, r *SharingReducer, memo map[ast.ASTHandle]sharingProofResult) (sharingProofResult, error) {
+func (p *SharingGoalPass) rewriteWithProof(h ast.ASTHandle, r *SharingReducer, memo map[ast.ASTHandle]sharingProofResult, walk *sharingWalk) (sharingProofResult, error) {
+	if e := walk.advance(); e != nil {
+		return sharingProofResult{}, e
+	}
 	if found, ok := memo[h]; ok {
 		return found, nil
 	}
@@ -17,7 +20,7 @@ func (p *SharingGoalPass) rewriteWithProof(h ast.ASTHandle, r *SharingReducer, m
 		return sharingProofResult{}, e
 	}
 	if kind == ast.ASTQuantifier {
-		return p.rewriteQuantifierWithProof(h, r, memo)
+		return p.rewriteQuantifierWithProof(h, r, memo, walk)
 	}
 	if kind != ast.ASTApp {
 		v := sharingProofResult{expr: h}
@@ -39,8 +42,11 @@ func (p *SharingGoalPass) rewriteWithProof(h ast.ASTHandle, r *SharingReducer, m
 		if e != nil {
 			return sharingProofResult{}, e
 		}
-		child, e := p.rewriteWithProof(old, r, memo)
+		child, e := p.rewriteWithProof(old, r, memo, walk)
 		if e != nil {
+			return sharingProofResult{}, e
+		}
+		if e := walk.advance(); e != nil {
 			return sharingProofResult{}, e
 		}
 		args[i] = child.expr
@@ -94,13 +100,16 @@ func (p *SharingGoalPass) rewriteWithProof(h ast.ASTHandle, r *SharingReducer, m
 	return v, nil
 }
 
-func (p *SharingGoalPass) rewriteQuantifierWithProof(q ast.ASTHandle, r *SharingReducer, memo map[ast.ASTHandle]sharingProofResult) (sharingProofResult, error) {
+func (p *SharingGoalPass) rewriteQuantifierWithProof(q ast.ASTHandle, r *SharingReducer, memo map[ast.ASTHandle]sharingProofResult, walk *sharingWalk) (sharingProofResult, error) {
 	body, e := p.manager.GetQuantifierBody(q)
 	if e != nil {
 		return sharingProofResult{}, e
 	}
-	newBody, e := p.rewriteWithProof(body, r, memo)
+	newBody, e := p.rewriteWithProof(body, r, memo, walk)
 	if e != nil {
+		return sharingProofResult{}, e
+	}
+	if e := walk.advance(); e != nil {
 		return sharingProofResult{}, e
 	}
 	changed := newBody.expr != body
@@ -114,8 +123,11 @@ func (p *SharingGoalPass) rewriteQuantifierWithProof(q ast.ASTHandle, r *Sharing
 		if e != nil {
 			return sharingProofResult{}, e
 		}
-		rewritten, e := p.rewriteWithProof(old, r, memo)
+		rewritten, e := p.rewriteWithProof(old, r, memo, walk)
 		if e != nil {
+			return sharingProofResult{}, e
+		}
+		if e := walk.advance(); e != nil {
 			return sharingProofResult{}, e
 		}
 		patterns[i] = rewritten.expr
@@ -131,8 +143,11 @@ func (p *SharingGoalPass) rewriteQuantifierWithProof(q ast.ASTHandle, r *Sharing
 		if e != nil {
 			return sharingProofResult{}, e
 		}
-		rewritten, e := p.rewriteWithProof(old, r, memo)
+		rewritten, e := p.rewriteWithProof(old, r, memo, walk)
 		if e != nil {
+			return sharingProofResult{}, e
+		}
+		if e := walk.advance(); e != nil {
 			return sharingProofResult{}, e
 		}
 		noPatterns[i] = rewritten.expr

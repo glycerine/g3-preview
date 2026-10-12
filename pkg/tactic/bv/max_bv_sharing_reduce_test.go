@@ -1,12 +1,14 @@
 package bv
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -14,6 +16,98 @@ func sharingMust(t *testing.T, e error) {
 	t.Helper()
 	if e != nil {
 		t.Fatal(e)
+	}
+}
+
+func sharingParamsFixture(t *testing.T, m *ast.ASTManager) (*uparams.ParamsContext, *uparams.ParamsRef) {
+	t.Helper()
+	b := m.Budget()
+	numbers, e := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	sharingMust(t, e)
+	ctx, e := uparams.NewParamsContext(m.Symbols, numbers, uparams.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
+	sharingMust(t, e)
+	v, e := ctx.NewValue()
+	sharingMust(t, e)
+	t.Cleanup(func() { sharingMust(t, ctx.Del(&v)); sharingMust(t, ctx.Close()); sharingMust(t, numbers.Close()) })
+	return ctx, &v
+}
+
+func TestSharingGoalPassSourceParamsAndResourceLimits(t *testing.T) {
+	m, fid := sharingFixture(t)
+	ctx, params := sharingParamsFixture(t, m)
+	sort, e := m.BitVectorSort(8)
+	sharingMust(t, e)
+	vars := make([]ast.ASTHandle, 4)
+	for i := range vars {
+		vars[i], e = m.MkConst(symbol.Numerical(uint32(1000+i)), sort)
+		sharingMust(t, e)
+		sharingMust(t, m.IncRef(vars[i]))
+	}
+	t.Cleanup(func() {
+		for i := len(vars) - 1; i >= 0; i-- {
+			sharingMust(t, m.DecRef(vars[i]))
+		}
+	})
+	binary, e := m.MkFamilyApp(fid, 4, nil, vars[:2])
+	sharingMust(t, e)
+	nary, e := m.MkFamilyApp(fid, 4, nil, []ast.ASTHandle{vars[1], vars[2], vars[0], vars[3]})
+	sharingMust(t, e)
+	f0, e := m.MkEq(binary, vars[2])
+	sharingMust(t, e)
+	f1, e := m.MkEq(nary, vars[3])
+	sharingMust(t, e)
+	goal, e := tactic.NewGoal(m, false, true, false)
+	sharingMust(t, e)
+	t.Cleanup(func() { sharingMust(t, goal.Close()) })
+	sharingMust(t, goal.Assert(f0))
+	sharingMust(t, goal.Assert(f1))
+	key := "max_args"
+	sharingMust(t, ctx.SetUIntName(params, &key, 2))
+	pass, e := NewSharingGoalPassWithParams(m, ctx, params)
+	sharingMust(t, e)
+	_, e = pass.Apply(goal)
+	sharingMust(t, e)
+	form, e := goal.Form(1)
+	sharingMust(t, e)
+	term, e := m.GetArg(form, 0)
+	sharingMust(t, e)
+	left, e := m.GetArg(term, 0)
+	sharingMust(t, e)
+	left, e = m.GetArg(left, 0)
+	sharingMust(t, e)
+	if left == binary {
+		t.Fatal("max_args=2 did not disable greedy pair reuse")
+	}
+	boolSort, e := m.MkBoolSort()
+	sharingMust(t, e)
+	p, e := m.MkConst(symbol.Numerical(1010), boolSort)
+	sharingMust(t, e)
+	limited, e := tactic.NewGoal(m, false, true, false)
+	sharingMust(t, e)
+	t.Cleanup(func() { sharingMust(t, limited.Close()) })
+	sharingMust(t, limited.Assert(p))
+	stepsKey := "max_steps"
+	sharingMust(t, ctx.SetUIntName(params, &stepsKey, 0))
+	sharingMust(t, pass.UpdateParams(ctx, params))
+	if _, e = pass.Apply(limited); !errors.Is(e, ErrSharingMaxSteps) {
+		t.Fatal("source zero-step guard", e)
+	}
+	n, e := limited.Size()
+	sharingMust(t, e)
+	if n != 1 {
+		t.Fatal("step refusal changed goal", n)
+	}
+	sharingMust(t, ctx.SetUIntName(params, &stepsKey, ^uint32(0)))
+	memoryKey := "max_memory"
+	sharingMust(t, ctx.SetUIntName(params, &memoryKey, 0))
+	sharingMust(t, pass.UpdateParams(ctx, params))
+	if _, e = pass.Apply(limited); !errors.Is(e, ErrSharingMaxMemory) {
+		t.Fatal("source zero-memory guard", e)
+	}
+	n, e = limited.Size()
+	sharingMust(t, e)
+	if n != 1 {
+		t.Fatal("memory refusal changed goal", n)
 	}
 }
 
