@@ -39649,3 +39649,13 @@ key hash/equality on a null backing; live backings still reject foreign keys.
 Focused coverage exercises getter, contains, reset-key and live-key branches.
 The prior fallback test is linked to the getter method rows, and this test to
 the getter and reset/contains rows in both source units.
+
+### Unused parameter defaults on matching reads
+
+`src/util/params.cpp:827-934` scans for a matching symbol or rational value
+before returning the caller's default. Go previously validated the default
+symbol or rational owner before that scan, so an unused foreign default could
+fail an otherwise matching read. The checks now run only after a miss. Focused
+coverage includes a stored symbol, unsigned-to-rational conversion, a stored
+numeral, and missing-key errors for both default types. The source units stay
+partial for their remaining lifetime and process-global obligations.

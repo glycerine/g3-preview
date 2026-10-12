@@ -935,12 +935,15 @@ func (c *ParamsContext) GetDoubleFallbackName(v *ParamsRef, k *string, f *Params
 func (c *ParamsContext) getSymbol(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, f *ParamsRef, d usymbol.Symbol) (usymbol.Symbol, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if e := c.keyCheck(d); e != nil {
+	x, ok, e := c.get(v, k, name, byName, ParamSymbol, f)
+	if e != nil {
 		return usymbol.Symbol{}, e
 	}
-	x, ok, e := c.get(v, k, name, byName, ParamSymbol, f)
-	if e != nil || !ok {
-		return d, e
+	if !ok {
+		if e := c.keyCheck(d); e != nil {
+			return usymbol.Symbol{}, e
+		}
+		return d, nil
 	}
 	return x.symbol, nil
 }
@@ -989,12 +992,15 @@ func (c *ParamsContext) GetStringFallbackName(v *ParamsRef, k *string, f *Params
 func (c *ParamsContext) getRat(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, d *unumeral.OwnedRational) (unumeral.OwnedRational, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if _, e := c.NumeralsField.IsRational(d); e != nil {
-		return unumeral.OwnedRational{}, e
-	}
 	x, ok, e := c.get(v, k, name, byName, ParamNumeral, nil)
 	if e != nil {
 		return unumeral.OwnedRational{}, e
+	}
+	if !ok {
+		// params::get_rat copies the default only after its entry scan misses.
+		if _, e := c.NumeralsField.IsRational(d); e != nil {
+			return unumeral.OwnedRational{}, e
+		}
 	}
 	r, e := c.NumeralsField.NewValue()
 	if e != nil {

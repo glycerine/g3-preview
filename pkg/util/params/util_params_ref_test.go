@@ -441,6 +441,56 @@ func TestParamsReferenceNullBackingSkipsKeyRead(t *testing.T) {
 	paramsMust(t, c.Del(&v))
 }
 
+func TestParamsReferenceMatchedValuesSkipUnusedDefaults(t *testing.T) {
+	c, sy, q := paramsTestOwner(t)
+	_, foreignSymbols, foreignNumerals := paramsTestOwner(t)
+	key := internSymbol(t, sy, "key")
+	wantSymbol := internSymbol(t, sy, "value")
+	foreignDefault := internSymbol(t, foreignSymbols, "unused")
+	v, e := c.NewValue()
+	paramsMust(t, e)
+	paramsMust(t, c.SetSymbol(&v, key, wantSymbol))
+	gotSymbol, e := c.GetSymbol(&v, key, foreignDefault)
+	if e != nil || gotSymbol != wantSymbol {
+		t.Fatal("matching symbol read consulted default", gotSymbol, e)
+	}
+	paramsMust(t, c.ResetKey(&v, key))
+	if _, e = c.GetSymbol(&v, key, foreignDefault); !errors.Is(e, usymbol.ErrOwner) {
+		t.Fatal("missing symbol did not validate used default", e)
+	}
+
+	foreignRat, e := foreignNumerals.NewValue()
+	paramsMust(t, e)
+	paramsMust(t, c.SetUInt(&v, key, 7))
+	gotRat, e := c.GetRat(&v, key, &foreignRat)
+	paramsMust(t, e)
+	text, e := q.String(&gotRat)
+	paramsMust(t, e)
+	if text != "7" {
+		t.Fatal("matching unsigned rational conversion", text)
+	}
+	paramsMust(t, q.Del(&gotRat))
+	localRat, e := q.NewValue()
+	paramsMust(t, e)
+	paramsMust(t, q.AssignInt(&localRat, 9))
+	paramsMust(t, c.SetRat(&v, key, &localRat))
+	gotRat, e = c.GetRat(&v, key, &foreignRat)
+	paramsMust(t, e)
+	text, e = q.String(&gotRat)
+	paramsMust(t, e)
+	if text != "9" {
+		t.Fatal("matching numeral read consulted default", text)
+	}
+	paramsMust(t, q.Del(&gotRat))
+	paramsMust(t, c.ResetKey(&v, key))
+	if _, e = c.GetRat(&v, key, &foreignRat); !errors.Is(e, unumeral.ErrRationalServiceOwner) {
+		t.Fatal("missing numeral did not validate used default", e)
+	}
+	paramsMust(t, q.Del(&localRat))
+	paramsMust(t, foreignNumerals.Del(&foreignRat))
+	paramsMust(t, c.Del(&v))
+}
+
 func TestParamsReferenceValidationUnknownExactOrdering(t *testing.T) {
 	c, sy, _ := paramsTestOwner(t)
 	a, e := c.NewValue()
