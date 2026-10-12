@@ -111,6 +111,86 @@ func TestSharingGoalPassSourceParamsAndResourceLimits(t *testing.T) {
 	}
 }
 
+func TestSharingGoalPassConstantITEPrunesUnselectedPairCache(t *testing.T) {
+	m, fid := sharingFixture(t)
+	sort, e := m.BitVectorSort(8)
+	sharingMust(t, e)
+	vars := make([]ast.ASTHandle, 4)
+	for i := range vars {
+		vars[i], e = m.MkConst(symbol.Numerical(uint32(1020+i)), sort)
+		sharingMust(t, e)
+		sharingMust(t, m.IncRef(vars[i]))
+	}
+	t.Cleanup(func() {
+		for i := len(vars) - 1; i >= 0; i-- {
+			sharingMust(t, m.DecRef(vars[i]))
+		}
+	})
+	binary, e := m.MkFamilyApp(fid, 4, nil, vars[:2])
+	sharingMust(t, e)
+	nary, e := m.MkFamilyApp(fid, 4, nil, []ast.ASTHandle{vars[1], vars[2], vars[0], vars[3]})
+	sharingMust(t, e)
+	unused, e := m.MkEq(binary, vars[2])
+	sharingMust(t, e)
+	formula, e := m.MkEq(nary, vars[3])
+	sharingMust(t, e)
+	boolSort, e := m.MkBoolSort()
+	sharingMust(t, e)
+	selected, e := m.MkConst(symbol.Numerical(1025), boolSort)
+	sharingMust(t, e)
+	for _, h := range []ast.ASTHandle{unused, formula, selected} {
+		sharingMust(t, m.IncRef(h))
+		h := h
+		t.Cleanup(func() { sharingMust(t, m.DecRef(h)) })
+	}
+	truth, e := m.MkTrue()
+	sharingMust(t, e)
+	falsity, e := m.MkFalse()
+	sharingMust(t, e)
+	for _, test := range []struct {
+		name     string
+		cond     ast.ASTHandle
+		whenTrue bool
+	}{
+		{"true", truth, true}, {"false", falsity, false},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			var first ast.ASTHandle
+			if test.whenTrue {
+				first, e = m.MkIte(test.cond, selected, unused)
+			} else {
+				first, e = m.MkIte(test.cond, unused, selected)
+			}
+			sharingMust(t, e)
+			goal, e := tactic.NewGoal(m, false, true, false)
+			sharingMust(t, e)
+			defer func() { sharingMust(t, goal.Close()) }()
+			sharingMust(t, goal.Assert(first))
+			sharingMust(t, goal.Assert(formula))
+			pass, e := NewSharingGoalPass(m, 128)
+			sharingMust(t, e)
+			_, e = pass.Apply(goal)
+			sharingMust(t, e)
+			firstOut, e := goal.Form(0)
+			sharingMust(t, e)
+			if firstOut != selected {
+				t.Fatal("constant ITE did not select source branch", firstOut, selected)
+			}
+			out, e := goal.Form(1)
+			sharingMust(t, e)
+			term, e := m.GetArg(out, 0)
+			sharingMust(t, e)
+			left, e := m.GetArg(term, 0)
+			sharingMust(t, e)
+			pairFirst, e := m.GetArg(left, 0)
+			sharingMust(t, e)
+			if pairFirst != vars[1] {
+				t.Fatal("unselected ITE branch registered a BV pair", pairFirst, vars[1])
+			}
+		})
+	}
+}
+
 func TestSharingGoalPassReusesEarlierFormulaAndUpdatesDepth(t *testing.T) {
 	m, fid := sharingFixture(t)
 	sort, e := m.BitVectorSort(8)

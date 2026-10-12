@@ -196,7 +196,55 @@ func (p *SharingGoalPass) rewriteApplication(h ast.ASTHandle, r *SharingReducer,
 	}
 	args := make([]ast.ASTHandle, n)
 	changed := false
-	for i := range args {
+	start := 0
+	if n == 3 {
+		fid, e := p.manager.GetFamilyID(decl)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		k, e := p.manager.GetDeclKind(decl)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if fid == p.manager.BasicFamilyID() && k == ast.ASTOpIte {
+			cond, e := p.manager.GetArg(h, 0)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			args[0], e = p.rewriteApplication(cond, r, memo, walk)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			if e := walk.advance(); e != nil {
+				return ast.ASTHandle{}, e
+			}
+			selected := uint32(0)
+			if p.manager.IsTrue(args[0]) {
+				selected = 1
+			}
+			if p.manager.IsFalse(args[0]) {
+				selected = 2
+			}
+			if selected != 0 {
+				branch, e := p.manager.GetArg(h, selected)
+				if e != nil {
+					return ast.ASTHandle{}, e
+				}
+				result, e := p.rewriteApplication(branch, r, memo, walk)
+				if e != nil {
+					return ast.ASTHandle{}, e
+				}
+				if e := walk.advance(); e != nil {
+					return ast.ASTHandle{}, e
+				}
+				memo[original] = result
+				return result, nil
+			}
+			changed = args[0] != cond
+			start = 1
+		}
+	}
+	for i := start; i < len(args); i++ {
 		arg, e := p.manager.GetArg(h, uint32(i))
 		if e != nil {
 			return ast.ASTHandle{}, e

@@ -95716,7 +95716,8 @@
         "TestSharingGoalPassVisitsQuantifiedBody",
         "TestSharingGoalPassProofChainsCongruenceAndRewrite",
         "TestSharingGoalPassProofQuantifierIntroduction",
-        "TestSharingGoalPassSourceParamsAndResourceLimits"
+        "TestSharingGoalPassSourceParamsAndResourceLimits",
+        "TestSharingGoalPassConstantITEPrunesUnselectedPairCache"
       ],
       "conditionals": [
         {
@@ -95762,12 +95763,13 @@
           ]
         },
         {
-          "name": "goal application, bottom-up AST and quantifier traversal, pair reuse across sequential goal updates, and depth transition",
+          "name": "goal application, bottom-up AST and quantifier traversal, nonproof constant-ITE branch pruning, pair reuse across sequential goal updates, and depth transition",
           "status": "partial",
           "go_target": "pkg/tactic/bv/max_bv_sharing_goal.go",
           "tests": [
             "TestSharingGoalPassReusesEarlierFormulaAndUpdatesDepth",
-            "TestSharingGoalPassVisitsQuantifiedBody"
+            "TestSharingGoalPassVisitsQuantifiedBody",
+            "TestSharingGoalPassConstantITEPrunesUnselectedPairCache"
           ]
         },
         {
