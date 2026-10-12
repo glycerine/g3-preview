@@ -246,4 +246,49 @@ func TestRationalIntervalRetainedPredicatesAddSubAndOwnership(t *testing.T) {
 	if out.String() != "(-oo, +oo)" {
 		t.Fatalf("mixed infinite product = %q", out.String())
 	}
+	setPowerInput := func(l, u string, lopen, uopen bool) {
+		t.Helper()
+		must(m.SetString(&lower, l))
+		must(m.SetString(&upper, u))
+		must(a.SetFinite(&lower, &upper, lopen, uopen))
+	}
+	assertPower := func(n uint32, want string) {
+		t.Helper()
+		must(c.Power(a, n))
+		out.Reset()
+		must(c.Display(&out))
+		if out.String() != want {
+			t.Fatalf("interval %d-power = %q, want %q", n, out.String(), want)
+		}
+	}
+	setPowerInput("2", "3", false, false)
+	assertPower(2, "[4, 9]")
+	must(c.Power(c, 2))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[16, 81]" {
+		t.Fatalf("aliased power = %q", out.String())
+	}
+	assertPower(0, "[1, 1]")
+	setPowerInput("-3", "-2", false, false)
+	assertPower(2, "[4, 9]")
+	must(c.SetFrom(a))
+	must(c.Power(c, 2))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[4, 9]" {
+		t.Fatalf("aliased negative even power = %q", out.String())
+	}
+	must(a.ResetLower())
+	assertPower(2, "[4, +oo)")
+	setPowerInput("-2", "3", false, false)
+	assertPower(2, "[0, 9]")
+	assertPower(3, "[-8, 27]")
+	assertPower(0, "[0, 1]")
+	must(a.ResetLower())
+	assertPower(3, "(-oo, 27]")
+	setPowerInput("-3", "3", false, true)
+	assertPower(2, "[0, 9]") // equal maxima prefer closed lower endpoint
+	setPowerInput("-3", "3", true, true)
+	assertPower(2, "[0, 9)")
 }

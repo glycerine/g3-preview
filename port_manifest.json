@@ -34494,7 +34494,8 @@
       "go_targets": [
         "pkg/math/interval/rational_interval.go",
         "pkg/math/interval/rational_interval_test.go",
-        "pkg/math/interval/rational_interval_mul.go"
+        "pkg/math/interval/rational_interval_mul.go",
+        "pkg/math/interval/rational_interval_power.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
@@ -34866,6 +34867,14 @@
           "name": "Concrete mpq interval multiplication sign-class matrix, zero/infinity endpoints, mixed extrema and open-bound tie selection (src/math/interval/interval_def.h:1019-1218)",
           "status": "partial",
           "go_target": "pkg/math/interval/rational_interval_mul.go",
+          "tests": [
+            "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+          ]
+        },
+        {
+          "name": "Concrete mpq interval powers: n=1 copy, positive and negative even, crossing-zero equal-max tie, odd monotonic, infinity and in-place endpoints (src/math/interval/interval_def.h:1271-1378)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/rational_interval_power.go",
           "tests": [
             "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
           ]
@@ -115029,7 +115038,8 @@
         "pkg/math/interval/rational_extended_test.go",
         "pkg/math/interval/rational_interval.go",
         "pkg/math/interval/rational_interval_test.go",
-        "pkg/math/interval/rational_interval_mul.go"
+        "pkg/math/interval/rational_interval_mul.go",
+        "pkg/math/interval/rational_interval_power.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",
