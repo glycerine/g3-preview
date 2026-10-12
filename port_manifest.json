@@ -119120,13 +119120,14 @@
       "path": "src/util/lp/breakpoint.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/primal_breakpoint_float.go",
         "pkg/util/lp/primal_breakpoint_exact.go",
         "pkg/util/lp/primal_breakpoint_rational.go",
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
-        "pkg/util/lp/primal_breakpoint_advance_rational.go"
+        "pkg/util/lp/primal_breakpoint_advance_rational.go",
+        "pkg/util/lp/breakpoint_alias_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalBreakpointIndependentCrossings",
@@ -119156,10 +119157,11 @@
         "TestLPRationalPrimalBreakpointAdvanceWrapper",
         "TestLPRationalPrimalBreakpointAdvanceGuards",
         "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
-        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
+        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures",
+        "TestLPBreakpointOwnedDeltaAliasPhysicalPrefixes"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained floating breakpoint records, exact-zero/sign gate, row/entering breakpoint construction, queue lifecycle, slope change, first-breakpoint double selection and complete floating find_leaving_and_t routing",
@@ -119173,7 +119175,8 @@
             "TestLPFloatPrimalLeavingPathIntegration",
             "TestLPFloatPrimalBreakpointPublicationAndGuards",
             "TestLPFloatPrimalLeavingReachedErrors"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_breakpoint_float.go"
         },
         {
           "name": "live concrete numeric_pair<mpq> breakpoint record construction/copy and owned Delta destruction",
@@ -119185,7 +119188,8 @@
             "TestLPExactBreakpointPhysicalOwnership",
             "TestLPExactBreakpointSourcePrefixesAndGuards",
             "TestLPExactBreakpointClearBeforeStoppedQueue",
-            "TestLPExactBreakpointPreservesOlderComparisonOwner"
+            "TestLPExactBreakpointPreservesOlderComparisonOwner",
+            "TestLPBreakpointOwnedDeltaAliasPhysicalPrefixes"
           ]
         },
         {
@@ -119198,7 +119202,8 @@
             "TestLPRationalPrimalBreakpointPhysicalOwnership",
             "TestLPRationalPrimalBreakpointReachedGuards",
             "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
-            "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner"
+            "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner",
+            "TestLPBreakpointOwnedDeltaAliasPhysicalPrefixes"
           ]
         },
         {
@@ -119220,12 +119225,16 @@
             "TestLPRationalPrimalBreakpointAdvanceGuards",
             "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
             "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_breakpoint_collect_rational.go"
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Retained X specializations are double, rational and rational-pair. Native floating records have value ownership; exact scalar/pair records independently own Delta. Source add_breakpoint copies its by-value argument, constructor argument/member, vector publication and queue priority in actual order; failed owners retain scratch/partial records until primal Close. Existing record Delta may be borrowed by a later append and remains valid through failure/success. No universal X adapter."
+      ],
       "deviations": [
-        "Go native FloatBreakpoint value slice replaces C++ vector records; scalar values have no independent ownership. Source double advance always stops after the first queued crossing even if slope remains beneficial; exact multi-breakpoint continuation is not claimed. Entering boxed breakpoint uses full bound span rather than distance from current X. Invalid source index/empty queue uses reached typed bounds/assertion guards; errors preserve earlier record/queue mutations. Exact records/solver, diagnostic printing and complete optimization loop remain open."
+        "Go native FloatBreakpoint value slice replaces C++ vector records; scalar values have no independent ownership. Source double advance always stops after the first queued crossing even if slope remains beneficial; exact multi-breakpoint continuation is not claimed. Entering boxed breakpoint uses full bound span rather than distance from current X. Invalid source index/empty queue uses reached typed bounds/assertion guards; errors preserve earlier record/queue mutations. Exact records/solver, diagnostic printing and complete optimization loop remain open.",
+        "Whole retained breakpoint.h audit complete: source unit contains only low/upper/fixed enum and three-field by-value record constructor. Retained specializations double, mpq and numeric_pair<mpq> use concrete existing owners. Default constructor leaves scalar fields unspecified and has no retained construction root: actual m_breakpoints only clear() and push_back(breakpoint<X>(j,delta,type)); no resize/default append. Do not synthesize default initialized records or port unused instantiations. Larger primal collection/diagnostic/solver algorithms are separate units; earlier exact-records/complete-loop note was stale and does not block this record header. Four new pooled/direct pair/scalar campaigns borrow an existing owned Delta through another AddBreakpoint, prove original record remains intact at every physical refusal, then independent appended record and absolute queue priority survive original mutation. Clear/Close root censuses pass; existing exact by-value construction/capture and older caller tests retained."
       ]
     },
     {
@@ -122108,7 +122117,7 @@
       "path": "src/util/lp/lar_solution_signature.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "platform_replacement",
       "go_targets": [
         "pkg/util/lp/lar_signature.go",
         "pkg/util/lp/lar_signature_test.go"
@@ -122120,8 +122129,8 @@
         "TestLARSignatureReachedPrefixes",
         "TestLARSignaturePhysicalOwnership"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "native solution signature and concrete pair/float extraction and preparation source356-405,653-662; bound selection, RNG and actual LU reconstruction",
@@ -122136,9 +122145,12 @@
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Header is only a typedef of unordered_map<unsigned,enum>. Go native map owns pointer-free uint32/enum entries; local declaration plus borrowed mutable/const references are the only retained C++ uses, with no signature value-copy or custom allocator operation. Native Go map garbage collection replaces bucket destruction."
+      ],
       "deviations": [
-        "Native uint32 map replaces unordered_map; preparation traverses ascending keys for reproducible RNG/error prefixes. C++ imposes no insertion-order contract. Exact and floating concrete consumers share only bound-selection control flow. Full signature/presolve/trace catch-up and LAR Solve remain open; no whole-unit promotion."
+        "Native uint32 map replaces unordered_map; preparation traverses ascending keys for reproducible RNG/error prefixes. C++ imposes no insertion-order contract. Exact and floating concrete consumers share only bound-selection control flow. Full signature/presolve/trace catch-up and LAR Solve remain open; no whole-unit promotion.",
+        "Whole source alias audit: lar_solution_signature.h has no project algorithm, only an STL unordered_map typedef. Native map[uint32]NonBasicColumnValuePosition replaces it without porting C++ containers. Whole-src references are one local declaration lar_core_solver.hpp287 and borrowed extraction/preparation/solve methods; no retained source signature copy requiring independent map clone. Extraction clears/reuses native map and makes nil map before stores. No source insertion-order contract; existing ascending-key preparation deliberately gives reproducible RNG/error prefixes instead of unspecified C++ bucket order. Full signature presolve/trace/Solve remain obligations of lar_core_solver.h/.hpp, independently partial; earlier note mixed consumer completion with this alias-only unit. Existing actual pair/double extraction/preparation/LU and physical ownership tests provide consumer evidence, not an STL port."
       ]
     },
     {

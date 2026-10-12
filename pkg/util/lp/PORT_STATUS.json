@@ -219,13 +219,14 @@
     },
     {
       "source": "src/util/lp/breakpoint.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/primal_breakpoint_float.go",
         "pkg/util/lp/primal_breakpoint_exact.go",
         "pkg/util/lp/primal_breakpoint_rational.go",
         "pkg/util/lp/primal_breakpoint_collect_rational.go",
-        "pkg/util/lp/primal_breakpoint_advance_rational.go"
+        "pkg/util/lp/primal_breakpoint_advance_rational.go",
+        "pkg/util/lp/breakpoint_alias_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalBreakpointIndependentCrossings",
@@ -255,7 +256,84 @@
         "TestLPRationalPrimalBreakpointAdvanceWrapper",
         "TestLPRationalPrimalBreakpointAdvanceGuards",
         "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
-        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
+        "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures",
+        "TestLPBreakpointOwnedDeltaAliasPhysicalPrefixes"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained floating breakpoint records, exact-zero/sign gate, row/entering breakpoint construction, queue lifecycle, slope change, first-breakpoint double selection and complete floating find_leaving_and_t routing",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_breakpoint_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalBreakpointIndependentCrossings",
+            "TestLPFloatPrimalBreakpointIndependentSlope",
+            "TestLPFloatPrimalLeavingPathIntegration",
+            "TestLPFloatPrimalBreakpointPublicationAndGuards",
+            "TestLPFloatPrimalLeavingReachedErrors"
+          ],
+          "go_target": "pkg/util/lp/primal_breakpoint_float.go"
+        },
+        {
+          "name": "live concrete numeric_pair<mpq> breakpoint record construction/copy and owned Delta destruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_breakpoint_exact.go",
+          "tests": [
+            "TestLPExactBreakpointIndependentRecordQueueOracle",
+            "TestLPExactBreakpointIndependentSlopeOracle",
+            "TestLPExactBreakpointPhysicalOwnership",
+            "TestLPExactBreakpointSourcePrefixesAndGuards",
+            "TestLPExactBreakpointClearBeforeStoppedQueue",
+            "TestLPExactBreakpointPreservesOlderComparisonOwner",
+            "TestLPBreakpointOwnedDeltaAliasPhysicalPrefixes"
+          ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq breakpoint record construction/copy, owned delta destruction, scalar absolute queue priority and slope changes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_breakpoint_rational.go",
+          "tests": [
+            "TestLPRationalPrimalBreakpointIndependentRecords",
+            "TestLPRationalPrimalBreakpointIndependentSlopes",
+            "TestLPRationalPrimalBreakpointPhysicalOwnership",
+            "TestLPRationalPrimalBreakpointReachedGuards",
+            "TestLPRationalPrimalBreakpointClearBeforeStoppedQueue",
+            "TestLPRationalPrimalBreakpointPreservesOlderComparisonOwner",
+            "TestLPBreakpointOwnedDeltaAliasPhysicalPrefixes"
+          ]
+        },
+        {
+          "name": "Retained scalar mpq/mpq breakpoint delta/row/entering collection, full sorted traversal, slope threshold and zero-slope RNG, precise wrapper assertion",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_breakpoint_collect_rational.go",
+            "pkg/util/lp/primal_breakpoint_advance_rational.go"
+          ],
+          "tests": [
+            "TestLPRationalPrimalBreakpointCollectIndependentDelta",
+            "TestLPRationalPrimalBreakpointCollectIndependentModel",
+            "TestLPRationalPrimalBreakpointCollectPhysicalOwnership",
+            "TestLPRationalPrimalBreakpointCollectGuardsAndPrefixes",
+            "TestLPRationalPrimalBreakpointTraversalPreservesOlderComparison",
+            "TestLPRationalPrimalBreakpointAdvanceIndependentOracle",
+            "TestLPRationalPrimalBreakpointAdvancePhysicalOwnership",
+            "TestLPRationalPrimalBreakpointAdvanceWrapper",
+            "TestLPRationalPrimalBreakpointAdvanceGuards",
+            "TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue",
+            "TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures"
+          ],
+          "go_target": "pkg/util/lp/primal_breakpoint_collect_rational.go"
+        }
+      ],
+      "ownership": [
+        "Retained X specializations are double, rational and rational-pair. Native floating records have value ownership; exact scalar/pair records independently own Delta. Source add_breakpoint copies its by-value argument, constructor argument/member, vector publication and queue priority in actual order; failed owners retain scratch/partial records until primal Close. Existing record Delta may be borrowed by a later append and remains valid through failure/success. No universal X adapter."
+      ],
+      "deviations": [
+        "Go native FloatBreakpoint value slice replaces C++ vector records; scalar values have no independent ownership. Source double advance always stops after the first queued crossing even if slope remains beneficial; exact multi-breakpoint continuation is not claimed. Entering boxed breakpoint uses full bound span rather than distance from current X. Invalid source index/empty queue uses reached typed bounds/assertion guards; errors preserve earlier record/queue mutations. Exact records/solver, diagnostic printing and complete optimization loop remain open.",
+        "Whole retained breakpoint.h audit complete: source unit contains only low/upper/fixed enum and three-field by-value record constructor. Retained specializations double, mpq and numeric_pair<mpq> use concrete existing owners. Default constructor leaves scalar fields unspecified and has no retained construction root: actual m_breakpoints only clear() and push_back(breakpoint<X>(j,delta,type)); no resize/default append. Do not synthesize default initialized records or port unused instantiations. Larger primal collection/diagnostic/solver algorithms are separate units; earlier exact-records/complete-loop note was stale and does not block this record header. Four new pooled/direct pair/scalar campaigns borrow an existing owned Delta through another AddBreakpoint, prove original record remains intact at every physical refusal, then independent appended record and absolute queue priority survive original mutation. Clear/Close root censuses pass; existing exact by-value construction/capture and older caller tests retained."
       ]
     },
     {
@@ -1082,7 +1160,7 @@
     },
     {
       "source": "src/util/lp/lar_solution_signature.h",
-      "status": "partial",
+      "status": "platform_replacement",
       "go_targets": [
         "pkg/util/lp/lar_signature.go",
         "pkg/util/lp/lar_signature_test.go"
@@ -1093,6 +1171,29 @@
         "TestLARSignaturePreparationIndependentSystems",
         "TestLARSignatureReachedPrefixes",
         "TestLARSignaturePhysicalOwnership"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "native solution signature and concrete pair/float extraction and preparation source356-405,653-662; bound selection, RNG and actual LU reconstruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_signature.go",
+          "tests": [
+            "TestLARSignatureExactPositionIndependentModels",
+            "TestLARSignatureExtractionIndependentModels",
+            "TestLARSignaturePreparationIndependentSystems",
+            "TestLARSignatureReachedPrefixes",
+            "TestLARSignaturePhysicalOwnership"
+          ]
+        }
+      ],
+      "ownership": [
+        "Header is only a typedef of unordered_map<unsigned,enum>. Go native map owns pointer-free uint32/enum entries; local declaration plus borrowed mutable/const references are the only retained C++ uses, with no signature value-copy or custom allocator operation. Native Go map garbage collection replaces bucket destruction."
+      ],
+      "deviations": [
+        "Native uint32 map replaces unordered_map; preparation traverses ascending keys for reproducible RNG/error prefixes. C++ imposes no insertion-order contract. Exact and floating concrete consumers share only bound-selection control flow. Full signature/presolve/trace catch-up and LAR Solve remain open; no whole-unit promotion.",
+        "Whole source alias audit: lar_solution_signature.h has no project algorithm, only an STL unordered_map typedef. Native map[uint32]NonBasicColumnValuePosition replaces it without porting C++ containers. Whole-src references are one local declaration lar_core_solver.hpp287 and borrowed extraction/preparation/solve methods; no retained source signature copy requiring independent map clone. Extraction clears/reuses native map and makes nil map before stores. No source insertion-order contract; existing ascending-key preparation deliberately gives reproducible RNG/error prefixes instead of unspecified C++ bucket order. Full signature presolve/trace/Solve remain obligations of lar_core_solver.h/.hpp, independently partial; earlier note mixed consumer completion with this alias-only unit. Existing actual pair/double extraction/preparation/LU and physical ownership tests provide consumer evidence, not an STL port."
       ]
     },
     {
@@ -5995,9 +6096,9 @@
     }
   ],
   "status_counts": {
-    "platform_replacement": 1,
-    "partial": 91,
-    "ported": 5,
+    "platform_replacement": 2,
+    "partial": 89,
+    "ported": 6,
     "reference_only": 10,
     "dead_deleted": 3
   },
@@ -10741,5 +10842,98 @@
       "/mnt/oldrog/tmp/g3-bound-support-audit-debug.cover"
     ],
     "remaining": "91 partial/10 reference_only/3 dead_deleted/1 platform_replacement remain in110 LP units. Full CLI execution/entry, remaining retained algorithms/callers and whole-source ownership audits remain open."
+  },
+  "latest_breakpoint_support_audit": {
+    "scope": "Whole retained breakpoint record header ported; signature STL typedef replaced by native Go map; larger primal/LAR core consumer units remain partial",
+    "units": [
+      "src/util/lp/breakpoint.h",
+      "src/util/lp/lar_solution_signature.h"
+    ],
+    "new_tests": [
+      "TestLPBreakpointOwnedDeltaAliasPhysicalPrefixes"
+    ],
+    "coverage": {
+      "native": {
+        "primal_breakpoint_float.go": {
+          "covered": 110,
+          "statements": 120,
+          "percent": 91.7
+        },
+        "primal_breakpoint_exact.go": {
+          "covered": 129,
+          "statements": 156,
+          "percent": 82.7
+        },
+        "primal_breakpoint_rational.go": {
+          "covered": 108,
+          "statements": 136,
+          "percent": 79.4
+        },
+        "primal_breakpoint_collect_rational.go": {
+          "covered": 123,
+          "statements": 136,
+          "percent": 90.4
+        },
+        "primal_breakpoint_advance_rational.go": {
+          "covered": 79,
+          "statements": 91,
+          "percent": 86.8
+        },
+        "lar_signature.go": {
+          "covered": 102,
+          "statements": 129,
+          "percent": 79.1
+        }
+      },
+      "debug": {
+        "primal_breakpoint_float.go": {
+          "covered": 112,
+          "statements": 120,
+          "percent": 93.3
+        },
+        "primal_breakpoint_exact.go": {
+          "covered": 136,
+          "statements": 156,
+          "percent": 87.2
+        },
+        "primal_breakpoint_rational.go": {
+          "covered": 115,
+          "statements": 136,
+          "percent": 84.6
+        },
+        "primal_breakpoint_collect_rational.go": {
+          "covered": 124,
+          "statements": 136,
+          "percent": 91.2
+        },
+        "primal_breakpoint_advance_rational.go": {
+          "covered": 76,
+          "statements": 91,
+          "percent": 83.5
+        },
+        "lar_signature.go": {
+          "covered": 113,
+          "statements": 129,
+          "percent": 87.6
+        }
+      }
+    },
+    "coverage_warning": "Per-file measurements include record algorithms and larger existing primal collection/advance/signature consumer bodies. Source record fields and alias-only map declaration have no separate executable statements. Native erases debug assertions; remaining gaps mainly stable delegated owner/metadata/cleanup guards. No whole primal/LAR completion claim.",
+    "retained_source_audit": [
+      "breakpoint.h enum and three-field by-value constructor covered by actual double/rational/pair owners. Actual vector consumers clear and explicit push_back only; no live default construction or unused generic adapter.",
+      "Signature header only unordered_map typedef. Whole-src local declaration/borrowed reference consumers have no signature by-value copy; native map clear/read/write reuse plus existing ascending preparation order replaces STL buckets."
+    ],
+    "ownership_evidence": "Four pooled/direct scalar/pair alias campaigns run actual AddBreakpoint borrowing existing record Delta through every physical refusal to success. Original record identity/value/metadata stay intact; successful new record and absolute queue priority survive original mutation; Clear/Close censuses pass. Existing source member-copy publication, queue-child invocation ownership, older1000-digit caller and independent numerical oracles retained.",
+    "validation": "Alias-focused native0.280s/combined0.397s; all breakpoint families plus signature native5.676s/combined8.396s passed. Both LP vets, both module compile gates, source portcheck (2103 units/677 APIs) and dependency graph refresh (64 packages/no unresolved imports) pass.",
+    "artifacts": [
+      "/mnt/oldrog/tmp/g3-lp-breakpoint-support-audit.txt",
+      "/mnt/oldrog/tmp/g3-breakpoint-alias-native.cover",
+      "/mnt/oldrog/tmp/g3-breakpoint-alias-debug.cover",
+      "/mnt/oldrog/tmp/g3-breakpoint-support-audit-native.cover",
+      "/mnt/oldrog/tmp/g3-breakpoint-support-audit-debug.cover",
+      "/mnt/oldrog/tmp/g3-breakpoint-support-audit-coverage.json"
+    ],
+    "remaining": "LP6ported/89partial/10reference_only/3dead_deleted/2platform_replacement (110units); complete algorithms/callers, CLI execution/entry and whole-source ownership audits remain open.",
+    "inventory_correction": "First strict completed-unit check rejected older breakpoint method entries that had only plural go_targets. Added explicit primary go_target to the existing method records; kept supporting targets and tests, did not weaken checker. Final source portcheck passes:68 ported/372 partial/1620 unported/5 dead-deleted across2103 units/677 APIs."
   }
 }
