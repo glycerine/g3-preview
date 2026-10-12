@@ -135642,7 +135642,7 @@
       "path": "src/util/lp/numeric_pair.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/numeric_pair.go",
         "pkg/util/lp/static_matrix_float.go",
@@ -135753,10 +135753,13 @@
         "TestLPExactAdvanceEqualLiveStepAliases",
         "TestLPExactAdvanceEqualSourcePrefixes",
         "TestLPExactAdvanceEqualOlderComparison",
-        "TestLPRationalPairPhysicalArithmeticPrefixes"
+        "TestLPRationalPairPhysicalArithmeticPrefixes",
+        "TestLPFloatMPSUnrangedRelationsAndNumericPrefixes",
+        "TestLPRationalMPSExactTokenSemantics",
+        "TestLPFloatScalerSourceStopsAndPrefixes"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "actual numeric_pair<mpq> initialized coordinates, copy/delete, component add/subtract/scale/divide/negate, lexicographic compare/equality/sign/zero, first-coordinate floating projection and formatting",
@@ -135951,6 +135954,25 @@
             "TestLPExactAdvanceEqualSourcePrefixes",
             "TestLPExactAdvanceEqualOlderComparison"
           ]
+        },
+        {
+          "name": "retained unsigned/double/mpq scalar numeric traits and MPS parsing, with native Go scalar/string handling",
+          "status": "ported",
+          "go_target": "pkg/util/lp/mps_reader_float.go",
+          "tests": [
+            "TestLPFloatMPSUnrangedRelationsAndNumericPrefixes",
+            "TestLPRationalMPSExactTokenSemantics",
+            "TestLPFloatScalerSourceStopsAndPrefixes"
+          ]
+        },
+        {
+          "name": "retained double bound conversion and precise pair bound comparison dispatch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_float.go",
+          "tests": [
+            "TestLPFloatCoreFeasibilityExactDyadicOracle",
+            "TestLPRationalPairOrderSignsAndFormatting"
+          ]
         }
       ],
       "ownership": [
@@ -135959,11 +135981,39 @@
         "Exact breakpoint collection retains difference/ratio and entering-span pair locals with the primal across record construction and queue enqueue. Scalar captures end before queue numerical work, so queue comparison receipts remain separate. Failure retains partial records and scratch for Close; older caller comparisons are preserved.",
         "Precise leaving scan owns full -ed*direction expression separately from the by-value basis multiplier, keeping it alive through delegated bound helpers. A distinct ratio local survives repeated row calculations and rejected entering bound flips. Each child retains its own numerical receipts; primal Close cleans raw invocations before all expression/ratio locals. Candidate and output failure prefixes, live input/output alias rereads and older caller comparisons are retained.",
         "Exact UpdateX captures its own arithmetic, retains scalar product expressions and the pair temporary with the core, and releases constructor scalar temporaries before compound subtraction. Entering updates precede ordered basic updates; precise mode leaves CopyXB unchanged. RestoreX retains the stored backup semantics, not an invented inverse. Stopped arithmetic can leave the current scalar partial; later destinations remain untouched. Close cleans raw invocations before scratch and allocation roots, preserving older caller comparisons.",
-        "Residual dot products and LU reconstruction are delegated outside core numeral captures. Core-owned row residual/scalar scratch and RHS vectors survive child failures; the LU is destroyed before its borrowed reconstruction RHS. Matrix and LU numerical receipts stay separate from the core. Reverse row/basis publication, live output aliases, stale factorization residuals, diagnostic recomputation and older caller comparisons are preserved. Exact reconstruction uses one solve and does not import floating refinement work."
+        "Residual dot products and LU reconstruction are delegated outside core numeral captures. Core-owned row residual/scalar scratch and RHS vectors survive child failures; the LU is destroyed before its borrowed reconstruction RHS. Matrix and LU numerical receipts stay separate from the core. Reverse row/basis publication, live output aliases, stale factorization residuals, diagnostic recomputation and older caller comparisons are preserved. Exact reconstruction uses one solve and does not import floating refinement work.",
+        "Scalar traits use native Go values; exact rational conversion and pair coordinates use the borrowed util/numeral manager with owned cleanup. The source precise dispatch bypasses approximate pair bound predicates, while concrete pair operations retain their captured rational allocation roots through expression and caller publication."
       ],
       "deviations": [
-        "Concrete numeric_pair<mpq> subset only. Remaining numeric traits, conversions and any reached project specializations remain open. Definition-only numeric_pair<double> and undefined pair-times-pair/pair-divided-by-pair bodies gain no invented adapters or source credit.",
+        "Concrete retained numeric_pair<mpq>, scalar traits and conversions are audited. Definition-only numeric_pair<double>, unreachable approximate precise bound branches and undefined pair/pair operators are excluded; containing MPS, scaling, solver and CLI audits remain independent.",
         "Existing raw numeral profile is retained: sign may return an inline numerator magnitude; scalar division by zero may retain zero denominators instead of raising an invented exception. No process-global rational service binding or full C++ constructor/allocation geometry claim."
+      ],
+      "retained_source_audit_evidence": "Whole retained numeric_pair.h trait, conversion and ownership audit: actual unsigned/double/mpq scalar traits use native Go scalars or util/numeral; numeric_pair<mpq> owns two rationals with literal X-before-Y construction/arithmetic, Y-before-X deletion, lexicographic comparison and first-coordinate projection. MPS numeric parsing uses Go standard-library strings/numerals as required, rather than reproducing C/C++ library parser internals. Retained convert_struct<double,double> strict/relative bound predicates match source; exact core bypasses approximate pair bound predicates. Scaling and static-matrix nonzero log stops follow source NOT_IMPLEMENTED_YET; exact solver scaling bypasses its unreachable rational log. Whole-source scan finds numeric_pair<double> only in header definitions, and pair*pair/pair/pair have undefined bodies; no adapters are added. Focused native/checked pair, MPS, scaler and float core tests pass. numeric_pair.go covers 65/65 statements in both builds; current consumer file coverage is float MPS357/381 native and360/381 checked, exact MPS449/501 and448/501, scaler226/260 and229/260, float core135/152 and148/152. Larger solver/MPS/CLI units remain independent.",
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "numeric_pair<double>",
+            "convert_struct<numeric_pair<double>,double>",
+            "convert_struct<double,numeric_pair<double>>"
+          ],
+          "reason": "Whole-src scan finds only their definitions in numeric_pair.h; no retained external consumer."
+        },
+        {
+          "source_methods": [
+            "numeric_pair::operator*(numeric_pair)",
+            "numeric_pair::operator/(numeric_pair)",
+            "numeric_pair::precize"
+          ],
+          "reason": "Pair/pair bodies have no implementation and precize calls a nonexistent trait spelling; no retained caller."
+        },
+        {
+          "source_methods": [
+            "numeric_traits<numeric_pair<T>>::one",
+            "convert_struct<numeric_pair<T>,double>::below_bound_numeric/above_bound_numeric",
+            "numeric_traits<mpq>::log"
+          ],
+          "reason": "No retained pair one consumer; precise core compares pairs directly and exact solver skips scaling before rational log."
+        }
       ]
     },
     {
@@ -173757,5 +173807,78 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_suite_qualification": "Latest completed full native55b06c96 predates recent lifetime corrections; focused native/debug, compile/vet and portcheck gates are separate evidence."
+  },
+  "latest_numeric_pair_whole_audit": {
+    "scope": "Whole retained numeric_pair.h trait, conversion and ownership audit: actual unsigned/double/mpq scalar traits use native Go scalars or util/numeral; numeric_pair<mpq> owns two rationals with literal X-before-Y construction/arithmetic, Y-before-X deletion, lexicographic comparison and first-coordinate projection. MPS numeric parsing uses Go standard-library strings/numerals as required, rather than reproducing C/C++ library parser internals. Retained convert_struct<double,double> strict/relative bound predicates match source; exact core bypasses approximate pair bound predicates. Scaling and static-matrix nonzero log stops follow source NOT_IMPLEMENTED_YET; exact solver scaling bypasses its unreachable rational log. Whole-source scan finds numeric_pair<double> only in header definitions, and pair*pair/pair/pair have undefined bodies; no adapters are added. Focused native/checked pair, MPS, scaler and float core tests pass. numeric_pair.go covers 65/65 statements in both builds; current consumer file coverage is float MPS357/381 native and360/381 checked, exact MPS449/501 and448/501, scaler226/260 and229/260, float core135/152 and148/152. Larger solver/MPS/CLI units remain independent.",
+    "source_units": [
+      "src/util/lp/numeric_pair.h"
+    ],
+    "go_targets": [
+      "pkg/util/lp/numeric_pair.go",
+      "pkg/util/lp/mps_reader_float.go",
+      "pkg/util/lp/mps_reader_exact.go",
+      "pkg/util/lp/scaler_float.go",
+      "pkg/util/lp/core_base_float.go"
+    ],
+    "focused_tests": [
+      "TestLPRationalPair",
+      "TestLPFloatScaler",
+      "TestLPFloatMPS",
+      "TestLPRationalMPS",
+      "TestLPFloatCore"
+    ],
+    "focused_go_file_coverage": {
+      "native": {
+        "numeric_pair.go": [
+          65,
+          65
+        ],
+        "mps_reader_float.go": [
+          357,
+          381
+        ],
+        "mps_reader_exact.go": [
+          449,
+          501
+        ],
+        "scaler_float.go": [
+          226,
+          260
+        ],
+        "core_base_float.go": [
+          135,
+          152
+        ]
+      },
+      "debug": {
+        "numeric_pair.go": [
+          65,
+          65
+        ],
+        "mps_reader_float.go": [
+          360,
+          381
+        ],
+        "mps_reader_exact.go": [
+          448,
+          501
+        ],
+        "scaler_float.go": [
+          229,
+          260
+        ],
+        "core_base_float.go": [
+          148,
+          152
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-numeric-pair-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-numeric-pair-whole-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Latest completed full native55b06c96 predates this audit and previous lifetime corrections; focused native/debug and portcheck evidence is separate."
   }
 }
