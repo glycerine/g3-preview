@@ -155322,27 +155322,18 @@
       "path": "src/util/obj_mark.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/ast/ast_mark.go",
-        "pkg/ast/ast_mark_doc.go",
-        "pkg/ast/ast_mark_fast.go",
-        "pkg/ast/ast_mark_node.go"
+        "pkg/ast/ast_mark.go"
       ],
       "tests": [
+        "TestASTMarkIDDomainsReuseAndReset",
+        "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
+        "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
         "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
         "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
         "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
-        "TestASTMarkFastBothPlanesLevelsAndNonRetention",
-        "TestASTMarkFastGrowthPrefixInlineAndOwners",
-        "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
-        "TestASTMarkHeaderRefusalPrecedesGoAllocation",
-        "TestASTMarkIDDomainsReuseAndReset",
-        "TestASTMarkLockedTraversalHelpers",
-        "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
-        "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
-        "TestASTMarkRefFastCallbacksAndFailurePrefix",
-        "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
+        "TestASTMarkHeaderRefusalPrecedesGoAllocation"
       ],
       "conditionals": [
         {
@@ -155354,36 +155345,29 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "concrete expression/declaration ID marks and fast/ref-fast marking specializations; other generic and diagnostic surfaces open",
-          "status": "partial",
+          "name": "Retained obj_mark<expr> and obj_mark<decl, bit_vector, decl2uint> construction, ID conversion, is_marked, mark(flag/default true), and reset",
+          "status": "ported",
           "go_target": "pkg/ast/ast_mark.go",
           "tests": [
+            "TestASTMarkIDDomainsReuseAndReset",
+            "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
+            "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
             "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
             "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
             "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
-            "TestASTMarkFastBothPlanesLevelsAndNonRetention",
-            "TestASTMarkFastGrowthPrefixInlineAndOwners",
-            "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
-            "TestASTMarkHeaderRefusalPrecedesGoAllocation",
-            "TestASTMarkIDDomainsReuseAndReset",
-            "TestASTMarkLockedTraversalHelpers",
-            "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
-            "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
-            "TestASTMarkRefFastCallbacksAndFailurePrefix",
-            "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
+            "TestASTMarkHeaderRefusalPrecedesGoAllocation"
           ]
         }
       ],
       "ownership": [
-        "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md."
+        "Concrete ASTExprMark and ASTMark own independent packed expression/declaration ID planes and borrow ASTManager for ID conversion and backing-budget lifetime. Ordinary ID marks retain no node reference and survive node deletion and ID reuse, matching source obj_mark behavior. Close releases each owner; wrapper copies and stale/foreign handles are rejected."
       ],
       "deviations": [
-        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
-        "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations."
+        "The two retained source instantiations are concrete Go AST mark types; no generic template adapter is introduced. Go ASTHandle replaces C++ pointer/reference overloads and reports invalid or stale handles as typed errors. Source default get_id and declaration get_decl_id map to separate packed planes; mark(false) still grows the plane before clearing the bit. Fast/ref-fast and sparse marks belong to ast.h, not obj_mark.h."
       ]
     },
     {

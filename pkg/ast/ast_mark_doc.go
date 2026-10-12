@@ -4,7 +4,9 @@
 // is_marked reference/pointer overloads -> ASTExprMark.IsMarked; mark(flag)
 // and mark(true) overloads -> Mark(h,flag); reset -> Reset. Its complete used
 // bit_vector subset is constructor/resize(false)/get/set/reset/destructor.
-// Alternative BV/functor/template instantiations remain outside this packet.
+// The other retained source instantiation, obj_mark<decl, bit_vector,
+// decl2uint>, is used by ast_mark and maps to ASTMark's declaration plane.
+// No universal obj_mark template adapter is retained.
 //
 // ast.h public mark1/2(bool), reset_mark1/2, is_marked1/2 -> ASTManager's
 // MarkNode1/2, ResetNodeMark1/2, IsNodeMarked1/2. Scalar uint64 owner identity
