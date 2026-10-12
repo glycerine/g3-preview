@@ -39,7 +39,6 @@ z3_add_component(util
     mpz.cpp
     page.cpp
     params.cpp
-    permutation.cpp
     prime_generator.cpp
     rational.cpp
     region.cpp

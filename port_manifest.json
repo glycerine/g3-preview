@@ -101572,7 +101572,7 @@
           ]
         },
         {
-          "name": "AND/OR/XOR/NOT/equals/contains",
+          "name": "AND/OR/NOT/equals/contains",
           "status": "ported",
           "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
@@ -114460,7 +114460,7 @@
           ]
         },
         {
-          "name": "AND/OR/XOR/NOT/equals/contains",
+          "name": "AND/OR/NOT/equals/contains",
           "status": "ported",
           "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
@@ -114609,7 +114609,7 @@
           ]
         },
         {
-          "name": "AND/OR/XOR/NOT/equals/contains",
+          "name": "AND/OR/NOT/equals/contains",
           "status": "ported",
           "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
@@ -157322,7 +157322,7 @@
       "path": "src/util/permutation.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "assertions": [
@@ -157351,28 +157351,12 @@
           "text": "SASSERT(m_inv_p[m_p[i]] == i);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [
-        {
-          "name": "permutation constructor and reset",
-          "status": "unported",
-          "tests": []
-        },
-        {
-          "name": "swap and move_after",
-          "status": "unported",
-          "tests": []
-        },
-        {
-          "name": "display and check_invariant",
-          "status": "unported",
-          "tests": []
-        }
-      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [],
       "ownership": [],
       "deviations": [
-        "A whole-source scan found no production caller of the C++ permutation class. The test-only Go Runtime/vector duplicate was deleted; retain the source unit as unported until source-deletion review."
+        "Source-deletion audit: this .cpp defines only permutation class constructor/reset/swap/move_after/display/check_invariant. A recursive src/ search found no class instantiation or method call: src/nlsat/nlsat_solver.cpp and src/math/polynomial/polynomial.cpp include permutation.h for its independent apply_permutation templates; src/tactic/core/symmetry_reduce_tactic.cpp has a local typedef of the same name. The registered src/test/permutation.cpp body is disabled by #if 0 and uses only the apply_permutation template. The class has no retained source consumer, so no Go class or ownership port is required. Its pkg/util/cppsrc/util/permutation.cpp mirror is deleted; the live header-template translation remains tracked separately."
       ]
     },
     {

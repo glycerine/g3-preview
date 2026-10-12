@@ -39232,3 +39232,22 @@ Latest full native checkpoint remains08:04UTC atbc47adfb and predates these file
 Native/debug module compilation, both vets, portcheck, dependency graph and
 diff checks pass. No full suite was repeated; the08:04UTC checkpoint remains
 the last completed native module run and predates this increment.
+
+### Util permutation class source-deletion audit
+
+`src/util/permutation.cpp` defines only the `permutation` class constructor,
+reset, swap, move-after, display, and invariant check. A recursive source
+search found no production instance or call of that class. The includes of
+`permutation.h` in nlsat and polynomial code use its independent
+`apply_permutation` templates; the similarly named symmetry tactic type is a
+local `ptr_vector<app>` typedef. The registered permutation test body is
+disabled by `#if 0` and mentions only the template. Accordingly the unused
+`.cpp` mirror and its mirror CMake entry were removed, and the source unit is
+marked `dead_deleted`. The header's live template implementation remains
+partial and is tracked independently.
+
+The fixed-bit-vector method ledger was corrected to list AND, OR, and NOT;
+the C++ manager has no XOR operation. Focused `util/permutation` and
+`util/bitset` tests pass in native and `g3debug,g3checked` profiles on CPUs
+0–7. `portcheck` passes. No whole-bit-vector or whole-util completion is
+claimed by this audit.
