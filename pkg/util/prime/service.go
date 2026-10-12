@@ -10,6 +10,30 @@ import (
 
 var ErrServiceOwner = errors.New("g3: invalid default prime service owner")
 
+// Source g_prime_generator is constructed before ordinary utility services.
+// The current Go port is single-goroutine, so the source's OpenMP critical
+// section is unnecessary for this process binding. Its nil budget keeps the
+// global cache outside caller-owned arena accounting.
+var processDefault = newProcessDefaultService()
+
+func newProcessDefaultService() *DefaultService {
+	s, e := NewDefaultService(nil)
+	if e != nil {
+		panic(e)
+	}
+	return s
+}
+
+// BorrowProcessGenerator is the nonowning binding for the source default
+// prime iterator and its polynomial factorization consumer.
+func BorrowProcessGenerator() (*Generator, error) {
+	return processDefault.BorrowGenerator()
+}
+
+// FinalizeProcessGenerator matches prime_iterator::finalize: the object
+// remains published, but its cached primes are cleared.
+func FinalizeProcessGenerator() error { return processDefault.Finalize() }
+
 // The actual generator is eagerly constructed with this binding, before any
 // memory initialization call. Finalize clears its slice and keeps its identity.
 // The enclosing header is charged cold Go binding metadata, not a source malloc
@@ -89,6 +113,9 @@ type ServiceIterator struct {
 func NewServiceIterator(s *DefaultService, g *Generator) (ServiceIterator, error) {
 	if g != nil {
 		return ServiceIterator{generator: g}, nil
+	}
+	if s == nil {
+		s = processDefault
 	}
 	if e := s.open(); e != nil {
 		return ServiceIterator{}, e

@@ -157563,7 +157563,9 @@
         "pkg/util/prime/service_test.go",
         "pkg/util/numeral/prime_service_integer_integration_test.go",
         "pkg/util/prime/service_borrow_test.go",
-        "pkg/math/polynomial/util_default_prime_factor_binding_source_test.go"
+        "pkg/math/polynomial/util_default_prime_factor_binding_source_test.go",
+        "pkg/util/prime/process_default_test.go",
+        "pkg/math/polynomial/upolynomial_factor_default_prime_test.go"
       ],
       "tests": [
         "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot",
@@ -157578,7 +157580,9 @@
         "TestDefaultPrimeRegisteredIntegerRootAssertions",
         "TestDefaultPrimeIndexWrapAndNativeGrowth",
         "TestDefaultPrimeBorrowExactBindingAndFinalizedIdentity",
-        "TestDefaultPrimeBorrowFullPolynomialFactorEndToEnd"
+        "TestDefaultPrimeBorrowFullPolynomialFactorEndToEnd",
+        "TestProcessDefaultPrimeIteratorEagerSharedCache",
+        "TestUPolynomialFactorDefaultProcessPrimeBinding"
       ],
       "assertions": [
         {
@@ -157635,17 +157639,29 @@
           "go_targets": [
             "pkg/math/polynomial/util_default_prime_factor_binding_source_test.go"
           ]
+        },
+        {
+          "name": "eager process g_prime_generator, nullptr default iterator, borrowed polynomial default prime backend and callable finalizer",
+          "status": "partial",
+          "go_target": "pkg/util/prime/service.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_service.go"
+          ],
+          "tests": [
+            "TestProcessDefaultPrimeIteratorEagerSharedCache",
+            "TestUPolynomialFactorDefaultProcessPrimeBinding"
+          ]
         }
       ],
       "ownership": [
         "Charged concrete cold cache owner; native []uint64 slices hold persistent primes and temporary candidates without arena backing reservations. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md.",
         "Named reflected cold owners and real delegated table/cache storage; all actual constructor/growth/erase refusal prefixes audited before disabling faults; borrowed region/generator lifetimes remain explicit.",
-        "BorrowGenerator returns exact existing pointer without owning or refunding it; Finalize preserves object identity and reached emptied-vector Bounds behavior. Full Factor closes its lazy UP service and does not close the borrowed generator."
+        "BorrowGenerator returns exact existing pointer without owning or refunding it; Finalize preserves object identity and reached emptied-vector Bounds behavior. Full Factor closes its lazy UP service and does not close the borrowed generator.",
+        "The eager process default service uses an unlimited nil Budget and owns one shared generator; default iterators and polynomial factorization borrow it. FinalizeProcessGenerator clears that object without replacing it."
       ],
       "deviations": [
-        "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checks the repeated condition; later indefinite iterations are not executed.",
-        "Native Go slice growth replaces source vector capacity, overflow and backing allocation behavior. Full prime source units remain partial for global-service and synchronization obligations.",
-        "Explicit caller-bound single-lane service; source-global shared Runtime allocation and process singleton binding remain open. OpenMP and source print/flush remain open; source reversed sparse-growth loop unchanged, finalization does not recreate cache."
+        "Native Go slices replace source vector capacity, overflow and backing allocation behavior. The literal source reversed nonterminating growth executes one complete 16384 body then checks its repeated condition; later indefinite iterations are not executed.",
+        "The eager process singleton and null/default iterator binding are now present for the selected single-goroutine Go profile. OpenMP locking is outside that profile. The source has no prime print/flush operation. Generated shell/API process-finalizer wiring remains open; the callable Go finalizer is available."
       ]
     },
     {
@@ -157659,7 +157675,9 @@
         "pkg/util/numeral/prime_generator_source_test.go",
         "pkg/util/prime/service.go",
         "pkg/util/prime/service_test.go",
-        "pkg/util/numeral/prime_service_integer_integration_test.go"
+        "pkg/util/numeral/prime_service_integer_integration_test.go",
+        "pkg/util/prime/process_default_test.go",
+        "pkg/math/polynomial/upolynomial_factor_default_prime_test.go"
       ],
       "tests": [
         "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot",
@@ -157672,7 +157690,9 @@
         "TestDefaultPrimeEveryEagerConstructionRefusal",
         "TestDefaultPrimeLocalAndCachedWarmSourceRoutes",
         "TestDefaultPrimeRegisteredIntegerRootAssertions",
-        "TestDefaultPrimeIndexWrapAndNativeGrowth"
+        "TestDefaultPrimeIndexWrapAndNativeGrowth",
+        "TestProcessDefaultPrimeIteratorEagerSharedCache",
+        "TestUPolynomialFactorDefaultProcessPrimeBinding"
       ],
       "conditionals": [
         {
@@ -157721,16 +157741,25 @@
           "go_targets": [
             "pkg/util/numeral/prime_service_integer_integration_test.go"
           ]
+        },
+        {
+          "name": "default-constructed process prime iterator and static finalizer entry",
+          "status": "partial",
+          "go_target": "pkg/util/prime/service.go",
+          "tests": [
+            "TestProcessDefaultPrimeIteratorEagerSharedCache",
+            "TestUPolynomialFactorDefaultProcessPrimeBinding"
+          ]
         }
       ],
       "ownership": [
         "Charged concrete cold cache owner; native []uint64 slices hold persistent primes and temporary candidates without arena backing reservations. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md.",
-        "Named reflected cold owners and real delegated table/cache storage; all actual constructor/growth/erase refusal prefixes audited before disabling faults; borrowed region/generator lifetimes remain explicit."
+        "Named reflected cold owners and real delegated table/cache storage; all actual constructor/growth/erase refusal prefixes audited before disabling faults; borrowed region/generator lifetimes remain explicit.",
+        "The process-default iterator borrows one eagerly constructed generator; each iterator has an independent uint32 index."
       ],
       "deviations": [
-        "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checks the repeated condition; later indefinite iterations are not executed.",
-        "Native Go slice growth replaces source vector capacity, overflow and backing allocation behavior. Full prime source units remain partial for global-service and synchronization obligations.",
-        "Explicit caller-bound single-lane service; source-global shared Runtime allocation and process singleton binding remain open. OpenMP and source print/flush remain open; source reversed sparse-growth loop unchanged, finalization does not recreate cache."
+        "Native Go slices replace source vector capacity, overflow and backing allocation behavior. The literal source reversed nonterminating growth executes one complete 16384 body then checks its repeated condition; later indefinite iterations are not executed.",
+        "The eager process singleton and null/default iterator binding are now present for the selected single-goroutine Go profile. OpenMP locking is outside that profile. The source has no prime print/flush operation. Generated shell/API process-finalizer wiring remains open; the callable Go finalizer is available."
       ]
     },
     {

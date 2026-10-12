@@ -39871,3 +39871,16 @@ uncollected dependency sorts, and retains the source's cycle traversal.
 Focused tests cover a shared dependency, duplicate collection, an omitted
 built-in sort, repeat calls, and a cycle. The declaration collector's visits
 and dependency gathering are still unported, so the header remains partial.
+
+### Process default prime generator
+
+`src/util/prime_generator.cpp` eagerly constructs one global generator. Go
+now does the same for the single-goroutine profile: a nil-service iterator
+binds that generator, each iterator advances its own index, and polynomial
+factorization with no explicit prime owner borrows the shared generator.
+The factorization service leaves the borrowed cache alive on close. Focused
+tests verify both iterator identity and an end-to-end factorization through
+the default binding. `FinalizeProcessGenerator` exposes the source finalizer
+action; generated shell/API shutdown wiring remains open. The source prime
+files contain no print/flush operation, so the old ledger obligation for one
+was removed.

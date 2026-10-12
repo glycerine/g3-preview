@@ -54,7 +54,11 @@ func NewUPolynomialFactorizationService(m *UPolynomialManager, c UPolynomialFact
 		return nil, e
 	}
 	if c.Primes == nil {
-		return nil, ErrUPolynomialOwner
+		var e error
+		c.Primes, e = primegen.BorrowProcessGenerator()
+		if e != nil {
+			return nil, e
+		}
 	}
 	if e := c.Primes.Check(); e != nil {
 		return nil, e
