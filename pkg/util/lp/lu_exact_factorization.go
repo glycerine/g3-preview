@@ -237,7 +237,7 @@ func (m *exactLUState) closeMembers() error {
 	}
 	for _, v := range []*IndexedRationalVector{m.yCopy, m.wExtension, m.rowEtaWork} {
 		if v != nil {
-			if err := v.Close(); err != nil {
+			if err := v.CloseForward(); err != nil {
 				return err
 			}
 		}
