@@ -120923,7 +120923,7 @@
       "path": "src/util/lp/iterator_on_column.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/rational_iterators.go"
       ],
@@ -120933,10 +120933,11 @@
         "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
         "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
         "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
-        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix",
+        "TestLPRationalIteratorsBorrowedOutputAlias"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained rational iterator Next/NextIndex/Reset/Size directions for row, column, indexed-vector and pivot-row consumers; typed project interface and owning numeric-call Close",
@@ -120948,7 +120949,8 @@
             "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
             "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
             "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
-            "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+            "TestLPRationalIteratorConstructorsRejectStoppedMatrix",
+            "TestLPRationalIteratorsBorrowedOutputAlias"
           ]
         }
       ],
@@ -120956,14 +120958,15 @@
         "Iterator borrows the stable source container and numeral manager; caller owns copied output. Only actual newly acquired copy-call roots/frames belong to the iterator and remain for Close. Row/indexed cursors and indices publish before Copy; column cursor advances before Copy and row index publishes afterward. Pivot owns the inline basis call and delegates further copies to its indexed child without adopting that child receipt. No container allocations or generic callback layer."
       ],
       "deviations": [
-        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim."
+        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim.",
+        "Whole retained iterator support audit: live exact instances are row/pivot row (lar_solver.h:223,240,292), column/indexed (lar_core_solver.h:806-811), and basis term (init_lar_solver.h:146). Concrete Go callers are lar_row_dispatch.go, random_update_interval.go and lar_model_terms.go. Constructor/Next/NextIndex/Reset/Size and virtual destruction map to existing typed implementations and Close; no universal template adapter. Source clone use is only commented bound_analyzer_on_row.h:286; vector-of-pairs construction only commented lar_solver.h:358. Excluded definition-only methods are not completion obligations. Retained borrowed container lifetime and owning mpq assignment/publication prefixes audited against each body. Term iteration uses approved insdict order and requires Reset after structural edits. Larger LAR/analyzer/random-update/CLI source units retain independent partial audits."
       ]
     },
     {
       "path": "src/util/lp/iterator_on_indexed_vector.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/rational_iterators.go"
       ],
@@ -120973,10 +120976,11 @@
         "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
         "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
         "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
-        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix",
+        "TestLPRationalIteratorsBorrowedOutputAlias"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained rational iterator Next/NextIndex/Reset/Size directions for row, column, indexed-vector and pivot-row consumers; typed project interface and owning numeric-call Close",
@@ -120988,7 +120992,8 @@
             "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
             "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
             "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
-            "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+            "TestLPRationalIteratorConstructorsRejectStoppedMatrix",
+            "TestLPRationalIteratorsBorrowedOutputAlias"
           ]
         }
       ],
@@ -120996,14 +121001,15 @@
         "Iterator borrows the stable source container and numeral manager; caller owns copied output. Only actual newly acquired copy-call roots/frames belong to the iterator and remain for Close. Row/indexed cursors and indices publish before Copy; column cursor advances before Copy and row index publishes afterward. Pivot owns the inline basis call and delegates further copies to its indexed child without adopting that child receipt. No container allocations or generic callback layer."
       ],
       "deviations": [
-        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim."
+        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim.",
+        "Whole retained iterator support audit: live exact instances are row/pivot row (lar_solver.h:223,240,292), column/indexed (lar_core_solver.h:806-811), and basis term (init_lar_solver.h:146). Concrete Go callers are lar_row_dispatch.go, random_update_interval.go and lar_model_terms.go. Constructor/Next/NextIndex/Reset/Size and virtual destruction map to existing typed implementations and Close; no universal template adapter. Source clone use is only commented bound_analyzer_on_row.h:286; vector-of-pairs construction only commented lar_solver.h:358. Excluded definition-only methods are not completion obligations. Retained borrowed container lifetime and owning mpq assignment/publication prefixes audited against each body. Term iteration uses approved insdict order and requires Reset after structural edits. Larger LAR/analyzer/random-update/CLI source units retain independent partial audits."
       ]
     },
     {
       "path": "src/util/lp/iterator_on_pivot_row.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/rational_iterators.go"
       ],
@@ -121013,10 +121019,11 @@
         "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
         "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
         "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
-        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix",
+        "TestLPRationalIteratorsBorrowedOutputAlias"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained rational iterator Next/NextIndex/Reset/Size directions for row, column, indexed-vector and pivot-row consumers; typed project interface and owning numeric-call Close",
@@ -121028,7 +121035,8 @@
             "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
             "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
             "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
-            "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+            "TestLPRationalIteratorConstructorsRejectStoppedMatrix",
+            "TestLPRationalIteratorsBorrowedOutputAlias"
           ]
         }
       ],
@@ -121036,14 +121044,15 @@
         "Iterator borrows the stable source container and numeral manager; caller owns copied output. Only actual newly acquired copy-call roots/frames belong to the iterator and remain for Close. Row/indexed cursors and indices publish before Copy; column cursor advances before Copy and row index publishes afterward. Pivot owns the inline basis call and delegates further copies to its indexed child without adopting that child receipt. No container allocations or generic callback layer."
       ],
       "deviations": [
-        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim."
+        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim.",
+        "Whole retained iterator support audit: live exact instances are row/pivot row (lar_solver.h:223,240,292), column/indexed (lar_core_solver.h:806-811), and basis term (init_lar_solver.h:146). Concrete Go callers are lar_row_dispatch.go, random_update_interval.go and lar_model_terms.go. Constructor/Next/NextIndex/Reset/Size and virtual destruction map to existing typed implementations and Close; no universal template adapter. Source clone use is only commented bound_analyzer_on_row.h:286; vector-of-pairs construction only commented lar_solver.h:358. Excluded definition-only methods are not completion obligations. Retained borrowed container lifetime and owning mpq assignment/publication prefixes audited against each body. Term iteration uses approved insdict order and requires Reset after structural edits. Larger LAR/analyzer/random-update/CLI source units retain independent partial audits."
       ]
     },
     {
       "path": "src/util/lp/iterator_on_row.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/rational_iterators.go"
       ],
@@ -121053,10 +121062,11 @@
         "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
         "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
         "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
-        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix",
+        "TestLPRationalIteratorsBorrowedOutputAlias"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained rational iterator Next/NextIndex/Reset/Size directions for row, column, indexed-vector and pivot-row consumers; typed project interface and owning numeric-call Close",
@@ -121068,7 +121078,8 @@
             "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
             "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
             "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
-            "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+            "TestLPRationalIteratorConstructorsRejectStoppedMatrix",
+            "TestLPRationalIteratorsBorrowedOutputAlias"
           ]
         }
       ],
@@ -121076,14 +121087,15 @@
         "Iterator borrows the stable source container and numeral manager; caller owns copied output. Only actual newly acquired copy-call roots/frames belong to the iterator and remain for Close. Row/indexed cursors and indices publish before Copy; column cursor advances before Copy and row index publishes afterward. Pivot owns the inline basis call and delegates further copies to its indexed child without adopting that child receipt. No container allocations or generic callback layer."
       ],
       "deviations": [
-        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim."
+        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim.",
+        "Whole retained iterator support audit: live exact instances are row/pivot row (lar_solver.h:223,240,292), column/indexed (lar_core_solver.h:806-811), and basis term (init_lar_solver.h:146). Concrete Go callers are lar_row_dispatch.go, random_update_interval.go and lar_model_terms.go. Constructor/Next/NextIndex/Reset/Size and virtual destruction map to existing typed implementations and Close; no universal template adapter. Source clone use is only commented bound_analyzer_on_row.h:286; vector-of-pairs construction only commented lar_solver.h:358. Excluded definition-only methods are not completion obligations. Retained borrowed container lifetime and owning mpq assignment/publication prefixes audited against each body. Term iteration uses approved insdict order and requires Reset after structural edits. Larger LAR/analyzer/random-update/CLI source units retain independent partial audits."
       ]
     },
     {
       "path": "src/util/lp/iterator_on_term_with_basis_var.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/lar_term.go",
         "pkg/util/lp/term_iterator.go"
@@ -121100,15 +121112,16 @@
         "TestLPExactStaticFillLiteralWorkspaceAndPublication",
         "TestLPExactStaticFillAllocationFailureCensus",
         "TestLPExactStaticFillBoundsAndLiteralStops",
-        "TestLPExactStaticFillAndTermLeaveOlderComparisonOwned"
+        "TestLPExactStaticFillAndTermLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorsBorrowedOutputAlias"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "retained exact term constructor/offset copy, coefficient insertion/accumulation/cancellation, size/contains/borrowed coefficients, owning export, live-pivot substitution and basis-variable Next/NextIndex/Reset/Size iterator",
+          "name": "Retained concrete mpq basis-term iterator constructor, Next/NextIndex/Reset/Size and owning numeric-call Close",
           "status": "ported",
-          "go_target": "pkg/util/lp/lar_term.go",
+          "go_target": "pkg/util/lp/term_iterator.go",
           "tests": [
             "TestLARTermIndependentArithmeticAndOrderOracle",
             "TestLARTermLiteralZeroAndLivePivotPrefixes",
@@ -121121,7 +121134,8 @@
             "TestLPExactStaticFillLiteralWorkspaceAndPublication",
             "TestLPExactStaticFillAllocationFailureCensus",
             "TestLPExactStaticFillBoundsAndLiteralStops",
-            "TestLPExactStaticFillAndTermLeaveOlderComparisonOwned"
+            "TestLPExactStaticFillAndTermLeaveOlderComparisonOwned",
+            "TestLPRationalIteratorsBorrowedOutputAlias"
           ]
         }
       ],
@@ -121129,7 +121143,8 @@
         "Term owns initialized rational constant and stable coefficient pointers in native insdict.Dict; actual numeric copies publish new entries only after completion. Existing exact cancellations release the value and erase the key. Substitution rereads the live pivot and owns actual unary-minus/product/insertion temporaries and newly acquired numeric receipts. Export owns its actual pair/stored copies separately from the borrowed term. Iterator owns its caller-output Copy receipts, publishes coefficient key before copy and advances only after success; negative unit basis publishes its flag before value, then key after copy."
       ],
       "deviations": [
-        "Insertion order via approved insdict v0.14.5 replaces unspecified C++ unordered-map bucket order and gives stable two-pass traversal. No hash-node/vector capacity or container-only budget events. Iterator snapshots only native keys on Reset and borrows live coefficient values; structural mutation requires Reset. Source erased-live-pivot/invalid iterator continuation is an explicit Go guard preserving the completed prefix, without a pivot snapshot or native undefined dereference. Definition-only term ==/!= and unused clone methods are excluded. Full LAR/bound-propagation/constraint integration and upstream driver remain open."
+        "Insertion order via approved insdict v0.14.5 replaces unspecified C++ unordered-map bucket order and gives stable two-pass traversal. No hash-node/vector capacity or container-only budget events. Iterator snapshots only native keys on Reset and borrows live coefficient values; structural mutation requires Reset. Source erased-live-pivot/invalid iterator continuation is an explicit Go guard preserving the completed prefix, without a pivot snapshot or native undefined dereference. Definition-only term ==/!= and unused clone methods are excluded. Full LAR/bound-propagation/constraint integration and upstream driver remain open.",
+        "Whole retained iterator support audit: live exact instances are row/pivot row (lar_solver.h:223,240,292), column/indexed (lar_core_solver.h:806-811), and basis term (init_lar_solver.h:146). Concrete Go callers are lar_row_dispatch.go, random_update_interval.go and lar_model_terms.go. Constructor/Next/NextIndex/Reset/Size and virtual destruction map to existing typed implementations and Close; no universal template adapter. Source clone use is only commented bound_analyzer_on_row.h:286; vector-of-pairs construction only commented lar_solver.h:358. Excluded definition-only methods are not completion obligations. Retained borrowed container lifetime and owning mpq assignment/publication prefixes audited against each body. Term iteration uses approved insdict order and requires Reset after structural edits. Larger LAR/analyzer/random-update/CLI source units retain independent partial audits."
       ]
     },
     {
@@ -123247,7 +123262,7 @@
       "path": "src/util/lp/linear_combination_iterator.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/rational_iterators.go"
       ],
@@ -123257,10 +123272,11 @@
         "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
         "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
         "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
-        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix",
+        "TestLPRationalIteratorsBorrowedOutputAlias"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained rational iterator Next/NextIndex/Reset/Size directions for row, column, indexed-vector and pivot-row consumers; typed project interface and owning numeric-call Close",
@@ -123272,7 +123288,8 @@
             "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
             "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
             "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
-            "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+            "TestLPRationalIteratorConstructorsRejectStoppedMatrix",
+            "TestLPRationalIteratorsBorrowedOutputAlias"
           ]
         }
       ],
@@ -123281,7 +123298,8 @@
         "Concrete exact iterators expose borrowed numeric-manager provenance for row-analyzer validation before copying any coefficient; this accessor adds no ownership or numeric operations."
       ],
       "deviations": [
-        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim."
+        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim.",
+        "Whole retained iterator support audit: live exact instances are row/pivot row (lar_solver.h:223,240,292), column/indexed (lar_core_solver.h:806-811), and basis term (init_lar_solver.h:146). Concrete Go callers are lar_row_dispatch.go, random_update_interval.go and lar_model_terms.go. Constructor/Next/NextIndex/Reset/Size and virtual destruction map to existing typed implementations and Close; no universal template adapter. Source clone use is only commented bound_analyzer_on_row.h:286; vector-of-pairs construction only commented lar_solver.h:358. Excluded definition-only methods are not completion obligations. Retained borrowed container lifetime and owning mpq assignment/publication prefixes audited against each body. Term iteration uses approved insdict order and requires Reset after structural edits. Larger LAR/analyzer/random-update/CLI source units retain independent partial audits."
       ]
     },
     {
