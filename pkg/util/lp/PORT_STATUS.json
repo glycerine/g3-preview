@@ -4676,7 +4676,7 @@
     },
     {
       "source": "src/util/lp/lp_settings.hpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/types.go",
         "pkg/util/lp/assert_debug.go",
@@ -8131,10 +8131,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 66,
+    "ported": 67,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 29
+    "partial": 28
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -14547,5 +14547,19 @@
       "/mnt/oldrog/tmp/g3-lp-lar-constraints-audit-debug.cover"
     ],
     "full_suite_qualification": "Revision55b06c96 predates this source audit and dependency pin; it remains a separate running checkpoint."
+  },
+  "latest_lp_settings_hpp_retained_audit": {
+    "scope": "Whole retained lp_settings.hpp audit: column/status spelling and asymmetric status parsing match the source; floating vector equality uses the retained relative 1e-6 normalization in permutation debug checks, while exact vector equality owns each subtraction temporary in the retained precise permutation path. The pointer-plus-length comparison has no reached source caller, sparse-matrix comparisons are disabled/commented, and the debug-only ddd definition has no consumer; these are excluded. The source test_permutations comparison and permutation_matrix debug assertions are represented by real float/exact paths. Source enum/status tests, float dense/sparse product and guard tests, and exact permutation equality early-return/physical-refusal tests pass native and debug/checked. The hpp unit is now ported and method/ownership audited; lp_settings.h remains partial for its separate wider settings surface. Focused native/combined groups pass0.076s/0.840s. The full native revision55b06c96 predates this audit and is not current-code evidence. CPUs8-16/GOMAXPROCS9.",
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "source_unit": "src/util/lp/lp_settings.hpp",
+    "focused_native_seconds": 0.076,
+    "focused_combined_seconds": 0.84,
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-settings-hpp-audit-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-settings-hpp-audit-debug.cover"
+    ],
+    "coverage_qualification": "Focused package coverage is diluted by unrelated LP files; retained methods and caller branches are exercised. No whole-Go-file coverage claim for shared types/permutation files.",
+    "full_suite_qualification": "Revision55b06c96 predates this source audit and later dependency pin."
   }
 }
