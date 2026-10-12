@@ -14,9 +14,9 @@ var (
 )
 
 // utilCooperation implements cooperate.cpp with z3_omp.h's actual _NO_OMP_
-// profile. It is confined to one operation owner. OpenMP scheduling is a
-// separate, unported profile. Source process globals become this cold owner;
-// all header bytes, including its Go lifetime adapter, are charged once.
+// profile. It is confined to one operation owner. OpenMP scheduling is outside
+// the current single-goroutine Go target. Source process globals become this
+// cold owner; all header bytes, including its Go lifetime adapter, are charged once.
 //
 // Begin/EndSection and Begin/EndTask express the lexical source constructors
 // and destructors. The source empty RAII objects have no additional payload.

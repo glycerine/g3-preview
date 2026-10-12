@@ -112782,7 +112782,7 @@
       "path": "src/util/cooperate.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/cooperate/cooperate.go",
         "pkg/util/cooperate/cooperate_debug.go",
@@ -112827,7 +112827,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "actual _NO_OMP_ enabled/checkpoint/cooperate and section/task constructors/destructors",
+          "name": "Single-goroutine _NO_OMP_ enabled/checkpoint/cooperate and cooperation_section/init_task construction/destruction with source debug assertion order",
           "status": "ported",
           "go_target": "pkg/util/cooperate/cooperate.go",
           "tests": [
@@ -112837,27 +112837,25 @@
             "TestCooperationColdOwnerFaultAndCopies",
             "TestCooperationNoOMPZeroWarmAllocations",
             "TestCooperationActualCPPNoOMPReleaseTrace"
+          ],
+          "go_targets": [
+            "pkg/util/cooperate/cooperate_debug.go",
+            "pkg/util/cooperate/cooperate_nodebug.go"
           ]
-        },
-        {
-          "name": "OpenMP multilane scheduling, recursive locks and conditional TRACE streams",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
         }
       ],
       "ownership": [
-        "Source global lock/enable state becomes one charged, self-guarded cold operation owner. Empty lexical section/task objects use balanced Begin/End calls; task spelling is not retained because source m_task is never written. See PORT_PROGRESS.md#audit-util-cooperate-port-status-md."
+        "The Go Cooperation owner holds the source enabled flag and lock-owner scalar for one operation lane. Empty source lexical section/task objects use balanced Begin/End calls; task spelling is not retained because source m_task is never assigned. The owner borrows its budget, charges one cold header, and releases it on Close."
       ],
       "deviations": [
-        "Selected actual z3_omp.h _NO_OMP_ compile profile: thread0, not parallel and no-op lock primitives. Runtime enabled/disabled state and source debug assertion positions execute. Other OpenMP profile remains open; no disabled callback substitute. Typed owner/lifetime errors adapt Go storage."
+        "The current Go target is single-goroutine, matching z3_omp.h _NO_OMP_: thread ID 0, omp_in_parallel false, no-op recursive locks and critical pragma. Source assertion positions execute under g3debug; optional TRACE output belongs to the separate trace unit. Multi-lane OpenMP scheduling is outside this target rather than an unimplemented branch of the single-goroutine port. Typed owner/lifetime errors adapt Go storage."
       ]
     },
     {
       "path": "src/util/cooperate.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/cooperate/cooperate.go",
         "pkg/util/cooperate/cooperate_debug.go",
@@ -112886,7 +112884,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "actual _NO_OMP_ enabled/checkpoint/cooperate and section/task constructors/destructors",
+          "name": "Single-goroutine _NO_OMP_ enabled/checkpoint/cooperate and cooperation_section/init_task construction/destruction with source debug assertion order",
           "status": "ported",
           "go_target": "pkg/util/cooperate/cooperate.go",
           "tests": [
@@ -112896,20 +112894,18 @@
             "TestCooperationColdOwnerFaultAndCopies",
             "TestCooperationNoOMPZeroWarmAllocations",
             "TestCooperationActualCPPNoOMPReleaseTrace"
+          ],
+          "go_targets": [
+            "pkg/util/cooperate/cooperate_debug.go",
+            "pkg/util/cooperate/cooperate_nodebug.go"
           ]
-        },
-        {
-          "name": "OpenMP multilane scheduling, recursive locks and conditional TRACE streams",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
         }
       ],
       "ownership": [
-        "Source global lock/enable state becomes one charged, self-guarded cold operation owner. Empty lexical section/task objects use balanced Begin/End calls; task spelling is not retained because source m_task is never written. See PORT_PROGRESS.md#audit-util-cooperate-port-status-md."
+        "The Go Cooperation owner holds the source enabled flag and lock-owner scalar for one operation lane. Empty source lexical section/task objects use balanced Begin/End calls; task spelling is not retained because source m_task is never assigned. The owner borrows its budget, charges one cold header, and releases it on Close."
       ],
       "deviations": [
-        "Selected actual z3_omp.h _NO_OMP_ compile profile: thread0, not parallel and no-op lock primitives. Runtime enabled/disabled state and source debug assertion positions execute. Other OpenMP profile remains open; no disabled callback substitute. Typed owner/lifetime errors adapt Go storage."
+        "The current Go target is single-goroutine, matching z3_omp.h _NO_OMP_: thread ID 0, omp_in_parallel false, no-op recursive locks and critical pragma. Source assertion positions execute under g3debug; optional TRACE output belongs to the separate trace unit. Multi-lane OpenMP scheduling is outside this target rather than an unimplemented branch of the single-goroutine port. Typed owner/lifetime errors adapt Go storage."
       ]
     },
     {
