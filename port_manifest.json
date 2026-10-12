@@ -100390,7 +100390,8 @@
         "pkg/tactic/ufbv/match_subst_apply.go",
         "pkg/tactic/ufbv/rewrite_rule_index.go",
         "pkg/tactic/ufbv/rewrite_back_index.go",
-        "pkg/tactic/ufbv/rewrite_demodulator_schedule.go"
+        "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
+        "pkg/tactic/ufbv/rewrite_loop.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
@@ -100401,7 +100402,8 @@
         "TestMatchSubstTwoOffsetRHSAndQuantifierShift",
         "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators",
         "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
-        "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
+        "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot",
+        "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"
       ],
       "conditionals": [
         {
@@ -100579,13 +100581,21 @@
           "tests": [
             "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
           ]
+        },
+        {
+          "name": "rewrite iterative application and quantifier traversal, rule rescan, Boolean reconstruction and unused-variable cleanup",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
+          "tests": [
+            "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"
+          ]
         }
       ],
       "ownership": [
         "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction. The matcher borrows pair-cache keys but retains each substitution target until reset or close. The forward rule index retains one reference each to quantifier, LHS and RHS until index close."
       ],
       "deviations": [
-        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, forward-rule dispatch/removal and both rescheduling paths are ported; the remaining UFBV rewrite loop and tactic integration remain open."
+        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, forward-rule dispatch/removal, both rescheduling paths and the iterative rewrite loop are ported; enclosing tactic integration and whole-unit ownership remain open."
       ]
     },
     {
@@ -100602,7 +100612,8 @@
         "pkg/tactic/ufbv/match_subst_apply.go",
         "pkg/tactic/ufbv/rewrite_rule_index.go",
         "pkg/tactic/ufbv/rewrite_back_index.go",
-        "pkg/tactic/ufbv/rewrite_demodulator_schedule.go"
+        "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
+        "pkg/tactic/ufbv/rewrite_loop.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
@@ -100613,7 +100624,8 @@
         "TestMatchSubstTwoOffsetRHSAndQuantifierShift",
         "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators",
         "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
-        "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
+        "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot",
+        "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"
       ],
       "conditionals": [
         {
@@ -100685,13 +100697,21 @@
           "tests": [
             "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
           ]
+        },
+        {
+          "name": "concrete iterative rewrite stack, typed cache and owning intermediate expression roots",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
+          "tests": [
+            "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"
+          ]
         }
       ],
       "ownership": [
         "The concrete plugin borrows its AST manager and retains each stored key and expression value; the bool payload is a scalar. The rule index separately retains each indexed quantifier, LHS and RHS."
       ],
       "deviations": [
-        "The matcher uses a concrete Go pair map and two-offset RHS substitution; the surrounding UFBV rewriter remains open."
+        "The matcher uses a concrete Go pair map and two-offset RHS substitution; the iterative UFBV rewrite loop is concrete, while the enclosing tactic and whole-unit ownership remain open."
       ]
     },
     {
@@ -161113,7 +161133,8 @@
         "pkg/tactic/ufbv/rewrite_traversal.go",
         "pkg/tactic/ufbv/rewrite_traversal_test.go",
         "pkg/tactic/ufbv/rewrite_back_index.go",
-        "pkg/tactic/ufbv/rewrite_demodulator_schedule.go"
+        "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
+        "pkg/tactic/ufbv/rewrite_loop.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -161132,7 +161153,8 @@
         "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
         "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
         "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
-        "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
+        "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot",
+        "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"
       ],
       "conditionals": [
         {
@@ -161240,6 +161262,14 @@
           "go_target": "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
           "tests": [
             "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
+          ]
+        },
+        {
+          "name": "concrete UFBV rewrite stack and intermediate expression roots use owning typed slices",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
+          "tests": [
+            "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"
           ]
         }
       ],
