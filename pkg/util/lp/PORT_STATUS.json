@@ -11871,5 +11871,42 @@
   "latest_numeric_benchmark_report_correction": {
     "summary": "Corrected retained numeric benchmark final reports to src/util/lp/lp_settings.h T_to_string overloads: scalar result converts through real RationalManager.Float64; pair result evaluates literal X+Y/mpq(1000) with concrete copied-left quotient/sum temporaries, converts to double and destroys lexical temporaries before formatting. Final output uses source six-significant-digit stream text. Input pair vector deliberately remains exact: numeric_pair::to_string resolves its earlier generic coordinate template, whereas direct final T_to_string selects the later concrete overload. A minimal standalone C++11 lookup probe confirms that declaration-order distinction; no C/cgo dependency or project/STL port introduced. Existing independent math/big arithmetic checks remain; full-count benchmark validators now inspect the exact live accumulator before final formatting instead of treating the approximate report as an exact oracle. Added9 literal source-report worlds (zero,27.828,69.4297 across scalar compound/plus/pair). All original report-byte/endl/timer/physical failure/older-caller tests plus actual CLI executor checks pass native1.148s/combined1.636s. Both LP vets pass before the final literal-only test addition. Focused profiles /mnt/oldrog/tmp/g3-lp-benchmark-report-{native,debug}.cover. Full pair count checkpoint on CPUs8\u201316 passed separately before this final-report correction; full current-code count/report combination remains separately verifiable. LP whole-source inventory remains20ported/75partial/10reference_only/3dead_deleted/2platform_replacement.",
     "full_count_evidence_predates_report_correction": true
+  },
+  "running_full_native_checkpoint": {
+    "status": "running",
+    "cpu_affinity": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "scope": "Full native module at8f2961ca, includes LPParams/scoped vector tests and corrected source numeric reports; excludes Go benchmark loops, which have separate full-count checkpoints",
+    "commit": "8f2961ca",
+    "started_utc": "2026-10-12 03:53:59 UTC",
+    "runner_pid": 2,
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "-json",
+      "./...",
+      "-p=2",
+      "-timeout=60m",
+      "-count=1",
+      "-coverprofile=/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.cover"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.json",
+    "go_pid": 5,
+    "actual_exec_session": 89234,
+    "completion_verified": false
   }
 }
