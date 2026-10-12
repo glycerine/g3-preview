@@ -110882,7 +110882,7 @@
       "path": "src/util/CMakeLists.txt",
       "component": "util",
       "role": "build_specification",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "registrations": [
@@ -110891,11 +110891,13 @@
           "text": "z3_add_component(util"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "This CMake file lists C++ util translation units and headers; it declares no runtime methods or owned values. The Go build is defined by pkg/go.mod and package directories. Keep this file as upstream build-inventory reference rather than porting CMake configuration into Go."
+      ]
     },
     {
       "path": "src/util/approx_nat.cpp",
