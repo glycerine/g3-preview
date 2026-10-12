@@ -461,8 +461,8 @@ func TestLPRationalMPSOuterNamedLookup(t *testing.T) {
 				h.must(s.base().SetFixedValue(^uint32(0), lpScalarBoundValue(h, "11/31")))
 				h.must(s.base().GiveSymbolicNameToColumn("wide", ^uint32(0)))
 				name, want = "wide", big.NewRat(11, 31)
-				if s.base().ColumnIndexByName(name) != -1 {
-					t.Fatal("signed source index cast")
+				if lpTestNamedColumn(t, s.base().NamesToColumns, name) != ^uint32(0) {
+					t.Fatal("full unsigned native name index")
 				}
 			case "alias":
 				c, _ := s.base().Columns.Get2(0)

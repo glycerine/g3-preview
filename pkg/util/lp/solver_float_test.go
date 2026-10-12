@@ -6,6 +6,15 @@ import (
 	"testing"
 )
 
+func lpTestNamedColumn(t *testing.T, names map[string]uint32, name string) uint32 {
+	t.Helper()
+	column, ok := names[name]
+	if !ok {
+		t.Fatalf("missing column name %q", name)
+	}
+	return column
+}
+
 func lpFloatSolver(t *testing.T) *FloatLPSolver {
 	t.Helper()
 	m, err := NewFloatLPSolver()
@@ -218,7 +227,7 @@ func TestLPFloatSolverSlackCountsNamesAndBypass(t *testing.T) {
 	if !m.ProblemIsEmpty() {
 		t.Fatal("empty solver")
 	}
-	if m.ColumnName(9) != "x9" || m.ColumnIndexByName("missing") != -1 {
+	if m.ColumnName(9) != "x9" {
 		t.Fatal("name defaults")
 	}
 	m.CoreColumnsToExternal[0] = 17
@@ -227,7 +236,7 @@ func TestLPFloatSolverSlackCountsNamesAndBypass(t *testing.T) {
 	}
 	m.GiveSymbolicNameToColumn("a", 17)
 	m.GiveSymbolicNameToColumn("b", 17)
-	if m.ColumnName(0) != "b" || m.ColumnIndexByName("a") != 17 || m.ColumnIndexByName("b") != 17 {
+	if m.ColumnName(0) != "b" || lpTestNamedColumn(t, m.NamesToColumns, "a") != 17 || lpTestNamedColumn(t, m.NamesToColumns, "b") != 17 {
 		t.Fatal("source stale name alias")
 	}
 	m = lpFloatSolver(t)

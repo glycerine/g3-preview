@@ -72,7 +72,7 @@ func TestLPFloatMPSIndependentOptima(t *testing.T) {
 		}
 		solution := map[string]float64{}
 		for _, name := range reader.ColumnNames() {
-			v, err := solver.GetColumnValue(uint32(solver.ColumnIndexByName(name)))
+			v, err := solver.GetColumnValue(lpTestNamedColumn(t, solver.NamesToColumns, name))
 			lpStaticMust(t, err)
 			solution[name] = v
 			if v < -1e-8 {
@@ -110,7 +110,7 @@ func TestLPFloatMPSFileBoundsRangesIntegration(t *testing.T) {
 	}
 	solution := map[string]float64{}
 	for _, name := range reader.ColumnNames() {
-		v, err := solver.GetColumnValue(uint32(solver.ColumnIndexByName(name)))
+		v, err := solver.GetColumnValue(lpTestNamedColumn(t, solver.NamesToColumns, name))
 		lpStaticMust(t, err)
 		solution[name] = v
 	}

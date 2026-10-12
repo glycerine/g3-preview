@@ -247,13 +247,6 @@ func (m *RationalLPSolver) ColumnName(core uint32) string {
 	} // undefined source null-column domain
 	return c.Name
 }
-func (m *RationalLPSolver) ColumnIndexByName(name string) int32 {
-	j, ok := m.NamesToColumns[name]
-	if !ok {
-		return -1
-	}
-	return int32(j)
-}
 func (m *RationalLPSolver) ProblemIsEmpty() bool {
 	for _, row := range m.AValues.All() {
 		if row != nil && row.Len() != 0 {

@@ -38,7 +38,7 @@ func TestLPRationalMPSCommonModelIndependentPopulation(t *testing.T) {
 		}
 		for j, name := range []string{"default", "free", "boxed", "fixed"} {
 			c, ok := m.Columns.Get2(uint32(j))
-			if !ok || c.Name != name || c.Index != InvalidColumnIndex || m.ColumnIndexByName(name) != int32(j) {
+			if !ok || c.Name != name || c.Index != InvalidColumnIndex || lpTestNamedColumn(t, m.NamesToColumns, name) != uint32(j) {
 				t.Fatal("symbolic column", j)
 			}
 			lpSparseRationalCheck(t, h, &c.Cost, coeff)

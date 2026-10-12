@@ -47,7 +47,7 @@ func TestLPRationalInputModelIndependentAssembly(t *testing.T) {
 				h.must(m.SetFixedValue(ext, &h.pair("3/23", "0").X))
 				lpSparseRationalCheck(t, h, &c.FixedValue, big.NewRat(3, 23))
 			}
-			if c.Name != fmt.Sprint("c", j) || m.ColumnIndexByName(c.Name) != int32(ext) {
+			if c.Name != fmt.Sprint("c", j) || lpTestNamedColumn(t, m.NamesToColumns, c.Name) != ext {
 				t.Fatal("column name")
 			}
 			m.CoreColumnsToExternal[uint32(j)] = ext
@@ -81,7 +81,7 @@ func TestLPRationalInputModelIndependentAssembly(t *testing.T) {
 				lpSparseRationalCheck(t, h, stored, want)
 			}
 		}
-		if m.ProblemIsEmpty() || m.Constraints.Len() != nr || m.Columns.Len() != nc || m.ColumnIndexByName("missing") != -1 {
+		if m.ProblemIsEmpty() || m.Constraints.Len() != nr || m.Columns.Len() != nc {
 			t.Fatal("model extent")
 		}
 		h.must(m.Close())
@@ -113,7 +113,7 @@ func TestLPRationalInputModelSourceReplacementAndNames(t *testing.T) {
 	lpSparseRationalCheck(t, h, second, big.NewRat(2, 7))
 	h.must(m.GiveSymbolicNameToColumn("old", 3))
 	h.must(m.GiveSymbolicNameToColumn("new", 3))
-	if m.ColumnIndexByName("old") != 3 || m.ColumnIndexByName("new") != 3 || m.ColumnName(3) != "x3" {
+	if lpTestNamedColumn(t, m.NamesToColumns, "old") != 3 || lpTestNamedColumn(t, m.NamesToColumns, "new") != 3 || m.ColumnName(3) != "x3" {
 		t.Fatal("source aliases or unmapped core name")
 	}
 	m.CoreColumnsToExternal[2] = 3
@@ -122,8 +122,8 @@ func TestLPRationalInputModelSourceReplacementAndNames(t *testing.T) {
 		t.Fatal("name fallback")
 	}
 	h.must(m.GiveSymbolicNameToColumn("wrap", 0x80000000))
-	if m.ColumnIndexByName("wrap") != -2147483648 {
-		t.Fatal("unsigned to signed source return")
+	if lpTestNamedColumn(t, m.NamesToColumns, "wrap") != 0x80000000 {
+		t.Fatal("full unsigned native name index")
 	}
 	h.must(m.AddConstraint(RelationEqual, &one.X, 9))
 	err := m.AddConstraint(RelationGreaterOrEqual, &two.X, 9)
@@ -339,7 +339,7 @@ func TestLPRationalInputModelUpstreamSolveRationalInput(t *testing.T) {
 		lpSparseRationalCheck(t, h, &col.Cost, big.NewRat(c, 1))
 		lpSparseRationalCheck(t, h, &col.Low, new(big.Rat))
 		lpSparseRationalCheck(t, h, &col.Upper, big.NewRat(upper[j], 1))
-		if col.ColumnType() != ColumnBoxed || x[j] < 0 || x[j] > upper[j] || m.ColumnIndexByName(fmt.Sprint("x", j+1)) != int32(j) {
+		if col.ColumnType() != ColumnBoxed || x[j] < 0 || x[j] > upper[j] || lpTestNamedColumn(t, m.NamesToColumns, fmt.Sprint("x", j+1)) != uint32(j) {
 			t.Fatal("upstream expected bound/name")
 		}
 		primal.Add(primal, new(big.Rat).Mul(big.NewRat(c, 1), big.NewRat(x[j], 1)))

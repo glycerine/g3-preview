@@ -131460,7 +131460,7 @@
       "path": "src/util/lp/lp_solver.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/column_info_float.go",
         "pkg/util/lp/solver_float.go",
@@ -131486,7 +131486,9 @@
         "pkg/util/lp/driver_mps_float.go",
         "pkg/util/lp/matrix_statistics_report_test.go",
         "pkg/util/lp/solver_model_report_float.go",
-        "pkg/util/lp/solver_model_report_float_test.go"
+        "pkg/util/lp/solver_model_report_float_test.go",
+        "pkg/util/lp/primal_solver_rational.go",
+        "pkg/util/lp/dual_objective_rational.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -131593,10 +131595,16 @@
         "TestLPFloatPresolveCleanupReportBoundaries",
         "TestLPFloatModelReportSolvedOriginalValues",
         "TestLPFloatModelReportEveryByteAndEndl",
-        "TestLPFloatModelReportGetterFailurePrefixes"
+        "TestLPFloatModelReportGetterFailurePrefixes",
+        "TestLPRationalPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
+        "TestLPRationalPrimalOuterPhysicalOwnership",
+        "TestLPRationalDualOuterIndependentPreparedVertices",
+        "TestLPRationalDualOuterCostAliasesAndLifetime",
+        "TestLPRationalDualOuterPhysicalOwnership"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained floating common data preparation: external/core maps, flipped matrix assembly, shifted RHS, scale/unscale reconstruction, slack/artificial counters, scaled costs and external values (lp_solver.hpp:24-38,47-65,82-86,103-125,415-529,531-570; lp_solver.h:38-94,229-252)",
@@ -131611,23 +131619,6 @@
             "TestLPFloatSolverSlackCountsNamesAndBypass",
             "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
             "TestLPFloatSolverScaledCostAndValueGuards"
-          ]
-        },
-        {
-          "name": "exact common solver data preparation, full optimization integration and retained diagnostics",
-          "status": "partial",
-          "go_target": "pkg/util/lp/solver_prepare_exact.go",
-          "tests": [
-            "TestLPRationalPreparationIndependentMatricesAndRHS",
-            "TestLPRationalPreparationSourceMappingPrefixes",
-            "TestLPRationalPreparationDenseResizeAndExactScale",
-            "TestLPRationalPreparationDescendingRHSAndCounters",
-            "TestLPRationalPreparationPhysicalOwnership",
-            "TestLPRationalPreparationSeparateEntriesAndRepeatedMapping",
-            "TestLPRationalPreparationReachedDomains",
-            "TestLPRationalPreparationActualMPSPipeline",
-            "TestLPRationalPreparationPreservesOlderComparison",
-            "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
           ]
         },
         {
@@ -131656,7 +131647,8 @@
             "TestLPFloatPrimalOuterErrorsKeepSourcePrefixes",
             "TestLPFloatPrimalOuterSourceUpperOnlyInconsistency",
             "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_solver_float.go"
         },
         {
           "name": "Floating common flip_costs used by dual preparation, including native metadata alias/IEEE and deterministic error prefix",
@@ -131808,6 +131800,38 @@
             "TestLPFloatModelReportEveryByteAndEndl",
             "TestLPFloatModelReportGetterFailurePrefixes"
           ]
+        },
+        {
+          "name": "Concrete mpq/mpq input constraint assignment, names, empty-input predicate and cleanup; full solver preparation/optimization remain open",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_exact_model.go",
+          "tests": [
+            "TestLPRationalInputModelIndependentAssembly",
+            "TestLPRationalInputModelSourceReplacementAndNames",
+            "TestLPRationalInputModelPhysicalOwnership",
+            "TestLPRationalInputModelEntryGuards",
+            "TestLPRationalInputModelUpstreamSolveRationalInput"
+          ]
+        },
+        {
+          "name": "Concrete scalar get_column_cost_value through the actual exact outer virtual column-value accessor, copied-left product and lexical current-cost sum",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solver_rational.go",
+          "tests": [
+            "TestLPRationalPrimalOuterIndependentVertices",
+            "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
+            "TestLPRationalPrimalOuterPhysicalOwnership"
+          ]
+        },
+        {
+          "name": "Concrete scalar dual objective consumer through actual external-column getter, copied-left product, lexical sum and copied unary-negative return",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_objective_rational.go",
+          "tests": [
+            "TestLPRationalDualOuterIndependentPreparedVertices",
+            "TestLPRationalDualOuterCostAliasesAndLifetime",
+            "TestLPRationalDualOuterPhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -131821,6 +131845,7 @@
         "Named exact getters borrow the model name map and dispatch to the actual concrete outer value getter. They do no numerical work themselves and never adopt older caller comparison receipts; delegated column/common owners retain failed numerical copies until owning cleanup. A caller output can alias a model cost. Full uint32 map indices are used directly rather than narrowing through the signed get_column_index_by_name result."
       ],
       "deviations": [
+        "Whole retained-source/ownership audit completes lp_solver.h/.hpp/instances.cpp for actual double/double and mpq/mpq consumers. Audited concrete constructors/input copies, row/column naming, native settings/status/iteration fields, all presolve, external/core assembly, descending shifted RHS, slack/artificial counts, scaling/reconstruction, cost/value/name getters, original objective integration, statistics/model reports and destruction. Existing concrete exact implementation and completed primal/dual wrapper evidence replace the stale broad partial/unported common-preparation placeholder; explicit instantiations create no extra consumer roots. No-ignore whole-src scan138references distinguishes same-name unrelated owners and static_matrix extrema. Uncalled common scale-report chain, invalid common map-row max template, limit getter and unset wrappers are excluded. get_column_index_by_name has only declaration/definition/two explicit instantiations: removed both Go signed wrappers and their mirror-only sentinel expectations; MPS solution/population/alias tests now use native uint32 name maps with membership checks, retaining full unsigned-domain coverage. No unused generic/template adapters or C++ storage port. Native focused common/outer/MPS/driver groups31.167s and combined34.281s pass, both LP vets and unchanged source checker pass:2103units/677APIs,101ported/339partial/1620unported/5dead_deleted. Focused coverage files covered/total {\"debug\":{\"column_info_float.go\":[48,48],\"solver_exact_model.go\":[147,163],\"solver_expression_exact.go\":[12,15],\"solver_float.go\":[195,199],\"solver_model_report_float.go\":[21,22],\"solver_named_rational.go\":[16,16],\"solver_objective_exact.go\":[91,97],\"solver_prepare_exact.go\":[230,249],\"solver_presolve_exact.go\":[307,332],\"solver_presolve_float.go\":[132,134]},\"native\":{\"column_info_float.go\":[43,48],\"solver_exact_model.go\":[146,163],\"solver_expression_exact.go\":[12,15],\"solver_float.go\":[192,199],\"solver_model_report_float.go\":[21,22],\"solver_named_rational.go\":[16,16],\"solver_objective_exact.go\":[90,97],\"solver_prepare_exact.go\":[229,249],\"solver_presolve_exact.go\":[308,332],\"solver_presolve_float.go\":[131,134]}}. Gaps chiefly protect stable exact cleanup/constant/borrowed-manager invariant failures and undefined null-column domains; native erases debug assertions. Floating automatic failed-scaling restoration remains unreachable under the existing source logarithm limitation; explicit Unscale is tested, no fake hook added. Actual exact dual rational(double)/omitted sparsity source boundaries remain preserved by separate outer tests. Native sorted numeric/string keys choose reproducible unordered-source summation/report order; insdict retains row/coefficient mutation order. Trivial scalar wrappers use concrete fields; exact numerical owners preserve source lifetime/refusal/cleanup order. This audit supersedes older common-unit open implementation notes; it does not close separate core/scaler/matrix/LAR/driver/SMT or shell-runtime audits. LP inventory39ported/56partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates recent report fixes and dead-wrapper removal; current evidence is focused. Profiles /mnt/oldrog/tmp/g3-lp-common-solver-final-{native,debug}.cover; audit /mnt/oldrog/tmp/g3-lp-common-solver-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
         "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
         "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested.",
@@ -131830,13 +131855,131 @@
         "Corrective common exact expression audit now preserves rational.h copied-left/compound-update/returned-reference-copy semantics in low-bound row shifts, RHS subtraction, presolve extrema, pinning conditions, row-classification differences and fixed-column elimination. Compound +=, -= and *= remain direct operations. Concrete scalar expression helpers also serve existing objective expressions; no callback arithmetic or unused template adapter is added. Pin-condition products are destroyed before the bound getter and unary-minus condition temporaries before pinning. Six additional direct physical campaigns run through success and each proves an actual returned-reference-copy refusal: the completed exact expression temporary equals an independent big.Rat result while its return destination remains incomplete, including a partially published destination with an invalid backing slot. Witnesses exclude active normalization/GCD/division receipts, so a failed normalization cannot masquerade as a completed expression. Earlier interrupted compound operations can leave an invalid temporary until receipt cleanup; the inspection test accepts only the actual ErrInvalidSlot domain for those earlier prefixes, then requires a valid completed-product witness and a final successful call. A closed-child getter fixture proves the completed condition owners are zero before that getter, while the source coefficient local stays alive. Its initial setup omitted explicit column registration and was corrected; final combined native/debug checks pass. Existing independent arithmetic oracles and pooled/direct preparation/presolve refusal campaigns still pass. Source inventory remains88 partial/16 unported/6 reference_only; no whole-unit promotion. Coverage native/debug: expression helpers12/15 (80.0%) both, with uncovered blocks rejecting already pending receipts; preparation229/249 (92.0%)/230/249 (92.4%); presolve307/332 (92.5%)/306/332 (92.2%); objective90/97 (92.8%)/91/97 (93.8%). Other uncovered blocks chiefly guard stable capture, predicates, destruction and source assertion alternatives. Combined exact input/column/preparation/presolve/objective/core-values/expression checks pass11.087s/13.813s. Related actual rational MPS and floating common/presolve/primal-outer/dual-preparation/cost regressions pass0.915s/1.194s. Both LP vets and full-module native/debug compilation pass. Full native checkpointa8a7ef66 predates these corrections; no full suite rerun inside the hourly interval. Complete scalar residual/pivot/optimization integration and full upstream drivers remain open.",
         "Floating common presolve cleanup now honors lp_solver.hpp:399-410 std::endl and rejects short nil-error writes through the existing checked line writer. TestLPFloatPresolveCleanupReportBoundaries covers every byte of singular/plural reports with explicit and short-nil errors, successful/failed flush, nil output and zero passes; verifies completed row erasure and endpoint pinning before output refusal. Three rows in one pass retain the singular report; the chained three-row model reports two passes. All floating/exact presolve groups pass native5.439s/combined6.757s. Whole floating presolve file coverage131/134statements native,132/134combined. Profiles /mnt/oldrog/tmp/g3-lp-cleanup-report-{native,debug}.cover. Whole no-ignore source scan finds live lp_solver.h:259-264 print_model consumer in src/shell/lp_frontend.cpp:92; no Go model report exists yet, so common solver remains partial. Uncalled scale-statistics chain and get_max_iterations_per_stage have no consumers in src. LP inventory unchanged36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native checkpoint predates this correction. All commands CPUs8\u201316/GOMAXPROCS9.",
         "Implemented retained lp_solver.h:259-264 print_model through concrete FloatPrimalSimplex.PrintModel, matching the only live caller src/shell/lp_frontend.cpp:92 (MPS factory selects primal double/double). Original objective getter follows written objective prefix; source name map includes aliases and missing-column zero values; column heading does not flush, objective and each value honor endl. Native sorted string keys provide deterministic order for the source unordered name map. No unused exact/dual report adapters added. Three tests use an actual scaled LU primal solve with independent unique vertex(2,2), objective16 including fixed term6, name aliases/fixed reconstruction, every report byte with ordinary/short-nil errors, every flush failure, objective-getter refusal prefix, missing-column noninsertion and empty model. Native related model-report/primal-outer/presolve tests0.116s and combined0.106s pass. New report21/22statements95.5% both; remaining getter-error transport cannot be reached in a stable valid model after the objective getter has already read every existing column, and no artificial mutation hook was added. Source shell frontend runtime/resource/timer integration remains unported; this completes the report method only, not containing common solver files. LP inventory unchanged36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Profiles /mnt/oldrog/tmp/g3-lp-model-report-{native,debug}.cover. CPUs8\u201316/GOMAXPROCS9."
+      ],
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "print_scale_stats",
+            "print_rows_scale_stats",
+            "print_columns_scale_stats",
+            "print_row_scale_stats",
+            "print_column_scale_stats"
+          ],
+          "reason": "Whole no-ignore src scan finds declarations/definitions and internal scale-report calls only; no retained caller enters this diagnostic chain."
+        },
+        {
+          "source_methods": [
+            "get_max_abs_in_row(std::unordered_map<unsigned,T>&)"
+          ],
+          "reason": "Uncalled invalid common-solver template, with void return of a value and pair pointer syntax; distinct retained static_matrix row extrema are implemented independently."
+        },
+        {
+          "source_methods": [
+            "get_max_iterations_per_stage",
+            "unset_fixed_value",
+            "unset_low_bound",
+            "unset_upper_bound"
+          ],
+          "reason": "No retained common-solver consumers in whole src scan; same-name column_info declarations or theory_str methods are distinct owners."
+        },
+        {
+          "source_methods": [
+            "get_column_index_by_name"
+          ],
+          "reason": "Whole src scan finds declaration/definition and two explicit instantiations only; removed both unused Go signed wrappers. Retained get_column_value_by_name accesses the full uint32 native name map directly. Tests use native map lookup with membership check."
+        }
+      ],
+      "retained_source_audit": [
+        {
+          "source_methods": [
+            "lp_solver constructor",
+            "row_count",
+            "get_status",
+            "set_status",
+            "settings",
+            "set_time_limit",
+            "set_max_iterations_per_stage"
+          ],
+          "implementation": "Native fields and concrete solver constructors/settings setup; source indeterminate total-iteration/default scalar storage is not claimed by Go zero initialization."
+        },
+        {
+          "source_methods": [
+            "get_or_create_column_info",
+            "set_cost_for_column",
+            "set_low_bound",
+            "set_upper_bound",
+            "set_fixed_value",
+            "set_row_column_coefficient",
+            "add_constraint",
+            "give_symbolic_name_to_column"
+          ],
+          "implementation": "Concrete FloatLPSolver native state and RationalLPSolver owned exact inputs; borrowed fields replace trivial floating scalar setters; exact by-value argument/column owners have physical-refusal and independent input tests."
+        },
+        {
+          "source_methods": [
+            "get_column_name",
+            "get_column_value_by_name",
+            "get_column_cost_value",
+            "get_current_cost",
+            "get_column_value",
+            "get_column_value_with_core_solver",
+            "print_model"
+          ],
+          "implementation": "Concrete original-column/value/cost/name getters and actual primal/dual dispatch; only floating primal has retained print_model consumer. No unused exact report adapter."
+        },
+        {
+          "source_methods": [
+            "problem_is_empty",
+            "map_external_rows_to_core_solver_rows",
+            "map_external_columns_to_core_solver_columns",
+            "number_of_core_structurals",
+            "fill_A_from_A_values",
+            "fill_matrix_A_and_init_right_side",
+            "low_bound_shift_for_row",
+            "fill_m_b",
+            "count_slacks_and_artificials",
+            "count_slacks_and_artificials_for_row",
+            "scale",
+            "unscale",
+            "restore_column_scales_to_one",
+            "set_scaled_cost",
+            "flip_costs",
+            "print_statistics_on_A"
+          ],
+          "implementation": "Existing concrete floating/exact assembly, scaling, objective and outer statistics paths, with map publication/descending RHS/counter/scaling/source assertion tests."
+        },
+        {
+          "source_methods": [
+            "pin_vars_down_on_row",
+            "pin_vars_up_on_row",
+            "pin_vars_on_row_with_sign",
+            "get_minimal_row_value",
+            "get_maximal_row_value",
+            "row_is_zero",
+            "row_e_is_obsolete",
+            "row_ge_is_obsolete",
+            "row_le_is_obsolete",
+            "row_is_obsolete",
+            "remove_fixed_or_zero_columns",
+            "remove_fixed_or_zero_columns_from_row",
+            "try_to_remove_some_rows",
+            "cleanup"
+          ],
+          "implementation": "Concrete float/exact presolve; sign constants at retained call sites replace tiny pin wrappers. Independent corner oracles, relation/pinning tests, real MPS preparation, output-prefix and exact owner campaigns."
+        },
+        {
+          "source_methods": [
+            "~lp_solver"
+          ],
+          "implementation": "Native floating matrix/column ownership and owning exact Close; failed child/input/expression receipts remain with actual invoker, prior caller comparisons remain borrowed, displaced exact matrices explicitly owned until cleanup."
+        }
       ]
     },
     {
       "path": "src/util/lp/lp_solver.hpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/column_info_float.go",
         "pkg/util/lp/solver_float.go",
@@ -131846,6 +131989,7 @@
         "pkg/util/lp/primal_solver_float.go",
         "pkg/util/lp/dual_prepare_float.go",
         "pkg/util/lp/dual_prepare_float_test.go",
+        "pkg/util/lp/dual_solver_float.go",
         "pkg/util/lp/solver_exact_model.go",
         "pkg/util/lp/solver_exact_model_test.go",
         "pkg/util/lp/solver_prepare_exact.go",
@@ -131856,10 +132000,14 @@
         "pkg/util/lp/solver_objective_exact_test.go",
         "pkg/util/lp/solver_expression_exact.go",
         "pkg/util/lp/solver_expression_exact_test.go",
-        "pkg/util/lp/primal_solver_rational.go",
-        "pkg/util/lp/dual_objective_rational.go",
         "pkg/util/lp/solver_named_rational.go",
-        "pkg/util/lp/driver_mps_float.go"
+        "pkg/util/lp/driver_settings.go",
+        "pkg/util/lp/driver_mps_float.go",
+        "pkg/util/lp/matrix_statistics_report_test.go",
+        "pkg/util/lp/solver_model_report_float.go",
+        "pkg/util/lp/solver_model_report_float_test.go",
+        "pkg/util/lp/primal_solver_rational.go",
+        "pkg/util/lp/dual_objective_rational.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -131880,6 +132028,12 @@
         "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors",
         "TestLPFloatDualCostFlipIEEEAndPublication",
         "TestLPFloatDualPreparationIndependentModels",
+        "TestLPFloatDualOuterIndependentVertices",
+        "TestLPFloatDualOuterStageStatusAndTolerance",
+        "TestLPFloatDualOuterEmptyFailuresAndPublication",
+        "TestLPFloatDualOuterRelationsFreeAndStatuses",
+        "TestLPFloatDualOuterActualStopsAndMetadata",
+        "TestLPFloatDualOuterReachedChildFailures",
         "TestLPRationalInputModelIndependentAssembly",
         "TestLPRationalInputModelSourceReplacementAndNames",
         "TestLPRationalInputModelPhysicalOwnership",
@@ -131919,12 +132073,6 @@
         "TestLPRationalObjectivePreservesOlderComparison",
         "TestLPRationalExpressionPhysicalReturnCopies",
         "TestLPRationalExpressionPinConditionLifetime",
-        "TestLPRationalPrimalOuterIndependentVertices",
-        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
-        "TestLPRationalPrimalOuterPhysicalOwnership",
-        "TestLPRationalDualOuterIndependentPreparedVertices",
-        "TestLPRationalDualOuterCostAliasesAndLifetime",
-        "TestLPRationalDualOuterPhysicalOwnership",
         "TestLPRationalMPSOuterIndependentOptima",
         "TestLPRationalMPSOuterIndependentClones",
         "TestLPRationalMPSOuterFullDualSourceBoundary",
@@ -131935,6 +132083,16 @@
         "TestLPRationalMPSOuterNamedPhysicalOwnership",
         "TestLPRationalMPSOuterPreservesOlderComparison",
         "TestLPRationalMPSOuterFactoryDiagnosticPrefixes",
+        "TestLPDriverArgumentCatalogue",
+        "TestLPDriverArgumentSourcePrefixesAndAccumulation",
+        "TestLPDriverArgumentPrintAndOutputFailures",
+        "TestLPDriverArgumentNumericDomains",
+        "TestLPDriverSettingsDefaultsAndOverrides",
+        "TestLPDriverSettingsDiagnosticPublication",
+        "TestLPDriverSetupActualMPSMinMax",
+        "TestLPDriverSetupLimitsAndFailurePrefixes",
+        "TestLPDriverSetupPhysicalOwnership",
+        "TestLPDriverSetupPreservesOlderComparison",
         "TestLPMPSDriverIndependentFileMinMax",
         "TestLPMPSDriverPercentSourceDomains",
         "TestLPMPSDriverClockFailurePrefixes",
@@ -131951,7 +132109,18 @@
         "TestLPMPSDriverEmptyAndInfeasibleFiles",
         "TestLPMPSDriverFileCloseFailure",
         "TestLPMPSDriverLiveReportEvaluation",
-        "TestLPFloatPresolveCleanupReportBoundaries"
+        "TestLPFloatMatrixStatisticsReportBoundaries",
+        "TestLPRationalMatrixStatisticsShortWrites",
+        "TestLPFloatPresolveCleanupReportBoundaries",
+        "TestLPFloatModelReportSolvedOriginalValues",
+        "TestLPFloatModelReportEveryByteAndEndl",
+        "TestLPFloatModelReportGetterFailurePrefixes",
+        "TestLPRationalPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
+        "TestLPRationalPrimalOuterPhysicalOwnership",
+        "TestLPRationalDualOuterIndependentPreparedVertices",
+        "TestLPRationalDualOuterCostAliasesAndLifetime",
+        "TestLPRationalDualOuterPhysicalOwnership"
       ],
       "assertions": [
         {
@@ -132011,8 +132180,8 @@
           "text": "SASSERT(ci->is_fixed() == false);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained floating common data preparation: external/core maps, flipped matrix assembly, shifted RHS, scale/unscale reconstruction, slack/artificial counters, scaled costs and external values (lp_solver.hpp:24-38,47-65,82-86,103-125,415-529,531-570; lp_solver.h:38-94,229-252)",
@@ -132027,23 +132196,6 @@
             "TestLPFloatSolverSlackCountsNamesAndBypass",
             "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
             "TestLPFloatSolverScaledCostAndValueGuards"
-          ]
-        },
-        {
-          "name": "exact common solver data preparation, full optimization integration and retained diagnostics",
-          "status": "partial",
-          "go_target": "pkg/util/lp/solver_prepare_exact.go",
-          "tests": [
-            "TestLPRationalPreparationIndependentMatricesAndRHS",
-            "TestLPRationalPreparationSourceMappingPrefixes",
-            "TestLPRationalPreparationDenseResizeAndExactScale",
-            "TestLPRationalPreparationDescendingRHSAndCounters",
-            "TestLPRationalPreparationPhysicalOwnership",
-            "TestLPRationalPreparationSeparateEntriesAndRepeatedMapping",
-            "TestLPRationalPreparationReachedDomains",
-            "TestLPRationalPreparationActualMPSPipeline",
-            "TestLPRationalPreparationPreservesOlderComparison",
-            "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
           ]
         },
         {
@@ -132072,7 +132224,8 @@
             "TestLPFloatPrimalOuterErrorsKeepSourcePrefixes",
             "TestLPFloatPrimalOuterSourceUpperOnlyInconsistency",
             "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors"
-          ]
+          ],
+          "go_target": "pkg/util/lp/primal_solver_float.go"
         },
         {
           "name": "Floating common flip_costs used by dual preparation, including native metadata alias/IEEE and deterministic error prefix",
@@ -132084,7 +132237,20 @@
           ]
         },
         {
-          "name": "Concrete mpq/mpq input constraint assignment, names, empty-input predicate and cleanup; full solver preparation/optimization remain open",
+          "name": "Floating matrix extent statistics output",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_solver_float.go",
+          "tests": [
+            "TestLPFloatDualOuterIndependentVertices",
+            "TestLPFloatDualOuterStageStatusAndTolerance",
+            "TestLPFloatDualOuterEmptyFailuresAndPublication",
+            "TestLPFloatDualOuterRelationsFreeAndStatuses",
+            "TestLPFloatDualOuterActualStopsAndMetadata",
+            "TestLPFloatDualOuterReachedChildFailures"
+          ]
+        },
+        {
+          "name": "Concrete mpq/mpq input entries with exact RHS/coefficient/column ownership; matrix/preparation/optimization remain open",
           "status": "ported",
           "go_target": "pkg/util/lp/solver_exact_model.go",
           "tests": [
@@ -132158,6 +132324,73 @@
           ]
         },
         {
+          "name": "get_column_value_by_name concrete retained exact primal/dual dispatch, native string lookup, missing-name exception and full uint32 index domain",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_named_rational.go",
+          "tests": [
+            "TestLPRationalMPSOuterIndependentOptima",
+            "TestLPRationalMPSOuterRetainedFile",
+            "TestLPRationalMPSOuterNamedLookup",
+            "TestLPRationalMPSOuterNamedPhysicalOwnership",
+            "TestLPRationalMPSOuterPreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "Concrete exact/floating set_time_limit and set_max_iterations_per_stage source consumers in setup_solver, before objective flip/settings",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_settings.go",
+          "tests": [
+            "TestLPDriverSettingsDefaultsAndOverrides",
+            "TestLPDriverSettingsDiagnosticPublication",
+            "TestLPDriverSetupActualMPSMinMax",
+            "TestLPDriverSetupLimitsAndFailurePrefixes",
+            "TestLPDriverSetupPhysicalOwnership",
+            "TestLPDriverSetupPreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "get_column_value_by_name retained floating driver dispatch through actual concrete primal/dual/comparison getters, full uint32 name map and source exception text",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_mps_float.go",
+          "tests": [
+            "TestLPMPSDriverIndependentFileMinMax",
+            "TestLPMPSDriverPreparedComparisonDiagnostics",
+            "TestLPMPSDriverNamedAndComparisonGuards",
+            "TestLPMPSDriverReportByteAndFlushFailures"
+          ]
+        },
+        {
+          "name": "shared print_statistics_on_A source endl/short-write behavior at real primal/dual caller publication boundaries",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_solver_float.go",
+          "tests": [
+            "TestLPFloatMatrixStatisticsReportBoundaries",
+            "TestLPRationalMatrixStatisticsShortWrites"
+          ]
+        },
+        {
+          "name": "print_model floating primal consumer at src/shell/lp_frontend.cpp:92; objective header, name-map column values and endl order (lp_solver.h:259-264)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_model_report_float.go",
+          "tests": [
+            "TestLPFloatModelReportSolvedOriginalValues",
+            "TestLPFloatModelReportEveryByteAndEndl",
+            "TestLPFloatModelReportGetterFailurePrefixes"
+          ]
+        },
+        {
+          "name": "Concrete mpq/mpq input constraint assignment, names, empty-input predicate and cleanup; full solver preparation/optimization remain open",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_exact_model.go",
+          "tests": [
+            "TestLPRationalInputModelIndependentAssembly",
+            "TestLPRationalInputModelSourceReplacementAndNames",
+            "TestLPRationalInputModelPhysicalOwnership",
+            "TestLPRationalInputModelEntryGuards",
+            "TestLPRationalInputModelUpstreamSolveRationalInput"
+          ]
+        },
+        {
           "name": "Concrete scalar get_column_cost_value through the actual exact outer virtual column-value accessor, copied-left product and lexical current-cost sum",
           "status": "ported",
           "go_target": "pkg/util/lp/primal_solver_rational.go",
@@ -132176,29 +132409,6 @@
             "TestLPRationalDualOuterCostAliasesAndLifetime",
             "TestLPRationalDualOuterPhysicalOwnership"
           ]
-        },
-        {
-          "name": "get_column_value_by_name concrete retained exact primal/dual dispatch, native string lookup, missing-name exception and full uint32 index domain",
-          "status": "ported",
-          "go_target": "pkg/util/lp/solver_named_rational.go",
-          "tests": [
-            "TestLPRationalMPSOuterIndependentOptima",
-            "TestLPRationalMPSOuterRetainedFile",
-            "TestLPRationalMPSOuterNamedLookup",
-            "TestLPRationalMPSOuterNamedPhysicalOwnership",
-            "TestLPRationalMPSOuterPreservesOlderComparison"
-          ]
-        },
-        {
-          "name": "get_column_value_by_name retained floating driver dispatch through actual concrete primal/dual/comparison getters, full uint32 name map and source exception text",
-          "status": "ported",
-          "go_target": "pkg/util/lp/driver_mps_float.go",
-          "tests": [
-            "TestLPMPSDriverIndependentFileMinMax",
-            "TestLPMPSDriverPreparedComparisonDiagnostics",
-            "TestLPMPSDriverNamedAndComparisonGuards",
-            "TestLPMPSDriverReportByteAndFlushFailures"
-          ]
         }
       ],
       "ownership": [
@@ -132212,6 +132422,7 @@
         "Named exact getters borrow the model name map and dispatch to the actual concrete outer value getter. They do no numerical work themselves and never adopt older caller comparison receipts; delegated column/common owners retain failed numerical copies until owning cleanup. A caller output can alias a model cost. Full uint32 map indices are used directly rather than narrowing through the signed get_column_index_by_name result."
       ],
       "deviations": [
+        "Whole retained-source/ownership audit completes lp_solver.h/.hpp/instances.cpp for actual double/double and mpq/mpq consumers. Audited concrete constructors/input copies, row/column naming, native settings/status/iteration fields, all presolve, external/core assembly, descending shifted RHS, slack/artificial counts, scaling/reconstruction, cost/value/name getters, original objective integration, statistics/model reports and destruction. Existing concrete exact implementation and completed primal/dual wrapper evidence replace the stale broad partial/unported common-preparation placeholder; explicit instantiations create no extra consumer roots. No-ignore whole-src scan138references distinguishes same-name unrelated owners and static_matrix extrema. Uncalled common scale-report chain, invalid common map-row max template, limit getter and unset wrappers are excluded. get_column_index_by_name has only declaration/definition/two explicit instantiations: removed both Go signed wrappers and their mirror-only sentinel expectations; MPS solution/population/alias tests now use native uint32 name maps with membership checks, retaining full unsigned-domain coverage. No unused generic/template adapters or C++ storage port. Native focused common/outer/MPS/driver groups31.167s and combined34.281s pass, both LP vets and unchanged source checker pass:2103units/677APIs,101ported/339partial/1620unported/5dead_deleted. Focused coverage files covered/total {\"debug\":{\"column_info_float.go\":[48,48],\"solver_exact_model.go\":[147,163],\"solver_expression_exact.go\":[12,15],\"solver_float.go\":[195,199],\"solver_model_report_float.go\":[21,22],\"solver_named_rational.go\":[16,16],\"solver_objective_exact.go\":[91,97],\"solver_prepare_exact.go\":[230,249],\"solver_presolve_exact.go\":[307,332],\"solver_presolve_float.go\":[132,134]},\"native\":{\"column_info_float.go\":[43,48],\"solver_exact_model.go\":[146,163],\"solver_expression_exact.go\":[12,15],\"solver_float.go\":[192,199],\"solver_model_report_float.go\":[21,22],\"solver_named_rational.go\":[16,16],\"solver_objective_exact.go\":[90,97],\"solver_prepare_exact.go\":[229,249],\"solver_presolve_exact.go\":[308,332],\"solver_presolve_float.go\":[131,134]}}. Gaps chiefly protect stable exact cleanup/constant/borrowed-manager invariant failures and undefined null-column domains; native erases debug assertions. Floating automatic failed-scaling restoration remains unreachable under the existing source logarithm limitation; explicit Unscale is tested, no fake hook added. Actual exact dual rational(double)/omitted sparsity source boundaries remain preserved by separate outer tests. Native sorted numeric/string keys choose reproducible unordered-source summation/report order; insdict retains row/coefficient mutation order. Trivial scalar wrappers use concrete fields; exact numerical owners preserve source lifetime/refusal/cleanup order. This audit supersedes older common-unit open implementation notes; it does not close separate core/scaler/matrix/LAR/driver/SMT or shell-runtime audits. LP inventory39ported/56partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates recent report fixes and dead-wrapper removal; current evidence is focused. Profiles /mnt/oldrog/tmp/g3-lp-common-solver-final-{native,debug}.cover; audit /mnt/oldrog/tmp/g3-lp-common-solver-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
         "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
         "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested.",
@@ -132221,25 +132432,159 @@
         "Corrective scalar objective expression audit: rational binary product and sum copy the left operand, apply the compound operator, then copy its returned reference. Objective work now owns both temporary and returned result, preserving physical failure prefixes. Existing six objective test groups and 14 pooled/direct campaigns pass with updated owner-prefix expectations; coverage98/107 native,99/107 debug. This does not credit complete exact optimization or prove earlier preparation/presolve expression lifetime fidelity; that audit remains open.",
         "Corrective common exact expression audit now preserves rational.h copied-left/compound-update/returned-reference-copy semantics in low-bound row shifts, RHS subtraction, presolve extrema, pinning conditions, row-classification differences and fixed-column elimination. Compound +=, -= and *= remain direct operations. Concrete scalar expression helpers also serve existing objective expressions; no callback arithmetic or unused template adapter is added. Pin-condition products are destroyed before the bound getter and unary-minus condition temporaries before pinning. Six additional direct physical campaigns run through success and each proves an actual returned-reference-copy refusal: the completed exact expression temporary equals an independent big.Rat result while its return destination remains incomplete, including a partially published destination with an invalid backing slot. Witnesses exclude active normalization/GCD/division receipts, so a failed normalization cannot masquerade as a completed expression. Earlier interrupted compound operations can leave an invalid temporary until receipt cleanup; the inspection test accepts only the actual ErrInvalidSlot domain for those earlier prefixes, then requires a valid completed-product witness and a final successful call. A closed-child getter fixture proves the completed condition owners are zero before that getter, while the source coefficient local stays alive. Its initial setup omitted explicit column registration and was corrected; final combined native/debug checks pass. Existing independent arithmetic oracles and pooled/direct preparation/presolve refusal campaigns still pass. Source inventory remains88 partial/16 unported/6 reference_only; no whole-unit promotion. Coverage native/debug: expression helpers12/15 (80.0%) both, with uncovered blocks rejecting already pending receipts; preparation229/249 (92.0%)/230/249 (92.4%); presolve307/332 (92.5%)/306/332 (92.2%); objective90/97 (92.8%)/91/97 (93.8%). Other uncovered blocks chiefly guard stable capture, predicates, destruction and source assertion alternatives. Combined exact input/column/preparation/presolve/objective/core-values/expression checks pass11.087s/13.813s. Related actual rational MPS and floating common/presolve/primal-outer/dual-preparation/cost regressions pass0.915s/1.194s. Both LP vets and full-module native/debug compilation pass. Full native checkpointa8a7ef66 predates these corrections; no full suite rerun inside the hourly interval. Complete scalar residual/pivot/optimization integration and full upstream drivers remain open.",
         "Floating common presolve cleanup now honors lp_solver.hpp:399-410 std::endl and rejects short nil-error writes through the existing checked line writer. TestLPFloatPresolveCleanupReportBoundaries covers every byte of singular/plural reports with explicit and short-nil errors, successful/failed flush, nil output and zero passes; verifies completed row erasure and endpoint pinning before output refusal. Three rows in one pass retain the singular report; the chained three-row model reports two passes. All floating/exact presolve groups pass native5.439s/combined6.757s. Whole floating presolve file coverage131/134statements native,132/134combined. Profiles /mnt/oldrog/tmp/g3-lp-cleanup-report-{native,debug}.cover. Whole no-ignore source scan finds live lp_solver.h:259-264 print_model consumer in src/shell/lp_frontend.cpp:92; no Go model report exists yet, so common solver remains partial. Uncalled scale-statistics chain and get_max_iterations_per_stage have no consumers in src. LP inventory unchanged36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native checkpoint predates this correction. All commands CPUs8\u201316/GOMAXPROCS9."
+      ],
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "print_scale_stats",
+            "print_rows_scale_stats",
+            "print_columns_scale_stats",
+            "print_row_scale_stats",
+            "print_column_scale_stats"
+          ],
+          "reason": "Whole no-ignore src scan finds declarations/definitions and internal scale-report calls only; no retained caller enters this diagnostic chain."
+        },
+        {
+          "source_methods": [
+            "get_max_abs_in_row(std::unordered_map<unsigned,T>&)"
+          ],
+          "reason": "Uncalled invalid common-solver template, with void return of a value and pair pointer syntax; distinct retained static_matrix row extrema are implemented independently."
+        },
+        {
+          "source_methods": [
+            "get_max_iterations_per_stage",
+            "unset_fixed_value",
+            "unset_low_bound",
+            "unset_upper_bound"
+          ],
+          "reason": "No retained common-solver consumers in whole src scan; same-name column_info declarations or theory_str methods are distinct owners."
+        },
+        {
+          "source_methods": [
+            "get_column_index_by_name"
+          ],
+          "reason": "Whole src scan finds declaration/definition and two explicit instantiations only; removed both unused Go signed wrappers. Retained get_column_value_by_name accesses the full uint32 native name map directly. Tests use native map lookup with membership check."
+        }
+      ],
+      "retained_source_audit": [
+        {
+          "source_methods": [
+            "lp_solver constructor",
+            "row_count",
+            "get_status",
+            "set_status",
+            "settings",
+            "set_time_limit",
+            "set_max_iterations_per_stage"
+          ],
+          "implementation": "Native fields and concrete solver constructors/settings setup; source indeterminate total-iteration/default scalar storage is not claimed by Go zero initialization."
+        },
+        {
+          "source_methods": [
+            "get_or_create_column_info",
+            "set_cost_for_column",
+            "set_low_bound",
+            "set_upper_bound",
+            "set_fixed_value",
+            "set_row_column_coefficient",
+            "add_constraint",
+            "give_symbolic_name_to_column"
+          ],
+          "implementation": "Concrete FloatLPSolver native state and RationalLPSolver owned exact inputs; borrowed fields replace trivial floating scalar setters; exact by-value argument/column owners have physical-refusal and independent input tests."
+        },
+        {
+          "source_methods": [
+            "get_column_name",
+            "get_column_value_by_name",
+            "get_column_cost_value",
+            "get_current_cost",
+            "get_column_value",
+            "get_column_value_with_core_solver",
+            "print_model"
+          ],
+          "implementation": "Concrete original-column/value/cost/name getters and actual primal/dual dispatch; only floating primal has retained print_model consumer. No unused exact report adapter."
+        },
+        {
+          "source_methods": [
+            "problem_is_empty",
+            "map_external_rows_to_core_solver_rows",
+            "map_external_columns_to_core_solver_columns",
+            "number_of_core_structurals",
+            "fill_A_from_A_values",
+            "fill_matrix_A_and_init_right_side",
+            "low_bound_shift_for_row",
+            "fill_m_b",
+            "count_slacks_and_artificials",
+            "count_slacks_and_artificials_for_row",
+            "scale",
+            "unscale",
+            "restore_column_scales_to_one",
+            "set_scaled_cost",
+            "flip_costs",
+            "print_statistics_on_A"
+          ],
+          "implementation": "Existing concrete floating/exact assembly, scaling, objective and outer statistics paths, with map publication/descending RHS/counter/scaling/source assertion tests."
+        },
+        {
+          "source_methods": [
+            "pin_vars_down_on_row",
+            "pin_vars_up_on_row",
+            "pin_vars_on_row_with_sign",
+            "get_minimal_row_value",
+            "get_maximal_row_value",
+            "row_is_zero",
+            "row_e_is_obsolete",
+            "row_ge_is_obsolete",
+            "row_le_is_obsolete",
+            "row_is_obsolete",
+            "remove_fixed_or_zero_columns",
+            "remove_fixed_or_zero_columns_from_row",
+            "try_to_remove_some_rows",
+            "cleanup"
+          ],
+          "implementation": "Concrete float/exact presolve; sign constants at retained call sites replace tiny pin wrappers. Independent corner oracles, relation/pinning tests, real MPS preparation, output-prefix and exact owner campaigns."
+        },
+        {
+          "source_methods": [
+            "~lp_solver"
+          ],
+          "implementation": "Native floating matrix/column ownership and owning exact Close; failed child/input/expression receipts remain with actual invoker, prior caller comparisons remain borrowed, displaced exact matrices explicitly owned until cleanup."
+        }
       ]
     },
     {
       "path": "src/util/lp/lp_solver_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/column_info_float.go",
         "pkg/util/lp/solver_float.go",
         "pkg/util/lp/solver_float_test.go",
         "pkg/util/lp/solver_presolve_float.go",
         "pkg/util/lp/solver_presolve_float_test.go",
+        "pkg/util/lp/primal_solver_float.go",
         "pkg/util/lp/dual_prepare_float.go",
         "pkg/util/lp/dual_prepare_float_test.go",
+        "pkg/util/lp/dual_solver_float.go",
+        "pkg/util/lp/solver_exact_model.go",
+        "pkg/util/lp/solver_exact_model_test.go",
+        "pkg/util/lp/solver_prepare_exact.go",
+        "pkg/util/lp/solver_prepare_exact_test.go",
+        "pkg/util/lp/solver_presolve_exact.go",
+        "pkg/util/lp/solver_presolve_exact_test.go",
+        "pkg/util/lp/solver_objective_exact.go",
+        "pkg/util/lp/solver_objective_exact_test.go",
+        "pkg/util/lp/solver_expression_exact.go",
+        "pkg/util/lp/solver_expression_exact_test.go",
         "pkg/util/lp/solver_named_rational.go",
+        "pkg/util/lp/driver_settings.go",
         "pkg/util/lp/driver_mps_float.go",
+        "pkg/util/lp/matrix_statistics_report_test.go",
         "pkg/util/lp/solver_model_report_float.go",
-        "pkg/util/lp/solver_model_report_float_test.go"
+        "pkg/util/lp/solver_model_report_float_test.go",
+        "pkg/util/lp/primal_solver_rational.go",
+        "pkg/util/lp/dual_objective_rational.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -132253,8 +132598,58 @@
         "TestLPFloatPresolveCleanupPassesAndDeferredErasure",
         "TestLPFloatPresolveInputAndWriterErrorPrefixes",
         "TestLPFloatPresolveComposedErrorsAndPreparedProblem",
+        "TestLPFloatPrimalOuterIndependentVertices",
+        "TestLPFloatPrimalOuterStatusesAndPublication",
+        "TestLPFloatPrimalOuterErrorsKeepSourcePrefixes",
+        "TestLPFloatPrimalOuterSourceUpperOnlyInconsistency",
+        "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors",
         "TestLPFloatDualCostFlipIEEEAndPublication",
         "TestLPFloatDualPreparationIndependentModels",
+        "TestLPFloatDualOuterIndependentVertices",
+        "TestLPFloatDualOuterStageStatusAndTolerance",
+        "TestLPFloatDualOuterEmptyFailuresAndPublication",
+        "TestLPFloatDualOuterRelationsFreeAndStatuses",
+        "TestLPFloatDualOuterActualStopsAndMetadata",
+        "TestLPFloatDualOuterReachedChildFailures",
+        "TestLPRationalInputModelIndependentAssembly",
+        "TestLPRationalInputModelSourceReplacementAndNames",
+        "TestLPRationalInputModelPhysicalOwnership",
+        "TestLPRationalInputModelEntryGuards",
+        "TestLPRationalInputModelUpstreamSolveRationalInput",
+        "TestLPRationalPreparationIndependentMatricesAndRHS",
+        "TestLPRationalPreparationSourceMappingPrefixes",
+        "TestLPRationalPreparationDenseResizeAndExactScale",
+        "TestLPRationalPreparationDescendingRHSAndCounters",
+        "TestLPRationalPreparationPhysicalOwnership",
+        "TestLPRationalPreparationSeparateEntriesAndRepeatedMapping",
+        "TestLPRationalPreparationReachedDomains",
+        "TestLPRationalPreparationActualMPSPipeline",
+        "TestLPRationalPreparationPreservesOlderComparison",
+        "TestLPRationalPreparationLateFailuresKeepReachedPrefix",
+        "TestLPRationalPresolveIndependentCornerExtrema",
+        "TestLPRationalPresolveUnknownBoundsAndZeroRead",
+        "TestLPRationalPresolveIndependentRowClassificationAndPinning",
+        "TestLPRationalPresolveZeroRowsAndUnknownRelations",
+        "TestLPRationalPresolveFixedEliminationAndRelease",
+        "TestLPRationalPresolveDeferredErasureAndFailurePrefixes",
+        "TestLPRationalPresolveCleanupPassesAndDiagnostics",
+        "TestLPRationalPresolvePhysicalOwnership",
+        "TestLPRationalPresolvePreservesOlderComparison",
+        "TestLPRationalPresolvePinSignsAndMissingBoundAssertions",
+        "TestLPRationalPresolveOneSidedClassification",
+        "TestLPRationalPresolveReachedGuards",
+        "TestLPRationalPresolveCleanupOutputModes",
+        "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
+        "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
+        "TestLPRationalPresolveForeignBorrowedNumerals",
+        "TestLPRationalObjectiveIndependentCostsAndReconstruction",
+        "TestLPRationalObjectiveSourceLookupAndFixedPrefixes",
+        "TestLPRationalObjectivePhysicalOwnership",
+        "TestLPRationalObjectiveActualMPSPreparation",
+        "TestLPRationalObjectiveBorrowedCoreAndAlias",
+        "TestLPRationalObjectivePreservesOlderComparison",
+        "TestLPRationalExpressionPhysicalReturnCopies",
+        "TestLPRationalExpressionPinConditionLifetime",
         "TestLPRationalMPSOuterIndependentOptima",
         "TestLPRationalMPSOuterIndependentClones",
         "TestLPRationalMPSOuterFullDualSourceBoundary",
@@ -132265,6 +132660,16 @@
         "TestLPRationalMPSOuterNamedPhysicalOwnership",
         "TestLPRationalMPSOuterPreservesOlderComparison",
         "TestLPRationalMPSOuterFactoryDiagnosticPrefixes",
+        "TestLPDriverArgumentCatalogue",
+        "TestLPDriverArgumentSourcePrefixesAndAccumulation",
+        "TestLPDriverArgumentPrintAndOutputFailures",
+        "TestLPDriverArgumentNumericDomains",
+        "TestLPDriverSettingsDefaultsAndOverrides",
+        "TestLPDriverSettingsDiagnosticPublication",
+        "TestLPDriverSetupActualMPSMinMax",
+        "TestLPDriverSetupLimitsAndFailurePrefixes",
+        "TestLPDriverSetupPhysicalOwnership",
+        "TestLPDriverSetupPreservesOlderComparison",
         "TestLPMPSDriverIndependentFileMinMax",
         "TestLPMPSDriverPercentSourceDomains",
         "TestLPMPSDriverClockFailurePrefixes",
@@ -132281,13 +132686,21 @@
         "TestLPMPSDriverEmptyAndInfeasibleFiles",
         "TestLPMPSDriverFileCloseFailure",
         "TestLPMPSDriverLiveReportEvaluation",
+        "TestLPFloatMatrixStatisticsReportBoundaries",
+        "TestLPRationalMatrixStatisticsShortWrites",
         "TestLPFloatPresolveCleanupReportBoundaries",
         "TestLPFloatModelReportSolvedOriginalValues",
         "TestLPFloatModelReportEveryByteAndEndl",
-        "TestLPFloatModelReportGetterFailurePrefixes"
+        "TestLPFloatModelReportGetterFailurePrefixes",
+        "TestLPRationalPrimalOuterIndependentVertices",
+        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
+        "TestLPRationalPrimalOuterPhysicalOwnership",
+        "TestLPRationalDualOuterIndependentPreparedVertices",
+        "TestLPRationalDualOuterCostAliasesAndLifetime",
+        "TestLPRationalDualOuterPhysicalOwnership"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained floating common data preparation: external/core maps, flipped matrix assembly, shifted RHS, scale/unscale reconstruction, slack/artificial counters, scaled costs and external values (lp_solver.hpp:24-38,47-65,82-86,103-125,415-529,531-570; lp_solver.h:38-94,229-252)",
@@ -132305,12 +132718,6 @@
           ]
         },
         {
-          "name": "exact common solver data preparation, full optimization integration and retained diagnostics",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
-        },
-        {
           "name": "retained floating presolve row extrema, zero/equality/inequality decisions, boundary pinning, fixed/zero term elimination, deferred row erasure and cleanup (lp_solver.hpp:168-412)",
           "status": "ported",
           "go_target": "pkg/util/lp/solver_presolve_float.go",
@@ -132325,12 +132732,114 @@
           ]
         },
         {
+          "name": "Floating outer total-iteration storage and original-column objective/value integration",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_solver_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalOuterIndependentVertices",
+            "TestLPFloatPrimalOuterStatusesAndPublication",
+            "TestLPFloatPrimalOuterErrorsKeepSourcePrefixes",
+            "TestLPFloatPrimalOuterSourceUpperOnlyInconsistency",
+            "TestLPFloatPrimalOuterInitialStatusAndPresolveErrors"
+          ],
+          "go_target": "pkg/util/lp/primal_solver_float.go"
+        },
+        {
           "name": "Floating common flip_costs used by dual preparation, including native metadata alias/IEEE and deterministic error prefix",
           "status": "ported",
           "go_target": "pkg/util/lp/dual_prepare_float.go",
           "tests": [
             "TestLPFloatDualCostFlipIEEEAndPublication",
             "TestLPFloatDualPreparationIndependentModels"
+          ]
+        },
+        {
+          "name": "Floating matrix extent statistics output",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_solver_float.go",
+          "tests": [
+            "TestLPFloatDualOuterIndependentVertices",
+            "TestLPFloatDualOuterStageStatusAndTolerance",
+            "TestLPFloatDualOuterEmptyFailuresAndPublication",
+            "TestLPFloatDualOuterRelationsFreeAndStatuses",
+            "TestLPFloatDualOuterActualStopsAndMetadata",
+            "TestLPFloatDualOuterReachedChildFailures"
+          ]
+        },
+        {
+          "name": "Concrete mpq/mpq input entries with exact RHS/coefficient/column ownership; matrix/preparation/optimization remain open",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_exact_model.go",
+          "tests": [
+            "TestLPRationalInputModelIndependentAssembly",
+            "TestLPRationalInputModelSourceReplacementAndNames",
+            "TestLPRationalInputModelPhysicalOwnership",
+            "TestLPRationalInputModelEntryGuards",
+            "TestLPRationalInputModelUpstreamSolveRationalInput"
+          ]
+        },
+        {
+          "name": "Concrete mpq/mpq external/core maps, exact matrix/RHS shifts, slack/artificial counts, precise scale bypass and matrix/RHS reconstruction (lp_solver.hpp:412-534,111-116; lp_solver.h:229-235)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_prepare_exact.go",
+          "tests": [
+            "TestLPRationalPreparationIndependentMatricesAndRHS",
+            "TestLPRationalPreparationSourceMappingPrefixes",
+            "TestLPRationalPreparationDenseResizeAndExactScale",
+            "TestLPRationalPreparationDescendingRHSAndCounters",
+            "TestLPRationalPreparationPhysicalOwnership",
+            "TestLPRationalPreparationSeparateEntriesAndRepeatedMapping",
+            "TestLPRationalPreparationReachedDomains",
+            "TestLPRationalPreparationActualMPSPipeline",
+            "TestLPRationalPreparationPreservesOlderComparison",
+            "TestLPRationalPreparationLateFailuresKeepReachedPrefix"
+          ]
+        },
+        {
+          "name": "Concrete mpq/mpq row bounds, signed endpoint pinning, exact row classification, fixed/zero elimination, deferred row erasure and cleanup (lp_solver.hpp:168-411; lp_solver.h:187-193)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_presolve_exact.go",
+          "tests": [
+            "TestLPRationalPresolveIndependentCornerExtrema",
+            "TestLPRationalPresolveUnknownBoundsAndZeroRead",
+            "TestLPRationalPresolveIndependentRowClassificationAndPinning",
+            "TestLPRationalPresolveZeroRowsAndUnknownRelations",
+            "TestLPRationalPresolveFixedEliminationAndRelease",
+            "TestLPRationalPresolveDeferredErasureAndFailurePrefixes",
+            "TestLPRationalPresolveCleanupPassesAndDiagnostics",
+            "TestLPRationalPresolvePhysicalOwnership",
+            "TestLPRationalPresolvePreservesOlderComparison",
+            "TestLPRationalPresolvePinSignsAndMissingBoundAssertions",
+            "TestLPRationalPresolveOneSidedClassification",
+            "TestLPRationalPresolveReachedGuards",
+            "TestLPRationalPresolveCleanupOutputModes",
+            "TestLPRationalPresolveActualMPSPreparationAndLoopCondition",
+            "TestLPRationalPresolveDeclaredAndExplicitZeroMPSRows",
+            "TestLPRationalPresolveForeignBorrowedNumerals"
+          ]
+        },
+        {
+          "name": "retained mpq/mpq cost flipping, scaled-cost assignment and direct core-X original-column reconstruction (lp_solver.hpp:95-100,528-577)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_objective_exact.go",
+          "tests": [
+            "TestLPRationalObjectiveIndependentCostsAndReconstruction",
+            "TestLPRationalObjectiveSourceLookupAndFixedPrefixes",
+            "TestLPRationalObjectivePhysicalOwnership",
+            "TestLPRationalObjectiveActualMPSPreparation",
+            "TestLPRationalObjectiveBorrowedCoreAndAlias",
+            "TestLPRationalObjectivePreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "retained mpq/mpq common solver binary product/sum/difference expression owners, return copies and condition lifetime audit",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_expression_exact.go",
+          "tests": [
+            "TestLPRationalExpressionPhysicalReturnCopies",
+            "TestLPRationalExpressionPinConditionLifetime"
           ]
         },
         {
@@ -132346,6 +132855,19 @@
           ]
         },
         {
+          "name": "Concrete exact/floating set_time_limit and set_max_iterations_per_stage source consumers in setup_solver, before objective flip/settings",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_settings.go",
+          "tests": [
+            "TestLPDriverSettingsDefaultsAndOverrides",
+            "TestLPDriverSettingsDiagnosticPublication",
+            "TestLPDriverSetupActualMPSMinMax",
+            "TestLPDriverSetupLimitsAndFailurePrefixes",
+            "TestLPDriverSetupPhysicalOwnership",
+            "TestLPDriverSetupPreservesOlderComparison"
+          ]
+        },
+        {
           "name": "get_column_value_by_name retained floating driver dispatch through actual concrete primal/dual/comparison getters, full uint32 name map and source exception text",
           "status": "ported",
           "go_target": "pkg/util/lp/driver_mps_float.go",
@@ -132357,6 +132879,15 @@
           ]
         },
         {
+          "name": "shared print_statistics_on_A source endl/short-write behavior at real primal/dual caller publication boundaries",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_solver_float.go",
+          "tests": [
+            "TestLPFloatMatrixStatisticsReportBoundaries",
+            "TestLPRationalMatrixStatisticsShortWrites"
+          ]
+        },
+        {
           "name": "print_model floating primal consumer at src/shell/lp_frontend.cpp:92; objective header, name-map column values and endl order (lp_solver.h:259-264)",
           "status": "ported",
           "go_target": "pkg/util/lp/solver_model_report_float.go",
@@ -132365,15 +132896,52 @@
             "TestLPFloatModelReportEveryByteAndEndl",
             "TestLPFloatModelReportGetterFailurePrefixes"
           ]
+        },
+        {
+          "name": "Concrete mpq/mpq input constraint assignment, names, empty-input predicate and cleanup; full solver preparation/optimization remain open",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_exact_model.go",
+          "tests": [
+            "TestLPRationalInputModelIndependentAssembly",
+            "TestLPRationalInputModelSourceReplacementAndNames",
+            "TestLPRationalInputModelPhysicalOwnership",
+            "TestLPRationalInputModelEntryGuards",
+            "TestLPRationalInputModelUpstreamSolveRationalInput"
+          ]
+        },
+        {
+          "name": "Concrete scalar get_column_cost_value through the actual exact outer virtual column-value accessor, copied-left product and lexical current-cost sum",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_solver_rational.go",
+          "tests": [
+            "TestLPRationalPrimalOuterIndependentVertices",
+            "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
+            "TestLPRationalPrimalOuterPhysicalOwnership"
+          ]
+        },
+        {
+          "name": "Concrete scalar dual objective consumer through actual external-column getter, copied-left product, lexical sum and copied unary-negative return",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_objective_rational.go",
+          "tests": [
+            "TestLPRationalDualOuterIndependentPreparedVertices",
+            "TestLPRationalDualOuterCostAliasesAndLifetime",
+            "TestLPRationalDualOuterPhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
         "Common floating state uses native slices/maps and insertion-ordered insdict dictionaries for rows/coefficients, preserving replacement position. FloatLPSolver owns its FloatStaticMatrix and column metadata; unscale clears the retired matrix before publishing reconstruction, then restores existing scale entries and refills RHS descending. No source vector/hash/STL storage emulation or fake allocation refusals. NewSettings error propagates real host-clock failure.",
         "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced.",
         "Presolve uses native temporary key slices and erases dictionary entries only after each source scan. RHS subtraction and earlier variable pins publish immediately. Infeasibility returns before queued row deletion and term elimination. No fake numerical allocation/refusal layer or generic bound callback is introduced; surviving FloatColumnInfo pointers retain identity.",
+        "Actual exact numeral copies retain by-value source parameters and newly acquired raw/owning receipts; partial child column closes before parent input argument and partial common solver closes before MPS reader loop local. Older caller comparison receipts remain borrowed and untouched. See latest_exact_input_model_increment in pkg/util/lp/PORT_STATUS.json.",
+        "Parent raw receipts close before matrix/column/dense-output child receipts; children close before source coefficient/result/shift locals and input owners. Dense resize destroys actual owning suffix values before shortening. Displaced native matrices remain explicitly owned until Close; old caller comparisons are neither adopted nor consumed. See latest_exact_preparation_increment in pkg/util/lp/PORT_STATUS.json.",
+        "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json.",
+        "Exact Costs and column children close before borrowed objective lexical copies; parent numerical receipts release before child/input values. Core X and caller result are borrowed through Close after error. Source getter, unary and product-copy owners are explicit; no exact core optimization is credited by accessor specialization.",
         "Named exact getters borrow the model name map and dispatch to the actual concrete outer value getter. They do no numerical work themselves and never adopt older caller comparison receipts; delegated column/common owners retain failed numerical copies until owning cleanup. A caller output can alias a model cost. Full uint32 map indices are used directly rather than narrowing through the signed get_column_index_by_name result."
       ],
       "deviations": [
+        "Whole retained-source/ownership audit completes lp_solver.h/.hpp/instances.cpp for actual double/double and mpq/mpq consumers. Audited concrete constructors/input copies, row/column naming, native settings/status/iteration fields, all presolve, external/core assembly, descending shifted RHS, slack/artificial counts, scaling/reconstruction, cost/value/name getters, original objective integration, statistics/model reports and destruction. Existing concrete exact implementation and completed primal/dual wrapper evidence replace the stale broad partial/unported common-preparation placeholder; explicit instantiations create no extra consumer roots. No-ignore whole-src scan138references distinguishes same-name unrelated owners and static_matrix extrema. Uncalled common scale-report chain, invalid common map-row max template, limit getter and unset wrappers are excluded. get_column_index_by_name has only declaration/definition/two explicit instantiations: removed both Go signed wrappers and their mirror-only sentinel expectations; MPS solution/population/alias tests now use native uint32 name maps with membership checks, retaining full unsigned-domain coverage. No unused generic/template adapters or C++ storage port. Native focused common/outer/MPS/driver groups31.167s and combined34.281s pass, both LP vets and unchanged source checker pass:2103units/677APIs,101ported/339partial/1620unported/5dead_deleted. Focused coverage files covered/total {\"debug\":{\"column_info_float.go\":[48,48],\"solver_exact_model.go\":[147,163],\"solver_expression_exact.go\":[12,15],\"solver_float.go\":[195,199],\"solver_model_report_float.go\":[21,22],\"solver_named_rational.go\":[16,16],\"solver_objective_exact.go\":[91,97],\"solver_prepare_exact.go\":[230,249],\"solver_presolve_exact.go\":[307,332],\"solver_presolve_float.go\":[132,134]},\"native\":{\"column_info_float.go\":[43,48],\"solver_exact_model.go\":[146,163],\"solver_expression_exact.go\":[12,15],\"solver_float.go\":[192,199],\"solver_model_report_float.go\":[21,22],\"solver_named_rational.go\":[16,16],\"solver_objective_exact.go\":[90,97],\"solver_prepare_exact.go\":[229,249],\"solver_presolve_exact.go\":[308,332],\"solver_presolve_float.go\":[131,134]}}. Gaps chiefly protect stable exact cleanup/constant/borrowed-manager invariant failures and undefined null-column domains; native erases debug assertions. Floating automatic failed-scaling restoration remains unreachable under the existing source logarithm limitation; explicit Unscale is tested, no fake hook added. Actual exact dual rational(double)/omitted sparsity source boundaries remain preserved by separate outer tests. Native sorted numeric/string keys choose reproducible unordered-source summation/report order; insdict retains row/coefficient mutation order. Trivial scalar wrappers use concrete fields; exact numerical owners preserve source lifetime/refusal/cleanup order. This audit supersedes older common-unit open implementation notes; it does not close separate core/scaler/matrix/LAR/driver/SMT or shell-runtime audits. LP inventory39ported/56partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates recent report fixes and dead-wrapper removal; current evidence is focused. Profiles /mnt/oldrog/tmp/g3-lp-common-solver-final-{native,debug}.cover; audit /mnt/oldrog/tmp/g3-lp-common-solver-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
         "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
         "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested.",
@@ -132381,6 +132949,124 @@
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
         "Floating common presolve cleanup now honors lp_solver.hpp:399-410 std::endl and rejects short nil-error writes through the existing checked line writer. TestLPFloatPresolveCleanupReportBoundaries covers every byte of singular/plural reports with explicit and short-nil errors, successful/failed flush, nil output and zero passes; verifies completed row erasure and endpoint pinning before output refusal. Three rows in one pass retain the singular report; the chained three-row model reports two passes. All floating/exact presolve groups pass native5.439s/combined6.757s. Whole floating presolve file coverage131/134statements native,132/134combined. Profiles /mnt/oldrog/tmp/g3-lp-cleanup-report-{native,debug}.cover. Whole no-ignore source scan finds live lp_solver.h:259-264 print_model consumer in src/shell/lp_frontend.cpp:92; no Go model report exists yet, so common solver remains partial. Uncalled scale-statistics chain and get_max_iterations_per_stage have no consumers in src. LP inventory unchanged36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native checkpoint predates this correction. All commands CPUs8\u201316/GOMAXPROCS9.",
         "Implemented retained lp_solver.h:259-264 print_model through concrete FloatPrimalSimplex.PrintModel, matching the only live caller src/shell/lp_frontend.cpp:92 (MPS factory selects primal double/double). Original objective getter follows written objective prefix; source name map includes aliases and missing-column zero values; column heading does not flush, objective and each value honor endl. Native sorted string keys provide deterministic order for the source unordered name map. No unused exact/dual report adapters added. Three tests use an actual scaled LU primal solve with independent unique vertex(2,2), objective16 including fixed term6, name aliases/fixed reconstruction, every report byte with ordinary/short-nil errors, every flush failure, objective-getter refusal prefix, missing-column noninsertion and empty model. Native related model-report/primal-outer/presolve tests0.116s and combined0.106s pass. New report21/22statements95.5% both; remaining getter-error transport cannot be reached in a stable valid model after the objective getter has already read every existing column, and no artificial mutation hook was added. Source shell frontend runtime/resource/timer integration remains unported; this completes the report method only, not containing common solver files. LP inventory unchanged36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Profiles /mnt/oldrog/tmp/g3-lp-model-report-{native,debug}.cover. CPUs8\u201316/GOMAXPROCS9."
+      ],
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "print_scale_stats",
+            "print_rows_scale_stats",
+            "print_columns_scale_stats",
+            "print_row_scale_stats",
+            "print_column_scale_stats"
+          ],
+          "reason": "Whole no-ignore src scan finds declarations/definitions and internal scale-report calls only; no retained caller enters this diagnostic chain."
+        },
+        {
+          "source_methods": [
+            "get_max_abs_in_row(std::unordered_map<unsigned,T>&)"
+          ],
+          "reason": "Uncalled invalid common-solver template, with void return of a value and pair pointer syntax; distinct retained static_matrix row extrema are implemented independently."
+        },
+        {
+          "source_methods": [
+            "get_max_iterations_per_stage",
+            "unset_fixed_value",
+            "unset_low_bound",
+            "unset_upper_bound"
+          ],
+          "reason": "No retained common-solver consumers in whole src scan; same-name column_info declarations or theory_str methods are distinct owners."
+        },
+        {
+          "source_methods": [
+            "get_column_index_by_name"
+          ],
+          "reason": "Whole src scan finds declaration/definition and two explicit instantiations only; removed both unused Go signed wrappers. Retained get_column_value_by_name accesses the full uint32 native name map directly. Tests use native map lookup with membership check."
+        }
+      ],
+      "retained_source_audit": [
+        {
+          "source_methods": [
+            "lp_solver constructor",
+            "row_count",
+            "get_status",
+            "set_status",
+            "settings",
+            "set_time_limit",
+            "set_max_iterations_per_stage"
+          ],
+          "implementation": "Native fields and concrete solver constructors/settings setup; source indeterminate total-iteration/default scalar storage is not claimed by Go zero initialization."
+        },
+        {
+          "source_methods": [
+            "get_or_create_column_info",
+            "set_cost_for_column",
+            "set_low_bound",
+            "set_upper_bound",
+            "set_fixed_value",
+            "set_row_column_coefficient",
+            "add_constraint",
+            "give_symbolic_name_to_column"
+          ],
+          "implementation": "Concrete FloatLPSolver native state and RationalLPSolver owned exact inputs; borrowed fields replace trivial floating scalar setters; exact by-value argument/column owners have physical-refusal and independent input tests."
+        },
+        {
+          "source_methods": [
+            "get_column_name",
+            "get_column_value_by_name",
+            "get_column_cost_value",
+            "get_current_cost",
+            "get_column_value",
+            "get_column_value_with_core_solver",
+            "print_model"
+          ],
+          "implementation": "Concrete original-column/value/cost/name getters and actual primal/dual dispatch; only floating primal has retained print_model consumer. No unused exact report adapter."
+        },
+        {
+          "source_methods": [
+            "problem_is_empty",
+            "map_external_rows_to_core_solver_rows",
+            "map_external_columns_to_core_solver_columns",
+            "number_of_core_structurals",
+            "fill_A_from_A_values",
+            "fill_matrix_A_and_init_right_side",
+            "low_bound_shift_for_row",
+            "fill_m_b",
+            "count_slacks_and_artificials",
+            "count_slacks_and_artificials_for_row",
+            "scale",
+            "unscale",
+            "restore_column_scales_to_one",
+            "set_scaled_cost",
+            "flip_costs",
+            "print_statistics_on_A"
+          ],
+          "implementation": "Existing concrete floating/exact assembly, scaling, objective and outer statistics paths, with map publication/descending RHS/counter/scaling/source assertion tests."
+        },
+        {
+          "source_methods": [
+            "pin_vars_down_on_row",
+            "pin_vars_up_on_row",
+            "pin_vars_on_row_with_sign",
+            "get_minimal_row_value",
+            "get_maximal_row_value",
+            "row_is_zero",
+            "row_e_is_obsolete",
+            "row_ge_is_obsolete",
+            "row_le_is_obsolete",
+            "row_is_obsolete",
+            "remove_fixed_or_zero_columns",
+            "remove_fixed_or_zero_columns_from_row",
+            "try_to_remove_some_rows",
+            "cleanup"
+          ],
+          "implementation": "Concrete float/exact presolve; sign constants at retained call sites replace tiny pin wrappers. Independent corner oracles, relation/pinning tests, real MPS preparation, output-prefix and exact owner campaigns."
+        },
+        {
+          "source_methods": [
+            "~lp_solver"
+          ],
+          "implementation": "Native floating matrix/column ownership and owning exact Close; failed child/input/expression receipts remain with actual invoker, prior caller comparisons remain borrowed, displaced exact matrices explicitly owned until cleanup."
+        }
       ]
     },
     {

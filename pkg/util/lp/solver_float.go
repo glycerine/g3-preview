@@ -92,13 +92,6 @@ func (m *FloatLPSolver) ColumnName(core uint32) string {
 	}
 	return c.Name
 }
-func (m *FloatLPSolver) ColumnIndexByName(name string) int32 {
-	j, ok := m.NamesToColumns[name]
-	if !ok {
-		return -1
-	}
-	return int32(j)
-}
 func (m *FloatLPSolver) ProblemIsEmpty() bool {
 	for _, row := range m.AValues.All() {
 		if row.Len() != 0 {
