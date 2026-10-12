@@ -11418,5 +11418,31 @@
     ],
     "full_registered_runs_verified": false,
     "whole_unit_promotion": false
+  },
+  "running_scalar_benchmark_checkpoint": {
+    "status": "running",
+    "commit": "5920ba19",
+    "started_utc": "2026-10-12 01:08:46 UTC",
+    "runner_pid": 2,
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "./util/lp",
+      "-run",
+      "^$",
+      "-bench",
+      "^BenchmarkLPRationalSource500000$",
+      "-benchtime=1x",
+      "-count=1",
+      "-timeout=60m"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-lp-scalar-benchmark-full-native.log",
+    "status_file": "/mnt/oldrog/tmp/g3-lp-scalar-benchmark-full-native.json",
+    "scope": "Two actual scalar source benchmarks, each500000 outer iterations/10products; independent result and successful owner cleanup required. Not a full module test.",
+    "go_pid": 5,
+    "actual_exec_session": 89471,
+    "completion_verified": false
   }
 }
