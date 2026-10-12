@@ -223,6 +223,19 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 // node's new interval for conflict. Relevance testing is the caller's choice,
 // as source unit clauses publish directly.
 func (c *FixedContext) PropagateBound(n *FixedNode, variable uint32, value *numeral.FixedPoint, lower, open bool) (err error) {
+	return c.publishBound(n, variable, value, lower, open, true)
+}
+
+// DecideBound creates the source's branch decision without putting it on the
+// propagation queue. AddRecentBounds queues surviving child decisions later.
+func (c *FixedContext) DecideBound(n *FixedNode, variable uint32, value *numeral.FixedPoint, lower, open bool) error {
+	if n == nil || n.parent == nil {
+		return arena.ErrInvalidSlot
+	}
+	return c.publishBound(n, variable, value, lower, open, false)
+}
+
+func (c *FixedContext) publishBound(n *FixedNode, variable uint32, value *numeral.FixedPoint, lower, open, enqueue bool) (err error) {
 	if err = c.checkNode(n, variable); err != nil {
 		return err
 	}
@@ -246,7 +259,9 @@ func (c *FixedContext) PropagateBound(n *FixedNode, variable uint32, value *nume
 	}
 	b := n.trail
 	b.timestamp = c.timestamp
-	c.queue = append(c.queue, b)
+	if enqueue {
+		c.queue = append(c.queue, b)
+	}
 	conflict, e := n.ConflictingBounds(variable)
 	if e != nil {
 		return e

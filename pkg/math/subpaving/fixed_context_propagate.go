@@ -67,6 +67,42 @@ func (c *FixedContext) boundOnTrail(n *FixedNode, b *FixedBound) bool {
 	return false
 }
 
+// AddRecentBounds requeues the current bounds added since the parent trail.
+// Source traversal is newest first and gives every replayed bound the current
+// context timestamp without advancing it.
+func (c *FixedContext) AddRecentBounds(n *FixedNode) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if n == nil || n.context != c || n.parent == nil || len(c.queue) != 0 || c.queueHead != 0 {
+		return arena.ErrInvalidSlot
+	}
+	if err := n.open(); err != nil {
+		return err
+	}
+	boundary := n.parent.trail
+	var recent []*FixedBound
+	current := n.trail
+	for current != boundary && current != nil {
+		b := current
+		if b.variable >= uint32(len(n.lower)) {
+			return arena.ErrInvalidSlot
+		}
+		if b.lower && n.lower[b.variable] == b || !b.lower && n.upper[b.variable] == b {
+			recent = append(recent, b)
+		}
+		current = current.prev
+	}
+	if current != boundary {
+		return arena.ErrInvalidSlot
+	}
+	for _, b := range recent {
+		b.timestamp = c.timestamp
+		c.queue = append(c.queue, b)
+	}
+	return nil
+}
+
 func (c *FixedContext) processQueuedBound(n *FixedNode, b *FixedBound) error {
 	if b.variable >= uint32(len(c.watchers)) || !c.boundOnTrail(n, b) {
 		return arena.ErrInvalidSlot

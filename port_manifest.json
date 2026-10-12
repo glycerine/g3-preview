@@ -49864,7 +49864,8 @@
         "pkg/math/subpaving/fixed_monomial.go",
         "pkg/math/subpaving/fixed_monomial_test.go",
         "pkg/math/subpaving/fixed_context_propagate.go",
-        "pkg/math/subpaving/fixed_context_propagate_test.go"
+        "pkg/math/subpaving/fixed_context_propagate_test.go",
+        "pkg/math/subpaving/fixed_context_recent_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -49887,7 +49888,9 @@
         "TestSubpavingFixedMonomialSourceThreeFactorDownwardScratch",
         "TestSubpavingFixedContextQueuedDefinitionWatchers",
         "TestSubpavingFixedContextQueuedCancellationResumes",
-        "TestSubpavingFixedContextInitialDefinitionSweep"
+        "TestSubpavingFixedContextInitialDefinitionSweep",
+        "TestSubpavingFixedContextRecentChildBoundsAndWatchers",
+        "TestSubpavingFixedContextRecentChildRejectsChangedParentTrail"
       ],
       "conditionals": [
         {
@@ -50007,7 +50010,8 @@
         "pkg/math/subpaving/fixed_monomial.go",
         "pkg/math/subpaving/fixed_monomial_test.go",
         "pkg/math/subpaving/fixed_context_propagate.go",
-        "pkg/math/subpaving/fixed_context_propagate_test.go"
+        "pkg/math/subpaving/fixed_context_propagate_test.go",
+        "pkg/math/subpaving/fixed_context_recent_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50025,7 +50029,9 @@
         "TestSubpavingFixedMonomialSourceThreeFactorDownwardScratch",
         "TestSubpavingFixedContextQueuedDefinitionWatchers",
         "TestSubpavingFixedContextQueuedCancellationResumes",
-        "TestSubpavingFixedContextInitialDefinitionSweep"
+        "TestSubpavingFixedContextInitialDefinitionSweep",
+        "TestSubpavingFixedContextRecentChildBoundsAndWatchers",
+        "TestSubpavingFixedContextRecentChildRejectsChangedParentTrail"
       ],
       "assertions": [
         {
