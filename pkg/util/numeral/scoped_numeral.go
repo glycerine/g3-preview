@@ -438,8 +438,10 @@ func (s *ScopedRational) Close() error {
 	return e
 }
 
-// Vectors remain source-noncopyable. No hot backing slice or element pointer
-// escapes: Read makes a deep caller-owned numeral; Set performs manager copy.
+// Vectors remain source-noncopyable. Read makes a deep caller-owned numeral;
+// Set performs manager copy. The explicit BorrowSlot/BorrowedValues and
+// SwapRaw methods expose the source numeral_buffer boundaries to its concrete
+// Euclidean caller, which must not keep a borrow across growth or swap.
 type ScopedIntVector struct {
 	manager *IntegerManager
 	data    []Int
@@ -564,6 +566,69 @@ func (v *ScopedRationalVector) Set(i uint32, num *Rational) error {
 		return arena.ErrBounds
 	}
 	return v.manager.Copy(&v.data[i], num)
+}
+
+// BorrowSlot exposes the mutable source numeral_buffer::operator[] slot.
+// The borrow ends at the next operation that may grow, reset or swap storage.
+func (v *ScopedIntVector) BorrowSlot(i uint32) (*Int, error) {
+	if e := v.open(); e != nil {
+		return nil, e
+	}
+	if uint64(i) >= uint64(len(v.data)) {
+		return nil, arena.ErrBounds
+	}
+	return &v.data[i], nil
+}
+
+func (v *ScopedRationalVector) BorrowSlot(i uint32) (*Rational, error) {
+	if e := v.open(); e != nil {
+		return nil, e
+	}
+	if uint64(i) >= uint64(len(v.data)) {
+		return nil, arena.ErrBounds
+	}
+	return &v.data[i], nil
+}
+
+// BorrowedValues exposes source numeral_buffer::c_ptr as a Go slice. The
+// caller may read the current slots only until growth, reset or swap.
+func (v *ScopedIntVector) BorrowedValues() ([]Int, error) {
+	if e := v.open(); e != nil {
+		return nil, e
+	}
+	return v.data, nil
+}
+
+func (v *ScopedRationalVector) BorrowedValues() ([]Rational, error) {
+	if e := v.open(); e != nil {
+		return nil, e
+	}
+	return v.data, nil
+}
+
+// SwapRaw is source numeral_buffer::swap(svector&): it transfers the whole
+// raw numeral slices without copying. The caller owns the old buffer values
+// moved into *raw and must later delete them with this same manager.
+func (v *ScopedIntVector) SwapRaw(raw *[]Int) error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if raw == nil {
+		return arena.ErrInvalidSlot
+	}
+	v.data, *raw = *raw, v.data
+	return nil
+}
+
+func (v *ScopedRationalVector) SwapRaw(raw *[]Rational) error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if raw == nil {
+		return arena.ErrInvalidSlot
+	}
+	v.data, *raw = *raw, v.data
+	return nil
 }
 
 // Publish a default element before the deep copy. A failed copy retains that

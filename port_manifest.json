@@ -33794,9 +33794,16 @@
       "path": "src/math/euclid/euclidean_solver.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/euclid/numeral_buffer_sort.go",
+        "pkg/math/euclid/numeral_buffer_sort_test.go",
+        "pkg/util/numeral/scoped_numeral.go"
+      ],
+      "tests": [
+        "TestEuclideanIntegerBufferSortAndRawSwap",
+        "TestEuclideanRationalBufferSortAndRawSwap"
+      ],
       "assertions": [
         {
           "line": 226,
@@ -33861,9 +33868,27 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete mpz/mpq sort and sort_core copy/index/swap paths at cpp:135-166",
+          "status": "partial",
+          "go_target": "pkg/math/euclid/numeral_buffer_sort.go",
+          "tests": [
+            "TestEuclideanIntegerBufferSortAndRawSwap",
+            "TestEuclideanRationalBufferSortAndRawSwap"
+          ]
+        },
+        {
+          "name": "equation ownership, elimination, decomposition and model/justification algorithms",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "The ported sort path borrows the rational manager, copies coefficient numerals into typed owned buffer slots, sorts scalar IDs, then swaps each raw numeral with its source-indexed slot. A whole-slice raw swap transfers numeral ownership between the equation slice and buffer without cloning."
+      ],
+      "deviations": [
+        "The Euclidean solver body is not yet ported; this is its concrete numeric buffer and sort path only."
+      ]
     },
     {
       "path": "src/math/euclid/euclidean_solver.h",
@@ -155474,9 +155499,16 @@
       "path": "src/util/numeral_buffer.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/numeral/scoped_numeral.go",
+        "pkg/math/euclid/numeral_buffer_sort.go",
+        "pkg/math/euclid/numeral_buffer_sort_test.go"
+      ],
+      "tests": [
+        "TestEuclideanIntegerBufferSortAndRawSwap",
+        "TestEuclideanRationalBufferSortAndRawSwap"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -155492,18 +155524,26 @@
       "methods": [
         {
           "name": "concrete mpz buffers in euclidean_solver, linear_equation, bound_propagator and theory_arith_int: indexed mutable numeral, deep-copy push, ascending reset, borrowed c_ptr and raw-vector swap",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/util/numeral/scoped_numeral.go",
+          "tests": [
+            "TestEuclideanIntegerBufferSortAndRawSwap"
+          ]
         },
         {
           "name": "concrete mpq buffers in euclidean_solver and propagate_ineqs_tactic: indexed mutable numeral, deep-copy push, ascending reset, borrowed c_ptr and raw-vector swap where reached",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/util/numeral/scoped_numeral.go",
+          "tests": [
+            "TestEuclideanRationalBufferSortAndRawSwap"
+          ]
         }
       ],
       "ownership": [
         "The buffer borrows its numeral manager and owns a manager-copy of each appended mpz/mpq value. Pop destroys the last value; reset and the destructor destroy values in ascending slot order. swap(svector&) transfers raw numeral storage in both directions, so the receiving owner must later delete its acquired numeral payloads. c_ptr and indexed access borrow mutable slots and become stale after slice growth or swap."
       ],
       "deviations": [
-        "No generic Go numeral-buffer adapter is retained. The Euclidean solver requires concrete integer and rational buffer owners plus its source sort_core swaps; existing scoped numeral vectors have related operations but do not implement raw-vector storage transfer or the borrowed c_ptr boundary. Keep this unit unported until those retained callers are represented."
+        "No generic Go numeral-buffer adapter is retained. Concrete typed scoped numeral vectors now expose borrowed indexed/c_ptr-style views and raw-slice storage swaps; the Euclidean sort path uses them and remains isolated until its solver owner is ported. Other arithmetic tactic and SMT consumers remain open."
       ]
     },
     {

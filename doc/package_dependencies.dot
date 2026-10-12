@@ -39,6 +39,9 @@ digraph packages {
   "clibrand" [style=filled, fillcolor="#eeeeee"];
   "cmd/portcheck" [style=filled, fillcolor="#eeeeee"];
   "cmd/portcheck" -> "portcheck";
+  "math/euclid" [style=filled, fillcolor="#eeeeee"];
+  "math/euclid" -> "arena";
+  "math/euclid" -> "util/numeral";
   "math/polynomial" [style=filled, fillcolor="#eeeeee"];
   "math/polynomial" -> "arena";
   "math/polynomial" -> "clibrand";
@@ -116,6 +119,8 @@ digraph packages {
   "tactic/sls" -> "util/params";
   "tactic/smtlogics" [style=filled, fillcolor="#eeeeee"];
   "tactic/smtlogics" -> "util/params";
+  "tactic/ufbv" [style=filled, fillcolor="#eeeeee"];
+  "tactic/ufbv" -> "ast";
   "test" [style=filled, fillcolor="#eeeeee"];
   "testoracle" [style=filled, fillcolor="#eeeeee"];
   "util/approx" [style=filled, fillcolor="#dceafa"];
