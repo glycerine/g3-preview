@@ -39251,3 +39251,15 @@ the C++ manager has no XOR operation. Focused `util/permutation` and
 `util/bitset` tests pass in native and `g3debug,g3checked` profiles on CPUs
 0–7. `portcheck` passes. No whole-bit-vector or whole-util completion is
 claimed by this audit.
+
+### Util resource-limit source body completion
+
+`src/util/rlimit.cpp` is now whole-ported. Its previously partial
+`get_cancel_msg` row chooses between the shared canceled and max-resource
+messages according to the current cancellation count. The retained C++ source
+only initializes those two `common_msgs` pointers; a recursive source search
+found no mutation. The concrete Go `Reslimit.CancelMessage` selects the same
+strings from `util/messages`. All remaining `.cpp` methods were already mapped
+and audited. `util/control` and `util/messages` pass native and
+`g3debug,g3checked` tests on CPUs 0–7; the cancellation tests check both exact
+message branches. This does not change the broader util port status.

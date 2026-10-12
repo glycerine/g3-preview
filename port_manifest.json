@@ -160228,7 +160228,7 @@
       "path": "src/util/rlimit.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/control/rlimit.go",
         "pkg/util/messages/messages.go",
@@ -160354,10 +160354,13 @@
           ]
         },
         {
-          "name": "cancel_msg rlimit.cpp:62-68 reads actual shared message binding",
-          "status": "partial",
+          "name": "get_cancel_msg rlimit.cpp:62-68 chooses the shared canceled or max-resource message",
+          "status": "ported",
           "go_target": "pkg/util/control/rlimit.go",
-          "tests": []
+          "tests": [
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSuspensionAndLateChild"
+          ]
         }
       ],
       "ownership": [
@@ -160365,8 +160368,10 @@
       ],
       "deviations": [
         "Atomic cancellation replaces volatile state; cold process-wide mutex replaces OpenMP critical section.",
-        "Predictable budget failures precede state publication. Popped child slots cleared for GC. Explicit close idempotent; invalid caller states diagnosed."
-      ]
+        "Predictable budget failures precede state publication. Popped child slots cleared for GC. Explicit close idempotent; invalid caller states diagnosed.",
+        "The retained source tree only initializes common_msgs::g_canceled_msg and g_max_resource_msg; no retained assignment or macro write changes either pointer. Go messages constants preserve the reached string values without exposing mutable C-string pointer identity."
+      ],
+      "retained_source_audit_evidence": "Whole rlimit.cpp body audit: construction/count/inc/push/pop/cancellation/child propagation and the two get_cancel_msg branches are mapped to pkg/util/control/rlimit.go. Source common_msgs.cpp initializes the two message pointers once and a recursive src search found no retained mutation. TestResourceLimitSourceCancellation checks both exact outputs; util/control and util/messages suites pass native and g3debug,g3checked on CPUs0-7. The header's scoped wrappers were already whole-ported separately."
     },
     {
       "path": "src/util/rlimit.h",
