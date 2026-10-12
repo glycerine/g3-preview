@@ -155714,9 +155714,10 @@
       "path": "src/util/page.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/arena/bytes_region.go"
+        "pkg/arena/bytes_region.go",
+        "pkg/util/stack/stack.go"
       ],
       "tests": [
         "TestBytesRegionSourceDisplayMemStats",
@@ -155732,7 +155733,8 @@
         "TestBytesRegionBulkScopeLifetime",
         "TestBytesRegionOwnerIDCollisionAndLifetime",
         "TestBytesRegionOwnerIDExhaustion",
-        "TestBytesRegionSourceDefaultAndAlignmentConstants"
+        "TestBytesRegionSourceDefaultAndAlignmentConstants",
+        "TestStackPageRecyclingAndBigPageRelease"
       ],
       "assertions": [
         {
@@ -155744,11 +155746,11 @@
           "text": "SASSERT(prev_page(page) == prev);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "region-owned allocate_default_page/allocate_page/recycle_page/del_pages and header/link geometry",
+          "name": "Retained region and stack page allocation, default-page recycling, big-page release, chain deletion, previous/default metadata and page constants",
           "status": "ported",
           "go_target": "pkg/arena/bytes_region.go",
           "tests": [
@@ -155765,24 +155767,29 @@
             "TestBytesRegionBulkScopeLifetime",
             "TestBytesRegionOwnerIDCollisionAndLifetime",
             "TestBytesRegionOwnerIDExhaustion",
-            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+            "TestBytesRegionSourceDefaultAndAlignmentConstants",
+            "TestStackPageRecyclingAndBigPageRelease"
+          ],
+          "go_targets": [
+            "pkg/util/stack/stack.go"
           ]
         }
       ],
       "ownership": [
-        "Concrete region-owned page specialization preserves LIFO default reuse, big-page release and source header backing. Other direct page users/general standalone binding remain to audit. See PORT_PROGRESS.md#audit-arena-port-status-md."
+        "Source page helpers have exactly two production consumers, util/region.cpp and util/stack.cpp. Both Go owners use BytesRegion for default and big pages; stack owns its BytesRegion and follows LIFO recycle/close. Page data, source header padding, cold page directory and old/new directory peaks are charged to the owning region Budget."
       ],
       "deviations": [
-        "Tagged native addresses are scalar previous/default metadata; allocated source header padding and cold page-directory headers are both charged."
+        "Tagged native addresses become scalar previous/default metadata and checked page IDs. Source size_t/pointer arithmetic is represented by bounded Go offsets; no standalone page API is retained because both live consumers own their pages through BytesRegion."
       ]
     },
     {
       "path": "src/util/page.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/arena/bytes_region.go"
+        "pkg/arena/bytes_region.go",
+        "pkg/util/stack/stack.go"
       ],
       "tests": [
         "TestBytesRegionSourceDisplayMemStats",
@@ -155798,7 +155805,8 @@
         "TestBytesRegionBulkScopeLifetime",
         "TestBytesRegionOwnerIDCollisionAndLifetime",
         "TestBytesRegionOwnerIDExhaustion",
-        "TestBytesRegionSourceDefaultAndAlignmentConstants"
+        "TestBytesRegionSourceDefaultAndAlignmentConstants",
+        "TestStackPageRecyclingAndBigPageRelease"
       ],
       "conditionals": [
         {
@@ -155810,11 +155818,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "region-owned allocate_default_page/allocate_page/recycle_page/del_pages and header/link geometry",
+          "name": "Retained region and stack page allocation, default-page recycling, big-page release, chain deletion, previous/default metadata and page constants",
           "status": "ported",
           "go_target": "pkg/arena/bytes_region.go",
           "tests": [
@@ -155831,15 +155839,19 @@
             "TestBytesRegionBulkScopeLifetime",
             "TestBytesRegionOwnerIDCollisionAndLifetime",
             "TestBytesRegionOwnerIDExhaustion",
-            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+            "TestBytesRegionSourceDefaultAndAlignmentConstants",
+            "TestStackPageRecyclingAndBigPageRelease"
+          ],
+          "go_targets": [
+            "pkg/util/stack/stack.go"
           ]
         }
       ],
       "ownership": [
-        "Concrete region-owned page specialization preserves LIFO default reuse, big-page release and source header backing. Other direct page users/general standalone binding remain to audit. See PORT_PROGRESS.md#audit-arena-port-status-md."
+        "Source page helpers have exactly two production consumers, util/region.cpp and util/stack.cpp. Both Go owners use BytesRegion for default and big pages; stack owns its BytesRegion and follows LIFO recycle/close. Page data, source header padding, cold page directory and old/new directory peaks are charged to the owning region Budget."
       ],
       "deviations": [
-        "Tagged native addresses are scalar previous/default metadata; allocated source header padding and cold page-directory headers are both charged."
+        "Tagged native addresses become scalar previous/default metadata and checked page IDs. Source size_t/pointer arithmetic is represented by bounded Go offsets; no standalone page API is retained because both live consumers own their pages through BytesRegion."
       ]
     },
     {
