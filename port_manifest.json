@@ -115094,8 +115094,8 @@
           "text": "SASSERT(n > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "hash_u",
@@ -115159,15 +115159,32 @@
             "TestSourceHashVectors",
             "TestCompositeVisitOrder"
           ]
+        },
+        {
+          "name": "mk_mix and constant default_kind_hash_proc for retained composite clients",
+          "status": "ported",
+          "go_target": "pkg/util/hash/hash.go",
+          "tests": [
+            "TestSourceHashVectors",
+            "TestCompositeVisitOrder"
+          ]
+        },
+        {
+          "name": "primitive, object, pointer, pair and triple hash functors used only for native map bucket selection in retained clients",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/hash/hash.go",
+          "tests": [
+            "TestSourceHashVectors"
+          ]
         }
       ],
       "ownership": [
-        "No retained caller data; baseline little-endian/signed-char policy explicit. Generic hash-table/container functors not yet audited; see PORT_PROGRESS.md#audit-utilhash-port-status-md.",
+        "Whole header audit: value hash and mix helpers borrow arguments only during the call. Composite child callbacks are invoked in the exact source order. Functor objects hold no owning resource; native Go map keys replace the bucket-selection functors for retained concrete containers. The source triple_hash template has no instantiation outside its definition and is not ported as an unused adapter. Future ports of currently unretained clients must audit their concrete hash use.",
         "Mutex detection uses a native map[[2]uint32]struct{} for literal-pair membership. It never iterates the map; source clause collection and clique traversal order remain. Removed Runtime-backed bucket geometry, cached hashes, FREE/default member construction, rehash/copy and allocation/destructor refusal simulation. Only the actual lexical frame header remains budgeted. A 32-variable complete graph exercises 496 pairs through both collection passes, repeats append-only queries with just one permitted header reservation, checks independent clique membership and exact frame cleanup. No C++ hash/table implementation credit is added."
       ],
       "deviations": [
         "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added.",
-        "Hash algorithms now live in independent util/hash. Retained numerical, AST and polynomial consumers import that package directly; runtime-backed checked readers use its MixState operation while remaining at their actual storage owner. AST and symbol duplicate mixing/string-hash bodies are replaced by the shared implementation. Hash golden tests and source_hash.json moved with the package. Algorithms, signed tails, callback visit order and concrete storage ownership are unchanged; this is package separation, not new port completion credit."
+        "Hash algorithms now live in independent util/hash. Retained numerical, AST and polynomial consumers import that package directly; runtime-backed checked readers use its MixState operation while remaining at their actual storage owner. AST and symbol duplicate mixing/string-hash bodies are replaced by the shared implementation. Hash golden tests and source_hash.json moved with the package. Algorithms, signed tails, callback visit order and concrete storage ownership are unchanged. Whole-header credit is limited to retained consumers; generic bucket geometry and unused templates are outside the requested port."
       ]
     },
     {

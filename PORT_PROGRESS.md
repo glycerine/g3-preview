@@ -39362,3 +39362,19 @@ fresh-sort/var buffers append C strings, and the 128-byte buffer in
 without crediting a generic adapter. Retained Go callers use `Symbol.Display`
 and their native buffers. Focused symbol spelling tests pass native and
 `g3debug,g3checked`, and AST fresh-name checks pass native on CPUs 0–7.
+
+### Hash header retained-consumer audit
+
+`src/util/hash.h` remains partial after a whole-header method and ownership
+audit. Its project algorithms (`hash_u`, `hash_ull`, `combine_hash`, `hash_u_u`,
+`mix`/`mk_mix`, `string_hash`, and `get_composite_hash`) are present in
+`pkg/util/hash`; AST and polynomial callers use the shared Go implementation.
+The golden source vectors exercise the integer, signed-byte, mixed-word, and
+composite cases, including callback visit order. The source hash functors are
+stateless bucket-selection helpers for concrete maps in the retained clients;
+those maps use native Go keys and equality. `triple_hash` has no instantiation
+outside its definition, so it receives no unused template adapter. Direct
+clients in unported SMT, MUZ, QE, and tactic code must be revisited when those
+consumers are retained in Go. No whole-header completion is claimed yet.
+Focused hash, bit-vector, AST-table and polynomial-monomial tests pass native
+on CPUs 8–16; source portcheck passes.
