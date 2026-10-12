@@ -37,6 +37,7 @@ func position(xs []uint32, x uint32) uint32 {
 type solverSetup struct {
 	self               *solverSetup
 	manager            *numeral.RationalManager
+	decomposeBuffer    *numeral.ScopedIntVector
 	asBuffer           *numeral.ScopedIntVector
 	bsBuffer           *numeral.ScopedRationalVector
 	tmpAs              *numeral.ScopedIntVector
@@ -70,14 +71,21 @@ func newSolverSetup(m *numeral.RationalManager) (*solverSetup, error) {
 	if e := m.BudgetField.Reserve(header); e != nil {
 		return nil, e
 	}
+	decompose, e := numeral.NewScopedIntVector(m.Integers())
+	if e != nil {
+		m.BudgetField.Release(header)
+		return nil, e
+	}
 	as, e := numeral.NewScopedIntVector(m.Integers())
 	if e != nil {
+		_ = decompose.Close()
 		m.BudgetField.Release(header)
 		return nil, e
 	}
 	bs, e := numeral.NewScopedRationalVector(m)
 	if e != nil {
 		_ = as.Close()
+		_ = decompose.Close()
 		m.BudgetField.Release(header)
 		return nil, e
 	}
@@ -85,6 +93,7 @@ func newSolverSetup(m *numeral.RationalManager) (*solverSetup, error) {
 	if e != nil {
 		_ = bs.Close()
 		_ = as.Close()
+		_ = decompose.Close()
 		m.BudgetField.Release(header)
 		return nil, e
 	}
@@ -93,10 +102,11 @@ func newSolverSetup(m *numeral.RationalManager) (*solverSetup, error) {
 		_ = tmpAs.Close()
 		_ = bs.Close()
 		_ = as.Close()
+		_ = decompose.Close()
 		m.BudgetField.Release(header)
 		return nil, e
 	}
-	s := &solverSetup{manager: m, asBuffer: as, bsBuffer: bs, tmpAs: tmpAs, tmpBs: tmpBs,
+	s := &solverSetup{manager: m, decomposeBuffer: decompose, asBuffer: as, bsBuffer: bs, tmpAs: tmpAs, tmpBs: tmpBs,
 		inconsistent: nullEquationIndex, nextX: nullEquationIndex, nextEq: nullEquationIndex, header: header}
 	s.self = s
 	s.queue, e = heap.New(16, heap.Config{Budget: m.BudgetField, Less: func(a, b int32) bool {
@@ -107,6 +117,7 @@ func newSolverSetup(m *numeral.RationalManager) (*solverSetup, error) {
 		_ = tmpAs.Close()
 		_ = bs.Close()
 		_ = as.Close()
+		_ = decompose.Close()
 		m.BudgetField.Release(header)
 		return nil, e
 	}
@@ -252,6 +263,9 @@ func (s *solverSetup) Close() error {
 		return e
 	}
 	if e := s.asBuffer.Close(); e != nil {
+		return e
+	}
+	if e := s.decomposeBuffer.Close(); e != nil {
 		return e
 	}
 	s.manager.BudgetField.Release(s.header)

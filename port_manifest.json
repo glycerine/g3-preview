@@ -33808,6 +33808,8 @@
         "pkg/math/euclid/normalize_test.go",
         "pkg/math/euclid/pivot.go",
         "pkg/math/euclid/pivot_test.go",
+        "pkg/math/euclid/decompose.go",
+        "pkg/math/euclid/decompose_test.go",
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go",
         "pkg/util/numeral/scoped_numeral.go"
@@ -33827,6 +33829,10 @@
         "TestEuclideanAssertEquationSubstitutesThenNormalizes",
         "TestEuclideanSelectNextPivotSourceTiesAndUnitStop",
         "TestEuclideanEliminateUnitSubstitutesOccurrences",
+        "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation",
+        "TestEuclideanNonUnitDecompositionZeroRemainderDropsOccurrence",
+        "TestEuclideanNonUnitDecompositionSubstitutesOtherEquations",
+        "TestEuclideanNonUnitDecompositionNegativeOtherCoefficient",
         "TestEuclideanPositionSourceBinarySearch",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership",
         "TestEuclideanSetupHeaderRefusalBeforeBuffers",
@@ -33965,7 +33971,18 @@
           ]
         },
         {
-          "name": "elimination, decomposition and model/justification algorithms",
+          "name": "decompose signed quotient/remainder and decompose_and_elim parameter/auxiliary equation/occurrence substitution at cpp:624-705",
+          "status": "partial",
+          "go_target": "pkg/math/euclid/decompose.go",
+          "tests": [
+            "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation",
+            "TestEuclideanNonUnitDecompositionZeroRemainderDropsOccurrence",
+            "TestEuclideanNonUnitDecompositionSubstitutesOtherEquations",
+            "TestEuclideanNonUnitDecompositionNegativeOtherCoefficient"
+          ]
+        },
+        {
+          "name": "solve loop, normalize/query and model/justification algorithms",
           "status": "unported"
         }
       ],
@@ -33973,11 +33990,12 @@
         "The partial sort path borrows the rational manager, copies coefficient numerals into typed owned buffer slots, sorts scalar IDs, then swaps each raw numeral with its source-indexed slot. A whole-slice raw swap transfers numeral ownership between the equation slice and buffer without cloning.",
         "The concrete equation allocates its owner header first, copies coefficients into indexed reusable slots, transfers them into its vectors with sort_core, then owns its constant, integer coefficients and rational justifications. del_eq releases those in that order, leaving caller inputs and reusable buffers separately owned.",
         "The pre-elimination setup borrows its rational manager, publishes variable metadata before the matching integer buffer slot, reserves that ID in a concrete solved-index-priority heap, publishes a justification buffer slot before incrementing its ID, owns equation pointers in source list order, and closes its heap, rational and integer member buffers in reverse declaration order.",
-        "Solved-equation promotion transfers one equation pointer from the todo list to the solution list. apply_solution swaps integer and rational row storage through reusable owned numeral buffers; the old target row remains in its buffer until the next reset or solver destruction. The coefficient borrowed from that old row remains alive across the rational merge."
+        "Solved-equation promotion transfers one equation pointer from the todo list to the solution list. apply_solution swaps integer and rational row storage through reusable owned numeral buffers; the old target row remains in its buffer until the next reset or solver destruction. The coefficient borrowed from that old row remains alive across the rational merge.",
+        "Non-unit decomposition borrows the selected positive magnitude, publishes a new parameter and buffer slot, compacts the todo equation's remainder numerals in place, copies auxiliary coefficients from the owned decomposition buffer into a solution equation, then substitutes that solution into prior occurrences. The decomposition buffer releases its copied numerals after the solution has independent ownership."
       ],
       "deviations": [
         "Source normalize_eq checks divisibility of the constant but divides only variable coefficients and justification coefficients by their gcd. The Go path retains that exact result. After source normalize_eq destroys an empty zero equality, assert_eq still calls add_occs on its null slot; Go skips that invalid dereference.",
-        "Unit-pivot selection and elimination are ported with source occurrence and solution ownership order; non-unit decomposition and the public solver API remain unported. The concrete assertion and substitution paths currently operate on internally owned equations."
+        "Unit and non-unit elimination paths are ported with source occurrence and solution ownership order; the solve loop, normalize/query methods and public solver API remain unported. The concrete assertion and substitution paths currently operate on internally owned equations."
       ]
     },
     {
@@ -155604,6 +155622,8 @@
         "pkg/math/euclid/addmul_test.go",
         "pkg/math/euclid/apply_solution.go",
         "pkg/math/euclid/apply_solution_test.go",
+        "pkg/math/euclid/decompose.go",
+        "pkg/math/euclid/decompose_test.go",
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go"
       ],
@@ -155613,6 +155633,10 @@
         "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
         "TestEuclideanRationalAddmulMergedJustifications",
         "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
+        "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation",
+        "TestEuclideanNonUnitDecompositionZeroRemainderDropsOccurrence",
+        "TestEuclideanNonUnitDecompositionSubstitutesOtherEquations",
+        "TestEuclideanNonUnitDecompositionNegativeOtherCoefficient",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership"
       ],
       "conditionals": [
