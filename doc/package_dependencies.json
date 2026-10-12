@@ -431,10 +431,18 @@
     {
       "package": "math/interval",
       "imports": [
+        "arena",
         "util/numeral"
       ],
       "production_files": [
-        "rational_extended.go"
+        "binary_extended.go",
+        "rational_extended.go",
+        "rational_interval.go",
+        "rational_interval_deps.go",
+        "rational_interval_div.go",
+        "rational_interval_inv.go",
+        "rational_interval_mul.go",
+        "rational_interval_power.go"
       ]
     },
     {
@@ -715,9 +723,13 @@
     {
       "package": "math/realclosure",
       "imports": [
+        "arena",
+        "math/interval",
+        "util/numeral",
         "util/params"
       ],
       "production_files": [
+        "binary_interval.go",
         "gparams_catalog_collectors.go"
       ]
     },

@@ -34440,11 +34440,14 @@
         "pkg/math/interval/rational_interval.go",
         "pkg/math/interval/rational_interval_test.go",
         "pkg/math/interval/rational_interval_deps.go",
-        "pkg/math/interval/rational_interval_deps_test.go"
+        "pkg/math/interval/rational_interval_deps_test.go",
+        "pkg/math/realclosure/binary_interval.go",
+        "pkg/math/realclosure/binary_interval_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
-        "TestRationalIntervalSourceDependencyMasks"
+        "TestRationalIntervalSourceDependencyMasks",
+        "TestRealClosureBinaryIntervalRetainedCore"
       ],
       "conditionals": [
         {
@@ -34510,11 +34513,14 @@
         "pkg/math/interval/rational_interval_inv.go",
         "pkg/math/interval/rational_interval_div.go",
         "pkg/math/interval/rational_interval_deps.go",
-        "pkg/math/interval/rational_interval_deps_test.go"
+        "pkg/math/interval/rational_interval_deps_test.go",
+        "pkg/math/realclosure/binary_interval.go",
+        "pkg/math/realclosure/binary_interval_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
-        "TestRationalIntervalSourceDependencyMasks"
+        "TestRationalIntervalSourceDependencyMasks",
+        "TestRealClosureBinaryIntervalRetainedCore"
       ],
       "conditionals": [
         {
@@ -34917,6 +34923,14 @@
           "go_target": "pkg/math/interval/rational_interval_deps.go",
           "tests": [
             "TestRationalIntervalSourceDependencyMasks"
+          ]
+        },
+        {
+          "name": "Selected interval_manager<mpbq_config> reset, containment, ordering, negation, addition and display via real-closure interval owner (src/math/interval/interval_def.h:597-837)",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/binary_interval.go",
+          "tests": [
+            "TestRealClosureBinaryIntervalRetainedCore"
           ]
         }
       ],
@@ -47507,10 +47521,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/interval/binary_extended.go",
-        "pkg/math/interval/binary_extended_test.go"
+        "pkg/math/interval/binary_extended_test.go",
+        "pkg/math/realclosure/binary_interval.go",
+        "pkg/math/realclosure/binary_interval_test.go"
       ],
       "tests": [
-        "TestRealClosureBinaryExtendedNumeralBranches"
+        "TestRealClosureBinaryExtendedNumeralBranches",
+        "TestRealClosureBinaryIntervalRetainedCore"
       ],
       "conditionals": [
         {
@@ -48705,6 +48722,14 @@
           "go_target": "pkg/math/interval/binary_extended.go",
           "tests": [
             "TestRealClosureBinaryExtendedNumeralBranches"
+          ]
+        },
+        {
+          "name": "Concrete mpbq_config interval endpoint owner and retained reset/set/sign/contains/neg/add/before/display consumer paths (src/math/realclosure/realclosure.cpp:54-135; src/math/interval/interval_def.h:597-837)",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/binary_interval.go",
+          "tests": [
+            "TestRealClosureBinaryIntervalRetainedCore"
           ]
         }
       ],
@@ -115097,12 +115122,15 @@
         "pkg/math/interval/rational_interval_inv.go",
         "pkg/math/interval/rational_interval_div.go",
         "pkg/math/interval/binary_extended.go",
-        "pkg/math/interval/binary_extended_test.go"
+        "pkg/math/interval/binary_extended_test.go",
+        "pkg/math/realclosure/binary_interval.go",
+        "pkg/math/realclosure/binary_interval_test.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
-        "TestRealClosureBinaryExtendedNumeralBranches"
+        "TestRealClosureBinaryExtendedNumeralBranches",
+        "TestRealClosureBinaryIntervalRetainedCore"
       ],
       "conditionals": [
         {

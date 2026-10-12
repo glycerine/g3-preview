@@ -44,6 +44,7 @@ digraph packages {
   "math/euclid" -> "util/heap";
   "math/euclid" -> "util/numeral";
   "math/interval" [style=filled, fillcolor="#eeeeee"];
+  "math/interval" -> "arena";
   "math/interval" -> "util/numeral";
   "math/polynomial" [style=filled, fillcolor="#eeeeee"];
   "math/polynomial" -> "arena";
@@ -57,6 +58,9 @@ digraph packages {
   "math/polynomial" -> "util/sexpr";
   "math/polynomial" -> "util/symbol";
   "math/realclosure" [style=filled, fillcolor="#eeeeee"];
+  "math/realclosure" -> "arena";
+  "math/realclosure" -> "math/interval";
+  "math/realclosure" -> "util/numeral";
   "math/realclosure" -> "util/params";
   "model" [style=filled, fillcolor="#eeeeee"];
   "model" -> "arena";
