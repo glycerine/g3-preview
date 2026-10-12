@@ -4,6 +4,7 @@
   "native_statement_coverage_of_current_go_code": 86.6,
   "coverage_warning": "Latest completed full native checkpointc32fb569 measures29932/34582 LP statements86.6%; not a measurement of later current code. Actual session40124 terminal exit0 and package/profile inspection verified. Excludes all debug-only code and later preparation short-write/three numeric benchmarks/executor changes. Later increments have separate focused coverage and scalar full-count evidence. Go statement coverage is not C++ completion; whole retained-source/consumer/ownership/SMT/CLI audits remain open.",
   "remaining_work": [
+    "lp_params.hpp live generated constructor/getters: borrowed local ParamsRef, acquired lp module reference, local/module/default fallback for rep_freq/min/print_stats/simplex_strategy/bprop_on_pivoted_rows; actual shell/lp_frontend.cpp and smt/theory_lra.cpp consumers",
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
     "remaining retained LU diagnostics and full solver/priority-queue lifecycle integration",
@@ -874,9 +875,10 @@
     },
     {
       "source": "src/util/lp/int_set.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/util/lp/int_set.go"
+        "pkg/util/lp/int_set.go",
+        "pkg/util/lp/scoped_container_audit_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -884,7 +886,66 @@
         "TestLPIntSetShrinkRetainsSourceIndexAndReachedClearPrefix",
         "TestLPIntSetIndependentFiniteMembership",
         "TestLPIntSetPrintOrderAndWriterFailure",
-        "TestLPIntSetPrintActualEndl"
+        "TestLPIntSetPrintActualEndl",
+        "TestLPIntSetPrintEveryByteAndBorrowedState"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructors, contains, insert and last-member replacement erase",
+          "status": "ported",
+          "go_target": "pkg/util/lp/int_set.go",
+          "tests": [
+            "TestLPIntSetSource",
+            "TestLPIntSetDenseOrderResizeAndGuards",
+            "TestLPIntSetShrinkRetainsSourceIndexAndReachedClearPrefix",
+            "TestLPIntSetIndependentFiniteMembership",
+            "TestLPIntSetPrintOrderAndWriterFailure"
+          ]
+        },
+        {
+          "name": "domain-only resize and growth, size/data_size/empty, borrowed dense traversal and clear",
+          "status": "ported",
+          "go_target": "pkg/util/lp/int_set.go",
+          "tests": [
+            "TestLPIntSetSource",
+            "TestLPIntSetDenseOrderResizeAndGuards",
+            "TestLPIntSetShrinkRetainsSourceIndexAndReachedClearPrefix",
+            "TestLPIntSetIndependentFiniteMembership",
+            "TestLPIntSetPrintOrderAndWriterFailure"
+          ]
+        },
+        {
+          "name": "unsigned-space-newline print via Go io.Writer",
+          "status": "ported",
+          "go_target": "pkg/util/lp/int_set.go",
+          "tests": [
+            "TestLPIntSetSource",
+            "TestLPIntSetDenseOrderResizeAndGuards",
+            "TestLPIntSetShrinkRetainsSourceIndexAndReachedClearPrefix",
+            "TestLPIntSetIndependentFiniteMembership",
+            "TestLPIntSetPrintOrderAndWriterFailure",
+            "TestLPIntSetPrintEveryByteAndBorrowedState"
+          ]
+        },
+        {
+          "name": "print source endl flush follows successful newline; actual empty/nonempty flush refusal",
+          "status": "ported",
+          "go_target": "pkg/util/lp/int_set.go",
+          "tests": [
+            "TestLPIntSetPrintActualEndl",
+            "TestLPIntSetPrintEveryByteAndBorrowedState"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native dense/inverse slices preserve all retained constructors/contains/insert/last-member erase/domain-only resize/growth/clear/print contracts. Borrowed dense view remains caller-readonly; no whole-owner generated copy root requires Clone. Unsupported signed extents and reached Clear invalid shrinking-domain prefixes have typed errors; no silent pruning. Larger core/LAR consumer algorithms remain independently partial. Checked print text and endl now reject every short nil-error write before later output/flush; output refusal leaves membership/order/inverse positions intact.",
+        "Whole-src no-ignore consumer scan includes .hpp. Native slices/maps own storage with no numeral/arena resources. Owner values are not copied after use; no source generated owner-copy caller remains unrepresented."
+      ],
+      "deviations": [
+        "Native dense/inverse slices preserve all retained constructors/contains/insert/last-member erase/domain-only resize/growth/clear/print contracts. Borrowed dense view remains caller-readonly; no whole-owner generated copy root requires Clone. Unsupported signed extents and reached Clear invalid shrinking-domain prefixes have typed errors; no silent pruning. Larger core/LAR consumer algorithms remain independently partial. Checked print text and endl now reject every short nil-error write before later output/flush; output refusal leaves membership/order/inverse positions intact.",
+        "Completion applies to this retained support header only; it does not promote larger solver/matrix/CLI/SMT source units. Audit /mnt/oldrog/tmp/g3-lp-scoped-container-audit.txt."
       ]
     },
     {
@@ -6056,26 +6117,75 @@
     },
     {
       "source": "src/util/lp/stacked_unordered_set.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/stacked_set.go",
-        "pkg/util/lp/stacked_set_test.go"
+        "pkg/util/lp/stacked_set_test.go",
+        "pkg/util/lp/scoped_container_audit_test.go"
       ],
       "tests": [
         "TestLPStackedIntSetSource",
         "TestLPStackedIntSetSnapshotOracle",
-        "TestLPStackedIntSetCheckedFailurePrefix"
+        "TestLPStackedIntSetCheckedFailurePrefix",
+        "TestLPStackedIntSetBorrowedViewAndFrameLifetime"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete int retained insert, push/pop and const set view, debug snapshot assertion before frame removal",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_set.go",
+          "tests": [
+            "TestLPStackedIntSetSource",
+            "TestLPStackedIntSetSnapshotOracle",
+            "TestLPStackedIntSetCheckedFailurePrefix",
+            "TestLPStackedIntSetBorrowedViewAndFrameLifetime"
+          ]
+        }
+      ],
+      "ownership": [
+        "Only concrete int instance is debug test_stacked_set under retained --smap. insert/push/pop/const set view and caller native snapshot are retained; erase/contains/size/other types have no call root and are excluded. Erased-map cancellation/restoration have no ordinary producer without unused Erase and remain source-body branches, not synthetic coverage. Native unordered iteration affects only independent scalar keys. Debug snapshot assertion precedes frame removal; corruption tests are outside valid const-source mutation. Popped frames clear all maps, readonly borrowed view remains attached through rollback and later insertion; native execution of source-debug scenario is independent extra evidence.",
+        "Whole-src no-ignore consumer scan includes .hpp. Native slices/maps own storage with no numeral/arena resources. Owner values are not copied after use; no source generated owner-copy caller remains unrepresented."
+      ],
+      "deviations": [
+        "Only concrete int instance is debug test_stacked_set under retained --smap. insert/push/pop/const set view and caller native snapshot are retained; erase/contains/size/other types have no call root and are excluded. Erased-map cancellation/restoration have no ordinary producer without unused Erase and remain source-body branches, not synthetic coverage. Native unordered iteration affects only independent scalar keys. Debug snapshot assertion precedes frame removal; corruption tests are outside valid const-source mutation. Popped frames clear all maps, readonly borrowed view remains attached through rollback and later insertion; native execution of source-debug scenario is independent extra evidence.",
+        "Completion applies to this retained support header only; it does not promote larger solver/matrix/CLI/SMT source units. Audit /mnt/oldrog/tmp/g3-lp-scoped-container-audit.txt."
       ]
     },
     {
       "source": "src/util/lp/stacked_value.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/util/lp/stacked_value.go"
+        "pkg/util/lp/stacked_value.go",
+        "pkg/util/lp/scoped_container_audit_test.go"
       ],
       "tests": [
         "TestLPStackedUnsignedSource",
-        "TestLPStackedSignedStatusAndStrategy"
+        "TestLPStackedSignedStatusAndStrategy",
+        "TestLPStackedScalarBorrowedValuesAndIndependentScopes"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete unsigned/int32/lp_status/simplex_strategy value snapshots, direct scalar mutation, push/stack_size and saturating pop",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_value.go",
+          "tests": [
+            "TestLPStackedUnsignedSource",
+            "TestLPStackedSignedStatusAndStrategy",
+            "TestLPStackedScalarBorrowedValuesAndIndependentScopes"
+          ]
+        }
+      ],
+      "ownership": [
+        "Only unsigned/int/lp_status/simplex_strategy_enum retained instances. Native scalar fields implement construction/assignment/reference conversions; snapshots use native slices, Pop saturates at empty and StackSize narrows to uint32. Saved references continue to address restored current value across Push/Pop. Source unspecified default scalar initialization is not claimed as an observable initialized value. No retained whole-owner copy root or unused generic adapter; larger LAR scope algorithms remain independently partial.",
+        "Whole-src no-ignore consumer scan includes .hpp. Native slices/maps own storage with no numeral/arena resources. Owner values are not copied after use; no source generated owner-copy caller remains unrepresented."
+      ],
+      "deviations": [
+        "Only unsigned/int/lp_status/simplex_strategy_enum retained instances. Native scalar fields implement construction/assignment/reference conversions; snapshots use native slices, Pop saturates at empty and StackSize narrows to uint32. Saved references continue to address restored current value across Push/Pop. Source unspecified default scalar initialization is not claimed as an observable initialized value. No retained whole-owner copy root or unused generic adapter; larger LAR scope algorithms remain independently partial.",
+        "Completion applies to this retained support header only; it does not promote larger solver/matrix/CLI/SMT source units. Audit /mnt/oldrog/tmp/g3-lp-scoped-container-audit.txt."
       ]
     },
     {
@@ -11479,5 +11589,55 @@
     ],
     "whole_unit_promotion": false,
     "full_registered_pair_count_verified": false
+  },
+  "latest_scoped_container_support_audit": {
+    "status": "verified",
+    "audit": "/mnt/oldrog/tmp/g3-lp-scoped-container-audit.txt",
+    "headers": [
+      "src/util/lp/int_set.h",
+      "src/util/lp/stacked_unordered_set.h",
+      "src/util/lp/stacked_value.h"
+    ],
+    "tests": [
+      "TestLPIntSetPrintEveryByteAndBorrowedState",
+      "TestLPStackedScalarBorrowedValuesAndIndependentScopes",
+      "TestLPStackedIntSetBorrowedViewAndFrameLifetime"
+    ],
+    "coverage": {
+      "native": {
+        "int_set.go": [
+          45,
+          45
+        ],
+        "stacked_value.go": [
+          32,
+          32
+        ],
+        "stacked_set.go": [
+          27,
+          34
+        ]
+      },
+      "debug": {
+        "int_set.go": [
+          45,
+          45
+        ],
+        "stacked_value.go": [
+          32,
+          32
+        ],
+        "stacked_set.go": [
+          32,
+          34
+        ]
+      }
+    },
+    "scope_warning": "Retained support headers only. Larger core/LAR/SMT/global driver consumers retain independent partial audits. New Print fix postdates completed full nativec32fb569; focused evidence separate.",
+    "summary": "Whole retained-source/ownership audit completes int_set.h, stacked_value.h and stacked_unordered_set.h. No-ignore source scans include .hpp: core/LAR feasibility/changed-bound/left-basis/pivoted-row integer sets, four actual scalar stack types and debug test-only int stacked set. Excluded unused whole-owner copies/other templates and set erase/lookup/size adapters; larger algorithms remain independently partial. Fixed IntSet.Print short nil-error writes with checked unsigned text/newline before endl flush. Three new test groups verify every empty/nonempty print byte/state/flush,12*3000 independent linked-snapshot worlds across all4types with live saved T& references, and a borrowed readonly set view across nested/excess Pop plus popped-map release. Focused native0.613s/combined0.695s; int_set45/45statements100%, scalar stack32/32100% both, set27/3479.4% native32/3494.1% combined. Native erases source debug assertions; ordinary erased-map branches have no retained producer without unused Erase, invalid borrowed-view corruption is separately qualified. Related actual LAR core/scope/validator/nested-bound/CLI tests native82.910s/combined139.937s pass; both LP vets and source portcheck pass (2103units/677APIs,78ported/362partial/1620unported/5dead). LP inventory16ported/79partial/10reference_only/3dead_deleted/2platform_replacement of110units. Completed full nativec32fb569 predates this Print fix and tests; focused profiles separate. Numeric-pair full-count session70865 remains live. Audit /mnt/oldrog/tmp/g3-lp-scoped-container-audit.txt; profiles /mnt/oldrog/tmp/g3-lp-scoped-container-{native,debug}.cover. Found actual missing generated lp_params.hpp constructor/five getters used by shell/lp_frontend.cpp and smt/theory_lra.cpp; recorded explicit next obligation, header/PYG remain partial.",
+    "focused_native_seconds": 0.613,
+    "focused_debug_seconds": 0.695,
+    "consumer_native_seconds": 82.91,
+    "consumer_debug_seconds": 139.937
   }
 }

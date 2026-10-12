@@ -3,9 +3,9 @@ package lp
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"math"
+	"strconv"
 )
 
 var ErrBounds = errors.New("lp: source index or extent outside supported bounds")
@@ -96,13 +96,9 @@ func (s *IntSet) Clear() error {
 // insertions, followed by the source endl flush. File ownership is borrowed.
 func (s *IntSet) Print(out io.Writer) error {
 	for _, j := range s.index {
-		if _, err := fmt.Fprintf(out, "%d ", j); err != nil {
+		if err := writeConstraintText(out, strconv.FormatUint(uint64(j), 10)+" "); err != nil {
 			return err
 		}
 	}
-	_, err := fmt.Fprintln(out)
-	if err != nil {
-		return err
-	}
-	return dualFlush(out)
+	return writeDriverLine(out, "")
 }
