@@ -1697,7 +1697,7 @@
     },
     {
       "source": "src/util/lp/lar_core_solver.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/lar_core.go",
         "pkg/util/lp/lar_model_test.go",
@@ -1855,11 +1855,15 @@
         "TestLARRandomIntervalReachedGuards",
         "TestLARRandomIntervalEmptyStopsBeforeLaterColumn",
         "TestLARRandomIntervalPreservesOlderComparison"
+      ],
+      "retained_source_audit_evidence": "Whole retained LAR audit: concrete exact/pair and floating core construction, preparation, signature/LU/tableau catch-up, exact core Solve, whole-model construction/scopes, changed-bound scheduling, propagation, conflict explanations, model extraction and exact maximization map to typed Go implementations. Retained source callers and borrowed settings/namer/model state are reconciled. Uncalled scaling and quick-xplain wrappers, assertion-only or definition-only helpers, and commented constraint normalization are excluded as source behavior; add_constraint preserves its executable assertion/no-op. Native and checked focused LAR tests pass (92.449s/183.456s), with full native checkpoint 17ecadb7 validating unchanged Go code. CPUs8-16/GOMAXPROCS9. Excluded uncalled lar_core_solver::scale_problem_for_doubles and its sole create_double_matrix helper (lar_core_solver.h:638-645,687-714). Exact scaler instantiation alone is not a retained caller.",
+      "deviations": [
+        "Excluded uncalled lar_core_solver::scale_problem_for_doubles and its sole create_double_matrix helper (lar_core_solver.h:638-645,687-714). Exact scaler instantiation alone is not a retained caller."
       ]
     },
     {
       "source": "src/util/lp/lar_core_solver.hpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/lar_core.go",
         "pkg/util/lp/lar_model_test.go",
@@ -1917,7 +1921,8 @@
         "TestLAROuterSolvePreservesOlderComparison",
         "TestLAROuterSolveCounterWrapAndRepeatedEarlyReturn",
         "TestLAROuterSolvePreparationAndReconstructionErrors"
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained LAR audit: concrete exact/pair and floating core construction, preparation, signature/LU/tableau catch-up, exact core Solve, whole-model construction/scopes, changed-bound scheduling, propagation, conflict explanations, model extraction and exact maximization map to typed Go implementations. Retained source callers and borrowed settings/namer/model state are reconciled. Uncalled scaling and quick-xplain wrappers, assertion-only or definition-only helpers, and commented constraint normalization are excluded as source behavior; add_constraint preserves its executable assertion/no-op. Native and checked focused LAR tests pass (92.449s/183.456s), with full native checkpoint 17ecadb7 validating unchanged Go code. CPUs8-16/GOMAXPROCS9. Header implementation methods have direct Go targets and tests; constructor, scratch and owned exact state are paired with the declaration audit."
     },
     {
       "source": "src/util/lp/lar_core_solver_instances.cpp",
@@ -1977,7 +1982,7 @@
     },
     {
       "source": "src/util/lp/lar_solver.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/lar_bounds.go",
         "pkg/util/lp/lar_bounds_test.go",
@@ -2215,8 +2220,10 @@
         }
       ],
       "deviations": [
-        "Implied-bound printing retains source original terms and all newline/endl positions. Original term coefficient order uses the existing insertion-ordered dictionary instead of unordered C++ bucket order. Existing native Go writer errors and explicit borrowed manager/owner guards apply; no whole LAR, SMT trace transport or CLI scenario completion credit."
-      ]
+        "Implied-bound printing retains source original terms and all newline/endl positions. Original term coefficient order uses the existing insertion-ordered dictionary instead of unordered C++ bucket order. Existing native Go writer errors and explicit borrowed manager/owner guards apply; no whole LAR, SMT trace transport or CLI scenario completion credit.",
+        "Excluded uncalled lar_solver::shrink_explanation_to_minimum (lar_solver.h:1557-1561); theory_lra.cpp:2213 comments out its sole external invocation. clear, adjust_x_of_column and create_matrix_A are assertion-only with no retained call; pop_core_solver_params, substitute_terms (only in commented add_constraint), and try_pivot_fixed_vars_from_basis have no retained call. add_constraint executable assertion/native return is ported."
+      ],
+      "retained_source_audit_evidence": "Whole retained LAR audit: concrete exact/pair and floating core construction, preparation, signature/LU/tableau catch-up, exact core Solve, whole-model construction/scopes, changed-bound scheduling, propagation, conflict explanations, model extraction and exact maximization map to typed Go implementations. Retained source callers and borrowed settings/namer/model state are reconciled. Uncalled scaling and quick-xplain wrappers, assertion-only or definition-only helpers, and commented constraint normalization are excluded as source behavior; add_constraint preserves its executable assertion/no-op. Native and checked focused LAR tests pass (92.449s/183.456s), with full native checkpoint 17ecadb7 validating unchanged Go code. CPUs8-16/GOMAXPROCS9. Excluded uncalled lar_solver::shrink_explanation_to_minimum (lar_solver.h:1557-1561); theory_lra.cpp:2213 comments out its sole external invocation. clear, adjust_x_of_column and create_matrix_A are assertion-only with no retained call; pop_core_solver_params, substitute_terms (only in commented add_constraint), and try_pivot_fixed_vars_from_basis have no retained call. add_constraint executable assertion/native return is ported."
     },
     {
       "source": "src/util/lp/lar_term.h",
@@ -8372,10 +8379,9 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 92,
+    "ported": 95,
     "reference_only": 10,
-    "dead_deleted": 3,
-    "partial": 3
+    "dead_deleted": 3
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -15542,5 +15548,24 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed on unchanged Go code; focused checked evidence is separate."
+  },
+  "latest_lar_whole_audit": {
+    "source_units": [
+      "src/util/lp/lar_core_solver.h",
+      "src/util/lp/lar_core_solver.hpp",
+      "src/util/lp/lar_solver.h"
+    ],
+    "scope": "Whole retained LAR audit: concrete exact/pair and floating core construction, preparation, signature/LU/tableau catch-up, exact core Solve, whole-model construction/scopes, changed-bound scheduling, propagation, conflict explanations, model extraction and exact maximization map to typed Go implementations. Retained source callers and borrowed settings/namer/model state are reconciled. Uncalled scaling and quick-xplain wrappers, assertion-only or definition-only helpers, and commented constraint normalization are excluded as source behavior; add_constraint preserves its executable assertion/no-op. Native and checked focused LAR tests pass (92.449s/183.456s), with full native checkpoint 17ecadb7 validating unchanged Go code. CPUs8-16/GOMAXPROCS9.",
+    "focused_tests": {
+      "native": "PASS 92.449s",
+      "g3debug_g3checked": "PASS 183.456s"
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-lar-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-lar-whole-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Full native checkpoint 17ecadb7 passes on unchanged Go code; subsequent work changes ledgers only."
   }
 }

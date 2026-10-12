@@ -122019,7 +122019,7 @@
       "path": "src/util/lp/lar_core_solver.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/lar_core.go",
         "pkg/util/lp/lar_model_test.go",
@@ -122366,8 +122366,8 @@
           "text": "SASSERT(l.x + delta * l.y <= u.x + delta * u.y);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained LAR exact/floating core constructor, borrowed settings/namer, source default state, dimensions/tiny/empty and LU-mode queries, owning teardown",
@@ -122605,12 +122605,6 @@
             "TestLARRandomIntervalEmptyStopsBeforeLaterColumn",
             "TestLARRandomIntervalPreservesOlderComparison"
           ]
-        },
-        {
-          "name": "scale_problem_for_doubles and its sole create_double_matrix helper have no retained root caller; whole-source reachability audit",
-          "status": "dead_deleted",
-          "go_target": "",
-          "tests": []
         }
       ],
       "ownership": [
@@ -122638,14 +122632,16 @@
         "Only retained pair and float forward catch-up plus the pair reverse consumer are implemented. Source unsigned threshold addition wraps; exact discarded LU is rebuilt immediately while discarded floating LU stays nil. Unmatched endpoint queues are discarded without forcing the requested basis; signature-guided exact solve and complete LAR orchestration remain open.",
         "Exact/floating nonbasic orders remain independent on the normal signature path; only the rollback fallback copies all metadata arrays. Coupled solver test fixtures now derive actual column/row count estimates rather than the scope-only sentinels, so exact pricing runs with valid source counts. Full signature-guided tableau and whole-LAR solve orchestration remain open.",
         "Strict model delta selection now visits all set bounds against actual exact X; boxed-only bound conversion remains a separate source routine. Output copying begins after all column updates; input/output aliasing is supported. Whole rational model extraction, constraint validation, outer LARSolver orchestration and complete upstream drivers remain open.",
-        "Whole-source scaling reachability: scale_problem_for_doubles (lar_core_solver.h:687-714) has no caller; create_double_matrix (638-645) is reached only by that dead helper. Exact scaler<mpq,mpq>::scale has only an explicit instantiation, since lp_solver::scale precise() returns before constructing a scaler. No standalone exact scaler or LAR scaling helper is ported. Live exact solver Scale is already implemented and tested with nil Settings by TestLPRationalPreparationIndependentMatricesAndRHS; floating assembly/scaling/restoration is tested independently by TestLPFloatSolverIndependentAssemblyScalingAndRestoration. Whole LP/LAR caller and ownership audits remain open."
-      ]
+        "Whole-source scaling reachability: scale_problem_for_doubles (lar_core_solver.h:687-714) has no caller; create_double_matrix (638-645) is reached only by that dead helper. Exact scaler<mpq,mpq>::scale has only an explicit instantiation, since lp_solver::scale precise() returns before constructing a scaler. No standalone exact scaler or LAR scaling helper is ported. Live exact solver Scale is already implemented and tested with nil Settings by TestLPRationalPreparationIndependentMatricesAndRHS; floating assembly/scaling/restoration is tested independently by TestLPFloatSolverIndependentAssemblyScalingAndRestoration. Whole LP/LAR caller and ownership audits remain open.",
+        "Excluded uncalled lar_core_solver::scale_problem_for_doubles and its sole create_double_matrix helper (lar_core_solver.h:638-645,687-714). Exact scaler instantiation alone is not a retained caller."
+      ],
+      "retained_source_audit_evidence": "Whole retained LAR audit: concrete exact/pair and floating core construction, preparation, signature/LU/tableau catch-up, exact core Solve, whole-model construction/scopes, changed-bound scheduling, propagation, conflict explanations, model extraction and exact maximization map to typed Go implementations. Retained source callers and borrowed settings/namer/model state are reconciled. Uncalled scaling and quick-xplain wrappers, assertion-only or definition-only helpers, and commented constraint normalization are excluded as source behavior; add_constraint preserves its executable assertion/no-op. Native and checked focused LAR tests pass (92.449s/183.456s), with full native checkpoint 17ecadb7 validating unchanged Go code. CPUs8-16/GOMAXPROCS9. Excluded uncalled lar_core_solver::scale_problem_for_doubles and its sole create_double_matrix helper (lar_core_solver.h:638-645,687-714). Exact scaler instantiation alone is not a retained caller."
     },
     {
       "path": "src/util/lp/lar_core_solver.hpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/lar_core.go",
         "pkg/util/lp/lar_model_test.go",
@@ -122766,8 +122762,8 @@
           "text": "SASSERT(m_r_solver.inf_set_is_correct());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained LAR constructor binding actual mpq/impq and double/double primal cores to live model vector headers",
@@ -122864,7 +122860,8 @@
         "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update.",
         "Concrete retained LAR infeasibility explanation consumer now ports inf_sign_of_column, which was not needed by row pricing alone. The existing typed sparse coefficient vector preserves source pair-copy lifetimes, zeros and order; a stopped negation/append remains owned until Core.Close. Full LAR Solve and signature/presolve integration remain open; no whole source-unit promotion.",
         "Outer LAR Solve and exact nonbasic bound snapping are implemented with actual coupled solvers and source publication order. Direct tableau cancellation may become Optimal while values remain infeasible; floating timeout preserves TimeExhausted via its earlier return. Tests preserve these literal source behaviors. No whole-source-unit promotion; remaining source audits and upstream drivers remain open."
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained LAR audit: concrete exact/pair and floating core construction, preparation, signature/LU/tableau catch-up, exact core Solve, whole-model construction/scopes, changed-bound scheduling, propagation, conflict explanations, model extraction and exact maximization map to typed Go implementations. Retained source callers and borrowed settings/namer/model state are reconciled. Uncalled scaling and quick-xplain wrappers, assertion-only or definition-only helpers, and commented constraint normalization are excluded as source behavior; add_constraint preserves its executable assertion/no-op. Native and checked focused LAR tests pass (92.449s/183.456s), with full native checkpoint 17ecadb7 validating unchanged Go code. CPUs8-16/GOMAXPROCS9. Header implementation methods have direct Go targets and tests; constructor, scratch and owned exact state are paired with the declaration audit."
     },
     {
       "path": "src/util/lp/lar_core_solver_instances.cpp",
@@ -122930,7 +122927,7 @@
       "path": "src/util/lp/lar_solver.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/lar_bounds.go",
         "pkg/util/lp/lar_bounds_test.go",
@@ -123513,8 +123510,8 @@
           "text": "SASSERT(this->explanation_is_correct(explanation));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "set_low_bound_witness and set_upper_bound_witness over concrete scoped ul_pair records",
@@ -123543,11 +123540,6 @@
             "TestLARBoundsDebugInvariantProfiles",
             "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
           ]
-        },
-        {
-          "name": "remaining whole-model constraint scopes, exact optimization, whole propagation scheduling and explanations",
-          "status": "unported",
-          "tests": []
         },
         {
           "name": "adjust_column_index_to_term_index and get_term live directory mapping consumed by exact bound propagation",
@@ -123892,11 +123884,6 @@
           ]
         },
         {
-          "name": "shrink_explanation_to_minimum (1557-1561)",
-          "status": "reference_only",
-          "tests": []
-        },
-        {
           "name": "get_total_iterations and get_list_of_all_var_indices (464-473)",
           "status": "ported",
           "go_target": "pkg/util/lp/lar_driver_queries.go",
@@ -123960,8 +123947,10 @@
         "Outer LARSolver FindFeasibleSolution, Solve and SolveWithCoreSolver now implement lar_solver.h:433-454,851-869 using the actual strategy initialization, exact/floating LU extension, exact prefix, changed-bound feasibility/cost updates, coupled core Solve, status publication and touched-row detection. The infeasible early return retains changed columns; strategy selection and the feasible-only flag precede that early return in FindFeasibleSolution. Ordinary Solve clears changed columns after optional propagation; errors retain the reached prefix.360 independently checked systems span all three strategies, strict/non-strict bounds and feasible/impossible rational term inequalities with original constants; extracted models satisfy independent rational inequalities and actual constraints. Direct core/repeated solves, bound-propagation toggles, early contradictory bounds, both undecided threshold branches, deferred-term/pending-core errors,21 cancellation/diagnostic worlds and four preparation/validation errors verify source order. Twelve pooled/direct physical refusal campaigns through success use large bounds and large matrix coefficients, and an actual older caller comparison survives owner cleanup. Source behavior is preserved: LU signature solving sets feasible-only even after a direct Solve entry; the floating term-row basis sign can leave the double presolver feasible while the exact model violates its upper bound, so cancellation may publish Optimal. A fixed term bound forces the separate floating TimeExhausted route. Tableau-cost direct optimization with active feasibility costs reaches DecideOnStatusWhenCannotFindEntering need_to_switch_costs assertion in debug and continues to Optimal in native; no silent cost-switch repair. New file49/57 statements (86.0%) native and55/57 (96.5%) debug/checked. Remaining debug branches guard final changed-set clearing and the cost-set extent derived from the actual model vector; native additionally erases final model validation. Focused native/debug2.828s/12.625s and related LAR native/debug55.307s/63.758s pass. Full native checkpoint60516955 is still running and predates this increment; completion and coverage are not credited. Complete upstream drivers, remaining optimization/scaling/random-update/diagnostic paths and whole-source audits remain open; inventory remains85 partial/25 unported. Both LP vets, native/debug module compilation, source portcheck, graph refresh and diff checks pass.",
         "Touched-row propagation now implements lar_solver.h:413-427 and its retained term-loop/assertion body at363-365,402-409, consumed by theory_lra.cpp:1303-1314. PropagateBoundsForTouchedRows bypasses non-tableau modes before inspecting rows or propagator, analyzes real rows in dense-set order, reads cancellation only after each complete row and clears marks only after the entire pass. Cancellation retains all marks for replay, including already completed rows; numerical/hook/provider errors stop the owner with reached bounds and lexical children intact. Live mode dispatch after final clearing preserves the source unused-term SASSERT(false)/native no-op body instead of inventing missing term propagation.160 independent three-row rational interval worlds across both tableau strategies run actual variable/term/bound construction and FindFeasibleSolution before propagation, check all960 emitted endpoint values, signs, strictness, term constants and row provenance, then replay and empty passes. Six cancellation/error prefixes, eight entry/late-row/cutoff/hook profiles and four live-mode/direct-term worlds verify ordering and retained publication. Two pooled/direct physical refusal campaigns through success cover large coefficients, first/late row arithmetic and partial propagator publication; an actual older caller comparison survives cleanup without adoption. New file29/33 statements (87.9%) native and31/33 (93.9%) debug/checked. Remaining debug returns guard final touched-set clearing and term-index validation in the established loop; native does not reach the term assertion/error paths in these worlds. Focused native/debug1.059s/1.824s pass. Full native60516955 checkpoint completed2026-10-11 at11:06:12UTC with exit0 and all64packages passing: LP1102.689s,19510/22307 statements (87.5%). Profile inspection confirms it predates outer LARSolver solve and this increment; their focused evidence remains separate. Whole-source audits, complete upstream drivers, remaining optimization/scaling/random-update/diagnostic work remain open; inventory remains85 partial/25 unported. Upstream lp.cpp bound-propagation examples call add_constraint, whose executable source body is only SASSERT(false)/native return0; disabled commented normalization code is not credited as an implementation. Related row analysis/propagator/changed-bound/outer-solve regressions pass110.008s native/139.015s debug/checked. Both LP vets, both module compilation gates, source portcheck, graph refresh and diff checks pass.",
         "Upstream test_term, test_evidence_for_total_inf_simple and triangle propagation driver faithfully reach the executable AddConstraint assertion/no-op. Native results are tested as unconstrained/partially constrained source behavior, not credited as solutions of the commented intended systems. A separate test installs the infeasible example through retained AddTerm/AddVarBound and independently validates its certificate.",
-        "Implied-bound printing retains source original terms and all newline/endl positions. Original term coefficient order uses the existing insertion-ordered dictionary instead of unordered C++ bucket order. Existing native Go writer errors and explicit borrowed manager/owner guards apply; no whole LAR, SMT trace transport or CLI scenario completion credit."
-      ]
+        "Implied-bound printing retains source original terms and all newline/endl positions. Original term coefficient order uses the existing insertion-ordered dictionary instead of unordered C++ bucket order. Existing native Go writer errors and explicit borrowed manager/owner guards apply; no whole LAR, SMT trace transport or CLI scenario completion credit.",
+        "Excluded uncalled lar_solver::shrink_explanation_to_minimum (lar_solver.h:1557-1561); theory_lra.cpp:2213 comments out its sole external invocation. clear, adjust_x_of_column and create_matrix_A are assertion-only with no retained call; pop_core_solver_params, substitute_terms (only in commented add_constraint), and try_pivot_fixed_vars_from_basis have no retained call. add_constraint executable assertion/native return is ported."
+      ],
+      "retained_source_audit_evidence": "Whole retained LAR audit: concrete exact/pair and floating core construction, preparation, signature/LU/tableau catch-up, exact core Solve, whole-model construction/scopes, changed-bound scheduling, propagation, conflict explanations, model extraction and exact maximization map to typed Go implementations. Retained source callers and borrowed settings/namer/model state are reconciled. Uncalled scaling and quick-xplain wrappers, assertion-only or definition-only helpers, and commented constraint normalization are excluded as source behavior; add_constraint preserves its executable assertion/no-op. Native and checked focused LAR tests pass (92.449s/183.456s), with full native checkpoint 17ecadb7 validating unchanged Go code. CPUs8-16/GOMAXPROCS9. Excluded uncalled lar_solver::shrink_explanation_to_minimum (lar_solver.h:1557-1561); theory_lra.cpp:2213 comments out its sole external invocation. clear, adjust_x_of_column and create_matrix_A are assertion-only with no retained call; pop_core_solver_params, substitute_terms (only in commented add_constraint), and try_pivot_fixed_vars_from_basis have no retained call. add_constraint executable assertion/native return is ported."
     },
     {
       "path": "src/util/lp/lar_term.h",
@@ -174598,5 +174587,24 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed on unchanged Go code; focused checked evidence is separate."
+  },
+  "latest_lar_whole_audit": {
+    "source_units": [
+      "src/util/lp/lar_core_solver.h",
+      "src/util/lp/lar_core_solver.hpp",
+      "src/util/lp/lar_solver.h"
+    ],
+    "scope": "Whole retained LAR audit: concrete exact/pair and floating core construction, preparation, signature/LU/tableau catch-up, exact core Solve, whole-model construction/scopes, changed-bound scheduling, propagation, conflict explanations, model extraction and exact maximization map to typed Go implementations. Retained source callers and borrowed settings/namer/model state are reconciled. Uncalled scaling and quick-xplain wrappers, assertion-only or definition-only helpers, and commented constraint normalization are excluded as source behavior; add_constraint preserves its executable assertion/no-op. Native and checked focused LAR tests pass (92.449s/183.456s), with full native checkpoint 17ecadb7 validating unchanged Go code. CPUs8-16/GOMAXPROCS9.",
+    "focused_tests": {
+      "native": "PASS 92.449s",
+      "g3debug_g3checked": "PASS 183.456s"
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-lar-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-lar-whole-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Full native checkpoint 17ecadb7 passes on unchanged Go code; subsequent work changes ledgers only."
   }
 }
