@@ -84,7 +84,6 @@ func TestLPExactRowEtaIndependentMatrixProducts(t *testing.T) {
 func TestLPExactRowEtaConjugationAndElements(t *testing.T) {
 	h := newLPPairHarness(t)
 	p := h.pair("3/7", "-2/11")
-	out := h.pair("0", "0")
 	for _, values := range lpPermutations(4) {
 		e := NewRationalRowEtaMatrix(h.m, 99, 1, 4)
 		h.must(e.Append(3, &p.Y))
@@ -95,13 +94,19 @@ func TestLPExactRowEtaConjugationAndElements(t *testing.T) {
 		old := lpExactIdentity(4)
 		old[1][3].SetFrac64(-2, 11)
 		old[1][0].SetFrac64(3, 7)
-		for i := uint32(0); i < 4; i++ {
-			for j := uint32(0); j < 4; j++ {
-				h.must(e.Element(i, j, &out.X))
-				lpCheckExactPermutationCoordinate(t, h, &out.X, old[values[i]][values[j]])
+		// Every column is checked through the retained application, without
+		// introducing an unused exact debug matrix interface.
+		for j := 0; j < 4; j++ {
+			in := []*big.Rat{new(big.Rat), new(big.Rat), new(big.Rat), new(big.Rat)}
+			in[j].SetInt64(1)
+			w := lpExactVectorFromOracle(h, in)
+			h.must(e.ApplyLeft(w.Data))
+			for i := 0; i < 4; i++ {
+				lpCheckExactPermutationCoordinate(t, h, &w.Data[i], old[values[i]][values[j]])
 			}
+			h.must(w.Close())
 		}
-		if e.RowIndex() != perm.reverse[1] || e.RowCount() != 4 || e.ColumnCount() != 4 || e.IsDense() {
+		if e.RowIndex() != perm.reverse[1] || e.IsDense() {
 			t.Fatal("metadata")
 		}
 		h.must(e.Close())
@@ -130,10 +135,7 @@ func lpExactRowEtaCheckFaultSuccess(t *testing.T, h *lpPairHarness, op string, e
 		lpCheckExactPermutationCoordinate(t, h, &e.Row.Data[0].Value, px)
 		return
 	}
-	if op == "lookup" {
-		lpCheckExactPermutationCoordinate(t, h, &w.Data[0], px)
-		return
-	}
+
 	matrix := lpExactIdentity(2)
 	matrix[0][1].Set(px)
 	x := []*big.Rat{big.NewRat(2, 1), big.NewRat(2, 1)}
@@ -176,131 +178,133 @@ func lpExactRowEtaCheckFaultSuccess(t *testing.T, h *lpPairHarness, op string, e
 }
 
 func TestLPExactRowEtaAllocationFailureCensus(t *testing.T) {
-	for _, op := range []string{"append", "lookup", "left", "right", "sparse-left", "sparse-right", "pair-left", "left-large-source", "right-large-source", "sparse-left-large-source", "sparse-right-large-source", "pair-large-source", "sparse-left-zero-pivot", "sparse-right-zero-dest", "sparse-left-cancel"} {
-		failures, successes, publishedStops := 0, 0, 0
-		for ordinal := int64(0); ordinal < 150; ordinal++ {
-			done := false
-			t.Run(fmt.Sprintf("%s/%d", op, ordinal), func(t *testing.T) {
-				h := newLPPairHarness(t)
-				p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
-				small := h.pair("2", "3")
-				e := NewPairRowEtaMatrix(h.m, 99, 0, 2)
-				if op != "append" {
-					c := &p.X
+	for _, direct := range []bool{false, true} {
+		for _, op := range []string{"append", "left", "right", "sparse-left", "sparse-right", "pair-left", "left-large-source", "right-large-source", "sparse-left-large-source", "sparse-right-large-source", "pair-large-source", "sparse-left-zero-pivot", "sparse-right-zero-dest", "sparse-left-cancel"} {
+			failures, successes, publishedStops := 0, 0, 0
+			for ordinal := int64(0); ordinal < 150; ordinal++ {
+				done := false
+				t.Run(fmt.Sprintf("direct=%t/%s/%d", direct, op, ordinal), func(t *testing.T) {
+					var h *lpPairHarness
+					if direct {
+						h = lpNewDirectSparseHarness(t)
+					} else {
+						h = newLPPairHarness(t)
+					}
+					p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
+					small := h.pair("2", "3")
+					e := NewPairRowEtaMatrix(h.m, 99, 0, 2)
+					if op != "append" {
+						c := &p.X
+						if strings.Contains(op, "large-source") {
+							c = &small.Y
+						}
+						if op == "sparse-left-cancel" {
+							neg := h.pair("-"+strings.Repeat("1234567890", 100)+"/7", "0")
+							c = &neg.X
+						}
+						h.must(e.Append(1, c))
+					}
+					w := NewIndexedRationalVector(h.m, 2)
+					pw := NewIndexedPairVector(h.m, 2)
+					for i := range w.Data {
+						h.must(w.copySlot(&w.Data[i], &small.X))
+						h.must(pw.copySlot(&pw.Data[i], small))
+					}
+					w.Index = []uint32{1, 0}
 					if strings.Contains(op, "large-source") {
-						c = &small.Y
+						i := 1
+						if strings.Contains(op, "right") {
+							i = 0
+						}
+						h.must(w.copySlot(&w.Data[i], &p.X))
+						h.must(pw.copySlot(&pw.Data[i], p))
+					}
+					if op == "sparse-left-zero-pivot" {
+						z := numeral.NewRational()
+						h.must(w.copySlot(&w.Data[0], &z))
+						w.Index = []uint32{1}
+					}
+					if op == "sparse-right-zero-dest" {
+						z := numeral.NewRational()
+						h.must(w.copySlot(&w.Data[1], &z))
+						w.Index = []uint32{0}
 					}
 					if op == "sparse-left-cancel" {
-						neg := h.pair("-"+strings.Repeat("1234567890", 100)+"/7", "0")
-						c = &neg.X
+						h.must(w.copySlot(&w.Data[0], &p.X))
+						h.must(h.m.SetInt64(&w.Data[1], 1))
 					}
-					h.must(e.Append(1, c))
+					h.budget.FailAfter(ordinal)
+					var err error
+					switch op {
+					case "append":
+						err = e.Append(1, &p.X)
+					case "left", "left-large-source":
+						err = e.RationalRowEtaMatrix.ApplyLeft(w.Data)
+					case "right", "right-large-source":
+						err = e.ApplyRight(w.Data)
+					case "sparse-left", "sparse-left-large-source", "sparse-left-zero-pivot", "sparse-left-cancel":
+						err = e.ApplyLeftToT(w, nil)
+					case "sparse-right", "sparse-right-large-source", "sparse-right-zero-dest":
+						err = e.ApplyRightIndexed(w)
+					case "pair-left", "pair-large-source":
+						err = e.ApplyLeft(pw.Data)
+					}
+					h.budget.FailAfter(-1)
+					if err == nil {
+						lpExactRowEtaCheckFaultSuccess(t, h, op, e, w, pw, p)
+						successes++
+						done = true
+					} else {
+						if !lpExactPriorityPhysicalRefusal(err) {
+							t.Fatal(err)
+						}
+						failures++
+						if op == "sparse-left-zero-pivot" && len(w.Index) == 2 {
+							publishedStops++
+						}
+					}
+					if e.ready() != nil {
+						if er := e.Append(1, &small.X); er != ErrExactVectorPending {
+							t.Fatal(er)
+						}
+						if er := e.ApplyLeft(pw.Data); er != ErrExactVectorPending {
+							t.Fatal(er)
+						}
+						if er := e.RationalRowEtaMatrix.ApplyLeft(w.Data); er != ErrExactVectorPending {
+							t.Fatal(er)
+						}
+						if er := e.ApplyRight(w.Data); er != ErrExactVectorPending {
+							t.Fatal(er)
+						}
+						if er := e.ApplyLeftToT(w, nil); er != ErrExactVectorPending {
+							t.Fatal(er)
+						}
+						if er := e.ApplyRightIndexed(w); er != ErrExactVectorPending {
+							t.Fatal(er)
+						}
+						if er := e.Conjugate(NewPermutation(2)); er != ErrExactVectorPending {
+							t.Fatal(er)
+						}
+					}
+					h.must(e.Close())
+					h.must(e.Close())
+					h.must(w.Close())
+					h.must(pw.Close())
+					lpExactVectorNamedCensus(t, h, nil)
+					if h.m.DivisionInvocationState().Active || h.m.RawInvocationState().Active != [3]bool{} || h.m.Z.DivisionRaw.Active || h.m.Z.GcdRaw.Active {
+						t.Fatal("orphan numeric frame")
+					}
+				})
+				if done {
+					break
 				}
-				w := NewIndexedRationalVector(h.m, 2)
-				pw := NewIndexedPairVector(h.m, 2)
-				for i := range w.Data {
-					h.must(w.copySlot(&w.Data[i], &small.X))
-					h.must(pw.copySlot(&pw.Data[i], small))
-				}
-				w.Index = []uint32{1, 0}
-				if strings.Contains(op, "large-source") {
-					i := 1
-					if strings.Contains(op, "right") {
-						i = 0
-					}
-					h.must(w.copySlot(&w.Data[i], &p.X))
-					h.must(pw.copySlot(&pw.Data[i], p))
-				}
-				if op == "sparse-left-zero-pivot" {
-					z := numeral.NewRational()
-					h.must(w.copySlot(&w.Data[0], &z))
-					w.Index = []uint32{1}
-				}
-				if op == "sparse-right-zero-dest" {
-					z := numeral.NewRational()
-					h.must(w.copySlot(&w.Data[1], &z))
-					w.Index = []uint32{0}
-				}
-				if op == "sparse-left-cancel" {
-					h.must(w.copySlot(&w.Data[0], &p.X))
-					h.must(h.m.SetInt64(&w.Data[1], 1))
-				}
-				h.budget.FailAfter(ordinal)
-				var err error
-				switch op {
-				case "append":
-					err = e.Append(1, &p.X)
-				case "lookup":
-					err = e.Element(0, 1, &w.Data[0])
-				case "left", "left-large-source":
-					err = e.RationalRowEtaMatrix.ApplyLeft(w.Data)
-				case "right", "right-large-source":
-					err = e.ApplyRight(w.Data)
-				case "sparse-left", "sparse-left-large-source", "sparse-left-zero-pivot", "sparse-left-cancel":
-					err = e.ApplyLeftToT(w, nil)
-				case "sparse-right", "sparse-right-large-source", "sparse-right-zero-dest":
-					err = e.ApplyRightIndexed(w)
-				case "pair-left", "pair-large-source":
-					err = e.ApplyLeft(pw.Data)
-				}
-				h.budget.FailAfter(-1)
-				if err == nil {
-					lpExactRowEtaCheckFaultSuccess(t, h, op, e, w, pw, p)
-					successes++
-					done = true
-				} else {
-					if !lpExactPriorityPhysicalRefusal(err) {
-						t.Fatal(err)
-					}
-					failures++
-					if op == "sparse-left-zero-pivot" && len(w.Index) == 2 {
-						publishedStops++
-					}
-				}
-				if e.ready() != nil {
-					if er := e.Append(1, &small.X); er != ErrExactVectorPending {
-						t.Fatal(er)
-					}
-					if er := e.ApplyLeft(pw.Data); er != ErrExactVectorPending {
-						t.Fatal(er)
-					}
-					if er := e.RationalRowEtaMatrix.ApplyLeft(w.Data); er != ErrExactVectorPending {
-						t.Fatal(er)
-					}
-					if er := e.ApplyRight(w.Data); er != ErrExactVectorPending {
-						t.Fatal(er)
-					}
-					if er := e.ApplyLeftToT(w, nil); er != ErrExactVectorPending {
-						t.Fatal(er)
-					}
-					if er := e.ApplyRightIndexed(w); er != ErrExactVectorPending {
-						t.Fatal(er)
-					}
-					if er := e.Element(0, 0, &small.X); er != ErrExactVectorPending {
-						t.Fatal(er)
-					}
-					if er := e.Conjugate(NewPermutation(2)); er != ErrExactVectorPending {
-						t.Fatal(er)
-					}
-				}
-				h.must(e.Close())
-				h.must(e.Close())
-				h.must(w.Close())
-				h.must(pw.Close())
-				lpExactVectorNamedCensus(t, h, nil)
-				if h.m.DivisionInvocationState().Active || h.m.RawInvocationState().Active != [3]bool{} || h.m.Z.DivisionRaw.Active || h.m.Z.GcdRaw.Active {
-					t.Fatal("orphan numeric frame")
-				}
-			})
-			if done {
-				break
 			}
-		}
-		if failures == 0 || successes != 1 {
-			t.Fatal(op, failures, successes)
-		}
-		if op == "sparse-left-zero-pivot" && publishedStops == 0 {
-			t.Fatal("index-before-result-copy stop not reached")
+			if failures == 0 || successes != 1 {
+				t.Fatal(op, failures, successes)
+			}
+			if op == "sparse-left-zero-pivot" && publishedStops == 0 {
+				t.Fatal("index-before-result-copy stop not reached")
+			}
 		}
 	}
 }
@@ -308,12 +312,9 @@ func TestLPExactRowEtaAllocationFailureCensus(t *testing.T) {
 func TestLPExactRowEtaLiteralStorageAndMutationPrefixes(t *testing.T) {
 	h := newLPPairHarness(t)
 	p := h.pair("1", "-1")
-	out := h.pair("0", "0")
 	e := NewRationalRowEtaMatrix(h.m, 999, 0, 2)
 	h.must(e.Append(1, &p.Y))
 	h.must(e.Append(1, &p.X))
-	h.must(e.Element(0, 1, &out.X))
-	lpCheckExactPermutationCoordinate(t, h, &out.X, big.NewRat(-1, 1))
 	w := lpExactVectorFromOracle(h, []*big.Rat{big.NewRat(1, 1), big.NewRat(1, 1)})
 	h.must(e.ApplyRightIndexed(w))
 	if !reflect.DeepEqual(w.Index, []uint32{0, 1}) {
@@ -395,8 +396,6 @@ func TestLPExactRowEtaLiteralStorageAndMutationPrefixes(t *testing.T) {
 		} else {
 			lpCheckExactPermutationCoordinate(t, h, &w.Data[0], big.NewRat(want, 1))
 		}
-		h.must(pe.Element(0, 0, &out.X))
-		lpCheckExactPermutationCoordinate(t, h, &out.X, big.NewRat(1, 1))
 		h.must(pe.Close())
 		h.must(w.Close())
 		h.must(pw.Close())
@@ -583,44 +582,51 @@ func TestLPExactRowEtaTailComposition(t *testing.T) {
 }
 
 func TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership(t *testing.T) {
-	h := newLPPairHarness(t)
-	a := h.pair(strings.Repeat("1234567890", 100)+"/7", "1")
-	b := h.pair(strings.Repeat("9876543210", 100)+"/13", "0")
-	w := NewIndexedRationalVector(h.m, 2)
-	h.must(w.SetValue(&a.X, 0))
-	e := NewRationalRowEtaMatrix(h.m, 0, 0, 2)
-	h.budget.FailAfter(0)
-	err := w.Add(0, &b.X)
-	h.budget.FailAfter(-1)
-	if !lpExactPriorityPhysicalRefusal(err) || !w.calls.pending() {
-		t.Fatal("no actual stopped destination", err)
+	for _, direct := range []bool{false, true} {
+		var h *lpPairHarness
+		if direct {
+			h = lpNewDirectSparseHarness(t)
+		} else {
+			h = newLPPairHarness(t)
+		}
+		a := h.pair(strings.Repeat("1234567890", 100)+"/7", "1")
+		b := h.pair(strings.Repeat("9876543210", 100)+"/13", "0")
+		w := NewIndexedRationalVector(h.m, 2)
+		h.must(w.SetValue(&a.X, 0))
+		e := NewRationalRowEtaMatrix(h.m, 0, 0, 2)
+		h.budget.FailAfter(0)
+		err := w.Add(0, &b.X)
+		h.budget.FailAfter(-1)
+		if !lpExactPriorityPhysicalRefusal(err) || !w.calls.pending() {
+			t.Fatal("no actual stopped destination", err)
+		}
+		before := w.calls
+		raw := h.m.RawInvocationState()
+		if err = e.ApplyLeftToT(w, nil); err != ErrExactVectorPending {
+			t.Fatal(err)
+		}
+		if err = e.ApplyRightIndexed(w); err != ErrExactVectorPending {
+			t.Fatal(err)
+		}
+		if e.work != nil {
+			t.Fatal("claimed destination lexical storage")
+		}
+		h.must(e.Close())
+		if w.calls != before || h.m.RawInvocationState() != raw {
+			t.Fatal("consumed destination receipt")
+		}
+		// A different matrix can complete an inline operation without acquiring
+		// the older pending addition. Its Close leaves the real owner's raw frame.
+		other := NewRationalRowEtaMatrix(h.m, 0, 0, 1)
+		small := NewIndexedRationalVector(h.m, 1)
+		h.must(other.ApplyLeft(small.Data))
+		h.must(other.ApplyRight(small.Data))
+		h.must(other.Close())
+		h.must(small.Close())
+		if h.m.RawInvocationState() != raw {
+			t.Fatal("consumed unrelated addition")
+		}
+		h.must(w.Close())
+		lpExactVectorNamedCensus(t, h, nil)
 	}
-	before := w.calls
-	raw := h.m.RawInvocationState()
-	if err = e.ApplyLeftToT(w, nil); err != ErrExactVectorPending {
-		t.Fatal(err)
-	}
-	if err = e.ApplyRightIndexed(w); err != ErrExactVectorPending {
-		t.Fatal(err)
-	}
-	if e.work != nil {
-		t.Fatal("claimed destination lexical storage")
-	}
-	h.must(e.Close())
-	if w.calls != before || h.m.RawInvocationState() != raw {
-		t.Fatal("consumed destination receipt")
-	}
-	// A different matrix can complete an inline operation without acquiring
-	// the older pending addition. Its Close leaves the real owner's raw frame.
-	other := NewRationalRowEtaMatrix(h.m, 0, 0, 1)
-	small := NewIndexedRationalVector(h.m, 1)
-	h.must(other.ApplyLeft(small.Data))
-	h.must(other.ApplyRight(small.Data))
-	h.must(other.Close())
-	h.must(small.Close())
-	if h.m.RawInvocationState() != raw {
-		t.Fatal("consumed unrelated addition")
-	}
-	h.must(w.Close())
-	lpExactVectorNamedCensus(t, h, nil)
 }

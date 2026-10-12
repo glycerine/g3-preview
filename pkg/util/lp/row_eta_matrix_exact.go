@@ -7,20 +7,18 @@ import "github.com/glycerine/g3/pkg/util/numeral"
 // transformation in a borrowed manager. The unused source row_start argument
 // is accepted without storage. Stopped lexical values remain owned until Close.
 type RationalRowEtaMatrix struct {
-	row, length uint32
-	Row         *SparseRationalVector
-	manager     *numeral.RationalManager
-	calls       exactEtaCalls
-	work        *IndexedRationalVector
+	row     uint32
+	Row     *SparseRationalVector
+	manager *numeral.RationalManager
+	calls   exactEtaCalls
+	work    *IndexedRationalVector
 }
 
-func NewRationalRowEtaMatrix(m *numeral.RationalManager, _ uint32, row, length uint32) *RationalRowEtaMatrix {
-	return &RationalRowEtaMatrix{row: row, length: length, manager: m, Row: NewSparseRationalVector(m)}
+func NewRationalRowEtaMatrix(m *numeral.RationalManager, _ uint32, row, _ uint32) *RationalRowEtaMatrix {
+	return &RationalRowEtaMatrix{row: row, manager: m, Row: NewSparseRationalVector(m)}
 }
-func (m *RationalRowEtaMatrix) IsDense() bool       { return false }
-func (m *RationalRowEtaMatrix) RowIndex() uint32    { return m.row }
-func (m *RationalRowEtaMatrix) RowCount() uint32    { return m.length }
-func (m *RationalRowEtaMatrix) ColumnCount() uint32 { return m.length }
+func (m *RationalRowEtaMatrix) IsDense() bool    { return false }
+func (m *RationalRowEtaMatrix) RowIndex() uint32 { return m.row }
 func (m *RationalRowEtaMatrix) ready() error {
 	if m.work != nil || m.calls.pending() {
 		return ErrExactVectorPending
@@ -69,24 +67,7 @@ func (m *RationalRowEtaMatrix) Append(index uint32, value *numeral.Rational) (er
 	m.work = nil
 	return nil
 }
-func (m *RationalRowEtaMatrix) Element(i, j uint32, out *numeral.Rational) (err error) {
-	if err = m.ready(); err != nil {
-		return err
-	}
-	if i == m.row && i != j {
-		return m.Row.At(j, out)
-	}
-	b, err := m.beginWork(0)
-	if err != nil {
-		return err
-	}
-	defer m.finishWork(b, &err)
-	value := numeral.NewRational()
-	if i == j {
-		value.Num = numeral.NewInt(1)
-	}
-	return m.manager.Copy(out, &value)
-}
+
 func (m *RationalRowEtaMatrix) ApplyLeft(w []numeral.Rational) (err error) {
 	b, err := m.beginWork(2)
 	if err != nil {
@@ -297,7 +278,7 @@ func (m *RationalRowEtaMatrix) Close() error {
 	if err := m.calls.cleanupRaw(m.manager); err != nil {
 		return err
 	}
-	if err := m.Row.Close(); err != nil {
+	if err := m.Row.closeCall(); err != nil {
 		return err
 	}
 	if m.work != nil {
@@ -305,6 +286,10 @@ func (m *RationalRowEtaMatrix) Close() error {
 			return err
 		}
 		m.work = nil
+	}
+	// Call locals die before the stored row member.
+	if err := m.Row.Close(); err != nil {
+		return err
 	}
 	return m.calls.cleanupRoots(m.manager)
 }

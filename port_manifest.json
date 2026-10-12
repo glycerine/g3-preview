@@ -136705,7 +136705,7 @@
       "path": "src/util/lp/row_eta_matrix.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/row_eta_matrix_float.go",
         "pkg/util/lp/row_eta_matrix_exact.go"
@@ -136769,8 +136769,8 @@
           "text": "SASSERT(row_index != m_row);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "actual double,double row eta dense/sparse applications and permutation conjugation with descending index publication",
@@ -136786,7 +136786,7 @@
           ]
         },
         {
-          "name": "retained mpq/mpq and mpq/numeric_pair row eta: exact coefficients, dense/sparse applications, literal element view, descending permutation conjugation and owning cleanup",
+          "name": "retained mpq/mpq and mpq/numeric_pair row eta: exact coefficients, dense/sparse applications, descending permutation conjugation and owning cleanup",
           "status": "ported",
           "go_target": "pkg/util/lp/row_eta_matrix_exact.go",
           "tests": [
@@ -136798,25 +136798,52 @@
             "TestLPExactRowEtaTailComposition",
             "TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership"
           ]
+        },
+        {
+          "name": "retained floating debug matrix dimensions/entry and source row_start construction without unused storage",
+          "status": "ported",
+          "go_target": "pkg/util/lp/row_eta_matrix_float.go",
+          "tests": [
+            "TestLPFloatEtaPermutationConjugationAndTailComposition",
+            "TestLPFloatEtaIndependentMatrixProducts"
+          ]
         }
       ],
       "ownership": [
         "Concrete floating values and typed sparse-entry slices replace source vector/STL storage. No generic/any algebra, synthetic native-storage charges or container OOM fixtures. Literal term/index order, duplicate/explicit-zero entries, scalar snapshots versus references and source valid mutation prefixes are preserved. FloatTailMatrix expresses actual retained LU polymorphism.",
-        "Borrowed rational manager, owning rational coefficient list and actual copied-row/product/expression/value-parameter lifetimes. Sparse-left index publication precedes result Copy; cancellation writes zero before rejecting an absent source erase position. Dense-right and sparse-right use the live row reference and precise zero tests. Pair dense-left retains scalar-left rational coordinate expressions before copying into the result pair. Concrete matrix call receipts own only acquired RAW generations and allocation roots; stopped destination and unrelated caller frames remain with those owners."
+        "Borrowed rational manager, owning rational coefficient list and actual copied-row/product/expression/value-parameter lifetimes. Sparse-left index publication precedes result Copy; cancellation writes zero before rejecting an absent source erase position. Dense-right and sparse-right use the live row reference and precise zero tests. Pair dense-left retains scalar-left rational coordinate expressions before copying into the result pair. Concrete matrix call receipts own only acquired RAW generations and allocation roots; stopped destination and unrelated caller frames remain with those owners.",
+        "Whole retained row_eta_matrix source/ownership audit: actual double/double, mpq/mpq and mpq/impq constructors, non-dense tail, by-value append, dense X-left/T-right, indexed T-left/right and descending permutation conjugation are implemented. Source row_start is never read; exact debug views, local_to_X, invalid unused diagonal getter and compact print are excluded. Floating debug view is retained by actual LU matrix consumers. Source live dense row versus copied sparse-left accumulator, precise zero branches, empty-index behavior, strict floating drop tests, insertion/erase order, self/duplicate terms and reached invalid-domain prefixes remain literal. Corrected Close to unwind owned child sparse call locals, then row-eta lexical work, then stored row coefficients. Caller destination and older raw invocation generations remain independent. Removed unused exact debug matrix adapters; conjugation oracle uses all24permutations and four retained basis-vector ApplyLeft products. Removed dead lookup fault scenario and expanded fourteen retained fault campaigns to pooled/direct allocation (28total), preserving endpoint oracle, named roots, pending guards and index-before-result-copy refusal requirements. Stopped-destination/older-raw ownership checks also use both allocator modes. Containing sparse/dense/LU/CLI/SMT audits remain separate."
       ],
       "deviations": [
-        "Exact mpq coefficient and rational/pair applications, full LU/matrix integration and printing remain open; no whole-unit promotion. Independent matrix products replace uninstantiated upstream debug matrix scaffolding; there is no direct active eta/row-eta unit scenario in src/test/lp.cpp.",
-        "Floating column diagonal must be set before use: its source constructor leaves the double uninitialized. Go zero initialization is not claimed as a source default. Sparse right uses fixed1e-14; sparse left uses live settings drop_tolerance. Boundary comparisons are strict and IEEE NaN/zero/infinity behavior is literal.",
-        "Row source erase(find(...)) without an end guard is represented by a typed error after its completed zero assignment. Column conjugation publishes ascending terms; row conjugation copies indices then publishes descending. Source debug-only assertions use the existing explicit Go error profile.",
-        "Whole-source scan finds row_eta get_diagonal_element and apply_from_left_local_to_X uncalled; no invalid/uninstantiated definition adapters are invented. The row_start member is never read by retained bodies. Actual column-diagonal getter is represented by the public Diagonal value. Debug row/column resize scaffolding and full stream/global debug binding remain unaudited.",
-        "Unused row_start storage and uncalled indexed local-to-X/get_diagonal_element definitions are not instantiated. Exact sparse tolerance is zero-only. Existing explicit Go bounds/error profiles retain source-valid prefixes. Formatting and complete matrix/LU integration remain open; whole source unit stays partial."
+        "Native Go sparse storage replaces STL internals; only actual concrete float64/mpq and dense pair numeral algorithms are retained. No unused template/any-valued algebra or standalone formatting adapter.",
+        "Source erase(find(row)) without end guard returns a typed Go error after the reached zero assignment. Dense self terms use the live row; sparse-left uses an owning local row copy. Sparse-right early zero return examines actual dense row even with empty sparse index.",
+        "Source indexed_vector::is_OK returns true unconditionally. Floating sparse-right fixed1e-14 and sparse-left live Settings tolerance retain strict boundary and IEEE behavior. Exact tolerance is zero-only.",
+        "Floating debug row dimensions/entry are retained through actual FloatLU tail views. Exact debug view, unused source row_start/get_diagonal_element/local_to_X/print and process-global stream binding are excluded."
+      ],
+      "evidence": "Whole retained row_eta_matrix source/ownership audit: actual double/double, mpq/mpq and mpq/impq constructors, non-dense tail, by-value append, dense X-left/T-right, indexed T-left/right and descending permutation conjugation are implemented. Source row_start is never read; exact debug views, local_to_X, invalid unused diagonal getter and compact print are excluded. Floating debug view is retained by actual LU matrix consumers. Source live dense row versus copied sparse-left accumulator, precise zero branches, empty-index behavior, strict floating drop tests, insertion/erase order, self/duplicate terms and reached invalid-domain prefixes remain literal. Corrected Close to unwind owned child sparse call locals, then row-eta lexical work, then stored row coefficients. Caller destination and older raw invocation generations remain independent. Removed unused exact debug matrix adapters; conjugation oracle uses all24permutations and four retained basis-vector ApplyLeft products. Removed dead lookup fault scenario and expanded fourteen retained fault campaigns to pooled/direct allocation (28total), preserving endpoint oracle, named roots, pending guards and index-before-result-copy refusal requirements. Stopped-destination/older-raw ownership checks also use both allocator modes. Containing sparse/dense/LU/CLI/SMT audits remain separate.",
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "exact debug get_elem/row_count/column_count/dimension storage"
+          ],
+          "reason": "No retained exact debug matrix root. Explicit instances alone are not consumers. Removed unused Go methods and tested real basis-vector applications."
+        },
+        {
+          "source_methods": [
+            "get_diagonal_element",
+            "apply_from_left_local_to_X",
+            "m_row_start storage",
+            "print"
+          ],
+          "reason": "Whole-src row_eta_matrix consumer/method scan finds no callers/read of these definitions/state. Invalid/uninstantiated source getter and compact print are not repaired or given Go adapters."
+        }
       ]
     },
     {
       "path": "src/util/lp/row_eta_matrix.hpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/row_eta_matrix_float.go",
         "pkg/util/lp/row_eta_matrix_exact.go"
@@ -136900,8 +136927,8 @@
           "text": "SASSERT(w.is_OK());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "actual double,double row eta dense/sparse applications and permutation conjugation with descending index publication",
@@ -136917,7 +136944,7 @@
           ]
         },
         {
-          "name": "retained mpq/mpq and mpq/numeric_pair row eta: exact coefficients, dense/sparse applications, literal element view, descending permutation conjugation and owning cleanup",
+          "name": "retained mpq/mpq and mpq/numeric_pair row eta: exact coefficients, dense/sparse applications, descending permutation conjugation and owning cleanup",
           "status": "ported",
           "go_target": "pkg/util/lp/row_eta_matrix_exact.go",
           "tests": [
@@ -136929,25 +136956,52 @@
             "TestLPExactRowEtaTailComposition",
             "TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership"
           ]
+        },
+        {
+          "name": "retained floating debug matrix dimensions/entry and source row_start construction without unused storage",
+          "status": "ported",
+          "go_target": "pkg/util/lp/row_eta_matrix_float.go",
+          "tests": [
+            "TestLPFloatEtaPermutationConjugationAndTailComposition",
+            "TestLPFloatEtaIndependentMatrixProducts"
+          ]
         }
       ],
       "ownership": [
         "Concrete floating values and typed sparse-entry slices replace source vector/STL storage. No generic/any algebra, synthetic native-storage charges or container OOM fixtures. Literal term/index order, duplicate/explicit-zero entries, scalar snapshots versus references and source valid mutation prefixes are preserved. FloatTailMatrix expresses actual retained LU polymorphism.",
-        "Borrowed rational manager, owning rational coefficient list and actual copied-row/product/expression/value-parameter lifetimes. Sparse-left index publication precedes result Copy; cancellation writes zero before rejecting an absent source erase position. Dense-right and sparse-right use the live row reference and precise zero tests. Pair dense-left retains scalar-left rational coordinate expressions before copying into the result pair. Concrete matrix call receipts own only acquired RAW generations and allocation roots; stopped destination and unrelated caller frames remain with those owners."
+        "Borrowed rational manager, owning rational coefficient list and actual copied-row/product/expression/value-parameter lifetimes. Sparse-left index publication precedes result Copy; cancellation writes zero before rejecting an absent source erase position. Dense-right and sparse-right use the live row reference and precise zero tests. Pair dense-left retains scalar-left rational coordinate expressions before copying into the result pair. Concrete matrix call receipts own only acquired RAW generations and allocation roots; stopped destination and unrelated caller frames remain with those owners.",
+        "Whole retained row_eta_matrix source/ownership audit: actual double/double, mpq/mpq and mpq/impq constructors, non-dense tail, by-value append, dense X-left/T-right, indexed T-left/right and descending permutation conjugation are implemented. Source row_start is never read; exact debug views, local_to_X, invalid unused diagonal getter and compact print are excluded. Floating debug view is retained by actual LU matrix consumers. Source live dense row versus copied sparse-left accumulator, precise zero branches, empty-index behavior, strict floating drop tests, insertion/erase order, self/duplicate terms and reached invalid-domain prefixes remain literal. Corrected Close to unwind owned child sparse call locals, then row-eta lexical work, then stored row coefficients. Caller destination and older raw invocation generations remain independent. Removed unused exact debug matrix adapters; conjugation oracle uses all24permutations and four retained basis-vector ApplyLeft products. Removed dead lookup fault scenario and expanded fourteen retained fault campaigns to pooled/direct allocation (28total), preserving endpoint oracle, named roots, pending guards and index-before-result-copy refusal requirements. Stopped-destination/older-raw ownership checks also use both allocator modes. Containing sparse/dense/LU/CLI/SMT audits remain separate."
       ],
       "deviations": [
-        "Exact mpq coefficient and rational/pair applications, full LU/matrix integration and printing remain open; no whole-unit promotion. Independent matrix products replace uninstantiated upstream debug matrix scaffolding; there is no direct active eta/row-eta unit scenario in src/test/lp.cpp.",
-        "Floating column diagonal must be set before use: its source constructor leaves the double uninitialized. Go zero initialization is not claimed as a source default. Sparse right uses fixed1e-14; sparse left uses live settings drop_tolerance. Boundary comparisons are strict and IEEE NaN/zero/infinity behavior is literal.",
-        "Row source erase(find(...)) without an end guard is represented by a typed error after its completed zero assignment. Column conjugation publishes ascending terms; row conjugation copies indices then publishes descending. Source debug-only assertions use the existing explicit Go error profile.",
-        "Whole-source scan finds row_eta get_diagonal_element and apply_from_left_local_to_X uncalled; no invalid/uninstantiated definition adapters are invented. The row_start member is never read by retained bodies. Actual column-diagonal getter is represented by the public Diagonal value. Debug row/column resize scaffolding and full stream/global debug binding remain unaudited.",
-        "Unused row_start storage and uncalled indexed local-to-X/get_diagonal_element definitions are not instantiated. Exact sparse tolerance is zero-only. Existing explicit Go bounds/error profiles retain source-valid prefixes. Formatting and complete matrix/LU integration remain open; whole source unit stays partial."
+        "Native Go sparse storage replaces STL internals; only actual concrete float64/mpq and dense pair numeral algorithms are retained. No unused template/any-valued algebra or standalone formatting adapter.",
+        "Source erase(find(row)) without end guard returns a typed Go error after the reached zero assignment. Dense self terms use the live row; sparse-left uses an owning local row copy. Sparse-right early zero return examines actual dense row even with empty sparse index.",
+        "Source indexed_vector::is_OK returns true unconditionally. Floating sparse-right fixed1e-14 and sparse-left live Settings tolerance retain strict boundary and IEEE behavior. Exact tolerance is zero-only.",
+        "Floating debug row dimensions/entry are retained through actual FloatLU tail views. Exact debug view, unused source row_start/get_diagonal_element/local_to_X/print and process-global stream binding are excluded."
+      ],
+      "evidence": "Whole retained row_eta_matrix source/ownership audit: actual double/double, mpq/mpq and mpq/impq constructors, non-dense tail, by-value append, dense X-left/T-right, indexed T-left/right and descending permutation conjugation are implemented. Source row_start is never read; exact debug views, local_to_X, invalid unused diagonal getter and compact print are excluded. Floating debug view is retained by actual LU matrix consumers. Source live dense row versus copied sparse-left accumulator, precise zero branches, empty-index behavior, strict floating drop tests, insertion/erase order, self/duplicate terms and reached invalid-domain prefixes remain literal. Corrected Close to unwind owned child sparse call locals, then row-eta lexical work, then stored row coefficients. Caller destination and older raw invocation generations remain independent. Removed unused exact debug matrix adapters; conjugation oracle uses all24permutations and four retained basis-vector ApplyLeft products. Removed dead lookup fault scenario and expanded fourteen retained fault campaigns to pooled/direct allocation (28total), preserving endpoint oracle, named roots, pending guards and index-before-result-copy refusal requirements. Stopped-destination/older-raw ownership checks also use both allocator modes. Containing sparse/dense/LU/CLI/SMT audits remain separate.",
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "exact debug get_elem/row_count/column_count/dimension storage"
+          ],
+          "reason": "No retained exact debug matrix root. Explicit instances alone are not consumers. Removed unused Go methods and tested real basis-vector applications."
+        },
+        {
+          "source_methods": [
+            "get_diagonal_element",
+            "apply_from_left_local_to_X",
+            "m_row_start storage",
+            "print"
+          ],
+          "reason": "Whole-src row_eta_matrix consumer/method scan finds no callers/read of these definitions/state. Invalid/uninstantiated source getter and compact print are not repaired or given Go adapters."
+        }
       ]
     },
     {
       "path": "src/util/lp/row_eta_matrix_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/row_eta_matrix_float.go",
         "pkg/util/lp/row_eta_matrix_exact.go"
@@ -136977,8 +137031,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "actual double,double row eta dense/sparse applications and permutation conjugation with descending index publication",
@@ -136994,7 +137048,7 @@
           ]
         },
         {
-          "name": "retained mpq/mpq and mpq/numeric_pair row eta: exact coefficients, dense/sparse applications, literal element view, descending permutation conjugation and owning cleanup",
+          "name": "retained mpq/mpq and mpq/numeric_pair row eta: exact coefficients, dense/sparse applications, descending permutation conjugation and owning cleanup",
           "status": "ported",
           "go_target": "pkg/util/lp/row_eta_matrix_exact.go",
           "tests": [
@@ -137006,18 +137060,45 @@
             "TestLPExactRowEtaTailComposition",
             "TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership"
           ]
+        },
+        {
+          "name": "retained floating debug matrix dimensions/entry and source row_start construction without unused storage",
+          "status": "ported",
+          "go_target": "pkg/util/lp/row_eta_matrix_float.go",
+          "tests": [
+            "TestLPFloatEtaPermutationConjugationAndTailComposition",
+            "TestLPFloatEtaIndependentMatrixProducts"
+          ]
         }
       ],
       "ownership": [
         "Concrete floating values and typed sparse-entry slices replace source vector/STL storage. No generic/any algebra, synthetic native-storage charges or container OOM fixtures. Literal term/index order, duplicate/explicit-zero entries, scalar snapshots versus references and source valid mutation prefixes are preserved. FloatTailMatrix expresses actual retained LU polymorphism.",
-        "Borrowed rational manager, owning rational coefficient list and actual copied-row/product/expression/value-parameter lifetimes. Sparse-left index publication precedes result Copy; cancellation writes zero before rejecting an absent source erase position. Dense-right and sparse-right use the live row reference and precise zero tests. Pair dense-left retains scalar-left rational coordinate expressions before copying into the result pair. Concrete matrix call receipts own only acquired RAW generations and allocation roots; stopped destination and unrelated caller frames remain with those owners."
+        "Borrowed rational manager, owning rational coefficient list and actual copied-row/product/expression/value-parameter lifetimes. Sparse-left index publication precedes result Copy; cancellation writes zero before rejecting an absent source erase position. Dense-right and sparse-right use the live row reference and precise zero tests. Pair dense-left retains scalar-left rational coordinate expressions before copying into the result pair. Concrete matrix call receipts own only acquired RAW generations and allocation roots; stopped destination and unrelated caller frames remain with those owners.",
+        "Whole retained row_eta_matrix source/ownership audit: actual double/double, mpq/mpq and mpq/impq constructors, non-dense tail, by-value append, dense X-left/T-right, indexed T-left/right and descending permutation conjugation are implemented. Source row_start is never read; exact debug views, local_to_X, invalid unused diagonal getter and compact print are excluded. Floating debug view is retained by actual LU matrix consumers. Source live dense row versus copied sparse-left accumulator, precise zero branches, empty-index behavior, strict floating drop tests, insertion/erase order, self/duplicate terms and reached invalid-domain prefixes remain literal. Corrected Close to unwind owned child sparse call locals, then row-eta lexical work, then stored row coefficients. Caller destination and older raw invocation generations remain independent. Removed unused exact debug matrix adapters; conjugation oracle uses all24permutations and four retained basis-vector ApplyLeft products. Removed dead lookup fault scenario and expanded fourteen retained fault campaigns to pooled/direct allocation (28total), preserving endpoint oracle, named roots, pending guards and index-before-result-copy refusal requirements. Stopped-destination/older-raw ownership checks also use both allocator modes. Containing sparse/dense/LU/CLI/SMT audits remain separate."
       ],
       "deviations": [
-        "Exact mpq coefficient and rational/pair applications, full LU/matrix integration and printing remain open; no whole-unit promotion. Independent matrix products replace uninstantiated upstream debug matrix scaffolding; there is no direct active eta/row-eta unit scenario in src/test/lp.cpp.",
-        "Floating column diagonal must be set before use: its source constructor leaves the double uninitialized. Go zero initialization is not claimed as a source default. Sparse right uses fixed1e-14; sparse left uses live settings drop_tolerance. Boundary comparisons are strict and IEEE NaN/zero/infinity behavior is literal.",
-        "Row source erase(find(...)) without an end guard is represented by a typed error after its completed zero assignment. Column conjugation publishes ascending terms; row conjugation copies indices then publishes descending. Source debug-only assertions use the existing explicit Go error profile.",
-        "Whole-source scan finds row_eta get_diagonal_element and apply_from_left_local_to_X uncalled; no invalid/uninstantiated definition adapters are invented. The row_start member is never read by retained bodies. Actual column-diagonal getter is represented by the public Diagonal value. Debug row/column resize scaffolding and full stream/global debug binding remain unaudited.",
-        "Unused row_start storage and uncalled indexed local-to-X/get_diagonal_element definitions are not instantiated. Exact sparse tolerance is zero-only. Existing explicit Go bounds/error profiles retain source-valid prefixes. Formatting and complete matrix/LU integration remain open; whole source unit stays partial."
+        "Native Go sparse storage replaces STL internals; only actual concrete float64/mpq and dense pair numeral algorithms are retained. No unused template/any-valued algebra or standalone formatting adapter.",
+        "Source erase(find(row)) without end guard returns a typed Go error after the reached zero assignment. Dense self terms use the live row; sparse-left uses an owning local row copy. Sparse-right early zero return examines actual dense row even with empty sparse index.",
+        "Source indexed_vector::is_OK returns true unconditionally. Floating sparse-right fixed1e-14 and sparse-left live Settings tolerance retain strict boundary and IEEE behavior. Exact tolerance is zero-only.",
+        "Floating debug row dimensions/entry are retained through actual FloatLU tail views. Exact debug view, unused source row_start/get_diagonal_element/local_to_X/print and process-global stream binding are excluded."
+      ],
+      "evidence": "Whole retained row_eta_matrix source/ownership audit: actual double/double, mpq/mpq and mpq/impq constructors, non-dense tail, by-value append, dense X-left/T-right, indexed T-left/right and descending permutation conjugation are implemented. Source row_start is never read; exact debug views, local_to_X, invalid unused diagonal getter and compact print are excluded. Floating debug view is retained by actual LU matrix consumers. Source live dense row versus copied sparse-left accumulator, precise zero branches, empty-index behavior, strict floating drop tests, insertion/erase order, self/duplicate terms and reached invalid-domain prefixes remain literal. Corrected Close to unwind owned child sparse call locals, then row-eta lexical work, then stored row coefficients. Caller destination and older raw invocation generations remain independent. Removed unused exact debug matrix adapters; conjugation oracle uses all24permutations and four retained basis-vector ApplyLeft products. Removed dead lookup fault scenario and expanded fourteen retained fault campaigns to pooled/direct allocation (28total), preserving endpoint oracle, named roots, pending guards and index-before-result-copy refusal requirements. Stopped-destination/older-raw ownership checks also use both allocator modes. Containing sparse/dense/LU/CLI/SMT audits remain separate.",
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "exact debug get_elem/row_count/column_count/dimension storage"
+          ],
+          "reason": "No retained exact debug matrix root. Explicit instances alone are not consumers. Removed unused Go methods and tested real basis-vector applications."
+        },
+        {
+          "source_methods": [
+            "get_diagonal_element",
+            "apply_from_left_local_to_X",
+            "m_row_start storage",
+            "print"
+          ],
+          "reason": "Whole-src row_eta_matrix consumer/method scan finds no callers/read of these definitions/state. Invalid/uninstantiated source getter and compact print are not repaired or given Go adapters."
+        }
       ]
     },
     {
@@ -172805,5 +172886,47 @@
     },
     "cache_cleanup_record": "/mnt/oldrog/tmp/g3-lp-eta-full-native-cache-cleanup.json",
     "qualification": "Includes retained permutation/eta audits, report fixes and bound-analyzer lifetime fix. No result or coverage credit until terminal success and profile inspection; last completed full checkpoint remains8f2961ca."
+  },
+  "latest_row_eta_support_audit": {
+    "scope": "Whole retained row_eta_matrix source/ownership audit: actual double/double, mpq/mpq and mpq/impq constructors, non-dense tail, by-value append, dense X-left/T-right, indexed T-left/right and descending permutation conjugation are implemented. Source row_start is never read; exact debug views, local_to_X, invalid unused diagonal getter and compact print are excluded. Floating debug view is retained by actual LU matrix consumers. Source live dense row versus copied sparse-left accumulator, precise zero branches, empty-index behavior, strict floating drop tests, insertion/erase order, self/duplicate terms and reached invalid-domain prefixes remain literal. Corrected Close to unwind owned child sparse call locals, then row-eta lexical work, then stored row coefficients. Caller destination and older raw invocation generations remain independent. Removed unused exact debug matrix adapters; conjugation oracle uses all24permutations and four retained basis-vector ApplyLeft products. Removed dead lookup fault scenario and expanded fourteen retained fault campaigns to pooled/direct allocation (28total), preserving endpoint oracle, named roots, pending guards and index-before-result-copy refusal requirements. Stopped-destination/older-raw ownership checks also use both allocator modes. Containing sparse/dense/LU/CLI/SMT audits remain separate.",
+    "focused_native_seconds": 26.458,
+    "focused_combined_seconds": 28.504,
+    "whole_go_file_focused_covered_total": {
+      "native": {
+        "row_eta_matrix_exact.go": [
+          211,
+          232
+        ],
+        "row_eta_matrix_float.go": [
+          87,
+          88
+        ]
+      },
+      "debug": {
+        "row_eta_matrix_exact.go": [
+          212,
+          232
+        ],
+        "row_eta_matrix_float.go": [
+          88,
+          88
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-row-eta-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-row-eta-debug.cover"
+    ],
+    "source_audits": [
+      "/mnt/oldrog/tmp/g3-lp-row-eta-consumers-audit.txt",
+      "/mnt/oldrog/tmp/g3-lp-row-eta-all-src-audit.txt"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Running full native3516687c/session44703 predates this row-eta correction; last completed8f2961ca also predates recent fixes. No current-code full-suite claim.",
+    "consumer_tests_native_seconds": 7.582,
+    "consumer_tests_combined_seconds": 9.241,
+    "coverage_qualification": "Remaining exact uncovered returns guard stable delegated numeric/cleanup errors and invariant-protected copies/checks. Floating native uncovered return is erased source assertion; combined row_eta_matrix_float is88/88. No synthetic failures or 100% exact coverage claim.",
+    "verification": "All64package native/combined compile gates, both LP vets and source portcheck pass: 2103units/677APIs,120ported/320partial/1620unported/5dead_deleted."
   }
 }
