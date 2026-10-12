@@ -114225,7 +114225,7 @@
       "path": "src/util/f2n.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -114268,7 +114268,9 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "No retained production source consumer: the only direct includes are src/test/f2n.cpp, src/test/hwf.cpp, src/test/mpf.cpp, src/test/im_float_config.h, and src/util/hwf.cpp; hwf.cpp and hwf.h themselves serve only standalone source tests. No Go template adapter is needed."
+      ]
     },
     {
       "path": "src/util/file_path.h",
@@ -115990,7 +115992,7 @@
       "path": "src/util/hwf.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -116373,13 +116375,15 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The hardware-float implementation has no retained production caller. Its header is included by src/test/hwf.cpp, src/test/f2n.cpp, and src/test/im_float_config.h only; hwf.cpp is its own implementation. Preserve the C++ file for source reference without a Go hardware-float adapter."
+      ]
     },
     {
       "path": "src/util/hwf.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -116410,7 +116414,9 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Direct include scan finds only src/test/hwf.cpp, src/test/f2n.cpp, src/test/im_float_config.h, and its implementation src/util/hwf.cpp. The entire hwf/f2n branch lacks a retained production consumer, so no Go hardware-float manager is ported."
+      ]
     },
     {
       "path": "src/util/id_gen.h",
