@@ -39515,5 +39515,10 @@ canonical-table declaration-domain and application-argument equality at
 node handles in order through `equalPayload`; no generic array helper is
 needed. A new source-focused test confirms repeated domains/applications
 intern together while reordered domain sorts and application arguments remain
-distinct. This selected `util.h` method is credited as ported; quantifier
-array uses and the rest of the header remain under their separate audit.
+distinct. The retained quantifier comparison at `ast.cpp:465-490` also reads
+declaration sorts, declaration names, patterns, and no-patterns in source
+order. A focused public-constructor test checks identical arrays intern
+together and reversing each array keeps the quantifiers distinct, including
+the source restriction that patterns and no-patterns cannot coexist. This
+completes the AST uses of this selected `util.h` method; the rest of the
+header remains partial.
