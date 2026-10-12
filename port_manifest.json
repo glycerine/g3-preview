@@ -76937,10 +76937,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_dyn_ack_triples.go"
+        "pkg/smtcore/smt_dyn_ack_triples.go",
+        "pkg/smtcore/smt_dyn_ack_pairs.go"
       ],
       "tests": [
-        "TestDynAckTripleOccurrencesThresholdInstantiationAndReset"
+        "TestDynAckTripleOccurrencesThresholdInstantiationAndReset",
+        "TestDynAckPairOccurrencesLiveGCAndOwnedApps"
       ],
       "conditionals": [
         {
@@ -77124,13 +77126,22 @@
           "tests": [
             "TestDynAckTripleOccurrencesThresholdInstantiationAndReset"
           ]
+        },
+        {
+          "name": "concrete cg_eh pair counts, threshold queue, live gc decay/stable ordering and clause/search lifecycle",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_dyn_ack_pairs.go",
+          "tests": [
+            "TestDynAckPairOccurrencesLiveGCAndOwnedApps"
+          ]
         }
       ],
       "ownership": [
-        "The concrete triple app vector retains each first, second and representative AST application once per newly observed row; map/set keys and candidate queue borrow those identities. Search reset releases all retained references in source order."
+        "The concrete triple app vector retains each first, second and representative AST application once per newly observed row; map/set keys and candidate queue borrow those identities. Search reset releases all retained references in source order.",
+        "The concrete pair app vector retains both application references per new observation row; live GC releases instantiated or decayed rows, and search reset releases remaining rows. Pair maps and candidate queue borrow app identities."
       ],
       "deviations": [
-        "The triple occurrence map and instantiated set use native Go maps instead of C++ hashtable storage. The source gc_triples body has no caller and is excluded. Pair-mode dynamic Ackermannization, SMT clause construction, propagation and enclosing context integration remain open."
+        "The triple and pair occurrence maps and instantiated sets use native Go maps instead of C++ hashtable storage. The source gc_triples body has no caller and is excluded. SMT clause construction, propagation and enclosing context integration remain open."
       ]
     },
     {
@@ -77139,10 +77150,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_dyn_ack_triples.go"
+        "pkg/smtcore/smt_dyn_ack_triples.go",
+        "pkg/smtcore/smt_dyn_ack_pairs.go"
       ],
       "tests": [
-        "TestDynAckTripleOccurrencesThresholdInstantiationAndReset"
+        "TestDynAckTripleOccurrencesThresholdInstantiationAndReset",
+        "TestDynAckPairOccurrencesLiveGCAndOwnedApps"
       ],
       "conditionals": [
         {
@@ -77172,13 +77185,21 @@
           "tests": [
             "TestDynAckTripleOccurrencesThresholdInstantiationAndReset"
           ]
+        },
+        {
+          "name": "concrete app-pair count, candidate queue, instantiated-set and live GC fields with cg_eh transition",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_dyn_ack_pairs.go",
+          "tests": [
+            "TestDynAckPairOccurrencesLiveGCAndOwnedApps"
+          ]
         }
       ],
       "ownership": [
-        "The Go triple state owns application references through an explicit typed slice and borrows AST handles in its maps and queue."
+        "The Go triple and pair states own application references through explicit typed slices and borrow AST handles in maps and queues."
       ],
       "deviations": [
-        "The enclosing context/clause lifecycle, pair specialization and source search hooks remain open."
+        "The enclosing context/clause lifecycle and source search hooks remain open."
       ]
     },
     {
@@ -157437,12 +157458,14 @@
       "go_targets": [
         "pkg/smtcore/smt_model_finder_hint_indexes.go",
         "pkg/smtcore/smt_model_finder_hint_plan.go",
-        "pkg/tactic/ufbv/match_subst.go"
+        "pkg/tactic/ufbv/match_subst.go",
+        "pkg/smtcore/smt_dyn_ack_pairs.go"
       ],
       "tests": [
         "TestModelFinderHintPreprocessIndexesAndResidueCandidates",
         "TestModelFinderHintPlanPartitionAndRunReset",
-        "TestMatchSubstConcretePairCacheAndVariableBindings"
+        "TestMatchSubstConcretePairCacheAndVariableBindings",
+        "TestDynAckPairOccurrencesLiveGCAndOwnedApps"
       ],
       "conditionals": [
         {
@@ -157479,13 +157502,21 @@
           "tests": [
             "TestMatchSubstConcretePairCacheAndVariableBindings"
           ]
+        },
+        {
+          "name": "dyn_ack obj_pair_map<app,app,unsigned> counts and obj_pair_hashtable<app,app> instantiated set",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_dyn_ack_pairs.go",
+          "tests": [
+            "TestDynAckPairOccurrencesLiveGCAndOwnedApps"
+          ]
         }
       ],
       "ownership": [
-        "The hint solver borrows function, definition and quantifier AST identities. Its Q_f_def map owns native set membership; full cond_macro and quantifier_info lifetimes remain in the enclosing model finder. The UFBV matcher's pair set borrows expression handles from its AST manager and owns only map membership."
+        "The hint solver borrows function, definition and quantifier AST identities. Its Q_f_def map owns native set membership; full cond_macro and quantifier_info lifetimes remain in the enclosing model finder. The UFBV matcher's pair set borrows expression handles from its AST manager and owns only map membership. The dyn_ack pair maps borrow app identities retained by its owning app vector."
       ],
       "deviations": [
-        "The selected Q_f_def specialization uses a native Go map keyed by a typed pair of AST handles, with native quantifier sets. Per-run reset now clears this pair index before rebuilding it. C++ cached hashes, sentinel buckets and probing are not ported. Other retained pair-map and pair-hashtable consumers remain open."
+        "The selected Q_f_def and dyn_ack count specializations use native Go maps keyed by typed AST-handle pairs; the former has native quantifier sets and the latter uses a native instantiated set. C++ cached hashes, sentinel buckets and probing are not ported. Other retained pair-map and pair-hashtable consumers remain open."
       ]
     },
     {
