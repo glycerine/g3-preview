@@ -34438,10 +34438,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/interval/rational_interval.go",
-        "pkg/math/interval/rational_interval_test.go"
+        "pkg/math/interval/rational_interval_test.go",
+        "pkg/math/interval/rational_interval_deps.go",
+        "pkg/math/interval/rational_interval_deps_test.go"
       ],
       "tests": [
-        "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+        "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
+        "TestRationalIntervalSourceDependencyMasks"
       ],
       "conditionals": [
         {
@@ -34481,6 +34484,14 @@
           "tests": [
             "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
           ]
+        },
+        {
+          "name": "Concrete bound dependency bit flags, endpoint membership and first-to-second operand shift (src/math/interval/interval.h:78-104)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/rational_interval_deps.go",
+          "tests": [
+            "TestRationalIntervalSourceDependencyMasks"
+          ]
         }
       ],
       "ownership": [],
@@ -34497,10 +34508,13 @@
         "pkg/math/interval/rational_interval_mul.go",
         "pkg/math/interval/rational_interval_power.go",
         "pkg/math/interval/rational_interval_inv.go",
-        "pkg/math/interval/rational_interval_div.go"
+        "pkg/math/interval/rational_interval_div.go",
+        "pkg/math/interval/rational_interval_deps.go",
+        "pkg/math/interval/rational_interval_deps_test.go"
       ],
       "tests": [
-        "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+        "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
+        "TestRationalIntervalSourceDependencyMasks"
       ],
       "conditionals": [
         {
@@ -34895,6 +34909,14 @@
           "go_target": "pkg/math/interval/rational_interval_div.go",
           "tests": [
             "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+          ]
+        },
+        {
+          "name": "Concrete mpq dependency masks for neg, add, sub, scalar multiply/divide, interval multiply, power, reciprocal and interval divide (src/math/interval/interval_def.h:710-725,776-823,834-850,928-1019,1219-1268,1494-1515,1593-1664)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/rational_interval_deps.go",
+          "tests": [
+            "TestRationalIntervalSourceDependencyMasks"
           ]
         }
       ],
