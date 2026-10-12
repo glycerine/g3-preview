@@ -100292,13 +100292,15 @@
         "pkg/tactic/ufbv/rewrite_cache.go",
         "pkg/tactic/ufbv/rewrite_cache_test.go",
         "pkg/tactic/ufbv/rewrite_traversal.go",
-        "pkg/tactic/ufbv/rewrite_traversal_test.go"
+        "pkg/tactic/ufbv/rewrite_traversal_test.go",
+        "pkg/tactic/ufbv/match_subst.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
         "TestRewriteCacheSourceTimestampWrap",
         "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
-        "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
+        "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
+        "TestMatchSubstConcretePairCacheAndVariableBindings"
       ],
       "conditionals": [
         {
@@ -100436,13 +100438,21 @@
             "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
             "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
           ]
+        },
+        {
+          "name": "match_subst expression instance-check traversal, repeated-variable bindings and concrete expression-pair cache",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/match_subst.go",
+          "tests": [
+            "TestMatchSubstConcretePairCacheAndVariableBindings"
+          ]
         }
       ],
       "ownership": [
         "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction."
       ],
       "deviations": [
-        "The concrete cache and reverse child-visit/cycle step are ported; the remaining UFBV rewrite loop, matcher, and tactic integration remain open."
+        "The concrete rewrite cache, reverse child-visit/cycle step and match_subst expression instance check are ported; matcher RHS substitution, remaining UFBV rewrite loop and tactic integration remain open."
       ]
     },
     {
@@ -100454,13 +100464,15 @@
         "pkg/tactic/ufbv/rewrite_cache.go",
         "pkg/tactic/ufbv/rewrite_cache_test.go",
         "pkg/tactic/ufbv/rewrite_traversal.go",
-        "pkg/tactic/ufbv/rewrite_traversal_test.go"
+        "pkg/tactic/ufbv/rewrite_traversal_test.go",
+        "pkg/tactic/ufbv/match_subst.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
         "TestRewriteCacheSourceTimestampWrap",
         "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
-        "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
+        "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
+        "TestMatchSubstConcretePairCacheAndVariableBindings"
       ],
       "conditionals": [
         {
@@ -100492,13 +100504,21 @@
             "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
             "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
           ]
+        },
+        {
+          "name": "match_subst concrete expression-pair cache and borrowed AST matcher state",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/match_subst.go",
+          "tests": [
+            "TestMatchSubstConcretePairCacheAndVariableBindings"
+          ]
         }
       ],
       "ownership": [
         "The concrete plugin borrows its AST manager and retains each stored key and expression value; the bool payload is a scalar."
       ],
       "deviations": [
-        "The surrounding UFBV rewriter declarations and matcher are not yet ported."
+        "The matcher expression instance-check path uses a concrete Go pair map; RHS substitution and the surrounding UFBV rewriter remain open."
       ]
     },
     {
@@ -157072,11 +157092,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_model_finder_hint_indexes.go",
-        "pkg/smtcore/smt_model_finder_hint_plan.go"
+        "pkg/smtcore/smt_model_finder_hint_plan.go",
+        "pkg/tactic/ufbv/match_subst.go"
       ],
       "tests": [
         "TestModelFinderHintPreprocessIndexesAndResidueCandidates",
-        "TestModelFinderHintPlanPartitionAndRunReset"
+        "TestModelFinderHintPlanPartitionAndRunReset",
+        "TestMatchSubstConcretePairCacheAndVariableBindings"
       ],
       "conditionals": [
         {
@@ -157105,10 +157127,18 @@
             "TestModelFinderHintPreprocessIndexesAndResidueCandidates",
             "TestModelFinderHintPlanPartitionAndRunReset"
           ]
+        },
+        {
+          "name": "UFBV match_subst obj_pair_hashtable<expr,expr> reset/contains/insert for expression instance checking",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/match_subst.go",
+          "tests": [
+            "TestMatchSubstConcretePairCacheAndVariableBindings"
+          ]
         }
       ],
       "ownership": [
-        "The hint solver borrows function, definition and quantifier AST identities. Its Q_f_def map owns native set membership; full cond_macro and quantifier_info lifetimes remain in the enclosing model finder."
+        "The hint solver borrows function, definition and quantifier AST identities. Its Q_f_def map owns native set membership; full cond_macro and quantifier_info lifetimes remain in the enclosing model finder. The UFBV matcher's pair set borrows expression handles from its AST manager and owns only map membership."
       ],
       "deviations": [
         "The selected Q_f_def specialization uses a native Go map keyed by a typed pair of AST handles, with native quantifier sets. Per-run reset now clears this pair index before rebuilding it. C++ cached hashes, sentinel buckets and probing are not ported. Other retained pair-map and pair-hashtable consumers remain open."
