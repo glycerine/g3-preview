@@ -13,8 +13,7 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "Complete registered CLI runtime/consumer/ownership audit, whole retained SMT reader/LP audit",
     "component property tests, coverage and integration audits",
-    "Complete retained source/ownership/SMT and process-global driver consumer audits; remaining optimization/scaling/randomize consumers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations.",
-    "Port retained floating lp_solver.h print_model used by src/shell/lp_frontend.cpp:92, with original objective/column getters and output/endl order; do not add unused exact instantiation"
+    "Complete retained source/ownership/SMT and process-global driver consumer audits; remaining optimization/scaling/randomize consumers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
   ],
   "units": [
     {
@@ -4409,7 +4408,9 @@
         "pkg/util/lp/solver_named_rational.go",
         "pkg/util/lp/driver_settings.go",
         "pkg/util/lp/driver_mps_float.go",
-        "pkg/util/lp/matrix_statistics_report_test.go"
+        "pkg/util/lp/matrix_statistics_report_test.go",
+        "pkg/util/lp/solver_model_report_float.go",
+        "pkg/util/lp/solver_model_report_float_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -4513,9 +4514,12 @@
         "TestLPMPSDriverLiveReportEvaluation",
         "TestLPFloatMatrixStatisticsReportBoundaries",
         "TestLPRationalMatrixStatisticsShortWrites",
-        "TestLPFloatPresolveCleanupReportBoundaries"
+        "TestLPFloatPresolveCleanupReportBoundaries",
+        "TestLPFloatModelReportSolvedOriginalValues",
+        "TestLPFloatModelReportEveryByteAndEndl",
+        "TestLPFloatModelReportGetterFailurePrefixes"
       ],
-      "evidence": "Floating common presolve cleanup now honors lp_solver.hpp:399-410 std::endl and rejects short nil-error writes through the existing checked line writer. TestLPFloatPresolveCleanupReportBoundaries covers every byte of singular/plural reports with explicit and short-nil errors, successful/failed flush, nil output and zero passes; verifies completed row erasure and endpoint pinning before output refusal. Three rows in one pass retain the singular report; the chained three-row model reports two passes. All floating/exact presolve groups pass native5.439s/combined6.757s. Whole floating presolve file coverage131/134statements native,132/134combined. Profiles /mnt/oldrog/tmp/g3-lp-cleanup-report-{native,debug}.cover. Whole no-ignore source scan finds live lp_solver.h:259-264 print_model consumer in src/shell/lp_frontend.cpp:92; no Go model report exists yet, so common solver remains partial. Uncalled scale-statistics chain and get_max_iterations_per_stage have no consumers in src. LP inventory unchanged36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native checkpoint predates this correction. All commands CPUs8\u201316/GOMAXPROCS9."
+      "evidence": "Implemented retained lp_solver.h:259-264 print_model through concrete FloatPrimalSimplex.PrintModel, matching the only live caller src/shell/lp_frontend.cpp:92 (MPS factory selects primal double/double). Original objective getter follows written objective prefix; source name map includes aliases and missing-column zero values; column heading does not flush, objective and each value honor endl. Native sorted string keys provide deterministic order for the source unordered name map. No unused exact/dual report adapters added. Three tests use an actual scaled LU primal solve with independent unique vertex(2,2), objective16 including fixed term6, name aliases/fixed reconstruction, every report byte with ordinary/short-nil errors, every flush failure, objective-getter refusal prefix, missing-column noninsertion and empty model. Native related model-report/primal-outer/presolve tests0.116s and combined0.106s pass. New report21/22statements95.5% both; remaining getter-error transport cannot be reached in a stable valid model after the objective getter has already read every existing column, and no artificial mutation hook was added. Source shell frontend runtime/resource/timer integration remains unported; this completes the report method only, not containing common solver files. LP inventory unchanged36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Profiles /mnt/oldrog/tmp/g3-lp-model-report-{native,debug}.cover. CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/lp_solver.hpp",
@@ -4647,7 +4651,9 @@
         "pkg/util/lp/dual_prepare_float.go",
         "pkg/util/lp/dual_prepare_float_test.go",
         "pkg/util/lp/solver_named_rational.go",
-        "pkg/util/lp/driver_mps_float.go"
+        "pkg/util/lp/driver_mps_float.go",
+        "pkg/util/lp/solver_model_report_float.go",
+        "pkg/util/lp/solver_model_report_float_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
@@ -4689,9 +4695,12 @@
         "TestLPMPSDriverEmptyAndInfeasibleFiles",
         "TestLPMPSDriverFileCloseFailure",
         "TestLPMPSDriverLiveReportEvaluation",
-        "TestLPFloatPresolveCleanupReportBoundaries"
+        "TestLPFloatPresolveCleanupReportBoundaries",
+        "TestLPFloatModelReportSolvedOriginalValues",
+        "TestLPFloatModelReportEveryByteAndEndl",
+        "TestLPFloatModelReportGetterFailurePrefixes"
       ],
-      "evidence": "Floating common presolve cleanup now honors lp_solver.hpp:399-410 std::endl and rejects short nil-error writes through the existing checked line writer. TestLPFloatPresolveCleanupReportBoundaries covers every byte of singular/plural reports with explicit and short-nil errors, successful/failed flush, nil output and zero passes; verifies completed row erasure and endpoint pinning before output refusal. Three rows in one pass retain the singular report; the chained three-row model reports two passes. All floating/exact presolve groups pass native5.439s/combined6.757s. Whole floating presolve file coverage131/134statements native,132/134combined. Profiles /mnt/oldrog/tmp/g3-lp-cleanup-report-{native,debug}.cover. Whole no-ignore source scan finds live lp_solver.h:259-264 print_model consumer in src/shell/lp_frontend.cpp:92; no Go model report exists yet, so common solver remains partial. Uncalled scale-statistics chain and get_max_iterations_per_stage have no consumers in src. LP inventory unchanged36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native checkpoint predates this correction. All commands CPUs8\u201316/GOMAXPROCS9."
+      "evidence": "Implemented retained lp_solver.h:259-264 print_model through concrete FloatPrimalSimplex.PrintModel, matching the only live caller src/shell/lp_frontend.cpp:92 (MPS factory selects primal double/double). Original objective getter follows written objective prefix; source name map includes aliases and missing-column zero values; column heading does not flush, objective and each value honor endl. Native sorted string keys provide deterministic order for the source unordered name map. No unused exact/dual report adapters added. Three tests use an actual scaled LU primal solve with independent unique vertex(2,2), objective16 including fixed term6, name aliases/fixed reconstruction, every report byte with ordinary/short-nil errors, every flush failure, objective-getter refusal prefix, missing-column noninsertion and empty model. Native related model-report/primal-outer/presolve tests0.116s and combined0.106s pass. New report21/22statements95.5% both; remaining getter-error transport cannot be reached in a stable valid model after the objective getter has already read every existing column, and no artificial mutation hook was added. Source shell frontend runtime/resource/timer integration remains unported; this completes the report method only, not containing common solver files. LP inventory unchanged36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Profiles /mnt/oldrog/tmp/g3-lp-model-report-{native,debug}.cover. CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/lp_utils.cpp",
