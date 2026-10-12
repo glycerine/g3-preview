@@ -119846,7 +119846,7 @@
       "path": "src/util/lp/dense_matrix.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/dense_matrix_float_debug.go",
         "pkg/util/lp/matrix_float_debug.go",
@@ -119861,7 +119861,14 @@
         "TestLPDebugDenseMatrixEqualityAndFailurePrefixes",
         "TestLPDebugDenseConcretePermutationAndStaticConsumers",
         "TestLPDebugDenseActualLUIdentities",
-        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
+        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes",
+        "TestLPSmallLUDriverLiteralScenario",
+        "TestLPLargerLUDriversIndependentLiteralAndRandomOracle",
+        "TestLPHolesLUDriverIndependentTailReportOracle",
+        "TestLPLUTestDriverSourceParentSequence",
+        "TestLPDriverSwapsIndependentSourceOracle",
+        "TestLPLUCheckDebugResidualSourceTolerance",
+        "TestLPLUCheckDebugResidualFailurePrefixes"
       ],
       "conditionals": [
         {
@@ -119887,8 +119894,8 @@
           "text": "SASSERT(column_count() == a.row_count());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete debug double/double constructor, flat get/set, base-view copy, dense assignment, square-loop left application and ordinary matrix multiplication",
@@ -119907,18 +119914,57 @@
         }
       ],
       "ownership": [
-        "Debug-only native Go float slices own copied dense storage and lexical product/vector temporaries. Copy and dense assignment deep-copy storage; partial constructors/products return reached owner/prefix. Dense left application computes entire temporary before publication; generic apply_to_vector snapshots input then publishes each completed row. No numerical arena roots or STL storage implementation."
+        "Debug-only native Go float slices own copied dense storage and lexical product/vector temporaries. Copy and dense assignment deep-copy storage; partial constructors/products return reached owner/prefix. Dense left application computes entire temporary before publication; generic apply_to_vector snapshots input then publishes each completed row. No numerical arena roots or STL storage implementation.",
+        "Concrete floating debug matrices own native scalar slices; source object copies/assignments do not share backing storage. Matrix views borrow their actual concrete matrix and dimension binding; no exact numerical receipts or unused template-owned resources. Failed report stops retain completed output with no fake numerical allocation layer."
       ],
       "deviations": [
+        "Whole retained-source/ownership audit completes debug matrix.h/.hpp and dense_matrix.h/.hpp for the actual double/double consumers. Concrete typed matrix view, unsigned32 dense flat get/set/construction, base-view copy, owning dense assignment, square-loop left application, ordinary product/equality and byte-width matrix/string-table printing are implemented. Live roots are original small/larger/holes LU/get_B/left/right/is_correct reports and assertions, sparse swap comparisons and LU file-check B*d validation. Constructor/dimensions/getters use concrete native Go fields; tail dimension binding covers actual eta/row-eta/diag/permutation/square-dense families. No-ignore whole-src105reference scan confirms uncalled primal check_correctness->check_Ax_equal_b and sparse really_best_pivot->can_improve_score_for_row->print_active_matrix chains; their additional dense/exact paths do not create roots. Extra exact instantiations, dead LU vector-check/tail_product and unused dense base assignment/multiply-assign/right/rectangular/pivot/swap/scale variants are explicit exclusions. Const ref m_v typo and invalid raw-array base assignment are uncalled, not repaired. Existing disabled test_dense_matrix direct fixture carries no registered CLI credit. Found/corrected debug matrix padding/cell/trailing-space short nil-error writes: all three insertions now use existing checked writer, preserving one-byte padding writes, live string reads and numeric snapshots. Extended TestLPDebugMatrixPrintEveryByteAndFlush checks every base/static report byte with nil-error short writes, exact output prefixes and completed endl count; existing ordinary refusals, every flush failure, mutable string cells, Unicode byte widths, IEEE/signed-zero formatting and getters remain tested. Focused combined matrix/dense/actual small/larger/holes/LU-parent/swap groups2.452s pass; additional actual LU file/check residual consumer groups0.027s pass; combined LP vet and native LP compile pass. Whole-Go-file focused covered/total {\"dense_matrix_float_debug.go\":[57,65],\"lu_float_debug_matrix.go\":[61,66],\"matrix_float_debug.go\":[34,36],\"matrix_float_debug_print.go\":[73,74]}. Remaining storage/product branches guard host-int size limits impossible on current64bit uint32 shape or invariant-protected output writes; LU view guards qualify source invalid dimensions/pointers. Source equality remains literal >1e-6 with NaN differences comparing equal. No exact debug matrix/formatter or STL adapter added. Build scope remains g3debug, matching Z3DEBUG; no native coverage/completion inference for erased bodies. Separate static/sparse/eta/permutation/square-dense/LU algorithms and full CLI/SMT audits remain open. LP inventory49ported/46partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates recent fixes; current focused profile /mnt/oldrog/tmp/g3-lp-debug-matrix-audit.cover; source audit /mnt/oldrog/tmp/g3-lp-debug-matrix-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "g3debug build scope matches source Z3DEBUG. Concrete FloatDebugMatrix transports floating values with explicit Go index errors; no any-valued callback layer or generic template. Unsigned32 rows*columns and flat offsets retain wrap/spill behavior; ErrBounds precedes actual invalid storage access. Exact scalar/pair coefficient variants, source formatting and whole-source/ownership audit remain open, so no whole-unit promotion.",
         "Uncalled base-matrix assignment (source invalid raw-array assignment), multiply-assign, pivot/swap/scale and extra rectangular/right/vector-X variants are not invented. Original test_dense_matrix is behind an unconditional return; direct fixture preserves its zero-unit typo without registered driver credit. Actual live consumers include LU get_B/left/right/is_correct and swap debug views; complete upstream assertion wiring remains open."
+      ],
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "exact matrix/dense specializations"
+          ],
+          "reason": "Explicit instantiations alone are not retained roots. Live matrix consumers above are double/double; other exact uses belong to uncalled diagnostic chains."
+        },
+        {
+          "source_methods": [
+            "matrix apply_to_vector",
+            "LU tail_product/vector-check closure"
+          ],
+          "reason": "Only definitions/declarations and internal dead-chain calls; no retained callers."
+        },
+        {
+          "source_methods": [
+            "primal check_correctness/check_Ax_equal_b",
+            "sparse really_best_pivot/can_improve_score_for_row/print_active_matrix"
+          ],
+          "reason": "Containing entry calls are commented out; all remaining references are declarations/definitions/internal calls, not roots."
+        },
+        {
+          "source_methods": [
+            "dense assignment from base matrix",
+            "multiply-assign",
+            "right application pointer/vector",
+            "left application with different dimensions",
+            "left X pointer/to-X vector",
+            "pivot_row_to_row",
+            "swap_columns",
+            "swap_rows",
+            "multiply_row_by_constant",
+            "const ref operator[]"
+          ],
+          "reason": "No retained calls in whole dense-owner consumer scan. Base assignment uses invalid raw-array-to-vector source assignment and const ref names nonexistent m_v; no unused repair/adapters added."
+        }
       ]
     },
     {
       "path": "src/util/lp/dense_matrix.hpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/dense_matrix_float_debug.go",
         "pkg/util/lp/matrix_float_debug.go",
@@ -119933,7 +119979,14 @@
         "TestLPDebugDenseMatrixEqualityAndFailurePrefixes",
         "TestLPDebugDenseConcretePermutationAndStaticConsumers",
         "TestLPDebugDenseActualLUIdentities",
-        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes"
+        "TestLPDebugDenseLUTailBindingsAndFailurePrefixes",
+        "TestLPSmallLUDriverLiteralScenario",
+        "TestLPLargerLUDriversIndependentLiteralAndRandomOracle",
+        "TestLPHolesLUDriverIndependentTailReportOracle",
+        "TestLPLUTestDriverSourceParentSequence",
+        "TestLPDriverSwapsIndependentSourceOracle",
+        "TestLPLUCheckDebugResidualSourceTolerance",
+        "TestLPLUCheckDebugResidualFailurePrefixes"
       ],
       "conditionals": [
         {
@@ -119951,8 +120004,8 @@
           "text": "SASSERT(a.column_count() == b.row_count());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete debug double/double constructor, flat get/set, base-view copy, dense assignment, square-loop left application and ordinary matrix multiplication",
@@ -119971,11 +120024,50 @@
         }
       ],
       "ownership": [
-        "Debug-only native Go float slices own copied dense storage and lexical product/vector temporaries. Copy and dense assignment deep-copy storage; partial constructors/products return reached owner/prefix. Dense left application computes entire temporary before publication; generic apply_to_vector snapshots input then publishes each completed row. No numerical arena roots or STL storage implementation."
+        "Debug-only native Go float slices own copied dense storage and lexical product/vector temporaries. Copy and dense assignment deep-copy storage; partial constructors/products return reached owner/prefix. Dense left application computes entire temporary before publication; generic apply_to_vector snapshots input then publishes each completed row. No numerical arena roots or STL storage implementation.",
+        "Concrete floating debug matrices own native scalar slices; source object copies/assignments do not share backing storage. Matrix views borrow their actual concrete matrix and dimension binding; no exact numerical receipts or unused template-owned resources. Failed report stops retain completed output with no fake numerical allocation layer."
       ],
       "deviations": [
+        "Whole retained-source/ownership audit completes debug matrix.h/.hpp and dense_matrix.h/.hpp for the actual double/double consumers. Concrete typed matrix view, unsigned32 dense flat get/set/construction, base-view copy, owning dense assignment, square-loop left application, ordinary product/equality and byte-width matrix/string-table printing are implemented. Live roots are original small/larger/holes LU/get_B/left/right/is_correct reports and assertions, sparse swap comparisons and LU file-check B*d validation. Constructor/dimensions/getters use concrete native Go fields; tail dimension binding covers actual eta/row-eta/diag/permutation/square-dense families. No-ignore whole-src105reference scan confirms uncalled primal check_correctness->check_Ax_equal_b and sparse really_best_pivot->can_improve_score_for_row->print_active_matrix chains; their additional dense/exact paths do not create roots. Extra exact instantiations, dead LU vector-check/tail_product and unused dense base assignment/multiply-assign/right/rectangular/pivot/swap/scale variants are explicit exclusions. Const ref m_v typo and invalid raw-array base assignment are uncalled, not repaired. Existing disabled test_dense_matrix direct fixture carries no registered CLI credit. Found/corrected debug matrix padding/cell/trailing-space short nil-error writes: all three insertions now use existing checked writer, preserving one-byte padding writes, live string reads and numeric snapshots. Extended TestLPDebugMatrixPrintEveryByteAndFlush checks every base/static report byte with nil-error short writes, exact output prefixes and completed endl count; existing ordinary refusals, every flush failure, mutable string cells, Unicode byte widths, IEEE/signed-zero formatting and getters remain tested. Focused combined matrix/dense/actual small/larger/holes/LU-parent/swap groups2.452s pass; additional actual LU file/check residual consumer groups0.027s pass; combined LP vet and native LP compile pass. Whole-Go-file focused covered/total {\"dense_matrix_float_debug.go\":[57,65],\"lu_float_debug_matrix.go\":[61,66],\"matrix_float_debug.go\":[34,36],\"matrix_float_debug_print.go\":[73,74]}. Remaining storage/product branches guard host-int size limits impossible on current64bit uint32 shape or invariant-protected output writes; LU view guards qualify source invalid dimensions/pointers. Source equality remains literal >1e-6 with NaN differences comparing equal. No exact debug matrix/formatter or STL adapter added. Build scope remains g3debug, matching Z3DEBUG; no native coverage/completion inference for erased bodies. Separate static/sparse/eta/permutation/square-dense/LU algorithms and full CLI/SMT audits remain open. LP inventory49ported/46partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates recent fixes; current focused profile /mnt/oldrog/tmp/g3-lp-debug-matrix-audit.cover; source audit /mnt/oldrog/tmp/g3-lp-debug-matrix-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "g3debug build scope matches source Z3DEBUG. Concrete FloatDebugMatrix transports floating values with explicit Go index errors; no any-valued callback layer or generic template. Unsigned32 rows*columns and flat offsets retain wrap/spill behavior; ErrBounds precedes actual invalid storage access. Exact scalar/pair coefficient variants, source formatting and whole-source/ownership audit remain open, so no whole-unit promotion.",
         "Uncalled base-matrix assignment (source invalid raw-array assignment), multiply-assign, pivot/swap/scale and extra rectangular/right/vector-X variants are not invented. Original test_dense_matrix is behind an unconditional return; direct fixture preserves its zero-unit typo without registered driver credit. Actual live consumers include LU get_B/left/right/is_correct and swap debug views; complete upstream assertion wiring remains open."
+      ],
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "exact matrix/dense specializations"
+          ],
+          "reason": "Explicit instantiations alone are not retained roots. Live matrix consumers above are double/double; other exact uses belong to uncalled diagnostic chains."
+        },
+        {
+          "source_methods": [
+            "matrix apply_to_vector",
+            "LU tail_product/vector-check closure"
+          ],
+          "reason": "Only definitions/declarations and internal dead-chain calls; no retained callers."
+        },
+        {
+          "source_methods": [
+            "primal check_correctness/check_Ax_equal_b",
+            "sparse really_best_pivot/can_improve_score_for_row/print_active_matrix"
+          ],
+          "reason": "Containing entry calls are commented out; all remaining references are declarations/definitions/internal calls, not roots."
+        },
+        {
+          "source_methods": [
+            "dense assignment from base matrix",
+            "multiply-assign",
+            "right application pointer/vector",
+            "left application with different dimensions",
+            "left X pointer/to-X vector",
+            "pivot_row_to_row",
+            "swap_columns",
+            "swap_rows",
+            "multiply_row_by_constant",
+            "const ref operator[]"
+          ],
+          "reason": "No retained calls in whole dense-owner consumer scan. Base assignment uses invalid raw-array-to-vector source assignment and const ref names nonexistent m_v; no unused repair/adapters added."
+        }
       ]
     },
     {
@@ -134734,7 +134826,7 @@
       "path": "src/util/lp/matrix.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/dense_matrix_float_debug.go",
         "pkg/util/lp/matrix_float_debug.go",
@@ -134757,7 +134849,14 @@
         "TestLPDebugMatrixPrintConcreteOverloads",
         "TestLPDebugMatrixPrintEveryByteAndFlush",
         "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
-        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
+        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots",
+        "TestLPSmallLUDriverLiteralScenario",
+        "TestLPLargerLUDriversIndependentLiteralAndRandomOracle",
+        "TestLPHolesLUDriverIndependentTailReportOracle",
+        "TestLPLUTestDriverSourceParentSequence",
+        "TestLPDriverSwapsIndependentSourceOracle",
+        "TestLPLUCheckDebugResidualSourceTolerance",
+        "TestLPLUCheckDebugResidualFailurePrefixes"
       ],
       "conditionals": [
         {
@@ -134769,8 +134868,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete debug floating matrix view, >1e-6/NaN equality, retained LU matrix consumers",
@@ -134799,29 +134898,48 @@
             "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
             "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
           ]
-        },
-        {
-          "name": "apply_to_vector reached only by the unreachable LU vector-check chain; whole-source reachability scan finds definitions/declarations/internal dead-chain calls only",
-          "status": "dead_deleted",
-          "tests": []
         }
       ],
       "ownership": [
         "Debug-only native Go float slices own copied dense storage and lexical product/vector temporaries. Copy and dense assignment deep-copy storage; partial constructors/products return reached owner/prefix. Dense left application computes entire temporary before publication; generic apply_to_vector snapshots input then publishes each completed row. No numerical arena roots or STL storage implementation.",
-        "Native Go string tables snapshot all numeric matrix cells before output. String-table printing borrows slice headers by value and rereads live cell strings after padding. Widths/temporary rows are native scalar/string storage, without numerical arena roots or C++ STL representations."
+        "Native Go string tables snapshot all numeric matrix cells before output. String-table printing borrows slice headers by value and rereads live cell strings after padding. Widths/temporary rows are native scalar/string storage, without numerical arena roots or C++ STL representations.",
+        "Concrete floating debug matrices own native scalar slices; source object copies/assignments do not share backing storage. Matrix views borrow their actual concrete matrix and dimension binding; no exact numerical receipts or unused template-owned resources. Failed report stops retain completed output with no fake numerical allocation layer."
       ],
       "deviations": [
+        "Whole retained-source/ownership audit completes debug matrix.h/.hpp and dense_matrix.h/.hpp for the actual double/double consumers. Concrete typed matrix view, unsigned32 dense flat get/set/construction, base-view copy, owning dense assignment, square-loop left application, ordinary product/equality and byte-width matrix/string-table printing are implemented. Live roots are original small/larger/holes LU/get_B/left/right/is_correct reports and assertions, sparse swap comparisons and LU file-check B*d validation. Constructor/dimensions/getters use concrete native Go fields; tail dimension binding covers actual eta/row-eta/diag/permutation/square-dense families. No-ignore whole-src105reference scan confirms uncalled primal check_correctness->check_Ax_equal_b and sparse really_best_pivot->can_improve_score_for_row->print_active_matrix chains; their additional dense/exact paths do not create roots. Extra exact instantiations, dead LU vector-check/tail_product and unused dense base assignment/multiply-assign/right/rectangular/pivot/swap/scale variants are explicit exclusions. Const ref m_v typo and invalid raw-array base assignment are uncalled, not repaired. Existing disabled test_dense_matrix direct fixture carries no registered CLI credit. Found/corrected debug matrix padding/cell/trailing-space short nil-error writes: all three insertions now use existing checked writer, preserving one-byte padding writes, live string reads and numeric snapshots. Extended TestLPDebugMatrixPrintEveryByteAndFlush checks every base/static report byte with nil-error short writes, exact output prefixes and completed endl count; existing ordinary refusals, every flush failure, mutable string cells, Unicode byte widths, IEEE/signed-zero formatting and getters remain tested. Focused combined matrix/dense/actual small/larger/holes/LU-parent/swap groups2.452s pass; additional actual LU file/check residual consumer groups0.027s pass; combined LP vet and native LP compile pass. Whole-Go-file focused covered/total {\"dense_matrix_float_debug.go\":[57,65],\"lu_float_debug_matrix.go\":[61,66],\"matrix_float_debug.go\":[34,36],\"matrix_float_debug_print.go\":[73,74]}. Remaining storage/product branches guard host-int size limits impossible on current64bit uint32 shape or invariant-protected output writes; LU view guards qualify source invalid dimensions/pointers. Source equality remains literal >1e-6 with NaN differences comparing equal. No exact debug matrix/formatter or STL adapter added. Build scope remains g3debug, matching Z3DEBUG; no native coverage/completion inference for erased bodies. Separate static/sparse/eta/permutation/square-dense/LU algorithms and full CLI/SMT audits remain open. LP inventory49ported/46partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates recent fixes; current focused profile /mnt/oldrog/tmp/g3-lp-debug-matrix-audit.cover; source audit /mnt/oldrog/tmp/g3-lp-debug-matrix-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "g3debug build scope matches source Z3DEBUG. Concrete FloatDebugMatrix transports floating values with explicit Go index errors; no any-valued callback layer or generic template. Unsigned32 rows*columns and flat offsets retain wrap/spill behavior; ErrBounds precedes actual invalid storage access. Exact scalar/pair coefficient variants, source formatting and whole-source/ownership audit remain open, so no whole-unit promotion.",
         "Uncalled base-matrix assignment (source invalid raw-array assignment), multiply-assign, pivot/swap/scale and extra rectangular/right/vector-X variants are not invented. Original test_dense_matrix is behind an unconditional return; direct fixture preserves its zero-unit typo without registered driver credit. Actual live consumers include LU get_B/left/right/is_correct and swap debug views; complete upstream assertion wiring remains open.",
         "Floating debug printers preserve byte rather than rune widths, trailing spaces, per-space writer insertions and row/final endl flushes. Width subtraction is unsigned32 before signed32 narrowing; negative print_blanks count reaches explicit ErrBounds before undefined signed-decrement behavior. Ragged/index/report/native stream errors stop with actual completed output prefix. Base pointer overload adds a final blank line; static/sparse/submatrix overloads do not. Whole source units, exact numeral/pair T_to_string ownership and complete upstream diagnostic/assertion/CLI wiring remain open. Unused static printer local get_domain result has no retained numerical effect and no STL set implementation is introduced.",
         "Reachability correction: uncalled LU tail_product/vector-check chain, matrix apply_to_vector, print_submatrix and core pretty_print closure are excluded. Earlier Go generic-vector and submatrix-print wrappers/direct tests were removed. lu::is_correct is RETAINED: src/test/lp.cpp245,255,267,280,292,311,405,410,452,499 contain actual SASSERT calls. Float LU DebugIsCorrect and independent left/right matrix identity tests remain. No exact-matrix or whole-LP completion inferred."
+      ],
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "exact matrix/dense specializations"
+          ],
+          "reason": "Explicit instantiations alone are not retained roots. Live matrix consumers above are double/double; other exact uses belong to uncalled diagnostic chains."
+        },
+        {
+          "source_methods": [
+            "matrix apply_to_vector",
+            "LU tail_product/vector-check closure"
+          ],
+          "reason": "Only definitions/declarations and internal dead-chain calls; no retained callers."
+        },
+        {
+          "source_methods": [
+            "primal check_correctness/check_Ax_equal_b",
+            "sparse really_best_pivot/can_improve_score_for_row/print_active_matrix"
+          ],
+          "reason": "Containing entry calls are commented out; all remaining references are declarations/definitions/internal calls, not roots."
+        }
       ]
     },
     {
       "path": "src/util/lp/matrix.hpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/dense_matrix_float_debug.go",
         "pkg/util/lp/matrix_float_debug.go",
@@ -134844,7 +134962,14 @@
         "TestLPDebugMatrixPrintConcreteOverloads",
         "TestLPDebugMatrixPrintEveryByteAndFlush",
         "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
-        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
+        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots",
+        "TestLPSmallLUDriverLiteralScenario",
+        "TestLPLargerLUDriversIndependentLiteralAndRandomOracle",
+        "TestLPHolesLUDriverIndependentTailReportOracle",
+        "TestLPLUTestDriverSourceParentSequence",
+        "TestLPDriverSwapsIndependentSourceOracle",
+        "TestLPLUCheckDebugResidualSourceTolerance",
+        "TestLPLUCheckDebugResidualFailurePrefixes"
       ],
       "conditionals": [
         {
@@ -134856,8 +134981,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete debug floating matrix view, >1e-6/NaN equality, retained LU matrix consumers",
@@ -134886,22 +135011,41 @@
             "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
             "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
           ]
-        },
-        {
-          "name": "apply_to_vector reached only by the unreachable LU vector-check chain; whole-source reachability scan finds definitions/declarations/internal dead-chain calls only",
-          "status": "dead_deleted",
-          "tests": []
         }
       ],
       "ownership": [
         "Debug-only native Go float slices own copied dense storage and lexical product/vector temporaries. Copy and dense assignment deep-copy storage; partial constructors/products return reached owner/prefix. Dense left application computes entire temporary before publication; generic apply_to_vector snapshots input then publishes each completed row. No numerical arena roots or STL storage implementation.",
-        "Native Go string tables snapshot all numeric matrix cells before output. String-table printing borrows slice headers by value and rereads live cell strings after padding. Widths/temporary rows are native scalar/string storage, without numerical arena roots or C++ STL representations."
+        "Native Go string tables snapshot all numeric matrix cells before output. String-table printing borrows slice headers by value and rereads live cell strings after padding. Widths/temporary rows are native scalar/string storage, without numerical arena roots or C++ STL representations.",
+        "Concrete floating debug matrices own native scalar slices; source object copies/assignments do not share backing storage. Matrix views borrow their actual concrete matrix and dimension binding; no exact numerical receipts or unused template-owned resources. Failed report stops retain completed output with no fake numerical allocation layer."
       ],
       "deviations": [
+        "Whole retained-source/ownership audit completes debug matrix.h/.hpp and dense_matrix.h/.hpp for the actual double/double consumers. Concrete typed matrix view, unsigned32 dense flat get/set/construction, base-view copy, owning dense assignment, square-loop left application, ordinary product/equality and byte-width matrix/string-table printing are implemented. Live roots are original small/larger/holes LU/get_B/left/right/is_correct reports and assertions, sparse swap comparisons and LU file-check B*d validation. Constructor/dimensions/getters use concrete native Go fields; tail dimension binding covers actual eta/row-eta/diag/permutation/square-dense families. No-ignore whole-src105reference scan confirms uncalled primal check_correctness->check_Ax_equal_b and sparse really_best_pivot->can_improve_score_for_row->print_active_matrix chains; their additional dense/exact paths do not create roots. Extra exact instantiations, dead LU vector-check/tail_product and unused dense base assignment/multiply-assign/right/rectangular/pivot/swap/scale variants are explicit exclusions. Const ref m_v typo and invalid raw-array base assignment are uncalled, not repaired. Existing disabled test_dense_matrix direct fixture carries no registered CLI credit. Found/corrected debug matrix padding/cell/trailing-space short nil-error writes: all three insertions now use existing checked writer, preserving one-byte padding writes, live string reads and numeric snapshots. Extended TestLPDebugMatrixPrintEveryByteAndFlush checks every base/static report byte with nil-error short writes, exact output prefixes and completed endl count; existing ordinary refusals, every flush failure, mutable string cells, Unicode byte widths, IEEE/signed-zero formatting and getters remain tested. Focused combined matrix/dense/actual small/larger/holes/LU-parent/swap groups2.452s pass; additional actual LU file/check residual consumer groups0.027s pass; combined LP vet and native LP compile pass. Whole-Go-file focused covered/total {\"dense_matrix_float_debug.go\":[57,65],\"lu_float_debug_matrix.go\":[61,66],\"matrix_float_debug.go\":[34,36],\"matrix_float_debug_print.go\":[73,74]}. Remaining storage/product branches guard host-int size limits impossible on current64bit uint32 shape or invariant-protected output writes; LU view guards qualify source invalid dimensions/pointers. Source equality remains literal >1e-6 with NaN differences comparing equal. No exact debug matrix/formatter or STL adapter added. Build scope remains g3debug, matching Z3DEBUG; no native coverage/completion inference for erased bodies. Separate static/sparse/eta/permutation/square-dense/LU algorithms and full CLI/SMT audits remain open. LP inventory49ported/46partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates recent fixes; current focused profile /mnt/oldrog/tmp/g3-lp-debug-matrix-audit.cover; source audit /mnt/oldrog/tmp/g3-lp-debug-matrix-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "g3debug build scope matches source Z3DEBUG. Concrete FloatDebugMatrix transports floating values with explicit Go index errors; no any-valued callback layer or generic template. Unsigned32 rows*columns and flat offsets retain wrap/spill behavior; ErrBounds precedes actual invalid storage access. Exact scalar/pair coefficient variants, source formatting and whole-source/ownership audit remain open, so no whole-unit promotion.",
         "Uncalled base-matrix assignment (source invalid raw-array assignment), multiply-assign, pivot/swap/scale and extra rectangular/right/vector-X variants are not invented. Original test_dense_matrix is behind an unconditional return; direct fixture preserves its zero-unit typo without registered driver credit. Actual live consumers include LU get_B/left/right/is_correct and swap debug views; complete upstream assertion wiring remains open.",
         "Floating debug printers preserve byte rather than rune widths, trailing spaces, per-space writer insertions and row/final endl flushes. Width subtraction is unsigned32 before signed32 narrowing; negative print_blanks count reaches explicit ErrBounds before undefined signed-decrement behavior. Ragged/index/report/native stream errors stop with actual completed output prefix. Base pointer overload adds a final blank line; static/sparse/submatrix overloads do not. Whole source units, exact numeral/pair T_to_string ownership and complete upstream diagnostic/assertion/CLI wiring remain open. Unused static printer local get_domain result has no retained numerical effect and no STL set implementation is introduced.",
         "Reachability correction: uncalled LU tail_product/vector-check chain, matrix apply_to_vector, print_submatrix and core pretty_print closure are excluded. Earlier Go generic-vector and submatrix-print wrappers/direct tests were removed. lu::is_correct is RETAINED: src/test/lp.cpp245,255,267,280,292,311,405,410,452,499 contain actual SASSERT calls. Float LU DebugIsCorrect and independent left/right matrix identity tests remain. No exact-matrix or whole-LP completion inferred."
+      ],
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "exact matrix/dense specializations"
+          ],
+          "reason": "Explicit instantiations alone are not retained roots. Live matrix consumers above are double/double; other exact uses belong to uncalled diagnostic chains."
+        },
+        {
+          "source_methods": [
+            "matrix apply_to_vector",
+            "LU tail_product/vector-check closure"
+          ],
+          "reason": "Only definitions/declarations and internal dead-chain calls; no retained callers."
+        },
+        {
+          "source_methods": [
+            "primal check_correctness/check_Ax_equal_b",
+            "sparse really_best_pivot/can_improve_score_for_row/print_active_matrix"
+          ],
+          "reason": "Containing entry calls are commented out; all remaining references are declarations/definitions/internal calls, not roots."
+        }
       ]
     },
     {

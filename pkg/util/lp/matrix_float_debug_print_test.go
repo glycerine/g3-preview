@@ -5,6 +5,7 @@ package lp
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"math"
 	"math/rand"
 	"strings"
@@ -109,6 +110,15 @@ func TestLPDebugMatrixPrintEveryByteAndFlush(t *testing.T) {
 			err := run(lpResidualWriterOnly{writer: writer})
 			if writer.String() != want[:accepted] || accepted < len(want) && err != lpErrResidualWrite || accepted == len(want) && err != nil {
 				t.Fatal(base, accepted, err, writer.String())
+			}
+			short := &lpValidationPrefixWriter{larConstraintPrefixWriter: larConstraintPrefixWriter{remaining: accepted}}
+			err = run(short)
+			var wantErr error
+			if accepted < len(want) {
+				wantErr = io.ErrShortWrite
+			}
+			if err != wantErr || short.output.String() != want[:accepted] || short.flushes != strings.Count(want[:accepted], "\n") {
+				t.Fatal("short write", base, accepted, err, short.output.String(), short.flushes)
 			}
 		}
 		for flush := 1; flush <= flushes; flush++ {

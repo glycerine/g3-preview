@@ -24,7 +24,7 @@ func debugPrintBlanks(n int32, out io.Writer) error {
 		return ErrBounds
 	}
 	for n > 0 {
-		if _, err := io.WriteString(out, " "); err != nil {
+		if err := writeConstraintText(out, " "); err != nil {
 			return err
 		}
 		n--
@@ -50,10 +50,10 @@ func PrintDebugMatrixWithWidths(rows [][]string, widths []uint32, out io.Writer)
 			if j >= len(rows[i]) {
 				return ErrBounds
 			}
-			if _, err := io.WriteString(out, rows[i][j]); err != nil {
+			if err := writeConstraintText(out, rows[i][j]); err != nil {
 				return err
 			}
-			if _, err := io.WriteString(out, " "); err != nil {
+			if err := writeConstraintText(out, " "); err != nil {
 				return err
 			}
 		}
