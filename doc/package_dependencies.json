@@ -730,6 +730,8 @@
       ],
       "production_files": [
         "binary_interval.go",
+        "binary_interval_div.go",
+        "binary_interval_inv.go",
         "binary_interval_mul.go",
         "gparams_catalog_collectors.go"
       ]

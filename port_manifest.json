@@ -34516,7 +34516,9 @@
         "pkg/math/interval/rational_interval_deps_test.go",
         "pkg/math/realclosure/binary_interval.go",
         "pkg/math/realclosure/binary_interval_test.go",
-        "pkg/math/realclosure/binary_interval_mul.go"
+        "pkg/math/realclosure/binary_interval_mul.go",
+        "pkg/math/realclosure/binary_interval_inv.go",
+        "pkg/math/realclosure/binary_interval_div.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34938,6 +34940,22 @@
           "name": "Concrete mpbq_config interval multiplication: nine sign-class branches, zero singleton, infinity bounds, mixed extrema ties and aliased destination (src/math/interval/interval_def.h:1019-1218)",
           "status": "partial",
           "go_target": "pkg/math/realclosure/binary_interval_mul.go",
+          "tests": [
+            "TestRealClosureBinaryIntervalRetainedCore"
+          ]
+        },
+        {
+          "name": "Concrete mpbq_config interval reciprocal with directed precision, open zero/infinite bounds, alias and owned scratch (src/math/interval/interval_def.h:1516-1587)",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/binary_interval_inv.go",
+          "tests": [
+            "TestRealClosureBinaryIntervalRetainedCore"
+          ]
+        },
+        {
+          "name": "Concrete mpbq_config interval division with directed precision, open zero/infinite bounds, alias and owned scratch (src/math/interval/interval_def.h:1663-1849)",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/binary_interval_div.go",
           "tests": [
             "TestRealClosureBinaryIntervalRetainedCore"
           ]
@@ -47533,7 +47551,9 @@
         "pkg/math/interval/binary_extended_test.go",
         "pkg/math/realclosure/binary_interval.go",
         "pkg/math/realclosure/binary_interval_test.go",
-        "pkg/math/realclosure/binary_interval_mul.go"
+        "pkg/math/realclosure/binary_interval_mul.go",
+        "pkg/math/realclosure/binary_interval_inv.go",
+        "pkg/math/realclosure/binary_interval_div.go"
       ],
       "tests": [
         "TestRealClosureBinaryExtendedNumeralBranches",
@@ -48746,6 +48766,22 @@
           "name": "Concrete mpbq_config interval multiplication: nine sign-class branches, zero singleton, infinity bounds, mixed extrema ties and aliased destination (src/math/interval/interval_def.h:1019-1218)",
           "status": "partial",
           "go_target": "pkg/math/realclosure/binary_interval_mul.go",
+          "tests": [
+            "TestRealClosureBinaryIntervalRetainedCore"
+          ]
+        },
+        {
+          "name": "Concrete mpbq_config interval reciprocal with directed precision, open zero/infinite bounds, alias and owned scratch (src/math/interval/interval_def.h:1516-1587)",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/binary_interval_inv.go",
+          "tests": [
+            "TestRealClosureBinaryIntervalRetainedCore"
+          ]
+        },
+        {
+          "name": "Concrete mpbq_config interval division with directed precision, open zero/infinite bounds, alias and owned scratch (src/math/interval/interval_def.h:1663-1849)",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/binary_interval_div.go",
           "tests": [
             "TestRealClosureBinaryIntervalRetainedCore"
           ]
@@ -115143,7 +115179,9 @@
         "pkg/math/interval/binary_extended_test.go",
         "pkg/math/realclosure/binary_interval.go",
         "pkg/math/realclosure/binary_interval_test.go",
-        "pkg/math/realclosure/binary_interval_mul.go"
+        "pkg/math/realclosure/binary_interval_mul.go",
+        "pkg/math/realclosure/binary_interval_inv.go",
+        "pkg/math/realclosure/binary_interval_div.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",

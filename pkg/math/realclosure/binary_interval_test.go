@@ -2,9 +2,11 @@ package realclosure
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -136,6 +138,20 @@ func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 		must(v.Display(&out))
 		return out.String()
 	}
+	bracketsThird := func(v *BinaryInterval) {
+		t.Helper()
+		one, three, scaled := numeral.NewBinaryInt(1), numeral.NewBinaryInt(3), numeral.NewBinaryRational()
+		defer func() { must(m.Del(&scaled)) }()
+		must(m.Mul(&v.lower, &three, &scaled))
+		below, err := m.Less(&scaled, &one)
+		must(err)
+		must(m.Mul(&v.upper, &three, &scaled))
+		above, err := m.Less(&one, &scaled)
+		must(err)
+		if !below || !above {
+			t.Fatalf("directed interval does not strictly enclose 1/3: %s", show(v))
+		}
+	}
 	classes := []struct {
 		name           string
 		al, au, bl, bu int32
@@ -193,5 +209,116 @@ func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 	must(a.Mul(a, b))
 	if got := show(a); got != "(-16, 8]" {
 		t.Fatalf("upper mixed tie with aliased left input = %q", got)
+	}
+	set(a, 3, 3, false, false)
+	must(c.Inv(a, 12))
+	less, err := m.Less(&c.lower, &c.upper)
+	must(err)
+	if !less {
+		t.Fatalf("directed reciprocal failed to bracket 1/3: %s", show(c))
+	}
+	bracketsThird(c)
+	set(a, 0, 2, true, false)
+	must(c.Inv(a, 12))
+	if got := show(c); got != "[1/2, +oo)" {
+		t.Fatalf("open positive zero reciprocal = %q", got)
+	}
+	set(a, -2, 0, false, true)
+	must(c.Inv(a, 12))
+	if got := show(c); got != "(-oo, -1/2]" {
+		t.Fatalf("open negative zero reciprocal = %q", got)
+	}
+	set(a, -2, -1, false, false)
+	must(c.Inv(a, 12))
+	if got := show(c); got != "[-1, -1/2]" {
+		t.Fatalf("negative reciprocal = %q", got)
+	}
+	set(a, 2, 3, false, false)
+	must(a.ResetUpper())
+	must(c.SetFrom(a))
+	must(c.Inv(c, 12))
+	if got := show(c); got != "(0, 1/2]" {
+		t.Fatalf("aliased unbounded reciprocal = %q", got)
+	}
+	set(a, -3, -2, false, false)
+	must(a.ResetLower())
+	must(c.Inv(a, 12))
+	if got := show(c); got != "[-2049/2^12, 0)" {
+		t.Fatalf("negative unbounded reciprocal = %q", got)
+	}
+	set(a, 0, 2, false, false)
+	if err := c.Inv(a, 12); !errors.Is(err, interval.ErrExtendedDomain) {
+		t.Fatalf("closed-zero reciprocal error = %v", err)
+	}
+	quotients := []struct {
+		name           string
+		al, au, bl, bu int32
+		want           string
+	}{
+		{"NN", -3, -1, -1, -1, "[1, 3]"},
+		{"NP", -3, -1, 1, 1, "[-3, -1]"},
+		{"MN", -2, 4, -1, -1, "[-4, 2]"},
+		{"MP", -2, 4, 1, 1, "[-2, 4]"},
+		{"PN", 1, 3, -1, -1, "[-3, -1]"},
+		{"PP", 1, 3, 1, 1, "[1, 3]"},
+	}
+	for _, tc := range quotients {
+		t.Run("div-"+tc.name, func(t *testing.T) {
+			set(a, tc.al, tc.au, false, false)
+			set(b, tc.bl, tc.bu, false, false)
+			must(c.Div(a, b, 12))
+			if got := show(c); got != tc.want {
+				t.Fatalf("binary interval division = %q, want %q", got, tc.want)
+			}
+		})
+	}
+	set(a, 1, 1, false, false)
+	set(b, 3, 3, false, false)
+	must(c.Div(a, b, 12))
+	less, err = m.Less(&c.lower, &c.upper)
+	must(err)
+	if !less {
+		t.Fatalf("directed quotient failed to bracket 1/3: %s", show(c))
+	}
+	bracketsThird(c)
+	set(a, 1, 3, false, false)
+	set(b, 0, 2, true, false)
+	must(c.Div(a, b, 12))
+	if got := show(c); got != "[1/2, +oo)" {
+		t.Fatalf("positive open-zero quotient = %q", got)
+	}
+	must(c.SetFrom(b))
+	must(c.Div(a, c, 12))
+	if got := show(c); got != "[1/2, +oo)" {
+		t.Fatalf("aliased denominator quotient = %q", got)
+	}
+	set(b, -2, 0, false, true)
+	must(c.Div(a, b, 12))
+	if got := show(c); got != "(-oo, -1/2]" {
+		t.Fatalf("negative open-zero quotient = %q", got)
+	}
+	set(b, 2, 3, false, false)
+	must(b.ResetUpper())
+	must(c.Div(a, b, 12))
+	if got := show(c); got != "(0, 3/2]" {
+		t.Fatalf("unbounded denominator quotient = %q", got)
+	}
+	set(b, 0, 2, true, false)
+	set(a, -2, 4, false, false)
+	must(c.Div(a, b, 12))
+	if got := show(c); got != "(-oo, +oo)" {
+		t.Fatalf("mixed open-zero quotient = %q", got)
+	}
+	set(a, 0, 0, false, false)
+	must(c.Div(a, b, 12))
+	if got := show(c); got != "[0, 0]" {
+		t.Fatalf("zero numerator quotient = %q", got)
+	}
+	if err := a.Div(a, b, 12); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("numerator alias error = %v", err)
+	}
+	set(b, 0, 2, false, false)
+	if err := c.Div(a, b, 12); !errors.Is(err, interval.ErrExtendedDomain) {
+		t.Fatalf("zero-containing denominator error = %v", err)
 	}
 }
