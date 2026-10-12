@@ -350,14 +350,14 @@ func (m *PairCoreSolverBase) Close() error {
 		}
 		m.Factorization = nil
 	}
-	if err := m.SteepestEdge.Close(); err != nil {
+	if err := m.SteepestEdge.CloseForward(); err != nil {
 		return err
 	}
-	if err := m.CopyXB.Close(); err != nil {
+	if err := m.CopyXB.CloseForward(); err != nil {
 		return err
 	}
 	for _, v := range []*IndexedRationalVector{m.ColumnNorms, m.Ed, m.D, m.W, m.Y, m.PivotRow, m.PivotRowB1} {
-		if err := v.Close(); err != nil {
+		if err := v.CloseForward(); err != nil {
 			return err
 		}
 	}

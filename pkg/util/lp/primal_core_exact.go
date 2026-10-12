@@ -227,7 +227,7 @@ func (m *PairPrimalCoreSolver) Close() error {
 		return err
 	}
 	if m.CostsBackup != nil {
-		if err := m.CostsBackup.Close(); err != nil {
+		if err := m.CostsBackup.CloseForward(); err != nil {
 			return err
 		}
 	}
@@ -235,7 +235,7 @@ func (m *PairPrimalCoreSolver) Close() error {
 		return err
 	}
 	if m.Beta != nil {
-		if err := m.Beta.Close(); err != nil {
+		if err := m.Beta.CloseForward(); err != nil {
 			return err
 		}
 	}

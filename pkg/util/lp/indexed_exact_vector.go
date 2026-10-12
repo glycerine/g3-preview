@@ -290,6 +290,27 @@ func (v *IndexedRationalVector) Close() error {
 	return nil
 }
 
+// CloseForward destroys a retained source vector's dense elements in the
+// forward order used by util/vector.h. Close remains the reverse lexical
+// cleanup used when this holder stores C++ expression temporaries.
+func (v *IndexedRationalVector) CloseForward() error {
+	if err := v.calls.cleanupRaw(v.manager); err != nil {
+		return err
+	}
+	for i := range v.Data {
+		if err := v.manager.Del(&v.Data[i]); err != nil {
+			return err
+		}
+		v.Data[i] = numeral.NewRational()
+	}
+	if err := v.calls.cleanupRoots(v.manager); err != nil {
+		return err
+	}
+	v.Data = nil
+	v.Index = nil
+	return nil
+}
+
 // IndexedPairVector owns initialized exact dense slots and a stable sparse
 // index in a borrowed manager. Data and Index are public for retained matrix
 // algorithms. Never shallow-copy an owning slot or change Data's length by hand;
@@ -566,6 +587,26 @@ func (v *IndexedPairVector) Close() error {
 			return err
 		}
 		v.Data = v.Data[:last]
+	}
+	if err := v.calls.cleanupRoots(v.manager); err != nil {
+		return err
+	}
+	v.Data = nil
+	v.Index = nil
+	return nil
+}
+
+// CloseForward destroys a retained source vector's pair elements in source
+// forward order. Pair.Del still destroys each element's Y before X.
+func (v *IndexedPairVector) CloseForward() error {
+	if err := v.calls.cleanupRaw(v.manager); err != nil {
+		return err
+	}
+	for i := range v.Data {
+		if err := v.Data[i].Del(v.manager); err != nil {
+			return err
+		}
+		v.Data[i] = NewRationalPair()
 	}
 	if err := v.calls.cleanupRoots(v.manager); err != nil {
 		return err
