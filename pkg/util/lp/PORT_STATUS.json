@@ -13,7 +13,8 @@
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
     "Complete registered CLI runtime/consumer/ownership audit, whole retained SMT reader/LP audit",
     "component property tests, coverage and integration audits",
-    "Complete retained source/ownership/SMT and process-global driver consumer audits; remaining optimization/scaling/randomize consumers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
+    "Complete retained source/ownership/SMT and process-global driver consumer audits; remaining optimization/scaling/randomize consumers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations.",
+    "Port retained floating lp_solver.h print_model used by src/shell/lp_frontend.cpp:92, with original objective/column getters and output/endl order; do not add unused exact instantiation"
   ],
   "units": [
     {
@@ -4511,8 +4512,10 @@
         "TestLPMPSDriverFileCloseFailure",
         "TestLPMPSDriverLiveReportEvaluation",
         "TestLPFloatMatrixStatisticsReportBoundaries",
-        "TestLPRationalMatrixStatisticsShortWrites"
-      ]
+        "TestLPRationalMatrixStatisticsShortWrites",
+        "TestLPFloatPresolveCleanupReportBoundaries"
+      ],
+      "evidence": "Floating common presolve cleanup now honors lp_solver.hpp:399-410 std::endl and rejects short nil-error writes through the existing checked line writer. TestLPFloatPresolveCleanupReportBoundaries covers every byte of singular/plural reports with explicit and short-nil errors, successful/failed flush, nil output and zero passes; verifies completed row erasure and endpoint pinning before output refusal. Three rows in one pass retain the singular report; the chained three-row model reports two passes. All floating/exact presolve groups pass native5.439s/combined6.757s. Whole floating presolve file coverage131/134statements native,132/134combined. Profiles /mnt/oldrog/tmp/g3-lp-cleanup-report-{native,debug}.cover. Whole no-ignore source scan finds live lp_solver.h:259-264 print_model consumer in src/shell/lp_frontend.cpp:92; no Go model report exists yet, so common solver remains partial. Uncalled scale-statistics chain and get_max_iterations_per_stage have no consumers in src. LP inventory unchanged36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native checkpoint predates this correction. All commands CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/lp_solver.hpp",
@@ -4627,8 +4630,10 @@
         "TestLPMPSDriverPreservesOlderComparison",
         "TestLPMPSDriverEmptyAndInfeasibleFiles",
         "TestLPMPSDriverFileCloseFailure",
-        "TestLPMPSDriverLiveReportEvaluation"
-      ]
+        "TestLPMPSDriverLiveReportEvaluation",
+        "TestLPFloatPresolveCleanupReportBoundaries"
+      ],
+      "evidence": "Floating common presolve cleanup now honors lp_solver.hpp:399-410 std::endl and rejects short nil-error writes through the existing checked line writer. TestLPFloatPresolveCleanupReportBoundaries covers every byte of singular/plural reports with explicit and short-nil errors, successful/failed flush, nil output and zero passes; verifies completed row erasure and endpoint pinning before output refusal. Three rows in one pass retain the singular report; the chained three-row model reports two passes. All floating/exact presolve groups pass native5.439s/combined6.757s. Whole floating presolve file coverage131/134statements native,132/134combined. Profiles /mnt/oldrog/tmp/g3-lp-cleanup-report-{native,debug}.cover. Whole no-ignore source scan finds live lp_solver.h:259-264 print_model consumer in src/shell/lp_frontend.cpp:92; no Go model report exists yet, so common solver remains partial. Uncalled scale-statistics chain and get_max_iterations_per_stage have no consumers in src. LP inventory unchanged36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native checkpoint predates this correction. All commands CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/lp_solver_instances.cpp",
@@ -4683,8 +4688,10 @@
         "TestLPMPSDriverPreservesOlderComparison",
         "TestLPMPSDriverEmptyAndInfeasibleFiles",
         "TestLPMPSDriverFileCloseFailure",
-        "TestLPMPSDriverLiveReportEvaluation"
-      ]
+        "TestLPMPSDriverLiveReportEvaluation",
+        "TestLPFloatPresolveCleanupReportBoundaries"
+      ],
+      "evidence": "Floating common presolve cleanup now honors lp_solver.hpp:399-410 std::endl and rejects short nil-error writes through the existing checked line writer. TestLPFloatPresolveCleanupReportBoundaries covers every byte of singular/plural reports with explicit and short-nil errors, successful/failed flush, nil output and zero passes; verifies completed row erasure and endpoint pinning before output refusal. Three rows in one pass retain the singular report; the chained three-row model reports two passes. All floating/exact presolve groups pass native5.439s/combined6.757s. Whole floating presolve file coverage131/134statements native,132/134combined. Profiles /mnt/oldrog/tmp/g3-lp-cleanup-report-{native,debug}.cover. Whole no-ignore source scan finds live lp_solver.h:259-264 print_model consumer in src/shell/lp_frontend.cpp:92; no Go model report exists yet, so common solver remains partial. Uncalled scale-statistics chain and get_max_iterations_per_stage have no consumers in src. LP inventory unchanged36ported/59partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native checkpoint predates this correction. All commands CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/lp_utils.cpp",

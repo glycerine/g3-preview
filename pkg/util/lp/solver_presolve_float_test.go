@@ -3,6 +3,7 @@ package lp
 import (
 	"bytes"
 	"errors"
+	"io"
 	"math"
 	"math/big"
 	"math/rand"
@@ -222,6 +223,92 @@ func TestLPFloatPresolveUnknownBoundsAndPinPrefixes(t *testing.T) {
 		}
 	} else if !got || err != nil {
 		t.Fatal(got, err)
+	}
+}
+
+func TestLPFloatPresolveCleanupReportBoundaries(t *testing.T) {
+	fixture := func(passes int) *FloatLPSolver {
+		m := lpFloatSolver(t)
+		if passes == 1 {
+			// Three rows removed together still produce the singular report.
+			m.GetOrCreateColumnInfo(0)
+			for i := uint32(0); i < 3; i++ {
+				m.SetRowColumnCoefficient(i, 0, 0)
+				if err := m.AddConstraint(RelationEqual, 0, i); err != nil {
+					t.Fatal(err)
+				}
+			}
+		} else if passes == 2 {
+			x, y := m.GetOrCreateColumnInfo(0), m.GetOrCreateColumnInfo(1)
+			x.SetLowBound(0)
+			x.SetUpperBound(1)
+			y.SetLowBound(0)
+			y.SetUpperBound(2)
+			m.SetRowColumnCoefficient(0, 0, 1)
+			m.SetRowColumnCoefficient(0, 1, 1)
+			for i := uint32(0); i < 3; i++ {
+				if i > 0 {
+					m.SetRowColumnCoefficient(i, 0, 1)
+				}
+				if err := m.AddConstraint(RelationEqual, 1, i); err != nil {
+					t.Fatal(err)
+				}
+			}
+		}
+		return m
+	}
+	checkState := func(m *FloatLPSolver, passes int) {
+		t.Helper()
+		if m.AValues.Len() != 0 {
+			t.Fatal("output failure preceded completed row erasure")
+		}
+		if passes == 2 {
+			x, y := m.Columns[0], m.Columns[1]
+			if !x.Fixed || x.FixedValue != 1 || !y.Fixed || y.FixedValue != 0 {
+				t.Fatal("output failure preceded completed pinning", x, y)
+			}
+		}
+	}
+	refused := errors.New("cleanup report refused")
+	for passes, report := range []string{"", "deleted one row\n", "deleted 2 rows\n"} {
+		for _, writeErr := range []error{nil, refused} {
+			for limit := 0; limit < len(report); limit++ {
+				m := fixture(passes)
+				w := &lpValidationPrefixWriter{larConstraintPrefixWriter: larConstraintPrefixWriter{remaining: limit, err: writeErr}}
+				m.Settings.DebugOut = w
+				want := writeErr
+				if want == nil {
+					want = io.ErrShortWrite
+				}
+				if err := m.Cleanup(); err != want || w.output.String() != report[:limit] || w.flushes != 0 {
+					t.Fatal(passes, limit, err, w.output.String(), w.flushes)
+				}
+				checkState(m, passes)
+			}
+		}
+		for _, failFlush := range []bool{false, true} {
+			m := fixture(passes)
+			w := &lpValidationPrefixWriter{larConstraintPrefixWriter: larConstraintPrefixWriter{remaining: len(report)}}
+			var want error
+			if failFlush && passes > 0 {
+				w.failAt, want = 1, lpErrResidualWrite
+			}
+			m.Settings.DebugOut = w
+			flushes := 0
+			if passes > 0 {
+				flushes = 1
+			}
+			if err := m.Cleanup(); err != want || w.output.String() != report || w.flushes != flushes {
+				t.Fatal(passes, failFlush, err, w.output.String(), w.flushes)
+			}
+			checkState(m, passes)
+		}
+		m := fixture(passes)
+		m.Settings.DebugOut = nil
+		if err := m.Cleanup(); err != nil {
+			t.Fatal(err)
+		}
+		checkState(m, passes)
 	}
 }
 

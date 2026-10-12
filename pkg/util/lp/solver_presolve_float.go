@@ -228,9 +228,7 @@ func (m *FloatLPSolver) Cleanup() error {
 		return nil
 	}
 	if passes == 1 {
-		_, err := fmt.Fprintln(m.Settings.DebugOut, "deleted one row")
-		return err
+		return writeDriverLine(m.Settings.DebugOut, "deleted one row")
 	}
-	_, err := fmt.Fprintf(m.Settings.DebugOut, "deleted %d rows\n", passes)
-	return err
+	return writeDriverLine(m.Settings.DebugOut, fmt.Sprintf("deleted %d rows", passes))
 }
