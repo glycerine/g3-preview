@@ -92205,9 +92205,15 @@
       "path": "src/tactic/arith/bound_propagator.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/arith/bound_equation_store.go",
+        "pkg/tactic/arith/bound_equation_store_test.go"
+      ],
+      "tests": [
+        "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
+        "TestBoundEquationStoreRationalConstructionAndCancellation"
+      ],
       "conditionals": [
         {
           "line": 303,
@@ -92302,17 +92308,43 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "equation constraint allocation, variable watch registration, variable-deletion dead mark and constraint deletion ownership",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_equation_store.go",
+          "tests": [
+            "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
+            "TestBoundEquationStoreRationalConstructionAndCancellation"
+          ]
+        },
+        {
+          "name": "bound propagation, scope trails, bound ownership, params, statistics and conflict/explanation paths",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The equation store owns each accepted linear equation; watch lists contain constraint indexes only. DeleteConstraints releases equations in insertion order and clears watch lists. Rational numeral manager remains borrowed."
+      ],
+      "deviations": [
+        "This concrete equation/watch-list owner covers the source setup and cleanup path only. It does not yet run source init_eq propagation or maintain bound/trail state. Invalid variable IDs return Go bounds errors instead of indexing outside source vectors."
+      ]
     },
     {
       "path": "src/tactic/arith/bound_propagator.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/arith/bound_equation_store.go",
+        "pkg/tactic/arith/bound_equation_store_test.go"
+      ],
+      "tests": [
+        "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
+        "TestBoundEquationStoreRationalConstructionAndCancellation"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -92351,9 +92383,29 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "equation constraint allocation, variable watch registration, variable-deletion dead mark and constraint deletion ownership",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_equation_store.go",
+          "tests": [
+            "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
+            "TestBoundEquationStoreRationalConstructionAndCancellation"
+          ]
+        },
+        {
+          "name": "bound propagation, scope trails, bound ownership, params, statistics and conflict/explanation paths",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The equation store owns each accepted linear equation; watch lists contain constraint indexes only. DeleteConstraints releases equations in insertion order and clears watch lists. Rational numeral manager remains borrowed."
+      ],
+      "deviations": [
+        "This concrete equation/watch-list owner covers the source setup and cleanup path only. It does not yet run source init_eq propagation or maintain bound/trail state. Invalid variable IDs return Go bounds errors instead of indexing outside source vectors."
+      ]
     },
     {
       "path": "src/tactic/arith/bv2int_rewriter.cpp",
@@ -155771,7 +155823,9 @@
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go",
         "pkg/tactic/arith/linear_equation.go",
-        "pkg/tactic/arith/linear_equation_test.go"
+        "pkg/tactic/arith/linear_equation_test.go",
+        "pkg/tactic/arith/bound_equation_store.go",
+        "pkg/tactic/arith/bound_equation_store_test.go"
       ],
       "tests": [
         "TestEuclideanIntegerBufferSortAndRawSwap",
@@ -155789,7 +155843,9 @@
         "TestEuclideanSetupVariableJustificationAndEquationOwnership",
         "TestLinearEquationIntegerCoalesceSortNormalizeAndReuse",
         "TestLinearEquationIntegerCancellationAndLargeOwnership",
-        "TestLinearEquationRationalDenominatorClearingAndCombination"
+        "TestLinearEquationRationalDenominatorClearingAndCombination",
+        "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
+        "TestBoundEquationStoreRationalConstructionAndCancellation"
       ],
       "conditionals": [
         {
@@ -155829,7 +155885,8 @@
       ],
       "deviations": [
         "No generic Go numeral-buffer adapter is retained. Concrete typed scoped numeral vectors expose borrowed indexed/c_ptr-style views and raw-slice storage swaps; Euclidean sorting and the integer/rational addmul row merges use them. The reached linear_equation mpz reserve is size growth, not Go capacity-only growth, and now has a concrete typed method; the linear_equation, other arithmetic tactic and SMT consumers remain open.",
-        "The arithmetic linear-equation owner now exercises concrete integer buffer reset, deep-copy push, logical-size reserve, borrowed indexed and slice views, and cleanup in native and checked/debug focused tests; other tactic and SMT consumers remain open."
+        "The arithmetic linear-equation owner now exercises concrete integer buffer reset, deep-copy push, logical-size reserve, borrowed indexed and slice views, and cleanup in native and checked/debug focused tests; other tactic and SMT consumers remain open.",
+        "The arithmetic bound equation store reaches the concrete linear-equation integer and rational buffers through variable-watch registration and ordered constraint cleanup; propagation and other tactic/SMT consumers remain open."
       ]
     },
     {
