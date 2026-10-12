@@ -141,3 +141,33 @@ func TestLPDriverPreparationReportFailurePrefixes(t *testing.T) {
 		}
 	}
 }
+
+func TestLPDriverPreparationShortWritePublication(t *testing.T) {
+	for _, args := range [][]string{{"--test_int_set"}, {"--unknown"}, {"--file"}} {
+		var full bytes.Buffer
+		good, err := PrepareLPDriver(args, &full)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for n := 0; n < full.Len(); n++ {
+			w := &larConstraintPrefixWriter{remaining: n}
+			p, err := PrepareLPDriver(args, w)
+			if !errors.Is(err, io.ErrShortWrite) || w.output.String() != full.String()[:n] {
+				t.Fatal(args, n, err, w.output.String())
+			}
+			// Header failure precedes argument construction. Later refusal
+			// retains the parsed arguments, but cannot publish action or exit.
+			if (p.Arguments == nil) != (n < len("resize\n")) || p.Action != "" || p.ExitCode != 0 || p.Settings != nil {
+				t.Fatal(args, n, p)
+			}
+			if p.Arguments != nil && p.Arguments.ErrorMessage != good.Arguments.ErrorMessage {
+				t.Fatal(args, n, "lost parser error")
+			}
+		}
+		w := &larConstraintPrefixWriter{remaining: full.Len()}
+		p, err := PrepareLPDriver(args, w)
+		if err != nil || w.output.String() != full.String() || p.Action != good.Action || p.ExitCode != good.ExitCode {
+			t.Fatal(args, p, err)
+		}
+	}
+}

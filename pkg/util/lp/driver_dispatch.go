@@ -20,7 +20,7 @@ func PrepareLPDriver(argv []string, out io.Writer) (*LPDriverPreparation, error)
 	p := &LPDriverPreparation{}
 	out = driverReportOutput(out)
 	// The source's resized, unused vector<mpq> has no retained consumer.
-	if _, err := io.WriteString(out, "resize\n"); err != nil {
+	if err := writeConstraintText(out, "resize\n"); err != nil {
 		return p, err
 	}
 	p.Arguments = NewDriverArguments(argv)
@@ -29,7 +29,7 @@ func PrepareLPDriver(argv []string, out io.Writer) (*LPDriverPreparation, error)
 		if err := writeDriverLine(out, a.ErrorMessage); err != nil {
 			return p, err
 		}
-		if _, err := io.WriteString(out, a.UsageString()); err != nil {
+		if err := writeConstraintText(out, a.UsageString()); err != nil {
 			return p, err
 		}
 		p.ExitCode = 1

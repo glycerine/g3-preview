@@ -11399,5 +11399,12 @@
     "includes": "native exact column copied-left lifetime fix and native iterator/column/settings alias/lifetime tests",
     "excludes": "all g3debug-only LU scenarios and diagnostics",
     "cache_cleanup": "/mnt/oldrog/tmp/g3-lp-column-lifetime-cache-cleanup.json"
+  },
+  "latest_dispatch_write_increment": {
+    "summary": "LP driver preparation now detects short nil-error writes in the initial resize header and parse-error usage report using the shared checked writer. New tests refuse every output byte for early int-set selection, unknown option and missing file value, verify exact report prefixes, argument construction/parsing boundaries, unpublished action/exit/settings and exact-length success. Native focused preparation checks0.164s and combined g3debug,g3checked0.163s pass. Driver dispatch coverage52/67statements (77.6%) native,66/67 (98.5%) combined; native erases source debug branches and the remaining combined gap transports NewSettings host-clock failure. Source checker remains2103units/677APIs,75ported/365partial/1620unported/5dead. Whole CLI executor/numeric benchmarks and retained-source/ownership audits remain open; no whole-unit promotion. Current full native checkpoint c32fb569 session40124 confirmed running and predates this report correction; focused profiles /mnt/oldrog/tmp/g3-lp-dispatch-write-{native,debug}.cover are separate evidence.",
+    "tests": [
+      "TestLPDriverPreparationShortWritePublication"
+    ],
+    "whole_unit_promotion": false
   }
 }

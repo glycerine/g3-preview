@@ -103301,7 +103301,8 @@
         "TestLPHolesLUDriverReportFailurePrefixes",
         "TestLPLUTestDriverSourceParentSequence",
         "TestLPLUTestDriverParentReportFailurePrefixes",
-        "TestLPLUTestDriverStopsOnChildAndExitFailures"
+        "TestLPLUTestDriverStopsOnChildAndExitFailures",
+        "TestLPDriverPreparationShortWritePublication"
       ],
       "conditionals": [
         {
@@ -104280,7 +104281,8 @@
             "TestLPDriverPreparationSourcePrecedence",
             "TestLPDriverPreparationEmptyOptionsAndDebugStage",
             "TestLPDriverPreparationSolveOptionsAndParseFailure",
-            "TestLPDriverPreparationReportFailurePrefixes"
+            "TestLPDriverPreparationReportFailurePrefixes",
+            "TestLPDriverPreparationShortWritePublication"
           ]
         },
         {
@@ -104461,7 +104463,8 @@
         "Debug --test_swaps retains shared10x10 fill and100 random attempts per helper. Despite its name, second helper calls swap_rows and TransposeRight; actual source equality fails for noncommuting exchanges. First helper TransposeLeft compensates all100 attempts. Independent dense-array/RNG oracle verifies50 seeds, exact reports/flushes, final logical matrix and draw count. Diagnostic setter stores zeros and two directions independently; source two-argument indexed_value m_other is indeterminate and never read by retained fill/Get/swap/print path. Native Other zero is an unobserved representation value, not reciprocal-link/elimination semantics; no universal or public Set adapter added. Native build erases entire debug scenario. Complete CLI execution/entry and whole-source/ownership audits remain open.",
         "Debug-only small LU scenario executes actual source literal, four updates and two appended rows; native scenario erased. Header initialization/change_basis helpers specialize their actual fixed inputs with descending nonbasis order. Settings remain borrowed. Source base-pointer matrix reports include final blank endl, unlike initial static-matrix overload. Full top-level CLI execution/entry and other registered LU/random scenarios remain open.",
         "Two retained6x12 debug LU scenarios are executable typed drivers; deterministic fill uses cyclic square values and random fill consumes exactly72 shared RNG draws in row/column order. Native bodies are erased. All source mismatch diagnostics and base-matrix trailing blank endl are retained; real DropTolerance .1/1/10/100 reaches deterministic exit diagnostics and randomized pre-report assertion. Full parent test_lu, holes scenario, top-level CLI execution/entry and other scenarios remain open; no whole-unit completion credit.",
-        "All four retained debug LU test_lu children and their parent are now executable typed drivers. Earlier larger-LU note that holes/parent remained open is superseded. Holes initial mismatch only reports then continues to source update/final assertion; real DropTolerance1/10 tests preserve that behavior. Default and sparse/dense source diagnostic views preserve positive implicit zeros versus stored dense negative zeros, reverse tail order and base-matrix blank endl. Full top-level CLI execution/entry, other test families and whole-source audits remain open; no whole test/lp.cpp or whole-LP completion credit."
+        "All four retained debug LU test_lu children and their parent are now executable typed drivers. Earlier larger-LU note that holes/parent remained open is superseded. Holes initial mismatch only reports then continues to source update/final assertion; real DropTolerance1/10 tests preserve that behavior. Default and sparse/dense source diagnostic views preserve positive implicit zeros versus stored dense negative zeros, reverse tail order and base-matrix blank endl. Full top-level CLI execution/entry, other test families and whole-source audits remain open; no whole test/lp.cpp or whole-LP completion credit.",
+        "Preparation header and usage short nil-error writes stop with io.ErrShortWrite before later publication; exact-length success and every byte prefix tested. Top-level selected-call execution remains separately open."
       ]
     },
     {
