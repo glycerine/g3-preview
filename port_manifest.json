@@ -111219,7 +111219,7 @@
       "path": "src/util/basic_interval.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/numeral/mpbqi.go",
         "pkg/util/numeral/mpbqi_format.go",
@@ -111359,18 +111359,13 @@
             "TestBinaryIntervalOwnerAndScope",
             "TestBinaryIntervalRetainedProductsAndDeepCopies"
           ]
-        },
-        {
-          "name": "Other numeral/closed configurations, field-only inv/div, persistent ostream and generic algorithm consumers",
-          "status": "unported",
-          "tests": []
         }
       ],
       "ownership": [
-        "Concrete pointer-free endpoints borrow one BinaryRationalManager domain. Actual cold manager and scope headers are charged; three retained multiplication scratch numerators preserve old output ownership. Source endpoint/destructor order and immediate reachable numeral/Words/diagnostic graphs are audited before formatting and teardown. See PORT_PROGRESS.md#audit-mpbqi-port-status-md."
+        "The only production source instantiation is basic_interval_manager<mpbq_manager, false>, through mpbqi_manager in mpbqi.h. Concrete pointer-free endpoints borrow one BinaryRationalManager domain. Cold manager and scope headers are charged; three retained multiplication scratch numerators preserve old output ownership. Source endpoint/destructor order and immediate reachable numeral/Words/diagnostic graphs are audited before formatting and teardown."
       ],
       "deviations": [
-        "Concrete MPBQ/open specialization replaces C++ templates without Go generics. Explicit lifetime/provenance guards and typed failures preserve completed source statement prefixes. Staged byte output and final caller-owned strings replace selected display calls; persistent ostream state, other numeral/closed specializations and real downstream consumers remain open."
+        "Concrete MPBQ/open specialization replaces C++ templates without Go generics. Explicit lifetime/provenance guards and typed failures preserve completed source statement prefixes. Staged byte output and final caller-owned strings replace selected display calls. The old_interval.cpp integer instantiation is source-test-only; no production source instantiates a closed manager or calls field-only inv/div (mpbq_manager::field() is false). Real downstream consumers remain separate source units."
       ]
     },
     {
