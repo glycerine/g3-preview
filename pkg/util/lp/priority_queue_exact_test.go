@@ -329,88 +329,96 @@ func TestLPPairPriorityQueueExactLifetimeAndPrefixContracts(t *testing.T) {
 }
 
 func TestLPRationalPriorityQueueAllocationFailureCensus(t *testing.T) {
-	for _, op := range []string{"new", "decrease", "increase", "dequeue"} {
-		failures, successes, lexicalStops := 0, 0, 0
-		for fail := int64(0); fail < 100; fail++ {
-			done := false
-			t.Run(fmt.Sprintf("%s/%d", op, fail), func(t *testing.T) {
-				h := newLPPairHarness(t)
-				digits := strings.Repeat("1234567890", 100)
-				old := h.pair(digits+"/7", digits+"/11")
-				next := h.pair("9"+digits+"/13", "8"+digits+"/17")
-				low := h.pair(digits+"/"+strings.Repeat("9876543210", 200)+"7", digits+"/"+strings.Repeat("7654321090", 200)+"9")
-				q := NewRationalPriorityQueue(h.m, 4)
-				h.must(q.Enqueue(0, &old.X))
-				if op == "decrease" || op == "increase" {
-					h.must(q.Enqueue(1, &next.X))
-				}
-				if op == "dequeue" {
-					a, b, c := h.pair(digits+"/11", "1"), h.pair(digits+"/13", "2"), h.pair(digits+"/17", "3")
-					for i, v := range []*RationalPair{a, b, c} {
-						h.must(q.Enqueue(uint32(i+1), &v.X))
+	for _, direct := range []bool{false, true} {
+		for _, op := range []string{"new", "decrease", "increase", "dequeue"} {
+			failures, successes, lexicalStops := 0, 0, 0
+			for fail := int64(0); fail < 100; fail++ {
+				done := false
+				t.Run(fmt.Sprintf("direct=%v/%s/%d", direct, op, fail), func(t *testing.T) {
+					var h *lpPairHarness
+					if direct {
+						h = lpNewDirectSparseHarness(t)
+					} else {
+						h = newLPPairHarness(t)
 					}
-				}
-				h.budget.FailAfter(fail)
-				var err error
-				switch op {
-				case "new":
-					err = q.Enqueue(1, &next.X)
-				case "decrease":
-					err = q.Enqueue(1, &low.X)
-				case "increase":
-					err = q.Enqueue(0, &next.X)
-				case "dequeue":
-					_, err = q.Dequeue()
-				}
-				h.budget.FailAfter(-1)
-				if err == nil {
-					successes++
-					done = true
-				} else {
-					if !lpExactPriorityPhysicalRefusal(err) {
-						t.Fatal("unexpected reservation error", err)
+					digits := strings.Repeat("1234567890", 100)
+					old := h.pair(digits+"/7", digits+"/11")
+					next := h.pair("9"+digits+"/13", "8"+digits+"/17")
+					low := h.pair(digits+"/"+strings.Repeat("9876543210", 200)+"7", digits+"/"+strings.Repeat("7654321090", 200)+"9")
+					q := NewRationalPriorityQueue(h.m, 4)
+					h.must(q.Enqueue(0, &old.X))
+					if op == "decrease" || op == "increase" {
+						h.must(q.Enqueue(1, &next.X))
 					}
-					failures++
-					if q.decreaseArg != nil {
-						lexicalStops++
+					if op == "dequeue" {
+						a, b, c := h.pair(digits+"/11", "1"), h.pair(digits+"/13", "2"), h.pair(digits+"/17", "3")
+						for i, v := range []*RationalPair{a, b, c} {
+							h.must(q.Enqueue(uint32(i+1), &v.X))
+						}
 					}
+					h.budget.FailAfter(fail)
+					var err error
+					switch op {
+					case "new":
+						err = q.Enqueue(1, &next.X)
+					case "decrease":
+						err = q.Enqueue(1, &low.X)
+					case "increase":
+						err = q.Enqueue(0, &next.X)
+					case "dequeue":
+						_, err = q.Dequeue()
+					}
+					h.budget.FailAfter(-1)
+					if err == nil {
+						successes++
+						done = true
+					} else {
+						if !lpExactPriorityPhysicalRefusal(err) {
+							t.Fatal("unexpected reservation error", err)
+						}
+						failures++
+						if q.decreaseArg != nil {
+							lexicalStops++
+						}
+					}
+					if q.ready() != nil {
+						if err := q.Enqueue(0, &old.X); err != ErrExactQueuePending {
+							t.Fatal(err)
+						}
+						if _, err := q.Dequeue(); err != ErrExactQueuePending {
+							t.Fatal(err)
+						}
+						if err := q.Resize(4); err != ErrExactQueuePending {
+							t.Fatal(err)
+						}
+						if err := q.Clear(); err != ErrExactQueuePending {
+							t.Fatal(err)
+						}
+					}
+					h.must(q.Close())
+					h.must(q.Close())
+					lpExactVectorNamedCensus(t, h, nil)
+					if state := h.m.ComparisonInvocationState(); state.Active {
+						t.Fatal("orphan comparison", state)
+					}
+					if state := h.m.RawInvocationState(); state.Active != [3]bool{} {
+						t.Fatal("orphan numerical call", state)
+					}
+				})
+				if done {
+					break
 				}
-				if q.ready() != nil {
-					if err := q.Enqueue(0, &old.X); err != ErrExactQueuePending {
-						t.Fatal(err)
-					}
-					if _, err := q.Dequeue(); err != ErrExactQueuePending {
-						t.Fatal(err)
-					}
-					if err := q.Resize(4); err != ErrExactQueuePending {
-						t.Fatal(err)
-					}
-					if err := q.Clear(); err != ErrExactQueuePending {
-						t.Fatal(err)
-					}
-				}
-				h.must(q.Close())
-				h.must(q.Close())
-				lpExactVectorNamedCensus(t, h, nil)
-				if state := h.m.ComparisonInvocationState(); state.Active {
-					t.Fatal("orphan comparison", state)
-				}
-				if state := h.m.RawInvocationState(); state.Active != [3]bool{} {
-					t.Fatal("orphan numerical call", state)
-				}
-			})
-			if done {
-				break
 			}
-		}
-		if failures == 0 || successes != 1 {
-			t.Fatal("incomplete reservation campaign", op, failures, successes)
-		}
-		if op == "decrease" && lexicalStops == 0 {
-			t.Fatal("by-value argument stop not reached")
+			if failures == 0 || successes != 1 {
+				t.Fatal("incomplete reservation campaign", op, failures, successes)
+			}
+			if op == "decrease" && lexicalStops == 0 {
+				t.Fatal("by-value argument stop not reached")
+			}
 		}
 	}
 }
+
 func TestLPRationalPriorityQueueOlderComparisonIdentity(t *testing.T) {
 	h := newLPPairHarness(t)
 	a := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
@@ -448,88 +456,96 @@ func TestLPRationalPriorityQueueOlderComparisonIdentity(t *testing.T) {
 }
 
 func TestLPPairPriorityQueueAllocationFailureCensus(t *testing.T) {
-	for _, op := range []string{"new", "decrease", "increase", "dequeue"} {
-		failures, successes, lexicalStops := 0, 0, 0
-		for fail := int64(0); fail < 100; fail++ {
-			done := false
-			t.Run(fmt.Sprintf("%s/%d", op, fail), func(t *testing.T) {
-				h := newLPPairHarness(t)
-				digits := strings.Repeat("1234567890", 100)
-				old := h.pair(digits+"/7", digits+"/11")
-				next := h.pair("9"+digits+"/13", "8"+digits+"/17")
-				low := h.pair(digits+"/"+strings.Repeat("9876543210", 200)+"7", digits+"/"+strings.Repeat("7654321090", 200)+"9")
-				q := NewPairPriorityQueue(h.m, 4)
-				h.must(q.Enqueue(0, old))
-				if op == "decrease" || op == "increase" {
-					h.must(q.Enqueue(1, next))
-				}
-				if op == "dequeue" {
-					a, b, c := h.pair(digits+"/11", "1"), h.pair(digits+"/13", "2"), h.pair(digits+"/17", "3")
-					for i, v := range []*RationalPair{a, b, c} {
-						h.must(q.Enqueue(uint32(i+1), v))
+	for _, direct := range []bool{false, true} {
+		for _, op := range []string{"new", "decrease", "increase", "dequeue"} {
+			failures, successes, lexicalStops := 0, 0, 0
+			for fail := int64(0); fail < 100; fail++ {
+				done := false
+				t.Run(fmt.Sprintf("direct=%v/%s/%d", direct, op, fail), func(t *testing.T) {
+					var h *lpPairHarness
+					if direct {
+						h = lpNewDirectSparseHarness(t)
+					} else {
+						h = newLPPairHarness(t)
 					}
-				}
-				h.budget.FailAfter(fail)
-				var err error
-				switch op {
-				case "new":
-					err = q.Enqueue(1, next)
-				case "decrease":
-					err = q.Enqueue(1, low)
-				case "increase":
-					err = q.Enqueue(0, next)
-				case "dequeue":
-					_, err = q.Dequeue()
-				}
-				h.budget.FailAfter(-1)
-				if err == nil {
-					successes++
-					done = true
-				} else {
-					if !lpExactPriorityPhysicalRefusal(err) {
-						t.Fatal("unexpected reservation error", err)
+					digits := strings.Repeat("1234567890", 100)
+					old := h.pair(digits+"/7", digits+"/11")
+					next := h.pair("9"+digits+"/13", "8"+digits+"/17")
+					low := h.pair(digits+"/"+strings.Repeat("9876543210", 200)+"7", digits+"/"+strings.Repeat("7654321090", 200)+"9")
+					q := NewPairPriorityQueue(h.m, 4)
+					h.must(q.Enqueue(0, old))
+					if op == "decrease" || op == "increase" {
+						h.must(q.Enqueue(1, next))
 					}
-					failures++
-					if q.decreaseArg != nil {
-						lexicalStops++
+					if op == "dequeue" {
+						a, b, c := h.pair(digits+"/11", "1"), h.pair(digits+"/13", "2"), h.pair(digits+"/17", "3")
+						for i, v := range []*RationalPair{a, b, c} {
+							h.must(q.Enqueue(uint32(i+1), v))
+						}
 					}
+					h.budget.FailAfter(fail)
+					var err error
+					switch op {
+					case "new":
+						err = q.Enqueue(1, next)
+					case "decrease":
+						err = q.Enqueue(1, low)
+					case "increase":
+						err = q.Enqueue(0, next)
+					case "dequeue":
+						_, err = q.Dequeue()
+					}
+					h.budget.FailAfter(-1)
+					if err == nil {
+						successes++
+						done = true
+					} else {
+						if !lpExactPriorityPhysicalRefusal(err) {
+							t.Fatal("unexpected reservation error", err)
+						}
+						failures++
+						if q.decreaseArg != nil {
+							lexicalStops++
+						}
+					}
+					if q.ready() != nil {
+						if err := q.Enqueue(0, old); err != ErrExactQueuePending {
+							t.Fatal(err)
+						}
+						if _, err := q.Dequeue(); err != ErrExactQueuePending {
+							t.Fatal(err)
+						}
+						if err := q.Resize(4); err != ErrExactQueuePending {
+							t.Fatal(err)
+						}
+						if err := q.Clear(); err != ErrExactQueuePending {
+							t.Fatal(err)
+						}
+					}
+					h.must(q.Close())
+					h.must(q.Close())
+					lpExactVectorNamedCensus(t, h, nil)
+					if state := h.m.ComparisonInvocationState(); state.Active {
+						t.Fatal("orphan comparison", state)
+					}
+					if state := h.m.RawInvocationState(); state.Active != [3]bool{} {
+						t.Fatal("orphan numerical call", state)
+					}
+				})
+				if done {
+					break
 				}
-				if q.ready() != nil {
-					if err := q.Enqueue(0, old); err != ErrExactQueuePending {
-						t.Fatal(err)
-					}
-					if _, err := q.Dequeue(); err != ErrExactQueuePending {
-						t.Fatal(err)
-					}
-					if err := q.Resize(4); err != ErrExactQueuePending {
-						t.Fatal(err)
-					}
-					if err := q.Clear(); err != ErrExactQueuePending {
-						t.Fatal(err)
-					}
-				}
-				h.must(q.Close())
-				h.must(q.Close())
-				lpExactVectorNamedCensus(t, h, nil)
-				if state := h.m.ComparisonInvocationState(); state.Active {
-					t.Fatal("orphan comparison", state)
-				}
-				if state := h.m.RawInvocationState(); state.Active != [3]bool{} {
-					t.Fatal("orphan numerical call", state)
-				}
-			})
-			if done {
-				break
 			}
-		}
-		if failures == 0 || successes != 1 {
-			t.Fatal("incomplete reservation campaign", op, failures, successes)
-		}
-		if op == "decrease" && lexicalStops == 0 {
-			t.Fatal("by-value argument stop not reached")
+			if failures == 0 || successes != 1 {
+				t.Fatal("incomplete reservation campaign", op, failures, successes)
+			}
+			if op == "decrease" && lexicalStops == 0 {
+				t.Fatal("by-value argument stop not reached")
+			}
 		}
 	}
 }
+
 func TestLPPairPriorityQueueOlderComparisonIdentity(t *testing.T) {
 	h := newLPPairHarness(t)
 	a := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")

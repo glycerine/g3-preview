@@ -118618,12 +118618,14 @@
       "path": "src/util/lp/binary_heap_priority_queue.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/priority_heap.go",
         "pkg/util/lp/priority_queue_native.go",
         "pkg/util/lp/priority_queue_exact.go",
-        "pkg/util/lp/exact_priority_calls.go"
+        "pkg/util/lp/exact_priority_calls.go",
+        "pkg/util/lp/driver_container_scenarios.go",
+        "pkg/util/lp/priority_queue_exact_test.go"
       ],
       "tests": [
         "TestLPPriorityQueueSource",
@@ -118652,7 +118654,16 @@
         "TestLPPairPriorityQueueAllocationFailureCensus",
         "TestLPPairPriorityQueueOlderComparisonIdentity",
         "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
-        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPSparsePivotPreparationIndependentOracle",
+        "TestLPSparsePivotLiteralQueueAndThresholds",
+        "TestLPSparseActiveShorteningIndependentOracle",
+        "TestLPFloatPrimalBreakpointIndependentCrossings",
+        "TestLPRationalPrimalBreakpointIndependentRecords",
+        "TestLPExactBreakpointIndependentRecordQueueOracle",
+        "TestLPContainerDriverLiteralReports",
+        "TestLPContainerDriverReportFailurePrefixes",
+        "TestLPContainerDriverSharedRandomAndGuards"
       ],
       "conditionals": [
         {
@@ -118678,8 +118689,8 @@
           "text": "SASSERT(m_heap_size > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "actual int/unsigned/double enqueue, priority change, sift directions, dequeue, clear, resize, inverse and heap consistency; retained int/unsigned remove",
@@ -118721,6 +118732,22 @@
             "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
             "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
           ]
+        },
+        {
+          "name": "retained consumer integration, source original driver and concrete owning destruction audit",
+          "status": "ported",
+          "go_target": "pkg/util/lp/priority_heap.go",
+          "tests": [
+            "TestLPSparsePivotPreparationIndependentOracle",
+            "TestLPSparsePivotLiteralQueueAndThresholds",
+            "TestLPSparseActiveShorteningIndependentOracle",
+            "TestLPFloatPrimalBreakpointIndependentCrossings",
+            "TestLPRationalPrimalBreakpointIndependentRecords",
+            "TestLPExactBreakpointIndependentRecordQueueOracle",
+            "TestLPContainerDriverLiteralReports",
+            "TestLPContainerDriverReportFailurePrefixes",
+            "TestLPContainerDriverSharedRandomAndGuards"
+          ]
         }
       ],
       "ownership": [
@@ -118728,7 +118755,7 @@
         "Exact priority slots and decrease-by-value arguments own concrete initialized project numerals. Comparison calls retain only newly acquired synchronized raw generations and physical allocation roots; older active comparisons remain with their actual caller. Source lexical argument copies remain owned until Close after a stopped call. Clear/dequeue retain priorities. No provenance is inferred from a manager registry."
       ],
       "deviations": [
-        "Complete primal/matrix integration remains open; no whole-unit promotion. Default source empty construction is New*PriorityQueue(0); constructor required before use.",
+        "Whole retained-source/ownership audit completes binary_heap_priority_queue.h/.hpp/instances.cpp and binary_heap_upair_queue.h/.hpp/instances.cpp. Concrete int/unsigned/double/mpq/numeric_pair<mpq> priority queues and int/unsigned pair-key queues cover all retained source consumers: original -tbq scenario, sparse LU pivot queues and primal breakpoint queues. Whole no-ignore audit85references verifies unused peek/put_to_heap/debug print/dequeue-with-priority and ij_index_is_new do not acquire invented adapters; the last appears only in a commented assertion. Source explicit instantiations are checked against consumer roots rather than treated as new roots. Existing native maps/slices preserve ordered pair identity, LIFO free slots, slot/map-before-underlying-enqueue publication, literal unsigned doubling, strict tie/IEEE comparisons, resize/shrink mutation prefixes and source consistency-check gaps. Exact priorities own cells independently of membership; clearing/dequeue retains stored values, decrease owns its by-value argument until return/Close, stopped numerical receipts remain with their invoking owner. Expanded rational/pair priority allocation-failure tests to pooled plus direct allocation:16 insertion/decrease/increase/dequeue campaigns through success, stopped-owner guards, lexical argument stops and exact named-cell/direct-object cleanup census. Full focused queue groups pass native81.768s/combined92.917s; actual independent sparse-pivot/active-shortening/primal-breakpoint consumer checks pass native0.101s/combined0.091s; source container driver literal-report/failure/shared-RNG checks native0.008s/combined0.009s. Both LP vets pass. Per-file focused covered/total statements: {\"native\":{\"exact_priority_calls.go\":[11,13],\"pair_priority_queue.go\":[59,64],\"pair_queue_index.go\":[48,53],\"priority_heap.go\":[50,57],\"priority_queue_exact.go\":[312,362],\"priority_queue_native.go\":[410,479]},\"debug\":{\"exact_priority_calls.go\":[11,13],\"pair_priority_queue.go\":[59,64],\"pair_queue_index.go\":[47,53],\"priority_heap.go\":[51,57],\"priority_queue_exact.go\":[312,362],\"priority_queue_native.go\":[410,479]}}. These are Go statement profiles, not C++ source coverage. No production algorithm changes or generic adapters. Completes these six queue source units only; full sparse/primal/solver audits remain separate. LP inventory30ported/65partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates this expanded test. Profiles /mnt/oldrog/tmp/g3-lp-priority-direct-audit-{native,debug}.cover; source audit /mnt/oldrog/tmp/g3-lp-priority-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "Whole-source scan finds dequeue_and_get_priority used only by uncalled debug print; print, peek, duplicate put_to_heap and uncalled float remove are not added merely to instantiate template definitions. The unused dequeue-with-priority inverse-index omission is not silently repaired or exercised as a retained caller.",
         "Typed Go guards retain valid prefixes after invalid source extent operations. Resize does not prune active membership. Auto-growth uses literal unsigned o<<1, including zero/wrap behavior. Strict tie comparisons and IEEE NaN/infinity behavior remain literal; native empty dequeue with existing storage retains unsigned size decrement, debug stops before mutation.",
         "Source debug inverse assertions use the existing explicit Go error profile, not process-global debugger/TRACE transport. The source consistency check does not verify every active heap object has an inverse member; independent tests check both directions for valid operations.",
@@ -118739,12 +118766,14 @@
       "path": "src/util/lp/binary_heap_priority_queue.hpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/priority_heap.go",
         "pkg/util/lp/priority_queue_native.go",
         "pkg/util/lp/priority_queue_exact.go",
-        "pkg/util/lp/exact_priority_calls.go"
+        "pkg/util/lp/exact_priority_calls.go",
+        "pkg/util/lp/driver_container_scenarios.go",
+        "pkg/util/lp/priority_queue_exact_test.go"
       ],
       "tests": [
         "TestLPPriorityQueueSource",
@@ -118773,7 +118802,16 @@
         "TestLPPairPriorityQueueAllocationFailureCensus",
         "TestLPPairPriorityQueueOlderComparisonIdentity",
         "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
-        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPSparsePivotPreparationIndependentOracle",
+        "TestLPSparsePivotLiteralQueueAndThresholds",
+        "TestLPSparseActiveShorteningIndependentOracle",
+        "TestLPFloatPrimalBreakpointIndependentCrossings",
+        "TestLPRationalPrimalBreakpointIndependentRecords",
+        "TestLPExactBreakpointIndependentRecordQueueOracle",
+        "TestLPContainerDriverLiteralReports",
+        "TestLPContainerDriverReportFailurePrefixes",
+        "TestLPContainerDriverSharedRandomAndGuards"
       ],
       "conditionals": [
         {
@@ -118823,8 +118861,8 @@
           "text": "SASSERT(m_heap_size > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "actual int/unsigned/double enqueue, priority change, sift directions, dequeue, clear, resize, inverse and heap consistency; retained int/unsigned remove",
@@ -118866,6 +118904,22 @@
             "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
             "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
           ]
+        },
+        {
+          "name": "retained consumer integration, source original driver and concrete owning destruction audit",
+          "status": "ported",
+          "go_target": "pkg/util/lp/priority_heap.go",
+          "tests": [
+            "TestLPSparsePivotPreparationIndependentOracle",
+            "TestLPSparsePivotLiteralQueueAndThresholds",
+            "TestLPSparseActiveShorteningIndependentOracle",
+            "TestLPFloatPrimalBreakpointIndependentCrossings",
+            "TestLPRationalPrimalBreakpointIndependentRecords",
+            "TestLPExactBreakpointIndependentRecordQueueOracle",
+            "TestLPContainerDriverLiteralReports",
+            "TestLPContainerDriverReportFailurePrefixes",
+            "TestLPContainerDriverSharedRandomAndGuards"
+          ]
         }
       ],
       "ownership": [
@@ -118873,7 +118927,7 @@
         "Exact priority slots and decrease-by-value arguments own concrete initialized project numerals. Comparison calls retain only newly acquired synchronized raw generations and physical allocation roots; older active comparisons remain with their actual caller. Source lexical argument copies remain owned until Close after a stopped call. Clear/dequeue retain priorities. No provenance is inferred from a manager registry."
       ],
       "deviations": [
-        "Complete primal/matrix integration remains open; no whole-unit promotion. Default source empty construction is New*PriorityQueue(0); constructor required before use.",
+        "Whole retained-source/ownership audit completes binary_heap_priority_queue.h/.hpp/instances.cpp and binary_heap_upair_queue.h/.hpp/instances.cpp. Concrete int/unsigned/double/mpq/numeric_pair<mpq> priority queues and int/unsigned pair-key queues cover all retained source consumers: original -tbq scenario, sparse LU pivot queues and primal breakpoint queues. Whole no-ignore audit85references verifies unused peek/put_to_heap/debug print/dequeue-with-priority and ij_index_is_new do not acquire invented adapters; the last appears only in a commented assertion. Source explicit instantiations are checked against consumer roots rather than treated as new roots. Existing native maps/slices preserve ordered pair identity, LIFO free slots, slot/map-before-underlying-enqueue publication, literal unsigned doubling, strict tie/IEEE comparisons, resize/shrink mutation prefixes and source consistency-check gaps. Exact priorities own cells independently of membership; clearing/dequeue retains stored values, decrease owns its by-value argument until return/Close, stopped numerical receipts remain with their invoking owner. Expanded rational/pair priority allocation-failure tests to pooled plus direct allocation:16 insertion/decrease/increase/dequeue campaigns through success, stopped-owner guards, lexical argument stops and exact named-cell/direct-object cleanup census. Full focused queue groups pass native81.768s/combined92.917s; actual independent sparse-pivot/active-shortening/primal-breakpoint consumer checks pass native0.101s/combined0.091s; source container driver literal-report/failure/shared-RNG checks native0.008s/combined0.009s. Both LP vets pass. Per-file focused covered/total statements: {\"native\":{\"exact_priority_calls.go\":[11,13],\"pair_priority_queue.go\":[59,64],\"pair_queue_index.go\":[48,53],\"priority_heap.go\":[50,57],\"priority_queue_exact.go\":[312,362],\"priority_queue_native.go\":[410,479]},\"debug\":{\"exact_priority_calls.go\":[11,13],\"pair_priority_queue.go\":[59,64],\"pair_queue_index.go\":[47,53],\"priority_heap.go\":[51,57],\"priority_queue_exact.go\":[312,362],\"priority_queue_native.go\":[410,479]}}. These are Go statement profiles, not C++ source coverage. No production algorithm changes or generic adapters. Completes these six queue source units only; full sparse/primal/solver audits remain separate. LP inventory30ported/65partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates this expanded test. Profiles /mnt/oldrog/tmp/g3-lp-priority-direct-audit-{native,debug}.cover; source audit /mnt/oldrog/tmp/g3-lp-priority-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "Whole-source scan finds dequeue_and_get_priority used only by uncalled debug print; print, peek, duplicate put_to_heap and uncalled float remove are not added merely to instantiate template definitions. The unused dequeue-with-priority inverse-index omission is not silently repaired or exercised as a retained caller.",
         "Typed Go guards retain valid prefixes after invalid source extent operations. Resize does not prune active membership. Auto-growth uses literal unsigned o<<1, including zero/wrap behavior. Strict tie comparisons and IEEE NaN/infinity behavior remain literal; native empty dequeue with existing storage retains unsigned size decrement, debug stops before mutation.",
         "Source debug inverse assertions use the existing explicit Go error profile, not process-global debugger/TRACE transport. The source consistency check does not verify every active heap object has an inverse member; independent tests check both directions for valid operations.",
@@ -118884,12 +118938,14 @@
       "path": "src/util/lp/binary_heap_priority_queue_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/priority_heap.go",
         "pkg/util/lp/priority_queue_native.go",
         "pkg/util/lp/priority_queue_exact.go",
-        "pkg/util/lp/exact_priority_calls.go"
+        "pkg/util/lp/exact_priority_calls.go",
+        "pkg/util/lp/driver_container_scenarios.go",
+        "pkg/util/lp/priority_queue_exact_test.go"
       ],
       "tests": [
         "TestLPPriorityQueueSource",
@@ -118918,10 +118974,19 @@
         "TestLPPairPriorityQueueAllocationFailureCensus",
         "TestLPPairPriorityQueueOlderComparisonIdentity",
         "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
-        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPSparsePivotPreparationIndependentOracle",
+        "TestLPSparsePivotLiteralQueueAndThresholds",
+        "TestLPSparseActiveShorteningIndependentOracle",
+        "TestLPFloatPrimalBreakpointIndependentCrossings",
+        "TestLPRationalPrimalBreakpointIndependentRecords",
+        "TestLPExactBreakpointIndependentRecordQueueOracle",
+        "TestLPContainerDriverLiteralReports",
+        "TestLPContainerDriverReportFailurePrefixes",
+        "TestLPContainerDriverSharedRandomAndGuards"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "actual int/unsigned/double enqueue, priority change, sift directions, dequeue, clear, resize, inverse and heap consistency; retained int/unsigned remove",
@@ -118963,6 +119028,22 @@
             "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
             "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
           ]
+        },
+        {
+          "name": "retained consumer integration, source original driver and concrete owning destruction audit",
+          "status": "ported",
+          "go_target": "pkg/util/lp/priority_heap.go",
+          "tests": [
+            "TestLPSparsePivotPreparationIndependentOracle",
+            "TestLPSparsePivotLiteralQueueAndThresholds",
+            "TestLPSparseActiveShorteningIndependentOracle",
+            "TestLPFloatPrimalBreakpointIndependentCrossings",
+            "TestLPRationalPrimalBreakpointIndependentRecords",
+            "TestLPExactBreakpointIndependentRecordQueueOracle",
+            "TestLPContainerDriverLiteralReports",
+            "TestLPContainerDriverReportFailurePrefixes",
+            "TestLPContainerDriverSharedRandomAndGuards"
+          ]
         }
       ],
       "ownership": [
@@ -118970,7 +119051,7 @@
         "Exact priority slots and decrease-by-value arguments own concrete initialized project numerals. Comparison calls retain only newly acquired synchronized raw generations and physical allocation roots; older active comparisons remain with their actual caller. Source lexical argument copies remain owned until Close after a stopped call. Clear/dequeue retain priorities. No provenance is inferred from a manager registry."
       ],
       "deviations": [
-        "Complete primal/matrix integration remains open; no whole-unit promotion. Default source empty construction is New*PriorityQueue(0); constructor required before use.",
+        "Whole retained-source/ownership audit completes binary_heap_priority_queue.h/.hpp/instances.cpp and binary_heap_upair_queue.h/.hpp/instances.cpp. Concrete int/unsigned/double/mpq/numeric_pair<mpq> priority queues and int/unsigned pair-key queues cover all retained source consumers: original -tbq scenario, sparse LU pivot queues and primal breakpoint queues. Whole no-ignore audit85references verifies unused peek/put_to_heap/debug print/dequeue-with-priority and ij_index_is_new do not acquire invented adapters; the last appears only in a commented assertion. Source explicit instantiations are checked against consumer roots rather than treated as new roots. Existing native maps/slices preserve ordered pair identity, LIFO free slots, slot/map-before-underlying-enqueue publication, literal unsigned doubling, strict tie/IEEE comparisons, resize/shrink mutation prefixes and source consistency-check gaps. Exact priorities own cells independently of membership; clearing/dequeue retains stored values, decrease owns its by-value argument until return/Close, stopped numerical receipts remain with their invoking owner. Expanded rational/pair priority allocation-failure tests to pooled plus direct allocation:16 insertion/decrease/increase/dequeue campaigns through success, stopped-owner guards, lexical argument stops and exact named-cell/direct-object cleanup census. Full focused queue groups pass native81.768s/combined92.917s; actual independent sparse-pivot/active-shortening/primal-breakpoint consumer checks pass native0.101s/combined0.091s; source container driver literal-report/failure/shared-RNG checks native0.008s/combined0.009s. Both LP vets pass. Per-file focused covered/total statements: {\"native\":{\"exact_priority_calls.go\":[11,13],\"pair_priority_queue.go\":[59,64],\"pair_queue_index.go\":[48,53],\"priority_heap.go\":[50,57],\"priority_queue_exact.go\":[312,362],\"priority_queue_native.go\":[410,479]},\"debug\":{\"exact_priority_calls.go\":[11,13],\"pair_priority_queue.go\":[59,64],\"pair_queue_index.go\":[47,53],\"priority_heap.go\":[51,57],\"priority_queue_exact.go\":[312,362],\"priority_queue_native.go\":[410,479]}}. These are Go statement profiles, not C++ source coverage. No production algorithm changes or generic adapters. Completes these six queue source units only; full sparse/primal/solver audits remain separate. LP inventory30ported/65partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates this expanded test. Profiles /mnt/oldrog/tmp/g3-lp-priority-direct-audit-{native,debug}.cover; source audit /mnt/oldrog/tmp/g3-lp-priority-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "Whole-source scan finds dequeue_and_get_priority used only by uncalled debug print; print, peek, duplicate put_to_heap and uncalled float remove are not added merely to instantiate template definitions. The unused dequeue-with-priority inverse-index omission is not silently repaired or exercised as a retained caller.",
         "Typed Go guards retain valid prefixes after invalid source extent operations. Resize does not prune active membership. Auto-growth uses literal unsigned o<<1, including zero/wrap behavior. Strict tie comparisons and IEEE NaN/infinity behavior remain literal; native empty dequeue with existing storage retains unsigned size decrement, debug stops before mutation.",
         "Source debug inverse assertions use the existing explicit Go error profile, not process-global debugger/TRACE transport. The source consistency check does not verify every active heap object has an inverse member; independent tests check both directions for valid operations.",
@@ -118981,19 +119062,30 @@
       "path": "src/util/lp/binary_heap_upair_queue.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/pair_queue_index.go",
         "pkg/util/lp/pair_priority_queue.go",
         "pkg/util/lp/priority_heap.go",
-        "pkg/util/lp/priority_queue_native.go"
+        "pkg/util/lp/priority_queue_native.go",
+        "pkg/util/lp/driver_container_scenarios.go",
+        "pkg/util/lp/priority_queue_exact_test.go"
       ],
       "tests": [
         "TestLPPairPriorityQueueSource",
         "TestLPIntPairPriorityQueueIndependentMapOracle",
         "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
         "TestLPUintPairPriorityQueueIndependentMapOracle",
-        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPSparsePivotPreparationIndependentOracle",
+        "TestLPSparsePivotLiteralQueueAndThresholds",
+        "TestLPSparseActiveShorteningIndependentOracle",
+        "TestLPFloatPrimalBreakpointIndependentCrossings",
+        "TestLPRationalPrimalBreakpointIndependentRecords",
+        "TestLPExactBreakpointIndependentRecordQueueOracle",
+        "TestLPContainerDriverLiteralReports",
+        "TestLPContainerDriverReportFailurePrefixes",
+        "TestLPContainerDriverSharedRandomAndGuards"
       ],
       "conditionals": [
         {
@@ -119005,8 +119097,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "actual int/unsigned pair queues, new/reused slots, updates, dequeue, remove, underlying-only resize, priority sentinel, bijection and free-slot diagnostics",
@@ -119019,13 +119111,29 @@
             "TestLPUintPairPriorityQueueIndependentMapOracle",
             "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
           ]
+        },
+        {
+          "name": "retained consumer integration, source original driver and concrete owning destruction audit",
+          "status": "ported",
+          "go_target": "pkg/util/lp/pair_queue_index.go",
+          "tests": [
+            "TestLPSparsePivotPreparationIndependentOracle",
+            "TestLPSparsePivotLiteralQueueAndThresholds",
+            "TestLPSparseActiveShorteningIndependentOracle",
+            "TestLPFloatPrimalBreakpointIndependentCrossings",
+            "TestLPRationalPrimalBreakpointIndependentRecords",
+            "TestLPExactBreakpointIndependentRecordQueueOracle",
+            "TestLPContainerDriverLiteralReports",
+            "TestLPContainerDriverReportFailurePrefixes",
+            "TestLPContainerDriverSharedRandomAndGuards"
+          ]
         }
       ],
       "ownership": [
         "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit."
       ],
       "deviations": [
-        "Complete sparse matrix/pivot integration remains open; no whole-unit promotion. Uncalled ij_index_is_new appears only in a commented source assertion and has no invented adapter.",
+        "Whole retained-source/ownership audit completes binary_heap_priority_queue.h/.hpp/instances.cpp and binary_heap_upair_queue.h/.hpp/instances.cpp. Concrete int/unsigned/double/mpq/numeric_pair<mpq> priority queues and int/unsigned pair-key queues cover all retained source consumers: original -tbq scenario, sparse LU pivot queues and primal breakpoint queues. Whole no-ignore audit85references verifies unused peek/put_to_heap/debug print/dequeue-with-priority and ij_index_is_new do not acquire invented adapters; the last appears only in a commented assertion. Source explicit instantiations are checked against consumer roots rather than treated as new roots. Existing native maps/slices preserve ordered pair identity, LIFO free slots, slot/map-before-underlying-enqueue publication, literal unsigned doubling, strict tie/IEEE comparisons, resize/shrink mutation prefixes and source consistency-check gaps. Exact priorities own cells independently of membership; clearing/dequeue retains stored values, decrease owns its by-value argument until return/Close, stopped numerical receipts remain with their invoking owner. Expanded rational/pair priority allocation-failure tests to pooled plus direct allocation:16 insertion/decrease/increase/dequeue campaigns through success, stopped-owner guards, lexical argument stops and exact named-cell/direct-object cleanup census. Full focused queue groups pass native81.768s/combined92.917s; actual independent sparse-pivot/active-shortening/primal-breakpoint consumer checks pass native0.101s/combined0.091s; source container driver literal-report/failure/shared-RNG checks native0.008s/combined0.009s. Both LP vets pass. Per-file focused covered/total statements: {\"native\":{\"exact_priority_calls.go\":[11,13],\"pair_priority_queue.go\":[59,64],\"pair_queue_index.go\":[48,53],\"priority_heap.go\":[50,57],\"priority_queue_exact.go\":[312,362],\"priority_queue_native.go\":[410,479]},\"debug\":{\"exact_priority_calls.go\":[11,13],\"pair_priority_queue.go\":[59,64],\"pair_queue_index.go\":[47,53],\"priority_heap.go\":[51,57],\"priority_queue_exact.go\":[312,362],\"priority_queue_native.go\":[410,479]}}. These are Go statement profiles, not C++ source coverage. No production algorithm changes or generic adapters. Completes these six queue source units only; full sparse/primal/solver audits remain separate. LP inventory30ported/65partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates this expanded test. Profiles /mnt/oldrog/tmp/g3-lp-priority-direct-audit-{native,debug}.cover; source audit /mnt/oldrog/tmp/g3-lp-priority-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "Pairs use native Go unordered maps and concrete IndexPair keys. Map/slot publication precedes underlying enqueue, and a failed queue access leaves that published prefix. Source zero-capacity doubling fails instead of inventing a growth policy; native/debug stops remain distinct.",
         "Pair consistency diagnostics preserve the source gap: map/slot uniqueness and free-slot checks need not detect a published pair absent from the underlying heap. Original upstream random pair smoke scenario is translated with a fixed independent generator and strengthened map/minimum assertions; no source generator algorithm is claimed by that fixture."
       ]
@@ -119034,19 +119142,30 @@
       "path": "src/util/lp/binary_heap_upair_queue.hpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/pair_queue_index.go",
         "pkg/util/lp/pair_priority_queue.go",
         "pkg/util/lp/priority_heap.go",
-        "pkg/util/lp/priority_queue_native.go"
+        "pkg/util/lp/priority_queue_native.go",
+        "pkg/util/lp/driver_container_scenarios.go",
+        "pkg/util/lp/priority_queue_exact_test.go"
       ],
       "tests": [
         "TestLPPairPriorityQueueSource",
         "TestLPIntPairPriorityQueueIndependentMapOracle",
         "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
         "TestLPUintPairPriorityQueueIndependentMapOracle",
-        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPSparsePivotPreparationIndependentOracle",
+        "TestLPSparsePivotLiteralQueueAndThresholds",
+        "TestLPSparseActiveShorteningIndependentOracle",
+        "TestLPFloatPrimalBreakpointIndependentCrossings",
+        "TestLPRationalPrimalBreakpointIndependentRecords",
+        "TestLPExactBreakpointIndependentRecordQueueOracle",
+        "TestLPContainerDriverLiteralReports",
+        "TestLPContainerDriverReportFailurePrefixes",
+        "TestLPContainerDriverSharedRandomAndGuards"
       ],
       "conditionals": [
         {
@@ -119068,8 +119187,8 @@
           "text": "SASSERT(!m_q.is_empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "actual int/unsigned pair queues, new/reused slots, updates, dequeue, remove, underlying-only resize, priority sentinel, bijection and free-slot diagnostics",
@@ -119082,13 +119201,29 @@
             "TestLPUintPairPriorityQueueIndependentMapOracle",
             "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
           ]
+        },
+        {
+          "name": "retained consumer integration, source original driver and concrete owning destruction audit",
+          "status": "ported",
+          "go_target": "pkg/util/lp/pair_queue_index.go",
+          "tests": [
+            "TestLPSparsePivotPreparationIndependentOracle",
+            "TestLPSparsePivotLiteralQueueAndThresholds",
+            "TestLPSparseActiveShorteningIndependentOracle",
+            "TestLPFloatPrimalBreakpointIndependentCrossings",
+            "TestLPRationalPrimalBreakpointIndependentRecords",
+            "TestLPExactBreakpointIndependentRecordQueueOracle",
+            "TestLPContainerDriverLiteralReports",
+            "TestLPContainerDriverReportFailurePrefixes",
+            "TestLPContainerDriverSharedRandomAndGuards"
+          ]
         }
       ],
       "ownership": [
         "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit."
       ],
       "deviations": [
-        "Complete sparse matrix/pivot integration remains open; no whole-unit promotion. Uncalled ij_index_is_new appears only in a commented source assertion and has no invented adapter.",
+        "Whole retained-source/ownership audit completes binary_heap_priority_queue.h/.hpp/instances.cpp and binary_heap_upair_queue.h/.hpp/instances.cpp. Concrete int/unsigned/double/mpq/numeric_pair<mpq> priority queues and int/unsigned pair-key queues cover all retained source consumers: original -tbq scenario, sparse LU pivot queues and primal breakpoint queues. Whole no-ignore audit85references verifies unused peek/put_to_heap/debug print/dequeue-with-priority and ij_index_is_new do not acquire invented adapters; the last appears only in a commented assertion. Source explicit instantiations are checked against consumer roots rather than treated as new roots. Existing native maps/slices preserve ordered pair identity, LIFO free slots, slot/map-before-underlying-enqueue publication, literal unsigned doubling, strict tie/IEEE comparisons, resize/shrink mutation prefixes and source consistency-check gaps. Exact priorities own cells independently of membership; clearing/dequeue retains stored values, decrease owns its by-value argument until return/Close, stopped numerical receipts remain with their invoking owner. Expanded rational/pair priority allocation-failure tests to pooled plus direct allocation:16 insertion/decrease/increase/dequeue campaigns through success, stopped-owner guards, lexical argument stops and exact named-cell/direct-object cleanup census. Full focused queue groups pass native81.768s/combined92.917s; actual independent sparse-pivot/active-shortening/primal-breakpoint consumer checks pass native0.101s/combined0.091s; source container driver literal-report/failure/shared-RNG checks native0.008s/combined0.009s. Both LP vets pass. Per-file focused covered/total statements: {\"native\":{\"exact_priority_calls.go\":[11,13],\"pair_priority_queue.go\":[59,64],\"pair_queue_index.go\":[48,53],\"priority_heap.go\":[50,57],\"priority_queue_exact.go\":[312,362],\"priority_queue_native.go\":[410,479]},\"debug\":{\"exact_priority_calls.go\":[11,13],\"pair_priority_queue.go\":[59,64],\"pair_queue_index.go\":[47,53],\"priority_heap.go\":[51,57],\"priority_queue_exact.go\":[312,362],\"priority_queue_native.go\":[410,479]}}. These are Go statement profiles, not C++ source coverage. No production algorithm changes or generic adapters. Completes these six queue source units only; full sparse/primal/solver audits remain separate. LP inventory30ported/65partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates this expanded test. Profiles /mnt/oldrog/tmp/g3-lp-priority-direct-audit-{native,debug}.cover; source audit /mnt/oldrog/tmp/g3-lp-priority-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "Pairs use native Go unordered maps and concrete IndexPair keys. Map/slot publication precedes underlying enqueue, and a failed queue access leaves that published prefix. Source zero-capacity doubling fails instead of inventing a growth policy; native/debug stops remain distinct.",
         "Pair consistency diagnostics preserve the source gap: map/slot uniqueness and free-slot checks need not detect a published pair absent from the underlying heap. Original upstream random pair smoke scenario is translated with a fixed independent generator and strengthened map/minimum assertions; no source generator algorithm is claimed by that fixture."
       ]
@@ -119097,22 +119232,33 @@
       "path": "src/util/lp/binary_heap_upair_queue_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/pair_queue_index.go",
         "pkg/util/lp/pair_priority_queue.go",
         "pkg/util/lp/priority_heap.go",
-        "pkg/util/lp/priority_queue_native.go"
+        "pkg/util/lp/priority_queue_native.go",
+        "pkg/util/lp/driver_container_scenarios.go",
+        "pkg/util/lp/priority_queue_exact_test.go"
       ],
       "tests": [
         "TestLPPairPriorityQueueSource",
         "TestLPIntPairPriorityQueueIndependentMapOracle",
         "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
         "TestLPUintPairPriorityQueueIndependentMapOracle",
-        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPSparsePivotPreparationIndependentOracle",
+        "TestLPSparsePivotLiteralQueueAndThresholds",
+        "TestLPSparseActiveShorteningIndependentOracle",
+        "TestLPFloatPrimalBreakpointIndependentCrossings",
+        "TestLPRationalPrimalBreakpointIndependentRecords",
+        "TestLPExactBreakpointIndependentRecordQueueOracle",
+        "TestLPContainerDriverLiteralReports",
+        "TestLPContainerDriverReportFailurePrefixes",
+        "TestLPContainerDriverSharedRandomAndGuards"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "actual int/unsigned pair queues, new/reused slots, updates, dequeue, remove, underlying-only resize, priority sentinel, bijection and free-slot diagnostics",
@@ -119125,13 +119271,29 @@
             "TestLPUintPairPriorityQueueIndependentMapOracle",
             "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
           ]
+        },
+        {
+          "name": "retained consumer integration, source original driver and concrete owning destruction audit",
+          "status": "ported",
+          "go_target": "pkg/util/lp/pair_queue_index.go",
+          "tests": [
+            "TestLPSparsePivotPreparationIndependentOracle",
+            "TestLPSparsePivotLiteralQueueAndThresholds",
+            "TestLPSparseActiveShorteningIndependentOracle",
+            "TestLPFloatPrimalBreakpointIndependentCrossings",
+            "TestLPRationalPrimalBreakpointIndependentRecords",
+            "TestLPExactBreakpointIndependentRecordQueueOracle",
+            "TestLPContainerDriverLiteralReports",
+            "TestLPContainerDriverReportFailurePrefixes",
+            "TestLPContainerDriverSharedRandomAndGuards"
+          ]
         }
       ],
       "ownership": [
         "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit."
       ],
       "deviations": [
-        "Complete sparse matrix/pivot integration remains open; no whole-unit promotion. Uncalled ij_index_is_new appears only in a commented source assertion and has no invented adapter.",
+        "Whole retained-source/ownership audit completes binary_heap_priority_queue.h/.hpp/instances.cpp and binary_heap_upair_queue.h/.hpp/instances.cpp. Concrete int/unsigned/double/mpq/numeric_pair<mpq> priority queues and int/unsigned pair-key queues cover all retained source consumers: original -tbq scenario, sparse LU pivot queues and primal breakpoint queues. Whole no-ignore audit85references verifies unused peek/put_to_heap/debug print/dequeue-with-priority and ij_index_is_new do not acquire invented adapters; the last appears only in a commented assertion. Source explicit instantiations are checked against consumer roots rather than treated as new roots. Existing native maps/slices preserve ordered pair identity, LIFO free slots, slot/map-before-underlying-enqueue publication, literal unsigned doubling, strict tie/IEEE comparisons, resize/shrink mutation prefixes and source consistency-check gaps. Exact priorities own cells independently of membership; clearing/dequeue retains stored values, decrease owns its by-value argument until return/Close, stopped numerical receipts remain with their invoking owner. Expanded rational/pair priority allocation-failure tests to pooled plus direct allocation:16 insertion/decrease/increase/dequeue campaigns through success, stopped-owner guards, lexical argument stops and exact named-cell/direct-object cleanup census. Full focused queue groups pass native81.768s/combined92.917s; actual independent sparse-pivot/active-shortening/primal-breakpoint consumer checks pass native0.101s/combined0.091s; source container driver literal-report/failure/shared-RNG checks native0.008s/combined0.009s. Both LP vets pass. Per-file focused covered/total statements: {\"native\":{\"exact_priority_calls.go\":[11,13],\"pair_priority_queue.go\":[59,64],\"pair_queue_index.go\":[48,53],\"priority_heap.go\":[50,57],\"priority_queue_exact.go\":[312,362],\"priority_queue_native.go\":[410,479]},\"debug\":{\"exact_priority_calls.go\":[11,13],\"pair_priority_queue.go\":[59,64],\"pair_queue_index.go\":[47,53],\"priority_heap.go\":[51,57],\"priority_queue_exact.go\":[312,362],\"priority_queue_native.go\":[410,479]}}. These are Go statement profiles, not C++ source coverage. No production algorithm changes or generic adapters. Completes these six queue source units only; full sparse/primal/solver audits remain separate. LP inventory30ported/65partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates this expanded test. Profiles /mnt/oldrog/tmp/g3-lp-priority-direct-audit-{native,debug}.cover; source audit /mnt/oldrog/tmp/g3-lp-priority-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
         "Pairs use native Go unordered maps and concrete IndexPair keys. Map/slot publication precedes underlying enqueue, and a failed queue access leaves that published prefix. Source zero-capacity doubling fails instead of inventing a growth policy; native/debug stops remain distinct.",
         "Pair consistency diagnostics preserve the source gap: map/slot uniqueness and free-slot checks need not detect a published pair absent from the underlying heap. Original upstream random pair smoke scenario is translated with a fixed independent generator and strengthened map/minimum assertions; no source generator algorithm is claimed by that fixture."
       ]
