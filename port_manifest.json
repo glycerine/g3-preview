@@ -120623,7 +120623,7 @@
       "path": "src/util/lp/init_lar_solver.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/lar_bounds.go",
         "pkg/util/lp/lar_bounds_test.go",
@@ -120806,8 +120806,8 @@
           "text": "SASSERT(false);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "update_column_type_and_bound concrete dispatch",
@@ -120894,11 +120894,6 @@
           ]
         },
         {
-          "name": "remaining external-variable/term registration, matrix/basis construction and strategy initialization",
-          "status": "unported",
-          "tests": []
-        },
-        {
           "name": "add_var, register_new_ext_var_index, add_non_basic_var_to_core_fields and exact/floating core-field growth with source statement publication order",
           "status": "ported",
           "go_target": "pkg/util/lp/lar_model.go",
@@ -120962,6 +120957,59 @@
             "TestLARStrategyReachedErrorPrefixes",
             "TestLARStrategyDeferredRowsPhysicalOwnership"
           ]
+        },
+        {
+          "name": "whole header declaration coverage; small wrapper bodies are concretely inlined at their sole caller where appropriate",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_model.go",
+          "declaration_targets": {
+            "strategy_is_undecided": "pkg/util/lp/lar_model.go",
+            "add_var": "pkg/util/lp/lar_model.go",
+            "register_new_ext_var_index": "pkg/util/lp/lar_model.go",
+            "add_non_basic_var_to_core_fields": "pkg/util/lp/lar_model.go",
+            "add_new_var_to_core_fields_for_doubles": "pkg/util/lp/lar_model.go",
+            "add_new_var_to_core_fields_for_mpq": "pkg/util/lp/lar_model.go",
+            "add_term_undecided": "pkg/util/lp/lar_model_terms.go",
+            "add_term": "pkg/util/lp/lar_model_terms.go",
+            "add_row_for_term": "pkg/util/lp/lar_model_terms.go",
+            "add_row_from_term_no_constraint": "pkg/util/lp/lar_model_terms.go",
+            "add_basic_var_to_core_fields": "pkg/util/lp/lar_model_terms.go",
+            "adjust_initial_state_for_tableau_rows": "pkg/util/lp/lar_model_terms.go",
+            "fill_last_row_of_A_d": "pkg/util/lp/lar_model_terms.go",
+            "add_var_bound": "pkg/util/lp/lar_model_bounds.go",
+            "add_var_bound_on_constraint_for_term": "pkg/util/lp/lar_model_bounds.go",
+            "add_constraint_from_term_and_create_new_column_row": "pkg/util/lp/lar_model_bounds.go",
+            "decide_on_strategy_and_adjust_initial_state": "pkg/util/lp/lar_strategy.go",
+            "adjust_initial_state": "pkg/util/lp/lar_strategy.go",
+            "adjust_initial_state_for_lu": "pkg/util/lp/lar_strategy.go",
+            "update_column_type_and_bound": "pkg/util/lp/lar_bounds.go",
+            "update_free_column_type_and_bound": "pkg/util/lp/lar_bounds.go",
+            "update_upper_bound_column_type_and_bound": "pkg/util/lp/lar_bounds.go",
+            "update_boxed_column_type_and_bound": "pkg/util/lp/lar_bounds.go",
+            "update_low_bound_column_type_and_bound": "pkg/util/lp/lar_bounds.go",
+            "update_fixed_column_type_and_bound": "pkg/util/lp/lar_bounds.go"
+          },
+          "tests": [
+            "TestLARBoundsIndependentIntervalIntersection",
+            "TestLARBoundsSourceConflictPublication",
+            "TestLARBoundsPhysicalUpdateRefusals",
+            "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
+            "TestLARBoundsExistingScopedOwnersAndAlias",
+            "TestLARBoundsDebugInvariantProfiles",
+            "TestLARBoundsMultipleColumnsAndExistingInfeasibility",
+            "TestLARModelIndependentVariableDirectories",
+            "TestLARModelIndependentTermRowsAndBounds",
+            "TestLARModelNestedTableauAndRowPropagation",
+            "TestLARModelPhysicalFailurePrefixes",
+            "TestLARModelDeferredEmptyTermsAndSourceGuards",
+            "TestLARModelLeavesOlderComparisonOwned",
+            "TestLARStrategyIndependentThresholdModels",
+            "TestLARStrategyLUResizesAndPreservesSourceContents",
+            "TestLARStrategyDispatcherProfiles",
+            "TestLARStrategyFloatConversionSourceExtremes",
+            "TestLARStrategyReachedErrorPrefixes",
+            "TestLARStrategyDeferredRowsPhysicalOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -120971,12 +121019,10 @@
         "Strategy initialization has no additional numerical owner. Real deferred tableau registration retains interrupted arithmetic in existing solver/term/primal owners until Close. Native floating slices own converted scalars; heading and basis copies do not alias the exact arrays. Pooled/direct physical refusal campaigns through success verify cleanup."
       ],
       "deviations": [
-        "All five bound update branches and dispatch preserve source epsilon signs, strict/structural pair comparison, assignment/witness/change/status order and source conflict asymmetries. This implements the bound component, not a complete LAR solver. Full add_var/add_var_bound, matrix/basis, constraint publication/scopes and optimization remain unported.",
-        "AppendFreeColumn initializes only the source bound fields, with witness/type/change-domain and low/upper publication; it does not claim complete source variable registration. Existing native scoped owners are exercised directly, without claiming whole-solver push/pop.",
-        "Source boxed-upper conflict sets Infeasible then debug-asserts before recording the infeasible column; low-only conflicting upper bound retains low-only type, while upper-only conflicting lower bound first changes to boxed. Contradictory equality can update only a witness without changing stored bounds. These transitions are explicit regressions, not corrected interval metadata.",
-        "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
-        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication.",
-        "Retained source strategy initialization and double matrix copy now execute. LU selection does not materialize deferred terms, initialize either factorization, assign floating nonbasis, clear existing matrix cells or resize row-offset scratch. Repeated copies append duplicates. Exact numerator and denominator convert separately, so overflow/underflow can produce Inf, omitted zero or NaN. Tableau-cost adjustment retains its source debug assertion and native fallthrough. Whole outer solve/model extraction/constraint validation and upstream drivers remain incomplete."
+        "Whole retained-source audit completes all25 methods of init_lar_solver.h. Explicit declaration-to-Go mapping reconciles the stale remaining-registration/strategy placeholder with previously implemented concrete external-variable registration, exact/floating field growth, working/original term construction, deferred/tableau/basic rows, ordinary/mapped/unmapped term constraints, all five bound update branches and strategy initialization. Existing tests cover independent directories/term rows/interval models, shared scoped owners, literal source conflict/publication asymmetries, threshold and floating conversion extremes, pooled/direct physical failure campaigns and preservation of older numerical callers. Focused native56.196s/combined59.702s pass. Per-file native/combined covered statements: bounds293/364 and312/364; model133/197 and140/197; term rows151/197 and161/197; bound registration64/68 both; strategy55/57 and56/57. These are current whole-Go-file coverage counts including unrelated outer solver cleanup and delegated error guards, not C++ statement coverage. No new production implementation or tests required by this reconciliation. Native Go maps/slices and concrete owning exact components preserve the retained algorithms; coefficient dictionaries keep insertion order. This completes initialization only; whole LAR optimization/scopes/propagation scheduling and source consumer entry integration remain separate audits. LP inventory24ported/71partial/10reference_only/3dead_deleted/2platform_replacement. Source name-reference audit /mnt/oldrog/tmp/g3-lp-init-lar-consumers-audit.txt:25 declarations/251 references (same-named unrelated methods included, not treated as consumer roots). Profiles /mnt/oldrog/tmp/g3-lp-init-lar-audit-{native,debug}.cover. CPUs8\u201316/GOMAXPROCS9.",
+        "Source behavior is preserved: nonbasic registration grows exact fields in statement order and floating fields only under LU; working versus original term constants have distinct uses; basic witness Row stores the column index; tableau RHS grows to column count; floating term basis is -1 while exact is +1. Only add_row_for_term adds both size assertions. Invalid external-variable throw adapts to ErrBounds in native and ErrAssertion in debug.",
+        "LU selection does not materialize deferred terms, initialize factorization, assign floating nonbasis or clear existing matrix cells. Repeated copies append duplicates. Exact numerator/denominator double conversion separately preserves Inf/zero/NaN. Tableau-cost adjustment asserts in debug and falls through in native.",
+        "Native container memory is managed by Go; exact values, parameter copies, unfinished terms/constraints, arithmetic temporaries and failed numerical receipts remain owned by their concrete owners until Close. Full outer solver behavior is not claimed by this header audit."
       ]
     },
     {
