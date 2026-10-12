@@ -1050,16 +1050,15 @@ remain live and unported. Concrete native maps/slices should be introduced only
 when their functional Go consumers are ported; empty source templates do not
 justify another dependency on the container infrastructure.
 
-## Native text buffer extraction
+## Native text buffers
 
-The live `string_buffer.h` behavior now resides in `util/text.Buffer`, backed
-by `bytes.Buffer`. Consumers import this package directly; root util has no
-forwarding alias. Its imports contain no numerical implementation. The one
-floating-point bridge is `ArbitraryFloatFormattedCString.AppendTo`, owned by
-the numerical value in root util, so numerical package extraction can proceed
-without introducing a text-to-numerics dependency. Existing C-string truncation,
-source integer formatting, long-width profiles, and borrowed-value lifetime
-checks remain covered by the buffer and numeric integration tests.
+`string_buffer.h` is a Go platform replacement. The former `util/text.Buffer`
+wrapper and its unused floating-point append adapter were removed. Retained
+callers use `bytes.Buffer`, `strings.Builder`, `strconv`, or local byte slices.
+For example, AST fresh-declaration names use `bytes.Buffer`, symbol text uses
+`strconv`, and AST model-value names retain a small inline byte array plus
+charged overflow because that caller exposes the source allocation prefix.
+The buffer disposition does not claim completion of the algorithms that use it.
 
 ## Floating-point numeral slice
 

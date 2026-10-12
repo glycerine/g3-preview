@@ -163827,9 +163827,16 @@
       "path": "src/util/string_buffer.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "platform_replacement",
+      "go_targets": [
+        "pkg/ast/ast_core_fresh_factories.go",
+        "pkg/ast/ast_core_symbols.go",
+        "pkg/util/symbol/symbol.go"
+      ],
+      "tests": [
+        "TestASTFreshFuncDeclNullAndSuffixSourceNames",
+        "TestASTModelValueNameInlineAndOverflowAccounting"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -163876,14 +163883,14 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [
-        "All retained Go consumers now use standard bytes.Buffer or strings.Builder directly. Deleted the unused util/text.Buffer wrapper and its tests, along with the uncalled formatted-CString insertion adapter. No C++ container or template implementation is retained."
+        "Retained Go consumers own their concrete native buffer directly: AST fresh declarations use a local bytes.Buffer, symbol text uses strconv, and AST model-value names use a local byte slice with a 64-byte inline array and charged overflow because that caller's source failure prefix is observable. No shared string_buffer owner or template implementation is retained. The unused util/text.Buffer wrapper and its tests were deleted earlier."
       ],
       "deviations": [
-        "C++ string_buffer implementation and standalone container-driver completion credit are retired. Native caller behavior is checked in actual AST, SMT context, parameter-display, SMT2 quoting and numeric-stream tests. The upstream source files still exist; this is not a source dead-code claim."
+        "Platform replacement of the buffer primitive only. Source-specific naming, integer formatting, C-string termination and failure ordering remain obligations of each retained caller; this disposition does not port unrelated AST, SMT, shell or test-driver algorithms. The upstream source header remains live and is not classified as dead. Focused AST fresh-name/model-value tests and util/symbol/util/text tests pass native, with AST checks also passing g3debug,g3checked on CPUs 0-7."
       ]
     },
     {
