@@ -11321,5 +11321,25 @@
     "full_native_checkpoint_excludes_debug_only_scenario": true,
     "remaining": "Other LU scenarios and full top-level test dispatch/entry; whole-source/consumer/ownership audits.",
     "related_lu_regressions_seconds": 0.347
+  },
+  "latest_larger_lu_cli_increment": {
+    "go_target": "pkg/util/lp/driver_larger_lu_debug.go",
+    "tests": [
+      "TestLPLargerLUDriversIndependentLiteralAndRandomOracle",
+      "TestLPLargerLUDriversReportFailurePrefixes",
+      "TestLPLargerLUDriverDropProfiles",
+      "TestLPLargerLUDriverMismatchDiagnosticFailurePrefixes"
+    ],
+    "coverage": {
+      "profile": "g3debug,g3checked",
+      "covered": 94,
+      "statements": 107,
+      "percent": 87.9
+    },
+    "focused_seconds": 0.161,
+    "related_small_update_extension_seconds": 0.278,
+    "remaining": "Holes scenario and parent test_lu; full top-level CLI execution/entry, other scenarios and whole-source/consumer/ownership audits.",
+    "full_native_checkpoint_excludes_debug_only_scenarios": true,
+    "evidence": "/mnt/oldrog/tmp/g3-larger-lu-driver-debug.cover"
   }
 }

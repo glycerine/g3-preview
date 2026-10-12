@@ -103056,7 +103056,8 @@
         "pkg/util/lp/driver_bound_propagation.go",
         "pkg/util/lp/driver_lp_zero.go",
         "pkg/util/lp/driver_swaps_debug.go",
-        "pkg/util/lp/driver_small_lu_debug.go"
+        "pkg/util/lp/driver_small_lu_debug.go",
+        "pkg/util/lp/driver_larger_lu_debug.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103288,7 +103289,11 @@
         "TestLPDriverSwapSetterAndGuards",
         "TestLPSmallLUDriverLiteralScenario",
         "TestLPSmallLUDriverIndependentExtendedSolves",
-        "TestLPSmallLUDriverReportFailurePrefixes"
+        "TestLPSmallLUDriverReportFailurePrefixes",
+        "TestLPLargerLUDriversIndependentLiteralAndRandomOracle",
+        "TestLPLargerLUDriversReportFailurePrefixes",
+        "TestLPLargerLUDriverDropProfiles",
+        "TestLPLargerLUDriverMismatchDiagnosticFailurePrefixes"
       ],
       "conditionals": [
         {
@@ -104366,6 +104371,17 @@
             "TestLPSmallLUDriverIndependentExtendedSolves",
             "TestLPSmallLUDriverReportFailurePrefixes"
           ]
+        },
+        {
+          "name": "retained debug test_larger_lu and test_larger_lu_exp src372-411/456-500: literal deterministic/shared-random matrices, initial side products and mismatch reports/exit, source column reports and replacement/check sequences",
+          "status": "ported",
+          "go_target": "pkg/util/lp/driver_larger_lu_debug.go",
+          "tests": [
+            "TestLPLargerLUDriversIndependentLiteralAndRandomOracle",
+            "TestLPLargerLUDriversReportFailurePrefixes",
+            "TestLPLargerLUDriverDropProfiles",
+            "TestLPLargerLUDriverMismatchDiagnosticFailurePrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -104382,7 +104398,8 @@
         "GLPK report readers own each local os.File only for its actual read and close on return, retaining parsed scalar/string snapshots. Native Go strings/slices replace STL token containers. Comparison borrows live uint32 counters, leaves inconclusives untouched, reopens actual paths for cost reads, publishes status failure after diagnostics but cost failure before diagnostics. No exact numerical arena work is introduced; actual solver-output integration closes MPS driver owners before report reads and checks exact root census.",
         "ProcessFileDriver borrows manager/arguments/live counters and owns actual os.File and concrete MPS/LAR child. Successful report stays open through actual external command/comparison; actual child Run closes successful solver scope. Caught source exception retains original CaughtError and publishes failure only after catching diagnostic; owning cleanup closes failed child before report and remains retryable. Physical pooled/direct exact-child campaigns run through genuine failure to success, with exact censuses; actual older1000-digit caller comparisons survive both MPS and LAR routes. External close retains descriptor metadata and actual error, not fabricated recovery.",
         "MPSBatchDriver owns native catalogue slice/map and one concrete MPS/ProcessFile child at a time, borrowing arguments and manager. Failed children remain for Close; successful default/MPS/Process scopes close before next file. Summary counters use actual separate source insertion reads, preserving live writer callback changes. Two pooled/direct physical default-exact child campaigns run through actual failures to success and exact root census; actual older1000-digit caller comparison remains owned by caller through child and batch cleanup. Native Run reads real HOME after limit parsing; concrete RunWithHome binds caller supplied getenv result without mutating process environment.",
-        "SmallLUTestDriver borrows caller Settings; owns literal matrix, LU/workspace, headings/basis/nonbasis and lexical dense report snapshot/replacement set. Every report/endl failure preserves reached owners and publications for Close; successful Run closes LU after actual final correctness check. Matrix and scalar snapshots remain inspectable native metadata. No new numerical manager or allocation adapter."
+        "SmallLUTestDriver borrows caller Settings; owns literal matrix, LU/workspace, headings/basis/nonbasis and lexical dense report snapshot/replacement set. Every report/endl failure preserves reached owners and publications for Close; successful Run closes LU after actual final correctness check. Matrix and scalar snapshots remain inspectable native metadata. No new numerical manager or allocation adapter.",
+        "LargerLUTestDriver borrows Settings/shared RNG and owns matrix, LU, lexical left/right dense products, workspace and native basis/headings. Left/right products survive through source scope after comparison; failed reports/algorithms retain reached owners until Close. Successful source return closes LU and lexical products. Source deterministic exit(1) is represented by ExitCode1 plus ErrAssertion instead of terminating the embedding Go process; owner cleanup remains explicit."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -104413,7 +104430,8 @@
         "Bound-propagation registered parent executes total-u, triangle, one-row, bounded-row, two-rows, mixed-row, total-l. Native ignored general constraints yield OPTIMAL with no found bounds; only triangle explicit AddTerm creates two rows. Debug stops at first AddConstraint before bounds/solve/propagator; total-u/l initial reports precede solver construction and do not flush. Triangle diagnostic is endl; found-bound report uses actual PrintImpliedBound if any. Local source ev is never populated, so first final total-l assertion is false; earlier mandatory AddConstraint assertion makes this and following contains_j_kind unreachable in debug. No unused contains_j_kind adapter, unused relevance lambda or commented sample is ported. All literals fit small numerals; pooled/direct allocation-disabled profiles prove unchanged custom budget rather than inventing large source inputs. Complete top-level CLI action execution/argv binding and retained-source/ownership audits remain open.",
         "Original test_lp_0 now executes source endl report before any model construction, literal sparse3x7 matrix, DotRow-derived B, X/basis/cost/type vectors, default Settings, simple xN names and actual zero-low constructor/Solve. Default source tableau profile has no floating LU: debug InitReducedCosts asserts, native reaches typed ErrBounds missing-factorization guard. No silent LU strategy override or default-model optimal-solve credit; existing explicit LU numerical fixtures/exhaustive vertices remain separate. Failed core stays owned until Close and borrows actual driver slice headers. Corrected shared writeDriverLine to return io.ErrShortWrite on a short nil-error write before flush/child construction. Initial test assumed ascending NBasis; source init builds descending, corrected expected[6,5,4,3] and headings[0,1,2,-4,-3,-2,-1]. Complete CLI dispatch/entry binding and retained-source/ownership audits remain open.",
         "Debug --test_swaps retains shared10x10 fill and100 random attempts per helper. Despite its name, second helper calls swap_rows and TransposeRight; actual source equality fails for noncommuting exchanges. First helper TransposeLeft compensates all100 attempts. Independent dense-array/RNG oracle verifies50 seeds, exact reports/flushes, final logical matrix and draw count. Diagnostic setter stores zeros and two directions independently; source two-argument indexed_value m_other is indeterminate and never read by retained fill/Get/swap/print path. Native Other zero is an unobserved representation value, not reciprocal-link/elimination semantics; no universal or public Set adapter added. Native build erases entire debug scenario. Complete CLI execution/entry and whole-source/ownership audits remain open.",
-        "Debug-only small LU scenario executes actual source literal, four updates and two appended rows; native scenario erased. Header initialization/change_basis helpers specialize their actual fixed inputs with descending nonbasis order. Settings remain borrowed. Source base-pointer matrix reports include final blank endl, unlike initial static-matrix overload. Full top-level CLI execution/entry and other registered LU/random scenarios remain open."
+        "Debug-only small LU scenario executes actual source literal, four updates and two appended rows; native scenario erased. Header initialization/change_basis helpers specialize their actual fixed inputs with descending nonbasis order. Settings remain borrowed. Source base-pointer matrix reports include final blank endl, unlike initial static-matrix overload. Full top-level CLI execution/entry and other registered LU/random scenarios remain open.",
+        "Two retained6x12 debug LU scenarios are executable typed drivers; deterministic fill uses cyclic square values and random fill consumes exactly72 shared RNG draws in row/column order. Native bodies are erased. All source mismatch diagnostics and base-matrix trailing blank endl are retained; real DropTolerance .1/1/10/100 reaches deterministic exit diagnostics and randomized pre-report assertion. Full parent test_lu, holes scenario, top-level CLI execution/entry and other scenarios remain open; no whole-unit completion credit."
       ]
     },
     {
