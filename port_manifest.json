@@ -33814,6 +33814,8 @@
         "pkg/math/euclid/solve_test.go",
         "pkg/math/euclid/normalize_query.go",
         "pkg/math/euclid/normalize_query_test.go",
+        "pkg/math/euclid/solver.go",
+        "pkg/math/euclid/solver_test.go",
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go",
         "pkg/util/numeral/scoped_numeral.go"
@@ -33842,6 +33844,10 @@
         "TestEuclideanSolveEmptyAndAlreadyInconsistent",
         "TestEuclideanNormalizeQueryAfterNonUnitSolve",
         "TestEuclideanNormalizeQueryJustificationAndConstantOnly",
+        "TestEuclideanPublicSolverBorrowedManagerSolveNormalizeReset",
+        "TestEuclideanPublicSolverOwnedManagerAndClosedGuards",
+        "TestEuclideanPublicSolverContradictionExplanationAndDisplay",
+        "TestEuclideanPublicSolverResetAfterGuardedAssertionError",
         "TestEuclideanPositionSourceBinarySearch",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership",
         "TestEuclideanSetupHeaderRefusalBeforeBuffers",
@@ -34010,8 +34016,15 @@
           ]
         },
         {
-          "name": "public solver wrapper, reset and display",
-          "status": "unported"
+          "name": "public solver wrapper, owned/borrowed numeral manager, reset, explanation, parameter query and display at cpp:485-501,788-845",
+          "status": "partial",
+          "go_target": "pkg/math/euclid/solver.go",
+          "tests": [
+            "TestEuclideanPublicSolverBorrowedManagerSolveNormalizeReset",
+            "TestEuclideanPublicSolverOwnedManagerAndClosedGuards",
+            "TestEuclideanPublicSolverContradictionExplanationAndDisplay",
+            "TestEuclideanPublicSolverResetAfterGuardedAssertionError"
+          ]
         }
       ],
       "ownership": [
@@ -34023,16 +34036,24 @@
       ],
       "deviations": [
         "Source normalize_eq checks divisibility of the constant but divides only variable coefficients and justification coefficients by their gcd. The Go path retains that exact result. After source normalize_eq destroys an empty zero equality, assert_eq still calls add_occs on its null slot; Go skips that invalid dereference.",
-        "Unit and non-unit elimination, internal solve and normalize-query paths are ported with source occurrence and solution ownership order. Source svector::erase(value) ignores an absent occurrence, which happens for a decomposition parameter in the compacted original equation; Go matches this no-op. The public solver wrapper, reset and display remain unported."
+        "Unit and non-unit elimination, internal solve, normalize query and public solver methods now have concrete Go paths. Source svector::erase(value) ignores an absent occurrence, which happens for a decomposition parameter in the compacted original equation; Go matches this no-op. Explanation IDs are returned as a copy of the source const vector, and io.Writer reports host write errors. Whole-source error/debug/driver audit remains open."
       ]
     },
     {
       "path": "src/math/euclid/euclidean_solver.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/euclid/solver.go",
+        "pkg/math/euclid/solver_test.go"
+      ],
+      "tests": [
+        "TestEuclideanPublicSolverBorrowedManagerSolveNormalizeReset",
+        "TestEuclideanPublicSolverOwnedManagerAndClosedGuards",
+        "TestEuclideanPublicSolverContradictionExplanationAndDisplay",
+        "TestEuclideanPublicSolverResetAfterGuardedAssertionError"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -34045,9 +34066,25 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "constructor/destructor, manager, reset, mk_var, mk_justification, assert_eq, solve, get_justification, inconsistent, is_parameter, normalize and display",
+          "status": "partial",
+          "go_target": "pkg/math/euclid/solver.go",
+          "tests": [
+            "TestEuclideanPublicSolverBorrowedManagerSolveNormalizeReset",
+            "TestEuclideanPublicSolverOwnedManagerAndClosedGuards",
+            "TestEuclideanPublicSolverContradictionExplanationAndDisplay",
+            "TestEuclideanPublicSolverResetAfterGuardedAssertionError"
+          ]
+        }
+      ],
+      "ownership": [
+        "The wrapper retains a supplied rational manager by borrow or creates and closes one over its own budget when nil. Reset closes and replaces only the solver state, keeping the same manager and ownership mode. Close destroys solver state before its owned manager."
+      ],
+      "deviations": [
+        "Go returns typed errors for invalid or closed operations, copies const explanation IDs, and accepts io.Writer for display. Public method and whole-source debug/error profiles remain partial."
+      ]
     },
     {
       "path": "src/math/grobner/CMakeLists.txt",
