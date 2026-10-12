@@ -762,7 +762,8 @@
         "fixed_monomial.go",
         "fixed_node.go",
         "fixed_node_predicates.go",
-        "fixed_polynomial.go"
+        "fixed_polynomial.go",
+        "fixed_split.go"
       ]
     },
     {

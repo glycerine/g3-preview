@@ -49865,7 +49865,9 @@
         "pkg/math/subpaving/fixed_monomial_test.go",
         "pkg/math/subpaving/fixed_context_propagate.go",
         "pkg/math/subpaving/fixed_context_propagate_test.go",
-        "pkg/math/subpaving/fixed_context_recent_test.go"
+        "pkg/math/subpaving/fixed_context_recent_test.go",
+        "pkg/math/subpaving/fixed_split.go",
+        "pkg/math/subpaving/fixed_split_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -49890,7 +49892,10 @@
         "TestSubpavingFixedContextQueuedCancellationResumes",
         "TestSubpavingFixedContextInitialDefinitionSweep",
         "TestSubpavingFixedContextRecentChildBoundsAndWatchers",
-        "TestSubpavingFixedContextRecentChildRejectsChangedParentTrail"
+        "TestSubpavingFixedContextRecentChildRejectsChangedParentTrail",
+        "TestSubpavingFixedMidpointSourceCasesAndNoInterior",
+        "TestSubpavingFixedMidpointChildrenPropagateDefinition",
+        "TestSubpavingFixedMidpointIntegerChildNormalization"
       ],
       "conditionals": [
         {
@@ -50011,7 +50016,9 @@
         "pkg/math/subpaving/fixed_monomial_test.go",
         "pkg/math/subpaving/fixed_context_propagate.go",
         "pkg/math/subpaving/fixed_context_propagate_test.go",
-        "pkg/math/subpaving/fixed_context_recent_test.go"
+        "pkg/math/subpaving/fixed_context_recent_test.go",
+        "pkg/math/subpaving/fixed_split.go",
+        "pkg/math/subpaving/fixed_split_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50031,7 +50038,10 @@
         "TestSubpavingFixedContextQueuedCancellationResumes",
         "TestSubpavingFixedContextInitialDefinitionSweep",
         "TestSubpavingFixedContextRecentChildBoundsAndWatchers",
-        "TestSubpavingFixedContextRecentChildRejectsChangedParentTrail"
+        "TestSubpavingFixedContextRecentChildRejectsChangedParentTrail",
+        "TestSubpavingFixedMidpointSourceCasesAndNoInterior",
+        "TestSubpavingFixedMidpointChildrenPropagateDefinition",
+        "TestSubpavingFixedMidpointIntegerChildNormalization"
       ],
       "assertions": [
         {
