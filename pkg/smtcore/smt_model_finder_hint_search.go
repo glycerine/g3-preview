@@ -9,10 +9,15 @@ import "github.com/glycerine/g3/pkg/ast"
 type hintSearchState struct {
 	residue, satisfied *scopedQuantifierSet
 	theOne             map[ast.ASTHandle]ast.ASTHandle
+	definitions        map[ast.ASTHandle]ast.ASTHandle
 }
 
 func newHintSearchState() *hintSearchState {
-	s := &hintSearchState{residue: newScopedQuantifierSet(nil), theOne: make(map[ast.ASTHandle]ast.ASTHandle)}
+	s := &hintSearchState{
+		residue:     newScopedQuantifierSet(nil),
+		theOne:      make(map[ast.ASTHandle]ast.ASTHandle),
+		definitions: make(map[ast.ASTHandle]ast.ASTHandle),
+	}
 	s.satisfied = newScopedQuantifierSet(func(q ast.ASTHandle, _ bool) {
 		// hint_solver::ev_handler runs before each satisfying-set trail edit.
 		s.theOne[q] = ast.ASTHandle{}

@@ -14826,7 +14826,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_for_each_expr.go",
-        "pkg/ast/ast_for_each_expr_source_test.go"
+        "pkg/ast/ast_for_each_expr_source_test.go",
+        "pkg/smtcore/smt_model_finder_hint_cycle.go"
       ],
       "tests": [
         "TestASTExprVisitorSourceCountSharedAndAllMarks",
@@ -14840,7 +14841,8 @@
         "TestASTExprVisitorSourceFinalizeEndsNodesWithoutAdoptingUnlistedMark",
         "TestASTExprVisitorSourcePendingMarkCannotClearForeignActualMark",
         "TestASTExprVisitorSourcePatternBodyOrderAndAllMarkedUnreadStack",
-        "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild"
+        "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild",
+        "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations"
       ],
       "conditionals": [
         {
@@ -14872,6 +14874,14 @@
             "TestASTExprVisitorSourcePendingMarkCannotClearForeignActualMark",
             "TestASTExprVisitorSourcePatternBodyOrderAndAllMarkedUnreadStack",
             "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild"
+          ]
+        },
+        {
+          "name": "hint_solver occurs_check concrete selected-definition traversal over app arguments and quantifier body/pattern/no-pattern children",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_cycle.go",
+          "tests": [
+            "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations"
           ]
         }
       ],
@@ -83769,12 +83779,15 @@
         "pkg/smtcore/smt_model_finder_quantifier_set.go",
         "pkg/smtcore/smt_model_finder_quantifier_set_test.go",
         "pkg/smtcore/smt_model_finder_hint_search.go",
-        "pkg/smtcore/smt_model_finder_hint_search_test.go"
+        "pkg/smtcore/smt_model_finder_hint_search_test.go",
+        "pkg/smtcore/smt_model_finder_hint_cycle.go",
+        "pkg/smtcore/smt_model_finder_hint_cycle_test.go"
       ],
       "tests": [
         "TestModelFinderScopedQuantifierSetTrailsAndEvents",
         "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
-        "TestModelFinderHintSatisfiedResidueSourceScopeTransitions"
+        "TestModelFinderHintSatisfiedResidueSourceScopeTransitions",
+        "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations"
       ],
       "assertions": [
         {
@@ -84194,13 +84207,21 @@
           "tests": [
             "TestModelFinderHintSatisfiedResidueSourceScopeTransitions"
           ]
+        },
+        {
+          "name": "hint_solver is_cyclic fixed-point selected-definition dependency check and occurs traversal",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_cycle.go",
+          "tests": [
+            "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations"
+          ]
         }
       ],
       "ownership": [
         "The scoped sets borrow quantifier handles; the satisfied-set undo callback clears the corresponding quantifier_info choice before each reverse set edit."
       ],
       "deviations": [
-        "The scoped quantifier sets, update_satisfied_residue transition and satisfied-set undo callback are ported with borrowed AST handles. Macro indexes, quantifier_info ownership, greedy search and broader model-finder algorithms remain open."
+        "The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback and selected-definition cycle check are ported with borrowed AST handles. Macro indexes, quantifier_info ownership, greedy search and broader model-finder algorithms remain open."
       ]
     },
     {
@@ -156759,7 +156780,8 @@
         "pkg/ast/ast_sparse_mark.go",
         "pkg/ast/ast_expr_substitution_table.go",
         "pkg/ast/ast_expr_substitution_ops.go",
-        "pkg/ast/rewriter/bv_trailing_table.go"
+        "pkg/ast/rewriter/bv_trailing_table.go",
+        "pkg/smtcore/smt_model_finder_hint_cycle.go"
       ],
       "tests": [
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
@@ -156818,7 +156840,8 @@
         "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
         "TestBVTrailingNativeWideDeletionReset",
-        "TestBVTrailingEveryColdCountReservation"
+        "TestBVTrailingEveryColdCountReservation",
+        "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations"
       ],
       "conditionals": [
         {
@@ -156933,6 +156956,14 @@
             "TestBVTrailingCacheGrowthAndEqualThresholdReset",
             "TestBVTrailingNativeWideDeletionReset",
             "TestBVTrailingEveryColdCountReservation"
+          ]
+        },
+        {
+          "name": "hint_solver selected function-to-definition map and acyclic declaration set use native maps of borrowed AST handles",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_cycle.go",
+          "tests": [
+            "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations"
           ]
         }
       ],
