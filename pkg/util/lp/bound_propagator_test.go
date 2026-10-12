@@ -1,7 +1,6 @@
 package lp
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"math/big"
@@ -184,25 +183,14 @@ func TestLARBoundPropagatorHooksBorrowedModelAndStreams(t *testing.T) {
 	up, err := p.UpperBound(0)
 	h.must(err)
 	h.check(up, big.NewRat(3, 1), big.NewRat(0, 1))
-	var out bytes.Buffer
-	p.Output = &out
-	h.must(p.Consume(&v.X, 71))
-	if out.String() != "doh\n" {
-		t.Fatal(out.String())
-	}
 	p.Evidence = hook
 	h.must(p.Consume(&v.X, 72))
-	if hook.witnesses[0] != 72 || hook.values[len(hook.values)-1] != "1/13" || out.String() != "doh\n" {
+	if hook.witnesses[0] != 72 || hook.values[len(hook.values)-1] != "1/13" {
 		t.Fatal("virtual evidence override")
 	}
 	failure := errors.New("evidence refused")
 	hook.err = failure
 	if err = p.Consume(&v.X, 73); !errors.Is(err, failure) {
-		t.Fatal(err)
-	}
-	p.Evidence = nil
-	p.Output = &larConstraintPrefixWriter{remaining: 2, err: failure}
-	if err = p.Consume(&v.X, 74); !errors.Is(err, failure) {
 		t.Fatal(err)
 	}
 	if err = p.TryAddBound(&v.X, 0, true, true, 91, true); !errors.Is(err, failure) {

@@ -193,6 +193,7 @@ func TestLARRowBoundAnalyzerPhysicalFailurePrefixes(t *testing.T) {
 	for _, direct := range []bool{false, true} {
 		for _, mode := range []string{"construct", "all", "unique"} {
 			succeeded, failures := false, 0
+			conditionFailures := 0
 			for ordinal := int64(0); ordinal < 800; ordinal++ {
 				done := false
 				t.Run(fmt.Sprintf("%v/%s/%d", direct, mode, ordinal), func(t *testing.T) {
@@ -244,6 +245,12 @@ func TestLARRowBoundAnalyzerPhysicalFailurePrefixes(t *testing.T) {
 							t.Fatal(err)
 						}
 						failures++
+						if a.condition != nil {
+							conditionFailures++
+							if mode != "unique" || p.NumberOfFoundBounds() != 0 {
+								t.Fatal("implicit pair refusal followed bound publication")
+							}
+						}
 						if !errors.Is(a.Analyze(), ErrExactVectorPending) {
 							t.Fatal("failed owner accepted retry")
 						}
@@ -289,6 +296,9 @@ func TestLARRowBoundAnalyzerPhysicalFailurePrefixes(t *testing.T) {
 			}
 			if !succeeded || failures == 0 {
 				t.Fatal(direct, mode, succeeded, failures)
+			}
+			if mode == "unique" && conditionFailures == 0 {
+				t.Fatal("implicit scalar-to-pair copy refusal not reached", direct)
 			}
 		}
 	}

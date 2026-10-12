@@ -20,6 +20,7 @@ type LARRowBoundAnalyzer struct {
 	before               exactEtaBefore
 	tracking, stopped    bool
 	work, phase          *IndexedRationalVector
+	condition            *RationalPair
 }
 
 func NewLARRowBoundAnalyzer(it RationalLinearIterator, rhs *RationalPair, row uint32, bp *LARBoundPropagator) (a *LARRowBoundAnalyzer, err error) {
@@ -300,9 +301,43 @@ func (a *LARRowBoundAnalyzer) unique(column uint32, maximum bool) error {
 	if err := a.manager.Div(bound, chosen, bound); err != nil {
 		return err
 	}
-	positive, err := a.manager.IsPos(chosen)
-	if err != nil {
-		return err
+	var positive bool
+	var err error
+	if maximum {
+		// Source numeric_traits<impq>::is_pos(u_coeff) implicitly constructs
+		// a pair from the scalar: copy X, initialize Y=0, test, destroy the
+		// full-expression temporary before entering limit_j.
+		condition := NewRationalPair()
+		a.condition = &condition
+		if err = a.manager.Copy(&condition.X, chosen); err != nil {
+			return err
+		}
+		positive, err = a.manager.IsPos(&condition.X)
+		if err != nil {
+			return err
+		}
+		if !positive {
+			var zero bool
+			zero, err = a.manager.IsZero(&condition.X)
+			if err != nil {
+				return err
+			}
+			if zero {
+				positive, err = a.manager.IsPos(&condition.Y)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		if err = condition.Del(a.manager); err != nil {
+			return err
+		}
+		a.condition = nil
+	} else {
+		positive, err = a.manager.IsPos(chosen)
+		if err != nil {
+			return err
+		}
 	}
 	if err = a.limit(column, bound, positive, positive == maximum, strict); err != nil {
 		return err
@@ -311,7 +346,7 @@ func (a *LARRowBoundAnalyzer) unique(column uint32, maximum bool) error {
 }
 
 func (a *LARRowBoundAnalyzer) Analyze() (err error) {
-	if a.stopped || a.work != nil || a.phase != nil || a.calls.pending() {
+	if a.stopped || a.work != nil || a.phase != nil || a.condition != nil || a.calls.pending() {
 		return ErrExactVectorPending
 	}
 	if err = a.resume(); err != nil {
@@ -361,6 +396,12 @@ func (a *LARRowBoundAnalyzer) Analyze() (err error) {
 func (a *LARRowBoundAnalyzer) Close() error {
 	if err := a.calls.cleanupRaw(a.manager); err != nil {
 		return err
+	}
+	if a.condition != nil {
+		if err := a.condition.Del(a.manager); err != nil {
+			return err
+		}
+		a.condition = nil
 	}
 	if a.phase != nil {
 		if err := a.phase.Close(); err != nil {

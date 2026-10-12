@@ -165,7 +165,6 @@ func (d *BoundPropagationExample) Run(which BoundPropagationCase) error {
 		return err
 	}
 	d.Propagator = NewLARBoundPropagator(s.Bounds, &s.ColumnsToExternal, &s.Terms)
-	d.Propagator.Output = d.out
 	if err = s.PropagateBoundsForTouchedRows(d.Propagator); err != nil {
 		return err
 	}

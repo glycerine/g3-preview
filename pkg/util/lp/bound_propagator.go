@@ -3,10 +3,6 @@
 package lp
 
 import (
-	"fmt"
-	"io"
-	"os"
-
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -30,7 +26,6 @@ type LARBoundPropagator struct {
 	FoundBounds       []*ImpliedBound
 	Interest          LARBoundInterest
 	Evidence          LARBoundEvidenceConsumer
-	Output            io.Writer
 	bounds            *LARBounds
 	columns           *[]uint32
 	terms             *[]*LARTerm
@@ -42,7 +37,7 @@ type LARBoundPropagator struct {
 }
 
 func NewLARBoundPropagator(bounds *LARBounds, columnsToExternal *[]uint32, terms *[]*LARTerm) *LARBoundPropagator {
-	return &LARBoundPropagator{bounds: bounds, columns: columnsToExternal, terms: terms, manager: bounds.manager, lower: make(map[uint32]uint32), upper: make(map[uint32]uint32), Output: os.Stdout}
+	return &LARBoundPropagator{bounds: bounds, columns: columnsToExternal, terms: terms, manager: bounds.manager, lower: make(map[uint32]uint32), upper: make(map[uint32]uint32)}
 }
 
 func (p *LARBoundPropagator) NumberOfFoundBounds() uint32                { return uint32(len(p.FoundBounds)) }
@@ -51,11 +46,13 @@ func (p *LARBoundPropagator) LowBound(j uint32) (*RationalPair, error)   { retur
 func (p *LARBoundPropagator) UpperBound(j uint32) (*RationalPair, error) { return p.bounds.Upper.At(j) }
 
 func (p *LARBoundPropagator) Consume(value *numeral.Rational, witness uint32) error {
-	if p.Evidence != nil {
-		return p.Evidence.Consume(value, witness)
+	// The only retained explanation caller uses theory_lra's override.
+	// The source base "doh" printer has no caller. Require the concrete hook
+	// rather than constructing an unused output-stream adapter for it.
+	if p.Evidence == nil {
+		return ErrBounds
 	}
-	_, err := fmt.Fprintln(p.Output, "doh")
-	return err
+	return p.Evidence.Consume(value, witness)
 }
 
 func (p *LARBoundPropagator) ready() error {

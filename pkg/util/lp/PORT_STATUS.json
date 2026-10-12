@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 86.6,
-  "coverage_warning": "Latest completed full native checkpointc32fb569 measures29932/34582 LP statements86.6%; not a measurement of later current code. Actual session40124 terminal exit0 and package/profile inspection verified. Excludes all debug-only code and later preparation short-write/three numeric benchmarks/executor changes. Later increments have separate focused coverage and scalar full-count evidence. Go statement coverage is not C++ completion; whole retained-source/consumer/ownership/SMT/CLI audits remain open.",
+  "coverage_warning": "Latest completed full native checkpoint8f2961ca measures30253/34954 LP statements86.6%; not a measurement of current code. Actual session89234 terminal exit0 and package/profile inspection verified. Excludes later debug-only precise-vector correction, indexed-value audit tests and subsequent reporting/common solver/analyzer changes. Later increments have separate focused coverage. Go statement coverage is not C++ completion; remaining whole retained-source/consumer/ownership/SMT/CLI audits remain open.",
   "remaining_work": [
     "Complete containing shell/lp_frontend.cpp and smt/theory_lra.cpp parameter/runtime integration; isolated generated LPParams constructor/getters and actual LP consumer value tests are complete",
     "remaining exact/floating numeric traits and conversions",
@@ -276,7 +276,7 @@
     },
     {
       "source": "src/util/lp/bound_analyzer_on_row.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/row_bound_analyzer.go",
         "pkg/util/lp/row_bound_analyzer_test.go"
@@ -287,8 +287,35 @@
         "TestLARRowBoundAnalyzerPhysicalFailurePrefixes",
         "TestLARRowBoundAnalyzerSourceRHSProfilesAndPivot",
         "TestLARRowBoundAnalyzerForeignIteratorAndCurrentCursor",
-        "TestLARRowBoundAnalyzerLeavesHookInvocationOwned"
-      ]
+        "TestLARRowBoundAnalyzerLeavesHookInvocationOwned",
+        "TestLARRowDispatchIndependentIntervals",
+        "TestLARRowDispatchGuardsAndCutoff",
+        "TestLARRowDispatchPhysicalFailureOwnership",
+        "TestLARTouchedRowsIndependentIntervalsAndSolve",
+        "TestLARTouchedRowsCancellationPrefixesAndReplay",
+        "TestLPBoundPropagationActualSourceCases",
+        "TestLPBoundPropagationOutputPrefixes"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "monoid_max(a,j) without strict output",
+            "monoid_min(a,j) without strict output"
+          ],
+          "reason": "Only strict-output overloads have retained callers; non-strict overloads are definitions only."
+        },
+        {
+          "source_methods": [
+            "bound_is_available",
+            "provide_evidence",
+            "public j"
+          ],
+          "reason": "Availability wrapper is referenced only by commented evidence code; commented callback apparatus/public unused field have no retained consumer."
+        }
+      ],
+      "evidence": "Whole retained-source/ownership audit completes bound_analyzer_on_row.h and lp_bound_propagator.h/.cpp. Concrete exact row/pivot iterator classification, persistent missing-bound counters/current cursor, strict min/max endpoint selection, all/unique monoid limits, RHS copy and destruction, term-adjusted strongest bound insertion/replacement, virtual interest/evidence boundaries and current model getters are implemented. Source whole no-ignore46reference audit verifies live LAR tableau/pivot/term dispatch and seven original bound driver cases. Found/corrected real unique-u lifetime gap at bound_analyzer_on_row.h:244: numeric_traits<impq>::is_pos(u_coeff) implicitly constructs pair X from an owning scalar copy and Y=0; Go now owns/destroys that full-expression temporary before limit_j, or retains it for cleanup after refusal. Unique-l uses scalar is_pos directly. Existing pooled/direct physical campaigns now require condition-copy refusal in both modes and verify no bound publication before that refusal, separate iterator/propagator invocation generations and exact root cleanup. Whole explain_implied_bound scan finds only theory_lra.cpp:1411 caller, whose local_bound_propagator overrides consume. Base doh printer has no retained caller: removed Go Output/io binding, default printer and its mirror checks, including unused source-driver stream binding. Retained typed evidence hook remains; nil evidence returns a qualified Go unsupported-profile guard, not a claim about C++ base output. Term-alias explanation test now checks four actual evidence deliveries; independent original-constraint proof/refusal/borrowed-consumer ownership checks remain. Uncalled non-strict monoid overloads, commented provide_evidence/bound_is_available apparatus and unused public j are explicit source exclusions; no adapters/ported-method credit. Source quirks retained: all-column paths ignore RHS, unique paths start at -RHS.X, RHS.Y unused; zero-coefficient division/source assertion and checked LAR driver stops remain literal. Native focused analyzer/propagator/explanation/row-dispatch/touched-row/original-driver groups89.994s, combined95.766s pass. Both LP vets and all64package compile gates pass in native/combined modes; final compile logs /mnt/oldrog/tmp/g3-lp-propagator-final-module-{native,debug}-compile.log. Source portcheck passes107ported/333partial/1620unported/5dead_deleted of2103units/677APIs. Whole-Go-file focused covered/total {\"debug\":{\"bound_propagator.go\":[118,132],\"driver_bound_propagation.go\":[76,146],\"lar_explanation.go\":[49,50],\"lar_propagate.go\":[31,33],\"lar_row_dispatch.go\":[37,40],\"row_bound_analyzer.go\":[218,261]},\"native\":{\"bound_propagator.go\":[118,132],\"driver_bound_propagation.go\":[117,146],\"lar_explanation.go\":[48,50],\"lar_propagate.go\":[29,33],\"lar_row_dispatch.go\":[35,40],\"row_bound_analyzer.go\":[209,261]}}. Remaining row branches primarily guard stable cleanup/sign/manager/iterator invariant errors and unavailable zero-divisor condition continuation; no fake failures/source repair. Checked original-driver coverage is lower because literal source assertions stop several cases early. This audit closes the three local units, not full LARSolver or containing SMT integration. LP inventory45ported/50partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates this correction; current focused profiles /mnt/oldrog/tmp/g3-lp-bound-analyzer-final-{native,debug}.cover;46-reference source audit /mnt/oldrog/tmp/g3-lp-bound-analyzer-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/breakpoint.h",
@@ -1896,7 +1923,7 @@
     },
     {
       "source": "src/util/lp/lp_bound_propagator.cpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/bound_propagator.go",
         "pkg/util/lp/bound_propagator_test.go"
@@ -1906,12 +1933,27 @@
         "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
         "TestLARBoundPropagatorPhysicalFailurePrefixes",
         "TestLARBoundPropagatorMappingAndOwnerGuards",
-        "TestLARBoundPropagatorLeavesHookInvocationOwned"
-      ]
+        "TestLARBoundPropagatorLeavesHookInvocationOwned",
+        "TestLARExplanationIndependentConstraintCombination",
+        "TestLARExplanationTermAliasAndOutput",
+        "TestLARExplanationConsumerRefusalPrefix",
+        "TestLPBoundPropagationActualSourceCases"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "base lp_bound_propagator::consume default doh printer"
+          ],
+          "reason": "Whole src explain_implied_bound scan finds sole live caller in theory_lra.cpp, whose local_bound_propagator overrides consume. Retained test/lp base instances propagate/print bounds without explaining them. Removed unused Go Output stream and printer/mirror tests; typed evidence override remains, nil evidence is a qualified unsupported Go-profile guard."
+        }
+      ],
+      "evidence": "Whole retained-source/ownership audit completes bound_analyzer_on_row.h and lp_bound_propagator.h/.cpp. Concrete exact row/pivot iterator classification, persistent missing-bound counters/current cursor, strict min/max endpoint selection, all/unique monoid limits, RHS copy and destruction, term-adjusted strongest bound insertion/replacement, virtual interest/evidence boundaries and current model getters are implemented. Source whole no-ignore46reference audit verifies live LAR tableau/pivot/term dispatch and seven original bound driver cases. Found/corrected real unique-u lifetime gap at bound_analyzer_on_row.h:244: numeric_traits<impq>::is_pos(u_coeff) implicitly constructs pair X from an owning scalar copy and Y=0; Go now owns/destroys that full-expression temporary before limit_j, or retains it for cleanup after refusal. Unique-l uses scalar is_pos directly. Existing pooled/direct physical campaigns now require condition-copy refusal in both modes and verify no bound publication before that refusal, separate iterator/propagator invocation generations and exact root cleanup. Whole explain_implied_bound scan finds only theory_lra.cpp:1411 caller, whose local_bound_propagator overrides consume. Base doh printer has no retained caller: removed Go Output/io binding, default printer and its mirror checks, including unused source-driver stream binding. Retained typed evidence hook remains; nil evidence returns a qualified Go unsupported-profile guard, not a claim about C++ base output. Term-alias explanation test now checks four actual evidence deliveries; independent original-constraint proof/refusal/borrowed-consumer ownership checks remain. Uncalled non-strict monoid overloads, commented provide_evidence/bound_is_available apparatus and unused public j are explicit source exclusions; no adapters/ported-method credit. Source quirks retained: all-column paths ignore RHS, unique paths start at -RHS.X, RHS.Y unused; zero-coefficient division/source assertion and checked LAR driver stops remain literal. Native focused analyzer/propagator/explanation/row-dispatch/touched-row/original-driver groups89.994s, combined95.766s pass. Both LP vets and all64package compile gates pass in native/combined modes; final compile logs /mnt/oldrog/tmp/g3-lp-propagator-final-module-{native,debug}-compile.log. Source portcheck passes107ported/333partial/1620unported/5dead_deleted of2103units/677APIs. Whole-Go-file focused covered/total {\"debug\":{\"bound_propagator.go\":[118,132],\"driver_bound_propagation.go\":[76,146],\"lar_explanation.go\":[49,50],\"lar_propagate.go\":[31,33],\"lar_row_dispatch.go\":[37,40],\"row_bound_analyzer.go\":[218,261]},\"native\":{\"bound_propagator.go\":[118,132],\"driver_bound_propagation.go\":[117,146],\"lar_explanation.go\":[48,50],\"lar_propagate.go\":[29,33],\"lar_row_dispatch.go\":[35,40],\"row_bound_analyzer.go\":[209,261]}}. Remaining row branches primarily guard stable cleanup/sign/manager/iterator invariant errors and unavailable zero-divisor condition continuation; no fake failures/source repair. Checked original-driver coverage is lower because literal source assertions stop several cases early. This audit closes the three local units, not full LARSolver or containing SMT integration. LP inventory45ported/50partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates this correction; current focused profiles /mnt/oldrog/tmp/g3-lp-bound-analyzer-final-{native,debug}.cover;46-reference source audit /mnt/oldrog/tmp/g3-lp-bound-analyzer-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/lp_bound_propagator.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/bound_propagator.go",
         "pkg/util/lp/bound_propagator_test.go"
@@ -1921,8 +1963,23 @@
         "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
         "TestLARBoundPropagatorPhysicalFailurePrefixes",
         "TestLARBoundPropagatorMappingAndOwnerGuards",
-        "TestLARBoundPropagatorLeavesHookInvocationOwned"
-      ]
+        "TestLARBoundPropagatorLeavesHookInvocationOwned",
+        "TestLARExplanationIndependentConstraintCombination",
+        "TestLARExplanationTermAliasAndOutput",
+        "TestLARExplanationConsumerRefusalPrefix",
+        "TestLPBoundPropagationActualSourceCases"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "base lp_bound_propagator::consume default doh printer"
+          ],
+          "reason": "Whole src explain_implied_bound scan finds sole live caller in theory_lra.cpp, whose local_bound_propagator overrides consume. Retained test/lp base instances propagate/print bounds without explaining them. Removed unused Go Output stream and printer/mirror tests; typed evidence override remains, nil evidence is a qualified unsupported Go-profile guard."
+        }
+      ],
+      "evidence": "Whole retained-source/ownership audit completes bound_analyzer_on_row.h and lp_bound_propagator.h/.cpp. Concrete exact row/pivot iterator classification, persistent missing-bound counters/current cursor, strict min/max endpoint selection, all/unique monoid limits, RHS copy and destruction, term-adjusted strongest bound insertion/replacement, virtual interest/evidence boundaries and current model getters are implemented. Source whole no-ignore46reference audit verifies live LAR tableau/pivot/term dispatch and seven original bound driver cases. Found/corrected real unique-u lifetime gap at bound_analyzer_on_row.h:244: numeric_traits<impq>::is_pos(u_coeff) implicitly constructs pair X from an owning scalar copy and Y=0; Go now owns/destroys that full-expression temporary before limit_j, or retains it for cleanup after refusal. Unique-l uses scalar is_pos directly. Existing pooled/direct physical campaigns now require condition-copy refusal in both modes and verify no bound publication before that refusal, separate iterator/propagator invocation generations and exact root cleanup. Whole explain_implied_bound scan finds only theory_lra.cpp:1411 caller, whose local_bound_propagator overrides consume. Base doh printer has no retained caller: removed Go Output/io binding, default printer and its mirror checks, including unused source-driver stream binding. Retained typed evidence hook remains; nil evidence returns a qualified Go unsupported-profile guard, not a claim about C++ base output. Term-alias explanation test now checks four actual evidence deliveries; independent original-constraint proof/refusal/borrowed-consumer ownership checks remain. Uncalled non-strict monoid overloads, commented provide_evidence/bound_is_available apparatus and unused public j are explicit source exclusions; no adapters/ported-method credit. Source quirks retained: all-column paths ignore RHS, unique paths start at -RHS.X, RHS.Y unused; zero-coefficient division/source assertion and checked LAR driver stops remain literal. Native focused analyzer/propagator/explanation/row-dispatch/touched-row/original-driver groups89.994s, combined95.766s pass. Both LP vets and all64package compile gates pass in native/combined modes; final compile logs /mnt/oldrog/tmp/g3-lp-propagator-final-module-{native,debug}-compile.log. Source portcheck passes107ported/333partial/1620unported/5dead_deleted of2103units/677APIs. Whole-Go-file focused covered/total {\"debug\":{\"bound_propagator.go\":[118,132],\"driver_bound_propagation.go\":[76,146],\"lar_explanation.go\":[49,50],\"lar_propagate.go\":[31,33],\"lar_row_dispatch.go\":[37,40],\"row_bound_analyzer.go\":[218,261]},\"native\":{\"bound_propagator.go\":[118,132],\"driver_bound_propagation.go\":[117,146],\"lar_explanation.go\":[48,50],\"lar_propagate.go\":[29,33],\"lar_row_dispatch.go\":[35,40],\"row_bound_analyzer.go\":[209,261]}}. Remaining row branches primarily guard stable cleanup/sign/manager/iterator invariant errors and unavailable zero-divisor condition continuation; no fake failures/source repair. Checked original-driver coverage is lower because literal source assertions stop several cases early. This audit closes the three local units, not full LARSolver or containing SMT integration. LP inventory45ported/50partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates this correction; current focused profiles /mnt/oldrog/tmp/g3-lp-bound-analyzer-final-{native,debug}.cover;46-reference source audit /mnt/oldrog/tmp/g3-lp-bound-analyzer-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/lp_core_solver_base.h",
@@ -7396,10 +7453,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 42,
-    "partial": 53,
+    "ported": 45,
     "reference_only": 10,
-    "dead_deleted": 3
+    "dead_deleted": 3,
+    "partial": 50
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -13076,5 +13133,69 @@
       229,
       260
     ]
+  },
+  "latest_bound_analyzer_propagator_audit": {
+    "source_units": [
+      "src/util/lp/bound_analyzer_on_row.h",
+      "src/util/lp/lp_bound_propagator.h",
+      "src/util/lp/lp_bound_propagator.cpp"
+    ],
+    "evidence": "Whole retained-source/ownership audit completes bound_analyzer_on_row.h and lp_bound_propagator.h/.cpp. Concrete exact row/pivot iterator classification, persistent missing-bound counters/current cursor, strict min/max endpoint selection, all/unique monoid limits, RHS copy and destruction, term-adjusted strongest bound insertion/replacement, virtual interest/evidence boundaries and current model getters are implemented. Source whole no-ignore46reference audit verifies live LAR tableau/pivot/term dispatch and seven original bound driver cases. Found/corrected real unique-u lifetime gap at bound_analyzer_on_row.h:244: numeric_traits<impq>::is_pos(u_coeff) implicitly constructs pair X from an owning scalar copy and Y=0; Go now owns/destroys that full-expression temporary before limit_j, or retains it for cleanup after refusal. Unique-l uses scalar is_pos directly. Existing pooled/direct physical campaigns now require condition-copy refusal in both modes and verify no bound publication before that refusal, separate iterator/propagator invocation generations and exact root cleanup. Whole explain_implied_bound scan finds only theory_lra.cpp:1411 caller, whose local_bound_propagator overrides consume. Base doh printer has no retained caller: removed Go Output/io binding, default printer and its mirror checks, including unused source-driver stream binding. Retained typed evidence hook remains; nil evidence returns a qualified Go unsupported-profile guard, not a claim about C++ base output. Term-alias explanation test now checks four actual evidence deliveries; independent original-constraint proof/refusal/borrowed-consumer ownership checks remain. Uncalled non-strict monoid overloads, commented provide_evidence/bound_is_available apparatus and unused public j are explicit source exclusions; no adapters/ported-method credit. Source quirks retained: all-column paths ignore RHS, unique paths start at -RHS.X, RHS.Y unused; zero-coefficient division/source assertion and checked LAR driver stops remain literal. Native focused analyzer/propagator/explanation/row-dispatch/touched-row/original-driver groups89.994s, combined95.766s pass. Both LP vets and all64package compile gates pass in native/combined modes; final compile logs /mnt/oldrog/tmp/g3-lp-propagator-final-module-{native,debug}-compile.log. Source portcheck passes107ported/333partial/1620unported/5dead_deleted of2103units/677APIs. Whole-Go-file focused covered/total {\"debug\":{\"bound_propagator.go\":[118,132],\"driver_bound_propagation.go\":[76,146],\"lar_explanation.go\":[49,50],\"lar_propagate.go\":[31,33],\"lar_row_dispatch.go\":[37,40],\"row_bound_analyzer.go\":[218,261]},\"native\":{\"bound_propagator.go\":[118,132],\"driver_bound_propagation.go\":[117,146],\"lar_explanation.go\":[48,50],\"lar_propagate.go\":[29,33],\"lar_row_dispatch.go\":[35,40],\"row_bound_analyzer.go\":[209,261]}}. Remaining row branches primarily guard stable cleanup/sign/manager/iterator invariant errors and unavailable zero-divisor condition continuation; no fake failures/source repair. Checked original-driver coverage is lower because literal source assertions stop several cases early. This audit closes the three local units, not full LARSolver or containing SMT integration. LP inventory45ported/50partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates this correction; current focused profiles /mnt/oldrog/tmp/g3-lp-bound-analyzer-final-{native,debug}.cover;46-reference source audit /mnt/oldrog/tmp/g3-lp-bound-analyzer-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
+    "focused_coverage": {
+      "native": {
+        "bound_propagator.go": [
+          118,
+          132
+        ],
+        "driver_bound_propagation.go": [
+          117,
+          146
+        ],
+        "lar_explanation.go": [
+          48,
+          50
+        ],
+        "lar_propagate.go": [
+          29,
+          33
+        ],
+        "lar_row_dispatch.go": [
+          35,
+          40
+        ],
+        "row_bound_analyzer.go": [
+          209,
+          261
+        ]
+      },
+      "debug": {
+        "bound_propagator.go": [
+          118,
+          132
+        ],
+        "driver_bound_propagation.go": [
+          76,
+          146
+        ],
+        "lar_explanation.go": [
+          49,
+          50
+        ],
+        "lar_propagate.go": [
+          31,
+          33
+        ],
+        "lar_row_dispatch.go": [
+          37,
+          40
+        ],
+        "row_bound_analyzer.go": [
+          218,
+          261
+        ]
+      }
+    },
+    "native_seconds": 89.994,
+    "combined_debug_checked_seconds": 95.766
   }
 }

@@ -1,7 +1,6 @@
 package lp
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"math/big"
@@ -145,16 +144,16 @@ func TestLARExplanationTermAliasAndOutput(t *testing.T) {
 	s, term := lpDispatchModel(t, h, false, "2", "-3")
 	p := s.NewBoundPropagator()
 	h.must(s.CalculateImpliedBoundsForRow(0, p))
-	var output bytes.Buffer
-	p.Output = &output
+	consumer := &lpExplanationCollector{}
+	p.Evidence = consumer
 	for _, b := range p.FoundBounds {
 		if b.Column != term {
 			t.Fatal("term alias missing")
 		}
 		h.must(s.ExplainImpliedBound(b, p))
 	}
-	if output.String() != strings.Repeat("doh\n", 4) {
-		t.Fatal("source default consume transport", output.String())
+	if len(consumer.witnesses) != 4 || len(consumer.values) != 4 {
+		t.Fatal("term explanation evidence", consumer.witnesses)
 	}
 	h.must(p.Close())
 	h.must(s.Close())
@@ -188,9 +187,9 @@ func TestLARExplanationConsumerRefusalPrefix(t *testing.T) {
 	}
 	h := newLPPairHarness(t)
 	f := lpNewExplanationFixture(t, h, 7)
-	f.p.Output = lpRefusingWriter{failure}
-	if err := f.s.ExplainImpliedBound(f.p.FoundBounds[0], f.p); !errors.Is(err, failure) {
-		t.Fatal("default writer refusal", err)
+	// No retained source caller explains a bound without an evidence override.
+	if err := f.s.ExplainImpliedBound(f.p.FoundBounds[0], f.p); !errors.Is(err, ErrBounds) {
+		t.Fatal("missing evidence hook guard", err)
 	}
 	h.must(f.s.Close())
 	h.must(f.p.Close())
