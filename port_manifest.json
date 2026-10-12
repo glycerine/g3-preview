@@ -112637,7 +112637,7 @@
       "path": "src/util/array_map.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/ufbv/rewrite_cache.go",
         "pkg/tactic/ufbv/rewrite_cache_test.go",
@@ -112648,7 +112648,8 @@
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
         "TestRewriteCacheSourceTimestampWrap",
         "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
-        "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
+        "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
+        "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"
       ],
       "conditionals": [
         {
@@ -112679,7 +112680,7 @@
       "methods": [
         {
           "name": "concrete UFBV expr-to-(expr,bool) rewrite cache: contains, get, insert, reset and destruction",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_cache.go",
           "tests": [
             "TestRewriteCacheSourceLazyResetAndReferenceOrder",
@@ -112687,16 +112688,13 @@
           ]
         },
         {
-          "name": "erase, flush and finalize have no retained UFBV call site",
-          "status": "dead_deleted"
-        },
-        {
           "name": "concrete cache contains/get/insert use in reverse UFBV child traversal and cycle detection",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_traversal.go",
           "tests": [
             "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
-            "TestRewriteTraversalSourceCycleCacheUsesActualTodo"
+            "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
+            "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"
           ]
         }
       ],
@@ -112704,7 +112702,7 @@
         "The sole production specialization is array_map<expr*, pair<expr*,bool>,plugin> in ufbv_rewriter. The plugin increments the expression key then expression value before a replacement decrements the old key then value. Reset advances a timestamp without releasing stale entries; replacement, timestamp wrap, and destruction release them."
       ],
       "deviations": [
-        "A Go map keyed by AST ID replaces the source optional-entry vector. The concrete cache now runs in the selected UFBV child visitor; the enclosing rewrite loop remains open. Unused erase/flush/finalize and the counters needed only by flush are excluded; no generic array_map adapter is added."
+        "A Go map keyed by AST ID replaces the source optional-entry vector. The concrete cache runs through the retained UFBV rewrite loop, including reverse child visits, cycle detection, reset, replacement and owner close. Explicit erase/flush/finalize and counters needed only by unused flush are excluded; timestamp-wrap and destructor cleanup remain live. No generic array_map adapter is added."
       ]
     },
     {
