@@ -118478,7 +118478,8 @@
         "CMake source enumeration and PYG registration are build inputs, not retained-consumer roots. Underlying algorithms and lp_params.pyg retain their independent partial audits.",
         "Native and combined module compile gates passed after recent code changes; native full checkpoint ea1b46ec is now running. This build-file classification does not claim whole-LP completion.",
         "Native build entry is pkg/go.mod. The manifest target field accepts Go source files only, so module/build metadata is recorded here rather than as a synthetic .go forwarding target."
-      ]
+      ],
+      "retained_source_audit_evidence": "Build-only source list: Go package files and go.mod replace CMake source registration. It contains no LP runtime algorithm or retained test behavior."
     },
     {
       "path": "src/util/lp/binary_heap_priority_queue.h",
@@ -119646,7 +119647,8 @@
       ],
       "deviations": [
         "Whole retained-source name scan finds no caller of lp_core_solver_base::pretty_print. Its definition is the only construction of core_solver_pretty_printer outside explicit-instantiation declarations. Includes, friendship and explicit-instantiation lines are not retained source consumers. Entire pretty-printer closure is intentionally omitted from Go under AGENTS.md; C++ reference files stay intact. This is dead-code exclusion, not algorithm implementation or test coverage."
-      ]
+      ],
+      "retained_source_audit_evidence": "Dead diagnostic class declaration: whole-src scan finds no retained construction or print call. Its only project entry is lp_core_solver_base::pretty_print, which has explicit template emissions but no retained caller; header includes and friend declarations do not make it live."
     },
     {
       "path": "src/util/lp/core_solver_pretty_printer.hpp",
@@ -119683,7 +119685,8 @@
       ],
       "deviations": [
         "Whole retained-source name scan finds no caller of lp_core_solver_base::pretty_print. Its definition is the only construction of core_solver_pretty_printer outside explicit-instantiation declarations. Includes, friendship and explicit-instantiation lines are not retained source consumers. Entire pretty-printer closure is intentionally omitted from Go under AGENTS.md; C++ reference files stay intact. This is dead-code exclusion, not algorithm implementation or test coverage."
-      ]
+      ],
+      "retained_source_audit_evidence": "Dead diagnostic bodies: the only entry is uncalled lp_core_solver_base::pretty_print. No retained solver, CLI, SMT or test invokes the printer; no Go adapter for its dormant formatting is needed."
     },
     {
       "path": "src/util/lp/core_solver_pretty_printer_instances.cpp",
@@ -119706,7 +119709,8 @@
       ],
       "deviations": [
         "Whole retained-source name scan finds no caller of lp_core_solver_base::pretty_print. Its definition is the only construction of core_solver_pretty_printer outside explicit-instantiation declarations. Includes, friendship and explicit-instantiation lines are not retained source consumers. Entire pretty-printer closure is intentionally omitted from Go under AGENTS.md; C++ reference files stay intact. This is dead-code exclusion, not algorithm implementation or test coverage."
-      ]
+      ],
+      "retained_source_audit_evidence": "Explicit constructor/print/destructor emissions for float, rational and pair pretty-printer forms have no retained call root. The source defines no independent runtime algorithm; the uncalled pretty_print chain is excluded."
     },
     {
       "path": "src/util/lp/dense_matrix.h",
@@ -119965,7 +119969,8 @@
       "deviations": [
         "Explicit dense-matrix instantiation declarations under Z3DEBUG only; no algorithm/object definitions. Retained concrete float debug consumers live in dense_matrix.hpp/matrix.hpp ports. Rational template declarations alone do not create live roots.",
         "No Go template-instantiation adapter or source consumer was added merely to mirror C++ linker declarations."
-      ]
+      ],
+      "retained_source_audit_evidence": "Z3DEBUG-only explicit template emissions, with no independent method body. Reached float dense construction, multiplication, left/right application and debug diagnostics are implemented in the paired dense_matrix.h/.hpp Go targets and tested by focused checked dense-matrix and CLI LU/swap suites. Unused rational emissions alone do not create retained consumers."
     },
     {
       "path": "src/util/lp/eta_matrix.h",
@@ -122746,7 +122751,8 @@
       "deviations": [
         "Include-only translation unit for lar_core_solver.hpp; no explicit instantiation or executable definition. Underlying LAR core source and ownership audits remain partial.",
         "No Go template-instantiation adapter or source consumer was added merely to mirror C++ linker declarations."
-      ]
+      ],
+      "retained_source_audit_evidence": "Include-only translation unit: it includes lar_core_solver.hpp and declares no explicit instantiation, definition, or runtime entry. Reached LAR methods are implemented and tested under lar_core_solver.h/.hpp."
     },
     {
       "path": "src/util/lp/lar_solution_signature.h",
@@ -122786,7 +122792,8 @@
       "deviations": [
         "Native uint32 map replaces unordered_map; preparation traverses ascending keys for reproducible RNG/error prefixes. C++ imposes no insertion-order contract. Exact and floating concrete consumers share only bound-selection control flow. Full signature/presolve/trace catch-up and LAR Solve remain open; no whole-unit promotion.",
         "Whole source alias audit: lar_solution_signature.h has no project algorithm, only an STL unordered_map typedef. Native map[uint32]NonBasicColumnValuePosition replaces it without porting C++ containers. Whole-src references are one local declaration lar_core_solver.hpp287 and borrowed extraction/preparation/solve methods; no retained source signature copy requiring independent map clone. Extraction clears/reuses native map and makes nil map before stores. No source insertion-order contract; existing ascending-key preparation deliberately gives reproducible RNG/error prefixes instead of unspecified C++ bucket order. Full signature presolve/trace/Solve remain obligations of lar_core_solver.h/.hpp, independently partial; earlier note mixed consumer completion with this alias-only unit. Existing actual pair/double extraction/preparation/LU and physical ownership tests provide consumer evidence, not an STL port."
-      ]
+      ],
+      "retained_source_audit_evidence": "Platform replacement of a typedef only: source unordered_map<unsigned, non_basic_column_value_position> becomes concrete Go LARSolutionSignature map[uint32]NonBasicColumnValuePosition. Actual extraction, preparation and signature-guided exact/floating solves use this map and have named tests; no STL adapter is ported."
     },
     {
       "path": "src/util/lp/lar_solver.h",
@@ -132086,7 +132093,8 @@
       "deviations": [
         "Two explicit vectors_are_equal instantiation declarations only; no algorithm definitions. Retained concrete float vector predicate is implemented in permutation_float.go; declarations do not establish rational runtime consumers.",
         "No Go template-instantiation adapter or source consumer was added merely to mirror C++ linker declarations."
-      ]
+      ],
+      "retained_source_audit_evidence": "Explicit vectors_are_equal<double/mpq> emissions only; their source body is in lp_settings.hpp. Reached debug vector comparisons in the retained CLI permutation/LU checks use concrete Go slice/value comparisons and tests. The emission file has no independent algorithm to port."
     },
     {
       "path": "src/util/lp/lp_solver.h",
@@ -135513,7 +135521,8 @@
       "deviations": [
         "Explicit matrix print/equality instantiation declarations under Z3DEBUG only; no algorithm/object definitions. Actual float debug consumers remain tracked by matrix.hpp; rational declarations are not live roots.",
         "No Go template-instantiation adapter or source consumer was added merely to mirror C++ linker declarations."
-      ]
+      ],
+      "retained_source_audit_evidence": "Z3DEBUG-only explicit print_matrix/is_equal emissions, with no independent method body. Reached float/pair/rational debug matrix operations are implemented and tested in the paired matrix.h/.hpp and dense-matrix Go code; unused emissions do not add callers."
     },
     {
       "path": "src/util/lp/mps_reader.h",
@@ -174506,5 +174515,21 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_native_checkpoint": "17ecadb7"
+  },
+  "latest_lp_exclusion_audit": {
+    "source_units": [
+      "src/util/lp/CMakeLists.txt",
+      "src/util/lp/core_solver_pretty_printer.h",
+      "src/util/lp/core_solver_pretty_printer.hpp",
+      "src/util/lp/core_solver_pretty_printer_instances.cpp",
+      "src/util/lp/dense_matrix_instances.cpp",
+      "src/util/lp/lar_core_solver_instances.cpp",
+      "src/util/lp/lp_settings_instances.cpp",
+      "src/util/lp/matrix_instances.cpp",
+      "src/util/lp/lar_solution_signature.h"
+    ],
+    "scope": "Whole LP exclusion audit records each build replacement, unused pretty-printer chain, template-emission-only source, include-only source and concrete map-alias replacement. Retained implementations and tests remain credited to defining source units.",
+    "cpu_affinity": "8-16",
+    "verification": "Whole-src symbol/use scan, source body inspection, existing focused checked matrix/signature and CLI tests; portcheck remains required."
   }
 }
