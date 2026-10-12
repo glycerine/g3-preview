@@ -39506,3 +39506,14 @@ exercise wrong-kind fallback, default text, replacement/reset invalidation,
 provider lifetime after context close, and source C-string sentry order. That
 specific method row moves from partial to ported; `params.cpp` remains partial
 for its other methods and ownership paths.
+
+### Retained AST `compare_arrays` specialization
+
+`src/util/util.h:307-315` supplies ordered element comparison to AST
+canonical-table declaration-domain and application-argument equality at
+`src/ast/ast.cpp:451-463`. The existing Go table reads its concrete stored
+node handles in order through `equalPayload`; no generic array helper is
+needed. A new source-focused test confirms repeated domains/applications
+intern together while reordered domain sorts and application arguments remain
+distinct. This selected `util.h` method is credited as ported; quantifier
+array uses and the rest of the header remain under their separate audit.

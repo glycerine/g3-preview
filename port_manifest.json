@@ -165282,7 +165282,8 @@
         "pkg/util/memory/allocator_io.go",
         "pkg/util/diagnostic/util_small_object_allocator.go",
         "pkg/util/diagnostic/util_small_object_allocator_stream.go",
-        "pkg/util/memory/runtime.go"
+        "pkg/util/memory/runtime.go",
+        "pkg/ast/ast_table_hash.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -165306,7 +165307,8 @@
         "TestVerboseContextAllocatorEveryOutputRefusal",
         "TestVerboseContextClosedLevelReachedBeforeOutput",
         "TestVerboseContextWarmOutputAndNullAdapter",
-        "TestRuntimeSourceMegabytesToBytesSaturatesAtSizeT"
+        "TestRuntimeSourceMegabytesToBytesSaturatesAtSizeT",
+        "TestASTSourceCompareArraysDeclarationAndApplicationOrder"
       ],
       "conditionals": [
         {
@@ -165575,12 +165577,21 @@
           "tests": [
             "TestRuntimeSourceMegabytesToBytesSaturatesAtSizeT"
           ]
+        },
+        {
+          "name": "compare_arrays concrete AST declaration domain and application argument identity/order (util.h:307-315; ast.cpp:451-463)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_table_hash.go",
+          "tests": [
+            "TestASTSourceCompareArraysDeclarationAndApplicationOrder"
+          ]
         }
       ],
       "ownership": [
         "Random state owner-local, shuffle borrows caller sequence. Other util methods unported.",
         "The escaped leaf borrows nullable input synchronously and writes to a caller-owned io.Writer or returns a caller-owned string. Standard library builders replace C++ vector and stream storage.",
-        "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events."
+        "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events.",
+        "AST canonical-table comparison reads borrowed concrete declaration-domain and application-argument storage in order; Go node handles preserve pointer identity and native table storage. No standalone C++ array template is ported."
       ],
       "deviations": [
         "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound. C++ ostream badbit, exception flags, and formatting state are standard-library internals rather than project escaped behavior and are excluded; Go Write reports io.Writer errors.",
