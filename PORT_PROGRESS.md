@@ -39482,3 +39482,14 @@ its region-backed destruction order. This identifies realclosure as the next
 consumer prerequisite for that header, while the current Go `pkg/math/realclosure`
 contains only parameter catalog code and source mirrors. Other partial util
 units with already ported Go callers can advance independently of this table.
+
+### Signed numerical symbol stream insertion
+
+The retained SMT-parameter display calls `GlobalParamsService.AppendSymbolTo`
+for the `m_logic` symbol. `symbol.h:97-110` sends `UNBOXINT`, which casts the
+tagged value to signed `int`, into the source ostream. The Go insertion now
+uses `AppendInt32(int32(value))` so decimal high-bit symbols and stream
+`showpos`/hex flags match that source operation. A focused test exercises null,
+borrowed string, positive numeric, `UINT32_MAX` as `-1`, and hex `ffffffff`.
+Native and checked profiles pass on CPUs 8–16. Wider symbol stream assertion
+and output-failure transport remain partial.

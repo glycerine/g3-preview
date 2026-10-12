@@ -529,10 +529,16 @@ func TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags(t
 	paramsMust(t, out.AppendByte('|'))
 	paramsMust(t, out.SetShowPos(true))
 	paramsMust(t, g.AppendSymbolTo(out, usymbol.Numerical(13)))
+	paramsMust(t, out.AppendByte('|'))
+	paramsMust(t, g.AppendSymbolTo(out, usymbol.Numerical(^uint32(0))))
+	paramsMust(t, out.SetShowPos(false))
+	paramsMust(t, out.AppendByte('|'))
+	paramsMust(t, out.SetIntegerBase(16))
+	paramsMust(t, g.AppendSymbolTo(out, usymbol.Numerical(^uint32(0))))
 	text, e := out.String()
 	paramsMust(t, e)
-	if text != "null|QF_LIA|k!13" {
-		t.Fatal("literal null/C-string/unsigned numeric chain", text)
+	if text != "null|QF_LIA|k!+13|k!-1|k!ffffffff" {
+		t.Fatal("literal null/C-string/signed numeric stream chain", text)
 	}
 }
 

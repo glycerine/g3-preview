@@ -30,5 +30,7 @@ func (g *GlobalParamsService) AppendSymbolTo(out *utext.NumericTextStream, s usy
 	if e = out.AppendCString("k!"); e != nil {
 		return e
 	}
-	return out.AppendUint32(s.Value)
+	// UNBOXINT in tptr.h casts the unboxed word to int before ostream
+	// insertion, so numeric flags and the signed 32-bit boundary apply.
+	return out.AppendInt32(int32(s.Value))
 }
