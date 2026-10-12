@@ -221,7 +221,7 @@ func TestSourceBoolVectorOracle(t *testing.T) {
 }
 func TestOwnershipAndRemainingMethods(t *testing.T) {
 	a := New(100)
-	if !a.Empty() || a.CapacityWords() != 4 {
+	if !a.Empty() || len(a.words) != 4 {
 		t.Fatal("reserve constructor")
 	}
 	a.Resize(35, true)
@@ -265,6 +265,7 @@ func TestOwnershipAndRemainingMethods(t *testing.T) {
 		t.Fatal("contains false")
 	}
 }
+
 // Hash values recorded from actual C++ string_hash over {1,0,0,0,3,0,0,0}.
 func TestSourceHashByteRounding(t *testing.T) {
 	var want []uint32
@@ -292,27 +293,21 @@ func TestAndEmptyAndLonger(t *testing.T) {
 	a.Or(empty)
 	check(t, a, 40)
 }
-func TestGrowthCapacityAndStaleBits(t *testing.T) {
+func TestNativeGrowthAndStaleBits(t *testing.T) {
 	v := new(Vector)
 	for i := uint32(0); i < 129; i++ {
 		v.Push(true)
-		want := uint32(2)
-		if i >= 64 {
-			want = 3
-		}
-		if i >= 96 {
-			want = 5
-		}
-		if v.CapacityWords() != want {
-			t.Fatal(i, v.CapacityWords(), want)
+		want := numWords(i + 1)
+		if uint32(len(v.words)) != want {
+			t.Fatal(i, len(v.words), want)
 		}
 	}
 	v.Shrink(1)
 	v.Resize(129, false)
 	check(t, v, 129, 0)
 	v.Reset()
-	if v.CapacityWords() != 5 {
-		t.Fatal("reset capacity")
+	if len(v.words) != 5 {
+		t.Fatal("reset retained native words")
 	}
 }
 func TestBoundedOperationOracle(t *testing.T) {

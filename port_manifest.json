@@ -110079,7 +110079,7 @@
         "TestUintSetSourceTst3",
         "TestUintSetSourceTst4",
         "TestUintSetSourceTst5PrintedExpectations",
-        "TestUintSetSourcePaddingCapacityAndCopies",
+        "TestUintSetSourcePaddingNativeStorageAndCopies",
         "TestUintSetTraversal",
         "TestUintSetWeightedHashWrap",
         "TestUintSetIndependentBoundedOracle",
@@ -110286,7 +110286,7 @@
         "Swap exchanges actual block and concrete physical-provider provenance without allocation, copy or charge transfer; cold wrappers retain original Budgets, moved raw growth/free use the adopted provider. Cached iterator Value reads no owner; scan_idx debug invariant precedes reached membership/word reads. Both providers must outlive exchanged backing."
       ],
       "deviations": [
-        "Invalid extent/capacity overflow diagnosed before growth; source get_max_elem would wrap.",
+        "Invalid source uint32 iteration extent diagnosed before native slice growth; source get_max_elem would wrap.",
         "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered.",
         "Selected explicit-provider/default-enabled assertion profile; process-global assertion binding, endangered wrapped extents, native ostream failbit/libc rand profile and legacy bitset allocation topology remain open. New random campaign executes source assertion expressions with an independent deterministic stream, not the exact libc sequence; broad test driver remains partial."
       ]
@@ -111566,7 +111566,7 @@
         "TestOwnershipAndRemainingMethods",
         "TestSourceHashByteRounding",
         "TestAndEmptyAndLonger",
-        "TestGrowthCapacityAndStaleBits",
+        "TestNativeGrowthAndStaleBits",
         "TestBoundedOperationOracle",
         "TestWarmOperationsDoNotAllocate"
       ],
@@ -111617,7 +111617,7 @@
             "TestOwnershipAndRemainingMethods",
             "TestSourceHashByteRounding",
             "TestAndEmptyAndLonger",
-            "TestGrowthCapacityAndStaleBits",
+            "TestNativeGrowthAndStaleBits",
             "TestBoundedOperationOracle",
             "TestWarmOperationsDoNotAllocate"
           ]
@@ -111627,7 +111627,7 @@
         "bitset.Vector owns native uint32 word storage. New zero-initializes reserved words and FromWords copies source words; Clone copies all capacity words, Assign preserves source-null early return, grows only when needed, and copies the source capacity words. Swap transfers word storage; Reset clears all backing words while retaining capacity. Growth and shrink preserve the source stale-bit behavior. Hash reads floor(size/8) bytes in source little-endian order."
       ],
       "deviations": [
-        "Native Go slices replace C++ memory-manager allocation and C++ ostream state. Bounds and impossible extent overflow are diagnosed with Go panics. The active descending display and packed-word algorithms are retained; inactive #else display is excluded. C++ optional TRACE output and process-global assertion diagnostics belong to their diagnostic units. fr_bit_vector has no source caller, so its earlier test-only Go FastReset translation was removed. AST-specific mark variants are credited to obj_mark.h, not to this bit-vector unit."
+        "Native Go slices replace C++ memory-manager allocation, source word-capacity scheduling and C++ ostream state. Bounds and impossible extent overflow are diagnosed with Go panics. The active descending display and packed-word algorithms are retained; inactive #else display is excluded. C++ optional TRACE output and process-global assertion diagnostics belong to their diagnostic units. fr_bit_vector has no source caller, so its earlier test-only Go FastReset translation was removed. AST-specific mark variants are credited to obj_mark.h, not to this bit-vector unit."
       ]
     },
     {
@@ -111650,7 +111650,7 @@
         "TestOwnershipAndRemainingMethods",
         "TestSourceHashByteRounding",
         "TestAndEmptyAndLonger",
-        "TestGrowthCapacityAndStaleBits",
+        "TestNativeGrowthAndStaleBits",
         "TestBoundedOperationOracle",
         "TestWarmOperationsDoNotAllocate"
       ],
@@ -111721,7 +111721,7 @@
             "TestOwnershipAndRemainingMethods",
             "TestSourceHashByteRounding",
             "TestAndEmptyAndLonger",
-            "TestGrowthCapacityAndStaleBits",
+            "TestNativeGrowthAndStaleBits",
             "TestBoundedOperationOracle",
             "TestWarmOperationsDoNotAllocate"
           ]
@@ -111731,7 +111731,7 @@
         "bitset.Vector owns native uint32 word storage. New zero-initializes reserved words and FromWords copies source words; Clone copies all capacity words, Assign preserves source-null early return, grows only when needed, and copies the source capacity words. Swap transfers word storage; Reset clears all backing words while retaining capacity. Growth and shrink preserve the source stale-bit behavior. Hash reads floor(size/8) bytes in source little-endian order."
       ],
       "deviations": [
-        "Native Go slices replace C++ memory-manager allocation and C++ ostream state. Bounds and impossible extent overflow are diagnosed with Go panics. The active descending display and packed-word algorithms are retained; inactive #else display is excluded. C++ optional TRACE output and process-global assertion diagnostics belong to their diagnostic units. fr_bit_vector has no source caller, so its earlier test-only Go FastReset translation was removed. AST-specific mark variants are credited to obj_mark.h, not to this bit-vector unit."
+        "Native Go slices replace C++ memory-manager allocation, source word-capacity scheduling and C++ ostream state. Bounds and impossible extent overflow are diagnosed with Go panics. The active descending display and packed-word algorithms are retained; inactive #else display is excluded. C++ optional TRACE output and process-global assertion diagnostics belong to their diagnostic units. fr_bit_vector has no source caller, so its earlier test-only Go FastReset translation was removed. AST-specific mark variants are credited to obj_mark.h, not to this bit-vector unit."
       ]
     },
     {
@@ -164958,7 +164958,7 @@
         "TestUintSetSourceTst4",
         "TestUintSetSourceTst5PrintedExpectations",
         "TestUintSetSparseHighWordDisplay",
-        "TestUintSetSourcePaddingCapacityAndCopies",
+        "TestUintSetSourcePaddingNativeStorageAndCopies",
         "TestUintSetTraversal",
         "TestUintSetWeightedHashWrap",
         "TestUintSetIndependentBoundedOracle",
@@ -165023,7 +165023,7 @@
             "TestUintSetSourceTst3",
             "TestUintSetSourceTst4",
             "TestUintSetSourceTst5PrintedExpectations",
-            "TestUintSetSourcePaddingCapacityAndCopies",
+            "TestUintSetSourcePaddingNativeStorageAndCopies",
             "TestUintSetTraversal",
             "TestUintSetWeightedHashWrap",
             "TestUintSetIndependentBoundedOracle",
@@ -165044,7 +165044,7 @@
             "TestUintSetSourceTst3",
             "TestUintSetSourceTst4",
             "TestUintSetSourceTst5PrintedExpectations",
-            "TestUintSetSourcePaddingCapacityAndCopies",
+            "TestUintSetSourcePaddingNativeStorageAndCopies",
             "TestUintSetTraversal",
             "TestUintSetWeightedHashWrap",
             "TestUintSetIndependentBoundedOracle",
@@ -165065,7 +165065,7 @@
             "TestUintSetSourceTst3",
             "TestUintSetSourceTst4",
             "TestUintSetSourceTst5PrintedExpectations",
-            "TestUintSetSourcePaddingCapacityAndCopies",
+            "TestUintSetSourcePaddingNativeStorageAndCopies",
             "TestUintSetTraversal",
             "TestUintSetWeightedHashWrap",
             "TestUintSetIndependentBoundedOracle",
@@ -165086,7 +165086,7 @@
             "TestUintSetSourceTst3",
             "TestUintSetSourceTst4",
             "TestUintSetSourceTst5PrintedExpectations",
-            "TestUintSetSourcePaddingCapacityAndCopies",
+            "TestUintSetSourcePaddingNativeStorageAndCopies",
             "TestUintSetTraversal",
             "TestUintSetWeightedHashWrap",
             "TestUintSetIndependentBoundedOracle",
@@ -165107,7 +165107,7 @@
             "TestUintSetSourceTst3",
             "TestUintSetSourceTst4",
             "TestUintSetSourceTst5PrintedExpectations",
-            "TestUintSetSourcePaddingCapacityAndCopies",
+            "TestUintSetSourcePaddingNativeStorageAndCopies",
             "TestUintSetTraversal",
             "TestUintSetWeightedHashWrap",
             "TestUintSetIndependentBoundedOracle",
@@ -165139,7 +165139,7 @@
         "bitset.UintSet owns native uint32 word storage. Clone and Assign copy logical words without aliasing; Assign retains source capacity, Reset retains receiver capacity, Swap exchanges backing slices, and Close releases the slice. The concrete max_cliques owner keeps its own typed uint32 slices."
       ],
       "deviations": [
-        "Native Go slices replace C++ vector allocation; invalid extents and capacity overflow are diagnosed before growth. Ascending ForEach replaces the copied C++ iterator and direct Equal/Hash methods replace its functor wrappers. String emits the same ordered text through Go string construction, scanning occupied words. C++ ostream flags, process assertion wiring, libc rand in the source test driver, and the test-only uint_set-key map are outside this live utility algorithm. The deleted Runtime/Block and UintSetMap translations receive no port credit."
+        "Native Go slices replace C++ vector allocation and capacity scheduling; invalid source uint32 iteration extents are diagnosed before growth. Ascending ForEach replaces the copied C++ iterator and direct Equal/Hash methods replace its functor wrappers. String emits the same ordered text through Go string construction, scanning occupied words. C++ ostream flags, process assertion wiring, libc rand in the source test driver, and the test-only uint_set-key map are outside this live utility algorithm. The deleted Runtime/Block and UintSetMap translations receive no port credit."
       ]
     },
     {

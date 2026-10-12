@@ -39794,3 +39794,15 @@ string argument, a literal percent sign, caller argument preservation,
 truncation and disabled emission. Other C format specifiers, the separate
 `format2ostream` exception constructor, and direct shell/AST warning consumers
 remain open; both warning source units stay partial.
+
+### Native bit-vector word growth
+
+The retained variable-width `bit_vector` and `uint_set` algorithms already
+used typed Go word slices, but their backing growth still followed copied C++
+vector capacity formulas. Both now extend slices with Go `append`. The unused
+`CapacityWords` adapters and tests for exact spare capacity are removed.
+Bit order, stale-bit clearing, `uint_set` union's extra logical word, copy
+independence, iteration and source uint32 endpoint guards remain covered by
+focused native and debug tests. The manifest keeps both source units ported
+for their project algorithms and records native storage as the platform
+replacement for vector capacity and allocation mechanics.

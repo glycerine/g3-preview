@@ -11,23 +11,6 @@ import (
 // assigning the Go struct aliases storage. No Go map chooses set iteration order.
 type UintSet struct{ words []uint32 }
 
-func (s *UintSet) CapacityWords() uint32 { return uint32(cap(s.words)) }
-func (s *UintSet) expand() {
-	old := s.CapacityWords()
-	next := uint32(2)
-	if old != 0 {
-		next = (3*old + 1) >> 1
-		if next <= old || uint64(next)*4+8 > uint64(^uint32(0)) {
-			panic("bitset: source vector capacity overflow")
-		}
-	}
-	if uint64(next) > uint64(^uint(0)>>1)/4 {
-		panic("bitset: vector capacity exceeds platform size")
-	}
-	words := make([]uint32, len(s.words), next)
-	copy(words, s.words)
-	s.words = words
-}
 func (s *UintSet) resize(n uint32) {
 	// get_max_elem is a uint32 exclusive iteration bound. Source overflow at
 	// 2^27 words would hide members from iteration/display; diagnose the size.
@@ -39,44 +22,20 @@ func (s *UintSet) resize(n uint32) {
 		s.words = s.words[:n]
 		return
 	}
-	for n > s.CapacityWords() {
-		s.expand()
-	}
-	s.words = s.words[:n]
-	clear(s.words[old:])
-}
-func (s *UintSet) pushWord(w uint32) {
-	n := uint32(len(s.words))
-	if n == s.CapacityWords() {
-		s.expand()
-	}
-	s.words = s.words[:n+1]
-	s.words[n] = w
+	s.words = append(s.words, make([]uint32, int(n-old))...)
 }
 
-// Clone follows the uint_set copy constructor's push_back loop, which derives
-// capacity from logical source words rather than copying spare source capacity.
+// Clone copies only logical words into independently owned native storage.
 func (s *UintSet) Clone() *UintSet {
-	r := new(UintSet)
-	for _, w := range s.words {
-		r.pushWord(w)
-	}
-	return r
+	return &UintSet{words: append([]uint32(nil), s.words...)}
 }
 
-// Assign translates implicitly generated uint_set assignment through vector's
-// copy assignment, including allocation at the source's capacity.
+// Assign copies logical words into independently owned native storage.
 func (s *UintSet) Assign(src *UintSet) {
 	if s == src {
 		return
 	}
-	if cap(src.words) == 0 {
-		s.words = nil
-		return
-	}
-	words := make([]uint32, len(src.words), cap(src.words))
-	copy(words, src.words)
-	s.words = words
+	s.words = append([]uint32(nil), src.words...)
 }
 func (s *UintSet) Swap(other *UintSet) { s.words, other.words = other.words, s.words }
 

@@ -170,36 +170,36 @@ func TestUintSetSparseHighWordDisplay(t *testing.T) {
 	}
 }
 
-func TestUintSetSourcePaddingCapacityAndCopies(t *testing.T) {
+func TestUintSetSourcePaddingNativeStorageAndCopies(t *testing.T) {
 	var a, b bitset.UintSet
 	b.Insert(96)
-	if b.MaxElem() != 128 || b.CapacityWords() != 5 {
-		t.Fatal("word extent/capacity", b.MaxElem(), b.CapacityWords())
+	if b.MaxElem() != 128 {
+		t.Fatal("word extent", b.MaxElem())
 	}
 	a.Union(&b)
-	if a.MaxElem() != 160 || a.CapacityWords() != 5 || !a.Equal(&b) || a.Hash() != b.Hash() {
+	if a.MaxElem() != 160 || !a.Equal(&b) || a.Hash() != b.Hash() {
 		t.Fatal("source_size+1 union padding", a.MaxElem())
 	}
 	b.Intersect(&bitset.UintSet{})
-	if b.MaxElem() != 0 || b.CapacityWords() != 5 {
-		t.Fatal("intersection retains capacity")
+	if b.MaxElem() != 0 {
+		t.Fatal("intersection clears logical words")
 	}
 	clone := b.Clone()
-	if clone.CapacityWords() != 0 || clone.MaxElem() != 0 {
-		t.Fatal("copy ctor only pushes logical words")
+	if clone.MaxElem() != 0 {
+		t.Fatal("clone copies only logical words")
 	}
 	var dst bitset.UintSet
 	dst.Assign(&b)
-	if dst.CapacityWords() != 5 || !dst.Empty() {
-		t.Fatal("assignment copies source capacity")
+	if dst.MaxElem() != 0 || !dst.Empty() {
+		t.Fatal("assignment copies only logical words")
 	}
 	dst.Insert(2)
 	if b.Contains(2) {
 		t.Fatal("assignment aliases")
 	}
 	a.Reset()
-	if a.MaxElem() != 0 || a.CapacityWords() != 5 {
-		t.Fatal("reset retains capacity")
+	if a.MaxElem() != 0 {
+		t.Fatal("reset clears logical words")
 	}
 	a.Insert(1)
 	if a.NumElems() != 1 || a.Contains(96) {
@@ -210,7 +210,7 @@ func TestUintSetSourcePaddingCapacityAndCopies(t *testing.T) {
 		t.Fatal("swap")
 	}
 	a.Close()
-	if a.CapacityWords() != 0 || a.MaxElem() != 0 {
+	if a.MaxElem() != 0 {
 		t.Fatal("destructor replacement")
 	}
 }
@@ -343,7 +343,7 @@ func TestUintSetWarmOperationsNoAllocation(t *testing.T) {
 func TestUintSetOverflowRejectedBeforeGrowth(t *testing.T) {
 	var s bitset.UintSet
 	s.Insert(3)
-	before := s.CapacityWords()
+	before := s.MaxElem()
 	func() {
 		defer func() {
 			if recover() == nil {
@@ -352,7 +352,7 @@ func TestUintSetOverflowRejectedBeforeGrowth(t *testing.T) {
 		}()
 		s.Insert(^uint32(0))
 	}()
-	if s.NumElems() != 1 || !s.Contains(3) || s.CapacityWords() != before {
+	if s.NumElems() != 1 || !s.Contains(3) || s.MaxElem() != before {
 		t.Fatal("invalid extent changed set")
 	}
 }

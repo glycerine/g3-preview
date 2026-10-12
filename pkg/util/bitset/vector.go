@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Vector owns 32-bit words, preserving source capacity growth and unused bits.
+// Vector owns 32-bit words in a Go slice and preserves unused bit values.
 // Copy with Clone or Assign; Go struct assignment aliases the word storage.
 type Vector struct {
 	size  uint32
@@ -37,19 +37,13 @@ func (v *Vector) Assign(src *Vector) {
 	}
 	copy(v.words, src.words)
 }
-func (v *Vector) expandTo(n uint32) {
-	words := make([]uint32, n)
-	copy(words, v.words)
-	v.words = words
-}
-func (v *Vector) Reset()                { clear(v.words); v.size = 0 }
-func (v *Vector) Swap(other *Vector)    { *v, *other = *other, *v }
-func (v *Vector) Fill0()                { clear(v.words) }
-func (v *Vector) Size() uint32          { return v.size }
-func (v *Vector) Empty() bool           { return v.size == 0 }
-func (v *Vector) NumWords() uint32      { return numWords(v.size) }
-func (v *Vector) CapacityWords() uint32 { return uint32(len(v.words)) }
-func (v *Vector) Word(i uint32) uint32  { return v.words[i] }
+func (v *Vector) Reset()               { clear(v.words); v.size = 0 }
+func (v *Vector) Swap(other *Vector)   { *v, *other = *other, *v }
+func (v *Vector) Fill0()               { clear(v.words) }
+func (v *Vector) Size() uint32         { return v.size }
+func (v *Vector) Empty() bool          { return v.size == 0 }
+func (v *Vector) NumWords() uint32     { return numWords(v.size) }
+func (v *Vector) Word(i uint32) uint32 { return v.words[i] }
 func (v *Vector) check(i uint32) {
 	if i >= v.size {
 		panic("bitset: bit index out of range")
@@ -74,11 +68,7 @@ func (v *Vector) Push(val bool) {
 		panic("bitset: size overflow")
 	}
 	if v.NumWords() > uint32(len(v.words)) {
-		n := uint32(2)
-		if len(v.words) != 0 {
-			n = (uint32(len(v.words))*3 + 1) >> 1
-		}
-		v.expandTo(n)
+		v.words = append(v.words, 0)
 	}
 	v.Set(i, val)
 }
@@ -107,7 +97,7 @@ func (v *Vector) Resize(n uint32, val bool) {
 	}
 	nw := numWords(n)
 	if nw > uint32(len(v.words)) {
-		v.expandTo((nw*3 + 1) >> 1)
+		v.words = append(v.words, make([]uint32, int(nw)-len(v.words))...)
 	}
 	bw := v.size / 32
 	mask := (uint32(1) << (v.size % 32)) - 1
