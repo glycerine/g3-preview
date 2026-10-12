@@ -6279,13 +6279,14 @@
     },
     {
       "source": "src/util/lp/stacked_vector.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/stacked_vector.go",
         "pkg/util/lp/stacked_pair_vector.go",
         "pkg/util/lp/stacked_lar_witness.go",
         "pkg/util/lp/lar_bounds.go",
-        "pkg/util/lp/lar_bounds_test.go"
+        "pkg/util/lp/lar_bounds_test.go",
+        "pkg/util/lp/stacked_pair_vector_test.go"
       ],
       "tests": [
         "TestLPStackedVectorSource",
@@ -6297,7 +6298,58 @@
         "TestLPStackedPairVectorAllocationFailureOwnership",
         "TestLPStackedPairVectorPendingAllocationIdentity",
         "TestLARBoundWitnessStackIndependentSnapshots",
-        "TestLARBoundsExistingScopedOwnersAndAlias"
+        "TestLARBoundsExistingScopedOwnersAndAlias",
+        "TestLPStackedPairVectorBorrowedElementAssignmentAndTailRestore",
+        "TestLPStackedPairVectorPreservesActualOlderComparison",
+        "TestLPStackedPairVectorDirectPhysicalRefusals",
+        "TestLARCoreScopesIndependentSnapshots",
+        "TestLARCoreScopesPhysicalBoundRestoration"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained scalar size/access/assignment/append/value initialization/scope size journals/push/exact-depth pop",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_vector.go",
+          "tests": [
+            "TestLPStackedVectorSource",
+            "TestLPStackedUintVectorSnapshots",
+            "TestLPStackedIntVectorSnapshots",
+            "TestLPStackedColumnVectorSnapshots"
+          ]
+        },
+        {
+          "name": "retained numeric_pair owning assignment/append/reverse restoration and source member destruction with interrupted-copy receipts",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_pair_vector.go",
+          "tests": [
+            "TestLPStackedPairVectorIndependentSnapshots",
+            "TestLPStackedPairVectorBigOwnership",
+            "TestLPStackedPairVectorAllocationFailureOwnership",
+            "TestLPStackedPairVectorPendingAllocationIdentity",
+            "TestLPStackedPairVectorBorrowedElementAssignmentAndTailRestore",
+            "TestLPStackedPairVectorPreservesActualOlderComparison",
+            "TestLPStackedPairVectorDirectPhysicalRefusals"
+          ]
+        },
+        {
+          "name": "retained ul_pair witness value assignment/append/read/size/peek/push/pop",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_lar_witness.go",
+          "tests": [
+            "TestLARBoundWitnessStackIndependentSnapshots",
+            "TestLARCoreScopesIndependentSnapshots",
+            "TestLARCoreScopesPhysicalBoundRestoration",
+            "TestLARBoundsExistingScopedOwnersAndAlias"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete native slices own scalar/witness values and journal metadata. Source const-vector/reference access is a borrowed read-only view. Pair values and journals own actual numeral cells; lexical pending copy and NumericAllocationRoots own only newly acquired allocation tokens. Failed operations retain reached storage for Close; older/replacement caller allocation identities and actual comparison invocation are preserved. No shallow owning vector copy is reached by retained consumers."
+      ],
+      "deviations": [
+        "Invalid extent/scope domains return ErrBounds/ErrScope; exact Pop requires a positive available count as source asserts, unlike saturating stacked scalar/map Pop. Other templates, unused witness default growth, saved proxy objects and STL allocation/copy internals are excluded. Empty allocation descriptor size fields are not owning tokens; identity checks use real object/block owners."
       ]
     },
     {
@@ -6546,8 +6598,8 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "partial": 76,
-    "ported": 19,
+    "partial": 75,
+    "ported": 20,
     "reference_only": 10,
     "dead_deleted": 3
   },
@@ -11790,6 +11842,23 @@
     "combined_debug_checked_statements": {
       "covered": 46,
       "total": 47
+    }
+  },
+  "latest_stacked_vector_support_audit": {
+    "summary": "Whole retained-source/ownership audit completes stacked_vector.h across five actual specializations: unsigned/int/column_type/ul_pair/numeric_pair<mpq>. Root consumers are lar_core_solver basis/sparsity snapshots, LAR column types/bounds/witnesses and the retained --smap int scenario. Existing concrete native vectors implement scoped replacement journals, append/value initialization, size/peek/read-only access, push and exact-depth pop; unused whole-owner copies, saved proxies and other instantiations are excluded. Rational pair vectors own current values, old-value journals and real interrupted copy roots; Close destroys values then journal then owned allocation prefixes. Three new groups add16 large-number cross-element/self assignment and appended-tail restoration worlds, four direct allocation-refusal campaigns through success, and an actual older1000-digit caller comparison across vector mutation/destruction with token identities preserved. Existing pooled refusal campaigns, older/replacement allocation identities, independent scalar/pair/witness snapshots and LAR scope/bound consumers remain green. A first test incorrectly required blocked copies in both builds and compared empty allocation-descriptor metadata; corrected to actual token ownership and native/debug success/refusal behavior. No production change was needed; the provisional guard was removed. Focused native2.647s/combined2.457s; scalar vectors96/96statements100%, witnesses31/31100%, pair90/9792.8% both. Seven remaining pair returns are delegated capture/copy/destructor/cleanup error guards. Related current-production LAR scopes/bounds checks pass native31.289s/combined35.107s. LP inventory20ported/75partial/10reference_only/3dead_deleted/2platform_replacement. Audit /mnt/oldrog/tmp/g3-lp-stacked-vector-consumers-audit.txt; profiles /mnt/oldrog/tmp/g3-lp-scoped-vector-audit-{native,debug}.cover. CPU restriction8\u201316 preserved.",
+    "coverage": {
+      "scalar_vectors": [
+        96,
+        96
+      ],
+      "witnesses": [
+        31,
+        31
+      ],
+      "pair": [
+        90,
+        97
+      ]
     }
   }
 }

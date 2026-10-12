@@ -1,7 +1,9 @@
 package lp
 
 import (
+	"errors"
 	"fmt"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"math"
 	"math/rand/v2"
@@ -293,5 +295,195 @@ func TestLPStackedPairVectorPendingAllocationIdentity(t *testing.T) {
 				t.Fatal("numeric roots retained", live, baseline)
 			}
 		})
+	}
+}
+
+// Assignment proxies borrow the actual source element. Journal growth and
+// append relocation must not turn a cross-element source into the destination.
+func TestLPStackedPairVectorBorrowedElementAssignmentAndTailRestore(t *testing.T) {
+	for world := 0; world < 16; world++ {
+		h := newLPPairHarness(t)
+		a := h.pair(strings.Repeat("1234567890", 20)+fmt.Sprint(world)+"/7", "-11/13")
+		b := h.pair(strings.Repeat("9876543210", 20)+fmt.Sprint(world)+"/17", "19/23")
+		v := NewStackedPairVector(h.m)
+		h.must(v.Append(a))
+		h.must(v.Append(b))
+		h.must(v.Push())
+		source, e := v.At(0)
+		h.must(e)
+		h.must(v.Set(1, source))
+		source, e = v.At(1)
+		h.must(e)
+		h.must(v.Append(source))
+		source, e = v.At(0)
+		h.must(e)
+		n := len(v.changes)
+		h.must(v.Set(0, source))
+		if len(v.changes) != n {
+			t.Fatal("self assignment journal")
+		}
+		h.must(v.Push())
+		h.must(v.Set(2, b))
+		source, e = v.At(2)
+		h.must(e)
+		h.must(v.Set(0, source))
+		h.must(v.Pop(2))
+		if v.Size() != 2 {
+			t.Fatal(v.Size())
+		}
+		for i, want := range []*RationalPair{a, b} {
+			got, e := v.At(uint32(i))
+			h.must(e)
+			equal, e := got.Equal(h.m, want)
+			h.must(e)
+			if !equal {
+				t.Fatal("borrowed source/tail restore", world, i)
+			}
+		}
+		h.must(v.Close())
+		lpExactVectorNamedCensus(t, h, nil)
+	}
+}
+
+func TestLPStackedPairVectorPreservesActualOlderComparison(t *testing.T) {
+	found := false
+	for ordinal := int64(0); ordinal < 40 && !found; ordinal++ {
+		h := newLPPairHarness(t)
+		a := h.pair(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
+		b := h.pair("17/19", "-23/29")
+		v := NewStackedPairVector(h.m)
+		h.must(v.Append(a))
+		h.must(v.Push())
+		var caller exactEtaCalls
+		before, e := caller.begin(h.m)
+		h.must(e)
+		h.budget.FailAfter(ordinal)
+		_, e = h.m.Compare(&a.X, &a.Y)
+		h.budget.FailAfter(-1)
+		e = caller.after(h.m, before, e)
+		older := h.m.ComparisonInvocationState()
+		if older.Active {
+			found = true
+			if !lpExactPriorityPhysicalRefusal(e) {
+				t.Fatal(e)
+			}
+			// An empty descriptor can retain size metadata without owning a token.
+			// Check actual owned roots, not equality of unused descriptor fields.
+			roots, e := numeral.CaptureNumericAllocationRoots(h.m.Z)
+			h.must(e)
+			if e := v.Set(0, b); e != nil {
+				if !errors.Is(e, umemory.ErrAllocatorPending) {
+					t.Fatal(e)
+				}
+				if numeral.NumericAllocationPending(&v.copyRoots) || len(v.changes) != 0 || v.Size() != 1 {
+					t.Fatal("adopted caller root or published replacement")
+				}
+			} else {
+				got, e := v.At(0)
+				h.must(e)
+				equal, e := got.Equal(h.m, b)
+				h.must(e)
+				if !equal || len(v.changes) != 1 {
+					t.Fatal("replacement copy")
+				}
+				h.must(v.Pop(1))
+			}
+			got, e := v.At(0)
+			h.must(e)
+			equal, e := got.Equal(h.m, a)
+			h.must(e)
+			if !equal {
+				t.Fatal("retained/restored old value")
+			}
+			now, e := numeral.CaptureNumericAllocationRoots(h.m.Z)
+			h.must(e)
+			if roots.Cell.Object.OwnerID() != 0 && now.Cell != roots.Cell {
+				t.Fatal("replaced caller allocation")
+			}
+			for i, token := range roots.Allocator {
+				if token.OwnerID() != 0 && now.Allocator[i] != token {
+					t.Fatal("replaced caller allocator block", i)
+				}
+			}
+			if h.m.ComparisonInvocationState() != older {
+				t.Fatal("vector consumed caller comparison")
+			}
+			h.must(v.Close())
+			if h.m.ComparisonInvocationState() != older {
+				t.Fatal("destructor consumed caller comparison")
+			}
+			now, e = numeral.CaptureNumericAllocationRoots(h.m.Z)
+			h.must(e)
+			if roots.Cell.Object.OwnerID() != 0 && now.Cell != roots.Cell {
+				t.Fatal("destructor consumed caller allocation")
+			}
+			for i, token := range roots.Allocator {
+				if token.OwnerID() != 0 && now.Allocator[i] != token {
+					t.Fatal("destructor consumed caller allocator block", i)
+				}
+			}
+		} else {
+			h.must(v.Close())
+		}
+		h.must(caller.cleanupRaw(h.m))
+		h.must(caller.cleanupRoots(h.m))
+		lpExactVectorNamedCensus(t, h, nil)
+	}
+	if !found {
+		t.Fatal("no actual older comparison")
+	}
+}
+
+func TestLPStackedPairVectorDirectPhysicalRefusals(t *testing.T) {
+	for _, operation := range []string{"append", "replace", "replace-grow", "restore"} {
+		failures, succeeded := 0, false
+		for ordinal := int64(0); ordinal < 48 && !succeeded; ordinal++ {
+			if !t.Run(fmt.Sprintf("%s/%d", operation, ordinal), func(t *testing.T) {
+				h := lpNewDirectSparseHarness(t)
+				large := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
+				zero := h.pair("0", "0")
+				v := NewStackedPairVector(h.m)
+				t.Cleanup(func() { h.budget.FailAfter(-1); h.must(v.Close()) })
+				switch operation {
+				case "replace":
+					h.must(v.Append(large))
+				case "replace-grow":
+					h.must(v.Append(zero))
+					h.must(v.Push())
+				case "restore":
+					h.must(v.Append(large))
+					h.must(v.Push())
+					h.must(v.Set(0, zero))
+				}
+				h.budget.FailAfter(ordinal)
+				var e error
+				switch operation {
+				case "append":
+					e = v.Append(large)
+				case "replace":
+					e = v.Set(0, zero)
+				case "replace-grow":
+					e = v.Set(0, large)
+				case "restore":
+					e = v.Pop(1)
+				}
+				h.budget.FailAfter(-1)
+				if e == nil {
+					succeeded = true
+				} else {
+					if !lpExactPriorityPhysicalRefusal(e) {
+						t.Fatal("actual physical refusal", e)
+					}
+					failures++
+				}
+				h.must(v.Close())
+				lpExactVectorNamedCensus(t, h, nil)
+			}) {
+				t.FailNow()
+			}
+		}
+		if !succeeded || failures == 0 {
+			t.Fatal("incomplete direct refusal campaign", operation, failures, succeeded)
+		}
 	}
 }

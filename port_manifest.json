@@ -137871,13 +137871,14 @@
       "path": "src/util/lp/stacked_vector.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/stacked_vector.go",
         "pkg/util/lp/stacked_pair_vector.go",
         "pkg/util/lp/stacked_lar_witness.go",
         "pkg/util/lp/lar_bounds.go",
-        "pkg/util/lp/lar_bounds_test.go"
+        "pkg/util/lp/lar_bounds_test.go",
+        "pkg/util/lp/stacked_pair_vector_test.go"
       ],
       "tests": [
         "TestLPStackedVectorSource",
@@ -137889,7 +137890,12 @@
         "TestLPStackedPairVectorAllocationFailureOwnership",
         "TestLPStackedPairVectorPendingAllocationIdentity",
         "TestLARBoundWitnessStackIndependentSnapshots",
-        "TestLARBoundsExistingScopedOwnersAndAlias"
+        "TestLARBoundsExistingScopedOwnersAndAlias",
+        "TestLPStackedPairVectorBorrowedElementAssignmentAndTailRestore",
+        "TestLPStackedPairVectorPreservesActualOlderComparison",
+        "TestLPStackedPairVectorDirectPhysicalRefusals",
+        "TestLARCoreScopesIndependentSnapshots",
+        "TestLARCoreScopesPhysicalBoundRestoration"
       ],
       "assertions": [
         {
@@ -137917,11 +137923,11 @@
           "text": "SASSERT(k > 0 && k <= m_stack_of_vector_sizes.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "concrete unsigned/int/column_type indexing, literal replacement history, push_back/increase_size_by_one, scope push/peek_size and reverse journal pop",
+          "name": "retained scalar size/access/assignment/append/value initialization/scope size journals/push/exact-depth pop",
           "status": "ported",
           "go_target": "pkg/util/lp/stacked_vector.go",
           "tests": [
@@ -137932,33 +137938,37 @@
           ]
         },
         {
-          "name": "actual numeric_pair<mpq> scoped bounds vector: owned deep copies, unchanged-value suppression, push/peek/pop, reverse restoration, tail destruction and explicit failed-copy close",
+          "name": "retained numeric_pair owning assignment/append/reverse restoration and source member destruction with interrupted-copy receipts",
           "status": "ported",
           "go_target": "pkg/util/lp/stacked_pair_vector.go",
           "tests": [
             "TestLPStackedPairVectorIndependentSnapshots",
             "TestLPStackedPairVectorBigOwnership",
             "TestLPStackedPairVectorAllocationFailureOwnership",
-            "TestLPStackedPairVectorPendingAllocationIdentity"
+            "TestLPStackedPairVectorPendingAllocationIdentity",
+            "TestLPStackedPairVectorBorrowedElementAssignmentAndTailRestore",
+            "TestLPStackedPairVectorPreservesActualOlderComparison",
+            "TestLPStackedPairVectorDirectPhysicalRefusals"
           ]
         },
         {
-          "name": "live ul_pair specialization with native values/replacement history, scope snapshots, tail removal and reverse restoration",
+          "name": "retained ul_pair witness value assignment/append/read/size/peek/push/pop",
           "status": "ported",
           "go_target": "pkg/util/lp/stacked_lar_witness.go",
           "tests": [
             "TestLARBoundWitnessStackIndependentSnapshots",
+            "TestLARCoreScopesIndependentSnapshots",
+            "TestLARCoreScopesPhysicalBoundRestoration",
             "TestLARBoundsExistingScopedOwnersAndAlias"
           ]
         }
       ],
       "ownership": [
-        "Native typed slices own values and change journals. Values borrows read-only backing; callers must use Set to preserve rollback. No numeral ownership or STL internals are claimed.",
-        "Exact scoped vectors own RationalPair values and replacement snapshots. An incomplete lexical copy stays in the actual pending field. CaptureNumericAllocationRoots/After records only newly acquired physical numeric/allocator roots; identity-checked cleanup excludes older/replaced pending allocations. Values and At borrow read-only numerals; Set is required for rollback. Close precedes borrowed manager closure and retains its cursor on errors.",
-        "Concrete StackedLARWitnessVector owns pointer-free witness values and native replacement/scope slices. Repeated identical assignment adds no journal; pop truncates values then restores retained entries in reverse order, ignoring removed columns."
+        "Concrete native slices own scalar/witness values and journal metadata. Source const-vector/reference access is a borrowed read-only view. Pair values and journals own actual numeral cells; lexical pending copy and NumericAllocationRoots own only newly acquired allocation tokens. Failed operations retain reached storage for Close; older/replacement caller allocation identities and actual comparison invocation are preserved. No shallow owning vector copy is reached by retained consumers."
       ],
       "deviations": [
-        "All four live element types now have concrete vector implementations; no whole source unit promotion before complete solver integration and source-profile audit. ErrBounds/ErrScope guard source-undefined accesses and zero/excess pops. Native backing has no simulated Runtime reservation failures. Actual numeral allocations can fail and retain explicit owning cleanup receipts; process-global allocation callback/stream bindings and teardown-stop profiles remain open."
+        "All four live element types now have concrete vector implementations; no whole source unit promotion before complete solver integration and source-profile audit. ErrBounds/ErrScope guard source-undefined accesses and zero/excess pops. Native backing has no simulated Runtime reservation failures. Actual numeral allocations can fail and retain explicit owning cleanup receipts; process-global allocation callback/stream bindings and teardown-stop profiles remain open.",
+        "Invalid extent/scope domains return ErrBounds/ErrScope; exact Pop requires a positive available count as source asserts, unlike saturating stacked scalar/map Pop. Other templates, unused witness default growth, saved proxy objects and STL allocation/copy internals are excluded. Empty allocation descriptor size fields are not owning tokens; identity checks use real object/block owners."
       ]
     },
     {
