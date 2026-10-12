@@ -1,0 +1,298 @@
+// Source: src/math/interval/interval.h:32-67,137-190 and
+// src/math/interval/interval_def.h:597-709,795-837.
+package interval
+
+import (
+	"errors"
+	"io"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/numeral"
+)
+
+// RationalInterval owns its two rational endpoints and borrows their manager.
+// Infinite endpoints retain reset numeral storage, matching interval_manager.
+type RationalInterval struct {
+	self                 *RationalInterval
+	numbers              *numeral.RationalManager
+	lower, upper         numeral.Rational
+	lowerOpen, upperOpen bool
+	lowerInf, upperInf   bool
+	closed               bool
+}
+
+func NewRationalInterval(m *numeral.RationalManager) (*RationalInterval, error) {
+	if m == nil {
+		return nil, arena.ErrInvalidSlot
+	}
+	v := &RationalInterval{numbers: m, lower: numeral.NewRational(), upper: numeral.NewRational()}
+	v.self = v
+	return v, nil
+}
+
+func (v *RationalInterval) open() error {
+	if v == nil || v.self != v || v.numbers == nil {
+		return arena.ErrInvalidSlot
+	}
+	if v.closed {
+		return arena.ErrClosed
+	}
+	return nil
+}
+
+func (v *RationalInterval) lowerKind() ExtendedKind {
+	if v.lowerInf {
+		return MinusInfinity
+	}
+	return Finite
+}
+
+func (v *RationalInterval) upperKind() ExtendedKind {
+	if v.upperInf {
+		return PlusInfinity
+	}
+	return Finite
+}
+
+func (v *RationalInterval) SetFinite(lower, upper *numeral.Rational, lowerOpen, upperOpen bool) error {
+	if err := v.open(); err != nil {
+		return err
+	}
+	cmp, err := v.numbers.Compare(lower, upper)
+	if err != nil {
+		return err
+	}
+	if cmp > 0 || cmp == 0 && (lowerOpen || upperOpen) {
+		return ErrExtendedDomain
+	}
+	if err = v.numbers.Copy(&v.lower, lower); err != nil {
+		return err
+	}
+	if err = v.numbers.Copy(&v.upper, upper); err != nil {
+		return err
+	}
+	v.lowerInf, v.upperInf = false, false
+	v.lowerOpen, v.upperOpen = lowerOpen, upperOpen
+	return nil
+}
+
+func (v *RationalInterval) Reset() error {
+	if err := v.open(); err != nil {
+		return err
+	}
+	if err := v.numbers.Reset(&v.lower); err != nil {
+		return err
+	}
+	if err := v.numbers.Reset(&v.upper); err != nil {
+		return err
+	}
+	v.lowerInf, v.upperInf = true, true
+	v.lowerOpen, v.upperOpen = true, true
+	return nil
+}
+
+func (v *RationalInterval) CheckInvariant() error {
+	if err := v.open(); err != nil {
+		return err
+	}
+	cmp, err := (RationalExtended{Numbers: v.numbers}).Compare(&v.lower, v.lowerKind(), &v.upper, v.upperKind())
+	if err != nil {
+		return err
+	}
+	if cmp > 0 || cmp == 0 && (v.lowerOpen || v.upperOpen) {
+		return ErrExtendedDomain
+	}
+	return nil
+}
+
+func (v *RationalInterval) ContainsZero() (bool, error) {
+	if err := v.open(); err != nil {
+		return false, err
+	}
+	e := RationalExtended{Numbers: v.numbers}
+	neg, err := e.IsNeg(&v.lower, v.lowerKind())
+	if err != nil {
+		return false, err
+	}
+	zero, err := e.IsZero(&v.lower, v.lowerKind())
+	if err != nil {
+		return false, err
+	}
+	if !neg && (!zero || v.lowerOpen) {
+		return false, nil
+	}
+	pos, err := e.IsPos(&v.upper, v.upperKind())
+	if err != nil {
+		return false, err
+	}
+	zero, err = e.IsZero(&v.upper, v.upperKind())
+	if err != nil {
+		return false, err
+	}
+	return pos || zero && !v.upperOpen, nil
+}
+
+func (v *RationalInterval) Contains(value *numeral.Rational) (bool, error) {
+	if err := v.open(); err != nil {
+		return false, err
+	}
+	if !v.lowerInf {
+		cmp, err := v.numbers.Compare(value, &v.lower)
+		if err != nil {
+			return false, err
+		}
+		if cmp < 0 || cmp == 0 && v.lowerOpen {
+			return false, nil
+		}
+	}
+	if !v.upperInf {
+		cmp, err := v.numbers.Compare(value, &v.upper)
+		if err != nil {
+			return false, err
+		}
+		if cmp > 0 || cmp == 0 && v.upperOpen {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func (v *RationalInterval) Equal(other *RationalInterval) (bool, error) {
+	if err := v.open(); err != nil {
+		return false, err
+	}
+	if err := other.open(); err != nil {
+		return false, err
+	}
+	if v.numbers != other.numbers {
+		return false, arena.ErrInvalidSlot
+	}
+	e := RationalExtended{Numbers: v.numbers}
+	l, err := e.Compare(&v.lower, v.lowerKind(), &other.lower, other.lowerKind())
+	if err != nil {
+		return false, err
+	}
+	if l != 0 {
+		return false, nil
+	}
+	u, err := e.Compare(&v.upper, v.upperKind(), &other.upper, other.upperKind())
+	if err != nil {
+		return false, err
+	}
+	return u == 0 && v.lowerOpen == other.lowerOpen && v.upperOpen == other.upperOpen, nil
+}
+
+func (v *RationalInterval) Before(other *RationalInterval) (bool, error) {
+	if err := v.open(); err != nil {
+		return false, err
+	}
+	if err := other.open(); err != nil {
+		return false, err
+	}
+	if v.numbers != other.numbers {
+		return false, arena.ErrInvalidSlot
+	}
+	if v.upperInf || other.lowerInf {
+		return false, nil
+	}
+	cmp, err := v.numbers.Compare(&v.upper, &other.lower)
+	if err != nil {
+		return false, err
+	}
+	return cmp < 0 || cmp == 0 && v.upperOpen, nil
+}
+
+func (v *RationalInterval) Add(a, b *RationalInterval) error {
+	if err := v.binaryOperands(a, b); err != nil {
+		return err
+	}
+	e := RationalExtended{Numbers: v.numbers}
+	lk, err := e.Add(&a.lower, a.lowerKind(), &b.lower, b.lowerKind(), &v.lower)
+	if err != nil {
+		return err
+	}
+	uk, err := e.Add(&a.upper, a.upperKind(), &b.upper, b.upperKind(), &v.upper)
+	if err != nil {
+		return err
+	}
+	v.lowerInf, v.upperInf = lk == MinusInfinity, uk == PlusInfinity
+	v.lowerOpen, v.upperOpen = a.lowerOpen || b.lowerOpen, a.upperOpen || b.upperOpen
+	return v.CheckInvariant()
+}
+
+func (v *RationalInterval) Sub(a, b *RationalInterval) error {
+	if err := v.binaryOperands(a, b); err != nil {
+		return err
+	}
+	e := RationalExtended{Numbers: v.numbers}
+	lk, err := e.Sub(&a.lower, a.lowerKind(), &b.upper, b.upperKind(), &v.lower)
+	if err != nil {
+		return err
+	}
+	uk, err := e.Sub(&a.upper, a.upperKind(), &b.lower, b.lowerKind(), &v.upper)
+	if err != nil {
+		return err
+	}
+	v.lowerInf, v.upperInf = lk == MinusInfinity, uk == PlusInfinity
+	v.lowerOpen, v.upperOpen = a.lowerOpen || b.upperOpen, a.upperOpen || b.lowerOpen
+	return v.CheckInvariant()
+}
+
+func (v *RationalInterval) binaryOperands(a, b *RationalInterval) error {
+	if err := v.open(); err != nil {
+		return err
+	}
+	if err := a.open(); err != nil {
+		return err
+	}
+	if err := b.open(); err != nil {
+		return err
+	}
+	if v.numbers != a.numbers || v.numbers != b.numbers {
+		return arena.ErrInvalidSlot
+	}
+	return nil
+}
+
+func (v *RationalInterval) Display(w io.Writer) error {
+	if err := v.open(); err != nil {
+		return err
+	}
+	left, right := "[", "]"
+	if v.lowerOpen {
+		left = "("
+	}
+	if v.upperOpen {
+		right = ")"
+	}
+	ls, us := "-oo", "+oo"
+	var err error
+	if !v.lowerInf {
+		ls, err = v.numbers.String(&v.lower)
+		if err != nil {
+			return err
+		}
+	}
+	if !v.upperInf {
+		us, err = v.numbers.String(&v.upper)
+		if err != nil {
+			return err
+		}
+	}
+	_, err = io.WriteString(w, left+ls+", "+us+right)
+	return err
+}
+
+func (v *RationalInterval) Close() error {
+	if v == nil || v.self != v {
+		return arena.ErrInvalidSlot
+	}
+	if v.closed {
+		return nil
+	}
+	if err := errors.Join(v.numbers.Del(&v.lower), v.numbers.Del(&v.upper)); err != nil {
+		return err
+	}
+	v.closed = true
+	return nil
+}

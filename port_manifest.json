@@ -34435,9 +34435,14 @@
       "path": "src/math/interval/interval.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/interval/rational_interval.go",
+        "pkg/math/interval/rational_interval_test.go"
+      ],
+      "tests": [
+        "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -34468,7 +34473,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Concrete mpq interval endpoint fields, finite/open/infinite predicates and owned endpoint lifetime (src/math/interval/interval.h:32-67,137-190)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/rational_interval.go",
+          "tests": [
+            "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -34476,9 +34490,14 @@
       "path": "src/math/interval/interval_def.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/interval/rational_interval.go",
+        "pkg/math/interval/rational_interval_test.go"
+      ],
+      "tests": [
+        "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -34825,7 +34844,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Retained reset, containment, equality, before, display, add and subtract for mpq intervals (src/math/interval/interval_def.h:597-709,795-837)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/rational_interval.go",
+          "tests": [
+            "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -114981,10 +115009,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/interval/rational_extended.go",
-        "pkg/math/interval/rational_extended_test.go"
+        "pkg/math/interval/rational_extended_test.go",
+        "pkg/math/interval/rational_interval.go",
+        "pkg/math/interval/rational_interval_test.go"
       ],
       "tests": [
-        "TestRationalExtendedIntervalBranches"
+        "TestRationalExtendedIntervalBranches",
+        "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
       ],
       "conditionals": [
         {
