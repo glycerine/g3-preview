@@ -115474,6 +115474,18 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained SAT u_map<index_set> antecedent map insertion/find/contains/reset and owned row lifetime",
+          "status": "platform_replacement",
+          "go_target": "pkg/sat/sat_solver_index_map.go",
+          "tests": [
+            "TestSATSolverAntecedentMapNativeColdConstruction",
+            "TestSATSolverAntecedentMapAllConstructorRefusalPrefixes",
+            "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
+            "TestSATSolverConsequenceNativeIndexOrderAndDeepMapCopy",
+            "TestSATSolverConsequenceNativeMapGrowthAndReplacement"
+          ]
+        },
+        {
           "name": "u_map<uint32> construction/copy/destruction",
           "status": "partial",
           "go_target": "",
@@ -141067,6 +141079,18 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained SAT u_map<index_set> antecedent map insertion/find/contains/reset and owned row lifetime",
+          "status": "platform_replacement",
+          "go_target": "pkg/sat/sat_solver_index_map.go",
+          "tests": [
+            "TestSATSolverAntecedentMapNativeColdConstruction",
+            "TestSATSolverAntecedentMapAllConstructorRefusalPrefixes",
+            "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
+            "TestSATSolverConsequenceNativeIndexOrderAndDeepMapCopy",
+            "TestSATSolverConsequenceNativeMapGrowthAndReplacement"
+          ]
+        },
         {
           "name": "u_map<uint32> construction/copy/destruction",
           "status": "partial",

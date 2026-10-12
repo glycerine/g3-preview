@@ -39683,3 +39683,13 @@ refusal reuses that declaration and creates only the missing app. This follows
 `ast_manager::mk_app` constructing the declaration before allocating the app,
 and extends the `buffer<parameter>` label lifetime evidence without claiming
 the other buffer specializations complete.
+
+### SAT antecedent map specialization
+
+The retained `u_map<index_set>` at `src/sat/sat_solver.h:483` uses a native
+`map[uint32]*satSolverIndexSet` in Go. The map copies each insertion-ordered
+index set, replaces an existing row in place, and invalidates borrowed rows
+on reset or close. Focused SAT tests cover growth, duplicate replacement,
+self-assignment, deep copy, reset, close, and constructor refusal. The
+`map.h` and `hashtable.h` manifest rows now credit this concrete platform
+replacement; their other specializations remain partial.
