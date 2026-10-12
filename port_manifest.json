@@ -163144,7 +163144,8 @@
       "go_targets": [
         "pkg/util/numeral/scoped_numeral_buffer.go",
         "pkg/util/numeral/scoped_numeral_buffer_source_test.go",
-        "pkg/util/numeral/scoped_numeral_buffer_review_test.go"
+        "pkg/util/numeral/scoped_numeral_buffer_review_test.go",
+        "pkg/util/numeral/scoped_integer_buffer16.go"
       ],
       "tests": [
         "TestScopedNumeralBufferNativeGrowthResetAndResize",
@@ -163154,7 +163155,9 @@
         "TestScopedNumeralBufferBorrowedNativeView",
         "TestScopedBufferReviewDestructiveCopyBeforeSourceDestructor",
         "TestScopedBufferReviewStoppedSourceBlocksMutation",
-        "TestScopedBufferReviewReleaseShrinkAboveSize"
+        "TestScopedBufferReviewReleaseShrinkAboveSize",
+        "TestScopedIntegerBuffer16CopiesMutableSubpavingCoefficients",
+        "TestScopedIntegerBuffer16FailedCopyRetainsOwningCleanup"
       ],
       "conditionals": [
         {
@@ -163183,13 +163186,22 @@
             "TestScopedBufferReviewStoppedSourceBlocksMutation",
             "TestScopedBufferReviewReleaseShrinkAboveSize"
           ]
+        },
+        {
+          "name": "Concrete unsynch_mpz_manager scoped integer buffers for expr2subpaving process_add: deep push, mutable element access, borrowed c_ptr view and ascending destructor cleanup",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/scoped_integer_buffer16.go",
+          "tests": [
+            "TestScopedIntegerBuffer16CopiesMutableSubpavingCoefficients",
+            "TestScopedIntegerBuffer16FailedCopyRetainsOwningCleanup"
+          ]
         }
       ],
       "ownership": [
-        "Concrete []Int elements retain numeral ownership. Deep copy and ascending source deletion remain explicit; a stopped deletion leaves older elements untouched, and borrowed views reference the live slice rather than a clone."
+        "Concrete []Int elements retain numeral ownership. Deep copy and ascending source deletion remain explicit; a stopped deletion leaves older elements untouched, and borrowed views reference the live slice rather than a clone. The subpaving integer specialization has its own manager-owned copied numerals and explicit owning cleanup after a stopped source scope."
       ],
       "deviations": [
-        "The live polynomial mpzzp specialization uses concrete []Int storage. Other source instantiations remain partial until their real Go callers need typed buffers; no any-valued universal buffer is retained.",
+        "The polynomial mpzzp and subpaving unsynch_mpz specializations use separate concrete []Int owners. The subpaving expression converter has not yet been ported, so its buffer is not integrated into a Go caller; no any-valued universal buffer is retained.",
         "Borrowed views remain valid only while the owning buffer is live and unchanged."
       ]
     },
