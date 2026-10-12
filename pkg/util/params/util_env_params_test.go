@@ -36,7 +36,7 @@ func envParamsRuntimeFixture(t *testing.T) (*GlobalParams, *diagnostic.VerboseCo
 	m, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	paramsMust(t, e)
 	stderr := &bytes.Buffer{}
-	warnings := diagnostic.NewWarningService(nil, stderr)
+	warnings := diagnostic.NewWarningService(stderr)
 	env, e := NewEnvParamsRuntime(g, v, m, warnings)
 	paramsMust(t, e)
 	t.Cleanup(func() {

@@ -166509,7 +166509,7 @@
       ],
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
-        "TestWarningSourceBorrowedStreamTruncationAndDisplayer",
+        "TestWarningSourceBorrowedStreamTruncationAndFallback",
         "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
       ],
       "conditionals": [
@@ -166562,12 +166562,12 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "send_warnings_to_stdout, enable_warning_messages and borrowed set_warning_stream state",
+          "name": "enable_warning_messages and borrowed set_warning_stream state",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_warning.go",
           "tests": [
             "TestWarningSourceDefaultRoutingAndDisabledState",
-            "TestWarningSourceBorrowedStreamTruncationAndDisplayer"
+            "TestWarningSourceBorrowedStreamTruncationAndFallback"
           ]
         },
         {
@@ -166576,7 +166576,7 @@
           "go_target": "pkg/util/diagnostic/util_warning.go",
           "tests": [
             "TestWarningSourceDefaultRoutingAndDisabledState",
-            "TestWarningSourceBorrowedStreamTruncationAndDisplayer"
+            "TestWarningSourceBorrowedStreamTruncationAndFallback"
           ]
         },
         {
@@ -166588,10 +166588,15 @@
           "name": "set_error_stream and disable_error_msg_prefix write-only globals with no source reader",
           "status": "reference_only",
           "tests": []
+        },
+        {
+          "name": "send_warnings_to_stdout has no source caller",
+          "status": "reference_only",
+          "tests": []
         }
       ],
       "ownership": [
-        "WarningService owns only scalar flags and borrows optional io.Writer streams. EnvParamsRuntime updates the same warning-enable state used by warning emission; literal writes retain source prefix, newline, C-string boundary and selected Linux AMD64 custom-stream truncation."
+        "WarningService owns only the enable scalar and borrows optional io.Writer streams. EnvParamsRuntime updates the same warning-enable state used by warning emission; no-format writes retain source prefix, newline, C-string boundary and selected Linux AMD64 custom-stream truncation."
       ],
       "deviations": [
         "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Formatted variadic callers and the shell/AST warning call sites remain to be ported; no C varargs or C++ standard-stream implementation is introduced."
@@ -166608,7 +166613,7 @@
       ],
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
-        "TestWarningSourceBorrowedStreamTruncationAndDisplayer",
+        "TestWarningSourceBorrowedStreamTruncationAndFallback",
         "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
       ],
       "conditionals": [
@@ -166630,16 +166635,13 @@
           "go_target": "pkg/util/diagnostic/util_warning.go",
           "tests": [
             "TestWarningSourceDefaultRoutingAndDisabledState",
-            "TestWarningSourceBorrowedStreamTruncationAndDisplayer"
+            "TestWarningSourceBorrowedStreamTruncationAndFallback"
           ]
         },
         {
-          "name": "warning_displayer sign-once and reset, including disabled sign consumption",
-          "status": "ported",
-          "go_target": "pkg/util/diagnostic/util_warning.go",
-          "tests": [
-            "TestWarningSourceBorrowedStreamTruncationAndDisplayer"
-          ]
+          "name": "warning_displayer sign-once and reset has no source caller",
+          "status": "reference_only",
+          "tests": []
         },
         {
           "name": "formatted variadic warning_msg and format2ostream for live future callers",
@@ -166648,7 +166650,7 @@
         }
       ],
       "ownership": [
-        "WarningDisplayer borrows WarningService and message bytes; service borrows selected output streams and owns only scalar flags."
+        "WarningService borrows selected output streams and owns only its enable flag. The unused warning_displayer class has no Go adapter."
       ],
       "deviations": [
         "The concrete warning service is now reached by EnvParamsRuntime. C++ stream internals and C varargs are not copied; direct formatted warning callers remain unported."
@@ -166658,7 +166660,7 @@
       "path": "src/util/z3_exception.cpp",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/util/z3exception/z3_exception.go"
       ],
@@ -166694,27 +166696,24 @@
           ]
         },
         {
-          "name": "formatted exception construction through ordinary Go formatting at call sites",
-          "status": "ported",
-          "go_target": "pkg/util/z3exception/z3_exception.go",
-          "tests": [
-            "TestDefaultExceptionSourceStringAndEmbeddedNUL"
-          ]
+          "name": "default_exception(fmt, char const*, ...) formatted construction at unported MUZ/parser callers",
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
         "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See PORT_PROGRESS.md#audit-z3-exception-port-status-md.",
-        "Formatted values use the selected budgeted integer/C-string formatter before caller-owned immutable exception construction. See PORT_PROGRESS.md#audit-printf-port-status-md."
+        "The source formatted constructor calls warning.cpp format2ostream. Its MUZ/parser call sites are unported, so no Go caller constructs that formatted value yet."
       ],
       "deviations": [
-        "Go error values replace virtual exception transport. Go callers format messages with fmt before constructing DefaultException; the C++ varargs/iostream formatter and exception hierarchy are not reproduced. Immutable Go strings own message bytes, and Message preserves the source first-NUL observation."
+        "Go error values replace virtual exception transport. The current concrete callers construct immutable messages directly; future formatted call sites should use Go standard-library formatting. The C++ varargs/iostream formatter and exception hierarchy are not reproduced. Message preserves the source first-NUL observation."
       ]
     },
     {
       "path": "src/util/z3_exception.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/util/z3exception/z3_exception.go",
         "pkg/util/diagnostic/util_memory_fatal_policy.go",
@@ -166758,12 +166757,9 @@
           ]
         },
         {
-          "name": "formatted exception construction through ordinary Go formatting at call sites",
-          "status": "ported",
-          "go_target": "pkg/util/z3exception/z3_exception.go",
-          "tests": [
-            "TestDefaultExceptionSourceStringAndEmbeddedNUL"
-          ]
+          "name": "default_exception(fmt, char const*, ...) formatted construction at unported MUZ/parser callers",
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "ERR_MEMOUT101/ERR_ALLOC_EXCEEDED113 actual fatal dispatch and out_of_memory_error -> z3_error derived/base Go catch adaptation",
@@ -166777,10 +166773,10 @@
       ],
       "ownership": [
         "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See PORT_PROGRESS.md#audit-z3-exception-port-status-md.",
-        "Formatted values use the selected budgeted integer/C-string formatter before caller-owned immutable exception construction. See PORT_PROGRESS.md#audit-printf-port-status-md."
+        "The source formatted constructor calls warning.cpp format2ostream. Its MUZ/parser call sites are unported, so no Go caller constructs that formatted value yet."
       ],
       "deviations": [
-        "Go error values replace virtual exception transport. Go callers format messages with fmt before constructing DefaultException; the C++ varargs/iostream formatter and exception hierarchy are not reproduced. Immutable Go strings own message bytes, and Message preserves the source first-NUL observation."
+        "Go error values replace virtual exception transport. The current concrete callers construct immutable messages directly; future formatted call sites should use Go standard-library formatting. The C++ varargs/iostream formatter and exception hierarchy are not reproduced. Message preserves the source first-NUL observation."
       ]
     },
     {

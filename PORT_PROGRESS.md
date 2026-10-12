@@ -39409,13 +39409,27 @@ partial because their direct caller `src/shell/main.cpp:297` is not yet in Go.
 
 `src/util/warning.h/.cpp` now have a concrete single-goroutine
 `WarningService` reached by `EnvParamsRuntime.Update`. The source default
-enable flag, stdout/stderr selection, borrowed warning stream, `WARNING: `
+enable flag, default stderr, borrowed warning stream, `WARNING: `
 prefix, C-string termination, newline, and Linux AMD64 1023-byte custom
-stream body limit are covered. `warning_displayer` preserves sign-once and
-reset, including a sign consumed while warnings are disabled. The environment
+stream body limit are covered. The environment
 update now changes the same enable flag used by emitted warnings; a later
 memory-owner failure preserves that earlier visible change. Focused native and
 checked tests pass on CPUs 8–16. Formatted variadic warnings, the unported
 shell/AST call sites, and `format2ostream` remain open, so both warning units
-are partial. The error-stream/prefix globals have no source reader and are
-retained only as source reference.
+are partial. `warning_displayer` and `send_warnings_to_stdout` have no source
+caller, and the error-stream/prefix globals have no source reader, so they
+remain source reference without Go adapters.
+
+### Warning and exception reachability correction
+
+A follow-up source scan found no caller of `warning_displayer` or
+`send_warnings_to_stdout`, so their newly added Go adapters were removed.
+`WarningService` now covers the reached enable state, borrowed warning stream,
+and no-format message path; source-only helpers remain reference-only. The
+formatted `default_exception(fmt, ...)` constructor still calls
+`warning.cpp:format2ostream`, and its MUZ/parser call sites have no Go port.
+`z3_exception.h/.cpp` therefore move from ported to partial. This corrects an
+earlier ledger claim; it does not change the already verified immutable
+message/error-code implementation. Future formatted callers should use Go
+standard-library formatting at their concrete sites. Focused warning,
+environment and exception checks plus source portcheck pass on CPUs 8–16.

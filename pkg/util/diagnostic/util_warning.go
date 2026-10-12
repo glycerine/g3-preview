@@ -12,20 +12,16 @@ import (
 // WarningService is the concrete single-goroutine owner of warning.cpp's
 // process-wide scalar settings. Streams are borrowed from the caller.
 type WarningService struct {
-	stdout, stderr io.Writer
-	stream         io.Writer
-	enabled        bool
-	toStdout       bool
+	stderr  io.Writer
+	stream  io.Writer
+	enabled bool
 }
 
-func NewWarningService(stdout, stderr io.Writer) *WarningService {
-	if stdout == nil {
-		stdout = os.Stdout
-	}
+func NewWarningService(stderr io.Writer) *WarningService {
 	if stderr == nil {
 		stderr = os.Stderr
 	}
-	return &WarningService{stdout: stdout, stderr: stderr, enabled: true}
+	return &WarningService{stderr: stderr, enabled: true}
 }
 
 func (s *WarningService) Enable(flag bool) error {
@@ -37,13 +33,6 @@ func (s *WarningService) Enable(flag bool) error {
 }
 func (s *WarningService) Enabled() bool { return s != nil && s.enabled }
 
-func (s *WarningService) SendToStdout(flag bool) error {
-	if s == nil {
-		return arena.ErrConfig
-	}
-	s.toStdout = flag
-	return nil
-}
 func (s *WarningService) SetWarningStream(stream io.Writer) error {
 	if s == nil {
 		return arena.ErrConfig
@@ -70,8 +59,6 @@ func (s *WarningService) Warning(message string) error {
 		if len(message) > 1023 {
 			message = message[:1023]
 		}
-	} else if s.toStdout {
-		w = s.stdout
 	} else {
 		w = s.stderr
 	}
@@ -83,37 +70,4 @@ func (s *WarningService) Warning(message string) error {
 	}
 	_, e := io.WriteString(w, "\n")
 	return e
-}
-
-// WarningDisplayer preserves warning.h's sign-once/reset behavior. A disabled
-// warning still counts as displayed, as in the source sign() method.
-type WarningDisplayer struct {
-	service   *WarningService
-	message   string
-	displayed bool
-}
-
-func NewWarningDisplayer(service *WarningService, message string) (*WarningDisplayer, error) {
-	if service == nil {
-		return nil, arena.ErrConfig
-	}
-	return &WarningDisplayer{service: service, message: message}, nil
-}
-func (d *WarningDisplayer) Sign() error {
-	if d == nil || d.service == nil {
-		return arena.ErrConfig
-	}
-	if d.displayed {
-		return nil
-	}
-	if e := d.service.Warning(d.message); e != nil {
-		return e
-	}
-	d.displayed = true
-	return nil
-}
-func (d *WarningDisplayer) Reset() {
-	if d != nil {
-		d.displayed = false
-	}
 }
