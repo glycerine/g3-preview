@@ -100392,7 +100392,8 @@
         "pkg/tactic/ufbv/rewrite_back_index.go",
         "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
         "pkg/tactic/ufbv/rewrite_loop.go",
-        "pkg/tactic/ufbv/rewrite_demodulator_classify.go"
+        "pkg/tactic/ufbv/rewrite_demodulator_classify.go",
+        "pkg/tactic/ufbv/rewrite_formula_process.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
@@ -100405,7 +100406,8 @@
         "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
         "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot",
         "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier",
-        "TestUFBVDemodulatorClassificationOrderingAndBooleanForms"
+        "TestUFBVDemodulatorClassificationOrderingAndBooleanForms",
+        "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
       ],
       "conditionals": [
         {
@@ -100599,13 +100601,21 @@
           "tests": [
             "TestUFBVDemodulatorClassificationOrderingAndBooleanForms"
           ]
+        },
+        {
+          "name": "operator() no-proof concrete formula todo, rewrite/classify, processed/rule rescheduling and owned result publication",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_process.go",
+          "tests": [
+            "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
+          ]
         }
       ],
       "ownership": [
         "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction. The matcher borrows pair-cache keys but retains each substitution target until reset or close. The forward rule index retains one reference each to quantifier, LHS and RHS until index close."
       ],
       "deviations": [
-        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, forward-rule dispatch/removal, both rescheduling paths, iterative rewrite loop and default demodulator classification are ported; enclosing tactic integration and whole-unit ownership remain open."
+        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, forward-rule dispatch/removal, both rescheduling paths, iterative rewrite loop and default demodulator classification are ported. The main formula queue now joins those pieces for the no-proof path; proof-vector handling, enclosing tactic integration and whole-unit ownership remain open."
       ]
     },
     {
@@ -100624,7 +100634,8 @@
         "pkg/tactic/ufbv/rewrite_back_index.go",
         "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
         "pkg/tactic/ufbv/rewrite_loop.go",
-        "pkg/tactic/ufbv/rewrite_demodulator_classify.go"
+        "pkg/tactic/ufbv/rewrite_demodulator_classify.go",
+        "pkg/tactic/ufbv/rewrite_formula_process.go"
       ],
       "tests": [
         "TestRewriteCacheSourceLazyResetAndReferenceOrder",
@@ -100637,7 +100648,8 @@
         "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
         "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot",
         "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier",
-        "TestUFBVDemodulatorClassificationOrderingAndBooleanForms"
+        "TestUFBVDemodulatorClassificationOrderingAndBooleanForms",
+        "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
       ],
       "conditionals": [
         {
@@ -100725,13 +100737,21 @@
           "tests": [
             "TestUFBVDemodulatorClassificationOrderingAndBooleanForms"
           ]
+        },
+        {
+          "name": "concrete UFBV no-proof formula queue and processed/demodulator output partition",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_process.go",
+          "tests": [
+            "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
+          ]
         }
       ],
       "ownership": [
         "The concrete plugin borrows its AST manager and retains each stored key and expression value; the bool payload is a scalar. The rule index separately retains each indexed quantifier, LHS and RHS."
       ],
       "deviations": [
-        "The matcher uses a concrete Go pair map and two-offset RHS substitution; the iterative UFBV rewrite loop and default demodulator classifier are concrete, while the enclosing tactic and whole-unit ownership remain open."
+        "The matcher uses a concrete Go pair map and two-offset RHS substitution; the iterative UFBV rewrite loop, default demodulator classifier and no-proof formula queue are concrete, while proof-vector handling, the enclosing tactic and whole-unit ownership remain open."
       ]
     },
     {
@@ -161154,7 +161174,8 @@
         "pkg/tactic/ufbv/rewrite_traversal_test.go",
         "pkg/tactic/ufbv/rewrite_back_index.go",
         "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
-        "pkg/tactic/ufbv/rewrite_loop.go"
+        "pkg/tactic/ufbv/rewrite_loop.go",
+        "pkg/tactic/ufbv/rewrite_formula_process.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -161174,7 +161195,8 @@
         "TestRewriteTraversalSourceCycleCacheUsesActualTodo",
         "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
         "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot",
-        "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"
+        "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier",
+        "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
       ],
       "conditionals": [
         {
@@ -161290,6 +161312,14 @@
           "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
           "tests": [
             "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"
+          ]
+        },
+        {
+          "name": "concrete UFBV main formula todo transfers owned AST roots into rewrite and output partitions",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_process.go",
+          "tests": [
+            "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
           ]
         }
       ],

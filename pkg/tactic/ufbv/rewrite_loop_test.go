@@ -11,6 +11,39 @@ import (
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
+func ufbvBooleanFixture(t *testing.T, m *ast.ASTManager) *rewriter.BoolRewriter {
+	t.Helper()
+	// The UFBV constructor configures elim_and=true on its Boolean reducer.
+	budget := arena.NewBudget(1 << 30)
+	numbers, e := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
+	cacheMust(t, e)
+	ctx, e := uparams.NewParamsContext(m.Symbols, numbers, uparams.ParamsConfig{Budget: budget, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: budget}}})
+	cacheMust(t, e)
+	catalog, e := uparams.NewGlobalParamsCatalog(m.Symbols, uparams.GlobalParamsCatalogConfig{Budget: budget, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: budget}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: budget}}})
+	cacheMust(t, e)
+	globals, e := uparams.NewGlobalParamsService(m.Symbols, ctx, uparams.GlobalParamsConfig{Budget: budget, Catalog: catalog, DescriptorPageSize: 2, DescriptorWordsPageSize: 16})
+	cacheMust(t, e)
+	cacheMust(t, globals.InitializeSource())
+	params, e := ctx.NewValue()
+	cacheMust(t, e)
+	key := "elim_and"
+	cacheMust(t, ctx.SetBoolName(&params, &key, true))
+	boolean, e := rewriter.NewBoolRewriter(m, ctx, globals, &params)
+	cacheMust(t, e)
+	t.Cleanup(func() {
+		cacheMust(t, boolean.Close())
+		cacheMust(t, ctx.Del(&params))
+		cacheMust(t, globals.Close())
+		cacheMust(t, catalog.Close())
+		cacheMust(t, ctx.Close())
+		cacheMust(t, numbers.Close())
+		if budget.Used() != 0 {
+			t.Fatal("boolean service roots", budget.Used())
+		}
+	})
+	return boolean
+}
+
 func TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier(t *testing.T) {
 	m := cacheFixture(t)
 	b, e := m.MkBoolSort()
@@ -63,34 +96,7 @@ func TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier(t *testing.T) {
 	cacheMust(t, e)
 	t.Cleanup(func() { cacheMust(t, loop.close()) })
 
-	// The UFBV constructor configures elim_and=true on its Boolean reducer.
-	budget := arena.NewBudget(1 << 30)
-	numbers, e := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
-	cacheMust(t, e)
-	ctx, e := uparams.NewParamsContext(m.Symbols, numbers, uparams.ParamsConfig{Budget: budget, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: budget}}})
-	cacheMust(t, e)
-	catalog, e := uparams.NewGlobalParamsCatalog(m.Symbols, uparams.GlobalParamsCatalogConfig{Budget: budget, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: budget}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: budget}}})
-	cacheMust(t, e)
-	globals, e := uparams.NewGlobalParamsService(m.Symbols, ctx, uparams.GlobalParamsConfig{Budget: budget, Catalog: catalog, DescriptorPageSize: 2, DescriptorWordsPageSize: 16})
-	cacheMust(t, e)
-	cacheMust(t, globals.InitializeSource())
-	params, e := ctx.NewValue()
-	cacheMust(t, e)
-	key := "elim_and"
-	cacheMust(t, ctx.SetBoolName(&params, &key, true))
-	boolean, e := rewriter.NewBoolRewriter(m, ctx, globals, &params)
-	cacheMust(t, e)
-	t.Cleanup(func() {
-		cacheMust(t, boolean.Close())
-		cacheMust(t, ctx.Del(&params))
-		cacheMust(t, globals.Close())
-		cacheMust(t, catalog.Close())
-		cacheMust(t, ctx.Close())
-		cacheMust(t, numbers.Close())
-		if budget.Used() != 0 {
-			t.Fatal("boolean service roots", budget.Used())
-		}
-	})
+	boolean := ufbvBooleanFixture(t, m)
 
 	fa, fc := app(f, a), app(f, c)
 	root := app(h, fa, fc)

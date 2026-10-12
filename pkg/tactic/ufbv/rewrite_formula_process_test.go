@@ -1,0 +1,77 @@
+package ufbv
+
+import (
+	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/symbol"
+)
+
+func TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults(t *testing.T) {
+	m := cacheFixture(t)
+	b, e := m.MkBoolSort()
+	cacheMust(t, e)
+	pin := func(h ast.ASTHandle) ast.ASTHandle {
+		t.Helper()
+		cacheMust(t, m.IncRef(h))
+		t.Cleanup(func() { cacheMust(t, m.DecRef(h)) })
+		return h
+	}
+	x, e := m.MkVar(0, b)
+	cacheMust(t, e)
+	pin(x)
+	f, e := m.MkFuncDecl(symbol.Numerical(301), []ast.ASTHandle{b}, b, ast.ASTFuncDeclInfo{})
+	cacheMust(t, e)
+	pin(f)
+	aDecl, e := m.MkFuncDecl(symbol.Numerical(302), nil, b, ast.ASTFuncDeclInfo{})
+	cacheMust(t, e)
+	pin(aDecl)
+	a, e := m.MkApp(aDecl, nil)
+	cacheMust(t, e)
+	pin(a)
+	fx, e := m.MkApp(f, []ast.ASTHandle{x})
+	cacheMust(t, e)
+	pin(fx)
+	fa, e := m.MkApp(f, []ast.ASTHandle{a})
+	cacheMust(t, e)
+	pin(fa)
+	q, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []symbol.Symbol{symbol.Numerical(303)}, Body: fx})
+	cacheMust(t, e)
+	pin(q)
+	truth, e := m.MkTrue()
+	cacheMust(t, e)
+	and, e := m.MkAnd(truth, fa)
+	cacheMust(t, e)
+	pin(and)
+	boolean := ufbvBooleanFixture(t, m)
+	processor, e := newFormulaProcessor(m, boolean)
+	cacheMust(t, e)
+	t.Cleanup(func() { cacheMust(t, processor.close()) })
+	// The initial LIFO queue processes `and` before it discovers q's rule.
+	// That rule reschedules the already processed expression for rewriting.
+	output, e := processor.run([]ast.ASTHandle{q, and})
+	cacheMust(t, e)
+	if len(output) != 2 || len(processor.back.processed) != 1 || len(processor.index.rules) != 1 || len(processor.back.todo) != 0 {
+		t.Fatal("source processed/rule partition and empty main todo", len(output), len(processor.back.processed), len(processor.index.rules), processor.back.todo)
+	}
+	seen := map[ast.ASTHandle]bool{}
+	for _, ref := range output {
+		h, e := m.RefGet(ref)
+		cacheMust(t, e)
+		seen[h] = true
+	}
+	if !seen[truth] || !seen[q] || len(seen) != 2 {
+		t.Fatal("rescheduled formula did not simplify or rule not published", seen)
+	}
+	if e := processor.close(); e != nil {
+		t.Fatal(e)
+	}
+	for _, ref := range output {
+		if _, e := m.RefGet(ref); e != nil {
+			t.Fatal("published result must outlive processor", e)
+		}
+	}
+	for i := range output {
+		cacheMust(t, m.DelRef(&output[i]))
+	}
+}
