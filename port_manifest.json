@@ -49858,7 +49858,9 @@
         "pkg/math/subpaving/fixed_interval_root_test.go",
         "pkg/math/subpaving/fixed_context.go",
         "pkg/math/subpaving/fixed_context_bounds.go",
-        "pkg/math/subpaving/fixed_context_bounds_test.go"
+        "pkg/math/subpaving/fixed_context_bounds_test.go",
+        "pkg/math/subpaving/fixed_polynomial.go",
+        "pkg/math/subpaving/fixed_polynomial_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -49872,7 +49874,9 @@
         "TestSubpavingFixedContextBoundFlowAndNormalization",
         "TestSubpavingFixedContextIntegerBoundNormalization",
         "TestSubpavingFixedContextPropagateCandidateAndRootPrecision",
-        "TestSubpavingFixedContextRelevanceArithmeticFailure"
+        "TestSubpavingFixedContextRelevanceArithmeticFailure",
+        "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant",
+        "TestSubpavingFixedPolynomialSingleUnboundedAndDuplicates"
       ],
       "conditionals": [
         {
@@ -49986,7 +49990,9 @@
         "pkg/math/subpaving/fixed_interval_root_test.go",
         "pkg/math/subpaving/fixed_context.go",
         "pkg/math/subpaving/fixed_context_bounds.go",
-        "pkg/math/subpaving/fixed_context_bounds_test.go"
+        "pkg/math/subpaving/fixed_context_bounds_test.go",
+        "pkg/math/subpaving/fixed_polynomial.go",
+        "pkg/math/subpaving/fixed_polynomial_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -49995,7 +50001,9 @@
         "TestSubpavingFixedContextBoundFlowAndNormalization",
         "TestSubpavingFixedContextIntegerBoundNormalization",
         "TestSubpavingFixedContextPropagateCandidateAndRootPrecision",
-        "TestSubpavingFixedContextRelevanceArithmeticFailure"
+        "TestSubpavingFixedContextRelevanceArithmeticFailure",
+        "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant",
+        "TestSubpavingFixedPolynomialSingleUnboundedAndDuplicates"
       ],
       "assertions": [
         {

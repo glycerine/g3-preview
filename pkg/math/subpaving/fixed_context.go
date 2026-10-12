@@ -30,6 +30,8 @@ type FixedContext struct {
 	arithmeticFailed bool
 	timestamp        uint64
 	queue            []*FixedBound
+	polynomials      map[uint32]*FixedPolynomial
+	watchers         [][]uint32
 	closed           bool
 }
 
@@ -39,7 +41,7 @@ func NewFixedContext(m *numeral.FixedPointManager, limit *control.Reslimit, isIn
 	if m == nil || limit == nil || len(isInt) > math.MaxUint32 {
 		return nil, arena.ErrInvalidSlot
 	}
-	c := &FixedContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), zeroEpsilon: epsilon == 0}
+	c := &FixedContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), zeroEpsilon: epsilon == 0, polynomials: make(map[uint32]*FixedPolynomial), watchers: make([][]uint32, len(isInt))}
 	c.self = c
 	defer func() {
 		if err != nil {
@@ -152,6 +154,13 @@ func (c *FixedContext) Close() error {
 	}
 	if err := c.root.Close(); err != nil {
 		return err
+	}
+	for x := range c.isInt {
+		if p := c.polynomials[uint32(x)]; p != nil {
+			if err := p.close(); err != nil {
+				return err
+			}
+		}
 	}
 	if err := c.closeNumerals(); err != nil {
 		return err
