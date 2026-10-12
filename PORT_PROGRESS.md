@@ -39840,5 +39840,11 @@ Go map, using C-string key boundaries and the source lazy table, all-flag,
 disable and finalize order. In particular, finalize releases the tag table
 without clearing enable-all. Focused native and debug tests cover those
 transitions. This supersedes the older ledger note about the deleted,
-unconsumed TraceContext. Process singleton wiring, `_TRACE` file output and
+unconsumed TraceContext. Process singleton wiring and optional `_TRACE`
 macro-site emission remain open, so both trace source units are partial.
+
+The explicit `open_trace` and `close_trace` functions have no caller in
+`src/`; they are dead for retained consumers. Their C++ stream lifecycle will
+not be copied into Go. The trace manifest now separates these dead controls
+from conditional macro emission, which has many retained source call sites and
+remains an open trace obligation.
