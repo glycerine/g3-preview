@@ -4081,7 +4081,7 @@
     },
     {
       "source": "src/util/lp/lp_primal_simplex.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/primal_prepare_float.go",
         "pkg/util/lp/primal_prepare_float_test.go",
@@ -4089,7 +4089,8 @@
         "pkg/util/lp/primal_solver_float.go",
         "pkg/util/lp/primal_validate_float.go",
         "pkg/util/lp/primal_prepare_rational.go",
-        "pkg/util/lp/primal_solver_rational.go"
+        "pkg/util/lp/primal_solver_rational.go",
+        "pkg/util/lp/primal_validate_float_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalPreparedBasisIndependentOracle",
@@ -4106,7 +4107,6 @@
         "TestLPFloatPrimalValidationToleranceAndIEEE",
         "TestLPFloatPrimalValidationOutputAndMutationPrefixes",
         "TestLPFloatPrimalValidationMissingMetadata",
-        "TestLPFloatPrimalOuterIndependentVertices",
         "TestLPRationalPrimalOuterIndependentVertices",
         "TestLPRationalPrimalOuterEmptyAndTerminal",
         "TestLPRationalPrimalStageIndependentRows",
@@ -4115,12 +4115,14 @@
         "TestLPRationalPrimalOuterPreservesOlderComparison",
         "TestLPRationalPrimalStageMetadataPublication",
         "TestLPRationalPrimalStageReporterAndFlush",
-        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges"
-      ]
+        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
+        "TestLPFloatPrimalValidationEveryReportByteAndEndl"
+      ],
+      "audit_note": "Whole retained-source/ownership audit completes lp_primal_simplex.h/.hpp/instances.cpp for actual double/double and mpq/mpq wrappers: initialization/preparation, residual-column basis assembly, core construction/Solve/status/iteration publication, original column/objective access and owning destruction. Retained named solution validators are floating only; no unused exact validators added. Source refactor, original_rows, alternative artificial initializers, init_buffer, set_zero_bound, undefined get_array_from_map and redundant derived get_or_create_column_info have no retained caller. Constructor/status fields use concrete Go owners/native fields; inherited base column lookup remains live. Full source scan includes ignored .hpp files and distinguishes explicit instantiations from consumer roots. Found and corrected two actual validator std::endl omissions: completed row and mismatch reports now flush through existing writer helper, and each insertion rejects short nil-error writes. Added TestLPFloatPrimalValidationEveryReportByteAndEndl: all byte prefixes for every relation plus a satisfied equality, explicit and nil-error short writes, sum-before/after each term, each flush failure, successful flush counts and no missing-constraint map publication before row endl succeeds. Existing fallible writer fixture now uses named buffer to prevent io.WriteString bypassing Write. Validation focus native0.072s/combined0.074s;76/78statements97.4% both. Full wrapper preparation/independent-vertex/status/alias/physical-ownership/metadata/report tests native2.098s/combined2.928s; per-file covered/total {\"native\":{\"primal_prepare_float.go\":[101,105],\"primal_prepare_rational.go\":[155,187],\"primal_solver_float.go\":[54,63],\"primal_solver_rational.go\":[107,133],\"primal_validate_float.go\":[76,78]},\"debug\":{\"primal_prepare_float.go\":[101,105],\"primal_prepare_rational.go\":[155,187],\"primal_solver_float.go\":[54,63],\"primal_solver_rational.go\":[107,133],\"primal_validate_float.go\":[76,78]}}. Both LP vets pass. Retained source limitations preserved: upper-only flip/type inconsistency, fresh tableau initial-zero OPTIMAL and checked uninitialized reduced-cost assertion. No mathematical/source repair, generic callback or unused template adapter. Core, common solver and source driver whole-unit audits remain separate; this audit closes only the three primal wrapper files. LP inventory33ported/62partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates the report fix. Profiles /mnt/oldrog/tmp/g3-lp-primal-wrapper-audit-{native,debug}.cover;66-reference source audit /mnt/oldrog/tmp/g3-lp-primal-wrapper-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/lp_primal_simplex.hpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/primal_prepare_float.go",
         "pkg/util/lp/primal_prepare_float_test.go",
@@ -4128,7 +4130,8 @@
         "pkg/util/lp/primal_solver_float.go",
         "pkg/util/lp/primal_validate_float.go",
         "pkg/util/lp/primal_prepare_rational.go",
-        "pkg/util/lp/primal_solver_rational.go"
+        "pkg/util/lp/primal_solver_rational.go",
+        "pkg/util/lp/primal_validate_float_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalPreparedBasisIndependentOracle",
@@ -4145,7 +4148,6 @@
         "TestLPFloatPrimalValidationToleranceAndIEEE",
         "TestLPFloatPrimalValidationOutputAndMutationPrefixes",
         "TestLPFloatPrimalValidationMissingMetadata",
-        "TestLPFloatPrimalOuterIndependentVertices",
         "TestLPRationalPrimalOuterIndependentVertices",
         "TestLPRationalPrimalOuterEmptyAndTerminal",
         "TestLPRationalPrimalStageIndependentRows",
@@ -4154,19 +4156,22 @@
         "TestLPRationalPrimalOuterPreservesOlderComparison",
         "TestLPRationalPrimalStageMetadataPublication",
         "TestLPRationalPrimalStageReporterAndFlush",
-        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges"
-      ]
+        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
+        "TestLPFloatPrimalValidationEveryReportByteAndEndl"
+      ],
+      "audit_note": "Whole retained-source/ownership audit completes lp_primal_simplex.h/.hpp/instances.cpp for actual double/double and mpq/mpq wrappers: initialization/preparation, residual-column basis assembly, core construction/Solve/status/iteration publication, original column/objective access and owning destruction. Retained named solution validators are floating only; no unused exact validators added. Source refactor, original_rows, alternative artificial initializers, init_buffer, set_zero_bound, undefined get_array_from_map and redundant derived get_or_create_column_info have no retained caller. Constructor/status fields use concrete Go owners/native fields; inherited base column lookup remains live. Full source scan includes ignored .hpp files and distinguishes explicit instantiations from consumer roots. Found and corrected two actual validator std::endl omissions: completed row and mismatch reports now flush through existing writer helper, and each insertion rejects short nil-error writes. Added TestLPFloatPrimalValidationEveryReportByteAndEndl: all byte prefixes for every relation plus a satisfied equality, explicit and nil-error short writes, sum-before/after each term, each flush failure, successful flush counts and no missing-constraint map publication before row endl succeeds. Existing fallible writer fixture now uses named buffer to prevent io.WriteString bypassing Write. Validation focus native0.072s/combined0.074s;76/78statements97.4% both. Full wrapper preparation/independent-vertex/status/alias/physical-ownership/metadata/report tests native2.098s/combined2.928s; per-file covered/total {\"native\":{\"primal_prepare_float.go\":[101,105],\"primal_prepare_rational.go\":[155,187],\"primal_solver_float.go\":[54,63],\"primal_solver_rational.go\":[107,133],\"primal_validate_float.go\":[76,78]},\"debug\":{\"primal_prepare_float.go\":[101,105],\"primal_prepare_rational.go\":[155,187],\"primal_solver_float.go\":[54,63],\"primal_solver_rational.go\":[107,133],\"primal_validate_float.go\":[76,78]}}. Both LP vets pass. Retained source limitations preserved: upper-only flip/type inconsistency, fresh tableau initial-zero OPTIMAL and checked uninitialized reduced-cost assertion. No mathematical/source repair, generic callback or unused template adapter. Core, common solver and source driver whole-unit audits remain separate; this audit closes only the three primal wrapper files. LP inventory33ported/62partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates the report fix. Profiles /mnt/oldrog/tmp/g3-lp-primal-wrapper-audit-{native,debug}.cover;66-reference source audit /mnt/oldrog/tmp/g3-lp-primal-wrapper-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/lp_primal_simplex_instances.cpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/primal_prepare_float.go",
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/solver_float.go",
         "pkg/util/lp/primal_validate_float.go",
         "pkg/util/lp/primal_prepare_rational.go",
-        "pkg/util/lp/primal_solver_rational.go"
+        "pkg/util/lp/primal_solver_rational.go",
+        "pkg/util/lp/primal_validate_float_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalPreparedBasisIndependentOracle",
@@ -4187,8 +4192,10 @@
         "TestLPRationalPrimalOuterPreservesOlderComparison",
         "TestLPRationalPrimalStageMetadataPublication",
         "TestLPRationalPrimalStageReporterAndFlush",
-        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges"
-      ]
+        "TestLPRationalPrimalOuterCostAliasesAndOwnerEdges",
+        "TestLPFloatPrimalValidationEveryReportByteAndEndl"
+      ],
+      "audit_note": "Whole retained-source/ownership audit completes lp_primal_simplex.h/.hpp/instances.cpp for actual double/double and mpq/mpq wrappers: initialization/preparation, residual-column basis assembly, core construction/Solve/status/iteration publication, original column/objective access and owning destruction. Retained named solution validators are floating only; no unused exact validators added. Source refactor, original_rows, alternative artificial initializers, init_buffer, set_zero_bound, undefined get_array_from_map and redundant derived get_or_create_column_info have no retained caller. Constructor/status fields use concrete Go owners/native fields; inherited base column lookup remains live. Full source scan includes ignored .hpp files and distinguishes explicit instantiations from consumer roots. Found and corrected two actual validator std::endl omissions: completed row and mismatch reports now flush through existing writer helper, and each insertion rejects short nil-error writes. Added TestLPFloatPrimalValidationEveryReportByteAndEndl: all byte prefixes for every relation plus a satisfied equality, explicit and nil-error short writes, sum-before/after each term, each flush failure, successful flush counts and no missing-constraint map publication before row endl succeeds. Existing fallible writer fixture now uses named buffer to prevent io.WriteString bypassing Write. Validation focus native0.072s/combined0.074s;76/78statements97.4% both. Full wrapper preparation/independent-vertex/status/alias/physical-ownership/metadata/report tests native2.098s/combined2.928s; per-file covered/total {\"native\":{\"primal_prepare_float.go\":[101,105],\"primal_prepare_rational.go\":[155,187],\"primal_solver_float.go\":[54,63],\"primal_solver_rational.go\":[107,133],\"primal_validate_float.go\":[76,78]},\"debug\":{\"primal_prepare_float.go\":[101,105],\"primal_prepare_rational.go\":[155,187],\"primal_solver_float.go\":[54,63],\"primal_solver_rational.go\":[107,133],\"primal_validate_float.go\":[76,78]}}. Both LP vets pass. Retained source limitations preserved: upper-only flip/type inconsistency, fresh tableau initial-zero OPTIMAL and checked uninitialized reduced-cost assertion. No mathematical/source repair, generic callback or unused template adapter. Core, common solver and source driver whole-unit audits remain separate; this audit closes only the three primal wrapper files. LP inventory33ported/62partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates the report fix. Profiles /mnt/oldrog/tmp/g3-lp-primal-wrapper-audit-{native,debug}.cover;66-reference source audit /mnt/oldrog/tmp/g3-lp-primal-wrapper-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9."
     },
     {
       "source": "src/util/lp/lp_settings.h",
@@ -6781,8 +6788,8 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 30,
-    "partial": 65,
+    "ported": 33,
+    "partial": 62,
     "reference_only": 10,
     "dead_deleted": 3
   },
@@ -12241,6 +12248,55 @@
         "priority_queue_native.go": [
           410,
           479
+        ]
+      }
+    }
+  },
+  "latest_primal_wrapper_support_audit": {
+    "summary": "Whole retained-source/ownership audit completes lp_primal_simplex.h/.hpp/instances.cpp for actual double/double and mpq/mpq wrappers: initialization/preparation, residual-column basis assembly, core construction/Solve/status/iteration publication, original column/objective access and owning destruction. Retained named solution validators are floating only; no unused exact validators added. Source refactor, original_rows, alternative artificial initializers, init_buffer, set_zero_bound, undefined get_array_from_map and redundant derived get_or_create_column_info have no retained caller. Constructor/status fields use concrete Go owners/native fields; inherited base column lookup remains live. Full source scan includes ignored .hpp files and distinguishes explicit instantiations from consumer roots. Found and corrected two actual validator std::endl omissions: completed row and mismatch reports now flush through existing writer helper, and each insertion rejects short nil-error writes. Added TestLPFloatPrimalValidationEveryReportByteAndEndl: all byte prefixes for every relation plus a satisfied equality, explicit and nil-error short writes, sum-before/after each term, each flush failure, successful flush counts and no missing-constraint map publication before row endl succeeds. Existing fallible writer fixture now uses named buffer to prevent io.WriteString bypassing Write. Validation focus native0.072s/combined0.074s;76/78statements97.4% both. Full wrapper preparation/independent-vertex/status/alias/physical-ownership/metadata/report tests native2.098s/combined2.928s; per-file covered/total {\"native\":{\"primal_prepare_float.go\":[101,105],\"primal_prepare_rational.go\":[155,187],\"primal_solver_float.go\":[54,63],\"primal_solver_rational.go\":[107,133],\"primal_validate_float.go\":[76,78]},\"debug\":{\"primal_prepare_float.go\":[101,105],\"primal_prepare_rational.go\":[155,187],\"primal_solver_float.go\":[54,63],\"primal_solver_rational.go\":[107,133],\"primal_validate_float.go\":[76,78]}}. Both LP vets pass. Retained source limitations preserved: upper-only flip/type inconsistency, fresh tableau initial-zero OPTIMAL and checked uninitialized reduced-cost assertion. No mathematical/source repair, generic callback or unused template adapter. Core, common solver and source driver whole-unit audits remain separate; this audit closes only the three primal wrapper files. LP inventory33ported/62partial/10reference_only/3dead_deleted/2platform_replacement. Latest full native8f2961ca predates the report fix. Profiles /mnt/oldrog/tmp/g3-lp-primal-wrapper-audit-{native,debug}.cover;66-reference source audit /mnt/oldrog/tmp/g3-lp-primal-wrapper-consumers-audit.txt. CPUs8\u201316/GOMAXPROCS9.",
+    "focused_go_file_statement_coverage": {
+      "native": {
+        "primal_prepare_float.go": [
+          101,
+          105
+        ],
+        "primal_prepare_rational.go": [
+          155,
+          187
+        ],
+        "primal_solver_float.go": [
+          54,
+          63
+        ],
+        "primal_solver_rational.go": [
+          107,
+          133
+        ],
+        "primal_validate_float.go": [
+          76,
+          78
+        ]
+      },
+      "debug": {
+        "primal_prepare_float.go": [
+          101,
+          105
+        ],
+        "primal_prepare_rational.go": [
+          155,
+          187
+        ],
+        "primal_solver_float.go": [
+          54,
+          63
+        ],
+        "primal_solver_rational.go": [
+          107,
+          133
+        ],
+        "primal_validate_float.go": [
+          76,
+          78
         ]
       }
     }

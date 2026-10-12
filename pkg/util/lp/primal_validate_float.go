@@ -63,14 +63,14 @@ func (m *FloatPrimalSimplex) GetRowValue(i uint32, solution map[string]float64, 
 			return ret, ErrBounds
 		}
 		if out != nil {
-			if _, err := fmt.Fprintf(out, "%s(%s=%s) ", floatLPNumberText(a), c.Name, floatLPNumberText(value)); err != nil {
+			if err := writeConstraintText(out, fmt.Sprintf("%s(%s=%s) ", floatLPNumberText(a), c.Name, floatLPNumberText(value))); err != nil {
 				return ret, err
 			}
 		}
 		ret += a * value
 	}
 	if out != nil {
-		if _, err := fmt.Fprintf(out, " = %s\n", floatLPNumberText(ret)); err != nil {
+		if err := writeDriverLine(out, " = "+floatLPNumberText(ret)); err != nil {
 			return ret, err
 		}
 	}
@@ -106,7 +106,7 @@ func (m *FloatPrimalSimplex) RowConstraintHolds(i uint32, solution map[string]fl
 	}
 	if bad {
 		if out != nil {
-			if _, err := fmt.Fprintf(out, "should be %s %s\n", comparison, floatLPNumberText(c.RightSide)); err != nil {
+			if err := writeDriverLine(out, "should be "+comparison+" "+floatLPNumberText(c.RightSide)); err != nil {
 				return false, err
 			}
 		}

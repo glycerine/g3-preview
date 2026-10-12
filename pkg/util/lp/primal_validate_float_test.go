@@ -3,6 +3,7 @@ package lp
 import (
 	"bytes"
 	"errors"
+	"io"
 	"math"
 	"math/rand"
 	"strings"
@@ -119,17 +120,19 @@ func TestLPFloatPrimalValidationToleranceAndIEEE(t *testing.T) {
 }
 
 type lpValidationWriter struct {
-	bytes.Buffer
+	buffer  bytes.Buffer
 	allowed int
 	err     error
 }
+
+func (w *lpValidationWriter) String() string { return w.buffer.String() }
 
 func (w *lpValidationWriter) Write(p []byte) (int, error) {
 	if w.allowed == 0 {
 		return 0, w.err
 	}
 	w.allowed--
-	return w.Buffer.Write(p)
+	return w.buffer.Write(p)
 }
 
 func TestLPFloatPrimalValidationOutputAndMutationPrefixes(t *testing.T) {
@@ -234,5 +237,105 @@ func TestLPFloatPrimalValidationMissingMetadata(t *testing.T) {
 	m.SetRowColumnCoefficient(4, 8, 0)
 	if _, err := m.GetRowValue(4, nil, nil); err != want {
 		t.Fatal(err)
+	}
+}
+
+// Source lp_primal_simplex.hpp:289-346: term insertion precedes its sum,
+// and each completed row/mismatch report ends with std::endl.
+type lpValidationPrefixWriter struct {
+	larConstraintPrefixWriter
+	flushes, failAt int
+}
+
+func (w *lpValidationPrefixWriter) Flush() error {
+	w.flushes++
+	if w.flushes == w.failAt {
+		return lpErrResidualWrite
+	}
+	return nil
+}
+
+func TestLPFloatPrimalValidationEveryReportByteAndEndl(t *testing.T) {
+	m := lpFloatPrimal(t)
+	m.GetOrCreateColumnInfo(1).Name = "a"
+	m.GetOrCreateColumnInfo(2).Name = "b"
+	m.SetRowColumnCoefficient(0, 1, 2)
+	m.SetRowColumnCoefficient(0, 2, -3)
+	solution := map[string]float64{"a": 4, "b": 1}
+	first, second := "2(a=4) ", "-3(b=1) "
+	row := first + second + " = 5\n"
+	for _, refused := range []error{nil, lpErrResidualWrite} {
+		wantErr := refused
+		if wantErr == nil {
+			wantErr = io.ErrShortWrite
+		}
+		for n := 0; n < len(row); n++ {
+			w := &lpValidationPrefixWriter{larConstraintPrefixWriter: larConstraintPrefixWriter{remaining: n, err: refused}}
+			got, err := m.GetRowValue(0, solution, w)
+			want := 0.0
+			if n >= len(first) {
+				want = 8
+			}
+			if n >= len(first)+len(second) {
+				want = 5
+			}
+			if err != wantErr || got != want || w.output.String() != row[:n] || w.flushes != 0 {
+				t.Fatal("row prefix", n, got, want, err, w.output.String(), w.flushes)
+			}
+		}
+		for _, tc := range []struct {
+			relation   LPRelation
+			right      float64
+			diagnostic string
+		}{
+			{RelationEqual, 4, "should be = 4\n"},
+			{RelationLessOrEqual, 4, "should be <= 4\n"},
+			{RelationGreaterOrEqual, 6, "should be >= 6\n"},
+			{RelationEqual, 5, ""},
+		} {
+			m.Constraints[0] = FloatConstraint{tc.right, tc.relation}
+			report := row + tc.diagnostic
+			for n := 0; n < len(report); n++ {
+				w := &lpValidationPrefixWriter{larConstraintPrefixWriter: larConstraintPrefixWriter{remaining: n, err: refused}}
+				ok, err := m.RowConstraintHolds(0, solution, w)
+				flushes := 0
+				if n >= len(row) {
+					flushes = 1
+				}
+				if ok || err != wantErr || w.output.String() != report[:n] || w.flushes != flushes {
+					t.Fatal("constraint prefix", tc, n, ok, err, w.output.String(), w.flushes, flushes)
+				}
+			}
+			flushes := 1
+			if tc.diagnostic != "" {
+				flushes = 2
+			}
+			for fail := 0; fail <= flushes; fail++ {
+				w := &lpValidationPrefixWriter{larConstraintPrefixWriter: larConstraintPrefixWriter{remaining: len(report)}, failAt: fail}
+				ok, err := m.RowConstraintHolds(0, solution, w)
+				if fail == 0 {
+					if err != nil || ok != (tc.diagnostic == "") || w.flushes != flushes || w.output.String() != report {
+						t.Fatal(tc, ok, err, w.flushes, w.output.String())
+					}
+				} else {
+					prefix := report
+					if fail == 1 {
+						prefix = row
+					}
+					if ok || err != lpErrResidualWrite || w.flushes != fail || w.output.String() != prefix {
+						t.Fatal(tc, fail, ok, err, w.flushes, w.output.String())
+					}
+				}
+			}
+		}
+	}
+	// A failed row endl precedes the source constraint operator[] insertion.
+	delete(m.Constraints, 0)
+	w := &lpValidationPrefixWriter{larConstraintPrefixWriter: larConstraintPrefixWriter{remaining: len(row)}, failAt: 1}
+	if ok, err := m.RowConstraintHolds(0, solution, w); ok || err != lpErrResidualWrite {
+		t.Fatal(ok, err)
+	}
+	if _, exists := m.Constraints[0]; exists {
+		t.Fatal("constraint published before row endl completed")
 	}
 }
