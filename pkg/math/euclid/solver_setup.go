@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/heap"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -39,6 +40,7 @@ type solverSetup struct {
 	manager            *numeral.RationalManager
 	asBuffer           *numeral.ScopedIntVector
 	bsBuffer           *numeral.ScopedRationalVector
+	queue              *heap.Int
 	parameter          []bool
 	solved             []uint32
 	occurrences        [][]uint32
@@ -71,6 +73,15 @@ func newSolverSetup(m *numeral.RationalManager) (*solverSetup, error) {
 	}
 	s := &solverSetup{manager: m, asBuffer: as, bsBuffer: bs, header: header}
 	s.self = s
+	s.queue, e = heap.New(16, heap.Config{Budget: m.BudgetField, Less: func(a, b int32) bool {
+		return s.solved[a] < s.solved[b]
+	}})
+	if e != nil {
+		_ = bs.Close()
+		_ = as.Close()
+		m.BudgetField.Release(header)
+		return nil, e
+	}
 	return s, nil
 }
 
@@ -93,7 +104,7 @@ func (s *solverSetup) mkVar(parameter bool) (uint32, error) {
 	if e := s.open(); e != nil {
 		return 0, e
 	}
-	if uint64(len(s.solved)) >= uint64(^uint32(0)) {
+	if len(s.solved) >= 1<<31-1 {
 		return 0, arena.ErrBounds
 	}
 	x := uint32(len(s.solved))
@@ -105,7 +116,31 @@ func (s *solverSetup) mkVar(parameter bool) (uint32, error) {
 		s.stop = e
 		return 0, e
 	}
+	if e := s.queue.Reserve(int32(x + 1)); e != nil {
+		s.stop = e
+		return 0, e
+	}
 	return x, nil
+}
+
+// scheduleVarSubst inserts only solved IDs, preserving source input order.
+// Equal-priority behavior remains the heap's concrete source ordering.
+func (s *solverSetup) scheduleVarSubst(xs []uint32) error {
+	if e := s.open(); e != nil {
+		return e
+	}
+	for _, x := range xs {
+		if uint64(x) >= uint64(len(s.solved)) {
+			return arena.ErrBounds
+		}
+		if s.solved[x] != nullEquationIndex {
+			if e := s.queue.Insert(int32(x)); e != nil {
+				s.stop = e
+				return e
+			}
+		}
+	}
+	return nil
 }
 
 // mkJustification appends the zero buffer slot before advancing the ID.
@@ -158,6 +193,9 @@ func (s *solverSetup) Close() error {
 		}
 		s.equations[s.equationCloseIndex] = nil
 		s.equationCloseIndex++
+	}
+	if e := s.queue.Close(); e != nil {
+		return e
 	}
 	if e := s.bsBuffer.Close(); e != nil {
 		return e

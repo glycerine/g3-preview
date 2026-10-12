@@ -33812,7 +33812,8 @@
         "TestEuclideanRationalBufferSortAndRawSwap",
         "TestEuclideanPositionSourceBinarySearch",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership",
-        "TestEuclideanSetupHeaderRefusalBeforeBuffers"
+        "TestEuclideanSetupHeaderRefusalBeforeBuffers",
+        "TestEuclideanSetupSolvedVariableQueue"
       ],
       "assertions": [
         {
@@ -33899,13 +33900,14 @@
           ]
         },
         {
-          "name": "imp pre-elimination constructor, pos, mk_var and mk_justification metadata/buffer publication, owned equation-list cleanup",
+          "name": "imp pre-elimination constructor, pos, mk_var and mk_justification metadata/buffer publication, solved-variable heap scheduling, owned equation-list cleanup",
           "status": "partial",
           "go_target": "pkg/math/euclid/solver_setup.go",
           "tests": [
             "TestEuclideanPositionSourceBinarySearch",
             "TestEuclideanSetupVariableJustificationAndEquationOwnership",
-            "TestEuclideanSetupHeaderRefusalBeforeBuffers"
+            "TestEuclideanSetupHeaderRefusalBeforeBuffers",
+            "TestEuclideanSetupSolvedVariableQueue"
           ]
         },
         {
@@ -33916,7 +33918,7 @@
       "ownership": [
         "The partial sort path borrows the rational manager, copies coefficient numerals into typed owned buffer slots, sorts scalar IDs, then swaps each raw numeral with its source-indexed slot. A whole-slice raw swap transfers numeral ownership between the equation slice and buffer without cloning.",
         "The concrete equation allocates its owner header first, copies coefficients into indexed reusable slots, transfers them into its vectors with sort_core, then owns its constant, integer coefficients and rational justifications. del_eq releases those in that order, leaving caller inputs and reusable buffers separately owned.",
-        "The pre-elimination setup borrows its rational manager, publishes variable metadata before the matching integer buffer slot, publishes a justification buffer slot before incrementing its ID, owns equation pointers in source list order, and closes its rational then integer member buffers in reverse declaration order."
+        "The pre-elimination setup borrows its rational manager, publishes variable metadata before the matching integer buffer slot, reserves that ID in a concrete solved-index-priority heap, publishes a justification buffer slot before incrementing its ID, owns equation pointers in source list order, and closes its heap, rational and integer member buffers in reverse declaration order."
       ],
       "deviations": [
         "The Euclidean solver body is not yet ported; this covers its concrete numeric buffer, sort, and equation construction/destruction paths only."
@@ -116066,7 +116068,9 @@
         "pkg/util/diagnostic/util_debug_macros.go",
         "pkg/util/diagnostic/util_debug_macro_source_test.go",
         "pkg/util/heap/source_prefix_test.go",
-        "pkg/sat/sat_var_queue_native_test.go"
+        "pkg/sat/sat_var_queue_native_test.go",
+        "pkg/math/euclid/solver_setup.go",
+        "pkg/math/euclid/solver_setup_test.go"
       ],
       "tests": [
         "TestHeapBudgetsFailuresSwapAndWarm",
@@ -116093,7 +116097,8 @@
         "TestDebugMacroCassertLiteralTagShortCircuitAndUninitializedCondition",
         "TestDebugMacroVerifyConditionIsNotErasedByAssertionSwitch",
         "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
-        "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards"
+        "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards",
+        "TestEuclideanSetupSolvedVariableQueue"
       ],
       "conditionals": [
         {

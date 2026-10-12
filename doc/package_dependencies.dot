@@ -41,6 +41,7 @@ digraph packages {
   "cmd/portcheck" -> "portcheck";
   "math/euclid" [style=filled, fillcolor="#eeeeee"];
   "math/euclid" -> "arena";
+  "math/euclid" -> "util/heap";
   "math/euclid" -> "util/numeral";
   "math/polynomial" [style=filled, fillcolor="#eeeeee"];
   "math/polynomial" -> "arena";

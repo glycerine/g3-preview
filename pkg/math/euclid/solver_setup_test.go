@@ -86,3 +86,35 @@ func TestEuclideanSetupHeaderRefusalBeforeBuffers(t *testing.T) {
 	}
 	m.BudgetField.FailAfter(-1)
 }
+
+func TestEuclideanSetupSolvedVariableQueue(t *testing.T) {
+	m := euclidNumeralManager(t)
+	s, e := newSolverSetup(m)
+	euclidMust(t, e)
+	if s.queue.Bounds() != 16 {
+		t.Fatalf("initial source queue bound = %d", s.queue.Bounds())
+	}
+	for i := 0; i < 17; i++ {
+		id, e := s.mkVar(false)
+		euclidMust(t, e)
+		if id != uint32(i) || s.queue.Bounds() < int32(i+1) {
+			t.Fatalf("variable %d queue bound = %d", id, s.queue.Bounds())
+		}
+	}
+	s.solved[0], s.solved[1], s.solved[2] = 5, 2, 9
+	euclidMust(t, s.scheduleVarSubst([]uint32{2, 0, 3, 1}))
+	if !s.queue.CheckInvariant() || s.queue.Contains(3) {
+		t.Fatal("queue accepted an unsolved variable or lost its order")
+	}
+	for _, want := range []int32{1, 0, 2} {
+		got, e := s.queue.EraseMin()
+		euclidMust(t, e)
+		if got != want {
+			t.Fatalf("erase minimum = %d, want %d", got, want)
+		}
+	}
+	if !s.queue.Empty() {
+		t.Fatal("scheduled variables remain")
+	}
+	euclidMust(t, s.Close())
+}

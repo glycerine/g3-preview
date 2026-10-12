@@ -410,6 +410,7 @@
       "package": "math/euclid",
       "imports": [
         "arena",
+        "util/heap",
         "util/numeral"
       ],
       "production_files": [
