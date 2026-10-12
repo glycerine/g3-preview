@@ -95707,12 +95707,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/bv/max_bv_sharing_reduce.go",
-        "pkg/tactic/bv/max_bv_sharing_goal.go"
+        "pkg/tactic/bv/max_bv_sharing_goal.go",
+        "pkg/tactic/bv/max_bv_sharing_proof.go"
       ],
       "tests": [
         "TestSharingReducerOrderedPairsReuseAndNumeralPosition",
         "TestSharingGoalPassReusesEarlierFormulaAndUpdatesDepth",
-        "TestSharingGoalPassVisitsQuantifiedBody"
+        "TestSharingGoalPassVisitsQuantifiedBody",
+        "TestSharingGoalPassProofChainsCongruenceAndRewrite",
+        "TestSharingGoalPassProofQuantifierIntroduction"
       ],
       "conditionals": [
         {
@@ -95758,17 +95761,26 @@
           ]
         },
         {
-          "name": "nonproof goal application, bottom-up AST and quantifier traversal, pair reuse across sequential goal updates, and depth transition",
+          "name": "goal application, bottom-up AST and quantifier traversal, pair reuse across sequential goal updates, and depth transition",
           "status": "partial",
           "go_target": "pkg/tactic/bv/max_bv_sharing_goal.go",
           "tests": [
             "TestSharingGoalPassReusesEarlierFormulaAndUpdatesDepth",
             "TestSharingGoalPassVisitsQuantifiedBody"
           ]
+        },
+        {
+          "name": "proof-enabled local rewrite, congruence, transitivity, quantifier introduction, and goal modus ponens",
+          "status": "ported",
+          "go_target": "pkg/tactic/bv/max_bv_sharing_proof.go",
+          "tests": [
+            "TestSharingGoalPassProofChainsCongruenceAndRewrite",
+            "TestSharingGoalPassProofQuantifierIntroduction"
+          ]
         }
       ],
       "ownership": [
-        "The concrete reducer retains cached pair operands and generated apps as AST roots through Close. The goal pass retains rebuilt applications and quantifiers until goal updates acquire their own roots. Proofs, parameters, budgets, and full tactic lifecycle remain unported."
+        "The concrete reducer retains cached pair operands and generated apps as AST roots through Close. The goal pass retains rebuilt applications, quantifiers, and proof nodes until goal updates acquire their own roots. Parameters, resource checks, and full tactic lifecycle remain unported."
       ],
       "deviations": [
         "The four obj_pair_hashtable<expr,expr> instantiations use typed Go maps keyed by ordered AST-handle pairs; C++ hash buckets are not retained."

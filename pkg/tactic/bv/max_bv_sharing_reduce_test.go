@@ -126,14 +126,115 @@ func TestSharingGoalPassVisitsQuantifiedBody(t *testing.T) {
 	}
 }
 
+func TestSharingGoalPassProofChainsCongruenceAndRewrite(t *testing.T) {
+	m, fid := sharingFixtureProofMode(t, ast.ASTProofEnabled)
+	sort, e := m.BitVectorSort(8)
+	sharingMust(t, e)
+	vars := make([]ast.ASTHandle, 4)
+	for i := range vars {
+		vars[i], e = m.MkConst(symbol.Numerical(uint32(980+i)), sort)
+		sharingMust(t, e)
+		sharingMust(t, m.IncRef(vars[i]))
+	}
+	t.Cleanup(func() {
+		for i := len(vars) - 1; i >= 0; i-- {
+			sharingMust(t, m.DecRef(vars[i]))
+		}
+	})
+	binary, e := m.MkFamilyApp(fid, 4, nil, vars[:2])
+	sharingMust(t, e)
+	nary, e := m.MkFamilyApp(fid, 4, nil, []ast.ASTHandle{vars[1], vars[2], vars[0], vars[3]})
+	sharingMust(t, e)
+	f0, e := m.MkEq(binary, vars[2])
+	sharingMust(t, e)
+	f1, e := m.MkEq(nary, vars[3])
+	sharingMust(t, e)
+	goal, e := tactic.NewGoal(m, true, true, false)
+	sharingMust(t, e)
+	t.Cleanup(func() { sharingMust(t, goal.Close()) })
+	sharingMust(t, goal.Assert(f0))
+	sharingMust(t, goal.Assert(f1))
+	before, e := goal.Proof(1)
+	sharingMust(t, e)
+	pass, e := NewSharingGoalPass(m, 128)
+	sharingMust(t, e)
+	_, e = pass.Apply(goal)
+	sharingMust(t, e)
+	form, e := goal.Form(1)
+	sharingMust(t, e)
+	pr, e := goal.Proof(1)
+	sharingMust(t, e)
+	if pr.IsNull() || pr == before || form == f1 {
+		t.Fatal("rewritten proof goal was not updated", pr, before, form, f1)
+	}
+	fact, e := m.GetProofFact(pr)
+	sharingMust(t, e)
+	if fact != form {
+		t.Fatal("proof fact does not match rewritten goal", fact, form)
+	}
+}
+
+func TestSharingGoalPassProofQuantifierIntroduction(t *testing.T) {
+	m, fid := sharingFixtureProofMode(t, ast.ASTProofEnabled)
+	sort, e := m.BitVectorSort(8)
+	sharingMust(t, e)
+	x, e := m.MkVar(0, sort)
+	sharingMust(t, e)
+	y, e := m.MkConst(symbol.Numerical(990), sort)
+	sharingMust(t, e)
+	z, e := m.MkConst(symbol.Numerical(991), sort)
+	sharingMust(t, e)
+	for _, h := range []ast.ASTHandle{x, y, z} {
+		sharingMust(t, m.IncRef(h))
+		h := h
+		t.Cleanup(func() { sharingMust(t, m.DecRef(h)) })
+	}
+	binary, e := m.MkFamilyApp(fid, 4, nil, []ast.ASTHandle{x, y})
+	sharingMust(t, e)
+	nary, e := m.MkFamilyApp(fid, 4, nil, []ast.ASTHandle{y, z, x, z})
+	sharingMust(t, e)
+	f0, e := m.MkEq(binary, z)
+	sharingMust(t, e)
+	f1, e := m.MkEq(nary, z)
+	sharingMust(t, e)
+	body, e := m.MkAnd(f0, f1)
+	sharingMust(t, e)
+	q, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{symbol.Numerical(992)}, Body: body})
+	sharingMust(t, e)
+	goal, e := tactic.NewGoal(m, true, true, false)
+	sharingMust(t, e)
+	t.Cleanup(func() { sharingMust(t, goal.Close()) })
+	sharingMust(t, goal.Assert(q))
+	pass, e := NewSharingGoalPass(m, 128)
+	sharingMust(t, e)
+	_, e = pass.Apply(goal)
+	sharingMust(t, e)
+	form, e := goal.Form(0)
+	sharingMust(t, e)
+	pr, e := goal.Proof(0)
+	sharingMust(t, e)
+	if form == q || pr.IsNull() {
+		t.Fatal("quantifier proof rewrite was not published", form, pr)
+	}
+	fact, e := m.GetProofFact(pr)
+	sharingMust(t, e)
+	if fact != form {
+		t.Fatal("quantifier proof fact mismatch", fact, form)
+	}
+}
+
 func sharingFixture(t *testing.T) (*ast.ASTManager, ast.FamilyID) {
+	return sharingFixtureProofMode(t, ast.ASTProofDisabled)
+}
+
+func sharingFixtureProofMode(t *testing.T, mode ast.ASTProofMode) (*ast.ASTManager, ast.FamilyID) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)
 	s, e := symbol.NewManager(symbol.Config{Budget: b})
 	sharingMust(t, e)
 	q, e := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	sharingMust(t, e)
-	m, e := ast.NewASTManager(ast.ASTManagerConfig{Symbols: s, Numerals: q, Budget: b})
+	m, e := ast.NewASTManager(ast.ASTManagerConfig{Symbols: s, Numerals: q, Budget: b, ProofMode: mode})
 	sharingMust(t, e)
 	_, e = m.RegisterArithmeticPlugin()
 	sharingMust(t, e)

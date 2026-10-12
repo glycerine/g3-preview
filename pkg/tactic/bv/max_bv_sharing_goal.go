@@ -8,10 +8,9 @@ import (
 	"github.com/glycerine/g3/pkg/tactic"
 )
 
-var ErrSharingProofs = errors.New("g3: max BV sharing proof traversal is not yet ported")
-
 // SharingGoalPass applies the concrete BV sharing reducer to goal formulas.
-// Proof production remains in the enclosing source tactic's unfinished scope.
+// Parameter/resource limits and lifecycle remain in the enclosing tactic's
+// unfinished scope.
 type SharingGoalPass struct {
 	manager *ast.ASTManager
 	family  ast.FamilyID
@@ -42,15 +41,13 @@ func (p *SharingGoalPass) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error
 	if e != nil {
 		return nil, e
 	}
-	if proofs {
-		return nil, ErrSharingProofs
-	}
 	r, e := NewSharingReducer(p.manager, p.family, p.maxArgs)
 	if e != nil {
 		return nil, e
 	}
 	defer func() { result = errors.Join(result, r.Close()) }()
 	memo := make(map[ast.ASTHandle]ast.ASTHandle)
+	proofMemo := make(map[ast.ASTHandle]sharingProofResult)
 	n, e := goal.Size()
 	if e != nil {
 		return nil, e
@@ -71,11 +68,34 @@ func (p *SharingGoalPass) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error
 		if e != nil {
 			return nil, e
 		}
-		rewritten, e := p.rewriteApplication(form, r, memo)
-		if e != nil {
-			return nil, e
+		var rewritten, rewrittenProof ast.ASTHandle
+		if proofs {
+			var step sharingProofResult
+			step, e = p.rewriteWithProof(form, r, proofMemo)
+			if e != nil {
+				return nil, e
+			}
+			rewritten = step.expr
+			rewrittenProof, e = goal.Proof(i)
+			if e != nil {
+				return nil, e
+			}
+			if !step.proof.IsNull() {
+				rewrittenProof, e = p.manager.MkProofModusPonens(rewrittenProof, step.proof)
+				if e != nil {
+					return nil, e
+				}
+				if e = r.keep(rewrittenProof); e != nil {
+					return nil, e
+				}
+			}
+		} else {
+			rewritten, e = p.rewriteApplication(form, r, memo)
+			if e != nil {
+				return nil, e
+			}
 		}
-		if e := goal.Update(i, rewritten, ast.ASTHandle{}, dep); e != nil {
+		if e := goal.Update(i, rewritten, rewrittenProof, dep); e != nil {
 			return nil, e
 		}
 	}
