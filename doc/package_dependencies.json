@@ -745,9 +745,12 @@
       "imports": [
         "arena",
         "math/interval",
+        "util/control",
         "util/numeral"
       ],
       "production_files": [
+        "fixed_context.go",
+        "fixed_context_bounds.go",
         "fixed_interval.go",
         "fixed_interval_arith.go",
         "fixed_interval_div.go",

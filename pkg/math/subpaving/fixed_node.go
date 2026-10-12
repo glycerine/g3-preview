@@ -12,11 +12,12 @@ import (
 // FixedBound owns its numeral. A node's lower/upper arrays borrow bounds;
 // each bound's creating node retains ownership until that node closes.
 type FixedBound struct {
-	value    *numeral.FixedPoint
-	variable uint32
-	lower    bool
-	open     bool
-	prev     *FixedBound
+	value     *numeral.FixedPoint
+	variable  uint32
+	lower     bool
+	open      bool
+	prev      *FixedBound
+	timestamp uint64
 }
 
 // FixedNode keeps the source's per-variable bound views and shared parent
@@ -30,6 +31,9 @@ type FixedNode struct {
 	owned        []*FixedBound
 	trail        *FixedBound
 	children     uint32
+	context      *FixedContext
+	conflictVar  uint32
+	inconsistent bool
 	closed       bool
 }
 
@@ -51,6 +55,9 @@ func NewFixedNode(m *numeral.FixedPointManager, variables uint32, parent *FixedN
 		copy(n.lower, parent.lower)
 		copy(n.upper, parent.upper)
 		n.trail = parent.trail
+		n.context = parent.context
+		n.conflictVar = parent.conflictVar
+		n.inconsistent = parent.inconsistent
 		parent.children++
 	}
 	return n, nil

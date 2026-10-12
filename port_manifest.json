@@ -49855,7 +49855,10 @@
         "pkg/math/subpaving/fixed_node_predicates.go",
         "pkg/math/subpaving/fixed_node_predicates_test.go",
         "pkg/math/subpaving/fixed_interval_root.go",
-        "pkg/math/subpaving/fixed_interval_root_test.go"
+        "pkg/math/subpaving/fixed_interval_root_test.go",
+        "pkg/math/subpaving/fixed_context.go",
+        "pkg/math/subpaving/fixed_context_bounds.go",
+        "pkg/math/subpaving/fixed_context_bounds_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -49865,7 +49868,11 @@
         "TestSubpavingFixedIntervalDivSignBranches",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
-        "TestSubpavingFixedIntervalXnEqYRetainedCases"
+        "TestSubpavingFixedIntervalXnEqYRetainedCases",
+        "TestSubpavingFixedContextBoundFlowAndNormalization",
+        "TestSubpavingFixedContextIntegerBoundNormalization",
+        "TestSubpavingFixedContextPropagateCandidateAndRootPrecision",
+        "TestSubpavingFixedContextRelevanceArithmeticFailure"
       ],
       "conditionals": [
         {
@@ -49976,12 +49983,19 @@
         "pkg/math/subpaving/fixed_node_predicates.go",
         "pkg/math/subpaving/fixed_node_predicates_test.go",
         "pkg/math/subpaving/fixed_interval_root.go",
-        "pkg/math/subpaving/fixed_interval_root_test.go"
+        "pkg/math/subpaving/fixed_interval_root_test.go",
+        "pkg/math/subpaving/fixed_context.go",
+        "pkg/math/subpaving/fixed_context_bounds.go",
+        "pkg/math/subpaving/fixed_context_bounds_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
-        "TestSubpavingFixedIntervalXnEqYRetainedCases"
+        "TestSubpavingFixedIntervalXnEqYRetainedCases",
+        "TestSubpavingFixedContextBoundFlowAndNormalization",
+        "TestSubpavingFixedContextIntegerBoundNormalization",
+        "TestSubpavingFixedContextPropagateCandidateAndRootPrecision",
+        "TestSubpavingFixedContextRelevanceArithmeticFailure"
       ],
       "assertions": [
         {
