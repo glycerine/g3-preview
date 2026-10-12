@@ -111742,6 +111742,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_core_factories.go",
+        "pkg/ast/ast_chainable_native_buffer_test.go",
         "pkg/tactic/tactic_stored_model.go",
         "pkg/util/sexpr/util_sexpr.go",
         "pkg/ast/ast_shared_occs_mark.go",
@@ -111765,6 +111767,7 @@
         "pkg/ast/ast_label.go"
       ],
       "tests": [
+        "TestASTChainableNativePairBufferOrderAndGrowth",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
         "TestTacticStoredModelLabelsSnapshotAndAppend",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
@@ -111913,6 +111916,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "AST chainable mk_app ptr_buffer<expr> adjacent binary applications and final conjunction use native typed Go slice",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_core_factories.go",
+          "tests": [
+            "TestASTChainableNativePairBufferOrderAndGrowth"
+          ]
+        },
         {
           "name": "model2mc buffer<symbol> copy, sixteen inline entries, doubling spill and destruction",
           "status": "ported",

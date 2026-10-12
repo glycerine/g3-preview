@@ -39695,3 +39695,15 @@ on reset or close. Focused SAT tests cover growth, duplicate replacement,
 self-assignment, deep copy, reset, close, and constructor refusal. The
 `map.h` and `hashtable.h` manifest rows now credit this concrete platform
 replacement; their other specializations remain partial.
+
+### AST chainable application scratch buffer
+
+`ast_manager::mk_app` uses `ptr_buffer<expr>` while expanding a chainable
+declaration into adjacent binary applications and a final conjunction
+(`src/ast/ast.cpp:2194-2201`). The retained Go path now appends those
+applications to a native `[]ASTHandle`, with 16 inline slots and ordinary Go
+growth afterward. It no longer models temporary buffer backing as an arena
+reservation. A focused 3-, 17-, and 20-argument test verifies the exact
+adjacent-pair order and resulting conjunction across that growth boundary.
+The concrete buffer specialization is credited as a platform replacement;
+other `buffer.h` uses remain partial.

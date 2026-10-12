@@ -5,7 +5,6 @@ package ast
 import (
 	"errors"
 	"math"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -354,8 +353,6 @@ func (m *ASTManager) mkAppArguments(decl astNodeRef, args AppArguments) (astNode
 		if f.Chainable {
 			var inline [16]ASTHandle
 			buffer := inline[:0]
-			var bytes uint64
-			defer func() { m.BudgetField.Release(bytes) }()
 			for i := 1; i < int(args.count); i++ {
 				pair[0], e = args.at(uint32(i - 1))
 				if e != nil {
@@ -368,22 +365,6 @@ func (m *ASTManager) mkAppArguments(decl astNodeRef, args AppArguments) (astNode
 				r, e := m.mkAppCore(decl, pair[:])
 				if e != nil {
 					return r, e
-				}
-				if len(buffer) == cap(buffer) {
-					n := uint64(cap(buffer)) * 2
-					width := uint64(reflect.TypeOf(ASTHandle{}).Size())
-					if n > math.MaxUint32 || n > uint64(^uint(0)>>1)/width {
-						return astNodeRef{}, arena.ErrBounds
-					}
-					nextBytes := n * width
-					if e = m.BudgetField.Reserve(nextBytes); e != nil {
-						return astNodeRef{}, e
-					}
-					next := make([]ASTHandle, len(buffer), int(n))
-					copy(next, buffer)
-					m.BudgetField.Release(bytes)
-					bytes = nextBytes
-					buffer = next
 				}
 				buffer = append(buffer, m.external(r))
 			}
