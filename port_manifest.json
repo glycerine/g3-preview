@@ -76935,9 +76935,13 @@
       "path": "src/smt/dyn_ack.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_dyn_ack_triples.go"
+      ],
+      "tests": [
+        "TestDynAckTripleOccurrencesThresholdInstantiationAndReset"
+      ],
       "conditionals": [
         {
           "line": 167,
@@ -77112,17 +77116,34 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete eq_eh triple occurrence, threshold queue, instantiated-clause and reset state",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_dyn_ack_triples.go",
+          "tests": [
+            "TestDynAckTripleOccurrencesThresholdInstantiationAndReset"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete triple app vector retains each first, second and representative AST application once per newly observed row; map/set keys and candidate queue borrow those identities. Search reset releases all retained references in source order."
+      ],
+      "deviations": [
+        "The triple occurrence map and instantiated set use native Go maps instead of C++ hashtable storage. The source gc_triples body has no caller and is excluded. Pair-mode dynamic Ackermannization, SMT clause construction, propagation and enclosing context integration remain open."
+      ]
     },
     {
       "path": "src/smt/dyn_ack.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_dyn_ack_triples.go"
+      ],
+      "tests": [
+        "TestDynAckTripleOccurrencesThresholdInstantiationAndReset"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -77143,9 +77164,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete app-triple count, candidate queue and instantiated-set fields with eq_eh transition",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_dyn_ack_triples.go",
+          "tests": [
+            "TestDynAckTripleOccurrencesThresholdInstantiationAndReset"
+          ]
+        }
+      ],
+      "ownership": [
+        "The Go triple state owns application references through an explicit typed slice and borrows AST handles in its maps and queue."
+      ],
+      "deviations": [
+        "The enclosing context/clause lifecycle, pair specialization and source search hooks remain open."
+      ]
     },
     {
       "path": "src/smt/elim_term_ite.cpp",
@@ -157689,9 +157723,13 @@
       "path": "src/util/obj_triple_hashtable.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_dyn_ack_triples.go"
+      ],
+      "tests": [
+        "TestDynAckTripleOccurrencesThresholdInstantiationAndReset"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -157710,9 +157748,30 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained dyn_ack obj_triple_map<app,app,app,unsigned> find/insert/erase/reset occurrence counts",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_dyn_ack_triples.go",
+          "tests": [
+            "TestDynAckTripleOccurrencesThresholdInstantiationAndReset"
+          ]
+        },
+        {
+          "name": "retained dyn_ack obj_triple_hashtable<app,app,app> instantiated membership, insertion, erase and reset",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_dyn_ack_triples.go",
+          "tests": [
+            "TestDynAckTripleOccurrencesThresholdInstantiationAndReset"
+          ]
+        }
+      ],
+      "ownership": [
+        "The source map and set borrow each triple's app pointers; the enclosing dyn_ack m_apps vector retains three references per newly observed triple. The Go owner mirrors this with native maps, a typed app-row slice and explicit three-reference release on search reset or close."
+      ],
+      "deviations": [
+        "Only the concrete dyn_ack app/app/app to unsigned map and instantiated triple set are retained production instantiations. Native Go maps replace hashtable allocation, cached hashes, tombstones and bucket iteration. Full dyn_ack context integration remains open before whole-unit completion is claimed."
+      ]
     },
     {
       "path": "src/util/object_allocator.h",
