@@ -147088,9 +147088,15 @@
       "path": "src/util/mpfx.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/numeral/mpfx_core.go",
+        "pkg/util/numeral/mpfx_core_test.go"
+      ],
+      "tests": [
+        "TestFixedPointRetainedArithmeticAndDirectedRounding",
+        "TestFixedPointRangeOwnershipAndPublication"
+      ],
       "conditionals": [
         {
           "line": 607,
@@ -147325,17 +147331,37 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete mpfx default word-sized scale/range, owned zero/reset/copy, signed integer and ratio setters, exact add/sub/compare, and directed mul/div (src/util/mpfx.cpp:28-83,90-100,133-249,316-520)",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpfx_core.go",
+          "tests": [
+            "TestFixedPointRetainedArithmeticAndDirectedRounding",
+            "TestFixedPointRangeOwnershipAndPublication"
+          ]
+        }
+      ],
+      "ownership": [
+        "FixedPointManager owns configuration and tracks live concrete numerals; each FixedPoint owns an independent signed scaled big.Int. Publication stages arithmetic before mutating destination, including aliased inputs."
+      ],
+      "deviations": [
+        "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. This preserves selected numerical bounds and rounding, but source pool allocation, diagnostic assertion and failure timing are not claimed. Remaining mpfx conversion, shifts, floor/ceil, power, display and complete subpaving consumer integration are open."
+      ]
     },
     {
       "path": "src/util/mpfx.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/numeral/mpfx_core.go",
+        "pkg/util/numeral/mpfx_core_test.go"
+      ],
+      "tests": [
+        "TestFixedPointRetainedArithmeticAndDirectedRounding",
+        "TestFixedPointRangeOwnershipAndPublication"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -147348,9 +147374,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete mpfx default word-sized scale/range, owned zero/reset/copy, signed integer and ratio setters, exact add/sub/compare, and directed mul/div (src/util/mpfx.cpp:28-83,90-100,133-249,316-520)",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpfx_core.go",
+          "tests": [
+            "TestFixedPointRetainedArithmeticAndDirectedRounding",
+            "TestFixedPointRangeOwnershipAndPublication"
+          ]
+        }
+      ],
+      "ownership": [
+        "FixedPointManager owns configuration and tracks live concrete numerals; each FixedPoint owns an independent signed scaled big.Int. Publication stages arithmetic before mutating destination, including aliased inputs."
+      ],
+      "deviations": [
+        "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. This preserves selected numerical bounds and rounding, but source pool allocation, diagnostic assertion and failure timing are not claimed. Remaining mpfx conversion, shifts, floor/ceil, power, display and complete subpaving consumer integration are open."
+      ]
     },
     {
       "path": "src/util/mpn.cpp",

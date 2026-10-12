@@ -1752,6 +1752,7 @@
         "mpff_limbs.go",
         "mpff_predicates.go",
         "mpff_ref.go",
+        "mpfx_core.go",
         "mpn.go",
         "mpn_cstring.go",
         "mpn_display_raw.go",
