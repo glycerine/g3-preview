@@ -52,3 +52,20 @@ func TestDefaultExceptionSourceStringAndEmbeddedNUL(t *testing.T) {
 		}
 	}
 }
+
+func TestDefaultExceptionSourceFormattedConstructor(t *testing.T) {
+	args := []any{12, "twelve\x00ignored"}
+	x := NewDefaultExceptionf("Format %d %s", args...)
+	if x.MessageField != "Format 12 twelve" || x.Message() != "Format 12 twelve" ||
+		x.ErrorCode() != ErrorOK || args[1] != "twelve\x00ignored" {
+		t.Fatal(x, args)
+	}
+	x = NewDefaultExceptionf("%s-end", strings.Repeat("x", 1100))
+	if x.MessageField != strings.Repeat("x", 1023) || len(x.Message()) != 1023 {
+		t.Fatal("source ostream truncation", len(x.MessageField))
+	}
+	x = NewDefaultExceptionf("%s-tail\x00ignored", "left\x00ignored")
+	if x.Message() != "left-tail" {
+		t.Fatal("C-string inputs", x.Message())
+	}
+}

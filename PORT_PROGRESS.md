@@ -39806,3 +39806,16 @@ independence, iteration and source uint32 endpoint guards remain covered by
 focused native and debug tests. The manifest keeps both source units ported
 for their project algorithms and records native storage as the platform
 replacement for vector capacity and allocation mechanics.
+
+### Selected formatted exception construction
+
+`default_exception(fmt, char const*, ...)` calls `warning.cpp`'s
+`format2ostream`; the retained `src/test/ex.cpp` case passes `%d` and `%s`.
+The concrete Go `DefaultException` now has `NewDefaultExceptionf` for those
+formats. It uses Go `fmt`, trims C-string format and string arguments, and
+keeps the selected Linux AMD64 stream result to 1,023 bytes. A focused test
+checks the exact source test message, caller argument preservation, embedded
+NUL handling and truncation. This credits the selected formatter consumer in
+`z3_exception.h/.cpp` and `warning.h/.cpp`. The source test's stderr print,
+other C format profiles and unported MUZ/parser callers remain open; the four
+utility source units stay partial.

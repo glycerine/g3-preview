@@ -3,6 +3,7 @@ package z3exception
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -88,14 +89,36 @@ func (e Z3Error) HasErrorCode() bool   { return e.ErrorCode() != ErrorOK }
 // DefaultException retains std::string bytes including embedded NUL; Message
 // observes the source msg() C-string prefix. Immutable Go strings keep their
 // backing live automatically; no borrowed owner is retained by an exception.
-// The fmt/va_list constructor is pending warning.cpp's printf formatter port.
 type DefaultException struct{ MessageField string }
 
 func NewDefaultException(message string) DefaultException { return DefaultException{message} }
-func (e DefaultException) Message() string                { return e.MessageField[:cStringLength(e.MessageField)] }
-func (e DefaultException) Error() string                  { return e.Message() }
-func (e DefaultException) ErrorCode() ErrorCode           { return ErrorOK }
-func (e DefaultException) HasErrorCode() bool             { return e.ErrorCode() != ErrorOK }
+
+// NewDefaultExceptionf covers retained %s/%d formatted constructor calls.
+// The selected Linux AMD64 format2ostream profile writes at most 1023 bytes.
+func NewDefaultExceptionf(format string, args ...any) DefaultException {
+	format = format[:cStringLength(format)]
+	copied := false
+	for i, arg := range args {
+		if value, ok := arg.(string); ok {
+			if end := cStringLength(value); end < len(value) {
+				if !copied {
+					args = append([]any(nil), args...)
+					copied = true
+				}
+				args[i] = value[:end]
+			}
+		}
+	}
+	message := fmt.Sprintf(format, args...)
+	if len(message) > 1023 {
+		message = message[:1023]
+	}
+	return DefaultException{message}
+}
+func (e DefaultException) Message() string      { return e.MessageField[:cStringLength(e.MessageField)] }
+func (e DefaultException) Error() string        { return e.Message() }
+func (e DefaultException) ErrorCode() ErrorCode { return ErrorOK }
+func (e DefaultException) HasErrorCode() bool   { return e.ErrorCode() != ErrorOK }
 
 func cStringLength(value string) int {
 	if index := strings.IndexByte(value, 0); index >= 0 {

@@ -101250,23 +101250,29 @@
       "component": "test",
       "role": "test",
       "status": "partial",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/util/z3exception/z3_exception.go"
+      ],
+      "tests": [
+        "TestDefaultExceptionSourceFormattedConstructor"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
         {
-          "name": "tst_ex formatted default_exception printed case (zero ENSURE assertions)",
+          "name": "tst_ex formatted default_exception construction/message; stderr print and custom ex/ex2 case remain (zero ENSURE assertions)",
           "status": "partial",
-          "go_target": "",
-          "tests": []
+          "go_target": "pkg/util/z3exception/z3_exception.go",
+          "tests": [
+            "TestDefaultExceptionSourceFormattedConstructor"
+          ]
         }
       ],
       "ownership": [
-        "Caller-owned exception value; formatter temporary ownership independently tested."
+        "Caller-owned formatted exception value and immutable Go message; no source stream owner is represented."
       ],
       "deviations": [
-        "One formatted printed consumer translated; custom ex/ex2 printed case remains open. No invented source assertion count."
+        "The selected formatted exception message is checked against the source tst_ex arguments. Its stderr print and custom ex/ex2 printed case remain open. No invented source assertion count."
       ]
     },
     {
@@ -166733,12 +166739,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/diagnostic/util_warning.go",
-        "pkg/util/params/util_env_params.go"
+        "pkg/util/params/util_env_params.go",
+        "pkg/util/z3exception/z3_exception.go"
       ],
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
         "TestWarningSourceBorrowedStreamTruncationAndFallback",
         "TestWarningFormattedStringAndIntegerRoutes",
+        "TestDefaultExceptionSourceFormattedConstructor",
         "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
       ],
       "conditionals": [
@@ -166809,11 +166817,15 @@
           ]
         },
         {
-          "name": "selected warning_msg %s/%d formatted emission; full format2ostream and other C format profiles remain",
+          "name": "selected warning_msg %s/%d emission and default_exception format2ostream; other C format profiles remain",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_warning.go",
+          "go_targets": [
+            "pkg/util/z3exception/z3_exception.go"
+          ],
           "tests": [
-            "TestWarningFormattedStringAndIntegerRoutes"
+            "TestWarningFormattedStringAndIntegerRoutes",
+            "TestDefaultExceptionSourceFormattedConstructor"
           ]
         },
         {
@@ -166831,7 +166843,7 @@
         "WarningService owns only the enable scalar and borrows optional io.Writer streams. EnvParamsRuntime updates the same warning-enable state used by warning emission; literal and selected formatted writes retain source prefix, newline, C-string boundary and selected Linux AMD64 custom-stream truncation."
       ],
       "deviations": [
-        "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Selected %s/%d warning calls use Go fmt with C-string input boundaries; other C format profiles, format2ostream exception integration and shell/AST warning call sites remain open. No C varargs or C++ standard-stream implementation is introduced."
+        "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Selected %s/%d warning calls use Go fmt with C-string input boundaries; other C format profiles and direct shell/AST warning call sites remain open. No C varargs or C++ standard-stream implementation is introduced."
       ]
     },
     {
@@ -166841,12 +166853,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/diagnostic/util_warning.go",
-        "pkg/util/params/util_env_params.go"
+        "pkg/util/params/util_env_params.go",
+        "pkg/util/z3exception/z3_exception.go"
       ],
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
         "TestWarningSourceBorrowedStreamTruncationAndFallback",
         "TestWarningFormattedStringAndIntegerRoutes",
+        "TestDefaultExceptionSourceFormattedConstructor",
         "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
       ],
       "conditionals": [
@@ -166877,11 +166891,15 @@
           "tests": []
         },
         {
-          "name": "selected warning_msg %s/%d formatted emission; full format2ostream and other C format profiles remain",
+          "name": "selected warning_msg %s/%d emission and default_exception format2ostream; other C format profiles remain",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_warning.go",
+          "go_targets": [
+            "pkg/util/z3exception/z3_exception.go"
+          ],
           "tests": [
-            "TestWarningFormattedStringAndIntegerRoutes"
+            "TestWarningFormattedStringAndIntegerRoutes",
+            "TestDefaultExceptionSourceFormattedConstructor"
           ]
         }
       ],
@@ -166902,7 +166920,8 @@
       ],
       "tests": [
         "TestZ3ExceptionSourceCodesAndLabels",
-        "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+        "TestDefaultExceptionSourceStringAndEmbeddedNUL",
+        "TestDefaultExceptionSourceFormattedConstructor"
       ],
       "assertions": [
         {
@@ -166932,17 +166951,20 @@
           ]
         },
         {
-          "name": "default_exception(fmt, char const*, ...) formatted construction at unported MUZ/parser callers",
-          "status": "unported",
-          "tests": []
+          "name": "selected default_exception(fmt, char const*, ...) %s/%d construction and Linux AMD64 stream truncation; other C formats and MUZ/parser callers remain",
+          "status": "partial",
+          "go_target": "pkg/util/z3exception/z3_exception.go",
+          "tests": [
+            "TestDefaultExceptionSourceFormattedConstructor"
+          ]
         }
       ],
       "ownership": [
         "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See PORT_PROGRESS.md#audit-z3-exception-port-status-md.",
-        "The source formatted constructor calls warning.cpp format2ostream. Its MUZ/parser call sites are unported, so no Go caller constructs that formatted value yet."
+        "The selected formatted constructor uses Go fmt and the Linux AMD64 1023-byte stream boundary; retained MUZ/parser call sites remain unported."
       ],
       "deviations": [
-        "Go error values replace virtual exception transport. The current concrete callers construct immutable messages directly; future formatted call sites should use Go standard-library formatting. The C++ varargs/iostream formatter and exception hierarchy are not reproduced. Message preserves the source first-NUL observation."
+        "Go error values replace virtual exception transport. Selected %s/%d formatted construction uses Go fmt with C-string input boundaries and Linux AMD64 truncation. Other C formats and the virtual exception/iostream implementation remain open. Message preserves the source first-NUL observation."
       ]
     },
     {
@@ -166958,6 +166980,7 @@
       "tests": [
         "TestZ3ExceptionSourceCodesAndLabels",
         "TestDefaultExceptionSourceStringAndEmbeddedNUL",
+        "TestDefaultExceptionSourceFormattedConstructor",
         "TestMemoryFatalNonExitExceptionCatch",
         "TestMemoryFatalRealExitWithActiveReservationRefusal"
       ],
@@ -166993,9 +167016,12 @@
           ]
         },
         {
-          "name": "default_exception(fmt, char const*, ...) formatted construction at unported MUZ/parser callers",
-          "status": "unported",
-          "tests": []
+          "name": "selected default_exception(fmt, char const*, ...) %s/%d construction and Linux AMD64 stream truncation; other C formats and MUZ/parser callers remain",
+          "status": "partial",
+          "go_target": "pkg/util/z3exception/z3_exception.go",
+          "tests": [
+            "TestDefaultExceptionSourceFormattedConstructor"
+          ]
         },
         {
           "name": "ERR_MEMOUT101/ERR_ALLOC_EXCEEDED113 actual fatal dispatch and out_of_memory_error -> z3_error derived/base Go catch adaptation",
@@ -167009,10 +167035,10 @@
       ],
       "ownership": [
         "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See PORT_PROGRESS.md#audit-z3-exception-port-status-md.",
-        "The source formatted constructor calls warning.cpp format2ostream. Its MUZ/parser call sites are unported, so no Go caller constructs that formatted value yet."
+        "The selected formatted constructor uses Go fmt and the Linux AMD64 1023-byte stream boundary; retained MUZ/parser call sites remain unported."
       ],
       "deviations": [
-        "Go error values replace virtual exception transport. The current concrete callers construct immutable messages directly; future formatted call sites should use Go standard-library formatting. The C++ varargs/iostream formatter and exception hierarchy are not reproduced. Message preserves the source first-NUL observation."
+        "Go error values replace virtual exception transport. Selected %s/%d formatted construction uses Go fmt with C-string input boundaries and Linux AMD64 truncation. Other C formats and the virtual exception/iostream implementation remain open. Message preserves the source first-NUL observation."
       ]
     },
     {
