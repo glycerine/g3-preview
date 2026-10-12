@@ -1753,6 +1753,7 @@
         "mpff_predicates.go",
         "mpff_ref.go",
         "mpfx_core.go",
+        "mpfx_ops.go",
         "mpn.go",
         "mpn_cstring.go",
         "mpn_display_raw.go",

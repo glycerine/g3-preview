@@ -12,6 +12,7 @@ var (
 	ErrFixedPointClosed   = errors.New("mpfx: manager or numeral closed")
 	ErrFixedPointOverflow = errors.New("mpfx: integer part overflow")
 	ErrFixedPointDivZero  = errors.New("mpfx: division by zero")
+	ErrFixedPointDomain   = errors.New("mpfx: undefined or nonterminating operation")
 )
 
 // FixedPointManager stores the source's fixed number of integer/fractional
