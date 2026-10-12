@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 86.6,
-  "coverage_warning": "Completed native checkpoint ea1b46ec measures29711/34323 LP statements (86.6%); actual session9671 terminal exit0 observed. All64 packages processed:63pass/1skip/51with named tests. Includes GLPK reports/process/batch and preparation/container/permutation/stacked/LAR examples. Excludes debug-only code and later implied-bound printing, bound-propagation scenarios, LP-zero driver/report fix and debug swaps; their focused profiles remain separate. Go statement coverage is not C++ completion; retained-source/consumer/ownership and complete top-level CLI audits remain open.",
+  "coverage_warning": "Latest completed full native checkpointc32fb569 measures29932/34582 LP statements86.6%; not a measurement of later current code. Actual session40124 terminal exit0 and package/profile inspection verified. Excludes all debug-only code and later preparation short-write/three numeric benchmarks/executor changes. Later increments have separate focused coverage and scalar full-count evidence. Go statement coverage is not C++ completion; whole retained-source/consumer/ownership/SMT/CLI audits remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -10,9 +10,9 @@
     "remaining retained objective/preparation consumers and complete retained primal/dual/LAR caller integration (uncalled LAR scaling helper excluded); whole random-update source/driver audit",
     "remaining retained constructor/diagnostic/validator and optimization consumer audits; complete MPS/CLI upstream drivers",
     "remaining whole-LAR propagation consumer integration, optimization callers and complete upstream solve drivers, remaining retained proof/explanation consumers; per-row exact pivot/term/analysis dispatch preserves source offset assertion profiles",
-    "remaining top-level CLI integration including empty directory branch and complete registered test dispatch; whole retained SMT reader/LP audit",
+    "Complete registered CLI runtime/consumer/ownership audit, full numeric-pair benchmark count verification and whole retained SMT reader/LP audit",
     "component property tests, coverage and integration audits",
-    "Remaining top-level test CLI dispatch, SMT file creation/input dispatch driver scenarios; remaining retained optimization consumers and whole scaling audit, whole-source/ownership audits and complete upstream LP/randomize drivers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
+    "Complete retained source/ownership/SMT and process-global driver consumer audits; remaining optimization/scaling/randomize consumers. Exact dual unsupported rational constructors and omitted sparsity extents remain source-limit audit obligations."
   ],
   "units": [
     {
@@ -6354,23 +6354,23 @@
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
-    "commit": "ea1b46ec",
-    "started_utc": "2026-10-11 23:37:38 UTC",
-    "completed_utc": "2026-10-12 00:01:48 UTC",
+    "commit": "c32fb569",
+    "started_utc": "2026-10-12 00:55:56 UTC",
+    "completed_utc": "2026-10-12 01:19:18 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.events.jsonl",
-    "profile": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-lp-driver-check-module-native.json",
+    "log": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.json",
     "packages": 64,
     "passed_packages": 63,
     "skipped_packages": 1,
     "packages_with_tests": 51,
-    "lp_seconds": 1446.829,
-    "lp_covered_statements": 29711,
-    "lp_statements": 34323,
-    "session_id": 9671,
-    "scope_warning": "Actual exec session9671 returned terminal exit0 and is closed. Native snapshot ea1b46ec includes GLPK reports/process/batch, preparation/container/permutation/stacked/LAR examples and earlier LP work. Excludes all g3debug-only code and later implied-bound printing5eee9473, bound-propagation scenarios ee3256cf, LP-zero driver/report fix79c34156 and current debug swap scenario; those keep separate focused evidence. Go statement coverage is not C++ completion."
+    "lp_seconds": 1397.137,
+    "lp_covered_statements": 29932,
+    "lp_statements": 34582,
+    "session_id": 40124,
+    "scope_warning": "Native module checkpointc32fb569 completed successfully: actual session40124 terminal exit0 observed and closed,2026-10-12 00:55:56\u201301:19:18UTC. All64packages processed,63pass/1skip/51with named tests; LP1397.137s,29932/34582statements86.6%. Actual profile contains no driver_rational_benchmark/driver_pair_benchmark/driver_execute files: includes native column copied-left fix, iterator/column/settings tests and preceding native work; excludes all debug-only LU scenarios and later preparation short-write correction/benchmark/executor increments. Profiles and terminal package events inspected; no whole-LP completion claim. Artifacts /mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.{json,log,cover,events.jsonl}."
   },
   "full_native_checkpoint_history": [
     {
@@ -11373,33 +11373,6 @@
     "evidence": "/mnt/oldrog/tmp/g3-lu-parent-driver-debug.cover",
     "remaining": "Full top-level test CLI dispatch/entry and other scenarios; whole retained-source/consumer/ownership audits."
   },
-  "running_full_native_checkpoint": {
-    "status": "running",
-    "commit": "c32fb569",
-    "started_utc": "2026-10-12 00:55:56 UTC",
-    "runner_pid": 2,
-    "command": [
-      "go",
-      "-C",
-      "pkg",
-      "test",
-      "-json",
-      "./...",
-      "-timeout=60m",
-      "-count=1",
-      "-coverprofile=/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.cover"
-    ],
-    "log": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.events.jsonl",
-    "profile": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.json",
-    "go_pid": 4,
-    "actual_exec_session": 40124,
-    "coverage_credit": "none until actual terminal exit and profile inspection",
-    "includes": "native exact column copied-left lifetime fix and native iterator/column/settings alias/lifetime tests",
-    "excludes": "all g3debug-only LU scenarios and diagnostics",
-    "cache_cleanup": "/mnt/oldrog/tmp/g3-lp-column-lifetime-cache-cleanup.json"
-  },
   "latest_dispatch_write_increment": {
     "summary": "LP driver preparation now detects short nil-error writes in the initial resize header and parse-error usage report using the shared checked writer. New tests refuse every output byte for early int-set selection, unknown option and missing file value, verify exact report prefixes, argument construction/parsing boundaries, unpublished action/exit/settings and exact-length success. Native focused preparation checks0.164s and combined g3debug,g3checked0.163s pass. Driver dispatch coverage52/67statements (77.6%) native,66/67 (98.5%) combined; native erases source debug branches and the remaining combined gap transports NewSettings host-clock failure. Source checker remains2103units/677APIs,75ported/365partial/1620unported/5dead. Whole CLI executor/numeric benchmarks and retained-source/ownership audits remain open; no whole-unit promotion. Current full native checkpoint c32fb569 session40124 confirmed running and predates this report correction; focused profiles /mnt/oldrog/tmp/g3-lp-dispatch-write-{native,debug}.cover are separate evidence.",
     "tests": [
@@ -11416,34 +11389,9 @@
       "TestLPRationalBenchmarkPhysicalRefusalOwnership",
       "TestLPRationalBenchmarkPreservesOlderComparison"
     ],
-    "full_registered_runs_verified": false,
-    "whole_unit_promotion": false
-  },
-  "running_scalar_benchmark_checkpoint": {
-    "status": "running",
-    "commit": "5920ba19",
-    "started_utc": "2026-10-12 01:08:46 UTC",
-    "runner_pid": 2,
-    "command": [
-      "go",
-      "-C",
-      "pkg",
-      "test",
-      "./util/lp",
-      "-run",
-      "^$",
-      "-bench",
-      "^BenchmarkLPRationalSource500000$",
-      "-benchtime=1x",
-      "-count=1",
-      "-timeout=60m"
-    ],
-    "log": "/mnt/oldrog/tmp/g3-lp-scalar-benchmark-full-native.log",
-    "status_file": "/mnt/oldrog/tmp/g3-lp-scalar-benchmark-full-native.json",
-    "scope": "Two actual scalar source benchmarks, each500000 outer iterations/10products; independent result and successful owner cleanup required. Not a full module test.",
-    "go_pid": 5,
-    "actual_exec_session": 89471,
-    "completion_verified": false
+    "full_registered_runs_verified": true,
+    "whole_unit_promotion": false,
+    "verification_note": "Full literal scalar benchmark checkpoint5920ba19 completed successfully: actual session89471 terminal exit0 observed and closed,2026-10-12 01:08:46\u201301:20:15UTC. Both actual500000-iteration/5000000-product source variants pass independent exact result, completed count and successful owning cleanup checks. Native compound324.379579410s and binary-plus354.654045986s, package679.043s. Log inspected for both samples and PASS. Scalar benchmark method full-count evidence now verified; pair benchmarkdada87f0/session70865 remains live. Artifacts /mnt/oldrog/tmp/g3-lp-scalar-benchmark-full-native.{json,log}."
   },
   "latest_pair_benchmark_increment": {
     "summary": "Retained test_rationals now has concrete PairBenchmarkDriver: public literal1000000 outer iterations/10scalar-pair products without hoisting,40 shared RNG draws, owned scalar-to-pair conversion/vector copies, exact x = input vector with trailing spaces/endl before stopwatch start, copied-left X/Y scalar expressions and owning pair constructor before X-then-Y compound accumulation, reverse lexical temporary destruction and source result/time reports. Five test groups verify30 independent seed worlds at0/1/3/7 iterations with all10coefficients/10pairs/exact accumulator/RNG, every report byte using explicit and short nil-error writes with timer/product/result-publication boundaries, all3endl failures, actual start/stop clock failures and lifetime guards, pooled/direct physical refusal campaigns through success with completed-product prefixes, and an actual older1000-digit caller comparison preserving stopped-manager refusal and independent cleanup. Focused native0.565s/combined0.894s pass; new driver96/116statements82.8% both. Remaining gaps guard stable delegated begin/cleanup/format errors; no synthetic failure hooks. Standard benchmark BenchmarkLPPairSource1000000 executes actual registered count/10000000products with independent exact result and successful owner cleanup checks; full-count execution not yet credited. All three numeric benchmark bodies are implemented; full CLI execution and whole-source/ownership audits remain open, no whole-unit promotion. Native module checkpointc32fb569/session40124 and scalar full-count checkpoint5920ba19/session89471 confirmed running and exclude this new pair driver. Profiles /mnt/oldrog/tmp/g3-lp-pair-benchmark-{native,debug}.cover.",
@@ -11482,5 +11430,54 @@
     "go_pid": 5,
     "actual_exec_session": 70865,
     "completion_verified": false
+  },
+  "latest_scalar_benchmark_checkpoint": {
+    "status": "completed",
+    "commit": "5920ba19",
+    "started_utc": "2026-10-12 01:08:46 UTC",
+    "runner_pid": 2,
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "./util/lp",
+      "-run",
+      "^$",
+      "-bench",
+      "^BenchmarkLPRationalSource500000$",
+      "-benchtime=1x",
+      "-count=1",
+      "-timeout=60m"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-lp-scalar-benchmark-full-native.log",
+    "status_file": "/mnt/oldrog/tmp/g3-lp-scalar-benchmark-full-native.json",
+    "scope": "Two actual scalar source benchmarks, each500000 outer iterations/10products; independent result and successful owner cleanup required. Not a full module test.",
+    "go_pid": 5,
+    "exit_code": 0,
+    "completed_utc": "2026-10-12 01:20:15 UTC",
+    "actual_exec_session": 89471,
+    "completion_verified": true,
+    "log_inspected": true,
+    "compound_seconds": 324.37957941,
+    "binary_plus_seconds": 354.654045986,
+    "scope_warning": "Full literal scalar benchmark checkpoint5920ba19 completed successfully: actual session89471 terminal exit0 observed and closed,2026-10-12 01:08:46\u201301:20:15UTC. Both actual500000-iteration/5000000-product source variants pass independent exact result, completed count and successful owning cleanup checks. Native compound324.379579410s and binary-plus354.654045986s, package679.043s. Log inspected for both samples and PASS. Scalar benchmark method full-count evidence now verified; pair benchmarkdada87f0/session70865 remains live. Artifacts /mnt/oldrog/tmp/g3-lp-scalar-benchmark-full-native.{json,log}."
+  },
+  "latest_cli_execution_increment": {
+    "summary": "Retained test_lp_local and tst_lp now have concrete LPTestDriver execution: exact argv+2/argc-2 entry, existing source precedence/preparation, every selected concrete algorithm/solver/input driver, empty commented directory body, debug-erased native branches and Linux-only batch call. Borrowed manager/shared RNG/config, successful lexical child Close before source finalize, failed reached child retained for owning Close, source larger-LU exit(1) transported via ExitCode, native inspection metadata preserved. Ten test groups verify entry/parse failure/early option precedence and300queue/72LU shared RNG draws; actual permutation/stacked/all7bound scenarios and native/debug example/zero/swap assertion profiles;32 independent min/max exact/floating MPS solves, duplicate file-list/blank stop and actual LU column26 solution; real benchmark setup/40draws/start-clock refusal without shrinking public loops; every ordinary report byte and endl before/after action selection; pooled/direct80-digit objective physical campaigns through success; all debug branches, real drop-tolerance child exit prefix, actual LAR MPS input and debug-child report refusals; Linux exact batch refuses first solver report before any real HOME catalogue file is opened. Initial small MPS fixture had no custom allocations and early swaps do not construct settings; corrected tests against real source domains. Focused execution native0.161s/combined0.210s, integrated preparation/scalar/pair/execution native1.180s/combined1.839s pass. Common executor coverage70/81native86.4%,71/81combined87.7%; debug31/38(81.6%); Linux2/2(100%). Stable delegated cleanup guards and impossible native debug dispatch remain gaps, no invented failure hooks. Whole-source/ownership/SMT/global driver consumer audits remain open; no whole-unit promotion. Profiles /mnt/oldrog/tmp/g3-lp-execution-{native,debug}.cover.",
+    "tests": [
+      "TestLPExecutionActualExamplesAndSourceFailures",
+      "TestLPExecutionDebugBranchesAndSourceExit",
+      "TestLPExecutionDebugLARActualFile",
+      "TestLPExecutionDebugReportFailureRetainsCurrentChild",
+      "TestLPExecutionEntryContainersAndPrecedence",
+      "TestLPExecutionEveryReportByteAndFlushPrefix",
+      "TestLPExecutionLUFileAndNumericBenchmarkSetup",
+      "TestLPExecutionLinuxBatchStopsBeforeOpeningCatalogueFile",
+      "TestLPExecutionMPSIndependentObjectivesAndFileList",
+      "TestLPExecutionMPSPhysicalFailureOwnership"
+    ],
+    "whole_unit_promotion": false,
+    "full_registered_pair_count_verified": false
   }
 }

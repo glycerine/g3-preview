@@ -103063,7 +103063,15 @@
         "pkg/util/lp/driver_rational_benchmark.go",
         "pkg/util/lp/driver_rational_benchmark_test.go",
         "pkg/util/lp/driver_pair_benchmark.go",
-        "pkg/util/lp/driver_pair_benchmark_test.go"
+        "pkg/util/lp/driver_pair_benchmark_test.go",
+        "pkg/util/lp/driver_execute.go",
+        "pkg/util/lp/driver_execute_debug.go",
+        "pkg/util/lp/driver_execute_debug_test.go",
+        "pkg/util/lp/driver_execute_linux.go",
+        "pkg/util/lp/driver_execute_linux_test.go",
+        "pkg/util/lp/driver_execute_native.go",
+        "pkg/util/lp/driver_execute_other.go",
+        "pkg/util/lp/driver_execute_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103316,7 +103324,17 @@
         "TestLPPairBenchmarkEveryReportByteAndEndlRefusal",
         "TestLPPairBenchmarkClockAndOwnerBoundaries",
         "TestLPPairBenchmarkPhysicalRefusalOwnership",
-        "TestLPPairBenchmarkPreservesOlderComparison"
+        "TestLPPairBenchmarkPreservesOlderComparison",
+        "TestLPExecutionActualExamplesAndSourceFailures",
+        "TestLPExecutionDebugBranchesAndSourceExit",
+        "TestLPExecutionDebugLARActualFile",
+        "TestLPExecutionDebugReportFailureRetainsCurrentChild",
+        "TestLPExecutionEntryContainersAndPrecedence",
+        "TestLPExecutionEveryReportByteAndFlushPrefix",
+        "TestLPExecutionLUFileAndNumericBenchmarkSetup",
+        "TestLPExecutionLinuxBatchStopsBeforeOpeningCatalogueFile",
+        "TestLPExecutionMPSIndependentObjectivesAndFileList",
+        "TestLPExecutionMPSPhysicalFailureOwnership"
       ],
       "conditionals": [
         {
@@ -104428,8 +104446,8 @@
           ]
         },
         {
-          "name": "test_rationals_no_numeric_pairs/test_rationals_no_numeric_pairs_plus: literal500000 Run implemented; focused loop bodies/setup/report/cleanup verified; full registered counts pending",
-          "status": "partial",
+          "name": "test_rationals_no_numeric_pairs/test_rationals_no_numeric_pairs_plus: literal500000 Run, actual full native counts/results/cleanup verified at5920ba19; focused setup/report/failure profiles native/checked",
+          "status": "ported",
           "go_target": "pkg/util/lp/driver_rational_benchmark.go",
           "tests": [
             "TestLPRationalBenchmarkIndependentArithmeticAndInputs",
@@ -104449,6 +104467,23 @@
             "TestLPPairBenchmarkClockAndOwnerBoundaries",
             "TestLPPairBenchmarkPhysicalRefusalOwnership",
             "TestLPPairBenchmarkPreservesOlderComparison"
+          ]
+        },
+        {
+          "name": "test_lp_local/tst_lp concrete selected-call executor and argv+2 entry, native/debug/Linux branches; numeric-pair full-count and whole driver consumer audit remain independently open",
+          "status": "partial",
+          "go_target": "pkg/util/lp/driver_execute.go",
+          "tests": [
+            "TestLPExecutionActualExamplesAndSourceFailures",
+            "TestLPExecutionDebugBranchesAndSourceExit",
+            "TestLPExecutionDebugLARActualFile",
+            "TestLPExecutionDebugReportFailureRetainsCurrentChild",
+            "TestLPExecutionEntryContainersAndPrecedence",
+            "TestLPExecutionEveryReportByteAndFlushPrefix",
+            "TestLPExecutionLUFileAndNumericBenchmarkSetup",
+            "TestLPExecutionLinuxBatchStopsBeforeOpeningCatalogueFile",
+            "TestLPExecutionMPSIndependentObjectivesAndFileList",
+            "TestLPExecutionMPSPhysicalFailureOwnership"
           ]
         }
       ],
@@ -104470,7 +104505,8 @@
         "LargerLUTestDriver borrows Settings/shared RNG and owns matrix, LU, lexical left/right dense products, workspace and native basis/headings. Left/right products survive through source scope after comparison; failed reports/algorithms retain reached owners until Close. Successful source return closes LU and lexical products. Source deterministic exit(1) is represented by ExitCode1 plus ErrAssertion instead of terminating the embedding Go process; owner cleanup remains explicit.",
         "HolesLUTestDriver owns literal matrix/LU, native basis/headings/workspace and lexical left/right products; its current printed tail is borrowed from LU. Every failed report/assertion retains reached owners until Close. Parent LUTestDriver borrows one Settings and shared RNG, runs each child through actual owning Close before constructing the next and retains closed metadata/completed prefix. Failed current child stays reachable; parent Close visits child owners in reverse order.",
         "Scalar rational benchmarks borrow manager/shared RNG, own copied input numerals and lexical product/binary-plus/val/r slots, record only new arithmetic receipts, and close failed owners before borrowed manager. Del is followed by fresh initialized temporary reconstruction where source creates a new local.",
-        "Pair benchmark borrows manager/shared RNG, owns scalar/pair input conversion copies, coordinate-expression/constructor/product/accumulator temporaries, and only new arithmetic receipts. Pair-vector cleanup precedes coefficient-vector cleanup; failed reached owners remain reachable until Close."
+        "Pair benchmark borrows manager/shared RNG, owns scalar/pair input conversion copies, coordinate-expression/constructor/product/accumulator temporaries, and only new arithmetic receipts. Pair-vector cleanup precedes coefficient-vector cleanup; failed reached owners remain reachable until Close.",
+        "LPTestDriver borrows numeral manager/shared RNG and owns only reached concrete child drivers; successful children close before source finalize, failed child and source exit code remain inspectable, Close precedes borrowed manager destruction. No universal numerical callback adapter or process termination added."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -104506,7 +104542,8 @@
         "All four retained debug LU test_lu children and their parent are now executable typed drivers. Earlier larger-LU note that holes/parent remained open is superseded. Holes initial mismatch only reports then continues to source update/final assertion; real DropTolerance1/10 tests preserve that behavior. Default and sparse/dense source diagnostic views preserve positive implicit zeros versus stored dense negative zeros, reverse tail order and base-matrix blank endl. Full top-level CLI execution/entry, other test families and whole-source audits remain open; no whole test/lp.cpp or whole-LP completion credit.",
         "Preparation header and usage short nil-error writes stop with io.ErrShortWrite before later publication; exact-length success and every byte prefix tested. Top-level selected-call execution remains separately open.",
         "Private scalar benchmark iteration bound is used only by focused tests; public Run retains500000 and standard benchmark checks actual full count. Full-count execution remains unverified at this increment. No source arithmetic shortcut or synthetic allocator hooks.",
-        "Private pair benchmark iteration bound is for focused tests only; public Run retains1000000 and standard benchmark independently checks full count and exact result. Full-count execution not credited at implementation commit; no source arithmetic shortcut or unused generic adapter."
+        "Private pair benchmark iteration bound is for focused tests only; public Run retains1000000 and standard benchmark independently checks full count and exact result. Full-count execution not credited at implementation commit; no source arithmetic shortcut or unused generic adapter.",
+        "Source debug-only branches are erased without g3debug, solve_some_mps call is Linux-only, commented directory body is an executable no-op, too-short argv+2 returns ErrBounds and source exit(1) is transported as ExitCode/ErrAssertion. Actual scalar full counts verified5920ba19; pair full count and whole external driver/global consumer audit remain open."
       ]
     },
     {
