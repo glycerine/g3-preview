@@ -119241,7 +119241,7 @@
       "path": "src/util/lp/column_info.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/column_info_float.go",
         "pkg/util/lp/solver_float.go",
@@ -119259,7 +119259,9 @@
         "TestLPRationalColumnNativeToleranceAndDebugConstructor",
         "TestLPRationalColumnGetterAssertionsAndEntryGuards",
         "TestLPRationalColumnPhysicalOwnership",
-        "TestLPRationalColumnPreservesOlderComparison"
+        "TestLPRationalColumnPreservesOlderComparison",
+        "TestLPRationalColumnAliasedFixedParameterPreservesSource",
+        "TestLPRationalColumnAdjustedExpressionPhysicalPrefixes"
       ],
       "assertions": [
         {
@@ -119275,8 +119277,8 @@
           "text": "SASSERT(m_is_fixed);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained floating column construction, type/flip/free/shift, bound setters/read guards, adjusted upper bound and asymmetric primal bound tolerances; scalar/name/index properties use native Go fields",
@@ -119290,15 +119292,22 @@
           ]
         },
         {
-          "name": "retained exact column metadata and numerical ownership",
-          "status": "partial",
+          "name": "Retained concrete mpq column numeric members and owning destruction, getters, setters and bound predicate parameter/expression lifetimes",
+          "status": "ported",
           "go_target": "pkg/util/lp/column_info_exact.go",
           "tests": [
+            "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+            "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
+            "TestLPFloatSolverSlackCountsNamesAndBypass",
+            "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+            "TestLPFloatSolverScaledCostAndValueGuards",
             "TestLPRationalColumnIndependentFlagsAndShift",
             "TestLPRationalColumnNativeToleranceAndDebugConstructor",
             "TestLPRationalColumnGetterAssertionsAndEntryGuards",
             "TestLPRationalColumnPhysicalOwnership",
-            "TestLPRationalColumnPreservesOlderComparison"
+            "TestLPRationalColumnPreservesOlderComparison",
+            "TestLPRationalColumnAliasedFixedParameterPreservesSource",
+            "TestLPRationalColumnAdjustedExpressionPhysicalPrefixes"
           ]
         },
         {
@@ -119310,7 +119319,9 @@
             "TestLPRationalColumnNativeToleranceAndDebugConstructor",
             "TestLPRationalColumnGetterAssertionsAndEntryGuards",
             "TestLPRationalColumnPhysicalOwnership",
-            "TestLPRationalColumnPreservesOlderComparison"
+            "TestLPRationalColumnPreservesOlderComparison",
+            "TestLPRationalColumnAliasedFixedParameterPreservesSource",
+            "TestLPRationalColumnAdjustedExpressionPhysicalPrefixes"
           ]
         }
       ],
@@ -119322,7 +119333,9 @@
       "deviations": [
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
         "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
-        "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested."
+        "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested.",
+        "Whole retained column_info.h audit complete. Actual lp_solver/primal/dual model maps own column_info pointers, with default and invalid-index constructors; no retained by-value record copy/equality use. Native fields preserve scalar/name/index/strictness and unset flag accessors. ColumnType also implements identical get_column_type_no_flipping behavior. Adjusted bound predicate helpers and column is_infeasible have no retained source calls; unrelated network_flow is_infeasible is a separate method. try_to_set_fixed is definition-only. Concrete double/mpq bound/shift/cost operations and owner cleanup are implemented. Strictness reads belong to separately audited conversion_helper consumers; this header does not claim their completion. Corrected exact upper-minus-low and native tolerance threshold expressions to preserve rational copied-left/compound/returned-reference-copy lifetimes via existing typed eta expression helpers. No template adapter/STL port. Larger solver headers remain partial.",
+        "Earlier initial-port/exact-ownership/integration-unported notes above are historical and superseded for this header by the retained column audit. Whole solver, scaling, conversion and upstream-driver source classifications remain independent."
       ]
     },
     {

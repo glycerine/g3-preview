@@ -154,7 +154,9 @@ func (c *RationalColumnInfo) AdjustedUpperBound(out *numeral.Rational) (err erro
 	if out == nil {
 		return ErrBounds
 	}
-	c.work = NewIndexedRationalVector(c.manager, 3)
+	// Keep both getter results and the copied-left subtraction temporary alive
+	// until the returned reference has been copied into the expression result.
+	c.work = NewIndexedRationalVector(c.manager, 4)
 	for i, field := range []struct {
 		set   bool
 		value *numeral.Rational
@@ -172,7 +174,7 @@ func (c *RationalColumnInfo) AdjustedUpperBound(out *numeral.Rational) (err erro
 	if e != nil {
 		return e
 	}
-	e = c.manager.Sub(&c.work.Data[0], &c.work.Data[1], &c.work.Data[2])
+	e = etaRationalDifference(c.manager, &c.work.Data[3], &c.work.Data[2], &c.work.Data[0], &c.work.Data[1])
 	if err = c.calls.after(c.manager, b, e); err != nil {
 		return err
 	}
@@ -193,7 +195,7 @@ func (c *RationalColumnInfo) boundHolds(v *numeral.Rational, upper bool) (bool, 
 	if v == nil {
 		return false, ErrBounds
 	}
-	c.boundWork = NewIndexedRationalVector(c.manager, 2)
+	c.boundWork = NewIndexedRationalVector(c.manager, 3)
 	if err := c.boundWork.copySlot(&c.boundWork.Data[0], v); err != nil {
 		return false, err
 	}
@@ -217,9 +219,9 @@ func (c *RationalColumnInfo) boundHolds(v *numeral.Rational, upper bool) (bool, 
 		return false, err
 	}
 	if upper {
-		err = c.manager.Add(&c.Upper, &zero, &c.boundWork.Data[1])
+		err = etaRationalSum(c.manager, &c.boundWork.Data[2], &c.boundWork.Data[1], &c.Upper, &zero)
 	} else {
-		err = c.manager.Sub(&c.Low, &zero, &c.boundWork.Data[1])
+		err = etaRationalDifference(c.manager, &c.boundWork.Data[2], &c.boundWork.Data[1], &c.Low, &zero)
 	}
 	if err = c.calls.after(c.manager, b, err); err != nil {
 		return false, err
