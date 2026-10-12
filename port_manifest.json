@@ -155488,10 +155488,23 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete mpz buffers in euclidean_solver, linear_equation, bound_propagator and theory_arith_int: indexed mutable numeral, deep-copy push, ascending reset, borrowed c_ptr and raw-vector swap",
+          "status": "unported"
+        },
+        {
+          "name": "concrete mpq buffers in euclidean_solver and propagate_ineqs_tactic: indexed mutable numeral, deep-copy push, ascending reset, borrowed c_ptr and raw-vector swap where reached",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "The buffer borrows its numeral manager and owns a manager-copy of each appended mpz/mpq value. Pop destroys the last value; reset and the destructor destroy values in ascending slot order. swap(svector&) transfers raw numeral storage in both directions, so the receiving owner must later delete its acquired numeral payloads. c_ptr and indexed access borrow mutable slots and become stale after slice growth or swap."
+      ],
+      "deviations": [
+        "No generic Go numeral-buffer adapter is retained. The Euclidean solver requires concrete integer and rational buffer owners plus its source sort_core swaps; existing scoped numeral vectors have related operations but do not implement raw-vector storage transfer or the borrowed c_ptr boundary. Keep this unit unported until those retained callers are represented."
+      ]
     },
     {
       "path": "src/util/obj_hashtable.h",
