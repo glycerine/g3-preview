@@ -5,6 +5,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -13,6 +14,115 @@ func sharingMust(t *testing.T, e error) {
 	t.Helper()
 	if e != nil {
 		t.Fatal(e)
+	}
+}
+
+func TestSharingGoalPassReusesEarlierFormulaAndUpdatesDepth(t *testing.T) {
+	m, fid := sharingFixture(t)
+	sort, e := m.BitVectorSort(8)
+	sharingMust(t, e)
+	vars := make([]ast.ASTHandle, 4)
+	for i := range vars {
+		vars[i], e = m.MkConst(symbol.Numerical(uint32(950+i)), sort)
+		sharingMust(t, e)
+		sharingMust(t, m.IncRef(vars[i]))
+	}
+	t.Cleanup(func() {
+		for i := len(vars) - 1; i >= 0; i-- {
+			sharingMust(t, m.DecRef(vars[i]))
+		}
+	})
+	binary, e := m.MkFamilyApp(fid, 4, nil, vars[:2])
+	sharingMust(t, e)
+	nary, e := m.MkFamilyApp(fid, 4, nil, []ast.ASTHandle{vars[1], vars[2], vars[0], vars[3]})
+	sharingMust(t, e)
+	f0, e := m.MkEq(binary, vars[2])
+	sharingMust(t, e)
+	f1, e := m.MkEq(nary, vars[3])
+	sharingMust(t, e)
+	goal, e := tactic.NewGoal(m, false, true, false)
+	sharingMust(t, e)
+	t.Cleanup(func() { sharingMust(t, goal.Close()) })
+	sharingMust(t, goal.Assert(f0))
+	sharingMust(t, goal.Assert(f1))
+	sharingMust(t, goal.SetDepth(7))
+	pass, e := NewSharingGoalPass(m, 128)
+	sharingMust(t, e)
+	gotGoal, e := pass.Apply(goal)
+	sharingMust(t, e)
+	if gotGoal != goal {
+		t.Fatal("source pass must publish input goal")
+	}
+	depth, e := goal.Depth()
+	sharingMust(t, e)
+	if depth != 8 {
+		t.Fatal("source depth transition", depth)
+	}
+	form, e := goal.Form(1)
+	sharingMust(t, e)
+	term, e := m.GetArg(form, 0)
+	sharingMust(t, e)
+	left, e := m.GetArg(term, 0)
+	sharingMust(t, e)
+	left, e = m.GetArg(left, 0)
+	sharingMust(t, e)
+	if left != binary {
+		t.Fatal("earlier goal formula did not guide later pair sharing", left, binary)
+	}
+}
+
+func TestSharingGoalPassVisitsQuantifiedBody(t *testing.T) {
+	m, fid := sharingFixture(t)
+	sort, e := m.BitVectorSort(8)
+	sharingMust(t, e)
+	x, e := m.MkVar(0, sort)
+	sharingMust(t, e)
+	y, e := m.MkConst(symbol.Numerical(970), sort)
+	sharingMust(t, e)
+	z, e := m.MkConst(symbol.Numerical(971), sort)
+	sharingMust(t, e)
+	for _, h := range []ast.ASTHandle{x, y, z} {
+		sharingMust(t, m.IncRef(h))
+		h := h
+		t.Cleanup(func() { sharingMust(t, m.DecRef(h)) })
+	}
+	binary, e := m.MkFamilyApp(fid, 4, nil, []ast.ASTHandle{x, y})
+	sharingMust(t, e)
+	nary, e := m.MkFamilyApp(fid, 4, nil, []ast.ASTHandle{y, z, x, z})
+	sharingMust(t, e)
+	f0, e := m.MkEq(binary, z)
+	sharingMust(t, e)
+	f1, e := m.MkEq(nary, z)
+	sharingMust(t, e)
+	body, e := m.MkAnd(f0, f1)
+	sharingMust(t, e)
+	q, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{symbol.Numerical(972)}, Body: body})
+	sharingMust(t, e)
+	goal, e := tactic.NewGoal(m, false, true, false)
+	sharingMust(t, e)
+	t.Cleanup(func() { sharingMust(t, goal.Close()) })
+	sharingMust(t, goal.Assert(q))
+	pass, e := NewSharingGoalPass(m, 128)
+	sharingMust(t, e)
+	_, e = pass.Apply(goal)
+	sharingMust(t, e)
+	got, e := goal.Form(0)
+	sharingMust(t, e)
+	if got == q {
+		t.Fatal("quantified BV body was not rewritten")
+	}
+	newBody, e := m.GetQuantifierBody(got)
+	sharingMust(t, e)
+	second, e := m.GetArg(newBody, 1)
+	sharingMust(t, e)
+	term, e := m.GetArg(second, 0)
+	sharingMust(t, e)
+	left, e := m.GetArg(term, 0)
+	sharingMust(t, e)
+	left, e = m.GetArg(left, 0)
+	sharingMust(t, e)
+	if left != binary {
+		t.Fatal("quantifier body missed cached ordered pair", left, binary)
 	}
 }
 

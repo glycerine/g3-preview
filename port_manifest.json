@@ -95706,10 +95706,13 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/tactic/bv/max_bv_sharing_reduce.go"
+        "pkg/tactic/bv/max_bv_sharing_reduce.go",
+        "pkg/tactic/bv/max_bv_sharing_goal.go"
       ],
       "tests": [
-        "TestSharingReducerOrderedPairsReuseAndNumeralPosition"
+        "TestSharingReducerOrderedPairsReuseAndNumeralPosition",
+        "TestSharingGoalPassReusesEarlierFormulaAndUpdatesDepth",
+        "TestSharingGoalPassVisitsQuantifiedBody"
       ],
       "conditionals": [
         {
@@ -95753,10 +95756,19 @@
           "tests": [
             "TestSharingReducerOrderedPairsReuseAndNumeralPosition"
           ]
+        },
+        {
+          "name": "nonproof goal application, bottom-up AST and quantifier traversal, pair reuse across sequential goal updates, and depth transition",
+          "status": "partial",
+          "go_target": "pkg/tactic/bv/max_bv_sharing_goal.go",
+          "tests": [
+            "TestSharingGoalPassReusesEarlierFormulaAndUpdatesDepth",
+            "TestSharingGoalPassVisitsQuantifiedBody"
+          ]
         }
       ],
       "ownership": [
-        "The concrete reducer retains cached pair operands and generated apps as AST roots through Close. The enclosing goal traversal, proofs, parameters, budgets, and tactic lifecycle remain unported."
+        "The concrete reducer retains cached pair operands and generated apps as AST roots through Close. The goal pass retains rebuilt applications and quantifiers until goal updates acquire their own roots. Proofs, parameters, budgets, and full tactic lifecycle remain unported."
       ],
       "deviations": [
         "The four obj_pair_hashtable<expr,expr> instantiations use typed Go maps keyed by ordered AST-handle pairs; C++ hash buckets are not retained."
