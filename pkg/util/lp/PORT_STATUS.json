@@ -6689,23 +6689,34 @@
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
-    "commit": "c32fb569",
-    "started_utc": "2026-10-12 00:55:56 UTC",
-    "completed_utc": "2026-10-12 01:19:18 UTC",
+    "commit": "8f2961ca",
+    "started_utc": "2026-10-12 03:53:59 UTC",
+    "completed_utc": "2026-10-12 04:18:29 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.events.jsonl",
-    "profile": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.json",
+    "log": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.json",
+    "cpu_affinity": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
     "packages": 64,
     "passed_packages": 63,
     "skipped_packages": 1,
     "packages_with_tests": 51,
-    "lp_seconds": 1397.137,
-    "lp_covered_statements": 29932,
-    "lp_statements": 34582,
-    "session_id": 40124,
-    "scope_warning": "Native module checkpointc32fb569 completed successfully: actual session40124 terminal exit0 observed and closed,2026-10-12 00:55:56\u201301:19:18UTC. All64packages processed,63pass/1skip/51with named tests; LP1397.137s,29932/34582statements86.6%. Actual profile contains no driver_rational_benchmark/driver_pair_benchmark/driver_execute files: includes native column copied-left fix, iterator/column/settings tests and preceding native work; excludes all debug-only LU scenarios and later preparation short-write correction/benchmark/executor increments. Profiles and terminal package events inspected; no whole-LP completion claim. Artifacts /mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.{json,log,cover,events.jsonl}."
+    "lp_seconds": 1442.72,
+    "lp_covered_statements": 30253,
+    "lp_statements": 34954,
+    "session_id": 89234,
+    "scope_warning": "Full native module checkpoint 8f2961ca completed successfully; actual session 89234 terminal exit 0 observed and closed. All 64 packages processed: 63 pass, one skip, 51 with named tests. LP 1442.720s, 30253/34954 statements (86.6%). Includes LPParams, scoped-container tests, numeric benchmark final-report correction and actual CLI executor. Excludes later debug-only precise-vector equality correction and indexed-value audit tests; these have separate focused evidence. Go benchmark full-count loops are separate checkpoints. CPU affinity 8\u201316, GOMAXPROCS=9. No whole-LP completion claim."
   },
   "full_native_checkpoint_history": [
     {
@@ -6950,6 +6961,25 @@
       "lp_statements": 33519,
       "session_id": 87618,
       "scope_warning": "Actual session87618 returned terminal exit0 and is closed. Includes native LP implementation/tests through a4d0e129 (LU check file driver and earlier scaling/scoped-map/known-solution/LAR/SMT/MPS increments). Native excludes g3debug dense/printer/residual files. Profile inspection confirms driver_glpk_reports.go, driver_process_file.go and driver_mps_batch.go absent; their later focused evidence is separate. Go statement coverage is not C++ completion."
+    },
+    {
+      "commit": "c32fb569",
+      "started_utc": "2026-10-12 00:55:56 UTC",
+      "completed_utc": "2026-10-12 01:19:18 UTC",
+      "exit_code": 0,
+      "log": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.log",
+      "event_log": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.events.jsonl",
+      "profile": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.cover",
+      "status_file": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.json",
+      "packages": 64,
+      "passed_packages": 63,
+      "skipped_packages": 1,
+      "packages_with_tests": 51,
+      "lp_seconds": 1397.137,
+      "lp_covered_statements": 29932,
+      "lp_statements": 34582,
+      "session_id": 40124,
+      "scope_warning": "Native module checkpointc32fb569 completed successfully: actual session40124 terminal exit0 observed and closed,2026-10-12 00:55:56\u201301:19:18UTC. All64packages processed,63pass/1skip/51with named tests; LP1397.137s,29932/34582statements86.6%. Actual profile contains no driver_rational_benchmark/driver_pair_benchmark/driver_execute files: includes native column copied-left fix, iterator/column/settings tests and preceding native work; excludes all debug-only LU scenarios and later preparation short-write correction/benchmark/executor increments. Profiles and terminal package events inspected; no whole-LP completion claim. Artifacts /mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.{json,log,cover,events.jsonl}."
     }
   ],
   "latest_tableau_catchup_increment": {
@@ -11955,43 +11985,6 @@
   "latest_numeric_benchmark_report_correction": {
     "summary": "Corrected retained numeric benchmark final reports to src/util/lp/lp_settings.h T_to_string overloads: scalar result converts through real RationalManager.Float64; pair result evaluates literal X+Y/mpq(1000) with concrete copied-left quotient/sum temporaries, converts to double and destroys lexical temporaries before formatting. Final output uses source six-significant-digit stream text. Input pair vector deliberately remains exact: numeric_pair::to_string resolves its earlier generic coordinate template, whereas direct final T_to_string selects the later concrete overload. A minimal standalone C++11 lookup probe confirms that declaration-order distinction; no C/cgo dependency or project/STL port introduced. Existing independent math/big arithmetic checks remain; full-count benchmark validators now inspect the exact live accumulator before final formatting instead of treating the approximate report as an exact oracle. Added9 literal source-report worlds (zero,27.828,69.4297 across scalar compound/plus/pair). All original report-byte/endl/timer/physical failure/older-caller tests plus actual CLI executor checks pass native1.148s/combined1.636s. Both LP vets pass before the final literal-only test addition. Focused profiles /mnt/oldrog/tmp/g3-lp-benchmark-report-{native,debug}.cover. Full pair count checkpoint on CPUs8\u201316 passed separately before this final-report correction; full current-code count/report combination remains separately verifiable. LP whole-source inventory remains20ported/75partial/10reference_only/3dead_deleted/2platform_replacement.",
     "full_count_evidence_predates_report_correction": true
-  },
-  "running_full_native_checkpoint": {
-    "status": "running",
-    "cpu_affinity": [
-      8,
-      9,
-      10,
-      11,
-      12,
-      13,
-      14,
-      15,
-      16
-    ],
-    "scope": "Full native module at8f2961ca, includes LPParams/scoped vector tests and corrected source numeric reports; excludes Go benchmark loops, which have separate full-count checkpoints",
-    "commit": "8f2961ca",
-    "started_utc": "2026-10-12 03:53:59 UTC",
-    "runner_pid": 2,
-    "command": [
-      "go",
-      "-C",
-      "pkg",
-      "test",
-      "-json",
-      "./...",
-      "-p=2",
-      "-timeout=60m",
-      "-count=1",
-      "-coverprofile=/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.cover"
-    ],
-    "log": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.events.jsonl",
-    "profile": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.cover",
-    "status_file": "/mnt/oldrog/tmp/g3-lp-params-vectors-module-native.json",
-    "go_pid": 5,
-    "actual_exec_session": 89234,
-    "completion_verified": false
   },
   "latest_precise_vector_equality_increment": {
     "summary": "Retained lp_settings.hpp precise vectors_are_equal helper now preserves the binary rational subtraction lifetime at its actual permutation debug consumer: copied left operand, compound subtraction, returned-value copy, then destruction before each next element or early false return. The previous direct Sub skipped those source copies. exactPermutationScratch owns two concrete numeral slots and existing call receipts, with no generic callback/unused adapter. Three g3debug test groups cover30 large-number independent equal/first-to-last mismatch worlds, empty/unequal extents, and pooled/direct physical refusal campaigns through success with exact ownership census after cleanup. Focused combined0.871s, helper17/20statements85.0%; three uncovered returns guard stable delegated begin/IsZero/destructor errors. Related actual rational/pair permutation tests pass combined10.810s; native/debug LP vets pass. Source operand mutation and transport prefixes remain owning until scratch Close. Full native8f2961ca/session89234 is still running and predates this debug-only correction; no current-code full coverage claim. Whole settings/permutation units remain independently partial, LP inventory20ported/75partial/10reference_only/3dead_deleted/2platform_replacement. Profile /mnt/oldrog/tmp/g3-lp-vector-equality-debug.cover. CPU affinity8\u201316 retained.",
