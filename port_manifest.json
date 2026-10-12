@@ -8992,7 +8992,8 @@
         "pkg/ast/ast_arith_numeral_read.go",
         "pkg/ast/ast_arith_numeral_read_test.go",
         "pkg/ast/ast_arith_numeral_invocation.go",
-        "pkg/ast/ast_arith_numeral_invocation_test.go"
+        "pkg/ast/ast_arith_numeral_invocation_test.go",
+        "pkg/ast/ast_arith_numeral_text.go"
       ],
       "tests": [
         "TestASTArithmeticSourceRegistrationAndDeclarations",
@@ -9021,7 +9022,8 @@
         "TestASTArithmeticNumeralReadStoredFlagAndOrderedCopy",
         "TestASTArithmeticNumeralInvocationEveryActualReservation",
         "TestASTArithmeticNumeralInvocationCacheAndGuardHaveNoChild",
-        "TestASTArithmeticNumeralInvocationCapturesExecutingCopy"
+        "TestASTArithmeticNumeralInvocationCapturesExecutingCopy",
+        "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer"
       ],
       "assertions": [
         {
@@ -9185,6 +9187,14 @@
             "TestASTArithmeticNumeralInvocationCacheAndGuardHaveNoChild",
             "TestASTArithmeticNumeralInvocationCapturesExecutingCopy"
           ]
+        },
+        {
+          "name": "Retained arithmetic tactic numeral recognition: read exact rational parameter text and integer flag from OP_NUM (src/ast/arith_decl_plugin.cpp:632-639)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_arith_numeral_text.go",
+          "tests": [
+            "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer"
+          ]
         }
       ],
       "ownership": [
@@ -9220,7 +9230,8 @@
         "pkg/ast/rewriter/bv_rewriter_bv2int.go",
         "pkg/ast/rewriter/bv_rewriter_bv2int_test.go",
         "pkg/ast/ast_bv_bv2int_numerals.go",
-        "pkg/ast/ast_bv_bv2int_numerals_test.go"
+        "pkg/ast/ast_bv_bv2int_numerals_test.go",
+        "pkg/ast/ast_arith_numeral_text.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
@@ -9228,7 +9239,8 @@
         "TestBVRewriterBV2IntOriginalBranches",
         "TestBVRewriterBV2IntEveryColdReservationAndPublication",
         "TestBV2IntNativeRootReplacementConsumedOldReference",
-        "TestASTBitVectorBV2IntEveryActualReservation"
+        "TestASTBitVectorBV2IntEveryActualReservation",
+        "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer"
       ],
       "conditionals": [
         {
@@ -94043,9 +94055,14 @@
       "path": "src/tactic/arith/propagate_ineqs_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/arith/polynomial_builder.go",
+        "pkg/tactic/arith/polynomial_builder_test.go"
+      ],
+      "tests": [
+        "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer"
+      ],
       "assertions": [
         {
           "line": 225,
@@ -94066,7 +94083,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Retained mk_var and expr2linear_pol arithmetic ADD, binary numeral MUL, to_real normalization and exact mpq coefficient buffer (src/tactic/arith/propagate_ineqs_tactic.cpp:121-174)",
+          "status": "partial",
+          "go_target": "pkg/tactic/arith/polynomial_builder.go",
+          "tests": [
+            "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -155931,7 +155957,9 @@
         "pkg/tactic/arith/linear_equation.go",
         "pkg/tactic/arith/linear_equation_test.go",
         "pkg/tactic/arith/bound_equation_store.go",
-        "pkg/tactic/arith/bound_equation_store_test.go"
+        "pkg/tactic/arith/bound_equation_store_test.go",
+        "pkg/tactic/arith/polynomial_builder.go",
+        "pkg/tactic/arith/polynomial_builder_test.go"
       ],
       "tests": [
         "TestEuclideanIntegerBufferSortAndRawSwap",
@@ -155951,7 +155979,8 @@
         "TestLinearEquationIntegerCancellationAndLargeOwnership",
         "TestLinearEquationRationalDenominatorClearingAndCombination",
         "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
-        "TestBoundEquationStoreRationalConstructionAndCancellation"
+        "TestBoundEquationStoreRationalConstructionAndCancellation",
+        "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer"
       ],
       "conditionals": [
         {

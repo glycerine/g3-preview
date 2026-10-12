@@ -70,6 +70,7 @@
         "ast_arith_numeral.go",
         "ast_arith_numeral_invocation.go",
         "ast_arith_numeral_read.go",
+        "ast_arith_numeral_text.go",
         "ast_arith_plugin.go",
         "ast_arith_values.go",
         "ast_array_as_array.go",
@@ -1013,15 +1014,18 @@
       "package": "tactic/arith",
       "imports": [
         "arena",
+        "ast",
         "util/numeral",
         "util/params"
       ],
       "production_files": [
         "bound_config.go",
+        "bound_display.go",
         "bound_equation_store.go",
         "bound_propagation.go",
         "bound_values.go",
-        "linear_equation.go"
+        "linear_equation.go",
+        "polynomial_builder.go"
       ]
     },
     {
