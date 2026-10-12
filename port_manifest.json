@@ -157071,10 +157071,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_model_finder_hint_indexes.go"
+        "pkg/smtcore/smt_model_finder_hint_indexes.go",
+        "pkg/smtcore/smt_model_finder_hint_plan.go"
       ],
       "tests": [
-        "TestModelFinderHintPreprocessIndexesAndResidueCandidates"
+        "TestModelFinderHintPreprocessIndexesAndResidueCandidates",
+        "TestModelFinderHintPlanPartitionAndRunReset"
       ],
       "conditionals": [
         {
@@ -157100,7 +157102,8 @@
           "status": "platform_replacement",
           "go_target": "pkg/smtcore/smt_model_finder_hint_indexes.go",
           "tests": [
-            "TestModelFinderHintPreprocessIndexesAndResidueCandidates"
+            "TestModelFinderHintPreprocessIndexesAndResidueCandidates",
+            "TestModelFinderHintPlanPartitionAndRunReset"
           ]
         }
       ],
@@ -157108,7 +157111,7 @@
         "The hint solver borrows function, definition and quantifier AST identities. Its Q_f_def map owns native set membership; full cond_macro and quantifier_info lifetimes remain in the enclosing model finder."
       ],
       "deviations": [
-        "The selected Q_f_def specialization uses a native Go map keyed by a typed pair of AST handles, with native quantifier sets. C++ cached hashes, sentinel buckets and probing are not ported. Other retained pair-map and pair-hashtable consumers remain open."
+        "The selected Q_f_def specialization uses a native Go map keyed by a typed pair of AST handles, with native quantifier sets. Per-run reset now clears this pair index before rebuilding it. C++ cached hashes, sentinel buckets and probing are not ported. Other retained pair-map and pair-hashtable consumers remain open."
       ]
     },
     {
