@@ -168,4 +168,82 @@ func TestRationalIntervalRetainedPredicatesAddSubAndOwnership(t *testing.T) {
 		t.Fatal("unbounded sum excludes zero")
 	}
 	must(c.CheckInvariant())
+	inputs := map[byte][2]string{'N': {"-3", "-1"}, 'M': {"-2", "4"}, 'P': {"1", "3"}}
+	wants := map[string]string{
+		"NN": "[1, 9]", "NM": "[-12, 6]", "NP": "[-9, -1]",
+		"MN": "[-12, 6]", "MM": "[-8, 16]", "MP": "[-6, 12]",
+		"PN": "[-9, -1]", "PM": "[-6, 12]", "PP": "[1, 9]",
+	}
+	setClass := func(dst *RationalInterval, class byte) {
+		t.Helper()
+		bounds := inputs[class]
+		must(m.SetString(&lower, bounds[0]))
+		must(m.SetString(&upper, bounds[1]))
+		must(dst.SetFinite(&lower, &upper, false, false))
+	}
+	for pair, want := range wants {
+		setClass(a, pair[0])
+		setClass(b, pair[1])
+		must(c.Mul(a, b))
+		out.Reset()
+		must(c.Display(&out))
+		if out.String() != want {
+			t.Fatalf("interval product %s = %q, want %q", pair, out.String(), want)
+		}
+	}
+	must(m.SetInt32(&lower, -3))
+	must(m.SetInt32(&upper, 0))
+	must(a.SetFinite(&lower, &upper, false, false))
+	must(m.SetInt32(&lower, 0))
+	must(m.SetInt32(&upper, 2))
+	must(b.SetFinite(&lower, &upper, false, false))
+	must(c.Mul(a, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[-6, 0]" {
+		t.Fatalf("closed-zero interval product = %q", out.String())
+	}
+	must(a.ResetLower()) // (-oo, 0]
+	must(c.Mul(a, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "(-oo, 0]" {
+		t.Fatalf("infinite interval product = %q", out.String())
+	}
+	must(m.SetInt32(&lower, -2))
+	must(m.SetInt32(&upper, 4))
+	must(a.SetFinite(&lower, &upper, true, false))
+	must(m.SetInt32(&lower, -3))
+	must(m.SetInt32(&upper, 6))
+	must(b.SetFinite(&lower, &upper, false, false))
+	must(c.Mul(a, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[-12, 24]" {
+		t.Fatalf("mixed tie prefers closed lower = %q", out.String())
+	}
+	must(c.SetFrom(b))
+	must(c.Mul(a, c))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[-12, 24]" {
+		t.Fatalf("aliased mixed product = %q", out.String())
+	}
+	must(m.SetInt32(&lower, -2))
+	must(m.SetInt32(&upper, 4))
+	must(a.SetFinite(&lower, &upper, false, true))
+	must(c.Mul(a, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "[-12, 24)" {
+		t.Fatalf("mixed tie prefers closed alternate = %q", out.String())
+	}
+	must(a.ResetLower())
+	must(b.ResetUpper())
+	must(c.Mul(a, b))
+	out.Reset()
+	must(c.Display(&out))
+	if out.String() != "(-oo, +oo)" {
+		t.Fatalf("mixed infinite product = %q", out.String())
+	}
 }
