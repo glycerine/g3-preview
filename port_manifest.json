@@ -83781,13 +83781,16 @@
         "pkg/smtcore/smt_model_finder_hint_search.go",
         "pkg/smtcore/smt_model_finder_hint_search_test.go",
         "pkg/smtcore/smt_model_finder_hint_cycle.go",
-        "pkg/smtcore/smt_model_finder_hint_cycle_test.go"
+        "pkg/smtcore/smt_model_finder_hint_cycle_test.go",
+        "pkg/smtcore/smt_model_finder_hint_indexes.go",
+        "pkg/smtcore/smt_model_finder_hint_indexes_test.go"
       ],
       "tests": [
         "TestModelFinderScopedQuantifierSetTrailsAndEvents",
         "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
         "TestModelFinderHintSatisfiedResidueSourceScopeTransitions",
-        "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations"
+        "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations",
+        "TestModelFinderHintPreprocessIndexesAndResidueCandidates"
       ],
       "assertions": [
         {
@@ -84215,13 +84218,21 @@
           "tests": [
             "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations"
           ]
+        },
+        {
+          "name": "hint_solver preprocess, Q_f/Q_f_def/f2defs construction and get_candidates_from_residue",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_indexes.go",
+          "tests": [
+            "TestModelFinderHintPreprocessIndexesAndResidueCandidates"
+          ]
         }
       ],
       "ownership": [
         "The scoped sets borrow quantifier handles; the satisfied-set undo callback clears the corresponding quantifier_info choice before each reverse set edit."
       ],
       "deviations": [
-        "The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback and selected-definition cycle check are ported with borrowed AST handles. Macro indexes, quantifier_info ownership, greedy search and broader model-finder algorithms remain open."
+        "The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback, selected-definition cycle check, iterative candidate filtering and Q_f/Q_f_def indexes are ported with borrowed AST handles. Full quantifier_info and cond_macro ownership, greedy search and broader model-finder algorithms remain open."
       ]
     },
     {
@@ -156781,7 +156792,8 @@
         "pkg/ast/ast_expr_substitution_table.go",
         "pkg/ast/ast_expr_substitution_ops.go",
         "pkg/ast/rewriter/bv_trailing_table.go",
-        "pkg/smtcore/smt_model_finder_hint_cycle.go"
+        "pkg/smtcore/smt_model_finder_hint_cycle.go",
+        "pkg/smtcore/smt_model_finder_hint_indexes.go"
       ],
       "tests": [
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
@@ -156841,7 +156853,8 @@
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
         "TestBVTrailingNativeWideDeletionReset",
         "TestBVTrailingEveryColdCountReservation",
-        "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations"
+        "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations",
+        "TestModelFinderHintPreprocessIndexesAndResidueCandidates"
       ],
       "conditionals": [
         {
@@ -156965,6 +156978,14 @@
           "tests": [
             "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations"
           ]
+        },
+        {
+          "name": "hint_solver Q_f, f2defs, candidate and forbidden object sets/maps use native borrowed-handle maps",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_indexes.go",
+          "tests": [
+            "TestModelFinderHintPreprocessIndexesAndResidueCandidates"
+          ]
         }
       ],
       "ownership": [
@@ -157033,9 +157054,13 @@
       "path": "src/util/obj_pair_hashtable.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_model_finder_hint_indexes.go"
+      ],
+      "tests": [
+        "TestModelFinderHintPreprocessIndexesAndResidueCandidates"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -157054,9 +157079,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "hint_solver obj_pair_map<func_decl,expr,quantifier_set*> Q_f_def lookup/insertion using concrete AST-handle pair keys",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_indexes.go",
+          "tests": [
+            "TestModelFinderHintPreprocessIndexesAndResidueCandidates"
+          ]
+        }
+      ],
+      "ownership": [
+        "The hint solver borrows function, definition and quantifier AST identities. Its Q_f_def map owns native set membership; full cond_macro and quantifier_info lifetimes remain in the enclosing model finder."
+      ],
+      "deviations": [
+        "The selected Q_f_def specialization uses a native Go map keyed by a typed pair of AST handles, with native quantifier sets. C++ cached hashes, sentinel buckets and probing are not ported. Other retained pair-map and pair-hashtable consumers remain open."
+      ]
     },
     {
       "path": "src/util/obj_pair_set.h",

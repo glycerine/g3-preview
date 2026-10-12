@@ -7,20 +7,31 @@ import "github.com/glycerine/g3/pkg/ast"
 // Quantifiers and function declarations are borrowed from its AST manager.
 // The surrounding macro indexes and greedy search remain in the model finder.
 type hintSearchState struct {
-	residue, satisfied *scopedQuantifierSet
-	theOne             map[ast.ASTHandle]ast.ASTHandle
-	definitions        map[ast.ASTHandle]ast.ASTHandle
+	residue, satisfied    *scopedQuantifierSet
+	definitions           map[ast.ASTHandle]ast.ASTHandle
+	infos                 map[ast.ASTHandle]*hintQuantifierInfo
+	forbidden, candidates map[ast.ASTHandle]struct{}
+	qByFunction           map[ast.ASTHandle]map[ast.ASTHandle]struct{}
+	qByDefinition         map[hintFunctionDefinition]map[ast.ASTHandle]struct{}
+	defsByFunction        map[ast.ASTHandle]map[ast.ASTHandle]struct{}
 }
 
 func newHintSearchState() *hintSearchState {
 	s := &hintSearchState{
-		residue:     newScopedQuantifierSet(nil),
-		theOne:      make(map[ast.ASTHandle]ast.ASTHandle),
-		definitions: make(map[ast.ASTHandle]ast.ASTHandle),
+		residue:        newScopedQuantifierSet(nil),
+		definitions:    make(map[ast.ASTHandle]ast.ASTHandle),
+		infos:          make(map[ast.ASTHandle]*hintQuantifierInfo),
+		forbidden:      make(map[ast.ASTHandle]struct{}),
+		candidates:     make(map[ast.ASTHandle]struct{}),
+		qByFunction:    make(map[ast.ASTHandle]map[ast.ASTHandle]struct{}),
+		qByDefinition:  make(map[hintFunctionDefinition]map[ast.ASTHandle]struct{}),
+		defsByFunction: make(map[ast.ASTHandle]map[ast.ASTHandle]struct{}),
 	}
 	s.satisfied = newScopedQuantifierSet(func(q ast.ASTHandle, _ bool) {
 		// hint_solver::ev_handler runs before each satisfying-set trail edit.
-		s.theOne[q] = ast.ASTHandle{}
+		if info := s.infos[q]; info != nil {
+			info.theOne = ast.ASTHandle{}
+		}
 	})
 	return s
 }
@@ -39,29 +50,37 @@ func (s *hintSearchState) popScope() error {
 	return s.residue.popScope()
 }
 
-// updateSatisfiedResidue follows hint_solver::update_satisfied_residue. The
-// two slices are the already-built q_f and q_f_def quantifier sets for (f,def).
-// The caller must hold the greedy search scope, as the source does.
-func (s *hintSearchState) updateSatisfiedResidue(f ast.ASTHandle, qF, qFDef []ast.ASTHandle) (bool, error) {
+// updateSatisfiedResidue follows hint_solver::update_satisfied_residue using
+// its already-built Q_f and Q_{f=def} indexes. The caller holds the greedy
+// search scope, as the source does.
+func (s *hintSearchState) updateSatisfiedResidue(f, def ast.ASTHandle) (bool, error) {
 	if s == nil || s.residue == nil || s.satisfied == nil || len(s.satisfied.scopes) == 0 || len(s.residue.scopes) == 0 {
 		return false, ast.ErrASTDomain
 	}
+	qF, qFDef := s.qByFunction[f], s.qByDefinition[hintFunctionDefinition{f, def}]
+	if qF == nil || qFDef == nil {
+		return false, ast.ErrASTDomain
+	}
 	useful := false
-	for _, q := range qFDef {
+	for q := range qFDef {
 		if s.satisfied.contains(q) {
 			continue
+		}
+		info, e := s.info(q)
+		if e != nil {
+			return false, e
 		}
 		useful = true
 		s.residue.erase(q)
 		s.satisfied.insert(q)
 		// This is quantifier_info::set_the_one(f); the event handler above
 		// clears it when the insertion is undone.
-		s.theOne[q] = f
+		info.theOne = f
 	}
 	if !useful {
 		return false, nil
 	}
-	for _, q := range qF {
+	for q := range qF {
 		if !s.satisfied.contains(q) {
 			s.residue.insert(q)
 		}

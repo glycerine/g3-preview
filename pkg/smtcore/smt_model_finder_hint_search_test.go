@@ -39,32 +39,37 @@ func TestModelFinderHintSatisfiedResidueSourceScopeTransitions(t *testing.T) {
 	})
 
 	s := newHintSearchState()
-	if _, e := s.updateSatisfiedResidue(f[0], qs, qs[:1]); !errors.Is(e, ast.ErrASTDomain) {
+	d0, d1 := qs[0], qs[1]
+	s.infos[qs[0]] = &hintQuantifierInfo{nonGround: []ast.ASTHandle{f[0]}, macros: []hintConditionalMacro{{function: f[0], definition: d0, satisfyAtom: true}}}
+	s.infos[qs[1]] = &hintQuantifierInfo{nonGround: []ast.ASTHandle{f[0], f[1]}, macros: []hintConditionalMacro{{function: f[1], definition: d1, satisfyAtom: true}}}
+	s.infos[qs[2]] = &hintQuantifierInfo{nonGround: []ast.ASTHandle{f[1]}}
+	astTestMust(t, s.makeQuantifierIndexes(qs))
+	if _, e := s.updateSatisfiedResidue(f[0], d0); !errors.Is(e, ast.ErrASTDomain) {
 		t.Fatal("source update requires greedy scope", e)
 	}
 	s.pushScope()
-	useful, e := s.updateSatisfiedResidue(f[0], qs[:2], qs[:1])
+	useful, e := s.updateSatisfiedResidue(f[0], d0)
 	astTestMust(t, e)
-	if !useful || !s.satisfied.contains(qs[0]) || !s.residue.contains(qs[1]) || s.residue.contains(qs[0]) || s.theOne[qs[0]] != f[0] {
+	if !useful || !s.satisfied.contains(qs[0]) || !s.residue.contains(qs[1]) || s.residue.contains(qs[0]) || s.infos[qs[0]].theOne != f[0] {
 		t.Fatal("first source q_f_def then q_f transition")
 	}
 	s.pushScope()
-	useful, e = s.updateSatisfiedResidue(f[1], qs[1:], qs[1:2])
+	useful, e = s.updateSatisfiedResidue(f[1], d1)
 	astTestMust(t, e)
-	if !useful || !s.satisfied.contains(qs[1]) || s.residue.contains(qs[1]) || !s.residue.contains(qs[2]) || s.theOne[qs[1]] != f[1] {
+	if !useful || !s.satisfied.contains(qs[1]) || s.residue.contains(qs[1]) || !s.residue.contains(qs[2]) || s.infos[qs[1]].theOne != f[1] {
 		t.Fatal("nested source residue-to-satisfied transition")
 	}
-	useful, e = s.updateSatisfiedResidue(f[1], qs[1:], qs[1:2])
+	useful, e = s.updateSatisfiedResidue(f[1], d1)
 	astTestMust(t, e)
 	if useful || len(s.satisfied.trail) != 2 || len(s.residue.trail) != 3 {
 		t.Fatal("already satisfied q_f_def must return before q_f update")
 	}
 	astTestMust(t, s.popScope())
-	if s.theOne[qs[1]] != (ast.ASTHandle{}) || s.satisfied.contains(qs[1]) || !s.residue.contains(qs[1]) || s.residue.contains(qs[2]) || s.theOne[qs[0]] != f[0] {
+	if s.infos[qs[1]].theOne != (ast.ASTHandle{}) || s.satisfied.contains(qs[1]) || !s.residue.contains(qs[1]) || s.residue.contains(qs[2]) || s.infos[qs[0]].theOne != f[0] {
 		t.Fatal("satisfied event and residue undo order")
 	}
 	astTestMust(t, s.popScope())
-	if s.theOne[qs[0]] != (ast.ASTHandle{}) || !s.satisfied.empty() || !s.residue.empty() {
+	if s.infos[qs[0]].theOne != (ast.ASTHandle{}) || !s.satisfied.empty() || !s.residue.empty() {
 		t.Fatal("outer source scope restoration")
 	}
 }
