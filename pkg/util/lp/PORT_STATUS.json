@@ -11406,5 +11406,17 @@
       "TestLPDriverPreparationShortWritePublication"
     ],
     "whole_unit_promotion": false
+  },
+  "latest_scalar_benchmark_increment": {
+    "summary": "Retained test_rationals_no_numeric_pairs and test_rationals_no_numeric_pairs_plus now have concrete RationalBenchmarkDriver bodies: literal public500000 outer iterations and10 inner products,40 shared RNG draws, native input vectors with owned constructor copies, copied-left rational product/return temporary, compound versus binary-plus/assignment accumulation, lexical product/val destruction/reconstruction, process stopwatch and exact source report/endl order. Independent math/big oracle caught that Del preserves small scalar bits; fresh zero reconstruction now matches each source val lifetime. Five test groups cover40 seed/variant worlds at0/1/3/7 iterations with all20 inputs/result/shared RNG checked, every report byte with explicit and short nil-error writes plus both endl failures, actual start/stop clock failures and owner guards, pooled/direct physical refusal campaigns through success, and two actual older1000-digit caller comparisons whose stopped-manager invalid-slot refusal and independent cleanup are preserved. Focused native0.515s/combined0.694s pass; new driver79/95statements83.2% both. Stable delegated begin/cleanup/format errors remain uncovered; no artificial failure hooks. Standard Go benchmark BenchmarkLPRationalSource500000 executes each literal registered count and checks independent result/closed owner; full-count execution not yet credited. Pair benchmark, full CLI executor and whole-source/ownership audits remain open; no whole-unit promotion. Full nativec32fb569 session40124 is still running and predates this increment. Profiles /mnt/oldrog/tmp/g3-lp-scalar-benchmark-{native,debug}.cover.",
+    "tests": [
+      "TestLPRationalBenchmarkIndependentArithmeticAndInputs",
+      "TestLPRationalBenchmarkReportFailureAndFlushPrefixes",
+      "TestLPRationalBenchmarkClockAndOwnerBoundaries",
+      "TestLPRationalBenchmarkPhysicalRefusalOwnership",
+      "TestLPRationalBenchmarkPreservesOlderComparison"
+    ],
+    "full_registered_runs_verified": false,
+    "whole_unit_promotion": false
   }
 }
