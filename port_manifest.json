@@ -121812,7 +121812,7 @@
       "path": "src/util/lp/lar_constraints.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/implied_bound.go",
         "pkg/util/lp/implied_bound_test.go",
@@ -173366,5 +173366,32 @@
     "dependency": "github.com/glycerine/insdict v0.10.1",
     "full_suite_qualification": "Revision55b06c96 is still running and predates this source audit and dependency change.",
     "non_lp_native_test_gate": "All 63 non-LP package paths passed native go test with insdict v0.10.1; LP focused term/random groups pass native and combined."
+  },
+  "latest_lar_constraints_retained_audit": {
+    "scope": "Whole retained lar_constraints.h audit: flip_kind/string vocabulary, base RHS/free-coefficient owner, variable and term derived constraints, and general copied-coefficient constraint all have concrete implementations and live callers in init_lar_solver, lar_solver and quick_xplain. The default base constructor and assertion-only copy-from-base constructor have no retained call and are excluded. Independent120-world exact coefficient/borrow tests, seven physical refusal campaigns with successful value and publication checks, and actual LAR model/constraint consumer tests pass under insdict v0.10.1. The source virtual surface is a typed Go interface; term data remains borrowed, variable/general exports own numeral copies, and derived coefficient cleanup precedes base RHS cleanup. Focused native/combined groups pass26.644s/27.595s; lar_constraints.go has78/84 statements covered in each mode, with remaining blocks delegated failure cleanup and stable guards. This source unit is ported and ownership audited; larger solver, quick_xplain and input-driver units remain separately partial. The running full native revision55b06c96 predates these changes and is not current-code evidence. CPUs8-16/GOMAXPROCS9.",
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "source_unit": "src/util/lp/lar_constraints.h",
+    "focused_native_seconds": 26.644,
+    "focused_combined_seconds": 27.595,
+    "whole_go_file_focused_covered_total": {
+      "native": {
+        "lar_constraints.go": [
+          78,
+          84
+        ]
+      },
+      "debug": {
+        "lar_constraints.go": [
+          78,
+          84
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-lar-constraints-audit-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-lar-constraints-audit-debug.cover"
+    ],
+    "full_suite_qualification": "Revision55b06c96 predates this source audit and dependency pin; it remains a separate running checkpoint."
   }
 }
