@@ -34608,14 +34608,17 @@
         "pkg/math/interval/fixed_root.go",
         "pkg/math/interval/fixed_root_test.go",
         "pkg/math/subpaving/fixed_interval_root.go",
-        "pkg/math/subpaving/fixed_interval_root_test.go"
+        "pkg/math/subpaving/fixed_interval_root_test.go",
+        "pkg/math/subpaving/fast_interval.go",
+        "pkg/math/subpaving/fast_interval_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
         "TestRationalIntervalSourceDependencyMasks",
         "TestRealClosureBinaryIntervalRetainedCore",
         "TestFixedRootRetainedNewtonAndCertifiedBounds",
-        "TestSubpavingFixedIntervalXnEqYRetainedCases"
+        "TestSubpavingFixedIntervalXnEqYRetainedCases",
+        "TestSubpavingFastMutableIntervalRetainedCore"
       ],
       "conditionals": [
         {
@@ -35176,6 +35179,14 @@
           "tests": [
             "TestFixedRootRetainedNewtonAndCertifiedBounds",
             "TestSubpavingFixedIntervalXnEqYRetainedCases"
+          ]
+        },
+        {
+          "name": "Concrete mpff mutable subpaving interval endpoints, reset, set, invariant, zero containment and display (src/math/interval/interval_def.h:597-680)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_interval.go",
+          "tests": [
+            "TestSubpavingFastMutableIntervalRetainedCore"
           ]
         }
       ],
@@ -49907,9 +49918,14 @@
       "path": "src/math/subpaving/subpaving_mpff.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/subpaving/fast_interval.go",
+        "pkg/math/subpaving/fast_interval_test.go"
+      ],
+      "tests": [
+        "TestSubpavingFastMutableIntervalRetainedCore"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -49922,9 +49938,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete config_mpff interval manager binding to fast-float numerals and mutable endpoints",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_interval.go",
+          "tests": [
+            "TestSubpavingFastMutableIntervalRetainedCore"
+          ]
+        }
+      ],
+      "ownership": [
+        "The mutable fast-float interval owns both scoped endpoints and borrows its fast-float manager."
+      ],
+      "deviations": [
+        "The enclosing context_t<config_mpff> and its constant node/variable interval views remain unported."
+      ]
     },
     {
       "path": "src/math/subpaving/subpaving_mpfx.cpp",
@@ -50034,7 +50063,9 @@
         "pkg/math/subpaving/fixed_split.go",
         "pkg/math/subpaving/fixed_split_test.go",
         "pkg/math/subpaving/fixed_selector.go",
-        "pkg/math/subpaving/fixed_selector_test.go"
+        "pkg/math/subpaving/fixed_selector_test.go",
+        "pkg/math/subpaving/fast_interval.go",
+        "pkg/math/subpaving/fast_interval_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50064,7 +50095,8 @@
         "TestSubpavingFixedMidpointChildrenPropagateDefinition",
         "TestSubpavingFixedMidpointIntegerChildNormalization",
         "TestSubpavingFixedRoundRobinSourceDecisionAndDefinitionSkip",
-        "TestSubpavingFixedRoundRobinSingletonAndUndecidedChild"
+        "TestSubpavingFixedRoundRobinSingletonAndUndecidedChild",
+        "TestSubpavingFastMutableIntervalRetainedCore"
       ],
       "conditionals": [
         {
@@ -50160,9 +50192,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete config_mpff mutable interval endpoints and manager forwarding in context_t interval_config (src/math/subpaving/subpaving_t.h:239-316)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_interval.go",
+          "tests": [
+            "TestSubpavingFastMutableIntervalRetainedCore"
+          ]
+        }
+      ],
+      "ownership": [
+        "The mutable interval owns its fast-float endpoints; the numeric manager is borrowed."
+      ],
+      "deviations": [
+        "Fast-float constant node views and the enclosing context remain unported."
+      ]
     },
     {
       "path": "src/math/subpaving/subpaving_t_def.h",
@@ -116097,7 +116142,7 @@
       "deviations": [
         "No generic manager-interface translation is retained. Concrete mpq, mpbq, mpfx and mpff specializations live beside their interval and subpaving consumers. src/test/ext_numeral.cpp is test-only.",
         "Whole-source instantiation audit found real-closure mpbq and subpaving mpq/mpfx/mpf/mpff/hwf consumers; the concrete rational and binary-rational Go paths do not close all retained instantiations.",
-        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner; the mpff helper has no enclosing Go subpaving interval or context yet. Whole subpaving and other extended-number instantiations remain unfinished."
+        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner. The mpff helper now serves a mutable fast-float interval; constant node views and the enclosing subpaving context remain unported. Other extended-number instantiations remain unfinished."
       ]
     },
     {
