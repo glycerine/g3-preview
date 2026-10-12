@@ -39639,3 +39639,13 @@ a matching null string still wins over an invalid fallback. A focused
 regression covers these three branches, and the manifest links it to both
 `params.cpp` and `params.h`. The surrounding parameter lifetime and global
 service units remain partial.
+
+### Null parameter reference lookup order
+
+`src/util/params.cpp:614-680` returns defaults or false from a null-backed
+`params_ref` before it delegates to a concrete `params` lookup. The Go `find`
+helper previously validated a symbol key before this null test. It now skips
+key hash/equality on a null backing; live backings still reject foreign keys.
+Focused coverage exercises getter, contains, reset-key and live-key branches.
+The prior fallback test is linked to the getter method rows, and this test to
+the getter and reset/contains rows in both source units.

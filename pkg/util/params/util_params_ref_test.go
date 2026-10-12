@@ -414,6 +414,33 @@ func TestParamsReferenceFallbackReadOnlyAfterPrimaryMiss(t *testing.T) {
 	paramsMust(t, c.Del(&primary))
 }
 
+func TestParamsReferenceNullBackingSkipsKeyRead(t *testing.T) {
+	c, sy, _ := paramsTestOwner(t)
+	_, foreignSymbols, _ := paramsTestOwner(t)
+	foreignKey := internSymbol(t, foreignSymbols, "key")
+	v, e := c.NewValue()
+	paramsMust(t, e)
+	before := c.Stats()
+	got, e := c.GetBool(&v, foreignKey, true)
+	if e != nil || !got {
+		t.Fatal("null-backed get must return default before key read", got, e)
+	}
+	contains, e := c.Contains(&v, foreignKey)
+	if e != nil || contains {
+		t.Fatal("null-backed contains must not read key", contains, e)
+	}
+	paramsMust(t, c.ResetKey(&v, foreignKey))
+	if c.Stats() != before {
+		t.Fatal("null-backed reads or reset changed storage")
+	}
+	localKey := internSymbol(t, sy, "key")
+	paramsMust(t, c.SetBool(&v, localKey, true))
+	if _, e = c.GetBool(&v, foreignKey, false); !errors.Is(e, usymbol.ErrOwner) {
+		t.Fatal("live backing skipped foreign key check", e)
+	}
+	paramsMust(t, c.Del(&v))
+}
+
 func TestParamsReferenceValidationUnknownExactOrdering(t *testing.T) {
 	c, sy, _ := paramsTestOwner(t)
 	a, e := c.NewValue()

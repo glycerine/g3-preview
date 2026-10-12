@@ -536,13 +536,15 @@ func (c *ParamsContext) find(v *ParamsRef, k usymbol.Symbol, name *string, byNam
 	if e := c.check(v); e != nil {
 		return nil, e
 	}
+	// params_ref checks its null backing before delegating to params. A null
+	// reference has no entry traversal or key hash/equality operation.
+	if v.Slot == 0 {
+		return nil, nil
+	}
 	if !byName {
 		if e := c.keyCheck(k); e != nil {
 			return nil, e
 		}
-	}
-	if v.Slot == 0 {
-		return nil, nil
 	}
 	b := &c.Blocks[v.Slot-1]
 	for i := uint32(0); i < b.Size; i++ {
