@@ -154548,7 +154548,8 @@
         "TestPolynomialNormalizeActualTransportOwnerSourceRefusal",
         "TestPolynomialNormalizeIndependentSignedIntegerContent",
         "TestPolynomialVariableRecognitionExecutingIntegerOwnerRefusesFinalize",
-        "TestIntegerPNormalizeNilReturningTransportOwnerRefusal"
+        "TestIntegerPNormalizeNilReturningTransportOwnerRefusal",
+        "TestIntegerModularFusedLargeAliasOracle"
       ],
       "conditionals": [
         {
@@ -154794,7 +154795,8 @@
             "TestIntegerModularFiniteSourceQuirks",
             "TestIntegerModularExplicitInPlaceOverloads",
             "TestIntegerModularColdOwnerIdentity",
-            "TestIntegerModularConstructorOwnershipAndRefusal"
+            "TestIntegerModularConstructorOwnershipAndRefusal",
+            "TestIntegerModularFusedLargeAliasOracle"
           ]
         },
         {
@@ -154832,10 +154834,12 @@
           ]
         },
         {
-          "name": "Same-engine direct arithmetic caller leaf transport and optional actual AddMul RAW end-only DEL continuation; public AddMul body-failure adapter and SubMul remain incomplete",
+          "name": "Same-engine direct arithmetic caller leaf transport and optional actual AddMul RAW end-only DEL continuation; large fused AddMul/SubMul values and aliases covered, while public body-failure transport remains incomplete",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpzzp_ops.go",
-          "tests": []
+          "tests": [
+            "TestIntegerModularFusedLargeAliasOracle"
+          ]
         },
         {
           "name": "mpzzp.h:167-185,195-208 selected ScalarDiv direct argument allocation/Natural/RAW transport through the same literal engines; source end-only RAW DEL versus exact owning abort",
