@@ -89,7 +89,7 @@ func (c *LARCoreSolver) Close() error {
 	}
 	// A stopped LU replacement can still borrow the catch-up column.
 	if c.catchUpWork != nil {
-		if err := c.catchUpWork.Close(); err != nil {
+		if err := c.catchUpWork.CloseForward(); err != nil {
 			return err
 		}
 		c.catchUpWork = nil

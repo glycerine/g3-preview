@@ -139,7 +139,7 @@ func (c *LARCoreSolver) CatchUpInPairLU(trace []uint32, target []int32) (err err
 			}
 			s.Factorization = nil
 		}
-		if err = c.catchUpWork.Close(); err != nil {
+		if err = c.catchUpWork.CloseForward(); err != nil {
 			return err
 		}
 		c.catchUpWork = nil
