@@ -5760,7 +5760,7 @@
     },
     {
       "source": "src/util/lp/lu.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/diagonal_matrix_float.go",
         "pkg/util/lp/diagonal_matrix_exact.go",
@@ -5918,7 +5918,8 @@
         "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots",
         "TestLPDiagonalTailConstructorOwnsValueAndDebugReciprocal"
       ],
-      "diagonal_retained_source_qualification": "Retained one_elem_on_diag diagonal-tail audit inside lu.h/.hpp: actual double/double, mpq/mpq and mpq/impq construction, non-dense query, dense X-left/T-right, indexed T-left/right and reverse-permutation conjugation are implemented. Floating debug matrix view remains reached through LU. Exact debug matrix getters/dimensions and the unused copy constructor have no retained consumers and are excluded; removed exact view methods, dimension storage and its LU assignment. Preserved exact debug constructor reciprocal computation and ownership, including real allocation-failure prefixes. New constructor oracle mutates caller coefficient, applies both exact tail kinds, closes owners and verifies independent outputs with pooled/direct allocation. Fourteen physical refusal campaigns now check stored coefficient and debug reciprocal success endpoints; stopped borrowed input checks cover both allocators. Close unwinds owned calls, lexical work, reciprocal, then stored coefficient. Whole LU units remain partial."
+      "diagonal_retained_source_qualification": "Retained one_elem_on_diag diagonal-tail audit inside lu.h/.hpp: actual double/double, mpq/mpq and mpq/impq construction, non-dense query, dense X-left/T-right, indexed T-left/right and reverse-permutation conjugation are implemented. Floating debug matrix view remains reached through LU. Exact debug matrix getters/dimensions and the unused copy constructor have no retained consumers and are excluded; removed exact view methods, dimension storage and its LU assignment. Preserved exact debug constructor reciprocal computation and ownership, including real allocation-failure prefixes. New constructor oracle mutates caller coefficient, applies both exact tail kinds, closes owners and verifies independent outputs with pooled/direct allocation. Fourteen physical refusal campaigns now check stored coefficient and debug reciprocal success endpoints; stopped borrowed input checks cover both allocators. Close unwinds owned calls, lexical work, reciprocal, then stored coefficient. Whole LU units remain partial.",
+      "retained_source_audit_evidence": "Whole retained lu.h header audit: double/double, mpq/mpq and mpq/numeric_pair<mpq> live LU declarations and inline behavior map to concrete typed Go factorization, prepared solves, entering-column routes, Suhl column update, row residual check, extension, lifecycle, status/refactor/tail queries and diagonal tails. The retained scalar and pair dot-product instantiations use concrete Go arithmetic. Floating debug dense identities and printers are covered separately; debug-only tail_product, vector-check and print_submatrix call chains are dead, and indexed-X solve_By is the source unimplemented assertion stub with no retained caller. Source copy-constructor-only and uncalled print/template adapters are excluded. Native and g3debug,g3checked focused diagonal/LU/debug-dense groups pass, including independent basis worlds, source small-LU sequences, physical rational refusals and older caller comparison identity. Representative native file coverage: diagonal float36/37, exact93/108, LU float107/130, exact factorization118/141, exact solve74/74, float update141/155, exact update264/300, float refine110/121; checked covers diagonal float37/37, exact96/108, LU float111/130, exact factorization123/141, float update145/155, exact update265/300, debug matrix61/66. lu.hpp, lu_instances.cpp and containing solver audits remain separate."
     },
     {
       "source": "src/util/lp/lu.hpp",
@@ -8267,10 +8268,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 80,
+    "ported": 81,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 15
+    "partial": 14
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -15275,5 +15276,25 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+  },
+  "latest_lu_header_whole_audit": {
+    "source_units": [
+      "src/util/lp/lu.h"
+    ],
+    "scope": "Whole retained lu.h header audit: double/double, mpq/mpq and mpq/numeric_pair<mpq> live LU declarations and inline behavior map to concrete typed Go factorization, prepared solves, entering-column routes, Suhl column update, row residual check, extension, lifecycle, status/refactor/tail queries and diagonal tails. The retained scalar and pair dot-product instantiations use concrete Go arithmetic. Floating debug dense identities and printers are covered separately; debug-only tail_product, vector-check and print_submatrix call chains are dead, and indexed-X solve_By is the source unimplemented assertion stub with no retained caller. Source copy-constructor-only and uncalled print/template adapters are excluded. Native and g3debug,g3checked focused diagonal/LU/debug-dense groups pass, including independent basis worlds, source small-LU sequences, physical rational refusals and older caller comparison identity. Representative native file coverage: diagonal float36/37, exact93/108, LU float107/130, exact factorization118/141, exact solve74/74, float update141/155, exact update264/300, float refine110/121; checked covers diagonal float37/37, exact96/108, LU float111/130, exact factorization123/141, float update145/155, exact update265/300, debug matrix61/66. lu.hpp, lu_instances.cpp and containing solver audits remain separate.",
+    "focused_tests": [
+      "TestLPDiagonalTail",
+      "TestLPFloatLU",
+      "TestLPExactLU",
+      "TestLPLU",
+      "TestLPDebugDense"
+    ],
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-lu-header-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-lu-header-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Current full native suite is running from17ecadb7 and is not yet a completed checkpoint; focused native/debug and portcheck evidence is separate."
   }
 }
