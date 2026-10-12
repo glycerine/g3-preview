@@ -111521,34 +111521,25 @@
       "path": "src/util/bit_vector.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/ast/ast_mark.go",
-        "pkg/ast/ast_mark_doc.go",
-        "pkg/ast/ast_mark_fast.go",
-        "pkg/ast/ast_mark_node.go",
         "pkg/util/bitset/vector.go"
       ],
       "tests": [
-        "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
-        "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
-        "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
-        "TestASTMarkFastBothPlanesLevelsAndNonRetention",
-        "TestASTMarkFastGrowthPrefixInlineAndOwners",
-        "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
-        "TestASTMarkHeaderRefusalPrecedesGoAllocation",
-        "TestASTMarkIDDomainsReuseAndReset",
-        "TestASTMarkLockedTraversalHelpers",
-        "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
-        "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
-        "TestASTMarkRefFastCallbacksAndFailurePrefix",
-        "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
-        "TestBoundedOperationOracle",
-        "TestSourceAnd",
-        "TestSourceEq",
+        "TestSourceResizeCrash",
+        "TestSourceResize30",
+        "TestSourceShift",
         "TestSourceOr",
+        "TestSourceAnd",
         "TestSourceReset",
-        "TestSourceResizeCrash"
+        "TestSourceEq",
+        "TestSourceBoolVectorOracle",
+        "TestOwnershipAndRemainingMethods",
+        "TestSourceHashByteRounding",
+        "TestAndEmptyAndLonger",
+        "TestGrowthCapacityAndStaleBits",
+        "TestBoundedOperationOracle",
+        "TestWarmOperationsDoNotAllocate"
       ],
       "conditionals": [
         {
@@ -111578,90 +111569,61 @@
           "text": "SASSERT(n2 <= n1);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "concrete expression/declaration ID marks and fast/ref-fast marking specializations; other generic and diagnostic surfaces open",
-          "status": "partial",
-          "go_target": "pkg/ast/ast_mark.go",
-          "tests": [
-            "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
-            "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
-            "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
-            "TestASTMarkFastBothPlanesLevelsAndNonRetention",
-            "TestASTMarkFastGrowthPrefixInlineAndOwners",
-            "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
-            "TestASTMarkHeaderRefusalPrecedesGoAllocation",
-            "TestASTMarkIDDomainsReuseAndReset",
-            "TestASTMarkLockedTraversalHelpers",
-            "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
-            "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
-            "TestASTMarkRefFastCallbacksAndFailurePrefix",
-            "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
-          ]
-        },
-        {
-          "name": "native variable-width bit vector",
+          "name": "Retained variable-width bit_vector constructors, ownership, packed-bit operations, resize/shift, set algebra, hash and display (bit_vector.h/cpp)",
           "status": "ported",
           "go_target": "pkg/util/bitset/vector.go",
           "tests": [
             "TestSourceResizeCrash",
+            "TestSourceResize30",
+            "TestSourceShift",
             "TestSourceOr",
             "TestSourceAnd",
-            "TestSourceEq",
             "TestSourceReset",
-            "TestBoundedOperationOracle"
+            "TestSourceEq",
+            "TestSourceBoolVectorOracle",
+            "TestOwnershipAndRemainingMethods",
+            "TestSourceHashByteRounding",
+            "TestAndEmptyAndLonger",
+            "TestGrowthCapacityAndStaleBits",
+            "TestBoundedOperationOracle",
+            "TestWarmOperationsDoNotAllocate"
           ]
         }
       ],
       "ownership": [
-        "Vector owns word storage; Clone/Assign copy, Swap transfers, source growth and stale bits retained. Full audit and test mapping pending package report.",
-        "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md.",
-        "Native Vector owns Go word storage; Clone and Assign copy, Swap transfers, and growth preserves source stale bits.",
-        "Hash reads floor(size/8) bytes from the current words. AST marks retain their separate concrete typed ownership."
+        "bitset.Vector owns native uint32 word storage. New zero-initializes reserved words and FromWords copies source words; Clone copies all capacity words, Assign preserves source-null early return, grows only when needed, and copies the source capacity words. Swap transfers word storage; Reset clears all backing words while retaining capacity. Growth and shrink preserve the source stale-bit behavior. Hash reads floor(size/8) bytes in source little-endian order."
       ],
       "deviations": [
-        "Legacy bitset.Vector Go-slice profile remains partial and unchanged",
-        "Actual global DebugContext assertion enable/tag and process-global memory wiring remain open; selected default source g3debug assertions execute",
-        "inactive display #else and inactive tst1/tst2 not executed",
-        "The redundant Runtime/Block translation was deleted; native typed storage lives in util/bitset and AST mark specializations retain their own typed storage.",
-        "fr_bit_vector has no source caller or Go production consumer. Its test-only FastReset copy was removed; no live source behavior depends on that specialization.",
-        "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations."
+        "Native Go slices replace C++ memory-manager allocation and C++ ostream state. Bounds and impossible extent overflow are diagnosed with Go panics. The active descending display and packed-word algorithms are retained; inactive #else display is excluded. C++ optional TRACE output and process-global assertion diagnostics belong to their diagnostic units. fr_bit_vector has no source caller, so its earlier test-only Go FastReset translation was removed. AST-specific mark variants are credited to obj_mark.h, not to this bit-vector unit."
       ]
     },
     {
       "path": "src/util/bit_vector.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/ast/ast_mark.go",
-        "pkg/ast/ast_mark_doc.go",
-        "pkg/ast/ast_mark_fast.go",
-        "pkg/ast/ast_mark_node.go",
         "pkg/util/bitset/vector.go"
       ],
       "tests": [
-        "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
-        "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
-        "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
-        "TestASTMarkFastBothPlanesLevelsAndNonRetention",
-        "TestASTMarkFastGrowthPrefixInlineAndOwners",
-        "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
-        "TestASTMarkHeaderRefusalPrecedesGoAllocation",
-        "TestASTMarkIDDomainsReuseAndReset",
-        "TestASTMarkLockedTraversalHelpers",
-        "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
-        "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
-        "TestASTMarkRefFastCallbacksAndFailurePrefix",
-        "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
-        "TestBoundedOperationOracle",
-        "TestSourceAnd",
-        "TestSourceEq",
+        "TestSourceResizeCrash",
+        "TestSourceResize30",
+        "TestSourceShift",
         "TestSourceOr",
+        "TestSourceAnd",
         "TestSourceReset",
-        "TestSourceResizeCrash"
+        "TestSourceEq",
+        "TestSourceBoolVectorOracle",
+        "TestOwnershipAndRemainingMethods",
+        "TestSourceHashByteRounding",
+        "TestAndEmptyAndLonger",
+        "TestGrowthCapacityAndStaleBits",
+        "TestBoundedOperationOracle",
+        "TestWarmOperationsDoNotAllocate"
       ],
       "conditionals": [
         {
@@ -111711,56 +111673,36 @@
           "text": "SASSERT(new_size <= m_num_bits);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "concrete expression/declaration ID marks and fast/ref-fast marking specializations; other generic and diagnostic surfaces open",
-          "status": "partial",
-          "go_target": "pkg/ast/ast_mark.go",
-          "tests": [
-            "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
-            "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
-            "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
-            "TestASTMarkFastBothPlanesLevelsAndNonRetention",
-            "TestASTMarkFastGrowthPrefixInlineAndOwners",
-            "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
-            "TestASTMarkHeaderRefusalPrecedesGoAllocation",
-            "TestASTMarkIDDomainsReuseAndReset",
-            "TestASTMarkLockedTraversalHelpers",
-            "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
-            "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
-            "TestASTMarkRefFastCallbacksAndFailurePrefix",
-            "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
-          ]
-        },
-        {
-          "name": "native variable-width bit vector",
+          "name": "Retained variable-width bit_vector constructors, ownership, packed-bit operations, resize/shift, set algebra, hash and display (bit_vector.h/cpp)",
           "status": "ported",
           "go_target": "pkg/util/bitset/vector.go",
           "tests": [
             "TestSourceResizeCrash",
+            "TestSourceResize30",
+            "TestSourceShift",
             "TestSourceOr",
             "TestSourceAnd",
-            "TestSourceEq",
             "TestSourceReset",
-            "TestBoundedOperationOracle"
+            "TestSourceEq",
+            "TestSourceBoolVectorOracle",
+            "TestOwnershipAndRemainingMethods",
+            "TestSourceHashByteRounding",
+            "TestAndEmptyAndLonger",
+            "TestGrowthCapacityAndStaleBits",
+            "TestBoundedOperationOracle",
+            "TestWarmOperationsDoNotAllocate"
           ]
         }
       ],
       "ownership": [
-        "Vector owns word storage; Clone/Assign copy, Swap transfers, source growth and stale bits retained. Full audit and test mapping pending package report.",
-        "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md.",
-        "Native Vector owns Go word storage; Clone and Assign copy, Swap transfers, and growth preserves source stale bits.",
-        "Hash reads floor(size/8) bytes from the current words. AST marks retain their separate concrete typed ownership."
+        "bitset.Vector owns native uint32 word storage. New zero-initializes reserved words and FromWords copies source words; Clone copies all capacity words, Assign preserves source-null early return, grows only when needed, and copies the source capacity words. Swap transfers word storage; Reset clears all backing words while retaining capacity. Growth and shrink preserve the source stale-bit behavior. Hash reads floor(size/8) bytes in source little-endian order."
       ],
       "deviations": [
-        "Legacy bitset.Vector Go-slice profile remains partial and unchanged",
-        "Actual global DebugContext assertion enable/tag and process-global memory wiring remain open; selected default source g3debug assertions execute",
-        "inactive display #else and inactive tst1/tst2 not executed",
-        "The redundant Runtime/Block translation was deleted; native typed storage lives in util/bitset and AST mark specializations retain their own typed storage.",
-        "fr_bit_vector has no source caller or Go production consumer. Its test-only FastReset copy was removed; no live source behavior depends on that specialization.",
-        "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations."
+        "Native Go slices replace C++ memory-manager allocation and C++ ostream state. Bounds and impossible extent overflow are diagnosed with Go panics. The active descending display and packed-word algorithms are retained; inactive #else display is excluded. C++ optional TRACE output and process-global assertion diagnostics belong to their diagnostic units. fr_bit_vector has no source caller, so its earlier test-only Go FastReset translation was removed. AST-specific mark variants are credited to obj_mark.h, not to this bit-vector unit."
       ]
     },
     {
