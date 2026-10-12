@@ -3050,7 +3050,7 @@
     },
     {
       "source": "src/util/lp/lp_dual_core_solver.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/dual_core_float.go",
         "pkg/util/lp/dual_core_float_test.go",
@@ -3174,11 +3174,12 @@
         "TestLPRationalDualSolvePricingActualRecovery",
         "TestLPRationalDualSolveTentativeFullScan",
         "TestLPRationalDualSolveNoGrowthStrictLimit"
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained dual-core audit: double/double and mpq/mpq source construction, eligible nonbasis restoration, dual-feasible initialization, leaving-row pricing, exact/floating breakpoint and Harris ratio selection, bound flips, beta/row updates, basis change/recovery, diagnostic gates and full prepared core Solve map to concrete typed Go implementations. Both explicit start_with_initial_basis_and_make_it_dual_feasible and Solve instantiations are reached through retained solver consumers. Source restore_d, xb_minus_delta_p_pivot_column and snap_xN_to_bounds are uncalled definition-only helpers; snap_runaway_nonbasic_columns lacks a body/caller, and commented FTran has no consumer. No dead adapters are added. Exact rational(double) beta assertions have no defined continuation in checked C++; the Go checked path reports the source assertion, while native follows the existing exact zero-floor policy. Native/g3debug,g3checked focused TestLPFloatDual and TestLPRationalDual groups pass, including independent optima, source stage/status ordering, numeric owner failure and older caller comparison tests. Native file coverage: dual_core_float53/54, dual_initial_float46/51, dual_solve_float81/104, dual_core_rational117/135, dual_price_rational206/254, dual_ratio_rational170/203, dual_advance_rational235/282, dual_solve_rational102/130; checked covers additional assertions. Full native checkpoint17ecadb7 passed on unchanged Go code. MPS/CLI dispatch belongs to separate source units."
     },
     {
       "source": "src/util/lp/lp_dual_core_solver.hpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/dual_core_float.go",
         "pkg/util/lp/dual_core_float_test.go",
@@ -3302,20 +3303,70 @@
         "TestLPRationalDualSolvePricingActualRecovery",
         "TestLPRationalDualSolveTentativeFullScan",
         "TestLPRationalDualSolveNoGrowthStrictLimit"
-      ]
+      ],
+      "retained_source_audit_evidence": "Whole retained dual-core audit: double/double and mpq/mpq source construction, eligible nonbasis restoration, dual-feasible initialization, leaving-row pricing, exact/floating breakpoint and Harris ratio selection, bound flips, beta/row updates, basis change/recovery, diagnostic gates and full prepared core Solve map to concrete typed Go implementations. Both explicit start_with_initial_basis_and_make_it_dual_feasible and Solve instantiations are reached through retained solver consumers. Source restore_d, xb_minus_delta_p_pivot_column and snap_xN_to_bounds are uncalled definition-only helpers; snap_runaway_nonbasic_columns lacks a body/caller, and commented FTran has no consumer. No dead adapters are added. Exact rational(double) beta assertions have no defined continuation in checked C++; the Go checked path reports the source assertion, while native follows the existing exact zero-floor policy. Native/g3debug,g3checked focused TestLPFloatDual and TestLPRationalDual groups pass, including independent optima, source stage/status ordering, numeric owner failure and older caller comparison tests. Native file coverage: dual_core_float53/54, dual_initial_float46/51, dual_solve_float81/104, dual_core_rational117/135, dual_price_rational206/254, dual_ratio_rational170/203, dual_advance_rational235/282, dual_solve_rational102/130; checked covers additional assertions. Full native checkpoint17ecadb7 passed on unchanged Go code. MPS/CLI dispatch belongs to separate source units."
     },
     {
       "source": "src/util/lp/lp_dual_core_solver_instances.cpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/dual_core_float.go",
-        "pkg/util/lp/dual_core_float_test.go"
+        "pkg/util/lp/dual_core_float_test.go",
+        "pkg/util/lp/dual_initial_float.go",
+        "pkg/util/lp/dual_solve_float.go",
+        "pkg/util/lp/dual_advance_float.go",
+        "pkg/util/lp/dual_core_rational.go",
+        "pkg/util/lp/dual_prepare_rational.go",
+        "pkg/util/lp/dual_solve_rational.go",
+        "pkg/util/lp/dual_advance_rational.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
         "TestLPFloatDualCoreIndependentDualVectors",
-        "TestLPFloatDualCorePartialOwnersAndGuards"
-      ]
+        "TestLPFloatDualCorePartialOwnersAndGuards",
+        "TestLPFloatDualSolveIndependentVertices",
+        "TestLPFloatDualPricingRecordBudget",
+        "TestLPFloatDualLeavingBudgetRNGAndDomains",
+        "TestLPFloatDualSolveLimitsTimeAndUnbounded",
+        "TestLPFloatDualSolveDebugPreconditionsAndGuards",
+        "TestLPFloatDualPricingActualNumericalFailures",
+        "TestLPFloatDualSolvePreconditionPublication",
+        "TestLPFloatDualSolveActualNoImprovementStop",
+        "TestLPRationalDualCoreIndependentModels",
+        "TestLPRationalDualCoreDoneOrder",
+        "TestLPRationalDualCorePartialOwners",
+        "TestLPRationalDualCorePhysicalOwnership",
+        "TestLPRationalDualCoreLiveMetadataPrefixes",
+        "TestLPRationalDualCorePreservesOlderComparison",
+        "TestLPRationalDualSolveIndependentVertices",
+        "TestLPRationalDualSolvePricingIndependentRecordBudget",
+        "TestLPRationalDualSolveLimitsCancellationAndUnbounded",
+        "TestLPRationalDualSolveIterationRNGAndForbidden",
+        "TestLPRationalDualSolveEmptyAndPricingGuards",
+        "TestLPRationalDualSolveReportingBytePrefixes",
+        "TestLPRationalDualSolvePhysicalOwnership",
+        "TestLPRationalDualSolvePreservesOlderComparison",
+        "TestLPRationalDualSolveCheckedPreconditionOrder",
+        "TestLPRationalDualSolvePricingActualRecovery",
+        "TestLPRationalDualSolveTentativeFullScan",
+        "TestLPRationalDualSolveNoGrowthStrictLimit",
+        "TestLPRationalDualAdvanceIndependentExchanges",
+        "TestLPRationalDualAdvanceActualRecovery",
+        "TestLPRationalDualAdvanceRevertAndRecoverPositions",
+        "TestLPRationalDualAdvanceSnapIndependentProfiles",
+        "TestLPRationalDualAdvanceDoneAndNoCandidate",
+        "TestLPRationalDualAdvanceCostDiagnosticThresholds",
+        "TestLPRationalDualAdvanceDiagnosticWriterPrefixes",
+        "TestLPRationalDualAdvancePhysicalOwnership",
+        "TestLPRationalDualAdvancePreservesOlderComparison",
+        "TestLPRationalDualAdvanceMetadataAndStoppedPrefixes",
+        "TestLPRationalDualAdvanceUpperLeavingSnapAndReconstruct",
+        "TestLPRationalDualAdvanceActualSingularFallback",
+        "TestLPFloatDualAdvanceIndependentInverseRows",
+        "TestLPFloatDualAdvanceFlipsAndStops",
+        "TestLPFloatDualAdvanceActualDualRecovery"
+      ],
+      "retained_source_audit_evidence": "Whole retained dual-core audit: double/double and mpq/mpq source construction, eligible nonbasis restoration, dual-feasible initialization, leaving-row pricing, exact/floating breakpoint and Harris ratio selection, bound flips, beta/row updates, basis change/recovery, diagnostic gates and full prepared core Solve map to concrete typed Go implementations. Both explicit start_with_initial_basis_and_make_it_dual_feasible and Solve instantiations are reached through retained solver consumers. Source restore_d, xb_minus_delta_p_pivot_column and snap_xN_to_bounds are uncalled definition-only helpers; snap_runaway_nonbasic_columns lacks a body/caller, and commented FTran has no consumer. No dead adapters are added. Exact rational(double) beta assertions have no defined continuation in checked C++; the Go checked path reports the source assertion, while native follows the existing exact zero-floor policy. Native/g3debug,g3checked focused TestLPFloatDual and TestLPRationalDual groups pass, including independent optima, source stage/status ordering, numeric owner failure and older caller comparison tests. Native file coverage: dual_core_float53/54, dual_initial_float46/51, dual_solve_float81/104, dual_core_rational117/135, dual_price_rational206/254, dual_ratio_rational170/203, dual_advance_rational235/282, dual_solve_rational102/130; checked covers additional assertions. Full native checkpoint17ecadb7 passed on unchanged Go code. MPS/CLI dispatch belongs to separate source units."
     },
     {
       "source": "src/util/lp/lp_dual_simplex.h",
@@ -8273,10 +8324,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 86,
+    "ported": 89,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 9
+    "partial": 6
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -15398,5 +15449,24 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered. Focused checked evidence remains separate."
+  },
+  "latest_dual_core_whole_audit": {
+    "source_units": [
+      "src/util/lp/lp_dual_core_solver.h",
+      "src/util/lp/lp_dual_core_solver.hpp",
+      "src/util/lp/lp_dual_core_solver_instances.cpp"
+    ],
+    "scope": "Whole retained dual-core audit: double/double and mpq/mpq source construction, eligible nonbasis restoration, dual-feasible initialization, leaving-row pricing, exact/floating breakpoint and Harris ratio selection, bound flips, beta/row updates, basis change/recovery, diagnostic gates and full prepared core Solve map to concrete typed Go implementations. Both explicit start_with_initial_basis_and_make_it_dual_feasible and Solve instantiations are reached through retained solver consumers. Source restore_d, xb_minus_delta_p_pivot_column and snap_xN_to_bounds are uncalled definition-only helpers; snap_runaway_nonbasic_columns lacks a body/caller, and commented FTran has no consumer. No dead adapters are added. Exact rational(double) beta assertions have no defined continuation in checked C++; the Go checked path reports the source assertion, while native follows the existing exact zero-floor policy. Native/g3debug,g3checked focused TestLPFloatDual and TestLPRationalDual groups pass, including independent optima, source stage/status ordering, numeric owner failure and older caller comparison tests. Native file coverage: dual_core_float53/54, dual_initial_float46/51, dual_solve_float81/104, dual_core_rational117/135, dual_price_rational206/254, dual_ratio_rational170/203, dual_advance_rational235/282, dual_solve_rational102/130; checked covers additional assertions. Full native checkpoint17ecadb7 passed on unchanged Go code. MPS/CLI dispatch belongs to separate source units.",
+    "focused_tests": [
+      "TestLPFloatDual",
+      "TestLPRationalDual"
+    ],
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-dual-whole-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-dual-whole-debug.cover"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed on unchanged Go code; focused checked evidence is separate."
   }
 }
