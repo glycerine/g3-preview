@@ -47504,9 +47504,14 @@
       "path": "src/math/realclosure/realclosure.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/interval/binary_extended.go",
+        "pkg/math/interval/binary_extended_test.go"
+      ],
+      "tests": [
+        "TestRealClosureBinaryExtendedNumeralBranches"
+      ],
       "conditionals": [
         {
           "line": 34,
@@ -48693,7 +48698,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Selected real-closure mpbq interval-manager numeral operations with source division precision and rounding state (src/math/realclosure/realclosure.cpp:54-135)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/binary_extended.go",
+          "tests": [
+            "TestRealClosureBinaryExtendedNumeralBranches"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -115081,11 +115095,14 @@
         "pkg/math/interval/rational_interval_mul.go",
         "pkg/math/interval/rational_interval_power.go",
         "pkg/math/interval/rational_interval_inv.go",
-        "pkg/math/interval/rational_interval_div.go"
+        "pkg/math/interval/rational_interval_div.go",
+        "pkg/math/interval/binary_extended.go",
+        "pkg/math/interval/binary_extended_test.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",
-        "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+        "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
+        "TestRealClosureBinaryExtendedNumeralBranches"
       ],
       "conditionals": [
         {
@@ -115153,13 +115170,22 @@
           "tests": [
             "TestRationalExtendedIntervalBranches"
           ]
+        },
+        {
+          "name": "Concrete mpbq extended-number signs, order, add/sub/mul, directed approximate division/reciprocal and power reached by real-closure interval manager (src/util/ext_numeral.h:27-344)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/binary_extended.go",
+          "tests": [
+            "TestRealClosureBinaryExtendedNumeralBranches"
+          ]
         }
       ],
       "ownership": [
         "RationalExtended borrows the rational manager and operand numerals. Finite arithmetic writes its caller-owned output; infinity results reset that output numerator/denominator using the manager, preserving source cleanup. The interval manager consumer remains unported."
       ],
       "deviations": [
-        "No generic manager-interface translation is retained. The sole production consumer is the unported math/interval subsystem; implement its concrete numeral specialization beside that consumer when interval is ported. src/test/ext_numeral.cpp is test-only and supplies no production reason to retain an unused Go abstraction."
+        "No generic manager-interface translation is retained. The sole production consumer is the unported math/interval subsystem; implement its concrete numeral specialization beside that consumer when interval is ported. src/test/ext_numeral.cpp is test-only and supplies no production reason to retain an unused Go abstraction.",
+        "Whole-source instantiation audit found real-closure mpbq and subpaving mpq/mpfx/mpf/mpff/hwf consumers; the concrete rational and binary-rational Go paths do not close all retained instantiations."
       ]
     },
     {

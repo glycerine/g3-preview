@@ -146,6 +146,7 @@ func TestRationalIntervalSourceDependencyMasks(t *testing.T) {
 		}
 	}
 	set(a, "0", "0", false, false)
+	set(b, "2", "4", false, false)
 	if got, err := a.DivDeps(b); err != nil || got != (IntervalDeps{5, 6}) {
 		t.Fatalf("zero numerator positive deps = %+v, %v", got, err)
 	}
