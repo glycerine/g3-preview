@@ -5,6 +5,8 @@ import "github.com/glycerine/g3/pkg/ast"
 
 type demodulatorRule struct {
 	function, quantifier, lhs, rhs ast.ASTHandle
+	ownedStart                     int
+	removing                       bool
 }
 
 // rewriteRuleIndex is the concrete UFBV forward index and demodulator map.
@@ -15,6 +17,7 @@ type rewriteRuleIndex struct {
 	byFunc  map[ast.ASTHandle][]ast.ASTHandle
 	rules   map[ast.ASTHandle]demodulatorRule
 	owned   []ast.ASTHandle
+	closing bool
 	closed  bool
 }
 
@@ -31,7 +34,7 @@ func newRewriteRuleIndex(m *ast.ASTManager) (*rewriteRuleIndex, error) {
 }
 
 func (r *rewriteRuleIndex) check() error {
-	if r == nil || r.closed || r.manager == nil || r.matcher == nil {
+	if r == nil || r.closing || r.closed || r.manager == nil || r.matcher == nil {
 		return ast.ErrASTHandle
 	}
 	return nil
@@ -57,6 +60,7 @@ func (r *rewriteRuleIndex) insert(quantifier, lhs, rhs ast.ASTHandle) error {
 	if e != nil {
 		return e
 	}
+	start := len(r.owned)
 	if e = r.manager.IncRef(quantifier); e != nil {
 		return e
 	}
@@ -70,8 +74,69 @@ func (r *rewriteRuleIndex) insert(quantifier, lhs, rhs ast.ASTHandle) error {
 	}
 	r.owned = append(r.owned, rhs)
 	r.byFunc[f] = append(r.byFunc[f], quantifier)
-	r.rules[quantifier] = demodulatorRule{f, quantifier, lhs, rhs}
+	r.rules[quantifier] = demodulatorRule{function: f, quantifier: quantifier, lhs: lhs, rhs: rhs, ownedStart: start}
 	return nil
+}
+
+// remove follows remove_fwd_idx's LHS, RHS, quantifier release order. A
+// stopped release leaves its current reference and rule reachable for retry.
+// As in the source, the function entry remains after its last rule is erased.
+func (r *rewriteRuleIndex) remove(f, quantifier ast.ASTHandle) error {
+	if e := r.check(); e != nil {
+		return e
+	}
+	rule, found := r.rules[quantifier]
+	if !found || rule.function != f {
+		return ast.ErrASTDomain
+	}
+	rule.removing = true
+	r.rules[quantifier] = rule
+	for _, offset := range []int{1, 2, 0} {
+		at := rule.ownedStart + offset
+		if at >= len(r.owned) {
+			return ast.ErrASTDomain
+		}
+		h := r.owned[at]
+		if h.IsNull() {
+			continue
+		}
+		consumed, e := r.manager.DecRefConsumed(h)
+		if consumed {
+			r.owned[at] = ast.ASTHandle{}
+		}
+		if e != nil {
+			return e
+		}
+		if !consumed {
+			return ast.ErrASTPending
+		}
+	}
+	delete(r.rules, quantifier)
+	set := r.byFunc[f]
+	for i, q := range set {
+		if q == quantifier {
+			copy(set[i:], set[i+1:])
+			set[len(set)-1] = ast.ASTHandle{}
+			r.byFunc[f] = set[:len(set)-1]
+			return nil
+		}
+	}
+	return ast.ErrASTDomain
+}
+
+func (r *rewriteRuleIndex) consistent() bool {
+	if r.check() != nil {
+		return false
+	}
+	for f, set := range r.byFunc {
+		for _, q := range set {
+			rule, found := r.rules[q]
+			if !found || rule.removing || rule.function != f {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 // tryRewrite is rewrite1: it skips arity mismatches and tries each indexed
@@ -84,6 +149,9 @@ func (r *rewriteRuleIndex) tryRewrite(f ast.ASTHandle, args []ast.ASTHandle) (as
 		rule, found := r.rules[q]
 		if !found {
 			return ast.ASTRef{}, false, ast.ErrASTDomain
+		}
+		if rule.removing {
+			return ast.ASTRef{}, false, ast.ErrASTPending
 		}
 		count, e := r.manager.GetNumArgs(rule.lhs)
 		if e != nil {
@@ -111,11 +179,16 @@ func (r *rewriteRuleIndex) close() error {
 	if r == nil || r.closed {
 		return nil
 	}
+	r.closing = true
 	if e := r.matcher.close(); e != nil {
 		return e
 	}
 	for len(r.owned) != 0 {
 		h := r.owned[0]
+		if h.IsNull() {
+			r.owned = r.owned[1:]
+			continue
+		}
 		consumed, e := r.manager.DecRefConsumed(h)
 		if consumed {
 			r.owned[0] = ast.ASTHandle{}

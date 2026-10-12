@@ -73,6 +73,9 @@ func TestRewriteRuleIndexTriesRulesAndOwnsDemodulators(t *testing.T) {
 	if len(r.byFunc[f]) != 2 {
 		t.Fatal("forward index lost a rule")
 	}
+	if !r.consistent() {
+		t.Fatal("forward index lacks a demodulator mapping")
+	}
 	out, matched, e := r.tryRewrite(f, []ast.ASTHandle{a, c})
 	cacheMust(t, e)
 	if !matched {
@@ -87,6 +90,32 @@ func TestRewriteRuleIndexTriesRulesAndOwnsDemodulators(t *testing.T) {
 	cacheMust(t, e)
 	if matched || miss != (ast.ASTRef{}) {
 		t.Fatal("arity mismatch should skip indexed rules")
+	}
+	cacheMust(t, r.remove(f, q1))
+	if !r.consistent() || len(r.byFunc[f]) != 1 || r.byFunc[f][0] != q2 {
+		t.Fatal("remove_fwd_idx must erase only the selected quantifier", r.byFunc[f])
+	}
+	for _, h := range []ast.ASTHandle{q1, firstLHS, firstRHS} {
+		refs, e := m.GetRefCount(h)
+		cacheMust(t, e)
+		if refs != base[h] {
+			t.Fatal("remove_fwd_idx leaked a removed rule reference", h, refs, base[h])
+		}
+	}
+	again, matched, e := r.tryRewrite(f, []ast.ASTHandle{a, c})
+	cacheMust(t, e)
+	if !matched {
+		t.Fatal("remaining rule must still rewrite")
+	}
+	cacheMust(t, m.DelRef(&again))
+	cacheMust(t, r.remove(f, q2))
+	if !r.consistent() || len(r.byFunc[f]) != 0 {
+		t.Fatal("source keeps an empty forward function entry", r.byFunc[f])
+	}
+	miss, matched, e = r.tryRewrite(f, []ast.ASTHandle{a, c})
+	cacheMust(t, e)
+	if matched || miss != (ast.ASTRef{}) {
+		t.Fatal("removed rules must no longer match")
 	}
 	cacheMust(t, r.close())
 	for h, refs := range base {

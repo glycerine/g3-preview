@@ -100499,8 +100499,8 @@
           ]
         },
         {
-          "name": "insert_fwd_idx and rewrite1 concrete quantifier index, arity filtering and matcher dispatch",
-          "status": "partial",
+          "name": "insert_fwd_idx, remove_fwd_idx, check_fwd_idx_consistency and rewrite1 concrete quantifier index and matcher dispatch",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
           "tests": [
             "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
@@ -100511,7 +100511,7 @@
         "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction. The matcher borrows pair-cache keys but retains each substitution target until reset or close. The forward rule index retains one reference each to quantifier, LHS and RHS until index close."
       ],
       "deviations": [
-        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, and forward-rule dispatch are ported; the remaining UFBV rewrite loop, rule removal/rescheduling and tactic integration remain open."
+        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, forward-rule dispatch and removal are ported; the remaining UFBV rewrite loop, rescheduling and tactic integration remain open."
       ]
     },
     {
@@ -100585,8 +100585,8 @@
           ]
         },
         {
-          "name": "concrete fwd_idx/demodulator2lhs_rhs ownership and rewrite1 dispatch",
-          "status": "partial",
+          "name": "concrete fwd_idx/demodulator2lhs_rhs ownership, rule removal and rewrite1 dispatch",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
           "tests": [
             "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"
@@ -157104,7 +157104,7 @@
           ]
         },
         {
-          "name": "UFBV fwd_idx and demodulator2lhs_rhs concrete declaration and quantifier object maps",
+          "name": "UFBV fwd_idx and demodulator2lhs_rhs concrete declaration and quantifier object maps with removal",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
           "tests": [
