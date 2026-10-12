@@ -62,6 +62,10 @@ digraph packages {
   "math/realclosure" -> "math/interval";
   "math/realclosure" -> "util/numeral";
   "math/realclosure" -> "util/params";
+  "math/subpaving" [style=filled, fillcolor="#eeeeee"];
+  "math/subpaving" -> "arena";
+  "math/subpaving" -> "math/interval";
+  "math/subpaving" -> "util/numeral";
   "model" [style=filled, fillcolor="#eeeeee"];
   "model" -> "arena";
   "model" -> "ast";

@@ -738,6 +738,18 @@
       ]
     },
     {
+      "package": "math/subpaving",
+      "imports": [
+        "arena",
+        "math/interval",
+        "util/numeral"
+      ],
+      "production_files": [
+        "fixed_interval.go",
+        "fixed_interval_arith.go"
+      ]
+    },
+    {
       "package": "model",
       "imports": [
         "arena",
