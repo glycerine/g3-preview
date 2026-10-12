@@ -8,31 +8,40 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-// BoundEquationStore owns the linear constraints and variable watch lists used
-// by the bound propagator. Propagation and bound trails belong to later paths.
+// BoundEquationStore owns the linear constraints, variable watches and bounds
+// used by the arithmetic bound propagator.
 type BoundEquationStore struct {
-	self        *BoundEquationStore
-	manager     *numeral.RationalManager
-	equations   *LinearEquationManager
-	constraints []equationConstraint
-	variables   []equationVariable
-	trail       []*equationBound
-	conflict    uint32
-	timestamp   uint32
-	closed      bool
+	self           *BoundEquationStore
+	manager        *numeral.RationalManager
+	equations      *LinearEquationManager
+	constraints    []equationConstraint
+	variables      []equationVariable
+	trail          []*equationBound
+	qhead          int
+	conflict       uint32
+	timestamp      uint32
+	maxRefinements uint32
+	threshold      float64
+	smallInterval  float64
+	propagations   uint32
+	falseAlarms    uint32
+	closed         bool
 }
 
 type equationConstraint struct {
-	eq   *LinearEquation
-	dead bool
+	eq        *LinearEquation
+	dead      bool
+	timestamp uint32
 }
 
 type equationVariable struct {
-	active  bool
-	integer bool
-	watches []uint32
-	lower   *equationBound
-	upper   *equationBound
+	active           bool
+	integer          bool
+	watches          []uint32
+	lower            *equationBound
+	upper            *equationBound
+	lowerRefinements uint32
+	upperRefinements uint32
 }
 
 func NewBoundEquationStore(m *numeral.RationalManager) (*BoundEquationStore, error) {
@@ -40,7 +49,8 @@ func NewBoundEquationStore(m *numeral.RationalManager) (*BoundEquationStore, err
 	if err != nil {
 		return nil, err
 	}
-	s := &BoundEquationStore{manager: m, equations: equations, conflict: noEquationPosition}
+	s := &BoundEquationStore{manager: m, equations: equations, conflict: noEquationPosition,
+		maxRefinements: 16, threshold: 0.05, smallInterval: 128}
 	s.self = s
 	return s, nil
 }
@@ -72,6 +82,7 @@ func (s *BoundEquationStore) MkVar(x uint32, integer bool) error {
 	}
 	v.active, v.integer, v.watches = true, integer, v.watches[:0]
 	v.lower, v.upper = nil, nil
+	v.lowerRefinements, v.upperRefinements = 0, 0
 	return nil
 }
 
@@ -140,6 +151,9 @@ func (s *BoundEquationStore) addEquation(eq *LinearEquation) (uint32, error) {
 	for _, x := range eq.xs {
 		s.variables[x].watches = append(s.variables[x].watches, index)
 	}
+	if _, err := s.propagateEquation(index); err != nil {
+		return index, err
+	}
 	return index, nil
 }
 
@@ -167,7 +181,7 @@ func (s *BoundEquationStore) Watches(x uint32) ([]uint32, error) {
 
 // DeleteConstraints closes equations in source insertion order and clears all
 // watch lists. The source allows this only at scope level zero; this owner has
-// no scope/trail state yet.
+// no scope stack yet.
 func (s *BoundEquationStore) DeleteConstraints() error {
 	if err := s.open(); err != nil {
 		return err

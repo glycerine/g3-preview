@@ -15,19 +15,21 @@ type equationBound struct {
 	value     numeral.Rational
 	approx    float64
 	strict    bool
+	x         uint32
+	lower     bool
 	timestamp uint32
 	prev      *equationBound
 }
 
 func (s *BoundEquationStore) AssertLower(x uint32, k *numeral.Rational, strict bool) (bool, error) {
-	return s.assertBound(x, k, strict, true)
+	return s.assertBound(x, k, strict, true, false)
 }
 
 func (s *BoundEquationStore) AssertUpper(x uint32, k *numeral.Rational, strict bool) (bool, error) {
-	return s.assertBound(x, k, strict, false)
+	return s.assertBound(x, k, strict, false, false)
 }
 
-func (s *BoundEquationStore) assertBound(x uint32, k *numeral.Rational, strict, lower bool) (accepted bool, err error) {
+func (s *BoundEquationStore) assertBound(x uint32, k *numeral.Rational, strict, lower, derived bool) (accepted bool, err error) {
 	if err = s.open(); err != nil {
 		return false, err
 	}
@@ -79,8 +81,14 @@ func (s *BoundEquationStore) assertBound(x uint32, k *numeral.Rational, strict, 
 			return false, e
 		}
 		if (lower && cmp < 0) || (!lower && cmp > 0) || (cmp == 0 && (old.strict || !strict)) {
+			if derived {
+				s.falseAlarms++
+			}
 			return false, nil
 		}
+	}
+	if derived {
+		s.propagations++
 	}
 	approx, e := m.Float64(&working)
 	if e != nil {
@@ -92,15 +100,17 @@ func (s *BoundEquationStore) assertBound(x uint32, k *numeral.Rational, strict, 
 		approx = 0.000001 * math.Ceil(approx*1000000-0.0000001)
 	}
 	b := &equationBound{value: numeral.NewRational(), approx: approx,
-		strict: strict, timestamp: s.timestamp, prev: old}
+		strict: strict, x: x, lower: lower, timestamp: s.timestamp, prev: old}
 	if err = m.Copy(&b.value, &working); err != nil {
 		return false, errors.Join(err, m.Del(&b.value))
 	}
 	s.timestamp++
 	if lower {
 		v.lower = b
+		v.lowerRefinements++
 	} else {
 		v.upper = b
+		v.upperRefinements++
 	}
 	s.trail = append(s.trail, b)
 	if s.conflict == noEquationPosition && v.lower != nil && v.upper != nil {

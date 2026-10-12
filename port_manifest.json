@@ -92210,13 +92210,18 @@
         "pkg/tactic/arith/bound_equation_store.go",
         "pkg/tactic/arith/bound_equation_store_test.go",
         "pkg/tactic/arith/bound_values.go",
-        "pkg/tactic/arith/bound_values_test.go"
+        "pkg/tactic/arith/bound_values_test.go",
+        "pkg/tactic/arith/bound_propagation.go",
+        "pkg/tactic/arith/bound_propagation_test.go"
       ],
       "tests": [
         "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
         "TestBoundEquationStoreRationalConstructionAndCancellation",
         "TestBoundEquationStoreExactBoundsRoundingConflictAndPolynomial",
-        "TestBoundEquationStoreRationalStrictTieAndRelaxedApproximation"
+        "TestBoundEquationStoreRationalStrictTieAndRelaxedApproximation",
+        "TestBoundEquationImmediateAndWatchedPropagation",
+        "TestBoundEquationNegativeCoefficientAndDeadConstraint",
+        "TestBoundEquationFullyBoundedTighteningAndStrictness"
       ],
       "conditionals": [
         {
@@ -92332,7 +92337,17 @@
           ]
         },
         {
-          "name": "bound propagation, scope trails, bound ownership, params, statistics and conflict/explanation paths",
+          "name": "level-zero approximate equation scan, rational lower/upper derivation, relevance filtering, watched trail propagation and timestamp reset",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_propagation.go",
+          "tests": [
+            "TestBoundEquationImmediateAndWatchedPropagation",
+            "TestBoundEquationNegativeCoefficientAndDeadConstraint",
+            "TestBoundEquationFullyBoundedTighteningAndStrictness"
+          ]
+        },
+        {
+          "name": "scope push/pop and trail undo, assumption/derived explanation, parameter updates, complete statistics and source diagnostic/failure paths",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -92344,7 +92359,8 @@
       ],
       "deviations": [
         "This concrete equation/watch-list owner covers the source setup and cleanup path only. It does not yet run source init_eq propagation or maintain bound/trail state. Invalid variable IDs return Go bounds errors instead of indexing outside source vectors.",
-        "This increment covers level-zero bound values and the rational get_bound instantiation. Derived/assumption kind, propagation, scopes and trail undo remain open."
+        "This increment covers level-zero bound values and the rational get_bound instantiation. Derived/assumption kind, propagation, scopes and trail undo remain open.",
+        "Level-zero equation insertion now propagates immediately; subsequent bound events revisit watched constraints under the source timestamp gate. Scopes, explanation history, full parameter service and complete source failure behavior remain open."
       ]
     },
     {
@@ -92356,13 +92372,18 @@
         "pkg/tactic/arith/bound_equation_store.go",
         "pkg/tactic/arith/bound_equation_store_test.go",
         "pkg/tactic/arith/bound_values.go",
-        "pkg/tactic/arith/bound_values_test.go"
+        "pkg/tactic/arith/bound_values_test.go",
+        "pkg/tactic/arith/bound_propagation.go",
+        "pkg/tactic/arith/bound_propagation_test.go"
       ],
       "tests": [
         "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
         "TestBoundEquationStoreRationalConstructionAndCancellation",
         "TestBoundEquationStoreExactBoundsRoundingConflictAndPolynomial",
-        "TestBoundEquationStoreRationalStrictTieAndRelaxedApproximation"
+        "TestBoundEquationStoreRationalStrictTieAndRelaxedApproximation",
+        "TestBoundEquationImmediateAndWatchedPropagation",
+        "TestBoundEquationNegativeCoefficientAndDeadConstraint",
+        "TestBoundEquationFullyBoundedTighteningAndStrictness"
       ],
       "conditionals": [
         {
@@ -92422,7 +92443,17 @@
           ]
         },
         {
-          "name": "bound propagation, scope trails, bound ownership, params, statistics and conflict/explanation paths",
+          "name": "level-zero approximate equation scan, rational lower/upper derivation, relevance filtering, watched trail propagation and timestamp reset",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_propagation.go",
+          "tests": [
+            "TestBoundEquationImmediateAndWatchedPropagation",
+            "TestBoundEquationNegativeCoefficientAndDeadConstraint",
+            "TestBoundEquationFullyBoundedTighteningAndStrictness"
+          ]
+        },
+        {
+          "name": "scope push/pop and trail undo, assumption/derived explanation, parameter updates, complete statistics and source diagnostic/failure paths",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -92434,7 +92465,8 @@
       ],
       "deviations": [
         "This concrete equation/watch-list owner covers the source setup and cleanup path only. It does not yet run source init_eq propagation or maintain bound/trail state. Invalid variable IDs return Go bounds errors instead of indexing outside source vectors.",
-        "This increment covers level-zero bound values and the rational get_bound instantiation. Derived/assumption kind, propagation, scopes and trail undo remain open."
+        "This increment covers level-zero bound values and the rational get_bound instantiation. Derived/assumption kind, propagation, scopes and trail undo remain open.",
+        "Level-zero equation insertion now propagates immediately; subsequent bound events revisit watched constraints under the source timestamp gate. Scopes, explanation history, full parameter service and complete source failure behavior remain open."
       ]
     },
     {
