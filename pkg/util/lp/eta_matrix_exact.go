@@ -314,7 +314,7 @@ func (m *RationalEtaMatrix) Close() error {
 	if err := m.calls.cleanupRaw(m.manager); err != nil {
 		return err
 	}
-	if err := m.Column.Close(); err != nil {
+	if err := m.Column.closeCall(); err != nil {
 		return err
 	}
 	if m.work != nil {
@@ -327,6 +327,10 @@ func (m *RationalEtaMatrix) Close() error {
 		return err
 	}
 	m.Diagonal = numeral.NewRational()
+	// C++ members die in reverse declaration order: diagonal, then column.
+	if err := m.Column.Close(); err != nil {
+		return err
+	}
 	return m.calls.cleanupRoots(m.manager)
 }
 

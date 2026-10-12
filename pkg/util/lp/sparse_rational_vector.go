@@ -103,7 +103,10 @@ func (v *SparseRationalVector) Divide(value *numeral.Rational) (err error) {
 	return nil
 }
 
-func (v *SparseRationalVector) Close() error {
+// closeCall unwinds only this vector's interrupted call temporaries. A
+// containing eta calls it before destroying its own lexical values and members;
+// the vector's stored coefficients remain owned until Close.
+func (v *SparseRationalVector) closeCall() error {
 	if err := v.calls.cleanupRaw(v.manager); err != nil {
 		return err
 	}
@@ -112,6 +115,13 @@ func (v *SparseRationalVector) Close() error {
 			return err
 		}
 		v.appendValues = nil
+	}
+	return nil
+}
+
+func (v *SparseRationalVector) Close() error {
+	if err := v.closeCall(); err != nil {
+		return err
 	}
 	for len(v.Data) > 0 {
 		i := len(v.Data) - 1

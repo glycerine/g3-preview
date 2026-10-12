@@ -587,43 +587,50 @@ func TestLPExactEtaStoppedDestinationOwnership(t *testing.T) {
 }
 
 func TestLPExactEtaLeavesOlderDivisionOwned(t *testing.T) {
-	matched := false
-	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			h := newLPPairHarness(t)
-			p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/13")
-			z := h.pair("0", "1")
-			var caller exactEtaCalls
-			b, err := caller.begin(h.m)
-			h.must(err)
-			h.budget.FailAfter(ordinal)
-			err = h.m.Div(&p.X, &p.Y, &p.Y)
-			h.budget.FailAfter(-1)
-			err = caller.after(h.m, b, err)
-			state := h.m.DivisionInvocationState()
-			if state.Active {
-				if !lpExactPriorityPhysicalRefusal(err) {
-					t.Fatal(err)
+	for _, direct := range []bool{false, true} {
+		matched := false
+		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
+			t.Run(fmt.Sprintf("direct=%t/%d", direct, ordinal), func(t *testing.T) {
+				var h *lpPairHarness
+				if direct {
+					h = lpNewDirectSparseHarness(t)
+				} else {
+					h = newLPPairHarness(t)
 				}
-				matched = true
-				e := NewRationalEtaMatrix(h.m, 0, 1)
-				_, err = e.SetDiagonal(&z.Y)
+				p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/13")
+				z := h.pair("0", "1")
+				var caller exactEtaCalls
+				b, err := caller.begin(h.m)
 				h.must(err)
-				w := NewIndexedRationalVector(h.m, 1)
-				h.must(e.ApplyLeft(w.Data))
-				h.must(e.Close())
-				h.must(w.Close())
-				if h.m.DivisionInvocationState() != state {
-					t.Fatal("matrix consumed older raw division")
+				h.budget.FailAfter(ordinal)
+				err = h.m.Div(&p.X, &p.Y, &p.Y)
+				h.budget.FailAfter(-1)
+				err = caller.after(h.m, b, err)
+				state := h.m.DivisionInvocationState()
+				if state.Active {
+					if !lpExactPriorityPhysicalRefusal(err) {
+						t.Fatal(err)
+					}
+					matched = true
+					e := NewRationalEtaMatrix(h.m, 0, 1)
+					_, err = e.SetDiagonal(&z.Y)
+					h.must(err)
+					w := NewIndexedRationalVector(h.m, 1)
+					h.must(e.ApplyLeft(w.Data))
+					h.must(e.Close())
+					h.must(w.Close())
+					if h.m.DivisionInvocationState() != state {
+						t.Fatal("matrix consumed older raw division")
+					}
 				}
-			}
-			h.must(caller.cleanupRaw(h.m))
-			h.must(caller.cleanupRoots(h.m))
-			lpExactVectorNamedCensus(t, h, nil)
-		})
-	}
-	if !matched {
-		t.Fatal("no actual stopped division reached")
+				h.must(caller.cleanupRaw(h.m))
+				h.must(caller.cleanupRoots(h.m))
+				lpExactVectorNamedCensus(t, h, nil)
+			})
+		}
+		if !matched {
+			t.Fatal("no actual stopped division reached")
+		}
 	}
 }
 

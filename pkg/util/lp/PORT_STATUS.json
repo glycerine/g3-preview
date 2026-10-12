@@ -771,7 +771,7 @@
     },
     {
       "source": "src/util/lp/eta_matrix.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/eta_matrix_float.go",
         "pkg/util/lp/eta_matrix_exact.go",
@@ -806,15 +806,49 @@
             "exact debug row_count/column_count/dimension storage"
           ],
           "reason": "No retained exact debug matrix root; explicit instances alone are not roots. Removed exact Go adapters; conjugation tests now exercise retained ApplyLeft on all basis vectors against an independent permuted matrix oracle."
+        },
+        {
+          "source_methods": [
+            "eta_matrix::print"
+          ],
+          "reason": "No retained caller; source dependent print_matrix(*this,out) is not repaired or ported. Actual generic float print_matrix consumers are independently retained."
+        },
+        {
+          "source_methods": [
+            "unused apply_from_left_local<L> types",
+            "saved owning copies/STL adapters"
+          ],
+          "reason": "Actual sparse applications use float64 or mpq only. Pair dense left uses concrete coordinates; native Go storage replaces source vector internals."
         }
       ],
       "ownership": [
-        "Exact eta sparse-left multiplication temporary now dies after L v initialization and before drop test, matching source full-expression lifetime. Removed unused unit predicate and exact debug matrix adapters; concrete test fixtures exercise retained applications."
+        "Exact eta sparse-left multiplication temporary now dies after L v initialization and before drop test, matching source full-expression lifetime. Removed unused unit predicate and exact debug matrix adapters; concrete test fixtures exercise retained applications.",
+        "Whole retained eta source/ownership audit completes actual double/double, mpq/mpq and mpq/impq specializations: construction, native Diagonal getter, acceptance/set, by-value append, column division, dense left/right, indexed T left/right and conjugation. Floating debug dimensions/entry are retained through actual LU matrix views. IsUnit, exact debug matrix and unused local-L specializations are excluded; compact print has no retained caller. Source traversal, live dense pivot versus copied sparse anchor, local v lifetime, early empty/zero returns, duplicate/zero storage and strict floating tolerances remain literal. Exact numerical temporaries and actual stopped invocation receipts belong to invoking owners; borrowed caller values remain separate. Corrected sparse-left product lifetime ebf31537. Corrected Close: unwind actual column call temporaries, then eta lexical work, then diagonal and stored column in reverse source member declaration order. Sparse closeCall releases only interrupted-call state; its stored coefficients remain owned until Close. Expanded older-division owner test to pooled/direct allocation, preserving actual generation through eta operations and destruction. Existing28physical refusal campaigns and independent endpoint/matrix/constructor/alias/index/drop/prefix checks pass. Containing sparse/LU/row-eta/CLI/SMT whole audits remain separate."
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "evidence": "Whole retained eta source/ownership audit completes actual double/double, mpq/mpq and mpq/impq specializations: construction, native Diagonal getter, acceptance/set, by-value append, column division, dense left/right, indexed T left/right and conjugation. Floating debug dimensions/entry are retained through actual LU matrix views. IsUnit, exact debug matrix and unused local-L specializations are excluded; compact print has no retained caller. Source traversal, live dense pivot versus copied sparse anchor, local v lifetime, early empty/zero returns, duplicate/zero storage and strict floating tolerances remain literal. Exact numerical temporaries and actual stopped invocation receipts belong to invoking owners; borrowed caller values remain separate. Corrected sparse-left product lifetime ebf31537. Corrected Close: unwind actual column call temporaries, then eta lexical work, then diagonal and stored column in reverse source member declaration order. Sparse closeCall releases only interrupted-call state; its stored coefficients remain owned until Close. Expanded older-division owner test to pooled/direct allocation, preserving actual generation through eta operations and destruction. Existing28physical refusal campaigns and independent endpoint/matrix/constructor/alias/index/drop/prefix checks pass. Containing sparse/LU/row-eta/CLI/SMT whole audits remain separate.",
+      "deviations": [
+        "Floating source constructor leaves double diagonal uninitialized: Go zero initialization is not claimed as a source numerical default; callers SetDiagonal before use.",
+        "Dense left borrows a live pivot, while sparse left copies it. Sparse right tests index emptiness before pivot access and uses fixed strict1e-14; sparse left uses live Settings drop tolerance. Exact drops use IsZero. Zero/duplicate indices and IEEE behavior are not repaired.",
+        "Go guards return typed errors for reached invalid storage/manager/owner domains while preserving completed source prefixes. Source SASSERT uses existing debug/checked profile.",
+        "Float debug dimension binding uses actual FloatLU tail view; exact debug matrix getters, unit predicate and compact printer have no retained consumers and are excluded. No process-global stream or unused numeric adapter is added."
+      ],
+      "methods": [
+        {
+          "name": "retained floating debug matrix entry/dimension binding and native diagonal field access",
+          "status": "ported",
+          "go_target": "pkg/util/lp/eta_matrix_float.go",
+          "tests": [
+            "TestLPFloatEtaPermutationConjugationAndTailComposition",
+            "TestLPSparseEtaConstructionIndependentOracle"
+          ]
+        }
       ]
     },
     {
       "source": "src/util/lp/eta_matrix.hpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/eta_matrix_float.go",
         "pkg/util/lp/eta_matrix_exact.go",
@@ -849,15 +883,49 @@
             "exact debug row_count/column_count/dimension storage"
           ],
           "reason": "No retained exact debug matrix root; explicit instances alone are not roots. Removed exact Go adapters; conjugation tests now exercise retained ApplyLeft on all basis vectors against an independent permuted matrix oracle."
+        },
+        {
+          "source_methods": [
+            "eta_matrix::print"
+          ],
+          "reason": "No retained caller; source dependent print_matrix(*this,out) is not repaired or ported. Actual generic float print_matrix consumers are independently retained."
+        },
+        {
+          "source_methods": [
+            "unused apply_from_left_local<L> types",
+            "saved owning copies/STL adapters"
+          ],
+          "reason": "Actual sparse applications use float64 or mpq only. Pair dense left uses concrete coordinates; native Go storage replaces source vector internals."
         }
       ],
       "ownership": [
-        "Exact eta sparse-left multiplication temporary now dies after L v initialization and before drop test, matching source full-expression lifetime. Removed unused unit predicate and exact debug matrix adapters; concrete test fixtures exercise retained applications."
+        "Exact eta sparse-left multiplication temporary now dies after L v initialization and before drop test, matching source full-expression lifetime. Removed unused unit predicate and exact debug matrix adapters; concrete test fixtures exercise retained applications.",
+        "Whole retained eta source/ownership audit completes actual double/double, mpq/mpq and mpq/impq specializations: construction, native Diagonal getter, acceptance/set, by-value append, column division, dense left/right, indexed T left/right and conjugation. Floating debug dimensions/entry are retained through actual LU matrix views. IsUnit, exact debug matrix and unused local-L specializations are excluded; compact print has no retained caller. Source traversal, live dense pivot versus copied sparse anchor, local v lifetime, early empty/zero returns, duplicate/zero storage and strict floating tolerances remain literal. Exact numerical temporaries and actual stopped invocation receipts belong to invoking owners; borrowed caller values remain separate. Corrected sparse-left product lifetime ebf31537. Corrected Close: unwind actual column call temporaries, then eta lexical work, then diagonal and stored column in reverse source member declaration order. Sparse closeCall releases only interrupted-call state; its stored coefficients remain owned until Close. Expanded older-division owner test to pooled/direct allocation, preserving actual generation through eta operations and destruction. Existing28physical refusal campaigns and independent endpoint/matrix/constructor/alias/index/drop/prefix checks pass. Containing sparse/LU/row-eta/CLI/SMT whole audits remain separate."
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "evidence": "Whole retained eta source/ownership audit completes actual double/double, mpq/mpq and mpq/impq specializations: construction, native Diagonal getter, acceptance/set, by-value append, column division, dense left/right, indexed T left/right and conjugation. Floating debug dimensions/entry are retained through actual LU matrix views. IsUnit, exact debug matrix and unused local-L specializations are excluded; compact print has no retained caller. Source traversal, live dense pivot versus copied sparse anchor, local v lifetime, early empty/zero returns, duplicate/zero storage and strict floating tolerances remain literal. Exact numerical temporaries and actual stopped invocation receipts belong to invoking owners; borrowed caller values remain separate. Corrected sparse-left product lifetime ebf31537. Corrected Close: unwind actual column call temporaries, then eta lexical work, then diagonal and stored column in reverse source member declaration order. Sparse closeCall releases only interrupted-call state; its stored coefficients remain owned until Close. Expanded older-division owner test to pooled/direct allocation, preserving actual generation through eta operations and destruction. Existing28physical refusal campaigns and independent endpoint/matrix/constructor/alias/index/drop/prefix checks pass. Containing sparse/LU/row-eta/CLI/SMT whole audits remain separate.",
+      "deviations": [
+        "Floating source constructor leaves double diagonal uninitialized: Go zero initialization is not claimed as a source numerical default; callers SetDiagonal before use.",
+        "Dense left borrows a live pivot, while sparse left copies it. Sparse right tests index emptiness before pivot access and uses fixed strict1e-14; sparse left uses live Settings drop tolerance. Exact drops use IsZero. Zero/duplicate indices and IEEE behavior are not repaired.",
+        "Go guards return typed errors for reached invalid storage/manager/owner domains while preserving completed source prefixes. Source SASSERT uses existing debug/checked profile.",
+        "Float debug dimension binding uses actual FloatLU tail view; exact debug matrix getters, unit predicate and compact printer have no retained consumers and are excluded. No process-global stream or unused numeric adapter is added."
+      ],
+      "methods": [
+        {
+          "name": "retained floating debug matrix entry/dimension binding and native diagonal field access",
+          "status": "ported",
+          "go_target": "pkg/util/lp/eta_matrix_float.go",
+          "tests": [
+            "TestLPFloatEtaPermutationConjugationAndTailComposition",
+            "TestLPSparseEtaConstructionIndependentOracle"
+          ]
+        }
       ]
     },
     {
       "source": "src/util/lp/eta_matrix_instances.cpp",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/eta_matrix_float.go",
         "pkg/util/lp/eta_matrix_exact.go",
@@ -892,10 +960,44 @@
             "exact debug row_count/column_count/dimension storage"
           ],
           "reason": "No retained exact debug matrix root; explicit instances alone are not roots. Removed exact Go adapters; conjugation tests now exercise retained ApplyLeft on all basis vectors against an independent permuted matrix oracle."
+        },
+        {
+          "source_methods": [
+            "eta_matrix::print"
+          ],
+          "reason": "No retained caller; source dependent print_matrix(*this,out) is not repaired or ported. Actual generic float print_matrix consumers are independently retained."
+        },
+        {
+          "source_methods": [
+            "unused apply_from_left_local<L> types",
+            "saved owning copies/STL adapters"
+          ],
+          "reason": "Actual sparse applications use float64 or mpq only. Pair dense left uses concrete coordinates; native Go storage replaces source vector internals."
         }
       ],
       "ownership": [
-        "Exact eta sparse-left multiplication temporary now dies after L v initialization and before drop test, matching source full-expression lifetime. Removed unused unit predicate and exact debug matrix adapters; concrete test fixtures exercise retained applications."
+        "Exact eta sparse-left multiplication temporary now dies after L v initialization and before drop test, matching source full-expression lifetime. Removed unused unit predicate and exact debug matrix adapters; concrete test fixtures exercise retained applications.",
+        "Whole retained eta source/ownership audit completes actual double/double, mpq/mpq and mpq/impq specializations: construction, native Diagonal getter, acceptance/set, by-value append, column division, dense left/right, indexed T left/right and conjugation. Floating debug dimensions/entry are retained through actual LU matrix views. IsUnit, exact debug matrix and unused local-L specializations are excluded; compact print has no retained caller. Source traversal, live dense pivot versus copied sparse anchor, local v lifetime, early empty/zero returns, duplicate/zero storage and strict floating tolerances remain literal. Exact numerical temporaries and actual stopped invocation receipts belong to invoking owners; borrowed caller values remain separate. Corrected sparse-left product lifetime ebf31537. Corrected Close: unwind actual column call temporaries, then eta lexical work, then diagonal and stored column in reverse source member declaration order. Sparse closeCall releases only interrupted-call state; its stored coefficients remain owned until Close. Expanded older-division owner test to pooled/direct allocation, preserving actual generation through eta operations and destruction. Existing28physical refusal campaigns and independent endpoint/matrix/constructor/alias/index/drop/prefix checks pass. Containing sparse/LU/row-eta/CLI/SMT whole audits remain separate."
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "evidence": "Whole retained eta source/ownership audit completes actual double/double, mpq/mpq and mpq/impq specializations: construction, native Diagonal getter, acceptance/set, by-value append, column division, dense left/right, indexed T left/right and conjugation. Floating debug dimensions/entry are retained through actual LU matrix views. IsUnit, exact debug matrix and unused local-L specializations are excluded; compact print has no retained caller. Source traversal, live dense pivot versus copied sparse anchor, local v lifetime, early empty/zero returns, duplicate/zero storage and strict floating tolerances remain literal. Exact numerical temporaries and actual stopped invocation receipts belong to invoking owners; borrowed caller values remain separate. Corrected sparse-left product lifetime ebf31537. Corrected Close: unwind actual column call temporaries, then eta lexical work, then diagonal and stored column in reverse source member declaration order. Sparse closeCall releases only interrupted-call state; its stored coefficients remain owned until Close. Expanded older-division owner test to pooled/direct allocation, preserving actual generation through eta operations and destruction. Existing28physical refusal campaigns and independent endpoint/matrix/constructor/alias/index/drop/prefix checks pass. Containing sparse/LU/row-eta/CLI/SMT whole audits remain separate.",
+      "deviations": [
+        "Floating source constructor leaves double diagonal uninitialized: Go zero initialization is not claimed as a source numerical default; callers SetDiagonal before use.",
+        "Dense left borrows a live pivot, while sparse left copies it. Sparse right tests index emptiness before pivot access and uses fixed strict1e-14; sparse left uses live Settings drop tolerance. Exact drops use IsZero. Zero/duplicate indices and IEEE behavior are not repaired.",
+        "Go guards return typed errors for reached invalid storage/manager/owner domains while preserving completed source prefixes. Source SASSERT uses existing debug/checked profile.",
+        "Float debug dimension binding uses actual FloatLU tail view; exact debug matrix getters, unit predicate and compact printer have no retained consumers and are excluded. No process-global stream or unused numeric adapter is added."
+      ],
+      "methods": [
+        {
+          "name": "retained floating debug matrix entry/dimension binding and native diagonal field access",
+          "status": "ported",
+          "go_target": "pkg/util/lp/eta_matrix_float.go",
+          "tests": [
+            "TestLPFloatEtaPermutationConjugationAndTailComposition",
+            "TestLPSparseEtaConstructionIndependentOracle"
+          ]
+        }
       ]
     },
     {
@@ -7793,10 +7895,10 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "ported": 52,
+    "ported": 55,
     "reference_only": 10,
     "dead_deleted": 3,
-    "partial": 43
+    "partial": 40
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
@@ -13782,5 +13884,57 @@
     "consumer_tests_native_seconds": 8.933,
     "consumer_tests_combined_seconds": 11.152,
     "verification": "Both LP vets, all64package native/combined compile gates and source portcheck pass (2103units/677APIs,114ported/326partial/1620unported/5dead_deleted)."
+  },
+  "latest_eta_support_audit": {
+    "scope": "Whole retained eta source/ownership audit completes actual double/double, mpq/mpq and mpq/impq specializations: construction, native Diagonal getter, acceptance/set, by-value append, column division, dense left/right, indexed T left/right and conjugation. Floating debug dimensions/entry are retained through actual LU matrix views. IsUnit, exact debug matrix and unused local-L specializations are excluded; compact print has no retained caller. Source traversal, live dense pivot versus copied sparse anchor, local v lifetime, early empty/zero returns, duplicate/zero storage and strict floating tolerances remain literal. Exact numerical temporaries and actual stopped invocation receipts belong to invoking owners; borrowed caller values remain separate. Corrected sparse-left product lifetime ebf31537. Corrected Close: unwind actual column call temporaries, then eta lexical work, then diagonal and stored column in reverse source member declaration order. Sparse closeCall releases only interrupted-call state; its stored coefficients remain owned until Close. Expanded older-division owner test to pooled/direct allocation, preserving actual generation through eta operations and destruction. Existing28physical refusal campaigns and independent endpoint/matrix/constructor/alias/index/drop/prefix checks pass. Containing sparse/LU/row-eta/CLI/SMT whole audits remain separate.",
+    "focused_native_seconds": 56.104,
+    "focused_combined_seconds": 66.991,
+    "whole_go_file_focused_covered_total": {
+      "native": {
+        "eta_matrix_exact.go": [
+          226,
+          255
+        ],
+        "eta_matrix_float.go": [
+          87,
+          88
+        ],
+        "sparse_rational_vector.go": [
+          56,
+          65
+        ]
+      },
+      "debug": {
+        "eta_matrix_exact.go": [
+          227,
+          255
+        ],
+        "eta_matrix_float.go": [
+          88,
+          88
+        ],
+        "sparse_rational_vector.go": [
+          57,
+          65
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-eta-cleanup-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-eta-cleanup-debug.cover"
+    ],
+    "source_audits": [
+      "/mnt/oldrog/tmp/g3-lp-eta-consumers-audit.txt",
+      "/mnt/oldrog/tmp/g3-lp-eta-method-consumers-audit.txt",
+      "/mnt/oldrog/tmp/g3-lp-eta-consumer-files-all-src.txt",
+      "/mnt/oldrog/tmp/g3-lp-eta-is-unit-all-src.txt"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Latest completed full native8f2961ca predates current fixes; no new full result yet.",
+    "consumer_tests_native_seconds": 9.049,
+    "consumer_tests_combined_seconds": 11.27,
+    "verification": "All64package native/combined compile gates, both LP vets and source portcheck pass; 2103units/677APIs,117ported/323partial/1620unported/5dead_deleted.",
+    "coverage_qualification": "Whole-Go-file focus covers retained numerical paths; remaining exact returns guard invariant-protected bounds, stable delegated cleanup/check errors and unavailable precise zero-drop branches. Floating one native uncovered return is erased source assertion. Sparse helper extraction preserves standalone Close behavior; coefficients are deleted only by Close, not closeCall."
   }
 }
