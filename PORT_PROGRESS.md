@@ -39493,3 +39493,16 @@ uses `AppendInt32(int32(value))` so decimal high-bit symbols and stream
 borrowed string, positive numeric, `UINT32_MAX` as `-1`, and hex `ffffffff`.
 Native and checked profiles pass on CPUs 8–16. Wider symbol stream assertion
 and output-failure transport remain partial.
+
+### Parameter string fallback pointer audit
+
+The selected `params_ref::get_str(char const*, params_ref const&, char const*)`
+path at `params.cpp:639-648,902-930` is implemented by
+`ParamsContext.GetStringViewFallbackName` for retained module/SMT callers.
+The view selects the actual local or fallback entry, preserves a matching null
+instead of substituting the default, and borrows its owned-string or symbol
+provider without formatting into a context workspace. Existing focused tests
+exercise wrong-kind fallback, default text, replacement/reset invalidation,
+provider lifetime after context close, and source C-string sentry order. That
+specific method row moves from partial to ported; `params.cpp` remains partial
+for its other methods and ownership paths.

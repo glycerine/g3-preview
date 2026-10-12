@@ -156388,7 +156388,7 @@
         },
         {
           "name": "Borrowed get_str fallback pointer at the returned entry, without formatting copy (src/util/params.cpp:639-648,902-930)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_params_string_view.go",
           "tests": [
             "TestParamsStringViewReturnedPointerNoFormatCopyAndInvalidation",
