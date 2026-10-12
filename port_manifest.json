@@ -137725,7 +137725,7 @@
       "path": "src/util/lp/stacked_map.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/stacked_map.go",
         "pkg/util/lp/stacked_map_test.go"
@@ -137733,7 +137733,9 @@
       "tests": [
         "TestLPStackedIntFloatMapSource",
         "TestLPStackedIntFloatMapSnapshotOracle",
-        "TestLPStackedIntFloatMapSourceCancellationAndIEEE"
+        "TestLPStackedIntFloatMapSourceCancellationAndIEEE",
+        "TestLPDriverStackedIndependentResults",
+        "TestLPDriverStackedReportAndPublicationFailures"
       ],
       "assertions": [
         {
@@ -137757,26 +137759,29 @@
           "text": "SASSERT(orig_changed.find(key) == orig_changed.end());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "Concrete int/double retained assignment/emplace_replace, push/pop/erase with change cancellation and original-value restoration",
+          "name": "retained concrete int/double immediate subscript assignment, change journal, push, saturating pop and erase",
           "status": "ported",
           "go_target": "pkg/util/lp/stacked_map.go",
           "tests": [
             "TestLPStackedIntFloatMapSource",
             "TestLPStackedIntFloatMapSnapshotOracle",
-            "TestLPStackedIntFloatMapSourceCancellationAndIEEE"
+            "TestLPStackedIntFloatMapSourceCancellationAndIEEE",
+            "TestLPDriverStackedIndependentResults",
+            "TestLPDriverStackedReportAndPublicationFailures"
           ]
         }
       ],
       "ownership": [
-        "Native Go maps/slices own concrete scalar storage. Frames release map references before slice truncation; zero value is ready, copying after use aliases owned backing. No numerical arena roots or fake STL allocation-accounting layer."
+        "Native Go maps/slices own actual values and delta journals. Popped frames release both map references, including retained slice capacity. The sole retained consumer uses immediate literal-key assignment; no saved proxy, reference-to-reference assignment or owning copy is reached. No arbitrary callbacks, STL internals or unused map adapters are ported."
       ],
       "deviations": [
         "Whole-source scan finds only src/test/lp.cpp concrete instantiation, not production LAR consumers (includes alone do not count). Only operations reached by retained source tests are publicly exposed. Uncalled lookup/size/clear/proxy conversion or set erase methods and other template instantiations are not implemented. Whole-source/consumer audit and CLI dispatch remain open, so no whole-unit promotion. Native Go map iteration order is irrelevant for scalar rollback; set Values is a borrowed read-only view corresponding to const source operator().",
-        "Source equality governs changes inside scopes: signed zero compares equal and does not replace; NaN never cancels original-value tracking. Reinserted old key with retained original-change entry reaches source checked erase assertion; native continues, and pop restores original. Independent snapshot oracle tolerates only the actual checked assertion prefix without deleting logical state."
+        "Source equality governs changes inside scopes: signed zero compares equal and does not replace; NaN never cancels original-value tracking. Reinserted old key with retained original-change entry reaches source checked erase assertion; native continues, and pop restores original. Independent snapshot oracle tolerates only the actual checked assertion prefix without deleting logical state.",
+        "Only source-consumed Set/Push/Pop/Erase are exposed for int32/float64. Invalid absent-key/new-key metadata is outside the valid source state; source debug assertion remains guarded. IEEE signed-zero equality and non-reflexive NaN cancellation follow source comparisons."
       ]
     },
     {

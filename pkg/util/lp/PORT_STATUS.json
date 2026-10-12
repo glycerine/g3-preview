@@ -6169,7 +6169,7 @@
     },
     {
       "source": "src/util/lp/stacked_map.h",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/stacked_map.go",
         "pkg/util/lp/stacked_map_test.go"
@@ -6177,7 +6177,31 @@
       "tests": [
         "TestLPStackedIntFloatMapSource",
         "TestLPStackedIntFloatMapSnapshotOracle",
-        "TestLPStackedIntFloatMapSourceCancellationAndIEEE"
+        "TestLPStackedIntFloatMapSourceCancellationAndIEEE",
+        "TestLPDriverStackedIndependentResults",
+        "TestLPDriverStackedReportAndPublicationFailures"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained concrete int/double immediate subscript assignment, change journal, push, saturating pop and erase",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_map.go",
+          "tests": [
+            "TestLPStackedIntFloatMapSource",
+            "TestLPStackedIntFloatMapSnapshotOracle",
+            "TestLPStackedIntFloatMapSourceCancellationAndIEEE",
+            "TestLPDriverStackedIndependentResults",
+            "TestLPDriverStackedReportAndPublicationFailures"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native Go maps/slices own actual values and delta journals. Popped frames release both map references, including retained slice capacity. The sole retained consumer uses immediate literal-key assignment; no saved proxy, reference-to-reference assignment or owning copy is reached. No arbitrary callbacks, STL internals or unused map adapters are ported."
+      ],
+      "deviations": [
+        "Only source-consumed Set/Push/Pop/Erase are exposed for int32/float64. Invalid absent-key/new-key metadata is outside the valid source state; source debug assertion remains guarded. IEEE signed-zero equality and non-reflexive NaN cancellation follow source comparisons."
       ]
     },
     {
@@ -6522,8 +6546,8 @@
   ],
   "status_counts": {
     "platform_replacement": 2,
-    "partial": 77,
-    "ported": 18,
+    "partial": 76,
+    "ported": 19,
     "reference_only": 10,
     "dead_deleted": 3
   },
@@ -11756,5 +11780,16 @@
     "go_pid": 5,
     "actual_exec_session": 71810,
     "completion_verified": false
+  },
+  "latest_stacked_map_support_audit": {
+    "summary": "Whole retained-source/ownership audit completes stacked_map.h. No-ignore scan finds only test_stacked_map_itself/test_stacked (--smap), concrete int/double; actual operations are immediate subscript assignment/emplace_replace, push, saturating pop and erase. Existing Go Set/Push/Pop/Erase preserve source first-old-value/cancel-back journal rules and source native/debug erase assertions. No saved proxy/key borrow, ref-to-ref assignment, lookup/contains/size/clear/map-view, owner copies or additional template instantiations are reached; unused adapters excluded. Native Go maps/slices own storage and popped frames clear both map references. Existing40*2500 independent snapshot worlds, original sequence, original-value cancellation, signed zeros/NaN payload/Inf and source erase assertion behavior pass; native0.142s, combined0.142s, stacked_map.go45/47statements95.7% native46/4797.9% combined. Remaining native returns are erased assertions; debug remaining absent-value/new-key guard has no ordinary producer. Related retained CLI report/publication/set scenarios pass native0.004s/combined0.005s. No production change or redundant tests required. LP inventory19ported/76partial/10reference_only/3dead_deleted/2platform_replacement. Source audit /mnt/oldrog/tmp/g3-lp-stacked-map-consumers-audit.txt; profiles /mnt/oldrog/tmp/g3-lp-map-audit-{native,debug}.cover. All commands restricted to CPUs8\u201316.",
+    "native_statements": {
+      "covered": 45,
+      "total": 47
+    },
+    "combined_debug_checked_statements": {
+      "covered": 46,
+      "total": 47
+    }
   }
 }
