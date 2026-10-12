@@ -157227,8 +157227,8 @@
           "text": "SASSERT(p_j < static_cast<int>(sz));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "apply_permutation_core concrete uint32 specialization",
@@ -157272,16 +157272,23 @@
             "TestPolynomialLexSortNativeLargeBucketsIndependentGrid",
             "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse"
           ]
+        },
+        {
+          "name": "NLSAT sort_clauses_by_degree apply_permutation over borrowed clause* array and unsigned clause-index mapping",
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
         "The native uint32 cycle operations borrow caller slices, mark the mapping in place, and allocate no scratch storage. Reached errors preserve earlier marks and swaps.",
-        "Polynomial lex sorting retains its concrete raw coefficient and monomial cycle path until those owners move to native slices."
+        "Polynomial lex sorting retains its concrete raw coefficient and monomial cycle path until those owners move to native slices.",
+        "The retained NLSAT caller in nlsat_solver.cpp:2204-2230 owns clause pointers and its unsigned degree/permutation vectors. The header template borrows those arrays, mutates the mapping during cycles, restores it only after a completed traversal and allocates no storage. Its Go consumer and ownership binding remain unported with NLSAT."
       ],
       "deviations": [
         "Only concrete uint32 and polynomial payload consumers are represented; future consumers receive their own typed slice implementation without a generic container wrapper.",
         "The registered permutation test body is disabled by #if 0, so independent finite tests provide algorithm evidence without registered-driver credit.",
-        "Recursive polynomial lex sorting now uses [][]uint32 degree buckets and []uint32 permutation storage. Removed Runtime vector headers, child-binding directory, manual class movement/capacity publication, pending growth and bucket destructor failures. The project recursive highest-variable/descending-degree algorithm, in-place signed cycle markers, representation swaps and actual coefficient/monomial borrowed payload guards remain. Source/owning member destruction clears native slices; cleanup of a stopped invocation releases its own scratch without undoing published polynomial order. Cold/warm sorting under disabled Runtime reservations covers nested recursion and an independent 405-term three-variable grid. Obsolete vector allocation/capacity/spare-mapping topology tests are retired or replaced by native mapping/pair tests. Evaluator stale/early invocation checks now reach the existing wrapped-degree bounds guard to retain LexSort; actual numeral Copy failure campaigns and ownership assertions remain. No whole-unit completion credit is added."
+        "Recursive polynomial lex sorting now uses [][]uint32 degree buckets and []uint32 permutation storage. Removed Runtime vector headers, child-binding directory, manual class movement/capacity publication, pending growth and bucket destructor failures. The project recursive highest-variable/descending-degree algorithm, in-place signed cycle markers, representation swaps and actual coefficient/monomial borrowed payload guards remain. Source/owning member destruction clears native slices; cleanup of a stopped invocation releases its own scratch without undoing published polynomial order. Cold/warm sorting under disabled Runtime reservations covers nested recursion and an independent 405-term three-variable grid. Obsolete vector allocation/capacity/spare-mapping topology tests are retired or replaced by native mapping/pair tests. Evaluator stale/early invocation checks now reach the existing wrapped-degree bounds guard to retain LexSort; actual numeral Copy failure campaigns and ownership assertions remain. No whole-unit completion credit is added.",
+        "The permutation class bodies in permutation.cpp have no production caller and are dead/deleted. The header remains partial because the live NLSAT clause-pointer specialization has no Go consumer yet; port it alongside clause sorting without a generic Go template adapter."
       ]
     },
     {
