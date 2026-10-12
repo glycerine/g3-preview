@@ -8278,13 +8278,13 @@
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7,
   "latest_full_native_checkpoint": {
-    "commit": "55b06c96",
-    "started_utc": "2026-10-12 10:47 UTC",
-    "completed_utc": "2026-10-12 11:14:25 UTC",
+    "commit": "17ecadb7",
+    "started_utc": "2026-10-12 12:10:46 UTC",
+    "completed_utc": "2026-10-12 12:34:47 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-lp-indexed-module-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-lp-indexed-module-native.json",
-    "profile": "/mnt/oldrog/tmp/g3-lp-indexed-module-native.cover",
+    "log": "/mnt/oldrog/tmp/g3-lp-current-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-lp-current-native.json",
+    "profile": "/mnt/oldrog/tmp/g3-lp-current-native.cover",
     "cpu_affinity": [
       8,
       9,
@@ -8303,11 +8303,13 @@
     "passed_packages": 63,
     "skipped_packages": 1,
     "packages_with_tests": 51,
-    "lp_seconds": 1567.175,
-    "lp_covered_statements": 30137,
-    "lp_statements": 34842,
-    "session_id": 64751,
-    "scope_warning": "Full native module checkpoint55b06c96 completed successfully: session64751 exited0 at2026-10-12 11:14:25UTC after starting10:47UTC. All64 package paths processed,63pass/1skip/51with named tests; LP1567.175s and30137/34842 statements(86.5%) in the inspected profile. The run used CPUs8-16/GOMAXPROCS9, two package jobs and a30m per-package timeout. It includes the diagonal/square-dense audits and indexed-vector increment through revision55b06c96. It predates random-updater/term/constraint/settings audits, the insdict v0.10.1 pin and added numeric-pair physical tests; those have separate focused validation and are not credited to this full suite. No whole-LP completion claim. Artifacts /mnt/oldrog/tmp/g3-lp-indexed-module-native.{json,log,cover}."
+    "lp_seconds": 1392.052,
+    "lp_covered_statements": 30177,
+    "lp_statements": 34898,
+    "module_covered_statements": 129239,
+    "module_statements": 170244,
+    "session_id": 69692,
+    "scope_warning": "Full native module checkpoint17ecadb7 exited0 at2026-10-12 12:34:47UTC:64 package paths,63pass/1skip/51with named tests; LP1392.052s and30177/34898 statements(86.5%), module129239/170244(75.9%). The run used CPUs8-16/GOMAXPROCS9, two package jobs and a30m per-package timeout. Subsequent commits through ab9379e8 changed only ledgers/documentation, so the checkpoint validates current Go code. Focused checked runs remain separate; LP source audit is not complete."
   },
   "full_native_checkpoint_history": [
     {
@@ -14091,7 +14093,7 @@
     },
     "whole_unit_status": "partial",
     "cache_cleanup_record": "/mnt/oldrog/tmp/g3-lp-permutation-cache-cleanup.json",
-    "full_suite_qualification": "Latest full native checkpoint 8f2961ca predates this test expansion and recent production corrections; no new full-suite claim.",
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate.",
     "combined_permutation_suite_seconds": 21.795,
     "whole_go_file_focused_covered_total": {
       "native": {
@@ -14149,7 +14151,7 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "whole_unit_status": "partial",
-    "full_suite_qualification": "No current full native suite claim; 8f2961ca predates recent production changes.",
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate.",
     "focused_native_seconds": 52.051,
     "focused_combined_debug_checked_seconds": 67.147,
     "tests": "TestLP.*(Permutation|Eta)",
@@ -14202,7 +14204,7 @@
     "consumer_tests_combined_seconds": 11.947,
     "fault_campaigns": 40,
     "new_checks": "Every physical-fault success endpoint now checks literal transformed coordinates, pair Y and untouched buffer; sparse endpoints check all data and exact index order. Four float larger-indexed-input worlds check source reached mutation/diagnostic prefixes.",
-    "full_suite_qualification": "Latest full native8f2961ca predates recent changes; no new full-suite claim.",
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate.",
     "focused_native_seconds": 16.692,
     "focused_combined_seconds": 21.949,
     "whole_go_file_focused_covered_total": {
@@ -14255,7 +14257,7 @@
     "whole_unit_status": "partial",
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest full native8f2961ca predates recent corrections; no current full-suite coverage claim.",
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate.",
     "focused_native_seconds": 48.436,
     "focused_combined_seconds": 56.193,
     "whole_go_file_focused_covered_total": {
@@ -14339,7 +14341,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native8f2961ca predates current fixes; no new full result yet.",
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate.",
     "consumer_tests_native_seconds": 9.049,
     "consumer_tests_combined_seconds": 11.27,
     "verification": "All64package native/combined compile gates, both LP vets and source portcheck pass; 2103units/677APIs,117ported/323partial/1620unported/5dead_deleted.",
@@ -14381,7 +14383,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Running full native3516687c/session44703 predates this row-eta correction; last completed8f2961ca also predates recent fixes. No current-code full-suite claim.",
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate.",
     "consumer_tests_native_seconds": 7.582,
     "consumer_tests_combined_seconds": 9.241,
     "coverage_qualification": "Remaining exact uncovered returns guard stable delegated numeric/cleanup errors and invariant-protected copies/checks. Floating native uncovered return is erased source assertion; combined row_eta_matrix_float is88/88. No synthetic failures or 100% exact coverage claim.",
@@ -14430,7 +14432,7 @@
     "GOMAXPROCS": 9,
     "coverage_qualification": "Remaining exact uncovered returns guard stable delegated begin/check/destructor errors and the precise zero-after-nonzero-division branch, which has no ordinary producer. Native debug computations are erased. No synthetic errors or complete exact coverage claim.",
     "verification": "Native/combined focused diagonal and actual LU consumer tests, both LP vets, all64package compile gates and source portcheck pass:2103units/677APIs,120ported/320partial/1620unported/5dead_deleted.",
-    "full_suite_qualification": "Full native3516687c ended exit1 at default Go10m LP timeout;62packages passed,1skipped. It predates row-eta and this diagonal audit. No full-suite success/current-code coverage credit."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_square_dense_support_audit": {
     "scope": "Whole retained square_dense_submatrix.h/.hpp/instances.cpp audit: actual double/double, mpq/mpq and mpq/impq constructors, dense tail query, pivot selection/swaps/division/elimination, all existing-parent rows then upper fill then maxima, dense X-left/T-right, indexed T-left/right, conjugation and live LU L checks are implemented. Floating debug matrix view is retained through LU; exact debug getters have no retained caller and are removed. Default construction/init/is_active and alternate indexed row-product application are unused or disabled; standalone test_square_dense_submatrix has no dispatch, so no adapter or unreachable test credit. Native Go storage replaces source containers. Corrected exact Close to unwind persistent indexed workspace numeric call locals before enclosing product temporaries, then destroy workspace member and dense coefficients. Pair Close handles the same inherited scalar-right path. Existing independent180float/120exact elimination worlds, five exact application routes,40pooled/direct physical refusal campaigns, endpoint oracles and publication prefixes remain covered. Pair-constructor refusal success endpoints now check all copied coefficients; borrowed stopped-input and older-comparison tests cover both allocators. Added floating and pooled/direct exact dense-right parent-growth fixtures checking identity suffix and zeroed trailing output. LU/solver whole audits remain separate.",
@@ -14442,7 +14444,7 @@
     ],
     "consumer_tests_native_seconds": 2.299,
     "consumer_tests_combined_seconds": 2.722,
-    "full_suite_qualification": "Full native3516687c timed out at default10m and predates row/diagonal/dense corrections. Last completed full8f2961ca predates current changes; no current full-suite result/coverage claim.",
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate.",
     "focused_native_seconds": 3.221,
     "focused_combined_seconds": 4.961,
     "whole_go_file_focused_covered_total": {
@@ -14536,7 +14538,7 @@
       "/mnt/oldrog/tmp/g3-lp-indexed-vector-global-types-audit.txt"
     ],
     "source_shrink_evidence": "src/util/vector.h:389-405 releases removed elements forward, updates size after loop. This informs numeral ownership order only; no source container/STL implementation port.",
-    "full_suite_qualification": "Full3516687c timed out and predates current changes; last completed8f2961ca predates recent fixes. No current full-suite result/coverage credit.",
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate.",
     "focused_native_seconds": 25.532,
     "focused_combined_seconds": 33.225,
     "pair_printer_native_seconds": 0.496,
@@ -14637,7 +14639,7 @@
       "/mnt/oldrog/tmp/g3-lp-random-updater-audit-native.cover",
       "/mnt/oldrog/tmp/g3-lp-random-updater-audit-debug.cover"
     ],
-    "full_suite_qualification": "Revision55b06c96 is still running and predates this audit; prior completed full checkpoint8f2961ca also predates it."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_lar_term_retained_audit": {
     "scope": "Whole retained lar_term.h audit: live constructor/offset copy, map insert/accumulate/zero erase, size/contains/borrowed coefficients, owning vector export and basis-pivot substitution all have concrete exact implementations. The source equality operators always return false/true and have no retained caller; no adapter is added. Actual init_lar_solver, lar_solver, bound constraint and iterator consumers are traced; independent term arithmetic/order, erased-live-pivot, physical refusal, borrowed-vector, iterator and static-matrix fill tests pass. Native and combined focused file coverage is117/130 statements for lar_term.go and52/55 for term_iterator.go; remaining blocks are reached-error cleanup, rare guards and impossible nil iterator metadata. Source and Go ownership are audited: each stored numeral is independently owned; live pivot is reread during substitution; export owns its copies; a stopped owner retains numeric receipts for Close before borrowed manager/vector cleanup. The repository dependency now pins instructed insdict v0.10.1; API compatibility compiles all64 packages in both build modes and term/random focused tests pass on the pinned version. Other LAR solver/constraint/matrix source units remain partial. Full native revision55b06c96 predates the dependency change and is not current-code evidence. CPUs8-16/GOMAXPROCS9.",
@@ -14673,7 +14675,7 @@
       "/mnt/oldrog/tmp/g3-lp-lar-term-audit-debug.cover"
     ],
     "dependency": "github.com/glycerine/insdict v0.10.1",
-    "full_suite_qualification": "Revision55b06c96 is still running and predates this source audit and dependency change.",
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate.",
     "non_lp_native_test_gate": "All 63 non-LP package paths passed native go test with insdict v0.10.1; LP focused term/random groups pass native and combined."
   },
   "latest_lar_constraints_retained_audit": {
@@ -14701,7 +14703,7 @@
       "/mnt/oldrog/tmp/g3-lp-lar-constraints-audit-native.cover",
       "/mnt/oldrog/tmp/g3-lp-lar-constraints-audit-debug.cover"
     ],
-    "full_suite_qualification": "Revision55b06c96 predates this source audit and dependency pin; it remains a separate running checkpoint."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_lp_settings_hpp_retained_audit": {
     "scope": "Whole retained lp_settings.hpp audit: column/status spelling and asymmetric status parsing match the source; floating vector equality uses the retained relative 1e-6 normalization in permutation debug checks, while exact vector equality owns each subtraction temporary in the retained precise permutation path. The pointer-plus-length comparison has no reached source caller, sparse-matrix comparisons are disabled/commented, and the debug-only ddd definition has no consumer; these are excluded. The source test_permutations comparison and permutation_matrix debug assertions are represented by real float/exact paths. Source enum/status tests, float dense/sparse product and guard tests, and exact permutation equality early-return/physical-refusal tests pass native and debug/checked. The hpp unit is now ported and method/ownership audited; lp_settings.h remains partial for its separate wider settings surface. Focused native/combined groups pass0.076s/0.840s. The full native revision55b06c96 predates this audit and is not current-code evidence. CPUs8-16/GOMAXPROCS9.",
@@ -14715,7 +14717,7 @@
       "/mnt/oldrog/tmp/g3-lp-settings-hpp-audit-debug.cover"
     ],
     "coverage_qualification": "Focused package coverage is diluted by unrelated LP files; retained methods and caller branches are exercised. No whole-Go-file coverage claim for shared types/permutation files.",
-    "full_suite_qualification": "Revision55b06c96 predates this source audit and later dependency pin."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_numeric_pair_retained_increment": {
     "scope": "Retained numeric_pair<mpq> direct arithmetic audit: RationalPair now has twelve pooled/direct physical prefix campaigns for copy, add, subtract, scale, divide and in-place negate. The first five require a reached direct allocation refusal before successful exact big.Rat endpoints and unchanged borrowed inputs; in-place negate correctly has no physical allocation but its large-number result and cleanup are checked. The entire numeric_pair.go file is covered65/65 statements by focused native and debug/checked pair tests. The source numeric_pair<double> specializations have no retained external consumer in a whole-src scan; pair-times-pair and pair-divided-by-pair bodies are undefined in source and receive no adapter. numeric_pair.h remains partial because the wider scalar numeric_traits and convert_struct consumers across MPS, scaling and bound algorithms still require a whole-header reachability/ownership audit. Focused pair campaigns pass native and debug/checked; the running full native revision55b06c96 predates this test and is not current-code evidence. CPUs8-16/GOMAXPROCS9.",
@@ -14741,7 +14743,7 @@
       "/mnt/oldrog/tmp/g3-lp-numeric-pair-audit-debug.cover"
     ],
     "whole_source_qualification": "The source header remains partial until retained scalar traits and conversions are audited across consumers.",
-    "full_suite_qualification": "Revision55b06c96 predates this added test and dependency pin."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
@@ -14765,7 +14767,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this correction; focused native/debug and compile/vet/portcheck gates are separate evidence."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_indexed_vector_matrix_lar_owner_increment": {
     "scope": "Retained static-matrix and square-dense-submatrix indexed workspace members plus LAR solver column buffer now use source-forward exact element destruction. Their owning source declarations are static_matrix.h:70, square_dense_submatrix.h:62 and lar_solver.h:69. Reverse cleanup remains for lexical numeric work. Indexed vector units remain partial until other owner/root audit.",
@@ -14791,7 +14793,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this correction; focused native/debug and compile/vet/portcheck gates are separate evidence."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_indexed_vector_lu_owner_increment": {
     "scope": "Rational/pair LU persistent row-eta work, extension work and y-copy members now use source-forward element destruction. A whole retained class-field scan finds the other live indexed-vector class members in core, primal, static matrix, dense submatrix and LAR already use this path; source pretty-printer declarations are dead_deleted. Local indexed-vector temporaries and remaining template roots require separate audit, so three indexed-vector units stay partial.",
@@ -14815,7 +14817,7 @@
     "debug_seconds": 284.029,
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this correction; focused native/debug and compile/vet/portcheck gates are separate evidence."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_indexed_vector_catchup_local_increment": {
     "scope": "The reached exact local indexed_vector<L> in lar_core_solver.h:432 catch_up_in_lu now uses forward dense-element destruction on normal exit and stopped-owner cleanup. Other candidate locals: square_dense_submatrix.h:148 is #if 1==0; lu.hpp:359 is #if 0==1; lp_core_solver_base.hpp:944 pivot_fixed_vars_from_basis has no retained call; lp_primal_core_solver.hpp:986 requires non-precise T; sparse_matrix.hpp:565 double_solve_U_y indexed is selected by LU only for non-precise T. Final whole-template/helper reachability audit remains, so indexed-vector units stay partial.",
@@ -14839,7 +14841,7 @@
     "debug_seconds": 4.125,
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this correction; focused native/debug and compile/vet/portcheck gates are separate evidence."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_benchmark_vector_owner_increment": {
     "scope": "Retained src/test/lp.cpp rational and numeric-pair benchmark input vectors c and x use source-forward element destruction, while lexical arithmetic temporaries unwind in reverse. Pair benchmark retains pair-vector then scalar-vector owner ordering. The reached indexed_vector.hpp print_vector(pair) helper remains represented by benchmark output. Whole indexed_vector and test/lp.cpp units remain partial for independent broader audits.",
@@ -14880,7 +14882,7 @@
     },
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this correction; focused native/debug and compile/vet/portcheck gates are separate evidence."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_indexed_vector_whole_audit": {
     "scope": "Whole retained indexed_vector.h/.hpp/instances.cpp method, helper reachability and ownership audit. Actual double, unsigned, mpq and concrete pair-holder consumers use Go slices plus exact numeral owners. Source self-assignment clearing, duplicate SetValue publication/assertion, unconditional is_OK, strict floating 1e-14 drop, exact zero, copy-constructor versus sparse assignment, forward shrink and source-forward indexed-vector element destruction are represented. The reached pair CLI print_vector helper is implemented in PairBenchmarkDriver. No source STL container implementation, dead dictionary/equality/debug printer, disabled local copy, or uncalled template body is ported. Containing solver/matrix/CLI audits remain separate.",
@@ -14942,7 +14944,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates recent lifetime corrections; focused native/debug, compile/vet and portcheck gates are separate evidence."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_numeric_pair_whole_audit": {
     "scope": "Whole retained numeric_pair.h trait, conversion and ownership audit: actual unsigned/double/mpq scalar traits use native Go scalars or util/numeral; numeric_pair<mpq> owns two rationals with literal X-before-Y construction/arithmetic, Y-before-X deletion, lexicographic comparison and first-coordinate projection. MPS numeric parsing uses Go standard-library strings/numerals as required, rather than reproducing C/C++ library parser internals. Retained convert_struct<double,double> strict/relative bound predicates match source; exact core bypasses approximate pair bound predicates. Scaling and static-matrix nonzero log stops follow source NOT_IMPLEMENTED_YET; exact solver scaling bypasses its unreachable rational log. Whole-source scan finds numeric_pair<double> only in header definitions, and pair*pair/pair/pair have undefined bodies; no adapters are added. Focused native/checked pair, MPS, scaler and float core tests pass. numeric_pair.go covers 65/65 statements in both builds; current consumer file coverage is float MPS357/381 native and360/381 checked, exact MPS449/501 and448/501, scaler226/260 and229/260, float core135/152 and148/152. Larger solver/MPS/CLI units remain independent.",
@@ -15015,7 +15017,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this audit and previous lifetime corrections; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_lp_settings_h_retained_audit": {
     "scope": "Whole retained lp_settings.h declaration, service, helper and ownership audit: source enum/status values and asymmetric spelling/parser, all settings defaults and strategy/tolerance predicates, borrowed resource limit and default process timer, independent random generator, stats reset, output streams and LP_OUT publication are represented. Live ratio_of_index_size_to_all_size constants select float/exact LU routes. max_abs_in_vector participates in floating primal cost normalization; print_blanks in live matrix debug output; ensure_increasing in static/sparse pivot indexes; precise val_is_smaller_than_eps and exact pair T_to_string retain their source paths. The vectors_are_equal bodies belong to the separately audited lp_settings.hpp. Debug D and ddd have no retained caller; dead pretty-printer internals do not create a consumer. Native/checked settings, enum, float-primal/scaler, driver settings and debug-matrix tests pass. Current focused coverage is settings.go26/27 and types.go32/32 in both builds; the uncovered settings statement is delegated stopwatch-construction failure. Containing solver, matrix, MPS and CLI whole-source audits remain separate.",
@@ -15067,7 +15069,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this audit and recent lifetime corrections; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_mps_reader_whole_audit": {
     "scope": "Whole retained mps_reader.h audit for the actual double/double and mpq/mpq instantiations: NAME/ROWS/COLUMNS/RHS/BOUNDS/RANGES, fixed and token fields, malformed diagnostics, source section order, bound defaults, range expansion, stream/file lifetime, column names, concrete primal/dual solver factories and mpq LAR column-before-row population are implemented. Go strings/bufio/strconv and insdict replace native C++/C library internals while preserving project parsing and reached publication. The reader does not parse implicitly during create_solver and does not gate creation on is_ok; partial returned owners are closed before the reader. Actual MPS batch and LAR MPS/SMT file consumers pass native/checked. Current native file coverage: mps_reader_float.go357/381, mps_reader_exact.go449/501, mps_populate_exact.go68/73, solver_named_rational.go16/16; checked360/381,448/501,67/73,16/16. Most remaining branches are delegated numeric/IO errors, source-undefined input guards or unreachable exact nil-message assertion; no synthetic adapters. src/test/lp.cpp CLI/options/file-list/directory/SMT dispatch has its own partial root unit and is not part of this header completion.",
@@ -15140,7 +15142,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_primal_tableau_whole_audit": {
     "source_units": [
@@ -15161,7 +15163,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_static_matrix_header_whole_audit": {
     "source_units": [
@@ -15180,7 +15182,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_static_matrix_hpp_whole_audit": {
     "source_units": [
@@ -15199,7 +15201,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_static_matrix_instances_whole_audit": {
     "source_units": [
@@ -15218,7 +15220,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_sparse_matrix_header_whole_audit": {
     "source_units": [
@@ -15238,7 +15240,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_sparse_matrix_instances_whole_audit": {
     "source_units": [
@@ -15258,7 +15260,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_sparse_matrix_hpp_whole_audit": {
     "source_units": [
@@ -15278,7 +15280,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Latest completed full native55b06c96 predates this source audit and recent ownership corrections; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_lu_header_whole_audit": {
     "source_units": [
@@ -15298,7 +15300,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Current full native suite is running from17ecadb7 and is not yet a completed checkpoint; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_lu_instances_whole_audit": {
     "source_units": [
@@ -15318,7 +15320,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Current full native suite is running from17ecadb7 and is not yet a completed checkpoint; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_lu_hpp_whole_audit": {
     "source_units": [
@@ -15338,7 +15340,7 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Current full native suite is running from17ecadb7 and is not yet a completed checkpoint; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_core_base_instances_whole_audit": {
     "source_units": [
@@ -15363,6 +15365,6 @@
     ],
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
-    "full_suite_qualification": "Current full native suite is running from17ecadb7 and is not yet a completed checkpoint; focused native/debug and portcheck evidence is separate."
+    "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   }
 }
