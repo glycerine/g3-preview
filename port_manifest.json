@@ -166676,7 +166676,7 @@
       "path": "src/util/top_sort.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_sort_dependency_order.go",
         "pkg/ast/ast_sort_dependency_order_test.go",
@@ -166714,7 +166714,7 @@
       "methods": [
         {
           "name": "top_sort<sort> insertion and preorder/completion-stack traversal for decl_collector::order_deps",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_sort_dependency_order.go",
           "tests": [
             "TestSortDependencyOrderRetainedSourceTraversal",
@@ -166728,7 +166728,7 @@
         "The concrete AST sort-order state owns copied dependency-handle slices and borrows the referenced AST sort objects. Duplicate collected roots retain one traversal entry; dependencies absent from the collected root table are skipped. No source-owned dependency-set allocations are reproduced in Go."
       ],
       "deviations": [
-        "Only the retained top_sort<sort> specialization is implemented using concrete ASTHandle maps and slices in package ast; no generic adapter or C++ hash-table traversal order is retained. A concrete declaration collector now visits null/user-family AST graphs and orders their sorts; datatype constructor edges and full SMT printer integration remain open, so this source unit stays partial."
+        "The sole retained top_sort<sort> specialization uses concrete ASTHandle maps and slices in package ast; no generic adapter or C++ hash-table traversal order is retained. Datatype constructor-edge collection and full SMT printer integration remain open in the separate declaration-collector consumer, not in this util traversal."
       ]
     },
     {
