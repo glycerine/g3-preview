@@ -40,6 +40,52 @@ func TestSortDependencyOrderCycleAndUncollectedRoot(t *testing.T) {
 	}
 }
 
+func TestSortDependencyOrderCollectsActualSortParameters(t *testing.T) {
+	m := astTestManager(t)
+	a, e := m.MkSort(astTestSymbol(t, m, "A"), ASTSortInfo{})
+	astTestMust(t, e)
+	astTestPin(t, m, a)
+	mkSort := func(name string, children []ASTHandle) ASTHandle {
+		t.Helper()
+		ps := make([]ASTParameter, 0, len(children)+1)
+		for _, child := range children {
+			p, e := m.NewParameterAST(child)
+			astTestMust(t, e)
+			ps = append(ps, p)
+		}
+		value, e := m.NewParameterInt(9)
+		astTestMust(t, e)
+		ps = append(ps, value)
+		info, e := m.NewSortInfo(NullFamilyID, 0, ps, InfiniteSortSize(), false)
+		astTestMust(t, e)
+		h, e := m.MkSort(astTestSymbol(t, m, name), info)
+		astTestMust(t, e)
+		astTestPin(t, m, h)
+		astTestMust(t, m.DelSortInfo(&info))
+		for i := range ps {
+			astTestMust(t, m.DelParameter(&ps[i]))
+		}
+		return h
+	}
+	b := mkSort("B", []ASTHandle{a})
+	expr, e := m.MkVar(0, a)
+	astTestMust(t, e)
+	astTestPin(t, m, expr)
+	c := mkSort("C", []ASTHandle{a, expr, b, a})
+	var collected sortDependencyOrder
+	for _, h := range []ASTHandle{c, b, a} {
+		astTestMust(t, collected.insertASTSort(m, h))
+	}
+	if got, want := collected.order(), []ASTHandle{a, b, c}; !equalSortHandles(got, want) {
+		t.Fatalf("real sort dependency order = %v, want %v", got, want)
+	}
+	var missing sortDependencyOrder
+	astTestMust(t, missing.insertASTSort(m, b))
+	if got, want := missing.order(), []ASTHandle{b}; !equalSortHandles(got, want) {
+		t.Fatalf("uncollected dependency entered output: %v, want %v", got, want)
+	}
+}
+
 func equalSortHandles(a, b []ASTHandle) bool {
 	if len(a) != len(b) {
 		return false

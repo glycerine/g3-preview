@@ -13736,22 +13736,43 @@
       "path": "src/ast/decl_collector.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_sort_dependency_order.go"
+      ],
+      "tests": [
+        "TestSortDependencyOrderCollectsActualSortParameters"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "decl_collector::collect_deps parameter-sort edges for actual AST sort metadata",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_sort_dependency_order.go",
+          "tests": [
+            "TestSortDependencyOrderCollectsActualSortParameters"
+          ]
+        }
+      ],
+      "ownership": [
+        "The selected parameter-sort dependency collection borrows real AST metadata while the manager is open and stores handle identities in Go slices; full declaration-collector ownership remains open."
+      ],
+      "deviations": [
+        "Datatype constructor dependencies and the enclosing visit/order_deps integration remain unported."
+      ]
     },
     {
       "path": "src/ast/decl_collector.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_sort_dependency_order.go"
+      ],
+      "tests": [
+        "TestSortDependencyOrderCollectsActualSortParameters"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -13764,9 +13785,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "decl_collector::collect_deps parameter-sort edges for actual AST sort metadata",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_sort_dependency_order.go",
+          "tests": [
+            "TestSortDependencyOrderCollectsActualSortParameters"
+          ]
+        }
+      ],
+      "ownership": [
+        "The selected parameter-sort dependency collection borrows real AST metadata while the manager is open and stores handle identities in Go slices; full declaration-collector ownership remains open."
+      ],
+      "deviations": [
+        "Datatype constructor dependencies and the enclosing visit/order_deps integration remain unported."
+      ]
     },
     {
       "path": "src/ast/dl_decl_plugin.cpp",
@@ -165984,7 +166018,8 @@
       ],
       "tests": [
         "TestSortDependencyOrderRetainedSourceTraversal",
-        "TestSortDependencyOrderCycleAndUncollectedRoot"
+        "TestSortDependencyOrderCycleAndUncollectedRoot",
+        "TestSortDependencyOrderCollectsActualSortParameters"
       ],
       "conditionals": [
         {
@@ -166015,7 +166050,8 @@
           "go_target": "pkg/ast/ast_sort_dependency_order.go",
           "tests": [
             "TestSortDependencyOrderRetainedSourceTraversal",
-            "TestSortDependencyOrderCycleAndUncollectedRoot"
+            "TestSortDependencyOrderCycleAndUncollectedRoot",
+            "TestSortDependencyOrderCollectsActualSortParameters"
           ]
         }
       ],
@@ -166023,7 +166059,7 @@
         "The concrete AST sort-order state owns copied dependency-handle slices and borrows the referenced AST sort objects. Duplicate collected roots retain one traversal entry; dependencies absent from the collected root table are skipped. No source-owned dependency-set allocations are reproduced in Go."
       ],
       "deviations": [
-        "Only the retained top_sort<sort> specialization is implemented using concrete ASTHandle maps and slices in package ast; no generic adapter or C++ hash-table traversal order is retained. The AST declaration collector still needs its visit/collect_deps/order_deps integration, so this source unit remains partial."
+        "Only the retained top_sort<sort> specialization is implemented using concrete ASTHandle maps and slices in package ast; no generic adapter or C++ hash-table traversal order is retained. Real AST metadata now supplies parameter-sort edges; datatype constructor edges and the enclosing visit/order_deps integration remain open, so this source unit stays partial."
       ]
     },
     {

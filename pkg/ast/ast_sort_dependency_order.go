@@ -9,6 +9,55 @@ type sortDependencyOrder struct {
 	deps  map[ASTHandle][]ASTHandle
 }
 
+// insertASTSort supplies the parameter-sort edges collected by
+// decl_collector::collect_deps before top_sort<sort> traverses them. Datatype
+// constructor edges belong to the separate datatype collector path.
+func (o *sortDependencyOrder) insertASTSort(m *ASTManager, sort ASTHandle) error {
+	if o == nil || m == nil {
+		return ErrASTHandle
+	}
+	if e := m.lock(); e != nil {
+		return e
+	}
+	defer m.mu.Unlock()
+	r, e := m.requireKind(sort, ASTSort)
+	if e != nil {
+		return e
+	}
+	var deps []ASTHandle
+	info := m.sortAt(r.slot).info
+	if info != (ASTSortInfo{}) {
+		v, e := m.sortInfo(info)
+		if e != nil {
+			return e
+		}
+		seen := make(map[ASTHandle]struct{})
+		for i := v.count; i > 0; i-- {
+			p, e := m.infoParameter(v, i-1)
+			if e != nil {
+				return e
+			}
+			pv, e := m.parameter(p)
+			if e != nil {
+				return e
+			}
+			if pv.Kind != ASTParameterAST || pv.ast == (astNodeRef{}) || m.nodeAt(pv.ast.slot).kind != ASTSort {
+				continue
+			}
+			child := m.external(pv.ast)
+			if child == sort {
+				continue
+			}
+			if _, found := seen[child]; !found {
+				seen[child] = struct{}{}
+				deps = append(deps, child)
+			}
+		}
+	}
+	o.insert(sort, deps)
+	return nil
+}
+
 func (o *sortDependencyOrder) insert(sort ASTHandle, deps []ASTHandle) {
 	if o.deps == nil {
 		o.deps = make(map[ASTHandle][]ASTHandle)
