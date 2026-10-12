@@ -9829,7 +9829,8 @@
         "TestASTProofHyperNativeWideReaderExactOwnershipAndIndependentOutputs",
         "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix",
         "TestASTDependencyDecConsumedActualRootOwnership",
-        "TestASTLabelConcreteSymbolBufferAndRecognition"
+        "TestASTLabelConcreteSymbolBufferAndRecognition",
+        "TestASTLabelTemporaryParametersOnReservationFailure"
       ],
       "conditionals": [
         {
@@ -10814,7 +10815,8 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_label.go",
           "tests": [
-            "TestASTLabelConcreteSymbolBufferAndRecognition"
+            "TestASTLabelConcreteSymbolBufferAndRecognition",
+            "TestASTLabelTemporaryParametersOnReservationFailure"
           ]
         }
       ],
@@ -11081,7 +11083,8 @@
         "TestASTProofHyperNativeWideReaderExactOwnershipAndIndependentOutputs",
         "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix",
         "TestASTDependencyDecConsumedActualRootOwnership",
-        "TestASTLabelConcreteSymbolBufferAndRecognition"
+        "TestASTLabelConcreteSymbolBufferAndRecognition",
+        "TestASTLabelTemporaryParametersOnReservationFailure"
       ],
       "conditionals": [
         {
@@ -11756,7 +11759,8 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_label.go",
           "tests": [
-            "TestASTLabelConcreteSymbolBufferAndRecognition"
+            "TestASTLabelConcreteSymbolBufferAndRecognition",
+            "TestASTLabelTemporaryParametersOnReservationFailure"
           ]
         }
       ],
@@ -111839,7 +111843,8 @@
         "TestPolynomialSparseNativeLocalsIndependentSeventeenSamples",
         "TestPolynomialPSCBufferNativeGrowthAndReuse",
         "TestPolynomialPSCBufferNativeStoppedReferenceCleanup",
-        "TestASTLabelConcreteSymbolBufferAndRecognition"
+        "TestASTLabelConcreteSymbolBufferAndRecognition",
+        "TestASTLabelTemporaryParametersOnReservationFailure"
       ],
       "conditionals": [
         {
@@ -112052,7 +112057,8 @@
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_label.go",
           "tests": [
-            "TestASTLabelConcreteSymbolBufferAndRecognition"
+            "TestASTLabelConcreteSymbolBufferAndRecognition",
+            "TestASTLabelTemporaryParametersOnReservationFailure"
           ]
         }
       ],

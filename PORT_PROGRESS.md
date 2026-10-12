@@ -39672,3 +39672,14 @@ after declaration-owned copies are made, including on a foreign-name failure.
 This credits the retained `buffer<parameter>`/`buffer<symbol>` label use without
 adding a generic C++ buffer adapter; other AST and buffer source paths remain
 partial.
+
+### AST label constructor refusal boundary
+
+The retained label constructor now has a 12-point reservation sweep through
+the concrete AST manager. A failed call leaves either no new declaration or
+one completed, hash-consed declaration with its three copied parameters;
+temporary parameter records do not survive either failure. Retrying after a
+refusal reuses that declaration and creates only the missing app. This follows
+`ast_manager::mk_app` constructing the declaration before allocating the app,
+and extends the `buffer<parameter>` label lifetime evidence without claiming
+the other buffer specializations complete.

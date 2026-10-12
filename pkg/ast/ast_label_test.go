@@ -3,6 +3,7 @@ package ast
 
 import (
 	"errors"
+	"strconv"
 	"testing"
 
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -67,5 +68,48 @@ func TestASTLabelConcreteSymbolBufferAndRecognition(t *testing.T) {
 	}
 	if got := m.Stats().LiveParameters; got != before {
 		t.Fatal("failed label retained temporary parameters", got, before)
+	}
+}
+
+func TestASTLabelTemporaryParametersOnReservationFailure(t *testing.T) {
+	for refusal := int64(0); refusal < 12; refusal++ {
+		t.Run(strconv.FormatInt(refusal, 10), func(t *testing.T) {
+			m := astTestManager(t)
+			b, e := m.MkBoolSort()
+			astTestMust(t, e)
+			arg, e := m.MkConst(astTestSymbol(t, m, "arg"), b)
+			astTestMust(t, e)
+			astTestPin(t, m, arg)
+			first := astTestSymbol(t, m, "first")
+			second := astTestSymbol(t, m, "second")
+			before := m.Stats()
+			base := before.LiveParameters
+			m.BudgetField.FailAfter(refusal)
+			label, e := m.MkLabel(true, []usymbol.Symbol{first, second}, arg)
+			m.BudgetField.FailAfter(-1)
+			if e != nil {
+				after := m.Stats()
+				// mk_app constructs/registers its declaration first. An app
+				// refusal may leave that declaration and its copied parameters
+				// available for a later hash-consed retry.
+				noDecl := after.LiveParameters == base && after.LiveNodes == before.LiveNodes && after.LiveInfos == before.LiveInfos
+				withDecl := after.LiveParameters == base+3 && after.LiveNodes == before.LiveNodes+1 && after.LiveInfos == before.LiveInfos+1
+				if !noDecl && !withDecl {
+					t.Fatal("failed constructor retained a partial temporary", before, after, e)
+				}
+				label, e = m.MkLabel(true, []usymbol.Symbol{first, second}, arg)
+				astTestMust(t, e)
+				astTestPin(t, m, label)
+				retried := m.Stats()
+				if retried.LiveParameters != base+3 || retried.LiveNodes != before.LiveNodes+2 {
+					t.Fatal("retry did not reuse the completed declaration", before, after, retried)
+				}
+				return
+			}
+			astTestPin(t, m, label)
+			if got := m.Stats().LiveParameters; got != base+3 {
+				t.Fatal("successful declaration parameter copies", got, base)
+			}
+		})
 	}
 }
