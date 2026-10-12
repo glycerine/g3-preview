@@ -116,6 +116,9 @@ digraph packages {
   "tactic" -> "ast";
   "tactic" -> "model";
   "tactic" -> "util/symbol";
+  "tactic/arith" [style=filled, fillcolor="#eeeeee"];
+  "tactic/arith" -> "arena";
+  "tactic/arith" -> "util/numeral";
   "tactic/sls" [style=filled, fillcolor="#eeeeee"];
   "tactic/sls" -> "util/params";
   "tactic/smtlogics" [style=filled, fillcolor="#eeeeee"];

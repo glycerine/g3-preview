@@ -414,8 +414,16 @@
         "util/numeral"
       ],
       "production_files": [
+        "addmul.go",
+        "apply_solution.go",
+        "decompose.go",
         "equation.go",
+        "normalize.go",
+        "normalize_query.go",
         "numeral_buffer_sort.go",
+        "pivot.go",
+        "solve.go",
+        "solver.go",
         "solver_setup.go"
       ]
     },
@@ -999,6 +1007,16 @@
         "tactic_package_boundary.go",
         "tactic_probe.go",
         "tactic_stored_model.go"
+      ]
+    },
+    {
+      "package": "tactic/arith",
+      "imports": [
+        "arena",
+        "util/numeral"
+      ],
+      "production_files": [
+        "linear_equation.go"
       ]
     },
     {
