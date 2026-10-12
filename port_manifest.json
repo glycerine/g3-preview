@@ -123870,7 +123870,7 @@
       "path": "src/util/lp/lar_term.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/lp/lar_term.go",
         "pkg/util/lp/term_iterator.go"
@@ -123889,8 +123889,8 @@
         "TestLPExactStaticFillBoundsAndLiteralStops",
         "TestLPExactStaticFillAndTermLeaveOlderComparisonOwned"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained exact term constructor/offset copy, coefficient insertion/accumulation/cancellation, size/contains/borrowed coefficients, owning export, live-pivot substitution and basis-variable Next/NextIndex/Reset/Size iterator",
@@ -123916,7 +123916,7 @@
         "Term owns initialized rational constant and stable coefficient pointers in native insdict.Dict; actual numeric copies publish new entries only after completion. Existing exact cancellations release the value and erase the key. Substitution rereads the live pivot and owns actual unary-minus/product/insertion temporaries and newly acquired numeric receipts. Export owns its actual pair/stored copies separately from the borrowed term. Iterator owns its caller-output Copy receipts, publishes coefficient key before copy and advances only after success; negative unit basis publishes its flag before value, then key after copy."
       ],
       "deviations": [
-        "Insertion order via approved insdict v0.14.5 replaces unspecified C++ unordered-map bucket order and gives stable two-pass traversal. No hash-node/vector capacity or container-only budget events. Iterator snapshots only native keys on Reset and borrows live coefficient values; structural mutation requires Reset. Source erased-live-pivot/invalid iterator continuation is an explicit Go guard preserving the completed prefix, without a pivot snapshot or native undefined dereference. Definition-only term ==/!= and unused clone methods are excluded. Full LAR/bound-propagation/constraint integration and upstream driver remain open."
+        "Insertion order via approved insdict v0.10.1 replaces unspecified C++ unordered-map bucket order and gives stable two-pass traversal. No hash-node/vector capacity or container-only budget events. Iterator snapshots only native keys on Reset and borrows live coefficient values; structural mutation requires Reset. Source erased-live-pivot/invalid iterator continuation is an explicit Go guard preserving the completed prefix, without a pivot snapshot or native undefined dereference. Definition-only term ==/!= and unused clone methods are excluded. Full LAR/bound-propagation/constraint integration and upstream driver remain open."
       ]
     },
     {
@@ -173329,5 +173329,42 @@
       "/mnt/oldrog/tmp/g3-lp-random-updater-audit-debug.cover"
     ],
     "full_suite_qualification": "Revision55b06c96 is still running and predates this audit; prior completed full checkpoint8f2961ca also predates it."
+  },
+  "latest_lar_term_retained_audit": {
+    "scope": "Whole retained lar_term.h audit: live constructor/offset copy, map insert/accumulate/zero erase, size/contains/borrowed coefficients, owning vector export and basis-pivot substitution all have concrete exact implementations. The source equality operators always return false/true and have no retained caller; no adapter is added. Actual init_lar_solver, lar_solver, bound constraint and iterator consumers are traced; independent term arithmetic/order, erased-live-pivot, physical refusal, borrowed-vector, iterator and static-matrix fill tests pass. Native and combined focused file coverage is117/130 statements for lar_term.go and52/55 for term_iterator.go; remaining blocks are reached-error cleanup, rare guards and impossible nil iterator metadata. Source and Go ownership are audited: each stored numeral is independently owned; live pivot is reread during substitution; export owns its copies; a stopped owner retains numeric receipts for Close before borrowed manager/vector cleanup. The repository dependency now pins instructed insdict v0.10.1; API compatibility compiles all64 packages in both build modes and term/random focused tests pass on the pinned version. Other LAR solver/constraint/matrix source units remain partial. Full native revision55b06c96 predates the dependency change and is not current-code evidence. CPUs8-16/GOMAXPROCS9.",
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "source_unit": "src/util/lp/lar_term.h",
+    "focused_native_seconds": 13.412,
+    "focused_combined_seconds": 14.806,
+    "whole_go_file_focused_covered_total": {
+      "native": {
+        "lar_term.go": [
+          117,
+          130
+        ],
+        "term_iterator.go": [
+          52,
+          55
+        ]
+      },
+      "debug": {
+        "lar_term.go": [
+          117,
+          130
+        ],
+        "term_iterator.go": [
+          52,
+          55
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-lar-term-audit-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-lar-term-audit-debug.cover"
+    ],
+    "dependency": "github.com/glycerine/insdict v0.10.1",
+    "full_suite_qualification": "Revision55b06c96 is still running and predates this source audit and dependency change.",
+    "non_lp_native_test_gate": "All 63 non-LP package paths passed native go test with insdict v0.10.1; LP focused term/random groups pass native and combined."
   }
 }
