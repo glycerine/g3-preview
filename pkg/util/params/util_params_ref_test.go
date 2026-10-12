@@ -389,6 +389,31 @@ func TestParamsReferenceFallbackAllKinds(t *testing.T) {
 	paramsMust(t, c.Del(&b))
 }
 
+func TestParamsReferenceFallbackReadOnlyAfterPrimaryMiss(t *testing.T) {
+	c, _, _ := paramsTestOwner(t)
+	primary, e := c.NewValue()
+	paramsMust(t, e)
+	name := "local"
+	invalidFallback := ParamsRef{Owner: c.Owner + 1}
+	paramsMust(t, c.SetBoolName(&primary, &name, true))
+	got, e := c.GetBoolFallbackName(&primary, &name, &invalidFallback, false)
+	if e != nil || !got {
+		t.Fatal("primary match should return before fallback validation", got, e)
+	}
+
+	// A matching null string is still a match, even though it has no bytes.
+	paramsMust(t, c.SetStringName(&primary, &name, nil))
+	str, present, e := c.GetStringFallbackName(&primary, &name, &invalidFallback, nil)
+	if e != nil || present || str != "" {
+		t.Fatal("matching null string consulted fallback", str, present, e)
+	}
+	// The same key with a different requested kind takes the fallback path.
+	if _, e = c.GetBoolFallbackName(&primary, &name, &invalidFallback, false); !errors.Is(e, ErrParamsOwner) {
+		t.Fatal("wrong-kind primary did not consult fallback", e)
+	}
+	paramsMust(t, c.Del(&primary))
+}
+
 func TestParamsReferenceValidationUnknownExactOrdering(t *testing.T) {
 	c, sy, _ := paramsTestOwner(t)
 	a, e := c.NewValue()

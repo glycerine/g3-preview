@@ -859,10 +859,12 @@ func (c *ParamsContext) get(v *ParamsRef, k usymbol.Symbol, name *string, byName
 		return paramEntry{}, false, e
 	}
 	if fallback != nil {
-		if e = c.check(fallback); e != nil {
-			return paramEntry{}, false, e
-		}
 		if x == nil {
+			// GET_VALUE2 returns a primary match before it calls the fallback.
+			// In particular, a dead fallback has no observable effect on a hit.
+			if e = c.check(fallback); e != nil {
+				return paramEntry{}, false, e
+			}
 			x, e = c.find(fallback, usymbol.Symbol{}, name, true, kind, false)
 			if e != nil {
 				return paramEntry{}, false, e

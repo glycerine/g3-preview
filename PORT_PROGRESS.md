@@ -39628,3 +39628,14 @@ then throws `ERR_TIMEOUT`. `pkg/util/control.ScopedTimer` covers the lower timer
 mechanism but does not implement this shell-facing global sequence. The manifest
 now records each unported operation and ownership edge so the shell consumer
 port can implement one concrete service without a generic global adapter.
+
+### Parameter fallback read order
+
+`src/util/params.cpp:903-934` returns a matching primary entry from each
+`GET_VALUE2` getter before invoking the fallback `params_ref`. The shared Go
+getter had checked the fallback owner even on a primary hit. It now validates
+and reads the fallback only after a primary miss, including a wrong-kind miss;
+a matching null string still wins over an invalid fallback. A focused
+regression covers these three branches, and the manifest links it to both
+`params.cpp` and `params.h`. The surrounding parameter lifetime and global
+service units remain partial.
