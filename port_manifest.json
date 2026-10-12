@@ -113692,7 +113692,10 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/params/util_param_descrs.go",
-        "pkg/util/params/util_gparams_dictionary.go"
+        "pkg/util/params/util_gparams_dictionary.go",
+        "pkg/util/symbol/dictionary_int32.go",
+        "pkg/ast/ast_builtin_plugins_user.go",
+        "pkg/smtcore/tactic_manager.go"
       ],
       "tests": [
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
@@ -113718,7 +113721,14 @@
         "TestGlobalParamsRealModuleSnapshotsAndReset",
         "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
         "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
-        "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
+        "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule",
+        "TestSymbolDictionaryInt32LookupMutationAndReset",
+        "TestSymbolDictionaryInt32RejectsClosedSymbolOwner",
+        "TestASTUserNameDictionaryRegistrationAndFreshReplay",
+        "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
+        "TestTacticManagerSourceProbeReferencesAndStructuralValues",
+        "TestTacticManagerSourceDuplicateAssertionAndNamespaceSeparation",
+        "TestTacticManagerSourcePublishedDictionaryBeforeVectorRefusal"
       ],
       "conditionals": [
         {
@@ -113770,13 +113780,48 @@
             "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
             "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
           ]
+        },
+        {
+          "name": "Concrete dictionary<int> user_sort_plugin name-to-kind find/insert and fresh replay",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_builtin_plugins_user.go",
+          "go_targets": [
+            "pkg/util/symbol/dictionary_int32.go"
+          ],
+          "tests": [
+            "TestSymbolDictionaryInt32LookupMutationAndReset",
+            "TestSymbolDictionaryInt32RejectsClosedSymbolOwner",
+            "TestASTUserNameDictionaryRegistrationAndFreshReplay"
+          ]
+        },
+        {
+          "name": "Concrete tactic/probe symbol dictionaries: source lookup, insertion and publication before descriptor-vector growth",
+          "status": "ported",
+          "go_target": "pkg/smtcore/tactic_manager.go",
+          "go_targets": [
+            "pkg/util/symbol/dictionary_int32.go"
+          ],
+          "tests": [
+            "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
+            "TestTacticManagerSourceProbeReferencesAndStructuralValues",
+            "TestTacticManagerSourceDuplicateAssertionAndNamespaceSeparation",
+            "TestTacticManagerSourcePublishedDictionaryBeforeVectorRefusal"
+          ]
+        },
+        {
+          "name": "Remaining command-context, parser and plugin dictionary specializations",
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
         "Descriptor entries use insdict insertion order and native Go name slices; immutable nullable metadata uses Go strings with explicit presence bits. Copy shares immutable strings independently of owner lifetime. Only actual owner headers are budgeted; dictionary, names, text, and display scratch are Go-managed. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
-        "Three independent charged scalar record arrays and cold root directories preserve source physical bucket/action order. See PORT_PROGRESS.md#audit-gparams-registry-port-status-md; other source map operations remain required."
+        "Three independent charged scalar record arrays and cold root directories preserve source physical bucket/action order. See PORT_PROGRESS.md#audit-gparams-registry-port-status-md; other source map operations remain required.",
+        "AST user-sort and tactic/probe dictionaries use concrete map[Symbol]int32 storage with owner-validated symbols. Values are kind IDs or indices into separately owned descriptor slices; Go map iteration is not used for source-observable order. The source registration vector and finalization order remain in their consumers."
       ],
-      "deviations": []
+      "deviations": [
+        "Concrete integer dictionaries replace live symbol-keyed map specializations; no generic dictionary or C++ hash-table adapter is added. Other command-context and SMT2 parser instantiations remain with their unported consumers."
+      ]
     },
     {
       "path": "src/util/dlist.h",
