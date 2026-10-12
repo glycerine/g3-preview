@@ -103061,7 +103061,9 @@
         "pkg/util/lp/driver_holes_lu_debug.go",
         "pkg/util/lp/driver_lu_tests_debug.go",
         "pkg/util/lp/driver_rational_benchmark.go",
-        "pkg/util/lp/driver_rational_benchmark_test.go"
+        "pkg/util/lp/driver_rational_benchmark_test.go",
+        "pkg/util/lp/driver_pair_benchmark.go",
+        "pkg/util/lp/driver_pair_benchmark_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103309,7 +103311,12 @@
         "TestLPRationalBenchmarkReportFailureAndFlushPrefixes",
         "TestLPRationalBenchmarkClockAndOwnerBoundaries",
         "TestLPRationalBenchmarkPhysicalRefusalOwnership",
-        "TestLPRationalBenchmarkPreservesOlderComparison"
+        "TestLPRationalBenchmarkPreservesOlderComparison",
+        "TestLPPairBenchmarkIndependentInputsProductsAndReport",
+        "TestLPPairBenchmarkEveryReportByteAndEndlRefusal",
+        "TestLPPairBenchmarkClockAndOwnerBoundaries",
+        "TestLPPairBenchmarkPhysicalRefusalOwnership",
+        "TestLPPairBenchmarkPreservesOlderComparison"
       ],
       "conditionals": [
         {
@@ -104431,6 +104438,18 @@
             "TestLPRationalBenchmarkPhysicalRefusalOwnership",
             "TestLPRationalBenchmarkPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "test_rationals: literal1000000 Run/10000000products implemented; focused input/vector-report/loop/cleanup verified; actual full-count execution pending",
+          "status": "partial",
+          "go_target": "pkg/util/lp/driver_pair_benchmark.go",
+          "tests": [
+            "TestLPPairBenchmarkIndependentInputsProductsAndReport",
+            "TestLPPairBenchmarkEveryReportByteAndEndlRefusal",
+            "TestLPPairBenchmarkClockAndOwnerBoundaries",
+            "TestLPPairBenchmarkPhysicalRefusalOwnership",
+            "TestLPPairBenchmarkPreservesOlderComparison"
+          ]
         }
       ],
       "ownership": [
@@ -104450,7 +104469,8 @@
         "SmallLUTestDriver borrows caller Settings; owns literal matrix, LU/workspace, headings/basis/nonbasis and lexical dense report snapshot/replacement set. Every report/endl failure preserves reached owners and publications for Close; successful Run closes LU after actual final correctness check. Matrix and scalar snapshots remain inspectable native metadata. No new numerical manager or allocation adapter.",
         "LargerLUTestDriver borrows Settings/shared RNG and owns matrix, LU, lexical left/right dense products, workspace and native basis/headings. Left/right products survive through source scope after comparison; failed reports/algorithms retain reached owners until Close. Successful source return closes LU and lexical products. Source deterministic exit(1) is represented by ExitCode1 plus ErrAssertion instead of terminating the embedding Go process; owner cleanup remains explicit.",
         "HolesLUTestDriver owns literal matrix/LU, native basis/headings/workspace and lexical left/right products; its current printed tail is borrowed from LU. Every failed report/assertion retains reached owners until Close. Parent LUTestDriver borrows one Settings and shared RNG, runs each child through actual owning Close before constructing the next and retains closed metadata/completed prefix. Failed current child stays reachable; parent Close visits child owners in reverse order.",
-        "Scalar rational benchmarks borrow manager/shared RNG, own copied input numerals and lexical product/binary-plus/val/r slots, record only new arithmetic receipts, and close failed owners before borrowed manager. Del is followed by fresh initialized temporary reconstruction where source creates a new local."
+        "Scalar rational benchmarks borrow manager/shared RNG, own copied input numerals and lexical product/binary-plus/val/r slots, record only new arithmetic receipts, and close failed owners before borrowed manager. Del is followed by fresh initialized temporary reconstruction where source creates a new local.",
+        "Pair benchmark borrows manager/shared RNG, owns scalar/pair input conversion copies, coordinate-expression/constructor/product/accumulator temporaries, and only new arithmetic receipts. Pair-vector cleanup precedes coefficient-vector cleanup; failed reached owners remain reachable until Close."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
@@ -104485,7 +104505,8 @@
         "Two retained6x12 debug LU scenarios are executable typed drivers; deterministic fill uses cyclic square values and random fill consumes exactly72 shared RNG draws in row/column order. Native bodies are erased. All source mismatch diagnostics and base-matrix trailing blank endl are retained; real DropTolerance .1/1/10/100 reaches deterministic exit diagnostics and randomized pre-report assertion. Full parent test_lu, holes scenario, top-level CLI execution/entry and other scenarios remain open; no whole-unit completion credit.",
         "All four retained debug LU test_lu children and their parent are now executable typed drivers. Earlier larger-LU note that holes/parent remained open is superseded. Holes initial mismatch only reports then continues to source update/final assertion; real DropTolerance1/10 tests preserve that behavior. Default and sparse/dense source diagnostic views preserve positive implicit zeros versus stored dense negative zeros, reverse tail order and base-matrix blank endl. Full top-level CLI execution/entry, other test families and whole-source audits remain open; no whole test/lp.cpp or whole-LP completion credit.",
         "Preparation header and usage short nil-error writes stop with io.ErrShortWrite before later publication; exact-length success and every byte prefix tested. Top-level selected-call execution remains separately open.",
-        "Private scalar benchmark iteration bound is used only by focused tests; public Run retains500000 and standard benchmark checks actual full count. Full-count execution remains unverified at this increment. No source arithmetic shortcut or synthetic allocator hooks."
+        "Private scalar benchmark iteration bound is used only by focused tests; public Run retains500000 and standard benchmark checks actual full count. Full-count execution remains unverified at this increment. No source arithmetic shortcut or synthetic allocator hooks.",
+        "Private pair benchmark iteration bound is for focused tests only; public Run retains1000000 and standard benchmark independently checks full count and exact result. Full-count execution not credited at implementation commit; no source arithmetic shortcut or unused generic adapter."
       ]
     },
     {

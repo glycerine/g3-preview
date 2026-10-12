@@ -11444,5 +11444,17 @@
     "go_pid": 5,
     "actual_exec_session": 89471,
     "completion_verified": false
+  },
+  "latest_pair_benchmark_increment": {
+    "summary": "Retained test_rationals now has concrete PairBenchmarkDriver: public literal1000000 outer iterations/10scalar-pair products without hoisting,40 shared RNG draws, owned scalar-to-pair conversion/vector copies, exact x = input vector with trailing spaces/endl before stopwatch start, copied-left X/Y scalar expressions and owning pair constructor before X-then-Y compound accumulation, reverse lexical temporary destruction and source result/time reports. Five test groups verify30 independent seed worlds at0/1/3/7 iterations with all10coefficients/10pairs/exact accumulator/RNG, every report byte using explicit and short nil-error writes with timer/product/result-publication boundaries, all3endl failures, actual start/stop clock failures and lifetime guards, pooled/direct physical refusal campaigns through success with completed-product prefixes, and an actual older1000-digit caller comparison preserving stopped-manager refusal and independent cleanup. Focused native0.565s/combined0.894s pass; new driver96/116statements82.8% both. Remaining gaps guard stable delegated begin/cleanup/format errors; no synthetic failure hooks. Standard benchmark BenchmarkLPPairSource1000000 executes actual registered count/10000000products with independent exact result and successful owner cleanup checks; full-count execution not yet credited. All three numeric benchmark bodies are implemented; full CLI execution and whole-source/ownership audits remain open, no whole-unit promotion. Native module checkpointc32fb569/session40124 and scalar full-count checkpoint5920ba19/session89471 confirmed running and exclude this new pair driver. Profiles /mnt/oldrog/tmp/g3-lp-pair-benchmark-{native,debug}.cover.",
+    "tests": [
+      "TestLPPairBenchmarkIndependentInputsProductsAndReport",
+      "TestLPPairBenchmarkEveryReportByteAndEndlRefusal",
+      "TestLPPairBenchmarkClockAndOwnerBoundaries",
+      "TestLPPairBenchmarkPhysicalRefusalOwnership",
+      "TestLPPairBenchmarkPreservesOlderComparison"
+    ],
+    "full_registered_run_verified": false,
+    "whole_unit_promotion": false
   }
 }
