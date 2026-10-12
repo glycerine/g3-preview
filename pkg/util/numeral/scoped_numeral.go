@@ -734,6 +734,20 @@ func (v *ScopedIntVector) Resize(n uint32) error {
 	}
 	return nil
 }
+
+// Reserve follows src/util/vector.h:509-512: unlike Go slice capacity growth,
+// source reserve extends the logical size with default-initialized numerals.
+// linear_equation_manager indexes the new slots immediately afterward.
+func (v *ScopedIntVector) Reserve(n uint32) error {
+	if e := v.open(); e != nil {
+		return e
+	}
+	if n <= uint32(len(v.data)) {
+		return nil
+	}
+	return v.Resize(n)
+}
+
 func (v *ScopedRationalVector) Resize(n uint32) error {
 	if e := v.open(); e != nil {
 		return e

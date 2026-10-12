@@ -155685,6 +155685,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/numeral/scoped_numeral.go",
+        "pkg/util/numeral/numeral_buffer_reserve_test.go",
         "pkg/math/euclid/numeral_buffer_sort.go",
         "pkg/math/euclid/numeral_buffer_sort_test.go",
         "pkg/math/euclid/addmul.go",
@@ -155700,6 +155701,7 @@
       ],
       "tests": [
         "TestEuclideanIntegerBufferSortAndRawSwap",
+        "TestIntegerNumeralBufferSourceReserveIndexesAndOwnsSlots",
         "TestEuclideanRationalBufferSortAndRawSwap",
         "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
         "TestEuclideanRationalAddmulMergedJustifications",
@@ -155726,11 +155728,12 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "concrete mpz buffers in euclidean_solver, linear_equation, bound_propagator and theory_arith_int: indexed mutable numeral, deep-copy push, ascending reset, borrowed c_ptr and raw-vector swap",
+          "name": "concrete mpz buffers in euclidean_solver, linear_equation, bound_propagator and theory_arith_int: indexed mutable numeral, deep-copy push, source logical-size reserve, ascending reset, borrowed c_ptr and raw-vector swap",
           "status": "partial",
           "go_target": "pkg/util/numeral/scoped_numeral.go",
           "tests": [
             "TestEuclideanIntegerBufferSortAndRawSwap",
+            "TestIntegerNumeralBufferSourceReserveIndexesAndOwnsSlots",
             "TestEuclideanSetupVariableJustificationAndEquationOwnership"
           ]
         },
@@ -155748,7 +155751,7 @@
         "The buffer borrows its numeral manager and owns a manager-copy of each appended mpz/mpq value. Pop destroys the last value; reset and the destructor destroy values in ascending slot order. swap(svector&) transfers raw numeral storage in both directions, so the receiving owner must later delete its acquired numeral payloads. c_ptr and indexed access borrow mutable slots and become stale after slice growth or swap."
       ],
       "deviations": [
-        "No generic Go numeral-buffer adapter is retained. Concrete typed scoped numeral vectors now expose borrowed indexed/c_ptr-style views and raw-slice storage swaps; Euclidean sorting and the integer/rational addmul row merges use them within a partial solver owner. Other arithmetic tactic and SMT consumers remain open."
+        "No generic Go numeral-buffer adapter is retained. Concrete typed scoped numeral vectors expose borrowed indexed/c_ptr-style views and raw-slice storage swaps; Euclidean sorting and the integer/rational addmul row merges use them. The reached linear_equation mpz reserve is size growth, not Go capacity-only growth, and now has a concrete typed method; the linear_equation, other arithmetic tactic and SMT consumers remain open."
       ]
     },
     {
