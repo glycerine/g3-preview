@@ -11372,5 +11372,32 @@
     "full_native_checkpoint_excludes_debug_only_scenarios": true,
     "evidence": "/mnt/oldrog/tmp/g3-lu-parent-driver-debug.cover",
     "remaining": "Full top-level test CLI dispatch/entry and other scenarios; whole retained-source/consumer/ownership audits."
+  },
+  "running_full_native_checkpoint": {
+    "status": "running",
+    "commit": "c32fb569",
+    "started_utc": "2026-10-12 00:55:56 UTC",
+    "runner_pid": 2,
+    "command": [
+      "go",
+      "-C",
+      "pkg",
+      "test",
+      "-json",
+      "./...",
+      "-timeout=60m",
+      "-count=1",
+      "-coverprofile=/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.cover"
+    ],
+    "log": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.log",
+    "event_log": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.events.jsonl",
+    "profile": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.cover",
+    "status_file": "/mnt/oldrog/tmp/g3-lp-column-lifetime-module-native.json",
+    "go_pid": 4,
+    "actual_exec_session": 40124,
+    "coverage_credit": "none until actual terminal exit and profile inspection",
+    "includes": "native exact column copied-left lifetime fix and native iterator/column/settings alias/lifetime tests",
+    "excludes": "all g3debug-only LU scenarios and diagnostics",
+    "cache_cleanup": "/mnt/oldrog/tmp/g3-lp-column-lifetime-cache-cleanup.json"
   }
 }
