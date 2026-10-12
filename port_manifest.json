@@ -164852,7 +164852,7 @@
       "path": "src/util/trace.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "unported",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -164883,26 +164883,17 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [
-        {
-          "name": "Caller-bound trace tags: lazy table, enable/disable/all, short-circuit query and finalize",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        }
-      ],
-      "ownership": [
-        "TraceContext owns immutable Go string keys in a built-in map; it does not retain caller byte storage."
-      ],
+      "methods": [],
+      "ownership": [],
       "deviations": [
-        "Explicit caller-bound single-lane service; _TRACE output stream and macro wiring remain open. Go strings and a built-in map replace borrowed char pointers and the C++ hashtable. The enable-all flag survives finalization."
+        "The earlier caller-bound Go TraceContext and tests were deleted in 589e99f8 with the unconsumed diagnostic process graph. No current Go implementation covers trace tags, explicit trace controls, or the enabled trace output profile. Resolve retained source controls and trace consumers when their Go callers are ported."
       ]
     },
     {
       "path": "src/util/trace.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "unported",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -164945,19 +164936,10 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [
-        {
-          "name": "Caller-bound trace tags: lazy table, enable/disable/all, short-circuit query and finalize",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        }
-      ],
-      "ownership": [
-        "TraceContext owns immutable Go string keys in a built-in map; it does not retain caller byte storage."
-      ],
+      "methods": [],
+      "ownership": [],
       "deviations": [
-        "Explicit caller-bound single-lane service; _TRACE output stream and macro wiring remain open. Go strings and a built-in map replace borrowed char pointers and the C++ hashtable. The enable-all flag survives finalization."
+        "The earlier caller-bound Go TraceContext and tests were deleted in 589e99f8 with the unconsumed diagnostic process graph. No current Go implementation covers trace tags, explicit trace controls, or the enabled trace output profile. Resolve retained source controls and trace consumers when their Go callers are ported."
       ]
     },
     {
@@ -166748,7 +166730,7 @@
       "path": "src/util/warning.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "unported",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -166799,34 +166781,17 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [
-        {
-          "name": "format2ostream selected Linux integer/C-string profiles, source vector growth, truncation/fallback and retry",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "util_warning concrete reached source counterpart (warning.cpp:63-169)",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        }
-      ],
-      "ownership": [
-        "Per-call concrete byte-vector scratch charges actual source capacities and old/new peaks; cold owner header charged, temporary arrays refunded on success/error/panic. Explicit arguments borrowed synchronously; only final caller string escapes. See PORT_PROGRESS.md#audit-printf-port-status-md.",
-        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
-      ],
+      "methods": [],
+      "ownership": [],
       "deviations": [
-        "Go explicit tagged argument list replaces va_list; Linux/glibc C-locale integer/string subset implemented. Floating/wide/locale/positional/pointer/count-write formats, Windows CRT state and warning I/O/global behavior remain open. NonWindows32 persistent backend errors terminate with typed failure; original loop would retry forever.",
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Earlier Go util_printf and util_warning translations and their tests were deleted in 589e99f8 because the diagnostic process graph had no Go consumer. No current production Go implementation or tests cover this unit; retained source warning call sites still need native behavior when their consumers are ported. Use Go formatting and io.Writer facilities rather than C varargs or standard-stream internals."
       ]
     },
     {
       "path": "src/util/warning.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "unported",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -166841,19 +166806,10 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [
-        {
-          "name": "format2ostream selected Linux integer/C-string profiles, source vector growth, truncation/fallback and retry",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        }
-      ],
-      "ownership": [
-        "Per-call concrete byte-vector scratch charges actual source capacities and old/new peaks; cold owner header charged, temporary arrays refunded on success/error/panic. Explicit arguments borrowed synchronously; only final caller string escapes. See PORT_PROGRESS.md#audit-printf-port-status-md."
-      ],
+      "methods": [],
+      "ownership": [],
       "deviations": [
-        "Go explicit tagged argument list replaces va_list; Linux/glibc C-locale integer/string subset implemented. Floating/wide/locale/positional/pointer/count-write formats, Windows CRT state and warning I/O/global behavior remain open. NonWindows32 persistent backend errors terminate with typed failure; original loop would retry forever."
+        "Earlier Go util_printf and util_warning translations and their tests were deleted in 589e99f8 because the diagnostic process graph had no Go consumer. No current production Go implementation or tests cover this unit; retained source warning call sites still need native behavior when their consumers are ported. Use Go formatting and io.Writer facilities rather than C varargs or standard-stream internals."
       ]
     },
     {
