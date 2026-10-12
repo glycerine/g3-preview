@@ -155,7 +155,6 @@ func TestLPExactEtaIndependentMatrixProducts(t *testing.T) {
 func TestLPExactEtaConjugationAndElements(t *testing.T) {
 	h := newLPPairHarness(t)
 	p := h.pair("3/7", "-2/11")
-	out := h.pair("0", "0")
 	for _, values := range lpPermutations(4) {
 		e := NewRationalEtaMatrix(h.m, 1, 4)
 		ok, err := e.SetDiagonal(&p.X)
@@ -172,13 +171,19 @@ func TestLPExactEtaConjugationAndElements(t *testing.T) {
 		old[1][1] = big.NewRat(7, 3)
 		old[3][1] = big.NewRat(-2, 11)
 		old[0][1] = big.NewRat(3, 7)
-		for i := uint32(0); i < 4; i++ {
-			for j := uint32(0); j < 4; j++ {
-				h.must(e.Element(i, j, &out.X))
-				lpCheckExactPermutationCoordinate(t, h, &out.X, old[values[i]][values[j]])
+		// Apply the conjugated matrix to each basis vector. The independent
+		// matrix oracle checks every column through the retained operation.
+		for j := 0; j < 4; j++ {
+			in := []*big.Rat{new(big.Rat), new(big.Rat), new(big.Rat), new(big.Rat)}
+			in[j].SetInt64(1)
+			w := lpExactVectorFromOracle(h, in)
+			h.must(e.ApplyLeft(w.Data))
+			for i := 0; i < 4; i++ {
+				lpCheckExactPermutationCoordinate(t, h, &w.Data[i], old[values[i]][values[j]])
 			}
+			h.must(w.Close())
 		}
-		if e.ColumnIndex() != perm.reverse[1] || e.RowCount() != 4 || e.ColumnCount() != 4 || e.IsDense() {
+		if e.ColumnIndex() != perm.reverse[1] || e.IsDense() {
 			t.Fatal("metadata")
 		}
 		h.must(e.Close())
@@ -196,18 +201,8 @@ func TestLPExactEtaLiteralSparseAndBoundsPrefixes(t *testing.T) {
 	if !ok {
 		t.Fatal(ok)
 	}
-	unit, err := e.IsUnit()
-	h.must(err)
-	if !unit {
-		t.Fatal("identity")
-	}
 	h.must(e.Append(1, &p.Y))
 	h.must(e.Append(1, &p.X))
-	unit, err = e.IsUnit()
-	h.must(err)
-	if unit {
-		t.Fatal("literal duplicate entries omitted")
-	}
 	w := lpExactVectorFromOracle(h, []*big.Rat{big.NewRat(1, 1), big.NewRat(1, 1), big.NewRat(0, 1)})
 	t.Cleanup(func() { h.must(w.Close()) })
 	h.must(e.ApplyLeftToT(w, nil))
@@ -215,8 +210,6 @@ func TestLPExactEtaLiteralSparseAndBoundsPrefixes(t *testing.T) {
 		t.Fatal("cancel then append index order", w.Index)
 	}
 	lpCheckExactSparse(t, h, w, []*big.Rat{big.NewRat(1, 1), big.NewRat(1, 1), new(big.Rat)})
-	h.must(e.Element(1, 0, &p.Y))
-	lpCheckExactPermutationCoordinate(t, h, &p.Y, big.NewRat(-1, 1))
 	h.must(e.DivideByDiagonal())
 	// Dense right publishes only at the end, whereas sparse right mutates
 	// the pivot first. Bounds errors preserve those distinct valid prefixes.
@@ -233,111 +226,113 @@ func TestLPExactEtaLiteralSparseAndBoundsPrefixes(t *testing.T) {
 }
 
 func TestLPExactEtaAllocationFailureCensus(t *testing.T) {
-	for _, op := range []string{"set", "append", "divide-column", "left", "right", "sparse-left", "sparse-right", "pair-left", "element", "left-large-pivot", "right-large-pivot", "sparse-left-large-pivot", "sparse-right-large-pivot", "pair-large-pivot", "sparse-left-zero-dest", "element-large-diagonal"} {
-		failures, successes := 0, 0
-		for ordinal := int64(0); ordinal < 150; ordinal++ {
-			done := false
-			t.Run(fmt.Sprintf("%s/%d", op, ordinal), func(t *testing.T) {
-				h := newLPPairHarness(t)
-				p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
-				small := h.pair("2", "3")
-				e := NewPairEtaMatrix(h.m, 0, 2)
-				_, err := e.SetDiagonal(&small.X)
-				h.must(err)
-				if op != "append" {
-					coefficient := &p.X
-					if strings.Contains(op, "large-pivot") {
-						coefficient = &small.Y
+	for _, direct := range []bool{false, true} {
+		for _, op := range []string{"set", "append", "divide-column", "left", "right", "sparse-left", "sparse-right", "pair-left", "left-large-pivot", "right-large-pivot", "sparse-left-large-pivot", "sparse-right-large-pivot", "pair-large-pivot", "sparse-left-zero-dest"} {
+			failures, successes := 0, 0
+			for ordinal := int64(0); ordinal < 150; ordinal++ {
+				done := false
+				t.Run(fmt.Sprintf("direct=%t/%s/%d", direct, op, ordinal), func(t *testing.T) {
+					var h *lpPairHarness
+					if direct {
+						h = lpNewDirectSparseHarness(t)
+					} else {
+						h = newLPPairHarness(t)
 					}
-					h.must(e.Append(1, coefficient))
-				}
-				if op == "element-large-diagonal" {
-					_, err = e.SetDiagonal(&p.X)
+					p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
+					small := h.pair("2", "3")
+					e := NewPairEtaMatrix(h.m, 0, 2)
+					_, err := e.SetDiagonal(&small.X)
 					h.must(err)
-				}
-				w := NewIndexedRationalVector(h.m, 2)
-				pw := NewIndexedPairVector(h.m, 2)
-				for i := range w.Data {
-					h.must(w.copySlot(&w.Data[i], &small.X))
-					h.must(pw.copySlot(&pw.Data[i], small))
-				}
-				w.Index = []uint32{1, 0}
-				if strings.Contains(op, "large-pivot") {
-					h.must(w.copySlot(&w.Data[0], &p.X))
-					h.must(pw.copySlot(&pw.Data[0], p))
-				}
-				if op == "sparse-left-zero-dest" {
-					z := numeral.NewRational()
-					h.must(w.copySlot(&w.Data[1], &z))
-					w.Index = []uint32{0}
-				}
-				h.budget.FailAfter(ordinal)
-				switch op {
-				case "set":
-					_, err = e.SetDiagonal(&p.X)
-				case "append":
-					err = e.Append(1, &p.X)
-				case "divide-column":
-					err = e.DivideByDiagonal()
-				case "left", "left-large-pivot":
-					err = e.RationalEtaMatrix.ApplyLeft(w.Data)
-				case "right", "right-large-pivot":
-					err = e.ApplyRight(w.Data)
-				case "sparse-left", "sparse-left-large-pivot", "sparse-left-zero-dest":
-					err = e.ApplyLeftToT(w, nil)
-				case "sparse-right", "sparse-right-large-pivot":
-					err = e.ApplyRightIndexed(w)
-				case "pair-left", "pair-large-pivot":
-					err = e.ApplyLeft(pw.Data)
-				case "element", "element-large-diagonal":
-					err = e.Element(0, 0, &w.Data[0])
-				}
-				h.budget.FailAfter(-1)
-				if err == nil {
-					lpExactEtaCheckFaultSuccess(t, h, op, e, w, pw, p)
-					successes++
-					done = true
-				} else {
-					if !lpExactPriorityPhysicalRefusal(err) {
-						t.Fatal(err)
+					if op != "append" {
+						coefficient := &p.X
+						if strings.Contains(op, "large-pivot") {
+							coefficient = &small.Y
+						}
+						h.must(e.Append(1, coefficient))
 					}
-					failures++
+					w := NewIndexedRationalVector(h.m, 2)
+					pw := NewIndexedPairVector(h.m, 2)
+					for i := range w.Data {
+						h.must(w.copySlot(&w.Data[i], &small.X))
+						h.must(pw.copySlot(&pw.Data[i], small))
+					}
+					w.Index = []uint32{1, 0}
+					if strings.Contains(op, "large-pivot") {
+						h.must(w.copySlot(&w.Data[0], &p.X))
+						h.must(pw.copySlot(&pw.Data[0], p))
+					}
+					if op == "sparse-left-zero-dest" {
+						z := numeral.NewRational()
+						h.must(w.copySlot(&w.Data[1], &z))
+						w.Index = []uint32{0}
+					}
+					h.budget.FailAfter(ordinal)
+					switch op {
+					case "set":
+						_, err = e.SetDiagonal(&p.X)
+					case "append":
+						err = e.Append(1, &p.X)
+					case "divide-column":
+						err = e.DivideByDiagonal()
+					case "left", "left-large-pivot":
+						err = e.RationalEtaMatrix.ApplyLeft(w.Data)
+					case "right", "right-large-pivot":
+						err = e.ApplyRight(w.Data)
+					case "sparse-left", "sparse-left-large-pivot", "sparse-left-zero-dest":
+						err = e.ApplyLeftToT(w, nil)
+					case "sparse-right", "sparse-right-large-pivot":
+						err = e.ApplyRightIndexed(w)
+					case "pair-left", "pair-large-pivot":
+						err = e.ApplyLeft(pw.Data)
+
+					}
+					h.budget.FailAfter(-1)
+					if err == nil {
+						lpExactEtaCheckFaultSuccess(t, h, op, e, w, pw, p)
+						successes++
+						done = true
+					} else {
+						if !lpExactPriorityPhysicalRefusal(err) {
+							t.Fatal(err)
+						}
+						failures++
+					}
+					if e.ready() != nil {
+						if er := e.ApplyRight(w.Data); er != ErrExactVectorPending {
+							t.Fatal(er)
+						}
+						if er := e.ApplyLeft(pw.Data); er != ErrExactVectorPending {
+							t.Fatal(er)
+						}
+						if er := e.Append(1, &small.X); er != ErrExactVectorPending {
+							t.Fatal(er)
+						}
+						if _, er := e.SetDiagonal(&small.X); er != ErrExactVectorPending {
+							t.Fatal(er)
+						}
+						if er := e.DivideByDiagonal(); er != ErrExactVectorPending {
+							t.Fatal(er)
+						}
+					}
+					h.must(e.Close())
+					h.must(e.Close())
+					h.must(w.Close())
+					h.must(pw.Close())
+					lpExactVectorNamedCensus(t, h, nil)
+					if h.m.DivisionInvocationState().Active || h.m.RawInvocationState().Active != [3]bool{} || h.m.Z.DivisionRaw.Active || h.m.Z.GcdRaw.Active {
+						t.Fatal("orphan raw frame")
+					}
+				})
+				if done {
+					break
 				}
-				if e.ready() != nil {
-					if er := e.ApplyRight(w.Data); er != ErrExactVectorPending {
-						t.Fatal(er)
-					}
-					if er := e.ApplyLeft(pw.Data); er != ErrExactVectorPending {
-						t.Fatal(er)
-					}
-					if er := e.Append(1, &small.X); er != ErrExactVectorPending {
-						t.Fatal(er)
-					}
-					if _, er := e.SetDiagonal(&small.X); er != ErrExactVectorPending {
-						t.Fatal(er)
-					}
-					if er := e.DivideByDiagonal(); er != ErrExactVectorPending {
-						t.Fatal(er)
-					}
-				}
-				h.must(e.Close())
-				h.must(e.Close())
-				h.must(w.Close())
-				h.must(pw.Close())
-				lpExactVectorNamedCensus(t, h, nil)
-				if h.m.DivisionInvocationState().Active || h.m.RawInvocationState().Active != [3]bool{} || h.m.Z.DivisionRaw.Active || h.m.Z.GcdRaw.Active {
-					t.Fatal("orphan raw frame")
-				}
-			})
-			if done {
-				break
 			}
-		}
-		if successes != 1 {
-			t.Fatal(op, "no success", failures)
-		}
-		if op != "element" && failures == 0 {
-			t.Fatal(op, "no actual refusal")
+			if successes != 1 {
+				t.Fatal(op, "no success", failures)
+			}
+			if failures == 0 {
+				t.Fatal(op, "no actual refusal")
+			}
 		}
 	}
 }
@@ -481,9 +476,6 @@ func TestLPExactEtaReachedGuardsAndConjugationPrefixes(t *testing.T) {
 			if err = e.Conjugate(NewPermutation(2)); err != ErrExactVectorPending {
 				t.Fatal(err)
 			}
-			if err = e.Element(0, 0, &v.Y); err != ErrExactVectorPending {
-				t.Fatal(err)
-			}
 			if err = e.ApplyLeftToT(w, nil); err != ErrExactVectorPending {
 				t.Fatal(err)
 			}
@@ -496,11 +488,6 @@ func TestLPExactEtaReachedGuardsAndConjugationPrefixes(t *testing.T) {
 		}
 	}
 	e := NewRationalEtaMatrix(h.m, 0, 2)
-	unit, err := e.IsUnit()
-	h.must(err)
-	if unit {
-		t.Fatal("default rational diagonal is zero")
-	}
 	ok, err := e.SetDiagonal(&v.Y)
 	h.must(err)
 	if ok {
@@ -668,12 +655,6 @@ func lpExactEtaCheckFaultSuccess(t *testing.T, h *lpPairHarness, op string, e *P
 		return
 	case "divide-column":
 		lpCheckExactPermutationCoordinate(t, h, &e.Column.Data[0].Value, new(big.Rat).Quo(px, big.NewRat(2, 1)))
-		return
-	case "element":
-		lpCheckExactPermutationCoordinate(t, h, &w.Data[0], big.NewRat(1, 2))
-		return
-	case "element-large-diagonal":
-		lpCheckExactPermutationCoordinate(t, h, &w.Data[0], new(big.Rat).Inv(px))
 		return
 	}
 	matrix := lpExactIdentity(2)

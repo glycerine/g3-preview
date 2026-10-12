@@ -7,21 +7,19 @@ import "github.com/glycerine/g3/pkg/util/numeral"
 // borrowed manager. Caller vectors retain their completed and partial updates.
 // A stopped application is closed before further mutation. Do not shallow-copy.
 type RationalEtaMatrix struct {
-	length, column uint32
-	Column         *SparseRationalVector
-	Diagonal       numeral.Rational
-	manager        *numeral.RationalManager
-	calls          exactEtaCalls
-	work           *IndexedRationalVector
+	column   uint32
+	Column   *SparseRationalVector
+	Diagonal numeral.Rational
+	manager  *numeral.RationalManager
+	calls    exactEtaCalls
+	work     *IndexedRationalVector
 }
 
-func NewRationalEtaMatrix(m *numeral.RationalManager, column, length uint32) *RationalEtaMatrix {
-	return &RationalEtaMatrix{length: length, column: column, manager: m, Column: NewSparseRationalVector(m), Diagonal: numeral.NewRational()}
+func NewRationalEtaMatrix(m *numeral.RationalManager, column, _ uint32) *RationalEtaMatrix {
+	return &RationalEtaMatrix{column: column, manager: m, Column: NewSparseRationalVector(m), Diagonal: numeral.NewRational()}
 }
 func (m *RationalEtaMatrix) IsDense() bool       { return false }
 func (m *RationalEtaMatrix) ColumnIndex() uint32 { return m.column }
-func (m *RationalEtaMatrix) RowCount() uint32    { return m.length }
-func (m *RationalEtaMatrix) ColumnCount() uint32 { return m.length }
 func (m *RationalEtaMatrix) ready() error {
 	if m.work != nil || m.calls.pending() {
 		return ErrExactVectorPending
@@ -48,14 +46,7 @@ func (m *RationalEtaMatrix) finishWork(b exactEtaBefore, err *error) {
 		}
 	}
 }
-func (m *RationalEtaMatrix) IsUnit() (bool, error) {
-	if m.Column.Size() != 0 {
-		return false, nil
-	}
-	one := numeral.NewRational()
-	one.Num = numeral.NewInt(1)
-	return m.manager.Equal(&m.Diagonal, &one)
-}
+
 func (m *RationalEtaMatrix) SetDiagonal(value *numeral.Rational) (ok bool, err error) {
 	b, err := m.beginWork(0)
 	if err != nil {
@@ -98,27 +89,7 @@ func (m *RationalEtaMatrix) DivideByDiagonal() error {
 	}
 	return m.Column.Divide(&m.Diagonal)
 }
-func (m *RationalEtaMatrix) Element(i, j uint32, out *numeral.Rational) (err error) {
-	if err = m.ready(); err != nil {
-		return err
-	}
-	if j == m.column && i != j {
-		return m.Column.At(i, out)
-	}
-	b, err := m.beginWork(1)
-	if err != nil {
-		return err
-	}
-	defer m.finishWork(b, &err)
-	value := numeral.NewRational()
-	if i == j {
-		value.Num = numeral.NewInt(1)
-	}
-	if j == m.column {
-		return etaRationalQuotient(m.manager, &m.work.Data[0], out, &value, &m.Diagonal)
-	}
-	return m.manager.Copy(out, &value)
-}
+
 func (m *RationalEtaMatrix) ApplyLeft(w []numeral.Rational) (err error) {
 	b, err := m.beginWork(2)
 	if err != nil {
@@ -240,6 +211,12 @@ func (m *RationalEtaMatrix) ApplyLeftToT(w *IndexedRationalVector, _ *Settings) 
 		if err = m.manager.Copy(value, dst); err != nil {
 			return err
 		}
+		// The RHS product dies at the end of the L v initialization,
+		// before the drop test; v itself lives through the branch below.
+		if err = m.manager.Del(product); err != nil {
+			return err
+		}
+		*product = numeral.NewRational()
 		zero, err = m.manager.IsZero(value)
 		if err != nil {
 			return err
@@ -259,10 +236,6 @@ func (m *RationalEtaMatrix) ApplyLeftToT(w *IndexedRationalVector, _ *Settings) 
 			return err
 		}
 		*value = numeral.NewRational()
-		if err = m.manager.Del(product); err != nil {
-			return err
-		}
-		*product = numeral.NewRational()
 	}
 	return nil
 }

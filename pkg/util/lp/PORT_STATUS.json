@@ -792,6 +792,24 @@
         "TestLPExactEtaReachedGuardsAndConjugationPrefixes",
         "TestLPExactEtaStoppedDestinationOwnership",
         "TestLPExactEtaLeavesOlderDivisionOwned"
+      ],
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "eta_matrix::is_unit"
+          ],
+          "reason": "Definition only in whole-src/LP driver search; removed floating/exact Go adapters and mirror assertions."
+        },
+        {
+          "source_methods": [
+            "exact eta_matrix::get_elem",
+            "exact debug row_count/column_count/dimension storage"
+          ],
+          "reason": "No retained exact debug matrix root; explicit instances alone are not roots. Removed exact Go adapters; conjugation tests now exercise retained ApplyLeft on all basis vectors against an independent permuted matrix oracle."
+        }
+      ],
+      "ownership": [
+        "Exact eta sparse-left multiplication temporary now dies after L v initialization and before drop test, matching source full-expression lifetime. Removed unused unit predicate and exact debug matrix adapters; concrete test fixtures exercise retained applications."
       ]
     },
     {
@@ -817,6 +835,24 @@
         "TestLPExactEtaReachedGuardsAndConjugationPrefixes",
         "TestLPExactEtaStoppedDestinationOwnership",
         "TestLPExactEtaLeavesOlderDivisionOwned"
+      ],
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "eta_matrix::is_unit"
+          ],
+          "reason": "Definition only in whole-src/LP driver search; removed floating/exact Go adapters and mirror assertions."
+        },
+        {
+          "source_methods": [
+            "exact eta_matrix::get_elem",
+            "exact debug row_count/column_count/dimension storage"
+          ],
+          "reason": "No retained exact debug matrix root; explicit instances alone are not roots. Removed exact Go adapters; conjugation tests now exercise retained ApplyLeft on all basis vectors against an independent permuted matrix oracle."
+        }
+      ],
+      "ownership": [
+        "Exact eta sparse-left multiplication temporary now dies after L v initialization and before drop test, matching source full-expression lifetime. Removed unused unit predicate and exact debug matrix adapters; concrete test fixtures exercise retained applications."
       ]
     },
     {
@@ -842,6 +878,24 @@
         "TestLPExactEtaReachedGuardsAndConjugationPrefixes",
         "TestLPExactEtaStoppedDestinationOwnership",
         "TestLPExactEtaLeavesOlderDivisionOwned"
+      ],
+      "retained_source_exclusions": [
+        {
+          "source_methods": [
+            "eta_matrix::is_unit"
+          ],
+          "reason": "Definition only in whole-src/LP driver search; removed floating/exact Go adapters and mirror assertions."
+        },
+        {
+          "source_methods": [
+            "exact eta_matrix::get_elem",
+            "exact debug row_count/column_count/dimension storage"
+          ],
+          "reason": "No retained exact debug matrix root; explicit instances alone are not roots. Removed exact Go adapters; conjugation tests now exercise retained ApplyLeft on all basis vectors against an independent permuted matrix oracle."
+        }
+      ],
+      "ownership": [
+        "Exact eta sparse-left multiplication temporary now dies after L v initialization and before drop test, matching source full-expression lifetime. Removed unused unit predicate and exact debug matrix adapters; concrete test fixtures exercise retained applications."
       ]
     },
     {
@@ -13677,5 +13731,56 @@
       "/mnt/oldrog/tmp/g3-lp-permutation-final-debug.cover"
     ],
     "verification": "Both LP vets and source portcheck pass; 2103 units/677 APIs,114 ported/326 partial/1620 unported/5 dead_deleted. Previous 29cb5a7d all64package native/combined compile gates cover unchanged production implementation."
+  },
+  "latest_eta_retained_lifetime_increment": {
+    "scope": "Exact eta sparse-left multiplication temporary now dies after L v initialization and before drop test, matching source full-expression lifetime. Removed unused unit predicate and exact debug matrix adapters; concrete test fixtures exercise retained applications.",
+    "source": "src/util/lp/eta_matrix.hpp:46-56",
+    "source_audit": "/mnt/oldrog/tmp/g3-lp-eta-consumers-audit.txt",
+    "fault_campaigns": 28,
+    "allocation_profiles": [
+      "pooled",
+      "direct"
+    ],
+    "checks": "Fourteen retained operations in each allocation profile walk real physical refusals through first success, check independent endpoint values, pending-owner guards, exact numerical roots and absence of orphan raw frames. Conjugation uses all 24 permutations and four basis products.",
+    "whole_unit_status": "partial",
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 9,
+    "full_suite_qualification": "Latest full native8f2961ca predates recent corrections; no current full-suite coverage claim.",
+    "focused_native_seconds": 48.436,
+    "focused_combined_seconds": 56.193,
+    "whole_go_file_focused_covered_total": {
+      "native": {
+        "eta_matrix_exact.go": [
+          225,
+          253
+        ],
+        "eta_matrix_float.go": [
+          87,
+          88
+        ]
+      },
+      "debug": {
+        "eta_matrix_exact.go": [
+          226,
+          253
+        ],
+        "eta_matrix_float.go": [
+          88,
+          88
+        ]
+      }
+    },
+    "profiles": [
+      "/mnt/oldrog/tmp/g3-lp-eta-retained-native.cover",
+      "/mnt/oldrog/tmp/g3-lp-eta-retained-debug.cover"
+    ],
+    "remaining_work": "Whole eta owner/member cleanup order and remaining live method/consumer audit; no whole-unit promotion.",
+    "additional_source_evidence": [
+      "/mnt/oldrog/tmp/g3-lp-eta-consumer-files-all-src.txt",
+      "/mnt/oldrog/tmp/g3-lp-eta-is-unit-all-src.txt"
+    ],
+    "consumer_tests_native_seconds": 8.933,
+    "consumer_tests_combined_seconds": 11.152,
+    "verification": "Both LP vets, all64package native/combined compile gates and source portcheck pass (2103units/677APIs,114ported/326partial/1620unported/5dead_deleted)."
   }
 }

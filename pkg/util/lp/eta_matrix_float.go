@@ -14,7 +14,6 @@ func NewFloatEtaMatrix(column, length uint32) *FloatEtaMatrix {
 	return &FloatEtaMatrix{column: column, length: length}
 }
 func (m *FloatEtaMatrix) IsDense() bool       { return false }
-func (m *FloatEtaMatrix) IsUnit() bool        { return m.Column.Size() == 0 && m.Diagonal == 1 }
 func (m *FloatEtaMatrix) ColumnIndex() uint32 { return m.column }
 func (m *FloatEtaMatrix) SetDiagonal(value float64) bool {
 	m.Diagonal = value

@@ -117,7 +117,7 @@ func TestLPSparseEtaConstructionIndependentOracle(t *testing.T) {
 					t.Fatal("unit column allocated eta")
 				}
 			} else {
-				if eta == nil || feta == nil || eta.ColumnIndex() != j || eta.RowCount() != n || feta.RowCount() != n || len(eta.Column.Data) != len(expected) || len(feta.Column.Data) != len(expected) {
+				if eta == nil || feta == nil || eta.ColumnIndex() != j || feta.RowCount() != n || len(eta.Column.Data) != len(expected) || len(feta.Column.Data) != len(expected) {
 					t.Fatal("eta shape")
 				}
 				lpSparseRationalCheck(t, h, &eta.Diagonal, diagonal)

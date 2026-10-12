@@ -254,10 +254,10 @@ func TestLPSparseFloatVectorAndEtaLiteralStorage(t *testing.T) {
 		t.Fatal(v.Data)
 	}
 	eta := NewFloatEtaMatrix(1, 3)
-	if eta.IsUnit() || !eta.SetDiagonal(1) || !eta.IsUnit() {
-		t.Fatal("source unit predicate")
+	if !eta.SetDiagonal(1) {
+		t.Fatal("diagonal assignment")
 	}
-	if err := eta.Append(2, 0); err != nil || eta.IsUnit() {
+	if err := eta.Append(2, 0); err != nil || eta.Column.Size() != 1 {
 		t.Fatal(err, eta)
 	}
 	if !eta.SetDiagonal(2) {
