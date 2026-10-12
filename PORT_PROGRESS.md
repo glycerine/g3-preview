@@ -39587,3 +39587,20 @@ ported in `util.h/.cpp`. The default `std::cerr` binding and process-global
 setter/getter wiring belong to the still-unported shell and command-context
 consumers and remain separate unported method rows. No unused global Go
 adapter is introduced; both source units remain partial.
+
+### LP diagnostic regression recheck
+
+The eight LP diagnostic groups previously reported failing remotely now pass
+in this worktree in both native and `g3debug,g3checked` profiles on CPUs
+8–16: pair/rational column-info splitting and refusals, pair/rational cost
+validator closed-output and debug guards, rational feasibility diagnostics,
+pair core residual output, rational core residual pivot guards, and LAR scope
+validator stopped/closed-output guards. The focused command selected those
+eight named groups with `-count=1`; it is not a full LP or full-module pass.
+No production correction was needed for these observed test results.
+
+The remaining `symbol.h` ostream row is still partial. Its retained SMT
+parameter call maps to `GlobalParamsService.AppendSymbolTo`; null, borrowed
+string and signed numerical formatting have focused coverage. Marked-symbol
+assertion transport and complete source output-failure behavior remain open,
+so no further completion credit follows from this recheck.
