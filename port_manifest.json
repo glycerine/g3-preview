@@ -130671,7 +130671,11 @@
         "TestLPDebugMatrixPrintConcreteOverloads",
         "TestLPDebugMatrixPrintEveryByteAndFlush",
         "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
-        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
+        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots",
+        "TestLPSettingsBorrowedLimitAndContinuingDefaultTimer",
+        "TestLPSettingsIndependentRandomOwnersAndReseeding",
+        "TestLPSettingsAllToleranceFieldsRemainLive",
+        "TestLPSettingsDefaultTimerRestartFailureRetainsElapsed"
       ],
       "conditionals": [
         {
@@ -130715,7 +130719,11 @@
           "go_target": "pkg/util/lp/settings.go",
           "tests": [
             "TestLPSettingsDefaultsAndServices",
-            "TestLPSettingsFloatToleranceEdges"
+            "TestLPSettingsFloatToleranceEdges",
+            "TestLPSettingsBorrowedLimitAndContinuingDefaultTimer",
+            "TestLPSettingsIndependentRandomOwnersAndReseeding",
+            "TestLPSettingsAllToleranceFieldsRemainLive",
+            "TestLPSettingsDefaultTimerRestartFailureRetainsElapsed"
           ]
         },
         {
@@ -130858,7 +130866,8 @@
         "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim.",
         "Settings owns concrete random state, stats and an existing source-backed Stopwatch; custom resource limits and io.Writer transports are borrowed. No OS stream/STL port or callback numerical algebra. NewSettings returns a partially initialized owner with an explicit host clock error if the real default stopwatch cannot start.",
         "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json.",
-        "Native Go string tables snapshot all numeric matrix cells before output. String-table printing borrows slice headers by value and rereads live cell strings after padding. Widths/temporary rows are native scalar/string storage, without numerical arena roots or C++ STL representations."
+        "Native Go string tables snapshot all numeric matrix cells before output. String-table printing borrows slice headers by value and rereads live cell strings after padding. Widths/temporary rows are native scalar/string storage, without numerical arena roots or C++ STL representations.",
+        "Settings default timer continues while a borrowed resource provider is selected; provider replacement observes live state and transports its bool/error without clock reads. Returning to the Go nil-selected default does not restart its watch. Running queries stop/start; restart failure preserves stopped elapsed prefix. Independent settings objects own distinct RNG streams, reseeding one does not affect another."
       ],
       "deviations": [
         "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",

@@ -4048,7 +4048,18 @@
         "TestLPDebugMatrixPrintConcreteOverloads",
         "TestLPDebugMatrixPrintEveryByteAndFlush",
         "TestLPDebugMatrixPrintMalformedAndGetterPrefixes",
-        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots"
+        "TestLPDebugMatrixPrintLiveStringsAndNumericSnapshots",
+        "TestLPSettingsBorrowedLimitAndContinuingDefaultTimer",
+        "TestLPSettingsIndependentRandomOwnersAndReseeding",
+        "TestLPSettingsAllToleranceFieldsRemainLive",
+        "TestLPSettingsDefaultTimerRestartFailureRetainsElapsed"
+      ],
+      "ownership": [
+        "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim.",
+        "Settings owns concrete random state, stats and an existing source-backed Stopwatch; custom resource limits and io.Writer transports are borrowed. No OS stream/STL port or callback numerical algebra. NewSettings returns a partially initialized owner with an explicit host clock error if the real default stopwatch cannot start.",
+        "Exact presolve captures only its new raw/numerical receipts. Column getters and fixed-setter children close before source pin and row-bound locals, then outer RHS/difference work. Erased input coefficients immediately destroy their numerical values; the input registry retains initialized zero bookkeeping. Default RHS ownership is valid while default relation remains indeterminate until a retained assignment. Older caller comparisons and foreign borrowed numerals are not adopted or destroyed. See latest_exact_presolve_increment in pkg/util/lp/PORT_STATUS.json.",
+        "Native Go string tables snapshot all numeric matrix cells before output. String-table printing borrows slice headers by value and rereads live cell strings after padding. Widths/temporary rows are native scalar/string storage, without numerical arena roots or C++ STL representations.",
+        "Settings default timer continues while a borrowed resource provider is selected; provider replacement observes live state and transports its bool/error without clock reads. Returning to the Go nil-selected default does not restart its watch. Running queries stop/start; restart failure preserves stopped elapsed prefix. Independent settings objects own distinct RNG streams, reseeding one does not affect another."
       ]
     },
     {
@@ -11256,5 +11267,40 @@
     },
     "evidence": "/mnt/oldrog/tmp/g3-lp-column-support-audit.txt",
     "full_native_checkpoint_excludes_expression_fix": true
+  },
+  "latest_settings_lifetime_increment": {
+    "coverage": {
+      "native": {
+        "settings.go": {
+          "covered": 26,
+          "statements": 27,
+          "percent": 96.3
+        },
+        "types.go": {
+          "covered": 32,
+          "statements": 32,
+          "percent": 100.0
+        }
+      },
+      "debug": {
+        "settings.go": {
+          "covered": 26,
+          "statements": 27,
+          "percent": 96.3
+        },
+        "types.go": {
+          "covered": 32,
+          "statements": 32,
+          "percent": 100.0
+        }
+      }
+    },
+    "focused_seconds": {
+      "native": 0.107,
+      "combined_debug_checked": 0.105
+    },
+    "source_unit_status": "lp_settings.h/.hpp remain partial; no whole-source completion credit",
+    "evidence": "/mnt/oldrog/tmp/g3-lp-settings-lifetime-audit.txt",
+    "full_native_checkpoint_excludes_new_tests": true
   }
 }
