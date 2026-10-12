@@ -173020,29 +173020,21 @@
     "coverage_qualification": "Whole-Go-file focus covers retained numerical paths; remaining exact returns guard invariant-protected bounds, stable delegated cleanup/check errors and unavailable precise zero-drop branches. Floating one native uncovered return is erased source assertion. Sparse helper extraction preserves standalone Close behavior; coefficients are deleted only by Close, not closeCall."
   },
   "pending_full_native_checkpoint": {
-    "revision": "3516687c",
-    "status": "timed_out",
-    "session_id": 44703,
-    "started_utc": "2026-10-12 05:44:50 UTC",
+    "revision": "55b06c96",
+    "status": "running",
+    "session_id": 64751,
+    "started_utc": "2026-10-12 10:47 UTC",
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "package_parallelism": 2,
-    "command": "go -C pkg test ./... -p 2 -count=1 -coverprofile=/mnt/oldrog/tmp/g3-lp-eta-module-native.cover -json",
+    "timeout": "30m per package",
+    "command": "go -C pkg test ./... -p 2 -count=1 -timeout=30m -coverprofile=/mnt/oldrog/tmp/g3-lp-indexed-module-native.cover -json",
     "artifacts": {
-      "json": "/mnt/oldrog/tmp/g3-lp-eta-module-native.json",
-      "stderr": "/mnt/oldrog/tmp/g3-lp-eta-module-native.log",
-      "coverage": "/mnt/oldrog/tmp/g3-lp-eta-module-native.cover"
+      "json": "/mnt/oldrog/tmp/g3-lp-indexed-module-native.json",
+      "stderr": "/mnt/oldrog/tmp/g3-lp-indexed-module-native.log",
+      "coverage": "/mnt/oldrog/tmp/g3-lp-indexed-module-native.cover"
     },
-    "cache_cleanup_record": "/mnt/oldrog/tmp/g3-lp-eta-full-native-cache-cleanup.json",
-    "qualification": "Incomplete run; no full-suite result or coverage credit. Revision3516687c predates row-eta/diagonal changes. Next full run needs explicit longer timeout. Last completed full checkpoint remains8f2961ca.",
-    "exit_code": 1,
-    "ended_utc": "2026-10-12 05:55:17 UTC",
-    "package_results": {
-      "pass": 62,
-      "skip": 1,
-      "fail": 1
-    },
-    "failure": "LP exceeded default Go10m test timeout; panic in TestLARScopeValidatorPhysicalOwnership/direct=false/row/1."
+    "qualification": "Package results are provisional until terminal exit0 and profile inspection. Revision55b06c96 includes completed diagonal/square-dense and indexed increment; subsequent source edits are outside this checkpoint. Previous completed full8f2961ca is still last successful checkpoint."
   },
   "latest_row_eta_support_audit": {
     "scope": "Whole retained row_eta_matrix source/ownership audit: actual double/double, mpq/mpq and mpq/impq constructors, non-dense tail, by-value append, dense X-left/T-right, indexed T-left/right and descending permutation conjugation are implemented. Source row_start is never read; exact debug views, local_to_X, invalid unused diagonal getter and compact print are excluded. Floating debug view is retained by actual LU matrix consumers. Source live dense row versus copied sparse-left accumulator, precise zero branches, empty-index behavior, strict floating drop tests, insertion/erase order, self/duplicate terms and reached invalid-domain prefixes remain literal. Corrected Close to unwind owned child sparse call locals, then row-eta lexical work, then stored row coefficients. Caller destination and older raw invocation generations remain independent. Removed unused exact debug matrix adapters; conjugation oracle uses all24permutations and four retained basis-vector ApplyLeft products. Removed dead lookup fault scenario and expanded fourteen retained fault campaigns to pooled/direct allocation (28total), preserving endpoint oracle, named roots, pending guards and index-before-result-copy refusal requirements. Stopped-destination/older-raw ownership checks also use both allocator modes. Containing sparse/dense/LU/CLI/SMT audits remain separate.",
