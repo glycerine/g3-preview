@@ -15,6 +15,8 @@ import (
 
 var ErrExprConverterUnsupported = errors.New("subpaving tactic: arithmetic expression conversion is not yet implemented")
 var ErrExprConverterNonSimplified = errors.New("you must apply simplifier before internalizing expressions into the subpaving module.")
+var ErrExprConverterPurifier = errors.New("you must apply arithmetic purifier before internalizing expressions into the subpaving module.")
+var ErrExprConverterTranscendental = errors.New("transcendental and hyperbolic functions are not supported yet.")
 var ErrExprConverterCanceled = errors.New(messages.Canceled)
 
 // HardwareExprConverter owns the source expr2var references created for
@@ -161,6 +163,12 @@ func (c *HardwareExprConverter) process(t ast.ASTHandle, numerator, denominator 
 					return 0, err
 				}
 				return c.process(arg, numerator, denominator)
+			case 7, 8: // OP_SUB, OP_UMINUS
+				return 0, ErrExprConverterNonSimplified
+			case 1, 10, 11, 12, 13, 15: // irrational numeral, div/idiv/rem/mod/to_int
+				return 0, ErrExprConverterPurifier
+			case 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30:
+				return 0, ErrExprConverterTranscendental
 			default:
 				return 0, ErrExprConverterUnsupported
 			}

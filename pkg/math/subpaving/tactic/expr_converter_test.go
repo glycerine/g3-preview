@@ -305,6 +305,49 @@ func TestHardwareExprConverterTerms(t *testing.T) {
 	if _, err := converter.InternalizeTerm(zeroPower, &n, &d); !errors.Is(err, ErrExprConverterUnsupported) {
 		t.Fatalf("zero-degree monomial still open: %v", err)
 	}
+	for _, tc := range []struct {
+		name string
+		op   int32
+		args []ast.ASTHandle
+		want error
+	}{
+		{"sub", 7, []ast.ASTHandle{x, x}, ErrExprConverterNonSimplified},
+		{"uminus", 7, []ast.ASTHandle{x}, ErrExprConverterNonSimplified},
+		{"div", 10, []ast.ASTHandle{y, y}, ErrExprConverterPurifier},
+		{"idiv", 11, []ast.ASTHandle{x, x}, ErrExprConverterPurifier},
+		{"rem", 12, []ast.ASTHandle{x, x}, ErrExprConverterPurifier},
+		{"mod", 13, []ast.ASTHandle{x, x}, ErrExprConverterPurifier},
+		{"to-int", 15, []ast.ASTHandle{y}, ErrExprConverterPurifier},
+		{"sin", 19, []ast.ASTHandle{y}, ErrExprConverterTranscendental},
+		{"cos", 20, []ast.ASTHandle{y}, ErrExprConverterTranscendental},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			h, err := m.MkFamilyApp(family, tc.op, nil, tc.args)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := qm.Z.SetInt32(&n, 7); err != nil {
+				t.Fatal(err)
+			}
+			if err := qm.Z.SetInt32(&d, 11); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := converter.InternalizeTerm(h, &n, &d); !errors.Is(err, tc.want) || err.Error() != tc.want.Error() {
+				t.Fatalf("source refusal: %v, want %v", err, tc.want)
+			}
+			gotN, err := qm.Z.String(&n)
+			if err != nil {
+				t.Fatal(err)
+			}
+			gotD, err := qm.Z.String(&d)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if gotN != "7" || gotD != "11" {
+				t.Fatalf("refusal mutated outputs: %s/%s", gotN, gotD)
+			}
+		})
+	}
 	beforeCancel := m.Limit.Count()
 	m.Limit.Cancel()
 	if _, err := converter.InternalizeTerm(add, &n, &d); !errors.Is(err, ErrExprConverterCanceled) || m.Limit.Count() != beforeCancel+1 {

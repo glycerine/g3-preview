@@ -52690,7 +52690,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache and AST cancellation checkpoint are implemented; zero-degree monomials, literal conversion and full tactic integration remain open."
+        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and the source arithmetic refusal categories are implemented; zero-degree monomials, literal conversion and full tactic integration remain open."
       ]
     },
     {
@@ -52720,7 +52720,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache and AST cancellation checkpoint are implemented; zero-degree monomials, literal conversion and full tactic integration remain open."
+        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and the source arithmetic refusal categories are implemented; zero-degree monomials, literal conversion and full tactic integration remain open."
       ]
     },
     {
