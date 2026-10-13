@@ -5,6 +5,8 @@ package numeral
 import (
 	"errors"
 	"math/big"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var (
@@ -23,6 +25,7 @@ type FixedPointManager struct {
 	fracBits              uint
 	scale, magnitudeLimit big.Int
 	roundUp               bool
+	trace                 *diagnostic.TraceTags
 	live                  uint32
 	closed                bool
 }
@@ -244,9 +247,21 @@ func (m *FixedPointManager) Add(a, b, out *FixedPoint) error {
 	if err := m.check(out); err != nil {
 		return err
 	}
+	m.traceFixedAddSubOuter(a, b, out, false, true)
+	inner := a.scaled.Sign() != 0 && b.scaled.Sign() != 0
+	if inner {
+		m.traceFixedAddSubInner(a, b, out, false, true)
+	}
 	var v big.Int
 	v.Add(&a.scaled, &b.scaled)
-	return m.publish(out, &v)
+	if err := m.publish(out, &v); err != nil {
+		return err
+	}
+	if inner {
+		m.traceFixedAddSubInner(a, b, out, false, false)
+	}
+	m.traceFixedAddSubOuter(a, b, out, false, false)
+	return nil
 }
 
 func (m *FixedPointManager) Sub(a, b, out *FixedPoint) error {
@@ -256,9 +271,21 @@ func (m *FixedPointManager) Sub(a, b, out *FixedPoint) error {
 	if err := m.check(out); err != nil {
 		return err
 	}
+	m.traceFixedAddSubOuter(a, b, out, true, true)
+	inner := a.scaled.Sign() != 0 && b.scaled.Sign() != 0
+	if inner {
+		m.traceFixedAddSubInner(a, b, out, true, true)
+	}
 	var v big.Int
 	v.Sub(&a.scaled, &b.scaled)
-	return m.publish(out, &v)
+	if err := m.publish(out, &v); err != nil {
+		return err
+	}
+	if inner {
+		m.traceFixedAddSubInner(a, b, out, true, false)
+	}
+	m.traceFixedAddSubOuter(a, b, out, true, false)
+	return nil
 }
 
 func (m *FixedPointManager) Mul(a, b, out *FixedPoint) error {
