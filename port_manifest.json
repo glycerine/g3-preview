@@ -17904,9 +17904,10 @@
           "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames", "TestPatternInferencePullsBooleanApplicationThenFindsPattern"]
         },
         {
-          "name": "pull_quant TRACE source-site stream output (pull_quant.cpp:98,104,122)",
-          "status": "unported",
-          "tests": []
+          "name": "pull_quant TRACE declaration-count record at pull_quant.cpp:102; shifted-expression mk_pp records at 109 and 131 remain",
+          "status": "partial",
+          "go_target": "pkg/ast/pattern/pull_boolean.go",
+          "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"]
         },
         {
           "name": "proof generation, pull_quant2 and pull_nested_quant other consumers",

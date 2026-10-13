@@ -3,9 +3,11 @@ package pattern
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -263,6 +265,16 @@ func (p *patternQuantifierPull) pullBooleanApp(decl ast.ASTHandle, operator int3
 		return out, false, nil
 	}
 	count := uint32(len(sorts))
+	trace := p.owner.traceTags
+	if trace == nil {
+		trace = diagnostic.BorrowProcessTraceTags()
+	}
+	if trace.ShouldTrace("pull_quant") {
+		if e := trace.Emit("pull_quant", "pull_quant1_core", "src/ast/normal_forms/pull_quant.cpp", 102,
+			"Result num decls:"+strconv.FormatUint(uint64(count), 10)+"\n"); e != nil {
+			return out, false, e
+		}
+	}
 	var offset uint32
 	adjusted := make([]ast.ASTHandle, len(args))
 	refs := make([]ast.ASTRef, 0, len(args))

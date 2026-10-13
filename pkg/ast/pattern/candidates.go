@@ -3,6 +3,7 @@ package pattern
 
 import (
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 type candidateInfo struct {
@@ -29,6 +30,7 @@ type patternCandidates struct {
 	avoidSkolems       bool
 	nestedArithOnly    bool
 	forbiddenFamilies  map[ast.FamilyID]struct{}
+	traceTags          *diagnostic.TraceTags
 	closed             bool
 }
 

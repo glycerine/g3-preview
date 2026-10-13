@@ -51,8 +51,20 @@ func TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames(t *testing.T)
 	c, err := newPatternCandidates(m, 0, nil, false)
 	patternMust(t, err)
 	t.Cleanup(func() { patternMust(t, c.close()) })
+	var traceOutput bytes.Buffer
+	trace := diagnostic.NewTraceTagsWithWriter(&traceOutput)
+	trace.Enable("pull_quant")
+	c.traceTags = trace
 	ref, err := c.pullNoProof(and)
 	patternMust(t, err)
+	if trace.ShouldTrace("pull_quant") {
+		want := "-------- [pull_quant] pull_quant1_core src/ast/normal_forms/pull_quant.cpp:102 ---------\nResult num decls:2\n------------------------------------------------\n"
+		if traceOutput.String() != want {
+			t.Fatal("source declaration-count TRACE record", traceOutput.String())
+		}
+	} else if traceOutput.Len() != 0 {
+		t.Fatal("erased TRACE record wrote output", traceOutput.String())
+	}
 	defer func() { patternMust(t, m.DelRef(&ref)) }()
 	got, err := m.RefGet(ref)
 	patternMust(t, err)
