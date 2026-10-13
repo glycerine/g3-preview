@@ -151728,7 +151728,8 @@
         "pkg/util/numeral/mpff_mul_trace.go",
         "pkg/util/numeral/mpff_mul_trace_test.go",
         "pkg/util/numeral/mpff_div_trace.go",
-        "pkg/util/numeral/mpff_div_trace_test.go"
+        "pkg/util/numeral/mpff_div_trace_test.go",
+        "pkg/util/numeral/mpff_round_trace.go"
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
@@ -151770,7 +151771,8 @@
         "TestFastFloatAddSubOuterAndInnerTraceOrder",
         "TestFastFloatMulOuterAndInnerTraceOrder",
         "TestFastFloatMulTraceReachedImpreciseRounding",
-        "TestFastFloatDivTraceSourceShortcutsAndQuotient"
+        "TestFastFloatDivTraceSourceShortcutsAndQuotient",
+        "TestFastFloatFloorCeilRetainedShortTraceBranches"
       ],
       "conditionals": [
         {
@@ -152402,6 +152404,14 @@
           "tests": [
             "TestFastFloatMulOuterAndInnerTraceOrder",
             "TestFastFloatMulTraceReachedImpreciseRounding"
+          ]
+        },
+        {
+          "name": "mpff floor/ceil STRACE source value and rounded result after exponent guard",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_round_trace.go",
+          "tests": [
+            "TestFastFloatFloorCeilRetainedShortTraceBranches"
           ]
         },
         {
@@ -172448,10 +172458,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/diagnostic/util_trace_tags.go"
+        "pkg/util/diagnostic/util_trace_tags.go",
+        "pkg/util/numeral/mpff_round_trace.go"
       ],
       "tests": [
-        "TestTraceTagsSourceControlAndFinalize"
+        "TestTraceTagsSourceControlAndFinalize",
+        "TestFastFloatFloorCeilRetainedShortTraceBranches"
       ],
       "conditionals": [
         {
@@ -172632,6 +172644,14 @@
           ]
         },
         {
+          "name": "mpff floor/ceil STRACE source value and rounded result after exponent guard",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_round_trace.go",
+          "tests": [
+            "TestFastFloatFloorCeilRetainedShortTraceBranches"
+          ]
+        },
+        {
           "name": "optional _TRACE file and remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -172650,10 +172670,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/diagnostic/util_trace_tags.go"
+        "pkg/util/diagnostic/util_trace_tags.go",
+        "pkg/util/numeral/mpff_round_trace.go"
       ],
       "tests": [
-        "TestTraceTagsSourceControlAndFinalize"
+        "TestTraceTagsSourceControlAndFinalize",
+        "TestFastFloatFloorCeilRetainedShortTraceBranches"
       ],
       "conditionals": [
         {
@@ -172843,6 +172865,14 @@
           "go_target": "pkg/util/numeral/mpff_div_trace.go",
           "tests": [
             "TestFastFloatDivTraceSourceShortcutsAndQuotient"
+          ]
+        },
+        {
+          "name": "mpff floor/ceil STRACE source value and rounded result after exponent guard",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_round_trace.go",
+          "tests": [
+            "TestFastFloatFloorCeilRetainedShortTraceBranches"
           ]
         },
         {

@@ -417,21 +417,33 @@ func (m *FastFloatManager) Inv(a, c *FastFloat) error {
 	}
 	return m.InvInPlace(c)
 }
-func (m *FastFloatManager) roundInteger(a *FastFloat, ceil bool) error {
+func (m *FastFloatManager) roundInteger(a *FastFloat, ceil bool) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
 	if a.exponent >= 0 {
 		return nil
 	}
+	m.traceRoundInteger(a, ceil, true)
+	defer func() {
+		if err == nil {
+			m.traceRoundInteger(a, ceil, false)
+		}
+	}()
 	if a.exponent <= -int32(m.bits) {
 		if a.negative() != ceil {
 			if ceil {
-				return m.SetInt32(a, 1)
+				err = m.SetInt32(a, 1)
+			} else {
+				err = m.SetInt32(a, -1)
 			}
-			return m.SetInt32(a, -1)
+		} else {
+			err = m.Reset(a)
 		}
-		return m.Reset(a)
+		if err != nil {
+			return err
+		}
+		return m.debugCheck(a)
 	}
 	s := m.sig(a)
 	k := uint32(-a.exponent)
