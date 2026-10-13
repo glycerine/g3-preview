@@ -120760,6 +120760,7 @@
           "tests": [
             "TestGlobalParamsSetNameTracePrecedesNullAssertion",
             "TestGlobalParamsSetNameTraceBodyInsertionPrefixes",
+            "TestGlobalParamsTraceRefusalDoesNotStopNamespaceOperations",
             "TestGlobalParamsInitGetRefFinalizeTraceOrder",
             "TestGeneratedInitializeAndFinalizeConcreteServices",
             "TestGlobalParamsNamespaceNullAndSourceArgumentOrder"
@@ -120976,6 +120977,7 @@
           "tests": [
             "TestGlobalParamsSetNameTracePrecedesNullAssertion",
             "TestGlobalParamsSetNameTraceBodyInsertionPrefixes",
+            "TestGlobalParamsTraceRefusalDoesNotStopNamespaceOperations",
             "TestGlobalParamsInitGetRefFinalizeTraceOrder",
             "TestGeneratedInitializeAndFinalizeConcreteServices",
             "TestGlobalParamsNamespaceNullAndSourceArgumentOrder"
@@ -173494,6 +173496,7 @@
             "TestTraceEmissionCompileGateAndSourceRecord",
             "TestGlobalParamsSetNameTracePrecedesNullAssertion",
             "TestGlobalParamsSetNameTraceBodyInsertionPrefixes",
+            "TestGlobalParamsTraceRefusalDoesNotStopNamespaceOperations",
             "TestGlobalParamsInitGetRefFinalizeTraceOrder",
             "TestGeneratedInitializeAndFinalizeConcreteServices"
           ]
@@ -173862,6 +173865,7 @@
             "TestTraceEmissionCompileGateAndSourceRecord",
             "TestGlobalParamsSetNameTracePrecedesNullAssertion",
             "TestGlobalParamsSetNameTraceBodyInsertionPrefixes",
+            "TestGlobalParamsTraceRefusalDoesNotStopNamespaceOperations",
             "TestGlobalParamsInitGetRefFinalizeTraceOrder",
             "TestGeneratedInitializeAndFinalizeConcreteServices"
           ]

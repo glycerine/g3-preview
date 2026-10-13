@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 type gparamsTraceBodyRefusalWriter struct {
@@ -19,7 +20,7 @@ type gparamsTraceBodyRefusalWriter struct {
 
 func (w *gparamsTraceBodyRefusalWriter) Write(p []byte) (int, error) {
 	w.calls++
-	if w.calls == w.failAt {
+	if w.calls >= w.failAt {
 		return 0, w.cause
 	}
 	return w.Buffer.Write(p)
@@ -38,8 +39,8 @@ func TestGlobalParamsSetNameTraceBodyInsertionPrefixes(t *testing.T) {
 		tags := udiag.NewTraceTagsWithWriter(out)
 		tags.Enable("gparams")
 		paramsMust(t, s.BindNamespaceTrace(tags))
-		if err := s.SourceSetName("alpha\x00ignored", "beta\x00ignored"); !errors.Is(err, cause) {
-			t.Fatal("refused source body insertion", refused, err)
+		if err := s.SourceSetName("alpha\x00ignored", "beta\x00ignored"); !namespaceNullError(err) {
+			t.Fatal("trace refusal must reach source current-imp assertion", refused, err)
 		}
 		want := header
 		for _, part := range parts[:refused] {
@@ -47,6 +48,35 @@ func TestGlobalParamsSetNameTraceBodyInsertionPrefixes(t *testing.T) {
 		}
 		if got := out.String(); got != want || out.calls != 10+refused {
 			t.Fatal("source trace insertion prefix", refused, got, want, out.calls)
+		}
+	}
+}
+
+func TestGlobalParamsTraceRefusalDoesNotStopNamespaceOperations(t *testing.T) {
+	for _, failAt := range []int{2, 10, 11} {
+		s, _ := gparamsNamespaceFixture(t)
+		cause := errors.New("trace stream refused")
+		out := &gparamsTraceBodyRefusalWriter{failAt: failAt, cause: cause}
+		tags := udiag.NewTraceTagsWithWriter(out)
+		tags.Enable("gparams")
+		paramsMust(t, s.BindNamespaceTrace(tags))
+		paramsMust(t, s.InitializeSource())
+		current := s.Current
+		if current == nil {
+			t.Fatal("trace refusal skipped source init", failAt)
+		}
+		ref, err := s.SourceGetRef()
+		if err != nil || ref != &current.globalParams {
+			t.Fatal("trace refusal skipped source get_ref", failAt, err)
+		}
+		err = s.SourceSetName("unrecognized-parameter", "value")
+		var unknown z3exception.DefaultException
+		if !errors.As(err, &unknown) || errors.Is(err, cause) {
+			t.Fatal("trace refusal skipped source set", failAt, err)
+		}
+		paramsMust(t, s.FinalizeSource())
+		if s.Current != nil {
+			t.Fatal("trace refusal skipped source finalize", failAt)
 		}
 	}
 }

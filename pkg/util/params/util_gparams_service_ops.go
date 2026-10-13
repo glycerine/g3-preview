@@ -37,12 +37,14 @@ func (s *GlobalParamsService) BindNamespaceTrace(t *udiag.TraceTags) error {
 	return nil
 }
 
-func (s *GlobalParamsService) traceNamespace(function string, line int, body string) error {
+func (s *GlobalParamsService) traceNamespace(function string, line int, body string) {
 	trace := s.namespaceTrace
 	if trace == nil {
 		trace = udiag.BorrowProcessTraceTags()
 	}
-	return trace.Emit("gparams", function, "src/util/gparams.cpp", line, body)
+	// The source std::ofstream records failure in its stream state. Its default
+	// exception mask does not interrupt the enclosing namespace operation.
+	_ = trace.Emit("gparams", function, "src/util/gparams.cpp", line, body)
 }
 func (s *GlobalParamsService) NamespaceAssertionsEnabled() (bool, error) {
 	if !GlobalParamsSourceDebug {
@@ -95,7 +97,7 @@ func (s *GlobalParamsService) SourceSetName(name, value string) error {
 	if trace == nil {
 		trace = udiag.BorrowProcessTraceTags()
 	}
-	if e := trace.EmitConditional("gparams", "set", "src/util/gparams.cpp", 563, func() bool { return true }, func(w io.Writer) error {
+	_ = trace.EmitConditional("gparams", "set", "src/util/gparams.cpp", 563, func() bool { return true }, func(w io.Writer) error {
 		for _, part := range [...]string{"setting [", name[:utext.CStringLength(name)], "] <- '", value[:utext.CStringLength(value)], "'\n"} {
 			n, err := io.WriteString(w, part)
 			if err != nil {
@@ -106,9 +108,7 @@ func (s *GlobalParamsService) SourceSetName(name, value string) error {
 			}
 		}
 		return nil
-	}); e != nil {
-		return e
-	}
+	})
 	g, e := s.namespaceImpAt(564)
 	if e != nil {
 		return e
@@ -202,9 +202,7 @@ func (s *GlobalParamsService) SourceGetRef() (*ParamsRef, error) {
 	if e := s.open(); e != nil {
 		return nil, e
 	}
-	if e := s.traceNamespace("get_ref", 608, "gparams::get_ref()\n"); e != nil {
-		return nil, e
-	}
+	s.traceNamespace("get_ref", 608, "gparams::get_ref()\n")
 	g, e := s.namespaceImpAt(609)
 	if e != nil {
 		return nil, e
