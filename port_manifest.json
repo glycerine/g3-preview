@@ -172749,7 +172749,8 @@
         "The concrete shell TimeoutService owns one replaceable scoped timer and borrows the callback/output stream. The handler writes timeout, records the caller, invokes the callback, closes and clears the current timer, then delivers ERR_TIMEOUT through an explicit event channel. The shell main -T option branch now installs the timer; frontend callbacks remain unported."
       ],
       "deviations": [
-        "Go cannot throw the asynchronous C++ timeout exception into a shell call stack; the concrete shell owner transports its first pending unhandled exception on Events without blocking another timer callback. The source shell frontend callbacks and complete main argument loop are not yet linked, so this unit remains partial."
+        "Go cannot throw the asynchronous C++ timeout exception into a shell call stack; the concrete shell owner transports its first pending unhandled exception on Events without blocking another timer callback. The source shell frontend callbacks and complete main argument loop are not yet linked, so this unit remains partial.",
+        "The concrete TimeoutService and -T option are currently called only by focused Go tests. Source shell/main.cpp:213 reaches set_timeout; smtlib, datalog, dimacs, opt and lp frontends register callbacks that display statistics and exit. Those retained frontend owners are not yet ported. Keep timeout.cpp/.h partial until an actual Go shell driver wires the process timer and frontend callbacks; src/test/cnf_backbones.cpp is test-only."
       ]
     },
     {
@@ -172801,7 +172802,8 @@
         "The shell TimeoutService borrows a callback and owns one replaceable timer. Its explicit event channel transports the source asynchronous timeout error."
       ],
       "deviations": [
-        "The shell/main.cpp -T option branch now calls the concrete timeout owner. Frontend callback bindings remain unported; cnf_backbones.cpp is a separate test caller."
+        "The shell/main.cpp -T option branch now calls the concrete timeout owner. Frontend callback bindings remain unported; cnf_backbones.cpp is a separate test caller.",
+        "The concrete TimeoutService and -T option are currently called only by focused Go tests. Source shell/main.cpp:213 reaches set_timeout; smtlib, datalog, dimacs, opt and lp frontends register callbacks that display statistics and exit. Those retained frontend owners are not yet ported. Keep timeout.cpp/.h partial until an actual Go shell driver wires the process timer and frontend callbacks; src/test/cnf_backbones.cpp is test-only."
       ]
     },
     {
