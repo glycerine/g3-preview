@@ -3,6 +3,8 @@
 package pattern
 
 import (
+	"errors"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
@@ -233,13 +235,105 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 			}
 		}
 	}
+	baseQ, outputBody := q, newBody
 	if len(patterns) == 0 && opts.pullQuantifiers {
 		contained, e := c.bodyContainsQuantifier(newBody)
 		if e != nil {
 			return out, false, e
 		}
 		if contained {
-			return out, false, ast.ErrASTPending
+			kind, e := c.manager.GetKind(newBody)
+			if e != nil {
+				return out, false, e
+			}
+			if kind != ast.ASTQuantifier {
+				return out, false, ast.ErrASTPending
+			}
+			innerForall, e := c.manager.IsForall(newBody)
+			if e != nil {
+				return out, false, e
+			}
+			if !innerForall {
+				return out, false, ast.ErrASTPending
+			}
+			innerBody, e := c.manager.GetQuantifierBody(newBody)
+			if e != nil {
+				return out, false, e
+			}
+			deeper, e := c.bodyContainsQuantifier(innerBody)
+			if e != nil {
+				return out, false, e
+			}
+			if deeper {
+				return out, false, ast.ErrASTPending
+			}
+			preliminary, e := c.manager.UpdateQuantifierPatterns(q, nil, newBody)
+			if e != nil {
+				return out, false, e
+			}
+			preliminaryRef, e := c.manager.NewRef(preliminary)
+			if e != nil {
+				return out, false, e
+			}
+			defer func() {
+				if cleanup := c.manager.DelRef(&preliminaryRef); cleanup != nil {
+					if preliminaryRef != (ast.ASTRef{}) {
+						c.pendingPatternRefs = append(c.pendingPatternRefs, preliminaryRef)
+					}
+					err = errors.Join(err, cleanup)
+				}
+			}()
+			originalWeight, e := c.manager.GetQuantifierWeight(q)
+			if e != nil {
+				return out, false, e
+			}
+			if weight != originalWeight {
+				preliminary, e = c.manager.UpdateQuantifierWeight(preliminary, weight)
+				if e != nil {
+					return out, false, e
+				}
+				if e = c.manager.SetRef(preliminaryRef, preliminary); e != nil {
+					return out, false, e
+				}
+			}
+			pulled, e := c.pullDirectForall(preliminary, newBody)
+			if e != nil {
+				return out, false, e
+			}
+			pulledRef, e := c.manager.NewRef(pulled)
+			if e != nil {
+				return out, false, e
+			}
+			defer func() {
+				if cleanup := c.manager.DelRef(&pulledRef); cleanup != nil {
+					if pulledRef != (ast.ASTRef{}) {
+						c.pendingPatternRefs = append(c.pendingPatternRefs, pulledRef)
+					}
+					err = errors.Join(err, cleanup)
+				}
+			}()
+			pulledBody, e := c.manager.GetQuantifierBody(pulled)
+			if e != nil {
+				return out, false, e
+			}
+			pulledBindings, e := c.manager.GetNumDeclarations(pulled)
+			if e != nil {
+				return out, false, e
+			}
+			patterns, err = c.inferPatternBody(pulledBody, pulledBindings, nil, opts.maxExtraMulti)
+			if err != nil {
+				return out, false, err
+			}
+			if len(patterns) != 0 {
+				if err = c.quantifierWarning(opts, q, "pulled nested quantifier to be able to find an useable pattern (quantifier id: %s)"); err != nil {
+					return out, false, err
+				}
+				baseQ, outputBody = pulled, pulledBody
+				weight, err = c.manager.GetQuantifierWeight(pulled)
+				if err != nil {
+					return out, false, err
+				}
+			}
 		}
 	}
 	oldBody, err := c.manager.GetQuantifierBody(q)
@@ -261,11 +355,11 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 			return out, false, err
 		}
 	}
-	updated, err := c.manager.UpdateQuantifierPatterns(q, handles, newBody)
+	updated, err := c.manager.UpdateQuantifierPatterns(baseQ, handles, outputBody)
 	if err != nil {
 		return out, false, err
 	}
-	if originalWeight, e := c.manager.GetQuantifierWeight(q); e != nil {
+	if originalWeight, e := c.manager.GetQuantifierWeight(baseQ); e != nil {
 		return out, false, e
 	} else if weight != originalWeight {
 		updated, err = c.manager.UpdateQuantifierWeight(updated, weight)

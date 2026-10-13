@@ -17832,9 +17832,9 @@
       "path": "src/ast/normal_forms/pull_quant.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/ast/pattern/pull_direct.go", "pkg/ast/pattern/reduce_quantifier.go"],
+      "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"],
       "assertions": [
         {
           "line": 47,
@@ -17875,7 +17875,19 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "pull_quant1_core direct nested forall/forall binder concatenation and minimum weight for retained pattern inference (pull_quant.cpp:173-189)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/pull_direct.go",
+          "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"]
+        },
+        {
+          "name": "remaining NOT/AND/OR, nested application, recursive rewriter and proof branches",
+          "status": "unported",
+          "tests": []
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -17883,9 +17895,9 @@
       "path": "src/ast/normal_forms/pull_quant.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/ast/pattern/pull_direct.go", "pkg/ast/pattern/reduce_quantifier.go"],
+      "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"],
       "conditionals": [
         {
           "line": 19,
@@ -17898,7 +17910,19 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "pull_quant retained direct nested universal quantifier branch",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/pull_direct.go",
+          "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"]
+        },
+        {
+          "name": "remaining recursive, application and proof interfaces",
+          "status": "unported",
+          "tests": []
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -18107,6 +18131,7 @@
         "pkg/ast/pattern/collect.go",
         "pkg/ast/pattern/infer.go",
         "pkg/ast/pattern/reduce_quantifier.go",
+        "pkg/ast/pattern/pull_direct.go",
         "pkg/ast/pattern/rewriter.go",
         "pkg/ast/pattern/options.go",
         "pkg/smtcore/pattern_inference_rewriter.go"
@@ -18125,6 +18150,7 @@
         "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences",
         "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
         "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
+        "TestPatternInferencePullDirectNestedForallFindsPattern",
         "TestPatternInferenceActualRewriterTraversalAndOwnership",
         "TestPatternInferenceActualRewriterPendingPullAndResume",
         "TestPatternInferenceParamsBindRewriterAndRefresh",
@@ -18304,6 +18330,13 @@
             "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
             "TestPatternInferenceActualRewriterPendingPullAndResume"
           ]
+        },
+        {
+          "name": "pull_quantifiers direct nested universal body merges binder declarations and retries pattern inference with pulled warning (pattern_inference.cpp:679-698)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "go_targets": ["pkg/ast/pattern/pull_direct.go"],
+          "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"]
         },
         {
           "name": "pattern_inference_rw concrete no-proof traversal callback connects quantifier reduction, rewritten no-patterns and owning output",
@@ -175607,6 +175640,12 @@
             "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
             "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
           ]
+        },
+        {
+          "name": "pattern_inference pulled nested universal quantifier warning_msg %s caller (pattern_inference.cpp:689)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"]
         }
       ],
       "ownership": [
@@ -175700,6 +175739,12 @@
             "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
             "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
           ]
+        },
+        {
+          "name": "pattern_inference pulled nested universal quantifier warning_msg %s caller (pattern_inference.cpp:689)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"]
         }
       ],
       "ownership": [
