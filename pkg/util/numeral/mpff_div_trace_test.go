@@ -30,8 +30,12 @@ func TestFastFloatDivTraceSourceShortcutsAndQuotient(t *testing.T) {
 	if err := m.SetRounding(true); err != nil {
 		t.Fatal(err)
 	}
-	if err := m.Div(&six, &zero, &out); !errors.Is(err, ErrFastFloatDivisionByZero) || output.Len() != 0 {
+	err := m.Div(&six, &zero, &out)
+	if !errors.Is(err, ErrFastFloatDivisionByZero) || output.Len() != 0 {
 		t.Fatal("divisor check must precede trace", err, output.String())
+	}
+	if !errors.Is(err, ErrFastFloatDomain) || errors.Is(err, ErrFastFloatOverflow) {
+		t.Fatal("division by zero must inherit only the MPFF base exception", err)
 	}
 	for _, test := range []struct {
 		name     string

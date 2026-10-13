@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // FastFloat owns a fixed significand block in its implicit manager. No owning
@@ -42,9 +43,20 @@ func DefaultFastFloatConfig(c arena.VectorConfig) FastFloatConfig {
 	return FastFloatConfig{PrecisionWords: 2, InitialCapacity: 1024, Storage: c}
 }
 
-var ErrFastFloatOverflow = errors.New("multi-precision floating point (mpff) overflow")
-var ErrFastFloatDivisionByZero = errors.New("multi-precision floating point (mpff) division by zero")
-var ErrFastFloatDomain = errors.New("multi-precision floating point (mpff) exception")
+type fastFloatException struct {
+	message string
+	parent  error
+}
+
+func (e *fastFloatException) Error() string                    { return e.message }
+func (e *fastFloatException) Message() string                  { return e.message }
+func (e *fastFloatException) ErrorCode() z3exception.ErrorCode { return z3exception.ErrorOK }
+func (e *fastFloatException) HasErrorCode() bool               { return false }
+func (e *fastFloatException) Unwrap() error                    { return e.parent }
+
+var ErrFastFloatDomain error = &fastFloatException{message: "multi-precision floating point (mpff) exception"}
+var ErrFastFloatOverflow error = &fastFloatException{message: "multi-precision floating point (mpff) overflow", parent: ErrFastFloatDomain}
+var ErrFastFloatDivisionByZero error = &fastFloatException{message: "multi-precision floating point (mpff) division by zero", parent: ErrFastFloatDomain}
 var ErrFastFloatInvariant = errors.New("mpnum: MPFF source invariant")
 var ErrFastFloatPowerDomain = errors.New("mpnum: MPFF power mask wrapped into nontermination")
 var ErrFastFloatOwner = errors.New("mpnum: invalid MPFF owner or dead significand")

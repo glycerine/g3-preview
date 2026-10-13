@@ -113,7 +113,7 @@ func (c *FastContext) processQueuedBound(n *FastNode, b *FastBound) error {
 			return nil
 		}
 		if err := c.propagateDefinition(variable, n); err != nil {
-			if catchArithmetic && (errors.Is(err, numeral.ErrFastFloatOverflow) || errors.Is(err, numeral.ErrFastFloatDivisionByZero) || errors.Is(err, numeral.ErrFastFloatDomain)) {
+			if catchArithmetic && errors.Is(err, numeral.ErrFastFloatDomain) {
 				c.arithmeticFailed = true
 				return nil
 			}
@@ -131,7 +131,7 @@ func (c *FastContext) processQueuedBound(n *FastNode, b *FastBound) error {
 				continue
 			}
 			if err := c.PropagateClause(clause, n); err != nil {
-				if errors.Is(err, numeral.ErrFastFloatOverflow) || errors.Is(err, numeral.ErrFastFloatDivisionByZero) || errors.Is(err, numeral.ErrFastFloatDomain) {
+				if errors.Is(err, numeral.ErrFastFloatDomain) {
 					c.arithmeticFailed = true
 					continue
 				}

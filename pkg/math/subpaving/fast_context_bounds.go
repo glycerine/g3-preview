@@ -115,7 +115,7 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 		return false, err
 	}
 	defer func() {
-		if errors.Is(err, numeral.ErrFastFloatOverflow) || errors.Is(err, numeral.ErrFastFloatDivisionByZero) || errors.Is(err, numeral.ErrFastFloatDomain) {
+		if errors.Is(err, numeral.ErrFastFloatDomain) {
 			c.arithmeticFailed = true
 			relevant, err = false, nil
 		}

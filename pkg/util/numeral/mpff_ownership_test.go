@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Inspect actual roots before rendering or teardown; Close alone cannot detect
@@ -205,6 +206,13 @@ func TestFastFloatPowerWrapPrefixes(t *testing.T) {
 	e := m.Power(&a, 1<<31, &out)
 	if !errors.Is(e, ErrFastFloatOverflow) {
 		t.Fatal("finite overflow must precede wrap", e)
+	}
+	if !errors.Is(e, ErrFastFloatDomain) || errors.Is(e, ErrFastFloatDivisionByZero) {
+		t.Fatal("overflow must inherit only the MPFF base exception", e)
+	}
+	var exception z3exception.Z3Exception
+	if !errors.As(e, &exception) || exception.Message() != ErrFastFloatOverflow.Error() || exception.HasErrorCode() || exception.ErrorCode() != z3exception.ErrorOK {
+		t.Fatal("overflow must expose the source z3_exception surface", e)
 	}
 	if fastExact(m, &out).Cmp(big.NewRat(1, 1)) != 0 {
 		t.Fatal("completed result prefix")
