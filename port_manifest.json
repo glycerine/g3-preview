@@ -51748,6 +51748,8 @@
         "pkg/math/subpaving/arbitrary_context_init_test.go",
         "pkg/math/subpaving/arbitrary_context_child.go",
         "pkg/math/subpaving/arbitrary_context_child_test.go",
+        "pkg/math/subpaving/arbitrary_split.go",
+        "pkg/math/subpaving/arbitrary_split_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
@@ -51841,6 +51843,7 @@
         "TestArbitraryMonomialForwardInverseAndArithmetic",
         "TestArbitraryContextRootInitializationStagesAndConflict",
         "TestArbitraryChildRecentBoundReplayAndPolynomialWatcher",
+        "TestArbitraryMidpointSplitterSourceBranches",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -52575,6 +52578,17 @@
           ],
           "tests": [
             "TestArbitraryChildRecentBoundReplayAndPolynomialWatcher"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf midpoint splitting for unbounded, one-sided, finite, integer, and no-interior branches (src/math/subpaving/subpaving_t_def.h:185-247)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_split.go",
+          "go_targets": [
+            "pkg/math/subpaving/arbitrary_context_child.go"
+          ],
+          "tests": [
+            "TestArbitraryMidpointSplitterSourceBranches"
           ]
         },
         {
