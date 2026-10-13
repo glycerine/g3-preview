@@ -39639,7 +39639,14 @@ multiply/divide path now preserves source zero-scalar reset, negative bound
 reversal, separate directed reciprocals and destination alias. Focused
 native and checked/debug cases on CPUs 8–16 cover finite and one-sided
 infinite bounds and independent rational enclosures. Powers, root enclosure,
-node views and the enclosing context remain open.
+node views and the enclosing context remained open at that checkpoint. Concrete MPF interval power now
+implements positive and negative even intervals, mixed-sign extrema with
+source tie openness, odd monotonic intervals, infinite bounds and in-place
+destinations. Focused native and checked/debug cases on CPUs 8–16 compare
+integer cases and verify directed rational square enclosures. The retained
+monomial caller asserts positive degree; zero degree is rejected by this Go
+interval API. Root enclosure, node views and the enclosing context remain
+open.
 
 ### Environment parameter runtime boundary
 
