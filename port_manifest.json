@@ -34820,7 +34820,8 @@
         "pkg/math/subpaving/hardware_interval.go",
         "pkg/math/subpaving/hardware_interval_arith.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
-        "pkg/math/subpaving/hardware_interval_power.go"
+        "pkg/math/subpaving/hardware_interval_power.go",
+        "pkg/math/subpaving/hardware_interval_mul.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34852,7 +34853,8 @@
         "TestSubpavingMPFIntervalXnEqYRetainedCases",
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
-        "TestSubpavingHardwareIntervalPowerRetainedBranches"
+        "TestSubpavingHardwareIntervalPowerRetainedBranches",
+        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
       ],
       "conditionals": [
         {
@@ -35547,6 +35549,14 @@
           "go_target": "pkg/math/subpaving/hardware_interval_power.go",
           "tests": [
             "TestSubpavingHardwareIntervalPowerRetainedBranches"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval multiplication: nine sign classes, mixed extrema ties, infinity, zero and directed bounds (src/math/interval/interval_def.h:1017-1218)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_mul.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
           ]
         }
       ],
@@ -50234,12 +50244,14 @@
         "pkg/math/subpaving/hardware_interval.go",
         "pkg/math/subpaving/hardware_interval_arith.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
-        "pkg/math/subpaving/hardware_interval_power.go"
+        "pkg/math/subpaving/hardware_interval_power.go",
+        "pkg/math/subpaving/hardware_interval_mul.go"
       ],
       "tests": [
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
-        "TestSubpavingHardwareIntervalPowerRetainedBranches"
+        "TestSubpavingHardwareIntervalPowerRetainedBranches",
+        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
       ],
       "conditionals": [
         {
@@ -50284,6 +50296,14 @@
           "go_target": "pkg/math/subpaving/hardware_interval_power.go",
           "tests": [
             "TestSubpavingHardwareIntervalPowerRetainedBranches"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval multiplication: nine sign classes, mixed extrema ties, infinity, zero and directed bounds (src/math/interval/interval_def.h:1017-1218)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_mul.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
           ]
         }
       ],
@@ -50802,7 +50822,8 @@
         "pkg/math/subpaving/hardware_interval.go",
         "pkg/math/subpaving/hardware_interval_arith.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
-        "pkg/math/subpaving/hardware_interval_power.go"
+        "pkg/math/subpaving/hardware_interval_power.go",
+        "pkg/math/subpaving/hardware_interval_mul.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50863,7 +50884,8 @@
         "TestSubpavingMPFIntervalPowerRetainedCases",
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
-        "TestSubpavingHardwareIntervalPowerRetainedBranches"
+        "TestSubpavingHardwareIntervalPowerRetainedBranches",
+        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
       ],
       "conditionals": [
         {
@@ -51164,6 +51186,14 @@
           "tests": [
             "TestSubpavingHardwareIntervalPowerRetainedBranches"
           ]
+        },
+        {
+          "name": "Concrete config_hwf interval multiplication: nine sign classes, mixed extrema ties, infinity, zero and directed bounds (src/math/interval/interval_def.h:1017-1218)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_mul.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
+          ]
         }
       ],
       "ownership": [
@@ -51230,7 +51260,8 @@
         "pkg/math/subpaving/hardware_interval.go",
         "pkg/math/subpaving/hardware_interval_arith.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
-        "pkg/math/subpaving/hardware_interval_power.go"
+        "pkg/math/subpaving/hardware_interval_power.go",
+        "pkg/math/subpaving/hardware_interval_mul.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51282,7 +51313,8 @@
         "TestSubpavingMPFIntervalXnEqYRetainedCases",
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
-        "TestSubpavingHardwareIntervalPowerRetainedBranches"
+        "TestSubpavingHardwareIntervalPowerRetainedBranches",
+        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
       ],
       "assertions": [
         {
@@ -51824,6 +51856,14 @@
           "go_target": "pkg/math/subpaving/hardware_interval_power.go",
           "tests": [
             "TestSubpavingHardwareIntervalPowerRetainedBranches"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval multiplication: nine sign classes, mixed extrema ties, infinity, zero and directed bounds (src/math/interval/interval_def.h:1017-1218)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_mul.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
           ]
         }
       ],
@@ -117334,7 +117374,8 @@
         "pkg/math/subpaving/hardware_interval.go",
         "pkg/math/subpaving/hardware_interval_arith.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
-        "pkg/math/subpaving/hardware_interval_power.go"
+        "pkg/math/subpaving/hardware_interval_power.go",
+        "pkg/math/subpaving/hardware_interval_mul.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",
@@ -117348,7 +117389,8 @@
         "TestSubpavingHardwareExtendedRetainedBranches",
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
-        "TestSubpavingHardwareIntervalPowerRetainedBranches"
+        "TestSubpavingHardwareIntervalPowerRetainedBranches",
+        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
       ],
       "conditionals": [
         {
@@ -117562,11 +117604,13 @@
           "status": "partial",
           "go_target": "pkg/math/subpaving/hardware_interval_scalar.go",
           "go_targets": [
-            "pkg/math/subpaving/hardware_interval_power.go"
+            "pkg/math/subpaving/hardware_interval_power.go",
+            "pkg/math/subpaving/hardware_interval_mul.go"
           ],
           "tests": [
             "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
-            "TestSubpavingHardwareIntervalPowerRetainedBranches"
+            "TestSubpavingHardwareIntervalPowerRetainedBranches",
+            "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
           ]
         }
       ],
@@ -117596,7 +117640,8 @@
         "pkg/util/numeral/mpf_numeral_lifetime.go",
         "pkg/math/subpaving/arbitrary_context_root.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
-        "pkg/math/subpaving/hardware_interval_power.go"
+        "pkg/math/subpaving/hardware_interval_power.go",
+        "pkg/math/subpaving/hardware_interval_mul.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -117617,7 +117662,8 @@
         "TestArbitraryFloatNumeralSourceSwapAndDel",
         "TestSubpavingMPFIntervalXnEqYRetainedCases",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
-        "TestSubpavingHardwareIntervalPowerRetainedBranches"
+        "TestSubpavingHardwareIntervalPowerRetainedBranches",
+        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
       ],
       "conditionals": [
         {
@@ -117774,11 +117820,13 @@
           "status": "partial",
           "go_target": "pkg/math/subpaving/hardware_interval_scalar.go",
           "go_targets": [
-            "pkg/math/subpaving/hardware_interval_power.go"
+            "pkg/math/subpaving/hardware_interval_power.go",
+            "pkg/math/subpaving/hardware_interval_mul.go"
           ],
           "tests": [
             "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
-            "TestSubpavingHardwareIntervalPowerRetainedBranches"
+            "TestSubpavingHardwareIntervalPowerRetainedBranches",
+            "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
           ]
         }
       ],
