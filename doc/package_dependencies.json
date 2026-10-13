@@ -1152,9 +1152,11 @@
       "package": "shell",
       "imports": [
         "util/control",
+        "util/text",
         "util/z3exception"
       ],
       "production_files": [
+        "global_timeout_option.go",
         "timeout.go"
       ]
     },

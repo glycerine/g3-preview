@@ -154,6 +154,7 @@ digraph packages {
   "sat/tactic" -> "util/lbool";
   "shell" [style=filled, fillcolor="#eeeeee"];
   "shell" -> "util/control";
+  "shell" -> "util/text";
   "shell" -> "util/z3exception";
   "smtcore" [style=filled, fillcolor="#eeeeee"];
   "smtcore" -> "arena";

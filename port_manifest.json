@@ -78736,9 +78736,13 @@
       "path": "src/shell/main.cpp",
       "component": "shell",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/shell/global_timeout_option.go"
+      ],
+      "tests": [
+        "TestShellGlobalTimeoutOptionSourceBranch"
+      ],
       "conditionals": [
         {
           "line": 62,
@@ -78839,9 +78843,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "parse_cmd_line_args -T colon argument, signed decimal prefix and global timeout installation (main.cpp:207-214)",
+          "status": "partial",
+          "go_target": "pkg/shell/global_timeout_option.go",
+          "tests": [
+            "TestShellGlobalTimeoutOptionSourceBranch"
+          ]
+        }
+      ],
+      "ownership": [
+        "The -T branch borrows its extracted argument and installs the resulting timer into the concrete shell TimeoutService. Full argument scanning and frontend dispatch remain unported."
+      ],
+      "deviations": [
+        "Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go branch returns an explicit range error. The complete shell command-line loop and executable are still unported."
+      ]
     },
     {
       "path": "src/shell/mem_initializer.cpp",
@@ -171233,11 +171250,13 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/shell/timeout.go"
+        "pkg/shell/timeout.go",
+        "pkg/shell/global_timeout_option.go"
       ],
       "tests": [
         "TestShellTimeoutSourceCallbackOutputAndErrorOrder",
-        "TestShellTimeoutReplacementDisabledAndBorrowedCallback"
+        "TestShellTimeoutReplacementDisabledAndBorrowedCallback",
+        "TestShellGlobalTimeoutOptionSourceBranch"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -171247,7 +171266,8 @@
           "status": "partial",
           "go_target": "pkg/shell/timeout.go",
           "tests": [
-            "TestShellTimeoutReplacementDisabledAndBorrowedCallback"
+            "TestShellTimeoutReplacementDisabledAndBorrowedCallback",
+            "TestShellGlobalTimeoutOptionSourceBranch"
           ]
         },
         {
@@ -171268,10 +171288,10 @@
         }
       ],
       "ownership": [
-        "The concrete shell TimeoutService owns one replaceable scoped timer and borrows the callback/output stream. The handler writes timeout, records the caller, invokes the callback, closes and clears the current timer, then delivers ERR_TIMEOUT through an explicit event channel. Direct shell main/frontend callers remain unported."
+        "The concrete shell TimeoutService owns one replaceable scoped timer and borrows the callback/output stream. The handler writes timeout, records the caller, invokes the callback, closes and clears the current timer, then delivers ERR_TIMEOUT through an explicit event channel. The shell main -T option branch now installs the timer; frontend callbacks remain unported."
       ],
       "deviations": [
-        "Go cannot throw the asynchronous C++ timeout exception into a shell call stack; the concrete shell owner transports it on Events. The source shell main/frontend callers are not yet linked, so this unit remains partial."
+        "Go cannot throw the asynchronous C++ timeout exception into a shell call stack; the concrete shell owner transports it on Events. The source shell frontend callbacks and complete main argument loop are not yet linked, so this unit remains partial."
       ]
     },
     {
@@ -171280,11 +171300,13 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/shell/timeout.go"
+        "pkg/shell/timeout.go",
+        "pkg/shell/global_timeout_option.go"
       ],
       "tests": [
         "TestShellTimeoutSourceCallbackOutputAndErrorOrder",
-        "TestShellTimeoutReplacementDisabledAndBorrowedCallback"
+        "TestShellTimeoutReplacementDisabledAndBorrowedCallback",
+        "TestShellGlobalTimeoutOptionSourceBranch"
       ],
       "conditionals": [
         {
@@ -171304,7 +171326,8 @@
           "status": "partial",
           "go_target": "pkg/shell/timeout.go",
           "tests": [
-            "TestShellTimeoutReplacementDisabledAndBorrowedCallback"
+            "TestShellTimeoutReplacementDisabledAndBorrowedCallback",
+            "TestShellGlobalTimeoutOptionSourceBranch"
           ]
         },
         {
@@ -171320,7 +171343,7 @@
         "The shell TimeoutService borrows a callback and owns one replaceable timer. Its explicit event channel transports the source asynchronous timeout error."
       ],
       "deviations": [
-        "Production direct callers are shell/main.cpp and the shell frontends; cnf_backbones.cpp is a test caller. The concrete shell owner exists, but direct Go frontend bindings remain unported."
+        "The shell/main.cpp -T option branch now calls the concrete timeout owner. Frontend callback bindings remain unported; cnf_backbones.cpp is a separate test caller."
       ]
     },
     {
