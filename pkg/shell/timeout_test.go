@@ -19,6 +19,9 @@ func TestShellTimeoutSourceCallbackOutputAndErrorOrder(t *testing.T) {
 			t.Fatal(err)
 		}
 	}()
+	if s.Caller() != control.EventCallerUnset {
+		t.Fatal("source event caller must start unset")
+	}
 	var callbackOutput string
 	var callbackCaller control.EventCaller
 	if err := s.RegisterOnTimeoutProc(func() {
@@ -41,6 +44,9 @@ func TestShellTimeoutSourceCallbackOutputAndErrorOrder(t *testing.T) {
 	}
 	if callbackOutput != "timeout\n" || output.String() != "timeout\n" || callbackCaller != control.EventCallerTimeout {
 		t.Fatal("source print/caller/callback order", callbackOutput, output.String(), callbackCaller)
+	}
+	if s.Caller() != control.EventCallerTimeout {
+		t.Fatal("source caller metadata changed after timeout")
 	}
 	s.mu.Lock()
 	active := s.timer != nil

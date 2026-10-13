@@ -25,6 +25,17 @@ type TimeoutService struct {
 	closed   bool
 }
 
+// The scoped timer owns this concrete source g_timeout_eh counterpart until
+// replacement, expiry, or close; it borrows the process shell owner.
+type timeoutEventHandler struct {
+	owner  *TimeoutService
+	serial uint64
+}
+
+func (h *timeoutEventHandler) HandleEvent(caller control.EventCaller) {
+	h.owner.fire(h.serial, caller)
+}
+
 func NewTimeoutService(output io.Writer) *TimeoutService {
 	if output == nil {
 		output = os.Stdout
@@ -67,9 +78,7 @@ func (s *TimeoutService) SetTimeout(milliseconds int64) error {
 	}
 	s.serial++
 	serial := s.serial
-	timer, err := control.NewScopedTimer(uint32(milliseconds), control.EventHandlerFunc(func(caller control.EventCaller) {
-		s.fire(serial, caller)
-	}))
+	timer, err := control.NewScopedTimer(uint32(milliseconds), &timeoutEventHandler{owner: s, serial: serial})
 	if err != nil {
 		return err
 	}

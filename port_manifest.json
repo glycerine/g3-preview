@@ -118850,14 +118850,18 @@
       "go_targets": [
         "pkg/util/control/cancel_handler.go",
         "pkg/util/control/scoped_timer.go",
-        "pkg/util/control/scoped_ctrl_c.go"
+        "pkg/util/control/scoped_ctrl_c.go",
+        "pkg/shell/timeout.go"
       ],
       "tests": [
         "TestCancelHandlerSourceLifetime",
         "TestCancelHandlerSourceNestedAndReset",
         "TestCancelHandlerWarmNoAllocation",
         "TestScopedTimerFiresWithTimeoutCaller",
-        "TestScopedCtrlCReceivesProcessInterrupt"
+        "TestScopedCtrlCReceivesProcessInterrupt",
+        "TestShellTimeoutSourceCallbackOutputAndErrorOrder",
+        "TestShellTimeoutCallbackRearmIsDeletedBeforeError",
+        "TestShellTimeoutFirstUnhandledErrorDoesNotBlockRearm"
       ],
       "conditionals": [
         {
@@ -118920,7 +118924,13 @@
         },
         {
           "name": "process-global timeout handler caller ID, callback, timer destruction and timeout exception (src/util/timeout.cpp:27-59)",
-          "status": "unported"
+          "status": "ported",
+          "go_target": "pkg/shell/timeout.go",
+          "tests": [
+            "TestShellTimeoutSourceCallbackOutputAndErrorOrder",
+            "TestShellTimeoutCallbackRearmIsDeletedBeforeError",
+            "TestShellTimeoutFirstUnhandledErrorDoesNotBlockRearm"
+          ]
         },
         {
           "name": "combined_solver auxiliary timeout handler and check_sat_result caller-ID reason mapping (src/solver/combined_solver.cpp:85-100; src/solver/check_sat_result.cpp:21-38)",
@@ -118932,7 +118942,7 @@
         }
       ],
       "ownership": [
-        "Cold borrowed reslimit owner; explicit close once, serialized event invocation. Scoped timer and Ctrl-C dispatch borrow their handlers and pass source caller IDs. Process-global timeout, combined-solver and API interrupt owners remain with their unported concrete consumers. See PORT_PROGRESS.md#audit-rlimit-port-status-md."
+        "Cold borrowed reslimit owner; explicit close once, serialized event invocation. Scoped timer and Ctrl-C dispatch borrow their handlers and pass source caller IDs. The concrete shell timeout handler is owned by its scoped timer and borrows the shell service; combined-solver and API interrupt owners remain with their unported concrete consumers. See PORT_PROGRESS.md#audit-rlimit-port-status-md."
       ],
       "deviations": [
         "Concrete resource specialization replaces C++ template/virtual dispatch; repeated explicit close harmless. Only cancel_eh<reslimit> is instantiated in production. The generic event-handler base is not a separate Go owner; its remaining behavior belongs to the timeout, solver and API consumers."
@@ -171282,7 +171292,7 @@
         },
         {
           "name": "g_timeout_eh::operator(): print, set caller, invoke callback, delete timer, clear pointer, throw timeout error",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/shell/timeout.go",
           "tests": [
             "TestShellTimeoutSourceCallbackOutputAndErrorOrder",
