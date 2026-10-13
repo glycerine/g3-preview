@@ -119151,7 +119151,8 @@
             "TestGlobalParamsRealModuleSnapshotsAndReset",
             "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
             "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
-            "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
+            "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule",
+            "TestGlobalParamsUnknownParameterLegalListOmitsNullDescriptions"
           ]
         },
         {
@@ -120576,6 +120577,7 @@
         "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
         "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
         "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule",
+        "TestGlobalParamsUnknownParameterLegalListOmitsNullDescriptions",
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
@@ -120688,7 +120690,8 @@
             "TestGlobalParamsRealModuleSnapshotsAndReset",
             "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
             "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
-            "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
+            "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule",
+            "TestGlobalParamsUnknownParameterLegalListOmitsNullDescriptions"
           ]
         },
         {
@@ -120858,6 +120861,7 @@
         "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
         "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
         "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule",
+        "TestGlobalParamsUnknownParameterLegalListOmitsNullDescriptions",
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
@@ -120915,7 +120919,8 @@
             "TestGlobalParamsRealModuleSnapshotsAndReset",
             "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
             "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
-            "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
+            "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule",
+            "TestGlobalParamsUnknownParameterLegalListOmitsNullDescriptions"
           ]
         },
         {

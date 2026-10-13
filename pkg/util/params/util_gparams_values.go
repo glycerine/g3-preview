@@ -1,6 +1,7 @@
 package params
 
 import (
+	"bytes"
 	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -178,7 +179,7 @@ func (g *GlobalParams) unknownParameter(k usymbol.Symbol, d *ParamDescrs, module
 	if e != nil {
 		return e
 	}
-	var out strings.Builder
+	var out bytes.Buffer
 	out.WriteString("unknown parameter '")
 	out.WriteString(keyText)
 	if module == (usymbol.Symbol{}) {
@@ -193,11 +194,9 @@ func (g *GlobalParams) unknownParameter(k usymbol.Symbol, d *ParamDescrs, module
 		out.WriteString("'\n")
 	}
 	out.WriteString("Legal parameters are:\n")
-	legal, e := d.Display(2, false, false)
-	if e != nil {
+	if e := d.DisplayInto(&out, 2, false, false); e != nil {
 		return e
 	}
-	out.WriteString(legal)
 	return z3exception.NewDefaultException(out.String())
 }
 func (g *GlobalParams) findModuleDescriptor(k usymbol.Symbol) (*ParamDescrs, bool, error) {
