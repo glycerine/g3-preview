@@ -152296,6 +152296,7 @@
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
         "TestFastFloatSetIntegerRetainedTraceBranches",
+        "TestFastFloatSetIntegerTraceSourceInsertionBoundaries",
         "TestFastFloatToRationalRetainedTraceExponentBranches",
         "TestFastFloatToRationalTraceSourceExponentInsertions"
       ],
@@ -152981,7 +152982,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_convert_trace.go",
           "tests": [
-            "TestFastFloatSetIntegerRetainedTraceBranches"
+            "TestFastFloatSetIntegerRetainedTraceBranches",
+            "TestFastFloatSetIntegerTraceSourceInsertionBoundaries"
           ]
         },
         {
@@ -173692,6 +173694,7 @@
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
         "TestFastFloatSetIntegerRetainedTraceBranches",
+        "TestFastFloatSetIntegerTraceSourceInsertionBoundaries",
         "TestFastFloatToRationalRetainedTraceExponentBranches",
         "TestFastFloatToRationalTraceSourceExponentInsertions",
         "TestBinarySelectSmallRationalLowerRetainedTrace",
@@ -173920,7 +173923,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_convert_trace.go",
           "tests": [
-            "TestFastFloatSetIntegerRetainedTraceBranches"
+            "TestFastFloatSetIntegerRetainedTraceBranches",
+            "TestFastFloatSetIntegerTraceSourceInsertionBoundaries"
           ]
         },
         {
@@ -174077,6 +174081,7 @@
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
         "TestFastFloatSetIntegerRetainedTraceBranches",
+        "TestFastFloatSetIntegerTraceSourceInsertionBoundaries",
         "TestFastFloatToRationalRetainedTraceExponentBranches",
         "TestFastFloatToRationalTraceSourceExponentInsertions",
         "TestBinarySelectSmallRationalLowerRetainedTrace",
@@ -174317,7 +174322,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_convert_trace.go",
           "tests": [
-            "TestFastFloatSetIntegerRetainedTraceBranches"
+            "TestFastFloatSetIntegerRetainedTraceBranches",
+            "TestFastFloatSetIntegerTraceSourceInsertionBoundaries"
           ]
         },
         {

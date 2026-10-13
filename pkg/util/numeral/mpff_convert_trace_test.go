@@ -2,11 +2,101 @@ package numeral
 
 import (
 	"bytes"
+	"io"
 	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
+
+type mpffIntegerTraceWriter struct {
+	parts                  []string
+	flushes                int
+	refuseWordSpace, words bool
+	failed                 bool
+}
+
+func (w *mpffIntegerTraceWriter) Write(p []byte) (int, error) {
+	part := string(p)
+	if w.failed || w.refuseWordSpace && w.words && part == " " {
+		w.failed = true
+		return 0, io.ErrClosedPipe
+	}
+	w.parts = append(w.parts, part)
+	if part == "w words: " {
+		w.words = true
+	}
+	return len(p), nil
+}
+
+func (w *mpffIntegerTraceWriter) Flush() error {
+	w.flushes++
+	return nil
+}
+
+func TestFastFloatSetIntegerTraceSourceInsertionBoundaries(t *testing.T) {
+	m := fastManager(t, 2)
+	s, err := NewRationalService(serviceConfig(m.config.Storage.Descriptors.Budget))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	z := s.Manager.Z
+	for _, tc := range []struct {
+		input, label string
+		want         []string
+		refuseSpace  bool
+	}{
+		{"-3", "is_int64 ", []string{"is_int64 ", "-3", "\n"}, false},
+		{"1208925819614629174706177", "w words: ", []string{"w words: ", "1", " ", "0", " ", "65536", " ", "\n"}, false},
+		{"1208925819614629174706177", "w words: ", []string{"w words: ", "1"}, true},
+	} {
+		w := &mpffIntegerTraceWriter{refuseWordSpace: tc.refuseSpace}
+		tags := diagnostic.NewTraceTagsWithWriter(w)
+		tags.Enable("mpff")
+		if !tags.ShouldTrace("mpff") {
+			return
+		}
+		if err := m.BindTrace(tags); err != nil {
+			t.Fatal(err)
+		}
+		var value Int
+		var out FastFloat
+		if err := z.SetString(&value, tc.input); err != nil {
+			t.Fatal(err)
+		}
+		if err := m.SetInteger(&out, z, &value); err != nil {
+			t.Fatal(err)
+		}
+		at := -1
+		for i, part := range w.parts {
+			if part == tc.label {
+				at = i
+				break
+			}
+		}
+		if at < 0 || at+len(tc.want) > len(w.parts) {
+			t.Fatalf("missing source insertions %q in %q", tc.want, w.parts)
+		}
+		for i, want := range tc.want {
+			if got := w.parts[at+i]; got != want {
+				t.Fatalf("source insertion %d = %q, want %q; all %q", i, got, want, w.parts)
+			}
+		}
+		if tc.refuseSpace && (!w.failed || !strings.HasSuffix(strings.Join(w.parts, ""), "w words: 1")) {
+			t.Fatalf("refused word separator wrote later bytes: %q", w.parts)
+		}
+		if w.flushes != 3 {
+			t.Fatalf("source three trace flushes = %d", w.flushes)
+		}
+		if err := m.Del(&out); err != nil {
+			t.Fatal(err)
+		}
+		if err := z.Del(&value); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
 
 func TestFastFloatSetIntegerRetainedTraceBranches(t *testing.T) {
 	m := fastManager(t, 2)

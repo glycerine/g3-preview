@@ -26,7 +26,13 @@ func (m *FastFloatManager) traceSetIntegerInput(z *IntegerManager, v *Int) {
 
 func (m *FastFloatManager) traceSetIntegerSigned(v int64) {
 	m.traceSetInteger(331, func(w io.Writer) error {
-		return writeFastFloatPart(w, "is_int64 "+strconv.FormatInt(v, 10)+"\n")
+		if err := writeFastFloatPart(w, "is_int64 "); err != nil {
+			return err
+		}
+		if err := writeFastFloatPart(w, strconv.FormatInt(v, 10)); err != nil {
+			return err
+		}
+		return writeFastFloatPart(w, "\n")
 	})
 }
 
@@ -42,7 +48,10 @@ func (m *FastFloatManager) traceSetIntegerWords(w ffLimbView) {
 			return err
 		}
 		for i := uint32(0); i < w.size; i++ {
-			if err := writeFastFloatPart(out, strconv.FormatUint(uint64(w.read(i)), 10)+" "); err != nil {
+			if err := writeFastFloatPart(out, strconv.FormatUint(uint64(w.read(i)), 10)); err != nil {
+				return err
+			}
+			if err := writeFastFloatPart(out, " "); err != nil {
 				return err
 			}
 		}
