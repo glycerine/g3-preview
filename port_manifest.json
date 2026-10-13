@@ -161152,6 +161152,26 @@
           "tests": [
             "TestSharingReducerOrderedPairsReuseAndNumeralPosition"
           ]
+        },
+        {
+          "name": "pattern_inference expr-pair cache in src/ast/pattern/pattern_inference.h",
+          "status": "unported"
+        },
+        {
+          "name": "dom_simplify, sine_filter and nl_purify tactic expression-pair maps and sets",
+          "status": "unported"
+        },
+        {
+          "name": "QE arithmetic, datatype and difference-logic pair-map specializations",
+          "status": "unported"
+        },
+        {
+          "name": "SMT arithmetic equality, sequence, string, array and conflict-resolution pair maps and sets",
+          "status": "unported"
+        },
+        {
+          "name": "MUZ relation compiler sort/application and sort/declaration register maps",
+          "status": "unported"
         }
       ],
       "ownership": [
@@ -161159,7 +161179,7 @@
         "The BV sharing reducer retains each cached expr pair operand and each newly built application until Close; the native typed maps own pair membership only."
       ],
       "deviations": [
-        "The selected Q_f_def and dyn_ack count specializations use native Go maps keyed by typed AST-handle pairs; the former has native quantifier sets and the latter uses a native instantiated set. C++ cached hashes, sentinel buckets and probing are not ported. Other retained pair-map and pair-hashtable consumers remain open."
+        "The selected Q_f_def and dyn_ack count specializations use native Go maps keyed by typed AST-handle pairs; the former has native quantifier sets and the latter uses a native instantiated set. C++ cached hashes, sentinel buckets and probing are not ported. A source-wide instantiation scan identifies the remaining AST pattern, tactic, QE, SMT and MUZ consumers as unported; their concrete operations and ownership still require caller audits."
       ]
     },
     {
