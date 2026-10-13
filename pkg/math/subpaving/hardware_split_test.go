@@ -108,7 +108,7 @@ func TestHardwareMidpointSplitterRetainedBranchesAndRefusal(t *testing.T) {
 			t.Fatal(err)
 		}
 		left, right, err := c.SplitMidpoint(root, x, true, 1)
-		if !errors.Is(err, ErrHardwareSplitNoInterior) || left == nil || right == nil ||
+		if !errors.Is(err, ErrHardwareSplitNoInterior) || !errors.Is(err, ErrSubpavingFailure) || left == nil || right == nil ||
 			left.trail != root.trail || right.trail != root.trail || root.children != 2 {
 			t.Fatal("source creates both children before refusing non-interior midpoint", err)
 		}

@@ -3,14 +3,13 @@
 package subpaving
 
 import (
-	"errors"
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-var ErrHardwareContextTimestamp = errors.New("subpaving: hardware bound timestamp exhausted")
+var ErrHardwareContextTimestamp error = &sourceFailure{message: "subpaving: hardware bound timestamp exhausted"}
 
 func (c *HardwareContext) checkNode(n *HardwareNode, variable uint32) error {
 	if err := c.open(); err != nil {

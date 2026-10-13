@@ -3,14 +3,13 @@
 package subpaving
 
 import (
-	"errors"
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-var ErrHardwareSplitNoInterior = errors.New("subpaving: no representable hardware midpoint")
+var ErrHardwareSplitNoInterior error = &sourceFailure{message: "subpaving: no representable hardware midpoint"}
 
 // SplitMidpoint creates the two children before computing their shared
 // midpoint, following the source order. On a later arithmetic refusal it

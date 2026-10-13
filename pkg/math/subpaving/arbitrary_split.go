@@ -10,7 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-var ErrArbitrarySplitNoInterior = errors.New("subpaving: no representable arbitrary midpoint")
+var ErrArbitrarySplitNoInterior error = &sourceFailure{message: "subpaving: no representable arbitrary midpoint"}
 
 // SplitMidpoint creates both children before calculating the source midpoint.
 // Arithmetic or no-interior refusal leaves the children owned by the context.

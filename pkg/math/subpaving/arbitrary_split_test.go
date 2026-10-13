@@ -114,7 +114,7 @@ func TestArbitraryMidpointSplitterSourceBranches(t *testing.T) {
 			t.Fatal(err)
 		}
 		left, right, err := c.SplitMidpoint(root, f.x, true, 1)
-		if !errors.Is(err, ErrArbitrarySplitNoInterior) || left == nil || right == nil || root.children != 2 ||
+		if !errors.Is(err, ErrArbitrarySplitNoInterior) || !errors.Is(err, ErrSubpavingFailure) || left == nil || right == nil || root.children != 2 ||
 			left.trail != root.trail || right.trail != root.trail {
 			t.Fatal("source creates children before refusing non-interior midpoint", err)
 		}

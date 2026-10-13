@@ -11,7 +11,7 @@ import (
 )
 
 var ErrArbitraryContextCanceled = errors.New("subpaving: arbitrary context canceled")
-var ErrArbitraryContextTimestamp = errors.New("subpaving: arbitrary bound timestamp exhausted")
+var ErrArbitraryContextTimestamp error = &sourceFailure{message: "subpaving: arbitrary bound timestamp exhausted"}
 
 type ArbitraryBound struct {
 	context          *ArbitraryContext
