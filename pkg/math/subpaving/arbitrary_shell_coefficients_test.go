@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/control"
 	umm "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -32,26 +33,16 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	w, err := NewArbitraryShellCoefficients(core, numbers)
+	context, err := NewArbitraryContext(numbers, &control.Reslimit{Limit: 1000}, 0, 0, 1)
 	if err != nil {
 		t.Fatal(err)
 	}
-	otherCore, err := numeral.NewArbitraryFloatManager(config)
+	w, err := NewArbitraryShellCoefficients(context)
 	if err != nil {
 		t.Fatal(err)
 	}
-	otherNumbers, err := numeral.NewArbitraryFloatNumeralManager(otherCore, 11, 53)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := NewArbitraryShellCoefficients(core, otherNumbers); !errors.Is(err, arena.ErrInvalidSlot) {
-		t.Fatalf("foreign f2n core: %v", err)
-	}
-	if err := otherNumbers.Close(); err != nil {
-		t.Fatal(err)
-	}
-	if err := otherCore.Close(); err != nil {
-		t.Fatal(err)
+	if _, err := NewArbitraryShellCoefficients(nil); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("missing source context: %v", err)
 	}
 	copyOwner := *w
 	if _, _, err := copyOwner.PrepareSum(&numeral.Int{Val: 1}, nil); !errors.Is(err, arena.ErrInvalidSlot) {
@@ -63,7 +54,7 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	one, big, three := numeral.NewInt(1), numeral.Int{}, numeral.NewInt(3)
 	q := numeral.NewRational()
 	t.Cleanup(func() {
-		for _, e := range []error{w.Close(), qm.Del(&q), qm.Z.Del(&big), numbers.Close(), core.Close(), r.Close()} {
+		for _, e := range []error{w.Close(), context.Close(), qm.Del(&q), qm.Z.Del(&big), numbers.Close(), core.Close(), r.Close()} {
 			if e != nil {
 				t.Error(e)
 			}
@@ -107,6 +98,10 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	if err := qm.SetFractionSigned(&q, 1, 3); err != nil {
 		t.Fatal(err)
 	}
+	x, err := w.MkVar(false)
+	if err != nil || x != 0 {
+		t.Fatalf("first context variable: %d, %v", x, err)
+	}
 	lower, err := w.PrepareInequality(&q, true)
 	if err != nil {
 		t.Fatal(err)
@@ -123,10 +118,34 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	if err != nil || up != math.Nextafter(1.0/3.0, math.Inf(1)) {
 		t.Fatalf("upper direction: %v, %v", up, err)
 	}
+	a, err := w.MkInequality(x, &q, true, false)
+	if err != nil || a == nil || a.variable != x || !a.lower || a.open {
+		t.Fatalf("context inequality registration: %v, %v", a, err)
+	}
+	stored, err := core.ToDouble(&a.value)
+	if err != nil || stored != down {
+		t.Fatalf("context owns directed scalar: %v, %v", stored, err)
+	}
+	if _, err := w.MkInequality(x+1, &q, false, true); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("unknown context variable: %v", err)
+	}
+	beforeStopped := len(context.inequalities)
+	b.FailAfter(0)
+	_, stopped := context.NewInequality(x, &a.value, true, false)
+	b.FailAfter(-1)
+	if stopped == nil || len(context.inequalities) != beforeStopped+1 {
+		t.Fatalf("stopped copied numeral ownership: %v, %d", stopped, len(context.inequalities))
+	}
 	if err := w.Close(); err != nil {
 		t.Fatal(err)
 	}
 	if _, _, err := w.PrepareSum(&three, nil); !errors.Is(err, arena.ErrClosed) {
 		t.Fatalf("closed coefficient owner: %v", err)
+	}
+	if err := context.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := context.NewVariable(false); !errors.Is(err, arena.ErrClosed) {
+		t.Fatalf("closed MPF context: %v", err)
 	}
 }

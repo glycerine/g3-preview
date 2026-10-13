@@ -50281,7 +50281,7 @@
           ]
         },
         {
-          "name": "Concrete context_mpf wrapper exact integer coefficient preparation and directed rational inequality conversion (src/math/subpaving/subpaving.cpp:85-136)",
+          "name": "Concrete context_mpf wrapper exact integer coefficient preparation, mk_var and directed mk_ineq construction (src/math/subpaving/subpaving.cpp:85-136)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/arbitrary_shell_coefficients.go",
           "tests": [
@@ -50351,7 +50351,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The MPF wrapper now prepares exact integer coefficients in source order using a native typed slice and directed rational inequality bounds. Construction checks that f2n<mpf_manager>::m() is the exact borrowed core and copied Go owner values cannot release the same numerals twice. Its context_mpf mk_sum/mk_ineq construction and search graph remain open."
+        "The MPF wrapper prepares exact integer coefficients in source order using a native typed slice, registers context_mpf variables and copies directed rational inequality bounds into context ownership. Construction derives the exact borrowed core from f2n<mpf_manager>::m() and copied Go owner values cannot release the same numerals twice. Its context_mpf mk_sum construction, clause/search graph and tactic integration remain open."
       ]
     },
     {
@@ -51038,6 +51038,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/subpaving/arbitrary_shell_coefficients_test.go",
+        "pkg/math/subpaving/arbitrary_shell_coefficients.go",
+        "pkg/math/subpaving/arbitrary_context_root.go",
         "pkg/math/subpaving/fixed_interval.go",
         "pkg/math/subpaving/fixed_interval_arith.go",
         "pkg/math/subpaving/fixed_interval_test.go",
@@ -51136,6 +51139,7 @@
         "pkg/math/subpaving/hardware_context_params_test.go"
       ],
       "tests": [
+        "TestArbitraryShellCoefficientSourceConversionAndCleanup",
         "TestSubpavingFixedMutableIntervalRetainedCore",
         "TestSubpavingFixedIntervalScalarMulDiv",
         "TestSubpavingFixedIntervalPowerRetainedCases",
@@ -51693,6 +51697,14 @@
           "tests": [
             "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
           ]
+        },
+        {
+          "name": "Concrete config_mpf variable registration and context-owned directed inequality prefix",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_context_root.go",
+          "tests": [
+            "TestArbitraryShellCoefficientSourceConversionAndCleanup"
+          ]
         }
       ],
       "ownership": [
@@ -51710,6 +51722,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/subpaving/arbitrary_shell_coefficients_test.go",
+        "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
         "pkg/math/subpaving/fixed_node_predicates.go",
@@ -51790,6 +51804,7 @@
         "pkg/math/subpaving/tactic/options_test.go"
       ],
       "tests": [
+        "TestArbitraryShellCoefficientSourceConversionAndCleanup",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -52599,6 +52614,14 @@
           "go_targets": [
             "pkg/math/subpaving/tactic/hardware_engine.go",
             "pkg/math/subpaving/tactic/options_test.go"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf variable registration and context-owned directed inequality prefix",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_context_root.go",
+          "tests": [
+            "TestArbitraryShellCoefficientSourceConversionAndCleanup"
           ]
         }
       ],

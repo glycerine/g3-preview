@@ -15,6 +15,7 @@ var ErrArbitraryShellInexactInteger = errors.New("subpaving: integer coefficient
 // numerals and rational comparison scratch. Its managers are borrowed.
 type ArbitraryShellCoefficients struct {
 	self         *ArbitraryShellCoefficients
+	context      *ArbitraryContext
 	core         *numeral.ArbitraryFloatManager
 	numbers      *numeral.ArbitraryFloatNumeralManager
 	rational     *numeral.RationalManager
@@ -27,32 +28,39 @@ type ArbitraryShellCoefficients struct {
 	closed       bool
 }
 
-func NewArbitraryShellCoefficients(core *numeral.ArbitraryFloatManager, numbers *numeral.ArbitraryFloatNumeralManager) (*ArbitraryShellCoefficients, error) {
-	if core == nil || numbers == nil {
+func NewArbitraryShellCoefficients(context *ArbitraryContext) (*ArbitraryShellCoefficients, error) {
+	if context == nil {
 		return nil, arena.ErrInvalidSlot
+	}
+	if err := context.open(); err != nil {
+		return nil, err
+	}
+	numbers := context.numbers
+	core, err := numbers.BorrowCore()
+	if err != nil {
+		return nil, err
 	}
 	q, err := core.BorrowRationalManager()
 	if err != nil {
 		return nil, err
 	}
-	actual, err := numbers.BorrowCore()
-	if err != nil {
-		return nil, err
-	}
-	if actual != core {
-		return nil, arena.ErrInvalidSlot
-	}
-	w := &ArbitraryShellCoefficients{core: core, numbers: numbers, rational: q}
+	w := &ArbitraryShellCoefficients{context: context, core: core, numbers: numbers, rational: q}
 	w.self = w
 	return w, nil
 }
 
 func (w *ArbitraryShellCoefficients) open() error {
-	if w == nil || w.self != w || w.core == nil || w.numbers == nil || w.rational == nil {
+	if w == nil || w.self != w || w.context == nil || w.core == nil || w.numbers == nil || w.rational == nil {
 		return arena.ErrInvalidSlot
 	}
 	if w.closed {
 		return arena.ErrClosed
+	}
+	if err := w.context.open(); err != nil {
+		return err
+	}
+	if w.context.numbers != w.numbers {
+		return arena.ErrInvalidSlot
 	}
 	actual, err := w.numbers.BorrowCore()
 	if err != nil {
@@ -69,6 +77,21 @@ func (w *ArbitraryShellCoefficients) open() error {
 		return arena.ErrInvalidSlot
 	}
 	return nil
+}
+
+func (w *ArbitraryShellCoefficients) MkVar(integer bool) (uint32, error) {
+	if err := w.open(); err != nil {
+		return 0, err
+	}
+	return w.context.NewVariable(integer)
+}
+
+func (w *ArbitraryShellCoefficients) MkInequality(variable uint32, value *numeral.Rational, lower, open bool) (*ArbitraryInequality, error) {
+	bound, err := w.PrepareInequality(value, lower)
+	if err != nil {
+		return nil, err
+	}
+	return w.context.NewInequality(variable, bound, lower, open)
 }
 
 func (w *ArbitraryShellCoefficients) intToArbitrary(value *numeral.Int, out *numeral.ArbitraryFloat) error {
@@ -132,7 +155,7 @@ func (w *ArbitraryShellCoefficients) PrepareInequality(value *numeral.Rational, 
 // Close follows reverse member order: back, before, coefficient vector,
 // constant. A stopped cleanup resumes at its failing member.
 func (w *ArbitraryShellCoefficients) Close() error {
-	if w == nil || w.self != w || w.core == nil || w.numbers == nil || w.rational == nil {
+	if w == nil || w.self != w || w.context == nil || w.core == nil || w.numbers == nil || w.rational == nil {
 		return arena.ErrInvalidSlot
 	}
 	if w.closed {

@@ -4,6 +4,7 @@ package subpaving
 
 import (
 	"errors"
+	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/interval"
@@ -18,10 +19,21 @@ type ArbitraryContext struct {
 	self                                            *ArbitraryContext
 	numbers                                         *numeral.ArbitraryFloatNumeralManager
 	limit                                           *control.Reslimit
+	variables                                       []bool
+	inequalities                                    []*ArbitraryInequality
 	owners                                          [4]*numeral.ScopedArbitraryFloatNumeral
 	epsilon, maxBound, minusMaxBound, rootPrecision *numeral.ArbitraryFloat
 	zeroEpsilon                                     bool
 	closed                                          bool
+}
+
+// ArbitraryInequality owns the directed MPF scalar copied by mk_ineq.
+type ArbitraryInequality struct {
+	context  *ArbitraryContext
+	variable uint32
+	value    numeral.ArbitraryFloat
+	lower    bool
+	open     bool
 }
 
 // NewArbitraryContext takes the source epsilon, max_bound exponent and
@@ -106,6 +118,36 @@ func (c *ArbitraryContext) XnEqY(out, src *ArbitraryInterval, degree uint32) err
 	return out.XnEqY(src, degree, c.rootPrecision, interval.ArbitraryRoot{Numbers: c.numbers, Limit: c.limit})
 }
 
+// NewVariable is the concrete config_mpf mk_var prefix reached by the tactic.
+func (c *ArbitraryContext) NewVariable(integer bool) (uint32, error) {
+	if err := c.open(); err != nil {
+		return 0, err
+	}
+	if len(c.variables) >= math.MaxUint32 {
+		return 0, arena.ErrInvalidSlot
+	}
+	x := uint32(len(c.variables))
+	c.variables = append(c.variables, integer)
+	return x, nil
+}
+
+// NewInequality copies the wrapper's rounded scalar into context ownership.
+// A stopped copy remains in the context for explicit cleanup.
+func (c *ArbitraryContext) NewInequality(variable uint32, value *numeral.ArbitraryFloat, lower, open bool) (*ArbitraryInequality, error) {
+	if err := c.open(); err != nil {
+		return nil, err
+	}
+	if variable >= uint32(len(c.variables)) || value == nil {
+		return nil, arena.ErrInvalidSlot
+	}
+	a := &ArbitraryInequality{context: c, variable: variable, lower: lower, open: open}
+	c.inequalities = append(c.inequalities, a)
+	if err := c.numbers.Copy(&a.value, value); err != nil {
+		return nil, err
+	}
+	return a, nil
+}
+
 func (c *ArbitraryContext) closeNumerals() (err error) {
 	for i := range c.owners {
 		if c.owners[i] != nil {
@@ -125,6 +167,16 @@ func (c *ArbitraryContext) Close() error {
 	if err := c.closeNumerals(); err != nil {
 		return err
 	}
+	for len(c.inequalities) != 0 {
+		a := c.inequalities[0]
+		if err := c.numbers.Del(&a.value); err != nil {
+			return err
+		}
+		c.inequalities[0] = nil
+		c.inequalities = c.inequalities[1:]
+	}
+	c.inequalities = nil
+	c.variables = nil
 	c.closed = true
 	return nil
 }
