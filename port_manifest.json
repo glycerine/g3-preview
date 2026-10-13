@@ -152605,9 +152605,26 @@
           ]
         },
         {
-          "name": "persistent ostream state/transport, source exception transport and full subpaving tactic result integration",
+          "name": "remaining source exception transport and full subpaving tactic result integration",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "inherited persistent std::ostream state, flags and locale replaced by Go io.Writer for retained MPFF output",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpff_stream.go",
+          "tests": [
+            "TestFastFloatDisplayToSourceInsertionsAndShortWrites"
+          ]
+        },
+        {
+          "name": "mpff_manager exception base, overflow and division-by-zero source messages, z3_exception interface and base catch classification (mpff.h:180-190)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff.go",
+          "tests": [
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatDivTraceSourceShortcutsAndQuotient"
+          ]
         },
         {
           "name": "mpff_manager::display source-order sign, significand and exponent writer insertions reached by fast subpaving interval endpoints (src/util/mpff.cpp:1173-1224)",
@@ -152975,9 +152992,26 @@
           ]
         },
         {
-          "name": "persistent ostream state/transport, source exception transport and full subpaving tactic result integration",
+          "name": "remaining source exception transport and full subpaving tactic result integration",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "inherited persistent std::ostream state, flags and locale replaced by Go io.Writer for retained MPFF output",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpff_stream.go",
+          "tests": [
+            "TestFastFloatDisplayToSourceInsertionsAndShortWrites"
+          ]
+        },
+        {
+          "name": "mpff_manager exception base, overflow and division-by-zero source messages, z3_exception interface and base catch classification (mpff.h:180-190)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff.go",
+          "tests": [
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatDivTraceSourceShortcutsAndQuotient"
+          ]
         },
         {
           "name": "mpff_manager::display source-order sign, significand and exponent writer insertions reached by fast subpaving interval endpoints (src/util/mpff.h:468; src/util/mpff.cpp:1173-1224)",
@@ -153376,6 +153410,16 @@
           "tests": [
             "TestFixedPointRetainedDivisionCallersTrace"
           ]
+        },
+        {
+          "name": "mpfx_manager exception base, overflow and division-by-zero source messages, z3_exception interface and base catch classification (mpfx.h:127-138)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_core.go",
+          "tests": [
+            "TestFixedPointRetainedFloorCeilInverseAndPower",
+            "TestFixedPointPowerAliasExtraSquareAndCeilOverflow",
+            "TestFixedPointComparisonAndProductSourceTrace"
+          ]
         }
       ],
       "ownership": [
@@ -153479,6 +153523,16 @@
           "go_target": "pkg/util/numeral/mpfx_division_callers_trace.go",
           "tests": [
             "TestFixedPointRetainedDivisionCallersTrace"
+          ]
+        },
+        {
+          "name": "mpfx_manager exception base, overflow and division-by-zero source messages, z3_exception interface and base catch classification (mpfx.h:127-138)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_core.go",
+          "tests": [
+            "TestFixedPointRetainedFloorCeilInverseAndPower",
+            "TestFixedPointPowerAliasExtraSquareAndCeilOverflow",
+            "TestFixedPointComparisonAndProductSourceTrace"
           ]
         }
       ],
