@@ -150644,7 +150644,7 @@
         },
         {
           "name": "get_double numerator/denominator conversions and positive floating denominator assertion",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpq_inspect.go",
           "tests": [
             "TestSourceRationalConversionAssertions",
@@ -150657,7 +150657,8 @@
             "TestRationalInspectionEveryFailurePrefix",
             "TestRationalInspectionWarmAllocationAndIndependentValues",
             "TestRationalInspectionRawActionsAndIndependentIncrement",
-            "TestRationalInspectionAliasedCopyFailureCleanup"
+            "TestRationalInspectionAliasedCopyFailureCleanup",
+            "TestScalarProjectionFloatRawIEEEAndDebugAssertion"
           ]
         },
         {
@@ -150943,7 +150944,7 @@
         "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties.",
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing numeric access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
-        "Source get_double evaluates numerator then denominator and asserts d>0 only in debug; current Float64 rejects finite negative converted denominators in release too. Read-only source audit PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md records this remaining profile debt; no getter implementation change is claimed.",
+        "Source get_double evaluates numerator then denominator using the retained UINT_MAX floating radix; Float64 checks d>0 only in source-debug builds and returns the raw IEEE quotient in release, including negative, zero and NaN denominator cases. Focused TestScalarProjectionFloatRawIEEEAndDebugAssertion covers both manager profiles and ownership stability.",
         "Selected Mul/Div entry boundaries validate ordinary Integer ownership without an ordinary rational-read DEN domain. Scalar projections, remaining raw-domain methods, TRACE and whole rational lifecycle stay open.",
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
         "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md.",
