@@ -518,6 +518,16 @@ func (m *RationalManager) addSubWithAllocationContext(a, b, out *Rational, subtr
 			return e
 		}
 	}
+	op := "+"
+	if subtract {
+		op = "-"
+	}
+	m.traceMPQBinary(a, b, out, op, "mpq", true)
+	defer func() {
+		if _rawErr == nil {
+			m.traceMPQBinary(a, b, out, op, "mpq", false)
+		}
+	}()
 	if isIntegerRational(a) && isIntegerRational(b) {
 		var e error
 		if subtract {
@@ -533,6 +543,12 @@ func (m *RationalManager) addSubWithAllocationContext(a, b, out *Rational, subtr
 		}
 		return nil
 	}
+	m.traceMPQBinary(a, b, out, op, "rat_mpq", true)
+	defer func() {
+		if _rawErr == nil {
+			m.traceMPQBinary(a, b, out, op, "rat_mpq", false)
+		}
+	}()
 	one, two := &m.AddTmp1, &m.AddTmp2
 	if m.Synchronized {
 		r := &m.RawArithmetic
@@ -586,12 +602,18 @@ func (m *RationalManager) addSubWithAllocationContext(a, b, out *Rational, subtr
 func (m *RationalManager) Mul(a, b, out *Rational) error {
 	return m.mulWithAllocationContext(a, b, out, integerAllocationInvocationContext{})
 }
-func (m *RationalManager) mulWithAllocationContext(a, b, out *Rational, context integerAllocationInvocationContext) error {
+func (m *RationalManager) mulWithAllocationContext(a, b, out *Rational, context integerAllocationInvocationContext) (err error) {
 	for _, n := range []*Rational{a, b, out} {
 		if e := m.checkScalarValue(n); e != nil {
 			return e
 		}
 	}
+	m.traceMPQBinary(a, b, out, "*", "mpq", true)
+	defer func() {
+		if err == nil {
+			m.traceMPQBinary(a, b, out, "*", "mpq", false)
+		}
+	}()
 	// Source chooses this branch before output aliases can mutate operands.
 	integers, e := m.IsInt(a)
 	if e != nil {
@@ -602,6 +624,14 @@ func (m *RationalManager) mulWithAllocationContext(a, b, out *Rational, context 
 		if e != nil {
 			return e
 		}
+	}
+	if !integers {
+		m.traceMPQBinary(a, b, out, "*", "rat_mpq", true)
+		defer func() {
+			if err == nil {
+				m.traceMPQBinary(a, b, out, "*", "rat_mpq", false)
+			}
+		}()
 	}
 	if e := m.Z.mulWithAllocationContext(&a.Num, &b.Num, &out.Num, context); e != nil {
 		return e
