@@ -297,6 +297,98 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if err := cooperation.EndTask(); err != nil {
 		t.Fatal(err)
 	}
+	var adjacent numeral.FastFloat
+	adjacentExact := numeral.NewRational()
+	defer func() {
+		if err := qm.Del(&adjacentExact); err != nil {
+			t.Error(err)
+		}
+		if err := numbers.Del(&adjacent); err != nil {
+			t.Error(err)
+		}
+	}()
+	if err := numbers.SetInt32(&adjacent, 1); err != nil {
+		t.Fatal(err)
+	}
+	if err := numbers.Next(&adjacent); err != nil {
+		t.Fatal(err)
+	}
+	if err := numbers.ToRational(&adjacent, qm, &adjacentExact); err != nil {
+		t.Fatal(err)
+	}
+	adjacentText, err := qm.String(&adjacentExact)
+	if err != nil {
+		t.Fatal(err)
+	}
+	adjacentSort, err := m.MkFamilySort(family, 0, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	realName, err := sy.Intern("y")
+	if err != nil {
+		t.Fatal(err)
+	}
+	y, err := m.MkConst(realName, adjacentSort)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := q.SetString(&value, "1"); err != nil {
+		t.Fatal(err)
+	}
+	one, err := m.ArithmeticNumeral(&value, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := q.SetString(&value, adjacentText); err != nil {
+		t.Fatal(err)
+	}
+	upper, err := m.ArithmeticNumeral(&value, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	lowerBound, err := m.MkFamilyApp(family, 3, nil, []ast.ASTHandle{y, one})
+	if err != nil {
+		t.Fatal(err)
+	}
+	upperBound, err := m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{y, upper})
+	if err != nil {
+		t.Fatal(err)
+	}
+	adjacentGoal, err := goaltactic.NewGoal(m, false, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := adjacentGoal.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
+	if err := adjacentGoal.Assert(lowerBound); err != nil {
+		t.Fatal(err)
+	}
+	if err := adjacentGoal.Assert(upperBound); err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.SetUIntName(&p, &depthKey, 1); err != nil {
+		t.Fatal(err)
+	}
+	if err := core.UpdateParams(&p); err != nil {
+		t.Fatal(err)
+	}
+	if err := core.Cleanup(); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := core.Apply(adjacentGoal); got != nil {
+		t.Fatal("failed source search must not return a goal", got, err)
+	} else {
+		var tacticErr goaltactic.TacticException
+		if !errors.As(err, &tacticErr) || tacticErr.Message() != "failed building subpaving tree..." {
+			t.Fatal("source search exception translation", adjacentText, err)
+		}
+	}
+	if err := cooperation.EndTask(); err != nil {
+		t.Fatal(err)
+	}
 	memoryKey := "max_memory"
 	if err := pc.SetUIntName(&p, &memoryKey, 0); err != nil {
 		t.Fatal(err)
@@ -336,6 +428,9 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	}
 	physicalLive = false
 	if err := pc.SetUIntName(&p, &memoryKey, ^uint32(0)); err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.SetUIntName(&p, &depthKey, 0); err != nil {
 		t.Fatal(err)
 	}
 	if err := cooperation.EndSection(); err != nil {
