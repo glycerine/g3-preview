@@ -22,18 +22,18 @@ func (n *FixedNode) IsZero(variable uint32) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if lower == nil || upper == nil || lower.open || upper.open {
+	if lower == nil || upper == nil {
 		return false, nil
 	}
 	lz, err := n.numbers.IsZero(lower.value)
 	if err != nil {
 		return false, err
 	}
-	uz, err := n.numbers.IsZero(upper.value)
-	if err != nil {
-		return false, err
+	if !lz {
+		return false, nil
 	}
-	return lz && uz, nil
+	uz, err := n.numbers.IsZero(upper.value)
+	return uz && !lower.open && !upper.open, err
 }
 
 func (n *FixedNode) IsUpperZero(variable uint32) (bool, error) {
@@ -41,10 +41,11 @@ func (n *FixedNode) IsUpperZero(variable uint32) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if upper == nil || upper.open {
+	if upper == nil {
 		return false, nil
 	}
-	return n.numbers.IsZero(upper.value)
+	z, err := n.numbers.IsZero(upper.value)
+	return z && !upper.open, err
 }
 
 func (n *FixedNode) ConflictingBounds(variable uint32) (bool, error) {
@@ -59,9 +60,12 @@ func (n *FixedNode) ConflictingBounds(variable uint32) (bool, error) {
 	if lower == nil || upper == nil {
 		return false, nil
 	}
-	cmp, err := n.numbers.Compare(upper.value, lower.value)
-	if err != nil {
-		return false, err
+	less, err := n.numbers.Less(upper.value, lower.value)
+	if err != nil || less {
+		return less, err
 	}
-	return cmp < 0 || cmp == 0 && (lower.open || upper.open), nil
+	if !lower.open && !upper.open {
+		return false, nil
+	}
+	return n.numbers.Equal(upper.value, lower.value)
 }

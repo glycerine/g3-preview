@@ -22,15 +22,18 @@ func (n *FastNode) IsZero(variable uint32) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if lower == nil || upper == nil || lower.open || upper.open {
+	if lower == nil || upper == nil {
 		return false, nil
 	}
 	lz, err := n.numbers.IsZero(lower.value)
 	if err != nil {
 		return false, err
 	}
+	if !lz {
+		return false, nil
+	}
 	uz, err := n.numbers.IsZero(upper.value)
-	return lz && uz, err
+	return uz && !lower.open && !upper.open, err
 }
 
 func (n *FastNode) IsUpperZero(variable uint32) (bool, error) {
@@ -38,10 +41,11 @@ func (n *FastNode) IsUpperZero(variable uint32) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if upper == nil || upper.open {
+	if upper == nil {
 		return false, nil
 	}
-	return n.numbers.IsZero(upper.value)
+	z, err := n.numbers.IsZero(upper.value)
+	return z && !upper.open, err
 }
 
 func (n *FastNode) ConflictingBounds(variable uint32) (bool, error) {
