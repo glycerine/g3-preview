@@ -39497,6 +39497,15 @@ the corresponding value and predicate methods in `hwf.h/.cpp`. Directed
 rounding arithmetic, rational conversion, text, the manager's mpq child and
 the subpaving `f2n<hwf_manager>` caller remain open.
 
+The next HWF increment implements directed binary64 add, subtract, multiply
+and divide. Exact Go rationals supply the intermediate finite result, with
+nearest-even conversion and an adjacent binary64 value for directed modes;
+this avoids changing the process-wide FPU mode. Focused cases cover signed
+zero, overflow, underflow, exceptional operands, aliasing and unsupported
+nearest-away rounding. Fused arithmetic, square root, conversion, text,
+integral rounding, manager ownership and the concrete subpaving caller remain
+open.
+
 ### Environment parameter runtime boundary
 
 `src/util/env_params.h/.cpp` has exactly two static operations. The five
