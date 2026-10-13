@@ -51754,6 +51754,8 @@
         "pkg/math/subpaving/arbitrary_selector_test.go",
         "pkg/math/subpaving/arbitrary_search.go",
         "pkg/math/subpaving/arbitrary_search_test.go",
+        "pkg/math/subpaving/arbitrary_statistics.go",
+        "pkg/math/subpaving/arbitrary_statistics_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
@@ -51850,6 +51852,7 @@
         "TestArbitraryMidpointSplitterSourceBranches",
         "TestArbitrarySelectorsBreadthFirstAndRoundRobin",
         "TestArbitrarySearchBreadthFirstLimitAndChildResume",
+        "TestArbitraryStatisticsConflictLeafAndTreeCleanup",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -52620,6 +52623,18 @@
           ],
           "tests": [
             "TestArbitrarySearchBreadthFirstLimitAndChildResume"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf conflict leaf retirement, bound/conflict/split/node/visit statistics, reset, and descendant-first tree cleanup (src/math/subpaving/subpaving_t_def.h:897-960,1164-1174,1869-1884)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_statistics.go",
+          "go_targets": [
+            "pkg/math/subpaving/arbitrary_context_bounds.go",
+            "pkg/math/subpaving/arbitrary_context_root.go"
+          ],
+          "tests": [
+            "TestArbitraryStatisticsConflictLeafAndTreeCleanup"
           ]
         },
         {

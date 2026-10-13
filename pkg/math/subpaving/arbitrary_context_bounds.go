@@ -145,6 +145,7 @@ func (c *ArbitraryContext) publishBoundWithReason(n *ArbitraryNode, variable uin
 	if value == nil || n.conflictVar != math.MaxUint32 {
 		return arena.ErrInvalidSlot
 	}
+	c.numBounds++
 	b := &ArbitraryBound{context: c, variable: variable, lower: lower, open: open, axiom: axiom, reasonClause: clause, reasonVariable: reasonVariable, definitionReason: definitionReason}
 	c.bounds = append(c.bounds, b)
 	m := c.numbers
@@ -191,6 +192,8 @@ func (c *ArbitraryContext) publishBoundWithReason(n *ArbitraryNode, variable uin
 	}
 	if conflict {
 		n.conflictVar = variable
+		c.numConflicts++
+		c.removeLeaf(n)
 	}
 	c.timestamp++
 	if c.timestamp == math.MaxUint64 {

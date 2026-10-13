@@ -41,6 +41,8 @@ type ArbitraryContext struct {
 	searchNode                                      *ArbitraryNode
 	searchPhase                                     uint8
 	numSplits                                       uint64
+	numBounds                                       uint64
+	numConflicts                                    uint64
 	bounds                                          []*ArbitraryBound
 	queue                                           []*ArbitraryBound
 	queueHead                                       int
@@ -210,14 +212,25 @@ func (c *ArbitraryContext) Close() error {
 	c.queue = nil
 	c.queueHead = 0
 	for len(c.bounds) != 0 {
-		b := c.bounds[0]
+		i := len(c.bounds) - 1
+		b := c.bounds[i]
 		if err := c.numbers.Del(&b.value); err != nil {
 			return err
 		}
-		c.bounds[0] = nil
-		c.bounds = c.bounds[1:]
+		c.bounds[i] = nil
+		c.bounds = c.bounds[:i]
 	}
 	c.bounds = nil
+	for i := len(c.nodes) - 1; i >= 0; i-- {
+		n := c.nodes[i]
+		c.removeLeaf(n)
+		if n.parent != nil {
+			n.parent.children--
+		}
+		n.lower, n.upper = nil, nil
+		n.trail = nil
+		n.closed = true
+	}
 	c.root = nil
 	c.nodes = nil
 	c.leafHead, c.leafTail = nil, nil
