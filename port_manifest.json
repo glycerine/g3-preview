@@ -115909,24 +115909,36 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "dec_ref_key_values for AST expr_map, API AST map and recover_01_tactic bool-to-int map",
-          "status": "partial",
-          "go_target": "pkg/ast/ast_expr_map.go",
-          "go_targets": [
-            "pkg/api/api_ast_map_object.go"
-          ],
-          "tests": [
-            "TestASTExprMapConcreteReferenceCleanup",
-            "TestAPIASTMapConcreteReferenceCleanup"
-          ]
-        },
-        {
-          "name": "dec_ref_values for AST expr_map proof table, SMT name-to-assertion map and command user-tactic declarations",
-          "status": "partial",
+          "name": "dec_ref_key_values for AST expr_map expression table",
+          "status": "ported",
           "go_target": "pkg/ast/ast_expr_map.go",
           "tests": [
             "TestASTExprMapConcreteReferenceCleanup"
           ]
+        },
+        {
+          "name": "dec_ref_key_values for API AST map",
+          "status": "ported",
+          "go_target": "pkg/api/api_ast_map_object.go",
+          "tests": [
+            "TestAPIASTMapConcreteReferenceCleanup"
+          ]
+        },
+        {
+          "name": "dec_ref_key_values for recover_01_tactic bool-to-int map",
+          "status": "unported"
+        },
+        {
+          "name": "dec_ref_values for AST expr_map proof table",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr_map.go",
+          "tests": [
+            "TestASTExprMapConcreteReferenceCleanup"
+          ]
+        },
+        {
+          "name": "dec_ref_values for SMT name-to-assertion map and command user-tactic declarations",
+          "status": "unported"
         },
         {
           "name": "dec_ref_keys has no retained production call site",
