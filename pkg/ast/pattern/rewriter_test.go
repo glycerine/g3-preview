@@ -126,7 +126,9 @@ func TestPatternInferenceActualRewriterPendingPullAndResume(t *testing.T) {
 	if e := r.Rewrite(q, out); !errors.Is(e, ast.ErrASTPending) {
 		t.Fatal("default pull branch must remain explicit", e)
 	}
-	r.options.pullQuantifiers = false
+	options := DefaultInferenceOptions()
+	options.PullQuantifiers = false
+	patternMust(t, r.UpdateOptions(options))
 	patternMust(t, r.Resume(out))
 	got, err := m.RefGet(out)
 	patternMust(t, err)

@@ -296,6 +296,7 @@
         "contains_subpattern.go",
         "infer.go",
         "multi_pattern.go",
+        "options.go",
         "pattern_selection.go",
         "preferred_pattern.go",
         "reduce_quantifier.go",
@@ -1186,7 +1187,9 @@
       "imports": [
         "arena",
         "ast",
+        "ast/pattern",
         "ast/rewriter/bit_blaster",
+        "util/diagnostic",
         "util/memory",
         "util/params",
         "util/symbol",
@@ -1196,6 +1199,7 @@
       "production_files": [
         "gparams_catalog_collectors.go",
         "owned_string_alias.go",
+        "pattern_inference_rewriter.go",
         "smt_dyn_ack_pairs.go",
         "smt_dyn_ack_schedule.go",
         "smt_dyn_ack_triples.go",

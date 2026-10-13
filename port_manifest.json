@@ -18107,7 +18107,9 @@
         "pkg/ast/pattern/collect.go",
         "pkg/ast/pattern/infer.go",
         "pkg/ast/pattern/reduce_quantifier.go",
-        "pkg/ast/pattern/rewriter.go"
+        "pkg/ast/pattern/rewriter.go",
+        "pkg/ast/pattern/options.go",
+        "pkg/smtcore/pattern_inference_rewriter.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18124,7 +18126,8 @@
         "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
         "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
         "TestPatternInferenceActualRewriterTraversalAndOwnership",
-        "TestPatternInferenceActualRewriterPendingPullAndResume"
+        "TestPatternInferenceActualRewriterPendingPullAndResume",
+        "TestPatternInferenceParamsBindRewriterAndRefresh"
       ],
       "conditionals": [
         {
@@ -18300,6 +18303,14 @@
             "TestPatternInferenceActualRewriterTraversalAndOwnership",
             "TestPatternInferenceActualRewriterPendingPullAndResume"
           ]
+        },
+        {
+          "name": "Concrete pi option snapshot and refresh into pattern inference traversal, preserving full unsigned arithmetic mode",
+          "status": "partial",
+          "go_target": "pkg/smtcore/pattern_inference_rewriter.go",
+          "tests": [
+            "TestPatternInferenceParamsBindRewriterAndRefresh"
+          ]
         }
       ],
       "ownership": [],
@@ -18466,7 +18477,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/util_smt_pattern_inference_params.go",
-        "pkg/smtcore/util_smt_pattern_inference_params_source_test.go"
+        "pkg/smtcore/util_smt_pattern_inference_params_source_test.go",
+        "pkg/ast/pattern/options.go",
+        "pkg/smtcore/pattern_inference_rewriter.go"
       ],
       "tests": [
         "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
@@ -18474,7 +18487,8 @@
         "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
         "TestSMTPatternTenDisplayChainsGoBufferSignedEnumAndBool",
         "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
-        "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
+        "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestPatternInferenceParamsBindRewriterAndRefresh"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -18490,6 +18504,14 @@
             "TestSMTPatternTenDisplayChainsGoBufferSignedEnumAndBool",
             "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
             "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
+          ]
+        },
+        {
+          "name": "Concrete pi option snapshot and refresh into pattern inference traversal, preserving full unsigned arithmetic mode",
+          "status": "partial",
+          "go_target": "pkg/smtcore/pattern_inference_rewriter.go",
+          "tests": [
+            "TestPatternInferenceParamsBindRewriterAndRefresh"
           ]
         }
       ],
@@ -18508,7 +18530,9 @@
       "go_targets": [
         "pkg/smtcore/util_smt_pattern_inference_params.go",
         "pkg/smtcore/util_smt_pattern_inference_params_source_test.go",
-        "pkg/smtcore/util_smt_preprocessor_params.go"
+        "pkg/smtcore/util_smt_preprocessor_params.go",
+        "pkg/ast/pattern/options.go",
+        "pkg/smtcore/pattern_inference_rewriter.go"
       ],
       "tests": [
         "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
@@ -18519,7 +18543,8 @@
         "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation",
         "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
         "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
-        "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal"
+        "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal",
+        "TestPatternInferenceParamsBindRewriterAndRefresh"
       ],
       "conditionals": [
         {
@@ -18555,6 +18580,14 @@
             "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
             "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
             "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal"
+          ]
+        },
+        {
+          "name": "Concrete pi option snapshot and refresh into pattern inference traversal, preserving full unsigned arithmetic mode",
+          "status": "partial",
+          "go_target": "pkg/smtcore/pattern_inference_rewriter.go",
+          "tests": [
+            "TestPatternInferenceParamsBindRewriterAndRefresh"
           ]
         }
       ],
@@ -115757,8 +115790,13 @@
       "component": "util",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/util/bitset/approx.go"],
-      "tests": ["TestApproxSetSource64ResiduesDisplayAndIterator", "TestApproxSetIndependentFiniteAlgebra"],
+      "go_targets": [
+        "pkg/util/bitset/approx.go"
+      ],
+      "tests": [
+        "TestApproxSetSource64ResiduesDisplayAndIterator",
+        "TestApproxSetIndependentFiniteAlgebra"
+      ],
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
@@ -115766,7 +115804,10 @@
           "name": "approx_set::display and size ascending 64-bit residue traversal (approx_set.cpp:22-51)",
           "status": "ported",
           "go_target": "pkg/util/bitset/approx.go",
-          "tests": ["TestApproxSetSource64ResiduesDisplayAndIterator", "TestApproxSetIndependentFiniteAlgebra"]
+          "tests": [
+            "TestApproxSetSource64ResiduesDisplayAndIterator",
+            "TestApproxSetIndependentFiniteAlgebra"
+          ]
         }
       ],
       "ownership": [
@@ -115850,7 +115891,10 @@
           "name": "Concrete uint64 unsigned set algebra, source iterator and remaining-word equality; complete display and size bodies (approx_set.h:43-158,162-233; approx_set.cpp:22-51)",
           "status": "ported",
           "go_target": "pkg/util/bitset/approx.go",
-          "tests": ["TestApproxSetSource64ResiduesDisplayAndIterator", "TestApproxSetIndependentFiniteAlgebra"]
+          "tests": [
+            "TestApproxSetSource64ResiduesDisplayAndIterator",
+            "TestApproxSetIndependentFiniteAlgebra"
+          ]
         },
         {
           "name": "Complete remaining uint32 constructors, literal/variable mapping, value union/intersection and equality/subsumption; all six actual fork template aliases audited (approx_set.h:25-233; sat_types.h:115-119; sat_solver.h:419; smt_literal.h:114-116; smt_conflict_resolution.h:34)",

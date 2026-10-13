@@ -163,7 +163,9 @@ digraph packages {
   "smtcore" [style=filled, fillcolor="#eeeeee"];
   "smtcore" -> "arena";
   "smtcore" -> "ast";
+  "smtcore" -> "ast/pattern";
   "smtcore" -> "ast/rewriter/bit_blaster";
+  "smtcore" -> "util/diagnostic";
   "smtcore" -> "util/memory";
   "smtcore" -> "util/params";
   "smtcore" -> "util/symbol";

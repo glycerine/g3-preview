@@ -57,6 +57,10 @@ type InferenceRewriter struct {
 }
 
 func NewInferenceRewriter(m *ast.ASTManager) (*InferenceRewriter, error) {
+	return NewInferenceRewriterWithOptions(m, DefaultInferenceOptions())
+}
+
+func NewInferenceRewriterWithOptions(m *ast.ASTManager, options InferenceOptions) (*InferenceRewriter, error) {
 	if m == nil {
 		return nil, ast.ErrASTHandle
 	}
@@ -67,17 +71,14 @@ func NewInferenceRewriter(m *ast.ASTManager) (*InferenceRewriter, error) {
 	if proofs {
 		return nil, ast.ErrASTPending
 	}
-	candidates, err := newPatternCandidates(m, 0, nil, true)
+	candidates, err := newPatternCandidates(m, 0, nil, options.BlockLoopPatterns)
 	if err != nil {
 		return nil, err
 	}
+	candidates.avoidSkolems = options.AvoidSkolems
 	r := &InferenceRewriter{
 		manager: m, candidates: candidates,
-		options: quantifierInferenceOptions{
-			arithmeticMode:  arithmeticPatternsConservative,
-			noPatternWeight: -1, arithmeticWeight: 5, nonNestedArithmeticWeight: 10,
-			pullQuantifiers: true,
-		},
+		options: options.internal(),
 	}
 	r.self = r
 	r.config.owner = r
@@ -86,6 +87,16 @@ func NewInferenceRewriter(m *ast.ASTManager) (*InferenceRewriter, error) {
 		return r, err
 	}
 	return r, nil
+}
+
+func (r *InferenceRewriter) UpdateOptions(options InferenceOptions) error {
+	if r == nil || r.self != r || r.closed {
+		return ast.ErrASTHandle
+	}
+	r.options = options.internal()
+	r.candidates.blockLoops = options.BlockLoopPatterns
+	r.candidates.avoidSkolems = options.AvoidSkolems
+	return nil
 }
 
 func (r *InferenceRewriter) Rewrite(body ast.ASTHandle, out ast.ASTRef) error {
