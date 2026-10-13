@@ -50259,6 +50259,14 @@
           "tests": [
             "TestSubpavingHardwareShellCoefficientAndInequalityConversion"
           ]
+        },
+        {
+          "name": "Concrete context_hwf wrapper mk_sum and mk_ineq conversion and construction (src/math/subpaving/subpaving.cpp:144-206)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
+          "tests": [
+            "TestSubpavingHardwareShellCoefficientAndInequalityConversion"
+          ]
         }
       ],
       "ownership": [],
@@ -50943,7 +50951,8 @@
         "pkg/math/interval/hardware_root.go",
         "pkg/math/subpaving/hardware_interval_root.go",
         "pkg/math/subpaving/hardware_context_root.go",
-        "pkg/math/subpaving/hardware_context_params.go"
+        "pkg/math/subpaving/hardware_context_params.go",
+        "pkg/math/subpaving/hardware_context_constraints.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -51010,7 +51019,8 @@
         "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
         "TestSubpavingHardwareIntervalXnEqYRetainedCases",
         "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
-        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
+        "TestSubpavingHardwareShellCoefficientAndInequalityConversion"
       ],
       "conditionals": [
         {
@@ -51359,6 +51369,14 @@
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
           ]
+        },
+        {
+          "name": "Concrete config_hwf polynomial and inequality scalar records used by retained shell (src/math/subpaving/subpaving_t.h:51-67)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_constraints.go",
+          "tests": [
+            "TestSubpavingHardwareShellCoefficientAndInequalityConversion"
+          ]
         }
       ],
       "ownership": [
@@ -51431,7 +51449,8 @@
         "pkg/math/interval/hardware_root.go",
         "pkg/math/subpaving/hardware_interval_root.go",
         "pkg/math/subpaving/hardware_context_root.go",
-        "pkg/math/subpaving/hardware_context_params.go"
+        "pkg/math/subpaving/hardware_context_params.go",
+        "pkg/math/subpaving/hardware_context_constraints.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51489,7 +51508,8 @@
         "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
         "TestSubpavingHardwareIntervalXnEqYRetainedCases",
         "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
-        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
+        "TestSubpavingHardwareShellCoefficientAndInequalityConversion"
       ],
       "assertions": [
         {
@@ -52079,6 +52099,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_params.go",
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf mk_var, mk_sum, and mk_ineq construction with sorted duplicate coefficient swaps (src/math/subpaving/subpaving_t_def.h:666-687,741-780)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_constraints.go",
+          "tests": [
+            "TestSubpavingHardwareShellCoefficientAndInequalityConversion"
           ]
         }
       ],

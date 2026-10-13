@@ -95,8 +95,50 @@ func TestSubpavingHardwareShellCoefficientAndInequalityConversion(t *testing.T) 
 	if upper.Cmp(big.NewRat(1, 3)) <= 0 {
 		t.Fatal("upper inequality direction", upper)
 	}
+	x0, err := c.NewVariable(true)
+	must(err)
+	x1, err := c.NewVariable(true)
+	must(err)
+	_, err = c.NewVariable(false)
+	must(err)
+	must(qm.Z.SetInt64(&values[0], 3))
+	must(qm.Z.SetInt64(&values[1], 4))
+	must(qm.Z.SetInt64(&values[2], 5))
+	must(qm.Z.SetInt64(&values[3], 7))
+	polyVar, err := w.MkSum(&values[3], []*numeral.Int{&values[0], &values[1], &values[2]}, []uint32{x1, x0, x1})
+	must(err)
+	p := c.polynomials[polyVar]
+	if polyVar != 3 || c.isInt[polyVar] || m.ToFloat64(&p.constant) != 7 || len(p.terms) != 3 ||
+		p.terms[0].variable != x0 || m.ToFloat64(&p.terms[0].coefficient) != 4 ||
+		p.terms[1].variable != x1 || m.ToFloat64(&p.terms[1].coefficient) != 5 ||
+		p.terms[2].variable != x1 || m.ToFloat64(&p.terms[2].coefficient) != 0 ||
+		len(c.watchers[x1]) != 2 || c.watchers[x1][0] != polyVar || c.watchers[x1][1] != polyVar {
+		t.Fatalf("source sorted polynomial and duplicate coefficient swaps: x=%d int=%v c=%v terms=%v watchers=%v", polyVar, c.isInt[polyVar], m.ToFloat64(&p.constant), p.terms, c.watchers[x1])
+	}
+	if _, err := w.MkSum(&values[3], []*numeral.Int{&values[0]}, []uint32{x0, x1}); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatal("mismatched sum vectors", err)
+	}
+	if _, err := w.MkSum(&values[3], []*numeral.Int{&values[0]}, []uint32{99}); !errors.Is(err, arena.ErrInvalidSlot) || len(c.isInt) != 4 {
+		t.Fatal("invalid source variable", err)
+	}
+	lowerAtom, err := w.MkInequality(x0, &q, true, false)
+	must(err)
+	upperAtom, err := w.MkInequality(x0, &q, false, true)
+	must(err)
+	if !lowerAtom.lower || lowerAtom.open || upperAtom.lower || !upperAtom.open ||
+		new(big.Rat).SetFloat64(m.ToFloat64(&lowerAtom.value)).Cmp(big.NewRat(1, 3)) >= 0 ||
+		new(big.Rat).SetFloat64(m.ToFloat64(&upperAtom.value)).Cmp(big.NewRat(1, 3)) <= 0 ||
+		m.ToFloat64(&p.constant) != 7 {
+		t.Fatal("directed inequality copies and polynomial ownership")
+	}
+	if _, err := w.MkInequality(99, &q, true, false); !errors.Is(err, arena.ErrInvalidSlot) || len(c.inequalities) != 2 {
+		t.Fatal("invalid inequality variable", err)
+	}
 	must(c.Close())
 	if err := w.PrepareInequality(&q, true); !errors.Is(err, arena.ErrClosed) {
 		t.Fatal("closed wrapper context", err)
+	}
+	if _, err := c.NewVariable(true); !errors.Is(err, arena.ErrClosed) {
+		t.Fatal("closed context variable", err)
 	}
 }

@@ -98,3 +98,27 @@ func (w *HardwareShellCoefficients) PrepareInequality(value *numeral.Rational, l
 	w.context.numbers.SetRounding(!lower)
 	return w.context.numbers.SetRational(&w.constant, w.rational, value)
 }
+
+// MkSum completes the source wrapper's coefficient conversion and delegates
+// the scalar copies and variable registration to the hardware context.
+func (w *HardwareShellCoefficients) MkSum(constant *numeral.Int, coefficients []*numeral.Int, variables []uint32) (uint32, error) {
+	if len(coefficients) != len(variables) {
+		return 0, arena.ErrInvalidSlot
+	}
+	if err := w.PrepareSum(constant, coefficients); err != nil {
+		return 0, err
+	}
+	terms := make([]HardwarePolynomialTerm, len(variables))
+	for i, variable := range variables {
+		terms[i] = HardwarePolynomialTerm{Variable: variable, Coefficient: &w.coefficients[i]}
+	}
+	return w.context.DefinePolynomial(&w.constant, terms)
+}
+
+// MkInequality rounds its rational bound before copying it to the context.
+func (w *HardwareShellCoefficients) MkInequality(variable uint32, value *numeral.Rational, lower, open bool) (*HardwareInequality, error) {
+	if err := w.PrepareInequality(value, lower); err != nil {
+		return nil, err
+	}
+	return w.context.NewInequality(variable, &w.constant, lower, open)
+}

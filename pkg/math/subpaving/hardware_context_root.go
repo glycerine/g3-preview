@@ -26,6 +26,10 @@ type HardwareContext struct {
 	maxDepth      uint32
 	maxNodes      uint32
 	maxMemory     uint64
+	isInt         []bool
+	polynomials   map[uint32]*HardwarePolynomial
+	watchers      [][]uint32
+	inequalities  []*HardwareInequality
 	closed        bool
 }
 
