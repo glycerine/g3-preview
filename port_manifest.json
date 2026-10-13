@@ -117009,7 +117009,7 @@
         },
         {
           "name": "Concrete mpq extended-number signs, comparison, arithmetic, reciprocal and power reached by interval_manager (src/util/ext_numeral.h:27-344)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/interval/rational_extended.go",
           "tests": [
             "TestRationalExtendedIntervalBranches"
@@ -117080,7 +117080,7 @@
       ],
       "deviations": [
         "No generic manager-interface translation is retained. Concrete mpq, mpbq, mpfx and mpff specializations live beside their interval and subpaving consumers. src/test/ext_numeral.cpp is test-only.",
-        "Whole-source instantiation audit found real-closure mpbq and subpaving mpq/mpfx/mpf/mpff/hwf consumers; the concrete rational and binary-rational Go paths do not close all retained instantiations.",
+        "The interval_manager mpq specialization is covered by RationalExtended's live sign, order, arithmetic, reciprocal, power and display paths, with caller-owned outputs and borrowed numerals. Whole-source instantiation audit also found real-closure mpbq and subpaving mpq/mpfx/mpf/mpff/hwf consumers; the interval mpq port does not close those retained instantiations.",
         "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner. The mpff helper serves mutable and constant-node fast-float interval views; the enclosing subpaving context is partial. Concrete mpq/mpbq/mpfx/mpff displays now report Go io.Writer short writes after the exact emitted prefix. Other extended-number instantiations remain unfinished."
       ]
     },
