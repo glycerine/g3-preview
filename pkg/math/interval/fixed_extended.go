@@ -73,6 +73,16 @@ func (e FixedExtended) Compare(a *numeral.FixedPoint, ak ExtendedKind, b *numera
 	return e.Numbers.Compare(a, b)
 }
 
+func (e FixedExtended) Equal(a *numeral.FixedPoint, ak ExtendedKind, b *numeral.FixedPoint, bk ExtendedKind) (bool, error) {
+	if ak != Finite {
+		return ak == bk, nil
+	}
+	if bk != Finite {
+		return false, nil
+	}
+	return e.Numbers.Equal(a, b)
+}
+
 func (e FixedExtended) Neg(a *numeral.FixedPoint, k ExtendedKind) (ExtendedKind, error) {
 	if k == MinusInfinity {
 		return PlusInfinity, nil

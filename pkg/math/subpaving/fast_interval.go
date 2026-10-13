@@ -223,11 +223,22 @@ func (v *FastInterval) CheckInvariant() error {
 	if err != nil {
 		return err
 	}
-	cmp, err := (interval.FastExtended{Numbers: v.numbers}).Compare(lo, v.lowerKind(), hi, v.upperKind())
+	e := interval.FastExtended{Numbers: v.numbers}
+	equal, err := e.Equal(lo, v.lowerKind(), hi, v.upperKind())
 	if err != nil {
 		return err
 	}
-	if cmp > 0 || cmp == 0 && (v.lowerOpen || v.upperOpen) {
+	if equal {
+		if v.lowerOpen || v.upperOpen {
+			return interval.ErrExtendedDomain
+		}
+		return nil
+	}
+	cmp, err := e.Compare(lo, v.lowerKind(), hi, v.upperKind())
+	if err != nil {
+		return err
+	}
+	if cmp >= 0 {
 		return interval.ErrExtendedDomain
 	}
 	return nil

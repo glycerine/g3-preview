@@ -40,6 +40,16 @@ func TestRealClosureBinaryExtendedNumeralBranches(t *testing.T) {
 	must(m.SetInt32Power(&a, -3, 1))
 	must(m.SetInt32(&b, 2))
 	e := BinaryExtended{Numbers: m, DivisionPrecision: 64}
+	rawOne, rawTwoOverTwo := numeral.NewBinaryInt(1), numeral.NewBinaryIntPower(2, 1)
+	if equal, err := e.Equal(&rawOne, Finite, &rawTwoOverTwo, Finite); err != nil || equal {
+		t.Fatalf("source binary-rational equality compares raw fields: %v, %v", equal, err)
+	}
+	if cmp, err := e.Compare(&rawOne, Finite, &rawTwoOverTwo, Finite); err != nil || cmp != 0 {
+		t.Fatalf("numeric ordering of the same raw pair: %d, %v", cmp, err)
+	}
+	if equal, err := e.Equal(nil, PlusInfinity, nil, PlusInfinity); err != nil || !equal {
+		t.Fatalf("matching infinities must not read numerals: %v, %v", equal, err)
+	}
 	for _, tc := range []struct {
 		ak, bk ExtendedKind
 		want   int

@@ -35124,6 +35124,20 @@
           ]
         },
         {
+          "name": "Concrete mpbq/mpfx/mpff interval invariants test source extended equality before less-than (src/math/interval/interval_def.h:655-666)",
+          "status": "ported",
+          "go_target": "pkg/math/realclosure/binary_interval.go",
+          "go_targets": [
+            "pkg/math/subpaving/fixed_interval.go",
+            "pkg/math/subpaving/fast_interval.go"
+          ],
+          "tests": [
+            "TestRealClosureBinaryIntervalRetainedCore",
+            "TestSubpavingFixedMutableIntervalRetainedCore",
+            "TestSubpavingFastMutableIntervalRetainedCore"
+          ]
+        },
+        {
           "name": "Retained reset, containment, equality, before, display, add and subtract for mpq intervals (src/math/interval/interval_def.h:597-709,795-837)",
           "status": "partial",
           "go_target": "pkg/math/interval/rational_interval.go",
@@ -116776,6 +116790,24 @@
           "go_target": "pkg/math/interval/rational_extended.go",
           "tests": [
             "TestRationalExtendedStructuralEqualityWithoutCrossProducts"
+          ]
+        },
+        {
+          "name": "Concrete mpbq/mpfx/mpff ext_numeral eq finite manager route and nonfinite unread numeral short circuit (src/util/ext_numeral.h:244-256)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/binary_extended.go",
+          "go_targets": [
+            "pkg/math/interval/fixed_extended.go",
+            "pkg/math/interval/fast_extended.go",
+            "pkg/math/realclosure/binary_interval.go",
+            "pkg/math/subpaving/fixed_interval.go",
+            "pkg/math/subpaving/fast_interval.go"
+          ],
+          "tests": [
+            "TestRealClosureBinaryExtendedNumeralBranches",
+            "TestRealClosureBinaryIntervalRetainedCore",
+            "TestSubpavingFixedMutableIntervalRetainedCore",
+            "TestSubpavingFastMutableIntervalRetainedCore"
           ]
         },
         {

@@ -40209,3 +40209,7 @@ The whole-file `mpf.cpp` ownership inventory now includes the formatted C-string
 ### Rational extended interval equality source route
 
 The retained mpq interval invariant and interval equality now call the concrete `ext_numeral::eq` counterpart. Matching infinities skip both numeral reads; finite pairs call structural rational equality, which compares fields without the cross-products used by ordered comparison. The invariant reaches ordered comparison only after structural inequality, matching the source branch. A BIG rational singleton fixture checks both interval paths with new reservations refused, and the full interval package passes in native and checked/debug modes on CPUs 8-16. Source portcheck passes. The larger extended-number and interval source units remain partial for their other retained consumers.
+
+### Other concrete extended interval invariant equality routes
+
+The retained mpbq real-closure and mpfx/mpff subpaving invariants now also call their concrete `ext_numeral::eq` counterparts before ordered comparison. Binary-rational equality compares its stored numerator and denominator exponent; a raw 1 versus 2/2 fixture proves that numerical ordering alone cannot stand in for the source equality branch. Matching infinities skip numeral reads in all three specializations. The affected interval, real-closure and subpaving packages pass natively and with checked/debug tags on CPUs 8-16. Their broader source units remain partial.

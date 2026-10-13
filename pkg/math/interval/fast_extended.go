@@ -84,6 +84,16 @@ func (e FastExtended) Compare(a *numeral.FastFloat, ak ExtendedKind, b *numeral.
 	return 0, nil
 }
 
+func (e FastExtended) Equal(a *numeral.FastFloat, ak ExtendedKind, b *numeral.FastFloat, bk ExtendedKind) (bool, error) {
+	if ak != Finite {
+		return ak == bk, nil
+	}
+	if bk != Finite {
+		return false, nil
+	}
+	return e.Numbers.Equal(a, b)
+}
+
 func (e FastExtended) Neg(a *numeral.FastFloat, k ExtendedKind) (ExtendedKind, error) {
 	if k == MinusInfinity {
 		return PlusInfinity, nil

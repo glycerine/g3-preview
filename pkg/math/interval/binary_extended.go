@@ -97,6 +97,16 @@ func (e BinaryExtended) Compare(a *numeral.BinaryRational, ak ExtendedKind, b *n
 	return 0, nil
 }
 
+func (e BinaryExtended) Equal(a *numeral.BinaryRational, ak ExtendedKind, b *numeral.BinaryRational, bk ExtendedKind) (bool, error) {
+	if ak != Finite {
+		return ak == bk, nil
+	}
+	if bk != Finite {
+		return false, nil
+	}
+	return e.Numbers.Equal(a, b)
+}
+
 func (e BinaryExtended) Add(a *numeral.BinaryRational, ak ExtendedKind, b *numeral.BinaryRational, bk ExtendedKind, out *numeral.BinaryRational) (ExtendedKind, error) {
 	if ak != Finite && bk != Finite && ak != bk {
 		return Finite, ErrExtendedDomain

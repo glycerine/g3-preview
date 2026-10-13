@@ -375,4 +375,11 @@ func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 	if err := c.Div(a, b, 12); !errors.Is(err, interval.ErrExtendedDomain) {
 		t.Fatalf("zero-containing denominator error = %v", err)
 	}
+	// The source invariant checks raw mpbq equality first. These endpoints
+	// have the same numerical value but distinct source representations.
+	rawOne, rawTwoOverTwo := numeral.NewBinaryInt(1), numeral.NewBinaryIntPower(2, 1)
+	must(a.SetFinite(&rawOne, &rawTwoOverTwo, false, false))
+	if err := a.CheckInvariant(); !errors.Is(err, interval.ErrExtendedDomain) {
+		t.Fatalf("raw-distinct numerically equal endpoints passed invariant: %v", err)
+	}
 }

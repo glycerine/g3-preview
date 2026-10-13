@@ -202,11 +202,21 @@ func (v *FixedInterval) CheckInvariant() error {
 		return err
 	}
 	e := interval.FixedExtended{Numbers: v.numbers}
+	equal, err := e.Equal(v.lower, v.lowerKind(), v.upper, v.upperKind())
+	if err != nil {
+		return err
+	}
+	if equal {
+		if v.lowerOpen || v.upperOpen {
+			return interval.ErrExtendedDomain
+		}
+		return nil
+	}
 	cmp, err := e.Compare(v.lower, v.lowerKind(), v.upper, v.upperKind())
 	if err != nil {
 		return err
 	}
-	if cmp > 0 || cmp == 0 && (v.lowerOpen || v.upperOpen) {
+	if cmp >= 0 {
 		return interval.ErrExtendedDomain
 	}
 	return nil
