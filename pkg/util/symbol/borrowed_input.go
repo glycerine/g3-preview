@@ -8,8 +8,8 @@ func (m *Manager) InternBorrowedSymbolCString(s Symbol) (Symbol, error) {
 		return Symbol{}, e
 	}
 	if s.IsNumerical() {
-		if sourceDebug {
-			return Symbol{}, ErrInvalid
+		if e := m.bareStringNumericalAssertion(); e != nil {
+			return Symbol{}, e
 		}
 		// symbol.h:96 numerical bare_str is the actual empty string in release.
 		return m.intern("")

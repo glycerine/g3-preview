@@ -12,6 +12,7 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var ErrInvalid = errors.New("g3: invalid source symbol precondition")
@@ -63,6 +64,8 @@ func (s Symbol) Token() Token { return Token{symbol: s} }
 
 type Config struct {
 	Budget *arena.Budget
+	// Debug is borrowed for reached source assertions; the caller keeps it alive.
+	Debug *diagnostic.DebugContext
 	// Legacy arena geometry is ignored: spellings use Go-managed storage.
 	PageSize, Alignment, DescriptorPageSize uint32
 	DirectOnly                              bool
@@ -88,6 +91,7 @@ type Manager struct {
 	byText  map[string]uint32
 	entries []symbolEntry
 	Budget  *arena.Budget
+	debug   *diagnostic.DebugContext
 	owner   uint64
 	closed  bool
 }
@@ -116,7 +120,20 @@ func NewManager(c Config) (*Manager, error) {
 			break
 		}
 	}
-	return &Manager{byText: make(map[string]uint32), Budget: c.Budget, owner: owner}, nil
+	return &Manager{byText: make(map[string]uint32), Budget: c.Budget, debug: c.Debug, owner: owner}, nil
+}
+
+// The source SASSERT is reached before bare_str's numerical-empty-string
+// continuation. A nil binding keeps the existing explicit Go refusal.
+func (m *Manager) bareStringNumericalAssertion() error {
+	on, e := diagnostic.SourceAssertionsEnabled(m.debug)
+	if e != nil || !on {
+		return e
+	}
+	if m.debug == nil || !m.debug.HasAssertionActions() {
+		return ErrInvalid
+	}
+	return diagnostic.DebugAssertionFailure(m.debug, "src/util/symbol.h", 96, "!is_numerical()")
 }
 func cSymbolLength(text string) int {
 	if i := strings.IndexByte(text, 0); i >= 0 {
@@ -298,8 +315,8 @@ func (m *Manager) BareString(s Symbol) (text string, present bool, err error) {
 		return "", false, e
 	}
 	if s.IsNumerical() {
-		if sourceDebug {
-			return "", false, ErrInvalid
+		if e := m.bareStringNumericalAssertion(); e != nil {
+			return "", false, e
 		}
 		// symbol.h:96 returns a non-null empty C string after SASSERT is erased.
 		return "", true, nil

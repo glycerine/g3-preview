@@ -172113,7 +172113,9 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolDuplicateLookupAndInvalidTokens",
+            "TestNumericalBareStringBorrowsDebugAssertionSwitch",
+            "TestNumericalBareStringContinuesAfterDebugAction"
           ]
         },
         {
@@ -172310,7 +172312,9 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolDuplicateLookupAndInvalidTokens",
+            "TestNumericalBareStringBorrowsDebugAssertionSwitch",
+            "TestNumericalBareStringContinuesAfterDebugAction"
           ]
         },
         {
