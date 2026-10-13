@@ -39577,6 +39577,16 @@ a non-regular input before touching its output, matching the source setter
 order. `f2n.h` remains partial because its live MPF specialization is not yet
 ported; the enclosing subpaving source units remain separate work.
 
+The second live `f2n.h` instantiation now has a concrete MPF wrapper. It
+borrows the existing `ArbitraryFloatManager`, owns and deletes its two
+scratch numerals in source order, starts with upward rounding, and forwards
+checked integer/double/fraction/rational setters plus directed add, subtract,
+multiply and divide. Focused binary64-width cases cover upper/lower `1/3`,
+the four arithmetic operations, output publication before a non-regular
+check, and wrapper close before its borrowed manager closes. MPF predicates,
+floor/ceil, reciprocal, power, formatting and the subpaving caller remain
+open, so `f2n.h` is still partial.
+
 ### Environment parameter runtime boundary
 
 `src/util/env_params.h/.cpp` has exactly two static operations. The five

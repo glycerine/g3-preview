@@ -117105,7 +117105,8 @@
         "pkg/util/numeral/hwf_numeral.go",
         "pkg/util/numeral/hwf_rational_set.go",
         "pkg/util/numeral/hwf_rational_string.go",
-        "pkg/util/numeral/hwf_scientific.go"
+        "pkg/util/numeral/hwf_scientific.go",
+        "pkg/util/numeral/mpf_numeral.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -117115,7 +117116,9 @@
         "TestHardwareFloatRationalStringMatchesSourceConversion",
         "TestHardwareFloatRationalStringSourceFiniteGuard",
         "TestHardwareFloatNumeralSourceThinPredicatesAndMoves",
-        "TestHardwareFloatSourceScientificTraceDisplay"
+        "TestHardwareFloatSourceScientificTraceDisplay",
+        "TestArbitraryFloatNumeralSourceDirectedSetAndArithmetic",
+        "TestArbitraryFloatNumeralSourcePostCheckAndClose"
       ],
       "conditionals": [
         {
@@ -117213,15 +117216,24 @@
           "status": "reference_only"
         },
         {
-          "name": "Retained subpaving tactic f2n<mpf_manager> construction, rounding, value conversion and interval arithmetic selected by numeral=mpf",
+          "name": "Retained subpaving tactic f2n<mpf_manager> construction, owned scratch destruction, mode changes, checked scalar/rational setters and directed add/sub/mul/div",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_numeral.go",
+          "tests": [
+            "TestArbitraryFloatNumeralSourceDirectedSetAndArithmetic",
+            "TestArbitraryFloatNumeralSourcePostCheckAndClose"
+          ]
+        },
+        {
+          "name": "Remaining f2n<mpf_manager> predicates, floor/ceil, reciprocal, power, formatting and enclosing subpaving caller paths",
           "status": "unported"
         }
       ],
       "ownership": [
-        "The concrete HWF wrapper borrows its scalar manager and owns two pointer-free binary64 scratch values; no payload destructor is needed. The source HWF manager's rational child remains open."
+        "The concrete HWF wrapper borrows its scalar manager and owns two pointer-free binary64 scratch values; no payload destructor is needed. The MPF wrapper borrows its ArbitraryFloatManager and owns its one/tmp numerals, deleting tmp before one on close. The HWF internal rational child is replaced by a borrowed caller manager."
       ],
       "deviations": [
-        "The earlier test-only include audit missed src/math/subpaving/tactic/subpaving_tactic.cpp and the production subpaving_mpf.h/subpaving_hwf.h headers. The tactic constructs f2n<mpf_manager> and f2n<hwf_manager>; its numeral option selects HWF for hardware-float requests. The concrete HWF wrapper is partial, and the MPF wrapper and enclosing subpaving consumers remain open. No universal template adapter is used."
+        "The earlier test-only include audit missed src/math/subpaving/tactic/subpaving_tactic.cpp and the production subpaving_mpf.h/subpaving_hwf.h headers. The tactic constructs f2n<mpf_manager> and f2n<hwf_manager>. The concrete HWF specialization is covered for retained calls; the MPF specialization now has owned scratch and basic directed operations, while its remaining interval methods and enclosing subpaving consumers remain open. No universal template adapter is used."
       ]
     },
     {
