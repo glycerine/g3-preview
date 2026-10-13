@@ -171437,7 +171437,9 @@
         "pkg/math/subpaving/hardware_monomial.go",
         "pkg/math/subpaving/hardware_monomial_test.go",
         "pkg/math/subpaving/hardware_search.go",
-        "pkg/math/subpaving/hardware_search_test.go"
+        "pkg/math/subpaving/hardware_search_test.go",
+        "pkg/math/subpaving/hardware_node.go",
+        "pkg/math/subpaving/hardware_context_root.go"
       ],
       "tests": [
         "TestParamDescrsNativeStorageAndWarmDuplicate",
@@ -171639,7 +171641,8 @@
         "TestHardwareClauseOpenTruthAndQueuedUnitPropagation",
         "TestHardwareMonomialDefinitionForwardAndZero",
         "TestHardwareMonomialReverseCubicAndSourceProduct",
-        "TestHardwareSearchBreadthFirstSplitLimitAndChildResume"
+        "TestHardwareSearchBreadthFirstSplitLimitAndChildResume",
+        "TestHardwareClauseJustificationChildTrailAndContextClose"
       ],
       "conditionals": [
         {
@@ -172083,6 +172086,17 @@
           "go_target": "pkg/math/subpaving/hardware_context_propagate.go",
           "tests": [
             "TestHardwareChildRecentBoundReplayAndPolynomialWatcher"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf node bound-view, trail and clause-watch slice release in child-before-parent context teardown",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_context_root.go",
+          "go_targets": [
+            "pkg/math/subpaving/hardware_node.go"
+          ],
+          "tests": [
+            "TestHardwareClauseJustificationChildTrailAndContextClose"
           ]
         }
       ],

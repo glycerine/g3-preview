@@ -250,7 +250,11 @@ func TestHardwareClauseJustificationChildTrailAndContextClose(t *testing.T) {
 	if err := c.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if !root.closed || !child.closed || !clause.deleted || ax.refs != 0 || ay.refs != 0 || c.activeNodes != 0 {
+	if !root.closed || !child.closed || !clause.deleted || ax.refs != 0 || ay.refs != 0 || c.activeNodes != 0 ||
+		root.lower != nil || root.upper != nil || root.owned != nil || root.trail != nil ||
+		child.lower != nil || child.upper != nil || child.owned != nil || child.trail != nil ||
+		c.nodes != nil || c.clauses != nil || c.unitClauses != nil || c.inequalities != nil ||
+		c.watchOrder != nil || c.queue != nil || clause.atoms != nil {
 		t.Fatal("context closes child before releasing clause atoms")
 	}
 }

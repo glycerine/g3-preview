@@ -139,12 +139,18 @@ func (n *HardwareNode) Close() error {
 	if n.context != nil {
 		n.context.removeLeaf(n)
 	}
+	parent := n.parent
+	n.owned = nil
+	n.lower = nil
+	n.upper = nil
+	n.trail = nil
+	n.parent = nil
 	n.closed = true
 	if n.registered {
 		n.context.activeNodes--
 	}
-	if n.parent != nil {
-		n.parent.children--
+	if parent != nil {
+		parent.children--
 	}
 	return nil
 }

@@ -175,6 +175,8 @@ func (c *HardwareContext) Close() error {
 			return err
 		}
 	}
+	c.queue = nil
+	c.searchNode = nil
 	for _, unit := range c.unitClauses {
 		unit.atom.refs--
 	}
@@ -182,9 +184,19 @@ func (c *HardwareContext) Close() error {
 		for _, atom := range clause.atoms {
 			atom.refs--
 		}
+		clause.atoms = nil
 		clause.deleted = true
 	}
-	c.queue = nil
+	c.nodes = nil
+	c.unitClauses = nil
+	c.clauses = nil
+	c.inequalities = nil
+	c.watchers = nil
+	c.watchOrder = nil
+	c.polynomials = nil
+	c.monomials = nil
+	c.isInt = nil
+	c.leafHead, c.leafTail = nil, nil
 	c.closed = true
 	return nil
 }
