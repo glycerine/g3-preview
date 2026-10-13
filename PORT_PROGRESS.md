@@ -39529,6 +39529,14 @@ rational value. `1/3` direction cases and a large-integer source projection
 are covered; binary64-to-rational output, formatting, the owned rational
 child and the subpaving context remain open.
 
+The reverse `hwf_manager::to_rational` path now constructs caller-owned
+numerator and denominator integers from the binary64 bit fields and source
+raw exponent. The smallest subnormal therefore converts to `2^-1075`, as in
+the C++ implementation; both signs of zero normalize to rational zero.
+Focused native and checked/debug tests also distinguish the source debug
+finite assertion from its release bit path. Formatting, fused arithmetic,
+square root, the owned rational child and subpaving context remain open.
+
 ### Environment parameter runtime boundary
 
 `src/util/env_params.h/.cpp` has exactly two static operations. The five
