@@ -101001,7 +101001,8 @@
         "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
         "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
         "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
-        "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource"
+        "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource",
+        "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel"
       ],
       "assertions": [
         {
@@ -101020,7 +101021,8 @@
             "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
             "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
             "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
-            "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource"
+            "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource",
+            "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel"
           ]
         },
         {
@@ -101034,10 +101036,10 @@
         }
       ],
       "ownership": [
-        "Filter declarations are stored in a native owning []ASTHandle slice, preserving duplicate INCs and forward consumed-DEC cleanup. Membership uses a local Go map independent of shared AST marks. Replacement model publishes after constant/function/universe copying; actual unpublished owners are cleaned on error. Native append adds no custom vector/mark-trail reservation."
+        "Filter declarations are stored in a native owning []ASTHandle slice, preserving duplicate INCs and forward consumed-DEC cleanup. Membership uses a local Go map independent of shared AST marks. Replacement model publishes after constant/function/universe copying; before publication, a successful incoming model INC belongs to the output reference's pending receipt if old-model destruction stops. Truly unacquired owners are cleaned on error. Native append adds no custom vector/mark-trail reservation."
       ],
       "deviations": [
-        "Original function filtering/copy loop is now integrated, using active function declaration order and independent FunctionInterpretation copies. AST translation, display/TRACE and broader ownership/failure campaigns remain unported or unqualified; no whole converter or public solver API completion is credited. Go errors before model publication retire the reached replacement owner, including a retained unpublished function copy."
+        "Original function filtering/copy loop is now integrated, using active function declaration order and independent FunctionInterpretation copies. AST translation, display/TRACE and broader ownership/failure campaigns remain unported or unqualified; no whole converter or public solver API completion is credited. Go errors before model acquisition retire the reached replacement owner; a stopped old-model deletion leaves the already-acquired replacement with the output reference for owning cleanup."
       ]
     },
     {
@@ -101052,7 +101054,8 @@
         "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
         "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
         "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
-        "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource"
+        "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource",
+        "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel"
       ],
       "conditionals": [
         {
@@ -101079,10 +101082,10 @@
         }
       ],
       "ownership": [
-        "Filter declarations are stored in a native owning []ASTHandle slice, preserving duplicate INCs and forward consumed-DEC cleanup. Membership uses a local Go map independent of shared AST marks. Replacement model publishes after constant/function/universe copying; actual unpublished owners are cleaned on error. Native append adds no custom vector/mark-trail reservation."
+        "Filter declarations are stored in a native owning []ASTHandle slice, preserving duplicate INCs and forward consumed-DEC cleanup. Membership uses a local Go map independent of shared AST marks. Replacement model publishes after constant/function/universe copying; before publication, a successful incoming model INC belongs to the output reference pending receipt if old-model destruction stops. Truly unacquired owners are cleaned on error. Native append adds no custom vector/mark-trail reservation."
       ],
       "deviations": [
-        "Original function filtering/copy loop is now integrated, using active function declaration order and independent FunctionInterpretation copies. AST translation, display/TRACE and broader ownership/failure campaigns remain unported or unqualified; no whole converter or public solver API completion is credited. Go errors before model publication retire the reached replacement owner, including a retained unpublished function copy."
+        "Original function filtering/copy loop is now integrated, using active function declaration order and independent FunctionInterpretation copies. AST translation, display/TRACE and broader ownership/failure campaigns remain unported or unqualified; no whole converter or public solver API completion is credited. Go errors before model acquisition retire the reached replacement owner; a stopped old-model deletion leaves the already-acquired replacement with the output reference for owning cleanup."
       ]
     },
     {
@@ -101623,6 +101626,7 @@
         "TestModelDerivedConstructorHeaderRefusalUnwinds",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
         "TestTacticStoredModelLabelsSnapshotAndAppend",
+        "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
         "TestTacticStoredModelLabelAppendUsesNativeSliceStorage",
         "TestTacticModelReferenceOwningAliasAndReplacement",
@@ -101661,6 +101665,7 @@
           "tests": [
             "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
             "TestTacticStoredModelLabelsSnapshotAndAppend",
+            "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
             "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
             "TestTacticStoredModelLabelAppendUsesNativeSliceStorage"
           ]
@@ -101700,6 +101705,7 @@
         "TestModelDerivedConstructorHeaderRefusalUnwinds",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
         "TestTacticStoredModelLabelsSnapshotAndAppend",
+        "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
         "TestTacticStoredModelLabelAppendUsesNativeSliceStorage",
         "TestTacticModelReferenceOwningAliasAndReplacement",
@@ -101748,6 +101754,7 @@
           "tests": [
             "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
             "TestTacticStoredModelLabelsSnapshotAndAppend",
+            "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
             "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
             "TestTacticStoredModelLabelAppendUsesNativeSliceStorage"
           ]
@@ -167636,6 +167643,8 @@
         "TestTacticModelReferenceOwningAliasAndReplacement",
         "TestTacticModelReferenceCopyAssignmentOwnsSourceModel",
         "TestTacticModelRefKeepsOldOnConsumedDestructionStop",
+        "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
+        "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel",
         "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
         "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
@@ -167662,6 +167671,8 @@
           "tests": [
             "TestTacticModelReferenceCopyAssignmentOwnsSourceModel",
             "TestTacticModelRefKeepsOldOnConsumedDestructionStop",
+            "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
+            "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel",
             "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
             "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
             "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"

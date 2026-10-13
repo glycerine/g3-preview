@@ -122,6 +122,15 @@ func (c *tacticFilterModelConverter) ApplyModel(out *ModelRef, _ uint32) (err er
 		return e
 	}
 	if e = out.Set(next.Core()); e != nil {
+		// SET may acquire next before old-model deletion stops. In that case
+		// the output reference retains next as a pending owning receipt;
+		// closing this raw local would destroy an already-owned model.
+		for _, pending := range out.pending {
+			if pending == next.Core() {
+				published = true
+				break
+			}
+		}
 		return e
 	}
 	published = true
