@@ -3,6 +3,7 @@ package realclosure
 import (
 	"bytes"
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -15,6 +16,21 @@ type binaryDisplayRefusal struct {
 	remaining int
 	err       error
 }
+
+type shortOnceBinaryIntervalWriter struct {
+	bytes.Buffer
+	at, calls int
+}
+
+func (w *shortOnceBinaryIntervalWriter) Write(p []byte) (int, error) {
+	w.calls++
+	if w.calls == w.at {
+		return w.Buffer.Write(p[:len(p)-1])
+	}
+	return w.Buffer.Write(p)
+}
+
+func (w *shortOnceBinaryIntervalWriter) WriteString(s string) (int, error) { return w.Write([]byte(s)) }
 
 func (w *binaryDisplayRefusal) Write(p []byte) (int, error) {
 	if w.remaining == 0 {
@@ -72,6 +88,15 @@ func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 	must(a.Display(&out))
 	if out.String() != "(-oo, +oo)" {
 		t.Fatalf("default interval = %q", out.String())
+	}
+	for _, tc := range []struct {
+		at   int
+		want string
+	}{{1, ""}, {3, "(-oo,"}, {5, "(-oo, +oo"}} {
+		w := &shortOnceBinaryIntervalWriter{at: tc.at}
+		if err := a.Display(w); !errors.Is(err, io.ErrShortWrite) || w.String() != tc.want || w.calls != tc.at {
+			t.Fatalf("short insertion %d = (%q, %d, %v)", tc.at, w.String(), w.calls, err)
+		}
 	}
 	out.Reset()
 	must(a.DisplayPP(&out))

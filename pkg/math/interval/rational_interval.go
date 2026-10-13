@@ -464,21 +464,20 @@ func (v *RationalInterval) Display(w io.Writer) error {
 	if v.upperOpen {
 		right = ")"
 	}
-	if _, err := io.WriteString(w, left); err != nil {
+	if err := writeExtendedText(w, left); err != nil {
 		return err
 	}
 	e := RationalExtended{Numbers: v.numbers}
 	if err := e.Display(w, &v.lower, v.lowerKind()); err != nil {
 		return err
 	}
-	if _, err := io.WriteString(w, ", "); err != nil {
+	if err := writeExtendedText(w, ", "); err != nil {
 		return err
 	}
 	if err := e.Display(w, &v.upper, v.upperKind()); err != nil {
 		return err
 	}
-	_, err := io.WriteString(w, right)
-	return err
+	return writeExtendedText(w, right)
 }
 
 func (v *RationalInterval) Close() error {

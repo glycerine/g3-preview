@@ -3,12 +3,30 @@ package subpaving
 import (
 	"bytes"
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
+
+type shortOnceSubpavingIntervalWriter struct {
+	bytes.Buffer
+	at, calls int
+}
+
+func (w *shortOnceSubpavingIntervalWriter) Write(p []byte) (int, error) {
+	w.calls++
+	if w.calls == w.at {
+		return w.Buffer.Write(p[:len(p)-1])
+	}
+	return w.Buffer.Write(p)
+}
+
+func (w *shortOnceSubpavingIntervalWriter) WriteString(s string) (int, error) {
+	return w.Write([]byte(s))
+}
 
 func TestSubpavingFastMutableIntervalRetainedCore(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
@@ -65,6 +83,15 @@ func TestSubpavingFastMutableIntervalRetainedCore(t *testing.T) {
 	must(v.Display(&rendered))
 	if rendered.String() != "(-oo, +oo)" {
 		t.Fatal("initial interval", rendered.String())
+	}
+	for _, tc := range []struct {
+		at   int
+		want string
+	}{{1, ""}, {3, "(-oo,"}, {5, "(-oo, +oo"}} {
+		w := &shortOnceSubpavingIntervalWriter{at: tc.at}
+		if err := v.Display(w); !errors.Is(err, io.ErrShortWrite) || w.String() != tc.want || w.calls != tc.at {
+			t.Fatalf("short insertion %d = (%q, %d, %v)", tc.at, w.String(), w.calls, err)
+		}
 	}
 	contains, err := v.ContainsZero()
 	must(err)

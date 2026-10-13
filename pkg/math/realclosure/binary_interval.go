@@ -345,21 +345,31 @@ func (v *BinaryInterval) display(w io.Writer, pretty bool) error {
 	if v.upperOpen {
 		right = ")"
 	}
-	if _, err := io.WriteString(w, left); err != nil {
+	if err := writeBinaryIntervalText(w, left); err != nil {
 		return err
 	}
 	e := interval.BinaryExtended{Numbers: v.numbers}
 	if err := e.Display(w, &v.lower, v.lowerKind(), pretty); err != nil {
 		return err
 	}
-	if _, err := io.WriteString(w, ", "); err != nil {
+	if err := writeBinaryIntervalText(w, ", "); err != nil {
 		return err
 	}
 	if err := e.Display(w, &v.upper, v.upperKind(), pretty); err != nil {
 		return err
 	}
-	_, err := io.WriteString(w, right)
-	return err
+	return writeBinaryIntervalText(w, right)
+}
+
+func writeBinaryIntervalText(w io.Writer, s string) error {
+	n, err := io.WriteString(w, s)
+	if err != nil {
+		return err
+	}
+	if n != len(s) {
+		return io.ErrShortWrite
+	}
+	return nil
 }
 
 func (v *BinaryInterval) Close() error {

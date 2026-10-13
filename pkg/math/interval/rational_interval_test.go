@@ -3,6 +3,7 @@ package interval
 import (
 	"bytes"
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -14,6 +15,21 @@ type failAfterWrites struct {
 	remaining int
 	err       error
 }
+
+type shortOnceIntervalWriter struct {
+	bytes.Buffer
+	at, calls int
+}
+
+func (w *shortOnceIntervalWriter) Write(p []byte) (int, error) {
+	w.calls++
+	if w.calls == w.at {
+		return w.Buffer.Write(p[:len(p)-1])
+	}
+	return w.Buffer.Write(p)
+}
+
+func (w *shortOnceIntervalWriter) WriteString(s string) (int, error) { return w.Write([]byte(s)) }
 
 func (w *failAfterWrites) Write(p []byte) (int, error) {
 	if w.remaining == 0 {
@@ -76,6 +92,15 @@ func TestRationalIntervalRetainedPredicatesAddSubAndOwnership(t *testing.T) {
 	must(a.Display(&out))
 	if out.String() != "(-3/2, 2]" {
 		t.Fatalf("interval display = %q", out.String())
+	}
+	for _, tc := range []struct {
+		at   int
+		want string
+	}{{1, ""}, {3, "(-3/2,"}, {5, "(-3/2, 2"}} {
+		w := &shortOnceIntervalWriter{at: tc.at}
+		if err := a.Display(w); !errors.Is(err, io.ErrShortWrite) || w.String() != tc.want || w.calls != tc.at {
+			t.Fatalf("short insertion %d = (%q, %d, %v)", tc.at, w.String(), w.calls, err)
+		}
 	}
 	// Source interval display inserts each component in order. A failed
 	// upper endpoint write must leave the already emitted prefix intact.

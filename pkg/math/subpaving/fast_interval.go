@@ -284,21 +284,31 @@ func (v *FastInterval) Display(w io.Writer) error {
 	if v.upperOpen {
 		right = ")"
 	}
-	if _, err := io.WriteString(w, left); err != nil {
+	if err := writeSubpavingIntervalText(w, left); err != nil {
 		return err
 	}
 	e := interval.FastExtended{Numbers: v.numbers}
 	if err := e.Display(w, lo, v.lowerKind()); err != nil {
 		return err
 	}
-	if _, err := io.WriteString(w, ", "); err != nil {
+	if err := writeSubpavingIntervalText(w, ", "); err != nil {
 		return err
 	}
 	if err := e.Display(w, hi, v.upperKind()); err != nil {
 		return err
 	}
-	_, err = io.WriteString(w, right)
-	return err
+	return writeSubpavingIntervalText(w, right)
+}
+
+func writeSubpavingIntervalText(w io.Writer, s string) error {
+	n, err := io.WriteString(w, s)
+	if err != nil {
+		return err
+	}
+	if n != len(s) {
+		return io.ErrShortWrite
+	}
+	return nil
 }
 
 func (v *FastInterval) Close() error {

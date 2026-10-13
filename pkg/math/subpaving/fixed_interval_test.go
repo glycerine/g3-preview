@@ -3,6 +3,7 @@ package subpaving
 import (
 	"bytes"
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/math/interval"
@@ -80,6 +81,15 @@ func TestSubpavingFixedMutableIntervalRetainedCore(t *testing.T) {
 	}
 	if got := show(a); got != "(-oo, +oo)" {
 		t.Fatalf("initial interval = %q", got)
+	}
+	for _, tc := range []struct {
+		at   int
+		want string
+	}{{1, ""}, {3, "(-oo,"}, {5, "(-oo, +oo"}} {
+		w := &shortOnceSubpavingIntervalWriter{at: tc.at}
+		if err := a.Display(w); !errors.Is(err, io.ErrShortWrite) || w.String() != tc.want || w.calls != tc.at {
+			t.Fatalf("short insertion %d = (%q, %d, %v)", tc.at, w.String(), w.calls, err)
+		}
 	}
 	contains, err := a.ContainsZero()
 	must(err)

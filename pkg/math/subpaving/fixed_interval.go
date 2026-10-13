@@ -267,21 +267,20 @@ func (v *FixedInterval) Display(w io.Writer) error {
 	if v.upperOpen {
 		right = ")"
 	}
-	if _, err := io.WriteString(w, left); err != nil {
+	if err := writeSubpavingIntervalText(w, left); err != nil {
 		return err
 	}
 	e := interval.FixedExtended{Numbers: v.numbers}
 	if err := e.Display(w, v.lower, v.lowerKind()); err != nil {
 		return err
 	}
-	if _, err := io.WriteString(w, ", "); err != nil {
+	if err := writeSubpavingIntervalText(w, ", "); err != nil {
 		return err
 	}
 	if err := e.Display(w, v.upper, v.upperKind()); err != nil {
 		return err
 	}
-	_, err := io.WriteString(w, right)
-	return err
+	return writeSubpavingIntervalText(w, right)
 }
 
 func (v *FixedInterval) Close() error {
