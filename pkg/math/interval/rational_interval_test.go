@@ -455,3 +455,54 @@ func TestRationalIntervalRetainedPredicatesAddSubAndOwnership(t *testing.T) {
 		t.Fatalf("zero-containing divisor error = %v", err)
 	}
 }
+
+func TestRationalIntervalOpenBoundsUseSourceStructuralEquality(t *testing.T) {
+	budget := arena.NewBudget(1 << 28)
+	m, err := numeral.NewRationalManager(numeral.RationalConfig{Integers: numeral.IntegerConfig{
+		Cells: arena.Config{Budget: budget},
+		Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}},
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	left, err := NewRationalInterval(m)
+	if err != nil {
+		t.Fatal(err)
+	}
+	right, err := NewRationalInterval(m)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		for _, e := range []error{left.Close(), right.Close(), m.CloseChecked()} {
+			if e != nil {
+				t.Fatal(e)
+			}
+		}
+		if budget.Used() != 0 {
+			t.Fatal("retained rational interval roots", budget.Used())
+		}
+	})
+	zero := numeral.Rational{Num: numeral.NewInt(0), Den: numeral.NewInt(1)}
+	half := numeral.Rational{Num: numeral.NewInt(1), Den: numeral.NewInt(2)}
+	equivalent := numeral.Rational{Num: numeral.NewInt(2), Den: numeral.NewInt(4)}
+	one := numeral.Rational{Num: numeral.NewInt(1), Den: numeral.NewInt(1)}
+	if err := left.SetFinite(&zero, &half, false, true); err != nil {
+		t.Fatal(err)
+	}
+	if err := right.SetFinite(&equivalent, &one, false, false); err != nil {
+		t.Fatal(err)
+	}
+	if before, err := left.Before(right); err != nil || before {
+		t.Fatal("open upper bound must use structural equality", before, err)
+	}
+	if err := left.SetFinite(&half, &one, true, false); err != nil {
+		t.Fatal(err)
+	}
+	if contains, err := left.Contains(&equivalent); err != nil || !contains {
+		t.Fatal("raw-distinct numeric equal value remains inside", contains, err)
+	}
+	if contains, err := left.Contains(&half); err != nil || contains {
+		t.Fatal("structurally equal open bound must be excluded", contains, err)
+	}
+}

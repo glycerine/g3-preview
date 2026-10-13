@@ -169,8 +169,17 @@ func (v *RationalInterval) Contains(value *numeral.Rational) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		if cmp < 0 || cmp == 0 && v.lowerOpen {
+		if cmp < 0 {
 			return false, nil
+		}
+		if v.lowerOpen {
+			equal, err := v.numbers.Equal(value, &v.lower)
+			if err != nil {
+				return false, err
+			}
+			if equal {
+				return false, nil
+			}
 		}
 	}
 	if !v.upperInf {
@@ -178,8 +187,17 @@ func (v *RationalInterval) Contains(value *numeral.Rational) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		if cmp > 0 || cmp == 0 && v.upperOpen {
+		if cmp > 0 {
 			return false, nil
+		}
+		if v.upperOpen {
+			equal, err := v.numbers.Equal(value, &v.upper)
+			if err != nil {
+				return false, err
+			}
+			if equal {
+				return false, nil
+			}
 		}
 	}
 	return true, nil
@@ -227,7 +245,13 @@ func (v *RationalInterval) Before(other *RationalInterval) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return cmp < 0 || cmp == 0 && v.upperOpen, nil
+	if cmp < 0 {
+		return true, nil
+	}
+	if !v.upperOpen {
+		return false, nil
+	}
+	return v.numbers.Equal(&v.upper, &other.lower)
 }
 
 func (v *RationalInterval) Add(a, b *RationalInterval) error {

@@ -233,12 +233,17 @@ func (v *BinaryInterval) Before(other *BinaryInterval) (bool, error) {
 	if v.upperInf || other.lowerInf {
 		return false, nil
 	}
-	e := interval.BinaryExtended{Numbers: v.numbers}
-	cmp, err := e.Compare(&v.upper, interval.Finite, &other.lower, interval.Finite)
+	less, err := v.numbers.Less(&v.upper, &other.lower)
 	if err != nil {
 		return false, err
 	}
-	return cmp < 0 || cmp == 0 && v.upperOpen, nil
+	if less {
+		return true, nil
+	}
+	if !v.upperOpen {
+		return false, nil
+	}
+	return v.numbers.Equal(&v.upper, &other.lower)
 }
 
 func (v *BinaryInterval) Neg(src *BinaryInterval) error {

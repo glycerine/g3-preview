@@ -35138,6 +35138,23 @@
           ]
         },
         {
+          "name": "Concrete mpq interval contains and before keep source less/greater then optional structural equal short circuit (src/math/interval/interval_def.h:623-632,701-709)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/rational_interval.go",
+          "tests": [
+            "TestRationalIntervalOpenBoundsUseSourceStructuralEquality",
+            "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+          ]
+        },
+        {
+          "name": "Concrete mpbq interval before keeps source less then optional structural equal short circuit (src/math/interval/interval_def.h:701-709)",
+          "status": "ported",
+          "go_target": "pkg/math/realclosure/binary_interval.go",
+          "tests": [
+            "TestRealClosureBinaryIntervalRetainedCore"
+          ]
+        },
+        {
           "name": "Retained reset, containment, equality, before, display, add and subtract for mpq intervals (src/math/interval/interval_def.h:597-709,795-837)",
           "status": "partial",
           "go_target": "pkg/math/interval/rational_interval.go",

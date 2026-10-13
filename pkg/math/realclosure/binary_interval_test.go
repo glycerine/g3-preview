@@ -382,4 +382,10 @@ func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 	if err := a.CheckInvariant(); !errors.Is(err, interval.ErrExtendedDomain) {
 		t.Fatalf("raw-distinct numerically equal endpoints passed invariant: %v", err)
 	}
+	rawZero, rawTwo := numeral.NewBinaryInt(0), numeral.NewBinaryInt(2)
+	must(a.SetFinite(&rawZero, &rawOne, false, true))
+	must(b.SetFinite(&rawTwoOverTwo, &rawTwo, false, false))
+	if before, err := a.Before(b); err != nil || before {
+		t.Fatalf("raw-distinct numerically equal open boundary separated intervals: %v, %v", before, err)
+	}
 }

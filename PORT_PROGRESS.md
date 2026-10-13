@@ -40213,3 +40213,7 @@ The retained mpq interval invariant and interval equality now call the concrete 
 ### Other concrete extended interval invariant equality routes
 
 The retained mpbq real-closure and mpfx/mpff subpaving invariants now also call their concrete `ext_numeral::eq` counterparts before ordered comparison. Binary-rational equality compares its stored numerator and denominator exponent; a raw 1 versus 2/2 fixture proves that numerical ordering alone cannot stand in for the source equality branch. Matching infinities skip numeral reads in all three specializations. The affected interval, real-closure and subpaving packages pass natively and with checked/debug tags on CPUs 8-16. Their broader source units remain partial.
+
+### Open interval boundary equality order
+
+The retained mpq `contains` and `before` paths now perform source less/greater comparison first and reach structural equality only for an open boundary. The mpbq real-closure `before` path likewise uses its direct less operation, then structural equality only when the upper endpoint is open. Raw 1/2 versus 2/4 and raw binary 1 versus 2/2 fixtures distinguish these routes from a single numeric compare: numerically equal but structurally distinct values are not excluded by an open endpoint or separated by `before`. Native and checked/debug interval and real-closure package tests pass on CPUs 8-16. Other interval multiplication and power tie-selection routes still need separate audit.
