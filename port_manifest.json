@@ -162775,9 +162775,8 @@
           ]
         },
         {
-          "name": "remaining bound_propagator integration of concrete mpz equation buffers and propagation",
-          "status": "partial",
-          "go_target": "pkg/tactic/arith/bound_propagation.go"
+          "name": "bound_propagator.h:37 mpz_buffer is an unused typedef; the constructed linear_equation_manager buffers are the separately ported specialization",
+          "status": "reference_only"
         },
         {
           "name": "concrete mpq propagate_ineqs_tactic buffer: push, reset, size and borrowed c_ptr (propagate_ineqs_tactic.cpp:132-169, 256-277)",
