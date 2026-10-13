@@ -37,7 +37,8 @@ func TestArbitraryFloatFormattedLiteralFirstOwnRawStop(t *testing.T) {
 	if e = rt.Reallocate(&lane, uint64(16)+uint64(delta)-8); e != arena.ErrBounds {
 		t.Fatal("real TLS first-own domain", e)
 	}
-	oldBody, oldSource, oldIssued := s.bodyCause, s.sourceCause, s.child.frame.issued
+	h := s.child.frame
+	oldBody, oldSource, oldIssued := s.bodyCause, s.sourceCause, h.issued
 	firstOwn := m.CleanupFormattedLiteral()
 	if firstOwn != arena.ErrBounds || s.ownCause != firstOwn || s.bodyCause != oldBody || s.sourceCause != oldSource || s.child.frame.issued != oldIssued {
 		t.Fatal("first owning stop altered formatted history", firstOwn, s.ownCause, s.sourceCause)
@@ -46,6 +47,12 @@ func TestArbitraryFloatFormattedLiteralFirstOwnRawStop(t *testing.T) {
 	serviceMust(t, m.CleanupValue(&out))
 	recovery, e := rt.Allocate(200000)
 	serviceMust(t, e)
+	var after ArbitraryFloat
+	serviceMust(t, m.SetFormattedLiteral(&after, 8, 24, ArbitraryFloatNearestEven, "0p0"))
+	if h.issued != oldIssued || h.ownCause != firstOwn || !errors.Is(oldBody, h.bodyCause) {
+		t.Fatal("later formatted call changed old child failure", h)
+	}
+	serviceMust(t, m.CleanupValue(&after))
 	if e := m.SourceFinalize(); e != nil && !errors.Is(e, oldSource) && !m.integer.sourceGuard {
 		t.Fatal(e)
 	}

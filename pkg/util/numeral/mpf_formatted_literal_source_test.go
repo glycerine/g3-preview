@@ -2,9 +2,11 @@
 package numeral
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestArbitraryFloatFormattedLiteralSourceValues(t *testing.T) {
@@ -24,6 +26,9 @@ func TestArbitraryFloatFormattedLiteralSourceValues(t *testing.T) {
 		{"3", 3, false},
 		{"1.5p2\x00ignored", 6, false},
 		{"1P2p3", 96, false},
+		{"3/2p2", 6, false},
+		{"-1.25e2P-1", -62.5, true},
+		{"1p+2", 4, false},
 	} {
 		serviceMust(t, m.SetFormattedLiteral(&out, 11, 53, ArbitraryFloatTowardZero, tc.text))
 		got, e := m.ToDouble(&out)
@@ -111,5 +116,31 @@ func TestArbitraryFloatFormattedLiteralRetainedChildThenLaterCall(t *testing.T) 
 	}
 	if !found {
 		t.Fatal("no retained formatted conversion child")
+	}
+}
+
+func TestArbitraryFloatFormattedLiteralEntryAuthority(t *testing.T) {
+	b := arena.NewBudget(1 << 25)
+	m, e := NewArbitraryFloatManager(serviceConfig(b).Integers)
+	serviceMust(t, e)
+	var out ArbitraryFloat
+	before, used := out, b.Used()
+	if e := m.SetFormattedLiteral(nil, 8, 24, ArbitraryFloatNearestEven, "1p0"); !errors.Is(e, umemory.ErrRuntimeOwner) {
+		t.Fatal("nil output", e)
+	}
+	copyManager := *m
+	if e := copyManager.SetFormattedLiteral(&out, 8, 24, ArbitraryFloatNearestEven, "1p0"); !errors.Is(e, umemory.ErrRuntimeOwner) {
+		t.Fatal("copied manager", e)
+	}
+	m.formattedLiteral.invocation = ^uint64(0)
+	if e := m.SetFormattedLiteral(&out, 8, 24, ArbitraryFloatNearestEven, "1p0"); !errors.Is(e, ErrNumericPending) || out != before || b.Used() != used {
+		t.Fatal("counter refusal before publication", e, out)
+	}
+	m.formattedLiteral.invocation = 0
+	serviceMust(t, m.SetFormattedLiteral(&out, 8, 24, ArbitraryFloatNearestEven, "0p0"))
+	serviceMust(t, m.Del(&out))
+	serviceMust(t, m.Close())
+	if b.Used() != 0 {
+		t.Fatal("entry authority owner refund", b.Used())
 	}
 }
