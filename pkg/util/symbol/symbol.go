@@ -3,6 +3,7 @@ package symbol
 
 import (
 	"errors"
+	"io"
 	"math"
 	"reflect"
 	"strconv"
@@ -247,6 +248,41 @@ func (m *Manager) Display(s Symbol) (string, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	return m.text(s, true)
+}
+
+func writeSymbolText(w io.Writer, s string) error {
+	n, err := io.WriteString(w, s)
+	if err == nil && n != len(s) {
+		return io.ErrShortWrite
+	}
+	return err
+}
+
+// WriteDisplay is the retained symbol ostream insertion. A numerical symbol
+// writes its prefix before the number, so a failed second write leaves "k!".
+func (m *Manager) WriteDisplay(w io.Writer, s Symbol) error {
+	if w == nil {
+		return ErrInvalid
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if e := m.checkPlain(s); e != nil {
+		return e
+	}
+	if s.IsNumerical() {
+		if e := writeSymbolText(w, "k!"); e != nil {
+			return e
+		}
+		return writeSymbolText(w, strconv.FormatInt(int64(int32(s.Value)), 10))
+	}
+	if s.Value == 0 {
+		return writeSymbolText(w, "null")
+	}
+	text, e := m.spelling(s)
+	if e != nil {
+		return e
+	}
+	return writeSymbolText(w, text)
 }
 
 // BareString preserves source nullability through present=false. Its immutable

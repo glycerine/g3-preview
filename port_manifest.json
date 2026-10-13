@@ -166592,16 +166592,19 @@
         "pkg/util/symbol/bytes.go",
         "pkg/util/symbol/hash.go",
         "pkg/util/symbol/symbol.go",
+        "pkg/util/symbol/symbol_stream_test.go",
         "pkg/util/symbol/service.go",
         "pkg/util/symbol/service_test.go",
         "pkg/util/params/util_gparams_service_ops.go",
         "pkg/util/params/util_gparams_symbol_stream.go",
+        "pkg/util/params/util_gparams_display.go",
         "pkg/smtcore/util_smt_params_source_test.go"
       ],
       "tests": [
         "TestSymbolSpellingHashSourceGolden",
         "TestSymbolNativeInternGrowthAndStringLifetime",
         "TestSymbolSourceAssertions",
+        "TestSymbolSourceStreamInsertionAndWriteBoundary",
         "TestSymbolTagsNullBytesAndCachedHash",
         "TestSymbolOwnerFailureLifetimeAndWarmIntern",
         "TestSymbolConcurrentInternIdentity",
@@ -166769,6 +166772,17 @@
           "status": "partial",
           "go_target": "pkg/util/params/util_gparams_service_ops.go",
           "tests": []
+        },
+        {
+          "name": "concrete null/string/numerical symbol io.Writer insertion, including numeric prefix write and refusal boundary",
+          "status": "ported",
+          "go_target": "pkg/util/symbol/symbol.go",
+          "tests": [
+            "TestSymbolSourceStreamInsertionAndWriteBoundary"
+          ],
+          "go_targets": [
+            "pkg/util/params/util_gparams_display.go"
+          ]
         },
         {
           "name": "Reached null/string/numerical symbol ostream insertion (src/util/symbol.h:97-110)",

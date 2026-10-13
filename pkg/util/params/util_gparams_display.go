@@ -95,12 +95,8 @@ func (g *GlobalParams) moduleHeaderInto(out *bytes.Buffer, key usymbol.Symbol) e
 		return ErrGlobalParamsOwner
 	}
 	out.WriteString("[module] ")
-	{
-		text, e := g.SymbolsField.Display(key)
-		if e != nil {
-			return e
-		}
-		out.WriteString(text)
+	if e := g.SymbolsField.WriteDisplay(out, key); e != nil {
+		return e
 	}
 	if _, e := g.SymbolsField.Hash(key); e != nil {
 		return e
@@ -225,20 +221,12 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *bytes.Buffer, name st
 	}
 	debugOut.WriteString(name[:utext.CStringLength(name)])
 	debugOut.WriteByte(' ')
-	{
-		text, e := g.SymbolsField.Display(module)
-		if e != nil {
-			return e
-		}
-		debugOut.WriteString(text)
+	if e := g.SymbolsField.WriteDisplay(debugOut, module); e != nil {
+		return e
 	}
 	debugOut.WriteByte(' ')
-	{
-		text, e := g.SymbolsField.Display(param)
-		if e != nil {
-			return e
-		}
-		debugOut.WriteString(text)
+	if e := g.SymbolsField.WriteDisplay(debugOut, param); e != nil {
+		return e
 	}
 	debugOut.WriteByte('\n')
 	var d *ParamDescrs
@@ -268,38 +256,22 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *bytes.Buffer, name st
 		return ErrGlobalParamsOwner
 	}
 	out.WriteString("  name:           ")
-	{
-		text, e := g.SymbolsField.Display(param)
-		if e != nil {
-			return e
-		}
-		out.WriteString(text)
+	if e := g.SymbolsField.WriteDisplay(out, param); e != nil {
+		return e
 	}
 	out.WriteByte('\n')
 	if module != (usymbol.Symbol{}) {
 		out.WriteString("  module:         ")
-		{
-			text, e := g.SymbolsField.Display(module)
-			if e != nil {
-				return e
-			}
-			out.WriteString(text)
+		if e := g.SymbolsField.WriteDisplay(out, module); e != nil {
+			return e
 		}
 		out.WriteString("\n  qualified name: ")
-		{
-			text, e := g.SymbolsField.Display(module)
-			if e != nil {
-				return e
-			}
-			out.WriteString(text)
+		if e := g.SymbolsField.WriteDisplay(out, module); e != nil {
+			return e
 		}
 		out.WriteByte('.')
-		{
-			text, e := g.SymbolsField.Display(param)
-			if e != nil {
-				return e
-			}
-			out.WriteString(text)
+		if e := g.SymbolsField.WriteDisplay(out, param); e != nil {
+			return e
 		}
 		out.WriteByte('\n')
 	}
