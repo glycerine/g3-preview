@@ -50290,7 +50290,8 @@
         "pkg/math/subpaving/hardware_interval_mul.go",
         "pkg/math/subpaving/hardware_interval_div.go",
         "pkg/math/interval/hardware_root.go",
-        "pkg/math/subpaving/hardware_interval_root.go"
+        "pkg/math/subpaving/hardware_interval_root.go",
+        "pkg/math/subpaving/hardware_context_root.go"
       ],
       "tests": [
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
@@ -50299,7 +50300,8 @@
         "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
         "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
         "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
-        "TestSubpavingHardwareIntervalXnEqYRetainedCases"
+        "TestSubpavingHardwareIntervalXnEqYRetainedCases",
+        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
       ],
       "conditionals": [
         {
@@ -50376,6 +50378,14 @@
           "go_target": "pkg/math/subpaving/hardware_interval_root.go",
           "tests": [
             "TestSubpavingHardwareIntervalXnEqYRetainedCases"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf context bound-policy numerals, source parameter defaults and root inverse-image dispatch (src/math/subpaving/subpaving_t_def.h:408-514,1641)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_root.go",
+          "tests": [
+            "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
           ]
         }
       ],
@@ -50898,7 +50908,8 @@
         "pkg/math/subpaving/hardware_interval_mul.go",
         "pkg/math/subpaving/hardware_interval_div.go",
         "pkg/math/interval/hardware_root.go",
-        "pkg/math/subpaving/hardware_interval_root.go"
+        "pkg/math/subpaving/hardware_interval_root.go",
+        "pkg/math/subpaving/hardware_context_root.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50963,7 +50974,8 @@
         "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
         "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
         "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
-        "TestSubpavingHardwareIntervalXnEqYRetainedCases"
+        "TestSubpavingHardwareIntervalXnEqYRetainedCases",
+        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
       ],
       "conditionals": [
         {
@@ -51296,6 +51308,14 @@
           "tests": [
             "TestSubpavingHardwareIntervalXnEqYRetainedCases"
           ]
+        },
+        {
+          "name": "Concrete config_hwf context bound-policy numerals, source parameter defaults and root inverse-image dispatch (src/math/subpaving/subpaving_t_def.h:408-514,1641)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_root.go",
+          "tests": [
+            "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
+          ]
         }
       ],
       "ownership": [
@@ -51366,7 +51386,8 @@
         "pkg/math/subpaving/hardware_interval_mul.go",
         "pkg/math/subpaving/hardware_interval_div.go",
         "pkg/math/interval/hardware_root.go",
-        "pkg/math/subpaving/hardware_interval_root.go"
+        "pkg/math/subpaving/hardware_interval_root.go",
+        "pkg/math/subpaving/hardware_context_root.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51422,7 +51443,8 @@
         "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
         "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
         "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
-        "TestSubpavingHardwareIntervalXnEqYRetainedCases"
+        "TestSubpavingHardwareIntervalXnEqYRetainedCases",
+        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
       ],
       "assertions": [
         {
@@ -51996,6 +52018,14 @@
           "go_target": "pkg/math/subpaving/hardware_interval_root.go",
           "tests": [
             "TestSubpavingHardwareIntervalXnEqYRetainedCases"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf context bound-policy numerals, source parameter defaults and root inverse-image dispatch (src/math/subpaving/subpaving_t_def.h:408-514,1641)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_root.go",
+          "tests": [
+            "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
           ]
         }
       ],
@@ -117781,7 +117811,8 @@
         "pkg/math/subpaving/hardware_interval_div.go",
         "pkg/util/numeral/hwf_power_of_two.go",
         "pkg/math/interval/hardware_root.go",
-        "pkg/math/subpaving/hardware_interval_root.go"
+        "pkg/math/subpaving/hardware_interval_root.go",
+        "pkg/math/subpaving/hardware_context_root.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -117807,7 +117838,8 @@
         "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
         "TestHardwareFloatPrevPowerOfTwoSourceBoundaries",
         "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
-        "TestSubpavingHardwareIntervalXnEqYRetainedCases"
+        "TestSubpavingHardwareIntervalXnEqYRetainedCases",
+        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
       ],
       "conditionals": [
         {
@@ -117989,6 +118021,14 @@
           "go_target": "pkg/math/interval/hardware_root.go",
           "tests": [
             "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation"
+          ]
+        },
+        {
+          "name": "Concrete f2n<hwf_manager> power, reciprocal and checked scalar copies consumed by hardware context bound policy (src/util/f2n.h:70-156)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_root.go",
+          "tests": [
+            "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
           ]
         }
       ],
