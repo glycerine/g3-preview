@@ -10,7 +10,7 @@ import (
 // Div follows the six numerator and denominator sign combinations. As in the
 // source routine, the numerator cannot alias the result; the denominator may.
 func (v *HardwareInterval) Div(num, den *HardwareInterval) error {
-	if err := v.pair(num); err != nil {
+	if err := v.writablePair(num); err != nil {
 		return err
 	}
 	if err := v.pair(den); err != nil {

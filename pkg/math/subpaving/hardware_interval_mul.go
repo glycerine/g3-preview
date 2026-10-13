@@ -46,7 +46,7 @@ func (v *HardwareInterval) isSingletonZero() bool {
 // Mul follows all nine source sign classes, including mixed extrema ties.
 // Local scalar results leave aliased inputs intact until publication.
 func (v *HardwareInterval) Mul(a, b *HardwareInterval) error {
-	if err := v.pair(a); err != nil {
+	if err := v.writablePair(a); err != nil {
 		return err
 	}
 	if err := v.pair(b); err != nil {

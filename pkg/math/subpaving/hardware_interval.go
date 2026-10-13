@@ -16,6 +16,8 @@ type HardwareInterval struct {
 	self                 *HardwareInterval
 	numbers              *numeral.HardwareFloatNumeralManager
 	lower, upper         numeral.HardwareFloat
+	constantNode         *HardwareNode
+	constantVariable     uint32
 	lowerInf, upperInf   bool
 	lowerOpen, upperOpen bool
 	closed               bool
@@ -36,7 +38,63 @@ func (v *HardwareInterval) endpoints() (*numeral.HardwareFloat, *numeral.Hardwar
 	if v.closed {
 		return nil, nil, arena.ErrClosed
 	}
-	return &v.lower, &v.upper, nil
+	lower, upper := &v.lower, &v.upper
+	if v.constantNode != nil {
+		lo, err := v.constantNode.bound(v.constantVariable, true)
+		if err != nil {
+			return nil, nil, err
+		}
+		hi, err := v.constantNode.bound(v.constantVariable, false)
+		if err != nil {
+			return nil, nil, err
+		}
+		v.lowerInf, v.upperInf = lo == nil, hi == nil
+		v.lowerOpen, v.upperOpen = lo == nil || lo.open, hi == nil || hi.open
+		if lo != nil {
+			lower = &lo.value
+		}
+		if hi != nil {
+			upper = &hi.value
+		}
+	}
+	return lower, upper, nil
+}
+
+// SetConstant borrows a live node's bound views. Later reads observe bounds
+// pushed after this binding, as in the source interval::set_constant.
+func (v *HardwareInterval) SetConstant(node *HardwareNode, variable uint32) error {
+	if _, _, err := v.endpoints(); err != nil {
+		return err
+	}
+	if node == nil || node.numbers != v.numbers {
+		return arena.ErrInvalidSlot
+	}
+	if _, err := node.bound(variable, true); err != nil {
+		return err
+	}
+	if _, err := node.bound(variable, false); err != nil {
+		return err
+	}
+	v.constantNode, v.constantVariable = node, variable
+	_, _, err := v.endpoints()
+	return err
+}
+
+func (v *HardwareInterval) mutable() error {
+	if _, _, err := v.endpoints(); err != nil {
+		return err
+	}
+	if v.constantNode != nil {
+		return arena.ErrInvalidSlot
+	}
+	return nil
+}
+
+func (v *HardwareInterval) writablePair(other *HardwareInterval) error {
+	if err := v.mutable(); err != nil {
+		return err
+	}
+	return v.pair(other)
 }
 func (v *HardwareInterval) lowerKind() interval.ExtendedKind {
 	if v.lowerInf {
@@ -63,6 +121,9 @@ func (v *HardwareInterval) pair(other *HardwareInterval) error {
 	return nil
 }
 func (v *HardwareInterval) SetFinite(lower, upper *numeral.HardwareFloat, lowerOpen, upperOpen bool) error {
+	if err := v.mutable(); err != nil {
+		return err
+	}
 	lo, hi, err := v.endpoints()
 	if err != nil {
 		return err
@@ -83,6 +144,9 @@ func (v *HardwareInterval) SetFinite(lower, upper *numeral.HardwareFloat, lowerO
 	return nil
 }
 func (v *HardwareInterval) ResetLower() error {
+	if err := v.mutable(); err != nil {
+		return err
+	}
 	lo, _, err := v.endpoints()
 	if err != nil {
 		return err
@@ -94,6 +158,9 @@ func (v *HardwareInterval) ResetLower() error {
 	return nil
 }
 func (v *HardwareInterval) ResetUpper() error {
+	if err := v.mutable(); err != nil {
+		return err
+	}
 	_, hi, err := v.endpoints()
 	if err != nil {
 		return err
@@ -111,7 +178,7 @@ func (v *HardwareInterval) Reset() error {
 	return v.ResetUpper()
 }
 func (v *HardwareInterval) SetFrom(src *HardwareInterval) error {
-	if err := v.pair(src); err != nil {
+	if err := v.writablePair(src); err != nil {
 		return err
 	}
 	if v == src {

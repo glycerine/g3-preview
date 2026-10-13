@@ -18,7 +18,7 @@ func (v *HardwareInterval) LowerIsNeg() (bool, error) {
 // NthRoot computes the source monotone interval root. Even degrees require a
 // nonnegative lower bound; the inverse image of an even power is XnEqY.
 func (v *HardwareInterval) NthRoot(src *HardwareInterval, n uint32, precision *numeral.HardwareFloat, roots interval.HardwareRoot) error {
-	if err := v.pair(src); err != nil {
+	if err := v.writablePair(src); err != nil {
 		return err
 	}
 	if roots.Numbers != v.numbers {
@@ -73,7 +73,7 @@ func (v *HardwareInterval) NthRoot(src *HardwareInterval, n uint32, precision *n
 
 // XnEqY returns the interval inverse image of the retained monomial x^n = y.
 func (v *HardwareInterval) XnEqY(src *HardwareInterval, n uint32, precision *numeral.HardwareFloat, roots interval.HardwareRoot) error {
-	if err := v.pair(src); err != nil {
+	if err := v.writablePair(src); err != nil {
 		return err
 	}
 	if roots.Numbers != v.numbers {

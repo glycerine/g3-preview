@@ -51025,7 +51025,8 @@
         "TestSubpavingHardwareShellCoefficientAndInequalityConversion",
         "TestHardwareNodeRetainedBoundViewsAndChildTrail",
         "TestHardwareContextIntegerBoundsAndOpenConflicts",
-        "TestHardwareContextRootUnitAssertionResumeAndConflict"
+        "TestHardwareContextRootUnitAssertionResumeAndConflict",
+        "TestHardwareIntervalConstantNodeViewAndMutationGuards"
       ],
       "conditionals": [
         {
@@ -51399,6 +51400,14 @@
             "TestHardwareContextIntegerBoundsAndOpenConflicts",
             "TestHardwareContextRootUnitAssertionResumeAndConflict"
           ]
+        },
+        {
+          "name": "Concrete config_hwf interval constant node/variable view with borrowed live bounds and guarded mutable endpoints (src/math/subpaving/subpaving_t.h:239-263)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval.go",
+          "tests": [
+            "TestHardwareIntervalConstantNodeViewAndMutationGuards"
+          ]
         }
       ],
       "ownership": [
@@ -51537,7 +51546,8 @@
         "TestSubpavingHardwareShellCoefficientAndInequalityConversion",
         "TestHardwareNodeRetainedBoundViewsAndChildTrail",
         "TestHardwareContextIntegerBoundsAndOpenConflicts",
-        "TestHardwareContextRootUnitAssertionResumeAndConflict"
+        "TestHardwareContextRootUnitAssertionResumeAndConflict",
+        "TestHardwareIntervalConstantNodeViewAndMutationGuards"
       ],
       "assertions": [
         {
@@ -52159,6 +52169,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_units.go",
           "tests": [
             "TestHardwareContextRootUnitAssertionResumeAndConflict"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf node-bound interval view reached by polynomial and monomial propagation (src/math/subpaving/subpaving_t_def.h:1419-1435,1548-1634)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval.go",
+          "tests": [
+            "TestHardwareIntervalConstantNodeViewAndMutationGuards"
           ]
         }
       ],

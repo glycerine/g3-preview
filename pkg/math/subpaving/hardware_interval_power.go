@@ -9,7 +9,7 @@ import (
 // Power retains the source positive, negative, crossing-zero and odd branches.
 // Scalar scratch preserves the input when the destination aliases it.
 func (v *HardwareInterval) Power(src *HardwareInterval, n uint32) error {
-	if err := v.pair(src); err != nil {
+	if err := v.writablePair(src); err != nil {
 		return err
 	}
 	if n == 0 {

@@ -7,7 +7,7 @@ import (
 )
 
 func (v *HardwareInterval) Neg(src *HardwareInterval) error {
-	if err := v.pair(src); err != nil {
+	if err := v.writablePair(src); err != nil {
 		return err
 	}
 	slo, shi, _ := src.endpoints()
@@ -39,7 +39,7 @@ func (v *HardwareInterval) Neg(src *HardwareInterval) error {
 	return v.CheckInvariant()
 }
 func (v *HardwareInterval) Add(a, b *HardwareInterval) error {
-	if err := v.pair(a); err != nil {
+	if err := v.writablePair(a); err != nil {
 		return err
 	}
 	if err := v.pair(b); err != nil {
@@ -67,7 +67,7 @@ func (v *HardwareInterval) Add(a, b *HardwareInterval) error {
 	return v.CheckInvariant()
 }
 func (v *HardwareInterval) Sub(a, b *HardwareInterval) error {
-	if err := v.pair(a); err != nil {
+	if err := v.writablePair(a); err != nil {
 		return err
 	}
 	if err := v.pair(b); err != nil {

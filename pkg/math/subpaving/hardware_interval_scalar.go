@@ -13,7 +13,7 @@ func (v *HardwareInterval) DivScalar(src *HardwareInterval, k *numeral.HardwareF
 	return v.divMulScalar(k, src, true)
 }
 func (v *HardwareInterval) divMulScalar(k *numeral.HardwareFloat, src *HardwareInterval, inverse bool) error {
-	if err := v.pair(src); err != nil {
+	if err := v.writablePair(src); err != nil {
 		return err
 	}
 	m := v.numbers
