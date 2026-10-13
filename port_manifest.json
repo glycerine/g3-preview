@@ -18091,13 +18091,16 @@
         "pkg/ast/pattern/smaller_pattern.go",
         "pkg/ast/pattern/candidates.go",
         "pkg/ast/pattern/contains_subpattern.go",
-        "pkg/ast/pattern/candidate_selection.go"
+        "pkg/ast/pattern/candidate_selection.go",
+        "pkg/ast/pattern/multi_pattern.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
         "TestPatternInferenceLoopFilterConcreteCandidateOwnership",
         "TestPatternInferenceContainsSubpatternAndBiggerFilter",
-        "TestPatternInferenceStableWeightAndUnaryPatternOwnership"
+        "TestPatternInferenceStableWeightAndUnaryPatternOwnership",
+        "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
+        "TestPatternInferenceMultiPatternThirtyTwoSplitCap"
       ],
       "conditionals": [
         {
@@ -18213,11 +18216,20 @@
           "tests": [
             "TestPatternInferenceStableWeightAndUnaryPatternOwnership"
           ]
+        },
+        {
+          "name": "candidates2multi_patterns source pre-pattern branch queue, free-variable union, 32-split cap and result limit",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/multi_pattern.go",
+          "tests": [
+            "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
+            "TestPatternInferenceMultiPatternThirtyTwoSplitCap"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. Candidate insertion and strict loop filtering own AST references through a native slice and keep borrowed free-variable set metadata in a typed map. The larger-pattern filter searches a native visited-handle map and work slice. Unary pattern results use independently owning ASTRef values; the source stable weight sort uses Go's sort.SliceStable. The remaining pattern_inference_cfg collector, preferred/multi-pattern selection and quantifier rewrite are not ported."
+        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. Candidate insertion and strict loop filtering own AST references through a native slice and keep borrowed free-variable set metadata in a typed map. The larger-pattern filter searches a native visited-handle map and work slice. Unary and multi-pattern results use independently owning ASTRef values; the source stable weight sort uses Go's sort.SliceStable. The remaining pattern_inference_cfg collector, preferred-pattern selection and quantifier rewrite are not ported."
       ]
     },
     {
@@ -18229,13 +18241,16 @@
         "pkg/ast/pattern/smaller_pattern.go",
         "pkg/ast/pattern/candidates.go",
         "pkg/ast/pattern/contains_subpattern.go",
-        "pkg/ast/pattern/candidate_selection.go"
+        "pkg/ast/pattern/candidate_selection.go",
+        "pkg/ast/pattern/multi_pattern.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
         "TestPatternInferenceLoopFilterConcreteCandidateOwnership",
         "TestPatternInferenceContainsSubpatternAndBiggerFilter",
-        "TestPatternInferenceStableWeightAndUnaryPatternOwnership"
+        "TestPatternInferenceStableWeightAndUnaryPatternOwnership",
+        "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
+        "TestPatternInferenceMultiPatternThirtyTwoSplitCap"
       ],
       "conditionals": [
         {
@@ -18287,11 +18302,20 @@
           "tests": [
             "TestPatternInferenceStableWeightAndUnaryPatternOwnership"
           ]
+        },
+        {
+          "name": "pattern_inference_cfg pre-pattern state, multi-candidate split enumeration and owning pattern results",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/multi_pattern.go",
+          "tests": [
+            "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
+            "TestPatternInferenceMultiPatternThirtyTwoSplitCap"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The matcher borrows AST handles from its manager and owns only native Go pair-map and worklist storage. The candidate vector owns app handles while its metadata and visited maps borrow those identities; unary pattern ASTRef values own their results independently. The enclosing pattern inference class remains open."
+        "The matcher borrows AST handles from its manager and owns only native Go pair-map and worklist storage. The candidate vector owns app handles while its metadata and visited maps borrow those identities; unary and multi-pattern ASTRef values own their results independently. The enclosing pattern inference class remains open."
       ]
     },
     {
@@ -166148,6 +166172,14 @@
           "go_target": "pkg/ast/pattern/candidate_selection.go",
           "tests": [
             "TestPatternInferenceStableWeightAndUnaryPatternOwnership"
+          ]
+        },
+        {
+          "name": "pattern_inference multi-pattern app_ref_buffer completed-prefix ownership through ASTRef values",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/multi_pattern.go",
+          "tests": [
+            "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership"
           ]
         }
       ],
