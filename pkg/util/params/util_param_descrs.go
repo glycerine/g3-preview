@@ -3,6 +3,7 @@
 package params
 
 import (
+	"bytes"
 	"errors"
 	"reflect"
 	"strings"
@@ -595,103 +596,10 @@ func (d *ParamDescrs) sortSymbols(a []usymbol.Symbol) error {
 	}
 	return nil
 }
-func (d *ParamDescrs) writeName(out *strings.Builder, k usymbol.Symbol, smt2 bool) error {
-	m := d.manager
-	if e := m.Validate(k); e != nil {
-		return e
-	}
-	if k.Value == 0 || k.IsNumerical() {
-		return ErrParamDescrsPrecondition
-	}
-	text, _, e := m.BareString(k)
-	if e != nil {
-		return e
-	}
-	for i := 0; i < len(text); i++ {
-		ch := text[i]
-		if smt2 && ch == '_' {
-			ch = '-'
-		} else if !smt2 && ch == '-' {
-			ch = '_'
-		} else if ch >= 'A' && ch <= 'Z' {
-			ch = ch - 'A' + 'a'
-		}
-		out.WriteByte(ch)
-	}
-	return nil
-}
-func (d *ParamDescrs) writeText(out *strings.Builder, r paramDescrText) error {
-	out.WriteString(r.value)
-	return nil
-}
 func (d *ParamDescrs) Display(indent uint32, smt2, includeDescr bool) (string, error) {
-	d.mu.Lock()
-	defer d.mu.Unlock()
-	if e := d.open(); e != nil {
-		return "", e
-	}
-	var names []usymbol.Symbol
-	for key := range d.entries.All() {
-		names = append(names, key)
-	}
-	for _, k := range names {
-		if _, e := d.symbolCompare(k, k); e != nil {
-			return "", e
-		}
-		info, found, e := d.find(k)
-		if e != nil {
-			return "", e
-		}
-		if !found {
-			return "", ErrParamDescrsPrecondition
-		}
-		if paramDescrsStreamSourceDebug && !info.descr.present {
-			return "", ErrParamDescrsPrecondition
-		}
-	}
-	if e := d.sortSymbols(names); e != nil {
-		return "", e
-	}
-	var out strings.Builder
-	for _, key := range names {
-		for j := uint32(0); j < indent; j++ {
-			out.WriteByte(' ')
-		}
-		if smt2 {
-			out.WriteByte(':')
-		}
-		if e := d.writeName(&out, key, smt2); e != nil {
-			return "", e
-		}
-		info, found, e := d.find(key)
-		if e != nil {
-			return "", e
-		}
-		if !found {
-			return "", ErrParamDescrsPrecondition
-		}
-		out.WriteString(" (")
-		out.WriteString(info.kind.String())
-		out.WriteByte(')')
-		if includeDescr {
-			out.WriteByte(' ')
-			if !info.descr.present {
-				return out.String(), utext.ErrNullCString
-			}
-			if e = d.writeText(&out, info.descr); e != nil {
-				return "", e
-			}
-		}
-		if info.def.present {
-			out.WriteString(" (default: ")
-			if e = d.writeText(&out, info.def); e != nil {
-				return "", e
-			}
-			out.WriteByte(')')
-		}
-		out.WriteByte('\n')
-	}
-	return out.String(), nil
+	var out bytes.Buffer
+	err := d.DisplayInto(&out, indent, smt2, includeDescr)
+	return out.String(), err
 }
 func (d *ParamDescrs) Copy(other *ParamDescrs) error {
 	if other == nil {

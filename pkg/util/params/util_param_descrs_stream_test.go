@@ -52,8 +52,8 @@ func TestParamDescrsDisplayIntoNullDescriptionActualAction(t *testing.T) {
 			if !errors.Is(e, ErrParamDescrsPrecondition) {
 				t.Fatal("source assertion position", e)
 			}
-			if displayErr != ErrParamDescrsPrecondition {
-				t.Fatal("checked display assertion", displayErr)
+			if displayErr != ErrParamDescrsPrecondition || gotDisplay != want[1:] {
+				t.Fatal("checked display assertion prefix", gotDisplay, displayErr)
 			}
 		} else if descr {
 			want = "p  a_key (unsigned int) "
