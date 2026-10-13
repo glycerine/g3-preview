@@ -1,12 +1,15 @@
 package tactic
 
 import (
+	"bytes"
 	"errors"
 	"math"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	goaltactic "github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
@@ -354,6 +357,108 @@ func TestHardwareExprConverterTerms(t *testing.T) {
 		t.Fatalf("checkpoint before cached result: %v, steps %d", err, m.Limit.Count())
 	}
 	m.Limit.ResetCancel()
+	letwo, err := m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{x, two})
+	if err != nil {
+		t.Fatal(err)
+	}
+	gehalf, err := m.MkFamilyApp(family, 3, nil, []ast.ASTHandle{y, half})
+	if err != nil {
+		t.Fatal(err)
+	}
+	notGE, err := m.MkNot(gehalf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	clause, err := m.MkOr(letwo, notGE)
+	if err != nil {
+		t.Fatal(err)
+	}
+	goal, err := goaltactic.NewGoal(m, false, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := goal.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
+	if err := goal.Assert(clause); err != nil {
+		t.Fatal(err)
+	}
+	if err := converter.InternalizeGoal(goal); err != nil {
+		t.Fatal(err)
+	}
+	shell, err := engine.Shell()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var display bytes.Buffer
+	if err := shell.DisplayConstraints(&display, false); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(display.String(), "x0 <= 2 or ") || !strings.Contains(display.String(), " < 1/2") {
+		t.Fatalf("goal disjunction: %q", display.String())
+	}
+	if err := q.SetString(&value, "-2"); err != nil {
+		t.Fatal(err)
+	}
+	minusTwo, err := m.ArithmeticNumeral(&value, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	negativeX, err := m.MkFamilyApp(family, 9, nil, []ast.ASTHandle{minusTwo, x})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := q.SetString(&value, "4"); err != nil {
+		t.Fatal(err)
+	}
+	four, err := m.ArithmeticNumeral(&value, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	negativeLE, err := m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{negativeX, four})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := converter.InternalizeClause(negativeLE); err != nil {
+		t.Fatal(err)
+	}
+	display.Reset()
+	if err := shell.DisplayConstraints(&display, false); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(display.String(), "-2 <= x0") {
+		t.Fatalf("negative coefficient reverses direction: %q", display.String())
+	}
+	doubleNot, err := m.MkNot(notGE)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := converter.InternalizeClause(doubleNot); err != nil {
+		t.Fatal(err)
+	}
+	display.Reset()
+	if err := shell.DisplayConstraints(&display, false); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(display.String(), "1/2 <= x2") {
+		t.Fatalf("double negation restores closed lower bound: %q", display.String())
+	}
+	badAtom, err := m.MkEq(x, two)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := converter.InternalizeInequality(badAtom); !errors.Is(err, ErrHardwareUnsupportedAtom) {
+		t.Fatalf("non-inequality atom: %v", err)
+	}
+	badRHS, err := m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{x, x})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := converter.InternalizeInequality(badRHS); !errors.Is(err, ErrHardwareArithmeticLHS) {
+		t.Fatalf("non-numeral right side: %v", err)
+	}
 	if err := converter.Close(); err != nil {
 		t.Fatal(err)
 	}

@@ -52690,7 +52690,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and the source arithmetic refusal categories are implemented; zero-degree monomials, literal conversion and full tactic integration remain open."
+        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and the source arithmetic refusal categories are implemented; zero-degree monomials and full tactic ownership/integration remain open."
       ]
     },
     {
@@ -52720,7 +52720,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and the source arithmetic refusal categories are implemented; zero-degree monomials, literal conversion and full tactic integration remain open."
+        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and the source arithmetic refusal categories are implemented; zero-degree monomials and full tactic ownership/integration remain open."
       ]
     },
     {
@@ -52731,10 +52731,14 @@
       "go_targets": [
         "pkg/math/subpaving/tactic/options.go",
         "pkg/math/subpaving/tactic/options_test.go",
-        "pkg/math/subpaving/tactic/hardware_engine.go"
+        "pkg/math/subpaving/tactic/hardware_engine.go",
+        "pkg/math/subpaving/tactic/goal_internalize.go",
+        "pkg/math/subpaving/tactic/expr_converter.go",
+        "pkg/math/subpaving/tactic/expr_converter_test.go"
       ],
       "tests": [
-        "TestSubpavingTacticOptionSelectionAndDescriptions"
+        "TestSubpavingTacticOptionSelectionAndDescriptions",
+        "TestHardwareExprConverterTerms"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -52772,7 +52776,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The Go option selector and descriptor collector preserve the retained parameter-service calls but do not instantiate the MPQ/MPF/HWF/MPFF/MPFX contexts, expression converter, AST variable printer, goal processor or tactic owner."
+        "The HWF branch constructs a context and expression converter, internalizes <=/>= literals with numeral right sides, unwraps nested negations, scales bounds by exact numerator/denominator, and adds goal clauses in source order. MPQ/MPF/MPFF/MPFX engine construction, AST variable display, search/result tactic owner, simplify pipeline and factory remain open."
       ]
     },
     {
