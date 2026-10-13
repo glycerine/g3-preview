@@ -455,8 +455,9 @@ func TestParamsReferenceMatchedValuesSkipUnusedDefaults(t *testing.T) {
 		t.Fatal("matching symbol read consulted default", gotSymbol, e)
 	}
 	paramsMust(t, c.ResetKey(&v, key))
-	if _, e = c.GetSymbol(&v, key, foreignDefault); !errors.Is(e, usymbol.ErrOwner) {
-		t.Fatal("missing symbol did not validate used default", e)
+	gotSymbol, e = c.GetSymbol(&v, key, foreignDefault)
+	if e != nil || gotSymbol != foreignDefault {
+		t.Fatal("missing symbol read default instead of returning it", gotSymbol, e)
 	}
 
 	foreignRat, e := foreignNumerals.NewValue()

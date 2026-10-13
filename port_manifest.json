@@ -164443,6 +164443,15 @@
           "tests": [
             "TestParamsReferenceDisplayKeyEmptySkipsSymbolRead"
           ]
+        },
+        {
+          "name": "Selected params_ref/params get_sym miss returns the borrowed default symbol without reading its owner (src/util/params.cpp:631-656,827-833,895-900,933-935)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsGetSymbolMissReturnsDefaultWithoutReadingIt",
+            "TestParamsReferenceMatchedValuesSkipUnusedDefaults"
+          ]
         }
       ],
       "ownership": [
@@ -164949,6 +164958,15 @@
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceDisplayKeyEmptySkipsSymbolRead"
+          ]
+        },
+        {
+          "name": "Selected params_ref/params get_sym miss returns the borrowed default symbol without reading its owner (src/util/params.cpp:631-656,827-833,895-900,933-935)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsGetSymbolMissReturnsDefaultWithoutReadingIt",
+            "TestParamsReferenceMatchedValuesSkipUnusedDefaults"
           ]
         }
       ],

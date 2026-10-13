@@ -940,9 +940,6 @@ func (c *ParamsContext) getSymbol(v *ParamsRef, k usymbol.Symbol, name *string, 
 		return usymbol.Symbol{}, e
 	}
 	if !ok {
-		if e := c.keyCheck(d); e != nil {
-			return usymbol.Symbol{}, e
-		}
 		return d, nil
 	}
 	return x.symbol, nil
