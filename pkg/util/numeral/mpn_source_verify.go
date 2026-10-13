@@ -82,6 +82,7 @@ func (m *NaturalManager) sourceVerifyDivision(a, b, q, r limbView) error {
 	if out.read(a.size) != 0 {
 		ok = false
 	}
+	m.traceDivisionVerification(ok, out)
 	if !ok {
 		return ErrIntegerAssertion
 	}
