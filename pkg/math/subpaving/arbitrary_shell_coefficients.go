@@ -86,6 +86,13 @@ func (w *ArbitraryShellCoefficients) MkVar(integer bool) (uint32, error) {
 	return w.context.NewVariable(integer)
 }
 
+func (w *ArbitraryShellCoefficients) MkMonomial(powers []ArbitraryPower) (uint32, error) {
+	if err := w.open(); err != nil {
+		return 0, err
+	}
+	return w.context.DefineMonomial(powers)
+}
+
 // MkSum converts exact integer inputs in source order and transfers copies to
 // the context's polynomial definition and watcher registry.
 func (w *ArbitraryShellCoefficients) MkSum(constant *numeral.Int, coefficients []*numeral.Int, variables []uint32) (uint32, error) {

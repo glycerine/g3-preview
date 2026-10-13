@@ -152,6 +152,28 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	if stoppedSum == nil || len(context.variables) != beforeStoppedSum {
 		t.Fatalf("stopped MPF sum: %v, %d", stoppedSum, len(context.variables))
 	}
+	inputPowers := []ArbitraryPower{{Variable: y, Degree: 2}, {Variable: x, Degree: 1}, {Variable: y, Degree: 3}}
+	monomial, err := w.MkMonomial(inputPowers)
+	if err != nil || monomial != 4 || !context.variables[monomial] {
+		t.Fatalf("merged MPF monomial: %d, %v", monomial, err)
+	}
+	merged := context.monomials[monomial].powers
+	if len(merged) != 2 || merged[0] != (ArbitraryPower{x, 1}) || merged[1] != (ArbitraryPower{y, 5}) || inputPowers[0].Variable != y {
+		t.Fatalf("sorted/merged monomial and borrowed input: %v, %v", merged, inputPowers)
+	}
+	if len(context.watchers[x]) != 4 || context.watchers[x][3] != monomial || len(context.watchers[y]) != 2 || context.watchers[y][1] != monomial {
+		t.Fatalf("merged monomial watchers: %v, %v", context.watchers[x], context.watchers[y])
+	}
+	secondMonomial, err := w.MkMonomial([]ArbitraryPower{{Variable: x, Degree: 2}})
+	if err != nil || secondMonomial != 5 || context.variables[secondMonomial] || len(context.monomials[monomial].powers) != 2 {
+		t.Fatalf("scratch reuse and noninteger monomial: %d, %v", secondMonomial, err)
+	}
+	if _, err := w.MkMonomial([]ArbitraryPower{{Variable: x, Degree: math.MaxUint32}, {Variable: x, Degree: 1}}); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("degree overflow: %v", err)
+	}
+	if _, err := w.MkMonomial([]ArbitraryPower{{Variable: uint32(len(context.variables)), Degree: 1}}); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("unknown monomial factor: %v", err)
+	}
 	lower, err := w.PrepareInequality(&q, true)
 	if err != nil {
 		t.Fatal(err)

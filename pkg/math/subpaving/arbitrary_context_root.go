@@ -23,6 +23,8 @@ type ArbitraryContext struct {
 	watchers                                        [][]uint32
 	polynomials                                     map[uint32]*ArbitraryPolynomial
 	polynomialOwners                                []*ArbitraryPolynomial
+	monomials                                       map[uint32]*ArbitraryMonomial
+	powersScratch                                   []ArbitraryPower
 	numBuffer                                       []numeral.ArbitraryFloat
 	inequalities                                    []*ArbitraryInequality
 	owners                                          [4]*numeral.ScopedArbitraryFloatNumeral
@@ -204,6 +206,8 @@ func (c *ArbitraryContext) Close() error {
 	c.polynomialOwners = nil
 	c.numBuffer = nil
 	c.polynomials = nil
+	c.monomials = nil
+	c.powersScratch = nil
 	c.watchers = nil
 	c.variables = nil
 	c.closed = true
