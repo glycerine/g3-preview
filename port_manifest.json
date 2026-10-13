@@ -159503,6 +159503,17 @@
           "tests": [
             "TestIntegerDividesRetainedShortAndBugTrace"
           ]
+        },
+        {
+          "name": "lcm_bug TRACE records for all five result branches and the preceding GCD, including destination aliases (mpz.cpp:988-1011)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_lcm_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz_number_theory.go"
+          ],
+          "tests": [
+            "TestIntegerLCMRetainedBranchTraceAndAlias"
+          ]
         }
       ],
       "ownership": [
@@ -161521,6 +161532,17 @@
           "go_target": "pkg/util/numeral/mpz_number_theory.go",
           "tests": [
             "TestIntegerDividesRetainedShortAndBugTrace"
+          ]
+        },
+        {
+          "name": "lcm_bug TRACE records for all five result branches and the preceding GCD, including destination aliases (mpz.cpp:988-1011)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_lcm_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz_number_theory.go"
+          ],
+          "tests": [
+            "TestIntegerLCMRetainedBranchTraceAndAlias"
           ]
         },
         {

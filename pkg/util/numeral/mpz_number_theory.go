@@ -185,41 +185,66 @@ func (m *IntegerManager) LCM(a, b, c *Int) error {
 		}
 	}
 	if isOneInteger(b) {
-		return m.Copy(c, a)
+		if e := m.Copy(c, a); e != nil {
+			return e
+		}
+		m.traceLCM(a, b, c, nil, 1, 988)
+		return nil
 	}
 	if isOneInteger(a) {
-		return m.Copy(c, b)
+		if e := m.Copy(c, b); e != nil {
+			return e
+		}
+		m.traceLCM(a, b, c, nil, 2, 992)
+		return nil
 	}
 	cmp, e := m.Compare(a, b)
 	if e != nil {
 		return e
 	}
 	if cmp == 0 {
-		return m.Copy(c, b)
+		if e = m.Copy(c, b); e != nil {
+			return e
+		}
+		m.traceLCM(a, b, c, nil, 2, 992)
+		return nil
 	}
 	var r Int
 	defer m.Del(&r)
 	if e = m.GCD(a, b, &r); e != nil {
 		return e
 	}
+	m.traceLCM(a, b, c, &r, 0, 997)
 	cmp, e = m.Compare(&r, a)
 	if e != nil {
 		return e
 	}
 	if cmp == 0 {
-		return m.Copy(c, b)
+		if e = m.Copy(c, b); e != nil {
+			return e
+		}
+		m.traceLCM(a, b, c, nil, 3, 1000)
+		return nil
 	}
 	cmp, e = m.Compare(&r, b)
 	if e != nil {
 		return e
 	}
 	if cmp == 0 {
-		return m.Copy(c, a)
+		if e = m.Copy(c, a); e != nil {
+			return e
+		}
+		m.traceLCM(a, b, c, nil, 4, 1004)
+		return nil
 	}
 	if e = m.MachineDiv(a, &r, &r); e != nil {
 		return e
 	}
-	return m.Mul(&r, b, c)
+	if e = m.Mul(&r, b, c); e != nil {
+		return e
+	}
+	m.traceLCM(a, b, c, nil, 5, 1011)
+	return nil
 }
 func (m *IntegerManager) Divides(a, b *Int) (bool, error) {
 	return m.dividesWithAllocationContext(a, b, integerAllocationInvocationContext{})
