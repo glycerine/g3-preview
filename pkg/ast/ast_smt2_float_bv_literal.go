@@ -178,7 +178,7 @@ func (m *ASTManager) floatBitVectorSuffix(f *astFloatLiteralFrame, radix bool, g
 	if e = appendText(" "); e != nil {
 		return ASTHandle{}, e
 	}
-	bias, e := f.owner.numeric.ExponentBias(f.value.EBits())
+	biasedExponent, e := f.owner.numeric.BiasExp(f.value.EBits(), f.value.Exponent())
 	if e != nil {
 		return ASTHandle{}, e
 	}
@@ -187,7 +187,7 @@ func (m *ASTManager) floatBitVectorSuffix(f *astFloatLiteralFrame, radix bool, g
 		return ASTHandle{}, e
 	}
 	f.bvPlaced[0] = true
-	if e = m.numerals.SetInt64WithInvocation(&f.bvValues[0], f.value.Exponent()+bias, &f.bvInvocations[0]); e != nil {
+	if e = m.numerals.SetInt64WithInvocation(&f.bvValues[0], biasedExponent, &f.bvInvocations[0]); e != nil {
 		return ASTHandle{}, e
 	}
 	f.bvComplete[0] = true

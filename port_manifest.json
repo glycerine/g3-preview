@@ -147376,11 +147376,16 @@
         },
         {
           "name": "mpnum/mpf_printer_parts concrete reached source counterpart (mpf.h:152-153,192-193)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpf_printer_parts.go",
           "tests": [
             "TestArbitraryFloatPrinterSourceBiasAndScopedSignificand",
-            "TestArbitraryFloatPrinterSignificandEveryReservation"
+            "TestArbitraryFloatPrinterSignificandEveryReservation",
+            "TestASTSMT2FloatDefaultBitVectorFields",
+            "TestASTSMT2FloatBitVectorRejectsReachedSignedBiasOverflow"
+          ],
+          "go_targets": [
+            "pkg/ast/ast_smt2_float_bv_literal.go"
           ]
         },
         {

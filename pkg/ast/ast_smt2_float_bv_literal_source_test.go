@@ -2,11 +2,35 @@
 package ast
 
 import (
+	"errors"
+	"math"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
+
+func TestASTSMT2FloatBitVectorRejectsReachedSignedBiasOverflow(t *testing.T) {
+	m := astTestManager(t)
+	_, e := m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterBitVectorPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterFloatingPointPlugin()
+	astTestMust(t, e)
+	p := m.floatingPointPlugin
+	sig := unumeral.NewInt(4)
+	var value unumeral.ArbitraryFloat
+	astTestMust(t, p.numeric.SetComponents(&value, 63, 4, false, math.MaxInt64, &sig))
+	node, e := p.mkNumeral(&value, nil)
+	astTestMust(t, e)
+	if _, e = m.ppFloatBitVectorLiteral(m.external(node), true, nil); !errors.Is(e, arena.ErrBounds) {
+		t.Fatal("reached signed exponent-bias overflow", e)
+	}
+	astTestMust(t, p.numeric.Del(&value))
+	astTestMust(t, m.Close())
+}
 
 func TestASTSMT2FloatDefaultBitVectorFields(t *testing.T) {
 	c, g, p, b := dynAckSourceFixture(t)
