@@ -39634,7 +39634,12 @@ infinite denominator endpoints, early zero numerator, destination alias with
 the denominator and the prohibited numerator alias. Focused native and
 checked/debug tests on CPUs 8–16 verify these cases and distinct directed
 1/3 bounds. Powers, root enclosure, node views and the enclosing context
-remain open.
+remained open at that checkpoint. The concrete MPF interval scalar
+multiply/divide path now preserves source zero-scalar reset, negative bound
+reversal, separate directed reciprocals and destination alias. Focused
+native and checked/debug cases on CPUs 8–16 cover finite and one-sided
+infinite bounds and independent rational enclosures. Powers, root enclosure,
+node views and the enclosing context remain open.
 
 ### Environment parameter runtime boundary
 

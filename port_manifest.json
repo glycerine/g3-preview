@@ -34812,7 +34812,8 @@
         "pkg/math/subpaving/arbitrary_interval.go",
         "pkg/math/subpaving/arbitrary_interval_arith.go",
         "pkg/math/subpaving/arbitrary_interval_mul.go",
-        "pkg/math/subpaving/arbitrary_interval_div.go"
+        "pkg/math/subpaving/arbitrary_interval_div.go",
+        "pkg/math/subpaving/arbitrary_interval_scalar.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34837,7 +34838,8 @@
         "TestSubpavingMPFMutableIntervalRetainedCore",
         "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds",
-        "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
+        "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero",
+        "TestSubpavingMPFIntervalScalarMulDiv"
       ],
       "conditionals": [
         {
@@ -35468,6 +35470,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval_div.go",
           "tests": [
             "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf interval scalar multiply/divide: zero reset, negative reversal, directed reciprocal and destination alias (src/math/interval/interval_def.h:839-925)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_scalar.go",
+          "tests": [
+            "TestSubpavingMPFIntervalScalarMulDiv"
           ]
         }
       ],
@@ -50190,13 +50200,15 @@
         "pkg/math/subpaving/arbitrary_interval.go",
         "pkg/math/subpaving/arbitrary_interval_arith.go",
         "pkg/math/subpaving/arbitrary_interval_mul.go",
-        "pkg/math/subpaving/arbitrary_interval_div.go"
+        "pkg/math/subpaving/arbitrary_interval_div.go",
+        "pkg/math/subpaving/arbitrary_interval_scalar.go"
       ],
       "tests": [
         "TestSubpavingMPFMutableIntervalRetainedCore",
         "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds",
-        "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
+        "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero",
+        "TestSubpavingMPFIntervalScalarMulDiv"
       ],
       "conditionals": [
         {
@@ -50241,6 +50253,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval_div.go",
           "tests": [
             "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf interval scalar multiply/divide: zero reset, negative reversal, directed reciprocal and destination alias (src/math/interval/interval_def.h:839-925)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_scalar.go",
+          "tests": [
+            "TestSubpavingMPFIntervalScalarMulDiv"
           ]
         }
       ],
@@ -50644,7 +50664,8 @@
         "pkg/math/subpaving/arbitrary_interval.go",
         "pkg/math/subpaving/arbitrary_interval_arith.go",
         "pkg/math/subpaving/arbitrary_interval_mul.go",
-        "pkg/math/subpaving/arbitrary_interval_div.go"
+        "pkg/math/subpaving/arbitrary_interval_div.go",
+        "pkg/math/subpaving/arbitrary_interval_scalar.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50700,7 +50721,8 @@
         "TestSubpavingMPFMutableIntervalRetainedCore",
         "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds",
-        "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
+        "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero",
+        "TestSubpavingMPFIntervalScalarMulDiv"
       ],
       "conditionals": [
         {
@@ -50953,6 +50975,14 @@
           "tests": [
             "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
           ]
+        },
+        {
+          "name": "Concrete config_mpf interval scalar multiply/divide: zero reset, negative reversal, directed reciprocal and destination alias (src/math/interval/interval_def.h:839-925)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_scalar.go",
+          "tests": [
+            "TestSubpavingMPFIntervalScalarMulDiv"
+          ]
         }
       ],
       "ownership": [
@@ -51012,7 +51042,8 @@
         "pkg/math/subpaving/arbitrary_interval.go",
         "pkg/math/subpaving/arbitrary_interval_arith.go",
         "pkg/math/subpaving/arbitrary_interval_mul.go",
-        "pkg/math/subpaving/arbitrary_interval_div.go"
+        "pkg/math/subpaving/arbitrary_interval_div.go",
+        "pkg/math/subpaving/arbitrary_interval_scalar.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51058,7 +51089,8 @@
         "TestSubpavingMPFMutableIntervalRetainedCore",
         "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds",
-        "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
+        "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero",
+        "TestSubpavingMPFIntervalScalarMulDiv"
       ],
       "assertions": [
         {
@@ -51544,6 +51576,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval_div.go",
           "tests": [
             "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf interval scalar multiply/divide: zero reset, negative reversal, directed reciprocal and destination alias (src/math/interval/interval_def.h:839-925)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_scalar.go",
+          "tests": [
+            "TestSubpavingMPFIntervalScalarMulDiv"
           ]
         }
       ],
