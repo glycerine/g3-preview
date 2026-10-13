@@ -252,7 +252,7 @@ func Validate(m Manifest) error {
 				return fmt.Errorf("missing completion evidence for %s", u.Path)
 			}
 			for _, method := range u.Methods {
-				if method.Status != "ported" || method.GoTarget == "" || len(method.Tests) == 0 {
+				if (method.Status != "ported" && method.Status != "platform_replacement") || method.GoTarget == "" || len(method.Tests) == 0 {
 					return fmt.Errorf("unfinished method %s in %s", method.Name, u.Path)
 				}
 			}

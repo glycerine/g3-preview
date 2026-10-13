@@ -97,6 +97,10 @@ func TestDriftAndCompletionEvidence(t *testing.T) {
 	if err := Validate(a); err != nil {
 		t.Fatal(err)
 	}
+	a.Units[0].Methods[0].Status = "platform_replacement"
+	if err := Validate(a); err != nil {
+		t.Fatal(err)
+	}
 	a.Units[0].Methods[0].Status = "unported"
 	if Validate(a) == nil {
 		t.Fatal("unfinished method hidden by file status")

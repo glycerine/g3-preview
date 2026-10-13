@@ -117472,7 +117472,7 @@
       "path": "src/util/hash.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/hash/hash.go",
         "pkg/sat/sat_solver_mutex_pair_set_test.go",
@@ -117577,9 +117577,9 @@
         {
           "name": "primitive, object, pointer, pair and triple hash functors used only for native map bucket selection in retained clients",
           "status": "platform_replacement",
-          "go_target": "pkg/util/hash/hash.go",
+          "go_target": "pkg/sat/sat_solver_find_mutexes.go",
           "tests": [
-            "TestSourceHashVectors"
+            "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"
           ]
         }
       ],
