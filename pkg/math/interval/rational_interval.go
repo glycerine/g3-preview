@@ -112,11 +112,22 @@ func (v *RationalInterval) CheckInvariant() error {
 	if err := v.open(); err != nil {
 		return err
 	}
-	cmp, err := (RationalExtended{Numbers: v.numbers}).Compare(&v.lower, v.lowerKind(), &v.upper, v.upperKind())
+	e := RationalExtended{Numbers: v.numbers}
+	equal, err := e.Equal(&v.lower, v.lowerKind(), &v.upper, v.upperKind())
 	if err != nil {
 		return err
 	}
-	if cmp > 0 || cmp == 0 && (v.lowerOpen || v.upperOpen) {
+	if equal {
+		if v.lowerOpen || v.upperOpen {
+			return ErrExtendedDomain
+		}
+		return nil
+	}
+	cmp, err := e.Compare(&v.lower, v.lowerKind(), &v.upper, v.upperKind())
+	if err != nil {
+		return err
+	}
+	if cmp >= 0 {
 		return ErrExtendedDomain
 	}
 	return nil
@@ -185,18 +196,18 @@ func (v *RationalInterval) Equal(other *RationalInterval) (bool, error) {
 		return false, arena.ErrInvalidSlot
 	}
 	e := RationalExtended{Numbers: v.numbers}
-	l, err := e.Compare(&v.lower, v.lowerKind(), &other.lower, other.lowerKind())
+	l, err := e.Equal(&v.lower, v.lowerKind(), &other.lower, other.lowerKind())
 	if err != nil {
 		return false, err
 	}
-	if l != 0 {
+	if !l {
 		return false, nil
 	}
-	u, err := e.Compare(&v.upper, v.upperKind(), &other.upper, other.upperKind())
+	u, err := e.Equal(&v.upper, v.upperKind(), &other.upper, other.upperKind())
 	if err != nil {
 		return false, err
 	}
-	return u == 0 && v.lowerOpen == other.lowerOpen && v.upperOpen == other.upperOpen, nil
+	return u && v.lowerOpen == other.lowerOpen && v.upperOpen == other.upperOpen, nil
 }
 
 func (v *RationalInterval) Before(other *RationalInterval) (bool, error) {

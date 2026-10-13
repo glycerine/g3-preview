@@ -127,3 +127,56 @@ func TestRationalExtendedIntervalBranches(t *testing.T) {
 		t.Fatalf("infinite inverse = (%d,%s)", k, got)
 	}
 }
+
+func TestRationalExtendedStructuralEqualityWithoutCrossProducts(t *testing.T) {
+	budget := arena.NewBudget(1 << 30)
+	m, err := numeral.NewRationalManager(numeral.RationalConfig{Integers: numeral.IntegerConfig{
+		Cells: arena.Config{Budget: budget},
+		Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}},
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	value := numeral.NewRational()
+	left, err := NewRationalInterval(m)
+	if err != nil {
+		t.Fatal(err)
+	}
+	right, err := NewRationalInterval(m)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		budget.FailAfter(-1)
+		for _, e := range []error{left.Close(), right.Close(), m.Del(&value), m.CloseChecked()} {
+			if e != nil {
+				t.Fatal(e)
+			}
+		}
+		if budget.Used() != 0 {
+			t.Fatal("retained interval ownership", budget.Used())
+		}
+	})
+	if err := m.SetString(&value, "123456789012345678901234567890/7"); err != nil {
+		t.Fatal(err)
+	}
+	for _, v := range []*RationalInterval{left, right} {
+		if err := v.SetFinite(&value, &value, false, false); err != nil {
+			t.Fatal(err)
+		}
+	}
+	e := RationalExtended{Numbers: m}
+	budget.FailAfter(0)
+	if equal, err := e.Equal(nil, PlusInfinity, nil, PlusInfinity); err != nil || !equal {
+		t.Fatal("same infinity kind", equal, err)
+	}
+	if equal, err := e.Equal(nil, PlusInfinity, nil, Finite); err != nil || equal {
+		t.Fatal("finite branch must be skipped", equal, err)
+	}
+	if err := left.CheckInvariant(); err != nil {
+		t.Fatal("equal finite endpoints must avoid cross-products", err)
+	}
+	if equal, err := left.Equal(right); err != nil || !equal {
+		t.Fatal("equal finite intervals must avoid cross-products", equal, err)
+	}
+}

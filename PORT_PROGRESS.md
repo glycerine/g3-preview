@@ -40205,3 +40205,7 @@ The remaining `mpf` value definitions in `mpf.cpp` and declarations in `mpf.h` a
 ### MPF formatted setter ownership recorded
 
 The whole-file `mpf.cpp` ownership inventory now includes the formatted C-string setter's actual q/ex local order, reverse source destruction, exact parser and conversion child identities, first-own retry, and caller-owned output. Its focused native and checked/debug value, allocation, callback, source-stop, and owning-release tests pass, as does source portcheck on CPUs 8-16. This covers that method's retained ownership path; the full `mpf.cpp` ownership audit remains open. The process-global `timeout.cpp` path is still tied to the unported shell caller and cannot be credited from the lower scoped-timer primitive alone.
+
+### Rational extended interval equality source route
+
+The retained mpq interval invariant and interval equality now call the concrete `ext_numeral::eq` counterpart. Matching infinities skip both numeral reads; finite pairs call structural rational equality, which compares fields without the cross-products used by ordered comparison. The invariant reaches ordered comparison only after structural inequality, matching the source branch. A BIG rational singleton fixture checks both interval paths with new reservations refused, and the full interval package passes in native and checked/debug modes on CPUs 8-16. Source portcheck passes. The larger extended-number and interval source units remain partial for their other retained consumers.

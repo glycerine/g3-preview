@@ -35115,6 +35115,15 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete mpq interval invariant and equality use source extended structural equality before ordered comparison (src/math/interval/interval_def.h:655-699)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/rational_interval.go",
+          "tests": [
+            "TestRationalExtendedStructuralEqualityWithoutCrossProducts",
+            "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+          ]
+        },
+        {
           "name": "Retained reset, containment, equality, before, display, add and subtract for mpq intervals (src/math/interval/interval_def.h:597-709,795-837)",
           "status": "partial",
           "go_target": "pkg/math/interval/rational_interval.go",
@@ -116761,6 +116770,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete mpq ext_numeral eq finite structural manager route and nonfinite unread numeral short circuit (src/util/ext_numeral.h:244-256)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/rational_extended.go",
+          "tests": [
+            "TestRationalExtendedStructuralEqualityWithoutCrossProducts"
+          ]
+        },
         {
           "name": "Concrete mpq extended-number signs, comparison, arithmetic, reciprocal and power reached by interval_manager (src/util/ext_numeral.h:27-344)",
           "status": "partial",

@@ -81,6 +81,18 @@ func (e RationalExtended) Compare(a *numeral.Rational, ak ExtendedKind, b *numer
 	return e.Numbers.Compare(a, b)
 }
 
+// Equal follows ext_numeral::eq: finite values use the manager's structural
+// equality, while infinite kinds do not read either numeral.
+func (e RationalExtended) Equal(a *numeral.Rational, ak ExtendedKind, b *numeral.Rational, bk ExtendedKind) (bool, error) {
+	if ak != Finite {
+		return ak == bk, nil
+	}
+	if bk != Finite {
+		return false, nil
+	}
+	return e.Numbers.Equal(a, b)
+}
+
 func (e RationalExtended) Add(a *numeral.Rational, ak ExtendedKind, b *numeral.Rational, bk ExtendedKind, out *numeral.Rational) (ExtendedKind, error) {
 	if ak != Finite && bk != Finite && ak != bk {
 		return Finite, ErrExtendedDomain
