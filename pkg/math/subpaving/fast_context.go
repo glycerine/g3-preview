@@ -14,8 +14,8 @@ import (
 
 var ErrFastContextTimestamp = errors.New("subpaving: fast-float bound timestamp exhausted")
 
-// FastContext owns its bound-policy numerals and root node. The numeral
-// manager and resource limit remain caller-owned.
+// FastContext owns its bound-policy numerals, root node and search-created
+// children. The numeral manager and resource limit remain caller-owned.
 type FastContext struct {
 	self             *FastContext
 	numbers          *numeral.FastFloatManager
@@ -23,6 +23,11 @@ type FastContext struct {
 	isInt            []bool
 	root             *FastNode
 	nodes            []*FastNode
+	leafQueue        []*FastNode
+	searchOwned      []*FastNode
+	searchNode       *FastNode
+	searchPhase      uint8
+	numSplits        uint64
 	owned            [4]*numeral.ScopedFastFloat
 	epsilon          *numeral.FastFloat
 	maxBound         *numeral.FastFloat
@@ -63,6 +68,7 @@ func NewFastContext(m *numeral.FastFloatManager, limit *control.Reslimit, isInt 
 			err = errors.Join(err, c.Close())
 		}
 	}()
+	c.maxDepth, c.maxNodes, c.maxMemory = 128, 8192, math.MaxUint64
 	if err = c.updateEpsilon(epsilon); err != nil {
 		return nil, err
 	}
@@ -112,6 +118,8 @@ func newFastContextOwner(m *numeral.FastFloatManager, limit *control.Reslimit, i
 	}
 	c.root.context = c
 	c.nodes = []*FastNode{c.root}
+	c.leafQueue = []*FastNode{c.root}
+	c.root.queuedLeaf = true
 	return c, nil
 }
 
@@ -205,7 +213,7 @@ func (c *FastContext) NewChild(parent *FastNode) (*FastNode, error) {
 	if err := c.open(); err != nil {
 		return nil, err
 	}
-	if parent == nil || parent.context != c {
+	if parent == nil || parent.context != c || parent.depth == math.MaxUint32 || len(c.nodes) >= math.MaxUint32 {
 		return nil, arena.ErrInvalidSlot
 	}
 	child, err := NewFastNode(c.numbers, uint32(len(c.isInt)), parent)
@@ -213,6 +221,8 @@ func (c *FastContext) NewChild(parent *FastNode) (*FastNode, error) {
 		return nil, err
 	}
 	c.nodes = append(c.nodes, child)
+	c.leafQueue = append(c.leafQueue, child)
+	child.queuedLeaf = true
 	return child, nil
 }
 
@@ -232,6 +242,14 @@ func (c *FastContext) Close() error {
 	}
 	if c.root == nil {
 		return arena.ErrInvalidSlot
+	}
+	for len(c.searchOwned) != 0 {
+		i := len(c.searchOwned) - 1
+		if err := c.searchOwned[i].Close(); err != nil {
+			return err
+		}
+		c.searchOwned[i] = nil
+		c.searchOwned = c.searchOwned[:i]
 	}
 	if err := c.root.Close(); err != nil {
 		return err
@@ -268,6 +286,8 @@ func (c *FastContext) Close() error {
 	c.queue = nil
 	c.queueHead = 0
 	c.nodes = nil
+	c.leafQueue = nil
+	c.searchNode = nil
 	c.displayVariable = nil
 	c.closed = true
 	return nil

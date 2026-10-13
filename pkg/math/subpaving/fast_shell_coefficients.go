@@ -196,6 +196,13 @@ func (w *FastShellCoefficients) DisplayBounds(out io.Writer) error {
 	return w.context.DisplayBounds(out)
 }
 
+func (w *FastShellCoefficients) Search() error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.Search()
+}
+
 // Close unwinds the source members in reverse order. A refused release keeps
 // its member for a later retry; an owned context closes after wrapper members.
 func (w *FastShellCoefficients) Close() error {

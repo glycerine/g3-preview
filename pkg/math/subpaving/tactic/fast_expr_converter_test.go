@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"math"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -186,8 +187,8 @@ func TestFastExprConverterTermsAndClause(t *testing.T) {
 	if err := goal.Assert(ineq); err != nil {
 		t.Fatal(err)
 	}
-	if err := converter.InternalizeGoal(goal); err != nil {
-		t.Fatal("goal internalization", err)
+	if err := converter.SearchGoal(goal); err != nil {
+		t.Fatal("goal search", err)
 	}
 	shell, err := engine.Shell()
 	if err != nil {
@@ -199,6 +200,10 @@ func TestFastExprConverterTermsAndClause(t *testing.T) {
 	}
 	if got, want := out.String(), "x2 = 1 + x0 + x1\nx3 = x0^2\nx2 <= 2\nx2 <= 2\nx2 <= 2 or 2 < x2\n"; got != want {
 		t.Fatal("source-order MPFF constraints", out.String())
+	}
+	out.Reset()
+	if err := shell.DisplayBounds(&out); err != nil || !strings.Contains(out.String(), "x2 <= 2") {
+		t.Fatal("searched MPFF bound", out.String(), err)
 	}
 	if _, err := converter.InternalizeInequality(ineq); err != nil {
 		t.Fatal("inequality", err)

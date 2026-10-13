@@ -174,3 +174,15 @@ func (c *FastExprConverter) InternalizeGoal(g *goaltactic.Goal) error {
 	}
 	return nil
 }
+
+// SearchGoal follows the source's internalize-then-search order for MPFF.
+func (c *FastExprConverter) SearchGoal(g *goaltactic.Goal) error {
+	if err := c.InternalizeGoal(g); err != nil {
+		return err
+	}
+	shell, err := c.engine.Shell()
+	if err != nil {
+		return err
+	}
+	return shell.Search()
+}

@@ -147,4 +147,8 @@ func TestFastShellExactCoefficientsAndDirectedInequalities(t *testing.T) {
 	if err := w.SetVariableDisplay(nil); err != nil {
 		t.Fatal(err)
 	}
+	c.maxDepth = 0
+	if err := w.Search(); err != nil {
+		t.Fatal("shell search forwarding", err)
+	}
 }

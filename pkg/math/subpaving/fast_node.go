@@ -49,6 +49,8 @@ type FastNode struct {
 	owned        []*FastBound
 	trail        *FastBound
 	children     uint32
+	depth        uint32
+	queuedLeaf   bool
 	context      *FastContext
 	conflictVar  uint32
 	inconsistent bool
@@ -74,6 +76,7 @@ func NewFastNode(m *numeral.FastFloatManager, variables uint32, parent *FastNode
 		copy(n.upper, parent.upper)
 		n.trail = parent.trail
 		n.context = parent.context
+		n.depth = parent.depth + 1
 		n.conflictVar = parent.conflictVar
 		n.inconsistent = parent.inconsistent
 		parent.children++
@@ -152,6 +155,9 @@ func (n *FastNode) Close() (err error) {
 		return err
 	}
 	n.closed = true
+	if n.context != nil && n.queuedLeaf {
+		n.context.removeLeaf(n)
+	}
 	if n.parent != nil {
 		n.parent.children--
 		if n.context != nil {

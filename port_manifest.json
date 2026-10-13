@@ -50424,6 +50424,14 @@
           "tests": [
             "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
           ]
+        },
+        {
+          "name": "Concrete context_mpff_wrapper search forwarding (src/math/subpaving/subpaving.cpp:52)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_shell_coefficients.go",
+          "tests": [
+            "TestFastShellExactCoefficientsAndDirectedInequalities"
+          ]
         }
       ],
       "ownership": [],
@@ -50432,7 +50440,8 @@
         "The concrete MPFF wrapper now converts integer coefficients in source order with an exact mpz round trip, chooses directed rational bound rounding, and forwards typed variables, sums, monomials and clauses. Context parameter construction, search/display, and tactic lifetime remain open.",
         "The selected MPFF shell now owns the context created from source-order named parameters and retires wrapper members before context. Search/leaf-bound display forwarding and full tactic lifetime remain open.",
         "The MPFF shell now forwards constraint display and a borrowed variable printer. Search remains open.",
-        "The MPFF shell now forwards consistent leaf-bound display; search and the full tactic lifetime remain open."
+        "The MPFF shell now forwards consistent leaf-bound display; search and the full tactic lifetime remain open.",
+        "The MPFF shell now forwards context search; source process-global memory checkpoint and full tactic result ownership remain open."
       ]
     },
     {
@@ -51230,7 +51239,9 @@
         "pkg/math/subpaving/fast_display_bounds_test.go",
         "pkg/math/subpaving/fast_selector.go",
         "pkg/math/subpaving/fast_split.go",
-        "pkg/math/subpaving/fast_selector_split_test.go"
+        "pkg/math/subpaving/fast_selector_split_test.go",
+        "pkg/math/subpaving/fast_search.go",
+        "pkg/math/subpaving/fast_search_test.go"
       ],
       "tests": [
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
@@ -51327,7 +51338,10 @@
         "TestFastShellExactCoefficientsAndDirectedInequalities",
         "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes",
         "TestFastSelectorRoundRobinAndDefinitionFilter",
-        "TestFastMidpointSplitterSourceBranchesAndRefusal"
+        "TestFastMidpointSplitterSourceBranchesAndRefusal",
+        "TestFastSearchBreadthFirstCancellationAndOwnedChildren",
+        "TestFastSearchMaxNodesStopsBeforeNextLeaf",
+        "TestFastSearchRetainsRefusedSplitChildrenForOwnerClose"
       ],
       "conditionals": [
         {
@@ -51879,6 +51893,16 @@
           "tests": [
             "TestFastMidpointSplitterSourceBranchesAndRefusal"
           ]
+        },
+        {
+          "name": "Concrete config_mpff breadth-first loop, cancellation phases and search-owned child retirement (src/math/subpaving/subpaving_t_def.h:1806-1843)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_search.go",
+          "tests": [
+            "TestFastSearchBreadthFirstCancellationAndOwnedChildren",
+            "TestFastSearchMaxNodesStopsBeforeNextLeaf",
+            "TestFastSearchRetainsRefusedSplitChildrenForOwnerClose"
+          ]
         }
       ],
       "ownership": [
@@ -51891,7 +51915,8 @@
         "The config_mpff six named parameter updates now retain source order, defaults, partial numeric mutation and a closable refused owner. The Go context allocates its root before this pass; complete constructor allocation order, node search/splitting and full solver lifecycle remain open.",
         "The config_mpff context now displays definitions, units and clauses through the source MPFF to_rational_string spelling, which delegates to the ordinary String formatter. Borrowed variable display and shell forwarding are concrete; search remains open.",
         "The config_mpff context now records child creation order, displays consistent leaves with inherited bounds and exact MPFF numeral text, and omits conflicting leaves. Search, splitting and statistics remain open.",
-        "The config_mpff round-robin variable selector and midpoint splitter now use concrete FastFloat arithmetic. Integer-bound normalization, directed unbounded splits and adjacent-value refusal preserve source order; the enclosing search queue, depth/node budgets and full tactic lifecycle remain open."
+        "The config_mpff round-robin variable selector and midpoint splitter now use concrete FastFloat arithmetic. Integer-bound normalization, directed unbounded splits and adjacent-value refusal preserve source order; the enclosing search queue, depth/node budgets and full tactic lifecycle remain open.",
+        "The config_mpff search loop now initializes the root, selects leaves breadth-first, replays child decisions, resumes canceled propagation, enforces depth/node limits and owns split children through cleanup. Source process-global max_memory checkpoint and complete tactic result/simplify lifecycle remain open."
       ]
     },
     {
@@ -52015,7 +52040,9 @@
         "pkg/math/subpaving/fast_display_bounds_test.go",
         "pkg/math/subpaving/fast_selector.go",
         "pkg/math/subpaving/fast_split.go",
-        "pkg/math/subpaving/fast_selector_split_test.go"
+        "pkg/math/subpaving/fast_selector_split_test.go",
+        "pkg/math/subpaving/fast_search.go",
+        "pkg/math/subpaving/fast_search_test.go"
       ],
       "tests": [
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
@@ -52114,7 +52141,10 @@
         "TestFastShellExactCoefficientsAndDirectedInequalities",
         "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes",
         "TestFastSelectorRoundRobinAndDefinitionFilter",
-        "TestFastMidpointSplitterSourceBranchesAndRefusal"
+        "TestFastMidpointSplitterSourceBranchesAndRefusal",
+        "TestFastSearchBreadthFirstCancellationAndOwnedChildren",
+        "TestFastSearchMaxNodesStopsBeforeNextLeaf",
+        "TestFastSearchRetainsRefusedSplitChildrenForOwnerClose"
       ],
       "assertions": [
         {
@@ -53089,6 +53119,16 @@
           "tests": [
             "TestFastMidpointSplitterSourceBranchesAndRefusal"
           ]
+        },
+        {
+          "name": "Concrete config_mpff breadth-first loop, cancellation phases and search-owned child retirement (src/math/subpaving/subpaving_t_def.h:1806-1843)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_search.go",
+          "tests": [
+            "TestFastSearchBreadthFirstCancellationAndOwnedChildren",
+            "TestFastSearchMaxNodesStopsBeforeNextLeaf",
+            "TestFastSearchRetainsRefusedSplitChildrenForOwnerClose"
+          ]
         }
       ],
       "ownership": [
@@ -53101,7 +53141,8 @@
         "The config_mpff six named parameter updates now retain source order, defaults, partial numeric mutation and a closable refused owner. The Go context allocates its root before this pass; complete constructor allocation order, node search/splitting and full solver lifecycle remain open.",
         "The config_mpff context now displays definitions, units and clauses through the source MPFF to_rational_string spelling, which delegates to the ordinary String formatter. Borrowed variable display and shell forwarding are concrete; search remains open.",
         "The config_mpff context now records child creation order, displays consistent leaves with inherited bounds and exact MPFF numeral text, and omits conflicting leaves. Search, splitting and statistics remain open.",
-        "The config_mpff round-robin variable selector and midpoint splitter now use concrete FastFloat arithmetic. Integer-bound normalization, directed unbounded splits and adjacent-value refusal preserve source order; the enclosing search queue, depth/node budgets and full tactic lifecycle remain open."
+        "The config_mpff round-robin variable selector and midpoint splitter now use concrete FastFloat arithmetic. Integer-bound normalization, directed unbounded splits and adjacent-value refusal preserve source order; the enclosing search queue, depth/node budgets and full tactic lifecycle remain open.",
+        "The config_mpff search loop now initializes the root, selects leaves breadth-first, replays child decisions, resumes canceled propagation, enforces depth/node limits and owns split children through cleanup. Source process-global max_memory checkpoint and complete tactic result/simplify lifecycle remain open."
       ]
     },
     {
@@ -53334,13 +53375,22 @@
           "tests": [
             "TestFastEngineSelectedOwnerAndPartialCleanup"
           ]
+        },
+        {
+          "name": "Concrete MPFF goal internalize-then-search route (src/math/subpaving/tactic/subpaving_tactic.cpp:128-190)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/tactic/fast_goal_internalize.go",
+          "tests": [
+            "TestFastExprConverterTermsAndClause"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
         "The HWF and MPF branches construct concrete contexts and expression converters, internalize <=/>= literals with numeral right sides, unwrap nested negations, scale bounds by exact numerator/denominator, and add clauses in source order. The MPF converter borrows a rational manager and uses the selected owning MPF shell. A simple MPF integer-bound goal exercises internalize-then-search and displays its bound. The compound x^2 case preserves the source f2n refusal: unbounded even-power interval propagation resets its finite lower endpoint to zero, and the next interval::set calls f2n::set, whose is_regular check rejects formatted zero. MPQ/MPFX engine construction, AST variable display, optional print_nodes output, result tactic ownership, simplify pipeline and factory remain open.",
         "The selected MPFF engine now constructs and owns its concrete context/shell, borrowing numeral and rational managers. MPFF search/leaf-bound display, result ownership and simplify pipeline remain open.",
-        "The selected MPFF engine now has concrete expression and clause internalization, including nested negation and ordered disjunction. Search and full tactic result ownership remain open."
+        "The selected MPFF engine now has concrete expression and clause internalization, including nested negation and ordered disjunction. Search and full tactic result ownership remain open.",
+        "The MPFF tactic route now internalizes a goal and searches its selected context, with resulting bound display through the shell. Result tactic ownership, simplify pipeline and process-global memory checkpoint remain open."
       ]
     },
     {
@@ -151382,7 +151432,7 @@
           ]
         },
         {
-          "name": "persistent ostream state/transport, TRACE/STRACE actions, source exception transport and subpaving consumer integration",
+          "name": "persistent ostream state/transport, TRACE/STRACE actions, source exception transport and full subpaving tactic result integration",
           "status": "unported",
           "tests": []
         },
@@ -151429,7 +151479,8 @@
         "MPFF significands, handle metadata, recycled IDs, conversion scratch and arithmetic scratch use concrete Go uint32 slices. Copied vector growth, arena descriptors and storage reservation failures are removed. Numeric handle generation/recycling, arithmetic and rounding algorithms remain explicit; shared MPN workspaces retain their separate ownership.",
         "NaturalManager no longer owns or borrows an arena.Words service: division uses actual Runtime buffers and formatting uses native slices. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation.",
         "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit.",
-        "The retained context_mpff_wrapper now exercises exact SetInteger/ToInteger coefficient round trips and directed SetRational inequality bounds through a concrete subpaving caller; the enclosing MPFF tactic lifecycle remains partial."
+        "The retained context_mpff_wrapper now exercises exact SetInteger/ToInteger coefficient round trips and directed SetRational inequality bounds through a concrete subpaving caller; the enclosing MPFF tactic lifecycle remains partial.",
+        "Concrete config_mpff search now reaches the MPFF manager through live midpoint arithmetic and bound propagation, in addition to exact coefficient conversion and display. Persistent ostream transport, trace actions, global binding and full tactic result lifecycle remain open."
       ]
     },
     {
@@ -151674,7 +151725,7 @@
           ]
         },
         {
-          "name": "persistent ostream state/transport, TRACE/STRACE actions, source exception transport and subpaving consumer integration",
+          "name": "persistent ostream state/transport, TRACE/STRACE actions, source exception transport and full subpaving tactic result integration",
           "status": "unported",
           "tests": []
         },
@@ -151720,7 +151771,8 @@
         "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and full subpaving tactic integration remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
         "MPFF significands, handle metadata, recycled IDs, conversion scratch and arithmetic scratch use concrete Go uint32 slices. Copied vector growth, arena descriptors and storage reservation failures are removed. Numeric handle generation/recycling, arithmetic and rounding algorithms remain explicit; shared MPN workspaces retain their separate ownership.",
         "NaturalManager no longer owns or borrows an arena.Words service: division and formatting use their actual Runtime buffers. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation.",
-        "The retained context_mpff_wrapper now exercises exact SetInteger/ToInteger coefficient round trips and directed SetRational inequality bounds through a concrete subpaving caller; the enclosing MPFF tactic lifecycle remains partial."
+        "The retained context_mpff_wrapper now exercises exact SetInteger/ToInteger coefficient round trips and directed SetRational inequality bounds through a concrete subpaving caller; the enclosing MPFF tactic lifecycle remains partial.",
+        "Concrete config_mpff search now reaches the MPFF manager through live midpoint arithmetic and bound propagation, in addition to exact coefficient conversion and display. Persistent ostream transport, trace actions, global binding and full tactic result lifecycle remain open."
       ]
     },
     {
