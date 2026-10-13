@@ -19077,10 +19077,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/proofs/hypotheses.go"
+        "pkg/ast/proofs/hypotheses.go",
+        "pkg/ast/proofs/is_closed.go"
       ],
       "tests": [
-        "TestProofHypothesesConcreteUnionAndInheritedCopy"
+        "TestProofHypothesesConcreteUnionAndInheritedCopy",
+        "TestProofIsClosedLemmaLiteralsAndScopeReset"
       ],
       "assertions": [
         {
@@ -19154,6 +19156,14 @@
           "tests": [
             "TestProofHypothesesConcreteUnionAndInheritedCopy"
           ]
+        },
+        {
+          "name": "proof_is_closed scoped-lemma literal and shared-visited proof traversal (proof_utils.cpp:751-814)",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/is_closed.go",
+          "tests": [
+            "TestProofIsClosedLemmaLiteralsAndScopeReset"
+          ]
         }
       ],
       "ownership": [],
@@ -19163,9 +19173,13 @@
       "path": "src/ast/proofs/proof_utils.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/proofs/is_closed.go"
+      ],
+      "tests": [
+        "TestProofIsClosedLemmaLiteralsAndScopeReset"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -19208,7 +19222,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "proof_is_closed scoped-lemma literal and shared-visited proof traversal (proof_utils.cpp:751-814)",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/is_closed.go",
+          "tests": [
+            "TestProofIsClosedLemmaLiteralsAndScopeReset"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },

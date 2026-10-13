@@ -310,7 +310,8 @@
         "ast"
       ],
       "production_files": [
-        "hypotheses.go"
+        "hypotheses.go",
+        "is_closed.go"
       ]
     },
     {
