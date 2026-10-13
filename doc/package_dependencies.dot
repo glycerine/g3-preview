@@ -156,6 +156,7 @@ digraph packages {
   "tactic/bv" [style=filled, fillcolor="#eeeeee"];
   "tactic/bv" -> "ast";
   "tactic/bv" -> "tactic";
+  "tactic/bv" -> "util/memory";
   "tactic/bv" -> "util/params";
   "tactic/sls" [style=filled, fillcolor="#eeeeee"];
   "tactic/sls" -> "util/params";

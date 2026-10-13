@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/memory"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
@@ -18,6 +19,7 @@ var ErrSharingMaxMemory = errors.New("max. memory exceeded")
 // unfinished scope.
 type SharingGoalPass struct {
 	manager   *ast.ASTManager
+	memory    *memory.Runtime
 	family    ast.FamilyID
 	maxArgs   uint32
 	maxSteps  uint32
@@ -28,17 +30,33 @@ func NewSharingGoalPass(m *ast.ASTManager, maxArgs uint32) (*SharingGoalPass, er
 	if m == nil {
 		return nil, ast.ErrASTHandle
 	}
+	numerals := m.NumeralService()
+	if numerals == nil || numerals.RuntimeOwner() == nil {
+		return nil, ast.ErrASTHandle
+	}
+	runtime := numerals.RuntimeOwner()
+	if _, e := runtime.AllocationSize(); e != nil {
+		return nil, e
+	}
 	fid, e := m.RegisterBitVectorPlugin()
 	if e != nil {
 		return nil, e
 	}
-	return &SharingGoalPass{manager: m, family: fid, maxArgs: maxArgs, maxSteps: math.MaxUint32, maxMemory: math.MaxUint64}, nil
+	return &SharingGoalPass{manager: m, memory: runtime, family: fid, maxArgs: maxArgs, maxSteps: math.MaxUint32, maxMemory: math.MaxUint64}, nil
 }
 
 // UpdateParams reads the three unsigned settings used by rw_cfg::updt_params.
-// The Go budget accounts for the manager's cohort when enforcing max_memory.
+// The memory limit reads the source process allocation counter.
 func (p *SharingGoalPass) UpdateParams(c *uparams.ParamsContext, value *uparams.ParamsRef) error {
-	if p == nil || p.manager == nil || c == nil || c.SymbolsField != p.manager.Symbols {
+	if p == nil || p.manager == nil || p.memory == nil || c == nil || c.SymbolsField != p.manager.Symbols {
+		return ast.ErrASTHandle
+	}
+	paramsNumerals := c.Numerals()
+	if paramsNumerals == nil || paramsNumerals.RuntimeOwner() == nil {
+		return ast.ErrASTHandle
+	}
+	process, paramsProcess := p.memory.ProcessOwner(), paramsNumerals.RuntimeOwner().ProcessOwner()
+	if (process != nil || paramsProcess != nil) && process != paramsProcess {
 		return ast.ErrASTHandle
 	}
 	memName, stepsName, argsName := "max_memory", "max_steps", "max_args"
@@ -80,7 +98,11 @@ type sharingWalk struct {
 
 func (w *sharingWalk) advance() error {
 	w.steps++
-	if w.pass.manager.Budget().Used() > w.pass.maxMemory {
+	used, e := w.pass.memory.AllocationSize()
+	if e != nil {
+		return e
+	}
+	if used > w.pass.maxMemory {
 		return ErrSharingMaxMemory
 	}
 	if w.steps > w.pass.maxSteps {

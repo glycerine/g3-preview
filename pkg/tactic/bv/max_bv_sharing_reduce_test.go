@@ -7,6 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
@@ -101,6 +102,10 @@ func TestSharingGoalPassSourceParamsAndResourceLimits(t *testing.T) {
 	memoryKey := "max_memory"
 	sharingMust(t, ctx.SetUIntName(params, &memoryKey, 0))
 	sharingMust(t, pass.UpdateParams(ctx, params))
+	runtime := m.NumeralService().RuntimeOwner()
+	block, e := runtime.Allocate(1)
+	sharingMust(t, e)
+	t.Cleanup(func() { sharingMust(t, runtime.Deallocate(&block)) })
 	if _, e = pass.Apply(limited); !errors.Is(e, ErrSharingMaxMemory) {
 		t.Fatal("source zero-memory guard", e)
 	}
@@ -109,6 +114,84 @@ func TestSharingGoalPassSourceParamsAndResourceLimits(t *testing.T) {
 	if n != 1 {
 		t.Fatal("memory refusal changed goal", n)
 	}
+}
+
+func TestSharingGoalPassReadsSharedProcessMemory(t *testing.T) {
+	b := arena.NewBudget(1 << 27)
+	process := memory.NewProcessAccounting()
+	runtime, e := memory.NewRuntime(memory.RuntimeConfig{Budget: b, Process: process})
+	sharingMust(t, e)
+	s, e := symbol.NewManager(symbol.Config{Budget: b})
+	sharingMust(t, e)
+	q, e := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{
+		Memory: runtime, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}},
+	}})
+	sharingMust(t, e)
+	m, e := ast.NewASTManager(ast.ASTManagerConfig{Symbols: s, Numerals: q, Budget: b})
+	sharingMust(t, e)
+	_, e = m.RegisterArithmeticPlugin()
+	sharingMust(t, e)
+	c, e := uparams.NewParamsContext(s, q, uparams.ParamsConfig{Budget: b})
+	sharingMust(t, e)
+	v, e := c.NewValue()
+	sharingMust(t, e)
+	other, e := memory.NewRuntime(memory.RuntimeConfig{Budget: b, Process: process})
+	sharingMust(t, e)
+	t.Cleanup(func() {
+		sharingMust(t, other.Close())
+		sharingMust(t, c.Del(&v))
+		sharingMust(t, c.Close())
+		sharingMust(t, m.Close())
+		sharingMust(t, q.Close())
+		sharingMust(t, s.Close())
+		sharingMust(t, runtime.Close())
+		if b.Used() != 0 || process.AllocationSize() != 0 {
+			t.Fatal("remaining sharing process owners", b.Used(), process.AllocationSize())
+		}
+	})
+	sort, e := m.MkBoolSort()
+	sharingMust(t, e)
+	atom, e := m.MkConst(symbol.Numerical(2100), sort)
+	sharingMust(t, e)
+	goal, e := tactic.NewGoal(m, false, true, false)
+	sharingMust(t, e)
+	t.Cleanup(func() { sharingMust(t, goal.Close()) })
+	sharingMust(t, goal.Assert(atom))
+	key := "max_memory"
+	sharingMust(t, c.SetUIntName(&v, &key, 1))
+	pass, e := NewSharingGoalPassWithParams(m, c, &v)
+	sharingMust(t, e)
+	foreignRuntime, e := memory.NewRuntime(memory.RuntimeConfig{Budget: b, Process: memory.NewProcessAccounting()})
+	sharingMust(t, e)
+	foreignNumerals, e := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{
+		Memory: foreignRuntime, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}},
+	}})
+	sharingMust(t, e)
+	foreignContext, e := uparams.NewParamsContext(s, foreignNumerals, uparams.ParamsConfig{Budget: b})
+	sharingMust(t, e)
+	foreignValue, e := foreignContext.NewValue()
+	sharingMust(t, e)
+	before := pass.maxMemory
+	if err := pass.UpdateParams(foreignContext, &foreignValue); !errors.Is(err, ast.ErrASTHandle) || pass.maxMemory != before {
+		t.Fatal("mixed process parameter context changed sharing limit", err, pass.maxMemory, before)
+	}
+	sharingMust(t, foreignContext.Del(&foreignValue))
+	sharingMust(t, foreignContext.Close())
+	sharingMust(t, foreignNumerals.Close())
+	sharingMust(t, foreignRuntime.Close())
+	if process.AllocationSize() > 1<<20 {
+		t.Fatal("unexpected initial process allocation", process.AllocationSize())
+	}
+	_, e = pass.Apply(goal)
+	sharingMust(t, e)
+	block, e := other.Allocate(2 << 20)
+	sharingMust(t, e)
+	if _, e = pass.Apply(goal); !errors.Is(e, ErrSharingMaxMemory) {
+		t.Fatal("sharing pass missed allocation in another runtime", e)
+	}
+	sharingMust(t, other.Deallocate(&block))
+	_, e = pass.Apply(goal)
+	sharingMust(t, e)
 }
 
 func TestSharingGoalPassConstantITEPrunesUnselectedPairCache(t *testing.T) {

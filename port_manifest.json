@@ -98523,7 +98523,8 @@
         "TestSharingGoalPassProofChainsCongruenceAndRewrite",
         "TestSharingGoalPassProofQuantifierIntroduction",
         "TestSharingGoalPassSourceParamsAndResourceLimits",
-        "TestSharingGoalPassConstantITEPrunesUnselectedPairCache"
+        "TestSharingGoalPassConstantITEPrunesUnselectedPairCache",
+        "TestSharingGoalPassReadsSharedProcessMemory"
       ],
       "conditionals": [
         {
@@ -98592,7 +98593,8 @@
           "status": "partial",
           "go_target": "pkg/tactic/bv/max_bv_sharing_goal.go",
           "tests": [
-            "TestSharingGoalPassSourceParamsAndResourceLimits"
+            "TestSharingGoalPassSourceParamsAndResourceLimits",
+            "TestSharingGoalPassReadsSharedProcessMemory"
           ]
         }
       ],
@@ -98601,7 +98603,7 @@
       ],
       "deviations": [
         "The four obj_pair_hashtable<expr,expr> instantiations use typed Go maps keyed by ordered AST-handle pairs; C++ hash buckets are not retained.",
-        "The Go max_memory guard measures the AST manager's shared arena budget rather than the C++ process-global memory allocation size. Rewriter frame steps are counted along the concrete recursive traversal; conditional-fold and cache-shortcut step equivalence remains unaudited."
+        "The max_memory guard reads the AST numeral Runtime's source allocation counter, including other Runtimes with the same ProcessAccounting owner. AST arena allocations remain outside that counter. Rewriter frame steps are counted along the concrete recursive traversal; conditional-fold and cache-shortcut step equivalence remains unaudited."
       ]
     },
     {

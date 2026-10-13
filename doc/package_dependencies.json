@@ -1223,6 +1223,7 @@
       "imports": [
         "ast",
         "tactic",
+        "util/memory",
         "util/params"
       ],
       "production_files": [
