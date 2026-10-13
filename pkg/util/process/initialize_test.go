@@ -50,3 +50,11 @@ func TestGeneratedInitializeRejectsForeignRationalMemoryProcess(t *testing.T) {
 		t.Fatal("retained budget", b.Used())
 	}
 }
+
+func TestGeneratedFinalizeNullProcessSkipsChildren(t *testing.T) {
+	p := memory.NewProcessAccounting()
+	must(t, FinalizeGenerated(p, nil, nil, nil, nil, nil))
+	if p.InitializationStarted() {
+		t.Fatal("null finalization changed initialization guard")
+	}
+}

@@ -17,12 +17,15 @@ import (
 // stops at the exact child; the memory guard remains finalizing, matching the
 // source's absence of a catch or continuation after a failed destructor.
 func FinalizeGenerated(p *memory.ProcessAccounting, d *diagnostic.DebugContext, g *params.GlobalParamsService, r *numeral.RationalGlobalService, s *symbol.Service, tr *diagnostic.TraceTags) error {
-	if p == nil || !p.Valid() || d == nil || g == nil || r == nil || s == nil || tr == nil {
+	if p == nil || !p.Valid() {
 		return arena.ErrConfig
 	}
 	active, err := p.BeginFinalize()
 	if err != nil || !active {
 		return err
+	}
+	if d == nil || g == nil || r == nil || s == nil || tr == nil {
+		return arena.ErrConfig
 	}
 	if err = d.FinalizeDebug(); err != nil {
 		return err

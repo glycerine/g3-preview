@@ -62,6 +62,12 @@ func (p *ProcessAccounting) AboveWatermark() bool {
 	return p.Valid() && p.accounting.aboveWatermark()
 }
 
+// InitializationStarted reports the source g_memory_initialized guard. It is
+// retained across generated child construction and cleared by finalization.
+func (p *ProcessAccounting) InitializationStarted() bool {
+	return p.Valid() && p.initialized
+}
+
 // BeginFinalize enters memory::finalize's guarded generated-child interval.
 // The caller runs mem_finalize's concrete children before CompleteFinalize.
 func (p *ProcessAccounting) BeginFinalize() (bool, error) {

@@ -40,7 +40,20 @@ type Initialized struct {
 // updates the shared maximum through memory::initialize and returns nil,nil;
 // the caller retains the first result for later finalization and owning close.
 func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, error) {
-	if c.Runtime == nil || c.Rational == nil || c.Symbols == nil || c.Debug == nil || c.Params.Budget == nil ||
+	if c.Runtime == nil {
+		return nil, arena.ErrConfig
+	}
+	p := c.Runtime.ProcessOwner()
+	if p == nil {
+		return nil, arena.ErrConfig
+	}
+	// Source repeated calls update the maximum and return without reading any
+	// generated child. This also preserves the pending-stage guard in Runtime.
+	if p.InitializationStarted() {
+		_, err := c.Runtime.BeginSourceInitialize(maxSize)
+		return nil, err
+	}
+	if c.Rational == nil || c.Symbols == nil || c.Debug == nil || c.Params.Budget == nil ||
 		c.Catalog.Budget != c.Params.Budget || c.Globals.Budget != c.Params.Budget || c.Globals.Catalog != nil {
 		return nil, arena.ErrConfig
 	}

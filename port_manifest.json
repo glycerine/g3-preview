@@ -4827,7 +4827,8 @@
       ],
       "tests": [
         "TestGeneratedInitializeAndFinalizeConcreteServices",
-        "TestGeneratedInitializeRejectsForeignRationalMemoryProcess"
+        "TestGeneratedInitializeRejectsForeignRationalMemoryProcess",
+        "TestGeneratedFinalizeNullProcessSkipsChildren"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -4846,7 +4847,8 @@
           "status": "ported",
           "go_target": "pkg/util/process/finalize.go",
           "tests": [
-            "TestGeneratedInitializeAndFinalizeConcreteServices"
+            "TestGeneratedInitializeAndFinalizeConcreteServices",
+            "TestGeneratedFinalizeNullProcessSkipsChildren"
           ]
         }
       ],
@@ -78818,7 +78820,8 @@
       ],
       "tests": [
         "TestGeneratedInitializeAndFinalizeConcreteServices",
-        "TestGeneratedInitializeRejectsForeignRationalMemoryProcess"
+        "TestGeneratedInitializeRejectsForeignRationalMemoryProcess",
+        "TestGeneratedFinalizeNullProcessSkipsChildren"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -78837,7 +78840,8 @@
           "status": "ported",
           "go_target": "pkg/util/process/finalize.go",
           "tests": [
-            "TestGeneratedInitializeAndFinalizeConcreteServices"
+            "TestGeneratedInitializeAndFinalizeConcreteServices",
+            "TestGeneratedFinalizeNullProcessSkipsChildren"
           ]
         }
       ],
@@ -108968,7 +108972,8 @@
       ],
       "tests": [
         "TestGeneratedInitializeAndFinalizeConcreteServices",
-        "TestGeneratedInitializeRejectsForeignRationalMemoryProcess"
+        "TestGeneratedInitializeRejectsForeignRationalMemoryProcess",
+        "TestGeneratedFinalizeNullProcessSkipsChildren"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -108987,7 +108992,8 @@
           "status": "ported",
           "go_target": "pkg/util/process/finalize.go",
           "tests": [
-            "TestGeneratedInitializeAndFinalizeConcreteServices"
+            "TestGeneratedInitializeAndFinalizeConcreteServices",
+            "TestGeneratedFinalizeNullProcessSkipsChildren"
           ]
         }
       ],
@@ -146771,7 +146777,8 @@
         "TestProcessSourceLifecycleRejectsInvalidOwners",
         "TestGeneratedInitializeAndFinalizeConcreteServices",
         "TestGlobalParamsNamespaceAssertionBindingAtReachedSites",
-        "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"
+        "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion",
+        "TestGeneratedFinalizeNullProcessSkipsChildren"
       ],
       "conditionals": [
         {
@@ -147008,7 +147015,8 @@
           "tests": [
             "TestProcessSourceLifecycleGuards",
             "TestProcessSourceLifecycleRejectsInvalidOwners",
-            "TestGeneratedInitializeAndFinalizeConcreteServices"
+            "TestGeneratedInitializeAndFinalizeConcreteServices",
+            "TestGeneratedFinalizeNullProcessSkipsChildren"
           ]
         },
         {
@@ -147143,7 +147151,8 @@
         "TestNumericStreamNativeCountedTextAndOwnedInput",
         "TestProcessSourceLifecycleGuards",
         "TestProcessSourceLifecycleRejectsInvalidOwners",
-        "TestGeneratedInitializeAndFinalizeConcreteServices"
+        "TestGeneratedInitializeAndFinalizeConcreteServices",
+        "TestGeneratedFinalizeNullProcessSkipsChildren"
       ],
       "conditionals": [
         {
@@ -147358,7 +147367,8 @@
           "tests": [
             "TestProcessSourceLifecycleGuards",
             "TestProcessSourceLifecycleRejectsInvalidOwners",
-            "TestGeneratedInitializeAndFinalizeConcreteServices"
+            "TestGeneratedInitializeAndFinalizeConcreteServices",
+            "TestGeneratedFinalizeNullProcessSkipsChildren"
           ]
         }
       ],

@@ -45,7 +45,7 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 		t.Fatal("generated initialization did not publish its parameter owners")
 	}
 	g := init.Globals
-	if again, err := InitializeGenerated(cfg, 1<<25); err != nil || again != nil {
+	if again, err := InitializeGenerated(InitializationConfig{Runtime: m}, 1<<25); err != nil || again != nil {
 		t.Fatal("repeated generated initialization", again, err)
 	}
 	must(t, d.EnableAssertions(false))
@@ -72,6 +72,10 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	if active, err := p.BeginFinalize(); err != nil || active {
 		t.Fatal("process guard not completed", active, err)
 	}
+	if p.InitializationStarted() {
+		t.Fatal("finalization retained initialized guard")
+	}
+	must(t, FinalizeGenerated(p, nil, nil, nil, nil, nil))
 	must(t, init.Close())
 	must(t, r.Close())
 	must(t, s.Close())
