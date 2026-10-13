@@ -147886,6 +147886,7 @@
           ],
           "tests": [
             "TestProcessSourceLifecycleGuards",
+            "TestProcessSourceInitializeConvertsSizeTBeforeSentinel",
             "TestProcessSourceLifecycleRejectsInvalidOwners",
             "TestGeneratedInitializeAndFinalizeConcreteServices",
             "TestGeneratedFinalizeNullProcessSkipsChildren"
@@ -148276,6 +148277,7 @@
           ],
           "tests": [
             "TestProcessSourceLifecycleGuards",
+            "TestProcessSourceInitializeConvertsSizeTBeforeSentinel",
             "TestProcessSourceLifecycleRejectsInvalidOwners",
             "TestGeneratedInitializeAndFinalizeConcreteServices",
             "TestGeneratedFinalizeNullProcessSkipsChildren"
