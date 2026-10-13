@@ -3,6 +3,7 @@ package subpaving
 
 import (
 	"errors"
+	"io"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -167,4 +168,18 @@ func (w *HardwareShellCoefficients) CollectStatistics(st *statistics.Statistics)
 		return err
 	}
 	return w.context.CollectStatistics(st)
+}
+
+func (w *HardwareShellCoefficients) DisplayConstraints(out io.Writer, useStar bool, display HardwareVariableDisplay) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.DisplayConstraints(out, useStar, display)
+}
+
+func (w *HardwareShellCoefficients) DisplayBounds(out io.Writer, display HardwareVariableDisplay) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.DisplayBounds(out, display)
 }

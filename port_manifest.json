@@ -50237,13 +50237,15 @@
         "pkg/math/subpaving/hardware_context_params.go",
         "pkg/math/subpaving/hardware_shell_coefficients.go",
         "pkg/math/subpaving/hardware_shell_search_test.go",
-        "pkg/math/subpaving/hardware_statistics_test.go"
+        "pkg/math/subpaving/hardware_statistics_test.go",
+        "pkg/math/subpaving/hardware_display_test.go"
       ],
       "tests": [
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
         "TestSubpavingHardwareShellCoefficientAndInequalityConversion",
         "TestHardwareShellRetainedClauseAndSearchRoute",
-        "TestHardwareShellStatisticsCountersAndReset"
+        "TestHardwareShellStatisticsCountersAndReset",
+        "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -50287,6 +50289,14 @@
           "tests": [
             "TestHardwareShellStatisticsCountersAndReset"
           ]
+        },
+        {
+          "name": "Concrete config_hwf wrapper display_constraints and display_bounds forwarding (src/math/subpaving/subpaving.cpp:49,56)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
+          "tests": [
+            "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
+          ]
         }
       ],
       "ownership": [],
@@ -50300,11 +50310,13 @@
       "go_targets": [
         "pkg/math/subpaving/hardware_shell_coefficients.go",
         "pkg/math/subpaving/hardware_shell_search_test.go",
-        "pkg/math/subpaving/hardware_statistics_test.go"
+        "pkg/math/subpaving/hardware_statistics_test.go",
+        "pkg/math/subpaving/hardware_display_test.go"
       ],
       "tests": [
         "TestHardwareShellRetainedClauseAndSearchRoute",
-        "TestHardwareShellStatisticsCountersAndReset"
+        "TestHardwareShellStatisticsCountersAndReset",
+        "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
       ],
       "conditionals": [
         {
@@ -50333,6 +50345,14 @@
           "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
           "tests": [
             "TestHardwareShellStatisticsCountersAndReset"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf shell display_constraints and display_bounds entries (src/math/subpaving/subpaving.h:96,111)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
+          "tests": [
+            "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
           ]
         }
       ],
@@ -51028,7 +51048,9 @@
         "pkg/math/subpaving/hardware_search.go",
         "pkg/math/subpaving/hardware_search_test.go",
         "pkg/math/subpaving/hardware_shell_search_test.go",
-        "pkg/math/subpaving/hardware_statistics_test.go"
+        "pkg/math/subpaving/hardware_statistics_test.go",
+        "pkg/math/subpaving/hardware_display.go",
+        "pkg/math/subpaving/hardware_display_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -51115,7 +51137,8 @@
         "TestHardwareSearchBreadthFirstSplitLimitAndChildResume",
         "TestHardwareClauseJustificationChildTrailAndContextClose",
         "TestHardwareShellRetainedClauseAndSearchRoute",
-        "TestHardwareShellStatisticsCountersAndReset"
+        "TestHardwareShellStatisticsCountersAndReset",
+        "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
       ],
       "conditionals": [
         {
@@ -51554,6 +51577,14 @@
           "tests": [
             "TestHardwareShellStatisticsCountersAndReset"
           ]
+        },
+        {
+          "name": "Concrete config_hwf definition, inequality, clause and leaf display declarations (src/math/subpaving/subpaving_t.h:554-559)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_display.go",
+          "tests": [
+            "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
+          ]
         }
       ],
       "ownership": [
@@ -51643,7 +51674,9 @@
         "pkg/math/subpaving/hardware_search.go",
         "pkg/math/subpaving/hardware_search_test.go",
         "pkg/math/subpaving/hardware_shell_search_test.go",
-        "pkg/math/subpaving/hardware_statistics_test.go"
+        "pkg/math/subpaving/hardware_statistics_test.go",
+        "pkg/math/subpaving/hardware_display.go",
+        "pkg/math/subpaving/hardware_display_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51721,7 +51754,8 @@
         "TestHardwareSearchBreadthFirstSplitLimitAndChildResume",
         "TestHardwareClauseJustificationChildTrailAndContextClose",
         "TestHardwareShellRetainedClauseAndSearchRoute",
-        "TestHardwareShellStatisticsCountersAndReset"
+        "TestHardwareShellStatisticsCountersAndReset",
+        "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
       ],
       "assertions": [
         {
@@ -52408,6 +52442,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_root.go",
           "tests": [
             "TestHardwareShellStatisticsCountersAndReset"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf definition, inequality, clause and leaf display implementations (src/math/subpaving/subpaving_t_def.h:254-287,376-415,614-650,1067-1084,1135-1156,1848-1861)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_display.go",
+          "tests": [
+            "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
           ]
         }
       ],
