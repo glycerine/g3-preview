@@ -166715,6 +166715,8 @@
       "go_targets": [
         "pkg/util/numeral/scoped_numeral.go",
         "pkg/util/numeral/scoped_binary.go",
+        "pkg/util/numeral/scoped_mpf_vector.go",
+        "pkg/util/numeral/scoped_mpf_vector_test.go",
         "pkg/math/polynomial/upolynomial_vector.go",
         "pkg/math/polynomial/upolynomial_source_test.go",
         "pkg/math/subpaving/tactic/expr_converter.go",
@@ -166732,6 +166734,7 @@
         "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
         "TestScopedRationalVectorIndependentLifecycleAndFailures",
         "TestScopedNumeralDeepCloneFailureCleanup",
+        "TestScopedArbitraryFloatVectorRetainedMPFSlots",
         "TestBinarySourceTst1",
         "TestBinarySourceTst2",
         "TestBinaryMixedConversionsAndIntervals",
@@ -166900,16 +166903,25 @@
             "TestUPolynomialConcreteScopedVectorActions",
             "TestUPolynomialSourceLifecycleAndNumericDestructionOrder"
           ]
+        },
+        {
+          "name": "retained scoped_mpf_vector logical reserve, indexed manager copies, borrowed c_ptr and ascending numeral cleanup",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/scoped_mpf_vector.go",
+          "tests": [
+            "TestScopedArbitraryFloatVectorRetainedMPFSlots"
+          ]
         }
       ],
       "ownership": [
         "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See PORT_PROGRESS.md#audit-scoped-numeral-port-status-md.",
         "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See PORT_PROGRESS.md#audit-mpbq-port-status-md.",
         "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See PORT_PROGRESS.md#audit-mpff-port-status-md.",
-        "Scalar external polynomial owners and actual Int arrays preserve source numeral callbacks and publication prefixes. See PORT_PROGRESS.md#audit-upolynomial-port-status-md."
+        "Scalar external polynomial owners and actual Int arrays preserve source numeral callbacks and publication prefixes. See PORT_PROGRESS.md#audit-upolynomial-port-status-md.",
+        "The concrete scoped_mpf_vector borrows its MPF manager and owns each slot's significand. Native slice growth replaces source vector storage; reserve extends logical size, manager copies are independent, and shrink/close delete slots in ascending source order."
       ],
       "deviations": [
-        "Concrete Int, Rational, MPBQ, MPFF and mpzzp vectors retain manager-specific storage, ownership and failure behavior. The subpaving converter now uses the concrete Int vector for cached numerator and denominator copies; other retained source instantiations stay partial until a live caller is ported. The unused any-valued callback vector was removed.",
+        "Concrete Int, Rational, MPBQ, MPFF, MPF and mpzzp vectors retain manager-specific storage and ownership. The subpaving converter uses the Int vector for cached numerator and denominator copies; the MPF vector supplies the retained subpaving wrapper and AST floating-point plugin instantiation, whose enclosing Go consumers remain open. Other retained source instantiations stay partial until a live caller is ported. The unused any-valued callback vector was removed.",
         "Explicit Close substitutes RAII for retained concrete owners; no C++ vector implementation is ported.",
         "The scoped_mpff_vector specialization is omitted: its only upstream instantiation is src/test/mpff.cpp, and no production Z3 or Go code consumes it. Production scoped_mpff scalar behavior remains covered."
       ]
