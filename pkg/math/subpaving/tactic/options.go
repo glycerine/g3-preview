@@ -7,7 +7,7 @@ import (
 )
 
 // EngineKind follows the source's five concrete numeral choices. Goal
-// processing and non-hardware context construction are separate porting work.
+// processing and the other numeral-engine constructors remain separate work.
 type EngineKind uint8
 
 const (
