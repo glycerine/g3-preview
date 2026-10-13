@@ -79287,10 +79287,13 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/shell/global_timeout_option.go"
+        "pkg/shell/global_timeout_option.go",
+        "pkg/shell/input_file_option.go"
       ],
       "tests": [
-        "TestShellGlobalTimeoutOptionSourceBranch"
+        "TestShellGlobalTimeoutOptionSourceBranch",
+        "TestShellInputFileSourceBranches",
+        "TestShellInputFileWarningRefusalPreservesSelection"
       ],
       "conditionals": [
         {
@@ -79400,13 +79403,22 @@
           "tests": [
             "TestShellGlobalTimeoutOptionSourceBranch"
           ]
+        },
+        {
+          "name": "parse_cmd_line_args positional and terminal -- input-file selection and duplicate warning (main.cpp:119-136,275-286)",
+          "status": "partial",
+          "go_target": "pkg/shell/input_file_option.go",
+          "tests": [
+            "TestShellInputFileSourceBranches",
+            "TestShellInputFileWarningRefusalPreservesSelection"
+          ]
         }
       ],
       "ownership": [
-        "The -T branch borrows its extracted argument and installs the resulting timer into the concrete shell TimeoutService. Full argument scanning and frontend dispatch remain unported."
+        "The -T branch borrows its extracted argument and installs the resulting timer into the concrete shell TimeoutService. Input-file branches own the selected filename and borrow the warning service; a selected empty filename remains distinct from a null pointer. Full argument scanning and frontend dispatch remain unported."
       ],
       "deviations": [
-        "Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go branch returns an explicit range error. The complete shell command-line loop and executable are still unported."
+        "Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go branch returns an explicit range error. The two input-file branches now preserve duplicate warnings, first selection, C-string boundaries, and terminal -- joining. Their concrete owner is not yet wired into the complete shell command-line loop or executable."
       ]
     },
     {
@@ -176359,7 +176371,7 @@
         "WarningService owns only the enable scalar and borrows optional io.Writer streams. EnvParamsRuntime updates the same warning-enable state used by warning emission; literal and selected formatted writes retain source prefix, newline, C-string boundary, selected Linux AMD64 custom-stream truncation and completed-output flush when the borrowed writer supports Flush."
       ],
       "deviations": [
-        "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; ordinary Go io.Writer short writes return io.ErrShortWrite while retaining the source insertion prefix. Direct shell/AST/MUZ warning call sites remain open. No C varargs or C++ standard-stream implementation is introduced."
+        "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; ordinary Go io.Writer short writes return io.ErrShortWrite while retaining the source insertion prefix. The two shell input-file warning branches have a concrete owner, but the full shell loop and other direct shell/AST/MUZ warning call sites remain open. No C varargs or C++ standard-stream implementation is introduced."
       ]
     },
     {
@@ -176460,7 +176472,7 @@
         "WarningService borrows selected output streams and owns only its enable flag. A borrowed buffered writer is flushed after a complete warning. The unused warning_displayer class has no Go adapter."
       ],
       "deviations": [
-        "The concrete warning service is reached by EnvParamsRuntime. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; ordinary Go io.Writer short writes return io.ErrShortWrite after the completed source insertion prefix. Format2ostream exception integration and direct shell/AST/MUZ warning call sites remain open. C++ stream internals and C varargs are not copied."
+        "The concrete warning service is reached by EnvParamsRuntime. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; ordinary Go io.Writer short writes return io.ErrShortWrite after the completed source insertion prefix. The two shell input-file warning branches have a concrete owner, but the full shell loop, format2ostream exception integration and other direct shell/AST/MUZ warning call sites remain open. C++ stream internals and C varargs are not copied."
       ]
     },
     {
