@@ -69,3 +69,14 @@ func TestDefaultExceptionSourceFormattedConstructor(t *testing.T) {
 		t.Fatal("C-string inputs", x.Message())
 	}
 }
+
+func TestDefaultExceptionRetainedDatalogUnsignedLine(t *testing.T) {
+	got := NewDefaultExceptionf("%s at line %u '%s' found '%s'\n", "syntax", uint32(4294967295), "name", "token")
+	if want := "syntax at line 4294967295 'name' found 'token'\n"; got.Message() != want {
+		t.Fatalf("message = %q, want %q", got.Message(), want)
+	}
+	got = NewDefaultExceptionf("%%u line %u", uint32(7))
+	if want := "%u line 7"; got.Message() != want {
+		t.Fatalf("escaped percent = %q, want %q", got.Message(), want)
+	}
+}

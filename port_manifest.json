@@ -170870,7 +170870,8 @@
       "tests": [
         "TestZ3ExceptionSourceCodesAndLabels",
         "TestDefaultExceptionSourceStringAndEmbeddedNUL",
-        "TestDefaultExceptionSourceFormattedConstructor"
+        "TestDefaultExceptionSourceFormattedConstructor",
+        "TestDefaultExceptionRetainedDatalogUnsignedLine"
       ],
       "assertions": [
         {
@@ -170900,11 +170901,12 @@
           ]
         },
         {
-          "name": "selected default_exception(fmt, char const*, ...) %s/%d construction and Linux AMD64 stream truncation; other C formats and MUZ/parser callers remain",
+          "name": "selected default_exception(fmt, char const*, ...) %s/%d/%u construction and Linux AMD64 stream truncation; other C formats and MUZ/parser callers remain",
           "status": "partial",
           "go_target": "pkg/util/z3exception/z3_exception.go",
           "tests": [
-            "TestDefaultExceptionSourceFormattedConstructor"
+            "TestDefaultExceptionSourceFormattedConstructor",
+            "TestDefaultExceptionRetainedDatalogUnsignedLine"
           ]
         }
       ],
@@ -170913,7 +170915,7 @@
         "The selected formatted constructor uses Go fmt and the Linux AMD64 1023-byte stream boundary; retained MUZ/parser call sites remain unported."
       ],
       "deviations": [
-        "Go error values replace virtual exception transport. Selected %s/%d formatted construction uses Go fmt with C-string input boundaries and Linux AMD64 truncation. Other C formats and the virtual exception/iostream implementation remain open. Message preserves the source first-NUL observation."
+        "Go error values replace virtual exception transport. Selected %s/%d/%u formatted construction uses Go fmt with C-string input boundaries and Linux AMD64 truncation. Other C formats and the virtual exception/iostream implementation remain open. Message preserves the source first-NUL observation."
       ]
     },
     {
@@ -170930,6 +170932,7 @@
         "TestZ3ExceptionSourceCodesAndLabels",
         "TestDefaultExceptionSourceStringAndEmbeddedNUL",
         "TestDefaultExceptionSourceFormattedConstructor",
+        "TestDefaultExceptionRetainedDatalogUnsignedLine",
         "TestMemoryFatalNonExitExceptionCatch",
         "TestMemoryFatalRealExitWithActiveReservationRefusal"
       ],
@@ -170965,11 +170968,12 @@
           ]
         },
         {
-          "name": "selected default_exception(fmt, char const*, ...) %s/%d construction and Linux AMD64 stream truncation; other C formats and MUZ/parser callers remain",
+          "name": "selected default_exception(fmt, char const*, ...) %s/%d/%u construction and Linux AMD64 stream truncation; other C formats and MUZ/parser callers remain",
           "status": "partial",
           "go_target": "pkg/util/z3exception/z3_exception.go",
           "tests": [
-            "TestDefaultExceptionSourceFormattedConstructor"
+            "TestDefaultExceptionSourceFormattedConstructor",
+            "TestDefaultExceptionRetainedDatalogUnsignedLine"
           ]
         },
         {
@@ -170987,7 +170991,7 @@
         "The selected formatted constructor uses Go fmt and the Linux AMD64 1023-byte stream boundary; retained MUZ/parser call sites remain unported."
       ],
       "deviations": [
-        "Go error values replace virtual exception transport. Selected %s/%d formatted construction uses Go fmt with C-string input boundaries and Linux AMD64 truncation. Other C formats and the virtual exception/iostream implementation remain open. Message preserves the source first-NUL observation."
+        "Go error values replace virtual exception transport. Selected %s/%d/%u formatted construction uses Go fmt with C-string input boundaries and Linux AMD64 truncation. Other C formats and the virtual exception/iostream implementation remain open. Message preserves the source first-NUL observation."
       ]
     },
     {
