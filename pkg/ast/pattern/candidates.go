@@ -14,21 +14,22 @@ type candidateInfo struct {
 // pattern_inference_cfg. It owns each candidate AST reference; exclusions and
 // returned filter slices borrow handles from the surrounding quantifier.
 type patternCandidates struct {
-	manager           *ast.ASTManager
-	matcher           *smallerPattern
-	candidates        []ast.ASTHandle
-	info              map[ast.ASTHandle]candidateInfo
-	preferred         map[ast.ASTHandle]struct{}
-	visited           map[ast.ASTHandle]struct{}
-	todo              []ast.ASTHandle
-	noPatterns        []ast.ASTHandle
-	collectRefs       []ast.ASTHandle
-	numBindings       uint32
-	blockLoops        bool
-	avoidSkolems      bool
-	nestedArithOnly   bool
-	forbiddenFamilies map[ast.FamilyID]struct{}
-	closed            bool
+	manager            *ast.ASTManager
+	matcher            *smallerPattern
+	candidates         []ast.ASTHandle
+	info               map[ast.ASTHandle]candidateInfo
+	preferred          map[ast.ASTHandle]struct{}
+	visited            map[ast.ASTHandle]struct{}
+	todo               []ast.ASTHandle
+	noPatterns         []ast.ASTHandle
+	collectRefs        []ast.ASTHandle
+	pendingPatternRefs []ast.ASTRef
+	numBindings        uint32
+	blockLoops         bool
+	avoidSkolems       bool
+	nestedArithOnly    bool
+	forbiddenFamilies  map[ast.FamilyID]struct{}
+	closed             bool
 }
 
 func newPatternCandidates(m *ast.ASTManager, numBindings uint32, noPatterns []ast.ASTHandle, blockLoops bool) (*patternCandidates, error) {
@@ -171,6 +172,9 @@ func (c *patternCandidates) close() error {
 	}
 	if c.closed {
 		return nil
+	}
+	if err := c.releasePendingPatternRefs(); err != nil {
+		return err
 	}
 	if err := c.resetCandidates(); err != nil {
 		return err

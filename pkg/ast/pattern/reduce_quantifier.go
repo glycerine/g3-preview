@@ -1,0 +1,233 @@
+// Source: src/ast/pattern/pattern_inference.cpp:576-721, excluding the
+// database, pull_quant and proof branches.
+package pattern
+
+import (
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
+
+type arithmeticPatternMode uint8
+
+const (
+	arithmeticPatternsNo arithmeticPatternMode = iota
+	arithmeticPatternsConservative
+	arithmeticPatternsFull
+)
+
+type quantifierInferenceOptions struct {
+	arithmeticMode               arithmeticPatternMode
+	maxExtraMulti                uint32
+	noPatternWeight              int32
+	arithmeticWeight             uint32
+	nonNestedArithmeticWeight    uint32
+	useDatabase, pullQuantifiers bool
+	warnings                     bool
+	warningService               *diagnostic.WarningService
+}
+
+func (c *patternCandidates) quantifierWarning(opts quantifierInferenceOptions, q ast.ASTHandle, format string, values ...any) error {
+	if !opts.warnings {
+		return nil
+	}
+	name, err := c.quantifierName(q)
+	if err != nil {
+		return err
+	}
+	warnings := opts.warningService
+	if warnings == nil {
+		warnings = diagnostic.BorrowProcessWarningService()
+	}
+	return warnings.Warningf(format, append([]any{name}, values...)...)
+}
+
+func (c *patternCandidates) quantifierName(q ast.ASTHandle) (string, error) {
+	qid, _, err := c.manager.GetQuantifierIDs(q)
+	if err != nil {
+		return "", err
+	}
+	return c.manager.Symbols.String(qid)
+}
+
+func (c *patternCandidates) releasePatternRefs(patterns []ast.ASTRef) error {
+	for i := range patterns {
+		if err := c.manager.DelRef(&patterns[i]); err != nil {
+			for _, pending := range patterns[i:] {
+				if pending != (ast.ASTRef{}) {
+					c.pendingPatternRefs = append(c.pendingPatternRefs, pending)
+				}
+			}
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *patternCandidates) releasePendingPatternRefs() error {
+	for len(c.pendingPatternRefs) != 0 {
+		if err := c.manager.DelRef(&c.pendingPatternRefs[0]); err != nil {
+			if c.pendingPatternRefs[0] == (ast.ASTRef{}) {
+				c.pendingPatternRefs = c.pendingPatternRefs[1:]
+			}
+			return err
+		}
+		c.pendingPatternRefs = c.pendingPatternRefs[1:]
+	}
+	return nil
+}
+
+// reduceQuantifierNoDatabase applies the source inference/retry sequence for a
+// universal quantifier without the separately unported database, pull_quant
+// and proof paths. The returned quantifier reference is independently owned.
+func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle, newNoPatterns []ast.ASTHandle, opts quantifierInferenceOptions) (out ast.ASTRef, changed bool, err error) {
+	if c == nil || c.closed {
+		return out, false, ast.ErrASTHandle
+	}
+	if len(c.pendingPatternRefs) != 0 {
+		return out, false, ast.ErrASTPending
+	}
+	forall, err := c.manager.IsForall(q)
+	if err != nil || !forall {
+		return out, false, err
+	}
+	if opts.useDatabase {
+		return out, false, ast.ErrASTPending
+	}
+	proofs, err := c.manager.ProofsEnabled()
+	if err != nil {
+		return out, false, err
+	}
+	if proofs {
+		return out, false, ast.ErrASTPending
+	}
+	oldPatterns, err := c.manager.GetNumPatterns(q)
+	if err != nil || oldPatterns != 0 {
+		return out, false, err
+	}
+	originalNoPatterns, err := c.manager.GetNumNoPatterns(q)
+	if err != nil {
+		return out, false, err
+	}
+	weight, err := c.manager.GetQuantifierWeight(q)
+	if err != nil {
+		return out, false, err
+	}
+	if opts.noPatternWeight >= 0 {
+		weight = opts.noPatternWeight
+	}
+	bindings, err := c.manager.GetNumDeclarations(q)
+	if err != nil {
+		return out, false, err
+	}
+	arith, err := c.manager.ArithmeticFamilyID()
+	if err != nil {
+		return out, false, err
+	}
+	_, priorForbidden := c.forbiddenFamilies[arith]
+	if opts.arithmeticMode != arithmeticPatternsFull {
+		c.forbiddenFamilies[arith] = struct{}{}
+	}
+	defer func() {
+		if priorForbidden {
+			c.forbiddenFamilies[arith] = struct{}{}
+		} else {
+			delete(c.forbiddenFamilies, arith)
+		}
+	}()
+	var patterns []ast.ASTRef
+	defer func() {
+		if cleanupErr := c.releasePatternRefs(patterns); err == nil {
+			err = cleanupErr
+		}
+	}()
+	patterns, err = c.inferPatternBody(newBody, bindings, newNoPatterns, opts.maxExtraMulti)
+	if err != nil {
+		return out, false, err
+	}
+	if len(patterns) == 0 && originalNoPatterns != 0 {
+		patterns, err = c.inferPatternBody(newBody, bindings, nil, opts.maxExtraMulti)
+		if err != nil {
+			return out, false, err
+		}
+		if len(patterns) != 0 {
+			if err = c.quantifierWarning(opts, q, "ignoring nopats annotation because Z3 couldn't find any other pattern (quantifier id: %s)"); err != nil {
+				return out, false, err
+			}
+		}
+	}
+	if opts.arithmeticMode == arithmeticPatternsConservative {
+		if !priorForbidden {
+			delete(c.forbiddenFamilies, arith)
+		}
+		if len(patterns) == 0 {
+			oldBlock := c.blockLoops
+			c.blockLoops = false
+			patterns, err = c.inferPatternBody(newBody, bindings, newNoPatterns, opts.maxExtraMulti)
+			c.blockLoops = oldBlock
+			if err != nil {
+				return out, false, err
+			}
+			if len(patterns) != 0 {
+				if w := int32(opts.arithmeticWeight); w > weight {
+					weight = w
+				}
+				if err = c.quantifierWarning(opts, q, "using arith. in pattern (quantifier id: %s), the weight was increased to %d (this value can be modified using PI_ARITH_WEIGHT=<val>).", weight); err != nil {
+					return out, false, err
+				}
+			}
+		}
+	}
+	if opts.arithmeticMode != arithmeticPatternsNo && len(patterns) == 0 {
+		oldNested, oldBlock := c.nestedArithOnly, c.blockLoops
+		c.nestedArithOnly, c.blockLoops = false, false
+		patterns, err = c.inferPatternBody(newBody, bindings, newNoPatterns, opts.maxExtraMulti)
+		c.nestedArithOnly, c.blockLoops = oldNested, oldBlock
+		if err != nil {
+			return out, false, err
+		}
+		if len(patterns) != 0 {
+			if w := int32(opts.nonNestedArithmeticWeight); w > weight {
+				weight = w
+			}
+			if err = c.quantifierWarning(opts, q, "using non nested arith. pattern (quantifier id: %s), the weight was increased to %d (this value can be modified using PI_NON_NESTED_ARITH_WEIGHT=<val>).", weight); err != nil {
+				return out, false, err
+			}
+		}
+	}
+	if len(patterns) == 0 && opts.pullQuantifiers {
+		return out, false, ast.ErrASTPending
+	}
+	oldBody, err := c.manager.GetQuantifierBody(q)
+	if err != nil {
+		return out, false, err
+	}
+	if len(patterns) == 0 {
+		if err = c.quantifierWarning(opts, q, "failed to find a pattern for quantifier (quantifier id: %s)"); err != nil {
+			return out, false, err
+		}
+		if newBody == oldBody {
+			return out, false, nil
+		}
+	}
+	handles := make([]ast.ASTHandle, len(patterns))
+	for i, ref := range patterns {
+		handles[i], err = c.manager.RefGet(ref)
+		if err != nil {
+			return out, false, err
+		}
+	}
+	updated, err := c.manager.UpdateQuantifierPatterns(q, handles, newBody)
+	if err != nil {
+		return out, false, err
+	}
+	if originalWeight, e := c.manager.GetQuantifierWeight(q); e != nil {
+		return out, false, e
+	} else if weight != originalWeight {
+		updated, err = c.manager.UpdateQuantifierWeight(updated, weight)
+		if err != nil {
+			return out, false, err
+		}
+	}
+	out, err = c.manager.NewRef(updated)
+	return out, err == nil, err
+}

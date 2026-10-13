@@ -18105,7 +18105,8 @@
         "pkg/ast/pattern/preferred_pattern.go",
         "pkg/ast/pattern/pattern_selection.go",
         "pkg/ast/pattern/collect.go",
-        "pkg/ast/pattern/infer.go"
+        "pkg/ast/pattern/infer.go",
+        "pkg/ast/pattern/reduce_quantifier.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18118,7 +18119,9 @@
         "TestPatternInferenceSelectionStagesAndMultiBudget",
         "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
         "TestPatternInferenceCollectorArithmeticNestedAndDivisionException",
-        "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences"
+        "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences",
+        "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+        "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
       ],
       "conditionals": [
         {
@@ -18276,6 +18279,15 @@
           "tests": [
             "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences"
           ]
+        },
+        {
+          "name": "reduce_quantifier no-database/no-pull/no-proof retained selection retries, warnings, weight and updated quantifier publication",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "tests": [
+            "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+            "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
+          ]
         }
       ],
       "ownership": [],
@@ -18297,7 +18309,8 @@
         "pkg/ast/pattern/preferred_pattern.go",
         "pkg/ast/pattern/pattern_selection.go",
         "pkg/ast/pattern/collect.go",
-        "pkg/ast/pattern/infer.go"
+        "pkg/ast/pattern/infer.go",
+        "pkg/ast/pattern/reduce_quantifier.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18310,7 +18323,9 @@
         "TestPatternInferenceSelectionStagesAndMultiBudget",
         "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
         "TestPatternInferenceCollectorArithmeticNestedAndDivisionException",
-        "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences"
+        "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences",
+        "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+        "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
       ],
       "conditionals": [
         {
@@ -18403,6 +18418,15 @@
           "go_target": "pkg/ast/pattern/infer.go",
           "tests": [
             "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences"
+          ]
+        },
+        {
+          "name": "pattern_inference_cfg retained arithmetic mode and no-pattern retry state for no-database quantifier reduction",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "tests": [
+            "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+            "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
           ]
         }
       ],
@@ -162307,7 +162331,8 @@
         "pkg/ast/ast_bv_polynomial_neg_numerals.go",
         "pkg/ast/ast_bv_polynomial_sub_literal.go",
         "pkg/ast/ast_bv_polynomial_neg_sub_lifetime_test.go",
-        "pkg/ast/pattern/collect.go"
+        "pkg/ast/pattern/collect.go",
+        "pkg/ast/pattern/reduce_quantifier.go"
       ],
       "tests": [
         "TestSexprAccessorsAndScalarIterator",
@@ -162354,7 +162379,9 @@
         "TestPolynomialPSCBufferNativeGrowthAndReuse",
         "TestPolynomialPSCBufferNativeStoppedReferenceCleanup",
         "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
-        "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
+        "TestPatternInferenceCollectorArithmeticNestedAndDivisionException",
+        "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+        "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
       ],
       "conditionals": [
         {
@@ -162461,6 +162488,15 @@
           "tests": [
             "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
             "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
+          ]
+        },
+        {
+          "name": "pattern_inference quantifier result reference uses owning ASTRef after candidate pattern transfer",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "tests": [
+            "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+            "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
           ]
         }
       ],
@@ -166136,7 +166172,8 @@
         "pkg/tactic/ufbv/rewrite_loop.go",
         "pkg/tactic/ufbv/rewrite_formula_process.go",
         "pkg/tactic/ufbv/rewrite_tactic.go",
-        "pkg/ast/pattern/preferred_pattern.go"
+        "pkg/ast/pattern/preferred_pattern.go",
+        "pkg/ast/pattern/reduce_quantifier.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -166160,7 +166197,9 @@
         "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults",
         "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
         "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
-        "TestPatternInferencePreferredPatternsCompleteAndOwned"
+        "TestPatternInferencePreferredPatternsCompleteAndOwned",
+        "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+        "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
       ],
       "conditionals": [
         {
@@ -166317,6 +166356,15 @@
           "go_target": "pkg/ast/pattern/preferred_pattern.go",
           "tests": [
             "TestPatternInferencePreferredPatternsCompleteAndOwned"
+          ]
+        },
+        {
+          "name": "pattern_inference quantifier retry app_ref_buffer uses owning typed ASTRef result slices",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "tests": [
+            "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+            "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
           ]
         }
       ],
@@ -174199,7 +174247,8 @@
         "pkg/util/diagnostic/util_warning.go",
         "pkg/util/params/util_env_params.go",
         "pkg/util/z3exception/z3_exception.go",
-        "pkg/tactic/ufbv/rewrite_formula_process.go"
+        "pkg/tactic/ufbv/rewrite_formula_process.go",
+        "pkg/ast/pattern/reduce_quantifier.go"
       ],
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
@@ -174212,7 +174261,9 @@
         "TestDefaultExceptionSourceFormattedConstructor",
         "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
         "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
-        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
+        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning",
+        "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+        "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
       ],
       "conditionals": [
         {
@@ -174314,6 +174365,15 @@
           "name": "send_warnings_to_stdout has no source caller",
           "status": "reference_only",
           "tests": []
+        },
+        {
+          "name": "pattern_inference retained no-pattern, arithmetic fallback and failed-inference formatted warning callers",
+          "status": "partial",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "tests": [
+            "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+            "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
+          ]
         }
       ],
       "ownership": [
@@ -174332,7 +174392,8 @@
         "pkg/util/diagnostic/util_warning.go",
         "pkg/util/params/util_env_params.go",
         "pkg/util/z3exception/z3_exception.go",
-        "pkg/tactic/ufbv/rewrite_formula_process.go"
+        "pkg/tactic/ufbv/rewrite_formula_process.go",
+        "pkg/ast/pattern/reduce_quantifier.go"
       ],
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
@@ -174345,7 +174406,9 @@
         "TestDefaultExceptionSourceFormattedConstructor",
         "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
         "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
-        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
+        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning",
+        "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+        "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
       ],
       "conditionals": [
         {
@@ -174394,6 +174457,15 @@
             "TestWarningFormattedStringAndIntegerRoutes",
             "TestWarningRetainedDatalogUnsignedSymbol",
             "TestDefaultExceptionSourceFormattedConstructor"
+          ]
+        },
+        {
+          "name": "pattern_inference concrete warning_msg %s and %d call sites through borrowed WarningService",
+          "status": "partial",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "tests": [
+            "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+            "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
           ]
         }
       ],

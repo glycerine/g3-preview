@@ -285,7 +285,8 @@
     {
       "package": "ast/pattern",
       "imports": [
-        "ast"
+        "ast",
+        "util/diagnostic"
       ],
       "production_files": [
         "candidate_selection.go",
@@ -296,6 +297,7 @@
         "multi_pattern.go",
         "pattern_selection.go",
         "preferred_pattern.go",
+        "reduce_quantifier.go",
         "smaller_pattern.go"
       ]
     },

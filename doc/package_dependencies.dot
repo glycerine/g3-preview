@@ -30,6 +30,7 @@ digraph packages {
   "ast/normal_forms" -> "util/params";
   "ast/pattern" [style=filled, fillcolor="#eeeeee"];
   "ast/pattern" -> "ast";
+  "ast/pattern" -> "util/diagnostic";
   "ast/rewriter" [style=filled, fillcolor="#eeeeee"];
   "ast/rewriter" -> "ast";
   "ast/rewriter" -> "util/messages";
