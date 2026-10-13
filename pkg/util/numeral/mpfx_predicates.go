@@ -53,23 +53,33 @@ func (m *FixedPointManager) Equal(a, b *FixedPoint) (bool, error) {
 }
 
 func (m *FixedPointManager) Less(a, b *FixedPoint) (bool, error) {
-	cmp, err := m.Compare(a, b)
-	return cmp < 0, err
+	if err := m.pair(a, b); err != nil {
+		return false, err
+	}
+	m.traceFixedLess(a, b, false, false)
+	less := a.scaled.Cmp(&b.scaled) < 0
+	m.traceFixedLess(a, b, true, less)
+	return less, nil
 }
 
 func (m *FixedPointManager) LessEqual(a, b *FixedPoint) (bool, error) {
-	cmp, err := m.Compare(a, b)
-	return cmp <= 0, err
+	less, err := m.Less(b, a)
+	if err != nil {
+		return false, err
+	}
+	return !less, nil
 }
 
 func (m *FixedPointManager) Greater(a, b *FixedPoint) (bool, error) {
-	cmp, err := m.Compare(a, b)
-	return cmp > 0, err
+	return m.Less(b, a)
 }
 
 func (m *FixedPointManager) GreaterEqual(a, b *FixedPoint) (bool, error) {
-	cmp, err := m.Compare(a, b)
-	return cmp >= 0, err
+	less, err := m.Less(a, b)
+	if err != nil {
+		return false, err
+	}
+	return !less, nil
 }
 
 // Inc and Dec are source add/sub with the manager's retained one numeral.

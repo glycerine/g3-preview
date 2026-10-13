@@ -295,13 +295,18 @@ func (m *FixedPointManager) Mul(a, b, out *FixedPoint) error {
 	if err := m.check(out); err != nil {
 		return err
 	}
+	m.traceFixedProduct(a, b, out, false, false)
 	var product big.Int
 	product.Mul(&a.scaled, &b.scaled)
 	q, err := m.roundMagnitude(&product, &m.scale)
 	if err != nil {
 		return err
 	}
-	return m.publish(out, q)
+	if err := m.publish(out, q); err != nil {
+		return err
+	}
+	m.traceFixedProduct(a, b, out, false, true)
+	return nil
 }
 
 func (m *FixedPointManager) Div(a, b, out *FixedPoint) error {
@@ -311,13 +316,21 @@ func (m *FixedPointManager) Div(a, b, out *FixedPoint) error {
 	if err := m.check(out); err != nil {
 		return err
 	}
+	if b.scaled.Sign() == 0 {
+		return ErrFixedPointDivZero
+	}
+	m.traceFixedProduct(a, b, out, true, false)
 	var numerator big.Int
 	numerator.Mul(&a.scaled, &m.scale)
 	q, err := m.roundMagnitude(&numerator, &b.scaled)
 	if err != nil {
 		return err
 	}
-	return m.publish(out, q)
+	if err := m.publish(out, q); err != nil {
+		return err
+	}
+	m.traceFixedProduct(a, b, out, true, true)
+	return nil
 }
 
 // Rational returns an independent exact value for testing and concrete

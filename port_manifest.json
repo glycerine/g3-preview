@@ -153002,7 +153002,8 @@
         "pkg/util/numeral/mpfx_predicates.go",
         "pkg/util/numeral/mpfx_predicates_test.go",
         "pkg/util/numeral/mpfx_power_of_two.go",
-        "pkg/util/numeral/mpfx_power_of_two_test.go"
+        "pkg/util/numeral/mpfx_power_of_two_test.go",
+        "pkg/util/numeral/mpfx_compare_product_trace.go"
       ],
       "tests": [
         "TestFixedPointRetainedArithmeticAndDirectedRounding",
@@ -153012,7 +153013,8 @@
         "TestFixedPointRetainedRationalIntegerConversionAndDisplay",
         "TestFixedPointDisplaySourceInsertionsAndShortWrites",
         "TestFixedPointRetainedOrderingSignsIncrementAndSwap",
-        "TestFixedPointPrevPowerOfTwoSourceIntegerWords"
+        "TestFixedPointPrevPowerOfTwoSourceIntegerWords",
+        "TestFixedPointComparisonAndProductSourceTrace"
       ],
       "conditionals": [
         {
@@ -153297,6 +153299,14 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_add_trace.go",
           "tests": ["TestFixedPointAddSubSourceTraceOrderAndShortcuts"]
+        },
+        {
+          "name": "mpfx less-than, multiplication and division STRACE with source operand and result order (mpfx.cpp:332,351,420,443,450,517)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_compare_product_trace.go",
+          "tests": [
+            "TestFixedPointComparisonAndProductSourceTrace"
+          ]
         }
       ],
       "ownership": [
@@ -173094,7 +173104,8 @@
         "pkg/util/numeral/mpff_to_rational_trace.go",
         "pkg/util/numeral/mpbq_select_trace.go",
         "pkg/util/numeral/mpbq_debug_trace.go",
-        "pkg/util/numeral/mpq_parse_trace.go"
+        "pkg/util/numeral/mpq_parse_trace.go",
+        "pkg/util/numeral/mpfx_compare_product_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -173104,7 +173115,8 @@
         "TestFastFloatToRationalRetainedTraceExponentBranches",
         "TestBinarySelectSmallRationalLowerRetainedTrace",
         "TestBinaryRetainedDebugArithmeticTraceSites",
-        "TestRationalSetStringRetainedTraceBranches"
+        "TestRationalSetStringRetainedTraceBranches",
+        "TestFixedPointComparisonAndProductSourceTrace"
       ],
       "conditionals": [
         {
@@ -173372,6 +173384,14 @@
           "tests": ["TestFixedPointAddSubSourceTraceOrderAndShortcuts"]
         },
         {
+          "name": "mpfx less-than, multiplication and division STRACE with source operand and result order (mpfx.cpp:332,351,420,443,450,517)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_compare_product_trace.go",
+          "tests": [
+            "TestFixedPointComparisonAndProductSourceTrace"
+          ]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -173397,7 +173417,8 @@
         "pkg/util/numeral/mpff_to_rational_trace.go",
         "pkg/util/numeral/mpbq_select_trace.go",
         "pkg/util/numeral/mpbq_debug_trace.go",
-        "pkg/util/numeral/mpq_parse_trace.go"
+        "pkg/util/numeral/mpq_parse_trace.go",
+        "pkg/util/numeral/mpfx_compare_product_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -173407,7 +173428,8 @@
         "TestFastFloatToRationalRetainedTraceExponentBranches",
         "TestBinarySelectSmallRationalLowerRetainedTrace",
         "TestBinaryRetainedDebugArithmeticTraceSites",
-        "TestRationalSetStringRetainedTraceBranches"
+        "TestRationalSetStringRetainedTraceBranches",
+        "TestFixedPointComparisonAndProductSourceTrace"
       ],
       "conditionals": [
         {
@@ -173685,6 +173707,14 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_add_trace.go",
           "tests": ["TestFixedPointAddSubSourceTraceOrderAndShortcuts"]
+        },
+        {
+          "name": "mpfx less-than, multiplication and division STRACE with source operand and result order (mpfx.cpp:332,351,420,443,450,517)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_compare_product_trace.go",
+          "tests": [
+            "TestFixedPointComparisonAndProductSourceTrace"
+          ]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
