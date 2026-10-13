@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"strings"
 	"testing"
 
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -41,6 +42,32 @@ func TestParamsReferenceDirectWriterCompletedPrefixes(t *testing.T) {
 	}
 	if got, err := c.Display(&v); err != nil || got != want {
 		t.Fatalf("buffered display after refusal = %q, %v", got, err)
+	}
+}
+
+func TestParamsReferenceDirectWriterLargeNumeralScratch(t *testing.T) {
+	c, sy, q := paramsTestOwner(t)
+	v, err := c.NewValue()
+	paramsMust(t, err)
+	t.Cleanup(func() { paramsMust(t, c.Del(&v)) })
+	n, err := q.NewValue()
+	paramsMust(t, err)
+	digits := strings.Repeat("9", 160)
+	paramsMust(t, q.SetString(&n, digits))
+	paramsMust(t, c.SetRat(&v, internSymbol(t, sy, "large"), &n))
+	paramsMust(t, q.Del(&n))
+	var out bytes.Buffer
+	paramsMust(t, c.DisplayTo(&out, &v))
+	want, err := c.Display(&v)
+	paramsMust(t, err)
+	if out.String() != want || !strings.Contains(want, digits) {
+		t.Fatalf("large numeral direct output = %q, buffered = %q", out.String(), want)
+	}
+	for _, limit := range []int{0, 15, 80, len(want) - 1} {
+		w := &limitedDescriptorWriter{limit: limit, short: true}
+		if err := c.DisplayTo(w, &v); !errors.Is(err, io.ErrShortWrite) || w.out.String() != want[:limit] {
+			t.Fatalf("large numeral refused prefix %d = %q, %v", limit, w.out.String(), err)
+		}
 	}
 }
 

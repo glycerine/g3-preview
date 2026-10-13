@@ -164756,7 +164756,8 @@
           "go_target": "pkg/util/params/util_params_ref_writer.go",
           "tests": [
             "TestParamsReferenceDirectWriterCompletedPrefixes",
-            "TestParamsReferenceDirectWriterEmptyKeyAndSMT2Guards"
+            "TestParamsReferenceDirectWriterEmptyKeyAndSMT2Guards",
+            "TestParamsReferenceDirectWriterLargeNumeralScratch"
           ]
         }
       ],
@@ -165302,7 +165303,8 @@
           "go_target": "pkg/util/params/util_params_ref_writer.go",
           "tests": [
             "TestParamsReferenceDirectWriterCompletedPrefixes",
-            "TestParamsReferenceDirectWriterEmptyKeyAndSMT2Guards"
+            "TestParamsReferenceDirectWriterEmptyKeyAndSMT2Guards",
+            "TestParamsReferenceDirectWriterLargeNumeralScratch"
           ]
         }
       ],
