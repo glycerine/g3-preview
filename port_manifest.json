@@ -117106,7 +117106,8 @@
         "pkg/util/numeral/hwf_rational_set.go",
         "pkg/util/numeral/hwf_rational_string.go",
         "pkg/util/numeral/hwf_scientific.go",
-        "pkg/util/numeral/mpf_numeral.go"
+        "pkg/util/numeral/mpf_numeral.go",
+        "pkg/util/numeral/mpf_numeral_interval.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -117118,7 +117119,9 @@
         "TestHardwareFloatNumeralSourceThinPredicatesAndMoves",
         "TestHardwareFloatSourceScientificTraceDisplay",
         "TestArbitraryFloatNumeralSourceDirectedSetAndArithmetic",
-        "TestArbitraryFloatNumeralSourcePostCheckAndClose"
+        "TestArbitraryFloatNumeralSourcePostCheckAndClose",
+        "TestArbitraryFloatNumeralSourcePredicatesAndOrder",
+        "TestArbitraryFloatNumeralSourceFloorCeilAndClose"
       ],
       "conditionals": [
         {
@@ -117225,7 +117228,16 @@
           ]
         },
         {
-          "name": "Remaining f2n<mpf_manager> predicates, floor/ceil, reciprocal, power, formatting and enclosing subpaving caller paths",
+          "name": "f2n<mpf_manager> sign and integer predicates, comparison, abs/neg, and integral floor/ceil with owned scratch",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_numeral_interval.go",
+          "tests": [
+            "TestArbitraryFloatNumeralSourcePredicatesAndOrder",
+            "TestArbitraryFloatNumeralSourceFloorCeilAndClose"
+          ]
+        },
+        {
+          "name": "Remaining f2n<mpf_manager> reciprocal, power, formatting and enclosing subpaving caller paths",
           "status": "unported"
         }
       ],
@@ -117233,7 +117245,7 @@
         "The concrete HWF wrapper borrows its scalar manager and owns two pointer-free binary64 scratch values; no payload destructor is needed. The MPF wrapper borrows its ArbitraryFloatManager and owns its one/tmp numerals, deleting tmp before one on close. The HWF internal rational child is replaced by a borrowed caller manager."
       ],
       "deviations": [
-        "The earlier test-only include audit missed src/math/subpaving/tactic/subpaving_tactic.cpp and the production subpaving_mpf.h/subpaving_hwf.h headers. The tactic constructs f2n<mpf_manager> and f2n<hwf_manager>. The concrete HWF specialization is covered for retained calls; the MPF specialization now has owned scratch and basic directed operations, while its remaining interval methods and enclosing subpaving consumers remain open. No universal template adapter is used."
+        "The earlier test-only include audit missed src/math/subpaving/tactic/subpaving_tactic.cpp and the production subpaving_mpf.h/subpaving_hwf.h headers. The tactic constructs f2n<mpf_manager> and f2n<hwf_manager>. The concrete HWF specialization is covered for retained calls; the MPF specialization now has owned scratch and directed arithmetic, predicates, comparisons and integral rounding, while reciprocal, power, formatting and enclosing subpaving consumers remain open. No universal template adapter is used."
       ]
     },
     {

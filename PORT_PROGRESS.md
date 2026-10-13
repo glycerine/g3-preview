@@ -39583,9 +39583,12 @@ scratch numerals in source order, starts with upward rounding, and forwards
 checked integer/double/fraction/rational setters plus directed add, subtract,
 multiply and divide. Focused binary64-width cases cover upper/lower `1/3`,
 the four arithmetic operations, output publication before a non-regular
-check, and wrapper close before its borrowed manager closes. MPF predicates,
-floor/ceil, reciprocal, power, formatting and the subpaving caller remain
-open, so `f2n.h` is still partial.
+check, and wrapper close before its borrowed manager closes. The wrapper now
+also forwards source sign/integer predicates, comparisons and sign changes;
+its owned scratch numeral implements directed floor/ceil, including negative
+fractional and aliased inputs. Focused native and checked/debug cases cover
+these routes on CPUs 8–16. Reciprocal, power, formatting and the enclosing
+subpaving caller remain open, so `f2n.h` is still partial.
 
 ### Environment parameter runtime boundary
 
