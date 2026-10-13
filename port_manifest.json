@@ -146300,8 +146300,11 @@
       "methods": [
         {
           "name": "mpf.cpp:1519-1569 to_string explicit owned-text context numerical body",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpf_value_format.go",
+          "go_targets": [
+            "pkg/ast/ast_smt2_float_real.go"
+          ],
           "tests": [
             "TestArbitraryFloatToStringLiteralSpecialBranches",
             "TestArbitraryFloatToStringLiteralFiniteBranches",
@@ -146310,15 +146313,23 @@
             "TestArbitraryFloatToStringScopedRationalSourceDTStop",
             "TestArbitraryFloatToStringCopiedScopeAndRetainedHistory",
             "TestArbitraryFloatToStringOldScopePreservesLaterAllocatingCall",
-            "TestArbitraryFloatToStringColdPrefixEightImmediateGraph"
+            "TestArbitraryFloatToStringColdPrefixEightImmediateGraph",
+            "TestASTCheckpointMPFFormatTextActualNumericalInvocationResult",
+            "TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat"
           ]
         },
         {
           "name": "mpf.cpp:1519-1569 actual owned res return and caller result DT adapter",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/util_mpf_format_text.go",
+          "go_targets": [
+            "pkg/ast/ast_smt2_float_real.go"
+          ],
           "tests": [
-            "TestMPFFormatTextYoungerNumeralStopProtectsNonemptyResult"
+            "TestMPFFormatTextYoungerNumeralStopProtectsNonemptyResult",
+            "TestASTCheckpointMPFFormatTextActualNumericalInvocationResult",
+            "TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat",
+            "TestASTSMT2FloatRealLiteralEveryActualReservationPrefix"
           ]
         },
         {
@@ -146874,7 +146885,7 @@
         "Checked OwnedString output now belongs to OwnedString.AppendTo; NumericTextStream receives a native counted Go string through AppendString. Counted output preserves embedded NUL bytes and whole-field width/alignment; CString output independently stops at first NUL. Failed sentries check owner lifetime while preserving width and skipping payload conversion. Removed the stream method accepting OwnedString, so the stream no longer depends on that project text owner. See PORT_PROGRESS.md#native-counted-text-at-the-numeric-stream-boundary."
       ],
       "deviations": [
-        "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
+        "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are integrated through the owned MPF text result and AST SMT2 float-real literal printer; the enclosing MPF and rational source units still require whole-unit audit. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
         "mpf.cpp:1695-1711 represented Go INT64_MIN input refuses at reached undefined signed negation; no C++ assertion-prefix equivalence claimed. Signed-host TLS destructor-stop tests are actual owner-primitive guard domain, not ordinary mathematical allocation failure. New ToRational tests are adapted source assertions; no direct original mpf.cpp driver coverage or whole-unit completion credit.",
         "mpf.cpp:1712-1769 C++ undefined signed shifts/addition and oversized shift counts have explicit reached represented-Go guard, distinct from compiled SASSERT width checks. uint32 exponent/float shift/addition source wrapping is retained. Narrow denormal to_double follows literal double bottom-exponent mapping rather than a general format conversion. src/test/mpf.cpp:23-82 all18 ENSURE output values adapted using explicit source fields; original int/double/float SET dependencies remain separately unported, so no complete active-driver or whole MPF unit credit.",
         "mpf.cpp:1963-2098 represented undefined signed exponent arithmetic refuses at the reached expression without scoped NUM constructor credit. TLS negative-size stops are signed-host owner-primitive guard profile, not ordinary mathematical OOM. Independent branch tests add no active original-driver assertions; src/test/mpf.cpp:23-89 has only the earlier eighteen SET outputs. Literal scratch old-free/allocation-before-assignment may leave a guard-only InvalidSlot on retry; no scratch repair is inserted. TRACE remains diagnostic.",
@@ -151188,7 +151199,7 @@
         "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md.",
         "Cold adapter generation metadata adds no source allocator event; no arithmetic algorithm changes.",
         "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
-        "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
+        "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are integrated through the owned MPF text result and AST SMT2 float-real literal printer; the enclosing MPF and rational source units still require whole-unit audit. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
         "General power retains original repeated squaring, zero exponent result one, final unused square and actual uint32 mask-wrap qualification. Integer and fractional exponent65 cold campaigns cover every reached body reservation and exact owning release, without establishing independently stopped source-destructor or native fatal resumability. No native stack/layout/allocator/assertion/exception ABI or whole-unit completion is credited; bv2int integration remains required.",
         "ToOwnedString uses the same selected left-to-right concatenation profile as the existing infinitesimal formatter: numerator string, slash append, denominator string and append. It preserves raw zero/negative denominators and performs no normalization. Independent literal cases, every selected cold reservation with immediate physical/byte accounting and zero refunds, warm inline allocation refusal, caller-owned returned text after manager/runtime end, and real denominator-display returning transport are covered. Native C++ operand evaluation order, all library ABIs/NRVO schedules and alternate locale profiles are not claimed. This is the direct mpq to_string dependency for remaining MPF rational-string wrappers, which are still unfinished. Dedicated younger-source/first-own transport refinements remain outstanding.",
         "Literal and independent tests cover integer/fraction syntax, both decimal settings, zero and negative raw denominators, BIG values, and the allocating MinInt32 negation boundary. Every selected cold reservation includes immediate complete physical/byte graphs and zero refunds. All11 actual inline rational insertions are failed in turn with exact prefix assertions. Warm FailAfter(0) preserves exact Runtime/budget state and ended parent cleanup leaves later children intact. Real negative COPY transport checks nested scalar/lifecycle exclusion; a PageSize1 retained descriptor refusal proves older child preservation. A real signed-host TLS guard at negative temporary destruction stops rational continuation, retains source history and joins owning cleanup while preserving output. This is the existing explicit checked-runtime guard profile, not a claim of defined native signed overflow. Arbitrary native ostream ABI/locale and unrelated prior host-formatting adapters are not changed. Whole MPZ/MPQ/MPF/util completion is not claimed.",
