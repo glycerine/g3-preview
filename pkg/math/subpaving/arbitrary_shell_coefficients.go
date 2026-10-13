@@ -7,8 +7,10 @@ import (
 	"io"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 var ErrArbitraryShellInexactInteger = errors.New("subpaving: integer coefficient cannot be represented exactly as arbitrary float")
@@ -27,7 +29,23 @@ type ArbitraryShellCoefficients struct {
 	before, back numeral.Rational
 	closeStage   uint8
 	closeIndex   int
+	ownsContext  bool
 	closed       bool
+}
+
+// NewArbitraryShellFromParams constructs the retained context_mpf_wrapper as
+// one owner. A refused parameter pass returns its partial shell for Close.
+func NewArbitraryShellFromParams(m *numeral.ArbitraryFloatNumeralManager, limit *control.Reslimit, pc *params.ParamsContext, p *params.ParamsRef) (*ArbitraryShellCoefficients, error) {
+	c, cause := NewArbitraryContextFromParams(m, limit, pc, p)
+	if c == nil {
+		return nil, cause
+	}
+	w, err := NewArbitraryShellCoefficients(c)
+	if err != nil {
+		return nil, errors.Join(cause, err, c.Close())
+	}
+	w.ownsContext = true
+	return w, cause
 }
 
 func NewArbitraryShellCoefficients(context *ArbitraryContext) (*ArbitraryShellCoefficients, error) {
@@ -137,6 +155,27 @@ func (w *ArbitraryShellCoefficients) CollectParamDescrs(d *params.ParamDescrs) e
 	return CollectArbitraryParamDescrs(d)
 }
 
+func (w *ArbitraryShellCoefficients) Search() error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.Search()
+}
+
+func (w *ArbitraryShellCoefficients) ResetStatistics() error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.ResetStatistics()
+}
+
+func (w *ArbitraryShellCoefficients) CollectStatistics(st *statistics.Statistics) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.CollectStatistics(st)
+}
+
 // MkSum converts exact integer inputs in source order and transfers copies to
 // the context's polynomial definition and watcher registry.
 func (w *ArbitraryShellCoefficients) MkSum(constant *numeral.Int, coefficients []*numeral.Int, variables []uint32) (uint32, error) {
@@ -217,7 +256,8 @@ func (w *ArbitraryShellCoefficients) PrepareInequality(value *numeral.Rational, 
 }
 
 // Close follows reverse member order: back, before, coefficient vector,
-// constant. A stopped cleanup resumes at its failing member.
+// constant, then the owning context base when present. A stopped cleanup
+// resumes at its failing member.
 func (w *ArbitraryShellCoefficients) Close() error {
 	if w == nil || w.self != w || w.context == nil || w.core == nil || w.numbers == nil || w.rational == nil {
 		return arena.ErrInvalidSlot
@@ -246,8 +286,16 @@ func (w *ArbitraryShellCoefficients) Close() error {
 		}
 		w.closeStage++
 	}
-	if err := w.core.Del(&w.constant); err != nil {
-		return err
+	if w.closeStage == 3 {
+		if err := w.core.Del(&w.constant); err != nil {
+			return err
+		}
+		w.closeStage++
+	}
+	if w.ownsContext {
+		if err := w.context.Close(); err != nil {
+			return err
+		}
 	}
 	w.coefficients = nil
 	w.closed = true

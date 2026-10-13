@@ -287,6 +287,9 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	if err := w.Close(); err != nil {
 		t.Fatal(err)
 	}
+	if err := context.open(); err != nil {
+		t.Fatal("borrowed shell closed its context", err)
+	}
 	if _, _, err := w.PrepareSum(&three, nil); !errors.Is(err, arena.ErrClosed) {
 		t.Fatalf("closed coefficient owner: %v", err)
 	}

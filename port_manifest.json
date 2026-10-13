@@ -50376,9 +50376,9 @@
           ]
         },
         {
-          "name": "Concrete MPF factory context construction from source-order ParamsRef without preliminary default mutation (src/math/subpaving/subpaving.cpp:271-273); enclosing wrapper allocation and tactic dispatch remain",
-          "status": "partial",
-          "go_target": "pkg/math/subpaving/arbitrary_context_params.go",
+          "name": "Concrete MPF factory owning context_mpf_wrapper from source-order ParamsRef (src/math/subpaving/subpaving.cpp:102-107,271-273); tactic dispatch remains separate",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_shell_coefficients.go",
           "tests": [
             "TestArbitraryContextNamedParamsSourceOrderAndDescriptions"
           ]
@@ -149473,6 +149473,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/subpaving/arbitrary_shell_coefficients.go",
+        "pkg/math/subpaving/arbitrary_context_params_test.go",
         "pkg/util/numeral/mpf_value_to_rational.go",
         "pkg/util/numeral/mpf_value_ieee.go",
         "pkg/util/numeral/mpf_value_ieee_source_test.go",
@@ -149974,6 +149976,15 @@
             "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
             "TestASTFloatingPointScopedValueActualInlinePushPublication",
             "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren"
+          ]
+        },
+        {
+          "name": "Concrete subpaving context_mpf_wrapper scoped_mpf constant and scoped_mpf_vector coefficient owner (src/math/subpaving/subpaving.cpp:88-107; src/util/mpf.h:300-327)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_shell_coefficients.go",
+          "tests": [
+            "TestArbitraryShellCoefficientSourceConversionAndCleanup",
+            "TestArbitraryContextNamedParamsSourceOrderAndDescriptions"
           ]
         },
         {
@@ -166659,6 +166670,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/subpaving/arbitrary_shell_coefficients.go",
+        "pkg/math/subpaving/arbitrary_context_params_test.go",
         "pkg/util/numeral/scoped_numeral.go",
         "pkg/util/numeral/scoped_binary.go",
         "pkg/util/numeral/scoped_fast_float.go",
@@ -166939,9 +166952,18 @@
           ]
         },
         {
-          "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA rewriter/printers, SMT theory, subpaving and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
+          "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA rewriter/printers, SMT theory and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "Concrete subpaving context_mpf_wrapper scoped_mpf scalar lifetime and destructor order (src/math/subpaving/subpaving.cpp:88-107; src/util/scoped_numeral.h:24-55)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_shell_coefficients.go",
+          "tests": [
+            "TestArbitraryShellCoefficientSourceConversionAndCleanup",
+            "TestArbitraryContextNamedParamsSourceOrderAndDescriptions"
+          ]
         },
         {
           "name": "Concrete boolean FPA is_numeral overload with caller-local scoped_mpf, successful destructor, stopped copy retention and distinct owning cleanup (src/ast/fpa_decl_plugin.cpp:136-139; src/util/scoped_numeral.h:24-33)",

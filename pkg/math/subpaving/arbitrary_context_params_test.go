@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -130,6 +131,34 @@ func TestArbitraryContextNamedParamsSourceOrderAndDescriptions(t *testing.T) {
 	if err := fresh.Close(); err != nil {
 		t.Fatal(err)
 	}
+	set("max_depth", 0)
+	owned, err := NewArbitraryShellFromParams(f.numbers, &control.Reslimit{Limit: 100}, pc, &p)
+	if err != nil {
+		t.Fatal("owning MPF wrapper", err)
+	}
+	one := numeral.NewInt(1)
+	if _, _, err := owned.PrepareSum(&one, []*numeral.Int{&one}); err != nil {
+		t.Fatal("owning wrapper scalar and vector", err)
+	}
+	if _, err := owned.MkVar(false); err != nil {
+		t.Fatal(err)
+	}
+	if err := owned.Search(); err != nil {
+		t.Fatal("wrapper search forwarding", err)
+	}
+	stats := statistics.New()
+	if err := owned.CollectStatistics(stats); err != nil || stats.Size() != 1 || stats.Key(0) != "nodes" || stats.UintValue(0) != 1 {
+		t.Fatal("wrapper statistics forwarding", err)
+	}
+	if err := owned.ResetStatistics(); err != nil {
+		t.Fatal(err)
+	}
+	if err := owned.Close(); err != nil || !owned.context.closed {
+		t.Fatal("owning wrapper close order", err)
+	}
+	if err := owned.Search(); !errors.Is(err, arena.ErrClosed) {
+		t.Fatal("closed wrapper", err)
+	}
 	set("epsilon", 2)
 	set("max_bound", 1<<31)
 	partial, err := NewArbitraryContextFromParams(f.numbers, &control.Reslimit{Limit: 100}, pc, &p)
@@ -141,6 +170,13 @@ func TestArbitraryContextNamedParamsSourceOrderAndDescriptions(t *testing.T) {
 	}
 	if err := partial.Close(); err != nil {
 		t.Fatal("partial factory cleanup", err)
+	}
+	partialShell, err := NewArbitraryShellFromParams(f.numbers, &control.Reslimit{Limit: 100}, pc, &p)
+	if err == nil || partialShell == nil {
+		t.Fatal("refused owning wrapper", partialShell, err)
+	}
+	if err := partialShell.Close(); err != nil || !partialShell.context.closed {
+		t.Fatal("partial wrapper cleanup", err)
 	}
 	if missing, err := NewArbitraryContextFromParams(nil, &control.Reslimit{Limit: 100}, pc, &p); missing != nil || !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatal("missing factory manager", missing, err)
