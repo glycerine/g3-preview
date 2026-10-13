@@ -86,6 +86,19 @@ func (w *ArbitraryShellCoefficients) MkVar(integer bool) (uint32, error) {
 	return w.context.NewVariable(integer)
 }
 
+// MkSum converts exact integer inputs in source order and transfers copies to
+// the context's polynomial definition and watcher registry.
+func (w *ArbitraryShellCoefficients) MkSum(constant *numeral.Int, coefficients []*numeral.Int, variables []uint32) (uint32, error) {
+	if len(coefficients) != len(variables) {
+		return 0, arena.ErrInvalidSlot
+	}
+	c, as, err := w.PrepareSum(constant, coefficients)
+	if err != nil {
+		return 0, err
+	}
+	return w.context.DefinePolynomial(c, as, variables)
+}
+
 func (w *ArbitraryShellCoefficients) MkInequality(variable uint32, value *numeral.Rational, lower, open bool) (*ArbitraryInequality, error) {
 	bound, err := w.PrepareInequality(value, lower)
 	if err != nil {

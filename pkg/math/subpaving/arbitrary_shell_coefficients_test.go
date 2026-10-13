@@ -102,6 +102,56 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	if err != nil || x != 0 {
 		t.Fatalf("first context variable: %d, %v", x, err)
 	}
+	y, err := w.MkVar(true)
+	if err != nil || y != 1 {
+		t.Fatalf("second context variable: %d, %v", y, err)
+	}
+	z, err := w.MkSum(&three, []*numeral.Int{&one, &big}, []uint32{y, x})
+	if err != nil || z != 2 || context.variables[z] {
+		t.Fatalf("sorted MPF sum variable: %d, %v", z, err)
+	}
+	p := context.polynomials[z]
+	if p == nil || len(p.terms) != 2 || p.terms[0].variable != x || p.terms[1].variable != y {
+		t.Fatalf("sorted polynomial terms: %+v", p)
+	}
+	for i, tc := range []struct {
+		value *numeral.ArbitraryFloat
+		want  float64
+	}{{&p.terms[0].coefficient, math.Exp2(53)}, {&p.terms[1].coefficient, 1}, {&p.constant, 3}} {
+		got, e := core.ToDouble(tc.value)
+		if e != nil || got != tc.want {
+			t.Fatalf("owned sorted sum %d: %v, %v", i, got, e)
+		}
+	}
+	if len(context.watchers[x]) != 1 || context.watchers[x][0] != z || len(context.watchers[y]) != 1 || context.watchers[y][0] != z {
+		t.Fatalf("sum watcher registration: %v, %v", context.watchers[x], context.watchers[y])
+	}
+	duplicate, err := w.MkSum(&three, []*numeral.Int{&one, &big}, []uint32{x, x})
+	if err != nil || duplicate != 3 {
+		t.Fatalf("duplicate-variable sum: %d, %v", duplicate, err)
+	}
+	duplicateTerms := context.polynomials[duplicate].terms
+	first, err := core.ToDouble(&duplicateTerms[0].coefficient)
+	if err != nil || first != math.Exp2(53) || duplicateTerms[1].coefficient != (numeral.ArbitraryFloat{}) {
+		t.Fatalf("source duplicate overwrite/swap: %v, %v, %+v", first, err, duplicateTerms[1].coefficient)
+	}
+	if len(context.watchers[x]) != 3 || context.watchers[x][1] != duplicate || context.watchers[x][2] != duplicate {
+		t.Fatalf("duplicate watcher registrations: %v", context.watchers[x])
+	}
+	if _, err := w.MkSum(&three, []*numeral.Int{&one}, []uint32{x, y}); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("mismatched sum inputs: %v", err)
+	}
+	preparedConstant, preparedCoefficients, err := w.PrepareSum(&three, []*numeral.Int{&big})
+	if err != nil {
+		t.Fatal(err)
+	}
+	beforeStoppedSum := len(context.variables)
+	b.FailAfter(0)
+	_, stoppedSum := context.DefinePolynomial(preparedConstant, preparedCoefficients, []uint32{x})
+	b.FailAfter(-1)
+	if stoppedSum == nil || len(context.variables) != beforeStoppedSum {
+		t.Fatalf("stopped MPF sum: %v, %d", stoppedSum, len(context.variables))
+	}
 	lower, err := w.PrepareInequality(&q, true)
 	if err != nil {
 		t.Fatal(err)
@@ -126,7 +176,7 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	if err != nil || stored != down {
 		t.Fatalf("context owns directed scalar: %v, %v", stored, err)
 	}
-	if _, err := w.MkInequality(x+1, &q, false, true); !errors.Is(err, arena.ErrInvalidSlot) {
+	if _, err := w.MkInequality(uint32(len(context.variables)), &q, false, true); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatalf("unknown context variable: %v", err)
 	}
 	beforeStopped := len(context.inequalities)

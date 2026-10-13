@@ -20,6 +20,10 @@ type ArbitraryContext struct {
 	numbers                                         *numeral.ArbitraryFloatNumeralManager
 	limit                                           *control.Reslimit
 	variables                                       []bool
+	watchers                                        [][]uint32
+	polynomials                                     map[uint32]*ArbitraryPolynomial
+	polynomialOwners                                []*ArbitraryPolynomial
+	numBuffer                                       []numeral.ArbitraryFloat
 	inequalities                                    []*ArbitraryInequality
 	owners                                          [4]*numeral.ScopedArbitraryFloatNumeral
 	epsilon, maxBound, minusMaxBound, rootPrecision *numeral.ArbitraryFloat
@@ -128,6 +132,7 @@ func (c *ArbitraryContext) NewVariable(integer bool) (uint32, error) {
 	}
 	x := uint32(len(c.variables))
 	c.variables = append(c.variables, integer)
+	c.watchers = append(c.watchers, nil)
 	return x, nil
 }
 
@@ -176,6 +181,30 @@ func (c *ArbitraryContext) Close() error {
 		c.inequalities = c.inequalities[1:]
 	}
 	c.inequalities = nil
+	for len(c.polynomialOwners) != 0 {
+		p := c.polynomialOwners[0]
+		for p.closeIndex < len(p.terms) {
+			if err := c.numbers.Del(&p.terms[p.closeIndex].coefficient); err != nil {
+				return err
+			}
+			p.closeIndex++
+		}
+		if err := c.numbers.Del(&p.constant); err != nil {
+			return err
+		}
+		c.polynomialOwners[0] = nil
+		c.polynomialOwners = c.polynomialOwners[1:]
+	}
+	for len(c.numBuffer) != 0 {
+		if err := c.numbers.Del(&c.numBuffer[0]); err != nil {
+			return err
+		}
+		c.numBuffer = c.numBuffer[1:]
+	}
+	c.polynomialOwners = nil
+	c.numBuffer = nil
+	c.polynomials = nil
+	c.watchers = nil
 	c.variables = nil
 	c.closed = true
 	return nil
