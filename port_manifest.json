@@ -50954,7 +50954,8 @@
         "pkg/math/subpaving/hardware_context_params.go",
         "pkg/math/subpaving/hardware_context_constraints.go",
         "pkg/math/subpaving/hardware_node.go",
-        "pkg/math/subpaving/hardware_context_bounds.go"
+        "pkg/math/subpaving/hardware_context_bounds.go",
+        "pkg/math/subpaving/hardware_context_relevance.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -51026,7 +51027,8 @@
         "TestHardwareNodeRetainedBoundViewsAndChildTrail",
         "TestHardwareContextIntegerBoundsAndOpenConflicts",
         "TestHardwareContextRootUnitAssertionResumeAndConflict",
-        "TestHardwareIntervalConstantNodeViewAndMutationGuards"
+        "TestHardwareIntervalConstantNodeViewAndMutationGuards",
+        "TestHardwareContextRelevantNewBoundSourceBranches"
       ],
       "conditionals": [
         {
@@ -51408,6 +51410,14 @@
           "tests": [
             "TestHardwareIntervalConstantNodeViewAndMutationGuards"
           ]
+        },
+        {
+          "name": "Concrete config_hwf candidate relevance and arithmetic-failure context state consumed by definition propagation",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_relevance.go",
+          "tests": [
+            "TestHardwareContextRelevantNewBoundSourceBranches"
+          ]
         }
       ],
       "ownership": [
@@ -51484,7 +51494,8 @@
         "pkg/math/subpaving/hardware_context_constraints.go",
         "pkg/math/subpaving/hardware_node.go",
         "pkg/math/subpaving/hardware_context_bounds.go",
-        "pkg/math/subpaving/hardware_context_units.go"
+        "pkg/math/subpaving/hardware_context_units.go",
+        "pkg/math/subpaving/hardware_context_relevance.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51547,7 +51558,8 @@
         "TestHardwareNodeRetainedBoundViewsAndChildTrail",
         "TestHardwareContextIntegerBoundsAndOpenConflicts",
         "TestHardwareContextRootUnitAssertionResumeAndConflict",
-        "TestHardwareIntervalConstantNodeViewAndMutationGuards"
+        "TestHardwareIntervalConstantNodeViewAndMutationGuards",
+        "TestHardwareContextRelevantNewBoundSourceBranches"
       ],
       "assertions": [
         {
@@ -52177,6 +52189,14 @@
           "go_target": "pkg/math/subpaving/hardware_interval.go",
           "tests": [
             "TestHardwareIntervalConstantNodeViewAndMutationGuards"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf conflict-first, maximum-bound, zero-epsilon and epsilon-gap candidate relevance with arithmetic-failure refusal (src/math/subpaving/subpaving_t_def.h:1200-1317)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_relevance.go",
+          "tests": [
+            "TestHardwareContextRelevantNewBoundSourceBranches"
           ]
         }
       ],
@@ -117964,7 +117984,8 @@
         "pkg/math/interval/hardware_root.go",
         "pkg/math/subpaving/hardware_interval_root.go",
         "pkg/math/subpaving/hardware_context_root.go",
-        "pkg/math/subpaving/hardware_context_bounds.go"
+        "pkg/math/subpaving/hardware_context_bounds.go",
+        "pkg/math/subpaving/hardware_context_relevance.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -117992,7 +118013,8 @@
         "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
         "TestSubpavingHardwareIntervalXnEqYRetainedCases",
         "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
-        "TestHardwareContextIntegerBoundsAndOpenConflicts"
+        "TestHardwareContextIntegerBoundsAndOpenConflicts",
+        "TestHardwareContextRelevantNewBoundSourceBranches"
       ],
       "conditionals": [
         {
@@ -118190,6 +118212,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_bounds.go",
           "tests": [
             "TestHardwareContextIntegerBoundsAndOpenConflicts"
+          ]
+        },
+        {
+          "name": "Concrete f2n<hwf_manager> directed arithmetic and comparison consumed by hardware subpaving epsilon-gap relevance (src/util/f2n.h:70-159)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_relevance.go",
+          "tests": [
+            "TestHardwareContextRelevantNewBoundSourceBranches"
           ]
         }
       ],

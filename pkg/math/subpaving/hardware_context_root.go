@@ -15,29 +15,30 @@ import (
 // constraint and node records of context_hwf. Its manager and resource limit
 // are borrowed. Definition propagation, queue draining and search remain.
 type HardwareContext struct {
-	self          *HardwareContext
-	numbers       *numeral.HardwareFloatNumeralManager
-	limit         *control.Reslimit
-	epsilon       numeral.HardwareFloat
-	maxBound      numeral.HardwareFloat
-	minusMaxBound numeral.HardwareFloat
-	rootPrecision numeral.HardwareFloat
-	zeroEpsilon   bool
-	maxDepth      uint32
-	maxNodes      uint32
-	maxMemory     uint64
-	isInt         []bool
-	polynomials   map[uint32]*HardwarePolynomial
-	watchers      [][]uint32
-	inequalities  []*HardwareInequality
-	root          *HardwareNode
-	nextNodeID    uint32
-	timestamp     uint64
-	queue         []*HardwareBound
-	queueHead     int
-	unitClauses   []hardwareUnitClause
-	unitHead      int
-	closed        bool
+	self             *HardwareContext
+	numbers          *numeral.HardwareFloatNumeralManager
+	limit            *control.Reslimit
+	epsilon          numeral.HardwareFloat
+	maxBound         numeral.HardwareFloat
+	minusMaxBound    numeral.HardwareFloat
+	rootPrecision    numeral.HardwareFloat
+	zeroEpsilon      bool
+	arithmeticFailed bool
+	maxDepth         uint32
+	maxNodes         uint32
+	maxMemory        uint64
+	isInt            []bool
+	polynomials      map[uint32]*HardwarePolynomial
+	watchers         [][]uint32
+	inequalities     []*HardwareInequality
+	root             *HardwareNode
+	nextNodeID       uint32
+	timestamp        uint64
+	queue            []*HardwareBound
+	queueHead        int
+	unitClauses      []hardwareUnitClause
+	unitHead         int
+	closed           bool
 }
 
 // HardwareContextPolicy contains the unsigned source subpaving parameters.
