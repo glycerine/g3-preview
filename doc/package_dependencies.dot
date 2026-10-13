@@ -32,6 +32,8 @@ digraph packages {
   "ast/pattern" -> "ast";
   "ast/pattern" -> "ast/rewriter";
   "ast/pattern" -> "util/diagnostic";
+  "ast/proofs" [style=filled, fillcolor="#eeeeee"];
+  "ast/proofs" -> "ast";
   "ast/rewriter" [style=filled, fillcolor="#eeeeee"];
   "ast/rewriter" -> "ast";
   "ast/rewriter" -> "util/messages";

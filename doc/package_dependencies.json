@@ -305,6 +305,15 @@
       ]
     },
     {
+      "package": "ast/proofs",
+      "imports": [
+        "ast"
+      ],
+      "production_files": [
+        "hypotheses.go"
+      ]
+    },
+    {
       "package": "ast/rewriter",
       "imports": [
         "ast",

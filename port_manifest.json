@@ -19075,9 +19075,13 @@
       "path": "src/ast/proofs/proof_utils.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/proofs/hypotheses.go"
+      ],
+      "tests": [
+        "TestProofHypothesesConcreteUnionAndInheritedCopy"
+      ],
       "assertions": [
         {
           "line": 49,
@@ -19142,7 +19146,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "reduce_hypotheses0 add_hypotheses concrete expr-set union with inherited first-parent copy-on-write (proof_utils.cpp:394-421; container_util.h:48-52)",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/hypotheses.go",
+          "tests": [
+            "TestProofHypothesesConcreteUnionAndInheritedCopy"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -117727,9 +117740,13 @@
       "path": "src/util/container_util.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/proofs/hypotheses.go"
+      ],
+      "tests": [
+        "TestProofHypothesesConcreteUnionAndInheritedCopy"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -117776,6 +117793,14 @@
         {
           "name": "print_map and find_index: no retained production call sites",
           "status": "dead_deleted"
+        },
+        {
+          "name": "reduce_hypotheses0 add_hypotheses concrete expr-set union with inherited first-parent copy-on-write (proof_utils.cpp:394-421; container_util.h:48-52)",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/hypotheses.go",
+          "tests": [
+            "TestProofHypothesesConcreteUnionAndInheritedCopy"
+          ]
         }
       ],
       "ownership": [
