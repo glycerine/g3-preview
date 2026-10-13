@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"math"
 	"strconv"
+	"strings"
 
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -78,6 +79,29 @@ func (m *ASTManager) MkFreshConstNullable(prefix *string, sort ASTHandle) (ASTHa
 	}
 	r, e := m.mkApp(d, nil)
 	return m.external(r), e
+}
+
+// MkFreshVarName is the source mk_fresh_var_name scalar used when pulling
+// binders with repeated names. The numeric suffix consumes the same fresh_id
+// sequence as fresh declarations only after the symbol is interned.
+func (m *ASTManager) MkFreshVarName(prefix *string) (usymbol.Symbol, error) {
+	if e := m.lock(); e != nil {
+		return usymbol.Symbol{}, e
+	}
+	defer m.mu.Unlock()
+	stem := "var"
+	if prefix != nil {
+		stem = *prefix
+		if i := strings.IndexByte(stem, 0); i >= 0 {
+			stem = stem[:i]
+		}
+	}
+	name, e := m.Symbols.Intern(stem + "!" + strconv.FormatUint(uint64(m.freshID), 10))
+	if e != nil {
+		return usymbol.Symbol{}, e
+	}
+	m.freshID++
+	return name, nil
 }
 
 // The native output is interned before fresh_id publication.

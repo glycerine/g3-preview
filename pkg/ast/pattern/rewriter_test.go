@@ -108,7 +108,7 @@ func TestPatternInferenceActualRewriterPendingPullAndResume(t *testing.T) {
 	truth, err := m.MkFamilyApp(m.BasicFamilyID(), ast.ASTOpTrue, nil, nil)
 	patternMust(t, err)
 	inner, err := m.MkQuantifier(ast.ASTQuantifierSpec{
-		Forall: true, Sorts: []ast.ASTHandle{b}, Names: []symbol.Symbol{symbol.Numerical(870)}, Body: truth,
+		Forall: false, Sorts: []ast.ASTHandle{b}, Names: []symbol.Symbol{symbol.Numerical(870)}, Body: truth,
 	})
 	patternMust(t, err)
 	patternMust(t, m.IncRef(inner))
@@ -130,7 +130,7 @@ func TestPatternInferenceActualRewriterPendingPullAndResume(t *testing.T) {
 	patternMust(t, err)
 	t.Cleanup(func() { patternMust(t, m.DelRef(&out)) })
 	if e := r.Rewrite(q, out); !errors.Is(e, ast.ErrASTPending) {
-		t.Fatal("default pull branch must remain explicit", e)
+		t.Fatal("mixed-polarity pull branch must remain explicit", e)
 	}
 	options := DefaultInferenceOptions()
 	options.PullQuantifiers = false

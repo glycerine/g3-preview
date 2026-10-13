@@ -247,7 +247,7 @@ func TestPatternInferenceQuantifierNoPatternReturnAndGuards(t *testing.T) {
 	}
 	patternMust(t, m.DelRef(&ref))
 	inner, err := m.MkQuantifier(ast.ASTQuantifierSpec{
-		Forall: true, Sorts: []ast.ASTHandle{b}, Names: []symbol.Symbol{symbol.Numerical(852)}, Body: truth,
+		Forall: false, Sorts: []ast.ASTHandle{b}, Names: []symbol.Symbol{symbol.Numerical(852)}, Body: truth,
 	})
 	patternMust(t, err)
 	patternMust(t, m.IncRef(inner))
@@ -257,7 +257,7 @@ func TestPatternInferenceQuantifierNoPatternReturnAndGuards(t *testing.T) {
 	patternMust(t, m.IncRef(nestedBody))
 	t.Cleanup(func() { patternMust(t, m.DecRef(nestedBody)) })
 	if _, _, e := c.reduceQuantifierNoDatabase(q, nestedBody, nil, opts); !errors.Is(e, ast.ErrASTPending) {
-		t.Fatal("nested pull-quantifier path must remain explicit", e)
+		t.Fatal("mixed-polarity nested pull remains explicit", e)
 	}
 	opts.pullQuantifiers = false
 	opts.useDatabase = true

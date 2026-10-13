@@ -242,31 +242,6 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 			return out, false, e
 		}
 		if contained {
-			kind, e := c.manager.GetKind(newBody)
-			if e != nil {
-				return out, false, e
-			}
-			if kind != ast.ASTQuantifier {
-				return out, false, ast.ErrASTPending
-			}
-			innerForall, e := c.manager.IsForall(newBody)
-			if e != nil {
-				return out, false, e
-			}
-			if !innerForall {
-				return out, false, ast.ErrASTPending
-			}
-			innerBody, e := c.manager.GetQuantifierBody(newBody)
-			if e != nil {
-				return out, false, e
-			}
-			deeper, e := c.bodyContainsQuantifier(innerBody)
-			if e != nil {
-				return out, false, e
-			}
-			if deeper {
-				return out, false, ast.ErrASTPending
-			}
 			preliminary, e := c.manager.UpdateQuantifierPatterns(q, nil, newBody)
 			if e != nil {
 				return out, false, e
@@ -296,11 +271,7 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 					return out, false, e
 				}
 			}
-			pulled, e := c.pullDirectForall(preliminary, newBody)
-			if e != nil {
-				return out, false, e
-			}
-			pulledRef, e := c.manager.NewRef(pulled)
+			pulledRef, e := c.pullNoProof(preliminary)
 			if e != nil {
 				return out, false, e
 			}
@@ -312,26 +283,32 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 					err = errors.Join(err, cleanup)
 				}
 			}()
-			pulledBody, e := c.manager.GetQuantifierBody(pulled)
+			pulled, e := c.manager.RefGet(pulledRef)
 			if e != nil {
 				return out, false, e
 			}
-			pulledBindings, e := c.manager.GetNumDeclarations(pulled)
-			if e != nil {
-				return out, false, e
-			}
-			patterns, err = c.inferPatternBody(pulledBody, pulledBindings, nil, opts.maxExtraMulti)
-			if err != nil {
-				return out, false, err
-			}
-			if len(patterns) != 0 {
-				if err = c.quantifierWarning(opts, q, "pulled nested quantifier to be able to find an useable pattern (quantifier id: %s)"); err != nil {
-					return out, false, err
+			if pulled != preliminary {
+				pulledBody, e := c.manager.GetQuantifierBody(pulled)
+				if e != nil {
+					return out, false, e
 				}
-				baseQ, outputBody = pulled, pulledBody
-				weight, err = c.manager.GetQuantifierWeight(pulled)
+				pulledBindings, e := c.manager.GetNumDeclarations(pulled)
+				if e != nil {
+					return out, false, e
+				}
+				patterns, err = c.inferPatternBody(pulledBody, pulledBindings, nil, opts.maxExtraMulti)
 				if err != nil {
 					return out, false, err
+				}
+				if len(patterns) != 0 {
+					if err = c.quantifierWarning(opts, q, "pulled nested quantifier to be able to find an useable pattern (quantifier id: %s)"); err != nil {
+						return out, false, err
+					}
+					baseQ, outputBody = pulled, pulledBody
+					weight, err = c.manager.GetQuantifierWeight(pulled)
+					if err != nil {
+						return out, false, err
+					}
 				}
 			}
 		}

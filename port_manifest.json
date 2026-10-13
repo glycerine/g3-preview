@@ -10789,6 +10789,13 @@
           ]
         },
         {
+          "name": "ast_manager::mk_fresh_var_name shared fresh-id scalar for pulled duplicate binders (ast.cpp:2246-2251; ast.h:1827)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_fresh_factories.go",
+          "go_targets": ["pkg/ast/pattern/pull_boolean.go"],
+          "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"]
+        },
+        {
           "name": "Borrowed Runtime AST argument span through actual application/check_args/payload/register engines (src/ast/ast.cpp:2064-2211)",
           "status": "partial",
           "go_target": "pkg/ast/ast_core_span_factories.go",
@@ -11807,6 +11814,13 @@
             "TestASTFreshConstApplicationFailureRetainsDeclarationCounter",
             "TestASTFreshConstNullPointerPrefixSourceOverload"
           ]
+        },
+        {
+          "name": "ast_manager::mk_fresh_var_name shared fresh-id scalar for pulled duplicate binders (ast.cpp:2246-2251; ast.h:1827)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_fresh_factories.go",
+          "go_targets": ["pkg/ast/pattern/pull_boolean.go"],
+          "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"]
         },
         {
           "name": "Concrete basic Boolean factories and is_not argument unwrap (src/ast/ast.h:1984,2008-2018,2039-2046)",
@@ -17833,8 +17847,8 @@
       "component": "ast",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/ast/pattern/pull_direct.go", "pkg/ast/pattern/reduce_quantifier.go"],
-      "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"],
+      "go_targets": ["pkg/ast/pattern/pull_direct.go", "pkg/ast/pattern/pull_boolean.go", "pkg/ast/pattern/reduce_quantifier.go"],
+      "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern", "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames", "TestPatternInferencePullsBooleanApplicationThenFindsPattern"],
       "assertions": [
         {
           "line": 47,
@@ -17883,7 +17897,19 @@
           "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"]
         },
         {
-          "name": "remaining NOT/AND/OR, nested application, recursive rewriter and proof branches",
+          "name": "no-proof recursive NOT/AND/OR pull, bound/free variable shifts, duplicate binder names and retained pattern-inference caller",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/pull_boolean.go",
+          "go_targets": ["pkg/ast/ast_core_fresh_factories.go", "pkg/ast/pattern/reduce_quantifier.go"],
+          "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames", "TestPatternInferencePullsBooleanApplicationThenFindsPattern"]
+        },
+        {
+          "name": "pull_quant TRACE source-site stream output (pull_quant.cpp:98,104,122)",
+          "status": "unported",
+          "tests": []
+        },
+        {
+          "name": "proof generation, pull_quant2 and pull_nested_quant other consumers",
           "status": "unported",
           "tests": []
         }
@@ -17896,8 +17922,8 @@
       "component": "ast",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/ast/pattern/pull_direct.go", "pkg/ast/pattern/reduce_quantifier.go"],
-      "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"],
+      "go_targets": ["pkg/ast/pattern/pull_direct.go", "pkg/ast/pattern/pull_boolean.go", "pkg/ast/pattern/reduce_quantifier.go"],
+      "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern", "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames", "TestPatternInferencePullsBooleanApplicationThenFindsPattern"],
       "conditionals": [
         {
           "line": 19,
@@ -17918,7 +17944,13 @@
           "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"]
         },
         {
-          "name": "remaining recursive, application and proof interfaces",
+          "name": "retained no-proof recursive Boolean application pull",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/pull_boolean.go",
+          "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames", "TestPatternInferencePullsBooleanApplicationThenFindsPattern"]
+        },
+        {
+          "name": "proof and other pull_nested_quant interfaces",
           "status": "unported",
           "tests": []
         }
@@ -18132,6 +18164,7 @@
         "pkg/ast/pattern/infer.go",
         "pkg/ast/pattern/reduce_quantifier.go",
         "pkg/ast/pattern/pull_direct.go",
+        "pkg/ast/pattern/pull_boolean.go",
         "pkg/ast/pattern/rewriter.go",
         "pkg/ast/pattern/options.go",
         "pkg/smtcore/pattern_inference_rewriter.go"
@@ -18151,6 +18184,8 @@
         "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
         "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
         "TestPatternInferencePullDirectNestedForallFindsPattern",
+        "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames",
+        "TestPatternInferencePullsBooleanApplicationThenFindsPattern",
         "TestPatternInferenceActualRewriterTraversalAndOwnership",
         "TestPatternInferenceActualRewriterPendingPullAndResume",
         "TestPatternInferenceParamsBindRewriterAndRefresh",
@@ -18337,6 +18372,13 @@
           "go_target": "pkg/ast/pattern/reduce_quantifier.go",
           "go_targets": ["pkg/ast/pattern/pull_direct.go"],
           "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"]
+        },
+        {
+          "name": "pull_quantifiers no-proof recursive Boolean application retry and warning (pattern_inference.cpp:679-698)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "go_targets": ["pkg/ast/pattern/pull_boolean.go"],
+          "tests": ["TestPatternInferencePullsBooleanApplicationThenFindsPattern"]
         },
         {
           "name": "pattern_inference_rw concrete no-proof traversal callback connects quantifier reduction, rewritten no-patterns and owning output",
@@ -175645,7 +175687,7 @@
           "name": "pattern_inference pulled nested universal quantifier warning_msg %s caller (pattern_inference.cpp:689)",
           "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier.go",
-          "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"]
+          "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern", "TestPatternInferencePullsBooleanApplicationThenFindsPattern"]
         }
       ],
       "ownership": [
@@ -175744,7 +175786,7 @@
           "name": "pattern_inference pulled nested universal quantifier warning_msg %s caller (pattern_inference.cpp:689)",
           "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier.go",
-          "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"]
+          "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern", "TestPatternInferencePullsBooleanApplicationThenFindsPattern"]
         }
       ],
       "ownership": [
