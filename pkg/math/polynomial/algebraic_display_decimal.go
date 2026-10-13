@@ -1,0 +1,69 @@
+// Source: src/math/polynomial/algebraic_numbers.cpp:2721-2747.
+package polynomial
+
+import (
+	"errors"
+	"io"
+
+	"github.com/glycerine/g3/pkg/arena"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+)
+
+// DisplayDecimal refines local copies of a root cell's bounds before selecting
+// the source's upper approximation or exact lower root. The stored cell is not
+// refined by this display operation.
+func (m *AlgebraicRootCore) DisplayDecimal(w io.Writer, a *Algebraic, precision uint32) (err error) {
+	if w == nil {
+		return arena.ErrInvalidSlot
+	}
+	l, err := m.location(a)
+	if err != nil {
+		return err
+	}
+	if l == nil || l.kind == 0 {
+		q := unumeral.NewRational()
+		if l != nil {
+			r, loadErr := m.load(l)
+			if loadErr != nil {
+				return loadErr
+			}
+			q = r.value
+		}
+		text, formatErr := m.config.Rationals.DecimalString(&q, precision, false)
+		if formatErr != nil {
+			return formatErr
+		}
+		return writeAlgebraicIntervalPart(w, text)
+	}
+	r, err := m.load(l)
+	if err != nil {
+		return err
+	}
+	b := m.config.Binary
+	lower, upper := unumeral.NewBinaryRational(), unumeral.NewBinaryRational()
+	defer func() { err = errors.Join(err, b.Del(&lower)) }()
+	defer func() { err = errors.Join(err, b.Del(&upper)) }()
+	if err = b.Copy(&lower, &(*r.interval.BorrowLower())); err != nil {
+		return err
+	}
+	if err = b.Copy(&upper, &(*r.interval.BorrowUpper())); err != nil {
+		return err
+	}
+	view, err := m.sourcePolynomial(&r)
+	if err != nil {
+		return err
+	}
+	interval, err := m.config.Polynomials.RefineToPrecision(view, b, &lower, &upper, precision*4)
+	if err != nil {
+		return err
+	}
+	selected := &lower
+	if interval {
+		selected = &upper
+	}
+	text, err := b.DecimalString(selected, precision)
+	if err != nil {
+		return err
+	}
+	return writeAlgebraicIntervalPart(w, text)
+}

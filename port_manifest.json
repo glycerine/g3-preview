@@ -35359,7 +35359,9 @@
         "pkg/math/polynomial/algebraic_neg_owner_cleanup_source_test.go",
         "pkg/math/polynomial/algebraic_native_storage_test.go",
         "pkg/math/polynomial/algebraic_display_interval.go",
-        "pkg/math/polynomial/algebraic_display_interval_test.go"
+        "pkg/math/polynomial/algebraic_display_interval_test.go",
+        "pkg/math/polynomial/algebraic_display_decimal.go",
+        "pkg/math/polynomial/algebraic_display_decimal_test.go"
       ],
       "tests": [
         "TestAlgebraicSourceRootCounts",
@@ -35388,7 +35390,8 @@
         "TestAlgebraicNegMinimumEveryActualReservationPrefix",
         "TestAlgebraicNegRootHornerEveryActualReservationPrefix",
         "TestAlgebraicNativeLocatorAndVectorOwnership",
-        "TestAlgebraicDisplayIntervalSourceBranchesAndWritePrefixes"
+        "TestAlgebraicDisplayIntervalSourceBranchesAndWritePrefixes",
+        "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement"
       ],
       "conditionals": [
         {
@@ -35865,6 +35868,14 @@
           "go_target": "pkg/math/polynomial/algebraic_display_interval.go",
           "tests": [
             "TestAlgebraicDisplayIntervalSourceBranchesAndWritePrefixes"
+          ]
+        },
+        {
+          "name": "algebraic_numbers.cpp:2721-2747 basic decimal and copied root-cell precision refinement with upper/exact-lower selection",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/algebraic_display_decimal.go",
+          "tests": [
+            "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement"
           ]
         }
       ],
@@ -144333,7 +144344,8 @@
         "pkg/util/numeral/mpbq_stream.go",
         "pkg/util/numeral/mpbq_stream_test.go",
         "pkg/math/interval/binary_extended.go",
-        "pkg/math/realclosure/binary_interval_test.go"
+        "pkg/math/realclosure/binary_interval_test.go",
+        "pkg/math/polynomial/algebraic_display_decimal_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -144362,7 +144374,8 @@
         "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
         "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard",
         "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes",
-        "TestRealClosureBinaryIntervalRetainedCore"
+        "TestRealClosureBinaryIntervalRetainedCore",
+        "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement"
       ],
       "conditionals": [
         {
@@ -144851,7 +144864,8 @@
         "pkg/util/numeral/mpbq_stream.go",
         "pkg/util/numeral/mpbq_stream_test.go",
         "pkg/math/interval/binary_extended.go",
-        "pkg/math/realclosure/binary_interval_test.go"
+        "pkg/math/realclosure/binary_interval_test.go",
+        "pkg/math/polynomial/algebraic_display_decimal_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -144880,7 +144894,8 @@
         "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
         "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard",
         "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes",
-        "TestRealClosureBinaryIntervalRetainedCore"
+        "TestRealClosureBinaryIntervalRetainedCore",
+        "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement"
       ],
       "conditionals": [
         {
