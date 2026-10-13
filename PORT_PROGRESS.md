@@ -39513,6 +39513,14 @@ unordered comparison, preserving its signed-zero or NaN bits. These methods
 are needed by the concrete `f2n<hwf_manager>` path; square root, fused
 arithmetic, conversion, text and manager ownership are still outstanding.
 
+The retained `f2n<hwf_manager>` specialization now has a concrete Go wrapper
+for subpaving's default upward mode, direction changes, scalar setters,
+regular-result checks, interval arithmetic, reciprocal, increment/decrement,
+floor/ceil and exponentiation. Its two scratch numerals are pointer-free.
+Rational setters, formatting, power-of-two inspection, the parallel MPF
+specialization and enclosing subpaving context remain open; `f2n.h` is
+therefore partial rather than complete.
+
 ### Environment parameter runtime boundary
 
 `src/util/env_params.h/.cpp` has exactly two static operations. The five

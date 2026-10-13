@@ -117100,9 +117100,14 @@
       "path": "src/util/f2n.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/numeral/hwf_numeral.go"
+      ],
+      "tests": [
+        "TestHardwareFloatNumeralDirectedIntervalOperations",
+        "TestHardwareFloatNumeralFloorCeilPowerAndGuards"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -117143,7 +117148,16 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Retained subpaving tactic f2n<hwf_manager> construction, rounding mode, value conversion and interval arithmetic",
+          "name": "Retained subpaving tactic f2n<hwf_manager> construction, rounding mode, scalar conversion, checked arithmetic, floor, ceil and power",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_numeral.go",
+          "tests": [
+            "TestHardwareFloatNumeralDirectedIntervalOperations",
+            "TestHardwareFloatNumeralFloorCeilPowerAndGuards"
+          ]
+        },
+        {
+          "name": "Remaining f2n<hwf_manager> rational conversion, formatting, power-of-two and enclosing subpaving caller paths",
           "status": "unported"
         },
         {
@@ -117151,9 +117165,11 @@
           "status": "unported"
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The concrete HWF wrapper borrows its scalar manager and owns two pointer-free binary64 scratch values; no payload destructor is needed. The source HWF manager's rational child remains open."
+      ],
       "deviations": [
-        "The earlier test-only include audit missed src/math/subpaving/tactic/subpaving_tactic.cpp and the production subpaving_mpf.h/subpaving_hwf.h headers. The tactic constructs f2n<mpf_manager> and f2n<hwf_manager>; its numeral option selects HWF for hardware-float requests. Port concrete live wrappers with their subpaving consumers, without a universal template adapter."
+        "The earlier test-only include audit missed src/math/subpaving/tactic/subpaving_tactic.cpp and the production subpaving_mpf.h/subpaving_hwf.h headers. The tactic constructs f2n<mpf_manager> and f2n<hwf_manager>; its numeral option selects HWF for hardware-float requests. The concrete HWF wrapper is partial, and the MPF wrapper and enclosing subpaving consumers remain open. No universal template adapter is used."
       ]
     },
     {
