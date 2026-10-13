@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/heap"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -64,6 +65,10 @@ type solverSetup struct {
 }
 
 func newSolverSetup(m *numeral.RationalManager) (*solverSetup, error) {
+	return newSolverSetupWithDebug(m, nil)
+}
+
+func newSolverSetupWithDebug(m *numeral.RationalManager, debug *diagnostic.DebugContext) (*solverSetup, error) {
 	if m == nil || m.BudgetField == nil || m.Integers() == nil {
 		return nil, arena.ErrInvalidSlot
 	}
@@ -109,7 +114,7 @@ func newSolverSetup(m *numeral.RationalManager) (*solverSetup, error) {
 	s := &solverSetup{manager: m, decomposeBuffer: decompose, asBuffer: as, bsBuffer: bs, tmpAs: tmpAs, tmpBs: tmpBs,
 		inconsistent: nullEquationIndex, nextX: nullEquationIndex, nextEq: nullEquationIndex, header: header}
 	s.self = s
-	s.queue, e = heap.New(16, heap.Config{Budget: m.BudgetField, Less: func(a, b int32) bool {
+	s.queue, e = heap.New(16, heap.Config{Budget: m.BudgetField, Debug: debug, Less: func(a, b int32) bool {
 		return s.solved[a] < s.solved[b]
 	}})
 	if e != nil {

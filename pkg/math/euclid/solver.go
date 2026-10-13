@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -17,12 +18,19 @@ type Solver struct {
 	self    *Solver
 	setup   *solverSetup
 	manager *numeral.RationalManager
+	debug   *diagnostic.DebugContext
 	owns    bool
 	closed  bool
 	stop    error
 }
 
 func NewSolver(m *numeral.RationalManager) (*Solver, error) {
+	return NewSolverWithDebug(m, nil)
+}
+
+// NewSolverWithDebug borrows the source heap assertion owner through the
+// Euclidean solved-variable queue and across Reset.
+func NewSolverWithDebug(m *numeral.RationalManager, debug *diagnostic.DebugContext) (*Solver, error) {
 	owned := m == nil
 	if owned {
 		var e error
@@ -37,14 +45,14 @@ func NewSolver(m *numeral.RationalManager) (*Solver, error) {
 	} else if e := m.CheckOwnerReady(); e != nil {
 		return nil, e
 	}
-	setup, e := newSolverSetup(m)
+	setup, e := newSolverSetupWithDebug(m, debug)
 	if e != nil {
 		if owned {
 			e = errors.Join(e, m.CloseChecked())
 		}
 		return nil, e
 	}
-	s := &Solver{setup: setup, manager: m, owns: owned}
+	s := &Solver{setup: setup, manager: m, debug: debug, owns: owned}
 	s.self = s
 	return s, nil
 }
@@ -153,7 +161,7 @@ func (s *Solver) Reset() error {
 		}
 		s.setup = nil
 	}
-	setup, e := newSolverSetup(s.manager)
+	setup, e := newSolverSetupWithDebug(s.manager, s.debug)
 	if e != nil {
 		s.stop = e
 		return e

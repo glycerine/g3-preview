@@ -33,6 +33,7 @@ digraph packages {
   "util/hash/runtime" -> "util/memory";
   "util/heap" [style=filled, fillcolor="#dceafa"];
   "util/heap" -> "arena";
+  "util/heap" -> "util/diagnostic";
   "util/idgen" [style=filled, fillcolor="#dceafa"];
   "util/idgen" -> "arena";
   "util/lbool" [style=filled, fillcolor="#dceafa"];

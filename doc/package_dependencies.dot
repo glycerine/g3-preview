@@ -32,6 +32,7 @@ digraph packages {
   "ast/pattern" -> "ast";
   "ast/pattern" -> "ast/rewriter";
   "ast/pattern" -> "util/diagnostic";
+  "ast/pattern" -> "util/symbol";
   "ast/proofs" [style=filled, fillcolor="#eeeeee"];
   "ast/proofs" -> "ast";
   "ast/rewriter" [style=filled, fillcolor="#eeeeee"];
@@ -68,6 +69,7 @@ digraph packages {
   "engine" -> "util/process";
   "math/euclid" [style=filled, fillcolor="#eeeeee"];
   "math/euclid" -> "arena";
+  "math/euclid" -> "util/diagnostic";
   "math/euclid" -> "util/heap";
   "math/euclid" -> "util/numeral";
   "math/interval" [style=filled, fillcolor="#eeeeee"];
@@ -233,6 +235,7 @@ digraph packages {
   "util/hash/runtime" -> "util/memory";
   "util/heap" [style=filled, fillcolor="#dceafa"];
   "util/heap" -> "arena";
+  "util/heap" -> "util/diagnostic";
   "util/idgen" [style=filled, fillcolor="#dceafa"];
   "util/idgen" -> "arena";
   "util/lbool" [style=filled, fillcolor="#dceafa"];

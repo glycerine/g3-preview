@@ -34555,6 +34555,7 @@
         "pkg/math/euclid/solver_test.go",
         "pkg/math/euclid/solver_setup.go",
         "pkg/math/euclid/solver_setup_test.go",
+        "pkg/math/euclid/solver_heap_debug_test.go",
         "pkg/util/numeral/scoped_numeral.go"
       ],
       "tests": [
@@ -34582,6 +34583,7 @@
         "TestEuclideanNormalizeQueryAfterNonUnitSolve",
         "TestEuclideanNormalizeQueryJustificationAndConstantOnly",
         "TestEuclideanPublicSolverBorrowedManagerSolveNormalizeReset",
+        "TestEuclideanSolvedQueueBorrowsHeapDebugAcrossReset",
         "TestEuclideanPublicSolverOwnedManagerAndClosedGuards",
         "TestEuclideanPublicSolverContradictionExplanationAndDisplay",
         "TestEuclideanPublicSolverResetAfterGuardedAssertionError",
@@ -34758,6 +34760,7 @@
           "go_target": "pkg/math/euclid/solver.go",
           "tests": [
             "TestEuclideanPublicSolverBorrowedManagerSolveNormalizeReset",
+            "TestEuclideanSolvedQueueBorrowsHeapDebugAcrossReset",
             "TestEuclideanPublicSolverOwnedManagerAndClosedGuards",
             "TestEuclideanPublicSolverContradictionExplanationAndDisplay",
             "TestEuclideanPublicSolverResetAfterGuardedAssertionError"
@@ -121500,7 +121503,9 @@
         "pkg/util/heap/source_prefix_test.go",
         "pkg/sat/sat_var_queue_native_test.go",
         "pkg/math/euclid/solver_setup.go",
+        "pkg/math/euclid/solver.go",
         "pkg/math/euclid/solver_setup_test.go",
+        "pkg/math/euclid/solver_heap_debug_test.go",
         "pkg/math/euclid/apply_solution.go",
         "pkg/math/euclid/apply_solution_test.go",
         "pkg/math/euclid/normalize_query.go",
@@ -121535,6 +121540,7 @@
         "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
         "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards",
         "TestEuclideanSetupSolvedVariableQueue",
+        "TestEuclideanSolvedQueueBorrowsHeapDebugAcrossReset",
         "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
         "TestEuclideanNormalizeQueryAfterNonUnitSolve",
         "TestEuclideanNormalizeQueryJustificationAndConstantOnly"
@@ -121863,8 +121869,10 @@
           "name": "concrete Euclidean solved-variable heap with borrowed elimination order",
           "status": "ported",
           "go_target": "pkg/math/euclid/solver_setup.go",
+          "go_targets": ["pkg/math/euclid/solver.go"],
           "tests": [
             "TestEuclideanSetupSolvedVariableQueue",
+            "TestEuclideanSolvedQueueBorrowsHeapDebugAcrossReset",
             "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
             "TestEuclideanNormalizeQueryAfterNonUnitSolve"
           ]
