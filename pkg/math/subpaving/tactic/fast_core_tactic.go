@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	goaltactic "github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -39,6 +40,23 @@ func NewFastCoreTactic(m *ast.ASTManager, numbers *numeral.FastFloatManager, rat
 	}
 	if pc == nil || p == nil {
 		return nil, params.ErrParamsOwner
+	}
+	astNumerals := m.NumeralService()
+	parameterNumerals := pc.Numerals()
+	if astNumerals == nil || parameterNumerals == nil {
+		return nil, arena.ErrInvalidSlot
+	}
+	owners := []*memory.Runtime{numbers.RuntimeOwner(), rational.RuntimeOwner(), astNumerals.RuntimeOwner(), parameterNumerals.RuntimeOwner()}
+	for _, owner := range owners {
+		if owner == nil {
+			return nil, arena.ErrInvalidSlot
+		}
+	}
+	process := owners[0].ProcessOwner()
+	for _, owner := range owners[1:] {
+		if other := owner.ProcessOwner(); (process != nil || other != nil) && process != other {
+			return nil, arena.ErrConfig
+		}
 	}
 	owned, err := pc.NewValue()
 	if err != nil {
