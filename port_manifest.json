@@ -117893,7 +117893,8 @@
         "TestCooperationNoOMPTaskReleaseAndRuntimeEnable",
         "TestCooperationColdOwnerFaultAndCopies",
         "TestCooperationNoOMPZeroWarmAllocations",
-        "TestCooperationActualCPPNoOMPReleaseTrace"
+        "TestCooperationActualCPPNoOMPReleaseTrace",
+        "TestCooperationCheckpointTraceDetailAndConditional"
       ],
       "assertions": [
         {
@@ -117940,13 +117941,21 @@
             "pkg/util/cooperate/cooperate_debug.go",
             "pkg/util/cooperate/cooperate_nodebug.go"
           ]
+        },
+        {
+          "name": "checkpoint optional cooperate_detail TRACE and cooperate CTRACE at source sites 56-57",
+          "status": "ported",
+          "go_target": "pkg/util/cooperate/cooperate.go",
+          "tests": [
+            "TestCooperationCheckpointTraceDetailAndConditional"
+          ]
         }
       ],
       "ownership": [
         "The Go Cooperation owner holds the source enabled flag and lock-owner scalar for one operation lane. Empty source lexical section/task objects use balanced Begin/End calls; task spelling is not retained because source m_task is never assigned. The owner borrows its budget, charges one cold header, and releases it on Close."
       ],
       "deviations": [
-        "The current Go target is single-goroutine, matching z3_omp.h _NO_OMP_: thread ID 0, omp_in_parallel false, no-op recursive locks and critical pragma. Source assertion positions execute under g3debug; optional TRACE output belongs to the separate trace unit. Multi-lane OpenMP scheduling is outside this target rather than an unimplemented branch of the single-goroutine port. Typed owner/lifetime errors adapt Go storage."
+        "The current Go target is single-goroutine, matching z3_omp.h _NO_OMP_: thread ID 0, omp_in_parallel false, no-op recursive locks and critical pragma. Source assertion positions execute under g3debug; optional checkpoint TRACE and CTRACE output is wired through the separate trace unit. Multi-lane OpenMP scheduling is outside this target rather than an unimplemented branch of the single-goroutine port. Typed owner/lifetime errors adapt Go storage."
       ]
     },
     {
@@ -117966,7 +117975,8 @@
         "TestCooperationNoOMPTaskReleaseAndRuntimeEnable",
         "TestCooperationColdOwnerFaultAndCopies",
         "TestCooperationNoOMPZeroWarmAllocations",
-        "TestCooperationActualCPPNoOMPReleaseTrace"
+        "TestCooperationActualCPPNoOMPReleaseTrace",
+        "TestCooperationCheckpointTraceDetailAndConditional"
       ],
       "conditionals": [
         {
@@ -117997,13 +118007,21 @@
             "pkg/util/cooperate/cooperate_debug.go",
             "pkg/util/cooperate/cooperate_nodebug.go"
           ]
+        },
+        {
+          "name": "checkpoint optional cooperate_detail TRACE and cooperate CTRACE at source sites 56-57",
+          "status": "ported",
+          "go_target": "pkg/util/cooperate/cooperate.go",
+          "tests": [
+            "TestCooperationCheckpointTraceDetailAndConditional"
+          ]
         }
       ],
       "ownership": [
         "The Go Cooperation owner holds the source enabled flag and lock-owner scalar for one operation lane. Empty source lexical section/task objects use balanced Begin/End calls; task spelling is not retained because source m_task is never assigned. The owner borrows its budget, charges one cold header, and releases it on Close."
       ],
       "deviations": [
-        "The current Go target is single-goroutine, matching z3_omp.h _NO_OMP_: thread ID 0, omp_in_parallel false, no-op recursive locks and critical pragma. Source assertion positions execute under g3debug; optional TRACE output belongs to the separate trace unit. Multi-lane OpenMP scheduling is outside this target rather than an unimplemented branch of the single-goroutine port. Typed owner/lifetime errors adapt Go storage."
+        "The current Go target is single-goroutine, matching z3_omp.h _NO_OMP_: thread ID 0, omp_in_parallel false, no-op recursive locks and critical pragma. Source assertion positions execute under g3debug; optional checkpoint TRACE and CTRACE output is wired through the separate trace unit. Multi-lane OpenMP scheduling is outside this target rather than an unimplemented branch of the single-goroutine port. Typed owner/lifetime errors adapt Go storage."
       ]
     },
     {
@@ -172352,6 +172370,18 @@
           ]
         },
         {
+          "name": "STRACE and CTRACE lazy gates, body order and flush; retained cooperation checkpoint TRACE and CTRACE call sites",
+          "status": "ported",
+          "go_target": "pkg/util/diagnostic/util_trace_tags.go",
+          "go_targets": [
+            "pkg/util/cooperate/cooperate.go"
+          ],
+          "tests": [
+            "TestTraceShortAndConditionalGateOrder",
+            "TestCooperationCheckpointTraceDetailAndConditional"
+          ]
+        },
+        {
           "name": "optional _TRACE file and remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -172361,7 +172391,7 @@
         "TraceTags owns a native Go map of C-string tag values; Finalize drops that table but preserves enable-all. The default gparams binding uses a process singleton; full shell/API tag binding remains open. The optional trace writer is borrowed when injected; otherwise a trace-enabled emitted record lazily opens the process .z3-trace file."
       ],
       "deviations": [
-        "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Other optional TRACE/STRACE/CTRACE call sites remain open."
+        "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Cooperation checkpoint TRACE and CTRACE are wired; other optional TRACE/STRACE/CTRACE call sites remain open."
       ]
     },
     {
@@ -172460,6 +172490,18 @@
           ]
         },
         {
+          "name": "STRACE and CTRACE lazy gates, body order and flush; retained cooperation checkpoint TRACE and CTRACE call sites",
+          "status": "ported",
+          "go_target": "pkg/util/diagnostic/util_trace_tags.go",
+          "go_targets": [
+            "pkg/util/cooperate/cooperate.go"
+          ],
+          "tests": [
+            "TestTraceShortAndConditionalGateOrder",
+            "TestCooperationCheckpointTraceDetailAndConditional"
+          ]
+        },
+        {
           "name": "optional _TRACE file and remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -172469,7 +172511,7 @@
         "TraceTags owns a native Go map of C-string tag values; Finalize drops that table but preserves enable-all. The default gparams binding uses a process singleton; full shell/API tag binding remains open. The optional trace writer is borrowed when injected; otherwise a trace-enabled emitted record lazily opens the process .z3-trace file."
       ],
       "deviations": [
-        "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Other optional TRACE/STRACE/CTRACE call sites remain open."
+        "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Cooperation checkpoint TRACE and CTRACE are wired; other optional TRACE/STRACE/CTRACE call sites remain open."
       ]
     },
     {

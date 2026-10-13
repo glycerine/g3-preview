@@ -218,6 +218,7 @@ digraph packages {
   "util/control" -> "util/messages";
   "util/cooperate" [style=filled, fillcolor="#dceafa"];
   "util/cooperate" -> "arena";
+  "util/cooperate" -> "util/diagnostic";
   "util/diagnostic" [style=filled, fillcolor="#dceafa"];
   "util/diagnostic" -> "arena";
   "util/diagnostic" -> "util/memory";

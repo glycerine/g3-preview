@@ -2,9 +2,12 @@ package cooperate
 
 import (
 	"errors"
+	"io"
 	"reflect"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var (
@@ -24,6 +27,7 @@ var (
 type Cooperation struct {
 	self            *Cooperation
 	budget          *arena.Budget
+	trace           *diagnostic.TraceTags
 	OwnerThread     int32
 	enabled, closed bool
 }
@@ -36,6 +40,16 @@ func NewCooperation(b *arena.Budget) (*Cooperation, error) {
 	c.self = c
 	// omp_set_nested and omp_init_nest_lock are source no-ops in this profile.
 	return c, nil
+}
+
+// BindTrace borrows the source process trace state for this owner. Nil uses
+// the process-global tags.
+func (c *Cooperation) BindTrace(tags *diagnostic.TraceTags) error {
+	if err := c.check(); err != nil {
+		return err
+	}
+	c.trace = tags
+	return nil
 }
 
 func (c *Cooperation) check() error {
@@ -68,9 +82,33 @@ func (c *Cooperation) Checkpoint(task string) error {
 	if c.OwnerThread == 0 {
 		c.OwnerThread = -1
 	}
+	trace := c.trace
+	if trace == nil {
+		trace = diagnostic.BorrowProcessTraceTags()
+	}
+	if trace.ShouldTrace("cooperate_detail") || trace.ShouldTrace("cooperate") {
+		if end := strings.IndexByte(task, 0); end >= 0 {
+			task = task[:end]
+		}
+		if trace.ShouldTrace("cooperate_detail") {
+			_ = trace.Emit("cooperate_detail", "checkpoint", "src/util/cooperate.cpp", 56, task+", tid: 0\n")
+		}
+		// m_task starts null and is never assigned. Every retained Go task
+		// string represents a non-null source char pointer.
+		_ = trace.EmitConditional("cooperate", "checkpoint", "src/util/cooperate.cpp", 57,
+			func() bool { return true }, func(w io.Writer) error {
+				message := "moving to task: " + task + "\n"
+				n, err := io.WriteString(w, message)
+				if err != nil {
+					return err
+				}
+				if n != len(message) {
+					return io.ErrShortWrite
+				}
+				return nil
+			})
+	}
 	c.OwnerThread = 0
-	// Source m_task is never assigned. task is used only by unported TRACE;
-	// there is no retained task pointer or invented string validation here.
 	return nil
 }
 

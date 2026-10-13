@@ -1,11 +1,13 @@
 package cooperate
 
 import (
+	"bytes"
 	"errors"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func cooperationTestOwner(t *testing.T) (*Cooperation, *arena.Budget) {
@@ -24,6 +26,41 @@ func cooperationTestOwner(t *testing.T) (*Cooperation, *arena.Budget) {
 		}
 	})
 	return c, b
+}
+
+func TestCooperationCheckpointTraceDetailAndConditional(t *testing.T) {
+	c, _ := cooperationTestOwner(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("cooperate_detail")
+	tags.Enable("cooperate")
+	compiled := tags.ShouldTrace("cooperate")
+	if err := c.BindTrace(tags); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.BeginSection(); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.Checkpoint("sls\x00ignored"); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.EndSection(); err != nil {
+		t.Fatal(err)
+	}
+	if c.OwnerThread != 0 {
+		t.Fatal("TRACE changed lock publication", c.OwnerThread)
+	}
+	if !compiled {
+		if output.Len() != 0 {
+			t.Fatal("erased TRACE emitted", output.String())
+		}
+		return
+	}
+	want := "-------- [cooperate_detail] checkpoint src/util/cooperate.cpp:56 ---------\nsls, tid: 0\n------------------------------------------------\n" +
+		"-------- [cooperate] checkpoint src/util/cooperate.cpp:57 ---------\nmoving to task: sls\n------------------------------------------------\n"
+	if output.String() != want {
+		t.Fatal("source checkpoint trace order", output.String())
+	}
 }
 
 func TestCooperationNoOMPSourceCheckpointAndSection(t *testing.T) {

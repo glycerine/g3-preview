@@ -1427,7 +1427,8 @@
     {
       "package": "util/cooperate",
       "imports": [
-        "arena"
+        "arena",
+        "util/diagnostic"
       ],
       "production_files": [
         "cooperate.go",
