@@ -12,12 +12,14 @@ import (
 // FastBound owns its scoped numeral. Node bound arrays borrow these values;
 // a child can retain bounds created by its parent until it closes.
 type FastBound struct {
-	owner    *numeral.ScopedFastFloat
-	value    *numeral.FastFloat
-	variable uint32
-	lower    bool
-	open     bool
-	prev     *FastBound
+	owner     *numeral.ScopedFastFloat
+	value     *numeral.FastFloat
+	variable  uint32
+	lower     bool
+	open      bool
+	decision  bool
+	timestamp uint64
+	prev      *FastBound
 }
 
 // FastNode retains the concrete per-variable bounds needed by constant
@@ -30,6 +32,9 @@ type FastNode struct {
 	owned        []*FastBound
 	trail        *FastBound
 	children     uint32
+	context      *FastContext
+	conflictVar  uint32
+	inconsistent bool
 	closed       bool
 }
 
@@ -51,6 +56,9 @@ func NewFastNode(m *numeral.FastFloatManager, variables uint32, parent *FastNode
 		copy(n.lower, parent.lower)
 		copy(n.upper, parent.upper)
 		n.trail = parent.trail
+		n.context = parent.context
+		n.conflictVar = parent.conflictVar
+		n.inconsistent = parent.inconsistent
 		parent.children++
 	}
 	return n, nil
