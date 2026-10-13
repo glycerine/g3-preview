@@ -53388,7 +53388,7 @@
           ]
         },
         {
-          "name": "Concrete MPFF core tactic apply: retained input goal, accumulated source statistics and owned converter/context cleanup (src/math/subpaving/tactic/subpaving_tactic.cpp:193-263)",
+          "name": "Concrete MPFF core tactic apply: retained input goal, accumulated source statistics, parameter snapshot and fresh converter/context cleanup reconstruction (src/math/subpaving/tactic/subpaving_tactic.cpp:193-268)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/tactic/fast_core_tactic.go",
           "tests": [
@@ -53401,7 +53401,7 @@
         "The HWF and MPF branches construct concrete contexts and expression converters, internalize <=/>= literals with numeral right sides, unwrap nested negations, scale bounds by exact numerator/denominator, and add clauses in source order. The MPF converter borrows a rational manager and uses the selected owning MPF shell. A simple MPF integer-bound goal exercises internalize-then-search and displays its bound. The compound x^2 case preserves the source f2n refusal: unbounded even-power interval propagation resets its finite lower endpoint to zero, and the next interval::set calls f2n::set, whose is_regular check rejects formatted zero. MPQ/MPFX engine construction, AST variable display, optional print_nodes output, full public tactic ownership, simplify pipeline and factory remain open.",
         "The selected MPFF engine constructs and owns its concrete context/shell, borrowing numeral and rational managers. Search, leaf-bound display and core goal-result ownership are now reached; public simplify composition remains open.",
         "The selected MPFF engine has concrete expression and clause internalization, including nested negation and ordered disjunction, followed by search and the core tactic's retained goal result.",
-        "The MPFF tactic route now internalizes a goal and searches its selected context, with resulting bound display through the shell. The core tactic owns that engine and converter, returns the original borrowed goal, accumulates and resets source statistics, and releases converter references before the context. The AST variable printer, print_nodes output, parameter update/cleanup reconstruction, public simplify pipeline and process-global memory checkpoint remain open."
+        "The MPFF tactic route internalizes a goal and searches its selected context, with resulting bound display through the shell. The core tactic owns that engine, converter and shared parameter snapshot, returns the original borrowed goal, accumulates and resets source statistics, and releases converter references before reconstructing a fresh context on cleanup. The AST variable printer, print_nodes output, same-engine parameter updates, public simplify pipeline and process-global memory checkpoint remain open."
       ]
     },
     {

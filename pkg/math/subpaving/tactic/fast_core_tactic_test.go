@@ -123,6 +123,34 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if err := core.CollectStatistics(st); err != nil || st.Size() != 2 || st.Key(0) != "new bounds" || st.UintValue(0) != 1 || st.Key(1) != "nodes" || st.UintValue(1) != 1 {
 		t.Fatal("source core statistics", err, st.Size())
 	}
+	oldEngine, oldConverter := core.engine, core.converter
+	printKey := "print_nodes"
+	if err := pc.SetBoolName(&p, &printKey, true); err != nil {
+		t.Fatal(err)
+	}
+	if err := core.Cleanup(); err != nil {
+		t.Fatal("fresh implementation from retained parameters", err)
+	}
+	if _, err := oldEngine.Shell(); !errors.Is(err, arena.ErrClosed) {
+		t.Fatal("old context retired", err)
+	}
+	if err := oldConverter.check(); !errors.Is(err, arena.ErrClosed) {
+		t.Fatal("old converter retired before context", err)
+	}
+	if options, err := core.engine.Options(); err != nil || options.PrintNodes {
+		t.Fatal("caller mutation did not alter tactic snapshot", options, err)
+	}
+	st.Reset()
+	if err := core.CollectStatistics(st); err != nil || st.Size() != 2 || st.UintValue(0) != 1 || st.UintValue(1) != 1 {
+		t.Fatal("outer statistics survive cleanup", err, st.Size())
+	}
+	if got, err := core.Apply(goal); err != nil || got != goal {
+		t.Fatal("fresh context searches retained goal", got, err)
+	}
+	st.Reset()
+	if err := core.CollectStatistics(st); err != nil || st.Size() != 4 || st.Key(2) != "new bounds" || st.UintValue(2) != 1 || st.Key(3) != "nodes" || st.UintValue(3) != 1 {
+		t.Fatal("source tactic accumulates per-apply contributions", err, st.Size())
+	}
 	if err := core.ResetStatistics(); err != nil {
 		t.Fatal(err)
 	}
@@ -135,10 +163,6 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	}
 	if _, err := core.Apply(goal); !errors.Is(err, arena.ErrClosed) {
 		t.Fatal("closed core refusal", err)
-	}
-	printKey := "print_nodes"
-	if err := pc.SetBoolName(&p, &printKey, true); err != nil {
-		t.Fatal(err)
 	}
 	printing, err := NewFastCoreTactic(m, numbers, qm, pc, &p)
 	if err != nil {

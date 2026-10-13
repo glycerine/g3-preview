@@ -15,11 +15,16 @@ import (
 
 var ErrFastCorePrintNodes = errors.New("subpaving tactic: MPFF goal variable printer is not yet ported")
 
-// FastCoreTactic owns the selected engine and expression converter. The goal,
-// managers, and parameter service are borrowed. The returned goal is borrowed.
+// FastCoreTactic owns the selected engine, expression converter and a shared
+// parameter snapshot. The goal, managers and parameter service are borrowed.
+// The returned goal is borrowed.
 type FastCoreTactic struct {
 	self      *FastCoreTactic
 	manager   *ast.ASTManager
+	numbers   *numeral.FastFloatManager
+	rational  *numeral.RationalManager
+	pc        *params.ParamsContext
+	params    params.ParamsRef
 	engine    *FastEngine
 	converter *FastExprConverter
 	stats     statistics.Statistics
@@ -30,20 +35,38 @@ func NewFastCoreTactic(m *ast.ASTManager, numbers *numeral.FastFloatManager, rat
 	if m == nil || numbers == nil || rational == nil {
 		return nil, arena.ErrInvalidSlot
 	}
-	engine, err := NewFastEngine(m.ResourceLimit(), numbers, rational, pc, p)
+	if pc == nil || p == nil {
+		return nil, params.ErrParamsOwner
+	}
+	owned, err := pc.NewValue()
+	if err != nil {
+		return nil, err
+	}
+	if err := pc.Assign(&owned, p); err != nil {
+		return nil, errors.Join(err, pc.Del(&owned))
+	}
+	t := &FastCoreTactic{manager: m, numbers: numbers, rational: rational, pc: pc, params: owned}
+	t.self = t
+	if err := t.rebuild(); err != nil {
+		return nil, errors.Join(err, t.Close())
+	}
+	return t, nil
+}
+
+func (t *FastCoreTactic) rebuild() error {
+	engine, err := NewFastEngine(t.manager.ResourceLimit(), t.numbers, t.rational, t.pc, &t.params)
 	if err != nil {
 		if engine != nil {
 			err = errors.Join(err, engine.Close())
 		}
-		return nil, err
+		return err
 	}
-	converter, err := NewFastExprConverter(m, engine, rational)
+	converter, err := NewFastExprConverter(t.manager, engine, t.rational)
 	if err != nil {
-		return nil, errors.Join(err, engine.Close())
+		return errors.Join(err, engine.Close())
 	}
-	t := &FastCoreTactic{manager: m, engine: engine, converter: converter}
-	t.self = t
-	return t, nil
+	t.engine, t.converter = engine, converter
+	return nil
 }
 
 func (t *FastCoreTactic) open() error {
@@ -52,6 +75,9 @@ func (t *FastCoreTactic) open() error {
 	}
 	if t.closed {
 		return arena.ErrClosed
+	}
+	if t.converter == nil || t.engine == nil {
+		return arena.ErrInvalidSlot
 	}
 	return t.converter.check()
 }
@@ -113,6 +139,31 @@ func (t *FastCoreTactic) ResetStatistics() error {
 	return nil
 }
 
+// Cleanup releases the old converter before its context, then constructs a
+// fresh implementation from the tactic's retained parameter snapshot.
+// Accumulated outer statistics survive, as in the source tactic.
+func (t *FastCoreTactic) Cleanup() error {
+	if t == nil || t.self != t {
+		return arena.ErrInvalidSlot
+	}
+	if t.closed {
+		return arena.ErrClosed
+	}
+	if t.converter != nil {
+		if err := t.converter.Close(); err != nil {
+			return err
+		}
+		t.converter = nil
+	}
+	if t.engine != nil {
+		if err := t.engine.Close(); err != nil {
+			return err
+		}
+		t.engine = nil
+	}
+	return t.rebuild()
+}
+
 func (t *FastCoreTactic) Close() error {
 	if t == nil || t.self != t {
 		return arena.ErrInvalidSlot
@@ -126,10 +177,15 @@ func (t *FastCoreTactic) Close() error {
 		}
 		t.converter = nil
 	}
-	if err := t.engine.Close(); err != nil {
+	if t.engine != nil {
+		if err := t.engine.Close(); err != nil {
+			return err
+		}
+		t.engine = nil
+	}
+	if err := t.pc.Del(&t.params); err != nil {
 		return err
 	}
-	t.engine = nil
 	t.closed = true
 	return nil
 }
