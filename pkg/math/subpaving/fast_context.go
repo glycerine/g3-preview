@@ -30,6 +30,10 @@ type FastContext struct {
 	arithmeticFailed bool
 	timestamp        uint64
 	queue            []*FastBound
+	queueHead        int
+	numVisited       uint64
+	polynomials      map[uint32]*FastPolynomial
+	watchers         [][]uint32
 	closed           bool
 }
 
@@ -39,7 +43,7 @@ func NewFastContext(m *numeral.FastFloatManager, limit *control.Reslimit, isInt 
 	if m == nil || limit == nil || len(isInt) > math.MaxUint32 {
 		return nil, arena.ErrInvalidSlot
 	}
-	c := &FastContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), zeroEpsilon: epsilon == 0}
+	c := &FastContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), zeroEpsilon: epsilon == 0, polynomials: make(map[uint32]*FastPolynomial), watchers: make([][]uint32, len(isInt))}
 	c.self = c
 	defer func() {
 		if err != nil {
@@ -152,10 +156,18 @@ func (c *FastContext) Close() error {
 	if err := c.root.Close(); err != nil {
 		return err
 	}
+	for x := range c.isInt {
+		if p := c.polynomials[uint32(x)]; p != nil {
+			if err := p.close(); err != nil {
+				return err
+			}
+		}
+	}
 	if err := c.closeNumerals(); err != nil {
 		return err
 	}
 	c.queue = nil
+	c.queueHead = 0
 	c.closed = true
 	return nil
 }

@@ -50013,7 +50013,11 @@
         "pkg/math/subpaving/fast_node_predicates_test.go",
         "pkg/math/subpaving/fast_context.go",
         "pkg/math/subpaving/fast_context_bounds.go",
-        "pkg/math/subpaving/fast_context_bounds_test.go"
+        "pkg/math/subpaving/fast_context_bounds_test.go",
+        "pkg/math/subpaving/fast_polynomial.go",
+        "pkg/math/subpaving/fast_polynomial_test.go",
+        "pkg/math/subpaving/fast_context_propagate.go",
+        "pkg/math/subpaving/fast_context_propagate_test.go"
       ],
       "tests": [
         "TestSubpavingFastMutableIntervalRetainedCore",
@@ -50025,7 +50029,11 @@
         "TestSubpavingFastNodeConstantIntervalViews",
         "TestSubpavingFastNodeBoundPredicates",
         "TestSubpavingFastContextBoundFlowAndRelevance",
-        "TestSubpavingFastContextIntegerNormalizationAndCandidate"
+        "TestSubpavingFastContextIntegerNormalizationAndCandidate",
+        "TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients",
+        "TestSubpavingFastContextQueuedPolynomialWatchers",
+        "TestSubpavingFastContextQueueCancelAndRecentChild",
+        "TestSubpavingFastContextInitialPolynomialSweep"
       ],
       "conditionals": [
         {
@@ -50054,7 +50062,7 @@
         "The mutable fast-float interval owns both scoped endpoints and borrows its fast-float manager."
       ],
       "deviations": [
-        "The enclosing context_t<config_mpff> has concrete bound policy and interval views; definition propagation, search and the full lifecycle remain unported."
+        "The enclosing context_t<config_mpff> has concrete bound policy, interval views and polynomial watcher propagation; monomial/clause propagation, search and the full lifecycle remain unported."
       ]
     },
     {
@@ -50182,7 +50190,11 @@
         "pkg/math/subpaving/fast_node_test.go",
         "pkg/math/subpaving/fast_context.go",
         "pkg/math/subpaving/fast_context_bounds.go",
-        "pkg/math/subpaving/fast_context_bounds_test.go"
+        "pkg/math/subpaving/fast_context_bounds_test.go",
+        "pkg/math/subpaving/fast_polynomial.go",
+        "pkg/math/subpaving/fast_polynomial_test.go",
+        "pkg/math/subpaving/fast_context_propagate.go",
+        "pkg/math/subpaving/fast_context_propagate_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50221,7 +50233,11 @@
         "TestSubpavingFastIntervalPowerRetainedCases",
         "TestSubpavingFastNodeConstantIntervalViews",
         "TestSubpavingFastContextBoundFlowAndRelevance",
-        "TestSubpavingFastContextIntegerNormalizationAndCandidate"
+        "TestSubpavingFastContextIntegerNormalizationAndCandidate",
+        "TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients",
+        "TestSubpavingFastContextQueuedPolynomialWatchers",
+        "TestSubpavingFastContextQueueCancelAndRecentChild",
+        "TestSubpavingFastContextInitialPolynomialSweep"
       ],
       "conditionals": [
         {
@@ -50346,13 +50362,22 @@
             "TestSubpavingFastContextBoundFlowAndRelevance",
             "TestSubpavingFastContextIntegerNormalizationAndCandidate"
           ]
+        },
+        {
+          "name": "Concrete config_mpff polynomial terms, copied coefficient ownership and watcher registration (src/math/subpaving/subpaving_t.h:319-370,457-539)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_polynomial.go",
+          "tests": [
+            "TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients",
+            "TestSubpavingFastContextQueuedPolynomialWatchers"
+          ]
         }
       ],
       "ownership": [
-        "The mutable interval and node bounds own their fast-float endpoints; constant interval views borrow current node bounds. The context owns its root and parameter numerals and borrows the numeric manager and resource limit."
+        "The mutable interval and node bounds own their fast-float endpoints; constant interval views borrow current node bounds. The context owns its root, parameter numerals and copied polynomial coefficients, and borrows the numeric manager and resource limit."
       ],
       "deviations": [
-        "The config_mpff context's definition propagation, search and full lifecycle remain unported."
+        "The config_mpff context's monomial and clause propagation, search and full lifecycle remain unported."
       ]
     },
     {
@@ -50387,7 +50412,11 @@
         "pkg/math/subpaving/fast_node_predicates_test.go",
         "pkg/math/subpaving/fast_context.go",
         "pkg/math/subpaving/fast_context_bounds.go",
-        "pkg/math/subpaving/fast_context_bounds_test.go"
+        "pkg/math/subpaving/fast_context_bounds_test.go",
+        "pkg/math/subpaving/fast_polynomial.go",
+        "pkg/math/subpaving/fast_polynomial_test.go",
+        "pkg/math/subpaving/fast_context_propagate.go",
+        "pkg/math/subpaving/fast_context_propagate_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50416,7 +50445,11 @@
         "TestSubpavingFastNodeConstantIntervalViews",
         "TestSubpavingFastNodeBoundPredicates",
         "TestSubpavingFastContextBoundFlowAndRelevance",
-        "TestSubpavingFastContextIntegerNormalizationAndCandidate"
+        "TestSubpavingFastContextIntegerNormalizationAndCandidate",
+        "TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients",
+        "TestSubpavingFastContextQueuedPolynomialWatchers",
+        "TestSubpavingFastContextQueueCancelAndRecentChild",
+        "TestSubpavingFastContextInitialPolynomialSweep"
       ],
       "assertions": [
         {
@@ -50766,13 +50799,31 @@
             "TestSubpavingFastContextBoundFlowAndRelevance",
             "TestSubpavingFastContextIntegerNormalizationAndCandidate"
           ]
+        },
+        {
+          "name": "Concrete config_mpff polynomial definition and forward/reverse bound propagation through interval arithmetic (src/math/subpaving/subpaving_t_def.h:669-768,1408-1496)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_polynomial.go",
+          "tests": [
+            "TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients"
+          ]
+        },
+        {
+          "name": "Concrete config_mpff polynomial watcher queue, initial definition sweep, recent child bounds and cancellation resume (src/math/subpaving/subpaving_t_def.h:1664-1802)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_context_propagate.go",
+          "tests": [
+            "TestSubpavingFastContextQueuedPolynomialWatchers",
+            "TestSubpavingFastContextQueueCancelAndRecentChild",
+            "TestSubpavingFastContextInitialPolynomialSweep"
+          ]
         }
       ],
       "ownership": [
-        "Each fast-float node owns the bounds it publishes; child nodes borrow inherited parent bounds until closed. The context owns its parameter numerals and root, and borrows the fast-float manager and resource limit."
+        "Each fast-float node owns the bounds it publishes; child nodes borrow inherited parent bounds until closed. The context owns its parameter numerals, root and copied polynomial coefficients, and borrows the fast-float manager and resource limit."
       ],
       "deviations": [
-        "The config_mpff context's definition propagation, search and full lifecycle remain unported."
+        "The config_mpff context's monomial and clause propagation, search and full lifecycle remain unported."
       ]
     },
     {
