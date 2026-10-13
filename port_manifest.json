@@ -171231,39 +171231,61 @@
       "path": "src/util/timeout.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/shell/timeout.go"
+      ],
+      "tests": [
+        "TestShellTimeoutSourceCallbackOutputAndErrorOrder",
+        "TestShellTimeoutReplacementDisabledAndBorrowedCallback"
+      ],
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
           "name": "set_timeout: replace process-global scoped_timer and its owning event handler",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/shell/timeout.go",
+          "tests": [
+            "TestShellTimeoutReplacementDisabledAndBorrowedCallback"
+          ]
         },
         {
           "name": "register_on_timeout_proc: replace borrowed process-global callback",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/shell/timeout.go",
+          "tests": [
+            "TestShellTimeoutReplacementDisabledAndBorrowedCallback"
+          ]
         },
         {
           "name": "g_timeout_eh::operator(): print, set caller, invoke callback, delete timer, clear pointer, throw timeout error",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/shell/timeout.go",
+          "tests": [
+            "TestShellTimeoutSourceCallbackOutputAndErrorOrder"
+          ]
         }
       ],
       "ownership": [
-        "g_timeout owns one replaceable scoped_timer, which owns a newly allocated g_timeout_eh. g_on_timeout borrows a function pointer. On timeout, the handler writes to process stdout, invokes the borrowed callback, deletes and nulls the global timer, then throws ERR_TIMEOUT. The shell frontends install callbacks; shell/main.cpp sets the timer. No Go shell/process owner currently binds these globals."
+        "The concrete shell TimeoutService owns one replaceable scoped timer and borrows the callback/output stream. The handler writes timeout, records the caller, invokes the callback, closes and clears the current timer, then delivers ERR_TIMEOUT through an explicit event channel. Direct shell main/frontend callers remain unported."
       ],
       "deviations": [
-        "The existing util/control.ScopedTimer implements a lower timer mechanism but does not implement these process-global timeout controls or shell callback/output/error ordering. Port a concrete shell-owned service with the shell consumers; do not credit the lower timer as timeout.cpp."
+        "Go cannot throw the asynchronous C++ timeout exception into a shell call stack; the concrete shell owner transports it on Events. The source shell main/frontend callers are not yet linked, so this unit remains partial."
       ]
     },
     {
       "path": "src/util/timeout.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/shell/timeout.go"
+      ],
+      "tests": [
+        "TestShellTimeoutSourceCallbackOutputAndErrorOrder",
+        "TestShellTimeoutReplacementDisabledAndBorrowedCallback"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -171279,18 +171301,26 @@
       "methods": [
         {
           "name": "set_timeout(long)",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/shell/timeout.go",
+          "tests": [
+            "TestShellTimeoutReplacementDisabledAndBorrowedCallback"
+          ]
         },
         {
           "name": "register_on_timeout_proc(void (*)())",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/shell/timeout.go",
+          "tests": [
+            "TestShellTimeoutReplacementDisabledAndBorrowedCallback"
+          ]
         }
       ],
       "ownership": [
-        "Both declarations mutate process-global state defined in timeout.cpp. The callback is borrowed; the timer and its event handler are owned by the global timeout slot."
+        "The shell TimeoutService borrows a callback and owns one replaceable timer. Its explicit event channel transports the source asynchronous timeout error."
       ],
       "deviations": [
-        "Production direct callers are shell/main.cpp and the shell frontends; cnf_backbones.cpp is a test caller. The header remains unported until its concrete shell users are ported."
+        "Production direct callers are shell/main.cpp and the shell frontends; cnf_backbones.cpp is a test caller. The concrete shell owner exists, but direct Go frontend bindings remain unported."
       ]
     },
     {
