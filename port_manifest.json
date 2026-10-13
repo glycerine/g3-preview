@@ -164562,8 +164562,19 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "SMT MAM matcher and mam_impl pool<enode_vector> checkout with LIFO reuse or fresh vector allocation (mam.cpp:1874-1879,3088-3118)",
+          "status": "unported"
+        },
+        {
+          "name": "SMT MAM reset on checkout, unchecked recycle and destruction of only pooled vectors (mam.cpp:1877-1884,3115-3122; pool.h:26-46)",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Both retained MAM owners borrow checked-out enode_vector objects until recycle; the pool owns recycled vectors and destroys only those at owner destruction. Each checkout resets the vector after mk, while recycle preserves its contents until the next checkout. The Go MAM node and owner are not yet ported."
+      ],
       "deviations": [
         "No generic Go adapter is retained. Live production specializations belong to their unported consumers and should use concrete typed slices with explicit reset/destruction behavior."
       ]
@@ -168923,8 +168934,23 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "SMT theory_seq scoped_vector<eq>, <ne> and <nc> push_scope/pop_scope with source index-update trail and copy-on-write element storage (theory_seq.cpp:4115-4130; scoped_vector.h:37-65)",
+          "status": "unported"
+        },
+        {
+          "name": "SMT theory_seq indexed reads, set, push_back, pop_back, size and empty for equation, disequality and non-contains queues (theory_seq.cpp:325-2515; scoped_vector.h:69-140)",
+          "status": "unported"
+        },
+        {
+          "name": "scoped_vector ref and erase_and_swap have no retained theory_seq production call",
+          "status": "reference_only"
+        }
+      ],
+      "ownership": [
+        "The three theory_seq values own their concrete eq/ne/nc element histories. A scope records logical size, element length and index-trail length; pop restores index mappings in reverse order, shrinks owned element storage, then publishes the prior logical size. No SMT theory_seq Go owner exists yet."
+      ],
       "deviations": [
         "No Go adapter is retained. The live theory-sequence specialization belongs to unported SMT code and should be implemented there with concrete typed slices and scope indices."
       ]
