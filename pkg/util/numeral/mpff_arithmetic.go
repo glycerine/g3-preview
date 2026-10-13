@@ -482,13 +482,28 @@ func (m *FastFloatManager) Ceil(a, c *FastFloat) error {
 	}
 	return m.CeilInPlace(c)
 }
-func (m *FastFloatManager) Power(a *FastFloat, p uint32, b *FastFloat) error {
+func (m *FastFloatManager) Power(a *FastFloat, p uint32, b *FastFloat) (err error) {
 	if e := m.pair(a, b); e != nil {
 		return e
 	}
 	if e := m.debugCheck(a); e != nil {
 		return e
 	}
+	original := a
+	tags := m.mulTraceTags()
+	if a == b && tags.ShouldTrace("mpff_trace") {
+		var saved FastFloat
+		if err = m.Copy(&saved, a); err != nil {
+			return err
+		}
+		original = &saved
+		defer m.Del(&saved)
+	}
+	defer func() {
+		if err == nil {
+			m.tracePower(original, p, b)
+		}
+	}()
 	if a.index() == 0 {
 		if SourceExtendedGCDDebug && !(p != 0) {
 			return ErrFastFloatInvariant

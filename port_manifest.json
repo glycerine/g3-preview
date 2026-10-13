@@ -151729,7 +151729,8 @@
         "pkg/util/numeral/mpff_mul_trace_test.go",
         "pkg/util/numeral/mpff_div_trace.go",
         "pkg/util/numeral/mpff_div_trace_test.go",
-        "pkg/util/numeral/mpff_round_trace.go"
+        "pkg/util/numeral/mpff_round_trace.go",
+        "pkg/util/numeral/mpff_power_trace.go"
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
@@ -151772,7 +151773,8 @@
         "TestFastFloatMulOuterAndInnerTraceOrder",
         "TestFastFloatMulTraceReachedImpreciseRounding",
         "TestFastFloatDivTraceSourceShortcutsAndQuotient",
-        "TestFastFloatFloorCeilRetainedShortTraceBranches"
+        "TestFastFloatFloorCeilRetainedShortTraceBranches",
+        "TestFastFloatPowerRetainedTraceBranchesAndAlias"
       ],
       "conditionals": [
         {
@@ -152423,6 +152425,14 @@
           ],
           "tests": [
             "TestFastFloatDivTraceSourceShortcutsAndQuotient"
+          ]
+        },
+        {
+          "name": "mpff power STRACE original operand and result plus mpff_power raw TRACE after retained branches",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_power_trace.go",
+          "tests": [
+            "TestFastFloatPowerRetainedTraceBranchesAndAlias"
           ]
         }
       ],
@@ -172459,11 +172469,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/diagnostic/util_trace_tags.go",
-        "pkg/util/numeral/mpff_round_trace.go"
+        "pkg/util/numeral/mpff_round_trace.go",
+        "pkg/util/numeral/mpff_power_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
-        "TestFastFloatFloorCeilRetainedShortTraceBranches"
+        "TestFastFloatFloorCeilRetainedShortTraceBranches",
+        "TestFastFloatPowerRetainedTraceBranchesAndAlias"
       ],
       "conditionals": [
         {
@@ -172652,6 +172664,14 @@
           ]
         },
         {
+          "name": "mpff power STRACE original operand and result plus mpff_power raw TRACE after retained branches",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_power_trace.go",
+          "tests": [
+            "TestFastFloatPowerRetainedTraceBranchesAndAlias"
+          ]
+        },
+        {
           "name": "optional _TRACE file and remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -172671,11 +172691,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/diagnostic/util_trace_tags.go",
-        "pkg/util/numeral/mpff_round_trace.go"
+        "pkg/util/numeral/mpff_round_trace.go",
+        "pkg/util/numeral/mpff_power_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
-        "TestFastFloatFloorCeilRetainedShortTraceBranches"
+        "TestFastFloatFloorCeilRetainedShortTraceBranches",
+        "TestFastFloatPowerRetainedTraceBranchesAndAlias"
       ],
       "conditionals": [
         {
@@ -172873,6 +172895,14 @@
           "go_target": "pkg/util/numeral/mpff_round_trace.go",
           "tests": [
             "TestFastFloatFloorCeilRetainedShortTraceBranches"
+          ]
+        },
+        {
+          "name": "mpff power STRACE original operand and result plus mpff_power raw TRACE after retained branches",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_power_trace.go",
+          "tests": [
+            "TestFastFloatPowerRetainedTraceBranchesAndAlias"
           ]
         },
         {
