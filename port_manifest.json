@@ -148820,8 +148820,12 @@
         },
         {
           "name": "inherited custom ostream persistent flags/locale/stream state integration",
-          "status": "unported",
-          "tests": []
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpbq_stream.go",
+          "tests": [
+            "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes",
+            "TestBinaryRationalDecimalSourceStreamAndRawScope"
+          ]
         },
         {
           "name": "mpbq_manager::reset(mpbq_vector&) ascending scalar reset before square-free isolation",
@@ -149129,8 +149133,12 @@
         },
         {
           "name": "inherited custom ostream persistent flags/locale/stream state integration",
-          "status": "unported",
-          "tests": []
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpbq_stream.go",
+          "tests": [
+            "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes",
+            "TestBinaryRationalDecimalSourceStreamAndRawScope"
+          ]
         },
         {
           "name": "mpbq_manager::reset(mpbq_vector&) ascending scalar reset before square-free isolation",
