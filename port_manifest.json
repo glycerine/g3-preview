@@ -150080,7 +150080,8 @@
         "pkg/util/numeral/mpq_decimal_stream_source_stop_test.go",
         "pkg/util/numeral/rational_raw_boundary.go",
         "pkg/util/numeral/rational_raw_comparison_boundary_test.go",
-        "pkg/util/lp/priority_queue_exact_test.go"
+        "pkg/util/lp/priority_queue_exact_test.go",
+        "pkg/math/polynomial/algebraic_display_decimal_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -150280,7 +150281,8 @@
         "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
         "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes",
         "TestRationalDivisionBoundaryGenerationIdentity",
-        "TestRationalDivisionBoundaryGenerationExhaustion"
+        "TestRationalDivisionBoundaryGenerationExhaustion",
+        "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement"
       ],
       "assertions": [
         {
@@ -150957,7 +150959,8 @@
         "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added.",
         "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit.",
         "Native numerical text construction, assignment, CString append and prefix concatenation now take Go strings directly rather than ParamsStringView. Invalid numeric text owners/destinations use ErrOwnedStringOwner independently of parameter types. Existing checked numerical result/borrow lifetimes, first-NUL input semantics, counted output copies and actual numeric cleanup remain. This removes numeric-to-parameter dependencies without STL implementation or whole-unit credit.",
-        "Native numeral output migration: RationalSourceStream accepts string text. The numerical producer validates its completed character invocation and copies first-NUL text before calling output. The checked numeral view is private to util; callback strings survive source cleanup and nested display. Actual character-scope cleanup, insertion receipts and source destructor failures remain. This supersedes output-facing borrowed-view claims; it adds no STL or generic template implementation credit."
+        "Native numeral output migration: RationalSourceStream accepts string text. The numerical producer validates its completed character invocation and copies first-NUL text before calling output. The checked numeral view is private to util; callback strings survive source cleanup and nested display. Actual character-scope cleanup, insertion receipts and source destructor failures remain. This supersedes output-facing borrowed-view claims; it adds no STL or generic template implementation credit.",
+        "The retained algebraic basic decimal caller now borrows the existing concrete RationalSourceStream service through an io.Writer bridge. It preserves integer/dot/digit insertion boundaries and requires explicit CleanupDecimalStream after a refused writer; no C++ ostream implementation is added."
       ]
     },
     {
@@ -151035,7 +151038,8 @@
         "pkg/util/numeral/mpq_signed_fraction_source_test.go",
         "pkg/util/numeral/rational_raw_boundary.go",
         "pkg/util/numeral/rational_raw_comparison_boundary_test.go",
-        "pkg/util/lp/priority_queue_exact_test.go"
+        "pkg/util/lp/priority_queue_exact_test.go",
+        "pkg/math/polynomial/algebraic_display_decimal_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -151326,7 +151330,8 @@
         "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
         "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes",
         "TestRationalDivisionBoundaryGenerationIdentity",
-        "TestRationalDivisionBoundaryGenerationExhaustion"
+        "TestRationalDivisionBoundaryGenerationExhaustion",
+        "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement"
       ],
       "conditionals": [
         {
@@ -152570,7 +152575,8 @@
         "SetFractionSignedSource checks undefined signed32 local negation at its actual reach and preserves debug-only zero-denominator assertion. The preexisting widened SetFractionSigned service remains separate. Exhaustive small and independent boundary tests, every selected cold GCD reservation with physical accounting, warm allocation refusal, real checked TLS numerator release failure and original src/test/mpq.cpp:24-31 tst0 denominator-alias division pass. Native undefined signed overflow is not claimed; whole MPQ/util completion remains partial.",
         "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement.",
         "Native numerical text construction, assignment, CString append and prefix concatenation now take Go strings directly rather than ParamsStringView. Invalid numeric text owners/destinations use ErrOwnedStringOwner independently of parameter types. Existing checked numerical result/borrow lifetimes, first-NUL input semantics, counted output copies and actual numeric cleanup remain. This removes numeric-to-parameter dependencies without STL implementation or whole-unit credit.",
-        "Native numeral output migration: RationalSourceStream accepts string text. The numerical producer validates its completed character invocation and copies first-NUL text before calling output. The checked numeral view is private to util; callback strings survive source cleanup and nested display. Actual character-scope cleanup, insertion receipts and source destructor failures remain. This supersedes output-facing borrowed-view claims; it adds no STL or generic template implementation credit."
+        "Native numeral output migration: RationalSourceStream accepts string text. The numerical producer validates its completed character invocation and copies first-NUL text before calling output. The checked numeral view is private to util; callback strings survive source cleanup and nested display. Actual character-scope cleanup, insertion receipts and source destructor failures remain. This supersedes output-facing borrowed-view claims; it adds no STL or generic template implementation credit.",
+        "The retained algebraic basic decimal caller now borrows the existing concrete RationalSourceStream service through an io.Writer bridge. It preserves integer/dot/digit insertion boundaries and requires explicit CleanupDecimalStream after a refused writer; no C++ ostream implementation is added."
       ]
     },
     {

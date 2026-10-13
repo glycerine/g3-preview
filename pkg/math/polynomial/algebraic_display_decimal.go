@@ -4,14 +4,28 @@ package polynomial
 import (
 	"errors"
 	"io"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
+type algebraicDecimalWriter struct{ out io.Writer }
+
+func (w algebraicDecimalWriter) AppendInt32(n int32) error {
+	return writeAlgebraicIntervalPart(w.out, strconv.FormatInt(int64(n), 10))
+}
+func (w algebraicDecimalWriter) AppendCString(s string) error {
+	return writeAlgebraicIntervalPart(w.out, s)
+}
+func (w algebraicDecimalWriter) AppendNumeralText(s string) error {
+	return writeAlgebraicIntervalPart(w.out, s)
+}
+
 // DisplayDecimal refines local copies of a root cell's bounds before selecting
 // the source's upper approximation or exact lower root. The stored cell is not
-// refined by this display operation.
+// refined by this display operation. A stopped numeral insertion retains its
+// manager's source locals for CleanupDecimalStream or CleanupDisplay.
 func (m *AlgebraicRootCore) DisplayDecimal(w io.Writer, a *Algebraic, precision uint32) (err error) {
 	if w == nil {
 		return arena.ErrInvalidSlot
@@ -29,11 +43,7 @@ func (m *AlgebraicRootCore) DisplayDecimal(w io.Writer, a *Algebraic, precision 
 			}
 			q = r.value
 		}
-		text, formatErr := m.config.Rationals.DecimalString(&q, precision, false)
-		if formatErr != nil {
-			return formatErr
-		}
-		return writeAlgebraicIntervalPart(w, text)
+		return m.config.Rationals.DisplayDecimalInto(algebraicDecimalWriter{w}, &q, precision, false)
 	}
 	r, err := m.load(l)
 	if err != nil {

@@ -57,6 +57,18 @@ func TestAlgebraicDisplayDecimalBasicRootAndExactRefinement(t *testing.T) {
 		})
 	}
 	refusal := errors.New("decimal write refused")
+	for i, prefix := range []string{"", "1", "1."} {
+		out := &algebraicIntervalRefusingWriter{stop: i + 1, err: refusal}
+		if err := c.DisplayDecimal(out, &basic, 4); !errors.Is(err, refusal) || out.String() != prefix || out.writes != i+1 {
+			t.Fatalf("basic decimal write %d: %q, %d writes, %v", i+1, out.String(), out.writes, err)
+		}
+		serviceMust(t, c.config.Rationals.CleanupDecimalStream())
+	}
+	basicShort := &algebraicIntervalRefusingWriter{stop: 3}
+	if err := c.DisplayDecimal(basicShort, &basic, 4); !errors.Is(err, io.ErrShortWrite) || basicShort.String() != "1." {
+		t.Fatal("basic decimal short write", basicShort.String(), err)
+	}
+	serviceMust(t, c.config.Rationals.CleanupDecimalStream())
 	stop := &algebraicIntervalRefusingWriter{stop: 1, err: refusal}
 	if err := c.DisplayDecimal(stop, &root, 4); !errors.Is(err, refusal) || stop.String() != "" {
 		t.Fatal("decimal refusal", stop.String(), err)
