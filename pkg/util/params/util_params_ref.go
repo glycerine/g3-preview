@@ -1205,12 +1205,12 @@ func (c *ParamsContext) format(v *ParamsRef, key *usymbol.Symbol, module *string
 	if e := c.check(v); e != nil {
 		return e
 	}
-	if key != nil {
+	if key != nil && v.Slot != 0 {
 		if e := c.keyCheck(*key); e != nil {
 			return e
 		}
 	}
-	if d != nil {
+	if d != nil && v.Slot != 0 {
 		if d.manager != c.SymbolsField {
 			return ErrParamsOwner
 		}
@@ -1319,6 +1319,13 @@ func (c *ParamsContext) DisplayKey(v *ParamsRef, k usymbol.Symbol) (string, erro
 func (c *ParamsContext) DisplaySMT2(v *ParamsRef, module *string, d *ParamDescrs) (string, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	if e := c.check(v); e != nil {
+		return "", e
+	}
+	// params_ref::display_smt2 leaves an empty reference untouched.
+	if v.Slot == 0 {
+		return "", nil
+	}
 	if d == nil {
 		return "", ErrParamsPrecondition
 	}
@@ -1578,6 +1585,12 @@ func (c *ParamsContext) FormatKeyInto(v *ParamsRef, k usymbol.Symbol, dst []byte
 func (c *ParamsContext) FormatSMT2Into(v *ParamsRef, module *string, d *ParamDescrs, dst []byte) (int, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	if e := c.check(v); e != nil {
+		return 0, e
+	}
+	if v.Slot == 0 {
+		return 0, nil
+	}
 	if d == nil {
 		return 0, ErrParamsPrecondition
 	}

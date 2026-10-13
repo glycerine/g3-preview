@@ -164007,7 +164007,9 @@
         "TestContextParamsAllSetBooleanFieldsAndReachedBorrowedStringLifetime",
         "TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation",
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
-        "TestParamsReferenceValidateEmptySkipsDescriptors"
+        "TestParamsReferenceValidateEmptySkipsDescriptors",
+        "TestParamsReferenceDisplaySMT2EmptySkipsDescriptors",
+        "TestParamsReferenceDisplayKeyEmptySkipsSymbolRead"
       ],
       "conditionals": [
         {
@@ -164401,6 +164403,22 @@
           "tests": [
             "TestParamsReferenceValidateEmptySkipsDescriptors"
           ]
+        },
+        {
+          "name": "params_ref::display_smt2 empty-reference return before descriptor or module access (params.cpp:527-532)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceDisplaySMT2EmptySkipsDescriptors"
+          ]
+        },
+        {
+          "name": "params_ref::display(symbol) empty-reference default before key read (params.cpp:538-543)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceDisplayKeyEmptySkipsSymbolRead"
+          ]
         }
       ],
       "ownership": [
@@ -164543,7 +164561,9 @@
         "TestGlobalParamsServiceUnconditionalInitAndCurrentPointer",
         "TestGlobalParamsServiceCtorRefusalPreservesCurrentAndFailedHeaders",
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
-        "TestParamsReferenceValidateEmptySkipsDescriptors"
+        "TestParamsReferenceValidateEmptySkipsDescriptors",
+        "TestParamsReferenceDisplaySMT2EmptySkipsDescriptors",
+        "TestParamsReferenceDisplayKeyEmptySkipsSymbolRead"
       ],
       "conditionals": [
         {
@@ -164889,6 +164909,22 @@
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceValidateEmptySkipsDescriptors"
+          ]
+        },
+        {
+          "name": "params_ref::display_smt2 empty-reference return before descriptor or module access (params.cpp:527-532)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceDisplaySMT2EmptySkipsDescriptors"
+          ]
+        },
+        {
+          "name": "params_ref::display(symbol) empty-reference default before key read (params.cpp:538-543)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceDisplayKeyEmptySkipsSymbolRead"
           ]
         }
       ],
