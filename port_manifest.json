@@ -146589,7 +146589,8 @@
         "pkg/util/text/util_numeric_stream_file.go",
         "pkg/util/text/util_numeric_stream_file_test.go",
         "pkg/util/text/util_numeric_stream.go",
-        "pkg/util/memory/runtime_initialization_oom.go"
+        "pkg/util/memory/runtime_initialization_oom.go",
+        "pkg/util/memory/process_display.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -146654,6 +146655,7 @@
         "TestNumericFileStreamEveryColdReservation",
         "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
         "TestMemoryRuntimeInitializationClearReachedOwnerGuard",
+        "TestProcessDisplayMaxUsageSharedPeakAndInsertionPrefixes",
         "TestNumericStreamNativeCountedTextAndOwnedInput"
       ],
       "conditionals": [
@@ -146709,6 +146711,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "memory::display_max_usage shared peak read, default six-significant-digit megabyte conversion and retained shell insertion prefixes (cpp187-192; shell/z3_log_frontend.cpp:37)",
+          "status": "ported",
+          "go_target": "pkg/util/memory/process_display.go",
+          "tests": [
+            "TestProcessDisplayMaxUsageSharedPeakAndInsertionPrefixes"
+          ]
+        },
         {
           "name": "scalar global and lane counter transitions, synchronization and read predicates; allocator/runtime and transport open",
           "status": "partial",
@@ -146912,7 +146922,8 @@
         "pkg/util/text/util_numeric_stream_file.go",
         "pkg/util/text/util_numeric_stream_file_test.go",
         "pkg/util/text/util_numeric_stream.go",
-        "pkg/util/memory/runtime_initialization_oom.go"
+        "pkg/util/memory/runtime_initialization_oom.go",
+        "pkg/util/memory/process_display.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -146965,6 +146976,7 @@
         "TestNumericFileStreamEveryColdReservation",
         "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
         "TestMemoryRuntimeInitializationClearReachedOwnerGuard",
+        "TestProcessDisplayMaxUsageSharedPeakAndInsertionPrefixes",
         "TestNumericStreamNativeCountedTextAndOwnedInput"
       ],
       "conditionals": [
@@ -147024,6 +147036,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "memory::display_max_usage shared peak read, default six-significant-digit megabyte conversion and retained shell insertion prefixes (cpp187-192; shell/z3_log_frontend.cpp:37)",
+          "status": "ported",
+          "go_target": "pkg/util/memory/process_display.go",
+          "tests": [
+            "TestProcessDisplayMaxUsageSharedPeakAndInsertionPrefixes"
+          ]
+        },
         {
           "name": "scalar global and lane counter transitions, synchronization and read predicates; allocator/runtime and transport open",
           "status": "partial",
