@@ -11,16 +11,17 @@ import (
 // TraceTags is the caller-owned, single-goroutine trace-tag control state.
 // The retained shell and API callers can bind one shared instance.
 type TraceTags struct {
-	all    bool
-	tags   map[string]struct{}
-	writer io.Writer
+	all     bool
+	tags    map[string]struct{}
+	writer  io.Writer
+	openErr error
 }
 
 func NewTraceTags() *TraceTags { return &TraceTags{} }
 
 // The source tag table and trace stream are process globals. An explicit
 // instance may borrow a writer for a concrete caller or a focused test.
-var processTraceTags = NewTraceTags()
+var processTraceTags = newProcessTraceTags()
 
 func BorrowProcessTraceTags() *TraceTags { return processTraceTags }
 
@@ -64,6 +65,9 @@ func (t *TraceTags) ShouldTrace(tag string) bool {
 }
 
 func (t *TraceTags) traceWriter() (io.Writer, error) {
+	if t.openErr != nil {
+		return nil, t.openErr
+	}
 	if t.writer == nil {
 		f, err := os.OpenFile(".z3-trace", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 		if err != nil {
@@ -93,8 +97,9 @@ func flushTrace(w io.Writer) error {
 }
 
 // Emit writes one TRACE record to the source-order stream. The caller
-// supplies its static source site and already-gated body. The default stream
-// opens .z3-trace on first emitted record in a trace-enabled build.
+// supplies its static source site and already-gated body. An explicitly
+// constructed unbound stream opens .z3-trace on its first
+// emitted record. The process stream opens it during package initialization.
 func (t *TraceTags) Emit(tag, function, file string, line int, body string) error {
 	if !t.ShouldTrace(tag) {
 		return nil
