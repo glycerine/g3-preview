@@ -52685,14 +52685,44 @@
       "path": "src/math/subpaving/tactic/subpaving_tactic.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/subpaving/tactic/options.go",
+        "pkg/math/subpaving/tactic/options_test.go"
+      ],
+      "tests": [
+        "TestSubpavingTacticOptionSelectionAndDescriptions"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Concrete print_nodes and numeral parameter reads, source engine-name branch selection (src/math/subpaving/tactic/subpaving_tactic.cpp:92-108)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/options.go",
+          "tests": [
+            "TestSubpavingTacticOptionSelectionAndDescriptions"
+          ]
+        },
+        {
+          "name": "Concrete source-order context and tactic parameter descriptors (src/math/subpaving/tactic/subpaving_tactic.cpp:82-89)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/options.go",
+          "tests": [
+            "TestSubpavingTacticOptionSelectionAndDescriptions"
+          ]
+        },
+        {
+          "name": "Selected-engine context replacement, expression converter, goal processing and tactic lifetime (src/math/subpaving/tactic/subpaving_tactic.cpp:109-259)",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The Go option selector and descriptor collector preserve the retained parameter-service calls but do not instantiate the MPQ/MPF/HWF/MPFF/MPFX contexts, expression converter, AST variable printer, goal processor or tactic owner."
+      ]
     },
     {
       "path": "src/math/subpaving/tactic/subpaving_tactic.h",
