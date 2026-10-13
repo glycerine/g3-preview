@@ -117104,7 +117104,8 @@
       "go_targets": [
         "pkg/util/numeral/hwf_numeral.go",
         "pkg/util/numeral/hwf_rational_set.go",
-        "pkg/util/numeral/hwf_rational_string.go"
+        "pkg/util/numeral/hwf_rational_string.go",
+        "pkg/util/numeral/hwf_scientific.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -117113,7 +117114,8 @@
         "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
         "TestHardwareFloatRationalStringMatchesSourceConversion",
         "TestHardwareFloatRationalStringSourceFiniteGuard",
-        "TestHardwareFloatNumeralSourceThinPredicatesAndMoves"
+        "TestHardwareFloatNumeralSourceThinPredicatesAndMoves",
+        "TestHardwareFloatSourceScientificTraceDisplay"
       ],
       "conditionals": [
         {
@@ -117194,7 +117196,15 @@
           "status": "unported"
         },
         {
-          "name": "Uncalled f2n<hwf_manager> power-of-two, scientific-string, decimal and SMT2 display helpers",
+          "name": "f2n<hwf_manager> scientific-string forwarding and display reached by subpaving traces",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_scientific.go",
+          "tests": [
+            "TestHardwareFloatSourceScientificTraceDisplay"
+          ]
+        },
+        {
+          "name": "Uncalled f2n<hwf_manager> power-of-two, decimal and SMT2 display helpers",
           "status": "reference_only"
         },
         {
@@ -118983,7 +118993,8 @@
         "pkg/util/numeral/hwf_round_select.go",
         "pkg/util/numeral/hwf_rational_set.go",
         "pkg/util/numeral/hwf_rational_output.go",
-        "pkg/util/numeral/hwf_rational_string.go"
+        "pkg/util/numeral/hwf_rational_string.go",
+        "pkg/util/numeral/hwf_scientific.go"
       ],
       "tests": [
         "TestHardwareFloatSourceBinary64Classification",
@@ -118998,7 +119009,8 @@
         "TestHardwareFloatSourceToRationalBitDecomposition",
         "TestHardwareFloatSourceToRationalOwnerGuards",
         "TestHardwareFloatRationalStringMatchesSourceConversion",
-        "TestHardwareFloatRationalStringSourceFiniteGuard"
+        "TestHardwareFloatRationalStringSourceFiniteGuard",
+        "TestHardwareFloatSourceScientificTraceDisplay"
       ],
       "conditionals": [
         {
@@ -119435,6 +119447,14 @@
           ]
         },
         {
+          "name": "hwf.cpp:380-384 scientific string reached by subpaving traces",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_scientific.go",
+          "tests": [
+            "TestHardwareFloatSourceScientificTraceDisplay"
+          ]
+        },
+        {
           "name": "Source hwf_manager owned mpq child used for rational projection; Go borrows the subpaving caller's rational manager",
           "status": "platform_replacement",
           "go_target": "pkg/util/numeral/hwf_rational_set.go",
@@ -119465,7 +119485,8 @@
         "pkg/util/numeral/hwf_round_select.go",
         "pkg/util/numeral/hwf_rational_set.go",
         "pkg/util/numeral/hwf_rational_output.go",
-        "pkg/util/numeral/hwf_rational_string.go"
+        "pkg/util/numeral/hwf_rational_string.go",
+        "pkg/util/numeral/hwf_scientific.go"
       ],
       "tests": [
         "TestHardwareFloatSourceBinary64Classification",
@@ -119480,7 +119501,8 @@
         "TestHardwareFloatSourceToRationalBitDecomposition",
         "TestHardwareFloatSourceToRationalOwnerGuards",
         "TestHardwareFloatRationalStringMatchesSourceConversion",
-        "TestHardwareFloatRationalStringSourceFiniteGuard"
+        "TestHardwareFloatRationalStringSourceFiniteGuard",
+        "TestHardwareFloatSourceScientificTraceDisplay"
       ],
       "conditionals": [
         {
@@ -119562,6 +119584,14 @@
           "tests": [
             "TestHardwareFloatRationalStringMatchesSourceConversion",
             "TestHardwareFloatRationalStringSourceFiniteGuard"
+          ]
+        },
+        {
+          "name": "hwf_manager scientific-string declaration reached by subpaving traces",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_scientific.go",
+          "tests": [
+            "TestHardwareFloatSourceScientificTraceDisplay"
           ]
         },
         {

@@ -39558,6 +39558,13 @@ without changing the output, and continues through the other. This is the
 idiomatic Go replacement for the source child lifetime; concrete subpaving
 integration and the remaining retained-method audit are still open.
 
+Subpaving trace sites call `f2n<hwf_manager>::display`, which forwards the
+source scientific string with six fractional digits. The Go wrapper now
+formats this with `strconv.FormatFloat` and writes it to an `io.Writer`,
+reporting short writes after their actual prefix. Focused cases cover normal
+values, negative zero, infinity and a short writer. Other source display
+helpers are uncalled by the retained HWF specialization.
+
 ### Environment parameter runtime boundary
 
 `src/util/env_params.h/.cpp` has exactly two static operations. The five
