@@ -148,6 +148,23 @@ func (r *ModelRef) Close() error {
 	return failure
 }
 
+// holds reports whether assignment acquired a model even if old-model
+// destruction stopped before the new raw pointer was published.
+func (r *ModelRef) holds(value *model.ModelCore) bool {
+	if r == nil || value == nil {
+		return false
+	}
+	if r.value == value && r.owned {
+		return true
+	}
+	for _, pending := range r.pending {
+		if pending == value {
+			return true
+		}
+	}
+	return false
+}
+
 // ModelLabels borrows symbol identities, which stay valid with the source
 // symbol manager. Its typed slice is ordinary Go-managed storage.
 type ModelLabels struct {

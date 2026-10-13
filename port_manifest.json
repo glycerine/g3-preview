@@ -101615,7 +101615,8 @@
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/tactic/tactic_stored_model.go",
-        "pkg/tactic/tactic_model_converter.go"
+        "pkg/tactic/tactic_model_converter.go",
+        "pkg/tactic/tactic_model_to_model.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -101623,6 +101624,7 @@
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
         "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
         "TestModelConverterToModelOriginalAllocationAndApplication",
+        "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel",
         "TestModelDerivedConstructorHeaderRefusalUnwinds",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
         "TestTacticStoredModelLabelsSnapshotAndAppend",
@@ -101656,6 +101658,14 @@
             "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
             "TestModelConverterToModelOriginalAllocationAndApplication",
             "TestModelDerivedConstructorHeaderRefusalUnwinds"
+          ]
+        },
+        {
+          "name": "model_converter2model concrete output Set acquired model before stopped old deletion, with caller callback guard",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_model_to_model.go",
+          "tests": [
+            "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel"
           ]
         },
         {
@@ -101694,7 +101704,8 @@
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/tactic/tactic_stored_model.go",
-        "pkg/tactic/tactic_model_converter.go"
+        "pkg/tactic/tactic_model_converter.go",
+        "pkg/tactic/tactic_model_to_model.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -101702,6 +101713,7 @@
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
         "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
         "TestModelConverterToModelOriginalAllocationAndApplication",
+        "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel",
         "TestModelDerivedConstructorHeaderRefusalUnwinds",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
         "TestTacticStoredModelLabelsSnapshotAndAppend",
@@ -101745,6 +101757,14 @@
             "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
             "TestModelConverterToModelOriginalAllocationAndApplication",
             "TestModelDerivedConstructorHeaderRefusalUnwinds"
+          ]
+        },
+        {
+          "name": "model_converter2model concrete output Set acquired model before stopped old deletion, with caller callback guard",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_model_to_model.go",
+          "tests": [
+            "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel"
           ]
         },
         {
@@ -167645,6 +167665,7 @@
         "TestTacticModelRefKeepsOldOnConsumedDestructionStop",
         "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
         "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel",
+        "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel",
         "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
         "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
@@ -167673,6 +167694,7 @@
             "TestTacticModelRefKeepsOldOnConsumedDestructionStop",
             "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
             "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel",
+            "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel",
             "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
             "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
             "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"

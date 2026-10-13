@@ -113,3 +113,37 @@ func TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel(t *testing.T) 
 	satOK(t, old.Close())
 	satOK(t, filter.Close())
 }
+
+func TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel(t *testing.T) {
+	m := astTestManager(t)
+	old, e := model.NewModel(m)
+	satOK(t, e)
+	s, e := m.MkUninterpretedSort(astTestSymbol(t, m, "converter-to-model-source-order"), nil)
+	satOK(t, e)
+	v, e := m.GetSomeValue(s)
+	satOK(t, e)
+	satOK(t, old.RegisterUniverse(s, []ast.ASTHandle{v}))
+	var out ModelRef
+	satOK(t, out.Set(old.Core()))
+	calls := []string{}
+	converter := &modelConverterTestLeaf{name: "unreached", calls: &calls}
+	m.ExprIDs.Cleanup(m.ExprIDs.Range())
+	m.BudgetField.FailAfter(1) // new model header, then old AST ID recycle
+	e = ModelConverterToModel(m, converter, &out)
+	m.BudgetField.FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) {
+		t.Fatalf("old model deletion refusal: %v", e)
+	}
+	if len(calls) != 0 || out.value != old.Core() || out.owned || len(out.pending) != 1 {
+		t.Fatalf("converter callback or source raw publication: calls %v, ref %+v", calls, out)
+	}
+	next := out.pending[0]
+	if next.References != 1 || next.Closed || next.DerivedModel() == nil {
+		t.Fatalf("new model destroyed despite output receipt: refs %d closed %v", next.References, next.Closed)
+	}
+	satOK(t, out.Close())
+	if !next.Closed {
+		t.Fatal("output cleanup did not retire acquired new model")
+	}
+	satOK(t, old.Close())
+}

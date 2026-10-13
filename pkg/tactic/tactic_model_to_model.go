@@ -17,7 +17,10 @@ func ModelConverterToModel(m *ast.ASTManager, c ModelConverter, out *ModelRef) (
 		return err
 	}
 	if err = out.Set(md.Core()); err != nil {
-		return errors.Join(err, md.Close())
+		if !out.holds(md.Core()) {
+			return errors.Join(err, md.Close())
+		}
+		return err
 	}
 	return c.ApplyModel(out, 0)
 }
