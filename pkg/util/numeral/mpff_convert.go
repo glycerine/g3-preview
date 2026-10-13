@@ -261,6 +261,7 @@ func (m *FastFloatManager) ToRational(a *FastFloat, qm *RationalManager, out *Ra
 		return e
 	}
 	exp := a.exponent
+	m.traceToRational(a, exp)
 	if exp < 0 && exp > -int32(m.bits) && !ffHasLow(m.sig(a), uint32(-exp)) {
 		m.toBuffer(0, a, false, false)
 		v := m.buffer(0, m.precision)

@@ -151731,7 +151731,8 @@
         "pkg/util/numeral/mpff_div_trace_test.go",
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
-        "pkg/util/numeral/mpff_convert_trace.go"
+        "pkg/util/numeral/mpff_convert_trace.go",
+        "pkg/util/numeral/mpff_to_rational_trace.go"
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
@@ -151776,7 +151777,8 @@
         "TestFastFloatDivTraceSourceShortcutsAndQuotient",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
-        "TestFastFloatSetIntegerRetainedTraceBranches"
+        "TestFastFloatSetIntegerRetainedTraceBranches",
+        "TestFastFloatToRationalRetainedTraceExponentBranches"
       ],
       "conditionals": [
         {
@@ -152443,6 +152445,14 @@
           "go_target": "pkg/util/numeral/mpff_convert_trace.go",
           "tests": [
             "TestFastFloatSetIntegerRetainedTraceBranches"
+          ]
+        },
+        {
+          "name": "mpff to_mpq_core entry TRACE source display and stored exponent at retained rational conversion",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_to_rational_trace.go",
+          "tests": [
+            "TestFastFloatToRationalRetainedTraceExponentBranches"
           ]
         }
       ],
@@ -172481,13 +172491,15 @@
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
-        "pkg/util/numeral/mpff_convert_trace.go"
+        "pkg/util/numeral/mpff_convert_trace.go",
+        "pkg/util/numeral/mpff_to_rational_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
-        "TestFastFloatSetIntegerRetainedTraceBranches"
+        "TestFastFloatSetIntegerRetainedTraceBranches",
+        "TestFastFloatToRationalRetainedTraceExponentBranches"
       ],
       "conditionals": [
         {
@@ -172692,6 +172704,14 @@
           ]
         },
         {
+          "name": "mpff to_mpq_core entry TRACE source display and stored exponent at retained rational conversion",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_to_rational_trace.go",
+          "tests": [
+            "TestFastFloatToRationalRetainedTraceExponentBranches"
+          ]
+        },
+        {
           "name": "optional _TRACE file and remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -172713,13 +172733,15 @@
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
-        "pkg/util/numeral/mpff_convert_trace.go"
+        "pkg/util/numeral/mpff_convert_trace.go",
+        "pkg/util/numeral/mpff_to_rational_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
-        "TestFastFloatSetIntegerRetainedTraceBranches"
+        "TestFastFloatSetIntegerRetainedTraceBranches",
+        "TestFastFloatToRationalRetainedTraceExponentBranches"
       ],
       "conditionals": [
         {
@@ -172933,6 +172955,14 @@
           "go_target": "pkg/util/numeral/mpff_convert_trace.go",
           "tests": [
             "TestFastFloatSetIntegerRetainedTraceBranches"
+          ]
+        },
+        {
+          "name": "mpff to_mpq_core entry TRACE source display and stored exponent at retained rational conversion",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_to_rational_trace.go",
+          "tests": [
+            "TestFastFloatToRationalRetainedTraceExponentBranches"
           ]
         },
         {
