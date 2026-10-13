@@ -298,7 +298,11 @@ func (m *Manager) BareString(s Symbol) (text string, present bool, err error) {
 		return "", false, e
 	}
 	if s.IsNumerical() {
-		return "", false, ErrInvalid
+		if sourceDebug {
+			return "", false, ErrInvalid
+		}
+		// symbol.h:96 returns a non-null empty C string after SASSERT is erased.
+		return "", true, nil
 	}
 	if s.Value == 0 {
 		return "", false, nil

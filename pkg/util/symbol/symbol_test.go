@@ -182,8 +182,13 @@ func TestSymbolTagsNullBytesAndCachedHash(t *testing.T) {
 		if text, present, e := m.BareString(s); e != nil || !present || text != "foo" {
 			t.Fatal("source bare spelling", text, present, e)
 		}
-		if _, _, e := m.BareString(Numerical(1)); !errors.Is(e, ErrInvalid) {
-			t.Fatal("bare string numerical precondition", e)
+		bareText, present, e := m.BareString(Numerical(1))
+		if sourceDebug {
+			if !errors.Is(e, ErrInvalid) {
+				t.Fatal("debug bare string numerical assertion", e)
+			}
+		} else if e != nil || !present || bareText != "" {
+			t.Fatal("release numerical bare string continuation", bareText, present, e)
 		}
 		if h, e := m.Hash(s); e != nil || h != 1484660743 {
 			t.Fatal("cached source hash", h, e)
