@@ -3557,7 +3557,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/api/api_ast_map_object.go",
-        "pkg/api/api_ast_map_object_test.go"
+        "pkg/api/api_ast_map_object_test.go",
+        "pkg/api/api_ast_map_replacement_order_test.go"
       ],
       "tests": [
         "TestAPIASTMapConcreteReferenceCleanup",
@@ -3586,6 +3587,14 @@
           "go_target": "pkg/api/api_ast_map_object.go",
           "tests": [
             "TestAPIASTMapExpressionPairTransfer"
+          ]
+        },
+        {
+          "name": "Z3_ast_map_insert replacement increments incoming then decrements old before entry value publication, with stopped-deletion owning cleanup (api_ast_map.cpp:74-89)",
+          "status": "ported",
+          "go_target": "pkg/api/api_ast_map_object.go",
+          "tests": [
+            "TestAPIASTMapReplacementReleasesOldBeforePublishingNew"
           ]
         }
       ],

@@ -95,9 +95,16 @@ func (a *apiASTMapObject) insert(key, value ast.ASTHandle) error {
 		return e
 	}
 	old := entry.value
+	if e := a.dec(old); e != nil {
+		// The source entry still contains old after a stopped DEC. Keep the
+		// acquired incoming reference for explicit Go owner cleanup.
+		entry.valueOwned = false
+		a.pending = append(a.pending, value)
+		return e
+	}
 	entry.value = value
 	entry.valueOwned = true
-	return a.dec(old)
+	return nil
 }
 
 func (a *apiASTMapObject) contains(key ast.ASTHandle) (bool, error) {
