@@ -79289,7 +79289,8 @@
       "go_targets": [
         "pkg/shell/global_timeout_option.go",
         "pkg/shell/input_file_option.go",
-        "pkg/shell/command_line.go"
+        "pkg/shell/command_line.go",
+        "pkg/shell/command_line_output.go"
       ],
       "tests": [
         "TestShellGlobalTimeoutOptionSourceBranch",
@@ -79439,13 +79440,21 @@
             "TestShellCommandLineReachesGlobalParameterAndTimeoutOwners",
             "TestShellCommandLineDebugAndTraceBuildGates"
           ]
+        },
+        {
+          "name": "parse_cmd_line_args -p/-pd/-pm/-pp parameter display output and early exit branch (main.cpp:220-245)",
+          "status": "partial",
+          "go_target": "pkg/shell/command_line_output.go",
+          "tests": [
+            "TestShellCommandLineReachesGlobalParameterAndTimeoutOwners"
+          ]
         }
       ],
       "ownership": [
-        "The concrete command-line scan borrows actual global-parameter, timeout, verbosity, warning, trace-tag and debug contexts. It owns parser flags and filename state; -file can overwrite or clear selection, and a selected empty filename remains distinct from a null pointer. Terminal output and frontend dispatch remain unported."
+        "The concrete command-line scan borrows actual global-parameter, timeout, verbosity, warning, trace-tag and debug contexts. It owns parser flags and filename state; -file can overwrite or clear selection, and a selected empty filename remains distinct from a null pointer. Parameter-display terminal output uses the actual global-parameter service and a shared stdout buffer for -pp. Help/version output and frontend dispatch remain unported."
       ],
       "deviations": [
-        "The concrete scan now reaches -T, -v, -nw, -t, -memory, name=value and build-gated -tr/-dbg through actual utility services and preserves option order, early terminal selection, input-kind flags, duplicate warnings, C-string boundaries and -file direct assignment. Trace and debug options are unknown in builds without their corresponding source gate; compiled builds mutate borrowed tag contexts. It returns terminal actions for help/version/parameter display rather than writing or exiting; executable output, Windows slash options and frontend dispatch remain open. Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go -T branch returns an explicit range error."
+        "The concrete scan reaches -T, -v, -nw, -t, -memory, name=value and build-gated -tr/-dbg through actual utility services and preserves option order, early terminal selection, input-kind flags, duplicate warnings, C-string boundaries and -file direct assignment. Trace and debug options are unknown in builds without their corresponding source gate; compiled builds mutate borrowed tag contexts. -p/-pd/-pm/-pp terminal actions now display through the real global-parameter service, including the -pp diagnostic line and -pm usage suffix. Rendering uses a Go bytes.Buffer before writing to the borrowed stdout writer; a render failure still writes its completed prefix. Help/version output, process exit, Windows slash options and frontend dispatch remain open. Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go -T branch returns an explicit range error."
       ]
     },
     {

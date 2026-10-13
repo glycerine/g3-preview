@@ -3,6 +3,8 @@ package shell
 import (
 	"bytes"
 	"errors"
+	"io"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -213,5 +215,48 @@ func TestShellCommandLineReachesGlobalParameterAndTimeoutOwners(t *testing.T) {
 	}
 	if name, ok := c.Input.Selected(); !ok || name != "input.smt2" {
 		t.Fatal(name, ok)
+	}
+	if err := c.WriteTerminalAction(nil); err != nil {
+		t.Fatal("ordinary solver path must not need terminal output", err)
+	}
+	for _, test := range []struct {
+		argument string
+		want     string
+	}{
+		{"-p", "Global parameters\n"},
+		{"-pd", "Global parameters\n"},
+		{"-pm", "Use -pm:name to display all parameters"},
+		{"-pm:sat", "[module] sat"},
+		{"-pp:verbose", "  name:           verbose\n"},
+	} {
+		var output bytes.Buffer
+		choice := NewCommandLine(diagnostic.NewWarningService(&bytes.Buffer{}), timer, globals)
+		if err := choice.ParseAndWrite([]string{test.argument, "not-scanned"}, &output); err != nil {
+			t.Fatal(test.argument, err)
+		}
+		if !strings.Contains(output.String(), test.want) {
+			t.Fatal("source terminal output", test.argument, output.String())
+		}
+		if test.argument == "-p" && strings.Contains(output.String(), "be verbose, where the value is the verbosity level") {
+			t.Fatal("-p included descriptor prose")
+		}
+		if test.argument == "-pd" && !strings.Contains(output.String(), "be verbose, where the value is the verbosity level") {
+			t.Fatal("-pd omitted descriptor prose")
+		}
+		if test.argument == "-pp:verbose" && !strings.HasPrefix(output.String(), "verbose null verbose\n") {
+			t.Fatal("-pp stdout diagnostic preceded descriptor", output.String())
+		}
+		if _, selected := choice.Input.Selected(); selected {
+			t.Fatal("terminal action scanned later filename", test.argument)
+		}
+	}
+	choice := NewCommandLine(diagnostic.NewWarningService(&bytes.Buffer{}), timer, globals)
+	var missing bytes.Buffer
+	if err := choice.ParseAndWrite([]string{"-pp:no_such_parameter"}, &missing); err == nil || !strings.HasPrefix(missing.String(), "no_such_parameter ") {
+		t.Fatal("-pp source diagnostic before lookup failure", err, missing.String())
+	}
+	choice = NewCommandLine(diagnostic.NewWarningService(&bytes.Buffer{}), timer, globals)
+	if err := choice.ParseAndWrite([]string{"-p"}, refusedWarningWriter{}); !errors.Is(err, io.ErrClosedPipe) {
+		t.Fatal("terminal borrowed stdout refusal", err)
 	}
 }
