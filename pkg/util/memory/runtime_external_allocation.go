@@ -8,6 +8,6 @@ func (m *Runtime) RecordAllocationFailure() error {
 	if e := m.open(); e != nil {
 		return e
 	}
-	m.accounting.outOfMemory = true
+	m.accountingOwner().outOfMemory = true
 	return m.emitFailure(FailureMemout)
 }

@@ -59,7 +59,7 @@ func (m *Runtime) deallocateTracked(h *Block) (runtimeReleaseState, error) {
 		*p = runtimeReleaseState{serial: m.nextReleaseSerial, extent: n, generation: h.generation, stage: runtimeReleaseHeader}
 	}
 	if p.stage == runtimeReleaseHeader {
-		if e = m.transport(m.accounting.beginExtentDeallocation(&m.lane, p.extent, m.config.SizeTBits, m.config.ThreadLocal)); e != nil {
+		if e = m.transport(m.accountingOwner().beginExtentDeallocation(&m.lane, p.extent, m.config.SizeTBits, m.config.ThreadLocal)); e != nil {
 			return *p, e
 		}
 		p.stage = runtimeReleaseAccounted
@@ -74,7 +74,7 @@ func (m *Runtime) deallocateTracked(h *Block) (runtimeReleaseState, error) {
 	}
 	*h = Block{}
 	p.stage = runtimeReleasePhysical
-	return *p, m.transport(m.accounting.finishDeallocation(&m.lane, m.config.ThreadLocal))
+	return *p, m.transport(m.accountingOwner().finishDeallocation(&m.lane, m.config.ThreadLocal))
 }
 
 func (a *SmallAllocator) releaseSnapshot(r ObjectRef, p *allocatorReleaseState) ReleaseProgress {

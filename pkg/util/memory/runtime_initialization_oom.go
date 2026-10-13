@@ -9,6 +9,6 @@ func (m *Runtime) ClearOutOfMemoryForInitialization() error {
 	if e := m.open(); e != nil {
 		return e
 	}
-	m.accounting.outOfMemory = false
+	m.accountingOwner().outOfMemory = false
 	return nil
 }

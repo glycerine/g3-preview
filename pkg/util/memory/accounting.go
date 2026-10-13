@@ -1,9 +1,8 @@
 package memory
 
-// Counter-only source component from memory_manager.cpp. It is embedded, with
-// these fields charged once, in the future global memory/runtime owner. The
-// containing service must synchronize access to global fields; lanes are
-// confined to their source allocation thread/explicit Go owner.
+// Counter-only source component from memory_manager.cpp. Its global fields
+// belong either to one standalone Runtime or to a shared ProcessAccounting;
+// lanes remain confined to their source allocation thread/explicit Go owner.
 //
 // These methods do not allocate/free storage. Real allocation adapters must
 // invoke them at the source point: TLS malloc AFTER physical success, TLS

@@ -17,6 +17,7 @@ var memoryRuntimeOrigins atomic.Uint64
 
 type RuntimeConfig struct {
 	Budget      *arena.Budget
+	Process     *ProcessAccounting
 	ThreadLocal bool
 	Transport   ErrorTransport
 	FatalPolicy FatalPolicy
@@ -60,8 +61,12 @@ type RuntimeStats struct {
 // This is the explicit owner of the real raw allocate/reallocate/deallocate
 // paths, not generated memory::initialize/finalize or runtime-wide typed hooks.
 // One confined lane implements the selected TLS/non-TLS source body. Owners
-// and their Budget require caller confinement; process-global wiring stays open.
+// and their Budget require caller confinement. Runtimes that belong to the
+// same source memory process share a ProcessAccounting owner.
 func NewRuntime(c RuntimeConfig) (*Runtime, error) {
+	if c.Process != nil && c.Process.self != c.Process {
+		return nil, arena.ErrConfig
+	}
 	if c.FatalPolicy != nil && (c.Transport != nil || c.FatalPolicy.MemoryBudget() != c.Budget) {
 		return nil, arena.ErrConfig
 	}
@@ -90,6 +95,12 @@ func NewRuntime(c RuntimeConfig) (*Runtime, error) {
 	m := &Runtime{config: c, origin: id, header: n}
 	m.self = m
 	return m, nil
+}
+func (m *Runtime) accountingOwner() *utilMemoryAccounting {
+	if m.config.Process != nil {
+		return &m.config.Process.accounting
+	}
+	return &m.accounting
 }
 func (m *Runtime) open() error {
 	if m == nil || m.self != m {
@@ -133,7 +144,7 @@ func (m *Runtime) transport(r memoryAccountingResult) error {
 	}
 }
 func (m *Runtime) physicalFailure() error {
-	m.accounting.outOfMemory = true
+	m.accountingOwner().outOfMemory = true
 	return m.emitFailure(FailureMemout)
 }
 func (m *Runtime) slot() (uint32, error) {
@@ -210,7 +221,7 @@ func (m *Runtime) Allocate(n uint64) (Block, error) {
 		return Block{}, e
 	}
 	if !m.config.ThreadLocal {
-		if e = m.transport(m.accounting.accountExtentAllocation(&m.lane, extent, m.config.SizeTBits, false)); e != nil {
+		if e = m.transport(m.accountingOwner().accountExtentAllocation(&m.lane, extent, m.config.SizeTBits, false)); e != nil {
 			return Block{}, e
 		}
 	}
@@ -233,7 +244,7 @@ func (m *Runtime) Allocate(n uint64) (Block, error) {
 		return h, e
 	}
 	if m.config.ThreadLocal {
-		e = m.transport(m.accounting.accountExtentAllocation(&m.lane, extent, m.config.SizeTBits, true))
+		e = m.transport(m.accountingOwner().accountExtentAllocation(&m.lane, extent, m.config.SizeTBits, true))
 	}
 	// TLS limit checks follow real allocation/header/counter publication. Return
 	// the owned completed block even with an error; caller must Deallocate it.
@@ -264,7 +275,7 @@ func (m *Runtime) Reallocate(h *Block, n uint64) error {
 	if m.config.SizeTBits == 32 {
 		delta = uint64(uint32(extent) - uint32(old))
 	}
-	if e = m.transport(m.accounting.accountExtentAllocation(&m.lane, delta, m.config.SizeTBits, m.config.ThreadLocal)); e != nil {
+	if e = m.transport(m.accountingOwner().accountExtentAllocation(&m.lane, delta, m.config.SizeTBits, m.config.ThreadLocal)); e != nil {
 		return e
 	}
 	data, init, e := m.storage(extent)
@@ -346,7 +357,7 @@ func (m *Runtime) SetMaxSize(n uint64) error {
 	if m.config.SizeTBits == 32 {
 		n = uint64(uint32(n))
 	}
-	m.accounting.maxSize = int64(n)
+	m.accountingOwner().maxSize = int64(n)
 	return nil
 }
 
@@ -373,7 +384,7 @@ func (m *Runtime) SetMaxCount(n uint64) error {
 	if m.config.SizeTBits == 32 {
 		n = uint64(uint32(n))
 	}
-	m.accounting.maxCount = int64(n)
+	m.accountingOwner().maxCount = int64(n)
 	return nil
 }
 func (m *Runtime) SetWatermark(n uint64) error {
@@ -383,20 +394,20 @@ func (m *Runtime) SetWatermark(n uint64) error {
 	if m.config.SizeTBits == 32 {
 		n = uint64(uint32(n))
 	}
-	m.accounting.watermark = int64(n)
+	m.accountingOwner().watermark = int64(n)
 	return nil
 }
 func (m *Runtime) AboveWatermark() (bool, error) {
 	if e := m.open(); e != nil {
 		return false, e
 	}
-	return m.accounting.aboveWatermark(), nil
+	return m.accountingOwner().aboveWatermark(), nil
 }
 func (m *Runtime) State() RuntimeState {
 	if m == nil || m.self != m || m.closed {
 		return RuntimeState{}
 	}
-	a := &m.accounting
+	a := m.accountingOwner()
 	l := &m.lane
 	return RuntimeState{a.size, l.size, a.count, l.count, a.peak, a.outOfMemory}
 }
@@ -436,19 +447,19 @@ func (m *Runtime) AllocationSize() (uint64, error) {
 	if e := m.open(); e != nil {
 		return 0, e
 	}
-	return m.accounting.allocationSize(), nil
+	return m.accountingOwner().allocationSize(), nil
 }
 func (m *Runtime) MaximumUsed() (uint64, error) {
 	if e := m.open(); e != nil {
 		return 0, e
 	}
-	return m.accounting.maximumUsed(), nil
+	return m.accountingOwner().maximumUsed(), nil
 }
 func (m *Runtime) AllocationCount() (uint64, error) {
 	if e := m.open(); e != nil {
 		return 0, e
 	}
-	return m.accounting.allocationCount(), nil
+	return m.accountingOwner().allocationCount(), nil
 }
 
 // CleanupPartial releases only a physical block whose source SIZE_T header
@@ -481,5 +492,5 @@ func (m *Runtime) ConfiguredMaxAllocationCount() (int64, error) {
 	if e := m.open(); e != nil {
 		return 0, e
 	}
-	return m.accounting.maxCount, nil
+	return m.accountingOwner().maxCount, nil
 }
