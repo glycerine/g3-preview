@@ -90,12 +90,22 @@ func (s *WarningService) Warning(message string) error {
 	} else {
 		w = s.stderr
 	}
-	if _, e := io.WriteString(w, "WARNING: "); e != nil {
+	if e := writeWarningPart(w, "WARNING: "); e != nil {
 		return e
 	}
-	if _, e := io.WriteString(w, message); e != nil {
+	if e := writeWarningPart(w, message); e != nil {
 		return e
 	}
-	_, e := io.WriteString(w, "\n")
-	return e
+	return writeWarningPart(w, "\n")
+}
+
+func writeWarningPart(w io.Writer, part string) error {
+	n, err := io.WriteString(w, part)
+	if err != nil {
+		return err
+	}
+	if n != len(part) {
+		return io.ErrShortWrite
+	}
+	return nil
 }

@@ -2,9 +2,49 @@ package diagnostic
 
 import (
 	"bytes"
+	"errors"
+	"io"
 	"strings"
 	"testing"
 )
+
+type shortWarningWriter struct {
+	buf   bytes.Buffer
+	limit int
+}
+
+func (w *shortWarningWriter) Write(p []byte) (int, error) {
+	available := w.limit - w.buf.Len()
+	if available < len(p) {
+		if available < 0 {
+			available = 0
+		}
+		return w.buf.Write(p[:available])
+	}
+	return w.buf.Write(p)
+}
+
+func TestWarningShortWritePreservesSourceInsertionPrefix(t *testing.T) {
+	const output = "WARNING: xy\n"
+	for limit := 0; limit <= len(output); limit++ {
+		w := &shortWarningWriter{limit: limit}
+		s := NewWarningService(&w.buf)
+		if err := s.SetWarningStream(w); err != nil {
+			t.Fatal(err)
+		}
+		err := s.Warning("xy")
+		if got := w.buf.String(); got != output[:limit] {
+			t.Fatalf("limit %d: prefix %q", limit, got)
+		}
+		if limit == len(output) {
+			if err != nil {
+				t.Fatalf("complete output: %v", err)
+			}
+		} else if !errors.Is(err, io.ErrShortWrite) {
+			t.Fatalf("limit %d: got %v, want short write", limit, err)
+		}
+	}
+}
 
 func TestWarningSourceDefaultRoutingAndDisabledState(t *testing.T) {
 	var stderr bytes.Buffer
