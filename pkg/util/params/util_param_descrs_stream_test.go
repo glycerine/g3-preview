@@ -45,19 +45,29 @@ func TestParamDescrsDisplayIntoNullDescriptionActualAction(t *testing.T) {
 		b := pdStreamBuffer(t, nil)
 		b.WriteString("p")
 		e := d.DisplayInto(b, 2, false, descr)
+		gotDisplay, displayErr := d.Display(2, false, descr)
 		want := "p  a_key (unsigned int)\n"
 		if paramDescrsStreamSourceDebug {
 			want = "p  a_key"
 			if !errors.Is(e, ErrParamDescrsPrecondition) {
 				t.Fatal("source assertion position", e)
 			}
+			if displayErr != ErrParamDescrsPrecondition {
+				t.Fatal("checked display assertion", displayErr)
+			}
 		} else if descr {
 			want = "p  a_key (unsigned int) "
 			if !errors.Is(e, utext.ErrNullCString) {
 				t.Fatal("source null CString failure", e)
 			}
+			if !errors.Is(displayErr, utext.ErrNullCString) || gotDisplay != want[1:] {
+				t.Fatal("release display null CString prefix", gotDisplay, displayErr)
+			}
 		} else {
 			paramsMust(t, e)
+			if displayErr != nil || gotDisplay != want[1:] {
+				t.Fatal("release omitted description", gotDisplay, displayErr)
+			}
 		}
 		if got := pdStreamText(t, b); got != want {
 			t.Fatal(descr, got, want)

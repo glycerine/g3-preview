@@ -645,7 +645,7 @@ func (d *ParamDescrs) Display(indent uint32, smt2, includeDescr bool) (string, e
 		if !found {
 			return "", ErrParamDescrsPrecondition
 		}
-		if !info.descr.present {
+		if paramDescrsStreamSourceDebug && !info.descr.present {
 			return "", ErrParamDescrsPrecondition
 		}
 	}
@@ -675,6 +675,9 @@ func (d *ParamDescrs) Display(indent uint32, smt2, includeDescr bool) (string, e
 		out.WriteByte(')')
 		if includeDescr {
 			out.WriteByte(' ')
+			if !info.descr.present {
+				return out.String(), utext.ErrNullCString
+			}
 			if e = d.writeText(&out, info.descr); e != nil {
 				return "", e
 			}

@@ -311,8 +311,12 @@ func TestParamDescrsOwnershipNullableMetadataAndGuards(t *testing.T) {
 		t.Fatal(e)
 	}
 	pdinsert(t, d, "undescribed", ParamUInt, nil, nil, nil)
-	if _, e := d.Display(0, false, false); e != ErrParamDescrsPrecondition {
-		t.Fatal(e)
+	if got, e := d.Display(0, false, false); paramDescrsStreamSourceDebug {
+		if e != ErrParamDescrsPrecondition {
+			t.Fatal("checked description assertion", e)
+		}
+	} else if e != nil || got != "mixed_name (unknown) (default: )\nundescribed (unsigned int)\n" {
+		t.Fatal("release display without requested description", got, e)
 	}
 	b := arena.NewBudget(^uint64(0))
 	owned := pdnew(t, m, b)
