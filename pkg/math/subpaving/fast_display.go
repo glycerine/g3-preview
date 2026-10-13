@@ -215,3 +215,74 @@ func (c *FastContext) DisplayConstraints(w io.Writer, useStar bool) error {
 	}
 	return nil
 }
+
+func (c *FastContext) displayNodeBounds(w io.Writer, n *FastNode) error {
+	for variable := range c.isInt {
+		lower, upper := n.lower[variable], n.upper[variable]
+		if lower != nil {
+			if err := c.displayBound(w, lower); err != nil {
+				return err
+			}
+			if err := fastWrite(w, " "); err != nil {
+				return err
+			}
+		}
+		if upper != nil {
+			if err := c.displayBound(w, upper); err != nil {
+				return err
+			}
+		}
+		if lower != nil || upper != nil {
+			if err := fastWrite(w, "\n"); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// DisplayBounds visits consistent leaves in source creation order. Children
+// remain caller-owned; closed children are omitted from the current tree.
+func (c *FastContext) DisplayBounds(w io.Writer) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if w == nil {
+		return arena.ErrInvalidSlot
+	}
+	if err := c.root.open(); err != nil {
+		return err
+	}
+	children := make(map[*FastNode][]*FastNode, len(c.nodes))
+	for _, n := range c.nodes {
+		if !n.closed && n.parent != nil {
+			children[n.parent] = append(children[n.parent], n)
+		}
+	}
+	todo := []*FastNode{c.root}
+	first := true
+	for len(todo) != 0 {
+		last := len(todo) - 1
+		n := todo[last]
+		todo = todo[:last]
+		if descendants := children[n]; len(descendants) != 0 {
+			for i := len(descendants) - 1; i >= 0; i-- {
+				todo = append(todo, descendants[i])
+			}
+			continue
+		}
+		if n.inconsistent {
+			continue
+		}
+		if !first {
+			if err := fastWrite(w, "=========\n"); err != nil {
+				return err
+			}
+		}
+		first = false
+		if err := c.displayNodeBounds(w, n); err != nil {
+			return err
+		}
+	}
+	return nil
+}

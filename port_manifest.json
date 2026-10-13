@@ -50261,7 +50261,8 @@
         "pkg/math/subpaving/fast_context_params.go",
         "pkg/math/subpaving/tactic/fast_engine.go",
         "pkg/math/subpaving/tactic/fast_engine_test.go",
-        "pkg/math/subpaving/fast_shell_coefficients_test.go"
+        "pkg/math/subpaving/fast_shell_coefficients_test.go",
+        "pkg/math/subpaving/fast_display_bounds_test.go"
       ],
       "tests": [
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
@@ -50277,7 +50278,8 @@
         "TestSubpavingTacticOptionSelectionAndDescriptions",
         "TestFastShellExactCoefficientsAndDirectedInequalities",
         "TestFastContextNamedParamsSinglePassAndStoppedPrefix",
-        "TestFastEngineSelectedOwnerAndPartialCleanup"
+        "TestFastEngineSelectedOwnerAndPartialCleanup",
+        "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -50414,6 +50416,14 @@
           "tests": [
             "TestFastShellExactCoefficientsAndDirectedInequalities"
           ]
+        },
+        {
+          "name": "Concrete context_mpff_wrapper display_bounds forwarding (src/math/subpaving/subpaving.cpp:56)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_shell_coefficients.go",
+          "tests": [
+            "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
+          ]
         }
       ],
       "ownership": [],
@@ -50421,7 +50431,8 @@
         "The MPF wrapper prepares exact integer coefficients in source order using a native typed slice, registers context_mpf variables and copies directed rational inequality bounds into context ownership. Construction derives the exact borrowed core from f2n<mpf_manager>::m() and copied Go owner values cannot release the same numerals twice. The enclosing context_mpf search graph and complete tactic lifetime remain open.",
         "The concrete MPFF wrapper now converts integer coefficients in source order with an exact mpz round trip, chooses directed rational bound rounding, and forwards typed variables, sums, monomials and clauses. Context parameter construction, search/display, and tactic lifetime remain open.",
         "The selected MPFF shell now owns the context created from source-order named parameters and retires wrapper members before context. Search/leaf-bound display forwarding and full tactic lifetime remain open.",
-        "The MPFF shell now forwards constraint display and a borrowed variable printer. Leaf-bound display and search remain open."
+        "The MPFF shell now forwards constraint display and a borrowed variable printer. Search remains open.",
+        "The MPFF shell now forwards consistent leaf-bound display; search and the full tactic lifetime remain open."
       ]
     },
     {
@@ -51215,7 +51226,8 @@
         "pkg/math/subpaving/fast_context_params.go",
         "pkg/math/subpaving/fast_context_params_test.go",
         "pkg/math/subpaving/fast_display.go",
-        "pkg/math/subpaving/fast_shell_coefficients_test.go"
+        "pkg/math/subpaving/fast_shell_coefficients_test.go",
+        "pkg/math/subpaving/fast_display_bounds_test.go"
       ],
       "tests": [
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
@@ -51309,7 +51321,8 @@
         "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder",
         "TestHardwareShellParamDescriptionsSourceOrder",
         "TestFastContextNamedParamsSinglePassAndStoppedPrefix",
-        "TestFastShellExactCoefficientsAndDirectedInequalities"
+        "TestFastShellExactCoefficientsAndDirectedInequalities",
+        "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
       ],
       "conditionals": [
         {
@@ -51837,6 +51850,14 @@
           "tests": [
             "TestFastShellExactCoefficientsAndDirectedInequalities"
           ]
+        },
+        {
+          "name": "Concrete config_mpff consistent leaf-bound display with child creation order and writer prefix (src/math/subpaving/subpaving_t.h)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_display.go",
+          "tests": [
+            "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -51847,7 +51868,8 @@
       "deviations": [
         "The config_mpff tactic variable registration now grows source-order type/watch slots and the Go root bound arrays before initialization. The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open.",
         "The config_mpff six named parameter updates now retain source order, defaults, partial numeric mutation and a closable refused owner. The Go context allocates its root before this pass; complete constructor allocation order, node search/splitting and full solver lifecycle remain open.",
-        "The config_mpff context now displays definitions, units and clauses through the source MPFF to_rational_string spelling, which delegates to the ordinary String formatter. Borrowed variable display and shell forwarding are concrete; leaf-bound display and search remain open."
+        "The config_mpff context now displays definitions, units and clauses through the source MPFF to_rational_string spelling, which delegates to the ordinary String formatter. Borrowed variable display and shell forwarding are concrete; search remains open.",
+        "The config_mpff context now records child creation order, displays consistent leaves with inherited bounds and exact MPFF numeral text, and omits conflicting leaves. Search, splitting and statistics remain open."
       ]
     },
     {
@@ -51967,7 +51989,8 @@
         "pkg/math/subpaving/fast_context_params.go",
         "pkg/math/subpaving/fast_context_params_test.go",
         "pkg/math/subpaving/fast_display.go",
-        "pkg/math/subpaving/fast_shell_coefficients_test.go"
+        "pkg/math/subpaving/fast_shell_coefficients_test.go",
+        "pkg/math/subpaving/fast_display_bounds_test.go"
       ],
       "tests": [
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
@@ -52063,7 +52086,8 @@
         "TestHardwareShellParamDescriptionsSourceOrder",
         "TestSubpavingTacticOptionSelectionAndDescriptions",
         "TestFastContextNamedParamsSinglePassAndStoppedPrefix",
-        "TestFastShellExactCoefficientsAndDirectedInequalities"
+        "TestFastShellExactCoefficientsAndDirectedInequalities",
+        "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
       ],
       "assertions": [
         {
@@ -53014,6 +53038,14 @@
           "tests": [
             "TestFastShellExactCoefficientsAndDirectedInequalities"
           ]
+        },
+        {
+          "name": "Concrete config_mpff consistent leaf-bound display with child creation order and writer prefix (src/math/subpaving/subpaving_t_def.h)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_display.go",
+          "tests": [
+            "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -53024,7 +53056,8 @@
       "deviations": [
         "The config_mpff tactic variable registration now grows source-order type/watch slots and the Go root bound arrays before initialization. The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open.",
         "The config_mpff six named parameter updates now retain source order, defaults, partial numeric mutation and a closable refused owner. The Go context allocates its root before this pass; complete constructor allocation order, node search/splitting and full solver lifecycle remain open.",
-        "The config_mpff context now displays definitions, units and clauses through the source MPFF to_rational_string spelling, which delegates to the ordinary String formatter. Borrowed variable display and shell forwarding are concrete; leaf-bound display and search remain open."
+        "The config_mpff context now displays definitions, units and clauses through the source MPFF to_rational_string spelling, which delegates to the ordinary String formatter. Borrowed variable display and shell forwarding are concrete; search remains open.",
+        "The config_mpff context now records child creation order, displays consistent leaves with inherited bounds and exact MPFF numeral text, and omits conflicting leaves. Search, splitting and statistics remain open."
       ]
     },
     {

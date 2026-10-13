@@ -189,6 +189,13 @@ func (w *FastShellCoefficients) DisplayConstraints(out io.Writer, useStar bool) 
 	return w.context.DisplayConstraints(out, useStar)
 }
 
+func (w *FastShellCoefficients) DisplayBounds(out io.Writer) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.DisplayBounds(out)
+}
+
 // Close unwinds the source members in reverse order. A refused release keeps
 // its member for a later retry; an owned context closes after wrapper members.
 func (w *FastShellCoefficients) Close() error {

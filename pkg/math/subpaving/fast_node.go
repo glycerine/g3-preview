@@ -154,6 +154,17 @@ func (n *FastNode) Close() (err error) {
 	n.closed = true
 	if n.parent != nil {
 		n.parent.children--
+		if n.context != nil {
+			for i, child := range n.context.nodes {
+				if child == n {
+					copy(n.context.nodes[i:], n.context.nodes[i+1:])
+					last := len(n.context.nodes) - 1
+					n.context.nodes[last] = nil
+					n.context.nodes = n.context.nodes[:last]
+					break
+				}
+			}
+		}
 	}
 	return nil
 }

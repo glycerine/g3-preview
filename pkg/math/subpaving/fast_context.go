@@ -22,6 +22,7 @@ type FastContext struct {
 	limit            *control.Reslimit
 	isInt            []bool
 	root             *FastNode
+	nodes            []*FastNode
 	owned            [4]*numeral.ScopedFastFloat
 	epsilon          *numeral.FastFloat
 	maxBound         *numeral.FastFloat
@@ -110,6 +111,7 @@ func newFastContextOwner(m *numeral.FastFloatManager, limit *control.Reslimit, i
 		return nil, err
 	}
 	c.root.context = c
+	c.nodes = []*FastNode{c.root}
 	return c, nil
 }
 
@@ -206,7 +208,12 @@ func (c *FastContext) NewChild(parent *FastNode) (*FastNode, error) {
 	if parent == nil || parent.context != c {
 		return nil, arena.ErrInvalidSlot
 	}
-	return NewFastNode(c.numbers, uint32(len(c.isInt)), parent)
+	child, err := NewFastNode(c.numbers, uint32(len(c.isInt)), parent)
+	if err != nil {
+		return nil, err
+	}
+	c.nodes = append(c.nodes, child)
+	return child, nil
 }
 
 func (c *FastContext) XnEqY(out, src *FastInterval, degree uint32) error {
@@ -260,6 +267,8 @@ func (c *FastContext) Close() error {
 	}
 	c.queue = nil
 	c.queueHead = 0
+	c.nodes = nil
+	c.displayVariable = nil
 	c.closed = true
 	return nil
 }
