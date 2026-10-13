@@ -34810,7 +34810,8 @@
         "pkg/math/subpaving/fast_interval_root.go",
         "pkg/math/subpaving/fast_interval_root_test.go",
         "pkg/math/subpaving/arbitrary_interval.go",
-        "pkg/math/subpaving/arbitrary_interval_arith.go"
+        "pkg/math/subpaving/arbitrary_interval_arith.go",
+        "pkg/math/subpaving/arbitrary_interval_mul.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34833,7 +34834,8 @@
         "TestFastRootRetainedNewtonCertifiedBoundsAndCancellation",
         "TestSubpavingFastIntervalXnEqYRetainedCases",
         "TestSubpavingMPFMutableIntervalRetainedCore",
-        "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
+        "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
+        "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
       ],
       "conditionals": [
         {
@@ -35448,6 +35450,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval_arith.go",
           "tests": [
             "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf interval multiplication: nine sign classes, mixed extrema, infinity bounds, directed products and destination alias (src/math/interval/interval_def.h:1017-1218)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_mul.go",
+          "tests": [
+            "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
           ]
         }
       ],
@@ -50168,11 +50178,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/subpaving/arbitrary_interval.go",
-        "pkg/math/subpaving/arbitrary_interval_arith.go"
+        "pkg/math/subpaving/arbitrary_interval_arith.go",
+        "pkg/math/subpaving/arbitrary_interval_mul.go"
       ],
       "tests": [
         "TestSubpavingMPFMutableIntervalRetainedCore",
-        "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
+        "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
+        "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
       ],
       "conditionals": [
         {
@@ -50201,6 +50213,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval_arith.go",
           "tests": [
             "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf interval multiplication: nine sign classes, mixed extrema, infinity bounds, directed products and destination alias (src/math/interval/interval_def.h:1017-1218)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_mul.go",
+          "tests": [
+            "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
           ]
         }
       ],
@@ -50602,7 +50622,8 @@
         "pkg/math/subpaving/fast_context_init.go",
         "pkg/math/subpaving/fast_context_init_test.go",
         "pkg/math/subpaving/arbitrary_interval.go",
-        "pkg/math/subpaving/arbitrary_interval_arith.go"
+        "pkg/math/subpaving/arbitrary_interval_arith.go",
+        "pkg/math/subpaving/arbitrary_interval_mul.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50656,7 +50677,8 @@
         "TestSubpavingFastContextRootInitializationOrderAndResume",
         "TestSubpavingFastContextRootInitializationUnitConflict",
         "TestSubpavingMPFMutableIntervalRetainedCore",
-        "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
+        "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
+        "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
       ],
       "conditionals": [
         {
@@ -50893,6 +50915,14 @@
           "tests": [
             "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
           ]
+        },
+        {
+          "name": "Concrete config_mpf interval multiplication: nine sign classes, mixed extrema, infinity bounds, directed products and destination alias (src/math/interval/interval_def.h:1017-1218)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_mul.go",
+          "tests": [
+            "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
+          ]
         }
       ],
       "ownership": [
@@ -50950,7 +50980,8 @@
         "pkg/math/subpaving/fast_context_init.go",
         "pkg/math/subpaving/fast_context_init_test.go",
         "pkg/math/subpaving/arbitrary_interval.go",
-        "pkg/math/subpaving/arbitrary_interval_arith.go"
+        "pkg/math/subpaving/arbitrary_interval_arith.go",
+        "pkg/math/subpaving/arbitrary_interval_mul.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50994,7 +51025,8 @@
         "TestSubpavingFastContextRootInitializationOrderAndResume",
         "TestSubpavingFastContextRootInitializationUnitConflict",
         "TestSubpavingMPFMutableIntervalRetainedCore",
-        "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
+        "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
+        "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
       ],
       "assertions": [
         {
@@ -51464,6 +51496,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval_arith.go",
           "tests": [
             "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf interval multiplication: nine sign classes, mixed extrema, infinity bounds, directed products and destination alias (src/math/interval/interval_def.h:1017-1218)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_mul.go",
+          "tests": [
+            "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
           ]
         }
       ],

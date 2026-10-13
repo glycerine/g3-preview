@@ -39622,7 +39622,13 @@ scratch so destination aliases remain valid. Focused cases cover finite,
 unbounded and half-infinite bounds, open endpoints, aliased operands and
 separate lower/upper rounding on 1+1/3. Native and checked/debug tests run
 on CPUs 8–16. Multiplication, division, powers, root enclosure, node views
-and the enclosing context remain open.
+and the enclosing context remained open at that checkpoint. MPF interval
+multiplication now covers all nine source sign classes through the concrete
+extended endpoints, with mixed extrema tie selection, directed products,
+aliased destinations and one-sided infinity. Focused native/checked cases on
+CPUs 8–16 cover those branches and 1/3 products with distinct lower/upper
+bounds. Division, powers, root enclosure, node views and the enclosing
+context remain open.
 
 ### Environment parameter runtime boundary
 
