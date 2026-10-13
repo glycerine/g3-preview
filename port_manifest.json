@@ -168055,6 +168055,8 @@
         "TestSexprConcreteRefAndVectorActions",
         "TestSexprRefVectorSetKeepsSourcePointerAndIncomingOnStoppedDeletion",
         "TestSexprRefVectorShrinkKeepsRawPrefixAfterStoppedDeletion",
+        "TestSexprRefVectorStoppedRangeAndDetachedRelease",
+        "TestSexprRefVectorMoveAndSwapCarryStoppedSetReceipt",
         "TestSexprConstructorAndWholePhysicalGraph",
         "TestSexprFactoryRecordBeforeValueCopy",
         "TestSexprFailurePrefixesImmediateOwnership",
@@ -168169,7 +168171,7 @@
           "tests": []
         },
         {
-          "name": "actual sexpr concrete reference-vector methods, element and iterator adaptations; stopped-decrement set and shrink ownership now retains source raw pointers and owning cleanup receipts; other callback stops remain open",
+          "name": "actual sexpr concrete reference-vector methods, element and iterator adaptations; stopped-decrement set, range and detached-entry ownership retain source raw pointers and owning cleanup receipts; other retained specialization behavior remains open",
           "status": "partial",
           "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
@@ -168179,6 +168181,8 @@
             "TestSexprConcreteRefAndVectorActions",
             "TestSexprRefVectorSetKeepsSourcePointerAndIncomingOnStoppedDeletion",
             "TestSexprRefVectorShrinkKeepsRawPrefixAfterStoppedDeletion",
+            "TestSexprRefVectorStoppedRangeAndDetachedRelease",
+            "TestSexprRefVectorMoveAndSwapCarryStoppedSetReceipt",
             "TestSexprHandlesAndBoundedDAG",
             "TestSexprStringBytesAndWrapperRemainingBranches",
             "TestSexprFailurePrefixesImmediateOwnership",

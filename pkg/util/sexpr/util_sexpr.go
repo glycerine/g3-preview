@@ -1263,12 +1263,6 @@ func (v *SexprRefVector) inc(h SexprHandle) error {
 	}
 	return v.manager.inc(h)
 }
-func (v *SexprRefVector) dec(h SexprHandle) error {
-	if h.IsNull() {
-		return nil
-	}
-	return v.manager.dec(h)
-}
 func (v *SexprRefVector) decConsumed(h SexprHandle) (bool, error) {
 	if h.IsNull() {
 		return true, nil
