@@ -115215,6 +115215,18 @@
             "TestCmdExceptionSourceSymbolCompositionAndBorrowedLifetime",
             "TestCmdExceptionIndependentByteDomainsAndOwnerAccounting"
           ]
+        },
+        {
+          "name": "cmd base: name, source location, reset/finalize, metadata, prepare, execute and failure_cleanup lifecycle",
+          "status": "unported"
+        },
+        {
+          "name": "cmd base: next_arg_kind and typed set_next_arg overloads for all retained parser argument kinds",
+          "status": "unported"
+        },
+        {
+          "name": "sorted_var pair and VAR_ARITY command parser contract",
+          "status": "unported"
         }
       ],
       "ownership": [
@@ -115222,7 +115234,7 @@
         "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See PORT_PROGRESS.md#audit-z3-exception-port-status-md."
       ],
       "deviations": [
-        "Go cold error interfaces replace virtual throw transport; source nonzero/location assertions use classified guard errors. Generic printf constructor/platform domains remain explicitly open."
+        "Go cold error interfaces replace virtual throw transport; source location assertions use classified guard errors. The retained cmd command interface, typed parser argument routes, sorted_var and VAR_ARITY remain unported with the command-context consumers. Generic printf construction belongs to src/util/z3_exception.h/.cpp, not this header."
       ]
     },
     {
