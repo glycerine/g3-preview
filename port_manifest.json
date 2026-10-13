@@ -34818,7 +34818,9 @@
         "pkg/math/interval/arbitrary_root.go",
         "pkg/math/subpaving/arbitrary_interval_root.go",
         "pkg/math/subpaving/hardware_interval.go",
-        "pkg/math/subpaving/hardware_interval_arith.go"
+        "pkg/math/subpaving/hardware_interval_arith.go",
+        "pkg/math/subpaving/hardware_interval_scalar.go",
+        "pkg/math/subpaving/hardware_interval_power.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34848,7 +34850,9 @@
         "TestSubpavingMPFIntervalPowerRetainedCases",
         "TestArbitraryRootRetainedNewtonCertifiedBoundsAndCancellation",
         "TestSubpavingMPFIntervalXnEqYRetainedCases",
-        "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic"
+        "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
+        "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
+        "TestSubpavingHardwareIntervalPowerRetainedBranches"
       ],
       "conditionals": [
         {
@@ -35527,6 +35531,22 @@
           "go_target": "pkg/math/subpaving/hardware_interval_arith.go",
           "tests": [
             "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval scalar multiply/divide: zero reset, sign reversal, directed reciprocal and destination alias (src/math/interval/interval_def.h:839-925)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_scalar.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval powers: positive/negative even, crossing-zero tie, odd monotonic, infinity and in-place output (src/math/interval/interval_def.h:1271-1378)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_power.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalPowerRetainedBranches"
           ]
         }
       ],
@@ -50212,10 +50232,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/subpaving/hardware_interval.go",
-        "pkg/math/subpaving/hardware_interval_arith.go"
+        "pkg/math/subpaving/hardware_interval_arith.go",
+        "pkg/math/subpaving/hardware_interval_scalar.go",
+        "pkg/math/subpaving/hardware_interval_power.go"
       ],
       "tests": [
-        "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic"
+        "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
+        "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
+        "TestSubpavingHardwareIntervalPowerRetainedBranches"
       ],
       "conditionals": [
         {
@@ -50244,6 +50268,22 @@
           "go_target": "pkg/math/subpaving/hardware_interval_arith.go",
           "tests": [
             "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval scalar multiply/divide: zero reset, sign reversal, directed reciprocal and destination alias (src/math/interval/interval_def.h:839-925)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_scalar.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval powers: positive/negative even, crossing-zero tie, odd monotonic, infinity and in-place output (src/math/interval/interval_def.h:1271-1378)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_power.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalPowerRetainedBranches"
           ]
         }
       ],
@@ -50760,7 +50800,9 @@
         "pkg/math/subpaving/arbitrary_interval_scalar.go",
         "pkg/math/subpaving/arbitrary_interval_power.go",
         "pkg/math/subpaving/hardware_interval.go",
-        "pkg/math/subpaving/hardware_interval_arith.go"
+        "pkg/math/subpaving/hardware_interval_arith.go",
+        "pkg/math/subpaving/hardware_interval_scalar.go",
+        "pkg/math/subpaving/hardware_interval_power.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50819,7 +50861,9 @@
         "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero",
         "TestSubpavingMPFIntervalScalarMulDiv",
         "TestSubpavingMPFIntervalPowerRetainedCases",
-        "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic"
+        "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
+        "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
+        "TestSubpavingHardwareIntervalPowerRetainedBranches"
       ],
       "conditionals": [
         {
@@ -51104,6 +51148,22 @@
           "tests": [
             "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic"
           ]
+        },
+        {
+          "name": "Concrete config_hwf interval scalar multiply/divide: zero reset, sign reversal, directed reciprocal and destination alias (src/math/interval/interval_def.h:839-925)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_scalar.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval powers: positive/negative even, crossing-zero tie, odd monotonic, infinity and in-place output (src/math/interval/interval_def.h:1271-1378)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_power.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalPowerRetainedBranches"
+          ]
         }
       ],
       "ownership": [
@@ -51168,7 +51228,9 @@
         "pkg/math/subpaving/arbitrary_interval_power.go",
         "pkg/math/subpaving/arbitrary_context_root.go",
         "pkg/math/subpaving/hardware_interval.go",
-        "pkg/math/subpaving/hardware_interval_arith.go"
+        "pkg/math/subpaving/hardware_interval_arith.go",
+        "pkg/math/subpaving/hardware_interval_scalar.go",
+        "pkg/math/subpaving/hardware_interval_power.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51218,7 +51280,9 @@
         "TestSubpavingMPFIntervalScalarMulDiv",
         "TestSubpavingMPFIntervalPowerRetainedCases",
         "TestSubpavingMPFIntervalXnEqYRetainedCases",
-        "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic"
+        "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
+        "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
+        "TestSubpavingHardwareIntervalPowerRetainedBranches"
       ],
       "assertions": [
         {
@@ -51744,6 +51808,22 @@
           "go_target": "pkg/math/subpaving/hardware_interval_arith.go",
           "tests": [
             "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval scalar multiply/divide: zero reset, sign reversal, directed reciprocal and destination alias (src/math/interval/interval_def.h:839-925)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_scalar.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval powers: positive/negative even, crossing-zero tie, odd monotonic, infinity and in-place output (src/math/interval/interval_def.h:1271-1378)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_power.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalPowerRetainedBranches"
           ]
         }
       ],
@@ -117252,7 +117332,9 @@
         "pkg/math/interval/arbitrary_extended.go",
         "pkg/math/interval/hardware_extended.go",
         "pkg/math/subpaving/hardware_interval.go",
-        "pkg/math/subpaving/hardware_interval_arith.go"
+        "pkg/math/subpaving/hardware_interval_arith.go",
+        "pkg/math/subpaving/hardware_interval_scalar.go",
+        "pkg/math/subpaving/hardware_interval_power.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",
@@ -117264,7 +117346,9 @@
         "TestExtendedInfinityDisplaysShortWrites",
         "TestSubpavingMPFExtendedFiniteAndInfiniteBranches",
         "TestSubpavingHardwareExtendedRetainedBranches",
-        "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic"
+        "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
+        "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
+        "TestSubpavingHardwareIntervalPowerRetainedBranches"
       ],
       "conditionals": [
         {
@@ -117472,6 +117556,18 @@
           "go_targets": [
             "pkg/math/subpaving/hardware_interval.go"
           ]
+        },
+        {
+          "name": "Concrete hwf extended-number multiplication and power consumed by hardware scalar and crossing-zero interval branches (src/util/ext_numeral.h:145-198)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_scalar.go",
+          "go_targets": [
+            "pkg/math/subpaving/hardware_interval_power.go"
+          ],
+          "tests": [
+            "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
+            "TestSubpavingHardwareIntervalPowerRetainedBranches"
+          ]
         }
       ],
       "ownership": [
@@ -117498,7 +117594,9 @@
         "pkg/util/numeral/mpf_numeral_arithmetic.go",
         "pkg/util/numeral/mpf_numeral_rational_string.go",
         "pkg/util/numeral/mpf_numeral_lifetime.go",
-        "pkg/math/subpaving/arbitrary_context_root.go"
+        "pkg/math/subpaving/arbitrary_context_root.go",
+        "pkg/math/subpaving/hardware_interval_scalar.go",
+        "pkg/math/subpaving/hardware_interval_power.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -117517,7 +117615,9 @@
         "TestArbitraryFloatNumeralSourceRationalString",
         "TestArbitraryFloatNumeralSourceStringAndDisplay",
         "TestArbitraryFloatNumeralSourceSwapAndDel",
-        "TestSubpavingMPFIntervalXnEqYRetainedCases"
+        "TestSubpavingMPFIntervalXnEqYRetainedCases",
+        "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
+        "TestSubpavingHardwareIntervalPowerRetainedBranches"
       ],
       "conditionals": [
         {
@@ -117667,6 +117767,18 @@
           "go_target": "pkg/math/subpaving/arbitrary_context_root.go",
           "tests": [
             "TestSubpavingMPFIntervalXnEqYRetainedCases"
+          ]
+        },
+        {
+          "name": "Concrete f2n<hwf_manager> directed reciprocal/multiply and power consumed by hardware scalar and interval-power branches (src/util/f2n.h:70-156)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_scalar.go",
+          "go_targets": [
+            "pkg/math/subpaving/hardware_interval_power.go"
+          ],
+          "tests": [
+            "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
+            "TestSubpavingHardwareIntervalPowerRetainedBranches"
           ]
         }
       ],
