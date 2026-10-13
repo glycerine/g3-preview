@@ -14,8 +14,8 @@ func TestArbitraryFloatNumeralSourceSwapAndDel(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if m.Precise() {
-		t.Fatal("f2n interval trait")
+	if m.Precise() || !m.Field() {
+		t.Fatal("f2n interval traits")
 	}
 	var x, y ArbitraryFloat
 	if err := m.SetDouble(&x, math.Ldexp(1, 100)); err != nil {

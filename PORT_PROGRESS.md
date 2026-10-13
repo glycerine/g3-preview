@@ -39604,6 +39604,14 @@ Those concrete MPF routes now pass focused tests, including a large-cell swap
 and source `sbits+exponent-1` lookup. The interval/subpaving integration audit
 still remains, so `f2n.h` is partial.
 
+Retained MPF interval endpoint increment: concrete `ArbitraryExtended` now
+forwards finite sign/order, directed arithmetic, reciprocal, power and source
+spelled finite/infinite display through `f2n<mpf_manager>`. Focused native and
+checked/debug cases cover finite and infinity branches, output reset and
+domain refusals on CPUs 8–16. This advances `src/util/ext_numeral.h` and
+`f2n.h` consumer evidence; the mutable MPF interval and enclosing subpaving
+context remain unported.
+
 ### Environment parameter runtime boundary
 
 `src/util/env_params.h/.cpp` has exactly two static operations. The five

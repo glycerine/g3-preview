@@ -4,6 +4,9 @@ package numeral
 // The interval engine branches on this static f2n trait.
 func (*ArbitraryFloatNumeralManager) Precise() bool { return false }
 
+// ext_numeral's inverse assertion uses this static field trait.
+func (*ArbitraryFloatNumeralManager) Field() bool { return true }
+
 // Del releases a caller-owned numeral while the wrapper's borrowed manager
 // remains live.
 func (m *ArbitraryFloatNumeralManager) Del(x *ArbitraryFloat) error {

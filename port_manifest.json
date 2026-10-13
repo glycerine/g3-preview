@@ -116883,7 +116883,8 @@
         "pkg/math/interval/fast_extended.go",
         "pkg/math/interval/fast_extended_test.go",
         "pkg/math/interval/extended_write.go",
-        "pkg/math/interval/extended_write_test.go"
+        "pkg/math/interval/extended_write_test.go",
+        "pkg/math/interval/arbitrary_extended.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",
@@ -116892,7 +116893,8 @@
         "TestRealClosureBinaryIntervalRetainedCore",
         "TestSubpavingFixedExtendedRetainedBranches",
         "TestSubpavingFastFloatExtendedRetainedBranches",
-        "TestExtendedInfinityDisplaysShortWrites"
+        "TestExtendedInfinityDisplaysShortWrites",
+        "TestSubpavingMPFExtendedFiniteAndInfiniteBranches"
       ],
       "conditionals": [
         {
@@ -117079,8 +117081,12 @@
           "status": "unported"
         },
         {
-          "name": "Subpaving context_mpf interval extended-number operations through concrete f2n<mpf_manager>",
-          "status": "unported"
+          "name": "Subpaving context_mpf finite/infinite extended-number operations through concrete f2n<mpf_manager>; enclosing mutable interval remains open",
+          "status": "partial",
+          "go_target": "pkg/math/interval/arbitrary_extended.go",
+          "tests": [
+            "TestSubpavingMPFExtendedFiniteAndInfiniteBranches"
+          ]
         },
         {
           "name": "Subpaving context_hwf interval extended-number operations through concrete f2n<hwf_manager>",
@@ -117093,7 +117099,7 @@
       "deviations": [
         "No generic manager-interface translation is retained. Concrete mpq, mpbq, mpfx and mpff specializations live beside their interval and subpaving consumers. src/test/ext_numeral.cpp is test-only.",
         "The interval_manager mpq and real-closure mpbq specializations have concrete live sign, order, arithmetic, reciprocal, power and display paths, with caller-owned outputs and borrowed numerals. The mpbq division and reciprocal paths preserve the real-closure precision and rounding direction. Other retained subpaving mpq/mpfx/mpf/mpff/hwf instantiations remain open.",
-        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner. The mpff helper serves mutable and constant-node fast-float interval views; the enclosing subpaving context is partial. Concrete mpq/mpbq/mpfx/mpff displays now report Go io.Writer short writes after the exact emitted prefix. Source subpaving.cpp constructs context_mpq, context_mpf and context_hwf as additional live interval-manager instantiations; their concrete extended-number paths remain unported."
+        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner. The mpff helper serves mutable and constant-node fast-float interval views; the enclosing subpaving context is partial. Concrete mpq/mpbq/mpfx/mpff displays now report Go io.Writer short writes after the exact emitted prefix. Source subpaving.cpp constructs context_mpq, context_mpf and context_hwf as additional live interval-manager instantiations; the concrete MPF extended-number path is now partial; mpq/hwf paths remain unported."
       ]
     },
     {
