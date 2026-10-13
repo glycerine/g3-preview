@@ -39628,7 +39628,13 @@ extended endpoints, with mixed extrema tie selection, directed products,
 aliased destinations and one-sided infinity. Focused native/checked cases on
 CPUs 8–16 cover those branches and 1/3 products with distinct lower/upper
 bounds. Division, powers, root enclosure, node views and the enclosing
-context remain open.
+context remained open at that checkpoint. MPF interval division now follows
+the six source numerator/denominator sign branches, including open-zero and
+infinite denominator endpoints, early zero numerator, destination alias with
+the denominator and the prohibited numerator alias. Focused native and
+checked/debug tests on CPUs 8–16 verify these cases and distinct directed
+1/3 bounds. Powers, root enclosure, node views and the enclosing context
+remain open.
 
 ### Environment parameter runtime boundary
 

@@ -34811,7 +34811,8 @@
         "pkg/math/subpaving/fast_interval_root_test.go",
         "pkg/math/subpaving/arbitrary_interval.go",
         "pkg/math/subpaving/arbitrary_interval_arith.go",
-        "pkg/math/subpaving/arbitrary_interval_mul.go"
+        "pkg/math/subpaving/arbitrary_interval_mul.go",
+        "pkg/math/subpaving/arbitrary_interval_div.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34835,7 +34836,8 @@
         "TestSubpavingFastIntervalXnEqYRetainedCases",
         "TestSubpavingMPFMutableIntervalRetainedCore",
         "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
-        "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
+        "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds",
+        "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
       ],
       "conditionals": [
         {
@@ -35458,6 +35460,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval_mul.go",
           "tests": [
             "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf interval division: six sign branches, open-zero/infinite denominator bounds, directed results, zero numerator and denominator alias (src/math/interval/interval_def.h:1672-1849)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_div.go",
+          "tests": [
+            "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
           ]
         }
       ],
@@ -50179,12 +50189,14 @@
       "go_targets": [
         "pkg/math/subpaving/arbitrary_interval.go",
         "pkg/math/subpaving/arbitrary_interval_arith.go",
-        "pkg/math/subpaving/arbitrary_interval_mul.go"
+        "pkg/math/subpaving/arbitrary_interval_mul.go",
+        "pkg/math/subpaving/arbitrary_interval_div.go"
       ],
       "tests": [
         "TestSubpavingMPFMutableIntervalRetainedCore",
         "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
-        "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
+        "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds",
+        "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
       ],
       "conditionals": [
         {
@@ -50221,6 +50233,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval_mul.go",
           "tests": [
             "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf interval division: six sign branches, open-zero/infinite denominator bounds, directed results, zero numerator and denominator alias (src/math/interval/interval_def.h:1672-1849)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_div.go",
+          "tests": [
+            "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
           ]
         }
       ],
@@ -50623,7 +50643,8 @@
         "pkg/math/subpaving/fast_context_init_test.go",
         "pkg/math/subpaving/arbitrary_interval.go",
         "pkg/math/subpaving/arbitrary_interval_arith.go",
-        "pkg/math/subpaving/arbitrary_interval_mul.go"
+        "pkg/math/subpaving/arbitrary_interval_mul.go",
+        "pkg/math/subpaving/arbitrary_interval_div.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50678,7 +50699,8 @@
         "TestSubpavingFastContextRootInitializationUnitConflict",
         "TestSubpavingMPFMutableIntervalRetainedCore",
         "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
-        "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
+        "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds",
+        "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
       ],
       "conditionals": [
         {
@@ -50923,6 +50945,14 @@
           "tests": [
             "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
           ]
+        },
+        {
+          "name": "Concrete config_mpf interval division: six sign branches, open-zero/infinite denominator bounds, directed results, zero numerator and denominator alias (src/math/interval/interval_def.h:1672-1849)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_div.go",
+          "tests": [
+            "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
+          ]
         }
       ],
       "ownership": [
@@ -50981,7 +51011,8 @@
         "pkg/math/subpaving/fast_context_init_test.go",
         "pkg/math/subpaving/arbitrary_interval.go",
         "pkg/math/subpaving/arbitrary_interval_arith.go",
-        "pkg/math/subpaving/arbitrary_interval_mul.go"
+        "pkg/math/subpaving/arbitrary_interval_mul.go",
+        "pkg/math/subpaving/arbitrary_interval_div.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51026,7 +51057,8 @@
         "TestSubpavingFastContextRootInitializationUnitConflict",
         "TestSubpavingMPFMutableIntervalRetainedCore",
         "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
-        "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
+        "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds",
+        "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
       ],
       "assertions": [
         {
@@ -51504,6 +51536,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval_mul.go",
           "tests": [
             "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf interval division: six sign branches, open-zero/infinite denominator bounds, directed results, zero numerator and denominator alias (src/math/interval/interval_def.h:1672-1849)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_div.go",
+          "tests": [
+            "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero"
           ]
         }
       ],
