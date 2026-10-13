@@ -121190,10 +121190,25 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "list<enode*> prepend/head/tail/iteration for SMT almost_cg_table buckets and context disequality scan",
+          "status": "unported"
+        },
+        {
+          "name": "list<relevancy_eh*> prepend/head/tail for SMT relevancy handler and watch trails",
+          "status": "unported"
+        },
+        {
+          "name": "length and non-destructive append have only src/test/list.cpp callers",
+          "status": "reference_only"
+        }
+      ],
+      "ownership": [
+        "The live enode and relevancy-handler list nodes are allocated in each SMT consumer's region and borrow their pointer payloads. Region reset retires nodes together; list traversal and trail pop do not individually delete them. The Go SMT consumers are still unported, so typed slices or nodes must preserve prepend order, shared tails and trail restoration there."
+      ],
       "deviations": [
-        "No Go adapter is retained. The production instantiations belong to unported SMT consumers; port each concrete value type there with a typed Go node or slice when that consumer arrives."
+        "No generic Go adapter is retained. The only production instantiations are SMT almost_cg_table's enode bucket chain and SMT relevancy's handler/watch chains; both owning consumers are unported. Test-only integer append and length do not justify a production port."
       ]
     },
     {
