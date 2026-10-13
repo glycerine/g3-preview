@@ -1182,6 +1182,8 @@ type SexprRefVector struct {
 	manager *SexprManager
 	self    *SexprRefVector
 	nodes   []SexprHandle
+	owned   []bool
+	pending []SexprHandle
 	epoch   uint64
 	closed  bool
 }
@@ -1267,6 +1269,12 @@ func (v *SexprRefVector) dec(h SexprHandle) error {
 	}
 	return v.manager.dec(h)
 }
+func (v *SexprRefVector) decConsumed(h SexprHandle) (bool, error) {
+	if h.IsNull() {
+		return true, nil
+	}
+	return v.manager.decConsumed(h)
+}
 func (v *SexprRefVector) push(h SexprHandle) error {
 	if v.Size() == math.MaxUint32 {
 		return arena.ErrBounds
@@ -1283,6 +1291,7 @@ func (v *SexprRefVector) push(h SexprHandle) error {
 		return e
 	}
 	v.nodes = append(v.nodes, h)
+	v.owned = append(v.owned, !h.IsNull())
 	v.epoch++
 	return nil
 }
@@ -1304,12 +1313,19 @@ func (v *SexprRefVector) shrink(size uint32) error {
 		return e
 	}
 	for i := size; i < v.Size(); i++ {
-		if e := v.dec(v.nodes[i]); e != nil {
+		if !v.nodes[i].IsNull() && !v.owned[i] {
+			return arena.ErrInvalidSlot
+		}
+		consumed, e := v.decConsumed(v.nodes[i])
+		if consumed {
+			v.owned[i] = false
+		}
+		if e != nil {
 			return e
 		}
-		v.nodes[i] = SexprHandle{}
 	}
 	v.nodes = v.nodes[:size]
+	v.owned = v.owned[:size]
 	v.epoch++
 	return nil
 }
@@ -1332,6 +1348,7 @@ func (v *SexprRefVector) Resize(size uint32) error {
 		return e
 	}
 	v.nodes = append(v.nodes, make([]SexprHandle, int(size)-len(v.nodes))...)
+	v.owned = append(v.owned, make([]bool, int(size)-len(v.owned))...)
 	v.epoch++
 	return nil
 }
@@ -1377,11 +1394,19 @@ func (v *SexprRefVector) Finalize() error {
 		return e
 	}
 	for i := uint32(0); i < v.Size(); i++ {
-		if e := v.dec(v.nodes[i]); e != nil {
+		if !v.nodes[i].IsNull() && !v.owned[i] {
+			return arena.ErrInvalidSlot
+		}
+		consumed, e := v.decConsumed(v.nodes[i])
+		if consumed {
+			v.owned[i] = false
+		}
+		if e != nil {
 			return e
 		}
 	}
 	v.nodes = nil
+	v.owned = nil
 	v.epoch++
 	return nil
 }
@@ -1399,10 +1424,19 @@ func (v *SexprRefVector) PopBack() error {
 	}
 	last := len(v.nodes) - 1
 	h := v.nodes[last]
+	owned := v.owned[last]
 	v.nodes[last] = SexprHandle{}
 	v.nodes = v.nodes[:last]
+	v.owned = v.owned[:last]
 	v.epoch++
-	return v.dec(h)
+	if !h.IsNull() && !owned {
+		return arena.ErrInvalidSlot
+	}
+	consumed, e := v.decConsumed(h)
+	if !consumed && !h.IsNull() {
+		v.pending = append(v.pending, h)
+	}
+	return e
 }
 func (v *SexprRefVector) set(i uint32, h SexprHandle) error {
 	if i >= v.Size() {
@@ -1411,11 +1445,24 @@ func (v *SexprRefVector) set(i uint32, h SexprHandle) error {
 	if e := v.inc(h); e != nil {
 		return e
 	}
-	if e := v.dec(v.nodes[i]); e != nil {
-		v.dec(h)
+	if !v.nodes[i].IsNull() && !v.owned[i] {
+		if !h.IsNull() {
+			v.pending = append(v.pending, h)
+		}
+		return arena.ErrInvalidSlot
+	}
+	consumed, e := v.decConsumed(v.nodes[i])
+	if consumed {
+		v.owned[i] = false
+	}
+	if e != nil {
+		if !h.IsNull() {
+			v.pending = append(v.pending, h)
+		}
 		return e
 	}
 	v.nodes[i] = h
+	v.owned[i] = !h.IsNull()
 	return nil
 }
 func (v *SexprRefVector) Set(i uint32, h SexprHandle) error {
@@ -1433,12 +1480,22 @@ func (v *SexprRefVector) erase(i uint32) error {
 		return e
 	}
 	h := v.nodes[i]
+	owned := v.owned[i]
 	copy(v.nodes[i:], v.nodes[i+1:])
+	copy(v.owned[i:], v.owned[i+1:])
 	last := len(v.nodes) - 1
 	v.nodes[last] = SexprHandle{}
 	v.nodes = v.nodes[:last]
+	v.owned = v.owned[:last]
 	v.epoch++
-	return v.dec(h)
+	if !h.IsNull() && !owned {
+		return arena.ErrInvalidSlot
+	}
+	consumed, e := v.decConsumed(h)
+	if !consumed && !h.IsNull() {
+		v.pending = append(v.pending, h)
+	}
+	return e
 }
 func (v *SexprRefVector) EraseIndex(i uint32) error {
 	if e := v.lock(); e != nil {
@@ -1498,6 +1555,9 @@ func (v *SexprRefVector) AppendVector(other *SexprRefVector) error {
 		return arena.ErrBounds
 	}
 	for i := uint32(0); i < other.Size(); i++ {
+		if !other.nodes[i].IsNull() && !other.owned[i] {
+			return arena.ErrInvalidSlot
+		}
 		if e := v.push(other.nodes[i]); e != nil {
 			return e
 		}
@@ -1513,6 +1573,7 @@ func (v *SexprRefVector) SwapIndices(a, b uint32) error {
 		return arena.ErrBounds
 	}
 	v.nodes[a], v.nodes[b] = v.nodes[b], v.nodes[a]
+	v.owned[a], v.owned[b] = v.owned[b], v.owned[a]
 	return nil
 }
 func (v *SexprRefVector) Reverse() error {
@@ -1523,6 +1584,7 @@ func (v *SexprRefVector) Reverse() error {
 	for i := uint32(0); i < v.Size()/2; i++ {
 		j := v.Size() - i - 1
 		v.nodes[i], v.nodes[j] = v.nodes[j], v.nodes[i]
+		v.owned[i], v.owned[j] = v.owned[j], v.owned[i]
 	}
 	return nil
 }
@@ -1581,6 +1643,8 @@ func (v *SexprRefVector) Swap(other *SexprRefVector) error {
 		return e
 	}
 	v.nodes, other.nodes = other.nodes, v.nodes
+	v.owned, other.owned = other.owned, v.owned
+	v.pending, other.pending = other.pending, v.pending
 	v.epoch++
 	other.epoch++
 	return nil
@@ -1651,13 +1715,48 @@ func (v *SexprRefVector) Close() error {
 		return nil
 	}
 	if !m.closed {
+		var first error
 		for i := uint32(0); i < v.Size(); i++ {
-			if e := v.dec(v.nodes[i]); e != nil {
-				return e
+			if !v.owned[i] {
+				continue
+			}
+			consumed, e := v.decConsumed(v.nodes[i])
+			if consumed {
+				v.owned[i] = false
+			}
+			if e != nil && first == nil {
+				first = e
 			}
 		}
+		for i, h := range v.pending {
+			if h.IsNull() {
+				continue
+			}
+			consumed, e := v.decConsumed(h)
+			if consumed {
+				v.pending[i] = SexprHandle{}
+			}
+			if e != nil && first == nil {
+				first = e
+			}
+		}
+		for _, owned := range v.owned {
+			if owned {
+				return first
+			}
+		}
+		for _, h := range v.pending {
+			if !h.IsNull() {
+				return first
+			}
+		}
+		v.nodes, v.owned, v.pending = nil, nil, nil
+		v.closed = true
+		return first
 	}
 	v.nodes = nil
+	v.owned = nil
+	v.pending = nil
 	v.closed = true
 	return nil
 }
