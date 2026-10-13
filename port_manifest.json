@@ -173245,6 +173245,12 @@
           "tests": ["TestProcessTraceFileOpensBeforeFirstEmission"]
         },
         {
+          "name": "bit_vector::resize two growth TRACE records at source lines 43 and 67",
+          "status": "ported",
+          "go_target": "pkg/util/bitset/vector_trace.go",
+          "tests": ["TestBitVectorResizeSourceTraceSites"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -173534,6 +173540,12 @@
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_trace_process_compiled.go",
           "tests": ["TestProcessTraceFileOpensBeforeFirstEmission"]
+        },
+        {
+          "name": "bit_vector::resize two growth TRACE records at source lines 43 and 67",
+          "status": "ported",
+          "go_target": "pkg/util/bitset/vector_trace.go",
+          "tests": ["TestBitVectorResizeSourceTraceSites"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

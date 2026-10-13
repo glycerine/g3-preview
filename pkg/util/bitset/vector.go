@@ -3,6 +3,8 @@ package bitset
 
 import (
 	"strings"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // Vector owns 32-bit words in a Go slice and preserves unused bit values.
@@ -10,6 +12,7 @@ import (
 type Vector struct {
 	size  uint32
 	words []uint32
+	trace *diagnostic.TraceTags
 }
 
 func numWords(n uint32) uint32       { return uint32((uint64(n) + 31) / 32) }
@@ -21,7 +24,7 @@ func FromWords(words []uint32, n uint32) *Vector {
 	return v
 }
 func (v *Vector) Clone() *Vector {
-	w := &Vector{size: v.size}
+	w := &Vector{size: v.size, trace: v.trace}
 	if v.words != nil {
 		w.words = append([]uint32{}, v.words...)
 	}
@@ -37,8 +40,11 @@ func (v *Vector) Assign(src *Vector) {
 	}
 	copy(v.words, src.words)
 }
-func (v *Vector) Reset()               { clear(v.words); v.size = 0 }
-func (v *Vector) Swap(other *Vector)   { *v, *other = *other, *v }
+func (v *Vector) Reset() { clear(v.words); v.size = 0 }
+func (v *Vector) Swap(other *Vector) {
+	v.size, other.size = other.size, v.size
+	v.words, other.words = other.words, v.words
+}
 func (v *Vector) Fill0()               { clear(v.words) }
 func (v *Vector) Size() uint32         { return v.size }
 func (v *Vector) Empty() bool          { return v.size == 0 }
@@ -96,6 +102,7 @@ func (v *Vector) Resize(n uint32, val bool) {
 		return
 	}
 	nw := numWords(n)
+	v.traceResizeStart(n, nw)
 	if nw > uint32(len(v.words)) {
 		v.words = append(v.words, make([]uint32, int(nw)-len(v.words))...)
 	}
@@ -108,6 +115,7 @@ func (v *Vector) Resize(n uint32, val bool) {
 	} else {
 		v.words[bw] &= mask
 	}
+	v.traceResizeFields(bw, nw, v.size%32, mask, val)
 	for i := bw + 1; i < nw; i++ {
 		v.words[i] = fill
 	}
