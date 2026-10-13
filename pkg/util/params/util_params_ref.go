@@ -1356,21 +1356,6 @@ func (c *ParamsContext) appendDescrs(d *ParamDescrs) error {
 	for key := range d.entries.All() {
 		names = append(names, key)
 	}
-	for _, k := range names {
-		if _, e := d.symbolCompare(k, k); e != nil {
-			return e
-		}
-		info, found, e := d.find(k)
-		if e != nil {
-			return e
-		}
-		if !found {
-			return ErrParamDescrsPrecondition
-		}
-		if paramDescrsStreamSourceDebug && !info.descr.present {
-			return ErrParamDescrsPrecondition
-		}
-	}
 	if e := d.sortSymbols(names); e != nil {
 		return e
 	}
@@ -1386,6 +1371,9 @@ func (c *ParamsContext) appendDescrs(d *ParamDescrs) error {
 			return e
 		}
 		if !found {
+			return ErrParamDescrsPrecondition
+		}
+		if paramDescrsStreamSourceDebug && !info.descr.present {
 			return ErrParamDescrsPrecondition
 		}
 		if e = c.appendString(" ("); e != nil {

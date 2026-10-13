@@ -14,6 +14,9 @@ func TestParamsValidationLegalListMissingDescriptionSourceGuard(t *testing.T) {
 	paramsMust(t, err)
 	t.Cleanup(func() { paramsMust(t, d.Close()) })
 	known := internSymbol(t, symbols, "known")
+	first := internSymbol(t, symbols, "first")
+	descr := "first description"
+	paramsMust(t, d.Insert(first, ParamUInt, &descr, nil, nil))
 	paramsMust(t, d.Insert(known, ParamBool, nil, nil, nil))
 	paramsMust(t, c.SetBool(&v, known, true))
 	if err := c.Validate(&v, d); err != nil {
@@ -25,8 +28,12 @@ func TestParamsValidationLegalListMissingDescriptionSourceGuard(t *testing.T) {
 		if !errors.Is(err, ErrParamDescrsPrecondition) {
 			t.Fatal("checked legal-list assertion", err)
 		}
+		wantPrefix := "unknown parameter 'missing'\nLegal parameters are:\n  first (unsigned int)\n  known"
+		if got := string(c.workspace); got != wantPrefix {
+			t.Fatal("checked assertion lost earlier source insertions", got)
+		}
 	} else {
-		want := "unknown parameter 'missing'\nLegal parameters are:\n  known (bool)\n"
+		want := "unknown parameter 'missing'\nLegal parameters are:\n  first (unsigned int)\n  known (bool)\n"
 		if err == nil || err.Error() != want {
 			t.Fatal("release legal list omitted description", err)
 		}
