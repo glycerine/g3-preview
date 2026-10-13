@@ -11,12 +11,14 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-// FastInterval owns the mutable fast-float endpoints used by the subpaving
-// interval manager. Constant node/variable views belong to the context port.
+// FastInterval owns mutable fast-float endpoints. A constant view borrows
+// bounds from a live node and resolves their current values on each read.
 type FastInterval struct {
 	self                 *FastInterval
 	numbers              *numeral.FastFloatManager
 	lower, upper         *numeral.ScopedFastFloat
+	constantNode         *FastNode
+	constantVariable     uint32
 	lowerInf, upperInf   bool
 	lowerOpen, upperOpen bool
 	closed               bool
@@ -51,7 +53,58 @@ func (v *FastInterval) endpoints() (*numeral.FastFloat, *numeral.FastFloat, erro
 		return nil, nil, err
 	}
 	upper, err := v.upper.Get()
-	return lower, upper, err
+	if err != nil {
+		return nil, nil, err
+	}
+	if v.constantNode != nil {
+		lo, err := v.constantNode.bound(v.constantVariable, true)
+		if err != nil {
+			return nil, nil, err
+		}
+		hi, err := v.constantNode.bound(v.constantVariable, false)
+		if err != nil {
+			return nil, nil, err
+		}
+		v.lowerInf, v.upperInf = lo == nil, hi == nil
+		v.lowerOpen, v.upperOpen = lo == nil || lo.open, hi == nil || hi.open
+		if lo != nil {
+			lower = lo.value
+		}
+		if hi != nil {
+			upper = hi.value
+		}
+	}
+	return lower, upper, nil
+}
+
+// SetConstant binds this interval to a node/variable pair. Subsequent reads
+// observe bounds pushed on that node after the binding.
+func (v *FastInterval) SetConstant(node *FastNode, variable uint32) error {
+	if _, _, err := v.endpoints(); err != nil {
+		return err
+	}
+	if node == nil || node.numbers != v.numbers {
+		return arena.ErrInvalidSlot
+	}
+	if _, err := node.bound(variable, true); err != nil {
+		return err
+	}
+	if _, err := node.bound(variable, false); err != nil {
+		return err
+	}
+	v.constantNode, v.constantVariable = node, variable
+	_, _, err := v.endpoints()
+	return err
+}
+
+func (v *FastInterval) mutable() error {
+	if _, _, err := v.endpoints(); err != nil {
+		return err
+	}
+	if v.constantNode != nil {
+		return arena.ErrInvalidSlot
+	}
+	return nil
 }
 
 func (v *FastInterval) lowerKind() interval.ExtendedKind {
@@ -69,6 +122,9 @@ func (v *FastInterval) upperKind() interval.ExtendedKind {
 }
 
 func (v *FastInterval) SetFinite(lower, upper *numeral.FastFloat, lowerOpen, upperOpen bool) error {
+	if err := v.mutable(); err != nil {
+		return err
+	}
 	lo, hi, err := v.endpoints()
 	if err != nil {
 		return err
@@ -93,6 +149,9 @@ func (v *FastInterval) SetFinite(lower, upper *numeral.FastFloat, lowerOpen, upp
 }
 
 func (v *FastInterval) ResetLower() error {
+	if err := v.mutable(); err != nil {
+		return err
+	}
 	lo, _, err := v.endpoints()
 	if err != nil {
 		return err
@@ -105,6 +164,9 @@ func (v *FastInterval) ResetLower() error {
 }
 
 func (v *FastInterval) ResetUpper() error {
+	if err := v.mutable(); err != nil {
+		return err
+	}
 	_, hi, err := v.endpoints()
 	if err != nil {
 		return err
@@ -124,6 +186,9 @@ func (v *FastInterval) Reset() error {
 }
 
 func (v *FastInterval) SetFrom(src *FastInterval) error {
+	if err := v.mutable(); err != nil {
+		return err
+	}
 	lo, hi, err := v.endpoints()
 	if err != nil {
 		return err

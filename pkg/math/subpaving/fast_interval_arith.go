@@ -10,7 +10,7 @@ import (
 )
 
 func (v *FastInterval) pair(other *FastInterval) error {
-	if _, _, err := v.endpoints(); err != nil {
+	if err := v.mutable(); err != nil {
 		return err
 	}
 	if _, _, err := other.endpoints(); err != nil {

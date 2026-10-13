@@ -34633,7 +34633,8 @@
         "TestSubpavingFastIntervalMulSignClasses",
         "TestSubpavingFastIntervalDivSignBranches",
         "TestSubpavingFastIntervalScalarMulDiv",
-        "TestSubpavingFastIntervalPowerRetainedCases"
+        "TestSubpavingFastIntervalPowerRetainedCases",
+        "TestSubpavingFastNodeConstantIntervalViews"
       ],
       "conditionals": [
         {
@@ -34757,7 +34758,8 @@
         "TestSubpavingFastIntervalMulSignClasses",
         "TestSubpavingFastIntervalDivSignBranches",
         "TestSubpavingFastIntervalScalarMulDiv",
-        "TestSubpavingFastIntervalPowerRetainedCases"
+        "TestSubpavingFastIntervalPowerRetainedCases",
+        "TestSubpavingFastNodeConstantIntervalViews"
       ],
       "conditionals": [
         {
@@ -50004,7 +50006,9 @@
         "pkg/math/subpaving/fast_interval_scalar.go",
         "pkg/math/subpaving/fast_interval_scalar_test.go",
         "pkg/math/subpaving/fast_interval_power.go",
-        "pkg/math/subpaving/fast_interval_power_test.go"
+        "pkg/math/subpaving/fast_interval_power_test.go",
+        "pkg/math/subpaving/fast_node.go",
+        "pkg/math/subpaving/fast_node_test.go"
       ],
       "tests": [
         "TestSubpavingFastMutableIntervalRetainedCore",
@@ -50012,7 +50016,8 @@
         "TestSubpavingFastIntervalMulSignClasses",
         "TestSubpavingFastIntervalDivSignBranches",
         "TestSubpavingFastIntervalScalarMulDiv",
-        "TestSubpavingFastIntervalPowerRetainedCases"
+        "TestSubpavingFastIntervalPowerRetainedCases",
+        "TestSubpavingFastNodeConstantIntervalViews"
       ],
       "conditionals": [
         {
@@ -50041,7 +50046,7 @@
         "The mutable fast-float interval owns both scoped endpoints and borrows its fast-float manager."
       ],
       "deviations": [
-        "The enclosing context_t<config_mpff> and its constant node/variable interval views remain unported."
+        "The enclosing context_t<config_mpff> propagation, bound relevance and search lifecycle remain unported; concrete constant node/variable interval views are represented."
       ]
     },
     {
@@ -50164,7 +50169,9 @@
         "pkg/math/subpaving/fast_interval_scalar.go",
         "pkg/math/subpaving/fast_interval_scalar_test.go",
         "pkg/math/subpaving/fast_interval_power.go",
-        "pkg/math/subpaving/fast_interval_power_test.go"
+        "pkg/math/subpaving/fast_interval_power_test.go",
+        "pkg/math/subpaving/fast_node.go",
+        "pkg/math/subpaving/fast_node_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50200,7 +50207,8 @@
         "TestSubpavingFastIntervalMulSignClasses",
         "TestSubpavingFastIntervalDivSignBranches",
         "TestSubpavingFastIntervalScalarMulDiv",
-        "TestSubpavingFastIntervalPowerRetainedCases"
+        "TestSubpavingFastIntervalPowerRetainedCases",
+        "TestSubpavingFastNodeConstantIntervalViews"
       ],
       "conditionals": [
         {
@@ -50305,13 +50313,24 @@
             "TestSubpavingFastMutableIntervalRetainedCore",
             "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
           ]
+        },
+        {
+          "name": "Concrete config_mpff node bounds and live constant node/variable interval views (src/math/subpaving/subpaving_t.h:146-316)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_node.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_interval.go"
+          ],
+          "tests": [
+            "TestSubpavingFastNodeConstantIntervalViews"
+          ]
         }
       ],
       "ownership": [
-        "The mutable interval owns its fast-float endpoints; the numeric manager is borrowed."
+        "The mutable interval and node bounds own their fast-float endpoints; constant interval views borrow the current node bounds and the numeric manager is borrowed."
       ],
       "deviations": [
-        "Fast-float constant node views and the enclosing context remain unported."
+        "Fast-float node bound relevance, propagation and the enclosing context remain unported."
       ]
     },
     {
@@ -50339,7 +50358,9 @@
         "pkg/math/subpaving/fixed_split.go",
         "pkg/math/subpaving/fixed_split_test.go",
         "pkg/math/subpaving/fixed_selector.go",
-        "pkg/math/subpaving/fixed_selector_test.go"
+        "pkg/math/subpaving/fixed_selector_test.go",
+        "pkg/math/subpaving/fast_node.go",
+        "pkg/math/subpaving/fast_node_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50364,7 +50385,8 @@
         "TestSubpavingFixedMidpointChildrenPropagateDefinition",
         "TestSubpavingFixedMidpointIntegerChildNormalization",
         "TestSubpavingFixedRoundRobinSourceDecisionAndDefinitionSkip",
-        "TestSubpavingFixedRoundRobinSingletonAndUndecidedChild"
+        "TestSubpavingFixedRoundRobinSingletonAndUndecidedChild",
+        "TestSubpavingFastNodeConstantIntervalViews"
       ],
       "assertions": [
         {
@@ -50686,9 +50708,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete config_mpff node bound publication and parent/child copied bound views (src/math/subpaving/subpaving_t_def.h:296-348)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_node.go",
+          "tests": [
+            "TestSubpavingFastNodeConstantIntervalViews"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each fast-float node owns the bounds it publishes; child nodes borrow inherited parent bounds until closed."
+      ],
+      "deviations": [
+        "The surrounding config_mpff propagation context remains unported."
+      ]
     },
     {
       "path": "src/math/subpaving/subpaving_types.h",
@@ -116247,7 +116282,7 @@
       "deviations": [
         "No generic manager-interface translation is retained. Concrete mpq, mpbq, mpfx and mpff specializations live beside their interval and subpaving consumers. src/test/ext_numeral.cpp is test-only.",
         "Whole-source instantiation audit found real-closure mpbq and subpaving mpq/mpfx/mpf/mpff/hwf consumers; the concrete rational and binary-rational Go paths do not close all retained instantiations.",
-        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner. The mpff helper now serves a mutable fast-float interval; constant node views and the enclosing subpaving context remain unported. Other extended-number instantiations remain unfinished."
+        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner. The mpff helper now serves mutable and constant-node fast-float interval views; the enclosing subpaving context remains unported. Other extended-number instantiations remain unfinished."
       ]
     },
     {
@@ -159326,10 +159361,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/subpaving/fixed_node.go",
-        "pkg/math/subpaving/fixed_node_test.go"
+        "pkg/math/subpaving/fixed_node_test.go",
+        "pkg/math/subpaving/fast_node.go",
+        "pkg/math/subpaving/fast_node_test.go"
       ],
       "tests": [
-        "TestSubpavingFixedNodeConstantIntervalViews"
+        "TestSubpavingFixedNodeConstantIntervalViews",
+        "TestSubpavingFastNodeConstantIntervalViews"
       ],
       "conditionals": [
         {
@@ -159610,11 +159648,19 @@
           "tests": [
             "TestSubpavingFixedNodeConstantIntervalViews"
           ]
+        },
+        {
+          "name": "Concrete config_mpff subpaving bound-array child copy, indexed lookup and set with borrowed fast-float bound identity",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_node.go",
+          "tests": [
+            "TestSubpavingFastNodeConstantIntervalViews"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "No generic Go persistent-array implementation remains. Retained goal consumers use native owning slices with independent copies; generic parray algorithms and their standalone stress workload are not ported or credited. The concrete subpaving bound arrays now copy slices into child nodes and preserve borrowed bound identities, but the surrounding subpaving context remains partial. This source is not classified as dead."
+        "No generic Go persistent-array implementation remains. Retained goal consumers use native owning slices with independent copies; generic parray algorithms and their standalone stress workload are not ported or credited. Concrete fixed-point and fast-float subpaving bound arrays copy slices into child nodes and preserve borrowed bound identities, but the surrounding subpaving contexts remain partial. This source is not classified as dead."
       ]
     },
     {
