@@ -16,6 +16,12 @@ func (m *FastFloatManager) traceToRational(a *FastFloat, exponent int32) {
 			if err := m.DisplayTo(w, a); err != nil {
 				return err
 			}
-			return writeFastFloatPart(w, "\nexp: "+strconv.FormatInt(int64(exponent), 10)+"\n")
+			if err := writeFastFloatPart(w, "\nexp: "); err != nil {
+				return err
+			}
+			if err := writeFastFloatPart(w, strconv.FormatInt(int64(exponent), 10)); err != nil {
+				return err
+			}
+			return writeFastFloatPart(w, "\n")
 		})
 }

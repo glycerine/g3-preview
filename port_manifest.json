@@ -152296,7 +152296,8 @@
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
         "TestFastFloatSetIntegerRetainedTraceBranches",
-        "TestFastFloatToRationalRetainedTraceExponentBranches"
+        "TestFastFloatToRationalRetainedTraceExponentBranches",
+        "TestFastFloatToRationalTraceSourceExponentInsertions"
       ],
       "conditionals": [
         {
@@ -152988,7 +152989,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_to_rational_trace.go",
           "tests": [
-            "TestFastFloatToRationalRetainedTraceExponentBranches"
+            "TestFastFloatToRationalRetainedTraceExponentBranches",
+            "TestFastFloatToRationalTraceSourceExponentInsertions"
           ]
         }
       ],
@@ -173691,6 +173693,7 @@
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
         "TestFastFloatSetIntegerRetainedTraceBranches",
         "TestFastFloatToRationalRetainedTraceExponentBranches",
+        "TestFastFloatToRationalTraceSourceExponentInsertions",
         "TestBinarySelectSmallRationalLowerRetainedTrace",
         "TestBinaryRetainedDebugArithmeticTraceSites",
         "TestRationalSetStringRetainedTraceBranches",
@@ -173925,7 +173928,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_to_rational_trace.go",
           "tests": [
-            "TestFastFloatToRationalRetainedTraceExponentBranches"
+            "TestFastFloatToRationalRetainedTraceExponentBranches",
+            "TestFastFloatToRationalTraceSourceExponentInsertions"
           ]
         },
         {
@@ -174074,6 +174078,7 @@
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
         "TestFastFloatSetIntegerRetainedTraceBranches",
         "TestFastFloatToRationalRetainedTraceExponentBranches",
+        "TestFastFloatToRationalTraceSourceExponentInsertions",
         "TestBinarySelectSmallRationalLowerRetainedTrace",
         "TestBinaryRetainedDebugArithmeticTraceSites",
         "TestRationalSetStringRetainedTraceBranches",
@@ -174320,7 +174325,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_to_rational_trace.go",
           "tests": [
-            "TestFastFloatToRationalRetainedTraceExponentBranches"
+            "TestFastFloatToRationalRetainedTraceExponentBranches",
+            "TestFastFloatToRationalTraceSourceExponentInsertions"
           ]
         },
         {
