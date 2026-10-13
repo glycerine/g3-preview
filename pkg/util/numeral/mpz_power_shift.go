@@ -379,6 +379,7 @@ func (m *IntegerManager) mul2kCoreWithAllocationContext(a *Int, k uint32, contex
 	if a.IsSmall() && k < 32 {
 		return m.setInt64WithAllocationContext(a, int64(a.Val)*(int64(1)<<k), context)
 	}
+	m.traceMul2kStart(a, k)
 	wordShift, bitShift := k/32, k%32
 	oldSize := uint32(1)
 	if !a.IsSmall() {
@@ -388,6 +389,7 @@ func (m *IntegerManager) mul2kCoreWithAllocationContext(a *Int, k uint32, contex
 	if e := m.ensureOwnedCapacityWithAllocationContext(a, newSize, context); e != nil {
 		return e
 	}
+	m.traceMul2kCapacity(a, wordShift, bitShift, oldSize, newSize)
 	if modularSourceDebug && a.IsSmall() {
 		return ErrIntegerAssertion
 	}
@@ -457,5 +459,9 @@ func (m *IntegerManager) mul2kCoreWithAllocationContext(a *Int, k uint32, contex
 			previous = next
 		}
 	}
-	return m.normalizeOwned(a)
+	if e := m.normalizeOwned(a); e != nil {
+		return e
+	}
+	m.traceMul2kResult(a)
+	return nil
 }
