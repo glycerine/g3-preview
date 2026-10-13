@@ -4,6 +4,7 @@ package subpaving
 
 import (
 	"errors"
+	"io"
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -37,6 +38,7 @@ type ArbitraryContext struct {
 	root                                            *ArbitraryNode
 	nodes                                           []*ArbitraryNode
 	leafHead, leafTail                              *ArbitraryNode
+	displayVariable                                 func(io.Writer, uint32) error
 	maxDepth, maxNodes                              uint32
 	searchNode                                      *ArbitraryNode
 	searchPhase                                     uint8
@@ -234,6 +236,7 @@ func (c *ArbitraryContext) Close() error {
 	c.root = nil
 	c.nodes = nil
 	c.leafHead, c.leafTail = nil, nil
+	c.displayVariable = nil
 	c.searchNode = nil
 	for len(c.unitClauses) != 0 {
 		a := c.unitClauses[0].atom

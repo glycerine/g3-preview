@@ -50242,6 +50242,8 @@
         "pkg/math/subpaving/hardware_context_params.go",
         "pkg/math/subpaving/hardware_shell_coefficients.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
+        "pkg/math/subpaving/arbitrary_display.go",
+        "pkg/math/subpaving/arbitrary_display_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients_test.go",
         "pkg/math/subpaving/arbitrary_polynomial.go",
         "pkg/math/subpaving/arbitrary_monomial.go",
@@ -50258,6 +50260,8 @@
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
         "TestSubpavingHardwareShellCoefficientAndInequalityConversion",
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
+        "TestArbitraryDisplayConstraintsDefinitionsUnitsAndClauses",
+        "TestArbitraryDisplayBoundsTreeOrderConflictAndWriterPrefixes",
         "TestHardwareShellRetainedClauseAndSearchRoute",
         "TestHardwareShellStatisticsCountersAndReset",
         "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder",
@@ -50321,6 +50325,15 @@
           "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
           "tests": [
             "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf wrapper display_constraints/display_bounds and set_display_proc forwarding (src/math/subpaving/subpaving.cpp:49-50,56)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_shell_coefficients.go",
+          "tests": [
+            "TestArbitraryDisplayConstraintsDefinitionsUnitsAndClauses",
+            "TestArbitraryDisplayBoundsTreeOrderConflictAndWriterPrefixes"
           ]
         },
         {
@@ -51043,6 +51056,8 @@
       "go_targets": [
         "pkg/math/subpaving/arbitrary_shell_coefficients_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
+        "pkg/math/subpaving/arbitrary_display.go",
+        "pkg/math/subpaving/arbitrary_display_test.go",
         "pkg/math/subpaving/arbitrary_context_root.go",
         "pkg/math/subpaving/arbitrary_interval_node_test.go",
         "pkg/math/subpaving/fixed_interval.go",
@@ -51688,6 +51703,15 @@
           ]
         },
         {
+          "name": "Concrete config_mpf definition, inequality, clause and leaf display declarations (src/math/subpaving/subpaving_t.h:554-559,831-834)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_display.go",
+          "tests": [
+            "TestArbitraryDisplayConstraintsDefinitionsUnitsAndClauses",
+            "TestArbitraryDisplayBoundsTreeOrderConflictAndWriterPrefixes"
+          ]
+        },
+        {
           "name": "Concrete context_hwf static collect_param_descrs declaration (src/math/subpaving/subpaving_t.h:840)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_context_params.go",
@@ -51736,6 +51760,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/subpaving/arbitrary_shell_coefficients_test.go",
+        "pkg/math/subpaving/arbitrary_display.go",
+        "pkg/math/subpaving/arbitrary_display_test.go",
         "pkg/math/subpaving/arbitrary_clause_propagation_test.go",
         "pkg/math/subpaving/arbitrary_context_propagate.go",
         "pkg/math/subpaving/arbitrary_context_relevance.go",
@@ -52780,6 +52806,15 @@
           "go_target": "pkg/math/subpaving/hardware_display.go",
           "tests": [
             "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf definition, inequality, clause and consistent leaf display implementations (src/math/subpaving/subpaving_t_def.h:254-287,376-415,614-650,1067-1084,1135-1156,1848-1861)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_display.go",
+          "tests": [
+            "TestArbitraryDisplayConstraintsDefinitionsUnitsAndClauses",
+            "TestArbitraryDisplayBoundsTreeOrderConflictAndWriterPrefixes"
           ]
         },
         {

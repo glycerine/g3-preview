@@ -4,6 +4,7 @@ package subpaving
 
 import (
 	"errors"
+	"io"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -98,6 +99,27 @@ func (w *ArbitraryShellCoefficients) AddClause(atoms []*ArbitraryInequality) (*A
 		return nil, err
 	}
 	return w.context.AddClause(atoms)
+}
+
+func (w *ArbitraryShellCoefficients) SetVariableDisplay(display ArbitraryVariableDisplay) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.SetVariableDisplay(display)
+}
+
+func (w *ArbitraryShellCoefficients) DisplayBounds(out io.Writer) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.DisplayBounds(out)
+}
+
+func (w *ArbitraryShellCoefficients) DisplayConstraints(out io.Writer, useStar bool) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.DisplayConstraints(out, useStar)
 }
 
 // MkSum converts exact integer inputs in source order and transfers copies to
