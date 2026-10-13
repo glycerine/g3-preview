@@ -124,7 +124,7 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 		return out, false, err
 	}
 	_, priorForbidden := c.forbiddenFamilies[arith]
-	if opts.arithmeticMode == arithmeticPatternsNo || opts.arithmeticMode == arithmeticPatternsConservative {
+	if opts.arithmeticMode == arithmeticPatternsConservative {
 		c.forbiddenFamilies[arith] = struct{}{}
 	}
 	defer func() {

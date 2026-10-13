@@ -133,6 +133,37 @@ func TestPatternInferenceQuantifierRetriesWarningsAndWeights(t *testing.T) {
 	}
 	patternMust(t, m.DelRef(&result))
 	patternMust(t, c.close())
+
+	// The source casts the unsigned pi.arith value to its enum without
+	// narrowing or clamping. An unnamed value follows the non-nested retry,
+	// unlike AP_NO or the conservative-only retry.
+	output.Reset()
+	c = newOwner()
+	c.forbiddenFamilies[ast.NullFamilyID] = struct{}{}
+	opts.arithmeticMode = arithmeticPatternMode(257)
+	result, changed, err = c.reduceQuantifierNoDatabase(q, pmul, nil, opts)
+	patternMust(t, err)
+	if !changed {
+		t.Fatal("unnamed unsigned arithmetic mode must reach non-nested retry")
+	}
+	check(result, mul, 10)
+	if !strings.Contains(output.String(), "using non nested arith. pattern") {
+		t.Fatal("unnamed mode must use non-nested retry warning", output.String())
+	}
+	patternMust(t, m.DelRef(&result))
+	patternMust(t, c.close())
+
+	output.Reset()
+	c = newOwner()
+	c.forbiddenFamilies[ast.NullFamilyID] = struct{}{}
+	opts.arithmeticMode = arithmeticPatternsNo
+	c.forbiddenFamilies[arith] = struct{}{} // Source constructor caches AP_NO before reduction.
+	result, changed, err = c.reduceQuantifierNoDatabase(q, pmul, nil, opts)
+	patternMust(t, err)
+	if changed || result != (ast.ASTRef{}) || !strings.Contains(output.String(), "failed to find a pattern") {
+		t.Fatal("AP_NO must forbid arithmetic through the whole reduction", result, changed, output.String())
+	}
+	patternMust(t, c.close())
 }
 
 func TestPatternInferenceQuantifierNoPatternReturnAndGuards(t *testing.T) {

@@ -71,11 +71,18 @@ func NewInferenceRewriterWithOptions(m *ast.ASTManager, options InferenceOptions
 	if proofs {
 		return nil, ast.ErrASTPending
 	}
+	arith, err := m.ArithmeticFamilyID()
+	if err != nil {
+		return nil, err
+	}
 	candidates, err := newPatternCandidates(m, 0, nil, options.BlockLoopPatterns)
 	if err != nil {
 		return nil, err
 	}
 	candidates.avoidSkolems = options.AvoidSkolems
+	if options.Arithmetic == uint32(arithmeticPatternsNo) {
+		candidates.forbiddenFamilies[arith] = struct{}{}
+	}
 	r := &InferenceRewriter{
 		manager: m, candidates: candidates,
 		options: options.internal(),
@@ -89,12 +96,13 @@ func NewInferenceRewriterWithOptions(m *ast.ASTManager, options InferenceOptions
 	return r, nil
 }
 
+// UpdateOptions refreshes fields read from the borrowed source params. The
+// constructor's loop policy and AP_NO family registration remain fixed.
 func (r *InferenceRewriter) UpdateOptions(options InferenceOptions) error {
 	if r == nil || r.self != r || r.closed {
 		return ast.ErrASTHandle
 	}
 	r.options = options.internal()
-	r.candidates.blockLoops = options.BlockLoopPatterns
 	r.candidates.avoidSkolems = options.AvoidSkolems
 	return nil
 }

@@ -18127,7 +18127,8 @@
         "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
         "TestPatternInferenceActualRewriterTraversalAndOwnership",
         "TestPatternInferenceActualRewriterPendingPullAndResume",
-        "TestPatternInferenceParamsBindRewriterAndRefresh"
+        "TestPatternInferenceParamsBindRewriterAndRefresh",
+        "TestPatternInferenceConstructorSnapshotsArithmeticBanAndLoopPolicy"
       ],
       "conditionals": [
         {
@@ -18310,6 +18311,15 @@
           "go_target": "pkg/smtcore/pattern_inference_rewriter.go",
           "tests": [
             "TestPatternInferenceParamsBindRewriterAndRefresh"
+          ]
+        },
+        {
+          "name": "pattern_inference_cfg constructor caches AP_NO forbidden family and block-loop policy while subsequent borrowed scalar reads remain live (cpp:104-119,624-658)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/rewriter.go",
+          "tests": [
+            "TestPatternInferenceConstructorSnapshotsArithmeticBanAndLoopPolicy",
+            "TestPatternInferenceQuantifierRetriesWarningsAndWeights"
           ]
         }
       ],

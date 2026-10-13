@@ -136,3 +136,30 @@ func TestPatternInferenceActualRewriterPendingPullAndResume(t *testing.T) {
 		t.Fatal("resume after disabled pull should preserve unchanged quantifier", got, q)
 	}
 }
+
+func TestPatternInferenceConstructorSnapshotsArithmeticBanAndLoopPolicy(t *testing.T) {
+	m := patternManager(t)
+	options := DefaultInferenceOptions()
+	options.Arithmetic = 0
+	options.BlockLoopPatterns = false
+	r, err := NewInferenceRewriterWithOptions(m, options)
+	patternMust(t, err)
+	t.Cleanup(func() { patternMust(t, r.Close()) })
+	arith, err := m.ArithmeticFamilyID()
+	patternMust(t, err)
+	if _, banned := r.candidates.forbiddenFamilies[arith]; !banned || r.candidates.blockLoops {
+		t.Fatal("source constructor must cache AP_NO and loop policy")
+	}
+	options.Arithmetic = 257
+	options.BlockLoopPatterns = true
+	options.AvoidSkolems = false
+	patternMust(t, r.UpdateOptions(options))
+	if _, banned := r.candidates.forbiddenFamilies[arith]; !banned || r.candidates.blockLoops ||
+		r.candidates.avoidSkolems || r.options.arithmeticMode != arithmeticPatternMode(257) {
+		t.Fatal("borrowed parameter refresh changed constructor-owned policy", r.options, r.candidates.blockLoops)
+	}
+	patternMust(t, r.Close())
+	if err := r.UpdateOptions(DefaultInferenceOptions()); !errors.Is(err, ast.ErrASTHandle) {
+		t.Fatal("closed options refresh", err)
+	}
+}
