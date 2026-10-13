@@ -51744,6 +51744,8 @@
         "pkg/math/subpaving/arbitrary_polynomial_propagate_test.go",
         "pkg/math/subpaving/arbitrary_monomial_propagate.go",
         "pkg/math/subpaving/arbitrary_monomial_propagate_test.go",
+        "pkg/math/subpaving/arbitrary_context_init.go",
+        "pkg/math/subpaving/arbitrary_context_init_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
@@ -51835,6 +51837,7 @@
         "TestArbitraryContextSourceCandidateRelevanceAndNormalization",
         "TestArbitraryPolynomialForwardInverseAndQueue",
         "TestArbitraryMonomialForwardInverseAndArithmetic",
+        "TestArbitraryContextRootInitializationStagesAndConflict",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -52545,6 +52548,18 @@
           ],
           "tests": [
             "TestArbitraryMonomialForwardInverseAndArithmetic"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf root unit, definition, and queue initialization order with resumable checkpoints (src/math/subpaving/subpaving_t_def.h:1753-1808)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_context_init.go",
+          "go_targets": [
+            "pkg/math/subpaving/arbitrary_context_bounds.go",
+            "pkg/math/subpaving/arbitrary_context_propagate.go"
+          ],
+          "tests": [
+            "TestArbitraryContextRootInitializationStagesAndConflict"
           ]
         },
         {

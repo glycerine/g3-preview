@@ -32,6 +32,8 @@ type ArbitraryContext struct {
 	clauses                                         []*ArbitraryClause
 	unitClauses                                     []arbitraryUnitClause
 	unitHead                                        int
+	initStage                                       uint8
+	initDefHead                                     uint32
 	root                                            *ArbitraryNode
 	bounds                                          []*ArbitraryBound
 	queue                                           []*ArbitraryBound
