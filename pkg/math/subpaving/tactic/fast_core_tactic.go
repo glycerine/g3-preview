@@ -15,6 +15,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 var ErrFastCorePrintNodes = errors.New("subpaving tactic: SMT2 display for this mapped expression is not yet ported")
@@ -138,7 +139,7 @@ func (t *FastCoreTactic) Apply(g *goaltactic.Goal) (*goaltactic.Goal, error) {
 
 // ApplyWithOutput routes the source optional print_nodes output to a caller
 // writer. Nil is valid only when print_nodes is disabled.
-func (t *FastCoreTactic) ApplyWithOutput(g *goaltactic.Goal, out io.Writer) (*goaltactic.Goal, error) {
+func (t *FastCoreTactic) ApplyWithOutput(g *goaltactic.Goal, out io.Writer) (result *goaltactic.Goal, err error) {
 	if err := t.open(); err != nil {
 		return nil, err
 	}
@@ -158,6 +159,14 @@ func (t *FastCoreTactic) ApplyWithOutput(g *goaltactic.Goal, out io.Writer) (*go
 	if options.PrintNodes && out == nil {
 		return nil, arena.ErrInvalidSlot
 	}
+	// The source operator catches z3_exception around process, statistics and
+	// result publication, then throws a fresh tactic_exception with ex.msg().
+	defer func() {
+		var source z3exception.Z3Exception
+		if errors.As(err, &source) {
+			result, err = nil, goaltactic.NewTacticException(source.Message())
+		}
+	}()
 	if err := t.converter.InternalizeGoal(g); err != nil {
 		return nil, err
 	}

@@ -53914,6 +53914,14 @@
           "tests": [
             "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
           ]
+        },
+        {
+          "name": "MPFF core tactic outer catch converts a retained z3_exception message into a fresh tactic_exception after process failure (subpaving_tactic.cpp:245-261)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/fast_core_tactic.go",
+          "tests": [
+            "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
+          ]
         }
       ],
       "ownership": [],
@@ -103577,9 +103585,13 @@
       "path": "src/tactic/tactic_exception.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/tactic_exception.go"
+      ],
+      "tests": [
+        "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -103592,7 +103604,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "selected tactic_exception copies a caught z3_exception message for the retained MPFF core tactic outer catch (tactic_exception.h:25-34)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_exception.go",
+          "tests": [
+            "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -152605,7 +152626,7 @@
           ]
         },
         {
-          "name": "remaining source exception transport and full subpaving tactic result integration",
+          "name": "remaining source exception transport beyond the selected MPFF tactic outer catch and full subpaving tactic result integration",
           "status": "unported",
           "tests": []
         },
@@ -152992,7 +153013,7 @@
           ]
         },
         {
-          "name": "remaining source exception transport and full subpaving tactic result integration",
+          "name": "remaining source exception transport beyond the selected MPFF tactic outer catch and full subpaving tactic result integration",
           "status": "unported",
           "tests": []
         },

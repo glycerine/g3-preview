@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/math/subpaving"
 	goaltactic "github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
@@ -14,6 +15,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 	"github.com/glycerine/g3/pkg/util/symbol"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
@@ -245,6 +247,50 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	}
 	if shown.String() != "x <= 2\nbounds at leaves: \nx <= 2\n" {
 		t.Fatal("source print_nodes output", shown.String())
+	}
+	if err := cooperation.EndTask(); err != nil {
+		t.Fatal(err)
+	}
+	memoryKey := "max_memory"
+	if err := pc.SetUIntName(&p, &memoryKey, 0); err != nil {
+		t.Fatal(err)
+	}
+	if err := core.UpdateParams(&p); err != nil {
+		t.Fatal(err)
+	}
+	if err := core.Cleanup(); err != nil {
+		t.Fatal(err)
+	}
+	physical, err := numbers.RuntimeOwner().Allocate(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	physicalLive := true
+	defer func() {
+		if physicalLive {
+			if err := numbers.RuntimeOwner().Deallocate(&physical); err != nil {
+				t.Error(err)
+			}
+		}
+	}()
+	if got, err := core.Apply(goal); got != nil {
+		t.Fatal("failed source tactic must not return a goal", got, err)
+	} else {
+		var tacticErr goaltactic.TacticException
+		if !errors.As(err, &tacticErr) || tacticErr.Message() != subpaving.ErrSubpavingMaxMemory.Error() || errors.Is(err, subpaving.ErrSubpavingMaxMemory) {
+			t.Fatal("source outer catch must rethrow the Z3 message as a tactic exception", err)
+		}
+		var base z3exception.Z3Exception
+		if !errors.As(err, &base) || base.ErrorCode() != z3exception.ErrorOK || base.HasErrorCode() {
+			t.Fatal("tactic exception must retain its source z3_exception base", err)
+		}
+	}
+	if err := numbers.RuntimeOwner().Deallocate(&physical); err != nil {
+		t.Fatal(err)
+	}
+	physicalLive = false
+	if err := pc.SetUIntName(&p, &memoryKey, ^uint32(0)); err != nil {
+		t.Fatal(err)
 	}
 	if err := cooperation.EndSection(); err != nil {
 		t.Fatal(err)
