@@ -1177,12 +1177,22 @@ func (m *IntegerManager) addSub(a, b, c *Int, subtract bool) error {
 func (m *IntegerManager) addSubWithPNReceipt(a, b, c *Int, subtract bool, pn *integerPNormalizeScope) error {
 	return m.addSubWithAllocationContext(a, b, c, subtract, pnAllocationContext(pn))
 }
-func (m *IntegerManager) addSubWithAllocationContext(a, b, c *Int, subtract bool, context integerAllocationInvocationContext) error {
+func (m *IntegerManager) addSubWithAllocationContext(a, b, c *Int, subtract bool, context integerAllocationInvocationContext) (err error) {
 	for _, n := range []*Int{a, b, c} {
 		if e := m.check(n); e != nil {
 			return e
 		}
 	}
+	op := "+"
+	if subtract {
+		op = "-"
+	}
+	m.traceMPZBinary(a, b, c, op, true)
+	defer func() {
+		if err == nil {
+			m.traceMPZBinary(a, b, c, op, false)
+		}
+	}()
 	if a.IsSmall() && b.IsSmall() {
 		v := int64(b.Val)
 		if subtract {

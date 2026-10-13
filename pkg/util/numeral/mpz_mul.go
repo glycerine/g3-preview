@@ -13,12 +13,18 @@ import (
 func (m *IntegerManager) Mul(a, b, c *Int) error {
 	return m.mulWithAllocationContext(a, b, c, integerAllocationInvocationContext{})
 }
-func (m *IntegerManager) mulWithAllocationContext(a, b, c *Int, context integerAllocationInvocationContext) error {
+func (m *IntegerManager) mulWithAllocationContext(a, b, c *Int, context integerAllocationInvocationContext) (err error) {
 	for _, n := range []*Int{a, b, c} {
 		if e := m.check(n); e != nil {
 			return e
 		}
 	}
+	m.traceMPZBinary(a, b, c, "*", true)
+	defer func() {
+		if err == nil {
+			m.traceMPZBinary(a, b, c, "*", false)
+		}
+	}()
 	if a.IsSmall() && b.IsSmall() {
 		return m.setInt64WithAllocationContext(c, int64(a.Val)*int64(b.Val), context)
 	}
