@@ -18,6 +18,14 @@ func (m *ArbitraryFloatNumeralManager) Inv(x *ArbitraryFloat) (cause error) {
 	return m.check(x)
 }
 
+// InvFrom is the source two-numeral overload used by interval division.
+func (m *ArbitraryFloatNumeralManager) InvFrom(in, out *ArbitraryFloat) error {
+	if e := m.Copy(out, in); e != nil {
+		return e
+	}
+	return m.Inv(out)
+}
+
 func (m *ArbitraryFloatNumeralManager) Increment(x *ArbitraryFloat) error {
 	if e := m.guard(); e != nil {
 		return e

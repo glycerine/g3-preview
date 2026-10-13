@@ -26,6 +26,11 @@ func TestArbitraryFloatNumeralSourceReciprocalIncrementAndPower(t *testing.T) {
 	if err := m.SetInt32(&x, 4); err != nil {
 		t.Fatal(err)
 	}
+	if err := m.InvFrom(&x, &out); err != nil {
+		t.Fatal(err)
+	}
+	check("inverse from", &out, 0.25)
+	check("inverse source preserved", &x, 4)
 	if err := m.Inv(&x); err != nil {
 		t.Fatal(err)
 	}

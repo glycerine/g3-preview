@@ -39597,7 +39597,12 @@ forwarding and the enclosing subpaving caller remained open at that
 checkpoint. Rational-string forwarding now copies from the source-owned text
 result; source numeral display uses the concrete format context and preserves
 short-write prefixes. Focused native cases cover exact text and cleanup. Live
-swap and subpaving integration remain, so `f2n.h` is still partial.
+swap and subpaving integration remained at that checkpoint. The interval
+engine audit then found two-argument inverse, unsigned input, previous-power
+lookup and `precise()` calls; its owned numerals also use deletion and swap.
+Those concrete MPF routes now pass focused tests, including a large-cell swap
+and source `sbits+exponent-1` lookup. The interval/subpaving integration audit
+still remains, so `f2n.h` is partial.
 
 ### Environment parameter runtime boundary
 
