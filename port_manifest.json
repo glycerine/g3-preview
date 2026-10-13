@@ -98043,10 +98043,12 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/arith/polynomial_builder.go",
-        "pkg/tactic/arith/polynomial_builder_test.go"
+        "pkg/tactic/arith/polynomial_builder_test.go",
+        "pkg/tactic/arith/polynomial_subsumption_test.go"
       ],
       "tests": [
-        "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer"
+        "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer",
+        "TestInequalityPolynomialSubsumptionUsesOwnedCoefficientBuffer"
       ],
       "assertions": [
         {
@@ -98075,6 +98077,14 @@
           "go_target": "pkg/tactic/arith/polynomial_builder.go",
           "tests": [
             "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer"
+          ]
+        },
+        {
+          "name": "Concrete lower_subsumed and upper_subsumed ADD coefficient-buffer reset, fill, borrowed bound query and strict comparison (src/tactic/arith/propagate_ineqs_tactic.cpp:256-277)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/polynomial_builder.go",
+          "tests": [
+            "TestInequalityPolynomialSubsumptionUsesOwnedCoefficientBuffer"
           ]
         }
       ],
@@ -162698,7 +162708,8 @@
         "pkg/tactic/arith/bound_equation_store.go",
         "pkg/tactic/arith/bound_equation_store_test.go",
         "pkg/tactic/arith/polynomial_builder.go",
-        "pkg/tactic/arith/polynomial_builder_test.go"
+        "pkg/tactic/arith/polynomial_builder_test.go",
+        "pkg/tactic/arith/polynomial_subsumption_test.go"
       ],
       "tests": [
         "TestEuclideanIntegerBufferSortAndRawSwap",
@@ -162719,7 +162730,8 @@
         "TestLinearEquationRationalDenominatorClearingAndCombination",
         "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
         "TestBoundEquationStoreRationalConstructionAndCancellation",
-        "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer"
+        "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer",
+        "TestInequalityPolynomialSubsumptionUsesOwnedCoefficientBuffer"
       ],
       "conditionals": [
         {
@@ -162769,7 +162781,12 @@
         },
         {
           "name": "concrete mpq propagate_ineqs_tactic buffer: push, reset, size and borrowed c_ptr (propagate_ineqs_tactic.cpp:132-169, 256-277)",
-          "status": "unported"
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/polynomial_builder.go",
+          "tests": [
+            "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer",
+            "TestInequalityPolynomialSubsumptionUsesOwnedCoefficientBuffer"
+          ]
         },
         {
           "name": "concrete mpz SMT theory_arith_int Euclidean bridge buffer (theory_arith_int.h:934-1112)",

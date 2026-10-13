@@ -214,6 +214,63 @@ func (b *PolynomialBuilder) MkLinearPolynomial(term ast.ASTHandle) (uint32, erro
 	return x, err
 }
 
+// LowerSubsumed and UpperSubsumed are the concrete rational-buffer callers in
+// propagate_ineqs_tactic.cpp:256-277. They reuse the same owned coefficient
+// buffer as MkLinearPolynomial and borrow its current contents for one bound
+// query; a non-addition has no polynomial subsumption path in the source.
+func (b *PolynomialBuilder) LowerSubsumed(term ast.ASTHandle, k *numeral.Rational, strict bool) (bool, error) {
+	return b.polynomialSubsumed(term, k, strict, true)
+}
+
+func (b *PolynomialBuilder) UpperSubsumed(term ast.ASTHandle, k *numeral.Rational, strict bool) (bool, error) {
+	return b.polynomialSubsumed(term, k, strict, false)
+}
+
+func (b *PolynomialBuilder) polynomialSubsumed(term ast.ASTHandle, k *numeral.Rational, strict, lower bool) (subsumed bool, err error) {
+	if err = b.open(); err != nil {
+		return false, err
+	}
+	add, err := b.isArithmetic(term, 6)
+	if err != nil || !add {
+		return false, err
+	}
+	if err = b.coeff.Reset(); err != nil {
+		return false, err
+	}
+	b.ids = b.ids[:0]
+	arity, err := b.manager.GetNumArgs(term)
+	if err != nil {
+		return false, err
+	}
+	for i := uint32(0); i < arity; i++ {
+		arg, e := b.manager.GetArg(term, i)
+		if e != nil {
+			return false, e
+		}
+		if e = b.pushTerm(arg); e != nil {
+			return false, e
+		}
+	}
+	values, err := b.coeff.BorrowedValues()
+	if err != nil {
+		return false, err
+	}
+	implied := numeral.NewRational()
+	defer func() { err = errors.Join(err, b.store.manager.Del(&implied)) }()
+	found, impliedStrict, err := b.store.PolynomialBound(values, b.ids, lower, &implied)
+	if err != nil || !found {
+		return false, err
+	}
+	cmp, err := b.store.manager.Compare(&implied, k)
+	if err != nil {
+		return false, err
+	}
+	if lower {
+		return cmp > 0 || cmp == 0 && (!strict || impliedStrict), nil
+	}
+	return cmp < 0 || cmp == 0 && (!strict || impliedStrict), nil
+}
+
 func (b *PolynomialBuilder) Close() error {
 	if b == nil || b.self != b {
 		return arena.ErrInvalidSlot
