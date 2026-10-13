@@ -146600,7 +146600,8 @@
         "pkg/util/memory/process_display.go",
         "pkg/sat/sat_solver_runtime.go",
         "pkg/sat/tactic/sat_goal_to_sat.go",
-        "pkg/model/model_evaluator.go"
+        "pkg/model/model_evaluator.go",
+        "pkg/util/memory/process_accounting.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -146669,7 +146670,9 @@
         "TestSATRuntimeSharedProcessAndNumeralCohort",
         "TestSATGoalTranslatorSharedProcessMemoryCheckpoint",
         "TestModelEvaluatorSharedProcessMemoryAndCohort",
-        "TestNumericStreamNativeCountedTextAndOwnedInput"
+        "TestNumericStreamNativeCountedTextAndOwnedInput",
+        "TestProcessSourceLifecycleGuards",
+        "TestProcessSourceLifecycleRejectsInvalidOwners"
       ],
       "conditionals": [
         {
@@ -146898,8 +146901,11 @@
         {
           "name": "caller-confined actual generated initialize/finalize scalar order cpp89-113/153-160 with stable-priority rational-symbol-gparams and debug-gparams-prime-rational-symbol-trace finalizers",
           "status": "partial",
-          "go_target": "",
-          "tests": []
+          "go_target": "pkg/util/memory/process_accounting.go",
+          "tests": [
+            "TestProcessSourceLifecycleGuards",
+            "TestProcessSourceLifecycleRejectsInvalidOwners"
+          ]
         },
         {
           "name": "caller-confined generated gparams preparation binds exact borrowed process assertion owner before imp initialize; reached namespace assertions and numeric bare_str share actual DebugContext state",
@@ -146963,7 +146969,8 @@
         "pkg/util/memory/process_display.go",
         "pkg/sat/sat_solver_runtime.go",
         "pkg/sat/tactic/sat_goal_to_sat.go",
-        "pkg/model/model_evaluator.go"
+        "pkg/model/model_evaluator.go",
+        "pkg/util/memory/process_accounting.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -147020,7 +147027,9 @@
         "TestSATRuntimeSharedProcessAndNumeralCohort",
         "TestSATGoalTranslatorSharedProcessMemoryCheckpoint",
         "TestModelEvaluatorSharedProcessMemoryAndCohort",
-        "TestNumericStreamNativeCountedTextAndOwnedInput"
+        "TestNumericStreamNativeCountedTextAndOwnedInput",
+        "TestProcessSourceLifecycleGuards",
+        "TestProcessSourceLifecycleRejectsInvalidOwners"
       ],
       "conditionals": [
         {
@@ -147227,8 +147236,11 @@
         {
           "name": "caller-confined actual generated initialize/finalize scalar order cpp89-113/153-160 with stable-priority rational-symbol-gparams and debug-gparams-prime-rational-symbol-trace finalizers",
           "status": "partial",
-          "go_target": "",
-          "tests": []
+          "go_target": "pkg/util/memory/process_accounting.go",
+          "tests": [
+            "TestProcessSourceLifecycleGuards",
+            "TestProcessSourceLifecycleRejectsInvalidOwners"
+          ]
         }
       ],
       "ownership": [

@@ -1,13 +1,20 @@
 package memory
 
+import "errors"
+
+var ErrProcessLifecyclePending = errors.New("g3: source memory lifecycle stage is pending")
+var ErrProcessLifecycleOrder = errors.New("g3: source memory lifecycle stage out of order")
+
 // ProcessAccounting is the shared source memory_manager.cpp counter and limit
 // state for a group of Runtime owners. The caller confines the process and its
 // runtimes to one goroutine, as with the individual Runtime owners. Each runtime
 // keeps its own allocation lane, including the source TLS synchronization
 // threshold; only the global fields are shared.
 type ProcessAccounting struct {
-	self       *ProcessAccounting
-	accounting utilMemoryAccounting
+	self                                      *ProcessAccounting
+	accounting                                utilMemoryAccounting
+	initialized, fullyInitialized, finalizing bool
+	initializing                              bool
 }
 
 func NewProcessAccounting() *ProcessAccounting {
@@ -53,4 +60,34 @@ func (p *ProcessAccounting) OutOfMemory() bool {
 // the predicate; the comparison uses only the synchronized global byte count.
 func (p *ProcessAccounting) AboveWatermark() bool {
 	return p.Valid() && p.accounting.aboveWatermark()
+}
+
+// BeginFinalize enters memory::finalize's guarded generated-child interval.
+// The caller runs mem_finalize's concrete children before CompleteFinalize.
+func (p *ProcessAccounting) BeginFinalize() (bool, error) {
+	if !p.Valid() {
+		return false, ErrRuntimeOwner
+	}
+	if p.initializing || p.finalizing {
+		return false, ErrProcessLifecyclePending
+	}
+	if !p.initialized {
+		return false, nil
+	}
+	p.finalizing = true
+	return true, nil
+}
+
+// CompleteFinalize matches the two assignments after generated mem_finalize.
+// The source does not clear g_memory_fully_initialized on finalization.
+func (p *ProcessAccounting) CompleteFinalize() error {
+	if !p.Valid() {
+		return ErrRuntimeOwner
+	}
+	if !p.finalizing {
+		return ErrProcessLifecycleOrder
+	}
+	p.initialized = false
+	p.finalizing = false
+	return nil
 }
