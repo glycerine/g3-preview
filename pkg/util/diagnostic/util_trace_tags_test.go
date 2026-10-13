@@ -2,10 +2,61 @@ package diagnostic
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"strings"
 	"testing"
 )
+
+type traceHeaderRefusalWriter struct {
+	bytes.Buffer
+	until, writes, flushes int
+	refusal                error
+}
+
+func (w *traceHeaderRefusalWriter) Write(p []byte) (int, error) {
+	w.writes++
+	if w.writes == w.until {
+		return 0, w.refusal
+	}
+	return w.Buffer.Write(p)
+}
+func (w *traceHeaderRefusalWriter) WriteString(s string) (int, error) { return w.Write([]byte(s)) }
+func (w *traceHeaderRefusalWriter) Flush() error                      { w.flushes++; return nil }
+
+func TestTraceHeaderSourceInsertionRefusalPrefixes(t *testing.T) {
+	parts := [...]string{"-------- [", "alpha", "] ", "work", " ", "src/util/trace.cpp", ":", "31", " ---------\n"}
+	for at := range parts {
+		for _, conditional := range []bool{false, true} {
+			refusal := errors.New("trace header refusal")
+			w := &traceHeaderRefusalWriter{until: at + 1, refusal: refusal}
+			tags := NewTraceTagsWithWriter(w)
+			tags.Enable("alpha")
+			called := 0
+			var err error
+			if conditional {
+				err = tags.EmitConditional("alpha", "work", "src/util/trace.cpp", 31,
+					func() bool { called++; return true },
+					func(io.Writer) error { called++; return nil })
+			} else {
+				err = tags.Emit("alpha", "work", "src/util/trace.cpp", 31, "body")
+			}
+			if !traceCompiled {
+				if err != nil || called != 0 || w.writes != 0 || w.flushes != 0 {
+					t.Fatal("erased header evaluated", at, conditional, err, called, w)
+				}
+				continue
+			}
+			want := strings.Join(parts[:at], "")
+			if !errors.Is(err, refusal) || w.String() != want || w.writes != at+1 || w.flushes != 0 {
+				t.Fatal("header refusal prefix", at, conditional, err, w.String(), want, w.writes, w.flushes)
+			}
+			if conditional && called != 1 {
+				t.Fatal("condition/body order", called)
+			}
+		}
+	}
+}
 
 func TestTraceTagsSourceControlAndFinalize(t *testing.T) {
 	tags := NewTraceTags()

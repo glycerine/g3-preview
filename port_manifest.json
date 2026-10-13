@@ -173400,6 +173400,7 @@
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
+        "TestTraceHeaderSourceInsertionRefusalPrefixes",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
         "TestFastFloatSetIntegerRetainedTraceBranches",
@@ -173495,6 +173496,14 @@
           "tests": [
             "TestTraceShortAndConditionalGateOrder",
             "TestCooperationCheckpointTraceDetailAndConditional"
+          ]
+        },
+        {
+          "name": "TRACE and CTRACE nine-piece source header insertion order and refused-prefix behavior",
+          "status": "ported",
+          "go_target": "pkg/util/diagnostic/util_trace_tags.go",
+          "tests": [
+            "TestTraceHeaderSourceInsertionRefusalPrefixes"
           ]
         },
         {
@@ -173744,6 +173753,7 @@
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
+        "TestTraceHeaderSourceInsertionRefusalPrefixes",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
         "TestFastFloatSetIntegerRetainedTraceBranches",
@@ -173851,6 +173861,14 @@
           "tests": [
             "TestTraceShortAndConditionalGateOrder",
             "TestCooperationCheckpointTraceDetailAndConditional"
+          ]
+        },
+        {
+          "name": "TRACE and CTRACE nine-piece source header insertion order and refused-prefix behavior",
+          "status": "ported",
+          "go_target": "pkg/util/diagnostic/util_trace_tags.go",
+          "tests": [
+            "TestTraceHeaderSourceInsertionRefusalPrefixes"
           ]
         },
         {

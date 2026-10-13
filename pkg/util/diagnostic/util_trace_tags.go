@@ -2,9 +2,9 @@
 package diagnostic
 
 import (
-	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -96,6 +96,16 @@ func flushTrace(w io.Writer) error {
 	return nil
 }
 
+// TRACE and CTRACE insert each header component separately before CODE runs.
+func writeTraceHeader(w io.Writer, tag, function, file string, line int) error {
+	for _, part := range [...]string{"-------- [", traceTagCString(tag), "] ", function, " ", file, ":", strconv.Itoa(line), " ---------\n"} {
+		if err := writeTracePart(w, part); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Emit writes one TRACE record to the source-order stream. The caller
 // supplies its static source site and already-gated body. An explicitly
 // constructed unbound stream opens .z3-trace on its first
@@ -108,12 +118,14 @@ func (t *TraceTags) Emit(tag, function, file string, line int, body string) erro
 	if err != nil {
 		return err
 	}
-	tag = traceTagCString(tag)
-	header := fmt.Sprintf("-------- [%s] %s %s:%d ---------\n", tag, function, file, line)
-	for _, part := range []string{header, body, "------------------------------------------------\n"} {
-		if err := writeTracePart(w, part); err != nil {
-			return err
-		}
+	if err := writeTraceHeader(w, tag, function, file, line); err != nil {
+		return err
+	}
+	if err := writeTracePart(w, body); err != nil {
+		return err
+	}
+	if err := writeTracePart(w, "------------------------------------------------\n"); err != nil {
+		return err
 	}
 	return flushTrace(w)
 }
@@ -147,8 +159,7 @@ func (t *TraceTags) EmitConditional(tag, function, file string, line int, condit
 	if err != nil {
 		return err
 	}
-	header := fmt.Sprintf("-------- [%s] %s %s:%d ---------\n", traceTagCString(tag), function, file, line)
-	if err := writeTracePart(w, header); err != nil {
+	if err := writeTraceHeader(w, tag, function, file, line); err != nil {
 		return err
 	}
 	if body != nil {
