@@ -50008,7 +50008,9 @@
         "pkg/math/subpaving/fast_interval_power.go",
         "pkg/math/subpaving/fast_interval_power_test.go",
         "pkg/math/subpaving/fast_node.go",
-        "pkg/math/subpaving/fast_node_test.go"
+        "pkg/math/subpaving/fast_node_test.go",
+        "pkg/math/subpaving/fast_node_predicates.go",
+        "pkg/math/subpaving/fast_node_predicates_test.go"
       ],
       "tests": [
         "TestSubpavingFastMutableIntervalRetainedCore",
@@ -50017,7 +50019,8 @@
         "TestSubpavingFastIntervalDivSignBranches",
         "TestSubpavingFastIntervalScalarMulDiv",
         "TestSubpavingFastIntervalPowerRetainedCases",
-        "TestSubpavingFastNodeConstantIntervalViews"
+        "TestSubpavingFastNodeConstantIntervalViews",
+        "TestSubpavingFastNodeBoundPredicates"
       ],
       "conditionals": [
         {
@@ -50360,7 +50363,9 @@
         "pkg/math/subpaving/fixed_selector.go",
         "pkg/math/subpaving/fixed_selector_test.go",
         "pkg/math/subpaving/fast_node.go",
-        "pkg/math/subpaving/fast_node_test.go"
+        "pkg/math/subpaving/fast_node_test.go",
+        "pkg/math/subpaving/fast_node_predicates.go",
+        "pkg/math/subpaving/fast_node_predicates_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50386,7 +50391,8 @@
         "TestSubpavingFixedMidpointIntegerChildNormalization",
         "TestSubpavingFixedRoundRobinSourceDecisionAndDefinitionSkip",
         "TestSubpavingFixedRoundRobinSingletonAndUndecidedChild",
-        "TestSubpavingFastNodeConstantIntervalViews"
+        "TestSubpavingFastNodeConstantIntervalViews",
+        "TestSubpavingFastNodeBoundPredicates"
       ],
       "assertions": [
         {
@@ -50715,6 +50721,14 @@
           "go_target": "pkg/math/subpaving/fast_node.go",
           "tests": [
             "TestSubpavingFastNodeConstantIntervalViews"
+          ]
+        },
+        {
+          "name": "Concrete config_mpff node zero, upper-zero and conflicting-bound predicates (src/math/subpaving/subpaving_t_def.h:1321-1343)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_node_predicates.go",
+          "tests": [
+            "TestSubpavingFastNodeBoundPredicates"
           ]
         }
       ],
