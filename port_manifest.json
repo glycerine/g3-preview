@@ -113352,7 +113352,8 @@
       "go_targets": [
         "pkg/util/numeral/mpbqi.go",
         "pkg/util/numeral/mpbqi_format.go",
-        "pkg/util/numeral/scoped_binary_interval.go"
+        "pkg/util/numeral/scoped_binary_interval.go",
+        "pkg/util/numeral/mpbqi_stream_test.go"
       ],
       "tests": [
         "TestBinaryIntervalQueriesAndScalarRoutes",
@@ -113364,7 +113365,8 @@
         "TestBinaryIntervalFormattingAndWarmStorage",
         "TestBinaryIntervalPredicateShortCircuits",
         "TestBinaryIntervalOwnerAndScope",
-        "TestBinaryIntervalRetainedProductsAndDeepCopies"
+        "TestBinaryIntervalRetainedProductsAndDeepCopies",
+        "TestBinaryIntervalSourceStreamOrderAndRefusalPrefixes"
       ],
       "conditionals": [
         {
@@ -113488,13 +113490,21 @@
             "TestBinaryIntervalOwnerAndScope",
             "TestBinaryIntervalRetainedProductsAndDeepCopies"
           ]
+        },
+        {
+          "name": "Concrete MPBQ/open interval io.Writer display with source-order delimiter and bound insertion plus partial-write prefixes (src/util/basic_interval.h:358-360)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbqi_format.go",
+          "tests": [
+            "TestBinaryIntervalSourceStreamOrderAndRefusalPrefixes"
+          ]
         }
       ],
       "ownership": [
         "The only production source instantiation is basic_interval_manager<mpbq_manager, false>, through mpbqi_manager in mpbqi.h. Concrete pointer-free endpoints borrow one BinaryRationalManager domain. Cold manager and scope headers are charged; three retained multiplication scratch numerators preserve old output ownership. Source endpoint/destructor order and immediate reachable numeral/Words/diagnostic graphs are audited before formatting and teardown."
       ],
       "deviations": [
-        "Concrete MPBQ/open specialization replaces C++ templates without Go generics. Explicit lifetime/provenance guards and typed failures preserve completed source statement prefixes. Staged byte output and final caller-owned strings replace selected display calls. The old_interval.cpp integer instantiation is source-test-only; no production source instantiates a closed manager or calls field-only inv/div (mpbq_manager::field() is false). Real downstream consumers remain separate source units."
+        "Concrete MPBQ/open specialization replaces C++ templates without Go generics. Native io.Writer insertion preserves source delimiter/bound order, while staged strings retain existing callers. The old_interval.cpp integer instantiation is source-test-only; no production source instantiates a closed manager or calls field-only inv/div (mpbq_manager::field() is false). Real downstream consumers remain separate source units."
       ]
     },
     {
@@ -145048,7 +145058,8 @@
       "go_targets": [
         "pkg/util/numeral/mpbqi.go",
         "pkg/util/numeral/mpbqi_format.go",
-        "pkg/util/numeral/scoped_binary_interval.go"
+        "pkg/util/numeral/scoped_binary_interval.go",
+        "pkg/util/numeral/mpbqi_stream_test.go"
       ],
       "tests": [
         "TestBinaryIntervalQueriesAndScalarRoutes",
@@ -145060,7 +145071,8 @@
         "TestBinaryIntervalFormattingAndWarmStorage",
         "TestBinaryIntervalPredicateShortCircuits",
         "TestBinaryIntervalOwnerAndScope",
-        "TestBinaryIntervalRetainedProductsAndDeepCopies"
+        "TestBinaryIntervalRetainedProductsAndDeepCopies",
+        "TestBinaryIntervalSourceStreamOrderAndRefusalPrefixes"
       ],
       "conditionals": [
         {
@@ -145127,16 +145139,24 @@
           ]
         },
         {
-          "name": "Persistent ostream integration and real polynomial/algebraic consumers",
-          "status": "unported",
+          "name": "Persistent platform ostream state and real polynomial/algebraic display consumers",
+          "status": "partial",
           "tests": []
+        },
+        {
+          "name": "Concrete MPBQ/open interval io.Writer display with source-order delimiter and bound insertion plus partial-write prefixes (src/util/basic_interval.h:358-360)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbqi_format.go",
+          "tests": [
+            "TestBinaryIntervalSourceStreamOrderAndRefusalPrefixes"
+          ]
         }
       ],
       "ownership": [
         "Concrete pointer-free endpoints borrow one BinaryRationalManager domain. Actual cold manager and scope headers are charged; three retained multiplication scratch numerators preserve old output ownership. Source endpoint/destructor order and immediate reachable numeral/Words/diagnostic graphs are audited before formatting and teardown. See PORT_PROGRESS.md#audit-mpbqi-port-status-md."
       ],
       "deviations": [
-        "Concrete MPBQ/open specialization replaces C++ templates without Go generics. Explicit lifetime/provenance guards and typed failures preserve completed source statement prefixes. Staged byte output and final caller-owned strings replace selected display calls; persistent ostream state, other numeral/closed specializations and real downstream consumers remain open."
+        "Concrete MPBQ/open specialization replaces C++ templates without Go generics. Native io.Writer insertion now preserves source delimiter/bound order and failing-write prefixes. Platform ostream state and the algebraic display_interval consumer remain open; staged caller-owned strings remain available."
       ]
     },
     {

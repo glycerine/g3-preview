@@ -1,6 +1,52 @@
 // Source basic_interval display.
 package numeral
 
+import (
+	"io"
+
+	"github.com/glycerine/g3/pkg/arena"
+)
+
+func writeBinaryIntervalPart(w io.Writer, text string) error {
+	n, err := io.WriteString(w, text)
+	if err == nil && n != len(text) {
+		return io.ErrShortWrite
+	}
+	return err
+}
+
+// Display follows basic_interval_manager<mpbq_manager,false>::display:
+// each delimiter and completed bound string is inserted in source order.
+func (m *BinaryIntervalManager) Display(w io.Writer, a *BinaryInterval) error {
+	if w == nil {
+		return arena.ErrInvalidSlot
+	}
+	if err := m.check(a); err != nil {
+		return err
+	}
+	if err := writeBinaryIntervalPart(w, "("); err != nil {
+		return err
+	}
+	lower, err := m.bounds.String(&a.lower)
+	if err != nil {
+		return err
+	}
+	if err := writeBinaryIntervalPart(w, lower); err != nil {
+		return err
+	}
+	if err := writeBinaryIntervalPart(w, ", "); err != nil {
+		return err
+	}
+	upper, err := m.bounds.String(&a.upper)
+	if err != nil {
+		return err
+	}
+	if err := writeBinaryIntervalPart(w, upper); err != nil {
+		return err
+	}
+	return writeBinaryIntervalPart(w, ")")
+}
+
 func (m *BinaryIntervalManager) appendBound(a *BinaryRational, offset uint32) (uint32, error) {
 	n, e := m.bounds.Z.prepareInteger(&a.Num, offset)
 	if e != nil || a.KField == 0 {
