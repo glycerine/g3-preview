@@ -18206,6 +18206,7 @@
         "TestPatternInferenceStableWeightAndUnaryPatternOwnership",
         "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
         "TestPatternInferenceMultiPatternThirtyTwoSplitCap",
+        "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
         "TestPatternInferencePreferredPatternsCompleteAndOwned",
         "TestPatternInferenceSelectionStagesAndMultiBudget",
         "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
@@ -18343,7 +18344,8 @@
           "go_target": "pkg/ast/pattern/multi_pattern.go",
           "tests": [
             "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
-            "TestPatternInferenceMultiPatternThirtyTwoSplitCap"
+            "TestPatternInferenceMultiPatternThirtyTwoSplitCap",
+            "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn"
           ]
         },
         {
@@ -173616,7 +173618,8 @@
         "pkg/util/numeral/mpfx_integral_trace.go",
         "pkg/util/numeral/mpfx_power_trace.go",
         "pkg/util/numeral/mpfx_division_callers_trace.go",
-        "pkg/ast/pattern/smaller_pattern.go"
+        "pkg/ast/pattern/smaller_pattern.go",
+        "pkg/ast/pattern/multi_pattern.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -173634,7 +173637,8 @@
         "TestFixedPointRetainedDivisionCallersTrace",
         "TestFixedPointDivisionTraceSourceInsertionPrefixes",
         "TestFixedPointDivisionTraceRefusalKeepsArithmetic",
-        "TestSmallerPatternSaveTraceBeforePairPublication"
+        "TestSmallerPatternSaveTraceBeforePairPublication",
+        "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn"
       ],
       "conditionals": [
         {
@@ -173957,6 +173961,14 @@
           ]
         },
         {
+          "name": "retained candidates2multi_patterns queue-size and split-count TRACE after each completed loop body (src/ast/pattern/pattern_inference.cpp:474-475)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/multi_pattern.go",
+          "tests": [
+            "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn"
+          ]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -173987,7 +173999,8 @@
         "pkg/util/numeral/mpfx_integral_trace.go",
         "pkg/util/numeral/mpfx_power_trace.go",
         "pkg/util/numeral/mpfx_division_callers_trace.go",
-        "pkg/ast/pattern/smaller_pattern.go"
+        "pkg/ast/pattern/smaller_pattern.go",
+        "pkg/ast/pattern/multi_pattern.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -174005,7 +174018,8 @@
         "TestFixedPointRetainedDivisionCallersTrace",
         "TestFixedPointDivisionTraceSourceInsertionPrefixes",
         "TestFixedPointDivisionTraceRefusalKeepsArithmetic",
-        "TestSmallerPatternSaveTraceBeforePairPublication"
+        "TestSmallerPatternSaveTraceBeforePairPublication",
+        "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn"
       ],
       "conditionals": [
         {
@@ -174337,6 +174351,14 @@
           "go_target": "pkg/ast/pattern/smaller_pattern.go",
           "tests": [
             "TestSmallerPatternSaveTraceBeforePairPublication"
+          ]
+        },
+        {
+          "name": "retained candidates2multi_patterns queue-size and split-count TRACE after each completed loop body (src/ast/pattern/pattern_inference.cpp:474-475)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/multi_pattern.go",
+          "tests": [
+            "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn"
           ]
         },
         {

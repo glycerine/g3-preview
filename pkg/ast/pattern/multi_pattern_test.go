@@ -1,11 +1,76 @@
 package pattern
 
 import (
+	"bytes"
+	"fmt"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn(t *testing.T) {
+	m := patternManager(t)
+	b, err := m.MkBoolSort()
+	patternMust(t, err)
+	pin := func(h ast.ASTHandle) ast.ASTHandle {
+		t.Helper()
+		patternMust(t, m.IncRef(h))
+		t.Cleanup(func() { patternMust(t, m.DecRef(h)) })
+		return h
+	}
+	x, err := m.MkVar(0, b)
+	patternMust(t, err)
+	y, err := m.MkVar(1, b)
+	patternMust(t, err)
+	pin(x)
+	pin(y)
+	app := func(name uint32, arg ast.ASTHandle) ast.ASTHandle {
+		t.Helper()
+		d, e := m.MkFuncDecl(symbol.Numerical(name), []ast.ASTHandle{b}, b, ast.ASTFuncDeclInfo{})
+		patternMust(t, e)
+		pin(d)
+		h, e := m.MkApp(d, []ast.ASTHandle{arg})
+		patternMust(t, e)
+		return pin(h)
+	}
+	a, d := app(780, x), app(781, y)
+	c, err := newPatternCandidates(m, 2, nil, false)
+	patternMust(t, err)
+	t.Cleanup(func() { patternMust(t, c.close()) })
+	patternMust(t, c.addCandidate(a, []uint32{0}, 2))
+	patternMust(t, c.addCandidate(d, []uint32{1}, 2))
+	var output bytes.Buffer
+	trace := diagnostic.NewTraceTagsWithWriter(&output)
+	trace.Enable("pattern_inference")
+	c.traceTags = trace
+	result, err := c.selectMulti([]ast.ASTHandle{a, d}, 1, nil)
+	patternMust(t, err)
+	if len(result) != 1 {
+		t.Fatal("source first complete multi-pattern", len(result))
+	}
+	patternMust(t, m.DelRef(&result[0]))
+	if trace.ShouldTrace("pattern_inference") {
+		record := func(size, splits int) string {
+			return fmt.Sprintf("-------- [pattern_inference] candidates2multi_patterns src/ast/pattern/pattern_inference.cpp:474 ---------\nm_pre_patterns.size(): %d\nnum_splits: %d\n------------------------------------------------\n", size, splits)
+		}
+		want := record(3, 1) + record(5, 2) + record(7, 3)
+		if output.String() != want {
+			t.Fatalf("source queue trace and early-return prefix: got %q, want %q", output.String(), want)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("erased queue trace wrote output", output.String())
+	}
+	output.Reset()
+	trace.Disable("pattern_inference")
+	result, err = c.selectMulti([]ast.ASTHandle{a, d}, 1, nil)
+	patternMust(t, err)
+	if len(result) != 1 || output.Len() != 0 {
+		t.Fatal("disabled queue trace changed result or emitted output", len(result), output.String())
+	}
+	patternMust(t, m.DelRef(&result[0]))
+}
 
 func TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership(t *testing.T) {
 	m := patternManager(t)

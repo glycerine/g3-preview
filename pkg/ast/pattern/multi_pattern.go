@@ -1,7 +1,12 @@
 // Source: src/ast/pattern/pattern_inference.cpp:435-482.
 package pattern
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"fmt"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
 
 const maxPatternSplits = 32
 
@@ -33,6 +38,10 @@ func (c *patternCandidates) selectMulti(candidates []ast.ASTHandle, maxPatterns 
 	}
 	states := []*prePattern{{freeVars: make(map[uint32]struct{})}}
 	var splits uint32
+	trace := c.traceTags
+	if trace == nil {
+		trace = diagnostic.BorrowProcessTraceTags()
+	}
 	for j := 0; j < len(states); j++ {
 		current := states[j]
 		if uint32(len(current.freeVars)) == c.numBindings {
@@ -77,6 +86,12 @@ func (c *patternCandidates) selectMulti(candidates []ast.ASTHandle, maxPatterns 
 				states[j] = nil
 				current.index++
 				states = append(states, current)
+			}
+		}
+		if trace.ShouldTrace("pattern_inference") {
+			if err := trace.Emit("pattern_inference", "candidates2multi_patterns", "src/ast/pattern/pattern_inference.cpp", 474,
+				fmt.Sprintf("m_pre_patterns.size(): %d\nnum_splits: %d\n", len(states), splits)); err != nil {
+				return result, err
 			}
 		}
 	}
