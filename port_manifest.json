@@ -51227,7 +51227,10 @@
         "pkg/math/subpaving/fast_context_params_test.go",
         "pkg/math/subpaving/fast_display.go",
         "pkg/math/subpaving/fast_shell_coefficients_test.go",
-        "pkg/math/subpaving/fast_display_bounds_test.go"
+        "pkg/math/subpaving/fast_display_bounds_test.go",
+        "pkg/math/subpaving/fast_selector.go",
+        "pkg/math/subpaving/fast_split.go",
+        "pkg/math/subpaving/fast_selector_split_test.go"
       ],
       "tests": [
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
@@ -51322,7 +51325,9 @@
         "TestHardwareShellParamDescriptionsSourceOrder",
         "TestFastContextNamedParamsSinglePassAndStoppedPrefix",
         "TestFastShellExactCoefficientsAndDirectedInequalities",
-        "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
+        "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes",
+        "TestFastSelectorRoundRobinAndDefinitionFilter",
+        "TestFastMidpointSplitterSourceBranchesAndRefusal"
       ],
       "conditionals": [
         {
@@ -51858,6 +51863,22 @@
           "tests": [
             "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
           ]
+        },
+        {
+          "name": "Concrete config_mpff round-robin variable selector after latest child axiom (src/math/subpaving/subpaving_t_def.h:66-101)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_selector.go",
+          "tests": [
+            "TestFastSelectorRoundRobinAndDefinitionFilter"
+          ]
+        },
+        {
+          "name": "Concrete config_mpff midpoint splitter creates children before arithmetic and preserves integer normalization (src/math/subpaving/subpaving_t_def.h:185-247)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_split.go",
+          "tests": [
+            "TestFastMidpointSplitterSourceBranchesAndRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -51869,7 +51890,8 @@
         "The config_mpff tactic variable registration now grows source-order type/watch slots and the Go root bound arrays before initialization. The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open.",
         "The config_mpff six named parameter updates now retain source order, defaults, partial numeric mutation and a closable refused owner. The Go context allocates its root before this pass; complete constructor allocation order, node search/splitting and full solver lifecycle remain open.",
         "The config_mpff context now displays definitions, units and clauses through the source MPFF to_rational_string spelling, which delegates to the ordinary String formatter. Borrowed variable display and shell forwarding are concrete; search remains open.",
-        "The config_mpff context now records child creation order, displays consistent leaves with inherited bounds and exact MPFF numeral text, and omits conflicting leaves. Search, splitting and statistics remain open."
+        "The config_mpff context now records child creation order, displays consistent leaves with inherited bounds and exact MPFF numeral text, and omits conflicting leaves. Search, splitting and statistics remain open.",
+        "The config_mpff round-robin variable selector and midpoint splitter now use concrete FastFloat arithmetic. Integer-bound normalization, directed unbounded splits and adjacent-value refusal preserve source order; the enclosing search queue, depth/node budgets and full tactic lifecycle remain open."
       ]
     },
     {
@@ -51990,7 +52012,10 @@
         "pkg/math/subpaving/fast_context_params_test.go",
         "pkg/math/subpaving/fast_display.go",
         "pkg/math/subpaving/fast_shell_coefficients_test.go",
-        "pkg/math/subpaving/fast_display_bounds_test.go"
+        "pkg/math/subpaving/fast_display_bounds_test.go",
+        "pkg/math/subpaving/fast_selector.go",
+        "pkg/math/subpaving/fast_split.go",
+        "pkg/math/subpaving/fast_selector_split_test.go"
       ],
       "tests": [
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
@@ -52087,7 +52112,9 @@
         "TestSubpavingTacticOptionSelectionAndDescriptions",
         "TestFastContextNamedParamsSinglePassAndStoppedPrefix",
         "TestFastShellExactCoefficientsAndDirectedInequalities",
-        "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
+        "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes",
+        "TestFastSelectorRoundRobinAndDefinitionFilter",
+        "TestFastMidpointSplitterSourceBranchesAndRefusal"
       ],
       "assertions": [
         {
@@ -53046,6 +53073,22 @@
           "tests": [
             "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
           ]
+        },
+        {
+          "name": "Concrete config_mpff round-robin variable selector after latest child axiom (src/math/subpaving/subpaving_t_def.h:66-101)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_selector.go",
+          "tests": [
+            "TestFastSelectorRoundRobinAndDefinitionFilter"
+          ]
+        },
+        {
+          "name": "Concrete config_mpff midpoint splitter creates children before arithmetic and preserves integer normalization (src/math/subpaving/subpaving_t_def.h:185-247)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_split.go",
+          "tests": [
+            "TestFastMidpointSplitterSourceBranchesAndRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -53057,7 +53100,8 @@
         "The config_mpff tactic variable registration now grows source-order type/watch slots and the Go root bound arrays before initialization. The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open.",
         "The config_mpff six named parameter updates now retain source order, defaults, partial numeric mutation and a closable refused owner. The Go context allocates its root before this pass; complete constructor allocation order, node search/splitting and full solver lifecycle remain open.",
         "The config_mpff context now displays definitions, units and clauses through the source MPFF to_rational_string spelling, which delegates to the ordinary String formatter. Borrowed variable display and shell forwarding are concrete; search remains open.",
-        "The config_mpff context now records child creation order, displays consistent leaves with inherited bounds and exact MPFF numeral text, and omits conflicting leaves. Search, splitting and statistics remain open."
+        "The config_mpff context now records child creation order, displays consistent leaves with inherited bounds and exact MPFF numeral text, and omits conflicting leaves. Search, splitting and statistics remain open.",
+        "The config_mpff round-robin variable selector and midpoint splitter now use concrete FastFloat arithmetic. Integer-bound normalization, directed unbounded splits and adjacent-value refusal preserve source order; the enclosing search queue, depth/node budgets and full tactic lifecycle remain open."
       ]
     },
     {
