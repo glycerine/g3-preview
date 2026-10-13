@@ -41,11 +41,11 @@ func (c *FastContext) writeVariable(w io.Writer, variable uint32) error {
 }
 
 func (c *FastContext) displayRelation(w io.Writer, variable uint32, number *numeral.FastFloat, lower, open bool) error {
-	value, err := c.numbers.String(number)
-	if err != nil {
-		return err
-	}
 	if lower {
+		value, err := c.numbers.String(number)
+		if err != nil {
+			return err
+		}
 		if err := fastWrite(w, value); err != nil {
 			return err
 		}
@@ -74,6 +74,10 @@ func (c *FastContext) displayRelation(w io.Writer, variable uint32, number *nume
 		}
 	}
 	if err := fastWrite(w, " "); err != nil {
+		return err
+	}
+	value, err := c.numbers.String(number)
+	if err != nil {
 		return err
 	}
 	return fastWrite(w, value)

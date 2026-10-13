@@ -52364,7 +52364,8 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fast_display.go",
           "tests": [
-            "TestFastShellExactCoefficientsAndDirectedInequalities"
+            "TestFastShellExactCoefficientsAndDirectedInequalities",
+            "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
           ]
         },
         {
@@ -53590,7 +53591,8 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fast_display.go",
           "tests": [
-            "TestFastShellExactCoefficientsAndDirectedInequalities"
+            "TestFastShellExactCoefficientsAndDirectedInequalities",
+            "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
           ]
         },
         {

@@ -84,6 +84,23 @@ func TestFastDisplayBoundsLeavesConflictAndWriterPrefixes(t *testing.T) {
 	if err := c.DisplayBounds(&out); err != nil || out.Len() != 0 {
 		t.Fatal("empty root", out.String(), err)
 	}
+	stoppedVariable := errors.New("stopped variable printer")
+	if err := c.SetVariableDisplay(func(io.Writer, uint32) error { return stoppedVariable }); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.displayRelation(&out, 0, nil, false, false); !errors.Is(err, stoppedVariable) || out.Len() != 0 {
+		t.Fatal("upper variable must precede numeral formatting", out.String(), err)
+	}
+	if err := c.SetVariableDisplay(nil); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.displayRelation(&out, 0, nil, false, false); !errors.Is(err, arena.ErrInvalidSlot) || out.String() != "x0 <= " {
+		t.Fatal("upper numeral refusal must retain relation prefix", out.String(), err)
+	}
+	out.Reset()
+	if err := c.displayRelation(&out, 0, nil, true, false); !errors.Is(err, arena.ErrInvalidSlot) || out.Len() != 0 {
+		t.Fatal("lower numeral must precede relation output", out.String(), err)
+	}
 	set := func(n int32) {
 		t.Helper()
 		if err := m.SetInt32(value, n); err != nil {
