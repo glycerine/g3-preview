@@ -170767,6 +170767,8 @@
         "TestTimeitOriginalMemoryCaptureAndFormatting",
         "TestTimeitDisabledErasureAndDefaultOutput",
         "TestTimeitOutputFailureAndFlush",
+        "TestTimeitEachSourceOutputBoundary",
+        "TestTimeitReadsSharedProcessAllocationAtBothSnapshots",
         "TestTimeitClockAndMemoryFailurePrefixes",
         "TestTimeitProviderReentryAndBorrowedOutput"
       ],
@@ -170781,16 +170783,18 @@
             "TestTimeitOriginalMemoryCaptureAndFormatting",
             "TestTimeitDisabledErasureAndDefaultOutput",
             "TestTimeitOutputFailureAndFlush",
+            "TestTimeitEachSourceOutputBoundary",
+            "TestTimeitReadsSharedProcessAllocationAtBothSnapshots",
             "TestTimeitClockAndMemoryFailurePrefixes",
             "TestTimeitProviderReentryAndBorrowedOutput"
           ]
         }
       ],
       "ownership": [
-        "Timeit in util/stopwatch embeds a Go stopwatch and scalar memory baseline, retains its immutable message string, and borrows an io.Writer and optional byte-count callback. Output defaults to os.Stderr. No Runtime block, source-layout allocation, root util dependency, or ostream flag state remains. End memory is captured before reporting; clock, memory-provider, write, and flush errors remain sticky. Cleanup ends a failed scope without replaying output."
+        "Timeit in util/stopwatch embeds a Go stopwatch and scalar memory baseline, retains its immutable message string, and borrows an io.Writer and either an explicit shared process owner or optional byte-count callback. Output defaults to os.Stderr. No Runtime block, source-layout allocation, root util dependency, or ostream flag state remains. End memory is captured before reporting; clock, memory-provider, write, and flush errors remain sticky. Cleanup ends a failed scope without replaying output."
       ],
       "deviations": [
-        "Native Go fields and fmt formatting replace the C++ imp allocation and ostream machinery. Go storage adds no fabricated extent to memory snapshots. Callers select memory statistics through a typed optional callback; omitted statistics report zero. Optional writer Flush is honored. Immutable strings replace dangling/null C message pointers and preserve NUL-terminated source name semantics. Explicit Construct/Close/Cleanup replace stack lifetime. Live production reports occur in src/smt/smt_context.cpp and src/muz/spacer/spacer_context.cpp."
+        "Native Go fields and fmt formatting replace the C++ imp allocation and ostream machinery. Go storage adds no fabricated extent to memory snapshots. Callers select memory statistics through a shared process owner or typed optional callback; omitted statistics report zero. Optional writer Flush is honored. Immutable strings replace dangling/null C message pointers and preserve NUL-terminated source name semantics. Explicit Construct/Close/Cleanup replace stack lifetime. Live production reports occur in src/smt/smt_context.cpp and src/muz/spacer/spacer_context.cpp."
       ]
     },
     {
@@ -170806,6 +170810,8 @@
         "TestTimeitOriginalMemoryCaptureAndFormatting",
         "TestTimeitDisabledErasureAndDefaultOutput",
         "TestTimeitOutputFailureAndFlush",
+        "TestTimeitEachSourceOutputBoundary",
+        "TestTimeitReadsSharedProcessAllocationAtBothSnapshots",
         "TestTimeitClockAndMemoryFailurePrefixes",
         "TestTimeitProviderReentryAndBorrowedOutput"
       ],
@@ -170830,16 +170836,18 @@
             "TestTimeitOriginalMemoryCaptureAndFormatting",
             "TestTimeitDisabledErasureAndDefaultOutput",
             "TestTimeitOutputFailureAndFlush",
+            "TestTimeitEachSourceOutputBoundary",
+            "TestTimeitReadsSharedProcessAllocationAtBothSnapshots",
             "TestTimeitClockAndMemoryFailurePrefixes",
             "TestTimeitProviderReentryAndBorrowedOutput"
           ]
         }
       ],
       "ownership": [
-        "Timeit in util/stopwatch embeds a Go stopwatch and scalar memory baseline, retains its immutable message string, and borrows an io.Writer and optional byte-count callback. Output defaults to os.Stderr. No Runtime block, source-layout allocation, root util dependency, or ostream flag state remains. End memory is captured before reporting; clock, memory-provider, write, and flush errors remain sticky. Cleanup ends a failed scope without replaying output."
+        "Timeit in util/stopwatch embeds a Go stopwatch and scalar memory baseline, retains its immutable message string, and borrows an io.Writer and either an explicit shared process owner or optional byte-count callback. Output defaults to os.Stderr. No Runtime block, source-layout allocation, root util dependency, or ostream flag state remains. End memory is captured before reporting; clock, memory-provider, write, and flush errors remain sticky. Cleanup ends a failed scope without replaying output."
       ],
       "deviations": [
-        "Native Go fields and fmt formatting replace the C++ imp allocation and ostream machinery. Go storage adds no fabricated extent to memory snapshots. Callers select memory statistics through a typed optional callback; omitted statistics report zero. Optional writer Flush is honored. Immutable strings replace dangling/null C message pointers and preserve NUL-terminated source name semantics. Explicit Construct/Close/Cleanup replace stack lifetime. Live production reports occur in src/smt/smt_context.cpp and src/muz/spacer/spacer_context.cpp."
+        "Native Go fields and fmt formatting replace the C++ imp allocation and ostream machinery. Go storage adds no fabricated extent to memory snapshots. Callers select memory statistics through a shared process owner or typed optional callback; omitted statistics report zero. Optional writer Flush is honored. Immutable strings replace dangling/null C message pointers and preserve NUL-terminated source name semantics. Explicit Construct/Close/Cleanup replace stack lifetime. Live production reports occur in src/smt/smt_context.cpp and src/muz/spacer/spacer_context.cpp."
       ]
     },
     {

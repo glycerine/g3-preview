@@ -112,8 +112,14 @@ func (p *Timeit) Close() (cause error) {
 	if e != nil {
 		return e
 	}
-	if _, e = fmt.Fprintf(p.output, "(%s :time %.2f :before-memory %.2f :after-memory %.2f)\n", p.message, seconds, p.beforeMemory, afterMemory); e != nil {
-		return e
+	for _, part := range []string{
+		"(", p.message, " :time ", fmt.Sprintf("%.2f", seconds),
+		" :before-memory ", fmt.Sprintf("%.2f", p.beforeMemory),
+		" :after-memory ", fmt.Sprintf("%.2f", afterMemory), ")", "\n",
+	} {
+		if e = writeTimeitPart(p.output, part); e != nil {
+			return e
+		}
 	}
 	if out, ok := p.output.(interface{ Flush() error }); ok {
 		if e = out.Flush(); e != nil {
@@ -121,6 +127,17 @@ func (p *Timeit) Close() (cause error) {
 		}
 	}
 	p.closed = true
+	return nil
+}
+
+func writeTimeitPart(out io.Writer, part string) error {
+	n, e := out.Write([]byte(part))
+	if e != nil {
+		return e
+	}
+	if n != len(part) {
+		return io.ErrShortWrite
+	}
 	return nil
 }
 

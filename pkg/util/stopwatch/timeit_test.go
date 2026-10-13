@@ -4,7 +4,9 @@ package stopwatch
 import (
 	"bytes"
 	"errors"
+	"io"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -131,7 +133,7 @@ type timeitWriter struct {
 func (w *timeitWriter) Write(p []byte) (int, error) {
 	w.writes++
 	if w.writeError != nil {
-		n, _ := w.Buffer.Write(p[:7])
+		n, _ := w.Buffer.Write(p[:1])
 		return n, w.writeError
 	}
 	return w.Buffer.Write(p)
@@ -157,15 +159,65 @@ func TestTimeitOutputFailureAndFlush(t *testing.T) {
 			t.Fatal("output error must be sticky", mode, cause)
 		}
 		if mode == "write" {
-			if output.String() != "(report" || output.flushes != 0 {
+			if output.String() != "(" || output.flushes != 0 {
 				t.Fatal(output)
 			}
 		} else if output.String() != "(report :time 0.00 :before-memory 0.00 :after-memory 0.00)\n" || output.flushes != 1 {
 			t.Fatal(output)
 		}
 		timerMust(t, scope.Cleanup())
-		if output.writes != 1 {
+		wantWrites := 10
+		if mode == "write" {
+			wantWrites = 1
+		}
+		if output.writes != wantWrites {
 			t.Fatal("cleanup replayed output", output.writes)
+		}
+	}
+}
+
+type timeitBoundaryWriter struct {
+	bytes.Buffer
+	call, failAt, partial, flushes int
+	cause                          error
+}
+
+func (w *timeitBoundaryWriter) Write(p []byte) (int, error) {
+	w.call++
+	if w.call == w.failAt {
+		if w.partial == 0 {
+			return 0, w.cause
+		}
+		if len(p) > 1 {
+			return w.Buffer.Write(p[:1])
+		}
+		return 0, nil
+	}
+	return w.Buffer.Write(p)
+}
+func (w *timeitBoundaryWriter) Flush() error { w.flushes++; return nil }
+
+func TestTimeitEachSourceOutputBoundary(t *testing.T) {
+	parts := []string{"(", "report", " :time ", "0.00", " :before-memory ", "0.00", " :after-memory ", "0.00", ")", "\n"}
+	failure := errors.New("write failed")
+	for _, partial := range []int{0, 1} {
+		for at := 1; at <= len(parts); at++ {
+			out := &timeitBoundaryWriter{failAt: at, partial: partial, cause: failure}
+			var scope Timeit
+			timerMust(t, scope.Construct(true, TimeitConfig{Output: out, Message: "report", Clock: func() (uint64, error) { return 0, nil }}))
+			e := scope.Close()
+			want := failure
+			if partial != 0 {
+				want = io.ErrShortWrite
+			}
+			prefix := strings.Join(parts[:at-1], "")
+			if partial != 0 && len(parts[at-1]) > 1 {
+				prefix += parts[at-1][:1]
+			}
+			if e != want || scope.Close() != want || out.String() != prefix || out.call != at || out.flushes != 0 {
+				t.Fatal("timeit output prefix", partial, at, e, out.String(), prefix, out.call, out.flushes)
+			}
+			timerMust(t, scope.Cleanup())
 		}
 	}
 }
