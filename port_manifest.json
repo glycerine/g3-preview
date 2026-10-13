@@ -78041,6 +78041,7 @@
         "TestSATGoalTranslatorAtomOwnershipAndClosedGuard",
         "TestSATGoalTranslatorBooleanInterfaceAndInterpretedAtoms",
         "TestSATGoalTranslatorCancellationAndMemoryParams",
+        "TestSATGoalTranslatorSharedProcessMemoryCheckpoint",
         "TestSATGoalTranslatorAtomMapGrowthAndModel",
         "TestSATGoalTranslatorRejectsUnnormalizedSourceOperators",
         "TestSATGoalTranslatorUsesASTManagerResourceLimit",
@@ -78160,6 +78161,7 @@
             "TestSATGoalTranslatorAtomOwnershipAndClosedGuard",
             "TestSATGoalTranslatorBooleanInterfaceAndInterpretedAtoms",
             "TestSATGoalTranslatorCancellationAndMemoryParams",
+            "TestSATGoalTranslatorSharedProcessMemoryCheckpoint",
             "TestSATGoalTranslatorAtomMapGrowthAndModel",
             "TestSATGoalTranslatorRejectsUnnormalizedSourceOperators"
           ]
@@ -146591,7 +146593,8 @@
         "pkg/util/text/util_numeric_stream.go",
         "pkg/util/memory/runtime_initialization_oom.go",
         "pkg/util/memory/process_display.go",
-        "pkg/sat/sat_solver_runtime.go"
+        "pkg/sat/sat_solver_runtime.go",
+        "pkg/sat/tactic/sat_goal_to_sat.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -146658,6 +146661,7 @@
         "TestMemoryRuntimeInitializationClearReachedOwnerGuard",
         "TestProcessDisplayMaxUsageSharedPeakAndInsertionPrefixes",
         "TestSATRuntimeSharedProcessAndNumeralCohort",
+        "TestSATGoalTranslatorSharedProcessMemoryCheckpoint",
         "TestNumericStreamNativeCountedTextAndOwnedInput"
       ],
       "conditionals": [
@@ -146713,6 +146717,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "goal2sat process-memory checkpoint binds its AST and SAT numeral owners to one shared source allocation counter (goal2sat.cpp:380-391)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat.go",
+          "tests": [
+            "TestSATGoalTranslatorSharedProcessMemoryCheckpoint"
+          ]
+        },
         {
           "name": "SAT solver process cohort binds its raw Runtime to parameter numeral ProcessAccounting and reads other-runtime bytes at retained memory-stat checkpoint (sat_solver.cpp:3762; sat_types.h:289-293)",
           "status": "ported",
@@ -146934,7 +146946,8 @@
         "pkg/util/text/util_numeric_stream.go",
         "pkg/util/memory/runtime_initialization_oom.go",
         "pkg/util/memory/process_display.go",
-        "pkg/sat/sat_solver_runtime.go"
+        "pkg/sat/sat_solver_runtime.go",
+        "pkg/sat/tactic/sat_goal_to_sat.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -146989,6 +147002,7 @@
         "TestMemoryRuntimeInitializationClearReachedOwnerGuard",
         "TestProcessDisplayMaxUsageSharedPeakAndInsertionPrefixes",
         "TestSATRuntimeSharedProcessAndNumeralCohort",
+        "TestSATGoalTranslatorSharedProcessMemoryCheckpoint",
         "TestNumericStreamNativeCountedTextAndOwnedInput"
       ],
       "conditionals": [
@@ -147048,6 +147062,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "goal2sat process-memory checkpoint binds its AST and SAT numeral owners to one shared source allocation counter (goal2sat.cpp:380-391)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat.go",
+          "tests": [
+            "TestSATGoalTranslatorSharedProcessMemoryCheckpoint"
+          ]
+        },
         {
           "name": "SAT solver process cohort binds its raw Runtime to parameter numeral ProcessAccounting and reads other-runtime bytes at retained memory-stat checkpoint (sat_solver.cpp:3762; sat_types.h:289-293)",
           "status": "ported",

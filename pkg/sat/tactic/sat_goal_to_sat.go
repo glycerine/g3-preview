@@ -56,6 +56,15 @@ func NewGoalTranslator(m *ast.ASTManager, s *sat.Solver) (tr *GoalTranslator, er
 	if err = s.CheckOwner(); err != nil {
 		return nil, err
 	}
+	numerals := m.NumeralService()
+	if numerals == nil || numerals.RuntimeOwner() == nil {
+		return nil, ast.ErrASTHandle
+	}
+	solverProcess := s.RuntimeOwner().ProcessOwner()
+	astProcess := numerals.RuntimeOwner().ProcessOwner()
+	if (solverProcess != nil || astProcess != nil) && solverProcess != astProcess {
+		return nil, sat.ErrSATOwner
+	}
 	boolSort, err := m.MkBoolSort()
 	if err != nil {
 		return nil, err
