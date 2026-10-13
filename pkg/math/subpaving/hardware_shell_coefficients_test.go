@@ -134,6 +134,23 @@ func TestSubpavingHardwareShellCoefficientAndInequalityConversion(t *testing.T) 
 	if _, err := w.MkInequality(99, &q, true, false); !errors.Is(err, arena.ErrInvalidSlot) || len(c.inequalities) != 2 {
 		t.Fatal("invalid inequality variable", err)
 	}
+	root, err := c.CreateRootNode()
+	must(err)
+	if root.id != 0 || root.depth != 0 || len(root.lower) != len(c.isInt) || root.context != c {
+		t.Fatal("context root bound views")
+	}
+	if _, err := c.NewVariable(true); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatal("variable after root construction", err)
+	}
+	child, err := c.NewChildNode(root)
+	must(err)
+	if child.id != 1 || child.depth != 1 || child.context != c {
+		t.Fatal("context child node identity")
+	}
+	if err := c.Close(); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatal("context with live child", err)
+	}
+	must(child.Close())
 	must(c.Close())
 	if err := w.PrepareInequality(&q, true); !errors.Is(err, arena.ErrClosed) {
 		t.Fatal("closed wrapper context", err)

@@ -42,7 +42,7 @@ func (c *HardwareContext) NewVariable(integer bool) (uint32, error) {
 	if err := c.open(); err != nil {
 		return 0, err
 	}
-	if len(c.isInt) >= math.MaxUint32 {
+	if c.root != nil || len(c.isInt) >= math.MaxUint32 {
 		return 0, arena.ErrInvalidSlot
 	}
 	x := uint32(len(c.isInt))
@@ -58,7 +58,7 @@ func (c *HardwareContext) DefinePolynomial(constant *numeral.HardwareFloat, term
 	if err := c.open(); err != nil {
 		return 0, err
 	}
-	if len(c.isInt) >= math.MaxUint32 {
+	if c.root != nil || len(c.isInt) >= math.MaxUint32 {
 		return 0, arena.ErrInvalidSlot
 	}
 	m := c.numbers

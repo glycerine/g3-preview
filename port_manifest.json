@@ -50952,7 +50952,8 @@
         "pkg/math/subpaving/hardware_interval_root.go",
         "pkg/math/subpaving/hardware_context_root.go",
         "pkg/math/subpaving/hardware_context_params.go",
-        "pkg/math/subpaving/hardware_context_constraints.go"
+        "pkg/math/subpaving/hardware_context_constraints.go",
+        "pkg/math/subpaving/hardware_node.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -51020,7 +51021,8 @@
         "TestSubpavingHardwareIntervalXnEqYRetainedCases",
         "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
-        "TestSubpavingHardwareShellCoefficientAndInequalityConversion"
+        "TestSubpavingHardwareShellCoefficientAndInequalityConversion",
+        "TestHardwareNodeRetainedBoundViewsAndChildTrail"
       ],
       "conditionals": [
         {
@@ -51377,6 +51379,14 @@
           "tests": [
             "TestSubpavingHardwareShellCoefficientAndInequalityConversion"
           ]
+        },
+        {
+          "name": "Concrete config_hwf bound and node records with copied parent views and trail (src/math/subpaving/subpaving_t.h:146-237)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_node.go",
+          "tests": [
+            "TestHardwareNodeRetainedBoundViewsAndChildTrail"
+          ]
         }
       ],
       "ownership": [
@@ -51450,7 +51460,8 @@
         "pkg/math/subpaving/hardware_interval_root.go",
         "pkg/math/subpaving/hardware_context_root.go",
         "pkg/math/subpaving/hardware_context_params.go",
-        "pkg/math/subpaving/hardware_context_constraints.go"
+        "pkg/math/subpaving/hardware_context_constraints.go",
+        "pkg/math/subpaving/hardware_node.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51509,7 +51520,8 @@
         "TestSubpavingHardwareIntervalXnEqYRetainedCases",
         "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
-        "TestSubpavingHardwareShellCoefficientAndInequalityConversion"
+        "TestSubpavingHardwareShellCoefficientAndInequalityConversion",
+        "TestHardwareNodeRetainedBoundViewsAndChildTrail"
       ],
       "assertions": [
         {
@@ -52107,6 +52119,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_constraints.go",
           "tests": [
             "TestSubpavingHardwareShellCoefficientAndInequalityConversion"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf root/child node storage and bound push (src/math/subpaving/subpaving_t_def.h:296-348,878-891)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_node.go",
+          "tests": [
+            "TestHardwareNodeRetainedBoundViewsAndChildTrail"
           ]
         }
       ],
@@ -161880,11 +161900,13 @@
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
         "pkg/math/subpaving/fast_node.go",
-        "pkg/math/subpaving/fast_node_test.go"
+        "pkg/math/subpaving/fast_node_test.go",
+        "pkg/math/subpaving/hardware_node.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
-        "TestSubpavingFastNodeConstantIntervalViews"
+        "TestSubpavingFastNodeConstantIntervalViews",
+        "TestHardwareNodeRetainedBoundViewsAndChildTrail"
       ],
       "conditionals": [
         {
@@ -162172,6 +162194,14 @@
           "go_target": "pkg/math/subpaving/fast_node.go",
           "tests": [
             "TestSubpavingFastNodeConstantIntervalViews"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf subpaving bound-array root initialization, child copy and indexed replacement with borrowed bound identity",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_node.go",
+          "tests": [
+            "TestHardwareNodeRetainedBoundViewsAndChildTrail"
           ]
         }
       ],

@@ -11,9 +11,9 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-// HardwareContext owns the four scalar bound-policy numerals of context_hwf.
-// Its manager and resource limit are borrowed. Node and search state follow
-// as the retained concrete context is ported.
+// HardwareContext owns the scalar bound-policy numerals and concrete
+// constraint and node records of context_hwf. Its manager and resource limit
+// are borrowed. Root propagation and search remain to be ported.
 type HardwareContext struct {
 	self          *HardwareContext
 	numbers       *numeral.HardwareFloatNumeralManager
@@ -30,6 +30,8 @@ type HardwareContext struct {
 	polynomials   map[uint32]*HardwarePolynomial
 	watchers      [][]uint32
 	inequalities  []*HardwareInequality
+	root          *HardwareNode
+	nextNodeID    uint32
 	closed        bool
 }
 
@@ -145,6 +147,14 @@ func (c *HardwareContext) XnEqY(out, src *HardwareInterval, degree uint32) error
 func (c *HardwareContext) Close() error {
 	if c == nil || c.self != c {
 		return arena.ErrInvalidSlot
+	}
+	if c.closed {
+		return nil
+	}
+	if c.root != nil {
+		if err := c.root.Close(); err != nil {
+			return err
+		}
 	}
 	c.closed = true
 	return nil
