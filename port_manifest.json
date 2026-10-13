@@ -50179,29 +50179,68 @@
         "Root close precedes source-order unit then problem-clause then lemma reference release; shared inequality values close at their last reference, and remaining unreferenced context-owned values close before context numerals. Idempotent release progress preserves cleanup retries."
       ],
       "deviations": [
-        "The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Bound justification metadata, node search/splitting and the full solver lifecycle remain unported."
+        "The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open."
       ]
     },
     {
       "path": "src/math/subpaving/subpaving_mpfx.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/subpaving/fixed_context.go",
+        "pkg/math/subpaving/fixed_context_bounds.go",
+        "pkg/math/subpaving/fixed_monomial.go",
+        "pkg/math/subpaving/fixed_polynomial.go"
+      ],
+      "tests": [
+        "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
+        "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "selected context_mpfx bound normalization, monomial and polynomial propagation through concrete fixed-point numerals",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fixed_context_bounds.go",
+          "tests": [
+            "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
+            "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant"
+          ]
+        },
+        {
+          "name": "selected context_mpfx bound axiom and variable-definition justification tags",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_node.go",
+          "tests": [
+            "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
+            "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete fixed-point bounds own copied numeral values; node arrays borrow them until node teardown. Full context, clause, search and explanation ownership remains unaudited."
+      ],
+      "deviations": [
+        "The fixed-point context is a partial concrete instantiation of subpaving_t; no completion claim is made for clause/unit propagation or the full solver lifecycle."
+      ]
     },
     {
       "path": "src/math/subpaving/subpaving_mpfx.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/subpaving/fixed_context.go",
+        "pkg/math/subpaving/fixed_context_bounds.go",
+        "pkg/math/subpaving/fixed_monomial.go",
+        "pkg/math/subpaving/fixed_polynomial.go"
+      ],
+      "tests": [
+        "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
+        "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -50214,9 +50253,32 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "selected config_mpfx manager binding and directed fixed-point rounding through concrete context bounds",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fixed_context_bounds.go",
+          "tests": [
+            "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
+            "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant"
+          ]
+        },
+        {
+          "name": "selected context_mpfx bound axiom and variable-definition justification tags",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_node.go",
+          "tests": [
+            "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
+            "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete fixed-point bounds own copied numeral values; node arrays borrow them until node teardown. Full context, clause, search and explanation ownership remains unaudited."
+      ],
+      "deviations": [
+        "The fixed-point context is a partial concrete instantiation of subpaving_t; no completion claim is made for clause/unit propagation or the full solver lifecycle."
+      ]
     },
     {
       "path": "src/math/subpaving/subpaving_mpq.cpp",
@@ -50469,6 +50531,20 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Selected config_mpfx bound axiom and polynomial/monomial variable-definition justification tags (subpaving_t.h:108-140; subpaving_t_def.h:525-576,1408-1656)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_context_bounds.go",
+          "go_targets": [
+            "pkg/math/subpaving/fixed_node.go",
+            "pkg/math/subpaving/fixed_monomial.go",
+            "pkg/math/subpaving/fixed_polynomial.go"
+          ],
+          "tests": [
+            "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
+            "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant"
+          ]
+        },
+        {
           "name": "Concrete config_mpff mutable interval endpoints and manager forwarding in context_t interval_config (src/math/subpaving/subpaving_t.h:239-316)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/fast_interval.go",
@@ -50572,7 +50648,7 @@
         "Root close precedes source-order unit then problem-clause then lemma reference release; shared inequality values close at their last reference, and remaining unreferenced context-owned values close before context numerals. Idempotent release progress preserves cleanup retries."
       ],
       "deviations": [
-        "The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Bound justification metadata, node search/splitting and the full solver lifecycle remain unported."
+        "The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open."
       ]
     },
     {
@@ -50985,6 +51061,20 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Selected config_mpfx bound axiom and polynomial/monomial variable-definition justification tags (subpaving_t.h:108-140; subpaving_t_def.h:525-576,1408-1656)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_context_bounds.go",
+          "go_targets": [
+            "pkg/math/subpaving/fixed_node.go",
+            "pkg/math/subpaving/fixed_monomial.go",
+            "pkg/math/subpaving/fixed_polynomial.go"
+          ],
+          "tests": [
+            "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
+            "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant"
+          ]
+        },
+        {
           "name": "Concrete config_mpff node bound publication and parent/child copied bound views (src/math/subpaving/subpaving_t_def.h:296-348)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/fast_node.go",
@@ -51096,7 +51186,7 @@
         "Root close precedes source-order unit then problem-clause then lemma reference release; shared inequality values close at their last reference, and remaining unreferenced context-owned values close before context numerals. Idempotent release progress preserves cleanup retries."
       ],
       "deviations": [
-        "The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Bound justification metadata, node search/splitting and the full solver lifecycle remain unported."
+        "The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open."
       ]
     },
     {

@@ -108,6 +108,9 @@ func TestSubpavingFixedContextRecentChildRejectsChangedParentTrail(t *testing.T)
 	must(ctx.PropagateQueued(root))
 	must(m.SetInt64(v, 2))
 	must(ctx.DecideBound(child, 0, v, false, false))
+	if child.trail.reason != (fixedBoundReason{kind: fixedReasonAxiom}) {
+		t.Fatal("source branch axiom justification", child.trail.reason)
+	}
 	stamp := child.trail.timestamp
 	if err := ctx.AddRecentBounds(child); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatalf("changed parent trail replay = %v", err)

@@ -43,6 +43,10 @@ func TestSubpavingFixedMonomialMergedPowerForwardAndZero(t *testing.T) {
 	if got := out.String(); got != "[4, 9]" {
 		t.Fatalf("squared bounds = %s, want [4, 9]", got)
 	}
+	if root.lower[x].reason != (fixedBoundReason{kind: fixedReasonVariableDefinition, variable: x}) ||
+		root.upper[x].reason != (fixedBoundReason{kind: fixedReasonVariableDefinition, variable: x}) {
+		t.Fatal("forward monomial justification")
+	}
 	must(view.Close())
 	must(ctx.Close())
 	must(v.Close())
@@ -65,6 +69,10 @@ func TestSubpavingFixedMonomialMergedPowerForwardAndZero(t *testing.T) {
 	must(err)
 	if !zero || len(ctx.queue) != 3 {
 		t.Fatalf("even upper-zero factor did not force output zero: zero=%v queue=%d", zero, len(ctx.queue))
+	}
+	if root.lower[x].reason != (fixedBoundReason{kind: fixedReasonVariableDefinition, variable: x}) ||
+		root.upper[x].reason != (fixedBoundReason{kind: fixedReasonVariableDefinition, variable: x}) {
+		t.Fatal("zero monomial justification")
 	}
 	must(ctx.Close())
 	must(v.Close())

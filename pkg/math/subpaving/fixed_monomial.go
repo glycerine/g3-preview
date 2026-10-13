@@ -114,10 +114,11 @@ func (c *FixedContext) PropagateMonomial(variable uint32, n *FixedNode) (err err
 		if err = c.numbers.SetInt64(v, 0); err != nil {
 			return err
 		}
-		if err = c.PropagateBound(n, variable, v, true, false); err != nil || n.inconsistent {
+		reason := fixedBoundReason{kind: fixedReasonVariableDefinition, variable: variable}
+		if err = c.propagateBoundReason(n, variable, v, true, false, reason); err != nil || n.inconsistent {
 			return err
 		}
-		return c.PropagateBound(n, variable, v, false, false)
+		return c.propagateBoundReason(n, variable, v, false, false, reason)
 	}
 	xUnbounded, err := n.IsUnbounded(variable)
 	if err != nil {
@@ -198,7 +199,7 @@ func (c *FixedContext) propagateMonomialUpward(m *FixedMonomial, variable uint32
 			return err
 		}
 	}
-	return c.propagateFixedIntervalBounds(n, variable, r)
+	return c.propagateFixedIntervalBounds(n, variable, variable, r)
 }
 
 func (c *FixedContext) propagateMonomialDownward(m *FixedMonomial, variable uint32, j int, n *FixedNode) (err error) {
@@ -269,12 +270,12 @@ func (c *FixedContext) propagateMonomialDownward(m *FixedMonomial, variable uint
 			return err
 		}
 	}
-	return c.propagateFixedIntervalBounds(n, m.powers[j].Variable, r)
+	return c.propagateFixedIntervalBounds(n, m.powers[j].Variable, variable, r)
 }
 
-func (c *FixedContext) propagateFixedIntervalBounds(n *FixedNode, variable uint32, r *FixedInterval) error {
+func (c *FixedContext) propagateFixedIntervalBounds(n *FixedNode, variable, sourceVariable uint32, r *FixedInterval) error {
 	if !r.lowerInf {
-		if _, err := c.PropagateCandidate(n, variable, r.lower, true, r.lowerOpen); err != nil {
+		if _, err := c.propagateCandidateReason(n, variable, r.lower, true, r.lowerOpen, fixedBoundReason{kind: fixedReasonVariableDefinition, variable: sourceVariable}); err != nil {
 			return err
 		}
 		if n.inconsistent {
@@ -282,7 +283,7 @@ func (c *FixedContext) propagateFixedIntervalBounds(n *FixedNode, variable uint3
 		}
 	}
 	if !r.upperInf {
-		_, err := c.PropagateCandidate(n, variable, r.upper, false, r.upperOpen)
+		_, err := c.propagateCandidateReason(n, variable, r.upper, false, r.upperOpen, fixedBoundReason{kind: fixedReasonVariableDefinition, variable: sourceVariable})
 		return err
 	}
 	return nil

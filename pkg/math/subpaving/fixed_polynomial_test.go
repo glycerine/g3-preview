@@ -56,6 +56,10 @@ func TestSubpavingFixedPolynomialForwardReverseAndSourceConstant(t *testing.T) {
 	if got := out.String(); got != "[8, 13]" {
 		t.Fatalf("forward bounds = %s, want [8, 13] (source omits constant 5)", got)
 	}
+	if root.lower[x].reason != (fixedBoundReason{kind: fixedReasonVariableDefinition, variable: x}) ||
+		root.upper[x].reason != (fixedBoundReason{kind: fixedReasonVariableDefinition, variable: x}) {
+		t.Fatal("forward polynomial justification")
+	}
 	if len(ctx.queue) != 6 {
 		t.Fatalf("forward queue length = %d, want 6", len(ctx.queue))
 	}

@@ -11,12 +11,26 @@ import (
 
 // FixedBound owns its numeral. A node's lower/upper arrays borrow bounds;
 // each bound's creating node retains ownership until that node closes.
+type fixedBoundReasonKind uint8
+
+const (
+	fixedReasonUnknown fixedBoundReasonKind = iota
+	fixedReasonAxiom
+	fixedReasonVariableDefinition
+)
+
+type fixedBoundReason struct {
+	kind     fixedBoundReasonKind
+	variable uint32
+}
+
 type FixedBound struct {
 	value     *numeral.FixedPoint
 	variable  uint32
 	lower     bool
 	open      bool
 	decision  bool
+	reason    fixedBoundReason
 	prev      *FixedBound
 	timestamp uint64
 }

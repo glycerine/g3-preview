@@ -223,7 +223,11 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 // node's new interval for conflict. Relevance testing is the caller's choice,
 // as source unit clauses publish directly.
 func (c *FixedContext) PropagateBound(n *FixedNode, variable uint32, value *numeral.FixedPoint, lower, open bool) (err error) {
-	return c.publishBound(n, variable, value, lower, open, true)
+	return c.propagateBoundReason(n, variable, value, lower, open, fixedBoundReason{})
+}
+
+func (c *FixedContext) propagateBoundReason(n *FixedNode, variable uint32, value *numeral.FixedPoint, lower, open bool, reason fixedBoundReason) error {
+	return c.publishBound(n, variable, value, lower, open, true, reason)
 }
 
 // DecideBound creates the source's branch decision without putting it on the
@@ -232,10 +236,10 @@ func (c *FixedContext) DecideBound(n *FixedNode, variable uint32, value *numeral
 	if n == nil || n.parent == nil {
 		return arena.ErrInvalidSlot
 	}
-	return c.publishBound(n, variable, value, lower, open, false)
+	return c.publishBound(n, variable, value, lower, open, false, fixedBoundReason{kind: fixedReasonAxiom})
 }
 
-func (c *FixedContext) publishBound(n *FixedNode, variable uint32, value *numeral.FixedPoint, lower, open, enqueue bool) (err error) {
+func (c *FixedContext) publishBound(n *FixedNode, variable uint32, value *numeral.FixedPoint, lower, open, enqueue bool, reason fixedBoundReason) (err error) {
 	if err = c.checkNode(n, variable); err != nil {
 		return err
 	}
@@ -260,6 +264,7 @@ func (c *FixedContext) publishBound(n *FixedNode, variable uint32, value *numera
 	b := n.trail
 	b.timestamp = c.timestamp
 	b.decision = !enqueue
+	b.reason = reason
 	if enqueue {
 		c.queue = append(c.queue, b)
 	}
@@ -280,6 +285,10 @@ func (c *FixedContext) publishBound(n *FixedNode, variable uint32, value *numera
 // PropagateCandidate is the source definition-propagation sequence: normalize
 // a scratch candidate, check its relevance, then publish it when selected.
 func (c *FixedContext) PropagateCandidate(n *FixedNode, variable uint32, value *numeral.FixedPoint, lower, open bool) (published bool, err error) {
+	return c.propagateCandidateReason(n, variable, value, lower, open, fixedBoundReason{})
+}
+
+func (c *FixedContext) propagateCandidateReason(n *FixedNode, variable uint32, value *numeral.FixedPoint, lower, open bool, reason fixedBoundReason) (published bool, err error) {
 	if err = c.checkNode(n, variable); err != nil {
 		return false, err
 	}
@@ -298,5 +307,5 @@ func (c *FixedContext) PropagateCandidate(n *FixedNode, variable uint32, value *
 	if err != nil || !published {
 		return published, err
 	}
-	return true, c.PropagateBound(n, variable, scratch, lower, open)
+	return true, c.propagateBoundReason(n, variable, scratch, lower, open, reason)
 }

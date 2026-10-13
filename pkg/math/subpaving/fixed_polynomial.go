@@ -218,7 +218,7 @@ func (c *FixedContext) propagatePolynomialTarget(p *FixedPolynomial, variable, t
 	}
 	// The retained C++ propagation path stores p.m_c but omits it here.
 	if !r.lowerInf {
-		if _, err = c.PropagateCandidate(n, target, r.lower, true, r.lowerOpen); err != nil {
+		if _, err = c.propagateCandidateReason(n, target, r.lower, true, r.lowerOpen, fixedBoundReason{kind: fixedReasonVariableDefinition, variable: variable}); err != nil {
 			return err
 		}
 		if n.inconsistent {
@@ -226,7 +226,7 @@ func (c *FixedContext) propagatePolynomialTarget(p *FixedPolynomial, variable, t
 		}
 	}
 	if !r.upperInf {
-		_, err = c.PropagateCandidate(n, target, r.upper, false, r.upperOpen)
+		_, err = c.propagateCandidateReason(n, target, r.upper, false, r.upperOpen, fixedBoundReason{kind: fixedReasonVariableDefinition, variable: variable})
 	}
 	return err
 }
