@@ -8,13 +8,18 @@ func (m *FixedPointManager) Floor(a *FixedPoint) error {
 	if err := m.check(a); err != nil {
 		return err
 	}
+	m.traceFixedRoundIntegral(a, false, false)
 	var q, rem, rounded big.Int
 	q.QuoRem(&a.scaled, &m.scale, &rem)
 	if rem.Sign() != 0 && a.scaled.Sign() < 0 {
 		q.Sub(&q, big.NewInt(1))
 	}
 	rounded.Mul(&q, &m.scale)
-	return m.publish(a, &rounded)
+	if err := m.publish(a, &rounded); err != nil {
+		return err
+	}
+	m.traceFixedRoundIntegral(a, false, true)
+	return nil
 }
 
 // Ceil rounds an owned fixed-point value toward plus infinity.
@@ -22,13 +27,18 @@ func (m *FixedPointManager) Ceil(a *FixedPoint) error {
 	if err := m.check(a); err != nil {
 		return err
 	}
+	m.traceFixedRoundIntegral(a, true, false)
 	var q, rem, rounded big.Int
 	q.QuoRem(&a.scaled, &m.scale, &rem)
 	if rem.Sign() != 0 && a.scaled.Sign() > 0 {
 		q.Add(&q, big.NewInt(1))
 	}
 	rounded.Mul(&q, &m.scale)
-	return m.publish(a, &rounded)
+	if err := m.publish(a, &rounded); err != nil {
+		return err
+	}
+	m.traceFixedRoundIntegral(a, true, true)
+	return nil
 }
 
 // Inv uses the manager's current directed rounding for 1/a. The source

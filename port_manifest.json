@@ -153003,7 +153003,8 @@
         "pkg/util/numeral/mpfx_predicates_test.go",
         "pkg/util/numeral/mpfx_power_of_two.go",
         "pkg/util/numeral/mpfx_power_of_two_test.go",
-        "pkg/util/numeral/mpfx_compare_product_trace.go"
+        "pkg/util/numeral/mpfx_compare_product_trace.go",
+        "pkg/util/numeral/mpfx_integral_trace.go"
       ],
       "tests": [
         "TestFixedPointRetainedArithmeticAndDirectedRounding",
@@ -153014,7 +153015,8 @@
         "TestFixedPointDisplaySourceInsertionsAndShortWrites",
         "TestFixedPointRetainedOrderingSignsIncrementAndSwap",
         "TestFixedPointPrevPowerOfTwoSourceIntegerWords",
-        "TestFixedPointComparisonAndProductSourceTrace"
+        "TestFixedPointComparisonAndProductSourceTrace",
+        "TestFixedPointFloorCeilSourceTrace"
       ],
       "conditionals": [
         {
@@ -153306,6 +153308,14 @@
           "go_target": "pkg/util/numeral/mpfx_compare_product_trace.go",
           "tests": [
             "TestFixedPointComparisonAndProductSourceTrace"
+          ]
+        },
+        {
+          "name": "mpfx floor and ceiling STRACE before mutation and after successful rounding (mpfx.cpp:559,579,583,603)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_integral_trace.go",
+          "tests": [
+            "TestFixedPointFloorCeilSourceTrace"
           ]
         }
       ],
@@ -173105,7 +173115,8 @@
         "pkg/util/numeral/mpbq_select_trace.go",
         "pkg/util/numeral/mpbq_debug_trace.go",
         "pkg/util/numeral/mpq_parse_trace.go",
-        "pkg/util/numeral/mpfx_compare_product_trace.go"
+        "pkg/util/numeral/mpfx_compare_product_trace.go",
+        "pkg/util/numeral/mpfx_integral_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -173116,7 +173127,8 @@
         "TestBinarySelectSmallRationalLowerRetainedTrace",
         "TestBinaryRetainedDebugArithmeticTraceSites",
         "TestRationalSetStringRetainedTraceBranches",
-        "TestFixedPointComparisonAndProductSourceTrace"
+        "TestFixedPointComparisonAndProductSourceTrace",
+        "TestFixedPointFloorCeilSourceTrace"
       ],
       "conditionals": [
         {
@@ -173392,6 +173404,14 @@
           ]
         },
         {
+          "name": "mpfx floor and ceiling STRACE before mutation and after successful rounding (mpfx.cpp:559,579,583,603)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_integral_trace.go",
+          "tests": [
+            "TestFixedPointFloorCeilSourceTrace"
+          ]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -173418,7 +173438,8 @@
         "pkg/util/numeral/mpbq_select_trace.go",
         "pkg/util/numeral/mpbq_debug_trace.go",
         "pkg/util/numeral/mpq_parse_trace.go",
-        "pkg/util/numeral/mpfx_compare_product_trace.go"
+        "pkg/util/numeral/mpfx_compare_product_trace.go",
+        "pkg/util/numeral/mpfx_integral_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -173429,7 +173450,8 @@
         "TestBinarySelectSmallRationalLowerRetainedTrace",
         "TestBinaryRetainedDebugArithmeticTraceSites",
         "TestRationalSetStringRetainedTraceBranches",
-        "TestFixedPointComparisonAndProductSourceTrace"
+        "TestFixedPointComparisonAndProductSourceTrace",
+        "TestFixedPointFloorCeilSourceTrace"
       ],
       "conditionals": [
         {
@@ -173714,6 +173736,14 @@
           "go_target": "pkg/util/numeral/mpfx_compare_product_trace.go",
           "tests": [
             "TestFixedPointComparisonAndProductSourceTrace"
+          ]
+        },
+        {
+          "name": "mpfx floor and ceiling STRACE before mutation and after successful rounding (mpfx.cpp:559,579,583,603)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_integral_trace.go",
+          "tests": [
+            "TestFixedPointFloorCeilSourceTrace"
           ]
         },
         {
