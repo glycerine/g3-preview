@@ -121,11 +121,23 @@ func (c *FastContext) processQueuedBound(n *FastNode, b *FastBound) error {
 		}
 		return nil
 	}
-	for _, variable := range c.watchers[b.variable] {
+	for _, watched := range c.watchOrder[b.variable] {
 		if n.inconsistent {
 			return nil
 		}
-		if err := visit(variable, true); err != nil {
+		if watched.clause != nil {
+			clause := watched.clause
+			if b.timestamp < clause.visited {
+				continue
+			}
+			if err := c.PropagateClause(clause, n); err != nil {
+				if errors.Is(err, numeral.ErrFastFloatOverflow) || errors.Is(err, numeral.ErrFastFloatDivisionByZero) || errors.Is(err, numeral.ErrFastFloatDomain) {
+					c.arithmeticFailed = true
+					continue
+				}
+				return err
+			}
+		} else if err := visit(watched.definition, true); err != nil {
 			return err
 		}
 	}

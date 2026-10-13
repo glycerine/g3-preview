@@ -50039,7 +50039,9 @@
         "pkg/math/subpaving/fast_interval_root.go",
         "pkg/math/subpaving/fast_interval_root_test.go",
         "pkg/math/subpaving/fast_monomial.go",
-        "pkg/math/subpaving/fast_monomial_test.go"
+        "pkg/math/subpaving/fast_monomial_test.go",
+        "pkg/math/subpaving/fast_clause.go",
+        "pkg/math/subpaving/fast_clause_test.go"
       ],
       "tests": [
         "TestSubpavingFastMutableIntervalRetainedCore",
@@ -50059,7 +50061,9 @@
         "TestSubpavingFastIntervalXnEqYRetainedCases",
         "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
         "TestSubpavingFastMonomialReverseAndSourceScratch",
-        "TestSubpavingFastMonomialIntervalDisplaySmoke"
+        "TestSubpavingFastMonomialIntervalDisplaySmoke",
+        "TestSubpavingFastClauseStableWatchUnitAndConflict",
+        "TestSubpavingFastClauseOpennessAndUnitResume"
       ],
       "conditionals": [
         {
@@ -50096,13 +50100,26 @@
             "TestSubpavingFastMonomialReverseAndSourceScratch",
             "TestSubpavingFastMonomialIntervalDisplaySmoke"
           ]
+        },
+        {
+          "name": "Concrete config_mpff inequality owned values, stable clauses, three-valued evaluation, unique variable watchers, unit assertions and conflict-first propagation (src/math/subpaving/subpaving_t_def.h:802-880,1349-1405,1709-1729,1774-1786)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_clause.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_context_propagate.go"
+          ],
+          "tests": [
+            "TestSubpavingFastClauseStableWatchUnitAndConflict",
+            "TestSubpavingFastClauseOpennessAndUnitResume"
+          ]
         }
       ],
       "ownership": [
-        "The mutable fast-float interval owns both scoped endpoints and borrows its fast-float manager."
+        "The mutable fast-float interval owns both scoped endpoints and borrows its fast-float manager.",
+        "Fast inequalities own copied scoped fast-float values through their context. Clauses borrow atom pointers, count source-style references and register each watched variable once; context close retires the owning values after nodes. Learned-clause deletion and justification lifetime remain open."
       ],
       "deviations": [
-        "The enclosing context_t<config_mpff> now has concrete bound policy, polynomial and monomial watcher propagation, and nth-root inverse images; clause propagation, search and the full lifecycle remain unported."
+        "The config_mpff context now has concrete clause value/propagation and root unit assertion paths. Learned-clause deletion/justification retention, search and full solver lifecycle remain unported."
       ]
     },
     {
@@ -50238,7 +50255,9 @@
         "pkg/math/subpaving/fast_interval_root.go",
         "pkg/math/subpaving/fast_interval_root_test.go",
         "pkg/math/subpaving/fast_monomial.go",
-        "pkg/math/subpaving/fast_monomial_test.go"
+        "pkg/math/subpaving/fast_monomial_test.go",
+        "pkg/math/subpaving/fast_clause.go",
+        "pkg/math/subpaving/fast_clause_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50285,7 +50304,9 @@
         "TestSubpavingFastIntervalXnEqYRetainedCases",
         "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
         "TestSubpavingFastMonomialReverseAndSourceScratch",
-        "TestSubpavingFastMonomialIntervalDisplaySmoke"
+        "TestSubpavingFastMonomialIntervalDisplaySmoke",
+        "TestSubpavingFastClauseStableWatchUnitAndConflict",
+        "TestSubpavingFastClauseOpennessAndUnitResume"
       ],
       "conditionals": [
         {
@@ -50434,13 +50455,26 @@
             "TestSubpavingFastMonomialReverseAndSourceScratch",
             "TestSubpavingFastMonomialIntervalDisplaySmoke"
           ]
+        },
+        {
+          "name": "Concrete config_mpff inequality owned values, stable clauses, three-valued evaluation, unique variable watchers, unit assertions and conflict-first propagation (src/math/subpaving/subpaving_t_def.h:802-880,1349-1405,1709-1729,1774-1786)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_clause.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_context_propagate.go"
+          ],
+          "tests": [
+            "TestSubpavingFastClauseStableWatchUnitAndConflict",
+            "TestSubpavingFastClauseOpennessAndUnitResume"
+          ]
         }
       ],
       "ownership": [
-        "The mutable interval and node bounds own their fast-float endpoints; constant interval views borrow current node bounds. The context owns its root, parameter numerals and copied polynomial coefficients, and borrows the numeric manager and resource limit."
+        "The mutable interval and node bounds own their fast-float endpoints; constant interval views borrow current node bounds. The context owns its root, parameter numerals and copied polynomial coefficients, and borrows the numeric manager and resource limit.",
+        "Fast inequalities own copied scoped fast-float values through their context. Clauses borrow atom pointers, count source-style references and register each watched variable once; context close retires the owning values after nodes. Learned-clause deletion and justification lifetime remain open."
       ],
       "deviations": [
-        "The config_mpff context's clause propagation, search and full lifecycle remain unported."
+        "The config_mpff context now has concrete clause value/propagation and root unit assertion paths. Learned-clause deletion/justification retention, search and full solver lifecycle remain unported."
       ]
     },
     {
@@ -50483,7 +50517,9 @@
         "pkg/math/subpaving/fast_interval_root.go",
         "pkg/math/subpaving/fast_interval_root_test.go",
         "pkg/math/subpaving/fast_monomial.go",
-        "pkg/math/subpaving/fast_monomial_test.go"
+        "pkg/math/subpaving/fast_monomial_test.go",
+        "pkg/math/subpaving/fast_clause.go",
+        "pkg/math/subpaving/fast_clause_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50520,7 +50556,9 @@
         "TestSubpavingFastIntervalXnEqYRetainedCases",
         "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
         "TestSubpavingFastMonomialReverseAndSourceScratch",
-        "TestSubpavingFastMonomialIntervalDisplaySmoke"
+        "TestSubpavingFastMonomialIntervalDisplaySmoke",
+        "TestSubpavingFastClauseStableWatchUnitAndConflict",
+        "TestSubpavingFastClauseOpennessAndUnitResume"
       ],
       "assertions": [
         {
@@ -50903,13 +50941,26 @@
             "TestSubpavingFastMonomialReverseAndSourceScratch",
             "TestSubpavingFastMonomialIntervalDisplaySmoke"
           ]
+        },
+        {
+          "name": "Concrete config_mpff inequality owned values, stable clauses, three-valued evaluation, unique variable watchers, unit assertions and conflict-first propagation (src/math/subpaving/subpaving_t_def.h:802-880,1349-1405,1709-1729,1774-1786)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_clause.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_context_propagate.go"
+          ],
+          "tests": [
+            "TestSubpavingFastClauseStableWatchUnitAndConflict",
+            "TestSubpavingFastClauseOpennessAndUnitResume"
+          ]
         }
       ],
       "ownership": [
-        "Each fast-float node owns the bounds it publishes; child nodes borrow inherited parent bounds until closed. The context owns its parameter numerals, root and copied polynomial coefficients, and borrows the fast-float manager and resource limit."
+        "Each fast-float node owns the bounds it publishes; child nodes borrow inherited parent bounds until closed. The context owns its parameter numerals, root and copied polynomial coefficients, and borrows the fast-float manager and resource limit.",
+        "Fast inequalities own copied scoped fast-float values through their context. Clauses borrow atom pointers, count source-style references and register each watched variable once; context close retires the owning values after nodes. Learned-clause deletion and justification lifetime remain open."
       ],
       "deviations": [
-        "The config_mpff context's clause propagation, search and full lifecycle remain unported."
+        "The config_mpff context now has concrete clause value/propagation and root unit assertion paths. Learned-clause deletion/justification retention, search and full solver lifecycle remain unported."
       ]
     },
     {

@@ -36,6 +36,11 @@ type FastContext struct {
 	polynomials      map[uint32]*FastPolynomial
 	monomials        map[uint32]*FastMonomial
 	watchers         [][]uint32
+	watchOrder       [][]fastWatch
+	inequalities     []*FastInequality
+	clauses          []*FastClause
+	unitClauses      []fastUnitClause
+	unitHead         int
 	closed           bool
 }
 
@@ -45,7 +50,7 @@ func NewFastContext(m *numeral.FastFloatManager, limit *control.Reslimit, isInt 
 	if m == nil || limit == nil || len(isInt) > math.MaxUint32 {
 		return nil, arena.ErrInvalidSlot
 	}
-	c := &FastContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), zeroEpsilon: epsilon == 0, polynomials: make(map[uint32]*FastPolynomial), monomials: make(map[uint32]*FastMonomial), watchers: make([][]uint32, len(isInt))}
+	c := &FastContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), zeroEpsilon: epsilon == 0, polynomials: make(map[uint32]*FastPolynomial), monomials: make(map[uint32]*FastMonomial), watchers: make([][]uint32, len(isInt)), watchOrder: make([][]fastWatch, len(isInt))}
 	c.self = c
 	defer func() {
 		if err != nil {
@@ -170,6 +175,11 @@ func (c *FastContext) Close() error {
 			if err := p.close(); err != nil {
 				return err
 			}
+		}
+	}
+	for i := len(c.inequalities) - 1; i >= 0; i-- {
+		if err := c.inequalities[i].owner.Close(); err != nil {
+			return err
 		}
 	}
 	if err := c.closeNumerals(); err != nil {

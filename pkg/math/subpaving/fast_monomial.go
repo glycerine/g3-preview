@@ -57,11 +57,13 @@ func (c *FastContext) DefineMonomial(powers []FastPower) (uint32, error) {
 	x := uint32(len(c.isInt))
 	c.isInt = append(c.isInt, integer)
 	c.watchers = append(c.watchers, nil)
+	c.watchOrder = append(c.watchOrder, nil)
 	c.root.lower = append(c.root.lower, nil)
 	c.root.upper = append(c.root.upper, nil)
 	c.monomials[x] = &FastMonomial{powers: merged}
 	for _, power := range merged {
 		c.watchers[power.Variable] = append(c.watchers[power.Variable], x)
+		c.watchOrder[power.Variable] = append(c.watchOrder[power.Variable], fastWatch{definition: x})
 	}
 	return x, nil
 }

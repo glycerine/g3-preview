@@ -104,10 +104,12 @@ func (c *FastContext) DefinePolynomial(constant *numeral.FastFloat, terms []Fast
 	x := uint32(len(c.isInt))
 	c.isInt = append(c.isInt, integer)
 	c.watchers = append(c.watchers, nil)
+	c.watchOrder = append(c.watchOrder, nil)
 	c.root.lower = append(c.root.lower, nil)
 	c.root.upper = append(c.root.upper, nil)
 	for _, term := range p.terms {
 		c.watchers[term.Variable] = append(c.watchers[term.Variable], x)
+		c.watchOrder[term.Variable] = append(c.watchOrder[term.Variable], fastWatch{definition: x})
 	}
 	c.polynomials[x] = p
 	return x, nil
