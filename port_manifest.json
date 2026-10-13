@@ -14282,7 +14282,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_expr_map.go",
-        "pkg/ast/ast_expr_map_test.go"
+        "pkg/ast/ast_expr_map_test.go",
+        "pkg/ast/ast_expr_map_replacement_order_test.go"
       ],
       "tests": [
         "TestASTExprMapConcreteReferenceCleanup",
@@ -14303,6 +14304,15 @@
           "go_target": "pkg/ast/ast_expr_map.go",
           "tests": [
             "TestASTExprMapConcreteReferenceCleanup"
+          ]
+        },
+        {
+          "name": "expr_map::insert replacement publishes expression and proof only after each old DEC, retaining the acquired incoming reference for owning cleanup on a stopped source deletion (expr_map.cpp:43-57)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr_map.go",
+          "tests": [
+            "TestASTExprMapReplacementReleasesOldBeforePublishingNew",
+            "TestASTExprMapProofReplacementReleasesOldBeforePublishingNew"
           ]
         }
       ],

@@ -108,11 +108,16 @@ func (s *ASTExprMap) Insert(key, value, proof ASTHandle) error {
 		s.entries[k] = entry
 	} else {
 		old := entry.value
-		entry.value = v
-		entry.valueOwned = true
 		if e = s.release(m, old); e != nil {
+			// Source still stores the old pointer when its DEC stops. The new
+			// reference was already acquired, so the Go owner must retain it
+			// for explicit cleanup without publishing it in the map.
+			entry.valueOwned = false
+			s.pending = append(s.pending, v)
 			return e
 		}
+		entry.value = v
+		entry.valueOwned = true
 	}
 	if s.storeProofs {
 		if p.slot != 0 {
@@ -121,11 +126,17 @@ func (s *ASTExprMap) Insert(key, value, proof ASTHandle) error {
 			}
 		}
 		old := entry.proof
+		if old.slot != 0 {
+			if e = s.release(m, old); e != nil {
+				entry.proofOwned = false
+				if p.slot != 0 {
+					s.pending = append(s.pending, p)
+				}
+				return e
+			}
+		}
 		entry.proof = p
 		entry.proofOwned = p.slot != 0
-		if old.slot != 0 {
-			return s.release(m, old)
-		}
 	}
 	return nil
 }
