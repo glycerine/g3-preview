@@ -4,6 +4,7 @@ package process
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
@@ -17,6 +18,7 @@ type InitializationConfig struct {
 	Runtime  *memory.Runtime
 	Rational *numeral.RationalGlobalService
 	Symbols  *symbol.Service
+	Debug    *diagnostic.DebugContext
 	Params   params.ParamsConfig
 	Catalog  params.GlobalParamsCatalogConfig
 	Globals  params.GlobalParamsConfig
@@ -38,9 +40,12 @@ type Initialized struct {
 // updates the shared maximum through memory::initialize and returns nil,nil;
 // the caller retains the first result for later finalization and owning close.
 func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, error) {
-	if c.Runtime == nil || c.Rational == nil || c.Symbols == nil || c.Params.Budget == nil ||
+	if c.Runtime == nil || c.Rational == nil || c.Symbols == nil || c.Debug == nil || c.Params.Budget == nil ||
 		c.Catalog.Budget != c.Params.Budget || c.Globals.Budget != c.Params.Budget || c.Globals.Catalog != nil {
 		return nil, arena.ErrConfig
+	}
+	if _, err := c.Debug.AssertionsEnabled(); err != nil {
+		return nil, err
 	}
 	rationalProcess, err := c.Rational.ProcessOwner()
 	if err != nil {
@@ -80,6 +85,9 @@ func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, 
 	c.Globals.Catalog = result.Catalog
 	result.Globals, err = params.NewGlobalParamsService(s, result.Context, c.Globals)
 	if err != nil {
+		return result, err
+	}
+	if err = result.Globals.BindNamespaceAssertions(c.Debug); err != nil {
 		return result, err
 	}
 	if err = result.Globals.InitializeSource(); err != nil {

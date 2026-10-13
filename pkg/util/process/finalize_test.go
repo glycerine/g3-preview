@@ -31,7 +31,11 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	must(t, err)
 	s, err := symbol.NewService(symbol.Config{Budget: b})
 	must(t, err)
-	cfg := InitializationConfig{Runtime: m, Rational: r, Symbols: s,
+	region, err := arena.NewBytesRegion(arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}})
+	must(t, err)
+	d, err := diagnostic.NewDebugContext(region, b)
+	must(t, err)
+	cfg := InitializationConfig{Runtime: m, Rational: r, Symbols: s, Debug: d,
 		Params:  params.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}},
 		Catalog: params.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}},
 		Globals: params.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}}
@@ -44,10 +48,14 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	if again, err := InitializeGenerated(cfg, 1<<25); err != nil || again != nil {
 		t.Fatal("repeated generated initialization", again, err)
 	}
-	region, err := arena.NewBytesRegion(arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}})
-	must(t, err)
-	d, err := diagnostic.NewDebugContext(region, b)
-	must(t, err)
+	must(t, d.EnableAssertions(false))
+	if enabled, err := g.NamespaceAssertionsEnabled(); err != nil || enabled {
+		t.Fatal("global params missed disabled process assertions", enabled, err)
+	}
+	must(t, d.EnableAssertions(true))
+	if enabled, err := g.NamespaceAssertionsEnabled(); err != nil || enabled != params.GlobalParamsSourceDebug {
+		t.Fatal("global params did not reread process assertions", enabled, err)
+	}
 	must(t, d.EnableDebug("memory"))
 	tr := diagnostic.NewTraceTags()
 	tr.Enable("memory")

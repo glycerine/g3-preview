@@ -119785,7 +119785,8 @@
         "pkg/util/params/util_gparams_global_reset_source_test.go",
         "pkg/util/params/util_gparams_service.go",
         "pkg/util/params/util_gparams_constructor_source.go",
-        "pkg/util/params/util_gparams_service_ops.go"
+        "pkg/util/params/util_gparams_service_ops.go",
+        "pkg/util/process/initialize.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -119828,7 +119829,8 @@
         "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
         "TestGlobalParamsNamespaceDisplayUsesGoBuffer",
         "TestGlobalParamsNamespaceNativeSymbolConstructionBeforeNull",
-        "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
+        "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument",
+        "TestGeneratedInitializeAndFinalizeConcreteServices"
       ],
       "assertions": [
         {
@@ -119987,9 +119989,16 @@
         },
         {
           "name": "caller-confined generated gparams preparation binds exact borrowed process assertion owner before imp initialize; reached namespace assertions and numeric bare_str share actual DebugContext state",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/util/process/initialize.go",
+          "tests": [
+            "TestGeneratedInitializeAndFinalizeConcreteServices",
+            "TestGlobalParamsNamespaceAssertionBindingAtReachedSites",
+            "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"
+          ],
+          "go_targets": [
+            "pkg/util/params/util_gparams_service_ops.go"
+          ]
         },
         {
           "name": "Concrete default standard-stream/action service preparation and exact borrowed generated process Context finalizer; source-site namespace assertion transport with gate-before-condition and bare_str C continuation (src/util/debug.cpp:28-35; src/util/debug.cpp:44-68; src/util/debug.cpp:37-42,73-117; src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:558,564,569,574,579,584,589,594,603,609,614,619,624,629; src/util/symbol.h:96)",
@@ -146687,7 +146696,8 @@
         "pkg/model/model_evaluator.go",
         "pkg/util/memory/process_accounting.go",
         "pkg/util/process/finalize.go",
-        "pkg/util/process/initialize.go"
+        "pkg/util/process/initialize.go",
+        "pkg/util/params/util_gparams_service_ops.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -146759,7 +146769,9 @@
         "TestNumericStreamNativeCountedTextAndOwnedInput",
         "TestProcessSourceLifecycleGuards",
         "TestProcessSourceLifecycleRejectsInvalidOwners",
-        "TestGeneratedInitializeAndFinalizeConcreteServices"
+        "TestGeneratedInitializeAndFinalizeConcreteServices",
+        "TestGlobalParamsNamespaceAssertionBindingAtReachedSites",
+        "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"
       ],
       "conditionals": [
         {
@@ -147001,9 +147013,16 @@
         },
         {
           "name": "caller-confined generated gparams preparation binds exact borrowed process assertion owner before imp initialize; reached namespace assertions and numeric bare_str share actual DebugContext state",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/util/process/initialize.go",
+          "tests": [
+            "TestGeneratedInitializeAndFinalizeConcreteServices",
+            "TestGlobalParamsNamespaceAssertionBindingAtReachedSites",
+            "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"
+          ],
+          "go_targets": [
+            "pkg/util/params/util_gparams_service_ops.go"
+          ]
         }
       ],
       "ownership": [
