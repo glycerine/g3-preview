@@ -2,6 +2,7 @@ package subpaving
 
 import (
 	"errors"
+	"math"
 	"math/big"
 	"testing"
 
@@ -18,7 +19,7 @@ func TestSubpavingHardwareContextBoundPolicyAndRootDispatch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if c.zeroEpsilon || m.ToFloat64(&c.maxBound) != 1e10 || m.ToFloat64(&c.minusMaxBound) != -1e10 || m.ToFloat64(&c.rootPrecision) != 1.0/8192.0 {
+	if c.zeroEpsilon || m.ToFloat64(&c.maxBound) != 1e10 || m.ToFloat64(&c.minusMaxBound) != -1e10 || m.ToFloat64(&c.rootPrecision) != 1.0/8192.0 || c.maxDepth != 128 || c.maxNodes != 8192 || c.maxMemory != math.MaxUint64 {
 		t.Fatal("hardware context policy numerals")
 	}
 	epsilon := new(big.Rat).SetFloat64(m.ToFloat64(&c.epsilon))
@@ -54,8 +55,23 @@ func TestSubpavingHardwareContextBoundPolicyAndRootDispatch(t *testing.T) {
 	if err := c.XnEqY(out, src, 2); !errors.Is(err, interval.ErrHardwareRootCanceled) {
 		t.Fatal("context checkpoint", err)
 	}
+	if err := c.UpdateParams(HardwareContextPolicy{MaxBoundPower: 2, MaxDepth: 7, MaxNodes: 9, MaxMemoryMB: 3}); err != nil {
+		t.Fatal(err)
+	}
+	if !c.zeroEpsilon || !m.IsZero(&c.epsilon) || m.ToFloat64(&c.maxBound) != 100 || m.ToFloat64(&c.minusMaxBound) != -100 || m.ToFloat64(&c.rootPrecision) != 1 || c.maxDepth != 7 || c.maxNodes != 9 || c.maxMemory != 3*1024*1024 {
+		t.Fatal("updated hardware context policy")
+	}
+	if err := c.UpdateParams(HardwareContextPolicy{Epsilon: 4, MaxBoundPower: 1 << 31, MaxDepth: 8, MaxNodes: 10, MaxMemoryMB: 4}); !errors.Is(err, arena.ErrBounds) {
+		t.Fatal("source power guard", err)
+	}
+	if c.zeroEpsilon || m.ToFloat64(&c.epsilon) != .25 || m.ToFloat64(&c.maxBound) != 10 || m.ToFloat64(&c.minusMaxBound) != -100 || c.maxDepth != 7 || c.maxNodes != 9 || c.maxMemory != 3*1024*1024 {
+		t.Fatal("failed update did not preserve source field prefix")
+	}
 	if err := c.Close(); err != nil {
 		t.Fatal(err)
+	}
+	if err := c.UpdateParams(HardwareContextPolicy{}); !errors.Is(err, arena.ErrClosed) {
+		t.Fatal("closed context update", err)
 	}
 	if err := c.XnEqY(out, src, 2); !errors.Is(err, arena.ErrClosed) {
 		t.Fatal("closed context", err)

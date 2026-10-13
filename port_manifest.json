@@ -50381,7 +50381,7 @@
           ]
         },
         {
-          "name": "Concrete config_hwf context bound-policy numerals, source parameter defaults and root inverse-image dispatch (src/math/subpaving/subpaving_t_def.h:408-514,1641)",
+          "name": "Concrete config_hwf context bound-policy numerals, source-order parameter updates, depth/node/memory limits and root inverse-image dispatch (src/math/subpaving/subpaving_t_def.h:408-514,1641)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/hardware_context_root.go",
           "tests": [
@@ -51310,7 +51310,7 @@
           ]
         },
         {
-          "name": "Concrete config_hwf context bound-policy numerals, source parameter defaults and root inverse-image dispatch (src/math/subpaving/subpaving_t_def.h:408-514,1641)",
+          "name": "Concrete config_hwf context bound-policy numerals, source-order parameter updates, depth/node/memory limits and root inverse-image dispatch (src/math/subpaving/subpaving_t_def.h:408-514,1641)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/hardware_context_root.go",
           "tests": [
@@ -52021,7 +52021,7 @@
           ]
         },
         {
-          "name": "Concrete config_hwf context bound-policy numerals, source parameter defaults and root inverse-image dispatch (src/math/subpaving/subpaving_t_def.h:408-514,1641)",
+          "name": "Concrete config_hwf context bound-policy numerals, source-order parameter updates, depth/node/memory limits and root inverse-image dispatch (src/math/subpaving/subpaving_t_def.h:408-514,1641)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/hardware_context_root.go",
           "tests": [
@@ -170523,7 +170523,8 @@
         "pkg/util/bitset/uint_set.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/rewriter/bv_rewriter_shift.go",
-        "pkg/test/uint_set_test.go"
+        "pkg/test/uint_set_test.go",
+        "pkg/math/subpaving/hardware_context_root.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -170557,7 +170558,8 @@
         "TestUintSetSourceTst1",
         "TestUintSetIndependentBoundedOracle",
         "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
-        "TestASTSomeValueProcFallbackReservationFailureRestores"
+        "TestASTSomeValueProcFallbackReservationFailureRestores",
+        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
       ],
       "conditionals": [
         {
@@ -170887,6 +170889,14 @@
           "tests": [
             "TestASTBasicCacheNativeGrowthPreservesEntriesAndZeroGaps",
             "TestASTBitVectorNativeCacheGrowthPreservesValidationAndOwnership"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf max_memory parameter uses UINT_MAX sentinel and native size_t megabytes conversion (src/util/util.h:391-398)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_context_root.go",
+          "tests": [
+            "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
           ]
         }
       ],

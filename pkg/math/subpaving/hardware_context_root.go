@@ -3,6 +3,8 @@
 package subpaving
 
 import (
+	"math"
+
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
@@ -21,7 +23,16 @@ type HardwareContext struct {
 	minusMaxBound numeral.HardwareFloat
 	rootPrecision numeral.HardwareFloat
 	zeroEpsilon   bool
+	maxDepth      uint32
+	maxNodes      uint32
+	maxMemory     uint64
 	closed        bool
+}
+
+// HardwareContextPolicy contains the unsigned source subpaving parameters.
+type HardwareContextPolicy struct {
+	Epsilon, MaxBoundPower, RootPrecision uint32
+	MaxDepth, MaxNodes, MaxMemoryMB       uint32
 }
 
 // NewHardwareContext applies the source epsilon, max_bound and
@@ -30,40 +41,62 @@ func NewHardwareContext(m *numeral.HardwareFloatNumeralManager, limit *control.R
 	if m == nil || limit == nil {
 		return nil, arena.ErrInvalidSlot
 	}
-	c := &HardwareContext{numbers: m, limit: limit, zeroEpsilon: epsilon == 0}
+	c := &HardwareContext{numbers: m, limit: limit}
 	c.self = c
-	if epsilon != 0 {
-		if err := m.SetInt32(&c.epsilon, int32(epsilon)); err != nil {
-			return nil, err
-		}
-		if err := m.Inv(&c.epsilon); err != nil {
-			return nil, err
-		}
-	} else if err := m.Reset(&c.epsilon); err != nil {
-		return nil, err
-	}
-	if err := m.SetInt32(&c.maxBound, 10); err != nil {
-		return nil, err
-	}
-	if err := m.Power(&c.maxBound, maxBoundPower, &c.maxBound); err != nil {
-		return nil, err
-	}
-	if err := m.Set(&c.minusMaxBound, &c.maxBound); err != nil {
-		return nil, err
-	}
-	if err := m.Neg(&c.minusMaxBound, &c.minusMaxBound); err != nil {
-		return nil, err
-	}
-	if rootPrecision == 0 {
-		rootPrecision = 1
-	}
-	if err := m.SetInt32(&c.rootPrecision, int32(rootPrecision)); err != nil {
-		return nil, err
-	}
-	if err := m.Inv(&c.rootPrecision); err != nil {
+	if err := c.UpdateParams(HardwareContextPolicy{Epsilon: epsilon, MaxBoundPower: maxBoundPower, RootPrecision: rootPrecision, MaxDepth: 128, MaxNodes: 8192, MaxMemoryMB: math.MaxUint32}); err != nil {
 		return nil, err
 	}
 	return c, nil
+}
+
+// UpdateParams preserves the source's field mutation order. A failed numeral
+// operation leaves the already reached prefix visible to the owning context.
+func (c *HardwareContext) UpdateParams(p HardwareContextPolicy) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	m := c.numbers
+	if p.Epsilon != 0 {
+		if err := m.SetInt32(&c.epsilon, int32(p.Epsilon)); err != nil {
+			return err
+		}
+		if err := m.Inv(&c.epsilon); err != nil {
+			return err
+		}
+		c.zeroEpsilon = false
+	} else {
+		if err := m.Reset(&c.epsilon); err != nil {
+			return err
+		}
+		c.zeroEpsilon = true
+	}
+	if err := m.SetInt32(&c.maxBound, 10); err != nil {
+		return err
+	}
+	if err := m.Power(&c.maxBound, p.MaxBoundPower, &c.maxBound); err != nil {
+		return err
+	}
+	if err := m.Set(&c.minusMaxBound, &c.maxBound); err != nil {
+		return err
+	}
+	if err := m.Neg(&c.minusMaxBound, &c.minusMaxBound); err != nil {
+		return err
+	}
+	c.maxDepth = p.MaxDepth
+	c.maxNodes = p.MaxNodes
+	if p.MaxMemoryMB == math.MaxUint32 {
+		c.maxMemory = math.MaxUint64
+	} else {
+		c.maxMemory = uint64(p.MaxMemoryMB) * 1024 * 1024
+	}
+	precision := p.RootPrecision
+	if precision == 0 {
+		precision = 1
+	}
+	if err := m.SetInt32(&c.rootPrecision, int32(precision)); err != nil {
+		return err
+	}
+	return m.Inv(&c.rootPrecision)
 }
 
 func (c *HardwareContext) open() error {
