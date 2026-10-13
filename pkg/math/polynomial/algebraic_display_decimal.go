@@ -61,9 +61,5 @@ func (m *AlgebraicRootCore) DisplayDecimal(w io.Writer, a *Algebraic, precision 
 	if interval {
 		selected = &upper
 	}
-	text, err := b.DecimalString(selected, precision)
-	if err != nil {
-		return err
-	}
-	return writeAlgebraicIntervalPart(w, text)
+	return b.DisplayDecimalTo(w, selected, precision)
 }

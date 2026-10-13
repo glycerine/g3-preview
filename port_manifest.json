@@ -144345,7 +144345,9 @@
         "pkg/util/numeral/mpbq_stream_test.go",
         "pkg/math/interval/binary_extended.go",
         "pkg/math/realclosure/binary_interval_test.go",
-        "pkg/math/polynomial/algebraic_display_decimal_test.go"
+        "pkg/math/polynomial/algebraic_display_decimal_test.go",
+        "pkg/util/numeral/mpbq_decimal_stream.go",
+        "pkg/util/numeral/mpbq_decimal_stream_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -144375,7 +144377,8 @@
         "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard",
         "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes",
         "TestRealClosureBinaryIntervalRetainedCore",
-        "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement"
+        "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement",
+        "TestBinaryRationalDecimalSourceStreamAndRawScope"
       ],
       "conditionals": [
         {
@@ -144828,6 +144831,14 @@
           "tests": [
             "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes"
           ]
+        },
+        {
+          "name": "mpbq.cpp:426-458 decimal io.Writer sign/integer/dot/digit/uncertainty insertions with raw local end-label cleanup",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_decimal_stream.go",
+          "tests": [
+            "TestBinaryRationalDecimalSourceStreamAndRawScope"
+          ]
         }
       ],
       "ownership": [
@@ -144838,7 +144849,8 @@
         "Explicit owner-local contexts and Close replace global diagnostic service/RAII. Imported foreign rational numerators/denominators copied through their real owners. Undefined degree-zero and interval preconditions have typed adapters; finite raw negative/unreduced shapes remain source behavior. Selected byte output stages in charged retained workspace; final strings caller-owned. Integer storage error adapters inherited; completed BQ statement/exponent/alias prefixes retained. Open trace/custom ostream integration keeps whole unit partial.",
         "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
         "Binary-rational fields and DRS/Sturm stacks now use native slice append, removing C++ vector capacity/header arithmetic, initialized masks and container-only reservations/refunds. Binary logical size remains distinct from native constructed field extent; relocation transfers actual numeral fields once and clears old owning records. Root-isolation frame packing/traversal, endpoint arithmetic, ascending numeric destruction, actual cold owners and real numeric allocation failures remain. Native buffer BackingBytes is zero.",
-        "Retained realclosure finite endpoint display now emits numerator, /2 and exponent markup through separate io.Writer insertions, preserving refused/short-write prefixes. Staged String and PrettyString remain for their other callers; persistent C++ ostream state is outside Go standard-library output."
+        "Retained realclosure finite endpoint display now emits numerator, /2 and exponent markup through separate io.Writer insertions, preserving refused/short-write prefixes. Staged String and PrettyString remain for their other callers; persistent C++ ostream state is outside Go standard-library output.",
+        "Selected ordinary decimal output now uses direct source-order io.Writer insertions through the algebraic root display caller. Refused writes retain the raw numeric display scope until explicit CleanupDisplay; staged DecimalString remains for other callers. Interval-decimal and SMT2 stream insertion remain separate work."
       ]
     },
     {
@@ -144865,7 +144877,9 @@
         "pkg/util/numeral/mpbq_stream_test.go",
         "pkg/math/interval/binary_extended.go",
         "pkg/math/realclosure/binary_interval_test.go",
-        "pkg/math/polynomial/algebraic_display_decimal_test.go"
+        "pkg/math/polynomial/algebraic_display_decimal_test.go",
+        "pkg/util/numeral/mpbq_decimal_stream.go",
+        "pkg/util/numeral/mpbq_decimal_stream_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -144895,7 +144909,8 @@
         "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard",
         "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes",
         "TestRealClosureBinaryIntervalRetainedCore",
-        "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement"
+        "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement",
+        "TestBinaryRationalDecimalSourceStreamAndRawScope"
       ],
       "conditionals": [
         {
@@ -145099,6 +145114,14 @@
           "tests": [
             "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes"
           ]
+        },
+        {
+          "name": "mpbq.cpp:426-458 decimal io.Writer sign/integer/dot/digit/uncertainty insertions with raw local end-label cleanup",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_decimal_stream.go",
+          "tests": [
+            "TestBinaryRationalDecimalSourceStreamAndRawScope"
+          ]
         }
       ],
       "ownership": [
@@ -145109,7 +145132,8 @@
         "Explicit owner-local contexts and Close replace global diagnostic service/RAII. Imported foreign rational numerators/denominators copied through their real owners. Undefined degree-zero and interval preconditions have typed adapters; finite raw negative/unreduced shapes remain source behavior. Selected byte output stages in charged retained workspace; final strings caller-owned. Integer storage error adapters inherited; completed BQ statement/exponent/alias prefixes retained. Open trace/custom ostream integration keeps whole unit partial.",
         "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
         "Binary-rational fields and DRS/Sturm stacks now use native slice append, removing C++ vector capacity/header arithmetic, initialized masks and container-only reservations/refunds. Binary logical size remains distinct from native constructed field extent; relocation transfers actual numeral fields once and clears old owning records. Root-isolation frame packing/traversal, endpoint arithmetic, ascending numeric destruction, actual cold owners and real numeric allocation failures remain. Native buffer BackingBytes is zero.",
-        "Retained realclosure finite endpoint display now emits numerator, /2 and exponent markup through separate io.Writer insertions, preserving refused/short-write prefixes. Staged String and PrettyString remain for their other callers; persistent C++ ostream state is outside Go standard-library output."
+        "Retained realclosure finite endpoint display now emits numerator, /2 and exponent markup through separate io.Writer insertions, preserving refused/short-write prefixes. Staged String and PrettyString remain for their other callers; persistent C++ ostream state is outside Go standard-library output.",
+        "Selected ordinary decimal output now uses direct source-order io.Writer insertions through the algebraic root display caller. Refused writes retain the raw numeric display scope until explicit CleanupDisplay; staged DecimalString remains for other callers. Interval-decimal and SMT2 stream insertion remain separate work."
       ]
     },
     {

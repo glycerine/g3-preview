@@ -61,10 +61,12 @@ func TestAlgebraicDisplayDecimalBasicRootAndExactRefinement(t *testing.T) {
 	if err := c.DisplayDecimal(stop, &root, 4); !errors.Is(err, refusal) || stop.String() != "" {
 		t.Fatal("decimal refusal", stop.String(), err)
 	}
+	serviceMust(t, c.config.Binary.CleanupDisplay())
 	short := &algebraicIntervalRefusingWriter{stop: 1}
 	if err := c.DisplayDecimal(short, &root, 4); !errors.Is(err, io.ErrShortWrite) || short.String() != "" {
 		t.Fatal("decimal short write", short.String(), err)
 	}
+	serviceMust(t, c.config.Binary.CleanupDisplay())
 	if err := c.DisplayDecimal(nil, &basic, 4); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatal("nil writer", err)
 	}
