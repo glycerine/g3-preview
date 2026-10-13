@@ -120,3 +120,25 @@ func TestWarningFormattedStringAndIntegerRoutes(t *testing.T) {
 		t.Fatal(e, stderr.String())
 	}
 }
+
+func TestWarningRetainedDatalogUnsignedSymbol(t *testing.T) {
+	var stderr, stream bytes.Buffer
+	s := NewWarningService(&stderr)
+	format := "symbol number %I64u on line %d in file %s does not belong to sort %s"
+	if e := s.Warningf(format, ^uint64(0), 7, "facts.rel", "Color"); e != nil {
+		t.Fatal(e)
+	}
+	want := "WARNING: symbol number 18446744073709551615 on line 7 in file facts.rel does not belong to sort Color\n"
+	if got := stderr.String(); got != want {
+		t.Fatalf("default stream = %q, want %q", got, want)
+	}
+	if e := s.SetWarningStream(&stream); e != nil {
+		t.Fatal(e)
+	}
+	if e := s.Warningf("%%I64u: %I64u", uint64(42)); e != nil {
+		t.Fatal(e)
+	}
+	if got, want := stream.String(), "WARNING: %I64u: 42\n"; got != want {
+		t.Fatalf("borrowed stream = %q, want %q", got, want)
+	}
+}

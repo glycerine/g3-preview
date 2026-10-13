@@ -42,7 +42,8 @@ func (s *WarningService) SetWarningStream(stream io.Writer) error {
 	return nil
 }
 
-// Warningf covers retained warning_msg calls using Go's %s and %d formatting.
+// Warningf covers retained warning_msg calls using Go's %s and %d formatting,
+// including the datalog parser's 64-bit unsigned-decimal %I64u spelling.
 // String arguments are C-string views at those source sites.
 func (s *WarningService) Warningf(format string, args ...any) error {
 	if s == nil {
@@ -53,6 +54,26 @@ func (s *WarningService) Warningf(format string, args ...any) error {
 	}
 	if i := strings.IndexByte(format, 0); i >= 0 {
 		format = format[:i]
+	}
+	if strings.Contains(format, "%I64u") {
+		var converted strings.Builder
+		converted.Grow(len(format))
+		for i := 0; i < len(format); i++ {
+			if format[i] == '%' && i+1 < len(format) {
+				if format[i+1] == '%' {
+					converted.WriteString("%%")
+					i++
+					continue
+				}
+				if strings.HasPrefix(format[i+1:], "I64u") {
+					converted.WriteString("%d")
+					i += 4
+					continue
+				}
+			}
+			converted.WriteByte(format[i])
+		}
+		format = converted.String()
 	}
 	copied := false
 	for i, arg := range args {
