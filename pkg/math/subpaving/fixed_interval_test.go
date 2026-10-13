@@ -98,7 +98,7 @@ func TestSubpavingFixedMutableIntervalRetainedCore(t *testing.T) {
 	}
 	set(a, -3, 2, 2, 1, true, false) // (-3/2,2]
 	writeErr := errors.New("fixed upper endpoint refused")
-	refused := &fixedDisplayRefusal{remaining: 3, err: writeErr}
+	refused := &fixedDisplayRefusal{remaining: 5, err: writeErr}
 	if err := a.Display(refused); !errors.Is(err, writeErr) || refused.String() != "(-3/2, " {
 		t.Fatalf("fixed display refusal = (%q, %v)", refused.String(), err)
 	}

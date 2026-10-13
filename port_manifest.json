@@ -149181,6 +149181,7 @@
         "pkg/util/numeral/mpfx_ops_test.go",
         "pkg/util/numeral/mpfx_convert.go",
         "pkg/util/numeral/mpfx_convert_test.go",
+        "pkg/util/numeral/mpfx_display_source_test.go",
         "pkg/util/numeral/mpfx_predicates.go",
         "pkg/util/numeral/mpfx_predicates_test.go",
         "pkg/util/numeral/mpfx_power_of_two.go",
@@ -149192,6 +149193,7 @@
         "TestFixedPointRetainedFloorCeilInverseAndPower",
         "TestFixedPointPowerAliasExtraSquareAndCeilOverflow",
         "TestFixedPointRetainedRationalIntegerConversionAndDisplay",
+        "TestFixedPointDisplaySourceInsertionsAndShortWrites",
         "TestFixedPointRetainedOrderingSignsIncrementAndSwap",
         "TestFixedPointPrevPowerOfTwoSourceIntegerWords"
       ],
@@ -149453,7 +149455,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_convert.go",
           "tests": [
-            "TestFixedPointRetainedRationalIntegerConversionAndDisplay"
+            "TestFixedPointRetainedRationalIntegerConversionAndDisplay",
+            "TestFixedPointDisplaySourceInsertionsAndShortWrites"
           ]
         },
         {
@@ -149494,6 +149497,7 @@
         "pkg/util/numeral/mpfx_ops_test.go",
         "pkg/util/numeral/mpfx_convert.go",
         "pkg/util/numeral/mpfx_convert_test.go",
+        "pkg/util/numeral/mpfx_display_source_test.go",
         "pkg/util/numeral/mpfx_predicates.go",
         "pkg/util/numeral/mpfx_predicates_test.go",
         "pkg/util/numeral/mpfx_power_of_two.go",
@@ -149505,6 +149509,7 @@
         "TestFixedPointRetainedFloorCeilInverseAndPower",
         "TestFixedPointPowerAliasExtraSquareAndCeilOverflow",
         "TestFixedPointRetainedRationalIntegerConversionAndDisplay",
+        "TestFixedPointDisplaySourceInsertionsAndShortWrites",
         "TestFixedPointRetainedOrderingSignsIncrementAndSwap",
         "TestFixedPointPrevPowerOfTwoSourceIntegerWords"
       ],
@@ -149544,7 +149549,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_convert.go",
           "tests": [
-            "TestFixedPointRetainedRationalIntegerConversionAndDisplay"
+            "TestFixedPointRetainedRationalIntegerConversionAndDisplay",
+            "TestFixedPointDisplaySourceInsertionsAndShortWrites"
           ]
         },
         {

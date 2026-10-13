@@ -5,6 +5,8 @@ import (
 	"io"
 	"math/big"
 	"strconv"
+
+	"github.com/glycerine/g3/pkg/arena"
 )
 
 // SetFromInteger is the reached subpaving mpz -> mpfx conversion. The source
@@ -116,10 +118,46 @@ func (m *FixedPointManager) ToRationalString(a *FixedPoint) (string, error) {
 }
 
 func (m *FixedPointManager) Display(w io.Writer, a *FixedPoint) error {
-	s, err := m.String(a)
+	if w == nil {
+		return arena.ErrInvalidSlot
+	}
+	if err := m.check(a); err != nil {
+		return err
+	}
+	if a.scaled.Sign() < 0 {
+		if err := writeFixedPointPart(w, "-"); err != nil {
+			return err
+		}
+	}
+	r, err := m.Rational(a)
 	if err != nil {
 		return err
 	}
-	_, err = io.WriteString(w, s)
+	num := r.Num()
+	num.Abs(num)
+	if err := writeFixedPointPart(w, num.String()); err != nil {
+		return err
+	}
+	if r.IsInt() {
+		return nil
+	}
+	if err := writeFixedPointPart(w, "/2"); err != nil {
+		return err
+	}
+	k := r.Denom().BitLen() - 1
+	if k <= 1 {
+		return nil
+	}
+	if err := writeFixedPointPart(w, "^"); err != nil {
+		return err
+	}
+	return writeFixedPointPart(w, strconv.Itoa(k))
+}
+
+func writeFixedPointPart(w io.Writer, s string) error {
+	n, err := io.WriteString(w, s)
+	if err == nil && n != len(s) {
+		return io.ErrShortWrite
+	}
 	return err
 }

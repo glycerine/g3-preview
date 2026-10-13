@@ -24,11 +24,7 @@ func (e FixedExtended) Display(w io.Writer, a *numeral.FixedPoint, k ExtendedKin
 	case PlusInfinity:
 		s = "+oo"
 	default:
-		var err error
-		s, err = e.Numbers.String(a)
-		if err != nil {
-			return err
-		}
+		return e.Numbers.Display(w, a)
 	}
 	return writeExtendedText(w, s)
 }
