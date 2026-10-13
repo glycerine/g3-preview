@@ -21,6 +21,7 @@ type HardwareEngine struct {
 	self    *HardwareEngine
 	context *subpaving.HardwareContext
 	shell   *subpaving.HardwareShellCoefficients
+	qm      *numeral.RationalManager
 	options Options
 	closed  bool
 }
@@ -44,7 +45,7 @@ func NewHardwareEngine(limit *control.Reslimit, qm *numeral.RationalManager, pc 
 	if c == nil {
 		return nil, err
 	}
-	e := &HardwareEngine{context: c, options: selected}
+	e := &HardwareEngine{context: c, qm: qm, options: selected}
 	e.self = e
 	if err != nil {
 		return e, err
@@ -95,6 +96,7 @@ func (e *HardwareEngine) Close() error {
 	}
 	e.shell = nil
 	e.context = nil
+	e.qm = nil
 	e.closed = true
 	return nil
 }

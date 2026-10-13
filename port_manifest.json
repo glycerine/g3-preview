@@ -52639,9 +52639,14 @@
       "path": "src/math/subpaving/tactic/expr2subpaving.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/subpaving/tactic/expr_converter.go",
+        "pkg/math/subpaving/tactic/expr_converter_test.go"
+      ],
+      "tests": [
+        "TestHardwareExprConverterNumeralsAndVariableLeaves"
+      ],
       "assertions": [
         {
           "line": 103,
@@ -52684,15 +52689,22 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Incremental hardware context specialization: numeral and variable leaves, to_real and process_add are implemented; multiplication, power, literal conversion, cache, checkpoints and full tactic integration remain open."
+      ]
     },
     {
       "path": "src/math/subpaving/tactic/expr2subpaving.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/subpaving/tactic/expr_converter.go",
+        "pkg/math/subpaving/tactic/expr_converter_test.go"
+      ],
+      "tests": [
+        "TestHardwareExprConverterNumeralsAndVariableLeaves"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -52707,7 +52719,9 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Incremental hardware context specialization: numeral and variable leaves, to_real and process_add are implemented; multiplication, power, literal conversion, cache, checkpoints and full tactic integration remain open."
+      ]
     },
     {
       "path": "src/math/subpaving/tactic/subpaving_tactic.cpp",
