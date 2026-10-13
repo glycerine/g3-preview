@@ -116665,12 +116665,16 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/control/cancel_handler.go"
+        "pkg/util/control/cancel_handler.go",
+        "pkg/util/control/scoped_timer.go",
+        "pkg/util/control/scoped_ctrl_c.go"
       ],
       "tests": [
         "TestCancelHandlerSourceLifetime",
         "TestCancelHandlerSourceNestedAndReset",
-        "TestCancelHandlerWarmNoAllocation"
+        "TestCancelHandlerWarmNoAllocation",
+        "TestScopedTimerFiresWithTimeoutCaller",
+        "TestScopedCtrlCReceivesProcessInterrupt"
       ],
       "conditionals": [
         {
@@ -116682,7 +116686,7 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": false,
       "methods": [
         {
@@ -116714,13 +116718,41 @@
             "TestCancelHandlerSourceNestedAndReset",
             "TestCancelHandlerWarmNoAllocation"
           ]
+        },
+        {
+          "name": "borrowed event_handler timeout dispatch through scoped_timer (src/util/scoped_timer.cpp:57-129)",
+          "status": "ported",
+          "go_target": "pkg/util/control/scoped_timer.go",
+          "tests": [
+            "TestScopedTimerFiresWithTimeoutCaller"
+          ]
+        },
+        {
+          "name": "borrowed event_handler interrupt dispatch through scoped_ctrl_c (src/util/scoped_ctrl_c.cpp:39-66)",
+          "status": "ported",
+          "go_target": "pkg/util/control/scoped_ctrl_c.go",
+          "tests": [
+            "TestScopedCtrlCReceivesProcessInterrupt"
+          ]
+        },
+        {
+          "name": "process-global timeout handler caller ID, callback, timer destruction and timeout exception (src/util/timeout.cpp:27-59)",
+          "status": "unported"
+        },
+        {
+          "name": "combined_solver auxiliary timeout handler and check_sat_result caller-ID reason mapping (src/solver/combined_solver.cpp:85-100; src/solver/check_sat_result.cpp:21-38)",
+          "status": "unported"
+        },
+        {
+          "name": "API context interruptable borrowed handler registration and interrupt dispatch (src/api/api_context.cpp:121-145)",
+          "status": "unported"
         }
       ],
       "ownership": [
-        "Cold borrowed reslimit owner; explicit close once, serialized event invocation. Other specializations and OS dispatch pending. See PORT_PROGRESS.md#audit-rlimit-port-status-md."
+        "Cold borrowed reslimit owner; explicit close once, serialized event invocation. Scoped timer and Ctrl-C dispatch borrow their handlers and pass source caller IDs. Process-global timeout, combined-solver and API interrupt owners remain with their unported concrete consumers. See PORT_PROGRESS.md#audit-rlimit-port-status-md."
       ],
       "deviations": [
-        "Concrete resource specialization replaces C++ template/virtual dispatch; repeated explicit close harmless."
+        "Concrete resource specialization replaces C++ template/virtual dispatch; repeated explicit close harmless. Only cancel_eh<reslimit> is instantiated in production. The generic event-handler base is not a separate Go owner; its remaining behavior belongs to the timeout, solver and API consumers."
       ]
     },
     {
