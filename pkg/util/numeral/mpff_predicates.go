@@ -170,19 +170,30 @@ func (m *FastFloatManager) Less(a, b *FastFloat) (bool, error) {
 	if e := m.pair(a, b); e != nil {
 		return false, e
 	}
+	m.traceLessOperands(a, b)
 	if a.index() == 0 {
-		return b.index() != 0 && !b.negative(), nil
+		result := b.index() != 0 && !b.negative()
+		m.traceLessResult(result, false)
+		return result, nil
 	}
 	if b.index() == 0 {
-		return a.negative(), nil
+		result := a.negative()
+		m.traceLessResult(result, false)
+		return result, nil
 	}
 	if a.negative() != b.negative() {
-		return a.negative(), nil
+		result := a.negative()
+		m.traceLessResult(result, false)
+		return result, nil
 	}
 	if a.negative() {
-		return b.exponent < a.exponent || (a.exponent == b.exponent && ffCompare(m.sig(b), m.sig(a)) < 0), nil
+		result := b.exponent < a.exponent || (a.exponent == b.exponent && ffCompare(m.sig(b), m.sig(a)) < 0)
+		m.traceLessResult(result, true)
+		return result, nil
 	}
-	return a.exponent < b.exponent || (a.exponent == b.exponent && ffCompare(m.sig(a), m.sig(b)) < 0), nil
+	result := a.exponent < b.exponent || (a.exponent == b.exponent && ffCompare(m.sig(a), m.sig(b)) < 0)
+	m.traceLessResult(result, true)
+	return result, nil
 }
 func (m *FastFloatManager) Greater(a, b *FastFloat) (bool, error) { return m.Less(b, a) }
 func (m *FastFloatManager) LessEqual(a, b *FastFloat) (bool, error) {

@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -52,6 +53,7 @@ var ErrFastFloatOwner = errors.New("mpnum: invalid MPFF owner or dead significan
 // conversion managers are borrowed only for their individual operation.
 type FastFloatManager struct {
 	self                                       *FastFloatManager
+	trace                                      *diagnostic.TraceTags
 	natural                                    *NaturalManager
 	config                                     FastFloatConfig
 	precision, bits, capacity, next, live      uint32
