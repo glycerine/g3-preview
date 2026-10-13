@@ -1,12 +1,14 @@
 package ufbv
 
 import (
+	"bytes"
 	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
@@ -110,6 +112,15 @@ func TestUFBVRewriterTacticGoalTransitionAndCoreRefusal(t *testing.T) {
 }
 
 func TestUFBVRewriterTacticProofModePreservesFormulaAndProof(t *testing.T) {
+	warnings := diagnostic.BorrowProcessWarningService()
+	oldEnabled := warnings.Enabled()
+	var warningOutput bytes.Buffer
+	cacheMust(t, warnings.SetWarningStream(&warningOutput))
+	t.Cleanup(func() {
+		cacheMust(t, warnings.SetWarningStream(nil))
+		cacheMust(t, warnings.Enable(oldEnabled))
+	})
+	cacheMust(t, warnings.Enable(true))
 	m := cacheFixtureProofMode(t, ast.ASTProofEnabled)
 	b, e := m.MkBoolSort()
 	cacheMust(t, e)
@@ -147,5 +158,14 @@ func TestUFBVRewriterTacticProofModePreservesFormulaAndProof(t *testing.T) {
 	cacheMust(t, e)
 	if n != 1 || afterForm != beforeForm || afterProof != beforeProof || depth != 1 {
 		t.Fatal("source proof bypass and goal depth", n, afterForm, afterProof, depth)
+	}
+	if got, want := warningOutput.String(), "WARNING: PRE_DEMODULATOR=true is not supported when proofs are enabled.\n"; got != want {
+		t.Fatal("source proof-mode warning", got, want)
+	}
+	cacheMust(t, warnings.Enable(false))
+	_, e = rewriter.Apply(goal)
+	cacheMust(t, e)
+	if got, want := warningOutput.String(), "WARNING: PRE_DEMODULATOR=true is not supported when proofs are enabled.\n"; got != want {
+		t.Fatal("disabled process warning emitted", got)
 	}
 }

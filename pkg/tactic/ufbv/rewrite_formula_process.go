@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // formulaProcessor owns the concrete indexes and work queues for one UFBV
@@ -75,6 +76,9 @@ func (r *formulaProcessor) run(formulas []ast.ASTHandle) (output []ast.ASTRef, r
 		return nil, e
 	}
 	if proofs {
+		if e := diagnostic.BorrowProcessWarningService().Warning("PRE_DEMODULATOR=true is not supported when proofs are enabled."); e != nil {
+			return nil, e
+		}
 		for _, h := range formulas {
 			ref, e := m.NewRef(h)
 			if e != nil {

@@ -103361,7 +103361,8 @@
         "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot",
         "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier",
         "TestUFBVDemodulatorClassificationOrderingAndBooleanForms",
-        "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
+        "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults",
+        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
       ],
       "conditionals": [
         {
@@ -103563,6 +103564,14 @@
           "go_target": "pkg/tactic/ufbv/rewrite_formula_process.go",
           "tests": [
             "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
+          ]
+        },
+        {
+          "name": "operator() proof-enabled warning_msg and unchanged formula/proof publication (ufbv_rewriter.cpp:659-667)",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_process.go",
+          "tests": [
+            "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
           ]
         }
       ],
@@ -173654,7 +173663,8 @@
       "go_targets": [
         "pkg/util/diagnostic/util_warning.go",
         "pkg/util/params/util_env_params.go",
-        "pkg/util/z3exception/z3_exception.go"
+        "pkg/util/z3exception/z3_exception.go",
+        "pkg/tactic/ufbv/rewrite_formula_process.go"
       ],
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
@@ -173663,7 +173673,8 @@
         "TestWarningFormattedStringAndIntegerRoutes",
         "TestWarningRetainedDatalogUnsignedSymbol",
         "TestDefaultExceptionSourceFormattedConstructor",
-        "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
+        "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
+        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
       ],
       "conditionals": [
         {
@@ -173730,7 +173741,11 @@
           "tests": [
             "TestWarningSourceDefaultRoutingAndDisabledState",
             "TestWarningSourceBorrowedStreamTruncationAndFallback",
-            "TestWarningShortWritePreservesSourceInsertionPrefix"
+            "TestWarningShortWritePreservesSourceInsertionPrefix",
+            "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+          ],
+          "go_targets": [
+            "pkg/tactic/ufbv/rewrite_formula_process.go"
           ]
         },
         {
@@ -173772,7 +173787,8 @@
       "go_targets": [
         "pkg/util/diagnostic/util_warning.go",
         "pkg/util/params/util_env_params.go",
-        "pkg/util/z3exception/z3_exception.go"
+        "pkg/util/z3exception/z3_exception.go",
+        "pkg/tactic/ufbv/rewrite_formula_process.go"
       ],
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
@@ -173781,7 +173797,8 @@
         "TestWarningFormattedStringAndIntegerRoutes",
         "TestWarningRetainedDatalogUnsignedSymbol",
         "TestDefaultExceptionSourceFormattedConstructor",
-        "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
+        "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
+        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
       ],
       "conditionals": [
         {
@@ -173803,7 +173820,11 @@
           "tests": [
             "TestWarningSourceDefaultRoutingAndDisabledState",
             "TestWarningSourceBorrowedStreamTruncationAndFallback",
-            "TestWarningShortWritePreservesSourceInsertionPrefix"
+            "TestWarningShortWritePreservesSourceInsertionPrefix",
+            "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+          ],
+          "go_targets": [
+            "pkg/tactic/ufbv/rewrite_formula_process.go"
           ]
         },
         {

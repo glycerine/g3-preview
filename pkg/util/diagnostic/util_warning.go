@@ -18,6 +18,12 @@ type WarningService struct {
 	enabled bool
 }
 
+// The source warning settings are process globals. Retained callers share this
+// one service; tests and explicit owners may still construct isolated services.
+var processWarnings = NewWarningService(os.Stderr)
+
+func BorrowProcessWarningService() *WarningService { return processWarnings }
+
 func NewWarningService(stderr io.Writer) *WarningService {
 	if stderr == nil {
 		stderr = os.Stderr
