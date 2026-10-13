@@ -176470,7 +176470,7 @@
         "TestWarningSourceBorrowedStreamTruncationAndFallback",
         "TestWarningShortWritePreservesSourceInsertionPrefix",
         "TestWarningFlushesCompletedBorrowedAndDefaultStreams",
-        "TestWarningShortWriteDoesNotFlush",
+        "TestWarningShortWriteStillFlushesSourceStream",
         "TestWarningFormattedStringAndIntegerRoutes",
         "TestWarningRetainedDatalogUnsignedSymbol",
         "TestDefaultExceptionSourceFormattedConstructor",
@@ -176551,7 +176551,7 @@
             "TestWarningSourceBorrowedStreamTruncationAndFallback",
             "TestWarningShortWritePreservesSourceInsertionPrefix",
             "TestWarningFlushesCompletedBorrowedAndDefaultStreams",
-            "TestWarningShortWriteDoesNotFlush",
+            "TestWarningShortWriteStillFlushesSourceStream",
             "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
           ],
           "go_targets": [
@@ -176568,6 +176568,7 @@
           "tests": [
             "TestWarningFormattedStringAndIntegerRoutes",
             "TestWarningRetainedDatalogUnsignedSymbol",
+            "TestWarningShortWriteStillFlushesSourceStream",
             "TestDefaultExceptionSourceFormattedConstructor"
           ]
         },
@@ -176623,7 +176624,7 @@
         "TestWarningSourceBorrowedStreamTruncationAndFallback",
         "TestWarningShortWritePreservesSourceInsertionPrefix",
         "TestWarningFlushesCompletedBorrowedAndDefaultStreams",
-        "TestWarningShortWriteDoesNotFlush",
+        "TestWarningShortWriteStillFlushesSourceStream",
         "TestWarningFormattedStringAndIntegerRoutes",
         "TestWarningRetainedDatalogUnsignedSymbol",
         "TestDefaultExceptionSourceFormattedConstructor",
@@ -176655,7 +176656,7 @@
             "TestWarningSourceBorrowedStreamTruncationAndFallback",
             "TestWarningShortWritePreservesSourceInsertionPrefix",
             "TestWarningFlushesCompletedBorrowedAndDefaultStreams",
-            "TestWarningShortWriteDoesNotFlush",
+            "TestWarningShortWriteStillFlushesSourceStream",
             "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
             "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
           ],
@@ -176679,6 +176680,7 @@
           "tests": [
             "TestWarningFormattedStringAndIntegerRoutes",
             "TestWarningRetainedDatalogUnsignedSymbol",
+            "TestWarningShortWriteStillFlushesSourceStream",
             "TestDefaultExceptionSourceFormattedConstructor"
           ]
         },

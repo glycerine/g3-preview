@@ -54,22 +54,29 @@ func TestWarningFlushesCompletedBorrowedAndDefaultStreams(t *testing.T) {
 	}
 }
 
-func TestWarningShortWriteDoesNotFlush(t *testing.T) {
+func TestWarningShortWriteStillFlushesSourceStream(t *testing.T) {
 	w := &shortFlushingWarningWriter{shortWarningWriter: shortWarningWriter{limit: len("WARNING: x")}}
 	s := NewWarningService(w)
-	if err := s.Warning("xy"); !errors.Is(err, io.ErrShortWrite) || w.flushes != 0 {
-		t.Fatal("short write flushed incomplete warning", err, w.flushes)
+	if err := s.Warning("xy"); !errors.Is(err, io.ErrShortWrite) || w.flushes != 1 || w.buf.String() != "WARNING: x" {
+		t.Fatal("short write source flush and prefix", err, w.flushes, w.buf.String())
+	}
+	flushErr := errors.New("flush failed")
+	w = &shortFlushingWarningWriter{shortWarningWriter: shortWarningWriter{limit: 0}, err: flushErr}
+	s = NewWarningService(w)
+	if err := s.Warning("xy"); !errors.Is(err, io.ErrShortWrite) || errors.Is(err, flushErr) || w.flushes != 1 {
+		t.Fatal("first insertion error precedes later flush failure", err, w.flushes)
 	}
 }
 
 type shortFlushingWarningWriter struct {
 	shortWarningWriter
 	flushes int
+	err     error
 }
 
 func (w *shortFlushingWarningWriter) Flush() error {
 	w.flushes++
-	return nil
+	return w.err
 }
 
 type shortWarningWriter struct {

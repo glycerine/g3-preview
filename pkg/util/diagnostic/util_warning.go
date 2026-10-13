@@ -117,21 +117,23 @@ func (s *WarningService) Warning(message string) error {
 	} else {
 		w = s.stderr
 	}
-	if e := writeWarningPart(w, "WARNING: "); e != nil {
-		return e
-	}
-	if e := writeWarningPart(w, message); e != nil {
-		return e
-	}
-	if e := writeWarningPart(w, "\n"); e != nil {
-		return e
+	// The source performs all three insertions and flushes even after the
+	// stream enters a failed state. A Go writer has no sticky state, so retain
+	// the first insertion failure and skip later underlying writes.
+	var failure error
+	for _, part := range [...]string{"WARNING: ", message, "\n"} {
+		if failure == nil {
+			failure = writeWarningPart(w, part)
+		}
 	}
 	// std::ostream::flush and fflush publish the completed warning. A borrowed
 	// buffered Go writer supplies the corresponding Flush method.
 	if f, ok := w.(interface{ Flush() error }); ok {
-		return f.Flush()
+		if e := f.Flush(); failure == nil {
+			failure = e
+		}
 	}
-	return nil
+	return failure
 }
 
 func writeWarningPart(w io.Writer, part string) error {
