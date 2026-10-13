@@ -1401,6 +1401,10 @@ func (c *ParamsContext) Validate(v *ParamsRef, d *ParamDescrs) error {
 	if e := c.check(v); e != nil {
 		return e
 	}
+	// params_ref::validate does not inspect descriptors for a null m_params.
+	if v.Slot == 0 {
+		return nil
+	}
 	if d == nil || d.manager != c.SymbolsField {
 		return ErrParamsOwner
 	}
@@ -1408,9 +1412,6 @@ func (c *ParamsContext) Validate(v *ParamsRef, d *ParamDescrs) error {
 	defer d.mu.Unlock()
 	if e := d.open(); e != nil {
 		return e
-	}
-	if v.Slot == 0 {
-		return nil
 	}
 	b := &c.Blocks[v.Slot-1]
 	for i := uint32(0); i < b.Size; i++ {

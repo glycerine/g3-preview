@@ -164006,7 +164006,8 @@
         "TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral",
         "TestContextParamsAllSetBooleanFieldsAndReachedBorrowedStringLifetime",
         "TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation",
-        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
+        "TestParamsReferenceValidateEmptySkipsDescriptors"
       ],
       "conditionals": [
         {
@@ -164392,6 +164393,14 @@
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
           ]
+        },
+        {
+          "name": "params_ref::validate empty-reference return before descriptor access (params.cpp:545-548)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceValidateEmptySkipsDescriptors"
+          ]
         }
       ],
       "ownership": [
@@ -164533,7 +164542,8 @@
         "TestGlobalParamsSourceConstructorAllActualNestedPrefixes",
         "TestGlobalParamsServiceUnconditionalInitAndCurrentPointer",
         "TestGlobalParamsServiceCtorRefusalPreservesCurrentAndFailedHeaders",
-        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
+        "TestParamsReferenceValidateEmptySkipsDescriptors"
       ],
       "conditionals": [
         {
@@ -164871,6 +164881,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_params.go",
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
+        },
+        {
+          "name": "params_ref::validate empty-reference return before descriptor access (params.cpp:545-548)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceValidateEmptySkipsDescriptors"
           ]
         }
       ],
