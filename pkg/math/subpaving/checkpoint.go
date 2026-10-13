@@ -3,6 +3,7 @@ package subpaving
 
 import (
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/z3exception"
@@ -10,10 +11,10 @@ import (
 
 var ErrSubpavingMaxMemory = z3exception.NewDefaultException(messages.MaxMemory)
 
-// sourceCheckpoint preserves the source order: resource increment precedes the
-// process-global allocation getter. A numeral runtime without a shared process
+// sourceCheckpoint preserves the source order: resource increment, allocation
+// check, then cooperate("subpaving"). A numeral runtime without a shared process
 // still exposes its own concrete source allocation counter.
-func sourceCheckpoint(limit *control.Reslimit, runtime *memory.Runtime, process *memory.ProcessAccounting, maxMemory uint64, canceled error) error {
+func sourceCheckpoint(limit *control.Reslimit, runtime *memory.Runtime, process *memory.ProcessAccounting, maxMemory uint64, canceled error, cooperation *cooperate.Cooperation) error {
 	if !limit.Inc() {
 		return canceled
 	}
@@ -29,6 +30,9 @@ func sourceCheckpoint(limit *control.Reslimit, runtime *memory.Runtime, process 
 		if used > maxMemory {
 			return ErrSubpavingMaxMemory
 		}
+	}
+	if cooperation != nil {
+		return cooperation.Cooperate("subpaving")
 	}
 	return nil
 }

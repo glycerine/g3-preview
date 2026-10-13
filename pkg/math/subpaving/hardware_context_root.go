@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -20,6 +21,7 @@ type HardwareContext struct {
 	self             *HardwareContext
 	numbers          *numeral.HardwareFloatNumeralManager
 	limit            *control.Reslimit
+	cooperation      *cooperate.Cooperation
 	process          *memory.ProcessAccounting
 	epsilon          numeral.HardwareFloat
 	maxBound         numeral.HardwareFloat
@@ -208,7 +210,7 @@ func (c *HardwareContext) XnEqY(out, src *HardwareInterval, degree uint32) error
 	if err := c.open(); err != nil {
 		return err
 	}
-	return out.XnEqY(src, degree, &c.rootPrecision, interval.HardwareRoot{Numbers: c.numbers, Limit: c.limit})
+	return out.XnEqY(src, degree, &c.rootPrecision, interval.HardwareRoot{Numbers: c.numbers, Limit: c.limit, Cooperation: c.cooperation})
 }
 
 func (c *HardwareContext) Close() error {

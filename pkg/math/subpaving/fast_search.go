@@ -48,7 +48,7 @@ func (c *FastContext) Search() error {
 	}
 	for c.searchNode != nil || len(c.leafQueue) != 0 {
 		if c.searchNode == nil {
-			if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrFastContextCanceled); err != nil {
+			if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrFastContextCanceled, c.cooperation); err != nil {
 				return err
 			}
 			if len(c.queue) != 0 || c.queueHead != 0 {

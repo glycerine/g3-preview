@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -20,6 +21,7 @@ type FixedContext struct {
 	self             *FixedContext
 	numbers          *numeral.FixedPointManager
 	limit            *control.Reslimit
+	cooperation      *cooperate.Cooperation
 	isInt            []bool
 	root             *FixedNode
 	epsilon          *numeral.FixedPoint
@@ -149,7 +151,7 @@ func (c *FixedContext) XnEqY(out, src *FixedInterval, degree uint32) error {
 	if err := c.open(); err != nil {
 		return err
 	}
-	return out.XnEqY(src, degree, c.rootPrecision, interval.FixedRoot{Numbers: c.numbers, Limit: c.limit})
+	return out.XnEqY(src, degree, c.rootPrecision, interval.FixedRoot{Numbers: c.numbers, Limit: c.limit, Cooperation: c.cooperation})
 }
 
 func (c *FixedContext) Close() error {

@@ -140,7 +140,7 @@ func TestFastCheckpointReadsUnsharedRuntime(t *testing.T) {
 	if used, err := r.AllocationSize(); err != nil || used != baseline {
 		t.Fatal("fast-float runtime did not return to checkpoint limit", used, err, baseline)
 	}
-	if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrFastContextCanceled); err != nil {
+	if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrFastContextCanceled, c.cooperation); err != nil {
 		t.Fatal("equal runtime allocation must pass checkpoint", err)
 	}
 }

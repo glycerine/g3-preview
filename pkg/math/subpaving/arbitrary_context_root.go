@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -21,6 +22,7 @@ type ArbitraryContext struct {
 	self                                            *ArbitraryContext
 	numbers                                         *numeral.ArbitraryFloatNumeralManager
 	limit                                           *control.Reslimit
+	cooperation                                     *cooperate.Cooperation
 	runtime                                         *memory.Runtime
 	process                                         *memory.ProcessAccounting
 	variables                                       []bool
@@ -174,7 +176,7 @@ func (c *ArbitraryContext) XnEqY(out, src *ArbitraryInterval, degree uint32) err
 	if err := c.open(); err != nil {
 		return err
 	}
-	return out.XnEqY(src, degree, c.rootPrecision, interval.ArbitraryRoot{Numbers: c.numbers, Limit: c.limit})
+	return out.XnEqY(src, degree, c.rootPrecision, interval.ArbitraryRoot{Numbers: c.numbers, Limit: c.limit, Cooperation: c.cooperation})
 }
 
 // NewVariable is the concrete config_mpf mk_var prefix reached by the tactic.

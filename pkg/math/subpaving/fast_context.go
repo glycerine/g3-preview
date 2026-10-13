@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -21,6 +22,7 @@ type FastContext struct {
 	self             *FastContext
 	numbers          *numeral.FastFloatManager
 	limit            *control.Reslimit
+	cooperation      *cooperate.Cooperation
 	runtime          *memory.Runtime
 	process          *memory.ProcessAccounting
 	isInt            []bool
@@ -239,7 +241,7 @@ func (c *FastContext) XnEqY(out, src *FastInterval, degree uint32) error {
 	if err := c.open(); err != nil {
 		return err
 	}
-	return out.XnEqY(src, degree, c.rootPrecision, interval.FastRoot{Numbers: c.numbers, Limit: c.limit})
+	return out.XnEqY(src, degree, c.rootPrecision, interval.FastRoot{Numbers: c.numbers, Limit: c.limit, Cooperation: c.cooperation})
 }
 
 func (c *FastContext) Close() error {

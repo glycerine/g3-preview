@@ -52654,7 +52654,10 @@
         "TestFastMidpointSplitterSourceBranchesAndRefusal",
         "TestFastSearchBreadthFirstCancellationAndOwnedChildren",
         "TestFastSearchMaxNodesStopsBeforeNextLeaf",
-        "TestFastSearchRetainsRefusedSplitChildrenForOwnerClose"
+        "TestFastSearchRetainsRefusedSplitChildrenForOwnerClose",
+        "TestSubpavingCheckpointCooperatesAfterResourceAndMemory",
+        "TestFastSearchUsesBoundCooperation",
+        "TestFixedContextRootUsesBoundCooperation"
       ],
       "assertions": [
         {
@@ -118016,7 +118019,8 @@
         "TestCooperationColdOwnerFaultAndCopies",
         "TestCooperationNoOMPZeroWarmAllocations",
         "TestCooperationActualCPPNoOMPReleaseTrace",
-        "TestCooperationCheckpointTraceDetailAndConditional"
+        "TestCooperationCheckpointTraceDetailAndConditional",
+        "TestSubpavingCheckpointCooperatesAfterResourceAndMemory"
       ],
       "assertions": [
         {
@@ -118098,7 +118102,8 @@
         "TestCooperationColdOwnerFaultAndCopies",
         "TestCooperationNoOMPZeroWarmAllocations",
         "TestCooperationActualCPPNoOMPReleaseTrace",
-        "TestCooperationCheckpointTraceDetailAndConditional"
+        "TestCooperationCheckpointTraceDetailAndConditional",
+        "TestSubpavingCheckpointCooperatesAfterResourceAndMemory"
       ],
       "conditionals": [
         {

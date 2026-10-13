@@ -76,7 +76,7 @@ func TestArbitraryCheckpointReadsUnsharedRuntime(t *testing.T) {
 	if used, err := c.runtime.AllocationSize(); err != nil || used != baseline {
 		t.Fatal("arbitrary-float runtime did not return to checkpoint limit", used, err, baseline)
 	}
-	if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrArbitraryContextCanceled); err != nil {
+	if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrArbitraryContextCanceled, c.cooperation); err != nil {
 		t.Fatal("equal runtime allocation must pass checkpoint", err)
 	}
 }

@@ -164,7 +164,7 @@ func (c *FastContext) PropagateQueued(n *FastNode) error {
 		return err
 	}
 	for c.queueHead < len(c.queue) && !n.inconsistent {
-		if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrFastContextCanceled); err != nil {
+		if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrFastContextCanceled, c.cooperation); err != nil {
 			return err
 		}
 		b := c.queue[c.queueHead]
