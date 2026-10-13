@@ -1,5 +1,5 @@
 // Source: src/ast/pattern/pattern_inference.cpp:576-721, excluding the
-// database, pull_quant and proof branches.
+// database, nested pull_quant rewriting and proof branches.
 package pattern
 
 import (
@@ -24,6 +24,44 @@ type quantifierInferenceOptions struct {
 	useDatabase, pullQuantifiers bool
 	warnings                     bool
 	warningService               *diagnostic.WarningService
+}
+
+// Without a quantifier below the body, pull_quant cannot change the formula.
+// Its remaining rewriting cases still require the separate pull_quant port.
+func (c *patternCandidates) bodyContainsQuantifier(body ast.ASTHandle) (bool, error) {
+	seen := make(map[ast.ASTHandle]struct{})
+	work := []ast.ASTHandle{body}
+	for len(work) != 0 {
+		last := len(work) - 1
+		current := work[last]
+		work = work[:last]
+		if _, visited := seen[current]; visited {
+			continue
+		}
+		seen[current] = struct{}{}
+		kind, err := c.manager.GetKind(current)
+		if err != nil {
+			return false, err
+		}
+		if kind == ast.ASTQuantifier {
+			return true, nil
+		}
+		if kind != ast.ASTApp {
+			continue
+		}
+		n, err := c.manager.GetNumArgs(current)
+		if err != nil {
+			return false, err
+		}
+		for i := uint32(0); i < n; i++ {
+			child, err := c.manager.GetArg(current, i)
+			if err != nil {
+				return false, err
+			}
+			work = append(work, child)
+		}
+	}
+	return false, nil
 }
 
 func (c *patternCandidates) quantifierWarning(opts quantifierInferenceOptions, q ast.ASTHandle, format string, values ...any) error {
@@ -77,8 +115,9 @@ func (c *patternCandidates) releasePendingPatternRefs() error {
 }
 
 // reduceQuantifierNoDatabase applies the source inference/retry sequence for a
-// universal quantifier without the separately unported database, pull_quant
-// and proof paths. The returned quantifier reference is independently owned.
+// universal quantifier without the separately unported database, nested
+// pull_quant rewriting and proof paths. The result reference is independently
+// owned.
 func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle, newNoPatterns []ast.ASTHandle, opts quantifierInferenceOptions) (out ast.ASTRef, changed bool, err error) {
 	if c == nil || c.closed {
 		return out, false, ast.ErrASTHandle
@@ -195,7 +234,13 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 		}
 	}
 	if len(patterns) == 0 && opts.pullQuantifiers {
-		return out, false, ast.ErrASTPending
+		contained, e := c.bodyContainsQuantifier(newBody)
+		if e != nil {
+			return out, false, e
+		}
+		if contained {
+			return out, false, ast.ErrASTPending
+		}
 	}
 	oldBody, err := c.manager.GetQuantifierBody(q)
 	if err != nil {

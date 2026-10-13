@@ -107,7 +107,13 @@ func TestPatternInferenceActualRewriterPendingPullAndResume(t *testing.T) {
 	t.Cleanup(func() { patternMust(t, m.DecRef(x)) })
 	truth, err := m.MkFamilyApp(m.BasicFamilyID(), ast.ASTOpTrue, nil, nil)
 	patternMust(t, err)
-	body, err := m.MkFamilyApp(m.BasicFamilyID(), ast.ASTOpAnd, nil, []ast.ASTHandle{x, truth})
+	inner, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{b}, Names: []symbol.Symbol{symbol.Numerical(870)}, Body: truth,
+	})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(inner))
+	t.Cleanup(func() { patternMust(t, m.DecRef(inner)) })
+	body, err := m.MkFamilyApp(m.BasicFamilyID(), ast.ASTOpAnd, nil, []ast.ASTHandle{x, inner})
 	patternMust(t, err)
 	patternMust(t, m.IncRef(body))
 	t.Cleanup(func() { patternMust(t, m.DecRef(body)) })

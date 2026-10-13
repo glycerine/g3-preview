@@ -18297,6 +18297,15 @@
           ]
         },
         {
+          "name": "pull_quantifiers enabled with a quantifier-free rewritten body: source pull_quant makes no change, so inference follows its ordinary no-pattern result; nested pull remains pending",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "tests": [
+            "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
+            "TestPatternInferenceActualRewriterPendingPullAndResume"
+          ]
+        },
+        {
           "name": "pattern_inference_rw concrete no-proof traversal callback connects quantifier reduction, rewritten no-patterns and owning output",
           "status": "ported",
           "go_target": "pkg/ast/pattern/rewriter.go",

@@ -230,8 +230,34 @@ func TestPatternInferenceQuantifierNoPatternReturnAndGuards(t *testing.T) {
 	}
 	patternMust(t, m.DelRef(&ref))
 	opts.pullQuantifiers = true
-	if _, _, e := c.reduceQuantifierNoDatabase(q, body, nil, opts); !errors.Is(e, ast.ErrASTPending) {
-		t.Fatal("unported pull-quantifier path must be explicit", e)
+	if ref, changed, e := c.reduceQuantifierNoDatabase(q, body, nil, opts); e != nil || changed || ref != (ast.ASTRef{}) {
+		t.Fatal("pull pass without nested quantifiers is unchanged", ref, changed, e)
+	}
+	ref, changed, err = c.reduceQuantifierNoDatabase(q, otherBody, nil, opts)
+	patternMust(t, err)
+	if !changed {
+		t.Fatal("quantifier-free pull must publish the changed body")
+	}
+	updated, err = m.RefGet(ref)
+	patternMust(t, err)
+	actualBody, err = m.GetQuantifierBody(updated)
+	patternMust(t, err)
+	if actualBody != otherBody {
+		t.Fatal("quantifier-free pull lost the changed body", actualBody, otherBody)
+	}
+	patternMust(t, m.DelRef(&ref))
+	inner, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{b}, Names: []symbol.Symbol{symbol.Numerical(852)}, Body: truth,
+	})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(inner))
+	t.Cleanup(func() { patternMust(t, m.DecRef(inner)) })
+	nestedBody, err := m.MkFamilyApp(m.BasicFamilyID(), ast.ASTOpAnd, nil, []ast.ASTHandle{x, inner})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(nestedBody))
+	t.Cleanup(func() { patternMust(t, m.DecRef(nestedBody)) })
+	if _, _, e := c.reduceQuantifierNoDatabase(q, nestedBody, nil, opts); !errors.Is(e, ast.ErrASTPending) {
+		t.Fatal("nested pull-quantifier path must remain explicit", e)
 	}
 	opts.pullQuantifiers = false
 	opts.useDatabase = true
