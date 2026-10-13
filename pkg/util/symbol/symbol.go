@@ -260,25 +260,29 @@ func writeSymbolText(w io.Writer, s string) error {
 
 // WriteDisplay is the retained symbol ostream insertion. A numerical symbol
 // writes its prefix before the number, so a failed second write leaves "k!".
+// Resolve the immutable spelling before calling a writer that may reenter us.
 func (m *Manager) WriteDisplay(w io.Writer, s Symbol) error {
 	if w == nil {
 		return ErrInvalid
 	}
 	m.mu.Lock()
-	defer m.mu.Unlock()
 	if e := m.checkPlain(s); e != nil {
+		m.mu.Unlock()
 		return e
 	}
 	if s.IsNumerical() {
+		m.mu.Unlock()
 		if e := writeSymbolText(w, "k!"); e != nil {
 			return e
 		}
 		return writeSymbolText(w, strconv.FormatInt(int64(int32(s.Value)), 10))
 	}
 	if s.Value == 0 {
+		m.mu.Unlock()
 		return writeSymbolText(w, "null")
 	}
 	text, e := m.spelling(s)
+	m.mu.Unlock()
 	if e != nil {
 		return e
 	}

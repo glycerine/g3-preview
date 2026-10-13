@@ -14,6 +14,22 @@ type symbolRefusingWriter struct {
 	err    error
 }
 
+type symbolReentrantWriter struct {
+	bytes.Buffer
+	onWrite func() error
+}
+
+func (w *symbolReentrantWriter) Write(p []byte) (int, error) {
+	if e := w.onWrite(); e != nil {
+		return 0, e
+	}
+	return w.Buffer.Write(p)
+}
+
+func (w *symbolReentrantWriter) WriteString(s string) (int, error) {
+	return w.Write([]byte(s))
+}
+
 func (w *symbolRefusingWriter) Write(p []byte) (int, error) {
 	w.writes++
 	if w.writes == w.stop {
@@ -72,5 +88,31 @@ func TestSymbolSourceStreamInsertionAndWriteBoundary(t *testing.T) {
 	}
 	if err := m.WriteDisplay(nil, spelling); !errors.Is(err, ErrInvalid) {
 		t.Fatal("nil stream", err)
+	}
+}
+
+func TestSymbolStreamWriterCanReenterManager(t *testing.T) {
+	m := symbolManagerTest(t, nil, false)
+	spelling := internSymbol(t, m, "alpha")
+	for _, tc := range []struct {
+		symbol Symbol
+		want   string
+	}{
+		{spelling, "alpha"},
+		{Numerical(17), "k!17"},
+		{Symbol{}, "null"},
+	} {
+		writes := 0
+		w := &symbolReentrantWriter{onWrite: func() error {
+			writes++
+			if _, e := m.Display(spelling); e != nil {
+				return e
+			}
+			_, e := m.Intern("during-output")
+			return e
+		}}
+		if e := m.WriteDisplay(w, tc.symbol); e != nil || w.String() != tc.want || writes == 0 {
+			t.Fatalf("symbol %v: output %q, writes %d, error %v", tc.symbol, w.String(), writes, e)
+		}
 	}
 }

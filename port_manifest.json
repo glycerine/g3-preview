@@ -167380,7 +167380,8 @@
           "status": "ported",
           "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
-            "TestSymbolSourceStreamInsertionAndWriteBoundary"
+            "TestSymbolSourceStreamInsertionAndWriteBoundary",
+            "TestSymbolStreamWriterCanReenterManager"
           ],
           "go_targets": [
             "pkg/util/params/util_gparams_display.go"
