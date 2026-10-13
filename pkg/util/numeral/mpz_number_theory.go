@@ -4,8 +4,10 @@ package numeral
 
 import (
 	"errors"
+	"io"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var errExtendedGCDInvariant = errors.New("mpnum: source extended gcd Bezout assertion failed")
@@ -222,6 +224,57 @@ func (m *IntegerManager) LCM(a, b, c *Int) error {
 func (m *IntegerManager) Divides(a, b *Int) (bool, error) {
 	return m.dividesWithAllocationContext(a, b, integerAllocationInvocationContext{})
 }
+
+// BindTrace borrows the process trace state for retained integer operations.
+// Nil restores the source process tags.
+func (m *IntegerManager) BindTrace(tags *diagnostic.TraceTags) error {
+	if err := m.SourceReady(); err != nil {
+		return err
+	}
+	m.trace = tags
+	return nil
+}
+
+func (m *IntegerManager) traceDivides(a, b, tmp *Int, result bool) {
+	tags := m.trace
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if tags.ShouldTrace("divides") {
+		_ = tags.EmitShort("divides", func(w io.Writer) error {
+			if err := writeNumeralDisplayPart(w, "[mpz] Divisible["); err != nil {
+				return err
+			}
+			if err := m.DisplayTo(w, b); err != nil {
+				return err
+			}
+			if err := writeNumeralDisplayPart(w, ", "); err != nil {
+				return err
+			}
+			if err := m.DisplayTo(w, a); err != nil {
+				return err
+			}
+			word := "] == False\n"
+			if result {
+				word = "] == True\n"
+			}
+			return writeNumeralDisplayPart(w, word)
+		})
+	}
+	if tags.ShouldTrace("divides_bug") {
+		_ = tags.EmitConditional("divides_bug", "divides", "src/util/mpz.cpp", 2068,
+			func() bool { return true }, func(w io.Writer) error {
+				if err := writeNumeralDisplayPart(w, "tmp: "); err != nil {
+					return err
+				}
+				if err := m.DisplayTo(w, tmp); err != nil {
+					return err
+				}
+				return writeNumeralDisplayPart(w, "\n")
+			})
+	}
+}
+
 func (m *IntegerManager) dividesWithAllocationContext(a, b *Int, parent integerAllocationInvocationContext) (result bool, cause error) {
 	if e := m.check(a); e != nil {
 		return false, e
@@ -240,11 +293,14 @@ func (m *IntegerManager) dividesWithAllocationContext(a, b *Int, parent integerA
 		cause = JoinNumericErrors(cause, m.FinishDividesNumeralSource(s))
 	}()
 	if a.Val == 0 {
-		return b.Val == 0, nil
+		result = b.Val == 0
+	} else {
+		context := integerAllocationInvocationContext{BoolDivides: &s.Receipt, BoolDividesInvocation: s.Invocation}
+		if e := m.remWithAllocationContext(b, a, &s.Numeral, context); e != nil {
+			return false, e
+		}
+		result = s.Numeral.Val == 0
 	}
-	context := integerAllocationInvocationContext{BoolDivides: &s.Receipt, BoolDividesInvocation: s.Invocation}
-	if e := m.remWithAllocationContext(b, a, &s.Numeral, context); e != nil {
-		return false, e
-	}
-	return s.Numeral.Val == 0, nil
+	m.traceDivides(a, b, &s.Numeral, result)
+	return result, nil
 }

@@ -9,6 +9,7 @@ import (
 	"runtime"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -51,6 +52,7 @@ type IntegerManager struct {
 	mySqrt          integerMPFSqrtHelperScope
 	callerExecuting func() bool
 	callerBindings  *NumericCallerBinding
+	trace           *diagnostic.TraceTags
 
 	rationalServiceParent *RationalService
 	rationalServiceRead   *RationalServiceInvocation

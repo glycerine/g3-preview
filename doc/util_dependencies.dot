@@ -50,6 +50,7 @@ digraph packages {
   "util/natset" [style=filled, fillcolor="#dceafa"];
   "util/numeral" [style=filled, fillcolor="#dceafa"];
   "util/numeral" -> "arena";
+  "util/numeral" -> "util/diagnostic";
   "util/numeral" -> "util/hash";
   "util/numeral" -> "util/memory";
   "util/numeral" -> "util/text";

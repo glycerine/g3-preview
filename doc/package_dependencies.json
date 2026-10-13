@@ -1918,6 +1918,7 @@
       "package": "util/numeral",
       "imports": [
         "arena",
+        "util/diagnostic",
         "util/hash",
         "util/memory",
         "util/text"
