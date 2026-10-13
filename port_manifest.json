@@ -163736,6 +163736,8 @@
         "TestPolynomialFactoryReferenceWrongPointerAndForeignReceiptGuards",
         "TestASTBitVectorUnaryMinusPhysicalLocalAndLiteralLifetimes",
         "TestASTBitVectorSubtractionLiteralRefAcquiredBeforeTemporaryRetires",
+        "TestASTRefAssignmentKeepsOldPointerOnConsumedDeletionStop",
+        "TestASTRefResetKeepsOldPointerOnConsumedDeletionStop",
         "TestPolynomialPSCBufferNativeGrowthAndReuse",
         "TestPolynomialPSCBufferNativeStoppedReferenceCleanup",
         "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
@@ -163787,7 +163789,10 @@
           "name": "concrete retained AST scalar owning references; generic vector adapters excluded after native consumer migrations",
           "status": "partial",
           "go_target": "pkg/ast/ast_ref.go",
-          "tests": []
+          "tests": [
+            "TestASTRefAssignmentKeepsOldPointerOnConsumedDeletionStop",
+            "TestASTRefResetKeepsOldPointerOnConsumedDeletionStop"
+          ]
         },
         {
           "name": "Concrete selected polynomial owning ref/reference-vector methods for actual Newton consumers; completed DEC and unjoined INC retain separate source versus owning phases",

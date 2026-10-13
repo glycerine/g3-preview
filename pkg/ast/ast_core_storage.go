@@ -167,6 +167,8 @@ type astRefRecord struct {
 	generation, nextFree uint32
 	live                 bool
 	node                 astNodeRef
+	owned                bool
+	pending              []astNodeRef
 }
 
 const astPageSize = 64

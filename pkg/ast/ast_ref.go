@@ -46,6 +46,8 @@ func (m *ASTManager) releaseReferenceRecord(ref ASTRef) {
 	r := m.referenceAt(ref.slot)
 	r.live = false
 	r.node = astNodeRef{}
+	r.owned = false
+	r.pending = nil
 	r.nextFree = m.freeReference
 	m.freeReference = ref.slot
 	m.liveReferences--
@@ -72,6 +74,7 @@ func (m *ASTManager) NewRef(h ASTHandle) (ASTRef, error) {
 		return ASTRef{}, e
 	}
 	m.referenceAt(ref.slot).node = node
+	m.referenceAt(ref.slot).owned = node.slot != 0
 	return ref, nil
 }
 func (m *ASTManager) RefGet(ref ASTRef) (ASTHandle, error) {
@@ -104,6 +107,7 @@ func (m *ASTManager) CopyRef(source ASTRef) (ASTRef, error) {
 		return ASTRef{}, e
 	}
 	m.referenceAt(ref.slot).node = node
+	m.referenceAt(ref.slot).owned = node.slot != 0
 	return ref, nil
 }
 func (m *ASTManager) assignRef(dst ASTRef, node astNodeRef) error {
@@ -114,13 +118,26 @@ func (m *ASTManager) assignRef(dst ASTRef, node astNodeRef) error {
 	if e = m.incNode(node); e != nil {
 		return e
 	}
+	if r.node.slot != 0 && !r.owned {
+		r.pending = append(r.pending, node)
+		return ErrASTHandle
+	}
 	consumed, e := m.decNode(r.node)
-	if consumed {
-		r.node = node
+	if e != nil || !consumed {
+		// Source assignment has not reached m_obj = n. Its incoming INC
+		// remains owned by this reference until explicit owning deletion.
+		r.pending = append(r.pending, node)
+		if consumed {
+			r.owned = false
+		}
+		if e == nil {
+			return ErrASTPending
+		}
 		return e
 	}
-	m.decNode(node)
-	return e
+	r.node = node
+	r.owned = node.slot != 0
+	return nil
 }
 func (m *ASTManager) AssignRef(dst, src ASTRef) error {
 	if e := m.lock(); e != nil {
@@ -157,11 +174,41 @@ func (m *ASTManager) ResetRef(ref ASTRef) error {
 	if e != nil {
 		return e
 	}
+	if r.node.slot != 0 && !r.owned {
+		return ErrASTHandle
+	}
 	consumed, e := m.decNode(r.node)
+	if e != nil {
+		if consumed {
+			r.owned = false
+		}
+		return e
+	}
 	if consumed {
 		r.node = astNodeRef{}
+		r.owned = false
 	}
-	return e
+	return nil
+}
+func (m *ASTManager) drainRefPending(r *astRefRecord) error {
+	var failure error
+	for len(r.pending) != 0 {
+		last := len(r.pending) - 1
+		consumed, e := m.decNode(r.pending[last])
+		if consumed {
+			r.pending = r.pending[:last]
+		}
+		if failure == nil {
+			failure = e
+		}
+		if !consumed {
+			if e != nil {
+				return e
+			}
+			return ErrASTPending
+		}
+	}
+	return failure
 }
 func (m *ASTManager) DelRef(ref *ASTRef) error {
 	if e := m.lock(); e != nil {
@@ -175,12 +222,29 @@ func (m *ASTManager) DelRef(ref *ASTRef) error {
 	if e != nil {
 		return e
 	}
-	consumed, e := m.decNode(r.node)
-	if consumed {
-		m.releaseReferenceRecord(*ref)
-		*ref = ASTRef{}
+	var failure error
+	if r.owned || r.node.slot == 0 {
+		consumed, e := m.decNode(r.node)
+		if consumed {
+			r.owned = false
+		}
+		if !consumed {
+			if e != nil {
+				return e
+			}
+			return ErrASTPending
+		}
+		failure = e
 	}
-	return e
+	if e := m.drainRefPending(r); failure == nil {
+		failure = e
+	}
+	if len(r.pending) != 0 {
+		return failure
+	}
+	m.releaseReferenceRecord(*ref)
+	*ref = ASTRef{}
+	return failure
 }
 func (m *ASTManager) MoveRef(source ASTRef) (ASTRef, error) {
 	if e := m.lock(); e != nil {
@@ -197,7 +261,11 @@ func (m *ASTManager) MoveRef(source ASTRef) (ASTRef, error) {
 		return ref, e
 	}
 	m.referenceAt(ref.slot).node = node
+	m.referenceAt(ref.slot).owned = src.owned
+	m.referenceAt(ref.slot).pending = src.pending
 	m.referenceAt(source.slot).node = astNodeRef{}
+	m.referenceAt(source.slot).owned = false
+	m.referenceAt(source.slot).pending = nil
 	return ref, nil
 }
 func (m *ASTManager) SwapRefs(a, b ASTRef) error {
@@ -214,6 +282,8 @@ func (m *ASTManager) SwapRefs(a, b ASTRef) error {
 		return e
 	}
 	x.node, y.node = y.node, x.node
+	x.owned, y.owned = y.owned, x.owned
+	x.pending, y.pending = y.pending, x.pending
 	return nil
 }
 func (m *ASTManager) StealRef(source ASTRef) (ASTHandle, error) {
@@ -227,5 +297,6 @@ func (m *ASTManager) StealRef(source ASTRef) (ASTHandle, error) {
 	}
 	node := src.node
 	src.node = astNodeRef{}
+	src.owned = false
 	return m.external(node), nil
 }
