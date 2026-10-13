@@ -39549,6 +39549,15 @@ interval engine. A focused case checks source ordering, signed values and
 restoration of the borrowed input for the minus-one predicate. Retained
 method coverage and end-to-end subpaving integration still require audit.
 
+The HWF owner audit resolves the source manager's internal `mpq_manager`
+child for retained conversion. Subpaving already owns the rational inputs;
+the Go HWF converter borrows that `RationalManager` for each call, while its
+binary64 output owns no payload. A focused test converts through two
+independent owners, closes one, verifies that its later call is rejected
+without changing the output, and continues through the other. This is the
+idiomatic Go replacement for the source child lifetime; concrete subpaving
+integration and the remaining retained-method audit are still open.
+
 ### Environment parameter runtime boundary
 
 `src/util/env_params.h/.cpp` has exactly two static operations. The five

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"math"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
 )
 
 func TestHardwareFloatSourceRationalInputDirectedBounds(t *testing.T) {
@@ -68,5 +70,36 @@ func TestHardwareFloatSourceRationalInputLargeIntegerAndGuards(t *testing.T) {
 	}
 	if e := m.SetRational(&up, ArbitraryFloatNearestEven, nil, &q); !errors.Is(e, ErrNumericOwner) || up.RawBits() != before {
 		t.Fatal("missing rational manager changed output", up, e)
+	}
+}
+
+func TestHardwareFloatBorrowedRationalOwnerLifecycle(t *testing.T) {
+	first, _ := rationalManager(t, false)
+	second, _ := rationalManager(t, false)
+	a, b := NewRational(), NewRational()
+	if e := first.SetString(&a, "1/3"); e != nil {
+		t.Fatal(e)
+	}
+	if e := second.SetString(&b, "2/3"); e != nil {
+		t.Fatal(e)
+	}
+	defer second.Del(&b)
+	m := NewHardwareFloatManager()
+	var out HardwareFloat
+	if e := m.SetRational(&out, ArbitraryFloatTowardPositive, first, &a); e != nil || out.value != math.Nextafter(1.0/3.0, math.Inf(1)) {
+		t.Fatal("first borrowed owner", out, e)
+	}
+	if e := first.Del(&a); e != nil {
+		t.Fatal(e)
+	}
+	if e := first.CloseChecked(); e != nil {
+		t.Fatal(e)
+	}
+	before := out.RawBits()
+	if e := m.SetRational(&out, ArbitraryFloatTowardPositive, first, &a); !errors.Is(e, arena.ErrClosed) || out.RawBits() != before {
+		t.Fatal("closed borrowed owner changed output", out, e)
+	}
+	if e := m.SetRational(&out, ArbitraryFloatTowardPositive, second, &b); e != nil || out.value != math.Nextafter(2.0/3.0, math.Inf(1)) {
+		t.Fatal("independent borrowed owner", out, e)
 	}
 }

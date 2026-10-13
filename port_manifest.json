@@ -118994,6 +118994,7 @@
         "TestHardwareFloatRoundToIntegralSourceModes",
         "TestHardwareFloatSourceRationalInputDirectedBounds",
         "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
+        "TestHardwareFloatBorrowedRationalOwnerLifecycle",
         "TestHardwareFloatSourceToRationalBitDecomposition",
         "TestHardwareFloatSourceToRationalOwnerGuards",
         "TestHardwareFloatRationalStringMatchesSourceConversion",
@@ -119411,7 +119412,8 @@
           "go_target": "pkg/util/numeral/hwf_rational_set.go",
           "tests": [
             "TestHardwareFloatSourceRationalInputDirectedBounds",
-            "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards"
+            "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
+            "TestHardwareFloatBorrowedRationalOwnerLifecycle"
           ]
         },
         {
@@ -119433,8 +119435,12 @@
           ]
         },
         {
-          "name": "Remaining owning HWF manager lifetime reached by subpaving",
-          "status": "unported"
+          "name": "Source hwf_manager owned mpq child used for rational projection; Go borrows the subpaving caller's rational manager",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/hwf_rational_set.go",
+          "tests": [
+            "TestHardwareFloatBorrowedRationalOwnerLifecycle"
+          ]
         },
         {
           "name": "Uncalled HWF fused arithmetic, square root, remainder and min/max methods",
@@ -119442,10 +119448,10 @@
         }
       ],
       "ownership": [
-        "The concrete binary64 value is scalar and pointer-free; the Go scalar manager has no owned child. The source hwf_manager also owns an mpq manager for conversion, which is not yet ported into the HWF subpaving path."
+        "The concrete binary64 value is scalar and pointer-free. The source hwf_manager owns an mpq child for rational projection; the Go scalar manager borrows the caller's independently owned RationalManager during conversion. Closed borrowers refuse reads, and no payload remains with the HWF manager."
       ],
       "deviations": [
-        "The retained subpaving tactic owns hwf_manager and f2n<hwf_manager>. The Go binary64 scalar/profile uses math.Float64bits/frombits for exact source fields and Go comparisons. Directed arithmetic and integral rounding avoid changing process-wide FPU mode. Rational input repeats the source UINT_MAX integer radix under the selected mode, then divides. Rational output retains the source raw exponent, including the subnormal 2^-1075 result. Rational-string formatting uses Go math/big.Rat for the source's temporary normalized mpq. The owning manager path remains open."
+        "The retained subpaving tactic owns hwf_manager and f2n<hwf_manager>. The Go binary64 scalar/profile uses math.Float64bits/frombits for exact source fields and Go comparisons. Directed arithmetic and integral rounding avoid changing process-wide FPU mode. Rational input repeats the source UINT_MAX integer radix under the selected mode, then divides. Rational output retains the source raw exponent, including the subnormal 2^-1075 result. Rational-string formatting uses Go math/big.Rat for the source's temporary normalized mpq. The source internal mpq child is replaced by a borrowed caller owner; retained-call integration remains open."
       ]
     },
     {
@@ -119470,6 +119476,7 @@
         "TestHardwareFloatRoundToIntegralSourceModes",
         "TestHardwareFloatSourceRationalInputDirectedBounds",
         "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
+        "TestHardwareFloatBorrowedRationalOwnerLifecycle",
         "TestHardwareFloatSourceToRationalBitDecomposition",
         "TestHardwareFloatSourceToRationalOwnerGuards",
         "TestHardwareFloatRationalStringMatchesSourceConversion",
@@ -119535,7 +119542,8 @@
           "go_target": "pkg/util/numeral/hwf_rational_set.go",
           "tests": [
             "TestHardwareFloatSourceRationalInputDirectedBounds",
-            "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards"
+            "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
+            "TestHardwareFloatBorrowedRationalOwnerLifecycle"
           ]
         },
         {
@@ -119557,8 +119565,12 @@
           ]
         },
         {
-          "name": "Remaining owned mpq-manager declaration path",
-          "status": "unported"
+          "name": "Source owned mpq-manager declaration replaced by borrowed caller RationalManager for the retained conversion",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/hwf_rational_set.go",
+          "tests": [
+            "TestHardwareFloatBorrowedRationalOwnerLifecycle"
+          ]
         },
         {
           "name": "Uncalled hwf_manager fused arithmetic, square root, remainder and min/max declarations",
@@ -119566,10 +119578,10 @@
         }
       ],
       "ownership": [
-        "HardwareFloat values are pointer-free binary64 scalars. The selected Go manager owns no storage; the source manager's mpq child remains open."
+        "HardwareFloat values are pointer-free binary64 scalars. The selected Go manager owns no storage and borrows the caller's RationalManager for retained rational conversion; closure of that manager is checked before reading."
       ],
       "deviations": [
-        "The HWF branch is selected by the retained subpaving tactic numeral option. Its scalar value, classification, basic directed arithmetic and rational input are ported; concrete subpaving integration and hardware-manager ownership remain open."
+        "The HWF branch is selected by the retained subpaving tactic numeral option. Its scalar value, classification, directed arithmetic and rational input are ported. The source internal mpq child is replaced by the caller's borrowed rational owner; concrete subpaving integration remains open."
       ]
     },
     {
