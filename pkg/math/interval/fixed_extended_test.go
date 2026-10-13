@@ -2,6 +2,7 @@ package interval
 
 import (
 	"errors"
+	"io"
 	"math/big"
 	"testing"
 
@@ -25,6 +26,9 @@ func TestSubpavingFixedExtendedRetainedBranches(t *testing.T) {
 	defer func() { must(a.Close()); must(b.Close()); must(out.Close()); must(m.Close()) }()
 	e := FixedExtended{Numbers: m}
 	must(m.SetRatio(a, -3, 2))
+	finite, err := m.String(a)
+	must(err)
+	assertExtendedShortWrites(t, finite, func(w io.Writer) error { return e.Display(w, a, Finite) })
 	must(m.SetInt64(b, 2))
 	must(m.SetInt64(out, 7))
 	kind, err := e.Add(a, Finite, b, Finite, out)

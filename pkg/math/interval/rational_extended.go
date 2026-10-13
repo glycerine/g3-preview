@@ -29,18 +29,15 @@ type RationalExtended struct{ Numbers *numeral.RationalManager }
 func (e RationalExtended) Display(w io.Writer, a *numeral.Rational, k ExtendedKind) error {
 	switch k {
 	case MinusInfinity:
-		_, err := io.WriteString(w, "-oo")
-		return err
+		return writeExtendedText(w, "-oo")
 	case PlusInfinity:
-		_, err := io.WriteString(w, "+oo")
-		return err
+		return writeExtendedText(w, "+oo")
 	default:
 		s, err := e.Numbers.String(a)
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, s)
-		return err
+		return writeExtendedText(w, s)
 	}
 }
 

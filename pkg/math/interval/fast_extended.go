@@ -27,8 +27,7 @@ func (e FastExtended) Display(w io.Writer, a *numeral.FastFloat, k ExtendedKind)
 			return err
 		}
 	}
-	_, err := io.WriteString(w, s)
-	return err
+	return writeExtendedText(w, s)
 }
 
 func (e FastExtended) IsZero(a *numeral.FastFloat, k ExtendedKind) (bool, error) {

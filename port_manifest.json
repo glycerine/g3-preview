@@ -116676,7 +116676,9 @@
         "pkg/math/interval/fixed_extended.go",
         "pkg/math/interval/fixed_extended_test.go",
         "pkg/math/interval/fast_extended.go",
-        "pkg/math/interval/fast_extended_test.go"
+        "pkg/math/interval/fast_extended_test.go",
+        "pkg/math/interval/extended_write.go",
+        "pkg/math/interval/extended_write_test.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",
@@ -116684,7 +116686,8 @@
         "TestRealClosureBinaryExtendedNumeralBranches",
         "TestRealClosureBinaryIntervalRetainedCore",
         "TestSubpavingFixedExtendedRetainedBranches",
-        "TestSubpavingFastFloatExtendedRetainedBranches"
+        "TestSubpavingFastFloatExtendedRetainedBranches",
+        "TestExtendedInfinityDisplaysShortWrites"
       ],
       "conditionals": [
         {
@@ -116782,7 +116785,9 @@
           "status": "ported",
           "go_target": "pkg/math/interval/rational_extended.go",
           "tests": [
-            "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+            "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
+            "TestRationalExtendedIntervalBranches",
+            "TestExtendedInfinityDisplaysShortWrites"
           ]
         },
         {
@@ -116806,7 +116811,8 @@
           "status": "partial",
           "go_target": "pkg/math/interval/fast_extended.go",
           "tests": [
-            "TestSubpavingFastFloatExtendedRetainedBranches"
+            "TestSubpavingFastFloatExtendedRetainedBranches",
+            "TestExtendedInfinityDisplaysShortWrites"
           ]
         }
       ],
@@ -116816,7 +116822,7 @@
       "deviations": [
         "No generic manager-interface translation is retained. Concrete mpq, mpbq, mpfx and mpff specializations live beside their interval and subpaving consumers. src/test/ext_numeral.cpp is test-only.",
         "Whole-source instantiation audit found real-closure mpbq and subpaving mpq/mpfx/mpf/mpff/hwf consumers; the concrete rational and binary-rational Go paths do not close all retained instantiations.",
-        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner. The mpff helper serves mutable and constant-node fast-float interval views; the enclosing subpaving context is partial. Other extended-number instantiations remain unfinished."
+        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner. The mpff helper serves mutable and constant-node fast-float interval views; the enclosing subpaving context is partial. Concrete mpq/mpbq/mpfx/mpff displays now report Go io.Writer short writes after the exact emitted prefix. Other extended-number instantiations remain unfinished."
       ]
     },
     {

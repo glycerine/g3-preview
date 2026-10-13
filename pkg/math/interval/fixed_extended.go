@@ -30,8 +30,7 @@ func (e FixedExtended) Display(w io.Writer, a *numeral.FixedPoint, k ExtendedKin
 			return err
 		}
 	}
-	_, err := io.WriteString(w, s)
-	return err
+	return writeExtendedText(w, s)
 }
 
 func (e FixedExtended) IsZero(a *numeral.FixedPoint, k ExtendedKind) (bool, error) {

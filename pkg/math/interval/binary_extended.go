@@ -40,11 +40,7 @@ func (e BinaryExtended) Display(w io.Writer, a *numeral.BinaryRational, k Extend
 		}
 		return e.Numbers.DisplayTo(w, a)
 	}
-	n, err := io.WriteString(w, s)
-	if err == nil && n != len(s) {
-		return io.ErrShortWrite
-	}
-	return err
+	return writeExtendedText(w, s)
 }
 
 func (e BinaryExtended) IsZero(a *numeral.BinaryRational, k ExtendedKind) (bool, error) {

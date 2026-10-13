@@ -2,6 +2,7 @@ package interval
 
 import (
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -36,6 +37,9 @@ func TestRationalExtendedIntervalBranches(t *testing.T) {
 	check(m.SetString(&a, "-3/2"))
 	check(m.SetString(&b, "2"))
 	e := RationalExtended{Numbers: m}
+	finite, err := m.String(&a)
+	check(err)
+	assertExtendedShortWrites(t, finite, func(w io.Writer) error { return e.Display(w, &a, Finite) })
 	for _, tc := range []struct {
 		ak, bk ExtendedKind
 		want   int

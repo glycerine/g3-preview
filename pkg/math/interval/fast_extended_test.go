@@ -3,6 +3,7 @@ package interval
 import (
 	"bytes"
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -73,6 +74,7 @@ func TestSubpavingFastFloatExtendedRetainedBranches(t *testing.T) {
 	if rendered.String() != finite {
 		t.Fatalf("finite display: got %q, want %q", rendered.String(), finite)
 	}
+	assertExtendedShortWrites(t, finite, func(w io.Writer) error { return e.Display(w, a, Finite) })
 	positive, err := e.IsPos(d, Finite)
 	must(err)
 	negative, err := e.IsNeg(a, Finite)
