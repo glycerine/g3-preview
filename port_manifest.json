@@ -120477,6 +120477,7 @@
         }
       ],
       "ownership": [
+        "The native Int heap now rejects copied owner values in its read-only Size, Bounds, Contains, CheckInvariant and Stats views; mutation, iterators and Close already reject the same invalid copy.",
         "The concrete Int heap borrows its comparator and Budget. It owns two []int32 columns, charges its cold header and each backing-capacity change, and releases them through explicit Close; Clone and Assign use independent destination storage. The source values/indices construction and destruction order is retained.",
         "The heap borrows an explicit DebugContext where source assertion gates are tested. That context and its tag table remain caller-owned; the heap does not adopt or charge their storage.",
         "Concrete borrowed assertion/action/stream providers reuse actual charged existing headers; macro leaves and call-local scalar operands add no owning storage; actual heap refusal graph audited before fault lift.",

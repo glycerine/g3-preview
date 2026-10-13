@@ -129,25 +129,25 @@ func (h *Int) Empty() bool {
 	return h.Size() == 0
 }
 func (h *Int) Size() uint32 {
-	if h == nil || h.closed {
+	if h == nil || h.self != h || h.closed {
 		return 0
 	}
 	return uint32(len(h.values) - 1)
 }
 func (h *Int) Bounds() int32 {
-	if h == nil || h.closed {
+	if h == nil || h.self != h || h.closed {
 		return 0
 	}
 	return int32(len(h.indices))
 }
 func (h *Int) Contains(v int32) bool {
-	return h != nil && !h.closed && v >= 0 && int64(v) < int64(len(h.indices)) && h.indices[v] != 0
+	return h != nil && h.self == h && !h.closed && v >= 0 && int64(v) < int64(len(h.indices)) && h.indices[v] != 0
 }
 
 // CheckInvariant checks live values, as the source traversal does. Failed
 // insertion can leave additional inverse entries that this check does not visit.
 func (h *Int) CheckInvariant() bool {
-	if h == nil || h.closed || len(h.values) == 0 || h.values[0] != -1 {
+	if h == nil || h.self != h || h.closed || len(h.values) == 0 || h.values[0] != -1 {
 		return false
 	}
 	for i := 1; i < len(h.values); i++ {
@@ -487,7 +487,7 @@ func (h *Int) CleanupStopped() error {
 }
 
 func (h *Int) Stats() Stats {
-	if h == nil || h.closed {
+	if h == nil || h.self != h || h.closed {
 		return Stats{}
 	}
 	v, i := uint64(cap(h.values))*4, uint64(cap(h.indices))*4
