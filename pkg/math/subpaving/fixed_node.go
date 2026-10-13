@@ -17,11 +17,14 @@ const (
 	fixedReasonUnknown fixedBoundReasonKind = iota
 	fixedReasonAxiom
 	fixedReasonVariableDefinition
+	fixedReasonAssumption
+	fixedReasonClause
 )
 
 type fixedBoundReason struct {
 	kind     fixedBoundReasonKind
 	variable uint32
+	clause   *FixedClause
 }
 
 type FixedBound struct {

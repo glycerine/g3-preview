@@ -50217,13 +50217,26 @@
             "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
             "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant"
           ]
+        },
+        {
+          "name": "concrete config_mpfx inequality values, watched clauses, unit assertions, root initialization and clause justifications",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fixed_clause.go",
+          "go_targets": [
+            "pkg/math/subpaving/fixed_context_init.go",
+            "pkg/math/subpaving/fixed_context_propagate.go"
+          ],
+          "tests": [
+            "TestSubpavingFixedClauseWatchPropagationAndConflict",
+            "TestSubpavingFixedClauseUnitsResumeAndCleanup"
+          ]
         }
       ],
       "ownership": [
         "Concrete fixed-point bounds own copied numeral values; node arrays borrow them until node teardown. Full context, clause, search and explanation ownership remains unaudited."
       ],
       "deviations": [
-        "The fixed-point context is a partial concrete instantiation of subpaving_t; no completion claim is made for clause/unit propagation or the full solver lifecycle."
+        "The fixed-point context is a partial concrete instantiation of subpaving_t; clause/unit propagation is now present, while search, explanation and the full solver lifecycle remain open."
       ]
     },
     {
@@ -50271,13 +50284,26 @@
             "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
             "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant"
           ]
+        },
+        {
+          "name": "concrete config_mpfx inequality values, watched clauses, unit assertions, root initialization and clause justifications",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fixed_clause.go",
+          "go_targets": [
+            "pkg/math/subpaving/fixed_context_init.go",
+            "pkg/math/subpaving/fixed_context_propagate.go"
+          ],
+          "tests": [
+            "TestSubpavingFixedClauseWatchPropagationAndConflict",
+            "TestSubpavingFixedClauseUnitsResumeAndCleanup"
+          ]
         }
       ],
       "ownership": [
         "Concrete fixed-point bounds own copied numeral values; node arrays borrow them until node teardown. Full context, clause, search and explanation ownership remains unaudited."
       ],
       "deviations": [
-        "The fixed-point context is a partial concrete instantiation of subpaving_t; no completion claim is made for clause/unit propagation or the full solver lifecycle."
+        "The fixed-point context is a partial concrete instantiation of subpaving_t; clause/unit propagation is now present, while search, explanation and the full solver lifecycle remain open."
       ]
     },
     {
@@ -50542,6 +50568,20 @@
           "tests": [
             "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
             "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant"
+          ]
+        },
+        {
+          "name": "Concrete config_mpfx inequality ownership, three-valued clause evaluation, unique variable watches, unit assertion, root initialization and clause-bound reasons (src/math/subpaving/subpaving_t_def.h:802-880,1349-1405,1753-1808)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fixed_clause.go",
+          "go_targets": [
+            "pkg/math/subpaving/fixed_context_init.go",
+            "pkg/math/subpaving/fixed_context_propagate.go",
+            "pkg/math/subpaving/fixed_node.go"
+          ],
+          "tests": [
+            "TestSubpavingFixedClauseWatchPropagationAndConflict",
+            "TestSubpavingFixedClauseUnitsResumeAndCleanup"
           ]
         },
         {
@@ -51072,6 +51112,20 @@
           "tests": [
             "TestSubpavingFixedMonomialMergedPowerForwardAndZero",
             "TestSubpavingFixedPolynomialForwardReverseAndSourceConstant"
+          ]
+        },
+        {
+          "name": "Concrete config_mpfx inequality ownership, three-valued clause evaluation, unique variable watches, unit assertion, root initialization and clause-bound reasons (src/math/subpaving/subpaving_t_def.h:802-880,1349-1405,1753-1808)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fixed_clause.go",
+          "go_targets": [
+            "pkg/math/subpaving/fixed_context_init.go",
+            "pkg/math/subpaving/fixed_context_propagate.go",
+            "pkg/math/subpaving/fixed_node.go"
+          ],
+          "tests": [
+            "TestSubpavingFixedClauseWatchPropagationAndConflict",
+            "TestSubpavingFixedClauseUnitsResumeAndCleanup"
           ]
         },
         {

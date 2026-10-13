@@ -121,11 +121,23 @@ func (c *FixedContext) processQueuedBound(n *FixedNode, b *FixedBound) error {
 		}
 		return nil
 	}
-	for _, variable := range c.watchers[b.variable] {
+	for _, watched := range c.watchOrder[b.variable] {
 		if n.inconsistent {
 			return nil
 		}
-		if err := visit(variable, true); err != nil {
+		if watched.clause != nil {
+			clause := watched.clause
+			if b.timestamp < clause.visited {
+				continue
+			}
+			if err := c.PropagateClause(clause, n); err != nil {
+				if errors.Is(err, numeral.ErrFixedPointOverflow) || errors.Is(err, numeral.ErrFixedPointDivZero) || errors.Is(err, numeral.ErrFixedPointDomain) {
+					c.arithmeticFailed = true
+					continue
+				}
+				return err
+			}
+		} else if err := visit(watched.definition, true); err != nil {
 			return err
 		}
 	}

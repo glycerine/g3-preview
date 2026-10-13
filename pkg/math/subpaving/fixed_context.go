@@ -35,6 +35,13 @@ type FixedContext struct {
 	polynomials      map[uint32]*FixedPolynomial
 	monomials        map[uint32]*FixedMonomial
 	watchers         [][]uint32
+	watchOrder       [][]fixedWatch
+	inequalities     []*FixedInequality
+	clauses          []*FixedClause
+	unitClauses      []fixedUnitClause
+	unitHead         int
+	initStage        uint8
+	initDefHead      uint32
 	closed           bool
 }
 
@@ -44,7 +51,7 @@ func NewFixedContext(m *numeral.FixedPointManager, limit *control.Reslimit, isIn
 	if m == nil || limit == nil || len(isInt) > math.MaxUint32 {
 		return nil, arena.ErrInvalidSlot
 	}
-	c := &FixedContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), zeroEpsilon: epsilon == 0, polynomials: make(map[uint32]*FixedPolynomial), monomials: make(map[uint32]*FixedMonomial), watchers: make([][]uint32, len(isInt))}
+	c := &FixedContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), zeroEpsilon: epsilon == 0, polynomials: make(map[uint32]*FixedPolynomial), monomials: make(map[uint32]*FixedMonomial), watchers: make([][]uint32, len(isInt)), watchOrder: make([][]fixedWatch, len(isInt))}
 	c.self = c
 	defer func() {
 		if err != nil {
@@ -158,11 +165,30 @@ func (c *FixedContext) Close() error {
 	if err := c.root.Close(); err != nil {
 		return err
 	}
+	for i := range c.unitClauses {
+		if err := c.releaseUnit(i); err != nil {
+			return err
+		}
+	}
+	for _, lemma := range []bool{false, true} {
+		for _, clause := range c.clauses {
+			if clause.lemma == lemma {
+				if err := c.releaseClause(clause); err != nil {
+					return err
+				}
+			}
+		}
+	}
 	for x := range c.isInt {
 		if p := c.polynomials[uint32(x)]; p != nil {
 			if err := p.close(); err != nil {
 				return err
 			}
+		}
+	}
+	for i := len(c.inequalities) - 1; i >= 0; i-- {
+		if err := c.inequalities[i].value.Close(); err != nil {
+			return err
 		}
 	}
 	if err := c.closeNumerals(); err != nil {
