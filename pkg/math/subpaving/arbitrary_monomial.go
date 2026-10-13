@@ -70,6 +70,7 @@ func (c *ArbitraryContext) DefineMonomial(powers []ArbitraryPower) (uint32, erro
 	c.monomials[x] = m
 	for _, power := range merged {
 		c.watchers[power.Variable] = append(c.watchers[power.Variable], x)
+		c.watchOrder[power.Variable] = append(c.watchOrder[power.Variable], arbitraryWatch{definition: x})
 	}
 	return x, nil
 }

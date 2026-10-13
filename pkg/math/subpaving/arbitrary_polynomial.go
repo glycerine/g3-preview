@@ -92,6 +92,7 @@ func (c *ArbitraryContext) DefinePolynomial(constant *numeral.ArbitraryFloat, co
 	c.polynomials[x] = p
 	for _, term := range p.terms {
 		c.watchers[term.variable] = append(c.watchers[term.variable], x)
+		c.watchOrder[term.variable] = append(c.watchOrder[term.variable], arbitraryWatch{definition: x})
 	}
 	return x, nil
 }

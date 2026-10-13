@@ -1,6 +1,7 @@
 package subpaving
 
 import (
+	"errors"
 	"math"
 	"testing"
 
@@ -151,6 +152,64 @@ func TestArbitraryClauseSourceTruthAndPropagation(t *testing.T) {
 		}
 		if root.conflictVar != f.x || root.lower[f.x] == nil || root.lower[f.x].reasonClause != clause || len(c.queue) != 3 {
 			t.Fatalf("all-false first atom conflict: %d, %+v, %d", root.conflictVar, root.lower[f.x], len(c.queue))
+		}
+	})
+}
+
+func TestArbitraryClauseQueuedWatchOrderAndCancellation(t *testing.T) {
+	t.Run("cancel and resume queued clause", func(t *testing.T) {
+		f := newArbitraryClauseFixture(t)
+		c := f.context
+		ax, err := c.NewInequality(f.x, &f.five, true, false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		ay, err := c.NewInequality(f.y, &f.five, true, false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		clause, err := c.AddClause([]*ArbitraryInequality{ay, ax})
+		if err != nil {
+			t.Fatal(err)
+		}
+		root, err := c.Root()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := c.PublishBound(root, f.x, &f.four, false, false, true); err != nil {
+			t.Fatal(err)
+		}
+		if !c.limit.Inc() {
+			t.Fatal("resource fixture setup")
+		}
+		c.limit.Limit = c.limit.Steps
+		if err := c.PropagateQueued(root); !errors.Is(err, ErrArbitraryContextCanceled) || c.queueHead != 0 || len(c.queue) != 1 {
+			t.Fatalf("checkpoint before first bound: %v, %d, %d", err, c.queueHead, len(c.queue))
+		}
+		c.limit.Limit = 0
+		if err := c.PropagateQueued(root); err != nil {
+			t.Fatal(err)
+		}
+		if root.lower[f.y] == nil || root.lower[f.y].reasonClause != clause || len(c.queue) != 0 || c.queueHead != 0 || c.numVisited != 1 {
+			t.Fatalf("resumed watched clause and generated bound: %+v, %d, %d, %d", root.lower[f.y], len(c.queue), c.queueHead, c.numVisited)
+		}
+	})
+	t.Run("definition watch is retained", func(t *testing.T) {
+		f := newArbitraryClauseFixture(t)
+		c := f.context
+		z, err := c.DefineMonomial([]ArbitraryPower{{Variable: f.x, Degree: 2}})
+		if err != nil || z != 2 {
+			t.Fatalf("monomial setup: %d, %v", z, err)
+		}
+		root, err := c.Root()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := c.PublishBound(root, f.x, &f.four, false, false, true); err != nil {
+			t.Fatal(err)
+		}
+		if err := c.PropagateQueued(root); !errors.Is(err, ErrArbitraryDefinitionPending) || c.queueHead != 0 || len(c.queue) != 1 {
+			t.Fatalf("unported definition guard preserves queue: %v, %d, %d", err, c.queueHead, len(c.queue))
 		}
 	})
 }

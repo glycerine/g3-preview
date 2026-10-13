@@ -51727,6 +51727,7 @@
       "go_targets": [
         "pkg/math/subpaving/arbitrary_shell_coefficients_test.go",
         "pkg/math/subpaving/arbitrary_clause_propagation_test.go",
+        "pkg/math/subpaving/arbitrary_context_propagate.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
@@ -51814,6 +51815,7 @@
       "tests": [
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
         "TestArbitraryClauseSourceTruthAndPropagation",
+        "TestArbitraryClauseQueuedWatchOrderAndCancellation",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -52482,6 +52484,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_params.go",
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf queued bound checkpoint, clause watcher timestamp dispatch, generated-bound drainage and retained definition-watch guard (src/math/subpaving/subpaving_t_def.h:1694-1750)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_context_propagate.go",
+          "tests": [
+            "TestArbitraryClauseQueuedWatchOrderAndCancellation"
           ]
         },
         {

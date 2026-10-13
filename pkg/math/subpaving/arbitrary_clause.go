@@ -215,6 +215,7 @@ func (c *ArbitraryContext) AddClause(atoms []*ArbitraryInequality) (*ArbitraryCl
 	for i, a := range ordered {
 		if i == 0 || a.variable != ordered[i-1].variable {
 			c.clauseWatchers[a.variable] = append(c.clauseWatchers[a.variable], clause)
+			c.watchOrder[a.variable] = append(c.watchOrder[a.variable], arbitraryWatch{clause: clause})
 		}
 	}
 	c.clauses = append(c.clauses, clause)

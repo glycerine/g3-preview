@@ -22,6 +22,7 @@ type ArbitraryContext struct {
 	variables                                       []bool
 	watchers                                        [][]uint32
 	clauseWatchers                                  [][]*ArbitraryClause
+	watchOrder                                      [][]arbitraryWatch
 	polynomials                                     map[uint32]*ArbitraryPolynomial
 	polynomialOwners                                []*ArbitraryPolynomial
 	monomials                                       map[uint32]*ArbitraryMonomial
@@ -34,6 +35,7 @@ type ArbitraryContext struct {
 	root                                            *ArbitraryNode
 	bounds                                          []*ArbitraryBound
 	queue                                           []*ArbitraryBound
+	queueHead                                       int
 	timestamp                                       uint64
 	numVisited                                      uint64
 	owners                                          [4]*numeral.ScopedArbitraryFloatNumeral
@@ -146,6 +148,7 @@ func (c *ArbitraryContext) NewVariable(integer bool) (uint32, error) {
 	c.variables = append(c.variables, integer)
 	c.watchers = append(c.watchers, nil)
 	c.clauseWatchers = append(c.clauseWatchers, nil)
+	c.watchOrder = append(c.watchOrder, nil)
 	return x, nil
 }
 
@@ -186,6 +189,7 @@ func (c *ArbitraryContext) Close() error {
 		return err
 	}
 	c.queue = nil
+	c.queueHead = 0
 	for len(c.bounds) != 0 {
 		b := c.bounds[0]
 		if err := c.numbers.Del(&b.value); err != nil {
@@ -218,6 +222,7 @@ func (c *ArbitraryContext) Close() error {
 	c.unitClauses = nil
 	c.clauses = nil
 	c.clauseWatchers = nil
+	c.watchOrder = nil
 	for len(c.inequalities) != 0 {
 		a := c.inequalities[0]
 		if err := c.numbers.Del(&a.value); err != nil {
