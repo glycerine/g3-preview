@@ -39588,7 +39588,12 @@ also forwards source sign/integer predicates, comparisons and sign changes;
 its owned scratch numeral implements directed floor/ceil, including negative
 fractional and aliased inputs. Focused native and checked/debug cases cover
 these routes on CPUs 8–16. Reciprocal, power, formatting and the enclosing
-subpaving caller remain open, so `f2n.h` is still partial.
+subpaving caller remain open at that checkpoint. The next concrete increment
+ports the live subpaving parameter and bound operations: reciprocal through
+a local owned one, increment/decrement using the wrapper's one, and power
+through source-order unsigned-mask multiplication and its final square. Focused
+aliased-power and scalar cases pass on CPUs 8–16. Rational-string/display
+forwarding and the enclosing subpaving caller remain open; `f2n.h` is partial.
 
 ### Environment parameter runtime boundary
 
