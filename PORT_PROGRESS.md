@@ -39593,7 +39593,11 @@ ports the live subpaving parameter and bound operations: reciprocal through
 a local owned one, increment/decrement using the wrapper's one, and power
 through source-order unsigned-mask multiplication and its final square. Focused
 aliased-power and scalar cases pass on CPUs 8–16. Rational-string/display
-forwarding and the enclosing subpaving caller remain open; `f2n.h` is partial.
+forwarding and the enclosing subpaving caller remained open at that
+checkpoint. Rational-string forwarding now copies from the source-owned text
+result; source numeral display uses the concrete format context and preserves
+short-write prefixes. Focused native cases cover exact text and cleanup. Live
+swap and subpaving integration remain, so `f2n.h` is still partial.
 
 ### Environment parameter runtime boundary
 
