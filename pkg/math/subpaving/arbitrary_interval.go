@@ -16,6 +16,8 @@ type ArbitraryInterval struct {
 	self                 *ArbitraryInterval
 	numbers              *numeral.ArbitraryFloatNumeralManager
 	lower, upper         numeral.ArbitraryFloat
+	constantNode         *ArbitraryNode
+	constantVariable     uint32
 	lowerInf, upperInf   bool
 	lowerOpen, upperOpen bool
 	closed               bool
@@ -37,12 +39,59 @@ func (v *ArbitraryInterval) endpoints() (*numeral.ArbitraryFloat, *numeral.Arbit
 	if v.closed {
 		return nil, nil, arena.ErrClosed
 	}
-	return &v.lower, &v.upper, nil
+	lower, upper := &v.lower, &v.upper
+	if v.constantNode != nil {
+		lo, hi, err := v.constantNode.Bounds(v.constantVariable)
+		if err != nil {
+			return nil, nil, err
+		}
+		v.lowerInf, v.upperInf = lo == nil, hi == nil
+		v.lowerOpen, v.upperOpen = lo == nil || lo.open, hi == nil || hi.open
+		if lo != nil {
+			lower = &lo.value
+		}
+		if hi != nil {
+			upper = &hi.value
+		}
+	}
+	return lower, upper, nil
 }
 
 func (v *ArbitraryInterval) mutable() error {
 	_, _, err := v.endpoints()
+	if err == nil && v.constantNode != nil {
+		return arena.ErrInvalidSlot
+	}
 	return err
+}
+
+// SetConstant borrows the live root's current bounds. Later reads see bounds
+// published after binding, as in interval::set_constant.
+func (v *ArbitraryInterval) SetConstant(node *ArbitraryNode, variable uint32) error {
+	if _, _, err := v.endpoints(); err != nil {
+		return err
+	}
+	if node == nil || node.context == nil || node.context.numbers != v.numbers {
+		return arena.ErrInvalidSlot
+	}
+	if _, _, err := node.Bounds(variable); err != nil {
+		return err
+	}
+	v.constantNode, v.constantVariable = node, variable
+	_, _, err := v.endpoints()
+	return err
+}
+
+// SetMutable detaches the borrowed node view and restores the interval's
+// owned endpoint slots for source scratch reuse.
+func (v *ArbitraryInterval) SetMutable() error {
+	if _, _, err := v.endpoints(); err != nil {
+		return err
+	}
+	v.constantNode = nil
+	v.lowerInf, v.upperInf = true, true
+	v.lowerOpen, v.upperOpen = true, true
+	return nil
 }
 
 func (v *ArbitraryInterval) lowerKind() interval.ExtendedKind {

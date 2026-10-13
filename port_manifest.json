@@ -51044,6 +51044,7 @@
         "pkg/math/subpaving/arbitrary_shell_coefficients_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/arbitrary_context_root.go",
+        "pkg/math/subpaving/arbitrary_interval_node_test.go",
         "pkg/math/subpaving/fixed_interval.go",
         "pkg/math/subpaving/fixed_interval_arith.go",
         "pkg/math/subpaving/fixed_interval_test.go",
@@ -51143,6 +51144,7 @@
       ],
       "tests": [
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
+        "TestArbitraryIntervalLiveRootBoundViewAndOwnedCopy",
         "TestSubpavingFixedMutableIntervalRetainedCore",
         "TestSubpavingFixedIntervalScalarMulDiv",
         "TestSubpavingFixedIntervalPowerRetainedCases",
@@ -51352,6 +51354,14 @@
           "tests": [
             "TestSubpavingFixedClauseWatchPropagationAndConflict",
             "TestSubpavingFixedClauseUnitsResumeAndCleanup"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf node-bound interval::set_constant live borrowed view and set_mutable scratch detachment (src/math/subpaving/subpaving_t.h:146-316)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_interval.go",
+          "tests": [
+            "TestArbitraryIntervalLiveRootBoundViewAndOwnedCopy"
           ]
         },
         {
