@@ -13,7 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func TestHardwareExprConverterNumeralsAndVariableLeaves(t *testing.T) {
+func TestHardwareExprConverterTerms(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
 	sy, err := symbol.NewManager(symbol.Config{Budget: budget})
 	if err != nil {
@@ -221,8 +221,71 @@ func TestHardwareExprConverterNumeralsAndVariableLeaves(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := converter.InternalizeTerm(mul, &n, &d); !errors.Is(err, ErrExprConverterUnsupported) {
-		t.Fatalf("unported multiplication: %v", err)
+	if v, err := converter.InternalizeTerm(mul, &n, &d); err != nil || v == math.MaxUint32 || v == first {
+		t.Fatalf("x*x monomial: %d, %v", v, err)
+	}
+	if err := q.SetString(&value, "2"); err != nil {
+		t.Fatal(err)
+	}
+	two, err := m.ArithmeticNumeral(&value, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	power, err := m.MkFamilyApp(family, 18, nil, []ast.ASTHandle{x, two})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v, err := converter.InternalizeTerm(power, &n, &d); err != nil || v == math.MaxUint32 {
+		t.Fatalf("x^2 monomial: %d, %v", v, err)
+	}
+	scaled, err := m.MkFamilyApp(family, 9, nil, []ast.ASTHandle{two, power})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v, err := converter.InternalizeTerm(scaled, &n, &d); err != nil || v == math.MaxUint32 {
+		t.Fatalf("2*x^2: %d, %v", v, err)
+	}
+	gotN, err = qm.Z.String(&n)
+	if err != nil {
+		t.Fatal(err)
+	}
+	gotD, err = qm.Z.String(&d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if gotN != "2" || gotD != "1" {
+		t.Fatalf("scaled monomial coefficient: %s/%s", gotN, gotD)
+	}
+	if err := q.SetString(&value, "-1"); err != nil {
+		t.Fatal(err)
+	}
+	minusOne, err := m.ArithmeticNumeral(&value, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	negativePower, err := m.MkFamilyApp(family, 18, nil, []ast.ASTHandle{x, minusOne})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v, err := converter.InternalizeTerm(negativePower, &n, &d); err != nil || v == math.MaxUint32 {
+		t.Fatalf("negative exponent must be an atom: %d, %v", v, err)
+	}
+	if yes, err := converter.IsVar(negativePower); err != nil || !yes {
+		t.Fatalf("negative exponent atom mapping: %v, %v", yes, err)
+	}
+	if err := q.SetString(&value, "0"); err != nil {
+		t.Fatal(err)
+	}
+	zero, err := m.ArithmeticNumeral(&value, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	zeroPower, err := m.MkFamilyApp(family, 18, nil, []ast.ASTHandle{x, zero})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := converter.InternalizeTerm(zeroPower, &n, &d); !errors.Is(err, ErrExprConverterUnsupported) {
+		t.Fatalf("zero-degree monomial still open: %v", err)
 	}
 	if err := converter.Close(); err != nil {
 		t.Fatal(err)

@@ -52645,7 +52645,7 @@
         "pkg/math/subpaving/tactic/expr_converter_test.go"
       ],
       "tests": [
-        "TestHardwareExprConverterNumeralsAndVariableLeaves"
+        "TestHardwareExprConverterTerms"
       ],
       "assertions": [
         {
@@ -52690,7 +52690,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "Incremental hardware context specialization: numeral and variable leaves, to_real and process_add are implemented; multiplication, power, literal conversion, cache, checkpoints and full tactic integration remain open."
+        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul and positive integral power are implemented; zero-degree monomials, literal conversion, cache, checkpoints and full tactic integration remain open."
       ]
     },
     {
@@ -52703,7 +52703,7 @@
         "pkg/math/subpaving/tactic/expr_converter_test.go"
       ],
       "tests": [
-        "TestHardwareExprConverterNumeralsAndVariableLeaves"
+        "TestHardwareExprConverterTerms"
       ],
       "conditionals": [
         {
@@ -52720,7 +52720,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "Incremental hardware context specialization: numeral and variable leaves, to_real and process_add are implemented; multiplication, power, literal conversion, cache, checkpoints and full tactic integration remain open."
+        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul and positive integral power are implemented; zero-degree monomials, literal conversion, cache, checkpoints and full tactic integration remain open."
       ]
     },
     {

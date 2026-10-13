@@ -1,16 +1,19 @@
-// Source: src/math/subpaving/tactic/expr2subpaving.cpp:90-148, 221-264, 332-363.
+// Source: src/math/subpaving/tactic/expr2subpaving.cpp:90-286, 332-363.
 package tactic
 
 import (
 	"errors"
 	"math"
+	"math/big"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/math/subpaving"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
 var ErrExprConverterUnsupported = errors.New("subpaving tactic: arithmetic expression conversion is not yet implemented")
+var ErrExprConverterNonSimplified = errors.New("you must apply simplifier before internalizing expressions into the subpaving module.")
 
 // HardwareExprConverter owns the source expr2var references created for
 // arithmetic variables. Its AST manager and hardware engine are borrowed.
@@ -51,14 +54,15 @@ func (c *HardwareExprConverter) check() error {
 	return err
 }
 
-// InternalizeTerm implements numeral and variable leaves, to_real, and add.
+// InternalizeTerm implements numeral and variable leaves, to_real, add, mul,
+// and positive integral powers.
 // The caller owns numerator and denominator.
 // math.MaxUint32 is the source null_var value for constant terms.
 func (c *HardwareExprConverter) InternalizeTerm(t ast.ASTHandle, numerator, denominator *numeral.Int) (uint32, error) {
 	return c.process(t, numerator, denominator)
 }
 
-func (c *HardwareExprConverter) process(t ast.ASTHandle, numerator, denominator *numeral.Int) (uint32, error) {
+func (c *HardwareExprConverter) process(t ast.ASTHandle, numerator, denominator *numeral.Int) (variable uint32, err error) {
 	if err := c.check(); err != nil {
 		return 0, err
 	}
@@ -94,7 +98,7 @@ func (c *HardwareExprConverter) process(t ast.ASTHandle, numerator, denominator 
 		}
 		if matched {
 			r := numeral.NewRational()
-			defer c.engine.qm.Del(&r)
+			defer func() { err = errors.Join(err, c.engine.qm.Del(&r)) }()
 			if err := c.engine.qm.SetString(&r, value); err != nil {
 				return 0, err
 			}
@@ -118,6 +122,10 @@ func (c *HardwareExprConverter) process(t ast.ASTHandle, numerator, denominator 
 			switch operator {
 			case 6: // OP_ADD
 				return c.processAdd(t, numerator, denominator)
+			case 9: // OP_MUL
+				return c.processMul(t, numerator, denominator)
+			case 18: // OP_POWER
+				return c.processPower(t, numerator, denominator, sortKind == 1)
 			case 14: // OP_TO_REAL
 				arg, err := c.ast.GetArg(t, 0)
 				if err != nil {
@@ -129,6 +137,10 @@ func (c *HardwareExprConverter) process(t ast.ASTHandle, numerator, denominator 
 			}
 		}
 	}
+	return c.mkVarFor(t, sortKind == 1, numerator, denominator)
+}
+
+func (c *HardwareExprConverter) mkVarFor(t ast.ASTHandle, integer bool, numerator, denominator *numeral.Int) (uint32, error) {
 	if variable, ok := c.vars[t]; ok {
 		if err := c.engine.qm.Z.SetInt32(numerator, 1); err != nil {
 			return 0, err
@@ -143,7 +155,7 @@ func (c *HardwareExprConverter) process(t ast.ASTHandle, numerator, denominator 
 		c.ast.DecRef(t)
 		return 0, err
 	}
-	variable, err := shell.MkVar(sortKind == 1)
+	variable, err := shell.MkVar(integer)
 	if err != nil {
 		c.ast.DecRef(t)
 		return 0, err
@@ -154,6 +166,197 @@ func (c *HardwareExprConverter) process(t ast.ASTHandle, numerator, denominator 
 		return 0, err
 	}
 	return variable, c.engine.qm.Z.SetInt32(denominator, 1)
+}
+
+// unsignedExponent follows rational::is_unsigned and get_unsigned, including
+// the full uint32 range. The AST's detached decimal/fraction text is exact.
+func (c *HardwareExprConverter) unsignedExponent(h ast.ASTHandle) (uint32, bool, error) {
+	value, _, matched, err := c.ast.ArithmeticNumeralText(h)
+	if err != nil || !matched {
+		return 0, false, err
+	}
+	r, ok := new(big.Rat).SetString(value)
+	if !ok || !r.IsInt() || r.Sign() < 0 || r.Num().BitLen() > 32 {
+		return 0, false, nil
+	}
+	return uint32(r.Num().Uint64()), true, nil
+}
+
+func (c *HardwareExprConverter) asPower(h ast.ASTHandle) (ast.ASTHandle, uint32, error) {
+	kind, err := c.ast.GetKind(h)
+	if err != nil || kind != ast.ASTApp {
+		return h, 1, err
+	}
+	family, err := c.ast.GetFamilyID(h)
+	if err != nil || family != c.family {
+		return h, 1, err
+	}
+	op, err := c.ast.GetDeclKind(h)
+	if err != nil || op != 18 {
+		return h, 1, err
+	}
+	exponent, err := c.ast.GetArg(h, 1)
+	if err != nil {
+		return h, 1, err
+	}
+	k, yes, err := c.unsignedExponent(exponent)
+	if err != nil || !yes {
+		return h, 1, err
+	}
+	base, err := c.ast.GetArg(h, 0)
+	return base, k, err
+}
+
+func (c *HardwareExprConverter) processMul(t ast.ASTHandle, n, d *numeral.Int) (variable uint32, err error) {
+	z := c.engine.qm.Z
+	count, err := c.ast.GetNumArgs(t)
+	if err != nil {
+		return 0, err
+	}
+	if count <= 1 {
+		return 0, ErrExprConverterNonSimplified
+	}
+	first, err := c.ast.GetArg(t, 0)
+	if err != nil {
+		return 0, err
+	}
+	_, _, numeric, err := c.ast.ArithmeticNumeralText(first)
+	if err != nil {
+		return 0, err
+	}
+	m := t
+	if numeric {
+		if count != 2 {
+			return 0, ErrExprConverterNonSimplified
+		}
+		if _, err = c.process(first, n, d); err != nil {
+			return 0, err
+		}
+		m, err = c.ast.GetArg(t, 1)
+		if err != nil {
+			return 0, err
+		}
+	} else {
+		if err = z.SetInt32(n, 1); err != nil {
+			return 0, err
+		}
+		if err = z.SetInt32(d, 1); err != nil {
+			return 0, err
+		}
+	}
+	args := []ast.ASTHandle{m}
+	kind, e := c.ast.GetKind(m)
+	if e != nil {
+		return 0, e
+	}
+	if kind == ast.ASTApp {
+		family, e := c.ast.GetFamilyID(m)
+		if e != nil {
+			return 0, e
+		}
+		operator, e := c.ast.GetDeclKind(m)
+		if e != nil {
+			return 0, e
+		}
+		if family == c.family && operator == 9 {
+			length, e := c.ast.GetNumArgs(m)
+			if e != nil {
+				return 0, e
+			}
+			args = make([]ast.ASTHandle, length)
+			for i := range args {
+				args[i], e = c.ast.GetArg(m, uint32(i))
+				if e != nil {
+					return 0, e
+				}
+			}
+		}
+	}
+	var argN, argD numeral.Int
+	defer func() { err = errors.Join(err, z.Del(&argD), z.Del(&argN)) }()
+	powers := make([]subpaving.HardwarePower, 0, len(args))
+	for _, arg := range args {
+		base, degree, e := c.asPower(arg)
+		if e != nil {
+			return 0, e
+		}
+		x, e := c.process(base, &argN, &argD)
+		if e != nil {
+			return 0, e
+		}
+		if e = z.Power(&argN, degree, &argN); e != nil {
+			return 0, e
+		}
+		if e = z.Power(&argD, degree, &argD); e != nil {
+			return 0, e
+		}
+		if e = z.Mul(n, &argN, n); e != nil {
+			return 0, e
+		}
+		if e = z.Mul(d, &argD, d); e != nil {
+			return 0, e
+		}
+		if x != math.MaxUint32 {
+			if degree == 0 {
+				return 0, ErrExprConverterUnsupported
+			}
+			powers = append(powers, subpaving.HardwarePower{Variable: x, Degree: degree})
+		}
+	}
+	if len(powers) == 0 {
+		return math.MaxUint32, nil
+	}
+	if len(powers) == 1 && powers[0].Degree == 1 {
+		return powers[0].Variable, nil
+	}
+	shell, err := c.engine.Shell()
+	if err != nil {
+		return 0, err
+	}
+	return shell.MkMonomial(powers)
+}
+
+func (c *HardwareExprConverter) processPower(t ast.ASTHandle, n, d *numeral.Int, integer bool) (variable uint32, err error) {
+	z := c.engine.qm.Z
+	exponent, err := c.ast.GetArg(t, 1)
+	if err != nil {
+		return 0, err
+	}
+	k, yes, err := c.unsignedExponent(exponent)
+	if err != nil {
+		return 0, err
+	}
+	if !yes {
+		return c.mkVarFor(t, integer, n, d)
+	}
+	base, err := c.ast.GetArg(t, 0)
+	if err != nil {
+		return 0, err
+	}
+	x, err := c.process(base, n, d)
+	if err != nil {
+		return 0, err
+	}
+	if x != math.MaxUint32 {
+		if k == 0 {
+			return 0, ErrExprConverterUnsupported
+		}
+		shell, e := c.engine.Shell()
+		if e != nil {
+			return 0, e
+		}
+		x, err = shell.MkMonomial([]subpaving.HardwarePower{{Variable: x, Degree: k}})
+		if err != nil {
+			return 0, err
+		}
+	}
+	if err = z.Power(n, k, n); err != nil {
+		return 0, err
+	}
+	if err = z.Power(d, k, d); err != nil {
+		return 0, err
+	}
+	return x, nil
 }
 
 // processAdd uses the two live unsynch_mpz_manager buffer instantiations from
