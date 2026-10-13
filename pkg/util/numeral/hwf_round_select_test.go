@@ -33,32 +33,3 @@ func TestHardwareFloatRoundToIntegralSourceModes(t *testing.T) {
 		t.Fatal("unsupported rounding changed value", a, err)
 	}
 }
-
-func TestHardwareFloatSourceRemainderAndSSESelection(t *testing.T) {
-	m := NewHardwareFloatManager()
-	a, b, out := HardwareFloat{7}, HardwareFloat{4}, HardwareFloat{}
-	if err := m.Rem(&a, &b, &out); err != nil || out.value != -1 {
-		t.Fatal("IEEE nearest-even remainder", out, err)
-	}
-	a.value, b.value = 6, 4
-	if err := m.Rem(&a, &b, &out); err != nil || out.value != -2 {
-		t.Fatal("tie-even quotient remainder", out, err)
-	}
-	a.value, b.value = math.Copysign(0, -1), 0
-	if err := m.Maximum(&a, &b, &out); err != nil || out.RawBits() != 0 {
-		t.Fatal("equal max selects second signed zero", out, err)
-	}
-	if err := m.Minimum(&b, &a, &out); err != nil || out.RawBits() != a.RawBits() {
-		t.Fatal("equal min selects second signed zero", out, err)
-	}
-	a.value, b.value = math.Float64frombits(0x7ff8000000001234), 2
-	if err := m.Maximum(&a, &b, &out); err != nil || out.value != 2 {
-		t.Fatal("unordered max selects second finite", out, err)
-	}
-	if err := m.Minimum(&b, &a, &out); err != nil || out.RawBits() != a.RawBits() {
-		t.Fatal("unordered min preserves second NaN bits", out, err)
-	}
-	if err := m.Rem(&a, nil, &out); !errors.Is(err, ErrNumericOwner) {
-		t.Fatal(err)
-	}
-}

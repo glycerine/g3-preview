@@ -117169,8 +117169,12 @@
           ]
         },
         {
-          "name": "Remaining f2n<hwf_manager> formatting, power-of-two and enclosing subpaving caller paths",
+          "name": "Remaining f2n<hwf_manager> rational-string formatting and enclosing subpaving caller paths",
           "status": "unported"
+        },
+        {
+          "name": "Uncalled f2n<hwf_manager> power-of-two, scientific-string, decimal and SMT2 display helpers",
+          "status": "reference_only"
         },
         {
           "name": "Retained subpaving tactic f2n<mpf_manager> construction, rounding, value conversion and interval arithmetic selected by numeral=mpf",
@@ -118966,7 +118970,6 @@
         "TestHardwareFloatDirectedArithmetic",
         "TestHardwareFloatArithmeticGuardsAndAliasing",
         "TestHardwareFloatRoundToIntegralSourceModes",
-        "TestHardwareFloatSourceRemainderAndSSESelection",
         "TestHardwareFloatSourceRationalInputDirectedBounds",
         "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
         "TestHardwareFloatSourceToRationalBitDecomposition",
@@ -119371,12 +119374,11 @@
           ]
         },
         {
-          "name": "hwf.cpp:297-383 integral rounding, IEEE remainder and SSE min/max selection",
+          "name": "hwf.cpp:301-355 integral rounding reached by f2n<hwf_manager>",
           "status": "ported",
           "go_target": "pkg/util/numeral/hwf_round_select.go",
           "tests": [
-            "TestHardwareFloatRoundToIntegralSourceModes",
-            "TestHardwareFloatSourceRemainderAndSSESelection"
+            "TestHardwareFloatRoundToIntegralSourceModes"
           ]
         },
         {
@@ -119398,8 +119400,12 @@
           ]
         },
         {
-          "name": "Remaining HWF fused arithmetic, square root, formatting and owning manager lifetime reached by subpaving",
+          "name": "Remaining HWF rational-string formatting and owning manager lifetime reached by subpaving",
           "status": "unported"
+        },
+        {
+          "name": "Uncalled HWF fused arithmetic, square root, remainder and min/max methods",
+          "status": "reference_only"
         }
       ],
       "ownership": [
@@ -119428,7 +119434,6 @@
         "TestHardwareFloatDirectedArithmetic",
         "TestHardwareFloatArithmeticGuardsAndAliasing",
         "TestHardwareFloatRoundToIntegralSourceModes",
-        "TestHardwareFloatSourceRemainderAndSSESelection",
         "TestHardwareFloatSourceRationalInputDirectedBounds",
         "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
         "TestHardwareFloatSourceToRationalBitDecomposition",
@@ -119481,12 +119486,11 @@
           ]
         },
         {
-          "name": "hwf_manager integral rounding, remainder, maximum and minimum declarations",
+          "name": "hwf_manager integral rounding declaration reached by f2n<hwf_manager>",
           "status": "ported",
           "go_target": "pkg/util/numeral/hwf_round_select.go",
           "tests": [
-            "TestHardwareFloatRoundToIntegralSourceModes",
-            "TestHardwareFloatSourceRemainderAndSSESelection"
+            "TestHardwareFloatRoundToIntegralSourceModes"
           ]
         },
         {
@@ -119508,8 +119512,12 @@
           ]
         },
         {
-          "name": "Remaining hwf_manager fused arithmetic, square root, formatting and owned mpq-manager declaration paths",
+          "name": "Remaining hwf_manager rational-string formatting and owned mpq-manager declaration paths",
           "status": "unported"
+        },
+        {
+          "name": "Uncalled hwf_manager fused arithmetic, square root, remainder and min/max declarations",
+          "status": "reference_only"
         }
       ],
       "ownership": [

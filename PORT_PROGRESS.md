@@ -39502,22 +39502,21 @@ and divide. Exact Go rationals supply the intermediate finite result, with
 nearest-even conversion and an adjacent binary64 value for directed modes;
 this avoids changing the process-wide FPU mode. Focused cases cover signed
 zero, overflow, underflow, exceptional operands, aliasing and unsupported
-nearest-away rounding. Fused arithmetic, square root, conversion, text,
-integral rounding, manager ownership and the concrete subpaving caller remain
-open.
+nearest-away rounding. The later reachability audit below excludes uncalled
+fused arithmetic and square root from the retained port.
 
-The HWF scalar manager now also implements `round_to_integral` for the four
-hardware-supported modes, IEEE remainder, and the Linux x86-64 SSE min/max
-selection rules. The latter select the second operand on equality or an
-unordered comparison, preserving its signed-zero or NaN bits. These methods
-are needed by the concrete `f2n<hwf_manager>` path; square root, fused
-arithmetic, conversion, text and manager ownership are still outstanding.
+The HWF scalar manager implements `round_to_integral` for the four
+hardware-supported modes. A later reachability audit removed previously
+ported IEEE remainder and SSE min/max methods: the retained subpaving
+`f2n<hwf_manager>` wrapper does not call them. Square root and fused
+arithmetic are also uncalled by this specialization and need no Go port.
+Conversion, text and manager ownership remain outstanding.
 
 The retained `f2n<hwf_manager>` specialization now has a concrete Go wrapper
 for subpaving's default upward mode, direction changes, scalar setters,
 regular-result checks, interval arithmetic, reciprocal, increment/decrement,
 floor/ceil and exponentiation. Its two scratch numerals are pointer-free.
-Rational setters, formatting, power-of-two inspection, the parallel MPF
+Rational setters, rational-string formatting, the parallel MPF
 specialization and enclosing subpaving context remain open; `f2n.h` is
 therefore partial rather than complete.
 
@@ -39534,8 +39533,9 @@ numerator and denominator integers from the binary64 bit fields and source
 raw exponent. The smallest subnormal therefore converts to `2^-1075`, as in
 the C++ implementation; both signs of zero normalize to rational zero.
 Focused native and checked/debug tests also distinguish the source debug
-finite assertion from its release bit path. Formatting, fused arithmetic,
-square root, the owned rational child and subpaving context remain open.
+finite assertion from its release bit path. The retained rational-string
+formatter, owned rational child and subpaving context remain open. The
+uncalled fused arithmetic and square-root methods have no Go-port obligation.
 
 ### Environment parameter runtime boundary
 
