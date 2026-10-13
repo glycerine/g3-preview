@@ -164556,6 +164556,11 @@
             "TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals",
             "TestPolynomialSubstitutionExpiredSOMReceiptPreservesReplacement"
           ]
+        },
+        {
+          "name": "Concrete inherited scoped_mpf scalar lifetime for retained AST FPA plugin, rewriter, printers, SMT theory, subpaving and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -164565,10 +164570,11 @@
         "Source destructor stops retain the first cause and older auxiliary roots; separate owning cleanup completes exact retained owners before cache reuse.",
         "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership.",
         "Actual source NUM destruction follows returned-factory evaluation; sticky source guard is not automatically retried by owning cleanup",
-        "scoped_numeral.h:31-33 actual Neg minus_a source destructor precedes factory result exposure; stopped source history remains distinct from exact owning acknowledgment."
+        "scoped_numeral.h:31-33 actual Neg minus_a source destructor precedes factory result exposure; stopped source history remains distinct from exact owning acknowledgment.",
+        "The retained scoped_mpf scalar borrows mpf_manager and owns an mpf value; its inherited destructor deletes the value after the caller's body, including early API returns. AST FPA plugin, rewriter and printer, SMT FPA, subpaving and API call sites still need concrete caller-local binding and exact cleanup. The existing AST scoped_mpf_vector is a separate owning collection and does not discharge scalar scope lifetimes."
       ],
       "deviations": [
-        "Only concrete source instantiations are represented in Go. Integer, rational, binary-rational and fast-float owners use their concrete numeral and manager types; the unused any-valued callback adapter was removed.",
+        "Selected concrete Int, rational, MPBQ and MPFF scopes are represented in Go. The retained MPF scalar specialization is still open at its actual AST, SMT, subpaving and API callers; the unused any-valued callback adapter was removed.",
         "Explicit Close substitutes RAII for the retained concrete owners. Display returns Go strings instead of recreating C++ ostream insertion.",
         "TLS signed-host overflow fixtures test an explicitly guarded source-undefined domain, not ordinary exhaustion or an end-to-end recursive arithmetic claim."
       ]
