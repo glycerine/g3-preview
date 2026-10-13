@@ -1,6 +1,7 @@
 package tactic
 
 import (
+	"bytes"
 	"errors"
 	"math"
 	"testing"
@@ -187,6 +188,17 @@ func TestFastExprConverterTermsAndClause(t *testing.T) {
 	}
 	if err := converter.InternalizeGoal(goal); err != nil {
 		t.Fatal("goal internalization", err)
+	}
+	shell, err := engine.Shell()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var out bytes.Buffer
+	if err := shell.DisplayConstraints(&out, true); err != nil {
+		t.Fatal("MPFF constraints", err)
+	}
+	if got, want := out.String(), "x2 = 1 + x0 + x1\nx3 = x0^2\nx2 <= 2\nx2 <= 2\nx2 <= 2 or 2 < x2\n"; got != want {
+		t.Fatal("source-order MPFF constraints", out.String())
 	}
 	if _, err := converter.InternalizeInequality(ineq); err != nil {
 		t.Fatal("inequality", err)

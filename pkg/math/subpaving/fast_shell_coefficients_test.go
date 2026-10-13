@@ -1,7 +1,10 @@
 package subpaving
 
 import (
+	"bytes"
 	"errors"
+	"io"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -126,5 +129,22 @@ func TestFastShellExactCoefficientsAndDirectedInequalities(t *testing.T) {
 	}
 	if _, err := w.MkMonomial([]FastPower{{Variable: y, Degree: 2}}); err != nil {
 		t.Fatal("monomial", err)
+	}
+	var display bytes.Buffer
+	if err := w.DisplayConstraints(&display, true); err != nil {
+		t.Fatal("MPFF display", err)
+	}
+	if got := display.String(); !strings.HasPrefix(got, "x2 = 3 + x0 + ") || !strings.Contains(got, "*x1\n") || !strings.Contains(got, " or ") || !strings.Contains(got, "x3 = x1^2\n") {
+		t.Fatal("MPFF source display", got)
+	}
+	if err := w.SetVariableDisplay(func(out io.Writer, x uint32) error { return fastWrite(out, "v"+string(rune('0'+x))) }); err != nil {
+		t.Fatal(err)
+	}
+	display.Reset()
+	if err := w.DisplayConstraints(&display, false); err != nil || !strings.HasPrefix(display.String(), "v2 = ") {
+		t.Fatal("borrowed variable printer", display.String(), err)
+	}
+	if err := w.SetVariableDisplay(nil); err != nil {
+		t.Fatal(err)
 	}
 }

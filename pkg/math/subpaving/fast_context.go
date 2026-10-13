@@ -44,6 +44,7 @@ type FastContext struct {
 	clauses          []*FastClause
 	unitClauses      []fastUnitClause
 	unitHead         int
+	displayVariable  FastVariableDisplay
 	initStage        uint8
 	initDefHead      uint32
 	closed           bool

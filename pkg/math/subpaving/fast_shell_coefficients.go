@@ -3,6 +3,7 @@ package subpaving
 
 import (
 	"errors"
+	"io"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
@@ -13,7 +14,8 @@ import (
 var ErrFastShellInexactInteger = errors.New("subpaving: integer coefficient cannot be represented exactly as fast float")
 
 // FastShellCoefficients owns the MPFF wrapper's scalar, coefficient vector,
-// and exact integer comparison scratch. Its context and managers are borrowed.
+// and exact integer comparison scratch. It owns the context only when created
+// from named parameters; both numeral managers remain borrowed.
 type FastShellCoefficients struct {
 	self         *FastShellCoefficients
 	context      *FastContext
@@ -173,8 +175,22 @@ func (w *FastShellCoefficients) AddClause(atoms []*FastInequality) (*FastClause,
 	return w.context.AddClause(atoms, false, true)
 }
 
+func (w *FastShellCoefficients) SetVariableDisplay(display FastVariableDisplay) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.SetVariableDisplay(display)
+}
+
+func (w *FastShellCoefficients) DisplayConstraints(out io.Writer, useStar bool) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.DisplayConstraints(out, useStar)
+}
+
 // Close unwinds the source members in reverse order. A refused release keeps
-// its member for a later retry; the borrowed context is closed by its owner.
+// its member for a later retry; an owned context closes after wrapper members.
 func (w *FastShellCoefficients) Close() error {
 	if w == nil || w.self != w || w.numbers == nil || w.rational == nil {
 		return arena.ErrInvalidSlot
