@@ -86,6 +86,9 @@ func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, 
 	if err != nil {
 		return result, err
 	}
+	if err = s.BindDebug(c.Debug); err != nil {
+		return result, err
+	}
 	q, err := c.Rational.Service()
 	if err != nil {
 		return result, err

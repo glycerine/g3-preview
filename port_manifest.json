@@ -172239,7 +172239,9 @@
         "pkg/util/params/util_gparams_service_ops.go",
         "pkg/util/params/util_gparams_symbol_stream.go",
         "pkg/util/params/util_gparams_display.go",
-        "pkg/smtcore/util_smt_params_source_test.go"
+        "pkg/smtcore/util_smt_params_source_test.go",
+        "pkg/util/process/initialize.go",
+        "pkg/util/process/finalize_test.go"
       ],
       "tests": [
         "TestSymbolSpellingHashSourceGolden",
@@ -172254,7 +172256,8 @@
         "TestSymbolServiceSourcePublicationAndReinitialize",
         "TestSymbolServiceSourceEveryConstructorReservation",
         "TestSymbolServiceSourceCopiedOwnerAndPrepareFailure",
-        "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags"
+        "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
+        "TestGeneratedInitializeAndFinalizeConcreteServices"
       ],
       "conditionals": [
         {
@@ -172408,6 +172411,17 @@
             "TestSymbolServiceSourcePublicationAndReinitialize",
             "TestSymbolServiceSourceEveryConstructorReservation",
             "TestSymbolServiceSourceCopiedOwnerAndPrepareFailure"
+          ]
+        },
+        {
+          "name": "Generated process symbol manager borrows its DebugContext and rereads the bare_str numerical SASSERT switch (symbol.h:96; test/mem_initializer.cpp:13-20)",
+          "status": "ported",
+          "go_target": "pkg/util/symbol/symbol.go",
+          "go_targets": [
+            "pkg/util/process/initialize.go"
+          ],
+          "tests": [
+            "TestGeneratedInitializeAndFinalizeConcreteServices"
           ]
         },
         {

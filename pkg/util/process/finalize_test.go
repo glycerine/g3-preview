@@ -2,6 +2,7 @@ package process
 
 import (
 	"bytes"
+	"errors"
 	"math"
 	"testing"
 
@@ -53,11 +54,23 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	if again, err := InitializeGenerated(InitializationConfig{Runtime: m}, 1<<25); err != nil || again != nil {
 		t.Fatal("repeated generated initialization", again, err)
 	}
+	symbols, err := s.Manager()
+	must(t, err)
 	must(t, d.EnableAssertions(false))
+	if bare, present, err := symbols.BareString(symbol.Numerical(7)); err != nil || !present || bare != "" {
+		t.Fatal("generated symbol table missed disabled process assertions", bare, present, err)
+	}
 	if enabled, err := g.NamespaceAssertionsEnabled(); err != nil || enabled {
 		t.Fatal("global params missed disabled process assertions", enabled, err)
 	}
 	must(t, d.EnableAssertions(true))
+	if bare, present, err := symbols.BareString(symbol.Numerical(7)); params.GlobalParamsSourceDebug {
+		if !errors.Is(err, symbol.ErrInvalid) || present || bare != "" {
+			t.Fatal("generated symbol table missed re-enabled process assertion", bare, present, err)
+		}
+	} else if err != nil || !present || bare != "" {
+		t.Fatal("native bare_str numerical continuation", bare, present, err)
+	}
 	if enabled, err := g.NamespaceAssertionsEnabled(); err != nil || enabled != params.GlobalParamsSourceDebug {
 		t.Fatal("global params did not reread process assertions", enabled, err)
 	}

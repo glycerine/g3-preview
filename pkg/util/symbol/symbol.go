@@ -123,6 +123,25 @@ func NewManager(c Config) (*Manager, error) {
 	return &Manager{byText: make(map[string]uint32), Budget: c.Budget, debug: c.Debug, owner: owner}, nil
 }
 
+// BindDebug borrows the generated process assertion owner after the symbol
+// table is constructed. The source SASSERT reads that process switch when
+// bare_str is called, so later changes to the switch remain visible.
+func (m *Manager) BindDebug(d *diagnostic.DebugContext) error {
+	if m == nil || d == nil {
+		return arena.ErrConfig
+	}
+	if _, e := d.AssertionsEnabled(); e != nil {
+		return e
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.closed {
+		return arena.ErrClosed
+	}
+	m.debug = d
+	return nil
+}
+
 // The source SASSERT is reached before bare_str's numerical-empty-string
 // continuation. A nil binding keeps the existing explicit Go refusal.
 func (m *Manager) bareStringNumericalAssertion() error {
