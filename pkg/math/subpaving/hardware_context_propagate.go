@@ -59,6 +59,41 @@ func (c *HardwareContext) boundOnTrail(n *HardwareNode, b *HardwareBound) bool {
 	return false
 }
 
+// AddRecentBounds replays only surviving child-local bounds, newest first.
+// The source assigns the current context timestamp without incrementing it.
+func (c *HardwareContext) AddRecentBounds(n *HardwareNode) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if n == nil || n.context != c || n.parent == nil || len(c.queue) != 0 || c.queueHead != 0 {
+		return arena.ErrInvalidSlot
+	}
+	if err := n.open(); err != nil {
+		return err
+	}
+	boundary := n.parent.trail
+	current := n.trail
+	var recent []*HardwareBound
+	for current != boundary && current != nil {
+		b := current
+		if b.variable >= uint32(len(n.lower)) {
+			return arena.ErrInvalidSlot
+		}
+		if b.lower && n.lower[b.variable] == b || !b.lower && n.upper[b.variable] == b {
+			recent = append(recent, b)
+		}
+		current = current.prev
+	}
+	if current != boundary {
+		return arena.ErrInvalidSlot
+	}
+	for _, b := range recent {
+		b.timestamp = c.timestamp
+		c.queue = append(c.queue, b)
+	}
+	return nil
+}
+
 func (c *HardwareContext) processQueuedBound(n *HardwareNode, b *HardwareBound) error {
 	if b == nil || b.variable >= uint32(len(c.watchers)) || !c.boundOnTrail(n, b) {
 		return arena.ErrInvalidSlot

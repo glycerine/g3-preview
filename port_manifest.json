@@ -51032,7 +51032,8 @@
         "TestHardwareIntervalConstantNodeViewAndMutationGuards",
         "TestHardwareContextRelevantNewBoundSourceBranches",
         "TestHardwarePolynomialForwardInverseAndUnboundedSelection",
-        "TestHardwareContextRootDefinitionOrderAndQueuedWatchers"
+        "TestHardwareContextRootDefinitionOrderAndQueuedWatchers",
+        "TestHardwareChildRecentBoundReplayAndPolynomialWatcher"
       ],
       "conditionals": [
         {
@@ -51438,6 +51439,14 @@
           "tests": [
             "TestHardwareContextRootDefinitionOrderAndQueuedWatchers"
           ]
+        },
+        {
+          "name": "Concrete config_hwf unqueued child decision bounds and replay timestamps reached by splitter",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_bounds.go",
+          "tests": [
+            "TestHardwareChildRecentBoundReplayAndPolynomialWatcher"
+          ]
         }
       ],
       "ownership": [
@@ -51583,7 +51592,8 @@
         "TestHardwareIntervalConstantNodeViewAndMutationGuards",
         "TestHardwareContextRelevantNewBoundSourceBranches",
         "TestHardwarePolynomialForwardInverseAndUnboundedSelection",
-        "TestHardwareContextRootDefinitionOrderAndQueuedWatchers"
+        "TestHardwareContextRootDefinitionOrderAndQueuedWatchers",
+        "TestHardwareChildRecentBoundReplayAndPolynomialWatcher"
       ],
       "assertions": [
         {
@@ -52237,6 +52247,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_propagate.go",
           "tests": [
             "TestHardwareContextRootDefinitionOrderAndQueuedWatchers"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf newest-first child decision-bound replay and most-recent bound selection (src/math/subpaving/subpaving_t_def.h:1661-1681)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_propagate.go",
+          "tests": [
+            "TestHardwareChildRecentBoundReplayAndPolynomialWatcher"
           ]
         }
       ],
@@ -171463,7 +171481,8 @@
         "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
         "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards",
         "TestASTBitVectorNativeCacheGrowthPreservesValidationAndOwnership",
-        "TestHardwareContextRootDefinitionOrderAndQueuedWatchers"
+        "TestHardwareContextRootDefinitionOrderAndQueuedWatchers",
+        "TestHardwareChildRecentBoundReplayAndPolynomialWatcher"
       ],
       "conditionals": [
         {
@@ -171899,6 +171918,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_propagate.go",
           "tests": [
             "TestHardwareContextRootDefinitionOrderAndQueuedWatchers"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf child recent-bound queue replay with typed Go slice order",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_propagate.go",
+          "tests": [
+            "TestHardwareChildRecentBoundReplayAndPolynomialWatcher"
           ]
         }
       ],

@@ -88,6 +88,19 @@ func (c *HardwareContext) PropagateBound(n *HardwareNode, variable uint32, value
 }
 
 func (c *HardwareContext) propagateBoundReason(n *HardwareNode, variable uint32, value *numeral.HardwareFloat, lower, open bool, reason hardwareBoundReasonKind, reasonVariable uint32) error {
+	return c.publishBound(n, variable, value, lower, open, reason, reasonVariable, true)
+}
+
+// DecideBound is the source splitter's unqueued mk_decided_bound path.
+// AddRecentBounds queues surviving child decisions when that child is selected.
+func (c *HardwareContext) DecideBound(n *HardwareNode, variable uint32, value *numeral.HardwareFloat, lower, open bool) error {
+	if n == nil || n.parent == nil {
+		return arena.ErrInvalidSlot
+	}
+	return c.publishBound(n, variable, value, lower, open, hardwareReasonAxiom, 0, false)
+}
+
+func (c *HardwareContext) publishBound(n *HardwareNode, variable uint32, value *numeral.HardwareFloat, lower, open bool, reason hardwareBoundReasonKind, reasonVariable uint32, enqueue bool) error {
 	if err := c.checkNode(n, variable); err != nil {
 		return err
 	}
@@ -119,6 +132,8 @@ func (c *HardwareContext) propagateBoundReason(n *HardwareNode, variable uint32,
 	if c.timestamp == math.MaxUint64 {
 		return ErrHardwareContextTimestamp
 	}
-	c.queue = append(c.queue, b)
+	if enqueue {
+		c.queue = append(c.queue, b)
+	}
 	return nil
 }
