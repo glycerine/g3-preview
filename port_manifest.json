@@ -113201,25 +113201,31 @@
           "text": "SASSERT(idx < size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "realclosure ptr_array<value> polynomial and array<polynomial/int/sign_condition*> fixed storage, set/index/size/c_ptr/finalize",
-          "status": "unported",
-          "tests": []
+          "name": "realclosure ptr_array<value> polynomial construction/set/index/size/c_ptr/finalize",
+          "status": "unported"
         },
         {
-          "name": "sarray<p2s> sign-pair typedef without construction or method call",
-          "status": "reference_only",
-          "tests": []
+          "name": "realclosure array<polynomial> sign-determination prs/qs construction, indexed polynomial reset and finalize",
+          "status": "unported"
+        },
+        {
+          "name": "realclosure array<int> Tarski-query and array<sign_condition*> column construction, indexed reads and finalize",
+          "status": "unported"
+        },
+        {
+          "name": "sarray<p2s> signs typedef with no constructed production instance",
+          "status": "reference_only"
         }
       ],
       "ownership": [
-        "The sole production include is src/math/realclosure/realclosure.cpp. Its sign_det creates region-allocated fixed arrays; del_sign_det retires pointed sign-condition chains, polynomial values, and array backing in separate source steps (realclosure.cpp:799-810). The realclosure consumer has no Go body yet."
+        "The only production include is realclosure.cpp. Polynomial ptr_array borrows value pointers and never destroys pointed-to values itself; realclosure::reset_p decrements them before finalizing the array storage. Sign-determination arrays own their element slots and backing; del_sign_det frees sign-condition nodes separately, then finalizes the pointer array, polynomial arrays and integer array in source order. The Go realclosure port has interval arithmetic but not the sign-determination or rational-function owners that reach these arrays."
       ],
       "deviations": [
-        "Use concrete Go slices in the realclosure port; do not add a generic array<T> or copy C++ allocation headers. The similarly named src/api/c++/z3++.h array is a different class."
+        "Use concrete Go slices owned by the realclosure value/sign-determination consumers. Preserve explicit referenced-value decrements, sign-condition deletion and source owner order; do not copy C++ array allocation headers or add a generic array<T>. The similarly named src/api/c++/z3++.h array is unrelated."
       ]
     },
     {
@@ -158167,11 +158173,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "SMT conflict_resolution enode_pair_set insert_if_not_there for owner-ID-normalized equality pairs",
+          "status": "unported"
+        },
+        {
+          "name": "SMT conflict_resolution enode_pair_set contains debug check and reset after conflict processing",
+          "status": "unported"
+        },
+        {
+          "name": "Other insert/erase/empty/iterator overloads have no direct retained production call on this specialization",
+          "status": "reference_only"
+        }
+      ],
+      "ownership": [
+        "The sole production instantiation is obj_pair_set<enode,enode> in smt_conflict_resolution.h. It borrows both enode pointers; membership is owned by the set and reset drops only membership. mark_eq orders pair operands by owner ID, inserts once, then pushes the pair into m_todo_eqs. The SMT conflict-resolution consumer is not yet ported to Go."
+      ],
+      "deviations": [
+        "When SMT conflict_resolution is ported, use a concrete map keyed by the ordered pair of typed enode handles; keep mark_eq normalization and first-insertion todo order. Do not port chashtable probing or add a universal pair-set adapter."
+      ]
     },
     {
       "path": "src/util/obj_ref.h",
@@ -160151,11 +160174,32 @@
           "text": "SASSERT(m_fid2plugins.get(fid, 0) == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "SMT context plugin_manager<theory> register/get and registration-order iteration",
+          "status": "unported"
+        },
+        {
+          "name": "SMT proto_model plugin_manager<value_factory> register/get",
+          "status": "unported"
+        },
+        {
+          "name": "Owner destruction deletes registered plugin objects; release has no direct retained production call",
+          "status": "unported"
+        },
+        {
+          "name": "release clears family index and registration list without deletion, with no direct retained production call",
+          "status": "reference_only"
+        }
+      ],
+      "ownership": [
+        "The only production specializations are SMT context theory and proto_model value_factory. Registration stores the same borrowed pointer in a family-ID index and in an owning registration-order list; manager destruction deletes each plugin from the latter once. The release method would discard both lists and transfer ownership outward but has no direct retained production call. Their Go SMT owners are not yet ported."
+      ],
+      "deviations": [
+        "Use concrete typed Go family-ID indexes plus registration-order slices inside the SMT context and proto_model owners. Preserve duplicate-family refusal, null-family lookup and exactly-once plugin cleanup; no generic plugin manager or C++ vector implementation is needed."
+      ]
     },
     {
       "path": "src/util/pool.h",
