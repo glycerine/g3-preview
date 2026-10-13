@@ -16667,7 +16667,8 @@
         "TestASTFloatingPointBooleanNumeralScopedValue",
         "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy",
         "TestASTFloatingPointSpecialConstructorsScopedValue",
-        "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
+        "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
+        "TestASTFloatingPointSignedZeroSortOverloads"
       ],
       "assertions": [
         {
@@ -16783,6 +16784,14 @@
             "TestASTFloatingPointSpecialConstructorsScopedValue",
             "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
           ]
+        },
+        {
+          "name": "Retained fpa_util mk_pzero(sort*) and mk_nzero(sort*) exponent-then-significand parameter reads before concrete scoped_mpf construction (src/ast/fpa_decl_plugin.h:252-253; src/ast/fpa_decl_plugin.cpp:939-975)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointSignedZeroSortOverloads"
+          ]
         }
       ],
       "ownership": [
@@ -16810,7 +16819,8 @@
         "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren",
         "TestASTFloatingPointScopedClassificationSourcePredicates",
         "TestASTFloatingPointSpecialConstructorsScopedValue",
-        "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
+        "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
+        "TestASTFloatingPointSignedZeroSortOverloads"
       ],
       "conditionals": [
         {
@@ -16889,6 +16899,14 @@
           "tests": [
             "TestASTFloatingPointSpecialConstructorsScopedValue",
             "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
+          ]
+        },
+        {
+          "name": "Retained fpa_util mk_pzero(sort*) and mk_nzero(sort*) exponent-then-significand parameter reads before concrete scoped_mpf construction (src/ast/fpa_decl_plugin.h:252-253; src/ast/fpa_decl_plugin.cpp:939-975)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointSignedZeroSortOverloads"
           ]
         }
       ],
@@ -147633,7 +147651,8 @@
         "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy",
         "TestASTFloatingPointScopedClassificationSourcePredicates",
         "TestASTFloatingPointSpecialConstructorsScopedValue",
-        "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
+        "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
+        "TestASTFloatingPointSignedZeroSortOverloads"
       ],
       "conditionals": [
         {
@@ -148219,6 +148238,14 @@
           "tests": [
             "TestASTFloatingPointSpecialConstructorsScopedValue",
             "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
+          ]
+        },
+        {
+          "name": "Retained fpa_util mk_pzero(sort*) and mk_nzero(sort*) exponent-then-significand parameter reads before concrete scoped_mpf construction (src/ast/fpa_decl_plugin.h:252-253; src/ast/fpa_decl_plugin.cpp:939-975)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointSignedZeroSortOverloads"
           ]
         }
       ],
@@ -164458,7 +164485,8 @@
         "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy",
         "TestASTFloatingPointScopedClassificationSourcePredicates",
         "TestASTFloatingPointSpecialConstructorsScopedValue",
-        "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
+        "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
+        "TestASTFloatingPointSignedZeroSortOverloads"
       ],
       "conditionals": [
         {
@@ -164676,6 +164704,14 @@
           "tests": [
             "TestASTFloatingPointSpecialConstructorsScopedValue",
             "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
+          ]
+        },
+        {
+          "name": "Retained fpa_util mk_pzero(sort*) and mk_nzero(sort*) exponent-then-significand parameter reads before concrete scoped_mpf construction (src/ast/fpa_decl_plugin.h:252-253; src/ast/fpa_decl_plugin.cpp:939-975)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointSignedZeroSortOverloads"
           ]
         }
       ],

@@ -202,3 +202,40 @@ func TestASTFloatingPointSpecialNaNFailureRetainsScalar(t *testing.T) {
 	astFloatingPointConstructorRawGraph(t, m.numerals, p)
 	astTestMust(t, m.Close())
 }
+
+func TestASTFloatingPointSignedZeroSortOverloads(t *testing.T) {
+	m := astTestManager(t)
+	_, e := m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterBitVectorPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterFloatingPointPlugin()
+	astTestMust(t, e)
+	p := m.floatingPointPlugin
+	sort, e := m.mkFloatSort(8, 24)
+	astTestMust(t, e)
+	for _, negative := range []bool{false, true} {
+		n, e := p.mkSignedZeroFromSort(sort, negative)
+		astTestMust(t, e)
+		kind := astFPAPlusZero
+		class := astFloatPZero
+		if negative {
+			kind = astFPAMinusZero
+			class = astFloatNZero
+		}
+		family, got, e := m.declIdentity(m.appAt(n.slot).decl)
+		astTestMust(t, e)
+		if family != p.family || got != kind || p.numeralProbeFrames != nil {
+			t.Fatal("sort overload result and scope", negative, family, got, p.numeralProbeFrames)
+		}
+		matched, e := p.isNumeralClass(n, class)
+		astTestMust(t, e)
+		if !matched {
+			t.Fatal("sort overload lost sign", negative)
+		}
+	}
+	if n, e := p.mkSignedZeroFromSort(m.boolSort, false); e != ErrASTDomain || n.slot != 0 || p.numeralProbeFrames != nil {
+		t.Fatal("nonfloating sort entered local MPF constructor", n, e, p.numeralProbeFrames)
+	}
+	astTestMust(t, m.Close())
+}

@@ -227,3 +227,47 @@ func (p *astFloatingPointPluginOwner) mkSpecialNumeral(ebits, sbits uint32, clas
 	}
 	return p.mkNumeral(&f.value, nil)
 }
+
+// The retained sort overloads read exponent then significand parameters before
+// entering the unsigned-width special-value constructor and its local MPF.
+func (p *astFloatingPointPluginOwner) mkSignedZeroFromSort(sort astNodeRef, negative bool) (astNodeRef, error) {
+	if p == nil || p.self != p || p.owner == nil || p.owner.floatingPointPlugin != p || !p.published || p.sourceEnded {
+		return astNodeRef{}, ErrASTHandle
+	}
+	m := p.owner
+	if e := m.validNode(sort); e != nil {
+		return astNodeRef{}, e
+	}
+	if m.nodeAt(sort.slot).kind != ASTSort {
+		return astNodeRef{}, ErrASTDomain
+	}
+	info, e := m.sortInfo(m.sortAt(sort.slot).info)
+	if e != nil {
+		return astNodeRef{}, e
+	}
+	if info.family != p.family || info.kind != 0 {
+		return astNodeRef{}, ErrASTDomain
+	}
+	eParam, e := m.infoParameter(info, 0)
+	if e != nil {
+		return astNodeRef{}, e
+	}
+	eValue, e := m.parameterOfKind(eParam, ASTParameterInt)
+	if e != nil {
+		return astNodeRef{}, e
+	}
+	ebits := uint32(eValue.integer)
+	sParam, e := m.infoParameter(info, 1)
+	if e != nil {
+		return astNodeRef{}, e
+	}
+	sValue, e := m.parameterOfKind(sParam, ASTParameterInt)
+	if e != nil {
+		return astNodeRef{}, e
+	}
+	class := astFloatPZero
+	if negative {
+		class = astFloatNZero
+	}
+	return p.mkSpecialNumeral(ebits, uint32(sValue.integer), class)
+}
