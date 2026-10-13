@@ -157,3 +157,60 @@ func TestSubpavingFastClauseOpennessAndUnitResume(t *testing.T) {
 		t.Fatal("nil atom", err)
 	}
 }
+
+func TestSubpavingFastClauseSharedAtomSourceCleanup(t *testing.T) {
+	m, c, v, root := fastMonomialFixture(t, []bool{false, false, false})
+	makeAtom := func(variable uint32, value int32) *FastInequality {
+		t.Helper()
+		if err := m.SetInt32(v, value); err != nil {
+			t.Fatal(err)
+		}
+		a, err := c.NewInequality(variable, v, true, false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return a
+	}
+	shared, first, second := makeAtom(0, 1), makeAtom(1, 2), makeAtom(2, 3)
+	if err := c.AddUnitClause(shared, true); err != nil {
+		t.Fatal(err)
+	}
+	problem, err := c.AddClause([]*FastInequality{first, shared}, false, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	lemma, err := c.AddClause([]*FastInequality{second, shared}, true, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if shared.refs != 3 || first.refs != 1 || second.refs != 1 || len(c.watchOrder[0]) != 2 {
+		t.Fatal("source shared reference count and watch registration", shared.refs, first.refs, second.refs)
+	}
+	if err := c.releaseUnit(0); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.releaseClause(problem); err != nil {
+		t.Fatal(err)
+	}
+	if shared.refs != 1 || first.refs != 0 || len(c.watchOrder[0]) != 1 || len(c.watchOrder[1]) != 0 {
+		t.Fatal("problem clause cleanup", shared.refs, first.refs, c.watchOrder)
+	}
+	if _, err := first.owner.Get(); !errors.Is(err, arena.ErrClosed) {
+		t.Fatal("unreferenced problem atom stayed live", err)
+	}
+	if err := c.PropagateClause(problem, root); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatal("deleted problem clause propagated", err)
+	}
+	if err := c.releaseClause(lemma); err != nil {
+		t.Fatal(err)
+	}
+	if shared.refs != 0 || second.refs != 0 || len(c.watchOrder[0]) != 0 || len(c.watchOrder[2]) != 0 {
+		t.Fatal("lemma cleanup", shared.refs, second.refs, c.watchOrder)
+	}
+	if _, err := shared.owner.Get(); !errors.Is(err, arena.ErrClosed) {
+		t.Fatal("shared atom stayed live", err)
+	}
+	if err := c.Close(); err != nil {
+		t.Fatal(err)
+	}
+}

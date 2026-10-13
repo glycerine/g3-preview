@@ -41,6 +41,8 @@ type FastContext struct {
 	clauses          []*FastClause
 	unitClauses      []fastUnitClause
 	unitHead         int
+	initStage        uint8
+	initDefHead      uint32
 	closed           bool
 }
 
@@ -169,6 +171,20 @@ func (c *FastContext) Close() error {
 	}
 	if err := c.root.Close(); err != nil {
 		return err
+	}
+	for i := range c.unitClauses {
+		if err := c.releaseUnit(i); err != nil {
+			return err
+		}
+	}
+	for _, lemma := range []bool{false, true} {
+		for _, clause := range c.clauses {
+			if clause.lemma == lemma {
+				if err := c.releaseClause(clause); err != nil {
+					return err
+				}
+			}
+		}
 	}
 	for x := range c.isInt {
 		if p := c.polynomials[uint32(x)]; p != nil {

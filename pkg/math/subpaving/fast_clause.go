@@ -23,16 +23,20 @@ type FastInequality struct {
 }
 
 type FastClause struct {
-	context *FastContext
-	atoms   []*FastInequality
-	lemma   bool
-	watched bool
-	visited uint64
+	context        *FastContext
+	atoms          []*FastInequality
+	lemma          bool
+	watched        bool
+	visited        uint64
+	releaseAt      int
+	watchesRemoved bool
+	deleted        bool
 }
 
 type fastUnitClause struct {
-	atom  *FastInequality
-	axiom bool
+	atom     *FastInequality
+	axiom    bool
+	released bool
 }
 
 type fastWatch struct {
@@ -69,6 +73,61 @@ func (c *FastContext) checkInequality(a *FastInequality) error {
 	}
 	_, err := a.owner.Get()
 	return err
+}
+
+func (c *FastContext) releaseInequality(a *FastInequality) error {
+	if a.refs > 0 {
+		a.refs--
+	}
+	if a.refs == 0 {
+		return a.owner.Close()
+	}
+	return nil
+}
+
+func (c *FastContext) releaseUnit(i int) error {
+	unit := &c.unitClauses[i]
+	if unit.released {
+		return nil
+	}
+	if err := c.releaseInequality(unit.atom); err != nil {
+		return err
+	}
+	unit.released = true
+	return nil
+}
+
+func (c *FastContext) releaseClause(clause *FastClause) error {
+	if clause.deleted {
+		return nil
+	}
+	if !clause.watchesRemoved {
+		if clause.watched {
+			var previous uint32
+			for i, atom := range clause.atoms {
+				if i != 0 && atom.variable == previous {
+					continue
+				}
+				watchers := c.watchOrder[atom.variable]
+				for j, watch := range watchers {
+					if watch.clause == clause {
+						c.watchOrder[atom.variable] = append(watchers[:j], watchers[j+1:]...)
+						break
+					}
+				}
+				previous = atom.variable
+			}
+		}
+		clause.watchesRemoved = true
+	}
+	for clause.releaseAt < len(clause.atoms) {
+		if err := c.releaseInequality(clause.atoms[clause.releaseAt]); err != nil {
+			return err
+		}
+		clause.releaseAt++
+	}
+	clause.deleted = true
+	return nil
 }
 
 // AddClause retains the input atom pointers in stable variable order. Source
@@ -215,7 +274,7 @@ func (c *FastContext) PropagateClause(clause *FastClause, n *FastNode) error {
 	if err := c.open(); err != nil {
 		return err
 	}
-	if clause == nil || clause.context != c || n == nil || n.context != c || n.inconsistent {
+	if clause == nil || clause.context != c || clause.deleted || n == nil || n.context != c || n.inconsistent {
 		return arena.ErrInvalidSlot
 	}
 	if err := n.open(); err != nil {

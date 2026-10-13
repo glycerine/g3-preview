@@ -50041,7 +50041,9 @@
         "pkg/math/subpaving/fast_monomial.go",
         "pkg/math/subpaving/fast_monomial_test.go",
         "pkg/math/subpaving/fast_clause.go",
-        "pkg/math/subpaving/fast_clause_test.go"
+        "pkg/math/subpaving/fast_clause_test.go",
+        "pkg/math/subpaving/fast_context_init.go",
+        "pkg/math/subpaving/fast_context_init_test.go"
       ],
       "tests": [
         "TestSubpavingFastMutableIntervalRetainedCore",
@@ -50063,7 +50065,10 @@
         "TestSubpavingFastMonomialReverseAndSourceScratch",
         "TestSubpavingFastMonomialIntervalDisplaySmoke",
         "TestSubpavingFastClauseStableWatchUnitAndConflict",
-        "TestSubpavingFastClauseOpennessAndUnitResume"
+        "TestSubpavingFastClauseOpennessAndUnitResume",
+        "TestSubpavingFastClauseSharedAtomSourceCleanup",
+        "TestSubpavingFastContextRootInitializationOrderAndResume",
+        "TestSubpavingFastContextRootInitializationUnitConflict"
       ],
       "conditionals": [
         {
@@ -50110,16 +50115,32 @@
           ],
           "tests": [
             "TestSubpavingFastClauseStableWatchUnitAndConflict",
-            "TestSubpavingFastClauseOpennessAndUnitResume"
+            "TestSubpavingFastClauseOpennessAndUnitResume",
+            "TestSubpavingFastClauseSharedAtomSourceCleanup"
+          ]
+        },
+        {
+          "name": "Concrete config_mpff source-order root unit assertion, definition sweep, queue drain and resumable cancellation; shared clause/inequality teardown (src/math/subpaving/subpaving_t_def.h:845-861,1092-1111,1753-1808)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_context_init.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_context.go",
+            "pkg/math/subpaving/fast_clause.go"
+          ],
+          "tests": [
+            "TestSubpavingFastClauseSharedAtomSourceCleanup",
+            "TestSubpavingFastContextRootInitializationOrderAndResume",
+            "TestSubpavingFastContextRootInitializationUnitConflict"
           ]
         }
       ],
       "ownership": [
         "The mutable fast-float interval owns both scoped endpoints and borrows its fast-float manager.",
-        "Fast inequalities own copied scoped fast-float values through their context. Clauses borrow atom pointers, count source-style references and register each watched variable once; context close retires the owning values after nodes. Learned-clause deletion and justification lifetime remain open."
+        "Fast inequalities own copied scoped fast-float values through their context. Clauses borrow atom pointers, count source-style references and register each watched variable once; context close retires the owning values after nodes. Learned-clause deletion and justification lifetime remain open.",
+        "Root close precedes source-order unit then problem-clause then lemma reference release; shared inequality values close at their last reference, and remaining unreferenced context-owned values close before context numerals. Idempotent release progress preserves cleanup retries."
       ],
       "deviations": [
-        "The config_mpff context now has concrete clause value/propagation and root unit assertion paths. Learned-clause deletion/justification retention, search and full solver lifecycle remain unported."
+        "The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Bound justification metadata, node search/splitting and the full solver lifecycle remain unported."
       ]
     },
     {
@@ -50257,7 +50278,9 @@
         "pkg/math/subpaving/fast_monomial.go",
         "pkg/math/subpaving/fast_monomial_test.go",
         "pkg/math/subpaving/fast_clause.go",
-        "pkg/math/subpaving/fast_clause_test.go"
+        "pkg/math/subpaving/fast_clause_test.go",
+        "pkg/math/subpaving/fast_context_init.go",
+        "pkg/math/subpaving/fast_context_init_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50306,7 +50329,10 @@
         "TestSubpavingFastMonomialReverseAndSourceScratch",
         "TestSubpavingFastMonomialIntervalDisplaySmoke",
         "TestSubpavingFastClauseStableWatchUnitAndConflict",
-        "TestSubpavingFastClauseOpennessAndUnitResume"
+        "TestSubpavingFastClauseOpennessAndUnitResume",
+        "TestSubpavingFastClauseSharedAtomSourceCleanup",
+        "TestSubpavingFastContextRootInitializationOrderAndResume",
+        "TestSubpavingFastContextRootInitializationUnitConflict"
       ],
       "conditionals": [
         {
@@ -50465,16 +50491,32 @@
           ],
           "tests": [
             "TestSubpavingFastClauseStableWatchUnitAndConflict",
-            "TestSubpavingFastClauseOpennessAndUnitResume"
+            "TestSubpavingFastClauseOpennessAndUnitResume",
+            "TestSubpavingFastClauseSharedAtomSourceCleanup"
+          ]
+        },
+        {
+          "name": "Concrete config_mpff source-order root unit assertion, definition sweep, queue drain and resumable cancellation; shared clause/inequality teardown (src/math/subpaving/subpaving_t_def.h:845-861,1092-1111,1753-1808)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_context_init.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_context.go",
+            "pkg/math/subpaving/fast_clause.go"
+          ],
+          "tests": [
+            "TestSubpavingFastClauseSharedAtomSourceCleanup",
+            "TestSubpavingFastContextRootInitializationOrderAndResume",
+            "TestSubpavingFastContextRootInitializationUnitConflict"
           ]
         }
       ],
       "ownership": [
         "The mutable interval and node bounds own their fast-float endpoints; constant interval views borrow current node bounds. The context owns its root, parameter numerals and copied polynomial coefficients, and borrows the numeric manager and resource limit.",
-        "Fast inequalities own copied scoped fast-float values through their context. Clauses borrow atom pointers, count source-style references and register each watched variable once; context close retires the owning values after nodes. Learned-clause deletion and justification lifetime remain open."
+        "Fast inequalities own copied scoped fast-float values through their context. Clauses borrow atom pointers, count source-style references and register each watched variable once; context close retires the owning values after nodes. Learned-clause deletion and justification lifetime remain open.",
+        "Root close precedes source-order unit then problem-clause then lemma reference release; shared inequality values close at their last reference, and remaining unreferenced context-owned values close before context numerals. Idempotent release progress preserves cleanup retries."
       ],
       "deviations": [
-        "The config_mpff context now has concrete clause value/propagation and root unit assertion paths. Learned-clause deletion/justification retention, search and full solver lifecycle remain unported."
+        "The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Bound justification metadata, node search/splitting and the full solver lifecycle remain unported."
       ]
     },
     {
@@ -50519,7 +50561,9 @@
         "pkg/math/subpaving/fast_monomial.go",
         "pkg/math/subpaving/fast_monomial_test.go",
         "pkg/math/subpaving/fast_clause.go",
-        "pkg/math/subpaving/fast_clause_test.go"
+        "pkg/math/subpaving/fast_clause_test.go",
+        "pkg/math/subpaving/fast_context_init.go",
+        "pkg/math/subpaving/fast_context_init_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50558,7 +50602,10 @@
         "TestSubpavingFastMonomialReverseAndSourceScratch",
         "TestSubpavingFastMonomialIntervalDisplaySmoke",
         "TestSubpavingFastClauseStableWatchUnitAndConflict",
-        "TestSubpavingFastClauseOpennessAndUnitResume"
+        "TestSubpavingFastClauseOpennessAndUnitResume",
+        "TestSubpavingFastClauseSharedAtomSourceCleanup",
+        "TestSubpavingFastContextRootInitializationOrderAndResume",
+        "TestSubpavingFastContextRootInitializationUnitConflict"
       ],
       "assertions": [
         {
@@ -50951,16 +50998,32 @@
           ],
           "tests": [
             "TestSubpavingFastClauseStableWatchUnitAndConflict",
-            "TestSubpavingFastClauseOpennessAndUnitResume"
+            "TestSubpavingFastClauseOpennessAndUnitResume",
+            "TestSubpavingFastClauseSharedAtomSourceCleanup"
+          ]
+        },
+        {
+          "name": "Concrete config_mpff source-order root unit assertion, definition sweep, queue drain and resumable cancellation; shared clause/inequality teardown (src/math/subpaving/subpaving_t_def.h:845-861,1092-1111,1753-1808)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_context_init.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_context.go",
+            "pkg/math/subpaving/fast_clause.go"
+          ],
+          "tests": [
+            "TestSubpavingFastClauseSharedAtomSourceCleanup",
+            "TestSubpavingFastContextRootInitializationOrderAndResume",
+            "TestSubpavingFastContextRootInitializationUnitConflict"
           ]
         }
       ],
       "ownership": [
         "Each fast-float node owns the bounds it publishes; child nodes borrow inherited parent bounds until closed. The context owns its parameter numerals, root and copied polynomial coefficients, and borrows the fast-float manager and resource limit.",
-        "Fast inequalities own copied scoped fast-float values through their context. Clauses borrow atom pointers, count source-style references and register each watched variable once; context close retires the owning values after nodes. Learned-clause deletion and justification lifetime remain open."
+        "Fast inequalities own copied scoped fast-float values through their context. Clauses borrow atom pointers, count source-style references and register each watched variable once; context close retires the owning values after nodes. Learned-clause deletion and justification lifetime remain open.",
+        "Root close precedes source-order unit then problem-clause then lemma reference release; shared inequality values close at their last reference, and remaining unreferenced context-owned values close before context numerals. Idempotent release progress preserves cleanup retries."
       ],
       "deviations": [
-        "The config_mpff context now has concrete clause value/propagation and root unit assertion paths. Learned-clause deletion/justification retention, search and full solver lifecycle remain unported."
+        "The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Bound justification metadata, node search/splitting and the full solver lifecycle remain unported."
       ]
     },
     {
