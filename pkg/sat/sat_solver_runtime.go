@@ -20,6 +20,7 @@ var ErrSATRuntimeLive = errors.New("sat: borrowed runtime still has live solver 
 type RuntimeConfig struct {
 	Budget        *arena.Budget
 	ParamsContext *uparams.ParamsContext
+	Process       *umemory.ProcessAccounting
 }
 type Runtime struct {
 	self            *Runtime
@@ -39,6 +40,14 @@ func NewRuntime(c RuntimeConfig) (r *Runtime, err error) {
 	if err = c.ParamsContext.CheckOpen(); err != nil {
 		return nil, err
 	}
+	numerals := c.ParamsContext.Numerals()
+	if numerals == nil || numerals.RuntimeOwner() == nil || (c.Process != nil && !c.Process.Valid()) {
+		return nil, ErrSATOwner
+	}
+	numericProcess := numerals.RuntimeOwner().ProcessOwner()
+	if (c.Process != nil || numericProcess != nil) && c.Process != numericProcess {
+		return nil, ErrSATOwner
+	}
 	n := uint64(reflect.TypeOf(Runtime{}).Size())
 	if err = c.Budget.Reserve(n); err != nil {
 		return nil, err
@@ -54,7 +63,7 @@ func NewRuntime(c RuntimeConfig) (r *Runtime, err error) {
 			}
 		}
 	}()
-	if r.memory, err = umemory.NewRuntime(umemory.RuntimeConfig{Budget: c.Budget}); err != nil {
+	if r.memory, err = umemory.NewRuntime(umemory.RuntimeConfig{Budget: c.Budget, Process: c.Process}); err != nil {
 		return r, err
 	}
 	// GetModule does not execute descriptor registration. Optional descriptor

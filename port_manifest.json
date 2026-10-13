@@ -146590,7 +146590,8 @@
         "pkg/util/text/util_numeric_stream_file_test.go",
         "pkg/util/text/util_numeric_stream.go",
         "pkg/util/memory/runtime_initialization_oom.go",
-        "pkg/util/memory/process_display.go"
+        "pkg/util/memory/process_display.go",
+        "pkg/sat/sat_solver_runtime.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -146656,6 +146657,7 @@
         "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
         "TestMemoryRuntimeInitializationClearReachedOwnerGuard",
         "TestProcessDisplayMaxUsageSharedPeakAndInsertionPrefixes",
+        "TestSATRuntimeSharedProcessAndNumeralCohort",
         "TestNumericStreamNativeCountedTextAndOwnedInput"
       ],
       "conditionals": [
@@ -146711,6 +146713,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "SAT solver process cohort binds its raw Runtime to parameter numeral ProcessAccounting and reads other-runtime bytes at retained memory-stat checkpoint (sat_solver.cpp:3762; sat_types.h:289-293)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_runtime.go",
+          "tests": [
+            "TestSATRuntimeSharedProcessAndNumeralCohort"
+          ]
+        },
         {
           "name": "memory::display_max_usage shared peak read, default six-significant-digit megabyte conversion and retained shell insertion prefixes (cpp187-192; shell/z3_log_frontend.cpp:37)",
           "status": "ported",
@@ -146923,7 +146933,8 @@
         "pkg/util/text/util_numeric_stream_file_test.go",
         "pkg/util/text/util_numeric_stream.go",
         "pkg/util/memory/runtime_initialization_oom.go",
-        "pkg/util/memory/process_display.go"
+        "pkg/util/memory/process_display.go",
+        "pkg/sat/sat_solver_runtime.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -146977,6 +146988,7 @@
         "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
         "TestMemoryRuntimeInitializationClearReachedOwnerGuard",
         "TestProcessDisplayMaxUsageSharedPeakAndInsertionPrefixes",
+        "TestSATRuntimeSharedProcessAndNumeralCohort",
         "TestNumericStreamNativeCountedTextAndOwnedInput"
       ],
       "conditionals": [
@@ -147036,6 +147048,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "SAT solver process cohort binds its raw Runtime to parameter numeral ProcessAccounting and reads other-runtime bytes at retained memory-stat checkpoint (sat_solver.cpp:3762; sat_types.h:289-293)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_runtime.go",
+          "tests": [
+            "TestSATRuntimeSharedProcessAndNumeralCohort"
+          ]
+        },
         {
           "name": "memory::display_max_usage shared peak read, default six-significant-digit megabyte conversion and retained shell insertion prefixes (cpp187-192; shell/z3_log_frontend.cpp:37)",
           "status": "ported",
