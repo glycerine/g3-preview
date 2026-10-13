@@ -335,13 +335,19 @@ func (m *FastFloatManager) toBuffer(i int, a *FastFloat, extension, shift bool) 
 		ffCopy(s, b)
 	}
 }
-func (m *FastFloatManager) Div(a, b, c *FastFloat) error {
+func (m *FastFloatManager) Div(a, b, c *FastFloat) (err error) {
 	if e := m.triple(a, b, c); e != nil {
 		return e
 	}
 	if b.index() == 0 {
 		return ErrFastFloatDivisionByZero
 	}
+	m.traceDivOuter(a, b, c, true)
+	defer func() {
+		if err == nil {
+			m.traceDivOuter(a, b, c, false)
+		}
+	}()
 	if a.index() == 0 {
 		return m.Reset(c)
 	}
@@ -373,6 +379,7 @@ func (m *FastFloatManager) Div(a, b, c *FastFloat) error {
 		return e
 	}
 	q, r := m.buffer(1, m.precision+1), m.buffer(2, m.precision)
+	m.traceDivQuotient(q)
 	lz := ffNLZ(q)
 	if SourceExtendedGCDDebug && !(!ffIsZero(q) && lz < q.size*32) {
 		return ErrFastFloatInvariant
