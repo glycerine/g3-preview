@@ -1390,14 +1390,16 @@
     {
       "package": "util/bitset",
       "imports": [
-        "arena"
+        "arena",
+        "util/diagnostic"
       ],
       "production_files": [
         "approx.go",
         "fixed.go",
         "hash.go",
         "uint_set.go",
-        "vector.go"
+        "vector.go",
+        "vector_trace.go"
       ]
     },
     {
@@ -1908,9 +1910,12 @@
     },
     {
       "package": "util/mincut",
-      "imports": [],
+      "imports": [
+        "util/diagnostic"
+      ],
       "production_files": [
-        "min_cut.go"
+        "min_cut.go",
+        "min_cut_trace.go"
       ]
     },
     {
@@ -2343,6 +2348,7 @@
       "package": "util/symbol",
       "imports": [
         "arena",
+        "util/diagnostic",
         "util/hash"
       ],
       "production_files": [

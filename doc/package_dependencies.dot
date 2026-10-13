@@ -213,6 +213,7 @@ digraph packages {
   "util/backtrack" -> "util/diagnostic";
   "util/bitset" [style=filled, fillcolor="#dceafa"];
   "util/bitset" -> "arena";
+  "util/bitset" -> "util/diagnostic";
   "util/checkedint" [style=filled, fillcolor="#dceafa"];
   "util/cliques" [style=filled, fillcolor="#dceafa"];
   "util/control" [style=filled, fillcolor="#dceafa"];
@@ -250,6 +251,7 @@ digraph packages {
   "util/memory" -> "arena";
   "util/messages" [style=filled, fillcolor="#dceafa"];
   "util/mincut" [style=filled, fillcolor="#dceafa"];
+  "util/mincut" -> "util/diagnostic";
   "util/natset" [style=filled, fillcolor="#dceafa"];
   "util/numeral" [style=filled, fillcolor="#dceafa"];
   "util/numeral" -> "arena";
@@ -296,6 +298,7 @@ digraph packages {
   "util/stopwatch" -> "util/memory";
   "util/symbol" [style=filled, fillcolor="#dceafa"];
   "util/symbol" -> "arena";
+  "util/symbol" -> "util/diagnostic";
   "util/symbol" -> "util/hash";
   "util/text" [style=filled, fillcolor="#dceafa"];
   "util/text" -> "arena";
