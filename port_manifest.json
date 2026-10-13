@@ -117686,7 +117686,8 @@
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
         "pkg/math/subpaving/hardware_interval_mul.go",
-        "pkg/math/subpaving/hardware_interval_div.go"
+        "pkg/math/subpaving/hardware_interval_div.go",
+        "pkg/util/numeral/hwf_power_of_two.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -117709,7 +117710,8 @@
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
         "TestSubpavingHardwareIntervalPowerRetainedBranches",
         "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
-        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
+        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
+        "TestHardwareFloatPrevPowerOfTwoSourceBoundaries"
       ],
       "conditionals": [
         {
@@ -117803,7 +117805,7 @@
           ]
         },
         {
-          "name": "Uncalled f2n<hwf_manager> field/precise, arbitrary mode setter, second inverse overload, power-of-two, decimal and SMT2 display helpers",
+          "name": "Uncalled f2n<hwf_manager> field/precise, arbitrary mode setter, second inverse overload, decimal and SMT2 display helpers",
           "status": "reference_only"
         },
         {
@@ -117875,6 +117877,14 @@
             "TestSubpavingHardwareIntervalPowerRetainedBranches",
             "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
             "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
+          ]
+        },
+        {
+          "name": "Concrete f2n<hwf_manager> previous-power forwarding reached by retained hardware Newton root (src/util/f2n.h:145)",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/hwf_power_of_two.go",
+          "tests": [
+            "TestHardwareFloatPrevPowerOfTwoSourceBoundaries"
           ]
         }
       ],
@@ -119660,7 +119670,8 @@
         "pkg/util/numeral/hwf_rational_set.go",
         "pkg/util/numeral/hwf_rational_output.go",
         "pkg/util/numeral/hwf_rational_string.go",
-        "pkg/util/numeral/hwf_scientific.go"
+        "pkg/util/numeral/hwf_scientific.go",
+        "pkg/util/numeral/hwf_power_of_two.go"
       ],
       "tests": [
         "TestHardwareFloatSourceBinary64Classification",
@@ -119676,7 +119687,8 @@
         "TestHardwareFloatSourceToRationalOwnerGuards",
         "TestHardwareFloatRationalStringMatchesSourceConversion",
         "TestHardwareFloatRationalStringSourceFiniteGuard",
-        "TestHardwareFloatSourceScientificTraceDisplay"
+        "TestHardwareFloatSourceScientificTraceDisplay",
+        "TestHardwareFloatPrevPowerOfTwoSourceBoundaries"
       ],
       "conditionals": [
         {
@@ -120136,6 +120148,14 @@
             "TestHardwareFloatDirectedArithmetic",
             "TestHardwareFloatRoundToIntegralSourceModes"
           ]
+        },
+        {
+          "name": "hwf_manager previous-power-of-two source exponent cutoff and unsigned result reached by hardware Newton root (src/util/hwf.cpp:577-584)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_power_of_two.go",
+          "tests": [
+            "TestHardwareFloatPrevPowerOfTwoSourceBoundaries"
+          ]
         }
       ],
       "ownership": [
@@ -120157,7 +120177,8 @@
         "pkg/util/numeral/hwf_rational_set.go",
         "pkg/util/numeral/hwf_rational_output.go",
         "pkg/util/numeral/hwf_rational_string.go",
-        "pkg/util/numeral/hwf_scientific.go"
+        "pkg/util/numeral/hwf_scientific.go",
+        "pkg/util/numeral/hwf_power_of_two.go"
       ],
       "tests": [
         "TestHardwareFloatSourceBinary64Classification",
@@ -120173,7 +120194,8 @@
         "TestHardwareFloatSourceToRationalOwnerGuards",
         "TestHardwareFloatRationalStringMatchesSourceConversion",
         "TestHardwareFloatRationalStringSourceFiniteGuard",
-        "TestHardwareFloatSourceScientificTraceDisplay"
+        "TestHardwareFloatSourceScientificTraceDisplay",
+        "TestHardwareFloatPrevPowerOfTwoSourceBoundaries"
       ],
       "conditionals": [
         {
@@ -120280,6 +120302,14 @@
           "tests": [
             "TestHardwareFloatDirectedArithmetic",
             "TestHardwareFloatRoundToIntegralSourceModes"
+          ]
+        },
+        {
+          "name": "hwf_manager previous-power-of-two source exponent cutoff and unsigned result reached by hardware Newton root (src/util/hwf.h:165)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_power_of_two.go",
+          "tests": [
+            "TestHardwareFloatPrevPowerOfTwoSourceBoundaries"
           ]
         }
       ],
