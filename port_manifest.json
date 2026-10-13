@@ -51738,6 +51738,8 @@
         "pkg/math/subpaving/arbitrary_shell_coefficients_test.go",
         "pkg/math/subpaving/arbitrary_clause_propagation_test.go",
         "pkg/math/subpaving/arbitrary_context_propagate.go",
+        "pkg/math/subpaving/arbitrary_context_relevance.go",
+        "pkg/math/subpaving/arbitrary_context_relevance_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
@@ -51826,6 +51828,7 @@
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
         "TestArbitraryClauseSourceTruthAndPropagation",
         "TestArbitraryClauseQueuedWatchOrderAndCancellation",
+        "TestArbitraryContextSourceCandidateRelevanceAndNormalization",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -52494,6 +52497,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_params.go",
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf candidate integer normalization, conflict-first relevance, maximum bound and positive-epsilon gap (src/math/subpaving/subpaving_t_def.h:1179-1317)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_context_relevance.go",
+          "tests": [
+            "TestArbitraryContextSourceCandidateRelevanceAndNormalization"
           ]
         },
         {
@@ -118541,6 +118552,7 @@
         "pkg/util/numeral/mpf_numeral_lifetime.go",
         "pkg/math/subpaving/arbitrary_context_root.go",
         "pkg/math/subpaving/arbitrary_context_bounds.go",
+        "pkg/math/subpaving/arbitrary_context_relevance.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
@@ -118567,6 +118579,7 @@
         "TestArbitraryFloatNumeralSourceDirectedSetAndArithmetic",
         "TestArbitraryFloatNumeralSourcePostCheckAndClose",
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
+        "TestArbitraryContextSourceCandidateRelevanceAndNormalization",
         "TestArbitraryFloatNumeralSourcePredicatesAndOrder",
         "TestArbitraryFloatNumeralSourceFloorCeilAndClose",
         "TestArbitraryFloatNumeralSourceReciprocalIncrementAndPower",

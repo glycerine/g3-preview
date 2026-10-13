@@ -38,6 +38,8 @@ type ArbitraryContext struct {
 	queueHead                                       int
 	timestamp                                       uint64
 	numVisited                                      uint64
+	candidateScratch                                numeral.ArbitraryFloat
+	relevanceScratch                                [3]numeral.ArbitraryFloat
 	owners                                          [4]*numeral.ScopedArbitraryFloatNumeral
 	epsilon, maxBound, minusMaxBound, rootPrecision *numeral.ArbitraryFloat
 	zeroEpsilon                                     bool
@@ -187,6 +189,14 @@ func (c *ArbitraryContext) Close() error {
 	}
 	if err := c.closeNumerals(); err != nil {
 		return err
+	}
+	if err := c.numbers.Del(&c.candidateScratch); err != nil {
+		return err
+	}
+	for i := range c.relevanceScratch {
+		if err := c.numbers.Del(&c.relevanceScratch[i]); err != nil {
+			return err
+		}
 	}
 	c.queue = nil
 	c.queueHead = 0

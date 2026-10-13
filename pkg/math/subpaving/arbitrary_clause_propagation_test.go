@@ -20,6 +20,10 @@ type arbitraryClauseFixture struct {
 }
 
 func newArbitraryClauseFixture(t *testing.T) *arbitraryClauseFixture {
+	return newArbitraryClauseFixtureWithPolicy(t, 0, false)
+}
+
+func newArbitraryClauseFixtureWithPolicy(t *testing.T, epsilon uint32, yInteger bool) *arbitraryClauseFixture {
 	t.Helper()
 	b := arena.NewBudget(1 << 27)
 	r, err := umm.NewRuntime(umm.RuntimeConfig{Budget: b, SizeTBits: 64})
@@ -38,7 +42,7 @@ func newArbitraryClauseFixture(t *testing.T) *arbitraryClauseFixture {
 	if err != nil {
 		t.Fatal(err)
 	}
-	c, err := NewArbitraryContext(numbers, &control.Reslimit{Limit: 100}, 0, 0, 1)
+	c, err := NewArbitraryContext(numbers, &control.Reslimit{Limit: 100}, epsilon, 2, 1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,7 +50,7 @@ func newArbitraryClauseFixture(t *testing.T) *arbitraryClauseFixture {
 	if f.x, err = c.NewVariable(false); err != nil {
 		t.Fatal(err)
 	}
-	if f.y, err = c.NewVariable(false); err != nil {
+	if f.y, err = c.NewVariable(yInteger); err != nil {
 		t.Fatal(err)
 	}
 	if err := numbers.SetInt32(&f.four, 4); err != nil {
