@@ -18093,7 +18093,8 @@
         "pkg/ast/pattern/contains_subpattern.go",
         "pkg/ast/pattern/candidate_selection.go",
         "pkg/ast/pattern/multi_pattern.go",
-        "pkg/ast/pattern/preferred_pattern.go"
+        "pkg/ast/pattern/preferred_pattern.go",
+        "pkg/ast/pattern/pattern_selection.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18102,7 +18103,8 @@
         "TestPatternInferenceStableWeightAndUnaryPatternOwnership",
         "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
         "TestPatternInferenceMultiPatternThirtyTwoSplitCap",
-        "TestPatternInferencePreferredPatternsCompleteAndOwned"
+        "TestPatternInferencePreferredPatternsCompleteAndOwned",
+        "TestPatternInferenceSelectionStagesAndMultiBudget"
       ],
       "conditionals": [
         {
@@ -18235,6 +18237,14 @@
           "tests": [
             "TestPatternInferencePreferredPatternsCompleteAndOwned"
           ]
+        },
+        {
+          "name": "mk_patterns collected-candidate stage order: loop filter, preferred short-circuit, larger filter, unary selection and stable multi budget",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/pattern_selection.go",
+          "tests": [
+            "TestPatternInferenceSelectionStagesAndMultiBudget"
+          ]
         }
       ],
       "ownership": [],
@@ -18253,7 +18263,8 @@
         "pkg/ast/pattern/contains_subpattern.go",
         "pkg/ast/pattern/candidate_selection.go",
         "pkg/ast/pattern/multi_pattern.go",
-        "pkg/ast/pattern/preferred_pattern.go"
+        "pkg/ast/pattern/preferred_pattern.go",
+        "pkg/ast/pattern/pattern_selection.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18262,7 +18273,8 @@
         "TestPatternInferenceStableWeightAndUnaryPatternOwnership",
         "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
         "TestPatternInferenceMultiPatternThirtyTwoSplitCap",
-        "TestPatternInferencePreferredPatternsCompleteAndOwned"
+        "TestPatternInferencePreferredPatternsCompleteAndOwned",
+        "TestPatternInferenceSelectionStagesAndMultiBudget"
       ],
       "conditionals": [
         {
@@ -18330,6 +18342,14 @@
           "go_target": "pkg/ast/pattern/preferred_pattern.go",
           "tests": [
             "TestPatternInferencePreferredPatternsCompleteAndOwned"
+          ]
+        },
+        {
+          "name": "mk_patterns collected-candidate orchestration and source multi-pattern budget",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/pattern_selection.go",
+          "tests": [
+            "TestPatternInferenceSelectionStagesAndMultiBudget"
           ]
         }
       ],
