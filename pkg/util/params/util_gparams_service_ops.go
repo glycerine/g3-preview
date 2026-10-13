@@ -5,10 +5,12 @@ package params
 import (
 	"bytes"
 	"errors"
+	"fmt"
 
 	"github.com/glycerine/g3/pkg/arena"
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var ErrGlobalParamsAssertion = errors.New("g3: global parameters source assertion")
@@ -22,6 +24,16 @@ func (s *GlobalParamsService) BindNamespaceAssertions(d *udiag.DebugContext) err
 		return e
 	}
 	s.namespaceAssertions = d
+	return nil
+}
+
+// BindNamespaceTrace borrows the concrete process trace state for this source
+// namespace. Nil restores the process-global state used by gparams::set.
+func (s *GlobalParamsService) BindNamespaceTrace(t *udiag.TraceTags) error {
+	if e := s.open(); e != nil {
+		return e
+	}
+	s.namespaceTrace = t
 	return nil
 }
 func (s *GlobalParamsService) NamespaceAssertionsEnabled() (bool, error) {
@@ -68,6 +80,19 @@ func (s *GlobalParamsService) SourceReset() error {
 	return g.Reset()
 }
 func (s *GlobalParamsService) SourceSetName(name, value string) error {
+	if e := s.open(); e != nil {
+		return e
+	}
+	trace := s.namespaceTrace
+	if trace == nil {
+		trace = udiag.BorrowProcessTraceTags()
+	}
+	if trace.ShouldTrace("gparams") {
+		body := fmt.Sprintf("setting [%s] <- '%s'\n", name[:utext.CStringLength(name)], value[:utext.CStringLength(value)])
+		if e := trace.Emit("gparams", "set", "src/util/gparams.cpp", 563, body); e != nil {
+			return e
+		}
+	}
 	g, e := s.namespaceImpAt(564)
 	if e != nil {
 		return e

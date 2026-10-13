@@ -19,6 +19,7 @@ var ErrGlobalParamsUninitialized = errors.New("g3: source global parameter point
 type GlobalParamsService struct {
 	self                        *GlobalParamsService
 	namespaceAssertions         *udiag.DebugContext
+	namespaceTrace              *udiag.TraceTags
 	Symbols                     *usymbol.Manager
 	Context                     *ParamsContext
 	Config                      GlobalParamsConfig
