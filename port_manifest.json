@@ -117073,6 +117073,18 @@
             "TestSubpavingFastFloatExtendedRetainedBranches",
             "TestExtendedInfinityDisplaysShortWrites"
           ]
+        },
+        {
+          "name": "Subpaving context_mpq interval extended-number operations distinct from the default rational interval owner",
+          "status": "unported"
+        },
+        {
+          "name": "Subpaving context_mpf interval extended-number operations through concrete f2n<mpf_manager>",
+          "status": "unported"
+        },
+        {
+          "name": "Subpaving context_hwf interval extended-number operations through concrete f2n<hwf_manager>",
+          "status": "unported"
         }
       ],
       "ownership": [
@@ -117081,7 +117093,7 @@
       "deviations": [
         "No generic manager-interface translation is retained. Concrete mpq, mpbq, mpfx and mpff specializations live beside their interval and subpaving consumers. src/test/ext_numeral.cpp is test-only.",
         "The interval_manager mpq and real-closure mpbq specializations have concrete live sign, order, arithmetic, reciprocal, power and display paths, with caller-owned outputs and borrowed numerals. The mpbq division and reciprocal paths preserve the real-closure precision and rounding direction. Other retained subpaving mpq/mpfx/mpf/mpff/hwf instantiations remain open.",
-        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner. The mpff helper serves mutable and constant-node fast-float interval views; the enclosing subpaving context is partial. Concrete mpq/mpbq/mpfx/mpff displays now report Go io.Writer short writes after the exact emitted prefix. Other extended-number instantiations remain unfinished."
+        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner. The mpff helper serves mutable and constant-node fast-float interval views; the enclosing subpaving context is partial. Concrete mpq/mpbq/mpfx/mpff displays now report Go io.Writer short writes after the exact emitted prefix. Source subpaving.cpp constructs context_mpq, context_mpf and context_hwf as additional live interval-manager instantiations; their concrete extended-number paths remain unported."
       ]
     },
     {
