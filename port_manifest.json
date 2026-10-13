@@ -54102,6 +54102,7 @@
         "pkg/model/model_evaluator_bv_unspecified_test.go"
       ],
       "tests": [
+        "TestModelEvaluatorSharedProcessMemoryAndCohort",
         "TestModelEvaluatorConstantCompletionAndBooleanReduction",
         "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
         "TestModelEvaluatorResourceLimitsAndReset",
@@ -54169,6 +54170,7 @@
           "status": "partial",
           "go_target": "pkg/model/model_evaluator.go",
           "tests": [
+            "TestModelEvaluatorSharedProcessMemoryAndCohort",
             "TestModelEvaluatorConstantCompletionAndBooleanReduction",
             "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
             "TestModelEvaluatorResourceLimitsAndReset",
@@ -54255,6 +54257,7 @@
         "pkg/model/model_array_tuple_table.go"
       ],
       "tests": [
+        "TestModelEvaluatorSharedProcessMemoryAndCohort",
         "TestModelEvaluatorConstantCompletionAndBooleanReduction",
         "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
         "TestModelEvaluatorResourceLimitsAndReset",
@@ -54298,6 +54301,7 @@
           "status": "partial",
           "go_target": "pkg/model/model_evaluator.go",
           "tests": [
+            "TestModelEvaluatorSharedProcessMemoryAndCohort",
             "TestModelEvaluatorConstantCompletionAndBooleanReduction",
             "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
             "TestModelEvaluatorResourceLimitsAndReset",
@@ -146595,7 +146599,8 @@
         "pkg/util/memory/runtime_initialization_oom.go",
         "pkg/util/memory/process_display.go",
         "pkg/sat/sat_solver_runtime.go",
-        "pkg/sat/tactic/sat_goal_to_sat.go"
+        "pkg/sat/tactic/sat_goal_to_sat.go",
+        "pkg/model/model_evaluator.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -146663,6 +146668,7 @@
         "TestProcessDisplayMaxUsageSharedPeakAndInsertionPrefixes",
         "TestSATRuntimeSharedProcessAndNumeralCohort",
         "TestSATGoalTranslatorSharedProcessMemoryCheckpoint",
+        "TestModelEvaluatorSharedProcessMemoryAndCohort",
         "TestNumericStreamNativeCountedTextAndOwnedInput"
       ],
       "conditionals": [
@@ -146718,6 +146724,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "model evaluator max-memory checkpoint shares AST, parameter and explicit raw Runtime process bytes (model_evaluator.cpp:282-290)",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator.go",
+          "tests": [
+            "TestModelEvaluatorSharedProcessMemoryAndCohort"
+          ]
+        },
         {
           "name": "goal2sat and sat2goal memory checkpoints share the actual AST/SAT numeral process counter (goal2sat.cpp:380-391,685-699)",
           "status": "ported",
@@ -146948,7 +146962,8 @@
         "pkg/util/memory/runtime_initialization_oom.go",
         "pkg/util/memory/process_display.go",
         "pkg/sat/sat_solver_runtime.go",
-        "pkg/sat/tactic/sat_goal_to_sat.go"
+        "pkg/sat/tactic/sat_goal_to_sat.go",
+        "pkg/model/model_evaluator.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -147004,6 +147019,7 @@
         "TestProcessDisplayMaxUsageSharedPeakAndInsertionPrefixes",
         "TestSATRuntimeSharedProcessAndNumeralCohort",
         "TestSATGoalTranslatorSharedProcessMemoryCheckpoint",
+        "TestModelEvaluatorSharedProcessMemoryAndCohort",
         "TestNumericStreamNativeCountedTextAndOwnedInput"
       ],
       "conditionals": [
@@ -147063,6 +147079,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "model evaluator max-memory checkpoint shares AST, parameter and explicit raw Runtime process bytes (model_evaluator.cpp:282-290)",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator.go",
+          "tests": [
+            "TestModelEvaluatorSharedProcessMemoryAndCohort"
+          ]
+        },
         {
           "name": "goal2sat and sat2goal memory checkpoints share the actual AST/SAT numeral process counter (goal2sat.cpp:380-391,685-699)",
           "status": "ported",

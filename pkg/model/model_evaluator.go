@@ -66,6 +66,14 @@ func NewModelEvaluator(md *ModelCore, s ModelEvaluatorConfig) (*ModelEvaluator, 
 	if s.Context.SymbolsField != md.manager.Symbols || s.Globals.Context != s.Context {
 		return nil, uparams.ErrParamsOwner
 	}
+	astNumerals, paramsNumerals := md.manager.NumeralService(), s.Context.Numerals()
+	if astNumerals == nil || paramsNumerals == nil || astNumerals.RuntimeOwner() == nil || paramsNumerals.RuntimeOwner() == nil {
+		return nil, uparams.ErrParamsOwner
+	}
+	process, astProcess, paramsProcess := s.Memory.ProcessOwner(), astNumerals.RuntimeOwner().ProcessOwner(), paramsNumerals.RuntimeOwner().ProcessOwner()
+	if (process != nil || astProcess != nil || paramsProcess != nil) && (process != astProcess || process != paramsProcess) {
+		return nil, uparams.ErrParamsOwner
+	}
 	if _, e := s.Memory.AllocationSize(); e != nil {
 		return nil, e
 	}
