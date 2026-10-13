@@ -1,6 +1,7 @@
 package tactic
 
 import (
+	"bytes"
 	"errors"
 	"testing"
 
@@ -123,6 +124,18 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if err := core.CollectStatistics(st); err != nil || st.Size() != 2 || st.Key(0) != "new bounds" || st.UintValue(0) != 1 || st.Key(1) != "nodes" || st.UintValue(1) != 1 {
 		t.Fatal("source core statistics", err, st.Size())
 	}
+	display, err := core.converter.VariableDisplay(sy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var shown bytes.Buffer
+	if err := display(&shown, 0); err != nil || shown.String() != "x" {
+		t.Fatal("inverse expression display", shown.String(), err)
+	}
+	shown.Reset()
+	if err := display(&shown, 99); err != nil || shown.String() != "k!99" {
+		t.Fatal("generated variable fallback", shown.String(), err)
+	}
 	oldEngine, oldConverter := core.engine, core.converter
 	printKey := "print_nodes"
 	if err := pc.SetBoolName(&p, &printKey, true); err != nil {
@@ -161,8 +174,8 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if err := core.UpdateParams(&p); err != nil {
 		t.Fatal("same-engine parameter update", err)
 	}
-	if got, err := core.Apply(goal); got != nil || !errors.Is(err, ErrFastCorePrintNodes) {
-		t.Fatal("updated live display option", got, err)
+	if options, err := core.engine.Options(); err != nil || !options.PrintNodes {
+		t.Fatal("updated live display option", options, err)
 	}
 	if err := pc.SetBoolName(&p, &printKey, false); err != nil {
 		t.Fatal(err)
@@ -170,8 +183,12 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if err := core.Cleanup(); err != nil {
 		t.Fatal("updated parameter snapshot rebuild", err)
 	}
-	if got, err := core.Apply(goal); got != nil || !errors.Is(err, ErrFastCorePrintNodes) {
+	shown.Reset()
+	if got, err := core.ApplyWithOutput(goal, &shown); err != nil || got != goal {
 		t.Fatal("caller mutation does not alter updated tactic snapshot", got, err)
+	}
+	if shown.String() != "x <= 2\nbounds at leaves: \nx <= 2\n" {
+		t.Fatal("source print_nodes output", shown.String())
 	}
 	if err := core.Close(); err != nil {
 		t.Fatal(err)
@@ -186,8 +203,46 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, err := printing.Apply(goal); got != nil || !errors.Is(err, ErrFastCorePrintNodes) {
-		t.Fatal("unported variable printer refuses before mutating goal", got, err)
+	quotedName, err := sy.Intern("x y")
+	if err != nil {
+		t.Fatal(err)
+	}
+	quoted, err := m.MkConst(quotedName, sort)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := m.IncRef(quoted); err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if e := m.DecRef(quoted); e != nil {
+			t.Error(e)
+		}
+	}()
+	var n, d numeral.Int
+	defer func() {
+		if e := qm.Z.Del(&d); e != nil {
+			t.Error(e)
+		}
+		if e := qm.Z.Del(&n); e != nil {
+			t.Error(e)
+		}
+	}()
+	quotedVariable, err := printing.converter.InternalizeTerm(quoted, &n, &d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	display, err = printing.converter.VariableDisplay(sy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	shown.Reset()
+	if err := display(&shown, quotedVariable); err != nil || shown.String() != "|x y|" {
+		t.Fatal("source SMT2 quoted symbol", shown.String(), err)
+	}
+	shown.Reset()
+	if got, err := printing.ApplyWithOutput(goal, &shown); err != nil || got != goal || shown.String() != "x <= 2\nbounds at leaves: \nx <= 2\n" {
+		t.Fatal("selected print_nodes output", got, err, shown.String())
 	}
 	if err := printing.Close(); err != nil {
 		t.Fatal(err)

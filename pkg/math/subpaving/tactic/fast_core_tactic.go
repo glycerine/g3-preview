@@ -4,6 +4,8 @@ package tactic
 
 import (
 	"errors"
+	"io"
+	"os"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
@@ -13,7 +15,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
-var ErrFastCorePrintNodes = errors.New("subpaving tactic: MPFF goal variable printer is not yet ported")
+var ErrFastCorePrintNodes = errors.New("subpaving tactic: SMT2 display for this mapped expression is not yet ported")
 
 // FastCoreTactic owns the selected engine, expression converter and a shared
 // parameter snapshot. The goal, managers and parameter service are borrowed.
@@ -86,6 +88,12 @@ func (t *FastCoreTactic) open() error {
 // tactic, a successful result contains exactly the original goal; it creates
 // no model, proof, or unsat-core converter.
 func (t *FastCoreTactic) Apply(g *goaltactic.Goal) (*goaltactic.Goal, error) {
+	return t.ApplyWithOutput(g, os.Stdout)
+}
+
+// ApplyWithOutput routes the source optional print_nodes output to a caller
+// writer. Nil is valid only when print_nodes is disabled.
+func (t *FastCoreTactic) ApplyWithOutput(g *goaltactic.Goal, out io.Writer) (*goaltactic.Goal, error) {
 	if err := t.open(); err != nil {
 		return nil, err
 	}
@@ -102,15 +110,36 @@ func (t *FastCoreTactic) Apply(g *goaltactic.Goal) (*goaltactic.Goal, error) {
 	if err != nil {
 		return nil, err
 	}
-	if options.PrintNodes {
-		return nil, ErrFastCorePrintNodes
+	if options.PrintNodes && out == nil {
+		return nil, arena.ErrInvalidSlot
 	}
-	if err := t.converter.SearchGoal(g); err != nil {
+	if err := t.converter.InternalizeGoal(g); err != nil {
 		return nil, err
 	}
 	shell, err := t.engine.Shell()
 	if err != nil {
 		return nil, err
+	}
+	display, err := t.converter.VariableDisplay(t.pc.SymbolsField)
+	if err != nil {
+		return nil, err
+	}
+	if err := shell.SetVariableDisplay(display); err != nil {
+		return nil, err
+	}
+	if err := shell.Search(); err != nil {
+		return nil, err
+	}
+	if options.PrintNodes {
+		if err := shell.DisplayConstraints(out, true); err != nil {
+			return nil, err
+		}
+		if err := fastWriteDisplay(out, "bounds at leaves: \n"); err != nil {
+			return nil, err
+		}
+		if err := shell.DisplayBounds(out); err != nil {
+			return nil, err
+		}
 	}
 	var current statistics.Statistics
 	if err := shell.CollectStatistics(&current); err != nil {
