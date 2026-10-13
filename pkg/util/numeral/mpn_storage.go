@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -18,6 +19,7 @@ type NaturalManager struct {
 	callerBindings  *NumericCallerBinding
 
 	self                              *NaturalManager
+	trace                             *diagnostic.TraceTags
 	runtime                           *umemory.Runtime
 	ownsRuntime                       bool
 	Division                          [4][]uint32

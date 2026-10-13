@@ -257,6 +257,9 @@ func (m *IntegerManager) BindTrace(tags *diagnostic.TraceTags) error {
 		return err
 	}
 	m.trace = tags
+	if m.Natural != nil {
+		m.Natural.trace = tags
+	}
 	return nil
 }
 

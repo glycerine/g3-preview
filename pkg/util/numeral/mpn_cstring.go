@@ -162,6 +162,7 @@ func (m *NaturalManager) sourceCStringBodyScoped(a limbView, dst sourceDecimalDe
 			numer.write(i, temp.read(i)<<d|temp.read(i-1)>>(32-d))
 		}
 		numer.write(0, temp.read(0)<<d)
+		m.traceDivisionNormalize(numer.external[:numer.size], denom.external[:denom.size])
 		divideViewOne(numer, denom.read(0), temp)
 		if e := dst.write(j, '0'+byte(numer.read(0)>>d)); e != nil {
 			return e

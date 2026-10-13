@@ -136,6 +136,7 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 		}
 		m.sourceDivWrite(v, 0, b.read(0)<<d)
 	}
+	m.traceDivisionNormalize(m.Division[u][:na+1], m.Division[v][:nb])
 	if nb == 1 {
 		divideViewOne(limbView{external: m.Division[u], size: na + 1}, m.sourceDivRead(v, 0), q)
 	} else {

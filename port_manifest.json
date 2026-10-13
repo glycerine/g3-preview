@@ -153844,6 +153844,20 @@
             "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
             "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards"
           ]
+        },
+        {
+          "name": "div_normalize mpn_norm TRACE through both numeric division and multi-limb decimal conversion (mpn.cpp:257)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_normalize_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn_indexed.go",
+            "pkg/util/numeral/mpn_cstring.go",
+            "pkg/util/numeral/mpn_storage.go",
+            "pkg/util/numeral/mpz_number_theory.go"
+          ],
+          "tests": [
+            "TestMPNNormalizationTraceDivisionAndDecimalConversion"
+          ]
         }
       ],
       "ownership": [
@@ -154309,6 +154323,20 @@
             "TestIntegerPublicRawUnpublishedCellOwnAfterSourceFinalize",
             "TestIntegerPublicRawRuntimeCallbackHasNoAmbientAcquisition",
             "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse"
+          ]
+        },
+        {
+          "name": "div_normalize mpn_norm TRACE through numeric division and multi-limb decimal conversion (mpn.cpp:257)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_normalize_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn_indexed.go",
+            "pkg/util/numeral/mpn_cstring.go",
+            "pkg/util/numeral/mpn_storage.go",
+            "pkg/util/numeral/mpz_number_theory.go"
+          ],
+          "tests": [
+            "TestMPNNormalizationTraceDivisionAndDecimalConversion"
           ]
         }
       ],
