@@ -18,6 +18,8 @@ type patternCandidates struct {
 	matcher     *smallerPattern
 	candidates  []ast.ASTHandle
 	info        map[ast.ASTHandle]candidateInfo
+	visited     map[ast.ASTHandle]struct{}
+	todo        []ast.ASTHandle
 	noPatterns  []ast.ASTHandle
 	numBindings uint32
 	blockLoops  bool
@@ -30,7 +32,7 @@ func newPatternCandidates(m *ast.ASTManager, numBindings uint32, noPatterns []as
 		return nil, err
 	}
 	return &patternCandidates{
-		manager: m, matcher: matcher, info: make(map[ast.ASTHandle]candidateInfo),
+		manager: m, matcher: matcher, info: make(map[ast.ASTHandle]candidateInfo), visited: make(map[ast.ASTHandle]struct{}),
 		noPatterns: noPatterns, numBindings: numBindings, blockLoops: blockLoops,
 	}, nil
 }
@@ -151,6 +153,8 @@ func (c *patternCandidates) close() error {
 		}
 	}
 	clear(c.info)
+	clear(c.visited)
+	c.todo = nil
 	c.noPatterns = nil
 	c.closed = true
 	return nil

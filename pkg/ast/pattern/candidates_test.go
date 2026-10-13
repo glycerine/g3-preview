@@ -1,6 +1,7 @@
 package pattern
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -79,4 +80,81 @@ func TestPatternInferenceLoopFilterConcreteCandidateOwnership(t *testing.T) {
 		t.Fatal("disabled loop filtering must preserve candidate order", got)
 	}
 	patternMust(t, pass.close())
+}
+
+func TestPatternInferenceContainsSubpatternAndBiggerFilter(t *testing.T) {
+	m := patternManager(t)
+	b, err := m.MkBoolSort()
+	patternMust(t, err)
+	pin := func(h ast.ASTHandle) ast.ASTHandle {
+		t.Helper()
+		patternMust(t, m.IncRef(h))
+		t.Cleanup(func() { patternMust(t, m.DecRef(h)) })
+		return h
+	}
+	x, err := m.MkVar(0, b)
+	patternMust(t, err)
+	pin(x)
+	y, err := m.MkVar(1, b)
+	patternMust(t, err)
+	pin(y)
+	decl := func(name uint32, arity int) ast.ASTHandle {
+		t.Helper()
+		domain := make([]ast.ASTHandle, arity)
+		for i := range domain {
+			domain[i] = b
+		}
+		h, e := m.MkFuncDecl(symbol.Numerical(name), domain, b, ast.ASTFuncDeclInfo{})
+		patternMust(t, e)
+		return pin(h)
+	}
+	app := func(d ast.ASTHandle, args ...ast.ASTHandle) ast.ASTHandle {
+		t.Helper()
+		h, e := m.MkApp(d, args)
+		patternMust(t, e)
+		return pin(h)
+	}
+	g, h, f := decl(721, 1), decl(722, 1), decl(723, 2)
+	first, last := app(g, x), app(h, x)
+	root := app(f, first, last)
+	wider := app(f, first, y)
+	c, err := newPatternCandidates(m, 2, nil, false)
+	patternMust(t, err)
+	t.Cleanup(func() { patternMust(t, c.close()) })
+	for _, item := range []struct {
+		h    ast.ASTHandle
+		vars []uint32
+	}{
+		{first, []uint32{0}}, {last, []uint32{0}},
+		{root, []uint32{0}}, {wider, []uint32{0, 1}},
+	} {
+		patternMust(t, c.addCandidate(item.h, item.vars, 1))
+	}
+	if yes, e := c.containsSubpattern(root); e != nil || !yes {
+		t.Fatal("root must contain its last-child candidate", yes, e)
+	}
+	if len(c.todo) != 1 || c.todo[0] != first {
+		t.Fatal("source traversal must leave first child pending after last-child match", c.todo)
+	}
+	if yes, e := c.containsSubpattern(wider); e != nil || yes {
+		t.Fatal("proper child with fewer free variables must not remove parent", yes, e)
+	}
+	if len(c.todo) != 0 {
+		t.Fatal("full traversal must drain worklist", c.todo)
+	}
+	looped, err := c.filterLooping()
+	patternMust(t, err)
+	got, err := c.filterBigger(looped)
+	patternMust(t, err)
+	if len(got) != 3 || got[0] != first || got[1] != last || got[2] != wider {
+		t.Fatal("bigger filter must keep source order and same-variable rule", got)
+	}
+	if _, found := c.info[root]; !found {
+		t.Fatal("larger-pattern filter must not erase candidate metadata")
+	}
+	unknown := app(decl(724, 1), x)
+	if _, e := c.containsSubpattern(unknown); !errors.Is(e, ast.ErrASTDomain) {
+		t.Fatal("source requires root metadata", e)
+	}
+	patternMust(t, c.close())
 }

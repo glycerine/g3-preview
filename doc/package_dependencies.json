@@ -289,6 +289,7 @@
       ],
       "production_files": [
         "candidates.go",
+        "contains_subpattern.go",
         "smaller_pattern.go"
       ]
     },

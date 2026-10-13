@@ -18089,11 +18089,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/pattern/smaller_pattern.go",
-        "pkg/ast/pattern/candidates.go"
+        "pkg/ast/pattern/candidates.go",
+        "pkg/ast/pattern/contains_subpattern.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
-        "TestPatternInferenceLoopFilterConcreteCandidateOwnership"
+        "TestPatternInferenceLoopFilterConcreteCandidateOwnership",
+        "TestPatternInferenceContainsSubpatternAndBiggerFilter"
       ],
       "conditionals": [
         {
@@ -18193,11 +18195,19 @@
           "tests": [
             "TestPatternInferenceLoopFilterConcreteCandidateOwnership"
           ]
+        },
+        {
+          "name": "contains_subpattern save/operator() visited-DAG search and filter_bigger_patterns same-free-variable child rejection",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/contains_subpattern.go",
+          "tests": [
+            "TestPatternInferenceContainsSubpatternAndBiggerFilter"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. Candidate insertion and strict loop filtering own AST references through a native slice and keep borrowed free-variable set metadata in a typed map. The remaining pattern_inference_cfg collector, larger-pattern filter and quantifier rewrite are not ported."
+        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. Candidate insertion and strict loop filtering own AST references through a native slice and keep borrowed free-variable set metadata in a typed map. The larger-pattern filter searches a native visited-handle map and work slice. The remaining pattern_inference_cfg collector, preferred-pattern selection and quantifier rewrite are not ported."
       ]
     },
     {
@@ -18207,11 +18217,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/pattern/smaller_pattern.go",
-        "pkg/ast/pattern/candidates.go"
+        "pkg/ast/pattern/candidates.go",
+        "pkg/ast/pattern/contains_subpattern.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
-        "TestPatternInferenceLoopFilterConcreteCandidateOwnership"
+        "TestPatternInferenceLoopFilterConcreteCandidateOwnership",
+        "TestPatternInferenceContainsSubpatternAndBiggerFilter"
       ],
       "conditionals": [
         {
@@ -18247,11 +18259,19 @@
           "tests": [
             "TestPatternInferenceLoopFilterConcreteCandidateOwnership"
           ]
+        },
+        {
+          "name": "contains_subpattern native visited identities and worklist for proper candidate descendants",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/contains_subpattern.go",
+          "tests": [
+            "TestPatternInferenceContainsSubpatternAndBiggerFilter"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The matcher borrows AST handles from its manager and owns only native Go pair-map and worklist storage. The candidate vector owns app handles while its metadata map borrows those identities; the enclosing pattern inference class remains open."
+        "The matcher borrows AST handles from its manager and owns only native Go pair-map and worklist storage. The candidate vector owns app handles while its metadata and visited maps borrow those identities; the enclosing pattern inference class remains open."
       ]
     },
     {
@@ -161486,13 +161506,15 @@
       "status": "ported",
       "go_targets": [
         "pkg/util/natset/set.go",
-        "pkg/util/natset/set_test.go"
+        "pkg/util/natset/set_test.go",
+        "pkg/ast/pattern/contains_subpattern.go"
       ],
       "tests": [
         "TestMembershipResetAndRemoval",
         "TestDomainGrowthShrinkAndRegrowth",
         "TestTimestampWrapClearsBacking",
-        "TestOutOfDomainAccessPanics"
+        "TestOutOfDomainAccessPanics",
+        "TestPatternInferenceContainsSubpatternAndBiggerFilter"
       ],
       "conditionals": [
         {
@@ -161540,6 +161562,14 @@
           "tests": [
             "TestMembershipResetAndRemoval",
             "TestTimestampWrapClearsBacking"
+          ]
+        },
+        {
+          "name": "pattern_inference contains_subpattern visited AST identities with native Go map reset and membership",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/contains_subpattern.go",
+          "tests": [
+            "TestPatternInferenceContainsSubpatternAndBiggerFilter"
           ]
         }
       ],
