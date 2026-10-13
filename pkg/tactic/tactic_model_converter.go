@@ -64,6 +64,20 @@ func (r *ModelRef) Set(value *model.ModelCore) error {
 	r.value = value
 	return nil
 }
+
+// SetRef is the concrete ref<model> copy assignment used by model2mc.
+// Set retains the incoming model before releasing the outgoing one, including
+// when both references already point to the same model.
+func (r *ModelRef) SetRef(source *ModelRef) error {
+	if e := r.open(); e != nil {
+		return e
+	}
+	if e := source.open(); e != nil {
+		return e
+	}
+	return r.Set(source.value)
+}
+
 func (r *ModelRef) Get() (*model.ModelCore, error) {
 	if e := r.open(); e != nil {
 		return nil, e

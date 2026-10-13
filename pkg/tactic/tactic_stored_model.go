@@ -66,11 +66,7 @@ func (c *tacticStoredModelConverter) ApplyModel(out *ModelRef, _ uint32) error {
 	if e := c.open(); e != nil {
 		return e
 	}
-	md, e := c.model.Get()
-	if e != nil {
-		return e
-	}
-	return out.Set(md)
+	return out.SetRef(&c.model)
 }
 func (c *tacticStoredModelConverter) ApplyUnindexed(out *ModelRef) error {
 	return c.ApplyModel(out, 0)

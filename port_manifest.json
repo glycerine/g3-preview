@@ -167394,10 +167394,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/tactic/tactic_model_converter.go"
+        "pkg/tactic/tactic_model_converter.go",
+        "pkg/tactic/tactic_stored_model.go"
       ],
       "tests": [
         "TestTacticModelReferenceOwningAliasAndReplacement",
+        "TestTacticModelReferenceCopyAssignmentOwnsSourceModel",
         "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
         "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
@@ -167422,6 +167424,7 @@
           "status": "partial",
           "go_target": "pkg/tactic/tactic_model_converter.go",
           "tests": [
+            "TestTacticModelReferenceCopyAssignmentOwnsSourceModel",
             "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
             "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
             "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
@@ -167430,7 +167433,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "Only the concrete owning model-core reference portion is implemented, with explicit alias-safe assignment and copied/retired owner guards. General copy/move/detach reference facades, derived model dispatch and failure histories remain open."
+        "The retained model2mc model_ref-to-model_ref assignment now uses the concrete SetRef operation, which retains the incoming model before releasing the outgoing reference, including self-aliases. Copied/retired owner guards remain explicit. Other retained reference instantiations, move/detach paths and failure histories remain open."
       ]
     },
     {

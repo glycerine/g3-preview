@@ -112,6 +112,40 @@ func TestTacticModelReferenceOwningAliasAndReplacement(t *testing.T) {
 	}
 }
 
+func TestTacticModelReferenceCopyAssignmentOwnsSourceModel(t *testing.T) {
+	m := astTestManager(t)
+	a, e := model.NewModelCore(m)
+	satOK(t, e)
+	b, e := model.NewModelCore(m)
+	satOK(t, e)
+	var source, target ModelRef
+	t.Cleanup(func() { satOK(t, target.Close()); satOK(t, source.Close()); satOK(t, a.Close()); satOK(t, b.Close()) })
+	satOK(t, source.Set(a))
+	satOK(t, target.Set(b))
+	satOK(t, target.SetRef(&source))
+	if !b.Closed || a.Closed || a.References != 2 {
+		t.Fatal("copy assignment did not retain source before retiring target", a.References, a.Closed, b.Closed)
+	}
+	satOK(t, source.Set(nil))
+	if a.Closed || a.References != 1 {
+		t.Fatal("target did not own its independent model reference", a.References, a.Closed)
+	}
+	satOK(t, target.SetRef(&target))
+	if a.Closed || a.References != 1 {
+		t.Fatal("self-assignment changed reference ownership", a.References, a.Closed)
+	}
+	if e = target.SetRef(nil); e != ErrModelConverterOwner {
+		t.Fatal("nil source accepted", e)
+	}
+	satOK(t, target.Close())
+	if !a.Closed {
+		t.Fatal("last reference did not retire copied model")
+	}
+	if e = source.SetRef(&target); e != ErrModelConverterOwner {
+		t.Fatal("retired source accepted", e)
+	}
+}
+
 func TestTacticModelConcatStarSubgoalDispatchAndDestruction(t *testing.T) {
 	m := astTestManager(t)
 	calls := []string{}
