@@ -117561,7 +117561,7 @@
         },
         {
           "name": "disabled #if0 trace and destructor output",
-          "status": "unported",
+          "status": "dead_deleted",
           "go_target": "",
           "tests": []
         },
