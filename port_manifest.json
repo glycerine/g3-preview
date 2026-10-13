@@ -50351,7 +50351,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The MPF wrapper now prepares exact integer coefficients in source order using a native typed slice and directed rational inequality bounds; its context_mpf mk_sum/mk_ineq construction and search graph remain open."
+        "The MPF wrapper now prepares exact integer coefficients in source order using a native typed slice and directed rational inequality bounds. Construction checks that f2n<mpf_manager>::m() is the exact borrowed core and copied Go owner values cannot release the same numerals twice. Its context_mpf mk_sum/mk_ineq construction and search graph remain open."
       ]
     },
     {
@@ -118448,6 +118448,7 @@
         "pkg/util/numeral/mpf_numeral_rational_string.go",
         "pkg/util/numeral/mpf_numeral_lifetime.go",
         "pkg/math/subpaving/arbitrary_context_root.go",
+        "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
         "pkg/math/subpaving/hardware_interval_mul.go",
@@ -118472,6 +118473,7 @@
         "TestHardwareFloatSourceScientificTraceDisplay",
         "TestArbitraryFloatNumeralSourceDirectedSetAndArithmetic",
         "TestArbitraryFloatNumeralSourcePostCheckAndClose",
+        "TestArbitraryShellCoefficientSourceConversionAndCleanup",
         "TestArbitraryFloatNumeralSourcePredicatesAndOrder",
         "TestArbitraryFloatNumeralSourceFloorCeilAndClose",
         "TestArbitraryFloatNumeralSourceReciprocalIncrementAndPower",
@@ -118593,6 +118595,14 @@
           "go_target": "pkg/util/numeral/mpf_numeral.go",
           "tests": [
             "TestArbitraryFloatNumeralSourceDirectedSetAndArithmetic",
+            "TestArbitraryFloatNumeralSourcePostCheckAndClose"
+          ]
+        },
+        {
+          "name": "f2n<mpf_manager>::m() borrows the exact live core manager used by the MPF subpaving wrapper",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_numeral.go",
+          "tests": [
             "TestArbitraryFloatNumeralSourcePostCheckAndClose"
           ]
         },

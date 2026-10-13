@@ -14,6 +14,7 @@ var ErrArbitraryShellInexactInteger = errors.New("subpaving: integer coefficient
 // ArbitraryShellCoefficients owns the source wrapper's constant, coefficient
 // numerals and rational comparison scratch. Its managers are borrowed.
 type ArbitraryShellCoefficients struct {
+	self         *ArbitraryShellCoefficients
 	core         *numeral.ArbitraryFloatManager
 	numbers      *numeral.ArbitraryFloatNumeralManager
 	rational     *numeral.RationalManager
@@ -34,18 +35,40 @@ func NewArbitraryShellCoefficients(core *numeral.ArbitraryFloatManager, numbers 
 	if err != nil {
 		return nil, err
 	}
-	return &ArbitraryShellCoefficients{core: core, numbers: numbers, rational: q}, nil
+	actual, err := numbers.BorrowCore()
+	if err != nil {
+		return nil, err
+	}
+	if actual != core {
+		return nil, arena.ErrInvalidSlot
+	}
+	w := &ArbitraryShellCoefficients{core: core, numbers: numbers, rational: q}
+	w.self = w
+	return w, nil
 }
 
 func (w *ArbitraryShellCoefficients) open() error {
-	if w == nil || w.core == nil || w.numbers == nil || w.rational == nil {
+	if w == nil || w.self != w || w.core == nil || w.numbers == nil || w.rational == nil {
 		return arena.ErrInvalidSlot
 	}
 	if w.closed {
 		return arena.ErrClosed
 	}
-	_, err := w.core.BorrowRationalManager()
-	return err
+	actual, err := w.numbers.BorrowCore()
+	if err != nil {
+		return err
+	}
+	if actual != w.core {
+		return arena.ErrInvalidSlot
+	}
+	q, err := w.core.BorrowRationalManager()
+	if err != nil {
+		return err
+	}
+	if q != w.rational {
+		return arena.ErrInvalidSlot
+	}
+	return nil
 }
 
 func (w *ArbitraryShellCoefficients) intToArbitrary(value *numeral.Int, out *numeral.ArbitraryFloat) error {
@@ -109,7 +132,7 @@ func (w *ArbitraryShellCoefficients) PrepareInequality(value *numeral.Rational, 
 // Close follows reverse member order: back, before, coefficient vector,
 // constant. A stopped cleanup resumes at its failing member.
 func (w *ArbitraryShellCoefficients) Close() error {
-	if w == nil || w.core == nil || w.numbers == nil || w.rational == nil {
+	if w == nil || w.self != w || w.core == nil || w.numbers == nil || w.rational == nil {
 		return arena.ErrInvalidSlot
 	}
 	if w.closed {

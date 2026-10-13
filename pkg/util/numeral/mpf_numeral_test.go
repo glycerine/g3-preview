@@ -83,6 +83,9 @@ func TestArbitraryFloatNumeralSourcePostCheckAndClose(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
+	if borrowed, err := m.BorrowCore(); err != nil || borrowed != core {
+		t.Fatalf("source f2n::m borrow: %p, %v", borrowed, err)
+	}
 	var out ArbitraryFloat
 	if e := m.SetDouble(&out, math.Inf(1)); !errors.Is(e, ErrArbitraryFloatNonRegular) {
 		t.Fatal("post-set regular check", e)
@@ -100,8 +103,10 @@ func TestArbitraryFloatNumeralSourcePostCheckAndClose(t *testing.T) {
 	if e := m.SetInt32(&out, 1); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal("closed wrapper", e)
 	}
+	if _, e := m.BorrowCore(); !errors.Is(e, arena.ErrClosed) {
+		t.Fatal("closed manager borrow", e)
+	}
 	if e := m.Close(); e != nil {
 		t.Fatal("idempotent close", e)
 	}
 }
-

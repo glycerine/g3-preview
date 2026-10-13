@@ -80,8 +80,18 @@ func (m *ArbitraryFloatNumeralManager) Close() error {
 func (m *ArbitraryFloatNumeralManager) RoundingMode() ArbitraryFloatRoundingMode { return m.mode }
 func (m *ArbitraryFloatNumeralManager) ExponentBits() uint32                     { return m.ebits }
 func (m *ArbitraryFloatNumeralManager) SignificandBits() uint32                  { return m.sbits }
-func (m *ArbitraryFloatNumeralManager) RoundToPlusInf()                          { m.mode = ArbitraryFloatTowardPositive }
-func (m *ArbitraryFloatNumeralManager) RoundToMinusInf()                         { m.mode = ArbitraryFloatTowardNegative }
+
+// BorrowCore is the concrete f2n<mpf_manager>::m() reference. The returned
+// manager belongs to the caller and must outlive this numeral wrapper.
+func (m *ArbitraryFloatNumeralManager) BorrowCore() (*ArbitraryFloatManager, error) {
+	if err := m.guard(); err != nil {
+		return nil, err
+	}
+	return m.core, nil
+}
+
+func (m *ArbitraryFloatNumeralManager) RoundToPlusInf()  { m.mode = ArbitraryFloatTowardPositive }
+func (m *ArbitraryFloatNumeralManager) RoundToMinusInf() { m.mode = ArbitraryFloatTowardNegative }
 func (m *ArbitraryFloatNumeralManager) SetRounding(toPlus bool) {
 	if toPlus {
 		m.RoundToPlusInf()

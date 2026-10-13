@@ -16,10 +16,11 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	core, err := numeral.NewArbitraryFloatManager(numeral.IntegerConfig{
+	config := numeral.IntegerConfig{
 		Memory: r, Profile: umm.SmallAllocatorProfile{PointerBits: 64, Debug: true},
 		Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}},
-	})
+	}
+	core, err := numeral.NewArbitraryFloatManager(config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,6 +35,30 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	w, err := NewArbitraryShellCoefficients(core, numbers)
 	if err != nil {
 		t.Fatal(err)
+	}
+	otherCore, err := numeral.NewArbitraryFloatManager(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	otherNumbers, err := numeral.NewArbitraryFloatNumeralManager(otherCore, 11, 53)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := NewArbitraryShellCoefficients(core, otherNumbers); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("foreign f2n core: %v", err)
+	}
+	if err := otherNumbers.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := otherCore.Close(); err != nil {
+		t.Fatal(err)
+	}
+	copyOwner := *w
+	if _, _, err := copyOwner.PrepareSum(&numeral.Int{Val: 1}, nil); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("copied coefficient owner: %v", err)
+	}
+	if err := copyOwner.Close(); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("copied owner cleanup: %v", err)
 	}
 	one, big, three := numeral.NewInt(1), numeral.Int{}, numeral.NewInt(3)
 	q := numeral.NewRational()
