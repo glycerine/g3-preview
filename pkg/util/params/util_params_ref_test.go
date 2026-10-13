@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
@@ -233,18 +234,44 @@ func TestParamsReferenceExactDisplayAndKinds(t *testing.T) {
 	paramsMust(t, c.Del(&a))
 }
 
-func TestParamsReferenceNumericalSymbolValueGuard(t *testing.T) {
+func TestParamsReferenceNumericalSymbolValueBareString(t *testing.T) {
 	c, sy, _ := paramsTestOwner(t)
 	a, e := c.NewValue()
 	paramsMust(t, e)
-	before := c.Stats()
-	e = c.SetSymbol(&a, internSymbol(t, sy, "s"), usymbol.Numerical(5))
-	if e != ErrParamsPrecondition {
-		t.Fatal(e)
+	k := internSymbol(t, sy, "s")
+	e = c.SetSymbol(&a, k, usymbol.Numerical(5))
+	if udiag.DebugBuild {
+		if e != usymbol.ErrInvalid || a.Slot == 0 {
+			t.Fatal("source assertion must follow params_ref::init", e, a)
+		}
+		if got, e := c.GetSymbol(&a, k, usymbol.Symbol{}); e != nil || got != (usymbol.Symbol{}) {
+			t.Fatal("assertion must leave the new block without a value", got, e)
+		}
+	} else {
+		paramsMust(t, e)
+		got, e := c.GetSymbol(&a, k, usymbol.Symbol{})
+		paramsMust(t, e)
+		spelling, present, e := sy.BareString(got)
+		paramsMust(t, e)
+		if !present || spelling != "" || got.IsNumerical() {
+			t.Fatal("numerical value must be stored as the empty spelling", got, spelling, present)
+		}
 	}
-	after := c.Stats()
-	if before != after {
-		t.Fatal("invalid symbol value mutated graph")
+	name := "named"
+	e = c.SetSymbolName(&a, &name, usymbol.Numerical(9))
+	if udiag.DebugBuild {
+		if e != usymbol.ErrInvalid {
+			t.Fatal("named setter must reach the same assertion", e)
+		}
+	} else {
+		paramsMust(t, e)
+		got, e := c.GetSymbolName(&a, &name, usymbol.Symbol{})
+		paramsMust(t, e)
+		spelling, present, e := sy.BareString(got)
+		paramsMust(t, e)
+		if !present || spelling != "" || got.IsNumerical() {
+			t.Fatal("named setter must store the empty spelling", got, spelling, present)
+		}
 	}
 	paramsMust(t, c.Del(&a))
 }

@@ -759,9 +759,6 @@ func (c *ParamsContext) set(v *ParamsRef, k usymbol.Symbol, name *string, byName
 		}
 	}
 	if kind == ParamSymbol {
-		if sym.IsNumerical() {
-			return ErrParamsPrecondition
-		}
 		if e := c.keyCheck(sym); e != nil {
 			return e
 		}
@@ -777,6 +774,18 @@ func (c *ParamsContext) set(v *ParamsRef, k usymbol.Symbol, name *string, byName
 	if byName {
 		var e error
 		k, e = c.SymbolsField.InternNullable(name)
+		if e != nil {
+			return e
+		}
+	}
+	if kind == ParamSymbol && sym.IsNumerical() {
+		// params::set_sym stores bare_str(), which is an empty C string for
+		// a numerical symbol after the source assertion is erased/continued.
+		spelling, _, e := c.SymbolsField.BareString(sym)
+		if e != nil {
+			return e
+		}
+		sym, e = c.SymbolsField.Intern(spelling)
 		if e != nil {
 			return e
 		}
