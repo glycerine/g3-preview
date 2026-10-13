@@ -204,6 +204,13 @@ func (w *FastShellCoefficients) Search() error {
 	return w.context.Search()
 }
 
+func (w *FastShellCoefficients) UpdateParamsRef(pc *params.ParamsContext, p *params.ParamsRef) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.UpdateParamsRef(pc, p)
+}
+
 func (w *FastShellCoefficients) ResetStatistics() error {
 	if err := w.open(); err != nil {
 		return err

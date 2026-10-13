@@ -71,6 +71,23 @@ func (e *FastEngine) Options() (Options, error) {
 	return e.options, nil
 }
 
+// UpdateParamsRef follows the selected MPFF branch's display flag update,
+// then forwards source-order scalar updates into its existing context.
+func (e *FastEngine) UpdateParamsRef(pc *params.ParamsContext, p *params.ParamsRef) error {
+	if err := e.check(); err != nil {
+		return err
+	}
+	selected, err := ReadOptions(pc, p)
+	if err != nil {
+		return err
+	}
+	if selected.Engine != EngineMPFF {
+		return ErrFastEngineSelection
+	}
+	e.options = selected
+	return e.shell.UpdateParamsRef(pc, p)
+}
+
 func (e *FastEngine) Close() error {
 	if e == nil || e.self != e {
 		return arena.ErrInvalidSlot

@@ -158,11 +158,29 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if err := core.CollectStatistics(st); err != nil || st.Size() != 0 {
 		t.Fatal("outer statistics reset", err, st.Size())
 	}
+	if err := core.UpdateParams(&p); err != nil {
+		t.Fatal("same-engine parameter update", err)
+	}
+	if got, err := core.Apply(goal); got != nil || !errors.Is(err, ErrFastCorePrintNodes) {
+		t.Fatal("updated live display option", got, err)
+	}
+	if err := pc.SetBoolName(&p, &printKey, false); err != nil {
+		t.Fatal(err)
+	}
+	if err := core.Cleanup(); err != nil {
+		t.Fatal("updated parameter snapshot rebuild", err)
+	}
+	if got, err := core.Apply(goal); got != nil || !errors.Is(err, ErrFastCorePrintNodes) {
+		t.Fatal("caller mutation does not alter updated tactic snapshot", got, err)
+	}
 	if err := core.Close(); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := core.Apply(goal); !errors.Is(err, arena.ErrClosed) {
 		t.Fatal("closed core refusal", err)
+	}
+	if err := pc.SetBoolName(&p, &printKey, true); err != nil {
+		t.Fatal(err)
 	}
 	printing, err := NewFastCoreTactic(m, numbers, qm, pc, &p)
 	if err != nil {

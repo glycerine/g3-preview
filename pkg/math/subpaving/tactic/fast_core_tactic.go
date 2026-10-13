@@ -139,6 +139,26 @@ func (t *FastCoreTactic) ResetStatistics() error {
 	return nil
 }
 
+// UpdateParams retains the caller's parameter value before updating the live
+// selected MPFF context. Other numeral engines require their own concrete
+// tactic owners and leave this MPFF owner unchanged.
+func (t *FastCoreTactic) UpdateParams(p *params.ParamsRef) error {
+	if err := t.open(); err != nil {
+		return err
+	}
+	selected, err := ReadOptions(t.pc, p)
+	if err != nil {
+		return err
+	}
+	if selected.Engine != EngineMPFF {
+		return ErrFastEngineSelection
+	}
+	if err := t.pc.Assign(&t.params, p); err != nil {
+		return err
+	}
+	return t.engine.UpdateParamsRef(t.pc, &t.params)
+}
+
 // Cleanup releases the old converter before its context, then constructs a
 // fresh implementation from the tactic's retained parameter snapshot.
 // Accumulated outer statistics survive, as in the source tactic.
