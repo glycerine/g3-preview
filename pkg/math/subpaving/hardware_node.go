@@ -18,6 +18,7 @@ type HardwareBound struct {
 	open           bool
 	reason         hardwareBoundReasonKind
 	reasonVariable uint32
+	reasonClause   *HardwareClause
 	timestamp      uint64
 	prev           *HardwareBound
 }
@@ -29,6 +30,7 @@ const (
 	hardwareReasonAxiom
 	hardwareReasonAssumption
 	hardwareReasonVariableDefinition
+	hardwareReasonClause
 )
 
 // HardwareNode uses copied Go slices for the retained parray bound views.

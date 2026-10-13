@@ -50959,7 +50959,9 @@
         "pkg/math/subpaving/hardware_polynomial.go",
         "pkg/math/subpaving/hardware_context_propagate.go",
         "pkg/math/subpaving/hardware_split.go",
-        "pkg/math/subpaving/hardware_selector.go"
+        "pkg/math/subpaving/hardware_selector.go",
+        "pkg/math/subpaving/hardware_clause.go",
+        "pkg/math/subpaving/hardware_clause_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -51038,7 +51040,9 @@
         "TestHardwareChildRecentBoundReplayAndPolynomialWatcher",
         "TestHardwareMidpointSplitterRetainedBranchesAndRefusal",
         "TestHardwareSelectorsRoundRobinAndBreadthFirstSourceOrder",
-        "TestHardwareSelectorSingletonAndUndecidedChild"
+        "TestHardwareSelectorSingletonAndUndecidedChild",
+        "TestHardwareClauseStableWatchersAndReferences",
+        "TestHardwareClauseOpenTruthAndQueuedUnitPropagation"
       ],
       "conditionals": [
         {
@@ -51550,7 +51554,9 @@
         "pkg/math/subpaving/hardware_polynomial.go",
         "pkg/math/subpaving/hardware_context_propagate.go",
         "pkg/math/subpaving/hardware_split.go",
-        "pkg/math/subpaving/hardware_selector.go"
+        "pkg/math/subpaving/hardware_selector.go",
+        "pkg/math/subpaving/hardware_clause.go",
+        "pkg/math/subpaving/hardware_clause_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51620,7 +51626,9 @@
         "TestHardwareChildRecentBoundReplayAndPolynomialWatcher",
         "TestHardwareMidpointSplitterRetainedBranchesAndRefusal",
         "TestHardwareSelectorsRoundRobinAndBreadthFirstSourceOrder",
-        "TestHardwareSelectorSingletonAndUndecidedChild"
+        "TestHardwareSelectorSingletonAndUndecidedChild",
+        "TestHardwareClauseStableWatchersAndReferences",
+        "TestHardwareClauseOpenTruthAndQueuedUnitPropagation"
       ],
       "assertions": [
         {
@@ -171349,7 +171357,9 @@
         "pkg/sat/sat_solver_trail_test.go",
         "pkg/sat/sat_var_queue_native_test.go",
         "pkg/ast/ast_native_plugin_caches_test.go",
-        "pkg/math/subpaving/hardware_context_propagate.go"
+        "pkg/math/subpaving/hardware_context_propagate.go",
+        "pkg/math/subpaving/hardware_clause.go",
+        "pkg/math/subpaving/hardware_clause_test.go"
       ],
       "tests": [
         "TestParamDescrsNativeStorageAndWarmDuplicate",
@@ -171546,7 +171556,9 @@
         "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards",
         "TestASTBitVectorNativeCacheGrowthPreservesValidationAndOwnership",
         "TestHardwareContextRootDefinitionOrderAndQueuedWatchers",
-        "TestHardwareChildRecentBoundReplayAndPolynomialWatcher"
+        "TestHardwareChildRecentBoundReplayAndPolynomialWatcher",
+        "TestHardwareClauseStableWatchersAndReferences",
+        "TestHardwareClauseOpenTruthAndQueuedUnitPropagation"
       ],
       "conditionals": [
         {

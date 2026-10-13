@@ -49,6 +49,7 @@ func (c *HardwareContext) NewVariable(integer bool) (uint32, error) {
 	x := uint32(len(c.isInt))
 	c.isInt = append(c.isInt, integer)
 	c.watchers = append(c.watchers, nil)
+	c.watchOrder = append(c.watchOrder, nil)
 	return x, nil
 }
 
@@ -94,8 +95,10 @@ func (c *HardwareContext) DefinePolynomial(constant *numeral.HardwareFloat, term
 	x := uint32(len(c.isInt))
 	c.isInt = append(c.isInt, integer)
 	c.watchers = append(c.watchers, nil)
+	c.watchOrder = append(c.watchOrder, nil)
 	for _, term := range p.terms {
 		c.watchers[term.variable] = append(c.watchers[term.variable], x)
+		c.watchOrder[term.variable] = append(c.watchOrder[term.variable], hardwareWatch{definition: x})
 	}
 	if c.polynomials == nil {
 		c.polynomials = make(map[uint32]*HardwarePolynomial)

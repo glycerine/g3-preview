@@ -112,11 +112,23 @@ func (c *HardwareContext) processQueuedBound(n *HardwareNode, b *HardwareBound) 
 		}
 		return nil
 	}
-	for _, watched := range c.watchers[b.variable] {
+	for _, watched := range c.watchOrder[b.variable] {
 		if n.conflictVar != math.MaxUint32 {
 			return nil
 		}
-		if err := visit(watched, true); err != nil {
+		if watched.clause != nil {
+			clause := watched.clause
+			if b.timestamp < clause.visited {
+				continue
+			}
+			if err := c.PropagateClause(clause, n); err != nil {
+				if errors.Is(err, numeral.ErrHardwareFloatNonRegular) {
+					c.arithmeticFailed = true
+					continue
+				}
+				return err
+			}
+		} else if err := visit(watched.definition, true); err != nil {
 			return err
 		}
 	}

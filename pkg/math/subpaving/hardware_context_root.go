@@ -30,7 +30,9 @@ type HardwareContext struct {
 	isInt            []bool
 	polynomials      map[uint32]*HardwarePolynomial
 	watchers         [][]uint32
+	watchOrder       [][]hardwareWatch
 	inequalities     []*HardwareInequality
+	clauses          []*HardwareClause
 	root             *HardwareNode
 	leafHead         *HardwareNode
 	leafTail         *HardwareNode
@@ -169,6 +171,12 @@ func (c *HardwareContext) Close() error {
 	}
 	for _, unit := range c.unitClauses {
 		unit.atom.refs--
+	}
+	for _, clause := range c.clauses {
+		for _, atom := range clause.atoms {
+			atom.refs--
+		}
+		clause.deleted = true
 	}
 	c.queue = nil
 	c.closed = true
