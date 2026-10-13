@@ -8,6 +8,7 @@ digraph packages {
   "arena" [style=filled, fillcolor="#c9e8cb"];
   "util/approx" [style=filled, fillcolor="#dceafa"];
   "util/backtrack" [style=filled, fillcolor="#dceafa"];
+  "util/backtrack" -> "util/diagnostic";
   "util/bitset" [style=filled, fillcolor="#dceafa"];
   "util/bitset" -> "arena";
   "util/checkedint" [style=filled, fillcolor="#dceafa"];

@@ -208,6 +208,7 @@ digraph packages {
   "testoracle" [style=filled, fillcolor="#eeeeee"];
   "util/approx" [style=filled, fillcolor="#dceafa"];
   "util/backtrack" [style=filled, fillcolor="#dceafa"];
+  "util/backtrack" -> "util/diagnostic";
   "util/bitset" [style=filled, fillcolor="#dceafa"];
   "util/bitset" -> "arena";
   "util/checkedint" [style=filled, fillcolor="#dceafa"];

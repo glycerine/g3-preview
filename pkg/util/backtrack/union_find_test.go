@@ -6,11 +6,42 @@ import (
 	"errors"
 	"reflect"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 type unionFindRecordingContext struct {
 	trail  *TrailStack
 	events []unionFindEvent
+}
+
+func TestUnionFindTraceBeforeSameRootReturnAndUnmerge(t *testing.T) {
+	context := NewUnionFindDefaultContext()
+	u, err := NewUnionFind(context)
+	trailMust(t, err)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("union_find")
+	compiled := tags.ShouldTrace("union_find")
+	u.BindTrace(tags)
+	context.GetTrailStack().PushScope()
+	u.MkVar()
+	u.MkVar()
+	u.Merge(0, 1)
+	u.Merge(0, 1)
+	trailMust(t, context.GetTrailStack().PopScope(1))
+	if !compiled {
+		if output.Len() != 0 {
+			t.Fatal("erased union-find TRACE emitted", output.String())
+		}
+		return
+	}
+	want := "-------- [union_find] merge src/util/union_find.h:122 ---------\nmerging 0 1\n------------------------------------------------\n" +
+		"-------- [union_find] merge src/util/union_find.h:122 ---------\nmerging 1 1\n------------------------------------------------\n" +
+		"-------- [union_find] unmerge src/util/union_find.h:79 ---------\nunmerging 0 1\n------------------------------------------------\n"
+	if output.String() != want {
+		t.Fatal("source merge/unmerge TRACE order", output.String())
+	}
 }
 
 type unionFindEvent struct {

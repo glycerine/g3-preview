@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var ErrUnionFindContext = errors.New("g3: union-find context has no trail stack")
@@ -48,6 +50,7 @@ type UnionFind struct {
 	find    []uint32
 	size    []uint32
 	next    []uint32
+	trace   *diagnostic.TraceTags
 }
 
 func NewUnionFind(context UnionFindContext) (*UnionFind, error) {
@@ -65,6 +68,25 @@ func NewDefaultUnionFind() *UnionFind {
 	context := NewUnionFindDefaultContext()
 	result, _ := NewUnionFind(context)
 	return result
+}
+
+// BindTrace borrows the source process trace state for this concrete owner.
+// Nil restores the process-global trace tags.
+func (u *UnionFind) BindTrace(tags *diagnostic.TraceTags) {
+	u.trace = tags
+}
+
+func (u *UnionFind) traceRoots(function string, line int, verb string, root1, root2 uint32) {
+	tags := u.trace
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if tags.ShouldTrace("union_find") {
+		// Source std::ofstream has no throwing exceptions by default. An output
+		// failure leaves the union-find transition uninterrupted.
+		_ = tags.Emit("union_find", function, "src/util/union_find.h", line,
+			fmt.Sprintf("%s %d %d\n", verb, root1, root2))
+	}
 }
 
 func (u *UnionFind) MkVar() uint32 {
@@ -101,6 +123,7 @@ func (u *UnionFind) IsRoot(value uint32) bool { return u.find[value] == value }
 func (u *UnionFind) Merge(value1, value2 uint32) {
 	root1 := u.Find(value1)
 	root2 := u.Find(value2)
+	u.traceRoots("merge", 122, "merging", root1, root2)
 	if root1 == root2 {
 		return
 	}
@@ -117,6 +140,7 @@ func (u *UnionFind) Merge(value1, value2 uint32) {
 
 func (u *UnionFind) unmerge(root1 uint32) {
 	root2 := u.find[root1]
+	u.traceRoots("unmerge", 79, "unmerging", root1, root2)
 	u.size[root2] -= u.size[root1]
 	u.find[root1] = root1
 	u.next[root1], u.next[root2] = u.next[root2], u.next[root1]

@@ -172344,6 +172344,14 @@
           ]
         },
         {
+          "name": "union_find merge and unmerge optional TRACE records at retained backtracking caller",
+          "status": "ported",
+          "go_target": "pkg/util/backtrack/union_find.go",
+          "tests": [
+            "TestUnionFindTraceBeforeSameRootReturnAndUnmerge"
+          ]
+        },
+        {
           "name": "optional _TRACE file and remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -172441,6 +172449,14 @@
           "go_target": "pkg/util/process/initialize.go",
           "tests": [
             "TestGeneratedInitializeAndFinalizeConcreteServices"
+          ]
+        },
+        {
+          "name": "union_find merge and unmerge optional TRACE records at retained backtracking caller",
+          "status": "ported",
+          "go_target": "pkg/util/backtrack/union_find.go",
+          "tests": [
+            "TestUnionFindTraceBeforeSameRootReturnAndUnmerge"
           ]
         },
         {
@@ -172798,7 +172814,8 @@
         "TestUnionFindBacktrackingCallbacksAndClassCycle",
         "TestUnionFindDissolveEntireClassAndDisplay",
         "TestBasicUnionFindUnknownMergeCycleAndReset",
-        "TestUnionFindContextValidationAndInvariantFailure"
+        "TestUnionFindContextValidationAndInvariantFailure",
+        "TestUnionFindTraceBeforeSameRootReturnAndUnmerge"
       ],
       "conditionals": [
         {
@@ -172870,6 +172887,14 @@
           "go_target": "pkg/util/backtrack/union_find.go",
           "tests": [
             "TestUnionFindBacktrackingCallbacksAndClassCycle"
+          ]
+        },
+        {
+          "name": "union_find merge/unmerge optional TRACE before same-root return and backtrack restoration (union_find.h:79,122)",
+          "status": "ported",
+          "go_target": "pkg/util/backtrack/union_find.go",
+          "tests": [
+            "TestUnionFindTraceBeforeSameRootReturnAndUnmerge"
           ]
         },
         {

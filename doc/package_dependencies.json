@@ -1375,7 +1375,9 @@
     },
     {
       "package": "util/backtrack",
-      "imports": [],
+      "imports": [
+        "util/diagnostic"
+      ],
       "production_files": [
         "trail.go",
         "union_find.go"
@@ -1454,6 +1456,7 @@
         "util_process_verbose.go",
         "util_small_object_allocator.go",
         "util_small_object_allocator_stream.go",
+        "util_trace_erased.go",
         "util_trace_tags.go",
         "util_verbose_context.go",
         "util_warning.go"
