@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/subpaving"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -18,6 +19,7 @@ type FastExprConverter struct {
 	self                                 *FastExprConverter
 	ast                                  *ast.ASTManager
 	engine                               *FastEngine
+	cooperation                          *cooperate.Cooperation
 	qm                                   *numeral.RationalManager
 	family                               ast.FamilyID
 	vars                                 map[ast.ASTHandle]uint32
@@ -64,6 +66,21 @@ func (c *FastExprConverter) check() error {
 	return err
 }
 
+// BindCooperation borrows the source process owner for expression checkpoints.
+func (c *FastExprConverter) BindCooperation(owner *cooperate.Cooperation) error {
+	if err := c.check(); err != nil {
+		return err
+	}
+	if owner == nil {
+		return arena.ErrConfig
+	}
+	if _, err := owner.Enabled(); err != nil {
+		return err
+	}
+	c.cooperation = owner
+	return nil
+}
+
 // InternalizeTerm implements numeral and variable leaves, to_real, add, mul,
 // and positive integral powers.
 // The caller owns numerator and denominator.
@@ -85,6 +102,11 @@ func (c *FastExprConverter) process(t ast.ASTHandle, numerator, denominator *num
 	}
 	if canceled {
 		return 0, ErrExprConverterCanceled
+	}
+	if c.cooperation != nil {
+		if err := c.cooperation.Cooperate("expr2subpaving"); err != nil {
+			return 0, err
+		}
 	}
 	kind, err := c.ast.GetKind(t)
 	if err != nil {

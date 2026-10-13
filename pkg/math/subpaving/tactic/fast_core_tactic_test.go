@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	goaltactic "github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -73,6 +74,12 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if err := cooperation.BeginSection(); err != nil {
 		t.Fatal(err)
 	}
+	var cooperationTrace bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&cooperationTrace)
+	tags.Enable("cooperate_detail")
+	if err := cooperation.BindTrace(tags); err != nil {
+		t.Fatal(err)
+	}
 	if err := core.BindCooperation(cooperation); err != nil {
 		t.Fatal(err)
 	}
@@ -131,6 +138,35 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if cooperation.OwnerThread != 0 {
 		t.Fatal("source tactic search omitted cooperation checkpoint")
 	}
+	if tags.ShouldTrace("cooperate_detail") {
+		conversion := bytes.Index(cooperationTrace.Bytes(), []byte("\nexpr2subpaving, tid: 0\n"))
+		search := bytes.LastIndex(cooperationTrace.Bytes(), []byte("\nsubpaving, tid: 0\n"))
+		if conversion < 0 || search <= conversion {
+			t.Fatal("source conversion must cooperate before search", cooperationTrace.String())
+		}
+	}
+	if err := cooperation.EndTask(); err != nil {
+		t.Fatal(err)
+	}
+	var converterN, converterD numeral.Int
+	if _, err := core.converter.InternalizeTerm(x, &converterN, &converterD); err != nil || cooperation.OwnerThread != 0 {
+		t.Fatal("direct converter checkpoint omitted cooperation", err, cooperation.OwnerThread)
+	}
+	if err := qm.Z.Del(&converterD); err != nil {
+		t.Fatal(err)
+	}
+	if err := qm.Z.Del(&converterN); err != nil {
+		t.Fatal(err)
+	}
+	if err := cooperation.EndTask(); err != nil {
+		t.Fatal(err)
+	}
+	limit := m.ResourceLimit()
+	limit.Cancel()
+	if _, err := core.converter.InternalizeTerm(x, &converterN, &converterD); !errors.Is(err, ErrExprConverterCanceled) || cooperation.OwnerThread != -1 {
+		t.Fatal("cancellation must precede expression cooperation", err, cooperation.OwnerThread)
+	}
+	limit.ResetCancel()
 	if n, err := goal.Size(); err != nil || n != 1 {
 		t.Fatal("input goal retained", n, err)
 	}

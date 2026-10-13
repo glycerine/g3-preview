@@ -92,6 +92,11 @@ func (t *FastCoreTactic) rebuild() error {
 	if err != nil {
 		return errors.Join(err, engine.Close())
 	}
+	if t.cooperation != nil {
+		if err := converter.BindCooperation(t.cooperation); err != nil {
+			return errors.Join(err, converter.Close(), engine.Close())
+		}
+	}
 	t.engine, t.converter = engine, converter
 	return nil
 }
@@ -102,6 +107,9 @@ func (t *FastCoreTactic) BindCooperation(owner *cooperate.Cooperation) error {
 		return err
 	}
 	if err := t.engine.BindCooperation(owner); err != nil {
+		return err
+	}
+	if err := t.converter.BindCooperation(owner); err != nil {
 		return err
 	}
 	t.cooperation = owner

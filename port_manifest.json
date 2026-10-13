@@ -53719,7 +53719,8 @@
         "TestHardwareExprConverterTerms",
         "TestArbitraryExprConverterTermsAndClause",
         "TestArbitraryExprConverterSearchSimpleGoal",
-        "TestFastExprConverterTermsAndClause"
+        "TestFastExprConverterTermsAndClause",
+        "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
       ],
       "assertions": [
         {
@@ -53786,7 +53787,8 @@
         "TestHardwareExprConverterTerms",
         "TestArbitraryExprConverterTermsAndClause",
         "TestArbitraryExprConverterSearchSimpleGoal",
-        "TestFastExprConverterTermsAndClause"
+        "TestFastExprConverterTermsAndClause",
+        "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
       ],
       "conditionals": [
         {
