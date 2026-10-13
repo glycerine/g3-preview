@@ -50824,8 +50824,7 @@
           "go_target": "pkg/math/subpaving/arbitrary_shell_coefficients.go",
           "tests": [
             "TestArbitraryShellCoefficientSourceConversionAndCleanup",
-            "TestArbitraryShellCatchesNonregularNumeralAtInequalityBoundary",
-            "TestArbitraryExprConverterTermsAndClause"
+            "TestArbitraryShellCatchesNonregularNumeralAtInequalityBoundary"
           ]
         },
         {
@@ -50918,8 +50917,7 @@
           "status": "partial",
           "go_target": "pkg/math/subpaving/fast_shell_coefficients.go",
           "tests": [
-            "TestFastShellExactCoefficientsAndDirectedInequalities",
-            "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
+            "TestFastShellExactCoefficientsAndDirectedInequalities"
           ]
         },
         {
@@ -79454,7 +79452,7 @@
         "The concrete command-line scan borrows actual global-parameter, timeout, verbosity, warning, trace-tag and debug contexts. It owns parser flags and filename state; -file can overwrite or clear selection, and a selected empty filename remains distinct from a null pointer. Parameter-display terminal output uses the actual global-parameter service and a shared stdout buffer for -pp. Help/version output and frontend dispatch remain unported."
       ],
       "deviations": [
-        "The concrete scan reaches -T, -v, -nw, -t, -memory, name=value and build-gated -tr/-dbg through actual utility services and preserves option order, early terminal selection, input-kind flags, duplicate warnings, C-string boundaries and -file direct assignment. Trace and debug options are unknown in builds without their corresponding source gate; compiled builds mutate borrowed tag contexts. -p/-pd/-pm/-pp terminal actions now display through the real global-parameter service, including the -pp diagnostic line and -pm usage suffix. Rendering uses a Go bytes.Buffer before writing to the borrowed stdout writer; a render failure still writes its completed prefix. Help/version output, process exit, Windows slash options and frontend dispatch remain open. Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go -T branch returns an explicit range error."
+        "The concrete scan reaches -T, -v, -nw, -t, -memory, name=value and build-gated -tr/-dbg through actual utility services and preserves option order, early terminal selection, input-kind flags, duplicate warnings, C-string boundaries and -file direct assignment. Trace and debug options are unknown in builds without their corresponding source gate; compiled builds mutate borrowed tag contexts. -p/-pd/-pm/-pp terminal actions now display through the real global-parameter service, including the -pp diagnostic line and -pm usage suffix. Rendering writes directly to the borrowed stdout writer in source insertion order, preserving a completed prefix on refusal. Help/version output, process exit, Windows slash options and frontend dispatch remain open. Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go -T branch returns an explicit range error."
       ]
     },
     {
@@ -103689,7 +103687,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/tactic/tactic_exception.go"
+        "pkg/tactic/tactic_exception.go",
+        "pkg/math/subpaving/tactic/fast_core_tactic_test.go"
       ],
       "tests": [
         "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
@@ -103711,6 +103710,9 @@
           "name": "selected tactic_exception copies a caught z3_exception message for the retained MPFF core tactic outer catch (tactic_exception.h:25-34)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_exception.go",
+          "go_targets": [
+            "pkg/math/subpaving/tactic/fast_core_tactic_test.go"
+          ],
           "tests": [
             "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
           ]
@@ -118136,7 +118138,8 @@
         "pkg/util/cooperate/cooperate.go",
         "pkg/util/cooperate/cooperate_debug.go",
         "pkg/util/cooperate/cooperate_nodebug.go",
-        "pkg/util/cooperate/cooperate_test.go"
+        "pkg/util/cooperate/cooperate_test.go",
+        "pkg/math/subpaving/cooperation_checkpoint_source_test.go"
       ],
       "tests": [
         "TestCooperationNoOMPSourceCheckpointAndSection",
@@ -118221,7 +118224,8 @@
         "pkg/util/cooperate/cooperate.go",
         "pkg/util/cooperate/cooperate_debug.go",
         "pkg/util/cooperate/cooperate_nodebug.go",
-        "pkg/util/cooperate/cooperate_test.go"
+        "pkg/util/cooperate/cooperate_test.go",
+        "pkg/math/subpaving/cooperation_checkpoint_source_test.go"
       ],
       "tests": [
         "TestCooperationNoOMPSourceCheckpointAndSection",
@@ -120612,7 +120616,9 @@
         "pkg/util/params/util_gparams_service.go",
         "pkg/util/params/util_gparams_constructor_source.go",
         "pkg/util/params/util_gparams_service_ops.go",
-        "pkg/util/process/initialize.go"
+        "pkg/util/process/initialize.go",
+        "pkg/util/params/util_gparams_service_writer.go",
+        "pkg/util/params/util_source_text_writer.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -120851,6 +120857,18 @@
           "status": "partial",
           "go_target": "pkg/util/params/util_gparams_service_ops.go",
           "tests": []
+        },
+        {
+          "name": "gparams namespace display forwarding to direct borrowed writer with source insertion order and sticky ostream failure (gparams.cpp:612-631)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_gparams_service_writer.go",
+          "go_targets": [
+            "pkg/util/params/util_source_text_writer.go"
+          ],
+          "tests": [
+            "TestGlobalParamsNamespaceDirectWriterAndStickyRefusal",
+            "TestGlobalParamsDirectWriterFailbitStillRegistersCatalog"
+          ]
         }
       ],
       "ownership": [
@@ -120900,7 +120918,9 @@
         "pkg/util/params/util_gparams_source_finalize_test.go",
         "pkg/util/params/util_gparams_service.go",
         "pkg/util/params/util_gparams_constructor_source.go",
-        "pkg/util/params/util_gparams_service_ops.go"
+        "pkg/util/params/util_gparams_service_ops.go",
+        "pkg/util/params/util_gparams_service_writer.go",
+        "pkg/util/params/util_source_text_writer.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -121048,6 +121068,18 @@
             "TestGlobalParamsNamespaceDisplayUsesGoBuffer",
             "TestGlobalParamsNamespaceNativeSymbolConstructionBeforeNull",
             "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
+          ]
+        },
+        {
+          "name": "gparams namespace display forwarding to direct borrowed writer with source insertion order and sticky ostream failure (gparams.cpp:612-631)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_gparams_service_writer.go",
+          "go_targets": [
+            "pkg/util/params/util_source_text_writer.go"
+          ],
+          "tests": [
+            "TestGlobalParamsNamespaceDirectWriterAndStickyRefusal",
+            "TestGlobalParamsDirectWriterFailbitStillRegistersCatalog"
           ]
         }
       ],
@@ -164171,7 +164203,9 @@
         "pkg/util/params/util_params_string_stream.go",
         "pkg/math/subpaving/hardware_context_params.go",
         "pkg/math/subpaving/hardware_shell_coefficients.go",
-        "pkg/math/subpaving/hardware_context_params_test.go"
+        "pkg/math/subpaving/hardware_context_params_test.go",
+        "pkg/util/params/util_param_descrs_writer_test.go",
+        "pkg/util/params/util_source_text_writer.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -164683,6 +164717,17 @@
             "TestParamsGetSymbolMissReturnsDefaultWithoutReadingIt",
             "TestParamsReferenceMatchedValuesSkipUnusedDefaults"
           ]
+        },
+        {
+          "name": "param_descrs::display borrowed ostream insertion path with sticky failure and completed prefix (params.cpp:165-195)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_param_descrs_stream.go",
+          "go_targets": [
+            "pkg/util/params/util_source_text_writer.go"
+          ],
+          "tests": [
+            "TestParamDescrsDisplayToStickyWriterPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -164755,7 +164800,9 @@
         "pkg/util/params/util_params_string_stream.go",
         "pkg/math/subpaving/hardware_context_params.go",
         "pkg/math/subpaving/hardware_shell_coefficients.go",
-        "pkg/math/subpaving/hardware_context_params_test.go"
+        "pkg/math/subpaving/hardware_context_params_test.go",
+        "pkg/util/params/util_param_descrs_writer_test.go",
+        "pkg/util/params/util_source_text_writer.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -165204,6 +165251,17 @@
           "tests": [
             "TestParamsGetSymbolMissReturnsDefaultWithoutReadingIt",
             "TestParamsReferenceMatchedValuesSkipUnusedDefaults"
+          ]
+        },
+        {
+          "name": "param_descrs::display borrowed ostream insertion path with sticky failure and completed prefix (params.cpp:165-195)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_param_descrs_stream.go",
+          "go_targets": [
+            "pkg/util/params/util_source_text_writer.go"
+          ],
+          "tests": [
+            "TestParamDescrsDisplayToStickyWriterPrefix"
           ]
         }
       ],

@@ -62,7 +62,7 @@ func (g *GlobalParams) RegisterModuleDescription(name string, region *arena.Byte
 	defer g.mu.Unlock()
 	return g.registerModuleDescription(name, region, ref, offset)
 }
-func (g *GlobalParams) descriptionInto(out *bytes.Buffer, text utext.RegionCString) error {
+func (g *GlobalParams) descriptionInto(out sourceTextBuffer, text utext.RegionCString) error {
 	if !text.Present {
 		return utext.ErrNullCString
 	}
@@ -90,7 +90,7 @@ func (g *GlobalParams) descriptionInto(out *bytes.Buffer, text utext.RegionCStri
 		}
 	}
 }
-func (g *GlobalParams) moduleHeaderInto(out *bytes.Buffer, key usymbol.Symbol) error {
+func (g *GlobalParams) moduleHeaderInto(out sourceTextBuffer, key usymbol.Symbol) error {
 	if out == nil {
 		return ErrGlobalParamsOwner
 	}
@@ -117,6 +117,13 @@ func (g *GlobalParams) descriptorEntry(n uint32) (*ParamDescrs, error) {
 	return g.Descriptors[n-1], nil
 }
 func (g *GlobalParams) DisplayInto(out *bytes.Buffer, indent uint32, smt2, includeDescr bool) error {
+	var dst sourceTextBuffer
+	if out != nil {
+		dst = out
+	}
+	return g.displayInto(dst, indent, smt2, includeDescr)
+}
+func (g *GlobalParams) displayInto(out sourceTextBuffer, indent uint32, smt2, includeDescr bool) error {
 	if g == nil {
 		return ErrGlobalParamsOwner
 	}
@@ -132,7 +139,7 @@ func (g *GlobalParams) DisplayInto(out *bytes.Buffer, indent uint32, smt2, inclu
 	if e := g.ensureRegistered(); e != nil {
 		return e
 	}
-	if e := g.GlobalDescriptors.DisplayInto(out, indent+4, smt2, includeDescr); e != nil {
+	if e := g.GlobalDescriptors.displayInto(out, indent+4, smt2, includeDescr); e != nil {
 		return e
 	}
 	out.WriteByte('\n')
@@ -147,13 +154,20 @@ func (g *GlobalParams) DisplayInto(out *bytes.Buffer, indent uint32, smt2, inclu
 		if e != nil {
 			return e
 		}
-		if e = d.DisplayInto(out, indent+4, smt2, includeDescr); e != nil {
+		if e = d.displayInto(out, indent+4, smt2, includeDescr); e != nil {
 			return e
 		}
 	}
 	return nil
 }
 func (g *GlobalParams) DisplayModulesInto(out *bytes.Buffer) error {
+	var dst sourceTextBuffer
+	if out != nil {
+		dst = out
+	}
+	return g.displayModulesInto(dst)
+}
+func (g *GlobalParams) displayModulesInto(out sourceTextBuffer) error {
 	if g == nil {
 		return ErrGlobalParamsOwner
 	}
@@ -170,6 +184,13 @@ func (g *GlobalParams) DisplayModulesInto(out *bytes.Buffer) error {
 	return nil
 }
 func (g *GlobalParams) DisplayModuleInto(out *bytes.Buffer, name string) error {
+	var dst sourceTextBuffer
+	if out != nil {
+		dst = out
+	}
+	return g.displayModuleInto(dst, name)
+}
+func (g *GlobalParams) displayModuleInto(out sourceTextBuffer, name string) error {
 	if g == nil {
 		return ErrGlobalParamsOwner
 	}
@@ -186,7 +207,7 @@ func (g *GlobalParams) DisplayModuleInto(out *bytes.Buffer, name string) error {
 }
 
 // Caller owns the existing imp lock and has reached its ordinary open guard.
-func (g *GlobalParams) displayModuleKey(out *bytes.Buffer, key usymbol.Symbol) error {
+func (g *GlobalParams) displayModuleKey(out sourceTextBuffer, key usymbol.Symbol) error {
 	d, found, e := g.findModuleDescriptor(key)
 	if e != nil {
 		return e
@@ -197,13 +218,23 @@ func (g *GlobalParams) displayModuleKey(out *bytes.Buffer, key usymbol.Symbol) e
 	if e = g.moduleHeaderInto(out, key); e != nil {
 		return e
 	}
-	return d.DisplayInto(out, 4, false, true)
+	return d.displayInto(out, 4, false, true)
 }
 
 // DisplayParameterInto preserves the source's unsolicited stdout line in the
 // explicit debugOut stream before descriptor lookup. Binding that stream to
 // process stdout remains the runtime caller's job; it is not a global CLI.
 func (g *GlobalParams) DisplayParameterInto(out, debugOut *bytes.Buffer, name string) error {
+	var dst, debugDst sourceTextBuffer
+	if out != nil {
+		dst = out
+	}
+	if debugOut != nil {
+		debugDst = debugOut
+	}
+	return g.displayParameterInto(dst, debugDst, name)
+}
+func (g *GlobalParams) displayParameterInto(out, debugOut sourceTextBuffer, name string) error {
 	if g == nil {
 		return ErrGlobalParamsOwner
 	}

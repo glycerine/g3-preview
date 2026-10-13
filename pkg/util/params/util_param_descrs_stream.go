@@ -2,6 +2,8 @@ package params
 
 import (
 	"bytes"
+	"errors"
+	"io"
 
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
@@ -13,6 +15,20 @@ func (d *ParamDescrs) DisplayInto(dst *bytes.Buffer, indent uint32, smt2, includ
 	if dst == nil {
 		return ErrParamDescrsPrecondition
 	}
+	return d.displayInto(dst, indent, smt2, includeDescr)
+}
+
+// DisplayTo writes directly to the borrowed output stream. A refusing stream
+// enters sticky failbit while the source descriptor traversal continues.
+func (d *ParamDescrs) DisplayTo(dst io.Writer, indent uint32, smt2, includeDescr bool) error {
+	if dst == nil {
+		return ErrParamDescrsPrecondition
+	}
+	w := &sourceTextWriter{dst: dst}
+	return errors.Join(d.displayInto(w, indent, smt2, includeDescr), w.failure)
+}
+
+func (d *ParamDescrs) displayInto(dst sourceTextBuffer, indent uint32, smt2, includeDescr bool) error {
 	if d == nil {
 		return ErrParamDescrsPrecondition
 	}
@@ -69,7 +85,7 @@ func (d *ParamDescrs) DisplayInto(dst *bytes.Buffer, indent uint32, smt2, includ
 	}
 	return nil
 }
-func (d *ParamDescrs) writeNameInto(dst *bytes.Buffer, k usymbol.Symbol, smt2 bool) error {
+func (d *ParamDescrs) writeNameInto(dst sourceTextBuffer, k usymbol.Symbol, smt2 bool) error {
 	m := d.manager
 	if e := m.Validate(k); e != nil {
 		return e
