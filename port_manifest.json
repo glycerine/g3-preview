@@ -50957,7 +50957,8 @@
         "pkg/math/subpaving/hardware_context_bounds.go",
         "pkg/math/subpaving/hardware_context_relevance.go",
         "pkg/math/subpaving/hardware_polynomial.go",
-        "pkg/math/subpaving/hardware_context_propagate.go"
+        "pkg/math/subpaving/hardware_context_propagate.go",
+        "pkg/math/subpaving/hardware_split.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -51033,7 +51034,8 @@
         "TestHardwareContextRelevantNewBoundSourceBranches",
         "TestHardwarePolynomialForwardInverseAndUnboundedSelection",
         "TestHardwareContextRootDefinitionOrderAndQueuedWatchers",
-        "TestHardwareChildRecentBoundReplayAndPolynomialWatcher"
+        "TestHardwareChildRecentBoundReplayAndPolynomialWatcher",
+        "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
       ],
       "conditionals": [
         {
@@ -51447,6 +51449,14 @@
           "tests": [
             "TestHardwareChildRecentBoundReplayAndPolynomialWatcher"
           ]
+        },
+        {
+          "name": "Concrete config_hwf node-splitter child creation and decided-bound publication (src/math/subpaving/subpaving_t.h:434-450)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_split.go",
+          "tests": [
+            "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -51526,7 +51536,8 @@
         "pkg/math/subpaving/hardware_context_units.go",
         "pkg/math/subpaving/hardware_context_relevance.go",
         "pkg/math/subpaving/hardware_polynomial.go",
-        "pkg/math/subpaving/hardware_context_propagate.go"
+        "pkg/math/subpaving/hardware_context_propagate.go",
+        "pkg/math/subpaving/hardware_split.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51593,7 +51604,8 @@
         "TestHardwareContextRelevantNewBoundSourceBranches",
         "TestHardwarePolynomialForwardInverseAndUnboundedSelection",
         "TestHardwareContextRootDefinitionOrderAndQueuedWatchers",
-        "TestHardwareChildRecentBoundReplayAndPolynomialWatcher"
+        "TestHardwareChildRecentBoundReplayAndPolynomialWatcher",
+        "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
       ],
       "assertions": [
         {
@@ -52255,6 +52267,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_propagate.go",
           "tests": [
             "TestHardwareChildRecentBoundReplayAndPolynomialWatcher"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf midpoint splitter for unbounded, one-sided, finite and integer child bounds (src/math/subpaving/subpaving_t_def.h:185-247)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_split.go",
+          "tests": [
+            "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
           ]
         }
       ],
@@ -118044,7 +118064,8 @@
         "pkg/math/subpaving/hardware_context_root.go",
         "pkg/math/subpaving/hardware_context_bounds.go",
         "pkg/math/subpaving/hardware_context_relevance.go",
-        "pkg/math/subpaving/hardware_polynomial.go"
+        "pkg/math/subpaving/hardware_polynomial.go",
+        "pkg/math/subpaving/hardware_split.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -118074,7 +118095,8 @@
         "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
         "TestHardwareContextIntegerBoundsAndOpenConflicts",
         "TestHardwareContextRelevantNewBoundSourceBranches",
-        "TestHardwarePolynomialForwardInverseAndUnboundedSelection"
+        "TestHardwarePolynomialForwardInverseAndUnboundedSelection",
+        "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
       ],
       "conditionals": [
         {
@@ -118288,6 +118310,14 @@
           "go_target": "pkg/math/subpaving/hardware_polynomial.go",
           "tests": [
             "TestHardwarePolynomialForwardInverseAndUnboundedSelection"
+          ]
+        },
+        {
+          "name": "Concrete f2n<hwf_manager> directed midpoint add/sub/div and strict comparison reached by hardware splitter (src/util/f2n.h:70-159)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_split.go",
+          "tests": [
+            "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
           ]
         }
       ],
@@ -165869,7 +165899,8 @@
         "pkg/ast/ast_fpa_numeral_probe_test.go",
         "pkg/ast/ast_fpa_plugin.go",
         "pkg/ast/ast_fpa_plugin_source_test.go",
-        "pkg/util/numeral/scoped_arbitrary_float_numeral.go"
+        "pkg/util/numeral/scoped_arbitrary_float_numeral.go",
+        "pkg/math/subpaving/hardware_split.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -165940,7 +165971,8 @@
         "TestASTFloatingPointSpecialConstructorsScopedValue",
         "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
         "TestASTFloatingPointSignedZeroSortOverloads",
-        "TestScopedArbitraryFloatNumeralSourceLifetime"
+        "TestScopedArbitraryFloatNumeralSourceLifetime",
+        "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
       ],
       "conditionals": [
         {
@@ -166174,6 +166206,14 @@
           "go_target": "pkg/util/numeral/scoped_arbitrary_float_numeral.go",
           "tests": [
             "TestScopedArbitraryFloatNumeralSourceLifetime"
+          ]
+        },
+        {
+          "name": "Concrete hardware splitter scoped midpoint and step numerals replaced by stack-owned Go binary64 values",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_split.go",
+          "tests": [
+            "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
           ]
         }
       ],
