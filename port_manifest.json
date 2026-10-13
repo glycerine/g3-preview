@@ -50956,7 +50956,8 @@
         "pkg/math/subpaving/hardware_node.go",
         "pkg/math/subpaving/hardware_context_bounds.go",
         "pkg/math/subpaving/hardware_context_relevance.go",
-        "pkg/math/subpaving/hardware_polynomial.go"
+        "pkg/math/subpaving/hardware_polynomial.go",
+        "pkg/math/subpaving/hardware_context_propagate.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -51030,7 +51031,8 @@
         "TestHardwareContextRootUnitAssertionResumeAndConflict",
         "TestHardwareIntervalConstantNodeViewAndMutationGuards",
         "TestHardwareContextRelevantNewBoundSourceBranches",
-        "TestHardwarePolynomialForwardInverseAndUnboundedSelection"
+        "TestHardwarePolynomialForwardInverseAndUnboundedSelection",
+        "TestHardwareContextRootDefinitionOrderAndQueuedWatchers"
       ],
       "conditionals": [
         {
@@ -51428,6 +51430,14 @@
           "tests": [
             "TestHardwarePolynomialForwardInverseAndUnboundedSelection"
           ]
+        },
+        {
+          "name": "Concrete config_hwf bound queue head, definition visits and resumable root initialization state",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_propagate.go",
+          "tests": [
+            "TestHardwareContextRootDefinitionOrderAndQueuedWatchers"
+          ]
         }
       ],
       "ownership": [
@@ -51506,7 +51516,8 @@
         "pkg/math/subpaving/hardware_context_bounds.go",
         "pkg/math/subpaving/hardware_context_units.go",
         "pkg/math/subpaving/hardware_context_relevance.go",
-        "pkg/math/subpaving/hardware_polynomial.go"
+        "pkg/math/subpaving/hardware_polynomial.go",
+        "pkg/math/subpaving/hardware_context_propagate.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51571,7 +51582,8 @@
         "TestHardwareContextRootUnitAssertionResumeAndConflict",
         "TestHardwareIntervalConstantNodeViewAndMutationGuards",
         "TestHardwareContextRelevantNewBoundSourceBranches",
-        "TestHardwarePolynomialForwardInverseAndUnboundedSelection"
+        "TestHardwarePolynomialForwardInverseAndUnboundedSelection",
+        "TestHardwareContextRootDefinitionOrderAndQueuedWatchers"
       ],
       "assertions": [
         {
@@ -52217,6 +52229,14 @@
           "go_target": "pkg/math/subpaving/hardware_polynomial.go",
           "tests": [
             "TestHardwarePolynomialForwardInverseAndUnboundedSelection"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf root definition order and timestamp-gated polynomial watcher queue (src/math/subpaving/subpaving_t_def.h:1683-1802)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_propagate.go",
+          "tests": [
+            "TestHardwareContextRootDefinitionOrderAndQueuedWatchers"
           ]
         }
       ],
@@ -171246,7 +171266,8 @@
         "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go",
         "pkg/sat/sat_solver_trail_test.go",
         "pkg/sat/sat_var_queue_native_test.go",
-        "pkg/ast/ast_native_plugin_caches_test.go"
+        "pkg/ast/ast_native_plugin_caches_test.go",
+        "pkg/math/subpaving/hardware_context_propagate.go"
       ],
       "tests": [
         "TestParamDescrsNativeStorageAndWarmDuplicate",
@@ -171441,7 +171462,8 @@
         "TestSATSolverNativeTrailColdHeaderAndRetirement",
         "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
         "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards",
-        "TestASTBitVectorNativeCacheGrowthPreservesValidationAndOwnership"
+        "TestASTBitVectorNativeCacheGrowthPreservesValidationAndOwnership",
+        "TestHardwareContextRootDefinitionOrderAndQueuedWatchers"
       ],
       "conditionals": [
         {
@@ -171869,6 +171891,14 @@
             "TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix",
             "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
             "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf bound queue and per-variable polynomial watch lists replaced by typed Go slices",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_propagate.go",
+          "tests": [
+            "TestHardwareContextRootDefinitionOrderAndQueuedWatchers"
           ]
         }
       ],
