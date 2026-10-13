@@ -4865,7 +4865,8 @@
           "go_target": "pkg/util/process/finalize.go",
           "tests": [
             "TestGeneratedInitializeAndFinalizeConcreteServices",
-            "TestGeneratedFinalizeNullProcessSkipsChildren"
+            "TestGeneratedFinalizeNullProcessSkipsChildren",
+            "TestGeneratedMemoryLifecycleContinuesAfterGParamsTraceRefusal"
           ]
         }
       ],
@@ -79440,7 +79441,8 @@
           "go_target": "pkg/util/process/finalize.go",
           "tests": [
             "TestGeneratedInitializeAndFinalizeConcreteServices",
-            "TestGeneratedFinalizeNullProcessSkipsChildren"
+            "TestGeneratedFinalizeNullProcessSkipsChildren",
+            "TestGeneratedMemoryLifecycleContinuesAfterGParamsTraceRefusal"
           ]
         }
       ],
@@ -109682,7 +109684,8 @@
           "go_target": "pkg/util/process/finalize.go",
           "tests": [
             "TestGeneratedInitializeAndFinalizeConcreteServices",
-            "TestGeneratedFinalizeNullProcessSkipsChildren"
+            "TestGeneratedFinalizeNullProcessSkipsChildren",
+            "TestGeneratedMemoryLifecycleContinuesAfterGParamsTraceRefusal"
           ]
         }
       ],
@@ -147906,7 +147909,8 @@
             "TestProcessSourceInitializeConvertsSizeTBeforeSentinel",
             "TestProcessSourceLifecycleRejectsInvalidOwners",
             "TestGeneratedInitializeAndFinalizeConcreteServices",
-            "TestGeneratedFinalizeNullProcessSkipsChildren"
+            "TestGeneratedFinalizeNullProcessSkipsChildren",
+            "TestGeneratedMemoryLifecycleContinuesAfterGParamsTraceRefusal"
           ]
         },
         {
@@ -148297,7 +148301,8 @@
             "TestProcessSourceInitializeConvertsSizeTBeforeSentinel",
             "TestProcessSourceLifecycleRejectsInvalidOwners",
             "TestGeneratedInitializeAndFinalizeConcreteServices",
-            "TestGeneratedFinalizeNullProcessSkipsChildren"
+            "TestGeneratedFinalizeNullProcessSkipsChildren",
+            "TestGeneratedMemoryLifecycleContinuesAfterGParamsTraceRefusal"
           ]
         },
         {

@@ -85,16 +85,29 @@ func TestLPParameterCatalogReachedFailurePrefixes(t *testing.T) {
 			if err := d.InsertName(key, uparams.ParamString, nil, nil, nil); err != nil {
 				t.Fatal(err)
 			}
-			if err := catalogCollectLpParams(d); err != uparams.ErrParamDescrsPrecondition {
-				t.Fatal("actual kind collision", err)
+			err := catalogCollectLpParams(d)
+			if sourceDebugEnabled {
+				if err != uparams.ErrParamDescrsPrecondition {
+					t.Fatal("checked kind collision", err)
+				}
+			} else if err != nil {
+				t.Fatal("release duplicate must retain the first descriptor", err)
 			}
 			n, err := d.Size()
-			if err != nil || n != uint32(i+1) {
+			wantSize := uint32(len(keys))
+			if sourceDebugEnabled {
+				wantSize = uint32(i + 1)
+			}
+			if err != nil || n != wantSize {
 				t.Fatal("completed prefix", n, err)
+			}
+			kind, err := d.KindName(key)
+			if err != nil || kind != uparams.ParamString {
+				t.Fatal("first descriptor kind changed", key, kind, err)
 			}
 			for j, name := range keys {
 				present, err := d.ContainsName(name)
-				if err != nil || present != (j <= i) {
+				if err != nil || present != (!sourceDebugEnabled || j <= i) {
 					t.Fatal(name, present, err)
 				}
 			}
