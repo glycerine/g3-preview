@@ -240,6 +240,85 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if err := display(&shown, quotedVariable); err != nil || shown.String() != "|x y|" {
 		t.Fatal("source SMT2 quoted symbol", shown.String(), err)
 	}
+	functionName, err := sy.Intern("f g")
+	if err != nil {
+		t.Fatal(err)
+	}
+	function, err := m.MkFuncDecl(functionName, []ast.ASTHandle{sort}, sort, ast.ASTFuncDeclInfo{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := q.SetString(&value, "-2"); err != nil {
+		t.Fatal(err)
+	}
+	negative, err := m.ArithmeticNumeral(&value, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, term := range []struct {
+		arg  ast.ASTHandle
+		want string
+	}{{x, "(|f g| x)"}, {two, "(|f g| 2)"}, {negative, "(|f g| (- 2))"}} {
+		application, err := m.MkApp(function, []ast.ASTHandle{term.arg})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := m.IncRef(application); err != nil {
+			t.Fatal(err)
+		}
+		variable, err := printing.converter.InternalizeTerm(application, &n, &d)
+		if err != nil {
+			t.Fatal(err)
+		}
+		display, err := printing.converter.VariableDisplay(sy)
+		if err != nil {
+			t.Fatal(err)
+		}
+		shown.Reset()
+		if err := display(&shown, variable); err != nil || shown.String() != term.want {
+			t.Fatal("uninterpreted arithmetic application", shown.String(), term.want, err)
+		}
+		if err := m.DecRef(application); err != nil {
+			t.Fatal(err)
+		}
+	}
+	realSort, err := m.MkFamilySort(family, 0, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	realFunction, err := m.MkFuncDecl(functionName, []ast.ASTHandle{realSort}, realSort, ast.ASTFuncDeclInfo{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := q.SetString(&value, "1/2"); err != nil {
+		t.Fatal(err)
+	}
+	fraction, err := m.ArithmeticNumeral(&value, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fractionApp, err := m.MkApp(realFunction, []ast.ASTHandle{fraction})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := m.IncRef(fractionApp); err != nil {
+		t.Fatal(err)
+	}
+	fractionVariable, err := printing.converter.InternalizeTerm(fractionApp, &n, &d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	display, err = printing.converter.VariableDisplay(sy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	shown.Reset()
+	if err := display(&shown, fractionVariable); err != nil || shown.String() != "(|f g| (/ 1.0 2.0))" {
+		t.Fatal("source real rational literal in application", shown.String(), err)
+	}
+	if err := m.DecRef(fractionApp); err != nil {
+		t.Fatal(err)
+	}
 	shown.Reset()
 	if got, err := printing.ApplyWithOutput(goal, &shown); err != nil || got != goal || shown.String() != "x <= 2\nbounds at leaves: \nx <= 2\n" {
 		t.Fatal("selected print_nodes output", got, err, shown.String())
