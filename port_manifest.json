@@ -164205,7 +164205,9 @@
         "pkg/math/subpaving/hardware_shell_coefficients.go",
         "pkg/math/subpaving/hardware_context_params_test.go",
         "pkg/util/params/util_param_descrs_writer_test.go",
-        "pkg/util/params/util_source_text_writer.go"
+        "pkg/util/params/util_source_text_writer.go",
+        "pkg/util/params/util_params_ref_writer.go",
+        "pkg/util/params/util_params_ref_writer_test.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -164728,6 +164730,15 @@
           "tests": [
             "TestParamDescrsDisplayToStickyWriterPrefix"
           ]
+        },
+        {
+          "name": "params_ref::display, display(symbol), and display_smt2 direct borrowed ostream insertions and empty-reference guards (params.cpp:503-543)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref_writer.go",
+          "tests": [
+            "TestParamsReferenceDirectWriterCompletedPrefixes",
+            "TestParamsReferenceDirectWriterEmptyKeyAndSMT2Guards"
+          ]
         }
       ],
       "ownership": [
@@ -164802,7 +164813,9 @@
         "pkg/math/subpaving/hardware_shell_coefficients.go",
         "pkg/math/subpaving/hardware_context_params_test.go",
         "pkg/util/params/util_param_descrs_writer_test.go",
-        "pkg/util/params/util_source_text_writer.go"
+        "pkg/util/params/util_source_text_writer.go",
+        "pkg/util/params/util_params_ref_writer.go",
+        "pkg/util/params/util_params_ref_writer_test.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -165262,6 +165275,15 @@
           ],
           "tests": [
             "TestParamDescrsDisplayToStickyWriterPrefix"
+          ]
+        },
+        {
+          "name": "params_ref::display, display(symbol), and display_smt2 direct borrowed ostream insertions and empty-reference guards (params.cpp:503-543)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref_writer.go",
+          "tests": [
+            "TestParamsReferenceDirectWriterCompletedPrefixes",
+            "TestParamsReferenceDirectWriterEmptyKeyAndSMT2Guards"
           ]
         }
       ],

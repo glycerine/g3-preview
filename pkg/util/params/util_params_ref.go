@@ -108,6 +108,7 @@ type ParamsContext struct {
 	sourceSerial      uint64
 	pages             []paramsEntryPage
 	workspace         []byte
+	formatWriter      *sourceTextWriter
 	pageEntries       uint32
 	headerBytes       uint64
 	Closed            bool
@@ -1072,6 +1073,10 @@ func (c *ParamsContext) reserveFormat(extra int) error {
 	return nil
 }
 func (c *ParamsContext) appendString(s string) error {
+	if c.formatWriter != nil {
+		_, _ = c.formatWriter.WriteString(s)
+		return nil
+	}
 	if e := c.reserveFormat(len(s)); e != nil {
 		return e
 	}
@@ -1079,6 +1084,9 @@ func (c *ParamsContext) appendString(s string) error {
 	return nil
 }
 func (c *ParamsContext) appendByte(b byte) error {
+	if c.formatWriter != nil {
+		return c.formatWriter.WriteByte(b)
+	}
 	if e := c.reserveFormat(1); e != nil {
 		return e
 	}
@@ -1115,6 +1123,9 @@ func (c *ParamsContext) appendSymbol(k usymbol.Symbol, strMode, normalize bool) 
 		b := strconv.AppendInt(a[:0], int64(int32(k.Value)), 10)
 		if e := c.appendString("k!"); e != nil {
 			return e
+		}
+		if c.formatWriter != nil {
+			return c.appendString(string(b))
 		}
 		if e := c.reserveFormat(len(b)); e != nil {
 			return e
@@ -1185,6 +1196,9 @@ func (c *ParamsContext) appendValue(x *paramEntry) error {
 		return c.appendEntryText(x)
 	case ParamNumeral:
 		for {
+			if c.formatWriter != nil {
+				c.workspace = c.workspace[:0]
+			}
 			if e := c.reserveFormat(64); e != nil {
 				return e
 			}
@@ -1200,11 +1214,17 @@ func (c *ParamsContext) appendValue(x *paramEntry) error {
 			if e != nil {
 				return e
 			}
+			if c.formatWriter != nil {
+				return c.appendString(string(dst[:n]))
+			}
 			c.workspace = c.workspace[:old+n]
 			return nil
 		}
 	default:
 		return ErrParamsPrecondition
+	}
+	if c.formatWriter != nil {
+		return c.appendString(string(b))
 	}
 	if e := c.reserveFormat(len(b)); e != nil {
 		return e
