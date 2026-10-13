@@ -166623,14 +166623,18 @@
       "path": "src/util/scoped_numeral_buffer.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/numeral/scoped_numeral_buffer.go",
         "pkg/util/numeral/scoped_numeral_buffer_source_test.go",
         "pkg/util/numeral/scoped_numeral_buffer_review_test.go",
         "pkg/util/numeral/scoped_integer_buffer16.go",
         "pkg/math/subpaving/tactic/expr_converter.go",
-        "pkg/math/subpaving/tactic/expr_converter_test.go"
+        "pkg/math/subpaving/tactic/expr_converter_test.go",
+        "pkg/math/polynomial/polynomial_to_polynomial.go",
+        "pkg/math/polynomial/polynomial_global_convert.go",
+        "pkg/math/polynomial/polynomial_to_polynomial_test.go",
+        "pkg/math/polynomial/polynomial_global_convert_test.go"
       ],
       "tests": [
         "TestScopedNumeralBufferNativeGrowthResetAndResize",
@@ -166644,7 +166648,11 @@
         "TestScopedIntegerBuffer16CopiesMutableSubpavingCoefficients",
         "TestScopedIntegerBuffer16FailedCopyRetainsOwningCleanup",
         "TestScopedIntegerBuffer16FailedInPlaceScaleRetainsOwningCleanup",
-        "TestHardwareExprConverterTerms"
+        "TestHardwareExprConverterTerms",
+        "TestPolynomialToPolynomialIndependentAscendingCoefficients",
+        "TestPolynomialToPolynomialEveryActualPrefix",
+        "TestPolynomialGlobalConvertDistinctOwnerFilter",
+        "TestPolynomialGlobalConvertEveryActualPrefix"
       ],
       "conditionals": [
         {
@@ -166689,7 +166697,7 @@
         "Concrete []Int elements retain numeral ownership. Deep copy and ascending source deletion remain explicit; a stopped deletion leaves older elements untouched, and borrowed views reference the live slice rather than a clone. The subpaving integer specialization has its own manager-owned copied numerals and explicit owning cleanup after a stopped source scope."
       ],
       "deviations": [
-        "The polynomial mpzzp and subpaving unsynch_mpz specializations use separate concrete []Int owners. The subpaving process_add specialization is now integrated in the hardware expression converter. The polynomial to_polynomial/convert callers remain open, so the whole header stays partial; no any-valued universal buffer is retained.",
+        "The polynomial mpzzp and subpaving unsynch_mpz specializations use separate concrete []Int owners. All three retained production sites are integrated: polynomial to_polynomial and global convert use ScopedIntegerModularBuffer128, and subpaving process_add uses ScopedIntegerBuffer16. Native slices replace source inline/spill storage; no any-valued universal buffer is retained.",
         "Borrowed views remain valid only while the owning buffer is live and unchanged."
       ]
     },
