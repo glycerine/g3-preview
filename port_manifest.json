@@ -51773,6 +51773,7 @@
         "pkg/math/subpaving/arbitrary_interval_scalar.go",
         "pkg/math/subpaving/arbitrary_interval_power.go",
         "pkg/math/subpaving/arbitrary_context_root.go",
+        "pkg/math/subpaving/arbitrary_context_bounds.go",
         "pkg/math/subpaving/arbitrary_polynomial.go",
         "pkg/math/subpaving/arbitrary_monomial.go",
         "pkg/math/subpaving/arbitrary_clause.go",
@@ -52479,6 +52480,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_params.go",
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf root node, directed integer bound normalization, conflict detection and source-order resumable unit assertion (src/math/subpaving/subpaving_t_def.h:291-342,525-581,1337-1343,1773-1785)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_context_bounds.go",
+          "tests": [
+            "TestArbitraryShellCoefficientSourceConversionAndCleanup"
           ]
         },
         {
@@ -118501,6 +118510,7 @@
         "pkg/util/numeral/mpf_numeral_rational_string.go",
         "pkg/util/numeral/mpf_numeral_lifetime.go",
         "pkg/math/subpaving/arbitrary_context_root.go",
+        "pkg/math/subpaving/arbitrary_context_bounds.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",

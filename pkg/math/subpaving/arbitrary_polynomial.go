@@ -30,7 +30,7 @@ func (c *ArbitraryContext) DefinePolynomial(constant *numeral.ArbitraryFloat, co
 	if err := c.open(); err != nil {
 		return 0, err
 	}
-	if constant == nil || len(coefficients) != len(variables) {
+	if c.root != nil || constant == nil || len(coefficients) != len(variables) {
 		return 0, arena.ErrInvalidSlot
 	}
 	for _, x := range variables {

@@ -30,6 +30,10 @@ type ArbitraryContext struct {
 	inequalities                                    []*ArbitraryInequality
 	clauses                                         []*ArbitraryClause
 	unitClauses                                     []arbitraryUnitClause
+	unitHead                                        int
+	root                                            *ArbitraryNode
+	bounds                                          []*ArbitraryBound
+	timestamp                                       uint64
 	owners                                          [4]*numeral.ScopedArbitraryFloatNumeral
 	epsilon, maxBound, minusMaxBound, rootPrecision *numeral.ArbitraryFloat
 	zeroEpsilon                                     bool
@@ -133,7 +137,7 @@ func (c *ArbitraryContext) NewVariable(integer bool) (uint32, error) {
 	if err := c.open(); err != nil {
 		return 0, err
 	}
-	if len(c.variables) >= math.MaxUint32 {
+	if c.root != nil || len(c.variables) >= math.MaxUint32 {
 		return 0, arena.ErrInvalidSlot
 	}
 	x := uint32(len(c.variables))
@@ -179,6 +183,16 @@ func (c *ArbitraryContext) Close() error {
 	if err := c.closeNumerals(); err != nil {
 		return err
 	}
+	for len(c.bounds) != 0 {
+		b := c.bounds[0]
+		if err := c.numbers.Del(&b.value); err != nil {
+			return err
+		}
+		c.bounds[0] = nil
+		c.bounds = c.bounds[1:]
+	}
+	c.bounds = nil
+	c.root = nil
 	for len(c.unitClauses) != 0 {
 		a := c.unitClauses[0].atom
 		if a.refs == 0 {

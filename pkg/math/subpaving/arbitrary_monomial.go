@@ -27,7 +27,7 @@ func (c *ArbitraryContext) DefineMonomial(powers []ArbitraryPower) (uint32, erro
 	if err := c.open(); err != nil {
 		return 0, err
 	}
-	if len(powers) == 0 || len(c.variables) >= math.MaxUint32 {
+	if c.root != nil || len(powers) == 0 || len(c.variables) >= math.MaxUint32 {
 		return 0, arena.ErrInvalidSlot
 	}
 	for _, power := range powers {

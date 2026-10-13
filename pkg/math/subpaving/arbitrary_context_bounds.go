@@ -1,0 +1,170 @@
+// Source: src/math/subpaving/subpaving_t_def.h:291-342,525-581,1337-1343,
+// 1773-1785, concrete config_mpf root unit-bound publication.
+package subpaving
+
+import (
+	"errors"
+	"math"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/numeral"
+)
+
+var ErrArbitraryContextCanceled = errors.New("subpaving: arbitrary context canceled")
+var ErrArbitraryContextTimestamp = errors.New("subpaving: arbitrary bound timestamp exhausted")
+
+type ArbitraryBound struct {
+	context   *ArbitraryContext
+	variable  uint32
+	value     numeral.ArbitraryFloat
+	lower     bool
+	open      bool
+	timestamp uint64
+	previous  *ArbitraryBound
+	axiom     bool
+}
+
+type ArbitraryNode struct {
+	context      *ArbitraryContext
+	lower, upper []*ArbitraryBound
+	trail        *ArbitraryBound
+	conflictVar  uint32
+}
+
+func (c *ArbitraryContext) checkRoot(n *ArbitraryNode, variable uint32) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if n == nil || n != c.root || n.context != c || variable >= uint32(len(c.variables)) {
+		return arena.ErrInvalidSlot
+	}
+	return nil
+}
+
+// Root creates the source's initial all-unbounded node. Later initialization
+// phases (definition propagation and search) remain with the context port.
+func (c *ArbitraryContext) Root() (*ArbitraryNode, error) {
+	if err := c.open(); err != nil {
+		return nil, err
+	}
+	if c.root == nil {
+		c.timestamp = 0
+		c.root = &ArbitraryNode{
+			context: c, lower: make([]*ArbitraryBound, len(c.variables)),
+			upper: make([]*ArbitraryBound, len(c.variables)), conflictVar: math.MaxUint32,
+		}
+	}
+	return c.root, nil
+}
+
+func (n *ArbitraryNode) Bounds(variable uint32) (lower, upper *ArbitraryBound, err error) {
+	if n == nil || n.context == nil {
+		return nil, nil, arena.ErrInvalidSlot
+	}
+	if err = n.context.checkRoot(n, variable); err != nil {
+		return nil, nil, err
+	}
+	return n.lower[variable], n.upper[variable], nil
+}
+
+func (n *ArbitraryNode) ConflictingBounds(variable uint32) (bool, error) {
+	l, u, err := n.Bounds(variable)
+	if err != nil || l == nil || u == nil {
+		return false, err
+	}
+	m := n.context.numbers
+	less, err := m.Less(&u.value, &l.value)
+	if err != nil || less {
+		return less, err
+	}
+	if !l.open && !u.open {
+		return false, nil
+	}
+	return m.Equal(&u.value, &l.value)
+}
+
+// PublishBound follows mk_bound: an integer variable first gets ceil/floor,
+// then a still-open integral endpoint moves one step in the directed mode.
+// It records the owned numeral before any fallible copy so Close can recover
+// a stopped construction.
+func (c *ArbitraryContext) PublishBound(n *ArbitraryNode, variable uint32, value *numeral.ArbitraryFloat, lower, open, axiom bool) error {
+	if err := c.checkRoot(n, variable); err != nil {
+		return err
+	}
+	if value == nil || n.conflictVar != math.MaxUint32 {
+		return arena.ErrInvalidSlot
+	}
+	b := &ArbitraryBound{context: c, variable: variable, lower: lower, open: open, axiom: axiom}
+	c.bounds = append(c.bounds, b)
+	m := c.numbers
+	if c.variables[variable] {
+		integer, err := m.IsInteger(value)
+		if err != nil {
+			return err
+		}
+		if !integer {
+			b.open = false
+		}
+		if lower {
+			if err := m.Ceil(value, &b.value); err != nil {
+				return err
+			}
+		} else if err := m.Floor(value, &b.value); err != nil {
+			return err
+		}
+		if b.open {
+			b.open = false
+			m.SetRounding(!lower)
+			if lower {
+				if err := m.Increment(&b.value); err != nil {
+					return err
+				}
+			} else if err := m.Decrement(&b.value); err != nil {
+				return err
+			}
+		}
+	} else if err := m.Copy(&b.value, value); err != nil {
+		return err
+	}
+	b.timestamp = c.timestamp
+	b.previous = n.trail
+	n.trail = b
+	if lower {
+		n.lower[variable] = b
+	} else {
+		n.upper[variable] = b
+	}
+	conflict, err := n.ConflictingBounds(variable)
+	if err != nil {
+		return err
+	}
+	if conflict {
+		n.conflictVar = variable
+	}
+	c.timestamp++
+	if c.timestamp == math.MaxUint64 {
+		return ErrArbitraryContextTimestamp
+	}
+	return nil
+}
+
+// AssertRootUnits checkpoints before each unit and resumes after a canceled
+// checkpoint without replaying the completed prefix.
+func (c *ArbitraryContext) AssertRootUnits() (*ArbitraryNode, error) {
+	n, err := c.Root()
+	if err != nil {
+		return nil, err
+	}
+	for c.unitHead < len(c.unitClauses) && n.conflictVar == math.MaxUint32 {
+		if !c.limit.Inc() {
+			return n, ErrArbitraryContextCanceled
+		}
+		unit := c.unitClauses[c.unitHead]
+		a := unit.atom
+		if err := c.PublishBound(n, a.variable, &a.value, a.lower, a.open, unit.axiom); err != nil {
+			return n, err
+		}
+		c.unitHead++
+	}
+	return n, nil
+}

@@ -232,6 +232,58 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	if stopped == nil || len(context.inequalities) != beforeStopped+1 {
 		t.Fatalf("stopped copied numeral ownership: %v, %d", stopped, len(context.inequalities))
 	}
+	qOne := numeral.NewRational()
+	if err := qm.SetInt32(&qOne, 1); err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := qm.Del(&qOne); err != nil {
+			t.Error(err)
+		}
+	}()
+	strictLower, err := w.MkInequality(y, &qOne, true, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	closedUpper, err := w.MkInequality(y, &qOne, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := context.AddUnitClause(strictLower, true); err != nil {
+		t.Fatal(err)
+	}
+	if err := context.AddUnitClause(closedUpper, true); err != nil {
+		t.Fatal(err)
+	}
+	context.limit.Limit = context.limit.Steps + 1
+	root, err := context.AssertRootUnits()
+	if !errors.Is(err, ErrArbitraryContextCanceled) || root == nil || context.unitHead != 1 {
+		t.Fatalf("MPF root canceled after first unit: %v, %v, %d", root, err, context.unitHead)
+	}
+	xLower, xUpper, err := root.Bounds(x)
+	if err != nil || xLower == nil || xUpper != nil || !xLower.axiom || xLower.open || root.conflictVar != math.MaxUint32 {
+		t.Fatalf("MPF first axiom bound: %+v, %+v, %v", xLower, xUpper, err)
+	}
+	context.limit.Limit = 0
+	resumed, err := context.AssertRootUnits()
+	if err != nil || resumed != root || context.unitHead != 3 || root.conflictVar != y {
+		t.Fatalf("MPF root conflict after resumed units: %v, %v, %d, %d", resumed, err, context.unitHead, root.conflictVar)
+	}
+	yLower, yUpper, err := root.Bounds(y)
+	if err != nil || yLower == nil || yUpper == nil || yLower.open || yUpper.open || yLower.timestamp != 1 || yUpper.timestamp != 2 {
+		t.Fatalf("MPF directed integer bounds: %+v, %+v, %v", yLower, yUpper, err)
+	}
+	gotLower, err := core.ToDouble(&yLower.value)
+	if err != nil || gotLower != 2 {
+		t.Fatalf("strict integer lower bound: %v, %v", gotLower, err)
+	}
+	gotUpper, err := core.ToDouble(&yUpper.value)
+	if err != nil || gotUpper != 1 {
+		t.Fatalf("closed integer upper bound: %v, %v", gotUpper, err)
+	}
+	if _, err := w.MkVar(false); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("variable registration after root snapshot: %v", err)
+	}
 	if err := w.Close(); err != nil {
 		t.Fatal(err)
 	}
