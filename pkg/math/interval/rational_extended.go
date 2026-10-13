@@ -93,6 +93,18 @@ func (e RationalExtended) Equal(a *numeral.Rational, ak ExtendedKind, b *numeral
 	return e.Numbers.Equal(a, b)
 }
 
+func (e RationalExtended) Less(a *numeral.Rational, ak ExtendedKind, b *numeral.Rational, bk ExtendedKind) (bool, error) {
+	if ak != Finite || bk != Finite {
+		return ak < bk, nil
+	}
+	cmp, err := e.Numbers.Compare(a, b)
+	return cmp < 0, err
+}
+
+func (e RationalExtended) Greater(a *numeral.Rational, ak ExtendedKind, b *numeral.Rational, bk ExtendedKind) (bool, error) {
+	return e.Less(b, bk, a, ak)
+}
+
 func (e RationalExtended) Add(a *numeral.Rational, ak ExtendedKind, b *numeral.Rational, bk ExtendedKind, out *numeral.Rational) (ExtendedKind, error) {
 	if ak != Finite && bk != Finite && ak != bk {
 		return Finite, ErrExtendedDomain

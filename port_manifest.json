@@ -35155,6 +35155,26 @@
           ]
         },
         {
+          "name": "Concrete mpq/mpbq mixed-product extrema use source lt/gt then reached structural equality for open-bound tie selection (src/math/interval/interval_def.h:1122-1134)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/rational_interval_mul.go",
+          "go_targets": [
+            "pkg/math/realclosure/binary_interval_mul.go"
+          ],
+          "tests": [
+            "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
+            "TestRealClosureBinaryIntervalRetainedCore"
+          ]
+        },
+        {
+          "name": "Concrete mpq mixed even-power upper-bound selection uses source gt then reached structural equality (src/math/interval/interval_def.h:1342-1351)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/rational_interval_power.go",
+          "tests": [
+            "TestRationalIntervalRetainedPredicatesAddSubAndOwnership"
+          ]
+        },
+        {
           "name": "Retained reset, containment, equality, before, display, add and subtract for mpq intervals (src/math/interval/interval_def.h:597-709,795-837)",
           "status": "partial",
           "go_target": "pkg/math/interval/rational_interval.go",
@@ -116825,6 +116845,20 @@
             "TestRealClosureBinaryIntervalRetainedCore",
             "TestSubpavingFixedMutableIntervalRetainedCore",
             "TestSubpavingFastMutableIntervalRetainedCore"
+          ]
+        },
+        {
+          "name": "Concrete mpq/mpbq ext_numeral lt and gt source kind short circuits and finite manager order (src/util/ext_numeral.h:267-306)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/rational_extended.go",
+          "go_targets": [
+            "pkg/math/interval/binary_extended.go",
+            "pkg/math/realclosure/binary_interval_mul.go"
+          ],
+          "tests": [
+            "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
+            "TestRealClosureBinaryExtendedNumeralBranches",
+            "TestRealClosureBinaryIntervalRetainedCore"
           ]
         },
         {

@@ -226,20 +226,34 @@ func (v *RationalInterval) Mul(a, b *RationalInterval) (err error) {
 		}
 		adOpen, bcOpen := al.open || bu.open, au.open || bl.open
 		acOpen, bdOpen := al.open || bl.open, au.open || bu.open
-		cmp, x := e.Compare(&ad, adk, &bcval, bck)
+		pickAD, x := e.Less(&ad, adk, &bcval, bck)
 		if x != nil {
 			return x
 		}
-		if cmp < 0 || cmp == 0 && !adOpen && bcOpen {
+		if !pickAD {
+			equal, e1 := e.Equal(&ad, adk, &bcval, bck)
+			if e1 != nil {
+				return e1
+			}
+			pickAD = equal && !adOpen && bcOpen
+		}
+		if pickAD {
 			le = intervalEndpoint{&ad, adk, adOpen}
 		} else {
 			le = intervalEndpoint{&bcval, bck, bcOpen}
 		}
-		cmp, x = e.Compare(&acval, ack, &bd, bdk)
+		pickAC, x := e.Greater(&acval, ack, &bd, bdk)
 		if x != nil {
 			return x
 		}
-		if cmp > 0 || cmp == 0 && !acOpen && bdOpen {
+		if !pickAC {
+			equal, e1 := e.Equal(&acval, ack, &bd, bdk)
+			if e1 != nil {
+				return e1
+			}
+			pickAC = equal && !acOpen && bdOpen
+		}
+		if pickAC {
 			ue = intervalEndpoint{&acval, ack, acOpen}
 		} else {
 			ue = intervalEndpoint{&bd, bdk, bdOpen}

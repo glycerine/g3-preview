@@ -47,6 +47,12 @@ func TestRealClosureBinaryExtendedNumeralBranches(t *testing.T) {
 	if cmp, err := e.Compare(&rawOne, Finite, &rawTwoOverTwo, Finite); err != nil || cmp != 0 {
 		t.Fatalf("numeric ordering of the same raw pair: %d, %v", cmp, err)
 	}
+	if less, err := e.Less(&rawOne, Finite, &rawTwoOverTwo, Finite); err != nil || less {
+		t.Fatalf("raw numeric tie less-than: %v, %v", less, err)
+	}
+	if greater, err := e.Greater(&rawOne, Finite, &rawTwoOverTwo, Finite); err != nil || greater {
+		t.Fatalf("raw numeric tie greater-than: %v, %v", greater, err)
+	}
 	if equal, err := e.Equal(nil, PlusInfinity, nil, PlusInfinity); err != nil || !equal {
 		t.Fatalf("matching infinities must not read numerals: %v, %v", equal, err)
 	}

@@ -94,11 +94,18 @@ func (v *RationalInterval) Power(src *RationalInterval, n uint32) (err error) {
 			if err != nil {
 				return err
 			}
-			cmp, e1 := e.Compare(&left, lk, &right, rk)
+			pickLeft, e1 := e.Greater(&left, lk, &right, rk)
 			if e1 != nil {
 				return e1
 			}
-			if cmp > 0 || cmp == 0 && !lo && uo {
+			if !pickLeft {
+				equal, e1 := e.Equal(&left, lk, &right, rk)
+				if e1 != nil {
+					return e1
+				}
+				pickLeft = equal && !lo && uo
+			}
+			if pickLeft {
 				if err = m.Swap(&upper, &left); err != nil {
 					return err
 				}

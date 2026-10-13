@@ -388,4 +388,18 @@ func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 	if before, err := a.Before(b); err != nil || before {
 		t.Fatalf("raw-distinct numerically equal open boundary separated intervals: %v, %v", before, err)
 	}
+	// Both lower candidates multiply to -1. The AD product keeps a raw
+	// denominator exponent and is structurally distinct from the BC product;
+	// source equality therefore selects the open BC bound.
+	rawMinusOne := numeral.NewBinaryIntPower(-2, 1)
+	rawPlusOne := numeral.NewBinaryIntPower(2, 1)
+	minusOne := numeral.NewBinaryInt(-1)
+	must(a.SetFinite(&rawMinusOne, &rawOne, false, false))
+	must(b.SetFinite(&minusOne, &rawPlusOne, true, false))
+	must(c.Mul(a, b))
+	var rawProduct bytes.Buffer
+	must(c.Display(&rawProduct))
+	if rawProduct.String() != "(-1, 1]" {
+		t.Fatalf("source raw-distinct product tie = %q", rawProduct.String())
+	}
 }

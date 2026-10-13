@@ -107,6 +107,17 @@ func (e BinaryExtended) Equal(a *numeral.BinaryRational, ak ExtendedKind, b *num
 	return e.Numbers.Equal(a, b)
 }
 
+func (e BinaryExtended) Less(a *numeral.BinaryRational, ak ExtendedKind, b *numeral.BinaryRational, bk ExtendedKind) (bool, error) {
+	if ak != Finite || bk != Finite {
+		return ak < bk, nil
+	}
+	return e.Numbers.Less(a, b)
+}
+
+func (e BinaryExtended) Greater(a *numeral.BinaryRational, ak ExtendedKind, b *numeral.BinaryRational, bk ExtendedKind) (bool, error) {
+	return e.Less(b, bk, a, ak)
+}
+
 func (e BinaryExtended) Add(a *numeral.BinaryRational, ak ExtendedKind, b *numeral.BinaryRational, bk ExtendedKind, out *numeral.BinaryRational) (ExtendedKind, error) {
 	if ak != Finite && bk != Finite && ak != bk {
 		return Finite, ErrExtendedDomain
