@@ -311,7 +311,8 @@
       ],
       "production_files": [
         "hypotheses.go",
-        "is_closed.go"
+        "is_closed.go",
+        "reduce_hypotheses.go"
       ]
     },
     {
