@@ -28,6 +28,9 @@ type FastContext struct {
 	minusMaxBound    *numeral.FastFloat
 	rootPrecision    *numeral.FastFloat
 	zeroEpsilon      bool
+	maxDepth         uint32
+	maxNodes         uint32
+	maxMemory        uint64
 	arithmeticFailed bool
 	timestamp        uint64
 	queue            []*FastBound
@@ -49,10 +52,32 @@ type FastContext struct {
 // NewFastContext accepts the source's epsilon, max_bound exponent and
 // nth_root_precision parameter values. The caller owns the manager and limit.
 func NewFastContext(m *numeral.FastFloatManager, limit *control.Reslimit, isInt []bool, epsilon, maxBoundPower, rootPrecision uint32) (_ *FastContext, err error) {
+	c, err := newFastContextOwner(m, limit, isInt)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, c.Close())
+		}
+	}()
+	if err = c.updateEpsilon(epsilon); err != nil {
+		return nil, err
+	}
+	if err = c.updateMaxBound(maxBoundPower); err != nil {
+		return nil, err
+	}
+	if err = c.updateRootPrecision(rootPrecision); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+func newFastContextOwner(m *numeral.FastFloatManager, limit *control.Reslimit, isInt []bool) (_ *FastContext, err error) {
 	if m == nil || limit == nil || len(isInt) > math.MaxUint32 {
 		return nil, arena.ErrInvalidSlot
 	}
-	c := &FastContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), zeroEpsilon: epsilon == 0, polynomials: make(map[uint32]*FastPolynomial), monomials: make(map[uint32]*FastMonomial), watchers: make([][]uint32, len(isInt)), watchOrder: make([][]fastWatch, len(isInt))}
+	c := &FastContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), polynomials: make(map[uint32]*FastPolynomial), monomials: make(map[uint32]*FastMonomial), watchers: make([][]uint32, len(isInt)), watchOrder: make([][]fastWatch, len(isInt))}
 	c.self = c
 	defer func() {
 		if err != nil {
@@ -80,40 +105,52 @@ func NewFastContext(m *numeral.FastFloatManager, limit *control.Reslimit, isInt 
 	if c.rootPrecision, err = c.owned[3].Get(); err != nil {
 		return nil, err
 	}
-	if epsilon != 0 {
-		if err = m.SetInt32(c.epsilon, int32(epsilon)); err != nil {
-			return nil, err
-		}
-		if err = m.InvInPlace(c.epsilon); err != nil {
-			return nil, err
-		}
-	}
-	if err = m.SetInt32(c.maxBound, 10); err != nil {
-		return nil, err
-	}
-	if err = m.Power(c.maxBound, maxBoundPower, c.maxBound); err != nil {
-		return nil, err
-	}
-	if err = m.Copy(c.minusMaxBound, c.maxBound); err != nil {
-		return nil, err
-	}
-	if err = m.Neg(c.minusMaxBound); err != nil {
-		return nil, err
-	}
-	if rootPrecision == 0 {
-		rootPrecision = 1
-	}
-	if err = m.SetInt32(c.rootPrecision, int32(rootPrecision)); err != nil {
-		return nil, err
-	}
-	if err = m.InvInPlace(c.rootPrecision); err != nil {
-		return nil, err
-	}
 	if c.root, err = NewFastNode(m, uint32(len(isInt)), nil); err != nil {
 		return nil, err
 	}
 	c.root.context = c
 	return c, nil
+}
+
+func (c *FastContext) updateEpsilon(v uint32) error {
+	if v == 0 {
+		if err := c.numbers.Reset(c.epsilon); err != nil {
+			return err
+		}
+		c.zeroEpsilon = true
+		return nil
+	}
+	if err := c.numbers.SetInt32(c.epsilon, int32(v)); err != nil {
+		return err
+	}
+	if err := c.numbers.InvInPlace(c.epsilon); err != nil {
+		return err
+	}
+	c.zeroEpsilon = false
+	return nil
+}
+
+func (c *FastContext) updateMaxBound(v uint32) error {
+	if err := c.numbers.SetInt32(c.maxBound, 10); err != nil {
+		return err
+	}
+	if err := c.numbers.Power(c.maxBound, v, c.maxBound); err != nil {
+		return err
+	}
+	if err := c.numbers.Copy(c.minusMaxBound, c.maxBound); err != nil {
+		return err
+	}
+	return c.numbers.Neg(c.minusMaxBound)
+}
+
+func (c *FastContext) updateRootPrecision(v uint32) error {
+	if v == 0 {
+		v = 1
+	}
+	if err := c.numbers.SetInt32(c.rootPrecision, int32(v)); err != nil {
+		return err
+	}
+	return c.numbers.InvInPlace(c.rootPrecision)
 }
 
 func (c *FastContext) open() error {

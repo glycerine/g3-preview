@@ -50257,7 +50257,10 @@
         "pkg/math/subpaving/hardware_context_params_test.go",
         "pkg/math/subpaving/hardware_context_root.go",
         "pkg/math/subpaving/tactic/options_test.go",
-        "pkg/math/subpaving/fast_shell_coefficients.go"
+        "pkg/math/subpaving/fast_shell_coefficients.go",
+        "pkg/math/subpaving/fast_context_params.go",
+        "pkg/math/subpaving/tactic/fast_engine.go",
+        "pkg/math/subpaving/tactic/fast_engine_test.go"
       ],
       "tests": [
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
@@ -50271,7 +50274,9 @@
         "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder",
         "TestHardwareShellParamDescriptionsSourceOrder",
         "TestSubpavingTacticOptionSelectionAndDescriptions",
-        "TestFastShellExactCoefficientsAndDirectedInequalities"
+        "TestFastShellExactCoefficientsAndDirectedInequalities",
+        "TestFastContextNamedParamsSinglePassAndStoppedPrefix",
+        "TestFastEngineSelectedOwnerAndPartialCleanup"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -50392,12 +50397,21 @@
           "tests": [
             "TestFastShellExactCoefficientsAndDirectedInequalities"
           ]
+        },
+        {
+          "name": "Concrete MPFF factory and owning shell selected from source-order ParamsRef (src/math/subpaving/subpaving.cpp:260,275-276)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/tactic/fast_engine.go",
+          "tests": [
+            "TestFastEngineSelectedOwnerAndPartialCleanup"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
         "The MPF wrapper prepares exact integer coefficients in source order using a native typed slice, registers context_mpf variables and copies directed rational inequality bounds into context ownership. Construction derives the exact borrowed core from f2n<mpf_manager>::m() and copied Go owner values cannot release the same numerals twice. The enclosing context_mpf search graph and complete tactic lifetime remain open.",
-        "The concrete MPFF wrapper now converts integer coefficients in source order with an exact mpz round trip, chooses directed rational bound rounding, and forwards typed variables, sums, monomials and clauses. Context parameter construction, search/display, and tactic lifetime remain open."
+        "The concrete MPFF wrapper now converts integer coefficients in source order with an exact mpz round trip, chooses directed rational bound rounding, and forwards typed variables, sums, monomials and clauses. Context parameter construction, search/display, and tactic lifetime remain open.",
+        "The selected MPFF shell now owns the context created from source-order named parameters and retires wrapper members before context. Search/display forwarding and full tactic lifetime remain open."
       ]
     },
     {
@@ -51187,7 +51201,9 @@
         "pkg/math/subpaving/hardware_display.go",
         "pkg/math/subpaving/hardware_display_test.go",
         "pkg/math/subpaving/hardware_param_descrs_test.go",
-        "pkg/math/subpaving/hardware_context_params_test.go"
+        "pkg/math/subpaving/hardware_context_params_test.go",
+        "pkg/math/subpaving/fast_context_params.go",
+        "pkg/math/subpaving/fast_context_params_test.go"
       ],
       "tests": [
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
@@ -51279,7 +51295,8 @@
         "TestHardwareShellRetainedClauseAndSearchRoute",
         "TestHardwareShellStatisticsCountersAndReset",
         "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder",
-        "TestHardwareShellParamDescriptionsSourceOrder"
+        "TestHardwareShellParamDescriptionsSourceOrder",
+        "TestFastContextNamedParamsSinglePassAndStoppedPrefix"
       ],
       "conditionals": [
         {
@@ -51791,6 +51808,14 @@
           "tests": [
             "TestArbitraryShellCoefficientSourceConversionAndCleanup"
           ]
+        },
+        {
+          "name": "Concrete config_mpff named parameter fields and source-order updates (src/math/subpaving/subpaving_t.h:516-548)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_context_params.go",
+          "tests": [
+            "TestFastContextNamedParamsSinglePassAndStoppedPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -51799,7 +51824,8 @@
         "Root close precedes source-order unit then problem-clause then lemma reference release; shared inequality values close at their last reference, and remaining unreferenced context-owned values close before context numerals. Idempotent release progress preserves cleanup retries."
       ],
       "deviations": [
-        "The config_mpff tactic variable registration now grows source-order type/watch slots and the Go root bound arrays before initialization. The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open."
+        "The config_mpff tactic variable registration now grows source-order type/watch slots and the Go root bound arrays before initialization. The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open.",
+        "The config_mpff six named parameter updates now retain source order, defaults, partial numeric mutation and a closable refused owner. The Go context allocates its root before this pass; complete constructor allocation order, node search/splitting and full solver lifecycle remain open."
       ]
     },
     {
@@ -51915,7 +51941,9 @@
         "pkg/math/subpaving/hardware_display_test.go",
         "pkg/math/subpaving/hardware_param_descrs_test.go",
         "pkg/math/subpaving/hardware_context_params_test.go",
-        "pkg/math/subpaving/tactic/options_test.go"
+        "pkg/math/subpaving/tactic/options_test.go",
+        "pkg/math/subpaving/fast_context_params.go",
+        "pkg/math/subpaving/fast_context_params_test.go"
       ],
       "tests": [
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
@@ -52009,7 +52037,8 @@
         "TestHardwareShellStatisticsCountersAndReset",
         "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder",
         "TestHardwareShellParamDescriptionsSourceOrder",
-        "TestSubpavingTacticOptionSelectionAndDescriptions"
+        "TestSubpavingTacticOptionSelectionAndDescriptions",
+        "TestFastContextNamedParamsSinglePassAndStoppedPrefix"
       ],
       "assertions": [
         {
@@ -52944,6 +52973,14 @@
           "tests": [
             "TestArbitraryShellCoefficientSourceConversionAndCleanup"
           ]
+        },
+        {
+          "name": "Concrete config_mpff six named updt_params lookups and immediate policy mutations (src/math/subpaving/subpaving_t_def.h:473-501)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_context_params.go",
+          "tests": [
+            "TestFastContextNamedParamsSinglePassAndStoppedPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -52952,7 +52989,8 @@
         "Root close precedes source-order unit then problem-clause then lemma reference release; shared inequality values close at their last reference, and remaining unreferenced context-owned values close before context numerals. Idempotent release progress preserves cleanup retries."
       ],
       "deviations": [
-        "The config_mpff tactic variable registration now grows source-order type/watch slots and the Go root bound arrays before initialization. The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open."
+        "The config_mpff tactic variable registration now grows source-order type/watch slots and the Go root bound arrays before initialization. The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open.",
+        "The config_mpff six named parameter updates now retain source order, defaults, partial numeric mutation and a closable refused owner. The Go context allocates its root before this pass; complete constructor allocation order, node search/splitting and full solver lifecycle remain open."
       ]
     },
     {
@@ -53109,14 +53147,17 @@
         "pkg/math/subpaving/tactic/expr_converter_test.go",
         "pkg/math/subpaving/tactic/arbitrary_expr_converter.go",
         "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go",
-        "pkg/math/subpaving/tactic/arbitrary_expr_converter_test.go"
+        "pkg/math/subpaving/tactic/arbitrary_expr_converter_test.go",
+        "pkg/math/subpaving/tactic/fast_engine.go",
+        "pkg/math/subpaving/tactic/fast_engine_test.go"
       ],
       "tests": [
         "TestSubpavingTacticOptionSelectionAndDescriptions",
         "TestHardwareExprConverterTerms",
         "TestArbitraryEngineSelectedContextAndPartialCleanup",
         "TestArbitraryExprConverterTermsAndClause",
-        "TestArbitraryExprConverterSearchSimpleGoal"
+        "TestArbitraryExprConverterSearchSimpleGoal",
+        "TestFastEngineSelectedOwnerAndPartialCleanup"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -53160,11 +53201,20 @@
           "tests": [
             "TestArbitraryEngineSelectedContextAndPartialCleanup"
           ]
+        },
+        {
+          "name": "Concrete MPFF engine branch selects and owns context_mpff_wrapper with borrowed numeral/rational managers (src/math/subpaving/tactic/subpaving_tactic.cpp:109-120)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/fast_engine.go",
+          "tests": [
+            "TestFastEngineSelectedOwnerAndPartialCleanup"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The HWF and MPF branches construct concrete contexts and expression converters, internalize <=/>= literals with numeral right sides, unwrap nested negations, scale bounds by exact numerator/denominator, and add clauses in source order. The MPF converter borrows a rational manager and uses the selected owning MPF shell. A simple MPF integer-bound goal exercises internalize-then-search and displays its bound. The compound x^2 case preserves the source f2n refusal: unbounded even-power interval propagation resets its finite lower endpoint to zero, and the next interval::set calls f2n::set, whose is_regular check rejects formatted zero. MPQ/MPFF/MPFX engine construction, AST variable display, optional print_nodes output, result tactic ownership, simplify pipeline and factory remain open."
+        "The HWF and MPF branches construct concrete contexts and expression converters, internalize <=/>= literals with numeral right sides, unwrap nested negations, scale bounds by exact numerator/denominator, and add clauses in source order. The MPF converter borrows a rational manager and uses the selected owning MPF shell. A simple MPF integer-bound goal exercises internalize-then-search and displays its bound. The compound x^2 case preserves the source f2n refusal: unbounded even-power interval propagation resets its finite lower endpoint to zero, and the next interval::set calls f2n::set, whose is_regular check rejects formatted zero. MPQ/MPFF/MPFX engine construction, AST variable display, optional print_nodes output, result tactic ownership, simplify pipeline and factory remain open.",
+        "The selected MPFF engine now constructs and owns its concrete context/shell, borrowing numeral and rational managers. MPFF expression conversion, search/display, result ownership and simplify pipeline remain open."
       ]
     },
     {

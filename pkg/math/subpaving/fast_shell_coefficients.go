@@ -5,7 +5,9 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/params"
 )
 
 var ErrFastShellInexactInteger = errors.New("subpaving: integer coefficient cannot be represented exactly as fast float")
@@ -22,7 +24,23 @@ type FastShellCoefficients struct {
 	z1, z2       numeral.Int
 	closeStage   uint8
 	closeIndex   int
+	ownsContext  bool
 	closed       bool
+}
+
+// NewFastShellFromParams constructs the selected MPFF wrapper and context as
+// one owner. A refused parameter pass retains a partial shell for Close.
+func NewFastShellFromParams(m *numeral.FastFloatManager, limit *control.Reslimit, rational *numeral.RationalManager, pc *params.ParamsContext, p *params.ParamsRef) (*FastShellCoefficients, error) {
+	c, cause := NewFastContextFromParams(m, limit, pc, p)
+	if c == nil {
+		return nil, cause
+	}
+	w, err := NewFastShellCoefficients(c, rational)
+	if err != nil {
+		return nil, errors.Join(cause, err, c.Close())
+	}
+	w.ownsContext = true
+	return w, cause
 }
 
 func NewFastShellCoefficients(context *FastContext, rational *numeral.RationalManager) (*FastShellCoefficients, error) {
@@ -191,6 +209,11 @@ func (w *FastShellCoefficients) Close() error {
 			return err
 		}
 		w.closeStage = 4
+	}
+	if w.ownsContext {
+		if err := w.context.Close(); err != nil {
+			return err
+		}
 	}
 	w.closed = true
 	return nil
