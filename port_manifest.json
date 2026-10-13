@@ -118092,11 +118092,21 @@
         },
         {
           "name": "Subpaving context_hwf interval extended-number operations through concrete f2n<hwf_manager>",
-          "status": "unported"
+          "status": "ported",
+          "go_target": "pkg/math/interval/hardware_extended.go",
+          "tests": [
+            "TestSubpavingHardwareExtendedRetainedBranches",
+            "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
+            "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
+            "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
+          ],
+          "go_targets": [
+            "pkg/math/subpaving/hardware_interval.go"
+          ]
         },
         {
           "name": "Concrete hwf extended-number finite/infinity sign, order, negation, arithmetic, reciprocal, power and display for retained subpaving hardware context (src/util/ext_numeral.h:27-344)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/interval/hardware_extended.go",
           "tests": [
             "TestSubpavingHardwareExtendedRetainedBranches"
@@ -118107,7 +118117,7 @@
         },
         {
           "name": "Concrete hwf extended-number multiplication and power consumed by hardware scalar and crossing-zero interval branches (src/util/ext_numeral.h:145-198)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_interval_scalar.go",
           "go_targets": [
             "pkg/math/subpaving/hardware_interval_power.go",
@@ -118127,8 +118137,9 @@
       ],
       "deviations": [
         "No generic manager-interface translation is retained. Concrete mpq, mpbq, mpfx and mpff specializations live beside their interval and subpaving consumers. src/test/ext_numeral.cpp is test-only.",
-        "The interval_manager mpq and real-closure mpbq specializations have concrete live sign, order, arithmetic, reciprocal, power and display paths, with caller-owned outputs and borrowed numerals. The mpbq division and reciprocal paths preserve the real-closure precision and rounding direction. Other retained subpaving mpq/mpfx/mpf/mpff/hwf instantiations remain open.",
-        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner. The mpff helper serves mutable and constant-node fast-float interval views; the enclosing subpaving context is partial. Concrete mpq/mpbq/mpfx/mpff displays now report Go io.Writer short writes after the exact emitted prefix. Source subpaving.cpp constructs context_mpq, context_mpf and context_hwf as additional live interval-manager instantiations; the concrete MPF extended-number path is now partial; mpq/hwf paths remain unported."
+        "The interval_manager mpq and real-closure mpbq specializations have concrete live sign, order, arithmetic, reciprocal, power and display paths, with caller-owned outputs and borrowed numerals. The mpbq division and reciprocal paths preserve the real-closure precision and rounding direction. Other retained subpaving mpq/mpfx/mpf/mpff instantiations remain open.",
+        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner. The mpff helper serves mutable and constant-node fast-float interval views; the enclosing subpaving context is partial. Concrete mpq/mpbq/mpfx/mpff displays now report Go io.Writer short writes after the exact emitted prefix. Source subpaving.cpp constructs context_mpq, context_mpf and context_hwf as additional live interval-manager instantiations; the concrete MPF extended-number path is now partial; the mpq path remains unported and the hwf path is ported at the method level.",
+        "The reached config_hwf extended-number specialization is now complete at the method level through concrete HardwareExtended and hardware interval callers; the shared header remains partial for other retained numeral configurations."
       ]
     },
     {
@@ -118343,7 +118354,7 @@
         },
         {
           "name": "Concrete f2n<hwf_manager> directed reciprocal/multiply and power consumed by hardware scalar and interval-power branches (src/util/f2n.h:70-156)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_interval_scalar.go",
           "go_targets": [
             "pkg/math/subpaving/hardware_interval_power.go",
@@ -118367,7 +118378,7 @@
         },
         {
           "name": "Concrete f2n<hwf_manager> arithmetic, unsigned power and previous-power lookup consumed by hardware Newton root (src/util/f2n.h:70-156)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/interval/hardware_root.go",
           "tests": [
             "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation"
@@ -118375,7 +118386,7 @@
         },
         {
           "name": "Concrete f2n<hwf_manager> power, reciprocal and checked scalar copies consumed by hardware context bound policy (src/util/f2n.h:70-156)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_context_root.go",
           "tests": [
             "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
@@ -118383,7 +118394,7 @@
         },
         {
           "name": "Concrete f2n<hwf_manager> ceil/floor, directed increment/decrement and integer check consumed by hardware subpaving bounds (src/util/f2n.h:70-159)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_context_bounds.go",
           "tests": [
             "TestHardwareContextIntegerBoundsAndOpenConflicts"
@@ -118391,7 +118402,7 @@
         },
         {
           "name": "Concrete f2n<hwf_manager> directed arithmetic and comparison consumed by hardware subpaving epsilon-gap relevance (src/util/f2n.h:70-159)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_context_relevance.go",
           "tests": [
             "TestHardwareContextRelevantNewBoundSourceBranches"
@@ -118399,7 +118410,7 @@
         },
         {
           "name": "Concrete f2n<hwf_manager> coefficient arithmetic reached by hardware polynomial interval propagation (src/util/f2n.h:70-159)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_polynomial.go",
           "tests": [
             "TestHardwarePolynomialForwardInverseAndUnboundedSelection"
@@ -118407,7 +118418,7 @@
         },
         {
           "name": "Concrete f2n<hwf_manager> directed midpoint add/sub/div and strict comparison reached by hardware splitter (src/util/f2n.h:70-159)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_split.go",
           "tests": [
             "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
@@ -118418,7 +118429,8 @@
         "The concrete HWF wrapper borrows its scalar manager and owns two pointer-free binary64 scratch values; no payload destructor is needed. The MPF wrapper borrows its ArbitraryFloatManager and owns its one/tmp numerals, deleting tmp before one on close. The HWF internal rational child is replaced by a borrowed caller manager."
       ],
       "deviations": [
-        "The earlier test-only include audit missed src/math/subpaving/tactic/subpaving_tactic.cpp and the production subpaving_mpf.h/subpaving_hwf.h headers. The tactic constructs f2n<mpf_manager> and f2n<hwf_manager>. The concrete HWF specialization is covered for retained calls; the MPF specialization now has owned scratch and directed arithmetic, predicates, comparisons and integral rounding, with reciprocal, increment/decrement and power now concrete; rational-string and numeral-display forwarding now concrete; live swap, unsigned input, previous-power, inverse overload and precise trait now concrete; interval and enclosing subpaving consumers remain open. No universal template adapter is used."
+        "The earlier test-only include audit missed src/math/subpaving/tactic/subpaving_tactic.cpp and the production subpaving_mpf.h/subpaving_hwf.h headers. The tactic constructs f2n<mpf_manager> and f2n<hwf_manager>. The concrete HWF specialization is covered for retained calls; the MPF specialization now has owned scratch and directed arithmetic, predicates, comparisons and integral rounding, with reciprocal, increment/decrement and power now concrete; rational-string and numeral-display forwarding now concrete; live swap, unsigned input, previous-power, inverse overload and precise trait now concrete; interval and enclosing subpaving consumers remain open. No universal template adapter is used.",
+        "Concrete f2n<hwf_manager> scalar operations reached by hardware intervals, Newton roots, context bound policy, normalization, relevance, polynomial propagation and midpoint splitting are ported; the shared template unit remains partial for other manager instantiations."
       ]
     },
     {
@@ -166303,7 +166315,7 @@
         },
         {
           "name": "Concrete hardware splitter scoped midpoint and step numerals replaced by stack-owned Go binary64 values",
-          "status": "partial",
+          "status": "platform_replacement",
           "go_target": "pkg/math/subpaving/hardware_split.go",
           "tests": [
             "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
@@ -166324,7 +166336,8 @@
       "deviations": [
         "Selected concrete Int, rational, MPBQ and MPFF scopes and the boolean AST FPA MPF scalar caller are represented in Go. Other retained MPF scalar callers remain open at AST, SMT, subpaving and API sites; the unused any-valued callback adapter was removed.",
         "Explicit Close substitutes RAII for the retained concrete owners. Display returns Go strings instead of recreating C++ ostream insertion.",
-        "TLS signed-host overflow fixtures test an explicitly guarded source-undefined domain, not ordinary exhaustion or an end-to-end recursive arithmetic claim."
+        "TLS signed-host overflow fixtures test an explicitly guarded source-undefined domain, not ordinary exhaustion or an end-to-end recursive arithmetic claim.",
+        "The hardware midpoint and one-sided step scoped numerals are stack-owned Go binary64 values. Source destructor work has no separately retained Go action for this concrete scalar path."
       ]
     },
     {
