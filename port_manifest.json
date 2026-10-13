@@ -18200,6 +18200,7 @@
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
+        "TestSmallerPatternSaveTraceBeforePairPublication",
         "TestPatternInferenceLoopFilterConcreteCandidateOwnership",
         "TestPatternInferenceContainsSubpatternAndBiggerFilter",
         "TestPatternInferenceStableWeightAndUnaryPatternOwnership",
@@ -18308,7 +18309,8 @@
           "status": "ported",
           "go_target": "pkg/ast/pattern/smaller_pattern.go",
           "tests": [
-            "TestSmallerPatternConcretePairCacheAndExternalVariables"
+            "TestSmallerPatternConcretePairCacheAndExternalVariables",
+            "TestSmallerPatternSaveTraceBeforePairPublication"
           ]
         },
         {
@@ -173613,7 +173615,8 @@
         "pkg/util/numeral/mpfx_compare_product_trace.go",
         "pkg/util/numeral/mpfx_integral_trace.go",
         "pkg/util/numeral/mpfx_power_trace.go",
-        "pkg/util/numeral/mpfx_division_callers_trace.go"
+        "pkg/util/numeral/mpfx_division_callers_trace.go",
+        "pkg/ast/pattern/smaller_pattern.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -173630,7 +173633,8 @@
         "TestFixedPointPowerSourceTraceAndRawWords",
         "TestFixedPointRetainedDivisionCallersTrace",
         "TestFixedPointDivisionTraceSourceInsertionPrefixes",
-        "TestFixedPointDivisionTraceRefusalKeepsArithmetic"
+        "TestFixedPointDivisionTraceRefusalKeepsArithmetic",
+        "TestSmallerPatternSaveTraceBeforePairPublication"
       ],
       "conditionals": [
         {
@@ -173945,6 +173949,14 @@
           ]
         },
         {
+          "name": "retained smaller_pattern::save TRACE after duplicate-pair check and before cache publication (src/ast/pattern/pattern_inference.cpp:34)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/smaller_pattern.go",
+          "tests": [
+            "TestSmallerPatternSaveTraceBeforePairPublication"
+          ]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -173974,7 +173986,8 @@
         "pkg/util/numeral/mpfx_compare_product_trace.go",
         "pkg/util/numeral/mpfx_integral_trace.go",
         "pkg/util/numeral/mpfx_power_trace.go",
-        "pkg/util/numeral/mpfx_division_callers_trace.go"
+        "pkg/util/numeral/mpfx_division_callers_trace.go",
+        "pkg/ast/pattern/smaller_pattern.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -173991,7 +174004,8 @@
         "TestFixedPointPowerSourceTraceAndRawWords",
         "TestFixedPointRetainedDivisionCallersTrace",
         "TestFixedPointDivisionTraceSourceInsertionPrefixes",
-        "TestFixedPointDivisionTraceRefusalKeepsArithmetic"
+        "TestFixedPointDivisionTraceRefusalKeepsArithmetic",
+        "TestSmallerPatternSaveTraceBeforePairPublication"
       ],
       "conditionals": [
         {
@@ -174315,6 +174329,14 @@
             "TestFixedPointRetainedDivisionCallersTrace",
             "TestFixedPointDivisionTraceSourceInsertionPrefixes",
             "TestFixedPointDivisionTraceRefusalKeepsArithmetic"
+          ]
+        },
+        {
+          "name": "retained smaller_pattern::save TRACE after duplicate-pair check and before cache publication (src/ast/pattern/pattern_inference.cpp:34)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/smaller_pattern.go",
+          "tests": [
+            "TestSmallerPatternSaveTraceBeforePairPublication"
           ]
         },
         {

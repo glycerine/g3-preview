@@ -1,7 +1,12 @@
 // Source: src/ast/pattern/pattern_inference.cpp:31-93.
 package pattern
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"fmt"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
 
 type expressionPair struct{ left, right ast.ASTHandle }
 
@@ -9,10 +14,11 @@ type expressionPair struct{ left, right ast.ASTHandle }
 // pattern inference compares two candidate patterns. The AST manager owns the
 // expressions; this matcher retains no references after a call.
 type smallerPattern struct {
-	manager  *ast.ASTManager
-	bindings []ast.ASTHandle
-	cache    map[expressionPair]struct{}
-	todo     []expressionPair
+	manager   *ast.ASTManager
+	bindings  []ast.ASTHandle
+	cache     map[expressionPair]struct{}
+	todo      []expressionPair
+	traceTags *diagnostic.TraceTags
 }
 
 func newSmallerPattern(m *ast.ASTManager) (*smallerPattern, error) {
@@ -22,13 +28,32 @@ func newSmallerPattern(m *ast.ASTManager) (*smallerPattern, error) {
 	return &smallerPattern{manager: m, cache: make(map[expressionPair]struct{})}, nil
 }
 
-func (s *smallerPattern) save(left, right ast.ASTHandle) {
+func (s *smallerPattern) save(left, right ast.ASTHandle) error {
 	pair := expressionPair{left, right}
 	if _, seen := s.cache[pair]; seen {
-		return
+		return nil
+	}
+	trace := s.traceTags
+	if trace == nil {
+		trace = diagnostic.BorrowProcessTraceTags()
+	}
+	if trace.ShouldTrace("smaller_pattern_proc") {
+		leftID, err := s.manager.GetASTID(left)
+		if err != nil {
+			return err
+		}
+		rightID, err := s.manager.GetASTID(right)
+		if err != nil {
+			return err
+		}
+		if err := trace.Emit("smaller_pattern_proc", "save", "src/ast/pattern/pattern_inference.cpp", 34,
+			fmt.Sprintf("saving: %d %d\n", leftID, rightID)); err != nil {
+			return err
+		}
 	}
 	s.cache[pair] = struct{}{}
 	s.todo = append(s.todo, pair)
+	return nil
 }
 
 // smaller implements smaller_pattern::operator(). Pattern variables below
@@ -49,7 +74,9 @@ func (s *smallerPattern) smaller(numBindings uint32, left, right ast.ASTHandle) 
 	}
 	clear(s.cache)
 	s.todo = s.todo[:0]
-	s.save(left, right)
+	if err := s.save(left, right); err != nil {
+		return false, err
+	}
 	for len(s.todo) != 0 {
 		i := len(s.todo) - 1
 		pair := s.todo[i]
@@ -98,7 +125,9 @@ func (s *smallerPattern) smaller(numBindings uint32, left, right ast.ASTHandle) 
 				if err != nil {
 					return false, err
 				}
-				s.save(childLeft, childRight)
+				if err := s.save(childLeft, childRight); err != nil {
+					return false, err
+				}
 			}
 		case ast.ASTVar:
 			index, err := s.manager.GetVarIndex(pair.left)

@@ -96,6 +96,7 @@ func (c *patternCandidates) filterLooping() ([]ast.ASTHandle, error) {
 	if c == nil || c.closed {
 		return nil, ast.ErrASTHandle
 	}
+	c.matcher.traceTags = c.traceTags
 	result := make([]ast.ASTHandle, 0, len(c.candidates))
 	for i, first := range c.candidates {
 		firstInfo, found := c.info[first]
