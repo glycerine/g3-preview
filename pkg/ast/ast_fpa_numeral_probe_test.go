@@ -85,3 +85,67 @@ func TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy(t *testing.T) {
 	astFloatingPointConstructorRawGraph(t, m.numerals, p)
 	astTestMust(t, m.Close())
 }
+
+func TestASTFloatingPointScopedClassificationSourcePredicates(t *testing.T) {
+	m := astTestManager(t)
+	_, e := m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterBitVectorPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterFloatingPointPlugin()
+	astTestMust(t, e)
+	p := m.floatingPointPlugin
+	classes := []astFloatClass{
+		astFloatAny, astFloatNaN, astFloatInf, astFloatPInf, astFloatNInf,
+		astFloatZero, astFloatPZero, astFloatNZero, astFloatNormal,
+		astFloatSubnormal, astFloatPositive, astFloatNegative,
+	}
+	for _, tc := range []struct {
+		name     string
+		sig      int32
+		exponent int64
+		sign     bool
+		trueFor  []astFloatClass
+	}{
+		{"nan", 1, 128, false, []astFloatClass{astFloatAny, astFloatNaN}},
+		{"positive infinity", 0, 128, false, []astFloatClass{astFloatAny, astFloatInf, astFloatPInf, astFloatPositive}},
+		{"negative infinity", 0, 128, true, []astFloatClass{astFloatAny, astFloatInf, astFloatNInf, astFloatNegative}},
+		{"positive zero", 0, -127, false, []astFloatClass{astFloatAny, astFloatZero, astFloatPZero, astFloatPositive}},
+		{"negative zero", 0, -127, true, []astFloatClass{astFloatAny, astFloatZero, astFloatNZero, astFloatNegative}},
+		{"normal", 19, 3, false, []astFloatClass{astFloatAny, astFloatNormal, astFloatPositive}},
+		{"negative normal", 19, 3, true, []astFloatClass{astFloatAny, astFloatNormal, astFloatNegative}},
+		{"subnormal", 1, -127, false, []astFloatClass{astFloatAny, astFloatSubnormal, astFloatPositive}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			sig := unumeral.NewInt(tc.sig)
+			var value unumeral.ArbitraryFloat
+			astTestMust(t, p.numeric.SetComponents(&value, 8, 24, tc.sign, tc.exponent, &sig))
+			n, e := p.mkNumeral(&value, nil)
+			astTestMust(t, e)
+			for _, class := range classes {
+				got, e := p.isNumeralClass(n, class)
+				astTestMust(t, e)
+				want := false
+				for _, expected := range tc.trueFor {
+					want = want || class == expected
+				}
+				if got != want || p.numeralProbeFrames != nil {
+					t.Fatal("source class and scope", class, got, want, p.numeralProbeFrames)
+				}
+			}
+			astTestMust(t, p.numeric.Del(&value))
+		})
+	}
+	h, e := m.MkTrue()
+	astTestMust(t, e)
+	n, e := m.internal(h)
+	astTestMust(t, e)
+	for _, class := range classes {
+		got, e := p.isNumeralClass(n, class)
+		astTestMust(t, e)
+		if got {
+			t.Fatal("unmatched expression classified", class)
+		}
+	}
+	astTestMust(t, m.Close())
+}

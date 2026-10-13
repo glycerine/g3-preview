@@ -16785,16 +16785,19 @@
       "path": "src/ast/fpa_decl_plugin.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/ast_fpa_scoped_values.go",
-        "pkg/ast/ast_fpa_scoped_values_source_test.go"
+        "pkg/ast/ast_fpa_scoped_values_source_test.go",
+        "pkg/ast/ast_fpa_numeral_probe.go",
+        "pkg/ast/ast_fpa_numeral_probe_test.go"
       ],
       "tests": [
         "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
         "TestASTFloatingPointScopedValueActualInlinePushPublication",
         "TestASTFloatingPointScopedValueInlineErasesCopyAcquisition",
-        "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren"
+        "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren",
+        "TestASTFloatingPointScopedClassificationSourcePredicates"
       ],
       "conditionals": [
         {
@@ -16856,6 +16859,14 @@
             "TestASTFloatingPointScopedValueActualInlinePushPublication",
             "TestASTFloatingPointScopedValueInlineErasesCopyAcquisition",
             "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren"
+          ]
+        },
+        {
+          "name": "Concrete FPA classification predicates is_nan/is_inf/is_pinf/is_ninf/is_zero/is_pzero/is_nzero/is_normal/is_subnormal/is_positive/is_negative with source short circuit and caller-local scoped_mpf (src/ast/fpa_decl_plugin.h:257-267)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointScopedClassificationSourcePredicates"
           ]
         }
       ],
@@ -147597,7 +147608,8 @@
         "TestArbitraryFloatSignedFractionYoungerSourceStop",
         "TestNumericStreamNativeCountedTextAndOwnedInput",
         "TestASTFloatingPointBooleanNumeralScopedValue",
-        "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy"
+        "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy",
+        "TestASTFloatingPointScopedClassificationSourcePredicates"
       ],
       "conditionals": [
         {
@@ -148166,6 +148178,14 @@
           "tests": [
             "TestASTFloatingPointBooleanNumeralScopedValue",
             "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy"
+          ]
+        },
+        {
+          "name": "Concrete FPA classification predicates is_nan/is_inf/is_pinf/is_ninf/is_zero/is_pzero/is_nzero/is_normal/is_subnormal/is_positive/is_negative with source short circuit and caller-local scoped_mpf (src/ast/fpa_decl_plugin.h:257-267)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointScopedClassificationSourcePredicates"
           ]
         }
       ],
@@ -164402,7 +164422,8 @@
         "TestPolynomialScalarDivEveryActualReservationPrefix",
         "TestPolynomialNegCompletedLocalGuardUnwind",
         "TestASTFloatingPointBooleanNumeralScopedValue",
-        "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy"
+        "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy",
+        "TestASTFloatingPointScopedClassificationSourcePredicates"
       ],
       "conditionals": [
         {
@@ -164603,6 +164624,14 @@
           "tests": [
             "TestASTFloatingPointBooleanNumeralScopedValue",
             "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy"
+          ]
+        },
+        {
+          "name": "Concrete FPA classification predicates is_nan/is_inf/is_pinf/is_ninf/is_zero/is_pzero/is_nzero/is_normal/is_subnormal/is_positive/is_negative with source short circuit and caller-local scoped_mpf (src/ast/fpa_decl_plugin.h:257-267)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointScopedClassificationSourcePredicates"
           ]
         }
       ],

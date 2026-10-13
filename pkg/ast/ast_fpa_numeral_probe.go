@@ -1,4 +1,5 @@
-// Source: src/ast/fpa_decl_plugin.cpp:136-139; src/util/scoped_numeral.h:24-33.
+// Source: src/ast/fpa_decl_plugin.cpp:136-139;
+// src/ast/fpa_decl_plugin.h:257-267; src/util/scoped_numeral.h:24-33.
 package ast
 
 import (
@@ -102,9 +103,26 @@ func (p *astFloatingPointPluginOwner) releaseNumeralProbes() {
 	p.numeralProbeFrames = nil
 }
 
-// isNumeralOnly preserves the source overload's value copy and destructor,
-// even though its caller observes only the boolean result.
-func (p *astFloatingPointPluginOwner) isNumeralOnly(n astNodeRef) (found bool, result error) {
+type astFloatClass uint8
+
+const (
+	astFloatAny astFloatClass = iota
+	astFloatNaN
+	astFloatInf
+	astFloatPInf
+	astFloatNInf
+	astFloatZero
+	astFloatPZero
+	astFloatNZero
+	astFloatNormal
+	astFloatSubnormal
+	astFloatPositive
+	astFloatNegative
+)
+
+// isNumeralClass preserves each source query's local value copy and destructor.
+// The predicate runs only after is_numeral succeeds and before that destructor.
+func (p *astFloatingPointPluginOwner) isNumeralClass(n astNodeRef, class astFloatClass) (matched bool, result error) {
 	if p == nil || p.self != p || p.owner == nil || p.owner.floatingPointPlugin != p || !p.published || p.sourceEnded {
 		return false, ErrASTHandle
 	}
@@ -133,5 +151,41 @@ func (p *astFloatingPointPluginOwner) isNumeralOnly(n astNodeRef) (found bool, r
 			}
 		}
 	}()
-	return p.isNumeral(n, &f.value, &f.copy)
+	found, e := p.isNumeral(n, &f.value, &f.copy)
+	if e != nil || !found {
+		return false, e
+	}
+	switch class {
+	case astFloatAny:
+		return true, nil
+	case astFloatNaN:
+		return p.numeric.IsNaN(&f.value)
+	case astFloatInf:
+		return p.numeric.IsInf(&f.value)
+	case astFloatPInf:
+		return p.numeric.IsPositiveInf(&f.value)
+	case astFloatNInf:
+		return p.numeric.IsNegativeInf(&f.value)
+	case astFloatZero:
+		return p.numeric.IsZero(&f.value)
+	case astFloatPZero:
+		return p.numeric.IsPositiveZero(&f.value)
+	case astFloatNZero:
+		return p.numeric.IsNegativeZero(&f.value)
+	case astFloatNormal:
+		return p.numeric.IsNormal(&f.value)
+	case astFloatSubnormal:
+		return p.numeric.IsDenormal(&f.value)
+	case astFloatPositive:
+		return p.numeric.IsPositive(&f.value)
+	case astFloatNegative:
+		return p.numeric.IsNegative(&f.value)
+	default:
+		return false, ErrASTDomain
+	}
+}
+
+// isNumeralOnly is fpa_decl_plugin::is_numeral(expr*).
+func (p *astFloatingPointPluginOwner) isNumeralOnly(n astNodeRef) (bool, error) {
+	return p.isNumeralClass(n, astFloatAny)
 }
