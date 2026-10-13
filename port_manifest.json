@@ -118926,14 +118926,17 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/numeral/hwf_value.go",
-        "pkg/util/numeral/hwf_arithmetic.go"
+        "pkg/util/numeral/hwf_arithmetic.go",
+        "pkg/util/numeral/hwf_round_select.go"
       ],
       "tests": [
         "TestHardwareFloatSourceBinary64Classification",
         "TestHardwareFloatSourceValueConstructionAndCopy",
         "TestHardwareFloatSourceSignAndComparison",
         "TestHardwareFloatDirectedArithmetic",
-        "TestHardwareFloatArithmeticGuardsAndAliasing"
+        "TestHardwareFloatArithmeticGuardsAndAliasing",
+        "TestHardwareFloatRoundToIntegralSourceModes",
+        "TestHardwareFloatSourceRemainderAndSSESelection"
       ],
       "conditionals": [
         {
@@ -119334,7 +119337,16 @@
           ]
         },
         {
-          "name": "Remaining HWF fused arithmetic, square root, rational conversion, formatting, integral rounding and owning manager lifetime reached by subpaving",
+          "name": "hwf.cpp:297-383 integral rounding, IEEE remainder and SSE min/max selection",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_round_select.go",
+          "tests": [
+            "TestHardwareFloatRoundToIntegralSourceModes",
+            "TestHardwareFloatSourceRemainderAndSSESelection"
+          ]
+        },
+        {
+          "name": "Remaining HWF fused arithmetic, square root, rational conversion, formatting and owning manager lifetime reached by subpaving",
           "status": "unported"
         }
       ],
@@ -119342,7 +119354,7 @@
         "The concrete binary64 value is scalar and pointer-free; the Go scalar manager has no owned child. The source hwf_manager also owns an mpq manager for conversion, which is not yet ported into the HWF subpaving path."
       ],
       "deviations": [
-        "The retained subpaving tactic owns hwf_manager and f2n<hwf_manager>. The Go binary64 scalar/profile uses math.Float64bits/frombits for exact source fields and Go comparisons. Basic directed arithmetic uses exact Go rationals and adjacent binary64 values rather than changing process-wide FPU mode; conversion and owning manager path remain open."
+        "The retained subpaving tactic owns hwf_manager and f2n<hwf_manager>. The Go binary64 scalar/profile uses math.Float64bits/frombits for exact source fields and Go comparisons. Directed arithmetic and integral rounding avoid changing process-wide FPU mode; conversion and owning manager path remain open."
       ]
     },
     {
@@ -119352,14 +119364,17 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/numeral/hwf_value.go",
-        "pkg/util/numeral/hwf_arithmetic.go"
+        "pkg/util/numeral/hwf_arithmetic.go",
+        "pkg/util/numeral/hwf_round_select.go"
       ],
       "tests": [
         "TestHardwareFloatSourceBinary64Classification",
         "TestHardwareFloatSourceValueConstructionAndCopy",
         "TestHardwareFloatSourceSignAndComparison",
         "TestHardwareFloatDirectedArithmetic",
-        "TestHardwareFloatArithmeticGuardsAndAliasing"
+        "TestHardwareFloatArithmeticGuardsAndAliasing",
+        "TestHardwareFloatRoundToIntegralSourceModes",
+        "TestHardwareFloatSourceRemainderAndSSESelection"
       ],
       "conditionals": [
         {
@@ -119408,7 +119423,16 @@
           ]
         },
         {
-          "name": "Remaining hwf_manager fused arithmetic, square root, conversion, formatting, integral rounding and owned mpq-manager declaration paths",
+          "name": "hwf_manager integral rounding, remainder, maximum and minimum declarations",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_round_select.go",
+          "tests": [
+            "TestHardwareFloatRoundToIntegralSourceModes",
+            "TestHardwareFloatSourceRemainderAndSSESelection"
+          ]
+        },
+        {
+          "name": "Remaining hwf_manager fused arithmetic, square root, conversion, formatting and owned mpq-manager declaration paths",
           "status": "unported"
         }
       ],

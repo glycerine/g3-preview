@@ -39506,6 +39506,13 @@ nearest-away rounding. Fused arithmetic, square root, conversion, text,
 integral rounding, manager ownership and the concrete subpaving caller remain
 open.
 
+The HWF scalar manager now also implements `round_to_integral` for the four
+hardware-supported modes, IEEE remainder, and the Linux x86-64 SSE min/max
+selection rules. The latter select the second operand on equality or an
+unordered comparison, preserving its signed-zero or NaN bits. These methods
+are needed by the concrete `f2n<hwf_manager>` path; square root, fused
+arithmetic, conversion, text and manager ownership are still outstanding.
+
 ### Environment parameter runtime boundary
 
 `src/util/env_params.h/.cpp` has exactly two static operations. The five
