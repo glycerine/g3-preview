@@ -20,6 +20,7 @@ type ArbitraryPolynomial struct {
 	variable   uint32
 	constant   numeral.ArbitraryFloat
 	terms      []arbitraryPolynomialTerm
+	visited    uint64
 	closeIndex int
 }
 

@@ -200,6 +200,14 @@ func (c *ArbitraryContext) RelevantNewBound(n *ArbitraryNode, variable uint32, c
 // PropagateCandidate performs the source normalize/relevance/publish sequence
 // for definition-derived bounds. The context keeps its reusable MPF scratch.
 func (c *ArbitraryContext) PropagateCandidate(n *ArbitraryNode, variable uint32, value *numeral.ArbitraryFloat, lower, open bool) (bool, error) {
+	return c.propagateCandidate(n, variable, value, lower, open, 0, false)
+}
+
+func (c *ArbitraryContext) propagateCandidateDefinition(n *ArbitraryNode, variable uint32, value *numeral.ArbitraryFloat, lower, open bool, definition uint32) (bool, error) {
+	return c.propagateCandidate(n, variable, value, lower, open, definition, true)
+}
+
+func (c *ArbitraryContext) propagateCandidate(n *ArbitraryNode, variable uint32, value *numeral.ArbitraryFloat, lower, open bool, definition uint32, fromDefinition bool) (bool, error) {
 	if err := c.checkRoot(n, variable); err != nil {
 		return false, err
 	}
@@ -216,5 +224,8 @@ func (c *ArbitraryContext) PropagateCandidate(n *ArbitraryNode, variable uint32,
 	if err != nil || !relevant {
 		return relevant, err
 	}
-	return true, c.PublishBound(n, variable, &c.candidateScratch, lower, open, true)
+	if err := c.publishBoundWithReason(n, variable, &c.candidateScratch, lower, open, !fromDefinition, nil, definition, fromDefinition); err != nil {
+		return true, err
+	}
+	return true, nil
 }

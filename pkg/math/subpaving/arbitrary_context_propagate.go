@@ -9,8 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// This port has not yet connected polynomial and monomial propagation. A
-// reached definition watch remains queued for the later concrete path.
+// A reached monomial watch remains queued for the later concrete path.
 var ErrArbitraryDefinitionPending = errors.New("subpaving: arbitrary definition propagation pending")
 
 type arbitraryWatch struct {
@@ -19,9 +18,8 @@ type arbitraryWatch struct {
 }
 
 // PropagateQueued checkpoints before each bound and processes clause watches
-// in their original interleaved registration order. It refuses a reached
-// definition before consuming that bound, preserving the queue for the next
-// implementation increment.
+// in their original interleaved registration order. A reached monomial is
+// refused before consuming that bound, preserving the queue for its port.
 func (c *ArbitraryContext) PropagateQueued(n *ArbitraryNode) error {
 	if err := c.open(); err != nil {
 		return err
@@ -38,11 +36,11 @@ func (c *ArbitraryContext) PropagateQueued(n *ArbitraryNode) error {
 			return arena.ErrInvalidSlot
 		}
 		for _, watch := range c.watchOrder[b.variable] {
-			if watch.clause == nil {
+			if watch.clause == nil && c.polynomials[watch.definition] == nil {
 				return ErrArbitraryDefinitionPending
 			}
 		}
-		if c.polynomials[b.variable] != nil || c.monomials[b.variable] != nil {
+		if c.monomials[b.variable] != nil {
 			return ErrArbitraryDefinitionPending
 		}
 		c.queueHead++
@@ -50,9 +48,25 @@ func (c *ArbitraryContext) PropagateQueued(n *ArbitraryNode) error {
 			if n.conflictVar != math.MaxUint32 {
 				break
 			}
-			clause := watch.clause
-			if b.timestamp >= clause.visited {
-				if err := c.PropagateClause(clause, n); err != nil {
+			if watch.clause != nil {
+				clause := watch.clause
+				if b.timestamp >= clause.visited {
+					if err := c.PropagateClause(clause, n); err != nil {
+						return err
+					}
+				}
+			} else {
+				p := c.polynomials[watch.definition]
+				if b.timestamp >= p.visited {
+					if err := c.PropagatePolynomial(watch.definition, n); err != nil {
+						return err
+					}
+				}
+			}
+		}
+		if n.conflictVar == math.MaxUint32 {
+			if p := c.polynomials[b.variable]; p != nil && b.timestamp >= p.visited {
+				if err := c.PropagatePolynomial(b.variable, n); err != nil {
 					return err
 				}
 			}

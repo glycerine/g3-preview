@@ -51740,6 +51740,8 @@
         "pkg/math/subpaving/arbitrary_context_propagate.go",
         "pkg/math/subpaving/arbitrary_context_relevance.go",
         "pkg/math/subpaving/arbitrary_context_relevance_test.go",
+        "pkg/math/subpaving/arbitrary_polynomial_propagate.go",
+        "pkg/math/subpaving/arbitrary_polynomial_propagate_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
@@ -51829,6 +51831,7 @@
         "TestArbitraryClauseSourceTruthAndPropagation",
         "TestArbitraryClauseQueuedWatchOrderAndCancellation",
         "TestArbitraryContextSourceCandidateRelevanceAndNormalization",
+        "TestArbitraryPolynomialForwardInverseAndQueue",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -52512,7 +52515,20 @@
           "status": "partial",
           "go_target": "pkg/math/subpaving/arbitrary_context_propagate.go",
           "tests": [
-            "TestArbitraryClauseQueuedWatchOrderAndCancellation"
+            "TestArbitraryClauseQueuedWatchOrderAndCancellation",
+            "TestArbitraryPolynomialForwardInverseAndQueue"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf polynomial forward and inverse interval bounds, single-unbounded selection, and queued polynomial watcher dispatch (src/math/subpaving/subpaving_t_def.h:1408-1496,1694-1750)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_polynomial_propagate.go",
+          "go_targets": [
+            "pkg/math/subpaving/arbitrary_context_propagate.go",
+            "pkg/math/subpaving/arbitrary_context_bounds.go"
+          ],
+          "tests": [
+            "TestArbitraryPolynomialForwardInverseAndQueue"
           ]
         },
         {
