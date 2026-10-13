@@ -173691,7 +173691,7 @@
           "name": "bit_vector::resize two growth TRACE records at source lines 43 and 67",
           "status": "ported",
           "go_target": "pkg/util/bitset/vector_trace.go",
-          "tests": ["TestBitVectorResizeSourceTraceSites"]
+          "tests": ["TestBitVectorResizeSourceTraceSites", "TestBitVectorResizeTraceBodySourceInsertionPrefixes"]
         },
         {
           "name": "min_cut::add_edge spacer.mincut TRACE after edge publication",
@@ -174057,7 +174057,7 @@
           "name": "bit_vector::resize two growth TRACE records at source lines 43 and 67",
           "status": "ported",
           "go_target": "pkg/util/bitset/vector_trace.go",
-          "tests": ["TestBitVectorResizeSourceTraceSites"]
+          "tests": ["TestBitVectorResizeSourceTraceSites", "TestBitVectorResizeTraceBodySourceInsertionPrefixes"]
         },
         {
           "name": "min_cut::add_edge spacer.mincut TRACE after edge publication",

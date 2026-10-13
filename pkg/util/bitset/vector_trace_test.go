@@ -32,7 +32,7 @@ func TestBitVectorResizeSourceTraceSites(t *testing.T) {
 	if output.Len() != 0 {
 		t.Fatal("shrink emitted growth TRACE", output.String())
 	}
-	capacity := cap(v.words)
+	capacity := len(v.words)
 	v.Resize(34, false)
 	if tags.ShouldTrace("bit_vector") {
 		want := header1 + fmt.Sprintf("expanding: 34 capacity: %d num words: 2\n", capacity) + footer +
@@ -43,5 +43,16 @@ func TestBitVectorResizeSourceTraceSites(t *testing.T) {
 	}
 	if v.Size() != 34 || !v.Get(0) || v.Get(1) {
 		t.Fatal("trace changed packed bit growth")
+	}
+	output.Reset()
+	reserved := &Vector{size: 1, words: make([]uint32, 2, 8)}
+	reserved.BindTrace(tags)
+	reserved.Resize(35, false)
+	if tags.ShouldTrace("bit_vector") {
+		want := header1 + "expanding: 35 capacity: 2 num words: 2\n" + footer +
+			header2 + "num_bits: 1\nbwidx:    0\newidx:    2\npos:      1\nmask:     1\ncval:     0\n" + footer
+		if got := output.String(); got != want {
+			t.Fatal("source logical word capacity must ignore Go slice capacity", got, want)
+		}
 	}
 }
