@@ -144,6 +144,21 @@ func TestHardwareExprConverterTerms(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// The source caches only expressions whose AST reference count exceeds one.
+	if err := m.IncRef(add); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.IncRef(add); err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := m.DecRef(add); err != nil {
+			t.Error(err)
+		}
+		if err := m.DecRef(add); err != nil {
+			t.Error(err)
+		}
+	}()
 	sum, err := converter.InternalizeTerm(add, &n, &d)
 	if err != nil || sum == math.MaxUint32 || sum == first {
 		t.Fatalf("x+x must define a polynomial variable: %d, %v", sum, err)
@@ -159,8 +174,11 @@ func TestHardwareExprConverterTerms(t *testing.T) {
 	if gotN != "1" || gotD != "1" {
 		t.Fatalf("sum coefficient: %s/%s", gotN, gotD)
 	}
-	if _, err := converter.InternalizeTerm(add, &n, &d); err != nil {
-		t.Fatal(err)
+	if again, err := converter.InternalizeTerm(add, &n, &d); err != nil || again != sum {
+		t.Fatalf("cached x+x: %d vs %d, %v", again, sum, err)
+	}
+	if rc, err := m.GetRefCount(add); err != nil || rc != 3 {
+		t.Fatalf("cached AST key reference: %d, %v", rc, err)
 	}
 	if err := q.SetString(&value, "1/2"); err != nil {
 		t.Fatal(err)
@@ -287,8 +305,17 @@ func TestHardwareExprConverterTerms(t *testing.T) {
 	if _, err := converter.InternalizeTerm(zeroPower, &n, &d); !errors.Is(err, ErrExprConverterUnsupported) {
 		t.Fatalf("zero-degree monomial still open: %v", err)
 	}
+	beforeCancel := m.Limit.Count()
+	m.Limit.Cancel()
+	if _, err := converter.InternalizeTerm(add, &n, &d); !errors.Is(err, ErrExprConverterCanceled) || m.Limit.Count() != beforeCancel+1 {
+		t.Fatalf("checkpoint before cached result: %v, steps %d", err, m.Limit.Count())
+	}
+	m.Limit.ResetCancel()
 	if err := converter.Close(); err != nil {
 		t.Fatal(err)
+	}
+	if rc, err := m.GetRefCount(add); err != nil || rc != 2 {
+		t.Fatalf("released cached AST key: %d, %v", rc, err)
 	}
 	if _, err := converter.InternalizeTerm(x, &n, &d); !errors.Is(err, arena.ErrClosed) {
 		t.Fatalf("closed converter: %v", err)

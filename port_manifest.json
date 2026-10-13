@@ -52690,7 +52690,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul and positive integral power are implemented; zero-degree monomials, literal conversion, cache, checkpoints and full tactic integration remain open."
+        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache and AST cancellation checkpoint are implemented; zero-degree monomials, literal conversion and full tactic integration remain open."
       ]
     },
     {
@@ -52720,7 +52720,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul and positive integral power are implemented; zero-degree monomials, literal conversion, cache, checkpoints and full tactic integration remain open."
+        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache and AST cancellation checkpoint are implemented; zero-degree monomials, literal conversion and full tactic integration remain open."
       ]
     },
     {
@@ -166628,7 +166628,9 @@
         "pkg/util/numeral/scoped_numeral_buffer.go",
         "pkg/util/numeral/scoped_numeral_buffer_source_test.go",
         "pkg/util/numeral/scoped_numeral_buffer_review_test.go",
-        "pkg/util/numeral/scoped_integer_buffer16.go"
+        "pkg/util/numeral/scoped_integer_buffer16.go",
+        "pkg/math/subpaving/tactic/expr_converter.go",
+        "pkg/math/subpaving/tactic/expr_converter_test.go"
       ],
       "tests": [
         "TestScopedNumeralBufferNativeGrowthResetAndResize",
@@ -166641,7 +166643,8 @@
         "TestScopedBufferReviewReleaseShrinkAboveSize",
         "TestScopedIntegerBuffer16CopiesMutableSubpavingCoefficients",
         "TestScopedIntegerBuffer16FailedCopyRetainsOwningCleanup",
-        "TestScopedIntegerBuffer16FailedInPlaceScaleRetainsOwningCleanup"
+        "TestScopedIntegerBuffer16FailedInPlaceScaleRetainsOwningCleanup",
+        "TestHardwareExprConverterTerms"
       ],
       "conditionals": [
         {
@@ -166673,7 +166676,7 @@
         },
         {
           "name": "Concrete unsynch_mpz_manager scoped integer buffers for expr2subpaving process_add: deep push, in-place numerator scaling, borrowed c_ptr view and ascending destructor cleanup",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/scoped_integer_buffer16.go",
           "tests": [
             "TestScopedIntegerBuffer16CopiesMutableSubpavingCoefficients",
@@ -166686,7 +166689,7 @@
         "Concrete []Int elements retain numeral ownership. Deep copy and ascending source deletion remain explicit; a stopped deletion leaves older elements untouched, and borrowed views reference the live slice rather than a clone. The subpaving integer specialization has its own manager-owned copied numerals and explicit owning cleanup after a stopped source scope."
       ],
       "deviations": [
-        "The polynomial mpzzp and subpaving unsynch_mpz specializations use separate concrete []Int owners. The subpaving expression converter has not yet been ported, so its buffer is not integrated into a Go caller; no any-valued universal buffer is retained.",
+        "The polynomial mpzzp and subpaving unsynch_mpz specializations use separate concrete []Int owners. The subpaving process_add specialization is now integrated in the hardware expression converter. The polynomial to_polynomial/convert callers remain open, so the whole header stays partial; no any-valued universal buffer is retained.",
         "Borrowed views remain valid only while the owning buffer is live and unchanged."
       ]
     },
@@ -166699,7 +166702,9 @@
         "pkg/util/numeral/scoped_numeral.go",
         "pkg/util/numeral/scoped_binary.go",
         "pkg/math/polynomial/upolynomial_vector.go",
-        "pkg/math/polynomial/upolynomial_source_test.go"
+        "pkg/math/polynomial/upolynomial_source_test.go",
+        "pkg/math/subpaving/tactic/expr_converter.go",
+        "pkg/math/subpaving/tactic/expr_converter_test.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -166768,7 +166773,8 @@
         "TestUPolynomialScalarModeAndDirectCheckpoint",
         "TestUPolynomialRawMutableScalarOverloads",
         "TestUPolynomialNativeDescriptorAndBackingDirectories",
-        "TestUPolynomialNativeBorrowedStoreDirectory"
+        "TestUPolynomialNativeBorrowedStoreDirectory",
+        "TestHardwareExprConverterTerms"
       ],
       "conditionals": [
         {
@@ -166889,7 +166895,7 @@
         "Scalar external polynomial owners and actual Int arrays preserve source numeral callbacks and publication prefixes. See PORT_PROGRESS.md#audit-upolynomial-port-status-md."
       ],
       "deviations": [
-        "Concrete Int, Rational, MPBQ, MPFF and mpzzp vectors retain manager-specific storage, ownership and failure behavior. Remaining source instantiations stay partial until a live caller is ported; the unused any-valued callback vector was removed.",
+        "Concrete Int, Rational, MPBQ, MPFF and mpzzp vectors retain manager-specific storage, ownership and failure behavior. The subpaving converter now uses the concrete Int vector for cached numerator and denominator copies; other retained source instantiations stay partial until a live caller is ported. The unused any-valued callback vector was removed.",
         "Explicit Close substitutes RAII for retained concrete owners; no C++ vector implementation is ported.",
         "The scoped_mpff_vector specialization is omitted: its only upstream instantiation is src/test/mpff.cpp, and no production Z3 or Go code consumes it. Production scoped_mpff scalar behavior remains covered."
       ]

@@ -1,4 +1,4 @@
-// Source: src/math/subpaving/tactic/expr2subpaving.cpp:90-286, 332-363.
+// Source: src/math/subpaving/tactic/expr2subpaving.cpp:84-286, 332-363.
 package tactic
 
 import (
@@ -9,22 +9,32 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/subpaving"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
 var ErrExprConverterUnsupported = errors.New("subpaving tactic: arithmetic expression conversion is not yet implemented")
 var ErrExprConverterNonSimplified = errors.New("you must apply simplifier before internalizing expressions into the subpaving module.")
+var ErrExprConverterCanceled = errors.New(messages.Canceled)
 
 // HardwareExprConverter owns the source expr2var references created for
 // arithmetic variables. Its AST manager and hardware engine are borrowed.
 type HardwareExprConverter struct {
-	self   *HardwareExprConverter
-	ast    *ast.ASTManager
-	engine *HardwareEngine
-	family ast.FamilyID
-	vars   map[ast.ASTHandle]uint32
-	order  []ast.ASTHandle
-	closed bool
+	self                                 *HardwareExprConverter
+	ast                                  *ast.ASTManager
+	engine                               *HardwareEngine
+	family                               ast.FamilyID
+	vars                                 map[ast.ASTHandle]uint32
+	order                                []ast.ASTHandle
+	cache                                map[ast.ASTHandle]cachedTerm
+	cachedOrder                          []ast.ASTHandle
+	cachedNumerators, cachedDenominators *numeral.ScopedIntVector
+	closed                               bool
+}
+
+type cachedTerm struct {
+	index    uint32
+	variable uint32
 }
 
 func NewHardwareExprConverter(m *ast.ASTManager, engine *HardwareEngine) (*HardwareExprConverter, error) {
@@ -38,7 +48,16 @@ func NewHardwareExprConverter(m *ast.ASTManager, engine *HardwareEngine) (*Hardw
 	if err != nil {
 		return nil, err
 	}
-	c := &HardwareExprConverter{ast: m, engine: engine, family: family, vars: make(map[ast.ASTHandle]uint32)}
+	ns, err := numeral.NewScopedIntVector(engine.qm.Z)
+	if err != nil {
+		return nil, err
+	}
+	ds, err := numeral.NewScopedIntVector(engine.qm.Z)
+	if err != nil {
+		_ = ns.Close()
+		return nil, err
+	}
+	c := &HardwareExprConverter{ast: m, engine: engine, family: family, vars: make(map[ast.ASTHandle]uint32), cache: make(map[ast.ASTHandle]cachedTerm), cachedNumerators: ns, cachedDenominators: ds}
 	c.self = c
 	return c, nil
 }
@@ -69,6 +88,13 @@ func (c *HardwareExprConverter) process(t ast.ASTHandle, numerator, denominator 
 	if numerator == nil || denominator == nil {
 		return 0, arena.ErrInvalidSlot
 	}
+	canceled, err := c.ast.Canceled()
+	if err != nil {
+		return 0, err
+	}
+	if canceled {
+		return 0, ErrExprConverterCanceled
+	}
 	kind, err := c.ast.GetKind(t)
 	if err != nil {
 		return 0, err
@@ -90,6 +116,9 @@ func (c *HardwareExprConverter) process(t ast.ASTHandle, numerator, denominator 
 	}
 	if family != c.family || (sortKind != 0 && sortKind != 1) {
 		return 0, ast.ErrASTDomain
+	}
+	if cached, ok, err := c.cachedTerm(t, numerator, denominator); err != nil || ok {
+		return cached, err
 	}
 	if kind == ast.ASTApp {
 		value, _, matched, err := c.ast.ArithmeticNumeralText(t)
@@ -138,6 +167,60 @@ func (c *HardwareExprConverter) process(t ast.ASTHandle, numerator, denominator 
 		}
 	}
 	return c.mkVarFor(t, sortKind == 1, numerator, denominator)
+}
+
+func (c *HardwareExprConverter) cachedTerm(t ast.ASTHandle, n, d *numeral.Int) (uint32, bool, error) {
+	rc, err := c.ast.GetRefCount(t)
+	if err != nil {
+		return 0, false, err
+	}
+	if rc <= 1 {
+		return 0, false, nil
+	}
+	entry, ok := c.cache[t]
+	if !ok {
+		return 0, false, nil
+	}
+	if err := c.cachedNumerators.Read(entry.index, n); err != nil {
+		return 0, true, err
+	}
+	if err := c.cachedDenominators.Read(entry.index, d); err != nil {
+		return 0, true, err
+	}
+	return entry.variable, true, nil
+}
+
+// cacheResult follows the source's ref-count threshold. Publishing both deep
+// copies and the retained AST key happens only after the entry is complete.
+func (c *HardwareExprConverter) cacheResult(t ast.ASTHandle, variable uint32, n, d *numeral.Int) (err error) {
+	rc, err := c.ast.GetRefCount(t)
+	if err != nil || rc <= 1 {
+		return err
+	}
+	if _, exists := c.cache[t]; exists {
+		return ast.ErrASTDomain
+	}
+	index := c.cachedNumerators.Size()
+	if err := c.ast.IncRef(t); err != nil {
+		return err
+	}
+	defer func() {
+		if err == nil {
+			return
+		}
+		err = errors.Join(err, c.cachedDenominators.Shrink(index), c.cachedNumerators.Shrink(index))
+		_, e := c.ast.DecRefConsumed(t)
+		err = errors.Join(err, e)
+	}()
+	if err = c.cachedNumerators.Push(n); err != nil {
+		return err
+	}
+	if err = c.cachedDenominators.Push(d); err != nil {
+		return err
+	}
+	c.cache[t] = cachedTerm{index: index, variable: variable}
+	c.cachedOrder = append(c.cachedOrder, t)
+	return nil
 }
 
 func (c *HardwareExprConverter) mkVarFor(t ast.ASTHandle, integer bool, numerator, denominator *numeral.Int) (uint32, error) {
@@ -304,16 +387,22 @@ func (c *HardwareExprConverter) processMul(t ast.ASTHandle, n, d *numeral.Int) (
 		}
 	}
 	if len(powers) == 0 {
-		return math.MaxUint32, nil
+		variable = math.MaxUint32
+		return variable, c.cacheResult(t, variable, n, d)
 	}
 	if len(powers) == 1 && powers[0].Degree == 1 {
-		return powers[0].Variable, nil
+		variable = powers[0].Variable
+		return variable, c.cacheResult(t, variable, n, d)
 	}
 	shell, err := c.engine.Shell()
 	if err != nil {
 		return 0, err
 	}
-	return shell.MkMonomial(powers)
+	variable, err = shell.MkMonomial(powers)
+	if err != nil {
+		return 0, err
+	}
+	return variable, c.cacheResult(t, variable, n, d)
 }
 
 func (c *HardwareExprConverter) processPower(t ast.ASTHandle, n, d *numeral.Int, integer bool) (variable uint32, err error) {
@@ -356,7 +445,7 @@ func (c *HardwareExprConverter) processPower(t ast.ASTHandle, n, d *numeral.Int,
 	if err = z.Power(d, k, d); err != nil {
 		return 0, err
 	}
-	return x, nil
+	return x, c.cacheResult(t, x, n, d)
 }
 
 // processAdd uses the two live unsynch_mpz_manager buffer instantiations from
@@ -451,7 +540,7 @@ func (c *HardwareExprConverter) processAdd(t ast.ASTHandle, n, d *numeral.Int) (
 		if err = z.Copy(n, &sumConstant); err != nil {
 			return 0, err
 		}
-		return math.MaxUint32, nil
+		return math.MaxUint32, c.cacheResult(t, math.MaxUint32, n, d)
 	}
 	coefficients := make([]*numeral.Int, len(vars))
 	for i := range coefficients {
@@ -471,7 +560,7 @@ func (c *HardwareExprConverter) processAdd(t ast.ASTHandle, n, d *numeral.Int) (
 	if err = z.SetInt32(n, 1); err != nil {
 		return 0, err
 	}
-	return variable, nil
+	return variable, c.cacheResult(t, variable, n, d)
 }
 
 func (c *HardwareExprConverter) IsVar(t ast.ASTHandle) (bool, error) {
@@ -488,6 +577,24 @@ func (c *HardwareExprConverter) Close() error {
 	}
 	if c.closed {
 		return nil
+	}
+	for _, h := range c.cachedOrder {
+		if _, ok := c.cache[h]; !ok {
+			continue
+		}
+		consumed, err := c.ast.DecRefConsumed(h)
+		if consumed {
+			delete(c.cache, h)
+		}
+		if err != nil {
+			return err
+		}
+	}
+	if err := c.cachedNumerators.Close(); err != nil {
+		return err
+	}
+	if err := c.cachedDenominators.Close(); err != nil {
+		return err
 	}
 	for _, h := range c.order {
 		if _, ok := c.vars[h]; !ok {
