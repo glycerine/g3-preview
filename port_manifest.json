@@ -150754,7 +150754,9 @@
         "pkg/util/numeral/rational_raw_boundary.go",
         "pkg/util/numeral/rational_raw_comparison_boundary_test.go",
         "pkg/util/lp/priority_queue_exact_test.go",
-        "pkg/math/polynomial/algebraic_display_decimal_test.go"
+        "pkg/math/polynomial/algebraic_display_decimal_test.go",
+        "pkg/util/numeral/mp_display_stream.go",
+        "pkg/util/numeral/mp_display_stream_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -150955,7 +150957,8 @@
         "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes",
         "TestRationalDivisionBoundaryGenerationIdentity",
         "TestRationalDivisionBoundaryGenerationExhaustion",
-        "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement"
+        "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement",
+        "TestIntegerAndRationalDisplaySourceInsertionOrder"
       ],
       "assertions": [
         {
@@ -151582,6 +151585,14 @@
             "TestRationalDivisionBoundaryGenerationIdentity",
             "TestRationalDivisionBoundaryGenerationExhaustion"
           ]
+        },
+        {
+          "name": "Source-order finite integer/rational display insertions reached by rational interval endpoints (src/util/mpz.cpp:1385-1408; src/util/mpq.cpp:130-139)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mp_display_stream.go",
+          "tests": [
+            "TestIntegerAndRationalDisplaySourceInsertionOrder"
+          ]
         }
       ],
       "ownership": [
@@ -151713,7 +151724,9 @@
         "pkg/util/numeral/rational_raw_boundary.go",
         "pkg/util/numeral/rational_raw_comparison_boundary_test.go",
         "pkg/util/lp/priority_queue_exact_test.go",
-        "pkg/math/polynomial/algebraic_display_decimal_test.go"
+        "pkg/math/polynomial/algebraic_display_decimal_test.go",
+        "pkg/util/numeral/mp_display_stream.go",
+        "pkg/util/numeral/mp_display_stream_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -152005,7 +152018,8 @@
         "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes",
         "TestRationalDivisionBoundaryGenerationIdentity",
         "TestRationalDivisionBoundaryGenerationExhaustion",
-        "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement"
+        "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement",
+        "TestIntegerAndRationalDisplaySourceInsertionOrder"
       ],
       "conditionals": [
         {
@@ -153185,6 +153199,14 @@
             "TestRationalDivisionBoundaryGenerationIdentity",
             "TestRationalDivisionBoundaryGenerationExhaustion"
           ]
+        },
+        {
+          "name": "Source-order finite integer/rational display insertions reached by rational interval endpoints (src/util/mpz.cpp:1385-1408; src/util/mpq.cpp:130-139)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mp_display_stream.go",
+          "tests": [
+            "TestIntegerAndRationalDisplaySourceInsertionOrder"
+          ]
         }
       ],
       "ownership": [
@@ -153481,7 +153503,9 @@
         "pkg/util/numeral/mpz_string_set_source_test.go",
         "pkg/util/numeral/mpz_string_set_callback_test.go",
         "pkg/util/text/owned_string_stream.go",
-        "pkg/util/text/owned_string_stream_test.go"
+        "pkg/util/text/owned_string_stream_test.go",
+        "pkg/util/numeral/mp_display_stream.go",
+        "pkg/util/numeral/mp_display_stream_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -153798,7 +153822,8 @@
         "TestOwnedStringStreamOwnerAndNativeTextGuards",
         "TestOwnedStringStreamSourceIntegerEveryColdReservation",
         "TestOwnedStringCopyAndReconstructionLifetime",
-        "TestIntegerRawObservationGenerationIdentity"
+        "TestIntegerRawObservationGenerationIdentity",
+        "TestIntegerAndRationalDisplaySourceInsertionOrder"
       ],
       "conditionals": [
         {
@@ -155774,6 +155799,14 @@
           "tests": [
             "TestIntegerRawObservationGenerationIdentity"
           ]
+        },
+        {
+          "name": "Source-order finite integer/rational display insertions reached by rational interval endpoints (src/util/mpz.cpp:1385-1408; src/util/mpq.cpp:130-139)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mp_display_stream.go",
+          "tests": [
+            "TestIntegerAndRationalDisplaySourceInsertionOrder"
+          ]
         }
       ],
       "ownership": [
@@ -155938,7 +155971,9 @@
         "pkg/util/numeral/mpz_string_set_source_test.go",
         "pkg/util/numeral/mpz_string_set_callback_test.go",
         "pkg/util/text/owned_string_stream.go",
-        "pkg/util/text/owned_string_stream_test.go"
+        "pkg/util/text/owned_string_stream_test.go",
+        "pkg/util/numeral/mp_display_stream.go",
+        "pkg/util/numeral/mp_display_stream_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -156263,7 +156298,8 @@
         "TestOwnedStringStreamOwnerAndNativeTextGuards",
         "TestOwnedStringStreamSourceIntegerEveryColdReservation",
         "TestOwnedStringCopyAndReconstructionLifetime",
-        "TestIntegerRawObservationGenerationIdentity"
+        "TestIntegerRawObservationGenerationIdentity",
+        "TestIntegerAndRationalDisplaySourceInsertionOrder"
       ],
       "conditionals": [
         {
@@ -157764,6 +157800,14 @@
           "go_target": "pkg/util/numeral/numeric_invocation_receipts.go",
           "tests": [
             "TestIntegerRawObservationGenerationIdentity"
+          ]
+        },
+        {
+          "name": "Source-order finite integer/rational display insertions reached by rational interval endpoints (src/util/mpz.cpp:1385-1408; src/util/mpq.cpp:130-139)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mp_display_stream.go",
+          "tests": [
+            "TestIntegerAndRationalDisplaySourceInsertionOrder"
           ]
         }
       ],

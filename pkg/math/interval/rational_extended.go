@@ -33,11 +33,7 @@ func (e RationalExtended) Display(w io.Writer, a *numeral.Rational, k ExtendedKi
 	case PlusInfinity:
 		return writeExtendedText(w, "+oo")
 	default:
-		s, err := e.Numbers.String(a)
-		if err != nil {
-			return err
-		}
-		return writeExtendedText(w, s)
+		return e.Numbers.DisplayTo(w, a)
 	}
 }
 

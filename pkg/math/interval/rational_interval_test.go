@@ -96,7 +96,7 @@ func TestRationalIntervalRetainedPredicatesAddSubAndOwnership(t *testing.T) {
 	for _, tc := range []struct {
 		at   int
 		want string
-	}{{1, ""}, {3, "(-3/2,"}, {5, "(-3/2, 2"}} {
+	}{{1, ""}, {5, "(-3/2,"}, {6, "(-3/2, "}} {
 		w := &shortOnceIntervalWriter{at: tc.at}
 		if err := a.Display(w); !errors.Is(err, io.ErrShortWrite) || w.String() != tc.want || w.calls != tc.at {
 			t.Fatalf("short insertion %d = (%q, %d, %v)", tc.at, w.String(), w.calls, err)
@@ -105,7 +105,7 @@ func TestRationalIntervalRetainedPredicatesAddSubAndOwnership(t *testing.T) {
 	// Source interval display inserts each component in order. A failed
 	// upper endpoint write must leave the already emitted prefix intact.
 	writeErr := errors.New("upper endpoint refused")
-	refused := &failAfterWrites{remaining: 3, err: writeErr}
+	refused := &failAfterWrites{remaining: 5, err: writeErr}
 	if err := a.Display(refused); !errors.Is(err, writeErr) || refused.String() != "(-3/2, " {
 		t.Fatalf("display refusal = (%q, %v)", refused.String(), err)
 	}
