@@ -1,11 +1,14 @@
 package tactic
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -126,5 +129,81 @@ func TestSubpavingTacticOptionSelectionAndDescriptions(t *testing.T) {
 		if err != nil || !present || text != entry.text {
 			t.Fatalf("description text %s: %q, %v", name, text, err)
 		}
+	}
+	qm, err := numeral.NewRationalManager(numeral.RationalConfig{Integers: numeral.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: budget}}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := qm.CloseChecked(); err != nil {
+			t.Error(err)
+		}
+	})
+	limit := &control.Reslimit{Limit: 1000}
+	if engine, err := NewHardwareEngine(limit, qm, pc, &p); !errors.Is(err, ErrHardwareEngineSelection) || engine != nil {
+		t.Fatalf("default MPQ engine must remain distinct: %p, %v", engine, err)
+	}
+	hwf, err := sy.Intern("hwf")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.SetSymbolName(&p, &numeralKey, hwf); err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.SetBoolName(&p, &printKey, true); err != nil {
+		t.Fatal(err)
+	}
+	depthKey, boundKey := "max_depth", "max_bound"
+	if err := pc.SetUIntName(&p, &depthKey, 0); err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.SetUIntName(&p, &boundKey, 1<<31); err != nil {
+		t.Fatal(err)
+	}
+	partial, err := NewHardwareEngine(limit, qm, pc, &p)
+	if !errors.Is(err, arena.ErrBounds) || partial == nil {
+		t.Fatalf("source max-bound refusal must return owning prefix: %p, %v", partial, err)
+	}
+	if err := partial.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.SetUIntName(&p, &boundKey, 2); err != nil {
+		t.Fatal(err)
+	}
+	engine, err := NewHardwareEngine(limit, qm, pc, &p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := engine.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	selected, err := engine.Options()
+	if err != nil || selected.Engine != EngineHWF || !selected.PrintNodes {
+		t.Fatalf("hardware engine options %+v: %v", selected, err)
+	}
+	shell, err := engine.Shell()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := shell.MkVar(false); err != nil {
+		t.Fatal(err)
+	}
+	if err := shell.Search(); err != nil {
+		t.Fatal(err)
+	}
+	st := statistics.New()
+	if err := shell.CollectStatistics(st); err != nil {
+		t.Fatal(err)
+	}
+	if st.Size() != 1 || st.Key(0) != "nodes" || st.UintValue(0) != 1 {
+		t.Fatal("configured zero-depth hardware search root", st.Size())
+	}
+	if err := engine.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := engine.Shell(); !errors.Is(err, arena.ErrClosed) {
+		t.Fatalf("closed engine shell borrow: %v", err)
 	}
 }

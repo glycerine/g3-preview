@@ -50241,7 +50241,8 @@
         "pkg/math/subpaving/hardware_display_test.go",
         "pkg/math/subpaving/hardware_param_descrs_test.go",
         "pkg/math/subpaving/hardware_context_params_test.go",
-        "pkg/math/subpaving/hardware_context_root.go"
+        "pkg/math/subpaving/hardware_context_root.go",
+        "pkg/math/subpaving/tactic/options_test.go"
       ],
       "tests": [
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
@@ -50249,7 +50250,8 @@
         "TestHardwareShellRetainedClauseAndSearchRoute",
         "TestHardwareShellStatisticsCountersAndReset",
         "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder",
-        "TestHardwareShellParamDescriptionsSourceOrder"
+        "TestHardwareShellParamDescriptionsSourceOrder",
+        "TestSubpavingTacticOptionSelectionAndDescriptions"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -50316,6 +50318,18 @@
           "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
           "tests": [
             "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete HWF factory construction from source-order ParamsRef without preliminary default mutation (src/math/subpaving/subpaving.cpp:271-273)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_params.go",
+          "tests": [
+            "TestSubpavingTacticOptionSelectionAndDescriptions"
+          ],
+          "go_targets": [
+            "pkg/math/subpaving/tactic/hardware_engine.go",
+            "pkg/math/subpaving/tactic/options_test.go"
           ]
         }
       ],
@@ -51754,7 +51768,8 @@
         "pkg/math/subpaving/hardware_display.go",
         "pkg/math/subpaving/hardware_display_test.go",
         "pkg/math/subpaving/hardware_param_descrs_test.go",
-        "pkg/math/subpaving/hardware_context_params_test.go"
+        "pkg/math/subpaving/hardware_context_params_test.go",
+        "pkg/math/subpaving/tactic/options_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51834,7 +51849,8 @@
         "TestHardwareShellRetainedClauseAndSearchRoute",
         "TestHardwareShellStatisticsCountersAndReset",
         "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder",
-        "TestHardwareShellParamDescriptionsSourceOrder"
+        "TestHardwareShellParamDescriptionsSourceOrder",
+        "TestSubpavingTacticOptionSelectionAndDescriptions"
       ],
       "assertions": [
         {
@@ -52554,6 +52570,18 @@
           "tests": [
             "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
           ]
+        },
+        {
+          "name": "Concrete HWF context constructor applies one source-order updt_params pass (src/math/subpaving/subpaving_t_def.h:419-438)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_params.go",
+          "tests": [
+            "TestSubpavingTacticOptionSelectionAndDescriptions"
+          ],
+          "go_targets": [
+            "pkg/math/subpaving/tactic/hardware_engine.go",
+            "pkg/math/subpaving/tactic/options_test.go"
+          ]
         }
       ],
       "ownership": [
@@ -52688,7 +52716,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/subpaving/tactic/options.go",
-        "pkg/math/subpaving/tactic/options_test.go"
+        "pkg/math/subpaving/tactic/options_test.go",
+        "pkg/math/subpaving/tactic/hardware_engine.go"
       ],
       "tests": [
         "TestSubpavingTacticOptionSelectionAndDescriptions"
@@ -52717,6 +52746,14 @@
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "Concrete HWF engine branch constructs selected context and shell with borrowed rational manager and resource limit (src/math/subpaving/tactic/subpaving_tactic.cpp:109-120)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/tactic/hardware_engine.go",
+          "tests": [
+            "TestSubpavingTacticOptionSelectionAndDescriptions"
+          ]
         }
       ],
       "ownership": [],

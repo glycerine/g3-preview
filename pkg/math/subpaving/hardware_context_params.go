@@ -6,8 +6,25 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
 )
+
+// NewHardwareContextFromParams follows the source context constructor's
+// single updt_params pass. A failed pass returns its partial context for the
+// caller's explicit owning Close.
+func NewHardwareContextFromParams(m *numeral.HardwareFloatNumeralManager, limit *control.Reslimit, pc *params.ParamsContext, p *params.ParamsRef) (*HardwareContext, error) {
+	if m == nil || limit == nil {
+		return nil, arena.ErrInvalidSlot
+	}
+	c := &HardwareContext{numbers: m, limit: limit}
+	c.self = c
+	if err := c.UpdateParamsRef(pc, p); err != nil {
+		return c, err
+	}
+	return c, nil
+}
 
 // UpdateParamsRef reads each retained parameter immediately before applying
 // its source-ordered mutation. A later getter failure leaves the earlier
