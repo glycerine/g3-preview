@@ -74,6 +74,24 @@ func (w *refusingWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
+type firstWriteRefusal struct{ calls int }
+
+func (w *firstWriteRefusal) Write([]byte) (int, error) {
+	w.calls++
+	return 0, io.ErrClosedPipe
+}
+
+func TestEscapedWriteReachesWriterBeforeLargeIndent(t *testing.T) {
+	in := "a\n"
+	w := new(firstWriteRefusal)
+	if err := Write(w, &in, false, ^uint32(0)); !errors.Is(err, io.ErrClosedPipe) || w.calls != 1 {
+		t.Fatalf("writer refusal = %v after %d calls", err, w.calls)
+	}
+	if _, err := String(&in, false, ^uint32(0)); !errors.Is(err, ErrTooLarge) {
+		t.Fatalf("String allocation bound = %v", err)
+	}
+}
+
 func TestEscapedWriterAndSizeBound(t *testing.T) {
 	in := "a\"\nb"
 	var out strings.Builder

@@ -175004,7 +175004,8 @@
           "tests": [
             "TestEscapedThirteenSourcePrintedFixtures",
             "TestEscapedIndependentByteIndentAndTrim",
-            "TestEscapedWriterAndSizeBound"
+            "TestEscapedWriterAndSizeBound",
+            "TestEscapedWriteReachesWriterBeforeLargeIndent"
           ]
         },
         {
@@ -175372,7 +175373,8 @@
           "tests": [
             "TestEscapedThirteenSourcePrintedFixtures",
             "TestEscapedIndependentByteIndentAndTrim",
-            "TestEscapedWriterAndSizeBound"
+            "TestEscapedWriterAndSizeBound",
+            "TestEscapedWriteReachesWriterBeforeLargeIndent"
           ]
         },
         {

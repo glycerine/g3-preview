@@ -71,9 +71,6 @@ func Write(w io.Writer, text *string, trim bool, indent uint32) error {
 		return io.ErrClosedPipe
 	}
 	s := prefix(text, trim)
-	if _, err := outputSize(s, indent); err != nil {
-		return err
-	}
 	for i := 0; i < len(s); i++ {
 		if s[i] == '"' {
 			if err := writeString(w, "\\"); err != nil {
