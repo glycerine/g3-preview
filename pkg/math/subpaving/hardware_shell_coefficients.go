@@ -191,3 +191,10 @@ func (w *HardwareShellCoefficients) CollectParamDescrs(d *params.ParamDescrs) er
 	}
 	return CollectHardwareParamDescrs(d)
 }
+
+func (w *HardwareShellCoefficients) UpdateParamsRef(pc *params.ParamsContext, p *params.ParamsRef) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.UpdateParamsRef(pc, p)
+}
