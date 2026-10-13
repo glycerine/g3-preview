@@ -138,7 +138,7 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	}
 	m.traceDivisionNormalize(m.Division[u][:na+1], m.Division[v][:nb])
 	if nb == 1 {
-		divideViewOne(limbView{external: m.Division[u], size: na + 1}, m.sourceDivRead(v, 0), q)
+		m.divideViewOne(limbView{external: m.Division[u], size: na + 1}, m.sourceDivRead(v, 0), q)
 	} else {
 		if e := m.divideMany(na+1, nb, q); e != nil {
 			return false, e
@@ -157,7 +157,7 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	}
 	return true, m.sourceVerifyDivision(a, b, q, r)
 }
-func divideViewOne(a limbView, b uint32, q limbView) {
+func (m *NaturalManager) divideViewOne(a limbView, b uint32, q limbView) {
 	denom := uint64(b)
 	for j := a.size - 1; j > 0; j-- {
 		temp := uint64(a.read(j))<<32 | uint64(a.read(j-1))
@@ -174,6 +174,7 @@ func divideViewOne(a limbView, b uint32, q limbView) {
 			q.write(j-1, uint32(qh)-1)
 			a.write(j, a.read(j-1)+b)
 		}
+		m.traceDivisionOneStep(j, qh, temp, denom, ms, a, borrow)
 	}
 }
 

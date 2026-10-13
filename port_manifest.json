@@ -153858,6 +153858,18 @@
           "tests": [
             "TestMPNNormalizationTraceDivisionAndDecimalConversion"
           ]
+        },
+        {
+          "name": "div_1 post-borrow mpn_div1 TRACE through numeric division and decimal conversion (mpn.cpp:296-302)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_div1_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn_indexed.go",
+            "pkg/util/numeral/mpn_cstring.go"
+          ],
+          "tests": [
+            "TestMPNSingleLimbDivisionTraceAndDecimalCaller"
+          ]
         }
       ],
       "ownership": [
@@ -154337,6 +154349,18 @@
           ],
           "tests": [
             "TestMPNNormalizationTraceDivisionAndDecimalConversion"
+          ]
+        },
+        {
+          "name": "div_1 post-borrow mpn_div1 TRACE through numeric division and decimal conversion (mpn.cpp:296-302)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_div1_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn_indexed.go",
+            "pkg/util/numeral/mpn_cstring.go"
+          ],
+          "tests": [
+            "TestMPNSingleLimbDivisionTraceAndDecimalCaller"
           ]
         }
       ],
