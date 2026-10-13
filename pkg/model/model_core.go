@@ -251,14 +251,22 @@ func (md *ModelCore) IncRef() error {
 	return nil
 }
 func (md *ModelCore) DecRef() error {
+	_, e := md.DecRefConsumed()
+	return e
+}
+
+// DecRefConsumed distinguishes a failed precondition from a deletion that
+// stopped after consuming this reference. Owning adapters use the receipt to
+// avoid decrementing the same model twice during explicit cleanup.
+func (md *ModelCore) DecRefConsumed() (bool, error) {
 	if e := md.open(); e != nil {
-		return e
+		return false, e
 	}
 	md.References--
 	if md.References == 0 {
-		return md.Close()
+		return true, md.Close()
 	}
-	return nil
+	return true, nil
 }
 func (md *ModelCore) Close() error {
 	if md == nil || md.self != md {

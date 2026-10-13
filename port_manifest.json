@@ -167628,11 +167628,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_model_converter.go",
-        "pkg/tactic/tactic_stored_model.go"
+        "pkg/tactic/tactic_stored_model.go",
+        "pkg/model/model_core.go",
+        "pkg/tactic/tactic_model_ref_source_order_test.go"
       ],
       "tests": [
         "TestTacticModelReferenceOwningAliasAndReplacement",
         "TestTacticModelReferenceCopyAssignmentOwnsSourceModel",
+        "TestTacticModelRefKeepsOldOnConsumedDestructionStop",
         "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
         "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
@@ -167653,11 +167656,12 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "model-core owning reference assignment/destruction specialisation",
+          "name": "model-core owning reference assignment/destruction specialisation, including consumed stopped final deletion and pending incoming cleanup",
           "status": "partial",
           "go_target": "pkg/tactic/tactic_model_converter.go",
           "tests": [
             "TestTacticModelReferenceCopyAssignmentOwnsSourceModel",
+            "TestTacticModelRefKeepsOldOnConsumedDestructionStop",
             "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
             "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
             "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
@@ -167666,7 +167670,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The retained model2mc model_ref-to-model_ref assignment now uses the concrete SetRef operation, which retains the incoming model before releasing the outgoing reference, including self-aliases. Copied/retired owner guards remain explicit. Other retained reference instantiations, move/detach paths and failure histories remain open."
+        "The retained model2mc model_ref-to-model_ref assignment retains the incoming model before releasing the outgoing reference, including self-aliases. A consumed stopped final model deletion keeps the old raw pointer published and the acquired incoming reference in an owning receipt until explicit close. Copied/retired owner guards remain explicit. Other retained reference instantiations, move/detach paths and failure histories remain open."
       ]
     },
     {

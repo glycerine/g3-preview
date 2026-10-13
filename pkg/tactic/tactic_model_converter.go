@@ -32,9 +32,11 @@ type ModelConverter interface {
 // Source owning ref assignment: retain incoming before releasing outgoing.
 // A zero value is an empty reference. The borrowed AST manager outlives models.
 type ModelRef struct {
-	self   *ModelRef
-	value  *model.ModelCore
-	closed bool
+	self    *ModelRef
+	value   *model.ModelCore
+	owned   bool
+	pending []*model.ModelCore
+	closed  bool
 }
 
 func (r *ModelRef) open() error {
@@ -54,14 +56,28 @@ func (r *ModelRef) Set(value *model.ModelCore) error {
 		}
 	}
 	if r.value != nil {
-		if e := r.value.DecRef(); e != nil {
+		if !r.owned {
 			if value != nil {
-				return errors.Join(e, value.DecRef())
+				r.pending = append(r.pending, value)
 			}
-			return e
+			return ErrModelConverterOwner
+		}
+		consumed, e := r.value.DecRefConsumed()
+		if consumed {
+			r.owned = false
+		}
+		if e != nil || !consumed {
+			if value != nil {
+				r.pending = append(r.pending, value)
+			}
+			if e != nil {
+				return e
+			}
+			return ErrModelConverterOwner
 		}
 	}
 	r.value = value
+	r.owned = value != nil
 	return nil
 }
 
@@ -96,11 +112,40 @@ func (r *ModelRef) Close() error {
 	if r.closed {
 		return nil
 	}
-	if e := r.Set(nil); e != nil {
-		return e
+	r.self = r
+	var failure error
+	if r.value != nil && r.owned {
+		consumed, e := r.value.DecRefConsumed()
+		if consumed {
+			r.owned = false
+		}
+		if !consumed {
+			if e != nil {
+				return e
+			}
+			return ErrModelConverterOwner
+		}
+		failure = e
 	}
+	for len(r.pending) != 0 {
+		last := len(r.pending) - 1
+		consumed, e := r.pending[last].DecRefConsumed()
+		if consumed {
+			r.pending = r.pending[:last]
+		}
+		if failure == nil {
+			failure = e
+		}
+		if !consumed {
+			if e != nil {
+				return e
+			}
+			return ErrModelConverterOwner
+		}
+	}
+	r.value = nil
 	r.closed = true
-	return nil
+	return failure
 }
 
 // ModelLabels borrows symbol identities, which stay valid with the source
