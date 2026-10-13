@@ -58,6 +58,11 @@ func TestHardwareFloatNumeralFloorCeilPowerAndGuards(t *testing.T) {
 	if err := m.Power(&x, 1<<31, &out); !errors.Is(err, arena.ErrBounds) {
 		t.Fatal("wrapped source exponent", err)
 	}
+	out.value = 17
+	x.value = math.Inf(1)
+	if err := m.Power(&x, 0, &out); !errors.Is(err, ErrHardwareFloatNonRegular) || out.value != 17 {
+		t.Fatal("source input check precedes result initialization", out, err)
+	}
 	x.value = math.MaxFloat64
 	if err := m.Inc(&x); !errors.Is(err, ErrHardwareFloatNonRegular) || !math.IsInf(x.value, 1) {
 		t.Fatal("overflow check", x, err)

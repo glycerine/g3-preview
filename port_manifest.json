@@ -117192,8 +117192,13 @@
           ]
         },
         {
-          "name": "Remaining f2n<hwf_manager> retained method audit and enclosing-caller verification",
-          "status": "unported"
+          "name": "f2n<hwf_manager> scalar scratch deletion and move/destruction use Go value lifetime",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/hwf_numeral.go",
+          "tests": [
+            "TestHardwareFloatNumeralDirectedIntervalOperations",
+            "TestHardwareFloatNumeralFloorCeilPowerAndGuards"
+          ]
         },
         {
           "name": "f2n<hwf_manager> scientific-string forwarding and display reached by subpaving traces",
@@ -117204,7 +117209,7 @@
           ]
         },
         {
-          "name": "Uncalled f2n<hwf_manager> power-of-two, decimal and SMT2 display helpers",
+          "name": "Uncalled f2n<hwf_manager> field/precise, arbitrary mode setter, second inverse overload, power-of-two, decimal and SMT2 display helpers",
           "status": "reference_only"
         },
         {
@@ -118986,7 +118991,7 @@
       "path": "src/util/hwf.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/numeral/hwf_value.go",
         "pkg/util/numeral/hwf_arithmetic.go",
@@ -119388,8 +119393,8 @@
           "text": "SASSERT(!is_nan(a) && !is_pinf(a) && !is_ninf(a));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "hwf.cpp:97-100,106-110,168-214,430-555 binary64 scalar set/copy, sign, comparison, classification and special-value construction",
@@ -119463,22 +119468,27 @@
           ]
         },
         {
-          "name": "Uncalled HWF fused arithmetic, square root, remainder and min/max methods",
-          "status": "reference_only"
+          "name": "Process-wide FPU rounding and Windows precision setup replaced by per-operation exact binary64 rounding",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/hwf_arithmetic.go",
+          "tests": [
+            "TestHardwareFloatDirectedArithmetic",
+            "TestHardwareFloatRoundToIntegralSourceModes"
+          ]
         }
       ],
       "ownership": [
         "The concrete binary64 value is scalar and pointer-free. The source hwf_manager owns an mpq child for rational projection; the Go scalar manager borrows the caller's independently owned RationalManager during conversion. Closed borrowers refuse reads, and no payload remains with the HWF manager."
       ],
       "deviations": [
-        "The retained subpaving tactic owns hwf_manager and f2n<hwf_manager>. The Go binary64 scalar/profile uses math.Float64bits/frombits for exact source fields and Go comparisons. Directed arithmetic and integral rounding avoid changing process-wide FPU mode. Rational input repeats the source UINT_MAX integer radix under the selected mode, then divides. Rational output retains the source raw exponent, including the subnormal 2^-1075 result. Rational-string formatting uses Go math/big.Rat for the source's temporary normalized mpq. The source internal mpq child is replaced by a borrowed caller owner; retained-call integration remains open."
+        "The retained subpaving tactic owns hwf_manager and f2n<hwf_manager>. The Go binary64 scalar/profile uses math.Float64bits/frombits for exact source fields and Go comparisons. Directed arithmetic and integral rounding avoid changing process-wide FPU mode. Rational input repeats the source UINT_MAX integer radix under the selected mode, then divides. Rational output retains the source raw exponent, including the subnormal 2^-1075 result. Rational-string formatting uses Go math/big.Rat for the source's temporary normalized mpq. The source internal mpq child is replaced by a borrowed caller owner. Formatted/exponent setters, fused arithmetic, square root, remainder, min/max, decimal/SMT2 display and previous-power methods have no retained HWF call. This whole-unit credit covers retained HWF calls; the enclosing subpaving context remains a separate unported source unit."
       ]
     },
     {
       "path": "src/util/hwf.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/numeral/hwf_value.go",
         "pkg/util/numeral/hwf_arithmetic.go",
@@ -119528,8 +119538,8 @@
           "text": "SASSERT(sizeof(n) == sizeof(value));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "hwf binary64 value and selected manager declarations for scalar set/copy/swap, fields, predicates and special values",
@@ -119603,15 +119613,20 @@
           ]
         },
         {
-          "name": "Uncalled hwf_manager fused arithmetic, square root, remainder and min/max declarations",
-          "status": "reference_only"
+          "name": "Source set_rounding_mode and platform precision controls replaced by local Go binary64 rounding",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/hwf_arithmetic.go",
+          "tests": [
+            "TestHardwareFloatDirectedArithmetic",
+            "TestHardwareFloatRoundToIntegralSourceModes"
+          ]
         }
       ],
       "ownership": [
         "HardwareFloat values are pointer-free binary64 scalars. The selected Go manager owns no storage and borrows the caller's RationalManager for retained rational conversion; closure of that manager is checked before reading."
       ],
       "deviations": [
-        "The HWF branch is selected by the retained subpaving tactic numeral option. Its scalar value, classification, directed arithmetic and rational input are ported. The source internal mpq child is replaced by the caller's borrowed rational owner; concrete subpaving integration remains open."
+        "The HWF branch is selected by the retained subpaving tactic numeral option. Its retained scalar, classification, directed arithmetic, conversion and display declarations are ported. Formatted/exponent setters, fused arithmetic, square root, remainder, min/max, decimal/SMT2 display, hash and previous-power declarations have no retained HWF call. The source internal mpq child is replaced by the caller's borrowed rational owner; concrete subpaving integration remains tracked with its own source units."
       ]
     },
     {

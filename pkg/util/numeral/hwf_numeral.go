@@ -189,6 +189,10 @@ func (m *HardwareFloatNumeralManager) Power(a *HardwareFloat, exponent uint32, o
 	if m == nil || m.core == nil || a == nil || out == nil {
 		return ErrNumericOwner
 	}
+	// Source set(power, a) checks the copied input before set(b, 1).
+	if err := m.check(a); err != nil {
+		return err
+	}
 	// The source's unsigned mask loop wraps for exponents >= 2^31.
 	if exponent >= 1<<31 {
 		return arena.ErrBounds

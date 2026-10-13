@@ -39565,6 +39565,18 @@ reporting short writes after their actual prefix. Focused cases cover normal
 values, negative zero, infinity and a short writer. Other source display
 helpers are uncalled by the retained HWF specialization.
 
+The whole-method audit now credits `hwf.h/.cpp` for their retained source
+consumers. Production HWF use is the subpaving tactic's concrete
+`f2n<hwf_manager>` instance; the latter calls the scalar, directed
+arithmetic, integral rounding, conversion and trace/display methods covered
+above. Formatted/exponent setters, fused arithmetic, square root, remainder,
+min/max, hash, previous-power and decimal/SMT2 display have no retained HWF
+caller. The source FPU mode and internal mpq child have the documented Go
+replacements. An additional focused case verifies that `f2n` power rejects
+a non-regular input before touching its output, matching the source setter
+order. `f2n.h` remains partial because its live MPF specialization is not yet
+ported; the enclosing subpaving source units remain separate work.
+
 ### Environment parameter runtime boundary
 
 `src/util/env_params.h/.cpp` has exactly two static operations. The five
