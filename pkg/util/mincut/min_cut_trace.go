@@ -2,7 +2,8 @@
 package mincut
 
 import (
-	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
@@ -12,9 +13,17 @@ func (m *MinCut) traceAddEdge(from, to uint32) {
 	if tags == nil {
 		tags = diagnostic.BorrowProcessTraceTags()
 	}
-	if !tags.ShouldTrace("spacer.mincut") {
-		return
-	}
-	_ = tags.Emit("spacer.mincut", "add_edge", "src/util/min_cut.cpp", 35,
-		fmt.Sprintf("adding edge (%d,%d)\n", from, to))
+	_ = tags.EmitConditional("spacer.mincut", "add_edge", "src/util/min_cut.cpp", 35,
+		func() bool { return true }, func(w io.Writer) error {
+			for _, part := range [...]string{"adding edge (", strconv.FormatUint(uint64(from), 10), ",", strconv.FormatUint(uint64(to), 10), ")\n"} {
+				n, err := io.WriteString(w, part)
+				if err != nil {
+					return err
+				}
+				if n != len(part) {
+					return io.ErrShortWrite
+				}
+			}
+			return nil
+		})
 }

@@ -118095,6 +118095,7 @@
         "TestCooperationNoOMPZeroWarmAllocations",
         "TestCooperationActualCPPNoOMPReleaseTrace",
         "TestCooperationCheckpointTraceDetailAndConditional",
+        "TestCooperationCheckpointTraceSourceInsertionPrefixes",
         "TestSubpavingCheckpointCooperatesAfterResourceAndMemory"
       ],
       "assertions": [
@@ -118148,7 +118149,8 @@
           "status": "ported",
           "go_target": "pkg/util/cooperate/cooperate.go",
           "tests": [
-            "TestCooperationCheckpointTraceDetailAndConditional"
+            "TestCooperationCheckpointTraceDetailAndConditional",
+            "TestCooperationCheckpointTraceSourceInsertionPrefixes"
           ]
         }
       ],
@@ -118178,6 +118180,7 @@
         "TestCooperationNoOMPZeroWarmAllocations",
         "TestCooperationActualCPPNoOMPReleaseTrace",
         "TestCooperationCheckpointTraceDetailAndConditional",
+        "TestCooperationCheckpointTraceSourceInsertionPrefixes",
         "TestSubpavingCheckpointCooperatesAfterResourceAndMemory"
       ],
       "conditionals": [
@@ -118215,7 +118218,8 @@
           "status": "ported",
           "go_target": "pkg/util/cooperate/cooperate.go",
           "tests": [
-            "TestCooperationCheckpointTraceDetailAndConditional"
+            "TestCooperationCheckpointTraceDetailAndConditional",
+            "TestCooperationCheckpointTraceSourceInsertionPrefixes"
           ]
         }
       ],
@@ -173507,7 +173511,8 @@
           "status": "ported",
           "go_target": "pkg/util/backtrack/union_find.go",
           "tests": [
-            "TestUnionFindTraceBeforeSameRootReturnAndUnmerge"
+            "TestUnionFindTraceBeforeSameRootReturnAndUnmerge",
+            "TestUnionFindMergeTraceSourceInsertionPrefixes"
           ]
         },
         {
@@ -173519,7 +173524,8 @@
           ],
           "tests": [
             "TestTraceShortAndConditionalGateOrder",
-            "TestCooperationCheckpointTraceDetailAndConditional"
+            "TestCooperationCheckpointTraceDetailAndConditional",
+            "TestCooperationCheckpointTraceSourceInsertionPrefixes"
           ]
         },
         {
@@ -173697,7 +173703,7 @@
           "name": "min_cut::add_edge spacer.mincut TRACE after edge publication",
           "status": "ported",
           "go_target": "pkg/util/mincut/min_cut_trace.go",
-          "tests": ["TestMinCutRetainedEdgeTraceAndCut"]
+          "tests": ["TestMinCutRetainedEdgeTraceAndCut", "TestMinCutTraceSourceInsertionPrefixes"]
         },
         {
           "name": "mpzzp setup_p and inv TRACE at source lines 55, 175, 177 and 179",
@@ -173873,7 +173879,8 @@
           "status": "ported",
           "go_target": "pkg/util/backtrack/union_find.go",
           "tests": [
-            "TestUnionFindTraceBeforeSameRootReturnAndUnmerge"
+            "TestUnionFindTraceBeforeSameRootReturnAndUnmerge",
+            "TestUnionFindMergeTraceSourceInsertionPrefixes"
           ]
         },
         {
@@ -173885,7 +173892,8 @@
           ],
           "tests": [
             "TestTraceShortAndConditionalGateOrder",
-            "TestCooperationCheckpointTraceDetailAndConditional"
+            "TestCooperationCheckpointTraceDetailAndConditional",
+            "TestCooperationCheckpointTraceSourceInsertionPrefixes"
           ]
         },
         {
@@ -174063,7 +174071,7 @@
           "name": "min_cut::add_edge spacer.mincut TRACE after edge publication",
           "status": "ported",
           "go_target": "pkg/util/mincut/min_cut_trace.go",
-          "tests": ["TestMinCutRetainedEdgeTraceAndCut"]
+          "tests": ["TestMinCutRetainedEdgeTraceAndCut", "TestMinCutTraceSourceInsertionPrefixes"]
         },
         {
           "name": "mpzzp setup_p and inv TRACE at source lines 55, 175, 177 and 179",
@@ -174465,7 +174473,8 @@
         "TestUnionFindDissolveEntireClassAndDisplay",
         "TestBasicUnionFindUnknownMergeCycleAndReset",
         "TestUnionFindContextValidationAndInvariantFailure",
-        "TestUnionFindTraceBeforeSameRootReturnAndUnmerge"
+        "TestUnionFindTraceBeforeSameRootReturnAndUnmerge",
+        "TestUnionFindMergeTraceSourceInsertionPrefixes"
       ],
       "conditionals": [
         {
@@ -174544,7 +174553,8 @@
           "status": "ported",
           "go_target": "pkg/util/backtrack/union_find.go",
           "tests": [
-            "TestUnionFindTraceBeforeSameRootReturnAndUnmerge"
+            "TestUnionFindTraceBeforeSameRootReturnAndUnmerge",
+            "TestUnionFindMergeTraceSourceInsertionPrefixes"
           ]
         },
         {

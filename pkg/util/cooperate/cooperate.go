@@ -90,25 +90,39 @@ func (c *Cooperation) Checkpoint(task string) error {
 		if end := strings.IndexByte(task, 0); end >= 0 {
 			task = task[:end]
 		}
-		if trace.ShouldTrace("cooperate_detail") {
-			_ = trace.Emit("cooperate_detail", "checkpoint", "src/util/cooperate.cpp", 56, task+", tid: 0\n")
-		}
+		_ = trace.EmitConditional("cooperate_detail", "checkpoint", "src/util/cooperate.cpp", 56,
+			func() bool { return true }, func(w io.Writer) error {
+				for _, part := range [...]string{task, ", tid: ", "0", "\n"} {
+					if err := writeCooperationTracePart(w, part); err != nil {
+						return err
+					}
+				}
+				return nil
+			})
 		// m_task starts null and is never assigned. Every retained Go task
 		// string represents a non-null source char pointer.
 		_ = trace.EmitConditional("cooperate", "checkpoint", "src/util/cooperate.cpp", 57,
 			func() bool { return true }, func(w io.Writer) error {
-				message := "moving to task: " + task + "\n"
-				n, err := io.WriteString(w, message)
-				if err != nil {
-					return err
-				}
-				if n != len(message) {
-					return io.ErrShortWrite
+				for _, part := range [...]string{"moving to task: ", task, "\n"} {
+					if err := writeCooperationTracePart(w, part); err != nil {
+						return err
+					}
 				}
 				return nil
 			})
 	}
 	c.OwnerThread = 0
+	return nil
+}
+
+func writeCooperationTracePart(w io.Writer, part string) error {
+	n, err := io.WriteString(w, part)
+	if err != nil {
+		return err
+	}
+	if n != len(part) {
+		return io.ErrShortWrite
+	}
 	return nil
 }
 

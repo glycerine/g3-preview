@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
@@ -81,12 +82,21 @@ func (u *UnionFind) traceRoots(function string, line int, verb string, root1, ro
 	if tags == nil {
 		tags = diagnostic.BorrowProcessTraceTags()
 	}
-	if tags.ShouldTrace("union_find") {
-		// Source std::ofstream has no throwing exceptions by default. An output
-		// failure leaves the union-find transition uninterrupted.
-		_ = tags.Emit("union_find", function, "src/util/union_find.h", line,
-			fmt.Sprintf("%s %d %d\n", verb, root1, root2))
-	}
+	// Source std::ofstream has no throwing exceptions by default. An output
+	// failure leaves the union-find transition uninterrupted.
+	_ = tags.EmitConditional("union_find", function, "src/util/union_find.h", line,
+		func() bool { return true }, func(w io.Writer) error {
+			for _, part := range [...]string{verb + " ", strconv.FormatUint(uint64(root1), 10), " ", strconv.FormatUint(uint64(root2), 10), "\n"} {
+				n, err := io.WriteString(w, part)
+				if err != nil {
+					return err
+				}
+				if n != len(part) {
+					return io.ErrShortWrite
+				}
+			}
+			return nil
+		})
 }
 
 func (u *UnionFind) MkVar() uint32 {
