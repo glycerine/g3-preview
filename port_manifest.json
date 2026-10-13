@@ -149292,7 +149292,9 @@
         "pkg/util/numeral/mpf_signed_fraction_callback_test.go",
         "pkg/util/numeral/mpf_signed_fraction_source_stop_test.go",
         "pkg/util/numeral/mpq_signed_fraction_source.go",
-        "pkg/util/text/owned_string_capture.go"
+        "pkg/util/text/owned_string_capture.go",
+        "pkg/util/numeral/mpf_sqrt_trace.go",
+        "pkg/util/numeral/mpf_sqrt_trace_test.go"
       ],
       "tests": [
         "TestArbitraryFloatToStringLiteralSpecialBranches",
@@ -149546,7 +149548,8 @@
         "TestArbitraryFloatSignedFractionRefusedNormalizationKeepsOlderGCD",
         "TestArbitraryFloatSignedFractionInlineChildKeepsOlderHistory",
         "TestArbitraryFloatSignedFractionYoungerSourceStop",
-        "TestNumericStreamNativeCountedTextAndOwnedInput"
+        "TestNumericStreamNativeCountedTextAndOwnedInput",
+        "TestMyMPZSqrtRetainedShortTraceBranches"
       ],
       "conditionals": [
         {
@@ -150527,6 +150530,17 @@
             "TestArbitraryFloatSignedFractionRefusedNormalizationKeepsOlderGCD",
             "TestArbitraryFloatSignedFractionInlineChildKeepsOlderHistory",
             "TestArbitraryFloatSignedFractionYoungerSourceStop"
+          ]
+        },
+        {
+          "name": "my_mpz_sqrt retained mpf_dbg STRACE bounds, midpoint and exact/inexact endpoint choices",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_integer_sqrt_helper.go",
+          "go_targets": [
+            "pkg/util/numeral/mpf_sqrt_trace.go"
+          ],
+          "tests": [
+            "TestMyMPZSqrtRetainedShortTraceBranches"
           ]
         }
       ],
@@ -172519,6 +172533,14 @@
           ]
         },
         {
+          "name": "my_mpz_sqrt mpf_dbg STRACE reached bounds, midpoint and endpoint caller",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_sqrt_trace.go",
+          "tests": [
+            "TestMyMPZSqrtRetainedShortTraceBranches"
+          ]
+        },
+        {
           "name": "optional _TRACE file and remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -172528,7 +172550,7 @@
         "TraceTags owns a native Go map of C-string tag values; Finalize drops that table but preserves enable-all. The default gparams binding uses a process singleton; full shell/API tag binding remains open. The optional trace writer is borrowed when injected; otherwise a trace-enabled emitted record lazily opens the process .z3-trace file."
       ],
       "deviations": [
-        "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Cooperation checkpoint TRACE and CTRACE plus integer divides STRACE and TRACE and integer negation, add/sub/mul and division-wrapper and rational add/sub/mul, mixed and division STRACE are wired; other optional TRACE/STRACE/CTRACE call sites remain open."
+        "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Cooperation checkpoint TRACE and CTRACE plus integer divides STRACE and TRACE and integer negation, add/sub/mul and division-wrapper and rational add/sub/mul, mixed and division STRACE plus MPF sqrt-helper STRACE are wired; other optional TRACE/STRACE/CTRACE call sites remain open."
       ]
     },
     {
@@ -172692,6 +172714,14 @@
           ]
         },
         {
+          "name": "my_mpz_sqrt mpf_dbg STRACE reached bounds, midpoint and endpoint caller",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_sqrt_trace.go",
+          "tests": [
+            "TestMyMPZSqrtRetainedShortTraceBranches"
+          ]
+        },
+        {
           "name": "optional _TRACE file and remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -172701,7 +172731,7 @@
         "TraceTags owns a native Go map of C-string tag values; Finalize drops that table but preserves enable-all. The default gparams binding uses a process singleton; full shell/API tag binding remains open. The optional trace writer is borrowed when injected; otherwise a trace-enabled emitted record lazily opens the process .z3-trace file."
       ],
       "deviations": [
-        "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Cooperation checkpoint TRACE and CTRACE plus integer divides STRACE and TRACE and integer negation, add/sub/mul and division-wrapper and rational add/sub/mul, mixed and division STRACE are wired; other optional TRACE/STRACE/CTRACE call sites remain open."
+        "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Cooperation checkpoint TRACE and CTRACE plus integer divides STRACE and TRACE and integer negation, add/sub/mul and division-wrapper and rational add/sub/mul, mixed and division STRACE plus MPF sqrt-helper STRACE are wired; other optional TRACE/STRACE/CTRACE call sites remain open."
       ]
     },
     {

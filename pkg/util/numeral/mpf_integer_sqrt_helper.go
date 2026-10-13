@@ -68,6 +68,7 @@ func MyMPZSqrt(m *IntegerManager, sbits uint32, oddExp bool, input, out *Int) (c
 		if equal {
 			return nil
 		}
+		m.traceMPFSqrtBounds(input, lower, upper)
 		if e := m.addSubWithAllocationContext(upper, lower, diff, true, context); e != nil {
 			return e
 		}
@@ -84,8 +85,10 @@ func MyMPZSqrt(m *IntegerManager, sbits uint32, oddExp bool, input, out *Int) (c
 				return e
 			}
 			if exact {
+				m.traceMPFSqrtChoice(true)
 				return s.copyValue(out, lower)
 			}
+			m.traceMPFSqrtChoice(false)
 			return s.copyValue(out, upper)
 		}
 		if e := m.addSubWithAllocationContext(lower, upper, mid, false, context); e != nil {
@@ -97,6 +100,7 @@ func MyMPZSqrt(m *IntegerManager, sbits uint32, oddExp bool, input, out *Int) (c
 		if e := m.mulWithAllocationContext(mid, mid, product, context); e != nil {
 			return e
 		}
+		m.traceMPFSqrtMid(mid, product)
 		less, e := m.Less(product, input)
 		if e != nil {
 			return e
