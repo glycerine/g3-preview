@@ -89,6 +89,7 @@ func (m *NaturalManager) sourceToCStringScopedTracked(a limbView, dst sourceDeci
 	if SourceExtendedGCDDebug && (lbuf == 0 || (dst.character == nil && dst.assembly == nil && dst.external == nil)) {
 		return ErrIntegerAssertion
 	}
+	m.traceToCStringInput(a)
 	if a.size == 1 {
 		value, e := readDecimalLimb(a, 0)
 		if e != nil {
@@ -107,6 +108,7 @@ func (m *NaturalManager) sourceToCStringScopedTracked(a limbView, dst sourceDeci
 		// snprintf's zero-size case writes nothing. Its return count is ignored
 		// in source; Cptr insertion subsequently reads the existing destination.
 		if lbuf == 0 {
+			m.traceToCStringResult(dst)
 			return nil
 		}
 		count := uint64(n)
@@ -118,7 +120,11 @@ func (m *NaturalManager) sourceToCStringScopedTracked(a limbView, dst sourceDeci
 				return e
 			}
 		}
-		return dst.write(count, 0)
+		if e := dst.write(count, 0); e != nil {
+			return e
+		}
+		m.traceToCStringResult(dst)
+		return nil
 	}
 	if e := m.beginFormattingScopeTracked(scope, a.size, receipt); e != nil {
 		return e
@@ -135,6 +141,9 @@ func (m *NaturalManager) sourceToCStringScopedTracked(a limbView, dst sourceDeci
 			return &NumeralSourceFailure{BodyCause: e, DestructorCause: cleanup}
 		}
 		return e
+	}
+	if cleanup == nil {
+		m.traceToCStringResult(dst)
 	}
 	return cleanup
 }

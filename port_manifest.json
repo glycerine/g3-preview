@@ -153881,6 +153881,17 @@
           "tests": [
             "TestMPNMultiLimbDivisionTraceStopsAtSourceOutOfBoundsRead"
           ]
+        },
+        {
+          "name": "to_string mpn_to_string TRACE entry and successful exit (mpn.cpp:362,395)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_to_string_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn_cstring.go"
+          ],
+          "tests": [
+            "TestMPNToStringSourceEntryExitAndShortDestinationTrace"
+          ]
         }
       ],
       "ownership": [
@@ -154383,6 +154394,17 @@
           ],
           "tests": [
             "TestMPNMultiLimbDivisionTraceStopsAtSourceOutOfBoundsRead"
+          ]
+        },
+        {
+          "name": "to_string mpn_to_string TRACE entry and successful exit (mpn.cpp:362,395)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_to_string_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn_cstring.go"
+          ],
+          "tests": [
+            "TestMPNToStringSourceEntryExitAndShortDestinationTrace"
           ]
         }
       ],
