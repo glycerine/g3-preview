@@ -47,13 +47,21 @@ func (m *FixedPointManager) Inv(a *FixedPoint) error {
 	if err := m.check(a); err != nil {
 		return err
 	}
+	if a.scaled.Sign() == 0 {
+		return ErrFixedPointDivZero
+	}
+	m.traceFixedInverse(a, false)
 	var oneScaled big.Int
 	oneScaled.Mul(&m.scale, &m.scale)
 	q, err := m.roundMagnitude(&oneScaled, &a.scaled)
 	if err != nil {
 		return err
 	}
-	return m.publish(a, q)
+	if err := m.publish(a, q); err != nil {
+		return err
+	}
+	m.traceFixedInverse(a, true)
+	return nil
 }
 
 // Power preserves the source's left-to-right small-power path for distinct

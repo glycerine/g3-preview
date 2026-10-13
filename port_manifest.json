@@ -153005,7 +153005,8 @@
         "pkg/util/numeral/mpfx_power_of_two_test.go",
         "pkg/util/numeral/mpfx_compare_product_trace.go",
         "pkg/util/numeral/mpfx_integral_trace.go",
-        "pkg/util/numeral/mpfx_power_trace.go"
+        "pkg/util/numeral/mpfx_power_trace.go",
+        "pkg/util/numeral/mpfx_division_callers_trace.go"
       ],
       "tests": [
         "TestFixedPointRetainedArithmeticAndDirectedRounding",
@@ -153018,7 +153019,8 @@
         "TestFixedPointPrevPowerOfTwoSourceIntegerWords",
         "TestFixedPointComparisonAndProductSourceTrace",
         "TestFixedPointFloorCeilSourceTrace",
-        "TestFixedPointPowerSourceTraceAndRawWords"
+        "TestFixedPointPowerSourceTraceAndRawWords",
+        "TestFixedPointRetainedDivisionCallersTrace"
       ],
       "conditionals": [
         {
@@ -153327,6 +153329,14 @@
           "tests": [
             "TestFixedPointPowerSourceTraceAndRawWords"
           ]
+        },
+        {
+          "name": "retained mpfx ratio setter and inverse route through division STRACE after operand and zero checks (mpfx.h:267-268; mpfx.cpp:221-234,447-517)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_division_callers_trace.go",
+          "tests": [
+            "TestFixedPointRetainedDivisionCallersTrace"
+          ]
         }
       ],
       "ownership": [
@@ -153354,7 +153364,8 @@
         "pkg/util/numeral/mpfx_predicates.go",
         "pkg/util/numeral/mpfx_predicates_test.go",
         "pkg/util/numeral/mpfx_power_of_two.go",
-        "pkg/util/numeral/mpfx_power_of_two_test.go"
+        "pkg/util/numeral/mpfx_power_of_two_test.go",
+        "pkg/util/numeral/mpfx_division_callers_trace.go"
       ],
       "tests": [
         "TestFixedPointRetainedArithmeticAndDirectedRounding",
@@ -153364,7 +153375,8 @@
         "TestFixedPointRetainedRationalIntegerConversionAndDisplay",
         "TestFixedPointDisplaySourceInsertionsAndShortWrites",
         "TestFixedPointRetainedOrderingSignsIncrementAndSwap",
-        "TestFixedPointPrevPowerOfTwoSourceIntegerWords"
+        "TestFixedPointPrevPowerOfTwoSourceIntegerWords",
+        "TestFixedPointRetainedDivisionCallersTrace"
       ],
       "conditionals": [
         {
@@ -153420,6 +153432,14 @@
           "go_target": "pkg/util/numeral/mpfx_power_of_two.go",
           "tests": [
             "TestFixedPointPrevPowerOfTwoSourceIntegerWords"
+          ]
+        },
+        {
+          "name": "retained mpfx ratio setter and inverse route through division STRACE after operand and zero checks (mpfx.h:267-268; mpfx.cpp:221-234,447-517)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_division_callers_trace.go",
+          "tests": [
+            "TestFixedPointRetainedDivisionCallersTrace"
           ]
         }
       ],
@@ -173127,7 +173147,8 @@
         "pkg/util/numeral/mpq_parse_trace.go",
         "pkg/util/numeral/mpfx_compare_product_trace.go",
         "pkg/util/numeral/mpfx_integral_trace.go",
-        "pkg/util/numeral/mpfx_power_trace.go"
+        "pkg/util/numeral/mpfx_power_trace.go",
+        "pkg/util/numeral/mpfx_division_callers_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -173140,7 +173161,8 @@
         "TestRationalSetStringRetainedTraceBranches",
         "TestFixedPointComparisonAndProductSourceTrace",
         "TestFixedPointFloorCeilSourceTrace",
-        "TestFixedPointPowerSourceTraceAndRawWords"
+        "TestFixedPointPowerSourceTraceAndRawWords",
+        "TestFixedPointRetainedDivisionCallersTrace"
       ],
       "conditionals": [
         {
@@ -173432,6 +173454,14 @@
           ]
         },
         {
+          "name": "retained mpfx ratio setter and inverse route through division STRACE after operand and zero checks (mpfx.h:267-268; mpfx.cpp:221-234,447-517)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_division_callers_trace.go",
+          "tests": [
+            "TestFixedPointRetainedDivisionCallersTrace"
+          ]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -173460,7 +173490,8 @@
         "pkg/util/numeral/mpq_parse_trace.go",
         "pkg/util/numeral/mpfx_compare_product_trace.go",
         "pkg/util/numeral/mpfx_integral_trace.go",
-        "pkg/util/numeral/mpfx_power_trace.go"
+        "pkg/util/numeral/mpfx_power_trace.go",
+        "pkg/util/numeral/mpfx_division_callers_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -173473,7 +173504,8 @@
         "TestRationalSetStringRetainedTraceBranches",
         "TestFixedPointComparisonAndProductSourceTrace",
         "TestFixedPointFloorCeilSourceTrace",
-        "TestFixedPointPowerSourceTraceAndRawWords"
+        "TestFixedPointPowerSourceTraceAndRawWords",
+        "TestFixedPointRetainedDivisionCallersTrace"
       ],
       "conditionals": [
         {
@@ -173774,6 +173806,14 @@
           "go_target": "pkg/util/numeral/mpfx_power_trace.go",
           "tests": [
             "TestFixedPointPowerSourceTraceAndRawWords"
+          ]
+        },
+        {
+          "name": "retained mpfx ratio setter and inverse route through division STRACE after operand and zero checks (mpfx.h:267-268; mpfx.cpp:221-234,447-517)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_division_callers_trace.go",
+          "tests": [
+            "TestFixedPointRetainedDivisionCallersTrace"
           ]
         },
         {

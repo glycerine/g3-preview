@@ -194,11 +194,19 @@ func (m *FixedPointManager) SetRatio(dst *FixedPoint, num int64, den uint64) err
 	if absNum.Cmp(&m.magnitudeLimit) >= 0 || scaledDen.Cmp(&m.magnitudeLimit) >= 0 {
 		return ErrFixedPointOverflow // source constructs both integer operands first
 	}
+	if den == 0 {
+		return ErrFixedPointDivZero
+	}
+	m.traceFixedIntegerDivision(num, den, dst, false)
 	q, err := m.roundMagnitude(&numerator, &denominator)
 	if err != nil {
 		return err
 	}
-	return m.publish(dst, q)
+	if err := m.publish(dst, q); err != nil {
+		return err
+	}
+	m.traceFixedIntegerDivision(num, den, dst, true)
+	return nil
 }
 
 func (m *FixedPointManager) Compare(a, b *FixedPoint) (int, error) {
