@@ -39,11 +39,17 @@ func (m *FastFloatManager) traceMulOuter(a, b, c *FastFloat, before bool) {
 		if err := m.DisplayTo(w, b); err != nil {
 			return err
 		}
-		bound := ") >= "
-		if m.toPlus {
-			bound = ") <= "
+		if err := writeFastFloatPart(w, ") "); err != nil {
+			return err
 		}
-		return writeFastFloatPart(w, bound)
+		bound := ">="
+		if m.toPlus {
+			bound = "<="
+		}
+		if err := writeFastFloatPart(w, bound); err != nil {
+			return err
+		}
+		return writeFastFloatPart(w, " ")
 	})
 }
 
@@ -77,7 +83,13 @@ func (m *FastFloatManager) traceMulLeading(zeros uint32) {
 	}
 	_ = tags.EmitConditional("mpff", "mul", "src/util/mpff.cpp", 800,
 		func() bool { return true }, func(w io.Writer) error {
-			return writeFastFloatPart(w, "num_leading_zeros: "+strconv.FormatUint(uint64(zeros), 10)+"\n")
+			if err := writeFastFloatPart(w, "num_leading_zeros: "); err != nil {
+				return err
+			}
+			if err := writeFastFloatPart(w, strconv.FormatUint(uint64(zeros), 10)); err != nil {
+				return err
+			}
+			return writeFastFloatPart(w, "\n")
 		})
 }
 
@@ -95,13 +107,16 @@ func (m *FastFloatManager) traceMulRounding(c *FastFloat, product ffLimbView, sh
 	}
 	_ = tags.EmitConditional("mpff", "mul", "src/util/mpff.cpp", 811,
 		func() bool { return true }, func(w io.Writer) error {
-			if err := writeFastFloatPart(w, "c.m_sign: "+traceBoolDigit(c.negative())+", m_to_plus_inf: "+traceBoolDigit(m.toPlus)+"\n"); err != nil {
-				return err
+			for _, part := range [...]string{
+				"c.m_sign: ", traceBoolDigit(c.negative()), ", m_to_plus_inf: ", traceBoolDigit(m.toPlus),
+				"\nhas_one_at_first_k_bits: ", traceBoolDigit(ffHasLow(product, shift)), "\n",
+				"_inc_significand: ", traceBoolDigit(inc), "\n",
+			} {
+				if err := writeFastFloatPart(w, part); err != nil {
+					return err
+				}
 			}
-			if err := writeFastFloatPart(w, "has_one_at_first_k_bits: "+traceBoolDigit(ffHasLow(product, shift))+"\n"); err != nil {
-				return err
-			}
-			return writeFastFloatPart(w, "_inc_significand: "+traceBoolDigit(inc)+"\n")
+			return nil
 		})
 }
 

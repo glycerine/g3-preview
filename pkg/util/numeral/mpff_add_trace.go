@@ -38,11 +38,17 @@ func (m *FastFloatManager) traceAddSubOuter(a, b, c *FastFloat, sub, before bool
 		if err := m.DisplayTo(w, b); err != nil {
 			return err
 		}
-		bound := " >= "
-		if m.toPlus {
-			bound = " <= "
+		if err := writeFastFloatPart(w, " "); err != nil {
+			return err
 		}
-		return writeFastFloatPart(w, bound)
+		bound := ">="
+		if m.toPlus {
+			bound = "<="
+		}
+		if err := writeFastFloatPart(w, bound); err != nil {
+			return err
+		}
+		return writeFastFloatPart(w, " ")
 	})
 }
 
@@ -69,11 +75,14 @@ func (m *FastFloatManager) traceAddSubInner(a, b, c *FastFloat, sub, before bool
 				}
 				return writeFastFloatPart(w, "\n")
 			}
-			name := "add("
+			name := "add"
 			if sub {
-				name = "sub("
+				name = "sub"
 			}
 			if err := writeFastFloatPart(w, name); err != nil {
+				return err
+			}
+			if err := writeFastFloatPart(w, "("); err != nil {
 				return err
 			}
 			if err := m.DisplayTo(w, a); err != nil {

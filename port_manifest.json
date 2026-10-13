@@ -152293,6 +152293,7 @@
         "TestFastFloatMulOuterAndInnerTraceOrder",
         "TestFastFloatMulTraceReachedImpreciseRounding",
         "TestFastFloatDivTraceSourceShortcutsAndQuotient",
+        "TestFastFloatArithmeticTraceSourceInsertions",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
         "TestFastFloatSetIntegerRetainedTraceBranches",
@@ -152934,7 +152935,8 @@
             "pkg/util/numeral/mpff_add_trace.go"
           ],
           "tests": [
-            "TestFastFloatAddSubOuterAndInnerTraceOrder"
+            "TestFastFloatAddSubOuterAndInnerTraceOrder",
+            "TestFastFloatArithmeticTraceSourceInsertions"
           ]
         },
         {
@@ -152946,7 +152948,8 @@
           ],
           "tests": [
             "TestFastFloatMulOuterAndInnerTraceOrder",
-            "TestFastFloatMulTraceReachedImpreciseRounding"
+            "TestFastFloatMulTraceReachedImpreciseRounding",
+            "TestFastFloatArithmeticTraceSourceInsertions"
           ]
         },
         {
@@ -152965,7 +152968,8 @@
             "pkg/util/numeral/mpff_div_trace.go"
           ],
           "tests": [
-            "TestFastFloatDivTraceSourceShortcutsAndQuotient"
+            "TestFastFloatDivTraceSourceShortcutsAndQuotient",
+            "TestFastFloatArithmeticTraceSourceInsertions"
           ]
         },
         {
@@ -173881,7 +173885,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_add_trace.go",
           "tests": [
-            "TestFastFloatAddSubOuterAndInnerTraceOrder"
+            "TestFastFloatAddSubOuterAndInnerTraceOrder",
+            "TestFastFloatArithmeticTraceSourceInsertions"
           ]
         },
         {
@@ -173890,7 +173895,8 @@
           "go_target": "pkg/util/numeral/mpff_mul_trace.go",
           "tests": [
             "TestFastFloatMulOuterAndInnerTraceOrder",
-            "TestFastFloatMulTraceReachedImpreciseRounding"
+            "TestFastFloatMulTraceReachedImpreciseRounding",
+            "TestFastFloatArithmeticTraceSourceInsertions"
           ]
         },
         {
@@ -173898,7 +173904,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_div_trace.go",
           "tests": [
-            "TestFastFloatDivTraceSourceShortcutsAndQuotient"
+            "TestFastFloatDivTraceSourceShortcutsAndQuotient",
+            "TestFastFloatArithmeticTraceSourceInsertions"
           ]
         },
         {
@@ -174280,7 +174287,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_add_trace.go",
           "tests": [
-            "TestFastFloatAddSubOuterAndInnerTraceOrder"
+            "TestFastFloatAddSubOuterAndInnerTraceOrder",
+            "TestFastFloatArithmeticTraceSourceInsertions"
           ]
         },
         {
@@ -174289,7 +174297,8 @@
           "go_target": "pkg/util/numeral/mpff_mul_trace.go",
           "tests": [
             "TestFastFloatMulOuterAndInnerTraceOrder",
-            "TestFastFloatMulTraceReachedImpreciseRounding"
+            "TestFastFloatMulTraceReachedImpreciseRounding",
+            "TestFastFloatArithmeticTraceSourceInsertions"
           ]
         },
         {
@@ -174297,7 +174306,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_div_trace.go",
           "tests": [
-            "TestFastFloatDivTraceSourceShortcutsAndQuotient"
+            "TestFastFloatDivTraceSourceShortcutsAndQuotient",
+            "TestFastFloatArithmeticTraceSourceInsertions"
           ]
         },
         {

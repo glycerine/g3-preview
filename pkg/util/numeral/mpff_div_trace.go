@@ -30,11 +30,17 @@ func (m *FastFloatManager) traceDivOuter(a, b, c *FastFloat, before bool) {
 		if err := m.DisplayTo(w, b); err != nil {
 			return err
 		}
-		bound := ") >= "
-		if m.toPlus {
-			bound = ") <= "
+		if err := writeFastFloatPart(w, ") "); err != nil {
+			return err
 		}
-		return writeFastFloatPart(w, bound)
+		bound := ">="
+		if m.toPlus {
+			bound = "<="
+		}
+		if err := writeFastFloatPart(w, bound); err != nil {
+			return err
+		}
+		return writeFastFloatPart(w, " ")
 	})
 }
 
@@ -49,7 +55,10 @@ func (m *FastFloatManager) traceDivQuotient(q ffLimbView) {
 		func() bool { return true }, func(w io.Writer) error {
 			for i := q.size; i > 0; {
 				i--
-				if _, err := fmt.Fprintf(w, "%08x ", q.read(i)); err != nil {
+				if err := writeFastFloatPart(w, fmt.Sprintf("%08x", q.read(i))); err != nil {
+					return err
+				}
+				if err := writeFastFloatPart(w, " "); err != nil {
 					return err
 				}
 			}
