@@ -198,7 +198,7 @@ func TestArbitraryClauseQueuedWatchOrderAndCancellation(t *testing.T) {
 			t.Fatalf("resumed watched clause and generated bound: %+v, %d, %d, %d", root.lower[f.y], len(c.queue), c.queueHead, c.numVisited)
 		}
 	})
-	t.Run("definition watch is retained", func(t *testing.T) {
+	t.Run("monomial definition watch", func(t *testing.T) {
 		f := newArbitraryClauseFixture(t)
 		c := f.context
 		z, err := c.DefineMonomial([]ArbitraryPower{{Variable: f.x, Degree: 2}})
@@ -212,8 +212,12 @@ func TestArbitraryClauseQueuedWatchOrderAndCancellation(t *testing.T) {
 		if err := c.PublishBound(root, f.x, &f.four, false, false, true); err != nil {
 			t.Fatal(err)
 		}
-		if err := c.PropagateQueued(root); !errors.Is(err, ErrArbitraryDefinitionPending) || c.queueHead != 0 || len(c.queue) != 1 {
-			t.Fatalf("unported definition guard preserves queue: %v, %d, %d", err, c.queueHead, len(c.queue))
+		if err := c.PublishBound(root, f.x, &f.four, true, false, true); err != nil {
+			t.Fatal(err)
+		}
+		if err := c.PropagateQueued(root); err != nil || root.lower[z] == nil || root.upper[z] == nil ||
+			!root.lower[z].definitionReason || root.upper[z].reasonVariable != z || c.queueHead != 0 || len(c.queue) != 0 {
+			t.Fatalf("queued monomial definition: %v, %+v/%+v, %d, %d", err, root.lower[z], root.upper[z], c.queueHead, len(c.queue))
 		}
 	})
 }

@@ -86,6 +86,26 @@ func (n *ArbitraryNode) ConflictingBounds(variable uint32) (bool, error) {
 	return m.Equal(&u.value, &l.value)
 }
 
+func (n *ArbitraryNode) IsZero(variable uint32) (bool, error) {
+	l, u, err := n.Bounds(variable)
+	if err != nil || l == nil || u == nil || l.open || u.open {
+		return false, err
+	}
+	lz, err := n.context.numbers.IsZero(&l.value)
+	if err != nil || !lz {
+		return false, err
+	}
+	return n.context.numbers.IsZero(&u.value)
+}
+
+func (n *ArbitraryNode) IsUpperZero(variable uint32) (bool, error) {
+	_, u, err := n.Bounds(variable)
+	if err != nil || u == nil || u.open {
+		return false, err
+	}
+	return n.context.numbers.IsZero(&u.value)
+}
+
 // PublishBound follows mk_bound: an integer variable first gets ceil/floor,
 // then a still-open integral endpoint moves one step in the directed mode.
 // It records the owned numeral before any fallible copy so Close can recover

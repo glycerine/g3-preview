@@ -7,10 +7,8 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/numeral"
 )
-
-// A reached monomial watch remains queued for the later concrete path.
-var ErrArbitraryDefinitionPending = errors.New("subpaving: arbitrary definition propagation pending")
 
 type arbitraryWatch struct {
 	definition uint32
@@ -18,8 +16,7 @@ type arbitraryWatch struct {
 }
 
 // PropagateQueued checkpoints before each bound and processes clause watches
-// in their original interleaved registration order. A reached monomial is
-// refused before consuming that bound, preserving the queue for its port.
+// in their original interleaved registration order.
 func (c *ArbitraryContext) PropagateQueued(n *ArbitraryNode) error {
 	if err := c.open(); err != nil {
 		return err
@@ -35,14 +32,6 @@ func (c *ArbitraryContext) PropagateQueued(n *ArbitraryNode) error {
 		if b == nil || b.context != c || b.variable >= uint32(len(c.variables)) {
 			return arena.ErrInvalidSlot
 		}
-		for _, watch := range c.watchOrder[b.variable] {
-			if watch.clause == nil && c.polynomials[watch.definition] == nil {
-				return ErrArbitraryDefinitionPending
-			}
-		}
-		if c.monomials[b.variable] != nil {
-			return ErrArbitraryDefinitionPending
-		}
 		c.queueHead++
 		for _, watch := range c.watchOrder[b.variable] {
 			if n.conflictVar != math.MaxUint32 {
@@ -52,21 +41,44 @@ func (c *ArbitraryContext) PropagateQueued(n *ArbitraryNode) error {
 				clause := watch.clause
 				if b.timestamp >= clause.visited {
 					if err := c.PropagateClause(clause, n); err != nil {
+						if errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
+							c.arithmeticFailed = true
+							continue
+						}
 						return err
 					}
 				}
 			} else {
 				p := c.polynomials[watch.definition]
-				if b.timestamp >= p.visited {
+				m := c.monomials[watch.definition]
+				if p != nil && b.timestamp >= p.visited {
 					if err := c.PropagatePolynomial(watch.definition, n); err != nil {
+						if errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
+							c.arithmeticFailed = true
+							continue
+						}
 						return err
 					}
+				} else if m != nil && b.timestamp >= m.visited {
+					if err := c.PropagateMonomial(watch.definition, n); err != nil {
+						if errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
+							c.arithmeticFailed = true
+							continue
+						}
+						return err
+					}
+				} else if p == nil && m == nil {
+					return arena.ErrInvalidSlot
 				}
 			}
 		}
 		if n.conflictVar == math.MaxUint32 {
 			if p := c.polynomials[b.variable]; p != nil && b.timestamp >= p.visited {
 				if err := c.PropagatePolynomial(b.variable, n); err != nil {
+					return err
+				}
+			} else if m := c.monomials[b.variable]; m != nil && b.timestamp >= m.visited {
+				if err := c.PropagateMonomial(b.variable, n); err != nil {
 					return err
 				}
 			}

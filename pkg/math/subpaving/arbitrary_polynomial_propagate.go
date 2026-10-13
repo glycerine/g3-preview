@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // PropagatePolynomial applies the source's single-unbounded-variable rule.
@@ -126,8 +127,12 @@ func (c *ArbitraryContext) propagatePolynomialTarget(p *ArbitraryPolynomial, var
 	if err != nil {
 		return err
 	}
+	return c.propagateArbitraryIntervalBounds(n, target, variable, r, lower, upper)
+}
+
+func (c *ArbitraryContext) propagateArbitraryIntervalBounds(n *ArbitraryNode, target, reason uint32, r *ArbitraryInterval, lower, upper *numeral.ArbitraryFloat) error {
 	if !r.lowerInf {
-		if _, err = c.propagateCandidateDefinition(n, target, lower, true, r.lowerOpen, variable); err != nil {
+		if _, err := c.propagateCandidateDefinition(n, target, lower, true, r.lowerOpen, reason); err != nil {
 			return err
 		}
 		if n.conflictVar != math.MaxUint32 {
@@ -135,7 +140,8 @@ func (c *ArbitraryContext) propagatePolynomialTarget(p *ArbitraryPolynomial, var
 		}
 	}
 	if !r.upperInf {
-		_, err = c.propagateCandidateDefinition(n, target, upper, false, r.upperOpen, variable)
+		_, err := c.propagateCandidateDefinition(n, target, upper, false, r.upperOpen, reason)
+		return err
 	}
-	return err
+	return nil
 }

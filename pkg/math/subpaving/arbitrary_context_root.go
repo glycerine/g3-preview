@@ -38,6 +38,7 @@ type ArbitraryContext struct {
 	queueHead                                       int
 	timestamp                                       uint64
 	numVisited                                      uint64
+	arithmeticFailed                                bool
 	candidateScratch                                numeral.ArbitraryFloat
 	relevanceScratch                                [3]numeral.ArbitraryFloat
 	owners                                          [4]*numeral.ScopedArbitraryFloatNumeral

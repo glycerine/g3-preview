@@ -18,6 +18,7 @@ type ArbitraryMonomial struct {
 	context  *ArbitraryContext
 	variable uint32
 	powers   []ArbitraryPower
+	visited  uint64
 }
 
 // DefineMonomial sorts and combines factors in the context's reusable scratch,
