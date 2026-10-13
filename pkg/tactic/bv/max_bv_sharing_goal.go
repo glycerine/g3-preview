@@ -120,6 +120,11 @@ func (p *SharingGoalPass) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error
 	if e := goal.CheckOwner(); e != nil {
 		return nil, e
 	}
+	report, e := tactic.NewTacticReport("max-bv-sharing", goal)
+	if e != nil {
+		return nil, e
+	}
+	defer func() { result = errors.Join(result, report.Close()) }()
 	proofs, e := goal.ProofsEnabled()
 	if e != nil {
 		return nil, e

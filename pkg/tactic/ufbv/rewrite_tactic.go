@@ -69,6 +69,11 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 	if e := goal.CheckOwner(); e != nil {
 		return nil, e
 	}
+	report, e := tactic.NewTacticReport("ufbv-rewriter", goal)
+	if e != nil {
+		return nil, e
+	}
+	defer func() { result = errors.Join(result, report.Close()) }()
 	cores, e := goal.UnsatCoresEnabled()
 	if e != nil {
 		return nil, e

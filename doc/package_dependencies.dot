@@ -147,7 +147,11 @@ digraph packages {
   "tactic" -> "arena";
   "tactic" -> "ast";
   "tactic" -> "model";
+  "tactic" -> "util/diagnostic";
+  "tactic" -> "util/memory";
+  "tactic" -> "util/stopwatch";
   "tactic" -> "util/symbol";
+  "tactic" -> "util/text";
   "tactic/arith" [style=filled, fillcolor="#eeeeee"];
   "tactic/arith" -> "arena";
   "tactic/arith" -> "ast";

@@ -1185,7 +1185,11 @@
         "arena",
         "ast",
         "model",
-        "util/symbol"
+        "util/diagnostic",
+        "util/memory",
+        "util/stopwatch",
+        "util/symbol",
+        "util/text"
       ],
       "production_files": [
         "source_debug_off.go",
@@ -1197,6 +1201,7 @@
         "tactic_model_to_model.go",
         "tactic_package_boundary.go",
         "tactic_probe.go",
+        "tactic_report.go",
         "tactic_stored_model.go"
       ]
     },

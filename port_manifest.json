@@ -102948,9 +102948,16 @@
       "path": "src/tactic/tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/tactic_report.go",
+        "pkg/tactic/bv/max_bv_sharing_goal.go",
+        "pkg/tactic/ufbv/rewrite_tactic.go"
+      ],
+      "tests": [
+        "TestTacticReportReadsProcessMemoryAndWritesSourceOrder",
+        "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal"
+      ],
       "assertions": [
         {
           "line": 215,
@@ -102959,7 +102966,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "tactic_report conditional construction, CPU stopwatch, process-memory snapshots and source-order verbose output (tactic.cpp:26-61)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_report.go",
+          "tests": [
+            "TestTacticReportReadsProcessMemoryAndWritesSourceOrder"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -102967,9 +102983,16 @@
       "path": "src/tactic/tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/tactic_report.go",
+        "pkg/tactic/bv/max_bv_sharing_goal.go",
+        "pkg/tactic/ufbv/rewrite_tactic.go"
+      ],
+      "tests": [
+        "TestTacticReportReadsProcessMemoryAndWritesSourceOrder",
+        "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -102988,7 +103011,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "tactic_report source verbosity level and scoped constructor/destructor for retained BV/UFBV tactics (tactic.h:103-120)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_report.go",
+          "tests": [
+            "TestTacticReportReadsProcessMemoryAndWritesSourceOrder"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -146871,6 +146903,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "tactic_report snapshots source process allocation bytes before and after retained tactics (tactic/tactic.cpp:26-50)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_report.go",
+          "tests": [
+            "TestTacticReportReadsProcessMemoryAndWritesSourceOrder"
+          ]
+        },
+        {
           "name": "memory_probe reads source process allocation bytes in MiB (tactic/probe.cpp:29-37)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_probe.go",
@@ -147260,6 +147300,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "tactic_report snapshots source process allocation bytes before and after retained tactics (tactic/tactic.cpp:26-50)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_report.go",
+          "tests": [
+            "TestTacticReportReadsProcessMemoryAndWritesSourceOrder"
+          ]
+        },
         {
           "name": "memory_probe reads source process allocation bytes in MiB (tactic/probe.cpp:29-37)",
           "status": "ported",

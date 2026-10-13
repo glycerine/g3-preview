@@ -3,6 +3,7 @@ package ufbv
 import (
 	"bytes"
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -12,6 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func ufbvTacticServicesFixture(t *testing.T, m *ast.ASTManager) (*uparams.ParamsContext, *uparams.GlobalParamsService) {
@@ -79,8 +81,30 @@ func TestUFBVRewriterTacticGoalTransitionAndCoreRefusal(t *testing.T) {
 	cacheMust(t, goal.Assert(q))
 	cacheMust(t, goal.Assert(fa))
 	cacheMust(t, goal.SetDepth(7))
+	reportBudget := arena.NewBudget(1 << 20)
+	reportStream, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: reportBudget})
+	cacheMust(t, e)
+	oldLevel, e := diagnostic.ProcessVerbosityLevel()
+	cacheMust(t, e)
+	oldStream, e := diagnostic.BorrowProcessVerboseStream()
+	cacheMust(t, e)
+	cacheMust(t, diagnostic.SetProcessVerboseStream(reportStream))
+	cacheMust(t, diagnostic.SetProcessVerbosityLevel(10))
+	t.Cleanup(func() {
+		cacheMust(t, diagnostic.SetProcessVerboseStream(oldStream))
+		cacheMust(t, diagnostic.SetProcessVerbosityLevel(oldLevel))
+		cacheMust(t, reportStream.Close())
+		if reportBudget.Used() != 0 {
+			t.Fatal("tactic report stream roots", reportBudget.Used())
+		}
+	})
 	got, e := rewriter.Apply(goal)
 	cacheMust(t, e)
+	reportText, e := reportStream.String()
+	cacheMust(t, e)
+	if !strings.HasPrefix(reportText, "(ufbv-rewriter :num-exprs ") || !strings.Contains(reportText, " :before-memory ") || !strings.Contains(reportText, " :after-memory ") {
+		t.Fatal("live UFBV tactic omitted source report", reportText)
+	}
 	if got != goal {
 		t.Fatal("source tactic must publish the input goal")
 	}
