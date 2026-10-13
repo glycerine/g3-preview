@@ -37,6 +37,10 @@ type ArbitraryContext struct {
 	root                                            *ArbitraryNode
 	nodes                                           []*ArbitraryNode
 	leafHead, leafTail                              *ArbitraryNode
+	maxDepth, maxNodes                              uint32
+	searchNode                                      *ArbitraryNode
+	searchPhase                                     uint8
+	numSplits                                       uint64
 	bounds                                          []*ArbitraryBound
 	queue                                           []*ArbitraryBound
 	queueHead                                       int
@@ -67,7 +71,7 @@ func NewArbitraryContext(m *numeral.ArbitraryFloatNumeralManager, limit *control
 	if m == nil || limit == nil {
 		return nil, arena.ErrInvalidSlot
 	}
-	c := &ArbitraryContext{numbers: m, limit: limit, zeroEpsilon: epsilon == 0}
+	c := &ArbitraryContext{numbers: m, limit: limit, zeroEpsilon: epsilon == 0, maxDepth: 128, maxNodes: 8192}
 	c.self = c
 	defer func() {
 		if err != nil {
@@ -217,6 +221,7 @@ func (c *ArbitraryContext) Close() error {
 	c.root = nil
 	c.nodes = nil
 	c.leafHead, c.leafTail = nil, nil
+	c.searchNode = nil
 	for len(c.unitClauses) != 0 {
 		a := c.unitClauses[0].atom
 		if a.refs == 0 {

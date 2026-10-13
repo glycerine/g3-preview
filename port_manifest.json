@@ -51752,6 +51752,8 @@
         "pkg/math/subpaving/arbitrary_split_test.go",
         "pkg/math/subpaving/arbitrary_selector.go",
         "pkg/math/subpaving/arbitrary_selector_test.go",
+        "pkg/math/subpaving/arbitrary_search.go",
+        "pkg/math/subpaving/arbitrary_search_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
@@ -51847,6 +51849,7 @@
         "TestArbitraryChildRecentBoundReplayAndPolynomialWatcher",
         "TestArbitraryMidpointSplitterSourceBranches",
         "TestArbitrarySelectorsBreadthFirstAndRoundRobin",
+        "TestArbitrarySearchBreadthFirstLimitAndChildResume",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -52604,6 +52607,19 @@
           ],
           "tests": [
             "TestArbitrarySelectorsBreadthFirstAndRoundRobin"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf root initialization, breadth-first search, node/depth cutoffs, child replay, and queue-checkpoint resumption (src/math/subpaving/subpaving_t_def.h:1806-1843)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_search.go",
+          "go_targets": [
+            "pkg/math/subpaving/arbitrary_context_init.go",
+            "pkg/math/subpaving/arbitrary_selector.go",
+            "pkg/math/subpaving/arbitrary_split.go"
+          ],
+          "tests": [
+            "TestArbitrarySearchBreadthFirstLimitAndChildResume"
           ]
         },
         {
