@@ -28,6 +28,8 @@ digraph packages {
   "ast/fpa" -> "util/params";
   "ast/normal_forms" [style=filled, fillcolor="#eeeeee"];
   "ast/normal_forms" -> "util/params";
+  "ast/pattern" [style=filled, fillcolor="#eeeeee"];
+  "ast/pattern" -> "ast";
   "ast/rewriter" [style=filled, fillcolor="#eeeeee"];
   "ast/rewriter" -> "ast";
   "ast/rewriter" -> "util/messages";

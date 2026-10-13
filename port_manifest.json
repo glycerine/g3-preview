@@ -18086,9 +18086,13 @@
       "path": "src/ast/pattern/pattern_inference.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/pattern/smaller_pattern.go"
+      ],
+      "tests": [
+        "TestSmallerPatternConcretePairCacheAndExternalVariables"
+      ],
       "conditionals": [
         {
           "line": 93,
@@ -18171,17 +18175,32 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "smaller_pattern save/process/operator() concrete AST pair cache, candidate variable bindings and reverse worklist traversal",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/smaller_pattern.go",
+          "tests": [
+            "TestSmallerPatternConcretePairCacheAndExternalVariables"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. The remaining pattern_inference_cfg collector, filters and quantifier rewrite are not ported."
+      ]
     },
     {
       "path": "src/ast/pattern/pattern_inference.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/pattern/smaller_pattern.go"
+      ],
+      "tests": [
+        "TestSmallerPatternConcretePairCacheAndExternalVariables"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -18200,9 +18219,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "smaller_pattern borrowed AST manager, concrete expression-pair cache, worklist and external-variable matching",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/smaller_pattern.go",
+          "tests": [
+            "TestSmallerPatternConcretePairCacheAndExternalVariables"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The matcher borrows AST handles from its manager and owns only native Go pair-map and worklist storage; the enclosing pattern inference class remains open."
+      ]
     },
     {
       "path": "src/ast/pattern/pattern_inference_params.cpp",
@@ -161968,8 +161998,12 @@
           ]
         },
         {
-          "name": "pattern_inference expr-pair cache in src/ast/pattern/pattern_inference.h",
-          "status": "unported"
+          "name": "pattern_inference smaller_pattern borrowed expr-pair visited cache",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/smaller_pattern.go",
+          "tests": [
+            "TestSmallerPatternConcretePairCacheAndExternalVariables"
+          ]
         },
         {
           "name": "dom_simplify, sine_filter and nl_purify tactic expression-pair maps and sets",
@@ -161993,7 +162027,7 @@
         "The BV sharing reducer retains each cached expr pair operand and each newly built application until Close; the native typed maps own pair membership only."
       ],
       "deviations": [
-        "The selected Q_f_def and dyn_ack count specializations use native Go maps keyed by typed AST-handle pairs; the former has native quantifier sets and the latter uses a native instantiated set. C++ cached hashes, sentinel buckets and probing are not ported. A source-wide instantiation scan identifies the remaining AST pattern, tactic, QE, SMT and MUZ consumers as unported; their concrete operations and ownership still require caller audits."
+        "The selected Q_f_def, dyn_ack count and smaller_pattern visited-pair specializations use native Go maps keyed by typed AST-handle pairs; the first has native quantifier sets and the second uses a native instantiated set. C++ cached hashes, sentinel buckets and probing are not ported. The remaining pattern-inference collector and tactic, QE, SMT and MUZ pair-table consumers still require caller audits."
       ]
     },
     {

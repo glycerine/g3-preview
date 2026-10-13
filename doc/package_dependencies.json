@@ -283,6 +283,15 @@
       ]
     },
     {
+      "package": "ast/pattern",
+      "imports": [
+        "ast"
+      ],
+      "production_files": [
+        "smaller_pattern.go"
+      ]
+    },
+    {
       "package": "ast/rewriter",
       "imports": [
         "ast",
