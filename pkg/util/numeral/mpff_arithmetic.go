@@ -282,16 +282,23 @@ func (m *FastFloatManager) Add(a, b, c *FastFloat) error { return m.addSub(false
 func (m *FastFloatManager) Sub(a, b, c *FastFloat) error { return m.addSub(true, a, b, c) }
 func (m *FastFloatManager) Inc(a *FastFloat) error       { return m.Add(a, &m.one, a) }
 func (m *FastFloatManager) Dec(a *FastFloat) error       { return m.Sub(a, &m.one, a) }
-func (m *FastFloatManager) Mul(a, b, c *FastFloat) error {
+func (m *FastFloatManager) Mul(a, b, c *FastFloat) (err error) {
 	if e := m.triple(a, b, c); e != nil {
 		return e
 	}
+	m.traceMulOuter(a, b, c, true)
+	defer func() {
+		if err == nil {
+			m.traceMulOuter(a, b, c, false)
+		}
+	}()
 	if a.index() == 0 || b.index() == 0 {
 		return m.Reset(c)
 	}
 	if e := m.allocate(c); e != nil {
 		return e
 	}
+	m.traceMulEntry(a, b)
 	c.sign(a.negative() != b.negative())
 	exp := int64(a.exponent) + int64(b.exponent)
 	r := m.buffer(0, 2*m.precision)
@@ -300,8 +307,10 @@ func (m *FastFloatManager) Mul(a, b, c *FastFloat) error {
 	if SourceExtendedGCDDebug && !(lz <= m.bits) {
 		return ErrFastFloatInvariant
 	}
+	m.traceMulLeading(lz)
 	shift := m.bits - lz
 	inc := c.negative() != m.toPlus && ffHasLow(r, shift)
+	m.traceMulRounding(c, r, shift, inc)
 	exp += int64(shift)
 	dest := m.sig(c)
 	ffShift(r, dest, shift, false)
@@ -311,6 +320,7 @@ func (m *FastFloatManager) Mul(a, b, c *FastFloat) error {
 	if e := m.exponent64(c, exp); e != nil {
 		return e
 	}
+	m.traceMulResult(c)
 	return m.debugCheck(c)
 }
 func (m *FastFloatManager) toBuffer(i int, a *FastFloat, extension, shift bool) {
