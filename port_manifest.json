@@ -146312,6 +146312,24 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "mpf.cpp:23-36,43-59 default value construction, format reset, empty destructor and value swap",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_value.go",
+          "go_targets": [
+            "pkg/util/numeral/mpf_add_sub.go",
+            "pkg/util/numeral/mpf_fma.go"
+          ],
+          "tests": [
+            "TestArbitraryFloatValueGeometryStructuralEqualityAndHash",
+            "TestArbitraryFloatAddSubIndependentIEEEPairsAndAliases",
+            "TestArbitraryFloatFMAIndependentIEEEAndAllAliases"
+          ]
+        },
+        {
+          "name": "mpf.cpp:38-41 two-argument value constructor has no retained source call",
+          "status": "dead_deleted"
+        },
+        {
           "name": "mpf.cpp:61-67 manager constructor and destructor dependency",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_manager.go"
@@ -147406,9 +147424,31 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "mpf.h:48 private unreachable copy assignment has no retained source call",
+          "status": "dead_deleted"
+        },
+        {
+          "name": "mpf.h:49,51,59,62 default value construction, format reset, destruction and swap",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_value.go",
+          "go_targets": [
+            "pkg/util/numeral/mpf_add_sub.go",
+            "pkg/util/numeral/mpf_fma.go"
+          ],
+          "tests": [
+            "TestArbitraryFloatValueGeometryStructuralEqualityAndHash",
+            "TestArbitraryFloatAddSubIndependentIEEEPairsAndAliases",
+            "TestArbitraryFloatFMAIndependentIEEEAndAllAliases"
+          ]
+        },
+        {
+          "name": "mpf.h:52 two-argument value constructor has no retained source call",
+          "status": "dead_deleted"
+        },
         {
           "name": "mpf.h:53-58 move constructor for retained scoped numerals and value storage",
           "status": "partial",
