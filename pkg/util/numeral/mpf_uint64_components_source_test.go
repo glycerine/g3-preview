@@ -64,7 +64,7 @@ func TestArbitraryFloatUint64ComponentsDebugAssertionAfterPublication(t *testing
 
 func TestArbitraryFloatUint64ComponentsAllocationPrefix(t *testing.T) {
 	completed := false
-	for ordinal := int64(0); ordinal < 24; ordinal++ {
+	for ordinal := int64(0); ordinal < 128; ordinal++ {
 		b := arena.NewBudget(1 << 25)
 		m, e := NewArbitraryFloatManager(serviceConfig(b).Integers)
 		serviceMust(t, e)
@@ -75,8 +75,15 @@ func TestArbitraryFloatUint64ComponentsAllocationPrefix(t *testing.T) {
 		if out.EBits() != 11 || out.SBits() != 65 || !out.Sign() {
 			t.Fatal("format/sign must precede integer SET", ordinal, out)
 		}
-		if body != nil && out.Exponent() != 0 || body == nil && out.Exponent() != 17 {
-			t.Fatal("exponent publishes only after successful integer SET", ordinal, body, out)
+		if out.Exponent() != 0 && out.Exponent() != 17 || body == nil && out.Exponent() != 17 {
+			t.Fatal("exponent publishes after integer SET, before debug assertions", ordinal, body, out)
+		}
+		if out.Exponent() == 17 {
+			got, e := m.integer.Uint64(&out.significand)
+			serviceMust(t, e)
+			if got != math.MaxUint64 {
+				t.Fatal("published exponent requires completed integer SET", ordinal, got)
+			}
 		}
 		b.FailAfter(-1)
 		serviceMust(t, m.CleanupValueInput(&receipt, false))
@@ -93,5 +100,27 @@ func TestArbitraryFloatUint64ComponentsAllocationPrefix(t *testing.T) {
 	}
 	if !completed {
 		t.Fatal("no successful scalar SET prefix")
+	}
+}
+
+func TestArbitraryFloatUint64ComponentsDebugCacheAfterPublication(t *testing.T) {
+	if !modularSourceDebug {
+		t.Skip("source DEBUG_CODE is disabled")
+	}
+	b := arena.NewBudget(1 << 25)
+	m, e := NewArbitraryFloatManager(serviceConfig(b).Integers)
+	serviceMust(t, e)
+	var out ArbitraryFloat
+	serviceMust(t, m.integer.SetUint64(&out.significand, math.MaxUint64))
+	b.FailAfter(0)
+	call := m.SetComponentsUint64(&out, 11, 65, true, 17, math.MaxUint64)
+	if call == nil || out.EBits() != 11 || out.SBits() != 65 || !out.Sign() || out.Exponent() != 17 {
+		t.Fatal("cold debug power lookup follows published scalar fields", call, out)
+	}
+	b.FailAfter(-1)
+	serviceMust(t, m.CleanupValue(&out))
+	serviceMust(t, m.Close())
+	if b.Used() != 0 {
+		t.Fatal("cold debug power failure owner refund", b.Used())
 	}
 }

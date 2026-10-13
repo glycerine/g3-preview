@@ -3,7 +3,6 @@ package numeral
 
 import (
 	"math"
-	"math/bits"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
@@ -34,11 +33,36 @@ func (m *ArbitraryFloatManager) SetComponentsUint64WithReceipt(out *ArbitraryFlo
 	m.valueExecuting = false
 	out.exponent = exponent
 	if modularSourceDebug {
-		if sbits == 0 || uint32(bits.Len64(significand)) >= sbits || ebits < 2 || ebits >= 64 {
+		if sbits == 0 {
+			return arena.ErrBounds
+		}
+		power, e := m.powerTwoWrapper(sbits-1, false)
+		if e != nil {
+			return e
+		}
+		bound, e := power.Capture()
+		if e != nil {
+			return e
+		}
+		less, e := m.integer.Less(&out.significand, &bound)
+		if e != nil {
+			return e
+		}
+		if !less {
 			return ErrIntegerAssertion
 		}
-		top := int64(1) << (ebits - 1)
-		if exponent > top || exponent < -(top-1) {
+		top, e := m.topExponent(ebits)
+		if e != nil {
+			return e
+		}
+		if exponent > top {
+			return ErrIntegerAssertion
+		}
+		bottom, e := m.bottomExponent(ebits)
+		if e != nil {
+			return e
+		}
+		if exponent < bottom {
 			return ErrIntegerAssertion
 		}
 	}

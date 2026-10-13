@@ -146379,12 +146379,13 @@
         },
         {
           "name": "mpf.cpp:303-316 scalar uint64 significand SET reached by api_fpa.cpp",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpf_value_input.go",
           "tests": [
             "TestArbitraryFloatUint64ComponentsSourcePublication",
             "TestArbitraryFloatUint64ComponentsDebugAssertionAfterPublication",
-            "TestArbitraryFloatUint64ComponentsAllocationPrefix"
+            "TestArbitraryFloatUint64ComponentsAllocationPrefix",
+            "TestArbitraryFloatUint64ComponentsDebugCacheAfterPublication"
           ]
         },
         {
