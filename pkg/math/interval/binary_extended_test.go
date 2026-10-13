@@ -136,4 +136,17 @@ func TestRealClosureBinaryExtendedNumeralBranches(t *testing.T) {
 	if !less {
 		t.Fatal("directed binary division did not bracket non-dyadic quotient")
 	}
+	loInv, hiInv := numeral.NewBinaryRational(), numeral.NewBinaryRational()
+	defer func() { must(m.Del(&loInv)); must(m.Del(&hiInv)) }()
+	must(m.SetInt32(&loInv, 3))
+	must(m.SetInt32(&hiInv, 3))
+	loKind, err := down.Inv(&loInv, Finite)
+	must(err)
+	hiKind, err := up.Inv(&hiInv, Finite)
+	must(err)
+	less, err = m.Less(&loInv, &hiInv)
+	must(err)
+	if loKind != Finite || hiKind != Finite || !less {
+		t.Fatal("directed binary reciprocal did not bracket non-dyadic quotient")
+	}
 }
