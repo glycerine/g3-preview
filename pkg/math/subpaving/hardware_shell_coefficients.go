@@ -1,0 +1,100 @@
+// Source: src/math/subpaving/subpaving.cpp:144-206, concrete context_hwf_wrapper.
+package subpaving
+
+import (
+	"errors"
+	"math/big"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/numeral"
+)
+
+var ErrHardwareShellInexactInteger = errors.New("subpaving: integer coefficient cannot be represented exactly as hardware float")
+
+// HardwareShellCoefficients owns the scalar coefficient scratch of the
+// retained context_hwf_wrapper. The context and rational manager are borrowed.
+type HardwareShellCoefficients struct {
+	context      *HardwareContext
+	rational     *numeral.RationalManager
+	constant     numeral.HardwareFloat
+	coefficients []numeral.HardwareFloat
+}
+
+func NewHardwareShellCoefficients(context *HardwareContext, rational *numeral.RationalManager) (*HardwareShellCoefficients, error) {
+	if context == nil || rational == nil || rational.Z == nil {
+		return nil, arena.ErrInvalidSlot
+	}
+	if err := context.open(); err != nil {
+		return nil, err
+	}
+	return &HardwareShellCoefficients{context: context, rational: rational}, nil
+}
+
+func (w *HardwareShellCoefficients) open() error {
+	if w == nil || w.context == nil || w.rational == nil || w.rational.Z == nil {
+		return arena.ErrInvalidSlot
+	}
+	return w.context.open()
+}
+
+// intToHardware follows the source's is_int64, get_int64, double set and
+// round-trip check. Exact rational comparison avoids C++'s undefined cast
+// when a rounded binary64 value lies beyond the signed int64 range.
+func (w *HardwareShellCoefficients) intToHardware(value *numeral.Int, out *numeral.HardwareFloat) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	if out == nil {
+		return arena.ErrInvalidSlot
+	}
+	z := w.rational.Z
+	fits, err := z.IsInt64(value)
+	if err != nil {
+		return err
+	}
+	if !fits {
+		return ErrHardwareShellInexactInteger
+	}
+	integer, err := z.Int64(value)
+	if err != nil {
+		return err
+	}
+	if err := w.context.numbers.SetFloat64(out, float64(integer)); err != nil {
+		return err
+	}
+	exact := new(big.Rat).SetInt64(integer)
+	actual := new(big.Rat).SetFloat64(w.context.numbers.ToFloat64(out))
+	if actual.Cmp(exact) != 0 {
+		return ErrHardwareShellInexactInteger
+	}
+	return nil
+}
+
+// PrepareSum converts coefficients in source order, then the constant. Its
+// typed slice is the native replacement for the wrapper's svector<hwf>.
+func (w *HardwareShellCoefficients) PrepareSum(constant *numeral.Int, coefficients []*numeral.Int) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	if len(coefficients) > cap(w.coefficients) {
+		w.coefficients = make([]numeral.HardwareFloat, len(coefficients))
+	} else {
+		w.coefficients = w.coefficients[:len(coefficients)]
+	}
+	for i, coefficient := range coefficients {
+		if err := w.intToHardware(coefficient, &w.coefficients[i]); err != nil {
+			return err
+		}
+	}
+	return w.intToHardware(constant, &w.constant)
+}
+
+// PrepareInequality keeps the source's direction-dependent rounding mode
+// before converting the borrowed rational into the wrapper's scalar scratch.
+func (w *HardwareShellCoefficients) PrepareInequality(value *numeral.Rational, lower bool) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	w.context.numbers.SetRounding(!lower)
+	return w.context.numbers.SetRational(&w.constant, w.rational, value)
+}

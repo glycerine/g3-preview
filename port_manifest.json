@@ -50234,10 +50234,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/math/subpaving/hardware_context_params.go"
+        "pkg/math/subpaving/hardware_context_params.go",
+        "pkg/math/subpaving/hardware_shell_coefficients.go"
       ],
       "tests": [
-        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
+        "TestSubpavingHardwareShellCoefficientAndInequalityConversion"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -50248,6 +50250,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_params.go",
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete context_hwf wrapper integer coefficient and directed rational inequality conversion (src/math/subpaving/subpaving.cpp:144-206)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
+          "tests": [
+            "TestSubpavingHardwareShellCoefficientAndInequalityConversion"
           ]
         }
       ],
