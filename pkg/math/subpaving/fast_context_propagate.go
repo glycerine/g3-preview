@@ -15,6 +15,9 @@ func (c *FastContext) definitionVisited(variable uint32) (uint64, bool) {
 	if p := c.polynomials[variable]; p != nil {
 		return p.visited, true
 	}
+	if m := c.monomials[variable]; m != nil {
+		return m.visited, true
+	}
 	return 0, false
 }
 
@@ -22,6 +25,9 @@ func (c *FastContext) propagateDefinition(variable uint32, n *FastNode) error {
 	c.numVisited++
 	if c.polynomials[variable] != nil {
 		return c.PropagatePolynomial(variable, n)
+	}
+	if c.monomials[variable] != nil {
+		return c.PropagateMonomial(variable, n)
 	}
 	return arena.ErrInvalidSlot
 }

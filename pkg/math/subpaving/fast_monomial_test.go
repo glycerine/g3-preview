@@ -1,0 +1,212 @@
+package subpaving
+
+import (
+	"bytes"
+	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/numeral"
+)
+
+func fastMonomialFixture(t *testing.T, isInt []bool) (*numeral.FastFloatManager, *FastContext, *numeral.FastFloat, *FastNode) {
+	t.Helper()
+	budget := arena.NewBudget(1 << 28)
+	cfg := numeral.DefaultFastFloatConfig(arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: budget}})
+	cfg.InitialCapacity = 4
+	m, err := numeral.NewFastFloatManager(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	owner, err := numeral.NewScopedFastFloat(m)
+	if err != nil {
+		t.Fatal(err)
+	}
+	v, err := owner.Get()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, err := NewFastContext(m, &control.Reslimit{Limit: 10000}, isInt, 0, 2, 8192)
+	if err != nil {
+		t.Fatal(err)
+	}
+	root, err := ctx.Root()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if e := ctx.Close(); e != nil {
+			t.Error(e)
+		}
+		if e := owner.Close(); e != nil {
+			t.Error(e)
+		}
+		if e := m.CloseChecked(); e != nil {
+			t.Error(e)
+		}
+		if budget.Used() != 0 {
+			t.Error("retained monomial roots", budget.Used())
+		}
+	})
+	return m, ctx, v, root
+}
+
+func fastMonomialBound(t *testing.T, m *numeral.FastFloatManager, c *FastContext, root *FastNode, v *numeral.FastFloat, variable uint32, value int32, lower bool) {
+	t.Helper()
+	if err := m.SetInt32(v, value); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := c.PropagateCandidate(root, variable, v, lower, false); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func fastMonomialCheckBound(t *testing.T, m *numeral.FastFloatManager, root *FastNode, v *numeral.FastFloat, variable uint32, value int32, lower bool) {
+	t.Helper()
+	b := root.upper[variable]
+	if lower {
+		b = root.lower[variable]
+	}
+	if b == nil {
+		t.Fatalf("variable %d missing lower=%t", variable, lower)
+	}
+	if err := m.SetInt32(v, value); err != nil {
+		t.Fatal(err)
+	}
+	equal, err := m.Equal(b.value, v)
+	if err != nil || !equal {
+		t.Fatalf("variable %d bound %d lower=%t: equal=%t err=%v", variable, value, lower, equal, err)
+	}
+}
+
+func TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue(t *testing.T) {
+	m, c, v, root := fastMonomialFixture(t, []bool{true})
+	x, err := c.DefineMonomial([]FastPower{{Variable: 0, Degree: 1}, {Variable: 0, Degree: 1}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if x != 1 || !c.isInt[x] || len(c.monomials[x].powers) != 1 || c.monomials[x].powers[0].Degree != 2 || len(c.watchers[0]) != 1 || c.watchers[0][0] != x {
+		t.Fatal("merged source definition", x, c.monomials[x].powers, c.watchers)
+	}
+	fastMonomialBound(t, m, c, root, v, 0, 2, true)
+	fastMonomialBound(t, m, c, root, v, 0, 3, false)
+	if err := c.PropagateQueued(root); err != nil {
+		t.Fatal(err)
+	}
+	fastMonomialCheckBound(t, m, root, v, x, 4, true)
+	fastMonomialCheckBound(t, m, root, v, x, 9, false)
+	if c.monomials[x].visited == 0 || c.numVisited == 0 {
+		t.Fatal("watch queue did not visit monomial")
+	}
+
+	m2, c2, v2, root2 := fastMonomialFixture(t, []bool{false})
+	y, err := c2.DefineMonomial([]FastPower{{Variable: 0, Degree: 2}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fastMonomialBound(t, m2, c2, root2, v2, 0, 0, false)
+	if err := c2.PropagateMonomial(y, root2); err != nil {
+		t.Fatal(err)
+	}
+	zero, err := root2.IsZero(y)
+	if err != nil || !zero {
+		t.Fatal("even upper-zero factor did not force zero", zero, err)
+	}
+}
+
+func TestSubpavingFastMonomialReverseAndSourceScratch(t *testing.T) {
+	t.Run("cubic", func(t *testing.T) {
+		m, c, v, root := fastMonomialFixture(t, []bool{false})
+		x, err := c.DefineMonomial([]FastPower{{Variable: 0, Degree: 3}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		fastMonomialBound(t, m, c, root, v, x, 8, true)
+		fastMonomialBound(t, m, c, root, v, x, 27, false)
+		if err := c.PropagateMonomial(x, root); err != nil {
+			t.Fatal(err)
+		}
+		if root.lower[0] == nil || root.upper[0] == nil || root.inconsistent {
+			t.Fatal("missing cubic reverse bounds")
+		}
+		if err := m.SetInt32(v, 2); err != nil {
+			t.Fatal(err)
+		}
+		tooHigh, err := m.Greater(root.lower[0].value, v)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := m.SetInt32(v, 3); err != nil {
+			t.Fatal(err)
+		}
+		tooLow, err := m.Less(root.upper[0].value, v)
+		if err != nil || tooHigh || tooLow {
+			t.Fatal("cubic reverse enclosure", tooHigh, tooLow, err)
+		}
+	})
+	t.Run("product", func(t *testing.T) {
+		m, c, v, root := fastMonomialFixture(t, []bool{false, true})
+		x, err := c.DefineMonomial([]FastPower{{Variable: 1, Degree: 1}, {Variable: 0, Degree: 1}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !c.isInt[x] || c.monomials[x].powers[0].Variable != 0 {
+			t.Fatal("source integer-any/sorted definition")
+		}
+		fastMonomialBound(t, m, c, root, v, 0, 2, true)
+		fastMonomialBound(t, m, c, root, v, 0, 3, false)
+		fastMonomialBound(t, m, c, root, v, x, 8, true)
+		fastMonomialBound(t, m, c, root, v, x, 15, false)
+		if err := c.PropagateMonomial(x, root); err != nil {
+			t.Fatal(err)
+		}
+		fastMonomialCheckBound(t, m, root, v, 1, 3, true)
+		fastMonomialCheckBound(t, m, root, v, 1, 7, false)
+	})
+	t.Run("three-factor-source-scratch", func(t *testing.T) {
+		m, c, v, root := fastMonomialFixture(t, []bool{false, false, false})
+		x, err := c.DefineMonomial([]FastPower{{0, 1}, {1, 1}, {2, 1}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, item := range []struct {
+			variable uint32
+			value    int32
+		}{{0, 2}, {1, 3}, {x, 30}} {
+			fastMonomialBound(t, m, c, root, v, item.variable, item.value, true)
+			fastMonomialBound(t, m, c, root, v, item.variable, item.value, false)
+		}
+		if err := c.PropagateMonomial(x, root); err != nil {
+			t.Fatal(err)
+		}
+		// Source leaves denominator d at its first factor when the later
+		// product is written to the separate r scratch interval.
+		fastMonomialCheckBound(t, m, root, v, 2, 15, true)
+		fastMonomialCheckBound(t, m, root, v, 2, 15, false)
+	})
+}
+
+func TestSubpavingFastMonomialIntervalDisplaySmoke(t *testing.T) {
+	m, c, v, root := fastMonomialFixture(t, []bool{false})
+	x, err := c.DefineMonomial([]FastPower{{0, 1}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fastMonomialBound(t, m, c, root, v, 0, 2, true)
+	fastMonomialBound(t, m, c, root, v, 0, 3, false)
+	if err := c.PropagateMonomial(x, root); err != nil {
+		t.Fatal(err)
+	}
+	view, err := NewFastInterval(m)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer view.Close()
+	if err := view.SetConstant(root, x); err != nil {
+		t.Fatal(err)
+	}
+	var out bytes.Buffer
+	if err := view.Display(&out); err != nil || out.String() != "[2, 3]" {
+		t.Fatal("monomial view", out.String(), err)
+	}
+}

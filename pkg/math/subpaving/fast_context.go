@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -33,6 +34,7 @@ type FastContext struct {
 	queueHead        int
 	numVisited       uint64
 	polynomials      map[uint32]*FastPolynomial
+	monomials        map[uint32]*FastMonomial
 	watchers         [][]uint32
 	closed           bool
 }
@@ -43,7 +45,7 @@ func NewFastContext(m *numeral.FastFloatManager, limit *control.Reslimit, isInt 
 	if m == nil || limit == nil || len(isInt) > math.MaxUint32 {
 		return nil, arena.ErrInvalidSlot
 	}
-	c := &FastContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), zeroEpsilon: epsilon == 0, polynomials: make(map[uint32]*FastPolynomial), watchers: make([][]uint32, len(isInt))}
+	c := &FastContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), zeroEpsilon: epsilon == 0, polynomials: make(map[uint32]*FastPolynomial), monomials: make(map[uint32]*FastMonomial), watchers: make([][]uint32, len(isInt))}
 	c.self = c
 	defer func() {
 		if err != nil {
@@ -141,6 +143,13 @@ func (c *FastContext) NewChild(parent *FastNode) (*FastNode, error) {
 		return nil, arena.ErrInvalidSlot
 	}
 	return NewFastNode(c.numbers, uint32(len(c.isInt)), parent)
+}
+
+func (c *FastContext) XnEqY(out, src *FastInterval, degree uint32) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return out.XnEqY(src, degree, c.rootPrecision, interval.FastRoot{Numbers: c.numbers, Limit: c.limit})
 }
 
 func (c *FastContext) Close() error {

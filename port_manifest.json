@@ -34740,7 +34740,11 @@
         "pkg/math/subpaving/fast_interval_scalar.go",
         "pkg/math/subpaving/fast_interval_scalar_test.go",
         "pkg/math/subpaving/fast_interval_power.go",
-        "pkg/math/subpaving/fast_interval_power_test.go"
+        "pkg/math/subpaving/fast_interval_power_test.go",
+        "pkg/math/interval/fast_root.go",
+        "pkg/math/interval/fast_root_test.go",
+        "pkg/math/subpaving/fast_interval_root.go",
+        "pkg/math/subpaving/fast_interval_root_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34759,7 +34763,9 @@
         "TestSubpavingFastIntervalDivSignBranches",
         "TestSubpavingFastIntervalScalarMulDiv",
         "TestSubpavingFastIntervalPowerRetainedCases",
-        "TestSubpavingFastNodeConstantIntervalViews"
+        "TestSubpavingFastNodeConstantIntervalViews",
+        "TestFastRootRetainedNewtonCertifiedBoundsAndCancellation",
+        "TestSubpavingFastIntervalXnEqYRetainedCases"
       ],
       "conditionals": [
         {
@@ -35262,6 +35268,18 @@
           "go_target": "pkg/math/subpaving/fast_interval_power.go",
           "tests": [
             "TestSubpavingFastIntervalPowerRetainedCases"
+          ]
+        },
+        {
+          "name": "Concrete mpff Newton nth-root enclosure, directed endpoint bounds and monomial x^n=y inverse image (src/math/interval/interval_def.h:175-380,1390-1478)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/fast_root.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_interval_root.go"
+          ],
+          "tests": [
+            "TestFastRootRetainedNewtonCertifiedBoundsAndCancellation",
+            "TestSubpavingFastIntervalXnEqYRetainedCases"
           ]
         }
       ],
@@ -50017,7 +50035,11 @@
         "pkg/math/subpaving/fast_polynomial.go",
         "pkg/math/subpaving/fast_polynomial_test.go",
         "pkg/math/subpaving/fast_context_propagate.go",
-        "pkg/math/subpaving/fast_context_propagate_test.go"
+        "pkg/math/subpaving/fast_context_propagate_test.go",
+        "pkg/math/subpaving/fast_interval_root.go",
+        "pkg/math/subpaving/fast_interval_root_test.go",
+        "pkg/math/subpaving/fast_monomial.go",
+        "pkg/math/subpaving/fast_monomial_test.go"
       ],
       "tests": [
         "TestSubpavingFastMutableIntervalRetainedCore",
@@ -50033,7 +50055,11 @@
         "TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients",
         "TestSubpavingFastContextQueuedPolynomialWatchers",
         "TestSubpavingFastContextQueueCancelAndRecentChild",
-        "TestSubpavingFastContextInitialPolynomialSweep"
+        "TestSubpavingFastContextInitialPolynomialSweep",
+        "TestSubpavingFastIntervalXnEqYRetainedCases",
+        "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
+        "TestSubpavingFastMonomialReverseAndSourceScratch",
+        "TestSubpavingFastMonomialIntervalDisplaySmoke"
       ],
       "conditionals": [
         {
@@ -50056,13 +50082,27 @@
             "TestSubpavingFastMutableIntervalRetainedCore",
             "TestSubpavingFastIntervalNegAddSubDirectedAndAlias"
           ]
+        },
+        {
+          "name": "Concrete config_mpff nth-root interval inverse image and monomial definition/propagation integration",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_monomial.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_interval_root.go"
+          ],
+          "tests": [
+            "TestSubpavingFastIntervalXnEqYRetainedCases",
+            "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
+            "TestSubpavingFastMonomialReverseAndSourceScratch",
+            "TestSubpavingFastMonomialIntervalDisplaySmoke"
+          ]
         }
       ],
       "ownership": [
         "The mutable fast-float interval owns both scoped endpoints and borrows its fast-float manager."
       ],
       "deviations": [
-        "The enclosing context_t<config_mpff> has concrete bound policy, interval views and polynomial watcher propagation; monomial/clause propagation, search and the full lifecycle remain unported."
+        "The enclosing context_t<config_mpff> now has concrete bound policy, polynomial and monomial watcher propagation, and nth-root inverse images; clause propagation, search and the full lifecycle remain unported."
       ]
     },
     {
@@ -50194,7 +50234,11 @@
         "pkg/math/subpaving/fast_polynomial.go",
         "pkg/math/subpaving/fast_polynomial_test.go",
         "pkg/math/subpaving/fast_context_propagate.go",
-        "pkg/math/subpaving/fast_context_propagate_test.go"
+        "pkg/math/subpaving/fast_context_propagate_test.go",
+        "pkg/math/subpaving/fast_interval_root.go",
+        "pkg/math/subpaving/fast_interval_root_test.go",
+        "pkg/math/subpaving/fast_monomial.go",
+        "pkg/math/subpaving/fast_monomial_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50237,7 +50281,11 @@
         "TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients",
         "TestSubpavingFastContextQueuedPolynomialWatchers",
         "TestSubpavingFastContextQueueCancelAndRecentChild",
-        "TestSubpavingFastContextInitialPolynomialSweep"
+        "TestSubpavingFastContextInitialPolynomialSweep",
+        "TestSubpavingFastIntervalXnEqYRetainedCases",
+        "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
+        "TestSubpavingFastMonomialReverseAndSourceScratch",
+        "TestSubpavingFastMonomialIntervalDisplaySmoke"
       ],
       "conditionals": [
         {
@@ -50371,13 +50419,28 @@
             "TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients",
             "TestSubpavingFastContextQueuedPolynomialWatchers"
           ]
+        },
+        {
+          "name": "Concrete config_mpff monomial sorting/merge, upward/downward/zero bound propagation, root inversion and watcher integration (src/math/subpaving/subpaving_t_def.h:363-390,657-721,1500-1663)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_monomial.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_interval_root.go",
+            "pkg/math/subpaving/fast_context_propagate.go"
+          ],
+          "tests": [
+            "TestSubpavingFastIntervalXnEqYRetainedCases",
+            "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
+            "TestSubpavingFastMonomialReverseAndSourceScratch",
+            "TestSubpavingFastMonomialIntervalDisplaySmoke"
+          ]
         }
       ],
       "ownership": [
         "The mutable interval and node bounds own their fast-float endpoints; constant interval views borrow current node bounds. The context owns its root, parameter numerals and copied polynomial coefficients, and borrows the numeric manager and resource limit."
       ],
       "deviations": [
-        "The config_mpff context's monomial and clause propagation, search and full lifecycle remain unported."
+        "The config_mpff context's clause propagation, search and full lifecycle remain unported."
       ]
     },
     {
@@ -50416,7 +50479,11 @@
         "pkg/math/subpaving/fast_polynomial.go",
         "pkg/math/subpaving/fast_polynomial_test.go",
         "pkg/math/subpaving/fast_context_propagate.go",
-        "pkg/math/subpaving/fast_context_propagate_test.go"
+        "pkg/math/subpaving/fast_context_propagate_test.go",
+        "pkg/math/subpaving/fast_interval_root.go",
+        "pkg/math/subpaving/fast_interval_root_test.go",
+        "pkg/math/subpaving/fast_monomial.go",
+        "pkg/math/subpaving/fast_monomial_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50449,7 +50516,11 @@
         "TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients",
         "TestSubpavingFastContextQueuedPolynomialWatchers",
         "TestSubpavingFastContextQueueCancelAndRecentChild",
-        "TestSubpavingFastContextInitialPolynomialSweep"
+        "TestSubpavingFastContextInitialPolynomialSweep",
+        "TestSubpavingFastIntervalXnEqYRetainedCases",
+        "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
+        "TestSubpavingFastMonomialReverseAndSourceScratch",
+        "TestSubpavingFastMonomialIntervalDisplaySmoke"
       ],
       "assertions": [
         {
@@ -50817,13 +50888,28 @@
             "TestSubpavingFastContextQueueCancelAndRecentChild",
             "TestSubpavingFastContextInitialPolynomialSweep"
           ]
+        },
+        {
+          "name": "Concrete config_mpff monomial sorting/merge, upward/downward/zero bound propagation, root inversion and watcher integration (src/math/subpaving/subpaving_t_def.h:363-390,657-721,1500-1663)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_monomial.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_interval_root.go",
+            "pkg/math/subpaving/fast_context_propagate.go"
+          ],
+          "tests": [
+            "TestSubpavingFastIntervalXnEqYRetainedCases",
+            "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
+            "TestSubpavingFastMonomialReverseAndSourceScratch",
+            "TestSubpavingFastMonomialIntervalDisplaySmoke"
+          ]
         }
       ],
       "ownership": [
         "Each fast-float node owns the bounds it publishes; child nodes borrow inherited parent bounds until closed. The context owns its parameter numerals, root and copied polynomial coefficients, and borrows the fast-float manager and resource limit."
       ],
       "deviations": [
-        "The config_mpff context's monomial and clause propagation, search and full lifecycle remain unported."
+        "The config_mpff context's clause propagation, search and full lifecycle remain unported."
       ]
     },
     {
