@@ -7,17 +7,21 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrTimeitOwner = errors.New("g3: invalid timeit owner")
 var ErrTimeitPending = errors.New("g3: timeit operation in progress")
 
 // TimeitConfig supplies optional report providers. Output defaults to stderr;
-// Memory reports bytes and defaults to zero. A nil Clock uses process CPU time.
+// Memory reports bytes; Process supplies the source shared allocation count
+// when Memory is nil. A nil Clock uses process CPU time.
 type TimeitConfig struct {
 	Output  io.Writer
 	Message string
 	Memory  func() (uint64, error)
+	Process *memory.ProcessAccounting
 	Clock   func() (uint64, error)
 }
 
@@ -50,6 +54,12 @@ func (p *Timeit) Construct(enabled bool, config TimeitConfig) (cause error) {
 	}
 	p.message, _, _ = strings.Cut(config.Message, "\x00")
 	p.memory = config.Memory
+	if p.memory == nil && config.Process != nil {
+		if !config.Process.Valid() {
+			return ErrTimeitOwner
+		}
+		p.memory = func() (uint64, error) { return config.Process.AllocationSize(), nil }
+	}
 	var e error
 	p.beforeMemory, e = p.memoryMB()
 	if e != nil {

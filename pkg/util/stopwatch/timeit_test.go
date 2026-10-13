@@ -6,7 +6,38 @@ import (
 	"errors"
 	"os"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/memory"
 )
+
+func TestTimeitReadsSharedProcessAllocationAtBothSnapshots(t *testing.T) {
+	b := arena.NewBudget(2 << 20)
+	p := memory.NewProcessAccounting()
+	r, err := memory.NewRuntime(memory.RuntimeConfig{Budget: b, Process: p, SizeTBits: 64})
+	timerMust(t, err)
+	other, err := memory.NewRuntime(memory.RuntimeConfig{Budget: b, Process: p, SizeTBits: 64})
+	timerMust(t, err)
+	var output bytes.Buffer
+	var scope Timeit
+	timerMust(t, scope.Construct(true, TimeitConfig{Output: &output, Message: "shared", Process: p,
+		Clock: func() (uint64, error) { return 0, nil }}))
+	block, err := other.Allocate(1 << 20)
+	timerMust(t, err)
+	if got := p.AllocationSize(); got < 1<<20 {
+		t.Fatal("other runtime did not publish process allocation", got)
+	}
+	timerMust(t, scope.Close())
+	if got, want := output.String(), "(shared :time 0.00 :before-memory 0.00 :after-memory 1.00)\n"; got != want {
+		t.Fatal(got, want)
+	}
+	timerMust(t, other.Deallocate(&block))
+	timerMust(t, other.Close())
+	timerMust(t, r.Close())
+	if p.AllocationSize() != 0 || b.Used() != 0 {
+		t.Fatal("shared process retained memory", p.AllocationSize(), b.Used())
+	}
+}
 
 func TestTimeitOriginalMemoryCaptureAndFormatting(t *testing.T) {
 	var output bytes.Buffer
