@@ -163701,6 +163701,8 @@
         "TestSexprVectorNativeGrowthUnderBudgetRefusal",
         "TestSexprBVSourceWidthQuirks",
         "TestSexprConcreteRefAndVectorActions",
+        "TestSexprRefAssignmentKeepsOldOnStoppedNumeralDeletion",
+        "TestSexprRefResetKeepsOldOnStoppedNumeralDeletion",
         "TestSexprConstructorAndWholePhysicalGraph",
         "TestSexprFactoryRecordBeforeValueCopy",
         "TestSexprFailurePrefixesImmediateOwnership",
@@ -163765,7 +163767,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "actual sexpr concrete specialization constructors/copy/move/assignment, roots, projections and vector element/iterator adaptations",
+          "name": "actual sexpr scalar owning reference constructors/copy/move/assignment, reset, swap, steal and raw projection",
           "status": "ported",
           "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
@@ -163773,6 +163775,8 @@
             "TestSexprBVSourceWidthQuirks",
             "TestSexprRCWrapAndDeletionLIFO",
             "TestSexprConcreteRefAndVectorActions",
+            "TestSexprRefAssignmentKeepsOldOnStoppedNumeralDeletion",
+            "TestSexprRefResetKeepsOldOnStoppedNumeralDeletion",
             "TestSexprHandlesAndBoundedDAG",
             "TestSexprStringBytesAndWrapperRemainingBranches",
             "TestSexprFailurePrefixesImmediateOwnership",
@@ -168163,8 +168167,8 @@
           "tests": []
         },
         {
-          "name": "actual sexpr concrete specialization constructors/copy/move/assignment, roots, projections and vector element/iterator adaptations",
-          "status": "ported",
+          "name": "actual sexpr concrete reference-vector methods, element and iterator adaptations; stopped-decrement ownership in set/shrink/finalize remains open",
+          "status": "partial",
           "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
             "TestSexprKindsFactoriesAndDefinedDisplay",
@@ -170320,6 +170324,8 @@
         "TestSexprBVSourceWidthQuirks",
         "TestSexprRCWrapAndDeletionLIFO",
         "TestSexprConcreteRefAndVectorActions",
+        "TestSexprRefAssignmentKeepsOldOnStoppedNumeralDeletion",
+        "TestSexprRefResetKeepsOldOnStoppedNumeralDeletion",
         "TestSexprHandlesAndBoundedDAG",
         "TestSexprStringBytesAndWrapperRemainingBranches",
         "TestSexprFailurePrefixesImmediateOwnership",
@@ -170399,6 +170405,8 @@
             "TestSexprBVSourceWidthQuirks",
             "TestSexprRCWrapAndDeletionLIFO",
             "TestSexprConcreteRefAndVectorActions",
+            "TestSexprRefAssignmentKeepsOldOnStoppedNumeralDeletion",
+            "TestSexprRefResetKeepsOldOnStoppedNumeralDeletion",
             "TestSexprHandlesAndBoundedDAG",
             "TestSexprStringBytesAndWrapperRemainingBranches",
             "TestSexprFailurePrefixesImmediateOwnership",
@@ -170528,6 +170536,8 @@
         "TestSexprBVSourceWidthQuirks",
         "TestSexprRCWrapAndDeletionLIFO",
         "TestSexprConcreteRefAndVectorActions",
+        "TestSexprRefAssignmentKeepsOldOnStoppedNumeralDeletion",
+        "TestSexprRefResetKeepsOldOnStoppedNumeralDeletion",
         "TestSexprHandlesAndBoundedDAG",
         "TestSexprStringBytesAndWrapperRemainingBranches",
         "TestSexprFailurePrefixesImmediateOwnership",
@@ -170571,6 +170581,8 @@
             "TestSexprBVSourceWidthQuirks",
             "TestSexprRCWrapAndDeletionLIFO",
             "TestSexprConcreteRefAndVectorActions",
+            "TestSexprRefAssignmentKeepsOldOnStoppedNumeralDeletion",
+            "TestSexprRefResetKeepsOldOnStoppedNumeralDeletion",
             "TestSexprHandlesAndBoundedDAG",
             "TestSexprStringBytesAndWrapperRemainingBranches",
             "TestSexprFailurePrefixesImmediateOwnership",

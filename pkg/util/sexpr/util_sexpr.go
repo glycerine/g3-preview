@@ -238,16 +238,20 @@ func (m *SexprManager) inc(h SexprHandle) error {
 	return nil
 }
 func (m *SexprManager) dec(h SexprHandle) error {
+	_, e := m.decConsumed(h)
+	return e
+}
+func (m *SexprManager) decConsumed(h SexprHandle) (bool, error) {
 	r, e := m.record(h)
 	if e != nil {
-		return e
+		return false, e
 	}
 	if r.refs == 0 {
-		return ErrSexprRefCount
+		return false, ErrSexprRefCount
 	}
 	r.refs--
 	if r.refs != 0 {
-		return nil
+		return true, nil
 	}
 	m.deletion = append(m.deletion[:0], h)
 	defer func() { m.deletion = m.deletion[:0] }()
@@ -257,21 +261,21 @@ func (m *SexprManager) dec(h SexprHandle) error {
 		m.deletion = m.deletion[:last]
 		n, e := m.record(curr)
 		if e != nil {
-			return e
+			return true, e
 		}
 		switch n.Kind {
 		case SexprComposite:
 			for i := uint32(0); i < n.length; i++ {
 				child, e := m.child(n, i)
 				if e != nil {
-					return e
+					return true, e
 				}
 				c, e := m.record(child)
 				if e != nil {
-					return e
+					return true, e
 				}
 				if c.refs == 0 {
-					return ErrSexprRefCount
+					return true, ErrSexprRefCount
 				}
 				c.refs--
 				if c.refs == 0 {
@@ -280,12 +284,12 @@ func (m *SexprManager) dec(h SexprHandle) error {
 			}
 		case SexprNumeral, SexprBVNumeral:
 			if e = m.Config.Rationals.Del(&n.Numeral); e != nil {
-				return e
+				return true, e
 			}
 		}
 		m.recycle(curr)
 	}
-	return nil
+	return true, nil
 }
 func (m *SexprManager) IncRef(h SexprHandle) error {
 	if e := m.lock(); e != nil {
@@ -971,8 +975,10 @@ func (m *SexprManager) Close() error {
 // SexprRef is a scalar owning reference; copying its Go value does not acquire
 // ownership. Use CloneRef or MoveRef. Null callbacks are source-defined here.
 type SexprRef struct {
-	owner uint64
-	h     SexprHandle
+	owner   uint64
+	h       SexprHandle
+	owned   bool
+	pending []SexprHandle
 }
 
 func (r SexprRef) IsNull() bool { return r.h.IsNull() }
@@ -980,7 +986,7 @@ func (m *SexprManager) checkRef(r *SexprRef) error {
 	if r == nil || r.owner != m.owner {
 		return ErrSexprOwner
 	}
-	if !r.h.IsNull() {
+	if !r.h.IsNull() && r.owned {
 		_, e := m.record(r.h)
 		return e
 	}
@@ -996,7 +1002,7 @@ func (m *SexprManager) NewRef(h SexprHandle) (SexprRef, error) {
 			return SexprRef{}, e
 		}
 	}
-	return SexprRef{m.owner, h}, nil
+	return SexprRef{owner: m.owner, h: h, owned: !h.IsNull()}, nil
 }
 func (m *SexprManager) CloneRef(src *SexprRef) (SexprRef, error) {
 	if e := m.lock(); e != nil {
@@ -1011,7 +1017,7 @@ func (m *SexprManager) CloneRef(src *SexprRef) (SexprRef, error) {
 			return SexprRef{}, e
 		}
 	}
-	return SexprRef{m.owner, src.h}, nil
+	return SexprRef{owner: m.owner, h: src.h, owned: !src.h.IsNull()}, nil
 }
 func (m *SexprManager) MoveRef(src *SexprRef) (SexprRef, error) {
 	if e := m.lock(); e != nil {
@@ -1023,6 +1029,8 @@ func (m *SexprManager) MoveRef(src *SexprRef) (SexprRef, error) {
 	}
 	out := *src
 	src.h = SexprHandle{}
+	src.owned = false
+	src.pending = nil
 	return out, nil
 }
 func (m *SexprManager) GetRef(r *SexprRef) (SexprHandle, error) {
@@ -1049,14 +1057,28 @@ func (m *SexprManager) AssignRef(r *SexprRef, h SexprHandle) error {
 		}
 	}
 	if !r.h.IsNull() {
-		if e := m.dec(r.h); e != nil {
+		if !r.owned {
 			if !h.IsNull() {
-				m.dec(h)
+				r.pending = append(r.pending, h)
+			}
+			return arena.ErrInvalidSlot
+		}
+		consumed, e := m.decConsumed(r.h)
+		if e != nil || !consumed {
+			if !h.IsNull() {
+				r.pending = append(r.pending, h)
+			}
+			if consumed {
+				r.owned = false
+			}
+			if e == nil {
+				return ErrSexprOwner
 			}
 			return e
 		}
 	}
 	r.h = h
+	r.owned = !h.IsNull()
 	return nil
 }
 func (m *SexprManager) AssignRefFrom(r, src *SexprRef) error {
@@ -1067,7 +1089,47 @@ func (m *SexprManager) AssignRefFrom(r, src *SexprRef) error {
 	return m.AssignRef(r, h)
 }
 func (m *SexprManager) ResetRef(r *SexprRef) error { return m.AssignRef(r, SexprHandle{}) }
-func (m *SexprManager) CloseRef(r *SexprRef) error { return m.ResetRef(r) }
+func (m *SexprManager) CloseRef(r *SexprRef) error {
+	if e := m.lock(); e != nil {
+		return e
+	}
+	defer m.mu.Unlock()
+	if e := m.checkRef(r); e != nil {
+		return e
+	}
+	var failure error
+	if r.owned {
+		consumed, e := m.decConsumed(r.h)
+		if consumed {
+			r.owned = false
+		}
+		if !consumed {
+			if e != nil {
+				return e
+			}
+			return ErrSexprOwner
+		}
+		failure = e
+	}
+	for len(r.pending) != 0 {
+		last := len(r.pending) - 1
+		consumed, e := m.decConsumed(r.pending[last])
+		if consumed {
+			r.pending = r.pending[:last]
+		}
+		if failure == nil {
+			failure = e
+		}
+		if !consumed {
+			if e != nil {
+				return e
+			}
+			return ErrSexprOwner
+		}
+	}
+	r.h = SexprHandle{}
+	return failure
+}
 func (m *SexprManager) SwapRef(a, b *SexprRef) error {
 	if e := m.lock(); e != nil {
 		return e
@@ -1080,6 +1142,8 @@ func (m *SexprManager) SwapRef(a, b *SexprRef) error {
 		return e
 	}
 	a.h, b.h = b.h, a.h
+	a.owned, b.owned = b.owned, a.owned
+	a.pending, b.pending = b.pending, a.pending
 	return nil
 }
 func (m *SexprManager) StealRef(r *SexprRef) (SexprHandle, error) {
@@ -1092,6 +1156,7 @@ func (m *SexprManager) StealRef(r *SexprRef) (SexprHandle, error) {
 	}
 	h := r.h
 	r.h = SexprHandle{}
+	r.owned = false
 	return h, nil
 }
 func (m *SexprManager) EqualRef(a, b *SexprRef) (bool, error) {
