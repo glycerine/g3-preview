@@ -13,7 +13,7 @@ import (
 
 // HardwareContext owns the scalar bound-policy numerals and concrete
 // constraint and node records of context_hwf. Its manager and resource limit
-// are borrowed. Monomial and clause propagation, selection and search remain.
+// are borrowed. Monomial and clause propagation and the search loop remain.
 type HardwareContext struct {
 	self             *HardwareContext
 	numbers          *numeral.HardwareFloatNumeralManager
@@ -32,6 +32,8 @@ type HardwareContext struct {
 	watchers         [][]uint32
 	inequalities     []*HardwareInequality
 	root             *HardwareNode
+	leafHead         *HardwareNode
+	leafTail         *HardwareNode
 	nextNodeID       uint32
 	timestamp        uint64
 	queue            []*HardwareBound

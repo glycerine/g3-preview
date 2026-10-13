@@ -50958,7 +50958,8 @@
         "pkg/math/subpaving/hardware_context_relevance.go",
         "pkg/math/subpaving/hardware_polynomial.go",
         "pkg/math/subpaving/hardware_context_propagate.go",
-        "pkg/math/subpaving/hardware_split.go"
+        "pkg/math/subpaving/hardware_split.go",
+        "pkg/math/subpaving/hardware_selector.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -51035,7 +51036,9 @@
         "TestHardwarePolynomialForwardInverseAndUnboundedSelection",
         "TestHardwareContextRootDefinitionOrderAndQueuedWatchers",
         "TestHardwareChildRecentBoundReplayAndPolynomialWatcher",
-        "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
+        "TestHardwareMidpointSplitterRetainedBranchesAndRefusal",
+        "TestHardwareSelectorsRoundRobinAndBreadthFirstSourceOrder",
+        "TestHardwareSelectorSingletonAndUndecidedChild"
       ],
       "conditionals": [
         {
@@ -51457,6 +51460,15 @@
           "tests": [
             "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
           ]
+        },
+        {
+          "name": "Concrete config_hwf leaf-list links and source-order selector state",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_selector.go",
+          "tests": [
+            "TestHardwareSelectorsRoundRobinAndBreadthFirstSourceOrder",
+            "TestHardwareSelectorSingletonAndUndecidedChild"
+          ]
         }
       ],
       "ownership": [
@@ -51537,7 +51549,8 @@
         "pkg/math/subpaving/hardware_context_relevance.go",
         "pkg/math/subpaving/hardware_polynomial.go",
         "pkg/math/subpaving/hardware_context_propagate.go",
-        "pkg/math/subpaving/hardware_split.go"
+        "pkg/math/subpaving/hardware_split.go",
+        "pkg/math/subpaving/hardware_selector.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51605,7 +51618,9 @@
         "TestHardwarePolynomialForwardInverseAndUnboundedSelection",
         "TestHardwareContextRootDefinitionOrderAndQueuedWatchers",
         "TestHardwareChildRecentBoundReplayAndPolynomialWatcher",
-        "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
+        "TestHardwareMidpointSplitterRetainedBranchesAndRefusal",
+        "TestHardwareSelectorsRoundRobinAndBreadthFirstSourceOrder",
+        "TestHardwareSelectorSingletonAndUndecidedChild"
       ],
       "assertions": [
         {
@@ -52275,6 +52290,15 @@
           "go_target": "pkg/math/subpaving/hardware_split.go",
           "tests": [
             "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf breadth-first leaf selector and default round-robin variable selector (src/math/subpaving/subpaving_t_def.h:24-101,344-359)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_selector.go",
+          "tests": [
+            "TestHardwareSelectorsRoundRobinAndBreadthFirstSourceOrder",
+            "TestHardwareSelectorSingletonAndUndecidedChild"
           ]
         }
       ],

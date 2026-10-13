@@ -44,6 +44,9 @@ type HardwareNode struct {
 	depth        uint32
 	children     uint32
 	context      *HardwareContext
+	leafPrev     *HardwareNode
+	leafNext     *HardwareNode
+	queuedLeaf   bool
 	conflictVar  uint32
 	closed       bool
 }
@@ -130,6 +133,9 @@ func (n *HardwareNode) Close() error {
 	if n.children != 0 {
 		return arena.ErrInvalidSlot
 	}
+	if n.context != nil {
+		n.context.removeLeaf(n)
+	}
 	n.closed = true
 	if n.parent != nil {
 		n.parent.children--
@@ -153,6 +159,7 @@ func (c *HardwareContext) CreateRootNode() (*HardwareNode, error) {
 	n.context = c
 	c.root = n
 	c.nextNodeID = 1
+	c.pushLeafFront(n)
 	return n, nil
 }
 
@@ -169,5 +176,6 @@ func (c *HardwareContext) NewChildNode(parent *HardwareNode) (*HardwareNode, err
 		return nil, err
 	}
 	c.nextNodeID++
+	c.pushLeafFront(n)
 	return n, nil
 }
