@@ -101426,7 +101426,8 @@
           "status": "partial",
           "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
           "tests": [
-            "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
+            "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
+            "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
           ]
         },
         {
@@ -162433,7 +162434,7 @@
         },
         {
           "name": "concrete UFBV main todo reference slice for processed-formula rescheduling and cleanup",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
           "tests": [
             "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
@@ -162441,7 +162442,7 @@
         },
         {
           "name": "concrete UFBV main todo receives demodulator root after forward-index removal",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
           "tests": [
             "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
