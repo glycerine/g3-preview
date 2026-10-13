@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/params"
 )
 
 var ErrArbitraryShellInexactInteger = errors.New("subpaving: integer coefficient cannot be represented exactly as arbitrary float")
@@ -120,6 +121,20 @@ func (w *ArbitraryShellCoefficients) DisplayConstraints(out io.Writer, useStar b
 		return err
 	}
 	return w.context.DisplayConstraints(out, useStar)
+}
+
+func (w *ArbitraryShellCoefficients) UpdateParamsRef(pc *params.ParamsContext, p *params.ParamsRef) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.UpdateParamsRef(pc, p)
+}
+
+func (w *ArbitraryShellCoefficients) CollectParamDescrs(d *params.ParamDescrs) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return CollectArbitraryParamDescrs(d)
 }
 
 // MkSum converts exact integer inputs in source order and transfers copies to

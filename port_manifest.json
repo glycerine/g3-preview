@@ -50244,6 +50244,8 @@
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/arbitrary_display.go",
         "pkg/math/subpaving/arbitrary_display_test.go",
+        "pkg/math/subpaving/arbitrary_context_params.go",
+        "pkg/math/subpaving/arbitrary_context_params_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients_test.go",
         "pkg/math/subpaving/arbitrary_polynomial.go",
         "pkg/math/subpaving/arbitrary_monomial.go",
@@ -50262,6 +50264,7 @@
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
         "TestArbitraryDisplayConstraintsDefinitionsUnitsAndClauses",
         "TestArbitraryDisplayBoundsTreeOrderConflictAndWriterPrefixes",
+        "TestArbitraryContextNamedParamsSourceOrderAndDescriptions",
         "TestHardwareShellRetainedClauseAndSearchRoute",
         "TestHardwareShellStatisticsCountersAndReset",
         "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder",
@@ -50277,6 +50280,14 @@
           "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete context_mpf wrapper updt_params and collect_param_descrs forwarding (src/math/subpaving/subpaving.cpp:53-54)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_shell_coefficients.go",
+          "tests": [
+            "TestArbitraryContextNamedParamsSourceOrderAndDescriptions"
           ]
         },
         {
@@ -51059,6 +51070,8 @@
         "pkg/math/subpaving/arbitrary_display.go",
         "pkg/math/subpaving/arbitrary_display_test.go",
         "pkg/math/subpaving/arbitrary_context_root.go",
+        "pkg/math/subpaving/arbitrary_context_params.go",
+        "pkg/math/subpaving/arbitrary_context_params_test.go",
         "pkg/math/subpaving/arbitrary_interval_node_test.go",
         "pkg/math/subpaving/fixed_interval.go",
         "pkg/math/subpaving/fixed_interval_arith.go",
@@ -51728,6 +51741,14 @@
           ]
         },
         {
+          "name": "Concrete config_mpf source-order updt_params declaration and policy fields (src/math/subpaving/subpaving_t.h:516-548)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_context_params.go",
+          "tests": [
+            "TestArbitraryContextNamedParamsSourceOrderAndDescriptions"
+          ]
+        },
+        {
           "name": "Concrete config_hwf borrowed display procedure state and setter (src/math/subpaving/subpaving_t.h:836)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_display.go",
@@ -51762,6 +51783,8 @@
         "pkg/math/subpaving/arbitrary_shell_coefficients_test.go",
         "pkg/math/subpaving/arbitrary_display.go",
         "pkg/math/subpaving/arbitrary_display_test.go",
+        "pkg/math/subpaving/arbitrary_context_params.go",
+        "pkg/math/subpaving/arbitrary_context_params_test.go",
         "pkg/math/subpaving/arbitrary_clause_propagation_test.go",
         "pkg/math/subpaving/arbitrary_context_propagate.go",
         "pkg/math/subpaving/arbitrary_context_relevance.go",
@@ -52831,6 +52854,22 @@
           "go_target": "pkg/math/subpaving/hardware_context_params.go",
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf updt_params six named unsigned lookups and immediate mutations (src/math/subpaving/subpaving_t_def.h:473-501)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_context_params.go",
+          "tests": [
+            "TestArbitraryContextNamedParamsSourceOrderAndDescriptions"
+          ]
+        },
+        {
+          "name": "Concrete context_mpf five source-order option descriptors (src/math/subpaving/subpaving_t_def.h:507-513)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_context_params.go",
+          "tests": [
+            "TestArbitraryContextNamedParamsSourceOrderAndDescriptions"
           ]
         },
         {

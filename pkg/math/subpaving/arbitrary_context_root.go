@@ -40,6 +40,7 @@ type ArbitraryContext struct {
 	leafHead, leafTail                              *ArbitraryNode
 	displayVariable                                 func(io.Writer, uint32) error
 	maxDepth, maxNodes                              uint32
+	maxMemory                                       uint64
 	searchNode                                      *ArbitraryNode
 	searchPhase                                     uint8
 	numSplits                                       uint64
@@ -75,7 +76,7 @@ func NewArbitraryContext(m *numeral.ArbitraryFloatNumeralManager, limit *control
 	if m == nil || limit == nil {
 		return nil, arena.ErrInvalidSlot
 	}
-	c := &ArbitraryContext{numbers: m, limit: limit, zeroEpsilon: epsilon == 0, maxDepth: 128, maxNodes: 8192}
+	c := &ArbitraryContext{numbers: m, limit: limit, zeroEpsilon: epsilon == 0, maxDepth: 128, maxNodes: 8192, maxMemory: math.MaxUint64}
 	c.self = c
 	defer func() {
 		if err != nil {
