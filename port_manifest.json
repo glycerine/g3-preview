@@ -168677,10 +168677,11 @@
         },
         {
           "name": "Reached null/string/numerical symbol ostream insertion (src/util/symbol.h:97-110)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_gparams_symbol_stream.go",
           "tests": [
-            "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags"
+            "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
+            "TestSMTParamsDisplayReachesLogicSymbolInsertion"
           ],
           "go_targets": [
             "pkg/smtcore/util_smt_params_source_test.go"

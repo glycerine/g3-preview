@@ -542,6 +542,28 @@ func TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags(t
 	}
 }
 
+func TestSMTParamsDisplayReachesLogicSymbolInsertion(t *testing.T) {
+	c, g, p, b := dynAckSourceFixture(t)
+	s, e := NewSMTParams(c, p, g, b)
+	paramsMust(t, e)
+	defer func() { paramsMust(t, s.Close()) }()
+	paramsMust(t, s.qi.SetEmatching(false))
+	logic, e := g.Symbols.Intern("QF_LIA")
+	paramsMust(t, e)
+	paramsMust(t, c.SetSymbolName(p, dynAckName("logic"), logic))
+	paramsMust(t, s.UpdateLocal(p))
+	sb := arena.NewBudget(1 << 24)
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb})
+	paramsMust(t, e)
+	defer func() { paramsMust(t, out.Close()) }()
+	paramsMust(t, s.Display(out))
+	got, e := out.String()
+	paramsMust(t, e)
+	if !strings.Contains(got, "m_logic=QF_LIA\n") {
+		t.Fatal("source symbol insertion in actual SMT display", got)
+	}
+}
+
 func TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases(t *testing.T) {
 	bn := arena.NewBudget(1 << 26)
 	bc := arena.NewBudget(1 << 24)
