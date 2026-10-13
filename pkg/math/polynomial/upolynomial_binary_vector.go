@@ -54,9 +54,26 @@ func upolyBinaryExtend(s *upolyBinaryVectorState, n uint32) error {
 	}
 	old := s.values
 	if int(n) > len(old) {
-		s.values = append(old, make([]unumeral.BinaryRational, int(n)-len(old))...)
-		if len(old) != 0 && &old[0] != &s.values[0] {
+		if int(n) <= cap(old) {
+			s.values = old[:n]
+		} else {
+			// Preserve vector.h's capacity progression with one typed backing move.
+			limit := uint64(^uint(0)>>1) / uint64(reflect.TypeOf(unumeral.BinaryRational{}).Size())
+			capacity := uint64(cap(old))
+			if capacity == 0 {
+				capacity = 2
+			}
+			for capacity < uint64(n) {
+				next := (3*capacity + 1) / 2
+				if next <= capacity || next > limit {
+					return arena.ErrBounds
+				}
+				capacity = next
+			}
+			next := make([]unumeral.BinaryRational, int(n), int(capacity))
+			copy(next, old)
 			clear(old)
+			s.values = next
 		}
 	}
 	clear(s.values[s.size:n])
