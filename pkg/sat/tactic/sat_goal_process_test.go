@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/sat"
+	gtactic "github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/control"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
@@ -78,6 +79,17 @@ func TestSATGoalTranslatorSharedProcessMemoryCheckpoint(t *testing.T) {
 		t.Fatal("retained goal2sat process checkpoint", e)
 	}
 	satOK(t, translator.Close())
+	_, e = solver.MkVar(false, true)
+	satOK(t, e)
+	recovery, e := NewGoalTranslator(m, solver)
+	satOK(t, e)
+	goal, e := gtactic.NewGoal(m, false, true, false)
+	satOK(t, e)
+	if e = recoverSATGoalFormulas(recovery, goal, false, recovery.maxMemory); e == nil || !strings.Contains(e.Error(), "max. memory exceeded") {
+		t.Fatal("retained sat2goal process checkpoint", e)
+	}
+	satOK(t, goal.Close())
+	satOK(t, recovery.Close())
 	satOK(t, other.Deallocate(&block))
 	satOK(t, other.Close())
 	satOK(t, solver.Close())

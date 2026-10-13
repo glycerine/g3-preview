@@ -78147,7 +78147,8 @@
             "TestSATGoalInverseLiteralOwnership",
             "TestSATGoalRecoveryIndependentBinaryTruthTables",
             "TestSATGoalRecoveryFreshUnitsLearnedAndCheckpoints",
-            "TestSATGoalRecoveryLongClauseBufferGrowth"
+            "TestSATGoalRecoveryLongClauseBufferGrowth",
+            "TestSATGoalTranslatorSharedProcessMemoryCheckpoint"
           ]
         },
         {
@@ -146718,7 +146719,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "goal2sat process-memory checkpoint binds its AST and SAT numeral owners to one shared source allocation counter (goal2sat.cpp:380-391)",
+          "name": "goal2sat and sat2goal memory checkpoints share the actual AST/SAT numeral process counter (goal2sat.cpp:380-391,685-699)",
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat.go",
           "tests": [
@@ -147063,7 +147064,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "goal2sat process-memory checkpoint binds its AST and SAT numeral owners to one shared source allocation counter (goal2sat.cpp:380-391)",
+          "name": "goal2sat and sat2goal memory checkpoints share the actual AST/SAT numeral process counter (goal2sat.cpp:380-391,685-699)",
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat.go",
           "tests": [
