@@ -21,6 +21,8 @@ type astFloatingPointPluginOwner struct {
 	literalPrimary                                              astFloatLiteralFrame
 	literalFrames                                               *astFloatLiteralFrame
 	literalSerial                                               uint64
+	numeralProbePrimary                                         astFloatNumeralProbe
+	numeralProbeFrames                                          *astFloatNumeralProbe
 	assertions                                                  *uparams.GlobalParamsService
 	next                                                        *astFloatingPointPluginOwner
 	self                                                        *astFloatingPointPluginOwner
@@ -42,7 +44,7 @@ type astFloatingPointPluginOwner struct {
 
 func (m *ASTManager) floatingPointPluginBytes() uint64 {
 	bytes := func(p *astFloatingPointPluginOwner) uint64 {
-		n := p.header + p.literalBytes()
+		n := p.header + p.literalBytes() + p.numeralProbeBytes()
 		if p.numeric != nil {
 			n += p.numeric.OwnedStorageBytes()
 		} else {
@@ -295,6 +297,9 @@ func (m *ASTManager) destroyFloatingPointMembers(own bool) error {
 		if e := p.destroyLiteralFrames(own); e != nil {
 			return stop(e)
 		}
+		if e := p.destroyNumeralProbes(own); e != nil {
+			return stop(e)
+		}
 		if p.tableReady {
 			p.table = nil
 			p.tableReady = false
@@ -344,12 +349,14 @@ func (m *ASTManager) destroyFloatingPointMembers(own bool) error {
 func (m *ASTManager) releaseFloatingPointHistory() {
 	if p := m.floatingPointPlugin; p != nil {
 		p.releaseLiteralFrames()
+		p.releaseNumeralProbes()
 		m.BudgetField.Release(p.header)
 		p.header = 0
 	}
 	m.floatingPointPlugin = nil
 	for p := m.floatingPointPluginFailed; p != nil; p = p.next {
 		p.releaseLiteralFrames()
+		p.releaseNumeralProbes()
 		m.BudgetField.Release(p.header)
 		p.header = 0
 	}

@@ -16647,7 +16647,9 @@
         "pkg/ast/ast_fpa_value_binding.go",
         "pkg/ast/ast_fpa_value_binding_source_test.go",
         "pkg/ast/ast_fpa_value_table.go",
-        "pkg/ast/ast_fpa_native_value_table_test.go"
+        "pkg/ast/ast_fpa_native_value_table_test.go",
+        "pkg/ast/ast_fpa_numeral_probe.go",
+        "pkg/ast/ast_fpa_numeral_probe_test.go"
       ],
       "tests": [
         "TestASTFloatingPointActualConstructorRegistrationAndSorts",
@@ -16661,7 +16663,9 @@
         "TestASTFloatingPointValueTableUsesActualMPFHashAndEquality",
         "TestASTFloatingPointValueIDLiteralCanonicalization",
         "TestASTFloatingPointValueIDEveryActualReservationPrefix",
-        "TestASTFloatingPointNativeValueBucketsGrowthCollisionAndReuse"
+        "TestASTFloatingPointNativeValueBucketsGrowthCollisionAndReuse",
+        "TestASTFloatingPointBooleanNumeralScopedValue",
+        "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy"
       ],
       "assertions": [
         {
@@ -16758,6 +16762,15 @@
             "TestASTFloatingPointValueTableUsesActualMPFHashAndEquality",
             "TestASTFloatingPointValueIDLiteralCanonicalization",
             "TestASTFloatingPointValueIDEveryActualReservationPrefix"
+          ]
+        },
+        {
+          "name": "Concrete boolean FPA is_numeral overload with caller-local scoped_mpf, successful destructor, stopped copy retention and distinct owning cleanup (src/ast/fpa_decl_plugin.cpp:136-139; src/util/scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointBooleanNumeralScopedValue",
+            "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy"
           ]
         }
       ],
@@ -147375,7 +147388,11 @@
         "pkg/util/numeral/mpf_signed_fraction_test.go",
         "pkg/util/numeral/mpf_signed_fraction_callback_test.go",
         "pkg/util/numeral/mpf_signed_fraction_source_stop_test.go",
-        "pkg/util/numeral/mpq_signed_fraction_source.go"
+        "pkg/util/numeral/mpq_signed_fraction_source.go",
+        "pkg/ast/ast_fpa_numeral_probe.go",
+        "pkg/ast/ast_fpa_numeral_probe_test.go",
+        "pkg/ast/ast_fpa_plugin.go",
+        "pkg/ast/ast_fpa_plugin_source_test.go"
       ],
       "tests": [
         "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
@@ -147578,7 +147595,9 @@
         "TestArbitraryFloatSignedFractionRefusedNormalizationKeepsOlderGCD",
         "TestArbitraryFloatSignedFractionInlineChildKeepsOlderHistory",
         "TestArbitraryFloatSignedFractionYoungerSourceStop",
-        "TestNumericStreamNativeCountedTextAndOwnedInput"
+        "TestNumericStreamNativeCountedTextAndOwnedInput",
+        "TestASTFloatingPointBooleanNumeralScopedValue",
+        "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy"
       ],
       "conditionals": [
         {
@@ -148138,6 +148157,15 @@
             "TestArbitraryFloatSignedFractionRefusedNormalizationKeepsOlderGCD",
             "TestArbitraryFloatSignedFractionInlineChildKeepsOlderHistory",
             "TestArbitraryFloatSignedFractionYoungerSourceStop"
+          ]
+        },
+        {
+          "name": "Concrete boolean FPA is_numeral overload with caller-local scoped_mpf, successful destructor, stopped copy retention and distinct owning cleanup (src/ast/fpa_decl_plugin.cpp:136-139; src/util/scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointBooleanNumeralScopedValue",
+            "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy"
           ]
         }
       ],
@@ -164304,7 +164332,11 @@
         "pkg/math/polynomial/polynomial_som_normalize_lifetime_source_test.go",
         "pkg/math/polynomial/polynomial_neg_scope.go",
         "pkg/math/polynomial/polynomial_scalar_div.go",
-        "pkg/math/polynomial/polynomial_neg_source_guard_test.go"
+        "pkg/math/polynomial/polynomial_neg_source_guard_test.go",
+        "pkg/ast/ast_fpa_numeral_probe.go",
+        "pkg/ast/ast_fpa_numeral_probe_test.go",
+        "pkg/ast/ast_fpa_plugin.go",
+        "pkg/ast/ast_fpa_plugin_source_test.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -164368,7 +164400,9 @@
         "TestPolynomialScalarDivLiteralIntegerAndFieldValues",
         "TestPolynomialScalarDivEmptyDoesNotReadDivisor",
         "TestPolynomialScalarDivEveryActualReservationPrefix",
-        "TestPolynomialNegCompletedLocalGuardUnwind"
+        "TestPolynomialNegCompletedLocalGuardUnwind",
+        "TestASTFloatingPointBooleanNumeralScopedValue",
+        "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy"
       ],
       "conditionals": [
         {
@@ -164558,9 +164592,18 @@
           ]
         },
         {
-          "name": "Concrete inherited scoped_mpf scalar lifetime for retained AST FPA plugin, rewriter, printers, SMT theory, subpaving and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
+          "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA rewriter/printers, SMT theory, subpaving and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "Concrete boolean FPA is_numeral overload with caller-local scoped_mpf, successful destructor, stopped copy retention and distinct owning cleanup (src/ast/fpa_decl_plugin.cpp:136-139; src/util/scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointBooleanNumeralScopedValue",
+            "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy"
+          ]
         }
       ],
       "ownership": [
@@ -164571,10 +164614,11 @@
         "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership.",
         "Actual source NUM destruction follows returned-factory evaluation; sticky source guard is not automatically retried by owning cleanup",
         "scoped_numeral.h:31-33 actual Neg minus_a source destructor precedes factory result exposure; stopped source history remains distinct from exact owning acknowledgment.",
-        "The retained scoped_mpf scalar borrows mpf_manager and owns an mpf value; its inherited destructor deletes the value after the caller's body, including early API returns. AST FPA plugin, rewriter and printer, SMT FPA, subpaving and API call sites still need concrete caller-local binding and exact cleanup. The existing AST scoped_mpf_vector is a separate owning collection and does not discharge scalar scope lifetimes."
+        "The retained scoped_mpf scalar borrows mpf_manager and owns an mpf value; its inherited destructor deletes the value after the caller's body, including early API returns. Apart from the selected boolean FPA query, AST FPA rewriter/printer, SMT FPA, subpaving and API call sites still need concrete caller-local binding and exact cleanup. The existing AST scoped_mpf_vector is a separate owning collection and does not discharge scalar scope lifetimes.",
+        "The boolean FPA numeral query owns its local MPF value until the source destructor completes; an allocation stop retains the exact local and copy child for separate owning cleanup before AST plugin teardown. Later calls use a charged distinct cold frame without replacing a stopped local."
       ],
       "deviations": [
-        "Selected concrete Int, rational, MPBQ and MPFF scopes are represented in Go. The retained MPF scalar specialization is still open at its actual AST, SMT, subpaving and API callers; the unused any-valued callback adapter was removed.",
+        "Selected concrete Int, rational, MPBQ and MPFF scopes and the boolean AST FPA MPF scalar caller are represented in Go. Other retained MPF scalar callers remain open at AST, SMT, subpaving and API sites; the unused any-valued callback adapter was removed.",
         "Explicit Close substitutes RAII for the retained concrete owners. Display returns Go strings instead of recreating C++ ostream insertion.",
         "TLS signed-host overflow fixtures test an explicitly guarded source-undefined domain, not ordinary exhaustion or an end-to-end recursive arithmetic claim."
       ]

@@ -152,6 +152,15 @@ func astFloatingPointRawGraphSourceOwners(t *testing.T, q *unumeral.RationalServ
 					add(uint64(words[4]) | uint64(words[5])<<32)
 				}
 			}
+			for f := p.numeralProbeFrames; f != nil; f = f.next {
+				if f.self != f || f.owner != p {
+					t.Fatal("foreign boolean numeral probe")
+				}
+				if !f.consumed {
+					value := reflect.ValueOf(&f.value).Elem()
+					add(testFieldBySourceName(testFieldBySourceName(value, "significand"), "cell").Uint())
+				}
+			}
 			for call := testFieldBySourceName(parent, "valueCalls"); !call.IsNil(); call = testFieldBySourceName(call.Elem(), "next") {
 				v := call.Elem()
 				if testFieldBySourceName(v, "self").Pointer() != call.Pointer() || testFieldBySourceName(v, "manager").Pointer() != parent.Addr().Pointer() {
