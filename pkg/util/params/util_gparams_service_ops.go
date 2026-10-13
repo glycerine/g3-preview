@@ -36,6 +36,14 @@ func (s *GlobalParamsService) BindNamespaceTrace(t *udiag.TraceTags) error {
 	s.namespaceTrace = t
 	return nil
 }
+
+func (s *GlobalParamsService) traceNamespace(function string, line int, body string) error {
+	trace := s.namespaceTrace
+	if trace == nil {
+		trace = udiag.BorrowProcessTraceTags()
+	}
+	return trace.Emit("gparams", function, "src/util/gparams.cpp", line, body)
+}
 func (s *GlobalParamsService) NamespaceAssertionsEnabled() (bool, error) {
 	if !GlobalParamsSourceDebug {
 		return false, nil
@@ -183,6 +191,12 @@ func (s *GlobalParamsService) SourceGetModuleSymbol(name usymbol.Symbol) (Params
 	return g.GetModule(name)
 }
 func (s *GlobalParamsService) SourceGetRef() (*ParamsRef, error) {
+	if e := s.open(); e != nil {
+		return nil, e
+	}
+	if e := s.traceNamespace("get_ref", 608, "gparams::get_ref()\n"); e != nil {
+		return nil, e
+	}
 	g, e := s.namespaceImpAt(609)
 	if e != nil {
 		return nil, e

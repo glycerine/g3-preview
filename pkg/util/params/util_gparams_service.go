@@ -72,6 +72,9 @@ func (s *GlobalParamsService) InitializeSource() error {
 	if e := s.open(); e != nil {
 		return e
 	}
+	if e := s.traceNamespace("init", 634, "gparams::init()\n"); e != nil {
+		return e
+	}
 	// Source init is unconditional; a previous live pointer does not skip alloc.
 	g, e := newSourceGlobalParams(s.Symbols, s.Context, s.Config)
 	if e != nil {
@@ -100,6 +103,9 @@ func (s *GlobalParamsService) Manager() (*GlobalParams, error) {
 }
 func (s *GlobalParamsService) FinalizeSource() error {
 	if e := s.open(); e != nil {
+		return e
+	}
+	if e := s.traceNamespace("finalize", 639, "gparams::finalize()\n"); e != nil {
 		return e
 	}
 	if s.Current != nil {
