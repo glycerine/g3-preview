@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	goaltactic "github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -65,12 +66,22 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	cooperation, err := cooperate.NewCooperation(b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := cooperation.BeginSection(); err != nil {
+		t.Fatal(err)
+	}
+	if err := core.BindCooperation(cooperation); err != nil {
+		t.Fatal(err)
+	}
 	goal, err := goaltactic.NewGoal(m, false, false, false)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() {
-		for _, e := range []error{goal.Close(), core.Close(), qm.CloseChecked(), pc.Del(&p), pc.Close(), m.Close(), q.Close(), sy.Close(), numbers.CloseChecked()} {
+		for _, e := range []error{goal.Close(), core.Close(), qm.CloseChecked(), pc.Del(&p), pc.Close(), m.Close(), q.Close(), sy.Close(), numbers.CloseChecked(), cooperation.Close()} {
 			if e != nil {
 				t.Error(e)
 			}
@@ -117,6 +128,9 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if got, err := core.Apply(goal); err != nil || got != goal {
 		t.Fatal("source core returns original goal", got, err)
 	}
+	if cooperation.OwnerThread != 0 {
+		t.Fatal("source tactic search omitted cooperation checkpoint")
+	}
 	if n, err := goal.Size(); err != nil || n != 1 {
 		t.Fatal("input goal retained", n, err)
 	}
@@ -137,6 +151,9 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 		t.Fatal("generated variable fallback", shown.String(), err)
 	}
 	oldEngine, oldConverter := core.engine, core.converter
+	if err := cooperation.EndTask(); err != nil {
+		t.Fatal(err)
+	}
 	printKey := "print_nodes"
 	if err := pc.SetBoolName(&p, &printKey, true); err != nil {
 		t.Fatal(err)
@@ -159,6 +176,9 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	}
 	if got, err := core.Apply(goal); err != nil || got != goal {
 		t.Fatal("fresh context searches retained goal", got, err)
+	}
+	if cooperation.OwnerThread != 0 {
+		t.Fatal("cleanup rebuild dropped borrowed cooperation owner")
 	}
 	st.Reset()
 	if err := core.CollectStatistics(st); err != nil || st.Size() != 4 || st.Key(2) != "new bounds" || st.UintValue(2) != 1 || st.Key(3) != "nodes" || st.UintValue(3) != 1 {
@@ -189,6 +209,9 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	}
 	if shown.String() != "x <= 2\nbounds at leaves: \nx <= 2\n" {
 		t.Fatal("source print_nodes output", shown.String())
+	}
+	if err := cooperation.EndSection(); err != nil {
+		t.Fatal(err)
 	}
 	if err := core.Close(); err != nil {
 		t.Fatal(err)

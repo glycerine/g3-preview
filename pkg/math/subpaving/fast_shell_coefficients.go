@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -202,6 +203,14 @@ func (w *FastShellCoefficients) Search() error {
 		return err
 	}
 	return w.context.Search()
+}
+
+// BindCooperation passes the borrowed process checkpoint owner to the context.
+func (w *FastShellCoefficients) BindCooperation(owner *cooperate.Cooperation) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.BindCooperation(owner)
 }
 
 func (w *FastShellCoefficients) UpdateParamsRef(pc *params.ParamsContext, p *params.ParamsRef) error {

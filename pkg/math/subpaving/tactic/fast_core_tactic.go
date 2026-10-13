@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	goaltactic "github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
@@ -22,16 +23,17 @@ var ErrFastCorePrintNodes = errors.New("subpaving tactic: SMT2 display for this 
 // parameter snapshot. The goal, managers and parameter service are borrowed.
 // The returned goal is borrowed.
 type FastCoreTactic struct {
-	self      *FastCoreTactic
-	manager   *ast.ASTManager
-	numbers   *numeral.FastFloatManager
-	rational  *numeral.RationalManager
-	pc        *params.ParamsContext
-	params    params.ParamsRef
-	engine    *FastEngine
-	converter *FastExprConverter
-	stats     statistics.Statistics
-	closed    bool
+	self        *FastCoreTactic
+	manager     *ast.ASTManager
+	numbers     *numeral.FastFloatManager
+	rational    *numeral.RationalManager
+	pc          *params.ParamsContext
+	params      params.ParamsRef
+	engine      *FastEngine
+	cooperation *cooperate.Cooperation
+	converter   *FastExprConverter
+	stats       statistics.Statistics
+	closed      bool
 }
 
 func NewFastCoreTactic(m *ast.ASTManager, numbers *numeral.FastFloatManager, rational *numeral.RationalManager, pc *params.ParamsContext, p *params.ParamsRef) (*FastCoreTactic, error) {
@@ -81,11 +83,28 @@ func (t *FastCoreTactic) rebuild() error {
 		}
 		return err
 	}
+	if t.cooperation != nil {
+		if err := engine.BindCooperation(t.cooperation); err != nil {
+			return errors.Join(err, engine.Close())
+		}
+	}
 	converter, err := NewFastExprConverter(t.manager, engine, t.rational)
 	if err != nil {
 		return errors.Join(err, engine.Close())
 	}
 	t.engine, t.converter = engine, converter
+	return nil
+}
+
+// BindCooperation retains the borrowed source process owner across Cleanup.
+func (t *FastCoreTactic) BindCooperation(owner *cooperate.Cooperation) error {
+	if err := t.open(); err != nil {
+		return err
+	}
+	if err := t.engine.BindCooperation(owner); err != nil {
+		return err
+	}
+	t.cooperation = owner
 	return nil
 }
 
