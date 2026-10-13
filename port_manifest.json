@@ -173810,6 +173810,8 @@
         "TestWarningSourceDefaultRoutingAndDisabledState",
         "TestWarningSourceBorrowedStreamTruncationAndFallback",
         "TestWarningShortWritePreservesSourceInsertionPrefix",
+        "TestWarningFlushesCompletedBorrowedAndDefaultStreams",
+        "TestWarningShortWriteDoesNotFlush",
         "TestWarningFormattedStringAndIntegerRoutes",
         "TestWarningRetainedDatalogUnsignedSymbol",
         "TestDefaultExceptionSourceFormattedConstructor",
@@ -173887,6 +173889,8 @@
             "TestWarningSourceDefaultRoutingAndDisabledState",
             "TestWarningSourceBorrowedStreamTruncationAndFallback",
             "TestWarningShortWritePreservesSourceInsertionPrefix",
+            "TestWarningFlushesCompletedBorrowedAndDefaultStreams",
+            "TestWarningShortWriteDoesNotFlush",
             "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
           ],
           "go_targets": [
@@ -173918,7 +173922,7 @@
         }
       ],
       "ownership": [
-        "WarningService owns only the enable scalar and borrows optional io.Writer streams. EnvParamsRuntime updates the same warning-enable state used by warning emission; literal and selected formatted writes retain source prefix, newline, C-string boundary and selected Linux AMD64 custom-stream truncation."
+        "WarningService owns only the enable scalar and borrows optional io.Writer streams. EnvParamsRuntime updates the same warning-enable state used by warning emission; literal and selected formatted writes retain source prefix, newline, C-string boundary, selected Linux AMD64 custom-stream truncation and completed-output flush when the borrowed writer supports Flush."
       ],
       "deviations": [
         "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; ordinary Go io.Writer short writes return io.ErrShortWrite while retaining the source insertion prefix. Direct shell/AST/MUZ warning call sites remain open. No C varargs or C++ standard-stream implementation is introduced."
@@ -173939,6 +173943,8 @@
         "TestWarningSourceDefaultRoutingAndDisabledState",
         "TestWarningSourceBorrowedStreamTruncationAndFallback",
         "TestWarningShortWritePreservesSourceInsertionPrefix",
+        "TestWarningFlushesCompletedBorrowedAndDefaultStreams",
+        "TestWarningShortWriteDoesNotFlush",
         "TestWarningFormattedStringAndIntegerRoutes",
         "TestWarningRetainedDatalogUnsignedSymbol",
         "TestDefaultExceptionSourceFormattedConstructor",
@@ -173967,6 +173973,8 @@
             "TestWarningSourceDefaultRoutingAndDisabledState",
             "TestWarningSourceBorrowedStreamTruncationAndFallback",
             "TestWarningShortWritePreservesSourceInsertionPrefix",
+            "TestWarningFlushesCompletedBorrowedAndDefaultStreams",
+            "TestWarningShortWriteDoesNotFlush",
             "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
             "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
           ],
@@ -173995,7 +174003,7 @@
         }
       ],
       "ownership": [
-        "WarningService borrows selected output streams and owns only its enable flag. The unused warning_displayer class has no Go adapter."
+        "WarningService borrows selected output streams and owns only its enable flag. A borrowed buffered writer is flushed after a complete warning. The unused warning_displayer class has no Go adapter."
       ],
       "deviations": [
         "The concrete warning service is reached by EnvParamsRuntime. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; ordinary Go io.Writer short writes return io.ErrShortWrite after the completed source insertion prefix. Format2ostream exception integration and direct shell/AST/MUZ warning call sites remain open. C++ stream internals and C varargs are not copied."

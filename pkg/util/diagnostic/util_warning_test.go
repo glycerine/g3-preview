@@ -1,12 +1,76 @@
 package diagnostic
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"io"
 	"strings"
 	"testing"
 )
+
+type flushedWarningWriter struct {
+	bytes.Buffer
+	flushes int
+	err     error
+}
+
+func (w *flushedWarningWriter) Flush() error {
+	w.flushes++
+	return w.err
+}
+
+func TestWarningFlushesCompletedBorrowedAndDefaultStreams(t *testing.T) {
+	var output bytes.Buffer
+	buffered := bufio.NewWriter(&output)
+	s := NewWarningService(buffered)
+	if err := s.Warning("default"); err != nil {
+		t.Fatal(err)
+	}
+	if got := output.String(); got != "WARNING: default\n" {
+		t.Fatal("default buffered warning was not flushed", got)
+	}
+
+	flushed := &flushedWarningWriter{}
+	if err := s.SetWarningStream(flushed); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Warningf("selected %d", 7); err != nil {
+		t.Fatal(err)
+	}
+	if flushed.String() != "WARNING: selected 7\n" || flushed.flushes != 1 {
+		t.Fatal("selected stream flush", flushed.String(), flushed.flushes)
+	}
+	flushErr := errors.New("flush failed")
+	flushed.err = flushErr
+	if err := s.Warning("again"); !errors.Is(err, flushErr) || flushed.flushes != 2 {
+		t.Fatal("completed warning flush failure", err, flushed.flushes)
+	}
+	if err := s.Enable(false); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Warning("disabled"); err != nil || flushed.flushes != 2 {
+		t.Fatal("disabled warning flushed", err, flushed.flushes)
+	}
+}
+
+func TestWarningShortWriteDoesNotFlush(t *testing.T) {
+	w := &shortFlushingWarningWriter{shortWarningWriter: shortWarningWriter{limit: len("WARNING: x")}}
+	s := NewWarningService(w)
+	if err := s.Warning("xy"); !errors.Is(err, io.ErrShortWrite) || w.flushes != 0 {
+		t.Fatal("short write flushed incomplete warning", err, w.flushes)
+	}
+}
+
+type shortFlushingWarningWriter struct {
+	shortWarningWriter
+	flushes int
+}
+
+func (w *shortFlushingWarningWriter) Flush() error {
+	w.flushes++
+	return nil
+}
 
 type shortWarningWriter struct {
 	buf   bytes.Buffer

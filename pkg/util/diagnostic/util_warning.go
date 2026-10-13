@@ -123,7 +123,15 @@ func (s *WarningService) Warning(message string) error {
 	if e := writeWarningPart(w, message); e != nil {
 		return e
 	}
-	return writeWarningPart(w, "\n")
+	if e := writeWarningPart(w, "\n"); e != nil {
+		return e
+	}
+	// std::ostream::flush and fflush publish the completed warning. A borrowed
+	// buffered Go writer supplies the corresponding Flush method.
+	if f, ok := w.(interface{ Flush() error }); ok {
+		return f.Flush()
+	}
+	return nil
 }
 
 func writeWarningPart(w io.Writer, part string) error {
