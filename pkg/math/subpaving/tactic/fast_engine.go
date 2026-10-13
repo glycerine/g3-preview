@@ -35,6 +35,13 @@ func NewFastEngine(limit *control.Reslimit, numbers *numeral.FastFloatManager, r
 	if selected.Engine != EngineMPFF {
 		return nil, ErrFastEngineSelection
 	}
+	fastRuntime, rationalRuntime := numbers.RuntimeOwner(), rational.RuntimeOwner()
+	if fastRuntime == nil || rationalRuntime == nil {
+		return nil, arena.ErrInvalidSlot
+	}
+	if fastProcess, rationalProcess := fastRuntime.ProcessOwner(), rationalRuntime.ProcessOwner(); (fastProcess != nil || rationalProcess != nil) && fastProcess != rationalProcess {
+		return nil, arena.ErrConfig
+	}
 	shell, cause := subpaving.NewFastShellFromParams(numbers, limit, rational, pc, p)
 	if shell == nil {
 		return nil, cause

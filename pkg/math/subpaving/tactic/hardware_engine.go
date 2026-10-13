@@ -47,6 +47,13 @@ func NewHardwareEngine(limit *control.Reslimit, qm *numeral.RationalManager, pc 
 	}
 	e := &HardwareEngine{context: c, qm: qm, options: selected}
 	e.self = e
+	if runtime := qm.RuntimeOwner(); runtime != nil {
+		if process := runtime.ProcessOwner(); process != nil {
+			if bindErr := c.BindProcessAccounting(process); bindErr != nil {
+				return e, errors.Join(err, bindErr)
+			}
+		}
+	}
 	if err != nil {
 		return e, err
 	}
