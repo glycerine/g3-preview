@@ -35,17 +35,15 @@ func (e BinaryExtended) Display(w io.Writer, a *numeral.BinaryRational, k Extend
 			s = "+oo"
 		}
 	default:
-		var err error
 		if pretty {
-			s, err = e.Numbers.PrettyString(a)
-		} else {
-			s, err = e.Numbers.String(a)
+			return e.Numbers.DisplayPPTo(w, a)
 		}
-		if err != nil {
-			return err
-		}
+		return e.Numbers.DisplayTo(w, a)
 	}
-	_, err := io.WriteString(w, s)
+	n, err := io.WriteString(w, s)
+	if err == nil && n != len(s) {
+		return io.ErrShortWrite
+	}
 	return err
 }
 

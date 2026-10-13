@@ -92,7 +92,7 @@ func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 		t.Fatalf("finite pretty interval = %q", out.String())
 	}
 	writeErr := errors.New("binary upper endpoint refused")
-	refused := &binaryDisplayRefusal{remaining: 3, err: writeErr}
+	refused := &binaryDisplayRefusal{remaining: 4, err: writeErr}
 	if err := a.DisplayPP(refused); !errors.Is(err, writeErr) || refused.String() != "(-3/2, " {
 		t.Fatalf("pretty display refusal = (%q, %v)", refused.String(), err)
 	}
@@ -103,6 +103,14 @@ func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 	must(c.DisplayPP(&out))
 	if out.String() != "[-3/2<sup>3</sup>, 5/2<sup>2</sup>)" {
 		t.Fatalf("powered pretty interval = %q", out.String())
+	}
+	refused = &binaryDisplayRefusal{remaining: 4, err: writeErr}
+	if err := c.DisplayPP(refused); !errors.Is(err, writeErr) || refused.String() != "[-3/2<sup>" {
+		t.Fatalf("lower exponent insertion refusal = (%q, %v)", refused.String(), err)
+	}
+	refused = &binaryDisplayRefusal{remaining: 9, err: writeErr}
+	if err := c.DisplayPP(refused); !errors.Is(err, writeErr) || refused.String() != "[-3/2<sup>3</sup>, 5/2" {
+		t.Fatalf("upper exponent insertion refusal = (%q, %v)", refused.String(), err)
 	}
 	must(m.SetInt32(&lo, 1))
 	must(m.SetInt32Power(&hi, 3, 1))
