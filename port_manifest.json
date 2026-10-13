@@ -18092,7 +18092,8 @@
         "pkg/ast/pattern/candidates.go",
         "pkg/ast/pattern/contains_subpattern.go",
         "pkg/ast/pattern/candidate_selection.go",
-        "pkg/ast/pattern/multi_pattern.go"
+        "pkg/ast/pattern/multi_pattern.go",
+        "pkg/ast/pattern/preferred_pattern.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18100,7 +18101,8 @@
         "TestPatternInferenceContainsSubpatternAndBiggerFilter",
         "TestPatternInferenceStableWeightAndUnaryPatternOwnership",
         "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
-        "TestPatternInferenceMultiPatternThirtyTwoSplitCap"
+        "TestPatternInferenceMultiPatternThirtyTwoSplitCap",
+        "TestPatternInferencePreferredPatternsCompleteAndOwned"
       ],
       "conditionals": [
         {
@@ -18225,6 +18227,14 @@
             "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
             "TestPatternInferenceMultiPatternThirtyTwoSplitCap"
           ]
+        },
+        {
+          "name": "pattern_inference_cfg has_preferred_patterns selects complete preferred candidate apps in input order and owns singleton patterns",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/preferred_pattern.go",
+          "tests": [
+            "TestPatternInferencePreferredPatternsCompleteAndOwned"
+          ]
         }
       ],
       "ownership": [],
@@ -18242,7 +18252,8 @@
         "pkg/ast/pattern/candidates.go",
         "pkg/ast/pattern/contains_subpattern.go",
         "pkg/ast/pattern/candidate_selection.go",
-        "pkg/ast/pattern/multi_pattern.go"
+        "pkg/ast/pattern/multi_pattern.go",
+        "pkg/ast/pattern/preferred_pattern.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18250,7 +18261,8 @@
         "TestPatternInferenceContainsSubpatternAndBiggerFilter",
         "TestPatternInferenceStableWeightAndUnaryPatternOwnership",
         "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
-        "TestPatternInferenceMultiPatternThirtyTwoSplitCap"
+        "TestPatternInferenceMultiPatternThirtyTwoSplitCap",
+        "TestPatternInferencePreferredPatternsCompleteAndOwned"
       ],
       "conditionals": [
         {
@@ -18310,6 +18322,14 @@
           "tests": [
             "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
             "TestPatternInferenceMultiPatternThirtyTwoSplitCap"
+          ]
+        },
+        {
+          "name": "pattern_inference_cfg register_preferred borrowed declaration set and preferred-pattern result ownership",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/preferred_pattern.go",
+          "tests": [
+            "TestPatternInferencePreferredPatternsCompleteAndOwned"
           ]
         }
       ],
@@ -161736,7 +161756,8 @@
         "pkg/smtcore/smt_model_finder_hint_indexes.go",
         "pkg/tactic/ufbv/rewrite_rule_index.go",
         "pkg/tactic/ufbv/rewrite_back_index.go",
-        "pkg/tactic/ufbv/rewrite_demodulator_schedule.go"
+        "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
+        "pkg/ast/pattern/preferred_pattern.go"
       ],
       "tests": [
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
@@ -161800,7 +161821,8 @@
         "TestModelFinderHintPreprocessIndexesAndResidueCandidates",
         "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators",
         "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
-        "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
+        "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot",
+        "TestPatternInferencePreferredPatternsCompleteAndOwned"
       ],
       "conditionals": [
         {
@@ -161963,6 +161985,14 @@
           "go_target": "pkg/ast/pattern/candidates.go",
           "tests": [
             "TestPatternInferenceLoopFilterConcreteCandidateOwnership"
+          ]
+        },
+        {
+          "name": "pattern_inference preferred function declaration set uses a native map of borrowed AST handles",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/preferred_pattern.go",
+          "tests": [
+            "TestPatternInferencePreferredPatternsCompleteAndOwned"
           ]
         }
       ],
@@ -166008,7 +166038,8 @@
         "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
         "pkg/tactic/ufbv/rewrite_loop.go",
         "pkg/tactic/ufbv/rewrite_formula_process.go",
-        "pkg/tactic/ufbv/rewrite_tactic.go"
+        "pkg/tactic/ufbv/rewrite_tactic.go",
+        "pkg/ast/pattern/preferred_pattern.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -166031,7 +166062,8 @@
         "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier",
         "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults",
         "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
-        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
+        "TestPatternInferencePreferredPatternsCompleteAndOwned"
       ],
       "conditionals": [
         {
@@ -166180,6 +166212,14 @@
           "go_target": "pkg/ast/pattern/multi_pattern.go",
           "tests": [
             "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership"
+          ]
+        },
+        {
+          "name": "pattern_inference preferred app_ref_buffer singleton pattern ownership through ASTRef values",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/preferred_pattern.go",
+          "tests": [
+            "TestPatternInferencePreferredPatternsCompleteAndOwned"
           ]
         }
       ],

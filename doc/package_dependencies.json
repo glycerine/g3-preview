@@ -292,6 +292,7 @@
         "candidates.go",
         "contains_subpattern.go",
         "multi_pattern.go",
+        "preferred_pattern.go",
         "smaller_pattern.go"
       ]
     },
