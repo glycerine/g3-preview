@@ -4,8 +4,6 @@ package heap
 import (
 	"errors"
 	"reflect"
-	"strconv"
-	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
@@ -14,7 +12,6 @@ var ErrStopped = errors.New("g3: heap source assignment stopped after destructio
 
 var ErrValue = errors.New("g3: invalid, absent, or duplicate heap value")
 var ErrOwner = errors.New("g3: invalid heap owner")
-var ErrIndexDomain = errors.New("g3: undefined signed heap child shift")
 
 // Config borrows Less and its environment for the heap's lifetime.
 // Less must be a strict ordering, must not panic or reenter the heap, and may
@@ -355,38 +352,6 @@ func (h *Int) AppendValues(dst []int32) ([]int32, error) {
 		return dst, e
 	}
 	return append(dst, h.values[1:]...), nil
-}
-
-func (h *Int) Display() (string, error) {
-	if e := h.alive(); e != nil {
-		return "", e
-	}
-	var out strings.Builder
-	var walk func(int32, uint32) error
-	walk = func(i int32, indent uint32) error {
-		n := uint32(len(h.values))
-		if i >= int32(n) {
-			return nil
-		}
-		if i < 0 {
-			return arena.ErrBounds
-		}
-		value := h.values[i]
-		for j := uint32(0); j < indent; j++ {
-			out.WriteByte(' ')
-		}
-		out.WriteString(strconv.FormatInt(int64(value), 10))
-		out.WriteByte('\n')
-		if i < 0 || i > int32(^uint32(0)>>2) {
-			return ErrIndexDomain
-		}
-		if e := walk(i<<1, indent+1); e != nil {
-			return e
-		}
-		return walk((i<<1)+1, indent+1)
-	}
-	e := walk(1, 0)
-	return out.String(), e
 }
 
 // Swap exchanges only the source value and inverse-index vectors, leaving

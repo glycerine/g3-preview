@@ -203,11 +203,6 @@ func TestHeapSourceShapeAndLifetime(t *testing.T) {
 			t.Fatal("source array layout", values)
 		}
 	}
-	text, e := h.Display()
-	heapMust(t, e)
-	if text != "1\n 2\n  4\n  3\n 5\n  6\n  7\n" {
-		t.Fatal("source display", text)
-	}
 	it := h.Begin()
 	if v, e := it.Value(); e != nil || v != 1 {
 		t.Fatal("iterator", v, e)
