@@ -39521,6 +39521,14 @@ Rational setters, formatting, power-of-two inspection, the parallel MPF
 specialization and enclosing subpaving context remain open; `f2n.h` is
 therefore partial rather than complete.
 
+HWF rational input now follows the reached source chain: project integers are
+converted with `UINT_MAX` as the floating radix under the selected directed
+mode, and the two projected binary64 values are divided. The concrete HWF
+wrapper applies its regular-result check after setting an integer ratio or
+rational value. `1/3` direction cases and a large-integer source projection
+are covered; binary64-to-rational output, formatting, the owned rational
+child and the subpaving context remain open.
+
 ### Environment parameter runtime boundary
 
 `src/util/env_params.h/.cpp` has exactly two static operations. The five

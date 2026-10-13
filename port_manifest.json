@@ -117102,11 +117102,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/numeral/hwf_numeral.go"
+        "pkg/util/numeral/hwf_numeral.go",
+        "pkg/util/numeral/hwf_rational_set.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
-        "TestHardwareFloatNumeralFloorCeilPowerAndGuards"
+        "TestHardwareFloatNumeralFloorCeilPowerAndGuards",
+        "TestHardwareFloatSourceRationalInputDirectedBounds",
+        "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards"
       ],
       "conditionals": [
         {
@@ -117157,7 +117160,16 @@
           ]
         },
         {
-          "name": "Remaining f2n<hwf_manager> rational conversion, formatting, power-of-two and enclosing subpaving caller paths",
+          "name": "f2n<hwf_manager> checked ratio and rational setters",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_rational_set.go",
+          "tests": [
+            "TestHardwareFloatSourceRationalInputDirectedBounds",
+            "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards"
+          ]
+        },
+        {
+          "name": "Remaining f2n<hwf_manager> formatting, power-of-two and enclosing subpaving caller paths",
           "status": "unported"
         },
         {
@@ -118943,7 +118955,8 @@
       "go_targets": [
         "pkg/util/numeral/hwf_value.go",
         "pkg/util/numeral/hwf_arithmetic.go",
-        "pkg/util/numeral/hwf_round_select.go"
+        "pkg/util/numeral/hwf_round_select.go",
+        "pkg/util/numeral/hwf_rational_set.go"
       ],
       "tests": [
         "TestHardwareFloatSourceBinary64Classification",
@@ -118952,7 +118965,9 @@
         "TestHardwareFloatDirectedArithmetic",
         "TestHardwareFloatArithmeticGuardsAndAliasing",
         "TestHardwareFloatRoundToIntegralSourceModes",
-        "TestHardwareFloatSourceRemainderAndSSESelection"
+        "TestHardwareFloatSourceRemainderAndSSESelection",
+        "TestHardwareFloatSourceRationalInputDirectedBounds",
+        "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards"
       ],
       "conditionals": [
         {
@@ -119362,7 +119377,16 @@
           ]
         },
         {
-          "name": "Remaining HWF fused arithmetic, square root, rational conversion, formatting and owning manager lifetime reached by subpaving",
+          "name": "hwf.cpp:101-105,114-117 directed integer-ratio and rational setters",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_rational_set.go",
+          "tests": [
+            "TestHardwareFloatSourceRationalInputDirectedBounds",
+            "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards"
+          ]
+        },
+        {
+          "name": "Remaining HWF fused arithmetic, square root, binary rational output conversion, formatting and owning manager lifetime reached by subpaving",
           "status": "unported"
         }
       ],
@@ -119370,7 +119394,7 @@
         "The concrete binary64 value is scalar and pointer-free; the Go scalar manager has no owned child. The source hwf_manager also owns an mpq manager for conversion, which is not yet ported into the HWF subpaving path."
       ],
       "deviations": [
-        "The retained subpaving tactic owns hwf_manager and f2n<hwf_manager>. The Go binary64 scalar/profile uses math.Float64bits/frombits for exact source fields and Go comparisons. Directed arithmetic and integral rounding avoid changing process-wide FPU mode; conversion and owning manager path remain open."
+        "The retained subpaving tactic owns hwf_manager and f2n<hwf_manager>. The Go binary64 scalar/profile uses math.Float64bits/frombits for exact source fields and Go comparisons. Directed arithmetic and integral rounding avoid changing process-wide FPU mode. Rational input conversion repeats the source UINT_MAX integer radix under the selected mode, then divides. Binary rational output and owning manager path remain open."
       ]
     },
     {
@@ -119381,7 +119405,8 @@
       "go_targets": [
         "pkg/util/numeral/hwf_value.go",
         "pkg/util/numeral/hwf_arithmetic.go",
-        "pkg/util/numeral/hwf_round_select.go"
+        "pkg/util/numeral/hwf_round_select.go",
+        "pkg/util/numeral/hwf_rational_set.go"
       ],
       "tests": [
         "TestHardwareFloatSourceBinary64Classification",
@@ -119390,7 +119415,9 @@
         "TestHardwareFloatDirectedArithmetic",
         "TestHardwareFloatArithmeticGuardsAndAliasing",
         "TestHardwareFloatRoundToIntegralSourceModes",
-        "TestHardwareFloatSourceRemainderAndSSESelection"
+        "TestHardwareFloatSourceRemainderAndSSESelection",
+        "TestHardwareFloatSourceRationalInputDirectedBounds",
+        "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards"
       ],
       "conditionals": [
         {
@@ -119448,7 +119475,16 @@
           ]
         },
         {
-          "name": "Remaining hwf_manager fused arithmetic, square root, conversion, formatting and owned mpq-manager declaration paths",
+          "name": "hwf_manager directed integer-ratio and rational setter declarations",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_rational_set.go",
+          "tests": [
+            "TestHardwareFloatSourceRationalInputDirectedBounds",
+            "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards"
+          ]
+        },
+        {
+          "name": "Remaining hwf_manager fused arithmetic, square root, binary rational output, formatting and owned mpq-manager declaration paths",
           "status": "unported"
         }
       ],
@@ -119456,7 +119492,7 @@
         "HardwareFloat values are pointer-free binary64 scalars. The selected Go manager owns no storage; the source manager's mpq child remains open."
       ],
       "deviations": [
-        "The HWF branch is selected by the retained subpaving tactic numeral option. Its scalar value, classification and basic directed arithmetic are ported; concrete f2n/hardware-manager ownership still require the subpaving consumer port."
+        "The HWF branch is selected by the retained subpaving tactic numeral option. Its scalar value, classification, basic directed arithmetic and rational input are ported; concrete subpaving integration and hardware-manager ownership remain open."
       ]
     },
     {
