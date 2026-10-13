@@ -69,7 +69,7 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	if err := qm.Z.Add(&big, &one, &big); err != nil {
 		t.Fatal(err)
 	}
-	if _, _, err := w.PrepareSum(&three, []*numeral.Int{&one, &big}); !errors.Is(err, ErrArbitraryShellInexactInteger) {
+	if _, _, err := w.PrepareSum(&three, []*numeral.Int{&one, &big}); !errors.Is(err, ErrArbitraryShellInexactInteger) || !errors.Is(err, ErrSubpavingFailure) {
 		t.Fatalf("rounded large coefficient: %v", err)
 	}
 	if err := qm.Z.Sub(&big, &one, &big); err != nil {
@@ -311,5 +311,42 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	}
 	if _, err := context.NewVariable(false); !errors.Is(err, arena.ErrClosed) {
 		t.Fatalf("closed MPF context: %v", err)
+	}
+}
+
+func TestArbitraryShellCatchesNonregularNumeralAtInequalityBoundary(t *testing.T) {
+	f := newArbitraryClauseFixture(t)
+	w, err := NewArbitraryShellCoefficients(f.context)
+	if err != nil {
+		t.Fatal(err)
+	}
+	core, err := f.numbers.BorrowCore()
+	if err != nil {
+		t.Fatal(err)
+	}
+	qm, err := core.BorrowRationalManager()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var power numeral.Int
+	q := numeral.NewRational()
+	t.Cleanup(func() {
+		for _, e := range []error{w.Close(), qm.Del(&q), qm.Z.Del(&power)} {
+			if e != nil {
+				t.Error(e)
+			}
+		}
+	})
+	if err := qm.Z.Power(&numeral.Int{Val: 2}, 2000, &power); err != nil {
+		t.Fatal(err)
+	}
+	if err := qm.SetInteger(&q, &power); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := w.PrepareInequality(&q, false); !errors.Is(err, ErrSubpavingFailure) || errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
+		t.Fatal("source MPF wrapper must replace its caught numeral exception", err)
+	}
+	if _, _, err := w.PrepareSum(&power, nil); !errors.Is(err, ErrSubpavingFailure) || errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
+		t.Fatal("source MPF sum conversion must replace its caught numeral exception", err)
 	}
 }

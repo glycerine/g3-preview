@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/math/subpaving"
 	goaltactic "github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/memory"
@@ -197,8 +198,8 @@ func TestArbitraryExprConverterTermsAndClause(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := converter.InternalizeTerm(zeroConstant, &n, &d); !errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
-		t.Fatal("MPF f2n zero-constant refusal", err)
+	if _, err := converter.InternalizeTerm(zeroConstant, &n, &d); !errors.Is(err, subpaving.ErrSubpavingFailure) || errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
+		t.Fatal("MPF wrapper replaces zero-constant f2n refusal", err)
 	}
 }
 

@@ -50822,7 +50822,9 @@
           "status": "partial",
           "go_target": "pkg/math/subpaving/arbitrary_shell_coefficients.go",
           "tests": [
-            "TestArbitraryShellCoefficientSourceConversionAndCleanup"
+            "TestArbitraryShellCoefficientSourceConversionAndCleanup",
+            "TestArbitraryShellCatchesNonregularNumeralAtInequalityBoundary",
+            "TestArbitraryExprConverterTermsAndClause"
           ]
         },
         {

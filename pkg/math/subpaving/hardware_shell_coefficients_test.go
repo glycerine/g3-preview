@@ -65,7 +65,7 @@ func TestSubpavingHardwareShellCoefficientAndInequalityConversion(t *testing.T) 
 	}
 	must(qm.Z.SetInt64(&values[0], 1<<53))
 	must(qm.Z.SetInt64(&values[1], 1<<53+1))
-	if err := w.PrepareSum(&values[2], []*numeral.Int{&values[0], &values[1]}); !errors.Is(err, ErrHardwareShellInexactInteger) {
+	if err := w.PrepareSum(&values[2], []*numeral.Int{&values[0], &values[1]}); !errors.Is(err, ErrHardwareShellInexactInteger) || !errors.Is(err, ErrSubpavingFailure) {
 		t.Fatal("rounded coefficient", err)
 	}
 	if m.ToFloat64(&w.coefficients[0]) != 1<<53 || m.ToFloat64(&w.coefficients[1]) != 1<<53 || m.ToFloat64(&w.constant) != 5 {
@@ -77,11 +77,11 @@ func TestSubpavingHardwareShellCoefficientAndInequalityConversion(t *testing.T) 
 		t.Fatal("exact minimum int64")
 	}
 	must(qm.Z.SetInt64(&values[0], math.MaxInt64))
-	if err := w.PrepareSum(&values[2], []*numeral.Int{&values[0]}); !errors.Is(err, ErrHardwareShellInexactInteger) {
+	if err := w.PrepareSum(&values[2], []*numeral.Int{&values[0]}); !errors.Is(err, ErrHardwareShellInexactInteger) || !errors.Is(err, ErrSubpavingFailure) {
 		t.Fatal("maximum int64 rounds outside range", err)
 	}
 	must(qm.Z.SetString(&values[3], "9223372036854775808"))
-	if err := w.PrepareSum(&values[2], []*numeral.Int{&values[3]}); !errors.Is(err, ErrHardwareShellInexactInteger) {
+	if err := w.PrepareSum(&values[2], []*numeral.Int{&values[3]}); !errors.Is(err, ErrHardwareShellInexactInteger) || !errors.Is(err, ErrSubpavingFailure) {
 		t.Fatal("out-of-int64 coefficient", err)
 	}
 	must(qm.SetFractionSigned(&q, 1, 3))
@@ -133,6 +133,11 @@ func TestSubpavingHardwareShellCoefficientAndInequalityConversion(t *testing.T) 
 	}
 	if _, err := w.MkInequality(99, &q, true, false); !errors.Is(err, arena.ErrInvalidSlot) || len(c.inequalities) != 2 {
 		t.Fatal("invalid inequality variable", err)
+	}
+	must(qm.Z.Power(&numeral.Int{Val: 2}, 2000, &values[0]))
+	must(qm.SetInteger(&q, &values[0]))
+	if err := w.PrepareInequality(&q, false); !errors.Is(err, numeral.ErrHardwareFloatNonRegular) || errors.Is(err, ErrSubpavingFailure) {
+		t.Fatal("source hardware wrapper preserves uncaught hardware numeral exception", err)
 	}
 	root, err := c.CreateRootNode()
 	must(err)

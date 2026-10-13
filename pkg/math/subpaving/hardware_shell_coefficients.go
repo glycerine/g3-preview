@@ -2,7 +2,6 @@
 package subpaving
 
 import (
-	"errors"
 	"io"
 	"math/big"
 
@@ -12,7 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
-var ErrHardwareShellInexactInteger = errors.New("subpaving: integer coefficient cannot be represented exactly as hardware float")
+var ErrHardwareShellInexactInteger error = &sourceFailure{message: "subpaving: integer coefficient cannot be represented exactly as hardware float"}
 
 // HardwareShellCoefficients owns the scalar coefficient scratch of the
 // retained context_hwf_wrapper. The context and rational manager are borrowed.
@@ -94,6 +93,8 @@ func (w *HardwareShellCoefficients) PrepareSum(constant *numeral.Int, coefficien
 
 // PrepareInequality keeps the source's direction-dependent rounding mode
 // before converting the borrowed rational into the wrapper's scalar scratch.
+// The source catch names f2n<mpf_manager>, so a hardware f2n exception passes
+// through unchanged.
 func (w *HardwareShellCoefficients) PrepareInequality(value *numeral.Rational, lower bool) error {
 	if err := w.open(); err != nil {
 		return err

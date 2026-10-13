@@ -13,7 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
-var ErrArbitraryShellInexactInteger = errors.New("subpaving: integer coefficient cannot be represented exactly as arbitrary float")
+var ErrArbitraryShellInexactInteger error = &sourceFailure{message: "subpaving: integer coefficient cannot be represented exactly as arbitrary float"}
 
 // ArbitraryShellCoefficients owns the source wrapper's constant, coefficient
 // numerals and rational comparison scratch. Its managers are borrowed.
@@ -186,7 +186,8 @@ func (w *ArbitraryShellCoefficients) MkSum(constant *numeral.Int, coefficients [
 	if err != nil {
 		return 0, err
 	}
-	return w.context.DefinePolynomial(c, as, variables)
+	variable, err := w.context.DefinePolynomial(c, as, variables)
+	return variable, sourceArbitraryFailure(err)
 }
 
 func (w *ArbitraryShellCoefficients) MkInequality(variable uint32, value *numeral.Rational, lower, open bool) (*ArbitraryInequality, error) {
@@ -194,7 +195,8 @@ func (w *ArbitraryShellCoefficients) MkInequality(variable uint32, value *numera
 	if err != nil {
 		return nil, err
 	}
-	return w.context.NewInequality(variable, bound, lower, open)
+	atom, err := w.context.NewInequality(variable, bound, lower, open)
+	return atom, sourceArbitraryFailure(err)
 }
 
 func (w *ArbitraryShellCoefficients) intToArbitrary(value *numeral.Int, out *numeral.ArbitraryFloat) error {
@@ -202,7 +204,7 @@ func (w *ArbitraryShellCoefficients) intToArbitrary(value *numeral.Int, out *num
 		return err
 	}
 	if err := w.numbers.SetRational(out, &w.before); err != nil {
-		return err
+		return sourceArbitraryFailure(err)
 	}
 	if err := w.core.ToRational(out, w.rational, &w.back); err != nil {
 		return err
@@ -250,7 +252,7 @@ func (w *ArbitraryShellCoefficients) PrepareInequality(value *numeral.Rational, 
 	}
 	w.numbers.SetRounding(!lower)
 	if err := w.numbers.SetRational(&w.constant, value); err != nil {
-		return nil, err
+		return nil, sourceArbitraryFailure(err)
 	}
 	return &w.constant, nil
 }

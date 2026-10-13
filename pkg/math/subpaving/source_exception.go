@@ -1,5 +1,5 @@
-// Source: src/math/subpaving/subpaving_types.h:30-31 and the concrete MPFF
-// throws in subpaving.cpp:213, subpaving_t_def.h:237,570.
+// Source: src/math/subpaving/subpaving_types.h:30-31 and the concrete
+// wrapper and context throws in subpaving.cpp and subpaving_t_def.h.
 package subpaving
 
 import (
@@ -19,6 +19,15 @@ func (e *sourceFailure) Unwrap() error { return ErrSubpavingFailure }
 // replaces it with a message-free subpaving::exception.
 func sourceFastFailure(err error) error {
 	if errors.Is(err, numeral.ErrFastFloatDomain) {
+		return ErrSubpavingFailure
+	}
+	return err
+}
+
+// The MPF wrapper catches f2n<mpf_manager>::exception around conversion,
+// construction, and inequality publication.
+func sourceArbitraryFailure(err error) error {
+	if errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
 		return ErrSubpavingFailure
 	}
 	return err
