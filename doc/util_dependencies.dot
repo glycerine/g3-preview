@@ -61,6 +61,14 @@ digraph packages {
   "util/params" -> "util/z3exception";
   "util/prime" [style=filled, fillcolor="#dceafa"];
   "util/prime" -> "arena";
+  "util/process" [style=filled, fillcolor="#dceafa"];
+  "util/process" -> "arena";
+  "util/process" -> "util/diagnostic";
+  "util/process" -> "util/memory";
+  "util/process" -> "util/numeral";
+  "util/process" -> "util/params";
+  "util/process" -> "util/prime";
+  "util/process" -> "util/symbol";
   "util/productiter" [style=filled, fillcolor="#dceafa"];
   "util/random" [style=filled, fillcolor="#dceafa"];
   "util/sexpr" [style=filled, fillcolor="#dceafa"];
@@ -76,7 +84,10 @@ digraph packages {
   "util/stack" [style=filled, fillcolor="#dceafa"];
   "util/stack" -> "arena";
   "util/statistics" [style=filled, fillcolor="#dceafa"];
+  "util/statistics" -> "arena";
+  "util/statistics" -> "util/memory";
   "util/stopwatch" [style=filled, fillcolor="#dceafa"];
+  "util/stopwatch" -> "util/memory";
   "util/symbol" [style=filled, fillcolor="#dceafa"];
   "util/symbol" -> "arena";
   "util/symbol" -> "util/hash";
