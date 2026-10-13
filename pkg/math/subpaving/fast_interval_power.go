@@ -129,11 +129,18 @@ func (v *FastInterval) Power(src *FastInterval, n uint32) (err error) {
 			if e != nil {
 				return e
 			}
-			cmp, e := extended.Compare(left, lk, right, rk)
+			pickLeft, e := extended.Greater(left, lk, right, rk)
 			if e != nil {
 				return e
 			}
-			if cmp > 0 || cmp == 0 && !lowerOpen && upperOpen {
+			if !pickLeft {
+				equal, e1 := extended.Equal(left, lk, right, rk)
+				if e1 != nil {
+					return e1
+				}
+				pickLeft = equal && !lowerOpen && upperOpen
+			}
+			if pickLeft {
 				if err = m.Swap(hi, left); err != nil {
 					return err
 				}

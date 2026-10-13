@@ -94,6 +94,17 @@ func (e FastExtended) Equal(a *numeral.FastFloat, ak ExtendedKind, b *numeral.Fa
 	return e.Numbers.Equal(a, b)
 }
 
+func (e FastExtended) Less(a *numeral.FastFloat, ak ExtendedKind, b *numeral.FastFloat, bk ExtendedKind) (bool, error) {
+	if ak != Finite || bk != Finite {
+		return ak < bk, nil
+	}
+	return e.Numbers.Less(a, b)
+}
+
+func (e FastExtended) Greater(a *numeral.FastFloat, ak ExtendedKind, b *numeral.FastFloat, bk ExtendedKind) (bool, error) {
+	return e.Less(b, bk, a, ak)
+}
+
 func (e FastExtended) Neg(a *numeral.FastFloat, k ExtendedKind) (ExtendedKind, error) {
 	if k == MinusInfinity {
 		return PlusInfinity, nil

@@ -83,6 +83,17 @@ func (e FixedExtended) Equal(a *numeral.FixedPoint, ak ExtendedKind, b *numeral.
 	return e.Numbers.Equal(a, b)
 }
 
+func (e FixedExtended) Less(a *numeral.FixedPoint, ak ExtendedKind, b *numeral.FixedPoint, bk ExtendedKind) (bool, error) {
+	if ak != Finite || bk != Finite {
+		return ak < bk, nil
+	}
+	return e.Numbers.Less(a, b)
+}
+
+func (e FixedExtended) Greater(a *numeral.FixedPoint, ak ExtendedKind, b *numeral.FixedPoint, bk ExtendedKind) (bool, error) {
+	return e.Less(b, bk, a, ak)
+}
+
 func (e FixedExtended) Neg(a *numeral.FixedPoint, k ExtendedKind) (ExtendedKind, error) {
 	if k == MinusInfinity {
 		return PlusInfinity, nil

@@ -208,11 +208,18 @@ func (v *FixedInterval) Mul(a, b *FixedInterval) (err error) {
 		}
 		adOpen, bcOpen := al.open || bu.open, au.open || bl.open
 		acOpen, bdOpen := al.open || bl.open, au.open || bu.open
-		cmp, x := e.Compare(ad, adk, bcval, bck)
+		pickAD, x := e.Less(ad, adk, bcval, bck)
 		if x != nil {
 			return x
 		}
-		if cmp < 0 || cmp == 0 && !adOpen && bcOpen {
+		if !pickAD {
+			equal, e1 := e.Equal(ad, adk, bcval, bck)
+			if e1 != nil {
+				return e1
+			}
+			pickAD = equal && !adOpen && bcOpen
+		}
+		if pickAD {
 			if err = m.Swap(lower, ad); err != nil {
 				return err
 			}
@@ -223,11 +230,18 @@ func (v *FixedInterval) Mul(a, b *FixedInterval) (err error) {
 			}
 			lk, lowerOpen = bck, bcOpen
 		}
-		cmp, x = e.Compare(acval, ack, bd, bdk)
+		pickAC, x := e.Greater(acval, ack, bd, bdk)
 		if x != nil {
 			return x
 		}
-		if cmp > 0 || cmp == 0 && !acOpen && bdOpen {
+		if !pickAC {
+			equal, e1 := e.Equal(acval, ack, bd, bdk)
+			if e1 != nil {
+				return e1
+			}
+			pickAC = equal && !acOpen && bdOpen
+		}
+		if pickAC {
 			if err = m.Swap(upper, acval); err != nil {
 				return err
 			}
