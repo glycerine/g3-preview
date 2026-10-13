@@ -50245,6 +50245,7 @@
         "pkg/math/subpaving/arbitrary_shell_coefficients_test.go",
         "pkg/math/subpaving/arbitrary_polynomial.go",
         "pkg/math/subpaving/arbitrary_monomial.go",
+        "pkg/math/subpaving/arbitrary_clause.go",
         "pkg/math/subpaving/hardware_shell_search_test.go",
         "pkg/math/subpaving/hardware_statistics_test.go",
         "pkg/math/subpaving/hardware_display_test.go",
@@ -50283,7 +50284,7 @@
           ]
         },
         {
-          "name": "Concrete context_mpf wrapper exact integer coefficient preparation, mk_sum, mk_monomial, mk_var and directed mk_ineq construction (src/math/subpaving/subpaving.cpp:44-45,85-136)",
+          "name": "Concrete context_mpf wrapper exact integer coefficient preparation, mk_sum, mk_monomial, mk_var, add_clause and directed mk_ineq construction (src/math/subpaving/subpaving.cpp:44-48,85-136)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/arbitrary_shell_coefficients.go",
           "tests": [
@@ -51774,6 +51775,7 @@
         "pkg/math/subpaving/arbitrary_context_root.go",
         "pkg/math/subpaving/arbitrary_polynomial.go",
         "pkg/math/subpaving/arbitrary_monomial.go",
+        "pkg/math/subpaving/arbitrary_clause.go",
         "pkg/math/subpaving/hardware_interval.go",
         "pkg/math/subpaving/hardware_interval_arith.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
@@ -52477,6 +52479,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_params.go",
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf ordinary watched clause and singleton axiom unit registration, stable atom sort, references and distinct-variable watchers (src/math/subpaving/subpaving_t_def.h:773-869)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_clause.go",
+          "tests": [
+            "TestArbitraryShellCoefficientSourceConversionAndCleanup"
           ]
         },
         {

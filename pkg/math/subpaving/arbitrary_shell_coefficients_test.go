@@ -201,6 +201,30 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	if _, err := w.MkInequality(uint32(len(context.variables)), &q, false, true); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatalf("unknown context variable: %v", err)
 	}
+	bAtom, err := w.MkInequality(y, &q, false, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cAtom, err := w.MkInequality(x, &q, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	clause, err := w.AddClause([]*ArbitraryInequality{bAtom, a, cAtom})
+	if err != nil || clause == nil || len(clause.atoms) != 3 || clause.atoms[0] != a || clause.atoms[1] != cAtom || clause.atoms[2] != bAtom {
+		t.Fatalf("stable MPF clause sort: %+v, %v", clause, err)
+	}
+	if a.refs != 1 || bAtom.refs != 1 || cAtom.refs != 1 || len(context.clauseWatchers[x]) != 1 || context.clauseWatchers[x][0] != clause || len(context.clauseWatchers[y]) != 1 || context.clauseWatchers[y][0] != clause {
+		t.Fatalf("MPF clause references and unique watches: %d, %d, %d, %v, %v", a.refs, bAtom.refs, cAtom.refs, context.clauseWatchers[x], context.clauseWatchers[y])
+	}
+	if singleton, err := w.AddClause([]*ArbitraryInequality{a}); err != nil || singleton != nil || len(context.unitClauses) != 1 || !context.unitClauses[0].axiom || a.refs != 2 {
+		t.Fatalf("singleton MPF axiom unit: %v, %v", singleton, err)
+	}
+	if _, err := w.AddClause(nil); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("empty MPF clause: %v", err)
+	}
+	if _, err := w.AddClause([]*ArbitraryInequality{a, nil}); !errors.Is(err, arena.ErrInvalidSlot) || a.refs != 2 {
+		t.Fatalf("invalid MPF atom before any ref publication: %v, %d", err, a.refs)
+	}
 	beforeStopped := len(context.inequalities)
 	b.FailAfter(0)
 	_, stopped := context.NewInequality(x, &a.value, true, false)
@@ -216,6 +240,9 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	}
 	if err := context.Close(); err != nil {
 		t.Fatal(err)
+	}
+	if a.refs != 0 || bAtom.refs != 0 || cAtom.refs != 0 {
+		t.Fatalf("MPF clause/unit references after context cleanup: %d, %d, %d", a.refs, bAtom.refs, cAtom.refs)
 	}
 	if _, err := context.NewVariable(false); !errors.Is(err, arena.ErrClosed) {
 		t.Fatalf("closed MPF context: %v", err)

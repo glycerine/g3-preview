@@ -21,12 +21,15 @@ type ArbitraryContext struct {
 	limit                                           *control.Reslimit
 	variables                                       []bool
 	watchers                                        [][]uint32
+	clauseWatchers                                  [][]*ArbitraryClause
 	polynomials                                     map[uint32]*ArbitraryPolynomial
 	polynomialOwners                                []*ArbitraryPolynomial
 	monomials                                       map[uint32]*ArbitraryMonomial
 	powersScratch                                   []ArbitraryPower
 	numBuffer                                       []numeral.ArbitraryFloat
 	inequalities                                    []*ArbitraryInequality
+	clauses                                         []*ArbitraryClause
+	unitClauses                                     []arbitraryUnitClause
 	owners                                          [4]*numeral.ScopedArbitraryFloatNumeral
 	epsilon, maxBound, minusMaxBound, rootPrecision *numeral.ArbitraryFloat
 	zeroEpsilon                                     bool
@@ -40,6 +43,7 @@ type ArbitraryInequality struct {
 	value    numeral.ArbitraryFloat
 	lower    bool
 	open     bool
+	refs     uint32
 }
 
 // NewArbitraryContext takes the source epsilon, max_bound exponent and
@@ -135,6 +139,7 @@ func (c *ArbitraryContext) NewVariable(integer bool) (uint32, error) {
 	x := uint32(len(c.variables))
 	c.variables = append(c.variables, integer)
 	c.watchers = append(c.watchers, nil)
+	c.clauseWatchers = append(c.clauseWatchers, nil)
 	return x, nil
 }
 
@@ -174,6 +179,28 @@ func (c *ArbitraryContext) Close() error {
 	if err := c.closeNumerals(); err != nil {
 		return err
 	}
+	for len(c.unitClauses) != 0 {
+		a := c.unitClauses[0].atom
+		if a.refs == 0 {
+			return arena.ErrInvalidSlot
+		}
+		a.refs--
+		c.unitClauses = c.unitClauses[1:]
+	}
+	for len(c.clauses) != 0 {
+		clause := c.clauses[0]
+		for _, a := range clause.atoms {
+			if a.refs == 0 {
+				return arena.ErrInvalidSlot
+			}
+			a.refs--
+		}
+		c.clauses[0] = nil
+		c.clauses = c.clauses[1:]
+	}
+	c.unitClauses = nil
+	c.clauses = nil
+	c.clauseWatchers = nil
 	for len(c.inequalities) != 0 {
 		a := c.inequalities[0]
 		if err := c.numbers.Del(&a.value); err != nil {
