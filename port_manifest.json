@@ -34684,7 +34684,9 @@
         "pkg/math/subpaving/fast_interval_scalar.go",
         "pkg/math/subpaving/fast_interval_scalar_test.go",
         "pkg/math/subpaving/fast_interval_power.go",
-        "pkg/math/subpaving/fast_interval_power_test.go"
+        "pkg/math/subpaving/fast_interval_power_test.go",
+        "pkg/math/interval/hardware_root.go",
+        "pkg/math/subpaving/hardware_interval_root.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34698,7 +34700,9 @@
         "TestSubpavingFastIntervalDivSignBranches",
         "TestSubpavingFastIntervalScalarMulDiv",
         "TestSubpavingFastIntervalPowerRetainedCases",
-        "TestSubpavingFastNodeConstantIntervalViews"
+        "TestSubpavingFastNodeConstantIntervalViews",
+        "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
+        "TestSubpavingHardwareIntervalXnEqYRetainedCases"
       ],
       "conditionals": [
         {
@@ -34753,6 +34757,14 @@
           "go_target": "pkg/math/realclosure/binary_interval.go",
           "tests": [
             "TestRealClosureBinaryIntervalRetainedCore"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf Newton root and interval inverse-image declarations (src/math/interval/interval.h:147-152,302-307)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/hardware_root.go",
+          "tests": [
+            "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation"
           ]
         }
       ],
@@ -34822,7 +34834,9 @@
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
         "pkg/math/subpaving/hardware_interval_mul.go",
-        "pkg/math/subpaving/hardware_interval_div.go"
+        "pkg/math/subpaving/hardware_interval_div.go",
+        "pkg/math/interval/hardware_root.go",
+        "pkg/math/subpaving/hardware_interval_root.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34856,7 +34870,9 @@
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
         "TestSubpavingHardwareIntervalPowerRetainedBranches",
         "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
-        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
+        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
+        "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
+        "TestSubpavingHardwareIntervalXnEqYRetainedCases"
       ],
       "conditionals": [
         {
@@ -35567,6 +35583,22 @@
           "go_target": "pkg/math/subpaving/hardware_interval_div.go",
           "tests": [
             "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf Newton nth-root scalar enclosure (src/math/interval/interval_def.h:175-380)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/hardware_root.go",
+          "tests": [
+            "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval nth-root and xn_eq_y inverse image (src/math/interval/interval_def.h:1390-1478)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_root.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalXnEqYRetainedCases"
           ]
         }
       ],
@@ -50256,14 +50288,18 @@
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
         "pkg/math/subpaving/hardware_interval_mul.go",
-        "pkg/math/subpaving/hardware_interval_div.go"
+        "pkg/math/subpaving/hardware_interval_div.go",
+        "pkg/math/interval/hardware_root.go",
+        "pkg/math/subpaving/hardware_interval_root.go"
       ],
       "tests": [
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
         "TestSubpavingHardwareIntervalPowerRetainedBranches",
         "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
-        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
+        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
+        "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
+        "TestSubpavingHardwareIntervalXnEqYRetainedCases"
       ],
       "conditionals": [
         {
@@ -50324,6 +50360,22 @@
           "go_target": "pkg/math/subpaving/hardware_interval_div.go",
           "tests": [
             "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf Newton nth-root scalar enclosure (src/math/interval/interval_def.h:175-380)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/hardware_root.go",
+          "tests": [
+            "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval nth-root and xn_eq_y inverse image (src/math/interval/interval_def.h:1390-1478)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_root.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalXnEqYRetainedCases"
           ]
         }
       ],
@@ -50844,7 +50896,9 @@
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
         "pkg/math/subpaving/hardware_interval_mul.go",
-        "pkg/math/subpaving/hardware_interval_div.go"
+        "pkg/math/subpaving/hardware_interval_div.go",
+        "pkg/math/interval/hardware_root.go",
+        "pkg/math/subpaving/hardware_interval_root.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50907,7 +50961,9 @@
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
         "TestSubpavingHardwareIntervalPowerRetainedBranches",
         "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
-        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
+        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
+        "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
+        "TestSubpavingHardwareIntervalXnEqYRetainedCases"
       ],
       "conditionals": [
         {
@@ -51224,6 +51280,22 @@
           "tests": [
             "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
           ]
+        },
+        {
+          "name": "Concrete config_hwf Newton nth-root scalar enclosure (src/math/interval/interval_def.h:175-380)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/hardware_root.go",
+          "tests": [
+            "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval nth-root and xn_eq_y inverse image (src/math/interval/interval_def.h:1390-1478)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_root.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalXnEqYRetainedCases"
+          ]
         }
       ],
       "ownership": [
@@ -51292,7 +51364,9 @@
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
         "pkg/math/subpaving/hardware_interval_mul.go",
-        "pkg/math/subpaving/hardware_interval_div.go"
+        "pkg/math/subpaving/hardware_interval_div.go",
+        "pkg/math/interval/hardware_root.go",
+        "pkg/math/subpaving/hardware_interval_root.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51346,7 +51420,9 @@
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
         "TestSubpavingHardwareIntervalPowerRetainedBranches",
         "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
-        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
+        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
+        "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
+        "TestSubpavingHardwareIntervalXnEqYRetainedCases"
       ],
       "assertions": [
         {
@@ -51904,6 +51980,22 @@
           "go_target": "pkg/math/subpaving/hardware_interval_div.go",
           "tests": [
             "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf Newton nth-root scalar enclosure (src/math/interval/interval_def.h:175-380)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/hardware_root.go",
+          "tests": [
+            "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval nth-root and xn_eq_y inverse image (src/math/interval/interval_def.h:1390-1478)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_root.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalXnEqYRetainedCases"
           ]
         }
       ],
@@ -117687,7 +117779,9 @@
         "pkg/math/subpaving/hardware_interval_power.go",
         "pkg/math/subpaving/hardware_interval_mul.go",
         "pkg/math/subpaving/hardware_interval_div.go",
-        "pkg/util/numeral/hwf_power_of_two.go"
+        "pkg/util/numeral/hwf_power_of_two.go",
+        "pkg/math/interval/hardware_root.go",
+        "pkg/math/subpaving/hardware_interval_root.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -117711,7 +117805,9 @@
         "TestSubpavingHardwareIntervalPowerRetainedBranches",
         "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
         "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
-        "TestHardwareFloatPrevPowerOfTwoSourceBoundaries"
+        "TestHardwareFloatPrevPowerOfTwoSourceBoundaries",
+        "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
+        "TestSubpavingHardwareIntervalXnEqYRetainedCases"
       ],
       "conditionals": [
         {
@@ -117881,10 +117977,18 @@
         },
         {
           "name": "Concrete f2n<hwf_manager> previous-power forwarding reached by retained hardware Newton root (src/util/f2n.h:145)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/hwf_power_of_two.go",
           "tests": [
             "TestHardwareFloatPrevPowerOfTwoSourceBoundaries"
+          ]
+        },
+        {
+          "name": "Concrete f2n<hwf_manager> arithmetic, unsigned power and previous-power lookup consumed by hardware Newton root (src/util/f2n.h:70-156)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/hardware_root.go",
+          "tests": [
+            "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation"
           ]
         }
       ],
