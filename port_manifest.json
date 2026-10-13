@@ -53044,12 +53044,16 @@
         "pkg/math/subpaving/tactic/expr_converter.go",
         "pkg/math/subpaving/tactic/expr_converter_test.go",
         "pkg/math/subpaving/tactic/arbitrary_expr_converter.go",
-        "pkg/math/subpaving/tactic/arbitrary_expr_converter_test.go"
+        "pkg/math/subpaving/tactic/arbitrary_expr_converter_test.go",
+        "pkg/math/subpaving/tactic/fast_expr_converter.go",
+        "pkg/math/subpaving/tactic/fast_goal_internalize.go",
+        "pkg/math/subpaving/tactic/fast_expr_converter_test.go"
       ],
       "tests": [
         "TestHardwareExprConverterTerms",
         "TestArbitraryExprConverterTermsAndClause",
-        "TestArbitraryExprConverterSearchSimpleGoal"
+        "TestArbitraryExprConverterSearchSimpleGoal",
+        "TestFastExprConverterTermsAndClause"
       ],
       "assertions": [
         {
@@ -53094,7 +53098,8 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "Concrete HWF and MPF context specializations now implement numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and source arithmetic refusal categories. MPF formatted zero is rejected by the source f2n wrapper, including a zero sum constant. Zero-degree monomials and full tactic ownership/integration remain open."
+        "Concrete HWF and MPF context specializations now implement numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and source arithmetic refusal categories. MPF formatted zero is rejected by the source f2n wrapper, including a zero sum constant. Zero-degree monomials and full tactic ownership/integration remain open.",
+        "The concrete MPFF instantiation now internalizes AST numerals, variables, sums, products, powers, inequalities and clauses through the selected FastEngine and owning FastShellCoefficients. Ref-counted AST cache and native integer buffer lifetimes are exercised. MPFF search and enclosing tactic result ownership remain open."
       ]
     },
     {
@@ -53106,12 +53111,16 @@
         "pkg/math/subpaving/tactic/expr_converter.go",
         "pkg/math/subpaving/tactic/expr_converter_test.go",
         "pkg/math/subpaving/tactic/arbitrary_expr_converter.go",
-        "pkg/math/subpaving/tactic/arbitrary_expr_converter_test.go"
+        "pkg/math/subpaving/tactic/arbitrary_expr_converter_test.go",
+        "pkg/math/subpaving/tactic/fast_expr_converter.go",
+        "pkg/math/subpaving/tactic/fast_goal_internalize.go",
+        "pkg/math/subpaving/tactic/fast_expr_converter_test.go"
       ],
       "tests": [
         "TestHardwareExprConverterTerms",
         "TestArbitraryExprConverterTermsAndClause",
-        "TestArbitraryExprConverterSearchSimpleGoal"
+        "TestArbitraryExprConverterSearchSimpleGoal",
+        "TestFastExprConverterTermsAndClause"
       ],
       "conditionals": [
         {
@@ -53128,7 +53137,8 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "Concrete HWF and MPF context specializations now implement numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and source arithmetic refusal categories. MPF formatted zero is rejected by the source f2n wrapper, including a zero sum constant. Zero-degree monomials and full tactic ownership/integration remain open."
+        "Concrete HWF and MPF context specializations now implement numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and source arithmetic refusal categories. MPF formatted zero is rejected by the source f2n wrapper, including a zero sum constant. Zero-degree monomials and full tactic ownership/integration remain open.",
+        "The concrete MPFF instantiation now internalizes AST numerals, variables, sums, products, powers, inequalities and clauses through the selected FastEngine and owning FastShellCoefficients. Ref-counted AST cache and native integer buffer lifetimes are exercised. MPFF search and enclosing tactic result ownership remain open."
       ]
     },
     {
@@ -53149,7 +53159,10 @@
         "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go",
         "pkg/math/subpaving/tactic/arbitrary_expr_converter_test.go",
         "pkg/math/subpaving/tactic/fast_engine.go",
-        "pkg/math/subpaving/tactic/fast_engine_test.go"
+        "pkg/math/subpaving/tactic/fast_engine_test.go",
+        "pkg/math/subpaving/tactic/fast_expr_converter.go",
+        "pkg/math/subpaving/tactic/fast_goal_internalize.go",
+        "pkg/math/subpaving/tactic/fast_expr_converter_test.go"
       ],
       "tests": [
         "TestSubpavingTacticOptionSelectionAndDescriptions",
@@ -53157,7 +53170,8 @@
         "TestArbitraryEngineSelectedContextAndPartialCleanup",
         "TestArbitraryExprConverterTermsAndClause",
         "TestArbitraryExprConverterSearchSimpleGoal",
-        "TestFastEngineSelectedOwnerAndPartialCleanup"
+        "TestFastEngineSelectedOwnerAndPartialCleanup",
+        "TestFastExprConverterTermsAndClause"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -53213,8 +53227,9 @@
       ],
       "ownership": [],
       "deviations": [
-        "The HWF and MPF branches construct concrete contexts and expression converters, internalize <=/>= literals with numeral right sides, unwrap nested negations, scale bounds by exact numerator/denominator, and add clauses in source order. The MPF converter borrows a rational manager and uses the selected owning MPF shell. A simple MPF integer-bound goal exercises internalize-then-search and displays its bound. The compound x^2 case preserves the source f2n refusal: unbounded even-power interval propagation resets its finite lower endpoint to zero, and the next interval::set calls f2n::set, whose is_regular check rejects formatted zero. MPQ/MPFF/MPFX engine construction, AST variable display, optional print_nodes output, result tactic ownership, simplify pipeline and factory remain open.",
-        "The selected MPFF engine now constructs and owns its concrete context/shell, borrowing numeral and rational managers. MPFF expression conversion, search/display, result ownership and simplify pipeline remain open."
+        "The HWF and MPF branches construct concrete contexts and expression converters, internalize <=/>= literals with numeral right sides, unwrap nested negations, scale bounds by exact numerator/denominator, and add clauses in source order. The MPF converter borrows a rational manager and uses the selected owning MPF shell. A simple MPF integer-bound goal exercises internalize-then-search and displays its bound. The compound x^2 case preserves the source f2n refusal: unbounded even-power interval propagation resets its finite lower endpoint to zero, and the next interval::set calls f2n::set, whose is_regular check rejects formatted zero. MPQ/MPFX engine construction, AST variable display, optional print_nodes output, result tactic ownership, simplify pipeline and factory remain open.",
+        "The selected MPFF engine now constructs and owns its concrete context/shell, borrowing numeral and rational managers. MPFF search/display, result ownership and simplify pipeline remain open.",
+        "The selected MPFF engine now has concrete expression and clause internalization, including nested negation and ordered disjunction. Search and full tactic result ownership remain open."
       ]
     },
     {
