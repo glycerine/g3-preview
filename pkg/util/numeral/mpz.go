@@ -1004,10 +1004,12 @@ func (m *IntegerManager) negWithAllocationContext(a *Int, context integerAllocat
 	if e := m.check(a); e != nil {
 		return e
 	}
+	m.traceMPZNeg(a, true)
 	if a.IsSmall() && a.Val == math.MinInt32 {
 		return m.setInt64WithAllocationContext(a, -int64(math.MinInt32), context)
 	}
 	a.Val = -a.Val
+	m.traceMPZNeg(a, false)
 	return nil
 }
 func (m *IntegerManager) Abs(a *Int) error {
@@ -1019,7 +1021,10 @@ func (m *IntegerManager) absWithAllocationContext(a *Int, context integerAllocat
 	}
 	if a.IsSmall() {
 		if a.Val < 0 {
-			return m.negWithAllocationContext(a, context)
+			if a.Val == math.MinInt32 {
+				return m.setInt64WithAllocationContext(a, -int64(math.MinInt32), context)
+			}
+			a.Val = -a.Val
 		}
 	} else {
 		a.Val = 1
