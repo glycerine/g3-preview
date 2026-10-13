@@ -79299,7 +79299,8 @@
         "TestShellCommandLineFilenameWarningAndOptionOrder",
         "TestShellCommandLineTerminalActionsAndKinds",
         "TestShellCommandLineSourceDecimalAndRefusals",
-        "TestShellCommandLineReachesGlobalParameterAndTimeoutOwners"
+        "TestShellCommandLineReachesGlobalParameterAndTimeoutOwners",
+        "TestShellCommandLineDebugAndTraceBuildGates"
       ],
       "conditionals": [
         {
@@ -79435,15 +79436,16 @@
             "TestShellCommandLineFilenameWarningAndOptionOrder",
             "TestShellCommandLineTerminalActionsAndKinds",
             "TestShellCommandLineSourceDecimalAndRefusals",
-            "TestShellCommandLineReachesGlobalParameterAndTimeoutOwners"
+            "TestShellCommandLineReachesGlobalParameterAndTimeoutOwners",
+            "TestShellCommandLineDebugAndTraceBuildGates"
           ]
         }
       ],
       "ownership": [
-        "The concrete command-line scan borrows actual global-parameter, timeout, verbosity and warning services. It owns parser flags and filename state; -file can overwrite or clear selection, and a selected empty filename remains distinct from a null pointer. Terminal output and frontend dispatch remain unported."
+        "The concrete command-line scan borrows actual global-parameter, timeout, verbosity, warning, trace-tag and debug contexts. It owns parser flags and filename state; -file can overwrite or clear selection, and a selected empty filename remains distinct from a null pointer. Terminal output and frontend dispatch remain unported."
       ],
       "deviations": [
-        "The concrete scan now reaches -T, -v, -nw, -t, -memory and name=value through actual utility services and preserves option order, early terminal selection, input-kind flags, duplicate warnings, C-string boundaries and -file direct assignment. It returns terminal actions for help/version/parameter display rather than writing or exiting; -tr/-dbg, executable output, Windows slash options and frontend dispatch remain open. Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go -T branch returns an explicit range error."
+        "The concrete scan now reaches -T, -v, -nw, -t, -memory, name=value and build-gated -tr/-dbg through actual utility services and preserves option order, early terminal selection, input-kind flags, duplicate warnings, C-string boundaries and -file direct assignment. Trace and debug options are unknown in builds without their corresponding source gate; compiled builds mutate borrowed tag contexts. It returns terminal actions for help/version/parameter display rather than writing or exiting; executable output, Windows slash options and frontend dispatch remain open. Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go -T branch returns an explicit range error."
       ]
     },
     {

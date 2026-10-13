@@ -40,7 +40,6 @@ const (
 var ErrShellCommandLine = errors.New("shell: invalid command line option")
 var ErrShellOptionArgument = errors.New("shell: required option argument is missing")
 var ErrShellOptionService = errors.New("shell: option service is unavailable")
-var ErrShellOptionUnported = errors.New("shell: option is not yet ported")
 
 // CommandLine borrows the process services and owns only parser state. Args
 // excludes argv[0], exactly as the source loop starts at argv[1].
@@ -49,6 +48,8 @@ type CommandLine struct {
 	Timer              *TimeoutService
 	Warnings           *diagnostic.WarningService
 	Globals            *params.GlobalParamsService
+	Trace              *diagnostic.TraceTags
+	Debug              *diagnostic.DebugContext
 	Kind               InputKind
 	StandardInput      bool
 	DisplayStatistics  bool
@@ -61,7 +62,7 @@ func NewCommandLine(warnings *diagnostic.WarningService, timer *TimeoutService, 
 	if warnings == nil {
 		warnings = diagnostic.BorrowProcessWarningService()
 	}
-	return &CommandLine{Input: NewInputFileOption(warnings), Timer: timer, Warnings: warnings, Globals: globals}
+	return &CommandLine{Input: NewInputFileOption(warnings), Timer: timer, Warnings: warnings, Globals: globals, Trace: diagnostic.BorrowProcessTraceTags()}
 }
 
 func shellCString(s string) string { return s[:text.CStringLength(s)] }
@@ -201,8 +202,30 @@ func (c *CommandLine) Parse(args []string) error {
 				}
 				c.Action, c.ActionArgument = CommandDisplayParameter, *value
 				return nil
-			case "tr", "dbg":
-				return ErrShellOptionUnported
+			case "tr":
+				if !shellTraceOptions {
+					return ErrShellCommandLine
+				}
+				if value == nil {
+					return ErrShellOptionArgument
+				}
+				if c.Trace == nil {
+					return ErrShellOptionService
+				}
+				c.Trace.Enable(*value)
+			case "dbg":
+				if !shellDebugOptions {
+					return ErrShellCommandLine
+				}
+				if value == nil {
+					return ErrShellOptionArgument
+				}
+				if c.Debug == nil {
+					return ErrShellOptionService
+				}
+				if err := c.Debug.EnableDebug(*value); err != nil {
+					return err
+				}
 			default:
 				return ErrShellCommandLine
 			}

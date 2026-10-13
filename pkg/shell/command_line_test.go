@@ -92,12 +92,68 @@ func TestShellCommandLineSourceDecimalAndRefusals(t *testing.T) {
 		{"-v", ErrShellOptionArgument}, {"-T", ErrMissingGlobalTimeout},
 		{"-t", ErrShellOptionArgument}, {"-memory", ErrShellOptionArgument},
 		{"-pp", ErrShellOptionArgument}, {"-bogus", ErrShellCommandLine},
-		{"-tr:tag", ErrShellOptionUnported}, {"-dbg:tag", ErrShellOptionUnported},
 		{"name=value", ErrShellOptionService},
 	} {
 		c = NewCommandLine(diagnostic.NewWarningService(&bytes.Buffer{}), nil, nil)
 		if err := c.Parse([]string{test.arg}); !errors.Is(err, test.want) {
 			t.Fatal(test.arg, err, test.want)
+		}
+	}
+}
+
+func TestShellCommandLineDebugAndTraceBuildGates(t *testing.T) {
+	b := arena.NewBudget(1 << 20)
+	r, err := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	d, err := diagnostic.NewDebugContext(r, b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := d.Close(); err != nil {
+			t.Error(err)
+		}
+		if err := r.Close(); err != nil {
+			t.Error(err)
+		}
+		if b.Used() != 0 {
+			t.Error("debug owner retained bytes", b.Used())
+		}
+	})
+	tags := diagnostic.NewTraceTagsWithWriter(&bytes.Buffer{})
+	c := NewCommandLine(diagnostic.NewWarningService(&bytes.Buffer{}), nil, nil)
+	c.Trace, c.Debug = tags, d
+	traceError := c.Parse([]string{"-tr:arith\x00ignored"})
+	if shellTraceOptions {
+		if traceError != nil || !tags.IsEnabled("arith") || !tags.IsEnabled("arith\x00ignored-more") {
+			t.Fatal("compiled source trace option", traceError)
+		}
+	} else if !errors.Is(traceError, ErrShellCommandLine) || tags.IsEnabled("arith") {
+		t.Fatal("erased source trace option", traceError)
+	}
+	debugError := c.Parse([]string{"-dbg:solver\x00ignored"})
+	if shellDebugOptions {
+		enabled, e := d.IsDebugEnabled("solver")
+		if debugError != nil || e != nil || !enabled {
+			t.Fatal("compiled source debug option", debugError, e, enabled)
+		}
+	} else if !errors.Is(debugError, ErrShellCommandLine) {
+		t.Fatal("erased source debug option", debugError)
+	}
+	for _, test := range []struct {
+		arg     string
+		enabled bool
+	}{
+		{"-tr", shellTraceOptions}, {"-dbg", shellDebugOptions},
+	} {
+		want := ErrShellCommandLine
+		if test.enabled {
+			want = ErrShellOptionArgument
+		}
+		if err := c.Parse([]string{test.arg}); !errors.Is(err, want) {
+			t.Fatal("source gate before argument check", test.arg, err, want)
 		}
 	}
 }
