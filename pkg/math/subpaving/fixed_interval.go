@@ -212,11 +212,11 @@ func (v *FixedInterval) CheckInvariant() error {
 		}
 		return nil
 	}
-	cmp, err := e.Compare(v.lower, v.lowerKind(), v.upper, v.upperKind())
+	less, err := e.Less(v.lower, v.lowerKind(), v.upper, v.upperKind())
 	if err != nil {
 		return err
 	}
-	if cmp >= 0 {
+	if !less {
 		return interval.ErrExtendedDomain
 	}
 	return nil

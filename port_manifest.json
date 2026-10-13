@@ -36102,6 +36102,18 @@
           "tests": [
             "TestSubpavingHardwareIntervalXnEqYRetainedCases"
           ]
+        },
+        {
+          "name": "Concrete fixed, fast and MPF check_invariant equality then extended less-than (src/math/interval/interval_def.h:658-665)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_interval.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_interval.go",
+            "pkg/math/subpaving/arbitrary_interval.go"
+          ],
+          "tests": [
+            "TestSubpavingFixedIntervalInvariantUsesExtendedLess"
+          ]
         }
       ],
       "ownership": [],
@@ -119785,6 +119797,18 @@
             "TestSubpavingHardwareIntervalPowerRetainedBranches",
             "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
             "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
+          ]
+        },
+        {
+          "name": "Concrete fixed, fast and MPF extended less-than in retained subpaving interval invariants (src/util/ext_numeral.h:268-294)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_interval.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_interval.go",
+            "pkg/math/subpaving/arbitrary_interval.go"
+          ],
+          "tests": [
+            "TestSubpavingFixedIntervalInvariantUsesExtendedLess"
           ]
         }
       ],

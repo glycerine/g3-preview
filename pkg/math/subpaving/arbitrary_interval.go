@@ -221,11 +221,11 @@ func (v *ArbitraryInterval) CheckInvariant() error {
 		}
 		return nil
 	}
-	cmp, err := e.Compare(lo, v.lowerKind(), hi, v.upperKind())
+	less, err := e.Less(lo, v.lowerKind(), hi, v.upperKind())
 	if err != nil {
 		return err
 	}
-	if cmp >= 0 {
+	if !less {
 		return interval.ErrExtendedDomain
 	}
 	return nil
