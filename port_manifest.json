@@ -163860,9 +163860,18 @@
           "tests": []
         },
         {
-          "name": "remaining real AST expression/dependency callbacks, subpaving context integration and other template configurations",
+          "name": "remaining direct AST-manager expression/dependency array callbacks, subpaving context integration and other template configurations",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "Concrete tactic goal expression, proof and dependency arrays: independent native slice copy, append, set, shrink and ascending release",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/tactic_goal_ownership.go",
+          "tests": [
+            "TestTacticGoalNativeSlicesGrowCopyUpdateAndRelease",
+            "TestTacticGoalNativeSlicesKeepActualPublicationPrefix"
+          ]
         },
         {
           "name": "Concrete subpaving bound-array copy, indexed lookup and set with borrowed bound identity",
@@ -163891,7 +163900,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "No generic Go persistent-array implementation remains. Retained goal consumers use native owning slices with independent copies; generic parray algorithms and their standalone stress workload are not ported or credited. Concrete fixed-point and fast-float subpaving bound arrays copy slices into child nodes and preserve borrowed bound identities, but the surrounding subpaving contexts remain partial. This source is not classified as dead."
+        "No generic Go persistent-array implementation remains. The retained tactic goal uses native owning slices with independent copies and now has an explicit concrete platform-replacement credit; generic parray algorithms and their standalone int32 stress workload are not ported. Direct AST-manager array callbacks remain open. Concrete fixed-point and fast-float subpaving bound arrays copy slices into child nodes and preserve borrowed bound identities, but the surrounding subpaving contexts remain partial. This source is not classified as dead."
       ]
     },
     {
