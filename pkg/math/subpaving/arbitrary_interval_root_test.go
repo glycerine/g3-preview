@@ -2,6 +2,7 @@ package subpaving
 
 import (
 	"errors"
+	"math/big"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -57,6 +58,52 @@ func TestSubpavingMPFIntervalXnEqYRetainedCases(t *testing.T) {
 	must(m.SetFractionSigned(p, 1, 8192))
 	limit := &control.Reslimit{Limit: 1000}
 	roots := interval.ArbitraryRoot{Numbers: m, Limit: limit}
+	ctx, err := NewArbitraryContext(m, limit, 20, 10, 8192)
+	must(err)
+	defer func() { must(ctx.Close()) }()
+	for _, check := range []struct {
+		value *numeral.ArbitraryFloat
+		want  string
+	}{
+		{ctx.maxBound, "10000000000"},
+		{ctx.minusMaxBound, "-10000000000"},
+		{ctx.rootPrecision, "1/8192"},
+	} {
+		got, e := m.ToRationalString(check.value)
+		must(e)
+		if got != check.want {
+			t.Fatalf("MPF context parameter = %s, want %s", got, check.want)
+		}
+	}
+	epsilonText, err := m.ToRationalString(ctx.epsilon)
+	must(err)
+	epsilonValue, ok := new(big.Rat).SetString(epsilonText)
+	if !ok {
+		t.Fatal("invalid MPF epsilon", epsilonText)
+	}
+	target := big.NewRat(1, 20)
+	delta := new(big.Rat).Sub(epsilonValue, target)
+	if delta.Sign() < 0 || delta.Cmp(new(big.Rat).SetFrac64(1, 1<<50)) > 0 {
+		t.Fatal("directed MPF epsilon", epsilonText)
+	}
+	zeroContext, err := NewArbitraryContext(m, limit, 0, 0, 0)
+	must(err)
+	zero, err := m.IsZero(zeroContext.epsilon)
+	must(err)
+	if !zeroContext.zeroEpsilon || !zero {
+		t.Fatal("zero-epsilon source branch")
+	}
+	for _, value := range []*numeral.ArbitraryFloat{zeroContext.maxBound, zeroContext.rootPrecision} {
+		one, e := m.IsOne(value)
+		must(e)
+		if !one {
+			t.Fatal("zero power/precision source fallback")
+		}
+	}
+	must(zeroContext.Close())
+	if e := zeroContext.XnEqY(b, a, 2); !errors.Is(e, arena.ErrClosed) {
+		t.Fatal("closed MPF context", e)
+	}
 	set := func(l, u int32, lOpen, uOpen bool) {
 		t.Helper()
 		must(m.SetInt32(lo, l))
@@ -78,6 +125,8 @@ func TestSubpavingMPFIntervalXnEqYRetainedCases(t *testing.T) {
 		}
 	}
 	set(4, 9, false, false)
+	must(ctx.XnEqY(b, a, 2))
+	checkEncloses(b, -3, 3)
 	must(b.XnEqY(a, 2, p, roots))
 	checkEncloses(b, -3, 3)
 	set(4, 9, false, true)

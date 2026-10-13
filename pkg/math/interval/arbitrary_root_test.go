@@ -81,13 +81,27 @@ func TestArbitraryRootRetainedNewtonCertifiedBoundsAndCancellation(t *testing.T)
 	must(m.SetFractionSigned(p, 1, 8192))
 	limit := &control.Reslimit{Limit: 1000}
 	root := ArbitraryRoot{Numbers: m, Limit: limit}
-	for _, tc := range []struct {
+	cases := []struct {
 		num, den int32
 		degree   uint32
 	}{
 		{1, 1, 2}, {-1, 1, 3}, {4, 1, 2}, {8, 1, 3}, {32, 1, 5},
 		{2, 1, 2}, {2, 1, 3}, {-2, 1, 3}, {1, 2, 2}, {1, 2, 3}, {3, 2, 3}, {-1, 2, 3},
-	} {
+	}
+	for _, num := range []int32{-17, -9, -3, 1, 2, 7, 19} {
+		for _, den := range []int32{1, 3, 11} {
+			for _, degree := range []uint32{2, 3, 5, 7} {
+				if num < 0 && degree%2 == 0 {
+					continue
+				}
+				cases = append(cases, struct {
+					num, den int32
+					degree   uint32
+				}{num, den, degree})
+			}
+		}
+	}
+	for _, tc := range cases {
 		limit.Steps = 0
 		must(m.SetFractionSigned(a, tc.num, tc.den))
 		if err := root.Bounds(a, tc.degree, p, lo, hi); err != nil {

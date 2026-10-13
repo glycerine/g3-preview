@@ -50233,7 +50233,8 @@
         "pkg/math/subpaving/arbitrary_interval_mul.go",
         "pkg/math/subpaving/arbitrary_interval_div.go",
         "pkg/math/subpaving/arbitrary_interval_scalar.go",
-        "pkg/math/subpaving/arbitrary_interval_power.go"
+        "pkg/math/subpaving/arbitrary_interval_power.go",
+        "pkg/math/subpaving/arbitrary_context_root.go"
       ],
       "tests": [
         "TestSubpavingMPFMutableIntervalRetainedCore",
@@ -50241,7 +50242,8 @@
         "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds",
         "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero",
         "TestSubpavingMPFIntervalScalarMulDiv",
-        "TestSubpavingMPFIntervalPowerRetainedCases"
+        "TestSubpavingMPFIntervalPowerRetainedCases",
+        "TestSubpavingMPFIntervalXnEqYRetainedCases"
       ],
       "conditionals": [
         {
@@ -50302,6 +50304,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval_power.go",
           "tests": [
             "TestSubpavingMPFIntervalPowerRetainedCases"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf bound-policy numerals and retained monomial inverse-root dispatch (src/math/subpaving/subpaving_t_def.h:408-514,1641; src/math/subpaving/subpaving_mpf.h:23-43)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_context_root.go",
+          "tests": [
+            "TestSubpavingMPFIntervalXnEqYRetainedCases"
           ]
         }
       ],
@@ -51095,7 +51105,8 @@
         "pkg/math/subpaving/arbitrary_interval_mul.go",
         "pkg/math/subpaving/arbitrary_interval_div.go",
         "pkg/math/subpaving/arbitrary_interval_scalar.go",
-        "pkg/math/subpaving/arbitrary_interval_power.go"
+        "pkg/math/subpaving/arbitrary_interval_power.go",
+        "pkg/math/subpaving/arbitrary_context_root.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51143,7 +51154,8 @@
         "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds",
         "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero",
         "TestSubpavingMPFIntervalScalarMulDiv",
-        "TestSubpavingMPFIntervalPowerRetainedCases"
+        "TestSubpavingMPFIntervalPowerRetainedCases",
+        "TestSubpavingMPFIntervalXnEqYRetainedCases"
       ],
       "assertions": [
         {
@@ -51645,6 +51657,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval_power.go",
           "tests": [
             "TestSubpavingMPFIntervalPowerRetainedCases"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf bound-policy numerals and retained monomial inverse-root dispatch (src/math/subpaving/subpaving_t_def.h:408-514,1641; src/math/subpaving/subpaving_mpf.h:23-43)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_context_root.go",
+          "tests": [
+            "TestSubpavingMPFIntervalXnEqYRetainedCases"
           ]
         }
       ],
@@ -117382,7 +117402,8 @@
         "pkg/util/numeral/mpf_numeral_interval.go",
         "pkg/util/numeral/mpf_numeral_arithmetic.go",
         "pkg/util/numeral/mpf_numeral_rational_string.go",
-        "pkg/util/numeral/mpf_numeral_lifetime.go"
+        "pkg/util/numeral/mpf_numeral_lifetime.go",
+        "pkg/math/subpaving/arbitrary_context_root.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -117400,7 +117421,8 @@
         "TestArbitraryFloatNumeralSourceReciprocalIncrementAndPower",
         "TestArbitraryFloatNumeralSourceRationalString",
         "TestArbitraryFloatNumeralSourceStringAndDisplay",
-        "TestArbitraryFloatNumeralSourceSwapAndDel"
+        "TestArbitraryFloatNumeralSourceSwapAndDel",
+        "TestSubpavingMPFIntervalXnEqYRetainedCases"
       ],
       "conditionals": [
         {
@@ -117543,6 +117565,14 @@
         {
           "name": "Remaining f2n<mpf_manager> interval and subpaving caller integration audit",
           "status": "unported"
+        },
+        {
+          "name": "Concrete config_mpf bound-policy numerals and retained monomial inverse-root dispatch (src/math/subpaving/subpaving_t_def.h:408-514,1641; src/math/subpaving/subpaving_mpf.h:23-43)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_context_root.go",
+          "tests": [
+            "TestSubpavingMPFIntervalXnEqYRetainedCases"
+          ]
         }
       ],
       "ownership": [
