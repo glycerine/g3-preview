@@ -69,3 +69,40 @@ func TestShellInputFileWarningRefusalPreservesSelection(t *testing.T) {
 		t.Fatal("nil receiver", err)
 	}
 }
+
+func TestShellFileOptionDirectAssignmentAndNullReset(t *testing.T) {
+	var output bytes.Buffer
+	option := NewInputFileOption(diagnostic.NewWarningService(&output))
+	if err := option.AcceptPositional("first"); err != nil {
+		t.Fatal(err)
+	}
+	second := "second\x00ignored"
+	if err := option.ApplyFileOption(&second); err != nil {
+		t.Fatal(err)
+	}
+	if name, ok := option.Selected(); !ok || name != "second" || output.Len() != 0 {
+		t.Fatal("-file must overwrite without warning", name, ok, output.String())
+	}
+	if err := option.ApplyFileOption(nil); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := option.Selected(); ok {
+		t.Fatal("-file without colon must clear the source pointer")
+	}
+	if err := option.AcceptPositional("third"); err != nil {
+		t.Fatal(err)
+	}
+	empty := ""
+	if err := option.ApplyFileOption(&empty); err != nil {
+		t.Fatal(err)
+	}
+	if name, ok := option.Selected(); !ok || name != "" {
+		t.Fatal("-file: must select a non-null empty filename", name, ok)
+	}
+	if err := option.AcceptPositional("fourth"); err != nil {
+		t.Fatal(err)
+	}
+	if name, ok := option.Selected(); !ok || name != "" || output.String() != "WARNING: input file was already specified.\n" {
+		t.Fatal("empty filename duplicate must warn and preserve selection", name, ok, output.String())
+	}
+}

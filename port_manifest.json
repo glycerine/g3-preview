@@ -79293,7 +79293,8 @@
       "tests": [
         "TestShellGlobalTimeoutOptionSourceBranch",
         "TestShellInputFileSourceBranches",
-        "TestShellInputFileWarningRefusalPreservesSelection"
+        "TestShellInputFileWarningRefusalPreservesSelection",
+        "TestShellFileOptionDirectAssignmentAndNullReset"
       ],
       "conditionals": [
         {
@@ -79412,13 +79413,21 @@
             "TestShellInputFileSourceBranches",
             "TestShellInputFileWarningRefusalPreservesSelection"
           ]
+        },
+        {
+          "name": "parse_cmd_line_args -file direct pointer assignment, overwrite and null clear (main.cpp:204-206)",
+          "status": "partial",
+          "go_target": "pkg/shell/input_file_option.go",
+          "tests": [
+            "TestShellFileOptionDirectAssignmentAndNullReset"
+          ]
         }
       ],
       "ownership": [
-        "The -T branch borrows its extracted argument and installs the resulting timer into the concrete shell TimeoutService. Input-file branches own the selected filename and borrow the warning service; a selected empty filename remains distinct from a null pointer. Full argument scanning and frontend dispatch remain unported."
+        "The -T branch borrows its extracted argument and installs the resulting timer into the concrete shell TimeoutService. Input-file branches own the selected filename and borrow the warning service; -file can overwrite or clear selection, and a selected empty filename remains distinct from a null pointer. Full argument scanning and frontend dispatch remain unported."
       ],
       "deviations": [
-        "Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go branch returns an explicit range error. The two input-file branches now preserve duplicate warnings, first selection, C-string boundaries, and terminal -- joining. Their concrete owner is not yet wired into the complete shell command-line loop or executable."
+        "Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go branch returns an explicit range error. The input-file owner now preserves duplicate warnings, first selection, C-string boundaries, terminal -- joining, and -file direct overwrite/null assignment. Its concrete owner is not yet wired into the complete shell command-line loop or executable."
       ]
     },
     {

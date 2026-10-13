@@ -1,4 +1,4 @@
-// Source: src/shell/main.cpp:119-136,275-286, concrete input-file branches.
+// Source: src/shell/main.cpp:119-136,204-206,275-286, concrete input-file branches.
 package shell
 
 import (
@@ -29,6 +29,23 @@ func (o *InputFileOption) Selected() (string, bool) {
 		return "", false
 	}
 	return o.filename, o.selected
+}
+
+// ApplyFileOption implements -file[:name]. Unlike positional input, source
+// g_input_file = opt_arg replaces any previous value; absent colon clears the
+// pointer, while a present empty argument selects an empty filename.
+func (o *InputFileOption) ApplyFileOption(argument *string) error {
+	if o == nil || o.warnings == nil {
+		return arena.ErrInvalidSlot
+	}
+	if argument == nil {
+		o.filename = ""
+		o.selected = false
+		return nil
+	}
+	o.filename = (*argument)[:text.CStringLength(*argument)]
+	o.selected = true
+	return nil
 }
 
 // AcceptPositional implements the ordinary filename branch. A duplicate
